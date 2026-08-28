@@ -221,6 +221,11 @@ export function riftRecoveryPointSafe(ctx: SimContext, p: Entity, pos: Vec3): bo
 }
 
 function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active: boolean): void {
+  // Stamp the mirror flag beside the emit, so the explicit entry/descent/exit
+  // emits and the reconciliation sweep (reconcileRiftStateMirrors) read one
+  // shared truth and can never fight over the client's riftFloor mirror.
+  const p = ctx.entities.get(pid);
+  if (p) p.riftStateActive = active;
   const floor = floorForInstance(inst);
   const event =
     inst.eventId === null
@@ -1741,7 +1746,43 @@ export function tickRiftLockpicks(ctx: SimContext): void {
   }
 }
 
+/** Reconcile each member's online riftState mirror with their actual position.
+ *
+ * ClientWorld.riftFloor is only a mirror of riftState events, while the offline
+ * Sim derives its riftFloor per tick from the player's position, so any teleport
+ * out of the band that skips emitRiftState leaves an online client stuck on the
+ * rift map at an overworld graveyard (the reported bug: die in a rift, release,
+ * open the map, see the rift floor). Rather than patching every exit path
+ * (spirit.ts releaseAtNearestGraveyard, the dead-Unstuck graveyard pull, slot
+ * teardown, and any future displacement), this per-tick sweep emits the one
+ * missing active: false for any member whose LAST emitted state was active
+ * (Entity.riftStateActive, stamped by emitRiftState) and who no longer stands
+ * inside a floor region of a run they belong to. The entry/descent emits keep
+ * riftState active because those teleports never leave the band. Draws no rng. */
+function reconcileRiftStateMirrors(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null) continue;
+    let origin: { x: number; z: number } | null = null;
+    for (const pid of inst.memberIds) {
+      const p = ctx.entities.get(pid);
+      if (!p?.riftStateActive) continue;
+      origin ??= riftInstanceOrigin(inst.slot, inst.floorIndex);
+      if (inRiftFloorRegion(p.pos, origin)) continue;
+      // Standing inside a DIFFERENT run they are also a member of (a stale
+      // membership on an unreclaimed leftover instance): that run's own
+      // enterRift emit owns the mirror, so this instance must not clear it.
+      if (isRiftPos(p.pos.x) && riftInstanceAtPos(ctx, p.pos)?.memberIds.has(pid)) continue;
+      emitRiftState(ctx, pid, inst, false);
+    }
+  }
+}
+
 export function updateRiftInstances(ctx: SimContext): void {
+  // Mirror reconciliation at TICK resolution, before the 1 Hz sweep below: a
+  // released ghost should see the world map on the tick it lands at the
+  // graveyard, not up to a second later. Zero-rng, so appending it to this
+  // phase moves no draw order.
+  reconcileRiftStateMirrors(ctx);
   // Pre-pass at TICK resolution: stamp the moment each floor boss is first seen
   // dead. The sweep below runs once a second, so without the stamp two groups
   // whose bosses fall inside the same window would be ranked by slot order and

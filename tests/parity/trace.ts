@@ -201,6 +201,13 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // In-flight Dawn's Embrace reservation for Radiant Resonance. The observable
   // cast time, mana spend, aura removal, and heal remain in the parity digest.
   'castRadiantResonance',
+  // Last-emitted riftState mirror flag (rift/runs.ts emitRiftState stamps it,
+  // reconcileRiftStateMirrors reads it): session-only presentation-sync
+  // bookkeeping, never serialized, fully derived from the riftState emit
+  // stream. Its EFFECT (which riftState events fire, and when the closing
+  // active: false lands) is pinned by the event digest (the
+  // castConsumedEmpower class).
+  'riftStateActive',
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

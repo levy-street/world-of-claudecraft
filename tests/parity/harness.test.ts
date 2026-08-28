@@ -153,6 +153,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'potionCdRemaining',
       'prevFacing',
       'prevPos',
+      'riftStateActive', // last-emitted riftState mirror flag; effect pinned via the event digest
       'scale',
       'sharedCritBonus', // derived crit core; its inputs (ratings/talents/auras) are sampled
       'skin',
@@ -207,6 +208,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'damageHistory', // Rewind's ring; only present after a player takes damage
       'castConsumedEmpower', // set only while a cast that consumed an empower resolves
       'castRadiantResonance', // set only while Dawn's Embrace has reserved the proc
+      'riftStateActive', // stamped only once a riftState event has been emitted for the player
     ]);
     const optionalMeta = new Set(['characterId', 'lastWhisperFrom']);
     for (const k of ENTITY_EXCLUDE) {
