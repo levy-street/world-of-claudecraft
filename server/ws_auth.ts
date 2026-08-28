@@ -146,10 +146,15 @@ export interface WsAuthDeps {
   // rejection fails the handshake exactly like a getCharacter failure. characterCount
   // (the tutorial greeting's firstCharacter fact; the row being joined is already
   // counted, so first means <= 1) rides the same single round trip rather than a
-  // second serial await on every handshake.
-  bankBonusForAccount: (
-    accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
+  // second serial await on every handshake, and so does seekerEntitled (whether the
+  // account holds a Seeker Genesis Token claim, which game.join turns into the
+  // promotional mount grant; server/seeker_mount_grant.ts).
+  bankBonusForAccount: (accountId: number) => Promise<{
+    bonusSlots: number;
+    sources: BankBonusSource[];
+    characterCount: number;
+    seekerEntitled: boolean;
+  }>;
 }
 
 export interface WsAuthHandlers {
@@ -457,6 +462,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // (the row being joined is already counted). Fresh-join arm only,
             // like bankBonus, whose single query carries the count.
             const firstCharacter = bankBonus.characterCount <= 1;
+            // The Seeker Genesis Token claim fact, same round trip, fresh-join arm
+            // only: game.join grants the promotional mount reins off it.
+            const seekerEntitled = bankBonus.seekerEntitled === true;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -511,6 +519,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 leaseNonce,
                 bankBonus,
                 firstCharacter,
+                seekerEntitled,
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,

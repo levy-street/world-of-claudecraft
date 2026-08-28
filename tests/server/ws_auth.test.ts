@@ -128,7 +128,12 @@ function setup() {
     // Bank bonus deps: the fresh-join arm recomputes the bank bonus and stamps it into the join
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
+    bankBonusForAccount: vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 1,
+      seekerEntitled: false,
+    })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -782,7 +787,7 @@ describe('createWsAuth: realm admission cap', () => {
     // createWsAuth destructures the deps at construction, so the three joins'
     // behaviors are queued up front: join 1 has its lease refused (a live foreign
     // lease), join 2 throws on the bank-bonus DB read, join 3 is clean.
-    const bankOk = { bonusSlots: 0, sources: [], characterCount: 1 };
+    const bankOk = { bonusSlots: 0, sources: [], characterCount: 1, seekerEntitled: false };
     deps.bankBonusForAccount = vi
       .fn(async () => bankOk)
       .mockResolvedValueOnce(bankOk)
@@ -1170,6 +1175,7 @@ describe('createWsAuth: bank bonus stamp', () => {
     const grant = {
       bonusSlots: 6,
       characterCount: 1,
+      seekerEntitled: false,
       sources: [
         { id: 'email', slots: 2, maxSlots: 2 },
         { id: 'referral', slots: 4, maxSlots: 10, count: 2, cap: 5 },
@@ -1205,6 +1211,50 @@ describe('createWsAuth: bank bonus stamp', () => {
   });
 });
 
+describe('createWsAuth: seekerEntitled stamp (the promotional mount grant fact)', () => {
+  it('stamps seekerEntitled true on a fresh join when the account holds a claim', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 1,
+      seekerEntitled: true,
+    }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    // The same single round trip as the bank bonus; the fact rides the join
+    // meta so game.join can hand the character the Seeker board reins.
+    expect(deps.bankBonusForAccount).toHaveBeenCalledTimes(1);
+    expect(joinedMeta(game).seekerEntitled).toBe(true);
+  });
+
+  it('stamps seekerEntitled false for an account with no claim', async () => {
+    const { ws, game, deps, req } = setup();
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(joinedMeta(game).seekerEntitled).toBe(false);
+  });
+
+  it('never stamps it on the resume arm (no mid-session recompute)', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 1,
+      seekerEntitled: true,
+    }));
+    game.hasSessionForCharacter = vi.fn(() => true);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
+    expect(joinedMeta(game).seekerEntitled).toBeUndefined();
+  });
+});
+
 describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact)', () => {
   it('stamps firstCharacter true when the account-wide count is at most 1', async () => {
     const { ws, game, deps, req } = setup();
@@ -1212,6 +1262,7 @@ describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact
       bonusSlots: 0,
       sources: [],
       characterCount: 1,
+      seekerEntitled: false,
     }));
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
@@ -1228,6 +1279,7 @@ describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact
       bonusSlots: 0,
       sources: [],
       characterCount: 3,
+      seekerEntitled: false,
     }));
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);

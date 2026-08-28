@@ -182,10 +182,15 @@ describe('mount reins items (the collection: owning the item is owning the mount
         //
         // The Solana Seeker is bound for a different reason, and a stated one:
         // issue #3628 requires one mount per Seeker Genesis Token, permanently
-        // bound to the claiming account, never sold, traded or transferred, so
-        // the promotional reward cannot become a secondary-market asset.
-        // soulbound IS that guarantee at the item layer.
+        // bound to the claiming account, never sold, traded or transferred.
+        // Binding alone is NOT that guarantee: the $WOC Exchange tolerates a
+        // soulbound mount on purpose, so the cash and vendor rails are closed
+        // by their own flags (policy pinned in tests/exchange_eligibility.test.ts).
         expect(item.soulbound).toBe(true);
+        if (key === 'seeker_board') {
+          expect(item.noMarketList).toBe(true);
+          expect(item.noVendorSell).toBe(true);
+        }
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
         // the guild bank like any other item (the transfer describe below).
@@ -249,10 +254,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    // reins_seeker_board is sourceless for a different reason than the
-    // raptor: it is claimed against a Solana Mobile Seeker Genesis Token
-    // (issue #3628), so its route is an external claim flow rather than any
-    // in-game table. Until that flow lands it must appear on NO table at all.
+    // reins_seeker_board is table-less for a different reason than the
+    // raptor: its one route is the server-side grant off the Seeker Genesis
+    // Token claim ledger (server/seeker_mount_grant.ts, issue #3628), which no
+    // in-game table can express, so it must appear on NO table at all.
     const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_seeker_board'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],

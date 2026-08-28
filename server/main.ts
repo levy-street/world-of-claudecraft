@@ -358,6 +358,8 @@ import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
+import { configureSeekerEntitlementRuntime } from './seeker_entitlement';
+import { grantSeekerMountToLiveSessions } from './seeker_mount_grant';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
 import { captureSignupContext, parseSignupProfile } from './signup_attribution';
@@ -3115,6 +3117,19 @@ configureDiscordRuntime({
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
 });
 
+// The Seeker Genesis Token claim route delivers the promotional mount into any
+// live session on the account the moment a fresh claim lands (same deferred
+// liveGame() closure pattern; offline accounts get it at their next fresh join
+// through game.join). The save is the audited-grant durability pattern.
+configureSeekerEntitlementRuntime({
+  grantMount: (accountId) => {
+    const game = liveGame();
+    grantSeekerMountToLiveSessions(game.clients.values(), accountId, game.sim, (session) =>
+      game.saveCharacter(session),
+    );
+  },
+});
+
 // Claudium routes mirror weapon-skin purchases into account cosmetics live (the
 // same deferred liveGame() closure pattern as the Discord hooks above).
 configureClaudiumRuntime({
@@ -3566,7 +3581,11 @@ export async function startServer(): Promise<http.Server> {
       // a separate characterCountForAccount await lengthened every handshake
       // for a fact only newborn characters use).
       const facts = await bankBonusFactsForAccount(id);
-      return { ...computeBankBonus(facts), characterCount: facts.characterCount };
+      return {
+        ...computeBankBonus(facts),
+        characterCount: facts.characterCount,
+        seekerEntitled: facts.seekerEntitled,
+      };
     },
   });
   wsAuth.attachUpgrade(server, wss);

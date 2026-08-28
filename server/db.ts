@@ -2735,7 +2735,16 @@ export async function referralCountForAccount(accountId: number): Promise<number
 //     level >= 10 (the denormalized characters.level; deliberately realm-agnostic, referrals are
 //     account-global; the characters_account index covers the probe). Counted RAW; the cap is
 //     registry data applied in computeBankBonus.
-export async function bankBonusFactsForAccount(accountId: number): Promise<BankBonusFacts> {
+//   - seekerEntitled: a seeker_entitlement_claims ROW for the account (server/seeker_entitlement_db.ts,
+//     account_id is UNIQUE there). Not a bank fact: it rides this query because it is the other
+//     fresh-join account fact (the promotional mount grant, server/seeker_mount_grant.ts) and a
+//     second serial await would lengthen every handshake for it. A row is the whole proof; the
+//     chain was verified when the row was written.
+export interface FreshJoinAccountFacts extends BankBonusFacts {
+  seekerEntitled: boolean;
+}
+
+export async function bankBonusFactsForAccount(accountId: number): Promise<FreshJoinAccountFacts> {
   const res = await pool.query(
     `SELECT
        (a.email_verified_at IS NOT NULL) AS email_verified,
@@ -2748,7 +2757,8 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
               WHERE c.account_id = r.referee_account_id AND c.level >= 10
             )) AS qualified_referrals,
        (SELECT count(*)::int FROM characters cc
-          WHERE cc.account_id = $1) AS character_count
+          WHERE cc.account_id = $1) AS character_count,
+       EXISTS(SELECT 1 FROM seeker_entitlement_claims sc WHERE sc.account_id = $1) AS seeker_entitled
      FROM accounts a
      WHERE a.id = $1`,
     [accountId],
@@ -2760,6 +2770,7 @@ export async function bankBonusFactsForAccount(accountId: number): Promise<BankB
     walletLinked: !!row?.wallet_linked,
     qualifiedReferrals: row?.qualified_referrals ?? 0,
     characterCount: row?.character_count ?? 0,
+    seekerEntitled: !!row?.seeker_entitled,
   };
 }
 

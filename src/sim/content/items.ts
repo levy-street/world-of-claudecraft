@@ -419,9 +419,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // with sellValue 0 a future un-bind would turn vendoring into a silent
   // destroy.
   //
-  // It has NO in-game acquisition path yet, so it is absent from vendors,
-  // quests, creature loot, heroic loot and rift pools; the claim flow that
-  // grants it is separate work (see the PR).
+  // It has NO in-game acquisition path: absent from vendors, quests, creature
+  // loot, heroic loot and rift pools. The one route is server-side, off the
+  // Seeker Genesis Token claim ledger (server/seeker_mount_grant.ts), which
+  // the offline world cannot hold; /dev give covers dev testing.
   reins_seeker_board: {
     id: 'reins_seeker_board',
     name: 'Genesis Key: Seeker Board',

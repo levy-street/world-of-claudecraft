@@ -701,7 +701,7 @@ describe('bankBonusFactsForAccount', () => {
   // The bank bonus-slot facts read at every fresh join. One round trip, fully
   // parameterized, with the RESOLVED criteria (verified email, level-10 referee), and
   // NEVER a balance/holder/chain read for the wallet fact.
-  it('reads all four facts in one parameterized query carrying the load-bearing predicates', async () => {
+  it('reads every fresh-join fact in one parameterized query carrying the load-bearing predicates', async () => {
     dbMock.query.mockResolvedValueOnce({
       rows: [
         {
@@ -710,6 +710,7 @@ describe('bankBonusFactsForAccount', () => {
           wallet_linked: true,
           qualified_referrals: 3,
           character_count: 2,
+          seeker_entitled: true,
         },
       ],
     } as any);
@@ -737,6 +738,9 @@ describe('bankBonusFactsForAccount', () => {
     expect(sql).toMatch(/c\.account_id\s*=\s*r\.referee_account_id/);
     // Invariant: never a balance/holder-tier/chain read for the wallet fact.
     expect(sql).not.toMatch(/balance|holder|pubkey|chain/i);
+    // The Seeker claim fact is a ROW probe on the claim ledger, keyed by the same
+    // bound account id (the promotional mount grant, server/seeker_mount_grant.ts).
+    expect(sql).toMatch(/EXISTS\(SELECT 1 FROM seeker_entitlement_claims \w+ WHERE \w+\.account_id = \$1\)/);
     // Rows map straight onto the facts object.
     expect(facts).toEqual({
       emailVerified: true,
@@ -744,6 +748,7 @@ describe('bankBonusFactsForAccount', () => {
       walletLinked: true,
       qualifiedReferrals: 3,
       characterCount: 2,
+      seekerEntitled: true,
     });
   });
 
@@ -755,6 +760,7 @@ describe('bankBonusFactsForAccount', () => {
       walletLinked: false,
       qualifiedReferrals: 0,
       characterCount: 0,
+      seekerEntitled: false,
     });
   });
 
@@ -775,6 +781,7 @@ describe('bankBonusFactsForAccount', () => {
       walletLinked: false,
       qualifiedReferrals: 0,
       characterCount: 0,
+      seekerEntitled: false,
     });
   });
 });

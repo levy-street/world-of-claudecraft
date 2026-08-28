@@ -71,6 +71,42 @@ export function resetSeekerEntitlementRuntimeForTests(): void {
   currentOwnershipVerifier = makeCurrentOwnershipVerifier();
 }
 
+/** The main.ts game-session hook the claim route needs but cannot import
+ *  without a cycle (the configureDiscordRuntime pattern): the live grant of
+ *  the Seeker promotional mount to an account whose claim just landed
+ *  (server/seeker_mount_grant.ts). */
+export interface SeekerEntitlementGameHooks {
+  grantMount(accountId: number): void;
+}
+
+let gameHooks: SeekerEntitlementGameHooks | null = null;
+
+/** Inject the game-session hook (boot). */
+export function configureSeekerEntitlementRuntime(rt: SeekerEntitlementGameHooks): void {
+  gameHooks = rt;
+}
+
+/** Clear the injected hook so a unit test can install its own fake. */
+export function resetSeekerEntitlementGameHooksForTests(): void {
+  gameHooks = null;
+}
+
+/** Best-effort by design: the ledger row IS the entitlement and the grant is
+ *  only its delivery, so neither a missing hook nor a throwing grant may turn
+ *  a landed claim into an error response. The fresh-join arm re-grants at the
+ *  next login either way. Loud in the log so a boot-wiring gap is visible. */
+function grantMountAfterClaim(accountId: number): void {
+  if (gameHooks === null) {
+    console.error('seeker entitlement runtime is not configured; mount grant deferred to login');
+    return;
+  }
+  try {
+    gameHooks.grantMount(accountId);
+  } catch (err) {
+    console.error('seeker mount grant after claim failed:', err);
+  }
+}
+
 function makeGuardDb() {
   return { accountAndScopeForToken, moderationStatusForAccount };
 }
@@ -188,6 +224,9 @@ export async function handleSeekerEntitlementClaim(
     });
     return;
   }
+  // A FRESH claim delivers the mount now; existing_same means the account was
+  // already entitled, and its join arm has already handled (or will handle) it.
+  if (result.status === 'claimed') grantMountAfterClaim(accountId);
   json(res, 200, { entitled: true, mint: result.mint });
 }
 
