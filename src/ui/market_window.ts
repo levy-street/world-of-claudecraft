@@ -30,7 +30,8 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
-import { itemDisplayName } from './entity_i18n';
+import { itemDisplayName, tEntity } from './entity_i18n';
+import { ITEMS } from '../sim/data';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
@@ -139,6 +140,7 @@ export class MarketWindow {
   // once the server echoes the new myListingCount without clobbering the form.
   private lastMyListingCount = -1;
   private lastMaxListings = -1;
+  private localizedNameEntries: Array<{ localized: string; itemID: string }>;
   private openerFocus: HTMLElement | null = null;
   // Armed by onReconnected() and cleared by the next refreshIfChanged() that
   // actually observes a post-reconnect MarketInfo. onReconnected() fires
@@ -151,7 +153,24 @@ export class MarketWindow {
   // next snapshot lets it see the real post-reconnect echo instead.
   private pendingReconnectResync = false;
 
-  constructor(private readonly deps: MarketWindowDeps) {}
+  constructor(private readonly deps: MarketWindowDeps) {
+    this.localizedNameEntries = Object.entries(ITEMS).map(([id, item]) => ({
+      localized: tEntity({ kind: 'item', id, field: 'name' }),
+      itemID: id,
+    }));
+  }
+
+  private convertSearchTerm(searchTerm: string): string {
+    if (!searchTerm) return searchTerm;
+    const lcSearch = searchTerm.trim().toLowerCase();
+    for (const entry of this.localizedNameEntries) {
+      if (entry.localized.toLowerCase().includes(lcSearch)) {
+        const item = ITEMS[entry.itemID];
+        return item.name ?? entry.itemID;
+      }
+    }
+    return searchTerm;
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -462,7 +481,7 @@ export class MarketWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const searchInput = el.querySelector<HTMLInputElement>('.mkt-search');
     searchInput?.addEventListener('input', () => {
-      this.searchQuery = searchInput.value;
+      this.searchQuery = this.convertSearchTerm(searchInput.value);
       this.browsePage = 0;
       this.pushQuery();
     });
