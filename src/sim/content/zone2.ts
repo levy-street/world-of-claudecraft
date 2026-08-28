@@ -2056,8 +2056,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'common',
     foodHp: 243,
-    sellValue: 10,
-    buyValue: 50,
+    sellValue: 25,
+    buyValue: 400,
   },
   marsh_mint_tea: {
     id: 'marsh_mint_tea',
@@ -2065,8 +2065,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'drink',
     quality: 'common',
     drinkMana: 288,
-    sellValue: 10,
-    buyValue: 50,
+    sellValue: 25,
+    buyValue: 400,
   },
   smoked_eel: {
     id: 'smoked_eel',
@@ -2074,8 +2074,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'common',
     foodHp: 432,
-    sellValue: 20,
-    buyValue: 90,
+    sellValue: 60,
+    buyValue: 1000,
   },
   silvermist_cordial: {
     id: 'silvermist_cordial',
@@ -2083,8 +2083,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'drink',
     quality: 'common',
     drinkMana: 436,
-    sellValue: 20,
-    buyValue: 90,
+    sellValue: 60,
+    buyValue: 1000,
   },
   // --- vendor white gear (Provisioner Hale) ---
   bogiron_mace: {
