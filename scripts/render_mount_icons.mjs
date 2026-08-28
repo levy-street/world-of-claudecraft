@@ -22,6 +22,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
 const outDir = path.join(root, 'public/ui/items');
 const OUT_PX = 128; // matches the existing public/ui/items icon size (mapping.json iconSize)
+// The item-icon vignette (a soft radial glow over near-black), the shipped icon
+// family's ground. Every shipped item icon is fully OPAQUE
+// (docs/design/item-icon-art-style.md, machine-checked by
+// tests/item_art_consistency.test.ts), so a render is composited over this
+// rather than shipped on transparency. Same ground as render_island_item_icons.
+const ITEM_ICON_GROUND_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="${OUT_PX}" height="${OUT_PX}"><defs><radialGradient id="g" cx="50%" cy="42%" r="62%"><stop offset="0%" stop-color="#3a3527"/><stop offset="55%" stop-color="#211d15"/><stop offset="100%" stop-color="#0d0b08"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`;
 const debugDir = process.env.DEBUG_DIR || null;
 mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
@@ -159,8 +165,12 @@ for (const job of JOBS) {
     if (!alpha || alpha.max < 8) {
       throw new Error(`blank render (alpha max ${alpha ? alpha.max : 'none'})`);
     }
-    const webp = await sharp(png)
+    const subject = await sharp(png)
       .resize(OUT_PX, OUT_PX, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+    const webp = await sharp(Buffer.from(ITEM_ICON_GROUND_SVG))
+      .composite([{ input: subject }])
       .webp({ quality: 90, alphaQuality: 100, effort: 6 })
       .toBuffer();
     writeFileSync(path.join(outDir, `${job.id}.webp`), webp);
