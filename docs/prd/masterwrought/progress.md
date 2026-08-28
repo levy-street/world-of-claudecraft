@@ -957,3 +957,28 @@ freeze: 3212/22 files, 47302 passed / 2 xfail / 380 skipped, tsc and
 ci:changed and both regens clean, drift attributed byte-exact. Full
 ledger, judged lists, and the recorded maintainer reads: state.md,
 "Phase 13 QA ledger". LOCAL only, no push, no PR.
+
+## Phase 14 (2026-08-28): COMPLETE, the crafting UX beauty pass
+One professions interface out of two families, DESIGN.md governed.
+Seven commits: the ip-14-UI migration (src/ui/hud/professions/ minted,
+42 modules moved zero-logic), the three-slice feature wave (the
+Perfecting window + naming dialog + apex surfacing; cap visibility +
+the commission quality signal + the catalyst refusal countdown; four
+dedicated cues + the kind-fair tray + the copy carries), the
+unification slice (one log-tone source, one denial pattern, one
+stepped-track and one empty-state family, one placement-verb pattern,
+the journal writer polish, the feast-flourish prewarm close, farming's
+first DESIGN.md compliance statement), and three review-round commits
+(five wave-1 reviewers + the render reviewer + a fresh reader + the
+qa-checklist gate + its frontend pass, every finding applied or
+recorded). THE STOP RULE FIRED: the commission minimum-fee floor is
+PARKED, a maintainer ruling owed on the fee's mechanics and the floor's
+basis (state.md, "Phase 14 ledger"). hud.ts fell 18242 to 18217 with
+sim.ts and game.ts also lowered, all ceilings exact; parity goldens
+byte-unmoved; screenshots under docs/screenshots/masterwrought-phase-14
+with the sparse cone extended same-change. FROZEN at 6ed1915a4e EXIT=0:
+3220/22 files (3242), 47435 passed / 2 xfail / 380 skipped, tsc /
+error-level changed-files biome / both regens clean after the last
+commit, drift = exactly the eight new suites plus their extended arms.
+Full record: state.md, "Phase 14 ledger". LOCAL only, no push, no PR.
+NEXT = Phase 14 QA (phase-14-qa.md), FRESH session.

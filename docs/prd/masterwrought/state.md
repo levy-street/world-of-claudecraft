@@ -20431,3 +20431,36 @@ Parity goldens byte-unmoved (verified twice: the build and the
 review rounds). The consumable starvation pin FLIPPED by design; the
 hud_update_drive registry unchanged (the window polls itself at 1 Hz,
 never from update()).
+
+### THE FROZEN STAMP: one run, EXIT=0 at 6ed1915a4e
+TIP 6ed1915a4e (the seventh phase commit, the qa-round frontend-review
+fixes), PORCELAIN 0 before and after, zero vitest processes before,
+DATABASE_URL unset, the wrapper wrote TIP first and SUITE_EXIT=0 before
+the follow-on stages. npm test: 3220 passed / 22 skipped files (3242);
+47435 passed / 2 expected fail / 380 skipped (47817);
+2026-08-28T11:07:32Z to 11:14:59Z. Follow-ons all clean AFTER the last
+commit: tsc, changed-files biome at error level (1041 files, zero
+errors; warnings are the pre-existing debt), wiki:content and i18n:gen
+both zero-diff (porcelain 0 after both). Drift vs the Phase 13 QA stamp
+f9eed89385 (3212/22 files 3234; 47302/2/380 47684): files +8 passed,
+exactly the eight new suites (perfecting_view, perfecting_window,
+input_dialog, apex_recipe_view, masterwrought_cap_view,
+sim_calendar_feed, denial_line_core, profession_log_tones); tests +133
+passed from those suites plus the extended arms across the touched
+suites, skipped and xfail unmoved. The one commit after the run is this
+docs-only stamp, per the convention.
+
+HANDOFF: Phase 14 QA (phase-14-qa.md), the twin. The one professions
+interface is standing: the Perfecting window with its naming dialog,
+bind warning, and status region; the crafting window's apex surfacing
+and Perfecting entry; cap visibility on the character sheet and
+tooltips; the commission quality signal (the fee floor PARKED behind
+the fired stop rule, ruling owed); the kind-fair tray; the four
+dedicated cues; and the one-of-each unification with farming's first
+DESIGN.md compliance statement. Seven commits, every reviewer finding
+applied or recorded, the frozen suite green at 6ed1915a4e. The QA twin
+additionally owes (per the phase file): the farming-window compliance
+statements re-derived with evidence, the merged bucket table audit,
+both screenshot subtrees, and the VERIFY set (perf tour, mobile E2E;
+the browser suite ran green this phase, 263 cases). The judged lists
+above and the standing sets are binding.
