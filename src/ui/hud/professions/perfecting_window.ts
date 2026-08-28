@@ -237,6 +237,9 @@ export class PerfectingWindow {
     }
     const prev = this.prevSelected;
     if (detail && prev && samePerfectRef(prev.ref, detail.ref)) {
+      // The edge latches through prevSelected below, so whichever forced
+      // repaint observes it first (the 1 Hz tick, or a relocalize that beat
+      // it) plays the cue exactly once; a later repaint can never replay it.
       if (detail.info.rank > prev.rank || (detail.info.perfected && !prev.perfected)) {
         audio.perfectingSuccess();
       }
@@ -283,6 +286,27 @@ export class PerfectingWindow {
         this.selectedRef = ref;
         this.paint();
       });
+      // Owned stacks get the real item tooltip (the commission-board shape):
+      // a candidate resolves its own copy's payload so the Perfected badge
+      // and rank line ride along.
+      const c = view.candidates[Number(btn.dataset.candI)];
+      const def = c ? ITEMS[c.itemId] : undefined;
+      if (c && def) {
+        // Lazy thunk (the attachTooltip contract), resolving the copy's
+        // payload at hover time off the LIVE world so the badge lines track
+        // the mirrors rather than the render.
+        const ref = c.ref;
+        this.deps.attachTooltip(btn, () => {
+          const live = this.deps.world();
+          const instance =
+            'slot' in ref ? live.equipmentInstances[ref.slot] : live.inventory[ref.bag]?.instance;
+          return this.deps.itemTooltip(def, instance);
+        });
+      }
+    }
+    for (const row of root.querySelectorAll<HTMLElement>('[data-mat-id]')) {
+      const def = ITEMS[row.dataset.matId ?? ''];
+      if (def) this.deps.attachTooltip(row, () => this.deps.itemTooltip(def));
     }
     root.querySelector('[data-action]')?.addEventListener('click', () => {
       const detail = this.paintedView?.detail;
@@ -294,6 +318,28 @@ export class PerfectingWindow {
         this.openNamingDialog(detail);
       }
     });
+  }
+
+  /** Focus repair after a prompt teardown: dismissAndReturn's captured opener
+   *  may have been detached by a mid-prompt 1 Hz repaint (the root rebuilds
+   *  through innerHTML), and a landed promotion dismisses with no return at
+   *  all, so whenever a teardown leaves focus outside the window put it on
+   *  the best live rung: the selected candidate row, the action button, then
+   *  close. All three carry focus keys, so a repaint that follows in the same
+   *  frame carries the choice across. This is the dialog-return half of focus
+   *  management, not a repaint-refocus (the #2377 ruling bars those; it runs
+   *  only when a prompt THIS window opened has just torn down, and the window
+   *  is FocusManager-registered).  */
+  private refocusAfterPrompt(): void {
+    if (!this.isOpen) return;
+    const root = this.root();
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active !== document.body && root.contains(active)) return;
+    restoreFirstEnabled([
+      root.querySelector<HTMLElement>('.pf-cand[aria-checked="true"]'),
+      root.querySelector<HTMLElement>('[data-action]'),
+      root.querySelector<HTMLElement>('[data-close]'),
+    ]);
   }
 
   private sendAttempt(ref: PerfectItemRef): void {
@@ -309,7 +355,12 @@ export class PerfectingWindow {
    *  shared modal recipe (never a hand-rolled trap). */
   private confirmBindThenAttempt(detail: PerfectingDetail): void {
     const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
+    if (!stack) {
+      // Dev-channel only: both entry documents ship #prompt-stack, so a miss
+      // is a broken embed, and a silently dead confirm would read as a bug.
+      console.warn('perfecting: #prompt-stack missing, bind confirm unavailable');
+      return;
+    }
     const def = ITEMS[detail.itemId];
     const name = def ? itemDisplayName(def) : detail.itemId;
     const prompt = document.createElement('div');
@@ -330,14 +381,29 @@ export class PerfectingWindow {
     actions.append(cancel, confirm);
     prompt.append(text, actions);
     const opener = this.root().querySelector<HTMLElement>('[data-action]');
-    const { dismissAndReturn } = installPromptDialog(prompt, opener, () => prompt.remove(), {
-      inertRoot: this.root(),
-      idPrefix: 'pf-bind-title',
-    });
+    const { dismissAndReturn } = installPromptDialog(
+      prompt,
+      opener,
+      () => {
+        prompt.remove();
+        this.refocusAfterPrompt();
+      },
+      {
+        inertRoot: this.root(),
+        idPrefix: 'pf-bind-title',
+      },
+    );
     confirm.addEventListener('click', () => {
-      const ref = this.paintedView?.detail?.ref ?? detail.ref;
+      // Send the ref the dialog was OPENED for, never a re-resolve: the 1 Hz
+      // repaint keeps running behind the prompt and the HUD outside this
+      // window stays interactive, so a bag shift mid-dialog would make a
+      // re-resolved view fall back to another candidate and this confirm
+      // would bind THAT copy. A genuinely stale captured ref resolves to
+      // nothing server-side (the index-plus-id pin) and answers with the
+      // sim's own noItem line, which is the safe direction (the phase 13
+      // peek/consume ruling).
       dismissAndReturn();
-      this.sendAttempt(ref);
+      this.sendAttempt(detail.ref);
     });
     cancel.addEventListener('click', () => dismissAndReturn());
     stack.appendChild(prompt);
@@ -352,14 +418,18 @@ export class PerfectingWindow {
       opener: this.root().querySelector<HTMLElement>('[data-action]'),
       itemName: def ? itemDisplayName(def) : detail.itemId,
       onSubmit: (name) => {
-        // Re-resolve the ref at submit time (the dialog can outlive a
-        // repaint); a genuinely stale ref answers the sim's noItem line.
-        const ref = this.paintedView?.detail?.ref ?? detail.ref;
+        // Send the ref the dialog was OPENED for, never a re-resolve: a bag
+        // shift mid-dialog would retarget a re-resolved view onto another
+        // candidate and spend the Deed of Making naming the wrong copy. A
+        // stale captured ref resolves to nothing server-side (the
+        // index-plus-id pin) and answers with the sim's noItem line, the
+        // safe direction (the phase 13 peek/consume ruling).
         this.setPendingSend(true);
-        this.deps.world().perfectItem(ref, name);
+        this.deps.world().perfectItem(detail.ref, name);
       },
       onClosed: () => {
         this.namingDialog = null;
+        this.refocusAfterPrompt();
       },
     });
   }
@@ -368,7 +438,9 @@ export class PerfectingWindow {
 
   private bodyHtml(view: PerfectingViewModel): string {
     if (view.candidates.length === 0) {
-      return `<p class="pf-empty">${esc(t('hudChrome.perfecting.empty'))}</p>`;
+      // The family empty state (.prof-empty, phase 14): body line alone, the
+      // section-empty variant.
+      return `<div class="prof-empty"><p>${esc(t('hudChrome.perfecting.empty'))}</p></div>`;
     }
     // Single-select rows are a radiogroup of natively tabbable radios (the
     // plant sheet's a11y shape); the group borrows the dialog title as its
@@ -397,10 +469,18 @@ export class PerfectingWindow {
     const worn = c.worn
       ? `<span class="pf-chip">${esc(t('hudChrome.perfecting.wornChip'))}</span>`
       : '';
+    // A promoted legend's row leads with its player-chosen name (raw VALUE,
+    // esc'd standalone per D13-2) so two promotions of one base item read
+    // apart at a glance; the base name rides beneath, the detail-pane shape.
+    const rowName = c.state === 'promoted' && c.chosenName !== null ? c.chosenName : name;
+    const sub =
+      c.state === 'promoted' && c.chosenName !== null
+        ? `<span class="pf-cand-sub">${esc(name)}</span>`
+        : '';
     return (
       `<li role="none"><button type="button" role="radio" class="pf-cand" data-cand-i="${index}" data-focus-key="${esc(focusKey)}" aria-checked="${c.selected ? 'true' : 'false'}">` +
       `<span class="pf-cand-socket">${icon}</span>` +
-      `<span class="pf-cand-main"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(name)}</span>${worn}</span>` +
+      `<span class="pf-cand-main"><span class="pf-name${c.state === 'promoted' ? ' q-legendary' : ''}">${esc(rowName)}</span>${sub}${worn}</span>` +
       `<span class="pf-cand-state">${esc(this.stateText(c.state, c.rank, c.ranks))}</span>` +
       `</button></li>`
     );
@@ -420,14 +500,16 @@ export class PerfectingWindow {
       `<span class="pf-detail-names"><span class="pf-detail-name${d.state === 'promoted' ? ' q-legendary' : ''}">${esc(promotedName ? (d.chosenName as string) : name)}</span>` +
       `${promotedName ? `<span class="pf-detail-sub">${esc(name)}</span>` : ''}</span></div>`;
     const statusText = this.stateText(d.state, d.info.rank, d.info.ranks);
+    // The shared .prof-track family (phase 14) carries the anatomy; the
+    // pf- classes stay for the settled-state fills keyed off data-state.
     const steps = Array.from({ length: d.info.ranks }, (_, i) => {
       const filled = d.state !== 'track' || i < d.info.rank;
-      return `<span class="pf-step${filled ? ' filled' : ''}"></span>`;
+      return `<span class="prof-track-step pf-step${filled ? ' filled' : ''}"></span>`;
     }).join('');
     const track =
-      `<div class="pf-track" data-state="${esc(d.state)}">` +
-      `<span class="pf-track-steps" aria-hidden="true">${steps}</span>` +
-      `<span class="pf-track-label">${esc(statusText)}</span></div>`;
+      `<div class="prof-track pf-track" data-state="${esc(d.state)}">` +
+      `<span class="prof-track-steps" aria-hidden="true">${steps}</span>` +
+      `<span class="prof-track-text pf-track-label">${esc(statusText)}</span></div>`;
     const warning = d.bindWarning
       ? `<div class="pf-warning" role="note">${svgIcon('alert')}<span>${esc(t('hudChrome.perfecting.bindWarn', { name }))} ${esc(t('hudChrome.perfecting.bindWarnDetail'))}</span></div>`
       : '';
@@ -446,7 +528,7 @@ export class PerfectingWindow {
         const matIcon = matDef ? this.deps.itemIcon(matDef) : '';
         const short = row.have < row.required;
         return (
-          `<li class="pf-mat${short ? ' short' : ''}"><span class="pf-cand-socket">${matIcon}</span>` +
+          `<li class="pf-mat${short ? ' short' : ''}" data-mat-id="${esc(row.itemId)}"><span class="pf-cand-socket">${matIcon}</span>` +
           `<span class="pf-name">${esc(matName)}</span>` +
           `<span class="pf-mat-count">${esc(t('hudChrome.perfecting.matCount', { have: wholeNumber(row.have), required: wholeNumber(row.required) }))}</span></li>`
         );

@@ -9705,6 +9705,7 @@ export const zh_CN: EnTranslations = {
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickSetOut": "点击摆放",
+      "clickSetUp": "点击架设",
       "clickBuyback": "点击回购",
       "bagSlots": "{slots} 格背包"
     },

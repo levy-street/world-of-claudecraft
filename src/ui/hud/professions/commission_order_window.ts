@@ -137,9 +137,13 @@ function renderSection(
   heading.textContent = t(titleKey as never);
   body.appendChild(heading);
   if (rows.length === 0) {
+    // The professions family empty state (.prof-empty, phase 14), replacing
+    // the borrowed vendor-family class: body line alone, the section variant.
     const empty = document.createElement('div');
-    empty.className = 'vendor-empty';
-    empty.textContent = t(emptyKey as never);
+    empty.className = 'prof-empty';
+    const line = document.createElement('p');
+    line.textContent = t(emptyKey as never);
+    empty.appendChild(line);
     body.appendChild(empty);
     return;
   }

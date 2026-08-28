@@ -8,6 +8,7 @@
 // GLB here resolves through the primitive-box fallback. That is deliberate
 // coverage, not a shortcut: the fallback is the path the game itself takes on
 // the frames before the assets land.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
@@ -760,5 +761,30 @@ describe('the GLB-loaded adapter branch (synthetic scenes, no file IO)', () => {
       cloned.onBeforeCompile,
       'the clone must carry a real hook, not the prototype default',
     ).not.toBe(new THREE.MeshStandardMaterial().onBeforeCompile);
+  });
+});
+
+describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
+  it("renderer's prewarm pass holds the farm sync until the world holds its own player", () => {
+    // The unarmed-baseline arm above deliberately pins that an EMPTY first
+    // pass arms the flourish, so the close for carry 16 lives at the RENDERER
+    // call site: prewarmWorldFrame may only sync the farm visuals once the
+    // world's entity map holds the player (the entry watch's own readiness
+    // predicate), or a prewarm over a snapshot-less online mirror would
+    // consume the silent first pass and every standing feast would puff on
+    // the first live read. Comments are stripped so the doc paragraph that
+    // NAMES the guard cannot satisfy the pin.
+    const src = readFileSync('src/render/renderer.ts', 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(src).toContain(
+      'if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(',
+    );
+    // The live-frame call site stays UNGUARDED by design (it runs only after
+    // entry completes, and its own doc paragraph in prewarmWorldFrame says
+    // why), so exactly one of the two sync call sites carries the guard; a
+    // refactor that removes either shows up here.
+    const calls = src.match(/this\.farmPatchVisuals\.sync\(/g) ?? [];
+    expect(calls).toHaveLength(2);
   });
 });

@@ -525,6 +525,7 @@ import {
   buildProfessionIdentityView,
   professionSurfaceRefreshSig,
 } from './hud/professions/profession_identity_view';
+import { PROF_LOG_DENY, PROF_LOG_GRANT } from './hud/professions/profession_log_tones';
 import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
 import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
 import { ProfessionsWindow } from './hud/professions/professions_window';
@@ -11399,7 +11400,7 @@ export class Hud {
                 name: grantItemToken(ev.itemId),
                 qty: grantQtyText(ev.count),
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
             const recipe = ALL_RECIPES.find((r) => r.id === ev.recipeId);
             audio.craftSuccess(recipe?.professionId ?? '');
@@ -11421,7 +11422,7 @@ export class Hud {
                   ? { station: stationNameText(denial.stationType) }
                   : denial.params,
               ),
-              '#ff6b6b',
+              PROF_LOG_DENY,
             );
           }
           if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
@@ -11444,7 +11445,7 @@ export class Hud {
               t('hudChrome.training.learned', {
                 recipe: item ? itemDisplayName(item) : ev.recipeId,
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
           } else if (ev.reason) {
             // A reason-less deny is the malformed-recipe-id probe arm
@@ -11468,7 +11469,7 @@ export class Hud {
                           ? 'hudChrome.training.alreadyKnown'
                           : 'hudChrome.training.outOfRange',
                   ),
-              '#ff6b6b',
+              PROF_LOG_DENY,
             );
           }
           // Flip the trained row (and the crafting list, which filters to
@@ -11492,14 +11493,14 @@ export class Hud {
                 name: unboundName,
                 fee: formatLocalizedMoney(ev.fee),
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
           } else if (ev.reason) {
             // A reason-less deny is the malformed-item-id probe arm
             // (resolveUnbind's silent arm): nothing legible to render. The
             // reason-to-key pairing is the total UNBIND_DENY_KEY record in
             // hud/vendor/unbind_view.ts, never a chain here.
-            this.log(t(unbindDenyKey(ev.reason)), '#ff6b6b');
+            this.log(t(unbindDenyKey(ev.reason)), PROF_LOG_DENY);
           }
           // Refresh the service rows and the bags (the single-copy unbind
           // clears boundTo in place, so no loot event repaints them for us).
@@ -11573,7 +11574,7 @@ export class Hud {
                 // requesterName, never the crafter's own entity name.
                 name: ev.action === 'deliver' ? (ev.requesterName ?? '') : '',
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
           } else if (ev.reason) {
             const denyKey =
@@ -11606,7 +11607,7 @@ export class Hud {
                                         : ev.reason === 'deliver_out_of_range'
                                           ? 'hudChrome.commissionBoard.denyOutOfRange'
                                           : 'hudChrome.commissionBoard.denyNoSpace';
-            this.log(t(denyKey), '#ff6b6b');
+            this.log(t(denyKey), PROF_LOG_DENY);
           }
           // Refresh the board window if open (renderCommissionBoard no-ops
           // when it is not); deliver also touches bags on the crafter's own
@@ -13149,9 +13150,8 @@ export class Hud {
             this.combatLog(text, ev.color ?? '#ccc');
           else this.log(text, ev.color ?? '#ccc');
           if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
-          // Sundering completion cue: matched on the RAW English before
-          // localization, the fiestaRevive precedent (predicate + weld:
-          // profession_event_lines_core.ts).
+          // Sundering completion cue: raw-English match pre-localization (the
+          // fiestaRevive precedent; weld: profession_event_lines_core.ts).
           if (isSunderCompletionLog(ev.text)) audio.sunderComplete();
           const bubble = chatBubbleKind(ev.text);
           if (ev.entityId !== undefined && bubble !== null)

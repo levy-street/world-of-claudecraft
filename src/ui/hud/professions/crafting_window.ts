@@ -24,7 +24,6 @@
 // it, so assistive tech never sees the text).
 
 import type { StationType } from '../../../sim/professions/stations';
-import { craftNameText } from '../../char_window';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, tEntity } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -46,6 +45,7 @@ import {
   IDLE_CRAFT_CAST_SESSION,
   maxCraftBatchFit,
 } from './craft_cast_view';
+import { craftNameText } from './craft_name_view';
 import {
   type CraftDifficulty,
   type CraftingView,
@@ -201,9 +201,13 @@ export function renderCraftingWindow(
   if (identity) renderProfessionIdentityCard(el, identity);
 
   if (view.recipes.length === 0) {
+    // The professions family empty state (.prof-empty, phase 14), replacing
+    // the borrowed vendor-family class: body line alone, the section variant.
     const empty = document.createElement('div');
-    empty.className = 'vendor-empty';
-    empty.textContent = t('hudChrome.crafting.empty');
+    empty.className = 'prof-empty';
+    const line = document.createElement('p');
+    line.textContent = t('hudChrome.crafting.empty');
+    empty.appendChild(line);
     el.appendChild(empty);
   }
 

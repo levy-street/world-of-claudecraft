@@ -250,7 +250,9 @@ export class PlantSheetWindow {
 
   private bodyHtml(view: PlantSheetViewModel): string {
     if (view.seedRows.length === 0 && view.lockedRows.length === 0) {
-      return `<p class="ps-empty">${esc(t('hudChrome.farming.plantSheet.empty'))}</p>`;
+      // The family empty state (.prof-empty, phase 14): body line alone, the
+      // section-empty variant.
+      return `<div class="prof-empty"><p>${esc(t('hudChrome.farming.plantSheet.empty'))}</p></div>`;
     }
     // The seed rows are SINGLE-SELECT (picking one un-picks the rest), so
     // they expose radiogroup semantics, not a row of independent aria-pressed
@@ -276,7 +278,7 @@ export class PlantSheetWindow {
     const plant =
       view.seedRows.length > 0
         ? `<button type="button" class="ps-plant" data-plant data-focus-key="plantSheetPlant">${esc(t('hudChrome.farming.plantSheet.plant'))}</button>`
-        : `<p class="ps-empty">${esc(t('hudChrome.farming.plantSheet.empty'))}</p>`;
+        : `<div class="prof-empty"><p>${esc(t('hudChrome.farming.plantSheet.empty'))}</p></div>`;
     return `${seeds}${locked}${knobs}${plant}`;
   }
 

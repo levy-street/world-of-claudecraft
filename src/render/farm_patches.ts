@@ -449,12 +449,16 @@ export class FarmPatchVisuals {
    *  would consume the silent first pass over an empty entity map (that
    *  baseline is deliberately pinned by tests/farm_patches_adapter.test.ts),
    *  so every feast already standing in interest scope would puff on the
-   *  first live read. Today no such pass precedes the first snapshot; if an
-   *  entry-sequence change ever creates one, the fix belongs at the RENDERER
-   *  call site (hold farmPatchVisuals.sync until the mirror is synced),
-   *  never as a non-empty-map guard here, which would flip the pinned
-   *  rebuild/login silence into a burst. Cosmetic either way: both emitters
-   *  ride vfx.ts's scaled budget. */
+   *  first live read. CLOSED at the renderer call site (Masterwrought
+   *  phase 14, 2026-08-28): prewarmWorldFrame holds this sync until the
+   *  world holds its own player entity (the entry watch's readiness
+   *  predicate), a guard that is inert in every reachable sequence today
+   *  (offline Sims populate synchronously; online entry waits for the first
+   *  snapshot before the renderer exists) and exists against a future
+   *  entry-sequence change. The fix stays at the RENDERER call site by
+   *  design, never as a non-empty-map guard here, which would flip the
+   *  pinned rebuild/login silence into a burst. Cosmetic either way: both
+   *  emitters ride vfx.ts's scaled budget. */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;

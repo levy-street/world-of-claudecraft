@@ -9705,6 +9705,7 @@ export const nl_NL: EnTranslations = {
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Klik om terug te kopen",
       "bagSlots": "Tas met {slots} vakken"
     },

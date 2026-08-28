@@ -304,4 +304,35 @@ describe('dailyResetRemainingSec', () => {
       dailyResetRemainingSec(now, DEFAULT_RAID_RESET_TIME_ZONE),
     );
   });
+
+  it('survives the ambiguous DST fall-back hour: the memo expires on the instant, not the label', () => {
+    // EET fall-back 2026-10-25: local 04:00 EEST becomes 03:00 EET, so 03:00
+    // happens twice. resetDayKey flips at the FIRST 03:00 (00:00Z) while the
+    // reset resolves to the SECOND (01:00Z). A label-keyed memo populated at
+    // 00:00Z would keep serving 01:00Z after it passed, pinning the answer at
+    // the 1-second floor for the rest of the window (the wave-1 hot-path
+    // review's measured finding). The memo must re-resolve once the cached
+    // instant passes, in exact agreement with nextRaidResetMs at every probe.
+    const zone = 'Europe/Athens';
+    const firstThree = Date.UTC(2026, 9, 25, 0, 0, 0);
+    const secondThree = Date.UTC(2026, 9, 25, 1, 0, 0);
+    // Populate the memo inside the ambiguous window, then probe past the
+    // resolved reset: the answer must track nextRaidResetMs, never the floor.
+    expect(dailyResetRemainingSec(firstThree, zone)).toBe(
+      Math.ceil((nextRaidResetMs(firstThree, zone) - firstThree) / 1000),
+    );
+    for (const probe of [
+      secondThree - 1000,
+      secondThree,
+      secondThree + 60 * 1000,
+      secondThree + 12 * 3600 * 1000,
+    ]) {
+      expect(dailyResetRemainingSec(probe, zone), new Date(probe).toISOString()).toBe(
+        Math.max(1, Math.ceil((nextRaidResetMs(probe, zone) - probe) / 1000)),
+      );
+    }
+    // Sanity: an hour after the second 03:00 the countdown is a large number
+    // (the next day's reset), not the 1-second lie.
+    expect(dailyResetRemainingSec(secondThree + 3600 * 1000, zone)).toBeGreaterThan(20 * 3600);
+  });
 });

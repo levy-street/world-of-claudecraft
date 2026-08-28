@@ -203,7 +203,15 @@ export function dailyResetRemainingSec(
 ): number {
   const memoKey = `${resetDayKey(nowMs, zone)}:${zone}`;
   let resetAt = nextResetMemo.get(memoKey);
-  if (resetAt === undefined) {
+  // Self-expiring on the RESOLVED instant, never the label alone: in a zone
+  // whose local 03:00 is ambiguous on DST fall-back (the EET family,
+  // Pacific/Chatham), resetDayKey flips at the FIRST 03:00 while the reset
+  // resolves to the SECOND, so a label-trusting memo would serve a stale
+  // instant (and the floor's "1 second" lie) for the rest of that window.
+  // Re-resolving once the cached instant passes keeps one recompute per day
+  // and handles a backward wall-clock step across a boundary too (the wave-1
+  // hot-path review, measured over all 418 zones).
+  if (resetAt === undefined || nowMs >= resetAt) {
     resetAt = nextRaidResetMs(nowMs, zone);
     if (nextResetMemo.size >= NEXT_RESET_MEMO_MAX) nextResetMemo.clear();
     nextResetMemo.set(memoKey, resetAt);

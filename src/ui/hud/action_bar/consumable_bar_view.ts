@@ -35,7 +35,10 @@ export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
 // Reused per-call scratch for the kind-fair cap (phase 14): segment bounds and
 // keep counts per kind, sized once to the fixed kind table so a per-frame call
 // allocates nothing. Overwritten wholesale on every call, never read across
-// calls, so the core stays same-input-same-output.
+// calls, so the core stays same-input-same-output. NOT re-entrant: the
+// caller-supplied `lookup` runs inside the segment walk, so a lookup that
+// re-enters consumableBarItems would clobber the scratch mid-walk; every live
+// lookup is a plain items-table read, keep it that way.
 const SEG_START = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);
 const SEG_LEN = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);
 const SEG_KEEP = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);

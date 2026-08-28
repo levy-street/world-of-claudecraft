@@ -175,7 +175,7 @@ describe('plant sheet window: paint', () => {
   it('renders the empty state when no seed is held at all', () => {
     world.inventory = [{ itemId: 'garden_hoe', count: 1 }];
     makeWindow().open(BED);
-    expect(root.querySelector('.ps-empty')?.textContent).toBe(
+    expect(root.querySelector('.prof-empty')?.textContent).toBe(
       'You have no seed you can sow at this bed.',
     );
     expect(root.querySelector('[data-plant]')).toBeNull();
@@ -226,7 +226,7 @@ describe('plant sheet window: paint', () => {
       'An item that would pay for that is locked.',
     );
     expect(root.querySelector('[data-plant]')).toBeNull();
-    expect(root.querySelector('.ps-empty')).not.toBeNull();
+    expect(root.querySelector('.prof-empty')).not.toBeNull();
   });
 
   it('locks every row by skill when professionsState has no farming row (the ?? 0 default)', () => {

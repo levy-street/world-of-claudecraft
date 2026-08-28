@@ -440,6 +440,12 @@ describe('bare containment reads of the active element stay out of repaint ladde
     'focus_manager.ts': 'the Tab trap itself (armed while focus is inside the root)',
     'focus_restore.ts': 'the helper',
     'hud/vendor/buy_quantity_prompt_window.ts': 'do-not-steal-focus check, never focuses anything',
+    'hud/professions/perfecting_window.ts':
+      'prompt-teardown return repair (refocusAfterPrompt), not a repaint ladder: it runs only ' +
+      'after a dialog THIS window opened tears down, and the containment read is a do-nothing ' +
+      'guard (focus still inside the window means no restore); the repaint path itself carries ' +
+      'focus through captureFocusKey/restoreFirstEnabled, and the #2377 bar on repaint refocus ' +
+      'is untouched',
     'spellbook_window.ts':
       'dataset/class-keyed read with no Close rung; a parked root resolves nothing',
   };

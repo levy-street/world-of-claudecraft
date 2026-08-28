@@ -126,7 +126,7 @@ describe('renderCommissionOrderWindow', () => {
     const d = deps();
     const model = buildCommissionOrderBoardModel([], [], ITEMS);
     renderCommissionOrderWindow(el, model, d);
-    const emptyLines = [...el.querySelectorAll('.vendor-empty')].map((n) => n.textContent);
+    const emptyLines = [...el.querySelectorAll('.prof-empty')].map((n) => n.textContent);
     expect(emptyLines).toHaveLength(3); // mine, toCraft, board
   });
 

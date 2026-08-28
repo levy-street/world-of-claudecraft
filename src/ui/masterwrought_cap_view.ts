@@ -59,7 +59,10 @@ export function masterwroughtCapReadout(
 export function masterwroughtTooltipLines(
   equipment: Partial<Record<EquipSlot, string>>,
   items: Record<string, ItemDef>,
-): { key: 'hudChrome.itemMasterwrought' | 'hudChrome.masterwrought.tooltipAtCap'; values: Record<string, string> }[] {
+): {
+  key: 'hudChrome.itemMasterwrought' | 'hudChrome.masterwrought.tooltipAtCap';
+  values: Record<string, string>;
+}[] {
   const lines: ReturnType<typeof masterwroughtTooltipLines> = [
     { key: 'hudChrome.itemMasterwrought', values: { count: itemNumber(MASTERWROUGHT_EQUIP_CAP) } },
   ];

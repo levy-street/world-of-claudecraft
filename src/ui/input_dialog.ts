@@ -92,7 +92,7 @@ export function showInputDialog(deps: InputDialogDeps, opts: InputDialogOpts): I
     (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
     `<div class="cd-field">${field}</div>` +
     `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +
-    (opts.copy ? `<button class="btn" data-copy>${t('game.talents.copy')}</button>` : '') +
+    (opts.copy ? `<button class="btn" data-copy>${esc(t('game.talents.copy'))}</button>` : '') +
     (opts.onOk
       ? `<button class="btn cd-ok" data-ok>${esc(opts.okText ?? t('game.talents.save'))}</button>`
       : '') +

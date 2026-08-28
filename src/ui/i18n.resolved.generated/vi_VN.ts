@@ -9705,6 +9705,7 @@ export const vi_VN: EnTranslations = {
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Nhấp để mua lại",
       "bagSlots": "Túi {slots} Ô"
     },

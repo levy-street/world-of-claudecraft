@@ -147,6 +147,32 @@ describe('harvest journal window: paint', () => {
     expect(times).toEqual(['Ready in 5m 00s', 'Ready to harvest', 'Withered']);
   });
 
+  it('growing rows carry the shared professions track family for their stage (phase 14)', () => {
+    // 5 of 10 minutes elapsed is the seedling stage (farmGrowthStage: past
+    // 1/3, short of 2/3), so the compact shared track fills 2 of its 4 cells.
+    // The steps are aria-hidden decoration: the stage WORD beside them stays
+    // the accessible text, and the countdown cell rides the family text
+    // style, exactly the perfecting rank track's split.
+    world.nowMs = 5 * MINUTE;
+    makeWindow().open();
+    const steps = root.querySelector('.prof-track-steps.compact') as HTMLElement;
+    expect(steps.getAttribute('aria-hidden')).toBe('true');
+    expect(steps.querySelectorAll('.prof-track-step')).toHaveLength(4);
+    expect(steps.querySelectorAll('.prof-track-step.filled')).toHaveLength(2);
+    expect(root.querySelector('.hj-stage')?.textContent).toBe('Seedling');
+    expect(countdownCell()?.classList.contains('prof-track-text')).toBe(true);
+  });
+
+  it('settled rows carry no step track (the stage is only a growing fact)', () => {
+    world.plots = [
+      plot({ status: 'ready' }),
+      plot({ bedId: 'bed_eastbrook_2', status: 'withered' }),
+    ];
+    world.nowMs = 10 * MINUTE + 30 * SECOND;
+    makeWindow().open();
+    expect(root.querySelectorAll('.prof-track-steps')).toHaveLength(0);
+  });
+
   it("renders the zero-clamped 'finishing up' line, not Ready, past the deadline", () => {
     world.nowMs = 10 * MINUTE + 30 * SECOND;
     makeWindow().open();
@@ -190,13 +216,13 @@ describe('harvest journal window: paint', () => {
     world.farmingSkill = 0;
     const win = makeWindow();
     win.open();
-    expect(root.querySelector('.hj-empty h3')?.textContent).toBe(
+    expect(root.querySelector('.prof-empty h3')?.textContent).toBe(
       'You have not worked a garden bed yet',
     );
     win.close();
     world.farmingSkill = 40;
     win.open();
-    expect(root.querySelector('.hj-empty h3')?.textContent).toBe('No crops planted');
+    expect(root.querySelector('.prof-empty h3')?.textContent).toBe('No crops planted');
   });
 });
 
@@ -354,7 +380,7 @@ describe('harvest journal window: the countdown clock', () => {
     world.plots = [];
     vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
     expect(root.querySelectorAll('.hj-row')).toHaveLength(0);
-    expect(root.querySelector('.hj-empty h3')?.textContent).toBe('No crops planted');
+    expect(root.querySelector('.prof-empty h3')?.textContent).toBe('No crops planted');
   });
 
   // These two count the LIVE TIMER, not the work the timer does. The tick's

@@ -440,6 +440,7 @@ import {
   completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
   emitCraftResult,
+  storedCraftResult,
 } from './professions/crafting';
 import { sanitizeDailyGateLoad } from './professions/daily_gate_load';
 import {
@@ -2245,8 +2246,7 @@ export class Sim {
   // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
   // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
   eventLeadDay = '';
-  // The when-half of resetDay (phase 14): seconds until the window closes, fed
-  // beside it; 0 = no calendar. Read only by the daily_limit refusal answer.
+  // resetDay's when-half (phase 14): seconds to window close; 0 = no calendar.
   dailyResetRemainingSec = 0;
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
@@ -9113,7 +9113,7 @@ export class Sim {
     const result = craftItemImpl(this.ctx, recipeId, commission === true, pid, batchCount);
     if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
-    if (meta) meta.lastCraftResult = result;
+    if (meta) meta.lastCraftResult = storedCraftResult(result);
     // One shared emit shape (professions/crafting.ts emitCraftResult, phase 14).
     emitCraftResult(this.ctx, result, meta?.entityId);
   }

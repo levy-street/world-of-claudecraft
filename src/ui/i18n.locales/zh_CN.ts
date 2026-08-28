@@ -2754,6 +2754,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickSetOut': '点击摆放',
+  'itemUi.tooltip.clickSetUp': '点击架设',
   'itemUi.tooltip.clickBuyback': '点击回购',
   'itemUi.bags.title': '背包',
   'itemUi.bags.close': '关闭背包',

@@ -9705,6 +9705,7 @@ export const de_DE: EnTranslations = {
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Zum Rückkaufen klicken",
       "bagSlots": "Tasche mit {slots} Plätzen"
     },

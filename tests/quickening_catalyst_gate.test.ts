@@ -480,10 +480,15 @@ describe('the refusal countdown (Masterwrought phase 14, retryAfterSeconds)', ()
     const refusal = events[0] as { reason?: string; retryAfterSeconds?: number };
     expect(refusal.reason).toBe('daily_limit');
     expect(refusal.retryAfterSeconds).toBe(4321);
-    // The lastCraftResult mirror carries it too (the IWorld read is the
-    // convergence arm), still refusal-time only.
+    // The lastCraftResult mirror does NOT carry it: the countdown is
+    // EVENT-ONLY (storedCraftResult strips it before the store), so the
+    // session mirror matches CraftResultView on both hosts and the parity
+    // state digest never samples a wall-clock-derived value (the wave-1
+    // review round's converging parity + architecture finding).
     const meta = sim.players.get(pid) as PlayerMeta;
-    expect(meta.lastCraftResult?.retryAfterSeconds).toBe(4321);
+    expect(meta.lastCraftResult?.reason).toBe('daily_limit');
+    expect(meta.lastCraftResult?.retryAfterSeconds).toBeUndefined();
+    expect('retryAfterSeconds' in (meta.lastCraftResult ?? {})).toBe(false);
   });
 
   it('the batch auto-continue refusal carries the same countdown', () => {

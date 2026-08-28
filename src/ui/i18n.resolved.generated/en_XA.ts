@@ -9705,6 +9705,7 @@ export const en_XA: EnTranslations = {
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
       "clickSetOut": "[Çļíçķ ţó šéţ óúţ]",
+      "clickSetUp": "[Çļíçķ ţó šéţ úþ]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
       "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
     },

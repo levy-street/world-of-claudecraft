@@ -252,6 +252,19 @@ describe('the placeable feast classification (Farming Phase 12)', () => {
     expect(bagItemAction(ITEMS.plainJunk, NO_MODE)).toBe('use');
   });
 
+  it('a station-placing tool hovers the set-up hint, the feast pattern`s twin (phase 14)', () => {
+    // ONE deployable-hint pattern: a placeable's hover speaks its family's
+    // own placement verb (feast "set out", station "set up", the sim
+    // placement line's verb), never the generic use line. Off the real
+    // catalog def so the hint cannot detach from the item the sim places.
+    expect(CATALOG_ITEMS.masters_field_forge).toBeDefined();
+    expect(bagTooltipHintKey(CATALOG_ITEMS.masters_field_forge, NO_MODE)).toBe(
+      'itemUi.tooltip.clickSetUp',
+    );
+    // The junk twin that keeps the arm honest: no use payload, no set-up hint.
+    expect(bagTooltipHintKey(ITEMS.plainJunk, NO_MODE)).not.toBe('itemUi.tooltip.clickSetUp');
+  });
+
   it('every window mode still outranks the feast arm (a vendor click sells it)', () => {
     expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, tradeOpen: true })).toBe('trade');
     expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, marketSell: true })).toBe('marketSell');

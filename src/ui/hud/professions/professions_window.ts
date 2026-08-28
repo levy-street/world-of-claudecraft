@@ -19,7 +19,7 @@ import {
 } from '../../../sim/content/professions';
 import { ITEMS } from '../../../sim/data';
 import type { IWorld } from '../../../world_api';
-import { archetypeTitleText, craftNameText } from '../../char_window';
+import { archetypeTitleText } from '../../char_window';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -30,6 +30,7 @@ import type { PainterHostPresentation } from '../../painter_host';
 import { toolEffectNameKey } from '../../tool_effect_name';
 import { hasToolEffectCard, toolEffectStandaloneTooltip } from '../../tool_effect_tooltip';
 import { svgIcon } from '../../ui_icons';
+import { craftNameText } from './craft_name_view';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { archetypeImageUrl } from './profession_art';
 import type { EmpowermentCeiling, ProfessionRole } from './profession_identity_view';

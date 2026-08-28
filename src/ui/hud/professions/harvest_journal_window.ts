@@ -19,10 +19,11 @@
 //      this window naturally consistent with the server's events-before-
 //      snapshots message order: there is no event-forced cache here, and none
 //      is wanted.
-//   2. otherwise rewrite ONLY the countdown cells' text, matched by the
-//      data-harvest-journal-countdown attribute the build stamps with each
-//      row's readyAtMs, and only when the rendered string actually moved (the
-//      gather_node_tooltip_controller elision precedent).
+//   2. otherwise rewrite ONLY the countdown cells' text, through the refs the
+//      paint collected when it minted the cells (stamped with each row's
+//      readyAtMs via data-harvest-journal-countdown; the lockpick #2498 ref
+//      discipline), and only when the rendered string moved against the
+//      cached copy, so an unchanged tick touches no DOM at all.
 // The cadence is a fixed wall-clock second: it is never preset-, tier-, or
 // governor-keyed, because a crop timer is actionable information and the
 // graphics-fairness invariant forbids shedding it by tier.
@@ -65,6 +66,29 @@ const STAGE_LABEL_KEYS: Record<FarmGrowthStage, TranslationKey> = {
   maturing: 'hudChrome.harvestJournal.stageMaturing',
   ready: 'hudChrome.harvestJournal.stageRipe',
 };
+
+// How many of the four track steps each growth stage fills (the shared
+// .prof-track family, phase 14: the journal's growth stages and the
+// Perfecting rank track are one presentation). Keyed by the union like
+// STAGE_LABEL_KEYS, for the same compile-time reason.
+const STAGE_STEP_FILL: Record<FarmGrowthStage, number> = {
+  sprout: 1,
+  seedling: 2,
+  maturing: 3,
+  ready: 4,
+};
+const STAGE_STEP_TOTAL = 4;
+
+/** The aria-hidden compact step track beside a growing row's stage word (the
+ *  stage word stays the accessible text, the perfecting track's split). */
+function stageStepsHtml(stage: FarmGrowthStage): string {
+  const filled = STAGE_STEP_FILL[stage];
+  const steps = Array.from(
+    { length: STAGE_STEP_TOTAL },
+    (_, i) => `<span class="prof-track-step${i < filled ? ' filled' : ''}"></span>`,
+  ).join('');
+  return `<span class="prof-track-steps compact" aria-hidden="true">${steps}</span>`;
+}
 
 // Keyed by the settled timer arms for the same reason as STAGE_LABEL_KEYS: a
 // fifth HarvestJournalTimer arm stops this file compiling until its label
@@ -140,6 +164,11 @@ export class HarvestJournalWindow {
   private openerFocus: HTMLElement | null = null;
   private countdown: number | null = null;
   private paintedSignature: string | null = null;
+  /** The growing rows' countdown cells, collected ONCE per paint at the one
+   *  innerHTML site that mints them (the lockpick #2498 ref discipline), with
+   *  each cell's deadline and last rendered string, so the 1 Hz tick walks no
+   *  subtree, reads no dataset, and writes only a cell whose text moved. */
+  private countdownCells: { el: HTMLElement; readyAtMs: number; lastText: string }[] = [];
   /** The persistent in-dialog status line (see liveStatusNode). */
   private liveStatus: HTMLElement | null = null;
   /** Bed ids observed ready by the LAST paint of an open journal, or null
@@ -187,6 +216,7 @@ export class HarvestJournalWindow {
     root.style.display = 'none';
     this.deps.onVisibilityChange?.();
     this.paintedSignature = null;
+    this.countdownCells = [];
     // The flip baseline and any standing announcement die with the session:
     // a reopen observes fresh and must not re-announce (or announce stale).
     this.readyBedIds = null;
@@ -247,20 +277,33 @@ export class HarvestJournalWindow {
     this.paintCountdowns(nowMs);
   }
 
-  /** Rewrite the live countdown cells in place. Only rows whose timer is the
-   *  growing arm carry the attribute, and the signature check above has
-   *  already established that every stamped row is STILL growing at this same
-   *  nowMs, so this never has to re-decide a plot's state; it only moves
-   *  digits. Unchanged text is not written at all. */
+  /** Rewrite the live countdown cells in place, off the refs paint()
+   *  collected when it minted them. Only growing rows are collected, and the
+   *  signature check above has already established that every collected row
+   *  is STILL growing at this same nowMs, so this never has to re-decide a
+   *  plot's state; it only moves digits. The compare runs against the cached
+   *  string, so an unchanged cell costs no DOM access at all (a journal of
+   *  day-long crops touches nothing between minute boundaries). */
   private paintCountdowns(nowMs: number): void {
-    const cells = this.deps
-      .root()
-      .querySelectorAll<HTMLElement>('[data-harvest-journal-countdown]');
-    for (const cell of cells) {
-      const readyAtMs = Number(cell.dataset.harvestJournalCountdown);
+    for (const cell of this.countdownCells) {
+      const text = countdownText(cell.readyAtMs, nowMs);
+      if (text === cell.lastText) continue;
+      cell.lastText = text;
+      cell.el.textContent = text;
+    }
+  }
+
+  /** Collect the countdown cell refs from a freshly painted subtree: the one
+   *  querySelectorAll, at the innerHTML site that just replaced the nodes,
+   *  never from the tick. The stamped attribute stays the collection key (and
+   *  the markup contract the tests pin); its value is read here once, and the
+   *  cached rendered string seeds the tick's write elision. */
+  private collectCountdownCells(content: HTMLElement, nowMs: number): void {
+    this.countdownCells = [];
+    for (const el of content.querySelectorAll<HTMLElement>('[data-harvest-journal-countdown]')) {
+      const readyAtMs = Number(el.dataset.harvestJournalCountdown);
       if (!Number.isFinite(readyAtMs)) continue;
-      const text = countdownText(readyAtMs, nowMs);
-      if (cell.textContent !== text) cell.textContent = text;
+      this.countdownCells.push({ el, readyAtMs, lastText: countdownText(readyAtMs, nowMs) });
     }
   }
 
@@ -290,6 +333,7 @@ export class HarvestJournalWindow {
       `<div class="panel-title"><span id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
       `<button type="button" class="x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
+    this.collectCountdownCells(content, nowMs);
     this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focusKey !== null) {
@@ -361,7 +405,7 @@ export class HarvestJournalWindow {
         view.kind === 'novice'
           ? t('hudChrome.harvestJournal.noviceBody')
           : t('hudChrome.harvestJournal.emptyBody');
-      return `<div class="hj-empty"><h3>${esc(title)}</h3><p>${esc(body)}</p></div>`;
+      return `<div class="prof-empty"><h3>${esc(title)}</h3><p>${esc(body)}</p></div>`;
     }
     const rows = view.rows.map((row) => this.rowHtml(row, nowMs)).join('');
     return `<ul class="hj-list" role="list" aria-label="${esc(t('hudChrome.harvestJournal.listLabel'))}">${rows}</ul>`;
@@ -373,11 +417,11 @@ export class HarvestJournalWindow {
     // touch. The state class is the second, non-hue signal beside the words.
     const time =
       row.timer.kind === 'growing'
-        ? `<span class="hj-time" data-harvest-journal-countdown="${esc(String(row.readyAtMs))}">${esc(countdownText(row.readyAtMs, nowMs))}</span>`
-        : `<span class="hj-time">${esc(t(TIMER_LABEL_KEYS[row.timer.kind]))}</span>`;
+        ? `<span class="hj-time prof-track-text" data-harvest-journal-countdown="${esc(String(row.readyAtMs))}">${esc(countdownText(row.readyAtMs, nowMs))}</span>`
+        : `<span class="hj-time prof-track-text">${esc(t(TIMER_LABEL_KEYS[row.timer.kind]))}</span>`;
     const stage =
       row.timer.kind === 'growing'
-        ? `<span class="hj-stage">${esc(t(STAGE_LABEL_KEYS[row.stage]))}</span>`
+        ? `${stageStepsHtml(row.stage)}<span class="hj-stage">${esc(t(STAGE_LABEL_KEYS[row.stage]))}</span>`
         : '';
     return (
       `<li class="hj-row hj-${esc(row.timer.kind)}">` +

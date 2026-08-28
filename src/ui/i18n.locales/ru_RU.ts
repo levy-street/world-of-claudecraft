@@ -2905,6 +2905,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickSetOut': 'Нажмите, чтобы накрыть стол',
+  'itemUi.tooltip.clickSetUp': 'Нажмите, чтобы установить',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
   'itemUi.bags.title': 'Сумки',
   'itemUi.bags.close': 'Закрыть сумки',

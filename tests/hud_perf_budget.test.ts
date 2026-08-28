@@ -921,16 +921,18 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         },
         // `.style` is the `isOpen` getter reading root().style.display, the
         // daily_rewards shape (this matcher counts ACCESSES, not writes).
-        // `.dataset` reads each cell's stamped readyAtMs. `.textContent` is
-        // TWO because the write is elided: the tick compares the rendered
-        // string first and skips an unchanged cell entirely, so a journal of
-        // day-long crops writes nothing at all between minute boundaries.
-        writeAllow: { '.style': 1, '.textContent': 2, '.dataset': 1 },
-        // ONE subtree walk per tick for the countdown cells. A re-query rather
-        // than a cached ref because every repaint replaces the nodes; at 1 Hz
-        // over at most a couple of dozen beds that is cheap, and the count is
-        // what makes a second one a conscious act.
-        queryAllow: { '.querySelectorAll': 1 },
+        // `.textContent` is ONE, the elided write alone: the tick compares
+        // against the CACHED rendered string (collected with the cell refs at
+        // the paint that minted them, the lockpick #2498 discipline), so an
+        // unchanged cell costs no DOM access at all and a journal of day-long
+        // crops touches nothing between minute boundaries. The former
+        // `.dataset` read per tick moved to the paint-time collection with
+        // the refs (phase 14).
+        writeAllow: { '.style': 1, '.textContent': 1 },
+        // ZERO: the countdown cell refs are collected once per paint, at the
+        // one innerHTML site that replaces the nodes, never re-queried from
+        // the tick (the same fix #2498 made to the lockpick clock).
+        queryAllow: {},
         idlAllow: {},
         // Zero: the tick writes text but never reads a layout box back.
         reflowAllow: {},

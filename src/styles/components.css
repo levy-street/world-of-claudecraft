@@ -5805,7 +5805,7 @@
     padding: 10px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   .profession-identity-main {
     flex: 1 1 0;
@@ -6617,7 +6617,10 @@
     border: 1px solid #5a4a2a;
     border-radius: 6px;
     color: #ffe6a8;
-    font-family: Georgia, serif;
+    /* The serif face by its token (the literal Georgia stack predated
+       --font-serif); the warm input hexes above stay with their mail-form
+       siblings until that family gets its own token pass. */
+    font-family: var(--font-serif);
   }
   .commission-field input[type="text"]:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -9637,23 +9640,97 @@
      positions are build-time inline writes; ring strokes carry
      vector-effect="non-scaling-stroke" so these pixel widths survive the
      unit-circle viewBox. Semantic colours come from tokens; the showcase
-     hairline is the shared --color-border-showcase token, and the remaining
-     inset-card cosmetics (rgba card fills, the ring stage haze) are
-     deliberate literals shared with the char-window showcase family. */
+     hairline is the shared --color-border-showcase token and the card fills
+     its --color-card-inset companion (phase 14); the ring stage haze stays a
+     deliberate literal shared with the char-window showcase family. */
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
     flex-direction: column;
   }
-  #professions-window .panel-title {
+  /* ONE title treatment for the column-flex professions windows (phase 14:
+     four byte-identical copies collapsed; the crafting window keeps its own
+     relative-positioned title because its close button pins differently). */
+  #professions-window .panel-title,
+  #harvest-journal-window .panel-title,
+  #plant-sheet-window .panel-title,
+  #perfecting-window .panel-title {
     flex: none;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  #professions-window .panel-title > span {
+  #professions-window .panel-title > span,
+  #harvest-journal-window .panel-title > span,
+  #plant-sheet-window .panel-title > span,
+  #perfecting-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  /* ONE empty-state family for the professions windows (phase 14: the
+     harvest journal's shape, the best of the four the family had grown, now
+     the only one): a centered quiet block, optional small-caps title over a
+     muted body line. Whole-window empties carry both; a section or list
+     empty carries the body alone. */
+  .prof-empty {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    text-align: center;
+  }
+  .prof-empty h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  .prof-empty p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* ONE progress/track family for the professions windows (phase 14,
+     DESIGN.md 10.5): a stepped rank or growth track plus its status text.
+     Consumers: the Perfecting rank track (perfecting_window.ts) and the
+     Harvest Journal's growth stages and countdown (harvest_journal_window.ts).
+     Dark cells on the one-pixel dark keyline (--panel-edge, the panel's own
+     keyline shade), colored fill with a one-pixel top highlight, tabular
+     status text so ticking digits do not jitter their row. */
+  .prof-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prof-track-steps {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .prof-track-step {
+    width: 22px;
+    height: 8px;
+    border: 1px solid var(--panel-edge);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .prof-track-step.filled {
+    background: var(--gold-dim);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  /* The compact variant for dense rows (the journal's per-row growth
+     stages): same anatomy, smaller cells; two sizes, one primitive. */
+  .prof-track-steps.compact .prof-track-step {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+  }
+  .prof-track-text {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
   }
   .prof-scroll {
     flex: 1 1 auto;
@@ -9688,7 +9765,7 @@
     padding: 10px 14px 12px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   /* The hero band: the identity card beside the wheel on its stage. */
   .prof-hero {
@@ -10043,16 +10120,6 @@
     max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
     flex-direction: column;
   }
-  #harvest-journal-window .panel-title {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  #harvest-journal-window .panel-title > span {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
   .hj-body {
     flex: 1 1 auto;
     min-height: 120px;
@@ -10077,7 +10144,7 @@
     padding: 8px 10px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    background: var(--color-card-inset);
   }
   .hj-crop {
     grid-column: 1;
@@ -10100,10 +10167,15 @@
     gap: 8px;
     min-width: 0;
   }
-  .hj-time {
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text-light);
+  /* The growth-stage step track (the shared .prof-track family): the cells
+     are blocks, so they center in the baseline-aligned state row instead of
+     hanging from the text baseline. */
+  .hj-state .prof-track-steps {
+    align-self: center;
   }
+  /* .hj-time rides the shared .prof-track-text style (the family above);
+     only the settled-state tints live here, and each is never the only
+     signal (the cell also says its word). */
   .hj-ready .hj-time {
     color: var(--color-text-success);
   }
@@ -10134,27 +10206,6 @@
   }
   .hj-care-none {
     font-size: 10px;
-    color: var(--color-text-muted);
-  }
-  .hj-empty {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 18px 14px;
-    text-align: center;
-  }
-  .hj-empty h3 {
-    margin: 0;
-    font-family: var(--title-font);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    font-variant: small-caps;
-    color: var(--gold);
-  }
-  .hj-empty p {
-    margin: 0;
-    font-size: 11px;
     color: var(--color-text-muted);
   }
   /* The journal's repaint wrapper: the whole title + body re-renders inside
@@ -10190,16 +10241,6 @@
     width: 440px;
     max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
     flex-direction: column;
-  }
-  #plant-sheet-window .panel-title {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  #plant-sheet-window .panel-title > span {
-    flex: 1 1 auto;
-    min-width: 0;
   }
   .ps-body {
     flex: 1 1 auto;
@@ -10326,14 +10367,6 @@
     font-weight: 600;
     cursor: pointer;
   }
-  .ps-empty {
-    margin: 0;
-    padding: 14px;
-    text-align: center;
-    font-size: 11px;
-    color: var(--color-text-muted);
-  }
-
   /* ---------- perfecting window ---------- */
   /* The Perfecting window (#perfecting-window, Masterwrought phase 14): the
      apex rank track and the orange promotion. Candidate rows are single-select
@@ -10345,16 +10378,6 @@
     width: 460px;
     max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
     flex-direction: column;
-  }
-  #perfecting-window .panel-title {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  #perfecting-window .panel-title > span {
-    flex: 1 1 auto;
-    min-width: 0;
   }
   .pf-body {
     flex: 1 1 auto;
@@ -10433,13 +10456,6 @@
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
   }
-  .pf-empty {
-    margin: 0;
-    padding: 14px;
-    text-align: center;
-    font-size: 11px;
-    color: var(--color-text-muted);
-  }
   .pf-detail {
     display: flex;
     flex-direction: column;
@@ -10465,40 +10481,16 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
-  /* The rank track: four steps, then the Perfected/Promoted faces. The steps
-     are aria-hidden decoration; .pf-track-label is the accessible text. */
-  .pf-track {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .pf-track-steps {
-    display: inline-flex;
-    gap: 4px;
-  }
-  .pf-step {
-    width: 22px;
-    height: 8px;
-    border: 1px solid var(--color-border-showcase);
-    border-radius: 4px;
-    background: var(--color-bg-input);
-  }
-  .pf-step.filled {
-    background: var(--gold-dim);
-    border-color: var(--gold-dim);
-  }
+  /* The rank track rides the shared .prof-track family (the professions
+     section above): the steps are aria-hidden decoration, .pf-track-label is
+     the accessible text. Only the settled-state fills live here; the keyline
+     stays the family's constant dark one (DESIGN.md 10.5), and each tint is
+     never the only signal (the label says the state's word). */
   .pf-track[data-state="perfected"] .pf-step.filled {
     background: var(--gold);
-    border-color: var(--gold);
   }
   .pf-track[data-state="promoted"] .pf-step.filled {
     background: var(--mkt-name-legendary);
-    border-color: var(--mkt-name-legendary);
-  }
-  .pf-track-label {
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text-light);
   }
   .pf-track[data-state="promoted"] .pf-track-label {
     color: var(--mkt-name-legendary);

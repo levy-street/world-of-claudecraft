@@ -575,6 +575,11 @@ const mergeStringsEn = {
       // The placeable feast's hint (bags_view.ts): the click PLACES the feast
       // at your feet, it never eats it, so "use" undersold what happens.
       clickSetOut: 'Click to set out',
+      // The station-placing tools' hint (bags_view.ts), the feast's twin and
+      // the ONE deployable-hint pattern (Masterwrought phase 14): the click
+      // sets the field station up at your feet, the sim line's own verb
+      // ("You set up the {name}."), so "use" undersold this one the same way.
+      clickSetUp: 'Click to set up',
       clickBuyback: 'Click to buy back',
       // Rendered by the item tooltip (hud.ts), the bag sockets (bags_window.ts) AND the
       // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new

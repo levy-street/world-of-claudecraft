@@ -16,8 +16,8 @@ import { FARM_COMPOST_ITEM_ID, FARM_WITHERED_HUSK_ITEM_ID } from '../../../sim/p
 import type { SimEvent } from '../../../sim/types';
 import { grantItemToken, grantQtyText } from '../../grant_line_view';
 import { formatNumber, t } from '../../i18n';
+import { farmDenialLine } from './denial_line_core';
 import {
-  farmDeniedToast,
   farmFineLineKey,
   farmHarvestLineKey,
   farmHusksConvertedLineKey,
@@ -25,6 +25,7 @@ import {
   farmSeedBackLineKey,
   farmWitheredLineKey,
 } from './farming_view';
+import { PROF_LOG_GRANT, PROF_LOG_MISS, PROF_LOG_NEWS } from './profession_log_tones';
 
 /** The seven farming events, narrowed from the shared SimEvent union. */
 export type FarmEvent = Extract<
@@ -71,7 +72,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
         t('hudChrome.farming.plantLine', {
           name: grantItemToken(farmPlantedTokenId(ev.cropId)),
         }),
-        '#c8f7c5',
+        PROF_LOG_NEWS,
       );
       break;
     }
@@ -91,7 +92,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
           name: grantItemToken(ev.itemId),
           qty: grantQtyText(ev.count),
         }),
-        '#7fdc4f',
+        PROF_LOG_GRANT,
       );
       // Both halves demanded, not just the id: the emitter always writes
       // the pair together (a present pair means a MIXED harvest), but the
@@ -105,7 +106,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
             name: grantItemToken(ev.fineItemId),
             qty: grantQtyText(ev.fineCount),
           }),
-          '#7fdc4f',
+          PROF_LOG_GRANT,
         );
       }
       // The tier 3/4 seed-back sentence, only when the event carries a
@@ -119,7 +120,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
             name: grantItemToken(farmPlantedTokenId(ev.cropId)),
             qty: grantQtyText(ev.seedBackCount),
           }),
-          '#7fdc4f',
+          PROF_LOG_GRANT,
         );
       }
       // The golden-harvest BONUS line (Phase 11f). Rendered only when the
@@ -134,7 +135,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
           t('hudChrome.farming.goldenBonusLine', {
             name: grantItemToken(ev.goldenBonusItemId),
           }),
-          '#7fdc4f',
+          PROF_LOG_GRANT,
         );
       }
       // The last-charge signal (the gatherResult arm's farming twin):
@@ -162,7 +163,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
           name: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
           qty: grantQtyText(ev.count),
         }),
-        '#a8a8a8',
+        PROF_LOG_MISS,
       );
       // The seed-back consolation on a failed high-tier crop (the roll
       // fires on BOTH outcomes): a real grant, so it keeps the grant
@@ -174,7 +175,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
             name: grantItemToken(farmPlantedTokenId(ev.cropId)),
             qty: grantQtyText(ev.seedBackCount),
           }),
-          '#7fdc4f',
+          PROF_LOG_GRANT,
         );
       }
       break;
@@ -194,19 +195,13 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
     case 'farmDenied': {
       // A refused plant, harvest or husk trade: an error toast ONLY, no
       // line, no cue, no other state (the gatherDenied pattern). The sim
-      // event is text-free, so the pure core resolves the key, and for
-      // the 'tool' reason also the tier the refused crop demands (the
-      // tierRequired.farming line, node-path parity), which is formatted
-      // HERE because the pure core stays formatter-free.
-      const toast = farmDeniedToast(ev.reason, ev.cropId);
-      host.showError(
-        t(
-          toast.key,
-          toast.params
-            ? { tier: formatNumber(toast.params.tier, { maximumFractionDigits: 0 }) }
-            : undefined,
-        ),
-      );
+      // event is text-free; the shared denial pattern (denial_line_core.ts,
+      // the ONE shape crafting's deny arm also extends) resolves the key
+      // through the pure core and spells the 'tool' reason's tier (the
+      // tierRequired.farming line, node-path parity), so this render is
+      // exactly the crafting call site's: t(line.key, line.params).
+      const line = farmDenialLine(ev.reason, ev.cropId);
+      host.showError(t(line.key, line.params));
       break;
     }
     case 'farmHusksConverted': {
@@ -226,7 +221,7 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
           name: grantItemToken(FARM_COMPOST_ITEM_ID),
           qty: grantQtyText(ev.compost),
         }),
-        '#7fdc4f',
+        PROF_LOG_GRANT,
       );
       break;
     }
@@ -286,8 +281,8 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // here, this is news about the player's own beds. The withered half
       // keeps the grey no-cost-miss register of the withered harvest line
       // (the crop was lost, the bed was not).
-      if (readyText) host.log(readyText, '#c8f7c5');
-      if (witheredText) host.log(witheredText, '#a8a8a8');
+      if (readyText) host.log(readyText, PROF_LOG_NEWS);
+      if (witheredText) host.log(witheredText, PROF_LOG_MISS);
       break;
     }
     default: {

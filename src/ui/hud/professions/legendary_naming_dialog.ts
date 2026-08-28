@@ -68,7 +68,12 @@ export function openLegendaryNamingDialog(
   opts: LegendaryNamingDialogOpts,
 ): LegendaryNamingDialogHandle | null {
   const stack = document.getElementById('prompt-stack');
-  if (!stack) return null;
+  if (!stack) {
+    // Dev-channel only: both entry documents ship #prompt-stack, so a miss is
+    // a broken embed, and a silently dead promote button would read as a bug.
+    console.warn('perfecting: #prompt-stack missing, naming dialog unavailable');
+    return null;
+  }
   const prompt = document.createElement('div');
   prompt.className = 'prompt panel pf-name-prompt';
   const title = document.createElement('div');
@@ -102,7 +107,7 @@ export function openLegendaryNamingDialog(
   submit.textContent = t('hudChrome.perfecting.nameSubmit');
   const cancel = document.createElement('button');
   cancel.type = 'button';
-  cancel.className = 'btn';
+  cancel.className = 'btn pf-name-cancel';
   cancel.textContent = t('hudChrome.perfecting.nameCancel');
   actions.append(cancel, submit);
   prompt.append(title, label, input, count, hint, actions);

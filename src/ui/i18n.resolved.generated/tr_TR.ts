@@ -9705,6 +9705,7 @@ export const tr_TR: EnTranslations = {
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Geri satın almak için tıkla",
       "bagSlots": "{slots} Yuvalı Çanta"
     },

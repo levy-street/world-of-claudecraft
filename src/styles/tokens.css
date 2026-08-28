@@ -133,6 +133,14 @@
        recipe cards, pill chips, panel dividers). One token for every site so
        the family cannot drift shade by shade. */
     --color-border-showcase: #463a1c;
+    /* The showcase inset-card FILL that pairs with the hairline above: the
+       translucent scrim the section cards sit on, so the panel gradient stays
+       visible through them. Named at the phase 14 professions unification
+       (consumers: the professions window's section cards, the crafting
+       identity card, the harvest journal rows); the char-window showcase
+       family still spells the same value and migrates when it is next
+       touched. */
+    --color-card-inset: rgba(0, 0, 0, 0.24);
     --color-border-focus: #c8a838;
     --color-border-invalid: #ff8f85;
     --color-border-valid: #48e060;

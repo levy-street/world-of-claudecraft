@@ -54,6 +54,22 @@ Kept at `src/ui/` root on purpose; do not pull them in without a reason:
   item-tooltip gathering glue (3D node tooltips, map tips, bag tooltips),
   consumed by the map/world/tooltip families.
 
+## Family-wide presentation seams (the phase 14 unification; reuse, never fork)
+- Chat-log tones: `profession_log_tones.ts` names the family's five inline
+  log colours once (`tests/profession_log_tones.test.ts` scans this whole
+  directory for a re-spell). A new module never spells a log hex.
+- Refusals: `denial_line_core.ts` owns the ProfessionDenialLine shape (key
+  plus ready-made params) every "action refused with a reason" resolves to;
+  crafting's `crafting_deny_core.ts` extends it, farming renders
+  `farmDenialLine` through it. One surface per refusal, no cue.
+- Empty states: the `.prof-empty` CSS family (components.css, professions
+  section) is the ONE empty-state shape (optional h3 title + p body); every
+  family window's no-candidates / no-orders / no-crops state uses it.
+- Progress/rank/growth tracks: the `.prof-track` CSS family (same section,
+  DESIGN.md 10.5) is the ONE stepped-track presentation; the Perfecting rank
+  track and the Harvest Journal growth stages both consume it (steps are
+  aria-hidden decoration beside accessible text).
+
 ## Named siblings and recorded decisions
 - The commission board opens from the crafting window's title-bar button
   (`.crafting-orders-btn`), not a rail tile; a sibling professions window

@@ -24,6 +24,7 @@ import { QUALITY_COLOR } from '../../icons';
 import type { CraftCelebrationBanner, CraftTierUp } from './craft_celebration_view';
 import { craftNameText } from './craft_name_view';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { PROF_LOG_TOAST } from './profession_log_tones';
 
 /** One chat-line bundle: the Hud.log(text, color, icon) arguments plus the
  *  audio decision. `playCue` is whether THIS line's recipient hears the one
@@ -58,8 +59,11 @@ export function tierUpToastText(up: CraftTierUp): string {
 }
 
 /** The chat-log color of the masterwork and tier-up toast lines (the classic
- *  gold the hud arm carried as a bare literal before the phase 13 QA). */
-export const CRAFT_TOAST_LOG_COLOR = '#ffd100';
+ *  gold the hud arm carried as a bare literal before the phase 13 QA). Since
+ *  the phase 14 unification the VALUE lives in profession_log_tones.ts with
+ *  the rest of the family's tones; this export stays for the callers that
+ *  already name the toast color through it. */
+export const CRAFT_TOAST_LOG_COLOR = PROF_LOG_TOAST;
 
 /** The plan's chat-log lines, in log order: the masterwork toast when the
  *  plan carries one, then every tier-up. The bundle decides the color, so the

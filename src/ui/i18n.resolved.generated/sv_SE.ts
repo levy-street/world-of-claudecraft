@@ -9705,6 +9705,7 @@ export const sv_SE: EnTranslations = {
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Klicka för att köpa tillbaka",
       "bagSlots": "Väska med {slots} platser"
     },

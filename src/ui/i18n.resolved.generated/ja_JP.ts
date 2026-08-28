@@ -9705,6 +9705,7 @@ export const ja_JP: EnTranslations = {
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
       "clickSetOut": "クリックして設置",
+      "clickSetUp": "クリックして設営",
       "clickBuyback": "クリックして買い戻す",
       "bagSlots": "{slots}スロットのバッグ"
     },

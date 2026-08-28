@@ -275,8 +275,22 @@ export interface CraftResult {
   // (ctx.dailyResetRemainingSec > 0; headless/replay hosts feed nothing and
   // the refusal stays countdown-free). Refusal-time by design: gate STATE
   // stays server-private and learn-on-attempt, so no standing surface may
-  // ever carry this.
+  // ever carry this: it rides the craftResult EVENT only and is STRIPPED
+  // before the lastCraftResult store (storedCraftResult below), so the
+  // session mirror matches CraftResultView on both hosts and the parity
+  // state digest never samples a wall-clock-derived value.
   retryAfterSeconds?: number;
+}
+
+/** The lastCraftResult store shape: the result minus the event-only
+ *  countdown. Every meta.lastCraftResult assignment routes through this so a
+ *  clock-derived number can never enter sampled sim state (the parity trace
+ *  digests player meta) and the offline mirror cannot drift from the online
+ *  CraftResultView, which deliberately omits the field. */
+export function storedCraftResult(result: CraftResult): CraftResult {
+  if (result.retryAfterSeconds === undefined) return result;
+  const { retryAfterSeconds: _eventOnly, ...stored } = result;
+  return stored;
 }
 
 /** Whether `meta` currently knows `recipe` (issue #1299): a recipe with no
@@ -1408,7 +1422,7 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   const recipe = recipeById(recipeId);
   if (!recipe) {
     const result: CraftResult = { ok: false, recipeId, reason: 'unknown_recipe' };
-    meta.lastCraftResult = result;
+    meta.lastCraftResult = storedCraftResult(result);
     // Short-shape emit BY DESIGN (see emitCraftResult): this site never
     // carried the optional keys, and the parity digest pins key presence.
     ctx.emit({
@@ -1422,7 +1436,7 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   }
   const result = resolveCraftForRecipe(ctx, meta.entityId, recipe, commission);
   applyCraftSuccessHooks(ctx, meta, recipe.id, result);
-  meta.lastCraftResult = result;
+  meta.lastCraftResult = storedCraftResult(result);
   emitCraftResult(ctx, result, meta.entityId);
   if (result.masterwork && result.itemId) {
     const proc: MasterworkProc = {
@@ -1446,7 +1460,7 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   if (p.castingAbility || isConsuming(p)) return;
   const nextDenial = evaluateCraftAdmission(ctx, meta.entityId, recipe, commission);
   if (nextDenial) {
-    meta.lastCraftResult = nextDenial;
+    meta.lastCraftResult = storedCraftResult(nextDenial);
     // Short-shape emit BY DESIGN (see emitCraftResult), plus the phase 14
     // daily-gate countdown when the denial carries one: presence-conditional,
     // so every pre-phase emit stays byte-identical in the parity digest.

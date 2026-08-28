@@ -4133,9 +4133,11 @@
   body.mobile-touch .crafting-cast-progress-batch {
     font-size: 12px;
   }
-  /* Phase 3 batch: 40px touch floor on qty stepper and Create All. */
+  /* Phase 3 batch: 40px touch floor on qty stepper and Create All; phase 14
+     adds the batch row's Perfecting link to the same floor. */
   body.mobile-touch .crafting-qty-btn,
-  body.mobile-touch .crafting-create-all-btn {
+  body.mobile-touch .crafting-create-all-btn,
+  body.mobile-touch .crafting-perfecting-link {
     min-width: 40px;
     min-height: 40px;
   }

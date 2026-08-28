@@ -9705,6 +9705,7 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickSetOut": "클릭하여 차리기",
+      "clickSetUp": "클릭하여 설치",
       "clickBuyback": "클릭하여 되사기",
       "bagSlots": "{slots}칸 가방"
     },

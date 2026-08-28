@@ -22,13 +22,16 @@ import { recipeById } from '../../../sim/content/recipes';
 import type { StationType } from '../../../sim/professions/stations';
 import type { SimEvent } from '../../../sim/types';
 import { durationText } from '../../duration_text';
-import type { TranslationKey } from '../../i18n';
 import { craftDenialLine } from './craft_denial_line_view';
+import type { ProfessionDenialLine } from './denial_line_core';
 
 export type CraftDenyReason = NonNullable<Extract<SimEvent, { type: 'craftResult' }>['reason']>;
 
-export interface CraftDenyMessage {
-  key: TranslationKey;
+/** The crafting arm of the shared ProfessionDenialLine pattern
+ *  (denial_line_core.ts): key plus ready-made params, extended by the one
+ *  crafting-specific fact (stationType), which stays unresolved here because
+ *  the localized station name lives window-side (stationNameText). */
+export interface CraftDenyMessage extends ProfessionDenialLine {
   /** Set only for a resolvable station_required refusal; the painter renders
    *  the station name into the stationRequired template. */
   stationType?: StationType;

@@ -2851,6 +2851,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
   'itemUi.tooltip.clickSetOut': '클릭하여 차리기',
+  'itemUi.tooltip.clickSetUp': '클릭하여 설치',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',
   'itemUi.bags.title': '가방',
   'itemUi.bags.close': '가방 닫기',

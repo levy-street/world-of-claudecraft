@@ -236,8 +236,11 @@ export function acceptCommissionOrder(
   // counters are zero: an honest "0 masterworks" is the signal working, and
   // presence doubling as accepted-ness would make a zero-record crafter's
   // acceptance indistinguishable from an open row.
-  order.crafterMasterworks = r.meta.deedStats.counters.masterworksCrafted ?? 0;
-  order.crafterLegendaries = r.meta.deedStats.counters.legendariesForged ?? 0;
+  // Plain reads: DeedStats.counters is a REQUIRED record every deed-stat key
+  // is zero-filled into on create and restore, so a fallback here would be
+  // dead defensive code (the wave-1 architecture review).
+  order.crafterMasterworks = r.meta.deedStats.counters.masterworksCrafted;
+  order.crafterLegendaries = r.meta.deedStats.counters.legendariesForged;
   ctx.bumpCommissionOrderBoardRev();
   return { ok: true, orderId };
 }

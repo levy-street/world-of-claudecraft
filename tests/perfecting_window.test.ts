@@ -108,8 +108,25 @@ describe('radiogroup semantics (the plant sheet shape)', () => {
     win.open();
     expect(root().getAttribute('role')).toBe('dialog');
     expect(root().getAttribute('aria-labelledby')).toBe('perfecting-title');
-    expect(root().querySelector('.pf-empty')).not.toBeNull();
+    // The empty state rides the shared professions family class (the
+    // unification slice's .prof-empty), not a bespoke pf- one.
+    expect(root().querySelector('.prof-empty')).not.toBeNull();
     expect(root().querySelector('[data-action]')).toBeNull();
+  });
+
+  it('the rank track rides the shared professions track family (phase 14)', () => {
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
+    const win = makeWindow();
+    win.open();
+    // One presentation family for the journal's growth stages and this rank
+    // track: the shared prof-track classes carry the anatomy, the pf-
+    // classes stay only for the settled-state fills keyed off data-state.
+    const track = root().querySelector('.prof-track.pf-track') as HTMLElement;
+    expect(track).not.toBeNull();
+    const steps = track.querySelector('.prof-track-steps') as HTMLElement;
+    expect(steps.getAttribute('aria-hidden')).toBe('true');
+    expect(steps.querySelectorAll('.prof-track-step.pf-step').length).toBeGreaterThan(0);
+    expect(track.querySelector('.prof-track-text.pf-track-label')).not.toBeNull();
   });
 });
 
@@ -203,6 +220,29 @@ describe('the R2 bind-warning confirm step', () => {
     const second = document.querySelector('.pf-bind-prompt') as HTMLElement;
     (second.querySelectorAll('button')[0] as HTMLButtonElement).click();
     expect(world.perfectItem).toHaveBeenCalledTimes(1);
+  });
+
+  it('a mid-dialog repaint cannot retarget the confirm: the OPENED ref is sent', () => {
+    // The security-review retarget class: bags stay interactive behind the
+    // prompt and the 1 Hz repaint keeps running, so a bag shift while the
+    // confirm is open makes a re-resolved selection fall back to another
+    // candidate. The confirm must send the ref it was opened for; a stale
+    // captured ref dies on the server's index-plus-id pin instead.
+    world.equipment = {};
+    world.inventory.push({ itemId: APEX, count: 1 });
+    const win = makeWindow();
+    win.open();
+    const bagIndex = world.inventory.length - 1;
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(document.querySelector('.pf-bind-prompt')).not.toBeNull();
+    // The bag shifts under the open prompt (a preceding stack is consumed),
+    // and a repaint runs: the candidate's cell index is different now.
+    world.inventory.splice(0, 1);
+    vi.advanceTimersByTime(1000);
+    const prompt = document.querySelector('.pf-bind-prompt') as HTMLElement;
+    (prompt.querySelector('.pf-bind-confirm') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenCalledTimes(1);
+    expect(world.perfectItem.mock.calls[0][0]).toEqual({ bag: bagIndex, itemId: APEX });
   });
 
   it('a bound copy skips the confirm entirely', () => {
@@ -319,6 +359,28 @@ describe('the naming dialog (deliverable B)', () => {
     // The detail pane now leads with the chosen name and the promoted face.
     expect(root().textContent).toContain('Oath');
     expect(root().querySelector('[data-action]')).toBeNull();
+    // Focus lands on a live rung, never <body> (the wave-1 frontend review:
+    // dismiss() has no opener return, so the window repairs it itself; the
+    // promoted face has no action button, so the candidate row takes it).
+    expect(document.activeElement).not.toBe(document.body);
+    expect(root().contains(document.activeElement)).toBe(true);
+  });
+
+  it('cancelling after a mid-prompt repaint still returns focus into the window', () => {
+    // The captured opener node is destroyed by any 1 Hz repaint whose
+    // signature moved (root.innerHTML rebuild), so dismissAndReturn's
+    // opener.focus() is a detached no-op; the refocus repair puts the
+    // keyboard somewhere real.
+    const win = makeWindow();
+    openDialog(win);
+    world.inventory[0].count -= 1;
+    vi.advanceTimersByTime(1000);
+    const prompt = document.querySelector('.pf-name-prompt') as HTMLElement;
+    expect(prompt).not.toBeNull();
+    (prompt.querySelector('.pf-name-cancel') as HTMLButtonElement).click();
+    expect(document.querySelector('.pf-name-prompt')).toBeNull();
+    expect(document.activeElement).not.toBe(document.body);
+    expect(root().contains(document.activeElement)).toBe(true);
   });
 
   it('closing the window under an open dialog clears inert (the backstop)', () => {

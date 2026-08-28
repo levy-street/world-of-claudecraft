@@ -9705,6 +9705,7 @@ export const cs_CZ: EnTranslations = {
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
       "clickSetOut": "Click to set out",
+      "clickSetUp": "Click to set up",
       "clickBuyback": "Kliknutím odkoupíš zpět",
       "bagSlots": "Batoh s {slots} sloty"
     },

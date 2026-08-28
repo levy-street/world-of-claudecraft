@@ -1,6 +1,7 @@
-import { archetypeTitleText, craftNameText } from '../../char_window';
+import { archetypeTitleText } from '../../char_window';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { craftNameText } from './craft_name_view';
 import { archetypeImageUrl } from './profession_art';
 import { orderSkillsForCard, type ProfessionIdentityModel } from './profession_identity_view';
 

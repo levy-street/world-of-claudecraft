@@ -11398,6 +11398,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.clickMarketList'
   | 'itemUi.tooltip.clickSell'
   | 'itemUi.tooltip.clickSetOut'
+  | 'itemUi.tooltip.clickSetUp'
   | 'itemUi.tooltip.clickTradeOffer'
   | 'itemUi.tooltip.clickUse'
   | 'itemUi.tooltip.clickUseInstant'

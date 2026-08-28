@@ -4960,7 +4960,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.update(dt);
     }
     if (this.farmPatchVisuals) {
-      this.farmPatchVisuals.sync(this.sim, dt);
+      if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(this.sim, dt);
       this.farmPatchVisuals.update(dt);
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);

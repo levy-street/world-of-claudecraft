@@ -132,6 +132,10 @@ export type BagTooltipHintKey =
   // The placeable feast: the click SETS IT OUT at your feet (placeFeast),
   // it never eats it, so the generic "Click to use" undersold the action.
   | 'itemUi.tooltip.clickSetOut'
+  // The station-placing tools: the click SETS THE STATION UP at your feet
+  // (placeMobileStation), the feast's twin in the one deployable-hint
+  // pattern, and the same verb the sim's placement line speaks.
+  | 'itemUi.tooltip.clickSetUp'
   // Tool-effect charms are not bag-usable: the sim refuses useItem with the
   // "Open Professions to slot that" line, so the hover must not advertise
   // "Click to use" for a click that only errors.
@@ -461,6 +465,11 @@ export function bagTooltipHintKey(
   // arm uses (this module's own item shape carries feast? on every item), so
   // the hover can never advertise a click the ladder routes elsewhere.
   if (item.feast) return 'itemUi.tooltip.clickSetOut';
+  // The station-placing tools (Master's Field Forge and kin): the same
+  // deployable pattern as the feast above, with the family's own verb. The
+  // hover previews the click the ladder's useItem arm performs, in the words
+  // the sim's placement line will confirm ("You set up the {name}.").
+  if (isPlaceStationBagUse(item.use)) return 'itemUi.tooltip.clickSetUp';
   // Patterns are usable but carry no `use` payload (the kind IS the payload),
   // so the kind joins this arm to reach the shared use hint; without it the
   // hover stayed silent about a click that learns a recipe.
@@ -475,6 +484,20 @@ function isToolEffectBagUse(use: unknown): boolean {
     typeof use === 'object' &&
     Object.hasOwn(use, 'type') &&
     (use as { type: unknown }).type === 'toolEffect'
+  );
+}
+
+/** True when the bag use payload places a mobile crafting station (ItemDef
+ *  use.type 'placeMobileStation'): the structural twin of
+ *  isPlaceMobileStationItem in hud/professions/mobile_station_tooltip.ts,
+ *  which this view cannot import as a guard because its item shape carries
+ *  `use` as unknown. */
+function isPlaceStationBagUse(use: unknown): boolean {
+  return (
+    !!use &&
+    typeof use === 'object' &&
+    Object.hasOwn(use, 'type') &&
+    (use as { type: unknown }).type === 'placeMobileStation'
   );
 }
 
