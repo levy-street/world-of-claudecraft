@@ -22,7 +22,7 @@
 //     refused enchant buy a cast bar);
 //   - every refusal arm draws zero rng, behind a positive control, so a
 //     mis-wired observer cannot make those zeros vacuous.
-// The picker mirror (src/ui/enchant_apply_view.ts) is pinned in
+// The picker mirror (src/ui/hud/professions/enchant_apply_view.ts) is pinned in
 // tests/enchant_apply_view.test.ts and deliberately not repeated here.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';

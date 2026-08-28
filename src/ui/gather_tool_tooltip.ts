@@ -38,7 +38,7 @@ import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { gatheringProfessionNameKey } from './gathering_profession_name';
+import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 
 const KIND_KEYS: Record<GatheringProfessionId, TranslationKey> = {

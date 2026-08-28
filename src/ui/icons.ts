@@ -13,12 +13,12 @@ import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { professionImageUrl } from './hud/professions/profession_art';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
-import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
-export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
+export { PROFESSION_IMAGE_IDS, professionImageUrl } from './hud/professions/profession_art';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
 

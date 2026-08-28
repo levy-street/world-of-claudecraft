@@ -16,16 +16,16 @@ import { MOUNTS } from '../src/sim/content/mounts';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
-import { cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
-import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
-import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
-import { materialHintLine } from '../src/ui/material_hint_view';
-import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
-import { mobileStationTooltipLines } from '../src/ui/mobile_station_tooltip';
-import { recipePatternTooltipLines } from '../src/ui/recipe_pattern_tooltip_view';
+import { cookingCatchHintKey } from '../src/ui/hud/professions/cooking_catch_hint_view';
+import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
+import { feastTooltipLines } from '../src/ui/hud/professions/feast_tooltip_view';
+import { materialHintLine } from '../src/ui/hud/professions/material_hint_view';
+import { materialProfessionHintText } from '../src/ui/hud/professions/material_profession_hint_view';
+import { mobileStationTooltipLines } from '../src/ui/hud/professions/mobile_station_tooltip';
+import { recipePatternTooltipLines } from '../src/ui/hud/professions/recipe_pattern_tooltip_view';
+import { wellFedTooltipLines } from '../src/ui/hud/professions/wellfed_tooltip_view';
 import { toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
-import { wellFedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 
 const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['weapon damage', (def) => def.weapon !== undefined],

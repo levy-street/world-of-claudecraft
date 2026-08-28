@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import type { GatherRareEventFlavor } from '../src/sim/types';
 import { GATHER_RARE_EVENT_LINE_KEYS } from '../src/ui/gather_rare_event_feedback';
-import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
+import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/hud/professions/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
 import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
 import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
@@ -489,7 +489,7 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
         .replace(/(^|\s)\/\/.*$/gm, '$1');
     for (const file of [
       'src/ui/char_window.ts',
-      'src/ui/professions_window.ts',
+      'src/ui/hud/professions/professions_window.ts',
       // The third consumer, which is why the table was extracted at all.
       'src/ui/hud/vendor/vendor_window.ts',
     ]) {

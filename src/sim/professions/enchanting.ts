@@ -158,7 +158,7 @@ export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
  *  #2340 disenchant fallback). The apply command is item-id-keyed, so when two
  *  enchanted copies of one item id carry different enchants, this pin is what
  *  decides the victim; the UI confirm dialog names the enchant of exactly this
- *  copy (src/ui/enchant_apply_view.ts enchantTargets builds its replace rows
+ *  copy (src/ui/hud/professions/enchant_apply_view.ts enchantTargets builds its replace rows
  *  from this same function), so what the player confirms is what the sim
  *  destroys. The pin re-resolves when the command lands, which is the accepted
  *  trade of an id-keyed command with no per-copy token: an enchanted copy of
@@ -216,7 +216,7 @@ export function isDisenchantable(def: ItemDef | undefined): boolean {
 /** The rarity/tier-scaled base yield the rng bonus rides on: the shared term
  *  of disenchantYield and maxDisenchantYield, so the #2350 capacity gate's
  *  worst case can never drift from the rolled grant. Exported so the UI's
- *  disenchant-confirm yield preview (src/ui/disenchant_yield_view.ts) reads the
+ *  disenchant-confirm yield preview (src/ui/hud/professions/disenchant_yield_view.ts) reads the
  *  LOW end of the sub-rare range from this same term instead of restating it. */
 export function baseDisenchantYield(def: ItemDef): number {
   const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
@@ -742,7 +742,7 @@ export interface ApplyEnchantResult {
  *  slots); the returned payload is the slot's LIVE object by reference, so
  *  callers treat it as read-only. Shared by the
  *  Perfected guard below and the Apply Enchant picker's bagged candidate scan
- *  (src/ui/enchant_apply_view.ts), so the row a player sees and the copy the
+ *  (src/ui/hud/professions/enchant_apply_view.ts), so the row a player sees and the copy the
  *  sim judges are one selection by construction. */
 export function baggedEnchantVictim(
   inventory: readonly InvSlot[],
@@ -1150,7 +1150,7 @@ function resolveReplaceEnchantBagged(
  *
  *  DENY LADDER, in order, and the order is deliberate the way #2415's
  *  flag-before-id-compare is (evaluateApplyEnchantAdmission mirrors it arm for
- *  arm, and src/ui/enchant_apply_view.ts mirrors the first four so the picker
+ *  arm, and src/ui/hud/professions/enchant_apply_view.ts mirrors the first four so the picker
  *  never offers what this refuses):
  *    1. unknown_item / unknown_enchant: nothing to reason about without both
  *       defs, so they come first whatever else is wrong.

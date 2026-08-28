@@ -437,7 +437,7 @@ describe('classifyDiff', () => {
   });
 
   it('stages a complete profession identity for refresh-aware captures', () => {
-    const target = resolveTargets(['src/ui/professions_window.ts']).find(
+    const target = resolveTargets(['src/ui/hud/professions/professions_window.ts']).find(
       (candidate: { key: string }) => candidate.key === 'professions',
     );
     expect(target?.capture.toString()).toContain('knownRecipes: []');
@@ -446,10 +446,10 @@ describe('classifyDiff', () => {
   it('maps the identity card and view modules to the crafting target (phase 22)', () => {
     // A rename or when-list trim would silently stop capturing the identity
     // card framings; pin the routing per module the phase added.
-    const cardPlan = classifyDiff(['src/ui/profession_identity_card.ts']);
+    const cardPlan = classifyDiff(['src/ui/hud/professions/profession_identity_card.ts']);
     expect(cardPlan.isVisual).toBe(true);
     expect(cardPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
-    const viewPlan = classifyDiff(['src/ui/profession_identity_view.ts']);
+    const viewPlan = classifyDiff(['src/ui/hud/professions/profession_identity_view.ts']);
     expect(viewPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
     const crafting = cardPlan.specific.find(
       (candidate: { key: string }) => candidate.key === 'crafting',
@@ -594,8 +594,8 @@ describe('classifyDiff', () => {
     // proximity resolver is the third road to the same surface, so a change
     // to any of the three reshoots the bed press.
     for (const path of [
-      'src/ui/farming_plant_sheet_view.ts',
-      'src/ui/farming_plant_sheet_window.ts',
+      'src/ui/hud/professions/farming_plant_sheet_view.ts',
+      'src/ui/hud/professions/farming_plant_sheet_window.ts',
       'src/game/farm_bed_interact.ts',
     ]) {
       const plan = classifyDiff([path]);
@@ -605,7 +605,7 @@ describe('classifyDiff', () => {
         path,
       ).toContain('farm-plant-sheet');
     }
-    const target = resolveTargets(['src/ui/farming_plant_sheet_view.ts']).find(
+    const target = resolveTargets(['src/ui/hud/professions/farming_plant_sheet_view.ts']).find(
       (candidate: { key: string }) => candidate.key === 'farm-plant-sheet',
     );
     // Desktop and mobile landscape both, each on the LOW graphics seed (the

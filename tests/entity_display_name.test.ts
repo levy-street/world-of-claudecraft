@@ -10,7 +10,7 @@ import {
   feastTitleKeyedTemplateIds,
   feastTitleKeyFor,
   feastTitleTemplateIds,
-} from '../src/ui/feast_title';
+} from '../src/ui/hud/professions/feast_title';
 
 function ent(over: Record<string, unknown>): Entity {
   return {

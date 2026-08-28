@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
 import type { SimEvent } from '../src/sim/types';
 import { type BannerVariant, Hud } from '../src/ui/hud';
-import { professionImageUrl } from '../src/ui/profession_art';
+import { professionImageUrl } from '../src/ui/hud/professions/profession_art';
 import {
   advanceSkillLevelObservation,
   buildSkillLevelCelebrationPlan,
@@ -21,7 +21,7 @@ import {
   SKILL_PLATE_MILESTONE_STEP,
   skillDisplayLevel,
   skillLevelArtId,
-} from '../src/ui/skill_level_toast_view';
+} from '../src/ui/hud/professions/skill_level_toast_view';
 
 describe('skillDisplayLevel', () => {
   it('floors a fractional skill to the player-visible level', () => {

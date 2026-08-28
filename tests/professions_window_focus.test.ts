@@ -9,7 +9,10 @@
 // writes. Drives the real ProfessionsWindow over jsdom with stub deps.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ProfessionsWindow, type ProfessionsWindowDeps } from '../src/ui/professions_window';
+import {
+  ProfessionsWindow,
+  type ProfessionsWindowDeps,
+} from '../src/ui/hud/professions/professions_window';
 
 // jsdom ships no 2D canvas, so the procedural icon compositor cannot run here;
 // the painter only ever uses the returned string as an <img src>.
@@ -350,7 +353,7 @@ describe('ProfessionsWindow: mode and row gating', () => {
     // Fishing joined the name table with Professions 2.0, so the unknown-id
     // example is skinning (documented in gathering.ts as deliberately NOT a
     // gathering profession): an id with no GATHERING_PROFESSION_NAME_KEYS
-    // entry (src/ui/gathering_profession_name.ts, the extracted shared
+    // entry (src/ui/hud/professions/gathering_profession_name.ts, the extracted shared
     // table) renders no row BY DESIGN, while the known ids beside it still
     // render.
     const state = baseState();

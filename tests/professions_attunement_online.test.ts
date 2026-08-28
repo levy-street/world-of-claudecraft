@@ -41,7 +41,7 @@ import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
-import { buildAttunementPreview } from '../src/ui/profession_identity_view';
+import { buildAttunementPreview } from '../src/ui/hud/professions/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 const SMITH_PAIR = 'weaponcrafting+armorcrafting';

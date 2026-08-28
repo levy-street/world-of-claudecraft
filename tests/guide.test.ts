@@ -129,9 +129,9 @@ import {
 import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
 import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
+import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
-import { WELLFED_STAT_KEYS } from '../src/ui/wellfed_stat_keys';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));

@@ -8,8 +8,11 @@
 import { describe, expect, it } from 'vitest';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
-import { COOKING_CATCH_HINT_KEY, cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
 import { Hud } from '../src/ui/hud';
+import {
+  COOKING_CATCH_HINT_KEY,
+  cookingCatchHintKey,
+} from '../src/ui/hud/professions/cooking_catch_hint_view';
 import { t } from '../src/ui/i18n';
 import { createTooltipLine } from '../src/ui/tooltip_line';
 
@@ -65,7 +68,10 @@ describe('createTooltipLine (createElement paint)', () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     // Repo root is process.cwd() under vitest (worktree root).
-    for (const rel of ['src/ui/cooking_catch_hint_view.ts', 'src/ui/tooltip_line.ts']) {
+    for (const rel of [
+      'src/ui/hud/professions/cooking_catch_hint_view.ts',
+      'src/ui/tooltip_line.ts',
+    ]) {
       const src = readFileSync(join(process.cwd(), rel), 'utf8');
       expect(src, rel).not.toMatch(/\.innerHTML\s*=/);
       expect(src, rel).not.toMatch(/`[\s\S]*class="tt-/);

@@ -262,7 +262,7 @@ export function usableToolEffectSlot(
  * promised a second the sim's clamp never gave. One definition, three live
  * readers (the capacity gates at both ends of the cast, through
  * harvestYieldItemId, the grant, and the grade-preview tooltip, which adapts
- * the IWorld reads into `GradeReadMeta` in src/ui/gathering_view.ts so the
+ * the IWorld reads into `GradeReadMeta` in src/ui/hud/professions/gathering_view.ts so the
  * preview and the grant literally share this function).
  *
  * Pure and draw-free, and it never spends a charge: spending belongs to the

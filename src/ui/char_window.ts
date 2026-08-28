@@ -23,15 +23,16 @@ import { type EquipSlot, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
-import { craftNameText } from './craft_name_view';
 import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
-import { gatheringProfessionNameKey } from './gathering_profession_name';
-import { buildGatheringProficiencyRows } from './gathering_view';
+import { craftNameText } from './hud/professions/craft_name_view';
+import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
+import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
+import { archetypeImageUrl } from './hud/professions/profession_art';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
@@ -45,7 +46,6 @@ import {
   onPortraitUpdate,
   portraitChipHtml,
 } from './portrait_chip';
-import { archetypeImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';

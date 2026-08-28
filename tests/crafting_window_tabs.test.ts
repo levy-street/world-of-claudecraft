@@ -22,8 +22,8 @@ import {
   craftingTabs,
   craftOwnsTab,
   resolveSelectedCraft,
-} from '../src/ui/crafting_view';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
+} from '../src/ui/hud/professions/crafting_view';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
 import { isRecipeKnownForViewer } from '../src/ui/hud/vendor/train_view';
 
 // Two weaponcrafting recipes that STRADDLE an alchemy recipe in ALL_RECIPES

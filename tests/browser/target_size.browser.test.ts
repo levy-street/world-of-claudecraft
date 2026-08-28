@@ -8,7 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
-import { PlantSheetWindow } from '../../src/ui/farming_plant_sheet_window';
+import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
 import { cleanup } from './_harness';
 
 const TOUCH_FLOOR = 40;

@@ -3,7 +3,10 @@
 // or dropped arm in the mapping fails HERE decisively; the hud.ts caller is
 // pinned as a thin wire in tests/profession_identity_card.test.ts.
 import { describe, expect, it } from 'vitest';
-import { craftDenialLine, DENIAL_KEY_BY_REASON } from '../src/ui/craft_denial_line_view';
+import {
+  craftDenialLine,
+  DENIAL_KEY_BY_REASON,
+} from '../src/ui/hud/professions/craft_denial_line_view';
 
 describe('craft_denial_line_view', () => {
   it('maps every plain denial reason to its literal key', () => {

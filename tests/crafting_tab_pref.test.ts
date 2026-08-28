@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parseCraftingTab, serializeCraftingTab } from '../src/ui/crafting_tab_pref';
+import {
+  parseCraftingTab,
+  serializeCraftingTab,
+} from '../src/ui/hud/professions/crafting_tab_pref';
 
 describe('serialize / parse round-trip', () => {
   it('round-trips a valid profession id', () => {

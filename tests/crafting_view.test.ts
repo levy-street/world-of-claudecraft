@@ -21,7 +21,7 @@ import {
   craftingReagentSig,
   craftLearnHints,
   type RecipeDefLike,
-} from '../src/ui/crafting_view';
+} from '../src/ui/hud/professions/crafting_view';
 
 function item(id: string): ItemDef {
   return {

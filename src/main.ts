@@ -431,7 +431,6 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
-import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -443,6 +442,7 @@ import {
   setReferralProvider,
   setStandingProvider,
 } from './ui/hud/player_card/player_card_share';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/hud/professions/gathering_view';
 import {
   ensureLocaleLoaded,
   formatNumber,

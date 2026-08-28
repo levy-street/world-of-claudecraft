@@ -10,8 +10,8 @@
 // pinned at source in tests/craft_celebration_text_view.test.ts.
 import { describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { legendaryForgedLine } from '../src/ui/craft_celebration_text_view';
 import { Hud } from '../src/ui/hud';
+import { legendaryForgedLine } from '../src/ui/hud/professions/craft_celebration_text_view';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));

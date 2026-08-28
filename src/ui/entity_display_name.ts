@@ -17,7 +17,7 @@
 import { isNecromancyUndead } from '../sim/combat/necromancy';
 import type { Entity } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { feastTitleFor } from './feast_title';
+import { feastTitleFor } from './hud/professions/feast_title';
 import { localizeSimAuraName } from './sim_i18n';
 
 export function entityDisplayName(entity: Entity): string {

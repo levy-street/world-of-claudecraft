@@ -842,7 +842,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // arms nothing.
   { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
-    file: 'crafting_window.ts',
+    file: 'hud/professions/crafting_window.ts',
     // Three scroll regions carried across the rebuild, capture + write-back
     // each: .crafting-body, the identity card's capped .profession-skill-list
     // (desktop), and the card itself (the MOBILE scroller; hud.mobile.css
@@ -854,7 +854,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // Same scroll pair as the vendor family's cold windows above: read the
   // position before the rebuild, write it back after, so the order list
   // does not jump under the player on their own action's repaint.
-  { file: 'commission_order_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/professions/commission_order_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
   {
@@ -903,7 +907,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // world every tick, so the journal stays consistent with the server's
   // events-before-snapshots order without an event-forced cache.
   {
-    file: 'harvest_journal_window.ts',
+    file: 'hud/professions/harvest_journal_window.ts',
     reflowAllow: {},
     driverAllow: { setInterval: 1 },
     drivers: [
@@ -1017,7 +1021,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // path. ONE call, guarded by a feature check with a setTimeout fallback; the
   // count is 3 because the optional-API type declaration names it twice more.
   { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
-  { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/professions/professions_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The root, trigger, and popover rects position the target-aura configurator inside the
   // viewport. They run only when the player opens or changes that configurator, or when an
@@ -1592,7 +1600,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gather_node_tooltip_controller.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
-      'harvest_journal_window.ts#0',
+      'hud/professions/harvest_journal_window.ts#0',
       'hud/delve/lockpick_window.ts#0',
     ]);
     // THIRD, the matchers must have seen real source. The positive control is the lockpick
@@ -1624,7 +1632,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // and only reaches it when the model's value signature actually moved
       // (argued in the entry's why/stopsAt above): the tick body itself is the
       // isOpen guard, one pure view rebuild, and the text-only cell rewrite.
-      'harvest_journal_window.ts: paint',
+      'hud/professions/harvest_journal_window.ts: paint',
     ]);
     expect(
       sweep.violations,

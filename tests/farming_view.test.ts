@@ -1,4 +1,4 @@
-// Pure-core tests for src/ui/farming_view.ts: the farmDenied toast key and the
+// Pure-core tests for src/ui/hud/professions/farming_view.ts: the farmDenied toast key and the
 // farm grant-line selectors. Moved here with the selectors themselves when the
 // knobs phase extracted farming's own view core (previously these blocks lived
 // in tests/gathering_view.test.ts and tests/grant_line_view.test.ts beside the
@@ -9,6 +9,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { FARM_HUSKS_PER_COMPOST } from '../src/sim/professions/farming';
+import { gatherLineKey, harvestLineKey } from '../src/ui/grant_line_view';
 import {
   type FarmDeniedReason,
   type FarmDeniedToast,
@@ -20,8 +21,7 @@ import {
   farmPlantedTokenId,
   farmSeedBackLineKey,
   farmWitheredLineKey,
-} from '../src/ui/farming_view';
-import { gatherLineKey, harvestLineKey } from '../src/ui/grant_line_view';
+} from '../src/ui/hud/professions/farming_view';
 import { setLanguage, t } from '../src/ui/i18n';
 
 describe('farmDeniedLineKey', () => {
@@ -267,7 +267,7 @@ describe('farmDeniedToast: the tool refusal names the crop tier when it can', ()
 describe('the farm feedback seed-back render arms (source pin)', () => {
   // The seed-back arms lived in hud.ts's farmHarvested and farmWithered case
   // bodies until the v0.38.0 sync's monolith extraction moved them whole to
-  // src/ui/farm_event_feedback.ts, where tests/farm_event_feedback.test.ts
+  // src/ui/hud/professions/farm_event_feedback.ts, where tests/farm_event_feedback.test.ts
   // now DRIVES them directly (the executed coverage this pin's original
   // premise said was missing). The structural pin stays as belt-and-braces
   // over the extracted source: each arm calls farmSeedBackLineKey exactly
@@ -276,7 +276,7 @@ describe('the farm feedback seed-back render arms (source pin)', () => {
   // block, never on whole-file proximity regex; whole-line comments are
   // stripped first so a commented-out call cannot satisfy the pin.
   const feedbackSrc = readFileSync(
-    path.join(__dirname, '../src/ui/farm_event_feedback.ts'),
+    path.join(__dirname, '../src/ui/hud/professions/farm_event_feedback.ts'),
     'utf8',
   ).replace(/^\s*\/\/.*$/gm, '');
 

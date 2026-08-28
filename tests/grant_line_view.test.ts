@@ -168,5 +168,5 @@ describe('the quantity-variant key selectors', () => {
 
   // The farm grant-line selector blocks (farmPlantedTokenId and the three
   // farm key selectors) moved to tests/farming_view.test.ts with the
-  // selectors themselves: the knobs phase extracted src/ui/farming_view.ts.
+  // selectors themselves: the knobs phase extracted src/ui/hud/professions/farming_view.ts.
 });

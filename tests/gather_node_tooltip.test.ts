@@ -11,7 +11,7 @@ import {
   gatherNodeToolGateFor,
   gatherNodeTooltipHtml,
 } from '../src/ui/gather_node_tooltip_controller';
-import type { GatherNodeTooltipModel } from '../src/ui/gathering_view';
+import type { GatherNodeTooltipModel } from '../src/ui/hud/professions/gathering_view';
 import { hasTranslation } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 

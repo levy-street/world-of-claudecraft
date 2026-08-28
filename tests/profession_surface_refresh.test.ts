@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS, GATHERING_PROFESSIONS } from '../src/sim/content/professions';
-import type { GatheringProficiencyRow } from '../src/ui/gathering_view';
-import { professionSurfaceRefreshSig } from '../src/ui/profession_identity_view';
+import type { GatheringProficiencyRow } from '../src/ui/hud/professions/gathering_view';
+import { professionSurfaceRefreshSig } from '../src/ui/hud/professions/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 function identity(overrides: Partial<CraftingIdentityView> = {}): CraftingIdentityView {

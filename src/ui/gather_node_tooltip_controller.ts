@@ -31,7 +31,7 @@ import {
   buildGatherNodeTooltip,
   type GatherNodeTooltipModel,
   viewerUsableToolTier,
-} from './gathering_view';
+} from './hud/professions/gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { getUiScale } from './ui_scale';
 

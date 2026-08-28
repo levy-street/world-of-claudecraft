@@ -24,7 +24,7 @@ import {
   maxCraftBatchFit,
   maxCraftsFromReagents,
   recipeDurationSec,
-} from '../src/ui/craft_cast_view';
+} from '../src/ui/hud/professions/craft_cast_view';
 
 function row(partial: {
   recipeId?: string;

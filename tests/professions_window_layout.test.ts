@@ -14,7 +14,10 @@ import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import { requiredAmendsProgress } from '../src/sim/professions/archetype';
-import { ProfessionsWindow, type ProfessionsWindowDeps } from '../src/ui/professions_window';
+import {
+  ProfessionsWindow,
+  type ProfessionsWindowDeps,
+} from '../src/ui/hud/professions/professions_window';
 
 // This file runs under jsdom, where import.meta.url is an http URL that
 // readFileSync rejects; resolve the source-scan reads from __dirname instead.
@@ -274,7 +277,7 @@ describe('ProfessionsWindow: simplified call to action', () => {
     // mapping is pinned at the source: the painter must select the
     // specialized copy exactly when nextUnlock.kind is 'specialized' and the
     // plain raise copy otherwise.
-    const painter = read('../src/ui/professions_window.ts');
+    const painter = read('../src/ui/hud/professions/professions_window.ts');
     expect(painter).toContain("'hudChrome.professions.ctaRaiseSpecialized'");
     expect(painter).toContain("'hudChrome.professions.ctaRaise'");
     const flat = painter.replace(/\s+/g, ' ');

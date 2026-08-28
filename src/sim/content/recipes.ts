@@ -3069,7 +3069,7 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   //
   // THE THREE SURFACES THAT ACTUALLY DRAW IT, traced rather than assumed,
   // because Phase 11g's own record named a fourth that structurally cannot:
-  // the crafting window's reagent line (src/ui/crafting_window.ts, which wraps
+  // the crafting window's reagent line (src/ui/hud/professions/crafting_window.ts, which wraps
   // inside a card whose pane scrolls), that window's recipe TOOLTIP, and the
   // wiki materials cell (src/guide/pages/professions_craft.ts, whose
   // .guide-prof-mat rule wraps between entries). The bag action-menu cost line

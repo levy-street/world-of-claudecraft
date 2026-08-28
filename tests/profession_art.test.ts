@@ -6,7 +6,7 @@ import {
   MASTERWORK_SEAL_IMAGE_URL,
   PROFESSION_IMAGE_IDS,
   professionImageUrl,
-} from '../src/ui/profession_art';
+} from '../src/ui/hud/professions/profession_art';
 
 const EXPECTED_IMAGE_IDS = [
   'archetype_apothecary',

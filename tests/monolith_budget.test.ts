@@ -101,7 +101,7 @@ const MONOLITHS: MonolithRow[] = [
     // never a raise. A raise stays a maintainer decision, per the header.
     // Re-pinned down from 19338 after the error-text matcher moved out to
     // src/ui/error_text_i18n_core.ts, then from 19190 after the craft-deny
-    // message table moved to src/ui/crafting_deny_core.ts (the v0.37.0 sync
+    // message table moved to src/ui/hud/professions/crafting_deny_core.ts (the v0.37.0 sync
     // merge had pushed the file over), keeping the zero-headroom posture.
     // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
     // overhaul extracted marker interaction out of the coordinator, so the

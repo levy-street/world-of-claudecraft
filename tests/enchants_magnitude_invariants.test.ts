@@ -20,7 +20,7 @@ const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 // lucent_reagent, Greater is the arcane_shard consumer, Runed consumes a
 // resonant_* typed disenchant secondary, base is everything else. Apex is
 // tested FIRST and subtracted from the other three, the same top-down
-// precedence src/ui/enchant_apply_view.ts enchantTier and the sim's
+// precedence src/ui/hud/professions/enchant_apply_view.ts enchantTier and the sim's
 // enchantGainTier use: every Lucent enchant also draws on the tier below it
 // (shard or dust), so an apex-blind predicate would read three of the four as
 // Greater and quietly widen that tier's pinned id list.

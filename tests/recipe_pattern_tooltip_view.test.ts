@@ -21,7 +21,7 @@ import {
   type RecipePatternViewerInput,
   recipePatternTooltipLines,
   recipePatternTooltipModel,
-} from '../src/ui/recipe_pattern_tooltip_view';
+} from '../src/ui/hud/professions/recipe_pattern_tooltip_view';
 import { bareClient } from './helpers/bare_client';
 
 // An alchemy recipe with a real skill gate and a resolvable result item.

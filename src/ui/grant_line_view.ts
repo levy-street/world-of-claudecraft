@@ -114,12 +114,12 @@ export function craftedLineKey(count: number | undefined): TranslationKey {
 }
 
 // The farm grant-line selectors (farmPlantedTokenId, farmHarvestLineKey,
-// farmFineLineKey, farmWitheredLineKey) moved to src/ui/farming_view.ts when
+// farmFineLineKey, farmWitheredLineKey) moved to src/ui/hud/professions/farming_view.ts when
 // the knobs phase tripped the rule of three: farming's view logic now has its
 // own pure core, which consumes isMultiUnitGrant above exactly as
 // enchanting_view.ts does, so the grant-line families cannot diverge.
 
 // The three enchanting-action lines (disenchant / salvage / apply-enchant)
-// keep their key selection in src/ui/enchanting_view.ts, which already owns the
+// keep their key selection in src/ui/hud/professions/enchanting_view.ts, which already owns the
 // event -> key + sink mapping for those commands; it consumes isMultiUnitGrant
 // above so all four families agree on when a quantity is worth showing.

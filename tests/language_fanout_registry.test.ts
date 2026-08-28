@@ -348,13 +348,13 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: "the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature. paintedWalletSig is the Solana wallet card's locale-free connection and balance state that gates onWalletChanged(); the same render() repaints the card in the current language and re-latches the signature, so the one relocalize() arm answers both memos",
   },
   {
-    file: 'professions_window.ts',
+    file: 'hud/professions/professions_window.ts',
     memos: ['lastSig'],
     answer: 'this.professionsWindow.render',
     why: 'the known professions and their skill numbers; render() carries no self-gate',
   },
   {
-    file: 'harvest_journal_window.ts',
+    file: 'hud/professions/harvest_journal_window.ts',
     memos: ['paintedSignature'],
     answer: 'this.harvestJournalWindow.relocalize',
     why:

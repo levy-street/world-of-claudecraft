@@ -15,14 +15,14 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { AuraKind, FoodItemDef, ItemDef } from '../src/sim/types';
-import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
+import { wellFedTooltipLines } from '../src/ui/hud/professions/wellfed_tooltip_view';
 import {
   ensureLocaleLoaded,
   formatNumber,
   type SupportedLanguage,
   setLanguage,
 } from '../src/ui/i18n';
-import { wellFedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 import { stripComments } from './helpers/strip_comments';
 
 // Synthetic wellFed variants: one def spread with a replaced record, so the
@@ -220,8 +220,14 @@ describe('the wellfed and elixir stat maps stay in step', () => {
     // WELLFED_STAT_KEYS lives in its own pure leaf (Phase 14, C10: the
     // wiki's effect prose consumes it too and the guide bundle may not
     // reach this view's sim_i18n graph); the source read follows it there.
-    const wellfedKeys = readMapKeys('../src/ui/wellfed_stat_keys.ts', 'WELLFED_STAT_KEYS');
-    const elixirKeys = readMapKeys('../src/ui/elixir_tooltip_view.ts', 'ELIXIR_STAT_KEYS');
+    const wellfedKeys = readMapKeys(
+      '../src/ui/hud/professions/wellfed_stat_keys.ts',
+      'WELLFED_STAT_KEYS',
+    );
+    const elixirKeys = readMapKeys(
+      '../src/ui/hud/professions/elixir_tooltip_view.ts',
+      'ELIXIR_STAT_KEYS',
+    );
     expect(wellfedKeys).toEqual(elixirKeys);
     expect(wellfedKeys.length).toBeGreaterThanOrEqual(5);
     for (const kind of wellfedKeys) {

@@ -12,7 +12,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { FoodItemDef, ItemDef, OtherItemDef } from '../src/sim/types';
-import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
+import { feastTooltipLines } from '../src/ui/hud/professions/feast_tooltip_view';
 import {
   ensureLocaleLoaded,
   formatNumber,

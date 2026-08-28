@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Hud } from '../src/ui/hud';
-import { wellFedTooltipLines } from '../src/ui/wellfed_tooltip_view';
+import { wellFedTooltipLines } from '../src/ui/hud/professions/wellfed_tooltip_view';
 
 function tooltipHtml(itemId: string): string {
   const h = Object.create(Hud.prototype) as unknown as {

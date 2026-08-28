@@ -9,7 +9,7 @@ import {
   disenchantResultToast,
   disenchantSecondaryLineKey,
   salvageResultToast,
-} from '../src/ui/enchanting_view';
+} from '../src/ui/hud/professions/enchanting_view';
 
 describe('enchanting_view: disenchant toast mapping', () => {
   it('maps a success carrying a yield to the yield-naming chat line', () => {

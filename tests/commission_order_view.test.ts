@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { buildCommissionOrderBoardModel } from '../src/ui/commission_order_view';
+import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
 import type { CommissionOrderView } from '../src/world_api/professions';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';

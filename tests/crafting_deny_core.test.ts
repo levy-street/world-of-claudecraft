@@ -1,4 +1,4 @@
-// The craft-deny message table (src/ui/crafting_deny_core.ts): every refusal
+// The craft-deny message table (src/ui/hud/professions/crafting_deny_core.ts): every refusal
 // reason a craftResult event can carry maps to exactly the key hud.ts's log
 // arm rendered before the extraction, and the station arm resolves the
 // station type from recipe content. Inputs are plain event fields, identical
@@ -6,7 +6,10 @@
 // union is shared), so one table drives both hosts.
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { type CraftDenyReason, craftDenyMessage } from '../src/ui/crafting_deny_core';
+import {
+  type CraftDenyReason,
+  craftDenyMessage,
+} from '../src/ui/hud/professions/crafting_deny_core';
 
 describe('craftDenyMessage', () => {
   it('maps every non-station reason to its key, unknown and absent to the materials line', () => {

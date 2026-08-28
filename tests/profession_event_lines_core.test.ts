@@ -3,7 +3,7 @@ import { QUESTS } from '../src/sim/data';
 import {
   attunementMasterForPair,
   planProfessionEvent,
-} from '../src/ui/profession_event_lines_core';
+} from '../src/ui/hud/professions/profession_event_lines_core';
 
 describe('attunementMasterForPair', () => {
   it('resolves each wave-one pair to its attunement quest giver', () => {

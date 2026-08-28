@@ -22,7 +22,7 @@ import {
   harvestJournalRowSignature,
   harvestJournalTimer,
   harvestJournalViewSignature,
-} from '../src/ui/harvest_journal_view';
+} from '../src/ui/hud/professions/harvest_journal_view';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;

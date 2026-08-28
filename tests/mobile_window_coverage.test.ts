@@ -238,8 +238,8 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     // the same change that gives its window a mobile rule or an exception below.
     expect(dyn.windowClassFiles).toEqual([
       'dev_command_window.ts',
+      'hud/professions/profession_tutorial_window.ts',
       'hud.ts',
-      'profession_tutorial_window.ts',
       'tutorial_greeting_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([

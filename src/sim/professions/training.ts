@@ -77,7 +77,7 @@ export function teachTierMet(recipe: ProfessionRecipeRecord, craftSkills: CraftS
  * station binding when it has one, else the station serving its home craft.
  * One definition, three readers (resolveTrain's range arm, the trainer
  * window's teach list in src/ui/hud/vendor/train_view.ts, and the crafting
- * window's where-to-learn hint in src/ui/crafting_view.ts), so what the UI
+ * window's where-to-learn hint in src/ui/hud/professions/crafting_view.ts), so what the UI
  * lists and what the sim teaches can never name different masters.
  *
  * The fallback order matters for the crafts with no physical station

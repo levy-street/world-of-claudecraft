@@ -17,7 +17,10 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { FarmPlotView } from '../src/sim/professions/farm_projection';
-import { HARVEST_JOURNAL_TICK_MS, HarvestJournalWindow } from '../src/ui/harvest_journal_window';
+import {
+  HARVEST_JOURNAL_TICK_MS,
+  HarvestJournalWindow,
+} from '../src/ui/hud/professions/harvest_journal_window';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
 
@@ -523,7 +526,7 @@ describe('harvest journal window (source contract)', () => {
   // being deleted out from under a green TS pin. Comments are stripped so
   // prose about 'block' can neither satisfy nor trip a needle.
   const src = stripComments(
-    readFileSync(join(process.cwd(), 'src/ui/harvest_journal_window.ts'), 'utf8'),
+    readFileSync(join(process.cwd(), 'src/ui/hud/professions/harvest_journal_window.ts'), 'utf8'),
   );
 
   it('opens and closes with inline flex, with no block write or block-shaped guard', () => {

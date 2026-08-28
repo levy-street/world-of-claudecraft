@@ -16,11 +16,11 @@ import { isEnchantedInstance } from '../sim/professions/enchanting';
 import { LEGENDARY_PROMOTION_COST } from '../sim/professions/perfecting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { esc } from './esc';
+import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { svgIcon } from './ui_icons';
 
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {

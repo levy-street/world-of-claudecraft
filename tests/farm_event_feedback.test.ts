@@ -1,4 +1,4 @@
-// The extracted farming feedback executor (src/ui/farm_event_feedback.ts, the
+// The extracted farming feedback executor (src/ui/hud/professions/farm_event_feedback.ts, the
 // v0.38.0 sync monolith heal): the five HUD arms driven through a recording
 // host. These arms previously lived inline in hud.ts's event switch with no
 // direct test (the pure resolution underneath is farming_view.test.ts's job);
@@ -19,10 +19,10 @@ const audioMock = vi.hoisted(() => ({
 }));
 vi.mock('../src/game/audio', () => ({ audio: audioMock }));
 
-import type { FarmEvent, FarmFeedbackHost } from '../src/ui/farm_event_feedback';
-import { handleFarmEvent } from '../src/ui/farm_event_feedback';
-import type { FarmDeniedReason } from '../src/ui/farming_view';
 import { grantItemToken } from '../src/ui/grant_line_view';
+import type { FarmEvent, FarmFeedbackHost } from '../src/ui/hud/professions/farm_event_feedback';
+import { handleFarmEvent } from '../src/ui/hud/professions/farm_event_feedback';
+import type { FarmDeniedReason } from '../src/ui/hud/professions/farming_view';
 
 beforeEach(() => {
   vi.clearAllMocks();

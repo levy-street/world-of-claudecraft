@@ -337,7 +337,7 @@ export function acquireRecipeForRecipe(
 /** Whether `inventory` holds a slot for `itemId` carrying a signed instance
  *  stamped with `playerName` (a self-gathered signed material). The
  *  host-agnostic form of the #1145 self-signed predicate: no PlayerMeta, so
- *  the crafting window's view core (src/ui/crafting_view.ts) consumes the
+ *  the crafting window's view core (src/ui/hud/professions/crafting_view.ts) consumes the
  *  SAME check the sim charges by, and the two can never diverge. */
 export function holdsSelfSignedInstance(
   inventory: readonly InvSlot[],

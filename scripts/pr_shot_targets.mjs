@@ -880,7 +880,7 @@ export const TARGETS = [
   {
     key: 'skill-milestone-plate',
     label: 'Banner: gathering skill milestone plate (#2934)',
-    when: ['ui/skill_level_toast_view'],
+    when: ['ui/hud/professions/skill_level_toast_view'],
     // Drives the REAL observation path: the handleEvents tail baselines the
     // live meta proficiency on one drain, then a later mutation crosses 25 (a
     // milestone, safely below the 100/200 deed bands so no deed plate
@@ -2268,7 +2268,7 @@ export const TARGETS = [
       'material_profession_hint_view',
       'material_profession_affinity',
       'craft_name_view',
-      'ui/material_hint',
+      'ui/hud/professions/material_hint',
     ],
     // Classic AND Parchment presets: the line's craft tint is a theme-emitted
     // token repaired per preset (src/ui/theme.ts --color-material-use), and the light
@@ -2339,7 +2339,7 @@ export const TARGETS = [
   {
     key: 'elixir-use-tooltip',
     label: 'Elixir of the Boar tooltip with its Use line',
-    when: ['ui/elixir_tooltip_view'],
+    when: ['ui/hud/professions/elixir_tooltip_view'],
     // Desktop only, the material-usedby-tooltip rationale: the synthetic
     // hover path does not raise #tooltip on the touch layout, and the
     // tooltip content is byte-identical on mobile.
@@ -2606,7 +2606,7 @@ export const TARGETS = [
   {
     key: 'profession-grant-lines',
     label: 'Chat log: one line per profession grant (#2430)',
-    when: ['ui/grant_line_view', 'ui/enchanting_view', 'sim/professions'],
+    when: ['ui/grant_line_view', 'ui/hud/professions/enchanting_view', 'sim/professions'],
     // Runs four profession actions back to back through the REAL sim commands
     // (craft, salvage, disenchant, apply enchant) and clips the chat log, so
     // the before/after pair shows the same four actions producing eight grant
@@ -3028,12 +3028,12 @@ export const TARGETS = [
     key: 'crafting',
     label: 'Crafting window',
     when: [
-      'ui/crafting_view',
-      'ui/crafting_window',
+      'ui/hud/professions/crafting_view',
+      'ui/hud/professions/crafting_window',
       'sim/content/recipes',
       'sim/professions',
-      'ui/profession_identity_card',
-      'ui/profession_identity_view',
+      'ui/hud/professions/profession_identity_card',
+      'ui/hud/professions/profession_identity_view',
     ],
     // Desktop and mobile variants: the legibility rows (skill line,
     // difficulty label, station badge, combo reason) are actionable info and
@@ -3284,8 +3284,8 @@ export const TARGETS = [
     key: 'commission-board',
     label: 'Commission order board (issue #1298)',
     when: [
-      'ui/commission_order_view',
-      'ui/commission_order_window',
+      'ui/hud/professions/commission_order_view',
+      'ui/hud/professions/commission_order_window',
       'sim/professions/commission_order',
     ],
     // Stages one order per section: an open request the viewer posted
@@ -3371,7 +3371,11 @@ export const TARGETS = [
   {
     key: 'gather-node-hover-tooltip',
     label: 'World hover: gather-node requirement and wield lines (#2343, R22)',
-    when: ['ui/gather_node_tooltip_controller', 'ui/gathering_view', 'professions/gathering'],
+    when: [
+      'ui/gather_node_tooltip_controller',
+      'ui/hud/professions/gathering_view',
+      'professions/gathering',
+    ],
     // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
     // hover tooltip only paints through the live pointermove raycast, so the
     // sweep proves the actual path. Toolless shows the red requires-a-pick
@@ -5703,7 +5707,7 @@ export const TARGETS = [
   {
     key: 'worn-enchant-tooltip',
     label: 'Paperdoll tooltip after enchanting the WORN piece in place',
-    when: ['professions/enchanting', 'ui/enchant_apply_view'],
+    when: ['professions/enchanting', 'ui/hud/professions/enchant_apply_view'],
     // Equip a plain sword, apply an enchant to it IN PLACE (the worn arm), then
     // hover its paperdoll row: the enchanted marker and the green bonus stat line
     // read off equippedInstances without the piece ever leaving the slot. Full
@@ -7153,7 +7157,11 @@ export const TARGETS = [
     label: 'Professions wheel window',
     // content/professions: registering or retuning a profession in the content
     // table changes what this window renders (the farming Phase 1 lesson).
-    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts', 'content/professions'],
+    when: [
+      'src/ui/hud/professions/professions_view.ts',
+      'src/ui/hud/professions/professions_window.ts',
+      'content/professions',
+    ],
     variants: [
       { key: 'desktop-full', charClass: 'warrior', charName: 'Forgeheart' },
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
@@ -7438,7 +7446,7 @@ export const TARGETS = [
       'ui/hud/vendor/vendor_window',
       // The shared profession-name table renders INTO the requirement line, so
       // a change there changes this frame.
-      'ui/gathering_profession_name',
+      'ui/hud/professions/gathering_profession_name',
     ],
     // Quartermaster Bree is the only counter carrying all three rungs of a
     // ladder at once (Highwatch has tier-1 through tier-3 ground), so one frame
@@ -8171,8 +8179,8 @@ export const TARGETS = [
     when: [
       'ui/hud/quest/quest_dialog_controller',
       'sim/quests/profession_quest_effects',
-      'ui/profession_tutorial_window',
-      'ui/profession_identity_view.ts',
+      'ui/hud/professions/profession_tutorial_window',
+      'ui/hud/professions/profession_identity_view.ts',
     ],
     // The legibility rule: the full pre-commit picture (majors, hobby,
     // dormancy, and the escalating make-amends return cost) must be visible in
@@ -10193,7 +10201,7 @@ export const TARGETS = [
   {
     key: 'farm-feast',
     label: 'Placed harvest feast beside the Eastbrook garden beds (the shared feast)',
-    when: ['sim/professions/feast', 'game/feast_interact', 'ui/feast_tooltip_view'],
+    when: ['sim/professions/feast', 'game/feast_interact', 'ui/hud/professions/feast_tooltip_view'],
     variants: [
       { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
       { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
@@ -10234,7 +10242,7 @@ export const TARGETS = [
   {
     key: 'harvest-journal',
     label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
-    when: ['ui/harvest_journal'],
+    when: ['ui/hud/professions/harvest_journal'],
     variants: [
       { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
       { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
@@ -10433,7 +10441,7 @@ export const TARGETS = [
     // proves the binding is live end to end.
     key: 'farm-plant-sheet',
     label: 'The plant sheet opened from a free garden bed by the interact press (Phase 9b)',
-    when: ['ui/farming_plant_sheet', 'game/farm_bed_interact'],
+    when: ['ui/hud/professions/farming_plant_sheet', 'game/farm_bed_interact'],
     variants: [
       { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
       { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
@@ -10777,8 +10785,8 @@ export const TARGETS = [
     when: [
       'content/profession_items',
       'hud/action_bar/consumable_bar_view',
-      'ui/elixir_tooltip_view',
-      'ui/enchant_apply_view',
+      'ui/hud/professions/elixir_tooltip_view',
+      'ui/hud/professions/enchant_apply_view',
       // The painter that mints the gate sub-lines and the row routing. NOT the
       // mobile stylesheet: a whole-sheet path in a specific target would turn a
       // hud.mobile.css-only diff from the generic desktop+mobile HUD frames into

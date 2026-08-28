@@ -41,7 +41,7 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
  */
 const CODE_BUILT: Record<string, string> = {
   'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
-  'profession-tutorial': 'src/ui/profession_tutorial_window.ts',
+  'profession-tutorial': 'src/ui/hud/professions/profession_tutorial_window.ts',
   'tutorial-greeting': 'src/ui/tutorial_greeting_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
 };
@@ -338,7 +338,7 @@ describe('closeManagedWindow case registry', () => {
       // mint #tutorial-greeting, and one closeTutorialGreeting covers both.
       'ui/tutorial_greeting_window.ts': 2,
       'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
-      'ui/profession_tutorial_window.ts': 1,
+      'ui/hud/professions/profession_tutorial_window.ts': 1,
     });
     for (const id of Object.keys(CODE_BUILT)) expect(caseIds).toContain(id);
   });

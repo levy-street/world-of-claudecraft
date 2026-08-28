@@ -1083,7 +1083,7 @@ const typedSecondaryIds = new Set([
   'resonant_steel',
   'resonant_timber',
 ]);
-// Top down, the same precedence src/ui/enchant_apply_view.ts enchantTier and
+// Top down, the same precedence src/ui/hud/professions/enchant_apply_view.ts enchantTier and
 // the sim's enchantGainTier use: the apex Lucent reagent wins over the shard
 // (every Lucent enchant consumes both), then the shard, then a typed secondary.
 const enchantTier = (e) =>

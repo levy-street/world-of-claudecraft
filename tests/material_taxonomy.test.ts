@@ -801,7 +801,7 @@ describe('no src/sim importer (the module-evaluation hard rule)', () => {
     { name: 'material_taxonomy', liveImporter: '../src/ui/bag_filter.ts' },
     {
       name: 'material_profession_affinity',
-      liveImporter: '../src/ui/material_profession_hint_view.ts',
+      liveImporter: '../src/ui/hud/professions/material_profession_hint_view.ts',
     },
   ] as const;
 

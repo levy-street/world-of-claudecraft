@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { buildProfessionsView } from '../src/ui/professions_view';
+import { buildProfessionsView } from '../src/ui/hud/professions/professions_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 function identity(craftSkills: Record<string, number>): CraftingIdentityView {

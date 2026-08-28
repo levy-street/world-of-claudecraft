@@ -52,8 +52,8 @@ import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
-import { buildCraftingView } from '../src/ui/crafting_view';
 import { deedBorderSlug } from '../src/ui/deed_border_view';
+import { buildCraftingView } from '../src/ui/hud/professions/crafting_view';
 import { playtimeParts } from '../src/ui/playtime_view';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import {

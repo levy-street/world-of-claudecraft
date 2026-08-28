@@ -41,8 +41,10 @@ import {
   destroyConsumesSpecialCopy,
 } from './bag_item_context_menu';
 import { bagStackIndex } from './bags_view';
-import { craftNameKey } from './craft_name_view';
-import { disenchantYieldLines } from './disenchant_yield_view';
+import { itemDisplayName } from './entity_i18n';
+import { esc } from './esc';
+import { craftNameKey } from './hud/professions/craft_name_view';
+import { disenchantYieldLines } from './hud/professions/disenchant_yield_view';
 import {
   type EnchantReplaceTargetInfo,
   type EnchantViewerInput,
@@ -53,9 +55,7 @@ import {
   preservedTraitKey,
   type WornEnchantTargetRow,
   wornEnchantTargets,
-} from './enchant_apply_view';
-import { itemDisplayName } from './entity_i18n';
-import { esc } from './esc';
+} from './hud/professions/enchant_apply_view';
 import { formatNumber, t } from './i18n';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
 import { wornItemCellParts } from './worn_item_cell_view';

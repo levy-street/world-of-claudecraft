@@ -49,7 +49,7 @@ import {
   type StationType,
 } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { viewerUsableToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import {
   MAP_MARKER_SIZES,
   mapMarkerSizeForSemantic,

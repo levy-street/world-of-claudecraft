@@ -20,9 +20,12 @@ import {
   CTX_ITEM_GATE_CLASS,
   CTX_MENU_PICKER_CLASS,
 } from '../src/ui/bag_item_action_menu';
-import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
-import { enchantSectionsForReagent, HEROIC_TAG_KEY } from '../src/ui/enchant_apply_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
+import { disenchantYieldLines } from '../src/ui/hud/professions/disenchant_yield_view';
+import {
+  enchantSectionsForReagent,
+  HEROIC_TAG_KEY,
+} from '../src/ui/hud/professions/enchant_apply_view';
 import { t } from '../src/ui/i18n';
 import { itemNumber } from '../src/ui/item_instance_tooltip';
 import { itemSlotLabel } from '../src/ui/item_slot_labels';

@@ -1,5 +1,5 @@
 // The localized crafting-celebration text core
-// (src/ui/craft_celebration_text_view.ts): the masterwork toast/tier-up/zone
+// (src/ui/hud/professions/craft_celebration_text_view.ts): the masterwork toast/tier-up/zone
 // lines extracted from hud.ts, and the Masterwrought phase 13 legendary pair.
 // The extraction pins hold the pre-extraction hud behavior byte for byte; the
 // legendary pins hold the phase 13 doctrine: the player-chosen name is a
@@ -18,9 +18,9 @@ import {
   masterworkToastText,
   masterworkZoneLine,
   tierUpToastText,
-} from '../src/ui/craft_celebration_text_view';
+} from '../src/ui/hud/professions/craft_celebration_text_view';
+import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/hud/professions/profession_art';
 import { QUALITY_COLOR } from '../src/ui/icons';
-import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 
 const ITEM_ID = 'eastbrook_arming_sword';
 const ITEM_NAME = ITEMS[ITEM_ID].name;

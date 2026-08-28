@@ -21,8 +21,8 @@ import {
 import type { FarmPlotView } from '../src/sim/professions/farm_projection';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import type { InvSlot } from '../src/sim/types';
-import type { FarmEvent } from '../src/ui/farm_event_feedback';
-import { PlantSheetWindow } from '../src/ui/farming_plant_sheet_window';
+import type { FarmEvent } from '../src/ui/hud/professions/farm_event_feedback';
+import { PlantSheetWindow } from '../src/ui/hud/professions/farming_plant_sheet_window';
 import { bindPointerBlur, POINTER_FOCUS_PARK_SELECTOR } from '../src/ui/pointer_blur';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
@@ -617,7 +617,7 @@ describe('plant sheet window (source contract)', () => {
   // half below. Comments are stripped so prose about 'block' can neither
   // satisfy nor trip a needle.
   const sheetSrc = stripComments(
-    readFileSync(join(repoRoot, 'src/ui/farming_plant_sheet_window.ts'), 'utf8'),
+    readFileSync(join(repoRoot, 'src/ui/hud/professions/farming_plant_sheet_window.ts'), 'utf8'),
   );
 
   it('opens and closes with inline flex, with no block write or block-shaped guard', () => {

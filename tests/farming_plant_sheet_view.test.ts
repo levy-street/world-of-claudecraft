@@ -1,4 +1,4 @@
-// The plant sheet's pure core (src/ui/farming_plant_sheet_view.ts): the
+// The plant sheet's pure core (src/ui/hud/professions/farming_plant_sheet_view.ts): the
 // bag-derived offer gates that mirror the sim's own plantCrop order (skill,
 // then the unlocked seed, then the hoe), the locked-vs-absent split, the knob
 // affordability (including the watch fee plan's legs and its null arm), and
@@ -21,7 +21,7 @@ import {
   buildPlantSheetView,
   canOpenPlantSheet,
   type PlantSheetInput,
-} from '../src/ui/farming_plant_sheet_view';
+} from '../src/ui/hud/professions/farming_plant_sheet_view';
 
 const WHEAT = FARM_CROPS.vale_wheat; // tier 1
 const CARROT = FARM_CROPS.brook_carrot; // tier 1

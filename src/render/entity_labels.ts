@@ -6,7 +6,7 @@
 
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
-import { feastTitleFor } from '../ui/feast_title';
+import { feastTitleFor } from '../ui/hud/professions/feast_title';
 import { t } from '../ui/i18n';
 
 export function mobDisplayName(mobId: string): string {
@@ -84,7 +84,7 @@ export function objectDisplayName(entity: Entity): string {
   // the entity's wire name is the PLACER'S raw player name, a VALUE, and the
   // displayed title composes it into the localized "{name}'s <Feast>" here on
   // the painter side (sim and server stay language-agnostic). The rule lives
-  // in the shared src/ui/feast_title.ts leaf, which src/ui/entity_display_name
+  // in the shared src/ui/hud/professions/feast_title.ts leaf, which src/ui/entity_display_name
   // also reads, so the world label and the target frame cannot drift.
   const feastTitle = feastTitleFor(entity.templateId, entity.name);
   if (feastTitle !== null) return feastTitle;

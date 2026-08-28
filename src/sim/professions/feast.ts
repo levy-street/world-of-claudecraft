@@ -80,7 +80,7 @@ export const FARM_FEAST_TEMPLATE_ID = 'farm_feast';
  *  WHAT AUTHORING A DEF DOES NOT DO, stated here rather than as a footnote,
  *  because "joins every site at once" is the over-reading this comment has to
  *  refuse: the two TITLE composers reach the family through
- *  src/ui/feast_title.ts, whose templateId-to-key map is HAND-LISTED (a t() key
+ *  src/ui/hud/professions/feast_title.ts, whose templateId-to-key map is HAND-LISTED (a t() key
  *  built by template literal is invisible to every static consumer, which this
  *  packet has paid for twice). A new def joins the derived set everywhere and
  *  leaves that map short, so the placed entity falls through to the raw placer

@@ -16,7 +16,7 @@ import {
   professionsRefreshSig,
   RING_STEP_ANGLE,
   ringNodePositions,
-} from '../src/ui/professions_view';
+} from '../src/ui/hud/professions/professions_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 // The locked ring order (docs/prd Professions 2.0): a content reorder must be a

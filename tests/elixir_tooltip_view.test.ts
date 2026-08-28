@@ -10,7 +10,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { AuraKind, ItemDef } from '../src/sim/types';
-import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { elixirTooltipLines } from '../src/ui/hud/professions/elixir_tooltip_view';
 import { formatNumber, setLanguage } from '../src/ui/i18n';
 
 /** The shared temporary-buff effect record both builders read. */

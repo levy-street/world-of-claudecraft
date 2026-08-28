@@ -15,8 +15,8 @@
 
 import type { AuraKind } from '../../sim/types';
 import { esc } from '../../ui/esc';
+import { WELLFED_STAT_KEYS } from '../../ui/hud/professions/wellfed_stat_keys';
 import { formatMoney, formatNumber, type TranslationKey, t } from '../../ui/i18n';
-import { WELLFED_STAT_KEYS } from '../../ui/wellfed_stat_keys';
 import {
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_CURVE,

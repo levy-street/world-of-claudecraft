@@ -14,9 +14,15 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import { CRAFT_CAST_ID } from '../src/sim/types';
 import { CastBarPainter } from '../src/ui/cast_bar_painter';
-import { buildCraftCastSession, IDLE_CRAFT_CAST_SESSION } from '../src/ui/craft_cast_view';
-import { buildCraftingView, type CraftingView } from '../src/ui/crafting_view';
-import { craftCastStripElements, renderCraftingWindow } from '../src/ui/crafting_window';
+import {
+  buildCraftCastSession,
+  IDLE_CRAFT_CAST_SESSION,
+} from '../src/ui/hud/professions/craft_cast_view';
+import { buildCraftingView, type CraftingView } from '../src/ui/hud/professions/crafting_view';
+import {
+  craftCastStripElements,
+  renderCraftingWindow,
+} from '../src/ui/hud/professions/crafting_window';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
 function item(id: string): ItemDef {

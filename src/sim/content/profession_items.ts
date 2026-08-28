@@ -783,7 +783,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   //
   // EACH CARRIES ITS OWN templateId, and they are unique per feast id. The
   // placed title is composed client-side off templateId
-  // (src/ui/feast_title.ts), so sharing one would label an apex feast as the
+  // (src/ui/hud/professions/feast_title.ts), so sharing one would label an apex feast as the
   // rung it is not, which is exactly decision K1's rejected alternative.
   stonepot_feast: {
     id: 'stonepot_feast',

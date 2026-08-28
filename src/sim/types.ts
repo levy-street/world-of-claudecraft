@@ -1261,7 +1261,7 @@ export interface OtherItemDef extends BaseItemDef {
   // a string literal any more, which is the narrow and true version of the
   // claim: authoring a def joins the DERIVED set at all five. It does not
   // finish the job. Two of those five are the title composers, and they reach
-  // the family through a hand-listed key map in src/ui/feast_title.ts (a t()
+  // the family through a hand-listed key map in src/ui/hud/professions/feast_title.ts (a t()
   // key built by template literal is invisible to every static consumer), so a
   // new def leaves that map short and the exhaustiveness pin in
   // tests/entity_display_name.test.ts is what catches it. professions/feast.ts's

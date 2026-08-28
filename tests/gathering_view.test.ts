@@ -23,7 +23,7 @@ import {
   gatherToolNoNodeKey,
   isNodeToolLockedFor,
   viewerUsableToolTier,
-} from '../src/ui/gathering_view';
+} from '../src/ui/hud/professions/gathering_view';
 import { setLanguage, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
@@ -617,7 +617,7 @@ describe('tool-tier lock dimension', () => {
   });
 
   // The farmDeniedLineKey block moved to tests/farming_view.test.ts with the
-  // selector itself: the knobs phase extracted src/ui/farming_view.ts.
+  // selector itself: the knobs phase extracted src/ui/hud/professions/farming_view.ts.
 });
 
 describe('buildGatheringProficiencyRows', () => {

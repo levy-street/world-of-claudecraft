@@ -4,10 +4,10 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
+import { renderProfessionIdentityCard } from '../src/ui/hud/professions/profession_identity_card';
+import { buildProfessionIdentityView } from '../src/ui/hud/professions/profession_identity_view';
 import { QUALITY_COLOR } from '../src/ui/icons';
-import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
-import { buildProfessionIdentityView } from '../src/ui/profession_identity_view';
 
 /** Comment-stripped TS source: a pinned token inside a comment must never
  *  satisfy a pin about live code (review round; hoisted for EVERY source
@@ -24,10 +24,13 @@ const codeOnly = (source: string): string =>
 const cssOnly = (source: string): string => source.replace(/\/\*[\s\S]*?\*\//g, '');
 
 const painter = codeOnly(
-  readFileSync(path.resolve(process.cwd(), 'src/ui/profession_identity_card.ts'), 'utf8'),
+  readFileSync(
+    path.resolve(process.cwd(), 'src/ui/hud/professions/profession_identity_card.ts'),
+    'utf8',
+  ),
 );
 const craftingWindow = codeOnly(
-  readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_window.ts'), 'utf8'),
+  readFileSync(path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_window.ts'), 'utf8'),
 );
 
 describe('profession identity card painter contract', () => {
@@ -1071,7 +1074,7 @@ describe('craftResult deny toast names the station (source pins)', () => {
   });
 
   // RE-POINTED AT THE SEAM (the Phase 11k QA release sync). The release
-  // extracted the same table as src/ui/crafting_deny_core.ts and pinned its
+  // extracted the same table as src/ui/hud/professions/crafting_deny_core.ts and pinned its
   // TERNARY CHAIN by source text; the merge collapsed the twin cores to one
   // authority (the exhaustive Record in craft_denial_line_view.ts, which
   // crafting_deny_core now delegates to), so the chain those pins named no
@@ -1080,10 +1083,16 @@ describe('craftResult deny toast names the station (source pins)', () => {
   // and the release's own behavioural suite tests/crafting_deny_core.test.ts,
   // which still drives craftDenyMessage end to end through the delegate.
   const denyCore = codeOnly(
-    readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_deny_core.ts'), 'utf8'),
+    readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_deny_core.ts'),
+      'utf8',
+    ),
   );
   const denyTable = codeOnly(
-    readFileSync(path.resolve(process.cwd(), 'src/ui/craft_denial_line_view.ts'), 'utf8'),
+    readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/craft_denial_line_view.ts'),
+      'utf8',
+    ),
   );
 
   it('the release core resolves the station from recipe content and delegates the key', () => {

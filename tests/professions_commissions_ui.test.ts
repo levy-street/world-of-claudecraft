@@ -12,8 +12,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
-import { buildCraftingView } from '../src/ui/crafting_view';
-import { renderCraftingWindow } from '../src/ui/crafting_window';
+import { buildCraftingView } from '../src/ui/hud/professions/crafting_view';
+import { renderCraftingWindow } from '../src/ui/hud/professions/crafting_window';
 import { buildUnbindView, UNBIND_DENY_KEY, unbindDenyKey } from '../src/ui/hud/vendor/unbind_view';
 import { renderUnbindWindow } from '../src/ui/hud/vendor/unbind_window';
 

@@ -14,11 +14,11 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
-import { gatheringProfessionNameKey } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import { wornItemCellParts } from '../../worn_item_cell_view';
+import { gatheringProfessionNameKey } from '../professions/gathering_profession_name';
 import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
 import {
   VENDOR_MULTIPLES,

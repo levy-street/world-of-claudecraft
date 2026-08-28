@@ -13,14 +13,14 @@ import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
-import { setLanguage } from '../src/ui/i18n';
-import { itemKindLabel } from '../src/ui/item_kind_label';
-import { MATERIAL_HINT_KEYS } from '../src/ui/material_hint_view';
+import { MATERIAL_HINT_KEYS } from '../src/ui/hud/professions/material_hint_view';
 import {
   CRAFT_NAMING_HINT_KEYS,
   hasSupersedingPurposeHint,
   materialProfessionHintText,
-} from '../src/ui/material_profession_hint_view';
+} from '../src/ui/hud/professions/material_profession_hint_view';
+import { setLanguage } from '../src/ui/i18n';
+import { itemKindLabel } from '../src/ui/item_kind_label';
 import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 function tooltipHtml(itemId: string): string {

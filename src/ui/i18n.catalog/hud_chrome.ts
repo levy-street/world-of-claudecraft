@@ -3558,7 +3558,7 @@ export const hudChromeStrings = {
     enchantedFallback: 'Enchanted',
   },
   // Purpose hints for the eight enchanting materials
-  // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the
+  // (src/ui/hud/professions/material_hint_view.ts), keyed by item id there. Each says what the
   // material is for and which gear disenchants into it, so a junk-kind reagent
   // stops being an unexplained stack in the bags. The sources track the sim's
   // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
@@ -4484,7 +4484,7 @@ export const hudChromeStrings = {
       feast_eaten: 'You have already eaten from that feast.',
     },
     // THE PLACED FEAST TITLES (professions/feast.ts), composed client-side off
-    // the entity's templateId by src/ui/feast_title.ts, which is the ONE map
+    // the entity's templateId by src/ui/hud/professions/feast_title.ts, which is the ONE map
     // both the target frame and the floating world label read. In every one,
     // {name} is the PLACER'S raw player name, carried by the entity as a VALUE
     // and never translated (the gatherEvent.goldenHarvest finder-param
@@ -4814,7 +4814,7 @@ export const hudChromeStrings = {
       landOnly: 'Does not slot on fishing rods.',
       openProfessions: 'Open Professions to slot this onto a gathering tool.',
     },
-    // Mobile-station tool tooltip copy (src/ui/mobile_station_tooltip.ts):
+    // Mobile-station tool tooltip copy (src/ui/hud/professions/mobile_station_tooltip.ts):
     // what placing the Master's Field Forge does, the party-share radius,
     // the duration, and the replace rule. {radius} interpolates
     // STATION_RADIUS and {minutes} derives from
@@ -5250,7 +5250,7 @@ export const hudChromeStrings = {
       lucent: 'Lucent Enchants',
     },
     // The disenchant confirm's expected-yield preview
-    // (src/ui/disenchant_yield_view.ts), appended under the destroy warning so
+    // (src/ui/hud/professions/disenchant_yield_view.ts), appended under the destroy warning so
     // an irreversible destroy states what it pays out first. The range shape
     // covers the sub-rare rng bonus arm and the epic/legendary secondary roll.
     yieldHeader: 'Expected materials:',

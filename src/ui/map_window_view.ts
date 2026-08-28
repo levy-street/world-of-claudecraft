@@ -44,7 +44,7 @@ import type {
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
-import { viewerUsableToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import type { MapMarkerProfile } from './map_marker_profile_core';
 import {

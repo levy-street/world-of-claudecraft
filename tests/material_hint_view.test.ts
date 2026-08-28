@@ -21,7 +21,7 @@ import {
   MATERIAL_HINT_KEYS,
   materialHintKey,
   materialHintLine,
-} from '../src/ui/material_hint_view';
+} from '../src/ui/hud/professions/material_hint_view';
 
 const ENCHANTING_IDS = [
   'arcane_dust',

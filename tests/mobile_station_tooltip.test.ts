@@ -14,11 +14,11 @@ import {
 } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { TICK_RATE } from '../src/sim/types';
-import { stationNameText } from '../src/ui/crafting_window';
+import { stationNameText } from '../src/ui/hud/professions/crafting_window';
 import {
   isPlaceMobileStationItem,
   mobileStationTooltipLines,
-} from '../src/ui/mobile_station_tooltip';
+} from '../src/ui/hud/professions/mobile_station_tooltip';
 import { toolEffectStandaloneTooltip } from '../src/ui/tool_effect_tooltip';
 
 /** Comment-stripped source (the profession_identity_card.test.ts helper
@@ -88,7 +88,7 @@ describe('mobileStationTooltipLines: everything else', () => {
 
   it('Hud.itemTooltip composes the module (one line, never inline logic)', () => {
     const hudSrc = codeOnly(readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8'));
-    expect(hudSrc).toContain("from './mobile_station_tooltip'");
+    expect(hudSrc).toContain("from './hud/professions/mobile_station_tooltip'");
     expect(hudSrc).toContain('mobileStationTooltipLines(item, stationNameText)');
   });
 });

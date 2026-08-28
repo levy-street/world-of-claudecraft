@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef, ItemSlot } from '../src/sim/types';
+import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   ENCHANT_PRESERVED_TRAITS,
   ENCHANT_TIER_ORDER,
@@ -25,8 +26,7 @@ import {
   preservedReplaceTraits,
   preservedTraitKey,
   wornEnchantTargets,
-} from '../src/ui/enchant_apply_view';
-import { itemDisplayName } from '../src/ui/entity_i18n';
+} from '../src/ui/hud/professions/enchant_apply_view';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { translations } from '../src/ui/i18n.resolved.generated';
 import { wornTooltipInstance } from '../src/ui/item_instance_tooltip';
@@ -220,7 +220,7 @@ describe('enchant_apply_view: tier classification', () => {
       unclassifiable,
       'these reagents match no tier rule and would silently classify as Base:\n' +
         `${unclassifiable.join('\n')}\n` +
-        'Add the material to enchantTier (src/ui/enchant_apply_view.ts) and to this list.',
+        'Add the material to enchantTier (src/ui/hud/professions/enchant_apply_view.ts) and to this list.',
     ).toEqual([]);
   });
 

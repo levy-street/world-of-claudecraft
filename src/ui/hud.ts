@@ -229,41 +229,10 @@ import {
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
 } from './combat_sfx';
-import { buildCommissionOrderBoardModel } from './commission_order_view';
-import { renderCommissionOrderWindow } from './commission_order_window';
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
-import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
-import {
-  buildCraftCastSession,
-  type CraftCastSessionView,
-  craftCastActivitySig,
-} from './craft_cast_view';
-import {
-  craftBannerIcon,
-  craftBannerText,
-  craftToastLogLines,
-  legendaryForgedLine,
-  legendaryZoneLine,
-  masterworkZoneLine,
-} from './craft_celebration_text_view';
-import {
-  buildCraftCelebrationPlan,
-  CRAFT_TIER_UP_DRAIN_WINDOW,
-  type CraftTierUp,
-  observeCraftSkillsForTierUps,
-} from './craft_celebration_view';
-import { craftDenyMessage } from './crafting_deny_core';
-import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
-import {
-  buildCraftingView,
-  craftingReagentSig,
-  craftLearnHints,
-  craftOwnsTab,
-} from './crafting_view';
-import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
@@ -296,14 +265,7 @@ import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
-import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
-import {
-  applyEnchantResultToast,
-  disenchantResultToast,
-  disenchantSecondaryLineKey,
-  salvageResultToast,
-} from './enchanting_view';
 import {
   delveDisplayName,
   delveText,
@@ -339,12 +301,9 @@ import {
 } from './error_text_i18n_core';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
-import { handleFarmEvent } from './farm_event_feedback';
-import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
-import { feastTooltipLines } from './feast_tooltip_view';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
@@ -355,14 +314,6 @@ import {
 } from './frame_pos_reset';
 import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
-import { gatheringProfessionNameKey } from './gathering_profession_name';
-import {
-  buildGatheringProficiencyRows,
-  gatherDeniedLineKey,
-  gatherDowngradeLineKey,
-  gatherRareTierFor,
-  gatherToolNoNodeKey,
-} from './gathering_view';
 import { generalChatQuotaView } from './general_chat_quota_view';
 import {
   craftedLineKey,
@@ -372,7 +323,6 @@ import {
   harvestLineKey,
 } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
-import { HarvestJournalWindow } from './harvest_journal_window';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -512,6 +462,83 @@ import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/m
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
+import { buildCommissionOrderBoardModel } from './hud/professions/commission_order_view';
+import { renderCommissionOrderWindow } from './hud/professions/commission_order_window';
+import { cookingCatchHintKey } from './hud/professions/cooking_catch_hint_view';
+import {
+  buildCraftCastSession,
+  type CraftCastSessionView,
+  craftCastActivitySig,
+} from './hud/professions/craft_cast_view';
+import {
+  craftBannerIcon,
+  craftBannerText,
+  craftToastLogLines,
+  legendaryForgedLine,
+  legendaryZoneLine,
+  masterworkZoneLine,
+} from './hud/professions/craft_celebration_text_view';
+import {
+  buildCraftCelebrationPlan,
+  CRAFT_TIER_UP_DRAIN_WINDOW,
+  type CraftTierUp,
+  observeCraftSkillsForTierUps,
+} from './hud/professions/craft_celebration_view';
+import { craftDenyMessage } from './hud/professions/crafting_deny_core';
+import { parseCraftingTab, serializeCraftingTab } from './hud/professions/crafting_tab_pref';
+import {
+  buildCraftingView,
+  craftingReagentSig,
+  craftLearnHints,
+  craftOwnsTab,
+} from './hud/professions/crafting_view';
+import {
+  craftCastStripElements,
+  renderCraftingWindow,
+  stationNameText,
+} from './hud/professions/crafting_window';
+import { elixirTooltipLines } from './hud/professions/elixir_tooltip_view';
+import {
+  applyEnchantResultToast,
+  disenchantResultToast,
+  disenchantSecondaryLineKey,
+  salvageResultToast,
+} from './hud/professions/enchanting_view';
+import { handleFarmEvent } from './hud/professions/farm_event_feedback';
+import { PlantSheetWindow } from './hud/professions/farming_plant_sheet_window';
+import { feastTooltipLines } from './hud/professions/feast_tooltip_view';
+import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
+import {
+  buildGatheringProficiencyRows,
+  gatherDeniedLineKey,
+  gatherDowngradeLineKey,
+  gatherRareTierFor,
+  gatherToolNoNodeKey,
+} from './hud/professions/gathering_view';
+import { HarvestJournalWindow } from './hud/professions/harvest_journal_window';
+import { materialHintLine } from './hud/professions/material_hint_view';
+import { materialProfessionHintText } from './hud/professions/material_profession_hint_view';
+import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
+import { professionImageUrl } from './hud/professions/profession_art';
+import {
+  type ProfessionEventInput,
+  planProfessionEvent,
+} from './hud/professions/profession_event_lines_core';
+import {
+  buildProfessionIdentityView,
+  professionSurfaceRefreshSig,
+} from './hud/professions/profession_identity_view';
+import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
+import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
+import { ProfessionsWindow } from './hud/professions/professions_window';
+import { recipePatternTooltipLines } from './hud/professions/recipe_pattern_tooltip_view';
+import {
+  advanceSkillLevelObservation,
+  buildSkillLevelCelebrationPlan,
+  type SkillLevelUp,
+  skillLevelArtId,
+} from './hud/professions/skill_level_toast_view';
+import { wellFedTooltipLines } from './hud/professions/wellfed_tooltip_view';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
 import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
@@ -604,8 +631,6 @@ import { MapWindowPainter } from './map_window_painter';
 import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
-import { materialHintLine } from './material_hint_view';
-import { materialProfessionHintText } from './material_profession_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -627,7 +652,6 @@ import {
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { MobileMoreDialogController } from './mobile_more_dialog';
-import { mobileStationTooltipLines } from './mobile_station_tooltip';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
@@ -685,15 +709,6 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
-import { professionImageUrl } from './profession_art';
-import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
-import {
-  buildProfessionIdentityView,
-  professionSurfaceRefreshSig,
-} from './profession_identity_view';
-import { buildProfessionTutorialModel } from './profession_tutorial_view';
-import { renderProfessionTutorial } from './profession_tutorial_window';
-import { ProfessionsWindow } from './professions_window';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -703,7 +718,6 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { recipePatternTooltipLines } from './recipe_pattern_tooltip_view';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -737,12 +751,6 @@ import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText, tSim } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
-import {
-  advanceSkillLevelObservation,
-  buildSkillLevelCelebrationPlan,
-  type SkillLevelUp,
-  skillLevelArtId,
-} from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
@@ -806,7 +814,6 @@ import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
-import { wellFedTooltipLines } from './wellfed_tooltip_view';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -6040,7 +6047,7 @@ export class Hud {
     // Directly under the restore line it qualifies: a buff food (farm dish or
     // apex role plate) heals while you sit AND leaves Well Fed once the meal
     // finishes, so the two read in the order the player experiences them. The
-    // ONE well-fed line per tooltip (src/ui/wellfed_tooltip_view.ts).
+    // ONE well-fed line per tooltip (src/ui/hud/professions/wellfed_tooltip_view.ts).
     html += wellFedTooltipLines(item);
     // Gathering implements (#2343): picks/axes/sickles/rods and the simple
     // pole render their kind, requirement, use, and bonus lines from the
@@ -11991,7 +11998,7 @@ export class Hud {
         case 'farmReady':
         case 'farmFeastPlaced':
           // Farming's seven feedback arms, extracted whole to
-          // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
+          // src/ui/hud/professions/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.
           handleFarmEvent(ev, this);
           this.plantSheetWindow.notifyFarmEvent(ev);
