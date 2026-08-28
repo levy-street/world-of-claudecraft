@@ -740,7 +740,9 @@ describe('bankBonusFactsForAccount', () => {
     expect(sql).not.toMatch(/balance|holder|pubkey|chain/i);
     // The Seeker claim fact is a ROW probe on the claim ledger, keyed by the same
     // bound account id (the promotional mount grant, server/seeker_mount_grant.ts).
-    expect(sql).toMatch(/EXISTS\(SELECT 1 FROM seeker_entitlement_claims \w+ WHERE \w+\.account_id = \$1\)/);
+    expect(sql).toMatch(
+      /EXISTS\(SELECT 1 FROM seeker_entitlement_claims \w+ WHERE \w+\.account_id = \$1\)/,
+    );
     // Rows map straight onto the facts object.
     expect(facts).toEqual({
       emailVerified: true,

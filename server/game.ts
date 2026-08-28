@@ -318,7 +318,6 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitAtJoin } from './pbe_boost';
-import { applySeekerMountAtJoin } from './seeker_mount_grant';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -326,6 +325,7 @@ import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
+import { applySeekerMountAtJoin } from './seeker_mount_grant';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,

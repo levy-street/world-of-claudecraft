@@ -155,7 +155,9 @@ describe('Seeker entitlement claim', () => {
         body: { nativeAttestation: { challengeId: 'id', token: 'token' } },
       });
     const arm = (
-      result: { status: 'claimed' | 'existing_same'; mint: string } | { status: 'conflict'; mint: null },
+      result:
+        | { status: 'claimed' | 'existing_same'; mint: string }
+        | { status: 'conflict'; mint: null },
       existing: { mint: string; claimantWallet: string } | null = null,
     ) =>
       setSeekerEntitlementRuntimeForTests({

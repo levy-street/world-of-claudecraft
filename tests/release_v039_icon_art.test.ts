@@ -38,7 +38,7 @@ const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c032376
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
 const SECOND_PASS_RECORD_SHA256 =
-  'c8be18ed7509145b06fbee002a385decf196499f3d8452722b4ecb169bbd090f';
+  '95d1b967dd1f9601d1a207b29a3ea5069d0f03fbe94d20a424e69b05276e23d0';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',

@@ -2746,9 +2746,9 @@ describe('reliquarySourceLineText', () => {
     expect(reliquarySourceLineText({ kind: 'activity', activityId: 'rift_first_clear' })).toBe(
       "Awarded to every member of the party that wins a ranked Rift's first clear",
     );
-    expect(
-      reliquarySourceLineText({ kind: 'activity', activityId: 'seeker_genesis_claim' }),
-    ).toBe('Claimed on a Solana Seeker with its verified Seeker Genesis Token');
+    expect(reliquarySourceLineText({ kind: 'activity', activityId: 'seeker_genesis_claim' })).toBe(
+      'Claimed on a Solana Seeker with its verified Seeker Genesis Token',
+    );
   });
 
   it('renders a line for EVERY pinned activity id (the key table cannot drift)', () => {
