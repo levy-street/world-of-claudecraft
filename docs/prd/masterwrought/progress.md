@@ -989,3 +989,38 @@ hud.ts 18731 and main.ts 11593, RELEASE-attributed to PR #3284 (the
 unlock-interface frames), never packet payback. Branch-authored growth of
 either file stays zero; the "never grow" obligation is judged PER MERGE
 PARENT (docs/prd/masterwrought/state.md, "Phase 14 QA ledger").
+
+## Phase 14 QA (2026-08-28): COMPLETE, verdict PASS
+The twin audited the beauty pass against the ledger's decisions, never
+the phase file's stale sentences: the PARKED fee floor audited as a park
+(never built, never counted as a gap), the monolith rule judged per merge
+parent, the sync already paid. Eight audit lanes plus twelve adversarial
+verifiers, the test-coverage auditor, the frontend seam reviewer, and the
+qa-checklist gate (READY, zero blocking) re-derived every build claim;
+the VERIFY set the build could not run ran for real: the browser suite
+276/276, the real-GPU perf tour with ARM 3 green after a same-machine
+three-way A/B attributed the desktop bypass growth to the release span
+(anchor re-captured 706 to 1014, branch-neutral), and the two mobile
+scripts shown byte-identical on the pre-phase base (recorded tooling
+staleness). Thirteen fix commits plus the docs stamp over sixteen
+fresh-reader rounds and 39 mutants (every reviewer finding applied or
+recorded, none dropped),
+notably: the bind copy states live behavior (a failed first attempt
+leaves a Maker's-Bond-clearable rank-0 copy, a maintainer read), the
+wyrmfall line names the first A or S rank Rift race WIN and both boss
+gates, the two dialog cancels join the 44px floor, the offline calendar
+feed reads ONE instant and the dead per-key caches are gone, and a
+shifted bagged Perfecting selection now FOLLOWS its copy through an
+(ordinal, count) anchor that outranks the cell (the adjacent-sibling
+hijack, the click path, and keyboard focus all covered), with three
+blocking and eleven should-fix coverage gaps closed by decisive pins.
+FROZEN at d51139a103 EXIT=0 under the gate's 8-worker bound (two
+unbounded runs each red only on the known corpse_harvest_sim contention
+timeout, green standalone): 3234 passed / 22 skipped files (3256), 47738
+passed / 2 xfail / 381 skipped (48121), tsc / ci:changed (zero errors,
+no format diffs) / both regens clean after the last commit; drift vs
+6ed1915a4e attributed exactly in the ledger. Full record: state.md,
+"Phase 14 QA ledger". origin/release/v0.41.0 moved to d3f8bae369 (PR
+#3728) during the QA: Phase 15's STEP 0 sync. LOCAL only, no push, no PR.
+NEXT = Phase 15 (phase-15-power-verification.md, ultracode), FRESH
+session.
