@@ -49,6 +49,7 @@ export type UiIconName =
   | 'x'
   | 'kick'
   | 'youtube'
+  | 'steam'
   | 'donate'
   | 'chest'
   // hand-authored geometrics
@@ -156,6 +157,11 @@ const ICONS: Record<UiIconName, string> = {
   // The same YouTube mark public/links.html draws inline for the project's channel.
   youtube:
     '<g transform="translate(16 16) scale(20)"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></g>',
+  // The Steam mark, reproduced monochrome for identification only (see CREDITS.md)
+  // on the same 24 x 24 artboard as the marks above for the wishlist reminder
+  // surfaces owned by steam_wishlist.ts.
+  steam:
+    '<g transform="translate(16 16) scale(20)"><path d="M11.979 0C5.678 0 .511 4.86 0 11.032l6.447 2.665c.545-.373 1.203-.59 1.91-.59.063 0 .125.002.188.005l2.866-4.154V8.9c0-2.501 2.034-4.534 4.534-4.534 2.5 0 4.533 2.034 4.533 4.534s-2.034 4.535-4.533 4.535h-.104l-4.089 2.92c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></g>',
   // The same filled heart the pre-game shell's Donate community link draws inline
   // (a 24 x 24 artboard), scaled and centered to fit the shared 0 0 512 512 viewBox.
   donate:

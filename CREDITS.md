@@ -67,7 +67,7 @@ so you *may* redistribute them non-commercially with attribution, but you may
 to World of ClaudeCraft (Levy Street) only and does not transfer to forks. See
 the Audio section.
 
-The **brand marks** (Twitch, X, Kick, YouTube, Discord, Solana, USDC) are
+The **brand marks** (Twitch, X, Kick, YouTube, Discord, Steam, Solana, USDC) are
 trademarks and are not licensed to anyone by this file. See Brand marks.
 
 ## Can I still fork and host my own world?
@@ -205,7 +205,8 @@ The four streamer-platform marks inlined as SVG paths in `src/ui/ui_icons.ts`
 reproduced monochrome and unmodified in shape solely to identify a link that
 points at that platform. They are not project assets, and no endorsement or
 affiliation is implied. The Discord (Clyde) mark in the same file is used the
-same way.
+same way, as is the Steam mark, which identifies the links to the game's Steam
+store page (the wishlist reminder, `src/ui/steam_wishlist.ts`).
 
 The Solana and USDC logos shipped as `public/claudium/icons/solana-icon.webp`
 and `public/claudium/icons/usdc-icon.webp` are trademarks of their respective

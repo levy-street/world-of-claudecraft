@@ -18,6 +18,7 @@ describe('classifyDiff', () => {
       4,
     );
     expect(script).toContain('localStorage.removeItem(key)');
+    expect(script).toContain("waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0'");
 
     const sliceBetween = (start: string, end: string, from = 0) => {
       const startIndex = script.indexOf(start, from);
@@ -79,14 +80,57 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
-  it('maps an options_view change to the graphics dial AND interface tab targets, in order', () => {
-    // Both targets key on 'ui/options_view'; the graphics-options entry sits
-    // first in the registry so the dial card is the lead capture. An
-    // ordering or selector regression here silently drops or duplicates the
-    // options-panel evidence.
+  it('maps the Steam wishlist owner to current web and borderless landing evidence', () => {
+    const plan = classifyDiff(['src/ui/steam_wishlist.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((target: { key: string }) => target.key)).toContain('steam-wishlist');
+    const target = plan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'steam-wishlist',
+    );
+    expect(target?.variants).toEqual([
+      { key: 'homepage-header-web', landing: true, beforeLoad: expect.any(Function) },
+      {
+        key: 'homepage-header-borderless-1366',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        borderless: true,
+      },
+      {
+        key: 'homepage-footer-web',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        footer: true,
+      },
+      {
+        key: 'desktop-community-tray',
+        beforeLoad: expect.any(Function),
+        communityTray: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+      },
+      {
+        key: 'mobile-more-tray',
+        landing: true,
+        mobile: true,
+        beforeLoad: expect.any(Function),
+        moreTray: true,
+      },
+    ]);
+    expect(target?.variants[1].beforeLoad.toString()).toContain(
+      "localStorage.setItem('locale', 'de_DE')",
+    );
+    expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps an options_view change to the unlock, graphics dial AND interface tab targets, in order', () => {
+    // All three targets key on 'ui/options_view'; the interface-unlock entry
+    // precedes the graphics-options one in the registry, so the unlock row is
+    // the lead capture. An ordering or selector regression here silently
+    // drops or duplicates the options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'interface-unlock-option',
       'graphics-options-shadow-dial',
       'interface-options-tabs',
     ]);

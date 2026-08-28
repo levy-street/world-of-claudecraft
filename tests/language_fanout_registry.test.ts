@@ -109,11 +109,17 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
   'this.riftPainter.relocalize|',
-  'this.targetFrameMover.relocalize|',
-  'this.playerFrameMover.relocalize|',
-  'this.partyFrameMover.relocalize|',
+  // One arm for every MovableFrame in the HUD: the three unit frames and the
+  // frames the "Unlock interface" option governs all register with the same
+  // coordinator, which forwards relocalize() to each of them (superseding the
+  // three per-mover arms the pre-merge release listed).
+  'this.interfaceUnlock.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.doomMeter.relocalize|',
+  // The chat box's geometry chrome (the tab strip's move label, the resize
+  // grip's name, the arrange-mode name chip, the mobile handle) is written
+  // once at init by ChatGeometryController; its relocalize() rewrites them.
+  'this.chatGeometry.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,
@@ -412,6 +418,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[] | 'coordinator';
   readonly reason: string;
 }> = [
+  {
+    file: 'movable_frame.ts',
+    memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
+    reason:
+      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor values (the game-styled var(--cursor-resize-*) tokens with their keyword fallbacks), which are never localized. lastHoverEdge is the FrameEdge id that cursor was set for (opposite edges share a cursor, so the elision compares both); an edge id is never text. lastBottom retains the frame bottom edge in visual px for reanchorBottom, a pure coordinate. Every MovableFrame label already rides the interface_unlock relocalize() fan-out arm; no memo holds text.',
+  },
   {
     file: 'map_semantic_accessibility_core.ts',
     memos: ['lastHash', 'lastLanguage'],
@@ -758,7 +770,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // glow strobe fix): the memo holds the freshly BUILT html, which
       // embeds every t() string, so a locale switch moves the comparison
       // itself and the tracker repaints with no fan-out arm.
-    ).toBe(11);
+      // 12 as of the v0.41.0 sync merge, which folded in the edge-resize
+      // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
+      // cursor-keyword write and can never hold text; the frame's t() labels
+      // already ride the interface_unlock relocalize() arm.
+    ).toBe(12);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

@@ -1004,6 +1004,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // clamp a drag or resize; chat_window fits the input and keeps the log pinned to the
   // bottom; fiesta forces one reflow to restart a CSS animation, the same documented trick
   // fct_painter uses.
+  // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
+  // from the applied placement (refilled by apply()/ensureGeometry, nulled on
+  // viewport resize), so hovering the unlocked chat box costs no layout read
+  // per pointermove; the five reads are the drag/resize measures.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 5 },

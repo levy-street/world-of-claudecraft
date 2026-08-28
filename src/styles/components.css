@@ -13769,8 +13769,44 @@
     margin: 6px 0 2px;
     line-height: 1.4;
   }
+  /* An options-tab subsection header (the Frames tab's Party Frame Options
+     group): the title-font gold treatment the panel titles use, scaled to a
+     row divider. */
+  .set-subhead {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 4px;
+    margin: 10px 0 6px;
+  }
   .graphics-controls-disabled {
     opacity: 0.55;
+  }
+  /* The export/import expando (Frames tab: frame layout; General tab: all
+     settings): a code textarea with its action button underneath. */
+  .transfer-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 4px 0 8px;
+  }
+  .transfer-pane[hidden] {
+    display: none;
+  }
+  .transfer-code {
+    width: 100%;
+    min-height: 72px;
+    resize: vertical;
+    padding: 6px 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #e8dcb8;
+    background: #0c0a07;
+    border: 1px solid var(--border);
+    border-radius: 4px;
   }
   /* The graphics panel's one inline action row: Back, the stretching status,
      then Reset (a quiet text button) beside the primary Apply at the end. */
@@ -14663,6 +14699,177 @@
   #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
     inset-inline-end: 64px;
   }
+  /* The Fancy Gold theme's window frame: every desktop feature window wears
+     the gilded frame WHILE the fancyGold preset is active (the
+     .fancy-gold-ui root class applyTheme stamps in main.ts). The default
+     presets keep the classic flat panels: an always-on rollout shipped
+     briefly and the owner walked it back to the theme opt-in. The pilot's
+     mask-over-gradient ::before cannot generalize here because every .window
+     is its OWN scroll container (the sticky .panel-title depends on it), and
+     a scroll container both clips and scrolls a pseudo-element away with the
+     content; the container's own BACKGROUND stays pinned to the border box,
+     the exact mechanism the resize grip already rides (layout.css). So these
+     are the same 12 tiles, ink pre-tinted from the gold ramp
+     (applyWindowOrnamentVars, perf_ornament_svg.ts), stacked as background
+     layers over the shared panel gradient. Position/size/repeat lists below
+     are written against windowOrnamentFrameImage's fixed layer order:
+     corners (tl, tr, bl, br), mid-edges (t, b, l, r), ribbons (t, b, l, r),
+     then the panel gradient. The perf-wide view keeps its richer masked
+     ornament and is excluded so the two never double-paint. Mobile keeps the
+     flat chrome: the compact sheets hand-tune every window's geometry and
+     the corner ink would sit under real touch targets.
+     The top ribbon and the upper half of the top corners sit BENEATH the
+     sticky title's opaque strip by design: the gilt title bar (gold text +
+     gold-700 underline, below) reads as the frame's top rail, with the
+     corner tendrils emerging from under it. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {
+    /* THE FRAME CONTRACT (owner request): the ornament reads as a frame
+       SURROUNDING the menu, the contents never spill past it, the items keep
+       breathing room from it, and the scrollbar sits INSIDE it. One thick
+       transparent border delivers all four at once: overflow on a scroll
+       container clips at the PADDING box, so scrolling content can never
+       paint into the border band, and browsers draw the scrollbar inside
+       the border too; the ornament layers anchor to the BORDER box
+       (background-origin below), so the frame owns exactly the band the
+       content cannot reach. --window-pad (the shared inset the sticky title
+       mirrors) then adds the interior breathing room between the menu items
+       and the frame. Not `border: 0` + padding instead: the clip boundary
+       is what guarantees containment, padding alone would let wide content
+       and the scrollbar sit on the frame. */
+    border-width: 14px;
+    border-color: transparent;
+    outline: none;
+    border-radius: 30px;
+    --window-pad: 22px;
+    box-shadow:
+      inset 0 0 24px #0006,
+      inset 0 1px 0 #ffffff14;
+    /* Anchor every layer (and the panel gradient) to the border box, so the
+       frame paints in the transparent border band at the window's true outer
+       edge instead of shifting inward to the padding box. */
+    background-origin: border-box;
+    background-clip: border-box;
+    background-image: var(--window-ornament-frame), var(--panel-bg);
+    background-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right,
+      0 0;
+    background-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px,
+      auto;
+    background-repeat:
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      repeat-x,
+      repeat-x,
+      repeat-y,
+      repeat-y,
+      no-repeat;
+  }
+  /* Resizable windows: restate the grip layer (layout.css draws it as the
+     first background layer for the same stays-pinned reason) ahead of the
+     ornament stack, or this rule's background-image would silently drop it. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel.window-resizable:not(.perf-wide) {
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px),
+      var(--window-ornament-frame), var(--panel-bg);
+    background-position:
+/* The grip moves in past the 14px frame border plus the bottom-right
+         corner motif's rounding, so it reads inside the frame beside the
+         (equally inset) scrollbar rather than on the ornament band. */
+      right 18px bottom 18px,
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right,
+      0 0;
+    background-size:
+      12px 12px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px,
+      auto;
+    background-repeat:
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      repeat-x,
+      repeat-x,
+      repeat-y,
+      repeat-y,
+      no-repeat;
+  }
+  /* The gilt title bar: same treatment as the pilot's (warm gold text, gold
+     underline reading as the frame's top rail, both title paddings widened so
+     the text and the pinned close button clear the top corners' ink), with
+     the top radius matching the frame's INNER curve (the 30px outer radius
+     minus the 14px frame border), so the sticky strip's opaque background
+     hugs the rounded padding box it now lives inside without square-cutting
+     the corners or bleeding onto the frame band. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) > .panel-title {
+    color: var(--color-gold-400);
+    border-bottom-color: var(--color-gold-700);
+    border-radius: 16px 16px 0 0;
+    padding-left: 64px;
+    padding-right: 118px;
+  }
+  .fancy-gold-ui
+    body:not(.mobile-touch)
+    .window.panel:not(.perf-wide)
+    > .panel-title
+    > .x-btn:not(.back-btn) {
+    inset-inline-end: 64px;
+  }
   /* forced-colors: active strips background/mask layers (WCAG contract, see
      src/ui/CLAUDE.md); restore a plain system-color border so the window frame
      stays visible in high-contrast mode instead of vanishing with the mask. */
@@ -14672,6 +14879,9 @@
     }
     #options-menu.perf-wide::before {
       display: none;
+    }
+    .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {
+      border-color: CanvasText;
     }
   }
 

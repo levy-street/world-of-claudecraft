@@ -43,6 +43,7 @@ import type {
 } from './woc_market_economy_types';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
 import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
+import type * as WocOps from './woc_market_ops';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
@@ -563,12 +564,12 @@ export interface WocMarketDb {
   markCustodyRefBooked(custodyRef: string): Promise<void>;
   opsListings(q: {
     realm: string;
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOps.WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }>;
+  }): Promise<{ rows: WocOps.WocOpsListingRow[]; hasMore: boolean }>;
   opsP2pTrades(q: {
     realm: string;
     status: WocDirectedOfferStatus | 'all';
@@ -576,7 +577,7 @@ export interface WocMarketDb {
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }>;
+  }): Promise<{ rows: WocOps.WocOpsP2pTradeRow[]; hasMore: boolean }>;
   /** The claim row for a ref (booked flag plus rail intents), or null when
    *  no claim exists. What the resume paths consult when a claim is not fresh:
    *  booked means done; a grant intent parks; a mail intent may resume only
@@ -1173,12 +1174,6 @@ export { BOND_PAYOUT_BUDGET_MS, WOC_MARKET_ME_READOUT_DEADLINE_MS } from './woc_
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without
  *  it. An arm returning a FULL batch is the "backlog is not draining" signal. */
-/** A directed offer plus the outcome it reached, for the operator p2p view. */
-export interface WocOpsP2pTradeRow extends WocDirectedOfferRow {
-  settledAmountBase: string | null;
-  txSignature: string | null;
-}
-
 // The sweep's pass-accounting vocabulary lives in woc_market_sweep_types.ts
 // (the ratchet's leaf-types pattern); the trio keeps this import path.
 export type {
@@ -2289,12 +2284,12 @@ export class WocMarketService {
    * dashboard cannot ask one realm's process about another's.
    */
   async opsListings(q: {
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOps.WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOps.WocOpsListingRow[]; hasMore: boolean }> {
     return this.deps.db.opsListings({ ...q, realm: this.cfg.realm });
   }
 
@@ -2304,7 +2299,7 @@ export class WocMarketService {
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOps.WocOpsP2pTradeRow[]; hasMore: boolean }> {
     return this.deps.db.opsP2pTrades({ ...q, realm: this.cfg.realm });
   }
 

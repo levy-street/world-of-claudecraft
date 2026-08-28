@@ -663,10 +663,9 @@ export function buildInterfaceControls(
   env?: OptionsEnv,
 ): OptionsControl[] {
   const general: OptionsControl[] = [
-    // uiScale commits on release: applying it live rescales the whole UI (the
-    // options window included), which shoves the slider under the cursor and
-    // makes the value hard to land (issue 1558).
-    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
+    // The UI Scale slider deliberately has NO menu row (owner request): the
+    // stored uiScale setting stays applied and the General tab's Reset to
+    // Defaults still clears a saved value (renderInterface's footer).
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
@@ -709,18 +708,21 @@ export function buildInterfaceControls(
   return [
     ...tag('general', general),
     ...tag('frames', [
-      slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
-      slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
+      // The player/target/party frame scale sliders deliberately have NO menu
+      // rows: Edit Frames (the unlock mode) resizes each frame directly, and a
+      // slider row beside it would fight that gesture. The settings keys stay
+      // (saved values still apply; the Frames tab's Reset to Defaults clears
+      // them, see renderInterface's footer).
       choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
         { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
         { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
-      slider(s, 'partyFrameScale', 'hudChrome.partyFrames.scale'),
-      slider(s, 'partyFrameWidth', 'hudChrome.partyFrames.width', 'oneDecimal', 5),
-      slider(s, 'partyFrameHeight', 'hudChrome.partyFrames.height', 'oneDecimal', 2),
-      slider(s, 'partyFrameSpacing', 'hudChrome.partyFrames.spacing', 'oneDecimal', 1),
-      slider(s, 'partyFrameColumns', 'hudChrome.partyFrames.columns', 'oneDecimal', 1),
+      // partyFrameWidth/partyFrameHeight likewise have NO rows here (Edit
+      // Frames drags them directly), and partyFrameColumns +
+      // partyFrameSpacing moved into the in-editor Frames Settings dropdown
+      // beside the other frame knobs; the keys stay live and this tab's
+      // Reset to Defaults still clears them.
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
         { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
         { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
@@ -756,17 +758,16 @@ export function buildInterfaceControls(
       boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
-      boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
-      boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
-        rerender: true,
-      }),
-      boolToggle(s, 'showThirdActionBar', 'hudChrome.options.showThirdActionBar', {
-        disabled: !s.bool('showSecondaryActionBar'),
-      }),
-      boolToggle(s, 'hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'),
-      boolToggle(s, 'lockActionBars', 'hudChrome.options.lockActionBars'),
+      // The secondary/third bar toggles deliberately have NO menu rows: the
+      // plus/minus buttons on the primary action bar are the one control for
+      // adding and removing the optional rows (the settings and the central
+      // resolver in main.ts are unchanged; only the duplicate UI is gone).
+      // Likewise combineActionBars / hideUnusedActionSlots / mouseoverCast /
+      // lockActionBars: the edit mode's Frames Settings dropdown owns their
+      // rows now (interface_unlock.ts settingToggles), so a duplicate here
+      // would drift out of sync with it.
     ]),
   ];
 }

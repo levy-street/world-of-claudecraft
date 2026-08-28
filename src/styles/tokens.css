@@ -455,6 +455,33 @@
     --cursor-arrow: url("/ui/cursors/arrow.png") 7 2, default;
     --cursor-point: url("/ui/cursors/gauntlet.png") 6 4, pointer;
     --cursor-grab: url("/ui/cursors/hand-grab.png") 11 16, grabbing;
+    /* Arrange-mode manipulation cursors, matching the painted set's gold
+       blade on a near-black rim so editing never flips between the game
+       cursor and the OS one (PR #3284 review play-testing). Inline SVG (no
+       new raster assets); every declaration keeps its OS keyword fallback
+       for engines without SVG cursor support. Consumers: the unlocked frame
+       bodies (hud.css) and the inline border writes (cursorForFrameEdge in
+       src/ui/target_frame_pos.ts). */
+    --cursor-move:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M16%202%2021%209H18V14H23V11L30%2016%2023%2021V18H18V23H21L16%2030%2011%2023H14V18H9V21L2%2016%209%2011V14H14V9H11Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      move;
+    --cursor-resize-ns:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M16%202%2022%2010H19V22H22L16%2030%2010%2022H13V10H10Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      ns-resize;
+    --cursor-resize-ew:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M2%2016%2010%2010V13H22V10L30%2016%2022%2022V19H10V22Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      ew-resize;
+    --cursor-resize-nwse:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M4%204H13L9.9%207.1%2024.9%2022.1%2028%2019V28H19L22.1%2024.9%207.1%209.9%204%2013Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      nwse-resize;
+    --cursor-resize-nesw:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M28%204H19L22.1%207.1%207.1%2022.1%204%2019V28H13L9.9%2024.9%2024.9%209.9%2028%2013Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      nesw-resize;
     /* Back-compat aliases */
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
@@ -498,6 +525,14 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent);
     --perf-ornament-edge-right: linear-gradient(transparent, transparent);
     --perf-ornament-gilt: var(--color-gold-700);
+    /* The Fancy Gold theme's gilded window frame (desktop .window.panel
+       under the .fancy-gold-ui root class; components.css):
+       applyWindowOrnamentVars overwrites this with the
+       12-layer tinted composite at boot. Same fallback contract as the
+       --perf-ornament-* masks above: consumed inside a `background-image`
+       list, so it needs a real (invisible) image value before boot, not an
+       unset property that would invalidate the whole declaration. */
+    --window-ornament-frame: linear-gradient(transparent, transparent);
     /* Minimap disc's gilded ring (hud.css "minimap" section /
        minimap_gilded_ornament.ts). Same fallback contract as
        --perf-ornament-gilt above: consumed as a whole `background`, so it
@@ -558,6 +593,10 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent) !important;
     --perf-ornament-edge-right: linear-gradient(transparent, transparent) !important;
     --perf-ornament-gilt: var(--color-gold-700) !important;
+    /* The Fancy Gold window frame is cosmetic filigree too, shed the same
+       way (the inline value applyWindowOrnamentVars sets is non-important,
+       so this stylesheet !important wins on the low tier). */
+    --window-ornament-frame: linear-gradient(transparent, transparent) !important;
     /* The minimap ring is purely cosmetic too (never actionable information),
        so it is shed at the low effect tier the same way. */
     --minimap-gilt: var(--color-gold-700) !important;

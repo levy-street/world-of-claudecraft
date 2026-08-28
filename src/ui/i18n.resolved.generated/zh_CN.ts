@@ -850,6 +850,7 @@ export const zh_CN: EnTranslations = {
       "reset": "重置",
       "presets": {
         "classic": "经典金色",
+        "fancyGold": "华丽金色",
         "midnight": "午夜",
         "parchment": "羊皮纸",
         "highContrast": "高对比度"
@@ -1326,6 +1327,11 @@ export const zh_CN: EnTranslations = {
       "reset": "重置",
       "done": "完成",
       "cancel": "取消",
+      "showExtraBar": "显示更多动作条",
+      "hideExtraBar": "隐藏一条动作条",
+      "conflictTitle": "按键已被占用",
+      "conflictBody": "{key} 已绑定到{other}。将其绑定到{action}会解除{other}的绑定。",
+      "conflictAccept": "仍然重新绑定",
       "resetConfirmTitle": "重置动作条按键？",
       "resetConfirmBody": "第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。"
     },
@@ -1546,6 +1552,7 @@ export const zh_CN: EnTranslations = {
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
       "showThirdActionBar": "显示第三动作条",
+      "combineActionBars": "合并动作条",
       "hideUnusedActionSlots": "隐藏未使用的动作栏位",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
@@ -2714,6 +2721,7 @@ export const zh_CN: EnTranslations = {
     },
     "partyFrames": {
       "section": "队伍和团队框体",
+      "optionsSection": "队伍框体选项",
       "unlock": "移动队伍和团队框体",
       "lock": "锁定队伍和团队框体",
       "style": "框体样式",
@@ -2743,6 +2751,62 @@ export const zh_CN: EnTranslations = {
     },
     "frameReset": {
       "label": "重置框体位置"
+    },
+    "interfaceUnlock": {
+      "label": "编辑框体",
+      "unlock": "解锁界面",
+      "lock": "锁定界面",
+      "lockAll": "锁定界面",
+      "barsNote": "编辑时只会显示你已开启的动作条。若要摆放更多动作条，请先用主动作条上的加减按钮添加。",
+      "frozenNote": "编辑期间界面和镜头会被冻结：按钮和框体只是待摆放的静态图片，点击不会传入游戏世界。",
+      "unlockFrame": "解锁此框体",
+      "lockFrame": "锁定此框体",
+      "resizeFrame": "调整此框体大小",
+      "frameNames": {
+        "actionBar1": "动作条",
+        "actionBar2": "动作条 2",
+        "actionBar3": "动作条 3",
+        "steamWishlist": "愿望单提醒",
+        "menu": "Menu",
+        "minimap": "小地图",
+        "stanceBar": "姿态栏",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "动作条组",
+        "playerFrame": "玩家",
+        "targetFrame": "目标",
+        "partyFrames": "队伍",
+        "swingBar": "自动攻击"
+      },
+      "framesMenu": "框体设置",
+      "framesMenuTitle": "显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。",
+      "showHideFrames": "显示或隐藏框体",
+      "buffsLeftToRight": "增益从左到右",
+      "debuffsLeftToRight": "减益从左到右",
+      "lockPlayerFrameToBar": "玩家框体锁定在动作条上方",
+      "actionBarsVertical": "动作条纵向排列",
+      "actionBar1Vertical": "动作条纵向",
+      "actionBar2Vertical": "动作条 2 纵向",
+      "actionBar3Vertical": "动作条 3 纵向",
+      "menuRailHorizontal": "菜单横向排列",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "重置尺寸",
+      "resetFrameSizeFor": "重置{name}的尺寸",
+      "previewSpell": "示例法术"
+    },
+    "transfer": {
+      "frameLayout": "框体布局",
+      "allSettings": "全部设置",
+      "exportAction": "导出",
+      "importAction": "导入",
+      "copy": "复制",
+      "copied": "已复制到剪贴板。",
+      "copyFailed": "复制失败。请选中代码后手动复制。",
+      "applyReload": "应用并重新载入",
+      "pastePlaceholder": "在此粘贴导出的代码。",
+      "invalid": "这不是有效的导出代码。",
+      "wrongKind": "该代码属于另一种导出类型。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
@@ -2958,7 +3022,10 @@ export const zh_CN: EnTranslations = {
       "unlink": "取消关联 Steam",
       "linked": "已关联 Steam 账号 {id}",
       "benefits": "在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。",
-      "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。"
+      "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。",
+      "wishlist": "在 Steam 上加入愿望单",
+      "wishlistAria": "在 Steam 上加入愿望单：打开 World of ClaudeCraft 商店页面",
+      "wishlistShort": "加入愿望单"
     },
     "epic": {
       "title": "Epic",

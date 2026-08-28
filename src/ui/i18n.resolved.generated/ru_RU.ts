@@ -850,6 +850,7 @@ export const ru_RU: EnTranslations = {
       "reset": "Сброс",
       "presets": {
         "classic": "Классическое золото",
+        "fancyGold": "Роскошное золото",
         "midnight": "Полночь",
         "parchment": "Пергамент",
         "highContrast": "Высокий контраст"
@@ -1326,6 +1327,11 @@ export const ru_RU: EnTranslations = {
       "reset": "Сбросить",
       "done": "Готово",
       "cancel": "Отмена",
+      "showExtraBar": "Показать ещё одну панель действий",
+      "hideExtraBar": "Скрыть панель действий",
+      "conflictTitle": "Клавиша уже занята",
+      "conflictBody": "{key} уже назначена на «{other}». Назначение на «{action}» снимет привязку с «{other}».",
+      "conflictAccept": "Всё равно переназначить",
       "resetConfirmTitle": "Сбросить клавиши панели действий?",
       "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
     },
@@ -1546,6 +1552,7 @@ export const ru_RU: EnTranslations = {
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showThirdActionBar": "Показывать третью панель действий",
+      "combineActionBars": "Объединить панели действий",
       "hideUnusedActionSlots": "Скрыть неиспользуемые ячейки действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
@@ -2714,6 +2721,7 @@ export const ru_RU: EnTranslations = {
     },
     "partyFrames": {
       "section": "Рамки группы и рейда",
+      "optionsSection": "Настройки фреймов группы",
       "unlock": "Переместить рамки группы и рейда",
       "lock": "Закрепить рамки группы и рейда",
       "style": "Стиль рамок",
@@ -2743,6 +2751,62 @@ export const ru_RU: EnTranslations = {
     },
     "frameReset": {
       "label": "Сбросить положение рамок"
+    },
+    "interfaceUnlock": {
+      "label": "Редактирование фреймов",
+      "unlock": "Разблокировать интерфейс",
+      "lock": "Заблокировать интерфейс",
+      "lockAll": "Заблокировать интерфейс",
+      "barsNote": "Во время редактирования видны только включённые панели действий. Чтобы разместить больше панелей, сначала добавьте их кнопками плюс и минус на основной панели.",
+      "frozenNote": "Во время редактирования интерфейс и камера заморожены: кнопки и рамки становятся неподвижными картинками для расстановки, а щелчки не попадают в игровой мир.",
+      "unlockFrame": "Разблокировать эту рамку",
+      "lockFrame": "Заблокировать эту рамку",
+      "resizeFrame": "Изменить размер этой рамки",
+      "frameNames": {
+        "actionBar1": "Панель команд",
+        "actionBar2": "Панель команд 2",
+        "actionBar3": "Панель команд 3",
+        "steamWishlist": "Напоминание о списке желаемого",
+        "menu": "Menu",
+        "minimap": "Мини-карта",
+        "stanceBar": "Панель стоек",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "Панели действий",
+        "playerFrame": "Игрок",
+        "targetFrame": "Цель",
+        "partyFrames": "Группа",
+        "swingBar": "Автоатака"
+      },
+      "framesMenu": "Настройки фреймов",
+      "framesMenuTitle": "Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.",
+      "showHideFrames": "Показать или скрыть фреймы",
+      "buffsLeftToRight": "Усиления слева направо",
+      "debuffsLeftToRight": "Ослабления слева направо",
+      "lockPlayerFrameToBar": "Закрепить фрейм игрока над панелью действий",
+      "actionBarsVertical": "Вертикальные панели действий",
+      "actionBar1Vertical": "Вертикальная панель команд",
+      "actionBar2Vertical": "Вертикальная панель команд 2",
+      "actionBar3Vertical": "Вертикальная панель команд 3",
+      "menuRailHorizontal": "Горизонтальное меню",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Сбросить размер",
+      "resetFrameSizeFor": "Сбросить размер: {name}",
+      "previewSpell": "Пример заклинания"
+    },
+    "transfer": {
+      "frameLayout": "Расположение фреймов",
+      "allSettings": "Все настройки",
+      "exportAction": "Экспорт",
+      "importAction": "Импорт",
+      "copy": "Копировать",
+      "copied": "Скопировано в буфер обмена.",
+      "copyFailed": "Не удалось скопировать. Выделите код и скопируйте его вручную.",
+      "applyReload": "Применить и перезагрузить",
+      "pastePlaceholder": "Вставьте сюда экспортированный код.",
+      "invalid": "Это не действительный код экспорта.",
+      "wrongKind": "Этот код относится к другому типу экспорта."
     },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",
@@ -2958,7 +3022,10 @@ export const ru_RU: EnTranslations = {
       "unlink": "Отвязать Steam",
       "linked": "Привязан аккаунт Steam {id}",
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
-      "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
+      "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку.",
+      "wishlist": "Добавить в желаемое в Steam",
+      "wishlistAria": "Добавить в желаемое в Steam: открыть страницу World of ClaudeCraft в магазине",
+      "wishlistShort": "В желаемое"
     },
     "epic": {
       "title": "Epic",

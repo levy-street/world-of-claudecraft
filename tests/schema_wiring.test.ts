@@ -689,6 +689,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'chat_violations_retention_created',
       'bank_ledger_account_recent',
       'woc_market_sales_seller',
+      'woc_market_ops_closed_created',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -781,6 +782,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(wocSalesSeller?.checkSql).toContain("to_regclass('woc_market_sales_seller')");
     expect(wocSalesSeller?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS woc_market_sales_seller',
+    );
+    const wocOpsClosed = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'woc_market_ops_closed_created',
+    );
+    expect(wocOpsClosed?.createSql).toContain(
+      'ON woc_market_listings(realm, resolution, created_at DESC, id DESC)',
+    );
+    expect(wocOpsClosed?.createSql).toContain(
+      "WHERE directed_buyer_account IS NULL AND status = 'closed'",
+    );
+    expect(wocOpsClosed?.checkSql).toContain("to_regclass('woc_market_ops_closed_created')");
+    expect(wocOpsClosed?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS woc_market_ops_closed_created',
     );
   });
 

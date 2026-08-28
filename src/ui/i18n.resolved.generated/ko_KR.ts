@@ -850,6 +850,7 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "presets": {
         "classic": "클래식 골드",
+        "fancyGold": "화려한 골드",
         "midnight": "미드나이트",
         "parchment": "양피지",
         "highContrast": "고대비"
@@ -1326,6 +1327,11 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "done": "완료",
       "cancel": "취소",
+      "showExtraBar": "액션 바 하나 더 표시",
+      "hideExtraBar": "액션 바 하나 숨기기",
+      "conflictTitle": "이미 지정된 키",
+      "conflictBody": "{key} 키는 이미 {other}에 지정되어 있습니다. {action}에 지정하면 {other}의 지정이 해제됩니다.",
+      "conflictAccept": "그래도 재지정",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
     },
@@ -1546,6 +1552,7 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "combineActionBars": "액션 바 합치기",
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
@@ -2714,6 +2721,7 @@ export const ko_KR: EnTranslations = {
     },
     "partyFrames": {
       "section": "파티 및 공격대 프레임",
+      "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
       "lock": "파티 및 공격대 프레임 고정",
       "style": "프레임 스타일",
@@ -2743,6 +2751,62 @@ export const ko_KR: EnTranslations = {
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
+    },
+    "interfaceUnlock": {
+      "label": "프레임 편집",
+      "unlock": "인터페이스 잠금 해제",
+      "lock": "인터페이스 잠금",
+      "lockAll": "인터페이스 잠금",
+      "barsNote": "편집 중에는 켜 둔 액션 바만 표시됩니다. 더 많은 바를 배치하려면 먼저 기본 액션 바의 더하기/빼기 버튼으로 추가하세요.",
+      "frozenNote": "편집 중에는 인터페이스와 카메라가 고정됩니다. 버튼과 프레임은 배치용 정지 화면이 되며, 클릭은 게임 세계에 전달되지 않습니다.",
+      "unlockFrame": "이 프레임 잠금 해제",
+      "lockFrame": "이 프레임 잠금",
+      "resizeFrame": "이 프레임 크기 조절",
+      "frameNames": {
+        "actionBar1": "행동 단축바",
+        "actionBar2": "행동 단축바 2",
+        "actionBar3": "행동 단축바 3",
+        "steamWishlist": "찜 목록 알림",
+        "menu": "Menu",
+        "minimap": "미니맵",
+        "stanceBar": "태세 바",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "액션 바",
+        "playerFrame": "플레이어",
+        "targetFrame": "대상",
+        "partyFrames": "파티",
+        "swingBar": "자동 공격"
+      },
+      "framesMenu": "프레임 설정",
+      "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",
+      "showHideFrames": "프레임 표시 및 숨기기",
+      "buffsLeftToRight": "버프 왼쪽에서 오른쪽으로",
+      "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
+      "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
+      "actionBarsVertical": "액션 바 세로 배치",
+      "actionBar1Vertical": "액션 바 세로 배치",
+      "actionBar2Vertical": "액션 바 2 세로 배치",
+      "actionBar3Vertical": "액션 바 3 세로 배치",
+      "menuRailHorizontal": "메뉴 가로 배치",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "크기 초기화",
+      "resetFrameSizeFor": "{name} 크기 초기화",
+      "previewSpell": "예시 주문"
+    },
+    "transfer": {
+      "frameLayout": "프레임 배치",
+      "allSettings": "모든 설정",
+      "exportAction": "내보내기",
+      "importAction": "가져오기",
+      "copy": "복사",
+      "copied": "클립보드에 복사했습니다.",
+      "copyFailed": "복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.",
+      "applyReload": "적용 후 다시 불러오기",
+      "pastePlaceholder": "내보낸 코드를 여기에 붙여넣으세요.",
+      "invalid": "유효한 내보내기 코드가 아닙니다.",
+      "wrongKind": "이 코드는 다른 종류의 내보내기입니다."
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
@@ -2958,7 +3022,10 @@ export const ko_KR: EnTranslations = {
       "unlink": "Steam 연동 해제",
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
-      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.",
+      "wishlist": "Steam에서 위시리스트에 추가",
+      "wishlistAria": "Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기",
+      "wishlistShort": "위시리스트"
     },
     "epic": {
       "title": "Epic",

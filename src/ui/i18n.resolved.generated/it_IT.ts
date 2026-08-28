@@ -850,6 +850,7 @@ export const it_IT: EnTranslations = {
       "reset": "Ripristina",
       "presets": {
         "classic": "Oro classico",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Mezzanotte",
         "parchment": "Pergamena",
         "highContrast": "Alto contrasto"
@@ -1326,6 +1327,11 @@ export const it_IT: EnTranslations = {
       "reset": "Ripristina",
       "done": "Fatto",
       "cancel": "Annulla",
+      "showExtraBar": "Show Another Action Bar",
+      "hideExtraBar": "Hide an Action Bar",
+      "conflictTitle": "Key Already Bound",
+      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
+      "conflictAccept": "Rebind Anyway",
       "resetConfirmTitle": "Ripristinare i tasti della barra delle azioni?",
       "resetConfirmBody": "La prima barra torna ai suoi tasti predefiniti. La seconda e la terza restano senza tasti assegnati. L'operazione non può essere annullata."
     },
@@ -1546,6 +1552,7 @@ export const it_IT: EnTranslations = {
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
       "showThirdActionBar": "Mostra la terza barra delle azioni",
+      "combineActionBars": "Combine Action Bars",
       "hideUnusedActionSlots": "Nascondi gli slot azione inutilizzati",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
@@ -2714,6 +2721,7 @@ export const it_IT: EnTranslations = {
     },
     "partyFrames": {
       "section": "Riquadri gruppo e incursione",
+      "optionsSection": "Party Frame Options",
       "unlock": "Sposta i riquadri di gruppo e incursione",
       "lock": "Blocca i riquadri di gruppo e incursione",
       "style": "Stile riquadri",
@@ -2743,6 +2751,62 @@ export const it_IT: EnTranslations = {
     },
     "frameReset": {
       "label": "Ripristina le posizioni dei riquadri"
+    },
+    "interfaceUnlock": {
+      "label": "Edit Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "lockAll": "Lock Interface",
+      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
+      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Resize this frame",
+      "frameNames": {
+        "actionBar1": "Action Bar",
+        "actionBar2": "Action Bar 2",
+        "actionBar3": "Action Bar 3",
+        "steamWishlist": "Wishlist Reminder",
+        "menu": "Menu",
+        "minimap": "Minimap",
+        "stanceBar": "Stance Bar",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "Action Bars",
+        "playerFrame": "Player",
+        "targetFrame": "Target",
+        "partyFrames": "Party",
+        "swingBar": "Auto Attack"
+      },
+      "framesMenu": "Frames Settings",
+      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
+      "showHideFrames": "Show or Hide Frames",
+      "buffsLeftToRight": "Buffs left to right",
+      "debuffsLeftToRight": "Debuffs left to right",
+      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
+      "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
+      "menuRailHorizontal": "Horizontal Menu",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Reset size",
+      "resetFrameSizeFor": "Reset size for {name}",
+      "previewSpell": "Example Spell"
+    },
+    "transfer": {
+      "frameLayout": "Frame Layout",
+      "allSettings": "All Settings",
+      "exportAction": "Export",
+      "importAction": "Import",
+      "copy": "Copy",
+      "copied": "Copied to clipboard.",
+      "copyFailed": "Copy failed. Select the code and copy it yourself.",
+      "applyReload": "Apply and Reload",
+      "pastePlaceholder": "Paste an exported code here.",
+      "invalid": "That is not a valid export code.",
+      "wrongKind": "That code is a different export type."
     },
     "itemTooltip": {
       "requiresLevel": "Richiede livello {level}",
@@ -2958,7 +3022,10 @@ export const it_IT: EnTranslations = {
       "unlink": "Scollega Steam",
       "linked": "Collegato all'account Steam {id}",
       "benefits": "Collega il tuo account Steam dall'app desktop per rispecchiare le imprese che ottieni negli obiettivi di Steam.",
-      "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova."
+      "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

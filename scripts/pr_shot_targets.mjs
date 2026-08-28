@@ -271,6 +271,42 @@ async function openMarketBrowse(page) {
   return pollForSize(page, '#market-window');
 }
 
+// Open Esc options -> Interface -> Combat by CLICKING the rendered controls rather
+// than reaching past them, so the shot proves the row is reachable the way a player
+// reaches it. Interface is the 4th main-menu row (buildOptionsMenu; the optional Bug
+// Report row is appended AFTER it, so the index is stable) and Combat the 4th tab of
+// the Interface panel (INTERFACE_TAB_ORDER). The window is force-hidden first so the
+// toggle is deterministic regardless of prior state, the same trick the bags target uses.
+async function openInterfaceCombatTab(page) {
+  await page.evaluate(() => {
+    const el = document.querySelector('#options-menu');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.toggleOptionsMenu?.();
+  });
+  await wait(400);
+  await page.evaluate(() => {
+    document.querySelectorAll('#options-menu .opt-btn')[3]?.click();
+  });
+  await wait(400);
+  await page.evaluate(() => {
+    document.querySelectorAll('#options-menu .opt-tab')[3]?.click();
+  });
+  return pollForSize(page, '#options-menu');
+}
+
+// Press the real "Unlock interface" button (the first row of the Combat tabpanel,
+// which interfaceUnlockRow appends ahead of the declarative list), then close the
+// menu so the loosened HUD is what the camera sees.
+async function unlockInterfaceThroughTheOption(page) {
+  await openInterfaceCombatTab(page);
+  await page.evaluate(() => {
+    document.querySelector('#interface-tabpanel .set-row button')?.click();
+  });
+  await wait(300);
+  await page.evaluate(() => window.__game?.hud?.toggleOptionsMenu?.());
+  await wait(500);
+}
+
 // The home page's global board is a REST read (`/api/leaderboard?scope=global...`),
 // and a screenshot host has no populated realm behind it, so answer that one request
 // with a representative cross-realm page before the document loads. Everything after
@@ -377,6 +413,22 @@ async function stubDesktopUpdateBridge(page) {
       }
       return real(input, init);
     };
+  })()`);
+}
+
+// The landing-header wishlist shares space with the borderless desktop shell's
+// Exit Game control. Seed the exact host shape which reveals that control and
+// choose German, whose longer navigation/action labels exercise the supported
+// compact desktop boundary in the screenshot rather than only in geometry tests.
+async function stubBorderlessDesktopBridge(page) {
+  await lowGraphicsSeed(page);
+  await stubDesktopUpdateBridge(page);
+  await page.evaluateOnNewDocument(`(() => {
+    try { localStorage.setItem('locale', 'de_DE'); } catch {}
+    Object.assign(window.wocDesktop, {
+      getDisplayMode: () => Promise.resolve('borderless'),
+      quitApp: () => Promise.resolve(true),
+    });
   })()`);
 }
 
@@ -1835,6 +1887,64 @@ export const TARGETS = [
         throw new Error(`missing ability surfaces: ${JSON.stringify(surfaces)}`);
       }
       return {};
+    },
+  },
+  {
+    key: 'interface-unlock-option',
+    label: 'Interface options, Combat tab: the Unlock interface row',
+    when: ['ui/interface_unlock', 'ui/options_window', 'ui/options_view'],
+    // Desktop and mobile: the row is an ordinary options control on both, and the
+    // template asks for the mobile arm of any options-panel change.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await openInterfaceCombatTab(page);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'interface-unlock-hud',
+    label: 'HUD with the interface unlocked: move buttons and resize grips on every live frame',
+    when: ['ui/interface_unlock', 'ui/movable_frame'],
+    // Desktop only, and that is the feature rather than a gap: MovableFrame refuses
+    // every gesture on the mobile layout and the stylesheet hides the chrome there,
+    // so the mobile shot would be identical to the locked one.
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await unlockInterfaceThroughTheOption(page);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'interface-unlock-moved',
+    label: 'HUD after frames have been dragged and scaled (the persisted boxes replayed)',
+    when: ['ui/interface_unlock', 'ui/target_frame_pos'],
+    variants: [
+      {
+        key: 'desktop',
+        // Seed the SAME localStorage keys a real drag persists, before the document
+        // loads, so the shot exercises the real parse-and-apply path a returning
+        // player hits rather than a synthetic pointer script. String form because
+        // this script runs under tsx (keepNames breaks nested evaluate functions).
+        beforeLoad: async (page) => {
+          await page.evaluateOnNewDocument(
+            `try {
+               localStorage.setItem('woc_hud_frame_castbar', JSON.stringify({ left: 240, top: 300, scale: 1.4 }));
+               localStorage.setItem('woc_hud_frame_minimap', JSON.stringify({ left: 40, top: 60, scale: 0.8 }));
+               localStorage.setItem('woc_hud_frame_side_buttons', JSON.stringify({ left: 1180, top: 120, scale: 1 }));
+               // The primary action bar covers the OTHER half of the feature: it
+               // lives under #bottom-bar's centering transform, so it only lands
+               // here if the re-home onto #ui and the .hud-frame-detached
+               // positioning both work. A frame that is already absolute would
+               // move without either of them and prove nothing.
+               localStorage.setItem('woc_hud_frame_actionbar', JSON.stringify({ left: 620, top: 470, scale: 1 }));
+             } catch {}`,
+          );
+        },
+      },
+    ],
+    async capture(page) {
+      await unlockInterfaceThroughTheOption(page);
+      return { clip: '#ui' };
     },
   },
   {
@@ -9435,7 +9545,12 @@ export const TARGETS = [
     ],
     async capture(page, variant) {
       if (variant?.moreTray) {
+        await dismissEntryOverlays(page);
         await page.evaluate(() => {
+          // A fresh offline character may receive Ferryman Odo's one-time
+          // arrival note after the shared entry helper has settled. It is
+          // unrelated to chrome-icon review and otherwise covers the tray.
+          document.querySelector('#tutorial-greeting')?.remove();
           document.querySelector('#mobile-more')?.click();
         });
         if (!(await pollForSize(page, '#mobile-extra-controls')))
@@ -9449,6 +9564,109 @@ export const TARGETS = [
       const sel = variant?.mobile ? '#mobile-combat-controls' : '#side-buttons';
       if (!(await pollForSize(page, sel))) throw new Error(`${sel} never laid out`);
       return { clip: sel };
+    },
+  },
+  {
+    key: 'steam-wishlist',
+    label: 'Steam wishlist reminder on the landing shell and desktop/mobile chrome',
+    when: ['src/ui/steam_wishlist'],
+    variants: [
+      { key: 'homepage-header-web', landing: true, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'homepage-header-borderless-1366',
+        landing: true,
+        beforeLoad: stubBorderlessDesktopBridge,
+        borderless: true,
+      },
+      { key: 'homepage-footer-web', landing: true, beforeLoad: lowGraphicsSeed, footer: true },
+      {
+        key: 'desktop-community-tray',
+        beforeLoad: lowGraphicsSeed,
+        communityTray: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+      },
+      {
+        key: 'mobile-more-tray',
+        landing: true,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+        moreTray: true,
+      },
+    ],
+    async capture(page, variant) {
+      if (variant?.communityTray) {
+        await page.setViewport({ width: 1120, height: 560 });
+        await dismissEntryOverlays(page);
+        await page.waitForFunction(
+          () => !document.body.classList.contains('steam-wishlist-pending'),
+          { timeout: 10000, polling: 100 },
+        );
+        await page.evaluate(() => {
+          document.querySelector('#tutorial-greeting')?.remove();
+          const menu = document.querySelector('#community-menu');
+          if (menu instanceof HTMLDetailsElement) menu.open = true;
+        });
+        if (!(await pollForSize(page, '#community-hud .community-tray'))) {
+          const state = await page.evaluate(() => {
+            const box = (selector) => {
+              const element = document.querySelector(selector);
+              if (!(element instanceof HTMLElement)) return null;
+              const rect = element.getBoundingClientRect();
+              return {
+                display: getComputedStyle(element).display,
+                width: rect.width,
+                height: rect.height,
+              };
+            };
+            return {
+              start: box('#start-screen'),
+              ui: box('#ui'),
+              hud: box('#community-hud'),
+              tray: box('#community-hud .community-tray'),
+            };
+          });
+          throw new Error(`desktop Community tray did not open: ${JSON.stringify(state)}`);
+        }
+        await wait(400);
+        return { clip: '#community-hud .community-tray' };
+      }
+      if (variant?.moreTray) {
+        await page.evaluate(() => {
+          // This frame reviews the static tray composition, not world state.
+          // Stage the same open classes/ARIA that Hud's real mobile-more click
+          // owns, while staying on the landing boot so a cold renderer cannot
+          // make a UI-only screenshot nondeterministic.
+          document.body.classList.add('game-active', 'mobile-touch', 'mobile-more-open');
+          const ui = document.querySelector('#ui');
+          if (ui instanceof HTMLElement) ui.style.display = 'block';
+          document.querySelector('#mobile-extra-controls')?.setAttribute('aria-hidden', 'false');
+          document.querySelector('#mobile-more')?.setAttribute('aria-expanded', 'true');
+        });
+        if (!(await pollForSize(page, '#mobile-extra-controls'))) {
+          throw new Error('mobile More tray did not open');
+        }
+        await wait(400);
+        return { clip: '#mobile-extra-controls' };
+      }
+      if (variant?.borderless) {
+        await page.setViewport({ width: 1366, height: 768 });
+        await page.waitForFunction(
+          () => document.querySelector('#desktop-login-exit')?.hidden === false,
+          { timeout: 10000, polling: 100 },
+        );
+      }
+      if (variant?.footer) {
+        await page.evaluate(() => {
+          document.querySelector('.homepage-footer')?.scrollIntoView({ block: 'end' });
+        });
+        await wait(300);
+        return { clip: '.homepage-footer' };
+      }
+      if (!(await pollForSize(page, '.homepage-header', 10, 200))) {
+        throw new Error('home-page header did not render');
+      }
+      return { clip: '.homepage-header' };
     },
   },
   {

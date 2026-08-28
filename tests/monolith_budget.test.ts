@@ -321,7 +321,19 @@ const MONOLITHS: MonolithRow[] = [
     // the at-cap line), paying for the denial params thread
     // (craftDenyMessage's retryAfterSeconds pass-through). Exact count, zero
     // slack.
-    ceiling: 18217,
+    // Release arm, carried for the record: raised to 19002 at the PR #3284
+    // v0.41.0 sync merge (the interface-unlock live hooks: dimension-mode
+    // mover wiring, the edit-preview painter closure, the player-frame bar
+    // lock), after that PR's review-round extraction moved the frames-menu
+    // toggle/select tables, the reset-key table, and the party-sample roster
+    // builder to the pure core interface_unlock_menu_core.ts.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 8592df3866) into
+    // feature/masterwrought (base cb10309ba6). BOTH parent pins for the
+    // record: ours 18217, the release 19002. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/ui/hud.ts), neither
+    // parent's literal. Exact merged count, zero slack: any further growth
+    // reds again.
+    ceiling: 18731,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -859,7 +871,18 @@ const MONOLITHS: MonolithRow[] = [
     // ours 11528, the release 11563. The release span's one-line shed lands on
     // top of ours, so the merged file measures 11527 (wc -l < src/main.ts), under
     // both parents; the ratchet follows it down. Exact merged count, zero slack.
-    ceiling: 11527,
+    // Release arm, carried for the record: raised to 11629 at the PR #3284
+    // v0.41.0 sync merge (the applySetting arms for the interface-editor
+    // settings: frame dimensions, aura direction vars, the player-frame bar
+    // lock; folding them behind a src/game/ settings-application seam is
+    // flagged follow-up work on the release side).
+    // RE-PINNED at the merge of release/v0.41.0 (tip 8592df3866) into
+    // feature/masterwrought (base cb10309ba6). BOTH parent pins for the
+    // record: ours 11527, the release 11629. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/main.ts), neither
+    // parent's literal. Exact merged count, zero slack: any further growth
+    // reds again.
+    ceiling: 11593,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1117,7 +1140,9 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
-    ceiling: 3929,
+    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
+    // woc_market_ops.ts instead of growing this coordinator.
+    ceiling: 3924,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

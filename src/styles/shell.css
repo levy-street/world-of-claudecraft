@@ -418,6 +418,68 @@
     display: block;
   }
 
+  /* Steam wishlist reminder, the header companion to the Donate CTA above.
+     Deliberately the quieter of the pair: at most one gold action per surface
+     (DESIGN.md 10.1), and Donate already holds it, so the wishlist takes the
+     ink-and-silver ghost variant at the same 40px height and reads as a second
+     option rather than a second shout. Steam's #66c0f4 arrives on hover and
+     keyboard focus only. hud.css owns the in-game chip and the one rule that
+     suppresses every wishlist surface at once. */
+  .steam-wishlist-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: linear-gradient(180deg, #1b1b26 0%, #0d0d14 100%);
+    /* This control keeps a fixed dark plate under every theme, so its resting
+       ink must stay fixed too. Theme gold becomes dark brown on Parchment and
+       falls below AA against this plate; this silver holds above 7:1. */
+    color: #b8bcc8;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition:
+      color var(--transition-speed) var(--transition-ease),
+      border-color var(--transition-speed) var(--transition-ease),
+      box-shadow var(--transition-speed) var(--transition-ease);
+  }
+  .steam-wishlist-cta:hover,
+  .steam-wishlist-cta:focus-visible {
+    color: #eaf4ff;
+    border-color: #66c0f4;
+    box-shadow:
+      0 2px 12px rgba(102, 192, 244, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .steam-wishlist-cta .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  /* The footer twin keeps every .social-link behaviour, including the gold hover
+     the row shares and the icon-only collapse on narrow viewports; it only needs
+     the hydrated glyph sized like the inline marks beside it. Left at the base
+     .social-link svg specificity on purpose, so the narrow-viewport 18px rule
+     later in this sheet still wins over it. */
+  .social-link.steam-wishlist-social {
+    /* .social-link uses themed gold, but this sibling retains the fixed dark
+       plate above; keep the small label AA-safe on Parchment too. */
+    color: #b8bcc8;
+  }
+  .steam-wishlist-social svg {
+    width: 16px;
+    height: 16px;
+  }
+
   /* Wallet verification CTA. It is a gold action until the account has a
      server-verified wallet, then settles into a green verified state. */
   .wallet-cta {
@@ -7267,7 +7329,10 @@
     width: 100%;
   }
 
-  @media (max-width: 860px) {
+  /* The added wishlist action makes the full localized desktop header too wide
+     below 1121px. Collapse the menu before any action is clipped by
+     #start-screen's intentional horizontal overflow guard. */
+  @media (max-width: 1120px) {
     /* Mobile First Homepage Header and Hamburger Menu */
     .mobile-menu-toggle {
       display: flex;
@@ -7378,6 +7443,36 @@
     .social-link svg {
       width: 18px;
       height: 18px;
+    }
+  }
+
+  /* Between the collapsed-menu breakpoint and a comfortably wide desktop,
+     retain the wishlist action as an icon-labelled-by-aria. This keeps long
+     locale nav labels (notably German) inside the viewport at 1200px. */
+  @media (min-width: 1121px) and (max-width: 1280px) {
+    .steam-wishlist-cta {
+      width: 40px;
+      padding-inline: 0;
+      justify-content: center;
+    }
+    .steam-wishlist-cta span {
+      display: none;
+    }
+  }
+
+  /* Borderless desktop builds add Exit Game to the action group. Keep that
+     desktop-only combination on its own centered row until the full German
+     header has reliable one-row clearance; web and windowed shells retain the
+     ordinary layout because their exit control remains hidden. */
+  @media (min-width: 1121px) and (max-width: 1440px) {
+    body.desktop-app:has(.desktop-login-exit:not([hidden])) .homepage-header {
+      grid-template-rows: auto auto;
+      row-gap: var(--spacing-xs);
+    }
+    body.desktop-app:has(.desktop-login-exit:not([hidden])) .header-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: center;
     }
   }
 

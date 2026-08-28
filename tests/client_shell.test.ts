@@ -1201,11 +1201,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
+    // Two Ko-fi taps per entry (the marketing donate-cta and the mobile
+    // drawer): the in-game community tray's third one left with the tray's
+    // GitHub/Donate links (owner request, the tray is wishlist-only now).
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(2);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1638,10 +1641,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
-  it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
+  it('carries a wishlist-only community tray in BOTH entries, with no duplicate Discord entry', () => {
+    // The tray's GitHub and Donate links were removed (owner request); the
+    // Steam wishlist chip is the tray's one remaining entry, and the
+    // homepage marketing links stay where they are.
     for (const entry of [html, playHtml]) {
-      expect(entry).toContain('<a class="community-link github"');
-      expect(entry).toContain('<a class="community-link donate"');
+      expect(entry).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+      expect(entry).not.toContain('<a class="community-link github"');
+      expect(entry).not.toContain('<a class="community-link donate"');
       expect(entry).not.toContain('<a class="community-link discord"');
     }
   });
@@ -1735,8 +1742,11 @@ describe('client HTML shell', () => {
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
     expect(html).toContain('<div class="community-tray">');
-    expect(html).toContain('<a class="community-link github"');
-    expect(html).toContain('<a class="community-link donate"');
+    // The tray is wishlist-only now (its GitHub/Donate links were removed,
+    // owner request); the marketing donate-cta above stays.
+    expect(html).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+    expect(html).not.toContain('<a class="community-link github"');
+    expect(html).not.toContain('<a class="community-link donate"');
     // No separate Discord invite link here: it duplicated the Discord (U)
     // icon-rail button (#mm-discord), the game HUD's single Discord entry
     // point (see the fix/inspect-camera-talent-overlap-discord-dup PR).

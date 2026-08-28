@@ -40,6 +40,9 @@ function makeInput(userAgent?: string) {
   // Input's optional "a menu owns the keyboard right now" gate; true unless a
   // test flips it, so every existing expectation is unaffected.
   let gameKeysAllowed = true;
+  // The optional "Unlock interface" arrange-mode gate: while true, no camera
+  // drag / mouselook / click-pick may start. False unless a test flips it.
+  let cameraLocked = false;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -86,6 +89,7 @@ function makeInput(userAgent?: string) {
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
     canUseGameKeys: () => gameKeysAllowed,
+    isCameraLocked: () => cameraLocked,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -103,6 +107,9 @@ function makeInput(userAgent?: string) {
     },
     setGameKeysAllowed: (allowed: boolean) => {
       gameKeysAllowed = allowed;
+    },
+    setCameraLocked: (locked: boolean) => {
+      cameraLocked = locked;
     },
   };
 }
@@ -1941,5 +1948,56 @@ describe('Input mouse-button bindings', () => {
 
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+});
+
+// The "Unlock interface" arrange mode claims the mouse for HUD-frame drags: a
+// canvas press while the gate reports locked must start NO camera drag,
+// mouselook, or click-pick, or a grab that misses a frame spins the camera (the
+// exact complaint the gate exists for). Wheel zoom and keyboard movement are
+// deliberately outside the gate.
+describe('Input camera lock (interface unlock arrange mode)', () => {
+  it('starts no camera drag or mouselook while the arrange mode owns the mouse', () => {
+    const { canvas, input, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    const yaw = input.camYaw;
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+
+    expect(input.isCameraDragActive()).toBe(false);
+    expect(input.camYaw).toBe(yaw);
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('synthesizes no click-pick from a press that started while locked', () => {
+    const { canvas, cb, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+
+    canvasListeners.get('mousedown')!({ button: 0, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mouseup')!({ button: 0, ...CENTER, target: canvas });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('restores the normal camera drag the moment the mode is left', () => {
+    const { input, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    expect(input.isCameraDragActive()).toBe(false);
+
+    setCameraLocked(false);
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(input.isCameraDragActive()).toBe(true);
+  });
+
+  it('still zooms with the wheel while locked (zoom is not a drag)', () => {
+    const { canvasListeners, input, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(13.4);
   });
 });
