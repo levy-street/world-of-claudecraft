@@ -81,7 +81,8 @@ export const ko_KR: Record<string, string> = {
   'moderationHistory.actionRestoreItem': '아이템 복구',
   'moderationHistory.actionRestoreSlot': '슬롯 복구',
   'moderationHistory.actionClearItemName': '아이템 이름 삭제',
-  'error.clearItemNameTargetForms': '대상을 정확히 하나만 지정하세요. 착용 슬롯, 가방 칸, 또는 all: true',
+  'error.clearItemNameTargetForms':
+    '대상을 정확히 하나만 지정하세요. 착용 슬롯, 가방 칸, 또는 all: true',
   'error.clearItemNameUnknownSlot': '알 수 없는 장비 슬롯입니다',
   'error.clearItemNameAllLiteral': 'all은 리터럴 true여야 합니다',
   'error.clearItemNameBagPair': '가방 대상에는 칸 번호와 아이템 ID가 모두 필요합니다',

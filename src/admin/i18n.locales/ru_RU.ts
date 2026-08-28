@@ -86,8 +86,7 @@ export const ru_RU: Record<string, string> = {
     'укажите ровно одну цель: надетый слот, ячейку сумки или all: true',
   'error.clearItemNameUnknownSlot': 'неизвестный слот экипировки',
   'error.clearItemNameAllLiteral': 'all должно быть литералом true',
-  'error.clearItemNameBagPair':
-    'для цели в сумке нужны и индекс ячейки, и идентификатор предмета',
+  'error.clearItemNameBagPair': 'для цели в сумке нужны и индекс ячейки, и идентификатор предмета',
   'error.clearItemNameBagIndex': 'bag должно быть целым неотрицательным числом',
   'error.clearItemNameOnline': 'персонаж в сети на этом мире; сначала отключите его',
   'error.clearItemNameNoMatch': 'ни одна именованная копия не подошла под эту цель',
