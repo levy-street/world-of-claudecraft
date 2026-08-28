@@ -326,9 +326,10 @@ private resizeObserver: (() => void) | null = null;
   private lastSortBaseline = '';
   private resizeObserver: (() => void) | null = null;
 
-  constructor(private readonly deps: BagsWindowDeps) {}
-      this.resizeObserver = () => this.onWindowResized();
-      window.addEventListener('resize', this.resizeObserver);
+  constructor(private readonly deps: BagsWindowDeps) {
+    this.resizeObserver = () => this.onWindowResized();
+    window.addEventListener('resize', this.resizeObserver);
+  }
 
   private armSortSettle(): void {
     this.sortSettleArmedAt = performance.now();
@@ -337,10 +338,11 @@ private resizeObserver: (() => void) | null = null;
     this.lastSortBaseline = bagSortSignature(this.deps.world().inventory);
   }
 
-    private onWindowResized() {
-      if (!this.opened) return;
-      const el = this.deps.root();
-      const rect = el.getBoundingClientRect();
+  private onWindowResized(): void {
+    if (!this.deps.root()) return;
+    const el = this.deps.root();
+    if (el.style.display === 'none') return;
+    const rect = el.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       let needsReposition = false;
