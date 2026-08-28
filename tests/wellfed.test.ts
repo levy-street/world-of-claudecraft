@@ -292,6 +292,37 @@ describe('well fed: elixir coexistence (the ids cannot collide, both orders)', (
     expect(elx, 'elixir intact after the meal').toBeTruthy();
     expect(elx!.value).toBe(6);
   });
+
+  it('the two families are disjoint over the WHOLE catalog, not just the pair quaffed above', () => {
+    // ADDED AT PHASE 15, the SPANNING half of the pin ip-15-KIT owes, read off
+    // the CATALOG rather than off the one constant: the arms above prove
+    // coexistence for the pair they drink, this proves the ids CANNOT collide
+    // for every payload the game ships. `elixir_${kind}` is the id
+    // src/sim/items.ts builds for every elixir, scroll and flask; well_fed is
+    // what every food mints. A new payload kind (the guardian-elixir family
+    // items.ts anticipates), or a rename of either scheme toward the other's
+    // shape, reds here rather than surfacing as a coexistence bug for a stat
+    // nobody wrote a behavioural arm for.
+    const elixirIds = new Set<string>();
+    let payloadCount = 0;
+    for (const def of Object.values(ITEMS)) {
+      if (def.kind !== 'elixir' && def.kind !== 'scroll' && def.kind !== 'flask') continue;
+      expect(def.elixir, `${def.id} carries an elixir payload`).toBeTruthy();
+      elixirIds.add(`elixir_${def.elixir!.kind}`);
+      payloadCount++;
+    }
+    expect(payloadCount, 'the shipped elixir-family carrier count').toBe(10);
+    expect([...elixirIds].sort(), 'the shipped elixir-family ids').toEqual([
+      'elixir_buff_ap',
+      'elixir_buff_int',
+      'elixir_buff_sta',
+    ]);
+    expect(elixirIds.has(WELL_FED_AURA_ID), 'no elixir id is the food id').toBe(false);
+    for (const id of elixirIds) {
+      expect(WELL_FED_AURA_ID.startsWith(id), `${id} is not a prefix of the food id`).toBe(false);
+      expect(id.startsWith(WELL_FED_AURA_ID), `the food id is not a prefix of ${id}`).toBe(false);
+    }
+  });
 });
 
 describe('well fed: one food buff at a time (last eaten wins, whole family)', () => {
@@ -465,43 +496,120 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
   // (a quote directly before the token), which is what an aura id literal or
   // a template like the retired mint's id interpolation looks like, and what
   // a module path or prose mention does not.
-  it('well_fed can never collide with an elixir id, and wellfed_<kind> exists nowhere', () => {
+  it('well_fed can never collide with an elixir id, and no per-kind well-fed id exists anywhere', () => {
     expect(WELL_FED_AURA_ID.startsWith('elixir')).toBe(false);
     expect(WELL_FED_AURA_ID.includes('_fed')).toBe(true);
 
-    // Needle built from parts so this file's own source cannot match it, and
-    // a POSITIVE control (also built from parts) so a mis-built needle can
-    // never turn the negative sweep below into a pass over nothing.
-    const needle = new RegExp(`['"\`]${'well'}${'fed'}_`);
+    // Needles built from parts so this file's own source cannot match them,
+    // and POSITIVE controls (also built from parts) so a mis-built needle can
+    // never turn the negative sweep below into a pass over nothing. TWO
+    // needles since Phase 15, because one spelling is one spelling:
+    //  - the QUOTED retired prefix, the shape an aura-id literal or the
+    //    retired mint's own template interpolation takes, and
+    //  - the KIND-SHAPED token at ANY position, which is what catches the
+    //    three spellings the quoted needle cannot see. An UNQUOTED object key:
+    //    the AURA_RECIPES map in src/ui/icons.ts keys the live row as
+    //    `well_fed:` with no quote at all, so a retired per-kind row would be
+    //    spelled `wellfed_buff_sta:` in exactly that map (planted there, the
+    //    quoted needle stayed green over 48 tests). A namespace re-derived
+    //    from the SURVIVING constant ('well_fed_buff_sta'), which carries a
+    //    middle underscore the first needle forbids. And the camelCase
+    //    spelling of the field name. Only the second needle is case-blind: a
+    //    case-blind quoted needle starts matching the WELL_FED_AURA_ID
+    //    identifier itself.
+    const quoted = new RegExp(`['"\`]${'well'}${'fed'}_`);
+    const kindShaped = new RegExp(`${'well'}_?${'fed'}_buff_[a-z]`, 'i');
     const retiredId = `${'well'}${'fed'}_buff_sta`;
-    expect(needle.test(`const id = '${retiredId}';`), 'the needle sees a quoted id').toBe(true);
-    expect(needle.test(`id: \`${retiredId}\``), 'the needle sees a template literal').toBe(true);
+    expect(quoted.test(`const id = '${retiredId}';`), 'quoted needle: a quoted id').toBe(true);
+    expect(quoted.test(`id: \`${retiredId}\``), 'quoted needle: a template literal').toBe(true);
+    expect(kindShaped.test(`  ${retiredId}: recipe(),`), 'kind needle: an UNQUOTED key').toBe(true);
+    expect(
+      kindShaped.test(`id: '${WELL_FED_AURA_ID}_buff_sta'`),
+      'kind needle: an id re-derived from the surviving constant',
+    ).toBe(true);
+    expect(
+      kindShaped.test(`  ${'well'}${'Fed'}_buff_sta: 1,`),
+      'kind needle: the camelCase spelling of the field name',
+    ).toBe(true);
+
+    // EVERY source root since Phase 15, not the three the client lives in:
+    // ip-15-KIT says the retired namespace exists NOWHERE and the packet's QA
+    // checklist says "absent from the tree", and a stale aura-id MATCHER is as
+    // much a leftover as a stale mint. server/ is where an id-keyed reader
+    // would live (snapshot_timer_wire, party_frame_projection and
+    // cheater_mark_runtime all key on aura fields), and a retired-id literal
+    // planted there was invisible to the old three-root walk.
+    const ROOTS = ['src', 'scripts', 'tests', 'server', 'headless', 'bot', 'electron'] as const;
+    // Non-vacuity floors PER ROOT (tests/CLAUDE.md): an empty walk would make
+    // the assertion below pass over nothing at all, and a single total would
+    // clear on src/ alone even if a root silently dropped out of the walk, so
+    // each root is floored near its own real count. The tests/ floor sits
+    // ABOVE what a single-level collapse of tests/ would leave, and the NESTED
+    // counts pin the recursion directly: a walk that stopped descending reds
+    // on its own line instead of hiding inside a total. headless/, bot/ and
+    // electron/ are FLAT today, so their nested floor is 0 and the loop below
+    // skips the assertion rather than reddening on the honest tree.
+    const FLOORS: Record<(typeof ROOTS)[number], { scanned: number; nested: number }> = {
+      src: { scanned: 1800, nested: 1500 },
+      scripts: { scanned: 400, nested: 200 },
+      tests: { scanned: 3000, nested: 250 },
+      server: { scanned: 250, nested: 50 },
+      headless: { scanned: 2, nested: 0 },
+      bot: { scanned: 10, nested: 0 },
+      electron: { scanned: 15, nested: 0 },
+    };
     const offenders: string[] = [];
-    const scanned = { src: 0, scripts: 0, tests: 0 };
-    const nested = { src: 0, scripts: 0, tests: 0 };
-    for (const root of ['src', 'scripts', 'tests'] as const) {
-      for (const f of sourceFilesUnder(join(process.cwd(), root))) {
+    const scanned: Record<string, number> = {};
+    const nested: Record<string, number> = {};
+    for (const root of ROOTS) {
+      scanned[root] = 0;
+      nested[root] = 0;
+      for (const f of sourceFilesUnder(join(process.cwd(), root), {
+        skipDirectories: ['node_modules'],
+      })) {
         scanned[root]++;
         if (f.file.includes('/')) nested[root]++;
         const code = stripComments(readFileSync(f.full, 'utf8'));
-        if (needle.test(code)) offenders.push(`${root}/${f.file}`);
+        if (quoted.test(code) || kindShaped.test(code)) offenders.push(`${root}/${f.file}`);
       }
     }
-    // Non-vacuity floors PER ROOT (tests/CLAUDE.md): an empty walk would make
-    // the assertion below pass over nothing at all, and a single total would
-    // clear on src/ alone even if scripts/ or tests/ silently dropped out of
-    // the walk, so each root is floored near its own real count. The tests/
-    // floor sits ABOVE what a single-level collapse of tests/ would leave
-    // (about 2800 of its roughly 3100 files sit flat), and the NESTED counts
-    // pin the recursion directly: a walk that stopped descending reds on its
-    // own line instead of hiding inside a total.
-    expect(scanned.src, 'the sweep really walked src/').toBeGreaterThan(1800);
-    expect(scanned.scripts, 'the sweep really walked scripts/').toBeGreaterThan(400);
-    expect(scanned.tests, 'the sweep really walked tests/').toBeGreaterThan(3000);
-    expect(nested.src, 'the walk descended under src/').toBeGreaterThan(1500);
-    expect(nested.scripts, 'the walk descended under scripts/').toBeGreaterThan(200);
-    expect(nested.tests, 'the walk descended under tests/').toBeGreaterThan(250);
-    expect(offenders, 'files still carrying a wellfed_<kind> id literal').toEqual([]);
+    for (const root of ROOTS) {
+      expect(scanned[root], `the sweep really walked ${root}/`).toBeGreaterThan(
+        FLOORS[root].scanned,
+      );
+      if (FLOORS[root].nested > 0) {
+        expect(nested[root], `the walk descended under ${root}/`).toBeGreaterThan(
+          FLOORS[root].nested,
+        );
+      }
+    }
+    expect(offenders, 'files still carrying a per-kind well-fed id').toEqual([]);
+  });
+
+  it('every carrier mints exactly the one id at RUNTIME, whatever the source spells', () => {
+    // The sweep above reads TEXT, so a per-kind namespace ASSEMBLED at runtime
+    // (a constant plus the payload kind) is invisible to it: no retired token
+    // ever appears as a literal to find. This is the same claim measured
+    // through the mint instead, which is the only way to close that shape.
+    // Without it the per-kind regression is caught only as collateral by a
+    // dozen arms named for timing, rng and save/load, and none of them says
+    // what actually broke.
+    const carriers = Object.values(ITEMS)
+      .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
+      .map((def) => def.id)
+      .sort();
+    expect(carriers, 'the sweep really has carriers to eat').toHaveLength(7);
+    for (const itemId of carriers) {
+      const { sim, pid, p } = playerWorld();
+      eatToCompletion(sim, pid, p, itemId);
+      const fed = wellFedByName(p);
+      expect(fed, `${itemId} minted exactly one Well Fed`).toHaveLength(1);
+      expect(fed[0].id, `${itemId} minted the ONE id`).toBe(WELL_FED_AURA_ID);
+      expect(
+        p.auras.filter((a) => a.id !== WELL_FED_AURA_ID && a.id.includes('fed')).map((a) => a.id),
+        `${itemId} minted no second well-fed namespace`,
+      ).toEqual([]);
+    }
   });
 
   it('scan hygiene: this guard reads only through the shared walker', () => {

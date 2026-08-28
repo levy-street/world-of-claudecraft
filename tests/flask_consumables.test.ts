@@ -686,3 +686,85 @@ describe('flask auras are undispellable (the phase 10 QA STK-2 ruling, 2026-08-1
     expect(scrollAura[0].undispellable).toBeUndefined();
   });
 });
+
+describe('the R5 full kit: a flask and a Well Fed plate ride together, both magnitudes at once', () => {
+  // ADDED AT PHASE 15. R5 (docs/prd/masterwrought/state.md) measures a geared
+  // individual carrying flask PLUS food, so that exact pair is the one the
+  // envelope depends on. The death contrast above quaffs the flask BEFORE the
+  // meal, which never puts a live Well Fed in front of the singleton strip or
+  // the downward refusal: both run at flask-use time. So a strip that shed the
+  // food buff, or a flask refused because a food buff was already worn, was
+  // invisible to this whole file, and both mutations shipped green across 156
+  // tests at the audit. The other order is here, and the STAT BOOK is read at
+  // the end, because every arm above reads aura.value and none of them proves
+  // the two magnitudes reach the player together.
+
+  it('food FIRST, then the flask: the strip spares Well Fed and nothing is refused', () => {
+    const { sim, pid, p } = world();
+    use(sim, pid, STEW);
+    for (let i = 0; i < MEAL_TICKS; i++) sim.tick();
+    expect(aurasById(p, WELL_FED), 'the plate is worn when the strip runs').toHaveLength(1);
+    sim.drainEvents();
+
+    use(sim, pid, IRONHUSK);
+
+    const errors = (sim.drainEvents() as SimEvent[]).filter((e) => e.type === 'error');
+    expect(errors, 'a worn food buff never refuses a flask').toHaveLength(0);
+    expect(sim.countItem(IRONHUSK), 'the flask really was drunk').toBe(0);
+    const fed = aurasById(p, WELL_FED);
+    expect(fed, 'the marker-less food buff survived the strip').toHaveLength(1);
+    expect(fed[0].value, 'at full strength').toBe(6);
+    const flasks = flaskAuras(p);
+    expect(flasks, 'and the flask is the only marked aura').toHaveLength(1);
+    expect(flasks[0].id).toBe(STA_FAMILY);
+    expect(flasks[0].value).toBe(13);
+  });
+
+  it('the R5 stamina arithmetic: flask 13 plus plate 6 is 19 on the stat book, both orders', () => {
+    // The number power-verification.md sets the gate on, measured rather than
+    // asserted in prose, and read off stats.sta rather than off the aura list:
+    // an aura that rides but no longer folds into the book would pass every
+    // other arm in this file. It read 15 plus 6 for 21 before Phase 15 trimmed
+    // the flask band to the measured envelope.
+    const flaskFirst = world();
+    const baseSta = flaskFirst.p.stats.sta;
+    use(flaskFirst.sim, flaskFirst.pid, IRONHUSK);
+    use(flaskFirst.sim, flaskFirst.pid, STEW);
+    for (let i = 0; i < MEAL_TICKS; i++) flaskFirst.sim.tick();
+    expect(aurasById(flaskFirst.p, WELL_FED)).toHaveLength(1);
+    expect(flaskAuras(flaskFirst.p)).toHaveLength(1);
+    expect(flaskFirst.p.stats.sta, 'flask then plate: both magnitudes reach the book').toBe(
+      baseSta + 13 + 6,
+    );
+    expect(flaskFirst.p.stats.sta - baseSta, 'the literal beside it').toBe(19);
+
+    const foodFirst = world(43);
+    const baseSta2 = foodFirst.p.stats.sta;
+    use(foodFirst.sim, foodFirst.pid, STEW);
+    for (let i = 0; i < MEAL_TICKS; i++) foodFirst.sim.tick();
+    use(foodFirst.sim, foodFirst.pid, IRONHUSK);
+    expect(foodFirst.p.stats.sta, 'plate then flask: the same 19').toBe(baseSta2 + 19);
+  });
+
+  it('the maximal legal kit: an int flask, a stamina elixir and an int plate all ride', () => {
+    // The widest stack the shipped catalog allows, and the reason it is worth
+    // its own arm: the elixir and scroll catalog is entirely buff_sta, so a
+    // STAMINA flask refuses every one of them downward and the physical kit can
+    // only ever be two auras. Put the flask on the int side and three ride at
+    // once, with two of them folding into the SAME stat. This is the caster arm
+    // of the R5 measurement.
+    const { sim, pid, p } = world();
+    const base = { sta: p.stats.sta, int: p.stats.int };
+    use(sim, pid, RUNEWATER);
+    use(sim, pid, SERPENT);
+    use(sim, pid, CHOWDER);
+    for (let i = 0; i < MEAL_TICKS; i++) sim.tick();
+
+    expect(aurasById(p, INT_FAMILY), 'the int flask').toHaveLength(1);
+    expect(aurasById(p, STA_FAMILY), 'the stamina elixir beside it').toHaveLength(1);
+    expect(aurasById(p, WELL_FED), 'and the plate').toHaveLength(1);
+    expect(flaskAuras(p), 'exactly one marked aura').toHaveLength(1);
+    expect(p.stats.int, 'flask 13 plus plate 6 on one stat').toBe(base.int + 13 + 6);
+    expect(p.stats.sta, 'the elixir on the other').toBe(base.sta + 12);
+  });
+});
