@@ -29,7 +29,7 @@ export interface BagItemInfo {
   noMarketList?: boolean;
   /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
   noVendorSell?: boolean;
-  /** Rarity tier; only 'poor' is instant-sellable (vendorSellIsInstant below). */
+  /** Rarity tier; a PLAIN sub-rare copy is instant-sellable (vendorSellIsInstant below). */
   quality?: Quality;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
@@ -216,28 +216,30 @@ export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
   return mode.bankDeposit ? 'bankDeposit' : 'none';
 }
 
+/** Qualities whose PLAIN copies vendor-sell on the spot: everything below
+ *  rare, with a missing quality reading as 'common' (bagQualityKey below, the
+ *  house default). Rare and above stay behind the confirm prompt. */
+const VENDOR_INSTANT_QUALITIES: ReadonlySet<string> = new Set(['poor', 'common', 'uncommon']);
+
 /** Whether a plain vendor-window click may sell `item` immediately, with no
- *  confirm step. Only true junk qualifies: poor quality AND no instance
- *  payload of any kind (an enchant, masterwork bake, signer, rolled stats, a
- *  bound-to owner, or a player lock all make a copy non-interchangeable with
- *  a plain one; item_copy_ref.ts's whole reason two copies of an id stopped
- *  being safe to treat as one) AND no crafted-recipe marker (InvSlot's OWN
- *  `craftedRecipeId`, kept off the instance payload on purpose so common
- *  crafted gear does not gain a signer/masterwork/enchant identity, item
- *  types.ts). Mirrors src/sim/items.ts junkSellableSlot's poor-quality gate,
- *  widened to ANY instance payload or crafted marker rather than only a
- *  bound/locked one: this gate exists to protect VALUE from an accidental
- *  click, not merely to mirror what the sim would refuse outright. False
- *  routes the caller to a confirm prompt instead of an instant sale, closing
- *  the gap where selling gray junk one item at a time (no per-item
- *  confirmation existed) could vendor an adjacent, unrelated valuable item on
- *  a single stray click. */
-export function vendorSellIsInstant(
-  item: BagItemInfo,
-  instance?: ItemInstancePayload,
-  craftedRecipeId?: string,
-): boolean {
-  return item.quality === 'poor' && instance === undefined && craftedRecipeId === undefined;
+ *  confirm step. The line is drawn at RECOVERABILITY: a plain sub-rare copy
+ *  (no instance payload) is interchangeable, and buyback restores exactly
+ *  what was sold (recordVendorBuyback in src/sim/items.ts keeps the payload
+ *  and the slot's craftedRecipeId per row), so a stray click costs at most a
+ *  buyback trip. ANY instance payload (an enchant, masterwork bake, signer,
+ *  rolled stats, a bound-to owner, or a player lock; item_copy_ref.ts's whole
+ *  reason two copies of an id stopped being safe to treat as one) or rare+
+ *  quality routes to the confirm prompt instead: the bag reshuffles unhinted
+ *  stacks on every render, so rapid junk-selling can slide an unrelated
+ *  valuable item under the next click (the enchanted-offhand report the
+ *  confirm gate exists for). The first version of the gate confirmed
+ *  everything but poor quality, which players reported as a per-item approval
+ *  on ordinary vendor-trash runs (whites and greens); the crafted-recipe
+ *  marker is likewise no longer consulted, because it is deliberately kept
+ *  off the instance payload so common crafted gear stays interchangeable
+ *  (types.ts), and buyback restores it byte for byte. */
+export function vendorSellIsInstant(item: BagItemInfo, instance?: ItemInstancePayload): boolean {
+  return VENDOR_INSTANT_QUALITIES.has(item.quality ?? 'common') && instance === undefined;
 }
 
 /** Whether a shift-click on a bag item should link it into chat (classic

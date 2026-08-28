@@ -424,30 +424,30 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
   });
 });
 
-describe('bags_window: a vendor click confirms before selling anything but true junk', () => {
+describe('bags_window: a vendor click confirms before selling a rare+ or instanced copy', () => {
   // The reported bug: selling gray junk one item at a time (a plain click while
   // the vendor is open) had no per-item confirmation, so a single stray click
   // could vendor an adjacent, unrelated, enchanted item with no recourse beyond
   // the bounded buyback list. vendorSellIsInstant (bags_view.ts) is the pure
-  // gate; the real dispatch (which command each modifier sends, the stale-copy
-  // refusal, the focus landing) is behaviorally pinned in
-  // tests/bags_vendor_sell_confirm.test.ts against the real BagsWindow; these
-  // source pins are the no-magic-values-file's own idiom for anchoring the
-  // wiring text they exercise.
+  // gate (plain sub-rare copies are instant, buyback restores them exactly;
+  // rare+ or any instance payload confirms); the real dispatch (which command
+  // each modifier sends, the stale-copy refusal, the focus landing) is
+  // behaviorally pinned in tests/bags_vendor_sell_confirm.test.ts against the
+  // real BagsWindow; these source pins are the no-magic-values-file's own
+  // idiom for anchoring the wiring text they exercise.
   it('imports vendorSellIsInstant from bags_view and gates the plain-click arm on it', () => {
     expect(painter).toContain('vendorSellIsInstant');
     const body = painter.slice(
       painter.indexOf('private sellBagItem('),
       painter.indexOf('private showSellConfirmPrompt('),
     );
-    expect(body).toContain(
-      'const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);',
-    );
+    expect(body).toContain('const instant = vendorSellIsInstant(item, slot.instance);');
     expect(body).toContain('!instant');
     expect(body).toContain('this.showSellConfirmPrompt(item, slot)');
     // Ctrl/meta and shift both still confirm a non-instant sale (the review-round
     // fix): only the id-scoped bulk quantity prompt or the per-slot confirm
-    // prompt, never an unconfirmed instant sellItem call, for anything but junk.
+    // prompt, never an unconfirmed instant sellItem call, for a rare+ or
+    // instanced copy.
     expect(body).toMatch(/if \(instant\)[\s\S]{0,40}sellItem\(slot\.itemId, count\)/);
     expect(body).toContain('this.showSellQuantityPrompt(slot.itemId, heldTotal);');
   });
@@ -475,11 +475,13 @@ describe('bags_window: a vendor click confirms before selling anything but true 
     expect(body).toContain("t('itemUi.vendor.sellQuantityCancel')");
   });
 
-  it('the pure gate itself: only poor quality with no instance or crafted marker is instant', () => {
+  it('the pure gate itself: only a PLAIN sub-rare copy is instant', () => {
     expect(view).toContain('export function vendorSellIsInstant(');
     expect(view).toContain(
-      "return item.quality === 'poor' && instance === undefined && craftedRecipeId === undefined;",
+      "return VENDOR_INSTANT_QUALITIES.has(item.quality ?? 'common') && instance === undefined;",
     );
+    // The instant set stays below rare: rare, epic, and legendary all confirm.
+    expect(view).toContain("new Set(['poor', 'common', 'uncommon'])");
   });
 });
 

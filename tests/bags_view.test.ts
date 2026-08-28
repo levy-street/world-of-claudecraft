@@ -172,43 +172,46 @@ describe('bagItemAction priority order', () => {
 });
 
 describe('vendorSellIsInstant (the plain-click vendor sale safety gate)', () => {
-  // The reported bug: selling gray junk one stack at a time (no confirm on a
-  // plain vendor click) could vendor an adjacent, unrelated, enchanted item on
-  // a single stray click, with no recourse beyond the bounded buyback list.
-  // Only true junk (poor quality, no instance payload) may sell on the spot;
-  // everything else routes the caller to a confirm prompt instead.
-  it('true junk (poor quality, no instance) sells instantly', () => {
-    expect(vendorSellIsInstant(ITEMS.junk)).toBe(true);
-    expect(vendorSellIsInstant(ITEMS.junk, undefined)).toBe(true);
+  // The enchanted-offhand report (PR 3547): unhinted bag stacks reshuffle on
+  // every render, so rapid one-at-a-time junk selling could slide a valuable
+  // item under the cursor and vendor it on a single stray click. The first gate
+  // confirmed everything except poor-quality plain stacks, which players then
+  // reported as a per-item approval on ordinary vendor-trash runs (whites and
+  // greens). The line is now drawn at RECOVERABILITY instead of quality alone:
+  // a PLAIN sub-rare copy is interchangeable and buyback restores it exactly
+  // (recordVendorBuyback keeps the payload AND the crafted marker per row,
+  // src/sim/items.ts), so it sells on the spot; rare+ quality or ANY instance
+  // payload still routes to the confirm prompt.
+  it('plain sub-rare copies sell instantly: poor, common, uncommon, and the common default', () => {
+    expect(vendorSellIsInstant(ITEMS.junk)).toBe(true); // poor
+    expect(vendorSellIsInstant(ITEMS.potion)).toBe(true); // common
+    expect(vendorSellIsInstant(ITEMS.bound)).toBe(true); // uncommon
+    // No quality field reads as 'common' (the bagQualityKey default), so an
+    // unspecified-quality tool is bulk-sellable like any other white item.
+    expect(vendorSellIsInstant(ITEMS.rod)).toBe(true);
   });
 
-  it('anything above poor quality needs confirmation, even with no instance payload', () => {
+  it('rare and above needs confirmation, even with no instance payload', () => {
     expect(vendorSellIsInstant(ITEMS.sword)).toBe(false); // rare
-    expect(vendorSellIsInstant(ITEMS.potion)).toBe(false); // common
-    expect(vendorSellIsInstant(ITEMS.bound)).toBe(false); // uncommon
+    expect(vendorSellIsInstant(ITEMS.questItem)).toBe(false); // epic
   });
 
-  it('a poor-quality item carrying ANY instance payload also needs confirmation', () => {
+  it('ANY instance payload needs confirmation, at every quality tier', () => {
     // A poor-quality copy can still carry an enchant (professions/enchanting.ts's
     // resolveApplyEnchantWorn gates on item kind/slot, never quality), so the
     // instance check must stand even when quality alone would say "junk".
     expect(vendorSellIsInstant(ITEMS.junk, { enchant: 'enchant_weapon_might' })).toBe(false);
-    expect(vendorSellIsInstant(ITEMS.junk, { boundTo: 7 })).toBe(false);
-    expect(vendorSellIsInstant(ITEMS.junk, { signer: 'Ayla' })).toBe(false);
-  });
-
-  it('an instanced non-junk copy needs confirmation on both counts', () => {
+    expect(vendorSellIsInstant(ITEMS.potion, { boundTo: 7 })).toBe(false);
+    expect(vendorSellIsInstant(ITEMS.bound, { signer: 'Ayla' })).toBe(false);
     expect(vendorSellIsInstant(ITEMS.sword, { rolled: { stats: { str: 1 } } })).toBe(false);
   });
 
-  it('a poor-quality PLAIN-STACK craftedRecipeId marker also needs confirmation', () => {
-    // craftedRecipeId is a SLOT-level field (InvSlot), deliberately kept off the
-    // instance payload so common crafted gear does not gain a signer/masterwork/
-    // enchant identity (types.ts). The gate must still catch it, or a poor-quality
-    // recipe-minted stack would misread as safe junk despite carrying provenance.
-    expect(vendorSellIsInstant(ITEMS.junk, undefined, 'recipe_tangled_weed')).toBe(false);
-    expect(vendorSellIsInstant(ITEMS.junk, undefined, undefined)).toBe(true);
-  });
+  // craftedRecipeId is deliberately NO LONGER consulted: the marker is a
+  // SLOT-level field kept off the instance payload precisely so common crafted
+  // gear stays interchangeable (types.ts), recordVendorBuyback preserves it
+  // per row so an accidental sale is fully restorable, and profession levelers
+  // bulk-vendor crafted whites by the dozen (the loudest per-item-approval
+  // complaint). A crafted RARE still confirms through the quality arm.
 });
 
 describe('transfer-locked instanced copies (issue 1165)', () => {

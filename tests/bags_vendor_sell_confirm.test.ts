@@ -16,15 +16,26 @@ import { tSim } from '../src/ui/sim_i18n';
 import type { IWorld } from '../src/world_api';
 
 // Real merged-table ids, derived rather than hardcoded (the guild-deposit
-// suite's own convention). A junk id (poor quality, plain sale is instant) and
-// a common+ weapon id (needs confirmation) beside each other.
+// suite's own convention). A junk id (poor quality) and a plain common weapon
+// id (both instant-sellable), and a rare+ weapon id (needs confirmation).
 const junkId = Object.keys(ITEMS).find((id) => {
   const d = ITEMS[id];
   return d.quality === 'poor' && d.kind !== 'quest' && !d.noVendorSell && !d.soulbound;
 }) as string;
-const valuableId = Object.keys(ITEMS).find((id) => {
+const commonId = Object.keys(ITEMS).find((id) => {
   const d = ITEMS[id];
-  return d.kind === 'weapon' && d.quality !== 'poor' && !d.noVendorSell && !d.soulbound;
+  return (
+    d.kind === 'weapon' && (d.quality ?? 'common') === 'common' && !d.noVendorSell && !d.soulbound
+  );
+}) as string;
+const rareId = Object.keys(ITEMS).find((id) => {
+  const d = ITEMS[id];
+  return (
+    d.kind === 'weapon' &&
+    (d.quality === 'rare' || d.quality === 'epic' || d.quality === 'legendary') &&
+    !d.noVendorSell &&
+    !d.soulbound
+  );
 }) as string;
 
 interface Harness {
@@ -135,51 +146,73 @@ function clickPromptConfirmButton(): void {
   (btn as HTMLElement).click();
 }
 
-describe('vendor plain click: true junk still sells in one step', () => {
-  it('sells instantly, no prompt, exactly the clicked slot', () => {
+describe('vendor plain click: plain sub-rare items sell in one step', () => {
+  it('true junk sells instantly, no prompt, exactly the clicked slot', () => {
     const h = harness([{ itemId: junkId, count: 1 }]);
     clickCellFor(h.root, junkId);
     expect(confirmPrompt()).toBeNull();
     expect(h.calls).toEqual([`sellItem:${junkId},{"slotIndex":0}`]);
   });
+
+  it('a PLAIN common item sells instantly again (the per-item-approval report)', () => {
+    // The follow-up player report on the confirm gate: with only poor quality
+    // instant, every white and green on an ordinary vendor-trash run popped an
+    // approval dialog. A plain sub-rare copy is interchangeable and buyback
+    // restores it exactly, so the one-step classic sale is back for these.
+    const h = harness([{ itemId: commonId, count: 1 }]);
+    clickCellFor(h.root, commonId);
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${commonId},{"slotIndex":0}`]);
+  });
+
+  it('an ENCHANTED copy of that same common item still confirms', () => {
+    // The instance-payload arm is quality-independent: the enchanted-offhand
+    // loss was an instanced copy, and those keep the safety net at every tier.
+    const h = harness([
+      { itemId: commonId, count: 1, instance: { enchant: 'enchant_weapon_might' } },
+    ]);
+    clickCellFor(h.root, commonId);
+    expect(h.calls).toEqual([]);
+    expect(confirmPrompt()).not.toBeNull();
+  });
 });
 
-describe('vendor plain click on a non-junk item opens a confirm prompt instead of selling', () => {
+describe('vendor plain click on a rare+ item opens a confirm prompt instead of selling', () => {
   it('does not sell on click; opens exactly one .sell-confirm-prompt', () => {
-    const h = harness([{ itemId: valuableId, count: 1 }]);
-    clickCellFor(h.root, valuableId);
+    const h = harness([{ itemId: rareId, count: 1 }]);
+    clickCellFor(h.root, rareId);
     expect(h.calls).toEqual([]);
     const prompt = confirmPrompt();
     expect(prompt).not.toBeNull();
-    expect(prompt?.textContent).toContain(ITEMS[valuableId].name);
+    expect(prompt?.textContent).toContain(ITEMS[rareId].name);
   });
 
   it('a second click while the prompt is open does not stack a second prompt', () => {
-    const h = harness([{ itemId: valuableId, count: 1 }]);
-    clickCellFor(h.root, valuableId);
-    clickCellFor(h.root, valuableId);
+    const h = harness([{ itemId: rareId, count: 1 }]);
+    clickCellFor(h.root, rareId);
+    clickCellFor(h.root, rareId);
     expect(document.querySelectorAll('.sell-confirm-prompt')).toHaveLength(1);
     expect(h.calls).toEqual([]);
   });
 
   it('Confirm sells exactly the named slot and Cancel sends nothing', () => {
-    const h = harness([{ itemId: valuableId, count: 1 }]);
-    clickCellFor(h.root, valuableId);
+    const h = harness([{ itemId: rareId, count: 1 }]);
+    clickCellFor(h.root, rareId);
     const buttons = Array.from(confirmPrompt()?.querySelectorAll('button.btn') ?? []);
     expect(buttons, 'expected [Confirm, Cancel]').toHaveLength(2);
     (buttons[1] as HTMLElement).click();
     expect(h.calls).toEqual([]);
     expect(confirmPrompt()).toBeNull();
 
-    clickCellFor(h.root, valuableId);
+    clickCellFor(h.root, rareId);
     clickPromptConfirmButton();
-    expect(h.calls).toEqual([`sellItem:${valuableId},1,{"slotIndex":0}`]);
+    expect(h.calls).toEqual([`sellItem:${rareId},1,{"slotIndex":0}`]);
     expect(confirmPrompt()).toBeNull();
   });
 
   it('focus lands on the close button after a confirmed sale, not a detached cell', () => {
-    const h = harness([{ itemId: valuableId, count: 1 }]);
-    clickCellFor(h.root, valuableId);
+    const h = harness([{ itemId: rareId, count: 1 }]);
+    clickCellFor(h.root, rareId);
     clickPromptConfirmButton();
     expect(document.activeElement).toBe(h.root.querySelector('[data-close]'));
   });
@@ -190,23 +223,23 @@ describe('vendor plain click on a non-junk item opens a confirm prompt instead o
     // that copy leaves and only an ENCHANTED copy of the same id remains. Falling
     // back to an itemId-only sellItem call would vendor the enchanted copy the
     // dialog never named; the fix must refuse instead.
-    const inventory: InvSlot[] = [{ itemId: valuableId, count: 1 }];
+    const inventory: InvSlot[] = [{ itemId: rareId, count: 1 }];
     const h = harness(inventory);
-    clickCellFor(h.root, valuableId);
+    clickCellFor(h.root, rareId);
     expect(confirmPrompt()).not.toBeNull();
     // Simulate the repaint: the named slot is gone, an instanced copy sits alone.
     inventory.length = 0;
-    inventory.push({ itemId: valuableId, count: 1, instance: { enchant: 'enchant_weapon_might' } });
+    inventory.push({ itemId: rareId, count: 1, instance: { enchant: 'enchant_weapon_might' } });
     clickPromptConfirmButton();
     expect(h.calls, 'no sale was dispatched').toEqual([]);
     expect(h.errors).toEqual([tSim('error.noItem')]);
   });
 });
 
-describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
-  it('a single-count copy opens the same per-slot confirm prompt as a plain click', () => {
-    const h = harness([{ itemId: valuableId, count: 1 }]);
-    clickCellFor(h.root, valuableId, { ctrl: true });
+describe('vendor ctrl/meta click respects the same gate', () => {
+  it('a single-count rare+ copy opens the same per-slot confirm prompt as a plain click', () => {
+    const h = harness([{ itemId: rareId, count: 1 }]);
+    clickCellFor(h.root, rareId, { ctrl: true });
     expect(h.calls).toEqual([]);
     expect(confirmPrompt()).not.toBeNull();
   });
@@ -216,5 +249,12 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     clickCellFor(h.root, junkId, { ctrl: true });
     expect(confirmPrompt()).toBeNull();
     expect(h.calls).toEqual([`sellItem:${junkId},3`]);
+  });
+
+  it('a plain common stack bulk-sells instantly on ctrl-click again', () => {
+    const h = harness([{ itemId: commonId, count: 2 }]);
+    clickCellFor(h.root, commonId, { ctrl: true });
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${commonId},2`]);
   });
 });
