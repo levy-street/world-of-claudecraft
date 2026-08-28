@@ -343,6 +343,8 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       // Inside this of the spawn point he lies down: his own body length, so he never
       // paces on the spot hunting for an exact coordinate a slope or the pad denies him.
       bedRadius: 6,
+      // Balgath_Wake runs 3.95 s (scripts/build_balgath_anims.mjs); the hold outlasts it.
+      riseSeconds: 4,
     },
     quietMechanics: true,
     // THE mechanic of this fight. Without it his AoEs fire instantly with no warning,

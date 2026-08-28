@@ -23,7 +23,7 @@ import { MOBS, zoneAt } from '../data';
 import { isDaylightPhase } from '../day_night';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
-import { type Aura, dist2d, type Entity, type MobTemplate } from '../types';
+import { type Aura, DT, dist2d, type Entity, type MobTemplate } from '../types';
 import { emitMobYell } from './yells';
 
 /** Aura id of the slumber (the frame shows it as a buff; the HUD keys its tooltip on it). */
@@ -36,8 +36,9 @@ type SlumberDef = NonNullable<MobTemplate['slumber']>;
  *  - 'awake':  run the ordinary mob AI (day, or a fight still running after dusk).
  *  - 'homing': he is walking home to bed; nothing else this tick (no aggro scan).
  *  - 'asleep': he is in bed; nothing else this tick.
+ *  - 'rising': just woke, standing up (slumber.riseSeconds); hostile, but the AI waits.
  */
-export type SlumberTick = 'awake' | 'homing' | 'asleep';
+export type SlumberTick = 'awake' | 'homing' | 'asleep' | 'rising';
 
 /** Night, for a slumbering template: a clocked host past sunset. Clockless is day. */
 function slumberNight(ctx: SimContext): boolean {
@@ -59,8 +60,9 @@ export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
       return 'asleep';
     }
     wake(ctx, mob, def);
-    return 'awake';
+    return rise(mob);
   }
+  if (mob.slumberRise !== undefined && mob.slumberRise > 0) return rise(mob);
   if (!night) return 'awake';
   // Night, and he is up. A running fight is fought to its end: the pull decides when
   // the day ends, not the clock. An evade walk home is already a walk home.
@@ -86,8 +88,24 @@ export function tickSlumber(ctx: SimContext, mob: Entity): SlumberTick {
   return 'asleep';
 }
 
+/**
+ * The rise: count the hold down and keep the AI off him while the body stands up. The
+ * renderer plays the wake one-shot on the asleep-to-awake edge; if the ordinary AI ran the
+ * same tick, the first wander step or aggro chase would slide the sleeping pose across
+ * the ground while it played, the exact skate the boss's clips were authored to remove.
+ * He is hostile the whole time: a raid that is waiting for him can open on him, and the
+ * threat they build is waiting for the AI when the hold ends.
+ */
+function rise(mob: Entity): SlumberTick {
+  if (mob.slumberRise === undefined || mob.slumberRise <= 0) return 'awake';
+  mob.slumberRise = Math.max(0, mob.slumberRise - DT);
+  mob.aiState = 'idle';
+  return 'rising';
+}
+
 function fallAsleep(ctx: SimContext, mob: Entity, def: SlumberDef): void {
   mob.asleep = true;
+  if (mob.slumberRise !== undefined) mob.slumberRise = 0;
   mob.hostile = false;
   mob.aiState = 'idle';
   mob.inCombat = false;
@@ -120,6 +138,7 @@ function holdAsleep(mob: Entity, def: SlumberDef): void {
 function wake(ctx: SimContext, mob: Entity, def: SlumberDef): void {
   mob.asleep = false;
   mob.hostile = true;
+  mob.slumberRise = def.riseSeconds ?? 0;
   mob.auras = mob.auras.filter((a) => a.id !== SLUMBER_AURA_ID);
   mob.hp = mob.maxHp;
   // Threat can be seeded onto a neutral sleeper by sources that never consult hostility

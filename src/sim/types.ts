@@ -1564,6 +1564,11 @@ export interface MobTemplate {
     yellRange?: number;
     /** How close to the spawn point counts as "in bed": inside it he lies down. */
     bedRadius: number;
+    /** Seconds the AI waits after the dawn wake before he moves or acts, so the body
+     *  can stand up (the renderer's wake one-shot) without the first wander step or
+     *  chase sliding the pose across the ground. Hostile and attackable throughout;
+     *  absent means no hold. */
+    riseSeconds?: number;
   };
   /**
    * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
@@ -4985,6 +4990,8 @@ export interface Entity extends ClientMirroredEntityFields {
   // night. Only ever defined on such a mob (the same defined-vs-undefined discipline as
   // the warpath fields), mirrored to clients so the rig can lie down and wake with him.
   asleep?: boolean;
+  /** Seconds left in the dawn rise (mob/slumber.ts): the AI is held while it runs. */
+  slumberRise?: number;
   /** Index into the template's destination list. */
   warpathDestination?: number;
   /** Seconds since anything reduced his health. */

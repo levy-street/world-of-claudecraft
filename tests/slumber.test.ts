@@ -21,7 +21,7 @@ import {
 import { SLUMBER_AURA_ID, tickSlumber } from '../src/sim/mob/slumber';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
+import { DT, dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
 
 const BALGATH = 'balgath_cyclops';
@@ -312,6 +312,45 @@ describe('the night in a live world', () => {
     expect(yells()).toContain(MOBS[BALGATH]?.slumber?.wakeYell);
     const zone = zoneAt(boss.pos.x, boss.pos.z).name;
     expect(logs()).toContain(`${boss.name} wakes over ${zone}!`);
+  });
+
+  it('stands still for the rise: the AI waits out riseSeconds before he moves or acts', () => {
+    // The dawn wake is a 3.95 s one-shot on the renderer (Balgath_Wake levers him up out
+    // of the mound). If the ordinary AI ran the same tick he woke, the first wander step or
+    // the first aggro chase would slide the mound across the ground while the clip played:
+    // the exact skate artifact the boss's clips were authored to remove. So the sim holds
+    // him: hostile and attackable, but the AI waits for the body to stand up.
+    const rise = MOBS[BALGATH]?.slumber?.riseSeconds ?? 0;
+    expect(rise).toBeGreaterThan(0);
+    clock.set(0.8);
+    tick();
+    expect(boss.asleep).toBe(true);
+    const bed = { ...boss.pos };
+    // A player standing in his face: an awake AI would have him chasing within a tick.
+    sim.player.pos.x = bed.x - 8;
+    sim.player.pos.z = bed.z;
+    sim.player.prevPos = { ...sim.player.pos };
+    clock.set(DAWN_PHASE);
+    const ticks = Math.round(rise / DT);
+    for (let i = 0; i < ticks; i++) {
+      tick();
+      expect(boss.asleep).toBe(false);
+      expect(boss.hostile).toBe(true);
+      expect(boss.aiState).toBe('idle');
+      expect(dist2d(boss.pos, bed)).toBeLessThan(1e-6);
+    }
+    // The hold is over: the ordinary AI runs and finds the player in his aggro ring.
+    tick(20 * 3);
+    expect(['chase', 'attack']).toContain(boss.aiState);
+  });
+
+  it('answers "rising" to the dispatcher for exactly the hold, then "awake"', () => {
+    // The pure surface of the hold, off the live loop so the countdown is this test's.
+    boss.slumberRise = 2 * DT;
+    expect(tickSlumber(ctx, boss)).toBe('rising');
+    expect(tickSlumber(ctx, boss)).toBe('rising');
+    expect(tickSlumber(ctx, boss)).toBe('awake');
+    expect(boss.slumberRise).toBe(0);
   });
 
   it('is the driver the dispatcher runs, and it answers what it did', () => {
