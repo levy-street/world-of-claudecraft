@@ -34,10 +34,10 @@ export const SEEKER_REINS_ITEM_ID = mountItemId(SEEKER_MOUNT_KEY) ?? 'reins_seek
 
 /** Hand the character the Seeker board reins unless it already owns them.
  *  Ownership is bags OR bank: a banked reins still counts, and re-granting
- *  one every login would be the leak this guard exists to close. NOT a
- *  movement grant: the first grant is the real obtain, so the loot toast, the
- *  deed discovery and the Reliquary first-find stamp land like any other first
- *  acquisition. Returns whether a reins was granted. */
+ *  one every login would be the leak this guard exists to close. Goes through
+ *  the inventory hub like any other first acquisition, so the loot toast and
+ *  the deed discovery land (a mount reins takes no Reliquary first-find stamp
+ *  either way). Returns whether a reins was granted. */
 export function grantSeekerBoardIfMissing(sim: Sim, pid: number): boolean {
   const meta = sim.meta(pid);
   if (!meta || mountOwned(meta, SEEKER_MOUNT_KEY)) return false;
@@ -72,10 +72,13 @@ export interface SeekerGrantSession {
   name: string;
 }
 
-/** Claim-success arm: grant into every live session on the account and force
- *  a save, so the reins do not sit un-persisted for an autosave window after
- *  the claim row is already durable. Offline accounts are a no-op; the join
- *  arm is the backstop, and it is also the recovery if a save is fenced by a
+/** Claim-success arm: grant into every live session on the account in THIS
+ *  realm process and force a save, so the reins do not sit un-persisted for
+ *  an autosave window after the claim row is already durable. An account that
+ *  is offline, or live on another realm process (the claim POST cannot see a
+ *  sibling process's sessions, and a cross-process fan-out is not worth a
+ *  connection for a once-per-account event), is a no-op here: the join arm is
+ *  the backstop, and it is also the recovery if a save is fenced by a
  *  same-account takeover (the character reloads without the reins and is
  *  re-granted at its next fresh join). Returns how many sessions were granted. */
 export function grantSeekerMountToLiveSessions<S extends SeekerGrantSession>(

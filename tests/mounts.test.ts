@@ -171,11 +171,14 @@ describe('mount reins items (the collection: owning the item is owning the mount
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
   it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+    // A renamed mount key would skip the seeker arm below silently; make it red.
+    let seekerChecked = false;
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
+      if (key === 'seeker_board') seekerChecked = true;
       if (key === 'terrorspark_groundshaker' || key === 'seeker_board') {
         // The developer-only tank stays soulbound: it has no player acquisition
         // path, and tradability would turn a dev grant into a leak vector.
@@ -204,6 +207,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
+    expect(seekerChecked, 'the seeker arm ran').toBe(true);
   });
 
   // scripts/mounts_shot.mjs grants the reins by a hardcoded list, and a mount
@@ -763,6 +767,18 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
       null,
     );
+  });
+
+  it('the Seeker reins are refused by the guild bank pipes too (bags or bank only)', () => {
+    // The promotional grant's idempotence rests on the reins never leaving the
+    // character (server/seeker_mount_grant.ts reads mountOwned, bags or bank),
+    // so every pipe out of a character is pinned per item, not inferred.
+    for (const direction of [undefined, 'withdraw'] as const) {
+      expect(
+        guildBankPipeRefusal({ itemId: 'reins_seeker_board', count: 1 }, direction),
+        String(direction),
+      ).not.toBeNull();
+    }
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {

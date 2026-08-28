@@ -118,6 +118,13 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS reward_points');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS reward_ledger');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS swag_claims');
+    // The Seeker claim ledger (SEEKER_ENTITLEMENT_SCHEMA): since the promotional
+    // mount grant, the fresh-join facts query (db.ts bankBonusFactsForAccount)
+    // probes it with an EXISTS, so an unapplied module would no longer just
+    // kill the Seeker feature, it would fail EVERY login on every realm. The
+    // UNIQUE (account_id) constraint is the index that probe rides.
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS seeker_entitlement_claims');
+    expect(applied).toContain('UNIQUE (account_id)');
     // The captured Discord email column (recovery-email capture) must be added at boot,
     // on both the durable link and the first-time pending-login rows.
     expect(applied).toContain('ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_email');

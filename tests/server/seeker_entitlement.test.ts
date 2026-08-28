@@ -227,6 +227,9 @@ describe('Seeker entitlement claim', () => {
       expect(JSON.parse(unwiredRes.body)).toEqual({ entitled: true, mint: 'mint-a' });
       expect(grantMount).toHaveBeenCalledTimes(1);
       expect(errorSpy).toHaveBeenCalledTimes(2);
+      // The null guard, not the catch: a deleted guard would still log once
+      // (a TypeError into the catch) and this line is what tells them apart.
+      expect(String(errorSpy.mock.calls[1][0])).toContain('runtime is not configured');
     } finally {
       errorSpy.mockRestore();
     }

@@ -11,9 +11,10 @@
 // The pool never connects: every db-touching path in this file is faked.
 process.env.DATABASE_URL ??= 'postgres://unused:unused@localhost:9/unused';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { normalizeCharName, offensiveName } from '../../server/auth';
 import {
+  applyBoostKitAtJoin,
   applyBoostKitToPlayer,
   BOOST_BAG_SOCKETS,
   BOOST_CLASSES,
@@ -230,6 +231,61 @@ describe('buildBoostedCharacterState', () => {
     expect(reloaded?.level).toBe(BOOST_LEVEL);
     expect(reloaded?.equipment).toEqual(state.equipment);
     expect(reloaded?.pbeBoostKit, 'stamp survives the login round-trip').toBe(BOOST_KIT_VERSION);
+  });
+});
+
+describe('applyBoostKitAtJoin (the arm game.join calls)', () => {
+  const previous = process.env.PBE_BOOST_ACCOUNTS;
+  afterEach(() => {
+    if (previous === undefined) delete process.env.PBE_BOOST_ACCOUNTS;
+    else process.env.PBE_BOOST_ACCOUNTS = previous;
+    vi.restoreAllMocks();
+  });
+
+  function boostSim(): { sim: Sim; pid: number } {
+    const sim = new Sim({
+      seed: 41,
+      playerClass: 'warrior',
+      playerName: 'Joinkit',
+      world: PBE_BOOST_TEST_WORLD,
+    });
+    return { sim, pid: sim.playerId };
+  }
+
+  it('is gated on the env flag: off leaves the character un-kitted and silent', () => {
+    delete process.env.PBE_BOOST_ACCOUNTS;
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { sim, pid } = boostSim();
+    applyBoostKitAtJoin(sim, pid, 'Joinkit', 100);
+    expect(sim.meta(pid)?.pbeBoostKit ?? 0).toBe(0);
+    expect(sim.meta(pid)?.ridingTrained).toBeFalsy();
+    expect(logSpy).not.toHaveBeenCalled();
+  });
+
+  it('on: kits once, logs once, and a second join is a silent no-op', () => {
+    process.env.PBE_BOOST_ACCOUNTS = '1';
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { sim, pid } = boostSim();
+    applyBoostKitAtJoin(sim, pid, 'Joinkit', 100);
+    expect(sim.meta(pid)?.pbeBoostKit).toBe(BOOST_KIT_VERSION);
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    expect(String(logSpy.mock.calls[0][0])).toContain('pbe boost kit topped up: Joinkit');
+    applyBoostKitAtJoin(sim, pid, 'Joinkit', 100);
+    expect(logSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('never fails the join: a throwing sim is logged and swallowed', () => {
+    process.env.PBE_BOOST_ACCOUNTS = '1';
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const broken = {
+      ctx: {
+        resolve: () => {
+          throw new Error('sim exploded');
+        },
+      },
+    } as unknown as Sim;
+    expect(() => applyBoostKitAtJoin(broken, 1, 'Joinkit', 100)).not.toThrow();
+    expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });
 

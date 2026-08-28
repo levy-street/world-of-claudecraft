@@ -2488,7 +2488,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
   professions_specimens: 7,
-  // 10 = the nine in-game doors (Marla, the five heroic bosses, the raid, the
+  // 11 = the ten in-game doors (Marla, the five heroic bosses, the raid, the
   // three rift ranks) plus the Seeker claim activity.
   horizons_mounts: 11,
   horizons_weapon_skins: 1,
