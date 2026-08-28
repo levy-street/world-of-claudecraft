@@ -226,6 +226,23 @@ describe('the night in a live world', () => {
     expect(boss.asleep).toBe(true);
   });
 
+  it('stays whole all night and wakes with an empty hate table', () => {
+    clock.set(0.8);
+    tick();
+    expect(boss.asleep).toBe(true);
+    // Damage that never consulted hostility (a lingering tick), and threat seeded by a
+    // source that never did either (a heal's awareness threat): neither survives the night.
+    boss.hp -= 500;
+    boss.threat.set(sim.player.id, 40);
+    tick();
+    expect(boss.hp).toBe(boss.maxHp);
+    clock.set(DAWN_PHASE);
+    tick();
+    expect(boss.asleep).toBe(false);
+    expect(boss.threat.size).toBe(0);
+    expect(boss.aggroTargetId).toBeNull();
+  });
+
   it('walks home first when dusk finds him away from his bed', () => {
     const spawn = lair();
     const far = { x: spawn.x - 40, z: spawn.z };
@@ -324,6 +341,70 @@ describe('the night in a live world', () => {
     expect(w.wu).toBe(4.25);
     boss.warpathPhase = 'focus';
     expect(dynamicFields(boss).wu).toBeUndefined();
+  });
+});
+
+describe('two hosts fed the same clock agree', () => {
+  it('sleep, wake and the dawn respawn land on the same tick for the same clock', () => {
+    // The clock is an INPUT, so determinism is per clock, not per wall time: two sims
+    // built on one seed and handed the identical sequence of clock readings must agree
+    // tick for tick through dusk, the night, the dawn wake, a kill and the dawn rise.
+    const script = (i: number): number => {
+      // 0.5 for 40 ticks, then night, then dawn, then a long day.
+      if (i < 40) return 0.5;
+      if (i < 200) return 0.9;
+      if (i < 400) return DAWN_PHASE + 0.001;
+      return 0.6;
+    };
+    const build = () => {
+      let i = 0;
+      const sim = new Sim({
+        seed: 7,
+        playerClass: 'warrior',
+        autoEquip: true,
+        noPlayer: true,
+        world: SLUMBER_TEST_WORLD,
+        worldBossAtBoot: true,
+        dayNightNowMs: () => phaseToCycleMs(script(i)),
+      });
+      return {
+        sim,
+        step: () => {
+          i++;
+          return sim.tick();
+        },
+      };
+    };
+    const a = build();
+    const b = build();
+    const bossOf = (sim: Sim) => [...sim.entities.values()].find((e) => e.templateId === BALGATH);
+    const trace: string[][] = [[], []];
+    for (let t = 0; t < 420; t++) {
+      for (const [k, host] of [a, b].entries()) {
+        const events = host.step();
+        const boss = bossOf(host.sim);
+        if (t === 120) {
+          // Kill him in his sleep from outside the fight (only the schedule is under test).
+          if (boss) {
+            boss.hp = 0;
+            boss.dead = true;
+            boss.corpseTimer = 0;
+          }
+        }
+        trace[k].push(
+          `${t}:${boss ? `${boss.id}/${boss.asleep}/${boss.hostile}/${boss.hp}` : 'none'}:${events
+            .filter((e) => e.type === 'log' || e.type === 'chat')
+            .map((e) => (e as { text: string }).text)
+            .join('|')}`,
+        );
+      }
+    }
+    expect(trace[0]).toEqual(trace[1]);
+    // And the trace actually visited every arm, so the equality proved something.
+    const joined = trace[0].join('\n');
+    expect(joined).toContain('sleeps until dawn.');
+    expect(joined).toContain('rises over');
+    expect(joined).toMatch(/:\d+\/true\/false\//);
   });
 });
 

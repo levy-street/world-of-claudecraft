@@ -14,7 +14,13 @@
 // height test rather than an `onGround` flag a one-frame hop would satisfy. And the launch
 // has to throw a player without quietly handing them fall damage on the way down, which is
 // a number nobody would notice until a raider died to a mechanic that did not kill them.
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The live-fight suites tick a real Sim through a 175-yard opening march before a cleave
+// or hammer resolves: 4 to 5 seconds each on an idle machine, and past the shared 20 s
+// default under CI shard contention. Same allowance the Vale Cup match suite takes.
+vi.setConfig({ testTimeout: 40_000 });
+
 import { MOBS } from '../src/sim/data';
 import {
   CLEAVE_ABILITY,
@@ -309,10 +315,9 @@ describe('the aimed slams in a live fight', () => {
   const rideOutCleave = (feetAboveGround: number) => {
     const ring = waitForRing(CLEAVE_ABILITY, 200);
     expect(ring, 'he never threw a cleave').not.toBeNull();
-    const aim = Math.atan2(
-      (ring?.ev as { dirX?: number }).dirX ?? 0,
-      (ring?.ev as { dirZ?: number }).dirZ ?? 1,
-    );
+    if (!ring) throw new Error('he never threw a cleave');
+    const swept = ring.ev as { dirX?: number; dirZ?: number };
+    const aim = Math.atan2(swept.dirX ?? 0, swept.dirZ ?? 1);
     // Plant them dead centre in the arc, well inside its reach.
     const hold = () => {
       player.pos.x = boss.pos.x + Math.sin(aim) * 10;

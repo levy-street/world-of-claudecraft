@@ -25,16 +25,15 @@ export function cyclePhase(nowMs: number): number {
   );
 }
 
-/** Phase of solar midnight, noon, sunrise and sunset. The sun is exactly on the
- *  horizon at DAWN and DUSK (day_night_core.sunDirection), so "daylight" below is
- *  the half of the cycle the sun is up. */
-export const MIDNIGHT_PHASE = 0;
+/** Phase of sunrise, solar noon and sunset (midnight is 0). The sun is exactly on the
+ *  horizon at DAWN and DUSK (day_night_core.sunDirection), so "daylight" below is the
+ *  half of the cycle the sun is up. NOON is what a clock with no live cycle reports. */
 export const DAWN_PHASE = 0.25;
 export const NOON_PHASE = 0.5;
 export const DUSK_PHASE = 0.75;
 
 /** Wrap any real number into a cycle phase in [0, 1). */
-export function wrapPhase(phase: number): number {
+function wrapPhase(phase: number): number {
   const p = phase % 1;
   return p < 0 ? p + 1 : p;
 }

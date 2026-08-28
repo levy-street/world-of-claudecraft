@@ -19,6 +19,7 @@
 // loot entries in array order) so the parity gate's rng draw-order log stays stable.
 
 import { MOBS } from './data';
+import { crossedDawn } from './day_night';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, LootEntry, LootSlot } from './types';
@@ -51,8 +52,8 @@ export interface WorldBossDef {
 }
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
-// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises at
-// Barrowmound Reach in Mirefen Marsh.
+// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises beside
+// the Starfall Crater in Mirefen Marsh, and only by day (MobTemplate.slumber).
 export const WORLD_BOSSES: readonly WorldBossDef[] = [
   {
     templateId: 'thunzharr_waking_peak',
@@ -70,9 +71,10 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // by INDEX into this array (`worldBossNextAt`), so reordering silently re-points every
     // live timer and every test that forces a spawn by index.
     //
-    // The Starfall Crater's western rim, east Mirefen: where Brother Aldric's fallen star
-    // came down (MIREFEN_IMPACT_CRATER in world.ts), and where he sleeps. Picked by
-    // measurement rather than by eye: dry ground, under two yards of relief across a
+    // Beside the Starfall Crater, east Mirefen: 40 yards south-west of the centre of the
+    // bowl Brother Aldric's fallen star dug (MIREFEN_IMPACT_CRATER in world.ts), just off
+    // its rim band, and where he sleeps. Picked by measurement rather than by eye: dry
+    // ground, under two yards of relief across a
     // 13-unit arena, 45+ yards clear of the Widow Thicket spider camps (MAX_AGGRO_RADIUS
     // is 20, so a level-eight fighting spiders at the camp's edge cannot pull him), and
     // outside the crater's bowl and rim band so his raid-floor pad never flattens the
@@ -88,6 +90,85 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     hpScale: { base: 24_000, perPlayer: 3_500, max: 600_000 },
   },
 ];
+
+/** The scheduler's live state, owned by `Sim` and handed in as views: one slot per
+ *  WORLD_BOSSES entry (index-keyed, which is why the registry is append-only). */
+export interface WorldBossClock {
+  /** The day/night phase the previous pass observed (null until a clocked host ticks). */
+  lastPhase: number | null;
+}
+export interface WorldBossScheduleState {
+  /** Sim time each slot's interval next comes due. */
+  nextAt: number[];
+  /** The live (or lingering-corpse) entity per slot, null when none. */
+  entityIds: (number | null)[];
+  /** Slumbering bosses only: set once a slain boss's corpse is gone, held until the next
+   *  DAWN spawns him again. While set, the interval cadence is ignored for that slot, so
+   *  "he rises again at sunrise" is literally true: a kill at noon is a kill for the rest
+   *  of the day. Never set without a day/night clock. Process-local like every other
+   *  slot timer here (none is persisted): a realm restart puts him back on the boot
+   *  cadence (`worldBossAtBoot`), exactly as Thunzharr has always come back on a restart. */
+  riseAtDawn: boolean[];
+  clock: WorldBossClock;
+}
+
+/**
+ * The per-tick scheduler pass. Per slot: when the live boss is gone, clear the slot (and
+ * once its lootable corpse window has elapsed, remove the corpse plus any summoned adds).
+ * When the interval comes due, advance it and, if no boss is up, spawn a fresh one. A
+ * slumbering boss (MobTemplate.slumber) additionally waits for SUNRISE after a kill: the
+ * dawn edge is the crossing since the previous pass, so it fires exactly once per day.
+ * Draws no rng and allocates no ids until a spawn actually fires (which never happens
+ * inside the short parity scenarios), so existing determinism traces are unaffected.
+ */
+export function tickWorldBossSchedule(
+  ctx: SimContext,
+  state: WorldBossScheduleState,
+  spawn: (def: WorldBossDef) => number | null,
+): void {
+  // One clock read per pass, shared by every slot. `dawn` is never true without a clock
+  // and never true twice for one sunrise.
+  const phase = ctx.dayNightPhase();
+  const dawn =
+    phase !== null && state.clock.lastPhase !== null && crossedDawn(state.clock.lastPhase, phase);
+  state.clock.lastPhase = phase;
+  for (let i = 0; i < WORLD_BOSSES.length; i++) {
+    const def = WORLD_BOSSES[i];
+    // A slumbering boss keeps the interval cadence on a clockless host (tests, the RL
+    // env): with no night there is no dawn to wait for.
+    const slumbers = phase !== null && !!MOBS[def.templateId]?.slumber;
+    const liveId = state.entityIds[i];
+    if (liveId !== null) {
+      const boss = ctx.entities.get(liveId);
+      if (!boss) {
+        state.entityIds[i] = null;
+      } else if (!boss.dead) {
+        // Grow the HP pool with the raid size (retail-style, up to the cap).
+        scaleWorldBossHp(ctx, boss, def);
+      }
+      if (boss?.dead) {
+        // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to loot, then
+        // is removed; respawnTimer is Infinity (handleDeath) so the normal in-place
+        // respawn never fires; only this scheduler respawns it.
+        if (boss.corpseTimer <= 0) {
+          for (const addId of boss.summonedIds) ctx.dropEntity(addId);
+          ctx.dropEntity(liveId);
+          state.entityIds[i] = null;
+          // A slain sleeper is gone until sunrise, whatever the interval says.
+          if (slumbers) state.riseAtDawn[i] = true;
+        }
+      }
+    }
+    if (ctx.time >= state.nextAt[i]) {
+      state.nextAt[i] += def.intervalSeconds;
+      if (state.entityIds[i] === null && !state.riseAtDawn[i]) state.entityIds[i] = spawn(def);
+    }
+    if (slumbers && state.riseAtDawn[i] && dawn && state.entityIds[i] === null) {
+      state.riseAtDawn[i] = false;
+      state.entityIds[i] = spawn(def);
+    }
+  }
+}
 
 // The raid-lockout id under which a looted world boss is BOTH gated and shown in the
 // raid-lockout timer UI. Prefixed so it never collides with a real dungeon id (the

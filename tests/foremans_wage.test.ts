@@ -65,6 +65,18 @@ describe('the wage rows on his table', () => {
     expect(ITEMS[REINS]?.kind).toBe('mount');
   });
 
+  it('keeps the wage items on exactly one table, so the gate stays their only source', () => {
+    // item_level.ts keeps the HIGHEST source across every table an item sits on, so a second
+    // ungated table anywhere would silently re-level all three back to that source's level.
+    for (const id of WAGE) {
+      const tables = Object.values(MOBS).filter((m) => m.loot.some((r) => r.itemId === id));
+      expect(
+        tables.map((m) => m.id),
+        id,
+      ).toEqual([BALGATH]);
+    }
+  });
+
   it('is the only table in the game using the personal level gate', () => {
     // The gate is honored by rollWorldBossLoot alone; an ordinary mob's rollLoot ignores
     // it, so a gated row anywhere else would be a silent no-op.
@@ -118,7 +130,7 @@ describe('the personal roll honors the gate in both directions', () => {
   }
 
   it('hands wage gear only to the local, epics to anyone, and never two gear pieces', () => {
-    const { sim, boss, lowbie, raider, metas } = world();
+    const { sim, boss, lowbie, metas } = world();
     const roll = (sim as unknown as { rollWorldBossLoot(m: Entity, c: PlayerMeta[]): void })
       .rollWorldBossLoot;
     const counts = { lowbieWage: 0, lowbieEpic: 0, raiderWage: 0, raiderEpic: 0, reins: 0 };

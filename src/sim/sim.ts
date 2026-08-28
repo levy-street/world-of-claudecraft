@@ -217,7 +217,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
-import { crossedDawn, cyclePhase, isDaylightPhase } from './day_night';
+import { cyclePhase, isDaylightPhase } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import * as deedsMod from './deeds';
 import {
@@ -567,8 +567,9 @@ import {
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
-  scaleWorldBossHp,
+  tickWorldBossSchedule,
   WORLD_BOSSES,
+  type WorldBossClock,
   type WorldBossDef,
 } from './world_boss';
 
@@ -2287,13 +2288,10 @@ export class Sim {
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
   // Slumbering bosses (MobTemplate.slumber) only: set once a slain boss's corpse is gone,
-  // and held until the next DAWN spawns him again. While set, the interval cadence is
-  // ignored for that slot, so "he rises again at sunrise" is literally true: a kill at
-  // noon is a kill for the rest of the day. Never set without a day/night clock.
+  // and held until the next DAWN spawns him again (world_boss.ts tickWorldBossSchedule).
   private worldBossRiseAtDawn: boolean[] = WORLD_BOSSES.map(() => false);
-  // The day/night phase observed by the previous tick's scheduler pass, for the
-  // dawn-crossing edge (null until a clocked host has ticked once).
-  private lastDayNightPhase: number | null = null;
+  // The day/night phase the previous scheduler pass observed, for the dawn edge.
+  private worldBossClock: WorldBossClock = { lastPhase: null };
   // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
   // ClientWorld's null-out pattern so the offline arm honors the same
   // consumed-once contract instead of returning the 'noop' value forever.
@@ -2798,59 +2796,20 @@ export class Sim {
     }
   }
 
-  // World-boss scheduler. Per WORLD_BOSSES slot: when the live boss is gone, clear
-  // the slot (and once its lootable corpse window has elapsed, remove the corpse +
-  // any stormlings it left). When the interval comes due, advance it and, if no
-  // boss is currently up, spawn a fresh one. Draws no rng and allocates no ids until
-  // a spawn actually fires (which never happens inside the short parity scenarios),
-  // so existing determinism traces are unaffected.
+  // World-boss scheduler: the per-slot lifecycle lives in world_boss.ts
+  // (tickWorldBossSchedule); the STATE stays here as live views, and so does the spawn
+  // primitive, which needs createMob/addEntity/groundPos. Draws no rng.
   private updateWorldBosses(): void {
-    // One clock read per tick, shared by every slot. `dawn` is the sunrise EDGE since
-    // the previous pass (never true without a clock, never true twice for one sunrise).
-    const phase = this.dayNightPhase();
-    const dawn =
-      phase !== null &&
-      this.lastDayNightPhase !== null &&
-      crossedDawn(this.lastDayNightPhase, phase);
-    this.lastDayNightPhase = phase;
-    for (let i = 0; i < WORLD_BOSSES.length; i++) {
-      const def = WORLD_BOSSES[i];
-      // A slumbering boss keeps the interval cadence on a clockless host (tests, the RL
-      // env): with no night there is no dawn to wait for.
-      const slumbers = phase !== null && !!MOBS[def.templateId]?.slumber;
-      const liveId = this.worldBossEntityIds[i];
-      if (liveId !== null) {
-        const boss = this.entities.get(liveId);
-        if (!boss) {
-          this.worldBossEntityIds[i] = null;
-        } else if (!boss.dead) {
-          // Grow the HP pool with the raid size (retail-style, up to the cap).
-          scaleWorldBossHp(this.ctx, boss, def);
-        }
-        if (boss?.dead) {
-          // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to
-          // loot, then is removed; respawnTimer is Infinity (handleDeath) so the
-          // normal in-place respawn never fires; only this scheduler respawns it.
-          if (boss.corpseTimer <= 0) {
-            for (const addId of boss.summonedIds) this.dropEntity(addId);
-            this.dropEntity(liveId);
-            this.worldBossEntityIds[i] = null;
-            // A slain sleeper is gone until sunrise, whatever the interval says.
-            if (slumbers) this.worldBossRiseAtDawn[i] = true;
-          }
-        }
-      }
-      if (this.time >= this.worldBossNextAt[i]) {
-        this.worldBossNextAt[i] += def.intervalSeconds;
-        if (this.worldBossEntityIds[i] === null && !this.worldBossRiseAtDawn[i]) {
-          this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
-        }
-      }
-      if (slumbers && this.worldBossRiseAtDawn[i] && dawn && this.worldBossEntityIds[i] === null) {
-        this.worldBossRiseAtDawn[i] = false;
-        this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
-      }
-    }
+    tickWorldBossSchedule(
+      this.ctx,
+      {
+        nextAt: this.worldBossNextAt,
+        entityIds: this.worldBossEntityIds,
+        riseAtDawn: this.worldBossRiseAtDawn,
+        clock: this.worldBossClock,
+      },
+      (def) => this.spawnWorldBoss(def),
+    );
   }
 
   // Spawn a world boss at its fixed point and announce it server-wide. Returns the

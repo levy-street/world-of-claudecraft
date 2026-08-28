@@ -6158,7 +6158,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
   {
     "id": "conquerors_balgath",
     "shelf": "conquerors",
-    "name": "Barrowmound Reach (World Boss)",
+    "name": "Starfall Crater (World Boss)",
     "relics": [
       {
         "kind": "item",

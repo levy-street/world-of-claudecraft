@@ -429,6 +429,16 @@ describe('createAurasView: derivation per mode', () => {
       v.tick(entity([aura({ id: 'slumber', kind: 'buff_dr', remaining: 3600 })])).slots[0]
         .durationText,
     ).toBe('1h');
+    // Scope, stated: the rule is about the BIT, not about buffs. A permanent DEBUFF is a
+    // state too (nothing will ever expire it), so it shows no countdown either; a timed
+    // debuff is untouched and keeps the timer the fairness contract protects.
+    expect(
+      v.tick(entity([aura({ id: 'brand', kind: 'dot', remaining: 3600, permanent: true })]))
+        .slots[0].durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'brand', kind: 'dot', remaining: 12 })])).slots[0].durationText,
+    ).toBe('12s');
   });
 
   it('hides the countdown under toggle auras (stealth / forms / stance / Ghost Wolf)', () => {

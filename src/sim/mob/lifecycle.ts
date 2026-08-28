@@ -84,6 +84,10 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // phase at the barrow, not mid-run to whichever landmark he was heading for.
   resetWarpath(mob);
   resetBossSlams(mob);
+  // A slumbering template that ever respawned in place (none does today: the world boss is
+  // scheduler-owned) must come back awake, or a daytime respawn would run the dawn wake
+  // and broadcast the realm-wide call on every single respawn.
+  if (MOBS[mob.templateId]?.slumber) mob.asleep = false;
   clearThreat(mob);
   // A respawn is a brand-new pull: the world-boss damager roster clears with
   // the hate table so loot rights never carry across lives.

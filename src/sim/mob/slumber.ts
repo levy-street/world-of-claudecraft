@@ -29,7 +29,7 @@ import { emitMobYell } from './yells';
 /** Aura id of the slumber (the frame shows it as a buff; the HUD keys its tooltip on it). */
 export const SLUMBER_AURA_ID = 'slumber';
 
-export type SlumberDef = NonNullable<MobTemplate['slumber']>;
+type SlumberDef = NonNullable<MobTemplate['slumber']>;
 
 /**
  * What the dispatcher should do after this tick:
@@ -40,14 +40,9 @@ export type SlumberDef = NonNullable<MobTemplate['slumber']>;
 export type SlumberTick = 'awake' | 'homing' | 'asleep';
 
 /** Night, for a slumbering template: a clocked host past sunset. Clockless is day. */
-export function slumberNight(ctx: SimContext): boolean {
+function slumberNight(ctx: SimContext): boolean {
   const phase = ctx.dayNightPhase();
   return phase !== null && !isDaylightPhase(phase);
-}
-
-/** Is this mob currently asleep? (False for every mob without the opt-in.) */
-export function mobAsleep(mob: Entity): boolean {
-  return mob.asleep === true;
 }
 
 /**
@@ -116,6 +111,9 @@ function holdAsleep(mob: Entity, def: SlumberDef): void {
   mob.hostile = false;
   mob.aiState = 'idle';
   mob.inCombat = false;
+  // Whole all night, not just at the edges: a lingering tick from before dusk or a source
+  // that never consults isHostileTo must not carve into a sleeper nobody can fight.
+  mob.hp = mob.maxHp;
   if (!mob.auras.some((a) => a.id === SLUMBER_AURA_ID)) mob.auras.push(slumberAura(mob, def));
 }
 
@@ -124,6 +122,10 @@ function wake(ctx: SimContext, mob: Entity, def: SlumberDef): void {
   mob.hostile = true;
   mob.auras = mob.auras.filter((a) => a.id !== SLUMBER_AURA_ID);
   mob.hp = mob.maxHp;
+  // Threat can be seeded onto a neutral sleeper by sources that never consult hostility
+  // (a heal's awareness threat, a mass-threat effect); dawn opens on a boss aggroed on
+  // nobody, never on someone who slept past him.
+  clearThreat(mob);
   emitMobYell(ctx, mob, def.wakeYell, def.yellRange);
   // The daily call to arms, realm-wide (same channel as the spawn announcement).
   ctx.emit({

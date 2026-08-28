@@ -1732,6 +1732,10 @@ async function startGame(
   });
   // Dev-only chat command to scrub the world day/night cycle for testing
   // (src/game/day_night_dev_command.ts): sky, minimap dial and the offline sim together.
+  const dayNightDevDeps = {
+    log: (text: string, color: string) => hud.log(text, color),
+    refreshDayNightDial: () => hud.refreshDayNightDial(),
+  };
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
     // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
@@ -1747,7 +1751,7 @@ async function startGame(
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
       // dev-only day/night scrub command, intercepted before the chat send path
-      if (import.meta.env.DEV && tryDayNightDevCommand(raw, hud)) {
+      if (import.meta.env.DEV && tryDayNightDevCommand(raw, dayNightDevDeps)) {
         chatInput.value = '';
         closeChat();
         return;
@@ -2804,7 +2808,7 @@ async function startGame(
     activateProfile: (target) =>
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
-    buildRenderer: (target, recycled) => {
+    buildRenderer: (_target, recycled) => {
       const next = new Renderer(world, recycled.canvas, nameplates, {
         context: recycled.context,
         initializeGfx: false,

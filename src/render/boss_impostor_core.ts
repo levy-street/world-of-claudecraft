@@ -95,7 +95,9 @@ export function bossImpostorFrame(relBearing: number): { a: number; b: number; b
 
 /** Everything the show/hide decision needs, read off the entity and the renderer. */
 export interface BossImpostorShowInput {
-  /** True when the renderer is drawing his rig THIS frame (view exists and is visible). */
+  /** True unless the renderer's RANGE band hid his rig this frame. Range only: a rig
+   *  hidden by the shader-compile gate or the off-screen cull still counts as shown, or
+   *  a boss spawning thirty yards away would flash as a flat sprite while his rig links. */
   rigShown: boolean;
   /** Yards from the viewer (the player, not the camera). */
   dist: number;

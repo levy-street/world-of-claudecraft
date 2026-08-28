@@ -1122,8 +1122,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // boss page is supposed to mean: no shared tier, no second door, no page you can
     // complete without meeting him. The three Foreman's Wage rares are his too, but they
     // only ever fall to a contributor at or below level 13 (LootEntry.maxPlayerLevel), so
-    // a page completed at twenty was started as a local. His reins are on the Horizons
-    // mounts page, never here (the curation rule above).
+    // a page completed at twenty was either started as a local or finished across a trade:
+    // the wage pieces are unbound, and discovery counts on the first copy a character
+    // ever holds, however it arrived. His reins are on the Horizons mounts page, never
+    // here (the curation rule above).
     sourceDefault: fromBoss('balgath_cyclops'),
     relics: items(
       'foremans_barrowmaul',

@@ -117,12 +117,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/sim.ts',
-    ceiling: 12660,
+    ceiling: 12606,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
     file: 'src/main.ts',
-    ceiling: 11430,
+    ceiling: 11414,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

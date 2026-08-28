@@ -1101,6 +1101,7 @@ export interface EntityView {
   viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
   shadowOn: boolean;
   isFar: boolean;
+  rangeHidden: boolean; // hidden by the 80/96 yd range band this frame (not a gate or cull)
   // hidden until its shader programs finish linking off-thread (async-compile gate)
   compilePending: boolean;
   // Resolves when compilePending clears after the non-cancellable link settles.
@@ -1839,8 +1840,9 @@ export class Renderer {
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
   // allocates no closure (see the drape path in vale_cup_team_ring.ts).
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
-  /** Boss impostor exclusion input: true while this entity's rig is drawn this frame. */
-  private rigShownFor = (id: number): boolean => this.views.get(id)?.group.visible === true;
+  /** Impostor exclusion: the rig counts as shown unless the RANGE band hid it (not the
+   *  compile gate or the cull, either of which would draw the flat sprite at 30 yards). */
+  private rigShownFor = (id: number): boolean => !(this.views.get(id)?.rangeHidden ?? true);
   private selectionDrapeSupportY = 0;
   private selectionGroundSample = (x: number, z: number): number =>
     Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
@@ -8677,6 +8679,7 @@ export class Renderer {
       viewLights,
       shadowOn: true,
       isFar: false,
+      rangeHidden: false,
       compilePending: false,
       compileReady: null,
       mountCompilePending: false,
@@ -10551,8 +10554,10 @@ export class Renderer {
         )
       ) {
         v.group.visible = false;
+        v.rangeHidden = true;
         continue;
       }
+      v.rangeHidden = false;
       this.syncDrainChannelVisual(id, e);
       // The ward's on-model cues (eye_ward_marker_drive.ts owns every decision). The RETICLE
       // only aims for a pike carrier; the STATE badge shows for everyone, because "his ward
@@ -11266,7 +11271,6 @@ export class Renderer {
         !e.dead && feetDepth >= floorSampleDepth
           ? wl - groundHeight(ax, az, this.sim.cfg.seed)
           : Number.NEGATIVE_INFINITY;
-      // A wading body (MobTemplate.wadeDepth) swims only past ITS depth, not the human line.
       const wadeDepth = e.kind === 'mob' ? MOBS[e.templateId]?.wadeDepth : undefined;
       const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
       // ...and the band under it, where the feet are wet but the ground is
@@ -12223,8 +12227,7 @@ export class Renderer {
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
     this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
-    // Measured from the PLAYER, not the camera (same range zoomed in or out). Draws only
-    // while the rig is not; takes the rig's light grade (neutral day on the low tier).
+    // From the PLAYER, not the camera; draws only while the rig is range-hidden; rig's grade.
     this.bossImpostors.sync(
       this.webgl,
       this.sim.entities.values(),
