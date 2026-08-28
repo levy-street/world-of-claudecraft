@@ -9,6 +9,7 @@ import {
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
+import { clipNamesOf } from '../src/render/characters/visual';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the
@@ -248,6 +249,27 @@ describe('character ClipMaps match the shipped GLBs', () => {
         expect(existsSync(publicPath(url)), `${key}: ${url} is missing`).toBe(true);
       }
     }
+  });
+
+  it('binds every gate-required clip as a mixer action (visual.ts clipNamesOf)', () => {
+    // visual.ts creates an AnimationAction ONLY for the names clipNamesOf enumerates, so a
+    // ClipMap slot this gate requires the GLB to carry but that list forgets is a clip that
+    // ships, passes the gate, and never plays: the state machine refuses a state it has no
+    // action for (desiredBaseState's hasSleepClip/hasWadeClip gates) and the one-shots
+    // resolve to null. Balgath's sleep loop shipped exactly that way once. The two
+    // enumerations agree by construction here, per rig, name for name.
+    for (const [key, def] of rigs) {
+      const bound = new Set(clipNamesOf(def));
+      const unbound = requiredClipNames(def.clips).filter((name) => !bound.has(name));
+      expect(unbound, `${key}: required clips visual.ts never binds`).toEqual([]);
+    }
+    // The gate is only as wide as its own list: the slots that motivated it are on it.
+    const balgath = VISUALS.mob_balgath_cyclops.clips;
+    expect(balgath.sleep).toBe('Balgath_Sleep');
+    expect(balgath.wake).toBe('Balgath_Wake');
+    expect(requiredClipNames(balgath)).toEqual(
+      expect.arrayContaining(['Balgath_Sleep', 'Balgath_Wake']),
+    );
   });
 
   it('checks every ClipMap field (a new field must join the gate)', () => {

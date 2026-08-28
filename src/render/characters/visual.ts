@@ -3124,7 +3124,7 @@ export class CharacterVisual {
   }
 }
 
-function clipNamesOf(def: VisualDef): string[] {
+export function clipNamesOf(def: VisualDef): string[] {
   const c = def.clips;
   return [
     c.idle,
@@ -3148,6 +3148,11 @@ function clipNamesOf(def: VisualDef): string[] {
     c.walkBack,
     c.flourish,
     c.stow,
+    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
+    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
+    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
+    c.sleep,
+    c.wake,
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }
