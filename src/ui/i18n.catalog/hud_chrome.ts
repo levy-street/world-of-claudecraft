@@ -5483,6 +5483,11 @@ export const hudChromeStrings = {
     // the old fills carried the race reading but not those qualifiers).
     sourceActivityRiftFirstClear:
       "Awarded to every member of the party that wins a ranked Rift's first clear",
+    // The Seeker board: granted server-side to an account that claimed with a
+    // Seeker Genesis Token in the native app (server/seeker_mount_grant.ts).
+    // Names the DEVICE and the token, the two things a player needs to know.
+    sourceActivitySeekerGenesisClaim:
+      'Claimed on a Solana Seeker with its verified Seeker Genesis Token',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

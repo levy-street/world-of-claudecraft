@@ -3970,6 +3970,7 @@ export const pl_PL: EnTranslations = {
       "sourceActivityCorpseHarvest": "Odzyskiwana przy oprawianiu zwłok stworzeń",
       "sourceActivityMasterworkCraft": "Zdobywana przez wykonanie arcydzieła",
       "sourceActivityRiftFirstClear": "Przyznawana każdemu członkowi drużyny, która zdobędzie pierwsze przejście rankingowej Szczeliny",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, jeszcze nieznaleziona, {source}",
       "cellOwnedClearsAria": "{name}, skatalogowana, znaleziona po raz pierwszy przy przejściu {count}",
       "searchPlaceholder": "Szukaj relikwii",

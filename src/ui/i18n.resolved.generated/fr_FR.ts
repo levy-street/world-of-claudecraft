@@ -3970,6 +3970,7 @@ export const fr_FR: EnTranslations = {
       "sourceActivityCorpseHarvest": "Récupérée en récoltant des cadavres de créatures",
       "sourceActivityMasterworkCraft": "Obtenue en fabriquant un chef-d'œuvre",
       "sourceActivityRiftFirstClear": "Attribuée à chaque membre du groupe qui remporte la première conquête d'une Faille classée",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, pas encore trouvée, {source}",
       "cellOwnedClearsAria": "{name}, cataloguée, trouvée pour la première fois à la conquête {count}",
       "searchPlaceholder": "Rechercher des reliques",

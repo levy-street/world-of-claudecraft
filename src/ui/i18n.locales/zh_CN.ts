@@ -10582,6 +10582,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '采集生物尸体时获得',
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '制作杰作时获得',
   'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予率先通关分级裂隙的队伍全体成员',
+  'hudChrome.reliquary.sourceActivitySeekerGenesisClaim':
+    '在Solana Seeker手机上凭已验证的Seeker Genesis Token领取',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}，尚未获得，{source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}，已收录，首次获得于第 {count} 次通关',
   'hudChrome.reliquary.searchPlaceholder': '搜索圣物',

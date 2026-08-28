@@ -3970,6 +3970,7 @@ export const vi_VN: EnTranslations = {
       "sourceActivityCorpseHarvest": "Thu được khi mổ xác sinh vật",
       "sourceActivityMasterworkCraft": "Nhận được khi chế tác một kiệt tác",
       "sourceActivityRiftFirstClear": "Trao cho mọi thành viên của tổ đội giành lượt hoàn thành đầu tiên của một Rạn Nứt xếp hạng",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, chưa tìm thấy, {source}",
       "cellOwnedClearsAria": "{name}, đã biên mục, lần đầu tìm thấy ở lượt hoàn thành thứ {count}",
       "searchPlaceholder": "Tìm kỳ trân",

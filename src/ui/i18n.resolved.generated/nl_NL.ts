@@ -3970,6 +3970,7 @@ export const nl_NL: EnTranslations = {
       "sourceActivityCorpseHarvest": "Geborgen bij het oogsten van kadavers van wezens",
       "sourceActivityMasterworkCraft": "Verdiend door een meesterwerk te vervaardigen",
       "sourceActivityRiftFirstClear": "Toegekend aan elk lid van de groep die de eerste voltooiing van een gerangschikte Rift wint",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, nog niet gevonden, {source}",
       "cellOwnedClearsAria": "{name}, gecatalogiseerd, voor het eerst gevonden bij voltooiing {count}",
       "searchPlaceholder": "Relieken zoeken",

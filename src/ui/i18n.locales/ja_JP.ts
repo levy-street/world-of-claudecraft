@@ -11102,6 +11102,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityMasterworkCraft': '傑作の製作で入手',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
     'ランク付きリフトの初回クリアを制したパーティーの全員に授与',
+  'hudChrome.reliquary.sourceActivitySeekerGenesisClaim':
+    'Solana Seeker端末で、認証済みのSeeker Genesis Tokenにより受け取る',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}、未発見、{source}',
   'hudChrome.reliquary.cellOwnedClearsAria': '{name}、収蔵済み、初回入手はクリア {count} 回目',
   'hudChrome.reliquary.searchPlaceholder': '聖遺物を検索',

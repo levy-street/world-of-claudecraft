@@ -11280,6 +11280,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceActivityMasterworkCraft': 'Даётся за создание шедевра',
   'hudChrome.reliquary.sourceActivityRiftFirstClear':
     'Вручается каждому участнику группы, первой прошедшей ранговый разлом',
+  'hudChrome.reliquary.sourceActivitySeekerGenesisClaim':
+    'Выдаётся на Solana Seeker по подтверждённому Seeker Genesis Token',
   'hudChrome.reliquary.cellMissingSourceAria': '{name}, ещё не найдено, {source}',
   'hudChrome.reliquary.cellOwnedClearsAria':
     '{name}, каталогизировано, впервые найдено на прохождении {count}',

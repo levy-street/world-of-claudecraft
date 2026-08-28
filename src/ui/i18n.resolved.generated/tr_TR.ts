@@ -3970,6 +3970,7 @@ export const tr_TR: EnTranslations = {
       "sourceActivityCorpseHarvest": "Yaratık leşlerini işlerken elde edilir",
       "sourceActivityMasterworkCraft": "Bir şaheser üreterek kazanılır",
       "sourceActivityRiftFirstClear": "Dereceli bir Yarık'ın ilk tamamlamasını kazanan grubun her üyesine verilir",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, henüz bulunmadı, {source}",
       "cellOwnedClearsAria": "{name}, kataloglandı, ilk kez {count}. tamamlamada bulundu",
       "searchPlaceholder": "Yadigâr ara",

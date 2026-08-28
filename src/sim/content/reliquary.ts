@@ -108,11 +108,18 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   gates the call on claim.won AND claim.event, so a dev portal never mints).
  *   The hint is rank-agnostic on purpose: every ranked tier, C included, mints
  *   the rings on its event's first clear.
+ * - seeker_genesis_claim: server/seeker_mount_grant.ts hands the Seeker board
+ *   reins to a character whose account holds a Seeker Genesis Token claim
+ *   (server/seeker_entitlement_db.ts), at fresh join and on claim success.
+ *   The write site is the server rather than the sim on purpose: the
+ *   entitlement is an account fact the offline world cannot hold, so no
+ *   in-game table awards the reins and the claim itself is the door.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
+  'seeker_genesis_claim',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -289,6 +296,10 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
 // shelf is the third pending slot (QA ruling 2026-08-07).
 //
+// seeker_board is awarded by no in-game table either, but it is NOT pending:
+// its door is the Seeker Genesis Token claim, a server-side grant recorded as
+// the seeker_genesis_claim activity (RELIQUARY_ACTIVITY_SOURCE_IDS).
+//
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
 // pin one layer later.
@@ -323,6 +334,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  seeker_board: fromActivity('seeker_genesis_claim'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS

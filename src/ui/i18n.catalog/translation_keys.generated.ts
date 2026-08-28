@@ -10048,6 +10048,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.sourceActivityCorpseHarvest'
   | 'hudChrome.reliquary.sourceActivityMasterworkCraft'
   | 'hudChrome.reliquary.sourceActivityRiftFirstClear'
+  | 'hudChrome.reliquary.sourceActivitySeekerGenesisClaim'
   | 'hudChrome.reliquary.sourceBoss'
   | 'hudChrome.reliquary.sourceBossDungeon'
   | 'hudChrome.reliquary.sourceBossZone'

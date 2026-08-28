@@ -3970,6 +3970,7 @@ export const it_IT: EnTranslations = {
       "sourceActivityCorpseHarvest": "Recuperata raccogliendo dalle carcasse delle creature",
       "sourceActivityMasterworkCraft": "Si ottiene creando un capolavoro",
       "sourceActivityRiftFirstClear": "Assegnata a ogni membro del gruppo che ottiene la prima conquista di uno Squarcio classificato",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, non ancora trovata, {source}",
       "cellOwnedClearsAria": "{name}, catalogata, trovata per la prima volta alla conquista {count}",
       "searchPlaceholder": "Cerca reliquie",

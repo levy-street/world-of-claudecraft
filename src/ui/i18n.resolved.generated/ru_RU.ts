@@ -3970,6 +3970,7 @@ export const ru_RU: EnTranslations = {
       "sourceActivityCorpseHarvest": "Находится при сборе с трупов существ",
       "sourceActivityMasterworkCraft": "Даётся за создание шедевра",
       "sourceActivityRiftFirstClear": "Вручается каждому участнику группы, первой прошедшей ранговый разлом",
+      "sourceActivitySeekerGenesisClaim": "Выдаётся на Solana Seeker по подтверждённому Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, ещё не найдено, {source}",
       "cellOwnedClearsAria": "{name}, каталогизировано, впервые найдено на прохождении {count}",
       "searchPlaceholder": "Поиск реликвий",

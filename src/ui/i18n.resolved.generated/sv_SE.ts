@@ -3970,6 +3970,7 @@ export const sv_SE: EnTranslations = {
       "sourceActivityCorpseHarvest": "Bärgad vid skörd av varelsekadaver",
       "sourceActivityMasterworkCraft": "Förtjänas genom att tillverka ett mästerverk",
       "sourceActivityRiftFirstClear": "Tilldelas varje medlem i gruppen som vinner första klarningen av en rankad Reva",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, ännu inte funnen, {source}",
       "cellOwnedClearsAria": "{name}, katalogiserad, först funnen vid klarning {count}",
       "searchPlaceholder": "Sök reliker",

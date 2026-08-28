@@ -3970,6 +3970,7 @@ export const da_DK: EnTranslations = {
       "sourceActivityCorpseHarvest": "Bjærget ved høst af kadavere fra skabninger",
       "sourceActivityMasterworkCraft": "Optjenes ved at fremstille et mesterværk",
       "sourceActivityRiftFirstClear": "Tildeles hvert medlem af den gruppe, der vinder den første gennemførsel af en rangeret Rift",
+      "sourceActivitySeekerGenesisClaim": "Claimed on a Solana Seeker with its verified Seeker Genesis Token",
       "cellMissingSourceAria": "{name}, endnu ikke fundet, {source}",
       "cellOwnedClearsAria": "{name}, katalogiseret, først fundet ved gennemførsel {count}",
       "searchPlaceholder": "Søg efter relikvier",

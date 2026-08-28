@@ -3970,6 +3970,7 @@ export const ja_JP: EnTranslations = {
       "sourceActivityCorpseHarvest": "敵の死体の採取で入手",
       "sourceActivityMasterworkCraft": "傑作の製作で入手",
       "sourceActivityRiftFirstClear": "ランク付きリフトの初回クリアを制したパーティーの全員に授与",
+      "sourceActivitySeekerGenesisClaim": "Solana Seeker端末で、認証済みのSeeker Genesis Tokenにより受け取る",
       "cellMissingSourceAria": "{name}、未発見、{source}",
       "cellOwnedClearsAria": "{name}、収蔵済み、初回入手はクリア {count} 回目",
       "searchPlaceholder": "聖遺物を検索",

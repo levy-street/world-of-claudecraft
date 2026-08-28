@@ -3970,6 +3970,7 @@ export const en_XA: EnTranslations = {
       "sourceActivityCorpseHarvest": "[Ŕéçóʋéŕéð ŵĥíļé ĥáŕʋéšţíñĝ çŕéáţúŕé çóŕþšéš]",
       "sourceActivityMasterworkCraft": "[Éáŕñéð ƀý çŕáƒţíñĝ á ɱášţéŕŵóŕķ]",
       "sourceActivityRiftFirstClear": "[Áŵáŕðéð ţó éʋéŕý ɱéɱƀéŕ óƒ ţĥé þáŕţý ţĥáţ ŵíñš á ŕáñķéð Ŕíƒţ'š ƒíŕšţ çļéáŕ]",
+      "sourceActivitySeekerGenesisClaim": "[Çļáíɱéð óñ á Šóļáñá Šééķéŕ ŵíţĥ íţš ʋéŕíƒíéð Šééķéŕ Ĝéñéšíš Ţóķéñ]",
       "cellMissingSourceAria": "[{name}, ñóţ ýéţ ƒóúñð, {source}]",
       "cellOwnedClearsAria": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {count}]",
       "searchPlaceholder": "[Šéáŕçĥ ŕéļíçš]",

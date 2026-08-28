@@ -3970,6 +3970,7 @@ export const zh_TW: EnTranslations = {
       "sourceActivityCorpseHarvest": "採集生物屍體時獲得",
       "sourceActivityMasterworkCraft": "製作傑作時獲得",
       "sourceActivityRiftFirstClear": "授予率先通關分級裂隙的隊伍全體成員",
+      "sourceActivitySeekerGenesisClaim": "在Solana Seeker手機上憑已驗證的Seeker Genesis Token領取",
       "cellMissingSourceAria": "{name}，尚未獲得，{source}",
       "cellOwnedClearsAria": "{name}，已收錄，首次獲得於第 {count} 次通關",
       "searchPlaceholder": "搜尋聖物",
