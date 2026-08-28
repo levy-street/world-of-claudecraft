@@ -1667,6 +1667,11 @@
   .spell-row .spell-name,
   .spell-row .spell-sub {
     overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   .spell-icon {
     width: 34px;
