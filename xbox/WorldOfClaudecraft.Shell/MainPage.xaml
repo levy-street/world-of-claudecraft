@@ -1,0 +1,18 @@
+<Page
+    x:Class="WorldOfClaudecraft.Shell.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    Background="#050509">
+    <Grid>
+        <controls:WebView2 x:Name="Web" />
+        <TextBlock x:Name="Status"
+                   Foreground="#9FB3D9"
+                   FontSize="20"
+                   Margin="60"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Text="Starting World of ClaudeCraft..." />
+    </Grid>
+</Page>

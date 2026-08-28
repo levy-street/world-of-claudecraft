@@ -13,7 +13,7 @@ import type { IncomingMessage } from 'node:http';
 import { verifyNativeAttestation } from './native_attestation';
 import { recordUsageMetric } from './provider_usage';
 import { requestIp } from './ratelimit';
-import { isDesktopAppRequest, isNativeAppRequest } from './web_login_guard';
+import { isDesktopAppRequest, isNativeAppRequest, isXboxAppRequest } from './web_login_guard';
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT_MS = 5000;
@@ -71,6 +71,13 @@ export async function passesTurnstile(
   fetchImpl: typeof fetch = fetch,
 ): Promise<boolean> {
   if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
+  // The packaged Xbox console shell, admitted by Origin alone for the same
+  // reason as the desktop shell: a Turnstile widget cannot pass Cloudflare's
+  // domain validation at the shell's private app.local virtual host, and UWP
+  // exposes no equivalent of the mobile attestation bridge, so there is no
+  // token or proof it could send. Same deliberate, documented softening, same
+  // long-term fix; rate limits and credential checks are untouched.
+  if (isXboxAppRequest(req)) return true;
   if (isDesktopAppRequest(req)) return true;
   if (!secret) return true;
   return verifyTurnstile(String(body.turnstileToken ?? ''), secret, requestIp(req), fetchImpl);

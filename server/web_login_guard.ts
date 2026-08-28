@@ -7,6 +7,19 @@ export const NATIVE_APP_ORIGINS = new Set([
   'https://localhost',
 ]);
 
+// The Xbox UWP shell (xbox/) serves its packaged client from this exact origin,
+// a WebView2 virtual host that maps to a folder inside the MSIX and resolves to
+// nothing on the public internet.
+//
+// Deliberately NOT a member of NATIVE_APP_ORIGINS. That set means "proves
+// itself with a platform attestation": it gates verifyNativeAttestation, and
+// the Seeker entitlement and daily-reward paths key off it too. The console
+// shell has no Capacitor attestation plugin, so folding it in there would both
+// break console sign-in wherever attestation is required and hand an
+// Origin-only client the mobile entitlement branches. It gets its own
+// client-class marker instead, exactly like the Electron desktop origins.
+export const XBOX_APP_ORIGIN = 'https://app.local';
+
 export const DESKTOP_APP_ORIGINS = new Set([
   'app://worldofclaudecraft',
   'http://127.0.0.1:5173',
@@ -16,6 +29,13 @@ export const DESKTOP_APP_ORIGINS = new Set([
 export function isNativeAppRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
   const origin = req.headers.origin;
   return typeof origin === 'string' && NATIVE_APP_ORIGINS.has(origin);
+}
+
+// The packaged Xbox console shell. Same contract as isDesktopAppRequest below:
+// a client CLASS marker, never proof of identity. Exact match only, so a
+// look-alike host (https://app.local.example.com) gets nothing.
+export function isXboxAppRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
+  return req.headers.origin === XBOX_APP_ORIGIN;
 }
 
 // The Electron desktop shell (app://worldofclaudecraft packaged, the two localhost
@@ -37,6 +57,7 @@ export function allowedCorsOrigin(origin: unknown): string | null {
   if (
     REALM_ORIGINS.has(origin) ||
     NATIVE_APP_ORIGINS.has(origin) ||
+    origin === XBOX_APP_ORIGIN ||
     DESKTOP_APP_ORIGINS.has(origin)
   ) {
     return origin;
@@ -74,6 +95,7 @@ export function isWebClientRequest(
   const allow = new Set<string>([
     ...REALM_ORIGINS,
     ...NATIVE_APP_ORIGINS,
+    XBOX_APP_ORIGIN,
     ...DESKTOP_APP_ORIGINS,
     ...String(env.WEB_ORIGINS ?? '')
       .split(',')

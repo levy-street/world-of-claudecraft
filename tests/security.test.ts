@@ -885,6 +885,33 @@ describe('Turnstile gate policy (passesTurnstile)', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('admits only the exact packaged Xbox origin, without weakening mobile attestation', async () => {
+    // The console shell is admitted by Origin like the desktop shell. It must
+    // NOT ride the native-app branch: that requires a platform attestation the
+    // UWP shell cannot produce, so console sign-in would fail closed wherever
+    // attestation is required, while mobile must still be held to the proof.
+    process.env.NATIVE_ATTESTATION_REQUIRED = '1';
+    try {
+      const xbox = fakeReq({ origin: 'https://app.local' }, '203.0.113.55');
+      await expect(passesTurnstile(xbox, {}, testSecret, vi.fn() as any)).resolves.toBe(true);
+
+      for (const origin of [
+        'http://app.local',
+        'https://app.local.evil.invalid',
+        'https://app.local.example.com',
+      ]) {
+        await expect(
+          passesTurnstile(fakeReq({ origin }, '203.0.113.55'), {}, testSecret, vi.fn() as any),
+        ).resolves.toBe(false);
+      }
+
+      const mobile = fakeReq({ origin: 'capacitor://localhost' }, '203.0.113.55');
+      await expect(passesTurnstile(mobile, {}, testSecret, vi.fn() as any)).resolves.toBe(false);
+    } finally {
+      delete process.env.NATIVE_ATTESTATION_REQUIRED;
+    }
+  });
+
   it('still fails closed for plain web origins with a secret set and no token', async () => {
     const fetchSpy = vi.fn();
     const req = fakeReq({ origin: 'https://worldofclaudecraft.com' }, '203.0.113.55');

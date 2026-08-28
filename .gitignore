@@ -15,6 +15,15 @@ release-steam/
 electron/vendor/
 media-cache/
 sfx-runtime/
+# Xbox UWP shell: MSBuild intermediates, the packaged output, the client copy
+# staged into the package at build time, and any local signing certificate
+# (see xbox/README.md).
+xbox/**/bin/
+xbox/**/obj/
+xbox/**/AppPackages/
+xbox/**/BundleArtifacts/
+xbox/WorldOfClaudecraft.Shell/web/
+xbox/**/*.pfx
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)
 src/ui/i18n.resolved.generated/*.tmp
