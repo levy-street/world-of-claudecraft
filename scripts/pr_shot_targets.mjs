@@ -668,7 +668,7 @@ const fakePadSeed = async (page) => {
 
 // Pin the page's clock to a LOCAL Saturday noon before the app boots, so the
 // weekly Double Honor surfaces render their active state through the real code
-// path (currentResetDay reads the local clock; src/sim/pvp/honor_event.ts turns
+// path (feedSimCalendar reads the local clock; src/sim/pvp/honor_event.ts turns
 // Saturday reset days into the event). A Date subclass shim rather than a sim
 // poke: main.ts re-supplies resetDay every frame, so a staged write would be
 // overwritten one frame later. String form for the usual tsx keepNames reason.

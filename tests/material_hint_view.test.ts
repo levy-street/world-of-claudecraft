@@ -177,19 +177,26 @@ describe('material_hint_view', () => {
     // first-clear pair, in rank order.
     const line = materialHintLine('wyrmfall_core');
     expect(line).toContain('class="tt-desc"');
-    expect(line).toContain(`drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} once per day`);
-    expect(line).toContain(`grants ${WYRMFALL_RIFT_COUNT.A} or ${WYRMFALL_RIFT_COUNT.S}`);
-    // The TRIGGER wording is part of the pin (the tooltip standard's
+    // BOTH boss clauses pin the income constants (a retune of either reds),
+    // and the TRIGGER wording is part of the pin (the tooltip standard's
     // trigger/limit rule): the boss gate is per (dungeon, difficulty) and
     // only the raid has two eligible difficulties (dungeon bosses pay on
-    // heroic alone, so "each difficulty" may not distribute over them); the
-    // rift arm pays on the day's first WINNING A or S clear whatever earlier
-    // losses (a losing clear forfeits the cores, masterwrought_materials.ts),
-    // so the sentence names the first WIN of the day, never merely clearing
-    // and never "winning your first race".
-    expect(line).toContain('The raid final boss drops');
-    expect(line).toContain('once per day on each difficulty, heroic dungeon final bosses drop');
-    expect(line).toContain('first A or S rank rift race win of the day');
+    // heroic alone, so "on each difficulty" belongs to the raid clause only,
+    // and "each" keeps the dungeon limit per dungeon); the rolled count goes
+    // to every participant; the rift arm pays on the day's first WINNING A
+    // or S clear whatever earlier losses (a losing clear forfeits the cores,
+    // masterwrought_materials.ts), so the sentence names the first WIN of
+    // the day, never merely clearing and never "winning your first race",
+    // with the pair mapped to its rank.
+    expect(line).toContain(
+      `The raid final boss drops ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} to each player once per day on each difficulty.`,
+    );
+    expect(line).toContain(
+      `Heroic dungeon final bosses each drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} to each player once per day.`,
+    );
+    expect(line).toContain(
+      `Your first Rift race win of the day grants ${WYRMFALL_RIFT_COUNT.A} at A rank or ${WYRMFALL_RIFT_COUNT.S} at S rank.`,
+    );
     expect(line).toContain('Heroic Quartermaster');
     expect(line).toContain('Heroic Marks');
     // Craft-free lead scoping (the intermediates rule): the lead must not

@@ -2834,7 +2834,7 @@ export const id_ID: EnTranslations = {
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
       "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
-      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 once per day on each difficulty, heroic dungeon final bosses drop 1 to 3 once per day, your first A or S rank rift race win of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks."
     },
     "discord": {
       "title": "Discord",

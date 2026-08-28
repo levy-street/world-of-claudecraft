@@ -11676,7 +11676,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。',
   'hudChrome.materialHint.wyrmfallCore':
-    '大师锻造制作催化剂。团队副本最终首领每个难度每日掉落一次，每次1到3个；英雄地下城最终首领每日掉落一次，每次1到3个；每日首次在A级或S级裂隙竞速中获胜可获得1或2个；英雄军需官以英雄徽记出售。',
+    '大师锻造制作催化剂。团队副本最终首领每个难度每日一次，为每位玩家掉落1到3个。英雄地下城最终首领各自每日一次，为每位玩家掉落1到3个。每日首次裂隙竞速获胜时，A级可获得1个，S级可获得2个。英雄军需官以英雄徽记出售。',
   'hudChrome.enchanting.tier.base': '基础附魔',
   'hudChrome.enchanting.tier.runed': '符文附魔',
   'hudChrome.enchanting.tier.greater': '强效附魔',

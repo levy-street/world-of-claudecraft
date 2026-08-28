@@ -184,9 +184,13 @@ export function baggedCopyOrdinal(
  * spend the next ember on a copy the player never picked). Only when the count
  * moved, or there is no anchor, does the request fall back to the first
  * candidate, so a copy that left the bags mid-session never strands the detail
- * pane on a ghost. The one shape the anchor cannot see is two same-id bagged
- * copies REORDERED between two polls (a drag inside the bag), the recorded
- * same-id class.
+ * pane on a ghost. Every array mutation the sim performs on the bag is a
+ * splice or a push at the end (a drag rewrites cell HINTS, never the array,
+ * inventory_order.ts), so same-id siblings keep their order; the one shape the
+ * anchor cannot see is a same-id copy LEAVING and another ARRIVING inside one
+ * poll window (a sale plus a pickup, or equipping a bagged copy while a
+ * same-id worn copy is benched), where the count holds and the ordinal names
+ * a different copy: the recorded same-id class.
  */
 export function buildPerfectingView(
   reads: PerfectingWorldReads,

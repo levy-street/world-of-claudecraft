@@ -233,6 +233,32 @@ describe('feedSimCalendar', () => {
     expect(sim.dailyResetRemainingSec).toBe(24 * 3600);
   });
 
+  it('reads the clock ONCE per feed: four values from one instant even when the clock moves between reads', () => {
+    // Fake timers freeze Date.now, so the loop above cannot tell one read
+    // from four. Here every Date.now() call advances the clock 700ms, and
+    // the first read sits 300ms BEFORE the local reset: a per-value
+    // implementation would take its later reads past the boundary and feed
+    // a new-window countdown beside an old-window resetDay, exactly the
+    // incoherence the single-instant feed exists to prevent.
+    vi.useFakeTimers();
+    const base = new Date(2026, 7, 7, 2, 59, 59, 700).getTime();
+    let reads = 0;
+    const now = vi.spyOn(Date, 'now').mockImplementation(() => base + reads++ * 700);
+    try {
+      const sim = freshSim();
+      feedSimCalendar(sim);
+      const at = new Date(base);
+      expect(sim.resetDay).toBe(resetDayOf(at));
+      expect(sim.resetDay).toBe('2026-08-06');
+      expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(at));
+      expect(sim.dailyResetRemainingSec).toBe(1);
+      expect(sim.eventLeadDay).toBe(eventLeadDayOf(at));
+      expect(sim.utcDay).toBe(at.toISOString().slice(0, 10));
+    } finally {
+      now.mockRestore();
+    }
+  });
+
   it('a backward wall-clock step refreshes rather than serving the old set to its deadline', () => {
     // A deadline-only cache serves stale values after the clock steps back
     // (an NTP correction, a manual change) until the OLD deadline arrives,

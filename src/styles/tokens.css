@@ -170,10 +170,11 @@
        aliases the icon palette verbatim: rare, epic, and legendary are LIFTED
        because the shipped hues fail WCAG AA there (rare #0070dd reads 3.87:1,
        epic #a335ee 3.82:1, both under the 4.5:1 text floor; legendary
-       #ff8000 lifts to #ffab5e), while poor, common, and uncommon are
-       softened off the pure greys and greens so a name reads as text rather
-       than a glare. Scoped to NAME TEXT on purpose: the icon border and every
-       other surface stay on the shared palette (icons.ts). */
+       #ff8000 lifts to #ffab5e); poor is lifted to a brighter grey for
+       legibility on the same ground, and common and uncommon are softened
+       off the pure white and green so a name reads as text rather than a
+       glare. Scoped to NAME TEXT on purpose: the icon border and every other
+       surface stay on the shared palette (icons.ts). */
     --mkt-name-poor: #b8b8b8;
     --mkt-name-common: #f2efe6;
     --mkt-name-uncommon: #7fc98f;

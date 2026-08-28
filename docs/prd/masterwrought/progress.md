@@ -982,3 +982,10 @@ error-level changed-files biome / both regens clean after the last
 commit, drift = exactly the eight new suites plus their extended arms.
 Full record: state.md, "Phase 14 ledger". LOCAL only, no push, no PR.
 NEXT = Phase 14 QA (phase-14-qa.md), FRESH session.
+AMENDED 2026-08-28 (the v0.41.0 sync preceding the QA, tip 8592df3866
+merged as 4cd68a918a + audit fix 0ecf2aa7cb): the "hud.ts 18217" and
+main.ts figures above are the phase's own counts; the live ceilings are
+hud.ts 18731 and main.ts 11593, RELEASE-attributed to PR #3284 (the
+unlock-interface frames), never packet payback. Branch-authored growth of
+either file stays zero; the "never grow" obligation is judged PER MERGE
+PARENT (docs/prd/masterwrought/state.md, "Phase 14 QA ledger").

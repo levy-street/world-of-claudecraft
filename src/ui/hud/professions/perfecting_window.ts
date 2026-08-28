@@ -379,6 +379,11 @@ export class PerfectingWindow {
         const ref = view.candidates[index]?.ref;
         if (!ref || samePerfectRef(ref, this.selectedRef)) return;
         this.selectedRef = ref;
+        // Latch the CLICKED copy's anchor from the painted model before the
+        // repaint: buildView hands the anchor to the view, and the previous
+        // selection's ordinal applied to this copy's siblings could re-target
+        // a click that landed after a bag shift onto the wrong same-id copy.
+        this.selectedAnchor = baggedCopyOrdinal(view.candidates, ref);
         this.paint();
       });
       // Owned stacks get the real item tooltip (the commission-board shape):

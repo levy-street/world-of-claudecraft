@@ -4,7 +4,11 @@
 // (the two family-wide seams, denial_line_core and profession_log_tones,
 // were the ones missing when the QA round looked). Walks the directory with
 // the shared walker and diffs BOTH ways: a module the barrel omits fails,
-// and so does a barrel row naming a module that no longer exists.
+// and so does a barrel row naming a module that no longer exists. The family
+// is FLAT by design (the walker recurses, the barrel's rows are './name'), so
+// a nested module fails here permanently on purpose: whoever nests one adds
+// its sub-barrel row to index.ts and teaches this diff the nested shape in
+// the same change, never by widening the floor.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

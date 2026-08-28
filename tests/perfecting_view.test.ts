@@ -414,20 +414,27 @@ describe('the selection anchor (a bagged selection follows its copy across a bag
   });
 
   it('refuses to guess when the same-id count moved (a copy sold or deposited)', () => {
+    // The FIRST of the two copies is selected (ordinal 0), then sold while
+    // the ember stack is spent: count 2 -> 1. The surviving sibling now sits
+    // at ordinal 0, so an ordinal-only re-target (the count guard deleted)
+    // would adopt it; the guard refuses and the request falls back to the
+    // worn piece instead. (Selecting the LAST copy would let the
+    // out-of-bounds arm pass this test with the guard deleted.)
+    // Only the sale here (no lower splice): a splice as well would land the
+    // sibling on the requested cell and the exact match would take it, the
+    // recorded same-id index-collision class, not the count guard.
     const state = twoCopies();
-    const before = buildPerfectingView(simShapedReads(state), { bag: 4, itemId: APEX_BAGGED });
+    const before = buildPerfectingView(simShapedReads(state), { bag: 2, itemId: APEX_BAGGED });
     const anchor = baggedCopyOrdinal(before.candidates, before.detail!.ref);
-    // The SELECTED copy leaves the bag (sold) and the ember stack is spent in
-    // the same window: count 2 -> 1, so the ordinal no longer identifies
-    // anything and the request falls back rather than adopting the sibling.
-    state.inventory.splice(4, 1);
-    state.inventory.splice(0, 1);
+    expect(anchor).toEqual({ ordinal: 0, count: 2 });
+    state.inventory.splice(2, 1);
     const after = buildPerfectingView(
       simShapedReads(state),
-      { bag: 4, itemId: APEX_BAGGED },
+      { bag: 2, itemId: APEX_BAGGED },
       anchor,
     );
     expect(after.detail?.ref).toEqual({ slot: 'mainhand' });
+    expect(after.candidates.filter((c) => !c.worn)).toHaveLength(1);
   });
 
   it('an anchor never overrides an exact match, and a worn request ignores it', () => {

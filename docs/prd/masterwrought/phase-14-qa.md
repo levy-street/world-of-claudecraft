@@ -60,3 +60,17 @@ STEP 4 - DOCS: progress.md (Phase 14 QA row), state.md drift, memory notes.
 STEP 5 - REPORT: PASS / PASS-WITH-FOLLOWUPS / FAIL, counts found and fixed, handoff to
 Phase 15. Follow-ups are CUT-or-fix decisions, never future-PR items.
 ```
+
+### Amendments (2026-08-28, the QA as run)
+
+- STEP 0's sync was already paid before the QA started (origin/release/v0.41.0 tip
+  8592df3866 merged as 4cd68a918a, audit fix 0ecf2aa7cb, the release-merge-audit run as
+  its own step), so the QA skipped the re-merge.
+- The frontend-contract agent's "no hud.ts or main.ts growth" is judged PER MERGE PARENT:
+  the live ceilings hud.ts 18731 / main.ts 11593 are release-attributed (PR #3284), and the
+  branch's own contribution to both files is zero or negative.
+- The correctness agent's "commission signaling + fee floor" deliverable is HALF-MET BY
+  CONSTRUCTION: the fee floor is PARKED behind the phase's fired stopping rule (the
+  ledger enumerates the ruling questions), so the QA audits the park, never the floor.
+- The test-decisiveness agent's "the fee-floor test has a negative case" is N/A for the
+  same reason; the audit instead confirms no fee-floor code, test, or copy exists.

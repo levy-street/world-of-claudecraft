@@ -3785,11 +3785,15 @@ export const hudChromeStrings = {
     // masterwrought_materials.ts); the boss gate is per (dungeon,
     // difficulty), and only the raid has two eligible difficulties (dungeon
     // bosses pay on heroic alone), so the two sources are stated apart.
+    // One sentence per source (the tooltip standard); the rolled boss count
+    // goes to EVERY participant (never a shared drop), and the rift pair is
+    // mapped to its rank.
     wyrmfallCore:
-      'Masterwrought crafting catalyst. The raid final boss drops 1 to 3 once ' +
-      'per day on each difficulty, heroic dungeon final bosses drop 1 to 3 ' +
-      'once per day, your first A or S rank rift race win of the day grants ' +
-      '1 or 2, and the Heroic Quartermaster sells one for Heroic Marks.',
+      'Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to ' +
+      'each player once per day on each difficulty. Heroic dungeon final ' +
+      'bosses each drop 1 to 3 to each player once per day. Your first Rift ' +
+      'race win of the day grants 1 at A rank or 2 at S rank. The Heroic ' +
+      'Quartermaster sells one for Heroic Marks.',
   },
   discord: {
     title: 'Discord',
