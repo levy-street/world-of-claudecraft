@@ -129,6 +129,10 @@ export interface BattlegroundLightHooks {
   /** Called after the field pushes lights into, or splices them out of,
    *  `fireLights`, so the renderer can rebuild its light rank. */
   onFireLightsChanged?: () => void;
+  /** How each streamed part (terrain, wards, placements, grass, decals,
+   *  flames) joins the field group: the renderer attaches it hidden until its
+   *  programs link (battleground_views.ts). Default: a bare add. */
+  attachPart?: (part: THREE.Object3D, into: THREE.Group) => void;
 }
 
 /** Authored intensities are map units; the renderer's lights are much dimmer. */
@@ -329,6 +333,10 @@ export function buildBattleground(
   // who arrives mid-stream sees the field fill in rather than nothing at all.
   // Queue intent normally commits the prewarm first; reconnecting directly
   // into an active match deliberately takes this fail-soft streaming path.
+  const attach = (part: THREE.Object3D): void => {
+    if (opts.attachPart) opts.attachPart(part, group);
+    else group.add(part);
+  };
   void (async () => {
     try {
       const { bgFieldHeightLocal } = await import('../sim/battleground_field');
@@ -337,12 +345,12 @@ export function buildBattleground(
         terrain.dispose();
         return;
       }
-      group.add(terrain.group);
+      attach(terrain.group);
 
       // The wards go up with the ground: they are the visible half of rules the
       // sim already enforces, so they must not wait on the art stream.
       wards = buildBgWards();
-      group.add(wards.group);
+      attach(wards.group);
       if (pendingWard) wards.setState(pendingWard);
 
       placements = await buildBattlegroundPlacements(bgAssetGroups(), { lowGfx: opts.lowGfx });
@@ -350,17 +358,17 @@ export function buildBattleground(
         placements.dispose();
         return;
       }
-      group.add(placements.group);
+      attach(placements.group);
 
       const grass = buildGrass();
       if (grass) {
         owned.push(grass.geometry, grass.material as THREE.Material);
-        group.add(grass);
+        attach(grass);
       }
 
       for (const mesh of await buildDecals(bgFieldHeightLocal)) {
         owned.push(mesh.geometry, mesh.material as THREE.Material);
-        group.add(mesh);
+        attach(mesh);
       }
 
       // Fire: one Points draw per fixture family for the WHOLE field, animated
@@ -381,7 +389,7 @@ export function buildBattleground(
         });
         if (flames) {
           owned.push(flames.geometry, flames.material as THREE.Material);
-          group.add(flames);
+          attach(flames);
         }
       }
 

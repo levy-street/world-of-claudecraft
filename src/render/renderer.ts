@@ -10,8 +10,6 @@ import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
-  BG_SLOT_COUNT,
-  battlegroundOrigin,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -70,10 +68,15 @@ import { formatResidencyBudget, residencyBudget } from './assets/residency_budge
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
-import { type BattlegroundView, buildBattleground } from './battleground';
+import type { BattlegroundView } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
 import { updateBattlegroundOccluderFades } from './battleground_placements';
 import { buildBattlegroundObject } from './battleground_props';
+import {
+  type BattlegroundViewHost,
+  ensureBattlegroundViewNear,
+  prebuildBattlegroundView,
+} from './battleground_views';
 import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
 import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
@@ -4030,9 +4033,7 @@ export class Renderer {
     // frame. Registration into the fog-cull sweep is deferred to the reveal,
     // because updateZoneFeatureVisibility writes .visible every frame and
     // would flip the hidden group back on mid-compile.
-    const gate = this.asyncCompileSupported
-      ? (target: THREE.Object3D) => this.compileGate(target)
-      : undefined;
+    const gate = this.worldCompileGate();
     const attached = attachSceneGroupGated(this.scene, view.group, gate);
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
     // (fire_light_registry.ts carries the why).
@@ -7333,6 +7334,9 @@ export class Renderer {
         this.needleOfFateVfx.endCast(ev.entityId);
         break;
       }
+      case 'bgProposed':
+        prebuildBattlegroundView(this.bgViews, this.battlegroundViewHost());
+        break;
       case 'spellfx': {
         if (ev.fx === 'lichTransform') {
           if (!this.reducedMotion()) {
@@ -9357,37 +9361,12 @@ export class Renderer {
             lowGfx: this.lowGfx,
           });
           setRenderCategory(view.group, 'dungeon');
-          this.scene.add(view.group);
+          void attachSceneGroupGated(this.scene, view.group, this.worldCompileGate());
           this.yumiMazeViews.set(i, view);
         }
       }
     } else if (inside && isBgPos(px)) {
-      // build the Thornhollow Fields copy the player was matched into (the yumi
-      // view-map pattern; the field is static, so no per-frame update hook)
-      for (let i = 0; i < BG_SLOT_COUNT; i++) {
-        if (this.bgViews.has(i)) continue;
-        const o = battlegroundOrigin(i);
-        if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
-          // The field's authored point lights ride the shared fire-light budget
-          // (the yumi-maze hook shape above): the field streams in mid-session,
-          // and up to 14 lights appearing outside the rank would change the
-          // pinned visible point-light count and relink every lit material in
-          // view. The build is async, so the registration lands later; the
-          // callback marks the rank dirty whenever it does.
-          const view = buildBattleground(o, this.sim.cfg.seed, {
-            lowGfx: this.lowGfx,
-            // The raw registry on purpose: buildBgFieldLights already hides
-            // each light (battleground.ts) and its release path splices, which
-            // an append-only sink cannot express.
-            fireLights: this.fireLights,
-            onFireLightsChanged: () => {
-              this.lightRankDirty = true;
-            },
-          });
-          this.scene.add(view.group);
-          this.bgViews.set(i, view);
-        }
-      }
+      ensureBattlegroundViewNear(this.bgViews, px, pz, this.battlegroundViewHost());
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -9933,6 +9912,27 @@ export class Renderer {
   /** Drive the field wards off the live match view: the form-up gate while the
    *  countdown holds, and the grave ward while the player waits as a spirit.
    *  Only visibility flags, so this is cheap enough for the per-frame block. */
+  /** The gate a streamed world group attaches through; none without parallel compile. */
+  private worldCompileGate(): ((target: THREE.Object3D) => Promise<unknown>) | undefined {
+    return this.asyncCompileSupported ? (target) => this.compileGate(target) : undefined;
+  }
+
+  /** What battleground_views.ts needs to build and attach a field copy. Its lights
+   *  ride the shared fire-light budget (the raw registry on purpose: buildBgFieldLights
+   *  hides each light and its release splices); the async build marks the rank dirty. */
+  private battlegroundViewHost(): BattlegroundViewHost {
+    return {
+      scene: this.scene,
+      seed: this.sim.cfg.seed,
+      lowGfx: this.lowGfx,
+      fireLights: this.fireLights,
+      onFireLightsChanged: () => {
+        this.lightRankDirty = true;
+      },
+      attachPart: (part, into) => void attachSceneGroupGated(into, part, this.worldCompileGate()),
+    };
+  }
+
   private updateBgWards(): void {
     if (this.bgViews.size === 0) return;
     const match = this.sim.bgInfo?.match ?? null;

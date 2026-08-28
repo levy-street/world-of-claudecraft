@@ -725,8 +725,10 @@ describe('fire-light adoption sink', () => {
     const outsideBudget = renderer.replace(budget, '');
     const handoffs = [...outsideBudget.matchAll(/fireLights:\s*this\.fireLights\b/g)];
     expect(handoffs).toHaveLength(1);
-    const bgStart = outsideBudget.search(/const view =\s*buildBattleground\(/);
-    const bgEnd = outsideBudget.indexOf('this.scene.add(view.group);', bgStart);
+    // The handoff lives in the host the renderer hands battleground_views.ts,
+    // which builds the field copies (the branch itself was extracted).
+    const bgStart = outsideBudget.indexOf('private battlegroundViewHost(): BattlegroundViewHost {');
+    const bgEnd = outsideBudget.indexOf('attachPart:', bgStart);
     expect(bgStart).toBeGreaterThan(-1);
     expect(bgEnd).toBeGreaterThan(bgStart);
     expect(handoffs[0].index).toBeGreaterThan(bgStart);

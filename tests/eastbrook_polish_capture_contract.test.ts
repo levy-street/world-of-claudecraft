@@ -334,8 +334,11 @@ interface AttributionTargetFixture {
 // under programs.<id>, the painter gates on the cast readiness): renderer.ts
 // and prewarm_policy.ts both moved, the seals follow the swept evidence bytes.
 // No capture was retaken.
+// Re-minted for the gated battleground and yumi attaches (the field copies
+// moved to battleground_views.ts, the proposal prebuild): renderer.ts moved,
+// the seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'af5c6b0b6d1342fb311006fb77380dc907ec82a0b452b6ad922c7bce737b221e';
+  '015f8f4ae3b3bc7722126ea8ff0fdc4d1ba573c1a43eaec56eeb0d9ea84b8507';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
