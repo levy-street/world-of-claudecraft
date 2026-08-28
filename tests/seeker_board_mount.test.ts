@@ -125,6 +125,28 @@ describe('Seeker board wiring', () => {
     expect(def.yaw ?? 0).toBeCloseTo(-Math.PI / 2, 6);
   });
 
+  it('keeps its baked FX shells out of the shadow pass, by their real node names', () => {
+    // Six of the seven materials are alpha-blended emissive shells (the exhaust
+    // cloud and the light trail); the depth pass would draw them as solid blobs
+    // under a hovering board. The names must be nodes the GLB really carries,
+    // and every shell node must be named, or one still casts.
+    const json = glbJson(GLB) as { nodes?: { name?: string; mesh?: number }[] } & {
+      meshes?: { primitives: { material: number }[] }[];
+      materials?: { alphaMode?: string }[];
+    };
+    const blendedNodes = (json.nodes ?? [])
+      .filter((n) => n.mesh !== undefined)
+      .filter((n) =>
+        (json.meshes?.[n.mesh as number]?.primitives ?? []).some(
+          (p) => json.materials?.[p.material]?.alphaMode === 'BLEND',
+        ),
+      )
+      .map((n) => n.name)
+      .sort();
+    expect(blendedNodes.length).toBeGreaterThan(0);
+    expect([...(VISUALS.mount_seeker_board.noShadowNodes ?? [])].sort()).toEqual(blendedNodes);
+  });
+
   it('gives the board a jump clip without handing one to every other mount', () => {
     expect(VISUALS.mount_seeker_board.clips.jump).toBe('Jump');
     // MOUNT_RIGGED is shared by reference; editing it would hand a jump clip to

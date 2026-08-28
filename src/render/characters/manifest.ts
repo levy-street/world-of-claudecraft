@@ -95,6 +95,11 @@ export interface VisualDef {
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
+  /** Mesh nodes (by name) kept OUT of the shadow pass: authored FX shells such
+   *  as an additive exhaust cloud or a light trail, which the depth material
+   *  would otherwise draw as a solid blob under the rig. Everything else on a
+   *  rig casts. */
+  noShadowNodes?: readonly string[];
   attach?: AttachDef[];
   /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
    *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
@@ -1674,6 +1679,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // travels sideways on a board pointing across the direction of travel.
     yaw: -Math.PI / 2,
     clips: MOUNT_SEEKER,
+    // The exhaust cloud and the light trail are alpha-blended emissive shells
+    // baked into the rig (six of its seven materials); in the shadow pass they
+    // would read as solid blobs beneath a hovering board.
+    noShadowNodes: ['Cloud_FX', 'Trail_FX'],
     lazyPreload: true,
   },
   mount_aether_hover_cycle: {

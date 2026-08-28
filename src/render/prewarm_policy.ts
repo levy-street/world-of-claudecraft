@@ -44,9 +44,10 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * per-process memory ceiling) and must stay skipped. An id here is by
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
  *
- * vfx.mount-programs is deliberately NOT here. Its units force nine skinned
- * GLB rigs resident (roughly 10 MB of VRAM after KTX2 transcode, plus an
- * equal retained CPU copy, since `mounts` is exempt from mip release), and
+ * vfx.mount-programs is deliberately NOT here. Its units force ten skinned
+ * GLB rigs resident (roughly 12 MB of VRAM after KTX2 transcode, the Seeker
+ * board's two 1024-square textures being the newest share, plus an equal
+ * retained CPU copy, since `mounts` is exempt from mip release), and
  * those assets are lazyPreload precisely so they never weigh on a
  * constrained client's footprint. That is exactly the GPU-footprint reason
  * this list otherwise excludes an entry, and the iOS process-kill history in

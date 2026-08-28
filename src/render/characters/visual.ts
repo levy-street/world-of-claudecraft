@@ -816,12 +816,15 @@ export class CharacterVisual {
         // the halo is an unlit additive FX quad: keep it out of the caster list
         // or this sweep overwrites buildHalo's castShadow = false
         if (!mesh.isMesh || mesh.name === 'class_halo') return;
-        mesh.castShadow = true;
+        // Authored FX shells the manifest names (VisualDef.noShadowNodes) stay
+        // out of the shadow pass and the caster list; everything else casts.
+        const shadowless = this.def.noShadowNodes?.includes(mesh.name) === true;
+        mesh.castShadow = !shadowless;
         mesh.receiveShadow = false;
         // skinned bounds drift outside bind-pose spheres; entity-level culling
         // (80u draw range) already bounds the cost
         if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
-        this.casters.push(mesh);
+        if (!shadowless) this.casters.push(mesh);
       });
 
       // far LOD + shadow proxy share the baked idle-pose geometry per key. Skin
