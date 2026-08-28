@@ -3815,6 +3815,8 @@ export const cs_CZ: EnTranslations = {
       "wornChip": "Worn",
       "rowRank": "Rank {rank} of {ranks}",
       "rowPerfected": "Perfected",
+      "rankAnnounce": "Perfecting rank {rank} of {ranks} reached.",
+      "perfectedAnnounce": "{name} is now Perfected.",
       "rowPromoted": "Legendary",
       "attemptCost": "Attempt cost",
       "promoteCost": "Promotion cost",

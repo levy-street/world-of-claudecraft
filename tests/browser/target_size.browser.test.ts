@@ -8,7 +8,9 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+import { perfectingInfoFrom } from '../../src/sim/professions/perfecting';
 import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
+import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
 import { cleanup } from './_harness';
 
 const TOUCH_FLOOR = 40;
@@ -345,6 +347,49 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
       expectAtLeastFloor(node as HTMLElement, sel);
     }
     win.close();
+  });
+
+  it('perfecting window controls: candidate rows, the action button, close (real painter)', () => {
+    // The real painter under the real styles (the plant-sheet idiom). The
+    // window mints its own root, so it is queried by id after open. The stub
+    // is handed over `as never`, same trap as the plant sheet: it must carry
+    // every member buildView reads.
+    const world = {
+      equipment: { mainhand: 'duskforged_warblade' },
+      equipmentInstances: {},
+      inventory: [{ itemId: 'makers_ember', count: 1 }],
+      craftingIdentity: { synced: true },
+      craftSkills: { weaponcrafting: 125 },
+      perfectItem: () => {},
+      perfectingInfo(ref: unknown) {
+        return perfectingInfoFrom({
+          ref,
+          inventory: world.inventory,
+          equipment: world.equipment,
+          equipmentInstances: world.equipmentInstances,
+          craftSkills: world.craftSkills,
+        } as never);
+      },
+    };
+    const win = new PerfectingWindow({
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: () => {},
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    } as never);
+    win.open();
+    const root = document.getElementById('perfecting-window') as HTMLElement;
+    for (const sel of ['.pf-cand', '.pf-action', '[data-close]']) {
+      const node = root.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    win.close();
+    root.remove();
   });
 
   it('the per-use confirm dialog actions (R40 confirmToolEffectUse)', () => {

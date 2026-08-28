@@ -175,6 +175,34 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(root().textContent).toContain('Rank 2 of 4');
   });
 
+  it('announces a landed rank and the Perfected stamp through the persistent status region', () => {
+    const win = makeWindow();
+    win.open();
+    const live = root().querySelector('.pf-live-status') as HTMLElement;
+    expect(live.getAttribute('role')).toBe('status');
+    expect(live.textContent).toBe('');
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    world.inventory[0].count -= 1;
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
+    vi.advanceTimersByTime(1000);
+    // The SAME node persists across the repaint (a region that re-enters the
+    // tree drops or repeats its announcements) and carries a fresh span.
+    expect(root().querySelector('.pf-live-status')).toBe(live);
+    expect(live.textContent).toContain('rank 2 of 4');
+    expect(live.children.length).toBe(1);
+    // The Perfected flip outranks a same-frame rank line.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfected: true } };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).toContain('is now Perfected');
+    // A language switch clears the standing announcement (old-locale text).
+    win.relocalize();
+    expect(live.textContent).toBe('');
+    // Close clears it too, with the other latches.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 3 } };
+    win.close();
+    expect(live.textContent).toBe('');
+  });
+
   it('an unchanged world ticks without repainting (the signature gate)', () => {
     const win = makeWindow();
     win.open();

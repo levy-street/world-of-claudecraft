@@ -5480,6 +5480,11 @@ export const hudChromeStrings = {
     wornChip: 'Worn',
     rowRank: 'Rank {rank} of {ranks}',
     rowPerfected: 'Perfected',
+    // The status-region announcements (role=status beside the repaint shell):
+    // a landed rank and the Perfected stamp, for assistive tech; the track
+    // and lead lines carry the visible state.
+    rankAnnounce: 'Perfecting rank {rank} of {ranks} reached.',
+    perfectedAnnounce: '{name} is now Perfected.',
     rowPromoted: 'Legendary',
     attemptCost: 'Attempt cost',
     promoteCost: 'Promotion cost',

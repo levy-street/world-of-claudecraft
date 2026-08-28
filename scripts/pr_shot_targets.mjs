@@ -11239,7 +11239,11 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#perfecting-window');
       if (!open) return { skip: 'the perfecting window never opened (base checkout?)' };
+      // The staged skill crossing a tier pops the first-tier profession
+      // tutorial AFTER the entry flow's dismissal already ran; clear it
+      // before the shot (the naming target's precedent).
       await wait(400);
+      await dismissTutorialGreeting(page);
       // Mobile clips the whole HUD so the shot also proves the window fits
       // the 844x390 landscape viewport beside the touch cluster.
       return { clip: shot?.mobile ? '#ui' : '#perfecting-window' };

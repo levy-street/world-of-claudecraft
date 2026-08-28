@@ -121,7 +121,12 @@ export async function dismissEntryOverlays(page) {
           greetingUp,
         };
       })
-      .catch(() => ({ introUp: false, tutorialUp: false, cameraPromptUp: false, greetingUp: false }));
+      .catch(() => ({
+        introUp: false,
+        tutorialUp: false,
+        cameraPromptUp: false,
+        greetingUp: false,
+      }));
     // Hold at least three polls (~1.2s): the spawn greeting arrives on the
     // sim's own timer and a first quiet poll proves nothing about it.
     if (i >= 2 && !state.introUp && !state.tutorialUp && !state.cameraPromptUp && !state.greetingUp)

@@ -3815,6 +3815,8 @@ export const zh_CN: EnTranslations = {
       "wornChip": "已装备",
       "rowRank": "第{rank}阶，共{ranks}阶",
       "rowPerfected": "臻至完美",
+      "rankAnnounce": "完美化已达到第{rank}阶，共{ranks}阶。",
+      "perfectedAnnounce": "{name}已臻至完美。",
       "rowPromoted": "传说",
       "attemptCost": "尝试费用",
       "promoteCost": "晋升费用",

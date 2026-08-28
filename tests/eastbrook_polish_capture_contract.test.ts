@@ -467,8 +467,12 @@ interface AttributionTargetFixture {
 // the fully resolved tree, with renderer.ts, eastbrook_town.ts and
 // eastbrook_layout.ts as the drifted inputs), committed with exactly the
 // bytes it read. No capture was retaken.
+// Re-minted for the Masterwrought phase 14 farm-visuals prewarm guard: the
+// one-line renderer.ts change (prewarmWorldFrame gates the farm sync on the
+// world holding its own player) moved the runtimeRender renderer leaf; the
+// evidence seals were swept by the one-step re-mint. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ad463f06d9f597d8aed5b13cba23564161e09170e9cbb1dbee8a2ee5a54f67b1';
+  '01fcf59e411c88182484ac1b1a598db19f0633f61905f8f9331ef5c5a3bcce64';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

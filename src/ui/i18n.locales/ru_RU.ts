@@ -14467,6 +14467,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.wornChip': 'Надето',
   'hudChrome.perfecting.rowRank': 'Ранг {rank} из {ranks}',
   'hudChrome.perfecting.rowPerfected': 'Совершенство',
+  'hudChrome.perfecting.rankAnnounce': 'Достигнут ранг совершенствования {rank} из {ranks}.',
+  'hudChrome.perfecting.perfectedAnnounce': '{name}: предмет доведен до совершенства.',
   'hudChrome.perfecting.rowPromoted': 'Легендарный',
   'hudChrome.perfecting.attemptCost': 'Цена попытки',
   'hudChrome.perfecting.promoteCost': 'Цена возвышения',

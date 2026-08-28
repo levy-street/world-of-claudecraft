@@ -1157,9 +1157,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // eastbrook_layout.ts as the drifted inputs), committed with exactly the
 // bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a718525e4ed723cf4693d0a730191da33f0049455073704180be0cc4a931d507';
+  '339dc137a34b693f16d8bae229eb74394cf7ff0f1b15d251afb95855395d7e01';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'ad463f06d9f597d8aed5b13cba23564161e09170e9cbb1dbee8a2ee5a54f67b1';
+  '01fcf59e411c88182484ac1b1a598db19f0633f61905f8f9331ef5c5a3bcce64';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2382,7 +2382,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // 5bae1eef; the release literal stood in as a placeholder until the
       // re-mint below, computed LAST per REMINT_COMMAND on the merged working
       // tree. No capture was retaken.
-    ).toBe('407f758586fc6aeb86f388c4212cf3ae88aaeef2b6a56fa5f7d1a779b6760b73');
+      // Re-pinned for the Masterwrought phase 14 farm-visuals prewarm guard:
+      // the first-order composite follows renderer.ts, then this second-order
+      // performance seal follows the swept evidence bytes. No capture was
+      // retaken.
+    ).toBe('90cf6f2f10321c0d8553c5fb17a0e067b462831dfa7e55980d26523709754dbe');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

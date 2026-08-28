@@ -13968,6 +13968,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.wornChip': '已装备',
   'hudChrome.perfecting.rowRank': '第{rank}阶，共{ranks}阶',
   'hudChrome.perfecting.rowPerfected': '臻至完美',
+  'hudChrome.perfecting.rankAnnounce': '完美化已达到第{rank}阶，共{ranks}阶。',
+  'hudChrome.perfecting.perfectedAnnounce': '{name}已臻至完美。',
   'hudChrome.perfecting.rowPromoted': '传说',
   'hudChrome.perfecting.attemptCost': '尝试费用',
   'hudChrome.perfecting.promoteCost': '晋升费用',

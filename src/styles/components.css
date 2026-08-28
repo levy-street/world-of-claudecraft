@@ -10374,6 +10374,24 @@
      shape) on the 40px touch floor; every state pairs its tint with text
      (rank label, warning sentences), never color alone. Column-flex window
      family; .pf-body is the ONE scroller (the capped-flex rule). */
+  /* The repaint targets .pf-shell so the sibling role=status region is a
+     persistent node (the harvest journal's structural trick); display:
+     contents keeps the column-flex layout reading the shell's children as
+     the window's own. The status line is aria-only here (the rank track and
+     the Perfected lead already SHOW the state; the region announces it), so
+     it is clipped off-screen rather than painted, unlike .hj-live-status
+     whose text is the journal's visible status line. */
+  .pf-shell {
+    display: contents;
+  }
+  .pf-live-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   #perfecting-window {
     width: 460px;
     max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);

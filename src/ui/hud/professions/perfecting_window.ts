@@ -74,6 +74,8 @@ interface BuiltView {
 
 export class PerfectingWindow {
   private rootEl: HTMLElement | null = null;
+  private shellEl: HTMLElement | null = null;
+  private liveEl: HTMLElement | null = null;
   private openerFocus: HTMLElement | null = null;
   private selectedRef: PerfectItemRef | null = null;
   private paintedView: PerfectingViewModel | null = null;
@@ -103,15 +105,38 @@ export class PerfectingWindow {
   constructor(private readonly deps: PerfectingWindowDeps) {}
 
   /** The minted #perfecting-window root (the dev_command_window shape): no
-   *  markup entry ships it, so the first reach creates it. */
+   *  markup entry ships it, so the first reach creates it. The repaint
+   *  target is the inner .pf-shell (display: contents) so the LIVE REGION
+   *  beside it is a persistent node the innerHTML rewrite never destroys
+   *  (the harvest journal's structural trick: a region that leaves and
+   *  re-enters the tree drops or repeats its announcements). */
   private root(): HTMLElement {
     if (this.rootEl) return this.rootEl;
     const root = document.createElement('div');
     root.id = 'perfecting-window';
     root.className = 'window panel';
+    const shell = document.createElement('div');
+    shell.className = 'pf-shell';
+    const live = document.createElement('span');
+    live.className = 'pf-live-status';
+    live.setAttribute('role', 'status');
+    root.append(shell, live);
     (document.getElementById('ui') ?? document.body).appendChild(root);
     this.rootEl = root;
+    this.shellEl = shell;
+    this.liveEl = live;
     return root;
+  }
+
+  /** Announce a landed act through the persistent status region: a FRESH
+   *  child span per announcement (a byte-identical textContent write mutates
+   *  nothing and announces nothing; the journal's readyAnnounce shape). */
+  private announce(text: string): void {
+    if (!this.liveEl) return;
+    this.liveEl.textContent = '';
+    const line = document.createElement('span');
+    line.textContent = text;
+    this.liveEl.appendChild(line);
   }
 
   private setPendingSend(value: boolean): void {
@@ -168,7 +193,9 @@ export class PerfectingWindow {
     }
     this.setPendingSend(false);
     // Drop the session latches so a reopen never replays a stale edge (a
-    // rank advance that happened while closed is old news, not a cue).
+    // rank advance that happened while closed is old news, not a cue), and
+    // clear the standing announcement with them.
+    if (this.liveEl) this.liveEl.textContent = '';
     this.lastSig = '';
     this.lastSelectedSig = null;
     this.prevSelected = null;
@@ -181,7 +208,11 @@ export class PerfectingWindow {
    *  text-independent by design, so force exactly one rebuild (paint()
    *  re-latches the signature to the current state, never clears it). */
   relocalize(): void {
-    if (this.isOpen) this.paint();
+    if (!this.isOpen) return;
+    // The standing announcement was minted in the old locale; clear rather
+    // than re-announce (the journal's rule).
+    if (this.liveEl) this.liveEl.textContent = '';
+    this.paint();
   }
 
   /** The Hud's error-toast forward (the plant sheet precedent): the sim's
@@ -244,16 +275,31 @@ export class PerfectingWindow {
       // it) plays the cue exactly once; a later repaint can never replay it.
       if (detail.info.rank > prev.rank || (detail.info.perfected && !prev.perfected)) {
         audio.perfectingSuccess();
+        // The aria-live half of the flip (the farming-arm acceptance): the
+        // Perfected stamp outranks a same-frame rank line.
+        const def = ITEMS[detail.itemId];
+        const name = def ? itemDisplayName(def) : detail.itemId;
+        this.announce(
+          detail.info.perfected && !prev.perfected
+            ? t('hudChrome.perfecting.perfectedAnnounce', { name })
+            : t('hudChrome.perfecting.rankAnnounce', {
+                rank: wholeNumber(detail.info.rank),
+                ranks: wholeNumber(detail.info.ranks),
+              }),
+        );
       }
       if (detail.info.promoted && !prev.promoted) this.namingDialog?.dismiss();
     }
     this.selectedRef = detail?.ref ?? null;
     this.paintedView = view;
     const root = this.root();
+    const shell = this.shellEl ?? root;
     const scroller = root.querySelector<HTMLElement>('.pf-body');
     const scrollTop = scroller?.scrollTop ?? 0;
     const focusKey = captureFocusKey(root);
-    root.innerHTML =
+    // The rewrite targets the inner shell so the sibling live region never
+    // leaves the tree (see root()).
+    shell.innerHTML =
       `<div class="panel-title"><span id="perfecting-title">${esc(t('hudChrome.perfecting.title'))}</span>` +
       `<button type="button" class="x-btn" data-close data-focus-key="pfClose" aria-label="${esc(t('hudChrome.perfecting.close'))}" title="${esc(t('hudChrome.perfecting.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="pf-body">${this.bodyHtml(view)}</div>`;

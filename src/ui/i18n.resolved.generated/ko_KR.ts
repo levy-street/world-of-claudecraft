@@ -3815,6 +3815,8 @@ export const ko_KR: EnTranslations = {
       "wornChip": "착용 중",
       "rowRank": "{ranks}단계 중 {rank}단계",
       "rowPerfected": "완전함",
+      "rankAnnounce": "완전화 {ranks}단계 중 {rank}단계에 도달했습니다.",
+      "perfectedAnnounce": "{name}이(가) 완전해졌습니다.",
       "rowPromoted": "전설",
       "attemptCost": "시도 비용",
       "promoteCost": "승급 비용",

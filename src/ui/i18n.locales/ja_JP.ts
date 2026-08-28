@@ -14266,6 +14266,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.wornChip': '装備中',
   'hudChrome.perfecting.rowRank': 'ランク{rank}/{ranks}',
   'hudChrome.perfecting.rowPerfected': '完全化済み',
+  'hudChrome.perfecting.rankAnnounce': '完全化ランク{rank}/{ranks}に到達しました。',
+  'hudChrome.perfecting.perfectedAnnounce': '{name}は完全化されました。',
   'hudChrome.perfecting.rowPromoted': '伝説',
   'hudChrome.perfecting.attemptCost': '挑戦コスト',
   'hudChrome.perfecting.promoteCost': '昇格コスト',

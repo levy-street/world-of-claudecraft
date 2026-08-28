@@ -3815,6 +3815,8 @@ export const ja_JP: EnTranslations = {
       "wornChip": "装備中",
       "rowRank": "ランク{rank}/{ranks}",
       "rowPerfected": "完全化済み",
+      "rankAnnounce": "完全化ランク{rank}/{ranks}に到達しました。",
+      "perfectedAnnounce": "{name}は完全化されました。",
       "rowPromoted": "伝説",
       "attemptCost": "挑戦コスト",
       "promoteCost": "昇格コスト",

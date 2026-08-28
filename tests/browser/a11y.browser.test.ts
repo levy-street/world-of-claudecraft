@@ -15,6 +15,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
+import { PERFECTING_SKILL_REQ, perfectingInfoFrom } from '../../src/sim/professions/perfecting';
 import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
@@ -23,6 +24,7 @@ import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
 import { HarvestJournalWindow } from '../../src/ui/hud/professions/harvest_journal_window';
+import { PerfectingWindow } from '../../src/ui/hud/professions/perfecting_window';
 import { ProfessionsWindow } from '../../src/ui/hud/professions/professions_window';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
@@ -1295,6 +1297,77 @@ describe('axe: harvest journal rows and the ready status line', () => {
     expect(status?.textContent?.length ?? 0).toBeGreaterThan(0);
     await expectClean(root);
     win.close();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Perfecting window (#perfecting-window, Masterwrought phase 14): the
+// third holder of the farming a11y shapes (candidate radiogroup, aria-busy
+// send-once, the persistent role=status region beside the repaint shell) plus
+// the R2 bind warning. The window mints its own root, so no host() here.
+// ---------------------------------------------------------------------------
+
+describe('axe: perfecting window candidates, bind warning, and status region', () => {
+  it('the radiogroup, busy tree, and announcing tree all axe clean with real names', async () => {
+    // CAUTION: `as never` handover, same trap as the plant sheet stub: the
+    // stub must carry every member buildView reads (equipment,
+    // equipmentInstances, inventory, craftSkills, craftingIdentity,
+    // perfectingInfo, perfectItem) or the miss is a runtime throw here only.
+    const world = {
+      equipment: { mainhand: 'duskforged_warblade' },
+      equipmentInstances: {} as Record<string, unknown>,
+      inventory: [
+        { itemId: 'makers_ember', count: 2 },
+        { itemId: 'sundered_essence', count: 1 },
+        { itemId: 'prismglass_setting', count: 1 },
+      ],
+      craftingIdentity: { synced: true },
+      craftSkills: { weaponcrafting: PERFECTING_SKILL_REQ },
+      perfectItem: () => {},
+      perfectingInfo(ref: unknown) {
+        return perfectingInfoFrom({
+          ref,
+          inventory: world.inventory,
+          equipment: world.equipment,
+          equipmentInstances: world.equipmentInstances,
+          craftSkills: world.craftSkills,
+        } as never);
+      },
+    };
+    const win = new PerfectingWindow({
+      itemIcon: () => '<img class="icon" alt="">',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: () => {},
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    } as never);
+    win.open();
+    const root = document.getElementById('perfecting-window') as HTMLElement;
+    expect(root).not.toBeNull();
+    // The farming shapes, live: single-select radios in a title-named group,
+    // the bind warning present BEFORE any attempt, the status region empty.
+    const group = root.querySelector<HTMLElement>('[role="radiogroup"]');
+    expect(group?.getAttribute('aria-labelledby')).toBe('perfecting-title');
+    const cand = root.querySelector<HTMLButtonElement>('.pf-cand');
+    expect(cand?.getAttribute('role')).toBe('radio');
+    expect(cand?.getAttribute('aria-checked')).toBe('true');
+    expect(root.querySelector('.pf-warning')).not.toBeNull();
+    const live = root.querySelector<HTMLElement>('.pf-live-status');
+    expect(live?.getAttribute('role')).toBe('status');
+    await expectClean(root);
+    // The armed send reports aria-busy on the dialog; the busy tree still
+    // axes clean. (The bind confirm's prompt path needs #prompt-stack, which
+    // this harness does not mount; the busy arm is driven on the bound copy.)
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
+    win.relocalize();
+    (root.querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    await expectClean(root);
+    win.close();
+    root.remove();
   });
 });
 

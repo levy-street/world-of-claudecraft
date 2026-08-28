@@ -3815,6 +3815,8 @@ export const en_XA: EnTranslations = {
       "wornChip": "[Ŵóŕñ]",
       "rowRank": "[Ŕáñķ {rank} óƒ {ranks}]",
       "rowPerfected": "[Þéŕƒéçţéð]",
+      "rankAnnounce": "[Þéŕƒéçţíñĝ ŕáñķ {rank} óƒ {ranks} ŕéáçĥéð.]",
+      "perfectedAnnounce": "[{name} íš ñóŵ Þéŕƒéçţéð.]",
       "rowPromoted": "[Ļéĝéñðáŕý]",
       "attemptCost": "[Áţţéɱþţ çóšţ]",
       "promoteCost": "[Þŕóɱóţíóñ çóšţ]",

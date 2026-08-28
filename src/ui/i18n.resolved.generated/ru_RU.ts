@@ -3815,6 +3815,8 @@ export const ru_RU: EnTranslations = {
       "wornChip": "Надето",
       "rowRank": "Ранг {rank} из {ranks}",
       "rowPerfected": "Совершенство",
+      "rankAnnounce": "Достигнут ранг совершенствования {rank} из {ranks}.",
+      "perfectedAnnounce": "{name}: предмет доведен до совершенства.",
       "rowPromoted": "Легендарный",
       "attemptCost": "Цена попытки",
       "promoteCost": "Цена возвышения",
