@@ -46,15 +46,21 @@ describe('the professions log tones are named once', () => {
     // suddenly sees almost nothing is a broken walk, not a clean family.
     expect(files.length).toBeGreaterThan(20);
     for (const { file, full } of files) {
-      const src = stripComments(readFileSync(full, 'utf8'));
+      // Lowercased: '#7FDC4F' is CSS-equivalent to '#7fdc4f' and renders
+      // identically, so a case-sensitive scan lets an uppercase re-spell
+      // escape (the tone literals themselves are all lowercase).
+      const src = stripComments(readFileSync(full, 'utf8')).toLowerCase();
       for (const tone of TONES) {
         expect(src, `${file} must import the tone, not spell ${tone}`).not.toContain(tone);
       }
     }
   });
 
-  it('positive control: the scan sees a literal it is given', () => {
+  it('positive control: the scan sees a literal it is given (either case)', () => {
     expect(stripComments(`const c = '${PROF_LOG_GRANT}';`)).toContain(PROF_LOG_GRANT);
+    expect(stripComments(`const c = '${PROF_LOG_GRANT.toUpperCase()}';`).toLowerCase()).toContain(
+      PROF_LOG_GRANT,
+    );
     expect(stripComments(`// ${PROF_LOG_GRANT}\nconst c = 1;`)).not.toContain(PROF_LOG_GRANT);
   });
 

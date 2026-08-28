@@ -148,6 +148,11 @@ describe('the Hud glue between the funnel and the sheet', () => {
   it('forwards every error toast to the window (the dead/busy re-arm)', () => {
     const block = sliceOnce(stripped, "case 'error': {", 'break;');
     expect(block).toContain('.plantSheetWindow.notifyErrorToast(');
+    // The Perfecting twin (phase 14): a refused attempt answers through
+    // ctx.error and moves no mirror, so without this forward pendingSend
+    // never clears and the action button silently swallows every later
+    // click until the window is reopened.
+    expect(block).toContain('.perfectingWindow.notifyErrorToast(');
   });
 
   // The guard list left hud.ts at the v0.40.0 sync of release tip 35a6481825

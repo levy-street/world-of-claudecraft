@@ -15,6 +15,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  ROD_RECIPES,
 } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -63,6 +64,24 @@ describe('apexRecipePresentation (content-derived, never invented)', () => {
 
   it('the apex floor matches the authored tier', () => {
     expect(GEAR.skillReq).toBe(APEX_TIER_SKILL_REQ);
+  });
+
+  it('the rod membership arm fires on its own (the defense-in-depth disjunct, pinned direct)', () => {
+    // The live caller always passes the recipe's own skillReq, which for
+    // every apex rod already clears the tier floor, so through the wrapper
+    // this disjunct can never decide the outcome (the same-predicate class).
+    // Pin it DIRECTLY at a sub-tier skillReq so deleting the arm reds: it is
+    // the guard for a future caller that resolves skillReq differently (a
+    // discounted or scaled rung).
+    const apexRod = ROD_RECIPES.find((r) => r.skillReq >= APEX_TIER_SKILL_REQ);
+    expect(apexRod).toBeDefined();
+    const viaRodSet = apexRecipePresentation(apexRod!.id, apexRod!.resultItemId, 1);
+    expect(viaRodSet.apex).toBe(true);
+    // And the set really is selective: a sub-tier rod stays plain.
+    const plainRod = ROD_RECIPES.find((r) => r.skillReq < APEX_TIER_SKILL_REQ);
+    if (plainRod) {
+      expect(apexRecipePresentation(plainRod.id, plainRod.resultItemId, 1).apex).toBe(false);
+    }
   });
 });
 
@@ -123,10 +142,20 @@ describe('the painter affordances', () => {
     const link = el.querySelector('.crafting-perfecting-link') as HTMLButtonElement;
     // Outside the craft button (nested-interactive is the axe violation).
     expect(link.closest('.crafting-recipe-btn')).toBeNull();
-    // WCAG 2.5.3: the accessible name contains the visible label.
+    // WCAG 2.5.3: the accessible name contains the visible label. The
+    // truthiness guard keeps the containment check from passing vacuously
+    // over an empty label (''.includes('') is true).
+    expect(link.textContent).toBeTruthy();
     expect(link.getAttribute('aria-label')).toContain(link.textContent);
     link.click();
     expect(onOpenPerfecting).toHaveBeenCalledTimes(1);
+  });
+
+  it('an apex ARMOR row renders the rift provenance line (the third channel at the painter)', () => {
+    // raid and vendor each had a painter case; a broken rift line-key
+    // mapping surfaced only in the pure-core test until this arm.
+    const el = paint([ARMOR], { onOpenPerfecting: vi.fn() });
+    expect((el.querySelector('.crafting-apex-line') as HTMLElement).textContent).toMatch(/rift/i);
   });
 
   it('an apex non-gear row hints its channel but never links to Perfecting', () => {

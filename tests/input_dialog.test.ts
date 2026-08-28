@@ -134,3 +134,52 @@ describe('the recorded gap fixes', () => {
     expect(onOk).toHaveBeenCalledWith('x');
   });
 });
+
+describe('the previously unpinned arms (the phase 14 QA)', () => {
+  it('the copy affordance selects the value and confirms through showError', () => {
+    const deps = makeDeps();
+    const select = vi.spyOn(HTMLInputElement.prototype, 'select');
+    showInputDialog(deps, { title: 'Export', value: 'BUILD:abc', copy: true });
+    const copy = el().querySelector('[data-copy]') as HTMLButtonElement;
+    expect(copy).not.toBeNull();
+    copy.click();
+    // The manual-select fallback runs whether or not a clipboard exists
+    // (happy-dom has none; the `?.` guard is the contract), and the player
+    // hears the confirmation either way.
+    expect(select).toHaveBeenCalled();
+    expect(deps.calls.some((entry) => entry.startsWith('error:'))).toBe(true);
+    // No copy option: no button.
+    showInputDialog(makeDeps(), { title: 'T' });
+    expect(el().querySelector('[data-copy]')).toBeNull();
+  });
+
+  it('readOnly and selectText both pre-select the field for the take-this-value flow', () => {
+    const select = vi.spyOn(HTMLInputElement.prototype, 'select');
+    showInputDialog(makeDeps(), { title: 'T', value: 'v', readOnly: true });
+    expect((el().querySelector('.cd-input') as HTMLInputElement).readOnly).toBe(true);
+    expect(select).toHaveBeenCalledTimes(1);
+    showInputDialog(makeDeps(), { title: 'T', value: 'v', selectText: true });
+    expect(select).toHaveBeenCalledTimes(2);
+    // Neither flag: focused but not selected.
+    showInputDialog(makeDeps(), { title: 'T', value: 'v' });
+    expect(select).toHaveBeenCalledTimes(2);
+  });
+
+  it('every interpolated string passes esc: a hostile value cannot break out of the markup', () => {
+    // The export/import callers round-trip PASTED build strings through the
+    // value field, so this arm carries real weight (the repo invariant:
+    // every interpolation through esc()).
+    showInputDialog(makeDeps(), {
+      title: '<i>T</i>',
+      label: '<u>L</u>',
+      placeholder: '<b>P</b>',
+      value: '"><img src=x>',
+    });
+    expect(el().querySelector('img')).toBeNull();
+    expect(el().querySelector('i')).toBeNull();
+    expect(el().querySelector('u')).toBeNull();
+    expect(el().querySelector('b')).toBeNull();
+    expect(document.getElementById('confirm-dialog-title')?.textContent).toBe('<i>T</i>');
+    expect((el().querySelector('.cd-input') as HTMLInputElement).value).toBe('"><img src=x>');
+  });
+});

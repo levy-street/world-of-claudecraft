@@ -52,4 +52,18 @@ describe('feedRealmCalendar', () => {
     expect(after.dailyResetRemainingSec).toBe(24 * 3600);
     expect(before.resetDay).not.toBe(after.resetDay);
   });
+
+  it('utcDay and resetDay stay distinct feeds (an instant where the two keys differ)', () => {
+    // At the first probe above, the ISO day and the reset-window key happen
+    // to agree in both probed zones, so `utcDay = resetDayKey(...)` survived
+    // the suite. Just before the 03:00 local reset the calendar date has
+    // rolled but the reset window has not: the two keys MUST differ here,
+    // which makes a swap in either direction red.
+    const nowMs = Date.UTC(2025, 5, 30, 6, 59, 59); // 02:59:59 EDT on the 30th
+    const sink = freshSink();
+    feedRealmCalendar(sink, nowMs, DEFAULT_RAID_RESET_TIME_ZONE);
+    expect(sink.utcDay).toBe('2025-06-30');
+    expect(sink.resetDay).toBe(resetDayKey(nowMs, DEFAULT_RAID_RESET_TIME_ZONE));
+    expect(sink.resetDay).not.toBe(sink.utcDay);
+  });
 });

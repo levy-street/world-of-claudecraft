@@ -1029,31 +1029,99 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
 });
 
 describe('char_window: the Masterwrought cap visibility family (phase 14)', () => {
-  it('the slots readout renders through the pure core and hides at zero worn', () => {
-    // The sheet-side readout resolves used/cap through masterwroughtCapReadout
-    // (the same flag walk the equip refusal runs, pinned equivalent in
-    // tests/masterwrought_cap_view.test.ts), never a hand count, and the row
-    // is skipped entirely when the readout is null (nothing worn).
-    expect(painter).toContain("import { masterwroughtCapReadout } from './masterwrought_cap_view'");
-    const readout = painter.slice(painter.indexOf('private masterwroughtSlotsHtml'));
-    expect(readout).toContain('masterwroughtCapReadout(world.equipment, ITEMS)');
-    expect(readout).toContain("if (!readout) return ''");
-    expect(painter).toContain('hudChrome.masterwrought.slotsLabel');
-    expect(painter).toContain('hudChrome.masterwrought.slotsValue');
+  // Behavioral: the real CharWindow rendered over happy-dom, replacing the
+  // raw-source pins that a comment quoting the line would have satisfied
+  // (the source-text pin trap; the sibling describe above strips comments
+  // for exactly that reason, and these had not).
+  type SheetWorld = { equipment: Record<string, string> };
+  function renderSheet(equipment: Record<string, string>) {
+    const root = document.createElement('div');
+    const tips: Array<{ el: Element; resolve: () => string }> = [];
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment,
+      equipmentInstances: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      professionsState: { skills: [] },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => true,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => 'deftip',
+      attachTooltip: (el: Element, resolve: () => string) => tips.push({ el, resolve }),
+    });
+    win.render();
+    return { root, tips, world: world as SheetWorld };
+  }
+
+  it('the slots row shows the live used count and hides entirely at zero worn', () => {
+    // Zero worn: no row at all (before endgame the cap never binds, and a
+    // standing "0 / 2" row would be noise on every sheet).
+    expect(renderSheet({}).root.querySelector('.char-mw-slots')).toBeNull();
+    // One worn, then two: the value tracks the flag walk, so a hand count
+    // that drifts from masterwroughtCapReadout reds here.
+    const one = renderSheet({ mainhand: 'duskforged_warblade' });
+    expect(one.root.querySelector('.char-mw-slots-value')?.textContent).toContain('1');
+    const two = renderSheet({ mainhand: 'duskforged_warblade', offhand: 'duskforged_bulwark' });
+    expect(two.root.querySelector('.char-mw-slots-value')?.textContent).toContain('2');
+    expect(two.root.querySelector('.char-mw-slots-label')?.textContent?.length).toBeGreaterThan(0);
   });
 
-  it('the worn-piece diamond carries its localized name, gated on the def flag', () => {
-    expect(painter).toContain('item?.masterwrought');
-    expect(painter).toContain('equip-mw-chip');
-    expect(painter).toContain('hudChrome.masterwrought.pieceMark');
+  it('the worn-piece diamond renders on the flagged slot only, with an accessible name', () => {
+    const { root } = renderSheet({ mainhand: 'duskforged_warblade' });
+    const chips = [...root.querySelectorAll('.equip-mw-chip')];
+    expect(chips.length).toBe(1);
+    const chip = chips[0] as HTMLElement;
+    expect(chip.closest('#equip-slot-mainhand')).not.toBeNull();
+    expect(chip.getAttribute('role')).toBe('img');
+    expect(chip.getAttribute('aria-label')?.length).toBeGreaterThan(0);
   });
 
   it('the worn tooltip adds the occupies-a-slot line with the LIVE count at hover time', () => {
-    // Resolved inside the attachTooltip closure (item.masterwrought gate),
-    // so a re-equip between hovers re-reads the world rather than a stale
-    // render-time count.
-    expect(painter).toContain('hudChrome.masterwrought.tooltipWorn');
-    const closure = painter.slice(painter.indexOf('const readout = item.masterwrought'));
-    expect(closure).toContain('masterwroughtCapReadout(world.equipment, ITEMS)');
+    const { root, tips, world } = renderSheet({ mainhand: 'duskforged_warblade' });
+    const row = root.querySelector('#equip-slot-mainhand') as Element;
+    const tip = tips.find((entry) => entry.el === row);
+    expect(tip).toBeDefined();
+    const atOne = tip!.resolve();
+    expect(atOne).toContain('deftip');
+    expect(atOne).toContain('1');
+    // The count resolves inside the closure, off the LIVE world: equipping a
+    // second piece between hovers moves the line with no re-render (an eager
+    // render-time count would serve the stale "1 of 2" byte-identically).
+    world.equipment.offhand = 'duskforged_bulwark';
+    const atTwo = tip!.resolve();
+    expect(atTwo).not.toBe(atOne);
+    expect(atTwo).toContain('2');
   });
 });

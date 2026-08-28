@@ -312,6 +312,40 @@ describe('the value signatures (the 1 Hz clock and the send-answer edge)', () =>
       perfectingInfoSignature(r2.detail?.info ?? null),
     );
   });
+
+  // Every digested field moves the signature IN ISOLATION. Only rank and the
+  // material rows had a moving case above, so dropping any other term
+  // (skillMet: a skill-up never re-enables the action; equipBlocked: the
+  // promote button stuck in the wrong state; bound: the bind warning
+  // outliving the bind) survived the suite.
+  const SIG_BASE = {
+    itemId: 'duskforged_warblade',
+    rank: 1,
+    ranks: 4,
+    perfected: false,
+    promoted: false,
+    craftId: 'craft_duskforged_warblade',
+    skillReq: 250,
+    skillMet: true,
+    bound: true,
+    equipBlocked: false,
+    materials: [{ itemId: 'makers_ember', required: 1, have: 2 }],
+  };
+  const SIG_FLIPS: Array<[string, Partial<PerfectingInfoView>]> = [
+    ['itemId', { itemId: 'wyrmfall_pendant' }],
+    ['rank', { rank: 2 }],
+    ['ranks', { ranks: 5 }],
+    ['perfected', { perfected: true }],
+    ['promoted', { promoted: true }],
+    ['bound', { bound: false }],
+    ['equipBlocked', { equipBlocked: true }],
+    ['skillMet', { skillMet: false }],
+    ['materials', { materials: [{ itemId: 'makers_ember', required: 1, have: 1 }] }],
+  ];
+  it.each(SIG_FLIPS)('flipping %s alone moves the info signature', (_field, patch) => {
+    const moved: PerfectingInfoView = { ...SIG_BASE, ...patch };
+    expect(perfectingInfoSignature(moved)).not.toBe(perfectingInfoSignature(SIG_BASE));
+  });
 });
 
 describe('samePerfectRef', () => {

@@ -138,6 +138,29 @@ describe('online ClientWorld host', () => {
     expect(client.lastCraftResult?.ok).toBe(true);
     expect(client.lastCraftResult?.masterwork).toBeUndefined();
   });
+
+  it('the mirror strips retryAfterSeconds like the sim store (D14-3, the online half)', () => {
+    // The event-only countdown: the EVENT carries retryAfterSeconds on the
+    // daily_limit refusal, but the session mirror must match CraftResultView
+    // on BOTH hosts (D14-3), and the sim host's storedCraftResult strip has
+    // its own pin (tests/quickening_catalyst_gate.test.ts). Online the strip
+    // is only the fresh allowlist literal in applyCraftResultEvent, which a
+    // refactor to a spread or a helper-built object escapes silently: this
+    // runtime pin is the two-host half of the claim.
+    const client = bareClient();
+    feed(client, {
+      type: 'craftResult',
+      ok: false,
+      reason: 'daily_limit',
+      recipeId: RECIPE_ID,
+      retryAfterSeconds: 4321,
+      pid: 7,
+    });
+    expect(client.lastCraftResult?.ok).toBe(false);
+    expect(client.lastCraftResult?.reason).toBe('daily_limit');
+    // Key-absence, not just undefined: the parity claim is the SHAPE.
+    expect('retryAfterSeconds' in (client.lastCraftResult ?? {})).toBe(false);
+  });
 });
 
 describe('host parity', () => {
