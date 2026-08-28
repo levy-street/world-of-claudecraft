@@ -35,6 +35,7 @@ const entrySource = `
   export { WEAPON_SKINS } from './src/sim/content/weapon_skins.ts';
   export { armorySkinStrings } from './src/ui/i18n.catalog/armory.ts';
   export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
+  export { hudChromeStrings } from './src/ui/i18n.catalog/hud_chrome.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
@@ -121,6 +122,7 @@ const {
   WEAPON_SKINS,
   armorySkinStrings,
   guideStrings,
+  hudChromeStrings,
   VISUALS,
   visualKeyFor,
   FISHING_SESSION_CAP_SEC,
@@ -574,9 +576,19 @@ function reliquaryRelicName(relic) {
     return name;
   }
   if (relic.kind === 'mount') {
-    const def = MOUNTS[relic.mountId];
-    if (!def) throw new Error(`reliquary wiki emit: unknown mount ${relic.mountId}`);
-    return def.name;
+    if (!MOUNTS[relic.mountId]) {
+      throw new Error(`reliquary wiki emit: unknown mount ${relic.mountId}`);
+    }
+    // The catalog English, not the raw sim name: every in-game surface resolves
+    // a mount through hudChrome.mounts.name_<key> (src/ui/mount_labels.ts), and
+    // the two can differ on purpose (the sim may not carry a brand word the
+    // architecture guard bans, so seeker_board is "Seeker Board" there and
+    // "Solana Seeker" everywhere a player reads it). Pinned by tests/guide.test.ts.
+    const name = hudChromeStrings.mounts?.[`name_${relic.mountId}`];
+    if (typeof name !== 'string' || !name) {
+      throw new Error(`reliquary wiki emit: missing English name for mount ${relic.mountId}`);
+    }
+    return name;
   }
   if (relic.kind === 'weapon_skin') {
     if (!WEAPON_SKINS[relic.skinId]) {

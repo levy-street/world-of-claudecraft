@@ -297,7 +297,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // shelf is the third pending slot (QA ruling 2026-08-07).
 //
 // seeker_board is awarded by no in-game table either, but it is NOT pending:
-// its door is the Seeker Genesis Token claim, a server-side grant recorded as
+// its door is the Seeker Genesis Token claim, a server-side grant hinted as
 // the seeker_genesis_claim activity (RELIQUARY_ACTIVITY_SOURCE_IDS).
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
@@ -1317,13 +1317,15 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Seven of the nine mounts name every door that awards their reins (see
+    // Eight of the ten mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
-    // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
-    // pending ruling that used to cover all nine is executed; the two that
-    // remain (drakemaw_raptor, terrorspark_groundshaker) are content gaps, not
-    // vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
+    // reins are Rift-only, valorsteed is Marla's counter, and seeker_board
+    // names the Seeker Genesis Token claim (its server-side grant is the
+    // seeker_genesis_claim activity). The page-wide pending ruling that used
+    // to cover all of them is executed; the two that remain (drakemaw_raptor,
+    // terrorspark_groundshaker) are content gaps, not vocabulary gaps, and
+    // stay hand-listed in SOURCE_PENDING_RULING.
     relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },
   {

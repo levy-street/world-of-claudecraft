@@ -54,7 +54,7 @@ import {
   SEEKER_REINS_ITEM_ID,
 } from '../../server/seeker_mount_grant';
 import { ITEMS } from '../../src/sim/data';
-import { mountOwned } from '../../src/sim/mounts';
+import { mountItemId, mountOwned } from '../../src/sim/mounts';
 import { Sim } from '../../src/sim/sim';
 
 function fakeWs() {
@@ -76,6 +76,10 @@ describe('grantSeekerBoardIfMissing (the pure grant)', () => {
     // The guard reads mountOwned, which only holds if the reins can never be
     // anywhere but this character's bags or bank: every transfer and destroy
     // rail is closed at the item layer.
+    // Literal on purpose: the export derives from the catalog so the grant and
+    // the guard agree, and this line keeps that derivation honest.
+    expect(SEEKER_REINS_ITEM_ID).toBe('reins_seeker_board');
+    expect(mountItemId(SEEKER_MOUNT_KEY)).toBe(SEEKER_REINS_ITEM_ID);
     const reins = ITEMS[SEEKER_REINS_ITEM_ID];
     expect(reins).toMatchObject({
       kind: 'mount',

@@ -1434,8 +1434,13 @@ export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>>
  * engineering recipe can proc a masterwork, so the slot is catalogued but
  * unwritable) and the two SOURCE_PENDING_RULING mounts (reins_drakemaw_raptor
  * has no acquisition path in content; reins_terrorspark_groundshaker is
- * dev-grant only). All three are owner decisions outside this packet; the
- * capstone becomes earnable with NO code change here once they all land.
+ * dev-grant only). All three are owner decisions outside this packet; once
+ * they land, the capstone needs NO code change here to become earnable, but
+ * a FOURTH slot then gates it: the seeker_board mount on horizons_mounts is
+ * hinted (the Seeker Genesis Token claim, server/seeker_mount_grant.ts) and
+ * scores like every other mount, so only a Seeker holder can complete the
+ * catalog. Same regime as the store-gated horizons_weapon_skins page, which
+ * also scores; excluding the slot would be an owner ruling, not a default.
  * Tests may still reach owned === total by granting marks and reins directly.
  * The deed carries feat: true so this pending window can never dead-end
  * feat_book_complete (see the record's comment in content/deeds.ts).

@@ -23,11 +23,14 @@
 //   configureSeekerEntitlementRuntime): the native player who just
 //   auto-claimed is already in the world, so the reins land in their live
 //   session instead of waiting for a relog.
-import { mountOwned } from '../src/sim/mounts';
+import { mountItemId, mountOwned } from '../src/sim/mounts';
 import type { Sim } from '../src/sim/sim';
 
 export const SEEKER_MOUNT_KEY = 'seeker_board';
-export const SEEKER_REINS_ITEM_ID = 'reins_seeker_board';
+/** The reins the catalog binds to the mount, resolved through the same seam
+ *  the ownership guard reads (mountItemId), so the grant can never write a
+ *  different id than mountOwned looks for. Pinned to the literal by test. */
+export const SEEKER_REINS_ITEM_ID = mountItemId(SEEKER_MOUNT_KEY) ?? 'reins_seeker_board';
 
 /** Hand the character the Seeker board reins unless it already owns them.
  *  Ownership is bags OR bank: a banked reins still counts, and re-granting
