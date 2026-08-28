@@ -134,6 +134,11 @@ export class MarketWindow {
   // needs to land once the server's async echo catches up, via a narrow
   // DOM-only patch. See refreshSellPriceRef.
   private lastSellPriceRefSig = '';
+  // The Sell tab's slot-counter state (issue 3698): the listing cap is its own
+  // async echo axis, tracked separately from the price ref so the counter lands
+  // once the server echoes the new myListingCount without clobbering the form.
+  private lastMyListingCount = -1;
+  private lastMaxListings = -1;
   private openerFocus: HTMLElement | null = null;
   // Armed by onReconnected() and cleared by the next refreshIfChanged() that
   // actually observes a post-reconnect MarketInfo. onReconnected() fires
@@ -286,14 +291,15 @@ export class MarketWindow {
 
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so the general rebuild below never
-  // touches it; its one async surface, the price reference (issue 3043), gets
-  // its own narrow patch instead (refreshSellPriceRef).
+  // touches it; its async surfaces (the price reference, the slot counter) get
+  // their own narrow patches instead (refreshSellPriceRef, refreshSellNote).
   refreshIfChanged(): void {
     if (!this.opened) return;
     const info = this.deps.world().marketInfo;
     this.resolvePendingReconnectResync(info);
     if (this.tab === 'sell') {
       this.refreshSellPriceRef(info);
+      this.refreshSellNote(info);
       return;
     }
     const sig = JSON.stringify([
@@ -340,6 +346,28 @@ export class MarketWindow {
           : t('itemUi.market.collect');
     }
     this.renderContent();
+  }
+
+  // The Sell tab's slot-counter echo (issue 3698), patched independently of
+  // the general per-frame rebuild above: the rest of the Sell tab holds typed
+  // quantity/price inputs a rebuild would clobber, but the server-round-tripped
+  // listing count still needs to land without the player taking another action.
+  // Touches only the .mkt-note node renderSell mints, never the form itself.
+  private refreshSellNote(info: MarketInfo | null): void {
+    if (!info) return;
+    if (info.myListingCount === this.lastMyListingCount && info.maxListings === this.lastMaxListings) return;
+    this.lastMyListingCount = info.myListingCount;
+    this.lastMaxListings = info.maxListings;
+    const body = this.deps.root().querySelector<HTMLElement>('#market-body');
+    const note = body?.querySelector<HTMLElement>('.mkt-note');
+    if (!note) return;
+    note.innerHTML = esc(
+      t('itemUi.market.sellNote', {
+        cut: formatNumber(info.cutPct, { maximumFractionDigits: 0 }),
+        used: formatNumber(info.myListingCount, { maximumFractionDigits: 0 }),
+        max: formatNumber(info.maxListings, { maximumFractionDigits: 0 }),
+      }),
+    );
   }
 
   // The Sell tab's price-reference echo (issue 3043), patched independently of
