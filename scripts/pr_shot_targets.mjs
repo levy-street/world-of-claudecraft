@@ -11185,6 +11185,32 @@ export const TARGETS = [
     },
   },
   {
+    // Masterwrought phase 14: the character sheet's cap visibility over a
+    // worn at-cap pair (warblade + bulwark, both masterwrought): the
+    // "Masterwrought slots: 2 / 2" row, the per-slot marks, and the worn
+    // tooltip line all read from the same masterwrought_cap_view readout.
+    key: 'masterwrought-cap',
+    label: 'The character sheet at the Masterwrought equip cap (phase 14)',
+    when: ['ui/masterwrought_cap_view'],
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        g?.sim?.setPlayerLevel?.(30);
+        g?.sim?.addItem?.('duskforged_warblade', 1);
+        g?.sim?.addItem?.('duskforged_bulwark', 1);
+        g?.sim?.equipItem?.('duskforged_warblade');
+        g?.sim?.equipItem?.('duskforged_bulwark');
+        g?.hud?.toggleChar?.();
+      });
+      const open = await pollForSize(page, '#char-window');
+      if (!open) return { skip: 'the character window never opened' };
+      await wait(400);
+      return { clip: '#char-window' };
+    },
+  },
+  {
     // Masterwrought phase 14: the Perfecting window over a bagged apex piece
     // with the attempt bill in reach, so the shot carries the candidate
     // radiogroup, the shared prof-track rank track, the materials rows, and

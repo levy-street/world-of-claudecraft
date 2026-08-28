@@ -20123,3 +20123,311 @@ names) audited through five fresh-reader rounds to convergence with every
 finding applied or recorded; the frozen suite is green at f9eed89385 with
 the drift attributed exactly. Phase 14 builds on this tip; the judged
 lists above and the standing sets are binding.
+
+## Phase 14 ledger (2026-08-28, the crafting UX beauty pass)
+
+STATUS: COMPLETE (one stopping rule FIRED and its arm parked, below).
+LOCAL, no push, no PR. DESIGN.md governed. Built as the phase file's
+three-agent fan-out with the farming arm folded per step, plus a fourth
+unification slice; five fresh reviewers plus the render reviewer over
+the build; a fresh reader over the fix round; every finding applied or
+recorded, none dropped.
+
+### STEP 0
+Clean at 6bf465acab (the Phase 13 QA docs stamp; frozen code tip
+f9eed89385). origin/release/v0.41.0 refetched: still cb10309ba6, already
+an ancestor, so no merge and no release-merge-audit owed; no newer
+release branch exists. Memory scan per the phase file plus the trap
+catalogs; all four ledgers' judged lists read end to end. The live
+monolith ceilings verified against the prompt's supersessions (hud.ts
+18242 exact; the 11d-U6-PAYBACK 19445 target long met; the live
+obligation = never grow).
+
+### THE STOP RULE FIRED: the commission minimum-fee floor is PARKED
+The research line (brainstorm.md, "WoW public orders: no quality
+signal, no fee floor: the commission UX phase adds both") names the
+feature, but no record anywhere gives the floor's value or basis, and a
+fee's transfer mechanics collide with the sim's own recorded no-escrow
+position (commission_order.ts: order-time escrow is a flagged later
+extension). That is the phase file's second stopping rule verbatim, so
+the floor was NOT built. OWED A MAINTAINER RULING: (a) the fee's
+mechanics: escrow at open (reversing the recorded no-escrow position),
+transfer at delivery (a new atomic gold move with an
+insufficient-funds refusal arm), or a display-only stated offer; (b)
+the floor's basis: the UNBIND_FEE_BY_QUALITY_TIER ladder, a fraction of
+the output's buyValue basis (the "Input 553 vs output 50" idiom), or a
+flat number. The quality-signal half SHIPPED (below) and the corder
+row's shape leaves room for the fee fields.
+
+### DECISIONS
+- D14-1 THE PERFECTING WINDOW IS A SIBLING WINDOW, never a crafting
+  tab: the tab id space is professionId-keyed and the commission
+  board's title-bar-button entry is the shipped precedent. Cold
+  painter on the plant-sheet shape (radiogroup of natively tabbable
+  radios, aria-busy send-once with the error-toast clear, markDialogRoot,
+  focus-key carry, the mobile body-class family), plus a counted 1 Hz
+  convergence driver (the harvest journal's shape) because the attempt
+  path emits no event: answer edges are OBSERVED off the mirrors, never
+  predicted.
+- D14-2 THE DIALOGS SEND THE REF THEY WERE OPENED FOR, never a
+  re-resolve (the wave-1 security review's retarget class; the phase 13
+  peek/consume ruling's direction): a stale captured ref dies on the
+  server's index-plus-id pin and answers with the sim's own noItem
+  line. Pinned by the mid-dialog repaint retarget case.
+- D14-3 THE CATALYST COUNTDOWN IS EVENT-ONLY: craftResult gains
+  optional retryAfterSeconds on the daily_limit refusal (fed by the new
+  server/sim_calendar_feed.ts and the offline utc_day arm; headless
+  feeds nothing by design), and storedCraftResult STRIPS it before the
+  lastCraftResult store, so the session mirror matches CraftResultView
+  on both hosts and the parity state digest never samples a wall-clock
+  value (three wave-1 reviewers converging). Gate state stays
+  server-private; the readout is refusal-time only.
+- D14-4 THE TRAY IS KIND-FAIR: every PRESENT consumable kind gets one
+  seat before any kind takes a second; leftover seats keep the old
+  priority order; the six-seat shell, markup, and gesture stack are
+  unchanged. The recorded flask starvation ends (the pinned residual
+  test flipped by design).
+- D14-5 THE PROMOTION'S CAPSTONE CUE is the dedicated
+  ui_legendary_forged on the personal arm (the zone arm's playCue stays
+  false), FEEDBACK-GATED like every craft celebration: the old
+  achievement() call's ungated class was borrowed, not decided, and the
+  interfaceSfx setting's documented meaning wins. A DELIBERATE behavior
+  change for interface-sounds-off players, recorded here.
+- D14-6 ONE-OF-EACH OWNERS (the farming-arm acceptance, each with the
+  file that owns it): log tones = hud/professions/profession_log_tones.ts;
+  denial pattern = hud/professions/denial_line_core.ts (crafting's
+  crafting_deny_core extends it, farming renders farmDenialLine through
+  it); stepped tracks = the .prof-track CSS family (components.css,
+  DESIGN.md 10.5; the Perfecting rank track and the Harvest Journal
+  growth stages both consume it); empty states = the .prof-empty family
+  (all six family surfaces); placement-verb pattern = the bag-tooltip
+  hint slot (itemUi.tooltip.clickSetUp joins clickSetOut; verbs stay
+  per-family, the PATTERN is one); window chrome = one grouped
+  .panel-title rule (crafting's relative-positioned title stays its
+  recorded exception).
+- D14-7 THE FEAST-FLOURISH PREWARM TENSION (carry 16) is CLOSED at the
+  renderer call site: prewarmWorldFrame syncs farm visuals only once
+  the world holds its own player entity (verified unreachable today on
+  every arm; the guard covers a future entry-sequence change), with a
+  location-bound source pin. What the close does NOT cover is recorded
+  at the module: farm_patches remains an unprepared GPU producer (the
+  cold-program-link class), an OPEN render work item below.
+
+### THE BUILT SHAPE (four slices plus the integration round)
+- THE MIGRATION (ip-14-UI executed, its own commit): src/ui/hud/professions/
+  minted with an index.ts barrel and a local CLAUDE.md; 42 modules moved
+  (crafting, commissions, enchanting views, profession identity and
+  tutorial, professions/gathering window surfaces, farming's windows and
+  the food/feast/wellfed tooltip views) as pure moves plus import
+  re-points, zero logic change. Boundary recorded in the new CLAUDE.md:
+  the item-cell/item-presentation authorities, the bags context menu,
+  and the world-surface gathering tooltip glue stay at src/ui root.
+- THE PERFECTING WINDOW: perfecting_view.ts (pure core; candidate walk
+  over worn + bagged apex copies via craftForApexItem; the synced gate
+  on the skill line; the equipBlocked-gated promote affordance; the R2
+  bind-warning predicate covering head-start copies) + perfecting_window.ts
+  (cold painter per D14-1) + legendary_naming_dialog.ts on the
+  prompt_dialog recipe (32-char cap mirroring legendary_name.ts, live
+  count, real accessible name, NAME_SUBMIT_LOCK_MS 600ms submit
+  debounce for the msg_lanes name-screen lane, esc'd raw name per
+  D13-2). Candidate and material rows carry real item tooltips; a
+  promoted legend's row leads with its chosen name. Entry: the
+  crafting title-bar Perfecting button (+ Hud openPerfecting/
+  togglePerfecting; no rail tile or keybind yet, recorded).
+- APEX CRAFTING SURFACING: known apex recipes get the Apex chip,
+  pattern-provenance hints (apex_recipe_view.ts; raid/rift/vendor/drop
+  channels derived from content), and the Perfecting link on
+  Perfecting-track rows; unlearned recipes stay unlisted (the closed
+  known-recipes ruling).
+- CAP VISIBILITY: masterwrought_cap_view.ts (readout pinned EQUIVALENT
+  to masterwroughtConflictSlot) drives the character panel's
+  Masterwrought slots row + per-slot marks, the worn tooltip line, and
+  the bag-side tooltip family lines incl. the at-cap line
+  (masterwroughtTooltipLines). instanceBadgeLines renders Perfected and
+  the head-start rank on the owner's own instance tooltips (peer wire
+  untouched per D13-3; the anonymous browse trim untouched by
+  decision). The enchant replace confirm lists Perfecting among kept
+  traits; replaceConfirmNoRefund verified accurate.
+- COMMISSION QUALITY SIGNAL: accepted orders snapshot the accepter's
+  masterworksCrafted/legendariesForged at accept (sim-side, zero
+  stamps honestly, open rows carry no keys, ~46-50 bytes on accepted
+  corder rows reaching exactly the two counterparties); the board
+  renders the record line via tPlural. No new command, no facet member
+  (a view-type extension only).
+- SFX: four deterministic synth cues (ui_perfecting_attempt/_success,
+  ui_legendary_forged, ui_sunder_complete closing the recorded silent
+  completion via isSunderCompletionLog over the sunder log line, welded
+  three ways in tests/professions_audio_wiring.test.ts). Catalog
+  269 to 273 keys / 67 to 71 UI cues; manifest regenerated twice,
+  second run zero-diff.
+- COPY: the wyrmfall_core faucet line (MATERIAL_HINT_KEYS row, numbers
+  pinned to the income constants), the name-aware station article (two
+  literal emits + log.placeStationThe matcher rule ordered ahead of the
+  general rule, all 22 locale DICT rows).
+- THE UNIFICATION SLICE: D14-6's owners landed; --color-card-inset
+  token replacing the raw card fills; the harvest journal's 1 Hz tick
+  routed through cached-ref elision (driver allowance counts DOWN:
+  .textContent 2 to 1, .dataset and .querySelectorAll dropped);
+  farming's controls joined the shared focus-ring list; the DESIGN.md
+  compliance statement for the farming windows (below).
+- hud.ts LEDGER: 18242 to 18217 across three recorded extractions
+  (Hud.inputDialog moved whole to src/ui/input_dialog.ts, gaining
+  maxLength/accessible-name/busy in its new home; the chat-bubble
+  decision + Nythraxis vision set to log_event_route.ts chatBubbleKind;
+  the masterwrought tooltip block onto masterwroughtTooltipLines),
+  paying for the PerfectingWindow wiring, the sunder cue arm, the
+  denial params thread, and the professions arms' tone imports.
+  sim.ts 12326 to 12324, game.ts 10473 to 10465, both extraction-first,
+  every ceiling LOWERED to the exact count.
+
+### REVIEW ROUNDS (all findings applied or recorded, none dropped)
+Wave-1 fan-out (five fresh reviewers over the committed range):
+- privacy-security-review: 1 WARNING, the retarget class (D14-2's fix +
+  the decisive pin); 2 INFOs applied/recorded (the esc'd copy label;
+  the sunder prose match recorded as precedented).
+- cross-platform-sync: 2 WARNINGS, both the lastCraftResult store
+  (D14-3's fix; the flipped mirror pin); INFOs recorded below.
+- architecture-reviewer: the same two as should-fix (same fix), the
+  types.ts comment reconciled, the dead ?? 0 removed; move-not-rewrite,
+  zero new draws, tick order, SimContext contract, monolith honesty all
+  verified clean; parity goldens byte-unmoved (professions_craft's own
+  daily_limit coverage is the extraction's proof).
+- server-hot-path-reviewer: 1 should-fix, the reset-countdown memo
+  serving the 1-second lie for a full day in ambiguous-DST zones (EET
+  family, Pacific/Chatham; measured over all 418 zones): fixed
+  self-expiring on the resolved instant, pinned at Europe/Athens across
+  the 2026-10-25 fall-back. Everything else measured clean (feed 0.7us,
+  memo win ~93us/call avoided, corder fan-out bounded at 2 sessions).
+- frontend-seam-reviewer: 0 blocking, 5 should-fix all applied (the
+  promotion focus drop + the detached-opener return, via
+  refocusAfterPrompt; the perfecting link's 40px mobile floor; item
+  tooltips on candidates/materials; the chosen-name rows), 8 notes all
+  applied or recorded (craftNameText re-points; the scratch
+  re-entrancy doc; focus rings for the new controls; the
+  single-fire-cue comment; dev-channel warns on a missing
+  prompt-stack; togglePerfecting's no-caller recorded; the
+  crafting_deny_core formatter allowance recorded).
+- render-performance-reviewer (over the D14-7 guard): verified the
+  guard inert and free on every arm; its two should-fix applied (the
+  location-bound pin; the farm GPU-producer gap recorded at the
+  module); its notes applied (comment target, dirname read).
+- THE FRESH READER over the fix round: 1 should-fix applied
+  (refocusAfterPrompt narrowed to repair only a DROPPED focus, so a
+  repaint-driven dismissal can never steal focus from another window;
+  the focus_restore non-ladder entry removed with the containment
+  read), 2 nits applied (the tone header; close() hides before
+  dismissing so the repair stands down). Its decisiveness traces
+  confirmed the retarget, store-strip, and DST pins red against the
+  pre-fix code.
+- The second fix round (reader2 + render findings) was applied with
+  pins and rides the end-of-phase qa-checklist plus the Phase 14 QA
+  twin rather than a third dedicated reader (recorded).
+
+### JUDGED THIS PHASE, do not re-raise
+- The fee floor's park is the stopping rule executing, not scope
+  shed; the ruling questions are enumerated above.
+- The naming dialog has no thin paired suite: its behavior is covered
+  end to end through tests/perfecting_window.test.ts (the
+  craft_activity paired-suite precedent from the Phase 13 QA).
+- The migration commit was transiently red on the hud.ts monolith row
+  at its own tip (biome rewraps of re-pointed imports grew the file 7
+  lines past the exact pin; caught and paid in the next commit's
+  extraction). Recorded honestly; the phase's net effect on hud.ts is
+  -25 lines with the ceiling lowered.
+- legendaryForged's feedback gating is D14-5's deliberate change, not
+  a regression.
+- The kind-fair tray changes which item occupies which seat for
+  existing players (a combat surface with muscle memory): deliberate,
+  tested, named here for the release notes.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+- The commission fee-floor ruling (the fired stop rule, above).
+- farm_patches is an unprepared GPU producer (pre-existing; the first
+  live plot stage-advance or in-scope feast likely pays a cold program
+  link): the correction is a prewarm-manifest twin for the farm GLB set
+  or a compile gate with the static bed as stand-in, owned by a render
+  diff (recorded at the module and here).
+- The commission board never calls markDialogRoot and opens
+  display:block against the family's flex-column shape (pre-existing;
+  completing its dialog semantics needs Hud-side focus wiring).
+- The index-plus-id pin cannot distinguish two copies of the SAME
+  itemId at the same index, so a mid-dialog shift landing another
+  same-id copy at the opened index would act on that copy (pre-existing
+  wire class, same posture as the phase 13 index-addressed discard).
+- itemUi.tooltip.clickSetUp and the phase's other wordy keys ride the
+  0.41.0 release fill (M16 non-Latin fills landed; Latin locales
+  pending as usual).
+- hud.ts still spells ~48 tone hexes inline in non-professions arms;
+  they migrate onto named tones as headroom allows.
+- The .mkt-ico pattern mark stays deferred (both corners occupied; a
+  third mark is a real sub-feature, verified again this phase); the
+  voidbound tome GLB (phase 09 follow-up) stays open, out of this
+  phase's UI scope; the flask_<kind> buff glyph still needs the wire
+  marker (cross-platform) and proceeds on its own merits.
+- The crafting tab underline #cc9a3c and the remaining wash/scrim
+  literals await the DESIGN.md foundation-phase tokens (enumerated in
+  the unification slice's report; not silent).
+- The perf tour and mobile E2E were not run this phase (no per-frame
+  contract change; hud_perf_budget green incl. the counted new driver);
+  the QA twin should mark them VERIFY.
+- The Perfecting window has no rail tile or keybind (togglePerfecting
+  is the surface for one; the crafting button is the entry today).
+
+### DESIGN.MD COMPLIANCE (stated with evidence)
+NEW SURFACES: the Perfecting window, naming dialog, apex treatment,
+cap indicators, and commission record line are token-only (the
+legendary tint rides the QUALITY_COLOR alias, golds are structural
+edges/text per section 4), type on the section 5 scale, primitives
+reused (radiogroup, prompt_dialog, .prof-track/.prof-empty, keycap-free),
+motion-free, focus-ringed via the shared token ring, formatter-clean
+(wholeNumber/duration_text/tPlural), and fairness-neutral (nothing
+tier- or theme-gated; verified by the frontend reviewer's fairness
+sweep).
+FARMING WINDOWS (their first statement of any kind): PLANT SHEET
+compliant on window grammar, token color, tabular numerics, a11y
+shape, touch floors; FIXED this phase: the missing themed focus rings
+(.ps-seed/.ps-knob/.ps-plant joined the shared ring list), empty states
+onto .prof-empty; RECORDED: the 10px chip type (chips, not body), the
+roving-tabindex deferral. HARVEST JOURNAL compliant on fairness (fixed
+1 Hz wall cadence, never preset-keyed), the live-region contract,
+tabular countdowns; FIXED: the raw rgba card fill onto
+--color-card-inset, growth stages onto the 10.5 track presentation,
+the writer polish; RECORDED: the gold .panel-title (parchment titles
+are the program-wide phase 2 retune). FARM_EVENT_FEEDBACK: FIXED the
+ten inline hexes onto named tones and the deny arm onto the shared
+denial pattern; nothing else owed. FEAST TOOLTIP: compliant as
+shipped, nothing owed. Cross-cutting: the four-trait visual signature
+and the 8.1 chrome targets await the DESIGN.md foundation/chrome
+phases; nothing this phase moves against them.
+
+### SCREENSHOTS (docs/screenshots/masterwrought-phase-14/, lowest preset)
+Captured with scripts/pr_screenshots.mjs via the three new
+pr_shot_targets entries (perfecting-window desktop+mobile,
+perfecting-naming, consumable-tray on the hold-reveal gesture) plus the
+standing targets; the shared entry flow gained the tutorial-island
+greeting dismissal. Pairs and news: before/after-crafting-desktop.png +
+before/after-crafting-mobile.png (the Perfecting entry),
+before/after-harvest-journal-desktop.png + -mobile.png (the unified
+empty state), before/after-farm-plant-sheet-desktop.png + -mobile.png,
+after-masterwrought-cap-desktop.png (the sheet at 2/2 with the per-slot
+marks, from the dedicated at-cap target; a bare before would show no
+row on identical gear, so the pair is AFTER-only by construction),
+before/after-professions-desktop.png,
+after-perfecting-window-desktop.png + -mobile.png (the new window:
+radiogroup, rank track, bill, bind warning),
+after-perfecting-naming-desktop.png (the naming dialog),
+after-consumable-tray-mobile.png (every present kind seated),
+after-commission-board-desktop.png. The new subtree joined the five
+CI sparse-checkout cone blocks and the SPARSE_CONE literal in the same
+change.
+
+### PINS (moved this phase)
+Monolith: hud.ts ceiling 18242 to 18217, sim.ts 12326 to 12324,
+game.ts 10473 to 10465, renderer.ts held at its exact ceiling (the
+one-line guard is a 1:1 replacement); db.ts/online.ts/main.ts
+untouched. SFX: catalog 269 to 273, UI cues 67 to 71. world_api member
+counts UNMOVED (a view-type extension only); command counts UNMOVED.
+Parity goldens byte-unmoved (verified twice: the build and the
+review rounds). The consumable starvation pin FLIPPED by design; the
+hud_update_drive registry unchanged (the window polls itself at 1 Hz,
+never from update()).
