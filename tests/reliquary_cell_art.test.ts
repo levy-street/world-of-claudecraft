@@ -727,8 +727,10 @@ describe('ReliquaryWindow cell markup', () => {
       .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
       .map((line) => line.replace(/\s\/\/.*$/, ''))
       .join('\n');
+    // The dep widened at the phase 13 QA (the copy's effective quality rides
+    // to the rim); the delegation to knownItemIconHtml is the pinned half.
     expect(hud).toMatch(
-      /private itemIcon\(item: ItemDef\): string \{\s*return knownItemIconHtml\(item\);/,
+      /private itemIcon\(item: ItemDef, quality\?: ItemDef\['quality'\]\): string \{\s*return knownItemIconHtml\(item, quality\);/,
     );
   });
 
