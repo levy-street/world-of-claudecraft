@@ -16859,7 +16859,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "str",
-          "value": 7
+          "value": 6
         }
       ]
     },
@@ -16887,7 +16887,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "int",
-          "value": 7
+          "value": 6
         }
       ]
     },

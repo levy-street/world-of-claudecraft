@@ -147,7 +147,11 @@ const APEX_ARMOR: Record<
     armorType: 'cloth',
     budget: 22,
     stats: { int: 12, spi: 10 },
-    rating: ['hitRating', 40],
+    // Haste since Phase 15: Hit converts at twice the rate of crit and haste,
+    // and this def clones the caster BiS chest exactly, so Hit here made it
+    // the sole source of the scarcest double-value rating in the biggest
+    // slot. Haste still complements the reference's crit.
+    rating: ['hasteRating', 40],
     armor: 90,
     armorRef: 'shroud_of_the_gravewyrm',
     sellValue: 200,
@@ -271,10 +275,13 @@ const APEX_SHIELDS: Record<
     budget: 16,
     stats: { sta: 11, str: 5 },
     rating: ['hitRating', 20],
-    blockValue: 32,
-    // Extrapolated from bonewrought_bulwark (680 at ilvl 29) up 2 ilvls at
-    // twice the 13-armor/ilvl epic mail chest slope; re-derived in the block.
-    armor: 732,
+    // Both mitigation numbers MATCH bonewrought_bulwark since Phase 15; they
+    // extrapolated past it before (30 -> 32, 680 -> 732) and produced the
+    // game's best shield, because the heroic variant generator freezes armor
+    // and blockValue so heroic_bonewrought_bulwark still reads 30 / 680 at
+    // ilvl 33. Re-derived in the block below against BOTH references.
+    blockValue: 30,
+    armor: 680,
     requiredClass: ['warrior', 'paladin', 'shaman'],
     sellValue: 300,
   },
@@ -958,22 +965,44 @@ describe('masterwrought apex budget sweep', () => {
     expect(primaryStatSum(def)).toBe(row.budget);
     expect(primaryStatSum(def)).toBe(primaryStatBudget(31, 'epic', 'offhand'));
 
-    // blockValue extrapolates the hand-authored shield ladder (buckler 6,
-    // Wallshield 14, bonewrought_bulwark 30 at ilvl 29) to ilvl 31.
-    expect(def.blockValue).toBe(row.blockValue);
-    expect(row.blockValue).toBe(32);
-    // Armor is EXTRAPOLATED, never copied (no same-slot ilvl-31 reference
-    // exists): bonewrought_bulwark's 680 at ilvl 29, up 2 ilvls at 26/ilvl
-    // (twice the 13-armor/ilvl epic mail chest slope, the 2x-chest shield
-    // rule). The reference's identity is pinned so a bulwark retune reds
-    // here and forces a re-derivation instead of leaving 732 orphaned.
+    // MITIGATION MATCHES THE REFERENCE (Phase 15). Both numbers used to
+    // extrapolate the shield ladder two item levels past bonewrought_bulwark
+    // (30 -> 32 block, 680 -> 732 armor at 26 armor per ilvl). The extrapolation
+    // is internally sound and it produced the game's best mitigation item,
+    // because makeHeroicVariant passes armor and blockValue through untouched:
+    // heroic_bonewrought_bulwark is ilvl 33 and still reads 30 / 680, so no
+    // heroic upgrade could ever answer a crafted shield. Both references are
+    // pinned by identity AND value here, in BOTH directions, so neither a
+    // bulwark retune nor a heroic-variant change can leave this def orphaned
+    // or let it climb back over the raid line.
     const ref = ITEMS.bonewrought_bulwark as ItemDef & { armorType?: string };
     expect(ref.slot).toBe('offhand');
     expect(ref.armorType).toBe(row.armorType);
     expect(itemLevel(ref)).toBe(29);
     expect((ref.stats as Record<string, number>).armor).toBe(680);
+    expect((ref as unknown as Record<string, unknown>).blockValue).toBe(30);
+    const heroicRef = ITEMS.heroic_bonewrought_bulwark as ItemDef & { armorType?: string };
+    expect(heroicRef.slot).toBe('offhand');
+    expect(itemLevel(heroicRef)).toBe(33);
+    expect(def.blockValue).toBe(row.blockValue);
+    expect(row.blockValue).toBe(30);
+    expect(row.blockValue).toBe((ref as unknown as Record<string, unknown>).blockValue);
     expect(armor).toBe(row.armor);
-    expect(row.armor).toBe(680 + 2 * 26);
+    expect(row.armor).toBe(680);
+    expect(row.armor).toBe((ref.stats as Record<string, number>).armor);
+    // THE INVERSION GUARD, the reason the two numbers moved: no crafted apex
+    // shield may out-mitigate the raid shield it competes with on either axis.
+    const heroicArmor = (heroicRef.stats as Record<string, number>).armor;
+    const heroicBlock = (heroicRef as unknown as Record<string, unknown>).blockValue as number;
+    expect(heroicArmor, 'the heroic shield still carries the frozen armor').toBe(680);
+    expect(heroicBlock, 'and the frozen blockValue').toBe(30);
+    expect(armor, 'apex shield armor never exceeds the raid shield').toBeLessThanOrEqual(
+      heroicArmor,
+    );
+    expect(
+      def.blockValue as number,
+      'apex shield blockValue never exceeds the raid shield',
+    ).toBeLessThanOrEqual(heroicBlock);
 
     // The held/shield band: one rating at 20; physical tank identity is Hit
     // (threat). Both halves: the literal 20 is the band LAW pin, the
@@ -1097,10 +1126,16 @@ describe('masterwrought apex budget sweep', () => {
     }
   });
 
-  it('the rating spread complements the drops: one Hit piece, crit and haste fill', () => {
+  it('the rating spread complements the drops: no Hit on armour, crit and haste fill', () => {
+    // ZERO Hit on the armour set since Phase 15. Hit is the double-value
+    // rating (10 rating per percent against 20 for crit and haste), and the
+    // complement rule forces the one Hit slot to be the one piece whose
+    // reference drop does NOT carry Hit, which was the cloth chest: the
+    // largest-budget slot, cloned from the caster BiS chest, and the only
+    // source of caster chest Hit in the game. It carries haste now.
     const counts = { hitRating: 0, critRating: 0, hasteRating: 0 };
     for (const row of Object.values(APEX_ARMOR)) counts[row.rating[0]] += 1;
-    expect(counts).toEqual({ hitRating: 1, critRating: 5, hasteRating: 3 });
+    expect(counts).toEqual({ hitRating: 0, critRating: 5, hasteRating: 4 });
     // The phase 09 families shift the whole-set spread deliberately: both
     // weapons and the shield carry Hit (the weapon band identity and the
     // tank threat line), jewelry leans haste (the vendor set's missing
@@ -1115,7 +1150,7 @@ describe('masterwrought apex budget sweep', () => {
       ...Object.values(APEX_HELD),
     ];
     for (const row of familyRows) all[row.rating[0]] += 1;
-    expect(all).toEqual({ hitRating: 5, critRating: 6, hasteRating: 6 });
+    expect(all).toEqual({ hitRating: 4, critRating: 6, hasteRating: 7 });
   });
 
   it('the apex bag: best capacity in the game, epic, tradable, NOT masterwrought', () => {

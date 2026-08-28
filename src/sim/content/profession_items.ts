@@ -1541,7 +1541,21 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     // ilvl-31 chest epic budget = 22; int:12+spi:10 = 22. Armor: shroud_of_the_gravewyrm.
     stats: { armor: 90, int: 12, spi: 10 },
-    hitRating: 40,
+    // HASTE, not Hit, and Phase 15 moved it here: hit converts at twice the
+    // rate of the other two ratings (HIT_RATING_PER_PCT 10 vs 20, types.ts),
+    // so a 40-rating Hit piece is worth 4 percent where a 40-rating crit or
+    // haste piece is worth 2. This def is a byte-identical stat and armor
+    // clone of the caster BiS chest shroud_of_the_gravewyrm, whose only
+    // difference was that it took the double-value rating, and caster chest
+    // Hit had ZERO pre-packet carriers, so it was the sole source of the
+    // scarcest rating in the largest-budget slot: the Lionheart shape the
+    // packet's own research names. Measured at an S-rift target (level 23,
+    // where spell hit is uncapped) that was worth 2.8 to 4.1 percent of
+    // throughput from one slot against an R5 budget of 5 percent for the
+    // whole kit. Haste still COMPLEMENTS the reference drop's crit, so the
+    // rule the other eight follow is untouched; the apex armour set now
+    // hands out no Hit at all, which is the conservative side of the band.
+    hasteRating: 40,
     sellValue: 200,
     masterwrought: true,
   },

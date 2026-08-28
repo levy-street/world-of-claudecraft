@@ -113,9 +113,28 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       .sort((a, b) => devScore(b) - devScore(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     expect(warrior.mainhand).toBe(mainhandPool[0].id);
     expect(ITEMS[warrior.mainhand as string].masterwrought).toBe(true);
+    // The OFFHAND is the raid shield, not the crafted one, and that is the
+    // point of the Phase 15 mitigation-parity tune: duskforged_bulwark used
+    // to carry armor 732 / blockValue 32 against heroic_bonewrought_bulwark's
+    // frozen 680 / 30, so the crafted shield out-mitigated the ilvl-33 raid
+    // drop and won this slot on the picker's armor-summing score. Both
+    // numbers now MATCH the reference, so the raid shield wins the slot back
+    // on its one extra stat point (697 to 696) and the warrior's second
+    // flagged pick moves to the neck. Pinned by id in both directions: a
+    // regression that puts the crafted shield back over the raid line reds
+    // here as well as in tests/masterwrought_budget.test.ts.
+    expect(warrior.offhand).toBe('heroic_bonewrought_bulwark');
     const offhand = ITEMS[warrior.offhand as string];
-    expect(offhand.masterwrought).toBe(true);
+    expect(offhand.masterwrought).toBeUndefined();
     expect(offhand.kind === 'armor' && 'shield' in offhand && offhand.shield === true).toBe(true);
+    const warriorFlagged = Object.entries(warrior)
+      .filter(([, id]) => id && ITEMS[id as string]?.masterwrought)
+      .map(([slot]) => slot)
+      .sort();
+    expect(warriorFlagged, 'the warrior pair is the weapon and the neck').toEqual([
+      'mainhand',
+      'neck',
+    ]);
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {

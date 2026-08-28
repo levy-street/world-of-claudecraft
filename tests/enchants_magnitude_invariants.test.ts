@@ -83,7 +83,8 @@ describe('enchant table magnitude invariants', () => {
     // Masterwrought Lucent tier landed (phase 10) four of them describe an
     // apex enchanter at skill 100 or above, not the ordinary stack: the four
     // axes the Lucent tier touches each moved by exactly its own slot's step
-    // (str +2 on the weapon, int +2 on the weapon via the Spellpower twin the
+    // (str +1 on the weapon since Phase 15 trimmed the rung 7 to 6, int +1 on
+    // the weapon via the Spellpower twin the
     // phase 10 QA D10-D1 ruling added, agi +1 on the boots, sta +6 on the
     // chest, which is the Perfected-only Lucent Infusion at 13 over the
     // Greater 7, a rung NO live item can take until phase 12 mints a
@@ -91,7 +92,7 @@ describe('enchant table magnitude invariants', () => {
     // their pre-phase values.
     // The percentages below still name the level-20 BiS budgets, so the sta
     // line reads high by design; phase 15 owns the envelope verification.
-    expect(bestPerSlotTotal('int')).toBe(26); // 24 before the Lucent weapon int twin
+    expect(bestPerSlotTotal('int')).toBe(25); // 24 before the Lucent weapon int twin
     // 27 before the Lucent tier (24 plus offhand's enchant_offhand_stamina,
     // #2825: the offhand slot had no base enchant at all before that fix).
     // The HP pin below covers the x10 conversion, over its own fixed 5-slot
@@ -99,7 +100,7 @@ describe('enchant table magnitude invariants', () => {
     // unaffected by this stack.
     expect(bestPerSlotTotal('sta')).toBe(33);
     expect(bestPerSlotTotal('agi')).toBe(26); // 25 before the Lucent boots step
-    expect(bestPerSlotTotal('str')).toBe(21); // 19 before the Lucent weapon step
+    expect(bestPerSlotTotal('str')).toBe(20); // 19 before the Lucent weapon step
     // Spirit rides only neck, chest, and the two rings, so its stack sits
     // below the band by construction; accepted and recorded rather than
     // padded with new enchants.
@@ -313,8 +314,8 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_chest_runeweave: { spi: 5 },
       enchant_legs_runed_hide: { agi: 4 },
       enchant_helmet_runed_links: { sta: 5 },
-      enchant_weapon_lucent_might: { str: 7 },
-      enchant_weapon_lucent_spellpower: { int: 7 },
+      enchant_weapon_lucent_might: { str: 6 },
+      enchant_weapon_lucent_spellpower: { int: 6 },
       enchant_chest_lucent_stamina: { sta: 10 },
       enchant_feet_lucent_agility: { agi: 3 },
       enchant_lucent_infusion: { sta: 13 },

@@ -499,15 +499,28 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // skill (skillReq, the first non-free-floor enchants; see the tier note in
   // the header). Each apex value continues its OWN slot ladder's step rather
   // than inventing a magnitude: weapon str runs 2 (base), 3 (runed), 5
-  // (Greater) and steps to 7, and the weapon INT twin runs the identical
+  // (Greater) and steps to 6, and the weapon INT twin runs the identical
   // ladder (Spellpower 2, Runed Sigil 3, Greater Spellpower 5) and steps to
-  // the same 7 with the byte-identical bill (the phase 10 QA D10-D1 ruling,
+  // the same 6 with the byte-identical bill (the phase 10 QA D10-D1 ruling,
   // taken 2026-08-16: every lower weapon rung pairs str with int, so the
   // apex rung does too); chest sta runs 4 (base), 7 (Greater) and steps
   // to 10; boots, which have no Greater rung by design, take the base-to-runed
   // sized step 2 -> 3, kept deliberately small because R7 rules the boots
   // enchant stats only (movement speed is not even expressible in statBonus,
-  // and it stays that way). ---
+  // and it stays that way).
+  //
+  // THE WEAPON STEP IS 1, NOT 2, AND PHASE 15 MOVED IT (7 -> 6 on both twins).
+  // The step reaches BOTH HANDS on a dual-wield loadout: a one-hand weapon
+  // declares ItemDef.slot 'mainhand' and is legal in the offhand, and the
+  // enchant slot gate compares itemDef.slot to enchant.itemSlot, so a fury
+  // warrior, an enhancement shaman and a rogue all carry the weapon enchant
+  // twice while recalcPlayerStats reads both instances. The packet's ratified
+  // R5 arithmetic (state.md, "the full physical kit at 4.2 to 4.7 percent")
+  // counted this term ONCE. At 7 the per-character delta over Greater was 4
+  // str for a dual-wielder against the 2 the record assumed; at 6 it is 2,
+  // which is the number the envelope was ratified on. The rung still sits
+  // strictly above Greater, and the str/int twins still match byte for byte.
+  // ---
   enchant_weapon_lucent_might: {
     id: 'enchant_weapon_lucent_might',
     name: 'Enchant Weapon - Lucent Might',
@@ -517,7 +530,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
       { itemId: 'arcane_shard', count: 1 },
       { itemId: 'arcane_essence', count: 2 },
     ],
-    statBonus: { str: 7 },
+    statBonus: { str: 6 },
     skillReq: 100,
   },
   enchant_weapon_lucent_spellpower: {
@@ -529,7 +542,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
       { itemId: 'arcane_shard', count: 1 },
       { itemId: 'arcane_essence', count: 2 },
     ],
-    statBonus: { int: 7 },
+    statBonus: { int: 6 },
     skillReq: 100,
   },
   enchant_chest_lucent_stamina: {

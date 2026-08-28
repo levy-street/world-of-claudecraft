@@ -3048,16 +3048,26 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'offhand',
     shield: true,
     quality: 'epic',
-    // blockValue extrapolates the hand-authored shield ladder (buckler 6,
-    // Wallshield 14, bonewrought_bulwark 30 at ilvl 29) to 32 at ilvl 31.
-    blockValue: 32,
-    // Armor extrapolates bonewrought_bulwark (680 at ilvl 29, itself 2x its
-    // tier's epic mail chest): the epic mail chest line grows 13 armor per
-    // ilvl (deathlord_warplate 270 at 26 to the heroic hauberks 335 at 31),
-    // so the shield line grows 2 x 13 = 26 per ilvl: 680 + 2 x 26 = 732.
+    // MITIGATION MATCHES THE REFERENCE, it does not extrapolate past it, and
+    // Phase 15 moved both numbers here. They read 32 and 732 before, from the
+    // ilvl-29 bonewrought_bulwark's 30 and 680 carried up two item levels at
+    // the shield line's 26 armor per ilvl. That derivation is internally
+    // sound and it produced the game's single best mitigation item: the
+    // heroic variant generator passes armor and blockValue through untouched
+    // (heroic_variants.ts, normalizePrimaryStats), so heroic_bonewrought_
+    // bulwark still reads 680 and 30 at ilvl 33 and NO future heroic upgrade
+    // can ever out-armour a crafted shield. Measured, that inversion was
+    // worth 1.02 percent less physical damage taken on the reference tank at
+    // heroic and S-rift attacker levels, on the axis R5's protected asset is
+    // priced in, with nothing measuring or pinning it. The other nine apex
+    // armour pieces already pin armor EQUAL to their reference drop's; the
+    // shield was the only one that extrapolated, so it joins that rule here.
+    blockValue: 30,
     // ilvl-31 offhand epic budget = 16; sta:11+str:5 = 16, sta-lead for the
-    // tank identity.
-    stats: { armor: 732, sta: 11, str: 5 },
+    // tank identity. The primary budget still reads at ilvl 31 (the budget is
+    // the item-level axis); only the two mitigation numbers match the
+    // reference, which is what keeps a crafted shield off the raid line.
+    stats: { armor: 680, sta: 11, str: 5 },
     // The held/shield family band: one rating at 20; physical tank identity
     // is Hit (threat), like bonewrought_bulwark.
     hitRating: 20,
