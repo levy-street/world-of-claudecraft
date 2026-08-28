@@ -1528,7 +1528,7 @@ export const cs_CZ: EnTranslations = {
       "gpuBackendAuto": "Auto (try Vulkan once)",
       "gpuBackendVulkan": "Vulkan",
       "gpuBackendOpenGL": "OpenGL",
-      "gpuBackendNote": "Auto tries Vulkan once at startup and keeps it when it works, where shader loading hitches drop sharply. Falls back to OpenGL when the driver cannot do it. Takes effect the next time the game starts.",
+      "gpuBackendNote": "Auto tries Vulkan once at startup and keeps it when it works, where shader loading hitches drop sharply. Falls back to OpenGL when the driver cannot do it. Choosing Auto again after Vulkan or OpenGL runs the trial once more. Takes effect the next time the game starts.",
       "discordPresence": "Rozšířená aktivita Discordu",
       "discordPresenceNote": "Zobrazuje zónu, ve které se nacházíš, a jak dlouho hraješ tuto relaci, jako tvou aktivitu na Discordu, a obojí vidí kdokoli, kdo vidí tvůj profil na Discordu. Sdílí se jen název zóny, čas tvé relace a název hry, nikdy tvoje postava, tvůj účet nebo s kým hraješ. Vyžaduje spuštěnou aplikaci Discord na tomto počítači.",
       "showDevBadges": "Zobrazit vývojářské odznaky",

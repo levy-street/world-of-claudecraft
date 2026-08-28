@@ -1173,6 +1173,9 @@ export class OptionsWindow {
               // nativeShell: the mobile shells and pre-display-mode desktop
               // builds must keep the browser toggle they can actually serve.
               desktopDisplayMode: desktopDisplayModeSupported(desktopBridge()),
+              // The Linux graphics backend row in the System card: the bridge
+              // methods AND the shell's platform answer, folded into one flag.
+              desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
             },
           )
         : [];
@@ -1410,7 +1413,6 @@ export class OptionsWindow {
       touch: useTouchInterface(),
       nativeShell: isNativeAppShell(),
       desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),
-      desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
       desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),
     };
     const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];

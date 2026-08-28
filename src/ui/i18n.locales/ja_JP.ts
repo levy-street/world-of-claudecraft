@@ -1437,7 +1437,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
   'hudChrome.options.gpuBackendNote':
-    '自動：起動時にVulkanを一度試し、動作すればそのまま使います。そこではシェーダー読み込みによるカクつきが大きく減ります。ドライバーが対応していない場合はOpenGLに戻ります。次回ゲームを起動したときに反映されます。',
+    '自動：起動時にVulkanを一度試し、動作すればそのまま使います。そこではシェーダー読み込みによるカクつきが大きく減ります。ドライバーが対応していない場合はOpenGLに戻ります。VulkanまたはOpenGLを選んだあとで再び自動を選ぶと、もう一度試します。次回ゲームを起動したときに反映されます。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
   'hudChrome.options.discordPresenceNote':
     'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',

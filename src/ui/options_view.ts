@@ -203,7 +203,8 @@ export interface OptionsEnv {
    *  Absent (the web/offline callers) means the row never renders. */
   desktopGpuPref?: boolean;
   /** desktopGpuBackendSupported() AND the shell's platform answer: reveals
-   *  the Linux graphics backend row (Auto / Vulkan / OpenGL). A bridge
+   *  the Linux graphics backend row (Auto / Vulkan / OpenGL) in the Graphics
+   *  panel's System card, under the shader warm-up worker it feeds. A bridge
    *  capability plus a platform gate: Windows and macOS shells expose the
    *  methods but have no choice to make, so they show no row. */
   desktopGpuBackend?: boolean;
@@ -536,6 +537,17 @@ export function buildGraphicsSections(
     choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
     note('hudChrome.options.shaderWarmNote'),
   ];
+  // The Linux graphics backend (the Vulkan trial) sits right under the shader
+  // warm-up worker it feeds, where a player looking for it expects it. Behind
+  // its own bridge capability AND the shell's platform answer; its note carries
+  // the next-launch caveat. Not a rebuild key: it writes live, and the shell
+  // reads the stored choice at its next launch.
+  if (env.desktopGpuBackend) {
+    system.push(
+      choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions),
+      note('hudChrome.options.gpuBackendNote'),
+    );
+  }
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {
     system.push(
@@ -718,14 +730,6 @@ export function buildInterfaceControls(
     general.push(
       boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
       note('hudChrome.options.forceHighPerfGpuNote'),
-    );
-  }
-  // The Linux graphics backend (the Vulkan trial), behind its own capability
-  // AND the shell's platform answer; its note carries the next-launch caveat.
-  if (env?.desktopGpuBackend) {
-    general.push(
-      choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions),
-      note('hudChrome.options.gpuBackendNote'),
     );
   }
   // Discord Rich Presence, behind its own bridge capability (an older shell has

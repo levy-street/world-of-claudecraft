@@ -1528,7 +1528,7 @@ export const de_DE: EnTranslations = {
       "gpuBackendAuto": "Auto (try Vulkan once)",
       "gpuBackendVulkan": "Vulkan",
       "gpuBackendOpenGL": "OpenGL",
-      "gpuBackendNote": "Auto tries Vulkan once at startup and keeps it when it works, where shader loading hitches drop sharply. Falls back to OpenGL when the driver cannot do it. Takes effect the next time the game starts.",
+      "gpuBackendNote": "Auto tries Vulkan once at startup and keeps it when it works, where shader loading hitches drop sharply. Falls back to OpenGL when the driver cannot do it. Choosing Auto again after Vulkan or OpenGL runs the trial once more. Takes effect the next time the game starts.",
       "discordPresence": "Discord-Aktivitätsanzeige",
       "discordPresenceNote": "Zeigt die Zone, in der du dich befindest, und wie lange du diese Sitzung schon spielst, als deine Discord-Aktivität an, und jeder, der dein Discord-Profil sehen kann, kann beides sehen. Geteilt werden nur der Zonenname, deine Sitzungszeit und das Spiel, niemals dein Charakter, dein Konto oder mit wem du spielst. Erfordert, dass die Discord-App auf diesem Computer läuft.",
       "showDevBadges": "Entwicklerabzeichen anzeigen",

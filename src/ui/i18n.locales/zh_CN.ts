@@ -1392,7 +1392,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL',
   'hudChrome.options.gpuBackendNote':
-    '自动：启动时尝试一次 Vulkan，可用则保留，此时着色器加载造成的卡顿会大幅减少。驱动不支持时回退到 OpenGL。下次启动游戏时生效。',
+    '自动：启动时尝试一次 Vulkan，可用则保留，此时着色器加载造成的卡顿会大幅减少。驱动不支持时回退到 OpenGL。选过 Vulkan 或 OpenGL 之后再选回“自动”，会重新尝试一次。下次启动游戏时生效。',
   'hudChrome.options.discordPresence': 'Discord 游戏状态',
   'hudChrome.options.discordPresenceNote':
     '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',

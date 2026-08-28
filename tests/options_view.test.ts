@@ -303,6 +303,33 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keysOf(stored)).not.toContain('note:hudChrome.options.gfxCustomNote');
   });
 
+  it('puts the graphics backend row + note in the System card, under the shader worker, ONLY with its capability', () => {
+    // The capability is the bridge methods AND the shell's platform answer,
+    // folded into one env flag by the options window; the GPU preference
+    // flag never stands in for it (Windows and macOS shells have the first
+    // and not the second).
+    const system = (env: OptionsEnv) =>
+      buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env).find(
+        (section) => section.titleKey === 'hudChrome.options.gfxSectionSystem',
+      );
+    const withBackend = system({ ...WEB_ENV, desktopGpuBackend: true });
+    expect(withBackend).toBeTruthy();
+    const keys = keysOf(withBackend?.controls ?? []);
+    expect(keys.slice(keys.indexOf('shaderWarm'), keys.indexOf('shaderWarm') + 5)).toEqual([
+      'shaderWarm',
+      'note:hudChrome.options.shaderWarmNote',
+      'gpuBackend',
+      'note:hudChrome.options.gpuBackendNote',
+      'interfaceMode',
+    ]);
+    expect(find(withBackend?.controls ?? [], 'gpuBackend')?.control).toBe('choice');
+    // Its keys are not rebuild keys: the row writes live, never through Apply.
+    expect(GRAPHICS_REBUILD_KEYS).not.toContain('gpuBackend');
+    for (const env of [WEB_ENV, DESKTOP_ENV, { touch: true, nativeShell: true }]) {
+      expect(find(system(env)?.controls ?? [], 'gpuBackend')).toBeUndefined();
+    }
+  });
+
   it('groups the panel into titled two-column cards whose flatten IS the control list', () => {
     const env = { touch: true, nativeShell: false };
     const sections = buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env);
@@ -682,26 +709,10 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ).toBeUndefined();
   });
 
-  it('appends the graphics backend row + note ONLY with its own capability (Linux shells)', () => {
-    // The capability is the bridge methods AND the shell's platform answer,
-    // folded into one env flag by the options window; the GPU preference
-    // flag never stands in for it (Windows and macOS shells have the first
-    // and not the second).
-    const withBackend = buildInterfaceControls(makeSource(), {
-      ...WEB_ENV,
-      desktopGpuBackend: true,
-    });
-    const row = find(withBackend, 'gpuBackend');
-    expect(row).toBeTruthy();
-    expect(row?.control).toBe('choice');
-    expect(withBackend[withBackend.indexOf(row as OptionsControl) + 1]).toMatchObject({
-      control: 'note',
-      textKey: 'hudChrome.options.gpuBackendNote',
-    });
-    expect(find(buildInterfaceControls(makeSource(), DESKTOP_ENV), 'gpuBackend')).toBeUndefined();
-    expect(find(buildInterfaceControls(makeSource(), WEB_ENV), 'gpuBackend')).toBeUndefined();
-    // The real Linux shell has all three capabilities: the tail keeps its
-    // order, GPU preference, then backend, then Discord.
+  it('keeps the graphics backend row OUT of the Interface panel (it lives under Graphics)', () => {
+    // A player looks for the backend next to the shader warm-up worker, in
+    // the Graphics panel's System card; the Interface tail keeps only the GPU
+    // preference and Discord, even when the shell has the backend capability.
     const allKeys = keysOf(
       buildInterfaceControls(makeSource(), {
         ...WEB_ENV,
@@ -710,15 +721,15 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         desktopDiscordPresence: true,
       }),
     );
+    expect(allKeys).not.toContain('gpuBackend');
+    expect(allKeys).not.toContain('note:hudChrome.options.gpuBackendNote');
     const tail = allKeys.slice(
       allKeys.indexOf('forceHighPerfGpu'),
-      allKeys.indexOf('forceHighPerfGpu') + 6,
+      allKeys.indexOf('forceHighPerfGpu') + 4,
     );
     expect(tail).toEqual([
       'forceHighPerfGpu',
       'note:hudChrome.options.forceHighPerfGpuNote',
-      'gpuBackend',
-      'note:hudChrome.options.gpuBackendNote',
       'discordPresence',
       'note:hudChrome.options.discordPresenceNote',
     ]);

@@ -1528,7 +1528,7 @@ export const ko_KR: EnTranslations = {
       "gpuBackendAuto": "자동(Vulkan 한 번 시도)",
       "gpuBackendVulkan": "Vulkan",
       "gpuBackendOpenGL": "OpenGL",
-      "gpuBackendNote": "자동: 시작할 때 Vulkan을 한 번 시도하고 정상 동작하면 계속 사용합니다. 그 경우 셰이더 로딩으로 인한 끊김이 크게 줄어듭니다. 드라이버가 지원하지 않으면 OpenGL로 돌아갑니다. 다음에 게임을 시작할 때 적용됩니다.",
+      "gpuBackendNote": "자동: 시작할 때 Vulkan을 한 번 시도하고 정상 동작하면 계속 사용합니다. 그 경우 셰이더 로딩으로 인한 끊김이 크게 줄어듭니다. 드라이버가 지원하지 않으면 OpenGL로 돌아갑니다. Vulkan 또는 OpenGL을 선택한 뒤 다시 자동을 선택하면 한 번 더 시도합니다. 다음에 게임을 시작할 때 적용됩니다.",
       "discordPresence": "Discord 리치 프레즌스",
       "discordPresenceNote": "플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.",
       "showDevBadges": "개발자 배지 표시",
