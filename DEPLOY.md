@@ -454,8 +454,9 @@ For off-box safety, sync the directory to S3 occasionally:
   promotion), a surface wider than a character name (up to 32 characters with
   spaces, apostrophes, and hyphens), so seed the file with the slur and hate-group
   residual the built-in word list does not carry before that feature is live. An
-  edited file takes effect without a restart, within one second (the cache is keyed
-  on the file's mtime and size, checked at most once per `USERNAME_BANLIST_STAT_HOLD_MS`,
+  edited file takes effect without a restart, at the next name screen at least one
+  second after the edit (nothing polls between screens; the cache is keyed on the
+  file's mtime and size, checked at most once per `USERNAME_BANLIST_STAT_HOLD_MS`,
   so a permissions-only repair, a bare `chmod`, needs a `touch` too); a missing,
   unreadable, or over-64-KiB file (about nine thousand terms; a name screen's cost does
   not grow with the list, only the once-per-edit parse does) warns once and keeps

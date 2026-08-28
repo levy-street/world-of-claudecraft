@@ -40,6 +40,7 @@ import {
   bagItemContextActions,
   destroyConsumesSpecialCopy,
 } from './bag_item_context_menu';
+import { bagStackIndex } from './bags_view';
 import { craftNameKey } from './craft_name_view';
 import { disenchantYieldLines } from './disenchant_yield_view';
 import {
@@ -227,14 +228,33 @@ export class BagItemActionMenu {
       t(c.ok),
       t('hud.chat.context.cancel'),
       () => {
+        // The stale-prompt doctrine (the sibling prompts' precedent): the
+        // captured cell can shift between open and OK, so the NAMED copy is
+        // re-resolved by reference identity and destroyed at its live index
+        // (a same-id swap follows the copy the dialog named). A vanished
+        // copy targets one past the end, a shape-valid index the sim's own
+        // range check refuses with its noItem line: this menu has no error
+        // surface of its own, and an untargeted fallback could consume an
+        // id-mate the dialog never named.
+        const live = this.deps.world();
+        const at = target
+          ? {
+              slotIndex: (() => {
+                const liveIndex = bagStackIndex(live.inventory, target);
+                return liveIndex >= 0 ? liveIndex : live.inventory.length;
+              })(),
+            }
+          : slotIndex === undefined
+            ? undefined
+            : { slotIndex };
         if (action === 'disenchant') {
-          if (slotIndex === undefined) world.disenchantItem(itemId);
-          else world.disenchantItem(itemId, { slotIndex });
+          if (at === undefined) live.disenchantItem(itemId);
+          else live.disenchantItem(itemId, at);
         } else if (action === 'sunder') {
-          if (slotIndex === undefined) world.extractEssence(itemId);
-          else world.extractEssence(itemId, { slotIndex });
-        } else if (slotIndex === undefined) world.salvageItem(itemId);
-        else world.salvageItem(itemId, { slotIndex });
+          if (at === undefined) live.extractEssence(itemId);
+          else live.extractEssence(itemId, at);
+        } else if (at === undefined) live.salvageItem(itemId);
+        else live.salvageItem(itemId, at);
         this.deps.afterAction();
       },
     );

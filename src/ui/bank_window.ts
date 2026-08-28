@@ -1186,6 +1186,10 @@ export class BankWindow {
     // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
     // made every bank item read tolerate an id this client does not know.
     const item = knownItemDef(ITEMS, slot.itemId);
+    // Uniformity read: inert today, since the partial-withdraw rung offers
+    // only on !slot.instance (bank_view.ts bankSlotAction), so this always
+    // resolves the def name; kept on the authority so a future instanced
+    // rung cannot regress it silently.
     const itemName = item ? wornItemCellParts(item, slot.instance).name : slot.itemId;
     showQuantityPrompt(
       {

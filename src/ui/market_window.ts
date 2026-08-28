@@ -33,7 +33,6 @@ import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
-import { tooltipEffectiveQuality } from './item_instance_tooltip';
 import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
 import {
   type MarketBuyConfirm,

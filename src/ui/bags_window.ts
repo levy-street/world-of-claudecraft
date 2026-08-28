@@ -1436,12 +1436,12 @@ export class BagsWindow {
    *  world-canvas drop target (the desktop arm of the same gesture) shares this one
    *  entry point with the touch arm above. */
   promptDestroy(itemId: string, count: number, index: number | null = null): void {
-    // The prompt names the COPY at the dragged index when that cell still
+    // The prompt takes the COPY at the dragged index when that cell still
     // holds this item id (the bags can shift under a snapshot mid-drag);
-    // otherwise it names the def, never a different copy's chosen name.
+    // otherwise the def alone, never a different copy's chosen name.
     const slot = index === null ? undefined : this.deps.world().inventory[index];
-    const instance = slot?.itemId === itemId ? slot.instance : undefined;
-    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)), instance);
+    const copy = slot?.itemId === itemId ? slot : undefined;
+    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)), copy);
   }
 
   /** What dropping `itemId` on the world does right now (pure decision, shared with
@@ -1581,7 +1581,7 @@ export class BagsWindow {
         this.render();
         break;
       case 'discardQuest':
-        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)), s.instance);
+        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)), s);
         break;
       case 'equipBag':
         this.deps.world().equipBag(s.itemId, undefined, this.copyRefFor(s));
@@ -1841,11 +1841,7 @@ export class BagsWindow {
     });
   }
 
-  private showDiscardItemPrompt(
-    itemId: string,
-    maxCount: number,
-    instance?: ItemInstancePayload,
-  ): void {
+  private showDiscardItemPrompt(itemId: string, maxCount: number, copy?: InvSlot): void {
     document.querySelectorAll('.discard-item-prompt').forEach((el) => {
       el.remove();
     });
@@ -1855,8 +1851,18 @@ export class BagsWindow {
     if (!stack) return;
     const prompt = document.createElement('div');
     prompt.className = 'prompt panel discard-item-prompt';
-    // The destroy prompt names the COPY being destroyed (the cell authority).
-    const itemName = item ? wornItemCellParts(item, instance).name : itemId;
+    // A SINGLE copy is destroyed BY TARGET (the submit below re-resolves it),
+    // so only then may the prompt name the copy; a bulk destroy rides the
+    // sim's untargeted prefer-fungible walk (src/sim/items.ts, which spares
+    // special copies by design), so it names the def, never a copy the walk
+    // may spare (the round-4 frontend and security reads: a prompt must not
+    // promise a copy the action does not consume).
+    const named = maxCount === 1 && copy ? copy : undefined;
+    const itemName = item
+      ? named
+        ? wornItemCellParts(item, named.instance).name
+        : itemDisplayName(item)
+      : itemId;
     prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.bags.destroyTitle', { item: itemName }))}</div>`;
     let input: HTMLInputElement | null = null;
     if (maxCount > 1) {
@@ -1882,7 +1888,17 @@ export class BagsWindow {
       const count = input
         ? Math.max(1, Math.min(maxCount, Math.floor(Number(input.value) || 0)))
         : 1;
-      this.deps.world().discardItem(itemId, count);
+      if (named) {
+        // Re-resolve by reference identity at SUBMIT (the sell-confirm
+        // precedent): the named copy is destroyed at whatever index it now
+        // occupies, and a vanished copy REFUSES rather than letting the
+        // untargeted walk consume an id-mate the prompt never named.
+        const liveIndex = bagStackIndex(this.deps.world().inventory, named);
+        if (liveIndex < 0) this.deps.showError(tSim('error.noItem'));
+        else this.deps.world().discardItem(itemId, 1, { slotIndex: liveIndex });
+      } else {
+        this.deps.world().discardItem(itemId, count);
+      }
       dismiss();
       this.deps.hideTooltip();
       this.render();

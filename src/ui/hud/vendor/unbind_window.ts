@@ -13,7 +13,6 @@
 
 import type { ItemDef } from '../../../sim/types';
 import { markDialogRoot } from '../../dialog_root';
-import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
@@ -83,7 +82,9 @@ export function renderUnbindWindow(
   }
 
   for (const row of view.rows) {
-    const name = rowName(row);
+    // One authority read per row (name + the quality the rim and glow share).
+    const parts = rowParts(row);
+    const name = parts.name;
     const fee = formatMoney(row.feeCopper);
     const button = document.createElement('button');
     button.type = 'button';
@@ -97,7 +98,7 @@ export function renderUnbindWindow(
       row.boundCount > 1 ? ` x${formatNumber(row.boundCount, { maximumFractionDigits: 0 })}` : '';
     // Quality-glow socket and fee treatment: the train_window idiom (gold
     // action chip when affordable, plain error-tint price when not).
-    const quality = rowParts(row).quality;
+    const quality = parts.quality;
     const glow = quality ? qualityGlowShadow(QUALITY_COLOR[quality]) : '';
     const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item, quality) : ''}</span>`;
     const feeHtml = row.affordable

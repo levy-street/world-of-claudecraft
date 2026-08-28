@@ -1,5 +1,12 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
-import { closeSync, fstatSync, openSync, readSync, statSync } from 'node:fs';
+import {
+  closeSync,
+  constants as fsConstants,
+  fstatSync,
+  openSync,
+  readSync,
+  statSync,
+} from 'node:fs';
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
 
 const SCRYPT_N = 16384,
@@ -134,7 +141,8 @@ export function usernameBanlistStatHoldMsForTest(): number {
   return banlistStatHoldMs;
 }
 
-// How many times the hold let a REAL statSync run (test observability for
+// How many times the hold admitted the fresh-stat BRANCH (the module's one
+// statSync site sits immediately below the increment; test observability for
 // the syscall-count claim itself: serving a stale answer and eliding the
 // syscall are different properties, and only this counts the second).
 let banlistStatCount = 0;
@@ -152,10 +160,11 @@ export interface BanlistIndex {
   lengths: number[];
 }
 
-/** Empty terms are dropped here as well as in parseBanlist, so the exported
- *  pair keeps its `some(includes)` equivalence for ANY caller: the one input
- *  class where a substring walk of lengths one and up would diverge from
- *  `includes('')` (always true) is the empty term, which no list can mean. */
+/** Empty terms are dropped here as well as in parseBanlist. Stated as the
+ *  one exception: for a list CONTAINING an empty term, `some(includes)` is
+ *  unconditionally true while the walk (lengths one and up) never matches
+ *  it, so the pair is equivalent exactly BECAUSE the empty term, which no
+ *  list can mean, is removed where the index is built. */
 export function indexBannedTerms(terms: string[]): BanlistIndex {
   const set = new Set<string>();
   const lengthSet = new Set<number>();
@@ -243,7 +252,10 @@ export function usernameBanlistBootLine(status: UsernameBanlistStatus): string {
  *  non-UTF-8 file under the ceiling is not refused for its U+FFFD inflation
  *  (the phase 13 QA security read of the first fix). */
 function readBanlistBounded(file: string): string {
-  const fd = openSync(file, 'r');
+  // O_NONBLOCK: a no-op for a regular file, and what keeps a writer-less
+  // FIFO at this path from hanging the open forever (a plain 'r' open of a
+  // FIFO blocks until a writer appears, before isFile() could refuse it).
+  const fd = openSync(file, fsConstants.O_RDONLY | fsConstants.O_NONBLOCK);
   try {
     const stat = fstatSync(fd);
     // A FIFO, a device, or a procfs-style file reports size 0 while holding

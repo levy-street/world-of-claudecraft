@@ -23,9 +23,10 @@ export interface WorldDropTargetDeps {
    *  means the drop is inert, e.g. a vendor/trade window owns the item). */
   destroyAction(itemId: string): 'discard' | 'discardBlocked' | 'none';
   /** Open the destroy prompt for the dropped stack (confirm + quantity). */
-  /** `index` is the stack's inventory index at pick-up (null when the grid
-   *  was not showing), so the destroy prompt can name the exact COPY being
-   *  destroyed rather than its def (the cell authority). */
+  /** Open the destroy prompt for the dropped stack. `index` is the stack's
+   *  inventory index at pick-up (null when the grid was not showing), so the
+   *  prompt can name and TARGET the exact copy being destroyed rather than
+   *  its def (the cell authority). */
   promptDestroy(itemId: string, count: number, index: number | null): void;
   /** Refusal toast for a protected (noDiscard) item. */
   showBlocked(): void;

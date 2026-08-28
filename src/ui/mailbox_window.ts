@@ -18,7 +18,7 @@ import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
-import { itemDisplayName, knownLetterId, tEntity } from './entity_i18n';
+import { knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
@@ -798,7 +798,7 @@ export class MailboxWindow {
         minus.setAttribute(
           'aria-label',
           t('hudChrome.mailbox.parcelQtyDecreaseAria', {
-            item: wornItemCellParts(item, slot.instance).name,
+            item: cell.name,
           }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
@@ -821,7 +821,7 @@ export class MailboxWindow {
         qty.setAttribute(
           'aria-label',
           t('hudChrome.mailbox.parcelQtyAria', {
-            item: wornItemCellParts(item, slot.instance).name,
+            item: cell.name,
           }),
         );
         // The coin-input focus contract: select the value so typing replaces it
@@ -847,7 +847,7 @@ export class MailboxWindow {
         plus.setAttribute(
           'aria-label',
           t('hudChrome.mailbox.parcelQtyIncreaseAria', {
-            item: wornItemCellParts(item, slot.instance).name,
+            item: cell.name,
           }),
         );
         plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
@@ -865,7 +865,7 @@ export class MailboxWindow {
       remove.setAttribute(
         'aria-label',
         t('hudChrome.mailbox.removeParcelAria', {
-          item: wornItemCellParts(item, slot.instance).name,
+          item: cell.name,
         }),
       );
       remove.addEventListener('click', () => {
