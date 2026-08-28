@@ -157,7 +157,20 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    report must preserve the diagnostic that motivated the field, or explicitly document that it
    is local-only. Check null behavior, malformed input, caps, and unknown-field dropping in
    `tests/perf_reporter.test.ts` and `tests/perf_report.test.ts`.
-8. **Is the result visible without overclaiming?** Use static contract tests for invariants, a
+8. **Does any material buy a second scene pass?** A material with `transmission > 0` (a
+   `MeshPhysicalMaterial`, which GLTFLoader mints for a glTF material carrying
+   `KHR_materials_transmission`) makes three render the whole opaque scene a SECOND time per
+   frame into a viewport-sized HalfFloat target with mipmaps (`renderTransmissionPass`), for
+   as long as the object is on screen: a 4 s first frame and a doubled draw cost on an
+   integrated GPU, and no prewarm can touch it (measured 2026-08-28 on the water elemental).
+   Flag any `transmission`, `transmissionMap`, `thickness`, `attenuationColor` or
+   `KHR_materials_transmission` / `KHR_materials_volume` reaching the renderer: a procedural
+   `new THREE.MeshPhysicalMaterial(` that sets them, an exporter or pipeline step that
+   preserves the extension, a GLB that ships it. The loader neutralizes parsed GLBs
+   (`assets/transmission_neutralize.ts`) and `tests/transmission_neutralize.test.ts` lists the
+   shipped models that carry the extension; a new one must be listed there on purpose, and a
+   procedural transmissive material is BLOCKING (translucency is alpha blending here).
+9. **Is the result visible without overclaiming?** Use static contract tests for invariants, a
    browser trace for stage attribution, and headed normal-vsync evidence for perceptual claims.
    A zero `live-program` count can mean a warm cache, no reached content, missing probe coverage,
    or no draw; it is never by itself proof of no hitch, no link, no memory growth, or no resource
@@ -178,7 +191,8 @@ instead of suppressing a finding.
   `[SEVERITY] (confidence: high|med|low) file:line - the observed work or missing evidence ->
   the broken contract -> the concrete check or smallest correction.`
   Severity: **BLOCKING** for unprepared live GPU work, a visible key change without a gated swap,
-  a post-boot light/context/resource leak, a false or incomparable performance claim, or telemetry
+  a transmissive material reaching the renderer (the second scene pass), a post-boot
+  light/context/resource leak, a false or incomparable performance claim, or telemetry
   that can crash, exfiltrate, or silently drop the safety signal; **SHOULD-FIX** for an uncovered
   variant or stage, weak memory route, missing lifecycle arm, unbounded/null-unsafe telemetry, or
   missing test; **NOTE** for clarity or a follow-up.

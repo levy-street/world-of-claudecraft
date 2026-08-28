@@ -2,7 +2,8 @@
 // (src/render/assets/transmission_neutralize.ts): three's transmission pass
 // (a second full-scene render per frame) never runs for a shipped asset.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,6 +12,7 @@ import {
   neutralizeTransmission,
   TRANSMISSION_OPACITY_LOSS,
 } from '../src/render/assets/transmission_neutralize';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 describe('neutralizeTransmission', () => {
   it('turns a transmissive physical material into a translucent one', () => {
@@ -64,13 +66,93 @@ describe('the loader applies the rule to every parsed GLB', () => {
     const glb = readFileSync(
       new URL('../public/models/creatures/water_elemental.glb', import.meta.url),
     );
-    const length = glb.readUInt32LE(12);
-    const json = JSON.parse(glb.subarray(20, 20 + length).toString('utf8')) as {
-      materials?: { name?: string; extensions?: Record<string, unknown> }[];
-    };
-    const transmissive = (json.materials ?? [])
+    const transmissive = glbMaterials(glb)
       .filter((m) => m.extensions?.KHR_materials_transmission)
       .map((m) => m.name);
     expect(transmissive).toEqual(['living_water', 'deep_water']);
+  });
+});
+
+interface GlbMaterial {
+  name?: string;
+  extensions?: Record<string, unknown>;
+}
+
+/** The materials of a GLB's JSON chunk (12-byte header, chunk 0 length at
+ *  offset 12, its JSON at offset 20). */
+function glbMaterials(glb: Buffer): GlbMaterial[] {
+  if (glb.readUInt32LE(0) !== 0x46546c67) return [];
+  const length = glb.readUInt32LE(12);
+  const json = JSON.parse(glb.subarray(20, 20 + length).toString('utf8')) as {
+    materials?: GlbMaterial[];
+  };
+  return json.materials ?? [];
+}
+
+function* walkGlbs(dir: string): Generator<string> {
+  const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+    a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+  );
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) yield* walkGlbs(full);
+    else if (entry.name.endsWith('.glb')) yield full;
+  }
+}
+
+describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
+  const root = new URL('..', import.meta.url).pathname;
+
+  /** Shipped models whose materials carry KHR_materials_transmission or
+   *  KHR_materials_volume, each neutralized at load. A new entry is a
+   *  decision, not a fact: the asset pipeline preserves the extension
+   *  (gltf-transform registers ALL_EXTENSIONS) and Tripo generates with
+   *  `pbr: true`, so a glass-like prompt lands one here. List it, and know
+   *  that the player will see alpha blending, never refraction. */
+  const TRANSMISSIVE_GLBS: Record<string, readonly string[]> = {
+    'public/models/creatures/water_elemental.glb': ['living_water', 'deep_water'],
+  };
+
+  it('every shipped GLB with a transmissive or volume material is listed on purpose', () => {
+    const found: Record<string, string[]> = {};
+    let scanned = 0;
+    for (const file of walkGlbs(join(root, 'public'))) {
+      scanned++;
+      const names = glbMaterials(readFileSync(file))
+        .filter(
+          (m) =>
+            m.extensions?.KHR_materials_transmission !== undefined ||
+            m.extensions?.KHR_materials_volume !== undefined,
+        )
+        .map((m) => m.name ?? '(unnamed)');
+      if (names.length > 0) found[relative(root, file)] = names;
+    }
+    // The vacuity floor: the walk must have seen the real model tree.
+    expect(scanned).toBeGreaterThan(1000);
+    expect(found).toEqual(TRANSMISSIVE_GLBS);
+  });
+
+  it('constructs no MeshPhysicalMaterial and sets no transmission in the client source', () => {
+    // three's transmission pass is what a MeshPhysicalMaterial with
+    // transmission > 0 buys; a physical material with none of it is a
+    // MeshStandardMaterial with extra uniforms. Translucency here is alpha
+    // blending. The neutralizer is the one writer, and it writes zero.
+    const offenders: string[] = [];
+    for (const dir of ['src/render', 'src/ui', 'src/game', 'src/editor', 'src/guide']) {
+      for (const { file, full } of tsFilesUnder(join(root, dir))) {
+        if (file.endsWith('.test.ts')) continue;
+        const rel = `${dir}/${file}`;
+        if (rel === 'src/render/assets/transmission_neutralize.ts') continue;
+        const source = readFileSync(full, 'utf8');
+        if (/new\s+(THREE\.)?MeshPhysicalMaterial\s*\(/.test(source))
+          offenders.push(`${rel}: construction`);
+        if (/\btransmission\s*[:=]\s*(?!0\b)[0-9.]/.test(source))
+          offenders.push(`${rel}: transmission set`);
+        if (/\b(thickness|attenuationColor|attenuationDistance)\s*[:=]/.test(source)) {
+          offenders.push(`${rel}: volume set`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 });

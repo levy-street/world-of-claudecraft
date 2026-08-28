@@ -622,6 +622,20 @@ GPU work signs. Each rule names its seam and its guard.
   `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
   `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
   `tests/renderer_look_pieces_hold.test.ts`.
+- **No material buys a second scene pass: transmission is forbidden.** A material with
+  `transmission > 0` (a `MeshPhysicalMaterial`; GLTFLoader mints one for a glTF material
+  carrying `KHR_materials_transmission`) makes three draw the whole opaque scene a second
+  time per frame into a viewport-sized HalfFloat target with mipmaps
+  (`WebGLRenderer.renderTransmissionPass`), for as long as the object is on screen: a 4 s
+  first frame and a doubled draw cost on an integrated GPU, which no prewarm can remove
+  (measured 2026-08-28 on the water elemental's `living_water`). Translucency here is
+  alpha blending (`transparent`, `opacity`, `depthWrite: false`, the alphaMode BLEND
+  state). The loader neutralizes every transmissive material on a parsed GLB
+  (`assets/transmission_neutralize.ts`), and `tests/transmission_neutralize.test.ts` names
+  the shipped models that carry the extension so a new one is listed on purpose; a
+  procedural `new THREE.MeshPhysicalMaterial(` that sets `transmission`, `thickness` or
+  `attenuationColor` is a defect. Guard: `render-performance-reviewer` (its second-pass
+  check).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a
