@@ -82,8 +82,14 @@ describe('lane constants hold the R5 budget literals', () => {
       joinPath(__dirname, '../docs/design/player-performance/packet-3-input-cadence.md'),
       'utf8',
     );
-    expect(doc).toContain(`refill ${MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND}/s`);
-    expect(doc).toContain(`burst ${MSG_LANE_NAME_SCREEN_BURST}.`);
+    // Sliced to the name-screen bullet so the chat ladder's own "burst 5"
+    // wording can never satisfy these (the round-3 test audit).
+    const bullet = doc.slice(
+      doc.indexOf('name-screen lane'),
+      doc.indexOf('parsed frames of any OTHER shape'),
+    );
+    expect(bullet).toContain(`refill ${MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND}/s`);
+    expect(bullet).toContain(`burst ${MSG_LANE_NAME_SCREEN_BURST}.`);
   });
 });
 

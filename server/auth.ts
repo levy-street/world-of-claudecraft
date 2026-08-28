@@ -126,6 +126,23 @@ export function setUsernameBanlistStatHoldMsForTest(ms: number): void {
   banlistStatHold = { file: '', atMs: Number.NEGATIVE_INFINITY, stamp: '', size: -1 };
 }
 
+/** The LIVE hold interval (the suite pins the initializer wiring by reading
+ *  this before its module-scope setter call: a `= 0` initializer would ship
+ *  the one-stat-per-screen cost back silently while the constant pin stayed
+ *  green, the round-3 test audit). */
+export function usernameBanlistStatHoldMsForTest(): number {
+  return banlistStatHoldMs;
+}
+
+// How many times the hold let a REAL statSync run (test observability for
+// the syscall-count claim itself: serving a stale answer and eliding the
+// syscall are different properties, and only this counts the second).
+let banlistStatCount = 0;
+
+export function usernameBanlistStatCountForTest(): number {
+  return banlistStatCount;
+}
+
 /** The banned-term index: the Set of terms and the DISTINCT term lengths,
  *  ascending (the walk in hasBannedTerm probes only those lengths: a list
  *  of a handful of terms costs a handful of substring lengths, not every
@@ -276,6 +293,7 @@ function bannedUsernameTerms(): BanlistIndex {
       fileStamp = banlistStatHold.stamp;
       fileSize = banlistStatHold.size;
     } else {
+      banlistStatCount += 1;
       try {
         const stat = statSync(file, { throwIfNoEntry: false });
         if (stat === undefined) fileStamp = 'unreadable';

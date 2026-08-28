@@ -483,6 +483,45 @@ describe('BagItemActionMenu target step: worn rows', () => {
     expect(h.applied[1]).toEqual({ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: undefined });
   });
 
+  it('a named worn copy titles its row by its chosen name; the bagged twin keeps the def name', () => {
+    // The cell authority in the target picker (the phase 13 QA round 3): the
+    // worn row names the exact worn COPY (Lucent Infusion targets promoted
+    // copies by design, and the chosen name is the discriminator between
+    // byte-identical rows), while bagged rows are grouped by item id and
+    // keep the def name (recorded: the group has no per-copy identity).
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+      equippedInstances: {
+        mainhand: { rolled: { quality: 'legendary' }, name: 'Dawn Oath', perfected: true },
+      },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    expect(h.rows()[0].text).toContain('Dawn Oath');
+    expect(h.rows()[0].text).toContain('Worn (Main Hand)');
+    expect(h.rows()[1].text).not.toContain('Dawn Oath');
+  });
+
+  it('the replace confirm names the worn victim by its chosen name', () => {
+    // The destroy-confirm family (#2415): what is destroyed is the WORN
+    // copy's old enchant, so the dialog names that copy, chosen name and all.
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: SWORD },
+      equippedInstances: {
+        mainhand: { enchant: 'enchant_weapon_intellect', name: 'Dawn Oath' },
+      },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click('worn:mainhand');
+    expect(h.applied).toEqual([]);
+    expect(h.confirms).toHaveLength(1);
+    expect(`${h.confirms[0].title} ${h.confirms[0].body}`).toContain('Dawn Oath');
+  });
+
   it('lists both hands separately, each dispatching its own slot', () => {
     const h = harness(768, {
       inventory: [{ itemId: DUST, count: 99 }],

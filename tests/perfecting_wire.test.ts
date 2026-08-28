@@ -496,7 +496,11 @@ describe('perfect_item over the real online dispatch path', () => {
     expect(online).toEqual(offline);
     expect(server.sim.countItem('deed_of_making', pid)).toBe(1);
     // Neither host let the oversized raw name LAND: no name, no promotion.
+    // Positive control first: the copy exists and IS Perfected (the four
+    // forced-success attempts above), so the two negatives cannot pass by a
+    // missing slot or a vanished instance.
     const copy = serverMeta(server, pid).inventory.find((s) => s.itemId === APEX_NECK)?.instance;
+    expect(copy?.perfected).toBe(true);
     expect(copy?.name).toBeUndefined();
     expect(copy?.rolled?.quality).toBeUndefined();
   });

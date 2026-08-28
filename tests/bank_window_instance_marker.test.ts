@@ -91,8 +91,9 @@ describe('bank grid instanced-slot marker', () => {
     expect(cells[0].getAttribute('aria-label')).toContain('Dawn Oath');
     expect(cells[0].getAttribute('aria-label')).not.toContain('Pitted Shortsword');
     expect(cells[1].getAttribute('aria-label')).toBe('Pitted Shortsword, quantity 1');
-    expect(iconCalls[0]?.quality).toBe('legendary');
-    expect(iconCalls[1]?.quality).not.toBe('legendary');
+    // Exact tuple: worn_sword is a defined 'common', so a 1-ary regression
+    // (undefined) fails the second entry too, not only the first.
+    expect(iconCalls.map((c) => c.quality)).toEqual(['legendary', 'common']);
   });
 
   it('a masterwork uses the authored seal and announces masterwork', () => {

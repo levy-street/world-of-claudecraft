@@ -432,6 +432,7 @@ describe('elision key composition stays banished (hud.ts + painter_host.ts sourc
     // forwards the same way; it is the same 1-ary-swallow class one file over.
     const bank = strip(read('../src/ui/bank_window.ts'));
     expect(bank).toContain('itemIcon: (item, quality) => this.deps.itemIcon(item, quality),');
+    expect(bank.match(/\bitemIcon:/g), 'one adapter key in the bank window').toHaveLength(1);
     expect(bank).not.toMatch(/itemIcon: \(item\) =>/);
     // The dep the adapters satisfy really declares the second parameter (over
     // comment-stripped source, like the arrows).

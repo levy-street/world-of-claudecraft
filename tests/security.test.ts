@@ -15,6 +15,8 @@ import {
   USERNAME_BANLIST_FILE_MAX_BYTES,
   USERNAME_BANLIST_STAT_HOLD_MS,
   usernameBanlistBootLine,
+  usernameBanlistStatCountForTest,
+  usernameBanlistStatHoldMsForTest,
   usernameBanlistStatus,
   validCharName,
   validEmail,
@@ -82,7 +84,10 @@ function fakeReq(headers: Record<string, string>, remoteAddress: string) {
 }
 
 // The banlist tests below edit the file and screen in the same millisecond, so
-// they run with no stat hold; the hold itself is proven by its own case.
+// they run with no stat hold; the hold itself is proven by its own case. The
+// LIVE initializer is captured BEFORE the blanket zero, so the production
+// wiring (hold = the constant) stays pinned (the round-3 test audit).
+const liveStatHoldMs = usernameBanlistStatHoldMsForTest();
 setUsernameBanlistStatHoldMsForTest(0);
 
 function withUsernameBanlist(env: { inline?: string; file?: string }, test: () => void): void {
@@ -823,6 +828,11 @@ describe('username censorship', () => {
     expect(deploy).toContain('within one second');
     expect(deploy).toContain("a name screen's cost does\n  not grow with the list");
     expect(deploy).not.toContain('scans every term');
+    // The boot-line promise the doc makes is the literal the helper prints.
+    expect(deploy).toContain('`name banlist:`');
+    expect(
+      usernameBanlistBootLine({ file: '/x', loaded: true, fileTerms: 1 }).includes('name banlist:'),
+    ).toBe(true);
   });
 
   it('the matcher second pass is skipped exactly when normalization changed only the case', () => {
@@ -890,14 +900,36 @@ describe('username censorship', () => {
     }
   });
 
+  it('ships with the hold WIRED to the constant, not only the constant declared', () => {
+    expect(liveStatHoldMs).toBe(USERNAME_BANLIST_STAT_HOLD_MS);
+  });
+
+  it('the warm runs before the game loop and the gauge reads the real accessor (boot wiring)', () => {
+    // Source-order pins over server/main.ts, comment-stripped: moving the
+    // warm back inside the listen callback (a hung mount would then stall a
+    // TICKING realm's screen instead of the boot) or stubbing the gauge's
+    // source arm would green every behavior suite, so the wiring is pinned.
+    const main = readFileSync(join(__dirname, '../server/main.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+    const warmAt = main.indexOf('const banlist = warmUsernameBanlist();');
+    const startAt = main.indexOf('game.start();');
+    expect(warmAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(-1);
+    expect(warmAt).toBeLessThan(startAt);
+    expect(main).toContain('usernameBanlistLoaded: usernameBanlistFileLoaded,');
+  });
+
   it('holds the file stat to one per USERNAME_BANLIST_STAT_HOLD_MS, then sees the edit', () => {
     expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
     const dir = mkdtempSync(join(tmpdir(), 'woc-banlist-hold-'));
     const file = join(dir, 'banlist.txt');
     writeFileSync(file, 'firstterm\n');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
       setUsernameBanlistStatHoldMsForTest(60_000);
       withUsernameBanlist({ file }, () => {
+        const statsBefore = usernameBanlistStatCountForTest();
         expect(offensiveName('firstterm')).toBe(true);
         // An edit inside the hold is invisible: no stat runs, the stamp is held.
         writeFileSync(file, 'secondterm\n');
@@ -905,12 +937,27 @@ describe('username censorship', () => {
         utimesSync(file, later, later);
         expect(offensiveName('secondterm')).toBe(false);
         expect(offensiveName('firstterm')).toBe(true);
+        // The syscall itself was elided, not merely its answer ignored: fifty
+        // screens inside the hold cost exactly the ONE stat that opened it.
+        for (let i = 0; i < 47; i++) offensiveName('firstterm');
+        expect(usernameBanlistStatCountForTest() - statsBefore).toBe(1);
+        // The hold is keyed to the PATH: a re-pointed env stats immediately
+        // (an oversized file at the new path warns ITS ceiling arm, which
+        // only a fresh stat of the new path can price).
+        const other = join(dir, 'banlist-other.txt');
+        writeFileSync(other, `overterm\n${'z'.repeat(USERNAME_BANLIST_FILE_MAX_BYTES)}`);
+        withUsernameBanlist({ file: other }, () => {
+          expect(offensiveName('overterm')).toBe(false);
+          expect(warn).toHaveBeenCalledOnce();
+          expect(String(warn.mock.calls[0][0])).toContain('ceiling');
+        });
         // Past the hold (dropped to zero here) the stat runs and the edit lands.
         setUsernameBanlistStatHoldMsForTest(0);
         expect(offensiveName('secondterm')).toBe(true);
         expect(offensiveName('firstterm')).toBe(false);
       });
     } finally {
+      warn.mockRestore();
       setUsernameBanlistStatHoldMsForTest(0);
       rmSync(dir, { force: true, recursive: true });
     }

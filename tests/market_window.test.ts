@@ -59,6 +59,11 @@ describe('market_window: no magic values', () => {
     expect(painterCode).toContain('const returned = wornItemCellParts(item, instance);');
     expect(painterCode).toContain('const returnedQuality = returned.quality;');
     expect(painterCode).toContain('marketNameColor(returnedQuality)');
+    // The NAME half of each row rides the same authority read (the round-3
+    // test audit: the quality pins alone left the name half revertible).
+    expect(painterCode).toContain('const itemName = parts.name;');
+    expect(painterCode).toContain('esc(staged.name)');
+    expect(painterCode).toContain('esc(returned.name)');
     expect(painterCode).toContain('const qColor = marketNameColor(item.quality);');
     const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
     expect(core).toContain('var(--mkt-name-');

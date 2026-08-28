@@ -433,6 +433,11 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
     expect(painter).toContain(
       'promptDestroy(itemId: string, count: number, index: number | null = null): void',
     );
+    // The touch drag ghost carries the copy's rim too (never exercised by the
+    // marker rig, whose render does not start a drag, so pinned here).
+    expect(painter).toMatch(
+      /ghostHtml: \(\) =>\s*this\.deps\.itemIcon\(item, wornItemCellParts\(item, s\.instance\)\.quality\),/,
+    );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
     expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
     // The HUD installs the canvas as the world drop target with exactly those seams.
