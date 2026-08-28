@@ -5084,6 +5084,23 @@ recorded, or refuted with the file open)
   phase 10 section) are historical records of the spec's original flavor,
   whose resolution into stations is already recorded in the Phase 10 ledger,
   and deliberately stand. R5's own wording in this file never listed a feast.
+  RE-RECORDED, OUTCOME 2026-08-28 (Phase 15 STEP 0, per ruling ip-15-KIT,
+  farming/state.md row 109): the 2026-08-16 outcome is FALSIFIED and the feast
+  is UN-DROPPED. Its finding was "there is no feast buff source to measure";
+  farming's `harvest_feast` (charges 10, durationTicks 3600, serving
+  `evergarden_braised_greens`) and 11k's three apex feasts (`stonepot_feast`,
+  `warspice_feast`, `sageleaf_feast`, each serving its apex role plate) are
+  real feast buff sources, all shipped in the merged tree
+  (src/sim/content/profession_items.ts, the `feast` records). BOTH live edits
+  the drop justified are reverted in this same change:
+  phase-15-power-verification.md's Goal line and Arm 1, and
+  implementation-plan.md's Phase 15 deliverable, all three now reading "the
+  best available food, always on, delivered by feast". The phase-10-era
+  mentions still stand as historical records, unchanged, for the same reason
+  as before. R5's own wording in this file still never listed a feast and is
+  not edited: the feast is the DELIVERY of the food term, not a fifth term
+  (ip-15-ACCESS). The re-authored premise is strictly STRONGER than the
+  dropped one, so the measured pass now measures what the game ships.
 - RULING REVIEW RECORD (2026-08-16): each of the six ruling commits got its
   own FRESH review (five reviewers: sim-seams over a1 and c, pin-quality
   over a2, content-obligations over b, a docs reviewer over d+e; the three

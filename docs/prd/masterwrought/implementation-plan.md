@@ -865,7 +865,8 @@ Goal: prove R5 before anything merges beyond this point.
 
 Deliverables:
 - The measured before/after pass per `docs/design/spell-balance-framework.md`: a
-  full-kit character (2 Perfected pieces, apex enchants, flask, food) vs
+  full-kit character (2 Perfected pieces, apex enchants, flask, and the best available
+  food always on, delivered by feast) vs
   pre-packet raid BiS, against heroic raid and S-rift tuning targets; results recorded in
   `power-verification.md` with the 5 percent envelope verdict.
 - Adversarial audit workflow: stat-shape review of every apex item (scarce-stat and
