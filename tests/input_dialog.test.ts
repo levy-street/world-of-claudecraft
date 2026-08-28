@@ -169,10 +169,13 @@ describe('the previously unpinned arms (the phase 14 QA)', () => {
     // The export/import callers round-trip PASTED build strings through the
     // value field, so this arm carries real weight (the repo invariant:
     // every interpolation through esc()).
+    // The placeholder and value sit inside QUOTED attributes, so their
+    // payloads break the quote first; the title and label are element
+    // content, so bare tags suffice. Each arm reds when its esc() is dropped.
     showInputDialog(makeDeps(), {
       title: '<i>T</i>',
       label: '<u>L</u>',
-      placeholder: '<b>P</b>',
+      placeholder: '"><b>P</b>',
       value: '"><img src=x>',
     });
     expect(el().querySelector('img')).toBeNull();
@@ -180,6 +183,8 @@ describe('the previously unpinned arms (the phase 14 QA)', () => {
     expect(el().querySelector('u')).toBeNull();
     expect(el().querySelector('b')).toBeNull();
     expect(document.getElementById('confirm-dialog-title')?.textContent).toBe('<i>T</i>');
-    expect((el().querySelector('.cd-input') as HTMLInputElement).value).toBe('"><img src=x>');
+    const input = el().querySelector('.cd-input') as HTMLInputElement;
+    expect(input.value).toBe('"><img src=x>');
+    expect(input.placeholder).toBe('"><b>P</b>');
   });
 });

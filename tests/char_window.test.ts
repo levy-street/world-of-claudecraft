@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
+import { ITEMS } from '../src/sim/data';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
 import { STAT_DEFENSE, STAT_GRID } from '../src/ui/char_stats_view';
 import {
@@ -1089,21 +1090,30 @@ describe('char_window: the Masterwrought cap visibility family (phase 14)', () =
     // Zero worn: no row at all (before endgame the cap never binds, and a
     // standing "0 / 2" row would be noise on every sheet).
     expect(renderSheet({}).root.querySelector('.char-mw-slots')).toBeNull();
-    // One worn, then two: the value tracks the flag walk, so a hand count
-    // that drifts from masterwroughtCapReadout reds here.
+    // One worn, then two: the EXACT "{used} / {cap}" value tracks the flag
+    // walk (a substring check on '2' was satisfied by the cap in '1 / 2', so
+    // a frozen used-count survived it).
     const one = renderSheet({ mainhand: 'duskforged_warblade' });
-    expect(one.root.querySelector('.char-mw-slots-value')?.textContent).toContain('1');
+    expect(one.root.querySelector('.char-mw-slots-value')?.textContent).toBe('1 / 2');
     const two = renderSheet({ mainhand: 'duskforged_warblade', offhand: 'duskforged_bulwark' });
-    expect(two.root.querySelector('.char-mw-slots-value')?.textContent).toContain('2');
+    expect(two.root.querySelector('.char-mw-slots-value')?.textContent).toBe('2 / 2');
     expect(two.root.querySelector('.char-mw-slots-label')?.textContent?.length).toBeGreaterThan(0);
   });
 
   it('the worn-piece diamond renders on the flagged slot only, with an accessible name', () => {
-    const { root } = renderSheet({ mainhand: 'duskforged_warblade' });
+    // A plain (unflagged) piece worn beside the Masterwrought one: the chip
+    // must gate on the def flag, so exactly one chip renders and it sits on
+    // the flagged slot (a chip-on-every-worn-item regression reds here).
+    const plainChest = Object.values(ITEMS).find(
+      (def) => def.kind === 'armor' && def.slot === 'chest' && !def.masterwrought,
+    );
+    expect(plainChest).toBeDefined();
+    const { root } = renderSheet({ mainhand: 'duskforged_warblade', chest: plainChest!.id });
     const chips = [...root.querySelectorAll('.equip-mw-chip')];
     expect(chips.length).toBe(1);
     const chip = chips[0] as HTMLElement;
     expect(chip.closest('#equip-slot-mainhand')).not.toBeNull();
+    expect(root.querySelector('#equip-slot-chest .equip-mw-chip')).toBeNull();
     expect(chip.getAttribute('role')).toBe('img');
     expect(chip.getAttribute('aria-label')?.length).toBeGreaterThan(0);
   });

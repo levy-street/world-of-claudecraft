@@ -85,10 +85,11 @@ export interface PerfectingDetail {
   /** Every material row satisfied (vacuously true on an empty bill). */
   materialsMet: boolean;
   /** The R2 warning: the copy is unbound and unperfected, so the NEXT attempt
-   *  permanently binds it (a craft-proc head-start copy at rank 1 is still
-   *  unbound and binds exactly the same way, so the predicate is bound-ness,
-   *  not rank). Also the confirm-step predicate: the attempt button's use on
-   *  such a copy goes through an explicit confirm. */
+   *  binds it (a craft-proc head-start copy at rank 1 is still unbound and
+   *  binds exactly the same way, so the predicate is bound-ness, not rank;
+   *  the bind's permanence is perfectingBindWarning's contract below). Also
+   *  the confirm-step predicate: the attempt button's use on such a copy
+   *  goes through an explicit confirm. */
   bindWarning: boolean;
 }
 
@@ -138,21 +139,59 @@ function chosenNameFor(reads: PerfectingWorldReads, ref: PerfectItemRef): string
 }
 
 /** The R2 bind-warning predicate, exported for the painter's confirm step and
- *  the tests: an unbound, unperfected, unpromoted copy binds permanently on
- *  its next resolved attempt. */
+ *  the tests: an unbound, unperfected, unpromoted copy binds on its next
+ *  resolved attempt (a craft-proc head-start copy at rank 1 is still unbound
+ *  and binds exactly the same way, so the predicate is bound-ness, not rank).
+ *  The bind holds for good once the copy carries Perfecting progress or the
+ *  Perfected stamp; a FAILED first attempt leaves a bound rank-0 copy the
+ *  Maker's Bond unbind can still clear (the recorded rank-0 shape). */
 export function perfectingBindWarning(info: PerfectingInfoView): boolean {
   return !info.bound && !info.perfected && !info.promoted;
 }
 
+/** Where a BAGGED copy sits among the bagged candidates of its item id
+ *  (`ordinal`, bag order) and how many there are (`count`). A splice of some
+ *  other stack (a resolved attempt exhausting a material) shifts every later
+ *  cell but never reorders same-id siblings, so this pair identifies the copy
+ *  across the shift where its cell index cannot; a sale, deposit, trade, or
+ *  destroy of a same-id copy moves `count`, which is the signal to stop
+ *  guessing. Null for a worn ref or a ref that names no candidate. */
+export interface PerfectingSelectionAnchor {
+  ordinal: number;
+  count: number;
+}
+
+export function baggedCopyOrdinal(
+  candidates: ReadonlyArray<{ ref: PerfectItemRef; worn: boolean }>,
+  ref: PerfectItemRef | null,
+): PerfectingSelectionAnchor | null {
+  if (ref === null || 'slot' in ref) return null;
+  const siblings = candidates.filter(
+    (c) => !c.worn && 'bag' in c.ref && c.ref.itemId === ref.itemId,
+  );
+  const ordinal = siblings.findIndex((c) => samePerfectRef(c.ref, ref));
+  return ordinal === -1 ? null : { ordinal, count: siblings.length };
+}
+
 /**
  * Build the whole view. `requested` is the painter-held selection (null before
- * any pick); a request that no longer names a candidate falls back to the
- * first candidate, so a copy that left the bags mid-session never strands the
- * detail pane on a ghost.
+ * any pick). A request that no longer names a candidate is first re-targeted
+ * through `anchor` (the painter-latched baggedCopyOrdinal of that selection):
+ * when the same-id bagged count is unchanged, the copy at the same ordinal IS
+ * the selected copy one or more cells over, so the selection follows it (a
+ * resolved attempt that exhausted a lower stack, the common shape) instead of
+ * jumping to the first candidate (a worn piece, whose action button would then
+ * spend the next ember on a copy the player never picked). Only when the count
+ * moved, or there is no anchor, does the request fall back to the first
+ * candidate, so a copy that left the bags mid-session never strands the detail
+ * pane on a ghost. The one shape the anchor cannot see is two same-id bagged
+ * copies REORDERED between two polls (a drag inside the bag), the recorded
+ * same-id class.
  */
 export function buildPerfectingView(
   reads: PerfectingWorldReads,
   requested: PerfectItemRef | null,
+  anchor: PerfectingSelectionAnchor | null = null,
 ): PerfectingViewModel {
   const refs = walkCandidateRefs(reads);
   const infos = new Map<{ ref: PerfectItemRef; worn: boolean }, PerfectingInfoView>();
@@ -161,8 +200,17 @@ export function buildPerfectingView(
     if (info) infos.set(entry, info);
   }
   const live = [...infos.keys()];
-  const selectedEntry =
-    live.find((entry) => samePerfectRef(entry.ref, requested)) ?? live[0] ?? null;
+  const exact = live.find((entry) => samePerfectRef(entry.ref, requested)) ?? null;
+  const followed =
+    exact === null && requested !== null && 'bag' in requested && anchor !== null
+      ? (() => {
+          const siblings = live.filter(
+            (entry) => !entry.worn && 'bag' in entry.ref && entry.ref.itemId === requested.itemId,
+          );
+          return siblings.length === anchor.count ? (siblings[anchor.ordinal] ?? null) : null;
+        })()
+      : null;
+  const selectedEntry = exact ?? followed ?? live[0] ?? null;
   const candidates: PerfectingCandidate[] = live.map((entry) => {
     const info = infos.get(entry) as PerfectingInfoView;
     return {

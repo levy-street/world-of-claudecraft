@@ -3780,15 +3780,16 @@ export const hudChromeStrings = {
     // module's own constants in tests/material_hint_view.test.ts, so a
     // faucet retune fails there instead of shipping a stale sentence.
     // Trigger wording is part of the pin (tests/material_hint_view.test.ts):
-    // the rift arm pays only on a WINNING first clear of the shared race (a
-    // losing A or S clear forfeits the cores, masterwrought_materials.ts),
-    // and the boss gate is per (dungeon, difficulty), so the raid pays once
-    // per difficulty per day.
+    // the rift arm pays on the day's first WINNING A or S clear of the shared
+    // race, whatever earlier losses (a losing clear forfeits the cores,
+    // masterwrought_materials.ts); the boss gate is per (dungeon,
+    // difficulty), and only the raid has two eligible difficulties (dungeon
+    // bosses pay on heroic alone), so the two sources are stated apart.
     wyrmfallCore:
-      'Masterwrought crafting catalyst. Raid and heroic dungeon final bosses ' +
-      'each drop 1 to 3 once per day for each difficulty, winning your ' +
-      'first A or S rank rift race of the day grants 1 or 2, and the Heroic ' +
-      'Quartermaster sells one for Heroic Marks.',
+      'Masterwrought crafting catalyst. The raid final boss drops 1 to 3 once ' +
+      'per day on each difficulty, heroic dungeon final bosses drop 1 to 3 ' +
+      'once per day, your first A or S rank rift race win of the day grants ' +
+      '1 or 2, and the Heroic Quartermaster sells one for Heroic Marks.',
   },
   discord: {
     title: 'Discord',
@@ -5644,7 +5645,7 @@ export const hudChromeStrings = {
     skillSyncing: 'Checking your craft skill.',
     bindWarn: 'Your first perfecting attempt binds {name} to you.',
     bindWarnDetail:
-      'Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress cannot be unbound, and a promotion is permanent.',
+      'Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.',
     bindConfirmText: 'Your first attempt binds {name} to you. Attempt anyway?',
     bindConfirmAccept: 'Bind and Attempt',
     bindConfirmCancel: 'Cancel',

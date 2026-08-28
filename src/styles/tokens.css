@@ -165,12 +165,14 @@
 
     /* Quality item-NAME text colors (consumers: market_name_color.ts via the
        Browse-row name, and since Masterwrought phase 14 the Perfecting
-       window's promoted-name and promoted-track tints). Every value is the
-       WCAG-lifted TEXT variant of its QUALITY_COLOR hue, none aliases the
-       icon palette verbatim: the shipped hues fail or crowd WCAG AA on the
-       panel ground (rare #0070dd reads 3.87:1, epic #a335ee 3.82:1, both
-       under the 4.5:1 text floor; legendary #ff8000 lifts to #ffab5e for the
-       same reason). Scoped to NAME TEXT on purpose: the icon border and every
+       window's promoted-name and promoted-track tints). Every value is a
+       TEXT variant of its QUALITY_COLOR hue tuned for the panel ground, none
+       aliases the icon palette verbatim: rare, epic, and legendary are LIFTED
+       because the shipped hues fail WCAG AA there (rare #0070dd reads 3.87:1,
+       epic #a335ee 3.82:1, both under the 4.5:1 text floor; legendary
+       #ff8000 lifts to #ffab5e), while poor, common, and uncommon are
+       softened off the pure greys and greens so a name reads as text rather
+       than a glare. Scoped to NAME TEXT on purpose: the icon border and every
        other surface stay on the shared palette (icons.ts). */
     --mkt-name-poor: #b8b8b8;
     --mkt-name-common: #f2efe6;

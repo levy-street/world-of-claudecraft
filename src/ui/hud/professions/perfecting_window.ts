@@ -41,9 +41,11 @@ import {
   openLegendaryNamingDialog,
 } from './legendary_naming_dialog';
 import {
+  baggedCopyOrdinal,
   buildPerfectingView,
   type PerfectingCandidate,
   type PerfectingDetail,
+  type PerfectingSelectionAnchor,
   type PerfectingViewModel,
   perfectingInfoSignature,
   perfectingViewSignature,
@@ -78,6 +80,9 @@ export class PerfectingWindow {
   private liveEl: HTMLElement | null = null;
   private openerFocus: HTMLElement | null = null;
   private selectedRef: PerfectItemRef | null = null;
+  /** The selection's latched baggedCopyOrdinal, handed back to the view so a
+   *  bagged selection follows its copy across a bag shift (null for worn). */
+  private selectedAnchor: PerfectingSelectionAnchor | null = null;
   private paintedView: PerfectingViewModel | null = null;
   private namingDialog: LegendaryNamingDialogHandle | null = null;
   private clock: number | null = null;
@@ -92,6 +97,7 @@ export class PerfectingWindow {
    *  promotion landed). Never a prediction: only what the mirrors now show. */
   private prevSelected: {
     ref: PerfectItemRef;
+    anchor: PerfectingSelectionAnchor | null;
     rank: number;
     perfected: boolean;
     promoted: boolean;
@@ -226,19 +232,24 @@ export class PerfectingWindow {
   /** The answer-edge gate matches the COPY, not only the cell. A resolved
    *  attempt consumes materials through the sim's slot walk, which SPLICES an
    *  exhausted stack, so a bagged candidate above it re-enters the answering
-   *  poll one cell lower: its cell ref no longer matches while the copy is
-   *  the same. Re-match a bagged ref by item id when its old cell has moved
-   *  on (the copy was not consumed by any Perfecting act, so a vacated cell
-   *  means a shift, never a loss); otherwise the landed rank's cue and
-   *  announcement, and the promotion's dialog dismissal, would be skipped
-   *  exactly once for that copy. Two same-id apex copies shifting together
-   *  stay the recorded index-collision class (the mid-dialog retarget note),
-   *  not something this re-match can distinguish. */
-  private sameSelectedCopy(prevRef: PerfectItemRef, ref: PerfectItemRef): boolean {
-    if (samePerfectRef(prevRef, ref)) return true;
-    if ('slot' in prevRef || 'slot' in ref || prevRef.itemId !== ref.itemId) return false;
-    const oldCell = this.deps.world().inventory[prevRef.bag];
-    return oldCell === undefined || oldCell.itemId !== prevRef.itemId;
+   *  poll one cell lower: the view has already re-targeted the selection to
+   *  that copy through its latched anchor (buildPerfectingView), and this
+   *  gate accepts the pair exactly when the view could: same item id, the
+   *  same-id bagged count unchanged, the same ordinal. A same-id sibling can
+   *  never satisfy it (a sibling at another ordinal, or a lost copy moving the
+   *  count, both refuse), so a failed attempt beside a higher-ranked sibling
+   *  cues nothing; without the gate the landed rank's cue and announcement,
+   *  and the promotion's dialog dismissal, would be skipped exactly once for
+   *  every shifted copy. */
+  private sameSelectedCopy(
+    prev: { ref: PerfectItemRef; anchor: PerfectingSelectionAnchor | null },
+    ref: PerfectItemRef,
+    anchor: PerfectingSelectionAnchor | null,
+  ): boolean {
+    if (samePerfectRef(prev.ref, ref)) return true;
+    if ('slot' in prev.ref || 'slot' in ref || prev.ref.itemId !== ref.itemId) return false;
+    if (prev.anchor === null || anchor === null) return false;
+    return prev.anchor.count === anchor.count && prev.anchor.ordinal === anchor.ordinal;
   }
 
   private buildView(): BuiltView {
@@ -253,6 +264,7 @@ export class PerfectingWindow {
         perfectingInfo: (ref) => world.perfectingInfo(ref),
       },
       this.selectedRef,
+      this.selectedAnchor,
     );
     return { view, syncing };
   }
@@ -286,7 +298,8 @@ export class PerfectingWindow {
       this.namingDialog?.notifyAnswered();
     }
     const prev = this.prevSelected;
-    if (detail && prev && this.sameSelectedCopy(prev.ref, detail.ref)) {
+    const anchor = detail ? baggedCopyOrdinal(view.candidates, detail.ref) : null;
+    if (detail && prev && this.sameSelectedCopy(prev, detail.ref, anchor)) {
       // The edge latches through prevSelected below, so whichever forced
       // repaint observes it first (the 1 Hz tick, or a relocalize that beat
       // it) plays the cue exactly once; a later repaint can never replay it.
@@ -323,6 +336,7 @@ export class PerfectingWindow {
       }
     }
     this.selectedRef = detail?.ref ?? null;
+    this.selectedAnchor = anchor;
     this.paintedView = view;
     const root = this.root();
     const shell = this.shellEl ?? root;
@@ -349,6 +363,7 @@ export class PerfectingWindow {
     this.prevSelected = detail
       ? {
           ref: detail.ref,
+          anchor,
           rank: detail.info.rank,
           perfected: detail.info.perfected,
           promoted: detail.info.promoted,

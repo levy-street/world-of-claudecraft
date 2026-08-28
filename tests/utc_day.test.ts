@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  currentResetDay,
-  currentUtcDay,
   DAILY_RESET_HOUR,
   eventLeadDayOf,
   feedSimCalendar,
@@ -10,27 +8,37 @@ import {
   resetRemainingSecOf,
 } from '../src/game/utc_day';
 
-describe('currentUtcDay', () => {
+function freshSim() {
+  return { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+}
+
+describe('the utcDay feed', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('returns the ISO UTC day', () => {
+  it('feeds the ISO UTC day', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-01T12:34:56Z'));
-    expect(currentUtcDay()).toBe('2026-07-01');
+    const sim = freshSim();
+    feedSimCalendar(sim);
+    expect(sim.utcDay).toBe('2026-07-01');
   });
 
   it('caches within the refresh window and rolls over across midnight', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-01T23:59:59.700Z'));
-    expect(currentUtcDay()).toBe('2026-07-01');
+    const sim = freshSim();
+    feedSimCalendar(sim);
+    expect(sim.utcDay).toBe('2026-07-01');
     // still inside the 1s cache window: the cached day is served as-is
     vi.setSystemTime(new Date('2026-07-02T00:00:00.100Z'));
-    expect(currentUtcDay()).toBe('2026-07-01');
-    // past the window: the next read re-derives and sees the new day
+    feedSimCalendar(sim);
+    expect(sim.utcDay).toBe('2026-07-01');
+    // past the window: the next feed re-derives and sees the new day
     vi.setSystemTime(new Date('2026-07-02T00:00:00.800Z'));
-    expect(currentUtcDay()).toBe('2026-07-02');
+    feedSimCalendar(sim);
+    expect(sim.utcDay).toBe('2026-07-02');
   });
 });
 
@@ -76,7 +84,7 @@ describe('resetDayOf', () => {
   });
 });
 
-describe('currentResetDay', () => {
+describe('the resetDay feed', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -85,11 +93,15 @@ describe('currentResetDay', () => {
     vi.useFakeTimers();
     const beforeReset = new Date(2026, 7, 7, 2, 59, 59, 700);
     vi.setSystemTime(beforeReset);
-    expect(currentResetDay()).toBe('2026-08-06');
+    const sim = freshSim();
+    feedSimCalendar(sim);
+    expect(sim.resetDay).toBe('2026-08-06');
     vi.setSystemTime(new Date(2026, 7, 7, 3, 0, 0, 100));
-    expect(currentResetDay(), 'inside the 1s window, the cached key is served').toBe('2026-08-06');
+    feedSimCalendar(sim);
+    expect(sim.resetDay, 'inside the 1s window, the cached key is served').toBe('2026-08-06');
     vi.setSystemTime(new Date(2026, 7, 7, 3, 0, 0, 800));
-    expect(currentResetDay(), 'past it, the next read re-derives').toBe('2026-08-07');
+    feedSimCalendar(sim);
+    expect(sim.resetDay, 'past it, the next feed re-derives').toBe('2026-08-07');
   });
 });
 
@@ -176,25 +188,28 @@ describe('feedSimCalendar', () => {
     expect(sim.dailyResetRemainingSec).toBe(7 * 3600);
   });
 
-  it('feeds all four values from ONE instant across the local reset boundary', () => {
-    // The per-key caches each carry their own 1-second deadline, so a feed
-    // routed through them could pair a stale old-window resetDay with a
-    // freshly refreshed ~24h countdown for up to a second at the boundary
-    // (the QA round's coherence finding). Prime ONE per-key cache before the
-    // boundary, then feed after it: the sim must read a coherent set, every
-    // value derived from the feed's own instant.
+  it('feeds all four values from ONE instant: the set is always self-consistent', () => {
+    // The retired per-key caches each carried their own 1-second deadline, so
+    // a feed routed through them could pair a stale old-window resetDay with
+    // a freshly refreshed ~24h countdown for up to a second at the boundary
+    // (the QA round's coherence finding). Now every value is derived from the
+    // feed's own instant: at any probe past the 1-second window the four
+    // agree with the pure primitives evaluated at ONE Date, including a
+    // probe just past the boundary that a fresh feed sees whole.
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2026, 7, 7, 2, 59, 59, 600));
-    expect(currentResetDay()).toBe('2026-08-06'); // the per-key cache, primed
-    const after = new Date(2026, 7, 7, 3, 0, 0, 200);
-    vi.setSystemTime(after);
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
-    feedSimCalendar(sim);
-    expect(sim.resetDay).toBe(resetDayOf(after));
-    expect(sim.resetDay).toBe('2026-08-07');
-    expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(after));
-    expect(sim.eventLeadDay).toBe(eventLeadDayOf(after));
-    expect(sim.utcDay).toBe(after.toISOString().slice(0, 10));
+    for (const at of [
+      new Date(2026, 7, 7, 2, 59, 59, 600),
+      new Date(2026, 7, 7, 3, 0, 1, 200),
+      new Date(2026, 7, 7, 20, 0, 0, 0),
+    ]) {
+      vi.setSystemTime(at);
+      const sim = freshSim();
+      feedSimCalendar(sim);
+      expect(sim.resetDay).toBe(resetDayOf(at));
+      expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(at));
+      expect(sim.eventLeadDay).toBe(eventLeadDayOf(at));
+      expect(sim.utcDay).toBe(at.toISOString().slice(0, 10));
+    }
   });
 
   it('holds one coherent set for its 1 Hz window, then refreshes every value together', () => {
@@ -225,7 +240,7 @@ describe('feedSimCalendar', () => {
     // documents the same case; the offline feed refreshes on it too.
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 21, 20, 0, 0, 0));
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+    const sim = freshSim();
     feedSimCalendar(sim);
     expect(sim.resetDay).toBe('2026-08-21');
     const stepped = new Date(2026, 7, 7, 12, 0, 0, 0);
@@ -233,5 +248,7 @@ describe('feedSimCalendar', () => {
     feedSimCalendar(sim);
     expect(sim.resetDay).toBe('2026-08-07');
     expect(sim.dailyResetRemainingSec).toBe(resetRemainingSecOf(stepped));
+    expect(sim.utcDay).toBe(stepped.toISOString().slice(0, 10));
+    expect(sim.eventLeadDay).toBe(eventLeadDayOf(stepped));
   });
 });

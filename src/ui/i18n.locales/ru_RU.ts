@@ -8023,7 +8023,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.slotsLabel': 'Ячейки Ковки мастера:',
   'hudChrome.masterwrought.pieceMark': 'Ковка мастера',
   'hudChrome.masterwrought.tooltipWorn': 'Занимает ячейку Ковки мастера (занято {used} из {cap}).',
-  'hudChrome.masterwrought.tooltipAtCap': 'Все {cap} ваши ячейки Ковки мастера заняты.',
+  'hudChrome.masterwrought.tooltipAtCap': 'Все ваши {cap} ячейки Ковки мастера заняты.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -12429,7 +12429,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
   'hudChrome.materialHint.wyrmfallCore':
-    'Катализатор ковки мастера. Финальные боссы рейда и героических подземелий раз в день на каждой сложности приносят от 1 до 3 каждый, победа в первой за день гонке Разлома ранга A или S даёт 1 или 2, а Героический интендант продаёт его за Героические знаки.',
+    'Катализатор ковки мастера. Финальный босс рейда раз в день на каждой сложности приносит от 1 до 3, финальные боссы героических подземелий раз в день приносят от 1 до 3, первая за день победа в гонке Разлома ранга A или S даёт 1 или 2, а Героический интендант продаёт его за Героические знаки.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',
@@ -14537,7 +14537,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillSyncing': 'Проверяем ваш навык ремесла.',
   'hudChrome.perfecting.bindWarn': 'Первая попытка совершенствования привяжет {name} к вам.',
   'hudChrome.perfecting.bindWarnDetail':
-    'Совершенствование никогда не понижает ранг: неудачная попытка лишь расходует материалы. С предмета с прогрессом совершенствования привязку нельзя снять, а возвышение необратимо.',
+    'Совершенствование никогда не понижает ранг: неудачная попытка лишь расходует материалы. С предмета с прогрессом совершенствования или доведённого до совершенства привязку нельзя снять, а возвышение необратимо.',
   'hudChrome.perfecting.bindConfirmText': 'Первая попытка привяжет {name} к вам. Всё равно попытаться?',
   'hudChrome.perfecting.bindConfirmAccept': 'Привязать и попытаться',
   'hudChrome.perfecting.bindConfirmCancel': 'Отмена',

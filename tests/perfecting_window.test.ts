@@ -250,34 +250,155 @@ describe('the aria-busy send-once lifecycle', () => {
     win.close();
   });
 
-  it('a bagged candidate shifted by an exhausted material stack still cues its landed rank', () => {
-    // The sim's slot walk SPLICES an exhausted stack, so a bagged copy above
-    // it re-enters the answering poll one cell lower: keyed on the CELL, the
-    // edge gate missed the landed rank once (no cue, no announcement, and a
-    // promotion's dialog dismissal) for that copy. The gate re-matches the
-    // copy by item id when its old cell has moved on.
+  // The sim's slot walk SPLICES an exhausted stack, so a bagged copy above it
+  // re-enters the answering poll one cell lower. The selection follows the
+  // copy through its (ordinal, count) anchor among same-id bagged candidates
+  // (buildPerfectingView), and the edge gate accepts exactly that pair, so
+  // the landed rank cues once, the followed radio stays checked, and the
+  // action keeps targeting THAT copy; a same-id sibling never passes.
+  const successCues = (): number =>
+    (audio.perfectingSuccess as ReturnType<typeof vi.fn>).mock.calls.length;
+  const checkedRef = (): string | null =>
+    (root().querySelector('[role="radio"][aria-checked="true"]') as HTMLElement | null)
+      ?.textContent ?? null;
+
+  it('a bagged copy shifted by an exhausted stack still cues, with a WORN apex piece first in the walk', () => {
+    // The endgame shape: a worn Masterwrought piece precedes every bagged
+    // candidate, so a fallback to the first candidate would jump the
+    // selection to the worn piece and the next click would spend an ember on
+    // a copy the player never picked.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
+    // A second ember stack past the copy keeps the bill met after the first
+    // stack is exhausted, so the follow-up click below is a real send.
+    world.inventory = [
+      { itemId: 'makers_ember', count: 1 },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: 'makers_ember', count: 2 },
+    ];
+    const win = makeWindow();
+    win.open();
+    const live = root().querySelector('.pf-live-status') as HTMLElement;
+    const radios = [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
+    expect(radios.length).toBe(2);
+    radios[1].click(); // the bagged copy
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
+    world.inventory.splice(0, 1);
+    world.inventory[0].count -= 1;
+    world.inventory[1].count -= 1;
+    world.inventory[2] = { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } };
+    vi.advanceTimersByTime(1000);
+    expect(root().getAttribute('aria-busy')).toBe('false');
+    expect(successCues()).toBe(1);
+    expect(live.textContent).toContain('rank 2 of 4');
+    // The bagged radio stays checked (the second row is the bagged copy),
+    // and the action still targets it at its NEW cell.
+    const after = [...root().querySelectorAll('[role="radio"]')];
+    expect(after.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true']);
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
+  });
+
+  it('a mid-bag copy (stacks below AND above it) shifts and still cues', () => {
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'makers_ember', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+    ];
+    const win = makeWindow();
+    win.open();
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
+    world.inventory.splice(0, 1);
+    world.inventory[0] = { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } };
+    world.inventory[1].count -= 1;
+    vi.advanceTimersByTime(1000);
+    expect(successCues()).toBe(1);
+    expect(root().textContent).toContain('Rank 2 of 4');
+  });
+
+  it('a same-id SIBLING never passes the gate: a failed attempt beside a higher rank cues nothing', () => {
+    // Two bagged copies of one id, the SECOND selected (rank 1) beside a
+    // rank-3 sibling. The attempt FAILS (rank unchanged) but exhausts the
+    // ember stack: both copies shift; the selection follows the second copy
+    // (ordinal 1), not the sibling, and no success cue plays.
     world.equipment = {};
     world.equipmentInstances = {};
     world.inventory = [
       { itemId: 'makers_ember', count: 1 },
       { itemId: 'sundered_essence', count: 2 },
       { itemId: 'prismglass_setting', count: 3 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: 'makers_ember', count: 2 },
+    ];
+    const win = makeWindow();
+    win.open();
+    const radios = [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
+    radios[1].click();
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 4, itemId: APEX });
+    world.inventory.splice(0, 1);
+    world.inventory[0].count -= 1;
+    world.inventory[1].count -= 1;
+    vi.advanceTimersByTime(1000);
+    expect(successCues()).toBe(0);
+    expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
+    expect(root().getAttribute('aria-busy')).toBe('false');
+    const after = [...root().querySelectorAll('[role="radio"]')];
+    expect(after.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true']);
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 3, itemId: APEX });
+  });
+
+  it('a LOST selected copy (sold mid-attempt) beside a same-id sibling cues nothing', () => {
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'makers_ember', count: 1 },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
       { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
     ];
     const win = makeWindow();
     win.open();
-    const live = root().querySelector('.pf-live-status') as HTMLElement;
+    ([...root().querySelectorAll('[role="radio"]')][1] as HTMLButtonElement).click();
     (root().querySelector('[data-action]') as HTMLButtonElement).click();
-    expect(world.perfectItem).toHaveBeenCalledWith({ bag: 3, itemId: APEX });
-    // The answer: the ember stack is exhausted (spliced), the copy lands
-    // rank 2 at its new cell.
+    // The selected copy leaves the bag and the ember stack is spent: the
+    // same-id count moved, so the anchor refuses and the gate sees another
+    // copy (no cue for the sibling's rank 3).
+    world.inventory.splice(4, 1);
     world.inventory.splice(0, 1);
-    world.inventory[1].count -= 1;
-    world.inventory[2] = { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } };
     vi.advanceTimersByTime(1000);
-    expect(root().getAttribute('aria-busy')).toBe('false');
-    expect((audio.perfectingSuccess as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
-    expect(live.textContent).toContain('rank 2 of 4');
+    expect(successCues()).toBe(0);
+    expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
+  });
+
+  it('a different-id bagged candidate taking the vacated selection cues nothing', () => {
+    // The itemId guard: the selected pendant is sold, the remaining apex
+    // copy (another id, higher rank) becomes the selection; no cue.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'makers_ember', count: 2 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: 'wyrmfall_pendant', count: 1, instance: { boundTo: 1, perfecting: 1 } },
+    ];
+    world.craftSkills.jewelcrafting = PERFECTING_SKILL_REQ;
+    const win = makeWindow();
+    win.open();
+    ([...root().querySelectorAll('[role="radio"]')][1] as HTMLButtonElement).click();
+    expect(checkedRef()).toContain('Wyrmfall');
+    world.inventory.splice(2, 1);
+    vi.advanceTimersByTime(1000);
+    expect(successCues()).toBe(0);
+    expect(checkedRef()).toContain('Duskforged');
   });
 
   it('a reopen never replays a stale edge (the close-time latch reset)', () => {
@@ -368,10 +489,12 @@ describe('the R2 bind-warning confirm step', () => {
     // bound rank-0 copy the Maker's Bond unbind can still clear for its
     // fee, so the copy claims only what holds (the QA round's correctness
     // finding); the detail line carries the accurate refusal set.
-    expect(warning.textContent).toContain('binds');
-    expect(warning.textContent).not.toContain('permanently binds');
+    expect(warning.textContent).toContain('Your first perfecting attempt binds');
+    expect(warning.textContent).not.toContain('permanently');
     expect(warning.textContent).toContain('never lowers a rank');
-    expect(warning.textContent).toContain('Perfecting progress cannot be unbound');
+    expect(warning.textContent).toContain(
+      'A piece with Perfecting progress or a Perfected piece cannot be unbound',
+    );
   });
 
   it('the first attempt routes through the confirm; confirming sends, cancelling does not', () => {

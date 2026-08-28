@@ -77,11 +77,11 @@ describe('apexRecipePresentation (content-derived, never invented)', () => {
     expect(apexRod).toBeDefined();
     const viaRodSet = apexRecipePresentation(apexRod!.id, apexRod!.resultItemId, 1);
     expect(viaRodSet.apex).toBe(true);
-    // And the set really is selective: a sub-tier rod stays plain.
+    // And the set really is selective: a sub-tier rod stays plain (the rod
+    // ladder carries a skill-75 rung, so this half is never optional).
     const plainRod = ROD_RECIPES.find((r) => r.skillReq < APEX_TIER_SKILL_REQ);
-    if (plainRod) {
-      expect(apexRecipePresentation(plainRod.id, plainRod.resultItemId, 1).apex).toBe(false);
-    }
+    expect(plainRod).toBeDefined();
+    expect(apexRecipePresentation(plainRod!.id, plainRod!.resultItemId, 1).apex).toBe(false);
   });
 });
 

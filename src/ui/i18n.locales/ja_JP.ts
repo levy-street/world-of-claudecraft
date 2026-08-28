@@ -12225,7 +12225,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
   'hudChrome.materialHint.wyrmfallCore':
-    '名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスが難易度ごとに1日1回、それぞれ1から3個をドロップする。その日最初のAまたはSランクのリフト競争に勝利すると1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。',
+    '名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、1から3個をドロップし、英雄ダンジョンの最終ボスは1日1回、1から3個をドロップする。その日最初にAまたはSランクのリフトレースに勝利すると1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',
@@ -14336,7 +14336,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillSyncing': '製作スキルを確認しています。',
   'hudChrome.perfecting.bindWarn': '最初の完全化の挑戦で、{name}はあなたに束縛されます。',
   'hudChrome.perfecting.bindWarnDetail':
-    '完全化でランクが下がることはありません。失敗しても素材を消費するだけです。完全化の進行がある品は束縛を解除できず、昇格も取り消せません。',
+    '完全化でランクが下がることはありません。失敗しても素材を消費するだけです。完全化の進行がある、または完全化済みのアイテムは束縛を解除できず、昇格も取り消せません。',
   'hudChrome.perfecting.bindConfirmText': '最初の挑戦で{name}はあなたに束縛されます。挑戦しますか？',
   'hudChrome.perfecting.bindConfirmAccept': '束縛して挑戦',
   'hudChrome.perfecting.bindConfirmCancel': 'キャンセル',

@@ -158,14 +158,20 @@ function holdsPerfectingBoundCopy(meta: PlayerMeta, itemId: string): boolean {
  * 3b. no SERVICEABLE bound copy, but a bound copy carrying the Perfecting
  *    track (`perfecting`) or the Perfected stamp is held (Masterwrought phase
  *    12, professions/perfecting.ts): unbind_perfecting. masterwrought R2 binds
- *    a piece the moment Perfecting begins, and that bind holds for good: a
- *    fee-reversible unbind would let a Perfected copy (its R5 bonus merged
- *    into rolled.stats) re-enter trade and the market, handing another
- *    character above-raid power without spending the Maker's Embers that
- *    pace the stage (qr-12-CADENCE). firstBoundSlotIndex never picks such a
- *    copy, so an ordinary Maker's Bond copy of the same id beside it still
- *    unbinds (the window lists exactly that copy); the refusal fires only
- *    when EVERY bound copy of the id is Perfecting-bound. Sharing rung 3's
+ *    a piece the moment Perfecting begins, and once the copy carries any
+ *    progress that bind holds for good: a fee-reversible unbind would let a
+ *    Perfected copy (its R5 bonus merged into rolled.stats) re-enter trade
+ *    and the market, handing another character above-raid power without
+ *    spending the Maker's Embers that pace the stage (qr-12-CADENCE). A copy
+ *    bound by a FAILED first attempt carries no marker (rank 0, no R5 bonus)
+ *    and is byte-identical to an ordinary Maker's Bond, so this rung does not
+ *    see it and the service clears it for the fee: the recorded rank-0 shape
+ *    (pinned in tests/professions_commissions.test.ts; whether to close it is
+ *    a maintainer read in the Masterwrought Phase 14 QA ledger).
+ *    firstBoundSlotIndex never picks a marker-carrying copy, so an ordinary
+ *    Maker's Bond copy of the same id beside it still unbinds (the window
+ *    lists exactly that copy); the refusal fires only when EVERY bound copy
+ *    of the id is Perfecting-bound. Sharing rung 3's
  *    position keeps a duplicate command charge-free, and it sits before the
  *    range and fee arms so the refusal never depends on where the player
  *    stands;

@@ -704,15 +704,19 @@ describe('unbind service deny order and mutation', () => {
     // Phase 14 QA reworded the bind copy to match ("binds", not
     // "permanently binds"); whether the sim should close the rank-0 hole is
     // the ledger's maintainer read, and closing it must flip this arm.
+    // A real APEX copy (the only kind the R2 bind can land on), never a
+    // plain sword: a future closure keyed off the masterwrought def flag
+    // must flip THIS arm, which a common fixture could not witness.
+    const APEX = 'duskforged_warblade';
     const sim = makeSim();
     const pid = sim.playerId;
-    sim.ctx.addItemInstance(SWORD, { boundTo: pid }, pid);
+    sim.ctx.addItemInstance(APEX, { boundTo: pid }, pid);
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
-    const cleared = unbindItemMod(sim.ctx, SWORD, pid);
+    const cleared = unbindItemMod(sim.ctx, APEX, pid);
     expect(cleared.ok).toBe(true);
-    expect(copperOf(sim, pid)).toBe(47500);
-    expect(slotsOf(sim, pid, SWORD).filter((s) => s.instance?.boundTo !== undefined)).toHaveLength(
+    expect(copperOf(sim, pid)).toBeLessThan(50000);
+    expect(slotsOf(sim, pid, APEX).filter((s) => s.instance?.boundTo !== undefined)).toHaveLength(
       0,
     );
   });

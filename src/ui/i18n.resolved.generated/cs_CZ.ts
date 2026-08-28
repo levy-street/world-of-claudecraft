@@ -2834,7 +2834,7 @@ export const cs_CZ: EnTranslations = {
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
       "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
-      "wyrmfallCore": "Masterwrought crafting catalyst. Raid and heroic dungeon final bosses each drop 1 to 3 once per day for each difficulty, winning your first A or S rank rift race of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 once per day on each difficulty, heroic dungeon final bosses drop 1 to 3 once per day, your first A or S rank rift race win of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
     },
     "discord": {
       "title": "Discord",
@@ -3894,7 +3894,7 @@ export const cs_CZ: EnTranslations = {
       "skillUnmet": "Not met.",
       "skillSyncing": "Checking your craft skill.",
       "bindWarn": "Your first perfecting attempt binds {name} to you.",
-      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress cannot be unbound, and a promotion is permanent.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
       "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
       "bindConfirmAccept": "Bind and Attempt",
       "bindConfirmCancel": "Cancel",

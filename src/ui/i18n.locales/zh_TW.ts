@@ -11678,7 +11678,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.growthTonic':
     '農用品。種植時消耗，有機會獲得略多的收成。若作物枯萎，滋補劑也會隨之失去。',
   'hudChrome.materialHint.wyrmfallCore':
-    '大師鍛造製作催化劑。團隊副本與英雄地下城的最終首領每個難度每日各掉落一次，每次1到3個；每日首次在A級或S級裂隙競速中獲勝可獲得1或2個；英雄軍需官以英雄徽記出售。',
+    '大師鍛造製作催化劑。團隊副本最終首領每個難度每日掉落一次，每次1到3個；英雄地下城最終首領每日掉落一次，每次1到3個；每日首次在A級或S級裂隙競速中獲勝可獲得1或2個；英雄軍需官以英雄徽記出售。',
   'hudChrome.enchanting.tier.base': '基礎附魔',
   'hudChrome.enchanting.tier.runed': '符文附魔',
   'hudChrome.enchanting.tier.greater': '強效附魔',
@@ -14044,7 +14044,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.skillSyncing': '正在核對你的工藝技能。',
   'hudChrome.perfecting.bindWarn': '你的第一次完美化嘗試會將{name}綁定給你。',
   'hudChrome.perfecting.bindWarnDetail':
-    '完美化永不降階：失敗的嘗試只會消耗材料。已有完美化進度的裝備無法解綁，晉升亦不可撤銷。',
+    '完美化永不降階：失敗的嘗試只會消耗材料。已有完美化進度或已臻至完美的裝備無法解綁，晉升亦不可撤銷。',
   'hudChrome.perfecting.bindConfirmText': '第一次嘗試會將{name}綁定給你。仍要嘗試嗎？',
   'hudChrome.perfecting.bindConfirmAccept': '綁定並嘗試',
   'hudChrome.perfecting.bindConfirmCancel': '取消',

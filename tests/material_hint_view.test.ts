@@ -180,12 +180,16 @@ describe('material_hint_view', () => {
     expect(line).toContain(`drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} once per day`);
     expect(line).toContain(`grants ${WYRMFALL_RIFT_COUNT.A} or ${WYRMFALL_RIFT_COUNT.S}`);
     // The TRIGGER wording is part of the pin (the tooltip standard's
-    // trigger/limit rule): the boss gate is per (dungeon, difficulty), and
-    // the rift arm pays only on a WINNING first clear of the shared race (a
-    // losing A or S clear forfeits the cores, masterwrought_materials.ts),
-    // so the sentence must not promise a core for merely clearing.
-    expect(line).toContain('once per day for each difficulty');
-    expect(line).toContain('winning your first A or S rank rift race');
+    // trigger/limit rule): the boss gate is per (dungeon, difficulty) and
+    // only the raid has two eligible difficulties (dungeon bosses pay on
+    // heroic alone, so "each difficulty" may not distribute over them); the
+    // rift arm pays on the day's first WINNING A or S clear whatever earlier
+    // losses (a losing clear forfeits the cores, masterwrought_materials.ts),
+    // so the sentence names the first WIN of the day, never merely clearing
+    // and never "winning your first race".
+    expect(line).toContain('The raid final boss drops');
+    expect(line).toContain('once per day on each difficulty, heroic dungeon final bosses drop');
+    expect(line).toContain('first A or S rank rift race win of the day');
     expect(line).toContain('Heroic Quartermaster');
     expect(line).toContain('Heroic Marks');
     // Craft-free lead scoping (the intermediates rule): the lead must not

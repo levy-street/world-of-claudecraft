@@ -2834,7 +2834,7 @@ export const zh_TW: EnTranslations = {
       "quickeningCatalyst": "製作催化劑。鍊金術士每天只能製作一個。",
       "growthTonic": "農用品。種植時消耗，有機會獲得略多的收成。若作物枯萎，滋補劑也會隨之失去。",
       "deedOfMaking": "銘文契據。消耗後將一件已臻至完美的大師鍛造作品提升為傳說，並為其命名。",
-      "wyrmfallCore": "大師鍛造製作催化劑。團隊副本與英雄地下城的最終首領每個難度每日各掉落一次，每次1到3個；每日首次在A級或S級裂隙競速中獲勝可獲得1或2個；英雄軍需官以英雄徽記出售。"
+      "wyrmfallCore": "大師鍛造製作催化劑。團隊副本最終首領每個難度每日掉落一次，每次1到3個；英雄地下城最終首領每日掉落一次，每次1到3個；每日首次在A級或S級裂隙競速中獲勝可獲得1或2個；英雄軍需官以英雄徽記出售。"
     },
     "discord": {
       "title": "Discord",
@@ -3894,7 +3894,7 @@ export const zh_TW: EnTranslations = {
       "skillUnmet": "未滿足。",
       "skillSyncing": "正在核對你的工藝技能。",
       "bindWarn": "你的第一次完美化嘗試會將{name}綁定給你。",
-      "bindWarnDetail": "完美化永不降階：失敗的嘗試只會消耗材料。已有完美化進度的裝備無法解綁，晉升亦不可撤銷。",
+      "bindWarnDetail": "完美化永不降階：失敗的嘗試只會消耗材料。已有完美化進度或已臻至完美的裝備無法解綁，晉升亦不可撤銷。",
       "bindConfirmText": "第一次嘗試會將{name}綁定給你。仍要嘗試嗎？",
       "bindConfirmAccept": "綁定並嘗試",
       "bindConfirmCancel": "取消",
