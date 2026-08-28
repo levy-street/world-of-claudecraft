@@ -16961,6 +16961,10 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleTalents(): void {
+    const player = this.sim.entities.get(this.sim.primaryId);
+    if (player?.inCombat || player?.nythraxis) {
+      return; // prevent opening talents during combat or boss encounter
+    }
     const el = $('#talents-window');
     if (el.style.display === 'block') {
       this.talentsWindow.close();
