@@ -236,18 +236,9 @@ export class PerfectingWindow {
     this.namingDialog?.notifyAnswered();
   }
 
-  /** The answer-edge gate matches the COPY, not only the cell. A resolved
-   *  attempt consumes materials through the sim's slot walk, which SPLICES an
-   *  exhausted stack, so a bagged candidate above it re-enters the answering
-   *  poll one cell lower: the view has already re-targeted the selection to
-   *  that copy through its latched anchor (buildPerfectingView), and this
-   *  gate accepts the pair exactly when the view could: same item id, the
-   *  same-id bagged count unchanged, the same ordinal. A same-id sibling can
-   *  never satisfy it (a sibling at another ordinal, or a lost copy moving the
-   *  count, both refuse), so a failed attempt beside a higher-ranked sibling
-   *  cues nothing; without the gate the landed rank's cue and announcement,
-   *  and the promotion's dialog dismissal, would be skipped exactly once for
-   *  every shifted copy. */
+  /** The view over the live IWorld reads, with the latched selection and its
+   *  anchor (the answer-edge gate's same-copy rule is sameSelectedCopy in
+   *  perfecting_view.ts, the one spelling both sides share). */
   private buildView(): BuiltView {
     const world = this.deps.world();
     const syncing = !world.craftingIdentity.synced;

@@ -245,17 +245,25 @@ export function buildPerfectingView(
       : null;
   const exact = live.find((entry) => samePerfectRef(entry.ref, requested)) ?? null;
   const selectedEntry = followed ?? exact ?? live[0] ?? null;
+  // One pass over the walk assigns each bagged copy its ordinal among same-id
+  // bagged candidates (the same number baggedCopyOrdinal reports, since both
+  // read the walk's bag order); the identity is the anchor's own vocabulary.
+  const seenPerId = new Map<string, number>();
   const candidates: PerfectingCandidate[] = live.map((entry) => {
     const info = infos.get(entry) as PerfectingInfoView;
-    const ordinal = baggedCopyOrdinal(live, entry.ref);
+    let identity: string;
+    if ('slot' in entry.ref) {
+      identity = `s:${entry.ref.slot}`;
+    } else {
+      const ordinal = seenPerId.get(entry.ref.itemId) ?? 0;
+      seenPerId.set(entry.ref.itemId, ordinal + 1);
+      identity = `b:${entry.ref.itemId}:${ordinal}`;
+    }
     return {
       ref: entry.ref,
       itemId: info.itemId,
       worn: entry.worn,
-      identity:
-        'slot' in entry.ref
-          ? `s:${entry.ref.slot}`
-          : `b:${entry.ref.itemId}:${ordinal ? ordinal.ordinal : entry.ref.bag}`,
+      identity,
       selected: entry === selectedEntry,
       state: trackState(info),
       rank: info.rank,

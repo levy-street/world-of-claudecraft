@@ -445,9 +445,10 @@ describe('the selection anchor (a bagged selection follows its copy across a bag
       // would adopt it; the guard refuses and the request falls back to the
       // worn piece instead. (Selecting the LAST copy would let the
       // out-of-bounds arm pass this test with the guard deleted.)
-      // Only the sale here (no lower splice): a splice as well would land the
-      // sibling on the requested cell and the exact match would take it, the
-      // recorded same-id index-collision class, not the count guard.
+      // Only the sale here (no lower splice), so the exact match on cell 2
+      // misses too and the count guard is the one deciding branch; the
+      // adjacency arm below is where a splice lands the sibling on the
+      // requested cell and the anchor, not the cell, keeps the copy.
       const state = twoCopies();
       const before = buildPerfectingView(make(state), { bag: 2, itemId: APEX_BAGGED });
       const anchor = baggedCopyOrdinal(before.candidates, before.detail!.ref);
