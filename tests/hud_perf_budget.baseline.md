@@ -59,6 +59,12 @@ PERF_OUT=/path/to/perf-tour-desktop.json PERF_VIEWPORT=desktop node scripts/perf
 PERF_GPU=1 PERF_VIEWPORT=both node scripts/perf_tour.mjs
 ```
 
+Run the headed tour TWICE and read the second capture: the first headed launch after a cold
+start (a fresh Chrome profile, cold shader and Vite transform caches) over-reports long
+frames (a 13-long-frame first launch against warm runs of 1 to 2 on 2026-08-28), which is a
+capture artifact, not a HUD regression, and must not be absorbed into the `frameLong50`
+anchor.
+
 `PERF_VIEWPORT` selects the profile: `desktop`, `mobile`, or `both` (default). Other relevant
 defaults: `GAME_URL=http://localhost:5173`, `PERF_SCENARIO=bench_perf_tour`,
 `PERF_STEP_MS=2500`, `PERF_SETTLE_MS=600`, `PERF_BOOT_TIMEOUT_MS=120000`. The mobile profile
@@ -80,8 +86,8 @@ carry their own capture dates and browser modes.
 | Browser (swiftshader rows) | Google Chrome 149.0.7827.196, headless, ANGLE swiftshader (software WebGL) |
 | Captured (swiftshader rows) | 2026-06-24 |
 | Node (real-GPU rows) | v26.5.0 |
-| Browser (real-GPU rows) | Google Chrome 150.0.7871.182, HEADED, real GPU (`PERF_GPU=1`) |
-| Captured (real-GPU rows) | 2026-07-23; packet-close reconfirm + bypass-anchor re-derivation 2026-07-24 |
+| Browser (real-GPU rows) | Google Chrome 150.0.7871.182, HEADED, real GPU (`PERF_GPU=1`); the 2026-08-28 bypass re-capture on Google Chrome 151.0.7922.175, macOS 26.5.2, Node v26.5.0 |
+| Captured (real-GPU rows) | 2026-07-23; packet-close reconfirm + bypass-anchor re-derivation 2026-07-24; bypass-anchor re-capture 2026-08-28 (frameLong50 and tourMinFrames rows KEPT) |
 
 ## Recorded floor
 
@@ -132,14 +138,16 @@ The elision-bypass anchor was re-derived at the packet close: the healthy captur
 desktop 538 and 539 bypass writes and mobile 632 and 632 (the v0.30 HUD growth, with the
 deed tracker, yumi strip, party-below-target, tab strip, and mobile action ring all
 establishing writes at boot; the touch HUD explains the viewport delta). The committed
-anchor covers the worst viewport (632) plus run-jitter headroom; a write-elision collapse
-balloons the count toward the frame count (thousands), so the headroom costs no detection.
+anchor covers the worst viewport plus run-jitter headroom (the canonical row below carries
+the live value and its dated re-derivations; 632 was the packet-close worst); a
+write-elision collapse balloons the count toward the frame count (thousands), so the
+headroom costs no detection.
 
 | Metric | Value | Role |
 |---|---|---|
 | frameLong50 | 12 | ARM 3 anchor: frames at or over 50 ms in the tour window (worst healthy capture 7) |
 | tourMinFrames | 500 | ARM 3 floor: minimum real frames the tour must render (worst healthy capture 873) |
-| hudHotDomWrites | 1014 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 1006, DESKTOP). Re-captured 2026-08-28 (the Masterwrought Phase 14 QA, same capture machine): release-side growth inherited at the v0.41.0 sync, branch-neutral by a three-way same-machine A/B (the pre-phase base 6bf465acab measures 987, the clean release tip 8592df3866 measures 1006, the branch 981 to 986; mobile 547 to 569 on all three), the desktop viewport now the worst since PR #3284's movable HUD frames and Fancy Gold theme establish their writes at boot. The 2026-08-08 row (706, worst 698 mobile) is superseded. Same 8-write headroom discipline. frameLong50 on the same captures: 1 to 2 on every warm run (a first cold headed launch measured 13 once, the cold-start artifact, not a regression); the 12 anchor is KEPT. |
+| hudHotDomWrites | 1014 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 1006, DESKTOP). Re-captured 2026-08-28 (the Masterwrought Phase 14 QA, same capture machine): release-side growth, branch-neutral by a three-way same-machine A/B (the pre-phase base 6bf465acab, synced to release cb10309ba6, measures 987; the clean release tip 8592df3866 measures 1006; the branch after the 8592df3866 sync 981 to 986; mobile 547 to 569 on all three). Desktop was already the worst viewport at the pre-phase base, so the flip from mobile happened in the release span between the 2026-08-08 capture and cb10309ba6, cause unmeasured (no per-PR capture was taken; the cb10309ba6-to-8592df3866 span, PR #3284 included, adds about nothing on the branch). The 2026-08-08 row (706, worst 698 mobile) is superseded. Same 8-write headroom discipline. frameLong50 on the same captures: 1 to 2 on every warm run (a first cold headed launch measured 13 once, the cold-start artifact, not a regression); the 12 anchor is KEPT. |
 
 All rows are single canonical rows valid for every viewport: each committed anchor covers
 the worst viewport, the committed floor the slowest one. `frameLong50` is windowed by the

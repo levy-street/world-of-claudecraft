@@ -350,6 +350,20 @@ describe('the value signatures (the 1 Hz clock and the send-answer edge)', () =>
     const moved: PerfectingInfoView = { ...SIG_BASE, ...patch };
     expect(perfectingInfoSignature(moved)).not.toBe(perfectingInfoSignature(SIG_BASE));
   });
+
+  it('the flip table covers the digest both ways (a term added to the signature needs a row)', () => {
+    // The digest joins its terms with '|': nine today (eight scalar terms
+    // plus the materials digest). A term added to perfectingInfoSignature
+    // moves that count and reds here until SIG_FLIPS gains its row; a term
+    // dropped reds its own flip above. The undigested fields (craftId,
+    // skillReq: content-fixed for an item id) are named so the key-set diff
+    // is exact rather than a floor.
+    expect(perfectingInfoSignature(SIG_BASE).split('|')).toHaveLength(9);
+    const flipped = new Set(SIG_FLIPS.map(([field]) => field.split('.')[0]));
+    const undigested = new Set(['craftId', 'skillReq']);
+    const digestedFields = Object.keys(SIG_BASE).filter((k) => !undigested.has(k));
+    expect([...flipped].sort()).toEqual(digestedFields.sort());
+  });
 });
 
 describe('the selection anchor (a bagged selection follows its copy across a bag shift)', () => {

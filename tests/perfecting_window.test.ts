@@ -177,7 +177,7 @@ describe('the aria-busy send-once lifecycle', () => {
     vi.advanceTimersByTime(1000);
     expect(root().getAttribute('aria-busy')).toBe('false');
     expect((audio.perfectingSuccess as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
-    expect(root().textContent).toContain('Rank 2 of 4');
+    expect(checkedRef()).toContain('Rank 2 of 4');
   });
 
   it('announces a landed rank and the Perfected stamp through the persistent status region', () => {
@@ -270,10 +270,10 @@ describe('the aria-busy send-once lifecycle', () => {
     world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 1 } };
     // The post-state below is a HAND-MODELED shift (the window is agnostic
     // to which stack vanished): the sim's consume walks from the highest
-    // index and with a one-unit bill can never exhaust a stack BELOW the
-    // copy while leaving the bill met, so the trailing essence exists only
-    // to keep the follow-up click a real send. The mid-bag arm models the
-    // walk's own exhausted stack faithfully.
+    // index, and with the only other essence stack ABOVE the copy it never
+    // reaches cell 0, so the trailing essence exists only to keep the
+    // follow-up click a real send and the splice is modeled rather than
+    // produced. The mid-bag arm models the walk's own exhausted stack.
     world.inventory = [
       { itemId: 'sundered_essence', count: 1 },
       { itemId: 'makers_ember', count: 2 },
@@ -325,7 +325,7 @@ describe('the aria-busy send-once lifecycle', () => {
     world.inventory[1].count -= 1;
     vi.advanceTimersByTime(1000);
     expect(successCues()).toBe(1);
-    expect(root().textContent).toContain('Rank 2 of 4');
+    expect(checkedRef()).toContain('Rank 2 of 4');
   });
 
   it('a same-id SIBLING never passes the gate: a failed attempt beside a higher rank cues nothing', () => {
@@ -467,6 +467,31 @@ describe('the aria-busy send-once lifecycle', () => {
     win.open();
     expect(checkedRef()).toContain('Rank 3 of 4');
     expect(successCues()).toBe(0);
+  });
+
+  it('a bagged pick survives a close when its exact cell still holds the copy', () => {
+    // The other half of close(): only the anchor is dropped, never the
+    // selection itself, so an unchanged bag reopens on the picked copy (a
+    // close() that also nulled selectedRef would fall back to the first
+    // candidate here).
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'makers_ember', count: 2 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+    ];
+    const win = makeWindow();
+    win.open();
+    ([...root().querySelectorAll('[role="radio"]')][1] as HTMLButtonElement).click();
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    win.close();
+    win.open();
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 2, itemId: APEX });
   });
 
   it('a different-id bagged candidate taking the vacated selection cues nothing', () => {
