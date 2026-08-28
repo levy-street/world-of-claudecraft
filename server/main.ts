@@ -92,7 +92,7 @@ import {
   normalizeEmail,
   offensiveName,
   usernameBanlistBootLine,
-  usernameBanlistStatus,
+  usernameBanlistFileLoaded,
   validUsernameShape,
   verifyPassword,
   warmUsernameBanlist,
@@ -3588,7 +3588,7 @@ export async function startServer(): Promise<http.Server> {
   // gauges read live state at scrape time; ws_connections is the raw open-socket
   // count (joined or not), distinct from players_online (joined sessions).
   const gameStateSource: GameStateSource = {
-    usernameBanlistLoaded: () => usernameBanlistStatus().loaded,
+    usernameBanlistLoaded: usernameBanlistFileLoaded,
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
     wsConnections: () => wss.clients.size,
@@ -3643,9 +3643,12 @@ export async function startServer(): Promise<http.Server> {
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
   businessMetrics.start();
 
-  // The banlist warm runs BEFORE the loop starts: its stat and read are
-  // synchronous, and a hung network mount must stall a boot, never a realm
-  // that is already ticking (the phase 13 QA hot-path review).
+  // The banlist warm runs BEFORE the loop starts, so a mount already hung at
+  // boot stalls the boot rather than a ticking realm. The residual is stated
+  // at USERNAME_BANLIST_STAT_HOLD_MS (server/auth.ts): the steady-state stat
+  // and read stay synchronous on this loop, held to one stat per second, so a
+  // mount that hangs LATER still blocks a name screen for the mount's timeout;
+  // DEPLOY.md tells the operator to keep the file on local disk.
   const banlist = warmUsernameBanlist();
   game.start();
   server.listen(config.port, () => {

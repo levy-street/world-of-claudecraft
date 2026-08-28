@@ -812,16 +812,37 @@ describe('username censorship', () => {
     );
   });
 
-  it('DEPLOY.md states the live file ceiling', () => {
-    // A doc figure with no code pin rots at the next constant move.
+  it('DEPLOY.md states the live file ceiling, the stat hold, and the per-screen cost honestly', () => {
+    // A doc figure with no code pin rots at the next constant move, and a
+    // cost claim with no pin rots at the next algorithm (the round-3 hot-path
+    // read caught "scans every term per name" one round after it stopped).
     const deploy = readFileSync(join(__dirname, '../DEPLOY.md'), 'utf8');
     expect(deploy).toContain(`over-${USERNAME_BANLIST_FILE_MAX_BYTES / 1024}-KiB`);
+    expect(deploy).toContain('`USERNAME_BANLIST_STAT_HOLD_MS`');
+    expect(USERNAME_BANLIST_STAT_HOLD_MS).toBe(1000);
+    expect(deploy).toContain('within one second');
+    expect(deploy).toContain("a name screen's cost does\n  not grow with the list");
+    expect(deploy).not.toContain('scans every term');
+  });
+
+  it('the matcher second pass is skipped exactly when normalization changed only the case', () => {
+    // The round-3 hot-path note: the second obscenity pass exists for
+    // spellings only the confusable fold or the non-letter strip expose; a
+    // spelling that folds to itself is screened once. Both spellings of the
+    // built-in term still refuse, and a confusable spelling still refuses.
+    withUsernameBanlist({}, () => {
+      expect(offensiveName('Hitler')).toBe(true);
+      expect(offensiveName('H1tler')).toBe(true);
+      expect(offensiveName('H i t l e r')).toBe(true);
+      expect(offensiveName('Aurelia')).toBe(false);
+    });
   });
 
   it('hasBannedTerm answers exactly terms.some(includes), by a walk bounded by the longest term', () => {
     const terms = ['ab', 'xyz', 'hitler', 'q'];
     const index = indexBannedTerms(terms);
-    expect(index.maxLen).toBe(6);
+    // The walk probes only the DISTINCT term lengths, ascending.
+    expect(index.lengths).toEqual([1, 2, 3, 6]);
     for (const name of ['', 'a', 'ab', 'cab', 'xy', 'wxyzw', 'hitle', 'ahitlerb', 'pq', 'zzzz']) {
       expect(hasBannedTerm(name, index), name).toBe(terms.some((term) => name.includes(term)));
     }
@@ -834,8 +855,13 @@ describe('username censorship', () => {
     // EMPTY term, is dropped at the index so the exported pair holds for any
     // caller (the round-3 security read); duplicates are absorbed.
     expect(hasBannedTerm('abc', indexBannedTerms(['']))).toBe(false);
-    expect(indexBannedTerms(['', 'ab', 'ab']).maxLen).toBe(2);
+    expect(indexBannedTerms(['', 'ab', 'ab']).lengths).toEqual([2]);
     expect(indexBannedTerms(['', 'ab', 'ab']).set.size).toBe(1);
+    // Boundary cases the walk must not miss: a match only at the last
+    // position, a term of exactly the name's length, a term one longer.
+    expect(hasBannedTerm('zzzab', indexBannedTerms(['ab']))).toBe(true);
+    expect(hasBannedTerm('abc', indexBannedTerms(['abc']))).toBe(true);
+    expect(hasBannedTerm('abc', indexBannedTerms(['abcd']))).toBe(false);
   });
 
   it('refuses a non-regular file (a device reads as empty) and keeps the last good list', () => {

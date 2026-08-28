@@ -454,11 +454,13 @@ For off-box safety, sync the directory to S3 occasionally:
   promotion), a surface wider than a character name (up to 32 characters with
   spaces, apostrophes, and hyphens), so seed the file with the slur and hate-group
   residual the built-in word list does not carry before that feature is live. An
-  edited file takes effect without a restart (the cache is keyed on the file's
-  mtime and size, so a permissions-only repair, a bare `chmod`, needs a `touch` too);
-  a missing, unreadable, or over-64-KiB file (about nine thousand terms; the screen
-  scans every term per name) warns once and keeps serving the last list it read
-  successfully (fail-open by decision: it never blocks a signup), and the boot log
+  edited file takes effect without a restart, within one second (the cache is keyed
+  on the file's mtime and size, checked at most once per `USERNAME_BANLIST_STAT_HOLD_MS`,
+  so a permissions-only repair, a bare `chmod`, needs a `touch` too); a missing,
+  unreadable, or over-64-KiB file (about nine thousand terms; a name screen's cost does
+  not grow with the list, only the once-per-edit parse does) warns once and keeps
+  serving the last list it read successfully (fail-open by decision: it never blocks a
+  signup), and the boot log
   prints one `name banlist:` line saying whether the configured file loaded (the
   `woc_username_banlist_file_loaded` gauge is its scrape-visible twin, as of the last
   name screen). Keep the file on LOCAL disk: the server stats it once a second at most

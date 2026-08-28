@@ -126,11 +126,13 @@ export function setUsernameBanlistStatHoldMsForTest(ms: number): void {
   banlistStatHold = { file: '', atMs: Number.NEGATIVE_INFINITY, stamp: '', size: -1 };
 }
 
-/** The banned-term index: the Set of terms and the longest term's length
- *  (the walk bound in hasBannedTerm). */
+/** The banned-term index: the Set of terms and the DISTINCT term lengths,
+ *  ascending (the walk in hasBannedTerm probes only those lengths: a list
+ *  of a handful of terms costs a handful of substring lengths, not every
+ *  length up to the longest, the round-3 hot-path measurement). */
 export interface BanlistIndex {
   set: Set<string>;
-  maxLen: number;
+  lengths: number[];
 }
 
 /** Empty terms are dropped here as well as in parseBanlist, so the exported
@@ -138,29 +140,29 @@ export interface BanlistIndex {
  *  class where a substring walk of lengths one and up would diverge from
  *  `includes('')` (always true) is the empty term, which no list can mean. */
 export function indexBannedTerms(terms: string[]): BanlistIndex {
-  let maxLen = 0;
   const set = new Set<string>();
+  const lengthSet = new Set<number>();
   for (const term of terms) {
     if (term.length === 0) continue;
     set.add(term);
-    if (term.length > maxLen) maxLen = term.length;
+    lengthSet.add(term.length);
   }
-  return { set, maxLen };
+  return { set, lengths: [...lengthSet].sort((a, b) => a - b) };
 }
 
 /** Whether any banned term is a substring of `normalized`: exactly
  *  `terms.some((term) => normalized.includes(term))`, evaluated as a walk
- *  over the substrings of the NAME (lengths one through the longest term)
- *  against the Set, so a screen costs O(name length x longest term) whatever
- *  the list size, instead of O(terms) per screen: sized for a real operator
- *  list (a few hundred terms and up), and at the default single built-in
- *  term it does a handful more operations than one `includes`, immaterial
- *  beside the two obscenity-matcher passes in the same screen. Every term is
- *  non-empty (indexBannedTerms drops empties), so length one is the floor. */
+ *  over the substrings of the NAME at the distinct term LENGTHS against the
+ *  Set, so a screen costs O(name length x distinct lengths) whatever the
+ *  term count: a one-term list probes one length, a nine-thousand-term list
+ *  probes at most a few dozen, and neither scans the list. Every term is
+ *  non-empty (indexBannedTerms drops empties), so no length-zero probe. The
+ *  obscenity matcher's two passes in the same screen remain the dominant
+ *  per-screen cost by an order of magnitude (recorded, not this round). */
 export function hasBannedTerm(normalized: string, index: BanlistIndex): boolean {
   const n = normalized.length;
-  const maxLen = Math.min(index.maxLen, n);
-  for (let len = 1; len <= maxLen; len++) {
+  for (const len of index.lengths) {
+    if (len > n) break;
     for (let start = 0; start + len <= n; start++) {
       if (index.set.has(normalized.slice(start, start + len))) return true;
     }
@@ -178,6 +180,13 @@ export interface UsernameBanlistStatus {
   fileTerms: number;
 }
 
+/** The one boolean the woc_username_banlist_file_loaded gauge scrapes: no
+ *  allocation per scrape, no stat, no read (the GameStateSource contract). */
+export function usernameBanlistFileLoaded(): boolean {
+  const file = process.env.USERNAME_BANLIST_FILE ?? '';
+  return file === '' || (banlistFileReadOk && banlistFileReadOkFor === file);
+}
+
 /** A pure readout of the served list's state (no stat, no read): what the
  *  boot line and the woc_username_banlist_file_loaded gauge report. It
  *  reflects the state as of the LAST name screen or the boot warm: a mount
@@ -185,7 +194,7 @@ export interface UsernameBanlistStatus {
  *  screen (or the warm) stats and reads. */
 export function usernameBanlistStatus(): UsernameBanlistStatus {
   const file = process.env.USERNAME_BANLIST_FILE ?? '';
-  const loaded = file === '' || (banlistFileReadOk && banlistFileReadOkFor === file);
+  const loaded = usernameBanlistFileLoaded();
   const fileTerms =
     file !== '' && banlistLastGoodFile === file ? banlistLastGoodFileTerms.length : 0;
   return { file, loaded, fileTerms };
@@ -330,9 +339,12 @@ export function offensiveUsername(u: unknown): boolean {
 export function offensiveName(u: unknown): boolean {
   if (typeof u !== 'string') return false;
   const normalized = normalizedUsernameForCensorship(u);
+  // The matcher's second pass exists for spellings only the confusable fold
+  // and the non-letter strip expose; when normalization changed nothing but
+  // case, the second pass is the first one again and is skipped.
   return (
     profanityMatcher.hasMatch(u) ||
-    profanityMatcher.hasMatch(normalized) ||
+    (normalized !== u.toLowerCase() && profanityMatcher.hasMatch(normalized)) ||
     hasBannedTerm(normalized, bannedUsernameTerms())
   );
 }
