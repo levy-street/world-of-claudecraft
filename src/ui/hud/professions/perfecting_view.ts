@@ -57,9 +57,11 @@ export interface PerfectingCandidate {
   worn: boolean;
   /** A stable copy identity for the painter's focus carry: a worn slot, or
    *  the item id plus the copy's (ordinal, count) among same-id bagged
-   *  candidates, which survives the bag shift the cell index does not and
-   *  changes exactly when the selection anchor stands down (a same-id
-   *  departure or arrival moves the count). */
+   *  candidates. It survives the bag shift the cell index does not, moves
+   *  with the anchor's own (ordinal, count) so it stands down with the anchor
+   *  on a count move (a same-id departure or arrival: the carry then falls
+   *  to the checked row, conservative by design), and shares the anchor's
+   *  one recorded blind spot (leave-and-arrive with the count held). */
   identity: string;
   selected: boolean;
   state: PerfectingTrackState;

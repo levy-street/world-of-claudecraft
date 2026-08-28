@@ -584,6 +584,22 @@ describe('the aria-busy send-once lifecycle', () => {
     expect((document.activeElement as HTMLElement).textContent).not.toContain('Rank 3 of 4');
   });
 
+  it('a same-id ARRIVAL moves focus from an unselected row to the checked row, never Close', () => {
+    // A pickup pushes at the END of the bag, so no cell shifts, but the
+    // same-id count moves and every sibling identity with it: a stateless
+    // identity cannot tell an arrival from a departure (the hazard), so the
+    // carry degrades to the checked row. Conservative by design.
+    focusWorld();
+    const win = makeWindow();
+    win.open();
+    rowWithRank(3).focus();
+    world.inventory.push({ itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } });
+    vi.advanceTimersByTime(1000);
+    const checked = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
+    expect(checked.textContent).toContain('Rank 1 of 4');
+    expect(document.activeElement).toBe(checked);
+  });
+
   it('a click landing after a shift with three same-id copies selects the CLICKED copy', () => {
     // [ember x1, A, B, C]: painted B is {bag:2}; the ember stack vanishes
     // before the click, so cell 2 now holds C. Cell-first resolution would

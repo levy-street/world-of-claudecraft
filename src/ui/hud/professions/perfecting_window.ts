@@ -95,7 +95,13 @@ export class PerfectingWindow {
   private lastSelectedSig: string | null = null;
   /** The selected copy's previous facts, for the observed-outcome edges (the
    *  success cue on a rank advance, dismissing the naming dialog once the
-   *  promotion landed). Never a prediction: only what the mirrors now show. */
+   *  promotion landed). Never a prediction: only what the mirrors now show.
+   *  When the gate refuses the pair (sameSelectedCopy: a same-id count move,
+   *  even on a copy that kept its cell), the rank cue, the announcements,
+   *  and the dialog auto-dismiss are all skipped for that one edge; the
+   *  dialog stays open but UNLOCKED (the selected-signature move still calls
+   *  notifyAnswered) and a re-submit is refused server-side. The deliberate
+   *  safe direction: the cell is no witness of the copy in that shape. */
   private prevSelected: {
     ref: PerfectItemRef;
     anchor: PerfectingSelectionAnchor | null;
@@ -290,6 +296,7 @@ export class PerfectingWindow {
       // The edge latches through prevSelected below, so whichever forced
       // repaint observes it first (the 1 Hz tick, or a relocalize that beat
       // it) plays the cue exactly once; a later repaint can never replay it.
+      // A refused pair skips this whole block once (see prevSelected's doc).
       if (detail.info.rank > prev.rank || (detail.info.perfected && !prev.perfected)) {
         audio.perfectingSuccess();
         // The aria-live half of the flip (the farming-arm acceptance): the
