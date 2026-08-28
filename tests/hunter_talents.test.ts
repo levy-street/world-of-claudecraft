@@ -270,6 +270,25 @@ describe('Hunter v0.29 choice-row mechanics', () => {
     );
   });
 
+  it('Guise Mastery lockout survives a right-click cancel (no free proc reset)', () => {
+    // The internal cooldown rides an aura and the proc gate is a presence
+    // check, so a cancelable lockout would let the hunter re-proc at will.
+    const sim = hunter('marksmanship', { 14: 'hun_r14_guise_mastery' }, 2935);
+    sim.castAbility('aspect_of_the_hawk');
+    const hasIcd = () => sim.player.auras.some((entry) => entry.id === 'hunter_guise_mastery_icd');
+    expect(hasIcd()).toBe(true);
+
+    sim.cancelAura('hunter_guise_mastery_icd');
+    expect(hasIcd()).toBe(true);
+
+    // Swap guise again well inside the 20 second lockout: the swap itself
+    // succeeds (positive control) but grants no second rider.
+    advance(sim, 2);
+    sim.castAbility('aspect_of_the_monkey');
+    expect(sim.player.auras.some((entry) => entry.id === 'aspect_of_the_monkey')).toBe(true);
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_guise_marten')).toBe(false);
+  });
+
   it('Shell and Fang trades mitigation for attacks during Shellskin', () => {
     const sim = hunter('marksmanship', { 17: 'hun_r17_shell_and_fang' }, 2934);
     const target = addMob(sim, 20);

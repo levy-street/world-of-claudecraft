@@ -554,10 +554,12 @@ export type AuraKind =
   // OUTCOME is overridden to true (combat/fire_mage.ts fireGuaranteedCrit; the
   // roll is still drawn). Guaranteed crits build Hot Streak like any other.
   | 'combustion'
-  // Inert timer marker: NO combat reader keys on this kind, so it is pure
-  // visible state (an internal cooldown or a capped-window accumulator the
-  // player can watch tick). Kept apart per user by the aura id (Temporal
-  // Rift's 20s ICD, Overflowing Power's 30s shave window).
+  // Inert timer marker: no combat reader keys on this kind, but the removal
+  // rule does (aura_classify.ts LOCKOUT_AURA_KINDS): its presence IS the
+  // cooldown, so no player counter (cancel, cleanse, dispel, Spellsteal) may
+  // take it off. Otherwise pure visible state (an internal cooldown or a
+  // capped-window accumulator the player can watch tick), kept apart per user
+  // by the aura id (Temporal Rift's 20s ICD, Overflowing Power's 30s window).
   | 'internal_cd'
   // Thornhollow Fields: "you are carrying the enemy flag" (social/battleground.ts).
   // Deliberately its own kind rather than a borrowed inert marker, because the

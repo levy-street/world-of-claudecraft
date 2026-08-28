@@ -57,17 +57,43 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
   return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }
 
+// A lockout the sim owns: the aura's PRESENCE is the cooldown. Internal cooldowns,
+// proc windows, and rolling-window accumulators gate their own re-arm on a bare
+// presence check, and the `sated` / `cauterize_fatigue` comments above say outright
+// that the debuff IS the lockout. Letting a player take one off (right-click
+// cancel, cleanse, a friendly dispel, or an enemy's offensive dispel or
+// Spellsteal) hands someone a free cooldown reset. `internal_cd` renders on the
+// buff bar so the player can watch it tick down; `sated` and `cauterize_fatigue`
+// stay in DEBUFF_AURA_KINDS so they keep rendering red.
+export const LOCKOUT_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'internal_cd',
+  'sated',
+  'cauterize_fatigue',
+]);
+
+// Two auras wear the internal_cd kind without being lockouts (nothing re-arms on
+// their presence), so they keep the normal removal rules:
+//  - Divine Ascension: a player-owned resource state surfaced as an aura for HUD
+//    clarity. Its voluntary right-click cancel deliberately ends the state
+//    (Sim.cancelAura zeroes the charges); dispel and Spellsteal still refuse it
+//    by id in isDispellableAura below.
+//  - Stoneward: a real ally-carried healing ward, so purge and Spellsteal remain
+//    legitimate counterplay and its carrier may right-click it off.
+const NON_LOCKOUT_AURA_IDS: ReadonlySet<string> = new Set(['divine_ascension', 'shaman_stoneward']);
+
 // The one rule for "may a player counter take this aura off at all", ahead of any
-// question of school or polarity. Two aura classes answer no: encounter-authored
-// unbreakable control (the script owns its release) and `undispellable` penalties
-// (the recovery sicknesses, which only their own timer clears). Every removal path a
-// player can drive routes through here so the answer cannot drift between them: the
-// dispel executor and its requiresDispellable cast gate (isDispellableAura below),
-// the cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
+// question of school or polarity. Three aura classes answer no: encounter-authored
+// unbreakable control (the script owns its release), `undispellable` penalties
+// (the recovery sicknesses, which only their own timer clears), and sim-owned
+// lockouts (LOCKOUT_AURA_KINDS above). Every removal path a player can drive
+// routes through here so the answer cannot drift between them: the dispel
+// executor and its requiresDispellable cast gate (isDispellableAura below), the
+// cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
 // cancel (combat/aura_cancel.ts).
 export function isPlayerRemovableAura(
-  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'>,
+  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'> & Partial<Pick<Aura, 'id'>>,
 ): boolean {
+  if (LOCKOUT_AURA_KINDS.has(aura.kind) && !NON_LOCKOUT_AURA_IDS.has(aura.id ?? '')) return false;
   return !isUnbreakableControlAura(aura) && aura.undispellable !== true;
 }
 

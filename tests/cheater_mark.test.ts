@@ -222,9 +222,10 @@ describe('cheaterMarkAura', () => {
   });
 
   test('rides the physical school, so a dispel is refused even without the flag', () => {
-    // Two independent guards, pinned independently. The repo's other inert
-    // markers (flag_carried, internal_cd) ride physical for exactly this reason:
-    // one boolean is one careless edit away from making the tag dispel food.
+    // Two independent guards, pinned independently. The flag_carried marker
+    // rides physical for exactly this reason (internal_cd instead has the
+    // kind-level LOCKOUT_AURA_KINDS guard): one boolean is one careless edit
+    // away from making the tag dispel food.
     expect(aura.school).toBe('physical');
     const flagDropped = { ...aura, undispellable: undefined };
     expect(isDispellableAura(flagDropped, false)).toBe(false);
