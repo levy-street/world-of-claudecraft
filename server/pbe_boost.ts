@@ -58,7 +58,8 @@ const CHARACTER_LIMIT = 10;
  *  the player, so none of it counts toward Reliquary obtain tallies (policy
  *  call, 2026-08-08). It mirrors the join-time retro fill, which deliberately
  *  never counts either: a boosted character starts holding gear it did not
- *  earn. Discovery is unaffected, exactly as on every other movement path.
+ *  earn. Collection discovery is also suppressed on every ordinary movement
+ *  path, so the kit cannot create deeds or Reliquary progress.
  *
  *  The offline /dev kit (src/sim/dev_kit.ts) deliberately DIFFERS and still
  *  counts: it is ALLOW_DEV_COMMANDS-gated so it cannot reach a real player,

@@ -845,11 +845,6 @@ export { FALL_SAFE_DISTANCE } from './player_motion';
 // server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
 const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 
-/** The one opts object a movement grant hands the discovery ledger, shared so
- *  the hot grant path never allocates per call (deeds.ts RETRO_SEED is the
- *  same idiom for the join-time seed). Discovery itself is unaffected by the
- *  flag; it only reaches the Reliquary's first-find provenance stamp. */
-const MOVEMENT_GRANT = { movement: true } as const;
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -1930,6 +1925,9 @@ export interface CharacterState {
   // forward-only rollback insurance.
   deeds?: Record<string, string>;
   deedStats?: SavedDeedStats;
+  // Literal-true one-time discovery migration latch. Missing legacy saves get
+  // one final holdings seed; saved characters never scan holdings again.
+  itemDiscoverySeedApplied?: boolean;
   activeTitle?: string | null;
   activeBorder?: string | null;
   renown?: number;
@@ -3672,14 +3670,17 @@ export class Sim {
       if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
     // Book of Deeds retro-on-join, after the saved state is fully restored:
-    // seed the discovery ledger from current holdings, apply the retro
+    // seed the discovery ledger from legacy/current starter holdings once,
+    // then apply the retro
     // fallbacks a predicate cannot express (proof inferences plus the
     // stranded-deed heals), then evaluate every predicate against the loaded
     // state (a pure function of that state and the catalog: no rng, so join
     // order cannot fork the draw order). Counters start at zero, so counter
     // deeds never retro-grant; the emitted events carry retro: true and
     // drain with the next tick to this player only.
-    deedsMod.seedItemDiscovery(this.ctx, meta);
+    if (savedState?.itemDiscoverySeedApplied !== true) {
+      deedsMod.seedItemDiscovery(this.ctx, meta);
+    }
     deedsMod.retroFallbackGrants(this.ctx, meta, player);
     deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
     this.deedDirtyPids.delete(player.id);
@@ -4335,6 +4336,9 @@ export class Sim {
         const deedStats = serializeDeedStats(meta.deedStats);
         return deedStats ? { deedStats } : {};
       })(),
+      // Forward-only migration latch: old/non-literal values run the final
+      // grandfather seed; every blob written here is thereafter relog-safe.
+      itemDiscoverySeedApplied: true,
       ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
       ...(meta.activeBorder !== null ? { activeBorder: meta.activeBorder } : {}),
       ...(meta.renown > 0 ? { renown: meta.renown } : {}),
@@ -8842,12 +8846,10 @@ export class Sim {
   // holds, or hands over copies another player held (trade, mail, market, an
   // enchant re-mint, an unbind stack split, a returned commission order,
   // vendor buyback, an admin restore, a PBE boost kit). It is not a
-  // world-sourced acquisition, so it must never bump a Reliquary obtain count,
-  // or two players could pass one relic back and forth and both watch the
-  // number climb. Discovery is UNAFFECTED: seeing a relic for the first time
-  // across a trade window still discovers it. The flag also suppresses the
-  // Reliquary's first-find CLEAR-COUNT stamp, which would otherwise claim a
-  // run the player never made (src/sim/reliquary.ts noteRelicItemFind).
+  // world-sourced acquisition, so it grants neither collection progress nor
+  // a Reliquary obtain count. The narrow `collectionEligible` exception lets
+  // authored NPC/system mail and Merchant house stock discover while keeping
+  // movement's existing tally and first-find clear-stamp behavior.
   //
   // Where the near cases land, stated once so a new grant site does not have
   // to guess. CRAFTING COUNTS: a craft output is world-sourced, and unlike the
@@ -8863,6 +8865,7 @@ export class Sim {
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
+      collectionEligible?: boolean;
     }>,
   ): void {
     const r = this.resolve(pid);
@@ -8870,17 +8873,9 @@ export class Sim {
     const { meta } = r;
     const def = ITEMS[itemId];
     addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
-    // Every grant that reaches the hub is an acquisition for the Book of
-    // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
-    // `movement` rides along but never gates discovery: it only tells the
-    // Reliquary's first-find stamp not to claim a clear the player never ran.
-    deedsMod.markItemDiscovered(
-      this.ctx,
-      meta,
-      itemId,
-      undefined,
-      opts?.movement ? MOVEMENT_GRANT : undefined,
-    );
+    // World-sourced grants discover. Movement grants do not, except for the
+    // explicit earned-world exception described above.
+    deedsMod.markItemDiscovered(this.ctx, meta, itemId, undefined, opts);
     // Reliquary obtain tally, one per COPY granted (not per call like the
     // discovery ledger above, where an id is simply new or not). Most
     // catalogued relics are gear and cannot stack, so the two readings usually
@@ -8931,6 +8926,7 @@ export class Sim {
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
+      collectionEligible?: boolean;
     }>,
   ): void {
     const r = this.resolve(pid);
@@ -8961,15 +8957,9 @@ export class Sim {
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
-    // the static def quality for the quality-first marks. `movement` rides
-    // along exactly as in addItem above (provenance only, never membership).
-    deedsMod.markItemDiscovered(
-      this.ctx,
-      meta,
-      itemId,
-      instance.rolled?.quality,
-      opts?.movement ? MOVEMENT_GRANT : undefined,
-    );
+    // the static def quality for the quality-first marks. Movement follows the
+    // same collection gate as the plain arm above.
+    deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality, opts);
     // Reliquary obtain tally, one per COPY granted: unlike discovery (which is
     // per call by definition, an id is either new or it is not) a windfall of
     // three copies really is three acquisitions.

@@ -776,8 +776,10 @@ export interface SimContextCallbacks {
   // contract (suppress the client's default loot audio cue, and its default
   // "You receive:" text line when the caller owns the line for this grant).
   // opts.movement: also Sim.addItem's, same contract (this grant relocates or
-  // re-mints copies somebody already held, so it never bumps a Reliquary
-  // obtain count; discovery still fires).
+  // re-mints copies somebody already held, so it never grants collection
+  // progress or bumps a Reliquary obtain count). `collectionEligible` is the
+  // narrow world-reward exception that restores discovery without changing
+  // movement's tally / first-find clear-stamp behavior.
   addItem(
     itemId: string,
     count: number,
@@ -787,6 +789,7 @@ export interface SimContextCallbacks {
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
+      collectionEligible?: boolean;
     }>,
   ): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
@@ -810,6 +813,7 @@ export interface SimContextCallbacks {
       callerLogs?: boolean;
       craftedRecipeId?: string;
       movement?: boolean;
+      collectionEligible?: boolean;
     }>,
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once

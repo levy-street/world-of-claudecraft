@@ -1064,6 +1064,7 @@ describe('persistence', () => {
     expect(meta.deedStats.itemsDiscovered.size).toBeGreaterThan(0);
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.deedStats?.itemsDiscovered?.length).toBe(meta.deedStats.itemsDiscovered.size);
+    expect(state.itemDiscoverySeedApplied).toBe(true);
   });
 
   it('a heroic variant credits its base item in the discovery ledger (drop and rejoin)', () => {
@@ -1100,7 +1101,7 @@ describe('persistence', () => {
     expect(m2.deedStats.itemsDiscovered.has('boundstone_helm')).toBe(true);
   });
 
-  it('the join seed covers the vendor buyback list, and a repurchase credits discovery', () => {
+  it('the legacy join seed covers buyback once, while a repurchase cannot discover', () => {
     const sim = makeSim();
     const state: CharacterState = {
       level: 20,
@@ -1122,14 +1123,15 @@ describe('persistence', () => {
     // possessed: the join seed credits it.
     expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
 
-    // The repurchase path credits on its own, so a future seed refactor
-    // cannot silently reopen the gap: clear the mark and buy the item back.
+    // Once the migration has run, buyback itself is neutral: model an
+    // unearned holding by clearing the mark, then prove the reclaim cannot
+    // create it again.
     meta.deedStats.itemsDiscovered.delete('wolf_fang');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     sim.entities.get(pid)!.pos = { x: wilkes.pos.x + 2, y: wilkes.pos.y, z: wilkes.pos.z };
     sim.buyBackItem('wolf_fang', undefined, undefined, pid);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
-    expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(false);
   });
 
   it('the discovery ledger rejects ids that are not real items', () => {
@@ -1347,6 +1349,18 @@ describe('meter triggers (negative then positive per resolver)', () => {
       sim.tick();
       expect(meta.deedsEarned.has(c.deedId), `${c.deedId} at threshold`).toBe(true);
     }
+  });
+
+  it('the Packrat description matches earned and transferred acquisitions', () => {
+    expect(DEEDS.col_discovery_25.desc).toBe(
+      'Discover 25 different items through loot, quests, crafting, gathering, or NPC vendors and rewards. Player transfers do not count.',
+    );
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItem('cryptbone_helm', 1, sim.playerId, { movement: true });
+    expect(meta.deedStats.itemsDiscovered.has('cryptbone_helm')).toBe(false);
+    sim.addItem('cryptbone_helm', 1, sim.playerId);
+    expect(meta.deedStats.itemsDiscovered.has('cryptbone_helm')).toBe(true);
   });
 
   it('the discovery-count meters count the set and its poor-quality slice', () => {

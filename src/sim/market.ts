@@ -803,6 +803,7 @@ export class Market {
       listing.count,
       listing.instance,
       listing.craftedRecipeId,
+      { collectionEligible: listing.house },
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));

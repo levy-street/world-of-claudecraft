@@ -553,7 +553,7 @@ export function bumpDeedStat(
   markDeedDirtyKey(ctx, meta.entityId, STAT_DIRTY_KEYS[stat]);
 }
 
-/** Record an item id as discovered (first time it ever enters possession).
+/** Record an item id as discovered (first world-sourced acquisition).
  *  Also feeds the quality-first marks; `rolledQuality` carries an instance's
  *  rolled quality (gathered rares) which beats the static def quality.
  *  `opts.retro` is set ONLY by the join-time seed pass (seedItemDiscovery):
@@ -563,18 +563,18 @@ export function bumpDeedStat(
  *
  *  `opts.movement` is the inventory hub's matching flag for a grant that
  *  relocated a copy somebody already held (trade, mail, market, a re-mint).
- *  DISCOVERY IS UNAFFECTED by it, deliberately: seeing a relic for the first
- *  time across a trade window still discovers it and still fills its catalog
- *  slot. It rides here only so the Reliquary's first-find stamp can tell "you
- *  found this on clear N" from "this arrived from somewhere", which is a claim
- *  about provenance rather than about ownership. */
+ *  Movement is not an accomplishment, so it returns before discovery, quality
+ *  marks, or Reliquary work. `collectionEligible` is the narrow exception for
+ *  authored NPC/system mail and Merchant house stock: those world rewards keep
+ *  movement tally/clear-stamp semantics while still earning discovery. */
 export function markItemDiscovered(
   ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   rolledQuality?: string,
-  opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
+  opts?: Readonly<{ retro?: boolean; movement?: boolean; collectionEligible?: boolean }>,
 ): void {
+  if (opts?.movement && !opts.collectionEligible) return;
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds
   // key on the BASE ids, so a variant discovery credits its base too, even
@@ -1203,8 +1203,10 @@ const RETRO_SEED = { retro: true } as const;
 
 /** Seed the discovery ledger from what the character already holds (bags,
  *  bank, equipment, and the vendor buyback list, whose entries were all once
- *  possessed), so veterans keep credit for what they still own. Runs on
- *  every join; the set only grows, so re-seeding is idempotent.
+ *  possessed), so veterans keep credit for what they still own. Sim.addPlayer
+ *  calls this only while the CharacterState migration latch is not literal
+ *  true; every save then stamps the latch, so later transferred holdings can
+ *  never be laundered by a relog.
  *
  *  Every call here is RETRO: the character already owned these before the
  *  join, so the Reliquary fills silently (no recent push, no invented clear

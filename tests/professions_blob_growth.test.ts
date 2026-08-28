@@ -170,6 +170,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'tutorialGreetingSent',
   'deeds',
   'deedStats',
+  'itemDiscoverySeedApplied',
   'activeTitle',
   'activeBorder',
   'renown',

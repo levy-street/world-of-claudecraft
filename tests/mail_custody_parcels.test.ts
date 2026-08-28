@@ -10,7 +10,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
-import { WOC_MARKET_DELIVERY_LETTER, WOC_MARKET_RETURN_LETTER } from '../src/sim/content/letters';
+import {
+  WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
+} from '../src/sim/content/letters';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 
@@ -31,16 +35,21 @@ const PAYLOAD: ItemInstancePayload = {
   rolled: { quality: 'epic', stats: { str: 4 }, masterwork: true },
 };
 
-function parcelFor(sim: Sim, pid: number, itemId: string): InvSlot {
+function parcelFor(
+  sim: Sim,
+  pid: number,
+  itemId: string,
+  marketLetter:
+    | typeof WOC_MARKET_DELIVERY_LETTER
+    | typeof WOC_MARKET_RETURN_LETTER = WOC_MARKET_DELIVERY_LETTER,
+): InvSlot {
   const meta = sim.players.get(pid)!;
   sim.postOffice.mailSystemParcel(
     { key: sim.postOffice.mailKeyFor(meta), name: meta.name },
-    WOC_MARKET_DELIVERY_LETTER,
+    marketLetter,
     [{ itemId, count: 1, instance: PAYLOAD, slot: 3 }],
   );
-  const letter = sim.postOffice.mail.find(
-    (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
-  );
+  const letter = sim.postOffice.mail.find((m) => m.letterId === marketLetter.letterId);
   if (!letter) throw new Error('parcel not booked');
   return letter.items[0];
 }
@@ -210,6 +219,49 @@ describe('custodyRef book-once dedupe', () => {
 });
 
 describe('taking an instanced parcel', () => {
+  for (const marketLetter of [WOC_MARKET_DELIVERY_LETTER, WOC_MARKET_RETURN_LETTER]) {
+    it(`keeps ${marketLetter.letterId} collection-neutral, even without custodyRef`, () => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Buyer');
+      const meta = sim.players.get(pid)!;
+      parcelFor(sim, pid, 'cryptbone_helm', marketLetter);
+      moveToMailbox(sim, pid);
+      const letter = sim.postOffice.mail.find((m) => m.letterId === marketLetter.letterId)!;
+      expect(letter.custodyRef).toBeUndefined();
+
+      sim.postOffice.mailTake(letter.id, pid);
+      expect(meta.inventory.some((s) => s.itemId === 'cryptbone_helm')).toBe(true);
+      expect(meta.deedStats.itemsDiscovered.has('cryptbone_helm')).toBe(false);
+      expect(meta.deedStats.visited.has('quality:epic')).toBe(false);
+      expect(meta.reliquary.firstFind.cryptbone_helm).toBeUndefined();
+    });
+  }
+
+  for (const exclusion of ['custodyRef', 'returned'] as const) {
+    it(`keeps a non-market system parcel neutral when it carries ${exclusion}`, () => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Returned Buyer');
+      const meta = sim.players.get(pid)!;
+      sim.postOffice.mailSystemParcel(
+        { key: sim.postOffice.mailKeyFor(meta), name: meta.name },
+        WELCOME_LETTER,
+        [{ itemId: 'cryptbone_helm', count: 1, instance: PAYLOAD }],
+        exclusion === 'custodyRef' ? 'generic_custody:1' : undefined,
+      );
+      const letter = sim.postOffice.mail.filter((mail) => mail.items.length > 0).at(-1)!;
+      if (exclusion === 'returned') letter.returned = true;
+      expect(letter.letterId).toBe(WELCOME_LETTER.letterId);
+      expect(letter.kind).toBe('system');
+      moveToMailbox(sim, pid);
+
+      sim.postOffice.mailTake(letter.id, pid);
+      expect(meta.inventory.some((slot) => slot.itemId === 'cryptbone_helm')).toBe(true);
+      expect(meta.deedStats.itemsDiscovered.has('cryptbone_helm')).toBe(false);
+      expect(meta.deedStats.visited.has('quality:epic')).toBe(false);
+      expect(meta.reliquary.firstFind.cryptbone_helm).toBeUndefined();
+    });
+  }
+
   it('grants the exact copy into the bags (instance survives the take)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Buyer');

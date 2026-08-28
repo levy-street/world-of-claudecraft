@@ -42,8 +42,8 @@ export interface ReliquaryCatalogCompletion {
  * by the kill-proof ledger) and how many have illuminated each page.
  * Zero-count ids are ABSENT from the maps, not zero-valued, and THREE relic
  * kinds are never counted: weapon skins (account-scoped), titles
- * (deed-scoped), and mounts (possession-based, and a mount cell's id is the
- * mount key rather than the reins item id), so absence always renders as
+ * (deed-scoped), and mounts (their earned provenance uses the reins item id,
+ * while a mount cell uses the mount key), so absence always renders as
  * "no line". Percentages are computed by the consumer, never sent. Mirrors
  * DeedsRarity member for member.
  */

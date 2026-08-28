@@ -54,6 +54,20 @@ client-side through `src/ui/deed_i18n.ts`. Steam is a dark, env-gated mirror
 their earned-and-mapped deeds pushed to Steam via `server/steam/`, with the
 server store always canonical.
 
+Item discovery records accomplishments, not possession. Loot, quest rewards,
+crafting, gathering/profession results, NPC vendors, and authored NPC/system
+mail may add to `deedStats.itemsDiscovered` and the first rare/epic/legendary
+marks. Player trade, player mail, player market listings, and neutral remints
+or returns still deliver the usable item but grant none of those records.
+`CharacterState.itemDiscoverySeedApplied` preserves the legacy holdings seed
+once, then prevents later relogs from converting transferred holdings into
+discoveries. Existing discoveries and deeds remain sticky; there is no
+retroactive revocation.
+
+The `col_discovery_25` description was reworded with this rule. Its non-English
+deed locale rows require the normal maintainer refill before release; contributors
+must not hand-edit those overlays.
+
 ## Rules that bind every deed
 
 1. **Cosmetic only.** Rewards are titles and borders. No deed, reward, or

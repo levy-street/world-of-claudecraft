@@ -28,6 +28,7 @@ import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
+import { earnedReliquaryMounts } from '../sim/reliquary';
 import type { IWorld, ReliquaryRarity } from '../world_api';
 import { deedName } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
@@ -564,7 +565,9 @@ export class ReliquaryWindow {
     const world = this.deps.world();
     const viewInput: ReliquaryViewInput = {
       ...input,
-      ownedMounts: new Set(world.ownedMounts()),
+      ownedMounts: new Set(
+        earnedReliquaryMounts(world.ownedMounts(), world.deedStats.itemsDiscovered),
+      ),
       weaponSkins: new Set(world.accountCosmetics.weaponSkinIds),
     };
     const model = buildReliquaryView(viewInput);

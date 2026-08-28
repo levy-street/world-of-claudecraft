@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
+import { characterReliquaryOwnership } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
@@ -589,6 +590,8 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
 
     expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
     expect(meta.copper).toBe(100_000_000 - 100_000); // reins_valorsteed buyValue 100_000
+    expect(meta.deedStats.itemsDiscovered.has('reins_valorsteed')).toBe(true);
+    expect(characterReliquaryOwnership(meta).ownedMounts.has('valorsteed')).toBe(true);
   });
 
   it('buyItem bulk purchase is still gated by bag capacity (refuses, never partial)', () => {

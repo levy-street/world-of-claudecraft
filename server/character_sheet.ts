@@ -28,6 +28,7 @@ import { bagOwnedMounts } from '../src/sim/mounts';
 import {
   catalogCharacterCompletion,
   curatorRankFromOwned,
+  earnedReliquaryMounts,
   isCataloguedRelicItem,
   RELIQUARY_MARK_IDS,
   restoreReliquaryMarks,
@@ -303,8 +304,9 @@ export function sheetRecentRelicsFromSaved(saved: CharacterState['reliquary']): 
 
 /**
  * Derive the privacy-safe Reliquary sheet block from a CharacterState blob.
- * Mount ownership scans bags + bank reins (same bags+bank seam as live
- * ownedMounts); skins are account cosmetics and are deliberately omitted.
+ * Mount ownership scans bags + bank reins, then applies the earned-discovery
+ * rule after the legacy seed migration; skins are account cosmetics and are
+ * deliberately omitted.
  */
 export function sheetReliquaryFromState(state: CharacterState): SheetReliquary {
   const itemsDiscovered = new Set(state.deedStats?.itemsDiscovered ?? []);
@@ -312,20 +314,18 @@ export function sheetReliquaryFromState(state: CharacterState): SheetReliquary {
   // whole state, so it no longer rebuilds firstFind and the counts map (and the
   // illuminated set) on every public sheet read.
   const marks = restoreReliquaryMarks(state.reliquary);
-  // PRIVACY NOTE (locked handling: documented, behavior unchanged). The union
-  // is bags PLUS bank, the same seam live ownedMounts uses, so a mount whose
-  // reins sit in the BANK still scores here. A public reader can therefore
-  // observe, through the owned aggregate and the Curator rank derived from it,
-  // that a character owns reins they have never carried. Accepted: the exposure
-  // is aggregate-only (one number and a rank, never a mount id, never a bank
-  // slot, never the bank's other contents), and it is the same number the
-  // in-game Mounts window already shows to the owner from both containers, so
-  // narrowing it here alone would make the public pair disagree with the live
-  // collection. Bags-only is a recorded follow-up for a later phase, an owner
-  // call, not a defect to fix in passing. See docs/design/reliquary.md, "Public
-  // sheet exposure".
+  // PRIVACY NOTE: the union is bags PLUS bank, matching the in-game Reliquary
+  // surface. A public reader can therefore infer earned banked reins through
+  // the aggregate and rank, but never a mount id, slot, or other bank contents.
+  // A legacy row has not run the one-time holdings seed yet, so preserve its
+  // previously visible mount fills until login writes the literal-true latch.
   const inv = [...(state.inventory ?? []), ...(state.bank?.inventory ?? [])];
-  const ownedMounts = new Set(bagOwnedMounts(inv));
+  const heldMounts = bagOwnedMounts(inv);
+  const ownedMounts = new Set(
+    state.itemDiscoverySeedApplied === true
+      ? earnedReliquaryMounts(heldMounts, itemsDiscovered)
+      : heldMounts,
+  );
   const deedsEarned = new Set(Object.keys(state.deeds ?? {}));
   const opts = { itemsDiscovered, marks, ownedMounts, deedsEarned };
   const completion = catalogCharacterCompletion(opts);

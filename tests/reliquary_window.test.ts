@@ -129,7 +129,9 @@ describe('painter hygiene', () => {
     expect(code).toContain('marks: world.reliquaryMarks');
     expect(code).toContain('marksSize: world.reliquaryMarks.size');
     // Phase 8: Horizons ownership from live seams only.
-    expect(code).toContain('ownedMounts: new Set(world.ownedMounts())');
+    expect(code).toMatch(
+      /earnedReliquaryMounts\(\s*world\.ownedMounts\(\),\s*world\.deedStats\.itemsDiscovered,?\s*\)/,
+    );
     expect(code).toContain('weaponSkins: new Set(world.accountCosmetics.weaponSkinIds)');
     expect(code).toContain('deedsEarned: world.deedsEarned');
   });
