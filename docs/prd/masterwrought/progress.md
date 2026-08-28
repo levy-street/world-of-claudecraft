@@ -940,3 +940,20 @@ is deliberately not copied here, it lives in the farming record.
   with F06b and F09b in the table above; the farming record lives whole in
   docs/prd/masterwrought/farming/progress.md. Full ledger, carry list, and the
   named red list: state.md, "Phase 11b BUILT ledger".
+
+## Phase 13 QA (2026-08-28): PASS, the frozen suite green at f9eed89385
+The twin, the strictest audit: the orange promotion verified against the
+Phase 13 ledger's decisions with the five phase-file lanes plus the four
+build-unrun reviewer lanes, 55 mutants killed across three throwaway
+worktrees, and then EIGHT fix rounds (24 commits) driven by fresh readers
+to convergence: the name-screen lane and shape-first screens, the raw-name
+host parity, the banlist cache hardened end to end (fd-bounded reads, the
+distinct-length term walk, the stat hold, the loaded gauge), the
+lease-fenced strip proven against real Postgres, the ONE item-cell
+authority on every owned surface, and every destructive prompt destroying
+exactly the copy it names by target. qa-checklist LAST (one blocker, the
+two-line biome format, fixed; its one missing suite added), then the
+freeze: 3212/22 files, 47302 passed / 2 xfail / 380 skipped, tsc and
+ci:changed and both regens clean, drift attributed byte-exact. Full
+ledger, judged lists, and the recorded maintainer reads: state.md,
+"Phase 13 QA ledger". LOCAL only, no push, no PR.

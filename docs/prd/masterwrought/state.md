@@ -19747,3 +19747,379 @@ appears; both rules count a promoted copy and the equip paths cannot
 be gamed by stack ordering; the frozen suite is green at 8f5c25957f
 with the drift attributed exactly. The open maintainer reads are the
 standing sets plus this round's list above.
+
+## Phase 13 QA ledger (2026-08-27, the twin)
+
+STATUS: PASS. LOCAL, no push, no PR. The orange promotion audited
+against the Phase 13 ledger's DECISIONS (not the phase file's three stale
+sentences): the five phase-file lanes as a parallel fan-out, the four
+phase-file reviewers plus the four lanes the build never ran fresh
+(migration-safety, database-performance, server-hot-path,
+test-coverage-auditor), the QA round's own kill tables in throwaway
+worktrees (55 mutants), eight fix rounds of 24 commits with EVERY round
+read by fresh readers until the findings converged to zero, qa-checklist
+LAST, and one clean freeze (the first freeze's two reds were the two
+stub-honesty pins no targeted run covered; repaired and re-frozen green).
+
+### STEP 0 (the eighteenth sync, and the pre-flight)
+Clean at 49e5cd7823 (the Phase 13 docs stamp; frozen code tip 8f5c25957f).
+origin/release/v0.41.0 had MOVED b02da096dd to cb10309ba6 (one PR, #3700,
+the Exchange website-desktop signing path: the desktop wallet handoff, the
+woc_market economy-types and desktop-handoff splits, i18n rows; same minor,
+no version jump), merged as 171db92c33: two conflicts, both the regen /
+re-pin class (both resolved-i18n pending tables regenerated via i18n:gen and
+proven byte-fresh by tests/i18n_resolved_equivalence + i18n_admin_catalog
+30/30; the monolith rows re-pinned to the exact merged counts, online.ts
+5926 to 5888 = the release span's 38-line shed, main.ts 11528 to 11527,
+hud.ts 18245 held, both parents named at each row), tsc clean, the Phase 13
+validation set plus the release overlap suites 16 files / 971 green before
+the commit. The release-merge-audit ran as its own step as a three-lane
+fan-out (overlaps read against both parents for all 40 non-generated
+overlap files with a stripped-hunk delta of zero both directions on 15 of
+16, the sixteenth being the documented conflict resolution; no legacy-arm
+divergence, the desktop-wallet family being dual-arm on the release's own
+side; no new registry route; no injection re-binding owed; no db-mock
+export drift; the two release suites ride the shard-weight fallback at
+0.9935 coverage): zero code findings, one docs finding (this STEP 0 record
+plus the ledger's stale online.ts pin, both folded). DATABASE_URL unset.
+Memory scan per the phase file plus the trap catalogs; judged lists read
+end to end (Phase 12, Phase 12 QA, Phase 13).
+
+### LANE VERDICTS (five lanes, eight reviewers, every build claim re-derived)
+- CORRECTNESS (D13-1/D13-3/D13-4): PASS. Zero draws proven transitively over
+  nine modules and by twelve direct counters; exactly one deed consumed,
+  lock-aware, nothing on any deny; stats byte-identical (the whole Entity
+  minus the mirror diffed before/after on the worn arm by probe); both
+  rules count a promoted copy; the slotIndex peek/consume closed both
+  directions; two bagged Perfected copies of DIFFERENT ids both promote and
+  exactly one refuses at equip (no double-refusal, no bypass); the
+  celebration order and the instanced skip probed; host parity of the whole
+  chain. Its three coverage nits (the worn arm's zero-draw pin, the
+  instanced-owner and three-player fan-out cases, the phase 13 view fields
+  never crossing a real snapshot) all applied.
+- NAMING AND MODERATION (D13-2 both halves both hosts; D13-5 as built): PASS
+  with one should-fix that mattered (the operator flow undiscoverable: no
+  runbook anywhere) and the reconnect-window finding shared with three
+  reviewers (below). Every stamp route enumerated: the command screens the
+  NORMALIZED value, shape-invalid rides raw to the sim's own refusal, no
+  other writer of `name` exists (the rename walk rekeys signers only, the
+  load arm is drop-only, every transfer channel refuses a bound copy), and
+  the offline host runs shape-only by the judged ruling. D13-2: standalone
+  renders esc'd raw on every surface on both hosts (tooltip title, inspect
+  row, paperdoll row, compare card, bags/bank/guild rims, market rows),
+  composed renders interpolate as t() values (the two chat lines plainText
+  through createTextNode, the Discord card sanitized to the mint shape); no
+  third plumbing, the name in no catalog. D13-5 as built: the permission
+  tier, the route rule, the audit-first ordering, the explicit target, the
+  realm scoping, the five-region walk all verified independently.
+- DEEDS (D13-7): PASS. Append at the tail proven both by the named pins and
+  by the hash reconstruction executed in the lane (the pre-append canonical
+  over 290 rows with feat_book_complete's live deedIds filtered back
+  reproduced 4533079d... exactly; the 291-row digest is d69e3def57...);
+  renown 50 in the prestige band, the rule-2 reading defensible (luck-PACED
+  on a fail-forward feeder, not luck-GATED; the honest weak clause is the
+  tie-break sentence, now recorded beside the rule in deeds.md); the counter
+  bumped at exactly one site after the consume; the census repair
+  8f5c25957f judged HONEST arm by arm (whole-array teeth, exact allowlist
+  identity, tightened SQL, a comment reworded rather than a guard weakened).
+- TEST DECISIVENESS (the mutation lane, in its own throwaway worktree at
+  171db92c33): 24 mutants, 22 KILLED, 2 SURVIVED, both test gaps and both
+  closed this round (K17: the content screen had no direct unit pin on the
+  NORMALIZED value, so screening the raw token survived every suite; K25: a
+  worn-arm-only stat slip survived because the byte-identity proof was
+  bagged-only). Every re-minted pin killed its mutant (the sha hex char, the
+  blob band in both directions, the art-audit script exit 1, the parity
+  golden digest, the inscription exact-roster). No constant-self-comparison
+  in the five new suites; the K20 comment-gameable class has no raw-text
+  pin on the already-legendary guard.
+- CLEANUP AND COMMENT TRUTH: PASS with one should-fix (the ledger's
+  online.ts pin stale after the sync, folded) and nits (the "FIRST event
+  carrying TWO pieces of player-authored text" claim false: duelEnd and
+  guildInvite already do; the header's "binds at rank 1" loose: the bind
+  lands on the first ATTEMPT; a biome useOptionalChain), all applied. Every
+  claim checked true: the hud log path is a text node, the five-region walk
+  is exhaustive for every legal writer, zero rng on every arm, the pre-fix
+  slotIndex divergence real at 740effed61, the command-lane metering, the
+  Sell Junk sweep's poor-only predicate. masterwork.ts, craftBonusStatsFor,
+  the tripwires, and the reliquary gear-capable pins untouched.
+- architecture-reviewer: 0 blocking. Zero draws transitively; the tick
+  phase untouched; one stamp site in the whole tree; SimContext unchanged;
+  announceZoneCelebration a true move; the golden's two-line diff exact;
+  the asPromoted synthetic cannot diverge from the stamped copy (only
+  inventory mutates between); perfected implies boundTo. Two should-fix
+  applied (the cross-host perfectingInfo equality now reaches Perfected,
+  promoted, and equipBlocked; the export's dead-gate note) and the
+  promoted copy's moot deed row emptied per the affordance rule.
+- cross-platform-sync: ONE BLOCKING, the round's real bug: the character
+  sheet's paperdoll TOOLTIP closure read the self ENTITY mirror, which
+  online is the eqi-trimmed peer projection without `perfected`, so a worn
+  promoted copy lost its Unique-Equipped tag on one host only (the same
+  class the post-qa inspect fix closed; this call site was left). Fixed:
+  the closure reads IWorld.equipmentInstances like the row and the inspect
+  card, pinned behaviorally. Plus the oversized-name host divergence (the
+  dispatch dropped the field, "needs a name", where the offline sim answers
+  "cannot be inscribed"): the dispatch cuts to the payload ceiling now, one
+  line on both hosts, pinned end to end. Pins 334/87/247/33 and 206/219/13
+  UNMOVED, verified by reading.
+- privacy-security-review: 0 blocking. The authority model sound (client
+  never decides; sim re-validates shape; server screens content;
+  normalization idempotent so the screened string is the stamped string);
+  every XSS sink enumerated and escaping; the Discord sanitizer proven by
+  regex to foreclose markdown and mention injection; the evasion residual
+  inside the alphabet is the character-name bar (recorded, with the
+  operator banlist as the tuning knob, now in DEPLOY.md). Two should-fix:
+  the banlist fail-open path (below, with the hot-path lane) and the
+  unrecorded Discord residual (recorded in every home).
+- frontend-seam-reviewer: 0 blocking, four should-fix all applied: the
+  ALL-SURFACES claim overshot (the mail chips, the trade row, and the
+  player card's gear rows still read the def alone), the shared
+  item_instance_tooltip authority was unregistered (a bare name escaping
+  the completeness sweep), and the cell triple was repeated five times. One
+  cell authority now (worn_item_cell_view.ts, a registered pure core), the
+  three surfaces on it, the icon dep widened so no painter bypasses the
+  seam, the toast colors moved into the celebration bundle, the aria pinned
+  behaviorally.
+- migration-safety: 0 blocking. Every promotion field survives an older
+  binary per field (name, rolled.quality, perfected: load, save, and the
+  replace-enchant clone path), so the Perfecting revert class does NOT
+  extend to the name; the DEED_STAT_KEYS append byte-equal; the kick side
+  of kick-then-clear CLOSED by leave()'s ordering; no DDL; the +88 blob
+  arithmetic re-derived exact. Its should-fix was the reconnect window
+  (below); its nits (the older binary erasing legendariesForged, the
+  neutral audit badge) applied, its infos recorded (the stale absurd-arm
+  figures amended in the Phase 12 ledger, the bag-index caveat in the
+  runbook).
+- database-performance-reviewer: no scaling defect, zero DDL, no new
+  unbounded table; the realm-scoped lookups plan as PK seeks with a heap
+  filter; the dedupe claim bounds getDeedBroadcasts; the deeds path batched.
+  Its should-fix pair applied: the force-rename lookup's SQL pin and the
+  legendary opt-out read count; its lease-fence proposal became the
+  round's mechanism (below).
+- server-hot-path-reviewer: ONE BLOCKING the ledger did not name: the
+  banlist file's failure arm never cached, so an unreadable-after-boot file
+  re-ran the stat, the read, AND a synchronous warn on every name screen
+  (7.6 us added per call, a log line per frame at the 30/s lane ceiling)
+  while dropping the operator list entirely; measured old vs new binary.
+  Fixed: stale-on-error keyed to the file path, warned once per state
+  transition, a one-MiB ceiling in the same class. Its should-fix applied:
+  the obscenity matcher (measured 24.6 us) rode the 30/s command lane ahead
+  of every sim gate (1000 sessions = 78 percent of a tick); named frames now
+  take their own name-screen lane (burst 5, one per second; pet_rename
+  joins), a cause in the closed vocabulary. The ledger's two named items
+  both verified: the statSync is 0.93 us (5 percent of the call; a re-stat
+  timer would be a net loss, NOT applied), and the eqi name field costs
+  bytes only on change or first sight (serialize-once holds; +39 to +42
+  bytes per named entity).
+- test-coverage-auditor: 0 blocking. Every claimed behavior decisive on the
+  five new suites (fixture holds two deeds so a zero-consume reds; the
+  whole-payload toEqual; the login race driven false-then-true; the five
+  regions each asserted; the banlist cache's three arms); the census repair
+  honest; the importer guard over-detects loudly (a second importer cannot
+  hide). Its six should-fix and three nits applied (comment-stripped source
+  pins in three suites with a positive control for the negative arm, the
+  mechanical region cross-scrape, the sub-cap-is-1 premise, wireRev on
+  every deny arm, the exact zone count, the 32/33 boundary, the literal
+  realm); its two infos executed (the catalog sha's pre-append
+  reconstruction made mechanical; server/craft_activity.ts's behavior is
+  covered end to end through the professions activity suite, the paired
+  suite convention recorded rather than a thin twin minted).
+
+### THE RECONNECT WINDOW (three reviewers converging, one mechanism)
+Security, database-performance, and migration-safety each found that
+D13-5's "a pre-save online re-check closing the reconnect race" overstated
+the build: the re-check answers sessions THIS process can see, but a fresh
+login re-reads the blob before game.join registers it, and a session on a
+peer process is invisible to the map. The migration lane's premise that the
+lease is acquired AFTER the read was wrong at the source (server/ws_auth.ts:
+acquireCharacterLease, THEN the refreshed getCharacter, THEN game.join), so
+the database lane's one-predicate fence IS decisive: the strip's blob write
+is now the lease-fenced saveOfflineCharacterState (UPDATE ... AND NOT EXISTS
+a live lease), rowCount 0 surfacing as a retry line. Judged a STRENGTHENING
+of the decided mechanism (kick-then-clear and the re-check stand; the
+handshake claims the lease before its read, so a login that could hold the
+pre-strip state has a live lease by the time the write runs), not a change
+to the decision; the D13-5 text carries the dated amendment, and the
+statement builder moved to server/character_save_statement.ts to pay for
+the arm (db.ts 4894 to 4877).
+
+### FINDINGS AND FIXES (24 commits on top of the merge, every finding applied)
+Round 1 (the lane fan-out's findings): 4aabd1e62d the server findings on
+the promotion; d040e54e60 the promoted copy's empty bill plus edge pins;
+e013b3e555 the paperdoll full worn map and the ONE cell authority
+(src/ui/worn_item_cell_view.ts); 53032b5fb8 the coverage lane's pin
+hardening; 0881d2bbbf the admin proses, the sanction badge, the non-Latin
+fills; 2862447617 the docs record. Round 2 (the first fresh-reader round):
+77d3482521 the raw legendary name, the shape-first pet screen, the
+name-screen refill 2; d85773c76b banlist 64 KiB plus the boot voice;
+fbe53ef765 vanished-vs-lease on the fenced strip; 18ec663030 the six Hud
+itemIcon adapters forward the quality; f5f2625428 the Korean particles.
+Round 3 (the second reader round): a029c8af90 the fd-bounded read and the
+current-read flag; 4eac2586e9 the term-length index, the stat hold, the
+woc_username_banlist_file_loaded gauge, the warm before the loop;
+1c385a7eb9 the cell authority on every owned-stack grid plus the vendor
+buyback row. Rounds 4 and 5 (the third reader round plus its test audit):
+d2b5a52a8d short and non-regular read refusals, the path-keyed flag, the
+monotonic hold; 3e5a0de1e6 the distinct-length walk and the honest
+residual statements; 97ebf1fa2a every destructive prompt and remaining
+instance-bearing row on the authority; e56b9b2c3e the audit-gap closures.
+Rounds 6 to 8 (the final reader round): c2888f7d0c destroy exactly the
+copy the prompt names, and the O_NONBLOCK open; 8a9e417d27 the final pins
+made decisive; 6375c27848 the length-independent -1 refusal token. The
+gate's pair: 088b832f20 the two-line biome format (the gate's one
+blocker); 20250ddda5 the REAL-Postgres lease-fence proof (7/7 against the
+dev database; skips green without TEST_DATABASE_URL). The freeze's pair
+repair: f9eed89385 the two stub-honesty pins re-pointed to the widened
+itemIcon shape.
+
+### THE REVIEW CHAIN (a fresh reader over every fix round, to convergence)
+Every fix round was read by FRESH readers, never the implementer, and
+every finding of every round was applied or recorded, none dropped:
+- Round-2 readers over round 1: security (4 nits, applied a029c8af90),
+  hot-path (3 should-fix plus 7 nits, applied 4eac2586e9 with the
+  residuals recorded), frontend (ONE BLOCKING: the bags and bank grids
+  still asked the icon dep 1-ary, a def-tier glow inside a legendary rim;
+  applied 1c385a7eb9), test auditor (THREE BLOCKING: the pet screen, the
+  bank tab adapter, and the Exchange floor swap each unpinned; closed
+  across the same round).
+- Round-3 readers over rounds 2 and 3: security (the short read, the
+  non-regular file, the path-keyed flag, the monotonic clock, the
+  empty-term guard, applied d2b5a52a8d; two fuzz proofs recorded, 400k
+  hasBannedTerm cases and 300k pet-name cases with zero divergence),
+  hot-path (the distinct-length walk, measured 10x to 800x on small
+  lists, applied 3e5a0de1e6; the sync-syscall DURATION residual stated at
+  every claim site), frontend (six should-fix: the sell confirm, the
+  world-drop prompt, the unbind rows, the hostile-name escapes; applied
+  97ebf1fa2a), test auditor (TWO BLOCKING: the action-menu and market
+  name changes unpinned; closed e56b9b2c3e).
+- The focused destructive-path read over rounds 4 to 6: the
+  untargeted-discard blocker was the previous round's CONVERGENT finding
+  (frontend and security independently), fixed c2888f7d0c, and its
+  refusal token corrected to the length-independent -1 on the focused
+  read's own finding (6375c27848), with the mirror-longer-than-at-capture
+  case pinned.
+- qa-checklist ran LAST over the whole range: NOT READY on exactly one
+  blocker (two unformatted admin overlay rows, the recorded
+  format-pass-is-not-a-check-pass trap), fixed 088b832f20 with ci:changed
+  re-run GREEN; its adversarial pass named exactly one missing suite,
+  closed 20250ddda5. Its VERIFY items are in RECORDED below.
+- The frozen run itself was the last reader: its two reds were the two
+  stub-honesty pins outside every targeted run (they spelled the pre-QA
+  1-ary Hud itemIcon), re-pointed f9eed89385 and the freeze re-run green.
+
+### THE QA ROUND'S OWN KILL TABLES (55 mutants, three throwaway worktrees, git-restore between, porcelain 0 after each)
+- The lane's table at 171db92c33: 24 mutants, 22 killed; both survivors
+  were real test gaps, closed in round 1 (K17 the content screen's
+  normalized-value unit pin; K25 the worn-arm byte-identity proof).
+- Kill-table 2 over round 1's fixes: K25 to K36, 12 of 12 killed (the
+  K32a survivor closed in the same round).
+- Kill-table 3 over rounds 2 and 3's fixes: F1 to F19, 19 of 19 killed.
+The throwaway worktrees were removed after the tables closed.
+
+### JUDGED THIS ROUND, do not re-raise
+- The reconnect window (three reviewers converging): the lease-fenced
+  offline save is a STRENGTHENING of D13-5, not a change to the decision
+  (the handshake claims the lease BEFORE its refreshed blob read); the
+  D13-5 text carries the dated amendment, and the fence's live semantics
+  are proven against real Postgres
+  (tests/character_save_statement_pg_integration.test.ts).
+- The raw-name pass-through replaced the first round's cut on its own
+  reader's refutation (a cut could normalize to a short VALID name online
+  only); the whitespace-run parity case is the decisive pin. Do not
+  re-raise the cut.
+- The bulk destroy prompt names the DEF by design: the sim's untargeted
+  prefer-fungible walk is the decided bulk rule (it spares special
+  copies), so only the single-copy arm may name a copy, and that arm
+  destroys exactly the copy it names, by target, at its live index.
+- The bagged enchant-target rows keep the def name: EnchantTargetRow
+  groups bagged copies by item id with no per-copy identity; giving them
+  one is a view-core redesign, not a QA fix.
+- msg_lanes over-meters perfect_item frames whose name field is
+  non-string onto the name-screen lane: the safe direction, deliberate.
+- The matcher second-pass skip is exactly the
+  normalization-changed-only-case predicate, proven by a BMP sweep
+  (U+212A the one exception, matcher-covered) and pinned by the one
+  spelling only the second pass catches.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets and the A2 escalation)
+- The nonce fence carries no expiry term (inherited): an
+  expired-but-unreclaimed lease plus a same-realm double boot can
+  autosave over a landed strip; the operator answer stays suspend-first
+  (DEPLOY.md).
+- characters.ts's rename signer sweep and pbe_boost.ts remain UNFENCED
+  offline writers; saveOfflineCharacterState is a drop-in when wanted.
+- The banlist stat and read stay synchronous on the realm loop, held to
+  one stat per second: the hold bounds FREQUENCY, never duration, so a
+  mount that hangs after boot still blocks a name screen for the mount's
+  timeout. Stated at the constant, in main.ts, and in DEPLOY.md (keep the
+  file on local disk); the structural close (an async off-loop refresh
+  through the cached_read seam) is a redesign the banlist suites'
+  synchronous shape resists, left as a maintainer decision.
+- The heavy-self dirty flag is set at the top of the dispatch switch for
+  every allowed perfect_item frame (pre-existing; the lane improved the
+  named-frame rate 15x).
+- The clear-item-name refusal path re-loads the whole blob where a
+  SELECT 1 would do (admin-rare).
+- The guild-name screen rides the 30/s command lane (string-bounded,
+  fee-gated, one-in-flight); its syscall half is closed by the stat hold.
+- The world-drop gesture resolves its copy at DROP time by index and id,
+  not by reference at drag START (the pick-up-to-prompt window every drop
+  action shares); carrying the InvSlot on ItemDragState is the airtight
+  follow-up.
+- The wire's one-shot discard is index-addressed (the
+  sell/deposit/lock class): under mirror divergence the server may
+  consume a different COPY of the same id, never a different id.
+- The trade row's label keeps the def name (a promoted copy is bound and
+  cannot reach the table; the looser persisted-load arm is the one
+  theoretical divergence, stated in the comment).
+- Bank search and name-sort (itemNameOf) do not match a chosen name yet
+  (a behavior extension, not a regression).
+- No E2E scripts the operator kick-clear-retry flow (the units plus the
+  pg fence suite cover the semantics; a live-server script is a follow-up
+  decision).
+- The perf tour and the mobile E2E were not run this round (no layout or
+  per-frame change; hud_perf_budget green); the final gate marked them
+  VERIFY.
+- The Discord activity-card residual stands (a stripped name survives in
+  already-published embeds; manual takedown).
+- The resolveLegendaryPromotion dead gate is a comment, not code (the
+  two Sim wrappers own the gate; a direct headless caller would bypass
+  it).
+- The database-performance, cross-platform-sync, and architecture
+  reviewer rows for the FIX-ROUND deltas were not re-dispatched: all
+  three ran in the phase's original lane fan-out, the round readers
+  covered their concerns on each delta, and the final gate verified them
+  by hand (parity, the SQL call sites, sim purity) and found them
+  passing.
+- The usernameBanlist* ForTest seams are production-inert (grep-proven by
+  the round-3 security read); the Windows O_NONBLOCK degradation is
+  stated at the open.
+- The admin ko/ja/ko/ru/zh overlay fills (round 1) plus the Korean
+  particle fix remain fills made on the maintainer's behalf: re-judge at
+  the release fill.
+
+### THE FROZEN STAMP: EXIT=0 at f9eed89385, drift attributed EXACTLY
+TIP f9eed89385 (unchanged end to end), PORCELAIN 0 at every checkpoint,
+zero vitest processes before, DATABASE_URL unset. npm test SUITE_EXIT=0:
+3212 passed / 22 skipped files (3234); 47302 passed / 2 expected fail /
+380 skipped (47684). Follow-ons all 0: tsc, ci:changed (warnings only),
+wiki:content fresh, i18n:gen fresh; 2026-08-28T01:39:11Z to
+01:47:45Z. Against the 8f5c25957f baseline (3206/21 files 3227; 47177/2/373
+47552) the drift is attributed to the last file: files +5 passed from the
+release span (2) and round 1 (3) plus the unbind rig (+1) and the pg fence
+suite (+1 SKIPPED, no TEST_DATABASE_URL in the freeze); tests +125 passed
+(the static it() adds net of retitles, no dynamic registration) and +7
+skipped (the pg suite's cases). ZERO residual: the prediction made before
+the run matched the tallies byte for byte. The FIRST freeze at 20250ddda5
+differed only by its two reds (the stub-honesty pins outside every
+targeted run, both spelling the pre-QA 1-ary itemIcon); f9eed89385
+re-pointed them and this re-run is the clean stamp. The one commit after
+the stamp is this docs-only record, per the convention.
+
+HANDOFF: Phase 13 QA COMPLETE (PASS). The orange promotion, its
+moderation spine (the name screens, the banlist cache, the lease-fenced
+strip), and the whole owned-item presentation family (the cell authority
+on every surface, every destructive prompt destroying exactly the copy it
+names) audited through five fresh-reader rounds to convergence with every
+finding applied or recorded; the frozen suite is green at f9eed89385 with
+the drift attributed exactly. Phase 14 builds on this tip; the judged
+lists above and the standing sets are binding.
