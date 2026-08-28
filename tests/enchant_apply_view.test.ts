@@ -610,6 +610,17 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     expect(preservedReplaceTraits({ boundTo: 3, bindOnTrade: true })).toEqual(['bond']);
   });
 
+  it('collapses the Perfecting family onto ONE trait, per state and combined (phase 14)', () => {
+    // The bond doctrine one trait over: a Perfected stamp, a live rank walk,
+    // and a copy carrying both print ONE "Perfecting" entry. rank 0 is
+    // spelled as an ABSENT perfecting field (the payload contract), so a
+    // plain copy stays trait-free.
+    expect(preservedReplaceTraits({ perfected: true })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({ perfecting: 2 })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({ perfected: true, perfecting: 3 })).toEqual(['perfecting']);
+    expect(preservedReplaceTraits({})).toEqual([]);
+  });
+
   it('drops both bind facts on the wire-trimmed arm, keeping signature and masterwork', () => {
     // The public eqi wire carries signer/enchant/rolled ONLY, so a reader of
     // that mirror cannot see a copy's bond while the offline Sim can. Claiming
@@ -622,11 +633,20 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       rolled: { masterwork: true },
       boundTo: 9,
       bindOnTrade: true,
+      // Phase 14: the Perfecting family sits BELOW the trim gate with the
+      // bond, because the peer eqi projection carries neither field (the
+      // allowlist pin below), so a trimmed reader must stay silent about it.
+      perfected: true as const,
     };
     expect(preservedReplaceTraits(victim, true)).toEqual(['signer', 'masterwork']);
     // ...and the untrimmed arm, reading a whole self mirror (the `inv` array
     // for the bags, the `einst` payloads for the body), states it.
-    expect(preservedReplaceTraits(victim, false)).toEqual(['signer', 'masterwork', 'bond']);
+    expect(preservedReplaceTraits(victim, false)).toEqual([
+      'signer',
+      'masterwork',
+      'bond',
+      'perfecting',
+    ]);
   });
 
   // The premise the wireTrimmed arm rests on, pinned against the SERVER so it
@@ -698,6 +718,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
         rolled: { masterwork: true },
         boundTo: 1,
         bindOnTrade: true,
+        perfected: true,
       }),
     ).toEqual([...ENCHANT_PRESERVED_TRAITS]);
   });

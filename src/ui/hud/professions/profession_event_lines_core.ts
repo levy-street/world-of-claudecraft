@@ -93,3 +93,13 @@ export function planProfessionEvent(
       return { kind: 'attunement', pairId: event.pairId, playSound: true, motion: !reducedMotion };
   }
 }
+
+/** The sundering completion's log line, matched on the RAW English before
+ *  localization (the fiestaRevive precedent in hud.ts): the sunder grant is
+ *  silent + callerLogs, so this line is the act's only completion signal and
+ *  the cue keys off it. The emit literal lives in
+ *  src/sim/professions/sundering.ts; tests/professions_audio_wiring.test.ts
+ *  welds the two so a reword cannot silently orphan the cue. */
+export function isSunderCompletionLog(text: string): boolean {
+  return text.startsWith('You sunder ') && text.endsWith(' into Sundered Essence.');
+}

@@ -5852,6 +5852,36 @@
   body.mobile-touch .ps-plant {
     min-height: 44px;
   }
+  /* The Perfecting window on touch (Masterwrought phase 14): inset-pinned on
+     all four edges like the harvest journal above, since its candidate list
+     plus detail pane is the whole window and a centered 460px card wastes a
+     landscape phone. .pf-body stays the one internal scroller; the interactive
+     rows carry the 44px touch floor. A re-pinned `left` re-declares
+     `transform` (the mobile transform rule). */
+  body.mobile-touch #perfecting-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch .pf-cand,
+  body.mobile-touch .pf-action,
+  body.mobile-touch .pf-name-submit,
+  body.mobile-touch .pf-bind-confirm {
+    min-height: 44px;
+  }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
      @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
      the coarse-pointer media rule serves real devices, and this class-scoped

@@ -65,6 +65,41 @@ describe('item_instance_tooltip', () => {
     expect(instanceMakersMarkLine({ signer: 'Bob' })).toContain('Crafted by Bob');
   });
 
+  // The phase 14 Perfecting badges: data-driven off the payload alone, so
+  // every trim stays the authority over which surface shows what (the peer
+  // eqi mirror never carries either field; the browse display trim drops
+  // `perfecting`, so a head-started listing stays blind there).
+  it('a Perfected copy states it in one gold line; the seal stacks beside it', () => {
+    const perfected = instanceBadgeLines({ perfected: true });
+    expect(perfected).toContain('Perfected');
+    expect(perfected).toContain('color:var(--gold)');
+    expect((perfected.match(/<div/g) ?? []).length).toBe(1);
+    const withSeal = instanceBadgeLines({
+      perfected: true,
+      rolled: { masterwork: true, stats: { str: 2 } },
+    });
+    expect(withSeal).toContain('Masterwork');
+    expect(withSeal).toContain('Perfected');
+    expect((withSeal.match(/<div/g) ?? []).length).toBe(2);
+  });
+
+  it('a head-started copy (rank walk in progress) states its rank; Perfected suppresses it', () => {
+    const rank2 = instanceBadgeLines({ perfecting: 2 });
+    expect(rank2).toContain('Perfecting: rank 2 of 4');
+    // A Perfected copy never shows a stale rank line beside its stamp (the
+    // payload contract deletes `perfecting` at the stamp, and the renderer
+    // holds the rule even against a payload that kept both).
+    const both = instanceBadgeLines({ perfected: true, perfecting: 3 });
+    expect(both).toContain('Perfected');
+    expect(both).not.toContain('Perfecting:');
+  });
+
+  it('an out-of-contract perfecting value renders no rank line at all', () => {
+    for (const bad of [0, -1, 4, 99, 1.5, Number.NaN]) {
+      expect(instanceBadgeLines({ perfecting: bad as number }), String(bad)).toBe('');
+    }
+  });
+
   it('baked bonus stats each render one tt-instance-bonus line', () => {
     const html = instanceBonusStatLines({
       rolled: { masterwork: true, stats: { str: 2, sta: 1 } },

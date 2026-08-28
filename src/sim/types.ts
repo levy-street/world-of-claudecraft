@@ -6296,6 +6296,12 @@ export type SimEvent = { pid?: number } & (
         // character already crafted it inside the current reset-day window
         // (professions/crafting.ts CraftResult.reason mirror).
         | 'daily_limit';
+      // Masterwrought phase 14: whole seconds until the daily reset reopens
+      // the gate, present ONLY beside reason 'daily_limit' and only when the
+      // host fed a live calendar countdown (Sim.dailyResetRemainingSec > 0).
+      // Refusal-time data by ruling: gate STATE stays learn-on-attempt, so
+      // no standing readout or snapshot field may ever mirror this.
+      retryAfterSeconds?: number;
     }
   // Enchanting profession outcomes (Professions 2.0): mirror
   // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and

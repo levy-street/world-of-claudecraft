@@ -5,7 +5,9 @@ import {
   DAILY_RESET_HOUR,
   eventLeadDayOf,
   feedSimCalendar,
+  nextResetMsOf,
   resetDayOf,
+  resetRemainingSecOf,
 } from '../src/game/utc_day';
 
 describe('currentUtcDay', () => {
@@ -112,20 +114,65 @@ describe('eventLeadDayOf', () => {
   });
 });
 
+// The when-half of resetDayOf (Masterwrought phase 14): the instant the
+// current local window closes, and the whole-second countdown to it, fed to
+// the sim beside the window key so a daily_limit refusal can answer with a
+// duration. Local civil terms like resetDayOf, so every case holds in any
+// process zone.
+describe('nextResetMsOf / resetRemainingSecOf', () => {
+  it("before the reset hour the window closes at TODAY's reset hour", () => {
+    const at = new Date(2026, 7, 7, 1, 0);
+    expect(new Date(nextResetMsOf(at)).getTime()).toBe(new Date(2026, 7, 7, 3, 0).getTime());
+    expect(resetRemainingSecOf(at)).toBe(2 * 3600);
+  });
+
+  it("at and after the reset hour it closes at TOMORROW's", () => {
+    const boundary = new Date(2026, 7, 7, 3, 0);
+    expect(nextResetMsOf(boundary)).toBe(new Date(2026, 7, 8, 3, 0).getTime());
+    expect(resetRemainingSecOf(boundary)).toBe(24 * 3600);
+    const evening = new Date(2026, 7, 7, 18, 30);
+    expect(nextResetMsOf(evening)).toBe(new Date(2026, 7, 8, 3, 0).getTime());
+  });
+
+  it('agrees with resetDayOf: the countdown expires exactly where the key flips', () => {
+    const justBefore = new Date(2026, 7, 7, 2, 59, 59, 400);
+    expect(resetDayOf(justBefore)).toBe('2026-08-06');
+    expect(resetRemainingSecOf(justBefore)).toBe(1);
+    expect(resetDayOf(new Date(nextResetMsOf(justBefore)))).toBe('2026-08-07');
+  });
+
+  it("never answers 0 (the sim's no-calendar sentinel) and rolls month edges", () => {
+    expect(resetRemainingSecOf(new Date(2026, 7, 31, 23, 0))).toBeGreaterThan(0);
+    expect(nextResetMsOf(new Date(2026, 7, 31, 23, 0))).toBe(new Date(2026, 8, 1, 3, 0).getTime());
+  });
+
+  it('does not mutate the Date it is handed', () => {
+    const at = new Date(2026, 7, 7, 1, 0);
+    const before = at.getTime();
+    nextResetMsOf(at);
+    resetRemainingSecOf(at);
+    expect(at.getTime()).toBe(before);
+  });
+});
+
 describe('feedSimCalendar', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('feeds the sim all three host calendar keys in one call', () => {
+  it('feeds the sim all four host calendar values in one call', () => {
     vi.useFakeTimers();
     // Friday 2026-08-21, 8 PM local: inside the early-open lead window.
     const at = new Date(2026, 7, 21, 20, 0);
     vi.setSystemTime(at);
-    const sim = { utcDay: '', resetDay: '', eventLeadDay: '' };
+    const sim = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
     feedSimCalendar(sim);
     expect(sim.utcDay).toBe(at.toISOString().slice(0, 10));
     expect(sim.resetDay).toBe('2026-08-21');
     expect(sim.eventLeadDay).toBe('2026-08-22');
+    // 8 PM to tomorrow 3 AM local: seven hours on the countdown, and always
+    // >= 1 so the sim's 0 = "no calendar" sentinel is never fed from a live
+    // clock.
+    expect(sim.dailyResetRemainingSec).toBe(7 * 3600);
   });
 });

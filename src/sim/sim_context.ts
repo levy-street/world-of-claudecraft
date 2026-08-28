@@ -258,6 +258,12 @@ export interface SimContextPrimitives {
   // (src/sim/pvp/honor_event.ts). Only the event reads this; every daily
   // rollover stays on `resetDay` above.
   readonly eventLeadDay: string;
+  // Host-supplied countdown to the reset that closes the current `resetDay`
+  // window, in whole seconds (0 = unknown, the same no-calendar contract).
+  // Read only at REFUSAL time by the oncePerDay craft gate, so a daily_limit
+  // answer can say when the gate reopens (Masterwrought phase 14); nothing
+  // else may key behavior on it (gate state stays learn-on-attempt).
+  readonly dailyResetRemainingSec: number;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -1338,6 +1344,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get eventLeadDay() {
       return host.eventLeadDay;
+    },
+    get dailyResetRemainingSec() {
+      return host.dailyResetRemainingSec;
     },
     get utcDay() {
       return host.utcDay;

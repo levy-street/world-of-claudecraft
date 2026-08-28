@@ -17,6 +17,7 @@ import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { resolveCraft } from '../src/sim/professions/crafting';
 import {
+  nameCarriesOwnArticle,
   placeMobileStationForPlayer,
   placeMobileStationFromItem,
 } from '../src/sim/professions/mobile_station';
@@ -206,17 +207,20 @@ describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () 
     // A permanent tool: the use never consumes the item.
     expect(sim.countItem(TEST_FORGE_ID, a)).toBe(1);
     // Success is never silent: the one scroll-pattern log line, exactly once
-    // (matched by log.placeStation in src/ui/sim_i18n.ts). Pinned as the WHOLE
+    // (matched by log.placeStationThe in src/ui/sim_i18n.ts). Pinned as the WHOLE
     // set of set-up lines rather than a count of matches, so a second, differently
     // worded placement line cannot ride along unnoticed beside the right one.
-    expect(setUpLines(sim)).toEqual([`You set up ${TEST_FORGE_NAME}.`]);
+    // The article is name-aware (phase 14): an article-free name gains "the".
+    expect(setUpLines(sim)).toEqual([`You set up the ${TEST_FORGE_NAME}.`]);
   });
 
-  it('the line carries no article of its own (a "The ..." item never doubles it)', () => {
-    // The Laden Hearth is the shipped name that made the omission visible:
-    // gluing "the" on produced "You set up the The Laden Hearth." The emit
-    // follows the quaff/read pattern instead and lets the name carry its own
-    // article, in English and in every {item} template downstream.
+  it('the article is name-aware: a "The ..." item never doubles it, a bare name gains it', () => {
+    // The Laden Hearth is the shipped name that made the phase 09 article
+    // omission visible: unconditionally gluing "the" on produced "You set up
+    // the The Laden Hearth." The phase 14 polish keeps the bare line for a
+    // name that begins with an article and adds "the" for one that does not
+    // (the article-free form read as a dropped word: "You set up Master's
+    // Field Forge."). Each arm is its own emit literal with its own matcher.
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     teleport(sim, a, FIELD.x, FIELD.z);
@@ -224,6 +228,19 @@ describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () 
     placeMobileStationFromItem(simCtx(sim), 'cooking', ITEMS.laden_hearth.name, a);
 
     expect(setUpLines(sim)).toEqual(['You set up The Laden Hearth.']);
+
+    // The indefinite articles hold the same rule (per-dimension negatives:
+    // "An" must not become "the An ..."), case-insensitively.
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'cooking', 'An Elder Kiln', a);
+    expect(setUpLines(sim)).toEqual(['You set up An Elder Kiln.']);
+
+    // And the predicate itself: an article PREFIX inside a word never counts.
+    expect(nameCarriesOwnArticle('The Laden Hearth')).toBe(true);
+    expect(nameCarriesOwnArticle('a travelling forge')).toBe(true);
+    expect(nameCarriesOwnArticle("Master's Field Forge")).toBe(false);
+    expect(nameCarriesOwnArticle('Anvil of Dawn')).toBe(false);
+    expect(nameCarriesOwnArticle('Theron Kiln')).toBe(false);
   });
 
   it('placement draws zero rng', () => {
@@ -653,12 +670,12 @@ describe('activeMobileStationCraftsFor set arms', () => {
   });
 });
 
-// The article omission above is pinned in English only, and English is the one
-// locale where the matcher's own regex cannot be caught out: /^You set up (.+)\.$/
-// matched the OLD "You set up the The Laden Hearth." sentence just as happily,
-// capturing "the The Laden Hearth", which no item name resolves. So the emit
-// shape is what carries the localization, not the regex, and that only shows up
-// once the line is actually run through a non-English locale.
+// The name-aware article above is pinned in English only, and English is the
+// one locale where the matcher's own regexes cannot be caught out: the general
+// /^You set up (.+)\.$/ rule would capture an articled sentence as
+// "the <name>", which no item name resolves, so the articled arm has its OWN
+// rule (log.placeStationThe) registered ahead of it. Both arms' emit-to-matcher
+// chains only show their localization once run through a non-English locale.
 describe('the set-up line round trips through a real locale', () => {
   // ja_JP is picked because the shipped overlay already carries an
   // entities.items.laden_hearth.name fill; en_XA is URL-param-only and not
@@ -696,19 +713,31 @@ describe('the set-up line round trips through a real locale', () => {
     expect(out, 'no English name left in the localized line').not.toContain(english);
   });
 
-  it('CHARACTERIZATION: the matcher cannot recover a doubled article, which is why the emit carries none', async () => {
-    // Not a requirement, a record of the matcher's limit and the reason the
-    // English arm above is not enough on its own: hand the matcher the sentence
-    // the old glued-article emit produced and the capture is "the The Laden
-    // Hearth", which resolves to no item at all, so the English name rides
-    // straight through into a Japanese sentence. A future matcher that strips
-    // a leading article would be free to retire this arm; the requirement it
-    // guards is the article-free emit, pinned by name earlier in this file.
+  it('the ARTICLED arm localizes end to end too, off its own matcher rule', async () => {
+    // The phase 14 arm: an article-free name (Master's Field Forge) now emits
+    // "You set up the {name}.", and that sentence must resolve through the
+    // dedicated log.placeStationThe rule, whose capture is the bare name, so
+    // the localized line carries the localized item name and no English. This
+    // replaces the old CHARACTERIZATION arm that recorded the doubled-article
+    // capture failure: the articled sentence is now a first-class emit with
+    // its own rule, so the failure mode it recorded no longer exists.
     await ensureLocaleLoaded(LOCALE);
     setLanguage(LOCALE);
-    const english = ITEMS.laden_hearth.name;
-    const doubled = localizeSimText(`You set up the ${english}.`);
-    expect(doubled, 'the over-broad regex still matches it').not.toBeNull();
-    expect(doubled, 'and leaks the English name into the localized line').toContain(english);
+    const english = ITEMS.masters_field_forge.name;
+    const localized = tEntity({ kind: 'item', id: 'masters_field_forge', field: 'name' });
+    expect(localized, 'the fixture locale really translates this item').not.toBe(english);
+
+    const sim = makeWorld();
+    const b = sim.addPlayer('priest', 'Bet');
+    teleport(sim, b, FIELD.x, FIELD.z);
+    drainEvents(sim);
+    placeMobileStationFromItem(simCtx(sim), 'weaponcrafting', english, b);
+    const [line] = setUpLines(sim);
+    expect(line, 'the placement logged the articled line').toBe(`You set up the ${english}.`);
+
+    const out = localizeSimText(line);
+    expect(out, 'the matcher recognized the articled line').not.toBeNull();
+    expect(out, 'the localized name reached the sentence').toContain(localized);
+    expect(out, 'no English name left in the localized line').not.toContain(english);
   });
 });

@@ -2525,6 +2525,18 @@ export const hudChromeStrings = {
   // in rather than written into the copy so the number cannot drift from the rule
   // (src/sim/equipment_rules.ts masterwroughtConflictSlot).
   itemMasterwrought: 'Unique-Equipped: Masterwrought ({count})',
+  // The Masterwrought cap-visibility family (phase 14): the character sheet's
+  // slots readout and worn-piece mark, plus the tooltip cap-state lines. Every
+  // number ({used}/{cap}) interpolates from the sim's own cap walk
+  // (src/ui/masterwrought_cap_view.ts over MASTERWROUGHT_EQUIP_CAP), never a
+  // literal in copy, the itemMasterwrought rule above.
+  masterwrought: {
+    slotsLabel: 'Masterwrought slots:',
+    slotsValue: '{used} / {cap}',
+    pieceMark: 'Masterwrought',
+    tooltipWorn: 'Occupies a Masterwrought slot ({used} of {cap} in use).',
+    tooltipAtCap: 'All {cap} Masterwrought slots are in use.',
+  },
   itemSet: {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
@@ -2567,6 +2579,21 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
+    // The commission board's crafter's-record counts (Masterwrought phase
+    // 14): lifetime masterworks crafted and legendaries forged, off the
+    // accepter's deed stat counters.
+    commissionMasterworks: {
+      one: '{count} masterwork',
+      few: '{count} masterworks',
+      many: '{count} masterworks',
+      other: '{count} masterworks',
+    },
+    commissionLegendaries: {
+      one: '{count} legendary',
+      few: '{count} legendaries',
+      many: '{count} legendaries',
+      other: '{count} legendaries',
+    },
     guildMembers: {
       one: 'your guild rank is {rank}; {count} member',
       few: 'your guild rank is {rank}; {count} members',
@@ -3556,6 +3583,14 @@ export const hudChromeStrings = {
     // while its bag corner still paints the enchant glyph. Rendered ONLY in
     // that case, never beside an attributed line.
     enchantedFallback: 'Enchanted',
+    // Phase 14, the Perfecting badges (item_instance_tooltip.ts
+    // instanceBadgeLines): the Perfected stamp as its own gold line (the
+    // owner's paperdoll and bag surfaces; the peer inspect card never
+    // receives the field), and the head-started rank line on the owner's
+    // full-payload surfaces. {rank}/{ranks} interpolate from the payload and
+    // the sim's PERFECTING_RANKS, never literals in copy.
+    perfectedBadge: 'Perfected',
+    perfectingRank: 'Perfecting: rank {rank} of {ranks}',
   },
   // Purpose hints for the eight enchanting materials
   // (src/ui/hud/professions/material_hint_view.ts), keyed by item id there. Each says what the
@@ -3614,6 +3649,16 @@ export const hudChromeStrings = {
     deedOfMaking:
       'Inscription writ. Consumed to raise a Perfected Masterwrought work ' +
       'to legendary and give it a name.',
+    // Wyrmfall Core (masterwrought Phase 14): the faucet line, written from
+    // the live income module (src/sim/professions/masterwrought_materials.ts
+    // and content/heroic_vendor.ts). The numbers are pinned against the
+    // module's own constants in tests/material_hint_view.test.ts, so a
+    // faucet retune fails there instead of shipping a stale sentence.
+    wyrmfallCore:
+      'Masterwrought crafting catalyst. Raid and heroic dungeon final bosses ' +
+      'each drop 1 to 3 once per day, your first A or S rank rift clear of ' +
+      'the day grants 1 or 2, and the Heroic Quartermaster sells one for ' +
+      'Heroic Marks.',
   },
   discord: {
     title: 'Discord',
@@ -5043,6 +5088,11 @@ export const hudChromeStrings = {
     // Masterwrought phase 07: a oncePerDay recipe already crafted inside the
     // current reset-day window (the Quickening Catalyst daily gate).
     dailyLimit: 'You can only craft that once per day.',
+    // Phase 14, the refusal countdown: rendered INSTEAD of dailyLimit when
+    // the craftResult refusal carried retryAfterSeconds (the host fed a live
+    // reset clock); {duration} is duration_text.ts over that figure. Older
+    // or calendar-less hosts keep the plain line above.
+    dailyLimitRetry: 'You can only craft that once per day. Available again in {duration}.',
     // The oncePerDay row affordance label (chip, tooltip line, and aria
     // clause): states the limit BEFORE the attempt, where the dailyLimit
     // refusal above lands after. Kept non-wordy (no 4-plus lowercase run)
@@ -5072,6 +5122,19 @@ export const hudChromeStrings = {
     // for a craft. {master} is the resident master's name (entity i18n),
     // {station} the localized stationName.* value, {craft} the craftName.* value.
     learnMoreAtStation: '{master} at the {station} can teach you more {craft} recipes.',
+    // The apex tier's restrained treatment (Masterwrought phase 14): the chip
+    // marks the endgame rung, and the provenance line says where a KNOWN
+    // recipe's pattern came from (the R8 channels, apex_recipe_view.ts; the
+    // window lists known recipes only, so no line ever reveals an unlearned
+    // one). perfectingLink is the apex GEAR rows' quiet door to the
+    // Perfecting window; its accessible name is perfecting.openButtonAria,
+    // which contains this visible label (WCAG 2.5.3).
+    apexChip: 'Apex',
+    apexPatternRaid: 'Its pattern is a rare raid trophy.',
+    apexPatternRift: 'Its pattern is won on victorious high-rank Rift clears.',
+    apexPatternVendor: 'The Heroic Quartermaster sells its pattern for Heroic Marks.',
+    apexPatternDrop: 'Its pattern is found in the world.',
+    perfectingLink: 'Perfecting',
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     // Masterwrought phase 13, the orange promotion celebration
@@ -5305,6 +5368,13 @@ export const hudChromeStrings = {
     // thing being preserved; it never names WHO it is bound to (boundTo is an
     // entity id, not a stable identity).
     replaceConfirmKeepsBond: 'Commission bond',
+    // ONE label for the whole Perfecting family, the bond rule above: a
+    // head-started copy's rank progress and a Perfected copy's stamp with its
+    // bonus all survive a replace untouched (the marker-arm peel subtracts
+    // only the old enchant's own share), and this line says the family is
+    // safe rather than which state it is in; the item tooltip's Perfected /
+    // Perfecting lines own that distinction.
+    replaceConfirmKeepsPerfecting: 'Perfecting',
     replaceConfirmCost: 'Cost: {cost}',
     replaceConfirmCostItem: '{name} x{count}',
     replaceConfirmAccept: 'Replace',
@@ -5392,6 +5462,53 @@ export const hudChromeStrings = {
   // window's header; no location gate, since opening/cancelling an order
   // carries no escrow. Chat lines answer commissionOrderResult (the
   // trainResult/unbindResult single-surface rule: one line, no toast).
+  // The Perfecting window (Masterwrought phase 14): the apex rank track and
+  // the orange promotion. Item and material NAMES resolve through entity
+  // i18n, never through these keys; the player-chosen legendary name is a raw
+  // VALUE (the D13-2 ruling), rendered esc'd standalone and only ever
+  // interpolated as a {name} param, never composed into a catalog value.
+  // The bind copy states the live mechanic exactly: fail-forward (a failed
+  // attempt spends materials, never lowers rank), the first attempt's bind is
+  // permanent (the unbind service refuses tracked and Perfected pieces), and
+  // a promotion is permanent.
+  perfecting: {
+    title: 'Perfecting',
+    close: 'Close the Perfecting window',
+    openButton: 'Perfecting',
+    openButtonAria: 'Open the Perfecting window',
+    empty: 'You hold no Masterwrought piece. The apex recipes forge one.',
+    wornChip: 'Worn',
+    rowRank: 'Rank {rank} of {ranks}',
+    rowPerfected: 'Perfected',
+    rowPromoted: 'Legendary',
+    attemptCost: 'Attempt cost',
+    promoteCost: 'Promotion cost',
+    matCount: '{have} of {required}',
+    skillNeed: 'Needs {craft} skill {skill}.',
+    skillMet: 'Met.',
+    skillUnmet: 'Not met.',
+    skillSyncing: 'Checking your craft skill.',
+    bindWarn: 'Your first perfecting attempt permanently binds {name} to you.',
+    bindWarnDetail:
+      'Perfecting never lowers a rank: a failed attempt only spends its materials. A bound piece cannot be unbound, and a promotion is permanent.',
+    bindConfirmText: 'Your first attempt permanently binds {name} to you. Attempt anyway?',
+    bindConfirmAccept: 'Bind and Attempt',
+    bindConfirmCancel: 'Cancel',
+    attempt: 'Attempt Perfecting',
+    promote: 'Name and Promote',
+    perfectedLead: 'Perfected. Give it a name to forge a legend.',
+    promotedLine: 'A finished legend: nothing left to perfect.',
+    equipBlocked: 'You could not equip it once promoted. Unequip the conflicting piece first.',
+    nameTitle: 'Name the Legend',
+    nameLabel: 'Inscribe a name for {name}. The name is permanent.',
+    nameInputAria: 'Legendary name',
+    nameHint:
+      'Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.',
+    nameCount: '{count} of {max}',
+    nameSubmit: 'Forge the Legend',
+    nameSubmitBusy: 'Forging',
+    nameCancel: 'Cancel',
+  },
   commissionBoard: {
     title: 'Commission Orders',
     close: 'Close commission orders',
@@ -5420,6 +5537,10 @@ export const hudChromeStrings = {
     rowFor: '{item} for {requester}',
     rowTargeted: '{item} for {requester} (for {crafter})',
     acceptedBy: 'Accepted by {name}',
+    // The crafter's-record quality signal on accepted rows (Masterwrought
+    // phase 14): the label ahead of the two tPlural count phrases
+    // (hudChrome.plurals.commissionMasterworks / commissionLegendaries).
+    crafterRecordLabel: "Crafter's record:",
     statusOpen: 'Open',
     statusAccepted: 'Accepted',
     statusDelivered: 'Delivered',

@@ -32,6 +32,14 @@ export const CONSUMABLE_KIND_ORDER = [
 
 export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
 
+// Reused per-call scratch for the kind-fair cap (phase 14): segment bounds and
+// keep counts per kind, sized once to the fixed kind table so a per-frame call
+// allocates nothing. Overwritten wholesale on every call, never read across
+// calls, so the core stays same-input-same-output.
+const SEG_START = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);
+const SEG_LEN = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);
+const SEG_KEEP = new Array<number>(CONSUMABLE_KIND_ORDER.length).fill(0);
+
 /**
  * Fill `out` with the item ids the quick bar shows, in render order:
  * potions, then elixirs, then flasks, then scrolls, then food, then drink; id-sorted within a
@@ -39,6 +47,16 @@ export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
  * Multiple stacks of one item collapse to a single slot (the shared bar core
  * sums the count across stacks). Mutates and returns `out` (allocation-light:
  * per-frame callers reuse one array, matching the action_bar_view contract).
+ *
+ * The cap is KIND-FAIR (phase 14): when more distinct consumables exist than
+ * seats, every PRESENT kind seats its id-sorted first item, in kind order,
+ * before any kind takes a second seat; the leftover seats then fill in the
+ * existing priority order (kind order, id order within a kind). Farming's
+ * dishes, feast, and tonic made a potion-and-elixir-heavy bag the common
+ * case, and the old head-first truncation starved whole kinds off the tray
+ * (the recorded flask starvation). With at most six kinds in the game, no
+ * kind is ever starved while a seat exists; past the guarantee, the shed
+ * order keeps the old priority semantics. Render order stays kind-grouped.
  */
 export function consumableBarItems(
   inventory: readonly Pick<InvSlot, 'itemId'>[],
@@ -47,8 +65,10 @@ export function consumableBarItems(
   cap = CONSUMABLE_BAR_SLOTS,
 ): string[] {
   out.length = 0;
-  for (const kind of CONSUMABLE_KIND_ORDER) {
+  for (let k = 0; k < CONSUMABLE_KIND_ORDER.length; k++) {
+    const kind = CONSUMABLE_KIND_ORDER[k];
     const segStart = out.length;
+    SEG_START[k] = segStart;
     for (const slot of inventory) {
       const def = lookup(slot.itemId);
       if (!def || def.kind !== kind) continue;
@@ -69,7 +89,38 @@ export function consumableBarItems(
         out[i] = tmp;
       }
     }
+    SEG_LEN[k] = out.length - segStart;
   }
-  if (out.length > cap) out.length = cap;
+  if (out.length <= cap) return out;
+  // Kind-fair cap. Guarantee pass: one seat per present kind, in kind order,
+  // while seats last (a cap under the present-kind count truncates the
+  // guarantee itself down the same ladder). Leftover pass: the remaining
+  // seats go to each kind's next id-sorted items in kind order, so the old
+  // priority semantics decide everything past the guarantee.
+  let guaranteeSeats = cap;
+  for (let k = 0; k < CONSUMABLE_KIND_ORDER.length; k++) {
+    if (SEG_LEN[k] > 0 && guaranteeSeats > 0) {
+      SEG_KEEP[k] = 1;
+      guaranteeSeats--;
+    } else {
+      SEG_KEEP[k] = 0;
+    }
+  }
+  let leftoverSeats = guaranteeSeats;
+  for (let k = 0; k < CONSUMABLE_KIND_ORDER.length && leftoverSeats > 0; k++) {
+    if (SEG_KEEP[k] === 0) continue;
+    const extra = Math.min(SEG_LEN[k] - SEG_KEEP[k], leftoverSeats);
+    SEG_KEEP[k] += extra;
+    leftoverSeats -= extra;
+  }
+  // Compact in place: each kept run is that kind's segment head, and the
+  // write cursor can never pass a segment's start, so the forward copy is
+  // safe without a second array.
+  let w = 0;
+  for (let k = 0; k < CONSUMABLE_KIND_ORDER.length; k++) {
+    const start = SEG_START[k];
+    for (let i = 0; i < SEG_KEEP[k]; i++) out[w++] = out[start + i];
+  }
+  out.length = w;
   return out;
 }

@@ -37,6 +37,7 @@ import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
+import { masterwroughtCapReadout } from './masterwrought_cap_view';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
 import {
@@ -281,6 +282,7 @@ export class CharWindow {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
+    html += this.masterwroughtSlotsHtml(world);
     // Stats as the showcase layout: five primary tiles, then the Offense and
     // Defense panels. The partition + heading keys come from the char_stats_view
     // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
@@ -413,6 +415,24 @@ export class CharWindow {
     return `<div class="char-progression char-playtime"><span class="cp-title char-playtime-label">${esc(t('hudChrome.charSheet.playtimeLabel'))}</span><b class="char-playtime-value${visible ? '' : ' char-playtime-value-hidden'}">${esc(value)}</b><button type="button" class="char-playtime-eye" data-act="toggle-playtime" aria-pressed="${visible ? 'false' : 'true'}" aria-label="${esc(eyeLabel)}">${svgIcon(visible ? 'eye' : 'eye-off')}</button></div>`;
   }
 
+  // The Masterwrought slots readout (phase 14): the character-sheet face of
+  // the equip cap (src/sim/equipment_rules.ts MASTERWROUGHT_EQUIP_CAP),
+  // rendered as a slim row right under the paperdoll it describes. Shown only
+  // once a Masterwrought piece is actually worn: before endgame the cap never
+  // binds, and a standing "0 / 2" row would be noise on every sheet. Counts
+  // come from the masterwrought_cap_view pure core, the same flag walk the
+  // equip refusal runs, so the readout can never disagree with the rule.
+  private masterwroughtSlotsHtml(world: IWorld): string {
+    const readout = masterwroughtCapReadout(world.equipment, ITEMS);
+    if (!readout) return '';
+    const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+    const value = t('hudChrome.masterwrought.slotsValue', {
+      used: num(readout.used),
+      cap: num(readout.cap),
+    });
+    return `<div class="char-progression char-mw-slots"><span class="cp-title char-mw-slots-label">${esc(t('hudChrome.masterwrought.slotsLabel'))}</span><b class="char-mw-slots-value">${esc(value)}</b></div>`;
+  }
+
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {
     const { slot, item, instance } = cell;
     const row = document.createElement('div');
@@ -437,8 +457,15 @@ export class CharWindow {
     const icon = item
       ? this.deps.itemIcon(item, parts?.quality)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
+    // The worn Masterwrought mark (phase 14): a small gold diamond beside the
+    // slot name, the paperdoll's per-slot half of the cap readout above it.
+    // role=img + a t() aria-label because the diamond is CSS-drawn (no glyph
+    // to read); the full cap relationship rides the row tooltip below.
+    const mwChip = item?.masterwrought
+      ? ` <span class="equip-mw-chip" role="img" aria-label="${esc(t('hudChrome.masterwrought.pieceMark'))}"></span>`
+      : '';
     row.innerHTML = `${icon}
-        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+        <div><div class="slot-name">${esc(this.deps.slotName(slot))}${mwChip}</div><div class="slot-item" style="color:${qColor}">${wornName !== null ? esc(wornName) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     // The helmet-visibility eye (head socket only): a standing wardrobe control,
     // so unlike the corner x it is always visible, and it rides the socket
     // because that is where the player looks for "my helmet". State + side
@@ -481,7 +508,21 @@ export class CharWindow {
         // identity plus the self-only Perfected stamp, never the bond.
         const world = this.deps.world();
         const instance = wornTooltipInstance(world.equipmentInstances?.[slot]);
-        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+        // The worn cap-relationship line (phase 14): this piece OCCUPIES one
+        // of the Masterwrought slots, with the live in-use count, resolved at
+        // hover so it tracks re-equips. Worn here, so the readout is never
+        // null; the def tooltip's own Masterwrought line states the budget,
+        // this one states this copy's claim on it.
+        const readout = item.masterwrought ? masterwroughtCapReadout(world.equipment, ITEMS) : null;
+        const mwLine = readout
+          ? `<div class="tt-sub" style="color:var(--gold)">${esc(
+              t('hudChrome.masterwrought.tooltipWorn', {
+                used: formatNumber(readout.used, { maximumFractionDigits: 0 }),
+                cap: formatNumber(readout.cap, { maximumFractionDigits: 0 }),
+              }),
+            )}</div>`
+          : '';
+        return `${this.deps.itemTooltip(item, instance)}${mwLine}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.

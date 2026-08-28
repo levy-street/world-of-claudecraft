@@ -120,6 +120,18 @@ export const UI_CUES = {
   // no conflict sharing the file with the real applyEnchant/enchantResult
   // action here.
   enchant: 'ui_craft_enchanting',
+  // Masterwrought crafting UX (phase 14): perfectingAttempt is the Perfecting
+  // attempt resolve strike and perfectingSuccess the rank landing (both
+  // consumed by the Perfecting window); legendaryForged is the orange
+  // promotion's own capstone cue, replacing the reused achievement chime at
+  // the hud's legendaryForged arm so the rarest crafting moment stops
+  // sounding like any deed unlock; sunderComplete closes the one silent
+  // craft-family completion (the sunder grant is silent + callerLogs, so no
+  // generic ding ever covered it).
+  perfectingAttempt: 'ui_perfecting_attempt',
+  perfectingSuccess: 'ui_perfecting_success',
+  legendaryForged: 'ui_legendary_forged',
+  sunderComplete: 'ui_sunder_complete',
   // Farming (the render / juice phase): the plant ACTION and the harvest
   // RESULT, the same cast/result split the gathering family uses. Both are
   // procedural placeholders in scripts/sfx/ui_sfx.mjs until real recordings
@@ -442,6 +454,31 @@ export class GameAudio {
 
   enchant(): void {
     this.playFeedback(UI_CUES.enchant);
+  }
+
+  // Masterwrought Perfecting (phase 14): the attempt resolve strike and the
+  // rank landing. Result feedback like craftSuccess/masterwork, so both ride
+  // the feedback gate.
+  perfectingAttempt(): void {
+    this.playFeedback(UI_CUES.perfectingAttempt);
+  }
+
+  perfectingSuccess(): void {
+    this.playFeedback(UI_CUES.perfectingSuccess);
+  }
+
+  // The orange moment (Masterwrought phase 13's promotion, cued in phase 14):
+  // the legendary promotion's own capstone cue. Feedback-gated like the other
+  // crafting result celebrations (craftSuccess, masterwork).
+  legendaryForged(): void {
+    this.playFeedback(UI_CUES.legendaryForged);
+  }
+
+  // The sundering completion: the grant is silent + callerLogs, so this cue
+  // is the action's only sound beyond the shared cast wind-up. Feedback-gated
+  // like disenchant/salvage, its enchant-family siblings.
+  sunderComplete(): void {
+    this.playFeedback(UI_CUES.sunderComplete);
   }
 
   // Farming plant: the direct-affordance half (you pressed plant and the soil

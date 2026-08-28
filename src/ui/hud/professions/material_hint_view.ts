@@ -81,6 +81,14 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   // LEGENDARY_PROMOTION_COST), so this purpose line is the one place its
   // tooltip says what it is for (the growth_tonic precedent).
   deed_of_making: 'hudChrome.materialHint.deedOfMaking',
+  // Wyrmfall Core (masterwrought Phase 14 UX pass): the tradable apex
+  // catalyst is kind 'junk' with no def-level use, so nothing in the client
+  // said where it comes from. The line names its faucets from the live
+  // income module (src/sim/professions/masterwrought_materials.ts: the
+  // per-source daily boss roll of WYRMFALL_BOSS_MIN..MAX, the deterministic
+  // WYRMFALL_RIFT_COUNT first-clear grants, the Heroic Quartermaster row in
+  // content/heroic_vendor.ts); the Used-by line names its consuming crafts.
+  wyrmfall_core: 'hudChrome.materialHint.wyrmfallCore',
 };
 
 /** The hint key for one item id, or undefined for every other item. */

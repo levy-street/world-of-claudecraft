@@ -7965,6 +7965,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemUniqueEquipped': 'Уникальный (экипируется)',
   'hudChrome.itemMasterwrought': 'Уникальный (экипируется): Ковка мастера ({count})',
+  'hudChrome.masterwrought.slotsLabel': 'Ячейки Ковки мастера:',
+  'hudChrome.masterwrought.pieceMark': 'Ковка мастера',
+  'hudChrome.masterwrought.tooltipWorn': 'Занимает ячейку Ковки мастера (занято {used} из {cap}).',
+  'hudChrome.masterwrought.tooltipAtCap': 'Все {cap} ячейки Ковки мастера заняты.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -8115,6 +8119,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLocked': 'Один из реагентов заблокирован.',
   'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
   'hudChrome.crafting.dailyLimit': 'Это можно создать лишь раз в день.',
+  'hudChrome.crafting.dailyLimitRetry':
+    'Это можно создать лишь раз в день. Снова будет доступно через {duration}.',
   'hudChrome.crafting.comboRequires': 'Настройка: {craftA} + {craftB}, ранг {tier}.',
   'hudChrome.crafting.comboMet': 'Готово.',
   'hudChrome.crafting.comboSyncing': 'Проверяем настройку на сервере.',
@@ -11899,6 +11905,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.commissionBoard.rowFor': '{item} для {requester}',
   'hudChrome.commissionBoard.rowTargeted': '{item} для {requester} (мастеру {crafter})',
   'hudChrome.commissionBoard.acceptedBy': 'Принял: {name}',
+  'hudChrome.commissionBoard.crafterRecordLabel': 'Послужной список мастера:',
+  'hudChrome.plurals.commissionMasterworks.one': '{count} шедевр',
+  'hudChrome.plurals.commissionMasterworks.few': '{count} шедевра',
+  'hudChrome.plurals.commissionMasterworks.many': '{count} шедевров',
+  'hudChrome.plurals.commissionMasterworks.other': '{count} шедевра',
+  'hudChrome.plurals.commissionLegendaries.one': '{count} легендарный предмет',
+  'hudChrome.plurals.commissionLegendaries.few': '{count} легендарных предмета',
+  'hudChrome.plurals.commissionLegendaries.many': '{count} легендарных предметов',
+  'hudChrome.plurals.commissionLegendaries.other': '{count} легендарных предмета',
   'hudChrome.commissionBoard.statusOpen': 'Открыт',
   'hudChrome.commissionBoard.statusAccepted': 'Принят',
   'hudChrome.commissionBoard.statusDelivered': 'Доставлен',
@@ -12355,6 +12370,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Катализатор для ремесла. Алхимик может создать лишь один в день.',
   'hudChrome.materialHint.growthTonic':
     'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
+  'hudChrome.materialHint.wyrmfallCore':
+    'Катализатор ковки мастера. Финальные боссы рейда и героических подземелий раз в день приносят от 1 до 3 каждый, первое за день прохождение Разлома ранга A или S даёт 1 или 2, а Героический интендант продаёт его за Героические знаки.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',
@@ -12378,6 +12395,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Клеймо создателя',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Бонус шедевра',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Привязка изделия на заказ',
+  'hudChrome.enchanting.replaceConfirmKeepsPerfecting': 'Совершенствование',
   'hudChrome.enchanting.replaceConfirmCost': 'Стоимость: {cost}',
   'hudChrome.enchanting.replaceConfirmCostItem': '{name}: {count}',
   'hudChrome.enchanting.replaceConfirmAccept': 'Заменить',
@@ -12387,6 +12405,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': 'Заблокировано',
   'hudChrome.bags.unlockItem': 'Разблокировать предмет',
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
+  'hudChrome.itemTooltip.perfectedBadge': 'Доведён до совершенства',
+  'hudChrome.itemTooltip.perfectingRank': 'Совершенствование: ранг {rank} из {ranks}',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
@@ -14425,4 +14445,57 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя.',
   'hudChrome.crafting.legendaryLine': '{item} перерождается как {name} и становится легендой!',
   'hudChrome.crafting.legendaryZoneLine': '{player} перековывает {item} в легенду: {name}!',
+  // Masterwrought Phase 14: the Perfecting window + the crafting window's
+  // apex surfacing (M16 fills). Terms follow the shipped sim_i18n rows:
+  // Perfecting = совершенствование, Masterwrought = «Ковка мастера»,
+  // Rift = разлом.
+  'hudChrome.crafting.apexChip': 'Вершина',
+  'hudChrome.crafting.apexPatternRaid': 'Его чертёж - редкий трофей рейда.',
+  'hudChrome.crafting.apexPatternRift':
+    'Его чертёж добывается за победные прохождения разломов высокого ранга.',
+  'hudChrome.crafting.apexPatternVendor':
+    'Героический интендант продаёт его чертёж за Героические знаки.',
+  'hudChrome.crafting.apexPatternDrop': 'Его чертёж можно найти в мире.',
+  'hudChrome.crafting.perfectingLink': 'Совершенствование',
+  'hudChrome.perfecting.title': 'Совершенствование',
+  'hudChrome.perfecting.close': 'Закрыть окно совершенствования',
+  'hudChrome.perfecting.openButton': 'Совершенствование',
+  'hudChrome.perfecting.openButtonAria': 'Открыть окно совершенствования',
+  'hudChrome.perfecting.empty':
+    'У вас нет предмета «Ковка мастера», который можно совершенствовать. Его создают вершинные рецепты.',
+  'hudChrome.perfecting.wornChip': 'Надето',
+  'hudChrome.perfecting.rowRank': 'Ранг {rank} из {ranks}',
+  'hudChrome.perfecting.rowPerfected': 'Совершенство',
+  'hudChrome.perfecting.rowPromoted': 'Легендарный',
+  'hudChrome.perfecting.attemptCost': 'Цена попытки',
+  'hudChrome.perfecting.promoteCost': 'Цена возвышения',
+  'hudChrome.perfecting.matCount': '{have} из {required}',
+  'hudChrome.perfecting.skillNeed': 'Требуется навык {skill}: {craft}.',
+  'hudChrome.perfecting.skillMet': 'Выполнено.',
+  'hudChrome.perfecting.skillUnmet': 'Не выполнено.',
+  'hudChrome.perfecting.skillSyncing': 'Проверяем ваш навык ремесла.',
+  'hudChrome.perfecting.bindWarn':
+    'Первая попытка совершенствования навсегда привяжет {name} к вам.',
+  'hudChrome.perfecting.bindWarnDetail':
+    'Совершенствование никогда не понижает ранг: неудачная попытка лишь расходует материалы. Привязку нельзя снять, а возвышение необратимо.',
+  'hudChrome.perfecting.bindConfirmText':
+    'Первая попытка навсегда привяжет {name} к вам. Всё равно попытаться?',
+  'hudChrome.perfecting.bindConfirmAccept': 'Привязать и попытаться',
+  'hudChrome.perfecting.bindConfirmCancel': 'Отмена',
+  'hudChrome.perfecting.attempt': 'Попытка совершенствования',
+  'hudChrome.perfecting.promote': 'Назвать и возвысить',
+  'hudChrome.perfecting.perfectedLead':
+    'Доведено до совершенства. Дайте предмету имя, чтобы выковать легенду.',
+  'hudChrome.perfecting.promotedLine': 'Завершённая легенда: совершенствовать больше нечего.',
+  'hudChrome.perfecting.equipBlocked':
+    'После возвышения вы не сможете его надеть. Сначала снимите конфликтующий предмет.',
+  'hudChrome.perfecting.nameTitle': 'Имя легенды',
+  'hudChrome.perfecting.nameLabel': 'Впишите имя для предмета {name}. Имя останется навсегда.',
+  'hudChrome.perfecting.nameInputAria': 'Легендарное имя',
+  'hudChrome.perfecting.nameHint':
+    'От 2 до 32 символов: латинские буквы, пробелы, апострофы и дефисы, первой должна быть буква.',
+  'hudChrome.perfecting.nameCount': '{count} из {max}',
+  'hudChrome.perfecting.nameSubmit': 'Выковать легенду',
+  'hudChrome.perfecting.nameSubmitBusy': 'Куём',
+  'hudChrome.perfecting.nameCancel': 'Отмена',
 };

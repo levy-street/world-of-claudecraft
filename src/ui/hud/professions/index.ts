@@ -1,3 +1,4 @@
+export * from './apex_recipe_view';
 export * from './commission_order_view';
 export * from './commission_order_window';
 export * from './cooking_catch_hint_view';
@@ -24,9 +25,12 @@ export * from './gathering_profession_name';
 export * from './gathering_view';
 export * from './harvest_journal_view';
 export * from './harvest_journal_window';
+export * from './legendary_naming_dialog';
 export * from './material_hint_view';
 export * from './material_profession_hint_view';
 export * from './mobile_station_tooltip';
+export * from './perfecting_view';
+export * from './perfecting_window';
 export * from './profession_art';
 export * from './profession_event_lines_core';
 export * from './profession_identity_card';

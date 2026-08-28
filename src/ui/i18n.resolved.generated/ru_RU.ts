@@ -2041,6 +2041,13 @@ export const ru_RU: EnTranslations = {
     "itemSoulbound": "Персональный",
     "itemUniqueEquipped": "Уникальный (экипируется)",
     "itemMasterwrought": "Уникальный (экипируется): Ковка мастера ({count})",
+    "masterwrought": {
+      "slotsLabel": "Ячейки Ковки мастера:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Ковка мастера",
+      "tooltipWorn": "Занимает ячейку Ковки мастера (занято {used} из {cap}).",
+      "tooltipAtCap": "Все {cap} ячейки Ковки мастера заняты."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2070,6 +2077,18 @@ export const ru_RU: EnTranslations = {
       "linkHint": "Shift + клик, чтобы вставить ссылку на этот предмет в чат."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} шедевр",
+        "few": "{count} шедевра",
+        "many": "{count} шедевров",
+        "other": "{count} шедевра"
+      },
+      "commissionLegendaries": {
+        "one": "{count} легендарный предмет",
+        "few": "{count} легендарных предмета",
+        "many": "{count} легендарных предметов",
+        "other": "{count} легендарных предмета"
+      },
       "guildMembers": {
         "one": "вы {rank}, {count} участник",
         "few": "вы {rank}, {count} участника",
@@ -2731,7 +2750,9 @@ export const ru_RU: EnTranslations = {
       "riftUpgrade": "Улучшение разлома {level}/{max}",
       "riftSockets": "Самоцветы разлома {used}/{total}",
       "statEnchanted": "+{value} {stat} (зачаровано)",
-      "enchantedFallback": "Зачаровано"
+      "enchantedFallback": "Зачаровано",
+      "perfectedBadge": "Доведён до совершенства",
+      "perfectingRank": "Совершенствование: ранг {rank} из {ranks}"
     },
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
@@ -2748,7 +2769,8 @@ export const ru_RU: EnTranslations = {
       "masterwroughtIntermediate": "Компонент ковки мастера.",
       "quickeningCatalyst": "Катализатор для ремесла. Алхимик может создать лишь один в день.",
       "growthTonic": "Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.",
-      "deedOfMaking": "Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя."
+      "deedOfMaking": "Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя.",
+      "wyrmfallCore": "Катализатор ковки мастера. Финальные боссы рейда и героических подземелий раз в день приносят от 1 до 3 каждый, первое за день прохождение Разлома ранга A или S даёт 1 или 2, а Героический интендант продаёт его за Героические знаки."
     },
     "discord": {
       "title": "Discord",
@@ -3623,6 +3645,7 @@ export const ru_RU: EnTranslations = {
       "recipeNotLearned": "Вы еще не изучили этот рецепт.",
       "noBagSpace": "В сумках нет места для созданного предмета.",
       "dailyLimit": "Это можно создать лишь раз в день.",
+      "dailyLimitRetry": "Это можно создать лишь раз в день. Снова будет доступно через {duration}.",
       "oncePerDay": "Once per day",
       "skillReqLine": "Требуется {craft} {skill}",
       "difficultyFull": "Полный рост навыка",
@@ -3632,6 +3655,12 @@ export const ru_RU: EnTranslations = {
       "stationBadge": "Станция",
       "stationOutOfRangeNamed": "Подойдите к станции \"{station}\", чтобы изготовить это.",
       "learnMoreAtStation": "{master} у станции «{station}» научит вас новым рецептам ремесла «{craft}».",
+      "apexChip": "Вершина",
+      "apexPatternRaid": "Его чертёж - редкий трофей рейда.",
+      "apexPatternRift": "Его чертёж добывается за победные прохождения разломов высокого ранга.",
+      "apexPatternVendor": "Героический интендант продаёт его чертёж за Героические знаки.",
+      "apexPatternDrop": "Его чертёж можно найти в мире.",
+      "perfectingLink": "Совершенствование",
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "legendaryLine": "{item} перерождается как {name} и становится легендой!",
@@ -3727,6 +3756,7 @@ export const ru_RU: EnTranslations = {
       "replaceConfirmKeepsSigner": "Клеймо создателя",
       "replaceConfirmKeepsMasterwork": "Бонус шедевра",
       "replaceConfirmKeepsBond": "Привязка изделия на заказ",
+      "replaceConfirmKeepsPerfecting": "Совершенствование",
       "replaceConfirmCost": "Стоимость: {cost}",
       "replaceConfirmCostItem": "{name}: {count}",
       "replaceConfirmAccept": "Заменить"
@@ -3776,6 +3806,42 @@ export const ru_RU: EnTranslations = {
       "noSpace": "В сумках нет места для предмета со снятой привязкой.",
       "perfecting": "Предмет на пути совершенствования или уже доведённый до совершенства остаётся привязанным."
     },
+    "perfecting": {
+      "title": "Совершенствование",
+      "close": "Закрыть окно совершенствования",
+      "openButton": "Совершенствование",
+      "openButtonAria": "Открыть окно совершенствования",
+      "empty": "У вас нет предмета «Ковка мастера», который можно совершенствовать. Его создают вершинные рецепты.",
+      "wornChip": "Надето",
+      "rowRank": "Ранг {rank} из {ranks}",
+      "rowPerfected": "Совершенство",
+      "rowPromoted": "Легендарный",
+      "attemptCost": "Цена попытки",
+      "promoteCost": "Цена возвышения",
+      "matCount": "{have} из {required}",
+      "skillNeed": "Требуется навык {skill}: {craft}.",
+      "skillMet": "Выполнено.",
+      "skillUnmet": "Не выполнено.",
+      "skillSyncing": "Проверяем ваш навык ремесла.",
+      "bindWarn": "Первая попытка совершенствования навсегда привяжет {name} к вам.",
+      "bindWarnDetail": "Совершенствование никогда не понижает ранг: неудачная попытка лишь расходует материалы. Привязку нельзя снять, а возвышение необратимо.",
+      "bindConfirmText": "Первая попытка навсегда привяжет {name} к вам. Всё равно попытаться?",
+      "bindConfirmAccept": "Привязать и попытаться",
+      "bindConfirmCancel": "Отмена",
+      "attempt": "Попытка совершенствования",
+      "promote": "Назвать и возвысить",
+      "perfectedLead": "Доведено до совершенства. Дайте предмету имя, чтобы выковать легенду.",
+      "promotedLine": "Завершённая легенда: совершенствовать больше нечего.",
+      "equipBlocked": "После возвышения вы не сможете его надеть. Сначала снимите конфликтующий предмет.",
+      "nameTitle": "Имя легенды",
+      "nameLabel": "Впишите имя для предмета {name}. Имя останется навсегда.",
+      "nameInputAria": "Легендарное имя",
+      "nameHint": "От 2 до 32 символов: латинские буквы, пробелы, апострофы и дефисы, первой должна быть буква.",
+      "nameCount": "{count} из {max}",
+      "nameSubmit": "Выковать легенду",
+      "nameSubmitBusy": "Куём",
+      "nameCancel": "Отмена"
+    },
     "commissionBoard": {
       "title": "Доска заказов",
       "close": "Закрыть доску заказов",
@@ -3800,6 +3866,7 @@ export const ru_RU: EnTranslations = {
       "rowFor": "{item} для {requester}",
       "rowTargeted": "{item} для {requester} (мастеру {crafter})",
       "acceptedBy": "Принял: {name}",
+      "crafterRecordLabel": "Послужной список мастера:",
       "statusOpen": "Открыт",
       "statusAccepted": "Принят",
       "statusDelivered": "Доставлен",

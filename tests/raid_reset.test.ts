@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_RAID_RESET_TIME_ZONE,
+  dailyResetRemainingSec,
   eventLeadDayKey,
   isSupportedTimeZone,
   nextRaidResetMs,
@@ -256,5 +257,51 @@ describe('resolveRaidResetTimeZone', () => {
     expect(resolveRaidResetTimeZone('Bad/Zone')).toBe(DEFAULT_RAID_RESET_TIME_ZONE);
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
+  });
+});
+
+// The when-half of resetDayKey (Masterwrought phase 14): whole seconds until
+// the reset that closes the current window, fed to the sim by
+// server/sim_calendar_feed.ts so the daily craft gate's refusal can answer
+// with a countdown. Pure in (instant, zone) like every sibling here.
+describe('dailyResetRemainingSec', () => {
+  it('is exactly the ceil of the distance to nextRaidResetMs', () => {
+    for (const now of [
+      Date.UTC(2025, 5, 29, 16, 0, 0), // summer (EDT)
+      Date.UTC(2025, 0, 15, 12, 0, 0), // winter (EST)
+      Date.UTC(2025, 11, 31, 23, 59, 0), // year boundary
+    ]) {
+      expect(dailyResetRemainingSec(now)).toBe(Math.ceil((nextRaidResetMs(now) - now) / 1000));
+    }
+  });
+
+  it('expires exactly where resetDayKey flips, and never answers 0', () => {
+    // One second before the summer boundary (2025-06-30 03:00 EDT == 07:00
+    // UTC): one second remains and the key still reads the old window; at
+    // the boundary a full day remains and the key reads the new one. The
+    // floor at 1 keeps a live realm clock from ever feeding the sim its
+    // 0 = "no calendar" sentinel.
+    const boundary = Date.UTC(2025, 5, 30, 7, 0, 0);
+    expect(dailyResetRemainingSec(boundary - 1000)).toBe(1);
+    expect(resetDayKey(boundary - 1000)).toBe('2025-06-29');
+    expect(dailyResetRemainingSec(boundary)).toBe(24 * 3600);
+    expect(resetDayKey(boundary)).toBe('2025-06-30');
+    expect(dailyResetRemainingSec(boundary - 1)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('the per-window memo answers identically across one window (the 20 Hz loop cost bound)', () => {
+    // Two instants inside one window must resolve the SAME closing instant
+    // (the memoized value), so remaining figures differ by exactly the
+    // elapsed seconds.
+    const morning = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const later = morning + 3600 * 1000;
+    expect(dailyResetRemainingSec(morning) - dailyResetRemainingSec(later)).toBe(3600);
+  });
+
+  it('honors the zone parameter like its siblings', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    expect(dailyResetRemainingSec(now, 'Europe/Paris')).not.toBe(
+      dailyResetRemainingSec(now, DEFAULT_RAID_RESET_TIME_ZONE),
+    );
   });
 });

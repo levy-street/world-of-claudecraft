@@ -269,6 +269,14 @@ export interface CraftResult {
     // PlayerMeta.craftDaily stamp; see craftDailyLimitReached below).
     | 'daily_limit'
     | 'busy';
+  // Masterwrought phase 14, the daily-gate refusal countdown: whole seconds
+  // until the reset that reopens the gate, present ONLY on a daily_limit
+  // refusal and only when the host fed a live calendar countdown
+  // (ctx.dailyResetRemainingSec > 0; headless/replay hosts feed nothing and
+  // the refusal stays countdown-free). Refusal-time by design: gate STATE
+  // stays server-private and learn-on-attempt, so no standing surface may
+  // ever carry this.
+  retryAfterSeconds?: number;
 }
 
 /** Whether `meta` currently knows `recipe` (issue #1299): a recipe with no
@@ -566,7 +574,20 @@ export function evaluateCraftAdmission(
   // the batch auto-continue, a batch stops itself here the moment the first
   // craft lands the stamp. Read-only, no rng, no side effect on denial.
   if (craftDailyLimitReached(ctx, meta, recipe)) {
-    return { ok: false, recipeId: recipe.id, reason: 'daily_limit' };
+    // The refusal tells the player when to come back (phase 14): the host-fed
+    // countdown to the reset that reopens this window, attached at refusal
+    // time only (the standing-state ruling). Both calendar halves must be
+    // live: remaining 0 means no countdown known, and an empty resetDay means
+    // the one-shot degrade, where no reset will ever reopen the gate, so a
+    // countdown would be a false promise.
+    return {
+      ok: false,
+      recipeId: recipe.id,
+      reason: 'daily_limit',
+      ...(ctx.resetDay !== '' && ctx.dailyResetRemainingSec > 0
+        ? { retryAfterSeconds: ctx.dailyResetRemainingSec }
+        : {}),
+    };
   }
   // Station gate (supersedes #1297's hub gate; the level arm retired
   // with it): a station-bound recipe requires the player to stand at a
@@ -1332,6 +1353,37 @@ function applyCraftSuccessHooks(
   ctx.onRecipeCraftedForQuests(recipeId, meta);
 }
 
+/** The FULL-SHAPE craftResult emit (phase 14), shared by the two sites that
+ *  have always emitted the complete key set (Sim.craftItem's start-gate arm
+ *  and the complete-side resolve below). Field order and key PRESENCE are the
+ *  historical shape exactly: the parity event digest canonicalizes a
+ *  present-undefined key to null rather than dropping it, so the optional
+ *  keys stay unconditionally present here while `retryAfterSeconds` joins
+ *  only when the refusal actually carries it (pre-phase emits stay
+ *  byte-identical in the digest AND on the wire). The two SHORT-shape sites
+ *  (the unknown-recipe complete and the batch auto-continue denial) keep
+ *  their own inline emits for the same reason. */
+export function emitCraftResult(
+  ctx: SimContext,
+  result: CraftResult,
+  pid: number | undefined,
+): void {
+  ctx.emit({
+    type: 'craftResult',
+    ok: result.ok,
+    recipeId: result.recipeId,
+    itemId: result.itemId,
+    count: result.count,
+    quality: result.quality,
+    masterwork: result.masterwork,
+    reason: result.reason,
+    ...(result.retryAfterSeconds !== undefined
+      ? { retryAfterSeconds: result.retryAfterSeconds }
+      : {}),
+    pid,
+  });
+}
+
 // Completion of a running craft cast, reached through ctx.completeCraftCast
 // when updateCasting sees CRAFT_CAST_ID finish. Re-validates via
 // resolveCraftForRecipe (station, materials, capacity, ...), then consumes,
@@ -1357,6 +1409,8 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   if (!recipe) {
     const result: CraftResult = { ok: false, recipeId, reason: 'unknown_recipe' };
     meta.lastCraftResult = result;
+    // Short-shape emit BY DESIGN (see emitCraftResult): this site never
+    // carried the optional keys, and the parity digest pins key presence.
     ctx.emit({
       type: 'craftResult',
       ok: false,
@@ -1369,17 +1423,7 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   const result = resolveCraftForRecipe(ctx, meta.entityId, recipe, commission);
   applyCraftSuccessHooks(ctx, meta, recipe.id, result);
   meta.lastCraftResult = result;
-  ctx.emit({
-    type: 'craftResult',
-    ok: result.ok,
-    recipeId: result.recipeId,
-    itemId: result.itemId,
-    count: result.count,
-    quality: result.quality,
-    masterwork: result.masterwork,
-    reason: result.reason,
-    pid: meta.entityId,
-  });
+  emitCraftResult(ctx, result, meta.entityId);
   if (result.masterwork && result.itemId) {
     const proc: MasterworkProc = {
       recipeId: result.recipeId,
@@ -1403,11 +1447,17 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   const nextDenial = evaluateCraftAdmission(ctx, meta.entityId, recipe, commission);
   if (nextDenial) {
     meta.lastCraftResult = nextDenial;
+    // Short-shape emit BY DESIGN (see emitCraftResult), plus the phase 14
+    // daily-gate countdown when the denial carries one: presence-conditional,
+    // so every pre-phase emit stays byte-identical in the parity digest.
     ctx.emit({
       type: 'craftResult',
       ok: false,
       recipeId: nextDenial.recipeId,
       reason: nextDenial.reason,
+      ...(nextDenial.retryAfterSeconds !== undefined
+        ? { retryAfterSeconds: nextDenial.retryAfterSeconds }
+        : {}),
       pid: meta.entityId,
     });
     return;

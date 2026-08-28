@@ -85,4 +85,22 @@ describe('craftDenyMessage', () => {
       key: 'hudChrome.crafting.insufficientMaterials',
     });
   });
+
+  it('daily_limit with a countdown carries ready-made duration params (phase 14)', () => {
+    // 7200 s spells as the duration_text largest-whole-unit phrase; the core
+    // hands the painter the FINISHED string so hud.ts needs no second
+    // resolver. English default locale in tests: '2 hours'.
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe', 7200)).toEqual({
+      key: 'hudChrome.crafting.dailyLimitRetry',
+      params: { duration: '2 hours' },
+    });
+    // Absent or malformed countdowns keep the plain line with NO params, so
+    // the caller's t() call cannot render a dangling {duration}.
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe')).toEqual({
+      key: 'hudChrome.crafting.dailyLimit',
+    });
+    expect(craftDenyMessage('daily_limit', 'not-a-recipe', 0)).toEqual({
+      key: 'hudChrome.crafting.dailyLimit',
+    });
+  });
 });

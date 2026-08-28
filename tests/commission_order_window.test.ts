@@ -138,3 +138,45 @@ describe('renderCommissionOrderWindow', () => {
     expect(d.onClose).toHaveBeenCalledOnce();
   });
 });
+
+// The crafter's-record quality signal (Masterwrought phase 14): the compact
+// line renders exactly when the view model resolved a record, with both
+// counts formatted, and never invents one on an open or record-less row.
+describe('the crafter record line', () => {
+  it('renders label and both pluralized counts on an accepted row', () => {
+    const el = document.createElement('div');
+    const model = buildCommissionOrderBoardModel(
+      [
+        order({
+          status: 'accepted',
+          acceptedByName: 'Borin',
+          crafterMasterworks: 12,
+          crafterLegendaries: 1,
+        }),
+      ],
+      [],
+      ITEMS,
+    );
+    renderCommissionOrderWindow(el, model, deps());
+    const line = el.querySelector('.commission-crafter-record');
+    expect(line).not.toBeNull();
+    expect(line?.querySelector('.ccr-label')?.textContent).toContain("Crafter's record");
+    const values = line?.querySelector('.ccr-values')?.textContent ?? '';
+    expect(values).toContain('12 masterworks');
+    expect(values).toContain('1 legendary');
+  });
+
+  it('renders nothing on an open row, and nothing when the wire carried no record', () => {
+    const el = document.createElement('div');
+    const model = buildCommissionOrderBoardModel(
+      [
+        order({ id: 1, status: 'open', crafterMasterworks: 4, crafterLegendaries: 4 }),
+        order({ id: 2, status: 'accepted', acceptedByName: 'Borin' }),
+      ],
+      [],
+      ITEMS,
+    );
+    renderCommissionOrderWindow(el, model, deps());
+    expect(el.querySelector('.commission-crafter-record')).toBeNull();
+  });
+});

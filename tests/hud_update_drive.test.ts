@@ -1263,7 +1263,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: {
       kind: 'module',
-      module: 'professions_window.ts',
+      // Re-pointed at the ip-14-UI professions migration: the window moved
+      // behind the hud/professions barrel with the rest of the family.
+      module: 'hud/professions/professions_window.ts',
       // The guard compares the freshly built input's signature directly (no
       // local sig binding): render() re-latches lastSig from the one input it
       // painted, so this band never re-acts on a stale one.
@@ -1726,7 +1728,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // The professions guard hashes the freshly built input inline (no local
         // sig binding): render() re-latches lastSig from the one input it
         // painted, so the band never re-acts on a stale signature.
-        'professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
+        'hud/professions/professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
         'reliquary_window.ts: const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
         // #2519 replaced the joined signature string this used to build every frame with

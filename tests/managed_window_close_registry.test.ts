@@ -40,10 +40,12 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
  * its own row here.
  */
 const CODE_BUILT: Record<string, string> = {
-  'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
+  'confirm-dialog':
+    'src/ui/hud.ts (confirmDialog) + src/ui/input_dialog.ts (the extracted input modal); the two share the one id',
   'profession-tutorial': 'src/ui/hud/professions/profession_tutorial_window.ts',
   'tutorial-greeting': 'src/ui/tutorial_greeting_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
+  'perfecting-window': 'src/ui/hud/professions/perfecting_window.ts',
 };
 
 /**
@@ -154,7 +156,7 @@ function readPanelIds(html: string): string[] {
 // The two populations on the day this was written. They are equal by coincidence, not by
 // construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
 // 34 + the 3 without one), so they get two names and must be bumped independently.
-const CASE_COUNT = 39; // +1: the tutorial island's #tutorial-greeting (code-built)
+const CASE_COUNT = 40; // +1: the Perfecting window (code-built, Masterwrought phase 14)
 const MARKUP_COUNT = 38;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
@@ -337,8 +339,13 @@ describe('closeManagedWindow case registry', () => {
       // single-button note variant (decline follow-up, bell homecoming) both
       // mint #tutorial-greeting, and one closeTutorialGreeting covers both.
       'ui/tutorial_greeting_window.ts': 2,
-      'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
+      'ui/hud.ts': 1, // confirmDialog's half of the shared #confirm-dialog id
+      // The extracted input modal (Masterwrought phase 14): the other half of
+      // the shared #confirm-dialog id, moved whole out of Hud.inputDialog.
+      'ui/input_dialog.ts': 1,
       'ui/hud/professions/profession_tutorial_window.ts': 1,
+      // The Perfecting window mints its own root (no markup entry).
+      'ui/hud/professions/perfecting_window.ts': 1,
     });
     for (const id of Object.keys(CODE_BUILT)) expect(caseIds).toContain(id);
   });

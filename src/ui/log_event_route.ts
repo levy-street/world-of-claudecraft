@@ -25,3 +25,30 @@ export function isCombatFlavorLog(
   if (telegraph) return false;
   return entityId !== undefined;
 }
+
+// The world chat-bubble half of the same `case 'log':` dispatch: which lines ALSO
+// paint an overhead bubble on their anchor entity. Two shapes qualify: a mob yell
+// (the `<name> yells, "..."` wrapper, bubbled AS a yell) and the Nythraxis crypt
+// vision's scripted beats, which arrive as quiet first-person lines with no yell
+// wrapper and bubble as normal speech so the vision plays out in the world.
+// Everything else stays in the log panes alone. Moved verbatim out of hud.ts's
+// dispatch (the phase 14 sunder-cue payback extraction); the line set matches the
+// vision script in the Nythraxis encounter content.
+const NYTHRAXIS_VISION_LINES: ReadonlySet<string> = new Set([
+  'My king was a good man.',
+  'I swore my blade to him.',
+  'I would do so again.',
+  'There had to be another way.',
+  'I could not let him die.',
+  'I only wanted to save him.',
+  'The king was already dead.',
+  'Malric refused to accept it.',
+  'We should have let him rest.',
+  'If you find the crypt... end this.',
+]);
+
+export function chatBubbleKind(text: string): 'yell' | 'speech' | null {
+  if (text.includes(' yells, "')) return 'yell';
+  if (NYTHRAXIS_VISION_LINES.has(text)) return 'speech';
+  return null;
+}

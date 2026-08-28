@@ -87,6 +87,43 @@ export function currentEventLeadDay(): string {
 }
 
 /**
+ * The instant the current daily window CLOSES: the next local
+ * DAILY_RESET_HOUR strictly after `at`, in the player's own zone (offline
+ * there is no realm; the server twin resolves its realm zone in
+ * server/raid_reset.ts). Clock-free and expressed in local `Date` terms like
+ * `resetDayOf` above, so month, year, and DST edges are the platform's
+ * arithmetic; a zone whose spring-forward skips the reset hour outright gets
+ * the platform's normalization of that wall time, the same best-effort the
+ * server side documents.
+ */
+export function nextResetMsOf(at: Date): number {
+  const target = new Date(at.getTime());
+  target.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  if (target.getTime() <= at.getTime()) target.setDate(target.getDate() + 1);
+  return target.getTime();
+}
+
+/** Whole seconds until the next local daily reset (>= 1: at the boundary the
+ *  window flips and a full day remains), the when-half of `resetDayOf`. */
+export function resetRemainingSecOf(at: Date): number {
+  return Math.max(1, Math.ceil((nextResetMsOf(at) - at.getTime()) / 1000));
+}
+
+let cachedResetRemainingSec = 0;
+let resetRemainingRefreshAtMs = 0;
+
+/** The current countdown, recomputed at most once per second (the value only
+ *  moves by whole seconds, and the frame loop asks at 60 Hz). */
+export function currentResetRemainingSec(): number {
+  const now = Date.now();
+  if (now >= resetRemainingRefreshAtMs) {
+    cachedResetRemainingSec = resetRemainingSecOf(new Date(now));
+    resetRemainingRefreshAtMs = now + 1000;
+  }
+  return cachedResetRemainingSec;
+}
+
+/**
  * Feed the offline sim its whole host calendar in one call: the frame loop's
  * single entry point, so a new calendar key lands here rather than as another
  * assignment in main.ts. Mutating the sim's host-fed fields in place is the
@@ -96,8 +133,10 @@ export function feedSimCalendar(sim: {
   utcDay: string;
   resetDay: string;
   eventLeadDay: string;
+  dailyResetRemainingSec: number;
 }): void {
   sim.utcDay = currentUtcDay();
   sim.resetDay = currentResetDay();
   sim.eventLeadDay = currentEventLeadDay();
+  sim.dailyResetRemainingSec = currentResetRemainingSec();
 }

@@ -424,6 +424,10 @@ describe('i18n CLDR pluralization', () => {
   it('declares the expected plural bases with all four CLDR categories in en', () => {
     expect(bases.sort()).toEqual([
       'characterCount',
+      // The commission board's crafter's-record counts (Masterwrought phase
+      // 14, the quality signal).
+      'commissionLegendaries',
+      'commissionMasterworks',
       'deedsRetroSummary',
       'finderPartySize',
       'guildMembers',

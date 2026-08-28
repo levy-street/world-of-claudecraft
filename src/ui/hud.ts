@@ -79,12 +79,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import {
-  canEquipItem,
-  isUniqueEquipped,
-  MASTERWROUGHT_EQUIP_CAP,
-  weaponHand,
-} from '../sim/equipment_rules';
+import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -519,8 +514,10 @@ import { HarvestJournalWindow } from './hud/professions/harvest_journal_window';
 import { materialHintLine } from './hud/professions/material_hint_view';
 import { materialProfessionHintText } from './hud/professions/material_profession_hint_view';
 import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
+import { PerfectingWindow } from './hud/professions/perfecting_window';
 import { professionImageUrl } from './hud/professions/profession_art';
 import {
+  isSunderCompletionLog,
   type ProfessionEventInput,
   planProfessionEvent,
 } from './hud/professions/profession_event_lines_core';
@@ -579,6 +576,7 @@ import {
   tPlural,
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import { type InputDialogOpts, showInputDialog } from './input_dialog';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -604,7 +602,7 @@ import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_pa
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
-import { isCombatFlavorLog } from './log_event_route';
+import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -631,6 +629,7 @@ import { MapWindowPainter } from './map_window_painter';
 import { MAP_OPEN_ZOOM, type MapWindowMode, mapWindowMode } from './map_window_view';
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
+import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -3437,6 +3436,11 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.plantSheetWindow.close();
         break;
+      case 'perfecting-window':
+        // Route through the painter: focus returns (WCAG 2.2 AA), the 1 Hz
+        // clock disarms, and an open naming prompt tears down inert-safe.
+        this.perfectingWindow.close();
+        break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
@@ -4826,6 +4830,17 @@ export class Hud {
     ...this.windowFocus('#plant-sheet-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
+  // The Perfecting window painter (perfecting_view.ts core + its painter):
+  // the apex rank track + the orange promotion (Masterwrought phase 14). It
+  // mints its own #perfecting-window root; cold, self-clocked at 1 Hz behind
+  // a value signature while open.
+  private readonly perfectingWindow = new PerfectingWindow({
+    ...this.presentationBag,
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#perfecting-window'),
+    ...this.windowFocus('#perfecting-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
   // trapping window (windowFocus), the deeds/professions shape exactly.
@@ -5932,9 +5947,8 @@ export class Hud {
       // so the number can never drift from the rule. It always takes its own
       // gold line, never the type seat, because a piece can carry both tags.
       if (item.masterwrought) {
-        html += `<div class="tt-sub" style="color:var(--gold)">${esc(
-          t('hudChrome.itemMasterwrought', { count: itemNumber(MASTERWROUGHT_EQUIP_CAP) }),
-        )}</div>`;
+        for (const line of masterwroughtTooltipLines(this.sim.equipment, ITEMS))
+          html += `<div class="tt-sub" style="color:var(--gold)">${esc(t(line.key, line.values))}</div>`;
       }
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
@@ -6457,6 +6471,10 @@ export class Hud {
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     this.harvestJournalWindow.relocalize();
     this.plantSheetWindow.relocalize();
+    // The Perfecting window's repaint signature is ids/ranks/counts, all
+    // text-independent, so a language switch alone never moves it; the arm
+    // forces one rebuild (self-gated on its own open check).
+    this.perfectingWindow.relocalize();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
@@ -11395,11 +11413,13 @@ export class Hud {
             // Record (its header carries why the two modules exist); this
             // stays the thin render, and the core's key is LIVE for the
             // station arm too (a hardcoded key here left that row dead data).
-            const denial = craftDenyMessage(ev.reason, ev.recipeId);
+            const denial = craftDenyMessage(ev.reason, ev.recipeId, ev.retryAfterSeconds);
             this.log(
               t(
                 denial.key,
-                denial.stationType ? { station: stationNameText(denial.stationType) } : undefined,
+                denial.stationType
+                  ? { station: stationNameText(denial.stationType) }
+                  : denial.params,
               ),
               '#ff6b6b',
             );
@@ -11513,7 +11533,9 @@ export class Hud {
           // the cue decision rides the view bundle like its siblings.
           const l = legendaryForgedLine(ev.itemId, ev.name);
           this.log(l.text, l.color, l.icon, ERROR_LOG_CHAN, false, true);
-          if (l.playCue) audio.achievement();
+          // The dedicated forged cue (the phase 14 SFX slice) supersedes the
+          // generic achievement chime for the owner's personal moment.
+          if (l.playCue) audio.legendaryForged();
           break;
         }
         case 'legendaryForgedZone': {
@@ -12184,6 +12206,7 @@ export class Hud {
             this.showError(this.localizeErrorText(ev.text));
           }
           this.plantSheetWindow.notifyErrorToast();
+          this.perfectingWindow.notifyErrorToast();
           break;
         }
         case 'questAccepted':
@@ -13126,24 +13149,13 @@ export class Hud {
             this.combatLog(text, ev.color ?? '#ccc');
           else this.log(text, ev.color ?? '#ccc');
           if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
-          const isNythraxisVisionLine = [
-            'My king was a good man.',
-            'I swore my blade to him.',
-            'I would do so again.',
-            'There had to be another way.',
-            'I could not let him die.',
-            'I only wanted to save him.',
-            'The king was already dead.',
-            'Malric refused to accept it.',
-            'We should have let him rest.',
-            'If you find the crypt... end this.',
-          ].includes(ev.text);
-          if (
-            ev.entityId !== undefined &&
-            (isNythraxisVisionLine || ev.text.includes(' yells, "'))
-          ) {
-            this.renderer.showChatBubble(ev.entityId, text, ev.text.includes(' yells, "'));
-          }
+          // Sundering completion cue: matched on the RAW English before
+          // localization, the fiestaRevive precedent (predicate + weld:
+          // profession_event_lines_core.ts).
+          if (isSunderCompletionLog(ev.text)) audio.sunderComplete();
+          const bubble = chatBubbleKind(ev.text);
+          if (ev.entityId !== undefined && bubble !== null)
+            this.renderer.showChatBubble(ev.entityId, text, bubble === 'yell');
           break;
         }
         case 'playerDeath': {
@@ -15433,6 +15445,7 @@ export class Hud {
         },
         onClose: () => this.closeCrafting(),
         onOpenOrders: () => this.openCommissionBoard(),
+        onOpenPerfecting: () => this.openPerfecting(),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
           if (on) this.craftCommissionOptIn.add(recipeId);
@@ -15722,6 +15735,18 @@ export class Hud {
   // The bed arm's free-bed route (NearbyInteractionHud): opens the plant sheet.
   openPlantSheet(bedId: string): void {
     this.plantSheetWindow.open(bedId);
+  }
+
+  // The Perfecting window entry points (the crafting window's title-bar
+  // button and its apex-row links open; Esc closes via the managed-window
+  // case; the toggle is the reliquary-shaped public surface for a future
+  // keybind or rail tile).
+  openPerfecting(): void {
+    this.perfectingWindow.open();
+  }
+
+  togglePerfecting(): void {
+    this.perfectingWindow.toggle();
   }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch
@@ -16641,87 +16666,30 @@ export class Hud {
     );
   }
 
-  // In-app text-input modal (reuses the confirm-dialog chrome) — replaces native
-  // window.prompt for build name / import / export. `readOnly` + `copy` powers
-  // the export view (selectable string + Copy button).
-  private inputDialog(opts: {
-    title: string;
-    label?: string;
-    value?: string;
-    placeholder?: string;
-    multiline?: boolean;
-    readOnly?: boolean;
-    copy?: boolean;
-    selectText?: boolean;
-    okText?: string;
-    cancelText?: string;
-    onOk?: (value: string) => void;
-  }): void {
-    this.confirmTrap?.release(false);
-    this.confirmTrap = null;
-    // Shares the #confirm-dialog slot: a replaced confirm's pending
-    // no-choice callback (R40 family) fires before the input modal takes it.
-    this.fireConfirmCancel();
-    document.getElementById('confirm-dialog')?.remove();
-    const el = document.createElement('div');
-    el.id = 'confirm-dialog';
-    el.className = 'window panel';
-    el.style.display = 'block';
-    // Same named, modal dialog semantics as confirmDialog (this reuses the #confirm-dialog
-    // chrome and is focus-trapped below); without them it announces as a bare unlabelled div.
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'true');
-    el.setAttribute('aria-labelledby', 'confirm-dialog-title');
-    const field = opts.multiline
-      ? `<textarea class="cd-input" rows="3" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}">${esc(opts.value ?? '')}</textarea>`
-      : `<input class="cd-input" type="text" ${opts.readOnly ? 'readonly' : ''} placeholder="${esc(opts.placeholder ?? '')}" value="${esc(opts.value ?? '')}">`;
-    el.innerHTML =
-      `<div class="panel-title"><span id="confirm-dialog-title">${esc(opts.title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(opts.cancelText ?? t('game.talents.cancel'))}">${svgIcon('close')}</button></div>` +
-      (opts.label ? `<div class="cd-body">${esc(opts.label)}</div>` : '') +
-      `<div class="cd-field">${field}</div>` +
-      `<div class="cd-actions"><button class="btn" data-cancel>${esc(opts.cancelText ?? t('game.talents.cancel'))}</button>` +
-      (opts.copy ? `<button class="btn" data-copy>${t('game.talents.copy')}</button>` : '') +
-      (opts.onOk
-        ? `<button class="btn cd-ok" data-ok>${esc(opts.okText ?? t('game.talents.save'))}</button>`
-        : '') +
-      `</div>`;
-    document.body.appendChild(el);
-    this.confirmTrap = this.focusManager.open({ root: () => el });
-    bindDialogKeyActivation(el);
-    const input = el.querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
-    const close = () => {
-      this.confirmTrap?.release();
-      this.confirmTrap = null;
-      el.remove();
-    };
-    const submit = () => {
-      const v = input?.value ?? '';
-      close();
-      opts.onOk?.(v);
-    };
-    el.querySelectorAll('[data-cancel]').forEach((b) => {
-      b.addEventListener('click', () => {
-        audio.click();
-        close();
-      });
-    });
-    el.querySelector('[data-ok]')?.addEventListener('click', submit);
-    el.querySelector('[data-copy]')?.addEventListener('click', () => {
-      input.select();
-      navigator.clipboard?.writeText(input.value).catch(() => {
-        /* clipboard blocked; manual select still works */
-      });
-      this.showError(t('game.talents.exportCopied'));
-    });
-    if (!opts.multiline)
-      input?.addEventListener('keydown', (e) => {
-        if ((e as KeyboardEvent).key === 'Enter') {
-          e.preventDefault();
-          submit();
-        }
-      });
-    input?.focus();
-    if (opts.readOnly || opts.selectText) input?.select?.();
+  // In-app text-input modal (reuses the confirm-dialog chrome); the whole
+  // body lives in src/ui/input_dialog.ts (the phase 14 ratchet payback), and
+  // this thin delegator only lends it the Hud-owned pieces: the shared
+  // confirm-trap slot and the pending no-choice cancel.
+  private inputDialog(opts: InputDialogOpts): void {
+    showInputDialog(
+      {
+        replaceStandingDialog: () => {
+          this.confirmTrap?.release(false);
+          this.confirmTrap = null;
+          this.fireConfirmCancel();
+        },
+        trapOpen: (el) => {
+          this.confirmTrap = this.focusManager.open({ root: () => el });
+        },
+        trapClose: () => {
+          this.confirmTrap?.release();
+          this.confirmTrap = null;
+        },
+        bindKeys: (el) => bindDialogKeyActivation(el),
+        showError: (text) => this.showError(text),
+      },
+      opts,
+    );
   }
 
   // Generic in-app dropdown (replaces native <select>). The selected value lives

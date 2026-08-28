@@ -13,7 +13,7 @@ import { ENCHANTS } from '../sim/content/enchants';
 import { effectiveQuality } from '../sim/equipment_rules';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
-import { LEGENDARY_PROMOTION_COST } from '../sim/professions/perfecting';
+import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { esc } from './esc';
 import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
@@ -166,11 +166,43 @@ export function instanceLockLine(instance?: ItemInstancePayload): string {
  *  renders nothing here. There is deliberately NO standalone enchanted marker:
  *  a bare "Enchanted" badge told a player their copy was enchanted but not what
  *  the enchant DID or which of the listed bonuses it accounted for, so the fact
- *  now rides the bonus stat lines themselves (instanceBonusStatLines below). */
+ *  now rides the bonus stat lines themselves (instanceBonusStatLines below).
+ *
+ *  Phase 14, the Perfecting badges, both DATA-DRIVEN off the payload alone so
+ *  every trim stays authoritative about what shows where:
+ *   - a `perfected` copy states it in one gold line. The worn projection
+ *     (wornTooltipInstance) deliberately carries `perfected`, so the OWNER'S
+ *     paperdoll shows it; the peer inspect card's eqi mirror never carries the
+ *     field (D13-3, perfected stays off that wire) and correctly stays silent.
+ *   - a HEAD-STARTED copy (rank-walk `perfecting` in [1, PERFECTING_RANKS-1],
+ *     not yet perfected) states its rank on the owner's own full-payload
+ *     surfaces (bags, the market sell staging, returned listings). The
+ *     anonymous browse pipe's display trim drops `perfecting`, so a
+ *     head-started listing stays blind there by the standing decision; this
+ *     renderer never re-derives it. Out-of-range values (a hostile wire, a
+ *     future widening) render nothing rather than a wrong rank. */
 export function instanceBadgeLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
-  if (!instance.rolled?.masterwork) return '';
-  return `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  let html = '';
+  if (instance.rolled?.masterwork) {
+    html += `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
+  }
+  if (instance.perfected === true) {
+    html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemTooltip.perfectedBadge'))}</div>`;
+  } else if (
+    typeof instance.perfecting === 'number' &&
+    Number.isInteger(instance.perfecting) &&
+    instance.perfecting >= 1 &&
+    instance.perfecting < PERFECTING_RANKS
+  ) {
+    html += `<div class="tt-sub" style="color:var(--gold)">${esc(
+      t('hudChrome.itemTooltip.perfectingRank', {
+        rank: itemNumber(instance.perfecting),
+        ranks: itemNumber(PERFECTING_RANKS),
+      }),
+    )}</div>`;
+  }
+  return html;
 }
 
 function statLine(key: TranslationKey, value: number, stat: string): string {

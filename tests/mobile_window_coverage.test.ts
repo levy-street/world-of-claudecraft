@@ -238,13 +238,20 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     // the same change that gives its window a mobile rule or an exception below.
     expect(dyn.windowClassFiles).toEqual([
       'dev_command_window.ts',
+      // The Perfecting window (Masterwrought phase 14) mints its own root and
+      // carries the four-edge body.mobile-touch pin in hud.mobile.css.
+      'hud/professions/perfecting_window.ts',
       'hud/professions/profession_tutorial_window.ts',
       'hud.ts',
+      // The extracted input modal (the other half of the shared
+      // #confirm-dialog id; the exception row below covers the id).
+      'input_dialog.ts',
       'tutorial_greeting_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
+      'perfecting-window',
       'profession-tutorial',
       'tutorial-greeting',
     ]);

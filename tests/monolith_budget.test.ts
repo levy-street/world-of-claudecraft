@@ -299,7 +299,29 @@ const MONOLITHS: MonolithRow[] = [
     // craft_celebration_text_view bundle (craftToastLogLines: the pure core
     // decides the color, the hud case cannot recolor a shared moment), and
     // the itemIcon dep widened in place. Exact count, zero slack.
-    ceiling: 18242,
+    // LOWERED 18242 -> 18230 at Masterwrought phase 14 (2026-08-28): the
+    // whole Hud.inputDialog body moved out to src/ui/input_dialog.ts (Hud
+    // keeps a thin delegator lending the confirm-trap slot and the pending
+    // no-choice cancel through a deps bag), which pays for the phase's own
+    // wiring (the PerfectingWindow construction, its closeAll case,
+    // relocalize arm, error-toast forward, open/togglePerfecting, and the
+    // crafting deps' onOpenPerfecting line) plus the 7 lines the
+    // hud/professions migration commit had landed over the pin. Exact count,
+    // zero slack.
+    // LOWERED 18230 -> 18220 in the same phase: the sunder completion cue's
+    // log arm landed as predicates in the registered pure cores instead of
+    // inline dispatch code (isSunderCompletionLog in
+    // profession_event_lines_core.ts; the chat-bubble decision and the
+    // Nythraxis vision line set moved verbatim to log_event_route.ts
+    // chatBubbleKind), so the case 'log' body shrank while gaining the cue.
+    // Exact count, zero slack.
+    // LOWERED 18220 -> 18217 wiring the same phase's cap-visibility and
+    // catalyst-readout arms: the masterwrought tooltip block collapsed onto
+    // masterwrought_cap_view.ts masterwroughtTooltipLines (which also brings
+    // the at-cap line), paying for the denial params thread
+    // (craftDenyMessage's retryAfterSeconds pass-through). Exact count, zero
+    // slack.
+    ceiling: 18217,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -697,7 +719,12 @@ const MONOLITHS: MonolithRow[] = [
     // delegates (perfectItem/perfectingInfo onto professions/perfecting.ts).
     // Extraction first, then the phase's lines, netting 35 UNDER the old
     // ceiling; the ceiling follows the file down. Exact count, zero slack.
-    ceiling: 12326,
+    // RE-PINNED 12326 -> 12324 at Masterwrought phase 14 (the daily-gate
+    // refusal countdown): the craftItem craftResult emit block moved into
+    // professions/crafting.ts emitCraftResult (the fourth copy of that emit;
+    // rule of three), paying for the host-fed dailyResetRemainingSec field,
+    // its buildSimContext getter, and the import. Exact count, zero slack.
+    ceiling: 12324,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -930,7 +957,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 10475 -> 10473 at the phase 13 QA second fix round: the two
     // name-screen refusal frames ride the existing sendChatNotice helper,
     // paying for the cleanPetName import and the shape-first pet_rename arm.
-    ceiling: 10473,
+    // LOWERED 10473 -> 10465 at Masterwrought phase 14: the loop's calendar
+    // feed block (utcDay/resetDay/eventLeadDay plus its rationale comment)
+    // moved into server/sim_calendar_feed.ts, which also feeds the new
+    // dailyResetRemainingSec countdown; the ceiling follows the file down.
+    ceiling: 10465,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

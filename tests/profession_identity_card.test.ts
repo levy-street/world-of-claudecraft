@@ -1057,7 +1057,7 @@ describe('craftResult deny toast names the station (source pins)', () => {
     // a production consumer. The station type still comes from RECIPE CONTENT
     // (no station field rides the event), so the core can name the station in
     // both worlds identically.
-    expect(hud).toMatch(/craftDenyMessage\(ev\.reason, ev\.recipeId\)/);
+    expect(hud).toMatch(/craftDenyMessage\(ev\.reason, ev\.recipeId, ev\.retryAfterSeconds\)/);
     expect(hud, 'and hud no longer resolves the station itself').not.toMatch(/craftDenialLine\(/);
   });
 
@@ -1097,8 +1097,12 @@ describe('craftResult deny toast names the station (source pins)', () => {
 
   it('the release core resolves the station from recipe content and delegates the key', () => {
     // No station field rides the event: the type comes from static recipe
-    // content, identical in both worlds.
-    expect(denyCore).toMatch(/craftDenialLine\(reason, recipeById\(recipeId\)\?\.stationType\)/);
+    // content, identical in both worlds. The third argument (phase 14) is the
+    // daily-gate refusal countdown off the event, threaded through so the
+    // dailyLimitRetry upgrade stays a table decision, never a hud branch.
+    expect(denyCore).toMatch(
+      /craftDenialLine\(reason, recipeById\(recipeId\)\?\.stationType, retryAfterSeconds\)/,
+    );
   });
 
   it('no_bag_space keeps its own toast, insufficient_materials stays the fall-through', () => {

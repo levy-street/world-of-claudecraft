@@ -40,6 +40,12 @@ const MASTER_GAINS_DB = {
   ui_farm_golden: 0,
   // The shared-feast placement PLACEHOLDER, unity gain with its four siblings.
   ui_farm_feast: 0,
+  // Masterwrought crafting-UX cues (phase 14): unity gain like the other
+  // synth stand-ins, so a real recording can drop in without a mix re-balance.
+  ui_perfecting_attempt: 0,
+  ui_perfecting_success: 0,
+  ui_legendary_forged: 0,
+  ui_sunder_complete: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -215,6 +221,64 @@ export const UI_SFX_SPECS = [
     noise('brown', 0, 0.2, 0.07, { lowpass: 600 }),
     noise('white', 0.18, 0.26, 0.035, { highpass: 2400, lowpass: 8000 }),
     tone(523, 0.3, 0.3, 0.09, { wave: 'triangle', endFrequency: 659 }),
+  ]),
+  // Masterwrought Perfecting ATTEMPT (phase 14), for the sound engineer: the
+  // anvil-and-arcane strike of an attempt resolving. Weighty and short where
+  // ui_craft_cast is a soft wind-up: a low saw thud with a brown-noise body is
+  // the hammer landing, the mid square partial is the metal answering, and a
+  // small high sparkle tail is the arcane charge in the work. Swap for a real
+  // recording when one lands, exactly as the gather/fishing placeholders were.
+  cue('ui_perfecting_attempt', 0.6, 'Weighty anvil strike with a short arcane sparkle tail.', [
+    tone(160, 0, 0.18, 0.2, { wave: 'saw', endFrequency: 90 }),
+    tone(660, 0, 0.12, 0.1, { wave: 'square', endFrequency: 620 }),
+    noise('brown', 0, 0.12, 0.09, { lowpass: 900 }),
+    noise('white', 0.04, 0.3, 0.03, { highpass: 3000 }),
+  ]),
+  // Masterwrought Perfecting SUCCESS (phase 14), for the sound engineer: a
+  // rank landing. Bright and ascending, shorter than a level-up: a clean
+  // three-note rising octave arc in the ui_farm_golden vocabulary (the
+  // ui_level_up flourish, shortened) with a soft shimmer, so it reads as one
+  // rung locking in rather than a fanfare. Swap for a real recording.
+  cue('ui_perfecting_success', 0.6, 'Short bright three-note ascending rank-up chime.', [
+    tone(523, 0, 0.2, 0.13, { wave: 'triangle' }),
+    tone(784, 0.09, 0.22, 0.13, { wave: 'triangle' }),
+    tone(1046, 0.18, 0.3, 0.14, { wave: 'triangle' }),
+    noise('white', 0.12, 0.4, 0.02, { highpass: 3200 }),
+  ]),
+  // THE ORANGE MOMENT (Masterwrought phase 14), for the sound engineer: the
+  // legendary promotion's own capstone cue, replacing the reused
+  // ui_achievement (which made the rarest moment in the crafting game sound
+  // like any deed unlock). A deep forge strike opens it, then a five-note
+  // triumphant flourish climbs PAST the ui_level_up ceiling with a long
+  // shimmer, so it audibly outranks ui_masterwork and the deed chime. Swap
+  // for a real recording when one lands.
+  cue(
+    'ui_legendary_forged',
+    1.4,
+    'Deep forge strike into a triumphant rising fanfare with long shimmer.',
+    [
+      noise('brown', 0, 0.2, 0.1, { lowpass: 700 }),
+      tone(130, 0, 0.3, 0.16, { wave: 'saw', endFrequency: 65 }),
+      tone(523, 0.12, 0.5, 0.12, { wave: 'triangle' }),
+      tone(659, 0.24, 0.5, 0.12, { wave: 'triangle' }),
+      tone(784, 0.36, 0.55, 0.13, { wave: 'triangle' }),
+      tone(1046, 0.48, 0.6, 0.14, { wave: 'triangle' }),
+      tone(1318, 0.6, 0.7, 0.12, { wave: 'triangle', endFrequency: 1568 }),
+      noise('white', 0.4, 0.95, 0.025, { highpass: 2800 }),
+    ],
+  ),
+  // Masterwrought SUNDERING completion (phase 14), for the sound engineer:
+  // the one silent craft-family completion closes (the sunder grant is
+  // silent + callerLogs, so no generic ding ever covered it). A raid epic
+  // breaking into essence: a bright crack over a low fracture body, then a
+  // FALLING arcane release with a soft shimmer, downward on purpose because
+  // something is destroyed, not won. Swap for a real recording.
+  cue('ui_sunder_complete', 0.7, 'Sharp crack into a falling arcane release with soft shimmer.', [
+    noise('white', 0, 0.12, 0.07, { highpass: 1200, lowpass: 6000 }),
+    tone(300, 0, 0.16, 0.15, { wave: 'saw', endFrequency: 120 }),
+    noise('brown', 0.02, 0.2, 0.08, { lowpass: 600 }),
+    tone(880, 0.14, 0.4, 0.08, { wave: 'sine', endFrequency: 440 }),
+    noise('white', 0.16, 0.4, 0.02, { highpass: 3000 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

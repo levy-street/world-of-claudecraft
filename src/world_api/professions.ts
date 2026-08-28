@@ -203,6 +203,14 @@ export interface CommissionOrderView {
   crafterName?: string;
   status: CommissionOrderStatus;
   acceptedByName?: string;
+  /** The accepter's lifetime craft record (Masterwrought phase 14, the
+   *  commission quality signal), SNAPSHOT at accept time from the crafter's
+   *  deed stat counters (masterworksCrafted / legendariesForged): numbers
+   *  only, string-free per the seam rule. Present together once a crafter
+   *  has accepted (zero is a real, honest record); ABSENT on every open row
+   *  and on rows from a pre-signal server. */
+  readonly crafterMasterworks?: number;
+  readonly crafterLegendaries?: number;
   /** The viewer is the requester who opened this order. */
   mine: boolean;
   /** The viewer is the crafter who accepted this order, or (while it is

@@ -2041,6 +2041,13 @@ export const ja_JP: EnTranslations = {
     "itemSoulbound": "魂縛",
     "itemUniqueEquipped": "装備ユニーク",
     "itemMasterwrought": "装備ユニーク：名匠鍛造（{count}）",
+    "masterwrought": {
+      "slotsLabel": "名匠鍛造スロット：",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "名匠鍛造",
+      "tooltipWorn": "名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。",
+      "tooltipAtCap": "名匠鍛造スロット{cap}枠はすべて使用中です。"
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2070,6 +2077,18 @@ export const ja_JP: EnTranslations = {
       "linkHint": "Shift + クリックでこのアイテムをチャットにリンクします。"
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "傑作{count}点",
+        "few": "傑作{count}点",
+        "many": "傑作{count}点",
+        "other": "傑作{count}点"
+      },
+      "commissionLegendaries": {
+        "one": "伝説の品{count}点",
+        "few": "伝説の品{count}点",
+        "many": "伝説の品{count}点",
+        "other": "伝説の品{count}点"
+      },
       "guildMembers": {
         "one": "あなたは{rank}、{count}人のメンバー",
         "few": "あなたは{rank}、{count}人のメンバー",
@@ -2731,7 +2750,9 @@ export const ja_JP: EnTranslations = {
       "riftUpgrade": "リフト強化 {level}/{max}",
       "riftSockets": "リフト宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（エンチャント）",
-      "enchantedFallback": "エンチャント済み"
+      "enchantedFallback": "エンチャント済み",
+      "perfectedBadge": "完全化済み",
+      "perfectingRank": "完全化：ランク{rank}／{ranks}"
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
@@ -2748,7 +2769,8 @@ export const ja_JP: EnTranslations = {
       "masterwroughtIntermediate": "名匠鍛造の製作部材。",
       "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
       "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。",
-      "deedOfMaking": "銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。"
+      "deedOfMaking": "銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。",
+      "wyrmfallCore": "名匠鍛造の製作触媒。レイドと英雄ダンジョンの最終ボスがそれぞれ1日1回、1から3個をドロップする。その日最初のAまたはSランクのリフト踏破で1個か2個を獲得でき、英雄補給係が英雄の証と引き換えに販売している。"
     },
     "discord": {
       "title": "Discord",
@@ -3623,6 +3645,7 @@ export const ja_JP: EnTranslations = {
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
       "dailyLimit": "それは1日に1回しか製作できません。",
+      "dailyLimitRetry": "それは1日に1回しか製作できません。{duration}後に再び製作できます。",
       "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} が必要",
       "difficultyFull": "技能上昇（全量）",
@@ -3632,6 +3655,12 @@ export const ja_JP: EnTranslations = {
       "stationBadge": "製作拠点",
       "stationOutOfRangeNamed": "{station}に移動して製作してください。",
       "learnMoreAtStation": "{station}の{master}が{craft}のレシピをさらに教えてくれます。",
+      "apexChip": "頂点",
+      "apexPatternRaid": "その設計図はレイドの希少な戦利品です。",
+      "apexPatternRift": "その設計図は高ランクの裂け目を制覇すると手に入ります。",
+      "apexPatternVendor": "その設計図は英雄補給係が英雄の証と引き換えに販売しています。",
+      "apexPatternDrop": "その設計図は世界のどこかで見つかります。",
+      "perfectingLink": "完全化",
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "legendaryLine": "{item}は{name}として生まれ変わり、伝説となりました！",
@@ -3727,6 +3756,7 @@ export const ja_JP: EnTranslations = {
       "replaceConfirmKeepsSigner": "製作者の刻印",
       "replaceConfirmKeepsMasterwork": "傑作ボーナス",
       "replaceConfirmKeepsBond": "受注品のバインド",
+      "replaceConfirmKeepsPerfecting": "完全化",
       "replaceConfirmCost": "費用: {cost}",
       "replaceConfirmCostItem": "{name} {count}個",
       "replaceConfirmAccept": "置き換える"
@@ -3776,6 +3806,42 @@ export const ja_JP: EnTranslations = {
       "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。",
       "perfecting": "完全化の途中、または完全化済みのアイテムはバインドされたままです。"
     },
+    "perfecting": {
+      "title": "完全化",
+      "close": "完全化ウィンドウを閉じる",
+      "openButton": "完全化",
+      "openButtonAria": "完全化ウィンドウを開く",
+      "empty": "完全化できる名匠鍛造アイテムを持っていません。頂点レシピで作り出せます。",
+      "wornChip": "装備中",
+      "rowRank": "ランク{rank}/{ranks}",
+      "rowPerfected": "完全化済み",
+      "rowPromoted": "伝説",
+      "attemptCost": "挑戦コスト",
+      "promoteCost": "昇格コスト",
+      "matCount": "{have}/{required}",
+      "skillNeed": "{craft}スキル{skill}が必要です。",
+      "skillMet": "条件を満たしています。",
+      "skillUnmet": "不足しています。",
+      "skillSyncing": "製作スキルを確認しています。",
+      "bindWarn": "最初の完全化の挑戦で、{name}はあなたに永久に束縛されます。",
+      "bindWarnDetail": "完全化でランクが下がることはありません。失敗しても素材を消費するだけです。束縛は解除できず、昇格も取り消せません。",
+      "bindConfirmText": "最初の挑戦で{name}はあなたに永久に束縛されます。挑戦しますか？",
+      "bindConfirmAccept": "束縛して挑戦",
+      "bindConfirmCancel": "キャンセル",
+      "attempt": "完全化に挑戦",
+      "promote": "命名して昇格",
+      "perfectedLead": "完全化されました。名を与え、伝説を鍛え上げましょう。",
+      "promotedLine": "完成した伝説：これ以上完全化するものはありません。",
+      "equipBlocked": "昇格すると装備できなくなります。先に競合する装備を外してください。",
+      "nameTitle": "伝説に名を",
+      "nameLabel": "{name}に刻む名前を入力してください。名前は永久に残ります。",
+      "nameInputAria": "伝説の名前",
+      "nameHint": "2から32文字：英字、スペース、アポストロフィ、ハイフンが使えます。先頭は英字にしてください。",
+      "nameCount": "{count}/{max}",
+      "nameSubmit": "伝説を鍛える",
+      "nameSubmitBusy": "鍛造中",
+      "nameCancel": "キャンセル"
+    },
     "commissionBoard": {
       "title": "依頼ボード",
       "close": "依頼ボードを閉じる",
@@ -3800,6 +3866,7 @@ export const ja_JP: EnTranslations = {
       "rowFor": "{item}（依頼者：{requester}）",
       "rowTargeted": "{item}（依頼者：{requester} / 指名：{crafter}）",
       "acceptedBy": "{name}が引き受け済み",
+      "crafterRecordLabel": "職人の実績：",
       "statusOpen": "募集中",
       "statusAccepted": "引き受け済み",
       "statusDelivered": "納品済み",

@@ -439,6 +439,7 @@ import {
   type CraftResult,
   completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
+  emitCraftResult,
 } from './professions/crafting';
 import { sanitizeDailyGateLoad } from './professions/daily_gate_load';
 import {
@@ -2244,6 +2245,9 @@ export class Sim {
   // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
   // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
   eventLeadDay = '';
+  // The when-half of resetDay (phase 14): seconds until the window closes, fed
+  // beside it; 0 = no calendar. Read only by the daily_limit refusal answer.
+  dailyResetRemainingSec = 0;
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -5461,6 +5465,9 @@ export class Sim {
       },
       get eventLeadDay() {
         return sim.eventLeadDay;
+      },
+      get dailyResetRemainingSec() {
+        return sim.dailyResetRemainingSec;
       },
       get utcDay() {
         return sim.utcDay;
@@ -9107,17 +9114,8 @@ export class Sim {
     if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
-    this.emit({
-      type: 'craftResult',
-      ok: result.ok,
-      recipeId: result.recipeId,
-      itemId: result.itemId,
-      count: result.count,
-      quality: result.quality,
-      masterwork: result.masterwork,
-      reason: result.reason,
-      pid: meta?.entityId,
-    });
+    // One shared emit shape (professions/crafting.ts emitCraftResult, phase 14).
+    emitCraftResult(this.ctx, result, meta?.entityId);
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the local viewer's most

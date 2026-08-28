@@ -1027,3 +1027,33 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
     expect(painterCode).not.toContain('world.entities.get(world.playerId)?.equippedInstances');
   });
 });
+
+describe('char_window: the Masterwrought cap visibility family (phase 14)', () => {
+  it('the slots readout renders through the pure core and hides at zero worn', () => {
+    // The sheet-side readout resolves used/cap through masterwroughtCapReadout
+    // (the same flag walk the equip refusal runs, pinned equivalent in
+    // tests/masterwrought_cap_view.test.ts), never a hand count, and the row
+    // is skipped entirely when the readout is null (nothing worn).
+    expect(painter).toContain("import { masterwroughtCapReadout } from './masterwrought_cap_view'");
+    const readout = painter.slice(painter.indexOf('private masterwroughtSlotsHtml'));
+    expect(readout).toContain('masterwroughtCapReadout(world.equipment, ITEMS)');
+    expect(readout).toContain("if (!readout) return ''");
+    expect(painter).toContain('hudChrome.masterwrought.slotsLabel');
+    expect(painter).toContain('hudChrome.masterwrought.slotsValue');
+  });
+
+  it('the worn-piece diamond carries its localized name, gated on the def flag', () => {
+    expect(painter).toContain('item?.masterwrought');
+    expect(painter).toContain('equip-mw-chip');
+    expect(painter).toContain('hudChrome.masterwrought.pieceMark');
+  });
+
+  it('the worn tooltip adds the occupies-a-slot line with the LIVE count at hover time', () => {
+    // Resolved inside the attachTooltip closure (item.masterwrought gate),
+    // so a re-equip between hovers re-reads the world rather than a stale
+    // render-time count.
+    expect(painter).toContain('hudChrome.masterwrought.tooltipWorn');
+    const closure = painter.slice(painter.indexOf('const readout = item.masterwrought'));
+    expect(closure).toContain('masterwroughtCapReadout(world.equipment, ITEMS)');
+  });
+});

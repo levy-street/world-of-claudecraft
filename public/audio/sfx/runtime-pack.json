@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "8d80395f4c52cad50792f26d6a2efb0d1f0f27d92f9aa5a768bd5b3b87f48053",
-  "catalogHash": "9490681076db6bdcaea960d8a9d412b14f83c41995e03bf2d9c0e1398b8173ed",
+  "bundleId": "311503e8922cc8570482fd0bb3a25ad6055edfb62a8a901df8c1fd3dd11c998a",
+  "catalogHash": "436c71d8212222d3dd1404292b43c45ab32d68923c1e6c17cad45b53e08d8acb",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -4402,6 +4402,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ui_legendary_forged": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_legendary_forged.mp3?v=32d3bd13daef",
+          "bytes": 35151,
+          "sha256": "32d3bd13daef9c3e509cefd772fdd09d33d6e97b3ca0f73d4648275329bdc3dc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "ui_level_up": {
       "variants": [
         {
@@ -4462,6 +4474,30 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ui_perfecting_attempt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_perfecting_attempt.mp3?v=af0d8a7c2dc5",
+          "bytes": 15716,
+          "sha256": "af0d8a7c2dc55f6a266d32bda40e6c621cadd8c113a239d457d5b7ae26e82fc9"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_perfecting_success": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_perfecting_success.mp3?v=3e4c81df3945",
+          "bytes": 15716,
+          "sha256": "3e4c81df3945043e7da9f3d7d2c3aebc77f2faab7b45b3fa09654c2d7aae4f95"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "ui_quest_done": {
       "variants": [
         {
@@ -4493,6 +4529,18 @@
           "url": "/audio/sfx/ui_sheep.mp3?v=70d353a7b3a0",
           "bytes": 18224,
           "sha256": "70d353a7b3a0c912c7aba97ea7f878f7784ceddc370e2d439640aacb0abe6a6c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_sunder_complete": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_sunder_complete.mp3?v=67322d72508e",
+          "bytes": 18224,
+          "sha256": "67322d72508ebdcb48127cf46309949253a4432ecdbcbfc4e7f392956beea908"
         }
       ],
       "gain": 1,

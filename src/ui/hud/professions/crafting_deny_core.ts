@@ -21,6 +21,7 @@
 import { recipeById } from '../../../sim/content/recipes';
 import type { StationType } from '../../../sim/professions/stations';
 import type { SimEvent } from '../../../sim/types';
+import { durationText } from '../../duration_text';
 import type { TranslationKey } from '../../i18n';
 import { craftDenialLine } from './craft_denial_line_view';
 
@@ -31,11 +32,24 @@ export interface CraftDenyMessage {
   /** Set only for a resolvable station_required refusal; the painter renders
    *  the station name into the stationRequired template. */
   stationType?: StationType;
+  /** Set only for a daily_limit refusal that carried a valid countdown
+   *  (phase 14): the ready-made t() params for the dailyLimitRetry line, the
+   *  {duration} already spelled through duration_text.ts so the painter needs
+   *  no second resolver. Absent otherwise. */
+  params?: { duration: string };
 }
 
 export function craftDenyMessage(
   reason: CraftDenyReason | undefined,
   recipeId: string,
+  retryAfterSeconds?: number,
 ): CraftDenyMessage {
-  return craftDenialLine(reason, recipeById(recipeId)?.stationType);
+  const line = craftDenialLine(reason, recipeById(recipeId)?.stationType, retryAfterSeconds);
+  return {
+    key: line.key,
+    ...(line.stationType !== undefined ? { stationType: line.stationType } : {}),
+    ...(line.retrySeconds !== undefined
+      ? { params: { duration: durationText(line.retrySeconds) } }
+      : {}),
+  };
 }

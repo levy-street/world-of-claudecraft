@@ -401,6 +401,75 @@ describe('commissionOrdersFor (the per-viewer projection)', () => {
 // ---------------------------------------------------------------------------
 // 6. The retention sweep.
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// The crafter's record quality signal (Masterwrought phase 14): accept
+// snapshots the accepter's lifetime deed stat counters onto the order, the
+// projection carries it only once set, and the snapshot never tracks later
+// counter movement (the number the requester weighed is the number kept).
+// ---------------------------------------------------------------------------
+describe('the accept-time crafter record (phase 14)', () => {
+  it('accept snapshots masterworksCrafted / legendariesForged from the live counters', () => {
+    const { sim, requester, crafter } = makeTwoPlayerSim();
+    const meta = metaOf(sim, crafter);
+    meta.deedStats.counters.masterworksCrafted = 12;
+    meta.deedStats.counters.legendariesForged = 3;
+    const { orderId } = openCommissionOrder(sim.ctx, SWORD_RECIPE, 'open', undefined, requester);
+    if (orderId === undefined) throw new Error('open failed');
+
+    // Open: the board row carries NO record keys at all.
+    const openRow = sim.commissionOrderBoard.find((o) => o.id === orderId);
+    expect(openRow?.crafterMasterworks).toBeUndefined();
+    expect(openRow?.crafterLegendaries).toBeUndefined();
+    const openProjection = commissionOrdersFor(sim.ctx, requester).find((r) => r.id === orderId);
+    expect(openProjection && 'crafterMasterworks' in openProjection).toBe(false);
+    expect(openProjection && 'crafterLegendaries' in openProjection).toBe(false);
+
+    expect(acceptCommissionOrder(sim.ctx, orderId, crafter).ok).toBe(true);
+    const accepted = sim.commissionOrderBoard.find((o) => o.id === orderId);
+    expect(accepted?.crafterMasterworks).toBe(12);
+    expect(accepted?.crafterLegendaries).toBe(3);
+    // EVERY viewer's projection carries the snapshot (the requester weighs it).
+    for (const pid of [requester, crafter]) {
+      const row = commissionOrdersFor(sim.ctx, pid).find((r) => r.id === orderId);
+      expect(row?.crafterMasterworks, `viewer ${pid}`).toBe(12);
+      expect(row?.crafterLegendaries, `viewer ${pid}`).toBe(3);
+    }
+  });
+
+  it('a zero record still stamps (presence means accepted, honesty means 0)', () => {
+    const { sim, requester, crafter } = makeTwoPlayerSim();
+    const { orderId } = openCommissionOrder(sim.ctx, SWORD_RECIPE, 'open', undefined, requester);
+    if (orderId === undefined) throw new Error('open failed');
+    expect(acceptCommissionOrder(sim.ctx, orderId, crafter).ok).toBe(true);
+    const row = commissionOrdersFor(sim.ctx, requester).find((r) => r.id === orderId);
+    expect(row?.crafterMasterworks).toBe(0);
+    expect(row?.crafterLegendaries).toBe(0);
+  });
+
+  it('a REFUSED accept stamps nothing', () => {
+    const { sim, requester } = makeTwoPlayerSim();
+    const { orderId } = openCommissionOrder(sim.ctx, SWORD_RECIPE, 'open', undefined, requester);
+    if (orderId === undefined) throw new Error('open failed');
+    // The requester cannot accept their own order.
+    expect(acceptCommissionOrder(sim.ctx, orderId, requester).ok).toBe(false);
+    const order = sim.commissionOrderBoard.find((o) => o.id === orderId);
+    expect(order?.crafterMasterworks).toBeUndefined();
+    expect(order?.crafterLegendaries).toBeUndefined();
+  });
+
+  it('the record is a SNAPSHOT: later counter movement never rewrites it', () => {
+    const { sim, requester, crafter } = makeTwoPlayerSim();
+    const meta = metaOf(sim, crafter);
+    meta.deedStats.counters.masterworksCrafted = 5;
+    const { orderId } = openCommissionOrder(sim.ctx, SWORD_RECIPE, 'open', undefined, requester);
+    if (orderId === undefined) throw new Error('open failed');
+    expect(acceptCommissionOrder(sim.ctx, orderId, crafter).ok).toBe(true);
+    meta.deedStats.counters.masterworksCrafted = 9;
+    const row = commissionOrdersFor(sim.ctx, requester).find((r) => r.id === orderId);
+    expect(row?.crafterMasterworks).toBe(5);
+  });
+});
+
 describe('updateCommissionOrders (the retention sweep)', () => {
   it('expires a stale open order past 24 sim-hours and prunes it after the retain window', () => {
     const { sim, requester } = makeTwoPlayerSim();

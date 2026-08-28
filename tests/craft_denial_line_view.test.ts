@@ -55,4 +55,35 @@ describe('craft_denial_line_view', () => {
       key: 'hudChrome.crafting.insufficientMaterials',
     });
   });
+
+  it('daily_limit with a valid countdown upgrades to the retry line (phase 14)', () => {
+    expect(craftDenialLine('daily_limit', undefined, 4321)).toEqual({
+      key: 'hudChrome.crafting.dailyLimitRetry',
+      retrySeconds: 4321,
+    });
+    // The station type stays a station-arm read, exactly as on the plain arms.
+    expect(craftDenialLine('daily_limit', 'forge', 60)).toEqual({
+      key: 'hudChrome.crafting.dailyLimitRetry',
+      retrySeconds: 60,
+    });
+  });
+
+  it('a malformed or absent countdown keeps the plain daily line (older hosts)', () => {
+    for (const bad of [undefined, 0, -5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(craftDenialLine('daily_limit', undefined, bad)).toEqual({
+        key: 'hudChrome.crafting.dailyLimit',
+      });
+    }
+  });
+
+  it('a countdown on any NON-daily reason changes nothing (per-reason isolation)', () => {
+    expect(craftDenialLine('busy', undefined, 4321)).toEqual({ key: 'hudChrome.crafting.busy' });
+    expect(craftDenialLine('station_required', 'forge', 4321)).toEqual({
+      key: 'hudChrome.crafting.stationRequired',
+      stationType: 'forge',
+    });
+    expect(craftDenialLine(undefined, undefined, 4321)).toEqual({
+      key: 'hudChrome.crafting.insufficientMaterials',
+    });
+  });
 });

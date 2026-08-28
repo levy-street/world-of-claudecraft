@@ -85,6 +85,11 @@ describe('sampled GameAudio facade', () => {
       ['farmReady', 'ui_farm_ready'],
       ['farmGolden', 'ui_farm_golden'],
       ['farmFeast', 'ui_farm_feast'],
+      // Masterwrought crafting-UX cues (phase 14).
+      ['perfectingAttempt', 'ui_perfecting_attempt'],
+      ['perfectingSuccess', 'ui_perfecting_success'],
+      ['legendaryForged', 'ui_legendary_forged'],
+      ['sunderComplete', 'ui_sunder_complete'],
     ] as const;
 
     for (const [method, key] of routes) {
@@ -139,6 +144,12 @@ describe('sampled GameAudio facade', () => {
       // The golden-harvest sting: a result notification layered over the
       // achievement cue, so it gates like masterwork and gatherRareTier.
       'farmGolden',
+      // The Masterwrought crafting-UX cues (phase 14): result feedback like
+      // craftSuccess/masterwork, so all four ride the feedback gate.
+      'perfectingAttempt',
+      'perfectingSuccess',
+      'legendaryForged',
+      'sunderComplete',
     ] as const;
     for (const m of feedback) audio[m]();
     // The parameterized gather/rarity/craft/enchanting cues gate the same way;
@@ -309,7 +320,7 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 20 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 24 unique UI cues to the authoritative studio inventory', () => {
     // 13 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
     // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
@@ -321,18 +332,24 @@ describe('deterministic UI SFX catalog', () => {
     // rarity-tier / fishing recordings replaced them (src/game/audio.ts);
     // ui_vcup_kickoff left with the Vale Cup minigame (the release's Sowfield
     // demolition), which is why the branch's 21 (counted with 14 pre-12b cues)
-    // lands at 20 on the merged tree: the release's 15 plus the five farm
-    // cues, measured from UI_SFX_CATALOG on the merged tree.
+    // landed at 20 on the merged tree: the release's 15 plus the five farm
+    // cues. Masterwrought phase 14 then added its four crafting-UX cues
+    // (ui_perfecting_attempt, ui_perfecting_success, ui_legendary_forged,
+    // ui_sunder_complete): 20 -> 24, measured from UI_SFX_CATALOG.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(20);
+    expect(keys).toHaveLength(24);
     expect(keys).toContain('ui_craft_cast');
     expect(keys).toContain('ui_farm_plant');
     expect(keys).toContain('ui_farm_harvest');
     expect(keys).toContain('ui_farm_ready');
     expect(keys).toContain('ui_farm_golden');
     expect(keys).toContain('ui_farm_feast');
+    expect(keys).toContain('ui_perfecting_attempt');
+    expect(keys).toContain('ui_perfecting_success');
+    expect(keys).toContain('ui_legendary_forged');
+    expect(keys).toContain('ui_sunder_complete');
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

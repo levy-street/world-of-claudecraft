@@ -2041,6 +2041,13 @@ export const ko_KR: EnTranslations = {
     "itemSoulbound": "귀속",
     "itemUniqueEquipped": "착용 시 고유",
     "itemMasterwrought": "착용 시 고유: 명장 제작 ({count})",
+    "masterwrought": {
+      "slotsLabel": "명장 제작 슬롯:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "명장 제작",
+      "tooltipWorn": "명장 제작 슬롯 1개를 차지합니다 ({cap}개 중 {used}개 사용 중).",
+      "tooltipAtCap": "명장 제작 슬롯 {cap}개가 모두 사용 중입니다."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2070,6 +2077,18 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "걸작 {count}점",
+        "few": "걸작 {count}점",
+        "many": "걸작 {count}점",
+        "other": "걸작 {count}점"
+      },
+      "commissionLegendaries": {
+        "one": "전설 아이템 {count}점",
+        "few": "전설 아이템 {count}점",
+        "many": "전설 아이템 {count}점",
+        "other": "전설 아이템 {count}점"
+      },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
         "few": "당신은 {rank}, {count}명 회원",
@@ -2731,7 +2750,9 @@ export const ko_KR: EnTranslations = {
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
       "statEnchanted": "+{value} {stat} (마법부여)",
-      "enchantedFallback": "마법부여됨"
+      "enchantedFallback": "마법부여됨",
+      "perfectedBadge": "완전해짐",
+      "perfectingRank": "완전화: {ranks}단계 중 {rank}단계"
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
@@ -2748,7 +2769,8 @@ export const ko_KR: EnTranslations = {
       "masterwroughtIntermediate": "명장 제작용 재료.",
       "quickeningCatalyst": "제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다.",
       "growthTonic": "농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.",
-      "deedOfMaking": "명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다."
+      "deedOfMaking": "명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다.",
+      "wyrmfallCore": "명장 제작용 촉매. 공격대와 영웅 던전의 최종 우두머리가 하루 한 번씩 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 공략으로 1~2개를 얻으며, 영웅 병참장교가 영웅의 징표를 받고 판매합니다."
     },
     "discord": {
       "title": "Discord",
@@ -3623,6 +3645,7 @@ export const ko_KR: EnTranslations = {
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다.",
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "dailyLimit": "하루에 한 번만 제작할 수 있습니다.",
+      "dailyLimitRetry": "하루에 한 번만 제작할 수 있습니다. {duration} 후에 다시 제작할 수 있습니다.",
       "oncePerDay": "Once per day",
       "skillReqLine": "{craft} {skill} 필요",
       "difficultyFull": "숙련도 전량 상승",
@@ -3632,6 +3655,12 @@ export const ko_KR: EnTranslations = {
       "stationBadge": "제작 거점",
       "stationOutOfRangeNamed": "{station}(으)로 이동하여 제작하세요.",
       "learnMoreAtStation": "{station}의 {master}이(가) 더 많은 {craft} 제작법을 가르쳐 줄 수 있습니다.",
+      "apexChip": "정점",
+      "apexPatternRaid": "이 도안은 공격대에서 나오는 희귀 전리품입니다.",
+      "apexPatternRift": "이 도안은 상위 등급 균열을 승리로 마치면 얻을 수 있습니다.",
+      "apexPatternVendor": "영웅 병참장교가 영웅의 징표를 받고 이 도안을 판매합니다.",
+      "apexPatternDrop": "이 도안은 세계 어딘가에서 발견됩니다.",
+      "perfectingLink": "완전화",
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "legendaryLine": "{item}이(가) {name}(으)로 다시 태어나 전설이 되었습니다!",
@@ -3727,6 +3756,7 @@ export const ko_KR: EnTranslations = {
       "replaceConfirmKeepsSigner": "제작자 각인",
       "replaceConfirmKeepsMasterwork": "걸작 보너스",
       "replaceConfirmKeepsBond": "주문 제작품 귀속",
+      "replaceConfirmKeepsPerfecting": "완전화",
       "replaceConfirmCost": "비용: {cost}",
       "replaceConfirmCostItem": "{name} {count}개",
       "replaceConfirmAccept": "대체"
@@ -3776,6 +3806,42 @@ export const ko_KR: EnTranslations = {
       "noSpace": "가방에 귀속 해제한 아이템을 넣을 공간이 없습니다.",
       "perfecting": "완전화 과정에 있거나 이미 완전해진 아이템은 귀속 상태로 유지됩니다."
     },
+    "perfecting": {
+      "title": "완전화",
+      "close": "완전화 창 닫기",
+      "openButton": "완전화",
+      "openButtonAria": "완전화 창 열기",
+      "empty": "완전화할 수 있는 명장 제작 아이템이 없습니다. 정점 제조법으로 만들 수 있습니다.",
+      "wornChip": "착용 중",
+      "rowRank": "{ranks}단계 중 {rank}단계",
+      "rowPerfected": "완전함",
+      "rowPromoted": "전설",
+      "attemptCost": "시도 비용",
+      "promoteCost": "승급 비용",
+      "matCount": "{have}/{required}",
+      "skillNeed": "{craft} 기술 {skill}이(가) 필요합니다.",
+      "skillMet": "충족했습니다.",
+      "skillUnmet": "부족합니다.",
+      "skillSyncing": "제작 기술을 확인하는 중입니다.",
+      "bindWarn": "첫 완전화 시도에서 {name}이(가) 당신에게 영구히 귀속됩니다.",
+      "bindWarnDetail": "완전화는 결코 단계를 낮추지 않습니다. 실패한 시도는 재료만 소모합니다. 귀속은 해제할 수 없으며, 승급도 되돌릴 수 없습니다.",
+      "bindConfirmText": "첫 시도에서 {name}이(가) 당신에게 영구히 귀속됩니다. 그래도 시도하시겠습니까?",
+      "bindConfirmAccept": "귀속하고 시도",
+      "bindConfirmCancel": "취소",
+      "attempt": "완전화 시도",
+      "promote": "이름 짓고 승급",
+      "perfectedLead": "완전해졌습니다. 이름을 지어 전설을 벼려내십시오.",
+      "promotedLine": "완성된 전설: 더 완전하게 만들 것이 없습니다.",
+      "equipBlocked": "승급하면 착용할 수 없게 됩니다. 먼저 충돌하는 장비를 해제하십시오.",
+      "nameTitle": "전설의 이름 짓기",
+      "nameLabel": "{name}에 새길 이름을 입력하십시오. 이름은 영구히 남습니다.",
+      "nameInputAria": "전설의 이름",
+      "nameHint": "2자에서 32자: 영문자, 공백, 아포스트로피, 하이픈을 쓸 수 있으며 첫 글자는 영문자여야 합니다.",
+      "nameCount": "{count}/{max}",
+      "nameSubmit": "전설 벼려내기",
+      "nameSubmitBusy": "벼려내는 중",
+      "nameCancel": "취소"
+    },
     "commissionBoard": {
       "title": "의뢰 게시판",
       "close": "의뢰 게시판 닫기",
@@ -3800,6 +3866,7 @@ export const ko_KR: EnTranslations = {
       "rowFor": "{item} (의뢰인: {requester})",
       "rowTargeted": "{item} (의뢰인: {requester}, 지정 제작자: {crafter})",
       "acceptedBy": "{name}님이 수락함",
+      "crafterRecordLabel": "장인 이력:",
       "statusOpen": "모집 중",
       "statusAccepted": "수락됨",
       "statusDelivered": "전달 완료",

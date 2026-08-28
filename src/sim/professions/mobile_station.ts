@@ -130,10 +130,13 @@ export function placeMobileStationForPlayer(
  * per-player PlayerMeta.mobileStation slot, replacing any previous station.
  * Success emits one player-visible log line naming `name`, the placing
  * item's display name (the phase 06 scroll-read pattern in items.ts; matched
- * by log.placeStation in src/ui/sim_i18n.ts), so a placement is never
- * silent. The line carries NO article of its own, the house quaff/read
- * pattern: an item name already supplies whatever article it wants, and
- * "You set up the The Laden Hearth." is what gluing one on produces. Draws no
+ * by log.placeStation / log.placeStationThe in src/ui/sim_i18n.ts), so a
+ * placement is never silent. The article is NAME-AWARE (the phase 14 polish
+ * of the phase 09 article-free form): a name already beginning with an
+ * article keeps the bare line, because "You set up the The Laden Hearth." is
+ * what unconditionally gluing one on produces, while an article-free name
+ * such as "Master's Field Forge" gains "the" so the sentence reads naturally.
+ * Each arm is its own emit literal with its own matcher rule. Draws no
  * rng, reads no wall clock; the CALLER never consumes the item (a permanent
  * tool, the mount-reins convention).
  */
@@ -155,8 +158,22 @@ export function placeMobileStationFromItem(
     expiresAtTick: ctx.tickCount + MOBILE_CRAFTING_STATION_DURATION_TICKS,
   };
   r.meta.mobileStation = station;
-  ctx.emit({ type: 'log', text: `You set up ${name}.`, color: '#c9f', pid: r.meta.entityId });
+  if (nameCarriesOwnArticle(name)) {
+    ctx.emit({ type: 'log', text: `You set up ${name}.`, color: '#c9f', pid: r.meta.entityId });
+  } else {
+    ctx.emit({ type: 'log', text: `You set up the ${name}.`, color: '#c9f', pid: r.meta.entityId });
+  }
   return station;
+}
+
+/** Whether an item display name already begins with its own article ("The
+ *  Laden Hearth"), so the placement line must not glue a second one on. Pure
+ *  and exported for the placement-line tests; kept to the three English
+ *  articles because the sim's emit language is English by contract (the
+ *  client matchers re-localize). Two emit sites above instead of one
+ *  variable-routed line, so the S3 guard keeps seeing both literals. */
+export function nameCarriesOwnArticle(name: string): boolean {
+  return /^(?:the|a|an)\s/i.test(name);
 }
 
 /**

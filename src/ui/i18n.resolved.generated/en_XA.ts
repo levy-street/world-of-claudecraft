@@ -2041,6 +2041,13 @@ export const en_XA: EnTranslations = {
     "itemSoulbound": "[Šóúļƀóúñð]",
     "itemUniqueEquipped": "[Úñíɋúé-Éɋúíþþéð]",
     "itemMasterwrought": "[Úñíɋúé-Éɋúíþþéð: Ɱášţéŕŵŕóúĝĥţ ({count})]",
+    "masterwrought": {
+      "slotsLabel": "[Ɱášţéŕŵŕóúĝĥţ šļóţš:]",
+      "slotsValue": "[{used} / {cap}]",
+      "pieceMark": "[Ɱášţéŕŵŕóúĝĥţ]",
+      "tooltipWorn": "[Óççúþíéš á Ɱášţéŕŵŕóúĝĥţ šļóţ ({used} óƒ {cap} íñ úšé).]",
+      "tooltipAtCap": "[Áļļ {cap} Ɱášţéŕŵŕóúĝĥţ šļóţš áŕé íñ úšé.]"
+    },
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"
@@ -2070,6 +2077,18 @@ export const en_XA: EnTranslations = {
       "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "[{count} ɱášţéŕŵóŕķ]",
+        "few": "[{count} ɱášţéŕŵóŕķš]",
+        "many": "[{count} ɱášţéŕŵóŕķš]",
+        "other": "[{count} ɱášţéŕŵóŕķš]"
+      },
+      "commissionLegendaries": {
+        "one": "[{count} ļéĝéñðáŕý]",
+        "few": "[{count} ļéĝéñðáŕíéš]",
+        "many": "[{count} ļéĝéñðáŕíéš]",
+        "other": "[{count} ļéĝéñðáŕíéš]"
+      },
       "guildMembers": {
         "one": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕ]",
         "few": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
@@ -2731,7 +2750,9 @@ export const en_XA: EnTranslations = {
       "riftUpgrade": "[Ŕíƒţ úþĝŕáðé {level}/{max}]",
       "riftSockets": "[Ŕíƒţ ĝéɱš {used}/{total}]",
       "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
-      "enchantedFallback": "[Éñçĥáñţéð]"
+      "enchantedFallback": "[Éñçĥáñţéð]",
+      "perfectedBadge": "[Þéŕƒéçţéð]",
+      "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]"
     },
     "materialHint": {
       "fineGrade": "[Ƒíñé ĝŕáðé. Ĝáţĥéŕéð ƒŕóɱ á ƒúļļ-ţíéŕ ʋéíñ ŵíţĥ á ţóóļ ŕáñķéð áƀóʋé ţĥé ɱáţéŕíáļ, áñð çóúñţš áš ţĥé óŕðíñáŕý ʋéŕšíóñ ŵĥéŕéʋéŕ óñé íš ŕéɋúíŕéð.]",
@@ -2748,7 +2769,8 @@ export const en_XA: EnTranslations = {
       "masterwroughtIntermediate": "[Ɱášţéŕŵŕóúĝĥţ çŕáƒţíñĝ çóɱþóñéñţ.]",
       "quickeningCatalyst": "[Çŕáƒţíñĝ çáţáļýšţ. Áñ áļçĥéɱíšţ çáñ çŕáƒţ óñļý óñé éáçĥ ðáý.]",
       "growthTonic": "[Ƒáŕɱíñĝ šúþþļý. Šþéñţ ŵĥéñ ýóú þļáñţ á çŕóþ ƒóŕ á çĥáñçé óƒ á šļíĝĥţļý ļáŕĝéŕ ĥáŕʋéšţ. Íƒ ţĥé çŕóþ ŵíţĥéŕš, ţĥé ţóñíç íš ļóšţ ŵíţĥ íţ.]",
-      "deedOfMaking": "[Íñšçŕíþţíóñ ŵŕíţ. Çóñšúɱéð ţó ŕáíšé á Þéŕƒéçţéð Ɱášţéŕŵŕóúĝĥţ ŵóŕķ ţó ļéĝéñðáŕý áñð ĝíʋé íţ á ñáɱé.]"
+      "deedOfMaking": "[Íñšçŕíþţíóñ ŵŕíţ. Çóñšúɱéð ţó ŕáíšé á Þéŕƒéçţéð Ɱášţéŕŵŕóúĝĥţ ŵóŕķ ţó ļéĝéñðáŕý áñð ĝíʋé íţ á ñáɱé.]",
+      "wyrmfallCore": "[Ɱášţéŕŵŕóúĝĥţ çŕáƒţíñĝ çáţáļýšţ. Ŕáíð áñð ĥéŕóíç ðúñĝéóñ ƒíñáļ ƀóššéš éáçĥ ðŕóþ 1 ţó 3 óñçé þéŕ ðáý, ýóúŕ ƒíŕšţ Á óŕ Š ŕáñķ ŕíƒţ çļéáŕ óƒ ţĥé ðáý ĝŕáñţš 1 óŕ 2, áñð ţĥé Ĥéŕóíç Ɋúáŕţéŕɱášţéŕ šéļļš óñé ƒóŕ Ĥéŕóíç Ɱáŕķš.]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -3623,6 +3645,7 @@ export const en_XA: EnTranslations = {
       "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]",
       "noBagSpace": "[Ýóú ðó ñóţ ĥáʋé ŕóóɱ ƒóŕ ţĥé çŕáƒţéð íţéɱ.]",
       "dailyLimit": "[Ýóú çáñ óñļý çŕáƒţ ţĥáţ óñçé þéŕ ðáý.]",
+      "dailyLimitRetry": "[Ýóú çáñ óñļý çŕáƒţ ţĥáţ óñçé þéŕ ðáý. Áʋáíļáƀļé áĝáíñ íñ {duration}.]",
       "oncePerDay": "[Óñçé þéŕ ðáý]",
       "skillReqLine": "[Ŕéɋúíŕéš {craft} {skill}]",
       "difficultyFull": "[Ƒúļļ šķíļļ ĝáíñ]",
@@ -3632,6 +3655,12 @@ export const en_XA: EnTranslations = {
       "stationBadge": "[Šţáţíóñ]",
       "stationOutOfRangeNamed": "[Ɱóʋé ţó ţĥé {station} ţó çŕáƒţ ţĥíš.]",
       "learnMoreAtStation": "[{master} áţ ţĥé {station} çáñ ţéáçĥ ýóú ɱóŕé {craft} ŕéçíþéš.]",
+      "apexChip": "[Áþéẋ]",
+      "apexPatternRaid": "[Íţš þáţţéŕñ íš á ŕáŕé ŕáíð ţŕóþĥý.]",
+      "apexPatternRift": "[Íţš þáţţéŕñ íš ŵóñ óñ ʋíçţóŕíóúš ĥíĝĥ-ŕáñķ Ŕíƒţ çļéáŕš.]",
+      "apexPatternVendor": "[Ţĥé Ĥéŕóíç Ɋúáŕţéŕɱášţéŕ šéļļš íţš þáţţéŕñ ƒóŕ Ĥéŕóíç Ɱáŕķš.]",
+      "apexPatternDrop": "[Íţš þáţţéŕñ íš ƒóúñð íñ ţĥé ŵóŕļð.]",
+      "perfectingLink": "[Þéŕƒéçţíñĝ]",
       "masterworkToast": "[Ɱášţéŕŵóŕķ! {name}]",
       "masterworkZoneLine": "[{crafter} çŕáƒţéð á ɱášţéŕŵóŕķ {name}!]",
       "legendaryLine": "[{item} íš ŕéƀóŕñ áš {name}, á ļéĝéñð!]",
@@ -3727,6 +3756,7 @@ export const en_XA: EnTranslations = {
       "replaceConfirmKeepsSigner": "[Ɱáķéŕ'š ɱáŕķ]",
       "replaceConfirmKeepsMasterwork": "[Ɱášţéŕŵóŕķ ƀóñúš]",
       "replaceConfirmKeepsBond": "[Çóɱɱíššíóñ ƀóñð]",
+      "replaceConfirmKeepsPerfecting": "[Þéŕƒéçţíñĝ]",
       "replaceConfirmCost": "[Çóšţ: {cost}]",
       "replaceConfirmCostItem": "[{name} ẋ{count}]",
       "replaceConfirmAccept": "[Ŕéþļáçé]"
@@ -3776,6 +3806,42 @@ export const en_XA: EnTranslations = {
       "noSpace": "[Ýóú ðó ñóţ ĥáʋé ŕóóɱ ƒóŕ ţĥé úñƀóúñð çóþý.]",
       "perfecting": "[Á þíéçé óñ ţĥé Þéŕƒéçţíñĝ ţŕáçķ, óŕ áļŕéáðý Þéŕƒéçţéð, šţáýš ƀóúñð.]"
     },
+    "perfecting": {
+      "title": "[Þéŕƒéçţíñĝ]",
+      "close": "[Çļóšé ţĥé Þéŕƒéçţíñĝ ŵíñðóŵ]",
+      "openButton": "[Þéŕƒéçţíñĝ]",
+      "openButtonAria": "[Óþéñ ţĥé Þéŕƒéçţíñĝ ŵíñðóŵ]",
+      "empty": "[Ýóú ĥóļð ñó Ɱášţéŕŵŕóúĝĥţ þíéçé. Ţĥé áþéẋ ŕéçíþéš ƒóŕĝé óñé.]",
+      "wornChip": "[Ŵóŕñ]",
+      "rowRank": "[Ŕáñķ {rank} óƒ {ranks}]",
+      "rowPerfected": "[Þéŕƒéçţéð]",
+      "rowPromoted": "[Ļéĝéñðáŕý]",
+      "attemptCost": "[Áţţéɱþţ çóšţ]",
+      "promoteCost": "[Þŕóɱóţíóñ çóšţ]",
+      "matCount": "[{have} óƒ {required}]",
+      "skillNeed": "[Ñééðš {craft} šķíļļ {skill}.]",
+      "skillMet": "[Ɱéţ.]",
+      "skillUnmet": "[Ñóţ ɱéţ.]",
+      "skillSyncing": "[Çĥéçķíñĝ ýóúŕ çŕáƒţ šķíļļ.]",
+      "bindWarn": "[Ýóúŕ ƒíŕšţ þéŕƒéçţíñĝ áţţéɱþţ þéŕɱáñéñţļý ƀíñðš {name} ţó ýóú.]",
+      "bindWarnDetail": "[Þéŕƒéçţíñĝ ñéʋéŕ ļóŵéŕš á ŕáñķ: á ƒáíļéð áţţéɱþţ óñļý šþéñðš íţš ɱáţéŕíáļš. Á ƀóúñð þíéçé çáññóţ ƀé úñƀóúñð, áñð á þŕóɱóţíóñ íš þéŕɱáñéñţ.]",
+      "bindConfirmText": "[Ýóúŕ ƒíŕšţ áţţéɱþţ þéŕɱáñéñţļý ƀíñðš {name} ţó ýóú. Áţţéɱþţ áñýŵáý?]",
+      "bindConfirmAccept": "[Ɓíñð áñð Áţţéɱþţ]",
+      "bindConfirmCancel": "[Çáñçéļ]",
+      "attempt": "[Áţţéɱþţ Þéŕƒéçţíñĝ]",
+      "promote": "[Ñáɱé áñð Þŕóɱóţé]",
+      "perfectedLead": "[Þéŕƒéçţéð. Ĝíʋé íţ á ñáɱé ţó ƒóŕĝé á ļéĝéñð.]",
+      "promotedLine": "[Á ƒíñíšĥéð ļéĝéñð: ñóţĥíñĝ ļéƒţ ţó þéŕƒéçţ.]",
+      "equipBlocked": "[Ýóú çóúļð ñóţ éɋúíþ íţ óñçé þŕóɱóţéð. Úñéɋúíþ ţĥé çóñƒļíçţíñĝ þíéçé ƒíŕšţ.]",
+      "nameTitle": "[Ñáɱé ţĥé Ļéĝéñð]",
+      "nameLabel": "[Íñšçŕíƀé á ñáɱé ƒóŕ {name}. Ţĥé ñáɱé íš þéŕɱáñéñţ.]",
+      "nameInputAria": "[Ļéĝéñðáŕý ñáɱé]",
+      "nameHint": "[Ţŵó ţó 32 çĥáŕáçţéŕš: ļéţţéŕš, šþáçéš, áþóšţŕóþĥéš, áñð ĥýþĥéñš, šţáŕţíñĝ ŵíţĥ á ļéţţéŕ.]",
+      "nameCount": "[{count} óƒ {max}]",
+      "nameSubmit": "[Ƒóŕĝé ţĥé Ļéĝéñð]",
+      "nameSubmitBusy": "[Ƒóŕĝíñĝ]",
+      "nameCancel": "[Çáñçéļ]"
+    },
     "commissionBoard": {
       "title": "[Çóɱɱíššíóñ Óŕðéŕš]",
       "close": "[Çļóšé çóɱɱíššíóñ óŕðéŕš]",
@@ -3800,6 +3866,7 @@ export const en_XA: EnTranslations = {
       "rowFor": "[{item} ƒóŕ {requester}]",
       "rowTargeted": "[{item} ƒóŕ {requester} (ƒóŕ {crafter})]",
       "acceptedBy": "[Áççéþţéð ƀý {name}]",
+      "crafterRecordLabel": "[Çŕáƒţéŕ'š ŕéçóŕð:]",
       "statusOpen": "[Óþéñ]",
       "statusAccepted": "[Áççéþţéð]",
       "statusDelivered": "[Ðéļíʋéŕéð]",

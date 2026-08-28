@@ -937,6 +937,35 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       },
     ],
   },
+  // The Perfecting window's convergence clock (Masterwrought phase 14): ONE
+  // 1 Hz interval armed on open and cleared on close, the harvest journal's
+  // shape. It exists because the attempt path emits NO event (feedback is the
+  // sim's lines plus the inv/einst mirrors re-diffing), so the window compares
+  // a VALUE signature once a second and repaints only when the model moved.
+  // The `.scrollTop` pair is the paint path's scroll carry (read before the
+  // innerHTML rebuild, write after), the reliquary shape.
+  {
+    file: 'hud/professions/perfecting_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the convergence poll: once a second while open, rebuild the pure view from fresh world reads and compare its VALUE signature with the painted one. A moved model (a material count, a rank landing, the Perfected or promoted stamp, the identity mirror syncing) repaints whole through the SAME paintFrom an open takes; an unmoved one does nothing at all.',
+        stopsAt: {
+          paintFrom:
+            "the window's ordinary full re-render, shared with open(), the selection click, and the language-switch relocalize(). The tick does nothing extra on its way there and only gets there when the model actually moved (the harvest journal's argument).",
+        },
+        // `.style` is the `isOpen` getter reading rootEl.style.display (the
+        // daily_rewards shape: the matcher counts ACCESSES, not writes).
+        writeAllow: { '.style': 1 },
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
@@ -1601,6 +1630,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/professions/harvest_journal_window.ts#0',
+      'hud/professions/perfecting_window.ts#0',
       'hud/delve/lockpick_window.ts#0',
     ]);
     // THIRD, the matchers must have seen real source. The positive control is the lockpick
@@ -1633,6 +1663,12 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // (argued in the entry's why/stopsAt above): the tick body itself is the
       // isOpen guard, one pure view rebuild, and the text-only cell rewrite.
       'hud/professions/harvest_journal_window.ts: paint',
+      // The Perfecting window's convergence tick, the journal's exact shape:
+      // it cuts at the SAME full paint an open and a selection click take, and
+      // only reaches it when the value signature moved (argued in the entry's
+      // why/stopsAt above). The tick body itself is the isOpen guard plus one
+      // pure view rebuild and signature compare.
+      'hud/professions/perfecting_window.ts: paintFrom',
     ]);
     expect(
       sweep.violations,

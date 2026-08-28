@@ -133,6 +133,10 @@ const FANOUT_ARMS: readonly string[] = [
   // The plant sheet's relocalize gates itself (paint only while open), so the
   // arm carries no guard of its own.
   'this.plantSheetWindow.relocalize|',
+  // The Perfecting window's relocalize gates itself the same way; its repaint
+  // signature is ids/ranks/counts (text-independent), so the arm forces the
+  // one rebuild (Masterwrought phase 14).
+  'this.perfectingWindow.relocalize|',
   // The Reliquary cold window is signature-gated (lastSig); language switch
   // must force render while open so curator rank chrome and shelf labels re-t().
   'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
@@ -352,6 +356,18 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.professionsWindow.render',
     why: 'the known professions and their skill numbers; render() carries no self-gate',
+  },
+  {
+    file: 'hud/professions/perfecting_window.ts',
+    memos: ['lastSelectedSig', 'lastSig'],
+    answer: 'this.perfectingWindow.relocalize',
+    why:
+      'the candidate rows (rank/Perfected/Legendary state text, the Worn ' +
+      'chip), the detail pane (rank label, bind warning, materials heading ' +
+      'and counts, the skill line, the action button label) and the empty ' +
+      'state; both signatures digest ids, ranks and counts only, so a locale ' +
+      'flip alone never moves them, and relocalize() forces the one repaint ' +
+      'that re-latches both',
   },
   {
     file: 'hud/professions/harvest_journal_window.ts',

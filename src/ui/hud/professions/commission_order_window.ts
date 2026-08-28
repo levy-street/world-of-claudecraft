@@ -14,7 +14,7 @@
 
 import { isCommissionEligibleKind } from '../../../sim/professions/commission';
 import { esc } from '../../esc';
-import { t } from '../../i18n';
+import { formatNumber, t, tPlural } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
@@ -49,6 +49,26 @@ function itemName(row: CommissionOrderRowModel): string {
   return row.item?.name ?? row.itemId;
 }
 
+/** The crafter's-record line (Masterwrought phase 14, the commission quality
+ *  signal): a muted label with parchment tabular values, rendered only when
+ *  the view model resolved a record for the row (accepted/delivered rows off
+ *  a record-carrying wire; commission_order_view.ts owns the gate). Counts
+ *  ride formatNumber; the words pluralize per locale via tPlural. */
+function crafterRecordHtml(row: CommissionOrderRowModel): string {
+  const record = row.crafterRecord;
+  if (!record) return '';
+  const count = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
+  const masterworks = tPlural('hudChrome.plurals.commissionMasterworks', record.masterworks, {
+    count: count(record.masterworks),
+  });
+  const legendaries = tPlural('hudChrome.plurals.commissionLegendaries', record.legendaries, {
+    count: count(record.legendaries),
+  });
+  return `<span class="vi-sub commission-crafter-record"><span class="ccr-label">${esc(
+    t('hudChrome.commissionBoard.crafterRecordLabel'),
+  )}</span> <span class="ccr-values">${esc(masterworks)} · ${esc(legendaries)}</span></span>`;
+}
+
 function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps): HTMLElement {
   const name = itemName(row);
   const item = document.createElement('div');
@@ -67,7 +87,7 @@ function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps
   const acceptedLine = row.acceptedByName
     ? t('hudChrome.commissionBoard.acceptedBy', { name: row.acceptedByName })
     : '';
-  item.innerHTML = `${socket}<span class="vi-name">${esc(line)}<span class="vi-sub">${esc(statusText)}${acceptedLine ? ` · ${esc(acceptedLine)}` : ''}</span></span>`;
+  item.innerHTML = `${socket}<span class="vi-name">${esc(line)}<span class="vi-sub">${esc(statusText)}${acceptedLine ? ` · ${esc(acceptedLine)}` : ''}</span>${crafterRecordHtml(row)}</span>`;
   if (row.item) {
     const displayItem = row.item;
     deps.attachTooltip(item, () => deps.itemTooltip(displayItem));

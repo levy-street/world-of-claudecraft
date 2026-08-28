@@ -1387,6 +1387,18 @@
     letter-spacing: 0.09em;
     color: var(--color-text-muted);
   }
+  /* The worn Masterwrought mark (phase 14): a small gold diamond beside the
+     slot name (a CSS-drawn rotated square; the aria-label carries the word).
+     Sized to the slot-name cap height so it reads as part of the label. */
+  .equip-mw-chip {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--gold-dim);
+    box-shadow: inset 0 0 0 1px var(--gold);
+    vertical-align: baseline;
+  }
   /* Item names WRAP (never ellipsized) so a full name always reads. */
   .equip-slot .slot-item {
     font-size: 11.5px;
@@ -1802,6 +1814,23 @@
   .cp-none {
     color: #7c7256;
     font-style: italic;
+  }
+  /* The Masterwrought slots readout (phase 14): the char-playtime slim-row
+     shape (muted label, parchment tabular value) seated under the paperdoll
+     whose worn diamonds it counts. */
+  .char-mw-slots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-mw-slots .cp-title {
+    margin-bottom: 0;
+  }
+  .char-mw-slots-value {
+    font-size: 13px;
+    color: var(--color-text-light);
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
   }
   /* The lifetime "Time Played" line footing the character sheet: the shared
      inset-card treatment laid out as one slim row (label, value, then the
@@ -6015,6 +6044,38 @@
     color: var(--color-text-muted);
     white-space: nowrap;
   }
+  /* The apex treatment (Masterwrought phase 14): restrained per DESIGN.md,
+     gold stays structural. The chip rides the duration-chip base rule with a
+     fine gold edge; the socket ring is one inset line; the provenance line
+     and the Perfecting link carry the same information as text. */
+  .crafting-apex-chip {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .crafting-recipe-socket.apex {
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+    border-radius: 3px;
+  }
+  .crafting-apex-line {
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .crafting-perfecting-link {
+    margin-left: auto;
+    min-height: 28px;
+    padding: 2px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: none;
+    color: var(--gold-dim);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .crafting-perfecting-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
   /* Polite live region: off-screen, announces cast start/complete/cancel. */
   /* In-window craft-cast strip (Craft Cast System Phase 2): the SINGLE
      progress surface for a craft cast while this window is open (the HUD
@@ -6610,6 +6671,16 @@
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+  }
+  /* The crafter's-record quality signal on accepted rows (Masterwrought
+     phase 14): muted label, parchment values, tabular numerals so a list of
+     records ranks at a glance. */
+  .commission-crafter-record .ccr-label {
+    color: var(--color-text-muted);
+  }
+  .commission-crafter-record .ccr-values {
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
   }
   .commission-order-actions {
     display: flex;
@@ -10261,6 +10332,273 @@
     text-align: center;
     font-size: 11px;
     color: var(--color-text-muted);
+  }
+
+  /* ---------- perfecting window ---------- */
+  /* The Perfecting window (#perfecting-window, Masterwrought phase 14): the
+     apex rank track and the orange promotion. Candidate rows are single-select
+     RADIOS in a radiogroup (aria-checked carries the pick, the plant-sheet
+     shape) on the 40px touch floor; every state pairs its tint with text
+     (rank label, warning sentences), never color alone. Column-flex window
+     family; .pf-body is the ONE scroller (the capped-flex rule). */
+  #perfecting-window {
+    width: 460px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #perfecting-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #perfecting-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .pf-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-cand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .pf-cand[aria-checked="true"] {
+    border-color: var(--gold);
+  }
+  .pf-cand-socket {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .pf-cand-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pf-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  /* The promoted legend's name tint: the shipped legendary quality color,
+     aliased once in tokens.css (--mkt-name-legendary mirrors icons.ts
+     QUALITY_COLOR.legendary); the adjacent state TEXT stays the signal. */
+  .pf-name.q-legendary,
+  .pf-detail-name.q-legendary {
+    border: none;
+    box-shadow: none;
+    color: var(--mkt-name-legendary);
+  }
+  .pf-chip {
+    flex: none;
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .pf-cand-state {
+    flex: none;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .pf-empty {
+    margin: 0;
+    padding: 14px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .pf-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+  }
+  .pf-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-detail-names {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .pf-detail-name {
+    font-weight: 600;
+  }
+  .pf-detail-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* The rank track: four steps, then the Perfected/Promoted faces. The steps
+     are aria-hidden decoration; .pf-track-label is the accessible text. */
+  .pf-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-track-steps {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .pf-step {
+    width: 22px;
+    height: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .pf-step.filled {
+    background: var(--gold-dim);
+    border-color: var(--gold-dim);
+  }
+  .pf-track[data-state="perfected"] .pf-step.filled {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .pf-track[data-state="promoted"] .pf-step.filled {
+    background: var(--mkt-name-legendary);
+    border-color: var(--mkt-name-legendary);
+  }
+  .pf-track-label {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .pf-track[data-state="promoted"] .pf-track-label {
+    color: var(--mkt-name-legendary);
+  }
+  .pf-lead {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-warning .ui-icon {
+    flex: none;
+    color: var(--gold);
+  }
+  .pf-mats-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .pf-mats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pf-mat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf-mat-count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  .pf-mat.short .pf-mat-count {
+    color: var(--color-text-error);
+  }
+  .pf-skill {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .pf-skill.unmet .pf-skill-state {
+    color: var(--color-text-error);
+  }
+  .pf-action {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pf-action:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  /* The naming prompt (#prompt-stack tenant) and the bind confirm: the shared
+     .prompt panel chrome plus the name form's own rows. The 16px mobile input
+     floor is base.css's coarse-pointer rule; nothing here undercuts it. */
+  .pf-name-label {
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .pf-name-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .pf-name-count {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+  .pf-name-hint {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .pf-name-hint[data-invalid="true"] {
+    color: var(--color-text-error);
+  }
+  .pf-name-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
   }
 
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */

@@ -27,6 +27,7 @@ import type { FarmPlotView } from '../src/sim/professions/farm_projection';
 import type { InvSlot } from '../src/sim/types';
 import { PlantSheetWindow } from '../src/ui/hud/professions/farming_plant_sheet_window';
 import { HarvestJournalWindow } from '../src/ui/hud/professions/harvest_journal_window';
+import { PerfectingWindow } from '../src/ui/hud/professions/perfecting_window';
 import { syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
@@ -112,6 +113,32 @@ const sheetWindow = (): PlantSheetWindow =>
     onVisibilityChange: sync,
   });
 
+// The Perfecting sibling (Masterwrought phase 14). It mints its own
+// #perfecting-window root, so no fixture div is seeded for it; an empty world
+// (no apex copies) paints the empty state, which is enough for the class arm.
+class PerfectingWorld {
+  equipment = {};
+  equipmentInstances = {};
+  inventory: InvSlot[] = [];
+  craftingIdentity = { synced: true };
+  perfectingInfo(): null {
+    return null;
+  }
+}
+
+const perfectingWindow = (): PerfectingWindow =>
+  new PerfectingWindow({
+    itemIcon: () => '',
+    moneyHtml: () => '',
+    itemTooltip: () => '',
+    attachTooltip: () => {},
+    world: () => new PerfectingWorld() as unknown as IWorld,
+    closeOthers: () => {},
+    captureFocus: () => null,
+    restoreFocus: () => {},
+    onVisibilityChange: sync,
+  });
+
 describe('the mobile-window-open body class follows the farming windows', () => {
   it('the harvest journal sets the class on open and clears it on close', () => {
     const win = journalWindow();
@@ -166,8 +193,29 @@ describe('the mobile-window-open body class follows the farming windows', () => 
     expect(journalDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
     const sheetDeps = depsSlice(
       'private readonly plantSheetWindow = new PlantSheetWindow({',
-      'private readonly reliquaryWindow = new ReliquaryWindow({',
+      'private readonly perfectingWindow = new PerfectingWindow({',
     );
     expect(sheetDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+    // The Perfecting window (Masterwrought phase 14) joins the family with
+    // the exact sibling shape.
+    const perfectingDeps = depsSlice(
+      'private readonly perfectingWindow = new PerfectingWindow({',
+      'private readonly reliquaryWindow = new ReliquaryWindow({',
+    );
+    expect(perfectingDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+  });
+
+  it('the perfecting window sets the class on open and clears it on close', () => {
+    const win = perfectingWindow();
+    expect(document.body.classList.contains('mobile-window-open')).toBe(false);
+    win.open();
+    // The open really opened (the window minted its own root and flipped it
+    // to flex), so the class assertion below cannot pass vacuously.
+    expect((document.getElementById('perfecting-window') as HTMLElement).style.display).toBe(
+      'flex',
+    );
+    expect(document.body.classList.contains('mobile-window-open')).toBe(true);
+    win.close();
+    expect(document.body.classList.contains('mobile-window-open')).toBe(false);
   });
 });

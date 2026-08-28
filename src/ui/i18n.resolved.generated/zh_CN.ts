@@ -2041,6 +2041,13 @@ export const zh_CN: EnTranslations = {
     "itemSoulbound": "灵魂绑定",
     "itemUniqueEquipped": "装备唯一",
     "itemMasterwrought": "装备唯一：大师锻造（{count}）",
+    "masterwrought": {
+      "slotsLabel": "大师锻造栏位：",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "大师锻造",
+      "tooltipWorn": "占用一个大师锻造栏位（已用{used}/{cap}）。",
+      "tooltipAtCap": "全部{cap}个大师锻造栏位均已占用。"
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2070,6 +2077,18 @@ export const zh_CN: EnTranslations = {
       "linkHint": "Shift + 点击可在聊天中链接该物品。"
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count}件杰作",
+        "few": "{count}件杰作",
+        "many": "{count}件杰作",
+        "other": "{count}件杰作"
+      },
+      "commissionLegendaries": {
+        "one": "{count}件传说物品",
+        "few": "{count}件传说物品",
+        "many": "{count}件传说物品",
+        "other": "{count}件传说物品"
+      },
       "guildMembers": {
         "one": "你是{rank}，{count}名成员",
         "few": "你是{rank}，{count}名成员",
@@ -2731,7 +2750,9 @@ export const zh_CN: EnTranslations = {
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（附魔）",
-      "enchantedFallback": "已附魔"
+      "enchantedFallback": "已附魔",
+      "perfectedBadge": "臻至完美",
+      "perfectingRank": "完美化：第{rank}阶，共{ranks}阶"
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
@@ -2748,7 +2769,8 @@ export const zh_CN: EnTranslations = {
       "masterwroughtIntermediate": "大师锻造制作部件。",
       "quickeningCatalyst": "制作催化剂。炼金术士每天只能制作一个。",
       "growthTonic": "农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。",
-      "deedOfMaking": "铭文契据。消耗后将一件已臻至完美的大师锻造作品提升为传说，并为其命名。"
+      "deedOfMaking": "铭文契据。消耗后将一件已臻至完美的大师锻造作品提升为传说，并为其命名。",
+      "wyrmfallCore": "大师锻造制作催化剂。团队副本与英雄地下城的最终首领每日各掉落一次，每次1到3个；每日首次通关A级或S级裂隙可获得1或2个；英雄军需官以英雄徽记出售。"
     },
     "discord": {
       "title": "Discord",
@@ -3623,6 +3645,7 @@ export const zh_CN: EnTranslations = {
       "recipeNotLearned": "你还没有学会这个配方。",
       "noBagSpace": "背包空间不足，无法存放制作的物品。",
       "dailyLimit": "该物品每天只能制作一次。",
+      "dailyLimitRetry": "该物品每天只能制作一次。{duration}后可再次制作。",
       "oncePerDay": "Once per day",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成长",
@@ -3632,6 +3655,12 @@ export const zh_CN: EnTranslations = {
       "stationBadge": "制作站",
       "stationOutOfRangeNamed": "前往{station}即可制作该物品。",
       "learnMoreAtStation": "{station}的{master}可以教你更多{craft}配方。",
+      "apexChip": "巅峰",
+      "apexPatternRaid": "其图样是团队副本中的稀有战利品。",
+      "apexPatternRift": "其图样可在高阶裂隙的胜利通关中获得。",
+      "apexPatternVendor": "英雄军需官出售其图样，需支付英雄徽记。",
+      "apexPatternDrop": "其图样可在世界中寻得。",
+      "perfectingLink": "完美化",
       "masterworkToast": "杰作！{name}",
       "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
       "legendaryLine": "{item}以{name}之名重生，成为传说！",
@@ -3727,6 +3756,7 @@ export const zh_CN: EnTranslations = {
       "replaceConfirmKeepsSigner": "制作者印记",
       "replaceConfirmKeepsMasterwork": "杰作加成",
       "replaceConfirmKeepsBond": "委托绑定",
+      "replaceConfirmKeepsPerfecting": "完美化",
       "replaceConfirmCost": "费用：{cost}",
       "replaceConfirmCostItem": "{name} {count} 个",
       "replaceConfirmAccept": "替换"
@@ -3776,6 +3806,42 @@ export const zh_CN: EnTranslations = {
       "noSpace": "背包空间不足，无法存放解绑后的物品。",
       "perfecting": "处于完美化过程中或已臻至完美的物品会保持绑定。"
     },
+    "perfecting": {
+      "title": "完美化",
+      "close": "关闭完美化窗口",
+      "openButton": "完美化",
+      "openButtonAria": "打开完美化窗口",
+      "empty": "你没有可完美化的大师锻造装备。巅峰配方可以打造一件。",
+      "wornChip": "已装备",
+      "rowRank": "第{rank}阶，共{ranks}阶",
+      "rowPerfected": "臻至完美",
+      "rowPromoted": "传说",
+      "attemptCost": "尝试费用",
+      "promoteCost": "晋升费用",
+      "matCount": "{have}/{required}",
+      "skillNeed": "需要{craft}技能{skill}点。",
+      "skillMet": "已满足。",
+      "skillUnmet": "未满足。",
+      "skillSyncing": "正在核对你的工艺技能。",
+      "bindWarn": "你的第一次完美化尝试会将{name}永久绑定给你。",
+      "bindWarnDetail": "完美化永不降阶：失败的尝试只会消耗材料。绑定后无法解绑，晋升亦不可撤销。",
+      "bindConfirmText": "第一次尝试会将{name}永久绑定给你。仍要尝试吗？",
+      "bindConfirmAccept": "绑定并尝试",
+      "bindConfirmCancel": "取消",
+      "attempt": "尝试完美化",
+      "promote": "命名并晋升",
+      "perfectedLead": "已臻至完美。为它命名，铸就传说。",
+      "promotedLine": "功成的传说：再无可完美之处。",
+      "equipBlocked": "晋升后你将无法装备它。请先卸下冲突的装备。",
+      "nameTitle": "为传说命名",
+      "nameLabel": "为{name}题写一个名字。该名字将永久保留。",
+      "nameInputAria": "传说之名",
+      "nameHint": "2到32个字符：英文字母、空格、撇号和连字符，且以英文字母开头。",
+      "nameCount": "{count}/{max}",
+      "nameSubmit": "铸就传说",
+      "nameSubmitBusy": "铸造中",
+      "nameCancel": "取消"
+    },
     "commissionBoard": {
       "title": "委托订单",
       "close": "关闭委托订单",
@@ -3800,6 +3866,7 @@ export const zh_CN: EnTranslations = {
       "rowFor": "{item}，委托人：{requester}",
       "rowTargeted": "{item}，委托人：{requester}（指定工匠：{crafter}）",
       "acceptedBy": "已由{name}接单",
+      "crafterRecordLabel": "工匠履历：",
       "statusOpen": "待接单",
       "statusAccepted": "已接单",
       "statusDelivered": "已交付",

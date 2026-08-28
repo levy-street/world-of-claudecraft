@@ -2041,6 +2041,13 @@ export const cs_CZ: EnTranslations = {
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "masterwrought": {
+      "slotsLabel": "Masterwrought slots:",
+      "slotsValue": "{used} / {cap}",
+      "pieceMark": "Masterwrought",
+      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipAtCap": "All {cap} Masterwrought slots are in use."
+    },
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2070,6 +2077,18 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
+      "commissionMasterworks": {
+        "one": "{count} masterwork",
+        "few": "{count} masterworks",
+        "many": "{count} masterworks",
+        "other": "{count} masterworks"
+      },
+      "commissionLegendaries": {
+        "one": "{count} legendary",
+        "few": "{count} legendaries",
+        "many": "{count} legendaries",
+        "other": "{count} legendaries"
+      },
       "guildMembers": {
         "one": "jste {rank}, {count} člen",
         "few": "jste {rank}, {count} členové",
@@ -2731,7 +2750,9 @@ export const cs_CZ: EnTranslations = {
       "riftUpgrade": "Vylepšení trhliny {level}/{max}",
       "riftSockets": "Trhlinové drahokamy {used}/{total}",
       "statEnchanted": "+{value} {stat} (okouzleno)",
-      "enchantedFallback": "Okouzlený"
+      "enchantedFallback": "Okouzlený",
+      "perfectedBadge": "Perfected",
+      "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
@@ -2748,7 +2769,8 @@ export const cs_CZ: EnTranslations = {
       "masterwroughtIntermediate": "Masterwrought crafting component.",
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
-      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name."
+      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
+      "wyrmfallCore": "Masterwrought crafting catalyst. Raid and heroic dungeon final bosses each drop 1 to 3 once per day, your first A or S rank rift clear of the day grants 1 or 2, and the Heroic Quartermaster sells one for Heroic Marks."
     },
     "discord": {
       "title": "Discord",
@@ -3623,6 +3645,7 @@ export const cs_CZ: EnTranslations = {
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
       "noBagSpace": "Nemáš místo pro vyrobený předmět.",
       "dailyLimit": "You can only craft that once per day.",
+      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
       "oncePerDay": "Once per day",
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
@@ -3632,6 +3655,12 @@ export const cs_CZ: EnTranslations = {
       "stationBadge": "Stanice",
       "stationOutOfRangeNamed": "Chcete-li to vytvořit, přejděte do {station}.",
       "learnMoreAtStation": "{master} na {station} tě může naučit více receptů {craft}.",
+      "apexChip": "Apex",
+      "apexPatternRaid": "Its pattern is a rare raid trophy.",
+      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
+      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
+      "apexPatternDrop": "Its pattern is found in the world.",
+      "perfectingLink": "Perfecting",
       "masterworkToast": "Mistrovské dílo! {name}",
       "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
       "legendaryLine": "{item} is reborn as {name}, a legend!",
@@ -3727,6 +3756,7 @@ export const cs_CZ: EnTranslations = {
       "replaceConfirmKeepsSigner": "Značka výrobce",
       "replaceConfirmKeepsMasterwork": "Bonus mistrovského díla",
       "replaceConfirmKeepsBond": "Vazba zakázky",
+      "replaceConfirmKeepsPerfecting": "Perfecting",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Nahradit"
@@ -3776,6 +3806,42 @@ export const cs_CZ: EnTranslations = {
       "noSpace": "Nemáš místo pro odpoutaný předmět.",
       "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
     },
+    "perfecting": {
+      "title": "Perfecting",
+      "close": "Close the Perfecting window",
+      "openButton": "Perfecting",
+      "openButtonAria": "Open the Perfecting window",
+      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
+      "wornChip": "Worn",
+      "rowRank": "Rank {rank} of {ranks}",
+      "rowPerfected": "Perfected",
+      "rowPromoted": "Legendary",
+      "attemptCost": "Attempt cost",
+      "promoteCost": "Promotion cost",
+      "matCount": "{have} of {required}",
+      "skillNeed": "Needs {craft} skill {skill}.",
+      "skillMet": "Met.",
+      "skillUnmet": "Not met.",
+      "skillSyncing": "Checking your craft skill.",
+      "bindWarn": "Your first perfecting attempt permanently binds {name} to you.",
+      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A bound piece cannot be unbound, and a promotion is permanent.",
+      "bindConfirmText": "Your first attempt permanently binds {name} to you. Attempt anyway?",
+      "bindConfirmAccept": "Bind and Attempt",
+      "bindConfirmCancel": "Cancel",
+      "attempt": "Attempt Perfecting",
+      "promote": "Name and Promote",
+      "perfectedLead": "Perfected. Give it a name to forge a legend.",
+      "promotedLine": "A finished legend: nothing left to perfect.",
+      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
+      "nameTitle": "Name the Legend",
+      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
+      "nameInputAria": "Legendary name",
+      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
+      "nameCount": "{count} of {max}",
+      "nameSubmit": "Forge the Legend",
+      "nameSubmitBusy": "Forging",
+      "nameCancel": "Cancel"
+    },
     "commissionBoard": {
       "title": "Zakázky",
       "close": "Zavřít zakázky",
@@ -3800,6 +3866,7 @@ export const cs_CZ: EnTranslations = {
       "rowFor": "{item} pro {requester}",
       "rowTargeted": "{item} pro {requester} (pro {crafter})",
       "acceptedBy": "Přijato: {name}",
+      "crafterRecordLabel": "Crafter's record:",
       "statusOpen": "Otevřeno",
       "statusAccepted": "Přijato",
       "statusDelivered": "Doručeno",

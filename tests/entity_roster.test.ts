@@ -149,6 +149,7 @@ function makeCtx() {
     utcDay: '',
     resetDay: '',
     eventLeadDay: '',
+    dailyResetRemainingSec: 0,
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),

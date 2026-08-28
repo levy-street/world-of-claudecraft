@@ -13,6 +13,11 @@ import {
 } from '../src/sim/professions/disenchant_reagents';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
 import {
+  WYRMFALL_BOSS_MAX,
+  WYRMFALL_BOSS_MIN,
+  WYRMFALL_RIFT_COUNT,
+} from '../src/sim/professions/masterwrought_materials';
+import {
   baseMaterialFor,
   MATERIAL_GRADES,
   materialGradeIds,
@@ -59,12 +64,18 @@ const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
 // because the final Perfecting rank consumes it, so the purpose line is the
 // one place its tooltip says what it is for (the growth_tonic precedent).
 const PROMOTION_WRIT_HINT_IDS = ['deed_of_making'];
+// The apex catalyst (Masterwrought phase 14 UX pass): the Wyrmfall Core is
+// kind 'junk' with no def-level use, and unlike the intermediates its whole
+// point is WHERE it comes from, so its line names the faucets
+// (masterwrought_materials.ts) and is pinned to that module's constants below.
+const APEX_CATALYST_HINT_IDS = ['wyrmfall_core'];
 const EXPECTED_IDS = [
   ...ENCHANTING_IDS,
   ...FINE_IDS,
   ...MASTERWROUGHT_IDS,
   ...FARM_SUPPLY_HINT_IDS,
   ...PROMOTION_WRIT_HINT_IDS,
+  ...APEX_CATALYST_HINT_IDS,
 ].sort();
 
 describe('material_hint_view', () => {
@@ -156,6 +167,24 @@ describe('material_hint_view', () => {
     expect(materialHintLine('resonant_links')).toContain('mail armor');
     expect(materialHintLine('resonant_steel')).toContain('melee weapons');
     expect(materialHintLine('resonant_timber')).toContain('staves');
+  });
+
+  it('the wyrmfall core line names its faucets with the live income constants', () => {
+    // Written from src/sim/professions/masterwrought_materials.ts: the line's
+    // numbers are pinned to the module's own constants so a faucet retune
+    // fails here instead of shipping a stale sentence. "1 to 3" is the
+    // per-source daily boss roll; "1 or 2" is the deterministic A/S rift
+    // first-clear pair, in rank order.
+    const line = materialHintLine('wyrmfall_core');
+    expect(line).toContain('class="tt-desc"');
+    expect(line).toContain(`drop ${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} once per day`);
+    expect(line).toContain(`grants ${WYRMFALL_RIFT_COUNT.A} or ${WYRMFALL_RIFT_COUNT.S}`);
+    expect(line).toContain('A or S rank rift');
+    expect(line).toContain('Heroic Quartermaster');
+    expect(line).toContain('Heroic Marks');
+    // Craft-free lead scoping (the intermediates rule): the lead must not
+    // claim a single craft, because the Used-by line names the consumers.
+    expect(line).not.toContain('Enchanting reagent.');
   });
 
   it('every enchanting-hinted material is really consumed by at least one enchant', () => {

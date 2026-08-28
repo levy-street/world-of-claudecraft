@@ -465,6 +465,91 @@ describe('determinism', () => {
   });
 });
 
+describe('the refusal countdown (Masterwrought phase 14, retryAfterSeconds)', () => {
+  it('a daily_limit refusal on a live calendar carries the host-fed countdown', () => {
+    const sim = makeSim();
+    sim.resetDay = DAY_ONE;
+    sim.dailyResetRemainingSec = 4321;
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    sim.drainEvents();
+
+    sim.craftItem(RECIPE_ID, false, pid, 1);
+    const events = sim.drainEvents().filter((ev) => ev.type === 'craftResult');
+    expect(events).toHaveLength(1);
+    const refusal = events[0] as { reason?: string; retryAfterSeconds?: number };
+    expect(refusal.reason).toBe('daily_limit');
+    expect(refusal.retryAfterSeconds).toBe(4321);
+    // The lastCraftResult mirror carries it too (the IWorld read is the
+    // convergence arm), still refusal-time only.
+    const meta = sim.players.get(pid) as PlayerMeta;
+    expect(meta.lastCraftResult?.retryAfterSeconds).toBe(4321);
+  });
+
+  it('the batch auto-continue refusal carries the same countdown', () => {
+    const sim = makeSim(12);
+    sim.resetDay = DAY_ONE;
+    sim.dailyResetRemainingSec = 777;
+    const pid = rigCrafter(sim, 2);
+    const p = (sim as any).entities.get(pid);
+    const meta = sim.players.get(pid) as PlayerMeta;
+    p.craftCastRecipeId = RECIPE_ID;
+    p.craftCastCommission = false;
+    p.craftCastBatchRemaining = 2;
+    p.craftCastBatchTotal = 2;
+    sim.ctx.completeCraftCast(p, meta);
+    const events = sim.drainEvents().filter((ev) => ev.type === 'craftResult') as {
+      ok: boolean;
+      retryAfterSeconds?: number;
+    }[];
+    expect(events.map((ev) => ev.ok)).toEqual([true, false]);
+    expect(events[0].retryAfterSeconds).toBeUndefined();
+    expect(events[1].retryAfterSeconds).toBe(777);
+  });
+
+  it('a calendar-less host attaches nothing: no false promise on the one-shot degrade', () => {
+    const sim = makeSim();
+    // resetDay stays '' and dailyResetRemainingSec stays 0 (the birth
+    // defaults: a headless or replay host feeds neither).
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    sim.drainEvents();
+    sim.craftItem(RECIPE_ID, false, pid, 1);
+    const events = sim.drainEvents().filter((ev) => ev.type === 'craftResult');
+    expect((events[0] as { retryAfterSeconds?: number }).retryAfterSeconds).toBeUndefined();
+    // Byte-shape too: the serialized event (what the wire would carry) has no
+    // countdown key at all, so pre-phase payloads stay byte-identical.
+    expect(JSON.stringify(events[0])).not.toContain('retryAfterSeconds');
+  });
+
+  it('a live resetDay with an unfed countdown (0) still attaches nothing', () => {
+    const sim = makeSim();
+    sim.resetDay = DAY_ONE;
+    expect(sim.dailyResetRemainingSec).toBe(0);
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    sim.drainEvents();
+    sim.craftItem(RECIPE_ID, false, pid, 1);
+    const events = sim.drainEvents().filter((ev) => ev.type === 'craftResult');
+    expect((events[0] as { retryAfterSeconds?: number }).retryAfterSeconds).toBeUndefined();
+  });
+
+  it('a fed countdown with the one-shot degrade (resetDay empty) attaches nothing', () => {
+    // The false-promise guard's own arm: remaining seconds without a live
+    // window key would promise a reopening that never comes, so the attach
+    // requires BOTH halves of the calendar.
+    const sim = makeSim();
+    sim.dailyResetRemainingSec = 900;
+    const pid = rigCrafter(sim, 2);
+    craftOnce(sim, pid);
+    sim.drainEvents();
+    sim.craftItem(RECIPE_ID, false, pid, 1);
+    const events = sim.drainEvents().filter((ev) => ev.type === 'craftResult');
+    expect((events[0] as { reason?: string }).reason).toBe('daily_limit');
+    expect((events[0] as { retryAfterSeconds?: number }).retryAfterSeconds).toBeUndefined();
+  });
+});
+
 describe('batch (shift-craft) never overpromises', () => {
   it('maxCraftCountForRecipe previews at most 1, and 0 once stamped', () => {
     const sim = makeSim(11);

@@ -185,3 +185,28 @@ export function eventLeadDayKey(
 ): string {
   return resetDayKey(nowMs + DOUBLE_HONOR_LEAD_MS, zone);
 }
+
+// Whole seconds until the reset that CLOSES the current window (Masterwrought
+// phase 14, the daily-gate refusal countdown): the when-half of resetDayKey,
+// fed to the sim beside it so a daily_limit refusal can tell the player when
+// the gate reopens. Runs in the 20 Hz loop like resetDayKey, so the resolved
+// INSTANT is memoized per (window, zone): within one window it is a constant,
+// and nextRaidResetMs builds several Intl.DateTimeFormat instances per call.
+// Still pure in (instant, zone); ceil'd and floored at 1 so a caller never
+// reads 0 (the sim's "no calendar" sentinel) from a live realm clock.
+const NEXT_RESET_MEMO_MAX = 16;
+const nextResetMemo = new Map<string, number>();
+
+export function dailyResetRemainingSec(
+  nowMs: number,
+  zone: string = DEFAULT_RAID_RESET_TIME_ZONE,
+): number {
+  const memoKey = `${resetDayKey(nowMs, zone)}:${zone}`;
+  let resetAt = nextResetMemo.get(memoKey);
+  if (resetAt === undefined) {
+    resetAt = nextRaidResetMs(nowMs, zone);
+    if (nextResetMemo.size >= NEXT_RESET_MEMO_MAX) nextResetMemo.clear();
+    nextResetMemo.set(memoKey, resetAt);
+  }
+  return Math.max(1, Math.ceil((resetAt - nowMs) / 1000));
+}

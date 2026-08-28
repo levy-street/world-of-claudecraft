@@ -23,6 +23,10 @@ export interface CraftDenialLine {
   /** Present only for a resolvable station_required denial: the caller
    *  renders the named stationRequired line with this type. */
   stationType?: StationType;
+  /** Present only for a daily_limit denial whose event carried a valid
+   *  retryAfterSeconds countdown (Masterwrought phase 14): the caller renders
+   *  the dailyLimitRetry line's {duration} from this via duration_text.ts. */
+  retrySeconds?: number;
 }
 
 /** Every reason's key, as an EXHAUSTIVE Record (review round): a tenth
@@ -53,13 +57,26 @@ export const DENIAL_KEY_BY_REASON: Record<NonNullable<CraftDenialReason>, Transl
 /** The chat-line model for one craftResult denial. `recipeStationType` is the
  *  denied recipe's stationType from static content; it is read only for the
  *  station_required arm. An absent reason reads as the generic materials
- *  line, the historical fall-through. */
+ *  line, the historical fall-through. `retryAfterSeconds` is the daily-gate
+ *  refusal countdown off the event (phase 14): a daily_limit denial carrying
+ *  a valid positive figure upgrades to the dailyLimitRetry line; malformed or
+ *  absent values (an older or calendar-less host) keep the plain line, so no
+ *  wire shape can render "{duration}" empty or wrong. */
 export function craftDenialLine(
   reason: CraftDenialReason,
   recipeStationType: StationType | undefined,
+  retryAfterSeconds?: number,
 ): CraftDenialLine {
   if (reason === 'station_required' && recipeStationType) {
     return { key: 'hudChrome.crafting.stationRequired', stationType: recipeStationType };
+  }
+  if (
+    reason === 'daily_limit' &&
+    typeof retryAfterSeconds === 'number' &&
+    Number.isFinite(retryAfterSeconds) &&
+    retryAfterSeconds > 0
+  ) {
+    return { key: 'hudChrome.crafting.dailyLimitRetry', retrySeconds: retryAfterSeconds };
   }
   return {
     key: reason ? DENIAL_KEY_BY_REASON[reason] : 'hudChrome.crafting.insufficientMaterials',

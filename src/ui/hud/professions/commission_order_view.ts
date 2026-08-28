@@ -27,6 +27,12 @@ export interface CommissionOrderRowModel {
   crafterName?: string;
   status: CommissionOrderStatus;
   acceptedByName?: string;
+  /** The accepter's craft record line (Masterwrought phase 14, the quality
+   *  signal): present only when the row should RENDER it, i.e. the order is
+   *  accepted (or delivered: the record stays honest on the closing row) AND
+   *  the wire actually carried the snapshot (absent from a pre-signal
+   *  server, so no row ever invents a zero). */
+  crafterRecord?: { masterworks: number; legendaries: number };
   canCancel: boolean;
   canAccept: boolean;
   canDeliver: boolean;
@@ -56,10 +62,24 @@ interface RecipeLike {
   resultItemId: string;
 }
 
+/** The record renders on rows a crafter is COMMITTED to (accepted, and the
+ *  delivered close-out while it lingers in retention), never on open or
+ *  never-accepted terminal rows, and only when both numbers actually rode the
+ *  wire (a pre-signal server sends neither; half a snapshot is treated as
+ *  none rather than inventing a zero for the missing half). */
+function crafterRecordFor(
+  o: CommissionOrderView,
+): CommissionOrderRowModel['crafterRecord'] | undefined {
+  if (o.status !== 'accepted' && o.status !== 'delivered') return undefined;
+  if (o.crafterMasterworks === undefined || o.crafterLegendaries === undefined) return undefined;
+  return { masterworks: o.crafterMasterworks, legendaries: o.crafterLegendaries };
+}
+
 function toRowModel(
   o: CommissionOrderView,
   items: Record<string, ItemDef>,
 ): CommissionOrderRowModel {
+  const crafterRecord = crafterRecordFor(o);
   return {
     id: o.id,
     recipeId: o.recipeId,
@@ -70,6 +90,7 @@ function toRowModel(
     crafterName: o.crafterName,
     status: o.status,
     acceptedByName: o.acceptedByName,
+    ...(crafterRecord ? { crafterRecord } : {}),
     canCancel: o.mine && o.status === 'open',
     canAccept: !o.mine && o.status === 'open',
     canDeliver: o.mineToCraft && o.status === 'accepted',

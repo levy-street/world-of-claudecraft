@@ -125,9 +125,13 @@ describe('the hud switch consumes the bundle decisions (source pins)', () => {
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '');
 
-  it('both legendary arms gate the achievement cue on playCue, never inline', () => {
-    const arms = hud.match(/if \(l\.playCue\) audio\.achievement\(\);/g);
-    expect(arms).toHaveLength(2);
+  it('both legendary arms gate their cue on playCue, never inline', () => {
+    // Phase 14 gave the personal arm its own capstone cue (the dedicated
+    // ui_legendary_forged recording, professions_audio_wiring.test.ts); the
+    // zone arm keeps the achievement chime, inert behind playCue false by the
+    // bundle's legendaryZoneLine contract. Both stay playCue-gated.
+    expect(hud.match(/if \(l\.playCue\) audio\.legendaryForged\(\);/g)).toHaveLength(1);
+    expect(hud.match(/if \(l\.playCue\) audio\.achievement\(\);/g)).toHaveLength(1);
   });
 
   it('both legendary log calls opt out of chat item-link parsing (plainText)', () => {

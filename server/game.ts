@@ -333,7 +333,7 @@ import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { parsePerfectItemRef, resolvePerfectItemName } from './perfect_item_ref';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
-import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
+import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -345,6 +345,7 @@ import {
   createKeyedSerialWriter,
   createSerialWriter,
 } from './serial_writer';
+import { feedRealmCalendar } from './sim_calendar_feed';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -2544,18 +2545,9 @@ export class GameServer {
           last = now;
           if (dt > 0.5) dt = 0.5;
           acc += dt;
-          // Feed the authoritative calendar to the sim so its daily windows work
-          // without the sim reading the wall clock itself (determinism invariant).
-          // Three values, three questions: `utcDay` stamps WHEN something happened
-          // (the deed earn date), `resetDay` is the daily-rollover window,
-          // derived from this realm's own reset boundary so the first
-          // battleground win of the day turns over with the raid lockouts rather
-          // than at midnight UTC (5 PM Pacific, mid-evening), and `eventLeadDay`
-          // is the weekend event's early-open probe of the same boundary.
-          const calendarNowMs = Date.now();
-          this.sim.utcDay = new Date(calendarNowMs).toISOString().slice(0, 10);
-          this.sim.resetDay = resetDayKey(calendarNowMs, REALM_RESET_TIME_ZONE);
-          this.sim.eventLeadDay = eventLeadDayKey(calendarNowMs, REALM_RESET_TIME_ZONE);
+          // Feed the authoritative realm calendar to the sim (the sim never
+          // reads the wall clock itself; rationale in sim_calendar_feed.ts).
+          feedRealmCalendar(this.sim, Date.now(), REALM_RESET_TIME_ZONE);
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
           this.selfWireNs.clear();

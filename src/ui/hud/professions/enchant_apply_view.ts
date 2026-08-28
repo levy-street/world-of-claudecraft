@@ -458,7 +458,7 @@ export function enchantSectionsForReagent(
  *  confirm dialog states these because the likeliest user of that dialog is
  *  holding a signed masterwork piece and cannot otherwise tell whether their
  *  signature and masterwork bonus survive the swap. */
-export type EnchantPreservedTrait = 'signer' | 'masterwork' | 'bond';
+export type EnchantPreservedTrait = 'signer' | 'masterwork' | 'bond' | 'perfecting';
 
 /** The localized label key for one preserved trait: its first render sink, the
  *  enchantNameKey contract. `bond` deliberately covers BOTH bind states with
@@ -472,6 +472,15 @@ const PRESERVED_TRAIT_KEYS: Record<EnchantPreservedTrait, TranslationKey> = {
   signer: 'hudChrome.enchanting.replaceConfirmKeepsSigner',
   masterwork: 'hudChrome.enchanting.replaceConfirmKeepsMasterwork',
   bond: 'hudChrome.enchanting.replaceConfirmKeepsBond',
+  // Phase 14, the bond doctrine one trait over: ONE label for the whole
+  // Perfecting family (a head-started copy's rank walk AND a Perfected copy's
+  // stamp with its R5 bonus), because the swap leaves every one of those
+  // fields alone (replacedEnchantPayloadFor rewrites only rolled.stats and
+  // the enchant marker, and its marker-arm peel subtracts only the old
+  // enchant's own share, so the Perfecting bonus baked beneath it survives
+  // exactly; the legacy wholesale-wipe arm is unreachable for these copies,
+  // isEnchantedInstance excludes a bare-stats `perfected` payload).
+  perfecting: 'hudChrome.enchanting.replaceConfirmKeepsPerfecting',
 };
 
 /** Every trait, in the order preservedReplaceTraits emits them. DERIVED from
@@ -521,6 +530,13 @@ export function preservedReplaceTraits(
   if (victim.rolled?.masterwork === true) traits.push('masterwork');
   if (wireTrimmed) return traits;
   if (victim.boundTo !== undefined || victim.bindOnTrade === true) traits.push('bond');
+  // The Perfecting family (phase 14): the `perfected` stamp, or a live rank
+  // walk (`perfecting`, presence-tested like boundTo: the payload contract
+  // keeps it in [1, PERFECTING_RANKS - 1], and over-narrowing here would
+  // silently drop the promise on a copy the swap still preserves). Below the
+  // trim gate with the bond: the eqi peer projection never carries either
+  // field, so a trimmed reader must not promise what it cannot see.
+  if (victim.perfected === true || victim.perfecting !== undefined) traits.push('perfecting');
   return traits;
 }
 

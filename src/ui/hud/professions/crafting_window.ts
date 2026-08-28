@@ -34,6 +34,7 @@ import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
+import { type ApexPatternChannel, apexRecipePresentation } from './apex_recipe_view';
 import {
   type CraftButtonState,
   type CraftCastSessionView,
@@ -92,6 +93,17 @@ export function stationNameText(type: StationType): string {
   return t(STATION_NAME_KEY[type]);
 }
 
+// The pattern-provenance lines (deliverable C): where a KNOWN apex recipe's
+// pattern came from, keyed by the content-derived channel (apex_recipe_view).
+// Text like every other actionable line here: never color-only, folded into
+// the aria name and the tooltip alike.
+const APEX_CHANNEL_KEY: Record<Exclude<ApexPatternChannel, null>, TranslationKey> = {
+  raid: 'hudChrome.crafting.apexPatternRaid',
+  rift: 'hudChrome.crafting.apexPatternRift',
+  vendor: 'hudChrome.crafting.apexPatternVendor',
+  drop: 'hudChrome.crafting.apexPatternDrop',
+};
+
 export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   /** Start a craft (or batch) for `recipeId` with the given count (clamped in sim). */
@@ -100,6 +112,11 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   /** Opens the commission order board (issue #1298), the crafting window's
    *  one entry point to it: a header button beside the close button. */
   onOpenOrders(): void;
+  /** Opens the Perfecting window (Masterwrought phase 14): the sibling
+   *  title-bar button beside the orders one, plus the subtle per-row link on
+   *  apex GEAR recipes. Optional so painter rigs without the window stay
+   *  valid; when absent, neither affordance renders. */
+  onOpenPerfecting?(): void;
   /** Commission opt-in state (Professions 2.0), held by the HUD so
    *  it survives the window's staleness repaints: whether `recipeId` is
    *  currently opted in, and the toggle callback the per-row checkbox fires.
@@ -170,8 +187,16 @@ export function renderCraftingWindow(
   const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
   const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
   const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  // The Perfecting entry rides the commission-board precedent: a sibling
+  // title-bar button, rendered only when the composition wires the window.
+  const perfectingBtn = deps.onOpenPerfecting
+    ? `<button type="button" class="crafting-orders-btn crafting-perfecting-btn" data-open-perfecting data-skip-open-focus data-focus-key="perfecting" aria-label="${esc(t('hudChrome.perfecting.openButtonAria'))}">${esc(t('hudChrome.perfecting.openButton'))}</button>`
+    : '';
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span>${perfectingBtn}<button type="button" class="crafting-orders-btn" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
   el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
+  el.querySelector('[data-open-perfecting]')?.addEventListener('click', () =>
+    deps.onOpenPerfecting?.(),
+  );
 
   if (identity) renderProfessionIdentityCard(el, identity);
 
@@ -426,13 +451,31 @@ export function renderCraftingWindow(
       const dailyChipHtml = dailyLabel
         ? ` <span class="crafting-duration-chip crafting-daily-chip">${esc(dailyLabel)}</span>`
         : '';
+      // The apex treatment (Masterwrought phase 14, deliverable C): a
+      // restrained gold-edged chip, the pattern-provenance line, and (for
+      // Perfecting-track gear) the subtle link to the Perfecting window. All
+      // decisions are content-derived in apex_recipe_view.ts; the row already
+      // renders only for KNOWN recipes, so nothing here reveals a pattern the
+      // viewer has not learned.
+      const apex = apexRecipePresentation(row.recipeId, row.resultItemId, row.skillReq);
+      const apexLabel = apex.apex ? t('hudChrome.crafting.apexChip') : '';
+      const apexChipHtml = apexLabel
+        ? ` <span class="crafting-duration-chip crafting-apex-chip">${esc(apexLabel)}</span>`
+        : '';
+      const apexProvenance = apex.channel !== null ? t(APEX_CHANNEL_KEY[apex.channel]) : '';
+      const apexLineHtml = apexProvenance
+        ? `<span class="vi-sub crafting-apex-line">${esc(apexProvenance)}</span>`
+        : '';
+      const apexAccessible = apexLabel
+        ? `. ${apexLabel}${apexProvenance ? `. ${apexProvenance}` : ''}`
+        : '';
 
       // The result icon sits in a fixed socket whose glow derives from the
       // item's quality color (the showcase paperdoll idiom, quality_glow.ts);
       // the icon img keeps its own .q-* quality border class.
       const icon = row.result ? deps.itemIcon(row.result) : '';
       const glow = row.result?.quality ? qualityGlowShadow(QUALITY_COLOR[row.result.quality]) : '';
-      const socket = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${icon}</span>`;
+      const socket = `<span class="crafting-recipe-socket${apex.apex ? ' apex' : ''}"${glow ? ` style="box-shadow:${glow}"` : ''}>${icon}</span>`;
       const btnState: CraftButtonState = craftButtonState(row, session);
       const canCraft = craftButtonEnabled(btnState);
       const castingActive = session.active;
@@ -451,7 +494,7 @@ export function renderCraftingWindow(
       // Duration is actionable pace info (fairness): always in the name, never color-only.
       craftBtn.setAttribute(
         'aria-label',
-        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}${craftFeeAccessible}. ${skillLine}. ${difficultyLabel}${stationAccessible}${dailyAccessible}${comboAccessible}`,
+        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}${craftFeeAccessible}. ${skillLine}. ${difficultyLabel}${stationAccessible}${dailyAccessible}${apexAccessible}${comboAccessible}`,
       );
       const resultCountSuffix =
         row.resultCount > 1
@@ -469,14 +512,14 @@ export function renderCraftingWindow(
       const craftFeeHtml = craftFeeLine
         ? `<span class="vi-sub crafting-fee-line">${esc(craftFeeLine)}</span>`
         : '';
-      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span>${craftFeeHtml}<span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span>${dailyChipHtml}</span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
+      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span>${craftFeeHtml}<span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span>${dailyChipHtml}${apexChipHtml}</span>${apexLineHtml}</span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
       craftBtn.addEventListener('click', () => {
         if (canCraft) deps.onCraft(row.recipeId, qty);
       });
       deps.attachTooltip(
         craftBtn,
         () =>
-          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div>${craftFeeLine ? `<div class="tt-sub">${esc(craftFeeLine)}</div>` : ''}<div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${dailyLabel ? `<div class="tt-sub">${esc(dailyLabel)}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
+          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div>${craftFeeLine ? `<div class="tt-sub">${esc(craftFeeLine)}</div>` : ''}<div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${dailyLabel ? `<div class="tt-sub">${esc(dailyLabel)}</div>` : ''}${apexProvenance ? `<div class="tt-sub">${esc(apexLabel)} ${esc(apexProvenance)}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
 
@@ -557,6 +600,21 @@ export function renderCraftingWindow(
         deps.onCraft(row.recipeId, all);
       });
       batchRow.appendChild(createAllBtn);
+      // The subtle Perfecting affordance on apex GEAR rows (deliverable C):
+      // its own control in the batch row, never nested inside the craft
+      // button (a nested interactive is the axe violation the party slivers
+      // already document).
+      if (apex.perfectingTrack && deps.onOpenPerfecting) {
+        const perfectingLink = document.createElement('button');
+        perfectingLink.type = 'button';
+        perfectingLink.className = 'crafting-perfecting-link';
+        perfectingLink.dataset.focusKey = `perfecting:${row.recipeId}`;
+        perfectingLink.textContent = t('hudChrome.crafting.perfectingLink');
+        // WCAG 2.5.3: the accessible name contains the visible label.
+        perfectingLink.setAttribute('aria-label', t('hudChrome.perfecting.openButtonAria'));
+        perfectingLink.addEventListener('click', () => deps.onOpenPerfecting?.());
+        batchRow.appendChild(perfectingLink);
+      }
       item.appendChild(batchRow);
       // Commission opt-in (the Maker's Bond): a per-recipe pill toggle-chip
       // in the card's chip language, right-aligned in the card footer so it
