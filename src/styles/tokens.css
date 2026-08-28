@@ -173,9 +173,9 @@
        #ff8000 lifts to #ffab5e); poor is lifted to a brighter grey for
        legibility on the same ground, and common and uncommon are softened
        off the pure white and green so a name reads as text rather than a
-       glare. Scoped to name text and the Perfecting track's promoted fill on
-       purpose: the icon border and every other surface stay on the shared
-       palette (icons.ts). */
+       glare. Scoped to name text and the Perfecting track's promoted fill and
+       label on purpose: the icon border and every other surface stay on the
+       shared palette (icons.ts). */
     --mkt-name-poor: #b8b8b8;
     --mkt-name-common: #f2efe6;
     --mkt-name-uncommon: #7fc98f;

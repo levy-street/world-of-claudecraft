@@ -503,10 +503,13 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 0, itemId: APEX });
   });
 
-  it('keyboard focus on the selected row follows the copy across the shift', () => {
-    // The candidate rows are keyed by copy identity (item id plus ordinal),
-    // so the focus carry lands on the followed copy's rebuilt row, never on
-    // Close and never on the sibling that took the old cell.
+  // Focus across the shift. The candidate rows are keyed by copy identity
+  // (item id plus ordinal and same-id count), and the restore ladder falls to
+  // the checked row before Close. The two arms below each isolate ONE half:
+  // the key-only arm focuses an UNSELECTED row (the rung alone would land on
+  // the checked row), the rung-only arm splices the focused copy OUT (the key
+  // alone would land on Close).
+  const focusWorld = () => {
     world.equipment = {};
     world.equipmentInstances = {};
     world.inventory = [
@@ -517,17 +520,92 @@ describe('the aria-busy send-once lifecycle', () => {
       { itemId: 'sundered_essence', count: 2 },
       { itemId: 'prismglass_setting', count: 3 },
     ];
+  };
+  const rowWithRank = (rank: number): HTMLElement =>
+    [...root().querySelectorAll('.pf-cand')].find((r) =>
+      r.textContent?.includes(`Rank ${rank} of 4`),
+    ) as HTMLElement;
+
+  it('keyboard focus on an UNSELECTED row follows that copy across the shift (the identity key)', () => {
+    focusWorld();
     const win = makeWindow();
     win.open();
-    const selectedRow = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
-    selectedRow.focus();
-    expect(document.activeElement).toBe(selectedRow);
+    expect(checkedRef()).toContain('Rank 1 of 4');
+    const siblingRow = rowWithRank(3);
+    siblingRow.focus();
+    expect(document.activeElement).toBe(siblingRow);
     world.inventory.splice(0, 1);
     vi.advanceTimersByTime(1000);
-    const rebuilt = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
-    expect(rebuilt).not.toBe(selectedRow);
-    expect(rebuilt.textContent).toContain('Rank 1 of 4');
-    expect(document.activeElement).toBe(rebuilt);
+    const rebuiltSibling = rowWithRank(3);
+    expect(rebuiltSibling).not.toBe(siblingRow);
+    expect(rebuiltSibling.getAttribute('aria-checked')).toBe('false');
+    expect(document.activeElement).toBe(rebuiltSibling);
+  });
+
+  it('keyboard focus on a copy that LEFT the bag lands on the checked row, never Close (the ladder rung)', () => {
+    focusWorld();
+    const win = makeWindow();
+    win.open();
+    const siblingRow = rowWithRank(3);
+    siblingRow.focus();
+    // The focused copy is sold: its identity is gone (and every same-id
+    // identity moved with the count), so the keyed rung misses and the
+    // ladder must stop at the checked row rather than on Close.
+    world.inventory.splice(2, 1);
+    vi.advanceTimersByTime(1000);
+    const checked = root().querySelector('.pf-cand[aria-checked="true"]') as HTMLElement;
+    expect(checked.textContent).toContain('Rank 1 of 4');
+    expect(document.activeElement).toBe(checked);
+    expect(document.activeElement).not.toBe(root().querySelector('[data-close]'));
+  });
+
+  it('a same-id departure never hops focus onto a sibling (the identity carries the count)', () => {
+    // [cloth, A rank 1, B rank 2, C rank 3]: A selected, focus on B. A is
+    // sold in the poll window, so B is ordinal 0 and C ordinal 1 of a count
+    // of 2: an ordinal-only key would match C's rebuilt row and move focus
+    // there silently; with the count in the key the carry misses and the
+    // ladder lands on the checked row, which is B (the exact match on the
+    // vacated cell, the recorded same-id class), never C.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'linen_cloth', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: 'makers_ember', count: 2 },
+    ];
+    const win = makeWindow();
+    win.open();
+    rowWithRank(2).focus();
+    world.inventory.splice(1, 1);
+    vi.advanceTimersByTime(1000);
+    expect((document.activeElement as HTMLElement).textContent).toContain('Rank 2 of 4');
+    expect((document.activeElement as HTMLElement).textContent).not.toContain('Rank 3 of 4');
+  });
+
+  it('a click landing after a shift with three same-id copies selects the CLICKED copy', () => {
+    // [ember x1, A, B, C]: painted B is {bag:2}; the ember stack vanishes
+    // before the click, so cell 2 now holds C. Cell-first resolution would
+    // select C; the clicked copy's own anchor {1, 3} names B.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: 'linen_cloth', count: 1 },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 1 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } },
+      { itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 3 } },
+      { itemId: 'makers_ember', count: 2 },
+      { itemId: 'sundered_essence', count: 2 },
+      { itemId: 'prismglass_setting', count: 3 },
+    ];
+    const win = makeWindow();
+    win.open();
+    world.inventory.splice(0, 1);
+    rowWithRank(2).click();
+    expect(checkedRef()).toContain('Rank 2 of 4');
+    (root().querySelector('[data-action]') as HTMLButtonElement).click();
+    expect(world.perfectItem).toHaveBeenLastCalledWith({ bag: 1, itemId: APEX });
   });
 
   it('a bagged pick survives a close when its exact cell still holds the copy', () => {

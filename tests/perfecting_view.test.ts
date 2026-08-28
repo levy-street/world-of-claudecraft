@@ -516,6 +516,11 @@ describe('the selection anchor (a bagged selection follows its copy across a bag
     expect(sameSelectedCopy(prevA, { bag: 0, itemId: APEX_BAGGED }, { ordinal: 0, count: 1 })).toBe(
       false,
     );
+    // ... and even at the SAME cell: a copy that kept its cell while a
+    // same-id sibling above it left in the same poll window is the same
+    // ambiguity as the hijack (the cell is no witness), so the gate refuses
+    // and one landed edge goes uncued: the deliberate safe direction.
+    expect(sameSelectedCopy(prevA, a, { ordinal: 0, count: 1 })).toBe(false);
     // Different ids never match; worn refs compare by slot; a bagged pair
     // without anchors compares by cell.
     expect(sameSelectedCopy({ ref: a, anchor: null }, { bag: 1, itemId: APEX_WORN }, null)).toBe(

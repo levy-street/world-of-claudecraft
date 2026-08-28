@@ -56,9 +56,10 @@ export interface PerfectingCandidate {
   itemId: string;
   worn: boolean;
   /** A stable copy identity for the painter's focus carry: a worn slot, or
-   *  the item id plus the copy's ordinal among same-id bagged candidates,
-   *  which survives the bag shift the cell index does not (the same identity
-   *  the selection anchor follows). */
+   *  the item id plus the copy's (ordinal, count) among same-id bagged
+   *  candidates, which survives the bag shift the cell index does not and
+   *  changes exactly when the selection anchor stands down (a same-id
+   *  departure or arrival moves the count). */
   identity: string;
   selected: boolean;
   state: PerfectingTrackState;
@@ -245,9 +246,18 @@ export function buildPerfectingView(
       : null;
   const exact = live.find((entry) => samePerfectRef(entry.ref, requested)) ?? null;
   const selectedEntry = followed ?? exact ?? live[0] ?? null;
-  // One pass over the walk assigns each bagged copy its ordinal among same-id
-  // bagged candidates (the same number baggedCopyOrdinal reports, since both
-  // read the walk's bag order); the identity is the anchor's own vocabulary.
+  // Two passes over the walk give each bagged copy the anchor's own
+  // vocabulary as its identity: its ordinal among same-id bagged candidates
+  // (the number baggedCopyOrdinal reports, both reading the walk's bag order)
+  // AND the same-id count, so a same-id departure changes every sibling's
+  // identity and the painter's focus carry misses on purpose, degrading to
+  // the checked row exactly the way the anchor stands down.
+  const countPerId = new Map<string, number>();
+  for (const entry of live) {
+    if ('bag' in entry.ref) {
+      countPerId.set(entry.ref.itemId, (countPerId.get(entry.ref.itemId) ?? 0) + 1);
+    }
+  }
   const seenPerId = new Map<string, number>();
   const candidates: PerfectingCandidate[] = live.map((entry) => {
     const info = infos.get(entry) as PerfectingInfoView;
@@ -257,7 +267,7 @@ export function buildPerfectingView(
     } else {
       const ordinal = seenPerId.get(entry.ref.itemId) ?? 0;
       seenPerId.set(entry.ref.itemId, ordinal + 1);
-      identity = `b:${entry.ref.itemId}:${ordinal}`;
+      identity = `b:${entry.ref.itemId}:${ordinal}/${countPerId.get(entry.ref.itemId) ?? 0}`;
     }
     return {
       ref: entry.ref,
