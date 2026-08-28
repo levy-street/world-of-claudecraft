@@ -143,13 +143,15 @@ describe('readShaderWarmSetting', () => {
 });
 
 describe('shaderWarmModeFor', () => {
-  it('resolves auto by the backend: reveal where the compile runs off the presenting thread', () => {
+  it('resolves auto by the backend: the full policy where the compile runs off the presenting thread', () => {
     // Measured 2026-08-28: D3D11 passed, Vulkan had nothing left to warm,
     // every OpenGL cell (Linux NVIDIA, Linux Intel, Android Mali) only
-    // relocated the stall into the GPU process.
-    expect(shaderWarmModeFor('auto', 'd3d11')).toBe('reveal');
-    expect(shaderWarmModeFor('auto', 'vulkan')).toBe('reveal');
-    expect(shaderWarmModeFor('auto', 'metal')).toBe('reveal');
+    // relocated the stall into the GPU process. The full policy holds the
+    // live view too: its stand-in already shows what is there, so a longer
+    // stand-in beats a frozen frame (settled 2026-08-28).
+    expect(shaderWarmModeFor('auto', 'd3d11')).toBe('all');
+    expect(shaderWarmModeFor('auto', 'vulkan')).toBe('all');
+    expect(shaderWarmModeFor('auto', 'metal')).toBe('all');
     expect(shaderWarmModeFor('auto', 'opengl')).toBe('off');
     expect(shaderWarmModeFor('auto', 'software')).toBe('off');
     expect(shaderWarmModeFor('auto', 'unknown')).toBe('off');

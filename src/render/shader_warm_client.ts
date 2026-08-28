@@ -177,10 +177,6 @@ export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   state.spawn = deps.spawn ?? defaultSpawn;
   state.schedule = deps.schedule ?? defaultSchedule;
   state.mobile = deps.mobile ?? defaultMobile();
-  if (state.mode === 'all') {
-    // A probe arm: it holds live entity views behind their stand-in too.
-    console.warn('[shader-warm] mode "all" holds live entity views for the worker (probe arm)');
-  }
 }
 
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {

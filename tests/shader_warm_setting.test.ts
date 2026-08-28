@@ -24,15 +24,15 @@ describe('shaderWarmSettingFromValue', () => {
   it('maps the three stored numbers, nearest wins, anything else is auto', () => {
     expect(shaderWarmSettingFromValue(SHADER_WARM_SETTING_VALUES.auto)).toBe('auto');
     expect(shaderWarmSettingFromValue(SHADER_WARM_SETTING_VALUES.off)).toBe('off');
-    expect(shaderWarmSettingFromValue(SHADER_WARM_SETTING_VALUES.on)).toBe('reveal');
+    expect(shaderWarmSettingFromValue(SHADER_WARM_SETTING_VALUES.on)).toBe('all');
     expect(shaderWarmSettingFromValue(1.4)).toBe('off');
     expect(shaderWarmSettingFromValue(7)).toBe('auto');
     expect(shaderWarmSettingFromValue(Number.NaN)).toBe('auto');
   });
 
-  it('never yields the probe-only all mode', () => {
+  it('never yields the probe-only reveal arm', () => {
     for (let value = -2; value <= 6; value += 0.5) {
-      expect(shaderWarmSettingFromValue(value)).not.toBe('all');
+      expect(shaderWarmSettingFromValue(value)).not.toBe('reveal');
     }
   });
 });
@@ -45,13 +45,13 @@ describe('registerShaderWarmSetting', () => {
     expect(shaderWarmSnapshot().setting).toBe('off');
     stored = SHADER_WARM_SETTING_VALUES.on;
     resetShaderWarmForTest({ search: '' });
-    expect(shaderWarmSnapshot().setting).toBe('reveal');
+    expect(shaderWarmSnapshot().setting).toBe('all');
   });
 
   it('lets a probe query pin an arm over the stored option', () => {
     registerShaderWarmSetting(() => SHADER_WARM_SETTING_VALUES.off);
-    resetShaderWarmForTest({ search: '?shaderwarm=all' });
-    expect(shaderWarmSnapshot().setting).toBe('all');
+    resetShaderWarmForTest({ search: '?shaderwarm=reveal' });
+    expect(shaderWarmSnapshot().setting).toBe('reveal');
   });
 
   it('reads the store once per configure, not per policy call', () => {

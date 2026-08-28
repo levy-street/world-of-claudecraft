@@ -262,14 +262,10 @@ describe('starting the shader warm worker', () => {
     expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', worker: 'idle' });
   });
 
-  it('warns once for the probe arm that holds live entity views', () => {
-    // Mode `all` holds gates a player is looking at; nobody should be able to
-    // leave a session on it without the console saying so.
+  it('configures every arm silently: holding the live view is the policy, not a probe', () => {
+    // Mode `all` is what `auto` and the stored On resolve to (the live view
+    // waits behind its stand-in), so no arm earns a console warning.
     start({ search: '?shaderwarm=all' });
-    expect(warned).toHaveLength(1);
-    expect(warned[0]).toContain('all');
-
-    warned.length = 0;
     start({ search: '?shaderwarm=reveal' });
     start({ search: '?shaderwarm=off' });
     expect(warned).toEqual([]);
@@ -791,7 +787,7 @@ describe('the auto setting follows the GPU backend', () => {
     };
   }
 
-  it('is OFF until a context is seen, then reveal on D3D11', () => {
+  it('is OFF until a context is seen, then the full policy on D3D11', () => {
     const worker = fakeWorker();
     resetShaderWarmForTest({ spawn: () => worker, search: '', stored: 'auto' });
     expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', backend: null });
@@ -802,7 +798,7 @@ describe('the auto setting follows the GPU backend', () => {
     );
     expect(shaderWarmSnapshot()).toMatchObject({
       setting: 'auto',
-      mode: 'reveal',
+      mode: 'all',
       backend: 'd3d11',
     });
     // Not armed yet: the first policy call still bypasses, but the worker
@@ -868,13 +864,13 @@ describe('the backend class follows the renderer across rebuilds', () => {
     shaderWarmDecide(backendContext(null), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
     expect(shaderWarmSnapshot()).toMatchObject({ backend: 'unknown', mode: 'off' });
     shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'reveal' });
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'all' });
   });
 
   it('forgets the class on dispose, so a rebuilt renderer on software reads OFF', () => {
     resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
     shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'reveal' });
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'all' });
     disposeShaderWarm();
     expect(shaderWarmSnapshot()).toMatchObject({ backend: null, mode: 'off' });
     shaderWarmDecide(backendContext(WARP), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);

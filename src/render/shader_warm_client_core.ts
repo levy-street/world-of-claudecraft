@@ -5,23 +5,26 @@
 // carries the messages and the frame readings.
 //
 // THE POLICY, in one place. The worker warms a program for the game's link
-// to be a hit, which only pays when the link has LEAD: content the camera is
+// to be a hit, which pays wherever the link can WAIT: content the camera is
 // not among yet (a streamed reveal key beyond the ring, the post-paint
-// catalogs, an approaching zone). A gate that must draw NOW (an actionable
-// or live entity view, an imminent reveal) gains nothing from waiting and
-// would only add the worker's round trip to its hold, and a gate created
-// before the reveal links under the curtain where nothing is felt and where
-// the renderer state is still moving (the step-1 measurement: the
+// catalogs, an approaching zone), and a live entity view too, whose stand-in
+// already shows the player what is there (a nameplate a little longer is
+// acceptable, a frozen frame is not; settled 2026-08-28). A gate that must
+// draw NOW (an actionable view, an imminent reveal) gains nothing from
+// waiting and would only add the worker's round trip to its hold, and a gate
+// created before the reveal links under the curtain where nothing is felt
+// and where the renderer state is still moving (the step-1 measurement: the
 // point-light census and the post pipeline settle after those gates were
 // created, so their keys move). Those are the named bypasses, each counted,
 // so the readout says how often the worker was NOT the path.
 //
 // The modes exist so the policy can be measured rather than believed:
 // the setting is `auto` by default (the mode follows the GPU backend, see
-// shaderWarmModeFor), `off` never asks the worker, `reveal` holds every
-// requester below the live view (the reveal gates and, since every producer
-// became a requester, the zone, resume and self-spirit lanes), `all` holds
-// every gate below the actionable floor; `?shaderwarm=` pins any of them.
+// shaderWarmModeFor), `off` never asks the worker, `all` holds every gate
+// below the actionable floor (the policy above; `auto` and the stored
+// option On resolve to it), `reveal` is the probe arm that exempts the live
+// view (the arm the step-3 cells ran, kept so a probe can price the
+// live-view hold on its own); `?shaderwarm=` pins any of them.
 
 import { compilesOffThread, type GpuBackendClass } from './gpu_backend_class_core';
 import { programSourceHash } from './shader_warm_audit_core';
@@ -96,18 +99,19 @@ export function readShaderWarmSetting(
   return query ?? asShaderWarmSetting(stored) ?? 'off';
 }
 
-/** `auto` resolves once the backend is known: the worker holds links only
- *  where the backend compiles off the presenting thread (D3D11, Vulkan,
- *  Metal; measured 2026-08-28, tmp/REPORT_worker-step3_2026-08-28.md). On
- *  ANGLE's OpenGL backends (Linux and Android Chrome) the worker only
- *  relocates the stall into the GPU process, so `auto` is OFF there, and
- *  OFF while the backend is still unknown. */
+/** `auto` resolves once the backend is known: the worker holds links (the
+ *  live view included) only where the backend compiles off the presenting
+ *  thread (D3D11, Vulkan, Metal; measured 2026-08-28,
+ *  tmp/REPORT_worker-step3_2026-08-28.md). On ANGLE's OpenGL backends (Linux
+ *  and Android Chrome) the worker only relocates the stall into the GPU
+ *  process, so `auto` is OFF there, and OFF while the backend is still
+ *  unknown. */
 export function shaderWarmModeFor(
   setting: ShaderWarmSetting,
   backend: GpuBackendClass | null,
 ): ShaderWarmMode {
   if (setting !== 'auto') return setting;
-  return backend !== null && compilesOffThread(backend) ? 'reveal' : 'off';
+  return backend !== null && compilesOffThread(backend) ? 'all' : 'off';
 }
 
 export interface ShaderWarmRequestSource {
