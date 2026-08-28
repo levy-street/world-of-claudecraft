@@ -34,7 +34,15 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import {
+  GATHER_NODES,
+  isBgPos,
+  isDelvePos,
+  isRiftPos,
+  isYumiMazePos,
+  QUESTS,
+  zoneAt,
+} from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
@@ -151,6 +159,29 @@ function centerFits(dist2: number, canvasSize: number, clearance: number): boole
 // player, shrinking to (MAX - RANGE) px near the rim. Byte-faithful to `6 - (dist/R)*3`.
 const PARTY_DISC_MAX_RADIUS = 6;
 const PARTY_DISC_RADIUS_RANGE = 3;
+
+/** The position of the nearest overworld rift entrance portal to `pos`, or null
+ *  when none is in the (interest-scoped) entity roster. Consulted only on the
+ *  rare ghost-with-a-rift-corpse frame, so the roster scan is off every common
+ *  path; returns the live entity's own pos (read-only), allocating nothing. */
+function nearestRiftPortalPos(
+  world: IWorld,
+  pos: { x: number; z: number },
+): { x: number; z: number } | null {
+  let best: { x: number; z: number } | null = null;
+  let bestD = Infinity;
+  for (const e of world.entities.values()) {
+    if (e.templateId !== 'rift_portal') continue;
+    const dx = e.pos.x - pos.x;
+    const dz = e.pos.z - pos.z;
+    const d = dx * dx + dz * dz;
+    if (d < bestD) {
+      bestD = d;
+      best = e.pos;
+    }
+  }
+  return best;
+}
 
 /** Which minimap surface a world renders: the delve schematic (owned by
  *  delve_map_painter), the Protect Yumi maze (the overworld marker set over a
@@ -597,9 +628,24 @@ export function createMinimapMarkers(): MinimapMarkers {
       // paintings and the ordinary live-entity layer. Preserve the established
       // top stack: corpse, party, NPC punctuation, then the local player.
       // The local player's own corpse is clamped to the rim when off-map.
-      if (p.ghost && p.corpsePos) {
-        const dx = -(p.corpsePos.x - p.pos.x) * pxPerYard;
-        const dz = -(p.corpsePos.z - p.pos.z) * pxPerYard;
+      // A corpse in the rift band while the ghost stands in the overworld is
+      // the one case where raw corpsePos misleads: the band is displaced far
+      // past any land (isRiftPos), so the rim arrow would point at coordinate
+      // space rather than the run back. The real run-back target is the rift
+      // entrance portal (still a live 'rift_portal' entity through the
+      // recovery grace, rift/portals.ts sealNaturalRiftPortalForRecovery), so
+      // aim the marker at the nearest mirrored portal instead; with none in
+      // the (interest-scoped) roster, draw no corpse marker at all rather
+      // than a false heading (the portal entity renders once approached).
+      const corpseTarget =
+        p.ghost && p.corpsePos
+          ? isRiftPos(p.corpsePos.x) && !isRiftPos(p.pos.x)
+            ? nearestRiftPortalPos(world, p.pos)
+            : p.corpsePos
+          : null;
+      if (corpseTarget) {
+        const dx = -(corpseTarget.x - p.pos.x) * pxPerYard;
+        const dz = -(corpseTarget.z - p.pos.z) * pxPerYard;
         const dist = Math.hypot(dx, dz);
         const corpseRim = minimapSafeCenterRadius(S, clearance.corpse);
         if (dist > corpseRim) {
