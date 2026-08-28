@@ -6999,6 +6999,7 @@
     box-sizing: border-box;
     resize: none;
     overflow-y: hidden;
+    min-height: 36px;
     max-height: 110px;
     white-space: pre-wrap;
     word-break: break-word;
