@@ -36,13 +36,13 @@ import type {
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
-  WocOpsP2pTradeRow,
   WocSaleRow,
   WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from './woc_market';
+import type { WocOpsListingRow, WocOpsListingStatus, WocOpsP2pTradeRow } from './woc_market_ops';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -1631,19 +1631,26 @@ export class PgWocMarketDb implements WocMarketDb {
    */
   async opsListings(q: {
     realm: string;
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOpsListingRow[]; hasMore: boolean }> {
     const where: string[] = ['realm = $1', 'directed_buyer_account IS NULL'];
     const params: unknown[] = [q.realm];
     params.push(new Date(q.fromMs));
     where.push(`created_at >= $${params.length}`);
     params.push(new Date(q.toMs));
     where.push(`created_at <= $${params.length}`);
-    if (q.status !== 'all') {
+    if (q.status === 'sold' || q.status === 'cancelled') {
+      // Keep the partial-index predicate literal so Postgres can prove that
+      // woc_market_ops_closed_created applies. Resolution is an index key,
+      // not part of that predicate, and remains safely bound.
+      where.push("status = 'closed'");
+      params.push(q.status);
+      where.push(`resolution = $${params.length}`);
+    } else if (q.status !== 'all') {
       params.push(q.status);
       where.push(`status = $${params.length}`);
     }
@@ -1653,16 +1660,44 @@ export class PgWocMarketDb implements WocMarketDb {
     // window count re-reads the whole matching set on every page, and an ops
     // range can be far wider than a player's.
     params.push(pageSize + 1, offset);
+    // Only standing sale provenance is operator-visible. A voided sale is
+    // retained with excluded=true for audit, but deliberately maps to a null
+    // buyer/sold-at here (and therefore N/A in the dashboard).
     const res = await this.pool.query(
-      `SELECT ${LISTING_COLS}
-         FROM woc_market_listings
-        WHERE ${where.join(' AND ')}
-        ORDER BY created_at DESC, id DESC
-        LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      `WITH listing_page AS MATERIALIZED (
+         SELECT ${LISTING_COLS}
+           FROM woc_market_listings
+          WHERE ${where.join(' AND ')}
+          ORDER BY created_at DESC, id DESC
+          LIMIT $${params.length - 1} OFFSET $${params.length}
+       )
+       SELECT p.*,
+              s.buyer_account AS sale_buyer_account,
+              s.buyer_name AS sale_buyer_name,
+              s.created_at AS sold_at
+         FROM listing_page p
+         LEFT JOIN LATERAL (
+           SELECT sale.buyer_account, sale.buyer_name, sale.created_at
+             FROM woc_market_sales sale
+            WHERE p.status = 'closed' AND p.resolution = 'sold'
+              AND sale.listing_id = p.id
+              AND sale.realm = p.realm
+              AND sale.excluded = false
+            LIMIT 1
+         ) s ON true
+        ORDER BY p.created_at DESC, p.id DESC`,
       params,
     );
     const hasMore = res.rows.length > pageSize;
-    return { rows: (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toListing), hasMore };
+    const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(
+      (row): WocOpsListingRow => ({
+        ...toListing(row),
+        buyerAccount: row.sale_buyer_account ?? null,
+        buyerName: row.sale_buyer_name ?? null,
+        soldAtMs: msOrNull(row.sold_at),
+      }),
+    );
+    return { rows, hasMore };
   }
 
   /**

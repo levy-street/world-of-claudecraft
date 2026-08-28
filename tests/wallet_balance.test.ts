@@ -5,10 +5,19 @@ import {
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
   verifiedWocBalance,
+  WocBalanceRefreshOrder,
   walletDisplayAvailable,
   wocBalance,
   wocBalanceVerified,
 } from '../src/ui/wallet_balance';
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
 
 describe('wallet balance UI state', () => {
   it('treats connected-wallet balances as unverified previews by default', () => {
@@ -118,6 +127,50 @@ describe('resolveWocBalanceUpdate (refresh apply/skip decision)', () => {
         linkedAddress: null,
       }),
     ).toEqual({ apply: true, setLinked: false });
+  });
+});
+
+describe('WocBalanceRefreshOrder', () => {
+  it('rejects an older refresh that completes after the latest request', async () => {
+    const order = new WocBalanceRefreshOrder();
+    const first = deferred<number>();
+    const second = deferred<number>();
+    const applied: number[] = [];
+    const run = async (read: Promise<number>) => {
+      const request = order.start();
+      const value = await read;
+      if (order.claim(request)) applied.push(value);
+    };
+
+    const firstRun = run(first.promise);
+    const secondRun = run(second.promise);
+    second.resolve(200);
+    await secondRun;
+    first.resolve(100);
+    await firstRun;
+
+    expect(applied).toEqual([200]);
+  });
+
+  it('allows an older usable result after a newer fresh read fails', async () => {
+    const order = new WocBalanceRefreshOrder();
+    const first = deferred<number | null>();
+    const second = deferred<number | null>();
+    const applied: number[] = [];
+    const run = async (read: Promise<number | null>) => {
+      const request = order.start();
+      const value = await read;
+      if (value !== null && order.claim(request)) applied.push(value);
+    };
+
+    const firstRun = run(first.promise);
+    const secondRun = run(second.promise);
+    second.resolve(null);
+    await secondRun;
+    first.resolve(100);
+    await firstRun;
+
+    expect(applied).toEqual([100]);
   });
 });
 

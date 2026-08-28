@@ -36,6 +36,7 @@ describe('every $WOC readout spells its tokens through this module', () => {
   const read = (rel: string) => stripComments(readFileSync(rel, 'utf8'));
   const CALLERS = [
     'src/ui/woc_market_window.ts',
+    'src/ui/woc_market_chrome.ts',
     'src/ui/trade_woc_arm_painter.ts',
     'src/ui/hud/woc_trade/woc_trade_controller.ts',
     'src/ui/woc_balance_chip.ts',

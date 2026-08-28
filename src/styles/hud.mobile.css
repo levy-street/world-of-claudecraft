@@ -2123,6 +2123,14 @@
     font-size: 9px;
     color: #e6d8ae;
   }
+  /* The Steam wishlist reminder is the one tray entry that is a link rather
+     than a wired button (index.html says why), so it needs the anchor reset its
+     button siblings get for free. Everything else about the pill is shared, and
+     the in-game community rail this mirrors is hidden on touch, which is why the
+     tray carries the reminder at all on a phone. */
+  body.mobile-touch #mobile-extra-controls a.mobile-btn {
+    text-decoration: none;
+  }
   body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
     flex: 0 0 18px;
   }
@@ -2897,6 +2905,21 @@
     top: max(8px, env(safe-area-inset-top));
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
+  }
+  /* The desktop interface editor's frame-dimension settings
+     (playerFrame/targetFrame Width/Height, movable_frame.ts 'dimensions'
+     mode) stay desktop: this sheet hand-tunes the compact placements around
+     stock metrics (the 300px player band, the 0.82-scaled target frame), the
+     same boundary that keeps desktop-dragged frame POSITIONS from applying on
+     mobile. Pin the vars back to their stock values so a desktop drag cannot
+     widen or thicken these frames into the touch surfaces beside them. */
+  body.mobile-touch #player-frame {
+    --player-frame-width: 612px;
+    --uf-bar-height: 15px;
+  }
+  body.mobile-touch #target-frame {
+    --target-frame-width: 190px;
+    --uf-bar-height: 15px;
   }
   /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
      showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
@@ -3898,6 +3921,23 @@
   body.mobile-touch #woc-market-window .wm-detail {
     position: static;
     max-height: none;
+  }
+  /* The Solana wallet card stacks on the phone sheet (the Claudium card's own
+     touch rule): the button drops under the sentence at the 44px floor rather
+     than squeezing the copy into half the width. */
+  body.mobile-touch #woc-market-window .wm-banner-wallet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #woc-market-window .wm-banner-wallet button {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 44px;
+  }
+  body.mobile-touch #woc-market-window .wm-wallet-balance {
+    grid-column: 1;
+    grid-row: auto;
+    align-items: flex-start;
+    text-align: left;
   }
   /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
      than the desktop 6px, and the FIRST row clears the header hairline with
@@ -7772,5 +7812,33 @@
     body.mobile-touch #fiesta-augments .fa-cat {
       font-size: 9px;
     }
+  }
+
+  /* ---------- interface editor (suppressed on touch) ---------- */
+  /* Every frame-editing gesture no-ops on mobile (MovableFrame and the chat
+     controller refuse touch layouts), so without these rules a player who
+     reaches the Edit Frames option still gets the floating lock bar, the
+     Frames Settings menu, the name chips and the preview placeholders, all
+     inert. Hide the editor chrome wholesale under the touch HUD. */
+  body.mobile-touch #interface-edit-controls,
+  body.mobile-touch #interface-frames-menu,
+  body.mobile-touch .tf-frame-label,
+  body.mobile-touch .tf-preview-unit,
+  body.mobile-touch .tf-preview-bars,
+  body.mobile-touch .tf-edge-glow,
+  body.mobile-touch #interface-grid-overlay,
+  body.mobile-touch .chat-move-btn {
+    display: none;
+  }
+  /* The unlocked-state dressing itself, for the mid-session layout flip: a
+     desktop session that entered edit mode and then shrank into the touch
+     layout would otherwise keep dashed outlines and touch-action: none on
+     every frame with no visible editor to leave the mode by (the toggle
+     refuses to ENTER on touch; this covers arriving with it already on). */
+  body.mobile-touch .tf-unlocked,
+  body.mobile-touch.interface-unlocked #chatlog-wrap {
+    outline: none;
+    touch-action: auto;
+    cursor: auto;
   }
 }

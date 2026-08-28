@@ -601,6 +601,21 @@ same file), and each module's header carries its own contract.
   Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
   and compositor-only until it commits through Hud's shared position clamp. Bump
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
+- **interface_unlock.ts** (pure `interface_unlock_core.ts`): the "Unlock interface" Interface
+  option (Combat tab). It owns no geometry: it is a registry of `MovableFrame`s plus one flag,
+  and a flip asks each entry's `isActive()` before loosening it, so a character with no pet out
+  and a disabled action bar never gain a draggable frame. Adding a frame is a row in
+  `HUD_FRAME_SPECS` plus its `isActive` probe in `Hud.initInterfaceUnlock`, never a branch in
+  the coordinator. `movable_frame.ts` carries two config shapes for this: the three unit frames
+  keep an always-visible corner button and move only, while the frames this option governs pass
+  `buttonOnlyWhenUnlocked` + `scalable` and so carry no chrome until they are unlocked. It is
+  also the SINGLE `relocalize()` fan-out arm for every `MovableFrame` in the HUD.
+  **Both frame gestures are keyboard-operable, and a new one must be:** the corner button takes
+  arrow keys to position and the SE grip (a real named `button`, not a decorative div like the
+  chat box's) takes arrow keys to size, Shift for the fine step, each stepping through a pure
+  helper in `target_frame_pos.ts` (`scaleFromKeyStep`). A frame gesture with no keyboard path is
+  a defect: unlocking is the only route to these frames, so a pointer-only affordance leaves a
+  keyboard-only player unable to reach what it changes at all.
 - **deeds_view.ts** / **deeds_window.ts** (+ the `deed_*` siblings): the Book of Deeds
   window: DOM-free category/entry/unlock model, a cold window painter, and the write-elided
   HUD watch tracker. `deed_i18n.ts` re-localizes deed names/descriptions/titles from ids

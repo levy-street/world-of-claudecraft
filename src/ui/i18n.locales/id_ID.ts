@@ -496,8 +496,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Lihat Ketentuan Bursa (terbuka di tab baru)',
   'hudChrome.wocMarket.title': 'Bursa $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Kamu berkomitmen membayar nilai USD dalam $WOC. Jumlah token yang pasti ditetapkan oleh kuotasi baru saat pembayaran diminta dan bisa berbeda dari perkiraan.',
-  'hudChrome.wocMarket.walletBanner': 'Tautkan dan verifikasi dompet untuk menawar, membeli, atau menjual di Bursa.',
-  'hudChrome.wocMarket.walletBannerCta': 'Hubungkan dompet',
   'hudChrome.wocMarket.yourListing': 'Daftarmu',
   'hudChrome.wocMarket.yourListingTip': 'Kamu mendaftarkan barang ini. Kamu tidak bisa menawar pada daftar milikmu sendiri; selama belum ada penawaran, kamu bisa membatalkannya di sini atau dari Aktivitasku.',
   'apiError.guilds.invalid_roster_name': 'Nama guild tidak valid.',

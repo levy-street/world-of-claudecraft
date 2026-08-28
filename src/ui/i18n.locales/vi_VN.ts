@@ -496,8 +496,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Xem điều khoản của Sàn Giao Dịch (mở trong tab mới)',
   'hudChrome.wocMarket.title': 'Sàn Giao Dịch $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Bạn đang cam kết thanh toán một giá trị USD bằng $WOC. Số lượng token chính xác được ấn định bởi một báo giá mới khi thanh toán được yêu cầu, và có thể khác với ước tính.',
-  'hudChrome.wocMarket.walletBanner': 'Liên kết và xác minh một ví để đặt giá thầu, mua hoặc bán trên Sàn Giao Dịch.',
-  'hudChrome.wocMarket.walletBannerCta': 'Kết nối ví',
   'hudChrome.wocMarket.yourListing': 'Tin rao của bạn',
   'hudChrome.wocMarket.yourListingTip': 'Bạn đã rao bán vật phẩm này. Bạn không thể đặt giá thầu trên tin rao của chính mình; khi tin rao chưa có giá thầu nào, bạn có thể hủy nó tại đây hoặc từ mục Hoạt Động.',
   'apiError.guilds.invalid_roster_name': 'Tên bang hội không hợp lệ.',

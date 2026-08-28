@@ -29,9 +29,21 @@ import {
   WOC_MARKET_ME_READOUT_DEADLINE_MS,
 } from './woc_market_budgets';
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
+import {
+  registerWocQuoteHandoff,
+  registerWocStepUpHandoff,
+  type WocDesktopHandoffRegistrar,
+} from './woc_market_desktop_handoff';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
+import type {
+  WocEstimate,
+  WocMarketEconomy,
+  WocPriceInfo,
+  WocQuoteIntent,
+} from './woc_market_economy_types';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
 import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
+import type * as WocOps from './woc_market_ops';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
@@ -552,12 +564,12 @@ export interface WocMarketDb {
   markCustodyRefBooked(custodyRef: string): Promise<void>;
   opsListings(q: {
     realm: string;
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOps.WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }>;
+  }): Promise<{ rows: WocOps.WocOpsListingRow[]; hasMore: boolean }>;
   opsP2pTrades(q: {
     realm: string;
     status: WocDirectedOfferStatus | 'all';
@@ -565,7 +577,7 @@ export interface WocMarketDb {
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }>;
+  }): Promise<{ rows: WocOps.WocOpsP2pTradeRow[]; hasMore: boolean }>;
   /** The claim row for a ref (booked flag plus rail intents), or null when
    *  no claim exists. What the resume paths consult when a claim is not fresh:
    *  booked means done; a grant intent parks; a mail intent may resume only
@@ -892,106 +904,16 @@ export interface WocMarketDb {
   ): Promise<{ characterId: number; name: string } | null>;
 }
 
-/** Token-side quote leg: the base-unit string is exact, the tokens number is
- *  the service-computed display value. The game renders both verbatim. */
-export interface WocQuoteLeg {
-  base: string;
-  tokens: number;
-}
-
-export interface WocPriceInfo {
-  available: boolean;
-  healthy: boolean;
-  reason: string | null;
-  /** Service-computed display rate (tokens per 1 USD); null when down. */
-  tokensPerUsd: number | null;
-  asOfMs: number | null;
-}
-
-/** The fee split for an amount, in USD CENTS, as computed by the economy
- *  service. The game NEVER derives these: the real split rounds each fee leg up
- *  and gives the seller the remainder, so a percentage recomputed here would
- *  disagree with the settlement by a cent. Null whenever the estimate is
- *  unavailable, and also on an older service build that does not send it. */
-export interface WocEstimateSplit {
-  sellerCents: number;
-  burnCents: number;
-  treasuryCents: number;
-}
-
-export interface WocEstimate {
-  available: boolean;
-  usdCents: number;
-  amount: WocQuoteLeg | null;
-  asOfMs: number | null;
-  split: WocEstimateSplit | null;
-}
-
-export interface WocQuoteIntent {
-  ok: boolean;
-  reference: string | null;
-  /** The full transfer the buyer signs (service-built transaction). */
-  transactionBase64: string | null;
-  /** Whether the buyer must sign it. False only under the service's dev chain,
-   *  whose stand-in transaction no wallet can sign. Defaults TRUE on anything
-   *  the service does not say, so a missing field can never skip a signature. */
-  signatureRequired: boolean;
-  amount: WocQuoteLeg | null;
-  seller: WocQuoteLeg | null;
-  burn: WocQuoteLeg | null;
-  treasury: WocQuoteLeg | null;
-  /** The SERVICE-computed bond for a bond quote (pure bps ceil of the bid,
-   *  clamped): the game renders and persists this figure, it never derives
-   *  the money. Null on settlement quotes. Also carried on a
-   *  bond_amount_drift refusal, so the caller can adopt the expected figure
-   *  and re-quote instead of stranding the bid. */
-  bondCents: number | null;
-  expiresAtMs: number | null;
-  reason: string | null;
-}
-
-/**
- * The economy-service seam. Everything on it is REFERENCE-keyed: the service
- * can legitimately hold TWO settled quotes for one memoRef (its entry
- * adoption re-settles a superseded quote that a ledger-proven payment backs,
- * beside the fresh quote), so no consumer may assume one settled row per
- * memo, enumerate by memo, or treat a memoRef as a settlement identity. The
- * game stores exactly one live reference per row (bond_reference /
- * quote_reference) and asks only about that; a re-quote that retires a
- * stored reference leaves the operator trace quoteFor logs.
- */
-export interface WocMarketEconomy {
-  price(): Promise<WocPriceInfo>;
-  estimate(usdCents: number): Promise<WocEstimate>;
-  bondQuote(args: {
-    memoRef: string;
-    /** The BID being bonded: the service computes the bond from it. */
-    bidCents: number;
-    /** Optional echo of the bond the caller expects (the stored figure on a
-     *  refresh). A mismatch refuses bond_amount_drift carrying the service's
-     *  bondCents; never the request's bond input. */
-    usdCents?: number;
-    buyerWallet: string;
-  }): Promise<WocQuoteIntent>;
-  settlementQuote(args: {
-    memoRef: string;
-    usdCents: number;
-    buyerWallet: string;
-    sellerWallet: string;
-  }): Promise<WocQuoteIntent>;
-  confirm(
-    reference: string,
-    signature: string,
-  ): Promise<{ settled: boolean; pending: boolean; reason: string | null }>;
-  refundBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
-  forfeitBond(reference: string): Promise<{ done: boolean; reason: string | null }>;
-  /** Ops introspection for the price cache (proxy only; the dev economy has
-   *  no cache): ages of the held success and failure memos, so a stale-served
-   *  or blanked price is a NUMBER on the internal stuck readout rather than
-   *  invisible (the cached_read stale-serve warn's spirit; this cache logs
-   *  nothing itself). */
-  priceCacheAges?(): { successAgeMs: number | null; failureAgeMs: number | null };
-}
+// The economy vocabulary lives in its own leaf module (the monitor-types
+// pattern); re-exported so every existing importer keeps this one home.
+export type {
+  WocEstimate,
+  WocEstimateSplit,
+  WocMarketEconomy,
+  WocPriceInfo,
+  WocQuoteIntent,
+  WocQuoteLeg,
+} from './woc_market_economy_types';
 
 export type WocCustodyExtract =
   | {
@@ -1134,6 +1056,9 @@ export interface WocMarketDeps {
    *  then answer signatureRequired false and accept the devsig form. In
    *  production this is false and every proof is a real ed25519 signature. */
   stepUpDevSig: boolean;
+  /** Desktop browser-signing registrar (the process handoff store). OPTIONAL:
+   *  absent (the rigs), nothing is desktop-signable; never widens behavior. */
+  desktopHandoff?: WocDesktopHandoffRegistrar;
   config: WocMarketConfig;
   /** The hot-read cache (H11). OPTIONAL: absent, every read is uncached (the
    *  service-test rigs and the sweep-only constructions), which is also why
@@ -1249,12 +1174,6 @@ export { BOND_PAYOUT_BUDGET_MS, WOC_MARKET_ME_READOUT_DEADLINE_MS } from './woc_
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without
  *  it. An arm returning a FULL batch is the "backlog is not draining" signal. */
-/** A directed offer plus the outcome it reached, for the operator p2p view. */
-export interface WocOpsP2pTradeRow extends WocDirectedOfferRow {
-  settledAmountBase: string | null;
-  txSignature: string | null;
-}
-
 // The sweep's pass-accounting vocabulary lives in woc_market_sweep_types.ts
 // (the ratchet's leaf-types pattern); the trio keeps this import path.
 export type {
@@ -1622,7 +1541,10 @@ export class WocMarketService {
     const wallet = await this.deps.verifiedWallet(account);
     if (!wallet) return refuse('wallet_required');
     const out = await issueStepUpChallengeFlow(this.stepUpCtx(), account, wallet, request);
-    return out.ok ? out : refuse(out.reason);
+    if (!out.ok) return refuse(out.reason);
+    // Registered by nonce so the handoff can serve the stored message.
+    registerWocStepUpHandoff(this.deps.desktopHandoff, account, wallet, out.challenge);
+    return out;
   }
 
   // -------------------------------------------------------------------------
@@ -2300,6 +2222,8 @@ export class WocMarketService {
       // plain contention, retryable, with nothing written.
       return refuse('contended');
     }
+    // Past the CAS only: no signable authorization for a refused quote.
+    registerWocQuoteHandoff(this.deps.desktopHandoff, args.account, wallet, intent, this.now());
     return {
       ok: true,
       // The patched bid mirrors the row the CAS just wrote (reference,
@@ -2360,12 +2284,12 @@ export class WocMarketService {
    * dashboard cannot ask one realm's process about another's.
    */
   async opsListings(q: {
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOps.WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOps.WocOpsListingRow[]; hasMore: boolean }> {
     return this.deps.db.opsListings({ ...q, realm: this.cfg.realm });
   }
 
@@ -2375,7 +2299,7 @@ export class WocMarketService {
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocOpsP2pTradeRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOps.WocOpsP2pTradeRow[]; hasMore: boolean }> {
     return this.deps.db.opsP2pTrades({ ...q, realm: this.cfg.realm });
   }
 
@@ -2486,6 +2410,8 @@ export class WocMarketService {
         after !== null && after.status === 'pending_bond' ? 'confirm_in_flight' : 'not_pending',
       );
     }
+    // Past the CAS only: no signable authorization for a refused refresh.
+    registerWocQuoteHandoff(this.deps.desktopHandoff, account, bid.wallet, intent, this.now());
     return { ok: true, bond: intent };
   }
 
@@ -2901,6 +2827,15 @@ export class WocMarketService {
         intent.amount?.base ?? null,
       );
       if (!stamped) return { ...intent, ok: false, reason: 'settlement_not_open' };
+      // Every payable settlement quote (buy-now, winner, revival) registers
+      // for desktop signing, past the stamp only (no adopted row, no entry).
+      registerWocQuoteHandoff(
+        this.deps.desktopHandoff,
+        settlement.buyerAccount,
+        settlement.buyerWallet,
+        intent,
+        this.now(),
+      );
       if (retiredPair !== null) {
         console.warn(
           `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(retiredPair.reference)} with recorded signature ${logSafe(retiredPair.signature)}`,

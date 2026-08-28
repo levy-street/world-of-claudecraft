@@ -507,8 +507,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Consulter les conditions de la Bourse (ouvre un nouvel onglet)',
   'hudChrome.wocMarket.title': 'Bourse $WOC',
   'hudChrome.wocMarket.variableTokenWarning': "Vous vous engagez à payer une valeur en USD en $WOC. Le montant exact de jetons est fixé par un nouveau devis au moment du paiement et peut différer de l'estimation.",
-  'hudChrome.wocMarket.walletBanner': 'Liez et vérifiez un portefeuille pour enchérir, acheter ou vendre sur la Bourse.',
-  'hudChrome.wocMarket.walletBannerCta': 'Connecter un portefeuille',
   'hudChrome.wocMarket.yourListing': 'Votre annonce',
   'hudChrome.wocMarket.yourListingTip': "Vous avez mis cet objet en vente. Vous ne pouvez pas enchérir sur votre propre annonce ; tant qu'elle n'a aucune enchère, vous pouvez l'annuler ici ou depuis Activité.",
   'apiError.guilds.invalid_roster_name': 'Nom de guilde invalide.',

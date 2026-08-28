@@ -1,5 +1,9 @@
 const { execFileSync: nodeExecFileSync, spawn: nodeSpawn } = require('node:child_process');
-const { existsSync: nodeExistsSync, readdirSync: nodeReaddirSync } = require('node:fs');
+const {
+  existsSync: nodeExistsSync,
+  readdirSync: nodeReaddirSync,
+  readFileSync: nodeReadFileSync,
+} = require('node:fs');
 const nodePath = require('node:path');
 
 // Force the app onto the discrete (high-performance) GPU on hybrid systems, with ZERO
@@ -82,9 +86,21 @@ const nodePath = require('node:path');
 //     caller must invoke this and, if it returns true, exit immediately without creating any
 //     window or spawning the GPU process itself. Four constraints shape the details:
 //     (a) HYBRID-GATED: the relaunch only happens when /sys/class/drm exposes two or more
-//         GPUs (isLinuxHybridGpu). A single-GPU machine gets neither the extra spawn nor a
+//         GPUs AND the card that drives the display (sysfs boot_vga) is not the NVIDIA one
+//         (isLinuxHybridGpu). A single-GPU machine gets neither the extra spawn nor a
 //         forced --ozone-platform=x11 (which would silently move native-Wayland players onto
 //         XWayland for no benefit, and would strand a Wayland-only setup with no XWayland).
+//         A DESKTOP with an integrated GPU left enabled next to the NVIDIA card that runs
+//         the screen is not hybrid territory either: the offload env there makes the NVIDIA
+//         EGL render beside a screen it already owns, every EGL display type fails to
+//         initialise ("Invalid visual ID requested"), the GPU process exits three times and
+//         Chromium disables the GPU for the session (measured 2026-08-28 on an Intel ARL
+//         iGPU + RTX 3090 desktop under X11: no WebGL at all).
+//         Known limit: the check keys on the NVIDIA vendor only. The analogous AMD desktop
+//         (an AMD card on the screen, an iGPU left enabled) still takes the offload path,
+//         where DRI_PRIME=1 points rendering at the other device: it mis-selects rather
+//         than crashing, exactly as under the old two-card rule, and PCI vendor ids cannot
+//         tell an AMD dGPU from an AMD APU, so the fatal NVIDIA case is the scope.
 //     (b) APPIMAGE-AWARE SPAWN SOURCE: in an AppImage, process.execPath points INSIDE the
 //         runtime's FUSE mount, and that mount's daemon is the runtime process, which
 //         unmounts and exits the moment its child (this process) exits; a child spawned from
@@ -308,20 +324,48 @@ function shouldRelaunchForLinuxPrime(env, argv, fileExists = nodeExistsSync) {
   return Object.keys(buildLinuxPrimeEnv(env, fileExists)).length > 0;
 }
 
+const NVIDIA_PCI_VENDOR = '0x10de';
+
+/** The card that drives the display, per sysfs: `boot_vga` is 1 on the VGA device the
+ *  firmware brought up the screen on. Null when no card says so or the files are
+ *  unreadable (a headless box, an exotic sandbox). */
+function linuxDisplayCardVendor(cards, readFile) {
+  for (const card of cards) {
+    try {
+      const bootVga = String(readFile(`/sys/class/drm/${card}/device/boot_vga`, 'utf8')).trim();
+      if (bootVga !== '1') continue;
+      return String(readFile(`/sys/class/drm/${card}/device/vendor`, 'utf8'))
+        .trim()
+        .toLowerCase();
+    } catch {
+      // This card has no PCI attributes (a virtual or platform device): not the one.
+    }
+  }
+  return null;
+}
+
 /**
- * True when /sys/class/drm exposes two or more GPU card devices, the hybrid-graphics case
- * this whole lever exists for. Needs no Electron API (getGPUInfo needs app ready, far too
- * late to decide a relaunch), so it can run at the very top of main. On any read failure
- * (exotic sandbox, no /sys) it returns false: when we cannot tell, we impose neither the
- * extra spawn nor a forced X11 backend on the player. `readdir` is injectable for tests.
+ * True when /sys/class/drm exposes two or more GPU card devices AND the card that drives
+ * the display is not the NVIDIA one: the hybrid-graphics case this whole lever exists for
+ * (an integrated GPU on the screen, the NVIDIA card idle until offloaded onto). When the
+ * NVIDIA card already runs the screen (a desktop with its iGPU left enabled, boot_vga on
+ * the 0x10de device) the offload env is not only useless but fatal to the GPU process,
+ * so that machine reads as not hybrid. Needs no Electron API (getGPUInfo needs app ready,
+ * far too late to decide a relaunch), so it can run at the very top of main. On a
+ * /sys/class/drm read failure (exotic sandbox, no /sys) it returns false: when we cannot
+ * tell, we impose neither the extra spawn nor a forced X11 backend on the player. When
+ * only the boot_vga files are unreadable, the two-card rule decides as it always has.
+ * `readdir` and `readFile` are injectable for tests.
  */
-function isLinuxHybridGpu(readdir = nodeReaddirSync) {
+function isLinuxHybridGpu(readdir = nodeReaddirSync, readFile = nodeReadFileSync) {
+  let cards;
   try {
-    const cards = readdir('/sys/class/drm').filter((name) => /^card\d+$/.test(name));
-    return cards.length >= 2;
+    cards = readdir('/sys/class/drm').filter((name) => /^card\d+$/.test(name));
   } catch {
     return false;
   }
+  if (cards.length < 2) return false;
+  return linuxDisplayCardVendor(cards, readFile) !== NVIDIA_PCI_VENDOR;
 }
 
 /**
