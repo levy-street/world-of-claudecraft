@@ -732,6 +732,26 @@ describe('combat SFX policy', () => {
     }
   });
 
+  it('resolves the Herald of the Last Flame to his recorded ignivar voice pack', () => {
+    // The SUBFAMILY_ALIAS row maps the boss template to the short 'ignivar'
+    // subfamily the ten hand-recorded takes are named under. Resolved against
+    // the REAL generated manifest on purpose: a missing alias or a stale
+    // manifest fails silent (the boss keeps the generic elemental voice, no
+    // error), so this is the positive proof the integration needs.
+    for (const action of ['idle', 'aggro', 'attack', 'hurt', 'death'] as const) {
+      const specific = `mob_elemental_ignivar_${action}`;
+      expect(specific in SFX_CLIPS, specific).toBe(true);
+      expect(
+        mobVoiceCue('ignivar_herald_of_the_last_flame', action, (key) => key in SFX_CLIPS),
+      ).toBe(specific);
+    }
+    // With no loaded takes the aliased template still falls back to the plain
+    // family-level sound, same as an unaliased one would.
+    expect(mobVoiceCue('ignivar_herald_of_the_last_flame', 'aggro', () => false)).toBe(
+      'mob_elemental_aggro',
+    );
+  });
+
   it('resolves the reptile family for its first real mob', () => {
     expect(mobVoiceFamily('deepfen_spearjaw')).toBe('reptile');
     expect(mobVoiceCue('deepfen_spearjaw', 'aggro')).toBe('mob_reptile_aggro');

@@ -22,6 +22,7 @@ const {
   normalizeSfxGainMap,
   normalizeSfxSpeedMap,
   readSfxPlaybackProfile,
+  resolvedGainCeilingDb,
   resolveSfxPlaybackProfile,
   SFX_GAIN_MAP_PATH,
   SFX_SPEED_MAP_PATH,
@@ -192,6 +193,63 @@ describe('SFX runtime playback profile', () => {
     ).toThrow('between 0.25 and 4');
     expect(existsSync(join(root, SFX_GAIN_MAP_PATH))).toBe(false);
     expect(existsSync(join(root, SFX_SPEED_MAP_PATH))).toBe(false);
+  });
+
+  it('addresses mob subfamily extension keys in both maps, held to their computed ceilings', () => {
+    // mob_beast_wolf_* are filesystem-discovered subfamily keys with no
+    // catalog row; their committed ceiling records come from the custom-family
+    // inheritance in sfx_gain_ceiling.mjs. The wolf pack is used on purpose:
+    // it shipped long before any subfamily carried a trim, so this test proves
+    // the pipeline on pre-existing content rather than on whichever new voice
+    // pack landed last. Read the live ceiling rather than hardcoding it so a
+    // re-cut take moves this test with the artifact.
+    const ceiling = resolvedGainCeilingDb('mob_beast_wolf_attack');
+    expect(ceiling).toBeGreaterThan(0);
+    // A trim at the computed ceiling is the intended shape and must resolve.
+    const boosted = resolveSfxPlaybackProfile('mob_beast_wolf_attack', {
+      gainMap: {
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { mob_beast_wolf_attack: ceiling },
+      },
+      speedMap: DEFAULT_SFX_SPEED_MAP,
+    });
+    expect(boosted.gainDb).toBe(ceiling);
+    expect(boosted.gain).toBeGreaterThan(1);
+    // Past the ceiling fails outright, exactly like a catalog custom key.
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { mob_beast_wolf_attack: ceiling + 0.5 },
+      }),
+    ).toThrow('resolved gain for mob_beast_wolf_attack');
+    // A valid-shape subfamily key with NO ceiling record keeps the flat 0dB
+    // cap, so a positive trim on it can never validate.
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { mob_elemental_nosuchsub_aggro: 1 },
+      }),
+    ).toThrow('resolved gain for mob_elemental_nosuchsub_aggro');
+    // Outside the known voice families, or off the key grammar, both maps
+    // still refuse the key outright.
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { mob_notafamily_testsub_aggro: -3 },
+      }),
+    ).toThrow('unknown SFX gain key');
+    expect(() =>
+      normalizeSfxSpeedMap({ version: 1, rateByKey: { mob_notafamily_testsub_aggro: 1.2 } }),
+    ).toThrow('unknown SFX speed key');
+    // A speed entry for a real subfamily key is addressable like gain is.
+    expect(
+      normalizeSfxSpeedMap({ version: 1, rateByKey: { mob_beast_wolf_attack: 1.1 } }).rateByKey
+        .mob_beast_wolf_attack,
+    ).toBe(1.1);
   });
 
   it('uses only the runtime maps for manifest gain and rate without changing audio identity', () => {
