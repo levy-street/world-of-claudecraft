@@ -573,7 +573,7 @@ export function markItemDiscovered(
   meta: PlayerMeta,
   itemId: string,
   rolledQuality?: string,
-  opts?: Readonly<{ retro?: boolean; movement?: boolean }>,
+  opts?: Readonly<{ retro?: boolean; movement?: boolean; buyback?: boolean }>,
 ): void {
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds
@@ -589,6 +589,11 @@ export function markItemDiscovered(
     const def: ItemDef | undefined = ITEMS[id];
     if (!def) return; // bounded by construction: only real item ids enter the set
     if (!meta.deedStats.itemsDiscovered.has(id)) {
+      // Movement items (trade, mail, market) don't count toward discovery
+      // (issue #3673): only earned play should credit deeds/reliquary.
+      // Buyback is an exception: it requires prior ownership and is copper
+      // neutral, so it's allowed to credit discovery.
+      if (opts?.movement && !opts?.buyback) continue;
       meta.deedStats.itemsDiscovered.add(id);
       markDeedDirtyKey(ctx, meta.entityId, 'items');
       // Reliquary sparse first-find + capped recent for catalogued relics only.
