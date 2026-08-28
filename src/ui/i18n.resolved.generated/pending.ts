@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -78,6 +80,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "es_ES": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -146,6 +150,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "fr_FR": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -214,6 +220,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "fr_CA": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -283,6 +291,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -351,6 +361,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "de_DE": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -451,6 +463,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletUsdBalance"
   ],
   "pt_BR": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -527,6 +541,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletUsdBalance"
   ],
   "cs_CZ": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -595,6 +611,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "nl_NL": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -663,6 +681,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "pl_PL": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -731,6 +751,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "id_ID": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -799,6 +821,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "tr_TR": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -867,6 +891,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "sv_SE": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -935,6 +961,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "vi_VN": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",
@@ -1003,6 +1031,8 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.browser.stepUpBody"
   ],
   "da_DK": [
+    "desktop.notify.readyCheckBody",
+    "desktop.notify.readyCheckTitle",
     "hudChrome.actionBar.conflictAccept",
     "hudChrome.actionBar.conflictBody",
     "hudChrome.actionBar.conflictTitle",

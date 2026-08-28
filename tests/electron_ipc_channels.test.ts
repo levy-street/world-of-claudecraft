@@ -298,7 +298,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const body = main.slice(start, end);
     expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).toContain("if (!payload || typeof payload !== 'object') return false;");
-    expect(body).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return false;");
+    expect(body).toContain(
+      "if (kind !== 'update-ready' && kind !== 'party-invite' && kind !== 'ready-check') return false;",
+    );
     expect(body).toContain(
       "if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return false;",
     );
@@ -376,7 +378,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(showEnd).toBeGreaterThan(showStart);
     const show = preload.slice(showStart, showEnd);
     expect(show).toContain("if (!payload || typeof payload !== 'object') return;");
-    expect(show).toContain("if (kind !== 'update-ready' && kind !== 'party-invite') return;");
+    expect(show).toContain(
+      "if (kind !== 'update-ready' && kind !== 'party-invite' && kind !== 'ready-check') return;",
+    );
     expect(show).toContain(
       "if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;",
     );

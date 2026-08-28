@@ -148,6 +148,8 @@ export const shellStrings = {
         updateReadyBody: 'Restart World of ClaudeCraft to apply the update.',
         partyInviteTitle: 'Party invite',
         partyInviteBody: '{name} invited you to a party.',
+        readyCheckTitle: 'Ready check',
+        readyCheckBody: '{name} started a ready check.',
       },
       crash: {
         title: 'World of ClaudeCraft',

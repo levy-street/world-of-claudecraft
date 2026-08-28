@@ -8033,6 +8033,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.notify.updateReadyBody': '업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.',
   'desktop.notify.partyInviteTitle': '파티 초대',
   'desktop.notify.partyInviteBody': '{name}님이 파티에 초대했습니다.',
+  'desktop.notify.readyCheckTitle': '준비 확인',
+  'desktop.notify.readyCheckBody': '{name}님이 준비 확인을 시작했습니다.',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',

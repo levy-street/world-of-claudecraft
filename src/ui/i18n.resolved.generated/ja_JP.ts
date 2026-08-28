@@ -8331,7 +8331,9 @@ export const ja_JP: EnTranslations = {
       "updateReadyTitleNoVersion": "アップデートの準備ができました",
       "updateReadyBody": "アップデートを適用するには World of ClaudeCraft を再起動してください。",
       "partyInviteTitle": "パーティ招待",
-      "partyInviteBody": "{name}があなたをパーティに招待しています。"
+      "partyInviteBody": "{name}があなたをパーティに招待しています。",
+      "readyCheckTitle": "準備確認",
+      "readyCheckBody": "{name}が準備確認を開始しました。"
     },
     "crash": {
       "title": "World of ClaudeCraft",

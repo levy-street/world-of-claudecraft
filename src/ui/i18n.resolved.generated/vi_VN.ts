@@ -8331,7 +8331,9 @@ export const vi_VN: EnTranslations = {
       "updateReadyTitleNoVersion": "Bản cập nhật đã sẵn sàng",
       "updateReadyBody": "Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.",
       "partyInviteTitle": "Lời mời tổ đội",
-      "partyInviteBody": "{name} đã mời bạn gia nhập tổ đội của họ."
+      "partyInviteBody": "{name} đã mời bạn gia nhập tổ đội của họ.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",

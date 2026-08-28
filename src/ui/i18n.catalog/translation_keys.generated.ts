@@ -784,6 +784,8 @@ export type TranslationKeyFlat =
   | 'desktop.crash.title'
   | 'desktop.notify.partyInviteBody'
   | 'desktop.notify.partyInviteTitle'
+  | 'desktop.notify.readyCheckBody'
+  | 'desktop.notify.readyCheckTitle'
   | 'desktop.notify.updateReadyBody'
   | 'desktop.notify.updateReadyTitle'
   | 'desktop.notify.updateReadyTitleNoVersion'

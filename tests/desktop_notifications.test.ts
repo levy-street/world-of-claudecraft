@@ -75,6 +75,12 @@ const inviteEvent = (fields: { pid?: number; fromName: string }): SimEvent => ({
   ...(fields.pid !== undefined ? { pid: fields.pid } : {}),
 });
 
+const readyCheckEvent = (fields: { pid?: number; fromName: string }): SimEvent => ({
+  type: 'readyCheckStart',
+  fromName: fields.fromName,
+  ...(fields.pid !== undefined ? { pid: fields.pid } : {}),
+});
+
 beforeEach(() => {
   document.hasFocus = () => focused;
   focused = true;
@@ -121,6 +127,42 @@ describe('createDesktopNotifyCore party invites', () => {
     expect(
       core.partyInvite(
         { type: 'guildInvite', fromName: 'Ayla', guildName: 'Oathsworn' },
+        LOCAL_PID,
+      ),
+    ).toBeNull();
+  });
+});
+
+describe('createDesktopNotifyCore ready checks', () => {
+  it('fires for an event with no pid at all (shape robustness: every real emission stamps one)', () => {
+    const core = createDesktopNotifyCore();
+    expect(core.readyCheckStart(readyCheckEvent({ fromName: 'Zev' }), LOCAL_PID)).toEqual({
+      name: 'Zev',
+    });
+  });
+
+  it('fires for an online event addressed to this player', () => {
+    const core = createDesktopNotifyCore();
+    expect(
+      core.readyCheckStart(readyCheckEvent({ pid: LOCAL_PID, fromName: 'Zev' }), LOCAL_PID),
+    ).toEqual({ name: 'Zev' });
+  });
+
+  it('ignores an event addressed to a different player', () => {
+    const core = createDesktopNotifyCore();
+    expect(
+      core.readyCheckStart(readyCheckEvent({ pid: LOCAL_PID + 1, fromName: 'Zev' }), LOCAL_PID),
+    ).toBeNull();
+  });
+
+  it('ignores every other event type, even one addressed to this player', () => {
+    const core = createDesktopNotifyCore();
+    expect(
+      core.readyCheckStart(inviteEvent({ pid: LOCAL_PID, fromName: 'Zev' }), LOCAL_PID),
+    ).toBeNull();
+    expect(
+      core.readyCheckStart(
+        { type: 'guildInvite', fromName: 'Zev', guildName: 'Oathsworn' },
         LOCAL_PID,
       ),
     ).toBeNull();
@@ -317,19 +359,38 @@ describe('desktopNotifyOnSimEvents', () => {
     expect(sent).toEqual([]);
   });
 
-  it('posts one notification per invite in a frame, and nothing for other events', () => {
+  it('posts a ready check while the player is away', () => {
+    const { sent } = boot();
+    setPlayer({ hidden: false, focused: false });
+    desktopNotifyOnSimEvents([readyCheckEvent({ pid: LOCAL_PID, fromName: 'Zev' })], LOCAL_PID);
+    expect(sent).toEqual([
+      { kind: 'ready-check', title: 'Ready check', body: 'Zev started a ready check.' },
+    ]);
+  });
+
+  it('posts no ready check while the player is present at the window', () => {
+    const { sent } = boot();
+    setPlayer({ hidden: false, focused: true });
+    desktopNotifyOnSimEvents([readyCheckEvent({ pid: LOCAL_PID, fromName: 'Zev' })], LOCAL_PID);
+    expect(sent).toEqual([]);
+  });
+
+  it('posts one notification per matching invite or ready check, and nothing for others', () => {
     const { sent } = boot();
     setPlayer({ hidden: true, focused: false });
     desktopNotifyOnSimEvents(
       [
-        { type: 'readyCheckStart', fromName: 'Zev', pid: LOCAL_PID },
+        readyCheckEvent({ pid: LOCAL_PID, fromName: 'Zev' }),
         inviteEvent({ pid: LOCAL_PID, fromName: 'Ayla' }),
         inviteEvent({ pid: LOCAL_PID + 1, fromName: 'Nym' }),
+        readyCheckEvent({ pid: LOCAL_PID + 1, fromName: 'Kor' }),
         inviteEvent({ fromName: 'Rin' }),
+        { type: 'guildInvite', fromName: 'Vex', guildName: 'Oathsworn' },
       ],
       LOCAL_PID,
     );
     expect(sent.map((request) => request.body)).toEqual([
+      'Zev started a ready check.',
       'Ayla invited you to a party.',
       'Rin invited you to a party.',
     ]);

@@ -8331,7 +8331,9 @@ export const sv_SE: EnTranslations = {
       "updateReadyTitleNoVersion": "Uppdatering är klar",
       "updateReadyBody": "Starta om World of ClaudeCraft för att tillämpa uppdateringen.",
       "partyInviteTitle": "Gruppinbjudan",
-      "partyInviteBody": "{name} bjöd in dig till en grupp."
+      "partyInviteBody": "{name} bjöd in dig till en grupp.",
+      "readyCheckTitle": "Ready check",
+      "readyCheckBody": "{name} started a ready check."
     },
     "crash": {
       "title": "World of ClaudeCraft",
