@@ -9,6 +9,7 @@
 // coverage, not a shortcut: the fallback is the path the game itself takes on
 // the frames before the assets land.
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
@@ -774,17 +775,28 @@ describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
     // consume the silent first pass and every standing feast would puff on
     // the first live read. Comments are stripped so the doc paragraph that
     // NAMES the guard cannot satisfy the pin.
-    const src = readFileSync('src/render/renderer.ts', 'utf8')
+    const src = readFileSync(join(__dirname, '..', 'src/render/renderer.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(src).toContain(
-      'if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(',
-    );
+    // LOCATION-BOUND (the render review's inversion hazard): the GUARDED call
+    // must sit inside prewarmWorldFrame's body, and the LIVE call site (the
+    // renderer update path, after prewarmWorldFrame in the file) must stay
+    // BARE, so a refactor that guards the live path and leaves the prewarm
+    // one open cannot satisfy this by counts alone.
+    const guarded = 'if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(';
+    const prewarmStart = src.indexOf('prewarmWorldFrame');
+    expect(prewarmStart).toBeGreaterThan(-1);
+    const guardedAt = src.indexOf(guarded);
+    expect(guardedAt).toBeGreaterThan(prewarmStart);
     // The live-frame call site stays UNGUARDED by design (it runs only after
-    // entry completes, and its own doc paragraph in prewarmWorldFrame says
-    // why), so exactly one of the two sync call sites carries the guard; a
-    // refactor that removes either shows up here.
+    // entry completes; the rationale paragraph lives in farm_patches.ts
+    // applyFeasts, renderer.ts deliberately carries no comment at its exact
+    // monolith ceiling). Exactly two call sites, and the one that is not the
+    // guarded one is bare.
     const calls = src.match(/this\.farmPatchVisuals\.sync\(/g) ?? [];
     expect(calls).toHaveLength(2);
+    const liveAt = src.indexOf('this.farmPatchVisuals.sync(', guardedAt + guarded.length);
+    expect(liveAt).toBeGreaterThan(guardedAt);
+    expect(src.slice(liveAt - guarded.length, liveAt)).not.toContain('entities.has');
   });
 });

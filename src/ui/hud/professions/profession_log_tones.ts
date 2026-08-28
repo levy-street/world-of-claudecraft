@@ -11,10 +11,10 @@
 //
 // The values deliberately match the HUD's own log registers: GRANT is the
 // loot-family green (--color-text-success), MISS the gathering got-away grey,
-// TOAST the house gold, DENY the HUD's refusal red. hud.ts's own pre-existing
-// log calls still spell these inline (its ratchet freezes it this phase); the
-// craftResult deny arm at hud.ts is the recorded consumer of DENY once a
-// wiring change is allowed there.
+// TOAST the house gold, DENY the HUD's refusal red. hud.ts's PROFESSIONS
+// event arms (craft/train/unbind/disenchant result) consume GRANT and DENY by
+// name; its non-professions arms still spell tone hexes inline (a ratcheted
+// file migrates as headroom allows, never wholesale).
 //
 // DOM-free and deterministic (registered in tests/architecture.test.ts
 // UI_PURE_CORES): five constants, no behavior.

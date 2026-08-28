@@ -153,12 +153,14 @@ export class PerfectingWindow {
       this.openerFocus = null;
       return;
     }
-    // Teardown order: the naming dialog's dismiss clears inert itself; the
-    // direct write after it is the backstop the prompt_dialog contract asks
-    // of a caller whose window can be force-closed under an open prompt.
+    // Teardown order: hide FIRST so the dialog teardown's focus repair sees a
+    // closed window and stands down (its isOpen gate); the dialog's dismiss
+    // then clears inert itself, and the direct write after it is the backstop
+    // the prompt_dialog contract asks of a caller whose window can be
+    // force-closed under an open prompt.
+    root.style.display = 'none';
     this.namingDialog?.dismiss();
     root.inert = false;
-    root.style.display = 'none';
     this.deps.onVisibilityChange?.();
     if (this.clock !== null) {
       window.clearInterval(this.clock);
@@ -332,9 +334,15 @@ export class PerfectingWindow {
    *  is FocusManager-registered).  */
   private refocusAfterPrompt(): void {
     if (!this.isOpen) return;
-    const root = this.root();
+    // Repair ONLY a dropped focus (body/null): a prompt teardown that leaves
+    // focus on any real control, this window's OR another's, keeps it. The
+    // fresh-read round's steal case: the promotion's repaint-driven
+    // auto-dismiss can fire while the player is typing in chat behind the
+    // dialog, and yanking them onto a perfecting rung mid-word is worse than
+    // the drop it repairs.
     const active = document.activeElement;
-    if (active instanceof HTMLElement && active !== document.body && root.contains(active)) return;
+    if (active instanceof HTMLElement && active !== document.body) return;
+    const root = this.root();
     restoreFirstEnabled([
       root.querySelector<HTMLElement>('.pf-cand[aria-checked="true"]'),
       root.querySelector<HTMLElement>('[data-action]'),

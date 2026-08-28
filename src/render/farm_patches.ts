@@ -458,7 +458,17 @@ export class FarmPatchVisuals {
    *  entry-sequence change. The fix stays at the RENDERER call site by
    *  design, never as a non-empty-map guard here, which would flip the
    *  pinned rebuild/login silence into a burst. Cosmetic either way: both
-   *  emitters ride vfx.ts's scaled budget. */
+   *  emitters ride vfx.ts's scaled budget. What that close does NOT cover
+   *  (recorded by the phase 14 render review, still OPEN): this module is
+   *  an unprepared GPU producer independent of the flourish. createFeast
+   *  and create scene-add cloned materials (and fallback BoxGeometry) from
+   *  the LIVE frame call site with no prewarm-manifest entry, compile gate,
+   *  or stand-in, so the first plot stage-advance or in-scope feast of a
+   *  session likely pays a cold program link mid-frame. The correction is a
+   *  prewarm manifest twin for the farm GLB set, or a compile gate on the
+   *  plot/feast attach with the static bed as the stand-in (a
+   *  render-scheduler change owned by a render diff, not the phase 14 UI
+   *  pass). */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;

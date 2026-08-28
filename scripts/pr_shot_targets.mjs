@@ -420,6 +420,21 @@ async function seedLowGraphicsPreset(page) {
   );
 }
 
+/** Dismiss the tutorial-island greeting dialog if it has spawned: standalone
+ *  pages enter at The Proving Shore, where Ferryman Odo's greeting pops a few
+ *  beats after entry and would overlap (or swallow the clicks of) any staged
+ *  window shot. Click its own confirm so the dismissal is the real path. */
+async function dismissTutorialGreeting(page) {
+  await page.evaluate(() => {
+    for (const id of ['tutorial-greeting', 'profession-tutorial']) {
+      const popup = document.getElementById(id);
+      popup?.querySelector('button')?.click();
+      popup?.remove();
+    }
+  });
+  await wait(200);
+}
+
 /** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
 async function seedHighGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
@@ -11167,6 +11182,116 @@ export const TARGETS = [
         await wait(400);
       }
       return { clip: '#bar-editor' };
+    },
+  },
+  {
+    // Masterwrought phase 14: the Perfecting window over a bagged apex piece
+    // with the attempt bill in reach, so the shot carries the candidate
+    // radiogroup, the shared prof-track rank track, the materials rows, and
+    // the R2 bind warning in one frame. Opened through the Hud entry the
+    // crafting title-bar button routes to. On a base checkout the optional
+    // chains degrade to a skip (the window does not exist there; the honest
+    // BEFORE is the crafting window's own shot).
+    key: 'perfecting-window',
+    label: 'The Perfecting window: candidates, rank track, bill, bind warning (phase 14)',
+    when: ['ui/hud/professions/perfecting_view', 'ui/hud/professions/perfecting_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        const meta = g?.sim?.players?.get?.(g?.sim?.primaryId);
+        if (meta?.craftSkills) meta.craftSkills.weaponcrafting = 125;
+        g?.sim?.addItem?.('duskforged_warblade', 1);
+        g?.sim?.addItem?.('makers_ember', 1);
+        g?.sim?.addItem?.('sundered_essence', 1);
+        g?.sim?.addItem?.('prismglass_setting', 1);
+        g?.hud?.openPerfecting?.();
+      });
+      const open = await pollForSize(page, '#perfecting-window');
+      if (!open) return { skip: 'the perfecting window never opened (base checkout?)' };
+      await wait(400);
+      // Mobile clips the whole HUD so the shot also proves the window fits
+      // the 844x390 landscape viewport beside the touch cluster.
+      return { clip: shot?.mobile ? '#ui' : '#perfecting-window' };
+    },
+  },
+  {
+    // The legendary naming dialog over a Perfected, promotion-ready bagged
+    // copy: the 32-char cap, the live count, the shape hint, and the
+    // debounce-armed submit, with a draft typed so the count reads real.
+    key: 'perfecting-naming',
+    label: 'The legendary naming dialog (phase 14)',
+    when: ['ui/hud/professions/legendary_naming_dialog'],
+    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        const meta = g?.sim?.players?.get?.(g?.sim?.primaryId);
+        if (meta?.craftSkills) meta.craftSkills.weaponcrafting = 125;
+        g?.sim?.addItemInstance?.('duskforged_warblade', { perfected: true, boundTo: 1 });
+        g?.sim?.addItem?.('deed_of_making', 1);
+        g?.hud?.openPerfecting?.();
+      });
+      if (!(await pollForSize(page, '#perfecting-window'))) {
+        return { skip: 'the perfecting window never opened (base checkout?)' };
+      }
+      // The staged skill crossing a tier can pop the first-tier profession
+      // tutorial over the window; clear it before driving the action button.
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('#perfecting-window [data-action]')?.click();
+      });
+      if (!(await pollForSize(page, '.pf-name-prompt'))) {
+        return { skip: 'the naming dialog never opened (no promote affordance?)' };
+      }
+      await page.type('.pf-name-input', 'Oathkeeper');
+      await wait(300);
+      return { clip: '#prompt-stack' };
+    },
+  },
+  {
+    // The kind-fair consumable tray (phase 14): a potion-and-elixir-heavy bag
+    // seats the flask instead of starving it (the recorded residual this
+    // phase fixed). Mobile only: the six-seat strip is the touch HUD's quick
+    // tray, revealed from the consumable ring seat in tap mode.
+    key: 'consumable-tray',
+    label: 'The quick tray seating every present consumable kind (phase 14)',
+    when: ['ui/hud/action_bar/consumable_bar_view'],
+    variants: [{ key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset }],
+    async capture(page) {
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        const g = window.__game;
+        for (const id of [
+          'minor_healing_potion',
+          'lesser_healing_potion',
+          'minor_mana_potion',
+          'lesser_mana_potion',
+          'elixir_of_the_bear',
+          'elixir_of_the_boar',
+          'husk_flask',
+        ]) {
+          g?.sim?.addItem?.(id, 1);
+        }
+      });
+      await wait(400);
+      // The strip reveals on the HOLD gesture (the shared strip layer's
+      // reveal timer); keep the touch held through the shot so the row stays
+      // open, exactly as a player mid-gesture sees it.
+      await holdOpen(page, '#mobile-consumable-seat');
+      const expanded = await page.evaluate(
+        () =>
+          document.getElementById('mobile-consumable-seat')?.getAttribute('aria-expanded') ===
+          'true',
+      );
+      if (!expanded) return { skip: 'the consumable strip never revealed from the seat hold' };
+      await wait(300);
+      return { clip: '#ui' };
     },
   },
 ];
