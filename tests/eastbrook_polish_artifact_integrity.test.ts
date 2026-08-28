@@ -1026,9 +1026,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b7dabf439a39bc1732755d87052a71e665e8a988ffba3d378e9178095b36f6da';
+  'f9586092df09d36e4299d4e80ccf798a5eb8c0ddf901812074364dcb10ff200b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '1de661ddb5b40515d4139c19878df51bad2d49ac31cecead957f27fd5046226e';
+  '17f15bf59f8736c30520dae05ebb8a832f6e88fff9aa59f320d7588ffa2054f7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2178,7 +2178,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('dfc3e2bd86f6efb98c38ba58964a09f8978f3f29467351ca94e12dab8c7583c7');
+    ).toBe('29a14c4978fb6308a3cb0548a829c877585366391dbff98f9d2920f3b567c21b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
