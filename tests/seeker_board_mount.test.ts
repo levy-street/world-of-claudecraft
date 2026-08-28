@@ -50,6 +50,18 @@ describe('Seeker board asset', () => {
     // skips the optimiser lands back near a megabyte and fails here instead of
     // passing quietly.
     expect(bytes).toBeLessThan(900_000);
+    // The size bound alone cannot catch a PNG re-export (the pre-KTX2 file was
+    // 772 KB), so the texture encoding is pinned the way the tank's is:
+    // KHR_texture_basisu REQUIRED (not merely used), every image ktx2.
+    const json = glbJson(GLB) as {
+      extensionsRequired?: string[];
+      images?: { mimeType?: string }[];
+    };
+    expect(json.extensionsRequired ?? []).toContain('KHR_texture_basisu');
+    expect(json.images?.length).toBeGreaterThan(0);
+    for (const image of json.images ?? []) {
+      expect(image.mimeType).toBe('image/ktx2');
+    }
   });
 
   it('carries every clip MOUNT_SEEKER names', () => {

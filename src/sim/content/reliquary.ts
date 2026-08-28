@@ -1317,7 +1317,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Eight of the ten mounts name every door that awards their reins (see
+    // All but the two pending mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
     // reins are Rift-only, valorsteed is Marla's counter, and seeker_board
