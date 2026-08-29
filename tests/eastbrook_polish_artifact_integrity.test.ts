@@ -1039,9 +1039,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // scenery cull beside this branch's aim blocked pass-through), then these
 // seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '914c94ce36a5c27da68ab69be29a61c9958e7c9e38857da2a3eace318b3caf93';
+  'ee4bfcf6b19a6d9783987b6d38fb09f7e2defd8a3d3f509e3a9cdae656186921';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'cbeaf192ce71a92b1d9b8b8e0dd92d885a60627f9e12955f20a06485d95129c8';
+  '373218a143bcfcc723227774f118894306b62cec652f477f7a53fb4e4dbe2fd0';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2202,10 +2202,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // release arm's battleground compile gate), so the composite follows the
     // merged tree and this seal follows the swept evidence bytes. No capture
     // was retaken.
+    // Re-minted again after the QA round's renderer edits (the extension sweep
+    // now installs the drift sentinel through one call). renderer.ts only; no
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('291f5317c503d2bb5b425e4585840eeac3088fd5e43d2cc2278bdf2439cd424f');
+    ).toBe('1c9872b3e55c5a0753e760de21c4507010a78d9b686405234801a534c4c7839d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

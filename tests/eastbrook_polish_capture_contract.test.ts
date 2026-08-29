@@ -337,7 +337,7 @@ interface AttributionTargetFixture {
 // branch's aim blocked pass-through, so the composite matches neither parent.
 // No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'cbeaf192ce71a92b1d9b8b8e0dd92d885a60627f9e12955f20a06485d95129c8';
+  '373218a143bcfcc723227774f118894306b62cec652f477f7a53fb4e4dbe2fd0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
