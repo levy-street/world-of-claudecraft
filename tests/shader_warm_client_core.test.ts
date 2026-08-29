@@ -7,11 +7,14 @@
 import { describe, expect, it } from 'vitest';
 import { programSourceHash } from '../src/render/shader_warm_audit_core';
 import {
+  createShaderWarmHoldRing,
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
   readShaderWarmSetting,
+  SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_FRAME_PERIOD_MS,
+  SHADER_WARM_HOLD_WINDOW,
   SHADER_WARM_PAUSE_ABOVE_MS,
   SHADER_WARM_RESUME_BELOW_MS,
   SHADER_WARM_SETTINGS,
@@ -360,6 +363,40 @@ describe('the breaker the client retires a worker on', () => {
     // already one too many to be one slow link.
     expect(SHADER_WARM_TIMEOUT_BREAKER).toBe(3);
   });
+
+  it('pins the expired share that retires a worker too slow for the demand', () => {
+    // Half of the last eight holds: a worker answering someone while most
+    // holds still pay the cap costs more than none.
+    expect(SHADER_WARM_HOLD_WINDOW).toBe(8);
+    expect(SHADER_WARM_EXPIRED_SHARE_BREAKER).toBe(4);
+  });
+
+  it('keeps the last few holds, and counts the expiries among them', () => {
+    const ring = createShaderWarmHoldRing(3);
+    expect(ring.expired()).toBe(0);
+    ring.note(true);
+    ring.note(true);
+    ring.note(false);
+    expect(ring.expired()).toBe(2);
+    expect(ring.size()).toBe(3);
+    // The oldest expiry rolls out.
+    ring.note(false);
+    expect(ring.expired()).toBe(1);
+    ring.note(false);
+    expect(ring.expired()).toBe(0);
+  });
+});
+
+describe('a cancelled request in the counters', () => {
+  it('counts a drop on the client word apart from a link the worker could not do', async () => {
+    const requests = createShaderWarmRequests();
+    const { ids } = requests.request([source('a'), source('b')], 20);
+    const settled = requests.whenSettled(ids);
+    requests.settle(1, 'failed', true);
+    requests.settle(2, 'failed');
+    expect(await settled).toEqual(['failed', 'failed']);
+    expect(requests.stats()).toMatchObject({ failed: 1, cancelled: 1, warmed: 0 });
+  });
 });
 
 describe('the pause signal the frame time drives', () => {
@@ -427,5 +464,45 @@ describe('the pause signal the frame time drives', () => {
     noteShaderWarmFrame(runaway, 60_000);
     noteShaderWarmFrame(clamped, 250);
     expect(runaway.emaMs).toBe(clamped.emaMs);
+  });
+});
+
+describe('abandoning a request', () => {
+  it('drops an id only when no other request still waits for it', () => {
+    // Two gates carrying the same material share one id: the first to give
+    // up must not cancel the link the second is still holding for.
+    const requests = createShaderWarmRequests();
+    const first = requests.request([source('void main() {}')], 20);
+    const second = requests.request([source('void main() {}')], 30);
+    expect(second.ids).toEqual(first.ids);
+
+    expect(requests.abandon(first.ids)).toEqual([]);
+    expect(requests.abandon(second.ids)).toEqual([1]);
+    // Once, and an unknown id is nobody's.
+    expect(requests.abandon([1, 99])).toEqual([]);
+  });
+
+  it('never drops an id the worker already settled', () => {
+    const requests = createShaderWarmRequests();
+    const { ids } = requests.request([source('void main() {}')], 20);
+    requests.settle(1, 'warmed');
+    expect(requests.abandon(ids)).toEqual([]);
+  });
+
+  it('asks again for the same text once it was dropped, as a fresh id', async () => {
+    // A dropped link never lands; a later gate must get its own request,
+    // not a wait on the cancelled one.
+    const requests = createShaderWarmRequests();
+    const first = requests.request([source('void main() {}')], 20);
+    expect(requests.abandon(first.ids)).toEqual([1]);
+    const again = requests.request([source('void main() {}')], 20);
+    expect(again.ids).toEqual([2]);
+    expect(again.toSend.map((item) => item.id)).toEqual([2]);
+
+    // The worker's cancel answer settles the old id for whoever kept waiting.
+    const old = requests.whenSettled(first.ids);
+    requests.settle(1, 'failed');
+    expect(await old).toEqual(['failed']);
+    expect(requests.stats()).toMatchObject({ sent: 2, deduped: 0, failed: 1 });
   });
 });

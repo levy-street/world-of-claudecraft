@@ -132,20 +132,26 @@ interface LaneWorker {
   onerror: ((event: ErrorEvent) => void) | null;
   emit(message: ShaderWarmWorkerMessage): void;
   askedIds(): number[];
+  cancelledIds(): number[];
 }
 
 /** A worker that comes up at once and, in `auto` mode, answers every program
  *  warm as it arrives, so a lane's own sequencing is what the case reads. */
 function laneWorker(auto = true): LaneWorker {
   const asked: number[] = [];
+  const cancelled: number[] = [];
   const worker: LaneWorker = {
     onmessage: null,
     onerror: null,
     terminate() {},
     postMessage(message) {
-      const payload = message as { kind: string; sources?: { id: number }[] };
+      const payload = message as { kind: string; sources?: { id: number }[]; ids?: number[] };
       if (payload.kind === 'init') {
         worker.emit({ kind: 'ready', ok: true, reason: null, extensions: [], adapter: 'test' });
+        return;
+      }
+      if (payload.kind === 'cancel') {
+        cancelled.push(...(payload.ids ?? []));
         return;
       }
       if (payload.kind !== 'warm') return;
@@ -158,6 +164,7 @@ function laneWorker(auto = true): LaneWorker {
       worker.onmessage?.({ data: message } as MessageEvent<ShaderWarmWorkerMessage>);
     },
     askedIds: () => asked.slice(),
+    cancelledIds: () => cancelled.slice(),
   };
   return worker;
 }
@@ -409,6 +416,8 @@ describe('warmRootBeforeLink holds', () => {
 
     expect(await held).toEqual({ warm: false, timedOut: true, holdMs: 3_200 });
     expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldWarm: 0, heldTimedOut: 1 });
+    // The root links cold now: the request behind the hold is given up.
+    expect(worker.cancelledIds()).toEqual([1]);
     // A warm that lands after the escape changes neither the answer nor the
     // count.
     worker.emit({ kind: 'warmed', id: 1, linkMs: 5 });

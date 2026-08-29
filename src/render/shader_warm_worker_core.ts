@@ -7,13 +7,15 @@
 // one link per unit: the window grows on fast settles and halves on slow
 // ones, so the worker keeps a couple of links in flight on a driver that
 // serializes them (the POC's N=2 kept the main thread near 60 fps on Linux
-// GL) and more where they overlap. The thresholds are read off the
-// cross-platform cold-link table (tmp/worker-tests/ANALYSIS.md, 2026-08-28):
-// a single heavy `physical` program links cold in 11 ms on Apple Metal,
-// 120 ms on Linux NVIDIA GL, 130 to 215 ms on Mali, Adreno and the iPhone,
-// 225 to 740 ms on Windows D3D11. A settle under the fast bound is a driver
-// with headroom; one past the slow bound is a driver that is already
-// queueing, and the window halves before the queue deepens.
+// GL) and more where they overlap. What "fast" and "slow" mean is the
+// relative judge's (shader_warm_settle_judge_core.ts): a settle is read
+// against what THIS driver costs for a link it has to itself, per thousand
+// characters of GLSL, never against a millisecond bound. The absolute
+// bounds this config used to carry (150 and 400 ms, read off other
+// machines: a cold `physical` links in 11 ms on Apple Metal, 120 ms on
+// Linux NVIDIA GL, 225 to 740 ms on Windows D3D11) pinned the D3D11 window
+// at one link for the whole session, on the one backend that overlaps
+// links (measured 2026-08-30, RTX 3060, Chrome 152).
 //
 // Order within the window: the highest priority first (the queue's
 // GPU_WORK_PRIORITY classes), then arrival order.
@@ -25,15 +27,68 @@ import {
   type AdaptiveLinkBudgetSnapshot,
   createAdaptiveLinkBudget,
 } from './adaptive_link_budget_core';
+import type { ShaderWarmSource, ShaderWarmStatsMessage } from './shader_warm_protocol';
+import {
+  createRelativeSettleJudge,
+  type RelativeSettleJudge,
+  type RelativeSettleJudgeSnapshot,
+} from './shader_warm_settle_judge_core';
 
+/** The unit the judge prices a link in: thousands of GLSL characters, the
+ *  vertex and fragment text together. Link time follows it within a size
+ *  class (the judge compares like with like; 8 to 10 ms per thousand on
+ *  D3D11 across 2.4k to 15.6k characters, 2026-08-30). */
+export const SHADER_WARM_WEIGHT_CHARS = 1_000;
+
+export function shaderWarmWeightOf(vertex: string, fragment: string): number {
+  return (vertex.length + fragment.length) / SHADER_WARM_WEIGHT_CHARS;
+}
+
+/** The scheduler request a warm message's source becomes: its id and
+ *  priority, priced by its text. */
+export function warmRequestOf(
+  source: Pick<ShaderWarmSource, 'id' | 'priority' | 'vertex' | 'fragment'>,
+): WarmSchedulerRequest {
+  return {
+    id: source.id,
+    priority: source.priority,
+    weight: shaderWarmWeightOf(source.vertex, source.fragment),
+  };
+}
+
+/** The stats message the worker posts: the scheduler's readout plus the
+ *  host's own counts. The judge's etalon rides it so a capture can say what
+ *  a link costs on this machine. */
+export function warmStatsOf(
+  snapshot: WarmSchedulerSnapshot,
+  host: { inFlight: number; warmed: number; failed: number; retained: number },
+): ShaderWarmStatsMessage {
+  return {
+    kind: 'stats',
+    pending: snapshot.pending,
+    inFlight: host.inFlight,
+    windowLinks: snapshot.budget.windowLinks,
+    state: snapshot.budget.state,
+    warmed: host.warmed,
+    failed: host.failed,
+    retained: host.retained,
+    cancelled: snapshot.cancelled,
+    backoffCount: snapshot.budget.backoffCount,
+    maxWindowObserved: snapshot.budget.maxWindowObserved,
+    etalonMsPerKchar: snapshot.judge.etalonMsPerWeight,
+    soloSamples: snapshot.judge.soloSamples,
+  };
+}
+
+/** The window starts at ONE link: the judge's etalon is the cost of a link
+ *  the driver has to itself, and the first link is the only one sure to be
+ *  alone. No absolute settle bounds: the judge reads every settle. */
 export const SHADER_WARM_WINDOW_CONFIG: AdaptiveLinkBudgetConfig = {
-  initialWindowLinks: 2,
+  initialWindowLinks: 1,
   minWindowLinks: 1,
   maxWindowLinks: 4,
   initialLinkEstimate: 1,
   increaseLinks: 1,
-  fastSettlementMs: 150,
-  slowSettlementMs: 400,
   noProgressMs: 4_000,
   maxSleepMs: 16,
 };
@@ -66,6 +121,8 @@ export const SHADER_WARM_LINK_DEADLINE_MS = SHADER_WARM_WINDOW_CONFIG.noProgress
 export interface WarmSchedulerRequest {
   id: number;
   priority: number;
+  /** `shaderWarmWeightOf` the sources; 1 when the caller did not say. */
+  weight?: number;
 }
 
 export interface WarmSchedulerSnapshot {
@@ -77,6 +134,7 @@ export interface WarmSchedulerSnapshot {
   failed: number;
   cancelled: number;
   budget: AdaptiveLinkBudgetSnapshot;
+  judge: RelativeSettleJudgeSnapshot;
 }
 
 export interface WarmScheduler {
@@ -105,10 +163,12 @@ export function createWarmScheduler(
   maxWindow: number = SHADER_WARM_MAX_WINDOW_DESKTOP,
   config: AdaptiveLinkBudgetConfig = SHADER_WARM_WINDOW_CONFIG,
 ): WarmScheduler {
+  const judge: RelativeSettleJudge = createRelativeSettleJudge();
   const budget: AdaptiveLinkBudget = createAdaptiveLinkBudget(
     {
       ...config,
       maxWindowLinks: Math.max(config.minWindowLinks, Math.min(config.maxWindowLinks, maxWindow)),
+      judgeSettlement: judge.judge,
     },
     clock,
   );
@@ -155,7 +215,7 @@ export function createWarmScheduler(
       const request = pending.shift();
       if (!request) return null;
       inFlight.add(request.id);
-      budget.markSubmitted(key(request.id));
+      budget.markSubmitted(key(request.id), request.weight);
       // One link per unit, charged as such: the AIMD prices the window in links.
       budget.markSyncEnd(key(request.id), 1);
       submitted++;
@@ -184,6 +244,7 @@ export function createWarmScheduler(
         failed,
         cancelled,
         budget: budget.snapshot(),
+        judge: judge.snapshot(),
       };
     },
   };

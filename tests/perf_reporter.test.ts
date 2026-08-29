@@ -1941,6 +1941,11 @@ describe('perf reporter world-entry blocks', () => {
         warmed: 8,
         failed: 1,
         retained: 9,
+        cancelled: 0,
+        backoffCount: 1,
+        maxWindowObserved: 4,
+        etalonMsPerKchar: 8.5,
+        soloSamples: 3,
       },
     };
     const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, new Settings(), 's', 1)!;

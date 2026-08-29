@@ -90,6 +90,18 @@ export interface ShaderWarmStatsMessage {
   warmed: number;
   failed: number;
   retained: number;
+  /** Requests the client gave up on (a hold that expired) and the worker
+   *  dropped before linking. */
+  cancelled: number;
+  /** The window's history: how often it halved, and the widest it got. An
+   *  oscillating window and a converged one read differently here. */
+  backoffCount: number;
+  maxWindowObserved: number;
+  /** The judge's etalon: milliseconds per thousand GLSL characters for a
+   *  link this driver has to itself; null before the first solo settle. */
+  etalonMsPerKchar: number | null;
+  /** Solo settles the etalon was taught by. */
+  soloSamples: number;
 }
 
 export type ShaderWarmWorkerMessage =

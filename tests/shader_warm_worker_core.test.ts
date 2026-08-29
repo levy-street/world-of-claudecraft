@@ -2,9 +2,11 @@
 // which request is submitted next, and how many links stay in flight. Two
 // rules, and the file is only worth its size if both hold: the highest
 // priority first and arrival order within a priority, and an AIMD window
-// that starts at two links, grows on fast settles up to the platform cap and
-// halves on a slow one. Everything here is driven by an injected clock, so a
-// settlement duration is a number this file chooses, never a wall reading.
+// that starts at ONE link (the judge's etalon is a link the driver had to
+// itself), grows while links in company settle near that cost, up to the
+// platform cap, and halves when they take twice as long. Everything here is
+// driven by an injected clock, so a settlement duration is a number this
+// file chooses, never a wall reading.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -14,8 +16,12 @@ import {
   SHADER_WARM_MAX_WINDOW_MOBILE,
   SHADER_WARM_RETAINED_DESKTOP,
   SHADER_WARM_RETAINED_MOBILE,
+  SHADER_WARM_WEIGHT_CHARS,
   SHADER_WARM_WINDOW_CONFIG,
+  shaderWarmWeightOf,
   type WarmScheduler,
+  warmRequestOf,
+  warmStatsOf,
 } from '../src/render/shader_warm_worker_core';
 
 interface Rig {
@@ -45,22 +51,26 @@ function rig(maxWindow = SHADER_WARM_MAX_WINDOW_DESKTOP): Rig {
 }
 
 describe('the window the worker paces itself with', () => {
-  it('pins the AIMD literals the cold-link table settled', () => {
-    // Read off the cross-platform cold-link measurements: a settle under the
-    // fast bound is a driver with headroom, one past the slow bound is a
-    // driver already queueing. Moving either silently re-tunes every
-    // platform at once.
+  it('pins the window config: one link first, and no absolute settle bound', () => {
+    // One link alone first: the judge's etalon is the cost of a link the
+    // driver has to itself, and the first link is the only one sure to be.
+    // No fast or slow milliseconds: the 150 and 400 ms this config carried
+    // (read off Linux GL and mobile cold links) pinned a cold Windows D3D11
+    // (400 ms a link, overlapping four) at one link for a whole session.
     expect(SHADER_WARM_WINDOW_CONFIG).toEqual({
-      initialWindowLinks: 2,
+      initialWindowLinks: 1,
       minWindowLinks: 1,
       maxWindowLinks: 4,
       initialLinkEstimate: 1,
       increaseLinks: 1,
-      fastSettlementMs: 150,
-      slowSettlementMs: 400,
       noProgressMs: 4_000,
       maxSleepMs: 16,
     });
+  });
+
+  it('prices a link in thousands of GLSL characters, both stages together', () => {
+    expect(SHADER_WARM_WEIGHT_CHARS).toBe(1_000);
+    expect(shaderWarmWeightOf('v'.repeat(1_500), 'f'.repeat(500))).toBe(2);
   });
 
   it('pins the two platform caps, the phone under the desktop', () => {
@@ -120,6 +130,7 @@ describe('warm scheduler order', () => {
     scheduler.enqueue({ id: 3, priority: 40 });
 
     expect(scheduler.takeNext()?.id).toBe(3);
+    scheduler.markSettled(3);
     expect(scheduler.takeNext()?.id).toBe(1);
   });
 
@@ -137,16 +148,16 @@ describe('warm scheduler order', () => {
 });
 
 describe('warm scheduler admission window', () => {
-  it('holds two links in flight before any settle answers', () => {
+  it('holds ONE link in flight until a solo settle taught the etalon', () => {
     const { scheduler } = rig();
     for (let id = 1; id <= 5; id++) scheduler.enqueue({ id, priority: 10 });
 
     expect(scheduler.takeNext()?.id).toBe(1);
-    expect(scheduler.takeNext()?.id).toBe(2);
     expect(scheduler.takeNext()).toBeNull();
-    expect(scheduler.inFlightCount()).toBe(2);
-    expect(scheduler.pendingCount()).toBe(3);
-    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
+    expect(scheduler.inFlightCount()).toBe(1);
+    expect(scheduler.pendingCount()).toBe(4);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(1);
+    expect(scheduler.snapshot().judge.etalonMsPerWeight).toBeNull();
   });
 
   it('admits nothing while paused, and picks up again on resume', () => {
@@ -165,65 +176,163 @@ describe('warm scheduler admission window', () => {
     expect(scheduler.takeNext()?.id).toBe(1);
   });
 
-  it('grows to the cap on fast settles, and stops there', () => {
+  it('grows to the cap while links in company settle near the solo cost, and stops there', () => {
+    // The D3D11 profile: 40 ms alone, 45 ms with company, whatever the
+    // company. The window is what admits, so each step is read off what
+    // drain() hands out.
     const { scheduler, advance, drain } = rig();
     for (let id = 1; id <= 12; id++) scheduler.enqueue({ id, priority: 10 });
 
-    expect(drain()).toEqual([1, 2]);
-    // Each settle lands well under the fast bound, which is what buys a slot.
-    advance(10);
+    expect(drain()).toEqual([1]);
+    advance(40);
     scheduler.markSettled(1);
-    expect(scheduler.snapshot().budget.windowLinks).toBe(3);
+    // One solo reading teaches; it takes a second to move the window.
+    expect(scheduler.snapshot().judge.etalonMsPerWeight).toBe(40);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(1);
+    expect(drain()).toEqual([2]);
+    advance(40);
+    scheduler.markSettled(2);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
     expect(drain()).toEqual([3, 4]);
 
-    advance(10);
-    scheduler.markSettled(2);
-    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    // 45 ms at two in flight: 1.1 times the solo cost, the driver overlapped.
+    advance(45);
+    scheduler.markSettled(3);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(3);
     expect(drain()).toEqual([5, 6]);
+    scheduler.markSettled(4);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    expect(drain()).toEqual([7, 8]);
 
     // At the cap the window stops: four in flight admits nothing more, and
     // more fast settles do not lift it past four.
     expect(scheduler.inFlightCount()).toBe(4);
     expect(scheduler.takeNext()).toBeNull();
-    advance(10);
-    scheduler.markSettled(3);
-    advance(10);
-    scheduler.markSettled(4);
-    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    advance(45);
+    scheduler.markSettled(5);
+    scheduler.markSettled(6);
+    expect(scheduler.snapshot().budget).toMatchObject({ windowLinks: 4, state: 'steady' });
+    expect(scheduler.snapshot().judge.lastRatio).toBeCloseTo(45 / 40, 6);
   });
 
-  it('halves the window on a settle past the slow bound', () => {
+  it('halves the window when links in company take twice the solo cost, twice in a row', () => {
+    // The Mesa profile: 40 ms alone, 90 ms as soon as two are in flight.
+    // One such reading is a coincidence; the second is the driver queueing.
     const { scheduler, advance, drain } = rig();
     for (let id = 1; id <= 12; id++) scheduler.enqueue({ id, priority: 10 });
-    drain();
-    advance(10);
+    expect(drain()).toEqual([1]);
+    advance(40);
     scheduler.markSettled(1);
-    advance(10);
+    expect(drain()).toEqual([2]);
+    advance(40);
     scheduler.markSettled(2);
-    drain();
-    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    expect(drain()).toEqual([3, 4]);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
 
-    // A driver that took 500 ms is already queueing: the window halves
-    // before the queue deepens.
-    advance(500);
+    advance(90);
     scheduler.markSettled(3);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
+    expect(scheduler.snapshot().judge.lastRatio).toBeCloseTo(2.25, 6);
+    expect(drain()).toEqual([5]);
+
+    scheduler.markSettled(4);
     const budget = scheduler.snapshot().budget;
-    expect(budget.windowLinks).toBe(2);
+    expect(budget.windowLinks).toBe(1);
     expect(budget.state).toBe('backoff');
-    expect(budget.lastSettlementMs).toBe(500);
+    expect(budget.lastSettlementMs).toBe(90);
+  });
+
+  it('comes back down when four in flight take twice the solo cost, having grown on two', () => {
+    // The NVIDIA OpenGL profile: 34 ms alone, 45 at two in flight (1.3,
+    // grow), 72 at four (2.1, halve). The window climbs past two and is
+    // halved on the second four-in-flight reading.
+    const { scheduler, advance, drain } = rig();
+    for (let id = 1; id <= 12; id++) scheduler.enqueue({ id, priority: 10 });
+    expect(drain()).toEqual([1]);
+    advance(34);
+    scheduler.markSettled(1);
+    expect(drain()).toEqual([2]);
+    advance(34);
+    scheduler.markSettled(2);
+    expect(drain()).toEqual([3, 4]);
+    advance(45);
+    scheduler.markSettled(3);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(3);
+    expect(drain()).toEqual([5, 6]);
+    scheduler.markSettled(4);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    expect(drain()).toEqual([7, 8]);
+
+    advance(72);
+    scheduler.markSettled(5);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(4);
+    scheduler.markSettled(6);
+    expect(scheduler.snapshot().budget).toMatchObject({ windowLinks: 2, state: 'backoff' });
+    expect(scheduler.snapshot().judge.lastRatio).toBeCloseTo(72 / 34, 6);
+  });
+
+  it('lifts the window to two on a trickle of solo settles, and no further', () => {
+    // One request at a time never shows the driver two links: the window
+    // may open the first step that can, and must not walk to the cap on it.
+    const { scheduler, advance } = rig();
+    for (let id = 1; id <= 8; id++) {
+      scheduler.enqueue({ id, priority: 10 });
+      expect(scheduler.takeNext()?.id).toBe(id);
+      advance(40);
+      scheduler.markSettled(id);
+    }
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
+    expect(scheduler.snapshot().judge.soloSamples).toBe(8);
+  });
+
+  it('reads a settle only against solo samples of comparable size', () => {
+    // Two light programs alone teach the light class; a heavy one in company
+    // has no etalon of its own class yet and moves nothing; once a heavy one
+    // linked alone, heavy company is read against it.
+    const { scheduler, advance, drain } = rig();
+    scheduler.enqueue({ id: 1, priority: 10, weight: 2 });
+    scheduler.enqueue({ id: 2, priority: 10, weight: 2 });
+    scheduler.enqueue({ id: 3, priority: 10, weight: 15 });
+    expect(drain()).toEqual([1]);
+    advance(80);
+    scheduler.markSettled(1);
+    expect(drain()).toEqual([2]);
+    advance(80);
+    scheduler.markSettled(2);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
+    // Alone, because nothing else is pending: it teaches its class.
+    expect(drain()).toEqual([3]);
+    advance(600);
+    scheduler.markSettled(3);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(2);
+    scheduler.enqueue({ id: 4, priority: 10, weight: 15 });
+    scheduler.enqueue({ id: 5, priority: 10, weight: 15 });
+    expect(drain()).toEqual([4, 5]);
+    advance(600);
+    scheduler.markSettled(4);
+    expect(scheduler.snapshot().judge.lastRatio).toBeCloseTo(1, 6);
+    scheduler.markSettled(5);
+    expect(scheduler.snapshot().budget).toMatchObject({ windowLinks: 3, state: 'ramp' });
   });
 
   it('never exceeds the phone cap, however fast the settles come back', () => {
     const { scheduler, advance, drain } = rig(SHADER_WARM_MAX_WINDOW_MOBILE);
     for (let id = 1; id <= 8; id++) scheduler.enqueue({ id, priority: 10 });
 
-    expect(drain()).toEqual([1, 2]);
-    for (const id of [1, 2]) {
+    expect(drain()).toEqual([1]);
+    advance(5);
+    scheduler.markSettled(1);
+    expect(drain()).toEqual([2]);
+    advance(5);
+    scheduler.markSettled(2);
+    expect(scheduler.snapshot().budget.windowLinks).toBe(SHADER_WARM_MAX_WINDOW_MOBILE);
+    expect(drain()).toEqual([3, 4]);
+    for (const id of [3, 4]) {
       advance(5);
       scheduler.markSettled(id);
     }
     expect(scheduler.snapshot().budget.windowLinks).toBe(SHADER_WARM_MAX_WINDOW_MOBILE);
-    expect(drain()).toEqual([3, 4]);
+    expect(drain()).toEqual([5, 6]);
     expect(scheduler.takeNext()).toBeNull();
   });
 });
@@ -267,9 +376,9 @@ describe('warm scheduler settles and cancels', () => {
     scheduler.enqueue({ id: 2, priority: 10 });
     expect(scheduler.active()).toBe(true);
     scheduler.takeNext();
-    scheduler.takeNext();
     advance(10);
     scheduler.markSettled(1);
+    scheduler.takeNext();
     scheduler.markFailed(2);
 
     expect(scheduler.snapshot()).toMatchObject({
@@ -293,5 +402,40 @@ describe('warm scheduler settles and cancels', () => {
 
     expect(scheduler.pendingCount()).toBe(0);
     expect(scheduler.active()).toBe(true);
+  });
+});
+
+describe('the two joins the worker host makes', () => {
+  it('prices a warm message source by its text when it becomes a request', () => {
+    expect(
+      warmRequestOf({ id: 7, priority: 30, vertex: 'v'.repeat(2_500), fragment: 'f'.repeat(500) }),
+    ).toEqual({ id: 7, priority: 30, weight: 3 });
+  });
+
+  it('projects the scheduler readout and the host counts into the stats message, etalon included', () => {
+    const { scheduler, advance } = rig();
+    scheduler.enqueue({ id: 1, priority: 10, weight: 2 });
+    scheduler.enqueue({ id: 2, priority: 10 });
+    scheduler.takeNext();
+    advance(80);
+    scheduler.markSettled(1);
+    expect(
+      warmStatsOf(scheduler.snapshot(), { inFlight: 0, warmed: 1, failed: 0, retained: 0 }),
+    ).toEqual({
+      kind: 'stats',
+      pending: 1,
+      inFlight: 0,
+      windowLinks: 1,
+      // One solo reading is not a verdict yet: the window held.
+      state: 'steady',
+      warmed: 1,
+      failed: 0,
+      retained: 0,
+      cancelled: 0,
+      backoffCount: 0,
+      maxWindowObserved: 1,
+      etalonMsPerKchar: 40,
+      soloSamples: 1,
+    });
   });
 });

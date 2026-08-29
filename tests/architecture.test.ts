@@ -586,6 +586,7 @@ const RENDER_PURE_CORES = [
   'src/render/shader_warm_audit_core.ts',
   'src/render/shader_warm_client_core.ts',
   'src/render/gpu_backend_class_core.ts',
+  'src/render/shader_warm_settle_judge_core.ts',
   'src/render/shader_warm_worker_core.ts',
   'src/render/shader_warmup_gl_core.ts',
   'src/render/reveal_gate_core.ts',

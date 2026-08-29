@@ -400,8 +400,12 @@ describe('a gate that holds for the worker', () => {
     });
     worker.ready();
     await flush();
-    // The first piece went cold the moment its assembly unit failed.
+    // The first piece went cold the moment its assembly unit failed, and
+    // its request went with it: the worker must not spend a slot on it.
     expect(rig.log).toEqual(['assemble@0', 'assemble@1', 'a@0']);
+    expect(worker.posted.filter((message) => message.kind === 'cancel')).toEqual([
+      { kind: 'cancel', ids: [1] },
+    ]);
 
     worker.emit({ kind: 'warmed', id: 2, linkMs: 9 });
     // The gate's result is its PIECES': an assembly that failed cost the
@@ -451,6 +455,11 @@ describe('a gate that holds for the worker', () => {
       heldTimedOut: 1,
       holdMs: 3_500,
     });
+    // The piece links cold now: the worker is told to drop its request
+    // rather than spend a slot warming a key the game already holds.
+    expect(worker.posted.filter((message) => message.kind === 'cancel')).toEqual([
+      { kind: 'cancel', ids: [1] },
+    ]);
 
     // The worker answering after the escape must not submit the piece twice.
     worker.emit({ kind: 'warmed', id: 1, linkMs: 9 });

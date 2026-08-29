@@ -24,10 +24,12 @@ import { mobilePlatformFromNavigator } from './gfx';
 import { type GpuBackendClass, readGpuBackend } from './gpu_backend_class_core';
 import { enableRendererExtensions } from './renderer_extensions';
 import {
+  createShaderWarmHoldRing,
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
   readShaderWarmSetting,
+  SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
   type ShaderWarmBypass,
   type ShaderWarmDecision,
@@ -81,6 +83,11 @@ export interface ShaderWarmSnapshot extends ShaderWarmRequestStats {
     warmed: number;
     failed: number;
     retained: number;
+    cancelled: number;
+    backoffCount: number;
+    maxWindowObserved: number;
+    etalonMsPerKchar: number | null;
+    soloSamples: number;
   } | null;
 }
 
@@ -101,6 +108,15 @@ export interface ShaderWarmClientDeps {
   platform?: ShaderWarmPlatform;
   /** Injectable timer for the ready deadline; returns the cancel. */
   schedule?: (callback: () => void, ms: number) => () => void;
+  /** Injectable clock, for the breaker's progress check. */
+  now?: () => number;
+}
+
+/** A request a hold can give up on: `settled` resolves with each program's
+ *  outcome; `abandon` tells the worker to drop what nobody else waits for. */
+export interface ShaderWarmHold {
+  settled: Promise<ShaderWarmOutcome[]>;
+  abandon(): void;
 }
 
 /** How long a spawned worker has to answer ready. A module worker loads and
@@ -124,15 +140,25 @@ const state = {
   workerStats: null as ShaderWarmSnapshot['workerStats'],
   spawn: null as (() => WorkerLike | null) | null,
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
+  now: null as (() => number) | null,
   mobile: false,
   platform: 'other' as ShaderWarmPlatform,
   /** Sources handed in before the worker answered ready, sent on ready. */
   queuedUntilReady: [] as ShaderWarmSource[],
   cancelReadyDeadline: null as (() => void) | null,
   pagehideHooked: false,
-  /** Held gates that expired in a row: the breaker's count. */
+  /** Held gates that expired in a row while the worker settled nothing:
+   *  the breaker's count. */
   consecutiveTimeouts: 0,
+  /** When the worker last answered warmed, on the client's clock. */
+  lastWarmedAtMs: Number.NEGATIVE_INFINITY,
+  /** The last few holds, for the breaker's expired-share rule. */
+  holds: createShaderWarmHoldRing(),
 };
+
+function defaultNow(): number {
+  return typeof performance !== 'undefined' ? performance.now() : Date.now();
+}
 
 function defaultSpawn(): WorkerLike | null {
   if (typeof Worker === 'undefined') return null;
@@ -185,6 +211,7 @@ export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   if (state.platform === 'ios' && state.setting !== 'off') state.refusal = 'ios-webkit';
   state.spawn = deps.spawn ?? defaultSpawn;
   state.schedule = deps.schedule ?? defaultSchedule;
+  state.now = deps.now ?? defaultNow;
   state.mobile = deps.mobile ?? defaultMobile();
 }
 
@@ -212,12 +239,13 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
       }
       break;
     case 'warmed':
+      state.lastWarmedAtMs = (state.now ?? defaultNow)();
       // A link time counts only for a request that was waiting for it.
       if (state.requests.settle(message.id, 'warmed')) state.requests.noteLink(message.linkMs);
       syncWorkerPause();
       break;
     case 'failed':
-      state.requests.settle(message.id, 'failed');
+      state.requests.settle(message.id, 'failed', message.reason === 'cancelled');
       syncWorkerPause();
       break;
     case 'lost':
@@ -234,6 +262,11 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
         warmed: message.warmed,
         failed: message.failed,
         retained: message.retained,
+        cancelled: message.cancelled,
+        backoffCount: message.backoffCount,
+        maxWindowObserved: message.maxWindowObserved,
+        etalonMsPerKchar: message.etalonMsPerKchar,
+        soloSamples: message.soloSamples,
       };
       break;
   }
@@ -357,6 +390,17 @@ export function warmShaderPrograms(
   sources: readonly ShaderWarmRequestSource[],
   priority: number,
 ): Promise<ShaderWarmOutcome[]> {
+  return holdShaderPrograms(sources, priority).settled;
+}
+
+/** The same request, with the hold's way out: a hold that expires abandons
+ *  its ids, and the worker drops the ones nobody else waits for rather than
+ *  spend a window slot linking a program the main thread just linked cold
+ *  (the worker's link of it would be a cache hit, and still a slot). */
+export function holdShaderPrograms(
+  sources: readonly ShaderWarmRequestSource[],
+  priority: number,
+): ShaderWarmHold {
   const { ids, toSend } = state.requests.request(sources, priority);
   if (toSend.length > 0) {
     if (state.workerState === 'ready' && state.worker) {
@@ -368,15 +412,45 @@ export function warmShaderPrograms(
       for (const source of toSend) state.requests.settle(source.id, 'failed');
     }
   }
-  return state.requests.whenSettled(ids);
+  const requests = state.requests;
+  return {
+    settled: requests.whenSettled(ids),
+    abandon: () => {
+      // The book this request was written in: a renderer swap starts a new
+      // one, and an abandon after that has nothing to drop.
+      if (requests !== state.requests) return;
+      const dropped = requests.abandon(ids);
+      if (dropped.length === 0) return;
+      if (state.workerState === 'ready' && state.worker) {
+        state.worker.postMessage({ kind: 'cancel', ids: dropped });
+      } else if (state.workerState === 'starting') {
+        const droppedSet = new Set(dropped);
+        state.queuedUntilReady = state.queuedUntilReady.filter((s) => !droppedSet.has(s.id));
+        for (const id of dropped) requests.settle(id, 'failed');
+      }
+    },
+  };
 }
 
-/** A held gate ended its hold. Consecutive expiries trip the breaker: the
- *  worker is retired and every later gate takes the unavailable bypass. */
+/** A held gate ended its hold. Consecutive expiries during which the worker
+ *  settled NOTHING trip the breaker: the worker is retired and every later
+ *  gate takes the unavailable bypass. An expiry the worker answered other
+ *  requests through is a slow worker, not a dead one (a cold D3D11 links
+ *  in 400 ms a program and a hold waits its turn in the queue), and a slow
+ *  worker that keeps delivering is worth more than none. */
 export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: number): void {
   state.requests.noteHeld(warm, timedOut, holdMs);
-  state.consecutiveTimeouts = timedOut ? state.consecutiveTimeouts + 1 : 0;
-  if (state.consecutiveTimeouts >= SHADER_WARM_TIMEOUT_BREAKER && state.workerState !== 'dead') {
+  state.holds.note(timedOut);
+  const holdStartedAtMs = (state.now ?? defaultNow)() - Math.max(0, holdMs);
+  const progressed = state.lastWarmedAtMs >= holdStartedAtMs;
+  state.consecutiveTimeouts = timedOut && !progressed ? state.consecutiveTimeouts + 1 : 0;
+  // Two rules: a worker that answered nothing through three expiries in a
+  // row is wedged; one that keeps answering someone while half the recent
+  // holds still expire is too slow for the demand, and either costs the
+  // player more than no worker.
+  const wedged = state.consecutiveTimeouts >= SHADER_WARM_TIMEOUT_BREAKER;
+  const tooSlow = state.holds.expired() >= SHADER_WARM_EXPIRED_SHARE_BREAKER;
+  if ((wedged || tooSlow) && state.workerState !== 'dead') {
     state.workerState = 'dead';
     state.refusal = 'hold-timeouts';
     retireWorker();
@@ -434,6 +508,8 @@ export function disposeShaderWarm(): void {
   state.workerStats = null;
   state.workerPaused = false;
   state.consecutiveTimeouts = 0;
+  state.lastWarmedAtMs = Number.NEGATIVE_INFINITY;
+  state.holds = createShaderWarmHoldRing();
   state.requests = createShaderWarmRequests();
 }
 
@@ -458,6 +534,7 @@ export function resetShaderWarmForTest(deps: ShaderWarmClientDeps = {}): void {
   state.pause = createShaderWarmPauseState();
   state.spawn = null;
   state.schedule = null;
+  state.now = null;
   state.pagehideHooked = false;
   configureShaderWarm({ search: '', mobile: false, platform: 'other', ...deps });
 }

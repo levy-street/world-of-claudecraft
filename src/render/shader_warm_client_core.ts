@@ -47,6 +47,36 @@ export type ShaderWarmBypass =
  *  and each expiry is a reveal delayed by the whole hold cap. */
 export const SHADER_WARM_TIMEOUT_BREAKER = 3;
 
+/** The breaker's second rule, for a worker that keeps answering SOMEONE
+ *  while most holds still pay the whole cap: over the last
+ *  `SHADER_WARM_HOLD_WINDOW` holds, `SHADER_WARM_EXPIRED_SHARE_BREAKER`
+ *  expiries retire it. A worker too slow for the demand is not wedged, and
+ *  the first rule (expiries the worker answered nothing through) never sees
+ *  it; this one bounds what it costs. */
+export const SHADER_WARM_HOLD_WINDOW = 8;
+export const SHADER_WARM_EXPIRED_SHARE_BREAKER = 4;
+
+/** The last few holds, expired or not, for the breaker's second rule. */
+export interface ShaderWarmHoldRing {
+  note(expired: boolean): void;
+  /** Expiries among the holds the ring holds. */
+  expired(): number;
+  size(): number;
+}
+
+export function createShaderWarmHoldRing(window = SHADER_WARM_HOLD_WINDOW): ShaderWarmHoldRing {
+  const ring: boolean[] = [];
+  const keep = Math.max(1, Math.floor(window));
+  return {
+    note(expired) {
+      ring.push(expired);
+      if (ring.length > keep) ring.splice(0, ring.length - keep);
+    },
+    expired: () => ring.filter(Boolean).length,
+    size: () => ring.length,
+  };
+}
+
 export interface ShaderWarmPolicyInputs {
   mode: ShaderWarmMode;
   /** The worker is ready (spawned, context up, extensions matched). */
@@ -134,9 +164,13 @@ export type ShaderWarmOutcome = 'warmed' | 'failed';
 
 interface ShaderWarmEntry {
   id: number;
+  hash: string;
   outcome: ShaderWarmOutcome | null;
   waiters: Array<(outcome: ShaderWarmOutcome) => void>;
   priority: number;
+  /** Requests still interested in the outcome: one per `request` call that
+   *  named it, minus the holds that abandoned it. */
+  interest: number;
 }
 
 export interface ShaderWarmRequestStats {
@@ -145,7 +179,10 @@ export interface ShaderWarmRequestStats {
   /** Distinct programs sent to the worker. */
   sent: number;
   warmed: number;
+  /** Programs the worker could not link. */
   failed: number;
+  /** Requests given up on (a hold that expired) and dropped unlinked. */
+  cancelled: number;
   /** Requests answered from an earlier warm (the same text asked again). */
   deduped: number;
   /** Gates that held their link for the worker. */
@@ -174,8 +211,15 @@ export interface ShaderWarmRequests {
   ): { ids: number[]; toSend: ShaderWarmSource[] };
   /** Resolves with the outcomes of `ids`, in order, once every one settled. */
   whenSettled(ids: readonly number[]): Promise<ShaderWarmOutcome[]>;
-  /** True when the id was pending and is settled now. */
-  settle(id: number, outcome: ShaderWarmOutcome): boolean;
+  /** True when the id was pending and is settled now. `cancelled` says a
+   *  failed outcome is a request dropped on the client's word, not a link
+   *  the worker could not do. */
+  settle(id: number, outcome: ShaderWarmOutcome, cancelled?: boolean): boolean;
+  /** A hold gave up on these ids (it links cold now). Returns the ids no
+   *  other request still waits for and the worker has not settled: those
+   *  are the worker's to drop, and the same text asked again later is a
+   *  fresh request rather than a wait on a link that was cancelled. */
+  abandon(ids: readonly number[]): number[];
   /** Every unsettled request fails now (the worker died). */
   failAll(): void;
   /** Requests sent and not settled: someone is waiting on each of them. */
@@ -197,6 +241,7 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
     sent: 0,
     warmed: 0,
     failed: 0,
+    cancelled: 0,
     deduped: 0,
     held: 0,
     heldWarm: 0,
@@ -225,8 +270,9 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
         let entry = byHash.get(hash);
         if (entry) {
           stats.deduped++;
+          entry.interest++;
         } else {
-          entry = { id: nextId++, outcome: null, waiters: [], priority };
+          entry = { id: nextId++, hash, outcome: null, waiters: [], priority, interest: 1 };
           byHash.set(hash, entry);
           byId.set(entry.id, entry);
           stats.sent++;
@@ -259,17 +305,30 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
         ),
       );
     },
-    settle(id, outcome) {
+    settle(id, outcome, cancelled = false) {
       const entry = byId.get(id);
       if (!entry || entry.outcome) return false;
       entry.outcome = outcome;
       unsettled--;
       if (outcome === 'warmed') stats.warmed++;
+      else if (cancelled) stats.cancelled++;
       else stats.failed++;
       const waiters = entry.waiters;
       entry.waiters = [];
       for (const waiter of waiters) waiter(outcome);
       return true;
+    },
+    abandon(ids) {
+      const dropped: number[] = [];
+      for (const id of ids) {
+        const entry = byId.get(id);
+        if (!entry || entry.interest === 0) continue;
+        entry.interest--;
+        if (entry.interest > 0 || entry.outcome) continue;
+        dropped.push(id);
+        if (byHash.get(entry.hash) === entry) byHash.delete(entry.hash);
+      }
+      return dropped;
     },
     failAll() {
       for (const entry of byId.values()) {

@@ -655,8 +655,21 @@ GPU work signs. Each rule names its seam and its guard.
   once more against a throwaway shader object, so a hook must stay idempotent and
   must never keep the shader object it was handed), posts them to the worker, and
   holds the gate's link piece until the worker answers or `SHADER_WARM_LANE_HOLD_CAP_MS`
-  passes (`shader_warm_lane.ts`; `SHADER_WARM_TIMEOUT_BREAKER` timeouts retire the
-  worker for the session). No new queue, no new lane: the hold is one more piece on
+  passes (`shader_warm_lane.ts`; a hold that expires abandons its request so the worker
+  drops what nobody else waits for; two breaker rules retire it for the session:
+  `SHADER_WARM_TIMEOUT_BREAKER` expiries in a row during which the worker settled NOTHING
+  (wedged), or `SHADER_WARM_EXPIRED_SHARE_BREAKER` of the last `SHADER_WARM_HOLD_WINDOW`
+  holds expired whatever it answered meanwhile (too slow for the demand); a slow worker
+  that keeps most holds served is kept). The worker paces its links with the AIMD budget
+  under a RELATIVE judge (`shader_warm_settle_judge_core.ts`): a settle is read against
+  what this driver costs for a link of COMPARABLE size it has to itself, per thousand
+  GLSL characters, never against a millisecond bound (the absolute 150/400 ms bounds
+  pinned a cold Windows D3D11 at one link for a whole session, on the one backend that
+  overlaps links, 2026-08-30); solo evidence opens the window to two and no further,
+  a cache hit teaches nothing, and a halving is followed by a cooldown. The boot lane
+  (`link_rate_budget.ts`) still runs the absolute bounds; the seam
+  (`AdaptiveLinkBudgetConfig.judgeSettlement`) is how it adopts the same rule later.
+  No new queue, no new lane: the hold is one more piece on
   the caller's queue at the caller's priority, and the actionable floor and
   imminent consults bypass it (`shaderWarmDecision`). The worker never draws, so it
   is the one secondary context exempt from the `checkShaderErrors` rule, and it

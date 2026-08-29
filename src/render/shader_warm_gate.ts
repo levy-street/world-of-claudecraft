@@ -26,11 +26,12 @@ import { collectRootProgramSources, type ProgramSourceEntry } from './program_so
 import { REVEAL_GATE_WATCHDOG_MS } from './reveal_gate';
 import { announceProgramSources, expectRootProgramSources } from './shader_warm_audit';
 import {
+  holdShaderPrograms,
   noteShaderWarmAssembly,
   noteShaderWarmBypass,
   noteShaderWarmHold,
+  type ShaderWarmHold,
   shaderWarmDecide,
-  warmShaderPrograms,
 } from './shader_warm_client';
 
 /** The longest a piece waits for its warm before it links cold: half the
@@ -117,6 +118,7 @@ export function runPiecesWarmed(
     // worker, and resolves at once (the hold waits outside the queue, so no
     // unit holds a slot while the worker links).
     let sources: ProgramSourceEntry[] = [];
+    let hold: ShaderWarmHold | null = null;
     let warm: Promise<boolean> | null = null;
     const assemble: CompileGatePiece = () => {
       const started = now();
@@ -128,7 +130,8 @@ export function runPiecesWarmed(
       }
       noteShaderWarmAssembly(now() - started);
       if (sources.length > 0) {
-        warm = warmShaderPrograms(sources, priority).then(
+        hold = holdShaderPrograms(sources, priority);
+        warm = hold.settled.then(
           (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
           () => false,
         );
@@ -137,7 +140,11 @@ export function runPiecesWarmed(
     };
     return submit([assemble], index).then((assembled) => {
       const pending = warm;
-      if (!pending || assembled.failed) return submit([piece], index);
+      if (!pending || assembled.failed) {
+        // The piece links cold now: the worker must not spend a slot on it.
+        hold?.abandon();
+        return submit([piece], index);
+      }
       anyHeld = true;
       const startedAt = now();
       return new Promise<CompileGateResult>((resolve, reject) => {
@@ -147,6 +154,8 @@ export function runPiecesWarmed(
           if (done) return;
           done = true;
           cancelCap();
+          // The piece links cold now: the worker must not spend a slot on it.
+          if (timedOut) hold?.abandon();
           noteShaderWarmHold(isWarm, timedOut, now() - startedAt);
           submit([piece], index).then(resolve, reject);
         };

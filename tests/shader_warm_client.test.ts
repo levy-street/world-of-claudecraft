@@ -11,6 +11,7 @@ import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import {
   armShaderWarm,
   disposeShaderWarm,
+  holdShaderPrograms,
   noteShaderWarmFrameMs,
   noteShaderWarmHold,
   resetShaderWarmForTest,
@@ -20,7 +21,11 @@ import {
   shaderWarmSnapshot,
   warmShaderPrograms,
 } from '../src/render/shader_warm_client';
-import { SHADER_WARM_TIMEOUT_BREAKER } from '../src/render/shader_warm_client_core';
+import {
+  SHADER_WARM_EXPIRED_SHARE_BREAKER,
+  SHADER_WARM_HOLD_WINDOW,
+  SHADER_WARM_TIMEOUT_BREAKER,
+} from '../src/render/shader_warm_client_core';
 import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
 
 let warned: string[] = [];
@@ -114,6 +119,7 @@ interface StartOptions {
   priority?: number;
   imminent?: boolean;
   armed?: boolean;
+  now?: () => number;
 }
 
 /** Reset the client onto fake workers and a fake timer, then make the first
@@ -137,6 +143,7 @@ function start(options: StartOptions = {}) {
         timer.cancels++;
       };
     },
+    now: options.now,
   });
   if (options.armed !== false) armShaderWarm();
   const stub = contextStub(options.granted ?? GRANTED);
@@ -498,6 +505,11 @@ describe('sending programs to the worker', () => {
       warmed: 11,
       failed: 1,
       retained: 12,
+      cancelled: 2,
+      backoffCount: 1,
+      maxWindowObserved: 4,
+      etalonMsPerKchar: 8.5,
+      soloSamples: 3,
     });
 
     expect(shaderWarmSnapshot().workerStats).toEqual({
@@ -508,6 +520,11 @@ describe('sending programs to the worker', () => {
       warmed: 11,
       failed: 1,
       retained: 12,
+      cancelled: 2,
+      backoffCount: 1,
+      maxWindowObserved: 4,
+      etalonMsPerKchar: 8.5,
+      soloSamples: 3,
     });
   });
 });
@@ -538,21 +555,99 @@ describe('the breaker on held gates that keep expiring', () => {
     });
   });
 
+  it('keeps a slow worker that delivered during the expired holds', () => {
+    // A cold D3D11 links a program in 400 ms and a hold waits its turn in
+    // the queue: holds expire while the worker is answering other requests.
+    // That is a slow worker, not a dead one, and worth more than none.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+
+    for (let expiry = 0; expiry < SHADER_WARM_TIMEOUT_BREAKER; expiry++) {
+      clock += 5_000;
+      // A warm the worker answered for some other request, inside the hold
+      // that is about to expire (the hold started 5 s ago on this clock).
+      worker().emit({ kind: 'warmed', id: 99, linkMs: 400 });
+      noteShaderWarmHold(false, true, 5_000);
+      // And a hold that came back warm between: most holds are served.
+      noteShaderWarmHold(true, false, 400);
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'ready',
+      heldTimedOut: SHADER_WARM_TIMEOUT_BREAKER,
+    });
+    expect(worker().terminations).toBe(0);
+  });
+
+  it('retires a worker too slow for the demand: half the recent holds expired, whatever it answered', () => {
+    // Every expiry here has a warm inside it, so the wedged rule never
+    // counts; a worker that keeps answering someone while the holds pay
+    // the whole cap is still costing more than none.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    for (let hold = 0; hold < SHADER_WARM_HOLD_WINDOW; hold++) {
+      clock += 5_000;
+      worker().emit({ kind: 'warmed', id: 99, linkMs: 400 });
+      const expired = hold % 2 === 1;
+      if (hold < SHADER_WARM_HOLD_WINDOW - 1) expect(shaderWarmSnapshot().worker).toBe('ready');
+      noteShaderWarmHold(!expired, expired, expired ? 5_000 : 400);
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'hold-timeouts',
+      heldTimedOut: SHADER_WARM_EXPIRED_SHARE_BREAKER,
+    });
+    expect(worker().terminations).toBe(1);
+  });
+
+  it('forgets holds past its window: old expiries do not add up forever', () => {
+    let clock = 0;
+    const { ready } = start({ now: () => clock });
+    ready();
+    // Three expiries with progress, then a run of warm holds, then three more.
+    for (let round = 0; round < 2; round++) {
+      for (let i = 0; i < SHADER_WARM_EXPIRED_SHARE_BREAKER - 1; i++) {
+        clock += 5_000;
+        noteShaderWarmHold(false, true, 5_000);
+        noteShaderWarmHold(true, false, 400);
+      }
+      for (let i = 0; i < SHADER_WARM_HOLD_WINDOW; i++) noteShaderWarmHold(true, false, 400);
+    }
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+  });
+
+  it('counts an expiry the worker answered nothing through, and three of those retire it', () => {
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    worker().emit({ kind: 'warmed', id: 99, linkMs: 400 });
+
+    // Every hold below started after that warm.
+    for (let expiry = 0; expiry < SHADER_WARM_TIMEOUT_BREAKER; expiry++) {
+      clock += 6_000;
+      expect(shaderWarmSnapshot().worker).toBe('ready');
+      noteShaderWarmHold(false, true, 5_000);
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts' });
+    expect(worker().terminations).toBe(1);
+  });
+
   it('counts expiries in a ROW: a hold that came back warm clears the streak', () => {
     const { ready } = start();
     ready();
 
+    // Three expiries, as many as the breaker, but not in a row.
     noteShaderWarmHold(false, true, 10);
     noteShaderWarmHold(false, true, 10);
     noteShaderWarmHold(true, false, 10);
     noteShaderWarmHold(false, true, 10);
-    noteShaderWarmHold(false, true, 10);
 
     expect(shaderWarmSnapshot()).toMatchObject({
       worker: 'ready',
-      held: 5,
+      held: 4,
       heldWarm: 1,
-      heldTimedOut: 4,
+      heldTimedOut: SHADER_WARM_TIMEOUT_BREAKER,
     });
   });
 });
@@ -892,5 +987,72 @@ describe('the backend class follows the renderer across rebuilds', () => {
     expect(shaderWarmSnapshot()).toMatchObject({ backend: null, mode: 'off' });
     shaderWarmDecide(backendContext(WARP), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
     expect(shaderWarmSnapshot()).toMatchObject({ backend: 'software', mode: 'off' });
+  });
+});
+
+describe('a hold that gives up on its request', () => {
+  it('tells the worker to drop the ids nobody else waits for', async () => {
+    // The piece links cold now: a worker slot spent on it would warm a key
+    // the game already holds. The program another gate still waits for
+    // stays in the worker's queue.
+    const { worker, ready } = start();
+    ready();
+    const hold = holdShaderPrograms([SOURCE, OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    const shared = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(worker().ofKind('warm')).toHaveLength(1);
+
+    hold.abandon();
+    expect(worker().ofKind('cancel')).toEqual([{ kind: 'cancel', ids: [2] }]);
+
+    worker().emit({ kind: 'failed', id: 2, reason: 'cancelled' });
+    worker().emit({ kind: 'warmed', id: 1, linkMs: 9 });
+    expect(await hold.settled).toEqual(['warmed', 'failed']);
+    expect(await shared).toEqual(['warmed']);
+    // A drop on the client's word is not a link the worker could not do.
+    expect(shaderWarmSnapshot()).toMatchObject({ warmed: 1, failed: 0, cancelled: 1 });
+    // Abandoning twice sends nothing more.
+    hold.abandon();
+    expect(worker().ofKind('cancel')).toHaveLength(1);
+  });
+
+  it('asks the worker again for text an abandoned hold gave up on', () => {
+    const { worker, ready } = start();
+    ready();
+    const hold = holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    hold.abandon();
+    worker().emit({ kind: 'failed', id: 1, reason: 'cancelled' });
+
+    void warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    const warms = worker().ofKind('warm') as { sources: { id: number }[] }[];
+    expect(warms).toHaveLength(2);
+    expect(warms[1]?.sources.map((source) => source.id)).toEqual([2]);
+    expect(shaderWarmSnapshot()).toMatchObject({ sent: 2, deduped: 0 });
+  });
+
+  it('does nothing against the next renderer worker: the book it was written in is gone', () => {
+    // A renderer swap starts a new request book and a new worker whose ids
+    // start over; a stale hold abandoning id 1 must not cancel the new
+    // worker's id 1.
+    const first = start();
+    first.ready();
+    const hold = holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    disposeShaderWarm();
+    const second = start();
+    second.ready();
+    void warmShaderPrograms([OTHER], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+
+    hold.abandon();
+    expect(second.latest().ofKind('cancel')).toHaveLength(0);
+  });
+
+  it('drops the queued text and fails the wait when it gives up before the worker is ready', async () => {
+    const { worker, ready } = start();
+    const hold = holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    hold.abandon();
+    expect(await hold.settled).toEqual(['failed']);
+
+    ready();
+    expect(worker().ofKind('warm')).toHaveLength(0);
+    expect(worker().ofKind('cancel')).toHaveLength(0);
   });
 });

@@ -29,6 +29,8 @@ import {
   SHADER_WARM_LINK_DEADLINE_MS,
   SHADER_WARM_RETAINED_DESKTOP,
   type WarmScheduler,
+  warmRequestOf,
+  warmStatsOf,
 } from './shader_warm_worker_core';
 import {
   deleteWarmProgram,
@@ -218,7 +220,9 @@ function tick(): void {
     inFlight.set(next.id, { handle, startedAt: performance.now() });
   }
   ticks++;
-  if (ticks % STATS_EVERY_TICKS === 0) postStats();
+  // Periodic while busy, and once more when the queue runs dry, so a session
+  // whose links finish inside the first period still reads out.
+  if (ticks % STATS_EVERY_TICKS === 0 || !scheduler.active()) postStats();
   schedule();
 }
 
@@ -232,17 +236,14 @@ function schedule(): void {
 
 function postStats(): void {
   if (!scheduler) return;
-  const snapshot = scheduler.snapshot();
-  post({
-    kind: 'stats',
-    pending: snapshot.pending,
-    inFlight: inFlight.size,
-    windowLinks: snapshot.budget.windowLinks,
-    state: snapshot.budget.state,
-    warmed,
-    failed,
-    retained: retained.length,
-  });
+  post(
+    warmStatsOf(scheduler.snapshot(), {
+      inFlight: inFlight.size,
+      warmed,
+      failed,
+      retained: retained.length,
+    }),
+  );
 }
 
 scope.onmessage = (event: MessageEvent<ShaderWarmClientMessage>) => {
@@ -259,7 +260,7 @@ scope.onmessage = (event: MessageEvent<ShaderWarmClientMessage>) => {
       }
       for (const source of message.sources) {
         sources.set(source.id, source);
-        scheduler.enqueue({ id: source.id, priority: source.priority });
+        scheduler.enqueue(warmRequestOf(source));
       }
       schedule();
       break;

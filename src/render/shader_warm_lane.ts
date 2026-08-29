@@ -18,11 +18,11 @@ import { collectRootProgramSources } from './program_sources';
 import { REVEAL_GATE_WATCHDOG_MS } from './reveal_gate';
 import { announceProgramSources, expectRootProgramSources } from './shader_warm_audit';
 import {
+  holdShaderPrograms,
   noteShaderWarmAssembly,
   noteShaderWarmBypass,
   noteShaderWarmHold,
   shaderWarmDecide,
-  warmShaderPrograms,
 } from './shader_warm_client';
 
 /** The longest a lane waits for a root's warm before it links cold: the
@@ -61,7 +61,14 @@ function defaultSchedule(callback: () => void, ms: number): () => void {
 
 const defaultNow = (): number => performance.now();
 
-/** Wait for a warm, bounded by the cap; a late warm after the cap is ignored. */
+/** How a warm promise gives up its request: registered by `requestRootWarm`
+ *  for the promise it hands out, read by the hold when the cap fires, so a
+ *  caller keeps holding a plain promise (self_spirit_warm.ts) and an expired
+ *  hold still tells the worker to drop what it was waiting for. */
+const abandonOf = new WeakMap<Promise<boolean>, () => void>();
+
+/** Wait for a warm, bounded by the cap; a late warm after the cap is ignored,
+ *  and the request behind it is abandoned (the root links cold now). */
 export function holdForWarm(
   warm: Promise<boolean>,
   holdCapMs: number,
@@ -78,7 +85,10 @@ export function holdForWarm(
       cancelCap();
       resolve({ warm: isWarm, timedOut, holdMs: now() - startedAt });
     };
-    cancelCap = schedule(() => finish(false, true), holdCapMs);
+    cancelCap = schedule(() => {
+      abandonOf.get(warm)?.();
+      finish(false, true);
+    }, holdCapMs);
     warm.then(
       (isWarm) => finish(isWarm, false),
       () => finish(false, false),
@@ -131,10 +141,13 @@ function requestDecidedRootWarm(
     noteShaderWarmBypass('nothing-to-warm');
     return null;
   }
-  return warmShaderPrograms(sources, priority).then(
+  const hold = holdShaderPrograms(sources, priority);
+  const warm = hold.settled.then(
     (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
     () => false,
   );
+  abandonOf.set(warm, hold.abandon);
+  return warm;
 }
 
 /** The hold on a request, counted in the readout. Never throws. */
