@@ -21256,14 +21256,17 @@ too", the twin of the caster arm beside it, reading `attackPower` off the
 stat book so an aura that rides without folding in cannot pass.
 
 THE POOL AMBIGUITY, the finding two readers raised independently. Section
-3 declared a legendary-inclusive baseline and then listed three loadouts
-containing no legendary, because they are `bestEpicGearFor` (which filters
-`quality === 'epic'`) minus the flagged picks. The document now states the
-rule the loadouts actually follow, per arm, and says why it is the safe
-side: a legendary-inclusive denominator is STRONGER, so re-deriving with
-it moves every percentage DOWN. `heart_of_the_rift` at primary sum 32 is
-the piece that would move most, and the tank arm does take it. The R5
-lead pin's comment is re-pointed at the same rule.
+3 declared a legendary-inclusive baseline and then listed loadouts built
+by `bestEpicGearFor` (which filters `quality === 'epic'`) minus the
+flagged picks. (AMENDED 2026-08-29, the Phase 15 QA: "three loadouts
+containing no legendary" overstated; the caster's maintained set carries
+the LEGENDARY mainhand heroic_deathless_heartwood, a stronger denominator
+and so the safe direction, now stated in section 3.) The document states
+the rule the loadouts actually follow, per arm, and says why it is the
+safe side: a legendary-inclusive denominator is STRONGER, so re-deriving
+with it moves every percentage DOWN. `heart_of_the_rift` at primary sum
+32 is the piece that would move most, and the tank arm does take it. The
+R5 lead pin's comment is re-pointed at the same rule.
 
 THREE SHIPPED COMMENTS the tunes had made false, all corrected in the
 source rather than only in the doc: the enchant derivation still claimed
