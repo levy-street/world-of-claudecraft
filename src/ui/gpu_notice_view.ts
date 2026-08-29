@@ -25,11 +25,7 @@
 // player already dismissed, but a verdict that grows a NEW component re-arms it
 // (the same shape as the perf nudge's keyed dismissal, perf_nudge_view.ts).
 
-export type GpuNoticeComponent =
-  | 'discrete-inactive'
-  | 'hybrid'
-  | 'requested-backend'
-  | 'software';
+export type GpuNoticeComponent = 'discrete-inactive' | 'hybrid' | 'requested-backend' | 'software';
 
 /** Every component id, in the sorted order a signature stores them in. */
 export const GPU_NOTICE_COMPONENTS = [
