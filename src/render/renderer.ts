@@ -329,6 +329,7 @@ import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from '.
 import {
   GFX,
   type GfxBucketLevels,
+  gfxTierAtLeast,
   initGfxTier,
   SUN_ANCHOR,
   SUN_DIR,
@@ -373,6 +374,7 @@ import {
 import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
+import { legendaryRegaliaActive, legendaryRegaliaEmitScale } from './legendary_regalia_core';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import {
@@ -1109,6 +1111,9 @@ export interface EntityView {
   formCompilePending: THREE.Object3D | null;
   lastOverheadEmoteKey: string | null;
   recklessSkullsSpawned?: boolean;
+  // orange worn-gear glow, recomputed only on equippedInstances identity change
+  legendaryRegalia?: boolean;
+  legendaryRegaliaRef?: unknown;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -11546,6 +11551,16 @@ export class Renderer {
             this.vfx.lichAura(e.id, dt, soulFragments);
           } else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
           else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+          // orange worn-gear motes: STATIC-preset-gated sheddable prestige
+          if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium')) {
+            if (v.legendaryRegaliaRef !== e.equippedInstances) {
+              v.legendaryRegaliaRef = e.equippedInstances;
+              v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);
+            }
+            if (v.legendaryRegalia) {
+              this.vfx.legendaryRegalia(e.id, dt * legendaryRegaliaEmitScale(d2));
+            }
+          }
         }
         // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
         if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
