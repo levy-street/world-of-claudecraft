@@ -21,8 +21,23 @@ import { DICT } from '../src/ui/sim_i18n';
 
 describe('originality-sweep display literals stay renamed', () => {
   it('pins the renamed enchant display names', () => {
-    expect(ENCHANTS.enchant_weapon_runed_focus.name).toBe('Enchant Weapon - Runed Sigil');
-    expect(ENCHANTS.enchant_chest_runeweave.name).toBe('Enchant Chest - Runed Weave');
+    expect(ENCHANTS.enchant_weapon_runed_focus.name).toBe('Weapon Etching: Runed Sigil');
+    expect(ENCHANTS.enchant_chest_runeweave.name).toBe('Chest Etching: Runed Weave');
+  });
+
+  // ip-NAME-BORDERLINE ITEM 5 (maintainer ruling 2026-08-20, executed
+  // 2026-08-29): the WoW "Enchant <Slot> - <Stat>" formula trade dress is
+  // re-cut scheme-wide to "<Slot> Etching: <Tier> <Stat>". The shape guard is
+  // the decisive pin: no enchant display name may lead with the WoW verb
+  // formula again, in either synchronized English layer (Lucent Infusion, the
+  // registered standalone noun, passes by construction).
+  it('no enchant display name wears the WoW verb-formula dress', () => {
+    for (const def of Object.values(ENCHANTS)) {
+      expect(def.name).not.toMatch(/^Enchant\s/);
+    }
+    for (const value of Object.values(en.hudChrome.enchantName)) {
+      expect(value).not.toMatch(/^Enchant\s/);
+    }
   });
 
   it('pins the renamed quest, deed, and tool-effect names', () => {

@@ -3179,6 +3179,61 @@ describe('Guide professions pages and routes', () => {
     ]);
   });
 
+  it('carries the Masterwrought endgame prose: the caps, the perfecting odds, the promotion', () => {
+    // The hand-authored endgame prose has no freshness gate (the guard-gap
+    // lesson at the farming anchors above), so each fact the phase shipped
+    // gets its own rendered anchor. All anchors are apostrophe-free on
+    // purpose: the rendered page escapes ' to &#39;.
+    setLanguage('en');
+    const hub = professionsPage.render(ctx([]));
+    expect(hub, 'the hub renders the endgame section').toContain('id="prof-endgame"');
+    expect(hub, 'the hub renders the perfecting section').toContain('id="prof-perfecting"');
+    // The materials, exact numbers per the transparency policy.
+    expect(hub).toContain('1 to 3 cores');
+    expect(hub).toContain('12 Heroic Marks');
+    expect(hub).toContain('exactly one essence');
+    expect(hub).toContain('one per week per character');
+    // The perfecting odds and fail-forward rule.
+    expect(hub).toContain('succeeds four times in five');
+    expect(hub).toContain('one Sundered Essence, and one Prismglass Setting');
+    expect(hub).toContain('never harmed or set back');
+    // The promotion: deterministic, one deed, name and color only.
+    expect(hub).toContain('one Deed of Making');
+    expect(hub).toContain('the promotion is deterministic');
+    expect(hub).toContain('what changes is the name and the color');
+    // The gear page's cap sentence moved to masterwroughtBodyLegendary: both
+    // caps spelled (the words themselves are derived from the constants in
+    // tests/masterwrought_cap.test.ts; these are the rendered-page halves).
+    const gearHtml =
+      pageFor('gear')?.render({ params: [], sub: 'gear', titleKey: 'guide.nav.gear' } as never) ??
+      '';
+    expect(gearHtml).toContain('at most two Masterwrought pieces at once');
+    expect(gearHtml).toContain('at most one legendary Masterwrought piece among the two');
+    // The enchanting page's Infusion tail is corrected: Perfecting is live,
+    // so the authored-ahead disclosure must be gone and the pointer present.
+    const ench = professionsPage.render(ctx(['enchanting']));
+    expect(ench).toContain('and the Professions page tells how a piece earns it');
+    expect(ench).not.toContain('no piece can be yet');
+    // The eleventh FAQ row renders.
+    const faq = professionsPage.render(ctx(['faq']));
+    expect(faq).toContain('How do I make an orange item?');
+  });
+
+  it('states the one-meal Well Fed rule on both sides of the kitchen', () => {
+    // The canonical sentence (byte-identical in both catalog bodies, matching
+    // the itemUi wellFed pair) plus each page cross-referencing the other.
+    setLanguage('en');
+    const ONE_MEAL = 'Only one Well Fed effect at a time: a newer meal replaces it.';
+    const cookingHtml = professionsPage.render(ctx(['cooking']));
+    expect(cookingHtml).toContain(ONE_MEAL);
+    expect(cookingHtml).toContain('the Farming page tells that side of the story');
+    const farmingHtml = professionsPage.render(ctx(['farming']));
+    expect(farmingHtml).toContain(ONE_MEAL);
+    expect(farmingHtml).toContain('the Cooking page carries every rung');
+    // The farming-only related row links the cooking page it defers to.
+    expect(farmingHtml).toContain(hrefFor('professions/cooking'));
+  });
+
   it('renders every detail page with exactly one h1 and real generated tables', () => {
     setLanguage('en');
     for (const id of GUIDE_PROF_PAGES) {
@@ -3351,7 +3406,7 @@ describe('Guide professions pages and routes', () => {
     expect(bannockRow).not.toContain(t('guide.profPages.sourceDrop'));
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
-    expect(ench).toContain('Enchant Weapon - Runed Edge');
+    expect(ench).toContain('Weapon Etching: Runed Edge');
     expect(ench).toContain('Chime Shard');
     expect(ench).toContain('id="prof-disenchant"');
     // The fishing page renders all three band tables and the koi.
@@ -3637,7 +3692,7 @@ describe('Guide professions pages and routes', () => {
     // The LITERAL first: FAQ_ANSWER_KEYS against PROF_FAQ_COUNT alone is two
     // exports of one module agreeing with each other, so dropping an answer and
     // decrementing the count would pass. The count is what the page renders.
-    expect(PROF_FAQ_COUNT, 'the professions FAQ has ten rows').toBe(10);
+    expect(PROF_FAQ_COUNT, 'the professions FAQ has eleven rows').toBe(11);
     expect(FAQ_ANSWER_KEYS).toHaveLength(PROF_FAQ_COUNT);
     for (const key of FAQ_ANSWER_KEYS) {
       expect(t(key as never).length, key).toBeGreaterThan(0);

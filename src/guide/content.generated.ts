@@ -16103,7 +16103,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
   "enchants": [
     {
       "id": "enchant_weapon_might",
-      "name": "Enchant Weapon - Might",
+      "name": "Weapon Etching: Might",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -16123,7 +16123,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_intellect",
-      "name": "Enchant Weapon - Spellpower",
+      "name": "Weapon Etching: Spellpower",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -16143,7 +16143,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_offhand_stamina",
-      "name": "Enchant Offhand - Stamina",
+      "name": "Offhand Etching: Stamina",
       "slot": "offhand",
       "tier": "base",
       "skillReq": 0,
@@ -16163,7 +16163,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_fortitude",
-      "name": "Enchant Helmet - Fortitude",
+      "name": "Helmet Etching: Fortitude",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -16183,7 +16183,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_spirit",
-      "name": "Enchant Necklace - Spirit",
+      "name": "Necklace Etching: Spirit",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -16203,7 +16203,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_agility",
-      "name": "Enchant Shoulders - Agility",
+      "name": "Shoulder Etching: Agility",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -16223,7 +16223,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_stamina",
-      "name": "Enchant Chest - Stamina",
+      "name": "Chest Etching: Stamina",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -16247,7 +16247,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_stamina",
-      "name": "Enchant Belt - Stamina",
+      "name": "Belt Etching: Stamina",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -16267,7 +16267,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_stamina",
-      "name": "Enchant Legs - Stamina",
+      "name": "Leg Etching: Stamina",
       "slot": "legs",
       "tier": "base",
       "skillReq": 0,
@@ -16291,7 +16291,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_agility",
-      "name": "Enchant Gloves - Agility",
+      "name": "Glove Etching: Agility",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -16311,7 +16311,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_intellect",
-      "name": "Enchant Gloves - Spellpower",
+      "name": "Glove Etching: Spellpower",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -16331,7 +16331,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_agility",
-      "name": "Enchant Boots - Agility",
+      "name": "Boot Etching: Agility",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -16351,7 +16351,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_spirit",
-      "name": "Enchant Ring - Spirit",
+      "name": "Ring Etching: Spirit",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -16371,7 +16371,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_agility",
-      "name": "Enchant Weapon - Agility",
+      "name": "Weapon Etching: Agility",
       "slot": "mainhand",
       "tier": "base",
       "skillReq": 0,
@@ -16391,7 +16391,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_intellect",
-      "name": "Enchant Helmet - Intellect",
+      "name": "Helmet Etching: Intellect",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -16415,7 +16415,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_armor",
-      "name": "Enchant Helmet - Reinforcement",
+      "name": "Helmet Etching: Reinforcement",
       "slot": "helmet",
       "tier": "base",
       "skillReq": 0,
@@ -16439,7 +16439,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_intellect",
-      "name": "Enchant Necklace - Intellect",
+      "name": "Necklace Etching: Intellect",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -16459,7 +16459,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_neck_agility",
-      "name": "Enchant Necklace - Agility",
+      "name": "Necklace Etching: Agility",
       "slot": "neck",
       "tier": "base",
       "skillReq": 0,
@@ -16479,7 +16479,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_strength",
-      "name": "Enchant Shoulders - Strength",
+      "name": "Shoulder Etching: Strength",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -16499,7 +16499,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_shoulder_intellect",
-      "name": "Enchant Shoulders - Intellect",
+      "name": "Shoulder Etching: Intellect",
       "slot": "shoulder",
       "tier": "base",
       "skillReq": 0,
@@ -16519,7 +16519,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_spirit",
-      "name": "Enchant Chest - Spirit",
+      "name": "Chest Etching: Spirit",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -16543,7 +16543,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_armor",
-      "name": "Enchant Chest - Reinforcement",
+      "name": "Chest Etching: Reinforcement",
       "slot": "chest",
       "tier": "base",
       "skillReq": 0,
@@ -16567,7 +16567,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_strength",
-      "name": "Enchant Belt - Strength",
+      "name": "Belt Etching: Strength",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -16587,7 +16587,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_waist_agility",
-      "name": "Enchant Belt - Agility",
+      "name": "Belt Etching: Agility",
       "slot": "waist",
       "tier": "base",
       "skillReq": 0,
@@ -16607,7 +16607,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_intellect",
-      "name": "Enchant Legs - Intellect",
+      "name": "Leg Etching: Intellect",
       "slot": "legs",
       "tier": "base",
       "skillReq": 0,
@@ -16631,7 +16631,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_strength",
-      "name": "Enchant Gloves - Strength",
+      "name": "Glove Etching: Strength",
       "slot": "gloves",
       "tier": "base",
       "skillReq": 0,
@@ -16651,7 +16651,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_strength",
-      "name": "Enchant Boots - Strength",
+      "name": "Boot Etching: Strength",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -16671,7 +16671,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_stamina",
-      "name": "Enchant Boots - Stamina",
+      "name": "Boot Etching: Stamina",
       "slot": "feet",
       "tier": "base",
       "skillReq": 0,
@@ -16691,7 +16691,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_strength",
-      "name": "Enchant Ring - Strength",
+      "name": "Ring Etching: Strength",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -16711,7 +16711,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_agility",
-      "name": "Enchant Ring - Agility",
+      "name": "Ring Etching: Agility",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -16731,7 +16731,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_ring_intellect",
-      "name": "Enchant Ring - Intellect",
+      "name": "Ring Etching: Intellect",
       "slot": "ring",
       "tier": "base",
       "skillReq": 0,
@@ -16751,7 +16751,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_might",
-      "name": "Enchant Weapon - Greater Might",
+      "name": "Weapon Etching: Greater Might",
       "slot": "mainhand",
       "tier": "greater",
       "skillReq": 0,
@@ -16775,7 +16775,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_greater_spellpower",
-      "name": "Enchant Weapon - Greater Spellpower",
+      "name": "Weapon Etching: Greater Spellpower",
       "slot": "mainhand",
       "tier": "greater",
       "skillReq": 0,
@@ -16799,7 +16799,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_greater_fortitude",
-      "name": "Enchant Helmet - Greater Fortitude",
+      "name": "Helmet Etching: Greater Fortitude",
       "slot": "helmet",
       "tier": "greater",
       "skillReq": 0,
@@ -16823,7 +16823,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_greater_stamina",
-      "name": "Enchant Chest - Greater Stamina",
+      "name": "Chest Etching: Greater Stamina",
       "slot": "chest",
       "tier": "greater",
       "skillReq": 0,
@@ -16847,7 +16847,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_greater_stamina",
-      "name": "Enchant Legs - Greater Stamina",
+      "name": "Leg Etching: Greater Stamina",
       "slot": "legs",
       "tier": "greater",
       "skillReq": 0,
@@ -16871,7 +16871,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_gloves_greater_agility",
-      "name": "Enchant Gloves - Greater Agility",
+      "name": "Glove Etching: Greater Agility",
       "slot": "gloves",
       "tier": "greater",
       "skillReq": 0,
@@ -16895,7 +16895,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_edge",
-      "name": "Enchant Weapon - Runed Edge",
+      "name": "Weapon Etching: Runed Edge",
       "slot": "mainhand",
       "tier": "runed",
       "skillReq": 0,
@@ -16919,7 +16919,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_runed_focus",
-      "name": "Enchant Weapon - Runed Sigil",
+      "name": "Weapon Etching: Runed Sigil",
       "slot": "mainhand",
       "tier": "runed",
       "skillReq": 0,
@@ -16943,7 +16943,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_runeweave",
-      "name": "Enchant Chest - Runed Weave",
+      "name": "Chest Etching: Runed Weave",
       "slot": "chest",
       "tier": "runed",
       "skillReq": 0,
@@ -16967,7 +16967,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_legs_runed_hide",
-      "name": "Enchant Legs - Runed Hide",
+      "name": "Leg Etching: Runed Hide",
       "slot": "legs",
       "tier": "runed",
       "skillReq": 0,
@@ -16991,7 +16991,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_helmet_runed_links",
-      "name": "Enchant Helmet - Runed Links",
+      "name": "Helmet Etching: Runed Links",
       "slot": "helmet",
       "tier": "runed",
       "skillReq": 0,
@@ -17015,7 +17015,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_lucent_might",
-      "name": "Enchant Weapon - Lucent Might",
+      "name": "Weapon Etching: Lucent Might",
       "slot": "mainhand",
       "tier": "lucent",
       "skillReq": 100,
@@ -17043,7 +17043,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_weapon_lucent_spellpower",
-      "name": "Enchant Weapon - Lucent Spellpower",
+      "name": "Weapon Etching: Lucent Spellpower",
       "slot": "mainhand",
       "tier": "lucent",
       "skillReq": 100,
@@ -17071,7 +17071,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_chest_lucent_stamina",
-      "name": "Enchant Chest - Lucent Stamina",
+      "name": "Chest Etching: Lucent Stamina",
       "slot": "chest",
       "tier": "lucent",
       "skillReq": 100,
@@ -17099,7 +17099,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
     },
     {
       "id": "enchant_feet_lucent_agility",
-      "name": "Enchant Boots - Lucent Agility",
+      "name": "Boot Etching: Lucent Agility",
       "slot": "feet",
       "tier": "lucent",
       "skillReq": 100,

@@ -627,7 +627,7 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual([`replace:${SWORD}`]);
     // The row's meta names the enchant a confirm would destroy.
-    expect(rows[0].text).toContain('Enchant Weapon - Agility');
+    expect(rows[0].text).toContain('Weapon Etching: Agility');
 
     h.click(`replace:${SWORD}`);
     // The click opened the confirm dialog and sent NOTHING yet.
@@ -643,7 +643,7 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     // toContains would still pass with {old} and {new} swapped, which would
     // tell the player the incoming enchant is the one being destroyed.
     expect(lines[0]).toBe(
-      'This replaces Enchant Weapon - Agility on Eastbrook Arming Sword with Enchant Weapon - Might.',
+      'This replaces Weapon Etching: Agility on Eastbrook Arming Sword with Weapon Etching: Might.',
     );
     // The settled ruling, stated before it is paid: destroyed, no refund.
     expect(lines[1]).toContain('not refunded');
@@ -669,7 +669,7 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     expect(h.confirms).toHaveLength(1);
     // The worn family paints the same replace meta the bagged one does, on
     // top of its own worn tag (both are .ctx-item-meta sub-lines).
-    expect(h.rows()[0].text).toContain('Replaces Enchant Weapon - Agility');
+    expect(h.rows()[0].text).toContain('Replaces Weapon Etching: Agility');
     h.confirms[0].onOk();
     expect(h.applied).toEqual([
       { itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: 'mainhand', confirmReplace: true },
@@ -693,7 +693,7 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     // Plain row first, replace row after, and only the replace row is flagged.
     expect(rows.map((row) => row.act)).toEqual([`target:${SWORD}`, `replace:${SWORD}`]);
     expect(rows[0].text).not.toContain('Replaces');
-    expect(rows[1].text).toContain('Replaces Enchant Weapon - Agility');
+    expect(rows[1].text).toContain('Replaces Weapon Etching: Agility');
 
     // The plain row sends immediately, unconfirmed, with no dialog at all.
     h.click(`target:${SWORD}`);
@@ -870,7 +870,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     // flag beside it promises to destroy an enchant.
     expect(worn.metas.map((meta) => meta.text)).toEqual([
       'Worn (Main Hand)',
-      'Replaces Enchant Weapon - Agility',
+      'Replaces Weapon Etching: Agility',
     ]);
     expect(worn.metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
     expect(worn.metas[1].classes).toEqual([CTX_ITEM_META_CLASS, CTX_ITEM_DANGER_CLASS]);
@@ -915,7 +915,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     // not by toContain: the requirement is that they DIFFER, and that each
     // states its own state rather than one of them staying silent.
     expect(rows[0].text).toBe('Eastbrook Arming SwordNot enchanted');
-    expect(rows[1].text).toBe('Eastbrook Arming SwordReplaces Enchant Weapon - Agility');
+    expect(rows[1].text).toBe('Eastbrook Arming SwordReplaces Weapon Etching: Agility');
     // Both rows carry a sub-line now, so the distinction no longer rests on one
     // of them having none.
     expect(rows.map((row) => row.metas.length)).toEqual([1, 1]);
@@ -942,7 +942,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
     expect(rows[0].text).toBe(
-      'Eastbrook Arming SwordWorn (Main Hand)Replaces Enchant Weapon - Agility',
+      'Eastbrook Arming SwordWorn (Main Hand)Replaces Weapon Etching: Agility',
     );
     expect(rows[1].text).toBe('Eastbrook Arming SwordNot enchanted');
     expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
@@ -1171,7 +1171,7 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     h.openTargets(CHEST_ENCHANT);
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual([`replace:${base}`, `replace:${heroic}`]);
-    const replaceTag = 'Replaces Enchant Chest - Spirit';
+    const replaceTag = 'Replaces Chest Etching: Spirit';
     expect(rows[0].text).toBe(`${name}${replaceTag}`);
     expect(rows[1].text).toBe(`${name}${HEROIC_TAG}${replaceTag}`);
     // The mark leads the state tags: identity first, then what the row will do.

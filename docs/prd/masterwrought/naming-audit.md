@@ -52,7 +52,7 @@ bullet.
 4. Zone-level identities hit the phase stopping rule: recorded for the
    maintainer below, never renamed unilaterally.
 
-## Renames applied (52 display strings, ids frozen)
+## Renames applied (52 display strings plus the 46-row enchant scheme re-cut, ids frozen)
 
 | Old | New | Colliding with |
 |-----|-----|----------------|
@@ -91,6 +91,7 @@ bullet.
 | The Moonwell (POI) / A Ripple on the Moonwell (deed) | The Moonspring / ... Moonspring | Warcraft's night-elf moonwell (caveat: Forgotten Realms moonwells predate WC3 by 15 years, Darkwalker on Moonshae 1987; renamed anyway under maintainer strictness) |
 | Sanctum Sprint (deed) | Sanctum Footrace | GW2's Sanctum Sprint activity (Sanctum Scramble rejected: also GW2) |
 | Knight-Lieutenant (deed + title) | Banneret, superseded at the v0.36.0 merge by Fieldreaver (see the merge supersession section below) | WoW Alliance honor rank 7, same honor-ladder role (Feist/Dragon Age uses noted; the Sergeant -> Knight-Lieutenant -> Field Marshal ladder subset was WoW's) |
+| Enchant <Slot> - <Stat> (46 rows) | <Slot> Etching: <Stat> | WoW enchant formula trade dress (ITEM 5, scheme-wide; executed 2026-08-29, record in "Recorded for the maintainer" below) |
 
 Every rename landed as: content def + English catalog together, sim_i18n matcher
 rows in the same change (single-line emits preserved), the five non-Latin
@@ -630,6 +631,34 @@ RENAME, IN THIS PACKET (Phase 16 owns it, inside its merged naming-registry pass
   distinctive suffixes were already originalized (Runed Sigil, Runed Weave), which leaves
   only the scheme itself to re-cut.
 
+  EXECUTED 2026-08-29, scheme-wide, as `<Slot> Etching: <Tier> <Stat>` (46 display names:
+  the 31 base, 6 Greater, 5 Runed, and 4 Lucent apex rows; ids frozen, display strings
+  only). Slot words are singular attributives (Shoulder, Glove, Boot, Leg); the shipped
+  tier words (Greater, Lucent) and the Runed distinctive suffixes (Runed Edge, Runed
+  Sigil, Runed Weave, Runed Hide, Runed Links) ride verbatim in trailing position. Lucent
+  Infusion (the registered standalone noun) and the four tier-header strings are
+  untouched. Same-change obligations landed per the protocol: content def + catalog in
+  lockstep, M16 re-fills of all 46 rows in the five non-Latin overlays (the old fills
+  mirrored the WoW scheme structurally), the 42 stale rows stripped to pending in each of
+  the 13 translated Latin overlays, wiki regen, the scheme-shape originality pin
+  (tests/originality_renames.test.ts: no enchant name may match /^Enchant\s/), and the
+  two old rows verified as verbatim live WoW enchant names armed in the ip_scrub denylist
+  (Enchant Gloves - Agility, Enchant Chest - Greater Stamina; the other 44 old rows were
+  not individually verified).
+
+  VERIFICATION (integrator web check, R15 bar): no game ships an "Etching" gear-power
+  SYSTEM noun. The named-system neighbours all use other words: Lost Ark's system is
+  Engravings, ESO's is Glyphs, WoW runeforging names its outputs "Rune of ...".
+  Same-word neighbours recorded as carve-outs (item-level or adjective uses, not system
+  nouns): WoW Classic's "Etched Rune" quest item, Diablo 3's "Etched Sigil" off-hand, and
+  this repo's own jewelcrafted "Etched Iron Loop" (an adjective on one forge item).
+  Rejected at authoring, with reasons: Imbue (the shaman weapon-imbue effect type and
+  tooltip verb), Charm (the tool-effect family: Springback Charm, Maker's Charm),
+  Attunement (raid/dungeon access plus a shaman talent), Resonance (tier-adjacent: the
+  Runed tier is described as the resonant tier), Engraving (Lost Ark's coined system
+  noun). Inlay is kept as the recorded fallback alternate (same structure, internally
+  clean; jewelcraft-flavored semantic).
+
 DO NOT RENAME, and do not re-raise:
 - ITEM 1, the zone families The Amberfall / The Frostveil Reach / The Nightbloom / Galecrest.
 - ITEM 3, the Voidscar zone family.
@@ -663,11 +692,12 @@ No phase in this packet may touch any of them.
 4. **Moonrest** (nightbloom hub): WoW has minor Moonrest subzones; moon+rest is
    a simple compound; kept.
 5. **The enchant formula scheme** ('Enchant Gloves - Agility', 'Enchant Ring -
-   Strength' are verbatim WoW formula names): the 'Enchant <Slot> - <Stat>'
-   scheme is descriptive-functional and the distinctive suffixes were already
-   originalized (Runed Sigil, Runed Weave), but the scheme itself is WoW trade
-   dress; renaming it is a system-wide convention change, so it is recorded
-   rather than done.
+   Strength' were verbatim WoW formula names): the 'Enchant <Slot> - <Stat>'
+   scheme was descriptive-functional and the distinctive suffixes were already
+   originalized (Runed Sigil, Runed Weave), but the scheme itself was WoW trade
+   dress; renaming it is a system-wide convention change, so it was recorded
+   2026-08-20 and EXECUTED 2026-08-29 as '<Slot> Etching: <Tier> <Stat>' (the
+   executed record above).
 6. **Timing-parallel coins** (ours may predate or closely trail the other
    game's): Brutok (our rare elite 2026-06-16 vs WoW Midnight's gronnling),
    Brother Halven (WoW's Speaker Halven, TWW 2024, ultra-minor), Aetherwell
@@ -735,13 +765,19 @@ Fieldreaver, Warcrowned; see the merge supersession section), plus the 14 QA
 addendum rows (two of them group rows covering the twelve bot names; see the
 QA addendum section).
 Counts: RENAMED 53 | BORDERLINE (maintainer) 16 | KEEP (flagged, kept) 95 |
-CLEAR 300 | GENERIC 2159. Three pre-QA rows were relabeled at QA with no
+CLEAR 300 | GENERIC 2159. (The ITEM 5 execution of 2026-08-29 additionally
+renamed the whole 46-name enchant scheme; its 42 appendix rows below keep their
+2026-08-07 GENERIC inventory label and are covered by the scheme-wide executed
+record in the body, so the disposition counts are not restated per row.) Three
+pre-QA rows were relabeled at QA with no
 rename: Splitshot CLEAR to KEEP and the two Mistveil items GENERIC to KEEP
 (known multi-property hits recorded on the rows). The body's Recorded for the
 maintainer items now carry the note on their appendix rows too (Aetherwell,
 Brother Halven, Brutok Skullsmasher, Gravelight, Summon Emberkin, Voidscar);
 the 42 'Enchant <Slot> - <Stat>' GENERIC rows are all covered by the scheme-wide
-maintainer record in the body and are not annotated row by row. GENERIC = shared/plain vocabulary (no search hit
+maintainer record in the body and are not annotated row by row: the scheme they
+carried was EXECUTED-renamed 2026-08-29 to '<Slot> Etching: <Tier> <Stat>' (46
+names including the 4 later-minted Lucent rows, which have no appendix rows). GENERIC = shared/plain vocabulary (no search hit
 claimed); CLEAR = distinctive or coined, web-verified unclaimed by any other
 game; KEEP = flagged by a sweep or hunter agent and kept after adversarial
 verification plus hand judgment; refs are `domain:id` (display-only, ids

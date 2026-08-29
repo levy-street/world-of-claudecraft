@@ -118,7 +118,7 @@ export interface EnchantDef {
 export const ENCHANTS: Record<string, EnchantDef> = {
   enchant_weapon_might: {
     id: 'enchant_weapon_might',
-    name: 'Enchant Weapon - Might',
+    name: 'Weapon Etching: Might',
     itemSlot: 'mainhand',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { str: 2 },
@@ -128,7 +128,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // physical enchant on the same slot, just the int axis.
   enchant_weapon_intellect: {
     id: 'enchant_weapon_intellect',
-    name: 'Enchant Weapon - Spellpower',
+    name: 'Weapon Etching: Spellpower',
     itemSlot: 'mainhand',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { int: 2 },
@@ -143,35 +143,35 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // the magnitude convention above (no new numbers invented).
   enchant_offhand_stamina: {
     id: 'enchant_offhand_stamina',
-    name: 'Enchant Offhand - Stamina',
+    name: 'Offhand Etching: Stamina',
     itemSlot: 'offhand',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { sta: 3 },
   },
   enchant_helmet_fortitude: {
     id: 'enchant_helmet_fortitude',
-    name: 'Enchant Helmet - Fortitude',
+    name: 'Helmet Etching: Fortitude',
     itemSlot: 'helmet',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { sta: 3 },
   },
   enchant_neck_spirit: {
     id: 'enchant_neck_spirit',
-    name: 'Enchant Necklace - Spirit',
+    name: 'Necklace Etching: Spirit',
     itemSlot: 'neck',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { spi: 3 },
   },
   enchant_shoulder_agility: {
     id: 'enchant_shoulder_agility',
-    name: 'Enchant Shoulders - Agility',
+    name: 'Shoulder Etching: Agility',
     itemSlot: 'shoulder',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { agi: 2 },
   },
   enchant_chest_stamina: {
     id: 'enchant_chest_stamina',
-    name: 'Enchant Chest - Stamina',
+    name: 'Chest Etching: Stamina',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -181,14 +181,14 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_waist_stamina: {
     id: 'enchant_waist_stamina',
-    name: 'Enchant Belt - Stamina',
+    name: 'Belt Etching: Stamina',
     itemSlot: 'waist',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { sta: 3 },
   },
   enchant_legs_stamina: {
     id: 'enchant_legs_stamina',
-    name: 'Enchant Legs - Stamina',
+    name: 'Leg Etching: Stamina',
     itemSlot: 'legs',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -198,28 +198,28 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_gloves_agility: {
     id: 'enchant_gloves_agility',
-    name: 'Enchant Gloves - Agility',
+    name: 'Glove Etching: Agility',
     itemSlot: 'gloves',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { agi: 3 },
   },
   enchant_gloves_intellect: {
     id: 'enchant_gloves_intellect',
-    name: 'Enchant Gloves - Spellpower',
+    name: 'Glove Etching: Spellpower',
     itemSlot: 'gloves',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { int: 3 },
   },
   enchant_feet_agility: {
     id: 'enchant_feet_agility',
-    name: 'Enchant Boots - Agility',
+    name: 'Boot Etching: Agility',
     itemSlot: 'feet',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { agi: 2 },
   },
   enchant_ring_spirit: {
     id: 'enchant_ring_spirit',
-    name: 'Enchant Ring - Spirit',
+    name: 'Ring Etching: Spirit',
     itemSlot: 'ring',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { spi: 2 },
@@ -232,7 +232,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // (Spellpower), so a rogue/hunter weapon is not stuck taking a str enchant.
   enchant_weapon_agility: {
     id: 'enchant_weapon_agility',
-    name: 'Enchant Weapon - Agility',
+    name: 'Weapon Etching: Agility',
     itemSlot: 'mainhand',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { agi: 2 },
@@ -240,7 +240,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Helmet: a caster (int) option and a tank (armor) option beside Fortitude.
   enchant_helmet_intellect: {
     id: 'enchant_helmet_intellect',
-    name: 'Enchant Helmet - Intellect',
+    name: 'Helmet Etching: Intellect',
     itemSlot: 'helmet',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -250,7 +250,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_helmet_armor: {
     id: 'enchant_helmet_armor',
-    name: 'Enchant Helmet - Reinforcement',
+    name: 'Helmet Etching: Reinforcement',
     itemSlot: 'helmet',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -261,14 +261,14 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Necklace: caster (int) and physical (agi) options beside Spirit.
   enchant_neck_intellect: {
     id: 'enchant_neck_intellect',
-    name: 'Enchant Necklace - Intellect',
+    name: 'Necklace Etching: Intellect',
     itemSlot: 'neck',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { int: 2 },
   },
   enchant_neck_agility: {
     id: 'enchant_neck_agility',
-    name: 'Enchant Necklace - Agility',
+    name: 'Necklace Etching: Agility',
     itemSlot: 'neck',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { agi: 2 },
@@ -276,14 +276,14 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Shoulders: melee (str) and caster (int) options beside Agility.
   enchant_shoulder_strength: {
     id: 'enchant_shoulder_strength',
-    name: 'Enchant Shoulders - Strength',
+    name: 'Shoulder Etching: Strength',
     itemSlot: 'shoulder',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { str: 2 },
   },
   enchant_shoulder_intellect: {
     id: 'enchant_shoulder_intellect',
-    name: 'Enchant Shoulders - Intellect',
+    name: 'Shoulder Etching: Intellect',
     itemSlot: 'shoulder',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { int: 2 },
@@ -291,7 +291,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Chest: a healer (spi) option and a tank (armor) option beside Stamina.
   enchant_chest_spirit: {
     id: 'enchant_chest_spirit',
-    name: 'Enchant Chest - Spirit',
+    name: 'Chest Etching: Spirit',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -301,7 +301,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_chest_armor: {
     id: 'enchant_chest_armor',
-    name: 'Enchant Chest - Reinforcement',
+    name: 'Chest Etching: Reinforcement',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -312,14 +312,14 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Belt: melee (str) and physical (agi) options beside Stamina.
   enchant_waist_strength: {
     id: 'enchant_waist_strength',
-    name: 'Enchant Belt - Strength',
+    name: 'Belt Etching: Strength',
     itemSlot: 'waist',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { str: 3 },
   },
   enchant_waist_agility: {
     id: 'enchant_waist_agility',
-    name: 'Enchant Belt - Agility',
+    name: 'Belt Etching: Agility',
     itemSlot: 'waist',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { agi: 3 },
@@ -327,7 +327,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Legs: a caster (int) option beside Stamina.
   enchant_legs_intellect: {
     id: 'enchant_legs_intellect',
-    name: 'Enchant Legs - Intellect',
+    name: 'Leg Etching: Intellect',
     itemSlot: 'legs',
     reagents: [
       { itemId: 'arcane_dust', count: 3 },
@@ -338,7 +338,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Gloves: a melee (str) option beside the existing agi and int.
   enchant_gloves_strength: {
     id: 'enchant_gloves_strength',
-    name: 'Enchant Gloves - Strength',
+    name: 'Glove Etching: Strength',
     itemSlot: 'gloves',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { str: 3 },
@@ -346,14 +346,14 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // Boots: a melee (str) option and a tank (sta) option beside Agility.
   enchant_feet_strength: {
     id: 'enchant_feet_strength',
-    name: 'Enchant Boots - Strength',
+    name: 'Boot Etching: Strength',
     itemSlot: 'feet',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { str: 2 },
   },
   enchant_feet_stamina: {
     id: 'enchant_feet_stamina',
-    name: 'Enchant Boots - Stamina',
+    name: 'Boot Etching: Stamina',
     itemSlot: 'feet',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { sta: 2 },
@@ -362,21 +362,21 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // ItemDef.slot 'ring' covers both ring1 and ring2 via resolveEquipSlot).
   enchant_ring_strength: {
     id: 'enchant_ring_strength',
-    name: 'Enchant Ring - Strength',
+    name: 'Ring Etching: Strength',
     itemSlot: 'ring',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { str: 2 },
   },
   enchant_ring_agility: {
     id: 'enchant_ring_agility',
-    name: 'Enchant Ring - Agility',
+    name: 'Ring Etching: Agility',
     itemSlot: 'ring',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { agi: 2 },
   },
   enchant_ring_intellect: {
     id: 'enchant_ring_intellect',
-    name: 'Enchant Ring - Intellect',
+    name: 'Ring Etching: Intellect',
     itemSlot: 'ring',
     reagents: [{ itemId: 'arcane_dust', count: 3 }],
     statBonus: { int: 2 },
@@ -388,7 +388,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // arcane_essence; a modest step up on the same axis as its base. ---
   enchant_weapon_greater_might: {
     id: 'enchant_weapon_greater_might',
-    name: 'Enchant Weapon - Greater Might',
+    name: 'Weapon Etching: Greater Might',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -398,7 +398,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_weapon_greater_spellpower: {
     id: 'enchant_weapon_greater_spellpower',
-    name: 'Enchant Weapon - Greater Spellpower',
+    name: 'Weapon Etching: Greater Spellpower',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -408,7 +408,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_helmet_greater_fortitude: {
     id: 'enchant_helmet_greater_fortitude',
-    name: 'Enchant Helmet - Greater Fortitude',
+    name: 'Helmet Etching: Greater Fortitude',
     itemSlot: 'helmet',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -418,7 +418,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_chest_greater_stamina: {
     id: 'enchant_chest_greater_stamina',
-    name: 'Enchant Chest - Greater Stamina',
+    name: 'Chest Etching: Greater Stamina',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -428,7 +428,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_legs_greater_stamina: {
     id: 'enchant_legs_greater_stamina',
-    name: 'Enchant Legs - Greater Stamina',
+    name: 'Leg Etching: Greater Stamina',
     itemSlot: 'legs',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -438,7 +438,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_gloves_greater_agility: {
     id: 'enchant_gloves_greater_agility',
-    name: 'Enchant Gloves - Greater Agility',
+    name: 'Glove Etching: Greater Agility',
     itemSlot: 'gloves',
     reagents: [
       { itemId: 'arcane_shard', count: 1 },
@@ -457,7 +457,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // thread->runeweave, hide->runed_hide, links->runed_links. ---
   enchant_weapon_runed_edge: {
     id: 'enchant_weapon_runed_edge',
-    name: 'Enchant Weapon - Runed Edge',
+    name: 'Weapon Etching: Runed Edge',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'arcane_essence', count: 2 },
@@ -467,7 +467,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_weapon_runed_focus: {
     id: 'enchant_weapon_runed_focus',
-    name: 'Enchant Weapon - Runed Sigil',
+    name: 'Weapon Etching: Runed Sigil',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'arcane_essence', count: 2 },
@@ -477,7 +477,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_chest_runeweave: {
     id: 'enchant_chest_runeweave',
-    name: 'Enchant Chest - Runed Weave',
+    name: 'Chest Etching: Runed Weave',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'arcane_essence', count: 2 },
@@ -487,7 +487,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_legs_runed_hide: {
     id: 'enchant_legs_runed_hide',
-    name: 'Enchant Legs - Runed Hide',
+    name: 'Leg Etching: Runed Hide',
     itemSlot: 'legs',
     reagents: [
       { itemId: 'arcane_essence', count: 2 },
@@ -497,7 +497,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_helmet_runed_links: {
     id: 'enchant_helmet_runed_links',
-    name: 'Enchant Helmet - Runed Links',
+    name: 'Helmet Etching: Runed Links',
     itemSlot: 'helmet',
     reagents: [
       { itemId: 'arcane_essence', count: 2 },
@@ -551,7 +551,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // ---
   enchant_weapon_lucent_might: {
     id: 'enchant_weapon_lucent_might',
-    name: 'Enchant Weapon - Lucent Might',
+    name: 'Weapon Etching: Lucent Might',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'lucent_reagent', count: 1 },
@@ -563,7 +563,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_weapon_lucent_spellpower: {
     id: 'enchant_weapon_lucent_spellpower',
-    name: 'Enchant Weapon - Lucent Spellpower',
+    name: 'Weapon Etching: Lucent Spellpower',
     itemSlot: 'mainhand',
     reagents: [
       { itemId: 'lucent_reagent', count: 1 },
@@ -575,7 +575,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_chest_lucent_stamina: {
     id: 'enchant_chest_lucent_stamina',
-    name: 'Enchant Chest - Lucent Stamina',
+    name: 'Chest Etching: Lucent Stamina',
     itemSlot: 'chest',
     reagents: [
       { itemId: 'lucent_reagent', count: 1 },
@@ -589,7 +589,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   enchant_feet_lucent_agility: {
     id: 'enchant_feet_lucent_agility',
-    name: 'Enchant Boots - Lucent Agility',
+    name: 'Boot Etching: Lucent Agility',
     itemSlot: 'feet',
     reagents: [
       { itemId: 'lucent_reagent', count: 1 },
@@ -602,7 +602,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   },
   // The capstone, and the one requiresPerfected def in the table. Its name is
   // the registered standalone noun (the naming registry's "Lucent Infusion"),
-  // NOT the "Enchant <slot> - <effect>" formula scheme every other row uses:
+  // NOT the "<Slot> Etching: <Tier> <Stat>" scheme every other row uses:
   // it is a single named work, not another option on a slot's ladder.
   //
   // PROVISIONAL, and recorded as such: phase 12's own planning file names no

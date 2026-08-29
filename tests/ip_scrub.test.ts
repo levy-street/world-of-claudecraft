@@ -146,6 +146,16 @@ const HARDCODED_VERBATIM: string[] = [
   'Eldergleam',
   'Moonwell',
   'Spiritmend',
+  // ip-NAME-BORDERLINE ITEM 5 (maintainer ruling 2026-08-20, executed
+  // 2026-08-29): the 'Enchant <Slot> - <Stat>' scheme re-cut to
+  // '<Slot> Etching: <Tier> <Stat>'. Only the two retired rows verified as
+  // verbatim LIVE WoW enchant names are armed here; the other 44 retired rows
+  // were not individually verified against WoW's live enchant list, and the
+  // scheme-shape guard in tests/originality_renames.test.ts (no enchant name
+  // may match /^Enchant\s/) is the load-bearing protection for the whole
+  // formula either way.
+  'Enchant Gloves - Agility',
+  'Enchant Chest - Greater Stamina',
 ];
 
 // The explicit PROSE-SCAN set (C1-owned flavor text): word-boundary regexes

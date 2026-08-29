@@ -849,6 +849,10 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   like map zones, let's not mess with that. Let's just stick to profession related stuff").
   RENAME IN THIS PACKET, Phase 16: the 'Enchant <Slot> - <Stat>' scheme, the only
   profession-related entry (verbatim WoW formula trade dress on ENCHANTING content).
+  EXECUTED 2026-08-29 as '<Slot> Etching: <Tier> <Stat>' (46 display names, ids frozen;
+  Lucent Infusion and the four tier headers untouched; M16 non-Latin re-fills plus the
+  Latin strip landed in-change; executed record + web-check evidence in naming-audit.md,
+  "Recorded for the maintainer").
   DO NOT RENAME, no phase may touch them: the zone families and the timing-parallel coins.
   Those are world identity, not professions; all were BORDERLINE not infringing, several
   plausibly predate the other property, and a shipped-zone rename cascades through zone
