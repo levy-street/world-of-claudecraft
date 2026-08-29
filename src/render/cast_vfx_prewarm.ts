@@ -10,6 +10,7 @@ import type * as THREE from 'three';
 import { abilityVfxCompileMaterials, collectAbilityVfxCompileTargets } from './ability_vfx';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import type { PrewarmResumeUnit } from './prewarm_resume';
+import { REVEAL_GATE_WATCHDOG_MS } from './reveal_gate';
 
 /** One link unit per distinct pooled program, plus one for the staged lazy
  *  stand-ins (null before their stage). Each unit names its root, so the
@@ -42,12 +43,23 @@ export interface LinkedProgramSource {
 /** The gate over the scene's cast materials and the lazy stand-ins' (kept by
  *  the host past their group's cleanup, since the group is removed and never
  *  disposed). */
+/** How long the cast gate may hold before it opens whatever its programs say.
+ *  Three times the reveal watchdog, the project's own bound for "the world
+ *  should be up by now": far past any legitimate resume on any device, so the
+ *  deadline can only be reached by a lane that has genuinely stopped. A choice
+ *  with its reason, not a measurement, and derived rather than tuned. */
+export const CAST_VFX_READY_DEADLINE_MS = REVEAL_GATE_WATCHDOG_MS * 3;
+
 export function createSceneCastVfxReadiness(
   scene: THREE.Object3D,
   webgl: LinkedProgramSource,
   standIns: () => readonly THREE.Material[] | null,
+  now: () => number = () => performance.now(),
+  deadlineMs: number = CAST_VFX_READY_DEADLINE_MS,
 ): CastVfxReadiness {
   return createCastVfxReadiness<THREE.Material>({
+    now,
+    deadlineMs,
     materials: () => [...abilityVfxCompileMaterials(scene), ...(standIns() ?? [])],
     staged: () => standIns() !== null,
     linked: (material) =>

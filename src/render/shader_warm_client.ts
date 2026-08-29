@@ -383,6 +383,19 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
   }
 }
 
+/** The game context enabled an extension the sweep did not: from here its
+ *  program-cache key differs from the worker's, so everything the worker has
+ *  warmed is keyed for a set the game no longer has and everything it would
+ *  warm next would be too. Retire it rather than let it link into the void;
+ *  the readout names the extension that did it, which is also the fix (add it
+ *  to RENDERER_CONTEXT_EXTENSIONS so both contexts enable it up front). */
+export function noteShaderWarmExtensionDrift(name: string): void {
+  if (state.workerState === 'dead') return;
+  state.workerState = 'dead';
+  state.refusal = `extension-drift:${name}`;
+  retireWorker();
+}
+
 /** The first reveal: from here the renderer state is settled and a held
  *  link is felt, so the worker is worth asking. */
 export function armShaderWarm(): void {

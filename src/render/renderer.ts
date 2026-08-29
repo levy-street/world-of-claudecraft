@@ -289,6 +289,7 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
+import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
@@ -575,7 +576,6 @@ import {
   RenderDiagnostics,
 } from './render_diagnostics';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
-import { enableRendererExtensions } from './renderer_extensions';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
 import {
   beginRendererFrameTelemetry,
@@ -2118,7 +2118,7 @@ export class Renderer {
     try {
       this.asyncCompileSupported =
         typeof this.webgl.compileAsync === 'function' &&
-        enableRendererExtensions(this.webgl.getContext()).parallelCompile;
+        enableAndWatchRendererExtensions(this.webgl).parallelCompile;
     } catch {
       this.asyncCompileSupported = false;
     }

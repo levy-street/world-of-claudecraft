@@ -1,6 +1,7 @@
 // The cast-VFX readiness gate (src/render/cast_vfx_readiness_core.ts): the
 // painter draws nothing until every cast program is linked, counts what it
-// refused, and latches once ready.
+// refused, latches once ready, and opens on its own deadline if the programs
+// never arrive (a hold with no floor cost the whole session's cast VFX).
 
 import { describe, expect, it, vi } from 'vitest';
 import { createCastVfxReadiness } from '../src/render/cast_vfx_readiness_core';
@@ -10,9 +11,13 @@ interface Mat {
   linked: boolean;
 }
 
+const DEADLINE_MS = 30_000;
+
 function harness(materials: Mat[], staged = true) {
-  const state = { staged, materials };
+  const state = { staged, materials, nowMs: 0 };
   const readiness = createCastVfxReadiness<Mat>({
+    now: () => state.nowMs,
+    deadlineMs: DEADLINE_MS,
     materials: () => state.materials,
     staged: () => state.staged,
     linked: (material) => material.linked,
@@ -28,11 +33,11 @@ describe('createCastVfxReadiness', () => {
     ]);
     expect(readiness.admit()).toBe(false);
     expect(readiness.admit()).toBe(false);
-    expect(readiness.snapshot()).toEqual({ ready: false, refused: 2, pending: 1 });
+    expect(readiness.snapshot()).toEqual({ ready: false, refused: 2, pending: 1, forced: false });
 
     state.materials[1].linked = true;
     expect(readiness.admit()).toBe(true);
-    expect(readiness.snapshot()).toEqual({ ready: true, refused: 2, pending: 0 });
+    expect(readiness.snapshot()).toEqual({ ready: true, refused: 2, pending: 0, forced: false });
   });
 
   it('refuses until the lazy stand-ins are staged, whatever the pools say', () => {
@@ -70,6 +75,8 @@ describe('createCastVfxReadiness', () => {
     const state = { staged: false, materials: [{ id: 'ring', linked: false }] };
     const reads = vi.fn(() => state.materials);
     const readiness = createCastVfxReadiness<Mat>({
+      now: () => 0,
+      deadlineMs: DEADLINE_MS,
       materials: reads,
       staged: () => state.staged,
       linked: (material) => material.linked,
@@ -87,5 +94,41 @@ describe('createCastVfxReadiness', () => {
   it('is ready with nothing to link once staged', () => {
     const { readiness } = harness([]);
     expect(readiness.admit()).toBe(true);
+  });
+
+  it('opens on its deadline when the programs never arrive', () => {
+    // The failure this bounds: a boot entry the budget dropped whose resume
+    // never lands. Without a floor the gate stays shut for the session and the
+    // player has no cast VFX at all, silently.
+    const { readiness, state } = harness([{ id: 'a', linked: false }]);
+    expect(readiness.admit()).toBe(false);
+    state.nowMs = DEADLINE_MS - 1;
+    expect(readiness.admit()).toBe(false);
+    expect(readiness.snapshot().forced).toBe(false);
+    state.nowMs = DEADLINE_MS;
+    expect(readiness.admit()).toBe(true);
+    // And it SAYS it escaped, so a readout can tell this apart from a gate
+    // that opened because its programs linked.
+    expect(readiness.snapshot().forced).toBe(true);
+    expect(readiness.snapshot().ready).toBe(true);
+  });
+
+  it('bounds the never-staged case too, not only the never-linked one', () => {
+    // The deadline runs from the first CONSULT, so a stand-in group that is
+    // never staged at all is bounded exactly like an unlinked one.
+    const { readiness, state } = harness([], false);
+    expect(readiness.admit()).toBe(false);
+    state.nowMs = DEADLINE_MS;
+    expect(readiness.admit()).toBe(true);
+    expect(readiness.snapshot().forced).toBe(true);
+  });
+
+  it('does not report forced when the programs did arrive in time', () => {
+    const { readiness, state } = harness([{ id: 'a', linked: false }]);
+    expect(readiness.admit()).toBe(false);
+    state.nowMs = DEADLINE_MS - 1;
+    state.materials[0].linked = true;
+    expect(readiness.admit()).toBe(true);
+    expect(readiness.snapshot().forced).toBe(false);
   });
 });

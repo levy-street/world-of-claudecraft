@@ -13,6 +13,18 @@
 // one is linked.
 
 export interface CastVfxReadinessDeps<M> {
+  /** The clock the deadline runs on; injected so the core stays pure. */
+  now: () => number;
+  /** How long the gate may hold before it opens on its own. Every sibling
+   *  hold in this subsystem is bounded and this one was not: `ready` latches
+   *  only when the stand-ins are staged AND every material is linked, so a
+   *  boot entry the budget dropped whose resume never lands (a page
+   *  backgrounded through the whole resume, a starved resume queue, a link
+   *  that rejects) left the painter drawing NO cast for the rest of the
+   *  session, with nothing to say so. The asymmetry decides the value: opening
+   *  early costs ONE cold link, never opening costs the whole session, so the
+   *  bound is deliberately far past any legitimate resume. */
+  deadlineMs: number;
   /** Every material a cast may draw with. Read ONCE, at the first consult
    *  after the stand-ins are staged: the pools and stand-ins are never
    *  disposed or replaced, and the per-frame consult must not walk the scene
@@ -30,6 +42,9 @@ export interface CastVfxReadinessSnapshot {
   refused: number;
   /** Unlinked materials at the last check; null while the stand-ins are not staged. */
   pending: number | null;
+  /** The gate opened on its deadline rather than on its programs: the resume
+   *  never landed, and the readout says so instead of the session going quiet. */
+  forced: boolean;
 }
 
 export interface CastVfxReadiness {
@@ -44,11 +59,22 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   // Latched: a linked program stays linked for the life of its material, and
   // the pools and stand-ins are never disposed.
   let ready = false;
+  let forced = false;
   let refused = 0;
   let pending: number | null = null;
   let materials: readonly M[] | null = null;
+  // From the first consult, not from the staging: the failure this bounds
+  // includes the one where the stand-ins are never staged at all.
+  let firstConsultAt: number | null = null;
   const check = (): boolean => {
     if (ready) return true;
+    const now = deps.now();
+    if (firstConsultAt === null) firstConsultAt = now;
+    if (now - firstConsultAt >= deps.deadlineMs) {
+      ready = true;
+      forced = true;
+      return true;
+    }
     if (!deps.staged()) {
       pending = null;
       return false;
@@ -69,7 +95,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
     ready: check,
     snapshot: () => {
       check();
-      return { ready, refused, pending };
+      return { ready, refused, pending, forced };
     },
   };
 }

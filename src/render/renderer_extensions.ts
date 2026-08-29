@@ -23,7 +23,18 @@
 
 /** In the order the world context enabled them on 2026-08-28 (three's
  *  `WebGLExtensions.init` first, then the renderer's own probes, then the
- *  two lazily enabled ones). Keep the order: it is part of the contract. */
+ *  lazily enabled ones). Keep the order: it is part of the contract.
+ *
+ *  The lazy tail is the load-bearing part, and it is why the list carries
+ *  compressed formats this machine does not have. three enables a compressed
+ *  format from `WebGLUtils.convert` on the FIRST upload of a texture in that
+ *  format, which on a KTX2 target of DXT, ETC or PVRTC lands well after this
+ *  sweep. The context's enabled set would then grow mid-session, every program
+ *  linked after that point would be keyed differently from the ones the warm
+ *  worker had already linked, and the whole warm-up would quietly stop paying.
+ *  A name the adapter does not have costs nothing (getExtension returns null,
+ *  exactly as three's own lazy get would), so the list names every format the
+ *  loader can target rather than the ones one machine happened to enable. */
 export const RENDERER_CONTEXT_EXTENSIONS: readonly string[] = [
   'EXT_color_buffer_float',
   'WEBGL_clip_cull_distance',
@@ -36,6 +47,11 @@ export const RENDERER_CONTEXT_EXTENSIONS: readonly string[] = [
   'EXT_texture_filter_anisotropic',
   'WEBGL_compressed_texture_astc',
   'EXT_texture_compression_bptc',
+  'WEBGL_compressed_texture_s3tc',
+  'WEBGL_compressed_texture_s3tc_srgb',
+  'WEBGL_compressed_texture_etc',
+  'WEBGL_compressed_texture_etc1',
+  'WEBGL_compressed_texture_pvrtc',
 ];
 
 export interface ExtensionHost {

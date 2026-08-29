@@ -21,27 +21,46 @@ function host(available: readonly string[], throwing: readonly string[] = []) {
 }
 
 describe('the renderer context extension list', () => {
-  it("starts with three's six init extensions, in three's order", () => {
-    expect(RENDERER_CONTEXT_EXTENSIONS.slice(0, 6)).toEqual([
+  it('is the whole list, in order, pinned to literals', () => {
+    // The ORDER is part of the cache-key contract (the worker refuses on any
+    // mismatch), so the tail cannot be pinned by unordered membership: pin the
+    // array itself, or a reorder ships in silence.
+    expect([...RENDERER_CONTEXT_EXTENSIONS]).toEqual([
+      // three's WebGLExtensions.init, in three's order.
       'EXT_color_buffer_float',
       'WEBGL_clip_cull_distance',
       'OES_texture_float_linear',
       'EXT_color_buffer_half_float',
       'WEBGL_multisampled_render_to_texture',
       'WEBGL_render_shared_exponent',
-    ]);
-  });
-
-  it('carries the parallel compile, the anisotropic filter and the two compressed formats', () => {
-    for (const name of [
+      // The renderer's own probes.
+      'WEBGL_debug_renderer_info',
       'KHR_parallel_shader_compile',
       'EXT_texture_filter_anisotropic',
+      // The lazy tail: three enables a compressed format on the FIRST upload
+      // in that format, so any of these missing here would grow the context's
+      // enabled set mid-session and re-key every program linked after it.
       'WEBGL_compressed_texture_astc',
       'EXT_texture_compression_bptc',
-    ]) {
-      expect(RENDERER_CONTEXT_EXTENSIONS).toContain(name);
-    }
+      'WEBGL_compressed_texture_s3tc',
+      'WEBGL_compressed_texture_s3tc_srgb',
+      'WEBGL_compressed_texture_etc',
+      'WEBGL_compressed_texture_etc1',
+      'WEBGL_compressed_texture_pvrtc',
+    ]);
     expect(new Set(RENDERER_CONTEXT_EXTENSIONS).size).toBe(RENDERER_CONTEXT_EXTENSIONS.length);
+  });
+
+  it('names every compressed format a device can be a KTX2 target for', () => {
+    // The list is deliberately WIDER than any one machine: a name the adapter
+    // lacks costs nothing, a name it has but we skipped costs the whole
+    // warm-up on that device. astc and bptc alone was one machine's reading.
+    for (const family of ['astc', 'bptc', 's3tc', 'etc', 'etc1', 'pvrtc']) {
+      expect(
+        RENDERER_CONTEXT_EXTENSIONS.some((name) => name.includes(family)),
+        `no compressed-texture extension for ${family}`,
+      ).toBe(true);
+    }
   });
 });
 
@@ -79,7 +98,7 @@ describe('the renderer sweeps its context before its first GPU work', () => {
     // Asserted, not assumed: an unchecked -1 turns indexOf(x, -1) into a
     // whole-file scan and both orderings below would pass from anywhere.
     expect(ctor).toBeGreaterThan(-1);
-    const sweep = source.indexOf('enableRendererExtensions(this.webgl.getContext())', ctor);
+    const sweep = source.indexOf('enableAndWatchRendererExtensions(this.webgl)', ctor);
     const firstBake = source.indexOf('bakeGrassGroundTexture(this.webgl', ctor);
     expect(sweep).toBeGreaterThan(ctor);
     expect(firstBake).toBeGreaterThan(sweep);
@@ -100,8 +119,12 @@ describe('the renderer sweeps its context before its first GPU work', () => {
     expect(end).toBeGreaterThan(at);
     const assignment = source.slice(at, end);
     expect(assignment).toContain("typeof this.webgl.compileAsync === 'function'");
-    expect(assignment).toContain(
-      'enableRendererExtensions(this.webgl.getContext()).parallelCompile',
+    // The sweeping call is the WATCHING one: a renderer that swept without
+    // installing the drift watch would be back to the silent failure, so the
+    // two are one function and the pin names it.
+    expect(assignment).toContain('enableAndWatchRendererExtensions(this.webgl).parallelCompile');
+    expect(source, 'the renderer must not sweep without the drift watch').not.toContain(
+      'enableRendererExtensions(',
     );
     // One derivation only: a second, laxer assignment elsewhere would win.
     expect(source.split('this.asyncCompileSupported =').length - 1).toBe(2);
