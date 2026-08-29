@@ -1275,17 +1275,24 @@ describe('archetype and scene-texture progress hooks stay honest (review round 2
   });
 
   it('counts an npc id done only when its model ends warm, never on an asset skip', () => {
-    const builderStart = renderer.indexOf('private buildNpcPrewarmGroup(');
-    const builderEnd = renderer.indexOf('private buildPlayerPrewarmGroup(', builderStart);
+    // The builder bodies live in zone_prewarm_groups.ts (extracted from
+    // renderer.ts under the monolith ratchet); the manifest entries above
+    // still read renderer.ts, which consumes the builders through the host.
+    const groups = readFileSync(
+      new URL('../src/render/zone_prewarm_groups.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const builderStart = groups.indexOf('export function buildNpcPrewarmGroup(');
+    const builderEnd = groups.indexOf('export function buildPlayerPrewarmGroup(', builderStart);
     expect(builderStart).toBeGreaterThan(-1);
     expect(builderEnd).toBeGreaterThan(builderStart);
-    const builder = renderer.slice(builderStart, builderEnd);
+    const builder = groups.slice(builderStart, builderEnd);
     // The old shape counted ids examined before any skip, so a loop that
     // built nothing still reported full work.
     expect(builder).not.toContain('processed');
     const visualAt = builder.indexOf('const visual = createCharacterVisual(entity)');
     const skipAt = builder.indexOf('if (!visual) continue', visualAt);
-    const markWarmAt = builder.indexOf('this.prewarmedNpcModels.add(modelKey)', skipAt);
+    const markWarmAt = builder.indexOf('h.prewarmedNpcModels.add(modelKey)', skipAt);
     const builtCountAt = builder.indexOf('warmed++', markWarmAt);
     expect(visualAt).toBeGreaterThan(-1);
     // The asset-unavailable skip leaves the id uncounted...
