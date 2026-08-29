@@ -985,6 +985,10 @@ export function doorArchAuthoredElsewhere(
   // over the owner's facade).
   if (dungeonId === 'ignivar_forge_lift' || dungeonId === 'ignivar_forge_approach')
     return placements.some((p) => p.key === 'dungeon_entrance');
+  // The rebuilt Last Keep: the owner's placed castle_door facade on the
+  // temple court IS the keep door (the same data-driven flip: it engages
+  // the moment a castle_door is baked into the fortress table).
+  if (dungeonId === 'the_last_keep') return placements.some((p) => p.key === 'castle_door');
   return false;
 }
 

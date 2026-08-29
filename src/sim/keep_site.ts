@@ -20,10 +20,26 @@ export const KEEP_SITE = {
   skirt: 9,
 } as const;
 
+/** The rebuilt keep's raised temple court: the pad YIELDS here so the
+ *  authored court stamps (content/ember_coast.ts, applied in the terrain
+ *  edit layer BENEATH the pad chain) can raise the raw ground to the deck
+ *  bases. Slightly larger than the stamps' flat cores, with a soft edge so
+ *  the pad floor crossfades into the court's own smooth rims. */
+const TEMPLE_COURT = { x0: 474.5, x1: 496, z0: 2154.5, z1: 2183, blend: 2 } as const;
+
+function templeCourtWeight(x: number, z: number): number {
+  const c = TEMPLE_COURT;
+  const inset = Math.min(x - c.x0, c.x1 - x, z - c.z0, c.z1 - z);
+  if (inset <= 0) return 0;
+  const t = Math.min(1, inset / c.blend);
+  return t * t * (3 - 2 * t);
+}
+
 /**
  * The pad skirt's reach: 1 over the graded rect, easing out to nothing over
  * the skirt band (the castle pad's smoothstep shape, kept so the ground
- * reads the same as every other authored pad edge).
+ * reads the same as every other authored pad edge), and yielding inside
+ * the temple court so the rebuild's stamps rule its ground.
  */
 export function keepSitePadWeight(x: number, z: number): number {
   const p = KEEP_SITE.pad;
@@ -32,7 +48,7 @@ export function keepSitePadWeight(x: number, z: number): number {
   const d = Math.hypot(dx, dz);
   if (d >= KEEP_SITE.skirt) return 0;
   const t = 1 - d / KEEP_SITE.skirt;
-  return t * t * (3 - 2 * t);
+  return t * t * (3 - 2 * t) * (1 - templeCourtWeight(x, z));
 }
 
 /** Scatter clearance: keep procedural decorations off the build ground

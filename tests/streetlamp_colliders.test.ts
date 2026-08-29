@@ -23,7 +23,7 @@ import {
   STREETLAMP_STYLE_BY_ZONE,
   type StreetlampStyleId,
 } from '../src/sim/streetlamp_style';
-import { roadDistance } from '../src/sim/world';
+import { groundHeight, roadDistance } from '../src/sim/world';
 
 // A streetlamp is a solid post, not a decal painted on the road: you cannot
 // walk into one, through one, or over one. These cases drive the SHIPPED world
@@ -138,12 +138,33 @@ describe('streetlamp colliders (you cannot walk into a lamp post)', () => {
     for (const lamp of sample) {
       const r = STREETLAMP_COLLIDER_RADIUS[lamp.style];
       const contact = r + PLAYER_BODY_RADIUS;
+      // Walk at the lamp's own standing surface: a fortress lamp can stand
+      // on a placed deck plate (a standable platform that is FULL-HEIGHT
+      // solid to a height-less mover, by the parkour doctrine), so a prober
+      // with no mover height would be depenetrated out of the deck instead
+      // of testing the post. The post itself is a plain full-height circle,
+      // so the mover height never weakens the claim under test.
+      const feet = Math.max(
+        groundHeight(lamp.x, lamp.z, SEED),
+        supportHeightAt(SEED, lamp.x, lamp.z, PLAYER_BODY_RADIUS, 1000),
+      );
+      const mover = { y: feet + 0.05, lift: 0.6 };
       for (let i = 0; i < 8; i++) {
         const angle = (i / 8) * Math.PI * 2;
         const start = around(lamp, angle, contact + 4);
         // Aim at the far side, so nothing but the post can stop the walk.
         const target = around(lamp, angle + Math.PI, contact + 4);
-        const end = resolveMovement(SEED, start.x, start.z, target.x, target.z, PLAYER_BODY_RADIUS);
+        const end = resolveMovement(
+          SEED,
+          start.x,
+          start.z,
+          target.x,
+          target.z,
+          PLAYER_BODY_RADIUS,
+          false,
+          undefined,
+          mover,
+        );
         const where = `${lamp.style} at ${lamp.x},${lamp.z} bearing ${i}`;
         // Signed distance along the direction of travel, from the lamp axis.
         const along =

@@ -50,7 +50,9 @@ export const DRAKELANDS_ZONE: ZoneDef = {
     // flat build land awaiting the owner's placer rebuild. Coordinates
     // swapped in place: poi locale keys are positional, never reorder.
     { x: 418, z: 2032, label: 'Trollmoot', id: 'trollmoot' },
-    { x: 463, z: 2152, label: 'The Last Keep', id: 'the_last_keep' },
+    // The rebuilt keep's heart: the raised temple court holding the
+    // placed castle_door (the dungeon door), east of the plazas.
+    { x: 486, z: 2168, label: 'The Last Keep', id: 'the_last_keep' },
     { x: 270, z: 2270, label: 'Bloodglass Fields', id: 'bloodglass_fields' },
     { x: 390, z: 2320, label: 'Drakemaw Caldera', id: 'drakemaw_caldera' },
   ],

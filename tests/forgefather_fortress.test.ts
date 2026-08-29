@@ -25,7 +25,7 @@ const GROUND_STAND_TOLERANCE = 2.5;
 
 describe('forgefather fortress bake', () => {
   it('every placement resolves a registered prop', () => {
-    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(185);
+    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(342);
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS)
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
@@ -148,7 +148,9 @@ describe('forgefather fortress bake', () => {
       // legitimate blocker; only flag when no such twin explains the hit.
       const twinBlocks = FORGEFATHER_FORTRESS_PLACEMENTS.some((other) => {
         if (other === placement || other.x !== placement.x || other.z !== placement.z) return false;
-        if (other.ry !== placement.ry) return false;
+        // a cylindrical twin collides as a circle, so its rotation cannot
+        // matter (the keep rebuild stacks rotate members tower by tower)
+        if (other.ry !== placement.ry && !FORTRESS_CYLINDRICAL_KEYS.has(other.key)) return false;
         if (FORTRESS_STANDABLE_KEYS.has(other.key) || IGNIVAR_NON_COLLIDING_PROPS.has(other.key))
           return false;
         const g = terrainHeight(other.x, other.z, WORLD_SEED);

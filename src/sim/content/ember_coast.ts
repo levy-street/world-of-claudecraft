@@ -182,6 +182,16 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 492.55, a1: 500.0, h0: -1.86, h1: 2.64 },
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 500.0, a1: 501.55, h0: 2.64, h1: 2.64 },
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 501.55, a1: 502.95, h0: 2.64, h1: 2.0 },
+  // the temple stair (the Last Keep rebuild): plaza plates (2.3) up to the
+  // temple court decks (5.76). The upper deck row starts INSIDE the flight
+  // span, so the flight runs its full model length and the plates take the
+  // hand-off mid-band (band = plate top there); the closing link tapers
+  // down to the court's stamped raw ground so groundHeight never cliffs
+  // under a plate-carried walker.
+  { link: true, axis: 'x', b0: 2165.4, b1: 2171.89, a0: 463.55, a1: 464.95, h0: 2.0, h1: 2.3 },
+  { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 464.95, a1: 471.95, h0: 2.3, h1: 5.76 },
+  { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 471.95, a1: 472.95, h0: 5.76, h1: 5.76 },
+  { link: true, axis: 'x', b0: 2165.4, b1: 2171.89, a0: 472.95, a1: 476.5, h0: 5.76, h1: 5.1 },
 ];
 
 /** No wild scatter on the fortress's graded grounds (the Last Keep rule):
@@ -451,4 +461,30 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 496, z: 2237, radius: 2.4, delta: 8.3, falloff: 'smooth', mode: 'level' },
   { x: 496, z: 2238.5, radius: 2.4, delta: 7.9, falloff: 'smooth', mode: 'level' },
   { x: 496, z: 2240, radius: 2.4, delta: 7.5, falloff: 'smooth', mode: 'level' },
+  // -----------------------------------------------------------------------
+  // The Last Keep rebuild's grounds (the second placer pass): the raised
+  // temple court's RAW ground comes up to 5.1, a 0.66 hand-off step under
+  // its deck tops (the isle-court rule above: the movement gates read the
+  // raw heightfield even under a platform-stander, and the keep door
+  // object seats near this ground), with smooth rims falling to the
+  // training yard south and the plazas west. The keep-site pad YIELDS
+  // inside this court (keep_site.ts templeCourtWeight) or its own late
+  // grading would flatten these stamps back to the pad floor.
+  { x: 482.5, z: 2162.5, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 482.5, z: 2174, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 490, z: 2162.5, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 490, z: 2174, radius: 11, delta: 5.1, falloff: 'smooth', mode: 'level' },
+  { x: 481.5, z: 2162.5, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 481.5, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 489, z: 2162.5, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 489, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  // ...and the western boardwalk sliver outside the pad's own grading,
+  // leveled to the deck bases so the gate-mouth road climbs a ramp, not a
+  // lip. (The temple stair needs no under-bank of its own: the keep-site
+  // pad keeps the raw ground beneath its whole flight at a calm 2.0, and
+  // inside the court cutout the discs above hold it at or under 4.5, both
+  // below the band's walking line.)
+  { x: 429, z: 2152, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
+  { x: 429, z: 2166, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
+  { x: 429, z: 2178, radius: 5, delta: 2.0, falloff: 'smooth', mode: 'level' },
 ];

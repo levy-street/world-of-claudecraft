@@ -1182,16 +1182,15 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
     // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
     index: 8,
-    // Development-only entrance until the owner's placer rebuild of the
-    // keep stands on the new site and hangs a real door (the pre-entrance
-    // Ignivar pattern): the interior, its keepsake, the locale keys, and
-    // the visit deed all survive behind the closed door. doorPos parks on
-    // the build pad at the site the keep moved to (the Trollmoot rise);
-    // the rebuild slice sites the true door on the finished facade and
-    // drops the overworldDoor flag.
-    doorPos: { x: 463, z: 2152 },
-    overworldDoor: false,
-    leaveOffset: { x: 0, z: 3.5 },
+    // The rebuilt keep's real door: the owner's placed castle_door facade
+    // on the temple court (forgefather_fortress.ts, the keep rebuild rows;
+    // the facade base sits at the court's stamped ground and faces WEST
+    // over the terrace). doorPos stands 1.2yd proud of the facade as a
+    // porch (the old keep's flush-jamb lesson), the visible body is the
+    // facade itself (door_portal.ts doorArchAuthoredElsewhere), and
+    // leaving drops the player forward onto the terrace deck (-x).
+    doorPos: { x: 479.4, z: 2168.1 },
+    leaveOffset: { x: -3.5, z: 0 },
     staticDoor: true,
     // Arrival just inside the entrance hall's south end, 4yd north of the exit
     // portal so zoning in never lands inside the exit's 2yd door trigger.

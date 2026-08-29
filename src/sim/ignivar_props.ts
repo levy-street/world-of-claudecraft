@@ -504,6 +504,10 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // The entrance facade frames a doorway players walk THROUGH: never a
   // blocker, or its own arch would seal the raid door it dresses.
   'dungeon_entrance',
+  // The Last Keep's placed door facade, the same rule: the keep dungeon's
+  // walk-in trigger owns entry (content/dungeons.ts the_last_keep), so the
+  // facade must never wall off the doorway it dresses.
+  'castle_door',
   // The forge-lift car kit's pass-through and overhead pieces: the arch and
   // beams span overhead, the frame and sliding door dress the gate line a
   // body must cross once the lift arrives, and the handle and hanging
@@ -534,6 +538,9 @@ export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, 
   control_machine: 0.8,
   shelf: 0.75,
   gear_pile: 0.85,
+  // the statue's spread wings widen the AABB well past the plinth a body
+  // actually brushes
+  dragon_statue: 0.75,
 };
 
 /** Full-height OBB colliders for every floor-standing dressing prop, in the
