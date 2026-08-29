@@ -478,6 +478,12 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 481.5, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
   { x: 489, z: 2162.5, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
   { x: 489, z: 2174, radius: 7, delta: 5.1, falloff: 'flat', mode: 'level' },
+  // ...and the court's west rank, so no hollow ring survives between the
+  // flats and the pad cutout's edge (a restore inside the court must land
+  // near the deck bases, never in a hidden 2.0 dip under the plates)
+  { x: 477, z: 2161.5, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 477, z: 2168, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
+  { x: 477, z: 2174.5, radius: 6.5, delta: 5.1, falloff: 'flat', mode: 'level' },
   // ...and the western boardwalk sliver outside the pad's own grading,
   // leveled to the deck bases so the gate-mouth road climbs a ramp, not a
   // lip. (The temple stair needs no under-bank of its own: the keep-site
