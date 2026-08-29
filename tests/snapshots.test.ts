@@ -42,7 +42,8 @@ import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { ClientWorld, EMPTY_MST_CRAFTS } from '../src/net/online';
+import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
+import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import {
   emptyPriestMarkerState,

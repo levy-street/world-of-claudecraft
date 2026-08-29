@@ -178,6 +178,11 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import {
+  decodeCraftingIdentity,
+  decodeMobileStationCrafts,
+  EMPTY_MST_CRAFTS,
+} from './crafting_wire';
+import {
   type DesktopWalletBrowserAction,
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
@@ -1276,13 +1281,6 @@ const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
 // snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
 // (and needs no clock at all in the decode path).
 const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
-
-// The one frozen empty craft set the mst mirror hands out (initial value and
-// every empty transition), so the empty case is identity-stable and
-// allocation-free exactly like the offline resolver's EMPTY_CRAFTS.
-// Exported for tests/helpers/bare_client.ts, which mirrors ClientWorld's
-// static defaults contract-for-contract.
-export const EMPTY_MST_CRAFTS: readonly string[] = Object.freeze([]);
 
 function blankEntity(id: number): Entity {
   return {
@@ -3793,15 +3791,7 @@ export class ClientWorld implements IWorld {
         const rawMst = (s.mst as string | null) ?? null;
         if (rawMst !== this.activeMobileStationCraftsRaw) {
           this.activeMobileStationCraftsRaw = rawMst;
-          // Frozen: the cached array is shared with every reader until the
-          // raw string changes, so a consumer mutation would corrupt the
-          // mirror persistently. The empty arm reuses the one shared frozen
-          // empty, and a malformed empty STRING (the shipped server sends
-          // null for the empty set, never '') decodes as empty rather than
-          // [''], the drop-malformed wire idiom.
-          this.activeMobileStationCrafts = rawMst
-            ? (Object.freeze(rawMst.split(',')) as readonly string[])
-            : EMPTY_MST_CRAFTS;
+          this.activeMobileStationCrafts = decodeMobileStationCrafts(rawMst);
         }
       }
       // Commission order board (issue #1298): server-gated on the board
@@ -3823,36 +3813,9 @@ export class ClientWorld implements IWorld {
       if (s.fplot !== undefined) this.myFarmPlots = s.fplot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
-        const cprof = s.cprof as CraftingIdentityView;
-        this.craftSkills = { ...(cprof.craftSkills ?? {}) };
-        this.craftingIdentity = {
-          version: 1,
-          synced: true,
-          craftSkills: this.craftSkills,
-          activeArchetype: cprof.activeArchetype ?? null,
-          pairedMajor: cprof.pairedMajor ?? null,
-          hobbyCraft: cprof.hobbyCraft ?? null,
-          attunedPairs: [...(cprof.attunedPairs ?? [])],
-          switchCount: cprof.switchCount ?? 0,
-          amendsProgress: cprof.amendsProgress ?? 0,
-          amendsRequired: cprof.amendsRequired ?? 0,
-          // The learned-recipe mirror. The identity is replaced
-          // wholesale on every cprof delta (see the comment above), so a
-          // train_recipe grant goes live the tick the server re-emits cprof
-          // (its JSON diff fires on the sorted array changing). The ?? []
-          // keeps an older server's payload (without the field) loading cleanly.
-          knownRecipes: [...(cprof.knownRecipes ?? [])],
-          // The server-computed work-order cooldown set (against ITS
-          // tickCount). questState() feeds it into computeQuestState so a work
-          // order on cooldown shows unavailable on the client too. The ?? []
-          // keeps an older server's payload (without the field) loading cleanly.
-          cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
-          // The quested-hobby record, mirrored so the attunement preview can
-          // promise the hobby a return will actually restore. Conditional
-          // spread: absent stays absent (older server payloads, characters
-          // without the feature).
-          ...(cprof.questedHobbies ? { questedHobbies: { ...cprof.questedHobbies } } : {}),
-        };
+        const decoded = decodeCraftingIdentity(s.cprof as CraftingIdentityView);
+        this.craftSkills = decoded.craftSkills;
+        this.craftingIdentity = decoded.identity;
       }
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {

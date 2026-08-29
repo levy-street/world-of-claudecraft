@@ -7,7 +7,8 @@
 // hand-rolling either fixture again.
 
 import type { ClientSession, GameServer } from '../../server/game';
-import { ClientWorld, EMPTY_MST_CRAFTS } from '../../src/net/online';
+import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
+import { ClientWorld } from '../../src/net/online';
 import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { emptyAllocation } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
