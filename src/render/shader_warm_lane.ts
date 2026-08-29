@@ -54,6 +54,14 @@ export interface HoldOutcome {
   holdMs: number;
 }
 
+/** A root's warm request as the lanes hand it around: the promise a hold
+ *  waits on, and the way to give the request up when the hold expires (the
+ *  root links cold then, and the worker must not spend a slot on it). */
+export interface RootWarmRequest {
+  warm: Promise<boolean>;
+  abandon(): void;
+}
+
 function defaultSchedule(callback: () => void, ms: number): () => void {
   const handle = setTimeout(callback, ms);
   return () => clearTimeout(handle);
@@ -61,16 +69,10 @@ function defaultSchedule(callback: () => void, ms: number): () => void {
 
 const defaultNow = (): number => performance.now();
 
-/** How a warm promise gives up its request: registered by `requestRootWarm`
- *  for the promise it hands out, read by the hold when the cap fires, so a
- *  caller keeps holding a plain promise (self_spirit_warm.ts) and an expired
- *  hold still tells the worker to drop what it was waiting for. */
-const abandonOf = new WeakMap<Promise<boolean>, () => void>();
-
 /** Wait for a warm, bounded by the cap; a late warm after the cap is ignored,
  *  and the request behind it is abandoned (the root links cold now). */
 export function holdForWarm(
-  warm: Promise<boolean>,
+  request: RootWarmRequest,
   holdCapMs: number,
   now: () => number = defaultNow,
   schedule: (callback: () => void, ms: number) => () => void = defaultSchedule,
@@ -86,10 +88,10 @@ export function holdForWarm(
       resolve({ warm: isWarm, timedOut, holdMs: now() - startedAt });
     };
     cancelCap = schedule(() => {
-      abandonOf.get(warm)?.();
+      request.abandon();
       finish(false, true);
     }, holdCapMs);
-    warm.then(
+    request.warm.then(
       (isWarm) => finish(isWarm, false),
       () => finish(false, false),
     );
@@ -109,7 +111,7 @@ export function requestRootWarm(
   priority: number,
   includeOffscreenVariant = false,
   now: () => number = defaultNow,
-): Promise<boolean> | null {
+): RootWarmRequest | null {
   if (!decideRootWarm(arms, root, priority, includeOffscreenVariant)) return null;
   return requestDecidedRootWarm(arms, root, priority, includeOffscreenVariant, now);
 }
@@ -123,7 +125,7 @@ function requestDecidedRootWarm(
   priority: number,
   includeOffscreenVariant: boolean,
   now: () => number,
-): Promise<boolean> | null {
+): RootWarmRequest | null {
   const started = now();
   let sources: ReturnType<typeof collectRootProgramSources> | null = null;
   try {
@@ -142,22 +144,23 @@ function requestDecidedRootWarm(
     return null;
   }
   const hold = holdShaderPrograms(sources, priority);
-  const warm = hold.settled.then(
-    (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
-    () => false,
-  );
-  abandonOf.set(warm, hold.abandon);
-  return warm;
+  return {
+    warm: hold.settled.then(
+      (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
+      () => false,
+    ),
+    abandon: hold.abandon,
+  };
 }
 
 /** The hold on a request, counted in the readout. Never throws. */
 export async function holdRootWarm(
-  warm: Promise<boolean>,
+  request: RootWarmRequest,
   holdCapMs: number = SHADER_WARM_LANE_HOLD_CAP_MS,
   now: () => number = defaultNow,
   schedule?: (callback: () => void, ms: number) => () => void,
 ): Promise<HoldOutcome> {
-  const outcome = await holdForWarm(warm, holdCapMs, now, schedule);
+  const outcome = await holdForWarm(request, holdCapMs, now, schedule);
   try {
     noteShaderWarmHold(outcome.warm, outcome.timedOut, outcome.holdMs);
   } catch {
@@ -181,7 +184,7 @@ export async function warmRootBeforeLink(
   // The policy first, on the caller's frame: a bypassed root costs no unit.
   if (!decideRootWarm(arms, root, options.priority, includeOffscreenVariant)) return null;
   const now = options.now ?? defaultNow;
-  const request: { warm: Promise<boolean> | null } = { warm: null };
+  const request: { warm: RootWarmRequest | null } = { warm: null };
   try {
     await options.run(
       () => {

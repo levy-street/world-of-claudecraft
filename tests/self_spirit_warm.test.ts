@@ -13,16 +13,23 @@ import {
   type SelfSpiritWarmDeps,
   warmSelfSpiritPrograms,
 } from '../src/render/self_spirit_warm';
+import type { RootWarmRequest } from '../src/render/shader_warm_lane';
 
 const lane = vi.hoisted(() => ({
-  request: vi.fn((..._args: unknown[]): Promise<boolean> | null => null),
-  hold: vi.fn(async (_warm: Promise<boolean>) => ({ warm: true, timedOut: false, holdMs: 0 })),
+  request: vi.fn((..._args: unknown[]): RootWarmRequest | null => null),
+  hold: vi.fn(async (_request: RootWarmRequest) => ({ warm: true, timedOut: false, holdMs: 0 })),
 }));
 
 vi.mock('../src/render/shader_warm_lane', () => ({
   requestRootWarm: (...args: unknown[]) => lane.request(...args),
-  holdRootWarm: (warm: Promise<boolean>) => lane.hold(warm),
+  holdRootWarm: (request: RootWarmRequest) => lane.hold(request),
 }));
+
+/** A warm request as the lane hands it out, answering `warm`. */
+const requestOf = (warm: boolean): RootWarmRequest => ({
+  warm: Promise.resolve(warm),
+  abandon: () => {},
+});
 
 afterEach(() => {
   lane.request.mockReset();
@@ -89,7 +96,7 @@ function rig(options: { blocked?: () => boolean; refuseWarmUnit?: boolean } = {}
 
 describe('warmSelfSpiritPrograms', () => {
   it('asks in one unit, holds between units, links in a second released-tail unit', async () => {
-    lane.request.mockImplementation(() => Promise.resolve(true));
+    lane.request.mockImplementation(() => requestOf(true));
     const { deps, events, calls, visual } = rig();
 
     await expect(warmSelfSpiritPrograms(deps)).resolves.toBe(true);
@@ -144,7 +151,7 @@ describe('warmSelfSpiritPrograms', () => {
     // The guard used to be read once, before a wait that is now hundreds of
     // milliseconds; undoing the swap on a dead player drew one opaque frame.
     let ghost = false;
-    lane.request.mockImplementation(() => Promise.resolve(true));
+    lane.request.mockImplementation(() => requestOf(true));
     lane.hold.mockImplementation(async () => {
       ghost = true;
       return { warm: true, timedOut: false, holdMs: 400 };
@@ -176,7 +183,7 @@ describe('warmSelfSpiritPrograms', () => {
   });
 
   it('links cold when the queue refuses the warm unit', async () => {
-    lane.request.mockImplementation(() => Promise.resolve(true));
+    lane.request.mockImplementation(() => requestOf(true));
     const { deps, events } = rig({ refuseWarmUnit: true });
 
     await expect(warmSelfSpiritPrograms(deps)).resolves.toBe(true);
@@ -186,7 +193,7 @@ describe('warmSelfSpiritPrograms', () => {
   });
 
   it('skips the link when the visual was rebuilt during the hold', async () => {
-    lane.request.mockImplementation(() => Promise.resolve(true));
+    lane.request.mockImplementation(() => requestOf(true));
     const { deps, events, visual } = rig();
     let current: typeof visual | null = visual;
     deps.visual = () => current;

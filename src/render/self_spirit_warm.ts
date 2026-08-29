@@ -14,7 +14,12 @@
 import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileArmHost } from './compile_arms';
-import { type HoldOutcome, holdRootWarm, requestRootWarm } from './shader_warm_lane';
+import {
+  type HoldOutcome,
+  holdRootWarm,
+  type RootWarmRequest,
+  requestRootWarm,
+} from './shader_warm_lane';
 
 /** A kind of its own (the label up to the first colon), so the budget prices
  *  the dry assembly apart from the link that follows it. */
@@ -42,7 +47,7 @@ export interface SelfSpiritWarmDeps {
   ): Promise<T>;
   /** The colour arm's link of the root under its current materials. */
   link(root: THREE.Object3D): Promise<void>;
-  hold?(warm: Promise<boolean>): Promise<HoldOutcome>;
+  hold?(request: RootWarmRequest): Promise<HoldOutcome>;
 }
 
 /** Resolves true only when the link actually ran. Never throws for a refused
@@ -51,7 +56,7 @@ export async function warmSelfSpiritPrograms(deps: SelfSpiritWarmDeps): Promise<
   if (deps.blocked()) return false;
   const visual = deps.visual();
   if (!visual) return false;
-  const request: { warm: Promise<boolean> | null } = { warm: null };
+  const request: { warm: RootWarmRequest | null } = { warm: null };
   try {
     await deps.run(
       () => {

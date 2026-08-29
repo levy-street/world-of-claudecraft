@@ -23,6 +23,7 @@ import {
 } from '../src/render/shader_warm_client';
 import {
   holdForWarm,
+  type RootWarmRequest,
   SHADER_WARM_LANE_HOLD_CAP_MS,
   type WarmLaneRun,
   warmRootBeforeLink,
@@ -199,21 +200,31 @@ describe('holdForWarm', () => {
     return () => readings[Math.min(at++, readings.length - 1)] ?? 0;
   }
 
+  /** A request around `warm`, counting how often the hold gave it up. */
+  function requestOf(warm: Promise<boolean>): RootWarmRequest & { abandons: number } {
+    const request = {
+      warm,
+      abandons: 0,
+      abandon() {
+        request.abandons++;
+      },
+    };
+    return request;
+  }
+
   it('resolves warm, with the time the hold actually took', async () => {
-    const outcome = await holdForWarm(
-      Promise.resolve(true),
-      5_000,
-      clockOf([1_000, 1_030]),
-      () => () => {},
-    );
+    const request = requestOf(Promise.resolve(true));
+    const outcome = await holdForWarm(request, 5_000, clockOf([1_000, 1_030]), () => () => {});
     expect(outcome).toEqual({ warm: true, timedOut: false, holdMs: 30 });
+    // Answered, so nothing to give up.
+    expect(request.abandons).toBe(0);
   });
 
   it('resolves not warm when the worker answered but could not link it', async () => {
     // Not a timeout: the hold ended on the worker's answer, and the caller
     // links cold knowing why.
     const outcome = await holdForWarm(
-      Promise.resolve(false),
+      requestOf(Promise.resolve(false)),
       5_000,
       clockOf([1_000, 1_005]),
       () => () => {},
@@ -223,7 +234,7 @@ describe('holdForWarm', () => {
 
   it('resolves not warm when the warm promise rejects', async () => {
     const outcome = await holdForWarm(
-      Promise.reject(new Error('the worker died')),
+      requestOf(Promise.reject(new Error('the worker died'))),
       5_000,
       clockOf([0, 4]),
       () => () => {},
@@ -234,7 +245,7 @@ describe('holdForWarm', () => {
   it('cancels the cap the moment the warm answers', async () => {
     let cancels = 0;
     let armed = 0;
-    await holdForWarm(Promise.resolve(true), 5_000, clockOf([0, 1]), (_callback, ms) => {
+    await holdForWarm(requestOf(Promise.resolve(true)), 5_000, clockOf([0, 1]), (_callback, ms) => {
       armed = ms;
       return () => {
         cancels++;
@@ -252,12 +263,15 @@ describe('holdForWarm', () => {
     const warm = new Promise<boolean>((resolve) => {
       resolveWarm = resolve;
     });
-    const held = holdForWarm(warm, 5_000, clockOf([2_000, 7_000, 9_999]), (callback) => {
+    const request = requestOf(warm);
+    const held = holdForWarm(request, 5_000, clockOf([2_000, 7_000, 9_999]), (callback) => {
       fire = callback;
       return () => {};
     });
 
     fire();
+    // The root links cold from here: the request is given up, once.
+    expect(request.abandons).toBe(1);
     resolveWarm(true);
 
     expect(await held).toEqual({ warm: false, timedOut: true, holdMs: 5_000 });
