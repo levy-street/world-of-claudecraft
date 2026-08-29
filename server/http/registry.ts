@@ -35,6 +35,7 @@ import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
 import { routes as epicRoutes } from '../epic';
 import { routes as githubRoutes } from '../github';
+import { routes as guildRosterRoutes } from '../guild_roster';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
@@ -154,6 +155,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...reliquaryRoutes,
   ...adSpendRoutes,
   ...wocMarketRoutes,
+  ...guildRosterRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

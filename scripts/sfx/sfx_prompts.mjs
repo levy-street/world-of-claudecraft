@@ -875,8 +875,6 @@ export const SFX = [
   { key: 'ui_cosmetic_unlock', custom: true },
 
   // Duel/arena start gong (custom recording, not ElevenLabs/generated).
-  // Vale Cup kickoff was split off to its own key (ui_vcup_kickoff) so this
-  // one stays real-duel/arena only; see the 'vcupKickoff' case in hud.ts.
   { key: 'ui_duel_start', custom: true },
 
   // Arena rating-loss defeat chime (custom recording, not ElevenLabs/generated).

@@ -4,6 +4,7 @@ import type { DesktopBridge } from '../runtime';
 import { desktopBridge } from '../runtime';
 import { userFacingApiError } from './api_error_i18n';
 import { t } from './i18n';
+import { syncSteamWishlistVisibility } from './steam_wishlist';
 
 // Steam account link (the deeds achievement mirror), a stacked card beside the
 // GitHub one. Entirely capability-driven: the group renders ONLY when the
@@ -147,6 +148,13 @@ async function startSteamLink(api: Api): Promise<void> {
 }
 
 export function wireSteamLink(api: Api): void {
+  // The one shell-boot moment the client's Steam surfaces are wired, so the
+  // wishlist reminder's build probe rides along here rather than adding another
+  // call to src/main.ts (a firewall, and pinned at its monolith ceiling). The
+  // two surfaces stay otherwise independent: the reminder is static markup that
+  // renders logged out, offline, and on a dark server, and only asks the desktop
+  // shell whether this is the Steam build (steam_wishlist.ts states why).
+  void syncSteamWishlistVisibility(DESKTOP_APP);
   document.getElementById('btn-steam-link')?.addEventListener('click', () => {
     void startSteamLink(api);
   });

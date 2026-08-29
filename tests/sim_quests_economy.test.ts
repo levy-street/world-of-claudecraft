@@ -811,7 +811,12 @@ describe('food, drink, vendor', () => {
 describe('quests', () => {
   it('full wolf quest flow: accept, kill 8, turn in', () => {
     const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
-    teleportTo(sim, 4, 4);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): stand at the giver like the
+    // q_boars flow below instead of the old (4, 4) marshal literal.
+    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
+    if (!giver) throw new Error('q_wolves giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_wolves')).toBe('active');
     const wolves = [...sim.entities.values()].filter((e) => e.templateId === 'forest_wolf');
@@ -829,7 +834,7 @@ describe('quests', () => {
       expect(wolf.dead).toBe(true);
     }
     expect(sim.questState('q_wolves')).toBe('ready');
-    teleportTo(sim, 4, 4);
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_wolves')).toBe('done');
     expect(sim.questState('q_bandits')).toBe('available');
@@ -921,7 +926,12 @@ describe('quests', () => {
 
   it('quest reward weapon is granted and auto-equipped', () => {
     const sim = makeScopedSim(QUESTS_TEST_WORLD, 'warrior');
-    teleportTo(sim, 4, 4);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): stand at the giver, same
+    // convention as the wolf-flow test above (q_bandits shares the giver).
+    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
+    if (!giver) throw new Error('q_wolves giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
     qp.counts[0] = 8;

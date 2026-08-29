@@ -13,7 +13,13 @@
 
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_market_custody';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  BankLedgerOutbox,
+  BankLedgerOutboxBudget,
+  type BankLedgerOutboxSnapshot,
+} from '../../server/bank_ledger_outbox';
+import type { CharacterSaveArgs } from '../../server/woc_market';
 import { createWocMarketCustody, type WocCustodyGameHost } from '../../server/woc_market_custody';
 import { isCataloguedRelicItem } from '../../src/sim/content/reliquary';
 import { Sim } from '../../src/sim/sim';
@@ -46,12 +52,27 @@ function makeHost(over: Partial<WocCustodyGameHost> = {}): {
       const state = host.sim.serializeCharacter(session.pid);
       return state ? { level: state.level, state } : null;
     },
+    acknowledgeCharacterSaveEffects: () => true,
+    hasCharacterOnlySaveConflict: () => false,
     hasDirtyGuildBooks: () => false,
     flushDirtyGuildBooks: async () => {},
     escrowSessionLost: () => {},
     ...over,
   };
   return { host, persists: () => persists };
+}
+
+function ledgerSnapshot(
+  over: Partial<Pick<BankLedgerOutboxSnapshot, 'guildIds' | 'hasUnscopedRows'>> = {},
+): BankLedgerOutboxSnapshot {
+  return Object.freeze({
+    owner: Object.freeze({ realm: 'Claudemoon', characterId: 2, accountId: 7 }),
+    batches: Object.freeze([]),
+    rowCount: 0,
+    encodedBytes: 0,
+    guildIds: Object.freeze(over.guildIds ? [...over.guildIds] : []),
+    hasUnscopedRows: over.hasUnscopedRows ?? true,
+  });
 }
 
 const GOOD: InvSlot = { itemId: 'rusty_hatchet', count: 1 };
@@ -274,6 +295,181 @@ function liveSession(
   });
   return pid;
 }
+
+function liveHostWithLedgerSnapshot(snapshot: BankLedgerOutboxSnapshot): {
+  host: WocCustodyGameHost;
+  pid: number;
+} {
+  const { host } = makeHost();
+  const pid = liveSession(host);
+  const serialize = host.serializeCharacterForPersist.bind(host);
+  host.serializeCharacterForPersist = (characterId) => {
+    const captured = serialize(characterId);
+    return captured ? { ...captured, bankLedgerSnapshot: snapshot } : null;
+  };
+  return { host, pid };
+}
+
+describe('custody character saves preserve the exact bank-ledger prefix', () => {
+  it('threads one snapshot object through extractCopy without cloning or filtering it', () => {
+    const snapshot = ledgerSnapshot({ guildIds: [19], hasUnscopedRows: true });
+    const { host, pid } = liveHostWithLedgerSnapshot(snapshot);
+    host.sim.addItem('rusty_hatchet', 1, pid, { silent: true });
+    const index = host.sim
+      .meta(pid)
+      ?.inventory.findIndex((slot) => slot.itemId === 'rusty_hatchet');
+    if (index === undefined || index < 0) throw new Error('missing extraction fixture');
+
+    const out = createWocMarketCustody(host).extractCopy(7, 2, {
+      index,
+      itemId: 'rusty_hatchet',
+    });
+
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.save.bankLedgerSnapshot).toBe(snapshot);
+    expect(out.save.bankLedgerSnapshot?.guildIds).toEqual([19]);
+    expect(out.save.bankLedgerSnapshot?.hasUnscopedRows).toBe(true);
+  });
+
+  it('threads one snapshot object through grantCopy and snapshotCopy', () => {
+    const snapshot = ledgerSnapshot();
+    const { host } = liveHostWithLedgerSnapshot(snapshot);
+    const custody = createWocMarketCustody(host);
+
+    const granted = custody.grantCopy(7, 2, GOOD);
+    expect(granted.ok).toBe(true);
+    if (!granted.ok) return;
+    expect(granted.save.bankLedgerSnapshot).toBe(snapshot);
+
+    const captured = custody.snapshotCopy(7, 2);
+    expect(captured.ok).toBe(true);
+    if (!captured.ok) return;
+    expect(captured.save.bankLedgerSnapshot).toBe(snapshot);
+  });
+
+  it('re-captures and passes the exact snapshot inside persistGrantSerialized', async () => {
+    const snapshot = ledgerSnapshot();
+    const { host } = liveHostWithLedgerSnapshot(snapshot);
+    const persist = vi.fn(async (_save: CharacterSaveArgs) => ({ ok: true }));
+
+    await expect(
+      createWocMarketCustody(host).persistGrantSerialized(7, 2, 'live-nonce', persist),
+    ).resolves.toEqual({ ok: true });
+    expect(persist).toHaveBeenCalledOnce();
+    expect(persist.mock.calls[0]?.[0].bankLedgerSnapshot).toBe(snapshot);
+  });
+});
+
+describe('character-only custody saves fail closed on guild-paired work', () => {
+  it('refuses an escrow job under the FIFO after the guild flush cannot clear the conflict', async () => {
+    const sequence: string[] = [];
+    const { host } = makeHost({
+      flushDirtyGuildBooks: async () => {
+        sequence.push('flush');
+      },
+      enqueueCharacterWrite: async (_characterId, job) => {
+        sequence.push('fifo');
+        return job();
+      },
+      hasCharacterOnlySaveConflict: () => true,
+    });
+    const job = vi.fn(async () => ({ ok: true }));
+
+    await expect(createWocMarketCustody(host).runSerialized(2, job)).resolves.toBe('contended');
+    expect(sequence).toEqual(['flush', 'fifo']);
+    expect(job).not.toHaveBeenCalled();
+  });
+
+  it('parks a grant save before serialization while guild-paired work is queued', async () => {
+    const { host } = makeHost({ hasCharacterOnlySaveConflict: () => true });
+    liveSession(host);
+    const serialize = vi.fn(host.serializeCharacterForPersist.bind(host));
+    host.serializeCharacterForPersist = serialize;
+    const persist = vi.fn(async () => ({ ok: true }));
+
+    await expect(
+      createWocMarketCustody(host).persistGrantSerialized(7, 2, 'live-nonce', persist),
+    ).resolves.toBe('busy');
+    expect(serialize).not.toHaveBeenCalled();
+    expect(persist).not.toHaveBeenCalled();
+  });
+});
+
+function ledgerOutbox(): BankLedgerOutbox {
+  return new BankLedgerOutbox({
+    owner: { realm: 'Claudemoon', characterId: 2, accountId: 7 },
+    budget: new BankLedgerOutboxBudget({ maxRows: 10, maxEncodedBytes: 100_000 }),
+    limits: { maxRows: 10, maxEncodedBytes: 100_000 },
+  });
+}
+
+function stageLedgerRow(outbox: BankLedgerOutbox, batchKey: string): void {
+  const reservation = outbox.tryReserve({ maxRows: 1, maxEncodedBytes: 10_000, batchKey });
+  if (!reservation) throw new Error('missing ledger capacity');
+  outbox.commit(reservation, [
+    {
+      realm: 'Claudemoon',
+      characterId: 2,
+      accountId: 7,
+      op: 'deposit',
+      itemId: 'peacebloom',
+      count: 1,
+      instance: null,
+      copperDelta: 0,
+      purchasedSlotsAfter: 6,
+      container: 'personal',
+      containerId: null,
+    },
+  ]);
+}
+
+describe('custody post-commit acknowledgement is exact and failure-safe', () => {
+  it('acknowledges only the captured prefix and leaves an in-flight append queued', () => {
+    const outbox = ledgerOutbox();
+    stageLedgerRow(outbox, 'woc:first');
+    const first = outbox.snapshot();
+    const { host } = liveHostWithLedgerSnapshot(first);
+    host.acknowledgeCharacterSaveEffects = (save) => {
+      expect(save.bankLedgerSnapshot).toBe(first);
+      return outbox.acknowledge(save.bankLedgerSnapshot as BankLedgerOutboxSnapshot);
+    };
+    const custody = createWocMarketCustody(host);
+    const captured = custody.snapshotCopy(7, 2);
+    if (!captured.ok) throw new Error(`snapshot refused: ${captured.reason}`);
+    stageLedgerRow(outbox, 'woc:append');
+
+    expect(() => custody.acknowledgeCharacterSave?.(captured.save)).not.toThrow();
+
+    expect(outbox.usage.queuedRows).toBe(1);
+    expect(outbox.snapshot().batches.map((batch) => batch.batchKey)).toEqual(['woc:append']);
+  });
+
+  it.each(['false', 'throw'] as const)(
+    'retains the captured prefix when the unified host acknowledgement returns %s',
+    (mode) => {
+      const outbox = ledgerOutbox();
+      stageLedgerRow(outbox, `woc:${mode}`);
+      const snapshot = outbox.snapshot();
+      const { host } = liveHostWithLedgerSnapshot(snapshot);
+      host.acknowledgeCharacterSaveEffects = () => {
+        if (mode === 'throw') throw new Error('ack failure');
+        return false;
+      };
+      const custody = createWocMarketCustody(host);
+      const captured = custody.snapshotCopy(7, 2);
+      if (!captured.ok) throw new Error(`snapshot refused: ${captured.reason}`);
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        expect(() => custody.acknowledgeCharacterSave?.(captured.save)).not.toThrow();
+        expect(outbox.usage.queuedRows).toBe(1);
+        expect(errors).toHaveBeenCalledOnce();
+      } finally {
+        errors.mockRestore();
+      }
+    },
+  );
+});
 
 /** The two sim calls the grant arms make, reachable for stubbing without
  *  widening anything on Sim itself. */

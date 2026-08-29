@@ -189,10 +189,17 @@ describe('the rod a zone takes', () => {
     expect(rodTierRequiredForZone('thornpeak_heights')).toBe(3);
   });
 
-  it('covers every zone the world ships, and floors an unknown one at tier 1', () => {
+  it('covers every professions zone the world ships, and floors an unknown one at tier 1', () => {
+    // The Proving Shore (the tutorial island) is the one deliberate absence:
+    // its R37 rollout row is 'none' (professions-free, no lakes), so it has
+    // NO rod row by design and resolves through the tier-1 floor like any
+    // unknown zone (tests/professions_zone_rollout.test.ts pins the absence).
     for (const zone of ZONES) {
+      if (zone.id === 'proving_shore') continue;
       expect(FISHING_ZONE_ROD_TIERS[zone.id], zone.id).toBeDefined();
     }
+    expect(FISHING_ZONE_ROD_TIERS.proving_shore).toBeUndefined();
+    expect(rodTierRequiredForZone('proving_shore')).toBe(DEFAULT_FISHING_ROD_TIER);
     expect(Object.keys(FISHING_ZONE_ROD_TIERS).sort()).toEqual(
       [...ZONE_IDS, ...EXPANSION_ZONE_IDS].sort(),
     );

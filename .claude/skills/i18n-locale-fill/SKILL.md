@@ -24,6 +24,14 @@ npm run i18n:worklist   # writes one batch per language under docs/i18n-scaling/
 - `main`-scope keys are filled in the matching `src/ui/i18n.locales/<lang>.ts` overlay.
 - `sim` / `server` / `admin` scope keys are filled in their matcher DICTs (the worklist
   header in `scripts/i18n_fill_worklist.mjs` names the exact files).
+- **The worklist NEVER lists sim-scope keys**: the sim DICT builds every language over
+  the English base table, so the scan classifies a sim row `translated` on presence
+  alone and `scripts/i18n_fill_worklist.mjs` (which selects `pending` only) cannot see
+  a missing fill. The net that does catch them is the release-tier S3 arm
+  (`I18N_RELEASE_TIER=1 npx vitest run tests/localization_fixes.test.ts`, the
+  `s3_localized` leak list): run it FIRST, and fill every sim key it names in the
+  per-language `BASE_DICT` blocks of `src/ui/sim_i18n.newlocales.ts` even though no
+  worklist batch mentions them.
 - **`humanRequired` entries are blocked by default** (quest narratives, names, lore, SEO
   copy): never machine-fill them; only `autoFillable` entries are fair game for a model pass.
 

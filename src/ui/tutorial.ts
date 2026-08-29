@@ -14,6 +14,7 @@
 
 import type { Keybinds } from '../game/keybinds';
 import type { Renderer } from '../render/renderer';
+import { isOnProvingShore } from '../sim/content/proving_shore';
 import { PLAYER_START, QUESTS, ZONES } from '../sim/data';
 import { dist2d, INTERACT_RANGE } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -70,6 +71,13 @@ export function isFreshCharacter(world: IWorld): boolean {
   const p = world.player;
   if (!p) return false;
   if (world.playerId < 0 || p.id !== world.playerId) return false;
+  // A fresh character standing on the Proving Shore (the tutorial island) is
+  // being taught by the island's own on-rails chain; this Eastbrook coachmark
+  // stays quiet there and still engages normally if they ferry back with no
+  // quest history. The gate is the shared zone-rectangle predicate, both axes:
+  // the island's x column also covers four mainland zones that differ only by
+  // z. (pos is optional-chained for the online pre-snapshot placeholder.)
+  if (isOnProvingShore(p.pos?.x ?? 0, p.pos?.z ?? 0)) return false;
   return p.level === 1 && world.questsDone.size === 0 && world.questLog.size === 0;
 }
 

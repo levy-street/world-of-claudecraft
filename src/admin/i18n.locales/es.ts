@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const es: Record<string, string> = {
+  'error.flagActiveExists': 'esta cuenta ya tiene una marca abierta de ese tipo',
+  'wealth.largeMovementsUnavailable':
+    'no se pudieron cargar los grandes movimientos bancarios (se agotó el tiempo de la lectura del registro); el desglose de oro anterior está completo',
   'error.guildBankDeleting':
     'Esta hermandad se está eliminando, así que su banco está cerrado. No se realizó ningún cambio.',
   'error.guildBankItemRequired': 'Introduce el id del objeto que esperas que contenga esa ranura.',

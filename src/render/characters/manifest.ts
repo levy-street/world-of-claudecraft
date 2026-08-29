@@ -3126,6 +3126,12 @@ const MOB_KEYS: Record<string, string> = {
   // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
   // (the canopy weavers take the spider family default)
   tide_scuttler: 'mob_crab',
+  // the Proving Shore (tutorial island): the strand crab and the straw
+  // practice target reuse the shipped crab and training-dummy rigs, and the
+  // tide-pool king is the same crab rig grown into his template scale
+  shore_scuttler: 'mob_crab',
+  mister_crabs: 'mob_crab',
+  training_effigy: 'mob_training_dummy',
   thicket_boar: 'mob_boar',
   idol_guardian: 'skel_golem',
   topiary_stag: 'mob_stag',

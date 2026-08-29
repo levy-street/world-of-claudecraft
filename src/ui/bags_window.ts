@@ -22,6 +22,7 @@ import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { isItemLocked } from '../sim/item_lock';
+import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
@@ -51,6 +52,7 @@ import {
   bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
+  bagSlotsLineKey,
   bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
@@ -60,10 +62,12 @@ import {
   buildBagBar,
   buildBagGrid,
   buildBagListRows,
+  carriedPools,
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { hasOpenBankSocket } from './bank_view';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
@@ -198,6 +202,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  bank instead (officer-plus only; the tab exists only while guildBankInfo
    *  is non-null, so this can never be true for a member or offline). */
   isGuildBankTab(): boolean;
+  /** The bank window is open ON ITS VAULT TAB with the Materials Vault
+   *  unlocked: a click deposits the material into the vault. The locked
+   *  offer pane arms nothing (a purchase surface, the guild Log rule). */
+  isVaultBankTab(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
@@ -579,7 +587,7 @@ export class BagsWindow {
           'aria-label',
           t('hudChrome.bags.bagSocketAria', {
             name: itemDisplayName(item),
-            slots: t('itemUi.tooltip.bagSlots', {
+            slots: t(bagSlotsLineKey(item) ?? 'itemUi.tooltip.bagSlots', {
               slots: formatNumber(socket.slots, { maximumFractionDigits: 0 }),
             }),
           }),
@@ -611,15 +619,56 @@ export class BagsWindow {
     }
     const counter = document.createElement('span');
     counter.className = `bag-capacity${model.used > model.capacity ? ' over' : ''}`;
+    // Focusable: the per-pool split lives only in the tooltip, whose host
+    // serves hover, long-press, AND focusin; a keyboard-only user needs the
+    // tab stop to reach it (the bank meter's twin, QA 08). The focus key
+    // keeps a parked reader here across the whole-window inventory rebuild
+    // (the restore ladder resolves by dataset equality).
+    counter.tabIndex = 0;
+    counter.dataset.focusKey = 'bag-capacity';
     const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
     counter.textContent = t('hudChrome.bags.capacity', {
       used: fmt(model.used),
       total: fmt(model.capacity),
     });
+    // The per-pool truth behind the summed counter (Bank Storage phase 08):
+    // with a materials-only bag equipped the summed pair can look roomy while
+    // one pool refuses pickups, so the aria splits when the materials pool has
+    // anything to say and the tooltip always names the pools. The split comes
+    // from the shared carriedPools core (the sim's own helpers), never a
+    // painter re-derivation. Non-actionable span: no click, no peek guard.
+    const split = carriedPools(world.bags, world.inventory);
     counter.setAttribute(
       'aria-label',
-      t('hudChrome.bags.capacityAria', { used: fmt(model.used), total: fmt(model.capacity) }),
+      split.showMaterials
+        ? t('hudChrome.bags.capacityPoolsAria', {
+            used: fmt(model.used),
+            total: fmt(model.capacity),
+            generalUsed: fmt(split.general.used),
+            generalTotal: fmt(split.general.capacity),
+            materialsUsed: fmt(split.materials.used),
+            materialsTotal: fmt(split.materials.capacity),
+          })
+        : t('hudChrome.bags.capacityAria', { used: fmt(model.used), total: fmt(model.capacity) }),
     );
+    this.deps.attachTooltip(counter, () => {
+      const generalLine = `<div class="tt-sub">${esc(
+        t('hudChrome.bags.poolGeneral', {
+          used: fmt(split.general.used),
+          total: fmt(split.general.capacity),
+        }),
+      )}</div>`;
+      if (!split.showMaterials) return generalLine;
+      return (
+        generalLine +
+        `<div class="tt-sub">${esc(
+          t('hudChrome.bags.poolMaterials', {
+            used: fmt(split.materials.used),
+            total: fmt(split.materials.capacity),
+          }),
+        )}</div>`
+      );
+    });
     bar.appendChild(counter);
     return bar;
   }
@@ -887,6 +936,9 @@ export class BagsWindow {
       const questReady = questMark === 'questReady';
       const fineMark = bagFineMark(item.id);
       row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
+      // Item identity for the island coach's press-this-next glow
+      // (bootcamp.ts; distinct from the focus-key namespace).
+      row.dataset.coachItem = item.id;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -1457,7 +1509,14 @@ export class BagsWindow {
   // pure bagItemAction decided. Both buttons run it (right-click is the classic
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
-    const action = bagItemAction(item, this.bagMode(), s.instance);
+    const action = bagItemAction(
+      // The vault arm needs the honest-set membership the info shape cannot
+      // carry (it has no id); every other arm ignores the extra field.
+      { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
+      this.bagMode(),
+      s.instance,
+      s.craftedRecipeId,
+    );
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -1517,6 +1576,16 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
+      case 'bankSocketBag':
+        // The bank-aimed twin of equipBag below: the clicked payload-free bag
+        // sockets into the bank's first empty unlocked socket (the sim owns
+        // the scan; no socket index is named), consuming the EXACT clicked
+        // copy via the named-slot selector. The bank pane repaints through its
+        // own signature (socketBags moves); the bags side repaints here.
+        this.deps.world().bankSocketBag(s.itemId, undefined, this.copyRefFor(s));
+        this.deps.hideTooltip();
+        this.render();
+        break;
       case 'bankDepositBlockedNoTarget':
         // The bank is open with no grid on screen to drop into (its guild pane's
         // Log view). SPEAK, do not go quiet: this is a deliberate click on an
@@ -1540,6 +1609,27 @@ export class BagsWindow {
         }
         break;
       }
+      case 'vaultDeposit': {
+        // The vault twin of bankDeposit: same reference-resolved index, same
+        // shift split prompt, sent through the IWorldBank vault facet (the
+        // sim clamps a partial fill to the material's headroom silently).
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)), 'vault');
+        } else {
+          this.deps.world().vaultDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+        break;
+      }
+      // The vault's one pre-empt deny voices the exact materials-only line the
+      // sim would refuse with, sending nothing. Identity-bearing materials
+      // reach the normal deposit arm and retain their payload in the vault.
+      case 'vaultDepositBlockedNotMaterial':
+        this.deps.showError(tSim('error.vaultOnlyMaterials'));
+        return;
       // The guild pipe's pre-empt denies, each voicing the exact line the sim
       // would refuse with (its established sim_i18n keys), sending nothing.
       case 'guildBankDepositBlockedQuest':
@@ -1590,16 +1680,23 @@ export class BagsWindow {
   private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
     this.deps.attachTooltip(row, () => {
       const mode = this.bagMode();
-      const key = bagTooltipHintKey(item, mode, s.instance);
+      const key = bagTooltipHintKey(
+        { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
+        mode,
+        s.instance,
+        s.craftedRecipeId,
+      );
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a
       // blocked quest item never shows it).
-      // Both bank modes advertise the shift split on their deposit-hint arm
-      // (a blocked item never shows it): the guild target reuses the partial
-      // wording, only the primary hint key differs.
+      // All three bank modes advertise the shift split on their deposit-hint
+      // arm (a blocked item never shows it): the guild and vault targets reuse
+      // the partial wording, only the primary hint key differs.
       const partial =
-        (key === 'hudChrome.bank.depositHint' || key === 'hudChrome.bank.guildDepositHint') &&
+        (key === 'hudChrome.bank.depositHint' ||
+          key === 'hudChrome.bank.guildDepositHint' ||
+          key === 'hudChrome.bank.vaultDepositHint') &&
         bankDepositOpensPrompt(s)
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
           : '';
@@ -1694,7 +1791,15 @@ export class BagsWindow {
       // the item action menu over a reading surface.
       bankOpen: this.deps.isBankOpen(),
       bankDeposit: this.deps.isPersonalBankTab(),
+      // Meaningful only beside bankDeposit, so the read is gated on it: a
+      // clicked payload-free bag SOCKETS while an unlocked bank socket is
+      // empty, and deposits otherwise. hasOpenBankSocket tolerates a thin
+      // world fake with no bankInfo member (unit and a11y rigs), reading it
+      // as false exactly like the away state.
+      bankSocketable:
+        this.deps.isPersonalBankTab() && hasOpenBankSocket(this.deps.world().bankInfo),
       guildBankDeposit: this.deps.isGuildBankTab(),
+      vaultDeposit: this.deps.isVaultBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
   }
@@ -1720,6 +1825,7 @@ export class BagsWindow {
       !mode.bankOpen &&
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
+      !mode.vaultDeposit &&
       !mode.petFeed;
     return inDefaultMode && bagItemHasContextActions(item, itemId, instance);
   }
@@ -1996,13 +2102,14 @@ export class BagsWindow {
   // owns the bags closures: the stale-slot re-resolve (resolveDepositSubmit
   // refuses on an itemId mismatch, else clamps to the live stack) and the send.
   // `target` picks which facet command the submit sends: the personal pane's
-  // bankDeposit (default) or the Guild tab's guildBankDeposit; everything else
-  // is identical between the two.
+  // bankDeposit (default), the Guild tab's guildBankDeposit, or the Vault
+  // tab's vaultDeposit (the sim clamps a partial fill to the material's
+  // headroom silently); everything else is identical across the three.
   private showDepositQuantityPrompt(
     index: number,
     captured: InvSlot,
     maxCount: number,
-    target: 'bank' | 'guild' = 'bank',
+    target: 'bank' | 'guild' | 'vault' = 'bank',
   ): void {
     // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
     // made every bags item read tolerate an id this client does not know.
@@ -2030,6 +2137,7 @@ export class BagsWindow {
         },
         send: (count) => {
           if (target === 'guild') this.deps.world().guildBankDeposit(index, count);
+          else if (target === 'vault') this.deps.world().vaultDeposit(index, count);
           else this.deps.world().bankDeposit(index, count);
         },
         afterClose: (sent) => {

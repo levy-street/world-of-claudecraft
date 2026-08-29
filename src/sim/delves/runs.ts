@@ -284,23 +284,47 @@ export function delveMemberSpawnPos(ctx: SimContext, entry: Vec3, slotIndex: num
 }
 
 export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null {
+  // The vault craft gate's membership arm probes this EVERY snapshot per
+  // connected session (the cvault wire signature). With no live runs there is
+  // nothing either scan below could find (both are keyed into ctx.delveRuns),
+  // so return before touching the entity at all; and when runs DO exist, the
+  // party key (a minted template-literal string) is lazily built only once a
+  // run's cheap dx band admits the position or the player stands in the delve
+  // band, so the common open-world session allocates nothing here. Inside the
+  // loop the order is dx band, then key, then the occupancy-radius walk: the
+  // key reject stays ahead of the O(modules) radius walk (same-delve runs at
+  // different slots share origin.x, so an in-delve session would otherwise
+  // pay that walk per foreign run), and every continue keeps the ORIGINAL
+  // comparison sense via negation, so a non-finite coordinate still matches
+  // nothing (NaN > 120 is as false as NaN <= 120; a bare `> 120` continue
+  // would fall through and bind a corrupt position to its party's live run).
+  // The predicate is the same conjunction as before, so the first match over
+  // delveRuns order is unchanged and no draw or outcome can move.
+  if (ctx.delveRuns.length === 0) return null;
   const e = ctx.entities.get(pid);
   if (!e) return null;
-  const key = ctx.instanceKeyFor(pid);
+  let key: string | null = null;
+  const keyOf = (): string => {
+    if (key === null) key = ctx.instanceKeyFor(pid);
+    return key;
+  };
   for (const run of ctx.delveRuns) {
-    if (run.partyKey !== key) continue;
     const dx = Math.abs(e.pos.x - run.origin.x);
+    if (!(dx <= 120)) continue;
+    if (run.partyKey !== keyOf()) continue;
     // Symmetric band ON PURPOSE, unlike the updateDelveRuns empty sweep's
     // asymmetric one: this lookup is key-gated (one run per delveId+key, and
     // delves sit 600u apart in x), so it can never bind a player to a NEIGHBOR
     // slot's run; the generous band only ever re-finds the caller's own run.
     const dz = Math.abs(e.pos.z - run.origin.z);
-    if (dx <= 120 && dz <= delveOccupancyRadius(run)) return run;
+    if (!(dz <= delveOccupancyRadius(run))) continue;
+    return run;
   }
   if (!isDelvePos(e.pos.x)) return null;
   const delve = delveAt(e.pos.x);
   if (!delve) return null;
-  return ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === key) ?? null;
+  const partyKey = keyOf();
+  return ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === partyKey) ?? null;
 }
 
 export function delveRunForMob(ctx: SimContext, mobId: number): DelveRun | null {

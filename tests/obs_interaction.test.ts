@@ -234,24 +234,34 @@ describe('RL interactable observation parity', () => {
     expect(sim.drainEvents()).toEqual([]);
   });
 
-  it('advertises Tinker when the shipped board is 4.5 yards away and Tinker is 4.8', () => {
+  it('advertises the Chronicler when the shipped board is 4.5 yards away and the Chronicler is 4.8', () => {
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the board and the toolworks
+    // are no longer neighbors, so the shipped-placement pairing swaps to
+    // chronicler_saul, the NPC the plan seats at the noticeboard. The standAt
+    // literal is the circle intersection of r=4.5 around the board (5, -89)
+    // and r=4.8 around Saul (10.2, -87.5); only those two sit in scan range.
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
     const board = entityByTemplate(sim, 'noticeboard_eastbrook');
-    const tinker = entityByTemplate(sim, 'tinker_gizzel');
+    const saul = entityByTemplate(sim, 'chronicler_saul');
+    // Park everything else, the file-wide fixture idiom: the tutorial island
+    // adds interactables of its own, and the claim under test is
+    // board-vs-Saul priority, not who is nearest overall.
+    parkOtherInteractables(sim, board, saul);
     const player = standAt(sim, {
-      x: 5.667054662450036,
-      z: -9.214736474221478,
+      x: 6.305857720281236,
+      z: -84.69364009697496,
     });
 
     expect(board.pos.x).toBe(EASTBROOK_LAYOUT.services.noticeboard.position.x);
     expect(board.pos.z).toBe(EASTBROOK_LAYOUT.services.noticeboard.position.z);
     expect(dist2d(player.pos, board.pos)).toBeCloseTo(4.5, 12);
-    expect(dist2d(player.pos, tinker.pos)).toBeCloseTo(4.8, 12);
-    expectAdvertises(sim, tinker, 1);
+    expect(dist2d(player.pos, saul.pos)).toBeCloseTo(4.8, 12);
+    expectAdvertises(sim, saul, 1);
 
     const talkToNpc = vi.spyOn(sim, 'talkToNpc');
     sim.interact();
-    expect(talkToNpc).toHaveBeenCalledWith(tinker.id, player.id);
+    expect(talkToNpc).toHaveBeenCalledWith(saul.id, player.id);
   });
 
   it.each([

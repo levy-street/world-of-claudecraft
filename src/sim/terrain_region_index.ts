@@ -55,10 +55,11 @@ export const TERRAIN_APPLIER = {
   frostTerraces: 29,
   fenBraids: 30,
   glacierTarnRamp: 31,
-  sowfieldFlatten: 32,
-  stableFlatten: 33,
-  fenSouthShore: 34,
-  gardenwalkWestPass: 35,
+  stableFlatten: 32,
+  fenSouthShore: 33,
+  provingCoast: 34,
+  provingMoat: 35,
+  gardenwalkWestPass: 36,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -103,13 +104,17 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   [bounds(-178, 178, 1460, 1960)],
   [bounds(-380, -184, 240, 620)],
   [bounds(25.5, 57, 1631.5, 1649)],
-  [bounds(-64, 42, -149, -75)],
   [bounds(320, 436, 536, 616)],
   // The fen's south shore: west of the world bound skirt out to the corner
   // where its bay meets the vale headland (FEN_SHORE_CORNER_X), and from the
   // tail fade (FEN_SHORE_TAIL_Z) north to FEN_ZMIN + FEN_SHORE_SUPPORT, the
   // widest the wandered waterline plus its bank shave can reach inland.
   [bounds(-566, -232, 132, 336)],
+  // provingCoast: the tutorial island's full window (fades included)
+  [bounds(-566, -166, -188, 188)],
+  // provingMoat: like starterMoat, its south open-sea band has unbounded z
+  // support, so it stays in the always-run mask
+  null,
   // The Gardenwalk pass floor's west-of-border mirror (applyGardenwalkWestPass):
   // its smoothstep(26,52,|z-800|) z-falloff and smoothstep(0,58,|x-180|)
   // x-falloff (centered ON the border, STRIP_MAX_X 180) are both fully zero

@@ -147,6 +147,15 @@ type FinalAuditVerdict = {
     modifiedItemArtCount: number;
     modifiedItemArtPaths: string[];
     groups: Record<string, number>;
+    incrementalReviews: Array<{
+      reviewedAt: string;
+      branch: string;
+      reviewer: string;
+      addedIds?: string[];
+      replacedIds?: string[];
+      provenance: string[];
+      note: string;
+    }>;
   };
   reviewContract: {
     everyShippingFileReviewedInModes: string[];
@@ -333,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '8ee3f954fc4e79c90c5e02be3b32e09b0a932e719a692c5da174e8a83a367c63',
-        acceptedBytes: 108_135,
+        acceptedSha256: 'aadf8ae9fe7e124a07a67acfea39021211d8f741d4e901d729e420a4b4535601',
+        acceptedBytes: 110_855,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -442,26 +451,27 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final 817-item visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the final item-art visual audit, Heroic accounting, and evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(108_135);
+    expect(verdictBytes.length).toBe(110_855);
     expect(sha256(verdictBytes)).toBe(
-      '8ee3f954fc4e79c90c5e02be3b32e09b0a932e719a692c5da174e8a83a367c63',
+      'aadf8ae9fe7e124a07a67acfea39021211d8f741d4e901d729e420a4b4535601',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
     expect(verdict.schemaVersion).toBe(1);
+    expect(verdict.generatedAt).toBe('2026-08-26T05:07:29.368Z');
     expect(verdict.auditScope).toMatchObject({
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 823,
-      liveItemDefinitions: 838,
+      itemArtFilesReviewed: 836,
+      liveItemDefinitions: 851,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,9 +481,28 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      823,
+      836,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
+    expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
+      reviewedAt: '2026-08-26',
+      branch: 'feature/bank-storage-pr',
+      reviewer: 'implementation agent',
+      replacedIds: [
+        'burlap_reagent_pouch',
+        'duskweave_bag',
+        'foragers_haversack',
+        'loombound_reagent_satchel',
+        'necromancers_reagent_satchel',
+        'resonant_weave_bag',
+        'wayfarers_backpack',
+      ],
+      provenance: [
+        'docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json',
+        'public/ui/items/mapping.json',
+      ],
+      note: 'Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged.',
+    });
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
@@ -516,13 +545,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 823,
+      passCount: 836,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12.',
+        'All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,8 +591,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '33d4dbff43be4e9f8628756571bc1a0ff33ad8069b607979ba9fbacbdd6b9b6e',
-      bytes: 451_762,
+      sha256: '691107c88450b6ef09fa36d12d4c330c602bcfddd08a70ce8d8dca72472ad2dd',
+      bytes: 458_451,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -616,7 +645,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '3c5ad46c56f049fab4696791e8d487e389f505dd0313a6b1037af58e60919110',
+      'f920e8c845f1bf3f91ebaf8090f6fdd07f6a8d581edd6653c884d8ac6d59bea8',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +655,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'cc5fc2f49d88532ef79bf342c0c56f14a798ff566f586dac55291ef44c88be87',
+      '5b40b3ab9e6795e169f08b202829dc529690316d2251359539bfcaddc83cf0dd',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -738,7 +767,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     expect(mapping.entries).toHaveLength(40);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(16);
+    expect(mapping.generatedBatches).toHaveLength(19);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -755,13 +784,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(509);
+    expect(oldGeneratedIds).toHaveLength(522);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(823);
-    expect(new Set(allCurrentOwnerIds).size).toBe(823);
+    expect(allCurrentOwnerIds).toHaveLength(836);
+    expect(new Set(allCurrentOwnerIds).size).toBe(836);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -883,7 +912,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
   }, 30_000);
 
-  it('keeps the full 817-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
+  it('keeps the full shipping icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
@@ -897,8 +926,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 823) violations.push(`mapping owner count: ${ownerIds.length} != 823`);
-    if (fileIds.length !== 823) violations.push(`shipping WebP count: ${fileIds.length} != 823`);
+    if (ownerIds.length !== 836) violations.push(`mapping owner count: ${ownerIds.length} != 836`);
+    if (fileIds.length !== 836) violations.push(`shipping WebP count: ${fileIds.length} != 836`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

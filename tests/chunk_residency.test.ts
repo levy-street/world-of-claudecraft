@@ -31,9 +31,10 @@ const GRID: ChunkGrid = {
 };
 
 // The same ownership rule terrain.ts builds against: a cell belongs to the zone
-// containing its CENTRE, and 96 of the 792 cells belong to no zone at all (the
-// zone rectangles do not tile). Deliberately not zoneAt(), which clamps a gap
-// to the nearest playable zone.
+// containing its CENTRE, and 60 of the 792 cells belong to no zone at all (the
+// zone rectangles do not tile; the Proving Shore tutorial island claimed the
+// west cell at x[-540,-180] z[-180,180]). Deliberately not zoneAt(), which
+// clamps a gap to the nearest playable zone.
 function cellOwner(cx: number, cz: number): string | null {
   const x = GRID.originX + (cx + 0.5) * GRID.size;
   const z = GRID.originZ + (cz + 0.5) * GRID.size;
@@ -152,7 +153,8 @@ describe('nearest unbuilt ground', () => {
   });
 
   it('never clamps against a cell no zone owns, or anything past the world rim', () => {
-    // 96 of the 792 cells are covered by no zone rectangle, so nothing will
+    // 60 of the 792 cells are covered by no zone rectangle (96 before the
+    // Proving Shore tutorial island claimed its 36), so nothing will
     // ever build them. Treating "no geometry" as "pending" would pin the view
     // against a hole that never fills, which is worse than the zone clamp this
     // replaces. The whole world is resident here, so only unowned cells remain.
@@ -162,7 +164,7 @@ describe('nearest unbuilt ground', () => {
         if (cellOwner(cx, cz) === null) unowned.push([cx, cz]);
       }
     }
-    expect(unowned.length).toBe(96);
+    expect(unowned.length).toBe(60);
     const isPending = pendingOutside(new Set(ZONES.map((zone) => zone.id)));
     // Stand in the middle of an unowned cell: even at zero distance it must not
     // clamp, and the full biome request is granted.
@@ -347,7 +349,10 @@ describe('the view wedge (turning on the spot must not move the horizon)', () =>
     // 90 degrees off the view axis, 235 with it 179 degrees off, i.e. squarely
     // behind the camera. Everything past that horizon is the coarse vista mesh,
     // which carries no splat texture and takes no shadows.
-    const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale']));
+    // The Proving Shore tutorial island now owns the west cell, so it joins the
+    // built set here to keep the spawn's one open heading (west, over the
+    // island toward the ocean past x=-540) that the report measured.
+    const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale', 'proving_shore']));
     const spawn = { x: 2, z: -2 };
     const served = [];
     for (let i = 0; i < 16; i++) {

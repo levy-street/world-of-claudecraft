@@ -28,6 +28,7 @@ import {
   GATHER_NODE_TYPES,
   GATHER_NODES,
   MOBS,
+  PROPS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   WORLD_MAX_X,
@@ -43,13 +44,6 @@ import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '.
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
 import { INTERACT_RANGE } from '../src/sim/types';
-import {
-  GOAL_LINE_EAST_X,
-  GOAL_LINE_WEST_X,
-  isOnPitch,
-  PITCH_CENTER,
-  SOWFIELD_EXCLUDE,
-} from '../src/sim/vale_cup_layout';
 import {
   DECORATION_MAX_SLOPE,
   groundHeight,
@@ -367,8 +361,16 @@ const ON_MAZE_WALL_POCKET = { x: -232, z: 452 };
 // pocket), so computing it twice bought nothing but wall time.
 const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
 const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
-const ON_SOWFIELD_STAND = { x: -41, z: -137 }; // groundHeight adds the stand lift here
-const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
+// The Eastbrook lake dock's plank surface: groundHeight rides dockSurfaceHeight
+// above the shore terrain here, so the two really differ.
+const ON_A_DOCK_PLANK = { x: PROPS.docks[0].x, z: PROPS.docks[0].z };
+// Re-pinned 2026-08 for the Eastbrook harbor move (d19aa33f76,
+// docs/design/eastbrook-revamp/site-plan.md): the old fixture (-29,0) sat
+// inside the origin town's ring wall, and the move demolished the wall and
+// emptied that ground. This point sits just inside the relocated smithy's
+// west wall at the crafts district (smithy lot (-2,-122)), with standable
+// ground a yard away, the same shallow shape the old fixture had.
+const INSIDE_A_TOWN_COLLIDER = { x: -7, z: -123 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
 // can hold is 4.5yd away, three times the widest clearance a node's own
 // body can account for, and still inside the harvest reach the sweep
@@ -581,58 +583,6 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
     expect(tightest, `tightest in-reach clearance is ${who}`).toBeGreaterThanOrEqual(0);
     expect(tightest, `tightest in-reach clearance is ${who}`).toBeLessThan(0.5);
-  });
-
-  it('no node grows inside the Sowfield boarball ground', () => {
-    // A gather node is a world prop, and SOWFIELD_EXCLUDE is the footprint
-    // world.ts generateDecorations already refuses to seat one in: the pitch,
-    // its goal pockets, both stands, the gate approach and the terrain
-    // flatten's falloff apron. Nothing applied that screen to authored nodes,
-    // and herb_eastbrook_4 shipped at (23,-99), INSIDE the pitch rectangle in
-    // the east goal's corner (the second half of the player report that opened
-    // this change: "one of the fine sheenleaf herb is inside the football game
-    // in eastbrook"). Every other arm passed it: the flattened pitch is dry,
-    // level, unblocked and reachable. The ground is a match venue, so a node
-    // on it is worked at the pitch police's pleasure (social/vale_cup.ts
-    // ejects any non-fighter standing there, cancelling the gather cast) and
-    // the patch grows on the playing surface. Reusing the shipped exclusion
-    // rather than a fresh rectangle keeps ONE definition of the venue's
-    // footprint for the terrain, the decorations and the nodes.
-    for (const node of GATHER_NODES) {
-      const { x, z } = node.pos;
-      const inside =
-        x >= SOWFIELD_EXCLUDE.xMin &&
-        x <= SOWFIELD_EXCLUDE.xMax &&
-        z >= SOWFIELD_EXCLUDE.zMin &&
-        z <= SOWFIELD_EXCLUDE.zMax;
-      expect(inside, `${node.id} at (${x},${z}) sits inside the Sowfield boarball ground`).toBe(
-        false,
-      );
-    }
-  });
-
-  it('the Sowfield arm rejects the old herb spot and the pitch it stood on', () => {
-    const inSowfield = (x: number, z: number) =>
-      x >= SOWFIELD_EXCLUDE.xMin &&
-      x <= SOWFIELD_EXCLUDE.xMax &&
-      z >= SOWFIELD_EXCLUDE.zMin &&
-      z <= SOWFIELD_EXCLUDE.zMax;
-    // The shipped-then-moved spot, and the property that made it a defect:
-    // it was not merely inside the exclusion apron, it was on the pitch.
-    expect(inSowfield(23, -99)).toBe(true);
-    expect(isOnPitch(23, -99)).toBe(true);
-    // The exclusion really does contain the whole playing surface, so the
-    // screen above cannot pass a node standing in a goal mouth either.
-    expect(inSowfield(PITCH_CENTER.x, PITCH_CENTER.z)).toBe(true);
-    expect(inSowfield(GOAL_LINE_WEST_X, PITCH_CENTER.z)).toBe(true);
-    expect(inSowfield(GOAL_LINE_EAST_X, PITCH_CENTER.z)).toBe(true);
-    // And it is a screen, not a blanket: the relocated patch is outside it,
-    // with real clearance rather than sitting on the boundary.
-    const moved = GATHER_NODES.find((n) => n.id === 'herb_eastbrook_4');
-    expect(moved, 'herb_eastbrook_4 names a live node').toBeDefined();
-    if (!moved) return;
-    expect(inSowfield(moved.pos.x, moved.pos.z)).toBe(false);
-    expect(moved.pos.z - SOWFIELD_EXCLUDE.zMax).toBeGreaterThanOrEqual(2);
   });
 
   it('the sea-plane arm rejects the Wickharbor cove floor, so it can fail', () => {
@@ -1167,6 +1117,15 @@ describe('gather node placement: every node sits on ground a player can work', (
     // already tells players to bring friends to; level-first is the path
     // (R32 family), and no tutorial quest sends anyone to this patch.
     'herb_eastbrook_5:mogger',
+    // New in owner round 6b: Gorrak's camp left (92,-92) and rejoined the main
+    // vale bandit band at (118,45), which walks the ringleader's aggro out to
+    // this patch at (99,57). Allowlisted on the same reading as Mogger two
+    // lines up: Gorrak the Ruthless is himself a quest target (the bandit
+    // ringleader fight), the patch shares the danger of a fight the zone
+    // already sends players to, and no tutorial quest routes anyone here. The
+    // overlap is 4.53 yd, in the same band as the wood_eastbrook_4 stand in
+    // Old Greyjaw's woods (4.48), not a deep-inside-the-camp placement.
+    'herb_eastbrook_6:gorrak',
     // The drowned bank: t2 ore beside the marsh's named lurker.
     'ore_mirefen_4:sloomtooth_the_drowned',
     // The cult side of the marsh: t2 ore inside Sister Nhalia's vigil.
@@ -1227,6 +1186,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // while any real relocation reds and forces a fresh decision here.
     const EXPECTED_CLEARANCE: Record<string, number> = {
       'herb_eastbrook_5:mogger': -0.98,
+      'herb_eastbrook_6:gorrak': -4.53,
       'ore_mirefen_4:sloomtooth_the_drowned': -5.0,
       'ore_mirefen_t2b:sister_nhalia': -8.98,
       'ore_thornpeak_1:ironvein_foreman': -13.05,
@@ -1303,9 +1263,12 @@ describe('gather node placement: every node sits on ground a player can work', (
     const reach = grix.radius + scaledAggro(mob.aggroRadius, mob.maxLevel, 1);
     const clearanceAt = (x: number, z: number) =>
       Math.hypot(x - grix.center.x, z - grix.center.z) - reach - REACH;
-    // The shipped-then-moved spots: both inside the scaled reach.
-    expect(clearanceAt(-99, -56)).toBeLessThan(0);
-    expect(clearanceAt(-76, -79)).toBeLessThan(0);
+    // The shipped-then-moved spots, carried through the 2026-08 headland
+    // translation (-60,-24) and then the phase 0b move to the Mirefen road
+    // (+110,+230) so they keep their original offsets from Grix: both inside
+    // the scaled reach.
+    expect(clearanceAt(-49, 150)).toBeLessThan(0);
+    expect(clearanceAt(-26, 127)).toBeLessThan(0);
     // Their replacements clear it with real margin.
     const five = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_5');
     const six = GATHER_NODES.find((n) => n.id === 'ore_eastbrook_6');
@@ -1313,7 +1276,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(six && clearanceAt(six.pos.x, six.pos.z)).toBeGreaterThan(0);
   });
 
-  it('the road band holds exactly the four deliberately-exempt nodes', () => {
+  it('the road band holds exactly the two deliberately-exempt nodes', () => {
     // The trailing comment at the bottom of this file explains why road clearance
     // is NOT an arm: generateDecorations screens world props at 5 yards from a
     // road, and four shipped nodes sit inside that, two of them the Copper Dig ore
@@ -1324,6 +1287,10 @@ describe('gather node placement: every node sits on ground a player can work', (
     // clearance rule; it is the record of who is exempt from one.
     // wood_mirefen_t2 left this set when R11 moved it off the road surface: it
     // was the one member whose exemption recorded a defect, not a decision.
+    // ore_eastbrook_1 and ore_eastbrook_3 left it with phase 0b of the New
+    // Eastbrook program: the relocated veins stand clear of the extended
+    // north road, so their old beside-the-mine-road exemption retired with
+    // the old road spur.
     const inBand = GATHER_NODES.filter(
       (n) =>
         (TUNED_ZONE_IDS as readonly string[]).includes(n.zoneId) &&
@@ -1331,12 +1298,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     )
       .map((n) => n.id)
       .sort();
-    expect(inBand).toEqual([
-      'herb_thornpeak_2',
-      'ore_eastbrook_1',
-      'ore_eastbrook_3',
-      'ore_mirefen_2',
-    ]);
+    expect(inBand).toEqual(['herb_thornpeak_2', 'ore_mirefen_2']);
   });
 
   it('the expansion-zone road band holds exactly the eight recorded exemptions', () => {
@@ -1572,9 +1534,9 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('render anchor: groundHeight and terrainHeight agree at every node', () => {
     // src/render/gather_nodes.ts seats each node prop at terrainHeight, while
     // every check above (and all movement) uses groundHeight, which adds the
-    // Sowfield stand lift and dock plank surfaces on top of the same baseline.
+    // dock plank and raised-walkway surfaces on top of the same baseline.
     // Where the two disagree the prop renders sunk into the platform a player is
-    // standing on, so a node authored onto a dock or a stand tier is a bug even
+    // standing on, so a node authored onto a dock or a walkway tier is a bug even
     // though it is dry, level, clear and reachable.
     for (const node of GATHER_NODES) {
       const { x, z } = node.pos;
@@ -1617,8 +1579,8 @@ describe('gather node placement: every node sits on ground a player can work', (
     ).toBeGreaterThanOrEqual(WATER_MARGIN);
   });
 
-  it('the anchor arm rejects a Sowfield stand tier, where the two really differ', () => {
-    const { x, z } = ON_SOWFIELD_STAND;
+  it('the anchor arm rejects a dock plank, where the two really differ', () => {
+    const { x, z } = ON_A_DOCK_PLANK;
     const lift = groundHeight(x, z, WORLD_SEED) - terrainHeight(x, z, WORLD_SEED);
     expect(lift).toBeGreaterThan(0.2);
     expect(groundHeight(x, z, WORLD_SEED)).not.toBeCloseTo(terrainHeight(x, z, WORLD_SEED), 9);

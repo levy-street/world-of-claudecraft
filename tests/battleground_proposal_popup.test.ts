@@ -31,6 +31,7 @@ function bgInfoWith(proposal: BgInfo['proposal']): BgInfo {
     proposal,
     requeueIn: 0,
     firstWinBonusReady: false,
+    doubleHonorActive: false,
     match: null,
     ladder: [],
   };

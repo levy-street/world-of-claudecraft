@@ -54,9 +54,18 @@ describe('bank_window: load-bearing behaviors preserved', () => {
     expect(painter).not.toContain('applyBagFilter(');
   });
 
-  it('captures and reapplies the .bank-scroll scroll offset across a rebuild', () => {
-    expect(painter).toContain(".bank-scroll')?.scrollTop");
-    expect(painter).toContain('scroll.scrollTop = prevScrollTop');
+  it('carries the pane scroll offset across a rebuild through the layout core', () => {
+    // WHICH element scrolls depends on the viewport (Bank Storage phase 18), so
+    // both candidates are captured and both are written back. The DECISION is
+    // driven in tests/bank_chrome_layout.test.ts, which also drives the
+    // BEHAVIOUR against a real accessor (a layout-free DOM stores no scroll
+    // offset at all, so an arm over it here would be vacuous whatever the window
+    // did). What this pins is the WIRING: the window consults the plan instead
+    // of re-deciding, and neither candidate is dropped.
+    expect(painter).toContain('planBankScrollRestore(');
+    expect(painter).toContain('inner: scroll?.scrollTop ?? 0, outer: el.scrollTop');
+    expect(painter).toContain('scroll.scrollTop = next.inner');
+    expect(painter).toContain('el.scrollTop = next.outer');
   });
 
   it('closes itself after a grace window once bankInfo goes null (walked away)', () => {
@@ -172,12 +181,100 @@ describe('bank_window: modal prompt a11y contract', () => {
   });
 
   it('mounts the prompt into #prompt-stack (outside the window)', () => {
-    expect(painter).toContain("getElementById('prompt-stack')");
+    // The buy confirm mounts through the SHARED family builder (the QA fix
+    // round extracted the third copy into bank_buy_prompt.ts), so the
+    // #prompt-stack mount lives in the leaf; the quantity prompt's own leaf
+    // (bank_quantity_prompt.ts) carries its twin. Pin the delegation AND the
+    // leaf's mount so neither half can silently drop the contract.
+    expect(painter).toContain('showBuyConfirmPrompt(');
+    const buyPromptLeaf = readFileSync(
+      new URL('../src/ui/bank_buy_prompt.ts', import.meta.url),
+      'utf8',
+    );
+    expect(buyPromptLeaf).toContain("getElementById('prompt-stack')");
+  });
+
+  it('both prompt leaves hold the cold contract the perf sweep cannot see', () => {
+    // The perf-budget discovery regex sweeps only *_painter/_window/_controller
+    // names, so DOM chrome extracted into a leaf leaves the gate's field of
+    // view; each leaf's docblock claims "no driver, no layout read" and this
+    // pin is what enforces it. A future edit that positions a prompt with
+    // getBoundingClientRect, or re-arms one with an interval, reds here.
+    for (const rel of ['../src/ui/bank_buy_prompt.ts', '../src/ui/bank_quantity_prompt.ts']) {
+      const leaf = readFileSync(new URL(rel, import.meta.url), 'utf8');
+      expect(leaf, `${rel} must not read layout`).not.toMatch(
+        /offsetWidth|offsetHeight|getBoundingClientRect|getComputedStyle|scrollHeight|scrollWidth/,
+      );
+      expect(leaf, `${rel} must not own a repeating driver`).not.toMatch(
+        /requestAnimationFrame|setInterval|requestIdleCallback/,
+      );
+    }
+  });
+
+  it('open() warms the vault material-set memo ahead of the first bag click', () => {
+    // A bare call expression whose only effect is memo population: nothing
+    // else reds when a cleanup pass deletes it, so the pin is a source
+    // scrape on the open() region (the first-derive walk over the content
+    // tables must land on the open path, not inside a click handler).
+    const openBody = painter.slice(painter.indexOf('open(): void {'));
+    expect(openBody.slice(0, 900)).toContain('vaultMaterialIds();');
   });
 
   it('buy-slots confirm calls bankBuySlots and withdraw-partial calls bankWithdraw with a count', () => {
     expect(painter).toContain('bankBuySlots()');
     expect(painter).toMatch(/bankWithdraw\(slotIndex, count\)/);
+  });
+});
+
+describe('bank_window: the bag-socket row (phase 07 source pins)', () => {
+  // The behavioral half (rendered cells, dispatched verbs, the signature
+  // repaint) lives in tests/bank_window_sockets.test.ts; these pins hold the
+  // contracts a behavioral rig cannot see.
+  it('every price the row shows comes from the wire, never a client table', () => {
+    // The phase 09 tunables rule (and this phase's stopping rule): the painter
+    // must never import or restate the socket price ladder. The only price it
+    // touches is the model's unlockCost, which buildBankView copies from
+    // BankInfo.nextSocketCost verbatim.
+    expect(painter).not.toContain('BANK_SOCKET_PRICES');
+    expect(painter).not.toContain('1000000');
+    expect(painter).toContain('cell.unlockCost');
+  });
+
+  it('the repaint signature carries the three socket terms, in the signed array', () => {
+    // COMMENTS STRIPPED before slicing (the pool_wiring_pins helper): the
+    // signed array carries prose that names the fields, so a raw-source scan
+    // would stay green with a term deleted and only its comment left behind.
+    // The per-term behavioral arms live in tests/bank_window_sockets.test.ts;
+    // this pins WHERE the terms live (inside the one signed array).
+    const stripped = painter
+      .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const sigStart = stripped.indexOf('const sig = JSON.stringify([');
+    expect(sigStart).toBeGreaterThan(-1);
+    const sigBody = stripped.slice(sigStart, stripped.indexOf(']);', sigStart));
+    expect(sigBody).toContain('info.socketsUnlocked');
+    expect(sigBody).toContain('info.socketBags');
+    expect(sigBody).toContain('info.nextSocketCost');
+  });
+
+  it('the deposit-all plan consumes the wire pool split, never the flat capacity', () => {
+    // Sliced to the click handler's own body (info.capacity legitimately
+    // appears elsewhere, e.g. as a repaint-signature term).
+    const body = painter.slice(
+      painter.indexOf('private onDepositAll(): void {'),
+      painter.indexOf('private setDepositStatus('),
+    );
+    expect(body).toContain(
+      'planDepositAllMaterials(world.inventory, info.slots, bankPoolsOf(info)',
+    );
+    expect(body).not.toContain('info.capacity');
+  });
+
+  it('the socket cells reuse the bag-socket family (focus ring and hover ride along)', () => {
+    // Family reuse, not a bespoke cell: the bags' .bag-socket:focus-visible
+    // ring and hover apply to every bank socket cell through the shared class.
+    expect(painter).toContain("'bag-socket bank-socket");
+    expect(components).toMatch(/\.bag-socket:focus-visible,/);
   });
 });
 
@@ -261,12 +358,16 @@ describe('bank_window: static window element is wired in both game entries', () 
 });
 
 describe('bank_window: search / sort / deposit-all', () => {
-  it('mounts the toolbar between the capacity counter and the grid, always in bank state', () => {
-    const capIdx = painter.indexOf("capacity.setAttribute('aria-label'");
+  it('mounts the toolbar between the socket row and the grid, always in bank state', () => {
+    // Phase 08 moved the used/total readout into the footer meter, so the
+    // socket row is the anchor above the toolbar now; the old header
+    // capacity band must not come back (its behavioral absence is pinned in
+    // tests/bank_window_sockets.test.ts).
+    const socketIdx = painter.indexOf('el.appendChild(this.buildSocketRow(model.sockets));');
     const barIdx = painter.indexOf('el.appendChild(this.buildFilterBar(model.empty));');
     const gridIdx = painter.indexOf("grid.className = 'bank-grid';");
-    expect(capIdx).toBeGreaterThan(0);
-    expect(barIdx).toBeGreaterThan(capIdx);
+    expect(socketIdx).toBeGreaterThan(0);
+    expect(barIdx).toBeGreaterThan(socketIdx);
     expect(gridIdx).toBeGreaterThan(barIdx);
   });
 
@@ -322,10 +423,13 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(refreshBody).toContain('private refreshGrid');
     expect(refreshBody).not.toContain('private buildBuyRow');
     expect(refreshBody).toContain(".bank-grid')");
-    // The offset lives on the wrapper: emptying the grid collapses the wrapper's
-    // scroll height (clamping scrollTop to 0), so it must capture + reapply.
+    // Emptying the grid collapses whichever element is scrolling (clamping its
+    // scrollTop to 0), so BOTH candidates must be captured and reapplied: this
+    // is the search-keystroke path, and getting it wrong on one viewport jumps
+    // the view under a player who is typing.
     expect(refreshBody).toContain(".bank-scroll')");
-    expect(refreshBody).toContain('if (scroll) scroll.scrollTop = prevScrollTop');
+    expect(refreshBody).toContain('if (scroll) scroll.scrollTop = prev.inner');
+    expect(refreshBody).toContain('root.scrollTop = prev.outer');
   });
 
   it('carries the ORIGINAL slotIndex through the filtered grid to the click handler', () => {
@@ -580,23 +684,22 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     }
   });
 
-  it('yields the grid floor on short landscape phones so the buy row stays visible', () => {
+  it('keeps the short-phone compression block the pinned footer sits on top of', () => {
     // At phone heights the pairing box (viewport minus the 10px top inset and the
     // 72px tray reservation) cannot hold the full-toolbar chrome, the two-row
-    // .bank-scroll floor (components.css), AND the buy row; without this media
-    // block the transactional buy row clips below the window edge whenever the
-    // vault has items (the toolbar only mounts on a non-empty vault, so an
-    // empty-vault walkthrough never sees it). The scroll region yields to one
-    // cell row, and to a sliver while the transient deposit-all status line
-    // shows. Behavioral oracle: scripts/bank_mobile_buyrow_check.mjs (live
-    // geometry at 740x360 / 844x390 / 915x412, needs npm run dev).
+    // .bank-scroll floor (components.css), AND the buy row. This block is every
+    // compression that layout can honestly make; it was never enough on a
+    // STOCKED bank, which is what Bank Storage phase 18's pinned footer closed.
+    // The grid floor stays because the GUILD pane still scrolls inside
+    // .bank-scroll; the two :has() carve-outs went with the personal pane's
+    // inner scroller and their absence is pinned in
+    // tests/bank_chrome_layout.test.ts, which also owns the pinned-footer block.
+    // Behavioral oracle: scripts/bank_mobile_buyrow_check.mjs (live geometry at
+    // 740x360 / 844x390 / 915x412, needs npm run dev).
     const start = mobileCss.indexOf('@media (max-height: 480px)');
     expect(start).toBeGreaterThan(0);
     expect(mobileCss).toMatch(
       /@media \(max-height: 480px\) \{\s*body\.mobile-touch #bank-window \.bank-scroll \{\s*min-height: 44px;/,
-    );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window:has\(\.bank-status\) \.bank-scroll \{\s*min-height: 13px;/,
     );
     expect(mobileCss).toMatch(
       /body\.mobile-touch #bank-window \.bank-buy-row \{\s*margin-top: 4px;/,
@@ -678,76 +781,43 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
 describe('bank_window: bonus-slot breakdown footer', () => {
   it('rides the bonus section as the tail of the shared .bank-scroll region', () => {
     // Order pin: grid into the scroll wrapper, bonus after it (the tail), the wrapper
-    // into the window, and the transactional buy row pinned AFTER the wrapper so it
-    // stays visible while the region scrolls (the 360px-phone budget: a fixed footer
-    // below the buy row crushed the grid or clipped itself, found live in QA).
+    // into the window, and the transactional footer (the phase 08 meter + the buy
+    // row) pinned AFTER the wrapper so it stays visible while the region scrolls
+    // (the 360px-phone budget: a fixed footer below the buy row crushed the grid
+    // or clipped itself, found live in QA).
     const renderBody = painter.slice(
       painter.indexOf('render(): void {'),
       painter.indexOf('refreshIfChanged(): void {'),
     );
     const gridIdx = renderBody.indexOf('scroll.appendChild(grid);');
-    const bonusIdx = renderBody.indexOf('this.buildBonusSection(model.bonus)');
-    const bonusAppendIdx = renderBody.indexOf('scroll.appendChild(bonus);');
+    // Bank Storage phase 17 moved the section's markup to src/ui/bank_bonus_view.ts,
+    // so the painter's two lines (build, then append) became this one mount. The
+    // ORDER claim is what this arm was always for and it is unchanged; the content
+    // claims that used to be scraped out of this file are EXECUTED in
+    // tests/bank_bonus_view.test.ts now.
+    const bonusIdx = renderBody.indexOf(
+      "scroll.insertAdjacentHTML('beforeend', bankBonusSectionHtml(model.bonus));",
+    );
     const scrollIdx = renderBody.indexOf('el.appendChild(scroll);');
-    const buyIdx = renderBody.indexOf('el.appendChild(this.buildBuyRow(model.buy));');
+    const footerIdx = renderBody.indexOf(
+      'el.appendChild(this.buildFooter(model.meter, model.buy));',
+    );
     expect(gridIdx).toBeGreaterThan(0);
     expect(bonusIdx).toBeGreaterThan(gridIdx);
-    expect(bonusAppendIdx).toBeGreaterThan(bonusIdx);
-    expect(scrollIdx).toBeGreaterThan(bonusAppendIdx);
-    expect(buyIdx).toBeGreaterThan(scrollIdx);
+    expect(scrollIdx).toBeGreaterThan(bonusIdx);
+    expect(footerIdx).toBeGreaterThan(scrollIdx);
   });
 
-  it('builds a labelled group section and SKIPS an unknown source id (forward compat)', () => {
-    expect(painter).toContain('private buildBonusSection(');
-    expect(painter).toContain("setAttribute('role', 'group')");
-    // The unknown-id skip arm: a source id absent from the known-source map is dropped
-    // rather than rendering a raw key or an English fallback (a future X/Twitch row).
-    expect(painter).toContain('const meta = BANK_BONUS_SOURCE_KEYS[row.id];');
-    expect(painter).toMatch(/if \(!meta\) continue;/);
-  });
-
-  it('references every bonus t() key (title, total, labels, adverts, progress, aria)', () => {
-    for (const key of [
-      'hudChrome.bank.bonusTitle',
-      'hudChrome.bank.bonusEarned',
-      'hudChrome.bank.bonusStatusEarned',
-      'hudChrome.bank.bonusSourceEmail',
-      'hudChrome.bank.bonusSourceDiscord',
-      'hudChrome.bank.bonusSourceWallet',
-      'hudChrome.bank.bonusSourceReferral',
-      'hudChrome.bank.bonusAdvertEmail',
-      'hudChrome.bank.bonusAdvertDiscord',
-      'hudChrome.bank.bonusAdvertWallet',
-      'hudChrome.bank.bonusReferralProgress',
-      'hudChrome.bank.bonusReferralExplainer',
-      'hudChrome.bank.bonusSectionAria',
-    ]) {
-      expect(painter, `missing t() key ${key}`).toContain(key);
-    }
-  });
-
-  it('shows referral progress from count/cap, earned link sources as +N, unearned as the advert', () => {
-    expect(painter).toContain(
-      'const hasProgress = row.count !== undefined && row.cap !== undefined;',
-    );
-    expect(painter).toContain("t('hudChrome.bank.bonusReferralProgress', {");
-    expect(painter).toContain(
-      "t('hudChrome.bank.bonusStatusEarned', { count: this.fmt(row.slots) })",
-    );
-    expect(painter).toContain('t(meta.advert)');
-  });
-
-  it('drives every bonus string through t(), never a bare English literal', () => {
-    const body = painter.slice(
-      painter.indexOf('private buildBonusSection('),
-      painter.indexOf('private showBuySlotsPrompt('),
-    );
-    expect(body.length).toBeGreaterThan(0);
-    expect(body).not.toContain('private showBuySlotsPrompt'); // slice guard
-    // No bare-string textContent or aria-label assignment: every visible string is a
-    // t() key (role='group' is a fixed ARIA value, not player-facing copy).
-    expect(body).not.toMatch(/textContent = '/);
-    expect(body).not.toMatch(/setAttribute\('aria-label', '/);
+  it('the painter reaches the bonus section through the extracted core, not a private fork', () => {
+    // The POSITIVE half of the extraction, and the reason it is positive: the two
+    // all-negative price bans that scan this file (tests/bank_view.test.ts,
+    // tests/vault_view.test.ts) cannot notice their subject leaving, so this is
+    // where "the code really did move, and the painter really does call it" is
+    // asserted. A re-forked private builder reds the second arm.
+    expect(painter).toContain("import { bankBonusSectionHtml } from './bank_bonus_view';");
+    expect(painter).not.toContain('private buildBonusSection(');
+    expect(painter).not.toContain('private buildBonusRow(');
+    expect(painter).not.toContain('BANK_BONUS_SOURCE_KEYS');
   });
 
   it('the .bank-bonus CSS block carries no literal hex (tokens / color-mix only)', () => {
@@ -830,5 +900,62 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     expect(body).toContain('this.onSlotClick(slot.slotIndex, ev.shiftKey)');
     expect(body).toContain('? this.deps.itemTooltip(item, slot.instance)');
     expect(body).toContain("t('itemUi.bags.unknownItem')");
+  });
+});
+
+describe('the gilded tokens and the forced-colors fill pin (phase 08 QA)', () => {
+  it('the low-tier gilt re-pins are byte-equal to the base declarations', () => {
+    // tokens.css declares the four gilt aliases twice: the base values and a
+    // low-fx-tier !important copy that exists ONLY to keep the near-full
+    // treatment tier-invariant (fairness: the warmth is acted on). Nothing
+    // else pins the two blocks together, so a one-sided retune would silently
+    // fork the tiers; equality here is the coupling.
+    // Sliced to the :root[data-fx-level="low"] ruleset (the ornament-shed
+    // block) and partitioned by !important rather than by order, so a benign
+    // block reorder cannot false-red and a copy drifting OUT of the low-tier
+    // block is caught, not just a value fork.
+    const lowStart = tokens.indexOf(':root[data-fx-level="low"] {');
+    expect(lowStart).toBeGreaterThan(-1);
+    const lowBlock = tokens.slice(lowStart, tokens.indexOf('}', lowStart));
+    const giltProps = [
+      '--bank-meter-gilt',
+      '--bank-meter-gilt-fill',
+      '--bank-meter-gilt-text',
+      '--bank-meter-gilt-glow',
+    ];
+    for (const prop of giltProps) {
+      const decls = [...tokens.matchAll(new RegExp(`${prop}:\\s*([^;]+);`, 'g'))].map((m) =>
+        m[1].trim(),
+      );
+      expect(decls, prop).toHaveLength(2);
+      const important = decls.filter((v) => v.endsWith('!important'));
+      const base = decls.filter((v) => !v.endsWith('!important'));
+      expect(important, prop).toHaveLength(1);
+      expect(base, prop).toHaveLength(1);
+      expect(important[0].replace(/\s*!important$/, ''), prop).toBe(base[0]);
+      expect(lowBlock, prop).toContain(`${prop}: ${important[0]};`);
+    }
+  });
+
+  it('forced-colors pins the meter fill to Highlight inside its own media block', () => {
+    // Forced-colors strips background layers, and the .near-full fill rule
+    // outranks a bare class by specificity: the !important Highlight pin is
+    // what keeps the track legible there (the castbar .fill precedent).
+    // Containment is checked inside the balanced block, not by proximity.
+    const blocks: string[] = [];
+    for (const m of components.matchAll(/@media \(forced-colors: active\)\s*\{/g)) {
+      let depth = 1;
+      let i = (m.index as number) + m[0].length;
+      const start = i;
+      while (i < components.length && depth > 0) {
+        if (components[i] === '{') depth++;
+        else if (components[i] === '}') depth--;
+        i++;
+      }
+      blocks.push(components.slice(start, i - 1));
+    }
+    const fill = blocks.find((b) => b.includes('.bank-meter-fill'));
+    expect(fill).toBeDefined();
+    expect(fill).toMatch(/\.bank-meter-fill\s*\{[^}]*background: Highlight !important/);
   });
 });

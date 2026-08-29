@@ -1,0 +1,964 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "bank-storage-painted-bags-2026-08-25",
+    "acceptedDate": "2026-08-25",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+    "styleContractId": "woc-item-icon-v1"
+  },
+  "scope": {
+    "itemPaintings": 7,
+    "replacedPlaceholders": 7,
+    "retainedGeneratedOriginals": 7,
+    "retainedNormalizedMasters": 7
+  },
+  "generationContract": {
+    "tool": "OpenAI built-in image generation",
+    "useCase": "style-transfer",
+    "oneAcceptedOriginalPerItem": true,
+    "retries": 0,
+    "promptRetention": "The exact per-item prompt and ordered repository references were recovered from the local generation session transcript. The generated PNGs contain OpenAI Content Credentials metadata but do not embed prompt text.",
+    "referencePolicy": "Image 1 in each call was the item's retired project-owned placeholder and controlled subject identity only. The remaining ordered references were existing World of ClaudeCraft item paintings used only for the roles stated in each exact prompt. Each reference retains its prior ownership and license.",
+    "sourceRetention": "Every accepted 1254x1254 generated original and normalized 512x512 master remains under the gitignored tmp/imagegen/bank-storage-painted-bags-2026-08-25 tree in the accepting worktree. Their exact paths, hashes, byte counts, and dimensions are pinned below."
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+  },
+  "reviewContract": {
+    "source": ["512-color"],
+    "shipping": [
+      "128-color",
+      "40-color",
+      "28-color",
+      "22-color",
+      "28-grayscale",
+      "64-circle",
+      "small-multiview",
+      "identity-display-name-and-id"
+    ],
+    "machineAudit": "node scripts/icon_asset_audit.mjs docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json tmp/imagegen/bank-storage-painted-bags-2026-08-25/audit",
+    "catalogAudit": "node scripts/item_art_audit.mjs"
+  },
+  "targetSets": {
+    "items": [
+      "burlap_reagent_pouch",
+      "duskweave_bag",
+      "foragers_haversack",
+      "loombound_reagent_satchel",
+      "necromancers_reagent_satchel",
+      "resonant_weave_bag",
+      "wayfarers_backpack"
+    ]
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "burlap_reagent_pouch",
+      "runtimeUrl": "/ui/items/burlap_reagent_pouch.webp",
+      "acceptedSha256": "1458914f29069f66b4cdcf295aae48d2867850809fa88844ef069e9b48dcfd96",
+      "acceptedBytes": 1900,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/burlap_reagent_pouch.png",
+        "bytes": 2099496,
+        "sha256": "96dce40c4334d39c96f1ebb7cee1c2f9235ed0064942708c908f4246af5cc37e",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/burlap_reagent_pouch.png",
+        "bytes": 363639,
+        "sha256": "463d77a512678d89a4a57072ea9d71855e3364b6bcd8b7a4c39315aeba293ed5",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Burlap Reagent Pouch",
+      "canonicalGameplayMeaningOrAcquisition": "A common 8-slot materials-only pouch sold by the ordinary bag vendor for 1000 copper; it has the same slot count as Traveler's Knapsack but accepts only materials.",
+      "intendedVisualSubject": "One humble compact coarse-tan burlap reagent pouch with a worn leather base, hand stitching, a narrow drawcord, and two restrained side loops.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 1,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Burlap Reagent Pouch (item id burlap_reagent_pouch) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a small entry-tier reagent pouch. Images 2-4 control only the premium house style, painterly finish, lighting, tactile cloth/leather materials, dark vignette, and composition. Do not copy their unrelated object shapes or ornaments.\nSubject and identity: one humble, compact eight-slot reagent pouch made from coarse tan burlap, visibly hand-stitched, with a worn dark-brown leather base, narrow leather drawcord/closure, and two tiny restrained side loops. It must read as a practical materials pouch, not luggage, not a coin purse, and not an ornate magical bag.\nComposition/framing: readable three-quarter volume, closure and construction visible, centered complete silhouette, about 72% fill, safe padding on every edge; readable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep warm umber-charcoal painted vignette, subtle atmospheric brushwork and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, rich tactile burlap weave and leather grain; warm top-left key light, cool deep bottom-right shadow.\nConstraints: one bag only; fully opaque square; no text, letters, numbers, pseudo-writing, label, loose reagents, herbs, bottles, hands, mannequin, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, flat vector shapes, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/burlap_reagent_pouch.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "8d6e1ba9750e81622402c9fc86ed8900b4d07ba590bb5ac46e28b9eaa727eeaa",
+            "bytesAtGeneration": 574,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+            "bytesAtGeneration": 3534,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/gravewoven_bag.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "d52a589bd98fb2f07d9e751a39d64d27e52553f2a3e24dc596117e7063210b08",
+            "bytesAtGeneration": 3158,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4",
+            "bytesAtGeneration": 4590,
+            "provenance": "World of ClaudeCraft project-generated item painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/burlap_reagent_pouch-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "duskweave_bag",
+      "runtimeUrl": "/ui/items/duskweave_bag.webp",
+      "acceptedSha256": "ceb7d9bba4c420e888e5e0a511fd5e279d5c8bf9d97b9865c29dd184d9667166",
+      "acceptedBytes": 1944,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/duskweave_bag.png",
+        "bytes": 2176438,
+        "sha256": "0f40f40da32d81f0f62ae9d8878542f2dfdb7a8e44a406c27e6154479a4a3203",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/duskweave_bag.png",
+        "bytes": 349538,
+        "sha256": "27e1f39cb9d321f5a9bf5d3faeeb30c844ac7072aacafb91ec00c26172e1a1a0",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Duskweave Bag",
+      "canonicalGameplayMeaningOrAcquisition": "A rare 12-slot general-purpose bag taught by the Tailoring trainer at skill 50 and crafted at a loom from Pristine Silk, Sunpetal Herb, Spider Silk, and Spools of Thread.",
+      "intendedVisualSubject": "One refined midnight-violet and charcoal silk bag with a softly gathered body, braided seams, folded flap, antique-brass clasp, and restrained gold stitching.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 2,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Duskweave Bag (item id duskweave_bag) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a purple crafted cloth bag. Images 2-4 control only the premium house style, painterly finish, lighting, tactile textile/leather materials, dark vignette, and composition. Do not copy their unrelated object shapes or ornaments.\nSubject and identity: one rare twelve-slot general-purpose bag tailored from deep midnight-violet pristine silk and charcoal spider silk, with a softly gathered rectangular body, sturdy braided black-violet seams, a folded flap, one warm antique-brass clasp, and a few restrained sunpetal-gold stitch accents. The fabric should suggest dusk through indigo-to-plum folds, not through stars, text, or glowing runes. It must feel clearly more refined than an entry pouch but less magical than an epic capstone.\nComposition/framing: readable three-quarter volume, closure and construction visible, centered complete silhouette, about 72% fill, safe padding; unmistakable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep navy-charcoal painted vignette, subtle atmospheric brushwork and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile silk weave, stitched piping and worn metal; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one bag only; fully opaque square; no text, letters, numbers, pseudo-writing, grid/rune pattern, constellations, loose items, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/duskweave_bag.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "75e90a5425b048b71ad4dae1e051fa5c2dac54b8efb26b9be6b71851bc6ea58b",
+            "bytesAtGeneration": 558,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/silkspun_satchel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "6ba051f23c5d0fbbad63be0cc7ecc573d3123dd611c468012ecb096f7e5fd66e",
+            "bytesAtGeneration": 2532,
+            "provenance": "World of ClaudeCraft project-generated Silkspun Satchel painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+            "bytesAtGeneration": 3534,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4",
+            "bytesAtGeneration": 4590,
+            "provenance": "World of ClaudeCraft project-generated item painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/duskweave_bag-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "foragers_haversack",
+      "runtimeUrl": "/ui/items/foragers_haversack.webp",
+      "acceptedSha256": "2106f6437a0b45e4d21238daca453e5ea67a5cfa40823c7d60a24dd5d04ded07",
+      "acceptedBytes": 2006,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/foragers_haversack.png",
+        "bytes": 2415124,
+        "sha256": "e219c883d4910ae8a56e7aefe617acdc1d05a59658a369634d9bdad8434b714b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/foragers_haversack.png",
+        "bytes": 381580,
+        "sha256": "e87200d10de029373ab00126e096757c7454759c9ac6735c61cdeaf2c7f4d234",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Forager's Haversack",
+      "canonicalGameplayMeaningOrAcquisition": "An uncommon 12-slot materials-only haversack taught by the Tailoring trainer at skill 25 and crafted at a loom from Spider Silk, Goldleaf Herb, and Spools of Thread.",
+      "intendedVisualSubject": "One field-worn moss-olive canvas haversack with warm leather reinforcement, a broad flap, short handle, two closed side pockets, and a hammered-brass leaf clasp.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 2,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Forager's Haversack (item id foragers_haversack) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a practical green flap haversack. Images 2-3 control only the premium house style, painterly finish, lighting, tactile materials, dark vignette, and composition. Image 4 controls the warm green-and-gold authored goldleaf palette only. Do not copy unrelated object shapes or ornaments.\nSubject and identity: one uncommon twelve-slot materials-only forager's shoulder haversack, made from moss-olive canvas reinforced with warm brown leather and spider-silk stitching. Show a broad folded flap, a short visible shoulder strap/handle, two compact closed side pockets for gathered materials, and one small intentional hammered-brass leaf clasp inspired by goldleaf. It must read as field-worn gathering gear, not a briefcase, handbag, or general luxury bag; no contents spill out.\nComposition/framing: sturdy asymmetrical three-quarter volume, flap and pockets readable, centered complete silhouette, about 72% fill, safe padding; recognizable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep forest-umber painted vignette with subdued atmosphere and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile canvas weave, leather grain, stitching and worn brass; warm top-left key light, cool deep bottom-right shadow.\nConstraints: one bag only; fully opaque square; no text, letters, numbers, pseudo-writing, loose herbs or tools, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/foragers_haversack.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "ade843921aa31c029214ad4f0855b84cd3e3308ed66fea7bf7c94573f777000c",
+            "bytesAtGeneration": 730,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/wolfhide_satchel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "5e957cdb385a22882dbb51d5fedf1cae1e9b98b9e3b3c7200acf4e49d29dda8c",
+            "bytesAtGeneration": 3418,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+            "bytesAtGeneration": 3534,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/goldleaf_herb.webp",
+            "role": "warm green-and-gold authored Goldleaf palette reference",
+            "sha256AtGeneration": "7d4e6ca993ad7a6920f3a9aa88fc2ccc172f4bb6733b336affe1fb89444a7db2",
+            "bytesAtGeneration": 2682,
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/foragers_haversack-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "loombound_reagent_satchel",
+      "runtimeUrl": "/ui/items/loombound_reagent_satchel.webp",
+      "acceptedSha256": "002c543130544418fd7022339ace468efcad71909075fdfc3440a84527ff668a",
+      "acceptedBytes": 2672,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/loombound_reagent_satchel.png",
+        "bytes": 2359662,
+        "sha256": "4b3d5c4f7208be96f63153c02bf0dbf170dd9dce99df25b6dd0d11ef29c7e448",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/loombound_reagent_satchel.png",
+        "bytes": 404666,
+        "sha256": "87dff53d19b198eee3008a479c3f52a3f37b19348be93444fa89f0bf13789fe6",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Loombound Reagent Satchel",
+      "canonicalGameplayMeaningOrAcquisition": "An epic 24-slot materials-only tailoring capstone taught at skill 50 and crafted at a loom from Resonant Thread, Pristine Silk, Sunpetal Herb, Homespun Cloth, and Spools of Thread.",
+      "intendedVisualSubject": "One broad structured violet reagent satchel with a gold-wrapped handle, reinforced gussets, diagonal functional tension cords, and a round gold loom-shuttle clasp.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 3,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Loombound Reagent Satchel (item id loombound_reagent_satchel) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a purple-gold crafted reagent satchel. Images 2-3 control only the premium house style, painterly finish, lighting, tactile cloth/leather, dark vignette, and composition. Image 4 defines the authored pearlescent resonant-thread material. Do not copy unrelated shapes or ornaments.\nSubject and identity: one epic twenty-four-slot materials-only tailoring capstone, a broad structured reagent satchel woven from pristine violet silk, deep wine-purple homespun panels, and luminous silver-violet resonant thread. Show a wide folded flap, a substantial arched gold-wrapped handle, reinforced gussets suggesting great capacity, and two intentional diagonal golden tension cords crossing through one round sunpetal-gold loom shuttle clasp. The cords should read as functional loom-bound construction, not a rune. Add restrained violet-cyan thread shimmer only along woven edges. It must read richer, wider, and more specialized than a general bag.\nComposition/framing: readable three-quarter volume, flap/handle/gussets visible, centered complete silhouette, about 72% fill, safe padding; recognizable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep plum-charcoal painted vignette, subtle atmosphere and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile weave, braided cord, leather reinforcement, controlled warm metal highlights; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one satchel only; fully opaque square; no text, letters, numbers, pseudo-writing, generic rune, loose reagents/spools/herbs, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/loombound_reagent_satchel.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "35d2e9d7b33d7f23c80ee5f23604d1aff29749324944397f878e672ca921405f",
+            "bytesAtGeneration": 1510,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/mistcallers_duffel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "6b88624868c0e94db06189ce41a4a1e879945e11df8af7ea9d18b9c820326ba3",
+            "bytesAtGeneration": 3110,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/silkspun_satchel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "6ba051f23c5d0fbbad63be0cc7ecc573d3123dd611c468012ecb096f7e5fd66e",
+            "bytesAtGeneration": 2532,
+            "provenance": "World of ClaudeCraft project-generated Silkspun Satchel painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/resonant_thread.webp",
+            "role": "authored pearlescent Resonant Thread material reference",
+            "sha256AtGeneration": "894be30a2a4e6b179b80b2f5c59465867538cef0bdb395cfa3ea6ebcf4c04be9",
+            "bytesAtGeneration": 2678,
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/loombound_reagent_satchel-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "necromancers_reagent_satchel",
+      "runtimeUrl": "/ui/items/necromancers_reagent_satchel.webp",
+      "acceptedSha256": "3c934789670d42e9ebcae00ce646f6ba3b0559479d78951840e245e6b8e339ae",
+      "acceptedBytes": 1692,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/necromancers_reagent_satchel.png",
+        "bytes": 1951971,
+        "sha256": "563e7ca82069c44dd93b99d02ce6e3aead97ac3ef188384f50936b8ad5b7eab5",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/necromancers_reagent_satchel.png",
+        "bytes": 331763,
+        "sha256": "c8c571bbf4f3b71032bd503c201fa1cfa9a0b9b6200201334fc117130a5f44ce",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Necromancer's Reagent Satchel",
+      "canonicalGameplayMeaningOrAcquisition": "A rare 20-slot materials-only satchel dropped from Grand Necromancer Velkhar's hoard in Gravewyrm Sanctum.",
+      "intendedVisualSubject": "One compact deep near-black green dungeon-worn satchel with cracked leather, cold stitching, a pale bone skull clasp, two short bone toggles, and restrained necromantic rim haze.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 3,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Necromancer's Reagent Satchel (item id necromancers_reagent_satchel) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a dark green reagent satchel with a pale bone closure. Images 2-4 control only the premium house style, painterly finish, lighting, tactile cloth/leather, restrained dark magic, dark vignette, and composition. Do not copy their unrelated object shapes or ornaments.\nSubject and identity: one rare twenty-slot materials-only satchel taken from Grand Necromancer Velkhar in Gravewyrm Sanctum. Make a compact but deep three-quarter satchel from aged near-black forest-green cloth and cracked black leather, with cold pewter stitching, a shadowed folded flap, and one small intentional ivory bone skull clasp with two short bone toggles hanging beneath it. Add an extremely restrained sickly teal-violet necromantic rim haze caught around the clasp and lower seams; the object remains the subject. It must feel ominous, practical, dungeon-worn, and clearly distinct from the round purple Gravewoven Bag.\nComposition/framing: closure and deep compartment volume readable, centered complete silhouette, about 72% fill, safe padding; recognizable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep green-black and charcoal painted vignette, subtle crypt atmosphere and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile worn cloth, cracked leather, aged bone and cold metal; warm muted top-left key light with cool deep bottom-right shadow.\nConstraints: one satchel only; fully opaque square; no text, letters, numbers, pseudo-writing, generic runes, gore, loose bones or reagents, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/necromancers_reagent_satchel.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "c4c790a68df5e0a4cddf6cd8ef10339f3d17e4092d12d781b185d1e279d9880f",
+            "bytesAtGeneration": 786,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/gravewoven_bag.webp",
+            "role": "premium house style, painterly finish, lighting, materials, dark magic, vignette, and composition reference",
+            "sha256AtGeneration": "d52a589bd98fb2f07d9e751a39d64d27e52553f2a3e24dc596117e7063210b08",
+            "bytesAtGeneration": 3158,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/silkspun_satchel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, dark magic, vignette, and composition reference",
+            "sha256AtGeneration": "6ba051f23c5d0fbbad63be0cc7ecc573d3123dd611c468012ecb096f7e5fd66e",
+            "bytesAtGeneration": 2532,
+            "provenance": "World of ClaudeCraft project-generated Silkspun Satchel painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/cinderweave_raiment.webp",
+            "role": "premium house style, painterly finish, lighting, materials, dark magic, vignette, and composition reference",
+            "sha256AtGeneration": "345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4",
+            "bytesAtGeneration": 4590,
+            "provenance": "World of ClaudeCraft project-generated item painting",
+            "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/necromancers_reagent_satchel-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "resonant_weave_bag",
+      "runtimeUrl": "/ui/items/resonant_weave_bag.webp",
+      "acceptedSha256": "4e8f897412df77417a3df2674819b2ce1b6666846fa9ab7080da7b4835713714",
+      "acceptedBytes": 3264,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/resonant_weave_bag.png",
+        "bytes": 2535101,
+        "sha256": "598694efa9caa64eaaea1ed7b1b055e3fda791e238a629ee5e452095254cfc89",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/resonant_weave_bag.png",
+        "bytes": 432855,
+        "sha256": "658128e078593dcf4c6f63d72a2f7549f559e793127c0a9b203d6dc63e592a73",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Resonantweave Bag",
+      "canonicalGameplayMeaningOrAcquisition": "An epic 16-slot general-purpose tailoring capstone taught at skill 50 and crafted at a loom from Resonant Thread, Pristine Silk, Sunpetal Herb, and Spools of Thread.",
+      "intendedVisualSubject": "One elegant rounded-trapezoid ocean-teal and indigo travel bag with silver-violet seams, an arched handle, concentric silver resonance clasp, and restrained cyan-violet shimmer.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 2,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Resonantweave Bag (item id resonant_weave_bag) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a cyan crafted bag with a circular resonance accent. Images 2-4 control only the premium house style, painterly finish, lighting, material treatment, restrained magic, and composition. Image 4 also defines the authored pearlescent blue-violet resonant-thread material. Do not copy unrelated object shapes or ornaments.\nSubject and identity: one epic sixteen-slot general-purpose capstone bag, capacious and elegant, woven from pearlescent resonant thread and pristine silk. Use layered ocean-teal, cobalt, and indigo cloth with silver-violet braided seams, a substantial arched handle, and one intentional circular silver resonance clasp made of two clean concentric metal rings. Add only a restrained cyan-violet rim shimmer caught in the weave; the magic supports the silhouette and does not flood it. It must look richer and more structurally advanced than Duskweave, with a distinct rounded-trapezoid travel-bag silhouette.\nComposition/framing: readable three-quarter volume, closure and handle visible, centered complete silhouette, about 72% fill, safe padding; recognizable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep blue-charcoal painted vignette with subdued atmosphere and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile woven silk, controlled silver metal highlights; warm top-left key light, cool deep bottom-right shadow.\nConstraints: one bag only; fully opaque square; no text, letters, numbers, pseudo-writing, generic runes, target/UI symbol, loose items, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/resonant_weave_bag.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "d71d93594c087677a39db4e9a80861060f9307e06082265b834c5928ca596af4",
+            "bytesAtGeneration": 1068,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/mistcallers_duffel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, restrained magic, and composition reference",
+            "sha256AtGeneration": "6b88624868c0e94db06189ce41a4a1e879945e11df8af7ea9d18b9c820326ba3",
+            "bytesAtGeneration": 3110,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "premium house style, painterly finish, lighting, materials, restrained magic, and composition reference",
+            "sha256AtGeneration": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+            "bytesAtGeneration": 3534,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/resonant_thread.webp",
+            "role": "authored pearlescent blue-violet Resonant Thread material reference",
+            "sha256AtGeneration": "894be30a2a4e6b179b80b2f5c59465867538cef0bdb395cfa3ea6ebcf4c04be9",
+            "bytesAtGeneration": 2678,
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/resonant_weave_bag-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    },
+    {
+      "kind": "item",
+      "id": "wayfarers_backpack",
+      "runtimeUrl": "/ui/items/wayfarers_backpack.webp",
+      "acceptedSha256": "90c931f7884ed7807f0bc60756c8b40e34988ee19624f2b84bc2f245ef0427f6",
+      "acceptedBytes": 2736,
+      "original": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/originals/wayfarers_backpack.png",
+        "bytes": 2201714,
+        "sha256": "eca877d7aa075afc4ee6b141e405d894d181cfab245e5c22c794334cae8e7b95",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque",
+        "contentCredentials": "OpenAI Content Credentials metadata present"
+      },
+      "source": {
+        "path": "tmp/imagegen/bank-storage-painted-bags-2026-08-25/masters/wayfarers_backpack.png",
+        "bytes": 382212,
+        "sha256": "dc1e4312a820f658cc78cef2228c5c32b167446066cf74c813731fe047764820",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Wayfarer's Backpack",
+      "canonicalGameplayMeaningOrAcquisition": "A rare 16-slot general-purpose world-drop backpack and the drop-only route to the joint-largest general bag capacity.",
+      "intendedVisualSubject": "One upright field-used mountain travel backpack of saddle-brown leather and ochre waxed canvas, with compression straps, a closed front pocket, reinforced corners, and a bottom bedroll.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "callGroup": 3,
+        "attempt": 1,
+        "acceptedAttempt": 1,
+        "retries": 0,
+        "promptRecord": {
+          "verbatimToolCallAvailable": true,
+          "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+          "prompt": "Use case: style-transfer\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: Repaint the Wayfarer's Backpack (item id wayfarers_backpack) to shipping quality under World of ClaudeCraft contract woc-item-icon-v1.\nInput images: Image 1 controls subject identity only: a rugged brown rectangular backpack. Images 2-4 control only the premium house style, painterly finish, lighting, tactile canvas/leather, dark vignette, and composition. Do not copy unrelated ornaments.\nSubject and identity: one rare sixteen-slot world-drop travel backpack built for a long mountain road: weathered saddle-brown leather over muted ochre waxed canvas, a tall rounded rectangular body, broad folded top flap, two sturdy vertical compression straps with worn brass buckles, a small closed front pocket, reinforced corners, and one compact rolled bedroll strapped neatly along the bottom. Keep the shoulder straps only subtly visible behind the silhouette. It must feel field-used, valuable, capacious, and practical\u2014not a school bag, modern luggage, or an overstuffed pile.\nComposition/framing: readable upright three-quarter backpack volume, complete silhouette, centered, about 72% fill, safe padding; recognizable at 22px and in a circular crop.\nScene/backdrop: opaque full-square deep mountain-umber and charcoal painted vignette, subtle cool highland atmosphere and grounded contact shadow.\nStyle/medium: premium hand-painted classic dark-fantasy MMO inventory art; crisp focal edges, softer peripheral brushwork, tactile canvas grain, scuffed leather, stitching, worn brass and cloth bedroll; warm top-left key light, cool deep bottom-right shadow.\nConstraints: one backpack only; fully opaque square; no text, letters, numbers, pseudo-writing, loose weapons/tools/potions, hands, mannequin, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, flat vector, cel shading, plastic gradients, photographic rendering, or cropped subject."
+        },
+        "references": [
+          {
+            "ordinal": 1,
+            "path": "public/ui/items/wayfarers_backpack.webp",
+            "role": "retired subject-identity placeholder",
+            "sha256AtGeneration": "b424eb9dc027e8d7d8074752ab0cac2fe369614de7f6a8d3072c70864070119e",
+            "bytesAtGeneration": 696,
+            "provenance": "World of ClaudeCraft project-owned procedurally rasterized SVG placeholder",
+            "license": "World of ClaudeCraft original art, project-owned"
+          },
+          {
+            "ordinal": 2,
+            "path": "public/ui/items/backpack.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "b6c576f5838dc13a59c3915546cbbab54362377774670d63e33cd61822154ce3",
+            "bytesAtGeneration": 2926,
+            "provenance": "World of ClaudeCraft original implicit-backpack art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 3,
+            "path": "public/ui/items/wolfhide_satchel.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "5e957cdb385a22882dbb51d5fedf1cae1e9b98b9e3b3c7200acf4e49d29dda8c",
+            "bytesAtGeneration": 3418,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "ordinal": 4,
+            "path": "public/ui/items/linen_pouch.webp",
+            "role": "premium house style, painterly finish, lighting, materials, vignette, and composition reference",
+            "sha256AtGeneration": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+            "bytesAtGeneration": 3534,
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted 1254x1254 image-generation result into the retained originals directory without changing its bytes.",
+        "Normalized it with Sharp to exact 512x512 using fit=fill and Lanczos3, flattened over #111014, converted to sRGB, and encoded as PNG at compression level 9 with adaptive filtering.",
+        "Encoded the normalized master through scripts/convert_item_icons_webp.mjs at quality 82 using its deterministic 128x128, opaque, 15 KiB contract."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-128.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-40.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-28.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-22.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-28-gray.png",
+        "tmp/imagegen/bank-storage-painted-bags-2026-08-25/review/wayfarers_backpack-64-circle.png"
+      ],
+      "validationStatus": "accepted, integrated, machine-audited, and visually reviewed at source and runtime sizes",
+      "family": "bank-storage-bags",
+      "batch": "bank-storage-painted-bags-2026-08-25"
+    }
+  ],
+  "supersedes": [
+    {
+      "itemId": "burlap_reagent_pouch",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "8d6e1ba9750e81622402c9fc86ed8900b4d07ba590bb5ac46e28b9eaa727eeaa",
+          "bytes": 574
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 6,
+          "name": "Burlap Reagent Pouch",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "1458914f29069f66b4cdcf295aae48d2867850809fa88844ef069e9b48dcfd96",
+        "acceptedBytes": 1900,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "duskweave_bag",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "75e90a5425b048b71ad4dae1e051fa5c2dac54b8efb26b9be6b71851bc6ea58b",
+          "bytes": 558
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 10,
+          "name": "Duskweave Bag",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "ceb7d9bba4c420e888e5e0a511fd5e279d5c8bf9d97b9865c29dd184d9667166",
+        "acceptedBytes": 1944,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "foragers_haversack",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "ade843921aa31c029214ad4f0855b84cd3e3308ed66fea7bf7c94573f777000c",
+          "bytes": 730
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 12,
+          "name": "Forager's Haversack",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "2106f6437a0b45e4d21238daca453e5ea67a5cfa40823c7d60a24dd5d04ded07",
+        "acceptedBytes": 2006,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "loombound_reagent_satchel",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "35d2e9d7b33d7f23c80ee5f23604d1aff29749324944397f878e672ca921405f",
+          "bytes": 1510
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 21,
+          "name": "Loombound Reagent Satchel",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "002c543130544418fd7022339ace468efcad71909075fdfc3440a84527ff668a",
+        "acceptedBytes": 2672,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "necromancers_reagent_satchel",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "c4c790a68df5e0a4cddf6cd8ef10339f3d17e4092d12d781b185d1e279d9880f",
+          "bytes": 786
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 23,
+          "name": "Necromancer's Reagent Satchel",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "3c934789670d42e9ebcae00ce646f6ba3b0559479d78951840e245e6b8e339ae",
+        "acceptedBytes": 1692,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "resonant_weave_bag",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "d71d93594c087677a39db4e9a80861060f9307e06082265b834c5928ca596af4",
+          "bytes": 1068
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 33,
+          "name": "Resonantweave Bag",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "4e8f897412df77417a3df2674819b2ce1b6666846fa9ab7080da7b4835713714",
+        "acceptedBytes": 3264,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    },
+    {
+      "itemId": "wayfarers_backpack",
+      "previous": {
+        "shipping": {
+          "commit": "62d2cb0c5478c300a305e147b6f807a031c0bf4a",
+          "sha256": "b424eb9dc027e8d7d8074752ab0cac2fe369614de7f6a8d3072c70864070119e",
+          "bytes": 696
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 45,
+          "name": "Wayfarer's Backpack",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
+        }
+      },
+      "replacementReason": "The ordinary owner explicitly classified this file as a programmatically drawn placeholder pending a painted woc_bags icon; the accepted replacement supplies the distinct painted item identity while this record preserves the historical owner and bytes.",
+      "historicalAcceptedArt": null,
+      "historicalAcceptedArtReason": "No accepted-art manifest existed for the placeholder.",
+      "replacement": {
+        "batchId": "bank-storage-painted-bags-2026-08-25",
+        "acceptedSha256": "90c931f7884ed7807f0bc60756c8b40e34988ee19624f2b84bc2f245ef0427f6",
+        "acceptedBytes": 2736,
+        "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      }
+    }
+  ]
+}

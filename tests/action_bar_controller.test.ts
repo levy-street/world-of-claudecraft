@@ -29,7 +29,6 @@ interface MutableState {
   level: number;
   spec: string | null;
   auras: string[];
-  sportTeam: number | null | undefined;
   showAttackButton: boolean;
 }
 
@@ -57,7 +56,6 @@ function makeHarness(
     level: 20,
     spec: null,
     auras: [],
-    sportTeam: undefined,
     showAttackButton: true,
   };
   const controller = new ActionBarController({
@@ -68,7 +66,6 @@ function makeHarness(
     talentSpec: () => state.spec,
     knownAbilityIds: () => state.known,
     hasAura: (kind) => state.auras.includes(kind),
-    isInSportMatch: () => state.sportTeam !== undefined && state.sportTeam !== null,
     showAttackButton: () => state.showAttackButton,
   });
   controller.replaceActions(initialBar);
@@ -379,34 +376,6 @@ describe('ActionBarController form persistence', () => {
 
     expect(harness.controller.activeForm).toBe('cat_stealth');
     expect(harness.controller.actions).toEqual(bar());
-  });
-
-  it('keeps the sport page ahead of every class stealth page', () => {
-    const rogue = makeHarness('rogue', ['stealth'], bar('stealth'));
-    rogue.state.sportTeam = 0;
-    rogue.state.auras = ['stealth'];
-    const druid = makeHarness('druid', ['cat_form', 'prowl'], bar('cat_form'));
-    druid.state.sportTeam = 1;
-    druid.state.auras = ['form_cat', 'stealth'];
-
-    expect(rogue.controller.resolveActiveForm()).toBe('sport');
-    expect(druid.controller.resolveActiveForm()).toBe('sport');
-  });
-
-  it('isolates sport abilities from the saved class page', () => {
-    const harness = makeHarness('rogue', ['sinister_strike'], bar('sinister_strike'));
-    harness.controller.syncKnownAbilities();
-    harness.state.known.push('sport_shoot', 'sport_pass');
-    harness.controller.syncKnownAbilities();
-    expect(harness.controller.actions).toEqual(bar('sinister_strike'));
-
-    harness.state.sportTeam = 0;
-    harness.controller.syncActiveForm();
-    expect(harness.controller.actions).toEqual(bar('sport_shoot', 'sport_pass'));
-
-    harness.state.sportTeam = null;
-    harness.controller.syncActiveForm();
-    expect(harness.controller.actions).toEqual(bar('sinister_strike'));
   });
 
   it('never seeds or auto-populates a stealth form kit', () => {
@@ -759,7 +728,6 @@ describe('ActionBarController persistence seam', () => {
       talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
       hasAura: () => false,
-      isInSportMatch: () => false,
       showAttackButton: () => true,
       persistLayout: (layout) => persisted.push(layout),
     });
@@ -802,7 +770,6 @@ describe('ActionBarController persistence seam', () => {
       talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike'],
       hasAura: () => false,
-      isInSportMatch: () => false,
       showAttackButton: () => true,
       // no persistLayout: offline arm
     });

@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
-// Hud.castCrossHotbarAction, the pad's one cast entry point. It routes a press
-// back through castSlot so a cross-hotbar cast keeps the semantics a key press
-// has (reticle, empower, sport tap, mouseover, the auto-attack QoL), and the
-// interesting half is what happens when the action is NOT on the desktop bar.
+// Hud.pressCrossHotbarAction / releaseCrossHotbarAction, the pad's press and
+// release edges, over Hud.castCrossHotbarAction, the tap-shaped fire. All route
+// back through the slot entry points so a cross-hotbar cast keeps the semantics
+// a key press has (reticle, empower, sport tap, mouseover, the auto-attack QoL),
+// and the interesting half is what happens when the action is NOT on the bar.
 //
 // The slot search is barSlot-indexed, NOT array-indexed: barSlot 0 is the fixed
 // Attack seat and 1..ACTION_BAR_ABILITY_SLOTS are the configurable slots, so a
@@ -42,6 +43,7 @@ vi.mock('../src/ui/icons', () => ({
 import { CROSS_HOTBAR_ATTACK_ID } from '../src/game/cross_hotbar';
 import { ABILITIES } from '../src/sim/data';
 import type { AbilityDef } from '../src/sim/types';
+import { EmpowerHold } from '../src/ui/empower_hold_core';
 import { Hud } from '../src/ui/hud';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { tSim } from '../src/ui/sim_i18n';
@@ -57,14 +59,21 @@ interface CastHarness {
   };
   sim: {
     castAbility: ReturnType<typeof vi.fn>;
+    releaseEmpoweredAbility: ReturnType<typeof vi.fn>;
+    known: { def: AbilityDef }[];
     useItem: ReturnType<typeof vi.fn>;
     tradeInfo: unknown;
   };
   castSlot: ReturnType<typeof vi.fn>;
+  pressSlot: ReturnType<typeof vi.fn>;
   activateFixedAttackSlot: ReturnType<typeof vi.fn>;
+  empowerHold: EmpowerHold;
+  flashActionSlot: ReturnType<typeof vi.fn>;
   showError: ReturnType<typeof vi.fn>;
   tryGatherToolUse: ReturnType<typeof vi.fn>;
   renderBags: ReturnType<typeof vi.fn>;
+  pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void;
+  releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void;
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void;
 }
 
@@ -78,6 +87,7 @@ function makeHud(
     usableItemIds?: readonly string[];
     tradeOpen?: boolean;
     gatherToolHandled?: boolean;
+    knownIds?: readonly string[];
   } = {},
 ): CastHarness {
   document.body.innerHTML = '<div id="bags" style="display:none"></div>';
@@ -94,16 +104,160 @@ function makeHud(
   // the way the real world reports one.
   hud.sim = {
     castAbility: vi.fn(),
+    releaseEmpoweredAbility: vi.fn(),
+    known: (opts.knownIds ?? []).map((id) => ({ def: ABILITIES[id] })),
     useItem: vi.fn(),
     tradeInfo: opts.tradeOpen ? { items: [] } : null,
   };
   hud.castSlot = vi.fn();
+  hud.pressSlot = vi.fn();
   hud.activateFixedAttackSlot = vi.fn();
+  hud.empowerHold = new EmpowerHold();
+  hud.flashActionSlot = vi.fn();
   hud.showError = vi.fn();
   hud.tryGatherToolUse = vi.fn(() => opts.gatherToolHandled ?? false);
   hud.renderBags = vi.fn();
   return hud;
 }
+
+describe('Hud cross hotbar hold routing', () => {
+  it('routes an on-bar press through pressSlot at the last bar slot', () => {
+    const last = ACTION_BAR_ABILITY_SLOTS - 1;
+    const hud = makeHud({ bar: barWith(last, { type: 'ability', id: 'glacial_front' }) });
+
+    hud.pressCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    expect(hud.pressSlot).toHaveBeenCalledExactlyOnceWith(ACTION_BAR_ABILITY_SLOTS);
+    expect(hud.sim.castAbility).not.toHaveBeenCalled();
+  });
+
+  it('starts an empowered off-bar ability without immediately releasing it', () => {
+    const hud = makeHud({ knownIds: ['glacial_front'] });
+
+    const fallback = vi.spyOn(hud, 'castCrossHotbarAction');
+
+    hud.pressCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    expect(hud.sim.castAbility).toHaveBeenCalledExactlyOnceWith('glacial_front');
+    expect(hud.sim.releaseEmpoweredAbility).not.toHaveBeenCalled();
+    expect(hud.empowerHold.active).toBe(true);
+    expect(fallback).not.toHaveBeenCalled();
+  });
+
+  it('keeps the unchanged fallback for a non-empowered off-bar ability', () => {
+    const hud = makeHud({ knownIds: ['defensive_stance'] });
+    const fallback = vi.spyOn(hud, 'castCrossHotbarAction');
+
+    hud.pressCrossHotbarAction({ type: 'ability', id: 'defensive_stance' });
+
+    expect(fallback).toHaveBeenCalledExactlyOnceWith({
+      type: 'ability',
+      id: 'defensive_stance',
+    });
+    expect(hud.sim.castAbility).toHaveBeenCalledExactlyOnceWith('defensive_stance');
+  });
+
+  it('uses the unchanged fallback for an empowered ability the player does not know', () => {
+    const hud = makeHud();
+    const fallback = vi.spyOn(hud, 'castCrossHotbarAction');
+
+    hud.pressCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    expect(fallback).toHaveBeenCalledExactlyOnceWith({
+      type: 'ability',
+      id: 'glacial_front',
+    });
+  });
+
+  it.each([
+    { type: 'ability' as const, id: CROSS_HOTBAR_ATTACK_ID },
+    { type: 'item' as const, id: 'minor_healing_potion' },
+  ])('delegates $type actions unchanged', (action) => {
+    const hud = makeHud({ usableItemIds: ['minor_healing_potion'] });
+    const fallback = vi.spyOn(hud, 'castCrossHotbarAction');
+
+    hud.pressCrossHotbarAction(action);
+
+    expect(fallback).toHaveBeenCalledExactlyOnceWith(action);
+  });
+
+  it('releases only the matching live empowered ability once', () => {
+    const hud = makeHud({ knownIds: ['glacial_front'] });
+    hud.pressCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    hud.releaseCrossHotbarAction({ type: 'ability', id: 'dragons_breath' });
+    expect(hud.sim.releaseEmpoweredAbility).not.toHaveBeenCalled();
+    hud.releaseCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+    hud.releaseCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    expect(hud.sim.releaseEmpoweredAbility).toHaveBeenCalledExactlyOnceWith('glacial_front');
+    expect(hud.flashActionSlot).not.toHaveBeenCalled();
+  });
+
+  it('does nothing on release without a live charge', () => {
+    const hud = makeHud({ knownIds: ['glacial_front'] });
+
+    hud.releaseCrossHotbarAction({ type: 'ability', id: 'glacial_front' });
+
+    expect(hud.sim.releaseEmpoweredAbility).not.toHaveBeenCalled();
+  });
+});
+
+describe('Hud slot hold routing', () => {
+  interface SlotHarness {
+    empowerHold: EmpowerHold;
+    sim: {
+      castAbility: ReturnType<typeof vi.fn>;
+      releaseEmpoweredAbility: ReturnType<typeof vi.fn>;
+    };
+    abilityForSlot: ReturnType<typeof vi.fn>;
+    castSlot: ReturnType<typeof vi.fn>;
+    flashActionSlot: ReturnType<typeof vi.fn>;
+    pressSlot(slot: number): void;
+    releaseSlot(slot: number): void;
+  }
+
+  function makeSlotHud(empowered: boolean): SlotHarness {
+    const hud = Object.create(Hud.prototype) as unknown as SlotHarness;
+    hud.empowerHold = new EmpowerHold();
+    hud.sim = {
+      castAbility: vi.fn(),
+      releaseEmpoweredAbility: vi.fn(),
+    };
+    hud.abilityForSlot = vi.fn(() =>
+      empowered ? { def: ABILITIES.glacial_front } : { def: ABILITIES.defensive_stance },
+    );
+    hud.castSlot = vi.fn();
+    hud.flashActionSlot = vi.fn();
+    return hud;
+  }
+
+  it('starts and releases an empowered slot through the real Hud methods', () => {
+    const hud = makeSlotHud(true);
+
+    hud.pressSlot(4);
+    hud.pressSlot(4);
+    expect(hud.sim.castAbility).toHaveBeenCalledExactlyOnceWith('glacial_front');
+    expect(hud.sim.releaseEmpoweredAbility).not.toHaveBeenCalled();
+    expect(hud.castSlot).not.toHaveBeenCalled();
+    hud.releaseSlot(4);
+
+    expect(hud.sim.releaseEmpoweredAbility).toHaveBeenCalledExactlyOnceWith('glacial_front');
+    expect(hud.flashActionSlot).toHaveBeenCalledExactlyOnceWith(4);
+  });
+
+  it('keeps non-empowered press fallthrough and release no-op behavior', () => {
+    const hud = makeSlotHud(false);
+
+    hud.pressSlot(4);
+    hud.releaseSlot(4);
+
+    expect(hud.castSlot).toHaveBeenCalledExactlyOnceWith(4);
+    expect(hud.sim.castAbility).not.toHaveBeenCalled();
+    expect(hud.sim.releaseEmpoweredAbility).not.toHaveBeenCalled();
+    expect(hud.flashActionSlot).not.toHaveBeenCalled();
+  });
+});
 
 function barWith(index: number, action: Action): Action[] {
   const bar: Action[] = Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, () => null);

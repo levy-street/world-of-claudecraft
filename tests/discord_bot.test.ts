@@ -35,12 +35,10 @@ import {
   stripLevelSuffix,
   tierRoleName,
   topSpecialRoleKeyFor,
-  VC_NATION_LABELS,
   voiceMembersForChannel,
 } from '../bot/logic';
 import type { ActivityKind } from '../server/discord_activity';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../server/http_util';
-import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 describe('gateway protocol helpers', () => {
   it('requests the privileged member + presence intents', () => {
@@ -607,61 +605,6 @@ describe('significant-activity cards', () => {
     expect(msg.allowed_mentions.users).toEqual(['111']);
   });
 
-  // The server has enqueued vale_cup cards since the Vale Cup shipped, but the
-  // bot's builder had no case for the kind, so every card posted as an embed
-  // with an undefined title/description/color (the empty-embed render).
-  it('vale-cup card names the winning nation, bracket, and score, tagging the side', () => {
-    const msg = buildActivityMessage({
-      kind: 'vale_cup',
-      realm: 'Claudemoon',
-      profileUrl: null,
-      bracket: 3,
-      scoreA: 2,
-      scoreB: 5,
-      winnerNation: 'copperdig',
-      participants: [linked('Aldric', '111'), linked('Mira', '222')],
-    }) as {
-      content: string;
-      allowed_mentions: { users: string[] };
-      embeds: Array<Record<string, any>>;
-    };
-    expect(msg.embeds[0].title).toContain('The Copper Dig');
-    expect(msg.embeds[0].title).toContain('3v3');
-    // Winning score reads first regardless of which team's column it sat in.
-    expect(msg.embeds[0].description).toContain('5 to 2');
-    expect(msg.embeds[0].description).toContain('<@111>');
-    expect(msg.embeds[0].description).toContain('<@222>');
-    expect(msg.allowed_mentions.users.sort()).toEqual(['111', '222']);
-    expect(typeof msg.embeds[0].color).toBe('number');
-  });
-
-  it('vale-cup card falls back to the raw nation id when the label map misses', () => {
-    const msg = buildActivityMessage({
-      kind: 'vale_cup',
-      realm: 'Claudemoon',
-      profileUrl: null,
-      bracket: 1,
-      scoreA: 3,
-      scoreB: 0,
-      winnerNation: 'newnation',
-      participants: [linked('Aldric', '111')],
-    }) as { embeds: Array<Record<string, any>> };
-    expect(msg.embeds[0].title).toContain('newnation');
-  });
-
-  // The bot's nation labels are a deliberate COPY of the game catalog's English
-  // values: bot/logic.ts must not import the ui catalog (the bot bundle stays
-  // standalone), so only this test, which imports BOTH, notices the two drifting
-  // apart. Reword hudChrome.vcup.nation.* and the bot copy reddens here.
-  it('pins the bot Vale Cup nation labels to the game catalog English values', () => {
-    const catalog: Record<string, string> = hudChromeStrings.vcup.nation;
-    expect(Object.keys(VC_NATION_LABELS).sort()).toEqual(Object.keys(catalog).sort());
-    expect(Object.keys(VC_NATION_LABELS)).toHaveLength(8);
-    for (const [id, label] of Object.entries(VC_NATION_LABELS)) {
-      expect(label, `nation ${id}`).toBe(catalog[id]);
-    }
-  });
-
   it('masterwork card names the crafted item and pings the crafter', () => {
     const msg = buildActivityMessage({
       kind: 'masterwork',
@@ -754,7 +697,6 @@ describe('significant-activity cards', () => {
     'rareloot',
     'duel',
     'arena',
-    'vale_cup',
     'masterwork',
     'deed',
   ] as const satisfies readonly ActivityKind[];

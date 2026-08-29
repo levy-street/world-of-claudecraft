@@ -81,6 +81,16 @@ describe('Settings', () => {
     expect(new Settings().get('cameraZoom')).toBe(8);
   });
 
+  it('persists the controller glyph family with Auto as the default', () => {
+    const settings = new Settings();
+
+    expect(SETTING_RANGES.gamepadGlyphStyle).toEqual({ min: 0, max: 3, def: 0 });
+    expect(settings.get('gamepadGlyphStyle')).toBe(0);
+    expect(settings.set('gamepadGlyphStyle', 1)).toBe(1);
+    expect(new Settings().get('gamepadGlyphStyle')).toBe(1);
+    expect(settings.set('gamepadGlyphStyle', 99)).toBe(3);
+  });
+
   it('keeps graphicsDefaultApplied false through an unrelated save and clears it on reset', () => {
     const s = new Settings();
     expect(s.get('graphicsDefaultApplied')).toBe(false);

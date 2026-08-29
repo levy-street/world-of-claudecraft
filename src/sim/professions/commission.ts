@@ -31,7 +31,7 @@
 // net imports, no randomness at all (commissions draw nothing), no Sim
 // import (PlayerMeta arrives type-only, the crafting.ts/training.ts idiom).
 
-import { bagCapacity, countFit } from '../bags';
+import { bagPools, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -150,7 +150,7 @@ export function resolveUnbind(
     scratch[boundIdx] = { ...scratch[boundIdx], count: scratch[boundIdx].count - 1 };
     const freed = cloneItemInstancePayload(boundSlot.instance);
     delete freed.boundTo;
-    if (countFit(scratch, bagCapacity(meta.bags), itemId, 1, freed) < 1) {
+    if (countFit(scratch, bagPools(meta.bags), itemId, 1, freed) < 1) {
       return { ok: false, itemId, reason: 'unbind_no_space', fee };
     }
   }

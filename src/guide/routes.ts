@@ -180,13 +180,6 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.arenaPage.intro',
   },
   {
-    id: 'vale-cup',
-    sub: 'vale-cup',
-    navKey: 'guide.nav.valeCup',
-    group: 'compete',
-    descKey: 'guide.valeCupPage.intro',
-  },
-  {
     id: 'thornhollow-fields',
     sub: 'thornhollow-fields',
     navKey: 'guide.nav.thornhollow',

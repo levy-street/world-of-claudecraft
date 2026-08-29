@@ -456,6 +456,50 @@ export const hudChromeStrings = {
     apply: 'Apply Skin',
     detach: 'Detach Skin',
     equipHint: 'Equip a {type} to apply this skin.',
+    // Strongbox Charters: the Claudium path to bank slots. Per CHARACTER, never
+    // account-wide, and never a capacity gold cannot also reach: the bursar
+    // sells the same slots. Display names live here because the sim registry
+    // (src/sim/content/storage_charters.ts) is deliberately name-free.
+    charter: {
+      eyebrow: 'Strongbox',
+      title: 'Strongbox Charters',
+      scope:
+        'A charter expands the bank of this character only. The bursar sells the same slots for gold.',
+      grant: 'Adds {slots} bank slots',
+      buy: 'Purchase Charter',
+      buyAria: 'Purchase {item}',
+      confirmTitle: 'Confirm Charter Purchase',
+      confirmBody: 'Purchase {item} for {cost} Claudium?',
+      resultContext: '{item} ({sku}): {message}',
+      granted: 'The charter was applied. The bank of this character is larger now.',
+      alreadyGranted: 'This charter is already on this character. You were not charged again.',
+      applyDeferred:
+        'Payment complete. The slots apply automatically the next time this character logs in.',
+      grantUnresolved:
+        'Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.',
+      inProgress: 'A purchase for this character is still being completed. Try again in a moment.',
+      doesNotFit: 'The bank of this character cannot fit the full grant of this charter.',
+      notPurchasable: 'This charter cannot be purchased right now.',
+      noRoom: 'The bank of this character has no room left for a charter.',
+      noCharterFits: 'No charter fits the room left in the bank of this character.',
+      // The hidden-charter silence-breaker: the fit gates drop charters one
+      // by one, so a list can render some rungs while hiding others, and even
+      // the fit-unknown arm renders it when the refusal prune hid rows. (Wordy
+      // value, M16: the five non-Latin fills land in this same change.)
+      someHiddenByFit:
+        'Charters too large for the room left in the bank of this character are not shown.',
+      outage:
+        'The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.',
+      outageStale:
+        'Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.',
+      failed: 'The purchase could not be completed.',
+      names: {
+        strongbox_charter_1: 'Lesser Strongbox Charter',
+        strongbox_charter_2: 'Greater Strongbox Charter',
+        strongbox_charter_3: 'Grand Strongbox Charter',
+        strongbox_charter_complete: 'Complete Strongbox Charter',
+      },
+    },
   },
   // CLAUDIUM: a server-authoritative soft currency. The game renders only what the
   // economy service returns (balance, SKU credits, prices, store costs); it
@@ -520,6 +564,7 @@ export const hudChromeStrings = {
     reset: 'Reset',
     presets: {
       classic: 'Classic Gold',
+      fancyGold: 'Fancy Gold (WIP)',
       midnight: 'Midnight',
       parchment: 'Parchment',
       highContrast: 'High Contrast',
@@ -861,6 +906,34 @@ export const hudChromeStrings = {
     clearAria: 'Clear a slot',
     clearArmed: 'Tap a slot to clear it.',
   },
+  // The spawn greeting dialog (tutorial island): the harbor guide's one-time
+  // offer of passage to the Proving Shore, first-character welcome vs
+  // returning-player refresher, and the two choice buttons
+  // (tutorial_greeting_view.ts / tutorial_greeting_window.ts).
+  tutorialGreeting: {
+    bodyFirst:
+      'I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.',
+    bodyRefresher:
+      'Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.',
+    play: 'Take the tutorial',
+    skip: 'Skip the tutorial',
+    // The decline follow-up: skipping is never a locked door.
+    declineNote:
+      'As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.',
+    // The first bell homecoming: the ride may have been a misclick, so the
+    // town's twin bell is pointed out once.
+    bellHomeNote:
+      'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+    // Ferryman Odo's island welcome, shown once per device on the first
+    // arrival: the greeting ferry lands beside his pier.
+    // Deliberately short (CX: the old note was a wall of text at the exact
+    // moment a new player wants to look at the world). It says where they
+    // are and who to talk to; the coach card, the golden trail and the
+    // floating bubble carry the rest, in place, as they need it.
+    islandArrivalNote:
+      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.',
+    noteClose: 'Understood',
+  },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
   // which is wrong on a phone whose only controls are the on-screen sticks and
@@ -897,6 +970,257 @@ export const hudChromeStrings = {
     nextTipQuestLog: 'Open your Quest Log ({key}) to find your next task nearby.',
     nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
     nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
+  },
+  // The Proving Shore movement bootcamp (src/ui/bootcamp.ts): the coachmark
+  // that meets a fresh arrival at the Gauntlet and walks them through it in
+  // running order: talk to Warden Tam, hold forward down lane 1, turn with
+  // the turn key and walk the south lane, swing the view with the mouse and
+  // strafe the last lane, then hand the run to Overseer Pell. Three copy
+  // arms per step: keyboard/mouse (default), touch, and gamepad, chosen by
+  // the live input-hint mode (src/game/input_hint_mode.ts). WORDY by M16, so
+  // the five non-Latin overlays carry real fills.
+  bootcamp: {
+    title: 'First Steps',
+    talkTitle: 'Speak to Warden Tam',
+    talkBody:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.',
+    talkBodyTouch:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.',
+    talkBodyPad:
+      'Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.',
+    forwardTitle: 'Walk the first lane',
+    forwardBody: 'Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.',
+    forwardBodyTouch:
+      'Step into the lane beside Tam and push the movement stick up to walk it west to its flag.',
+    forwardBodyPad:
+      'Step into the lane beside Tam and push the left stick up to walk it west to its flag.',
+    turnwalkTitle: 'Turn, then walk',
+    turnwalkBody:
+      'Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.',
+    turnwalkBodyTouch:
+      'Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.',
+    turnwalkBodyPad:
+      'Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.',
+    // Lane 3's corner, taught with the SAME shape as lane 2's: turn to face
+    // the lane, THEN walk it. One idiom for both corners, and the same
+    // sentence on keyboard, touch and pad, so nobody has to learn the course
+    // twice (the playtest ruling). Only the hand differs: left here, right
+    // there.
+    strafeTitle: 'Turn, then walk',
+    strafeBody:
+      'One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.',
+    strafeBodyTouch:
+      'One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.',
+    strafeBodyPad:
+      'One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.',
+    cameraTitle: 'Swing the camera',
+    cameraBody:
+      'One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.',
+    cameraBodyTouch:
+      'One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.',
+    cameraBodyPad:
+      'One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.',
+    courseProgress: 'Flag {current} of {total}',
+    doneTitle: 'Run complete',
+    doneBody:
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.',
+    doneBodyTouch:
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.',
+    doneBodyPad:
+      'That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.',
+    // The rail coach: the same card, generic three-state copy for every
+    // island quest after the Gauntlet (walk to the giver, do the task,
+    // return to the turn-in), so the helper persists the whole relay. {npc}
+    // splices the localized NPC name; the active card is titled with the
+    // quest's own localized name by the overlay. WORDY by M16, so the five
+    // non-Latin overlays carry real fills.
+    coachNextTitle: 'Next: {npc}',
+    coachNextBody:
+      'Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.',
+    coachNextBodyTouch:
+      'Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.',
+    coachNextBodyPad:
+      'Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.',
+    coachTaskBody:
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.',
+    coachTaskBodyTouch:
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.',
+    coachTaskBodyPad:
+      'Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.',
+    coachReadyTitle: 'Task complete',
+    // "Head to", never "Return to": on the rail every hand-in NPC is the NEXT
+    // station, someone the player has not met yet, so "return" reads as a
+    // place they have already been and sends new players backward.
+    coachReadyBody:
+      'Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.',
+    coachReadyBodyTouch: 'Head to {npc} and tap them to hand it in and take your reward.',
+    coachReadyBodyPad:
+      'Head to {npc} and press your interact button to hand it in and take your reward.',
+    // Per-quest mechanic lessons replacing the generic task/ready bodies
+    // (bootcamp_view.ts COACH_ACTIVE_OVERRIDES / COACH_READY_OVERRIDES):
+    // targeting and the swing for Strike True, the pickup press for the
+    // Wreck Line, and the buckle-on for the pouch before Maren's hand-in.
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    taskStrikeTrueBody:
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.',
+    taskStrikeTrueBodyTouch:
+      'Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.',
+    taskStrikeTrueBodyPad:
+      'Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.',
+    // The ability drill (q_ps_hone_the_edge): the yard's second lesson, and
+    // the one that stops a graduate leaving the island auto-attacking.
+    // {ability} is the localized name of THIS class's own attack and
+    // {abilityKey} the key it sits on, both derived from the live kit, so
+    // the card never tells a mage to press 1.
+    taskHoneBody:
+      'Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.',
+    taskHoneBodyTouch:
+      'Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.',
+    taskHoneBodyPad:
+      'Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.',
+    // The death lesson (q_ps_the_long_walk). Three bodies, because the
+    // lesson has three moments and a single static card would be wrong for
+    // two of them: walk to the stone, release the spirit, walk back. The
+    // copy names the literal buttons the death screen shows.
+    taskLongWalkBody:
+      'Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyTouch:
+      'Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
+    taskLongWalkBodyPad:
+      'Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.',
+    // Dead, spirit not yet released.
+    taskLongWalkDeadBody:
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyTouch:
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
+    taskLongWalkDeadBodyPad:
+      'You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.',
+    // A ghost walking back to the body.
+    taskLongWalkGhostBody:
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
+    taskLongWalkGhostBodyTouch:
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
+    taskLongWalkGhostBodyPad:
+      'Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.',
+    taskShellBody:
+      'The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyTouch:
+      'The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyPad:
+      'The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    // Caster arms (mage, warlock, priest, druid): their first real button is
+    // the slot-2 spell, so the combat lessons teach the second button and
+    // speak of casting. WORDY by M16, so the five non-Latin overlays carry
+    // fills.
+    taskStrikeTrueBodyCaster:
+      'Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.',
+    taskStrikeTrueBodyCasterTouch:
+      'Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.',
+    taskStrikeTrueBodyCasterPad:
+      'Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.',
+    taskShellBodyCaster:
+      'The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyCasterTouch:
+      'The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    taskShellBodyCasterPad:
+      'The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.',
+    // The pearl detour (q_ps_mother_of_pearl): using a bag item at a marked
+    // spot, a real fight, and looting a quest prize off the corpse. WORDY by
+    // M16, so the five non-Latin overlays carry fills.
+    taskPearlBody:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+    taskPearlBodyTouch:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+    taskPearlBodyPad:
+      "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
+    taskWreckLineBody:
+      'The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.',
+    taskWreckLineBodyTouch:
+      'The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.',
+    taskWreckLineBodyPad:
+      'The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.',
+    taskPouchBody:
+      'Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.',
+    taskPouchBodyTouch: 'Tap {npc} to open the stall, then tap the Linen Pouch to buy it.',
+    taskPouchBodyPad:
+      'Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.',
+    readyPouchBody:
+      'Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.',
+    readyPouchBodyTouch:
+      'Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.',
+    readyPouchBodyPad:
+      'Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.',
+    // The floating interact bubble over the coach's current target
+    // (bootcamp.ts + coach_prompt_view.ts): one keycap chip plus one short
+    // verb, readable without reading the card. Deliberately terse.
+    promptTalk: 'Talk',
+    promptTurnIn: 'Turn in quest',
+    promptPickUp: 'Pick up',
+    // The pearl on Mister Crabs' shell: name the prize, so a new player knows
+    // the corpse still owes them something (CX).
+    promptLootPearl: 'Loot the pearl',
+    promptRead: 'Read',
+    promptRing: 'Ring',
+    promptHold: 'Hold',
+    // The kill lessons' first half: click or tap the quarry, or use the pad's
+    // target cycle, to make it your target.
+    promptSelect: 'Select',
+    promptAttack: 'Attack',
+    // The ability drill's second half: the press it wants is the class's own
+    // button, not the swing the previous lesson taught.
+    promptUseAbility: 'Use ability',
+    // The death lesson's rite: kneeling at the Passing Stone.
+    promptKneel: 'Kneel',
+    // Screen-anchored asks: the lessons whose answer is a press on the
+    // interface rather than a place in the world. With the coach card gone
+    // these ARE the instruction, so each names its own press.
+    promptOpenBags: 'Open your bags',
+    promptCharacterSheet: 'Open your character sheet',
+    promptLookAround: 'Hold right-click and drag to look around',
+    promptJump: 'Jump',
+    promptSummon: 'Summon',
+    // The ring equip lesson (bootcamp_view.ts ringCardPlan): the pearl
+    // quest's reward sits in the bags, and these two cards walk wearing it
+    // and admiring it. WORDY by M16, so the five non-Latin overlays carry
+    // fills.
+    ringEquipTitle: 'Wear your prize',
+    ringEquipBody:
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.',
+    ringEquipBodyTouch:
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.',
+    ringEquipBodyPad:
+      'You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.',
+    ringAdmireTitle: 'Look at you',
+    ringAdmireBody:
+      'Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
+    ringAdmireBodyTouch:
+      'Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
+    ringAdmireBodyPad:
+      'Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.',
+    // The word between sequenced keycap chips ("D then W"): press order made
+    // explicit, the playtest ask.
+    keycapThen: 'then',
+    // Ferryman Odo's guiding voice: the CAPTION rows the coach card shows
+    // while the (English) VO clip plays. Each row mirrors one
+    // scripts/voices/extra_lines.mjs guide__odo__* line; reword the two
+    // together. WORDY by M16, so the five non-Latin overlays carry fills.
+    voiceArrival:
+      'Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.',
+    voiceFirstFlag: 'That is one flag down. Keep those legs moving, only two to go.',
+    voiceRunDone: 'A clean run, that. Overseer Pell holds your reward, go claim it.',
+    voiceStationDoneA: 'Fine work. On to the next, the path is already lit for you.',
+    voiceStationDoneB: 'You are getting the hang of this, no mistake.',
+    voiceVeerOff: 'Hold up, friend, that is the wrong way. The golden path is behind you.',
+    voiceGraduate:
+      'The bell is rung for you. Eastbrook waits across the water, and you are ready for it.',
+    // The closing card once Ferryman Odo has the last hand-in: ring home.
+    bellTitle: 'Ring the bell',
+    bellBody:
+      'Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.',
+    bellBodyTouch:
+      'Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.',
+    bellBodyPad:
+      'Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {
@@ -974,6 +1298,45 @@ export const hudChromeStrings = {
     devTierCol: 'Badge',
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
+  },
+  // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
+  // guild high-score tab's pledge affordances AND the social window's Pledges
+  // tab, so the two surfaces can never word the same state differently. Wordy
+  // values (M16) ship their five non-Latin fills in the same change.
+  pledge: {
+    // The per-guild recruiting status on the board: set by the Guild Master
+    // (setGuildPledgeSettings), defaults to accepting.
+    open: 'Accepting pledges',
+    closed: 'Not accepting pledges',
+    // Level floor chip beside the status when the guild set one (> 1).
+    minLevel: 'Level {level}+',
+    // The board row's action button, and the chip shown once the viewer's own
+    // pledge stands with this guild.
+    action: 'Pledge',
+    actionTitle: 'Pledge to {guild}',
+    pledged: 'Pledged',
+    yourGuild: 'Your guild',
+    // The social window's officer tab: title, empty state, decision buttons.
+    tab: 'Pledges',
+    // The tab label while pledges are waiting ({count} pre-formatted).
+    tabWithCount: 'Pledges ({count})',
+    empty: 'No one has pledged to your guild yet.',
+    accept: 'Accept',
+    acceptTitle: "Accept {name}'s pledge",
+    reject: 'Decline',
+    rejectTitle: "Decline {name}'s pledge",
+    // The recruiting settings editor (Guild Master + officers): the accepting
+    // toggle, the level floor, and the free-text note shown on the board.
+    settings: 'Recruitment',
+    acceptingLabel: 'Accept pledges',
+    minLevelLabel: 'Minimum level',
+    noteLabel: 'Board note',
+    notePlaceholder: 'Tell aspiring members what your guild is looking for',
+    save: 'Save',
+    // The unguilded viewer's own standing pledge (social window guild tab).
+    yourPledge: 'Your pledge: {guild}',
+    since: 'Pledged {date}',
+    withdraw: 'Withdraw pledge',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
@@ -1127,7 +1490,6 @@ export const hudChromeStrings = {
     targetPrev: 'Cycle Target Backward',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
-    valecup: 'Vale Cup',
     bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
     // Swimming: Jump swims up, this swims down.
@@ -1167,6 +1529,18 @@ export const hudChromeStrings = {
     reset: 'Reset',
     done: 'Done',
     cancel: 'Cancel',
+    // The small plus/minus buttons at the end of the primary bar: plus reveals
+    // the next optional row (secondary, then third), minus hides the topmost
+    // visible one. Same settings as the Interface options checkboxes.
+    showExtraBar: 'Show Another Action Bar',
+    hideExtraBar: 'Hide an Action Bar',
+    // The are-you-sure prompt shown when a captured key is already bound
+    // elsewhere: a key lives on one action at a time, so accepting UNBINDS the
+    // other one. {key} is the key label, {other} the action losing it, and
+    // {action} the one gaining it.
+    conflictTitle: 'Key Already Bound',
+    conflictBody: '{key} is already bound to {other}. Binding it to {action} will unbind {other}.',
+    conflictAccept: 'Rebind Anyway',
     resetConfirmTitle: 'Reset action bar keys?',
     resetConfirmBody:
       'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
@@ -1375,6 +1749,12 @@ export const hudChromeStrings = {
     // its own key because it is past tense.
     firstWinBonusLine: 'First win of the day: +{honor} Honor',
     firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
+    // The weekly Double Honor event chip ({mult} is the event multiplier,
+    // formatted). One key for the one surface; the calendar row below carries
+    // its own longer copy. Scoped copy on purpose: the event doubles
+    // Thornhollow Fields honor only, never arena or Fiesta honor.
+    doubleHonorLine:
+      'Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win',
     // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
     timeWarningMinutes: '{minutes} minutes remain',
     timeWarningOneMinute: 'One minute remains',
@@ -1393,186 +1773,6 @@ export const hudChromeStrings = {
       graveyard: 'Graveyard',
     },
   },
-  vcup: {
-    title: 'The Vale Cup',
-    // Label on the hold-to-charge shoot power meter (short, uppercased in CSS).
-    shootPower: 'POWER',
-    close: 'Close the Vale Cup window',
-    offlineNote: 'The fixture book is closed. The Vale Cup is not available right now.',
-    recordLine: 'Your record: {wins} wins, {losses} losses, {draws} draws.',
-    bracketsAria: 'Match bracket',
-    // "3v3" style tab label; {n} is the team size.
-    bracketLabel: '{n}v{n}',
-    waitingCount: '{count} waiting',
-    nationsHeading: 'Banner nation',
-    nation: {
-      vale: 'Eastbrook Vale',
-      mirefen: 'The Mirefen',
-      thornpeak: 'Thornpeak',
-      coliseum: 'The Ashen Coliseum',
-      choir: 'The Pale Choir',
-      ogre: 'The Ogre Clans',
-      moon: 'The Pale Moon',
-      copperdig: 'The Copper Dig',
-    },
-    awayNote: 'If both sides fly the same banner, the away side plays the inverted palette.',
-    rolesHeading: 'Sport role',
-    // Shown under the role picker in the 1v1/2v2 brackets, where the sim seats
-    // every fighter as All-Rounder regardless of the pick (issue 2767).
-    rolesSmallBracketNote:
-      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.',
-    role: {
-      allrounder: {
-        name: 'All-Rounder',
-        desc: 'A bit of everything: kick, boot, and a fair shoulder.',
-      },
-      striker: {
-        name: 'Striker',
-        desc: 'Lives for the long boot and the quick sidestep.',
-      },
-      sweeper: {
-        name: 'Sweeper',
-        desc: 'Bumps runners off the ball and hoofs it clear.',
-      },
-      keeper: {
-        name: 'Keeper',
-        desc: 'Guards the goal box with grip, dive, and punt.',
-      },
-    },
-    queue: 'Join the Queue',
-    leaveQueue: 'Leave the Queue',
-    queueNote: 'Queue from anywhere; the whistle calls you to the Sowfield.',
-    queuedStatus: 'Queued for {bracket}: position {position} of {count}.',
-    blockNation: 'Pick a banner nation first.',
-    blockPartySize: 'That bracket needs a smaller party.',
-    blockNotLeader: 'Only the party leader can queue the team.',
-    inMatchNote: 'Your team is on the pitch. Play on!',
-    deserterNote: 'The Groundskeeper remembers. You may queue again in {seconds} sec.',
-    liveHeading: 'Now at the Sowfield',
-    liveAria: 'Vale Cup: {nationA} {scoreA}, {nationB} {scoreB}',
-    walkUp: 'Walk up to the Sowfield to watch from the stands.',
-    noLive: 'The pitch is quiet. No match is being played.',
-    boardHeading: 'Winners board',
-    boardEmpty: 'No winners recorded yet. The Copper Pail waits.',
-    boardWins: '{count} wins',
-    // Guild banner entry + guild leaderboard.
-    enterAsGuild: 'Enter under the banner of {guild}',
-    guildRecordLine: 'Your guild record: {wins} wins, {losses} losses.',
-    guildBoardHeading: 'Guild banners',
-    guildBoardEmpty: 'No guild has taken the field yet. Fly your banner!',
-    guildBoardWl: '{wins} W, {losses} L',
-    practice: 'Practice vs. Bots',
-    practiceNote: 'Starts a private bot match on your own practice pitch right away.',
-    // Practice bouts are deliberately unrated; shown beside the practice button.
-    practiceUnratedNote:
-      'Practice bouts are unrated: standings and Book of Deeds progress do not count.',
-    // Region indicator: players currently off in a private practice instance.
-    practicingNow: 'Practicing now ({count}):',
-    // mm:ss; {seconds} is pre-padded to two digits.
-    clock: '{minutes}:{seconds}',
-    // Persistent indicator button states.
-    indicatorQueued: 'Vale Cup queue: {bracket}, position {position} of {count}',
-    indicatorLive: 'Vale Cup',
-    indicatorOpen: 'Open the Vale Cup window',
-    // In-match strip phase line.
-    phaseCountdown: 'Kickoff in {seconds}',
-    phaseGoal: 'GOAL!',
-    phaseGolden: 'GOLDEN GOAL',
-    phaseOver: 'FULL TIME',
-    // Event banners (match theatre; also seen by walk-up spectators).
-    bannerFound: 'The Vale Cup calls: {nationA} vs {nationB}!',
-    bannerCountdown: 'Kickoff in {seconds}...',
-    bannerKickoff: 'KICKOFF!',
-    bannerGoal: 'GOAL! {nation} scores!',
-    bannerSave: '{name} SAVES!',
-    bannerGolden: 'GOLDEN GOAL: next score wins!',
-    bannerEnd: 'Full time: {nationA} {scoreA}, {nationB} {scoreB}',
-    bannerWin: 'Victory at the Sowfield!',
-    bannerDraw: 'A draw at the Sowfield.',
-    bannerLoss: 'Defeat at the Sowfield.',
-    // Chat-log lines.
-    logQueued: 'You join the Vale Cup queue for {bracket} (position {position}).',
-    logUnqueued: 'You leave the Vale Cup queue.',
-    logFound: 'Your Vale Cup match is ready: {nationA} vs {nationB}.',
-    logRoster: 'Your side: {allies}. Their side: {enemies}.',
-    logGoal: '{name} scores for {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-    logSave: '{name} makes the save!',
-    logWin: 'You win the bout at the Sowfield.',
-    logDraw: 'The bout at the Sowfield ends in a draw.',
-    logLoss: 'You lose the bout at the Sowfield.',
-    // Groundskeeper Bram's gossip-menu entry.
-    gossipOpen: 'The book of fixtures',
-    gossipOpenAria: 'Open the Vale Cup window',
-    mobileLabel: 'Cup',
-    // Pre-match briefing overlay (the full-screen rules-and-kit card before kickoff).
-    briefing: {
-      subtitle: 'Pre-match briefing',
-      // The small "vs" glyph between the two banners in the header.
-      vs: 'vs',
-      rulesHeading: 'How to play',
-      rule1: 'Kick or pass the ball into the enemy goal to score.',
-      rule2: 'First to 5 goals wins, or the most goals when full time blows.',
-      rule3: 'A level match at full time goes to golden goal: the next score wins.',
-      rule4: 'Tackles only tumble you over. Nobody gets hurt under the harvest truce.',
-      rule5: 'Anyone can walk up and cheer you on from the stands.',
-      kitHeading: 'Your kit',
-      kitNote: 'These moves replace your class abilities for the match.',
-      // Extra rules-panel row for a bot-backfilled queued bout (issue 2767).
-      // Says "deeds for goals, saves, and clean sheets" rather than all deed
-      // progress: the debut deeds deliberately still credit a backfilled bout.
-      unratedNote:
-        'Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.',
-      // The same row for a private practice bout, which credits NO Cup deed at
-      // all (the debut deeds gate on the queued-bout predicate), so this copy
-      // is the blanket statement the backfill copy cannot make.
-      practiceUnratedNote:
-        'This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.',
-      rosterHeading: 'The team sheet',
-      // Row tags on the team sheet.
-      you: 'You',
-      bot: 'Bot',
-      // Ready button: its label, its readied-state label, and its accessible name.
-      ready: "I'm ready",
-      readyDone: 'Ready',
-      readyAria: 'Ready up for kickoff',
-      // Shown once you have readied and the match waits on the other fighters.
-      waiting: 'Waiting for the other side to ready up...',
-      // Live auto-ready countdown ({seconds} whole seconds) and the ready tally.
-      whistle: 'The whistle blows in {seconds}s.',
-      readyCount: '{ready} of {total} ready',
-    },
-    // Spectator parimutuel betting (the walk-up banner + card at the Sowfield).
-    bet: {
-      title: 'Match Bets',
-      aria: 'Vale Cup match betting',
-      // Live wager countdown / closed state.
-      closesIn: 'Bets close in {seconds}s',
-      closed: 'Betting closed',
-      // The prize pool (total copper wagered) shown between the two shares.
-      prize: 'Pool {amount}',
-      splitAria: 'Share of the betting pool on each team',
-      // The expand / collapse toggle for the full card.
-      expand: 'View bets and wager',
-      collapse: 'Hide bets',
-      oddsLabel: 'Pays',
-      // Stake button group heading; {team} is a nation name.
-      back: 'Back {team}',
-      // A fighter's lifetime form on the card.
-      form: '{wins}W-{losses}L',
-      // My current wager ({amount} money, {team} nation name), or none yet.
-      mine: 'Your bet: {amount} on {team}',
-      none: 'You have no bet on this match yet.',
-      // My lifetime betting record; {sign} is + or -, {net} the absolute money.
-      record: 'Betting record: {wins}W-{losses}L, {sign}{net}',
-      // Settlement toasts ({amount} money credited back).
-      wonBanner: 'Your bet won!',
-      wonLog: 'Your Vale Cup bet won: {amount} returned.',
-      lostLog: 'Your Vale Cup bet lost: {amount}.',
-      refundLog: 'Bets voided, your {amount} stake was returned.',
-    },
-  },
-  // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
-  // 0/2 maps to these at the HUD render boundary.
   options: {
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
@@ -1716,6 +1916,7 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    combineActionBars: 'Combine Action Bars',
     // Interface panel toggle (off by default): strips the black background,
     // border, and keybind label from action-bar slots with no ability or item
     // bound, so an unlearned class's bar reads clean instead of a wall of empty
@@ -1797,6 +1998,11 @@ export const hudChromeStrings = {
   // hardware glyphs in gamepad_map and need no translation.
   controller: {
     title: 'Controller',
+    glyphStyle: 'Button Labels',
+    glyphStyleAuto: 'Auto',
+    glyphStyleXbox: 'Xbox',
+    glyphStylePlayStation: 'PlayStation',
+    glyphStyleNintendo: 'Nintendo',
     enable: 'Enable Controller',
     invertY: 'Invert Camera (Y)',
     deadzone: 'Stick Deadzone',
@@ -2952,6 +3158,15 @@ export const hudChromeStrings = {
     bagSocketAria: '{name}: {slots}',
     socketEmpty: 'Empty bag slot',
     unequipHint: 'Click to remove this bag',
+    // Per-pool truth for the carried counter (Bank Storage phase 08): the
+    // counter's tooltip and split aria name both pools, because the summed
+    // {used}/{total} can read past its denominator in the tolerated-overflow
+    // state while one pool refuses pickups. Values are resolved pool numbers.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    poolGeneral: 'General: {used} of {total}',
+    poolMaterials: 'Materials: {used} of {total}',
+    capacityPoolsAria:
+      'Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -3282,6 +3497,12 @@ export const hudChromeStrings = {
     // tag differently owns its own wrapper instead of inheriting an English one.
     // Wordy (M16), so the five non-Latin fills ship in this same change.
     cheaterTag: '< Cheater >',
+    // The guild line of a player who PLEDGED to a guild without being a member
+    // (docs/prd/guild-pledge-board.md): replaces the `<Guild>` member wrapper so
+    // an aspirant never reads as a member. Like cheaterTag the whole drawn form
+    // is the VALUE (no wrapper added in code), so a locale owns its own shape.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    pledgeTag: 'Pledge of {guild}',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -3324,6 +3545,10 @@ export const hudChromeStrings = {
   },
   partyFrames: {
     section: 'Party and Raid Frames',
+    // The Frames tab's one labelled subsection (options window): every
+    // declarative row there tunes the party frames now. Wordy (M16):
+    // non-Latin fills land in this change.
+    optionsSection: 'Party Frame Options',
     unlock: 'Move party and raid frames',
     lock: 'Lock party and raid frames',
     style: 'Frame Style',
@@ -3364,6 +3589,108 @@ export const hudChromeStrings = {
   // non-Latin fills land in this same change.
   frameReset: {
     label: 'Reset Frame Positions',
+  },
+  // Interface panel (Combat tab) row above Auto-Attack on Ability Use: one press
+  // loosens every movable HUD frame (action bars, cast bar, menu rail, minimap,
+  // unit and pet frames) so they can be dragged and scaled, and the button
+  // relabels itself to the lock action while they are loose. `unlockFrame` /
+  // `lockFrame` name each frame's own corner button, `resizeFrame` its SE grip.
+  // `resizeFrame` names an action rather than a gesture because the grip is a
+  // real button driven by pointer drag AND arrow keys, so a screen reader must
+  // not be told to drag something a keyboard player operates with arrows.
+  // All wordy (M16), so the five non-Latin fills land in this same change.
+  interfaceUnlock: {
+    label: 'Edit Frames',
+    unlock: 'Unlock interface',
+    lock: 'Lock interface',
+    // The floating button that appears while the interface is unlocked, so
+    // finishing an arrangement does not mean reopening the options menu.
+    lockAll: 'Lock Interface',
+    // The two guidance notes under the Unlock Interface option row: what shows
+    // while editing (and where extra bars come from), and that the game is
+    // deliberately inert for the duration.
+    barsNote:
+      'Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.',
+    frozenNote:
+      'While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.',
+    unlockFrame: 'Unlock this frame',
+    lockFrame: 'Lock this frame',
+    resizeFrame: 'Resize this frame',
+    // Name chips shown on each unlocked frame. Only the frames with no existing
+    // name key mint one here (the unit frames reuse their aria labels, the
+    // buff/debuff rows the target-aura tab names, the cast bar its own aria).
+    // Action Bar / Minimap / Stance Bar are wordy (M16), so their five
+    // non-Latin fills land in this same change; Menu / XP Bar / Chat are not.
+    frameNames: {
+      actionBar1: 'Action Bar',
+      actionBar2: 'Action Bar 2',
+      actionBar3: 'Action Bar 3',
+      steamWishlist: 'Wishlist Reminder',
+      menu: 'Menu',
+      minimap: 'Minimap',
+      stanceBar: 'Stance Bar',
+      xpBar: 'XP Bar',
+      chat: 'Chat',
+      actionBarGroup: 'Action Bars',
+      // The unit frames chip plain functional names rather than their lore
+      // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
+      // in an arrangement mode.
+      playerFrame: 'Player',
+      targetFrame: 'Target',
+      partyFrames: 'Party',
+      // The auto-attack swing timer (#swingbar), hidden outside combat like
+      // the cast bar, so its chip is what names the placeholder.
+      swingBar: 'Auto Attack',
+    },
+    // The frames settings dropdown beside the floating Lock Interface button:
+    // a show/hide sub-menu plus the frame-behavior toggles that used to live
+    // in the options window. All wordy (M16): the five non-Latin fills land in
+    // this same change.
+    framesMenu: 'Frames Settings',
+    framesMenuTitle:
+      'Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.',
+    showHideFrames: 'Show or Hide Frames',
+    // The aura-row direction toggles in that dropdown (buffsLeftToRight /
+    // debuffsLeftToRight): ticked reads left to right, unticked keeps the
+    // stock right-to-left growth. Wordy (M16): non-Latin fills in this change.
+    buffsLeftToRight: 'Buffs left to right',
+    debuffsLeftToRight: 'Debuffs left to right',
+    // lockPlayerFrameToActionBar: the frame glues to the top of the action
+    // bars and stops being individually movable. Wordy (M16): non-Latin
+    // fills land in this change.
+    lockPlayerFrameToBar: 'Lock Player Frame to Action Bar',
+    // Orientation flips + the per-frame size reset (all wordy, M16:
+    // non-Latin fills land in this change). actionBarsVertical is the ONE
+    // combined-shape toggle; the numbered three are the per-bar rows shown
+    // while the bars are split.
+    actionBarsVertical: 'Vertical Action Bars',
+    actionBar1Vertical: 'Vertical Action Bar',
+    actionBar2Vertical: 'Vertical Action Bar 2',
+    actionBar3Vertical: 'Vertical Action Bar 3',
+    menuRailHorizontal: 'Horizontal Menu',
+    snapToGrid: 'Snap to Grid',
+    previewMemberName: '{className} {number}',
+    resetFrameSize: 'Reset size',
+    // The per-frame accessible name for that button ({name} is the frame name).
+    resetFrameSizeFor: 'Reset size for {name}',
+    // The sample spell name on the edit mode's filled cast-bar preview.
+    previewSpell: 'Example Spell',
+  },
+  // The export/import rows (Frames tab: the frame layout; General tab: every
+  // setting family). All wordy (M16): the five non-Latin fills land in this
+  // same change.
+  transfer: {
+    frameLayout: 'Frame Layout',
+    allSettings: 'All Settings',
+    exportAction: 'Export',
+    importAction: 'Import',
+    copy: 'Copy',
+    copied: 'Copied to clipboard.',
+    copyFailed: 'Copy failed. Select the code and copy it yourself.',
+    applyReload: 'Apply and Reload',
+    pastePlaceholder: 'Paste an exported code here.',
+    invalid: 'That is not a valid export code.',
+    wrongKind: 'That code is a different export type.',
   },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs
@@ -3624,6 +3951,17 @@ export const hudChromeStrings = {
     benefits:
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+    // The always-on wishlist reminder (src/ui/steam_wishlist.ts), a plain
+    // outbound store link with none of the account-link plumbing above it.
+    // `wishlist` is the chip label; `wishlistAria` is its accessible name and
+    // tooltip. It OPENS WITH the visible label on purpose: an accessible name
+    // that does not contain the visible text fails WCAG 2.5.3 (Label in Name)
+    // for speech input, and the mobile pill's short caption is inside it too.
+    wishlist: 'Wishlist on Steam',
+    wishlistAria: 'Wishlist on Steam: open the World of ClaudeCraft store page',
+    // The mobile More-tray caption: a 4-column 40px pill cannot hold the full
+    // label, so the pill shows this and carries `wishlistAria` as its name.
+    wishlistShort: 'Wishlist',
   },
   // Epic account link (the deeds achievement mirror), the stacked card beside
   // the Steam one on character select. Renders only when the server's
@@ -3706,6 +4044,17 @@ export const hudChromeStrings = {
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
+    // The signpost guild board window (src/ui/hud/guild_board/): the title
+    // reuses popupTitle below; the subtitle and the roster drill-in link
+    // title are its own.
+    subtitle: 'Guilds of the realm',
+    rosterTitle: 'View the roster of {guild}',
+    back: 'Back',
+    // The 'listings' arm of the noticeboard event opens the signpost popup
+    // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
+    // spliced verbatim like player names, never translated.
+    popupTitle: 'Guild Signpost',
+    close: 'Close',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
@@ -3723,6 +4072,49 @@ export const hudChromeStrings = {
     buySlotsMaxed: 'Fully expanded',
     buyConfirm: 'Purchase {count} additional bank slots for {price}?',
     buyConfirmAccept: 'Purchase',
+    // The capacity meter footer (Bank Storage phase 08): one footer band holds
+    // the meter and the single expand button. The meter label shows the summed
+    // display total; the tooltip and split aria carry the per-pool truth, so
+    // the footer never implies a non-material item can use materials-pool
+    // space. The economy disclaimer rides the click-gated purchase confirm;
+    // later purchase surfaces (store, Claudium) reuse the same key.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    meterLabel: '{used} of {total} slots',
+    meterPoolGeneral: 'General: {used} of {total}',
+    meterPoolMaterials: 'Materials: {used} of {total}',
+    meterPoolsAria:
+      'Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
+    meterMaterialsNote: 'Materials-only space from socketed satchels. Other items cannot use it.',
+    priceDisclaimer: 'Prices may change with the game economy.',
+    // The banker's SECOND price tag (Bank Storage phase 13): the same next
+    // rung the gold price buys, priced in Claudium by the economy service and
+    // delivered on the owner-only bank wire. ONE button carries both tags and
+    // the confirm prompt carries both rails, so gold stays primary by position
+    // and nothing anywhere states a rate, an equivalence, or a combined total.
+    // The top-up handoff, the cancel label and the price-changed line REUSE the
+    // shared hudChrome.wocStore.* Claudium strings (they name no product), and
+    // the disclaimer reuses priceDisclaimer above; only the copy that has to
+    // say BANK SLOTS is minted here. Never "vault": that word belongs to the
+    // Materials Vault, which has no Claudium path at all.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    rungItemName: '{count} bank slots',
+    buySlotsDualAria: 'Buy {count} slots for {price} or {cost} Claudium',
+    buyConfirmDual: 'Purchase {count} additional bank slots?',
+    buyConfirmGold: 'Purchase for {price}',
+    buyConfirmClaudium: 'Purchase for {cost} Claudium',
+    rungGranted: 'The bank slots were added. The bank of this character is larger now.',
+    rungAlreadyGranted: 'These slots are already on this character. You were not charged again.',
+    rungApplyDeferred:
+      'Payment complete. The slots apply automatically the next time this character logs in.',
+    rungGrantUnresolved:
+      'Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.',
+    rungInProgress:
+      'A purchase for this character is still being completed. Try again in a moment.',
+    rungDoesNotFit: 'The bank of this character cannot fit another expansion.',
+    rungNotPurchasable: 'These bank slots cannot be purchased right now.',
+    rungFailed: 'The purchase could not be completed.',
+    rungOutage:
+      'The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.',
     withdrawHint: 'Click to withdraw',
     withdrawPartialHint: 'Shift-click to withdraw a partial amount',
     depositHint: 'Click to deposit',
@@ -3740,6 +4132,21 @@ export const hudChromeStrings = {
     withdrawQuantityTitle: 'Withdraw {item}',
     withdrawQuantityInput: 'Quantity to withdraw',
     withdrawQuantityConfirm: 'Withdraw',
+    // The vault row's accessible ACTION name (its aria-label). Same English as
+    // withdrawQuantityTitle on purpose, but a distinct key: that one titles the
+    // quantity PROMPT, and rewording a dialog title must not silently rename
+    // every vault row. (The five non-Latin fills land in this same change.)
+    vaultRowWithdrawName: 'Withdraw {item}',
+    // The gold-ladder stale-price notice (vault upgrade, guild bank slots, bag
+    // sockets). Same English as hudChrome.wocStore.priceChanged, but its own
+    // key: those are sim-priced GOLD surfaces, and rewording the Claudium
+    // store's notice must not silently reword them. (Wordy value, M16: the
+    // five non-Latin fills land in this same change.)
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Item-qualified accessible name/title for every stocked-row partial action.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    withdrawQuantityAction: 'Quantity to withdraw: {item}',
     // Search / category / sort toolbar. The category chip and sort option
     // labels reuse the generic hudChrome.bags.* strings; only these bank-named aria
     // labels are distinct from the bags wording.
@@ -3770,6 +4177,65 @@ export const hudChromeStrings = {
     bonusReferralExplainer:
       'Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.',
     bonusSectionAria: 'Bonus bank slots and how to earn more',
+    // The bag-socket row (Bank Storage phase 07): four gold-bought sockets
+    // above the slot ladder, each holding one bag whose slots join the bank's
+    // budget. Every price is interpolated from the WIRE (nextSocketCost),
+    // never a client constant (phase 09 makes prices tunable). The filled
+    // cell's aria REUSES the generic hudChrome.bags.bagSocketAria
+    // '{name}: {slots}' with the shared itemUi.tooltip.bagSlots /
+    // bagSlotsMaterials line as its {slots} token, so the row says which pool
+    // the bag's slots actually feed without minting a duplicate key. (Wordy
+    // values, M16: the five non-Latin fills land in this same change.)
+    socketRowAria: 'Bank bag sockets',
+    socketEmpty: 'Empty bank bag socket',
+    // "in the bank", never "here": the bags-side click fills the FIRST empty
+    // unlocked socket, so a later empty cell's hint promising "here" would
+    // name a cell the click does not fill (tooltip-writing.md: write from the
+    // live mechanic).
+    socketEmptyHint: 'Click a bag in your bags to store it in the bank',
+    socketLocked: 'Locked bag socket',
+    socketLockedLater: 'Bag sockets unlock in order, cheapest first',
+    socketUnlockAria: 'Unlock a bank bag socket for {price}',
+    socketUnlockHint: 'Click to unlock this bag socket',
+    socketUnlockConfirm: 'Unlock a bank bag socket for {price}?',
+    socketUnlockAccept: 'Unlock',
+    unsocketHint: 'Click to return this bag to your bags',
+    // The bags-side hover while the personal pane is open and an unlocked
+    // socket is empty (the socket arm of the bank-deposit click ladder).
+    socketHint: 'Click to socket this bag into your bank',
+    // The Materials Vault tab (Bank Storage Phase 03): the per-material
+    // stockpile beside the slot bank. Every price and capacity is interpolated
+    // from the WIRE snapshot (nextUpgradeCost / perMaterialCap), never a
+    // client constant. Withdraw hints, the quantity prompts, the confirm
+    // accept, and the maxed label all REUSE the personal keys above; the
+    // bags-side click denies voice the sim's own error.vaultOnlyMaterials
+    // line (its cannot-store sibling retired with the identity-preserving
+    // deposit rework), so no deny copy lives here. {count} in
+    // the deposit-all summaries is the number of ITEMS moved (pooled counts,
+    // not stacks; the bank's summary counts stacks because slots are its
+    // unit). (Wordy values, M16: the five non-Latin fills land in this same
+    // change.)
+    vaultTab: 'Vault',
+    vaultCapacityNote: 'Each material holds up to {cap}.',
+    vaultEmpty: 'Your vault is empty. Click a material in your bags to deposit it.',
+    vaultRowAria: '{item}: {count} of {cap} stored',
+    vaultLockedIntro:
+      'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.',
+    vaultUnlockButton: 'Unlock the Materials Vault',
+    vaultUnlockConfirm: 'Unlock the Materials Vault for {price}?',
+    vaultUpgrade: 'Widen every ceiling to {cap}',
+    vaultUpgradeConfirm: 'Widen every material ceiling to {cap} for {price}?',
+    vaultDepositAll: 'Deposit all materials',
+    vaultDepositAllTooltip:
+      'Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.',
+    vaultDepositAllDone: 'Materials deposited: {count}.',
+    vaultDepositAllFull: 'Materials deposited: {count}. Some ceilings are full.',
+    vaultDepositAllNone: 'Vault ceilings full: nothing deposited.',
+    vaultWithdrawShort: 'Only {fit} of {count} fit in your bags.',
+    // Bags-side hints while the VAULT tab is active (the guild pair's rule:
+    // distinct keys because the target differs).
+    vaultDepositHint: 'Click to deposit into your vault',
+    vaultCannotDeposit: 'Cannot go in the vault',
     // The Guild tab (guild bank): the Personal/Guild strip renders only while
     // guildBankInfo is non-null (officer-plus standing at a banker, online).
     // Withdraw/deposit prompt bodies reuse the personal keys above; the gold
@@ -3903,6 +4369,10 @@ export const hudChromeStrings = {
       arenaClash: {
         title: 'Arena Clash',
         note: 'Duelists flock to the Ashen Coliseum. Queue up and climb the ladder.',
+      },
+      doubleHonor: {
+        title: 'Double Honor Weekend',
+        note: 'The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win.',
       },
       fishingDerby: {
         title: 'Fishing Derby',
@@ -4422,6 +4892,21 @@ export const hudChromeStrings = {
     // D8 downward substitution, 2x gather value), so the spend is stated
     // before the click instead of silent after it.
     reagentFineSub: '(spends {count} fine-grade)',
+    // The craft-from-vault suffix (Bank Storage Phase 04): appended to a
+    // reagent line when carried stock runs short and the craft would draw the
+    // remainder from the Materials Vault (carried always drains first), so
+    // the vault spend is stated before the click, exactly like the
+    // fine-substitution suffix above. Rendered only while the world reports
+    // vault draw available here (craftVaultStock non-null).
+    reagentVaultDraw: '(draws {count} from your vault)',
+    // The place-blocked note (Phase 04 QA): rendered once at the top of the
+    // recipe list when the world reports vault draw BLOCKED here
+    // (craftVaultStock null: an instanced context) AND some reagent row is
+    // short, so a row the vault would have satisfied in town never reads as
+    // a bare red count with no reason (the stationOutOfRange precedent).
+    // Neutral phrasing on purpose: it must stay true for a player who has
+    // never unlocked the vault.
+    vaultUnreachable: 'The Materials Vault is out of reach here.',
     // The #1301 gold-sink fee (src/sim/professions/crafting.ts
     // resolveCraftForRecipe), charged on every successful craft but never
     // shown anywhere before this: {fee} is the already-localized formatMoney
@@ -5393,7 +5878,8 @@ export const hudChromeStrings = {
     minLevelNote: 'Requires level {level}',
   },
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): USD-denominated
-  // auctions settled in $WOC, browser-web only, config-gated server-side.
+  // auctions settled in $WOC, browser web + website desktop only,
+  // config-gated server-side.
   // Every USD amount renders through formatNumber currency options and every
   // timestamp through formatDateTime (UTC plus local, per the PRD); the
   // window never composes numbers into these strings by concatenation.
@@ -5431,11 +5917,11 @@ export const hudChromeStrings = {
     // already sent is not health-gated and still settles.
     pausedBanner:
       'Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.',
-    walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
-    // The banner's own shortcut into the shared wallet connect flow (the
-    // woc:wallet-verify event the store and daily rewards buttons dispatch),
-    // so an unlinked player is never told to link with nowhere to do it.
-    walletBannerCta: 'Connect wallet',
+    walletLinkedDisconnected:
+      'Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.',
+    walletLinkedConnected: 'Your linked wallet app is connected and ready for $WOC purchases.',
+    walletUsdBalance: '{amount} USD',
+    walletUsdUnknown: 'Unknown',
     // The rate is per ONE dollar, said outright: 'per USD' read as a unit
     // label and players asked per how many.
     rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',

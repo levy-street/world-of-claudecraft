@@ -28,8 +28,8 @@ export const TOP_WEALTH_HOLDERS_LIMIT = 100;
 // authoritative ban state is enforced at every entry point regardless.
 export const TOP_WEALTH_HOLDERS_TTL_MS = 15_000;
 
-// "Large" gold movements on the account detail view: 10 gold and up.
-export const LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER = 100_000;
+// The fixed 10-gold threshold lives in bank_ledger_indexes.ts beside the
+// partial-index predicate and is interpolated into the SQL as a literal.
 export const LARGE_GOLD_MOVEMENT_LIMIT = 25;
 
 interface MailSaveShape {

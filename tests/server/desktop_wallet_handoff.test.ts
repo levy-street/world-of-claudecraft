@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createDesktopWalletHandoffStore,
   DESKTOP_WALLET_HANDOFF_TTL_MS,
+  DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS,
 } from '../../server/desktop_wallet_handoff';
 
 describe('desktop wallet handoff store', () => {
@@ -165,7 +166,7 @@ describe('desktop wallet handoff store', () => {
         reference: 'CLM_missing',
         expectedAddress: 'expected-wallet',
       }),
-    ).toThrow('authorized Claudium quote');
+    ).toThrow('authorized quote');
 
     store.authorizeTransaction(9, {
       reference: 'CLM_expiring',
@@ -183,10 +184,14 @@ describe('desktop wallet handoff store', () => {
         reference: 'CLM_expiring',
         expectedAddress: 'expected-wallet',
       }),
-    ).toThrow('authorized Claudium quote');
+    ).toThrow('authorized quote');
   });
 
-  it('never lets a transaction handoff outlive its authorized quote', () => {
+  it('caps a transaction handoff at its quote expiry plus the recording grace', () => {
+    // The grace exists for the record-a-late-signature stance: the browser
+    // wallet BROADCASTS at approval, so a signature landing at the quote
+    // boundary must still be completable and readable, exactly as the game's
+    // confirm intake deliberately records a signature for an expired quote.
     let now = 1_000;
     const store = createDesktopWalletHandoffStore({ now: () => now });
     store.authorizeTransaction(9, {
@@ -203,22 +208,111 @@ describe('desktop wallet handoff store', () => {
       reference: 'CLM_short_quote',
       expectedAddress: 'expected-wallet',
     });
-    expect(created.expiresInMs).toBe(100);
+    expect(created.expiresInMs).toBe(100 + DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS);
     expect(store.claim(created.code, '192.0.2.9')).toMatchObject({
       kind: 'transaction',
       reference: 'CLM_short_quote',
     });
 
-    now += 100;
+    // Just past the QUOTE expiry, inside the grace: a signature the wallet
+    // broadcast at the boundary still lands and is still readable.
+    now += 101;
+    store.complete(created.code, '192.0.2.9', {
+      kind: 'transaction',
+      address: 'expected-wallet',
+      signature: 'boundary-chain-signature',
+    });
+    expect(store.result(9, created.code)).toMatchObject({ status: 'complete' });
+
+    // Past the grace the entry is gone entirely.
+    now += DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS;
     expect(() => store.claim(created.code, '192.0.2.9')).toThrow('invalid or expired');
-    expect(() =>
-      store.complete(created.code, '192.0.2.9', {
-        kind: 'transaction',
-        address: 'expected-wallet',
-        signature: 'late-chain-signature',
-      }),
-    ).toThrow('invalid or expired');
     expect(store.result(9, created.code)).toEqual({ status: 'missing' });
+    // And a NEW handoff cannot be minted for the expired authorization.
+    expect(() =>
+      store.createTransaction(9, '192.0.2.9', {
+        reference: 'CLM_short_quote',
+        expectedAddress: 'expected-wallet',
+      }),
+    ).toThrow('not backed by an authorized quote');
+  });
+
+  it('a completed step-up frees its authorization slot (single-use downstream)', () => {
+    const store = createDesktopWalletHandoffStore();
+    const nonce = 'e'.repeat(32);
+    store.authorizeStepUp(9, {
+      nonce,
+      message: 'challenge text',
+      expectedAddress: 'expected-wallet',
+      expiresAtMs: Date.now() + 60_000,
+    });
+    const created = store.createStepUp(9, '192.0.2.9', {
+      nonce,
+      expectedAddress: 'expected-wallet',
+    });
+    store.complete(created.code, '192.0.2.9', {
+      kind: 'stepup',
+      address: 'expected-wallet',
+      signature: 'msg-signature',
+    });
+    // The stored result stays readable, but no SECOND handoff can be minted
+    // for the consumed challenge.
+    expect(store.result(9, created.code)).toMatchObject({ status: 'complete' });
+    expect(() =>
+      store.createStepUp(9, '192.0.2.9', { nonce, expectedAddress: 'expected-wallet' }),
+    ).toThrow('not backed by an issued Exchange challenge');
+  });
+
+  it('bounds each account to its authorization budget, evicting its own oldest', () => {
+    const evictions: string[] = [];
+    const store = createDesktopWalletHandoffStore({
+      onMetric: (event) => {
+        evictions.push(event);
+      },
+    });
+    const expiresAtMs = Date.now() + 60_000;
+    for (let index = 0; index < 9; index++) {
+      store.authorizeStepUp(9, {
+        nonce: String(index).repeat(32),
+        message: 'challenge text',
+        expectedAddress: 'expected-wallet',
+        expiresAtMs,
+      });
+    }
+    // The 9th insert evicted the account's OLDEST (nonce 0...), and only that
+    // one; the newest 8 all still mint.
+    expect(evictions).toEqual(['authorization_evicted']);
+    expect(() =>
+      store.createStepUp(9, '192.0.2.9', {
+        nonce: '0'.repeat(32),
+        expectedAddress: 'expected-wallet',
+      }),
+    ).toThrow('not backed by an issued Exchange challenge');
+    for (let index = 1; index < 9; index++) {
+      store.createStepUp(9, '192.0.2.9', {
+        nonce: String(index).repeat(32),
+        expectedAddress: 'expected-wallet',
+      });
+    }
+    // A DIFFERENT account is untouched by the first account's budget.
+    store.authorizeStepUp(8, {
+      nonce: 'a'.repeat(32),
+      message: 'challenge text',
+      expectedAddress: 'other-wallet',
+      expiresAtMs,
+    });
+    store.createStepUp(8, '192.0.2.9', {
+      nonce: 'a'.repeat(32),
+      expectedAddress: 'other-wallet',
+    });
+    // A same-key re-registration REPLACES in place, no eviction.
+    store.authorizeStepUp(8, {
+      nonce: 'a'.repeat(32),
+      message: 'newer challenge text',
+      expectedAddress: 'other-wallet',
+      expiresAtMs,
+    });
+    expect(evictions).toEqual(['authorization_evicted']);
   });
 
   it('expires operations and rejects browser requests from a different IP', () => {
@@ -229,5 +323,203 @@ describe('desktop wallet handoff store', () => {
 
     now += DESKTOP_WALLET_HANDOFF_TTL_MS + 1;
     expect(store.result(5, created.code)).toEqual({ status: 'missing' });
+  });
+
+  it('binds step-up claims and completions to the expected wallet', () => {
+    const store = createDesktopWalletHandoffStore();
+    const nonce = 'a'.repeat(32);
+    store.authorizeStepUp(9, {
+      nonce,
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: 'expected-wallet',
+      expiresAtMs: Date.now() + 60_000,
+    });
+    const created = store.createStepUp(9, '192.0.2.9', {
+      nonce,
+      expectedAddress: 'expected-wallet',
+    });
+
+    // The claim serves the SERVER-stored message (never renderer text).
+    expect(store.claim(created.code, '192.0.2.9')).toEqual({
+      kind: 'stepup',
+      nonce,
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: 'expected-wallet',
+    });
+    expect(() =>
+      store.complete(created.code, '192.0.2.9', {
+        kind: 'stepup',
+        address: 'wrong-wallet',
+        signature: 'msg-signature',
+      }),
+    ).toThrow('wallet does not match');
+    // A completion of the wrong KIND is refused before any address check.
+    expect(() =>
+      store.complete(created.code, '192.0.2.9', {
+        kind: 'transaction',
+        address: 'expected-wallet',
+        signature: 'msg-signature',
+      }),
+    ).toThrow('action mismatch');
+    store.complete(created.code, '192.0.2.9', {
+      kind: 'stepup',
+      address: 'expected-wallet',
+      signature: 'msg-signature',
+    });
+    expect(store.result(9, created.code)).toEqual({
+      status: 'complete',
+      result: { kind: 'stepup', address: 'expected-wallet', signature: 'msg-signature' },
+    });
+  });
+
+  it('rejects step-up handoffs without an issued, matching, unexpired challenge', () => {
+    let now = 1_000;
+    const store = createDesktopWalletHandoffStore({ now: () => now });
+    const nonce = 'b'.repeat(32);
+
+    // Never registered.
+    expect(() =>
+      store.createStepUp(9, '192.0.2.9', { nonce, expectedAddress: 'expected-wallet' }),
+    ).toThrow('not backed by an issued Exchange challenge');
+
+    store.authorizeStepUp(9, {
+      nonce,
+      message: 'challenge text',
+      expectedAddress: 'expected-wallet',
+      expiresAtMs: now + 5_000,
+    });
+    // Another account cannot mint against this nonce (the key is per-account).
+    expect(() =>
+      store.createStepUp(8, '192.0.2.9', { nonce, expectedAddress: 'expected-wallet' }),
+    ).toThrow('not backed by an issued Exchange challenge');
+    // A different wallet than the registered one is refused.
+    expect(() =>
+      store.createStepUp(9, '192.0.2.9', { nonce, expectedAddress: 'other-wallet' }),
+    ).toThrow('not backed by an issued Exchange challenge');
+    // Expiry closes it.
+    now += 5_001;
+    expect(() =>
+      store.createStepUp(9, '192.0.2.9', { nonce, expectedAddress: 'expected-wallet' }),
+    ).toThrow('not backed by an issued Exchange challenge');
+  });
+
+  it('never lets a step-up handoff outlive its challenge, and screens registrations', () => {
+    let now = 1_000;
+    const store = createDesktopWalletHandoffStore({ now: () => now });
+    const nonce = 'c'.repeat(32);
+    store.authorizeStepUp(9, {
+      nonce,
+      message: 'challenge text',
+      expectedAddress: 'expected-wallet',
+      expiresAtMs: now + 100,
+    });
+    const created = store.createStepUp(9, '192.0.2.9', {
+      nonce,
+      expectedAddress: 'expected-wallet',
+    });
+    expect(created.expiresInMs).toBe(100);
+    now += 101;
+    expect(() => store.claim(created.code, '192.0.2.9')).toThrow('invalid or expired');
+    expect(store.result(9, created.code)).toEqual({ status: 'missing' });
+
+    // Registration screens: a malformed nonce, an empty message, and a stale
+    // expiry are each refused at authorize time.
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'not-a-nonce',
+        message: 'x',
+        expectedAddress: 'w',
+        expiresAtMs: now + 100,
+      }),
+    ).toThrow('invalid step-up authorization');
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'd'.repeat(32),
+        message: '',
+        expectedAddress: 'w',
+        expiresAtMs: now + 100,
+      }),
+    ).toThrow('invalid step-up authorization');
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'd'.repeat(32),
+        message: 'x',
+        expectedAddress: 'w',
+        expiresAtMs: now,
+      }),
+    ).toThrow('invalid step-up authorization');
+    // The remaining screens, one negative per dimension: an over-long
+    // message, an empty expected address, and a non-finite expiry.
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'd'.repeat(32),
+        message: 'y'.repeat(2_049),
+        expectedAddress: 'w',
+        expiresAtMs: now + 100,
+      }),
+    ).toThrow('invalid step-up authorization');
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'd'.repeat(32),
+        message: 'x',
+        expectedAddress: '',
+        expiresAtMs: now + 100,
+      }),
+    ).toThrow('invalid step-up authorization');
+    expect(() =>
+      store.authorizeStepUp(9, {
+        nonce: 'd'.repeat(32),
+        message: 'x',
+        expectedAddress: 'w',
+        expiresAtMs: Number.NaN,
+      }),
+    ).toThrow('invalid step-up authorization');
+  });
+
+  it('at the global cap the oldest LIVE authorization is evicted, expired ones first', () => {
+    let now = 1_000;
+    const evictions: string[] = [];
+    const store = createDesktopWalletHandoffStore({
+      now: () => now,
+      onMetric: (event) => {
+        evictions.push(event);
+      },
+    });
+    // Fill the map to its 2000 cap across 250 accounts (8 per account, the
+    // per-account budget, so no per-account eviction fires while filling).
+    for (let account = 0; account < 250; account++) {
+      for (let slot = 0; slot < 8; slot++) {
+        store.authorizeStepUp(account, {
+          nonce: `${account.toString(16).padStart(4, '0')}${slot}`.padEnd(32, 'f'),
+          message: 'challenge text',
+          expectedAddress: `wallet-${account}`,
+          expiresAtMs: now + 60_000,
+        });
+      }
+    }
+    expect(evictions).toEqual([]);
+    // A NEW account at the cap evicts the globally oldest entry instead of
+    // refusing (a refusal would hard-fail the co-tenant's quote path).
+    store.authorizeStepUp(9_999, {
+      nonce: 'a'.repeat(32),
+      message: 'challenge text',
+      expectedAddress: 'wallet-new',
+      expiresAtMs: now + 60_000,
+    });
+    expect(evictions).toEqual(['authorization_evicted']);
+    store.createStepUp(9_999, '192.0.2.9', {
+      nonce: 'a'.repeat(32),
+      expectedAddress: 'wallet-new',
+    });
+    // Expired registrations stop counting toward the cap: advance past the
+    // TTL and a fresh insert prunes them instead of evicting anything live.
+    now += 60_001;
+    store.authorizeStepUp(1, {
+      nonce: 'b'.repeat(32),
+      message: 'challenge text',
+      expectedAddress: 'wallet-1',
+      expiresAtMs: now + 60_000,
+    });
+    expect(evictions).toEqual(['authorization_evicted']);
   });
 });

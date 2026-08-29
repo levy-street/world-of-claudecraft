@@ -60,6 +60,7 @@ import {
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { BgMatch } from './social/battleground';
+import { creditDeathLesson } from './tutorial/death_lesson';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
 
 // --- tuning -----------------------------------------------------------------
@@ -325,6 +326,8 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
   // teleported onto the exact corpse point.
   reviveAt(ctx, meta, p, p.pos, RES_HP_FRACTION, 'none');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+  // The island's death lesson: this IS the walk it teaches.
+  creditDeathLesson(ctx, meta, true);
 }
 
 // Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
@@ -339,6 +342,10 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, 'resurrection');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+  // Credited too, deliberately: the lesson teaches the corpse run, but a
+  // player who took the Keeper instead has no corpse left to walk to, and a
+  // quest they can no longer finish is worse than one finished the long way.
+  creditDeathLesson(ctx, meta, false);
   return true;
 }
 

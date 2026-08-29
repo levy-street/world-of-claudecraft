@@ -1,14 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   buildWorldAmbientSources,
-  crowdAmbienceAt,
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
-import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -34,8 +32,12 @@ function dockWorld(
 describe('world audio routing', () => {
   it('routes both rotated dock decks to wood without widening into nearby terrain', () => {
     for (const dock of PROPS.docks) {
-      const deck = dockWorld(dock, 0, -3.18);
-      const beside = dockWorld(dock, 1.05, -3.18);
+      // Local probe points grow with the dock's scale (dock_layout.ts
+      // normalizes deck maths through it): the deck centre and a point just
+      // past the scaled half-width (0.98s).
+      const s = dock.scale ?? 1;
+      const deck = dockWorld(dock, 0, -3.18 * s);
+      const beside = dockWorld(dock, 1.05 * s, -3.18 * s);
       expect(isOnDockDeck(deck.x, deck.z)).toBe(true);
       expect(
         footstepSurfaceAt(SEED, deck.x, groundHeight(deck.x, deck.z, SEED), deck.z, true),
@@ -70,13 +72,6 @@ describe('world audio routing', () => {
 
   it('keeps dungeon floors stone', () => {
     expect(footstepSurfaceAt(SEED, DUNGEON_X_THRESHOLD + 1, 0, 0, true)).toBe('stone');
-  });
-
-  it('preserves the Sowfield crowd bed and live-match swell', () => {
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, false, false)).toBe(0.4);
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, false, true)).toBe(1);
-    expect(crowdAmbienceAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z, true, true)).toBe(0);
-    expect(crowdAmbienceAt(0, 0, false, true)).toBe(0);
   });
 
   it('builds stable point sources for every campfire and both built-in smithies', () => {

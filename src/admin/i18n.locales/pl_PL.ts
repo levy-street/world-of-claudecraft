@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pl_PL: Record<string, string> = {
+  'error.flagActiveExists': 'to konto ma już otwarte oznaczenie tego rodzaju',
+  'wealth.largeMovementsUnavailable':
+    'nie udało się wczytać dużych ruchów bankowych (upłynął limit czasu odczytu rejestru); powyższe zestawienie złota jest kompletne',
   'error.guildBankDeleting':
     'Ta gildia jest usuwana, więc jej bank jest zamknięty. Nic nie zostało zmienione.',
   'error.guildBankItemRequired':

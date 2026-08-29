@@ -207,8 +207,8 @@ describe('distance-cull-exempt wardstone actually draws', () => {
     const group = new THREE.Object3D();
     const visible = syncDelveInteractableVisibility(
       group,
-      wardstone.templateId,
-      wardstone.lootable,
+      wardstone,
+      new Map(),
       false, // compilePending: false, the async-compile gate already cleared
     );
     expect(visible).toBe(true);

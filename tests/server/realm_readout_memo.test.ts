@@ -4,17 +4,17 @@ import {
   realmReadoutJson,
   realmReadoutObject,
 } from '../../server/realm_readout_memo';
-import type { VcSharedCupInfo } from '../../src/world_api/vale_cup';
 
-// A plain VcSharedCupInfo-shaped literal built locally: the memo is payload-agnostic,
-// so the test never imports cupSharedInfoFor. Slot 3 of queueSizes carries the value
-// we mutate between ticks to prove a stale-tick string is never served.
-const sample = (): VcSharedCupInfo => ({
+// A plain locally-shaped readout literal: the memo is payload-agnostic, so the
+// test never imports a live tenant's builder. Slot 3 of queueSizes carries the
+// value we mutate between ticks to prove a stale-tick string is never served.
+type SampleReadout = {
+  queueSizes: Record<number, number>;
+  board: { name: string; wins: number }[];
+};
+const sample = (): SampleReadout => ({
   queueSizes: { 1: 0, 2: 0, 3: 1, 4: 0, 5: 0 },
-  live: null,
   board: [{ name: 'A', wins: 3 }],
-  guildBoard: [],
-  practicing: ['B'],
 });
 
 describe('realm readout per-pass memo', () => {
@@ -29,11 +29,11 @@ describe('realm readout per-pass memo', () => {
   });
 
   it('builds and stringifies the shared readout at most once per tick', () => {
-    const memo = createRealmReadoutMemo<VcSharedCupInfo>();
+    const memo = createRealmReadoutMemo<SampleReadout>();
     // Injected spy build thunk: real builds bump `builds`; the tick-6 build returns a
     // different queueSizes so case 5 can prove the tick-6 string reflects the tick-6 object.
     let builds = 0;
-    const build = (): VcSharedCupInfo => {
+    const build = (): SampleReadout => {
       builds++;
       return builds === 1
         ? sample()
@@ -81,15 +81,15 @@ describe('realm readout per-pass memo', () => {
 
   it('serves two tenants of distinct types with independent tick keys and counters', () => {
     // The memo is generic over its payload: one GameServer holds one instance per
-    // realm-wide fragment (the Vale Cup readout, the dungeon-finder board), and
+    // realm-wide fragment (the dungeon-finder board is the live tenant today), and
     // the instances never share a tick key or a counter. A board-shaped array
     // tenant stands in for the second payload type here; the memo never inspects it.
-    const cup = createRealmReadoutMemo<VcSharedCupInfo>();
+    const readout = createRealmReadoutMemo<SampleReadout>();
     const board = createRealmReadoutMemo<{ id: number }[]>();
 
-    const cupJson5 = realmReadoutJson(cup, 5, sample);
-    expect(cup.objectBuilds).toBe(1);
-    expect(cup.stringifies).toBe(1);
+    const readoutJson5 = realmReadoutJson(readout, 5, sample);
+    expect(readout.objectBuilds).toBe(1);
+    expect(readout.stringifies).toBe(1);
     // building one tenant leaves the other untouched (no shared state)
     expect(board.objectBuilds).toBe(0);
     expect(board.stringifies).toBe(0);
@@ -99,16 +99,16 @@ describe('realm readout per-pass memo', () => {
     expect(boardJson5).toBe('[{"id":7}]');
     expect(board.objectBuilds).toBe(1);
     expect(board.stringifies).toBe(1);
-    expect(cup.objectBuilds).toBe(1); // and vice versa
+    expect(readout.objectBuilds).toBe(1); // and vice versa
 
     // independent tick keys: advancing ONE tenant to tick 6 rebuilds only it;
     // the other still serves its tick-5 value from cache on a same-tick re-read
-    realmReadoutJson(cup, 6, sample);
-    expect(cup.tick).toBe(6);
-    expect(cup.objectBuilds).toBe(2);
+    realmReadoutJson(readout, 6, sample);
+    expect(readout.tick).toBe(6);
+    expect(readout.objectBuilds).toBe(2);
     expect(board.tick).toBe(5);
     expect(realmReadoutJson(board, 5, () => [{ id: 99 }])).toBe(boardJson5);
     expect(board.objectBuilds).toBe(1);
-    expect(JSON.parse(cupJson5).queueSizes[3]).toBe(1); // tick-5 cup string was real payload
+    expect(JSON.parse(readoutJson5).queueSizes[3]).toBe(1); // tick-5 string was real payload
   });
 });

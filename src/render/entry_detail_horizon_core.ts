@@ -64,3 +64,21 @@ export function advanceEntryDetailHorizon(
     complete: nextCap >= input.targetFar,
   };
 }
+
+/**
+ * The cull far the reveal-gated scenery (props, towns, foliage) consults while
+ * the entry horizon is still expanding: the horizon's cap wins over a wider
+ * cull far. Before the far-terrain stand-in is complete the renderer culls at
+ * scene fog instead of the horizon, and one such frame under the entry cover
+ * requested every scenery key out to that fog (measured: 81 keys, 46 of them
+ * beyond the 240 yd first ring, the two mainland towns included), clogging the
+ * reveal lane the spawn's own decor waits in and starting their watchdogs
+ * while the horizon then hid them. Terrain keeps the wide far: the stand-in
+ * question is its own, and nothing it draws rides the reveal lane. The bound
+ * is on REAL-GEOMETRY keys: foliage sprite rows cull against the atmospheric
+ * far (foliage.ts `spriteFar`), which this cap does not shrink, so an impostor
+ * bucket beyond the ring still consults its gate.
+ */
+export function entrySceneryCullFar(cullFar: number, state: EntryDetailHorizonState): number {
+  return state.complete ? cullFar : Math.min(cullFar, state.cap);
+}

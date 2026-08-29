@@ -1,9 +1,13 @@
 // Bags: the WoW-style inventory capacity system. The player carries a fixed
 // 16-slot backpack plus up to 4 equippable bag items (kind:'bag', each granting
-// `bagSlots` extra slots). Capacity is POOLED: items live in the one flat
-// PlayerMeta.inventory list and the equipped bags only raise the slot budget,
-// so nothing here pins an item to a specific container (the wire shape and the
-// JSONB save shape are unchanged).
+// `bagSlots` extra slots). Capacity is POOLED into TWO pools (phase 05): the
+// backpack plus every unrestricted bag feed the general pool, every
+// materialsOnly bag feeds a materials-only pool the derived taxonomy alone may
+// occupy (src/sim/bag_pools.ts carries the split and the materials-first
+// allocation rule). Items still live in the one flat PlayerMeta.inventory
+// list and equipped bags only raise the budgets, so nothing here pins an item
+// to a specific container (the wire shape and the JSONB save shape are
+// unchanged; pools are capacity accounting, not containers).
 //
 // This module follows the items.ts pattern: pure capacity/stacking math a
 // Vitest imports directly, plus the two command bodies (equipBag/unequipBag)
@@ -25,6 +29,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
+import { freePoolSlots, type PoolCapacity, poolCapacityOf, totalPoolCapacity } from './bag_pools';
 import { ITEMS } from './data';
 import {
   consumeSelectedInventorySlot,
@@ -32,7 +37,7 @@ import {
   selectedInventorySlot,
 } from './item_copy_ref';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
-import type { PlayerMeta } from './sim';
+import { isMaterialItemId } from './material_ids';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
@@ -77,16 +82,27 @@ export function instancedCountCap(
   return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
 }
 
-/** Extra slots a bag item grants when equipped (0 for a non-bag). */
-export function bagSlotsOf(def: ItemDef | undefined): number {
-  return def?.kind === 'bag' ? (def.bagSlots ?? 0) : 0;
+/** Extra slots a bag item grants when equipped (0 for a non-bag). Defined in
+ *  bag_pools.ts, where poolCapacityOf reads the same answer, and re-exported
+ *  here so the carried-inventory consumers keep one bag-facing import. */
+export { bagSlotsOf } from './bag_pools';
+
+/** The carried inventory's two-pool budget: the backpack plus every
+ *  unrestricted bag feed the general pool, every materialsOnly bag feeds the
+ *  materials pool (src/sim/bag_pools.ts carries the allocation rule). Every
+ *  fit gate below takes this split, never a flat number, so no call site can
+ *  quietly keep the old pooled-total model. */
+export function bagPools(bags: readonly (string | null)[]): PoolCapacity {
+  return poolCapacityOf(BACKPACK_SLOTS, bags);
 }
 
-/** Total slot budget: the backpack plus every equipped bag's bagSlots. */
+/** Total slot budget, both pools summed: the backpack plus every equipped
+ *  bag's bagSlots. The equip/unequip shrink guards and the HUD's used/total
+ *  readout consume this; it is deliberately NOT a fit answer (a non-material
+ *  can be refused while total headroom remains), so fit questions go through
+ *  the PoolCapacity-taking gates below. */
 export function bagCapacity(bags: readonly (string | null)[]): number {
-  let total = BACKPACK_SLOTS;
-  for (const id of bags) if (id) total += bagSlotsOf(ITEMS[id]);
-  return total;
+  return totalPoolCapacity(bagPools(bags));
 }
 
 /** How many of `count` copies of an item would fit: existing stacks absorb up
@@ -96,10 +112,13 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
  *  canStackInstancePayloads (identical-payload stacking): a plain
  *  add never tops up an instanced slot (#1165) and an instanced add never
  *  tops up a plain slot or a differently-instanced one; a non-matching slot
- *  still occupies a slot in the `inventory.length` used count. */
+ *  still occupies a slot in the used count. Topping up an existing stack
+ *  occupies no new slot, so it is pool-blind; only FRESH stacks consult the
+ *  two-pool free-slot math (a non-material may only take general headroom, a
+ *  material takes materials headroom first, bag_pools.ts freePoolSlots). */
 export function countFit(
   inventory: readonly InvSlot[],
-  capacity: number,
+  pools: PoolCapacity,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
@@ -118,7 +137,7 @@ export function countFit(
       room += stack - s.count;
     }
   }
-  const freeSlots = Math.max(0, capacity - inventory.length);
+  const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
   // A non-mergeable payload (charges) keeps one-per-slot semantics, so each
   // fresh slot absorbs exactly one copy instead of a full stack.
   const perFreshSlot = instance && !isMergeableInstancePayload(instance) ? 1 : stack;
@@ -143,22 +162,22 @@ export function countFit(
  *  (a harvest quantity floors at 1). */
 export function canGrantItemInstance(
   inventory: readonly InvSlot[],
-  capacity: number,
+  pools: PoolCapacity,
   itemId: string,
   instance: ItemInstancePayload,
   count = 1,
 ): boolean {
-  return countFit(inventory, capacity, itemId, count, instance) >= count;
+  return countFit(inventory, pools, itemId, count, instance) >= count;
 }
 
 /** True when all `count` copies fit. */
 export function canAddItem(
   inventory: readonly InvSlot[],
-  capacity: number,
+  pools: PoolCapacity,
   itemId: string,
   count: number,
 ): boolean {
-  return countFit(inventory, capacity, itemId, count) >= count;
+  return countFit(inventory, pools, itemId, count) >= count;
 }
 
 /** The ONE capacity check the exchange pipes share (market buy/cancel/collect,
@@ -173,29 +192,52 @@ export function canAddItem(
  *  item_instance_transfer.ts grantCopies. */
 export function canGrantCopies(
   inventory: readonly InvSlot[],
-  capacity: number,
+  pools: PoolCapacity,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
 ): boolean {
-  return countFit(inventory, capacity, itemId, count, instance, craftedRecipeId) >= count;
+  return countFit(inventory, pools, itemId, count, instance, craftedRecipeId) >= count;
 }
 
 /** True when EVERY add in the batch fits together (simulated cumulatively on a
  *  scratch copy, so three 1-slot items against one free slot correctly fail). */
 export function fitsAll(
   inventory: readonly InvSlot[],
-  capacity: number,
+  pools: PoolCapacity,
   adds: readonly InvSlot[],
 ): boolean {
   const scratch = inventory.map((s) => ({ ...s }));
   for (const a of adds) {
-    if (countFit(scratch, capacity, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
+    if (countFit(scratch, pools, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
       return false;
     addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId);
   }
   return true;
+}
+
+/** Free FRESH-stack slots the pools offer `itemId` right now: the bag_pools
+ *  free-slot answer with the material predicate wired, for conservative
+ *  one-slot-per-unit models that bypass countFit's stacking arm.
+ *
+ *  ZERO PRODUCTION CALLERS as of the v0.40.0 sync, and say so rather than let
+ *  the docblock keep naming one. Its consumer was trade.ts fitsAfterSwap's
+ *  unknown-stock fallback, which the release DELETED when it rebuilt that model
+ *  around the shared shippedOfferUnits walk: units the walk cannot source ship
+ *  nothing in the real swap either, so the release argues modelling no arrival
+ *  for them is exact rather than optimistic, and the fallback had nothing left
+ *  to be conservative about. Kept and routed like the rest on the same footing
+ *  as fitForItemInstance above (state.md records that one as dead-but-routed):
+ *  it is still the ONE place the sim binds isMaterialItemId for a free-slot
+ *  question, and tests/bags.test.ts exercises the split through it. Deleting it
+ *  is a maintainer call, not a merge's. */
+export function freeBagSlotsFor(
+  inventory: readonly InvSlot[],
+  pools: PoolCapacity,
+  itemId: string,
+): number {
+  return freePoolSlots(inventory, pools, itemId, isMaterialItemId);
 }
 
 /** Stack-aware add: top up existing stacks to their stackSize, then append
@@ -321,8 +363,12 @@ export function bagsFullError(ctx: SimContext, pid: number): void {
 }
 
 // The bag ladder the pre-bag save migration draws from, ordered by quality
-// tier then size. Mirrors the shipped bag items in content/items.ts.
-const MIGRATION_BAGS: { id: string; slots: number; tier: number }[] = [
+// tier then size. A FROZEN back-compat subset of the shipped bag items (the
+// phase 05 catalog additions deliberately never join it; the grant ladder is
+// a shipped contract), with each slot count cross-checked against the live
+// content table by tests/bags.test.ts so a content re-tune cannot silently
+// under-grant a pre-bag save.
+export const MIGRATION_BAGS: { id: string; slots: number; tier: number }[] = [
   { id: 'linen_pouch', slots: 6, tier: 0 }, // common
   { id: 'travelers_knapsack', slots: 8, tier: 0 }, // common
   { id: 'wolfhide_satchel', slots: 10, tier: 1 }, // uncommon
@@ -395,6 +441,14 @@ export function equipBag(
   newBags[target] = itemId;
   // Simulate the post-swap inventory: the equipped bag leaves it, the replaced
   // bag (if any) returns to it. Guard only against ending above the new budget.
+  //
+  // Tolerated imprecision: on a LEGACY overstacked plain bag slot (count > 1,
+  // reachable only from a pre-bag or tampered save; live play never overstacks
+  // a bag, stackSizeOf pins kind 'bag' to 1), removeItem decrements the count
+  // instead of freeing the slot, so the real post-swap length is one MORE than
+  // modelled here and the inventory can land one slot past the summed budget.
+  // That state is inside the tolerated over-capacity class: it blocks new adds
+  // and destroys nothing.
   const after = meta.inventory.length - 1 + (old ? 1 : 0);
   if (after > bagCapacity(newBags)) {
     ctx.error(meta.entityId, 'You have too many items to swap to that bag.');
@@ -404,15 +458,16 @@ export function equipBag(
   // park an instance payload or a craftedRecipeId while a bag is worn, so
   // equipping a payload-bearing copy would silently destroy it on the next
   // unequip's plain addStacked grant. Not reachable through shipped content
-  // today: no bag recipe or grant currently carries one (tests/bags.test.ts
-  // pins that no CRAFTABLE bag-kind item def is authored at a signable
-  // material rarity, the one live-content vector craftedRecipeId's own kind
-  // check does not close; two shipped bags already sit at rare/epic quality,
-  // but both are recipe-free loot drops granted plain). Bags are DECLARED
-  // payload-free here rather than merely assumed: peek the copy that would
-  // be consumed BEFORE consuming it (refusing late would have already
-  // removed it) and refuse the equip outright the moment one ever does carry
-  // a payload, whatever the source, rather than dropping it.
+  // today: no bag recipe or grant currently carries one. The crafted signer
+  // mint is bag-exempt at the source (crafting.ts mintsSignedCraftOutput
+  // refuses to sign a bag-kind output at ANY rarity, pinned in
+  // tests/bags.test.ts), so the phase 05 tailoring ladder's rare and epic
+  // craftable bags grant plain and fungible, exactly like the recipe-free
+  // rare/epic loot bags always did. Bags are DECLARED payload-free here
+  // rather than merely assumed: peek the copy that would be consumed BEFORE
+  // consuming it (refusing late would have already removed it) and refuse
+  // the equip outright the moment one ever does carry a payload, whatever
+  // the source, rather than dropping it.
   const peeked =
     slotIndex !== undefined
       ? selectedInventorySlot(meta.inventory, itemId, slotIndex)

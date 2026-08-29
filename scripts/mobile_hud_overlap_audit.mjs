@@ -41,11 +41,13 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 import { controlGap, PROFILES } from './lib/overlap_geometry.mjs';
 
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
 const URL = process.env.URL || 'http://localhost:5173/';
 const GATE = process.argv.includes('--gate');
 // Opt-in full sweep (env MATRIX_ALL=1): Pass B runs EVERY window toggle (and the
 // vendor+bags co-open) at EVERY profile in PROFILES, instead of each window's own
 // short `widths` list. Default (unset) keeps the exact per-window widths below.
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
 const MATRIX_ALL = process.env.MATRIX_ALL === '1';
 const SHOT_DIR = 'tmp/mobile-hud-audit';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -126,7 +128,6 @@ const WINDOW_MATRIX = [
   { toggle: 'toggleCrafting', id: 'crafting-window', widths: [844] },
   { toggle: 'toggleCalendar', id: 'calendar-window', widths: [844] },
   { toggle: 'toggleArena', id: 'arena-window', widths: [844] },
-  { toggle: 'toggleValeCup', id: 'valecup-window', widths: [844] },
   { toggle: 'toggleLeaderboard', id: 'leaderboard-window', widths: [844] },
   { toggle: 'toggleSocial', id: 'social-window', widths: SPOT },
   { toggle: 'toggleMap', id: 'map-window', widths: [844] },
@@ -845,6 +846,7 @@ try {
 
     const allIds = [...CHROME_IDS, ...CONTROL_IDS];
     const g = await collectRects(page, allIds);
+    // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
     if (process.env.DEBUG_RECTS) {
       console.log(`${prof.name} rects: ${JSON.stringify(g.rects)}`);
     }
@@ -1626,6 +1628,7 @@ try {
     }, npcId);
     const v = vendorState.vendor;
     const b = vendorState.bags;
+    // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
     if (process.env.DEBUG_RECTS)
       console.log(`vendor state @${vprof.w}: ${JSON.stringify(vendorState)}`);
     // Both panels must be real, laid-out, AND actually overlapping the game area

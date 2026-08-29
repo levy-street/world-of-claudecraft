@@ -8,7 +8,6 @@ import {
 } from '../src/sim/data';
 import { isAtStation, stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
-import { VALE_CUP_BRAM_ID } from '../src/sim/social/vale_cup';
 import {
   assertCanonicalEastbrookNoticeboardDef,
   emptyZoneProps,
@@ -122,7 +121,6 @@ describe('WorldContent static gameplay services', () => {
       civicPlacements([], BUILTIN_WORLD.services?.noticeboards ?? []),
     );
     expect(entitiesWithTemplate(sim, 'spirit_healer')).toEqual([]);
-    expect(entitiesWithTemplate(sim, 'groundskeeper_bram')).toEqual([]);
     expect({ x: sim.player.pos.x, z: sim.player.pos.z }).toEqual(world.playerStart);
 
     sim.player.dead = true;
@@ -249,28 +247,6 @@ describe('WorldContent static gameplay services', () => {
     expect(sim.drainEvents()).toContainEqual(
       expect.objectContaining({ type: 'unbindResult', ok: true }),
     );
-  });
-
-  it('spawns the groundskeeper definition from cfg.world rather than built-in data', () => {
-    const world = worldWithoutServices();
-    world.npcs = {
-      groundskeeper_bram: {
-        ...BUILTIN_WORLD.npcs.groundskeeper_bram,
-        name: 'Custom Groundskeeper',
-        pos: { x: 40, z: 40 },
-        facing: Math.PI / 3,
-      },
-    };
-
-    const sim = new Sim({ seed: 71, playerClass: 'warrior', world });
-    const bram = sim.entities.get(VALE_CUP_BRAM_ID);
-
-    expect(bram).toMatchObject({
-      kind: 'npc',
-      name: 'Custom Groundskeeper',
-      facing: Math.PI / 3,
-    });
-    expect({ x: bram?.pos.x, z: bram?.pos.z }).toEqual(world.npcs.groundskeeper_bram.pos);
   });
 
   it('keeps built-in services unchanged after restoring the default world', () => {

@@ -109,11 +109,17 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
   'this.riftPainter.relocalize|',
-  'this.targetFrameMover.relocalize|',
-  'this.playerFrameMover.relocalize|',
-  'this.partyFrameMover.relocalize|',
+  // One arm for every MovableFrame in the HUD: the three unit frames and the
+  // frames the "Unlock interface" option governs all register with the same
+  // coordinator, which forwards relocalize() to each of them (superseding the
+  // three per-mover arms the pre-merge release listed).
+  'this.interfaceUnlock.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.doomMeter.relocalize|',
+  // The chat box's geometry chrome (the tab strip's move label, the resize
+  // grip's name, the arrange-mode name chip, the mobile handle) is written
+  // once at init by ChatGeometryController; its relocalize() rewrites them.
+  'this.chatGeometry.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,
@@ -144,12 +150,6 @@ const FANOUT_ARMS: readonly string[] = [
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
-  'this.valeCupWindow.relocalize|',
-  'this.vcupBetting.relocalize|',
-  'this.vcupIndicator.relocalize|',
-  'this.vcupMatchHud.relocalize|',
-  'this.vcupBriefing.relocalize|',
-  'this.vcupCharge.relocalize|',
   'this.questDialog.relocalize|',
   'this.calendarWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
@@ -159,6 +159,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.barEditorWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
+  'this.bootcamp.relocalize|',
+  'this.noticeboardPopup.relocalize|',
+  'this.guildBoardWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
@@ -236,6 +239,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
   },
   {
+    file: 'bootcamp.ts',
+    memos: ['lastCounts'],
+    answer: 'this.bootcamp.relocalize',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
+  },
+  {
     file: 'arena_window.ts',
     memos: ['lastSig'],
     answer: 'this.arenaWindow.relocalize',
@@ -243,9 +252,20 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bank_window.ts',
-    memos: ['lastRenderedGuildView', 'lastRenderedTab', 'lastSig'],
+    // RE-POINTED at Bank Storage phase 18, and the two that left are worth the
+    // sentence. lastRenderedTab and lastRenderedGuildView are still FIELDS here
+    // and still scope the scroll restore, but this module no longer COMPARES
+    // them: the comparison moved into src/ui/bank_chrome_layout_core.ts, which
+    // the sweep does not reach (it declares no memo of its own and emits no
+    // text). By this file's own rule a memo is a repaint gate only where it is
+    // compared, so they correctly leave the classification. Nothing about the
+    // language answer moves with them, because the row's own reasoning already
+    // called them text-INDEPENDENT: they gate a scroll offset, never a string.
+    // The full gate is what noticed; no targeted suite, source pin or mutation
+    // battery in the phase could see it.
+    memos: ['lastSig'],
     answer: 'this.bankWindow.render',
-    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended), plus lastRenderedTab and lastRenderedGuildView, two text-independent pane latches that only scope the scroll restore. render() carries no self-gate, so the arm rebuilds',
+    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended). render() carries no self-gate, so the arm rebuilds',
   },
   {
     file: 'calendar_window.ts',
@@ -333,9 +353,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'woc_market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'paintedWalletSig'],
     answer: 'this.wocMarketWindow.relocalize',
-    why: 'the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature',
+    why: "the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature. paintedWalletSig is the Solana wallet card's locale-free connection and balance state that gates onWalletChanged(); the same render() repaints the card in the current language and re-latches the signature, so the one relocalize() arm answers both memos",
   },
   {
     file: 'professions_window.ts',
@@ -354,36 +374,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['knownIds', 'knownNums', 'lastAttackOnBar', 'lastHasFree', 'lastSlotIds'],
     answer: 'this.spellbookWindow.relocalize',
     why: 'the resolved ability ids and their rank/cost/cast/cooldown numbers, plus the hotbar toggle state (#2529)',
-  },
-  {
-    file: 'vale_cup_betting.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBetting.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and a skeleton of each team roster',
-  },
-  {
-    file: 'vale_cup_briefing.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBriefing.relocalize',
-    why: 'the two nation ids, the away-palette flag, the local team and role, the format and a skeleton of each roster',
-  },
-  {
-    file: 'vale_cup_hud.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupMatchHud.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and the local team, pipe-joined',
-  },
-  {
-    file: 'vale_cup_indicator.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupIndicator.relocalize',
-    why: 'a hidden sentinel or the bracket, queue position and waiting count. The clock is deliberately out of it and rides the elided setText instead',
-  },
-  {
-    file: 'vale_cup_window.ts',
-    memos: ['lastSig'],
-    answer: 'this.valeCupWindow.relocalize',
-    why: 'standing, queue state, bracket, position, queue sizes, the deserter timer, nation, role and the live match scores',
   },
 ];
 
@@ -406,10 +396,22 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly reason: string;
 }> = [
   {
+    file: 'movable_frame.ts',
+    memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
+    reason:
+      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor values (the game-styled var(--cursor-resize-*) tokens with their keyword fallbacks), which are never localized. lastHoverEdge is the FrameEdge id that cursor was set for (opposite edges share a cursor, so the elision compares both); an edge id is never text. lastBottom retains the frame bottom edge in visual px for reanchorBottom, a pure coordinate. Every MovableFrame label already rides the interface_unlock relocalize() fan-out arm; no memo holds text.',
+  },
+  {
     file: 'map_semantic_accessibility_core.ts',
     memos: ['lastHash', 'lastLanguage'],
     reason:
       'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
+  {
+    file: 'hud/quest/quest_tracker_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
     file: 'claudium_window.ts',
@@ -661,7 +663,19 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
 
   it('pins each classification to the memo fields it was made about', () => {
     const drift: string[] = [];
-    for (const row of ANSWERED) {
+    // BOTH classifications, which is the whole point of the row type's contract
+    // above: an exemption is granted about SPECIFIC fields. Running this over
+    // ANSWERED alone left the cheaper classification unchecked, so an EXEMPT
+    // module could grow a real data signature and inherit an exemption argued
+    // about two write-elision memos, with no red anywhere. Found in Bank Storage
+    // phase 15 QA, where daily_rewards_window.ts had grown exactly that.
+    // 'coordinator' is hud.ts's deliberate opt-out and is skipped by name.
+    const classified: ReadonlyArray<{ file: string; memos: readonly string[] | 'coordinator' }> = [
+      ...ANSWERED,
+      ...NOT_A_LANGUAGE_GATE,
+    ];
+    for (const row of classified) {
+      if (row.memos === 'coordinator') continue;
       const found = discoveredByFile.get(row.file);
       if (!found) continue; // reported by the stale-row test above
       if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
@@ -741,7 +755,15 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // localized summary without a separate fan-out arm. Each side of the
       // merge had added one row (woc_trade above, the map core here), so the
       // merged list carries both.
-    ).toBe(10);
+      // 11 as of the quest tracker's lastHtml repaint memo (the island coach
+      // glow strobe fix): the memo holds the freshly BUILT html, which
+      // embeds every t() string, so a locale switch moves the comparison
+      // itself and the tracker repaints with no fan-out arm.
+      // 12 as of the v0.41.0 sync merge, which folded in the edge-resize
+      // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
+      // cursor-keyword write and can never hold text; the frame's t() labels
+      // already ride the interface_unlock relocalize() arm.
+    ).toBe(12);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

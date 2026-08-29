@@ -98,6 +98,10 @@ const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const gamepadSettingsTs = readFileSync(
+  new URL('../src/game/gamepad_settings.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // A raw source pin is satisfied by a commented-out occurrence, so the pad pins
 // below read a comment-stripped view (the tests/pad_reel.test.ts idiom).
 const stripLineComments = (source: string) => source.replace(/^\s*\/\/.*$/gm, '');
@@ -386,7 +390,7 @@ describe('client HTML shell', () => {
   });
 
   it('keeps live graphics rebuilds bound to the existing world and online session', () => {
-    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const buildAt = mainTs.indexOf('buildRenderer: (_target, recycled) => {');
     const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);
@@ -1192,11 +1196,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
+    // Two Ko-fi taps per entry (the marketing donate-cta and the mobile
+    // drawer): the in-game community tray's third one left with the tray's
+    // GitHub/Donate links (owner request, the tray is wishlist-only now).
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(2);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1629,10 +1636,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
-  it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
+  it('carries a wishlist-only community tray in BOTH entries, with no duplicate Discord entry', () => {
+    // The tray's GitHub and Donate links were removed (owner request); the
+    // Steam wishlist chip is the tray's one remaining entry, and the
+    // homepage marketing links stay where they are.
     for (const entry of [html, playHtml]) {
-      expect(entry).toContain('<a class="community-link github"');
-      expect(entry).toContain('<a class="community-link donate"');
+      expect(entry).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+      expect(entry).not.toContain('<a class="community-link github"');
+      expect(entry).not.toContain('<a class="community-link donate"');
       expect(entry).not.toContain('<a class="community-link discord"');
     }
   });
@@ -1726,8 +1737,11 @@ describe('client HTML shell', () => {
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
     expect(html).toContain('<div class="community-tray">');
-    expect(html).toContain('<a class="community-link github"');
-    expect(html).toContain('<a class="community-link donate"');
+    // The tray is wishlist-only now (its GitHub/Donate links were removed,
+    // owner request); the marketing donate-cta above stays.
+    expect(html).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+    expect(html).not.toContain('<a class="community-link github"');
+    expect(html).not.toContain('<a class="community-link donate"');
     // No separate Discord invite link here: it duplicated the Discord (U)
     // icon-rail button (#mm-discord), the game HUD's single Discord entry
     // point (see the fix/inspect-camera-talent-overlap-discord-dup PR).
@@ -1783,6 +1797,19 @@ describe('client HTML shell', () => {
     expect(hudTs).not.toMatch(
       /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
     );
+  });
+
+  it('ships both death action groups as standalone controller-navigation surfaces', () => {
+    for (const [entry, source] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(source, entry).toMatch(
+        /<div id="death-overlay" data-pad-nav-root data-pad-nav-required>/,
+      );
+      expect(source, entry).toMatch(/<div id="ghost-prompt" data-pad-nav-root>/);
+    }
+    expect(hudCss).toContain('content: attr(data-gamepad-confirm-label);');
   });
 
   it('keeps desktop community links open after HUD clicks', () => {
@@ -2823,13 +2850,11 @@ describe('client HTML shell', () => {
     expect(mainTsCode).toContain(
       'const padTargetPick = createPadTargetPick({ world, interactKey });',
     );
-    // Pad mode is a body class only syncPadMode writes, and gamepad.stop() releases
-    // the pad without an onConnectionChange, so the Controller settings arm has to
-    // re-read it: otherwise turning the setting off leaves the desktop rows hidden
-    // behind a cross hotbar no longer driven by anything.
-    expect(mainTsCode).toMatch(
-      /else gamepad\.stop\(\);[\s\S]{0,400}?crossHotbar\.syncPadMode\(gamepad\);/,
-    );
+    // Pad mode is a body class only syncPadMode writes, and pad.stop() releases
+    // the pad without an onConnectionChange, so the extracted Controller settings
+    // arm has to re-read it: otherwise turning the setting off leaves the desktop
+    // rows hidden behind a cross hotbar no longer driven by anything.
+    expect(gamepadSettingsTs).toMatch(/else pad\.stop\(\);[\s\S]{0,100}?syncPadMode\(\);/);
     // The pad layout is per character, like the keybinds it is scoped alongside.
     expect(mainTsCode).toContain('createCrossHotbar(() => hud, keybindScope)');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');

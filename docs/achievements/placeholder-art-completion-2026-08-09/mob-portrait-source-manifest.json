@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "600c81bb2fa34ae7c136c570194e9cbc25b1cb7f2e3215fb373b2e38c5a9d16e",
+  "rendererFingerprint": "ba62c437c4b38f3db2078d29498d9b3a170a5051df5dbf569a692835cfc86484",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4243678,
-      "sha256": "c6f56cd36e6104d083fe8ddf2af6bbf148e98ec850ccbd6a39ce70ae2960f353",
+      "bytes": 4295455,
+      "sha256": "d3ab474c8a53b94e72d73058fac141df746d77414531c526f9d53a945755e87a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 233,
+  "portraitCount": 235,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3605,6 +3605,40 @@
       }
     },
     {
+      "id": "mister_crabs",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_crab",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crabenemy.glb",
+          "path": "public/models/creatures/crabenemy.glb",
+          "bytes": 62156,
+          "sha256": "8d3c9c7a231c9835a1ee618c18e27d4285c0d369bfac10a2ff9680400bd7b06b"
+        },
+        "idle": "Idle",
+        "height": 1.7,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#b0402a",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "d9b51b2795eccc1807d3ce2d9b9b8271f76204002d8ade7c3fca934916365625",
+      "output": {
+        "path": "public/ui/mobs/mister_crabs.webp",
+        "bytes": 2188,
+        "sha256": "0144ca1e8d307ebebd60c446f8ef79cdeb1d15e605f2dec3f13e4fe1fe27211e"
+      }
+    },
+    {
       "id": "mogger",
       "family": "humanoid",
       "finderEncounter": false,
@@ -6373,6 +6407,40 @@
       }
     },
     {
+      "id": "shore_scuttler",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_crab",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crabenemy.glb",
+          "path": "public/models/creatures/crabenemy.glb",
+          "bytes": 62156,
+          "sha256": "8d3c9c7a231c9835a1ee618c18e27d4285c0d369bfac10a2ff9680400bd7b06b"
+        },
+        "idle": "Idle",
+        "height": 1.7,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7a5a3a",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "5410bf927da41fef18efaec05fbd45e67553daa2cf80644d204ae2136d061cb4",
+      "output": {
+        "path": "public/ui/mobs/shore_scuttler.webp",
+        "bytes": 2062,
+        "sha256": "c1814ea7c7c3cd34fc945fccf93e897a3c70403b16b35a6435109d2f7c0d7e73"
+      }
+    },
+    {
       "id": "sister_nhalia",
       "family": "humanoid",
       "finderEncounter": false,
@@ -7352,6 +7420,40 @@
       }
     },
     {
+      "id": "training_effigy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9a7b4f",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e1dccb172f7d36ec3c89bf242071bfb6b0c7d567ff86f9d5df691bc9389b86c7",
+      "output": {
+        "path": "public/ui/mobs/training_effigy.webp",
+        "bytes": 1800,
+        "sha256": "de693348234dd4a095c914c069e5ab70f557c43170d80a65f3b79a701a73b252"
+      }
+    },
+    {
       "id": "treant_elder",
       "family": "elemental",
       "finderEncounter": false,
@@ -7525,40 +7627,6 @@
         "path": "public/ui/mobs/vale_bandit.webp",
         "bytes": 2200,
         "sha256": "fe6421e76d4ed57346fa78eb75bd2536ba30a4271b7192d9efd558bc6f16fa5a"
-      }
-    },
-    {
-      "id": "vale_cup_ball",
-      "family": "beast",
-      "finderEncounter": false,
-      "visualKey": "mob_wolf",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/wolf_basic.glb",
-          "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
-        },
-        "idle": "Idle",
-        "height": 1.6,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.35
-      },
-      "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#f4f4f4",
-        "strength": 0.35
-      },
-      "sourceFingerprint": "dd1d16f350606d3b9ddb4bf96c23c842b13aee182107232647f43d801bac859e",
-      "output": {
-        "path": "public/ui/mobs/vale_cup_ball.webp",
-        "bytes": 1984,
-        "sha256": "213697db841ff257a90bbfd29f44c208a3bc7a77f9f04eb2ea612810b9f73f57"
       }
     },
     {

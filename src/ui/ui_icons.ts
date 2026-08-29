@@ -49,6 +49,7 @@ export type UiIconName =
   | 'x'
   | 'kick'
   | 'youtube'
+  | 'steam'
   | 'donate'
   | 'chest'
   // hand-authored geometrics
@@ -70,7 +71,6 @@ export type UiIconName =
   | 'vibrate'
   | 'lock'
   | 'mail'
-  | 'ball'
   | 'book'
   | 'cards'
   | 'trash'
@@ -157,6 +157,11 @@ const ICONS: Record<UiIconName, string> = {
   // The same YouTube mark public/links.html draws inline for the project's channel.
   youtube:
     '<g transform="translate(16 16) scale(20)"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></g>',
+  // The Steam mark, reproduced monochrome for identification only (see CREDITS.md)
+  // on the same 24 x 24 artboard as the marks above for the wishlist reminder
+  // surfaces owned by steam_wishlist.ts.
+  steam:
+    '<g transform="translate(16 16) scale(20)"><path d="M11.979 0C5.678 0 .511 4.86 0 11.032l6.447 2.665c.545-.373 1.203-.59 1.91-.59.063 0 .125.002.188.005l2.866-4.154V8.9c0-2.501 2.034-4.534 4.534-4.534 2.5 0 4.533 2.034 4.533 4.534s-2.034 4.535-4.533 4.535h-.104l-4.089 2.92c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></g>',
   // The same filled heart the pre-game shell's Donate community link draws inline
   // (a 24 x 24 artboard), scaled and centered to fit the shared 0 0 512 512 viewBox.
   donate:
@@ -213,9 +218,7 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored sealed envelope (frame + flap V), distinct from the solid
   // `whisper` glyph so mail chrome and whisper actions stay tellable apart
   mail: '<path d="M48 128a32 32 0 0 1 32-32h352a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H80a32 32 0 0 1-32-32V128zm52 8 156 122 156-122H100zm312 50L288 296a52 52 0 0 1-64 0L100 186v190h312V186z"/>',
-  // hand-authored boarball (the Vale Cup): a stitched ball, ring + two seams
   // with cross-stitch ticks so it reads at micro-button size
-  ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36zM220 238h72v36h-72z"/>',
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',

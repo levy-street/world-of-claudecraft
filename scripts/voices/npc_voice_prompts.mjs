@@ -326,17 +326,6 @@ export const VOICE_PROMPTS = [
       'forgive a wandering hand, so I will tell you plain before you swear anything.',
   },
   {
-    npcId: 'groundskeeper_bram',
-    name: 'Groundskeeper Bram',
-    voiceDescription:
-      'Keeper of the village sporting field, deep field green: a broad, weather-cured country ' +
-      'baritone, gruff and grinning, the tone of a man who referees a rough game and enjoys it. ' +
-      'Rolling rural vowels, easy laugh, firm on the rules. Age 40s to 50s. Male.',
-    sampleText:
-      'The truce holds at the Sowfield: boots and shoulders only. Care to play for the Copper ' +
-      'Pail? Mind the rules and mind your elbows, and we will get along famously.',
-  },
-  {
     npcId: 'tinker_gizzel',
     name: 'Tinker Gizzel',
     voiceDescription:
@@ -743,6 +732,20 @@ export const VOICE_PROMPTS = [
       'Ferry lanterns do not go out in water. That is the point of them.',
   },
 
+  // -- The Proving Shore (src/sim/content/proving_shore.ts) -----------------
+  {
+    npcId: 'ferryman_odo',
+    name: 'Ferryman Odo',
+    voiceDescription:
+      'The tutorial island ferryman and guiding voice, sun-bleached pier: a warm, weathered OLD ' +
+      'male voice, seventies, gravel under real kindness, unhurried grandfatherly encouragement ' +
+      'with a soft coastal lilt. Every line lands like advice from someone who has ferried a ' +
+      'thousand newcomers across and liked every one of them. Age 70s. Male.',
+    sampleText:
+      'Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. ' +
+      'Follow it, and when the bell rings for you, I will be right here at the pier.',
+  },
+
   // -- The Willowfen, Bridgemere (src/sim/content/willowfen.ts) -------------
   {
     npcId: 'waykeeper_pell',
@@ -1054,6 +1057,38 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
+  // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
+  // than the same character recurring under a suffixed id: each borrows the
+  // designed voice whose role and register its own dialogue carries. Promote
+  // each to its own VOICE_PROMPTS entry once an ElevenLabs key is available to
+  // design and render it.
+  // Harbor guide greeting newcomers and pointing them to the crossing: the
+  // waycamp keeper's warm, unhurried, hospitable-without-fuss register.
+  wayfarer_bryn: 'waykeeper_pell',
+  // Proving Master running drills for the unsteady: the riding-trial
+  // stablemaster's drill-instructor bark with real fondness under it.
+  instructor_maren: 'stablemaster_marla',
+  // Camp outfitter rattling off bread, water, and a draught: the Highwatch
+  // quartermaster's brisk, no-nonsense inventory cadence.
+  quartermaster_finch: 'quartermaster_bree',
+  // ferryman_odo graduated to his own designed old-man voice (VOICE_PROMPTS
+  // above): he is the island's spoken guide, not a role borrow.
+  // The camp's Gilded Strongbox desk: Eastbrook's own bursar register, the
+  // same institutional voice the brand speaks with in every town.
+  bursar_wick: 'bursar_fernando',
+  // Keeper of the Gauntlet cheering a first run down his lanes: the Fenbridge
+  // warden's steady, patrol-worn encouragement.
+  warden_tam: 'warden_fenwick',
+  // Gauntlet Overseer clocking every run from the finish: the foreman's dry,
+  // seen-it-all worksite judgment.
+  overseer_pell: 'foreman_odell',
+  // Yard Master turning footwork into swordwork: the marshal's parade-ground
+  // bark, softened by a teacher's patience.
+  drillmaster_rook: 'marshal_redbrook',
+  // Keeper of the Strand tallying shells and salvage: the harbor captain's
+  // weathered, water-wise authority.
+  tidewarden_nel: 'captain_thessaly',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

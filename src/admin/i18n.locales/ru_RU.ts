@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ru_RU: Record<string, string> = {
+  'error.flagActiveExists': 'у этого аккаунта уже есть открытый флаг такого типа',
+  'wealth.largeMovementsUnavailable':
+    'крупные банковские операции не удалось загрузить (истекло время ожидания при чтении бухгалтерской книги); разбивка по золоту выше приведена полностью',
   'error.guildBankDeleting':
     'Эта гильдия удаляется, поэтому её банк закрыт. Ничего не было изменено.',
   'error.guildBankItemRequired':

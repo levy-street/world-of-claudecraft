@@ -25,8 +25,11 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // player 2yd south of its near (z = -10) face on heading 0 (+z) runs straight
 // into it, while heading PI (-z) is open ground to the south.
 const R = PLAYER_BODY_RADIUS;
-const START = { x: 11.0, z: -12.0 };
-const INTO_WALL = 0; // +z, into the building 2yd ahead
+// Re-anchored for the New Eastbrook rebuild (the harbor-town move,
+// docs/design/eastbrook-revamp/site-plan.md): the old origin-side building is
+// gone, so the fixture sits against a dig-flank building in the new town.
+const START = { x: -100.0, z: -77.0 };
+const INTO_WALL = 0; // +z, into the building 1yd ahead
 const AWAY = Math.PI; // -z, open ground to the south
 
 function fearAura(angle: number): Aura {

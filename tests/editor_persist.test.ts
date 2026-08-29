@@ -139,7 +139,7 @@ describe('CustomMap build + projection', () => {
     expect(world.props.ruinRings).toEqual(BUILTIN_WORLD.props.ruinRings);
     expect(world.props.delveMarkers).toEqual(BUILTIN_WORLD.props.delveMarkers);
 
-    const exteriorValeMine = BUILTIN_WORLD.props.mines.find(({ x, z }) => x === -88 && z === -68);
+    const exteriorValeMine = BUILTIN_WORLD.props.mines.find(({ x, z }) => x === -38 && z === 138);
     const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(
       ({ id }) => id === 'fenbridge_crooked_reed_inn',
     );
@@ -166,7 +166,7 @@ describe('CustomMap build + projection', () => {
     ).toBe(false);
     expect(world.props.stalls).toContainEqual(highwatchForge);
     expect(world.props.campfires).toContainEqual(templeCampfire);
-    expect(world.props.mines.find(({ x, z }) => x === -88 && z === -68)).not.toBe(exteriorValeMine);
+    expect(world.props.mines.find(({ x, z }) => x === -38 && z === 138)).not.toBe(exteriorValeMine);
     expect(world.props.stalls.find(({ x, z }) => x === -4.5 && z === 673.5)).not.toBe(
       highwatchForge,
     );

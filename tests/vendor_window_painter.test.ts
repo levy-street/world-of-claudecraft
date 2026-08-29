@@ -24,6 +24,17 @@ import { renderVendorWindow, type VendorWindowDeps } from '../src/ui/hud/vendor/
 
 const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
 
+// Blank out comments while preserving line structure, so a comment quoting a call
+// shape can neither satisfy a positive pin nor trip a negative one. Block comments
+// go FIRST (a JSDoc block quoting a call is otherwise left whole by a line-comment
+// pass), then line comments INCLUDING trailing ones; the [^:] guard keeps a '://'
+// in a URL from being read as a line comment. The stripComments precedent lives in
+// tests/pool_wiring_pins.test.ts and tests/architecture.test.ts.
+const stripComments = (src: string): string =>
+  src
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
 // Select a prompt button by its rendered accessible name, never by position:
 // a reorder of confirm/cancel must fail loudly here, not silently swap which
 // button a test clicks.
@@ -1110,13 +1121,46 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // The one cheap pin on the buyCustomMax wiring: the cap must come from
     // maxBuyCount over the LIVE inventory (never a cached view), and a stale
     // bundle's unknown id caps at 0 so the prompt floor-of-1 lets the server
-    // answer honestly.
+    // answer honestly. The pinned line moved in phase 05 because maxBuyCount
+    // became pool-aware: it now takes the two-pool split bagPools(this.sim.bags)
+    // where it took the flat this.sim.bagCapacity total, so a materials-only
+    // bag's slots can never inflate the cap the prompt shows for a non-material.
     const renderVendorStart = anchor('private renderVendor(): void {');
     expect(openHeroicVendorStart).toBeGreaterThan(renderVendorStart);
     const renderVendorBody = hud.slice(renderVendorStart, openHeroicVendorStart);
     expect(renderVendorBody).toContain(
-      'return def ? maxBuyCount(this.sim.inventory, this.sim.bagCapacity, def) : 0;',
+      'return def ? maxBuyCount(this.sim.inventory, bagPools(this.sim.bags), def) : 0;',
     );
+  });
+
+  it('the item tooltip derives its bag slot line from the shared bagSlotsLineKey leaf', () => {
+    // The bags_window aria call site carries the same pin in its own suite;
+    // this is the hud half. Hardcoding the plain key here would keep every
+    // test green while every materials-satchel tooltip reverted to the plain
+    // wording (the leaf's variant table lives in tests/bags_view.test.ts).
+    // Anchored to itemTooltip's own body like the renderVendor pin above: an
+    // unscoped whole-file toContain is satisfied by the same expression in an
+    // unrelated method, and the slice is comment-stripped so a line of prose
+    // quoting the call cannot stand in for the call itself.
+    const itemTooltipStart = anchor(
+      'private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {',
+    );
+    const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
+    expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);
+    const itemTooltipBody = stripComments(hud.slice(itemTooltipStart, itemProcBlockStart));
+    expect(itemTooltipBody).toContain('const slotsKey = bagSlotsLineKey(item);');
+    expect(itemTooltipBody).toContain('t(slotsKey, { slots: itemNumber(item.bagSlots) })');
+    // The render gate is pinned too, since the two lines above survive it being
+    // mutated to a constant false: the guard is what decides the line renders at
+    // all, and without it here every bag tooltip could silently lose the slots
+    // line with this suite (and every other) still green. Both conjuncts are
+    // load-bearing, per the source comment: `slotsKey` keeps the no-line
+    // behavior for a non-bag def, `item.bagSlots` narrows the number for
+    // itemNumber and keeps a slotless bag def silent. Matched as a
+    // whitespace-tolerant regex rather than an exact substring: what is
+    // load-bearing is the CONJUNCTION, and a Biome re-wrap of a longer line (or
+    // an added space) must not red a guard that never changed.
+    expect(itemTooltipBody).toMatch(/if\s*\(\s*slotsKey\s*&&\s*item\.bagSlots\s*\)/);
   });
 });
 

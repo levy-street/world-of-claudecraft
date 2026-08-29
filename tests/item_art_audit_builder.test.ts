@@ -746,6 +746,9 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
+    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
+    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
+    // rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -755,11 +758,11 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '33d4dbff43be4e9f8628756571bc1a0ff33ad8069b607979ba9fbacbdd6b9b6e',
-      catalogBytes: 451762,
+      catalogSha256: '691107c88450b6ef09fa36d12d4c330c602bcfddd08a70ce8d8dca72472ad2dd',
+      catalogBytes: 458_451,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 823,
-      liveItemCount: 838,
+      catalogCount: 836,
+      liveItemCount: 851,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -768,7 +771,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: 'cc5fc2f49d88532ef79bf342c0c56f14a798ff566f586dac55291ef44c88be87',
+      shippingCatalogSha256: '5b40b3ab9e6795e169f08b202829dc529690316d2251359539bfcaddc83cf0dd',
       machineChecksPassed: true,
       verdict: null,
     });

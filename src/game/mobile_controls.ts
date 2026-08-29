@@ -136,7 +136,6 @@ export interface MobileControlCallbacks {
   onArena(): void;
   onDungeonFinder(): void;
   /** Open the Vale Cup window (queue/roster board for the boarball minigame). */
-  onValeCup(): void;
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
@@ -533,7 +532,6 @@ export class MobileControls {
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
     this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());
-    this.bindButton('mobile-valecup', () => this.callbacks.onValeCup());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());

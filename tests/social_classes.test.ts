@@ -184,7 +184,12 @@ describe('nine classes', () => {
     p.maxHp = 500;
     p.hp = 500;
     wolf.hp = 60;
-    teleport(sim, p.id, wolf.pos.x + 35, wolf.pos.z);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the wolf camp moved to
+    // (-10, 6), putting the deliberately unmoved armoury on the +35 east
+    // firing line and silently blocking ranged LoS; shoot from the clear
+    // west side instead.
+    teleport(sim, p.id, wolf.pos.x - 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     face(sim, p.id, wolf.id);
     sim.startAutoAttack();

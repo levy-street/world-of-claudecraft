@@ -4,9 +4,14 @@
 // The chest prefers the real dungeon-kit GLB (chest_gold) when loaded and falls
 // back to procedural geometry otherwise. The grave/wall/crate props each
 // prefer a small Tripo-generated GLB (see public/models/props/CLAUDE.md), same
-// fallback contract. No DOM, no sim imports (render-only).
+// fallback contract. No DOM, sim imports limited to pure view predicates (render-only otherwise).
 
 import * as THREE from 'three';
+import {
+  isObjectOpenedByViewer,
+  type OpenedObjectEntity,
+  type OpenedObjectQuestRow,
+} from '../sim/quests/opened_object_view';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { delveInteractableVisible } from './delve_interactable_visibility_core';
@@ -867,16 +872,22 @@ function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; h
 // ---------------------------------------------------------------------------
 type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
 
-/** Apply the object-view visibility policy after a delve prop mesh is rebuilt. */
+/** Apply the object-view visibility policy after a delve prop mesh is
+ *  rebuilt. Takes the entity and the viewer's quest log so an interact
+ *  objective's already-credited ground object (an opened castaway crate)
+ *  renders as gone for THIS player while everyone else still sees it. */
 export function syncDelveInteractableVisibility(
   group: THREE.Object3D,
-  templateId: string | null,
-  lootable: boolean,
+  entity: OpenedObjectEntity & { templateId?: string | null; lootable: boolean },
+  questLog: ReadonlyMap<string, OpenedObjectQuestRow>,
   compilePending: boolean,
   withinPortalRange = true,
 ): boolean {
   const visible =
-    !compilePending && delveInteractableVisible(templateId, lootable) && withinPortalRange;
+    !compilePending &&
+    delveInteractableVisible(entity.templateId ?? null, entity.lootable) &&
+    withinPortalRange &&
+    !isObjectOpenedByViewer(entity, questLog);
   group.visible = visible;
   return visible;
 }

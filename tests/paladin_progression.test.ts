@@ -8,7 +8,10 @@ const GENERAL_LEVELS = {
   holy_light: 1,
   divine_ascension: 1,
   hammer_of_justice: 2,
-  hammer_of_grace: 3,
+  // Moved 3 -> 1 so a fresh paladin has an offensive press at all: their
+  // other level-1 buttons are a heal and a Devotion spender that does
+  // nothing at 0 Devotion (src/sim/content/paladin_core_abilities.ts).
+  hammer_of_grace: 1,
   devotion_ward: 4,
   dawn_devotion: 5,
   solar_step: 5,
@@ -120,7 +123,10 @@ describe('Paladin final progression', () => {
   // end state, so a future edit cannot quietly flatten it back.
   it('ramps the early damage curves instead of opening at full power', () => {
     const curves: Record<string, { levels: number[]; opening: number; peak: number }> = {
-      hammer_of_grace: { levels: [3, 8, 14], opening: 30, peak: 95 },
+      // Opens at 1 now (see GENERAL_LEVELS). The RAMP is what this test
+      // guards and it is untouched: the same three ranks, the same opening
+      // and peak numbers, two levels earlier.
+      hammer_of_grace: { levels: [1, 8, 14], opening: 30, peak: 95 },
       consecration: { levels: [5, 11, 16], opening: 9, peak: 22 },
       final_edict: { levels: [8, 13, 17], opening: 20, peak: 52 },
     };

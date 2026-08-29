@@ -38,8 +38,12 @@ function makePair(): { sim: Sim; rogue: Entity; ally: Entity; rogueId: number } 
   expect(sim.applyTalents({ spec: null, rows: { 5: 'rog_r5_shadeslip' } }, rogueId)).toBe(true);
   // +x from the origin is open ground on this seed out to 12 yd, so the step
   // is never refused for line of sight (which would mask the targeting gate).
-  teleport(sim, rogue, 0, 0);
-  teleport(sim, ally, 12, 0);
+  // Anchored at (200, 0) rather than the origin: the harbor-town move
+  // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) put the forest_wolf
+  // camp at (-10, 6) r28.5 and harbor structures over the old open ground, so
+  // origin-anchored rigs pick up wild aggro and line-of-sight refusals.
+  teleport(sim, rogue, 200, 0);
+  teleport(sim, ally, 212, 0);
   rogue.resource = rogue.maxResource;
   return { sim, rogue, ally, rogueId };
 }
@@ -63,10 +67,10 @@ describe('Shadeslip steps to friend or foe', () => {
 
   it('still steps to a hostile mob, unchanged', () => {
     const { sim, rogue, rogueId } = makePair();
-    const mob = createMob(31_000, MOBS.forest_wolf, 10, { x: 0, y: 0, z: 0 });
+    const mob = createMob(31_000, MOBS.forest_wolf, 10, { x: 200, y: 0, z: 0 });
     mob.hostile = true;
     (sim as unknown as SimInternals).addEntity(mob);
-    teleport(sim, mob, 10, 0);
+    teleport(sim, mob, 210, 0);
 
     sim.targetEntity(mob.id, rogueId);
     sim.castAbility('shadowstep', rogueId);

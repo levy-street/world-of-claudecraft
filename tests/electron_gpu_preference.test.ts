@@ -349,13 +349,95 @@ describe('hasExplicitOzonePlatformArg', () => {
   });
 });
 
+/** A fake sysfs: which card the firmware brought the screen up on, and each
+ *  card's PCI vendor; a card absent from the map has no PCI attributes, a card
+ *  without `vendor` has an unreadable vendor file. */
+function sysfs(cards: Record<string, { vendor?: string; bootVga: '0' | '1' }>) {
+  return (path: string, encoding: 'utf8'): string => {
+    expect(encoding).toBe('utf8');
+    const match = /^\/sys\/class\/drm\/(card\d+)\/device\/(boot_vga|vendor)$/.exec(path);
+    const card = match ? cards[match[1]] : undefined;
+    if (!match || !card) throw new Error(`ENOENT ${path}`);
+    if (match[2] === 'boot_vga') return `${card.bootVga}\n`;
+    if (card.vendor === undefined) throw new Error(`EACCES ${path}`);
+    return `${card.vendor}\n`;
+  };
+}
+
+const INTEL = '0x8086';
+const NVIDIA = '0x10de';
+const AMD = '0x1002';
+
 describe('isLinuxHybridGpu', () => {
-  it('is true when /sys/class/drm exposes two or more card devices', () => {
+  it('is true on a laptop whose integrated GPU drives the screen next to an NVIDIA card', () => {
     const readdir = (path: string) => {
       expect(path).toBe('/sys/class/drm');
       return ['card0', 'card0-eDP-1', 'card1', 'renderD128', 'renderD129', 'version'];
     };
-    expect(isLinuxHybridGpu(readdir)).toBe(true);
+    const laptop = sysfs({
+      card0: { vendor: INTEL, bootVga: '1' },
+      card1: { vendor: NVIDIA, bootVga: '0' },
+    });
+    expect(isLinuxHybridGpu(readdir, laptop)).toBe(true);
+  });
+
+  it('is false on a desktop where the NVIDIA card already drives the screen', () => {
+    // An Intel ARL iGPU left enabled next to an RTX 3090 on the screen
+    // (measured 2026-08-28): the offload env there fails every EGL display
+    // type ("Invalid visual ID requested") and Chromium disables the GPU.
+    const desktop = sysfs({
+      card1: { vendor: INTEL, bootVga: '0' },
+      card2: { vendor: NVIDIA, bootVga: '1' },
+    });
+    expect(isLinuxHybridGpu(() => ['card1', 'card2', 'renderD128', 'renderD129'], desktop)).toBe(
+      false,
+    );
+  });
+
+  it('keeps an AMD APU plus NVIDIA laptop, and an all-AMD hybrid, on the offload path', () => {
+    const cards = () => ['card0', 'card1'];
+    expect(
+      isLinuxHybridGpu(
+        cards,
+        sysfs({ card0: { vendor: AMD, bootVga: '1' }, card1: { vendor: NVIDIA, bootVga: '0' } }),
+      ),
+    ).toBe(true);
+    expect(
+      isLinuxHybridGpu(
+        cards,
+        sysfs({ card0: { vendor: AMD, bootVga: '1' }, card1: { vendor: AMD, bootVga: '0' } }),
+      ),
+    ).toBe(true);
+  });
+
+  it('falls back to the two-card rule when no card claims the screen or the files are unreadable', () => {
+    const cards = () => ['card0', 'card1'];
+    expect(
+      isLinuxHybridGpu(
+        cards,
+        sysfs({ card0: { vendor: INTEL, bootVga: '0' }, card1: { vendor: NVIDIA, bootVga: '0' } }),
+      ),
+    ).toBe(true);
+    expect(
+      isLinuxHybridGpu(cards, () => {
+        throw new Error('EACCES');
+      }),
+    ).toBe(true);
+    // A card without PCI attributes (a virtual device) is skipped, not fatal.
+    expect(
+      isLinuxHybridGpu(
+        () => ['card0', 'card1', 'card2'],
+        sysfs({ card2: { vendor: NVIDIA, bootVga: '1' } }),
+      ),
+    ).toBe(false);
+    // boot_vga claims the screen but the vendor file is unreadable: that card is skipped
+    // and the two-card rule decides.
+    expect(
+      isLinuxHybridGpu(
+        cards,
+        sysfs({ card0: { bootVga: '1' }, card1: { vendor: NVIDIA, bootVga: '0' } }),
+      ),
+    ).toBe(true);
   });
 
   it('is false on a single-GPU machine (render nodes and connectors do not count)', () => {

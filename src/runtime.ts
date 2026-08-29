@@ -151,6 +151,12 @@ export interface DesktopBridge {
   // Website-distributed desktop builds may connect external wallets. Steam
   // builds return false so wallet code and controls remain absent there.
   walletConnectionSupported?(): Promise<boolean>;
+  // Whether the $WOC Exchange may attach in this shell: true only when the
+  // main process proves the website distribution from its packaged stamp;
+  // Steam, Epic, and unstamped builds answer false. Absent on older shells:
+  // the Exchange gate treats absence as false (fail-closed), never as
+  // browser web. Feature-check before use like the other post-trio methods.
+  wocExchangeSupported?(): Promise<boolean>;
   // Signals that the link POST settled (success or failure) so the shell can
   // cancel the outstanding Steam auth ticket promptly (Valve's CancelAuthTicket
   // contract). Absent on older shells: feature-check before use.

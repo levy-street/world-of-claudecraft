@@ -45,7 +45,6 @@
 //   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (guild-wide view
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
-//   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
@@ -95,7 +94,6 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
-import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -116,13 +114,28 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
-// Online world-layout compatibility is encoded in the first WebSocket frame's
-// discriminator. Changing the authoritative town layout requires a new epoch:
-// the strict discriminator makes both rolling-deploy directions fail closed
-// before either binary loads a character into a differently shaped world.
+// Online world and required-snapshot compatibility is encoded in the first
+// WebSocket frame's discriminator. Changing the authoritative town layout or
+// a required snapshot shape requires a new epoch: the strict discriminator
+// makes both rolling-deploy directions fail closed before either binary loads
+// a character into an incompatible world.
 // 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
 // disagree about the authoritative resource carrier, so they must fail closed.
-export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
+// 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
+// (new coast lobe, dig terrain stamp, moved camps/props/veins and colliders;
+// docs/design/eastbrook-revamp/master-plan.md). Numbered 7 on the pre-merge
+// eastbrook branch, which forked before the Fate Threads bump.
+// 9 = phase 0b of the same program: the dig headland reverts to open sea (the
+// ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
+// the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
+// land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
+// 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
+// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
+// rejected before the new client can consume the old six-field snapshot.
+// 11 = Materials Vault snapshots require the identity-preserving `special`
+// collection. An epoch-10 client can neither render nor select those rows, and
+// an epoch-10 server would omit them, stranding deposited special materials.
+export const ONLINE_WORLD_LAYOUT_VERSION = 11 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -156,7 +169,7 @@ export type {
   ActionBarLayoutRestore,
   ActionBarSlotAction,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo } from './world_api/bank';
+export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
@@ -243,6 +256,8 @@ export type {
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
+  GuildRosterEntry,
+  GuildRosterInfo,
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
@@ -258,24 +273,14 @@ export type {
   GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
+  GuildPledgeInfo,
+  GuildPledgeSettings,
   GuildRank,
+  MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
-export type {
-  CupInfo,
-  VcBetInfo,
-  VcBetRecord,
-  VcBoardEntry,
-  VcLiveMatch,
-  VcMatchInfo,
-  VcPhase,
-  VcRosterPlayer,
-  VcSharedCupInfo,
-  VcStanding,
-  VcViewerReadout,
-} from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -308,7 +313,6 @@ export interface IWorld
     IWorldProfessions,
     IWorldBank,
     IWorldGuildBank,
-    IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
@@ -426,6 +430,10 @@ export const COMMAND_NAMES = [
   'guild_kick',
   'guild_promote',
   'guild_demote',
+  'guild_pledge',
+  'guild_pledge_withdraw',
+  'guild_pledge_decide',
+  'guild_pledge_settings',
   'guild_transfer',
   'guild_disband',
   'arena_queue',
@@ -486,12 +494,6 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
-  'vcup_queue',
-  'vcup_leave',
-  'vcup_role',
-  'vcup_ready',
-  'vcup_bet',
-  'vcup_practice',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',
@@ -619,6 +621,39 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // The Materials Vault: the per-material, gold-upgraded material store beside the
+  // personal slot bank (src/sim/materials_vault.ts). Appended at the END because
+  // wire tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. `slot` is a carried-inventory index
+  // and `count` optional (the bank_* wire idiom); withdraw is keyed by `itemId`
+  // instead, because the vault has no slots to index. The Sim owns every gameplay
+  // rule (banker proximity, material scope, per-material cap, exact copper).
+  'vault_deposit',
+  'vault_withdraw',
+  'vault_buy_upgrade',
+  // The vault's batched deposit-all sweep (Bank Storage Phase 03): ONE
+  // server-side command, argument-free, so even a full carried sweep (112
+  // slots at the phase 05 bag ceiling) costs one
+  // command-lane token and one batched ledger write instead of a send per
+  // slot. Appended at the END because wire tokens are never reordered.
+  'vault_deposit_all',
+  // Bank bag sockets (Bank Storage phase 07): the three socket commands the
+  // phase 06 sim bodies gate (unlock in order for exact copper; socket a
+  // CARRIED payload-free bag, `item` + optional integer `socket` + optional
+  // integer `slot` naming the exact carried copy, the equip_bag wire shape
+  // verbatim; unsocket by integer `socket`). Appended at the END because wire
+  // tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. The Sim owns every gameplay rule
+  // (banker proximity, unlock order and price, the payload peek, the
+  // carried-side unsocket fit); dispatch is shape-only in server/bank_wire.ts.
+  'bank_unlock_socket',
+  'bank_socket_bag',
+  'bank_unsocket_bag',
+  // The tutorial greeting's accept: the ferry ride to the Proving Shore
+  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
+  // life, and band server-side). Appended because wire tokens are never
+  // reordered.
+  'tutorial_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -696,7 +731,6 @@ export type WorldFacet =
   | 'IWorldTelemetry'
   | 'IWorldBank'
   | 'IWorldGuildBank'
-  | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
@@ -835,6 +869,10 @@ export const COMMAND_FACETS = {
   ignore_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
+  guild_pledge: 'IWorldSocialGraph',
+  guild_pledge_withdraw: 'IWorldSocialGraph',
+  guild_pledge_decide: 'IWorldSocialGraph',
+  guild_pledge_settings: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',
   guild_decline: 'IWorldSocialGraph',
   guild_leave: 'IWorldSocialGraph',
@@ -849,6 +887,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  lock_item: 'IWorldInventory',
   market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
@@ -889,6 +928,19 @@ export const COMMAND_FACETS = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // The Materials Vault rides the SAME facet as the personal bank (same bursars,
+  // same proximity gate); vaultInfo is a proximity-gated snapshot read (no send,
+  // untagged), exactly like bankInfo above.
+  vault_deposit: 'IWorldBank',
+  vault_withdraw: 'IWorldBank',
+  vault_buy_upgrade: 'IWorldBank',
+  vault_deposit_all: 'IWorldBank',
+  // The bank bag sockets ride the SAME facet again (same bursars, same
+  // proximity gate; Bank Storage phase 07); the socket readouts ride the
+  // bankInfo snapshot read above (no send, untagged).
+  bank_unlock_socket: 'IWorldBank',
+  bank_socket_bag: 'IWorldBank',
+  bank_unsocket_bag: 'IWorldBank',
   // IWorldGuildBank: the officer-plus shared guild treasury + item store
   // (snake_case wire strings, by design; its OWN tokens, never a bank_* reuse).
   // guildBankInfo is a proximity + rank gated snapshot read (no send, untagged).
@@ -898,14 +950,6 @@ export const COMMAND_FACETS = {
   guild_bank_withdraw: 'IWorldGuildBank',
   guild_bank_buy_slots: 'IWorldGuildBank',
   guild_bank_log: 'IWorldGuildBank',
-  // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
-  // send); vcup_practice starts a private instanced practice bout (online + off).
-  vcup_queue: 'IWorldValeCup',
-  vcup_leave: 'IWorldValeCup',
-  vcup_role: 'IWorldValeCup',
-  vcup_ready: 'IWorldValeCup',
-  vcup_bet: 'IWorldValeCup',
-  vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
   // summoning one is an item use (use_item), not a mount command.

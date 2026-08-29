@@ -2445,7 +2445,20 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'ps_castaway_crate',
+  'ps_ferry_bell',
   'dawnhold_posy',
+  'wayfarers_backpack',
+  'burlap_reagent_pouch',
+  'necromancers_reagent_satchel',
+  'duskweave_bag',
+  'resonant_weave_bag',
+  'foragers_haversack',
+  'loombound_reagent_satchel',
+  'ps_briny_lure',
+  'ps_lustrous_pearl',
+  'mother_of_pearl',
+  'ps_passing_stone',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2574,7 +2587,24 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  // The Proving Shore (tutorial island), same English-appended treatment.
+  ps_castaway_crate: 'Castaway Crate',
+  ps_ferry_bell: 'Ferry Bell',
   dawnhold_posy: 'Dawnhold Garden Posy',
+  // The phase 05 bag catalog. English-appended like the quivers above until the
+  // release fill folds them into the per-locale arrays.
+  wayfarers_backpack: "Wayfarer's Backpack",
+  burlap_reagent_pouch: 'Burlap Reagent Pouch',
+  necromancers_reagent_satchel: "Necromancer's Reagent Satchel",
+  duskweave_bag: 'Duskweave Bag',
+  resonant_weave_bag: 'Resonantweave Bag',
+  foragers_haversack: "Forager's Haversack",
+  loombound_reagent_satchel: 'Loombound Reagent Satchel',
+  // The Proving Shore's pearl detour (q_ps_mother_of_pearl).
+  ps_briny_lure: 'Briny Lure',
+  ps_lustrous_pearl: 'Lustrous Pearl',
+  mother_of_pearl: 'Mother of Pearl',
+  ps_passing_stone: 'Passing Stone',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

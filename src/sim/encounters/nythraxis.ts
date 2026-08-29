@@ -59,6 +59,7 @@ import {
   type Vec3,
   YELL_RANGE,
 } from '../types';
+import { summonQuestMob } from './quest_summon';
 
 const NYTHRAXIS_RELIC_SUMMONS: Record<string, string> = {
   captains_crest: 'fallen_captain_aldren',
@@ -1619,43 +1620,7 @@ export function summonQuestVision(ctx: SimContext, itemId: string, pos: Vec3): n
   return mob.id;
 }
 
-export function summonQuestMob(
-  ctx: SimContext,
-  templateId: string,
-  pos: Vec3,
-  ownerPid: number,
-): void {
-  const existing = [...ctx.entities.values()].some(
-    (e) => e.kind === 'mob' && e.templateId === templateId && !e.dead && dist2d(e.pos, pos) < 18,
-  );
-  if (existing) return;
-  const template = MOBS[templateId];
-  if (!template) return;
-  const mob = createMob(ctx.nextId++, template, template.maxLevel, ctx.groundPos(pos.x, pos.z + 3));
-  mob.facing = Math.PI;
-  mob.prevFacing = mob.facing;
-  mob.tappedById = ownerPid;
-  ctx.addEntity(mob);
-  const owner = ctx.entities.get(ownerPid);
-  if (owner && owner.kind === 'player' && !owner.dead) ctx.aggroMob(mob, owner, false);
-  const inst = ctx.instances.find((i) => {
-    if (i.partyKey === null) return false;
-    const origin = ctx.instanceOriginOf(i);
-    return Math.abs(mob.pos.x - origin.x) < 120 && Math.abs(mob.pos.z - origin.z) < 250;
-  });
-  if (inst) inst.mobIds.push(mob.id);
-  ctx.emit({ type: 'log', text: `${template.name} awakens!`, color: '#ff6666' });
-  emitQuestMobDialogue(ctx, templateId, mob.id);
-}
-
-export function emitQuestMobDialogue(ctx: SimContext, templateId: string, entityId: number): void {
-  const text =
-    templateId === 'fallen_captain_aldren'
-      ? 'Fallen Captain Aldren yells, "None shall disturb the king\'s rest! For Thornpeak!"'
-      : templateId === 'corrupted_priest_malric'
-        ? 'Corrupted Priest Malric yells, "Death shall never claim my king! The ritual must endure!"'
-        : templateId === 'deathstalker_voss'
-          ? 'Deathstalker Voss yells, "You will not reach him! The king must endure!"'
-          : null;
-  if (text) ctx.emit({ type: 'log', text, color: '#ff9999', entityId });
-}
+// summonQuestMob and emitQuestMobDialogue moved to quest_summon.ts (shared
+// with the Proving Shore's tide-pool summon); re-exported for existing
+// importers.
+export { emitQuestMobDialogue, summonQuestMob } from './quest_summon';

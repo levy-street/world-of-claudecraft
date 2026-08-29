@@ -48,6 +48,7 @@ import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -1803,7 +1804,7 @@ function spendAbilityCost(
   p: Entity,
   meta: PlayerMeta,
   res: ResolvedAbility,
-  target: Entity | null = null,
+  _target: Entity | null = null,
 ): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
   if (res.def.devotionCost) spendDevotion(p, res.def.devotionCost);
@@ -2297,11 +2298,6 @@ const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
   'feralCharge',
   'blinkForward',
   'repositionToAim',
-  'ballKick',
-  'ballPass',
-  'ballShoot',
-  'sportDash',
-  'sportShove',
 ]);
 
 function applyAbility(
@@ -2712,6 +2708,11 @@ function applyAbility(
             ability: ability.name,
             kind: 'resist',
           });
+          // A resisted bolt never reaches runEffects, but the player still
+          // pressed the button the island asked for, so the drill credits
+          // here too. Without this the lesson stalls on an unlucky roll and
+          // the coach keeps asking for a press that already happened.
+          creditAbilityDrill(ctx, src, tgt, ability.id);
           ctx.enterCombat(src, tgt);
           restoreStormcastReservation(ctx, src, stormcastReservation);
           return;

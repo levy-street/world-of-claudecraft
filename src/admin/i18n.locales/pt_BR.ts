@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pt_BR: Record<string, string> = {
+  'error.flagActiveExists': 'esta conta já possui uma sinalização em aberto desse tipo',
+  'wealth.largeMovementsUnavailable':
+    'não foi possível carregar as movimentações bancárias de grande valor (a leitura do registro expirou); o detalhamento de ouro acima está completo',
   'error.guildBankDeleting':
     'Esta guilda está sendo excluída, então seu banco está fechado. Nada foi alterado.',
   'error.guildBankItemRequired': 'Informe o id do item que você espera encontrar nesse espaço.',

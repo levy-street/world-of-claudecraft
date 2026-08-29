@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
+  BAG_RECIPES,
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -432,6 +433,7 @@ describe('craftItem command (#1127)', () => {
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
+      ...BAG_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -442,7 +444,8 @@ describe('craftItem command (#1127)', () => {
         TOOL_EFFECT_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
-        LADDER_RECIPES.length,
+        LADDER_RECIPES.length +
+        BAG_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

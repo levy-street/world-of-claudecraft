@@ -9,6 +9,22 @@ import type { SimEvent } from '../src/sim/types';
 // hand-assembled sendRaw frame broadcastSnapshots already builds (head + ents.join(',')
 // + ...), applied to the events frame.
 
+// Drop the consumer-less events BEFORE the once-per-batch serialization.
+// vaultCraftConsume is server-side evidence only, with no client consumer
+// since the reservation journal replaced the observer (see
+// emitVaultCraftConsume): without this filter every batch paid a
+// JSON.stringify for an event every recipient then skipped. DELIBERATE side
+// effect this shares with the per-session skip it replaced: vaultCraftConsume
+// never reaches botDetector.observeEvent either; the detector reads
+// player-visible behavior, and this event is duplicate server-side evidence
+// of a craft the detector already observes through the craft command itself.
+// The some() guard keeps the common no-craft tick allocation-free.
+export function filterRoutableEvents(events: readonly SimEvent[]): readonly SimEvent[] {
+  return events.some((ev) => ev.type === 'vaultCraftConsume')
+    ? events.filter((ev) => ev.type !== 'vaultCraftConsume')
+    : events;
+}
+
 // JSON-stringify each event in a batch exactly once. The returned array is
 // index-aligned with `events`, so a per-session pass selects fragments by the same
 // index it would have selected the event. Call this AFTER any once-per-batch mutation

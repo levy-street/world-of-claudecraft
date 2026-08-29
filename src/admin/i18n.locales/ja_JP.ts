@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'error.flagActiveExists': 'このアカウントには、その種類の未処理のフラグがすでにあります。',
+  'wealth.largeMovementsUnavailable':
+    '大規模な銀行の動きを読み込めませんでした（台帳の読み取りがタイムアウトしました）。上記の金の内訳は完全です。',
   'error.guildBankDeleting':
     'このギルドは削除処理中のため、銀行は閉鎖されています。変更は行われませんでした。',
   'error.guildBankItemRequired': 'そのスロットに入っているはずのアイテムIDを入力してください。',

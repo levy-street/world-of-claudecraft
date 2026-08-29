@@ -344,7 +344,7 @@ describe('unstuck countdown and cancellation', () => {
     });
   });
 
-  it('keeps the hidden cooldown through Vale Cup practice reset and a relog', () => {
+  it('hides the retry cooldown from the /cooldowns readout, before and after a relog', () => {
     const sim = makeWedgedWorld();
     const { pid, player } = accepted(sim);
 
@@ -354,20 +354,13 @@ describe('unstuck countdown and cancellation', () => {
       .find((event): event is Extract<SimEvent, { type: 'error' }> => event.type === 'error');
     expect(readout?.text).toBe('No abilities are on cooldown.');
     expect(readout?.text).not.toContain(UNSTUCK_COOLDOWN_ID);
+    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_RETRY_SECONDS);
 
-    sim.vcupPracticeStart(1, pid);
-    expect(sim.vcup.practices).toHaveLength(1);
-    const afterPracticeReset = required(
-      player.cooldowns.get(UNSTUCK_COOLDOWN_ID),
-      'practice-preserved unstuck cooldown',
-    );
-    expect(afterPracticeReset).toBe(UNSTUCK_RETRY_SECONDS);
-
-    const state = required(sim.serializeCharacter(pid), 'practice character state');
+    const state = required(sim.serializeCharacter(pid), 'hidden-cooldown character state');
     const restored = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
     const restoredPid = restored.addPlayer('warrior', 'Wayfinder', { state });
-    const restoredPlayer = required(restored.entities.get(restoredPid), 'restored practice player');
-    expect(restoredPlayer.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(afterPracticeReset);
+    const restoredPlayer = required(restored.entities.get(restoredPid), 'restored hidden player');
+    expect(restoredPlayer.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_RETRY_SECONDS);
 
     restored.drainEvents();
     restored.chat('/cooldowns', restoredPid);

@@ -49,7 +49,6 @@ function makeCtx(
     entities,
     cardDuelQueue: [] as number[],
     cardDuels: new Map(),
-    vcup: { botPids: [] as number[] },
     bumpDeedStat,
     error,
     emit,
@@ -103,7 +102,6 @@ describe('card_duel', () => {
       entities,
       cardDuelQueue: [] as number[],
       cardDuels: new Map(),
-      vcup: { botPids: [] as number[] },
       bumpDeedStat: vi.fn(),
       error,
       emit: vi.fn(),
@@ -514,10 +512,10 @@ describe('card_duel', () => {
     expect(cardDuelMatchFor(ctx, 1)).toBeNull();
   });
 
-  it('cardMinigameAvailable ignores Fiesta/Vale Cup bots (offline bot matches must not fake availability)', () => {
+  it('cardMinigameAvailable ignores Fiesta bots (offline bot matches must not fake availability)', () => {
     const { ctx, error } = makeCtx();
     (ctx.players.get(2) as unknown as { isFiestaBot?: boolean }).isFiestaBot = true;
-    ctx.vcup.botPids.push(3);
+    (ctx.players.get(3) as unknown as { isFiestaBot?: boolean }).isFiestaBot = true;
     // Only pids 2 and 3 exist besides 1, and both are bots: no queueable
     // human opponent exists, so joining must still be refused.
     joinCardMinigameQueue(ctx, 1);
@@ -549,6 +547,7 @@ describe('card_duel.ts source: no ?? English-literal fallback inside a template 
     'utf8',
   );
 
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: the title names the banned template pattern literally.
   it('has no `${... ?? \'literal\'}` or `${... ?? "literal"}` pattern', () => {
     const bannedInTemplate = /\$\{[^}]*\?\?\s*(['"])[^'"]*\1[^}]*\}/g;
     const hits = [...src.matchAll(bannedInTemplate)].map((m) => m[0]);

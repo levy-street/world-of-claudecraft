@@ -58,6 +58,13 @@ function harness(slots: InvSlot[]): HTMLElement {
     bonusSlots: 0,
     nextExpansionCost: 500,
     bonusSources: [],
+    socketsUnlocked: 0,
+    socketBags: [null, null, null, null],
+    nextSocketCost: 1000000,
+    generalCapacity: 24,
+    materialsCapacity: 0,
+    generalUsed: 0,
+    materialsUsed: 0,
   };
   const world = {
     bankInfo: personal,

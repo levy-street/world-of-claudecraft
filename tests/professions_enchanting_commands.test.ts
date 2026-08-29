@@ -290,6 +290,11 @@ describe('offline Sim enchanting commands: replay + cast pace', () => {
 // tests/professions_training_online.test.ts + tests/snapshots.test.ts.
 // ---------------------------------------------------------------------------
 const FIELD_POS = { x: 0, z: 150 };
+/** Mirrors server/game.ts HEAVY_SELF_REFRESH_TICKS (not exported): the ~2 s
+ *  self-snapshot backstop, staggered per session as `(tickCount + pid) % N`.
+ *  Pinned as a literal here so a change to the server cadence surfaces as a
+ *  failure in the enchantResult heavy-self pin below. */
+const HEAVY_SELF_REFRESH_TICKS = 40;
 
 function fakeWs(): { sent: { t: string; list?: SimEvent[]; [k: string]: unknown }[]; ws: unknown } {
   const sent: { t: string; list?: SimEvent[] }[] = [];
@@ -661,6 +666,16 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     }
     expect(lastInvFrom(controlFrom), 'negative control: no dirty, no inv re-send').toBeNull();
 
+    // ESTABLISH the staggered-refresh precondition instead of asserting it and
+    // hoping. `(tickCount + pid) % HEAVY_SELF_REFRESH_TICKS` is a 1-in-40
+    // lottery over a pid that MOVES whenever content adds a construction-time
+    // entity, so a pure assertion turns red on an unrelated content append (it
+    // did, on the v0.39.0 base merge). Only flushEnchantFamilyCast ticks between
+    // here and the measured broadcast, so the projected tick is exactly +1;
+    // stepping one extra tick NOW is free because the negative control above
+    // just proved there is no pending dirty state to disturb.
+    if ((server.sim.tickCount + 1 + st.pid) % HEAVY_SELF_REFRESH_TICKS === 0) routeTick(server);
+
     const beforeCmd = fc.sent.length;
     cmd(server, st, {
       cmd: 'apply_enchant',
@@ -689,9 +704,10 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     // aside, only enchantResult's HEAVY_SELF_EVENTS membership can re-send inv.
     const session = st as unknown as { lastWireRev: number };
     session.lastWireRev = metaOf(server, st.pid).wireRev;
-    // 40 = server/game.ts HEAVY_SELF_REFRESH_TICKS (not exported); pinned as a
-    // literal so a change to the backstop cadence surfaces here.
-    expect((server.sim.tickCount + st.pid) % 40).not.toBe(0);
+    // Still asserted, now as a guard the step above guarantees: if the backstop
+    // cadence ever changes, HEAVY_SELF_REFRESH_TICKS stops matching the server
+    // and this reds rather than silently measuring the wrong trigger.
+    expect((server.sim.tickCount + st.pid) % HEAVY_SELF_REFRESH_TICKS).not.toBe(0);
     const afterFrom = fc.sent.length;
     broadcast(server);
     const lastInv = lastInvFrom(afterFrom);

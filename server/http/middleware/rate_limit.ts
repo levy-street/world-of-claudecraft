@@ -50,6 +50,7 @@ import {
   STEAM_LINK_MAX_PER_MINUTE,
   seekerSpinVerifyRateLimited,
   steamLinkRateLimited,
+  WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
@@ -60,6 +61,7 @@ import {
   WOC_MARKET_READ_MAX_PER_MINUTE,
   WOC_MARKET_STEPUP_MAX_PER_MINUTE,
   type WocMarketMutationAction,
+  walletHandoffResultRateLimited,
   walletLinkRateLimited,
   wocBalanceRateLimited,
   wocMarketMutationRateLimited,
@@ -262,6 +264,15 @@ export const WALLET_LINK_POLICY: RateLimitPolicy = {
   limit: WALLET_LINK_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => walletLinkRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+export const WALLET_HANDOFF_RESULT_POLICY: RateLimitPolicy = {
+  name: 'wallet_handoff_result',
+  keyClass: 'ip+account',
+  limit: WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => walletHandoffResultRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

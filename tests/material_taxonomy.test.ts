@@ -419,12 +419,15 @@ describe('isMaterialItem', () => {
   });
 });
 
-describe('no src/sim importer (the module-evaluation hard rule)', () => {
+describe('no src/sim importer (presentation-only taxonomy scope)', () => {
   // Two sim leaves carry the identical UI-only contract: material_taxonomy
   // (this file's module) and material_profession_affinity (same hazard class,
   // its header defers enforcement here). One walk guards both.
   // liveImporter is the known consumer outside src/sim that keeps the regex
   // honest as a positive control.
+  // material_ids.ts is the sim-safe canonical registry. This compatibility
+  // module remains presentation-only so production sim code cannot grow a
+  // dependency on an ItemDef-oriented UI predicate.
   const GUARDED_MODULES = [
     { name: 'material_taxonomy', liveImporter: '../src/ui/bag_filter.ts' },
     {
@@ -474,11 +477,8 @@ describe('no src/sim importer (the module-evaluation hard rule)', () => {
   });
 
   it('no src/sim file other than each module itself imports it', () => {
-    // Both modules derive at module evaluation by reading content tables; a
-    // content-side importer would pull that derive inside the tables' own
-    // evaluation cycle, where load order decides between a crash and a clean
-    // run (each module header states the rule), so only a static scan catches
-    // it reliably.
+    // Both modules are presentation classifiers. A static scan keeps the sim
+    // on its id-based/domain seams rather than importing UI-oriented helpers.
     const simRoot = fileURLToPath(new URL('../src/sim', import.meta.url));
     const guards = GUARDED_MODULES.map(({ name }) => ({
       re: importerReFor(name),

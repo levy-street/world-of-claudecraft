@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
 
@@ -76,13 +75,15 @@ function moteSprite(): THREE.Texture {
   const s = 32;
   const cv = document.createElement('canvas');
   cv.width = cv.height = s;
-  const g = cv.getContext('2d')!;
-  const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(0.4, 'rgba(255,255,255,0.5)');
-  grad.addColorStop(1, 'rgba(255,255,255,0)');
-  g.fillStyle = grad;
-  g.fillRect(0, 0, s, s);
+  const g = cv.getContext('2d');
+  if (g) {
+    const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.4, 'rgba(255,255,255,0.5)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, s, s);
+  }
   const tex = new THREE.CanvasTexture(cv);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
@@ -119,7 +120,6 @@ export function buildMotes(seed: number): MotesView {
     const x = px + Math.cos(ang) * r;
     const z = pz + Math.sin(ang) * r;
     if (Math.abs(x) > WORLD_MAX_X - 8 || z < WORLD_MIN_Z + 8 || z > WORLD_MAX_Z - 8) return false;
-    if (isInSowfieldShell(x, z)) return false; // no pollen drifting over the mown pitch
     const biome = zoneBiomeAt(x, z);
     if (MOTELESS_BIOMES.has(biome)) return false; // these realms drift no motes
     const h = terrainHeight(x, z, seed);

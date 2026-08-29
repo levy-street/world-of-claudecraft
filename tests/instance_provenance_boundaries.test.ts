@@ -189,9 +189,13 @@ describe('provenance survives every container boundary', () => {
     // through the bank commands above.
     const bags: InvSlot[] = [fullSlot()];
     const store: InvSlot[] = [];
-    expect(moveBetweenContainers(bags, 0, undefined, store, 40).moved).toBe(1);
+    expect(
+      moveBetweenContainers(bags, 0, undefined, store, { general: 40, materials: 0 }).moved,
+    ).toBe(1);
     expectFullyMarked(store[0], 'moveBetweenContainers out');
-    expect(moveBetweenContainers(store, 0, undefined, bags, 40).moved).toBe(1);
+    expect(
+      moveBetweenContainers(store, 0, undefined, bags, { general: 40, materials: 0 }).moved,
+    ).toBe(1);
     expectFullyMarked(bags[0], 'moveBetweenContainers back');
   });
 

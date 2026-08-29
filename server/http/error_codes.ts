@@ -103,6 +103,10 @@ export const ERROR_CODES = deepFreeze({
   'character.rename_not_permitted': { params: [] },
   // identity: "type the character name to confirm deletion"
   'character.delete_confirm': { params: [] },
+  // identity: an open paid storage purchase must settle before character deletion
+  'character.storage_purchase_open': { params: [] },
+  // identity: the realm background gate refused the delete; retry in a moment
+  'character.delete_busy': { params: [] },
   // identity: "character already in world"
   'character.already_in_world': { params: [] },
   // identity: "character taken over"
@@ -179,6 +183,9 @@ export const ERROR_CODES = deepFreeze({
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
   'deeds.invalid_input': { params: [] },
+  // The public guild roster read (server/guild_roster.ts).
+  'guilds.invalid_roster_name': { params: [] },
+  'guilds.unknown': { params: [] },
 
   // --- Steam link family codes (server/steam/). The whole surface is
   // env-gated: with STEAM_ENABLED unset every route answers steam.disabled.

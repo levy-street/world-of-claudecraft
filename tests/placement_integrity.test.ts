@@ -85,7 +85,6 @@ describe('placement categories are classified', () => {
       'escortRoute',
       'poi',
       'deckRoot',
-      'valeCup',
     ]) {
       expect(categories.has(required), `roster lost the ${required} category`).toBe(true);
     }

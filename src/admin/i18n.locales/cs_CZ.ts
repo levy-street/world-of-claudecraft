@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const cs_CZ: Record<string, string> = {
+  'error.flagActiveExists': 'tento účet už má otevřený příznak tohoto druhu',
+  'wealth.largeMovementsUnavailable':
+    'velké bankovní pohyby se nepodařilo načíst (čtení z účetní knihy vypršelo); rozpis zlata výše je úplný',
   'error.guildBankDeleting': 'Tento cech se maže, takže jeho banka je uzavřená. Nic se nezměnilo.',
   'error.guildBankItemRequired': 'Zadej ID předmětu, který má být v tomto slotu.',
   'error.guildBankNoCarrier':

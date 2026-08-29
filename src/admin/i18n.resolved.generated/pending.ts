@@ -11,84 +11,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "es_ES": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "fr_FR": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "fr_CA": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "en_CA": [],
   "it_IT": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "de_DE": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "zh_CN": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "zh_TW": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ko_KR": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ja_JP": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "pt_BR": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "ru_RU": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "cs_CZ": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "nl_NL": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "pl_PL": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "id_ID": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "tr_TR": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "sv_SE": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "vi_VN": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ],
   "da_DK": [
-    "error.flagActiveExists",
-    "wealth.largeMovementsUnavailable"
+    "usage.metric.walletHandoffAuthorizationEvicted",
+    "usage.metric.walletHandoffCreateRejected"
   ]
 };

@@ -789,7 +789,37 @@ export const ko_KR: EnTranslations = {
       "applied": "적용됨",
       "apply": "스킨 적용",
       "detach": "스킨 해제",
-      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요."
+      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요.",
+      "charter": {
+        "eyebrow": "금고",
+        "title": "금고 특허장",
+        "scope": "특허장은 이 캐릭터의 은행만 확장합니다. 출납관도 같은 칸을 골드로 판매합니다.",
+        "grant": "은행 칸 {slots}칸 추가",
+        "buy": "특허장 구매",
+        "buyAria": "{item} 구매",
+        "confirmTitle": "특허장 구매 확인",
+        "confirmBody": "{item}을(를) {cost} Claudium에 구매할까요?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "특허장이 적용되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+        "alreadyGranted": "이 특허장은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+        "applyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+        "grantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+        "inProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+        "doesNotFit": "이 캐릭터의 은행에는 이 특허장의 칸을 모두 담을 수 없습니다.",
+        "notPurchasable": "이 특허장은 지금 구매할 수 없습니다.",
+        "noRoom": "이 캐릭터의 은행에는 더 이상 특허장을 넣을 자리가 없습니다.",
+        "noCharterFits": "이 캐릭터의 은행에 남은 자리에 들어갈 수 있는 특허장이 없습니다.",
+        "someHiddenByFit": "이 캐릭터의 은행에 남은 자리보다 큰 특허장은 표시되지 않습니다.",
+        "outage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "outageStale": "상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "failed": "구매를 완료하지 못했습니다.",
+        "names": {
+          "strongbox_charter_1": "하급 금고 특허장",
+          "strongbox_charter_2": "상급 금고 특허장",
+          "strongbox_charter_3": "대금고 특허장",
+          "strongbox_charter_complete": "완전 금고 특허장"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "presets": {
         "classic": "클래식 골드",
+        "fancyGold": "화려한 골드",
         "midnight": "미드나이트",
         "parchment": "양피지",
         "highContrast": "고대비"
@@ -955,15 +986,15 @@ export const ko_KR: EnTranslations = {
       "actionRadial": "액션 방향",
       "actionRadialCancel": "동작 취소",
       "radialCenter": "가운데",
-      "radialUp": "Up",
+      "radialUp": "위",
       "radialRight": "오른쪽",
-      "radialDown": "Down",
-      "radialLeft": "Left",
+      "radialDown": "아래",
+      "radialLeft": "왼쪽",
       "consumableSeat": "소모품",
       "menuControl": "메뉴",
       "menuControlAria": "메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.",
       "menuControlAriaTap": "메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.",
-      "menuLabel": "Menu",
+      "menuLabel": "메뉴",
       "quickActions": "빠른 실행",
       "quickActionsAria": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.",
       "quickActionsAriaTap": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.",
@@ -980,14 +1011,14 @@ export const ko_KR: EnTranslations = {
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
       "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)",
-      "barEditor": "Edit Bars",
+      "barEditor": "단축바 편집",
       "barEditorAria": "행동 단축바 배치 편집"
     },
     "barEditor": {
       "title": "행동 단축바 편집",
       "close": "행동 단축바 편집 닫기",
       "pages": "행동 단축바 페이지",
-      "pageTab": "Page {page}",
+      "pageTab": "페이지 {page}",
       "buttonHeader": "버튼 {button}",
       "cellAria": "버튼 {button}, {direction}: {action}",
       "emptyCellAria": "버튼 {button}, {direction}: 비어 있음",
@@ -998,6 +1029,16 @@ export const ko_KR: EnTranslations = {
       "clear": "비우기",
       "clearAria": "슬롯 비우기",
       "clearArmed": "슬롯을 탭하면 비워집니다."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "처음 보는 얼굴이군요, 친구. 이 땅에서는 모험을 시작하는 이들이 수련의 해안을 찾는 것이 전통이에요. 해협 너머의 조용한 섬이죠. 그곳에서 세상의 시련에 맞서기 전에 실력을 갈고닦고 이곳에 익숙해질 수 있어요. 나룻배는 양방향으로 다니고, 가든 안 가든 누구도 당신을 얕보지 않을 거예요.",
+      "bodyRefresher": "새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.",
+      "play": "튜토리얼 진행하기",
+      "skip": "튜토리얼 건너뛰기",
+      "declineNote": "뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 레이븐포스트 우편함 옆의 나룻배 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 그 종은 기다려 준답니다.",
+      "bellHomeNote": "벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.",
+      "islandArrivalNote": "방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.",
+      "noteClose": "알겠어요"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -1010,6 +1051,117 @@ export const ko_KR: EnTranslations = {
       "nextTipQuestLog": "퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.",
       "nextTipMap": "월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.",
       "nextTipSocial": "소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요."
+    },
+    "bootcamp": {
+      "title": "첫걸음",
+      "talkTitle": "워든 탐에게 말 걸기",
+      "talkBody": "워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.",
+      "talkBodyTouch": "워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 그를 탭하거나 사용 버튼을 탭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.",
+      "talkBodyPad": "워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 말을 거세요. 그가 달리기 과제를 내줄 겁니다.",
+      "forwardTitle": "첫 번째 길 걷기",
+      "forwardBody": "탐 옆의 길에 들어서서 {forwardKey}를 누른 채 서쪽 깃발까지 걸어가세요.",
+      "forwardBodyTouch": "탐 옆의 길에 들어서서 이동 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.",
+      "forwardBodyPad": "탐 옆의 길에 들어서서 왼쪽 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.",
+      "turnwalkTitle": "돌아선 다음 걷기",
+      "turnwalkBody": "깃발 하나 통과. {turnKey}를 누른 채 제자리에서 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 다시 {forwardKey}를 누른 채 두 번째 깃발까지 걸어가세요.",
+      "turnwalkBodyTouch": "깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.",
+      "turnwalkBodyPad": "깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.",
+      "strafeTitle": "돌아서 걷기",
+      "strafeBody": "모퉁이 하나 남았습니다. {turnLeftKey}를 누른 채 제자리에서 돌아 마지막 길을 정면에 두고, 다시 {forwardKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.",
+      "strafeBodyTouch": "모퉁이 하나 남았습니다. (이동 스틱이 아니라) 화면을 손가락으로 쓸어 방향을 돌려 마지막 길을 정면에 두고, 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.",
+      "strafeBodyPad": "모퉁이 하나 남았습니다. 오른쪽 스틱을 밀어 방향을 돌려 마지막 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.",
+      "cameraTitle": "시점 돌리기",
+      "cameraBody": "완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.",
+      "cameraBodyTouch": "완주를 보고하기 전 마지막 가르침입니다. 세상 화면을 손가락으로 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.",
+      "cameraBodyPad": "완주를 보고하기 전 마지막 가르침입니다. 오른쪽 스틱을 밀어 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.",
+      "courseProgress": "깃발 {current} / {total}",
+      "doneTitle": "완주",
+      "doneBody": "몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그에게 {interactKey}를 누르거나 왼쪽 클릭해 완주를 보고하고 첫 보상을 받으세요.",
+      "doneBodyTouch": "몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그를 탭해 완주를 보고하고 첫 보상을 받으세요.",
+      "doneBodyPad": "몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 상호작용 버튼을 눌러 완주를 보고하고 첫 보상을 받으세요.",
+      "coachNextTitle": "다음: {npc}",
+      "coachNextBody": "황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 다음 임무를 받으세요.",
+      "coachNextBodyTouch": "황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상대를 탭하거나 사용 버튼을 탭해 다음 임무를 받으세요.",
+      "coachNextBodyPad": "황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 다음 임무를 받으세요.",
+      "coachTaskBody": "황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 {mapKey}로 지도를 열 수 있습니다.",
+      "coachTaskBodyTouch": "황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.",
+      "coachTaskBodyPad": "황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.",
+      "coachReadyTitle": "임무 완료",
+      "coachReadyBody": "{npc}에게 가서 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.",
+      "coachReadyBodyTouch": "{npc}에게 가서 상대를 탭해 임무를 보고하고 보상을 받으세요.",
+      "coachReadyBodyPad": "{npc}에게 가서 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.",
+      "taskStrikeTrueBody": "짚 허수아비에게 다가가 왼쪽 클릭해 대상으로 잡으세요. 화면 위쪽에 이름이 나타납니다. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskStrikeTrueBodyTouch": "짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskStrikeTrueBodyPad": "짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.",
+      "taskHoneBody": "허수아비를 왼쪽 클릭해 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.",
+      "taskHoneBodyTouch": "허수아비를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.",
+      "taskHoneBodyPad": "허수아비를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.",
+      "taskLongWalkBody": "{bagsKey}를 눌러 가방을 열고 안식의 돌을 왼쪽 클릭하세요. 그 자리에서 당신을 눕혀 줍니다. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.",
+      "taskLongWalkBodyTouch": "해안 길을 따라 남쪽으로 걸어가 안식의 돌을 탭해 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.",
+      "taskLongWalkBodyPad": "해안 길을 따라 남쪽으로 걸어가 안식의 돌 앞에서 상호작용 버튼을 눌러 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.",
+      "taskLongWalkDeadBody": "당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 누르면 야영지 뒤 묘지에서 영혼으로 일어납니다.",
+      "taskLongWalkDeadBodyTouch": "당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 탭하면 야영지 뒤 묘지에서 영혼으로 일어납니다.",
+      "taskLongWalkDeadBodyPad": "당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 고르면 야영지 뒤 묘지에서 영혼으로 일어납니다.",
+      "taskLongWalkGhostBody": "이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 누르면 아무런 대가 없이 온전해집니다.",
+      "taskLongWalkGhostBodyTouch": "이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 탭하면 아무런 대가 없이 온전해집니다.",
+      "taskLongWalkGhostBodyPad": "이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 고르면 아무런 대가 없이 온전해집니다.",
+      "taskShellBody": "종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyTouch": "종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyPad": "종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskStrikeTrueBodyCaster": "짚 허수아비에게 다가가 왼쪽 클릭해 대상으로 잡으세요. 화면 위쪽에 이름이 나타납니다. 그런 다음 {attackKey}를 누르거나 행동 단축바의 두 번째 버튼을 클릭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.",
+      "taskStrikeTrueBodyCasterTouch": "짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.",
+      "taskStrikeTrueBodyCasterPad": "짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 두 번째 행동 버튼을 눌러 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.",
+      "taskShellBodyCaster": "종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyCasterTouch": "종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskShellBodyCasterPad": "종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.",
+      "taskPearlBody": "황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 {bagsKey}를 눌러 가방을 열고, 짠물 미끼를 왼쪽 클릭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 {interactKey}를 눌러 영롱한 진주를 차지하세요.",
+      "taskPearlBodyTouch": "황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 탭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기를 탭해 영롱한 진주를 차지하세요.",
+      "taskPearlBodyPad": "황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 선택해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 상호작용 버튼을 눌러 영롱한 진주를 차지하세요.",
+      "taskWreckLineBody": "표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskWreckLineBodyTouch": "표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskWreckLineBodyPad": "표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.",
+      "taskPouchBody": "{npc}에게 {interactKey}를 누르거나 상대를 왼쪽 클릭해 좌판을 열고, 아마천 주머니를 왼쪽 클릭해 구입하세요.",
+      "taskPouchBodyTouch": "{npc}를 탭해 좌판을 열고, 아마천 주머니를 탭해 구입하세요.",
+      "taskPouchBodyPad": "{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.",
+      "readyPouchBody": "주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 {interactKey}를 눌러 보여 주세요.",
+      "readyPouchBodyTouch": "주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상대를 탭해 보여 주세요.",
+      "readyPouchBodyPad": "주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상호작용 버튼을 눌러 보여 주세요.",
+      "promptTalk": "대화",
+      "promptTurnIn": "퀘스트 완료",
+      "promptPickUp": "줍기",
+      "promptLootPearl": "진주 획득",
+      "promptRead": "읽기",
+      "promptRing": "울리기",
+      "promptHold": "누르고 있기",
+      "promptSelect": "대상 지정",
+      "promptAttack": "공격",
+      "promptUseAbility": "기술 사용",
+      "promptKneel": "무릎 꿇기",
+      "promptOpenBags": "가방 열기",
+      "promptCharacterSheet": "캐릭터 창 열기",
+      "promptLookAround": "오른쪽 버튼을 누른 채 끌어서 둘러보기",
+      "promptJump": "점프",
+      "promptSummon": "소환",
+      "ringEquipTitle": "전리품을 착용하세요",
+      "ringEquipBody": "진주의 어머니가 가방 안에 있습니다. {bagsKey}를 눌러 가방을 열고, 반지를 왼쪽 클릭해 손가락에 끼우세요.",
+      "ringEquipBodyTouch": "진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 탭해 손가락에 끼우세요.",
+      "ringEquipBodyPad": "진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 선택해 손가락에 끼우세요.",
+      "ringAdmireTitle": "잘 어울리네요",
+      "ringAdmireBody": "잘 어울립니다. {charKey}를 눌러 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.",
+      "ringAdmireBodyTouch": "잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.",
+      "ringAdmireBodyPad": "잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.",
+      "keycapThen": "다음",
+      "voiceArrival": "무사히 뭍에 올랐군. 발밑의 황금 길이 보이나? 나보다 길을 잘 아니 그대로 따라가게.",
+      "voiceFirstFlag": "깃발 하나를 지났군. 다리를 멈추지 말게, 이제 둘 남았네.",
+      "voiceRunDone": "깔끔한 질주였네. 보상은 감독관 펠이 갖고 있으니 가서 받게.",
+      "voiceStationDoneA": "잘했네. 다음으로 가게, 길은 이미 밝혀 두었으니.",
+      "voiceStationDoneB": "제법 손에 익어 가는군, 틀림없네.",
+      "voiceVeerOff": "잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.",
+      "voiceGraduate": "자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.",
+      "bellTitle": "종 울리기",
+      "bellBody": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.",
+      "bellBodyTouch": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 종을 탭해 이스트브룩으로 출항하세요.",
+      "bellBodyPad": "건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 상호작용 버튼을 눌러 이스트브룩으로 출항하세요."
     },
     "widgets": {
       "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
@@ -1061,6 +1213,31 @@ export const ko_KR: EnTranslations = {
       "devTierCol": "배지",
       "mergedPrs": "병합된 PR",
       "devEmpty": "아직 순위에 오른 기여자가 없습니다."
+    },
+    "pledge": {
+      "open": "서약 받는 중",
+      "closed": "서약 받지 않음",
+      "minLevel": "레벨 {level} 이상",
+      "action": "서약",
+      "actionTitle": "{guild}에 서약하기",
+      "pledged": "서약함",
+      "yourGuild": "내 길드",
+      "tab": "서약",
+      "tabWithCount": "서약 ({count})",
+      "empty": "아직 길드에 서약한 사람이 없습니다.",
+      "accept": "수락",
+      "acceptTitle": "{name}의 서약 수락",
+      "reject": "거절",
+      "rejectTitle": "{name}의 서약 거절",
+      "settings": "모집 설정",
+      "acceptingLabel": "서약 받기",
+      "minLevelLabel": "최소 레벨",
+      "noteLabel": "게시판 메모",
+      "notePlaceholder": "길드가 어떤 동료를 찾는지 알려 주세요",
+      "save": "저장",
+      "yourPledge": "내 서약: {guild}",
+      "since": "{date}에 서약",
+      "withdraw": "서약 철회"
     },
     "raidLockout": {
       "title": "공격대 잠금",
@@ -1153,7 +1330,6 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "targetPrev": "대상 역방향 순환",
       "discord": "Discord",
-      "valecup": "베일 컵",
       "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
       "dive": "아래로 수영",
@@ -1176,6 +1352,11 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "done": "완료",
       "cancel": "취소",
+      "showExtraBar": "액션 바 하나 더 표시",
+      "hideExtraBar": "액션 바 하나 숨기기",
+      "conflictTitle": "이미 지정된 키",
+      "conflictBody": "{key} 키는 이미 {other}에 지정되어 있습니다. {action}에 지정하면 {other}의 지정이 해제됩니다.",
+      "conflictAccept": "그래도 재지정",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
     },
@@ -1310,6 +1491,7 @@ export const ko_KR: EnTranslations = {
       "endedForfeitLog": "이 경기는 기권으로 끝났습니다.",
       "firstWinBonusLine": "오늘의 첫 승리: 명예 +{honor}",
       "firstWinBonusLog": "오늘의 첫 승리: 추가로 명예를 {honor} 획득했습니다.",
+      "doubleHonorLine": "명예 2배 주말: 오늘 쏜할로우 평원 명예 보상이 {mult}배로 지급되며, 끝까지 치른 패배도 승리와 같은 보상을 받습니다",
       "timeWarningMinutes": "{minutes}분 남았습니다",
       "timeWarningOneMinute": "1분 남았습니다",
       "timeWarningMinutesLog": "전투가 {minutes}분 남았습니다.",
@@ -1319,146 +1501,6 @@ export const ko_KR: EnTranslations = {
         "azureKeep": "애저 요새",
         "ruinCourtyard": "폐허 안뜰",
         "graveyard": "묘지"
-      }
-    },
-    "vcup": {
-      "title": "베일 컵",
-      "shootPower": "파워",
-      "close": "베일 컵 창 닫기",
-      "offlineNote": "대진표가 닫혀 있습니다. 지금은 베일 컵을 이용할 수 없습니다.",
-      "recordLine": "전적: {wins}승 {losses}패 {draws}무.",
-      "bracketsAria": "경기 등급",
-      "bracketLabel": "{n}대{n}",
-      "waitingCount": "{count}명 대기 중",
-      "nationsHeading": "깃발 국가",
-      "nation": {
-        "vale": "이스트브룩 골짜기",
-        "mirefen": "마이어펜",
-        "thornpeak": "쏜피크",
-        "coliseum": "잿빛 원형경기장",
-        "choir": "창백한 성가대",
-        "ogre": "오우거 부족",
-        "moon": "창백한 달",
-        "copperdig": "구리 광산"
-      },
-      "awayNote": "양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.",
-      "rolesHeading": "포지션",
-      "rolesSmallBracketNote": "1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.",
-      "role": {
-        "allrounder": {
-          "name": "올라운더",
-          "desc": "조금씩 다 합니다: 킥, 롱킥, 그리고 정당한 어깨싸움."
-        },
-        "striker": {
-          "name": "스트라이커",
-          "desc": "롱킥과 재빠른 사이드스텝에 사는 포지션."
-        },
-        "sweeper": {
-          "name": "스위퍼",
-          "desc": "공을 가진 상대를 밀쳐내고 멀리 걷어냅니다."
-        },
-        "keeper": {
-          "name": "키퍼",
-          "desc": "캐치, 다이빙, 펀트로 골 지역을 지킵니다."
-        }
-      },
-      "queue": "대기열 참가",
-      "leaveQueue": "대기열 떠나기",
-      "queueNote": "어디서든 줄을 설 수 있습니다. 휘슬이 울리면 소우필드로 부릅니다.",
-      "queuedStatus": "{bracket} 대기 중: {count}명 중 {position}번째.",
-      "blockNation": "먼저 깃발 국가를 선택하세요.",
-      "blockPartySize": "해당 등급에는 더 작은 파티가 필요합니다.",
-      "blockNotLeader": "파티장만 팀을 대기열에 올릴 수 있습니다.",
-      "inMatchNote": "당신의 팀이 경기장에 있습니다. 계속 뛰세요!",
-      "deserterNote": "경기장 관리인은 기억하고 있습니다. {seconds}초 후에 다시 줄을 설 수 있습니다.",
-      "liveHeading": "지금 소우필드에서는",
-      "liveAria": "베일 컵: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "소우필드로 걸어가 관중석에서 관전하세요.",
-      "noLive": "경기장이 조용합니다. 진행 중인 경기가 없습니다.",
-      "boardHeading": "우승자 명판",
-      "boardEmpty": "아직 기록된 우승자가 없습니다. 구리 들통이 기다립니다.",
-      "boardWins": "{count}승",
-      "enterAsGuild": "{guild} 깃발 아래 출전",
-      "guildRecordLine": "길드 전적: {wins}승 {losses}패.",
-      "guildBoardHeading": "길드 깃발",
-      "guildBoardEmpty": "아직 출전한 길드가 없습니다. 깃발을 올리세요!",
-      "guildBoardWl": "{wins}승 {losses}패",
-      "practice": "봇 연습 경기",
-      "practiceNote": "소우필드에서 봇과의 정식 경기를 즉시 시작합니다.",
-      "practiceUnratedNote": "연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.",
-      "practicingNow": "연습 중 ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "베일 컵 대기열: {bracket}, {count}명 중 {position}번째",
-      "indicatorLive": "베일 컵",
-      "indicatorOpen": "베일 컵 창 열기",
-      "phaseCountdown": "킥오프까지 {seconds}",
-      "phaseGoal": "골!",
-      "phaseGolden": "골든골",
-      "phaseOver": "경기 종료",
-      "bannerFound": "베일 컵이 부릅니다: {nationA} 대 {nationB}!",
-      "bannerCountdown": "킥오프까지 {seconds}초...",
-      "bannerKickoff": "킥오프!",
-      "bannerGoal": "골! {nation}의 득점!",
-      "bannerSave": "{name}의 선방!",
-      "bannerGolden": "골든골: 다음 득점이 승부를 가릅니다!",
-      "bannerEnd": "경기 종료: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "소우필드의 승리!",
-      "bannerDraw": "소우필드의 한판이 무승부로 끝났습니다.",
-      "bannerLoss": "소우필드에서의 패배.",
-      "logQueued": "{bracket} 베일 컵 대기열에 참가했습니다({position}번째).",
-      "logUnqueued": "베일 컵 대기열에서 나왔습니다.",
-      "logFound": "베일 컵 경기가 준비되었습니다: {nationA} 대 {nationB}.",
-      "logRoster": "아군: {allies}. 상대: {enemies}.",
-      "logGoal": "{name}, {nation}을(를) 위한 득점! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name}의 선방!",
-      "logWin": "소우필드의 한판에서 승리했습니다.",
-      "logDraw": "소우필드의 한판이 무승부로 끝났습니다.",
-      "logLoss": "소우필드의 한판에서 패배했습니다.",
-      "gossipOpen": "대진표",
-      "gossipOpenAria": "베일 컵 창 열기",
-      "mobileLabel": "컵",
-      "briefing": {
-        "subtitle": "경기 전 브리핑",
-        "vs": "대",
-        "rulesHeading": "플레이 방법",
-        "rule1": "공을 상대 골대에 차거나 패스해 득점하세요.",
-        "rule2": "먼저 5골을 넣으면 승리, 종료 시 더 많이 넣은 쪽이 승리.",
-        "rule3": "종료 시 동점이면 골든골, 다음 득점자가 승리합니다.",
-        "rule4": "태클은 넘어뜨릴 뿐, 추수 휴전으로 아무도 다치지 않습니다.",
-        "rule5": "누구나 다가와 관중석에서 응원할 수 있습니다.",
-        "kitHeading": "내 기술",
-        "kitNote": "경기 동안 이 동작들이 직업 능력을 대신합니다.",
-        "unratedNote": "봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.",
-        "practiceUnratedNote": "이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.",
-        "rosterHeading": "출전 명단",
-        "you": "나",
-        "bot": "봇",
-        "ready": "준비 완료",
-        "readyDone": "준비됨",
-        "readyAria": "킥오프 준비",
-        "waiting": "상대편의 준비를 기다리는 중...",
-        "whistle": "{seconds}초 후 휘슬이 울립니다.",
-        "readyCount": "준비 완료 {ready}/{total}"
-      },
-      "bet": {
-        "title": "경기 베팅",
-        "aria": "베일 컵 경기 베팅",
-        "closesIn": "{seconds}초 후 베팅 마감",
-        "closed": "베팅 마감",
-        "prize": "상금 풀 {amount}",
-        "splitAria": "양 팀 베팅 풀 비율",
-        "expand": "베팅 보기 및 걸기",
-        "collapse": "베팅 숨기기",
-        "oddsLabel": "배당",
-        "back": "{team} 베팅",
-        "form": "{wins}승-{losses}패",
-        "mine": "내 베팅: {amount}, {team}",
-        "none": "아직 이 경기에 베팅하지 않았습니다.",
-        "record": "베팅 전적: {wins}승-{losses}패, {sign}{net}",
-        "wonBanner": "베팅 적중!",
-        "wonLog": "베일 컵 베팅 적중: {amount} 반환.",
-        "lostLog": "베일 컵 베팅 실패: {amount}.",
-        "refundLog": "베팅 무효, 베팅금 {amount} 반환."
       }
     },
     "options": {
@@ -1535,6 +1577,7 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "combineActionBars": "액션 바 합치기",
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
@@ -1570,6 +1613,11 @@ export const ko_KR: EnTranslations = {
     },
     "controller": {
       "title": "컨트롤러",
+      "glyphStyle": "버튼 표시",
+      "glyphStyleAuto": "자동",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "플레이스테이션",
+      "glyphStyleNintendo": "닌텐도",
       "enable": "컨트롤러 사용",
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
@@ -2422,7 +2470,10 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "poolGeneral": "일반: {total}칸 중 {used}칸",
+      "poolMaterials": "재료: {total}칸 중 {used}칸",
+      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸."
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -2657,7 +2708,8 @@ export const ko_KR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
-      "cheaterTag": "< 부정행위자 >"
+      "cheaterTag": "< 부정행위자 >",
+      "pledgeTag": "{guild} 서약자"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -2677,6 +2729,7 @@ export const ko_KR: EnTranslations = {
     },
     "partyFrames": {
       "section": "파티 및 공격대 프레임",
+      "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
       "lock": "파티 및 공격대 프레임 고정",
       "style": "프레임 스타일",
@@ -2706,6 +2759,62 @@ export const ko_KR: EnTranslations = {
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
+    },
+    "interfaceUnlock": {
+      "label": "프레임 편집",
+      "unlock": "인터페이스 잠금 해제",
+      "lock": "인터페이스 잠금",
+      "lockAll": "인터페이스 잠금",
+      "barsNote": "편집 중에는 켜 둔 액션 바만 표시됩니다. 더 많은 바를 배치하려면 먼저 기본 액션 바의 더하기/빼기 버튼으로 추가하세요.",
+      "frozenNote": "편집 중에는 인터페이스와 카메라가 고정됩니다. 버튼과 프레임은 배치용 정지 화면이 되며, 클릭은 게임 세계에 전달되지 않습니다.",
+      "unlockFrame": "이 프레임 잠금 해제",
+      "lockFrame": "이 프레임 잠금",
+      "resizeFrame": "이 프레임 크기 조절",
+      "frameNames": {
+        "actionBar1": "행동 단축바",
+        "actionBar2": "행동 단축바 2",
+        "actionBar3": "행동 단축바 3",
+        "steamWishlist": "찜 목록 알림",
+        "menu": "Menu",
+        "minimap": "미니맵",
+        "stanceBar": "태세 바",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "액션 바",
+        "playerFrame": "플레이어",
+        "targetFrame": "대상",
+        "partyFrames": "파티",
+        "swingBar": "자동 공격"
+      },
+      "framesMenu": "프레임 설정",
+      "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",
+      "showHideFrames": "프레임 표시 및 숨기기",
+      "buffsLeftToRight": "버프 왼쪽에서 오른쪽으로",
+      "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
+      "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
+      "actionBarsVertical": "액션 바 세로 배치",
+      "actionBar1Vertical": "액션 바 세로 배치",
+      "actionBar2Vertical": "액션 바 2 세로 배치",
+      "actionBar3Vertical": "액션 바 3 세로 배치",
+      "menuRailHorizontal": "메뉴 가로 배치",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "크기 초기화",
+      "resetFrameSizeFor": "{name} 크기 초기화",
+      "previewSpell": "예시 주문"
+    },
+    "transfer": {
+      "frameLayout": "프레임 배치",
+      "allSettings": "모든 설정",
+      "exportAction": "내보내기",
+      "importAction": "가져오기",
+      "copy": "복사",
+      "copied": "클립보드에 복사했습니다.",
+      "copyFailed": "복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.",
+      "applyReload": "적용 후 다시 불러오기",
+      "pastePlaceholder": "내보낸 코드를 여기에 붙여넣으세요.",
+      "invalid": "유효한 내보내기 코드가 아닙니다.",
+      "wrongKind": "이 코드는 다른 종류의 내보내기입니다."
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
@@ -2914,7 +3023,10 @@ export const ko_KR: EnTranslations = {
       "unlink": "Steam 연동 해제",
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
-      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.",
+      "wishlist": "Steam에서 위시리스트에 추가",
+      "wishlistAria": "Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기",
+      "wishlistShort": "위시리스트"
     },
     "epic": {
       "title": "Epic",
@@ -2981,7 +3093,12 @@ export const ko_KR: EnTranslations = {
       "tip": "판매 대금이나 반송된 아이템이 상인에게서 수령을 기다리고 있습니다."
     },
     "noticeboard": {
-      "empty": "게시된 내용이 없는 것 같습니다."
+      "empty": "게시된 내용이 없는 것 같습니다.",
+      "subtitle": "월드의 길드",
+      "rosterTitle": "{guild}의 명단 보기",
+      "back": "뒤로",
+      "popupTitle": "길드 게시 기둥",
+      "close": "닫기"
     },
     "bank": {
       "title": "은행",
@@ -2995,6 +3112,26 @@ export const ko_KR: EnTranslations = {
       "buySlotsMaxed": "완전히 확장됨",
       "buyConfirm": "{price}에 은행 칸 {count}개를 추가로 구매하시겠습니까?",
       "buyConfirmAccept": "구매",
+      "meterLabel": "{total}칸 중 {used}칸 사용",
+      "meterPoolGeneral": "일반: {total}칸 중 {used}칸",
+      "meterPoolMaterials": "재료: {total}칸 중 {used}칸",
+      "meterPoolsAria": "사용 중인 은행 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.",
+      "meterMaterialsNote": "장착한 재료 가방이 제공하는 재료 전용 공간입니다. 다른 아이템은 사용할 수 없습니다.",
+      "priceDisclaimer": "가격은 게임 경제에 따라 변동될 수 있습니다.",
+      "rungItemName": "은행 칸 {count}개",
+      "buySlotsDualAria": "{price} 또는 {cost} Claudium으로 {count}칸 구매",
+      "buyConfirmDual": "은행 칸 {count}개를 추가로 구매하시겠습니까?",
+      "buyConfirmGold": "{price}에 구매",
+      "buyConfirmClaudium": "{cost} Claudium으로 구매",
+      "rungGranted": "은행 칸이 추가되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+      "rungAlreadyGranted": "이 칸은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+      "rungApplyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+      "rungGrantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+      "rungInProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+      "rungDoesNotFit": "이 캐릭터의 은행에는 더 이상 확장을 담을 수 없습니다.",
+      "rungNotPurchasable": "이 은행 칸은 지금 구매할 수 없습니다.",
+      "rungFailed": "구매를 완료하지 못했습니다.",
+      "rungOutage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
       "withdrawHint": "클릭하여 꺼내기",
       "withdrawPartialHint": "Shift+클릭하여 일부만 꺼내기",
       "depositHint": "클릭하여 넣기",
@@ -3007,6 +3144,9 @@ export const ko_KR: EnTranslations = {
       "withdrawQuantityTitle": "{item} 꺼내기",
       "withdrawQuantityInput": "꺼낼 수량",
       "withdrawQuantityConfirm": "꺼내기",
+      "vaultRowWithdrawName": "{item} 꺼내기",
+      "priceChanged": "구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.",
+      "withdrawQuantityAction": "{item} 꺼낼 수량 선택",
       "filterGroupAria": "은행을 분류별로 필터링",
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",
@@ -3028,6 +3168,34 @@ export const ko_KR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.",
       "bonusSectionAria": "보너스 은행 칸과 획득 방법",
+      "socketRowAria": "은행 가방 칸",
+      "socketEmpty": "빈 은행 가방 칸",
+      "socketEmptyHint": "가방에 있는 가방을 클릭하면 은행에 보관됩니다",
+      "socketLocked": "잠긴 가방 칸",
+      "socketLockedLater": "가방 칸은 저렴한 것부터 순서대로 해금됩니다",
+      "socketUnlockAria": "{price}(으)로 은행 가방 칸 해금",
+      "socketUnlockHint": "클릭하여 이 가방 칸을 해금",
+      "socketUnlockConfirm": "{price}(으)로 은행 가방 칸을 해금하시겠습니까?",
+      "socketUnlockAccept": "해금",
+      "unsocketHint": "클릭하여 이 가방을 가방으로 되돌리기",
+      "socketHint": "클릭하여 이 가방을 은행에 장착",
+      "vaultTab": "보관소",
+      "vaultCapacityNote": "각 재료는 최대 {cap}개까지 보관할 수 있습니다.",
+      "vaultEmpty": "재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.",
+      "vaultRowAria": "{item}: {count}/{cap}개 보관 중",
+      "vaultLockedIntro": "재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.",
+      "vaultUnlockButton": "재료 보관소 개방",
+      "vaultUnlockConfirm": "{price}(으)로 재료 보관소를 개방하시겠습니까?",
+      "vaultUpgrade": "보관 한도를 {cap}개로 확장",
+      "vaultUpgradeConfirm": "{price}(으)로 각 재료의 보관 한도를 {cap}개로 확장하시겠습니까?",
+      "vaultDepositAll": "재료 모두 보관",
+      "vaultDepositAllTooltip": "가방의 모든 재료를 한 번에 보관소로 옮깁니다. 각 재료는 한도까지 채워집니다. 장비, 도구, 퀘스트 아이템, 소모품은 옮겨지지 않습니다.",
+      "vaultDepositAllDone": "보관한 재료: {count}개.",
+      "vaultDepositAllFull": "보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.",
+      "vaultDepositAllNone": "보관 한도가 가득 차서 아무것도 보관하지 못했습니다.",
+      "vaultWithdrawShort": "가방에는 {count}개 중 {fit}개만 들어갑니다.",
+      "vaultDepositHint": "클릭하여 보관소에 보관",
+      "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
       "tabsAria": "은행 탭",
       "personalTab": "개인",
       "guildTab": "길드",
@@ -3113,6 +3281,10 @@ export const ko_KR: EnTranslations = {
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
+        },
+        "doubleHonor": {
+          "title": "명예 2배 주말",
+          "note": "전쟁 진영이 소집 나팔을 붑니다. 주말 동안 쏜할로우 평원 명예 보상이 2배가 되며, 끝까지 치른 패배도 승리와 같은 보상을 받습니다."
         },
         "fishingDerby": {
           "title": "낚시 대회",
@@ -3423,6 +3595,8 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
+      "reagentVaultDraw": "(재료 보관소에서 {count}개 사용)",
+      "vaultUnreachable": "여기에서는 재료 보관소를 사용할 수 없습니다.",
       "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
@@ -4024,8 +4198,10 @@ export const ko_KR: EnTranslations = {
       "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
       "disabledRealm": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
       "pausedBanner": "거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.",
-      "walletBanner": "지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.",
-      "walletBannerCta": "지갑 연결",
+      "walletLinkedDisconnected": "공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.",
+      "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "알 수 없음",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
@@ -4279,6 +4455,8 @@ export const ko_KR: EnTranslations = {
       "online": "캐릭터가 현재 접속 중입니다.",
       "rename_not_permitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
+      "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
+      "delete_busy": "서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
@@ -4317,6 +4495,10 @@ export const ko_KR: EnTranslations = {
     },
     "deeds": {
       "invalid_input": "입력이 올바르지 않습니다."
+    },
+    "guilds": {
+      "invalid_roster_name": "길드 이름이 유효하지 않습니다.",
+      "unknown": "그런 이름의 길드가 없습니다."
     },
     "steam": {
       "disabled": "현재 Steam 연동을 사용할 수 없습니다.",
@@ -4441,7 +4623,6 @@ export const ko_KR: EnTranslations = {
       "combat": "전투",
       "talents": "특성",
       "arena": "투기장과 PvP",
-      "valeCup": "베일 컵",
       "thornhollow": "쏜할로우 평원",
       "deeds": "업적의 서",
       "reliquary": "성물고",
@@ -4551,6 +4732,8 @@ export const ko_KR: EnTranslations = {
         "fenBlurb": "가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다.",
         "farshoreName": "먼바다 해안",
         "farshoreBlurb": "균열의 들판 위로 하늘이 찢어지고, 틈이 열릴 때마다 걸헤이븐이 종을 울리는 모래톱 건너의 섬.",
+        "provingName": "수련의 해안",
+        "provingBlurb": "해협 건너의 조용한 훈련 섬. 골짜기가 무언가를 요구하기 전에, 새내기 모험가들이 이곳에서 첫걸음을 다집니다.",
         "nightName": "밤꽃 평원",
         "nightBlurb": "꽃이 길을 밝히고 문레스트가 밤을 지새우는, 별이 쏟아지는 한밤의 나라.",
         "hauntName": "망령숲",
@@ -4651,7 +4834,6 @@ export const ko_KR: EnTranslations = {
       "reliquary": "성물고",
       "sheathe": "무기 넣기/빼기",
       "crafting": "제작",
-      "valeCup": "베일 컵",
       "mount": "탑승 / 하차",
       "calendar": "이벤트 달력",
       "dungeonFinder": "던전 찾기",
@@ -5513,6 +5695,10 @@ export const ko_KR: EnTranslations = {
       "farshoreGreeting": "Ferrywalk를 건너오셨소? 그렇다면 일주일 만의 첫 손님이오. 워든이 한 번 살펴보고 싶어 할 게요.",
       "farshoreGreeter": "종지기 탐, 선착장",
       "farshorePlaceNotes": "걸헤이븐은 섬의 유일한 마을이자 마지막 보루입니다. 선착장은 Ferrywalk가 뭍에 닿는 곳으로, 곶 위에 경종이 서 있습니다. 감시 초원은 마을 남동쪽 고지를 지키며, 그곳에서 균열감시자가 다음 찢김의 기척에 귀를 기울입니다. 찢겨진 절벽은 섬 남쪽 끝에서 갈라져 있고, 균열의 들판은 걸헤이븐 동쪽의 망가진 곡식 이랑으로, 그곳의 찢김을 통해 넘어온 것들이 아직 기어다니고 있습니다.",
+      "provingBlurb": "골짜기에서 해협을 건넌 곳에 있는 조용한 섬으로, 훈련장으로 쓰입니다. 야영지 하나, 수련장 하나, 잔해가 널린 바닷가, 그리고 양방향으로 다니는 나룻배가 있습니다.",
+      "provingGreeting": "골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠.",
+      "provingGreeter": "교관 마렌, 새벽쉼터 야영지",
+      "provingPlaceNotes": "새벽쉼터 야영지가 섬의 유일한 정착지로, 천막 몇 동과 좌판 하나, 모임 모닥불이 전부입니다. 낡은 부두는 골짜기를 마주하며 건너기 마법진이 졸업생을 해협 너머로 실어 나르고, 야영지 남쪽 수련장에는 필요한 이를 위해 짚 허수아비가 서 있으며, 난파선 해안은 조수가 표류 상자로 섬에 값을 치르는 잔해투성이 바닷가입니다.",
       "travelTitle": "돌아다니기",
       "travelBody": "왕국의 모든 길은 걷거나 말을 타고 갑니다. 비행 경로도, 마차도, 순간이동망도 없습니다. 지도는 하나로 이어진 땅덩어리이며, 모든 연결은 직접 발을 딛고 설 수 있는 것입니다. 산등성이가 한 왕국과 다음 왕국을 가르고, 두 왕국이 산등성이를 나눠 가진 곳에서는 길이 고개를 넘어 올라갑니다. 다만 모든 경계가 그런 것은 아닙니다. 북쪽에서는 긴 둑길이 장막의 골짜기에서 물 위를 가로질러 그 너머 눈의 땅으로 이어지고, 다시 남쪽에서는 Ferrywalk라 불리는 가느다란 천연 모래톱이 골짜기 해안에서 동쪽으로 뻗어 먼바다 해안의 선착장에 닿습니다. 그 섬에는 땅으로 이어진 경계가 아예 없습니다. 그리고 바깥 세계를 통틀어 진짜 문은 정확히 하나뿐입니다. 쏜피크 높은 곳에 걸린 황혼의 장막이 장막의 골짜기로 이어집니다. 장막의 골짜기 남쪽 산등성이는 고개 하나 없이 막혀 있으므로 그 장막이 처음 들어가는 길이며, 돌아 나올 때는 등 뒤에서 닫힙니다.\n\n어디에서 쓰러지든 돌아오는 길은 짧습니다. 모든 지역에는 묘석 위를 맴도는 영혼 치유사가 있는 묘지가 적어도 하나 있고, 풀려난 영혼은 그중 가장 가까운 곳에서 일어납니다.\n\n지도는 보이지 않는 벽으로 끝나지 않습니다. 땅은 백사장과 곶으로 이어지다가 트인 바다로 넘어갑니다. 세계가 헤엄쳐 건너라고 마련해 둔 물길, 곧 왕국과 왕국 사이의 해협과 호수는 잔잔하고 안전합니다. 대신 먼바다로 나아가면 거리 자체가 당신을 돌려세웁니다. 한 번 경고하고 다시 한 번 경고하며, 그래도 계속 헤엄치면 바다가 당신을 깎아 내려 끝내 목숨을 앗아 갑니다. 잠수에도 나름의 한계가 있어 수면 아래에서는 숨이 다하니, 물이 신호를 보내면 숨을 쉬러 올라와 뱃머리를 돌리세요.",
       "mountsTitle": "탈것",
@@ -5729,36 +5915,6 @@ export const ko_KR: EnTranslations = {
       "ladderBody": "모든 경기가 캐릭터에 매인 지속되는 전장 평점을 승패와 상관없이 움직이며, 역대 순위표가 세계의 용사들을 차례로 세웁니다.",
       "rewardsHeading": "경기가 주는 보상",
       "rewardsBody": "끝까지 치른 경기는 모두 명예를 줍니다. 승리는 더 많이, 패배나 무승부는 위로의 몫을 주며, 직접 넣은 결정타와 거든 처치마다 조금씩 더 붙으므로 깃발에서 떨어진 곳에서 싸우는 일도 값어치가 있습니다. 하루의 첫 승리는 그 위에 보너스를 얹어 주고, 그 보너스가 아직 남아 있는지는 패널이 알려 줍니다. 이 하루는 명예만의 하루라서, 왕국의 인스턴스 초기화가 아니라 자기만의 시계로 넘어갑니다. 같은 팀을 거듭 만나면 첫 경기 이후로는 경기 자체의 보상이 줄어들지만, 0으로 사라지지 않고 금세 바닥값에 자리 잡습니다. 몰수한 경기는 아무것도 주지 않습니다. 벌어들인 것은 어느 워페어 병참장교에게든 쓰세요."
-    },
-    "valeCupPage": {
-      "heading": "베일 컵",
-      "intro": "소우필드의 보어볼: 깃발을 고르고 포지션을 골라, 짚을 채운 멧돼지 가죽 공을 키퍼 너머로 차 넣고 구리 들통을 노리세요. 피도 전리품도 없이, 오직 관중석의 함성뿐.",
-      "loreHeading": "보어볼과 수확 휴전",
-      "loreOldSow": "망자들이 깨어나기 훨씬 전, 이스트브룩의 농부들은 수확이 끝난 그루터기 밭에서 보어볼을 즐겼습니다. 두 무리, 짚을 채운 멧돼지 가죽 하나, 그리고 풀밭 양 끝으로 끌어다 놓은 짐마차 문 두 짝. 첫 번째 공 \"올드 소우\"는 청동을 입고 선술집 벽난로 위에 걸려 있습니다.",
-      "loreTruce": "잿빛 원형경기장이 전쟁 경기를 공인하기 시작하자 레드브룩 원수는 더 온화한 것으로 답했습니다. 옛 풀밭에 상시 수확 휴전을 선포한 것입니다. 짐마차 문은 골대가 되었고, 풀밭에는 담장과 관중석, 그리고 \"소우필드\"라는 이름이 생겼습니다. 상품은 언제나 같았습니다. 우승자들이 돌려 마시던 찌그러진 우유통, 구리 들통입니다.",
-      "howHeading": "경기 방법",
-      "howQueue": "베일 컵 창으로 어디서든 줄을 서거나, 소우필드 정문의 경기장 관리인 브람에게 말을 거세요. 1대1부터 5대5까지의 등급과 깃발 국가, 포지션을 고르고, 혼자든 파티든 참가할 수 있습니다.",
-      "howMatch": "킥오프와 함께 직업 기술이 스포츠 키트로 바뀌고 경기 후 정확히 복원됩니다. 킥은 지면 조준점으로 겨냥하고, 공은 펜스에 튕기며, 드리블은 공과 함께 달리는 것뿐입니다. 종료 전까지 상대보다 많이 득점하세요. 무승부면 골든골로 이어집니다.",
-      "howTruce": "소우필드에서는 아무도 피 흘리지 않습니다. 태클은 구르게 할 뿐 아무것도 다치게 하지 않고, 펫은 경기 동안 쉬어 갑니다.",
-      "spectateBody": "경기장에서는 한 번에 한 경기만 열리며, 누구나 걸어와 관중석에서 관전할 수 있습니다.",
-      "bettingHeading": "난간에서 거는 가벼운 내기",
-      "bettingBody": "경기가 꾸려지는 동안 소우필드의 관중은 한쪽 편에 돈을 걸 수 있습니다. 베팅금은 하나로 모이고, 종료 휘슬이 울리면 이긴 쪽이 진 쪽의 풀을 저마다 건 만큼에 비례해 나눠 가집니다. 무승부로 끝나거나 아무도 걸지 않은 이변이 일어나면 모든 동전이 반환됩니다. 경기에 나선 선수는 자기 경기에 베팅할 수 없으며, 난간은 당신의 통산 승패와 순수익을 기록해 둡니다.",
-      "practiceHeading": "연습 경기와 한가한 경기장",
-      "practiceBody": "베일 컵 창에서는 연습도 할 수 있습니다. 봇이 양 팀을 채우고 무엇도 전적에 남지 않는, 경기장의 개인 사본입니다. 정식 경기에 한두 명이 모자란가요? 잠시 기다리면 봇이 팀을 채워 주며, 봇이 뛰는 경기는 언제나 친선전이고 결코 등급전으로 기록되지 않습니다. 그리고 소우필드가 한가할 때면 봇들이 시범 경기를 펼치는데, 관중석에서 구경하고 돈도 걸 수 있습니다. 진짜 플레이어들이 준비를 마치는 순간 시범 경기는 자리를 내주고, 걸린 돈은 모두 반환됩니다.",
-      "nationsHeading": "여덟 깃발 국가",
-      "nationsBody": "모든 팀은 깃발 아래에서 경기합니다. 주장이 국가를 고르며, 양측이 같은 깃발을 들면 원정 팀이 반전 배색으로 뜁니다.",
-      "nationVale": "초록과 금, 밀단 깃발: 뼛속까지 농사꾼인 홈 팀.",
-      "nationMirefen": "청록과 회색, 왜가리 아래: 참을성 있고, 다리 길고, 서두르지 않는다.",
-      "nationThornpeak": "얼음빛 파랑과 하양, 산봉우리 아래: 발걸음이 굳세고 고집이 세다.",
-      "nationColiseum": "빨강과 검정, 교차한 검: 아직도 전쟁 경기인 줄 알고 뛴다.",
-      "nationChoir": "옅은 파랑과 은빛, 종 아래: 으스스하고 정밀하며 아주 조용하다.",
-      "nationOgre": "주황과 암갈색, 주먹을 앞세워: 어깨부터 들이밀고 그걸 자랑한다.",
-      "nationMoon": "보라와 은빛, 초승달 아래: 밤의 선수들, 발놀림이 가볍다.",
-      "nationCopperdig": "구리빛과 갈색, 곡괭이와 함께: 쉬지 않고 달리는 광부들.",
-      "rolesHeading": "포지션",
-      "rolesBody": "포지션이 경기장에 들고 갈 키트를 정합니다. 누구나 공을 찹니다. 나머지는 기질의 문제입니다. 1인전과 2인전 구간에서는 모두가 만능 키트로 뛰므로, 포지션 선택은 3인전부터 비로소 제 몫을 합니다.",
-      "rewardsHeading": "휴전 규칙",
-      "rewardsBody": "휴전 규칙이란 경험치도 전리품도 없다는 뜻입니다. 승부가 난 경기는 전적과 우승자 명판에 기록되고, 승리는 그날의 보상 과제에도 포함됩니다. 경기를 버리면 자리가 비고, 경기장 관리인은 그것을 기억합니다."
     },
     "deedsPage": {
       "intro": "업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.",
@@ -5989,7 +6145,7 @@ export const ko_KR: EnTranslations = {
       "deedsHeading": "여정을 새기는 업적",
       "deedsBody": "업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.",
       "startHeading": "어디서 시작할까",
-      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
+      "startBody": "Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 북동쪽 Copper Dig 주변의 광맥을 알려 준다. 다만 채굴장 자체는 조심하자. 그곳에 진을 친 깊은바위 채굴꾼들은 갓 도착한 캐릭터보다 레벨이 몇 단계 높으니, 우선 바깥쪽 광맥부터 캐고 야영지 중심부는 레벨이 좀 오른 뒤로 미루자. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.",
       "colStation": "작업대",
       "colHub": "거점",
       "colMaster": "장인",
@@ -6074,13 +6230,13 @@ export const ko_KR: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "날랜 자들의 가죽",
-          "identityBody": "사다리는 소박한 Fenbridge 생가죽 다리 보호구, 장화, 허리띠에서 고급 marshstalker 셋을 거쳐 장인이 잘라 낼 수 있는 최고의 가죽인 희귀 mirewarden 세트로 오른다. 시전자용 두 벌, 야외 일반품 Eastbrook Druid's Hide와 기술 75의 Duskhide Wraps가 진용을 채운다. 요리와 재봉 사이에 있으며, 살아 있는 짝은 Eastbrook의 Weaver Ottilie 앞에서 맹세하는 의복 장인이고, 요리와 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+          "identityBody": "사다리는 소박한 Fenbridge 생가죽 다리 보호구, 장화, 허리띠에서 고급 marshstalker 셋을 거쳐 장인이 잘라 낼 수 있는 최고의 가죽인 희귀 mirewarden 세트로 오른다. 시전자용 두 벌, 야외 일반품 Eastbrook Druid's Hide와 기술 50의 Duskhide Wraps가 진용을 채운다. 요리와 재봉 사이에 있으며, 살아 있는 짝은 Eastbrook의 Weaver Ottilie 앞에서 맹세하는 의복 장인이고, 요리와 이루는 Trapper는 아직 서약 퀘스트가 없다.",
           "materialsHeading": "사냥이 곧 수확",
-          "materialsBody": "가죽세공에서는 레벨링 경로와 보급선이 같은 길이다. 거친 가죽은 가죽 있는 사체, 특히 늑대와 멧돼지에서 직접 벗기고, 사체 하나는 선착순 한 사람만 쓸 수 있다. 희귀 이상 판정은 Pristine Hide도 주는데 Mirewarden Jerkin이 바로 그 서명 표본을 원하니 보이는 대로 모아 두자. 조연은 적다. 거미 다리와 거미줄, 인간형의 홈스펀 천, mirewarden 희귀 각 벌에 오스뮴 하나(Duskhide Wraps 정점품은 6개), 그리고 무두질 작업장 계산대의 Tanning Agent(16동). 캐기 싫다면 Tanner Hesk가 오스뮴도 판다.",
+          "materialsBody": "가죽세공에서는 레벨링 경로와 보급선이 같은 길이다. 거친 가죽은 가죽 있는 사체, 특히 늑대와 멧돼지에서 직접 벗기고, 사체 하나는 선착순 한 사람만 쓸 수 있다. 희귀 이상 판정은 Pristine Hide도 주는데 Mirewarden Jerkin이 바로 그 서명 표본을 원하니 보이는 대로 모아 두자. 조연은 적다. 거미 다리와 거미줄, 인간형의 홈스펀 천, mirewarden 희귀 각 벌에 오스뮴 하나(Duskhide Wraps는 6개), 그리고 무두질 작업장 계산대의 Tanning Agent(16동). 오스뮴 자체는 결코 상점에서 팔지 않는다. Thornpeak이나 갓 시작하는 지역 대부분의 초보자용 광맥에서 직접 캐거나(Farshore만은 철을 캔다), 다른 플레이어에게서 사야 한다.",
           "ladderHeading": "Fenbridge에서 수련하기",
-          "ladderBody": "한 가지 다른 점. 무두질 작업장은 Mirefen Marsh 길목의 Fenbridge에 있어, Eastbrook 밖에서 수련하는 유일한 본격 기술이다. Tanner Hesk가 무두질 통 곁에서 가르친다. 생가죽 단은 기술 0에 무료, marshstalker 단은 기술 25부터 각 25은, mirewarden 단은 기술 50부터 각 1금. 두 제조법은 스승을 건너뛴다. 야외 일반품(Tanned Leather Jerkin과 Druid's Hide)은 처음부터 어디서든, Duskhide Wraps는 모두가 알지만 기술 75에 작업장 전용이다. 의복 장인의 서약 자체는 Eastbrook의 Ottilie 앞에서 한다. 늪에서 하는 것은 수련뿐이다.",
+          "ladderBody": "한 가지 다른 점. 무두질 작업장은 Mirefen Marsh 길목의 Fenbridge에 있어, Eastbrook 밖에서 수련하는 유일한 본격 기술이다. Tanner Hesk가 무두질 통 곁에서 가르친다. 생가죽 단은 기술 0에 무료, marshstalker 단은 기술 25부터 각 25은, mirewarden 단은 기술 50부터 각 1금. 두 제조법은 스승을 건너뛴다. 야외 일반품(Tanned Leather Jerkin과 Druid's Hide)은 처음부터 어디서든, Duskhide Wraps는 기술 50에 모두가 알며 작업장 전용이다. 의복 장인의 서약 자체는 Eastbrook의 Ottilie 앞에서 한다. 늪에서 하는 것은 수련뿐이다.",
           "routeHeading": "걸작, 그리고 125까지의 길",
-          "routeBody": "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden으로 75, 그 뒤는 Duskhide Wraps(3단 제조법, 오스뮴 6개, Pristine Hide 3장, 거친 가죽 2장, Tanning Agent 1)가 99까지 전속, 이후 절반으로 마지막 50점을 약 75회에 데려간다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다."
+          "routeBody": "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden 부위와 Duskhide Wraps가 함께 희귀 단계를 75까지 데려간다. 75를 넘으면 이 2단 제조법들은 절반, 다시 4분의 1로 숙련도가 줄어 마지막 50점을 125 상한까지 약 150회에 데려간다. 주 전공이 아니어도 완전히 막히지 않고 희귀 단계 제작 천장과 같은 수준을 유지한다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다."
         },
         "cooking": {
           "identityHeading": "일행을 먹이는 솥",
@@ -6280,7 +6436,7 @@ export const ko_KR: EnTranslations = {
         "q5": "걸작이 무엇인가요?",
         "a5": "모든 제작에는 품질이 한 단계 높게 완성될 작은 확률(3%부터 상한 15%)이 있으며, 공격대 하한을 넘는 일은 없다.",
         "q6": "'제작자:'는 무슨 뜻인가요?",
-        "a6": "아홉 가지 공용 야외 제작법과 도구 제작법은 처음부터 누구나 알고 있다. 작업장에 묶인 세 가지 상급 제작법(가마비늘 망토, 워드위브 두건, 더스크하이드 손목보호대)도 마찬가지여서 스승은 필요 없지만 그 작업장은 있어야 한다. 나머지는 모두 세 거점 마을의 각 작업장에 있는 스승이 가르친다. 대부분은 이스트브룩에 있고, 무두장이는 펜브릿지의 무두질 작업장에, 연금술사는 하이워치의 약방에 있다.\n\n스승의 제작법은 숙련 0, 25, 50 단계로 나뉘며 일회성 비용으로 각각 무료, 은 25, 금 1에 배운다. 스승은 그 제작 기술에서 당신의 등급이 제작법 자체의 등급에 이르면 가르쳐 주고, 배우려면 스승의 작업장에 서 있어야 한다. 이동식 작업장은 인정되지 않는다.",
+        "a6": "아홉 가지 공용 야외 제작법과 도구 제작법은 처음부터 누구나 알고 있다. 작업장에 묶인 세 가지 제작법(가마비늘 망토, 워드위브 두건, 더스크하이드 손목보호대)도 마찬가지여서 스승은 필요 없지만 그 작업장은 있어야 한다. 나머지는 모두 세 거점 마을의 각 작업장에 있는 스승이 가르친다. 대부분은 이스트브룩에 있고, 무두장이는 펜브릿지의 무두질 작업장에, 연금술사는 하이워치의 약방에 있다.\n\n스승의 제작법은 숙련 0, 25, 50 단계로 나뉘며 일회성 비용으로 각각 무료, 은 25, 금 1에 배운다. 마법부여의 부적 제조법 두 가지는 25 단계에 있고, 공작소 장인은 기술 75와 125에 제작 낚싯대 두 종을 각각 금 4와 16에 가르친다. 스승은 그 제작 기술에서 당신의 등급이 제작법 자체의 등급에 이르면 가르쳐 주고, 배우려면 스승의 작업장에 서 있어야 한다. 이동식 작업장은 인정되지 않는다.",
         "q7": "제작자의 서약이 무엇인가요?",
         "a7": "주문 제작품은 거래로 받는 이에게 귀속되고, 어느 작업대 장인이든 단계별 수수료로 풀어 줄 수 있다.",
         "q8": "원형을 바꿀 수 있나요?",
@@ -6305,6 +6461,7 @@ export const ko_KR: EnTranslations = {
       "bankBody": "모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.",
       "bankHow": "금고가 열린 상태에서 가방의 물건을 클릭하면 맡겨지고, 금고의 물건을 클릭하면 되찾습니다. 금고에는 물건만 보관할 수 있고 동전은 맡길 수 없으며, 퀘스트 아이템은 늘 몸에 지니게 됩니다. 여행 중에 가방이 가득 차면 제작 재료를 한 번에 맡기는 버튼도 있습니다.",
       "bankSlots": "갓 연 금고는 작지만 당신과 함께 자랍니다. 출납관은 추가 칸을 동전에 판매하며 가격은 단계마다 높아집니다. 온라인으로 플레이하면 이메일 인증, 계정 연동, 친구 초대 등으로 보너스 공간도 얻을 수 있습니다.",
+      "bankSockets": "칸 사다리 너머로, 출납관은 최대 네 개의 가방 칸도 판매합니다. 저렴한 것부터 순서대로 해금되며 가격은 단계마다 높아집니다. 들고 다니던 여분의 가방을 칸에 끼우면 그 가방의 칸이 금고 공간에 더해집니다. 일반 가방은 금고 전체를 넓히고, 재료 주머니는 제작 재료만 쓸 수 있는 공간을 더합니다. 가방에 있는 가방을 클릭하면 끼워지고, 칸을 클릭하면 되찾습니다. 되찾아도 보관한 물건을 잃는 일은 없습니다. 금고가 줄어든 공간을 넘어서더라도 모든 물건은 그대로 남고, 새 보관만 자리가 나기를 기다립니다.",
       "buyingTitle": "사고팔기",
       "buyingBody": "상인에게 말을 걸어 물건을 둘러보기로 하면, 그들의 상점이 세 개의 탭과 함께 열립니다. 구매, 판매, 되사기입니다. 구매 탭에는 그들이 갖춘 모든 물건이 있어, 형편이 닿는 한 무엇이든 살 수 있습니다. 판매 탭에는 가방 속에서 그들이 값을 치를 물건이 나열되며, 저마다 굴려 정해진 품질을 지닌 물건을 팔 때에는 먼저 확인을 묻기에, 아끼는 물건이 실수로 빠져나가는 일이 없습니다. 후회할 물건을 넘겼다면, 되사기 탭에 최근 판매 내역이 남아 있어 받았던 동전으로 다시 사들일 수 있습니다.",
       "junkTitle": "잡동사니 정리",
@@ -7341,6 +7498,7 @@ export const ko_KR: EnTranslations = {
       "title": "Solana 지갑 연결",
       "linkBody": "이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.",
       "paymentBody": "계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.",
+      "stepUpBody": "계정에 연결된 지갑을 선택하고 $WOC 거래소 승인 메시지에 서명하세요. 서명은 무료이며 자금이 이동하지 않습니다.",
       "extensionHelp": "호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.",
       "safety": "World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.",
       "continueWith": "{wallet}(으)로 계속",
@@ -9426,7 +9584,8 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots}칸 가방"
+      "bagSlots": "{slots}칸 가방",
+      "bagSlotsMaterials": "{slots}칸 재료 가방"
     },
     "bags": {
       "title": "가방",
@@ -9823,7 +9982,7 @@ export const ko_KR: EnTranslations = {
       },
       "ignition": {
         "name": "점화",
-        "description": "지속 효과: 주문이 치명타로 적중하면 대상을 불태워 6초에 걸쳐 입힌 피해의 40%만큼 피해를 줍니다. 효과는 중첩됩니다. (화염 특화)"
+        "description": "지속 효과: 주문이 치명타로 적중하면 대상을 불태워 6초에 걸쳐 입힌 피해의 30%만큼 피해를 줍니다. 효과는 중첩됩니다. (화염 특화)"
       },
       "mass_barrier": {
         "name": "대규모 방벽",
@@ -9993,7 +10152,7 @@ export const ko_KR: EnTranslations = {
       },
       "sap": {
         "name": "관자놀이 가격",
-        "description": "대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다."
+        "description": "대상을 8초 동안 무력화하며, 황혼장막을 해제하거나 전투를 시작하지 않습니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다."
       },
       "crippling_poison": {
         "name": "둔중한 독",
@@ -10265,7 +10424,7 @@ export const ko_KR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "준마의 상",
-        "description": "준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다."
+        "description": "준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다. 적용 중에는 피해를 받으면 둔화되어 4초 동안 이동 속도가 50% 감소합니다(적중할 때마다 둔화가 갱신됩니다)."
       },
       "aimed_shot": {
         "name": "긴 시위",
@@ -10429,7 +10588,7 @@ export const ko_KR: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "폭력의 주술",
-        "description": "적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 22의 암흑 피해를 되돌려 받습니다."
+        "description": "적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다."
       },
       "cruel_pact": {
         "name": "잔혹한 계약",
@@ -10635,7 +10794,7 @@ export const ko_KR: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "전령의 박자",
-        "description": "지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)"
+        "description": "지속 효과: 쌍수 무기 공격에는 추가 빗나갈 확률이 적용되지 않습니다. 무기 공격이 3번 적중할 때마다 25%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 전격 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)"
       },
       "stormsurge": {
         "name": "폭풍쇄도",
@@ -10847,7 +11006,7 @@ export const ko_KR: EnTranslations = {
       },
       "summon_infernal": {
         "name": "화염거상 소환",
-        "description": "대상 지역에 화염거상을 떨어뜨려 충돌 시 58-72의 화염 피해를 입힙니다. 당신의 악마를 대신하지 않은 채 30초 동안 싸우며, 2초마다 가까운 적을 태우고 1초마다 파괴력을 1 만듭니다."
+        "description": "대상 지역에 화염거상을 떨어뜨려 충돌 시 64-79의 화염 피해를 입힙니다. 당신의 악마를 대신하지 않은 채 30초 동안 싸우며, 2초마다 가까운 적을 태우고 1초마다 파괴력을 1 만듭니다."
       },
       "summon_doomguard": {
         "name": "망령태생 소환",
@@ -11195,7 +11354,7 @@ export const ko_KR: EnTranslations = {
       },
       "shadowstep": {
         "name": "그림자걸음",
-        "description": "그림자를 가로질러 대상에게 다가갑니다. (도적 특성)"
+        "description": "그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. (도적 특성)"
       },
       "silence": {
         "name": "침묵",
@@ -12851,8 +13010,47 @@ export const ko_KR: EnTranslations = {
       "pristine_claw": {
         "name": "온전한 발톱"
       },
+      "ps_castaway_crate": {
+        "name": "표류 상자"
+      },
+      "ps_ferry_bell": {
+        "name": "나룻배 종"
+      },
       "dawnhold_posy": {
         "name": "던홀드 정원 꽃다발"
+      },
+      "wayfarers_backpack": {
+        "name": "나그네의 배낭"
+      },
+      "burlap_reagent_pouch": {
+        "name": "삼베 재료 주머니"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "강령술사의 재료 가방"
+      },
+      "duskweave_bag": {
+        "name": "황혼결 가방"
+      },
+      "resonant_weave_bag": {
+        "name": "공명결 가방"
+      },
+      "foragers_haversack": {
+        "name": "채집가의 잡낭"
+      },
+      "loombound_reagent_satchel": {
+        "name": "베틀결 재료 가방"
+      },
+      "ps_briny_lure": {
+        "name": "짠물 미끼"
+      },
+      "ps_lustrous_pearl": {
+        "name": "영롱한 진주"
+      },
+      "mother_of_pearl": {
+        "name": "진주의 어머니"
+      },
+      "ps_passing_stone": {
+        "name": "안식의 돌"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -13894,9 +14092,6 @@ export const ko_KR: EnTranslations = {
       "tolling_bell": {
         "name": "울리는 종"
       },
-      "vale_cup_ball": {
-        "name": "멧돼지 가죽 공"
-      },
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
@@ -14194,6 +14389,15 @@ export const ko_KR: EnTranslations = {
       "fisher_bram": {
         "name": "어부 브람"
       },
+      "training_effigy": {
+        "name": "훈련용 허수아비"
+      },
+      "shore_scuttler": {
+        "name": "해변 종종게"
+      },
+      "mister_crabs": {
+        "name": "미스터 크랩스"
+      },
       "rift_hellguard": {
         "name": "지옥 수호병"
       },
@@ -14352,7 +14556,7 @@ export const ko_KR: EnTranslations = {
       "apothecary_lin": {
         "name": "약제사 린",
         "title": "약초상",
-        "greeting": "동쪽 숲에서 발 디딜 곳을 조심하십시오, 친구여."
+        "greeting": "북동쪽 숲에서 발 디딜 곳을 조심하십시오, 친구여."
       },
       "brother_aldric": {
         "name": "알드릭 수사",
@@ -14493,11 +14697,6 @@ export const ko_KR: EnTranslations = {
         "name": "영혼 치유사",
         "title": "죽은 자의 수호자",
         "greeting": "편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네."
-      },
-      "groundskeeper_bram": {
-        "name": "경기장 관리인 브람",
-        "title": "소우필드의 관리인",
-        "greeting": "소우필드에서는 휴전이 지켜지고 있소, {className}. 발과 어깨만 쓸 수 있소. 구리 들통을 걸고 한판 하겠소?"
       },
       "chronicler_saul": {
         "name": "연대기 기록관 사울",
@@ -14784,6 +14983,51 @@ export const ko_KR: EnTranslations = {
         "title": "약방의 주인",
         "greeting": "두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다."
       },
+      "wayfarer_bryn": {
+        "name": "방랑자 브린",
+        "title": "항구 안내인",
+        "greeting": "이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 레이븐포스트 우편함 옆의 나룻배 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다."
+      },
+      "instructor_maren": {
+        "name": "교관 마렌",
+        "title": "수련 사범",
+        "greeting": "골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요, {className}. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠. 이 해안은 그러라고 있는 곳이에요. 묻고, 연습하고, 실패해도 되는 곳에서 마음껏 실패하세요."
+      },
+      "quartermaster_finch": {
+        "name": "보급관 핀치",
+        "title": "야영지 물자상",
+        "greeting": "내 좌판에 파는 물건은 딱 하나예요, {playerName}. 길에서 주운 것들을 담을 여분의 주머니, 그것도 수업이 필요로 할 때만요. 그 밖의 것들은 전부 골짜기로 보낼 인양품이죠. 동전이 주머니를 사고, 일이 동전을 벌어요. 그게 경제의 전부예요. 더 복잡해지는 일은 없어요. 더 커질 뿐이지."
+      },
+      "ferryman_odo": {
+        "name": "뱃사공 오도",
+        "title": "나루터지기",
+        "greeting": "방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 이 해안의 지기들은 맡은 일이 끝날 때마다 당신을 다음 사람에게 넘겨주고, 화면 위쪽의 카드는 언제나 다음 길을 알고 있죠. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다."
+      },
+      "bursar_wick": {
+        "name": "경리관 윅",
+        "title": "도금 금고",
+        "greeting": "도금 금고는 이런 곳에도 책상 하나를 두고 있답니다, {playerName}. 내게 맡긴 것은 모든 마을 모든 경리관 뒤에 있는 같은 금고에서 기다립니다. 늑대도, 바닷물도, 당신 자신의 섣부른 판단도 손대지 못하죠."
+      },
+      "warden_tam": {
+        "name": "워든 탐",
+        "title": "건틀릿의 파수꾼",
+        "greeting": "이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 울타리의 등불은 밤새 꺼지지 않으니, 길이 닫히는 일은 없습니다."
+      },
+      "overseer_pell": {
+        "name": "감독관 펠",
+        "title": "건틀릿 감독관",
+        "greeting": "이 길을 내려오는 완주는 전부 내가 잽니다, {playerName}. 그리고 훨씬 형편없는 발놀림도 숱하게 봤죠. 내 뒤의 길은 수련장으로 오릅니다. 발놀림이 칼놀림으로 바뀌는 곳이 바로 거기죠."
+      },
+      "drillmaster_rook": {
+        "name": "교련관 루크",
+        "title": "수련장의 주인",
+        "greeting": "짚이 먼저, 껍데기는 그다음입니다, {playerName}. 허수아비는 팔에 휘두르는 법을 가르치고, 바닷가의 종종게들은 싫어하는 상대에게 맞히는 법을 가르치죠."
+      },
+      "tidewarden_nel": {
+        "name": "조수지기 넬",
+        "title": "바닷가의 파수꾼",
+        "greeting": "조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요."
+      },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
@@ -14793,7 +15037,7 @@ export const ko_KR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
-        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남동쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
+        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 북동쪽, 늑대길을 지난 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
         "completion": "보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.",
         "objectives": {
           "0": {
@@ -14833,7 +15077,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_spiders": {
         "title": "흑거미줄의 위협",
-        "text": "동쪽 숲의 잠복자들은 제 찜질약에 필요한 비단을 자아냅니다. 게다가 그 수가 너무 많이 불어났습니다. 흑거미줄 잠복자 6마리를 솎아내고 그 배에서 비단샘 4개를 잘라 오십시오.",
+        "text": "북동쪽 숲의 잠복자들은 제 찜질약에 필요한 비단을 자아냅니다. 게다가 그 수가 너무 많이 불어났습니다. 흑거미줄 잠복자 6마리를 솎아내고 그 배에서 비단샘 4개를 잘라 오십시오.",
         "completion": "윽, 아직 꿈틀거립니다. 완벽합니다. 보상을 받으십시오.",
         "objectives": {
           "0": {
@@ -14876,7 +15120,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_supplies": {
         "title": "도난당한 보급품",
-        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
+        "text": "도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 북서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.",
         "completion": "내 상자들입니다! 흠집도 거의 없군요. 대단합니다.",
         "objectives": {
           "0": {
@@ -14969,7 +15213,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_bandits": {
         "title": "계곡의 도적들",
-        "text": "남서쪽 언덕에 칼잡이들이 야영하고 있습니다. 이번 주에 마차 셋을 털었습니다. 계곡 도적 10명을 처치하십시오.",
+        "text": "북서쪽 언덕에 칼잡이들이 야영하고 있습니다. 이번 주에 마차 셋을 털었습니다. 계곡 도적 10명을 처치하십시오.",
         "completion": "어둠 속 칼이 열 자루 줄었습니다. 받으십시오, 벌어낸 보상입니다.",
         "objectives": {
           "0": {
@@ -15649,7 +15893,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "다시 이은 실",
-        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
+        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 북동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
         "completion": "다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.",
         "objectives": {
           "0": {
@@ -15659,7 +15903,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "다시 화덕 위로",
-        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
+        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 북서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
         "completion": "옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.",
         "objectives": {
           "0": {
@@ -16750,6 +16994,109 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "건틀릿 완주",
+        "text": "골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.",
+        "completion": "방금 그 완주, 제대로 쟀습니다, {playerName}. 더 빠른 발도 떨어뜨려 본 적이 있죠. 건틀릿은 이제 당신 것입니다. 내 뒤의 길은 수련장으로 오릅니다. 거기서 교련관 루크가 발놀림을 칼놀림으로 바꿔 주죠. 다음 임무는 그가 갖고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "건틀릿 깃발 통과"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "정확한 일격",
+        "text": "발 다음은 팔입니다, {playerName}. 수련장은 내 뒤 길을 오른 곳에 있고, 그곳의 짚 허수아비들은 맞으라고 만든 것들이죠. 길을 잃겠거든 M을 눌러 지도를 여세요. 맡은 임무는 모두 지도에 표시됩니다. 허수아비에게 다가가 Tab을 누르거나 왼쪽 클릭해 대상으로 잡고, 그런 다음 1을 누르거나 화면 아래쪽 행동 단축바의 첫 번째 아이콘을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요. 반격은 없습니다. 허수아비란 원래 그런 법이니까요. 교련관 루크가 바닷가 길이 시작되는 수련장 서쪽 끝에서 지켜보고 있습니다. 그에게 F를 눌러 결과를 보고하세요.",
+        "completion": "깔끔하게 하나 쓰러뜨렸고, 손아귀도 벌써 단단해졌군요. 그 감각을 기억하세요, {playerName}. 대상을 잡고, 내리치고, 계속 내리치기. 짚은 아무래도 상관하지 않지만, 다음에 당신이 칼을 휘두를 상대는 그렇지 않을 겁니다.",
+        "objectives": {
+          "0": {
+            "label": "훈련용 허수아비 쓰러뜨리기"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "날을 세우다",
+        "text": "휘두르는 건 휘두르는 것일 뿐입니다, {playerName}. 짚은 하루 종일이라도 받아 주지만, 그걸로는 아무것도 얻지 못합니다. 화면 아래에 늘어선 버튼들을 보세요. 그 줄이 당신의 기술이고, 하나하나가 팔만으로는 할 수 없는 일을 해냅니다. 이미 하나 가지고 있습니다. 허수아비로 돌아가 그것을 쓰세요. 대상을 잡고, 이 훈련장이 알려 주는 버튼을 누르는 겁니다. 세 번. 짚을 그냥 두들기지 말고, 당신이 아는 그 기술을 실제로 일으키세요. 그런 다음 제게 오세요.",
+        "completion": "이제야 허우적대는 대신 싸우고 있군요. 그 줄은 레벨을 올릴 때마다 길어집니다, {playerName}. 가장 오래 살아남는 이들은 그 줄을 읽는 사람들입니다. 짚은 당신이 어떤 버튼을 썼든 신경 쓰지 않습니다. 골짜기는 신경 씁니다.",
+        "objectives": {
+          "0": {
+            "label": "허수아비에 기술 명중"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "껍데기와 집게발",
+        "text": "짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. 왼쪽 클릭으로 한 마리를 대상으로 잡고, 수련장에서 배운 기술을 쓰며, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.",
+        "completion": "껍데기 셋을 깨고도 손가락은 하나도 잃지 않았군요. 첫 싸움치고는 훌륭해요, {playerName}. 저 게들은 조수가 표류물을 실어 오는 것보다 빨리 난파선을 털어 가니, 당신이 한 마리 솎아 낼 때마다 누군가의 동전이 지켜진답니다.",
+        "objectives": {
+          "0": {
+            "label": "해변 종종게 솎아내기"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "진주의 어머니",
+        "text": "껍데기 셋을 깼군요, {playerName}. 하지만 난파선 해안에는 왕이 있고, 그 왕은 이 백사장의 어느 상자보다 값진 보물을 깔고 앉아 있습니다. 이 짠물 미끼를 들고 난파선 너머, 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 B를 눌러 가방을 열고, 미끼를 왼쪽 클릭해 왕을 깨우세요. 미스터 크랩스의 집게는 작은 사촌들보다 훨씬 아픕니다. 생명력 막대를 살피고, 계속 공격하고, 숨을 돌려야 하면 모래 위로 물러나세요. 왕이 쓰러지면 이름이 보일 때까지 껍데기로 다가가 F를 누르거나 왼쪽 클릭해, 왕이 껴안고 있던 영롱한 진주를 차지하세요. 그 진주를 제게 가져오세요.",
+        "completion": "영롱한 진주, 그것도 얕은 바다의 늙은 왕에게서 직접 떼어 낸 것이군요. 제 아버지는 일 나가는 아침마다 그 게에게 모자를 들어 인사했습니다. 존경은 마땅히 치러야지요. 가만히... 됐습니다. 실에 꿰고, 고정하고, 이제 당신 것입니다, {playerName}. 진주의 어머니입니다. B를 눌러 가방을 열고 반지를 왼쪽 클릭해 끼워 보세요. 그런 다음 C를 눌러 캐릭터 창을 열면 손에 낀 반지가 보일 겁니다. 작은 물건이지만, 끼고 있으면 당신의 모든 것이 조금씩 나아집니다.",
+        "objectives": {
+          "0": {
+            "label": "미스터 크랩스 처치"
+          },
+          "1": {
+            "label": "영롱한 진주 획득"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "난파선 해안",
+        "text": "내 짐꾼들이 옛 난파선에서 표류물을 내려 새벽쉼터 야영지로 오르는 언덕길로 나릅니다, {playerName}. 그런데 상자 절반은 끝내 언덕을 다 오르지 못해요. 길가에 내려놓인 채 잊히고 말죠. 내 길을 따라 야영지 쪽으로 가면 그 낙오한 상자들 곁을 바로 지나게 됩니다. 여는 건 간단해요. 이름이 보일 때까지 상자에 다가가 F를 누르거나 상자를 왼쪽 클릭하면, 품고 있던 것을 내어 줍니다. 여섯이면 이 길이 말끔해지고, 앞으로 만날 모든 상자와 채집물과 문도 전부 같은 F 하나로 연다는 걸 기억하세요. 보급관 핀치가 야영지 좌판을 지키며 표류물이라면 나뭇가지 하나까지 사들입니다. 거둔 것을 그녀에게 넘기세요.",
+        "completion": "밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 전부 사죠, {playerName}. 주운 것을 지고 나를 줄 아는 등은 이 야영지에 어떤 칼보다 값진데, 당신의 등은 방금 한 번의 오르막으로 이 길을 통째로 치워 냈군요.",
+        "objectives": {
+          "0": {
+            "label": "표류 상자 열기"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "주머니와 돈주머니",
+        "text": "골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 그러니 내게 다시 F를 눌러 좌판을 열고, 물건 중에서 아마천 주머니를 왼쪽 클릭해 사세요. 그런 다음 B를 눌러 가방을 열고, 거기 있는 주머니를 왼쪽 클릭해 빈 고리에 채우세요. 교관 마렌이 몇 걸음 동쪽 집합 모닥불 곁에서 훈련을 이끌고 있습니다. 허리에 걸린 주머니를 보여 드리세요.",
+        "completion": "좋은 주머니군요. 아직 차지 않았다면 지금 차세요. B를 눌러 가방을 열고, 주머니를 왼쪽 클릭해 빈 가방 고리에 채우면, 말썽거리를 담을 칸이 여섯 늘어납니다. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 경리관 윅이 서쪽 길을 오른 곳에 금고 책상을 두고 있는데, 그가 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.",
+        "objectives": {
+          "0": {
+            "label": "아마천 주머니 구입하기"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "바람결 소식",
+        "text": "배울 습관이 하나 남았어요, {playerName}. 칼은 필요 없죠. 게시판 읽기입니다. 길드 게시 기둥이 내 모닥불에서 남서쪽으로 몇 걸음, 야영지 정문에 서 있고, 길드와 떠도는 무리들이 거기에 부름의 글을 붙입니다. 기둥 앞까지 다가가 F를 누르거나 왼쪽 클릭해 붙은 글을 읽고, 돌아와 바람이 무엇을 실어 왔는지 들려주세요. 앞으로 당신이 걸어 들어갈 모든 마을에 똑같은 게시판이 서 있답니다.",
+        "completion": "이제 골짜기에서 소식이 어떻게 도는지 알겠죠, {playerName}. 파발꾼이 아니라 게시판으로 돕니다. 지나는 마을마다 들여다보세요. 모험의 절반은 게시판 위 세 줄 먹글에서 시작된답니다.",
+        "objectives": {
+          "0": {
+            "label": "길드 게시 기둥 읽기"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "먼 귀로",
+        "text": "남은 가르침은 하나입니다, {playerName}. 그리고 이건 말로 전할 수 없어요. 한 번은 겪어 봐야 합니다. 당신은 바깥에서 죽게 됩니다. 누구나 그렇고, 그게 무엇의 끝도 아닙니다. 이 안식의 돌을 가져가세요. B를 눌러 가방을 열고 왼쪽 클릭하면, 선 자리에서 당신을 눕혀 줍니다. 그다음에는 화면에 뜨는 안내를 따르세요. 영혼을 해방하고, 당신의 시신까지 걸어가서, 그 안으로 들어가는 겁니다. 시신은 기다립니다. 그 길은 공짜이고, 걸어도 잃는 것은 없습니다.",
+        "completion": "그리고 이렇게 돌아왔군요, 아무 탈 없이. 그 느낌을 기억하세요, {playerName}. 다음번에는 이빨이 끼어 있을 테고, 옆에서 설명해 줄 사람도 없을 테니까요. 시신은 기다립니다. 길은 공짜이고, 죽음이 정말로 앗아가는 건 돌아오는 데 걸리는 시간뿐입니다.",
+        "objectives": {
+          "0": {
+            "label": "죽음에서 걸어 돌아옴"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "출항",
+        "text": "이 해안에는 당신이 이미 달리지 않았거나, 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 해안길을 따라 부두로 되돌아 내려가 뱃사공 오도에게 F를 누르고, 내가 당신이 건너갈 자격을 얻었다 했다고 전하세요. 누구에게 무엇을 빚졌는지 헷갈릴 때는 언제든 L을 누르세요. 그것이 당신의 퀘스트 일지입니다.",
+        "completion": "마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 준비가 되면 내 부두 옆에 선 종을 울리세요, {playerName}. 건너기가 이스트브룩 마을 한복판에 내려 줄 겁니다. 늑대를 조심하세요.",
+        "objectives": {
+          "0": {
+            "label": "뱃사공 오도에게 보고"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "바람길을 내려가다",
         "text": "그 비탈을 올라 냈으니, {playerName}, 바람이 자네를 거두기로 한 모양이군. 윅하버는 구릉 길을 따라 동쪽, 후미의 바람그늘에 웅크리고 있네. 항만장 오딜은 고개를 넘어오는 사람을 하나하나 세는데, 자네도 세고 싶어 할 걸세. 그녀에게 바람길이 아직 열려 있다고 전하게.",
@@ -16947,6 +17294,9 @@ export const ko_KR: EnTranslations = {
           },
           "11": {
             "label": "먼바다 해안 모래톱 둑길"
+          },
+          "12": {
+            "label": "이스트브룩 부두"
           }
         }
       },
@@ -17307,6 +17657,27 @@ export const ko_KR: EnTranslations = {
           },
           "4": {
             "label": "균열의 들판"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "수련의 해안",
+        "welcome": "수련의 해안이 당신에게 바라는 것은 시간뿐입니다. 야영지를 익히고, 허수아비를 치고, 난파선 해안을 걸어 보세요. 준비가 되면 뱃사공 오도가 골짜기까지 건네줄 겁니다.",
+        "pois": {
+          "0": {
+            "label": "새벽쉼터 야영지"
+          },
+          "1": {
+            "label": "낡은 부두"
+          },
+          "2": {
+            "label": "수련장"
+          },
+          "3": {
+            "label": "난파선 해안"
+          },
+          "4": {
+            "label": "건틀릿"
           }
         }
       }

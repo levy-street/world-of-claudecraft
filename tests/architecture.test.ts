@@ -217,10 +217,11 @@ const UI_PURE_CORES = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
-  'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
+  'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
+  'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/error_text_i18n_core.ts',
   'src/ui/general_chat_quota_view.ts',
@@ -260,6 +261,9 @@ const UI_PURE_CORES = [
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
   'src/ui/meters_breakdown_view.ts',
+  'src/ui/interface_unlock_core.ts',
+  'src/ui/interface_unlock_menu_core.ts',
+  'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
@@ -293,6 +297,13 @@ const UI_PURE_CORES = [
   'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
+  // The bank's bonus-slot breakdown footer: the KNOWN account-source table and the
+  // markup it projects a BankBonusModel into (Bank Storage phase 17, the extraction
+  // this window's ratchet row named).
+  'src/ui/bank_bonus_view.ts',
+  'src/ui/bank_socket_purchase_core.ts',
+  'src/ui/storage_rung_echo_core.ts',
+  'src/ui/vault_view.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
@@ -307,7 +318,67 @@ const UI_PURE_CORES = [
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_launcher_balance_core.ts',
   'src/ui/claudium_view.ts',
+  'src/ui/charter_card_view.ts',
+  // The Season 1 Armory's section / card / class-chip markup, the charter_card_view
+  // twin on the other half of the same store body (Bank Storage phase 15).
+  'src/ui/armory_card_view.ts',
+  // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
+  // phase 17). The overlay ELEMENT lives in the thin painter beside it.
+  'src/ui/daily_rewards_spin_view.ts',
+  // The rewards tab's leaderboard and payout-history panels, pure functions of the
+  // wire records (Bank Storage phase 17's review round, which spent the room the
+  // spin extraction bought and paid for it here rather than raising a ceiling).
+  'src/ui/daily_rewards_ranks_view.ts',
+  // The rewards tab's wallet LOCK card, a pure three-way branch on the lock reason
+  // (Bank Storage phase 17's review round, paying for a comment correction the way
+  // the phase paid for everything else).
+  'src/ui/daily_rewards_wallet_card_view.ts',
   'src/ui/woc_store_view.ts',
+  // The banker rung purchase's copy mappers and its second price tag's markup
+  // (Bank Storage phase 13), the charter_card_view twin one surface over.
+  'src/ui/bank_rung_view.ts',
+  // The capacity meter's copy: its accessible name and its tooltip body
+  // (Bank Storage phase 18, the same extraction shape one surface over).
+  'src/ui/bank_meter_view.ts',
+  // The banker rung purchase's money STATE MACHINE (Bank Storage phase 17,
+  // ruling 30): the sent latch, the in-flight SKU, the result band, the confirm
+  // latch and the re-prompt cap, plus the spend and its refusal handling. Every
+  // host effect is an injected closure, so it is DOM-free by construction. It is
+  // registered by name here rather than only swept: the determinism scan is what
+  // this file is for on this path, because a clock or an rng draw inside a
+  // purchase state machine is what mints a second key.
+  'src/ui/bank_rung_purchase_core.ts',
+  // The bank pane's short-phone chrome contract (Bank Storage phase 18): which
+  // bands must never scroll out of view, the compact-regime breakpoint the
+  // stylesheet also states, and where the pane's scroll offset lives. Pure
+  // numbers and selector strings; the sheet is held to it by
+  // tests/bank_chrome_layout.test.ts.
+  'src/ui/bank_chrome_layout_core.ts',
+  // The Claudium spend seam both spending windows consume. Not a *_view/*_core
+  // name, so registered by hand: it holds no state of its own and reads its
+  // host lazily, and a clock or an rng draw in here would reach the money path.
+  'src/ui/claudium_purchase_bridge.ts',
+  // The store's purchase-intent ledger. Not a *_view/*_core name, so the
+  // completeness scan below would never adopt it: registered by hand so the
+  // purity and determinism scans cover it. It holds one idempotency key per
+  // open purchase intent, and a clock or an rng draw in here would make a
+  // retry mint a new key, which is a second real charge.
+  'src/ui/store_purchase_intent.ts',
+  // The DURABLE half of that ledger: the row codec plus every guard that decides
+  // whether a stored intent may be handed back (scope, charset, cost, age, cap).
+  // Registered by hand for the same reason and with more force: it is the module
+  // a staleness rule would tempt someone to give a clock, and a clock in here
+  // would make the age check untestable and the ledger's own purity pointless.
+  // The clock and the browser storage live one door over, in the deliberately
+  // impure src/ui/purchase_intent_durability.ts.
+  'src/ui/purchase_intent_record.ts',
+  // What the open store remembers about charter FIT between paints: the server's
+  // refusals plus the ladder count last painted against, and the rule by which a
+  // count that moves DOWN invalidates the refusals (Bank Storage phase 15 QA).
+  // Not a *_view/*_core name, so registered by hand like the intent ledger above.
+  // It is deliberately DOM-free and clock-free: a wall-clock expiry in here would
+  // make a refusal lapse mid-visit and repaint a guaranteed-to-fail card enabled.
+  'src/ui/charter_fit_memory.ts',
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
@@ -322,6 +393,11 @@ const UI_PURE_CORES = [
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
+  'src/ui/bootcamp_view.ts',
+  'src/ui/coach_prompt_view.ts',
+  'src/ui/objective_glow_view.ts',
+  'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
@@ -364,24 +440,22 @@ const UI_PURE_CORES = [
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
-  'src/ui/vale_cup_window_view.ts',
-  'src/ui/vale_cup_indicator_view.ts',
-  'src/ui/vale_cup_hud_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
-  'src/ui/vale_cup_briefing_view.ts',
-  'src/ui/vale_cup_betting_view.ts',
-  'src/ui/vale_cup_charge_view.ts',
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
+  // The signpost guild board's roster drill-in core (the board itself reuses
+  // guild_leaderboard_view above).
+  'src/ui/hud/guild_board/guild_roster_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deed_border_view.ts',
+  'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/reliquary_view.ts',
@@ -398,6 +472,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
+  'src/ui/hud/action_bar/action_bar_toggle_core.ts',
   'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
@@ -424,6 +499,7 @@ const UI_PURE_CORES = [
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
+  'src/ui/target_frame_pos.ts',
   'src/ui/focus_order.ts',
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',
@@ -494,6 +570,9 @@ const RENDER_PURE_CORES = [
   'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
+  'src/render/quest_beacon_core.ts',
+  'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
@@ -537,13 +616,17 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
+  'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_decimation_core.ts',
+  'src/render/foliage_shore_gate_core.ts',
   'src/render/gpu_queue_window_core.ts',
   'src/render/compile_priority_core.ts',
   'src/render/view_create_budget_core.ts',
   'src/render/gpu_prep_budget_core.ts',
   'src/render/evil_eye_marker_core.ts',
+  'src/render/kit_uv_surface_core.ts',
+  'src/render/kit_window_panes_core.ts',
   'src/render/lich_audio_state_core.ts',
   'src/render/needle_of_fate_vfx_core.ts',
   'src/render/prewarm_resume_ledger_core.ts',
@@ -578,6 +661,7 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
@@ -713,6 +797,7 @@ const BARE_NAMED = [
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/target_frame_pos.ts',
   'src/ui/unit_frame.ts',
   'src/ui/hud_frames.ts',
   'src/ui/minimap_markers.ts',
@@ -730,6 +815,10 @@ const BARE_NAMED = [
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/claudium_purchase_bridge.ts',
+  'src/ui/store_purchase_intent.ts',
+  'src/ui/purchase_intent_record.ts',
+  'src/ui/charter_fit_memory.ts',
 ].map((rel) => join(repoRoot, rel));
 
 function importSpecs(src: string): string[] {
@@ -1745,7 +1834,9 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/charter_fit_memory.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/ui/claudium_purchase_bridge.ts',
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
@@ -1777,13 +1868,16 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/party_collapse.ts',
   'src/ui/party_frames.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
@@ -2124,11 +2218,12 @@ const UI_DOM_MODULES = [
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
+  'src/ui/bank_status_line.ts',
   'src/ui/bank_window.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
-  'src/ui/camera_prompt.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
@@ -2150,6 +2245,14 @@ const UI_DOM_MODULES = [
   'src/ui/continent_art.ts',
   'src/ui/crafting_window.ts',
   'src/ui/commission_order_window.ts',
+  // The spin celebration's live element: created, listened to, mounted on
+  // document.body and torn down (Bank Storage phase 17). Its markup and geometry
+  // are in the pure src/ui/daily_rewards_spin_view.ts. Named `_controller` so the
+  // painter gate's filename sweep keeps the cold contract this code held while it
+  // lived in the window, WITHOUT the stricter facet-routed contract a `_painter`
+  // carries or the by-name sweep that would drop this very row. The double
+  // coverage is the deliberate one this file's own header describes.
+  'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',
@@ -2166,6 +2269,7 @@ const UI_DOM_MODULES = [
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
   'src/ui/hud.ts',
+  'src/ui/hud/action_bar/action_bar_toggle_controller.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',
   'src/ui/hud/cosmetics/skin_event_controller.ts',
@@ -2194,6 +2298,8 @@ const UI_DOM_MODULES = [
   'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
   'src/ui/inspect_window.ts',
+  'src/ui/interface_unlock.ts',
+  'src/ui/settings_transfer.ts',
   'src/ui/item_drop_hit_test.ts',
   'src/ui/loading_backdrop.ts',
   'src/ui/loading_slow_hint.ts',
@@ -2217,6 +2323,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
@@ -2232,12 +2339,26 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/professions_window.ts',
+  // The binder that gives a purchase-intent ledger a durable half. It reaches
+  // localStorage (through the safe_local_storage seam, the one sanctioned door)
+  // and the clock, which is precisely why it is not in the pure record core it
+  // wraps: the age bound has to be injectable or it cannot be tested, and a
+  // clock inside a registered core would break the scan the ledger's whole
+  // testability rests on. Its sibling src/ui/purchase_intent_key.ts is listed
+  // here too, for the same reason on the other half of the split.
+  'src/ui/purchase_intent_durability.ts',
+  // The ONE Claudium idempotency-key minter. It reaches globalThis.crypto and,
+  // on the fallback arm, the clock and an rng, which is exactly why it is NOT
+  // in store_purchase_intent.ts: that ledger is a pure core whose determinism
+  // scan is what lets a caller inject a minter and test it deterministically.
+  'src/ui/purchase_intent_key.ts',
   'src/ui/reconnect_overlay.ts',
   // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
   // pinned page set persists per character in localStorage (the deeds_window
@@ -2249,6 +2370,8 @@ const UI_DOM_MODULES = [
   'src/ui/spellbook_window.ts',
   'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
+  'src/ui/steam_wishlist.ts',
+  'src/ui/store_decision_prompt.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
@@ -2262,13 +2385,11 @@ const UI_DOM_MODULES = [
   // pure core.
   'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
+  'src/ui/bootcamp.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',
-  'src/ui/vale_cup_betting.ts',
-  'src/ui/vale_cup_briefing.ts',
-  'src/ui/vale_cup_charge.ts',
-  'src/ui/vale_cup_hud.ts',
+  'src/ui/vault_window.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
@@ -2569,5 +2690,88 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect('rgba(0, 0, 0, .5)'.match(COLOR_FUNC_RE)).toEqual(['rgba(']);
     expect('rgb(1 2 3)'.match(COLOR_FUNC_RE)).toEqual(['rgb(']);
     expect('const hex = colorToken;'.match(COLOR_HEX_RE)).toBeNull();
+  });
+});
+
+// Shipping source (src/ and server/) must stay free of raw C0 control bytes.
+// This is not style: a single NUL makes the whole file BINARY to the grep-family
+// tools the repo's own sweeps are built on, and they fail SILENTLY. On this
+// machine `grep` is ugrep, which skips a binary file outright: before the Bank
+// Storage phase 11 QA fix, `grep -c export server/storage_purchases.ts` printed
+// nothing and exited 1 while `grep --binary-files=text` found ten, so the
+// phase's largest money-path module read as an EMPTY file to every source sweep.
+// tests/ is deliberately exempt: a test legitimately embeds a control byte as
+// INPUT (appearance_wire_bounds pins one inside a name, enchant_apply_view builds
+// a NUL-separated composite key, glb_assets feeds a sanitizer), and those files
+// are not what a source sweep is trying to read.
+const CONTROL_BYTE_ROOTS = ['src', 'server'] as const;
+
+/** Index of the first raw C0 control byte (or DEL), else -1. A codepoint scan
+ *  rather than a regex on purpose: a regex literal holding control characters
+ *  is itself a biome error (noControlCharactersInRegex), and a character class
+ *  is easy to widen or invert by accident, whereas this predicate is directly
+ *  unit-testable. Tab and newline are the only legal ones; carriage return is
+ *  banned with the rest because this repo is LF-only, so a CR here is
+ *  corruption too. */
+function firstControlByteIndex(text: string): number {
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code === 0x09 || code === 0x0a) continue;
+    if (code < 0x20 || code === 0x7f) return i;
+  }
+  return -1;
+}
+
+describe('shipping source carries no raw control bytes', () => {
+  const files = CONTROL_BYTE_ROOTS.flatMap((root) => walk(join(repoRoot, root)));
+
+  it('finds both shipping source trees', () => {
+    expect(files.length).toBeGreaterThan(400);
+  });
+
+  it('has no control byte in any src/ or server/ TypeScript file', () => {
+    const offenders: string[] = [];
+    for (const file of files) {
+      const text = readFileSync(file, 'utf8');
+      const at = firstControlByteIndex(text);
+      if (at === -1) continue;
+      const line = text.slice(0, at).split('\n').length;
+      const code = text.charCodeAt(at).toString(16).padStart(4, '0');
+      offenders.push(`${file.slice(repoRoot.length)}:${line} carries U+${code.toUpperCase()}`);
+    }
+    expect(
+      offenders,
+      'A raw control byte makes the file binary to grep, so every source sweep ' +
+        'silently skips it. Write the character as an escape in a string literal ' +
+        `instead:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('the ban FIRES on every control byte and spares tab, newline, and real text', () => {
+    // Mutation-proof for the predicate itself: the sweep above is only as strong
+    // as this scan, and an off-by-one in either bound would silently disarm it.
+    const nul = String.fromCharCode(0);
+    const del = String.fromCharCode(0x7f);
+    const esc = String.fromCharCode(0x1b);
+    // The exact regression this guard was written for.
+    expect(firstControlByteIndex(`const K = '${nul}recovery-scan';`)).toBe(11);
+    expect(firstControlByteIndex(del)).toBe(0);
+    expect(firstControlByteIndex(esc)).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x0d))).toBe(0);
+    // Both edges of the legal window, so neither bound can drift.
+    expect(firstControlByteIndex(String.fromCharCode(0x08))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x0b))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x1f))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x20))).toBe(-1);
+    expect(firstControlByteIndex(String.fromCharCode(0x7e))).toBe(-1);
+    // Tab and newline stay legal, and the shipped fix uses a real SPACE.
+    expect(firstControlByteIndex('\t')).toBe(-1);
+    expect(firstControlByteIndex('\n')).toBe(-1);
+    expect(firstControlByteIndex(`const K = ' recovery-scan';`)).toBe(-1);
+    // The escaped SPELLING of a control byte stays legal: only the raw byte is
+    // banned, so a module that genuinely needs one can still express it.
+    expect(firstControlByteIndex(`const sep = '\\u0000';`)).toBe(-1);
+    // It reports the FIRST offender, not merely "some", so the message locates it.
+    expect(firstControlByteIndex(`ab${del}c${nul}`)).toBe(2);
   });
 });

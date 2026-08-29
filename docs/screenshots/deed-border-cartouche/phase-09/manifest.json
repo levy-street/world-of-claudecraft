@@ -1,0 +1,29 @@
+{
+  "mode": "change-aware",
+  "captured": [
+    "01-deed-heraldry-unit-frames-desktop-low.png",
+    "02-deed-heraldry-unit-frames-desktop-high.png",
+    "03-deed-heraldry-unit-frames-mobile.png",
+    "04-deed-heraldry-unit-frames-parchment.png"
+  ],
+  "errors": [
+    "CONSOLE(deed-heraldry-unit-frames-desktop-low): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-low): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-low): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-high): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-high): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-high): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-desktop-high): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_murloc): Error: character asset not preloaded: models/creatures/frog.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (skel_minion): Error: character asset not preloaded: models/chars/enemies/skeleton_minion.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_troll): Error: character asset not preloaded: models/creatures/orc.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_grubjaw): Error: character asset not preloaded: models/creatures/grubjaw.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_wolf): Error: character asset not preloaded: models/creatures/wolf_basic.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_spider): Error: character asset not preloaded: models/creatures/spider.glb",
+    "CONSOLE(deed-heraldry-unit-frames-mobile): character visual unavailable, skipping view (mob_spider_egg_sac): Error: character asset not preloaded: models/creatures/spider_egg_sac.glb",
+    "CONSOLE(deed-heraldry-unit-frames-parchment): Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "CONSOLE(deed-heraldry-unit-frames-parchment): Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+  ]
+}

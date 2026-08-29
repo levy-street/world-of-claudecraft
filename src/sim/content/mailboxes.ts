@@ -15,6 +15,7 @@ import { FROSTVEIL_ZONE } from './frostveil';
 import { GALECREST_ZONE } from './galecrest';
 import { NIGHTBLOOM_ZONE } from './nightbloom';
 import { PALMREACH_ZONE } from './palmreach';
+import { PROVING_SHORE_ZONE } from './proving_shore';
 import { REALM_ZONE } from './realm';
 import { WILLOWFEN_ZONE } from './willowfen';
 import { WRAITHWOOD_ZONE } from './wraithwood';
@@ -43,4 +44,10 @@ export const MAILBOXES: MailboxDef[] = [
   hubMailbox(EVERGARDEN_ZONE, { x: -6, z: 6 }), // Hedgewick, facing the parterre
   hubMailbox(GALECREST_ZONE, { x: 7, z: -5 }), // Wickharbor, beside the harbor square
   hubMailbox(FARSHORE_ZONE, { x: -6, z: 6 }), // Gullhaven, inside the redoubt
+  // Dawnrest Camp, up the camp's north edge. Requested at (-306, 60), moved
+  // 4 yards south: the camp's shoreline runs diagonally and (-306, 60) sits
+  // below the waterline (ground -4.02 against WATER_LEVEL -4.3), which would
+  // have put the Ravenpost perch in the shallows. Turned a half circle from
+  // the pillars' default yaw so the slot faces the muster ground.
+  { ...hubMailbox(PROVING_SHORE_ZONE, { x: -6, z: 6 }), facing: Math.PI },
 ];

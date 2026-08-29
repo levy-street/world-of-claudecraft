@@ -31,6 +31,7 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
@@ -143,10 +144,13 @@ export interface WsAuthDeps {
   // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
   // referrals) so a fresh join stamps the current entitlement into the character state.
   // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
-  // rejection fails the handshake exactly like a getCharacter failure.
+  // rejection fails the handshake exactly like a getCharacter failure. characterCount
+  // (the tutorial greeting's firstCharacter fact; the row being joined is already
+  // counted, so first means <= 1) rides the same single round trip rather than a
+  // second serial await on every handshake.
   bankBonusForAccount: (
     accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
 }
 
 export interface WsAuthHandlers {
@@ -449,6 +453,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
+            // The tutorial greeting's account fact: this join's character is
+            // the account's first when the account-wide count is at most 1
+            // (the row being joined is already counted). Fresh-join arm only,
+            // like bankBonus, whose single query carries the count.
+            const firstCharacter = bankBonus.characterCount <= 1;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -502,6 +511,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
+                firstCharacter,
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,
@@ -536,6 +546,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );
+        // Bank Storage phase 11: settle any pending Claudium storage purchase
+        // against the freshly loaded state (fire-and-forget; never gates the
+        // join). A join that internally resumed a linkdead session is safe
+        // here too: an in-flight purchase still holds the per-character mutex
+        // and the recovery yields to it immediately.
+        kickStoragePurchaseRecovery(session.characterId);
         ws.on('message', (data) => {
           game.handleMessage(session, String(data));
         });

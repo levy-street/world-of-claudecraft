@@ -25,7 +25,6 @@ import {
   type TalentAllocation,
   type TalentRowLevel,
 } from '../sim/content/talents';
-import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import {
@@ -85,10 +84,7 @@ import {
   type RiftTier,
   type RiteIntensity,
   type SimEvent,
-  type SportRole,
   TICK_RATE,
-  type VcBracket,
-  type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
@@ -107,7 +103,6 @@ import {
   type ClientCommand,
   type CraftingIdentityView,
   type CraftResultView,
-  type CupInfo,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -125,6 +120,7 @@ import {
   type GuildBankLogEntry,
   type GuildBankLogView,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
@@ -150,8 +146,7 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
-  type VcSharedCupInfo,
-  type VcViewerReadout,
+  type VaultInfo,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -168,10 +163,16 @@ import type {
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
+import { applyBankSelfWire } from './bank_snapshot_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
+import {
+  type DesktopWalletBrowserAction,
+  type DesktopWalletStatus,
+  parseDesktopWalletHandoffStatus,
+} from './desktop_wallet_handoff';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
@@ -187,6 +188,7 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { vaultWithdrawPayload } from './vault_snapshot_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -606,7 +608,7 @@ export class Api {
   }
 
   async createDesktopWalletHandoff(
-    action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
+    action: DesktopWalletBrowserAction,
   ): Promise<{ code: string; expiresInMs: number }> {
     const data = await this.post(
       '/api/desktop-wallet/create',
@@ -619,55 +621,12 @@ export class Api {
     };
   }
 
-  async desktopWalletHandoffResult(code: string): Promise<
-    | { status: 'missing' | 'pending' }
-    | {
-        status: 'complete';
-        result:
-          | { kind: 'link'; address: string; nonce: string; signature: string }
-          | { kind: 'transaction'; address: string; signature: string };
-      }
-  > {
-    const data = await this.post(
-      '/api/desktop-wallet/result',
-      { code },
-      DESKTOP_API_ORIGIN || this.base,
+  async desktopWalletHandoffResult(code: string): Promise<DesktopWalletStatus> {
+    // Shape validation lives in the handoff module (an unknown or malformed
+    // result kind reads as 'missing', which the poller treats as expired).
+    return parseDesktopWalletHandoffStatus(
+      await this.post('/api/desktop-wallet/result', { code }, DESKTOP_API_ORIGIN || this.base),
     );
-    if (data.status !== 'complete' || !data.result || typeof data.result !== 'object') {
-      return { status: data.status === 'pending' ? 'pending' : 'missing' };
-    }
-    const result = data.result as Record<string, unknown>;
-    if (
-      result.kind === 'link' &&
-      typeof result.address === 'string' &&
-      typeof result.nonce === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'link',
-          address: result.address,
-          nonce: result.nonce,
-          signature: result.signature,
-        },
-      };
-    }
-    if (
-      result.kind === 'transaction' &&
-      typeof result.address === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'transaction',
-          address: result.address,
-          signature: result.signature,
-        },
-      };
-    }
-    return { status: 'missing' };
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────
@@ -1098,9 +1057,9 @@ export class Api {
   // ONE request. In-flight only, keyed by the realm base: nothing is memoized
   // past settle, so every non-overlapping call still reads the server fresh,
   // and a realm switch mid-flight never serves the old realm's document.
-  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+  private statusDocInFlight: { base: string; doc: Promise<Record<string, unknown>> } | null = null;
 
-  private statusDoc(): Promise<any> {
+  private statusDoc(): Promise<Record<string, unknown>> {
     const hit = this.statusDocInFlight;
     if (hit !== null && hit.base === this.base) return hit.doc;
     const doc = this.get('/api/status').finally(() => {
@@ -1520,6 +1479,8 @@ function blankEntity(id: number): Entity {
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    pledgeGuild: '',
+    guildTier: 0,
     title: null,
     border: null,
   };
@@ -1607,21 +1568,6 @@ export class ClientWorld implements IWorld {
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
-  // --- IWorldValeCup: Vale Cup queue/match state, recomposed from two
-  // delta-omitted self keys: `s.vcup` (the per-viewer remainder plus a wire-only
-  // liveHidden flag) and `s.vcupb` (the realm-wide fragment, serialized once
-  // server-side and shared across viewers). We keep the last of each mirror and
-  // rebuild cupInfo whenever either changes; a missing key keeps its prior mirror
-  // (never default to empty, that would wipe the other fragment). ---
-  private lastVcupRemainder: VcViewerReadout | null = null;
-  private lastVcupShared: VcSharedCupInfo | null = null;
-  cupInfo: CupInfo | null = null;
-  // My live sport role, mirrored from the wireRev-gated heavy self field
-  // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
-  // the per-snapshot known rebuild resolves the role kit via the ONE shared
-  // resolveSportKit instead of the class/level/talent derivation, so the
-  // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
-  sportRole: SportRole | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -1644,6 +1590,32 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldBank: Materials Vault contents view, the per-material store beside
+  // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
+  // The payload is OWNER-ONLY and never rides the interest-scoped entity
+  // broadcast: a vault is private character storage, so only the owning player's
+  // `self` block can ever carry it (and only while a banker gates it, like
+  // bankInfo above), which leaves this null away from a bursar. ---
+  vaultInfo: VaultInfo | null = null;
+  // --- IWorldBank: the craft-from-vault stock view (Bank Storage Phase 04),
+  // mirrored from the snapshot self (`s.cvault`, delta-omitted). Owner-only
+  // like vaultInfo, but gated on the craft-draw context predicate instead of
+  // banker proximity: null means vault reagent draw is unavailable HERE (an
+  // instanced or competitive context), {} means available but empty. ---
+  craftVaultStock: Record<string, number> | null = null;
+  // --- IWorldBank: this character's purchased ladder slots (Bank Storage phase
+  // 15), mirrored from the snapshot self (`bpsl`, delta-omitted). Owner-only
+  // like the three reads above, but gated on NOTHING: the Strongbox store opens
+  // anywhere and gates its charter list on this, so a proximity gate would
+  // reproduce the blindness it exists to close. The server emits it for the
+  // VIEWING session's own character rather than the spectate anchor, so this
+  // number always describes ONE character, and it only ever grows for as long as
+  // that character stays RESIDENT server-side (src/sim/bank.ts names the two
+  // reachable cases where a fresh join brings a LOWER count back into this same
+  // mirror, which is not reset on a reconnect). null until the first snapshot
+  // lands, which the fit gate reads as unknown (list everything), never as
+  // zero. ---
+  bankPurchasedSlots: number | null = null;
   // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
   // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
   // and outside a guild (proximity + membership gated by the server; ANY rank
@@ -2641,11 +2613,24 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'social') {
+      // The pledge-board fields are normalized with defaults so an older
+      // server's frame (no pledge board) still yields a fully-shaped mirror:
+      // settings read as accepting (the feature's default), no open pledges,
+      // tier 0, no standing pledge.
+      const guild = msg.guild
+        ? {
+            ...msg.guild,
+            pledgeSettings: msg.guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
+            pledges: msg.guild.pledges ?? [],
+            tier: msg.guild.tier ?? 0,
+          }
+        : null;
       this.socialInfo = {
         friends: msg.friends ?? [],
         blocks: msg.blocks ?? [],
         ignores: msg.ignores ?? [],
-        guild: msg.guild ?? null,
+        guild,
+        myPledge: msg.myPledge ?? null,
       };
       this.socialDirty = true;
       return;
@@ -3067,6 +3052,8 @@ export class ClientWorld implements IWorld {
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
+        e.pledgeGuild = w.pg ?? '';
+        e.guildTier = w.gt ?? 0;
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
         e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
@@ -3680,16 +3667,7 @@ export class ClientWorld implements IWorld {
       const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
-      // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
-      // server-side meta.known swap is invisible to this derived rebuild, so
-      // the server flags the live role via the wireRev-gated heavy `sport`
-      // field. While the mirrored role is set, known is the role kit from the
-      // shared resolver (identical to the Sim's swap); otherwise the normal
-      // class/level/talent derivation below applies.
-      if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
-      this.known = this.sportRole
-        ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
+      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3707,17 +3685,15 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
-      if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
-      if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
-      // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
-      // "no bank"); away from a banker the server encodes it as null. Never default
-      // to null/empty on omission, that would wipe an open bank window's mirror.
-      if (s.bank !== undefined) this.bankInfo = s.bank;
+      // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
+      // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
+      // module, where the delta contract, the by-reference adoption rationale,
+      // and each key's malformed policy (vault clears, the rest retain) live.
+      applyBankSelfWire(this, s);
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, and outside a guild (the proximity +
       // membership gate lives in sim guildBankInfoFor; any rank sees it, the
@@ -3955,31 +3931,6 @@ export class ClientWorld implements IWorld {
     return v;
   }
 
-  // Rebuild the public cupInfo from the two mirrored wire fragments. A null
-  // remainder (the viewer has no readout, or an explicit vcup:null) clears it; a
-  // remainder with no shared fragment yet (should not happen, they ship together
-  // on every gate-open pass and every resync) keeps the prior value rather than
-  // emitting a half-built readout. liveHidden reapplies the per-viewer practice
-  // suppression the server derived and is never surfaced on CupInfo.
-  private recomputeCupInfo(): void {
-    const rem = this.lastVcupRemainder;
-    const shared = this.lastVcupShared;
-    if (rem === null) {
-      this.cupInfo = null;
-      return;
-    }
-    if (shared === null) return;
-    const { liveHidden, ...viewer } = rem;
-    this.cupInfo = {
-      ...viewer,
-      queueSizes: shared.queueSizes,
-      live: liveHidden ? null : shared.live,
-      board: shared.board,
-      guildBoard: shared.guildBoard,
-      practicing: shared.practicing,
-    };
-  }
-
   // Refuse a hostile-target cast at an already-dead target: near-monotonic +
   // locally authoritative state, so it only drops casts the server would reject
   // anyway. The exception is a same-id revive (graveyard release, Fiesta respawn)
@@ -4212,6 +4163,12 @@ export class ClientWorld implements IWorld {
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
+  }
+  startTutorial(): void {
+    if (!this.canSendCommand()) return;
+    // Command only, never predicted: the server validates and the >30 yd
+    // displacement in the next snapshot drives the client's arrival flow.
+    this.cmd({ cmd: 'tutorial_start' });
   }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
@@ -4937,34 +4894,6 @@ export class ClientWorld implements IWorld {
   forfeitCardDuel(): void {
     this.cmd({ cmd: 'card_forfeit' });
   }
-  // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
-  // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild: boolean,
-  ): void {
-    this.cmd({ cmd: 'vcup_queue', bracket, nation, role, guild: enterAsGuild });
-  }
-  vcupQueueLeave(): void {
-    this.cmd({ cmd: 'vcup_leave' });
-  }
-  vcupSetRole(role: SportRole): void {
-    this.cmd({ cmd: 'vcup_role', role });
-  }
-  vcupReady(): void {
-    this.cmd({ cmd: 'vcup_ready' });
-  }
-  vcupBet(side: 'A' | 'B', amount: number): void {
-    this.cmd({ cmd: 'vcup_bet', side, amount });
-  }
-  // Private practice bout against bots: the server seats it on an instanced pitch
-  // copy far from the Sowfield, so it runs in parallel with the real match and
-  // every other practice. Same command online and off.
-  vcupPracticeStart(bracket: VcBracket): void {
-    this.cmd({ cmd: 'vcup_practice', bracket });
-  }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
@@ -4994,6 +4923,18 @@ export class ClientWorld implements IWorld {
   }
   guildAccept(): void {
     this.cmd({ cmd: 'guild_accept' });
+  }
+  guildPledge(name: string): void {
+    this.cmd({ cmd: 'guild_pledge', name });
+  }
+  guildPledgeWithdraw(): void {
+    this.cmd({ cmd: 'guild_pledge_withdraw' });
+  }
+  guildPledgeDecide(name: string, accept: boolean): void {
+    this.cmd({ cmd: 'guild_pledge_decide', name, accept });
+  }
+  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void {
+    this.cmd({ cmd: 'guild_pledge_settings', enabled, minLevel, note });
   }
   guildDecline(): void {
     this.cmd({ cmd: 'guild_decline' });
@@ -5203,6 +5144,42 @@ export class ClientWorld implements IWorld {
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
+  }
+  // --- IWorldBank: bank bag sockets (snake_case wire strings, Bank Storage
+  // phase 07: the command-schema triangle lands whole here, replacing the
+  // phase 06 no-op stubs). The server re-validates banker proximity, unlock
+  // order and exact copper, the payload-free bag rule, and the carried-side
+  // unsocket fit on every send; these are intent only. bankSocketBag mirrors
+  // equipBag's wire shape verbatim (`item` + optional `socket` + optional
+  // `slot` naming the exact carried copy). The socket READOUTS already ride
+  // bankInfo: the server serializes the sim's whole BankInfo, so the mirror
+  // above carries them with no per-field work. ---
+  bankUnlockSocket(): void {
+    this.cmd({ cmd: 'bank_unlock_socket' });
+  }
+  bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket });
+    else this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket, slot: target.slotIndex });
+  }
+  bankUnsocketBag(socket: number): void {
+    this.cmd({ cmd: 'bank_unsocket_bag', socket });
+  }
+  // --- IWorldBank: Materials Vault deposit/withdraw/buy-upgrade (snake_case wire
+  // strings). vaultInfo is a snapshot read (the mirror field above); the server
+  // re-validates banker proximity, material scope, cap, and price. Deposit uses
+  // carried-inventory index, optional partial `count`); pooled withdrawals use
+  // `itemId`, while special rows add their snapshot index plus fingerprint. ---
+  vaultDeposit(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'vault_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  vaultWithdraw(...args: Parameters<typeof vaultWithdrawPayload>): void {
+    this.cmd({ cmd: 'vault_withdraw', ...vaultWithdrawPayload(...args) });
+  }
+  vaultDepositAll(): void {
+    this.cmd({ cmd: 'vault_deposit_all' });
+  }
+  vaultBuyUpgrade(): void {
+    this.cmd({ cmd: 'vault_buy_upgrade' });
   }
   // --- IWorldGuildBank: the officer-plus shared treasury + item store
   // (snake_case guild_bank_* wire strings, never a bank_* reuse). The server
@@ -5695,6 +5672,35 @@ export class ClientWorld implements IWorld {
     } catch {
       return empty;
     }
+  }
+  // The signpost guild board's roster drill-in (REST GET, no wire command):
+  // the cached public read behind /api/guilds/roster. Null answers an
+  // UNKNOWN guild (the window's honest empty state); a transport failure or
+  // a malformed body REJECTS so the window can show its retry state instead
+  // of misreading a dead server as an empty board. Rows are re-validated at
+  // this trust boundary (numbers coerced, rank narrowed) before the view
+  // core consumes them.
+  async guildRoster(name: string): Promise<GuildRosterInfo | null> {
+    const res = await fetch(
+      apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`guild roster read failed (${res.status})`);
+    const data = await res.json();
+    if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) {
+      throw new Error('guild roster read returned a malformed body');
+    }
+    const members = (data.members as Record<string, unknown>[]).map((m) => ({
+      name: String(m.name ?? ''),
+      class: String(m.class ?? ''),
+      rank: (m.rank === 'leader' || m.rank === 'officer' ? m.rank : 'member') as
+        | 'leader'
+        | 'officer'
+        | 'member',
+      level: Number(m.level) || 0,
+      lifetimeXp: Number(m.lifetimeXp) || 0,
+    }));
+    return { guild: data.guild, members };
   }
   // Developer high-score board (REST GET, no wire command): ?board=devs ranks
   // contributors by landed commits. The same data for every realm, paged exactly

@@ -23,7 +23,8 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { bagPools, canGrantItemInstance, fitsAll } from './bags';
+import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { corpseCanInteract, corpseInteractionAvailability } from './corpse_interaction';
@@ -36,6 +37,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
@@ -71,6 +73,7 @@ import { noteReliquaryMark } from './reliquary';
 import { corpseHasDecayed } from './respawn_policy';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
+import { creditSignpostRead } from './tutorial/signpost_read';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -414,7 +417,7 @@ export function harvestCorpse(
   // both gates upstream guarantee yieldingFocusComponents is non-empty, so
   // `wanted` always holds at least one row and the short-circuit's false arm is
   // unreachable. Dead since #2513, kept for the same reason the others are.
-  if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
+  if (wanted.length > 0 && !fitsAll(meta.inventory, bagPools(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
@@ -603,7 +606,7 @@ export function harvestCorpse(
     if (
       canGrantItemInstance(
         meta.inventory,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         grant.itemId,
         payload,
         grant.plainQty,
@@ -658,7 +661,7 @@ export function harvestCorpse(
   for (const grant of signedGrants) {
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
+    if (canGrantItemInstance(meta.inventory, bagPools(meta.bags), grant.itemId, payload)) {
       // Exactly one unit, deliberately: the specimen is a jackpot, not a
       // quantity, so it never carries the component's rolled count the way the
       // signed grant above does. The guard's count defaults to that same 1.
@@ -771,12 +774,27 @@ export function pickUpObject(
     return false;
   }
   if (noticeboardDef) {
-    ctx.emit({
-      type: 'noticeboard',
-      noticeboardId: noticeboardDef.templateId,
-      state: 'empty',
-      pid: meta.entityId,
-    });
+    // The tutorial island's signpost lesson rides the same click as the
+    // notice feedback (tutorial/signpost_read.ts; a no-op off-quest and on
+    // every other board).
+    creditSignpostRead(ctx, meta, noticeboardDef.id);
+    const listings = NOTICEBOARD_LISTINGS[noticeboardDef.id] ?? [];
+    if (listings.length > 0) {
+      ctx.emit({
+        type: 'noticeboard',
+        noticeboardId: noticeboardDef.templateId,
+        state: 'listings',
+        listings,
+        pid: meta.entityId,
+      });
+    } else {
+      ctx.emit({
+        type: 'noticeboard',
+        noticeboardId: noticeboardDef.templateId,
+        state: 'empty',
+        pid: meta.entityId,
+      });
+    }
     return true;
   }
   const objectItemId = obj.objectItemId;
@@ -800,6 +818,11 @@ export function pickUpObject(
   // gating, cooldown, and objective credit) so a bare click never burns one.
   if (objectItemId === HUT_OBJECT_ID) {
     return tryBurnHut(ctx, obj, p, meta);
+  }
+  // The Proving Shore ferry bells travel, never loot: route the click to the
+  // ferry handler before the pickup path so ringing always sails.
+  if (objectItemId === FERRY_BELL_OBJECT_ID) {
+    return tryRingFerryBell(ctx, obj, p, meta);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

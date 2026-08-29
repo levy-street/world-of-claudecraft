@@ -9,7 +9,6 @@ const baseState: MusicMixState = {
   enabled: true,
   menuPaused: false,
   bossActive: false,
-  sowfieldActive: false,
   vol: 0.5,
 };
 
@@ -26,21 +25,16 @@ describe('musicMixMasterTarget', () => {
     expect(musicMixMasterTarget({ ...baseState, bossActive: true }, 0.5)).toBe(0);
   });
 
-  it('returns 0 while a Sowfield track owns the mix', () => {
-    expect(musicMixMasterTarget({ ...baseState, sowfieldActive: true }, 0.5)).toBe(0);
-  });
-
   it('returns streamLevel * vol otherwise', () => {
     expect(musicMixMasterTarget(baseState, 0.5)).toBeCloseTo(0.25);
   });
 });
 
 describe('isMusicMixAudible', () => {
-  it('mirrors the four duck conditions', () => {
+  it('mirrors the three duck flags', () => {
     expect(isMusicMixAudible({ ...baseState, enabled: false })).toBe(false);
     expect(isMusicMixAudible({ ...baseState, menuPaused: true })).toBe(false);
     expect(isMusicMixAudible({ ...baseState, bossActive: true })).toBe(false);
-    expect(isMusicMixAudible({ ...baseState, sowfieldActive: true })).toBe(false);
   });
 
   it('is false at vol 0', () => {

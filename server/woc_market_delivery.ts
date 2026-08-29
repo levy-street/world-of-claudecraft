@@ -10,7 +10,6 @@
 
 import type { InvSlot } from '../src/sim/types';
 import type {
-  CharacterSaveArgs,
   WocDeliveryScope,
   WocListingRow,
   WocMarketCustody,
@@ -493,8 +492,15 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
   ): Promise<'handed' | 'abort' | 'abort_busy'> {
     let out: 'booked' | 'lease_lost' | 'claim_missing' | 'busy' | 'session_lost';
     try {
-      out = await ctx.custody.persistGrantSerialized(accountId, characterId, leaseNonce, (save) =>
-        ctx.db.saveDeliveredCharacterBooked(save, custodyRef),
+      out = await ctx.custody.persistGrantSerialized(
+        accountId,
+        characterId,
+        leaseNonce,
+        async (save) => {
+          const result = await ctx.db.saveDeliveredCharacterBooked(save, custodyRef);
+          if (result === 'booked') ctx.custody.acknowledgeCharacterSave?.(save);
+          return result;
+        },
       );
     } catch (err) {
       // Transient throw (pool exhaustion, timeout, connection reset): the

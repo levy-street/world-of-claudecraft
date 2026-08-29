@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'error.flagActiveExists': 'ce compte a déjà un drapeau ouvert de ce type',
+  'wealth.largeMovementsUnavailable':
+    "les grands mouvements bancaires n'ont pas pu être chargés (la lecture du grand livre a expiré), le détail de l'or ci-dessus est complet",
   'error.guildBankDeleting':
     "Cette guilde est en cours de suppression, sa banque est donc fermée. Rien n'a été modifié.",
   'error.guildBankItemRequired':

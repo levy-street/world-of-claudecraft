@@ -91,7 +91,6 @@ export interface InputCallbacks {
       | 'targetAuras'
       | 'social'
       | 'arena'
-      | 'valecup'
       | 'bgFlag'
       | 'dungeonFinder'
       | 'leaderboard'
@@ -112,6 +111,11 @@ export interface InputCallbacks {
    *  and held movement keys. Escape is handled before this gate and still reaches
    *  onUiKey; key releases are ungated. */
   canUseGameKeys?: () => boolean;
+  /** When true, a canvas press starts NO camera drag, mouselook, or click-pick:
+   *  the HUD is in its "Unlock interface" arrange mode, where a missed frame
+   *  grab must not spin the camera or retarget instead. Wheel zoom and keyboard
+   *  movement stay live; only the mouse-on-canvas gestures are claimed. */
+  isCameraLocked?: () => boolean;
   onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }
 
@@ -1187,9 +1191,6 @@ export class Input {
       case 'mount':
         this.cb.onUiKey('mount');
         return;
-      case 'valecup':
-        this.cb.onUiKey('valecup');
-        return;
       case 'bgFlag':
         this.cb.onUiKey('bgFlag');
         return;
@@ -1226,6 +1227,10 @@ export class Input {
     // already in flight, and so its release cannot synthesize a world click;
     // its binding dispatch is the window-level onBindableMouseDown below.
     if (!isReservedMouseButton(e.button)) return;
+    // The HUD's arrange mode owns the mouse: no camera drag, mouselook, or
+    // click-pick may start under it (a grab that misses a frame would otherwise
+    // spin the camera or retarget). Presses already in flight are unaffected.
+    if (this.cb.isCameraLocked?.()) return;
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();

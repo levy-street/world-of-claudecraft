@@ -13,10 +13,8 @@ import {
   isArenaPos,
   isDelvePos,
   isRiftPos,
-  isVcPracticePos,
   isYumiMazePos,
   RIFT_X_MIN,
-  VC_PRACTICE_X,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
   YUMI_MAZE_SLOT_COUNT,
@@ -207,20 +205,18 @@ describe('yumi maze band edges', () => {
     expect(isYumiMazePos(YUMI_BAND_X_MAX - 1)).toBe(true);
     expect(isYumiMazePos(YUMI_BAND_X_MAX)).toBe(false);
     // The maze is no longer the delve band's east neighbour: the grid world's
-    // instance plane runs delve -> Vale Cup practice -> rift -> maze, so assert the
-    // property the old adjacency stood in for. Every band predicate must claim its
-    // OWN anchor and no other's, in both directions.
+    // instance plane runs delve -> rift -> maze, so assert the property the
+    // old adjacency stood in for. Every band predicate must claim its OWN
+    // anchor and no other's, in both directions.
     const anchors: Array<[string, number]> = [
       ['arena', ARENA_X],
       ['delve', DELVE_X_MIN],
-      ['vcPractice', VC_PRACTICE_X],
       ['rift', RIFT_X_MIN],
       ['maze', YUMI_MAZE_X],
     ];
     const predicates: Array<[string, (x: number) => boolean]> = [
       ['arena', isArenaPos],
       ['delve', isDelvePos],
-      ['vcPractice', isVcPracticePos],
       ['rift', isRiftPos],
       ['maze', isYumiMazePos],
     ];

@@ -23,7 +23,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
+import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
@@ -362,6 +362,10 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (rewardItem) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const obj of quest.objectives) {
+      // An ownership turn-in consumes nothing, so it frees no room either:
+      // modelling a removal here would let the reward overflow the bags
+      // (the #2139 class, in the other direction).
+      if (quest.keepsCollectedItems) break;
       if (obj.type === 'collect' && obj.itemId) {
         const index = quest.objectives.indexOf(obj);
         // The same grade plan turnInQuestCore applies, against the scratch
@@ -381,7 +385,7 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
         }
       }
     }
-    if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
+    if (countFit(scratch, bagPools(meta.bags), rewardItem, 1) < 1) {
       bagsFullError(ctx, meta.entityId);
       return;
     }
@@ -406,6 +410,9 @@ export function turnInQuestCore(
   if (!qp) return false;
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
   for (const [index, obj] of quest.objectives.entries()) {
+    // An ownership objective (QuestDef.keepsCollectedItems) proves the player
+    // HAS the thing; the turn-in leaves it with them, so nothing is consumed.
+    if (quest.keepsCollectedItems) break;
     if (obj.type === 'collect' && obj.itemId) {
       // Base grade first, then the fine grade, so a player holding both hands
       // over the plain ore and keeps the premium copies. Within each grade
