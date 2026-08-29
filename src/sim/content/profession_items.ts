@@ -1177,13 +1177,16 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // one always-on consumable, it is the first offensive consumable the game
   // has ever had (every pre-packet elixir and scroll is stamina), and its
   // whole magnitude lands as new throughput with nothing to net it off. The
-  // measured pass (docs/prd/masterwrought/power-verification.md) put the full
-  // kit outside the 5 percent envelope on the highest-throughput physical
-  // spec with the flask at 15, and inside it at 13, so the value is
-  // ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract and the
-  // packet's own record names flask 15 as the first tune-down knob. 13 is
-  // still strictly above the elixir ceiling of 12, which is what keeps the
-  // apex rung a rung. DURATION is untouched:
+  // measured pass (docs/prd/masterwrought/power-verification.md) read the
+  // full kit at 5.86 / 6.08 percent on the highest-throughput physical spec
+  // with the flask at 15; at 13 the central estimate is inside the 5 percent
+  // envelope with an interval that straddles the line, and the R5 verdict is
+  // SUSPENDED pending the gear-term ruling (that file's Verdict and section
+  // 9.6), so 13 is a conservative margin rather than a proven crossing. The
+  // value is ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract
+  // and the packet's own record names flask 15 as the first tune-down knob.
+  // 13 is still strictly above the elixir ceiling of 12, which is what keeps
+  // the apex rung a rung. DURATION is untouched:
   // 1200 is the serpent's 900 plus the ladder's ONE non-zero duration step
   // (600 / 900 / 900: +300, then flat; a strictly-flat reading would give 900,
   // rejected in the phase 10 ledger, and the classic 2x-elixir ratio would give
