@@ -21160,3 +21160,129 @@ retired key in the icon map, a per-kind aura id at the mint, an apex-band
 crafted output authored outside the apex arrays, and the apex plate's
 duration reverted. ALL TWELVE RED. Every run proved its baseline green and
 its patch applied; both worktrees ended porcelain-clean.
+
+### THE REVIEW ROUND (three fresh readers, 64 findings, every one applied
+### or recorded)
+Three fresh readers were dispatched over the whole phase diff, none of
+them the implementer, each with a different charter: the RECORDS lane
+(re-derive every premise and count against the live tree), the
+REPRODUCIBILITY lane (can the R5 verdict be rebuilt from the document
+alone), and the TUNE-JUSTIFICATION lane (is each of the four tunes
+downward, minimal, necessary, and honestly commented). Their verdicts
+agreed on the substance and disagreed with the record's precision: the
+envelope verdict is sound and every load-bearing premise reproduced
+EXACTLY, but the document was not reproducible at the precision it
+claimed, and nine factual claims were wrong.
+
+THE ONE BLOCKING GAP, closed by measurement rather than by prose. Every
+throughput and effective-health figure came out of a throwaway probe, so
+the packet's defining gate rested on numbers nothing in the repo could
+re-derive. The harness is now COMMITTED as `scripts/r5_envelope_probe.ts`
+(73ef1d6c0c), runnable whole or per lane, with `WOC_R5_SEEDS` and
+`WOC_R5_SECONDS` overriding the sample. Its constants ARE sections 3 and
+8 in executable form, and every printed figure reproduces from it.
+
+THE SECOND BLOCKING GAP, also closed by measurement. The caster gear term
+was modelled as "+2 lead-stat points" and never measured the loadout where
+`sunspun_vestments` is one of the two Perfected pieces, which the same
+document prices at 2.8 to 4.1 percent. That loadout is now its own arm and
+it reads +2.54 / +2.53 percent at heroic and +2.43 / +2.36 at S-rift,
+about 2.4 points BELOW the abstract term: the Mournweave 3-piece it breaks
+is +10 int and +10 sta, which 40 haste rating does not repay. The abstract
+model is therefore the CONSERVATIVE reading for the caster too, and the
+reviewer's worry that the maximal kit might read 5.0 to 5.8 is refuted by
+measurement, not argued away.
+
+THE NINE FACTUAL CORRECTIONS, each re-derived: four WARFARE pieces in the
+tank baseline, not three; alchemy's gray-grind row is 150 / 375 / 2.50,
+not 125 / 375 / 3.00 (it has no repeatable band-3 row, which the doc's own
+12.4 said while its table denied it); enchanting's is 150 / 225 / 1.50,
+not 150 / 250 / 1.67 (both columns must start at skill 25, its lowest
+skillReq); the cheapest-cost-per-point path beats intended for 9 of 10
+crafts at 0.66 to 0.88, not 10 of 10 at 0.60 to 0.88 (enchanting ties);
+`gyrelens_array` is +2 int base and +3 Perfected; the caster is at 98
+percent effective spell hit at level 22, not hit-capped, so the tuned-away
+hit line was a 0.04-point wash there rather than a downgrade;
+`isLinuxHybridGpu` is called from `scripts/electron-dev.mjs` as well as
+from `gpu_preference.cjs` (the STEP 0 conclusion survives: the branch owns
+neither, and both call it with no argument); the "47,677-test suite"
+figure carries no bound or tip and is not the packet's frozen 47738 stamp,
+so only the SURVIVAL is load-bearing; and the physical melee kit rides
+THREE auras, not two.
+
+That last one was backwards in the record and in a shipped test comment.
+The downward refusal fires only inside one `elixir_<kind>` family and the
+singleton strip sheds only flask-marked auras, so an AP or int flask
+leaves a stamina elixir alone. It is the TANK kit that is two, because its
+flask IS the stamina one. The claim is now pinned rather than asserted:
+`tests/flask_consumables.test.ts` gains "the PHYSICAL melee kit is three
+too", the twin of the caster arm beside it, reading `attackPower` off the
+stat book so an aura that rides without folding in cannot pass.
+
+THE POOL AMBIGUITY, the finding two readers raised independently. Section
+3 declared a legendary-inclusive baseline and then listed three loadouts
+containing no legendary, because they are `bestEpicGearFor` (which filters
+`quality === 'epic'`) minus the flagged picks. The document now states the
+rule the loadouts actually follow, per arm, and says why it is the safe
+side: a legendary-inclusive denominator is STRONGER, so re-deriving with
+it moves every percentage DOWN. `heart_of_the_rift` at primary sum 32 is
+the piece that would move most, and the tank arm does take it. The R5
+lead pin's comment is re-pointed at the same rule.
+
+THREE SHIPPED COMMENTS the tunes had made false, all corrected in the
+source rather than only in the doc: the enchant derivation still claimed
+every apex value continues its own ladder when the weapon rung is now HALF
+its ladder's step (a reader re-deriving from it would restore 7); the
+shield comment named an inversion the tune turned into a TIE, so its
+stated problem was not the problem the tune solved; and the chest comment
+said the apex armour set carries no Hit while the shield still carries 20.
+The enchant comment also now writes its "counted ONCE" reading as the
+inference it is, and names the int twin as moving under D10-D1 rather than
+under the measurement, since no caster spec can dual wield.
+
+THE TWO PINS THAT PASSED FOR THE WRONG REASON, both caught by fresh
+readers and both fixed in the same round they were raised. The
+max-mitigation equality passed on an ALPHABETICAL tie-break (three shields
+tie at 680 and the lowest id happens to be unflagged), replaced by a
+direct per-slot assertion that no flagged def out-armours the best
+unflagged piece. The R5 lead guard picked each slot's incumbent by
+stat-agnostic SUM, so `warhewn_signet` led its real strength incumbent by
+3 against a cap of 1 while an off-axis stamina ring set the bar; it gains
+an identity-matched arm, `MAX_LEAD_STAT_BY_SLOT`, comparing against the
+best pre-packet piece carrying the same lead stat.
+
+FRAMEWORK DEPARTURES, now declared rather than silent: no Area profile (R5
+protects two single-target bosses and every kit term is a flat stat), and
+a report reduced to the delta and its standard error (every other required
+column cancels between two arms sharing a seed, a rotation, a target and a
+fixture).
+
+THE PRECISION THE RECORD NOW CLAIMS. The binding fury lane's central
+estimate is inside at both targets and its 2-standard-error interval
+STRADDLES the line ([3.98, 5.90] heroic, [3.56, 5.44] S-rift). What the
+measurement establishes is a central estimate inside the envelope, not a
+demonstrated crossing, and the flask trim is stated as a conservative
+margin rather than a proof. Two smaller tunes are recorded as available
+and not taken, with the reason: flask 14 (inside, but with no margin over
+an interval that already straddles) and tuning only the two throughput
+flasks (free on every throughput lane, but it moves the tank arm to about
++5.1 percent and breaks the three role flasks' uniform magnitude).
+
+RULING 11c-D-2's SUPERSEDED RATIONALE, recorded for the maintainer and
+NOT re-opened by this phase. The ruling rejected an apex food of 8 because
+"flask 15 plus food 6 equals 21" and an 8 broke that sum. At flask 13 an
+apex food of 8 sums to exactly 21, so the arithmetic branch it closed is
+arithmetically re-open. What keeps 8 rejected is the LADDER, not the sum:
+the apex plate sits exactly one rung above farming's top rung of 5, which
+the Well Fed band and dominance arms pin. The outcome stands on the pinned
+rule; only the rationale is superseded.
+
+A NEW JUDGED RISK, recorded rather than tuned. The apex weapon rung is now
++1 over Greater while costing a `lucent_reagent`, an `arcane_shard` and two
+`arcane_essence` at enchanting 100. `enchants.ts` carries its own law that
+a Greater rung must beat base by at least 3 so the `arcane_shard` sink
+stays alive, and this is that shape one tier up. The envelope forced it
+(the term lands twice on a dual-wielder, so +2 over Greater is +4 on the
+binding lane) and raising it is exactly the move R5 forbids. It is a
+demand risk under R21 for a future pass, recorded in
+power-verification.md section 14 and beside the def.
