@@ -272,6 +272,29 @@ function hasGetGpuInfoEvidence(aux) {
 }
 
 /**
+ * Whether to tell the player their own choice did not take: they picked Vulkan and the
+ * session is not running Vulkan.
+ *
+ * This reads the SETTING, never the rung this launch asked for, and the difference is the
+ * whole point. A rescue chain ends on a process whose own launch SUCCEEDED (it asked for
+ * OpenGL and got it), so comparing against the launch would go quiet on exactly the
+ * machine the message exists for: the player asked for Vulkan, three processes tried, and
+ * the one they are looking at says nothing.
+ *
+ * Vulkan at all, not the exact rung: the picker offers Auto, Vulkan and OpenGL, so a
+ * session on `vulkan-plain` IS the Vulkan the player asked for (only the ANGLE
+ * parallel-compile feature is missing, which they never picked and cannot pick). Saying
+ * "unable to enable Vulkan" there would be false.
+ *
+ * Auto says nothing: the player chose nothing to fall short of, and the memory climbing
+ * back is the mechanism working rather than a failure to report.
+ */
+function requestedBackendUnavailable({ setting, judged, boundRung }) {
+  if (judged !== true || setting !== 'vulkan') return false;
+  return rungIndex(boundRung) >= 0 && !boundRung.startsWith('vulkan');
+}
+
+/**
  * The memory after a launch-time GPU-process death on `rung`: one more consecutive
  * crash, and a step down only once they reach MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES. The
  * PROOF is never touched here: a crash does not un-prove a session that ran healthy, and
@@ -394,6 +417,7 @@ module.exports = {
   judgeGpuBackendLaunch,
   launchCounterAfterAutoLaunch,
   relaunchOnLowerBackend,
+  requestedBackendUnavailable,
   rungAbove,
   rungBelow,
 };

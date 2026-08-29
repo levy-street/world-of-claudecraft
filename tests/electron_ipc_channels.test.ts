@@ -226,9 +226,14 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // Empty until the launch is judged: `boundRung` starts as the rung that was
     // ASKED for, and reporting that as active is the lie the row exists to stop.
     expect(state).toContain("active: gpuBackendJudged ? boundRung : '',");
-    // Only a rung BELOW the one asked for is the setting falling short.
+    // Off the SETTING, never this launch's rung: a rescue chain ends on a
+    // process whose own launch succeeded, so comparing against the launch would
+    // go quiet on exactly the machine the message exists for.
     expect(state).toContain(
-      'requestedUnavailable: gpuBackendJudged && isHigherRung(gpuBackendLaunch.rung, boundRung),',
+      'requestedUnavailable: requestedBackendUnavailable({ setting: desktopPrefs.gpuBackend, judged: gpuBackendJudged, boundRung, }),',
+    );
+    expect(state, 'the reading must not be derived from this launch').not.toContain(
+      'gpuBackendLaunch.rung',
     );
     expect(state).toContain("supported: process.platform === 'linux',");
   });

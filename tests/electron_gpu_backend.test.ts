@@ -15,6 +15,7 @@ import {
   REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES,
   REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES,
   relaunchOnLowerBackend,
+  requestedBackendUnavailable,
   SESSION_HEALTHY_AFTER_MS,
   TOP_GPU_BACKEND_RUNG,
   VULKAN_BACKEND_SWITCHES,
@@ -350,6 +351,44 @@ describe('judgeGpuBackendLaunch', () => {
     expect(
       judgeGpuBackendLaunch({ glRenderer: 'ANGLE (Vulkan, SWIFTSHADER)', parallel: true }),
     ).toBe('opengl');
+  });
+});
+
+describe('requestedBackendUnavailable', () => {
+  const at = (setting: string, boundRung: string, judged = true) =>
+    requestedBackendUnavailable({ setting, judged, boundRung });
+
+  it('survives the rescue chain, because it reads the SETTING not the launch', () => {
+    // The regression this exists for: a rescue chain ends on a process whose own
+    // launch SUCCEEDED (it asked for opengl and got it). Comparing against that
+    // launch's rung went quiet on exactly the machine the message is for, so a
+    // player who picked Vulkan, watched three processes try, and ended on OpenGL
+    // was told nothing at all.
+    expect(at('vulkan', 'opengl')).toBe(true);
+  });
+
+  it('says nothing while Vulkan IS what is running, whichever Vulkan rung', () => {
+    // The picker offers Auto, Vulkan and OpenGL: a session on vulkan-plain is the
+    // Vulkan the player asked for, and only the ANGLE feature they never picked
+    // is missing. "Unable to enable Vulkan" there would be false.
+    expect(at('vulkan', 'vulkan-parallel-compile')).toBe(false);
+    expect(at('vulkan', 'vulkan-plain')).toBe(false);
+  });
+
+  it('says nothing on Auto: the player chose nothing to fall short of', () => {
+    for (const rung of GPU_BACKEND_RUNGS) expect(at('auto', rung)).toBe(false);
+  });
+
+  it('says nothing for a player who picked OpenGL and got it', () => {
+    expect(at('opengl', 'opengl')).toBe(false);
+  });
+
+  it('says nothing before the launch is judged, or on a rung off the ladder', () => {
+    // Unjudged means the reading is the rung that was ASKED for, which would make
+    // every Vulkan launch announce its own failure for the first second.
+    expect(at('vulkan', 'opengl', false)).toBe(false);
+    expect(at('vulkan', '')).toBe(false);
+    expect(at('vulkan', 'nonsense')).toBe(false);
   });
 });
 

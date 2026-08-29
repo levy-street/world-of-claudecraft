@@ -84,6 +84,7 @@ const {
   isHigherRung,
   judgeGpuBackendLaunch,
   relaunchOnLowerBackend,
+  requestedBackendUnavailable,
   SESSION_HEALTHY_AFTER_MS,
 } = require('./gpu_backend.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
@@ -1164,9 +1165,14 @@ function gpuBackendState() {
     // for, and reporting that as the active one is exactly the lie the status
     // line exists to stop (the page reads an empty rung as "nothing to say").
     active: gpuBackendJudged ? boundRung : '',
-    // Only a rung BELOW the one asked for is a failure to enable it. A page
-    // reporting something higher is not the player's setting falling short.
-    requestedUnavailable: gpuBackendJudged && isHigherRung(gpuBackendLaunch.rung, boundRung),
+    // Read off the SETTING, not this launch's rung: a rescue chain ends on a
+    // process whose own launch succeeded, so comparing against the launch goes
+    // quiet on exactly the machine this message exists for.
+    requestedUnavailable: requestedBackendUnavailable({
+      setting: desktopPrefs.gpuBackend,
+      judged: gpuBackendJudged,
+      boundRung,
+    }),
     supported: process.platform === 'linux',
   };
 }
