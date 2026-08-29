@@ -40,10 +40,12 @@
 // and nothing else. The tank arm is the one exception and says so at its
 // definition: it swaps the two apex pieces in as ITEMS, because its gear term
 // is armour rather than a primary stat.
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
+import type { PlayerEquipment } from '../src/sim/entity';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, PlayerEquipment } from '../src/sim/types';
+import type { Aura, Entity } from '../src/sim/types';
 import { armorReduction } from '../src/sim/types';
 import { anchorProbeInOpenField } from './probe_anchor';
 
@@ -74,9 +76,48 @@ const SEEDS_DEFAULT = [
   2096, 2233, 2370, 2507, 2644, 2781, 2918, 3055, 3192, 3329, 3466, 3603, 3740, 3877, 4014, 4151,
   4288, 4425, 4562, 4699, 4836, 4973, 5110, 5247, 5384, 5521, 5658,
 ] as const;
+// THE ENCHANT DELTA IS READ, NEVER BAKED. The flask and the plate terms below
+// read their magnitudes off the live defs, and this term must too: it is the
+// one the R5 pass TUNED, so a literal here would keep reporting the tuned
+// number after someone restored the def, and the probe would hand a false PASS
+// to exactly the reader the doc sends here. Derived per axis, apex minus the
+// pre-packet best on the same slot.
+const enchantBonus = (id: string, axis: 'str' | 'int' | 'agi' | 'sta'): number =>
+  (ENCHANTS[id] as { statBonus?: Record<string, number> } | undefined)?.statBonus?.[axis] ?? 0;
+const WEAPON_STR_STEP =
+  enchantBonus('enchant_weapon_lucent_might', 'str') -
+  enchantBonus('enchant_weapon_greater_might', 'str');
+const WEAPON_INT_STEP =
+  enchantBonus('enchant_weapon_lucent_spellpower', 'int') -
+  enchantBonus('enchant_weapon_greater_spellpower', 'int');
+const FEET_AGI_STEP =
+  enchantBonus('enchant_feet_lucent_agility', 'agi') - enchantBonus('enchant_feet_agility', 'agi');
+// The chest rung has two arms: the Perfected-only Lucent Infusion a cloth or
+// leather wearer can take, and the plate/mail Lucent Stamina every other class
+// falls back to, since no mail or plate apex CHEST ships.
+const CHEST_STA_STEP_PERFECTED =
+  enchantBonus('enchant_lucent_infusion', 'sta') -
+  enchantBonus('enchant_chest_greater_stamina', 'sta');
+const CHEST_STA_STEP_PLATE =
+  enchantBonus('enchant_chest_lucent_stamina', 'sta') -
+  enchantBonus('enchant_chest_greater_stamina', 'sta');
+
 const SEED_COUNT = Number(process.env.WOC_R5_SEEDS ?? 25);
 const SECONDS = Number(process.env.WOC_R5_SECONDS ?? 180);
-const SEEDS = SEEDS_DEFAULT.slice(0, SEED_COUNT);
+// WOC_R5_ARMS restricts which kit arms run, for a PRECISION pass on one number
+// rather than the whole table. The baseline always runs (every delta is against
+// it). Unset means every arm, which is what the record's tables report.
+const WANTED_ARMS = (process.env.WOC_R5_ARMS ?? '').split(',').filter(Boolean);
+const WANT = (arm: string): boolean => WANTED_ARMS.length === 0 || WANTED_ARMS.includes(arm);
+// Never a SILENT truncation: WOC_R5_SEEDS above the curated list's length used
+// to slice down to it and print the smaller sample under the larger label. The
+// curated entries stay first so any run at or below their count reproduces the
+// record exactly; past that the list extends deterministically.
+const SEEDS: number[] = (() => {
+  const out: number[] = SEEDS_DEFAULT.slice(0, SEED_COUNT);
+  for (let i = out.length; i < SEED_COUNT; i++) out.push(100003 + i * 149);
+  return out;
+})();
 
 // --- the consumables (power-verification.md section 8.3) --------------------
 // Both arms carry the pre-packet consumable ceiling; only the flask and the
@@ -149,10 +190,18 @@ function dress(
       meta.equipmentInstance as never,
     );
   recalc();
-  for (const a of auras) s.ctx.applyAura(p, { sourceId: p.id, school: 'nature', ...a });
+  for (const a of auras)
+    s.ctx.applyAura(p, { ...a, sourceId: p.id, school: a.school ?? ('nature' as const) });
   recalc();
   p.hp = p.maxHp;
-  p.resource = p.maxResource;
+  // Resource is deliberately NOT touched: the sim's own initialization already
+  // gives each class the right opening (a warrior starts a fight at 0 rage, a
+  // rogue at full energy, a caster at full mana), and refilling it to
+  // maxResource would hand a fury warrior 100 rage it has to EARN. That is a
+  // refill, which power-verification.md section 9.1 forbids, and it compresses
+  // the very rage coupling section 9.3 identifies as why fury is the binding
+  // lane: it read 4.34 percent at heroic against the 4.94 the fixture without
+  // it measures.
 }
 
 function inertTarget(sim: Sim, level: number, armor: number): Entity {
@@ -234,10 +283,10 @@ const ROGUE_ENCH: SlotStats = {
 };
 const ROGUE_GEAR: SlotStats = { chest: { agi: 2 } };
 const ROGUE_ENCH_D: SlotStats = {
-  mainhand: { str: 1 },
-  offhand: { str: 1 },
-  feet: { agi: 1 },
-  chest: { sta: 6 },
+  mainhand: { str: WEAPON_STR_STEP },
+  offhand: { str: WEAPON_STR_STEP },
+  feet: { agi: FEET_AGI_STEP },
+  chest: { sta: CHEST_STA_STEP_PERFECTED },
 };
 const ROGUE_ROWS = {
   5: 'rog_r5_killers_pace',
@@ -353,7 +402,11 @@ const WAR_ENCH: SlotStats = {
 // The chest step is +3 rather than +6 because no mail or plate apex CHEST
 // ships, so enchant_lucent_infusion (requiresPerfected) is unreachable here.
 const WAR_GEAR: SlotStats = { legs: { str: 2 } };
-const WAR_ENCH_D: SlotStats = { mainhand: { str: 1 }, offhand: { str: 1 }, chest: { sta: 3 } };
+const WAR_ENCH_D: SlotStats = {
+  mainhand: { str: WEAPON_STR_STEP },
+  offhand: { str: WEAPON_STR_STEP },
+  chest: { sta: CHEST_STA_STEP_PLATE },
+};
 
 function furyLane(seed: number, arm: Arm, level: number, armor: number): number {
   const sim = new Sim({
@@ -440,7 +493,10 @@ const CASTER_ENCH: SlotStats = {
   waist: { sta: 3 },
 };
 const CASTER_GEAR: SlotStats = { chest: { int: 1 }, gloves: { int: 1 } };
-const CASTER_ENCH_D: SlotStats = { mainhand: { int: 1 }, chest: { sta: 6 } };
+const CASTER_ENCH_D: SlotStats = {
+  mainhand: { int: WEAPON_INT_STEP },
+  chest: { sta: CHEST_STA_STEP_PERFECTED },
+};
 
 // THE MAXIMAL CASTER KIT, measured as its own arm rather than modelled. The
 // 'full' arm above takes the caster's two Perfected pieces as a stat delta,
@@ -451,9 +507,9 @@ const CASTER_ENCH_D: SlotStats = { mainhand: { int: 1 }, chest: { sta: 6 } };
 // gain is not a thing to reason about; it is measured here.
 const CASTER_APEX_CHEST_ITEMS: Record<string, string> = { chest: 'sunspun_vestments' };
 const CASTER_APEX_CHEST_DELTA: SlotStats = {
-  chest: { int: 1, spi: 1, sta: 6 },
+  chest: { int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED },
   gloves: { int: 1 },
-  mainhand: { int: 1 },
+  mainhand: { int: WEAPON_INT_STEP },
 };
 
 function casterLane(seed: number, arm: Arm, level: number, armor: number, seconds: number): number {
@@ -552,7 +608,7 @@ const TANK_KIT_ITEMS: Record<string, string> = {
 const TANK_KIT_DELTA: SlotStats = {
   offhand: { str: 1, sta: 1 },
   legs: { str: 1 },
-  chest: { sta: 3 },
+  chest: { sta: CHEST_STA_STEP_PLATE },
 };
 
 export interface TankBody {
@@ -600,13 +656,23 @@ const se = (xs: number[]) => {
     xs.reduce((a, b) => a + (b - m) ** 2, 0) / Math.max(1, xs.length - 1) / xs.length,
   );
 };
+// PAIRED, not unpaired. Every arm runs the SAME seed list as the baseline, so
+// the seed-driven variation is common to both and cancels inside each pair. The
+// first version of this reporter combined each arm's independent standard error
+// (sqrt(se_kit^2 + se_base^2)), which throws that pairing away: it inflated the
+// interval by roughly a factor of five on the fury lane and left the binding
+// number reading as noise. The statistic is the mean of the per-seed relative
+// deltas and its own standard error; `spread` prints the extreme per-seed
+// deltas so a reader can see the distribution rather than trust one interval.
 const pct = (b: number, k: number) => ((k - b) / b) * 100;
 
 function row(name: string, base: number[], arms: Record<string, number[]>): void {
   const b = mean(base);
   const parts = Object.entries(arms).map(([k, xs]) => {
-    const err = ((2 * Math.sqrt(se(xs) ** 2 + se(base) ** 2)) / b) * 100;
-    return `${k} ${pct(b, mean(xs)).toFixed(2)}% (+/-${err.toFixed(2)})`;
+    const d = xs.map((v, i) => ((v - base[i]) / base[i]) * 100);
+    const lo = Math.min(...d);
+    const hi = Math.max(...d);
+    return `${k} ${mean(d).toFixed(2)}% (+/-${(2 * se(d)).toFixed(2)}, per-seed ${lo.toFixed(1)} to ${hi.toFixed(1)})`;
   });
   console.log(`${name}: base ${b.toFixed(2)} | ${parts.join(' | ')}`);
 }
@@ -633,11 +699,16 @@ function main(): void {
     }
     if (!only || only === 'fury') {
       const base = SEEDS.map((s) => furyLane(s, 'base', level, armor));
-      row(`${name} warrior-fury`, base, {
-        gear: SEEDS.map((s) => furyLane(s, 'gear', level, armor)),
-        'gear+ench': SEEDS.map((s) => furyLane(s, 'ench', level, armor)),
-        FULL: SEEDS.map((s) => furyLane(s, 'full', level, armor)),
-      });
+      const all: Record<string, number[]> = {
+        gear: WANT('gear') ? SEEDS.map((s) => furyLane(s, 'gear', level, armor)) : [],
+        'gear+ench': WANT('gear+ench') ? SEEDS.map((s) => furyLane(s, 'ench', level, armor)) : [],
+        FULL: WANT('FULL') ? SEEDS.map((s) => furyLane(s, 'full', level, armor)) : [],
+      };
+      row(
+        `${name} warrior-fury`,
+        base,
+        Object.fromEntries(Object.entries(all).filter(([, xs]) => xs.length > 0)),
+      );
     }
     if (!only || only === 'caster') {
       for (const secs of [60, SECONDS]) {
