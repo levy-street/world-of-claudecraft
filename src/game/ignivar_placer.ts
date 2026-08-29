@@ -164,9 +164,36 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
 /** The owner's NEW asset kit for the Drakelands rebuild (the Last Keep and
  *  Wyrmwatch placer passes): a dedicated picker section that holds ONLY the
  *  new assets the owner provides, never a key from the interior or exterior
- *  rosters. Empty until those assets land; each one registers in
+ *  rosters. Baked from the owner's drop by
+ *  scripts/assets/build_drakelands_kit.mjs; a future drop registers in
  *  IGNIVAR_ENV_PROP_URLS (plus its native dims) and then joins this list. */
-const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [];
+const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
+  'alchemist',
+  'barracks',
+  'building_1',
+  'building_2',
+  'building_base',
+  'building_base_roof',
+  'castle_door',
+  'church',
+  'dragon_statue',
+  'dummy',
+  'fence',
+  'gravestone_2',
+  'gravestone_3',
+  'horse_bell',
+  'horse_head',
+  'house_1',
+  'market_stall',
+  'notice_board',
+  'shield_rack',
+  'signpost',
+  'stables',
+  'tavern_sign',
+  'weapon_rack',
+  'well_pump',
+  'wooden_cart',
+];
 
 type AssetKit = 'interior' | 'exterior' | 'custom';
 
