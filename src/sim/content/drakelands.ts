@@ -7,7 +7,6 @@
 // lobes, the desert gradient, volcano cones).
 
 import { BULWARK_BUILDINGS } from '../bulwark_layout';
-import { castleBuildingProps } from '../castle_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -45,8 +44,13 @@ export const DRAKELANDS_ZONE: ZoneDef = {
     { x: 404, z: 1900, label: 'Wyrmwatch', id: 'wyrmwatch' },
     { x: 360, z: 1940, label: 'The Gatewood', id: 'the_gatewood' },
     { x: 330, z: 2100, label: 'Cinder Dunes', id: 'cinder_dunes' },
-    { x: 460, z: 2140, label: 'Trollmoot', id: 'trollmoot' },
-    { x: 406, z: 2032, label: 'The Last Keep', id: 'the_last_keep' },
+    // The two anchor sites TRADED PLACES (the drakelands-improvements epic):
+    // the troll moot now musters on the old keep grounds by the restored
+    // ruin ring, and the Last Keep's site moved to the rise the moot held,
+    // flat build land awaiting the owner's placer rebuild. Coordinates
+    // swapped in place: poi locale keys are positional, never reorder.
+    { x: 418, z: 2032, label: 'Trollmoot', id: 'trollmoot' },
+    { x: 463, z: 2152, label: 'The Last Keep', id: 'the_last_keep' },
     { x: 270, z: 2270, label: 'Bloodglass Fields', id: 'bloodglass_fields' },
     { x: 390, z: 2320, label: 'Drakemaw Caldera', id: 'drakemaw_caldera' },
   ],
@@ -91,9 +95,9 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 404, z: 1900 },
   ], // the Pale Causeway -> the Wyrmgate pass -> Wyrmwatch
   [
-    // Skirts the Last Keep instead of slicing through its north wall and
-    // barbican (the pre-castle line): around the northwest corner, down the
-    // west flank outside the outer work, and on south to the dunes.
+    // Skirts the old keep grounds (the castle is gone, but the shipped
+    // line stays: moving a road moves every world-gen draw downstream):
+    // around the northwest corner, down the west flank, south to the dunes.
     { x: 404, z: 1900 },
     { x: 372, z: 1958 },
     { x: 352, z: 1974 },
@@ -101,11 +105,15 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 330, z: 2030 },
     { x: 332, z: 2064 },
     { x: 330, z: 2100 },
-  ], // Wyrmwatch -> past the Last Keep's gate -> Cinder Dunes
+  ], // Wyrmwatch -> past the old keep grounds -> Cinder Dunes
   [
+    // The old keep spur, extended past the vanished barbican line to the
+    // Trollmoot: the fork now runs to the moot's ring on the old grounds,
+    // stopping short of the henge columns.
     { x: 330, z: 2030 },
     { x: 342, z: 2029.9 },
-  ], // the keep spur: the road's fork straight into the barbican's outer gate
+    { x: 404, z: 2031 },
+  ], // the moot spur: the road's fork to the Trollmoot ring
   [
     { x: 330, z: 2100 },
     { x: 380, z: 2180 },
@@ -113,9 +121,11 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 390, z: 2298 },
   ], // Cinder Dunes -> the Drakemaw crater rim
   [
+    // Re-aimed at the Last Keep's new site: the terminus stops on the
+    // build pad's west approach (the pad wins the grade inside its rect).
     { x: 380, z: 2180 },
-    { x: 460, z: 2140 },
-  ], // dune fork -> Trollmoot
+    { x: 426, z: 2154 },
+  ], // dune fork -> the Last Keep's build ground
   [
     { x: 330, z: 2100 },
     { x: 270, z: 2210 },
@@ -816,8 +826,12 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
   },
 };
 export const DRAKELANDS_CAMPS: CampDef[] = [
-  { mobId: 'dune_troll', center: { x: 460, z: 2140 }, radius: 10, count: 3 },
-  { mobId: 'dune_troll', center: { x: 476, z: 2124 }, radius: 8, count: 2 },
+  // The troll clans moved onto the old keep grounds with the site swap
+  // (camp CENTER moves in the same array slots: no insert, no delete, so
+  // every later camp keeps its slot; the new sites re-draw their own
+  // rejection sampling, which the parity goldens re-record).
+  { mobId: 'dune_troll', center: { x: 412, z: 2030 }, radius: 10, count: 3 },
+  { mobId: 'dune_troll', center: { x: 427, z: 2044 }, radius: 8, count: 2 },
   { mobId: 'ashbone_raider', center: { x: 356, z: 2086 }, radius: 10, count: 3 },
   { mobId: 'ashbone_raider', center: { x: 296, z: 2184 }, radius: 10, count: 3 },
   { mobId: 'ashbone_warcaller', center: { x: 448, z: 2106 }, radius: 8, count: 2 },
@@ -835,16 +849,12 @@ export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
     itemId: 'scorched_supply_crate',
     name: 'Scorched Supply Crate',
     // Strewn where the burned wagon broke apart along the Wyrmwatch -> Cinder
-    // Dunes road.
-    // The second crate sat at x 360, which is exactly CASTLE.wx0, the Last
-    // Keep's west curtain wall centerline: once the keep was authored over this
-    // stretch of road, castleLift raised that crate to the wall-walk (walkAbs
-    // 13, 7yd over the bailey floor), where a player following the road has
-    // nothing to see. Credit was never the gate: interaction.ts measures
-    // dist2d, so height is ignored and someone standing at the wall foot could
-    // still have taken it blind. What the stranding cost was FINDING it. It now
-    // lies on the open ground just west of the wall foot, still on the road
-    // line. tests/ground_object_placement.test.ts guards the whole family.
+    // Dunes road. The second crate once sat at x 360 on the castle's west
+    // curtain line and got lifted to the wall-walk when the keep was
+    // authored over this stretch; it moved to the open ground west of the
+    // old wall foot, still on the road line, and stays there now the
+    // castle is gone. tests/ground_object_placement.test.ts guards the
+    // whole family.
     positions: [
       { x: 372, z: 1968 },
       { x: 355, z: 2013 },
@@ -979,12 +989,13 @@ export const DRAKELANDS_BROOD_CAMPS: CampDef[] = [
 export const DRAKELANDS_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // fallen keeps of the old drake-cult: castle ruins across the wastes.
-  // (The Last Keep's ring at (422, 2032) is gone: that castle STANDS now,
-  // rebuilt as the walled garrison in castle_layout.ts.)
+  // The castle that stood on the (422, 2032) ring is gone again; the ring
+  // is BACK on its original ground, and the troll clans moot inside it
+  // (the henge left the rise so the Last Keep's build land could take it).
   ruinRings: [
     { x: 330, z: 2114, ringR: 10, columns: 8 }, // the Cinder Bastion
     { x: 338, z: 2124, ringR: 6, columns: 5 },
-    { x: 468, z: 2158, ringR: 7, columns: 6 }, // the Trollmoot henge
+    { x: 422, z: 2032, ringR: 7, columns: 6 }, // the Trollmoot henge
     { x: 268, z: 2256, ringR: 6, columns: 5 }, // Bloodglass watch
   ],
   graveyards: [
@@ -992,51 +1003,19 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
     { x: 300, z: 2176 },
     { x: 452, z: 2112 },
   ],
-  // Wyrmwatch: the dragon-watch garrison town on the Wyrmgate road. The
-  // north palisade parts at x 44 for the causeway gate; the southwest road
-  // to the dunes leaves between the inn and the well.
-  buildings: [
-    { kind: 'inn', x: 390, z: 1904, w: 6, d: 7, rot: 0.6 },
-    { kind: 'house', x: 414, z: 1892, w: 5, d: 5, rot: -1.1 },
-    { kind: 'house', x: 393, z: 1888, w: 5, d: 5, rot: 2.0 },
-    { kind: 'house', x: 416, z: 1912, w: 5, d: 6, rot: 2.6 },
-  ],
-  wells: [
-    { x: 410, z: 1902, r: 1.5 },
-    // the Last Keep's courtyard well
-    { x: 408, z: 2033, r: 1.5 },
-  ],
-  stalls: [
-    { x: 398, z: 1896, rot: 0.5, r: 1.6 },
-    { x: 410, z: 1910, rot: -1.2, r: 1.6 },
-    // The keep's market row inside the main gate. A stall's collider is its
-    // rotated box PLUS its dressing, so it needs the same standable lane
-    // around it the bailey buildings get: pitched against the market hall's
-    // circle it left a tapering alley a body could walk into and not turn
-    // around in.
-    { x: 394, z: 2032, rot: 0.7, r: 1.6 },
-    { x: 403, z: 2045.5, rot: -2.4, r: 1.6 },
-  ],
-  // the Last Keep's bailey: every building comes from the castle plan (one
-  // source of truth with the walls, walks, and colliders)
-  decorProps: [...castleBuildingProps(), ...BULWARK_BUILDINGS],
-  crates: [
-    [406, 1892],
-    [396, 1912],
-  ],
-  fences: [
-    // the north palisade, parted at the causeway gate
-    { x1: 390, z1: 1882, x2: 400, z2: 1882 },
-    { x1: 408, z1: 1882, x2: 416, z2: 1882 },
-  ],
-  // the old waypost stays: a garrison keeps its road camp
+  // Wyrmwatch stands STRIPPED for the owner's placer rebuild (the
+  // drakelands-improvements epic): the buildings, well, stalls, crates,
+  // palisade, road-camp tents, and hub campfire are all out, with the
+  // NPCs, spawn, quests, and functional graveyard holding the ground.
+  // The Last Keep's bailey furnishings went the same way with its castle.
+  // The Ashen Bulwark's yard buildings are not part of either site and
+  // stay authored in bulwark_layout.ts.
+  decorProps: [...BULWARK_BUILDINGS],
+  // Scout Yerrin's far-dune camp is hers, not Wyrmwatch's: it stays.
   tents: [
-    { x: 396, z: 1894, rot: 0.8, scale: 1 },
-    { x: 412, z: 1906, rot: -1.9, scale: 1 },
     { x: 497, z: 2097, rot: -2.2, scale: 1 }, // Scout Yerrin's ridge camp above the wargate
   ],
   campfires: [
-    [404, 1900],
     [492, 2103], // Yerrin's low fire, banked so the gate does not see it
   ],
 };

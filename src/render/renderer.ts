@@ -111,7 +111,6 @@ import {
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
-import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
 import {
@@ -1590,7 +1589,6 @@ export class Renderer {
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
   private bulwarkFeatures: BulwarkFeaturesView | null = null;
-  private castleFeatures: CastleFeaturesView | null = null;
   private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
@@ -4120,10 +4118,6 @@ export class Renderer {
         if (!this.emberFeatures) {
           this.emberFeatures = this.timedBuild('buildEmberFeatures', buildEmberFeatures);
           this.attachZoneFeature(this.emberFeatures);
-        }
-        if (!this.castleFeatures) {
-          this.castleFeatures = this.timedBuild('buildCastleFeatures', buildCastleFeatures);
-          this.attachZoneFeature(this.castleFeatures);
         }
         if (!this.bulwarkFeatures) {
           this.bulwarkFeatures = this.timedBuild('buildBulwarkFeatures', buildBulwarkFeatures);

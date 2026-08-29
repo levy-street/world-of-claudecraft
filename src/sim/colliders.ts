@@ -13,7 +13,6 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
-import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
 import {
   buildColliderCellIndex,
   type ColliderCellIndex,
@@ -58,7 +57,11 @@ import {
 // their './colliders' path.
 export { MAX_BODY_RADIUS } from './collider_cells';
 
-import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
+import {
+  DAWNHOLD_PARAPET_HALF,
+  DAWNHOLD_WALL_LEDGES,
+  dawnholdParapetSegments,
+} from './dawnhold_layout';
 import {
   decorationHasCollider,
   ROCK_RADIUS_PER_SCALE,
@@ -503,24 +506,11 @@ function staticWorldColliders(seed: number): Collider[] {
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 6),
     });
-  // The castles' outside climbing chains: corbelled shelves up each curtain
+  // Dawnhold's outside climbing chain: corbelled shelves up each curtain
   // so the wall-walk is reachable by parkour as well as by the flights.
-  // These are the only STANDABLE tops either castle has outdoors, because
+  // These are the only STANDABLE tops the castle has outdoors, because
   // the walls themselves are lift terrain rather than colliders and terrain
   // grants no ledge to grab.
-  for (const l of CASTLE_WALL_LEDGES) {
-    out.push({
-      type: 'obb',
-      x: l.x,
-      z: l.z,
-      hw: l.hw,
-      hd: l.hd,
-      rot: 0,
-      moveTopY: l.top,
-      standable: true,
-      cameraTopY: l.top,
-    });
-  }
   for (const l of DAWNHOLD_WALL_LEDGES) {
     out.push({
       type: 'obb',
@@ -544,15 +534,15 @@ function staticWorldColliders(seed: number): Collider[] {
   // a body whose feet are below the stone is blocked by it, and nobody may ever
   // the shelves right beside it, so the chase camera does not yank in on a
   // knee-high rail.
-  for (const seg of [...castleParapetSegments(), ...dawnholdParapetSegments()]) {
+  for (const seg of dawnholdParapetSegments()) {
     const alongHalf = (seg.a1 - seg.a0) / 2;
     const mid = (seg.a0 + seg.a1) / 2;
     out.push({
       type: 'obb',
       x: seg.axis === 'z' ? seg.line : mid,
       z: seg.axis === 'z' ? mid : seg.line,
-      hw: seg.axis === 'z' ? PARAPET_HALF : alongHalf,
-      hd: seg.axis === 'z' ? alongHalf : PARAPET_HALF,
+      hw: seg.axis === 'z' ? DAWNHOLD_PARAPET_HALF : alongHalf,
+      hd: seg.axis === 'z' ? alongHalf : DAWNHOLD_PARAPET_HALF,
       rot: 0,
       moveTopY: seg.top,
       cameraTopY: seg.top,

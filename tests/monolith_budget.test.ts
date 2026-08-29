@@ -183,7 +183,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
     // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
-    ceiling: 13265,
+    // Lowered again with the Last Keep castle removal (the drakelands site
+    // swap): the castleFeatures build/attach left the ember zone case.
+    // Exact count, zero slack.
+    ceiling: 13259,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -344,7 +347,10 @@ const MONOLITHS: MonolithRow[] = [
     // stair ramps fold in there), then EMBER_LAVA_POOLS moved home to
     // ember_lava_layout.ts beside its flat-pool sibling (paying for the
     // fortress scatter screen); exact count.
-    ceiling: 5275,
+    // Lowered with the Last Keep castle removal: the castle pad chain and
+    // the Last Spring's authored bank left the pad chain (keep_site.ts is
+    // the pad's new leaf home). Exact count, zero slack.
+    ceiling: 5229,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -418,7 +424,10 @@ const MONOLITHS: MonolithRow[] = [
     // colliders). Exact count, zero slack.
     // the dungeon-door jamb block extracted to dungeon_door_jambs.ts; the
     // fortress collider hook rode the freed room
-    ceiling: 2587,
+    // Lowered with the Last Keep castle removal: the keep's wall-ledge and
+    // parapet collider loops retired (Dawnhold keeps its own). Exact
+    // count, zero slack.
+    ceiling: 2577,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

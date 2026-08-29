@@ -6,15 +6,17 @@
 // heightfield rather than a collider, so findSafePos would not have moved it
 // anyway. That makes structure geometry authored LATER able to silently lift a
 // pickup onto masonry the player cannot see from the ground: the Scorched
-// Supply Crate at x 360 landed on the Last Keep's west curtain wall
-// (CASTLE.wx0 is 360, walkAbs 13) once the keep was built over the Wyrmwatch
-// road, stranding the quest 3 crates short of its 4-crate objective.
+// Supply Crate at x 360 landed on the old Last Keep's west curtain wall
+// (its wall centerline, walk 7yd over the bailey) when that castle was
+// built over the Wyrmwatch road, stranding the quest 3 crates short of its
+// 4-crate objective. That castle is gone; the hazard class (Dawnhold's
+// walls, the beacon stair, any future lift mass) is not.
 //
 // These are the guards for that class of bug, not just the one instance.
 import { describe, expect, it } from 'vitest';
-import { CASTLE } from '../src/sim/castle_layout';
 import { isBlocked } from '../src/sim/colliders';
 import { GROUND_OBJECTS } from '../src/sim/data';
+import { DAWNHOLD } from '../src/sim/dawnhold_layout';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -35,10 +37,10 @@ const LIFT_EPSILON = 0.01;
 // rule the sibling family guard states, tests/gather_node_placement.test.ts).
 //
 // The ring has to reach PAST the widest masonry a pickup could be standing on
-// top of, or it samples that same surface and reports level ground: the west
-// curtain strip is CASTLE.wallTh wide, so a crate on its centerline is still on
-// wall at half that.
-const PERCH_RING_RADIUS = CASTLE.wallTh;
+// top of, or it samples that same surface and reports level ground: the widest
+// standing wall-walk strip is DAWNHOLD.wallTh wide, so a crate on its
+// centerline is still on wall at half that.
+const PERCH_RING_RADIUS = DAWNHOLD.wallTh;
 // How far the crate may stand ABOVE the ground one ring-step away before it is
 // perched on something rather than lying on it. A rise the player can simply
 // walk up is not a perch, so the bar is the climb gate over that run rather

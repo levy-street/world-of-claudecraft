@@ -1,7 +1,6 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
 import { bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
-import { castlePadTarget, castlePadWeight, castleSkirtWeight, LAST_SPRING } from './castle_layout';
 import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
@@ -43,6 +42,7 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
+import { KEEP_SITE, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import {
@@ -2538,14 +2538,13 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   return out;
 }
 
-// The Last Keep's terraced grounds: the castle pads grade to their local
-// target (the outer bailey floor, or the raised inner ward with its stair
-// cuts; the plan lives in castle_layout.ts), with a gentle skirt back onto
-// the midlands.
-function applyCastlePad(x: number, z: number, h: number): number {
-  const w = castlePadWeight(x, z);
+// The Last Keep's SITE pad on the Trollmoot rise: one level build floor
+// with a gentle skirt back onto the rise (the castle that held the old
+// terraced grounds is gone; the plan lives in keep_site.ts).
+function applyKeepSitePad(x: number, z: number, h: number): number {
+  const w = keepSitePadWeight(x, z);
   if (w <= 0) return h;
-  return h + (castlePadTarget(x, z) - h) * w;
+  return h + (KEEP_SITE.pad.h - h) * w;
 }
 
 // The Ashen Bulwark's graded grounds on the Drakelands west headland (the
@@ -2556,52 +2555,10 @@ function applyBulwarkPad(x: number, z: number, h: number): number {
   return h + (bulwarkPadTarget() - h) * w;
 }
 
-// The pad's northeast apron meets the Last Spring pool, and the pad yields to
-// the pool over castlePadWeight's own ring: the bailey's level floor ends on an
-// arc about 16yd out from the pool center and the ground then falls to the pool
-// bed in about 5yd of run. That left a 1.85 rise/run face standing straight out
-// of the water (tests/world_edge_coast.test.ts swept it on the drake east
-// margin: 4.5 and 4.3yd per 2yd step at z 1990 and 1998).
-//
-// Grade the apron into the shore: fill the hollow between the arc and the water
-// with a straight bank, so the pad's skirt reaches the pool as a shore slope
-// instead of a lip (the near-shore band measures 1.58 rise/run after, 2.82
-// before). Three properties keep the castle out of it:
-//   - it RAISES ONLY, so no pad, courtyard, or grounds height can move down;
-//   - its rim stops inside the castle's closest masonry (the northeast
-//     bastion's outer face at x 440.2, 15.8yd from the pool center), so no
-//     wall, bastion, ramp, or flank-trap seal is ever in its reach;
-//   - its authority is the pad's OWN skirt (castleSkirtWeight), so the fill is
-//     the skirt meeting the water and dies out around the pool's far shores,
-//     which have no pad behind them and keep their natural bank.
-// The bank line dives under the pool bed inside the shallows and rises above
-// the natural apron outside it, so the fill releases to zero at both ends on
-// its own: no window edge to seam (tests/terrain_window_seams.test.ts).
-const LAST_SPRING_BANK = {
-  /** the bank's outer rim, measured from the pool center (castle_layout) */
-  rim: 15.5,
-  /** the bank's height at the rim, just under the apron it meets there */
-  rimH: 3.5,
-  /** rise/run of the bank plane, under PLAYER_MAX_CLIMB_SLOPE (the apron
-   *  ABOVE it is the pad's own yield ramp and stays as steep as it was) */
-  slope: 1.4,
-  /** the fill eases back to the natural apron over the last of the rim */
-  ease: 1.5,
-} as const;
-
-function applyLastSpringBank(x: number, z: number, h: number): number {
-  const b = LAST_SPRING_BANK;
-  const dx = x - LAST_SPRING.x;
-  const dz = z - LAST_SPRING.z;
-  if (dx < -b.rim || dx > b.rim || dz < -b.rim || dz > b.rim) return h;
-  const d = Math.hypot(dx, dz);
-  if (d >= b.rim) return h;
-  const target = b.rimH - b.slope * (b.rim - d);
-  if (target <= h) return h; // raises only: the apron above the bank never moves
-  const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
-  if (w <= 0) return h;
-  return h + (target - h) * w;
-}
+// (The Last Spring's authored shore bank retired with the castle pad: the
+// steep face it graded was the hollow the pad's own pool yield opened, and
+// the natural apron the pool keeps without a pad behind it never had one.
+// tests/world_edge_coast.test.ts and the lake escape sweep hold the shore.)
 
 // Dawnhold Castle's graded grounds in the Evergarden (the same idiom at a
 // smaller scale; the plan lives in dawnhold_layout.ts).
@@ -3969,19 +3926,16 @@ export function terrainHeightSansEdits(x: number, z: number, seed: number): numb
   return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed, true));
 }
 
-// The authored pad chain over the unpadded height (castle pad, spring bank,
-// pool walkway bed, garden/gale pads): one shared body so terrainHeight and
+// The authored pad chain over the unpadded height (keep-site pad, pool
+// walkway bed, garden/gale pads): one shared body so terrainHeight and
 // terrainHeightSansEdits can never drift.
 function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
   let h = h0;
-  // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
-  // sea shave runs late in the unpadded chain and was clipping the castle's
-  // seaward corner; the castle plateau must win everywhere inside its walls).
-  h = applyCastlePad(x, z, h);
-  // ...and the shore bank that carries that pad's northeast apron down into the
-  // Last Spring, applied straight after it: the hollow it fills is the one the
-  // pad's own pool yield opens, so it has to read the padded height.
-  h = applyLastSpringBank(x, z, h);
+  // The Last Keep's site pad on the Trollmoot rise, over the FINISHED
+  // height (the world-edge sea shave runs late in the unpadded chain and
+  // the rise sits near the west shore shelf; the build floor must win
+  // everywhere inside its rect).
+  h = applyKeepSitePad(x, z, h);
   // The Palmreach jungle-pool walkway's bed, over the FINISHED height: the
   // deck surfaces the movement kernel walks are anchored to this function, so
   // the rim the planks cover and the sand they land on have to be shaped here,
@@ -5068,9 +5022,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     // beds, and the shaped basins stay clear (a rock there is also a stray
     // collider standing in the melt)
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
-    // the Last Keep's graded grounds carry no wild scatter, and neither
+    // the Last Keep's build pad carries no wild scatter, and neither
     // do the Forgefather fortress's courts and stair flights
-    if (castlePadWeight(gx, gz) > 0) return null;
+    if (keepSitePadWeight(gx, gz) > 0) return null;
     if (forgefatherScatterExcluded(gx, gz)) return null;
     // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
     // is also a stray collider standing in the muster lane)

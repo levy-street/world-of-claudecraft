@@ -6,7 +6,6 @@
 // contract as realm_flora: build once, update(time) animates, lights join
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
-import { CASTLE_CRYSTALS } from '../sim/castle_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -54,7 +53,7 @@ interface PropPlacement {
 
 // Meshopt-quantized attributes are normalized ints; bake them to plain
 // floats BEFORE applying a world matrix, or setXYZ clamps every vertex
-// back into the normalized [-1, 1] domain (the castle_features guard).
+// back into the normalized [-1, 1] domain (the castle-assembly guard).
 function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   const attr = geo.getAttribute(name);
   if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
@@ -305,18 +304,6 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
           fp: 1.8 + hash2(x, z, seed + 861) * 1.6,
         });
       }
-    }
-    // ember crystals of varying sizes around the Last Keep: the castle plan
-    // authors these directly (they sit INSIDE the grounds the wild scatter
-    // clears), seated on the graded pad
-    for (const c of CASTLE_CRYSTALS) {
-      crystalSpots.push({
-        x: c.x,
-        z: c.z,
-        y: terrainHeight(c.x, c.z, seed) - 0.1,
-        fp: c.fp,
-        rot: hash2(c.x, c.z, seed + 843) * Math.PI * 2,
-      });
     }
     // a dense crystal garden on the Bloodglass Fields
     for (let k = 0; k < 14; k++) {

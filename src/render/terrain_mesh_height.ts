@@ -7,24 +7,17 @@
 // disagree: a player standing at the sim height either floats over the drawn
 // ground or sinks into it.
 //
-// The castle's built masses already avoid this: the curtain walls, bastions
-// and stair flights live in castleLift, which groundHeight adds and
-// terrainHeight does not, and render/castle_features.ts draws each one with a
-// visible cap so nobody stands on air. The Last Keep's inner ward was the one
-// exception, a 2.6yd terrace with a 0.7yd retaining blend baked into
-// terrainHeight; its faces smeared up to 1.7yd out over the bailey and buried
-// anyone walking along them (player report: characters sinking into the ground
-// on the keep's east and west faces).
-//
-// So the mesh subtracts the ward terrace and castle_features.ts draws it as
-// masonry. This is a RENDER view only: groundHeight, the climb gate, the
-// steepness field, and every collision path still see the exact terrace.
-import { castlePadWeight, wardTerraceRise } from '../sim/castle_layout';
+// Today every authored surface obeys that rule on its own: sheer walkable
+// masses live in the lift fields (walk_lifts.ts), which groundHeight adds and
+// terrainHeight does not, and their render modules draw each one with a
+// visible cap; the remaining authored pads (Dawnhold, the Bulwark, the Last
+// Keep's build site) blend over skirts wider than the lattice. So the mesh
+// height IS terrainHeight. The seam stays because the exception class is
+// real: the Last Keep's old inner-ward terrace baked a 0.7yd retaining blend
+// into terrainHeight and had to be subtracted here and drawn as masonry. A
+// future feature sharper than the lattice subtracts itself here the same way.
 import { terrainHeight } from '../sim/world';
 
 export function meshTerrainHeight(x: number, z: number, seed: number): number {
-  const rise = wardTerraceRise(x, z);
-  const h = terrainHeight(x, z, seed);
-  // exactly the contribution applyCastlePad added: target lerped in by weight
-  return rise > 0 ? h - rise * castlePadWeight(x, z) : h;
+  return terrainHeight(x, z, seed);
 }

@@ -30,15 +30,15 @@ export const EMBER_LAND_LOBES = [
   { x: 404, z: 1858, r: 52 }, // the Wyrmgate shore and Wyrmwatch
   { x: 360, z: 1900, r: 70 }, // the Gatewood
   { x: 450, z: 1920, r: 55 }, // eastern gatewood shore
-  { x: 455, z: 1995, r: 55 }, // the Last Spring headland
+  { x: 455, z: 1995, r: 55 }, // the Last Spring headland (LAST_SPRING below)
   { x: 290, z: 1940, r: 60 }, // western gatewood shore
   { x: 380, z: 2030, r: 90 }, // the drying midlands
   { x: 280, z: 2080, r: 65 }, // Mirage Hollow's dune shelf
   { x: 262, z: 2020, r: 46 }, // ...its southern shoulder under the dune road
   { x: 274, z: 2170, r: 48 }, // ...and the shelf road's western shoulder
   { x: 470, z: 2070, r: 70 }, // eastern dunes
-  { x: 465, z: 2150, r: 60 }, // Trollmoot's rise
-  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the Trollmoot fork
+  { x: 465, z: 2150, r: 60 }, // the Last Keep's rise (the old Trollmoot's)
+  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the keep-site fork
   { x: 340, z: 2160, r: 85 }, // the Cinder Dunes' heart
   { x: 420, z: 2260, r: 80 }, // approach to the Drakemaw
   { x: 360, z: 2238, r: 45 }, // the saddle carrying the Snowline road
@@ -58,7 +58,7 @@ export const EMBER_LAND_LOBES = [
   { x: 264, z: 1908, r: 44 }, // ...so no channel runs behind it to the sound
   { x: 492, z: 2390, r: 48 }, // the Goldmelt Water's east cap, waste side
   // The Forgefather's Isle: the Ignivar raid entrance rises off the
-  // Trollmoot coast (high x renders WEST on the world map), a terraced
+  // keep-site coast (high x renders WEST on the world map), a terraced
   // volcanic islet the owner's bridge asset will span from the mainland
   // (docs/design/ignivar-entrance/plan.md). The fortress tier plateaus
   // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below; the isle rows
@@ -87,13 +87,19 @@ export function forgefatherIsleRockWeight(x: number, z: number): number {
   return w < 0 ? 0 : w > 1 ? 1 : w;
 }
 
+// The Last Spring, the pool at the forest's edge on its headland lobe
+// (the zone lake in drakelands.ts pois beside it). Lived in castle_layout
+// while the castle stood over its west shore; the castle is gone and the
+// spring is coast furniture, so the landmark lives with the coast tables.
+export const LAST_SPRING = { x: 456, z: 1988 } as const;
+
 export const EMBER_BAYS = [
   { x: 195, z: 1980, r: 50 }, // the west bight
   // the east reach, drawn north of its old eye so its suppression frees
   // the Forgefather's Isle water while still carving the coast above
   { x: 538, z: 2162, r: 46 },
   { x: 205, z: 2230, r: 40 }, // a western cove under the spur
-  // the Forgefather's Strait, widened for the grand isle: the Trollmoot
+  // the Forgefather's Strait, widened for the grand isle: the keep-site
   // coast pulls further inland (the two eyes) so open water rings every
   // face and the owner's bridge earns its length
   { x: 478, z: 2210, r: 24 },

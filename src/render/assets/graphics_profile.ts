@@ -1,6 +1,5 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
-import { resetCastleFeatureProfileCaches } from '../castle_features';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
@@ -70,7 +69,6 @@ const RESETTERS = [
   ['props', resetPropProfileCaches],
   ['characters', resetCharacterProfileCaches],
   ['stations', resetStationProfileCaches],
-  ['castle_features', resetCastleFeatureProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],

@@ -157,7 +157,13 @@ export type {
 // dangerously smaller warning than the authoritative server damage.
 // (11 through 20 were numbered 9 through 18 on the pre-merge raid branch,
 // which forked before the Eastbrook program bumps above.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 20 as const;
+// 21 = the Drakelands site swap (docs/design/drakelands-improvements): the
+// Last Keep's castle removed to flat build land on the old Trollmoot rise,
+// the trolls mooting on the old keep grounds by the restored ruin ring,
+// Wyrmwatch's dressing stripped for the placer rebuild, roads re-aimed.
+// Epoch 20 clients would render a castle, a town, and camps the server no
+// longer stands anywhere near, and collide with walls that are not there.
+export const ONLINE_WORLD_LAYOUT_VERSION = 21 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

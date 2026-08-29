@@ -27,7 +27,6 @@ import type {
 
 export type { FishingEntry } from './content/items';
 
-import { CASTLE_BLOCKERS } from './castle_layout';
 import {
   AMBERFALL_CAMPS,
   AMBERFALL_ITEMS,
@@ -769,8 +768,7 @@ export const BUILTIN_WORLD: WorldContent = {
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's
-  // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
-  blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
+  blockers: [...JAIL_BLOCKERS],
   terrainEdits: [
     ...JAIL_TERRAIN_EDITS,
     ...COPPER_DIG_TERRAIN_EDITS,

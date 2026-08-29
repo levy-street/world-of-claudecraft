@@ -1,6 +1,6 @@
 // The Ashen Bulwark's render assembly (render-only): the Drakelands walled
 // barracks on the west headland, dressed in the same fortification idiom as
-// the Last Keep and Dawnhold. The walls the player climbs are bulwarkLift
+// Dawnhold. The walls the player climbs are bulwarkLift
 // terrain (sim/bulwark_layout.ts) and lift terrain draws nothing itself, so
 // every mass is built here: double-skinned kcas module rows over the wall
 // lines, open doorway arches whose openings the gate lift spans sit inside,

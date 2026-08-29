@@ -146,8 +146,9 @@ interface PropAssetDef {
   strip?: RegExp;
 }
 
-// exported for render/castle_features.ts, which instances the kcas castle
-// set through the same registry (one preload gate, one manifest surface)
+// exported for the castle render assemblies (render/dawnhold_features.ts),
+// which instance the kcas castle set through the same registry (one preload
+// gate, one manifest surface)
 export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },

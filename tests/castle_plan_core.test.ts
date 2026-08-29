@@ -1,11 +1,11 @@
-// The castles' map plans are DERIVED from the authored sim layouts, never
+// The castle map plan is DERIVED from the authored sim layout, never
 // re-typed, so this pins the derivation rather than the coordinates: every
 // wall run must lie on a real wall centreline, stop dead at its gate spans,
 // and every tower must match its layout entry. A castle whose walls move in
 // the sim then moves on the map in the same change, and if it does not,
-// these fail.
+// these fail. (The Last Keep's plan retired with its castle in the
+// drakelands-improvements site swap; Dawnhold is the one standing castle.)
 import { describe, expect, it } from 'vitest';
-import { CASTLE, CASTLE_GATES, CASTLE_TOWERS } from '../src/sim/castle_layout';
 import { DAWNHOLD, DAWNHOLD_GATES, DAWNHOLD_TOWERS } from '../src/sim/dawnhold_layout';
 import {
   buildCastlePlanMarkers,
@@ -20,8 +20,8 @@ const plan = (id: string): CastlePlan => {
 };
 
 describe('the castles map plan', () => {
-  it('covers both castles and nothing else', () => {
-    expect(CASTLE_MAP_PLANS.map((p) => p.id).sort()).toEqual(['dawnhold_castle', 'the_last_keep']);
+  it('covers every standing castle and nothing else', () => {
+    expect(CASTLE_MAP_PLANS.map((p) => p.id).sort()).toEqual(['dawnhold_castle']);
   });
 
   it('carries walls, towers and a court for each castle', () => {
@@ -33,36 +33,17 @@ describe('the castles map plan', () => {
   });
 
   it('places every tower on its authored layout entry', () => {
-    for (const [id, towers] of [
-      ['the_last_keep', CASTLE_TOWERS],
-      ['dawnhold_castle', DAWNHOLD_TOWERS],
-    ] as const) {
-      const drawn = plan(id).parts.filter((q) => q.part === 'tower');
-      expect(drawn.length, `${id} tower count`).toBe(towers.length);
-      for (const t of towers) {
-        const hit = drawn.find((q) => q.rect.cx === t.x && q.rect.cz === t.z);
-        expect(hit, `${id} tower at (${t.x},${t.z})`).toBeDefined();
-        expect(hit?.rect.hw).toBe(t.hw);
-      }
+    const drawn = plan('dawnhold_castle').parts.filter((q) => q.part === 'tower');
+    expect(drawn.length, 'dawnhold_castle tower count').toBe(DAWNHOLD_TOWERS.length);
+    for (const t of DAWNHOLD_TOWERS) {
+      const hit = drawn.find((q) => q.rect.cx === t.x && q.rect.cz === t.z);
+      expect(hit, `dawnhold_castle tower at (${t.x},${t.z})`).toBeDefined();
+      expect(hit?.rect.hw).toBe(t.hw);
     }
   });
 
   it('opens a real gap at every gate: no wall run crosses a gate span', () => {
-    // the Last Keep's main gate is a span on the west curtain (x = wx0)
-    const keep = plan('the_last_keep');
-    const westRuns = keep.parts.filter(
-      (q) => q.part === 'wall' && Math.abs(q.rect.cx - CASTLE.wx0) < 0.01,
-    );
-    expect(westRuns.length, 'the main gate parts the west curtain').toBeGreaterThan(1);
-    for (const r of westRuns) {
-      const z0 = r.rect.cz - r.rect.hd;
-      const z1 = r.rect.cz + r.rect.hd;
-      const g = CASTLE_GATES.main;
-      expect(z1 <= g.a0 + 0.01 || z0 >= g.a1 - 0.01, `run ${z0}..${z1} crosses the main gate`).toBe(
-        true,
-      );
-    }
-    // Dawnhold's main gate parts its east curtain the same way
+    // Dawnhold's main gate parts its east curtain
     const dawn = plan('dawnhold_castle');
     const eastRuns = dawn.parts.filter(
       (q) => q.part === 'wall' && Math.abs(q.rect.cx - DAWNHOLD.wx1) < 0.01,
@@ -93,20 +74,16 @@ describe('the castles map plan', () => {
 
   it('projects only the castles the view can see, and is deterministic', () => {
     const toMap = (x: number, z: number) => ({ mx: (x - 180) * 1.5, my: (z - 1820) * 1.5 });
+    // the Drakelands holds no standing castle since the keep retired
     const drakelands = { minX: 180, maxX: 540, minZ: 1820, maxZ: 2420 };
     const evergarden = { minX: 180, maxX: 540, minZ: 700, maxZ: 1260 };
-    const keepOnly = buildCastlePlanMarkers(drakelands, toMap);
+    expect(buildCastlePlanMarkers(drakelands, toMap)).toEqual([]);
     const dawnOnly = buildCastlePlanMarkers(evergarden, toMap);
-    expect(keepOnly.length).toBe(plan('the_last_keep').parts.length);
     expect(dawnOnly.length).toBe(plan('dawnhold_castle').parts.length);
-    // a zone holding neither castle draws none
-    expect(buildCastlePlanMarkers({ minX: -400, maxX: -100, minZ: 0, maxZ: 400 }, toMap)).toEqual(
-      [],
-    );
     // same input, same output
-    expect(buildCastlePlanMarkers(drakelands, toMap)).toEqual(keepOnly);
+    expect(buildCastlePlanMarkers(evergarden, toMap)).toEqual(dawnOnly);
     // and every projected rect has positive extent whatever the axis signs
-    const flipped = buildCastlePlanMarkers(drakelands, (x, z) => ({ mx: -x, my: -z }));
+    const flipped = buildCastlePlanMarkers(evergarden, (x, z) => ({ mx: -x, my: -z }));
     for (const m of flipped) {
       expect(m.w).toBeGreaterThanOrEqual(0);
       expect(m.h).toBeGreaterThanOrEqual(0);
