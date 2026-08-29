@@ -233,6 +233,11 @@ const CAST_FX = new Set([
 // 8 yd warrior shout ring).
 const RING_RADIUS_PER_SCALE = 4;
 
+/** The tier a REFUSED cast plans at: the most degraded one, so resolving a
+ *  plan for the telegraphs the refusal still owes never charges the cast
+ *  budget. Neither the area ring nor a rig clip varies with it. */
+const REFUSED_CAST_TIER = 2;
+
 // Palette to school mapping for the pooled point-light flashes (the renderer's
 // pulseAt is school-colored).
 const SCHOOL_BY_PALETTE: Record<string, string> = {
@@ -518,8 +523,13 @@ export class AbilityVfx {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
     const spec = abilityVfxSpec(ev.ability);
     if (!spec) return false;
-    // Claimed and drawn as nothing: the generic arm would link cold too.
-    if (!this.admitted()) return true;
+    // Claimed and drawn as nothing: the generic arm would link cold too. Two
+    // reads survive the refusal, for the same reason the point-anchored ring
+    // survives it in handleSpellfxAt below, and neither costs a cast program.
+    if (!this.admitted()) {
+      this.refusedTelegraphs(ev, spec);
+      return true;
+    }
     const full = abilityVfxFullSpec(ev.ability);
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
@@ -901,7 +911,12 @@ export class AbilityVfx {
       // The terrain-draped area ring is an actionable telegraph (the blast
       // AREA the player steps out of): its pool is linked at boot and never
       // waits on the cast programs, so it draws even while the rest is held.
-      if (ev.radius) this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
+      // With the plan's colour, or the same cast would read one colour on a
+      // held gate and another on an open one.
+      if (ev.radius) {
+        const held = planCast(spec, this.quality, REFUSED_CAST_TIER);
+        this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, held.color);
+      }
       return true;
     }
     const casterId = ev.sourceId ?? -1;
@@ -1534,6 +1549,28 @@ export class AbilityVfx {
     if (d.isMob?.(sourceId)) return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
     d.triggerAttack(sourceId, abilityId);
+  }
+
+  /** What a refused cast still owes the player. Two reads are telegraphs the
+   *  player ACTS on, so the gate must not hold them:
+   *
+   *  - The terrain-draped area ring, the blast area a player steps out of.
+   *    ability_vfx_core.ts states the rule this gate was breaking in its own
+   *    words: "NO tier drops the ring, the area telegraph". Its pool is linked
+   *    at boot and its scale and colour come off the spec, so drawing it costs
+   *    no cast program and no tier changes what it says.
+   *  - A mob's windup clip (and a spin spec's whirl), which is the authored
+   *    boss read the Cleave/Stun telegraph rides on. A rig animation is not a
+   *    program at all.
+   *
+   *  planCast at the most degraded tier because a refused cast must NOT charge
+   *  the cast budget (castTier records), and no tier moves either read.
+   */
+  private refusedTelegraphs(ev: AbilityVfxSpellfxEvent, spec: AbilityVfxSpec): void {
+    const plan = planCast(spec, this.quality, REFUSED_CAST_TIER);
+    if (plan.whirl || ev.fx === 'windup') this.deps.triggerAttack(ev.sourceId, ev.ability);
+    if (ev.fx === 'shout') this.spawnRing(ev.sourceId, plan, ev.school);
+    else if (ev.fx === 'nova') this.spawnRing(ev.targetId, plan, ev.school);
   }
 
   private spawnRing(entityId: number, plan: AbilityVfxPlan, school: string): void {

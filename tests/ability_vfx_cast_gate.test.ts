@@ -1,9 +1,10 @@
 // The painter's cast gate (src/render/ability_vfx/painter.ts, castVfxAdmit):
 // while a cast program is still unlinked the painter claims the event and
 // draws nothing, so a first cast never links a program cold on a live frame.
-// The one exception is the terrain-draped area ring: an actionable telegraph
-// (the blast area the player steps out of) whose pool is not a cast program,
-// so it draws even while the gate is closed.
+// The exceptions are the reads a player ACTS on, which the gate must never
+// hold: the terrain-draped area ring, point-anchored and entity-anchored alike
+// (the blast area the player steps out of, whose pool is not a cast program),
+// and a mob's windup clip (a rig animation, no program at all).
 
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -34,13 +35,14 @@ function painterWith(admit: () => boolean, ready: () => boolean = admit) {
     beam: vi.fn(),
   };
   const spawnAoeRing = vi.fn();
+  const triggerAttack = vi.fn();
   const painter = new AbilityVfx(
     {
       fx,
       vfx,
       anchor: () => ({ x: 0, y: 1, z: 0 }),
       spawnAoeRing,
-      triggerAttack: vi.fn(),
+      triggerAttack,
       localPlayerId: () => 1,
       castVfxAdmit: admit,
       castVfxReady: ready,
@@ -49,7 +51,7 @@ function painterWith(admit: () => boolean, ready: () => boolean = admit) {
   );
   // The constructor's delegate wiring is the one touch a closed gate allows.
   touched.clear();
-  return { painter, touched, vfx, spawnAoeRing };
+  return { painter, touched, vfx, spawnAoeRing, triggerAttack };
 }
 
 const frostbolt = {
@@ -80,6 +82,62 @@ describe('the cast gate', () => {
     for (const spawn of Object.values(vfx)) expect(spawn).not.toHaveBeenCalled();
   });
 
+  it('still draws the ENTITY-anchored area ring while closed', () => {
+    // Same telegraph as the point-anchored one below, anchored on the caster
+    // instead of a point: a self-centred AoE radius the player steps out of.
+    // ability_vfx_core states the rule the gate was breaking, "NO tier drops
+    // the ring, the area telegraph", so a held gate must not drop it either.
+    const { painter, vfx, spawnAoeRing } = painterWith(() => false);
+    const roar = {
+      sourceId: 1,
+      targetId: 1,
+      school: 'shadow',
+      fx: 'shout',
+      ability: 'demoralizing_roar',
+    };
+    expect(painter.handleSpellfx(roar)).toBe(true);
+    // Drawn as the ring and nothing else: no shoutwave, no sequence.
+    expect(vfx.shoutwave).not.toHaveBeenCalled();
+    expect(spawnAoeRing).toHaveBeenCalledTimes(1);
+    // Anchored on the caster, at the spec's ring scale, in the plan's colour.
+    expect(spawnAoeRing).toHaveBeenCalledWith(0, 0, 12, 'shadow', 0x7d6b9e);
+  });
+
+  it('still plays a windup clip while closed: an animation is not a program', () => {
+    // The authored boss read (the dragonkin brood's Cleave/Stun rides
+    // attackByAbility off this cue). The painter claims the event, so the
+    // renderer's own windup arm never sees it: dropping it here drops it.
+    const { painter, triggerAttack, vfx } = painterWith(() => false);
+    const windup = {
+      sourceId: 4,
+      targetId: 2,
+      school: 'frost',
+      fx: 'windup',
+      ability: 'frostbolt',
+    };
+    expect(painter.handleSpellfx(windup)).toBe(true);
+    expect(triggerAttack).toHaveBeenCalledWith(4, 'frostbolt');
+    expect(vfx.projectile).not.toHaveBeenCalled();
+  });
+
+  it('gives the refused point ring the same colour the admitted one gets', () => {
+    // The same cast must not read one colour on a held gate and another on an
+    // open one.
+    const aimedAt = {
+      x: 3,
+      z: -4,
+      radius: 8,
+      school: 'frost',
+      fx: 'nova',
+      ability: 'frost_nova',
+    };
+    const closed = painterWith(() => false);
+    expect(closed.painter.handleSpellfxAt(aimedAt)).toBe(true);
+    const open = painterWith(() => true);
+    expect(open.painter.handleSpellfxAt(aimedAt)).toBe(true);
+    expect(closed.spawnAoeRing.mock.calls[0]).toEqual(open.spawnAoeRing.mock.calls[0]);
+  });
+
   it('still draws the area ring while closed: the telegraph is not a cast program', () => {
     const { painter, touched, vfx, spawnAoeRing } = painterWith(() => false);
     const aimed = { x: 3, z: -4, school: 'frost', fx: 'nova', ability: 'frost_nova' };
@@ -89,7 +147,7 @@ describe('the cast gate', () => {
     // A radius-carrying landing flashes the blast area at once, and only that.
     expect(painter.handleSpellfxAt({ ...aimed, radius: 8 })).toBe(true);
     expect(spawnAoeRing).toHaveBeenCalledTimes(1);
-    expect(spawnAoeRing).toHaveBeenCalledWith(3, -4, 8, 'frost');
+    expect(spawnAoeRing).toHaveBeenCalledWith(3, -4, 8, 'frost', 0x7fd4ff);
     expect(touched).toEqual(new Set());
     for (const spawn of Object.values(vfx)) expect(spawn).not.toHaveBeenCalled();
   });
