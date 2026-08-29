@@ -605,8 +605,12 @@ const MONOLITHS: MonolithRow[] = [
     // fourth-round fixes: the notice filter moved to schema_notices.ts (both
     // boot clients now attach the shared forwarder) and the connection-budget
     // arithmetic to db_connection_budget.ts, paying for the VALIDATE's
-    // post-unlock restructure in place. Exact count, zero slack.
-    ceiling: 4959,
+    // post-unlock restructure in place. Lowered -54 when the client_perf_reports
+    // DDL moved verbatim out of SCHEMA into client_perf_schema.ts (ensureSchema
+    // applies it after the core tables it FK-references); the insert and prune
+    // primitives stay here, so only the table definition left. Exact count,
+    // zero slack.
+    ceiling: 4905,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
