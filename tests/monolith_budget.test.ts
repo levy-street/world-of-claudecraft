@@ -254,8 +254,10 @@ const MONOLITHS: MonolithRow[] = [
     // by 2 when the charge state and the XHB slot lookup moved to
     // src/ui/empower_hold_core.ts; this branch's arm stays its +3 store and
     // vault chrome. Measured on the merged tree, never reconciled by
-    // arithmetic. Exact count, zero slack.
-    ceiling: 19003,
+    // arithmetic. The managed-window position clamp now lives in
+    // src/ui/window_position_core.ts, lowering the merged coordinator by four
+    // more lines. Exact count, zero slack.
+    ceiling: 18999,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

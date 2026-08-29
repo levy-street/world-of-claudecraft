@@ -793,6 +793,7 @@ import {
   type WindowDragController,
 } from './window_drag';
 import { makeWindowFocus } from './window_focus';
+import { windowPixelPosition } from './window_position_core';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
 import { wocBalanceChipHtml } from './woc_balance_chip';
@@ -3421,27 +3422,22 @@ export class Hud {
     top: number,
     rect = el.getBoundingClientRect(),
   ): void {
-    const margin = 8;
-    // Callers pass coordinates in visual (zoomed) space: getBoundingClientRect()
-    // and pointer clientX/clientY are post-zoom, but style.left/top are author
-    // lengths the browser multiplies by #ui's `zoom`. Convert into author space
-    // (divide by the live UI scale) so the window lands where the pointer is, and
-    // clamp against the viewport expressed in that same author space. (Z=1 when
-    // uiScale is at its default, so this is a no-op for most players.)
-    const z = getUiScale();
-    const vw = window.innerWidth / z;
-    const vh = window.innerHeight / z;
-    const aLeft = left / z;
-    const aTop = top / z;
-    const width = Math.min(rect.width / z, vw - margin * 2);
-    const height = Math.min(rect.height / z, vh - margin * 2);
-    const maxLeft = Math.max(margin, vw - width - margin);
-    const maxTop = Math.max(margin, vh - height - margin);
-    el.style.left = `${Math.max(margin, Math.min(maxLeft, aLeft))}px`;
-    el.style.top = `${Math.max(margin, Math.min(maxTop, aTop))}px`;
+    const position = windowPixelPosition({
+      left,
+      top,
+      width: rect.width,
+      height: rect.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      scale: getUiScale(),
+    });
+    el.style.left = `${position.left}px`;
+    el.style.top = `${position.top}px`;
     el.style.right = 'auto';
     el.style.bottom = 'auto';
     el.style.transform = 'none';
+    // Pixel positions are re-clamped after viewport changes and on reopen.
+    el.dataset.windowMoved = '1';
   }
 
   // Place a cursor-anchored popup (context menus, the loot window) at a viewport
