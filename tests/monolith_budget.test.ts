@@ -433,16 +433,11 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
-    // the interface-editor settings (frame dimensions, aura direction vars,
-    // the player-frame bar lock) predate this ratchet; folding them behind a
-    // src/game/ settings-application seam is flagged follow-up work.
-    // The branch's spawn_intro_seen extraction still pays for its own line at
-    // the entry wait (3 under the release row), and the empower-hold sync
-    // merge lowered the release row by 1 (the pad cast routing lives in
-    // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
-    // Exact merged count, zero headroom.
-    ceiling: 11625,
+    // Lowered after the interface-editor applySetting arms moved behind
+    // src/game/interface_settings_application.ts. The v0.41 uplift also
+    // preserves the release line's pad-cast extraction. Exact merged count,
+    // zero headroom.
+    ceiling: 11564,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

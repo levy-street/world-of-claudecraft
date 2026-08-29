@@ -28,15 +28,21 @@ const hudCss = stripComments(
   readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
 const mainTs = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+const interfaceSettingsApplicationTs = stripComments(
+  readFileSync(new URL('../src/game/interface_settings_application.ts', import.meta.url), 'utf8'),
+);
 const menuCore = stripComments(
   readFileSync(new URL('../src/ui/interface_unlock_menu_core.ts', import.meta.url), 'utf8'),
 );
 
 describe('lockPlayerFrameToActionBar wiring', () => {
-  it('is a real bool setting, off by default, applied through main.ts', () => {
+  it('is a real bool setting, off by default, applied through the interface-settings seam', () => {
     expect(BOOL_SETTINGS.lockPlayerFrameToActionBar).toEqual({ def: false });
-    expect(mainTs).toContain("case 'lockPlayerFrameToActionBar':");
-    expect(mainTs).toContain('hud.setLockPlayerFrameToActionBar(!!v)');
+    expect(interfaceSettingsApplicationTs).toContain("case 'lockPlayerFrameToActionBar':");
+    expect(interfaceSettingsApplicationTs).toContain(
+      'host.setLockPlayerFrameToActionBar(Boolean(value))',
+    );
+    expect(mainTs).toContain('if (applyInterfaceSetting(key, v, interfaceSettingsHost)) return;');
   });
 
   it('the unlock registration refuses to loosen a locked frame', () => {
