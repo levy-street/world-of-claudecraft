@@ -942,10 +942,21 @@ describe('the cross-clock-base save assumption', () => {
     expect(callers.size).toBeGreaterThan(0); // the scan itself must see the real call sites
     for (const [caller, content] of callers) {
       expect(caller.startsWith('server/'), `${caller} calls serializeCharacter`).toBe(true);
+      // Since the release/v0.41.0 sync, server/game.ts assembles its
+      // SimConfig through the extracted server/sim_boot_config.ts seam
+      // (buildRealmSimConfig), so the file-level token there is the seam
+      // call; the injection itself is pinned on the seam module below.
       expect(
-        /lockoutNowMs/.test(content),
+        /lockoutNowMs/.test(content) || /buildRealmSimConfig/.test(content),
         `${caller} persists character blobs without injecting the wall clock (lockoutNowMs)`,
       ).toBe(true);
     }
+    // The indirection cannot rot: the boot-config seam really injects the
+    // wall clock.
+    const bootConfig = fs.readFileSync(
+      path.join(__dirname, '..', 'server', 'sim_boot_config.ts'),
+      'utf8',
+    );
+    expect(/lockoutNowMs: \(\) => Date\.now\(\)/.test(bootConfig)).toBe(true);
   });
 });

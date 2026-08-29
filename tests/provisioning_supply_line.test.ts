@@ -884,13 +884,19 @@ describe('masterwrought R18 and farming D24: the displacement guard', () => {
     // orange promotion's writ, inscription 125) carries sunpetal 2 and
     // reduces nothing anywhere, so sunpetal goes 44 to 46 while the other
     // two hold.
+    // RE-MEASURED at the merge of release/v0.41.0 (tip e19d832b47): the
+    // release's four Bank Storage BAG_RECIPES carry goldleaf 3 (the foragers
+    // haversack) and sunpetal 3 + 4 + 5 (duskweave, resonant weave, loombound
+    // satchel) and reduce nothing anywhere, so goldleaf goes 30 to 33 and
+    // sunpetal 46 to 58 while silverleaf holds; every delta is a named
+    // release bill, verified against BAG_RECIPES row by row.
     // The claim this arm makes has never been "the numbers do not move"; it is
     // "herbalism loses nothing", and a total that only ever climbs is what says
     // so.
     expect(totals).toEqual({
       silverleaf_herb: 28,
-      goldleaf_herb: 30,
-      sunpetal_herb: 46,
+      goldleaf_herb: 33,
+      sunpetal_herb: 58,
     });
   });
 

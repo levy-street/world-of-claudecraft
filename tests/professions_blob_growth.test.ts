@@ -905,9 +905,17 @@ describe('the professions blob growth bound (phase 16)', () => {
     // structural ceiling fell to 57 bytes of headroom at this measurement,
     // thinner than one recipe id, and re-minted at 18 KiB = 18432 per the
     // Phase 12 note's own standing precedent (narrative at the bound above).
+    // RE-MEASURED at the merge of release/v0.41.0 (tip e19d832b47): +114,
+    // predicted from the merged literals and measured EXACTLY (drift zero),
+    // in four accounted terms, the release's Bank Storage trainer bag
+    // recipes joining knownRecipes: "recipe_duskweave_bag", (23 characters
+    // quoted plus comma), "recipe_foragers_haversack", (28),
+    // "recipe_resonant_weave_bag", (28), and
+    // "recipe_loombound_reagent_satchel", (35). The edge stays measurement
+    // plus one and the floor measurement minus 380 (the 11m rule).
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16971);
-    expect(bytes).toBeLessThan(17352);
+    expect(bytes).toBeGreaterThan(17085);
+    expect(bytes).toBeLessThan(17466);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

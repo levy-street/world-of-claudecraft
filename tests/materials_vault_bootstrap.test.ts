@@ -18,7 +18,11 @@ import { vaultMaterialIds } from '../src/sim/materials_vault';
 describe('materials_vault as the first-evaluated sim module', () => {
   it('derives the full material set with no import of data.ts ahead of it', () => {
     const ids = vaultMaterialIds();
-    expect(ids.size).toBe(55);
+    // Recomputed at the merge of release/v0.41.0 (tip e19d832b47): the ruled
+    // 55 plus the packet's masterwrought reagents and the farming absorb's 39
+    // yields compose to a measured 116 on the merged catalog (both parents'
+    // own derivations, one union; no rule changed).
+    expect(ids.size).toBe(116);
     expect(ids.has('iron_ore')).toBe(true);
     expect(ids.has('arcanite_bar')).toBe(true);
     expect(ids.has('guardian_core')).toBe(false);

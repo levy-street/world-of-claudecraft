@@ -464,12 +464,22 @@ describe('elision key composition stays banished (hud.ts + painter_host.ts sourc
     );
     expect(forwarding, 'the six adapter arrows all forward the quality').toHaveLength(6);
     expect(hud).not.toMatch(/itemIcon: \(item\) =>/);
-    // The one adapter outside the Hud (the bank window wiring its guild tab)
-    // forwards the same way; it is the same 1-ary-swallow class one file over.
+    // The adapters outside the Hud (the bank window wiring its two panes).
+    // The guild tab forwards the quality the same way; it is the same
+    // 1-ary-swallow class one file over. The vault pane (release/v0.41.0,
+    // Bank Storage) is DIFFERENT by design: its dep declares NO quality
+    // parameter (vault rows are materials; the icon is quality-independent
+    // there), so its adapter is 1-ary against a 1-ary dep, not a swallow.
+    // Both shapes are pinned exactly, plus the vault dep's own declaration,
+    // so a quality-carrying dep can never silently gain a swallowing adapter.
     const bank = strip(read('../src/ui/bank_window.ts'));
     expect(bank).toContain('itemIcon: (item, quality) => this.deps.itemIcon(item, quality),');
-    expect(bank.match(/\bitemIcon:/g), 'one adapter key in the bank window').toHaveLength(1);
-    expect(bank).not.toMatch(/itemIcon: \(item\) =>/);
+    expect(bank).toContain('itemIcon: (item) => this.deps.itemIcon(item),');
+    expect(bank.match(/\bitemIcon:/g), 'two adapter keys in the bank window').toHaveLength(2);
+    expect(
+      strip(read('../src/ui/vault_window.ts')),
+      'the vault dep really declares no quality parameter',
+    ).toContain('itemIcon(item: ItemDef): string;');
     // The dep the adapters satisfy really declares the second parameter (over
     // comment-stripped source, like the arrows).
     expect(strip(read('../src/ui/painter_host.ts'))).toContain(

@@ -727,12 +727,16 @@ describe('stock rows: the phase 11n pulls', () => {
     for (const [npcId, npc] of Object.entries(NPCS)) {
       if (npc.vendorItems && npc.vendorItems.length > 0) counts[npcId] = npc.vendorItems.length;
     }
+    // Re-measured at the merge of release/v0.41.0 (tip e19d832b47): the
+    // release's Bank Storage adds one burlap_reagent_pouch row to each of
+    // trader_wilkes (13 to 14) and weaver_ottilie (4 to 5); no vendor lost a
+    // row (both deltas verified against the merged vendorItems lists by id).
     expect(counts).toEqual({
-      trader_wilkes: 13,
+      trader_wilkes: 14,
       cook_marlow: 6,
       tanner_hesk: 4,
       alchemist_verane: 5,
-      weaver_ottilie: 4,
+      weaver_ottilie: 5,
       quartermaster_finch: 1,
       forgemistress_darva: 2,
       provisioner_hale: 22,

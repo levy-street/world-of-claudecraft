@@ -19,6 +19,12 @@ const EXPECTED_CMDS = [
   'applyTalents',
   'bank_buy_slots',
   'bank_deposit',
+  // The release/v0.41.0 Bank Storage members, relocated into heavy_self.ts at
+  // the sync merge: the two bag-socket moves and the three Materials Vault
+  // item moves all rewrite the carried inventory (the heavy-gated inv key).
+  // vault_buy_upgrade stays absent on the module's own recorded terms.
+  'bank_socket_bag',
+  'bank_unsocket_bag',
   'bank_withdraw',
   'buy',
   'buyback',
@@ -73,6 +79,9 @@ const EXPECTED_CMDS = [
   'unequip_item',
   'unequip_mech_chroma',
   'use',
+  'vault_deposit',
+  'vault_deposit_all',
+  'vault_withdraw',
 ];
 
 const EXPECTED_EVENTS = [

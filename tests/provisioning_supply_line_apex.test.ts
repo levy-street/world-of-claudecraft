@@ -1468,7 +1468,10 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
     // new item id: ALL_RECIPES alone, upward.
     expect(APEX_CONSUMABLE_RECIPES).toHaveLength(13);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);
-    expect(ALL_RECIPES).toHaveLength(166);
+    // Then 170 at the merge of release/v0.41.0 (tip e19d832b47): the
+    // release's four Bank Storage BAG_RECIPES join ALL_RECIPES; this branch
+    // minted nothing at the sync.
+    expect(ALL_RECIPES).toHaveLength(170);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }
