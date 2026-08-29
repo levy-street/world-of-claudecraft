@@ -339,7 +339,7 @@ const merge = (...ds: SlotStats[]): SlotStats => {
   return out;
 };
 
-export type Arm = 'base' | 'gear' | 'ench' | 'full' | 'apexChest';
+export type Arm = 'base' | 'gear' | 'ench' | 'full' | 'apexChest' | 'equipped';
 
 function rogueLane(seed: number, spec: string, arm: Arm, level: number, armor: number): number {
   const sim = new Sim({
@@ -432,6 +432,26 @@ const WAR_ENCH: SlotStats = {
 // The chest step is +3 rather than +6 because no mail or plate apex CHEST
 // ships, so enchant_lucent_infusion (requiresPerfected) is unreachable here.
 const WAR_GEAR: SlotStats = { legs: { str: 2 } };
+// THE EQUIPPED ARM, and it exists because the modelled term above is NOT the
+// upper bound section 8.1 claims on this lane. WAR_BIS carries 355 hit rating
+// against a need of 190 at the heroic target and 260 at S-rift, so its
+// effective miss is already zero and 95 to 165 rating is DEAD. forgefold_
+// legguards is a byte-identical twin of the baseline legs except that its 40
+// HIT is 40 CRIT, so equipping it converts dead rating into live rating, a
+// gain "+2 lead stat" scores as nothing. warhewn_signet is the second
+// Perfected piece a fury warrior can wear. Both are swapped as ITEMS with
+// their real Perfecting bonuses, which is what a player would actually hold.
+const WAR_EQUIPPED_ITEMS: Record<string, string> = {
+  legs: 'forgefold_legguards',
+  ring2: 'warhewn_signet',
+};
+const WAR_EQUIPPED_DELTA: SlotStats = {
+  legs: { str: 1 },
+  ring2: { str: 1 },
+  mainhand: { str: WEAPON_STR_STEP },
+  offhand: { str: WEAPON_STR_STEP },
+  chest: { sta: CHEST_STA_STEP_PLATE },
+};
 const WAR_ENCH_D: SlotStats = {
   mainhand: { str: WEAPON_STR_STEP },
   offhand: { str: WEAPON_STR_STEP },
@@ -463,12 +483,25 @@ function furyLane(seed: number, arm: Arm, level: number, armor: number): number 
   ] as Array<[number, string]>) {
     if (!s.selectTalentRow(lvl, row)) throw new Error(`row pick failed: ${row}`);
   }
-  const delta = arm === 'base' ? {} : arm === 'gear' ? WAR_GEAR : merge(WAR_GEAR, WAR_ENCH_D);
+  const delta =
+    arm === 'base'
+      ? {}
+      : arm === 'gear'
+        ? WAR_GEAR
+        : arm === 'equipped'
+          ? WAR_EQUIPPED_DELTA
+          : merge(WAR_GEAR, WAR_ENCH_D);
   const auras =
-    arm === 'full'
+    arm === 'full' || arm === 'equipped'
       ? [SERPENT, flaskAura('buff_ap', 'Warboar Might'), plateAura('buff_ap')]
       : [SERPENT];
-  dress(sim, WAR_BIS, WAR_ENCH, delta, auras);
+  const equipment: PlayerEquipment = { ...WAR_BIS };
+  if (arm === 'equipped') {
+    for (const [slot, id] of Object.entries(WAR_EQUIPPED_ITEMS)) {
+      (equipment as Record<string, string>)[slot] = id;
+    }
+  }
+  dress(sim, equipment, WAR_ENCH, delta, auras);
   const p = s.player;
   const t = inertTarget(sim, level, armor);
   p.autoAttack = true;
@@ -725,6 +758,9 @@ export function main(): void {
         gear: WANT('gear') ? SEEDS.map((s) => furyLane(s, 'gear', level, armor)) : [],
         'gear+ench': WANT('gear+ench') ? SEEDS.map((s) => furyLane(s, 'ench', level, armor)) : [],
         FULL: WANT('FULL') ? SEEDS.map((s) => furyLane(s, 'full', level, armor)) : [],
+        'FULL+equipped': WANT('FULL+equipped')
+          ? SEEDS.map((s) => furyLane(s, 'equipped', level, armor))
+          : [],
       };
       row(
         `${name} warrior-fury`,
