@@ -9248,6 +9248,8 @@ export const pt_BR: EnTranslations = {
       "tool_recharge": "Recarregando",
       "demonHeal": "Cura demoníaca",
       "thunzharrStormcall": "Chamado da Tempestade",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Sepultura Glacial",
       "rift_frost_strike": "Zero Absoluto",
       "rift_ember_execution": "Poço de Magma",

@@ -9248,6 +9248,8 @@ export const en_CA: EnTranslations = {
       "tool_recharge": "Recharging",
       "demonHeal": "Demon Heal",
       "thunzharrStormcall": "Stormcall",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Glacial Grave",
       "rift_frost_strike": "Absolute Zero",
       "rift_ember_execution": "Magma Well",

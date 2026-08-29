@@ -1007,6 +1007,8 @@ const castDisplayName = (id: string): string => {
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  if (id === 'nythraxis_ward_channel') return t('abilityUi.cast.nythraxisWardChannel');
+  if (id === 'nythraxis_deathless_rage') return t('abilityUi.cast.nythraxisDeathlessRage');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];

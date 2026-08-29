@@ -2813,7 +2813,7 @@ describe('dungeons: raid lockout gate', () => {
     const events = sim.drainEvents() as any[];
     expect(
       events.some(
-        (e) => e.type === 'error' && e.text === 'You are locked to Nythraxis Raid Arena.',
+        (e) => e.type === 'error' && e.text === 'You are locked to the Nythraxis Pillar.',
       ),
     ).toBe(true);
     expect(sim.instanceSlotAt(sim.entities.get(leader)!.pos)).toBeNull(); // not entered
@@ -2831,7 +2831,7 @@ describe('dungeons: raid lockout gate', () => {
     const events = sim.drainEvents() as any[];
     expect(
       events.some(
-        (e) => e.type === 'error' && e.text === 'You are locked to Nythraxis Raid Arena.',
+        (e) => e.type === 'error' && e.text === 'You are locked to the Nythraxis Pillar.',
       ),
     ).toBe(false);
   });

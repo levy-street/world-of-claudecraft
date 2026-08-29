@@ -9248,6 +9248,8 @@ export const pl_PL: EnTranslations = {
       "tool_recharge": "Ładowanie",
       "demonHeal": "Demoniczne leczenie",
       "thunzharrStormcall": "Zew burzy",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Lodowaty Grób",
       "rift_frost_strike": "Zero Absolutne",
       "rift_ember_execution": "Studnia Magmy",

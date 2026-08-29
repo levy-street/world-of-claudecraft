@@ -74,8 +74,8 @@ describe('localizeErrorText', () => {
   it('enriches a raid lockout with the live countdown from the deps bag', () => {
     const withLock = deps([{ id: 'nythraxis_boss_arena', msRemaining: 90_000 }]);
 
-    expect(localizeErrorText('You are locked to Nythraxis Raid Arena.', withLock)).toBe(
-      'You are locked to Nythraxis Raid Arena. Unlocks in <90000ms>.',
+    expect(localizeErrorText('You are locked to the Nythraxis Pillar.', withLock)).toBe(
+      'You are locked to the Nythraxis Pillar. Unlocks in <90000ms>.',
     );
   });
 
@@ -96,9 +96,9 @@ describe('localizeErrorText', () => {
   });
 
   it('falls through to the base sim matcher once the raid lockout has cleared', () => {
-    const cleared = localizeErrorText('You are locked to Nythraxis Raid Arena.', deps());
+    const cleared = localizeErrorText('You are locked to the Nythraxis Pillar.', deps());
 
-    expect(cleared).toBe(localizeSimText('You are locked to Nythraxis Raid Arena.'));
+    expect(cleared).toBe(localizeSimText('You are locked to the Nythraxis Pillar.'));
     expect(cleared).not.toBeNull();
     expect(cleared).not.toContain('Unlocks in');
   });
@@ -112,7 +112,7 @@ describe('localizeErrorText', () => {
     expect(localizeServerText(serverText)).not.toBeNull();
     expect(localizeErrorText(serverText, deps())).toBe(localizeServerText(serverText));
 
-    const simText = 'You are locked to Nythraxis Raid Arena.';
+    const simText = 'You are locked to the Nythraxis Pillar.';
     expect(localizeServerText(simText)).toBeNull();
     expect(localizeSimText(simText)).not.toBeNull();
     expect(localizeErrorText(simText, deps())).toBe(localizeSimText(simText));

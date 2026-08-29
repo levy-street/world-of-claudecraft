@@ -37,11 +37,13 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   // Raid entry while locked: enrich the toast with the live unlock countdown
   // from the mirrored lockout state. Falls through to the base sim_i18n message
   // (still recognized there) if the lockout already cleared client-side.
-  if (text === 'You are locked to Nythraxis Raid Arena.') {
+  // Uses the player-friendly "Nythraxis Pillar" label rather than the dungeon's
+  // internal display name so the lockout toast never shows the raw arena id.
+  if (text === 'You are locked to the Nythraxis Pillar.') {
     const lock = deps.raidLockouts().find((l) => l.id === 'nythraxis_boss_arena');
     if (lock) {
       return t('hudChrome.raidLockout.lockedToast', {
-        raid: dungeonDisplayName('nythraxis_boss_arena'),
+        raid: 'the Nythraxis Pillar',
         time: deps.formatLockoutDuration(lock.msRemaining),
       });
     }

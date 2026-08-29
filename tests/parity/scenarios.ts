@@ -3143,7 +3143,7 @@ function dungeonInstances(): Scenario {
 // Dungeon raid lockout (I1): a five-strong attuned raid is blocked from re-entering
 // the Nythraxis arena by an active raid lockout. Exercises enterDungeon's raid gating
 // (convertPartyToRaid + canEnterNythraxisRaid attunement) and the isRaidLocked block
-// emitting "You are locked to Nythraxis Raid Arena." (no rng drawn).
+// emitting "You are locked to the Nythraxis Pillar." (no rng drawn).
 function dungeonRaidLockout(): Scenario {
   return {
     name: 'dungeon_raid_lockout',

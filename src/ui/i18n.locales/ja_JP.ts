@@ -2690,6 +2690,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
+  'abilityUi.cast.nythraxisWardChannel': 'ウォードストーン・チャンネル',
+  'abilityUi.cast.nythraxisDeathlessRage': 'デスレス・レイジ',
   'abilityUi.cast.rift_arcane_execution': '虚空の裂け目',
   'abilityUi.cast.rift_arcane_strike': '秘術の殲滅',
   'abilityUi.cast.rift_brute_execution': '大地砕き',

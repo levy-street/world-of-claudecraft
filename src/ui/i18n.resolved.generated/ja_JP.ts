@@ -9248,6 +9248,8 @@ export const ja_JP: EnTranslations = {
       "tool_recharge": "充填",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",
+      "nythraxisWardChannel": "ウォードストーン・チャンネル",
+      "nythraxisDeathlessRage": "デスレス・レイジ",
       "rift_frost_execution": "氷河の墓",
       "rift_frost_strike": "絶対零度",
       "rift_ember_execution": "マグマの泉",

@@ -512,7 +512,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     const rec = run('dungeon_raid_lockout');
     expect(
       (rec.allEvents as Ev[]).some(
-        (e) => e.type === 'error' && e.text === 'You are locked to Nythraxis Raid Arena.',
+        (e) => e.type === 'error' && e.text === 'You are locked to the Nythraxis Pillar.',
       ),
     ).toBe(true);
   });
