@@ -21813,3 +21813,134 @@ EXECUTED the same day the rulings landed. The inventory:
    per 2b; the roughly-3-percent-weak denominator per 1a). The four tunes
    stand. Validation: tests/r5_envelope_probe.test.ts and
    tests/masterwrought_budget.test.ts green at the closure tip, tsc clean.
+
+## Phase 16 ledger (2026-08-29, polish and content surfaces)
+
+STATUS: BUILD COMPLETE, review round in flight; the STATUS line, reviewer
+verdicts and the frozen stamp are appended below when the round settles.
+STEP 0: recorded NO-OP sync (origin/release/v0.41.0 unmoved at e19d832b47,
+already an ancestor; no merge, no audit; payback targets stand as the
+seventh-sync arithmetic moved them). STEP 0.5: the R5 closure, executed
+first (the rulings section and closure record above; commits 536e8cb846,
+a6cac2e226).
+
+### THE FOUR EXPLICIT RECORDS (in-or-CUT; each is the deliverable)
+
+1. STOREFRONT NON-MAPPING (decision 8 as settled: rows 11k-D-K3 and
+   ip-16-SURFACES a). The packet adds SEVENTEEN deeds, derived off the
+   final DEED_ORDER by set-difference against the correct base
+   origin/release/v0.41.0 = e19d832b47 (276 to 293, zero removals; the
+   stale local release ref would wrongly give 19, and
+   soc_strongbox_outfitter / soc_four_bags_deep are the release's, already
+   present at the base). The ten packet-minted:
+   prog_jewelcrafting_rare, prog_jewelcrafting_50,
+   prog_grandmaster_jewelcrafting, prog_inscription_rare,
+   prog_inscription_50, prog_grandmaster_inscription, col_deepest_cast,
+   col_farm_roster, prog_field_to_feast, prog_legendmaker. The seven
+   farming-absorbed: prog_first_planting, chr_vale_first_harvest,
+   chr_marsh_first_harvest, chr_peaks_first_harvest,
+   chr_evergarden_first_harvest, col_golden_harvest, prog_farming_100.
+   MAPPED: NONE OF THEM, deliberately. ACHIEVEMENT_MAP gains no row, both
+   storefront tables stay byte-equivalent and untouched, the 84 pin and
+   the 100 soft cap stand (verified: the branch diff over server/steam/,
+   server/epic/ and both map suites is empty). The reason is the settled
+   one: the launch storefront set is CURATED, not a catalog mirror, and
+   these are cosmetic profession deeds; headroom (16 slots) was never the
+   question, decision 8 CUT the mapping anyway. This record exists because
+   the exhaustive coverage arm is scoped to col_reliquary_*, so an
+   unmapped deed goes green silently; the record, not a mapping, is the
+   deliverable. docs/design/deeds.md already carries the packet-wide
+   paragraph beside step 7.
+
+2. THE ICON PARK, enumerated not sampled (state-GATE-5 and ip-16-ICON as
+   settled, with 11f's correction 5 applied to their text this phase).
+   Re-derived from the tree 2026-08-29, never from a remembered figure:
+   the packet's new item ids number 165 (123 minted minus 2 cut plus 44
+   farming-absorbed, and the grouped partition sums exactly). 84 are
+   ART-LANDED (P04 materials, P05 jewelcrafting, P06 inscription, P07
+   intermediates, P08 apex armor and bag, P09 apex weapons and jewelry,
+   P10 apex consumables, and all 28 P11 apex patterns), each with
+   committed WebP and exactly ONE mapping.json owner (68 curated entries,
+   the 10-id phase09 batch, the 6-id phase06 batch). 81 are PARKED: the
+   merged ITEM_ART_PENDING holds exactly the packet's 81 (the ENTIRE
+   allowlist is packet-owned debt; no pre-packet id parks there), every
+   parked id serves an authored, pairwise-distinct procedural recipe and
+   carries NO mapping.json owner (the corrected rule), and the art wave
+   runs on the maintainer's master SHA after the packet. ZERO ids are
+   missing from both sets. MASTERWROUGHT'S ASSERTED-EMPTY PENDING SET IS
+   RETIRED, formally: the packet's own 11-block and 11o/13 ids park
+   against the merged allowlist exactly like farming's, and the doctrine
+   conflict is resolved as PARK (this paragraph is the required explicit
+   statement). Deed art: DEED_ART_PENDING holds 15 rows, 10 the packet's
+   (the seven farming chronicle/collection rows, col_deepest_cast,
+   col_farm_roster, prog_field_to_feast is among them, and the promotion
+   deed prog_legendmaker already rides the list at its DEED_ORDER
+   position) plus 5 inherited release debt (exp_the_last_keep,
+   exp_dawnhold_castle, soc_strongbox_outfitter, soc_four_bags_deep,
+   prog_ready_for_an_adventure), which are NOT packet obligations;
+   prog_farming_100 ships committed art under the title-shelf rule, and
+   the commissioned crest brief stands. The compost rationale sweep was
+   discharged at the 11e QA (recorded, both doc homes annotated). The
+   phase changes NO icon code: the enumeration found nothing to add, and
+   that finding is this record.
+
+3. THE RL SCOPE CUT: landed in headless/CLAUDE.md (commit 278d603f81),
+   naming ctx.lockoutNowMs() as the structural cause (uninjected
+   sim-clock: a tier-1 crop outlives a default episode) and a virtual
+   clock as the re-admission condition; farming's five commands and
+   eight-member facet are OUT of the action space for this packet, by
+   record rather than silence.
+
+4. THE ADMIN WIDENING (N12, ip-16-SURFACES d as settled): the market
+   metrics page ships the WIDENED set: cores, essence, patterns AND
+   produce, seeds, compost, every bucket derived from content tables
+   (commit 8ce26542e1). The moved surfaces: a new
+   server/admin_market_metrics.ts read seam (boot-injected source, 15 s
+   cached read, no SQL, no new table), the registry-only RouteDef behind
+   analytics.read, and the Market Metrics dashboard page with every
+   operator string through the admin catalog. SOLD VOLUME IS A RECORDED
+   CUT: the sale log is a per-seller pending ledger cleared on collect,
+   so an honest volume metric needs a new accumulating store, and the
+   phase's stopping rule answers by storing nothing. The essence bucket
+   is a deliberate structural-zero tripwire (soulbound can never list;
+   any row there is an escrow bug).
+
+### THE ARMS AS LANDED (commits)
+- STEP 0.5 closure: 536e8cb846, a6cac2e226. Standalone records:
+  278d603f81, d044da1e34.
+- Monolith paybacks, both PAID past their targets with ceilings lowered
+  in the same commits: renderer.ts 13363 to 13116 via
+  src/render/zone_prewarm_groups.ts (cdba54791c; target was 13333), then
+  13131 after Arm 1's wiring in the same phase (2ed0748e53, the target
+  still cleared by 202); online.ts 5959 to 5922 via
+  src/net/crafting_wire.ts (9bc2cb735b; target was 5942). An UNPLANNED
+  third payback rode the Discord lane: server/game.ts 10462 to 10329 via
+  server/activity_detect.ts (c7493716b9), paying for the golden_harvest
+  arm inside a net -133.
+- Discord cards (N10, exactly two per ip-16-SURFACES b): c7493716b9. The
+  Harvestmaster card is a bespoke render INSIDE the existing deed kind
+  (the FIRST_KOI precedent), so no double-announce is possible; the
+  golden_harvest kind cards only the finder's own event copy, rides the
+  deed-broadcasts opt-out via the widened emitCraftActivityCard, and
+  non-crop flavors plus feast placements never card.
+- Admin metrics (N12): 8ce26542e1.
+- Orange identity (Arm 1): 2ed0748e53. Pure core over the four
+  eqi-allowlisted fields only (perfected never enters a render
+  predicate: the host-parity trap is pinned by token scan), pooled
+  emitter with no new GPU producer, preset-shed as pure prestige,
+  distance-shed on the fixed LOD anchor.
+- Guide (Arm 3): c4213e984d (the endgame and Perfecting hub sections,
+  the gear-page legendary sub-cap reword, the corrected Infusion tail,
+  FAQ row 11, the one-meal Well Fed rule byte-identical on both pages
+  with cross-references; the one-professions-framing requirement judged
+  satisfied by whatBody as written, dated in the catalog). One spec
+  correction found in-flight: the Perfecting bill also consumes a
+  Prismglass Setting per attempt, and the prose names all three costs.
+- Enchant scheme re-cut (ip-NAME-BORDERLINE item 5): c516e8cbf2. The
+  scheme is "<Slot> Etching: <Tier> <Stat>", web-verified per
+  masterwrought R15 (no game ships an Etching gear-power system;
+  carve-outs and rejected list in the naming registry, which flips item
+  5 to EXECUTED). Ids frozen; 46 English values in def/catalog lockstep;
+  46 x 5 non-Latin re-fills avoiding each locale's own trade-dress
+  nouns; 42 x 13 Latin rows stripped to pending for the release fill;
+  the originality pin gains the scheme-shape guard.
