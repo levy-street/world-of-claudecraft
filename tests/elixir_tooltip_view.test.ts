@@ -194,12 +194,16 @@ describe('elixirTooltipLines', () => {
 
     it('a flask adds its four rules under the shared Use line', () => {
       expect(ITEMS.ironhusk_flask.kind).toBe('flask');
+      // The magnitude in the sentence below is the DEF's, so the literal names
+      // its source: Phase 15's R5 envelope tune moved the flask band 15 to 13
+      // and this pin moved with it.
+      expect(ITEMS.ironhusk_flask.elixir?.value).toBe(13);
       const html = elixirTooltipLines(ITEMS.ironhusk_flask);
       // The Use line is the SAME sentence the elixirs get, word for word: a
       // flask really does replace the same-stat elixir or scroll, so the rules
       // are additions rather than a restatement.
       expect(html).toContain(
-        '<div class="tt-desc">Use: Increases your Stamina by 15 for 20 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
+        '<div class="tt-desc">Use: Increases your Stamina by 13 for 20 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
       );
       for (const rule of FLASK_RULES) expect(html, `flask must state: ${rule}`).toContain(rule);
       // Exactly five blocks, so a rule cannot be dropped or doubled unnoticed.

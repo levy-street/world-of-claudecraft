@@ -1275,21 +1275,30 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
 
   it('and nothing on the OUTPUT side moved anywhere in this phase (masterwrought R5)', () => {
     // R5 measures the full kit's throughput, so an input-cost change cannot
-    // reach it. Stated as an assertion rather than a claim: the kit is still
-    // flask 15 plus food 6, exactly the number Phase 15 was authored against.
+    // reach it. Stated as an assertion rather than a claim: 11h moved no
+    // output magnitude, and this arm is what says so.
+    //
+    // PHASE 15 MOVED THE FLASK, and this pin is re-cut to the shipped value
+    // rather than deleted. The 11h premise was "flask 15 plus food 6 equals
+    // 21"; the R5 measured pass found the full kit outside the envelope and
+    // used its own named tune-down knob, so the shipped kit is flask 13 plus
+    // plate 6 for 19 (docs/prd/masterwrought/power-verification.md section
+    // 10.4). The pin's JOB is unchanged: 11h is an input-cost phase and may
+    // never move these six numbers, so a magnitude change still reds HERE and
+    // not only in the budget suite.
     for (const row of APEX_ROWS) {
       const recipe = requireRecipe(row.id);
       const def = ITEMS[recipe.resultItemId];
       expect(def, `${row.id} output def`).toBeDefined();
       expect(def.slot, `${row.id} must not output an equippable`).toBeUndefined();
     }
-    // The two numbers R5 is measured against: flask 15 plus food 6 equals 21
-    // stamina, exactly what Phase 15 was authored on. Pinned per row so a
-    // magnitude change on any one of the six is a red HERE, in the phase that
-    // must not have moved it, and not only in the budget suite.
+    // The two numbers R5 is measured against: flask 13 plus plate 6 equals 19
+    // stamina, the shipped kit after Phase 15's envelope tune. Pinned per row
+    // so a magnitude change on any one of the six is a red HERE, in the phase
+    // that must not have moved it, and not only in the budget suite.
     for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask']) {
       const flask = flaskDef(id);
-      expect(flask.elixir?.value, `${id} flask magnitude`).toBe(15);
+      expect(flask.elixir?.value, `${id} flask magnitude`).toBe(13);
       expect(flask.elixir?.duration, `${id} flask duration`).toBe(1200);
     }
     for (const id of ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder']) {
