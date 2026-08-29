@@ -1,9 +1,16 @@
 # Masterwrought: cross-phase state
 
-Current phase: 15 BUILT (2026-08-28), POWER VERIFICATION. R5 is proven
-inside its envelope; the record is docs/prd/masterwrought/power-verification.md
-and the decisions are the Phase 15 ledger at the END of this file. Next:
-Phase 15 QA (phase-15-qa.md, fresh session). The header below is the
+Current phase: 15 BUILT AND ESCALATED (2026-08-28), POWER VERIFICATION.
+**R5 IS NOT PROVEN: the envelope verdict is SUSPENDED** and two ratified
+definitions are owed the maintainer, because the gear term was found to
+measure a stat MODEL of the kit rather than the kit (modelled 4.97 / 5.27
+percent against the same pieces EQUIPPED at 10.42 / 10.21). The four
+content tunes stand. The record is
+docs/prd/masterwrought/power-verification.md, whose Verdict section states
+the suspension and what the maintainer owns; the decisions, the judged
+list, the frozen stamp and the suspension block are the Phase 15 ledger at
+the END of this file. Next: Phase 15 QA (phase-15-qa.md, fresh session),
+which must verify the ESCALATION rather than confirm a verdict. The header below is the
 absorb-era orientation, kept because a fresh session still needs both
 worlds loaded; only the "Current phase" and "Next" lines in it are stale.
 
@@ -20937,12 +20944,22 @@ standing sets are binding.
 
 ## Phase 15 ledger (2026-08-28, power verification, the R5 gate)
 
-STATUS: BUILT. The envelope is proven INSIDE 5 percent on every measured
-kit and both protected targets, after four downward content tunes this
-phase applied. The kit as it arrived measured OUTSIDE it. The full
-record, reproducible from the doc alone, is
-docs/prd/masterwrought/power-verification.md; this ledger carries the
-decisions, the judged list, and the frozen stamp.
+STATUS: **BUILT AND ESCALATED, verdict SUSPENDED.** The phase ran the
+measured pass, applied four downward content tunes, and then its own fresh
+reader found that the R5 gear term measures a stat MODEL of the kit rather
+than the kit: on the physical lanes it is a LOWER bound, not the upper
+bound the record claimed. Modelled 4.97 / 5.27 percent on the binding
+lane against the same two Perfected pieces EQUIPPED at 10.42 / 10.21,
+against a 5 percent envelope. See "THE VERDICT IS SUSPENDED, and why" at
+the end of this ledger, and section 9.6 of
+docs/prd/masterwrought/power-verification.md.
+
+The four tunes stand; what failed is the measurement they were sized
+against. TWO RATIFIED DEFINITIONS ARE OWED THE MAINTAINER before the phase
+can close: section 3's baseline pool and section 8.1's gear term. Every
+other defect the phase and its review rounds found is fixed and committed.
+This ledger carries the decisions, the judged list, the frozen stamp and
+the suspension block.
 
 ### STEP 0 (the sync, paid as its own step)
 origin/release/v0.41.0 moved to d3f8bae369 (PR #3728) during the Phase 14
@@ -21334,3 +21351,42 @@ THE FOUR TUNES STAND. All four are downward, none moves a settled magnitude,
 and none is invalidated by this: what fails is the measurement they were sized
 against, not the tunes. Every other defect this round found is fixed and
 committed, and none of those fixes depends on how the ruling above lands.
+
+### THE FROZEN STAMP: EXIT=0 at e611b0639d, the gate's bounded form
+Taken 2026-08-29T12:38:33Z to 12:48:32Z, one run, first try, at the phase
+tip e611b0639d (porcelain clean before and after; HEAD unchanged across the
+run; DATABASE_URL confirmed unset; `npm test -- --maxWorkers=8`, which is
+the gate's own floor(cpu/2) bound on this 16-core machine). Log kept at the
+session scratchpad's fullsuite.log.
+
+  Test Files  3235 passed | 22 skipped (3257)
+       Tests  47763 passed | 2 expected fail | 381 skipped (48146)
+    Duration  598.62 s
+   SUITE_EXIT 0, zero failing files
+
+Follow-ons at the same tip, all clean: `npx tsc --noEmit` exit 0 with zero
+diagnostics (and note tsconfig's include was WIDENED this phase to cover
+scripts/r5_envelope_probe.ts and scripts/probe_anchor.ts, so the committed
+harness is inside this check for the first time); `npm run ci:changed` exit
+0, 1048 files, zero errors and no format diffs (3489 warnings and 25 infos,
+the pre-existing whole-repo debt the gate does not fail on); and the
+pretest chain's own i18n:gen and wiki:content left the tree porcelain
+clean, so both regens are zero-diff at this tip.
+
+DRIFT versus the Phase 14 QA frozen stamp (d51139a103: 3234 / 22 files
+(3256), 47738 / 2 / 381 (48121)): +1 file and +25 tests, skipped and
+expected-fail both unchanged. The +1 file is tests/r5_envelope_probe.test.ts,
+which contributes 3 of the +25; the other +22 are arms added to the eleven
+pre-existing test files this phase edited. The per-file decomposition of
+those 22 is arithmetic inference, not a measured before/after count.
+
+The corpse_harvest_sim contention timeout that reddened two UNBOUNDED runs
+during the Phase 14 QA did not appear here; this run was bounded, which is
+the form the stamp is defined in. Whether it still reproduces unbounded at
+this tip was not tested.
+
+NOTE ON WHAT THIS STAMP DOES AND DOES NOT SAY. It says the tree is green and
+the record's defects are fixed. It does NOT close the phase: the envelope
+verdict is suspended above, and no suite can settle it, because what is in
+question is which quantity the measurement should compute, not whether the
+tree passes its pins.

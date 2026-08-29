@@ -58,7 +58,7 @@
 | 13 QA | verify | pending | | |
 | 14 | Crafting UX beauty pass | pending | | |
 | 14 QA | verify | pending | | |
-| 15 | Power verification | pending | | |
+| 15 | Power verification | BUILT AND ESCALATED, verdict SUSPENDED (the measured pass ran and four downward content tunes landed, then the phase's own fresh reader found the R5 gear term measures a stat MODEL of the kit rather than the kit: on the physical lanes it is a LOWER bound, not the upper bound the record claimed. swingMissChance is max(0, miss - hitRating/1000), the fury baseline carries 355 hit against a need of 190 heroic and 260 S-rift so its effective miss is already ZERO, and forgefold_legguards is a byte-identical twin of the baseline legs except 40 hit becomes 40 CRIT, so equipping the apex piece converts dead rating into live rating that '+1 lead stat per piece' scores as nothing. Measured on the binding fury lane, same fixture and seeds, 60 seeds at 300 s: modelled 4.97 / 5.27 percent, the same two Perfected pieces EQUIPPED 10.42 / 10.21, against a 5 percent envelope; the caster's equipped arm reads BELOW its modelled arm, so the omission is not uniform and must be measured per lane. The measurement itself flatters the packet, since the baseline carries that dead hit and two rings worth zero attack power, and every reading on every baseline tried is still above 5. TWO RATIFIED DEFINITIONS ARE OWED THE MAINTAINER: section 3's baseline pool (bestEpicGearFor scores by raw stat SUM class-agnostically while the record calls it best-in-slot) and section 8.1's gear term (item swap on every lane, or a stated exclusion making every published percentage a floor). Escalated under the phase file's own 'the framework cannot measure a kit' stopping rule rather than re-tuned. The four tunes stand: apex weapon enchants 7 to 6 on both twins, sunspun_vestments hitRating 40 to hasteRating 40, duskforged_bulwark armor 732 to 680 and blockValue 32 to 30, the three apex flasks 15 to 13. Everything else the phase and its FOUR review rounds found is fixed and committed across 24 commits: TWO RED TESTS the flask tune had left on the branch (provisioning_supply_line_apex, the Phase 11h tripwire written to catch exactly this move, and elixir_tooltip_view), the public wiki telling players the pre-tune flask value in English plus five non-Latin overlays with nothing red because the generated guide bundle carries no consumable magnitudes, four false shipped comments the tunes had invalidated including the enchants.ts file header that would have led a reader to restore 7, six pin defects (two passing on an alphabetical tie-break and an off-axis maximum), and three harness defects (a resource refill handing a fury warrior 100 rage it must earn, a silent seed-list truncation, and an unpaired estimator that inflated the rogue and caster error bars about 35-fold). The measurement harness is now COMMITTED as scripts/r5_envelope_probe.ts, typechecked (tsconfig's include was widened to reach it), test-imported via tests/r5_envelope_probe.test.ts, and reads its tuned terms from the catalog rather than baking them, all mutation-verified. FROZEN STAMP at e611b0639d, EXIT=0 first try under the gate's bounded form: 3235 / 22 files (3257), 47763 / 2 xfail / 381 skipped (48146), tsc and ci:changed clean, both regens zero-diff; drift vs d51139a103 is +1 file and +25 tests. LOCAL only, no push, no PR. NEXT = Phase 15 QA, which must verify the ESCALATION rather than confirm a verdict) | 2026-08-28 | 2026-08-29 |
 | 15 QA | verify | pending | | |
 | 16 | Polish and content surfaces | pending | | |
 | 16 QA | verify | pending | | |
@@ -1024,3 +1024,52 @@ no format diffs) / both regens clean after the last commit; drift vs
 #3728) during the QA: Phase 15's STEP 0 sync. LOCAL only, no push, no PR.
 NEXT = Phase 15 (phase-15-power-verification.md, ultracode), FRESH
 session.
+
+## Phase 15 (2026-08-28): BUILT AND ESCALATED, verdict SUSPENDED
+
+The R5 measured pass ran and four downward content tunes landed. Then the
+phase's own fresh reader found the gear term measures a stat MODEL of the
+kit rather than the kit, and on the physical lanes that model is a LOWER
+bound, not the upper bound the record claimed.
+
+The mechanism, verified directly: `swingMissChance` is
+`max(0, miss - hitRating/1000)`, the fury baseline carries 355 hit rating
+against a need of 190 (heroic) and 260 (S-rift) so its effective miss is
+already ZERO, and `forgefold_legguards` is a byte-identical twin of the
+baseline legs except that its 40 hit is 40 CRIT. Equipping the apex piece
+converts dead rating into live rating, which "+1 lead stat per piece"
+scores as nothing, because Perfecting moves primary stats only.
+
+Measured on the binding fury lane, same fixture and seeds, 60 seeds at
+300 s: **modelled 4.97 / 5.27 percent, the same two Perfected pieces
+EQUIPPED 10.42 / 10.21**, against a 5 percent envelope. The caster's
+equipped arm reads BELOW its modelled arm, so the omission is not uniform
+and has to be measured per lane. The measurement flatters the packet (the
+baseline carries that dead hit and two rings worth zero attack power) and
+every reading on every baseline tried is still above 5.
+
+TWO RATIFIED DEFINITIONS ARE OWED THE MAINTAINER, either of which re-opens
+R5: section 3's baseline pool, and section 8.1's gear term. Escalated under
+the phase file's own "the framework cannot measure a kit" stopping rule
+rather than re-tuned, and no magnitude was touched to reach a verdict.
+
+The four tunes stand: apex weapon enchants 7 to 6 on both twins,
+`sunspun_vestments` hitRating 40 to hasteRating 40, `duskforged_bulwark`
+armor 732 to 680 and blockValue 32 to 30, the three apex flasks 15 to 13.
+
+Everything else four review rounds found is fixed across 24 commits: two
+RED TESTS the flask tune had left on the branch, the public wiki quoting
+the pre-tune flask value in six languages with nothing red, four false
+shipped comments, six pin defects, and three harness defects. The harness
+is committed, typechecked, test-imported and reads its tuned terms from the
+catalog, all mutation-verified.
+
+FROZEN STAMP at e611b0639d, EXIT=0 first try under the gate's bounded form
+(`npm test -- --maxWorkers=8`, DATABASE_URL unset, porcelain clean before
+and after): 3235 / 22 files (3257), 47763 / 2 xfail / 381 skipped (48146),
+598.62 s; tsc and ci:changed clean, both regens zero-diff. Drift versus the
+Phase 14 QA stamp d51139a103 is +1 file and +25 tests. Full record:
+state.md, "Phase 15 ledger". LOCAL only, no push, no PR.
+NEXT = Phase 15 QA (phase-15-qa.md, FRESH session), which must verify the
+ESCALATION rather than confirm a verdict, and whose own starter prompt is
+stale on exactly that point.
