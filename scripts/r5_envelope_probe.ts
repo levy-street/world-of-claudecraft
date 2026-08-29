@@ -1,7 +1,10 @@
 // THE R5 ENVELOPE PROBE (masterwrought Phase 15).
 //
-// Produces every number in docs/prd/masterwrought/power-verification.md
-// sections 9.2 and 9.5. R5 is the packet's defining gate:
+// Produces docs/prd/masterwrought/power-verification.md section 9.5 and the
+// rogue rows of section 9.2 exactly; the fury and caster rows of 9.2 came from
+// a superseded fixture and are marked STALE there (the 9.2 blockquote), so
+// this probe deliberately does NOT reproduce them. R5 is the packet's
+// defining gate:
 //
 //   "full kit (2 Perfected pieces + apex enchants + flask + food) at most
 //    5 percent total throughput over pre-packet raid BiS, measured via
@@ -30,9 +33,12 @@
 //    fixture goes out of mana partway and the dummy heals back up.
 // 2. The BASELINE is the epic-only dev best-in-slot pick with the packet's
 //    flagged defs removed, spelled out by id below rather than derived, so a
-//    later content change cannot silently re-gear the denominator. It excludes
-//    legendaries, which makes it the CONSERVATIVE denominator: a legendary-
-//    inclusive baseline is stronger and would report a smaller percentage.
+//    later content change cannot silently re-gear the denominator. Excluding
+//    legendaries makes it the CONSERVATIVE denominator: a legendary-inclusive
+//    baseline is stronger and would report a smaller percentage. Two stated
+//    departures carry legendaries the other way, both conservative: the tank
+//    arm by its own max-effective-health rule, and the caster set's
+//    legendary mainhand (see the caster lane header).
 //
 // The kit arm is the baseline character plus exactly the packet's own delta,
 // applied through the channels an enchant and a Perfected bonus really use
@@ -40,35 +46,45 @@
 // and nothing else. The tank arm is the one exception and says so at its
 // definition: it swaps the two apex pieces in as ITEMS, because its gear term
 // is armour rather than a primary stat.
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
 import type { PlayerEquipment } from '../src/sim/entity';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import { RIFT_HEROIC_TUNING, RIFT_S_LEVEL } from '../src/sim/rift/ranks';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 import { armorReduction } from '../src/sim/types';
 import { anchorProbeInOpenField } from './probe_anchor';
+import { LA_LUNA_ROGUE_ROWS } from './rogue_dps_probe';
 import { WARLOCK_FULL_BIS_GEAR } from './warlock_balance_probe';
 
 type Stats = Partial<Record<string, number>>;
 type SlotStats = Record<string, Stats>;
 
 // --- the targets, derived (power-verification.md section 5) ------------------
-// HEROIC_DUNGEON_TUNING.nythraxis_boss_arena is level 22 / armorMultiplier 1.2;
-// RIFT_S_LEVEL is 23 and the S rank's armorMultiplier is 1.4. createMob gives a
-// mob armorPerLevel * (level - 1) armor, and the Nythraxis template's
-// armorPerLevel is 42 (src/sim/content/dungeons.ts).
+// EVERY input is read from the live tuning tables, never baked: the boss-arena
+// row's level and armorMultiplier, RIFT_S_LEVEL and the S rank's
+// armorMultiplier, and the Nythraxis template's armorPerLevel
+// (src/sim/content/dungeons.ts). createMob gives a mob
+// armorPerLevel * (level - 1) armor. The pinned literals (22/1058, 23/1294)
+// live in tests/r5_envelope_probe.test.ts, so a retune of any of these rows
+// reds the suite and forces a re-measure, which is the correct failure.
 const NYTH_ARMOR_PER_LEVEL = (MOBS.nythraxis_scourge_of_thornpeak as { armorPerLevel: number })
   .armorPerLevel;
+const HEROIC_ROW = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena;
+if (!HEROIC_ROW) throw new Error('HEROIC_DUNGEON_TUNING lost its nythraxis_boss_arena row');
+const SRIFT_ROW = RIFT_HEROIC_TUNING.S;
+if (!SRIFT_ROW) throw new Error('RIFT_HEROIC_TUNING lost its S rank row');
 export const HEROIC_TARGET = {
-  name: 'heroic-raid-L22',
-  level: 22,
-  armor: Math.round(NYTH_ARMOR_PER_LEVEL * 21 * 1.2),
+  name: `heroic-raid-L${HEROIC_ROW.level}`,
+  level: HEROIC_ROW.level,
+  armor: Math.round(NYTH_ARMOR_PER_LEVEL * (HEROIC_ROW.level - 1) * HEROIC_ROW.armorMultiplier),
 } as const;
 export const SRIFT_TARGET = {
-  name: 's-rift-L23',
-  level: 23,
-  armor: Math.round(NYTH_ARMOR_PER_LEVEL * 22 * 1.4),
+  name: `s-rift-L${RIFT_S_LEVEL}`,
+  level: RIFT_S_LEVEL,
+  armor: Math.round(NYTH_ARMOR_PER_LEVEL * (RIFT_S_LEVEL - 1) * SRIFT_ROW.armorMultiplier),
 } as const;
 
 const SEEDS_DEFAULT = [
@@ -85,29 +101,31 @@ const SEEDS_DEFAULT = [
 // pre-packet best on the same slot.
 const enchantBonus = (id: string, axis: 'str' | 'int' | 'agi' | 'sta'): number =>
   (ENCHANTS[id] as { statBonus?: Record<string, number> } | undefined)?.statBonus?.[axis] ?? 0;
-const WEAPON_STR_STEP =
+export const WEAPON_STR_STEP =
   enchantBonus('enchant_weapon_lucent_might', 'str') -
   enchantBonus('enchant_weapon_greater_might', 'str');
-const WEAPON_INT_STEP =
+export const WEAPON_INT_STEP =
   enchantBonus('enchant_weapon_lucent_spellpower', 'int') -
   enchantBonus('enchant_weapon_greater_spellpower', 'int');
-const FEET_AGI_STEP =
+export const FEET_AGI_STEP =
   enchantBonus('enchant_feet_lucent_agility', 'agi') - enchantBonus('enchant_feet_agility', 'agi');
 // The chest rung has two arms: the Perfected-only Lucent Infusion a cloth or
 // leather wearer can take, and the plate/mail Lucent Stamina every other class
 // falls back to, since no mail or plate apex CHEST ships.
-const CHEST_STA_STEP_PERFECTED =
+export const CHEST_STA_STEP_PERFECTED =
   enchantBonus('enchant_lucent_infusion', 'sta') -
   enchantBonus('enchant_chest_greater_stamina', 'sta');
-const CHEST_STA_STEP_PLATE =
+export const CHEST_STA_STEP_PLATE =
   enchantBonus('enchant_chest_lucent_stamina', 'sta') -
   enchantBonus('enchant_chest_greater_stamina', 'sta');
 
 const SEED_COUNT = Number(process.env.WOC_R5_SEEDS ?? 25);
 const SECONDS = Number(process.env.WOC_R5_SECONDS ?? 180);
 // WOC_R5_ARMS restricts which kit arms run, for a PRECISION pass on one number
-// rather than the whole table. The baseline always runs (every delta is against
-// it). Unset means every arm, which is what the record's tables report.
+// rather than the whole table. It gates all three THROUGHPUT lanes by each
+// arm's printed label; the tank lane always runs (deterministic, effectively
+// free). The baseline always runs (every delta is against it). Unset means
+// every arm, which is what the record's tables report.
 const WANTED_ARMS = (process.env.WOC_R5_ARMS ?? '').split(',').filter(Boolean);
 const WANT = (arm: string): boolean => WANTED_ARMS.length === 0 || WANTED_ARMS.includes(arm);
 // Never a SILENT truncation: WOC_R5_SEEDS above the curated list's length used
@@ -123,8 +141,10 @@ const SEEDS: number[] = (() => {
 // --- the consumables (power-verification.md section 8.3) --------------------
 // Both arms carry the pre-packet consumable ceiling; only the flask and the
 // plate are the packet's. No pre-packet elixir or scroll raises attack power
-// or intellect: all ten are buff_sta, so the two throughput terms are wholly
-// new while the tank's nets against the serpent's 12.
+// or intellect: all seven pre-packet carriers (four elixirs, three scrolls)
+// are buff_sta, so the two throughput terms are wholly new while the tank's
+// nets against the serpent's 12. The value literal below is welded to the
+// elixir_of_the_serpent def by tests/r5_envelope_probe.test.ts.
 const SERPENT: Aura = {
   id: 'elixir_buff_sta',
   name: 'Might of the Serpent',
@@ -318,14 +338,13 @@ const ROGUE_ENCH_D: SlotStats = {
   feet: { agi: FEET_AGI_STEP },
   chest: { sta: CHEST_STA_STEP_PERFECTED },
 };
-const ROGUE_ROWS = {
-  5: 'rog_r5_killers_pace',
-  8: 'rog_r8_borrowed_breath',
-  11: 'rog_r11_marked_prey',
-  14: 'rog_r14_ceaseless_cuts',
-  17: 'rog_r17_flurry_of_knives',
-  20: 'rog_r20_second_shadow',
-};
+// IMPORTED, never re-typed: section 9.1 fixes the rogue build as the La Luna
+// build from scripts/rogue_dps_probe.ts, so this must BE that object (the
+// same reasoning as the CASTER_BIS import below). The fury rotation below is
+// the one deliberate re-type: scripts/fury_dps_probe.ts executes at import
+// (a top-level script with no main guard), so importing its ROTATION would
+// run the whole probe.
+const ROGUE_ROWS = LA_LUNA_ROGUE_ROWS;
 
 const merge = (...ds: SlotStats[]): SlotStats => {
   const out: SlotStats = {};
@@ -341,7 +360,23 @@ const merge = (...ds: SlotStats[]): SlotStats => {
 
 export type Arm = 'base' | 'gear' | 'ench' | 'full' | 'apexChest' | 'equipped';
 
-function rogueLane(seed: number, spec: string, arm: Arm, level: number, armor: number): number {
+// Each lane accepts only the arms it defines. Without this, a wrong
+// (lane, arm) pair fell into the catch-all else branch and silently measured
+// gear+ench under the wrong label; a bad pair now throws instead.
+const laneArms = (lane: string, supported: readonly Arm[], arm: Arm): void => {
+  if (!supported.includes(arm)) {
+    throw new Error(`arm ${arm} unsupported in the ${lane} lane`);
+  }
+};
+
+export function rogueLane(
+  seed: number,
+  spec: string,
+  arm: Arm,
+  level: number,
+  armor: number,
+): number {
+  laneArms('rogue', ['base', 'gear', 'ench', 'full'], arm);
   const sim = new Sim({
     seed,
     playerClass: 'rogue',
@@ -435,13 +470,15 @@ const WAR_GEAR: SlotStats = { legs: { str: 2 } };
 // THE EQUIPPED ARM, and it exists because the modelled term above is NOT the
 // upper bound section 8.1 claims on this lane. WAR_BIS carries 355 hit rating
 // against a need of 190 at the heroic target and 260 at S-rift, so its
-// effective miss is already zero and 95 to 165 rating is DEAD. forgefold_
-// legguards is a byte-identical twin of the baseline legs except that its 40
-// HIT is 40 CRIT, so equipping it converts dead rating into live rating, a
-// gain "+2 lead stat" scores as nothing. warhewn_signet is the second
-// Perfected piece a fury warrior can wear. Both are swapped as ITEMS with
-// their real Perfecting bonuses, which is what a player would actually hold.
-const WAR_EQUIPPED_ITEMS: Record<string, string> = {
+// effective SPECIAL-attack miss is already zero (white swings additionally
+// carry the flat dual-wield 10 percent penalty, which no hit reduces) and 95
+// to 165 rating is DEAD. forgefold_legguards is a stat-and-armour identical
+// twin of the baseline legs except that its 40 HIT is 40 CRIT, so equipping
+// it converts dead rating into live rating, a gain "+2 lead stat" scores as
+// nothing. warhewn_signet is the second Perfected piece this arm equips (the
+// lane's best realisable pair). Both are swapped as ITEMS with their real
+// Perfecting bonuses, which is what a player would actually hold.
+export const WAR_EQUIPPED_ITEMS: Record<string, string> = {
   legs: 'forgefold_legguards',
   ring2: 'warhewn_signet',
 };
@@ -458,20 +495,27 @@ const WAR_ENCH_D: SlotStats = {
   chest: { sta: CHEST_STA_STEP_PLATE },
 };
 
-function furyLane(seed: number, arm: Arm, level: number, armor: number): number {
-  const sim = new Sim({
-    seed,
-    playerClass: 'warrior',
-    autoEquip: false,
-    world: PROBE_WORLD,
-  }) as AnySim;
-  const s = sim as unknown as {
+interface FurySim {
+  sim: AnySim;
+  s: {
     setPlayerLevel(n: number): void;
     setSpec(id: string): boolean;
     selectTalentRow(level: number, row: string): boolean;
     castAbility(id: string): unknown;
     player: Entity;
   };
+  p: Entity;
+}
+
+function furyDress(seed: number, arm: Arm): FurySim {
+  laneArms('fury', ['base', 'gear', 'ench', 'full', 'equipped'], arm);
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: PROBE_WORLD,
+  }) as AnySim;
+  const s = sim as unknown as FurySim['s'];
   s.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
   if (!s.setSpec('fury')) throw new Error('setSpec fury failed');
@@ -502,7 +546,36 @@ function furyLane(seed: number, arm: Arm, level: number, armor: number): number 
     }
   }
   dress(sim, equipment, WAR_ENCH, delta, auras);
-  const p = s.player;
+  return { sim, s, p: s.player };
+}
+
+// Dress-only readout of the fury lane's derived stats, deterministic (no
+// fight, no seeds), so the suite can pin the escalation's MECHANISM: the base
+// arm's 355 hit rating, the equipped arm's dead-hit-to-live-crit conversion,
+// and that effective special miss is zero on both arms at both targets.
+export interface FuryBody {
+  str: number;
+  sta: number;
+  hitRating: number;
+  hitBonus: number;
+  critRating: number;
+  hasteRating: number;
+}
+
+export function furyBody(arm: Arm): FuryBody {
+  const { p } = furyDress(4242, arm);
+  return {
+    str: p.stats.str,
+    sta: p.stats.sta,
+    hitRating: p.hitRating,
+    hitBonus: p.hitBonus,
+    critRating: p.critRating,
+    hasteRating: p.hasteRating,
+  };
+}
+
+export function furyLane(seed: number, arm: Arm, level: number, armor: number): number {
+  const { sim, s, p } = furyDress(seed, arm);
   const t = inertTarget(sim, level, armor);
   p.autoAttack = true;
   s.castAbility('battle_shout');
@@ -520,9 +593,13 @@ function furyLane(seed: number, arm: Arm, level: number, armor: number): number 
 // ============================================================================
 // LANE 3: caster. A MAGE (spell power is int * 0.5, and frostbolt is its
 // band-matched nuke) wearing the maintained set-complete caster best-in-slot
-// kit, which the repo happens to name WARLOCK_FULL_BIS_GEAR: every piece lists
-// mage in requiredClass, and using a set-complete kit matters because a
-// set-incomplete caster benches 21 to 33 percent under this one.
+// kit, which the repo happens to name WARLOCK_FULL_BIS_GEAR: nine pieces list
+// mage in requiredClass and the neck and both rings are unrestricted, and
+// using a set-complete kit matters because a set-incomplete caster benches
+// 21 to 33 percent under this one. NOTE: this maintained set carries the
+// LEGENDARY mainhand heroic_deathless_heartwood, the one departure from the
+// epic-only baseline rule (a stronger denominator, so the caster rows read
+// LOWER, the safe direction; recorded in section 3).
 // Both arms drink sunpetal_mana_draught on cooldown. The framework forbids
 // restoring a resource each tick, and this is not that: it is a real
 // consumable both arms carry.
@@ -567,7 +644,14 @@ const CASTER_APEX_CHEST_DELTA: SlotStats = {
   mainhand: { int: WEAPON_INT_STEP },
 };
 
-function casterLane(seed: number, arm: Arm, level: number, armor: number, seconds: number): number {
+export function casterLane(
+  seed: number,
+  arm: Arm,
+  level: number,
+  armor: number,
+  seconds: number,
+): number {
+  laneArms('caster', ['base', 'gear', 'ench', 'full', 'apexChest'], arm);
   const sim = new Sim({
     seed,
     playerClass: 'mage',
@@ -656,11 +740,11 @@ const TANK_ENCH: SlotStats = {
   shoulder: { str: 2 },
   waist: { sta: 3 },
 };
-const TANK_KIT_ITEMS: Record<string, string> = {
+export const TANK_KIT_ITEMS: Record<string, string> = {
   offhand: 'duskforged_bulwark',
   legs: 'forgefold_legguards',
 };
-const TANK_KIT_DELTA: SlotStats = {
+export const TANK_KIT_DELTA: SlotStats = {
   offhand: { str: 1, sta: 1 },
   legs: { str: 1 },
   chest: { sta: CHEST_STA_STEP_PLATE },
@@ -695,7 +779,11 @@ export function tankBody(arm: 'base' | 'consumables' | 'consumablesEnchant' | 'f
     }
   }
   const delta: SlotStats =
-    arm === 'full' ? TANK_KIT_DELTA : arm === 'consumablesEnchant' ? { chest: { sta: 3 } } : {};
+    arm === 'full'
+      ? TANK_KIT_DELTA
+      : arm === 'consumablesEnchant'
+        ? { chest: { sta: CHEST_STA_STEP_PLATE } }
+        : {};
   const auras =
     arm === 'base' ? [SERPENT] : [flaskAura('buff_sta', 'Ironhusk Vigor'), plateAura('buff_sta')];
   dress(sim, equipment, TANK_ENCH, delta, auras);
@@ -734,6 +822,13 @@ function row(name: string, base: number[], arms: Record<string, number[]>): void
 
 export function main(): void {
   const only = process.argv[2];
+  if (SECONDS > 900) {
+    // The always-on consumable premise breaks past the plate's 900 s duration
+    // (the flask holds to 1200): auras are applied once at dress time and
+    // never refreshed, so a longer fight quietly measures a kit that fell
+    // off mid-run. Re-apply the auras inside act() before raising this.
+    throw new Error('WOC_R5_SECONDS above 900 breaks the always-on consumable premise');
+  }
   console.log(
     `TARGETS ${HEROIC_TARGET.name} armor=${HEROIC_TARGET.armor} DR=${(armorReduction(HEROIC_TARGET.armor, 20) * 100).toFixed(2)}% | ` +
       `${SRIFT_TARGET.name} armor=${SRIFT_TARGET.armor} DR=${(armorReduction(SRIFT_TARGET.armor, 20) * 100).toFixed(2)}%`,
@@ -745,11 +840,18 @@ export function main(): void {
     if (!only || only === 'rogue') {
       for (const spec of ['combat', 'assassination', 'subtlety']) {
         const base = SEEDS.map((s) => rogueLane(s, spec, 'base', level, armor));
-        row(`${name} rogue-${spec}`, base, {
-          gear: SEEDS.map((s) => rogueLane(s, spec, 'gear', level, armor)),
-          'gear+ench': SEEDS.map((s) => rogueLane(s, spec, 'ench', level, armor)),
-          FULL: SEEDS.map((s) => rogueLane(s, spec, 'full', level, armor)),
-        });
+        const all: Record<string, number[]> = {
+          gear: WANT('gear') ? SEEDS.map((s) => rogueLane(s, spec, 'gear', level, armor)) : [],
+          'gear+ench': WANT('gear+ench')
+            ? SEEDS.map((s) => rogueLane(s, spec, 'ench', level, armor))
+            : [],
+          FULL: WANT('FULL') ? SEEDS.map((s) => rogueLane(s, spec, 'full', level, armor)) : [],
+        };
+        row(
+          `${name} rogue-${spec}`,
+          base,
+          Object.fromEntries(Object.entries(all).filter(([, xs]) => xs.length > 0)),
+        );
       }
     }
     if (!only || only === 'fury') {
@@ -771,12 +873,21 @@ export function main(): void {
     if (!only || only === 'caster') {
       for (const secs of [60, SECONDS]) {
         const base = SEEDS.map((s) => casterLane(s, 'base', level, armor, secs));
-        row(`${name} caster-${secs}s`, base, {
-          gear: SEEDS.map((s) => casterLane(s, 'gear', level, armor, secs)),
-          'gear+ench': SEEDS.map((s) => casterLane(s, 'ench', level, armor, secs)),
-          FULL: SEEDS.map((s) => casterLane(s, 'full', level, armor, secs)),
-          'FULL+apexChest': SEEDS.map((s) => casterLane(s, 'apexChest', level, armor, secs)),
-        });
+        const all: Record<string, number[]> = {
+          gear: WANT('gear') ? SEEDS.map((s) => casterLane(s, 'gear', level, armor, secs)) : [],
+          'gear+ench': WANT('gear+ench')
+            ? SEEDS.map((s) => casterLane(s, 'ench', level, armor, secs))
+            : [],
+          FULL: WANT('FULL') ? SEEDS.map((s) => casterLane(s, 'full', level, armor, secs)) : [],
+          'FULL+apexChest': WANT('FULL+apexChest')
+            ? SEEDS.map((s) => casterLane(s, 'apexChest', level, armor, secs))
+            : [],
+        };
+        row(
+          `${name} caster-${secs}s`,
+          base,
+          Object.fromEntries(Object.entries(all).filter(([, xs]) => xs.length > 0)),
+        );
       }
     }
   }

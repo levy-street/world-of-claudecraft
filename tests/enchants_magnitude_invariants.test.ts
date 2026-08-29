@@ -157,11 +157,14 @@ describe('enchant table magnitude invariants', () => {
     expect(loadoutStack('sta', 'dualWield')).toBe(30);
     // The weapon rung is the whole difference, in the direction the envelope
     // pays for: the dual-wield lead over the per-slot model IS one more copy
-    // of the best weapon enchant on that axis.
-    for (const axis of ['str', 'int'] as const) {
+    // of the best weapon enchant on that axis. ALL FOUR axes (the Phase 15
+    // QA: str and int alone left agi's positive lead and sta's NEGATIVE lead,
+    // trading enchant_offhand_stamina away for a second weapon, riding on the
+    // literals above with no relation behind them).
+    for (const axis of ['str', 'agi', 'sta', 'int'] as const) {
       expect(
         loadoutStack(axis, 'dualWield') - loadoutStack(axis, 'shieldOrHeld'),
-        `${axis}: the dual-wield lead is one extra weapon rung`,
+        `${axis}: the dual-wield lead is one extra weapon rung minus the offhand line`,
       ).toBe(bestValue('mainhand', axis, () => true) - bestValue('offhand', axis, () => true));
     }
   });

@@ -1234,8 +1234,9 @@ describe('masterwrought apex budget sweep', () => {
     // no general bag EXCEEDS the apex bag, the ties are exactly the named
     // set, and the materials-only satchels are pinned by exact id and size.
     // Whether the apex bag should be re-distinguished (or the strictly-best
-    // ruling amended) is an OPEN maintainer ruling; re-tighten this to
-    // toBeLessThan when it is decided.
+    // ruling amended) is an OPEN maintainer ruling: re-tighten this to
+    // toBeLessThan and drop the tie set if the bag is re-distinguished; the
+    // rescoped pin below IS the final shape if the position is amended.
     const APEX_TIE_BAGS = ['resonant_weave_bag', 'wayfarers_backpack'];
     const ties: string[] = [];
     for (const def of Object.values(ITEMS)) {
@@ -1563,22 +1564,28 @@ describe('masterwrought apex budget sweep', () => {
     // apex piece is allowed, never grow it. Legendaries are the one exclusion,
     // because a legendary incumbent would mask a real lead behind a piece the
     // packet never competes with. Literal caps, never a self-derived bound.
+    // The Phase 15 QA tightened mainhand (2 to 1) and feet (1 to 0) to the
+    // measured leads: both rows carried authored slack the sweep below now
+    // refuses on every slot.
     const MAX_LEAD_BY_SLOT: Record<string, number> = {
       chest: 2,
       gloves: 2,
       waist: 2,
       legs: 1,
-      feet: 1,
+      feet: 0,
       neck: 3,
       ring: 1,
       offhand: 1,
-      mainhand: 2,
+      mainhand: 1,
     };
     // The identity-matched caps, per slot: how far a Perfected apex piece may
     // lead the best pre-packet piece CARRYING THE SAME lead stat. Throughput
     // is paid in the lead stat, so this is the bound that binds; the sum caps
     // above are the second arm.
-    // Every row is the EXACT measured lead, zero slack, so any widening reds.
+    // Every row is the EXACT measured lead, zero slack, so any widening reds,
+    // and the sweep ENFORCES the exactness after the loop (the Phase 15 QA:
+    // the claim used to ride on nothing, and the sum table above had quietly
+    // gathered two slots of slack).
     // The offhand's 3 is gyrelens_array and it is the packet's largest
     // single-axis lead: int 11 Perfected against the best pre-packet offhand
     // carrying int (heroic_wraithfire_orb, 8). It is recorded rather than
@@ -1613,6 +1620,11 @@ describe('masterwrought apex budget sweep', () => {
     // which is the direction that hides a lead.
     expect(pool.length, 'the baseline pool really has rows').toBeGreaterThan(400);
     let checked = 0;
+    const observedSum: Record<string, number> = {};
+    const observedLead: Record<string, number> = {};
+    const noteMax = (table: Record<string, number>, key: string, value: number): void => {
+      table[key] = Math.max(table[key] ?? Number.NEGATIVE_INFINITY, value);
+    };
     for (const [id, def] of Object.entries(ITEMS) as Array<
       [string, ItemDef & Record<string, unknown>]
     >) {
@@ -1634,6 +1646,7 @@ describe('masterwrought apex budget sweep', () => {
         perfected - best,
         `${id}: Perfected ${perfected} over the best pre-packet ${key} (${best})`,
       ).toBeLessThanOrEqual(cap);
+      noteMax(observedSum, key, perfected - best);
 
       // THE IDENTITY-MATCHED ARM, and it is the one that actually binds. The
       // sum comparison above is stat-agnostic, so an off-axis piece can set
@@ -1669,9 +1682,22 @@ describe('masterwrought apex budget sweep', () => {
         perfectedLead - bestLead,
         `${id}: Perfected ${lead} ${perfectedLead} over the best pre-packet ${key} carrying ${lead} (${bestLead})`,
       ).toBeLessThanOrEqual(leadCap);
+      noteMax(observedLead, key, perfectedLead - bestLead);
       checked++;
     }
     expect(checked, 'every flagged def was measured').toBe(17);
+    // ZERO SLACK, enforced. A widening reds on the caps above; a SHRINK (a
+    // stronger pre-packet incumbent arriving, or an apex piece trimmed) reds
+    // here and demands the cap be re-cut to the new measured lead, so the
+    // tables stay the exact measurement they claim to be in both directions.
+    for (const [key, cap] of Object.entries(MAX_LEAD_BY_SLOT)) {
+      expect(observedSum[key], `${key}: the sum cap is the measured lead, zero slack`).toBe(cap);
+    }
+    for (const [key, cap] of Object.entries(MAX_LEAD_STAT_BY_SLOT)) {
+      expect(observedLead[key], `${key}: the lead-stat cap is the measured lead, zero slack`).toBe(
+        cap,
+      );
+    }
   });
 
   it('no crafted output outside the apex arrays reaches the apex item level', () => {
@@ -1834,9 +1860,11 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // THE VALUE IS ENVELOPE-DERIVED, NOT LADDER-DERIVED, AND PHASE 15 MADE IT
     // SO (15 to 13). The ladder's own step would put the flask at 15, and that
     // is where it shipped. The measured R5 pass
-    // (docs/prd/masterwrought/power-verification.md) found the full kit outside
-    // the 5 percent envelope on the highest-throughput physical spec at 15 and
-    // inside it at 13: the flask is the single largest term in the envelope,
+    // (docs/prd/masterwrought/power-verification.md) read the full kit at 5.86
+    // and 6.08 percent at 15; at 13 the central estimate sits inside with a
+    // straddling interval, and the R5 verdict is SUSPENDED pending the
+    // gear-term ruling (its Verdict and section 9.6), so 13 is a conservative
+    // margin, not a proven crossing. The flask is the single largest term,
     // because it is the first offensive consumable the game has ever had (every
     // pre-packet elixir and scroll is stamina) and its whole magnitude lands as
     // new throughput with nothing to net it off. R5 is the contract and the

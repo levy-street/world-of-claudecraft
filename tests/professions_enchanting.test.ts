@@ -1259,6 +1259,21 @@ describe('apply enchant to WORN gear (in place)', () => {
       sim.player.stats.str - before,
       'both payloads reach the derived stat book, so the term is 2x',
     ).toBe(bonus * 2);
+
+    // The FORFEITED line, the other arm of the same gate (the Phase 15 QA):
+    // the offhand hand holding a mainhand-kind weapon REFUSES an offhand-slot
+    // enchant, because the gate compares the ITEM's declared slot, not the
+    // hand it sits in. Without this, only the accepting arm of the either/or
+    // claim above was pinned.
+    const refused = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      WORN_SWORD,
+      'enchant_offhand_stamina',
+      'offhand',
+    );
+    expect(refused.ok, 'an offhand enchant on a mainhand-kind weapon').toBe(false);
+    expect((refused as { reason?: string }).reason).toBe('wrong_slot');
   });
 
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {
