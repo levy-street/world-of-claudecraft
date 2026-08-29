@@ -272,6 +272,29 @@ function hasGetGpuInfoEvidence(aux) {
 }
 
 /**
+ * Whether a launch should be rescued because its backend never came up at all.
+ *
+ * The rescue's two other triggers both need the GPU process to have LIVED: one watches it
+ * die, the other reads the renderer the page reports. A Vulkan rung on a machine with no
+ * usable Vulkan driver produces neither, because the GPU process never starts: it cannot
+ * die, and with no GPU at all nothing can report a renderer. Chromium then disables GPU
+ * access for the profile and the player is left on a page that cannot make a context, with
+ * the ladder still sitting on the rung that failed.
+ *
+ * The evidence is already in hand at that moment: `app.getGPUFeatureStatus()`, which the
+ * shell reads and logs anyway. A launch that ASKED for a Vulkan rung and has no hardware
+ * WebGL is a launch whose backend did not take, so it steps down like any other.
+ *
+ * Only from a Vulkan rung: below OpenGL there is nothing to step to, and no switch of ours
+ * to blame, so a machine with no GPU at all stops there rather than looping. The caller
+ * adds the timing guard the other triggers use (before the session is healthy).
+ */
+function shouldRescueMissingGpu({ rung, hardwareWebgl }) {
+  if (hardwareWebgl !== false) return false;
+  return rungIndex(rung) >= 0 && rung.startsWith('vulkan');
+}
+
+/**
  * Whether to tell the player their own choice did not take: they picked Vulkan and the
  * session is not running Vulkan.
  *
@@ -419,5 +442,6 @@ module.exports = {
   relaunchOnLowerBackend,
   requestedBackendUnavailable,
   rungAbove,
+  shouldRescueMissingGpu,
   rungBelow,
 };

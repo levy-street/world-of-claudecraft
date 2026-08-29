@@ -394,9 +394,7 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // that is not lower changes nothing. `!==` would also fire on a higher one.
     expect(judge).toContain('if (!isHigherRung(gpuBackendLaunch.rung, boundRung)) return;');
     expect(judge).not.toContain('boundRung === gpuBackendLaunch.rung');
-    expect(judge).toContain(
-      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
-    );
+    expect(judge).toContain('rescueOntoLowerBackend(`it bound ${boundRung} instead`);');
     // Judging is not remembering, and it is not mode-aware either: a rescue
     // wrapped in an Auto guard here would strand exactly the explicit-choice
     // player this commit exists to rescue, and a flattened toContain on the
@@ -474,14 +472,12 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(gone).toContain(
       'const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });',
     );
-    expect(gone).toContain(
-      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
-    );
+    expect(gone).toContain("rescueOntoLowerBackend('the GPU process died at launch');");
     // The CONTIGUOUS text, not a brace count: the Auto arm's slice carries
     // braces from its own object literals, so counting them let the exact
     // pre-fix defect (the rescue moved inside the arm) pass green.
     expect(gone, 'the rescue must sit OUTSIDE the Auto-only arm, which is the whole fix').toContain(
-      "if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next); } if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);",
+      "if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next); } rescueOntoLowerBackend('the GPU process died at launch');",
     );
     // A late crash RETURNS: without it, a death after a healthy session would
     // demote the memory and re-exec a live session, the defect this replaces.
@@ -492,6 +488,30 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // could not be rescued would still record itself healthy sixty seconds on.
     expect(gone).toContain(
       'if (healthySessionTimer !== null) { clearTimeout(healthySessionTimer); healthySessionTimer = null; }',
+    );
+  });
+
+  it('rescues through ONE latched path, reachable from all three triggers', () => {
+    // The two triggers that need the GPU process to have lived cannot see a
+    // Vulkan rung whose process never started: it cannot die, and with no GPU
+    // nothing can report a renderer. The feature status is the only evidence
+    // there is, and the shell already reads it.
+    const rescue = block('function rescueOntoLowerBackend(why) {', '\n}', 'rescueOntoLowerBackend');
+    const flat = rescue.replace(/\s+/g, ' ');
+    // Latched, and never after the session has proven healthy: a late crash is
+    // Chromium's to recover, not ours to re-exec a live session for.
+    expect(flat).toContain('if (gpuRescueSpawned || sessionHealthy) return;');
+    expect(flat).toContain('gpuRescueSpawned = true;');
+    expect(flat).toContain(
+      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
+    );
+    // The spawn lives there and nowhere else, so no trigger can bypass the latch.
+    expect(count(code, 'relaunchOnLowerBackend(')).toBe(1);
+    expect(count(code, 'rescueOntoLowerBackend(')).toBe(4);
+    // The third trigger, at the one moment the evidence exists.
+    const gpu = block('function logGpuStatus() {', '\n}', 'logGpuStatus').replace(/\s+/g, ' ');
+    expect(gpu).toContain(
+      "if (shouldRescueMissingGpu({ rung: gpuBackendLaunch.rung, hardwareWebgl: false })) { rescueOntoLowerBackend('no hardware WebGL on a Vulkan rung'); }",
     );
   });
 

@@ -86,6 +86,7 @@ const {
   relaunchOnLowerBackend,
   requestedBackendUnavailable,
   SESSION_HEALTHY_AFTER_MS,
+  shouldRescueMissingGpu,
 } = require('./gpu_backend.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
@@ -1423,6 +1424,8 @@ let boundRung = gpuBackendLaunch.rung;
 let boundGpuDriver = '';
 let sessionHealthy = false;
 let healthySessionTimer = null;
+// One rescue per process, whichever trigger reaches it first.
+let gpuRescueSpawned = false;
 
 // What this launch actually bound, judged ONCE per process from the first piece of real
 // evidence (a crash-recovery reload must not re-judge: the adapter it lands on is the
@@ -1461,10 +1464,23 @@ function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
   log.warn(`[gpu] ${gpuBackendLaunch.rung} did not bind; rescuing onto the rung below it`, {
     bound: boundRung,
   });
+  rescueOntoLowerBackend(`it bound ${boundRung} instead`);
+}
+
+/**
+ * The one way this process rescues itself onto a lower rung. Three triggers can reach it
+ * (the GPU process dying at launch, a judged lower binding, and a Vulkan rung that never
+ * got a GPU at all), and they can overlap: a pending getGPUInfo promise resolving after a
+ * death handler has already spawned would otherwise spawn a second child on the same rung.
+ * Latched, so the first one wins and the rest are no-ops.
+ */
+function rescueOntoLowerBackend(why) {
+  if (gpuRescueSpawned || sessionHealthy) return;
+  gpuRescueSpawned = true;
+  log.warn(`[gpu] rescuing off ${gpuBackendLaunch.rung}: ${why}`);
   if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);
-  // No rescue available (the chain is spent, or the spawn failed): run what we have. The
-  // healthy-session timer is already running, and what bound IS what this machine can do,
-  // so a session that survives still records the truth.
+  // No lower rung, a spent chain or a failed spawn: run on whatever we have rather than
+  // leave the player with nothing.
 }
 
 // A session is HEALTHY once it has survived SESSION_HEALTHY_AFTER_MS without a
@@ -1539,7 +1555,7 @@ app.on('child-process-gone', (_event, details) => {
     const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });
     if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next);
   }
-  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);
+  rescueOntoLowerBackend('the GPU process died at launch');
 });
 
 function logGpuStatus() {
@@ -1553,6 +1569,13 @@ function logGpuStatus() {
         webgl: status?.webgl,
         webgl2: status?.webgl2,
       });
+      // The rescue's third trigger. The other two need the GPU process to have LIVED, and
+      // a Vulkan rung on a machine with no usable driver never starts one: it cannot die,
+      // and with no GPU nothing can report a renderer. This reading is the only evidence
+      // there is, and the shell already had it in hand.
+      if (shouldRescueMissingGpu({ rung: gpuBackendLaunch.rung, hardwareWebgl: false })) {
+        rescueOntoLowerBackend('no hardware WebGL on a Vulkan rung');
+      }
     }
   } catch (err) {
     log.error('[gpu] could not read feature status', err);

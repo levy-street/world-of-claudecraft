@@ -86,6 +86,9 @@ export function rungAbove(rung: unknown): GpuBackendRung | null;
 export function rungBelow(rung: unknown): GpuBackendRung | null;
 export function isHigherRung(rung: unknown, other: unknown): boolean;
 
+/** Whether a launch should be rescued because its backend never came up at all. */
+export function shouldRescueMissingGpu(input: { rung?: unknown; hardwareWebgl?: boolean }): boolean;
+
 /** Whether to tell the player their own Vulkan choice is not what is running. */
 export function requestedBackendUnavailable(input: {
   setting?: unknown;

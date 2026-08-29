@@ -17,6 +17,7 @@ import {
   relaunchOnLowerBackend,
   requestedBackendUnavailable,
   SESSION_HEALTHY_AFTER_MS,
+  shouldRescueMissingGpu,
   TOP_GPU_BACKEND_RUNG,
   VULKAN_BACKEND_SWITCHES,
   VULKAN_PARALLEL_COMPILE_SWITCH,
@@ -351,6 +352,39 @@ describe('judgeGpuBackendLaunch', () => {
     expect(
       judgeGpuBackendLaunch({ glRenderer: 'ANGLE (Vulkan, SWIFTSHADER)', parallel: true }),
     ).toBe('opengl');
+  });
+});
+
+describe('shouldRescueMissingGpu', () => {
+  const at = (rung: string, hardwareWebgl?: boolean) =>
+    shouldRescueMissingGpu({ rung, hardwareWebgl });
+
+  it('rescues a Vulkan rung that never got a GPU at all', () => {
+    // The gap this closes: the other two triggers both need the GPU process to
+    // have LIVED (one watches it die, the other reads the renderer the page
+    // reports). A Vulkan rung with no usable driver never starts one, so it
+    // cannot die and nothing can report, and the ladder stayed on the rung that
+    // failed while the player looked at a page that could not make a context.
+    expect(at('vulkan-parallel-compile', false)).toBe(true);
+    expect(at('vulkan-plain', false)).toBe(true);
+  });
+
+  it('does not fire from the bottom rung: there is nothing below it to try', () => {
+    // A machine with no GPU at all stops here rather than looping, and OpenGL
+    // carries none of our switches, so there is nothing of ours to blame.
+    expect(at('opengl', false)).toBe(false);
+  });
+
+  it('does not fire while there IS hardware WebGL', () => {
+    for (const rung of GPU_BACKEND_RUNGS) expect(at(rung, true)).toBe(false);
+  });
+
+  it('does not fire on an unknown reading, or a rung off the ladder', () => {
+    // The status could not be read: absence of evidence is not evidence, and
+    // rescuing on it would step a healthy machine down for a failed API call.
+    expect(at('vulkan-parallel-compile', undefined)).toBe(false);
+    expect(at('nonsense', false)).toBe(false);
+    expect(at('', false)).toBe(false);
   });
 });
 
