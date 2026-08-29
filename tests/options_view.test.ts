@@ -410,16 +410,18 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keys).toContain('touchInvertLook');
     expect(keys).toContain('mobileCameraJoystick');
     expect(keys).toContain('leftHandedTouch');
+    expect(keys).toContain('touchPreciseGroundAim');
     // touchLookSpeed sits right after cameraSpeed
     expect(keys[keys.indexOf('cameraSpeed') + 1]).toBe('touchLookSpeed');
-    // mobileCameraJoystick and leftHandedTouch are the last two touch-only rows,
-    // right after touchInvertLook, in that order.
+    // The boolean touch rows follow touchInvertLook in their rendered order.
     const touchInvertIdx = keys.indexOf('touchInvertLook');
     expect(keys[touchInvertIdx + 1]).toBe('mobileCameraJoystick');
     expect(keys[touchInvertIdx + 2]).toBe('leftHandedTouch');
+    expect(keys[touchInvertIdx + 3]).toBe('touchPreciseGroundAim');
+    expect(keys[touchInvertIdx + 4]).toBe('note:hudChrome.options.touchPreciseAimNote');
   });
 
-  it('hides mobileCameraJoystick and leftHandedTouch on a desktop interface', () => {
+  it('hides mobile touch toggles on a desktop interface', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
       touch: false,
       nativeShell: false,
@@ -427,13 +429,18 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     const keys = keysOf(controls);
     expect(keys).not.toContain('mobileCameraJoystick');
     expect(keys).not.toContain('leftHandedTouch');
+    expect(keys).not.toContain('touchPreciseGroundAim');
+    expect(keys).not.toContain('note:hudChrome.options.touchPreciseAimNote');
   });
 
-  it('gives mobileCameraJoystick and leftHandedTouch their correct i18n keys', () => {
-    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
-      touch: true,
-      nativeShell: false,
-    });
+  it('gives mobile touch toggles their correct i18n keys', () => {
+    const controls = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4 }, { touchPreciseGroundAim: true }),
+      {
+        touch: true,
+        nativeShell: false,
+      },
+    );
     expect(find(controls, 'mobileCameraJoystick')).toMatchObject({
       control: 'boolToggle',
       labelKey: 'hudChrome.options.mobileCameraJoystick',
@@ -441,6 +448,11 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(find(controls, 'leftHandedTouch')).toMatchObject({
       control: 'boolToggle',
       labelKey: 'hudChrome.options.mobileLeftHanded',
+    });
+    expect(find(controls, 'touchPreciseGroundAim')).toMatchObject({
+      control: 'boolToggle',
+      labelKey: 'hudChrome.options.touchPreciseAim',
+      on: true,
     });
   });
 });
@@ -480,6 +492,7 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
     expect(find(controls, 'gamepadGlyphStyle')).toMatchObject({
@@ -496,6 +509,10 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
     expect(find(controls, 'gamepadEnabled')).toMatchObject({ control: 'boolToggle' });
     // camera speed renders with a one-decimal readout, not a percent
     expect(find(controls, 'gamepadCameraSpeed')).toMatchObject({
+      control: 'slider',
+      fmt: 'oneDecimal',
+    });
+    expect(find(controls, 'gamepadReticleSpeed')).toMatchObject({
       control: 'slider',
       fmt: 'oneDecimal',
     });
@@ -518,6 +535,7 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
   });

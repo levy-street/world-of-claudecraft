@@ -75,6 +75,8 @@ export const API_ERROR_KEYS = {
   'character.online': 'apiError.character.online',
   'character.rename_not_permitted': 'apiError.character.rename_not_permitted',
   'character.delete_confirm': 'apiError.character.delete_confirm',
+  'character.storage_purchase_open': 'apiError.character.storage_purchase_open',
+  'character.delete_busy': 'apiError.character.delete_busy',
   'character.already_in_world': 'apiError.character.already_in_world',
   'character.taken_over': 'apiError.character.taken_over',
   'character.rename_required': 'apiError.character.rename_required',

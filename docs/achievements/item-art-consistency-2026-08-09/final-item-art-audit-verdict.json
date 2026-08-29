@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-10T04:33:00.640Z",
+  "generatedAt": "2026-08-26T05:07:29.368Z",
   "auditScope": {
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 829,
-    "liveItemDefinitions": 844,
+    "itemArtFilesReviewed": 836,
+    "liveItemDefinitions": 851,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -298,7 +298,7 @@
       "armor-ring": 18,
       "armor-shoulder": 49,
       "armor-waist": 27,
-      "bag": 6,
+      "bag": 13,
       "drink": 9,
       "elixir": 4,
       "food": 21,
@@ -342,6 +342,25 @@
           "docs/achievements/icon-brief.md"
         ],
         "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-26",
+        "branch": "feature/bank-storage-pr",
+        "reviewer": "implementation agent",
+        "replacedIds": [
+          "burlap_reagent_pouch",
+          "duskweave_bag",
+          "foragers_haversack",
+          "loombound_reagent_satchel",
+          "necromancers_reagent_satchel",
+          "resonant_weave_bag",
+          "wayfarers_backpack"
+        ],
+        "provenance": [
+          "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json",
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -384,7 +403,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 829,
+    "passCount": 836,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -461,6 +480,7 @@
       "broodmother_silk_robe",
       "brutoks_maul",
       "bulwark_rusted_pauldrons",
+      "burlap_reagent_pouch",
       "canopy_silk_hank",
       "cantors_drowned_sash",
       "captains_crest",
@@ -557,6 +577,7 @@
       "duskfang_dirk",
       "duskhide_wraps",
       "duskthorn_mantle",
+      "duskweave_bag",
       "duskwhisper",
       "duskwisp_essence",
       "eastbrook_arming_sword",
@@ -622,6 +643,7 @@
       "first_blood_razor",
       "fleetblood_band",
       "footpad_jerkin",
+      "foragers_haversack",
       "forest_pink_armor_plate",
       "fountain_court_mantle",
       "frayed_prayer_beads",
@@ -804,6 +826,7 @@
       "litany_legs",
       "litany_plate_chest",
       "litany_shoulder",
+      "loombound_reagent_satchel",
       "lost_caravan_goods",
       "lunar_choir_leggings",
       "lunar_tide_greatstaff",
@@ -877,6 +900,7 @@
       "mudfin_scale",
       "murloc_hut",
       "necromancers_legwraps",
+      "necromancers_reagent_satchel",
       "necromancers_soulspire_mantle",
       "necromancers_soulsteps",
       "necromancers_starshroud",
@@ -964,6 +988,7 @@
       "resonant_steel",
       "resonant_thread",
       "resonant_timber",
+      "resonant_weave_bag",
       "restless_skull",
       "revenant_silk_robe",
       "revenantstep_treads",
@@ -1173,6 +1198,7 @@
       "wardplate_cuirass",
       "wardweave_cowl",
       "waterlogged_idol",
+      "wayfarers_backpack",
       "wayfarers_hood",
       "weathered_ledger_page",
       "webwood_silk",
@@ -1220,7 +1246,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 829 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
+    "summary": "All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1377,8 +1403,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "ec47b8140b2f19caeddd869ee6a2bcb51f6965294b0fa93a1eeddf06d9c4c914",
-      "bytes": 454802
+      "sha256": "691107c88450b6ef09fa36d12d4c330c602bcfddd08a70ce8d8dca72472ad2dd",
+      "bytes": 458451
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1392,1673 +1418,1673 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "1ffdd0b938eee93919babb4d929efe33972d65b36b27243bc1a268a4eab81ae4",
+    "sheetSetSha256": "f920e8c845f1bf3f91ebaf8090f6fdd07f6a8d581edd6653c884d8ac6d59bea8",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
-        "sha256": "d48f675c481d092db3f4b4fbfb18d99f874fbfe2c8dfd867565104a37f9f0b63",
-        "bytes": 2848880,
+        "sha256": "e3c0645b2f106e796f1aabdae9480e711e2d6b1c3e51ad6c7cd61fadfd964a71",
+        "bytes": 2849829,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--40-color.png",
-        "sha256": "42e255f93e882b059c5a84c54bee44e5373867d4696004c14fc8c3e0966e4050",
-        "bytes": 489019,
+        "sha256": "54d3d4fe5942e6796216fb92af92708367d856ce5182f1913e3b441a8abcdd5e",
+        "bytes": 490097,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--28-color.png",
-        "sha256": "d2d054cb35f599a00e689ae9625d91124233433a6ffb557cd0dcf3ffaecc6b69",
-        "bytes": 324354,
+        "sha256": "814da1afaca8120c9e8dcebe1dec98d9f7b2c8f1b2ecd916671e98e83b6bdea4",
+        "bytes": 325554,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--22-color.png",
-        "sha256": "bcd58f402d2953bdd44dbf12387d8969b650b7c5e796f03fa609289e4ab40749",
-        "bytes": 249529,
+        "sha256": "0eed8ce860d2e62b34086fae90a44b89970c0611f5f4e691ad5b43e9ec8f751c",
+        "bytes": 250754,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--28-grayscale.png",
-        "sha256": "eb5da95cea6506222208e28181d6300eecb59ca726641bf136cefecf2181865e",
-        "bytes": 228784,
+        "sha256": "32fbfac9fe8a13d760fe8e6c2fc707a334d31de21c3cfab00e4673214e1949f4",
+        "bytes": 229887,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--64-circle.png",
-        "sha256": "5fba31aa8370e1361442cfb9480c4026e6a2158854dcb41a7f83281e2d7d9a63",
-        "bytes": 883627,
+        "sha256": "f95b2a3d2603c809110699e3edf9a3bf3c0f3950160cdc0e1fe08a0702c6bd4b",
+        "bytes": 884865,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--small-multiview.png",
-        "sha256": "afc344fe8711c9c129fabfc3b7b7519864fb1e8055e42e247fd7be5bc80d4fe8",
-        "bytes": 1573955,
+        "sha256": "8e0e9c629f7edbd63cbadb7b1445674e07c64d178d1df2d966b7e858372e5662",
+        "bytes": 1574979,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--identity.png",
-        "sha256": "2af7f7071ab9a785e4e1f10abaca893c88a954cd1585f6f9210be7eb5c56b80d",
-        "bytes": 2948808,
+        "sha256": "468e06ffdf0f66235820e8a3445c9e814c0da53204b0fbdd23ef88b923c0e8d6",
+        "bytes": 2950286,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--128-color.png",
-        "sha256": "862d8696a1b04a39fb83dd6cee157ee8b6a02108a37faae7d0d641ee60736be1",
-        "bytes": 427797,
+        "sha256": "32018bfe089539a1688a9c7a3df91323fb0df624b2693aeaa0eb821f6b564674",
+        "bytes": 427944,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--40-color.png",
-        "sha256": "275f3e8470872864d5ba3ea481b3e53b133860a5566b224cf11000530fdfd05e",
-        "bytes": 81898,
+        "sha256": "ea6dd7b8ed890e69ceb2f4ff73907ab66c6a0735b870c05f16544d049e42aa6e",
+        "bytes": 82046,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--28-color.png",
-        "sha256": "bfd04d56dfc78ab3fb0d3a7fa476bd2cb81b2e7905e35b760cd8bbceb6aeaef8",
-        "bytes": 57486,
+        "sha256": "4579b7580ea64f0f4f7e22bd91e754c3889f13d22dbf3e8106f8e0faae78a2cf",
+        "bytes": 57665,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--22-color.png",
-        "sha256": "df3bacb510d24f21aaba1c628946d25a9415c97519ad4b63520a379dc8cef0d1",
-        "bytes": 45676,
+        "sha256": "d374556fc538d9bdd767ecaf941e86e85a22266a6a95d4166bb62349c013f74f",
+        "bytes": 45834,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--28-grayscale.png",
-        "sha256": "06cb6628f3c29522f721273618c40d65953e9c1c6f995bcfe119f4f7e2f198c7",
-        "bytes": 43688,
+        "sha256": "0f7eebe6134890e3fcf2908af1177728c8fb666085d2a2e93d243917a43ad490",
+        "bytes": 43819,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--64-circle.png",
-        "sha256": "e37ba28b06289ce93e6db7914be18db45af6b35e0d561b457fc3fe83c247e678",
-        "bytes": 139437,
+        "sha256": "122fc8194f76c9f79f742f480684b93039fed3316f0c7eadfb5be03a397c6867",
+        "bytes": 139655,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--small-multiview.png",
-        "sha256": "2104d8f67998d78383ac22ca708b9af22f9c75cb82fa8cbb8185c1b6b0b6f2a8",
-        "bytes": 252480,
+        "sha256": "f4f8704fe0af5377f7a0a53539940cc67de6160317bf3fc67346d19362a15190",
+        "bytes": 252652,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p02--identity.png",
-        "sha256": "3697a6e122eafca98e0c0136c147d6bd04ba43e7cc71d2a546ceeb4c337dc5fe",
-        "bytes": 444910,
+        "sha256": "dbf01566cb97101f6444e9547490dde4ad288920420e7c58fd50714f48c75f5f",
+        "bytes": 445282,
         "width": 1800,
         "height": 452,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--128-color.png",
-        "sha256": "440e4a4ff920b20b03da3ded499c2e0bb9c3722990aae76880daada53b4a53b5",
-        "bytes": 2291219,
+        "sha256": "653b0db7ce0a58361a3438e3b36e9c730cae16e7f2879919679631b3253e4066",
+        "bytes": 2291955,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--40-color.png",
-        "sha256": "8a60495c1545c1615dffe503a1c7b9f3e67a23582883894866dee151dd149975",
-        "bytes": 401678,
+        "sha256": "cb81717ca904641141a5fb2b4fe8e938f0bfcf493275d111dbf0ad3a0046e14d",
+        "bytes": 402541,
         "width": 1600,
         "height": 898,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--28-color.png",
-        "sha256": "02b6beb7e203bcdc1f14f5596a2e1f567386a20e6e0271ce9d88e4ea6d4a62bd",
-        "bytes": 266854,
+        "sha256": "007465f3cafb781e6873435ce863c550e02178faeb2ca41403ac31ecb2ef2f0c",
+        "bytes": 267718,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--22-color.png",
-        "sha256": "1aee5e9fc926e2f922b47d71a2cabc0a9c816b64689e6b69a07997b18c82786d",
-        "bytes": 205967,
+        "sha256": "20b2c7a2fa64b94cc0ce9431bf3054c9b3fcd5cb0d24f58a54ecab6cbe59e635",
+        "bytes": 206853,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--28-grayscale.png",
-        "sha256": "ba1dcbffcd3b61bb846612f66e281e1163494405c070be8143523c79444566ce",
-        "bytes": 190642,
+        "sha256": "3b14cf1d0ecabc62aa25a6968083ff242ace5daec07bbffb0bad8ac721448e17",
+        "bytes": 191422,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--64-circle.png",
-        "sha256": "a8500776e36a0243ed454a9b34d6f28b4d5160a80cbcbfc9bf922f79c41c59d1",
-        "bytes": 714337,
+        "sha256": "bb6217b8b8f53ada20f415d9958e1fa6ca15cfc172e7580ad93e81d4a4c86cb7",
+        "bytes": 715185,
         "width": 1600,
         "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--small-multiview.png",
-        "sha256": "3321faf797e31955f88a6483520a261859a0c8535c113904bf3bd9a41ded6cb5",
-        "bytes": 1283794,
+        "sha256": "2b6c477f700a8d5b9b266612ab4a5ba07e1589d1f24f31489fd8dee8b996e0fd",
+        "bytes": 1284709,
         "width": 1800,
         "height": 1570,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-feet--p01--identity.png",
-        "sha256": "aa8c409c5ad9970ea93ae83cee5043c038f3dc19cf9d029f4fd22068b3b98f6a",
-        "bytes": 2365574,
+        "sha256": "066448e2a5fcdc00655ecab0480520298fb4cb374308180358e6471081b0325b",
+        "bytes": 2366669,
         "width": 1800,
         "height": 1472,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--128-color.png",
-        "sha256": "044278924c8353e4e2b5d68607afbca51c49dd61069173aef6db195ed0f596fe",
-        "bytes": 1382163,
+        "sha256": "980c83aea82a9c90974f093d520b52102c4e33815b8a95c15f0a4bd678d8ebe4",
+        "bytes": 1382870,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--40-color.png",
-        "sha256": "847e7400398c8ff34b1ce667f9842969ae33ccb22d6107ef17528a533b763849",
-        "bytes": 241452,
+        "sha256": "ee4c548f41a088547aeca429e6bf3cae0b7754fe212cff37d73980f4fd7bbe6d",
+        "bytes": 242256,
         "width": 1600,
         "height": 532,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--28-color.png",
-        "sha256": "b36b4434d49eb32fc545558741feef8cb8b6ca156768d6d9380150bcf5396713",
-        "bytes": 162119,
+        "sha256": "7805864ebf752935814aeeaf0709387cc49df2a393d97bb907dff6ee611192d5",
+        "bytes": 162990,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--22-color.png",
-        "sha256": "adfb81c6a6ae8ab4c51d623435f2acca9cde202247be427f08e54bbb870af46c",
-        "bytes": 125715,
+        "sha256": "6f443bed27875dffea2925dedd5e2b91d1bca7d049de16192f1cf7abd754dbfa",
+        "bytes": 126572,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--28-grayscale.png",
-        "sha256": "23a8c036131ecb3023b462ba7234155b68d709cbfe79504956ebc80139f5e16a",
-        "bytes": 115758,
+        "sha256": "a972f5bc098ab57de98bff52c0af04bbd353f10a97a169db9b692813a5a3ef8b",
+        "bytes": 116533,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--64-circle.png",
-        "sha256": "f894b5ba2c8c2e022c33fe8f9d336b0bc371746dd6ca7b9478cbee0b8a1e012f",
-        "bytes": 441023,
+        "sha256": "83ec26cd866e7a249c0a04236be5c94dcac8f387708d789f620182d0e371ffa5",
+        "bytes": 441848,
         "width": 1600,
         "height": 708,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--small-multiview.png",
-        "sha256": "6b94b2ffdb538cc6e3a6b9465e8eb9b62f0e614abb3bbe3c7c495d3dc20328eb",
-        "bytes": 778615,
+        "sha256": "52777ff56f5ecd9cebd30182e62502fbfb2d5675c6d3adbda2e63013a0d13b0d",
+        "bytes": 779437,
         "width": 1800,
         "height": 916,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-gloves--p01--identity.png",
-        "sha256": "306f320c07bf95c246448e7a8885aadaedb7b2b27ca4b5de250183ed6bdac0de",
-        "bytes": 1428297,
+        "sha256": "d1866f35319a8d350c74e5e7769b13d8f76ab6e37a4c68e60c59264e1e3b019c",
+        "bytes": 1429141,
         "width": 1800,
         "height": 860,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--128-color.png",
-        "sha256": "f6368a315522a9555daf49b5190653f81f537556ef2f68113855d9b7101b4f4a",
-        "bytes": 1363668,
+        "sha256": "374e34f74963a660dc391162f60239609ab555c07e8af0aac04266dc40594e51",
+        "bytes": 1364272,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--40-color.png",
-        "sha256": "7d1058d74e0b0b2532f0331896c68c3cc912acba333fbfd382680b435d9cff25",
-        "bytes": 245060,
+        "sha256": "0ba88921c57289116691b4b3b945150b80f8a3abd1af151e6a74ae9118b6f308",
+        "bytes": 245665,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--28-color.png",
-        "sha256": "0bee0f784e9a1bd3bb4f1315f965f1333de37be8b7333bea461d640b9a7386e8",
-        "bytes": 164382,
+        "sha256": "e8bbfdf56732c54aad00d559e81996cc40c3398e6e02f3d9176915cef41a74e9",
+        "bytes": 165014,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--22-color.png",
-        "sha256": "c8b1c4be6bb90b087ce36022c949e69843b95ccb4ed262dd0d138ff805a69ef8",
-        "bytes": 127872,
+        "sha256": "ac1f6804db40b9577cd4566daaee08f1e8028f25651992fe810f5c0e6137e634",
+        "bytes": 128499,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--28-grayscale.png",
-        "sha256": "a954d112d0cd31930a7b6ed3499be41bcad7e11beb3e00b0a3f4a335d29a85cd",
-        "bytes": 119545,
+        "sha256": "43a460180412bf9775a45e6929cb1dca6aaa614715edbd45d91d3f4f5ba86139",
+        "bytes": 120122,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--64-circle.png",
-        "sha256": "35995201d0276549ee3eaf586f1d3fffac3f41615e89d5a7a186e4785b28d78e",
-        "bytes": 434932,
+        "sha256": "fd2f5a2697dabcab04a5f59541b76ff9e44dcf2ba75722f3644f5cd2c1e02bee",
+        "bytes": 435591,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--small-multiview.png",
-        "sha256": "1363f99aa174ad7c08e7f4ca87d022d9e7efdf0a2ecb8c305d5766e6e9830315",
-        "bytes": 780951,
+        "sha256": "b32d07edb4c1ea0e092b132c4a6445f8d5a94deb0cec3209e251ac5611fa24e9",
+        "bytes": 781533,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-helmet--p01--identity.png",
-        "sha256": "4461a102a38615263ba9a2bfa7d0081aed13fefe3b97749d7407fb87d06835d1",
-        "bytes": 1411335,
+        "sha256": "c30cb5bea9e115b6218e05cf74b9e633b2c8e7eeae5bc7311614e02ed6cc0cd2",
+        "bytes": 1412135,
         "width": 1800,
         "height": 1064,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--128-color.png",
-        "sha256": "3e15eb26a246a7c9aea6196beff968d8dc19e1fec5f0661d089de68a95305664",
-        "bytes": 1866033,
+        "sha256": "ff19ccd062d0346088bec4cf77e56d42fb7ce32fa146cd1579ac53689569728f",
+        "bytes": 1867014,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--40-color.png",
-        "sha256": "af40c5194a3ee401866eee7f3d976d3f54bb8a2fb8525ba312095cbb752a8ea3",
-        "bytes": 343427,
+        "sha256": "bc193a3bbb575d7976ecc456f15d9fd864a60cd924696471915a1af82d414d31",
+        "bytes": 344606,
         "width": 1600,
         "height": 776,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--28-color.png",
-        "sha256": "41dd15c7ece9d100427ab667d0b67e3c0b97779c345e8a220edd8e15ece1814a",
-        "bytes": 232429,
+        "sha256": "69d5ff4e72235dac8e8b696f0c1a9fd926763db292035f77d9df0fd067b008b8",
+        "bytes": 233408,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--22-color.png",
-        "sha256": "1ae6b386ac0db49a295abc344a76740bc4ed6a7e880983ec317a4e04483a0b33",
-        "bytes": 182300,
+        "sha256": "7101d9a610af571cc61572fd843b07dcc5b40111aaa8578a64369f280cd24ff0",
+        "bytes": 183508,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--28-grayscale.png",
-        "sha256": "4de4637884a86abf0367db34eef0f4940a0b628d87097d2b002c83b223c6055d",
-        "bytes": 169361,
+        "sha256": "74667ba89d572c8059a3f6e86205b92755798a2c755446c5b0f0bb33e205305d",
+        "bytes": 170367,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--64-circle.png",
-        "sha256": "4a11dbcefe1317b2cc37b74b481c2dab7058257071704aa7a5bfcbf662c2dca2",
-        "bytes": 601926,
+        "sha256": "7d0b3ab525689ad1dc4b92ea466e5bf79e814601923bcf8f0a500e10c2132d01",
+        "bytes": 602978,
         "width": 1600,
         "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--small-multiview.png",
-        "sha256": "12702b89419634390801e7268bab5af1e5fe8714afd715340ae93ab603b4efa4",
-        "bytes": 1081029,
+        "sha256": "06e0362be322d2c71f9a648cb172b6c2fa51f23d987de12756b9187a92a81fbe",
+        "bytes": 1082041,
         "width": 1800,
         "height": 1352,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-legs--p01--identity.png",
-        "sha256": "f4e9a52c854ff9e47a1e80e76665489f91008e179423dbac92d07ece90851b31",
-        "bytes": 1936629,
+        "sha256": "fa508aba97b05006af315ddbe67000837c366bb5a3603f5e2b982038e7f6bc4d",
+        "bytes": 1938373,
         "width": 1800,
         "height": 1268,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--128-color.png",
-        "sha256": "09eae60066443c71639fbb3fef92e1adf4629d3acf00257d7ca649824ef2cd8a",
-        "bytes": 284819,
+        "sha256": "54e44fdcf33bc6e56e40ebbae45f2be1c937d80201b92b7e7bc1e1a8d9da4c12",
+        "bytes": 284909,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--40-color.png",
-        "sha256": "00f467c524587d2057179cddc7b4683c8c28af1f5deb1f276f947f4afabc7755",
-        "bytes": 53159,
+        "sha256": "90994ee22a90d80b630fa32a1cc396f70337abace7122e17b312deaa6696ce2a",
+        "bytes": 53215,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-color.png",
-        "sha256": "5bc27f13626d9ff6a1cc593d269b489f2afec3f6802365cad19f7e94c804ba30",
-        "bytes": 37836,
+        "sha256": "b5efae099aa245974698e900627f678efb46a32be7eb457ebca3dd194d024ab7",
+        "bytes": 37906,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--22-color.png",
-        "sha256": "80617e1eceaad574a7d072770d55a20e291f73f05cf1eaec102ce63e1d3bf358",
-        "bytes": 30015,
+        "sha256": "e4b0861bfc4b9742dab285c7394a0ce2fa517c8a4264637c7f29713adb6cba5d",
+        "bytes": 30079,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--28-grayscale.png",
-        "sha256": "342ff4d1a567fb78378ca116a9009017045de29c52bec866433ae4c4cf298450",
-        "bytes": 29449,
+        "sha256": "047c54364c2767759afc2fa9df8ea225f397edf4734fd786659ff16672f9bcdd",
+        "bytes": 29479,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--64-circle.png",
-        "sha256": "49d01e5fdb88693923f82f89b447be86f61836b7d7bf9e2ae90d274cd37ecc30",
-        "bytes": 91488,
+        "sha256": "a536b350ecf8f4fb484f9f30286aaeb9f3000085d9d818d16abf6af6a70b014f",
+        "bytes": 91541,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--small-multiview.png",
-        "sha256": "97bb16ec4b82b03c5e122fa233f629ed6eb998932bd24c5e54a90ec9a043a8e7",
-        "bytes": 165242,
+        "sha256": "af5c2c0df8c502cc91c5bee4a72c426fcde875ccb6a2f6f8e1a12bad44a53f55",
+        "bytes": 165329,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-neck--p01--identity.png",
-        "sha256": "aa482aa24bb511452acca50ba909819ed4a0261da61f8b2c98b4692ca79c54f2",
-        "bytes": 296873,
+        "sha256": "97f7951a584523e608e839fa65a21ddffe16ad2625eb5081d75afa5d7c821786",
+        "bytes": 296919,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--128-color.png",
-        "sha256": "2efbde9a35a9adc7041890b5a0cbdf0e467deda220f5931fb1c2f99f4f8c0129",
-        "bytes": 203061,
+        "sha256": "dded89e063199ed6341107f25e4c49062364c838dcb39f870e0f3eedff3b419c",
+        "bytes": 203146,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--40-color.png",
-        "sha256": "55ff7d96079f793a2320552e49095bb93ddc48f71f7db104b96ae0f801aa4b84",
-        "bytes": 38522,
+        "sha256": "a7f9a29c270246106908265a8ecd64061a402961a2d71a7e4b25ea866c742d5e",
+        "bytes": 38577,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-color.png",
-        "sha256": "03cb0383999294bcc5768798935628271bea119250efde17e2aed3b571a577e2",
-        "bytes": 27724,
+        "sha256": "0ba214d6479e0b6a3a886bf7fe5cef79e801efa40238b8e243e58ec66972e353",
+        "bytes": 27777,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--22-color.png",
-        "sha256": "5bd2908d5efd6be2f0a92a902c521ec14311b9a9ab7b726ba4b76753f8016a4e",
-        "bytes": 22674,
+        "sha256": "168a6571dcfb47298dfa441c502aebfec830fd8d0698527884edb475ec7df9b9",
+        "bytes": 22747,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-grayscale.png",
-        "sha256": "89a153361fc8edce5c6f9eddd7dd667ac2951ef3d010ac30ffd4450cec4e960b",
-        "bytes": 23660,
+        "sha256": "70b5ffbdde285592835a52f2d0e48b02b58f4ac8ecbbe57742bff49380c44407",
+        "bytes": 23709,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--64-circle.png",
-        "sha256": "76e508465a6eb33a624ce5b0790df66ff5590cbb4a85afa870081bbdbf1ad9a6",
-        "bytes": 66258,
+        "sha256": "8e6d377f6e28004c70a617d49a236840936712dab6205e6790bbd733058c5977",
+        "bytes": 66340,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--small-multiview.png",
-        "sha256": "be704ed70bb439a53ccbdc6649b6f685c458ff97e64a8a8132c91dcde3922e28",
-        "bytes": 117029,
+        "sha256": "d2e577ae24d4f99618713f16f84f12a2cc361fa663047121a85f7412cab03b5e",
+        "bytes": 117131,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--identity.png",
-        "sha256": "556e6c0f0cd2733f4879fc9ddd183c19e65de47268a7eb3cfed503ae1d8917bc",
-        "bytes": 211654,
+        "sha256": "7f5cc0359d5b9e3f2917dfb38b256c5bcdda2104baa0a275e11f77e09eb9abce",
+        "bytes": 211710,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--128-color.png",
-        "sha256": "8a4ab46ac77939e68d7e80ab152cd9a9207f8028125f94650daaf75e4866d11d",
-        "bytes": 578028,
+        "sha256": "bf00c70deb98b443a597a1da6769d161d0c7a7b98262507b1f60cf79f0b68ead",
+        "bytes": 578268,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--40-color.png",
-        "sha256": "de4f4589473e05af86b227e8bd4155be02baeb4cb575f31ead209a3a88c4861b",
-        "bytes": 106576,
+        "sha256": "3867722e82c9478c5955ff2984f46ad3812a3e26ee603d72ee5fbea2f3088aef",
+        "bytes": 106837,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-color.png",
-        "sha256": "1ac6698d1f78369186dc77a28f31103f5e0dcc7cb9683b6e59b6e2044072ecf3",
-        "bytes": 73792,
+        "sha256": "d3988615ecc0878b1c294258e4e6c21c590082239b536c195275f5dcc4fd1d4b",
+        "bytes": 74069,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--22-color.png",
-        "sha256": "2b65b3f2bc50cea03e6aae36a7470aab5892d88b062dbf8d209fae478e74ae27",
-        "bytes": 58554,
+        "sha256": "4751e3c3ee3c71e151873a72ebae789e2d45991365bc860d7ddf48eeecec02c2",
+        "bytes": 58826,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--28-grayscale.png",
-        "sha256": "4229c608644c69206eada764cf2f7220ae21bbb06c9c55a48a035079c96b90ee",
-        "bytes": 55062,
+        "sha256": "6d59d8ced03252ad45686b8e59cb3c1ef6e00c57675ef50a1c04614f88d820df",
+        "bytes": 55331,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--64-circle.png",
-        "sha256": "2bd0907e6a9ae5b770a8ba2c6957c7478b0c95bdef7a2e1f2b23f347b3532b2c",
-        "bytes": 191720,
+        "sha256": "aa26ddff586fb2f561a0e654cbe1f7913abf76cba6f918b9fb0412cd6653426c",
+        "bytes": 191950,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--small-multiview.png",
-        "sha256": "6a859cdbe19b3d499809e97399205448afe0ed97d6627fa01cc0c5012d37c098",
-        "bytes": 340557,
+        "sha256": "90c4e681090f7fab9aabf1c6ce1ae8fc8f50d2e7f5aad9830a68096cd34b8198",
+        "bytes": 340773,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-ring--p01--identity.png",
-        "sha256": "42e32d98c90532fd8d967f425875d73faf8c21501d2848fc9b9148d578d6a48e",
-        "bytes": 600851,
+        "sha256": "ffa77c0ef31b687898999397fb7eb3dd03c2017970cb8f28257ac32b54b12fb0",
+        "bytes": 601107,
         "width": 1800,
         "height": 452,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--128-color.png",
-        "sha256": "302b51638e0ad4339b8d95ac96907092d9be0e86874cc6346b316bf32f746be0",
-        "bytes": 1652746,
+        "sha256": "925ae79ff5def052b67008845afe82675e06c8d71df8fcd5565216b1195c0bd3",
+        "bytes": 1653353,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--40-color.png",
-        "sha256": "7a1ab895b5bf94482e464b07e02e9e8751dc9b3bfd9eeb377246784d14257fc8",
-        "bytes": 290146,
+        "sha256": "3cd31245ace7d56c27d85ee2e8501cd2da24483c30669fdd9d51c17d70453602",
+        "bytes": 290901,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--28-color.png",
-        "sha256": "3d6d4fb9ecfa5ceb721e2da7d1f566163fbc35973e453dae8a55c5877008ef2f",
-        "bytes": 195639,
+        "sha256": "05c02068a103b66ff1563f2fdbd5d42e49d6f61c710d3fc7bd0f5bed8e865033",
+        "bytes": 196397,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--22-color.png",
-        "sha256": "6ded1f3170930390bf037248233255f55ca0b417f779e5f8e8ea94e132c1f6aa",
-        "bytes": 153217,
+        "sha256": "f81fe08c5ec3c96caa1885877ae90c28cf9b1472f0f87c2bff4ddc9389aff68d",
+        "bytes": 153927,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--28-grayscale.png",
-        "sha256": "8d69aacc21444fb82554a4432d0aca40d5bb6a6d4a5eb42fd7f8419b32dc16c1",
-        "bytes": 141166,
+        "sha256": "b5c4b55523b047a44a13e2bead11dc406ec0ec7ad1fa23deca16cc1002d3c434",
+        "bytes": 141810,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--64-circle.png",
-        "sha256": "e5b0576bd570d33eb0c909f27efeca03e9613c8a2108c6f5421a919c85e20d51",
-        "bytes": 526856,
+        "sha256": "2baabb8a695ce3e0e41ee17366ed656a08cc753b8b52bc575276cd762337361a",
+        "bytes": 527573,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--small-multiview.png",
-        "sha256": "9ce5bf8f2c5cd25f235248cb5adfbbb8f9a8d577516b4441eab9bb3d00ab0165",
-        "bytes": 928300,
+        "sha256": "9c2297499fc60e7b0deebd879facaaf718b2b518d78003af9c336c8e77a597aa",
+        "bytes": 928887,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-shoulder--p01--identity.png",
-        "sha256": "c6b702f688a768179d194853a611f5e0e80b8deba9407fc90f6348fd8f599308",
-        "bytes": 1711569,
+        "sha256": "d598b3a6f214b893d0f2555b953090e71795fdacfe495548d50dd627be467a64",
+        "bytes": 1712360,
         "width": 1800,
         "height": 1064,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--128-color.png",
-        "sha256": "917b43a2a7fac36471f2919760ab6b34e47b6bd940f42a11cd46686961a8af85",
-        "bytes": 891113,
+        "sha256": "a31fcf0ed1496b4d72162da8e929a2885947fc3a5238d54c3aa7f0f9db3e846f",
+        "bytes": 891457,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--40-color.png",
-        "sha256": "deb634c926bfec1668ae84d33bba0e02b7f7f23961c8609f385792c7597c7ff4",
-        "bytes": 161194,
+        "sha256": "caf593c299bc10507fdca2c57e0eae0a428bbbaaa85d2e3535f4c5a083279da2",
+        "bytes": 161608,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--28-color.png",
-        "sha256": "22b253c6f01d8391e4c1b9c0eb1f7e6ff5013ce4f47cc703de33d87f2c8e16a5",
-        "bytes": 108164,
+        "sha256": "72fdaafb87f5d6a0fba3ceb1e60dc7f3dd1a39dfb6c096b982ed1cb1bd8f9492",
+        "bytes": 108609,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--22-color.png",
-        "sha256": "e9089090f0bb8e779e3810326e173d88fabc7e713018a52bfbada13278fca305",
-        "bytes": 85007,
+        "sha256": "f9a983ed2430ce705390e68f368abf05acc0a7ae0d67373c351bed4bdd35bd16",
+        "bytes": 85463,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--28-grayscale.png",
-        "sha256": "bcf939651b33c45c24bcdb6583e17251c1fcb5bde5bf88a0006688f4a25466ae",
-        "bytes": 78341,
+        "sha256": "996d78412dea3172137a55efb7023565eb51251ee3386f69cb394ba6718c7ba1",
+        "bytes": 78713,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--64-circle.png",
-        "sha256": "1d9d8b248f3224bd4f52d93f832a75774280745c1dbe166e5d3872625d220681",
-        "bytes": 286103,
+        "sha256": "86fd0bfc9222eb493f679151969cba0f5b9ea2ef776aa851074bb52dd38f8661",
+        "bytes": 286526,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--small-multiview.png",
-        "sha256": "0121bbb6ef366f22f3131b6ee68e701550e86a252fc783ea65100101fc6d3e60",
-        "bytes": 511175,
+        "sha256": "1a41d2ac469e93b76a2fc5d9258e5aece2a83c9f6b9902d1b9ff8b8b1222b1cb",
+        "bytes": 511532,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-waist--p01--identity.png",
-        "sha256": "2000273339befd2daef56aff908ab33e099253ebe8db5b8a658ab35a4c7b45c3",
-        "bytes": 921986,
+        "sha256": "bcafc1f26183efa145d0431f34dde0a226f080d786f46f073b75927548c00e8a",
+        "bytes": 922443,
         "width": 1800,
         "height": 656,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--128-color.png",
-        "sha256": "1740a2b2b31d515aa9ced2255d5b14a625fffd8b3f036f27544da19f9a1db5a8",
-        "bytes": 205497,
+        "sha256": "9dc1f42b24861f08ef7e490a4729dd544a31c347e1e554f6dc017dfb2d1d5f8a",
+        "bytes": 414632,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--40-color.png",
-        "sha256": "817c90d187fd8b182a62b01f523b27d5cedeb66f487c60f4a2c9fce7014d4c1c",
-        "bytes": 38237,
+        "sha256": "22912fcf62c7d7f65d3d4bc8e29b396c07ccbb5b5eedc4253725e739b67ce419",
+        "bytes": 78985,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-color.png",
-        "sha256": "0dd61ce32e267617c375b55e16c4a3f66b1d3aafd3764b933947a7ae18ffd2c1",
-        "bytes": 27573,
+        "sha256": "6eac7554711e37c601ea708d8a83be2f5931533764cbc1b3c4afb74109e14df8",
+        "bytes": 56117,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--22-color.png",
-        "sha256": "0beeb51cc29c9016c52fdd3356eb6caeed91796610b7b0cf1659926531c9a02c",
-        "bytes": 22110,
+        "sha256": "fbd4efa3ca67d1187fffb6d9ac55c28e78715b0efd3b805794434393b35f552e",
+        "bytes": 44574,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-grayscale.png",
-        "sha256": "d5ba62ced0ccc60c26ea577a3efcc894ae5f5d52c50d1cefd99c55fd8b35415f",
-        "bytes": 22465,
+        "sha256": "683c1f076191d6cb982d14aa9c664d907976ed415d0df0983a014e847b0670b7",
+        "bytes": 42438,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "2618ef73c3043f46cac4f631a4cd362168a0e84cf37ce9b0ef4a64a64905e2e8",
-        "bytes": 67973,
+        "sha256": "39eaeaac0afba4a9679b5b8e73461d6961da4b99dd30daf832db394a8fff9fc0",
+        "bytes": 137853,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "5ef91f33eda1e9fa3f42aa941f6dcd025949444f7312516049793257fcee5725",
-        "bytes": 121235,
+        "sha256": "71e5d5474a416238942554830cdb5dd860ca99e07a1fce6925437dd2ae817261",
+        "bytes": 247595,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--identity.png",
-        "sha256": "be243cd2875225a9b169b45bcc307b3551267dea2573026635815f35e9b14bab",
-        "bytes": 214532,
+        "sha256": "5352ee0940df7aa86a7e39fb209613f68f2be127ba86c53095970f59a4644c3e",
+        "bytes": 432542,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--128-color.png",
-        "sha256": "cfbd4c56aa2aebb1f7fd4d5170a0657f61c54105011405007fa3b59167a75620",
-        "bytes": 315601,
+        "sha256": "0863831c7f2f13176850d7db4a22b194e0e57779a3bed2b57a4c843a95bb7423",
+        "bytes": 315662,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--40-color.png",
-        "sha256": "d37cedd9c730d3762edde922af5056648b83eac408ec6dca13d12c6d72fa633f",
-        "bytes": 56775,
+        "sha256": "b28aca65cca8ce7a055430d08a72b4ddb1ff95b3a3f51e021c07df00a53427c1",
+        "bytes": 56794,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--28-color.png",
-        "sha256": "8eae277580d9a3ba1ee30d61bd871358ddd928e0b363eef5d68e1bac1fb87bb8",
-        "bytes": 38681,
+        "sha256": "25febc8847d5e805db61773a217c91198f053ae03a60a5ee95b30b1ea2ebf586",
+        "bytes": 38726,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--22-color.png",
-        "sha256": "bbb68739ef9b00b74f7c29075af8bc196e3c4d0a8fb850b45038b3b2977baef2",
-        "bytes": 30021,
+        "sha256": "61ea7cc1d0d9bc575de11ab6df2432046eee294f2175a5184af6798f3e0bc9c2",
+        "bytes": 30065,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--28-grayscale.png",
-        "sha256": "916e21b9412d8245582a9698238a2277d0995910e8cda59a0252904d57cce746",
-        "bytes": 29043,
+        "sha256": "8e26e24c536abbe5eec8f49991101a87246cd596ae39a1ae8d9d5d664cb6c83b",
+        "bytes": 29094,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--64-circle.png",
-        "sha256": "35732a4ddea769f7d451ace9892bf9baf115036d9c3d89b60c019ca7a9c545d1",
-        "bytes": 97452,
+        "sha256": "476827107719ec3dfbf439bc4f17c332e3a73ce37d33ed74be62412f92f0ab8b",
+        "bytes": 97531,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--small-multiview.png",
-        "sha256": "ec782149cc374086cb164d840c157049770027752d417e7e476c60412a5a9e17",
-        "bytes": 181046,
+        "sha256": "ae2379d85281724d5611831d237a755aaf808b88060615e97fa05d5ecc0b3520",
+        "bytes": 181160,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/drink--p01--identity.png",
-        "sha256": "6e1a638d38c826b985edf63fb94bf4935b6468f230502a7f91be8afc6f6dbe87",
-        "bytes": 327492,
+        "sha256": "21e413bb819275f1872206d52f8b3067ebdd4fe8741f3777827c78034c82522e",
+        "bytes": 327523,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--128-color.png",
-        "sha256": "bd9550d1d7b9e3ab8b2b9d6b2333dd7ece55999d6dff9d28e0f32a400307abb2",
-        "bytes": 150403,
+        "sha256": "e80ff4fc0e4a30cd08b4c92678fb1db419dd0a0659d032f64472b89ac01ad06e",
+        "bytes": 150459,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--40-color.png",
-        "sha256": "2cacbd547739b891ceb487f6402bec7ef84aa6cbecf5bee0ae00753477a3a763",
-        "bytes": 28995,
+        "sha256": "1e1fa1639784404f6e83a4bb0dc0c8e06148bd58ed28701a2a1a310133110263",
+        "bytes": 29062,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--28-color.png",
-        "sha256": "1d34dcf758deec6c75d0260c444157621ab4e8fbf3ff5d5629447c6d9c753e83",
-        "bytes": 20765,
+        "sha256": "9a4bd04552c0902de59a5466a05d7c4f57bb743bd29a175a7399f0ef2d64292d",
+        "bytes": 20821,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--22-color.png",
-        "sha256": "8201e17af488ef1656a51ace683cbb7fa5a1200dab295a832acd094711c398e7",
-        "bytes": 17152,
+        "sha256": "c7856b7e5398be369eed3bb569527328d3acc21c6ea23cc3f00c8a76eb6de391",
+        "bytes": 17205,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--28-grayscale.png",
-        "sha256": "9a99fae6b7dd6fdf99f9192c0071c778eff7ec7874dcbc5e1d9bd5cb97c6b028",
-        "bytes": 18329,
+        "sha256": "a63adf51ffc21d3cc0a8c053e67cde7c15ea4add0ca1104b26cde501ae190dae",
+        "bytes": 18380,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--64-circle.png",
-        "sha256": "2bc963a00ce5f0ce0fb9e1ec6242eed17eaa083c2a9e96bd03dc108962701e0b",
-        "bytes": 49667,
+        "sha256": "7bf5eff343ae0e60c0bb74ea9c00a8415b735bd7fdc88a1b47250706865d0a08",
+        "bytes": 49768,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--small-multiview.png",
-        "sha256": "5d524ad4ed5939680002a2fed2dcbc2cc3c2774ce3fd9a6d3607e63a91be24d5",
-        "bytes": 89739,
+        "sha256": "85a6f40aea5c2cdd95a90978f9ae768cd76dcef328980c8d75bce5dbac4fa354",
+        "bytes": 89703,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/elixir--p01--identity.png",
-        "sha256": "f3ffdb6d6d9a779f2111f019f0ed9e7d3b083dd44cef232e82744314b5abc540",
-        "bytes": 157444,
+        "sha256": "40639f736ab79413ed05b9912942b43414f5a5d047629d422b1a82479dc9350e",
+        "bytes": 157386,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--128-color.png",
-        "sha256": "66b05449b814736d91f55d1d7c52e06eb6f1436308bc45499354c57d3f99924f",
-        "bytes": 817021,
+        "sha256": "a91c61805d255a73a7706c6c4e1c39f25198a9249e3b074a109015940557531d",
+        "bytes": 817332,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--40-color.png",
-        "sha256": "cbc77d89fd441d01c12152b770ee1f854b2f0b5ea995106521b1e1d8944a1201",
-        "bytes": 135166,
+        "sha256": "8988bac8608680234d9190bc17d82725eb18ba49e574e903f58cc9bf52e90bef",
+        "bytes": 135501,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--28-color.png",
-        "sha256": "b03cb0d32bda966af4cd087396f706da41b2d61012e80df2f073ed1ecd329d1b",
-        "bytes": 89285,
+        "sha256": "81379f22146572cdb44b42af85212f284b77c73b172d94198d2852c054bb5e0b",
+        "bytes": 89637,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--22-color.png",
-        "sha256": "0d9421cbe6682df2c2fa3d6be2973748f6b77cd6605463f73224be7e041d6477",
-        "bytes": 68242,
+        "sha256": "2755c95dc6b592910bf1bce1d4fe6ad782f9f099fd5655544a4881aeb3a26932",
+        "bytes": 68613,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--28-grayscale.png",
-        "sha256": "f0d2b63f639188311c9085bd28b6fcd282d19ddb0d20e2295840c62dacb47985",
-        "bytes": 64506,
+        "sha256": "c5f09c6af069b1ace84e03d88f0d8d26da70615bb7abf697e0816f9287746326",
+        "bytes": 64803,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--64-circle.png",
-        "sha256": "8854bf51aaa01663a2da9753426be3717d0c17432fab625c878cb9f0095887e5",
-        "bytes": 246700,
+        "sha256": "1f249116f08463b342d27c77a24491e52cf2f4cc866cea52a8c0d0ead81799e0",
+        "bytes": 247076,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--small-multiview.png",
-        "sha256": "63d004ada8cd11182c36f5cad2f7e24bf673ee93b0ad53b7dcb80f165dae88e9",
-        "bytes": 441839,
+        "sha256": "657728c30e0236444ebe647f0b1bae2592645e9de81ac71b15ca8e34b0635418",
+        "bytes": 442148,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--identity.png",
-        "sha256": "50b9ca9d83f1a227ee8840b9c5eec253bca877df01999c9e1b56ec958a132c99",
-        "bytes": 844539,
+        "sha256": "c5d4efe24059f0dec670989d09c53d2a153279ec72a86c62e7e7a7b83e8772c7",
+        "bytes": 844922,
         "width": 1800,
         "height": 656,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--128-color.png",
-        "sha256": "1d2f295a2bd7fa70ae2fefca2905f6f9b4257e055c6315043f52444d40bd7775",
-        "bytes": 266246,
+        "sha256": "763817ea426b6f1fb8bbf2b28c0c876704d989046a4eab30cbc094b8ebde7110",
+        "bytes": 266287,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--40-color.png",
-        "sha256": "b0a000aad4b954b21fcefb51067601a4d677374283b978c1f450980f77d40443",
-        "bytes": 49423,
+        "sha256": "2a5962832ea56b5548dbf72a5617e01e156ad85d2be69c5e0a08424dca9669d6",
+        "bytes": 49508,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--28-color.png",
-        "sha256": "7bd97abf71d666952f10a3ef71679bce250936d1447ee2fa76a799aeae274149",
-        "bytes": 36860,
+        "sha256": "086b9978df6225c24234361723ac26820764565764901107d7666b057b642266",
+        "bytes": 36928,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--22-color.png",
-        "sha256": "658e6d8f33f1ce5ea3be7000fb4bffa1925cf1a693e9a6e17ae09b26d166dc3c",
-        "bytes": 29759,
+        "sha256": "3de197ac2928fb3c1a3189ae542221c2b240792db965a85684798ae5952158e1",
+        "bytes": 29817,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--28-grayscale.png",
-        "sha256": "bf7b0c19b5523165e1151ca86e205f6491bb4390782cd4e805b29a6c7d87beb8",
-        "bytes": 29911,
+        "sha256": "73f4dc820f8093de08a617171ef9ab2abfba21a0f780194eb99d2ce7dbc38515",
+        "bytes": 29976,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--64-circle.png",
-        "sha256": "24817ba0004700378ea528c07efd19a83283ee81d377c881f3b83d2bc2378fa9",
-        "bytes": 89843,
+        "sha256": "43cc76cf1875c1e867db649df3e430a04cd13cdb35dd26b7af4231ebcbda132e",
+        "bytes": 89959,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--small-multiview.png",
-        "sha256": "dced51beea964e861d226f6cf78df7eb8bfcb727e8acbb483719a40145bcf157",
-        "bytes": 155524,
+        "sha256": "196e0dde5963ec11f44d0207a56858f88210eae4dd8960050f327a8946a749b1",
+        "bytes": 155664,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/held_offhand--p01--identity.png",
-        "sha256": "f9c2a9fb99a46c05157be393b785ce32f9f0c4f768d5fe24e28966f244002582",
-        "bytes": 275398,
+        "sha256": "96417a6944d19a8582bccf3754e7c2283e67195d3b308ba259f5d4458e814f4f",
+        "bytes": 275543,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--128-color.png",
-        "sha256": "09ef972f5992ffc68d044e40fb1067a37e6ca9dcd52181ca5a65ae35c0944552",
-        "bytes": 2443842,
+        "sha256": "e76e5ed9802d7e1086e2834119dff84247fc902818ffac5f7ef2988411c3a832",
+        "bytes": 2444761,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--40-color.png",
-        "sha256": "6eb0b8c67a90ec06e57791e99e9078e37e02aa7eec09f0defccebab1e7e5a7dc",
-        "bytes": 444306,
+        "sha256": "45cab406f15a8405e67edaeceacac8d7208095cadfb4f801f59b5f85cd371c0b",
+        "bytes": 445280,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-color.png",
-        "sha256": "7231a0290cb4cb8727641ec6d188ceb24df2ee1d637a78ba13803b0917ed98c4",
-        "bytes": 294708,
+        "sha256": "89d3ec746890c1aadb7cedf700d08503d29afe5aa03391cb17c4044f88c303fe",
+        "bytes": 295741,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--22-color.png",
-        "sha256": "ac3ac0ee6affb08a3409b86060c940a9dfa43a5e6dfcb5b1167edb51be925b86",
-        "bytes": 224735,
+        "sha256": "e4818958bd236fb296118dee744a06b44d139b90a39f2d140e8de04d4b17aa2f",
+        "bytes": 225744,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-grayscale.png",
-        "sha256": "71919daa33e77e85c3768dee3380264614cff0049c9c36af2ac99e35af468899",
-        "bytes": 206355,
+        "sha256": "9c4f312fdf0306369438ccb8b7174a544d780947ef36c79f80070f6f75c004f8",
+        "bytes": 207286,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--64-circle.png",
-        "sha256": "fa04bfac4b314eb05e305a7b7ffaf67f3fd514eaaa48468f88f696c93ab9c623",
-        "bytes": 779885,
+        "sha256": "d88ffded03a10815d5fa5713bf64c12517d4381817c6c05c94d6bf5b3c19bd25",
+        "bytes": 780808,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--small-multiview.png",
-        "sha256": "7dc78204d5ac0b2637b880dfa67a8345f3125a20c8feb6bf281bca93eb3d10e2",
-        "bytes": 1440721,
+        "sha256": "fb7eaa92a5cd47b9c1c394c7539fa76b552f64c52285e5676f22404600b6980b",
+        "bytes": 1441596,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--identity.png",
-        "sha256": "a24301b37015be69d816b4c5359a7ca2fd72f7d51c9c41642f030de21cba7ffa",
-        "bytes": 2521411,
+        "sha256": "9f45dbc7b4a280e48be5466d6f1e748378f628e32b1d9fce564d18697e59a82c",
+        "bytes": 2522856,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--128-color.png",
-        "sha256": "f11fc350bbbc9ac4633ed0b1d97d92de7070266b92c3f7029f4f1f70addb125c",
-        "bytes": 62729,
+        "sha256": "3d6df6265c5ebc4696d3da64c7d9bd1728baaeec6f408551fb83e372cae5b4cb",
+        "bytes": 62700,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--40-color.png",
-        "sha256": "b563c45967b47610580ee62b338a0da469ba13cf78922511cc297240fabfa2d3",
-        "bytes": 16343,
+        "sha256": "1910c02da2d88db412612d073ed20df8613573f0e799d8df3d17488ff8cdb87f",
+        "bytes": 16369,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-color.png",
-        "sha256": "4dbf259661e6734013797d69f668ad84f30a23b7dfcbe2cda5ce4c8e10d59f28",
-        "bytes": 13215,
+        "sha256": "a90c27dc15894bd9a8847544d323edc46c7842b51596421ac76029f29cd522f7",
+        "bytes": 13222,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--22-color.png",
-        "sha256": "1324c0489676c64783693d1c41826d758153e8cecd7a6db86cef6e2b2cd24cc7",
-        "bytes": 11223,
+        "sha256": "85232b1db25b88ff20518ac818686c99b62d4ff79f5c86f9a27e9a3eb7f60ee8",
+        "bytes": 11230,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-grayscale.png",
-        "sha256": "1f688326deb0437dc6994d7a6c0f9071fdfa5c08d63d00fe5d6e98584bed5a14",
-        "bytes": 12111,
+        "sha256": "9d52873f3a8d5aef82a9e9111594ab389a3529566341e71f19ae3cb7512e9220",
+        "bytes": 12148,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--64-circle.png",
-        "sha256": "abfefd0f31167792ac39e2f1adc0d5a1030e4496251ec56af7e9c5369991368d",
-        "bytes": 24435,
+        "sha256": "323a4a3ed60cf4604ac3de96e75ca2f53d9a7632b2d16f4bc2b4eb9d5c713264",
+        "bytes": 24428,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--small-multiview.png",
-        "sha256": "d5e6660100596c522c83d638b0d567b06f0b303f707d0f62613226bd62ee5adc",
-        "bytes": 45652,
+        "sha256": "9f2929e9f10ac4f96bf46ac453996dc744796a24c29e2511af41fef55f0562f6",
+        "bytes": 45600,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--identity.png",
-        "sha256": "0c0c2da3717062cd245c76f670c8816bdc0461f6f894d76a1448e9e0f38ffdf7",
-        "bytes": 68285,
+        "sha256": "e6df9a0a29fbaa16d35af34adcbf05c53b820b5bdf9a57a26c5f75789ffd5e58",
+        "bytes": 68244,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "31f74ade6951362722f51cc85c98c1d4705d1b2adfe7414ce7989688e9f1ea4d",
-        "bytes": 324975,
+        "sha256": "f1b7aae2ff47c550e87f2d75e91446731644c8717058443b3b6748189ff03fc7",
+        "bytes": 325093,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e7d83e7409f03de58024266dd7aa8cd9da4fe7136f092b1c2c8ef78cc6957694",
-        "bytes": 61084,
+        "sha256": "5975fac5cd742ee2935735a0aea86890cea2b1f39ab3626189dd5c1455f0b4f6",
+        "bytes": 61220,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "237e10d12c6246022ad5bf5ab8439ff4d2f75df48b9211968048f029662e4bfb",
-        "bytes": 42755,
+        "sha256": "6802f9c8eede8582434180b37d2a2d6c279893fa0e215c9eb89d932b2c3e4ffa",
+        "bytes": 42920,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "d2a3cc6a0bfc8a7843fd56b59fc1922dc8e5b3fe638c68212d3d41a9a9da5f73",
-        "bytes": 33828,
+        "sha256": "209833dc337163368312edf93462b412eb3d3964a183e59007430e276f1fc91f",
+        "bytes": 33969,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "0fded7fbd7173e32d7b7d8a9c08e099b5865f1c8d6e99eac4bcf1f13b3c89229",
-        "bytes": 32248,
+        "sha256": "138159d278459a3a0731238ef1c32c7fe4177ace0f1be851acbab28a115ff801",
+        "bytes": 32393,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "f2d3f9ebf7f761042a0f67a9f915bb3847fce05782684e3a7f99f51ed8f7c311",
-        "bytes": 100934,
+        "sha256": "f7e7b60f7d99b2eeb148c92e703d3e70cdf6e7e850528675123e1d8694889b74",
+        "bytes": 101103,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e4bdd337ad3df5a849ecee8acf24ab9af1d7d4fbed3541b0729d36a2df0e038e",
-        "bytes": 183714,
+        "sha256": "fbd215c5b3c2c2fc514ce56ec1fb1bea1e65b7d97ff9064a7a3a8c06b4f471d5",
+        "bytes": 183867,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "e817d99475d5599a05b2164e3367b85b9148f16e8acd2b46ed170ef868cfce58",
-        "bytes": 342039,
+        "sha256": "ba03fad8348fa60ec3ce979b0ad952cfb4f0b9c7b0ac0de0b7ac07c9a9315cc0",
+        "bytes": 342237,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--128-color.png",
-        "sha256": "808176f6cea1b14d963509df8c44e29cd71966baef99f2b293f90fc6f28b0828",
-        "bytes": 463307,
+        "sha256": "49ad6cdfb2e13c2c2679d9bd610a99ff965b02e995000b31064a94ece52ce5f8",
+        "bytes": 463372,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--40-color.png",
-        "sha256": "51e891663a2b526f46c22c3f59acbad9aa618c1ef31e5d7672bcbe081ac01018",
-        "bytes": 85295,
+        "sha256": "f8acf66f7bee80e72854bf1bdfd8d6e578bae19524cb10213abd720310763aad",
+        "bytes": 85417,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--28-color.png",
-        "sha256": "6f74c91f11bfdf5993b910353e26f762f3e3263f25eb6ebb7a2f6474bfa36025",
-        "bytes": 59085,
+        "sha256": "fb2bec9add6d5ef1db1d9c4484249c923c689c4f45ed63ffbcde75b3cd8bef6e",
+        "bytes": 59204,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--22-color.png",
-        "sha256": "d645bad51bfedb5dcee9dfc4164176ac968cccd7024f36c20ffb6abf9116da49",
-        "bytes": 46871,
+        "sha256": "cd66fd92ec9a70f6b314435638e33f235c42fb0a9f56a265a7c82d8b712c3913",
+        "bytes": 46966,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--28-grayscale.png",
-        "sha256": "a80785c8514a6b21e6888f21bedc05c871e384bf10c88de9714e2134a70ed6e4",
-        "bytes": 45416,
+        "sha256": "d084b222d7c76e309b6b1d65efc52830fbce330dc5d07bc50b43ee4220e7fb54",
+        "bytes": 45534,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--64-circle.png",
-        "sha256": "2d9bdb88eeda4cf8dedbd814fd6355745fd813e55e4617861ccb58263e54df01",
-        "bytes": 148210,
+        "sha256": "85a029469c6f6efd9153f1f85e154478dd1700bedb4d9d3f29db19b1bddbc250",
+        "bytes": 148332,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--small-multiview.png",
-        "sha256": "9115c709f865b165798cd304736ed60a5e282eab3653926dff87339f0aa4b070",
-        "bytes": 267214,
+        "sha256": "b23303bee631e9faaf0f37ddd659990d11c7b26848726ecd43ed3fee9291d2cf",
+        "bytes": 267228,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/potion--p01--identity.png",
-        "sha256": "0b27a882897d20d00d48825d7ca754a60a7a1a23aadef45b77f30f0c4ecdbd15",
-        "bytes": 480758,
+        "sha256": "4ce65d0917d9d05d8c8c6fdcfa75c0a37752e9d8daa9c1bdf81c6461bd04600f",
+        "bytes": 480852,
         "width": 1800,
         "height": 452,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--128-color.png",
-        "sha256": "1d18eb38479136f2a566cc1c8925552b92e7eff916f591c889fbd349eef66c6e",
-        "bytes": 2382756,
+        "sha256": "c01fe392cf46710ff8997a5d0ecaf76f1d46268a8d2bceffccc105c481b7dccc",
+        "bytes": 2383807,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--40-color.png",
-        "sha256": "c670459bfb9fcfefbadaa47b91bf7fdfb21c1189e246fa11eb1455f40975ba7e",
-        "bytes": 442358,
+        "sha256": "0d0b0d41c7abf4b6cb04b2b3f477bfd7d11bbebf60b0341887ffa49fc222166c",
+        "bytes": 443458,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--28-color.png",
-        "sha256": "3de8031e5414efeeeefd237da8c1d5753b9db4ecad87780cac5e23c34a22b5c5",
-        "bytes": 298910,
+        "sha256": "b01c9b10142f8e67717116e1df328ca1db6b20ff958a24675179e74aa7afe625",
+        "bytes": 299966,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--22-color.png",
-        "sha256": "45cfe80d3aaa422b1956683b42d2c5c7e83f797f0a64f646de5606a61e533455",
-        "bytes": 231342,
+        "sha256": "4184971cbeea85609d3d2bd3ccade31841d166a6e9af7f516f0238b3a16f0ca8",
+        "bytes": 232456,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--28-grayscale.png",
-        "sha256": "3bb0233bb5424508aea40bb5eb09407bfb002e185a895698d2159e0402f76858",
-        "bytes": 213065,
+        "sha256": "bc08278651e7202fe809fc72df63ca3eca305654412a2e0556e08b52953e4425",
+        "bytes": 214302,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--64-circle.png",
-        "sha256": "e222686046e6171b8904128b0ddfeaaf08d32e15f6659f65159682d9c5293661",
-        "bytes": 772526,
+        "sha256": "01cbb192971ada5cb252fc296bb35f3b6aea96fe814fccb0847c98ee8dd17b5f",
+        "bytes": 773769,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--small-multiview.png",
-        "sha256": "e6ef595861a4c26b44959167b5dcc99707bbdaa64606b104bb2e9c99153fdf1f",
-        "bytes": 1414898,
+        "sha256": "ca1f8178de176e9933279c30570c454df4ccb760a55518e0e78633eb2748c1d5",
+        "bytes": 1415974,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p01--identity.png",
-        "sha256": "22cc36ecf88279e52d72004829c80f582578ec6742dcef9c73725b4e380881df",
-        "bytes": 2467133,
+        "sha256": "4bbecd36657bccdc98579a028b5aecdd78bfaf009f758ea58140f80256d08836",
+        "bytes": 2468427,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--128-color.png",
-        "sha256": "7336fff24d3eb266a8b73f0a497d5a0706fc2ecfcb696c356d2f668cfc3497e1",
-        "bytes": 682500,
+        "sha256": "bb92358663bef02ca7b946a5a1f7e9ba8304a65e550776058f5277fd37b58b36",
+        "bytes": 682768,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--40-color.png",
-        "sha256": "9c0749a07458a61a7ace9824e9448276582fbbbd62da834f0439f4ae7ac98110",
-        "bytes": 129804,
+        "sha256": "ca24f26698d43e4340338b7e3e35390edb67a2c2e04597dda96458117a1a533e",
+        "bytes": 130053,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--28-color.png",
-        "sha256": "8fd91db8db618c5d3bd1420e396bbb0763cb13b9a43ff219d4b13a37dada9c70",
-        "bytes": 89455,
+        "sha256": "f575b29823aaedf29e02494b261078515036852c34819fb908c16b165274322e",
+        "bytes": 89671,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--22-color.png",
-        "sha256": "10f231d2d6967a1c7c08e18de50b3069d3abfbfd494ddc0ff480bc92765ed739",
-        "bytes": 69962,
+        "sha256": "51aa83df423d857c37fb2fd73e7010f5c016701ab55699b9e855974458428726",
+        "bytes": 70193,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--28-grayscale.png",
-        "sha256": "e0bd418694a23c2e021c251c6e85acf7c8bc04b4e0b859b9e5b67af6425fd726",
-        "bytes": 65610,
+        "sha256": "2891825010dddd5082f03cd873e89460dfee52b857b343baf9fdaa3918ae4270",
+        "bytes": 65888,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--64-circle.png",
-        "sha256": "30cf12076d028eed9508bc5bb2a99b396f7363104bda50254d78a3ca09b98f9f",
-        "bytes": 219682,
+        "sha256": "61c04405303e55bb338034a96b8733096e7b6d28c9b1d561770a65ee1a6f5820",
+        "bytes": 219964,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--small-multiview.png",
-        "sha256": "fb29b0b874b56024c98d8369f9a3451b987e17957476fa16d59e34ad1d36a31a",
-        "bytes": 405853,
+        "sha256": "5216cd1c9e488ca4174d2ce0c88569dc0debacf49c914d4d6593cd8a37d14069",
+        "bytes": 406045,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/quest--p02--identity.png",
-        "sha256": "c9190d70cca29af07e47e52945e34ed5bedb56c6ddb6c7961d781eb654f69da4",
-        "bytes": 708155,
+        "sha256": "09ebeda0023f2603a3f506fb8a2a1f8818d72ab6960c2855173488409db57edd",
+        "bytes": 708370,
         "width": 1800,
         "height": 656,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--128-color.png",
-        "sha256": "8484bac61ba9c17027817aa4f2d420a1a7f61d859f16ae0240c5887b08416f7a",
-        "bytes": 1467096,
+        "sha256": "0281a4e7abd9bd31d555a5e4e34e9341e801a4478685763d4381fda488c790be",
+        "bytes": 1467688,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--40-color.png",
-        "sha256": "cc92a2d4c33784723fcd86feec67631ae0c3908467e3e90ec18edc2cb62bc78a",
-        "bytes": 265954,
+        "sha256": "038884e796dd6124c2e0f7e48354a42ab9d9bf24f526e9f3af36b583f79ccf9d",
+        "bytes": 266623,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-color.png",
-        "sha256": "961ade46ab9ec652cdcac4e377e6afba41aeb1e50b7a74728c1fd2cb9746eefd",
-        "bytes": 179385,
+        "sha256": "4fbba928bce707d414dfb1119ee358162d49c15be8d4f24a6a369f348dc99468",
+        "bytes": 180098,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--22-color.png",
-        "sha256": "41ebebaa22038a5c5eff69d11d7027e46337c1e31d5ed1aaf87d7c7604b3cbd7",
-        "bytes": 139217,
+        "sha256": "1d97dfff6cd69b96bc66e76aa9f2aafa94f1c7d6045fb95c33d2629a806fcfb8",
+        "bytes": 139906,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-grayscale.png",
-        "sha256": "9250d3c39498bd0cedbed59d25e93721a9e452f01bb2cbea2db9e9dde2e996fb",
-        "bytes": 130408,
+        "sha256": "cfad4351aeee0e63bc37446a86ac9a183d239eb8209fea48f65bc86b546f73c3",
+        "bytes": 131068,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--64-circle.png",
-        "sha256": "37e33281ef2325afb402fbba4b15f8fba6ccf405cf2ec13dba7f5069ea1140be",
-        "bytes": 456952,
+        "sha256": "3ab8af4fef11f3d09c3b6a04f66a8c49692256e4d7f7cb74e6afe98713097373",
+        "bytes": 457614,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--small-multiview.png",
-        "sha256": "cef3046c12e5fa48d5b93b602956254fecc5d07e3984993134f1f039e14d760f",
-        "bytes": 844126,
+        "sha256": "54f1eb0b178d14247f62093b82e738064bb05c3bbccfd299cb2cf2b5d162e620",
+        "bytes": 844768,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--identity.png",
-        "sha256": "0412547c1cca47a0c881f74488daa13c53f4ee59c7ee51469ae5596843154b0b",
-        "bytes": 1514552,
+        "sha256": "e0df7e969c9e508b692aa2a22eecd2de127f547b773cd641ac2a0cdadaa5eac2",
+        "bytes": 1515511,
         "width": 1800,
         "height": 1064,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--128-color.png",
-        "sha256": "cc49a442845c1ea3209e7aae0d0a1dbd544bc557f6e54dccfc3a044a984368f3",
-        "bytes": 40104,
+        "sha256": "a42274a70fe9762c9fc8d68eca657b341a9bb1744f1b8849111c549ee2f8a9d6",
+        "bytes": 40052,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--40-color.png",
-        "sha256": "7f1e488bb8ba9d6e7886fc15ae78194f15c559afb11018552e17e577483b7c42",
-        "bytes": 11580,
+        "sha256": "afb906e7b07924529548a86e80e90ddc3f0dd12214351202ccfd7621b418118c",
+        "bytes": 11544,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--28-color.png",
-        "sha256": "13e589572283a3d1a7b6c06f964772f0b7f6c9ce45e1d0a616f494dd960fc314",
-        "bytes": 9976,
+        "sha256": "dd595b4a5b9314abc68e8ad5567c1a6eeb3669eaa17c75144e2ed26a0602b9cf",
+        "bytes": 9967,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--22-color.png",
-        "sha256": "18104595eaf49dfedfc944957a1e63352b87dc34c1a4822b39423be5ea054574",
-        "bytes": 9106,
+        "sha256": "a30ae2237d91e8f812c79a884b0243a076ab1b4a3193e2661da708150d9556e8",
+        "bytes": 9093,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--28-grayscale.png",
-        "sha256": "834989b3abb54775dd31e888a88718f10ee1e229117d7af53c34759f949fcbd9",
-        "bytes": 10028,
+        "sha256": "ff0e96eed6f914fc21656a80a813356e8b5ae7329910ad0f832f501a83c7db25",
+        "bytes": 10027,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--64-circle.png",
-        "sha256": "218b60b97ba3ff4199039cf82c8b4ed687848903865c8d2316e406e833d35582",
-        "bytes": 17389,
+        "sha256": "29d1d154088b934b5031e112369bedd7d4e12b0a17ad7f0a699951a924851109",
+        "bytes": 17398,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--small-multiview.png",
-        "sha256": "8991b3f6e0cfdbdfef441ad33661f48c0383ab091c0f8e0d87faf838c7d39e38",
-        "bytes": 29835,
+        "sha256": "798aa18a424e7d140c5300fbe19fb128f13754fa1c810f16c4c69d835d312f6f",
+        "bytes": 29832,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/ui-backpack--p01--identity.png",
-        "sha256": "9fdd4a882396eca2ee273c24efe4543387fcdf4d50240f444b928a81f826b35a",
-        "bytes": 44081,
+        "sha256": "2e891653371709a3341d0f9bdb6fc9bfef5db788708f31396bae10063998274b",
+        "bytes": 44064,
         "width": 1800,
         "height": 248,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--128-color.png",
-        "sha256": "28c0b7d25dcbcdb5490e7a0c9b82e01c8ff002552329e5708855cc8dccae0d67",
-        "bytes": 2343201,
+        "sha256": "5a2e262aacc80c94ae7d91ae27808c7ae4fde8c82da51a1fbfebbc28541a3e0a",
+        "bytes": 2344157,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--40-color.png",
-        "sha256": "f9fb1bc9539900f673d655aad92431514c6226897da4409a74bf3635f75f061e",
-        "bytes": 460615,
+        "sha256": "48179548250c1966a619523448822b7ec0fa85a53e2a8b145044186d4f35829e",
+        "bytes": 461645,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-color.png",
-        "sha256": "7bc0f440ab437b025d7158c2efdf01fb75a5cd6302becf0c70740a7988187f4b",
-        "bytes": 309449,
+        "sha256": "f24b2bb785b967a23940e1222ea6ccbd97c60702b9a5e548d2e865e45391a948",
+        "bytes": 310440,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--22-color.png",
-        "sha256": "07462dcb9e99d1d9f9ff04c1db7ab880555913fa647538d971b9b7850cc657b7",
-        "bytes": 236741,
+        "sha256": "386f31d2f10673768277929679cf0d274a68cb7ab59af0f5a2d957c8ce712763",
+        "bytes": 237814,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--28-grayscale.png",
-        "sha256": "8ecf2e0138fd130d91827b86f2ff362930d54179ab50e9c1dcd9660bf609d18c",
-        "bytes": 215120,
+        "sha256": "58e034b9bde50b8c92458458fc48e781ddc054a52f0aa358ea5ca4433add5e51",
+        "bytes": 216111,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--64-circle.png",
-        "sha256": "43a9dba3f59abd9a7a2017a86eacbc82d3c57831b4f69182272225a0b8e05f46",
-        "bytes": 727058,
+        "sha256": "71a976c0f867627b8c313ab7966800b85d107a1ea649e4ee48369231f2e759c9",
+        "bytes": 728133,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--small-multiview.png",
-        "sha256": "10368a0dba07519b3fa1d425735dcfe35b69ec4c475e4018910245befe2ea02d",
-        "bytes": 1391548,
+        "sha256": "760d79ce0d6a256e82eaaeb288f9468ee88d7685feae8b2179e641561553d619",
+        "bytes": 1392487,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p01--identity.png",
-        "sha256": "00a7fc648856095bd9bfd2f449968b5b0bf7bca4dd709740cb1df858f2bb789b",
-        "bytes": 2433526,
+        "sha256": "903de1e38220a0375c2f37b891ac4858cc6a1d0e69f7a6ca48388d4c69413ec6",
+        "bytes": 2434757,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--128-color.png",
-        "sha256": "465cc21428f171948b6e0a59639203150e086a8d90198086b36aa2206ff69e98",
-        "bytes": 1037424,
+        "sha256": "78420932b32bf882500b07aea1adf3c970c074c2a99b555120f212bf334b80d9",
+        "bytes": 1037876,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--40-color.png",
-        "sha256": "43a035e4bdf4d125c12d719b49d375818b7b8e7a92c92b366493b4f4aaea9288",
-        "bytes": 213054,
+        "sha256": "738536bf1c8fdda89ae4da817506912a32072fb85c07388c44b40e9e06a17894",
+        "bytes": 213585,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-color.png",
-        "sha256": "b95f10e71216d6e568f53f89ba5da0d117fffbde13c205f55ff954e8e22a9f16",
-        "bytes": 152274,
+        "sha256": "aa80eb1394df4fec5d2758adeb783ee43d4a400bc4d82c4163d162e9c1462c24",
+        "bytes": 152771,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--22-color.png",
-        "sha256": "08ff03647103cb2899783b2eba07dab162d3d6a8afb9356c0732ec8e83e37a1b",
-        "bytes": 121326,
+        "sha256": "bfabe06f4a17feff971f1e3e399975e9955432c2c596c2259047cb79ada020eb",
+        "bytes": 121797,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-grayscale.png",
-        "sha256": "7fb20a9a123844a97557bb91abc835a1bf535f0508b00f3068c9f4eaefc2f3f9",
-        "bytes": 112911,
+        "sha256": "17eab835244850db7f6532c05ef993e1ef1e2949b47336ab2ff88b11056e0094",
+        "bytes": 113424,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--64-circle.png",
-        "sha256": "ac01ded0ac0e0340e953c08108c76f1453b5cd8a0b3864798a7b1dba042ebc87",
-        "bytes": 345029,
+        "sha256": "5a97f8c294d55067d799b7852088d04f2b1ceaae1497a0d6005a4284ea060bb8",
+        "bytes": 345505,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--small-multiview.png",
-        "sha256": "ac841bc758b59f2667b336f8f458d804854af0db728893cb77d9d793750ccf4c",
-        "bytes": 645240,
+        "sha256": "b21bb6b8e3f360ae6f0c0011eaa5b82c0fb5db9f243da729ff0024138093acf3",
+        "bytes": 645588,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--identity.png",
-        "sha256": "2ae8d23a5828cae35ce1a5b66deaff3c0d851fdc5f4ca8bda65f88d5868f55d0",
-        "bytes": 1085894,
+        "sha256": "7334987b4e8c15e9e26ff97d52beecf2fcf46db07241710b8b11964a19a58510",
+        "bytes": 1086636,
         "width": 1800,
         "height": 1064,
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "92015c29b0abcb6f1fbb4cdeba01917e7fe4ae641df8bcd3076974a19ce56c97"
+    "shippingCatalogSha256": "5b40b3ab9e6795e169f08b202829dc529690316d2251359539bfcaddc83cf0dd"
   }
 }

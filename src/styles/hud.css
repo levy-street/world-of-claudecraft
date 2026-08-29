@@ -3745,6 +3745,13 @@
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
   }
+  /* Armed ground aim: the queued/proc gold family, double so it can never be
+     read as the focus-visible ring (which stays the focus token, solid). */
+  .action-btn.aiming,
+  body.mobile-touch #mobile-action-ring button.aiming {
+    outline: 3px double var(--gold);
+    outline-offset: 1px;
+  }
   /* Proc glow (Battle Trance and similar): the classic pulsing
      gold rim on the covered abilities. Actionable info: never gated by a graphics tier; the
      pulse (motion only) stops under reduced motion, the steady glow stays. */
@@ -8672,6 +8679,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  /* Store decisions must clear the Armory inspector (z90), and async results
+     remain readable after the Store itself has closed. */
+  #prompt-stack.store-decision-active,
+  #prompt-stack.store-result-active {
+    z-index: 96;
   }
   .prompt {
     padding: 14px 18px;

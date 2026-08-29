@@ -9,7 +9,7 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagCapacity, bagsFullError, countFit } from '../bags';
+import { bagPools, bagsFullError, countFit } from '../bags';
 import { isActionLockingFormAuraKind } from '../combat/forms';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
@@ -32,7 +32,6 @@ import {
   type GatherRareEventFlavor,
   INTERACT_RANGE,
   type InvSlot,
-  type ItemDef,
   isConsuming,
 } from '../types';
 import {
@@ -40,6 +39,7 @@ import {
   GATHER_RARE_EVENT_YIELD_MULT,
   rollGatherRareEvent,
 } from './gather_events';
+import { type MaterialRarity, nodeMaterialFor } from './gathering_materials';
 import { fineGradeReachable, harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
@@ -88,96 +88,10 @@ export const NODE_HARVEST_TABLE: Record<
   herb: { professionId: 'herbalism', respawnSeconds: 240 },
 };
 
-// Every material row yields this many units per rolled rarity (one
-// shared curve; a per-family tune may diverge later if playtests want it).
-// Frozen because every NODE_MATERIAL_TABLE row shares this one object: a
-// per-family tune must clone it per row, never mutate it in place.
-const MATERIAL_QTY_BY_RARITY: Record<MaterialRarity, number> = Object.freeze({
-  common: 1,
-  uncommon: 2,
-  rare: 2,
-  epic: 3,
-  legendary: 4,
-});
-
-// Zone x node-type material matrix (Professions 2.0): which item a
-// harvest grants in which zone, and the per-rarity unit counts. The zone-1
-// (eastbrook_vale) rows grant ONLY the dedicated starter-material FAMILIES
-// (copper_ore/ironbark_log/silverleaf_herb), never the premium vendor
-// reagents: that is the stockpiling mitigation, scoped to what it actually
-// buys since D8: an out-tooled gatherer harvests the sellValue-8 FINE grade
-// of these same families here, so starter-node farming yields fine starter
-// materials, still never the mid-tier vendor reagents the mitigation
-// exists to keep off this faucet. Exported so tests can pin the table
-// contents.
-export const NODE_MATERIAL_TABLE: Record<
-  GatherNodeType,
-  Record<string, { itemId: string; qtyByRarity: Record<MaterialRarity, number> }>
-> = {
-  ore: {
-    eastbrook_vale: { itemId: 'copper_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    mirefen_marsh: { itemId: 'iron_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    thornpeak_heights: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    veiled_hollow: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    drakelands: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    frostveil: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    amberfall: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    willowfen: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    nightbloom: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    wraithwood: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    galecrest: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    palmreach: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    evergarden: { itemId: 'thorium_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    farshore_isle: { itemId: 'iron_ore', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-  },
-  wood: {
-    eastbrook_vale: { itemId: 'ironbark_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    mirefen_marsh: { itemId: 'ashwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    thornpeak_heights: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    veiled_hollow: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    drakelands: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    frostveil: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    amberfall: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    willowfen: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    nightbloom: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    wraithwood: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    galecrest: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    palmreach: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    evergarden: { itemId: 'elderwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    farshore_isle: { itemId: 'ashwood_log', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-  },
-  herb: {
-    eastbrook_vale: { itemId: 'silverleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    mirefen_marsh: { itemId: 'goldleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    thornpeak_heights: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    veiled_hollow: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    drakelands: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    frostveil: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    amberfall: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    willowfen: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    nightbloom: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    wraithwood: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    galecrest: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    palmreach: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    evergarden: { itemId: 'sunpetal_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-    farshore_isle: { itemId: 'goldleaf_herb', qtyByRarity: MATERIAL_QTY_BY_RARITY },
-  },
-};
-
-// The material row for one node type in one zone. A zone without its own row
-// (a future zone added before its material content lands) falls back to the
-// eastbrook_vale starter row rather than throwing: degraded yields, never a
-// broken harvest.
-export function nodeMaterialFor(
-  type: GatherNodeType,
-  zoneId: string,
-): { itemId: string; qtyByRarity: Record<MaterialRarity, number> } {
-  const byZone = NODE_MATERIAL_TABLE[type];
-  // Bare index on purpose, unlike rodTierRequiredForZone's Object.hasOwn:
-  // zoneId here is static GATHER_NODES content, never a map-doc-authored
-  // string, so a prototype key cannot reach this lookup.
-  return byZone[zoneId] ?? byZone.eastbrook_vale;
-}
+export type { MaterialRarity } from './gathering_materials';
+// Public compatibility: callers historically import these through the command
+// module even though their canonical owner is now a pure leaf.
+export { NODE_MATERIAL_TABLE, nodeMaterialFor } from './gathering_materials';
 
 /** The item id a harvest of `node` grants a player whose best matching tool is
  *  `usableToolTier`: the zone row's material, upgraded to its fine grade when
@@ -309,8 +223,6 @@ export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
 // src/sim/types.ts), minus 'poor' (a harvested material is never junk-grade). A
 // gathering profession's proficiency shifts a harvest's rarity roll toward the
 // higher tiers; a fresh proficiency-0 harvest always lands common.
-export type MaterialRarity = Exclude<NonNullable<ItemDef['quality']>, 'poor'>;
-
 // Proficiency is clamped to this ceiling before weighting: proficiency gains
 // beyond this point buy no further rarity odds (the ladder is already maxed out).
 export const MATERIAL_RARITY_MAX_PROFICIENCY = 100;
@@ -921,8 +833,8 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     // unsigned top-up grant (the truncation contract wins over signing in
     // that self-inflicted edge; the crossing-case pin lives in
     // tests/gather_rare_events.test.ts).
-    const capacity = bagCapacity(meta.bags);
-    const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
+    const pools = bagPools(meta.bags);
+    const fit = countFit(meta.inventory, pools, itemId, qty, { signer: meta.name });
     if (fit > 0) {
       // One batched grant: a x5 windfall lands as ONE hub loot event
       // instead of five (the recorded loot-burst polish), which the gather

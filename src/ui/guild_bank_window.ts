@@ -36,7 +36,10 @@ import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
+import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGuildBankLogView, guildBankLogSignature } from './guild_bank_log_view';
@@ -54,12 +57,13 @@ import {
   guildBankGoldWithdrawMax,
   guildBankSlotAction,
 } from './guild_bank_view';
-import { formatMoney, formatNumber, t } from './i18n';
+import { formatMoney, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
+import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
@@ -122,8 +126,22 @@ export class GuildBankTab {
   private readonly logPane = new GuildBankLogPane({
     itemDef: (id) => knownItemDef(ITEMS, id),
   });
+  private readonly purchaseEcho: StorageRungEchoLatch;
+  // A stale confirmation result belongs to the purchase surface, not the
+  // global HUD log: keep the localized key-shaped state beside that surface
+  // so repaints/language switches preserve visible feedback without replaying
+  // an already-heard announcement.
+  private priceChangedStatus: BankStatusAnnouncementState | null = null;
 
-  constructor(private readonly deps: GuildBankTabDeps) {}
+  constructor(private readonly deps: GuildBankTabDeps) {
+    this.purchaseEcho = new StorageRungEchoLatch(
+      {
+        schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+        cancel: (handle) => window.clearTimeout(handle),
+      },
+      () => this.deps.requestRender(),
+    );
+  }
 
   /** The active sub-view, for BankWindow's per-pane scroll scoping. */
   get activeView(): GuildBankPaneView {
@@ -144,6 +162,7 @@ export class GuildBankTab {
   resetView(): void {
     this.view = 'contents';
     this.prevReadOnly = null;
+    this.priceChangedStatus = null;
   }
 
   /**
@@ -170,11 +189,17 @@ export class GuildBankTab {
    *  marker; the opened pane ignores it (snapshot-only enablement). */
   model(): GuildBankViewModel {
     const world = this.deps.world();
+    this.purchaseEcho.observe(world.guildBankInfo?.purchasedSlots);
     // knownItemDef, never a raw ITEMS index: a prototype key ('constructor',
     // '__proto__') indexes to a truthy Function, which would send an unknown
     // server item id down the KNOWN arm below. The release's stale-client sweep
     // made every other bags/bank read go through this; the guild pane follows.
     return buildGuildBankView(world.guildBankInfo, (id) => knownItemDef(ITEMS, id), world.copper);
+  }
+
+  /** Release an in-flight rung when the authoritative command path refuses it. */
+  onDefinitivePurchaseRefusal(): boolean {
+    return this.purchaseEcho.refuse();
   }
 
   /** Append the guild pane sections (capacity, treasury, grid, buy row; for
@@ -211,6 +236,7 @@ export class GuildBankTab {
       this.logPane.renderInto(el, buildGuildBankLogView(this.deps.world().guildBankLog()));
       return;
     }
+    this.appendPriceChangedStatus(el);
     if (model.kind === 'unopened') {
       // No rung bought yet: the treasury works from day one, the item store
       // does not exist until an officer opens it from their own purse. A
@@ -223,7 +249,13 @@ export class GuildBankTab {
         el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote', announceReadOnly));
       }
       el.appendChild(this.buildTreasuryRow(model.treasury));
-      if (model.readOnly) el.appendChild(this.buildNote('hudChrome.bank.guildUnopenedNote'));
+      // The unopened note rides EVERY pane without an open row, not only the
+      // read-only one: since phase 09 the core also models open null for an
+      // editing officer whose snapshot quotes no price (unreachable off a real
+      // sim, but the pane must never read as empty rather than not-yet-opened).
+      if (model.readOnly || !model.open) {
+        el.appendChild(this.buildNote('hudChrome.bank.guildUnopenedNote'));
+      }
       if (model.open) el.appendChild(this.buildOpenRow(model.open));
       return;
     }
@@ -283,6 +315,21 @@ export class GuildBankTab {
     return note;
   }
 
+  /** Paint stale-offer feedback immediately, then publish it into an empty
+   * mounted live region. The status identity plus connectivity guard prevents
+   * an intervening repaint from speaking through a detached node. */
+  private appendPriceChangedStatus(parent: HTMLElement): void {
+    const status = this.priceChangedStatus;
+    if (!status) return;
+    const text = t('hudChrome.bank.priceChanged');
+    appendBankStatusLine(parent, status, {
+      text,
+      visibleClass: 'gbank-purchase-status',
+      liveDataAttribute: 'data-gbank-purchase-live',
+      isCurrent: () => this.priceChangedStatus === status,
+    });
+  }
+
   // The Contents / Log sub-strip: the shared WAI-ARIA tab strip core, the same
   // building block BankWindow's Personal/Guild strip uses. Its own aria-label,
   // because a nested tablist that borrowed the outer one's name would announce
@@ -315,7 +362,7 @@ export class GuildBankTab {
   }
 
   private fmt(n: number): string {
-    return formatNumber(n, { maximumFractionDigits: 0 });
+    return formatCount(n);
   }
 
   // The treasury header row: label + coin readout + the two gold actions.
@@ -373,7 +420,8 @@ export class GuildBankTab {
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.guildOpenBank'))}</span>` +
       this.deps.moneyHtml(open.price) +
       short;
-    btn.addEventListener('click', () => this.showOpenBankPrompt(open.price));
+    this.markPurchaseBusy(btn);
+    btn.addEventListener('click', () => this.showOpenBankPrompt(open));
     row.appendChild(btn);
     const note = document.createElement('div');
     note.className = 'gbank-buy-note';
@@ -388,53 +436,66 @@ export class GuildBankTab {
   // `.gbank-open-prompt` is a structural marker (no CSS rule of its own; the
   // shared bank-buy-prompt classes carry the styling): it distinguishes the
   // open confirm in tests and DOM tooling.
-  private showOpenBankPrompt(price: number): void {
-    this.showBuyConfirmPrompt({
+  private showOpenBankPrompt(open: GuildBankOpenModel): void {
+    this.showGuildBuyConfirm({
       className: 'gbank-open-prompt',
-      text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
+      text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(open.price) }),
       confirmLabel: t('hudChrome.bank.guildOpenAccept'),
+      offer: open,
     });
   }
 
-  // The ONE confirm-prompt builder behind the expansion and open-the-bank
-  // confirms (the rule of three landed with the open prompt: the personal
-  // pane's buy confirm in bank_window.ts is the third sibling; fold it in if
-  // it ever grows guild-shaped needs). Both actions send the same
-  // guildBankBuySlots token; the sim decides the rung and the payer.
-  private showBuyConfirmPrompt(opts: {
+  // The guild-flavoured wrapper over the FAMILY builder (bank_buy_prompt.ts,
+  // where the fold-in the older version of this comment promised has landed:
+  // the personal, guild, and vault confirms all mount through that one leaf
+  // now). This wrapper owns only the guild marker class and the confirm side
+  // effects. Both callers send the same guildBankBuySlots token; the sim
+  // decides the rung and the payer.
+  private showGuildBuyConfirm(opts: {
     className?: string;
     text: string;
     confirmLabel: string;
+    offer: { purchasedSlots: number; blockSlots: number; price: number };
   }): void {
-    this.deps.dismissPrompts();
-    const opener = document.activeElement as HTMLElement | null;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = ['prompt panel bank-buy-prompt gbank-buy-prompt', opts.className]
-      .filter(Boolean)
-      .join(' ');
-    prompt.innerHTML = `<div class="prompt-text">${esc(opts.text)}</div>`;
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = opts.confirmLabel;
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    prompt.append(confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.deps.installPromptDialog(prompt, opener, () =>
-      prompt.remove(),
+    if (this.purchaseEcho.pending) return;
+    showBuyConfirmPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.deps.installPromptDialog(prompt, opener, close),
+        dismissSiblings: () => this.deps.dismissPrompts(),
+      },
+      {
+        className: ['gbank-buy-prompt', opts.className].filter(Boolean).join(' '),
+        text: opts.text,
+        confirmLabel: opts.confirmLabel,
+        cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
+        onConfirm: (dismiss) => {
+          const world = this.deps.world();
+          const info = world.guildBankInfo;
+          if (
+            !info ||
+            info.purchasedSlots !== opts.offer.purchasedSlots ||
+            info.nextExpansionPrice !== opts.offer.price ||
+            !this.purchaseEcho.arm(
+              opts.offer.purchasedSlots,
+              opts.offer.purchasedSlots + opts.offer.blockSlots,
+            )
+          ) {
+            this.priceChangedStatus = { announcedText: null };
+            dismiss();
+            this.deps.requestRender();
+            this.focusPurchaseOffer();
+            return;
+          }
+          this.priceChangedStatus = null;
+          world.guildBankBuySlots();
+          audio.coin();
+          dismiss();
+          this.deps.requestRender();
+          this.focusClose();
+        },
+      },
     );
-    confirm.addEventListener('click', () => {
-      this.deps.world().guildBankBuySlots();
-      audio.coin();
-      dismiss();
-      this.deps.requestRender();
-      this.focusClose();
-    });
-    cancel.addEventListener('click', dismissAndReturn);
-    stack.appendChild(prompt);
-    window.setTimeout(() => confirm.focus(), 0);
   }
 
   private fillGrid(grid: HTMLElement, model: GuildBankViewModel & { kind: 'guild' }): void {
@@ -801,8 +862,9 @@ export class GuildBankTab {
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.buySlots', { count: this.fmt(buy.blockSlots) }))}</span>` +
       this.deps.moneyHtml(buy.nextPrice) +
       short;
+    this.markPurchaseBusy(btn);
     const price = buy.nextPrice;
-    btn.addEventListener('click', () => this.showBuySlotsPrompt(price, buy.blockSlots));
+    btn.addEventListener('click', () => this.showBuySlotsPrompt(buy, price));
     row.appendChild(btn);
     // The treasury-paid note: always-visible text (the price above is the
     // guild's money, not the officer's purse; saying so prevents mis-reads).
@@ -813,19 +875,39 @@ export class GuildBankTab {
     return row;
   }
 
-  private showBuySlotsPrompt(price: number, blockSlots: number): void {
-    this.showBuyConfirmPrompt({
+  private showBuySlotsPrompt(buy: GuildBankBuySlotsModel, price: number): void {
+    this.showGuildBuyConfirm({
       text: t('hudChrome.bank.guildBuyConfirm', {
-        count: this.fmt(blockSlots),
+        count: this.fmt(buy.blockSlots),
         price: formatMoney(price),
       }),
       confirmLabel: t('hudChrome.bank.buyConfirmAccept'),
+      offer: {
+        purchasedSlots: buy.purchasedSlots,
+        blockSlots: buy.blockSlots,
+        price,
+      },
     });
+  }
+
+  private markPurchaseBusy(button: HTMLButtonElement): void {
+    if (!this.purchaseEcho.pending) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
   }
 
   // Land focus on the window's always-present close button after an op-driven
   // rebuild detached the opener (the personal pane's idiom).
   private focusClose(): void {
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+  }
+
+  private focusPurchaseOffer(): void {
+    const root = this.deps.root();
+    const offer = root.querySelector<HTMLElement>(
+      '.gbank-open-row .bank-buy-btn:not(:disabled):not([aria-disabled="true"]), ' +
+        '.gbank-buy-row .bank-buy-btn:not(:disabled):not([aria-disabled="true"])',
+    );
+    (offer ?? root.querySelector<HTMLElement>('[data-close]'))?.focus();
   }
 }

@@ -15,7 +15,11 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { assembleEventsFrame, serializeEventFragments } from '../server/event_frame';
+import {
+  assembleEventsFrame,
+  filterRoutableEvents,
+  serializeEventFragments,
+} from '../server/event_frame';
 import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 
@@ -500,6 +504,57 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     expect(typeof spy.mock.calls[0][2]).toBe('number');
   });
 
+  it('prefilters consumer-less vaultCraftConsume before serialization: never stringified, never delivered', () => {
+    const server = new GameServer();
+    const sessions: ClientSession[] = [];
+    for (let i = 0; i < 3; i++) {
+      const fc = fakeWs();
+      sessions.push(joinServer(server, fc, i + 1, `Vaulter${i}`));
+      (sessions[i] as unknown as { fc: FakeClient }).fc = fc;
+    }
+    const speaker = sessions[0];
+    const batch: SimEvent[] = [
+      {
+        type: 'chat',
+        fromPid: speaker.pid,
+        from: 'Vaulter0',
+        channel: 'general',
+        text: 'before',
+      },
+      {
+        type: 'vaultCraftConsume',
+        pid: speaker.pid,
+        takes: [{ itemId: 'copper_ore', count: 2 }],
+        upgrades: 1,
+      } as SimEvent,
+      {
+        type: 'chat',
+        fromPid: speaker.pid,
+        from: 'Vaulter0',
+        channel: 'general',
+        text: 'after',
+      },
+    ];
+    const stringifySpy = vi.spyOn(JSON, 'stringify');
+    stringifySpy.mockClear();
+    routeRaw(server, batch);
+    // The consumer-less event is filtered BEFORE the once-per-batch
+    // serialization: only the two chat lines are ever stringified, instead of
+    // paying a JSON.stringify per batch for an event every recipient drops.
+    expect(stringifySpy).toHaveBeenCalledTimes(2);
+    stringifySpy.mockRestore();
+    for (const session of sessions) {
+      const fc = (session as unknown as { fc: FakeClient }).fc;
+      for (const frame of fc.sent) {
+        expect(frame).not.toContain('vaultCraftConsume');
+      }
+      // The surrounding chat still arrives: the filter removed one event, not
+      // the batch.
+      expect(fc.sent.some((frame) => frame.includes('before'))).toBe(true);
+      expect(fc.sent.some((frame) => frame.includes('after'))).toBe(true);
+    }
+  });
+
   it('serializes each event exactly once for the whole batch, not once per session', () => {
     const server = new GameServer();
     const sessions: ClientSession[] = [];
@@ -538,6 +593,14 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
 // caller's mine.length > 0 guard keeps the integration path from reaching (an empty list,
 // a single fragment) and the length-alignment serializeEventFragments must hold.
 describe('event_frame pure assembly', () => {
+  it('filterRoutableEvents returns the SAME array when nothing matches (allocation-free common case)', () => {
+    const events = [
+      { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },
+    ] as unknown as SimEvent[];
+    expect(filterRoutableEvents(events)).toBe(events);
+    expect(filterRoutableEvents([])).toEqual([]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

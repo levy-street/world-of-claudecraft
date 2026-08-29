@@ -150,8 +150,17 @@ describe('assertLoopbackDatabaseUrl', () => {
 // deleted import away from silently vanishing from a call site while the unit
 // tests above stayed green, so the call sites are pinned too.
 const GUARDED_SCRIPTS = [
+  // The banker rung's go-live probe (Bank Storage phase 17): it drives /dev
+  // cheats, mints an account and reads BOTH money tables, so it guards its game
+  // URL and both connection strings.
+  'scripts/bank_rung_claudium_probe.mjs',
   'scripts/admin_cheater_mark_shot.mjs',
   'scripts/admin_guild_bank_shot.mjs',
+  // The guild-pane seed step (Bank Storage phase 18 QA): it mints accounts and
+  // characters over REST and writes guild, membership and guild-book rows
+  // straight into Postgres, so it guards its server URL and its connection
+  // string. Its sibling probe opens no database and is URL-guarded below.
+  'scripts/bank_guild_pane_seed.mjs',
   'scripts/admin_professions_shot.mjs',
   'scripts/catalog_program_census.mjs',
   'scripts/chat_mute_resume_shot.mjs',
@@ -164,12 +173,21 @@ const GUARDED_SCRIPTS = [
   'scripts/mob_stall_repro.mjs',
   'scripts/profile_recent_finds_shot.mjs',
   'scripts/profiler/geared_arrival_roster.mjs',
+  'scripts/store_intent_durability_probe.mjs',
+  'scripts/store_online_ladder_probe.mjs',
 ] as const;
 
 // Scripts that drive /dev cheats over the wire but never open Postgres: they
 // guard the server target only. A script that grows a pg import graduates to
 // GUARDED_SCRIPTS (the discovery arm below reddens until it does).
 const URL_GUARDED_SCRIPTS = [
+  // The rig latency proxy opens no database, but it FORWARDS the economy
+  // secrets, so its upstream is exactly the URL this guard exists for.
+  'scripts/claudium_latency_proxy.mjs',
+  // The guild-pane probe (Bank Storage phase 18 QA): it drives /dev cheats
+  // against a live realm but opens no database of its own, reading its seeded
+  // state from a file the seed step wrote.
+  'scripts/bank_guild_pane_probe.mjs',
   'scripts/crowd_fps_bench.mjs',
   'scripts/gpu_hitch_capture.mjs',
 ] as const;
@@ -211,7 +229,10 @@ describe('loopback guard call sites', () => {
 
   it.each(URL_GUARDED_SCRIPTS)('%s imports the shared guard and calls the URL arm', (relPath) => {
     const code = scriptCode(relPath);
-    expect(code).toContain("from './lib/loopback_guard.mjs'");
+    // DERIVED, like the database arm: hardcoding the path made a URL-guarded
+    // script in a subdirectory red spuriously, which is what forced this rig's
+    // proxy out of scripts/lib in the first place.
+    expect(code).toContain(expectedGuardImport(relPath));
     expect(code).toContain('assertLoopbackUrl(');
     // No pg import means no database arm; the discovery arm below enforces
     // the graduation the moment one appears.

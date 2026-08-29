@@ -326,19 +326,18 @@ interface AttributionTargetFixture {
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
-// Re-minted for the three GLSL assembly seam patch (the pnpm-lock patch hash
-// moved, and the lockfile is a hashed leaf of the town fingerprint), so the
-// seals follow the swept evidence bytes. No capture was retaken.
-// Re-minted for the cast-VFX warm-up (the vfx.ability-primitives entry links
-// its programs through the compile arms, the dropped programs resume as debt
-// under programs.<id>, the painter gates on the cast readiness): renderer.ts
-// and prewarm_policy.ts both moved, the seals follow the swept evidence bytes.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// merged renderer.ts carries the entry-fade arm's scenery cull beside this
+// branch's aim blocked pass-through, so the composite matches neither parent.
 // No capture was retaken.
-// Re-minted for the gated battleground and yumi attaches (the field copies
-// moved to battleground_views.ts, the proposal prebuild): renderer.ts moved,
-// the seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '015f8f4ae3b3bc7722126ea8ff0fdc4d1ba573c1a43eaec56eeb0d9ea84b8507';
+  'cbeaf192ce71a92b1d9b8b8e0dd92d885a60627f9e12955f20a06485d95129c8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

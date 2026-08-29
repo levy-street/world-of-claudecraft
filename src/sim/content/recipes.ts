@@ -1539,6 +1539,94 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The crafted half of the bag catalog (phase 05 of the bank-storage packet).
+// These live OUTSIDE LADDER_RECIPES on purpose: the ladder is a fixed shape
+// (54 recipes, 9 per craft, 3 per rung, result quality dictated by the rung),
+// so an epic-result bag has no legal seat there and adding a seventh tailoring
+// rung would break the per-craft count. They are ordinary trainer recipes
+// otherwise, priced against the two tailoring bands the ladder already
+// defines: recipe_silkspun_satchel for the 25 band and
+// recipe_silkbinders_raiment for the 50 band, with the same
+// itemLevelBudget/level and the same reagent register.
+export const BAG_RECIPES: ProfessionRecipeRecord[] = [
+  // 25 band, anchored on recipe_silkspun_satchel (skillReq 25, budget 16,
+  // level 15, spider_silk/goldleaf/thread). Twelve materials-only slots against
+  // the satchel's ten general ones, so the same bill scaled up a notch.
+  {
+    id: 'recipe_foragers_haversack',
+    professionId: 'tailoring',
+    resultItemId: 'foragers_haversack',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'spider_silk', count: 8 },
+      { itemId: 'goldleaf_herb', count: 3 },
+      { itemId: 'spool_of_thread', count: 3 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  // 50 band, anchored on recipe_silkbinders_raiment (skillReq 50, budget 20,
+  // level 20, pristine_silk/sunpetal/spider_silk/thread).
+  {
+    id: 'recipe_duskweave_bag',
+    professionId: 'tailoring',
+    resultItemId: 'duskweave_bag',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'pristine_silk', count: 2 },
+      { itemId: 'sunpetal_herb', count: 3 },
+      { itemId: 'spider_silk', count: 6 },
+      { itemId: 'spool_of_thread', count: 3 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  // The two capstones sit in the same 50 band but carry visibly heavier bills:
+  // they are the deterministic routes to the two published ceilings (16 general
+  // slots, 24 materials slots), so the cost, not the skill rung, is the gate.
+  {
+    id: 'recipe_resonant_weave_bag',
+    professionId: 'tailoring',
+    resultItemId: 'resonant_weave_bag',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'resonant_thread', count: 8 },
+      { itemId: 'pristine_silk', count: 4 },
+      { itemId: 'sunpetal_herb', count: 4 },
+      { itemId: 'spool_of_thread', count: 4 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+  {
+    id: 'recipe_loombound_reagent_satchel',
+    professionId: 'tailoring',
+    resultItemId: 'loombound_reagent_satchel',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'resonant_thread', count: 12 },
+      { itemId: 'pristine_silk', count: 6 },
+      { itemId: 'sunpetal_herb', count: 5 },
+      { itemId: 'homespun_cloth', count: 8 },
+      { itemId: 'spool_of_thread', count: 6 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'loom',
+  },
+];
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
@@ -1552,6 +1640,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
+  ...BAG_RECIPES,
 ];
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {

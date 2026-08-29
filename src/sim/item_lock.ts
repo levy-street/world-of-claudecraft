@@ -107,6 +107,11 @@ export function setItemLocked(
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, locked, reason: 'not_held' };
   const { meta } = r;
+  // CARRIED bags only, by construction: the named slot resolves exclusively
+  // from meta.inventory, so this flip can never touch a banked row. If a
+  // bank-container arm is ever added here, it must call bank.ts
+  // bumpBankWireRev in the same change (bankInfoFor clones the mutated slot,
+  // and the server's `bank` wire gate elides on that revision).
   const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
   if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };

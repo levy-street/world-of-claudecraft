@@ -6,8 +6,15 @@ import {
   configureCommunityTestAccounts,
   generatedTestCharacterName,
 } from '../server/community_test_accounts';
-import { BOOST_KIT_VERSION, bisKit, bisKitForRole, CLASS_ROLES } from '../server/pbe_boost';
-import { bagCapacity } from '../src/sim/bags';
+import {
+  BOOST_KIT_VERSION,
+  bestBoostBag,
+  bisKit,
+  bisKitForRole,
+  CLASS_ROLES,
+} from '../server/pbe_boost';
+import { isMaterialsOnlyBag } from '../src/sim/bag_pools';
+import { BACKPACK_SLOTS, bagCapacity } from '../src/sim/bags';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
@@ -52,8 +59,20 @@ describe('community test character templates', () => {
       // The worn set is exactly the class's primary BiS kit (a 2H class may
       // legitimately leave the offhand empty).
       expect(Object.keys(state.equipment).sort()).toEqual(Object.keys(bisKit(cls)).sort());
-      expect(state.bags).toEqual(Array(4).fill('mistcallers_duffel'));
-      expect(bagCapacity(state.bags ?? [])).toBe(72);
+      // Derived from bestBoostBag(), never a literal id or total: two GENERAL
+      // 16-slot bags tie at the top since phase 05 (wayfarers_backpack and
+      // resonant_weave_bag) and bestBoostBag breaks the tie by ascending id,
+      // the same explicit rule as dev_kit's bestBy, so a content-table reorder
+      // cannot move the answer. Deriving keeps this suite agnostic to which
+      // bag wins if the catalog moves; the sibling suites (server/pbe_boost,
+      // dev_kit) pin the winner and picker agreement. What matters here is
+      // that every socket carries the boost pick and the total follows.
+      const boostBag = bestBoostBag();
+      expect(isMaterialsOnlyBag(ITEMS[boostBag])).toBe(false);
+      expect(state.bags).toEqual(Array(4).fill(boostBag));
+      expect(bagCapacity(state.bags ?? [])).toBe(
+        BACKPACK_SLOTS + 4 * (ITEMS[boostBag]?.bagSlots ?? 0),
+      );
 
       for (const itemId of Object.values(state.equipment)) {
         const item = ITEMS[itemId];

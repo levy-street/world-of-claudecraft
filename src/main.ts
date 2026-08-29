@@ -148,6 +148,8 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padCastPress, padCastRelease } from './game/pad_cast_routing';
+import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -2241,7 +2243,7 @@ async function startGame(
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
+      hud.pressSlot(Number(id.slice(4)));
       return;
     }
     hud.cancelGroundAim();
@@ -2407,13 +2409,17 @@ async function startGame(
         cameraPromptOpen(),
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
+    ...padGroundAimCallbacks({
+      hud,
+      world: () => world,
+      camYaw: () => input.camYaw,
+      reticleSpeed: () => settings.get('gamepadReticleSpeed'),
+    }),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbarCast: (action) => {
-      padTargetPick.autoTarget(action);
-      hud.castCrossHotbarAction(action);
-    },
+    onCrossHotbarCast: (action) => padCastPress(hud, padTargetPick.autoTarget, action),
+    onCastRelease: (hold) => padCastRelease(hud, hold),
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
@@ -2539,10 +2545,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
+    if (key === 'startAttackOnAbilityUse' || key === 'touchPreciseGroundAim') {
+      // No live subsystem to update: the HUD reads these settings at ability-cast
       // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
+      settings.set(key, !!value);
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -3122,6 +3128,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    groundAimTargetAttackable: (targetId) =>
+      isAttackableEntity(world.entities.get(targetId), world.playerId, activePvpOpponentIds(world)),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3215,6 +3223,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
+      // A ground aim armed before the drop is anchored to a stale world; the
+      // rebuilt mirror may place the player elsewhere entirely.
+      hud.cancelGroundAim();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3464,12 +3475,12 @@ async function startGame(
           throw new Error(claudiumCheckoutErrorText(err));
         });
       },
-      spend: async (itemId, kind, expectedCostClaudium) => {
+      spend: async (itemId, kind, expectedCostClaudium, idempotencyKey) => {
         const result = await economy.spend({
           itemId,
           kind,
           expectedCostClaudium,
-          idempotencyKey: newIdempotencyKey(),
+          idempotencyKey: idempotencyKey ?? newIdempotencyKey(),
         });
         return {
           granted: result.granted,
@@ -3592,32 +3603,15 @@ async function startGame(
   }
 
   function syncGroundAimReticle(): void {
-    if (!hud.isGroundAimActive()) {
-      renderer.setGroundAimReticle(null);
-      return;
-    }
-    // Touch placement is updated directly by MobileControls. Some mobile
-    // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
-    // reading it here would erase the finger-owned point every render frame.
-    if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
-      hud.updateGroundAimPoint(
-        cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
-      );
-    }
-    const reticle = hud.groundAimReticle();
-    renderer.setGroundAimReticle(
-      reticle
-        ? {
-            x: reticle.point.x,
-            z: reticle.point.z,
-            radius: reticle.radius,
-            school: reticle.school,
-            dimmed: reticle.clamped,
-          }
-        : null,
-    );
+    groundAimReticleSync();
   }
+  const groundAimReticleSync = createGroundAimReticleSync({
+    hud,
+    isMobileTouch: () => document.body.classList.contains('mobile-touch'),
+    cursorPoint: () => input.cursorPoint(),
+    groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
+    setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
+  });
 
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
@@ -4166,7 +4160,9 @@ async function startGame(
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it
-    // walks the player straight back into the trigger.
+    // walks the player straight back into the trigger. An armed ground aim is
+    // anchored to the prior position the same way, so it drops with it.
+    if (clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) hud.cancelGroundAim();
     if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
       input.clearClickMove();
     }
@@ -4519,6 +4515,7 @@ async function startGame(
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
+      hud.cancelGroundAim();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }

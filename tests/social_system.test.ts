@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { resolveRealm } from '../server/realm';
 import {
   type CharInfo,
@@ -1002,6 +1002,58 @@ describe('guilds', () => {
     expect(site.slice(0, 700)).toContain('offensiveName(');
     // The 5th param must be the real chat filter's hard tier, same rationale.
     expect(site.slice(0, 700)).toContain('chatFilter.findHardHit(');
+  });
+
+  it('runs an injected guild creator only after validation and content screening', async () => {
+    const screened = setup({ isNameOffensive: (name) => name === 'Blocked Banner' });
+    screened.add(1, 'Aleph');
+    const calls: Array<[string, number]> = [];
+    const create = async (name: string, leaderId: number) => {
+      calls.push([name, leaderId]);
+      return { guildId: 41 } as const;
+    };
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'no', create)).toBe(false);
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Blocked Banner', create)).toBe(false);
+    expect(calls).toEqual([]);
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Atomic Banner', create)).toBe(true);
+    expect(calls).toEqual([['Atomic Banner', 1]]);
+    expect(screened.tx.membershipStamps).toContainEqual({
+      id: 1,
+      membership: { guildId: 41, guildName: 'Atomic Banner', rank: 'leader' },
+    });
+    expect(screened.tx.created).toContainEqual({ id: 1, guildId: 41 });
+    expect(screened.tx.founded).toEqual([1]);
+  });
+
+  it('never turns a committed guild into a refusal when a live follow-up hook throws', async () => {
+    const isolated = setup();
+    isolated.add(1, 'Aleph');
+    isolated.tx.onGuildMembershipChanged = () => {
+      throw new Error('live stamp failed');
+    };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const created = await isolated.svc.guildCreate(
+        isolated.actor(1),
+        'Durable Banner',
+        async () => ({
+          guildId: 42,
+        }),
+      );
+
+      expect(created).toBe(true);
+      expect(isolated.tx.created).toEqual([{ id: 1, guildId: 42 }]);
+      expect(isolated.tx.founded).toEqual([1]);
+      expect(isolated.tx.textFor(1).join()).toContain('Durable Banner');
+      expect(logged).toHaveBeenCalledWith(
+        'guild create post-commit membership stamp failed:',
+        expect.any(Error),
+      );
+    } finally {
+      logged.mockRestore();
+    }
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
@@ -2237,9 +2289,9 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
   });
 
   it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
-    // The boolean is the reserve-at-gate refund signal (Guild Bank Phase 3
-    // QA): FALSE on every refusal arm (the dispatch gate refunds the reserved
-    // fee), TRUE only on the committed success arm (the hook consumed it).
+    // The default creator still reports false for every refusal and true only
+    // after its guild/member transaction commits. GameServer injects the paid,
+    // fully atomic creator in production.
     await expect(h.svc.guildCreate(h.actor(1), 'no')).resolves.toBe(false); // invalid name
     expect(h.tx.created).toEqual([]);
     await expect(h.svc.guildCreate(h.actor(1), 'Iron Vanguard')).resolves.toBe(true);
@@ -2249,8 +2301,7 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
     expect(h.tx.membershipStamps).toEqual([
       { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
     ]);
-    // Refusals after: duplicate name, already guilded. No further hook calls,
-    // and both report false so the gate refunds.
+    // Refusals after: duplicate name, already guilded. No further hook calls.
     await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
     await expect(h.svc.guildCreate(h.actor(1), 'Second Banner')).resolves.toBe(false);
     expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);

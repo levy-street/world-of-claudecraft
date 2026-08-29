@@ -28,6 +28,7 @@ import type { ActionBarState } from './action_bar_view';
 const ARIA_LABEL_ATTR = 'aria-label';
 const ARIA_DESCRIPTION_ATTR = 'aria-description';
 const ARIA_DISABLED_ATTR = 'aria-disabled';
+const ARIA_PRESSED_ATTR = 'aria-pressed';
 const BACKGROUND_IMAGE_PROP = 'background-image';
 const HEIGHT_PROP = 'height';
 // Drives the radial cooldown sweep: a CSS custom property the `.cd-overlay`
@@ -39,6 +40,7 @@ const CLASS_ABILITY = 'ability';
 const CLASS_UNUSABLE = 'unusable';
 const CLASS_OUT_OF_RANGE = 'oor';
 const CLASS_QUEUED = 'queued';
+const CLASS_AIMING = 'aiming';
 const CLASS_PROC = 'proc';
 const CLASS_EMPOWERED = 'empowered';
 const CLASS_ASCENSION_SPENDER = 'ascension-spender';
@@ -112,6 +114,7 @@ export class ActionBarPainter {
       this.writers.toggleClass(el.btn, CLASS_UNUSABLE, !s.usable);
       this.writers.toggleClass(el.btn, CLASS_OUT_OF_RANGE, s.outOfRange);
       this.writers.toggleClass(el.btn, CLASS_QUEUED, s.queued);
+      this.writers.toggleClass(el.btn, CLASS_AIMING, s.aiming);
       this.writers.toggleClass(el.btn, CLASS_PROC, s.procGlow);
       this.writers.toggleClass(el.btn, CLASS_EMPOWERED, s.empowered);
       this.writers.toggleClass(el.btn, CLASS_ASCENSION_SPENDER, s.ascensionSpender);
@@ -122,6 +125,14 @@ export class ActionBarPainter {
       this.writers.setAttr(el.btn, ARIA_LABEL_ATTR, s.ariaLabel);
       this.writers.setAttr(el.btn, ARIA_DESCRIPTION_ATTR, s.ariaDescription);
       this.writers.setAttr(el.btn, ARIA_DISABLED_ATTR, s.usable ? 'false' : 'true');
+      // aria-pressed only where a toggle semantic is real: the Attack toggle
+      // always, any other slot only while it owns the armed ground aim
+      // (removed afterwards, so ordinary cast buttons stay plain buttons).
+      this.writers.setAttr(
+        el.btn,
+        ARIA_PRESSED_ATTR,
+        s.kind === 'attack' ? (s.queued ? 'true' : 'false') : s.aiming ? 'true' : null,
+      );
       this.writers.setText(el.keybindEl, s.keybindLabel);
     }
   }

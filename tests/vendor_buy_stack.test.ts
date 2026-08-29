@@ -154,23 +154,44 @@ describe('maxBuyCount (the custom prompt cap, Q19: countFit in row units)', () =
   it('caps at bag fit in row units for a stacking single-unit row', () => {
     // minor_healing_potion: default stack 20, row unit 1. 16 free slots hold
     // 320 units, so 320 purchases fit.
-    expect(maxBuyCount(empty, 16, ITEMS.minor_healing_potion)).toBe(320);
+    expect(maxBuyCount(empty, { general: 16, materials: 0 }, ITEMS.minor_healing_potion)).toBe(320);
   });
 
   it('divides unit fit by the food row unit of 5', () => {
     // baked_bread: stack 20, row unit 5: 320 units is 64 purchases.
-    expect(maxBuyCount(empty, 16, ITEMS.baked_bread)).toBe(64);
+    expect(maxBuyCount(empty, { general: 16, materials: 0 }, ITEMS.baked_bread)).toBe(64);
   });
 
   it('counts existing-stack top-up room like the sim capacity model', () => {
     // One bread stack at 18/20 in a 16-slot bag: 2 top-up units plus 15 fresh
     // slots of 20 is 302 units, floored to 60 row units.
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 18 }];
-    expect(maxBuyCount(inv, 16, ITEMS.baked_bread)).toBe(60);
+    expect(maxBuyCount(inv, { general: 16, materials: 0 }, ITEMS.baked_bread)).toBe(60);
   });
 
   it('reports 0 for full bags (the prompt floors to 1 and lets the server refuse)', () => {
     const inv: InvSlot[] = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
-    expect(maxBuyCount(inv, 16, ITEMS.baked_bread)).toBe(0);
+    expect(maxBuyCount(inv, { general: 16, materials: 0 }, ITEMS.baked_bread)).toBe(0);
+  });
+
+  it('is pool-aware: materials headroom never inflates a non-material cap, DOES grow a material one', () => {
+    // maxBuyCount forwards def.id into countFit, so both pool arms are live
+    // in this suite's own function (the painter suite only pins the hud call
+    // site's source text). baked_bread is a non-material: 24 materials slots
+    // buy its prompt nothing, the cap stays the general-pool 64. The vendor
+    // staple spool_of_thread IS in the derived material set (kind junk,
+    // recipe reagent), so the same satchels grow its cap: 16 vs 40 slots of
+    // 20 at its row unit.
+    expect(maxBuyCount(empty, { general: 16, materials: 24 }, ITEMS.baked_bread)).toBe(64);
+    const withoutSatchels = maxBuyCount(
+      empty,
+      { general: 16, materials: 0 },
+      ITEMS.spool_of_thread,
+    );
+    const withSatchels = maxBuyCount(empty, { general: 16, materials: 24 }, ITEMS.spool_of_thread);
+    expect(withoutSatchels).toBeGreaterThan(0);
+    expect(withSatchels).toBeGreaterThan(withoutSatchels);
+    // Exact ratio: 40 slots against 16 at the same stack and row unit.
+    expect(withSatchels * 16).toBe(withoutSatchels * 40);
   });
 });

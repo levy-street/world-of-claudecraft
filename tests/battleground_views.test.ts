@@ -1,7 +1,9 @@
 // The battleground view map (src/render/battleground_views.ts): the copy the
 // player is matched into builds when they stand in the band, the queue
-// proposal prebuilds a hidden copy whose parts link ahead, and every streamed
-// part joins the field through the host's gated attach (battleground.ts).
+// proposal prebuilds a hidden copy whose pieces link ahead, and the renderer's
+// compile gate reaches the stream through the host. Which pieces the stream
+// gates, and which attach ungated, is battleground.ts's own contract, pinned
+// in tests/battleground_compile_gate.test.ts.
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -17,16 +19,16 @@ vi.mock('../src/render/battleground', () => ({
   buildBattleground: (
     origin: { x: number; z: number },
     seed: number,
-    opts: { attachPart?: (part: THREE.Object3D, into: THREE.Group) => void },
+    opts: { compileGate?: (target: THREE.Object3D) => Promise<unknown> },
   ) => {
     built.push({ origin, seed, opts });
     const group = new THREE.Group();
     group.name = 'battleground';
-    // One streamed part lands right away, through the host's attach.
+    // One streamed piece lands right away; the real stream gates it, this
+    // stand-in only has to produce a group the view map can own.
     const part = new THREE.Mesh();
     part.name = 'terrain';
-    if (opts.attachPart) opts.attachPart(part, group);
-    else group.add(part);
+    group.add(part);
     return { group, setWardState: vi.fn(), dispose: vi.fn() };
   },
 }));
@@ -42,19 +44,9 @@ import { BG_SLOT_COUNT, battlegroundOrigin } from '../src/sim/data';
 
 function host() {
   const scene = new THREE.Scene();
-  const attached: string[] = [];
-  const api: BattlegroundViewHost = {
-    scene,
-    seed: 7,
-    lowGfx: false,
-    fireLights: [],
-    attachPart: (part, into) => {
-      attached.push(part.name);
-      part.visible = false;
-      into.add(part);
-    },
-  };
-  return { scene, attached, api };
+  const compileGate = vi.fn(async () => {});
+  const api: BattlegroundViewHost = { scene, seed: 7, lowGfx: false, fireLights: [], compileGate };
+  return { scene, compileGate, api };
 }
 
 beforeEach(() => {
@@ -64,7 +56,7 @@ beforeEach(() => {
 
 describe('ensureBattlegroundViewNear', () => {
   it('builds the copy of the slot the player stands in, visible, once', () => {
-    const { scene, attached, api } = host();
+    const { scene, api } = host();
     const views: BattlegroundViews = new Map();
     const origin = battlegroundOrigin(1);
     ensureBattlegroundViewNear(views, origin.x + 10, origin.z - 10, api);
@@ -76,8 +68,9 @@ describe('ensureBattlegroundViewNear', () => {
     expect([...views.keys()]).toEqual([1]);
     expect(views.get(1)?.group.visible).toBe(true);
     expect(scene.children).toEqual([views.get(1)?.group]);
-    // The streamed part went through the host's attach, not a bare add.
-    expect(attached).toEqual(['terrain']);
+    // The host reaches buildBattleground whole, so the renderer's compile gate
+    // is what the stream gates each piece on.
+    expect((built[0].opts as { compileGate?: unknown }).compileGate).toBe(api.compileGate);
   });
 
   it('builds nothing while the player is outside every slot', () => {
@@ -121,34 +114,12 @@ describe('prebuildBattlegroundView', () => {
 describe('the streamed parts and the renderer wiring (source pins)', () => {
   const source = (rel: string) => readFileSync(new URL(rel, import.meta.url), 'utf8');
 
-  it('routes every streamed part of the field through attachPart, lights excepted', () => {
-    const field = source('../src/render/battleground.ts');
-    const start = field.indexOf('void (async () => {');
-    const end = field.indexOf('freezeStaticMatrices(group);', start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const streamed = field.slice(start, end);
-    const bareAdds = [...streamed.matchAll(/group\.add\(([^)]*)\)/g)].map((m) => m[1]);
-    expect(bareAdds).toEqual(['light']);
-    for (const part of [
-      'terrain.group',
-      'wards.group',
-      'placements.group',
-      'grass',
-      'mesh',
-      'flames',
-    ])
-      expect(streamed).toContain(`attach(${part});`);
-  });
-
   it('attaches the yumi maze and every field part through the compile gate, and prebuilds at the proposal', () => {
     const renderer = source('../src/render/renderer.ts');
     expect(renderer).toContain(
       'void attachSceneGroupGated(this.scene, view.group, this.worldCompileGate());',
     );
-    expect(renderer).toContain(
-      'attachPart: (part, into) => void attachSceneGroupGated(into, part, this.worldCompileGate()),',
-    );
+    expect(renderer).toContain('compileGate: this.worldCompileGate(),');
     expect(renderer).toContain(
       'ensureBattlegroundViewNear(this.bgViews, px, pz, this.battlegroundViewHost());',
     );

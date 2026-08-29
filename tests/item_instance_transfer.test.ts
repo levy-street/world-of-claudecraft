@@ -161,13 +161,19 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     const inventory: InvSlot[] = [{ itemId: 'pristine_hide', count: 1 }];
     // One free slot short: the plain stack tops up, the instanced copy needs
     // its own slot.
-    expect(canGrantCopies(inventory, 1, 'pristine_hide', 1)).toBe(true);
-    expect(canGrantCopies(inventory, 1, 'pristine_hide', 1, SIGNED)).toBe(false);
+    expect(canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(true);
+    expect(
+      canGrantCopies(inventory, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+    ).toBe(false);
     const signedStack: InvSlot[] = [
       { itemId: 'pristine_hide', count: 1, instance: { signer: 'Ayla' } },
     ];
-    expect(canGrantCopies(signedStack, 1, 'pristine_hide', 1, SIGNED)).toBe(true);
-    expect(canGrantCopies(signedStack, 1, 'pristine_hide', 1)).toBe(false);
+    expect(
+      canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1, SIGNED),
+    ).toBe(true);
+    expect(canGrantCopies(signedStack, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(
+      false,
+    );
   });
 
   // #2605 review (Rubsey/OSSBrain): canGrantCopies must model the same
@@ -180,13 +186,33 @@ describe('canGrantCopies / grantCopies: the shared exchange-pipe pair', () => {
     // One free slot short: the plain stack tops up for a marker-free grant,
     // but a crafted-marker grant of the same itemId cannot merge into it and
     // needs its own fresh slot.
-    expect(canGrantCopies(plainStack, 1, 'pristine_hide', 1)).toBe(true);
-    expect(canGrantCopies(plainStack, 1, 'pristine_hide', 1, undefined, 'recipe_x')).toBe(false);
+    expect(canGrantCopies(plainStack, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(true);
+    expect(
+      canGrantCopies(
+        plainStack,
+        { general: 1, materials: 0 },
+        'pristine_hide',
+        1,
+        undefined,
+        'recipe_x',
+      ),
+    ).toBe(false);
     const craftedStack: InvSlot[] = [
       { itemId: 'pristine_hide', count: 1, craftedRecipeId: 'recipe_x' },
     ];
-    expect(canGrantCopies(craftedStack, 1, 'pristine_hide', 1, undefined, 'recipe_x')).toBe(true);
-    expect(canGrantCopies(craftedStack, 1, 'pristine_hide', 1)).toBe(false);
+    expect(
+      canGrantCopies(
+        craftedStack,
+        { general: 1, materials: 0 },
+        'pristine_hide',
+        1,
+        undefined,
+        'recipe_x',
+      ),
+    ).toBe(true);
+    expect(canGrantCopies(craftedStack, { general: 1, materials: 0 }, 'pristine_hide', 1)).toBe(
+      false,
+    );
   });
 
   it('grant forwards craftedRecipeId on BOTH arms, not just the plain one', () => {

@@ -4212,6 +4212,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} bangkit di atas Dataran Tinggi Thornpeak!',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas {slots} Slot',
+  'itemUi.tooltip.bagSlotsMaterials': 'Tas Bahan {slots} Slot',
   'questUi.tracker.hideFromMap': 'Sembunyikan {name} dari peta',
   'questUi.tracker.showOnMap': 'Tampilkan {name} di peta',
   'sim.delve.baptistryEggs':

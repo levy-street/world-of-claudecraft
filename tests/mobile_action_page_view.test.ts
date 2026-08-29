@@ -7,6 +7,7 @@ import {
   MOBILE_ACTIONS_PER_PAGE,
   mobileActionSourceSlotCount,
   mobileButtonHasSourceSlot,
+  mobileButtonOwnsSourceSlot,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -163,6 +164,27 @@ describe('mobileButtonHasSourceSlot', () => {
     expect(mobileButtonHasSourceSlot(1, 0, span, 'down')).toBe(true); // slot 33
     expect(mobileButtonHasSourceSlot(1, 1, span, 'down')).toBe(false); // slot 34
     expect(mobilePageCount(span)).toBe(2);
+  });
+});
+
+describe('mobileButtonOwnsSourceSlot', () => {
+  it('matches every direction to the physical button that owns it', () => {
+    const expectedSlots = [1, 5, 9, 13, 17];
+    expect(
+      RADIAL_DIRECTIONS.map((direction) => sourceSlotForMobileButton(0, 0, direction)),
+    ).toEqual(expectedSlots);
+    for (const sourceSlot of expectedSlots) {
+      expect(mobileButtonOwnsSourceSlot(0, 0, sourceSlot)).toBe(true);
+    }
+    expect(mobileButtonOwnsSourceSlot(0, 1, 17)).toBe(false);
+  });
+
+  it('only owns slots on the current page and inside the reachable span', () => {
+    expect(sourceSlotForMobileButton(1, 0, 'down')).toBe(33);
+    expect(mobileButtonOwnsSourceSlot(1, 0, 33)).toBe(true);
+    expect(mobileButtonOwnsSourceSlot(0, 0, 33)).toBe(false);
+    expect(mobileButtonOwnsSourceSlot(1, 1, 34)).toBe(false);
+    expect(mobileButtonOwnsSourceSlot(1, 0, null)).toBe(false);
   });
 });
 

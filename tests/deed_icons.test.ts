@@ -364,7 +364,10 @@ describe('Book of Deeds webp icons', () => {
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(274);
+    // 273 -> 276 across the merge: the bank socket deed pair (Bank Storage
+    // phase 06) and the Proving Shore graduation deed, all three riding
+    // DEED_ART_PENDING until their commissioned art lands.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(276);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(271);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

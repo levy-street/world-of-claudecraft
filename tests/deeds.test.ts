@@ -1563,8 +1563,13 @@ describe('bounded sets on load', () => {
     // serialized fine but were dropped on load while the namespace was missing
     // from VISITED_MARK_NAMESPACES, so a mid-hunt save silently lost rare-event
     // deed progress. The mark must survive the round trip.
+    // 'toString' and 'constructor' give the Object.hasOwn arm its teeth: under
+    // the old `if (ITEMS[id])` truthiness check both index an INHERITED function
+    // off Object.prototype and would be restored into the persisted discovery
+    // ledger as real items; hasOwn drops them. 'not_a_real_item' alone cannot
+    // distinguish the two checks (undefined is falsy under both).
     const stats = restoreDeedStats({
-      itemsDiscovered: ['glimmerfin_koi', 'not_a_real_item'],
+      itemsDiscovered: ['glimmerfin_koi', 'not_a_real_item', 'toString', 'constructor'],
       visited: [
         'poi:eastbrook_vale:eastbrook',
         'gather_event:perfect_specimen',

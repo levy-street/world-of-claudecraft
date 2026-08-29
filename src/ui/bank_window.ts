@@ -16,9 +16,12 @@
 // #prompt-stack). No raw hex: the item-quality color comes from the shared
 // QUALITY_COLOR map and the unranked fallback is the --color-quality-default token.
 
+import { NATIVE_APP } from '../client_origin';
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
+import { guildBankRungsBought } from '../sim/guild_bank';
 import { isItemLocked } from '../sim/item_lock';
+import { vaultMaterialIds } from '../sim/materials_vault';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
@@ -34,13 +37,28 @@ import {
 } from './bag_filter';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { bankBonusSectionHtml } from './bank_bonus_view';
+import { showBuyConfirmPrompt } from './bank_buy_prompt';
+import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_layout_core';
 import { filterBankSlots } from './bank_filter';
+import { bankMeterAriaLabel, bankMeterTooltipHtml } from './bank_meter_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { BankRungPurchase } from './bank_rung_purchase_core';
 import {
-  type BankBonusModel,
-  type BankBonusRowModel,
+  bankRungClaudiumTagHtml,
+  bankRungNoticeText,
+  bankRungResultHtml,
+  bankRungTopUpCopy,
+  claudiumAmountText,
+} from './bank_rung_view';
+import { BankSocketPurchaseController } from './bank_socket_purchase_controller';
+import {
   type BankBuySlotsModel,
+  type BankClaudiumInput,
+  type BankMeterModel,
   type BankSlotModel,
+  type BankSocketCellModel,
+  bankPoolsOf,
   bankSlotAction,
   buildBankView,
   type DepositAllPlan,
@@ -48,17 +66,20 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
+import type { ClaudiumPurchaseFacet } from './claudium_purchase_bridge';
+import { formatCount } from './count_format';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, findFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { type GuildBankViewModel, guildBankSlotFocusKeys } from './guild_bank_view';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
   type GuildBankPaneView,
   GuildBankTab,
 } from './guild_bank_window';
-import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
+import { formatMoney, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   cornerMarkHtml,
@@ -72,10 +93,17 @@ import {
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
+// The durable ledger factory, which owns the ONE key minter every
+// Claudium-spending surface uses (a second minter is exactly the drift the
+// packet warns about; see src/ui/purchase_intent_key.ts).
+import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
+import { storageRungRefusalTargets } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
+import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -94,6 +122,21 @@ const BANK_PROMPT_SELECTOR = '.bank-quantity-prompt, .bank-buy-prompt';
 // Exported so the guild pane (guild_bank_window.ts), which shares this window's
 // prompt classes and force-close teardown, can tear siblings down before
 // mounting its own prompts.
+//
+// IT FIRES NO DISMISS HOOK, and which callers have to answer for that is stated
+// here rather than left to be rediscovered. The node is removed directly, so
+// bank_buy_prompt's onDismiss never runs on this path (its own comment used to
+// claim otherwise; phase 17 corrected it). The two callers that can tear down a
+// prompt the PLAYER left standing, close() and render(), therefore end the rung
+// attempt themselves through BankRungPurchase.endPrompt().
+//
+// The other call sites deliberately do not, and the premise is load-bearing: the
+// guild and vault panes' dismissPrompts deps and the dismissSiblings wirings all
+// run while some OTHER prompt is being opened, and no other prompt can be opened
+// while a rung confirm stands, because the confirm sets #bank-window inert.
+// tests/bank_rung_purchase.test.ts pins that inert. showBuySlotsPrompt's own
+// dismissSiblings is the one site that must NEVER end the attempt, because it
+// runs immediately after arming it.
 export function dismissBankPrompts(): void {
   for (const p of document.querySelectorAll(BANK_PROMPT_SELECTOR)) p.remove();
 }
@@ -135,31 +178,6 @@ const BANK_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   name: 'hudChrome.bags.sortName',
 };
 
-// The KNOWN bonus-source ids (server-stamped into BankInfo.bonusSources) with their
-// localized label and the advert shown while unearned; the referral row uses `advert`
-// as its always-on explainer detail line. A source id ABSENT from this map is SKIPPED
-// by buildBonusSection (forward compat: a future X/Twitch row arrives as a new server
-// id and must never render a raw key or an English fallback). SOURCE-SCAN pinned in
-// tests/bank_window.test.ts.
-const BANK_BONUS_SOURCE_KEYS: Record<string, { label: TranslationKey; advert: TranslationKey }> = {
-  email: {
-    label: 'hudChrome.bank.bonusSourceEmail',
-    advert: 'hudChrome.bank.bonusAdvertEmail',
-  },
-  discord: {
-    label: 'hudChrome.bank.bonusSourceDiscord',
-    advert: 'hudChrome.bank.bonusAdvertDiscord',
-  },
-  wallet: {
-    label: 'hudChrome.bank.bonusSourceWallet',
-    advert: 'hudChrome.bank.bonusAdvertWallet',
-  },
-  referral: {
-    label: 'hudChrome.bank.bonusSourceReferral',
-    advert: 'hudChrome.bank.bonusReferralExplainer',
-  },
-};
-
 /**
  * Hud-supplied glue. The icon/money/tooltip painters are the shared
  * PainterHostPresentation bag (Hud builds it once and hands it to every window that
@@ -168,7 +186,13 @@ const BANK_BONUS_SOURCE_KEYS: Record<string, { label: TranslationKey; advert: Tr
  * chrome. The module never reaches into Hud directly and never hardcodes the
  * window id (always deps.root()).
  */
-export interface BankWindowDeps extends PainterHostPresentation {
+// `Partial<ClaudiumPurchaseFacet>` is the phase 13 addition: the four members of
+// the shared Claudium spend seam (src/ui/claudium_purchase_bridge.ts), spread in
+// whole by src/ui/hud.ts. OPTIONAL because they genuinely are: the offline
+// browser world and the native builds construct this window with no Claudium
+// anything, and the tag's absence there is the intended behavior rather than a
+// degraded one.
+export interface BankWindowDeps extends PainterHostPresentation, Partial<ClaudiumPurchaseFacet> {
   /** The #bank-window root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
   /** The live world (offline Sim or online ClientWorld mirror). */
@@ -199,9 +223,11 @@ export interface BankWindowDeps extends PainterHostPresentation {
   onInventoryChanged(): void;
 }
 
-/** The two bank panes. The Guild tab exists only while guildBankInfo is
- *  non-null (officer-plus at a banker, online with the book loaded). */
-export type BankTabId = 'personal' | 'guild';
+/** The three bank panes. The Guild tab exists only while guildBankInfo is
+ *  non-null (any guild member at a banker, online with the book loaded;
+ *  canEdit gates the actions); the Vault tab exists only while vaultInfo is
+ *  non-null (standing at a banker, both hosts). */
+export type BankTabId = 'personal' | 'vault' | 'guild';
 
 export class BankWindow {
   private opened = false;
@@ -225,6 +251,9 @@ export class BankWindow {
   // The guild pane painter (guild_bank_view.ts core + guild_bank_window.ts),
   // sharing this window's presentation bag and prompt-dialog chrome.
   private readonly guildPane: GuildBankTab;
+  // The Materials Vault pane (vault_view.ts core + vault_window.ts), on the
+  // same composition terms.
+  private readonly vaultPane: VaultTab;
 
   // Window-local filter state: category chips + sort persist across sessions under
   // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
@@ -269,8 +298,93 @@ export class BankWindow {
   private depositAllPending = false;
   private depositAllTimer: number | null = null;
 
+  // The consent/echo latch survives close; only its transient status is reset.
+  private readonly socketPurchase = new BankSocketPurchaseController({
+    timers: {
+      schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+      cancel: (handle) => window.clearTimeout(handle),
+    },
+    current: () => this.deps.world().bankInfo,
+    send: () => {
+      this.deps.world().bankUnlockSocket();
+      audio.coin();
+      this.deps.onInventoryChanged();
+    },
+    repaint: () => {
+      if (this.opened) this.render();
+    },
+    root: () => this.deps.root(),
+    installPromptDialog: (prompt, opener, close) => this.installPromptDialog(prompt, opener, close),
+    dismissSiblings: dismissBankPrompts,
+  });
+
+  // --- The banker's Claudium rung purchase (Bank Storage phase 13) ---------
+  // The money state machine lives in src/ui/bank_rung_purchase_core.ts (ruling
+  // 30, taken by phase 17): the intent ledger, the sent latch, the in-flight
+  // SKU, the result band, the confirm latch and the one-per-open re-prompt cap,
+  // plus the spend and its refusal handling. What stays here is what needs the
+  // WINDOW: the confirm prompt, the focus capture and return, the live-DOM busy
+  // write, the live-region announcement, the repaint and the top-up handoff.
+  //
+  // The LEDGER is constructed here rather than in the controller, and stays one
+  // line for one line. It is the same durable ledger the store's charter flow
+  // uses, and the spelling below is what
+  // tests/woc_store_window_contract.test.ts's ruling-19 pin reads for: reverting
+  // either spending window to a memory-only ledger re-opens the double charge
+  // phase 16 closed, so the pin names both windows and this line keeps meaning
+  // what it says.
+  private readonly rungIntents: PurchaseIntentLedger = durableIntents(() => this.deps.world());
+  private readonly rungPurchase = new BankRungPurchase({
+    intents: this.rungIntents,
+    // The storage KIND is supplied HERE, at the one call site, so the wire
+    // literal stays where a source pin over this painter can still read it.
+    spend: (skuId, cost, key) => this.deps.spendStoreItem?.(skuId, 'storage', cost, key),
+    isOpen: () => this.opened,
+    setBusy: (busy) => this.setRungBusy(busy),
+    repaint: () => this.repaintAfterRung(),
+    currentOffer: () => this.currentRungOffer(),
+    reprompt: (buy) => this.showBuySlotsPrompt(buy),
+    needMoreClaudium: (blockSlots, cost, balance) =>
+      this.openNeedMoreClaudiumDialog(blockSlots, cost, balance),
+    coin: () => audio.coin(),
+  });
+  // The control that owned focus when the confirm prompt opened, captured
+  // BEFORE it opens (see showBuySlotsPrompt) and consumed by the post-result
+  // repaint. Window state, not purchase state: the controller answers WHETHER a
+  // prompt abandoned an intent and this decides what that does to focus.
+  //
+  // EQUIVALENT-MUTANT NOTE, recorded so a later reader does not hunt for the arms
+  // that pin the clear. It rides THREE sites now (the prompt's dismiss hook,
+  // close() and render()), and removing it at any of them changes no reachable
+  // outcome TODAY: the only consumer is repaintAfterRung, every path to a spend
+  // goes through showBuySlotsPrompt, and that re-captures this key
+  // unconditionally on the way in. So the key's real bound is the re-arm plus
+  // close(), and the clear is defence in depth. That it is bounded by a
+  // coincidence rather than by a stated rule is the StoreFocusStash shape
+  // (src/ui/store_focus_policy.ts) and is recorded rather than taken here.
+  private rungFocusReturnKey: string | null = null;
+  // The monotonic sequence that keeps an identical repeated message announcing.
+  private rungAnnounceSeq = 0;
+
   constructor(private readonly deps: BankWindowDeps) {
     this.guildPane = new GuildBankTab({
+      root: () => this.deps.root(),
+      world: () => this.deps.world(),
+      itemIcon: (item) => this.deps.itemIcon(item),
+      moneyHtml: (copper) => this.deps.moneyHtml(copper),
+      itemTooltip: (item, instance) => this.deps.itemTooltip(item, instance),
+      attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
+      hideTooltip: () => this.deps.hideTooltip(),
+      consumePeek: () => this.deps.consumePeek(),
+      onInventoryChanged: () => this.deps.onInventoryChanged(),
+      installPromptDialog: (prompt, opener, close) =>
+        this.installPromptDialog(prompt, opener, close),
+      dismissPrompts: () => dismissBankPrompts(),
+      requestRender: () => {
+        if (this.opened) this.render();
+      },
+    });
+    this.vaultPane = new VaultTab({
       root: () => this.deps.root(),
       world: () => this.deps.world(),
       itemIcon: (item) => this.deps.itemIcon(item),
@@ -328,6 +442,29 @@ export class BankWindow {
     );
   }
 
+  /** True while the window is open on the Vault pane with the vault UNLOCKED:
+   *  the bags companion reads this (via Hud) to route a bag click to
+   *  vaultDeposit. The LOCKED pane is a purchase surface, not a deposit
+   *  target, so it arms nothing (bankOpen stays true and the click falls to
+   *  the no-target speak-path, the guild Log rule); requiring the live
+   *  vaultInfo also closes the one-frame window between the mirror nulling
+   *  and the slow-band repaint, the guildTabActive rule. */
+  get vaultTabActive(): boolean {
+    return this.opened && this.tab === 'vault' && this.vaultPane.unlocked;
+  }
+
+  /** Observe raw authoritative refusals before Hud translates their text. */
+  observeStorageText(text: string): string {
+    const target = storageRungRefusalTargets(text);
+    const socketCleared = this.socketPurchase.observeText(text);
+    const guildCleared = target.guild ? this.guildPane.onDefinitivePurchaseRefusal() : false;
+    const vaultCleared = target.vault ? this.vaultPane.onDefinitivePurchaseRefusal() : false;
+    if ((socketCleared || guildCleared || vaultCleared) && this.opened) {
+      this.render();
+    }
+    return text;
+  }
+
   // Re-interacting with the banker while already open must not re-run the open
   // bookkeeping: re-capturing openerFocus could record a node INSIDE this window
   // (returned-to after close, i.e. destroyed), and a fresh render would tear an
@@ -339,6 +476,14 @@ export class BankWindow {
     this.opened = true;
     this.lastSig = '';
     this.openedAt = performance.now();
+    // Reset the one-per-open re-prompt cap on the way IN too: close() alone
+    // leaves a refusal that resolved after the close holding the next open's cap.
+    this.rungPurchase.resetRepromptCap();
+    // Warm the lazy material-set memo on the open path: its first derive walks
+    // the recipe/enchant/item tables, and without this the walk lands inside
+    // the first bag CLICK or tooltip hover instead of here (a one-time hitch,
+    // but the open already pays for a full render so it hides better).
+    vaultMaterialIds();
     this.render();
     this.deps.root().style.display = 'flex';
     audio.bagOpen();
@@ -352,10 +497,26 @@ export class BankWindow {
     // orphaned aria-modal dialog, then clear the inert it set (a hidden window must
     // never stay inert or the next open shows a dead grid).
     dismissBankPrompts();
+    // ...and END the rung attempt that prompt belonged to. dismissBankPrompts
+    // removes the NODE, so bank_buy_prompt's own dismiss hook never fires on this
+    // path: without this line an unsent Claudium intent survives the close with
+    // its cost FROZEN, and phase 16 made that record DURABLE, so it now outlives
+    // the page too. Idempotent, so running it on every close is free.
+    if (this.rungPurchase.endPrompt()) this.rungFocusReturnKey = null;
     // Drop any pending deposit-all summary (and its timer) so a reopened bank never
     // flashes a stale line, and no late timer fires render() on the hidden window.
     this.clearDepositStatus();
     this.clearDepositAllPending();
+    // Drop the purchase-result band and the focus stash. The in-flight SPEND is
+    // deliberately NOT cancelled and its intent is deliberately NOT dropped: a
+    // request already on the wire may be sitting behind a live debit, so the key
+    // must survive the close and let the next attempt replay under it. What is
+    // cleared is only what would otherwise paint a stale result on the next open.
+    this.rungPurchase.clearNotice();
+    this.socketPurchase.clearStatus();
+    this.rungFocusReturnKey = null;
+    this.rungAnnounceSeq++;
+    this.rungPurchase.resetRepromptCap();
     // The search is a per-visit filter: left set, the next open would start
     // pre-narrowed to a stale query (slots hidden with no cue why). Reset the
     // live value; the persist rewrite also scrubs any legacy pre-fix query out
@@ -375,6 +536,9 @@ export class BankWindow {
     // aim at it.
     this.guildPane.resetView();
     this.lastRenderedGuildView = 'contents';
+    // ...and the Vault pane's transient state (summary line, pending guard),
+    // so a reopened bank never flashes a stale line.
+    this.vaultPane.reset();
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -423,19 +587,28 @@ export class BankWindow {
     // the guild refresh arm repaints on ANY officer's op, so an external echo
     // must not yank a keyboard user off the tab, cell, or button they were on.
     // Guild controls carry keys (guild_bank_window.ts + the tab annotation
-    // below); personal controls carry none and keep the close-button fallback.
+    // below); personal controls keep the close-button fallback, except the
+    // meter (bank:meter), whose whole payload is focus-revealed.
     const focusKey = hadFocus ? captureFocusKey(el) : null;
     if (document.querySelector(BANK_PROMPT_SELECTOR)) {
       dismissBankPrompts();
+      // The SAME teardown close() performs, and the reachable one: render() takes
+      // this branch whenever the repaint signature moves with a confirm open, and
+      // the prompt's own dismiss hook does not see a raw node removal.
+      if (this.rungPurchase.endPrompt()) this.rungFocusReturnKey = null;
       el.inert = false;
     }
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.bank.title') });
-    // .bank-scroll (not #bank-window) is the scroll container; it is recreated on
-    // every rebuild, so capture its scroll offset and reapply it to the fresh one,
-    // else a withdraw snaps the list back to the top (the bags idiom).
-    const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
-    const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
+    // WHICH element scrolls depends on the viewport (bank_chrome_layout_core.ts):
+    // the .bank-scroll region normally, the window itself in the short-phone
+    // compact regime. Both are recreated or clamped by a rebuild, so both are
+    // captured here and both are written back, else a withdraw snaps the list
+    // back to the top (the bags idiom) on one viewport and not the other.
+    const prevScroll = this.captureScroll(el);
+    const bankInfo = this.deps.world().bankInfo;
+    this.socketPurchase.observeRevision(bankInfo?.socketsUnlocked);
+    const model = buildBankView(bankInfo, (id) => knownItemDef(ITEMS, id), this.claudiumInput());
     // The Guild tab exists ONLY while guildBankInfo is non-null (any guild
     // member at a banker, online, book loaded; a plain member's pane renders
     // read-only). When it goes away mid-open (leave,
@@ -445,26 +618,41 @@ export class BankWindow {
     const guildModel = this.guildPane.model();
     const guildAvailable = guildModel.kind !== 'hidden'; // opened OR unopened pane
     if (!guildAvailable) {
-      this.tab = 'personal';
+      // Only the GUILD tab falls back: an unconditional reset here would
+      // clobber the Vault tab for every guildless player (it did, in this
+      // phase's first cut; tests/vault_window.test.ts pins the fix).
+      if (this.tab === 'guild') this.tab = 'personal';
       // ...and drop the pane's OWN sub-view with it, the way close() does. The
       // log view is the one that fetches: leaving it selected on a pane that no
       // longer exists left a demoted client re-requesting a log the server
       // refuses, once per TTL, forever.
       this.guildPane.resetView();
     }
+    // The Vault tab follows the guild collapse rule: it exists only while
+    // vaultInfo is non-null (nearBanker in both hosts, the same gate as
+    // bankInfo, so a lone one-tick null cannot outlive the whole-window grace
+    // above), and the active tab snaps back to Personal when it disappears.
+    // Availability is the null test alone; the full model (a sort plus two
+    // catalog lookups per stocked material) is built only on the vault arm
+    // below, where it is actually painted. LOOSE != so an undefined member
+    // (a world double that predates the vault, or a host that never wires
+    // it) reads unavailable exactly like the pure core's falsy test did:
+    // a strict !== null renders a spurious tab for undefined.
+    const vaultAvailable = this.deps.world().vaultInfo != null;
+    if (!vaultAvailable && this.tab === 'vault') this.tab = 'personal';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (guildAvailable) {
+    if (guildAvailable || vaultAvailable) {
       // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
       // the social/talents idiom. The PERSONAL pane's sections still mount
       // directly on the window root (wrapping them would disturb the flex
       // column the bank CSS sizes), so the strip carries no blanket `panelId`;
-      // the GUILD pane does build a real role=tabpanel, because it holds a
-      // nested tab list of its own and a second peer tablist with no stated
-      // relationship is unintelligible to a screen reader. Its aria-controls is
-      // stamped below, once that panel exists.
+      // the GUILD and VAULT panes do build a real role=tabpanel (the guild one
+      // holds a nested tab list of its own, and a lone unwrapped peer would
+      // read as a second unrelated top level to a screen reader). Their
+      // aria-controls are stamped below, once each panel exists.
       el.insertAdjacentHTML(
         'beforeend',
         tabStripHtml(
@@ -475,16 +663,23 @@ export class BankWindow {
             selectedClass: 'on',
             tabs: [
               { id: 'personal', label: t('hudChrome.bank.personalTab') },
-              // A stable id so the Guild pane's panel can point its
-              // aria-labelledby back at this tab.
-              { id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID },
+              // The two conditional tabs carry stable button ids so their
+              // panels can point aria-labelledby back at them. The vault sits
+              // between Personal and Guild: both personal stores first, the
+              // shared one last.
+              ...(vaultAvailable
+                ? [{ id: 'vault', label: t('hudChrome.bank.vaultTab'), buttonId: VAULT_TAB_ID }]
+                : []),
+              ...(guildAvailable
+                ? [{ id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID }]
+                : []),
             ],
             selected: this.tab,
           }),
         ),
       );
       wireTabStrip(el, 'bank-tab', (id, focusFollow) => {
-        if (id !== 'personal' && id !== 'guild') return;
+        if (id !== 'personal' && id !== 'guild' && id !== 'vault') return;
         if (this.tab !== id) audio.click();
         this.tab = id;
         this.render();
@@ -496,6 +691,23 @@ export class BankWindow {
         tab.dataset.focusKey = `tab:${tab.dataset.tab}`;
       }
     }
+    // A status timer armed while the vault pane was showing must not outlive
+    // the pane onto another tab, where its firing would rebuild the whole
+    // window for a line nobody can see.
+    if (this.tab !== 'vault') this.vaultPane.pauseStatusTimer();
+    if (this.tab === 'vault') {
+      this.vaultPane.renderInto(el, this.vaultPane.model());
+      // Close the tab/panel relationship now that the panel exists (the guild
+      // pane's aria-controls rule below).
+      const vaultTab = el.querySelector<HTMLElement>(`#${VAULT_TAB_ID}`);
+      if (vaultTab && el.querySelector(`#${VAULT_PANEL_ID}`)) {
+        vaultTab.setAttribute('aria-controls', VAULT_PANEL_ID);
+      }
+      this.annotateVaultFocusKeys(el);
+      this.restoreScroll(el, prevScroll);
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      return;
+    }
     if (this.tab === 'guild') {
       this.guildPane.renderInto(el, guildModel);
       // Close the tab/panel relationship now that the panel exists: without it
@@ -505,8 +717,8 @@ export class BankWindow {
       if (guildTab && el.querySelector(`#${GUILD_PANEL_ID}`)) {
         guildTab.setAttribute('aria-controls', GUILD_PANEL_ID);
       }
-      this.annotateGuildFocusKeys(el);
-      this.restoreScroll(el, prevScrollTop);
+      this.annotateGuildFocusKeys(el, guildModel);
+      this.restoreScroll(el, prevScroll);
       // The guild pane has no search box, so a searchFocus capture degrades
       // through the key ladder to the close button, never to <body>.
       if (hadFocus) this.restoreControlFocus(el, focusKey);
@@ -521,13 +733,16 @@ export class BankWindow {
       if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
-    const capacity = document.createElement('div');
-    capacity.className = 'bank-capacity';
-    const used = this.fmt(model.capacity.used);
-    const total = this.fmt(model.capacity.total);
-    capacity.textContent = t('hudChrome.bank.capacity', { used, total });
-    capacity.setAttribute('aria-label', t('hudChrome.bank.capacityAria', { used, total }));
-    el.appendChild(capacity);
+    // The bag-socket row (Bank Storage phase 07) sits above the toolbar: one
+    // fixed-height strip (flex: none, the family's 40px cells), so at the
+    // 360px-tall phone budget the scroll-region relocation below was measured
+    // against it costs the grid one rigid band, absorbed because the grid
+    // SCROLLS (the shared .bank-scroll region keeps every cell reachable on
+    // any viewport; tests/mobile_window_coverage.test.ts holds the window's
+    // coverage). The used/total readout lives in the footer meter below
+    // (phase 08): no separate capacity band above the toolbar any more.
+    el.appendChild(this.buildSocketRow(model.sockets));
+    this.socketPurchase.appendStatus(el);
     // Always mount the toolbar in the bank state: the deposit-all button belongs there
     // even over an empty bank, while buildFilterBar drops the search/category/sort
     // controls when there is nothing yet to filter.
@@ -535,11 +750,17 @@ export class BankWindow {
     const status = this.buildDepositStatus();
     if (status) el.appendChild(status);
     // One shared scroll region holds the grid plus the bonus breakdown as its tail:
-    // at a 360px-tall phone the rigid chrome (title, capacity, toolbar, buy row)
-    // leaves less than one cell row of flex space, so a fixed below-the-buy-row
-    // footer either crushed the grid or clipped itself (found live in QA).
+    // at a 360px-tall phone the rigid chrome (title, socket row, toolbar,
+    // footer (meter + buy)) leaves less than one cell row of flex space, so a
+    // fixed below-the-buy-row footer either crushed the grid or clipped itself
+    // (found live in QA); the phase 08 meter rides INSIDE that existing footer
+    // band rather than adding a sixth band, so the 360px budget still holds.
     // Scrolling past the last cells reaches the bonus copy on every viewport, and
-    // the transactional buy row stays pinned below, always visible.
+    // the transactional footer stays pinned below, visible everywhere the pane
+    // itself fits its box (KNOWN BOUND, pre-existing: a stocked bank's rigid
+    // chrome alone can overflow a ~390px-tall phone and clip the grid and this
+    // footer, exactly as it clipped the old buy row; the structural deferral
+    // and evidence live in hud.mobile.css and the bank-storage state ledger).
     const scroll = document.createElement('div');
     scroll.className = 'bank-scroll';
     const grid = document.createElement('div');
@@ -547,16 +768,20 @@ export class BankWindow {
     this.fillGrid(grid, model.slots, model.emptyCells, model.empty);
     scroll.appendChild(grid);
     // The bonus-slot breakdown is present only online (bonusSources is [] offline);
-    // it advertises what account links earn.
-    const bonus = this.buildBonusSection(model.bonus);
-    if (bonus) scroll.appendChild(bonus);
+    // it advertises what account links earn. The core answers the empty string
+    // there, which is a no-op at this one mount.
+    scroll.insertAdjacentHTML('beforeend', bankBonusSectionHtml(model.bonus));
     el.appendChild(scroll);
-    this.restoreScroll(el, prevScrollTop);
-    el.appendChild(this.buildBuyRow(model.buy));
+    el.appendChild(this.buildFooter(model.meter, model.buy));
+    // AFTER the footer: in the compact regime the window is the scroller, and a
+    // write against a pane one band short clamps to that height and stays.
+    this.restoreScroll(el, prevScroll);
     if (searchFocus) {
       const fresh = el.querySelector('.bag-search') as HTMLInputElement | null;
       if (fresh) {
-        fresh.focus();
+        // preventScroll: the offset was just restored and on a short phone this
+        // box can sit far above the fold (focus_restore.ts records the why).
+        fresh.focus({ preventScroll: true });
         fresh.setSelectionRange(searchFocus.start, searchFocus.end);
       } else if (hadFocus) {
         // The rebuild dropped the search box (the bank emptied): fall back to the
@@ -572,21 +797,21 @@ export class BankWindow {
   // returned: the shared data-focus-key namespace stays inside this module,
   // the one that imports focus_restore (the single-reader guard in
   // tests/focus_restore.test.ts), and the pane stays focus-agnostic. Cells are
-  // keyed by wire index: fillGrid appends model.slots in order (slotIndex ==
-  // array index) before the empty pad, so DOM order IS slot order; the pinned
-  // focus test drives a real repaint over a focused cell, so a reorder that
-  // broke this coupling goes red there.
-  private annotateGuildFocusKeys(el: HTMLElement): void {
+  // keyed by semantic item/copy identity. Duplicate-group cardinality is part
+  // of that key, so an ambiguous disappearing twin safely falls back instead
+  // of transferring focus to a different physical copy.
+  private annotateGuildFocusKeys(el: HTMLElement, model: GuildBankViewModel): void {
     // The Contents / Log sub-strip first: the log repaints on ANY officer's op
     // (its cache busts and the response lands), so a keyboard user reading it
     // must not be thrown off the strip by somebody else's deposit.
     for (const tab of el.querySelectorAll<HTMLElement>('.gbank-view-tab')) {
       tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
     }
-    let slotIndex = 0;
-    for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
-      cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
-    }
+    const slotKeys = model.kind === 'guild' ? guildBankSlotFocusKeys(model.slots) : [];
+    // A key miss stamps NOTHING: '' would still satisfy the restore ladder.
+    el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)').forEach((cell, i) => {
+      if (slotKeys[i] !== undefined) cell.dataset.focusKey = slotKeys[i];
+    });
     const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
     if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';
     if (withdraw) withdraw.dataset.focusKey = 'gbank:withdraw-gold';
@@ -594,29 +819,49 @@ export class BankWindow {
     if (buy) buy.dataset.focusKey = 'gbank:buy';
   }
 
+  // VaultTab owns semantic row/action keys because it has the row model in
+  // hand. This window adds only its fixed footer controls after renderInto.
+  private annotateVaultFocusKeys(el: HTMLElement): void {
+    const deposit = el.querySelector<HTMLElement>('.vault-deposit-all');
+    if (deposit) deposit.dataset.focusKey = 'vault:deposit-all';
+    const unlock = el.querySelector<HTMLElement>('.vault-unlock-btn');
+    if (unlock) unlock.dataset.focusKey = 'vault:unlock';
+    const upgrade = el.querySelector<HTMLElement>('.vault-upgrade-btn');
+    if (upgrade) upgrade.dataset.focusKey = 'vault:upgrade';
+  }
+
   // Re-land focus after a full rebuild: the control the user was on (resolved
   // by its data-focus-key in the fresh tree, skipped when it came back
   // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
   private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
     restoreFirstEnabled([
-      focusKey
-        ? (el.querySelector(`[data-focus-key="${focusKey}"]`) as
-            | (HTMLElement & { disabled?: boolean })
-            | null)
-        : null,
+      focusKey ? findFocusKey(el, focusKey) : null,
       el.querySelector('[data-close]') as HTMLElement | null,
     ]);
   }
 
-  // Reapply the captured .bank-scroll offset to the freshly built pane, but only
-  // within one pane (a tab switch starts at the top, never mid-list), and latch
-  // which pane this paint drew. Every render path that mounts a scroll region
-  // routes through here so the offset can never leak across panes.
-  private restoreScroll(el: HTMLElement, prevScrollTop: number): void {
-    const view = this.guildPane.activeView;
-    const samePane = this.lastRenderedTab === this.tab && this.lastRenderedGuildView === view;
+  // Both candidate offsets, read off whichever elements exist right now; which
+  // one is live depends on the viewport (bank_chrome_layout_core.ts owns why).
+  private captureScroll(el: HTMLElement): BankScrollOffsets {
     const scroll = el.querySelector('.bank-scroll') as HTMLElement | null;
-    if (scroll) scroll.scrollTop = samePane ? prevScrollTop : 0;
+    return { inner: scroll?.scrollTop ?? 0, outer: el.scrollTop };
+  }
+
+  // Reapply the captured offsets to the freshly built pane, but only within one
+  // pane (a tab switch starts at the top, never mid-list), and latch which pane
+  // this paint drew. planBankScrollRestore owns that decision; every render path
+  // that mounts a scroll region routes through here so the offset can never leak
+  // across panes.
+  private restoreScroll(el: HTMLElement, prev: BankScrollOffsets): void {
+    const view = this.guildPane.activeView;
+    const next = planBankScrollRestore(
+      prev,
+      { tab: this.lastRenderedTab, guildView: this.lastRenderedGuildView },
+      { tab: this.tab, guildView: view },
+    );
+    const scroll = el.querySelector('.bank-scroll') as HTMLElement | null;
+    if (scroll) scroll.scrollTop = next.inner;
+    el.scrollTop = next.outer;
     this.lastRenderedTab = this.tab;
     this.lastRenderedGuildView = view;
   }
@@ -637,22 +882,92 @@ export class BankWindow {
     // collapses the whole guild arm so the strip drops and
     // the pane falls back to Personal in render(). Deliberately purse-free
     // (the guild enablement reads snapshot state only, see guild_bank_view.ts)
-    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0) and
-    // the viewer may edit, the
-    // open-the-bank row's shortfall marker reads the officer's own purse (rung
-    // 0 is purse-paid), so the purse joins the signature for that state only
-    // (a read-only member has no open row, so their pane stays purse-free).
+    // with ONE exception, scoped exactly like the vault purse term below:
+    // only while the guild pane is SHOWING, the bank is UNOPENED
+    // (purchasedSlots 0), the viewer may edit, AND a rung-0 price is quoted
+    // does the open-the-bank row's shortfall marker join, and as an
+    // AFFORDABILITY BOOLEAN, so ordinary copper churn never repaints the
+    // pane (a read-only member or a priceless snapshot has no open row, so
+    // their pane stays purse-free).
     // Nesting the guild arm under the bankInfo null-gate above is safe because
     // guildBankInfoFor's gate is a strict SUPERSET of bankInfoFor's (same
     // banker proximity, plus alive + guild membership + a loaded book):
     // guildBank can never be non-null while bankInfo is null.
     const g = this.deps.world().guildBankInfo;
+    // The vault arm rides the same signature, CONTENT-keyed and never
+    // identity-keyed. Identity is the wrong signal in BOTH directions:
+    // offline, Sim.vaultInfoFor mints a FRESH clone on every read, so an
+    // identity check would repaint the window on every poll (thrash); online,
+    // ClientWorld adopts the wire object by reference and a stock key-order
+    // churn (jsonb, or a full withdraw-then-redeposit) can re-ship an
+    // unchanged vault as a new object (a spurious repaint). So the entries
+    // are SORTED before serializing and the content string is the signal.
+    // The stock term is scoped to the vault pane like the purse read below:
+    // no other tab renders stock, so the sort never runs on their polls (the
+    // first poll after entering the tab repaints once as the term joins;
+    // harmless at the slow band). The one purse read is scoped like the
+    // guild arm's: only while the vault pane is showing AND a next rung is
+    // on offer does affordability join (as a boolean, so ordinary copper
+    // churn never repaints the pane).
+    const v = this.deps.world().vaultInfo;
     const sig = JSON.stringify([
       info.capacity,
       info.purchasedSlots,
       info.bonusSlots,
       info.nextExpansionCost,
+      // The footer meter's own terms (Bank Storage phase 08): the meter reads
+      // the wire split directly, and the split can move while every other
+      // term holds (a server-side reclassification or allocation-rule change
+      // moves pool numbers with capacity, slots, and socketBags unchanged),
+      // the socket-terms precedent below.
+      info.generalCapacity,
+      info.materialsCapacity,
+      info.generalUsed,
+      info.materialsUsed,
+      // The socket row's own terms (Bank Storage phase 07): an unlock moves
+      // ONLY socketsUnlocked and nextSocketCost (an empty socket adds zero
+      // capacity), and a same-size bag swap moves socketBags while capacity
+      // holds, so without these three the row sits stale until unrelated
+      // bank data happens to move, the exact failure mode this signature's
+      // buy-button comment documents.
+      info.socketsUnlocked,
+      info.socketBags,
+      info.nextSocketCost,
+      // The Claudium tag's own terms (Bank Storage phase 13). The WIRED price
+      // moves entirely on its own: the server re-joins its cached service
+      // catalog every snapshot, so a retune, a service outage and a recovery
+      // each change ONLY this field while capacity, slots and every other term
+      // above hold. Without it the tag would sit at a stale price, or linger
+      // after the service went away, until unrelated bank data happened to move.
+      info.nextRungClaudiumPrice ?? null,
+      // ...and the one host fact the wire cannot carry. `storeEnabled` flips
+      // when main.ts attaches the economy hooks after the online handshake,
+      // which is AFTER a bank opened at a bursar on a fast join. NATIVE_APP is
+      // a build constant and needs no term of its own. There is deliberately no
+      // affordability term: nothing on screen changes with it (bank_view.ts), so
+      // phase 13's term only forced zero-pixel rebuilds whenever a balance
+      // crossed the price.
+      this.deps.storeEnabled?.() === true,
       info.slots,
+      v && [
+        v.upgrades,
+        v.perMaterialCap,
+        v.nextUpgradeCost,
+        this.tab === 'vault' ? Object.entries(v.stock).sort() : null,
+        this.tab === 'vault' ? vaultSpecialContentKey(v.special) : null,
+        this.tab === 'vault' && v.nextUpgradeCost !== null
+          ? this.deps.world().copper >= v.nextUpgradeCost
+          : null,
+        // The deposit-all button's enabled state reads the CARRIED bags, which
+        // no other signature term covers: without this arm, looting a material
+        // while the pane is open leaves the button stale-disabled until some
+        // other bank data happens to move. Vault-pane-scoped like the purse
+        // term (the personal tab's twin button has the same pre-existing gap,
+        // recorded as a family follow-up).
+        this.tab === 'vault'
+          ? hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds())
+          : null,
+      ],
       g && [
         g.treasury,
         g.capacity,
@@ -660,7 +975,23 @@ export class BankWindow {
         g.nextExpansionPrice,
         g.slots,
         g.canEdit,
-        g.purchasedSlots === 0 && g.canEdit ? this.deps.world().copper : null,
+        // ...and only while the guild pane is showing AND a rung-0 price is
+        // actually quoted: with a null price the pane renders no open row
+        // (phase 09: the client never invents a price), and on another tab
+        // the marker is not rendered at all, so there is nothing to keep
+        // fresh. Coarsened to the affordability boolean the row actually
+        // renders, so copper churn on the same side of the price never
+        // repaints (the vault purse term's exact shape, three terms up).
+        // guildBankRungsBought, not a bare === 0: the pane's own unopened
+        // predicate (guild_bank_view.ts) treats ANY sub-first-rung value as
+        // unopened, so the two must agree or a legacy row could render a
+        // marker this term never refreshes.
+        this.tab === 'guild' &&
+        guildBankRungsBought(g.purchasedSlots) === 0 &&
+        g.canEdit &&
+        g.nextExpansionPrice !== null
+          ? this.deps.world().copper >= g.nextExpansionPrice
+          : null,
       ],
       // The activity log's own repaint arm, and NULL unless the log view is
       // actually open: the log is fetched on demand by reading it, so pulling
@@ -681,12 +1012,14 @@ export class BankWindow {
     this.lastSig = sig;
     // The bank data moved: any in-flight deposit-all run has echoed back (online) or
     // already applied (offline), so the button may re-enable on this repaint.
+    // Both panes' guards clear: the signature is shared.
     this.clearDepositAllPending();
+    this.vaultPane.clearDepositAllPending();
     this.render();
   }
 
   private fmt(n: number): string {
-    return formatNumber(n, { maximumFractionDigits: 0 });
+    return formatCount(n);
   }
 
   private fillGrid(
@@ -829,14 +1162,17 @@ export class BankWindow {
     if (!info) return; // walked away; refreshIfChanged owns the grace-close
     const model = buildBankView(info, (id) => knownItemDef(ITEMS, id));
     if (model.kind !== 'bank') return;
-    // The offset lives on the .bank-scroll wrapper; emptying the grid momentarily
-    // collapses the wrapper's scroll height (clamping scrollTop to 0), so capture
-    // and reapply around the refill.
-    const scroll = this.deps.root().querySelector('.bank-scroll') as HTMLElement | null;
-    const prevScrollTop = scroll?.scrollTop ?? 0;
+    // Emptying the grid momentarily collapses whichever element is scrolling
+    // (clamping its scrollTop to 0), so capture and reapply around the refill.
+    // This is the SEARCH keystroke path, so getting it wrong on one viewport
+    // means the view jumps under a player who is typing.
+    const root = this.deps.root();
+    const prev = this.captureScroll(root);
     grid.innerHTML = '';
     this.fillGrid(grid, model.slots, model.emptyCells, model.empty);
-    if (scroll) scroll.scrollTop = prevScrollTop;
+    const scroll = root.querySelector('.bank-scroll') as HTMLElement | null;
+    if (scroll) scroll.scrollTop = prev.inner;
+    root.scrollTop = prev.outer;
   }
 
   // The category-chip + sort + search toolbar, plus the deposit-all-materials button.
@@ -959,7 +1295,10 @@ export class BankWindow {
     const world = this.deps.world();
     const info = world.bankInfo;
     if (!info) return; // walked away between render and click
-    const plan = planDepositAllMaterials(world.inventory, info.slots, info.capacity, (id) =>
+    // The wire-fed pool split, never the flat capacity: with a materials
+    // satchel socketed, a flat budget would plan deposits the sim's pool-aware
+    // gate refuses (or skip ones it would accept).
+    const plan = planDepositAllMaterials(world.inventory, info.slots, bankPoolsOf(info), (id) =>
       knownItemDef(ITEMS, id),
     );
     if (plan.sends.length === 0 && !plan.full) return; // nothing to do (button was disabled)
@@ -1034,9 +1373,231 @@ export class BankWindow {
     }
   }
 
+  // The bag-socket row (Bank Storage phase 07): one .bag-socket-family cell per
+  // socket, mirroring the carried bag bar's grammar exactly. A FILLED socket is
+  // a button whose click returns the bag to the carried inventory
+  // (bankUnsocketBag; the bags-side unequip click, verbatim); an EMPTY unlocked
+  // socket is the informational focusable no-op the bags render, its tooltip
+  // pointing at the bags-grid click that fills it; the FIRST locked socket
+  // offers the unlock purchase at the WIRE price (nextSocketCost; never a
+  // client constant, the phase 09 tunables rule), and later locked sockets are
+  // informational (sockets unlock in order, so they have no honest price yet).
+  private buildSocketRow(cells: BankSocketCellModel[]): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'bank-sockets';
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', t('hudChrome.bank.socketRowAria'));
+    for (const cell of cells) {
+      if (cell.kind === 'filled') {
+        const item = knownItemDef(ITEMS, cell.itemId);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `bag-socket bank-socket q-${cell.qualityKey}`;
+        btn.dataset.focusKey = `bank:socket:${cell.socket}`;
+        // Stale-client guard (the grid's R34 rule): an id this bundle predates
+        // still holds a real socket, so it renders with the fallback icon and
+        // its raw id; the unsocket click stays live because the server
+        // resolves it by socket index, no def needed.
+        btn.innerHTML = item ? this.deps.itemIcon(item) : unknownItemIconHtml(cell.itemId);
+        // The slots-line KEY is the core's decision (bagSlotsLineKey through
+        // the model), and the aria REUSES the carried bag bar's generic
+        // '{name}: {slots}' key: neither wording is bank-specific, the
+        // category-chip reuse rule. On a def miss (the R34 stale-client cell)
+        // the raw id stays as the name, but the slots line becomes the
+        // unknown-item admission the cell's own tooltip already makes: the
+        // client does not know the bag's slot count (the real slots ARE
+        // feeding the pool server-side), so speaking the model's 0 fallback
+        // would assert a count that is simply wrong.
+        const slotsLine = item
+          ? t(cell.slotsLineKey, { slots: this.fmt(cell.slots) })
+          : t('itemUi.bags.unknownItem');
+        btn.setAttribute(
+          'aria-label',
+          t('hudChrome.bags.bagSocketAria', {
+            name: item ? itemDisplayName(item) : cell.itemId,
+            slots: slotsLine,
+          }),
+        );
+        btn.addEventListener('click', () => {
+          // On touch, the click that ends a long-press peek inspects the
+          // socketed bag (its tooltip is already shown) instead of unsocketing
+          // it: the release dismisses the tooltip and fires nothing, the bank
+          // grid cell's consumePeek rule. A plain tap / desktop click falls
+          // through.
+          if (this.deps.consumePeek()) {
+            this.deps.hideTooltip();
+            return;
+          }
+          // Server-authoritative like every bank op: the sim re-validates the
+          // socket and the carried-side fit, and the pane repaints through its
+          // signature when socketBags echoes back.
+          this.deps.world().bankUnsocketBag(cell.socket);
+          audio.click();
+          this.deps.hideTooltip();
+          // The bag just moved into the bags; repaint the companion (dep doc).
+          this.deps.onInventoryChanged();
+        });
+        this.deps.attachTooltip(btn, () => {
+          const body = item
+            ? this.deps.itemTooltip(item)
+            : `<div class="tt-title">${esc(cell.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
+          return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.unsocketHint'))}</div>`;
+        });
+        row.appendChild(btn);
+      } else if (cell.kind === 'empty') {
+        // Informational, not actionable (the bags' empty-socket rendering): a
+        // keyboard user still reaches the tooltip, which names the bags-grid
+        // click that fills it.
+        const empty = document.createElement('button');
+        empty.type = 'button';
+        empty.className = 'bag-socket bank-socket empty';
+        empty.dataset.focusKey = `bank:socket:${cell.socket}`;
+        empty.setAttribute('aria-disabled', 'true');
+        empty.setAttribute('aria-label', t('hudChrome.bank.socketEmpty'));
+        this.deps.attachTooltip(
+          empty,
+          () => `<div class="tt-sub">${esc(t('hudChrome.bank.socketEmptyHint'))}</div>`,
+        );
+        row.appendChild(empty);
+      } else {
+        const locked = document.createElement('button');
+        locked.type = 'button';
+        locked.className = 'bag-socket bank-socket locked';
+        locked.dataset.focusKey = `bank:socket:${cell.socket}`;
+        locked.innerHTML = svgIcon('lock');
+        if (cell.unlockCost !== null) {
+          const cost = cell.unlockCost;
+          this.socketPurchase.markBusy(locked);
+          locked.setAttribute(
+            'aria-label',
+            t('hudChrome.bank.socketUnlockAria', { price: formatMoney(cost) }),
+          );
+          locked.addEventListener('click', () => {
+            // Same touch rule as the filled cell: a long-press peek's release
+            // inspects the price tooltip, never pops the unlock confirm.
+            if (this.deps.consumePeek()) {
+              this.deps.hideTooltip();
+              return;
+            }
+            this.socketPurchase.show({ socketsUnlocked: cell.socket, cost });
+          });
+          this.deps.attachTooltip(
+            locked,
+            () =>
+              `<div class="tt-title">${esc(t('hudChrome.bank.socketLocked'))}</div>` +
+              `<div class="bank-socket-price">${this.deps.moneyHtml(cost)}</div>` +
+              `<div class="tt-sub">${esc(t('hudChrome.bank.socketUnlockHint'))}</div>`,
+          );
+        } else {
+          locked.setAttribute('aria-disabled', 'true');
+          locked.setAttribute('aria-label', t('hudChrome.bank.socketLocked'));
+          this.deps.attachTooltip(
+            locked,
+            () => `<div class="tt-sub">${esc(t('hudChrome.bank.socketLockedLater'))}</div>`,
+          );
+        }
+        row.appendChild(locked);
+      }
+    }
+    return row;
+  }
+
+  // The one rigid band below the scroll region (phase 08): the capacity meter
+  // over the expansion row (visibility bound: the KNOWN BOUND note at the
+  // scroll-region comment above). The state classes are plain
+  // className composition at build time (the cold-window idiom, the bags
+  // counter's `bag-capacity over` twin): a state flip arrives as bank data,
+  // which rebuilds the window through the signature.
+  private buildFooter(meter: BankMeterModel, buy: BankBuySlotsModel): HTMLElement {
+    const footer = document.createElement('div');
+    footer.className = `bank-footer${meter.nearFull ? ' near-full' : ''}${meter.over ? ' over' : ''}`;
+    footer.appendChild(this.buildMeter(meter));
+    footer.appendChild(this.buildBuyRow(buy));
+    footer.appendChild(this.buildRungNotice());
+    return footer;
+  }
+
+  /** The Claudium purchase-result band plus the region that announces it. The
+   *  markup, and the reason it is two nodes, live in bank_rung_view.ts. */
+  private buildRungNotice(): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'bank-rung-result';
+    wrap.innerHTML = bankRungResultHtml(this.rungPurchase.notice);
+    return wrap;
+  }
+
+  // The capacity meter: a non-actionable readout (no click, no peek guard) of
+  // the summed display pair plus the two wire-fed pool segments. Geometry goes
+  // out as unitless custom properties (each pool's share of the total, and its
+  // fill CLAMPED to [0,1]; the model's fraction stays honest past 1) so the
+  // stylesheet owns every visual decision. The materials segment always
+  // renders; a zero share collapses it in CSS.
+  private buildMeter(meter: BankMeterModel): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'bank-meter';
+    // Focusable readout: the pool lines and the materials note live only in
+    // the tooltip, whose host serves hover, long-press, AND focusin; without
+    // a tab stop a keyboard-only user could never reach them. role=group
+    // makes the aria-label conformant on the composite (bonus-section idiom).
+    // The focus key keeps a parked reader on the meter across mirror-driven
+    // rebuilds; the close-button fallback would silently defeat the tab stop.
+    el.setAttribute('role', 'group');
+    el.tabIndex = 0;
+    el.dataset.focusKey = 'bank:meter';
+    const share = (capacity: number): string =>
+      String(meter.total > 0 ? capacity / meter.total : 0);
+    const fill = (fraction: number): string => String(Math.min(1, Math.max(0, fraction)));
+    el.style.setProperty('--bank-meter-general-share', share(meter.general.capacity));
+    el.style.setProperty('--bank-meter-materials-share', share(meter.materials.capacity));
+    el.style.setProperty('--bank-meter-general-fill', fill(meter.general.fraction));
+    el.style.setProperty('--bank-meter-materials-fill', fill(meter.materials.fraction));
+    const track = document.createElement('div');
+    track.className = 'bank-meter-track';
+    for (const seg of ['bank-meter-seg-general', 'bank-meter-seg-materials']) {
+      const segment = document.createElement('div');
+      segment.className = seg;
+      const segFill = document.createElement('div');
+      segFill.className = 'bank-meter-fill';
+      segment.appendChild(segFill);
+      track.appendChild(segment);
+    }
+    el.appendChild(track);
+    const text = document.createElement('span');
+    text.className = 'bank-meter-text';
+    text.textContent = t('hudChrome.bank.meterLabel', {
+      used: this.fmt(meter.used),
+      total: this.fmt(meter.total),
+    });
+    el.appendChild(text);
+    // Both the accessible name and the tooltip body are pure copy over this
+    // same model (bank_meter_view.ts); the window keeps the ATTACH, which is
+    // the half that owns DOM.
+    el.setAttribute('aria-label', bankMeterAriaLabel(meter));
+    this.deps.attachTooltip(el, () => bankMeterTooltipHtml(meter));
+    return el;
+  }
+
   // The footer expansion row: the next block's price on a buy button, or a maxed
   // label when purchased slots are capped. Never gated on affordability (the sim is
   // authoritative and emits its own refusal line, localized by the existing pipeline).
+  // The price rides in a tags container (one product, one row, gold first and
+  // visually primary) so a second tag can join without a layout change.
+  // What the host knows that the wire does not, for the Claudium tag's gating
+  // (phase 13). Every field is read fresh per paint: hooks attach after the
+  // online handshake, and the balance latch moves on every spend. Returning
+  // undefined is the offline shape and the core suppresses the tag outright,
+  // which is why offline needs no second mechanism.
+  private claudiumInput(): BankClaudiumInput {
+    return {
+      storeEnabled: this.deps.storeEnabled?.() === true,
+      // The attach site in src/main.ts is already gated on !NATIVE_APP, so on a
+      // native build there are no hooks and storeEnabled is false. This states
+      // the platform rule at the render seam as well rather than resting on
+      // that one call site: two independent gates, either sufficient.
+      nativeBuild: NATIVE_APP,
+    };
+  }
+
   private buildBuyRow(buy: BankBuySlotsModel): HTMLElement {
     const row = document.createElement('div');
     row.className = 'bank-buy-row';
@@ -1050,122 +1611,256 @@ export class BankWindow {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'bank-buy-btn';
+    // The focus identity the post-purchase repaint lands back on. Stamped here
+    // rather than in an annotate pass because the guild pane's own annotation
+    // claims '.bank-buy-btn' for gbank:buy, and only one of the two panes is
+    // ever mounted; keying at construction keeps them independent.
+    btn.dataset.focusKey = 'bank:buy';
+    const claudium = buy.claudium;
     btn.innerHTML =
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.buySlots', { count: this.fmt(buy.blockSlots) }))}</span>` +
-      this.deps.moneyHtml(buy.nextCost);
+      `<span class="bank-buy-tags"><span class="bank-buy-tag bank-buy-tag-gold">${this.deps.moneyHtml(buy.nextCost)}</span>` +
+      // ONE button, TWO tags. Absent, never disabled, when the core offered no
+      // Claudium side: there is no greyed-out Claudium tag anywhere, and a
+      // service the client could not reach simply leaves a working gold-only
+      // button with no error and no retry affordance.
+      `${claudium ? bankRungClaudiumTagHtml(claudium) : ''}</span>`;
+    if (claudium) {
+      // Without this the button's accessible name is the two prices read back
+      // to back, which says nothing about there being a choice. The label
+      // states both rails as one spoken action; it is not a rate and not a
+      // total, just the two per-product prices the button carries.
+      btn.setAttribute(
+        'aria-label',
+        t('hudChrome.bank.buySlotsDualAria', {
+          count: this.fmt(buy.blockSlots),
+          price: formatMoney(buy.nextCost),
+          cost: claudiumAmountText(claudium.cost),
+        }),
+      );
+    }
+    // The in-flight state is MARKUP, read while this element is being built, so
+    // a data repaint that lands mid-spend cannot rebuild the button enabled.
+    if (claudium && this.rungPurchase.isInFlight(claudium.skuId)) {
+      btn.setAttribute('aria-busy', 'true');
+      btn.disabled = true;
+    }
     btn.addEventListener('click', () => this.showBuySlotsPrompt(buy));
     row.appendChild(btn);
     return row;
   }
 
-  // The bonus-slot breakdown footer: a header (title + the earned total like '+6')
-  // over one compact row per KNOWN account source. Earned link sources show '+N';
-  // unearned ones advertise what linking grants; the referral row shows its
-  // {count}/{cap} progress and the invite-a-friend explainer as a detail line. Static
-  // text only (no tooltip deps), all localized through t(). Returns null offline (no
-  // bonusSources) so the whole section stays hidden there.
-  private buildBonusSection(bonus: BankBonusModel): HTMLElement | null {
-    if (!bonus.show) return null;
-    const section = document.createElement('div');
-    section.className = 'bank-bonus';
-    // Grouped and labelled for AT; every earned/unearned state is conveyed in TEXT
-    // (the '+N' / advert / progress line), never color alone.
-    section.setAttribute('role', 'group');
-    section.setAttribute('aria-label', t('hudChrome.bank.bonusSectionAria'));
-
-    const head = document.createElement('div');
-    head.className = 'bank-bonus-head';
-    const title = document.createElement('span');
-    title.className = 'bank-bonus-title';
-    title.textContent = t('hudChrome.bank.bonusTitle');
-    const total = document.createElement('span');
-    total.className = 'bank-bonus-total';
-    total.textContent = t('hudChrome.bank.bonusEarned', { count: this.fmt(bonus.total) });
-    head.append(title, total);
-    section.appendChild(head);
-
-    for (const row of bonus.rows) {
-      const meta = BANK_BONUS_SOURCE_KEYS[row.id];
-      // Unknown source id (a future X/Twitch row landing before its label ships):
-      // SKIP it. Never render a raw key or an English fallback (forward compat).
-      if (!meta) continue;
-      section.appendChild(this.buildBonusRow(row, meta));
-    }
-    return section;
-  }
-
-  private buildBonusRow(
-    row: BankBonusRowModel,
-    meta: { label: TranslationKey; advert: TranslationKey },
-  ): HTMLElement {
-    const el = document.createElement('div');
-    el.className = `bank-bonus-row${row.earned ? ' earned' : ''}`;
-    const label = document.createElement('span');
-    label.className = 'bank-bonus-label';
-    label.textContent = t(meta.label);
-    const status = document.createElement('span');
-    status.className = 'bank-bonus-status';
-    // A source carrying progress numbers (referral, the only v1 one) shows {count}/{cap};
-    // otherwise an earned source shows '+N' and an unearned one shows its advert line.
-    const hasProgress = row.count !== undefined && row.cap !== undefined;
-    if (hasProgress) {
-      status.textContent = t('hudChrome.bank.bonusReferralProgress', {
-        count: this.fmt(row.count as number),
-        cap: this.fmt(row.cap as number),
-      });
-    } else if (row.earned) {
-      status.textContent = t('hudChrome.bank.bonusStatusEarned', { count: this.fmt(row.slots) });
-    } else {
-      status.textContent = t(meta.advert);
-    }
-    el.append(label, status);
-    // The referral row carries its explainer (invite a friend, they reach level 10,
-    // you both keep playing) as a wrapping detail line under the label/status pair.
-    if (hasProgress) {
-      const detail = document.createElement('div');
-      detail.className = 'bank-bonus-detail';
-      detail.textContent = t(meta.advert);
-      el.appendChild(detail);
-    }
-    return el;
-  }
-
   private showBuySlotsPrompt(buy: BankBuySlotsModel): void {
     if (buy.nextCost === null) return;
-    dismissBankPrompts();
-    const opener = document.activeElement as HTMLElement | null;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-buy-prompt';
-    prompt.innerHTML = `<div class="prompt-text">${esc(
-      t('hudChrome.bank.buyConfirm', {
-        count: this.fmt(buy.blockSlots),
-        price: formatMoney(buy.nextCost),
-      }),
-    )}</div>`;
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.buyConfirmAccept');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    prompt.append(confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
-    confirm.addEventListener('click', () => {
-      this.deps.world().bankBuySlots();
-      audio.coin();
-      // Coin just left the purse and the bags money row shows it (see the dep doc).
-      this.deps.onInventoryChanged();
-      dismiss();
-      // render() rebuilds the window, detaching the opener button, so land focus on
-      // the always-present close button rather than letting it fall to <body>.
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    // The price-changed arm re-enters here AFTER an await, so the bank may be
+    // gone, exactly as for openNeedMoreClaudiumDialog and repaintAfterRung,
+    // which both guard. Without this the automatic re-prompt mounts an
+    // aria-modal confirm over a bare world and inerts the hidden #bank-window.
+    if (!this.opened) return;
+    const claudium = buy.claudium;
+    // A spend for this rung is already on the wire. The button is rebuilt
+    // disabled, but a keyboard Enter can still arrive between the send and the
+    // repaint, and a second prompt over a live debit is the one thing this flow
+    // must never open.
+    if (claudium && this.rungPurchase.isInFlight(claudium.skuId)) return;
+    // MINT THE INTENT HERE, before the prompt exists, and quote ITS cost. Three
+    // things depend on it happening at this exact moment: the number the player
+    // confirms is the number that goes on the wire (intentFor returns an
+    // already-open intent unchanged and its cost is FROZEN, so on a retry after
+    // an ambiguous outcome the wire still carries the frozen price while a
+    // background refresh may have moved the wired one); the abandon path below
+    // has something to drop, which it would not if the mint happened at send
+    // time beside the sent-latch; and the focus key can still be read, because
+    // the button holds focus right now and the prompt's own trap will have moved
+    // it by the time either confirm arm runs.
+    const intent = claudium ? this.rungPurchase.intentFor(claudium.skuId, claudium.cost) : null;
+    this.rungFocusReturnKey = captureFocusKey(this.deps.root());
+    this.rungPurchase.armPrompt(claudium?.skuId ?? null);
+    const goldOnly = intent === null;
+    showBuyConfirmPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBankPrompts,
+      },
+      {
+        // The gold-only prompt is byte-for-byte what phase 08 shipped. The dual
+        // prompt moves the gold price out of the question and onto its own
+        // button so the two rails read as independent per-product prices: no
+        // rate, no equivalence, no combined total, and gold primary BY POSITION.
+        text: goldOnly
+          ? t('hudChrome.bank.buyConfirm', {
+              count: this.fmt(buy.blockSlots),
+              price: formatMoney(buy.nextCost),
+            })
+          : t('hudChrome.bank.buyConfirmDual', { count: this.fmt(buy.blockSlots) }),
+        // The economy disclaimer rides the click-gated confirm, not the always
+        // visible footer: the price on the button is live wire data; the
+        // caveat belongs where the player commits to it.
+        secondaryText: t('hudChrome.bank.priceDisclaimer'),
+        confirmLabel: goldOnly
+          ? t('hudChrome.bank.buyConfirmAccept')
+          : t('hudChrome.bank.buyConfirmGold', { price: formatMoney(buy.nextCost) }),
+        cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
+        onConfirm: (dismiss) => {
+          // Buying with GOLD abandons the Claudium intent this prompt minted,
+          // while it is still unsent (the controller applies the sent latch and
+          // the ledger applies the restored one).
+          this.rungPurchase.confirmWithGold(claudium?.skuId ?? null);
+          this.deps.world().bankBuySlots();
+          audio.coin();
+          // Coin just left the purse and the bags money row shows it (see the dep doc).
+          this.deps.onInventoryChanged();
+          dismiss();
+          // render() rebuilds the window, detaching the opener button, so land focus on
+          // the always-present close button rather than letting it fall to <body>.
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+        ...(intent !== null && claudium !== undefined
+          ? {
+              altConfirm: {
+                label: t('hudChrome.bank.buyConfirmClaudium', {
+                  cost: claudiumAmountText(intent.costClaudium),
+                }),
+                onConfirm: (dismiss: () => void) => {
+                  this.rungPurchase.confirmWithClaudium();
+                  dismiss();
+                  // Land focus before the await, as the gold arm does: dismiss()
+                  // detaches the dialog, so focus falls to <body> and STAYS there
+                  // for the whole round trip. repaintAfterRung restores it from
+                  // rungFocusReturnKey only once the result lands.
+                  (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+                  // The INTENT travels, not a loose cost. There is then exactly
+                  // one number that can reach the wire and one place it comes
+                  // from; a second cost parameter here would be a second thing
+                  // to get wrong, and the ledger's freeze would silently hide
+                  // the mistake rather than surface it.
+                  void this.rungPurchase.spend(claudium.skuId, intent, buy.blockSlots);
+                },
+              },
+            }
+          : {}),
+        onDismiss: () => {
+          // Only an ABANDONMENT drops the intent, and only while it has never
+          // reached the service. The controller owns that decision and answers
+          // whether it took it; the focus stash is the window's own to drop, and
+          // only on the abandonment, exactly as before.
+          if (this.rungPurchase.endPrompt()) this.rungFocusReturnKey = null;
+        },
+      },
+    );
+  }
+
+  /** The current buy sub-model, rebuilt from the live mirror. Used by the
+   *  price-changed re-prompt so the second prompt quotes what the wire says NOW
+   *  rather than anything cached from the first one. */
+  private currentRungOffer(): BankBuySlotsModel | null {
+    const model = buildBankView(
+      this.deps.world().bankInfo,
+      (id) => knownItemDef(ITEMS, id),
+      this.claudiumInput(),
+    );
+    return model.kind === 'bank' ? model.buy : null;
+  }
+
+  /** Hand off to the Claudium top-up window and come back. */
+  private openNeedMoreClaudiumDialog(
+    blockSlots: number,
+    cost: number,
+    balance: number | null,
+  ): void {
+    // Reached after an await, so the bank may be gone by now. The confirm dialog
+    // appends an aria-modal focus trap to document.body unconditionally, which
+    // over a bare game world is a prompt about a window the player has already
+    // walked away from.
+    if (!this.opened) return;
+    const copy = bankRungTopUpCopy(blockSlots, cost, balance ?? this.deps.claudiumBalance?.() ?? 0);
+    // The last argument is the one return path out of the handoff: the Claudium
+    // window fires it exactly once, when it closes, and the bank repaints with
+    // the refreshed balance. No timer guessing when the player is done.
+    this.deps.confirmDialog?.(copy.title, copy.body, copy.confirm, copy.cancel, () =>
+      this.deps.openClaudium?.(() => this.refreshAfterTopUp()),
+    );
+  }
+
+  /** Come back from the top-up window.
+   *
+   *  MEASURED, not assumed. The obvious guess is that the Claudium window closes
+   *  the bank behind it, because its deps name a `closeOthers`; driving the real
+   *  handoff at a live bursar showed it does NOT. Hud.closeOtherWindows ignores
+   *  its argument and closes only the context menu and the tooltip, so the
+   *  top-up window opens OVER a bank that stays open. The ordinary path is
+   *  therefore the REPAINT: the player returns with a bigger balance and the
+   *  tag's affordability and the shortfall the next handoff would quote both
+   *  have to reflect it.
+   *
+   *  The re-open branch is deliberate defence for the case where the bank is
+   *  NOT open by then (a walk-away grace close, a future chrome change that does
+   *  displace it), and it is guarded on the world still reporting a readout,
+   *  because the bank is proximity gated and re-opening after the player
+   *  wandered off would paint the away state at a bursar they are no longer
+   *  standing at. */
+  private refreshAfterTopUp(): void {
+    if (this.opened) {
+      this.render();
+      return;
+    }
+    if (this.deps.world().bankInfo === null) return;
+    this.open();
+  }
+
+  /** Mark the buy button busy on the LIVE element for the span of one spend.
+   *  The markup half of this state lives in buildBuyRow, which reads
+   *  rungInFlight while building; this is only the immediate feedback before
+   *  any repaint happens. */
+  private setRungBusy(busy: boolean): void {
+    // Addressed by the personal footer's OWN focus key, never by '.bank-buy-btn':
+    // the guild and vault panes paint a button of that class into the SAME root,
+    // and this write lands in a `finally` AFTER an await, so a tab switch mid
+    // spend would otherwise aim the release at a foreign pane's control.
+    const btn = this.deps
+      .root()
+      .querySelector<HTMLButtonElement>('.bank-footer [data-focus-key="bank:buy"]');
+    if (!btn) return;
+    if (busy) {
+      btn.setAttribute('aria-busy', 'true');
+      btn.disabled = true;
+      return;
+    }
+    btn.removeAttribute('aria-busy');
+    btn.disabled = false;
+  }
+
+  /** Write the current result into the freshly painted live region. */
+  private announceRung(): void {
+    const notice = this.rungPurchase.notice;
+    // Scoped to the footer for the same reason setRungBusy is: only the personal
+    // pane paints this region, and only its own copy may be written.
+    const live = this.deps.root().querySelector<HTMLElement>('.bank-footer [data-rung-live]');
+    if (!notice || !live) return;
+    // Clear first, then write in a microtask: an identical repeated message (two
+    // failed retries) is otherwise a no-op mutation and is not re-announced.
+    const seq = ++this.rungAnnounceSeq;
+    live.textContent = '';
+    queueMicrotask(() => {
+      if (seq === this.rungAnnounceSeq) live.textContent = bankRungNoticeText(notice);
     });
-    cancel.addEventListener('click', dismissAndReturn);
-    stack.appendChild(prompt);
-    window.setTimeout(() => confirm.focus(), 0);
+  }
+
+  /** Repaint after a purchase outcome, announce it, and hand focus back to the
+   *  control the player pressed. */
+  private repaintAfterRung(): void {
+    if (!this.opened) {
+      // Nothing will paint, so nothing consumes the stash. Drop it rather than
+      // leave it armed for whatever repaints next.
+      this.rungFocusReturnKey = null;
+      return;
+    }
+    this.render();
+    this.announceRung();
+    const key = this.rungFocusReturnKey;
+    this.rungFocusReturnKey = null;
+    if (key) this.restoreControlFocus(this.deps.root(), key);
   }
 
   // The shared quantity-prompt builder (bank_quantity_prompt.ts) owns the
@@ -1218,7 +1913,6 @@ export class BankWindow {
     );
   }
 
-  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
   // #bank-window is the inert root while a prompt is open; close() clears it too
   // as a force-close backstop, so the window is never left inert while hidden.
   private installPromptDialog(

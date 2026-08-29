@@ -1028,13 +1028,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
-// Re-minted for the three GLSL assembly seam patch (the pnpm-lock patch hash
-// moved, and the lockfile is a hashed leaf of the town fingerprint), so the
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// first-order composite follows the merged renderer.ts (the entry-fade arm's
+// scenery cull beside this branch's aim blocked pass-through), then these
 // seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '42545a110c611e52d413f11395275873b44e6adb1a9da92cb9b86898d3bc866c';
+  '914c94ce36a5c27da68ab69be29a61c9958e7c9e38857da2a3eace318b3caf93';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '015f8f4ae3b3bc7722126ea8ff0fdc4d1ba573c1a43eaec56eeb0d9ea84b8507';
+  'cbeaf192ce71a92b1d9b8b8e0dd92d885a60627f9e12955f20a06485d95129c8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2183,12 +2190,22 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // was retaken.
     // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
     // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the three GLSL assembly seam patch (pnpm-lock patch hash):
+    // Re-minted for the battleground field-stream compile gate (renderer.ts
+    // provenance input moved): same order, the composite first, then this
+    // seal. No capture was retaken.
+    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
     // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the 2026-08-29 v0.41.0 sync merge into the shader-warm
+    // branch: both parents move renderer.ts (the branch's extractions, the
+    // release arm's battleground compile gate), so the composite follows the
+    // merged tree and this seal follows the swept evidence bytes. No capture
+    // was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0add25bbc61e1c0885663315bb19ab0b6c2b54bd03bdfa8567fac9482478aa5c');
+    ).toBe('291f5317c503d2bb5b425e4585840eeac3088fd5e43d2cc2278bdf2439cd424f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

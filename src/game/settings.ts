@@ -134,6 +134,8 @@ export const SETTING_RANGES = {
   gamepadStickDeadzone: { min: 0.05, max: 0.4, def: 0.18 },
   // Right-stick camera turn/pitch rate, in radians/sec at full deflection.
   gamepadCameraSpeed: { min: 0.5, max: 5, def: 2.4 },
+  // Left-stick ground-reticle movement multiplier while placing an ability.
+  gamepadReticleSpeed: { min: 0.5, max: 2, def: 1 },
   // Rumble intensity (0 silences haptics without disabling the pad entirely).
   gamepadVibration: { min: 0, max: 1, def: 1 },
   // Printed controller glyph family: 0 Auto, 1 Xbox, 2 PlayStation, 3 Nintendo.
@@ -257,6 +259,9 @@ export const BOOL_SETTINGS = {
   // gameplay space is the primary camera path; this is an opt-in alternative for
   // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
   mobileCameraJoystick: { def: false },
+  // on by default: touch position abilities enter ground aim before casting.
+  // Turning it off casts immediately at the smart seed point instead.
+  touchPreciseGroundAim: { def: true },
   // off by default: replaces every touch gesture menu (the action radial, the
   // consumables row, the menu control) with a tap-only flow. Opening a menu casts
   // nothing, a second tap on the control runs its default action, and a tap

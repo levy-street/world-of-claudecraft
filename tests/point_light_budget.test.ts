@@ -728,7 +728,7 @@ describe('fire-light adoption sink', () => {
     // The handoff lives in the host the renderer hands battleground_views.ts,
     // which builds the field copies (the branch itself was extracted).
     const bgStart = outsideBudget.indexOf('private battlegroundViewHost(): BattlegroundViewHost {');
-    const bgEnd = outsideBudget.indexOf('attachPart:', bgStart);
+    const bgEnd = outsideBudget.indexOf('compileGate:', bgStart);
     expect(bgStart).toBeGreaterThan(-1);
     expect(bgEnd).toBeGreaterThan(bgStart);
     expect(handoffs[0].index).toBeGreaterThan(bgStart);

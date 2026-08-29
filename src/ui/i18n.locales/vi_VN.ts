@@ -4169,6 +4169,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!',
   'itemUi.kind.bag': 'Túi',
   'itemUi.tooltip.bagSlots': 'Túi {slots} Ô',
+  'itemUi.tooltip.bagSlotsMaterials': 'Túi Nguyên Liệu {slots} Ô',
   'questUi.tracker.hideFromMap': 'Ẩn {name} khỏi bản đồ',
   'questUi.tracker.showOnMap': 'Hiện {name} trên bản đồ',
   'sim.delve.baptistryEggs':

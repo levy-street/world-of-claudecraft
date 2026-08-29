@@ -495,7 +495,7 @@ describe('Thornhollow field lights ride the renderer point-light budget', () => 
     // The registry hand-off lives in the host the renderer gives
     // battleground_views.ts, which builds the copies (the branch was extracted).
     const buildStart = renderer.indexOf('private battlegroundViewHost(): BattlegroundViewHost {');
-    const buildEnd = renderer.indexOf('attachPart:', buildStart);
+    const buildEnd = renderer.indexOf('compileGate:', buildStart);
     expect(buildStart).toBeGreaterThan(-1);
     expect(buildEnd).toBeGreaterThan(buildStart);
     const construction = renderer.slice(buildStart, buildEnd);

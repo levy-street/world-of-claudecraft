@@ -4,14 +4,14 @@
 // The field streams in (buildBattleground: terrain, wards, placements, grass,
 // decals, flames arrive from async loads), and a bare add of each part drew
 // it on its first frame with its programs unlinked: the 1.3 s frame at the
-// /dev bg teleport in the 2026-08-28 combat audit, 11 cold programs. Every
-// streamed part now goes through the host's attach (gated: hidden until its
-// programs link, then shown), and the field's programs do not depend on the
-// slot (same kit, another origin), so the queue proposal, thirty seconds
-// before the teleport, prebuilds slot 0 hidden: its parts link through the
-// same gate during the answer window, and the copy the player is matched
-// into then links as a hit whichever slot it is. The asset preload commits
-// at the proposal too, so a reconnect straight into a live match, which never
+// /dev bg teleport in the 2026-08-28 combat audit, 11 cold programs. Each
+// streamed piece now attaches through the host's compile gate inside
+// buildBattleground itself (battleground.ts), and the field's programs do not
+// depend on the slot (same kit, another origin), so the queue proposal, thirty
+// seconds before the teleport, prebuilds slot 0 hidden: its pieces link through
+// that same gate during the answer window, and the copy the player is matched
+// into then links as a hit whichever slot it is. The asset preload commits at
+// the proposal too, so a reconnect straight into a live match, which never
 // clicked the queue, still drains it.
 
 import type * as THREE from 'three';
@@ -26,8 +26,10 @@ import {
 export interface BattlegroundViewHost extends BattlegroundLightHooks {
   scene: { add(object: THREE.Object3D): unknown };
   seed: number;
-  /** The streamed parts' attach into the field group (gated by the renderer). */
-  attachPart: (part: THREE.Object3D, into: THREE.Group) => void;
+  /** The renderer's async compile gate, passed straight through to
+   *  buildBattleground: absent means no KHR_parallel_shader_compile, and every
+   *  piece attaches direct and links at its first draw. */
+  compileGate?: (target: THREE.Object3D) => Promise<unknown>;
 }
 
 export type BattlegroundViews = Map<number, BattlegroundView>;
