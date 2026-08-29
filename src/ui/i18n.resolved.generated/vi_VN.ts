@@ -8456,6 +8456,7 @@ export const vi_VN: EnTranslations = {
     "bodyWeb": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.",
     "hybridBodyWindows": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, hãy đặt trình duyệt thành Hiệu năng cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa, rồi khởi động lại trình duyệt. Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
     "hybridBodyLinux": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, trình duyệt hoặc trình điều khiển đồ họa của bạn có thể có tùy chọn chọn GPU riêng, hoặc bản phân phối Linux của bạn có thể cung cấp công cụ chuyển GPU (như PRIME hoặc optimus-manager). Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
+    "bodyRequestedBackend": "The game could not start on the graphics backend you picked, so it is running on OpenGL instead. Everything works; loading and the first minutes may stutter more. You can pick a backend again under Options, Graphics, System.",
     "hybridBodyOther": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, hãy kiểm tra cài đặt đồ họa của trình duyệt và hệ điều hành để bật nó lên. Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
     "dismiss": "Bỏ Qua"
   },

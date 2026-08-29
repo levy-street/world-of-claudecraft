@@ -4904,6 +4904,7 @@ export type TranslationKeyFlat =
   | 'gatherEvent.pristineVein'
   | 'gpuNotice.bodyDesktop'
   | 'gpuNotice.bodyDiscreteInactive'
+  | 'gpuNotice.bodyRequestedBackend'
   | 'gpuNotice.bodyWeb'
   | 'gpuNotice.dismiss'
   | 'gpuNotice.hybridBodyLinux'

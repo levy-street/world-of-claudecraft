@@ -16,8 +16,14 @@
 
 import { activeGpuRendererName, gfxSoftwareRendering } from '../render/gfx';
 import { probeMajorPerformanceCaveat } from '../render/software_renderer';
-import { gpuNoticeDisplayed, initGpuNotice } from '../ui/gpu_notice_toast';
+import { desktopBridge } from '../runtime';
+import {
+  gpuNoticeDisplayed,
+  initGpuNotice,
+  updateGpuNoticeShellVerdict,
+} from '../ui/gpu_notice_toast';
 import { detectDesktopPlatform } from './desktop_download';
+import { desktopGpuBackendActive } from './desktop_gpu_backend_sync';
 import { latchedDesktopGpuStatus, mergeShellGpuVerdict } from './desktop_gpu_status';
 import { hybridGpuLikely } from './hybrid_gpu_detect';
 
@@ -35,8 +41,24 @@ export function initSoftwareRenderNotice(desktopShell: boolean): void {
     localSoftwareRendering,
     localHybridGpuLikely,
     shell: latchedDesktopGpuStatus(),
+    requestedBackendUnavailable: desktopGpuBackendActive()?.requestedUnavailable === true,
   });
   initGpuNotice({ ...verdict, desktopShell, desktopPlatform });
+  // The shell judges its launch around the time the page reports its renderer,
+  // which can be after this init: a late judgement pushes the same verdict the
+  // toast merges, exactly as the shell's GPU status already does.
+  const bridge = desktopBridge();
+  const subscribe = bridge?.onGpuBackendState;
+  if (typeof subscribe === 'function') {
+    subscribe.call(bridge, (state) => {
+      if (state?.requestedUnavailable !== true) return;
+      updateGpuNoticeShellVerdict({
+        softwareRendering: false,
+        discreteInactive: false,
+        requestedBackendUnavailable: true,
+      });
+    });
+  }
 }
 
 // The two exposures below read the notice's per-session display latch rather

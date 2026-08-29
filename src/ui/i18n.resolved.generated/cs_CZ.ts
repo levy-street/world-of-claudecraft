@@ -8456,6 +8456,7 @@ export const cs_CZ: EnTranslations = {
     "bodyWeb": "Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.",
     "hybridBodyWindows": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, nastav prohlížeč na Vysoký výkon v Nastavení, Systém, Displej, Grafika, a pak ho restartuj. Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
     "hybridBodyLinux": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, tvůj prohlížeč nebo grafický ovladač může mít vlastní nastavení výběru GPU, případně tvoje distribuce může nabízet nástroj pro přepínání grafiky (například PRIME nebo optimus-manager). Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
+    "bodyRequestedBackend": "The game could not start on the graphics backend you picked, so it is running on OpenGL instead. Everything works; loading and the first minutes may stutter more. You can pick a backend again under Options, Graphics, System.",
     "hybridBodyOther": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, zkontroluj nastavení grafiky v prohlížeči i v operačním systému a zapni ji tam. Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
     "dismiss": "Zavřít"
   },

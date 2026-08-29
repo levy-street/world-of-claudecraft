@@ -7799,6 +7799,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。',
   'gpuNotice.hybridBodyLinux':
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。',
+  'gpuNotice.bodyRequestedBackend':
+    '游戏无法在你选择的图形后端上启动，因此正在使用 OpenGL 运行。一切功能正常，但加载和最初几分钟可能更卡顿。你可以在「选项 > 图形 > 系统」中重新选择后端。',
   'gpuNotice.hybridBodyOther':
     '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。',
   'gpuNotice.dismiss': '关闭',

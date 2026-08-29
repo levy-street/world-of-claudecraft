@@ -8096,6 +8096,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
   'gpuNotice.hybridBodyLinux':
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
+  'gpuNotice.bodyRequestedBackend':
+    '선택한 그래픽 백엔드로 게임을 시작할 수 없어 OpenGL로 실행 중입니다. 정상적으로 작동하지만 로딩과 처음 몇 분 동안 더 끊길 수 있습니다. 옵션 > 그래픽 > 시스템에서 백엔드를 다시 선택할 수 있습니다.',
   'gpuNotice.hybridBodyOther':
     '이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저와 운영체제의 그래픽 설정을 확인하여 활성화하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.',
   'gpuNotice.dismiss': '닫기',

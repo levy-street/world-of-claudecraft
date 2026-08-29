@@ -8456,6 +8456,7 @@ export const it_IT: EnTranslations = {
     "bodyWeb": "Il gioco sta girando senza accelerazione GPU e sarà lento. Abilita l'accelerazione hardware nelle impostazioni del browser, aggiorna i driver grafici, poi riavvia il browser.",
     "hybridBodyWindows": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, imposta il browser su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica, poi riavvialo. L'app desktop seleziona automaticamente la GPU dedicata.",
     "hybridBodyLinux": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, il browser o il driver grafico potrebbero offrire un'impostazione di selezione GPU propria, oppure la tua distribuzione potrebbe offrire uno strumento di commutazione GPU (come PRIME o optimus-manager). L'app desktop seleziona automaticamente la GPU dedicata.",
+    "bodyRequestedBackend": "The game could not start on the graphics backend you picked, so it is running on OpenGL instead. Everything works; loading and the first minutes may stutter more. You can pick a backend again under Options, Graphics, System.",
     "hybridBodyOther": "Questa sessione sta girando sulla GPU integrata (a risparmio energetico). Se questo computer ha anche una GPU dedicata per il gioco, controlla le impostazioni grafiche del browser e del sistema operativo per abilitarla. L'app desktop seleziona automaticamente la GPU dedicata.",
     "dismiss": "Ignora"
   },

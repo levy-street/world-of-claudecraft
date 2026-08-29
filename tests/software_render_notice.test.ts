@@ -18,6 +18,7 @@ vi.mock('../src/ui/gpu_notice_toast', () => ({
     softwareRendering: false,
     discreteInactive: false,
     hybridGpuLikely: false,
+    requestedBackendUnavailable: false,
   })),
 }));
 vi.mock('../src/game/hybrid_gpu_detect', () => ({ hybridGpuLikely: vi.fn() }));
@@ -48,6 +49,7 @@ const NOTHING_DISPLAYED = {
   softwareRendering: false,
   discreteInactive: false,
   hybridGpuLikely: false,
+  requestedBackendUnavailable: false,
 };
 
 // Drives the real latch the assembler reads, the way the shell would.
@@ -81,6 +83,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: true,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: true,
       desktopPlatform: 'other',
     });
@@ -95,6 +98,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: true,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: false,
       desktopPlatform: 'other',
     });
@@ -108,6 +112,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: false,
       desktopPlatform: 'other',
     });
@@ -121,6 +126,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: true,
       desktopPlatform: 'other',
     });
@@ -140,6 +146,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: false,
       discreteInactive: false,
       hybridGpuLikely: true,
+      requestedBackendUnavailable: false,
       desktopShell: false,
       desktopPlatform: 'win',
     });
@@ -154,6 +161,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: false,
       discreteInactive: true,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: true,
       desktopPlatform: 'other',
     });
@@ -168,6 +176,7 @@ describe('initSoftwareRenderNotice', () => {
       softwareRendering: true,
       discreteInactive: false,
       hybridGpuLikely: false,
+      requestedBackendUnavailable: false,
       desktopShell: true,
       desktopPlatform: 'other',
     });
