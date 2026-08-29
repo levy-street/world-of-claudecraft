@@ -508,13 +508,13 @@ export const WAR_EQUIPPED_ITEMS: Record<string, string> = Object.freeze({
   legs: 'forgefold_legguards',
   ring2: 'warhewn_signet',
 });
-export const WAR_EQUIPPED_DELTA: SlotStats = {
-  legs: { str: 1 },
-  ring2: { str: 1 },
-  mainhand: { str: WEAPON_STR_STEP },
-  offhand: { str: WEAPON_STR_STEP },
-  chest: { sta: CHEST_STA_STEP_PLATE },
-};
+export const WAR_EQUIPPED_DELTA: SlotStats = Object.freeze({
+  legs: Object.freeze({ str: 1 }),
+  ring2: Object.freeze({ str: 1 }),
+  mainhand: Object.freeze({ str: WEAPON_STR_STEP }),
+  offhand: Object.freeze({ str: WEAPON_STR_STEP }),
+  chest: Object.freeze({ sta: CHEST_STA_STEP_PLATE }),
+});
 const WAR_ENCH_D: SlotStats = {
   mainhand: { str: WEAPON_STR_STEP },
   offhand: { str: WEAPON_STR_STEP },
@@ -673,11 +673,11 @@ const CASTER_ENCH_D: SlotStats = {
 export const CASTER_APEX_CHEST_ITEMS: Record<string, string> = Object.freeze({
   chest: 'sunspun_vestments',
 });
-export const CASTER_APEX_CHEST_DELTA: SlotStats = {
-  chest: { int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED },
-  gloves: { int: 1 },
-  mainhand: { int: WEAPON_INT_STEP },
-};
+export const CASTER_APEX_CHEST_DELTA: SlotStats = Object.freeze({
+  chest: Object.freeze({ int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED }),
+  gloves: Object.freeze({ int: 1 }),
+  mainhand: Object.freeze({ int: WEAPON_INT_STEP }),
+});
 
 export function casterLane(
   seed: number,
@@ -781,11 +781,11 @@ export const TANK_KIT_ITEMS: Record<string, string> = Object.freeze({
   offhand: 'duskforged_bulwark',
   legs: 'forgefold_legguards',
 });
-export const TANK_KIT_DELTA: SlotStats = {
-  offhand: { str: 1, sta: 1 },
-  legs: { str: 1 },
-  chest: { sta: CHEST_STA_STEP_PLATE },
-};
+export const TANK_KIT_DELTA: SlotStats = Object.freeze({
+  offhand: Object.freeze({ str: 1, sta: 1 }),
+  legs: Object.freeze({ str: 1 }),
+  chest: Object.freeze({ sta: CHEST_STA_STEP_PLATE }),
+});
 
 export interface TankBody {
   hp: number;
