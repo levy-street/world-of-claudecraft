@@ -134,9 +134,10 @@ describe('ignivar dressing plan', () => {
     // for the owner's dungeon_entrance facade (10_802_120), and again for
     // the eight-piece forge-lift car kit (measured total 12_554_128), the
     // winch remake's mount and spool pair, minus the retired one-piece
-    // winch and sliding door (measured total 12_731_480) plus a sliver of
+    // winch and sliding door, with the remake pair KTX2-compressed like
+    // the rest of the kit (measured total 12_572_412) plus a sliver of
     // rebake headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(12_800_000);
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(12_650_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {
