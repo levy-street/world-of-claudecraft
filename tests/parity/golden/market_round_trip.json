@@ -1112,7 +1112,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "13f1372d",
+      "state": "1ea0d2ea",
       "events": "77228fa2",
       "rng": {
         "draws": 0,
@@ -1223,8 +1223,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -1387,7 +1386,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "13f1372d",
+      "state": "1ea0d2ea",
       "events": "3f757b5c",
       "rng": {
         "draws": 0,
@@ -1498,8 +1497,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -1662,7 +1660,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "dce93465",
+      "state": "34f8be6c",
       "events": "91e4eef1",
       "rng": {
         "draws": 0,
@@ -1673,7 +1671,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "dce93465",
+      "state": "34f8be6c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1788,8 +1786,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook",
@@ -1956,7 +1953,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "53e2baa7",
+      "state": "3e83c5da",
       "events": "ae8af195",
       "rng": {
         "draws": 0,
@@ -2074,8 +2071,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook",
@@ -2242,7 +2238,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "53e2baa7",
+      "state": "3e83c5da",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2360,8 +2356,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
               "poi:eastbrook_vale:eastbrook",

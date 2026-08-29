@@ -441,6 +441,44 @@ describe('the World Market: the Merchant', () => {
     expect(info.collectionCopper).toBe(95);
   });
 
+  it('a player listing grants no collection progress, while Merchant house stock does', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    const sellerMeta = playerOf(sim, seller);
+    const buyerMeta = playerOf(sim, buyer);
+    buyerMeta.copper = 100_000;
+
+    const relic = 'cryptbone_helm';
+    sim.addItem(relic, 1, seller);
+    sim.marketList(relic, 1, 100, seller);
+    const playerListing = listingBy(
+      sim,
+      (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === relic,
+      'catalogued player listing',
+    );
+    sim.marketBuy(playerListing.id, buyer);
+
+    expect(buyerMeta.inventory.some((s) => s.itemId === relic)).toBe(true);
+    expect(buyerMeta.deedStats.itemsDiscovered.has(relic)).toBe(false);
+    expect(buyerMeta.reliquary.firstFind[relic]).toBeUndefined();
+    expect(buyerMeta.reliquary.recent).toEqual([]);
+
+    const houseListing = listingBy(
+      sim,
+      (l) => l.house && l.itemId === 'roadwardens_helm',
+      'Merchant house stock',
+    );
+    sim.marketBuy(houseListing.id, buyer);
+    expect(buyerMeta.inventory.some((s) => s.itemId === 'roadwardens_helm')).toBe(true);
+    expect(buyerMeta.deedStats.itemsDiscovered.has('roadwardens_helm')).toBe(true);
+    // House stock retains the market movement contract for the obtain tally.
+    expect(buyerMeta.reliquary.counts).toEqual({});
+    expect(sellerMeta.deedStats.itemsDiscovered.has(relic)).toBe(true);
+  });
+
   it("collecting moves waiting gold into the seller's purse", () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');

@@ -34,6 +34,7 @@ import { bareClient } from './helpers/bare_client';
 /** Catalogued Hollow Crypt unique used across Reliquary pin tests. */
 const CATALOGUE_RELIC = 'cryptbone_helm';
 const PAGE_ID = 'conquerors_hollow_crypt';
+const MOUNT_PAGE_ID = 'horizons_mounts';
 /** Hollow Crypt has five item relics; used for Illumination + absolute totals. */
 const HOLLOW_CRYPT_RELICS = [
   'cryptbone_greaves',
@@ -364,7 +365,7 @@ describe('Reliquary wire thrift', () => {
 });
 
 describe('Reliquary movement flag on the server-only grant paths', () => {
-  it('a GM item restore re-mints without counting, and still discovers', () => {
+  it('a GM item restore re-mints without collection progress', () => {
     const server = new GameServer();
     const fw = fakeWs();
     const session = joinAt(server, fw, 20, 'RelicRestore');
@@ -379,16 +380,13 @@ describe('Reliquary movement flag on the server-only grant paths', () => {
 
     // The grant really landed (otherwise every claim below is vacuous).
     expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
-    // Discovery fires, as on every movement path...
-    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
-    // ...while the tally stays empty and no clear count is invented, despite a
-    // meter reading 5. A support ticket must not move a player-visible number.
+    // A support ticket must not create accomplishment progress or provenance.
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
     expect(meta.reliquary.counts).toEqual({});
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
   });
 
-  it('a PBE boost kit seeds gear without counting any of it', () => {
+  it('a PBE boost kit seeds gear without collection progress', () => {
     // Behavioral rather than a source scan: applyBoostKitToPlayer is a pure
     // Sim function (the DB work lives in its callers), so the policy can be
     // driven for real. A boost kit is a SYSTEM SEED, mirroring the join-time
@@ -402,19 +400,16 @@ describe('Reliquary movement flag on the server-only grant paths', () => {
 
     expect(applyBoostKitToPlayer(sim, session.pid)).toBe(true);
 
-    // Premise: the kit really does hand over catalogued relics, or "no counts"
-    // would be true for the boring reason.
-    const seededRelics = [...meta.deedStats.itemsDiscovered].filter((id) =>
-      isCataloguedRelicItem(id),
-    );
-    expect(seededRelics.length).toBeGreaterThan(0);
-    // The alt-role BAGGED loop is a distinct grant site inside the kit: prove
-    // it handed over a catalogued relic of its own, so dropping only ITS
-    // movement flag cannot stay green on the equipped items' content alone.
-    expect(meta.inventory.some((s) => isCataloguedRelicItem(s.itemId))).toBe(true);
-    // Discovery fills the catalog, as on every movement path...
-    for (const id of seededRelics) expect(meta.reliquary.firstFind[id]).toBeDefined();
-    // ...and not one of them counts as something the world handed the player.
+    // The kit really hands over catalogued relics, including the alt-role bag
+    // loop, but a test-only system seed is possession rather than earned play.
+    const heldRelics = meta.inventory
+      .map((slot) => slot.itemId)
+      .filter((id) => isCataloguedRelicItem(id));
+    expect(heldRelics.length).toBeGreaterThan(0);
+    for (const id of heldRelics) {
+      expect(meta.deedStats.itemsDiscovered.has(id)).toBe(false);
+      expect(meta.reliquary.firstFind[id]).toBeUndefined();
+    }
     expect(meta.reliquary.counts).toEqual({});
   });
 });
@@ -468,6 +463,35 @@ describe('Reliquary online / offline parity for scripted state', () => {
     expect(client.reliquaryPageClearCount(PAGE_ID)).toBe(sim.reliquaryPageClearCount(PAGE_ID));
     expect(client.reliquaryPageClearCount(PAGE_ID)).toBe(4);
     expect(client.reliquaryPageCompletion('not_a_page')).toBeNull();
+  });
+
+  it('scores held mount reins on both hosts only after the reins are earned', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 44, 'Relic Mount');
+    const sim = server.sim as Sim;
+    const reinsId = 'reins_valorsteed';
+
+    sim.addItem(reinsId, 1, session.pid, { movement: true });
+    sim.tick();
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fw.sent));
+
+    expect(sim.ownedMounts()).toContain('valorsteed');
+    expect(client.ownedMounts()).toContain('valorsteed');
+    expect(sim.reliquaryPageCompletion(MOUNT_PAGE_ID)?.owned).toBe(0);
+    expect(client.reliquaryPageCompletion(MOUNT_PAGE_ID)?.owned).toBe(0);
+
+    sim.addItem(reinsId, 1, session.pid);
+    sim.tick();
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    (client as any).applySnapshot(lastSnap(fw.sent));
+
+    expect(sim.reliquaryPageCompletion(MOUNT_PAGE_ID)?.owned).toBe(1);
+    expect(client.reliquaryPageCompletion(MOUNT_PAGE_ID)?.owned).toBe(1);
   });
 
   it('the wire blob carries illuminatedPages and ClientWorld DROPS it on decode', () => {

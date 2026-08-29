@@ -586,6 +586,8 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     const base = sheetReliquaryFromState(makeState());
     const withReins = sheetReliquaryFromState(
       makeState({
+        itemDiscoverySeedApplied: true,
+        deedStats: { itemsDiscovered: ['reins_valorsteed'] },
         bank: {
           inventory: [{ itemId: 'reins_valorsteed', count: 1 }],
           purchasedSlots: 0,
@@ -610,10 +612,29 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(cataloguedMountIds).toContain(reinsDef.mount);
     const base = sheetReliquaryFromState(makeState());
     const withReins = sheetReliquaryFromState(
-      makeState({ inventory: [{ itemId: 'reins_valorsteed', count: 1 }] }),
+      makeState({
+        itemDiscoverySeedApplied: true,
+        inventory: [{ itemId: 'reins_valorsteed', count: 1 }],
+        deedStats: { itemsDiscovered: ['reins_valorsteed'] },
+      }),
     );
     expect(withReins.owned).toBe(base.owned + 1);
     expect(withReins.total).toBe(base.total);
+  });
+
+  it('grandfathers held reins only until the discovery seed latch is applied', () => {
+    const base = sheetReliquaryFromState(makeState({ itemDiscoverySeedApplied: true }));
+    const legacy = sheetReliquaryFromState(
+      makeState({ inventory: [{ itemId: 'reins_valorsteed', count: 1 }] }),
+    );
+    const latchedUnearned = sheetReliquaryFromState(
+      makeState({
+        itemDiscoverySeedApplied: true,
+        inventory: [{ itemId: 'reins_valorsteed', count: 1 }],
+      }),
+    );
+    expect(legacy.owned).toBe(base.owned + 1);
+    expect(latchedUnearned.owned).toBe(base.owned);
   });
 
   it('scores an earned title deed through sheetReliquaryFromState', () => {

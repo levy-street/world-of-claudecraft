@@ -765,6 +765,83 @@ describe('the Heroic Marks reward letter (mailHeroicMarks)', () => {
   });
 });
 
+describe('mail attachment collection provenance', () => {
+  const RELIC = 'cryptbone_helm';
+
+  it('player mail lands the item but stays undiscovered after a character relog', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice)!;
+    const bobMeta = sim.meta(bob)!;
+    aliceMeta.copper = 10_000;
+    sim.addItem(RELIC, 1, alice);
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'A found helm', 'For you.', 0, [{ itemId: RELIC, count: 1 }], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+    const letter = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'A found helm');
+    if (!letter) throw new Error('player parcel not delivered');
+
+    sim.mailTake(letter.id, bob);
+    expect(bobMeta.inventory.some((s) => s.itemId === RELIC)).toBe(true);
+    expect(bobMeta.deedStats.itemsDiscovered.has(RELIC)).toBe(false);
+    expect(bobMeta.reliquary.firstFind[RELIC]).toBeUndefined();
+    expect(bobMeta.reliquary.recent).toEqual([]);
+
+    const saved = sim.serializeCharacter(bob)!;
+    expect(saved.itemDiscoverySeedApplied).toBe(true);
+    const reloaded = makeWorld();
+    const rid = reloaded.addPlayer('mage', 'Bob Reloaded', { state: saved });
+    expect(reloaded.meta(rid)!.deedStats.itemsDiscovered.has(RELIC)).toBe(false);
+    expect(reloaded.meta(rid)!.reliquary.firstFind[RELIC]).toBeUndefined();
+  });
+
+  for (const kind of ['npc', 'system'] as const) {
+    it(`${kind} reward mail earns discovery while retaining movement tally and clear-stamp rules`, () => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', `${kind} recipient`);
+      const meta = sim.meta(pid)!;
+      meta.deedStats.dungeonClears.hollow_crypt = 7;
+      sim.postOffice.sendLetter(
+        sim.postOffice.mailKeyFor(meta),
+        meta.name,
+        {
+          letterId: `test_${kind}_earned_relic`,
+          senderName: kind === 'npc' ? 'Questgiver' : 'Quartermaster',
+          subject: 'An earned helm',
+          body: 'You earned this.',
+          items: [{ itemId: RELIC, count: 1 }],
+          delaySeconds: 0,
+        },
+        kind,
+      );
+      tickFor(sim, 1);
+      moveToMailbox(sim, pid);
+      const letter = sim.mailInfoFor(pid)?.messages.find((m) => m.subject === 'An earned helm');
+      if (!letter) throw new Error(`${kind} reward letter not delivered`);
+
+      sim.drainEvents();
+      sim.mailTake(letter.id, pid);
+      expect(meta.deedStats.itemsDiscovered.has(RELIC)).toBe(true);
+      expect(meta.reliquary.firstFind[RELIC]).toEqual({});
+      expect(meta.reliquary.recent).toEqual([RELIC]);
+      expect(meta.reliquary.counts).toEqual({});
+      expect(
+        sim
+          .drainEvents()
+          .filter((event) => event.type === 'reliquaryUnlock' && event.itemId === RELIC),
+      ).toEqual([
+        expect.objectContaining({
+          type: 'reliquaryUnlock',
+          itemId: RELIC,
+          pid,
+        }),
+      ]);
+    });
+  }
+});
+
 describe('persistence and rename', () => {
   it('round-trips the book through serializeMail/loadMail without re-announcing', () => {
     const sim = makeWorld();

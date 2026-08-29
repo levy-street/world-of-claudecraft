@@ -1080,6 +1080,7 @@ describe('reliquaryUnlock illumination fan-out through GameServer.detectActivity
     if (!state) throw new Error('the seeded character serialized to null');
     state.deedStats = undefined;
     state.reliquary = undefined;
+    state.itemDiscoverySeedApplied = undefined;
     return state;
   }
 

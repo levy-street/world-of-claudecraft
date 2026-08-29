@@ -6,6 +6,7 @@
 import {
   catalogCharacterCompletion,
   curatorRankFromOwned,
+  earnedReliquaryMounts,
   type OwnedIdLookup,
 } from '../sim/reliquary';
 import { esc } from './esc';
@@ -31,7 +32,9 @@ export function buildReliquarySheetModel(world: ReliquarySheetWorld): ReliquaryS
   const opts = {
     itemsDiscovered: world.deedStats.itemsDiscovered,
     marks: world.reliquaryMarks,
-    ownedMounts: new Set(world.ownedMounts()),
+    ownedMounts: new Set(
+      earnedReliquaryMounts(world.ownedMounts(), world.deedStats.itemsDiscovered),
+    ),
     deedsEarned: world.deedsEarned,
   };
   const completion = catalogCharacterCompletion(opts);

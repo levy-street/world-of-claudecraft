@@ -1492,9 +1492,8 @@ export function buyBackItem(
   // generic plain copy; addStacked deep-clones it into the new/topped-up
   // inventory slot, so the buyback row's own copy is never aliased.
   addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
-  // The silent add bypasses the inventory hub, so credit the discovery
-  // ledger here (an acquisition like any other; the mark is idempotent), and
-  // carry the SAME movement provenance the hub would have carried.
+  // The silent add bypasses the inventory hub, so route the attempted mark
+  // through the same movement gate the hub would have carried.
   //
   // Buyback is MOVEMENT (maintainer, 2026-08-08, superseding the phase file's
   // grant-path list), which buys two things. No obtain tally: sellItem credits
@@ -1502,17 +1501,8 @@ export function buyBackItem(
   // sell/buyback cycle is copper neutral and repeatable without limit, and
   // counting it would let one player inflate a relic's tally for free, the
   // same false reading the two-player trade ban exists to prevent. And no
-  // fabricated first-find provenance, which is what the flag below is for.
-  //
-  // A buyback USUALLY cannot produce a first find, because a row gets into the
-  // book through sellItem, which requires the player to have been holding the
-  // item, and anything held has been through a grant or the join-time seed
-  // (which sweeps vendorBuyback itself). But that is not a guarantee: guild
-  // bank withdrawals move items through moveBetweenContainers and never touch
-  // the discovery ledger, so an UNDISCOVERED relic can reach a player's bags,
-  // and selling then buying it back would fire its first-ever discovery here.
-  // Without the flag that first find would stamp whatever the live clear meter
-  // happens to read, inventing provenance on a pure transfer path.
+  // collection progress: buyback restores possession but never proves earned
+  // play, including for an undiscovered guild-bank withdrawal.
   //
   // Called as the deeds MODULE function rather than through ctx, which is the
   // Phase 10 pattern exactly: the module function carries the opts and the

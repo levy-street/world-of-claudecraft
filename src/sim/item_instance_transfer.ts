@@ -149,17 +149,25 @@ export function grantCopies(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  opts?: Readonly<{ collectionEligible?: boolean }>,
 ): void {
-  // movement: every pipe that shares this grant hands over copies that already
-  // existed in somebody's hands (a market purchase, a cancelled or collected
-  // listing coming home, a mail attachment), so none of them is a world-sourced
-  // acquisition for the Reliquary tally. Discovery still fires as it always has.
+  // movement: every pipe that shares this grant normally hands over copies
+  // that already existed in somebody's hands (market/trade return/mail), so it
+  // grants no collection progress or obtain tally. Authored world-reward mail
+  // and Merchant house stock pass collectionEligible while retaining movement
+  // for the existing tally / first-find clear-stamp contract.
   if (instance)
     ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
       craftedRecipeId,
       movement: true,
+      ...(opts?.collectionEligible ? { collectionEligible: true } : {}),
     });
-  else ctx.addItem(itemId, count, pid, { craftedRecipeId, movement: true });
+  else
+    ctx.addItem(itemId, count, pid, {
+      craftedRecipeId,
+      movement: true,
+      ...(opts?.collectionEligible ? { collectionEligible: true } : {}),
+    });
 }
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail

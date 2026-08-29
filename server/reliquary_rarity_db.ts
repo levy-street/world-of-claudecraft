@@ -40,9 +40,9 @@ export const RELIQUARY_RARITY_STATEMENT_TIMEOUT_MS = 10_000;
  *  GLOBAL (cross-realm) by design, the deeds rarity precedent: at current
  *  population, per-realm percentages would be noise. THREE relic kinds are
  *  deliberately not counted: weapon skins (account-scoped), titles
- *  (deed-scoped), and mounts (possession-based; a mount cell's id is the
- *  mount key, not the reins item id, so nothing in the blob arrays matches
- *  it). All three stay absent from `found` and the client renders no line
+ *  (deed-scoped), and mounts (their earned reins provenance lives in the
+ *  discovery ledger, but a mount cell's id is the mount key, so nothing in
+ *  the blob arrays matches it). All three stay absent from `found` and the client renders no line
  *  for them, the same shape as zero-found; a mounts page can still show a
  *  header illumination line while its cells never show one. */
 export interface ReliquaryRarityAggregate {

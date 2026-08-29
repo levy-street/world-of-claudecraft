@@ -61,14 +61,18 @@ describe('buildReliquarySheetModel', () => {
     expect(withMark.owned).toBe(base.owned + 1);
   });
 
-  it('counts a catalogued Horizons mount from the ownedMounts seam', () => {
+  it('counts a held Horizons mount only when its reins were earned', () => {
     // Membership pin: valorsteed must stay a live horizons_mounts relic
     // (RELIQUARY_HORIZON_MOUNTS), so catalog churn fails loudly right here.
     expect(RELIQUARY_HORIZON_MOUNTS).toContain('valorsteed');
     const base = buildReliquarySheetModel(world());
-    const withMount = buildReliquarySheetModel(world({ mounts: ['valorsteed'] }));
-    expect(withMount.owned).toBe(base.owned + 1);
-    expect(withMount.total).toBe(base.total);
+    const unearned = buildReliquarySheetModel(world({ mounts: ['valorsteed'] }));
+    const earned = buildReliquarySheetModel(
+      world({ items: ['reins_valorsteed'], mounts: ['valorsteed'] }),
+    );
+    expect(unearned.owned).toBe(base.owned);
+    expect(earned.owned).toBe(base.owned + 1);
+    expect(earned.total).toBe(base.total);
   });
 
   it('counts catalogued titles from a ClientWorld-shaped deedsEarned Map, matching a Set', () => {

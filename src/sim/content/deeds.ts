@@ -1013,7 +1013,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_discovery_25: {
     id: 'col_discovery_25',
     name: 'Packrat',
-    desc: 'Discover 25 different items (an item counts the first time it ever enters your possession).',
+    desc: 'Discover 25 different items through loot, quests, crafting, gathering, or NPC vendors and rewards. Player transfers do not count.',
     category: 'collection',
     renown: 5,
     trigger: { kind: 'meter', meter: 'itemsDiscoveredCount', amount: 25 },

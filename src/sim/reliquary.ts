@@ -30,7 +30,7 @@ import {
   type ReliquaryRelicDef,
 } from './content/reliquary';
 import { ITEMS } from './data';
-import { ownedMounts as ownedMountKeys } from './mounts';
+import { mountItemId, ownedMounts as ownedMountKeys } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { DeedStatKey, DeedStats, ItemDef } from './types';
@@ -58,10 +58,10 @@ export interface ReliquaryFirstFind {
    * before its clear was credited or arrived with no run behind it at all.
    * Absent means unknown, the same shape a retro fill writes.
    *
-   * A first find that arrived through a MOVEMENT grant is sparse too, at any
-   * meter value: the stamp answers "which clear did you find this on", and a
-   * relic bought, traded, or mailed to you was not found on one of your runs
-   * at all. See noteRelicItemFind for where the two gates live.
+   * An eligible authored reward delivered through a MOVEMENT grant is sparse
+   * too, at any meter value: the delivery pipe does not identify which clear
+   * produced it. Ordinary player movement grants never create a first find.
+   * See noteRelicItemFind for where the two gates live.
    */
   clears?: number;
 }
@@ -528,12 +528,10 @@ export function noteRelicItemFind(
   // Provenance is stamped only for a find the player's own play produced.
   // `retro` is the join-time seed (today's meter is not the meter at the real
   // first obtain) and `movement` is a grant that relocated somebody's existing
-  // copy (a trade, mail, a market buy, a re-mint). Both leave the entry
-  // sparse, because in both the clear count the meter happens to read has
-  // nothing to do with how this relic was acquired: a player sitting on twelve
-  // Hollow Crypt clears who BUYS the drop did not find it on clear twelve.
-  // Provenance only; the fill itself is real, so the unlock event, the toast,
-  // and the recent push below are deliberately unchanged on a movement find.
+  // copy. Ordinary movement is rejected before this hook; the remaining
+  // movement calls are authored NPC/system rewards or Merchant house stock.
+  // They earn the fill but leave this entry sparse because today's clear
+  // meter has nothing to do with a reward delivered through those pipes.
   if (!opts?.retro && !opts?.movement) {
     const pageId = RELIQUARY_ITEM_TO_PAGES.get(itemId)?.[0];
     const page = pageId !== undefined ? RELIQUARY_PAGES_BY_ID[pageId] : undefined;
@@ -1256,7 +1254,7 @@ export function catalogCharacterCompletion(
 export function reliquaryOwnershipOpts(input: {
   itemsDiscovered: OwnedIdLookup;
   marks?: OwnedIdLookup;
-  ownedMounts?: readonly string[] | OwnedIdLookup;
+  ownedMounts?: readonly string[];
   weaponSkinIds?: readonly string[] | OwnedIdLookup;
   deedsEarned?: OwnedIdLookup;
 }): {
@@ -1269,7 +1267,10 @@ export function reliquaryOwnershipOpts(input: {
   return {
     itemsDiscovered: input.itemsDiscovered,
     marks: input.marks,
-    ownedMounts: asOwnedLookup(input.ownedMounts),
+    ownedMounts:
+      input.ownedMounts === undefined
+        ? undefined
+        : new Set(earnedReliquaryMounts(input.ownedMounts, input.itemsDiscovered)),
     weaponSkins: asOwnedLookup(input.weaponSkinIds),
     deedsEarned: input.deedsEarned,
   };
@@ -1277,7 +1278,7 @@ export function reliquaryOwnershipOpts(input: {
 
 /**
  * Character-scoped ownership for mutation paths and join sync: items, marks,
- * live ownedMounts (bags+bank reins), and deedsEarned. Weapon skins are
+ * physically held AND earned mount reins, and deedsEarned. Weapon skins are
  * account cosmetics and are not on PlayerMeta; hosts pass them separately
  * for page/Overview fills only (never rank grants).
  */
@@ -1288,11 +1289,26 @@ export interface ReliquaryOwnershipSurfaces {
   deedsEarned: OwnedIdLookup;
 }
 
+/** Filter physically held reins to mounts the character earned through an
+ * eligible acquisition. Riding ownership deliberately remains item-borne;
+ * this helper changes only Reliquary/Horizons accomplishment scoring. */
+export function earnedReliquaryMounts(
+  heldMounts: readonly string[],
+  itemsDiscovered: OwnedIdLookup,
+): string[] {
+  return heldMounts.filter((mountKey) => {
+    const reinsId = mountItemId(mountKey);
+    return reinsId !== null && itemsDiscovered.has(reinsId);
+  });
+}
+
 export function characterReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershipSurfaces {
   return {
     itemsDiscovered: meta.deedStats.itemsDiscovered,
     marks: meta.reliquary.marks,
-    ownedMounts: new Set(ownedMountKeys(meta)),
+    ownedMounts: new Set(
+      earnedReliquaryMounts(ownedMountKeys(meta), meta.deedStats.itemsDiscovered),
+    ),
     deedsEarned: meta.deedsEarned,
   };
 }

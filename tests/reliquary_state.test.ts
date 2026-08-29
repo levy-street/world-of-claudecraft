@@ -658,7 +658,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     // Host-shaped opts (Sim + ClientWorld pass full surfaces including skins).
     // The strip in catalogRankOwned must ignore weaponSkins even when present.
     const hostOpts = reliquaryOwnershipOpts({
-      itemsDiscovered: new Set(),
+      itemsDiscovered: new Set(['reins_valorsteed']),
       ownedMounts: ['valorsteed'],
       weaponSkinIds: ['guildmark_arming_sword'],
       deedsEarned: new Set(['prog_veteran']),
@@ -686,7 +686,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     ).toBe(1);
   });
 
-  it('characterReliquaryOwnership uses live ownedMounts (bags + bank reins)', () => {
+  it('characterReliquaryOwnership uses earned live mount holdings (bags + bank reins)', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
     // No skins field: character path never carries account cosmetics.
@@ -698,7 +698,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(characterReliquaryOwnership(meta).ownedMounts.has('valorsteed')).toBe(true);
     expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(1);
 
-    // Bank-only reins still count (ownedMounts = bags + bank).
+    // Earned bank-only reins still count (physical ownership = bags + bank).
     const sim2 = makeSim();
     const m2 = primary(sim2).meta;
     sim2.addItem('reins_grag_bear', 1);
@@ -1731,36 +1731,47 @@ describe('Reliquary obtain counts', () => {
     expect(meta.reliquary.counts[STACKABLE_RELIC]).toBe(2);
   });
 
-  it('a MOVEMENT grant discovers but never counts, on both hub arms', () => {
+  it('a MOVEMENT grant lands but grants no collection progress, on both hub arms', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
+    sim.drainEvents();
 
     sim.addItem(CATALOGUE_RELIC, 1, sim.playerId, { movement: true });
-    // Discovery is deliberately unaffected: seeing a relic for the first time
-    // across a trade window still fills the page and still toasts.
-    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
+    expect(meta.reliquary.recent).toEqual([]);
     expect(meta.reliquary.counts).toEqual({});
 
-    sim.addItemInstance(STACKABLE_RELIC, { signer: 'Someone' }, sim.playerId, 2, {
-      movement: true,
-    });
-    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(true);
+    sim.addItemInstance(
+      STACKABLE_RELIC,
+      { signer: 'Someone', rolled: { quality: 'legendary' } },
+      sim.playerId,
+      2,
+      { movement: true },
+    );
+    expect(meta.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(false);
+    expect(meta.deedStats.visited.has('quality:legendary')).toBe(false);
+    expect(meta.reliquary.firstFind[STACKABLE_RELIC]).toBeUndefined();
+    expect(sim.drainEvents().filter((e) => e.type === 'reliquaryUnlock')).toEqual([]);
     expect(meta.reliquary.counts).toEqual({});
   });
 
-  it('the exchange pipes (market buy / cancel / collect, mail claim) never count', () => {
+  it('the transfer grant pipe lands copies without collection progress', () => {
     // grantCopies is the ONE grant all four share, so covering it covers them.
     const sim = makeSim();
     const { meta } = primary(sim);
     grantCopies(sim.ctx, sim.playerId, CATALOGUE_RELIC, 1);
     grantCopies(sim.ctx, sim.playerId, STACKABLE_RELIC, 2, { signer: 'Seller' });
-    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(true);
+    expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    expect(meta.inventory.some((s) => s.itemId === STACKABLE_RELIC)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(false);
     expect(meta.reliquary.counts).toEqual({});
   });
 
-  it('a completed trade never counts for the receiver', () => {
+  it('a completed trade grants no collection progress to the receiver', () => {
     const sim = makeSim();
     const giver = primary(sim);
     const takerPid = sim.addPlayer('warrior', 'Taker');
@@ -1802,11 +1813,11 @@ describe('Reliquary obtain counts', () => {
     expect(taker.inventory.find((s) => s.itemId === STACKABLE_RELIC)?.instance?.signer).toBe(
       'Giver',
     );
-    expect(taker.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    // ...and the receiving side gained membership without gaining a tally on
-    // EITHER arm (plain and instanced).
-    expect(taker.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
-    expect(taker.reliquary.firstFind[STACKABLE_RELIC]).toBeDefined();
+    expect(taker.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(taker.deedStats.itemsDiscovered.has(STACKABLE_RELIC)).toBe(false);
+    expect(taker.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
+    expect(taker.reliquary.firstFind[STACKABLE_RELIC]).toBeUndefined();
+    expect(taker.reliquary.recent).toEqual([]);
     expect(taker.reliquary.counts).toEqual({});
     // The giver's own tally is untouched by giving it away: the number counts
     // what the world handed you, and nothing takes that back.
@@ -1831,7 +1842,7 @@ describe('Reliquary obtain counts', () => {
     expect(meta.reliquary.counts[WEAPON_RELIC]).toBe(1);
   });
 
-  it('a vendor buyback NEVER counts, but still discovers', () => {
+  it('a vendor buyback NEVER counts and preserves an earlier earned discovery', () => {
     const sim = makeSim();
     const { meta, e } = primary(sim);
     // Stand at Trader Wilkes so the sell / buyback proximity gates pass (the
@@ -1863,7 +1874,7 @@ describe('Reliquary obtain counts', () => {
     // Copper-neutral, asserted rather than assumed: this is the premise the
     // ruling rests on, so it must red here if vendor pricing ever changes.
     expect(meta.copper).toBe(copperBeforeSale);
-    // Discovery is untouched on every movement path, buyback included.
+    // Sticky progress from the original world grant remains after buyback.
     expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
 
     // Ten more cycles do not move it either: the refusal is per acquisition,
@@ -1912,7 +1923,8 @@ describe('Reliquary obtain counts', () => {
     const traded = makeSim();
     const tradedMeta = primary(traded).meta;
     traded.addItem(heroicId, 1, traded.playerId, { movement: true });
-    expect(tradedMeta.deedStats.itemsDiscovered.has(baseId!)).toBe(true);
+    expect(tradedMeta.deedStats.itemsDiscovered.has(heroicId)).toBe(false);
+    expect(tradedMeta.deedStats.itemsDiscovered.has(baseId!)).toBe(false);
     expect(tradedMeta.reliquary.counts).toEqual({});
   });
 
@@ -1943,13 +1955,14 @@ describe('Reliquary obtain counts', () => {
 
     // And it survives the round trip, which is the whole point of the carrier.
     const saved = sim.serializeCharacter(pid)!;
+    expect(saved.itemDiscoverySeedApplied).toBe(true);
     expect(saved.reliquary?.firstFind?.[CATALOGUE_RELIC]).toEqual({ count: 1 });
     const reloaded = makeSim();
     const rid = reloaded.addPlayer('warrior', 'Reload', { state: saved });
     expect(reloaded.meta(rid)!.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
   });
 
-  it('a MOVEMENT first find stamps NO clears, at any meter value', () => {
+  it('a MOVEMENT grant creates no first find, at any meter value', () => {
     // The executed provenance ruling (maintainer, 2026-08-08), extending the
     // omit-at-zero one: the stamp answers "which clear did you find this on",
     // so a relic that arrived from somewhere else has no answer even when the
@@ -1963,7 +1976,8 @@ describe('Reliquary obtain counts', () => {
     expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(12);
 
     sim.addItem(CATALOGUE_RELIC, 1, sim.playerId, { movement: true });
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
 
     // CONTRAST, same meter, same relic id, world-sourced: the stamp lands.
     // Without this arm the assertion above would also pass if clears had
@@ -1975,11 +1989,7 @@ describe('Reliquary obtain counts', () => {
     expect(worldMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({ clears: 12 });
   });
 
-  it('a MOVEMENT first find still toasts and still pushes recent', () => {
-    // Scope guard for the ruling above: only PROVENANCE is unknown. The
-    // catalogue fill itself is real, so the unlock event, its page ids, and
-    // the recent ring are all unchanged. Narrowing those too would silently
-    // delete a player's "you filled a slot" moment on every market purchase.
+  it('a MOVEMENT grant neither toasts nor pushes recent', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
     sim.drainEvents();
@@ -1989,13 +1999,124 @@ describe('Reliquary obtain counts', () => {
     const unlocks = sim
       .drainEvents()
       .filter((e) => e.type === 'reliquaryUnlock' && e.itemId === CATALOGUE_RELIC);
-    expect(unlocks.length).toBe(1);
-    expect(unlocks[0].type === 'reliquaryUnlock' && unlocks[0].retro).toBeUndefined();
-    expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
-    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(unlocks).toEqual([]);
+    expect(meta.reliquary.recent).toEqual([]);
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
   });
 
-  it('the trade and market pipes land their first finds sparse', () => {
+  it('a transfer at the next Curator threshold leaves rank, deeds, and pages unchanged', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const nextThreshold = CURATOR_RANK_DEFS[1].threshold;
+    const relicIds = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((page) =>
+          page.relics.filter((relic) => relic.kind === 'item').map((relic) => relic.itemId),
+        ),
+      ),
+    ];
+    const earned = relicIds.slice(0, nextThreshold - 1);
+    const thresholdRelic = relicIds[nextThreshold - 1];
+    expect(earned).toHaveLength(nextThreshold - 1);
+    expect(thresholdRelic).toBeDefined();
+    for (const itemId of earned) markItemDiscovered(sim.ctx, meta, itemId);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(nextThreshold - 1);
+    expect(curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)))).toBe(1);
+
+    const deedsBefore = [...meta.deedsEarned.keys()].sort();
+    const pagesBefore = [...meta.reliquary.illuminatedPages].sort();
+    sim.drainEvents();
+    grantCopies(sim.ctx, sim.playerId, thresholdRelic!, 1);
+
+    expect(meta.inventory.some((slot) => slot.itemId === thresholdRelic)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(thresholdRelic!)).toBe(false);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(nextThreshold - 1);
+    expect(curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)))).toBe(1);
+    expect([...meta.deedsEarned.keys()].sort()).toEqual(deedsBefore);
+    expect([...meta.reliquary.illuminatedPages].sort()).toEqual(pagesBefore);
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'deedUnlocked' || event.type === 'reliquaryUnlock'),
+    ).toEqual([]);
+
+    sim.addItem(thresholdRelic!, 1, sim.playerId);
+    expect(meta.deedStats.itemsDiscovered.has(thresholdRelic!)).toBe(true);
+    // The tenth fill grants the rank-2 bridge deed, whose title is itself a
+    // Horizons relic. The live chain therefore finishes at eleven scored
+    // relics, while the neutral transfer above stays pinned at nine.
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(nextThreshold + 1);
+    expect(curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)))).toBe(2);
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    const earnedEvents = sim.drainEvents();
+    expect(
+      earnedEvents.filter(
+        (event) => event.type === 'reliquaryUnlock' && event.itemId === thresholdRelic,
+      ),
+    ).toHaveLength(1);
+    expect(
+      earnedEvents.some(
+        (event) => event.type === 'deedUnlocked' && event.deedId === 'col_reliquary_rank_2',
+      ),
+    ).toBe(true);
+  });
+
+  it('a transfer cannot complete a flagship page or its Illumination deed', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const pageId = 'conquerors_thunzharr';
+    const deedId = 'col_reliquary_illum_thunzharr';
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    expect(RELIQUARY_ILLUMINATION_DEED_PAGES[deedId]).toBe(pageId);
+    expect(page.relics.every((relic) => relic.kind === 'item')).toBe(true);
+    const itemIds = page.relics.map((relic) => {
+      if (relic.kind !== 'item') throw new Error('expected an item-only flagship page');
+      return relic.itemId;
+    });
+    const lastItemId = itemIds.at(-1)!;
+    for (const itemId of itemIds.slice(0, -1)) {
+      markItemDiscovered(sim.ctx, meta, itemId);
+    }
+    const ownershipBefore = characterReliquaryOwnership(meta);
+    expect(pageCompletion(page, ownershipBefore).complete).toBe(false);
+    expect(meta.reliquary.illuminatedPages.has(pageId)).toBe(false);
+    expect(meta.deedsEarned.has(deedId)).toBe(false);
+
+    sim.drainEvents();
+    grantCopies(sim.ctx, sim.playerId, lastItemId, 1);
+
+    expect(meta.inventory.some((slot) => slot.itemId === lastItemId)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(lastItemId)).toBe(false);
+    expect(pageCompletion(page, characterReliquaryOwnership(meta)).complete).toBe(false);
+    expect(meta.reliquary.illuminatedPages.has(pageId)).toBe(false);
+    expect(meta.deedsEarned.has(deedId)).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .filter((event) => event.type === 'deedUnlocked' || event.type === 'reliquaryUnlock'),
+    ).toEqual([]);
+
+    sim.addItem(lastItemId, 1, sim.playerId);
+
+    expect(meta.deedStats.itemsDiscovered.has(lastItemId)).toBe(true);
+    expect(pageCompletion(page, characterReliquaryOwnership(meta)).complete).toBe(true);
+    expect(meta.reliquary.illuminatedPages.has(pageId)).toBe(true);
+    expect(meta.deedsEarned.has(deedId)).toBe(true);
+    const earnedEvents = sim.drainEvents();
+    expect(
+      earnedEvents.some(
+        (event) =>
+          event.type === 'reliquaryUnlock' &&
+          event.itemId === lastItemId &&
+          event.illuminatedPageId === pageId,
+      ),
+    ).toBe(true);
+    expect(
+      earnedEvents.some((event) => event.type === 'deedUnlocked' && event.deedId === deedId),
+    ).toBe(true);
+  });
+
+  it('the trade and market pipes create no first finds', () => {
     // The ruling through the REAL relocation seams rather than the raw opt, so
     // a site that stopped passing the flag reds here even though the hub-level
     // test above would stay green.
@@ -2003,13 +2124,15 @@ describe('Reliquary obtain counts', () => {
     const tradedMeta = primary(traded).meta;
     tradedMeta.deedStats.dungeonClears.hollow_crypt = 7;
     grantCopies(traded.ctx, traded.playerId, CATALOGUE_RELIC, 1);
-    expect(tradedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    expect(tradedMeta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(tradedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
 
     const instanced = makeSim();
     const instancedMeta = primary(instanced).meta;
     instancedMeta.deedStats.dungeonClears.hollow_crypt = 7;
     grantCopies(instanced.ctx, instanced.playerId, CATALOGUE_RELIC, 1, { signer: 'Seller' });
-    expect(instancedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    expect(instancedMeta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(instancedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
   });
 
   it('clamps at the cap and ignores a non-positive copy count', () => {
@@ -2243,13 +2366,11 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
 
     const delivered = deliverCommissionOrder(sim.ctx, orderId!, sim.playerId);
     expect(delivered.ok, delivered.reason).toBe(true);
-    // The requester really received it, and gained membership without a tally.
+    // The requester really received it, but the handover grants no collection progress.
     expect(requester.inventory.some((s) => s.itemId === RELIC)).toBe(true);
-    expect(requester.deedStats.itemsDiscovered.has(RELIC)).toBe(true);
-    expect(requester.reliquary.firstFind[RELIC]).toBeDefined();
+    expect(requester.deedStats.itemsDiscovered.has(RELIC)).toBe(false);
+    expect(requester.reliquary.firstFind[RELIC]).toBeUndefined();
     expect(requester.reliquary.counts).toEqual({});
-    // ...and no provenance was fabricated for the handover either.
-    expect(requester.reliquary.firstFind[RELIC]).toEqual({});
     // The crafter's tally is unchanged by giving it away.
     expect(crafter.meta.reliquary.counts[RELIC]).toBe(1);
   });
@@ -2298,13 +2419,11 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
     expect(eligible.length).toBeGreaterThan(100);
   });
 
-  it('a guild-bank-shaped first find through buyback lands sparse and uncounted', () => {
-    // The hole the buyback comment used to deny: guild bank withdrawals move
-    // items with moveBetweenContainers and never touch the discovery ledger,
-    // so an UNDISCOVERED relic can reach a player's bags. Selling and buying
-    // it back then fires its first-ever discovery through the vendor path. The
-    // fixture models that arrival directly (bags mutated with no ledger write),
-    // because the state, not the route, is what the vendor path sees.
+  it('a guild-bank-shaped buyback remains collection-neutral', () => {
+    // Guild bank withdrawals move items with moveBetweenContainers and never
+    // touch the discovery ledger, so an UNDISCOVERED relic can reach a
+    // player's bags. The fixture models that arrival directly, then proves
+    // that selling and buying it back cannot turn custody into earned play.
     const sim = makeSim();
     const { meta, e } = primary(sim);
     const wilkes = [...sim.entities.values()].find((x) => x.templateId === 'trader_wilkes');
@@ -2321,12 +2440,9 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
     sim.sellItem(CATALOGUE_RELIC, 1, sim.playerId);
     sim.buyBackItem(CATALOGUE_RELIC, undefined, undefined, sim.playerId);
 
-    // The first-ever discovery really happened HERE, on the vendor path.
-    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
-    // ...and it invented neither provenance nor a tally, despite a meter
-    // reading 9 that the old opts-free seam call would have stamped.
-    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({});
+    // Buyback cannot turn an unearned holding into collection progress.
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
     expect(meta.reliquary.counts).toEqual({});
   });
 });
@@ -2391,6 +2507,22 @@ describe('Reliquary fill-chain ownership hoist premise', () => {
 });
 
 describe('Reliquary ownership snapshot liveness', () => {
+  it('bought reins stay usable but score only after an earned acquisition', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const reinsId = 'reins_valorsteed';
+    const mountKey = 'valorsteed';
+    expect(mountItemId(mountKey)).toBe(reinsId);
+
+    sim.addItem(reinsId, 1, sim.playerId, { movement: true });
+    expect(ownedMounts(meta)).toContain(mountKey);
+    expect(characterReliquaryOwnership(meta).ownedMounts.has(mountKey)).toBe(false);
+
+    sim.addItem(reinsId, 1, sim.playerId);
+    expect(meta.deedStats.itemsDiscovered.has(reinsId)).toBe(true);
+    expect(characterReliquaryOwnership(meta).ownedMounts.has(mountKey)).toBe(true);
+  });
+
   it('the snapshot surfaces the fill chain depends on are LIVE references', () => {
     // noteReliquaryMark builds its ownership snapshot BEFORE marks.add and
     // hands the SAME object to emitReliquaryUnlock and syncCuratorRankDeeds,
@@ -2780,6 +2912,7 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     const state = donor.serializeCharacter(donor.playerId)!;
     return {
       ...state,
+      itemDiscoverySeedApplied: undefined,
       inventory: SEEDED.slice(0, 8).map((itemId) => ({ itemId, count: 1 })),
       bank: {
         inventory: SEEDED.slice(8).map((itemId) => ({ itemId, count: 1 })),
@@ -2829,6 +2962,7 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     // The serialized blob stays honest too (no clears key round-trips out).
     // Count first: an empty firstFind would pass the loop vacuously.
     const saved = sim.serializeCharacter(pid)!;
+    expect(saved.itemDiscoverySeedApplied).toBe(true);
     expect(Object.keys(saved.reliquary?.firstFind ?? {}).length).toBe(SEEDED.length);
     for (const [itemId, entry] of Object.entries(saved.reliquary?.firstFind ?? {})) {
       // hasOwn, not toBeUndefined: an explicit `clears: undefined` key would
@@ -2847,11 +2981,66 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     }
     // "Seeds nothing new" asserted directly, not inferred from counts: a
     // re-login must not re-emit the retro batch (that is one spurious
-    // catch-up line per relog). The itemsDiscovered short-circuit makes the
-    // seed idempotent, and this pins it at the event surface.
+    // catch-up line per relog). The persisted seed latch makes that a strict
+    // no-scan join, and this pins it at the event surface.
     expect(
       reloaded.drainEvents().filter((e) => e.pid === rid && e.type === 'reliquaryUnlock'),
     ).toEqual([]);
+  });
+
+  it('a completed seed latch keeps an unearned holding neutral across relog, then live play earns it', () => {
+    const donor = makeSim();
+    const held: CharacterState = {
+      ...donor.serializeCharacter(donor.playerId)!,
+      inventory: [{ itemId: CATALOGUE_RELIC, count: 1 }],
+      deedStats: undefined,
+      reliquary: undefined,
+      itemDiscoverySeedApplied: true,
+    };
+    const sim = makeSim();
+    sim.drainEvents();
+    const pid = sim.addPlayer('warrior', 'Transferred', { state: held });
+    const meta = sim.meta(pid)!;
+
+    expect(meta.inventory.some((s) => s.itemId === CATALOGUE_RELIC)).toBe(true);
+    expect(meta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
+    expect(sim.drainEvents().filter((e) => e.pid === pid && e.type === 'reliquaryUnlock')).toEqual(
+      [],
+    );
+
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.itemDiscoverySeedApplied).toBe(true);
+    const reloaded = makeSim();
+    reloaded.drainEvents();
+    const rid = reloaded.addPlayer('warrior', 'Transferred Again', { state: saved });
+    const reloadedMeta = reloaded.meta(rid)!;
+    expect(reloadedMeta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(false);
+    expect(
+      reloaded.drainEvents().filter((e) => e.pid === rid && e.type === 'reliquaryUnlock'),
+    ).toEqual([]);
+
+    reloaded.addItem(CATALOGUE_RELIC, 1, rid);
+    expect(reloadedMeta.deedStats.itemsDiscovered.has(CATALOGUE_RELIC)).toBe(true);
+    expect(reloadedMeta.reliquary.firstFind[CATALOGUE_RELIC]).toBeDefined();
+    expect(reloadedMeta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+    expect(reloadedMeta.reliquary.counts[CATALOGUE_RELIC]).toBe(1);
+    expect(
+      reloaded
+        .drainEvents()
+        .filter(
+          (event) =>
+            event.pid === rid &&
+            event.type === 'reliquaryUnlock' &&
+            event.itemId === CATALOGUE_RELIC,
+        ),
+    ).toEqual([
+      expect.objectContaining({
+        type: 'reliquaryUnlock',
+        itemId: CATALOGUE_RELIC,
+        pid: rid,
+      }),
+    ]);
   });
 
   it('refills marks from the visit ledger BEFORE scoring rank, so mark fills can rank up', () => {
@@ -2940,6 +3129,7 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     const pid = sim.addPlayer('warrior', 'Stablehand', {
       state: {
         ...base,
+        itemDiscoverySeedApplied: undefined,
         inventory: [],
         // Reins in the BANK: the seed walks it like any other container.
         bank: {

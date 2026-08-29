@@ -23,6 +23,8 @@ import {
   type LetterDef,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
@@ -53,6 +55,19 @@ export const MAIL_POSTAGE = 30; // copper per letter
 export const MAIL_MAX_ATTACHMENTS = 3; // item stacks a letter can carry
 export const MAIL_DELIVERY_SECONDS = 45; // player mail: the raven's flight
 const MAIL_NPC_DELIVERY_SECONDS = 90; // authored letters default delay
+
+/** Authored world rewards earn collection progress while retaining mail's
+ * movement tally / clear-stamp semantics. Custody and migration returns are
+ * system mail too, so kind alone is deliberately insufficient. */
+function collectionEligibleMail(m: MailMessage): boolean {
+  if (m.kind === 'npc') return true;
+  if (m.kind !== 'system' || m.custodyRef !== undefined || m.returned === true) return false;
+  if (m.letterId === undefined) return false;
+  return (
+    m.letterId !== WOC_MARKET_DELIVERY_LETTER.letterId &&
+    m.letterId !== WOC_MARKET_RETURN_LETTER.letterId
+  );
+}
 const MAIL_EXPIRY_SECONDS = 14 * 24 * 3600; // sim-seconds a read/plain letter lingers
 // Sim-seconds an unclaimed player parcel waits before it flies home to its
 // sender, and the returned letter's second window before the sweep deletes it.
@@ -612,7 +627,9 @@ export class PostOffice {
           s.craftedRecipeId,
         )
       ) {
-        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
+        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId, {
+          collectionEligible: collectionEligibleMail(m),
+        });
       } else {
         kept.push(s);
       }

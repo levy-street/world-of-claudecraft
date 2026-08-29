@@ -272,6 +272,9 @@ export interface CharacterState {
   // forward-only rollback insurance.
   deeds?: Record<string, string>;
   deedStats?: SavedDeedStats;
+  // Literal-true one-time discovery migration latch. Missing legacy saves get
+  // one final holdings seed; saved characters never scan holdings again.
+  itemDiscoverySeedApplied?: boolean;
   activeTitle?: string | null;
   activeBorder?: string | null;
   renown?: number;

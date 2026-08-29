@@ -30,7 +30,8 @@ import {
   reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
 import { ITEMS } from '../src/sim/data';
-import { pageCompletion } from '../src/sim/reliquary';
+import { mountItemId } from '../src/sim/mounts';
+import { pageCompletion, reliquaryOwnershipOpts } from '../src/sim/reliquary';
 import { tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
 import {
@@ -223,6 +224,13 @@ function baseState(): WorldState {
   };
 }
 
+function earnMount(state: WorldState, mountKey: string): void {
+  const reinsId = mountItemId(mountKey);
+  if (!reinsId) throw new Error(`content premise: ${mountKey} has collectible reins`);
+  state.mounts.push(mountKey);
+  state.itemsDiscovered.add(reinsId);
+}
+
 interface Rig {
   w: ReliquaryWindow;
   el: HTMLElement;
@@ -305,13 +313,16 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
           if (!def) return null;
           // Read through the raw state fields, never the counted world
           // accessors, so this does not disturb the ownership-read counters.
-          const real = pageCompletion(def, {
-            itemsDiscovered: state.itemsDiscovered,
-            marks: state.marks,
-            ownedMounts: new Set(state.mounts),
-            weaponSkins: new Set(state.weaponSkinIds),
-            deedsEarned: state.deedsEarned,
-          });
+          const real = pageCompletion(
+            def,
+            reliquaryOwnershipOpts({
+              itemsDiscovered: state.itemsDiscovered,
+              marks: state.marks,
+              ownedMounts: state.mounts,
+              weaponSkinIds: state.weaponSkinIds,
+              deedsEarned: state.deedsEarned,
+            }),
+          );
           const owned = state.pageOwned.get(pageId) ?? real.owned;
           const total = state.pageTotal.get(pageId) ?? real.total;
           // complete mirrors production exactly (sim pageCompletion: owned === total).
@@ -1696,7 +1707,7 @@ describe('ReliquaryWindow: search filtering', () => {
     expect(page, 'content premise: the mounts page exists').toBeTruthy();
     const ownedState = baseState();
     const OWNED_HINTED_MOUNT = 'grag_bear';
-    ownedState.mounts = [OWNED_HINTED_MOUNT];
+    earnMount(ownedState, OWNED_HINTED_MOUNT);
     const rig = openPage(ownedState, UNHINTED_PAGE_ID, 'horizons');
     const grid = cells(rig.el);
     expect(grid.length).toBeGreaterThan(0);
@@ -2018,7 +2029,12 @@ describe('ReliquaryWindow: the roving grid tab stop', () => {
 function ownsSlot(state: WorldState, relic: ReliquaryRelicDef): boolean {
   if (relic.kind === 'item') return state.itemsDiscovered.has(relic.itemId);
   if (relic.kind === 'mark') return state.marks.has(relic.markId);
-  if (relic.kind === 'mount') return state.mounts.includes(relic.mountId);
+  if (relic.kind === 'mount') {
+    const reinsId = mountItemId(relic.mountId);
+    return (
+      state.mounts.includes(relic.mountId) && reinsId !== null && state.itemsDiscovered.has(reinsId)
+    );
+  }
   if (relic.kind === 'weapon_skin') return state.weaponSkinIds.includes(relic.skinId);
   return state.deedsEarned.has(relic.deedId);
 }
@@ -2363,7 +2379,7 @@ describe('ReliquaryWindow: the Overview shelf cards', () => {
     // policy). "Nothing catalogued yet" would contradict the pair printed
     // above the line, so the card omits the line entirely.
     const state = baseState();
-    state.mounts.push(UNHINTED_MOUNT_ID);
+    earnMount(state, UNHINTED_MOUNT_ID);
     const rig = makeWindow(state, { nav: 'overview' });
     const horizons = must(rig.el, '.reliquary-shelf-card[data-nav="horizons"]');
     const totals = shelfAggregate('horizons', state);
@@ -2714,7 +2730,7 @@ describe('ReliquaryWindow: an elided poll touches no ownership seam', () => {
     expect(state.reads).toEqual({ ownedMounts: 1, weaponSkinIds: 1 });
   });
 
-  it('still hands the view REAL ownership sets on the repaint', () => {
+  it('hands the view earned mount ownership on the repaint', () => {
     // The cheap half is only correct if the paint still sees the seams: a
     // window that elided by never reading them would show an owned mount as a
     // silhouette forever.
@@ -2727,6 +2743,13 @@ describe('ReliquaryWindow: an elided poll touches no ownership seam', () => {
     // reliquaryCatalogCompletion is a hand-set literal, so the rank bump
     // stands in for the owned-count move a real mount fill makes on both
     // hosts (catalogRelicCompletion counts mounts in the same surfaces).
+    state.curatorRank += 1;
+    rig.w.refreshIfChanged();
+    expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('0');
+
+    const reinsId = mountItemId(owned);
+    expect(reinsId, 'content premise: the mount has collectible reins').not.toBeNull();
+    state.itemsDiscovered.add(reinsId!);
     state.curatorRank += 1;
     rig.w.refreshIfChanged();
     expect(must(rig.el, `[data-cell-id="${owned}"]`).dataset.cellOwned).toBe('1');
@@ -2897,7 +2920,7 @@ describe('pinning a page to the HUD tracker', () => {
           state.marks.add(relic.markId);
           break;
         case 'mount':
-          state.mounts.push(relic.mountId);
+          earnMount(state, relic.mountId);
           break;
         case 'weapon_skin':
           state.weaponSkinIds.push(relic.skinId);
@@ -2992,7 +3015,7 @@ describe('pinning a page to the HUD tracker', () => {
           state.marks.add(relic.markId);
           break;
         case 'mount':
-          state.mounts.push(relic.mountId);
+          earnMount(state, relic.mountId);
           break;
         case 'weapon_skin':
           state.weaponSkinIds.push(relic.skinId);
@@ -3295,7 +3318,7 @@ describe('population rarity', () => {
   });
 
   it('mount and weapon-skin cells render no rarity line even with a live aggregate', async () => {
-    // The aggregate never counts possession-based or account-scoped kinds
+    // The aggregate never counts mount or account-scoped kinds
     // (the ReliquaryRarity facet doc): a mount cell keys on the MOUNT id, not
     // the reins item id, so nothing in the maps can match it. Pin one real
     // cell per kind rather than arguing by equivalence to "absent id".

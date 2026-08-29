@@ -6101,10 +6101,9 @@ export class GameServer {
     const clamped = Number.isInteger(count)
       ? Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, count))
       : 1;
-    // movement: a support restore re-mints a copy the player already obtained
-    // once (and already had counted), so crediting it again would inflate a
-    // player-visible number from a support ticket. The safer default for a
-    // verb named restore.
+    // movement: a support restore re-mints possession rather than an earned
+    // acquisition, so it grants no collection progress or obtain tally. The
+    // safer default for a verb named restore.
     this.sim.addItem(itemId, clamped, session.pid, { movement: true });
     // Close the audit-durability window: the audit row is already committed,
     // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a

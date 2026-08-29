@@ -44,7 +44,7 @@ Catalog is data-as-code: `src/sim/content/reliquary.ts` exports shelves,
 pages, and relic definitions. Runtime evaluation lives in
 `src/sim/reliquary.ts` behind the `SimContext` seam (module-first; never grow
 `sim.ts` with Reliquary method banks). Ownership of **item** relics reuses
-`deedStats.itemsDiscovered` via the existing first-obtain hub
+`deedStats.itemsDiscovered` via the existing eligible-acquisition hub
 `markItemDiscovered` (`src/sim/deeds.ts`). Reliquary-specific state is a
 **bounded, allowlist-only** sibling on `PlayerMeta` (first-find meta,
 profession lifetime marks, derived or stored curator progress). Render and
@@ -66,10 +66,13 @@ sparse Reliquary fields; no per-relic SQL table and no per-drop save storm.
    authored catalog ids (and existing discovery sets already bounded by the
    live `ITEMS` catalog). Never log trash commons, never unbounded history
    streams, never per-drop timestamps for non-relics.
-4. **First obtain at grant, not at roll.** Credit only when the item enters
-   the player through `addItem` / `addItemInstance` / `markItemDiscovered`
-   (need/greed winner, personal world-boss take, craft grant). Do not mark
-   on corpse roll alone.
+4. **Earned obtain at grant, not possession or roll.** Credit only when the
+   item enters through world-sourced play (`addItem` / `addItemInstance` /
+   `markItemDiscovered`): loot, quests including authored NPC/system mail,
+   crafting, gathering/profession results, and NPC vendors. Player trade,
+   player mail, player market listings, and neutral returns/remints deliver
+   the item but never fill discovery, quality marks, Reliquary state, rank,
+   or deeds. Do not mark on corpse roll or later container ownership.
 5. **Item-global ownership, multi-page fill.** Owning a unique item id fills
    every page that lists that id (shared uniques are intentional).
 6. **Clear counts are outcomes already tracked.** Prefer
@@ -243,13 +246,11 @@ additionally carries a day-granularity `earnedAt`.
 
 What IS new: the strip is the first PER-ITEM acquisition naming on the
 crawlable `/c/` page (`deeds.recent` rides the JSON sheet but the page renders
-no deed names), and the ring pushes on every first acquisition, movement finds
-included: a trade, a mail, a market buy, an enchant re-mint, an unbind stack
-split, or a returned commission pushes the ring exactly like a loot drop
-(`pushRecent` is deliberately unchanged on a movement find; a bank withdrawal
-is NOT one, it moves slots without re-granting). So "Recent finds" reads as discovery while meaning "recently first
-acquired, however acquired", the page is crawlable and archivable, and a relic
-later traded away still prints.
+no deed names). The ring pushes only for an eligible first discovery. Player
+trade, player mail, player market purchases, neutral returns/remints, and bank
+moves push nothing; authored NPC/system rewards still push because they are
+world-sourced play. A relic later traded away can still print because earned
+discovery is sticky.
 
 The strip is also LOCATION-BEARING, which the earlier wording did not carry: a
 `slain:*` entry names a rare whose camp zone is published, so the ring can
@@ -258,18 +259,18 @@ over what `/c/` already exposes is camp-within-zone rather than a new exposure
 class (the page already publishes the live zone uncoarsened), but it should be
 weighed as part of the strip, not discovered later.
 
-Whether movement acquisitions should push the ring, whether the public arm
-should carry the strip at all, and whether any character-level suppression is
-wanted are OWNER CALLS recorded under "Open owner calls" below, not decided
-here; closing the timing channel itself would be a change to both strips, not a
-Reliquary fix. Candidate mitigations if one is ever wanted: an owner-only arm,
-a window shuffle, or dropping movement pushes.
+Whether the public arm should carry the strip at all, and whether any
+character-level suppression is wanted, remain OWNER CALLS recorded under
+"Open owner calls" below. Candidate mitigations if one is ever wanted: an
+owner-only arm or a window shuffle.
 
 One consequence is deliberate and stated here rather than left to be
-rediscovered: mount ownership behind that pair reads bags **and** bank, the
-same seam live `ownedMounts` uses, so reins sitting in a character's bank score
-their completion pair and can carry their Curator rank. An unauthenticated
-reader can therefore infer that a character owns reins they have never carried.
+rediscovered: mount ownership behind that pair reads bags **and** bank, then
+filters those physically held reins through earned `itemsDiscovered`. Earned
+reins sitting in a character's bank score their completion pair and can carry
+their Curator rank; borrowed, traded, mailed, or market-bought reins remain
+fully usable but do not score. An unauthenticated reader can therefore infer
+that a character owns earned reins they have never carried.
 Accepted, with the exposure bounded to the aggregate: the sheet publishes an
 owned count and a rank, never a mount id, never a bank slot, and never anything
 else the bank holds. Narrowing it to bags alone here would also put the public
@@ -277,13 +278,9 @@ pair at odds with the collection the owner sees in game, which counts both
 containers.
 
 This acceptance covers BOTH audiences, not just the sheet: the entity-wire
-standing below is bank-inclusive through the same seam
-(`refreshCuratorStanding` scores `characterReliquaryOwnership`, whose mount
-surface is live `ownedMounts`), so everyone within interest radius receives
-the same bank-derived aggregate the sheet publishes. Because reins trade like
-any item, borrowed reins raise the broadcast standing until the next sweep
-after they leave; the aggregate bound above is what keeps that a cosmetic
-oddity rather than a leak.
+standing below is bank-inclusive through the same earned-reins seam, so
+everyone within interest radius receives the same bank-derived aggregate the
+sheet publishes. Borrowed reins never raise that standing.
 
 Bags-only is a **recorded follow-up and an owner call**, not a defect to fix in
 passing: it would visibly drop the pair for every character with banked reins,
@@ -389,7 +386,7 @@ The binding rules, all of them load-bearing:
   population total, never a character name, id, or roster. It is anonymous and
   public-read rate limited.
 - **Tri-kind exclusion.** Weapon skins (account-scoped), titles (deed-scoped),
-  and mounts (possession-based, where a cell's id is the mount key rather than
+  and mounts (held-and-earned, where a cell's id is the mount key rather than
   the reins item id) are never counted, so their absence always renders as no
   line rather than a wrong percentage.
 - **Online only, null offline.** The facet member `reliquaryRarity()` returns
@@ -559,10 +556,11 @@ intentional and pinned by a test.
   is why the capstone deed is marked as a feat and kept out of the Book
   completion pair. See "Open owner calls" for the consequence that is still
   undecided.
-- **Re-acquiring an already-discovered mount's reins never runs the completion
-  ladder live**, because first-discovery fires once while mount ownership is
-  possession-based. A player whose last missing relic is reins they once owned
-  receives the capstone silently at their next join rather than in the moment.
+- **Re-acquiring already-discovered mount reins never runs the completion
+  ladder live**, because first-discovery fires once while mount scoring also
+  requires current physical ownership. A player whose last missing relic is
+  earned reins they once owned receives the capstone silently at their next
+  join rather than in the moment.
 
 ## Operational riders (release and deploy work, not code)
 
@@ -598,14 +596,13 @@ intentional and pinned by a test.
 None of these is a defect. Each is a product decision with no ruling yet.
 
 - **Bags-only mount ownership.** The completion pair reads bags AND bank, so
-  banked reins score and borrowed reins can raise a broadcast standing until
-  the next sweep. Narrowing to bags alone would move the sheet, the window, the
-  rank bridges, and the wire stamp together, and would visibly drop the pair for
-  every character with banked reins.
-- **The public recent-finds strip bundle**: movement pushes, the polling timing
-  channel, the location-bearing `slain:*` entries, and the absence of any
-  character-level suppression. Described honestly above; unchanged pending a
-  call.
+  earned banked reins score. Narrowing to bags alone would move the sheet, the
+  window, the rank bridges, and the wire stamp together, and would visibly drop
+  the pair for every character with earned banked reins.
+- **The public recent-finds strip bundle**: eligible-discovery pushes, the
+  polling timing channel, the location-bearing `slain:*` entries, and the
+  absence of any character-level suppression. Described honestly above;
+  unchanged pending a call.
 - **Out-of-range remote inspect omits the Curator standing** that the public
   sheet publishes, so proximity shows a rank that a by-name lookup hides. A
   clean follow-up would add the facet field, the parse, the remote card, and a
