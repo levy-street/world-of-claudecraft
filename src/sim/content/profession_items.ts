@@ -653,8 +653,11 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // value that already sits past the 874 band, so the apex rung continues the
   // classic ladder rather than stepping from that value. The well-fed VALUE
   // enters at the consumable family's own entry rung, 6 (elixir_of_the_boar,
-  // the common elixir rung, the number R5's kit was measured against: flask
-  // 15 plus food 6 equals 21 stamina); the DURATION takes the elixir
+  // the common elixir rung). The kit sum that rung was chosen against read
+  // flask 15 plus food 6 for 21; Phase 15's measured pass brought the flask
+  // to 13, so the crafted stamina ceiling now reads 19. The PLATE's own 6 is
+  // unmoved and is not this phase's to move: it is settled at ruling
+  // 11c-D-2. The DURATION takes the elixir
   // ladder's own next step, the entry rung's 600 plus the boar-to-venomfire
   // duration step of 300, so the apex plate is 6 / 900 and strictly
   // dominates every farming rung of the five-rung Well Fed ladder below
@@ -936,8 +939,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // always wins (the classic one-food-buff rule) and a dish can never stack
   // with a role plate; a same-stat elixir still coexists (different aura
   // id), so the farming rungs' own stacking ceiling is dish 5 plus elixir
-  // 12, 17 stamina (the global crafted ceiling stays the apex block's flask
-  // 15 plus plate 6, 21), comfortably below the raid floor. The earlier per-kind
+  // 12, 17 stamina (the global crafted ceiling is the apex block's flask plus
+  // plate: 19 since Phase 15 trimmed the flask band to the measured R5
+  // envelope, 21 before it), comfortably below the raid floor either way.
+  // The earlier per-kind
   // wellfed_<kind> namespace and its "at or below the elixir budget ceiling"
   // calibration were retired here: they let a cooking-50 trainer dish (12 /
   // 900) beat the cooking-100 apex plate on both axes, the inversion the

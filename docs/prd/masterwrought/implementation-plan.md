@@ -903,6 +903,13 @@ a code-versus-ruling mismatch and this phase trips its own stopping rule: it re-
 in the record rather than silently re-tuning a settled magnitude. The measurement models the
 GEARED INDIVIDUAL at full food uptime, never the raid aggregate (ip-15-ACCESS), which is what
 "always on, delivered by feast" already means.
+OUTCOME 2026-08-28: 11c DID land exactly the settled ladder, so the phase proceeded rather
+than tripping that stopping rule, and the measured pass then found the kit OUTSIDE the
+envelope anyway. Four content values came down (the apex weapon enchants 7 to 6, the cloth
+apex chest's rating field, the apex shield's armour and block, and the apex flasks 15 to 13),
+none of them a magnitude 11c-D-2 settled: the well-fed ladder is untouched. The kit sum above
+therefore reads flask 13 plus food 6 for NINETEEN on the shipped tree; the 21 is the
+pre-Phase-15 number. Record: `power-verification.md` and the Phase 15 ledger in `state.md`.
 
 ## Phase 16: Polish and content surfaces (ultracode sweep)
 
