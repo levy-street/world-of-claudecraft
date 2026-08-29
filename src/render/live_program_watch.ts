@@ -57,7 +57,9 @@ export interface ProgramListHost {
 const watch = createLiveProgramWatch();
 const labels: string[] = [];
 const linkWindow = createPostRevealLinkWindow();
-// Read only while the window is open (its first 20 s), never on a closed one.
+// The real clock, passed as a thunk: the link window reads it only while the
+// window is open (its first 20 s), the ledger sweep only when it has a program
+// to stamp.
 const realClock = (): number => performance.now();
 let clock: () => number = realClock;
 
@@ -75,7 +77,7 @@ export function postRevealLinksSnapshot(): PostRevealLinksSnapshot | null {
 
 /** Linked programs and resident textures, as three reports them. */
 export function programCounts(webgl: ProgramInfoHost): { programs: number; textures: number } {
-  sweepProgramKeyLedger(webgl, performance.now());
+  sweepProgramKeyLedger(webgl, realClock);
   return {
     programs: webgl.info.programs?.length ?? 0,
     textures: webgl.info.memory.textures,
@@ -84,7 +86,7 @@ export function programCounts(webgl: ProgramInfoHost): { programs: number; textu
 
 /** Curtain-fade boundary: everything linked so far is prep, not an escape. */
 export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
-  sweepProgramKeyLedger(webgl, performance.now());
+  sweepProgramKeyLedger(webgl, realClock);
   armShaderWarmAudit(webgl);
   // The worker is worth asking from the first reveal on: the light census
   // and the post pipeline are settled, and a held link is felt.
@@ -103,7 +105,7 @@ export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
  *  prep (compileAsync prologues push programs too), so it is adopted, not
  *  reported. */
 export function absorbLivePrograms(webgl: ProgramListHost): void {
-  sweepProgramKeyLedger(webgl, performance.now());
+  sweepProgramKeyLedger(webgl, realClock);
   sweepShaderWarmAudit(webgl);
   absorbPrograms(watch, webgl.info?.programs ?? undefined);
 }
@@ -115,7 +117,7 @@ export function absorbLivePrograms(webgl: ProgramListHost): void {
  * frames after it.
  */
 export function recordNewLivePrograms(webgl: ProgramListHost): void {
-  sweepProgramKeyLedger(webgl, performance.now());
+  sweepProgramKeyLedger(webgl, realClock);
   sweepShaderWarmAudit(webgl);
   const found = collectNewLivePrograms(watch, webgl.info?.programs ?? undefined, labels);
   for (let i = 0; i < found; i++) {

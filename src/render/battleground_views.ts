@@ -75,11 +75,16 @@ export function ensureBattlegroundViewNear(
   host: BattlegroundViewHost,
 ): void {
   for (let slot = 0; slot < BG_SLOT_COUNT; slot++) {
+    // A copy that is already shown has nothing left to do, and the origin read
+    // mints a fresh point per call: settle the shown slot before it, so the
+    // frames after the flip no longer allocate for the slot the player is in.
+    const known = views.get(slot);
+    if (known?.group.visible) continue;
     const origin = battlegroundOrigin(slot);
     if (Math.abs(px - origin.x) >= BG_VIEW_NEAR_X || Math.abs(pz - origin.z) >= BG_VIEW_NEAR_Z) {
       continue;
     }
-    const view = views.get(slot) ?? buildSlot(views, slot, host, true);
+    const view = known ?? buildSlot(views, slot, host, true);
     view.group.visible = true;
   }
 }

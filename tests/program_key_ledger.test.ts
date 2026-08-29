@@ -1,6 +1,6 @@
 // The program-key ledger host: swept from the watch's readouts, off without
 // the perf flags, bounded, and carrying the full key with a timestamp.
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as liveProgramWatch from '../src/render/live_program_watch';
 import { resetLiveProgramWatchForTest } from '../src/render/live_program_watch';
 import type { LiveProgramEntry } from '../src/render/live_program_watch_core';
@@ -31,7 +31,7 @@ describe('programKeyLedger', () => {
   it('is off without the perf flags and on with either of them', () => {
     resetProgramKeyLedgerForTest('');
     expect(programKeyLedgerEnabled()).toBe(false);
-    expect(sweepProgramKeyLedger(host([program(1)]), 10)).toBe(0);
+    expect(sweepProgramKeyLedger(host([program(1)]), () => 10)).toBe(0);
     expect(programKeyLedgerSnapshot().entries).toEqual([]);
 
     resetProgramKeyLedgerForTest('?perf');
@@ -45,10 +45,10 @@ describe('programKeyLedger', () => {
   it('records each new program once, with its full key and the sweep time', () => {
     resetProgramKeyLedgerForTest('?perf');
     const programs = [program(1), program(2)];
-    expect(sweepProgramKeyLedger(host(programs), 100.4)).toBe(2);
-    expect(sweepProgramKeyLedger(host(programs), 200)).toBe(0);
+    expect(sweepProgramKeyLedger(host(programs), () => 100.4)).toBe(2);
+    expect(sweepProgramKeyLedger(host(programs), () => 200)).toBe(0);
     programs.push(program(3, 'ShaderMaterial'));
-    expect(sweepProgramKeyLedger(host(programs), 300)).toBe(1);
+    expect(sweepProgramKeyLedger(host(programs), () => 300)).toBe(1);
     expect(programKeyLedgerSnapshot()).toEqual({
       enabled: true,
       dropped: 0,
@@ -60,11 +60,32 @@ describe('programKeyLedger', () => {
     });
   });
 
+  it('never reads the clock with the ledger off, or on a list that did not move', () => {
+    // The watch readouts run several times per frame in every session, and the
+    // ledger is off in all but a `?perf` one: the sweep must cost the caller no
+    // clock read before it has something to stamp.
+    const now = vi.fn(() => 5);
+    resetProgramKeyLedgerForTest('');
+    expect(sweepProgramKeyLedger(host([program(1)]), now)).toBe(0);
+    expect(now).not.toHaveBeenCalled();
+
+    resetProgramKeyLedgerForTest('?perf');
+    const programs = [program(1)];
+    expect(sweepProgramKeyLedger(host(programs), now)).toBe(1);
+    expect(now).toHaveBeenCalledTimes(1);
+    // Same list next frame: the length compare answers, the clock is untouched.
+    expect(sweepProgramKeyLedger(host(programs), now)).toBe(0);
+    expect(now).toHaveBeenCalledTimes(1);
+    // And a host with no program list at all never reaches it either.
+    expect(sweepProgramKeyLedger({ info: null }, now)).toBe(0);
+    expect(now).toHaveBeenCalledTimes(1);
+  });
+
   it('stays bounded and says how much it dropped', () => {
     resetProgramKeyLedgerForTest('?perf');
     const programs: LiveProgramEntry[] = [];
     for (let id = 0; id < PROGRAM_KEY_LEDGER_LIMIT + 5; id++) programs.push(program(id));
-    expect(sweepProgramKeyLedger(host(programs), 1)).toBe(PROGRAM_KEY_LEDGER_LIMIT);
+    expect(sweepProgramKeyLedger(host(programs), () => 1)).toBe(PROGRAM_KEY_LEDGER_LIMIT);
     const snapshot = programKeyLedgerSnapshot();
     expect(snapshot.entries).toHaveLength(PROGRAM_KEY_LEDGER_LIMIT);
     expect(snapshot.dropped).toBe(5);

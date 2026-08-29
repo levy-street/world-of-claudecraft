@@ -3,6 +3,11 @@
 // stand-ins) is linked. Until then the painter draws nothing, so a first cast
 // never links a program cold on a live frame; the cast bars and nameplates
 // the player acts on are untouched, only the cosmetic read is skipped.
+// The per-frame path is wider than the cast draws alone (a held entity is
+// slept, so its CC band, ground aura, shell, orbit and glow sleep with it), and
+// what carries the actionable reads through the window is elsewhere: the rig's
+// windup clip, the terrain-draped area ring, the cast bar, the nameplate and
+// the HUD debuffs, with the deadline below bounding the whole window.
 //
 // Why a gate rather than an earlier link: the boot manifest's entry for these
 // programs runs after its 3 s budget on the OpenGL desktops (measured

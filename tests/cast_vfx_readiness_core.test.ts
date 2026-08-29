@@ -4,7 +4,9 @@
 // never arrive (a hold with no floor cost the whole session's cast VFX).
 
 import { describe, expect, it, vi } from 'vitest';
+import { CAST_VFX_READY_DEADLINE_MS } from '../src/render/cast_vfx_prewarm';
 import { createCastVfxReadiness } from '../src/render/cast_vfx_readiness_core';
+import { REVEAL_GATE_WATCHDOG_MS } from '../src/render/reveal_gate';
 
 interface Mat {
   id: string;
@@ -130,5 +132,12 @@ describe('createCastVfxReadiness', () => {
     state.materials[0].linked = true;
     expect(readiness.admit()).toBe(true);
     expect(readiness.snapshot().forced).toBe(false);
+  });
+});
+
+describe('the deadline the scene gate runs on', () => {
+  it('pins the cast-gate deadline to three times the reveal watchdog', () => {
+    expect(CAST_VFX_READY_DEADLINE_MS).toBe(REVEAL_GATE_WATCHDOG_MS * 3);
+    expect(CAST_VFX_READY_DEADLINE_MS).toBe(30_000);
   });
 });

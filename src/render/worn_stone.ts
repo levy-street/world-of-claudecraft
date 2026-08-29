@@ -726,8 +726,11 @@ export function applySurfaceDetail(
     if (hasMetal) shader.uniforms.uWornMetalMix = { value: metalMix };
     if (parallax) shader.uniforms.uWornDisp = { value: fam.tex.disp };
     // Per-family scalars: carried as uniforms rather than baked GLSL literals so
-    // families that share a STRUCTURE collapse to one compiled program. Each
-    // uniform holds exactly the value the literal did, so pixels are unchanged.
+    // families that share a STRUCTURE collapse to one compiled program. The
+    // uniform carries the UNROUNDED value; the literal it replaced was emitted
+    // through toFixed, so the rounding was the approximation, and the shift is
+    // sub-perceptual. The cache key stays sound because every structural token
+    // still rides customProgramCacheKey.
     shader.uniforms.uWornRoughMean = { value: fam.roughMean };
     if (!objectSpace) {
       shader.uniforms.uWornDetStart = { value: fade.detStart };

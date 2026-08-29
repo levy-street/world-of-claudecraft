@@ -53,13 +53,17 @@ const state: LedgerState = {
 
 /**
  * Records every program in the host's list that the ledger has not seen,
- * stamped `atMs`. One length compare when nothing moved (the per-frame case);
- * a walk otherwise, with a set lookup per entry. Returns how many were added.
+ * stamped by `now`. One length compare when nothing moved (the per-frame
+ * case); a walk otherwise, with a set lookup per entry. Returns how many were
+ * added. The clock is a thunk read only once the sweep has something to
+ * record, so a disabled ledger and a settled list cost the caller no clock
+ * read at all (the watch's readouts run several times per frame).
  */
-export function sweepProgramKeyLedger(webgl: LedgerHost, atMs: number): number {
+export function sweepProgramKeyLedger(webgl: LedgerHost, now: () => number): number {
   if (!state.enabled) return 0;
   const programs = webgl.info?.programs;
   if (!programs || programs.length === state.lastLength) return 0;
+  const atMs = now();
   let added = 0;
   for (const program of programs) {
     const identity = liveProgramIdentity(program);

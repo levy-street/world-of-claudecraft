@@ -10,10 +10,24 @@ import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
 
-const { built, commit } = vi.hoisted(() => ({
+const { built, commit, origins } = vi.hoisted(() => ({
   built: [] as { origin: { x: number; z: number }; seed: number; opts: unknown }[],
   commit: vi.fn(async () => {}),
+  // Every slot battlegroundOrigin was asked for: the read allocates a point, so
+  // the per-frame band walk must stop consulting it once a slot is shown.
+  origins: { slots: [] as number[] },
 }));
+
+vi.mock('../src/sim/data', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/sim/data')>();
+  return {
+    ...actual,
+    battlegroundOrigin: (slot: number) => {
+      origins.slots.push(slot);
+      return actual.battlegroundOrigin(slot);
+    },
+  };
+});
 
 vi.mock('../src/render/battleground', () => ({
   battlegroundAssetPrewarm: { commit },
@@ -53,6 +67,7 @@ function host() {
 beforeEach(() => {
   built.length = 0;
   commit.mockClear();
+  origins.slots.length = 0;
 });
 
 describe('ensureBattlegroundViewNear', () => {
@@ -72,6 +87,28 @@ describe('ensureBattlegroundViewNear', () => {
     // The host reaches buildBattleground whole, so the renderer's compile gate
     // is what the stream gates each piece on.
     expect((built[0].opts as { compileGate?: unknown }).compileGate).toBe(api.compileGate);
+  });
+
+  it('stops consulting a slot origin once that copy is shown', () => {
+    const { api } = host();
+    const views: BattlegroundViews = new Map();
+    const origin = battlegroundOrigin(1);
+    // The origin above went through the recorder too: only the ensure call's
+    // own reads may satisfy the pin.
+    origins.slots.length = 0;
+    // The frame that flips the copy still has to place the player, so it reads
+    // every slot's origin.
+    ensureBattlegroundViewNear(views, origin.x, origin.z, api);
+    expect(origins.slots).toContain(1);
+    expect(views.get(1)?.group.visible).toBe(true);
+    // Every frame after it: slot 1 short-circuits on the shown copy, so its
+    // origin is never minted again, and nothing is rebuilt.
+    origins.slots.length = 0;
+    ensureBattlegroundViewNear(views, origin.x, origin.z, api);
+    expect(origins.slots).not.toContain(1);
+    expect(origins.slots).toHaveLength(BG_SLOT_COUNT - 1);
+    expect(built).toHaveLength(1);
+    expect(views.get(1)?.group.visible).toBe(true);
   });
 
   it('builds nothing while the player is outside every slot', () => {
