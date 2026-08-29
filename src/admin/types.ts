@@ -242,6 +242,40 @@ export interface TopWealthHolderRow {
   updatedAt: string;
 }
 
+// Live World Market listing metrics; mirrors server/admin_market_metrics.ts
+// exactly. All six buckets are always present, in the server's fixed order.
+export type MarketMetricsBucketId =
+  | 'cores'
+  | 'essence'
+  | 'patterns'
+  | 'produce'
+  | 'seeds'
+  | 'compost';
+
+export interface AdminMarketMetricsItemRow {
+  itemId: string;
+  // Server-resolved English item name, rendered as data.
+  name: string;
+  listingCount: number;
+  totalQuantity: number;
+  lowestPerUnit: number;
+  medianPerUnit: number;
+}
+
+export interface AdminMarketMetricsBucket {
+  bucket: MarketMetricsBucketId;
+  listingCount: number;
+  totalQuantity: number;
+  trackedItemCount: number;
+  listedItemCount: number;
+  items: AdminMarketMetricsItemRow[];
+}
+
+export interface AdminMarketMetrics {
+  realm: string;
+  buckets: AdminMarketMetricsBucket[];
+}
+
 export interface AccountWealthCharacterRow {
   characterId: number;
   name: string;

@@ -1970,6 +1970,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'adminOversightReadRateLimited',
     requireOwnedExpected: null,
   },
+  // Live market listing metrics (Masterwrought supply oversight): registry-only
+  // like the clear-item-name route (no legacy ladder arm; the RouteDef path is
+  // the one dispatch source). No limiter: a warm in-memory cached read with
+  // zero DB cost, the overview precedent.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    handler: 'server/admin.ts marketMetricsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',

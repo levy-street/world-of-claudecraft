@@ -50,6 +50,7 @@ import {
 } from './admin_guilds_read';
 import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
+import { readAdminMarketMetrics } from './admin_market_metrics';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -2291,6 +2292,14 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
   });
 }
 
+/** GET /admin/api/market/metrics: live World Market listing aggregates over the
+ *  tracked supply buckets (server/admin_market_metrics.ts). No rate limiter:
+ *  the read is a warm in-memory cache with zero DB cost, the overview
+ *  precedent; adminOversightReadRateLimited meters DB-cost oversight reads. */
+async function marketMetricsHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, await readAdminMarketMetrics());
+}
+
 /** GET /admin/api/me: the caller's own staff identity (any staff role). */
 async function meHandler(ctx: Ctx): Promise<void> {
   const identity = adminIdentityOf(ctx);
@@ -3584,6 +3593,15 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: activityHandler,
+  },
+  // Registry-only (born after the migration): no legacy ladder arm.
+  {
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketMetricsHandler,
   },
   {
     method: 'GET',

@@ -75,6 +75,7 @@ import {
   pruneSitePresenceSessionsBatch,
   recordSitePresenceSample,
 } from './admin_db';
+import { buildAdminMarketMetrics, configureAdminMarketMetrics } from './admin_market_metrics';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
 import {
@@ -3602,6 +3603,9 @@ export async function startServer(): Promise<http.Server> {
   // (unlike AdminRuntime), so it rides its own seam, fed the SAME canonical source
   // /api/status uses, keeping the cap byte-identical across the status and overview reads.
   configureAdminPlayersCap(canonicalPlayersCap);
+  // The market metrics dashboard reads the live listing book through the pure
+  // builder; the module-side cache is TTL-only by design (see its header).
+  configureAdminMarketMetrics(() => buildAdminMarketMetrics(game.sim.marketListings, REALM));
   configureAdminGuildBoardCacheBust(bustBoardCaches);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh

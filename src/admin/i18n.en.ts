@@ -34,6 +34,7 @@ export const en = {
   'nav.reports': 'Reports',
   'nav.flags': 'Flagged',
   'nav.topHolders': 'Top Holders',
+  'nav.marketMetrics': 'Market Metrics',
   'nav.history': 'History',
   'nav.sharedIps': 'Shared IPs',
   'nav.botDetector': 'Bot Detector',
@@ -777,6 +778,30 @@ export const en = {
   'topHolders.colPurse': 'Purse',
   'topHolders.colMail': 'Mail',
   'topHolders.colMarket': 'Market',
+  // Economy oversight: live World Market listing metrics per supply bucket.
+  'marketMetrics.hint':
+    'Live World Market listings for the tracked supply buckets: what is on the book right now, not sold volume. The server caches this readout for about 15 seconds.',
+  'marketMetrics.autoRefresh': 'Auto-refresh ({seconds}s)',
+  'marketMetrics.loading': 'loading…',
+  'marketMetrics.loadFailed': 'failed to load market metrics',
+  'marketMetrics.empty': 'no live listings in any tracked bucket',
+  'marketMetrics.realm': 'Realm: {realm}',
+  'marketMetrics.bucketCores': 'Cores',
+  'marketMetrics.bucketEssence': 'Essence',
+  'marketMetrics.bucketPatterns': 'Patterns',
+  'marketMetrics.bucketProduce': 'Produce',
+  'marketMetrics.bucketSeeds': 'Seeds',
+  'marketMetrics.bucketCompost': 'Compost',
+  'marketMetrics.bucketSummary':
+    '{listings} listings, {quantity} units, {listed} of {tracked} items listed',
+  'marketMetrics.bucketEmpty': 'no live listings',
+  'marketMetrics.essenceNote':
+    'These materials are soulbound and can never be listed. Any row here means the market escrow invariant broke and needs engineering attention.',
+  'marketMetrics.colItem': 'Item',
+  'marketMetrics.colListings': 'Listings',
+  'marketMetrics.colQuantity': 'Quantity',
+  'marketMetrics.colLowest': 'Lowest (per unit)',
+  'marketMetrics.colMedian': 'Median (per unit)',
   // Economy oversight: the Flagged workflow queue.
   'flags.hint':
     'Accounts flagged by the monitoring systems. Flags only leave this queue through an explicit Clear or Actioned decision, and resolved flags stay on the account history.',
