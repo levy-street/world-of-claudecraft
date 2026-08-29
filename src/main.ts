@@ -8924,9 +8924,9 @@ function updateDiscordCtaBanner(): void {
 // (mobile) / the Hud discord hook (desktop), so both entries work logged-out too.
 function syncDiscordEntries(): void {
   const mobileBtn = document.getElementById('mobile-discord');
-  if (mobileBtn) mobileBtn.hidden = !DISCORD_BUILD_ENABLED;
+  if (mobileBtn) mobileBtn.hidden = !DISCORD_BUILD_ENABLED || !discordUiEnabled() || !api.token;
   const desktopBtn = document.getElementById('mm-discord');
-  if (desktopBtn) desktopBtn.hidden = !DISCORD_BUILD_ENABLED;
+  if (desktopBtn) desktopBtn.hidden = !DISCORD_BUILD_ENABLED || !discordUiEnabled() || !api.token;
 }
 
 // The More tray's Discord tap: the account panel (link / unlink / status) when
