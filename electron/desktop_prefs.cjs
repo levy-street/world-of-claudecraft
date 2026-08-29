@@ -34,7 +34,11 @@ const {
   MIN_WINDOW_POSITION,
   MIN_WINDOW_WIDTH,
 } = require('./window_memory.cjs');
-const { GPU_BACKEND_SETTINGS, VULKAN_VERDICTS } = require('./gpu_backend.cjs');
+const { GPU_BACKEND_RUNGS, GPU_BACKEND_SETTINGS } = require('./gpu_backend.cjs');
+
+/** How much of a proof's version and driver string is kept: enough to compare
+ *  two readings, far short of anything a prefs file should be storing. */
+const GPU_PROOF_FIELD_MAX = 256;
 
 // Bumped only when a field's MEANING changes. A file stamped with any other
 // version is discarded wholesale rather than field-matched: a future build may
@@ -68,15 +72,39 @@ const DISPLAY_MODES = ['borderless', 'windowed'];
 const readDisplayMode = (value, fallback) => (DISPLAY_MODES.includes(value) ? value : fallback);
 
 /**
- * The player's Linux GPU backend setting and the last Vulkan trial verdict off
- * disk. Exact literals only, same reasoning as the display mode: both feed the
- * launch decision in electron/gpu_backend.cjs before Electron starts, and a
- * near-miss must land on the default (one trial) rather than on whichever arm a
- * loose comparison would pick.
+ * The player's Linux GPU backend setting and the Auto memory off disk. Exact
+ * literals only, same reasoning as the display mode: both feed the launch
+ * decision in electron/gpu_backend.cjs before Electron starts, and a near-miss
+ * must land on the default rather than on whichever arm a loose comparison
+ * would pick.
  */
 const readGpuBackend = (value, fallback) =>
   GPU_BACKEND_SETTINGS.includes(value) ? value : fallback;
-const readVulkanVerdict = (value, fallback) => (VULKAN_VERDICTS.includes(value) ? value : fallback);
+/** A ladder rung, or undefined: absent means "Auto starts on the top rung". */
+const readGpuBackendRung = (value) => (GPU_BACKEND_RUNGS.includes(value) ? value : undefined);
+/** A counter off disk: a non-integer or a negative one reads as none. */
+const readCount = (value) => (isInteger(value) && value >= 0 ? value : 0);
+
+/**
+ * The proof that a session once ran healthy here, or null. All three fields or
+ * none: a backend without the version and driver it was proven under cannot be
+ * checked for staleness, and an unverifiable proof would aim the climb at a
+ * machine that no longer exists. Strings are capped because they come from a
+ * renderer string the page reported, and a prefs file is not a log.
+ */
+function readGpuBackendProof(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const backend = readGpuBackendRung(value.backend);
+  if (!backend) return null;
+  const { appVersion, gpuDriver } = value;
+  if (typeof appVersion !== 'string' || appVersion === '') return null;
+  if (typeof gpuDriver !== 'string' || gpuDriver === '') return null;
+  return {
+    backend,
+    appVersion: appVersion.slice(0, GPU_PROOF_FIELD_MAX),
+    gpuDriver: gpuDriver.slice(0, GPU_PROOF_FIELD_MAX),
+  };
+}
 
 /**
  * A window rect off disk, or null. Partial bounds are dropped whole: three of
@@ -104,7 +132,8 @@ function defaultDesktopPrefs() {
     displayMode: 'borderless',
     discordPresenceEnabled: true,
     gpuBackend: 'auto',
-    vulkanVerdict: 'untested',
+    consecutiveGpuLaunchCrashes: 0,
+    launchesSinceBackendReprobe: 0,
   };
 }
 
@@ -140,11 +169,20 @@ function sanitizeDesktopPrefs(input) {
   // the schema version does not move for it.
   prefs.discordPresenceEnabled = readBoolean(input.discordPresenceEnabled, true);
   // Additive as well (same absent-is-default reading, schema version unchanged):
-  // the Linux GPU backend setting and the verdict of the last Vulkan trial. An
-  // unusable verdict resolves to 'untested', which arms one trial: the safe
-  // direction, since a trial that fails records itself and relaunches.
+  // the Linux GPU backend setting and the Auto memory. Every unusable value
+  // resolves in the OPTIMISTIC direction, which is the safe one here: no
+  // remembered rung means Auto starts on the best backend, and the rescue is
+  // what covers a machine that cannot run it. `vulkanVerdict`, the verdict this
+  // memory replaces, is deliberately not read: a file written by a build that
+  // had it starts over with a clean memory rather than having a four-value
+  // verdict mapped onto a ladder it did not mean.
   prefs.gpuBackend = readGpuBackend(input.gpuBackend, 'auto');
-  prefs.vulkanVerdict = readVulkanVerdict(input.vulkanVerdict, 'untested');
+  const toAttempt = readGpuBackendRung(input.gpuBackendToAttempt);
+  if (toAttempt) prefs.gpuBackendToAttempt = toAttempt;
+  const proof = readGpuBackendProof(input.gpuBackendProof);
+  if (proof) prefs.gpuBackendProof = proof;
+  prefs.consecutiveGpuLaunchCrashes = readCount(input.consecutiveGpuLaunchCrashes);
+  prefs.launchesSinceBackendReprobe = readCount(input.launchesSinceBackendReprobe);
   return prefs;
 }
 

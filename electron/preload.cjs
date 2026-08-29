@@ -177,12 +177,34 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   getGpuForceOptOut: () => ipcRenderer.invoke('desktop-get-gpu-force-opt-out'),
   setGpuForceOptOut: (optOut) =>
     ipcRenderer.invoke('desktop-set-gpu-force-opt-out', optOut === true),
-  // The Linux GPU backend setting ('auto' | 'vulkan' | 'opengl'), the last Vulkan trial
-  // verdict, and whether the lever exists on this platform. Both about the NEXT launch:
-  // the switches land before Electron's own startup. The setter answers whether the value
-  // reached disk; main refuses anything outside its setting list.
+  // The Linux GPU backend: the stored setting ('auto' | 'vulkan' | 'opengl'), the rung
+  // this launch is ACTUALLY running, whether that fell short of what was asked for, and
+  // whether the lever exists on this platform. The SETTING is about the next launch (the
+  // switches land before Electron's own startup); `active` is about this one, which is
+  // what the options row shows so a player who picked Vulkan on a machine that cannot run
+  // it does not read "Vulkan" while playing on OpenGL. The setter answers whether the
+  // value reached disk; main refuses anything outside its setting list.
   getGpuBackend: () => ipcRenderer.invoke('desktop-get-gpu-backend'),
   setGpuBackend: (value) => ipcRenderer.invoke('desktop-set-gpu-backend', String(value)),
+  // The same state, pushed the moment the launch is judged, so a page already sitting on
+  // the options row updates instead of showing the pre-judgement reading for the session.
+  onGpuBackendState: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.setting === 'string' &&
+        typeof payload.active === 'string' &&
+        typeof payload.requestedUnavailable === 'boolean' &&
+        typeof payload.supported === 'boolean'
+      ) {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-gpu-backend-state', listener);
+    return () => ipcRenderer.removeListener('desktop-gpu-backend-state', listener);
+  },
   // The game's own WebGL renderer string, reported once its context exists: the evidence
   // the shell's Vulkan trial verdict is judged on (getGPUInfo can leave the renderer
   // string empty on Linux). Fire-and-forget, capped here so no unbounded string crosses.

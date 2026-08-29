@@ -359,88 +359,135 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(decision).toContain('platform: process.platform,');
     expect(decision).toContain('env: process.env,');
     expect(decision).toContain('prefs: desktopPrefs,');
-    // And the one log line a support ticket greps for.
+    // The app version too: a proof from another version must not aim the climb.
+    expect(decision).toContain('appVersion: app.getVersion(),');
+    // And the one log line a support ticket greps for. It names the RUNG, not
+    // the coarse backend: 'vulkan' cannot tell the two Vulkan rungs apart.
     expect(code).toMatch(
-      /`\[gpu\] backend launch: \$\{gpuBackendLaunch\.backend\} \(\$\{gpuBackendLaunch\.reason\}\)`/,
+      /`\[gpu\] backend launch: \$\{gpuBackendLaunch\.rung\} \(\$\{gpuBackendLaunch\.reason\}\)`/,
     );
   });
 
-  it('settles the Vulkan trial once, through one function fed by both evidence sources', () => {
-    // The verdict handling has ONE shape (settleVulkanTrial): it runs once per
-    // process (a crash-recovery reload lands on the post-crash fallback, not
-    // the trial), stores before it commits, logs the evidence, and a failed
-    // trial relaunches then exits. Both evidence sources call it: the
-    // getGPUInfo reading in logGpuStatus and the game's renderer report.
+  it('judges this launch once, through one function fed by every evidence source', () => {
+    // The judgement has ONE shape (judgeThisLaunch): it runs once per process (a
+    // crash-recovery reload lands on the post-crash fallback, not this launch's
+    // rung), records what actually bound, and rescues when that fell short of
+    // what was asked for. Judging is not remembering: nothing here writes the
+    // memory, which only moves once the session has proven healthy.
     const defAt = code.indexOf(
-      'function settleVulkanTrial(glRenderer, softwareRendering, parallelCompile) {',
+      'function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {',
     );
-    expect(defAt, 'settleVulkanTrial is gone').toBeGreaterThan(-1);
-    expect(count(code, 'function settleVulkanTrial(')).toBe(1);
-    const settleEnd = code.indexOf('\n}', defAt);
-    const settle = code.slice(defAt, settleEnd).replace(/\s+/g, ' ');
-    expect(settle).toContain('if (gpuBackendLaunch.trial !== true || vulkanTrialJudged) return;');
-    expect(settle).toContain('vulkanTrialJudged = true;');
-    expect(count(code, 'vulkanTrialJudged = true;')).toBe(1);
-    expect(code.indexOf('let vulkanTrialJudged = false;')).toBeLessThan(defAt);
-    // The rung (the launch's parallel flag) and the page's extension report
-    // feed the verdict beside the two evidence fields.
-    expect(settle).toContain(
-      'const vulkanVerdict = judgeVulkanLaunch({ glRenderer, softwareRendering, parallel: gpuBackendLaunch.parallel, parallelCompile, });',
+    expect(defAt, 'judgeThisLaunch is gone').toBeGreaterThan(-1);
+    expect(count(code, 'function judgeThisLaunch(')).toBe(1);
+    const judgeEnd = code.indexOf('\n}', defAt);
+    expect(judgeEnd).toBeGreaterThan(defAt);
+    const judge = code.slice(defAt, judgeEnd).replace(/\s+/g, ' ');
+    expect(judge).toContain('if (gpuBackendJudged) return;');
+    expect(judge).toContain('gpuBackendJudged = true;');
+    expect(count(code, 'gpuBackendJudged = true;')).toBe(1);
+    expect(code.indexOf('let gpuBackendJudged = false;')).toBeLessThan(defAt);
+    // The rung asked for and the page's extension report decide what bound.
+    expect(judge).toContain(
+      'boundRung = judgeGpuBackendLaunch({ glRenderer, softwareRendering, parallel: gpuBackendLaunch.parallel, parallelCompile, });',
     );
-    expect(settle).toContain(
-      'if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) { desktopPrefs.vulkanVerdict = vulkanVerdict; }',
+    // Bound what it asked for: arm the healthy-session timer and nothing else.
+    expect(judge).toContain(
+      'if (boundRung === gpuBackendLaunch.rung) { armHealthySessionTimer(); return; }',
     );
-    expect(settle).toMatch(
-      /`\[gpu\] vulkan trial verdict: \$\{vulkanVerdict\}`, \{ glRenderer, softwareRendering, parallel: gpuBackendLaunch\.parallel, parallelCompile, \}/,
+    // Bound something lower: rescue now, and still arm the timer when no rescue
+    // is available, since what bound IS what this machine can do.
+    expect(judge).toContain(
+      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) { app.exit(0); return; }',
     );
-    // A failed rung relaunches the NEXT rung: plain Vulkan after the parallel
-    // one, the default GL after the plain one (the child reads the marker).
-    expect(settle).toContain("if (vulkanVerdict === 'failed') {");
-    expect(settle).toContain(
-      "const nextRung = gpuBackendLaunch.parallel ? VULKAN_TRIAL_RELAUNCH_PLAIN : '1';",
+    expect(judge.lastIndexOf('armHealthySessionTimer();')).toBeGreaterThan(
+      judge.indexOf('relaunchOnLowerBackend('),
     );
-    expect(settle).toContain(
-      'if (relaunchAfterFailedTrial({ log }, nextRung)) { app.exit(0); return; }',
-    );
-    // The relaunch lives in the settle function and nowhere else.
-    expect(count(code, 'relaunchAfterFailedTrial(')).toBe(1);
-    expect(code.indexOf('relaunchAfterFailedTrial(')).toBeGreaterThan(defAt);
-    expect(code.indexOf('relaunchAfterFailedTrial(')).toBeLessThan(settleEnd);
+    // The memory is NOT written here.
+    expect(judge).not.toContain('saveDesktopPrefs');
+    expect(judge).not.toContain('mergeDesktopPrefs');
 
     // Caller one: logGpuStatus, after the desktop-gpu-status push, and ONLY when
     // the getGPUInfo reading carries evidence. An empty renderer string with no
     // software flag (the healthy Linux Vulkan reading) must not judge, so it
-    // cannot relaunch: it logs the waiting line and leaves the trial pending.
+    // cannot rescue: it logs the waiting line and leaves the judgement pending.
     const start = code.indexOf('function logGpuStatus()');
     const body = code.slice(start, code.indexOf('\n}', start));
     const sendAt = body.indexOf("webContents.send('desktop-gpu-status'");
     const flat = body.replace(/\s+/g, ' ');
     expect(sendAt).toBeGreaterThan(-1);
     expect(flat).toContain(
-      'if (hasGetGpuInfoEvidence(aux)) { settleVulkanTrial(aux.glRenderer, aux.softwareRendering); } else if (gpuBackendLaunch.trial === true && !vulkanTrialJudged) { log.info(',
+      'if (hasGetGpuInfoEvidence(aux)) { judgeThisLaunch(aux.glRenderer, aux.softwareRendering); } else if (!gpuBackendJudged) { log.info(',
     );
     expect(body.indexOf('hasGetGpuInfoEvidence(aux)')).toBeGreaterThan(sendAt);
     expect(body).toContain(
-      "[gpu] vulkan trial: waiting for the renderer's report (no renderer string from getGPUInfo)",
+      "[gpu] backend: waiting for the renderer's report (no renderer string from getGPUInfo)",
     );
-    expect(count(body, 'settleVulkanTrial(')).toBe(1);
-    expect(body).not.toContain('relaunchAfterFailedTrial(');
-    expect(body).not.toContain('judgeVulkanLaunch(');
+    expect(count(body, 'judgeThisLaunch(')).toBe(1);
+    expect(body).not.toContain('relaunchOnLowerBackend(');
+    expect(body).not.toContain('judgeGpuBackendLaunch(');
 
     // Caller two: the renderer's own report (body pinned in
     // tests/electron_ipc_channels.test.ts). The definition plus exactly two
-    // call sites in all.
+    // call sites in all: the GPU-process death has its OWN handler now, because
+    // a death is a rescue, not a judgement.
     const reportAt = code.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
     expect(reportAt).toBeGreaterThan(-1);
     const report = code.slice(reportAt, code.indexOf('\n});', reportAt));
-    expect(report).toContain('settleVulkanTrial(renderer.slice(0, 256), false, parallel);');
-    // Caller three: the GPU process dying under an unjudged trial IS the verdict.
+    expect(report).toContain('judgeThisLaunch(renderer.slice(0, 256), false, parallel);');
+    expect(count(code, 'judgeThisLaunch(')).toBe(3);
+  });
+
+  it('rescues a launch-time GPU death in EVERY mode, and counts one only on Auto', () => {
+    // The defect this replaces: an explicit choice had no rescue at all, so a
+    // player who picked Vulkan on a machine that cannot run it was left on a
+    // dead screen they could not click out of. The rescue is unconditional; the
+    // MEMORY is what stays out of an explicit choice's way.
     const goneAt = code.indexOf("app.on('child-process-gone'");
     expect(goneAt).toBeGreaterThan(-1);
-    expect(code.slice(goneAt, code.indexOf('\n});', goneAt))).toContain(
-      "settleVulkanTrial('', true, undefined);",
+    const goneEnd = code.indexOf('\n});', goneAt);
+    expect(goneEnd).toBeGreaterThan(goneAt);
+    const gone = code.slice(goneAt, goneEnd).replace(/\s+/g, ' ');
+    expect(gone).toContain("if (details?.type !== 'GPU') return;");
+    // After a healthy session it is the rare late crash: Chromium restarts the
+    // GPU process itself, nothing is counted and nothing is written.
+    expect(gone).toContain('if (sessionHealthy) {');
+    // Before that it is a launch failure: count it on Auto, then rescue whatever
+    // the mode. The rescue call carries no mode condition of its own.
+    expect(gone).toContain("if (desktopPrefs.gpuBackend === 'auto') {");
+    expect(gone).toContain(
+      'const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });',
     );
-    expect(count(code, 'settleVulkanTrial(')).toBe(4);
+    expect(gone).toContain(
+      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
+    );
+    const autoAt = gone.indexOf("if (desktopPrefs.gpuBackend === 'auto') {");
+    const rescueAt = gone.indexOf('if (relaunchOnLowerBackend(');
+    expect(rescueAt, 'the rescue must not sit inside the Auto-only arm').toBeGreaterThan(autoAt);
+    expect(gone.slice(autoAt, rescueAt)).toContain('}');
+  });
+
+  it('writes the memory only after a session has PROVEN healthy, and never on explicit', () => {
+    // The signal that separates "this rung runs here" from "this rung started
+    // here", which the verdict it replaces never made.
+    const armAt = code.indexOf('function armHealthySessionTimer() {');
+    expect(armAt, 'armHealthySessionTimer is gone').toBeGreaterThan(-1);
+    const armEnd = code.indexOf('\n}', armAt);
+    expect(armEnd).toBeGreaterThan(armAt);
+    const arm = code.slice(armAt, armEnd).replace(/\s+/g, ' ');
+    // Armed once, on the shell's own clock, and a launch-time death disarms it
+    // (pinned in the death handler above).
+    expect(arm).toContain('if (healthySessionTimer !== null || sessionHealthy) return;');
+    expect(arm).toContain('}, SESSION_HEALTHY_AFTER_MS);');
+    expect(arm).toContain('sessionHealthy = true;');
+    // An explicit choice never writes the memory: explicit means the player
+    // decided, not that we learned something about the machine.
+    expect(arm).toContain("if (desktopPrefs.gpuBackend !== 'auto') {");
+    expect(arm).toContain(
+      'const next = gpuBackendMemoryAfterHealthySession({ prefs: desktopPrefs, rung: boundRung, appVersion: app.getVersion(), gpuDriver: boundGpuDriver, });',
+    );
+    const explicitAt = arm.indexOf("if (desktopPrefs.gpuBackend !== 'auto') {");
+    expect(arm.indexOf('gpuBackendMemoryAfterHealthySession(')).toBeGreaterThan(explicitAt);
+    expect(count(code, 'gpuBackendMemoryAfterHealthySession(')).toBe(1);
   });
 
   it('constructs the window at the restored geometry rather than resizing it after', () => {

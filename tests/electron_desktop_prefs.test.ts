@@ -54,7 +54,8 @@ describe('desktop prefs schema', () => {
       displayMode: 'borderless',
       discordPresenceEnabled: true,
       gpuBackend: 'auto',
-      vulkanVerdict: 'untested',
+      consecutiveGpuLaunchCrashes: 0,
+      launchesSinceBackendReprobe: 0,
     });
   });
 
@@ -68,7 +69,14 @@ describe('desktop prefs schema', () => {
       displayMode: 'windowed',
       discordPresenceEnabled: false,
       gpuBackend: 'opengl',
-      vulkanVerdict: 'failed',
+      gpuBackendToAttempt: 'vulkan-plain',
+      gpuBackendProof: {
+        backend: 'vulkan-parallel-compile',
+        appVersion: '0.41.0',
+        gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+      },
+      consecutiveGpuLaunchCrashes: 2,
+      launchesSinceBackendReprobe: 7,
       // Junk a hand-edited file could carry; none of it may survive.
       apiOrigin: 'https://evil.example',
       extra: 'nope',
@@ -82,17 +90,27 @@ describe('desktop prefs schema', () => {
       displayMode: 'windowed',
       discordPresenceEnabled: false,
       gpuBackend: 'opengl',
-      vulkanVerdict: 'failed',
+      gpuBackendToAttempt: 'vulkan-plain',
+      gpuBackendProof: {
+        backend: 'vulkan-parallel-compile',
+        appVersion: '0.41.0',
+        gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+      },
+      consecutiveGpuLaunchCrashes: 2,
+      launchesSinceBackendReprobe: 7,
     });
     expect(Object.keys(prefs).sort()).toEqual([
+      'consecutiveGpuLaunchCrashes',
       'discordPresenceEnabled',
       'displayId',
       'displayMode',
       'gpuBackend',
+      'gpuBackendProof',
+      'gpuBackendToAttempt',
       'gpuForceOptOut',
+      'launchesSinceBackendReprobe',
       'maximized',
       'version',
-      'vulkanVerdict',
       'windowBounds',
     ]);
   });
@@ -172,35 +190,101 @@ describe('desktop prefs schema', () => {
     expect(sanitizeDesktopPrefs({ version: 1, maximized: true }).discordPresenceEnabled).toBe(true);
   });
 
-  it('takes the GPU backend setting and the Vulkan verdict as exact literals', () => {
+  it('takes the GPU backend setting and the remembered rung as exact literals', () => {
     // Both feed the Linux backend launch decision before Electron starts. A
-    // near-miss on the setting must land on 'auto' (one trial, self-correcting)
-    // and a near-miss on the verdict on 'untested' (re-arm the trial), never on
-    // an explicit backend a loose comparison happened to pick.
+    // near-miss on the setting must land on 'auto', and a near-miss on the
+    // remembered rung must land on ABSENT, which reads as "start on the best
+    // rung": the optimistic direction, which the rescue covers.
     for (const junk of ['Auto', 'VULKAN', 'gl', '', 1, true, null, {}, ['vulkan']]) {
-      const prefs = sanitizeDesktopPrefs({ version: 1, gpuBackend: junk, vulkanVerdict: junk });
+      const prefs = sanitizeDesktopPrefs({
+        version: 1,
+        gpuBackend: junk,
+        gpuBackendToAttempt: junk,
+      });
       expect(prefs.gpuBackend, `gpuBackend ${JSON.stringify(junk)}`).toBe('auto');
-      expect(prefs.vulkanVerdict, `vulkanVerdict ${JSON.stringify(junk)}`).toBe('untested');
+      expect(prefs, `gpuBackendToAttempt ${JSON.stringify(junk)}`).not.toHaveProperty(
+        'gpuBackendToAttempt',
+      );
     }
-    // The two lists are distinct: a verdict literal is junk as a setting and
-    // the other way round, so a shared reader could not pass both arms.
-    expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: 'ok' }).gpuBackend).toBe('auto');
-    expect(sanitizeDesktopPrefs({ version: 1, vulkanVerdict: 'vulkan' }).vulkanVerdict).toBe(
-      'untested',
+    // The two lists are distinct: a rung literal is junk as a setting and the
+    // other way round, so a shared reader could not pass both arms.
+    expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: 'vulkan-plain' }).gpuBackend).toBe(
+      'auto',
+    );
+    expect(sanitizeDesktopPrefs({ version: 1, gpuBackendToAttempt: 'vulkan' })).not.toHaveProperty(
+      'gpuBackendToAttempt',
     );
     for (const setting of ['auto', 'vulkan', 'opengl']) {
       expect(sanitizeDesktopPrefs({ version: 1, gpuBackend: setting }).gpuBackend).toBe(setting);
     }
-    for (const verdict of ['untested', 'ok', 'ok-plain', 'failed']) {
-      expect(sanitizeDesktopPrefs({ version: 1, vulkanVerdict: verdict }).vulkanVerdict).toBe(
-        verdict,
-      );
+    for (const rung of ['vulkan-parallel-compile', 'vulkan-plain', 'opengl']) {
+      expect(
+        sanitizeDesktopPrefs({ version: 1, gpuBackendToAttempt: rung }).gpuBackendToAttempt,
+      ).toBe(rung);
     }
     // Absent is the normal reading of a file written before the fields existed,
     // which is why the schema version did not move for them.
     const older = sanitizeDesktopPrefs({ version: 1, maximized: true });
     expect(older.gpuBackend).toBe('auto');
-    expect(older.vulkanVerdict).toBe('untested');
+    expect(older).not.toHaveProperty('gpuBackendToAttempt');
+  });
+
+  it('drops the verdict this memory replaces rather than mapping it onto a rung', () => {
+    // A file written by a build that carried `vulkanVerdict` starts over with a
+    // clean memory: a four-value verdict does not mean a ladder rung, and
+    // guessing a mapping would be a demotion nobody measured.
+    const prefs = sanitizeDesktopPrefs({ version: 1, gpuBackend: 'auto', vulkanVerdict: 'failed' });
+    expect(prefs).not.toHaveProperty('vulkanVerdict');
+    expect(prefs).not.toHaveProperty('gpuBackendToAttempt');
+    expect(prefs).not.toHaveProperty('gpuBackendProof');
+    expect(prefs.consecutiveGpuLaunchCrashes).toBe(0);
+  });
+
+  it('takes a proof only whole: a backend without its version and driver is not one', () => {
+    // A proof that cannot be checked for staleness would aim the climb at a
+    // machine that no longer exists, so a partial one is no proof at all.
+    const whole = {
+      backend: 'vulkan-parallel-compile',
+      appVersion: '0.41.0',
+      gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+    };
+    expect(sanitizeDesktopPrefs({ version: 1, gpuBackendProof: whole }).gpuBackendProof).toEqual(
+      whole,
+    );
+    for (const partial of [
+      { ...whole, backend: undefined },
+      { ...whole, backend: 'vulkan' },
+      { ...whole, appVersion: '' },
+      { ...whole, appVersion: 42 },
+      { ...whole, gpuDriver: undefined },
+      'vulkan-parallel-compile',
+      [whole],
+      null,
+    ]) {
+      expect(
+        sanitizeDesktopPrefs({ version: 1, gpuBackendProof: partial }),
+        JSON.stringify(partial),
+      ).not.toHaveProperty('gpuBackendProof');
+    }
+  });
+
+  it('reads the two counters as non-negative integers, defaulting to none', () => {
+    for (const junk of [-1, 1.5, '3', null, {}, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const prefs = sanitizeDesktopPrefs({
+        version: 1,
+        consecutiveGpuLaunchCrashes: junk,
+        launchesSinceBackendReprobe: junk,
+      });
+      expect(prefs.consecutiveGpuLaunchCrashes, JSON.stringify(junk)).toBe(0);
+      expect(prefs.launchesSinceBackendReprobe, JSON.stringify(junk)).toBe(0);
+    }
+    const kept = sanitizeDesktopPrefs({
+      version: 1,
+      consecutiveGpuLaunchCrashes: 2,
+      launchesSinceBackendReprobe: 41,
+    });
+    expect(kept.consecutiveGpuLaunchCrashes).toBe(2);
+    expect(kept.launchesSinceBackendReprobe).toBe(41);
   });
 
   it('takes the display mode as an exact literal, defaulting to borderless', () => {
@@ -280,7 +364,6 @@ describe('loadDesktopPrefs', () => {
       displayMode: 'windowed',
       discordPresenceEnabled: false,
       gpuBackend: 'vulkan',
-      vulkanVerdict: 'failed',
     };
     expect(saveDesktopPrefs(filePath, saved)).toBe(true);
     // mkdir recursive: the userData subdirectory may not exist on a first run.
@@ -296,10 +379,11 @@ describe('loadDesktopPrefs', () => {
       // An OFF toggle survives the file: the default is ON, so a field that
       // failed to persist would read back as the value the player rejected.
       discordPresenceEnabled: false,
-      // Non-default on both: a field that failed to persist would read back as
-      // 'auto' / 'untested' and silently re-arm a Vulkan trial.
+      // Non-default: a setting that failed to persist would read back as 'auto'
+      // and quietly hand the player a backend they did not pick.
       gpuBackend: 'vulkan',
-      vulkanVerdict: 'failed',
+      consecutiveGpuLaunchCrashes: 0,
+      launchesSinceBackendReprobe: 0,
     });
   });
 
@@ -458,7 +542,8 @@ describe('loadDesktopPrefs', () => {
       displayMode: 'borderless',
       discordPresenceEnabled: true,
       gpuBackend: 'auto',
-      vulkanVerdict: 'untested',
+      consecutiveGpuLaunchCrashes: 0,
+      launchesSinceBackendReprobe: 0,
     });
     expect(Object.prototype).not.toHaveProperty('polluted');
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
@@ -501,7 +586,7 @@ describe('saveDesktopPrefs', () => {
     expect(calls).toEqual([
       'mkdir:/userdata:true',
       'open:<staged>:wx',
-      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true,"gpuBackend":"auto","vulkanVerdict":"untested"}:utf8',
+      'write:41:{"version":1,"maximized":false,"gpuForceOptOut":true,"displayMode":"borderless","discordPresenceEnabled":true,"gpuBackend":"auto","consecutiveGpuLaunchCrashes":0,"launchesSinceBackendReprobe":0}:utf8',
       'fsync:41',
       'close:41',
       'rename:<staged>:/userdata/desktop-prefs.json',
@@ -636,7 +721,8 @@ describe('saveDesktopPrefs', () => {
       displayMode: 'borderless',
       discordPresenceEnabled: true,
       gpuBackend: 'auto',
-      vulkanVerdict: 'untested',
+      consecutiveGpuLaunchCrashes: 0,
+      launchesSinceBackendReprobe: 0,
     });
   });
 

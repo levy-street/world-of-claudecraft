@@ -1,6 +1,7 @@
 'use strict';
 
-// The Linux GPU backend lever: "try Vulkan once, verify, remember".
+// The Linux GPU backend lever: "run the best backend this machine has proven it can
+// run, rescue the session when it dies, and climb back when the machine changes".
 //
 // On Linux, Chromium's default WebGL backend is ANGLE over OpenGL, where every shader
 // program link resolves on the single GPU-process thread that presents frames: 100 to
@@ -12,13 +13,21 @@
 // blast radius on drivers the blocklist exists for), and never --disable-vulkan-surface
 // (a headless-only switch that breaks presentation in a windowed shell).
 //
-// The risk: a forced Vulkan backend has NO OpenGL fallback. On a machine without a
-// working Vulkan driver Chromium lands on SwiftShader (software rendering) and the game
-// crawls. So with the default 'auto' setting the first launch is a TRIAL: the switches go
-// on, the shell reads the renderer the GPU process actually bound (main.cjs logGpuStatus,
-// app.getGPUInfo('complete')), records the verdict in the prefs store, and when the trial
-// failed relaunches itself on the default backend. Every later launch reads the stored
-// verdict and never repeats the trial until the player picks 'auto' again.
+// The risk: a forced Vulkan backend has NO OpenGL fallback of its own. On a machine
+// without a working Vulkan driver Chromium lands on SwiftShader and the game crawls, or
+// the GPU process dies and the page is left blocked from WebGL for the rest of the
+// session, which is a game that never renders. So the shell runs a LADDER of rungs, and
+// two mechanisms that used to be one:
+//
+//   THE MEMORY answers "what should Auto start on". It is a guess that improves.
+//   THE RESCUE answers "what do we do when the GPU process dies at launch". It runs in
+//   EVERY mode, including an explicit player choice, because a player who picked Vulkan
+//   on a machine that cannot run it must still get a game rather than a dead screen they
+//   cannot click out of.
+//
+// Keeping them separate is what fixes the two defects of the verdict this replaces: one
+// GPU-process death used to demote a healthy machine for good, and an explicit choice
+// had no rescue at all.
 //
 // Pure functions with injected deps, exercised by tests/electron_gpu_backend.test.ts;
 // main.cjs is the only caller and wires process.platform, process.env, the prefs and app.
@@ -31,11 +40,13 @@ const { spawnDetachedSelf } = require('./gpu_preference.cjs');
 const GPU_BACKEND_SETTINGS = ['auto', 'vulkan', 'opengl'];
 
 /**
- * What the last Vulkan trial concluded: 'untested' arms exactly one trial ladder,
- * 'ok' is Vulkan with the parallel-compile feature, 'ok-plain' is Vulkan without it
- * (the feature crashed the GPU process or did not take), 'failed' is the default GL.
+ * The ladder, BEST FIRST. Index 0 is the top rung; a rung "below" another is later in
+ * this list. Named for what each one actually is, so a stored value reads without a
+ * decoder: 'vulkan-plain' is Vulkan WITHOUT the parallel-compile feature, which is a
+ * materially different backend from the rung above it, not a variant of it.
  */
-const VULKAN_VERDICTS = ['untested', 'ok', 'ok-plain', 'failed'];
+const GPU_BACKEND_RUNGS = ['vulkan-parallel-compile', 'vulkan-plain', 'opengl'];
+const TOP_GPU_BACKEND_RUNG = GPU_BACKEND_RUNGS[0];
 
 /** The Chromium switches that force ANGLE's Vulkan backend, as [name, value] pairs. */
 const VULKAN_BACKEND_SWITCHES = [
@@ -54,65 +65,159 @@ const VULKAN_BACKEND_SWITCHES = [
  * the extension is listed and COMPLETION_STATUS_KHR answers false for 13 to 22 frames
  * before true on a heavy link; in the game the RTX 3090's Vulkan sweep stalls (3.4 s of
  * slow frames) vanished and the curtain lost 2.8 s. Still opt-in upstream, with one
- * rare GPU-process crash seen on Intel/Mesa, hence the ladder below: this is the first
- * rung, plain Vulkan the second, the default GL the last.
+ * rare GPU-process crash seen on Intel/Mesa, which is why it is its own rung.
  */
 const VULKAN_PARALLEL_COMPILE_SWITCH = ['enable-angle-features', 'enableParallelCompileAndLink'];
 
-/** Launch-time override, never verified or relaunched: 'vulkan' or 'opengl'. */
+/** Launch-time override, never judged and never remembered: 'vulkan' or 'opengl'. */
 const GPU_BACKEND_ENV = 'WOC_GPU_BACKEND';
 
 /**
- * Set on the child spawned after a failed trial rung. Belt and braces over the stored
- * verdict: '1' marks the child of a failed plain-Vulkan trial, which never trials (so it
- * can never relaunch again), even when the verdict could not be written to disk;
- * 'plain' marks the child of a failed parallel-compile trial, which trials plain Vulkan
- * once and may relaunch once more, with '1'. Two relaunches at most, whatever the prefs.
+ * Set on the child a rescue spawns, naming the rung that child must run, in full
+ * (`vulkan-plain`, `opengl`). It wins over every other input including the player's own
+ * setting: the parent watched the rung above it die seconds ago, so re-deciding from the
+ * prefs would spawn the same death. Its presence is also what caps the chain: a rescue
+ * may only ever go BELOW the marker it carries, and the ladder is three rungs deep.
  */
-const VULKAN_TRIAL_RELAUNCH_MARKER = 'WOC_VULKAN_TRIAL_RELAUNCHED';
-const VULKAN_TRIAL_RELAUNCH_PLAIN = 'plain';
-
-const defaultLaunch = (reason) => ({ backend: 'default', parallel: false, trial: false, reason });
-const vulkanLaunch = (parallel, trial, reason) => ({ backend: 'vulkan', parallel, trial, reason });
+const GPU_BACKEND_RESCUE_ENV = 'WOC_GPU_BACKEND_RESCUED_TO';
 
 /**
- * Which backend THIS launch runs on, and whether it is a trial whose outcome must be
- * judged and stored. Decision table, first match wins:
- * - not Linux: the platform default (D3D11 on Windows, Metal on macOS);
- * - WOC_GPU_BACKEND=opengl | vulkan: that backend, explicit, never verified (it wins
- *   over the rescue below, so Vulkan can be tried with every other GPU lever off);
- * - WOC_DISABLE_GPU_FORCE=1: default, no trial (the documented no-GPU-lever rescue);
- * - setting 'opengl' | 'vulkan': that backend, explicit, never verified;
- * - setting 'auto': the stored verdict decides ('failed' stays on the default, 'ok'
- *   forces Vulkan with the parallel-compile feature, 'ok-plain' forces plain Vulkan,
- *   'untested' runs the TRIAL LADDER: Vulkan with the feature first; a process the
- *   failed first rung relaunched (marker 'plain') trials plain Vulkan; a process the
- *   failed second rung relaunched (marker '1') never trials again).
- * `parallel` says whether the parallel-compile switch rides along (an explicit Vulkan
- * takes it: explicit means unverified, and the feature is the whole point).
+ * How many CONSECUTIVE launch-time GPU-process deaths on the attempted rung it takes to
+ * step the memory down. Three, not one: the previous design demoted on a single death,
+ * and a single death is exactly what a transient compositor or driver hiccup produces,
+ * so a healthy machine walked itself down to the slowest backend and stayed there. A
+ * choice with its reason, not a measurement.
  */
-function decideGpuBackendLaunch({ platform, env, prefs }) {
-  if (platform !== 'linux') return defaultLaunch('platform default');
+const MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES = 3;
+
+/**
+ * How many Auto launches between attempts to climb back, WITH a valid proof: something
+ * on this machine used to work and stopped, so retrying often is worth one rescued
+ * launch when it does not.
+ */
+const REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES = 10;
+
+/**
+ * The same, with NO valid proof: this machine has never run the higher rung, so a retry
+ * is a rescue relaunch spent on a machine that has told us the answer. Rare, but never
+ * never: a driver does eventually get updated, and the app version does change.
+ */
+const REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES = 50;
+
+/**
+ * How long a session must run, after the page has reported its renderer, before its rung
+ * counts as PROVEN. Long enough that a launch-time death cannot slip past it (those land
+ * within a second or two of the window appearing) and short enough that a player who
+ * quits after one look still teaches the memory something. A choice with its reason.
+ */
+const SESSION_HEALTHY_AFTER_MS = 60_000;
+
+const rungIndex = (rung) => GPU_BACKEND_RUNGS.indexOf(rung);
+
+/** The rung one step down, or null at the bottom. */
+function rungBelow(rung) {
+  const at = rungIndex(rung);
+  if (at < 0) return null;
+  return GPU_BACKEND_RUNGS[at + 1] ?? null;
+}
+
+/** The rung one step up, or null at the top. */
+function rungAbove(rung) {
+  const at = rungIndex(rung);
+  if (at <= 0) return null;
+  return GPU_BACKEND_RUNGS[at - 1];
+}
+
+/** True when `rung` sits ABOVE `other` on the ladder (both must be real rungs). */
+function isHigherRung(rung, other) {
+  const a = rungIndex(rung);
+  const b = rungIndex(other);
+  return a >= 0 && b >= 0 && a < b;
+}
+
+/**
+ * The launch a rung describes: which switches, the rung itself for the judge, and
+ * whether this launch is an Auto CLIMB (a rung above the remembered one, tried on the
+ * cadence). The climb flag is what the launch counter keys off, so the counter measures
+ * launches since the last attempt rather than launches since anything at all.
+ */
+function launchForRung(rung, reason, reprobed = false) {
+  return {
+    backend: rung === 'opengl' ? 'default' : 'vulkan',
+    parallel: rung === 'vulkan-parallel-compile',
+    rung,
+    reprobed,
+    reason,
+  };
+}
+
+/** A stored proof is only about THIS app version; a version change re-opens the ladder. */
+function validProof(prefs, appVersion) {
+  const proof = prefs?.gpuBackendProof;
+  if (!proof || rungIndex(proof.backend) < 0) return null;
+  if (typeof appVersion === 'string' && appVersion !== '' && proof.appVersion !== appVersion) {
+    return null;
+  }
+  return proof;
+}
+
+/**
+ * Which backend THIS launch runs on. Decision table, first match wins:
+ * - not Linux: the platform default (D3D11 on Windows, Metal on macOS);
+ * - the rescue marker: the rung the parent rescued to, ahead of everything, because the
+ *   parent watched the rung above it die;
+ * - WOC_GPU_BACKEND=opengl | vulkan: that backend, explicit (it wins over the no-lever
+ *   rescue below, so Vulkan can be tried with every other GPU lever off);
+ * - WOC_DISABLE_GPU_FORCE=1: OpenGL (the documented no-GPU-lever rescue);
+ * - setting 'opengl' | 'vulkan': that rung, explicit; the memory is not read and not
+ *   written, but the RESCUE still applies to this launch;
+ * - setting 'auto': `gpuBackendToAttempt`, or the top rung when nothing is stored, with
+ *   a periodic climb back up (see reprobe below).
+ */
+function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
+  if (platform !== 'linux') return launchForRung('opengl', 'platform default');
   const environment = env ?? {};
+  const rescued = environment[GPU_BACKEND_RESCUE_ENV];
+  if (rungIndex(rescued) >= 0) return launchForRung(rescued, `rescued to ${rescued}`);
   const override = environment[GPU_BACKEND_ENV];
-  if (override === 'opengl') return defaultLaunch(`${GPU_BACKEND_ENV}=opengl`);
-  if (override === 'vulkan') return vulkanLaunch(true, false, `${GPU_BACKEND_ENV}=vulkan`);
-  if (environment.WOC_DISABLE_GPU_FORCE === '1') return defaultLaunch('WOC_DISABLE_GPU_FORCE=1');
+  if (override === 'opengl') return launchForRung('opengl', `${GPU_BACKEND_ENV}=opengl`);
+  if (override === 'vulkan') {
+    return launchForRung(TOP_GPU_BACKEND_RUNG, `${GPU_BACKEND_ENV}=vulkan`);
+  }
+  if (environment.WOC_DISABLE_GPU_FORCE === '1') {
+    return launchForRung('opengl', 'WOC_DISABLE_GPU_FORCE=1');
+  }
   const setting = prefs?.gpuBackend;
-  if (setting === 'opengl') return defaultLaunch('setting opengl');
-  if (setting === 'vulkan') return vulkanLaunch(true, false, 'setting vulkan');
-  const verdict = prefs?.vulkanVerdict;
-  if (verdict === 'failed') return defaultLaunch('auto, last Vulkan trial failed');
-  if (verdict === 'ok') return vulkanLaunch(true, false, 'auto, Vulkan trial passed');
-  if (verdict === 'ok-plain') {
-    return vulkanLaunch(false, false, 'auto, Vulkan trial passed without parallel compile');
-  }
-  const marker = environment[VULKAN_TRIAL_RELAUNCH_MARKER];
-  if (marker === '1') return defaultLaunch('auto, relaunched after a failed Vulkan trial');
-  if (marker === VULKAN_TRIAL_RELAUNCH_PLAIN) {
-    return vulkanLaunch(false, true, 'auto, plain Vulkan trial after a failed parallel one');
-  }
-  return vulkanLaunch(true, true, 'auto, Vulkan trial');
+  if (setting === 'opengl') return launchForRung('opengl', 'setting opengl');
+  if (setting === 'vulkan') return launchForRung(TOP_GPU_BACKEND_RUNG, 'setting vulkan');
+
+  const stored = prefs?.gpuBackendToAttempt;
+  const attempt = rungIndex(stored) >= 0 ? stored : TOP_GPU_BACKEND_RUNG;
+  if (attempt === TOP_GPU_BACKEND_RUNG) return launchForRung(attempt, 'auto, best rung');
+
+  // The climb back. Two cadences, and the proof is what tells them apart: a machine that
+  // once ran the higher rung is worth retrying often, a machine that never has is not.
+  const proof = validProof(prefs, appVersion);
+  const staleProof =
+    !!prefs?.gpuBackendProof && !proof && rungIndex(prefs.gpuBackendProof.backend) >= 0;
+  const every = proof
+    ? REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES
+    : REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES;
+  const since = Number.isInteger(prefs?.launchesSinceBackendReprobe)
+    ? prefs.launchesSinceBackendReprobe
+    : 0;
+  // An app version the proof does not know is a changed environment: re-probe now
+  // rather than waiting out a counter that describes the old one.
+  if (!staleProof && since < every) return launchForRung(attempt, 'auto, remembered rung');
+  const target = proof && isHigherRung(proof.backend, attempt) ? proof.backend : rungAbove(attempt);
+  if (!target) return launchForRung(attempt, 'auto, remembered rung');
+  return launchForRung(
+    target,
+    proof && target === proof.backend
+      ? `auto, re-probing the proven ${target}`
+      : `auto, re-probing ${target}`,
+    true,
+  );
 }
 
 /**
@@ -132,48 +237,34 @@ function applyGpuBackendSwitches(app, launch) {
 }
 
 /**
- * The trial's verdict from what the GPU process actually bound. Vulkan bound only when
- * Chromium does not report software rendering AND the renderer string names Vulkan AND
- * is not the SwiftShader device (whose own renderer string also says "Vulkan"); anything
- * else, including a missing renderer string, is 'failed'. A bound Vulkan is 'ok' on the
- * parallel rung unless the page reports the parallel-compile extension ABSENT (the
- * feature did not take: 'ok-plain', the next launch drops the switch), and 'ok-plain' on
- * the plain rung. An unknown `parallelCompile` (an older game build reporting the string
- * alone) keeps the rung. Real strings the tests pin:
- *   ok:       "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 3090 (...)), NVIDIA)"
- *   software: "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (...)), SwiftShader driver)"
- *   opengl:   "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)"
+ * The rung this launch ACTUALLY bound, from what the GPU process reports. Vulkan bound
+ * only when Chromium does not report software rendering AND the renderer string names
+ * Vulkan AND is not the SwiftShader device (whose own renderer string also says
+ * "Vulkan"); anything else, including a missing renderer string, reads as 'opengl'. A
+ * bound Vulkan is the parallel-compile rung only when that rung was asked for and the
+ * page did not report the extension ABSENT (an unknown `parallelCompile`, from an older
+ * game build reporting the string alone, keeps the rung). Real strings the tests pin:
+ *   vulkan-parallel-compile: "ANGLE (NVIDIA, Vulkan 1.4.312 (NVIDIA NVIDIA GeForce RTX 3090 (...)), NVIDIA)"
+ *   opengl (software):       "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (...)), SwiftShader driver)"
+ *   opengl:                  "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)"
  */
-function judgeVulkanLaunch({ glRenderer, softwareRendering, parallel, parallelCompile }) {
-  if (softwareRendering === true) return 'failed';
-  if (typeof glRenderer !== 'string' || glRenderer === '') return 'failed';
+function judgeGpuBackendLaunch({ glRenderer, softwareRendering, parallel, parallelCompile }) {
+  if (softwareRendering === true) return 'opengl';
+  if (typeof glRenderer !== 'string' || glRenderer === '') return 'opengl';
   const renderer = glRenderer.toLowerCase();
-  if (!renderer.includes('vulkan')) return 'failed';
-  if (renderer.includes('swiftshader')) return 'failed';
-  if (parallel !== true) return 'ok-plain';
-  return parallelCompile === false ? 'ok-plain' : 'ok';
+  if (!renderer.includes('vulkan')) return 'opengl';
+  if (renderer.includes('swiftshader')) return 'opengl';
+  if (parallel !== true) return 'vulkan-plain';
+  return parallelCompile === false ? 'vulkan-plain' : 'vulkan-parallel-compile';
 }
 
 /**
- * The verdict to store when the GPU process dies during a Vulkan session the trial had
- * already passed: one rung down ('ok' loses the parallel-compile feature, 'ok-plain'
- * falls back to the default GL), never up, and nothing else moves. The rare crash the
- * feature is known for happens late, long after any launch-time verdict, so this is the
- * only guard that reaches it.
- */
-function vulkanVerdictAfterGpuCrash(verdict) {
-  if (verdict === 'ok') return 'ok-plain';
-  if (verdict === 'ok-plain') return 'failed';
-  return verdict;
-}
-
-/**
- * Whether an app.getGPUInfo('complete') auxAttributes reading can judge the trial at all.
- * On Linux the GPU process can report a healthy Vulkan session (feature status
+ * Whether an app.getGPUInfo('complete') auxAttributes reading can judge the launch at
+ * all. On Linux the GPU process can report a healthy Vulkan session (feature status
  * `vulkan: enabled_on`, WebGL on ANGLE Vulkan) while glRenderer is EMPTY, so an absent
- * string is "no evidence", never "failed": the verdict then waits for the renderer string
- * the game reports itself (desktop-report-gpu-renderer). Chromium's own softwareRendering
- * flag is evidence on its own (a failed trial), as is any non-empty renderer string.
+ * string is "no evidence", never "it failed": the judgement then waits for the renderer
+ * string the game reports itself (desktop-report-gpu-renderer). Chromium's own
+ * softwareRendering flag is evidence on its own, as is any non-empty renderer string.
  */
 function hasGetGpuInfoEvidence(aux) {
   if (aux?.softwareRendering === true) return true;
@@ -181,55 +272,128 @@ function hasGetGpuInfoEvidence(aux) {
 }
 
 /**
- * Re-exec this process on the next rung after a failed trial: same binary (the outer
- * AppImage when running from one), same argv, detached, with the relaunch marker on the
- * child ('plain' after a failed parallel-compile rung, '1' after a failed plain rung).
- * Returns true when a child was spawned, in which case the caller exits this process
- * (app.exit(0)); false when the child would repeat a rung already run (marker '1'
- * present, or 'plain' asked from a 'plain' child: never more than two relaunches,
- * whatever the prefs say) or when the spawn itself fails, in which case this process
- * keeps running on whatever renderer it has rather than leaving the player with nothing.
+ * The memory after a launch-time GPU-process death on `rung`: one more consecutive
+ * crash, and a step down only once they reach MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES. The
+ * PROOF is never touched here: a crash does not un-prove a session that ran healthy, and
+ * keeping it is what lets the climb aim straight back instead of feeling its way up.
+ * Returns the fields to merge into the prefs, or null when nothing changed.
  */
-function relaunchAfterFailedTrial(deps = {}, marker = '1') {
+function demoteAfterRepeatedCrashes({ prefs, rung }) {
+  if (rungIndex(rung) < 0) return null;
+  const stored = prefs?.gpuBackendToAttempt;
+  const attempt = rungIndex(stored) >= 0 ? stored : TOP_GPU_BACKEND_RUNG;
+  // A death on a rung the memory is not attempting (an explicit choice, a re-probe of a
+  // rung above the remembered one) says nothing about the remembered rung.
+  if (rung !== attempt) return null;
+  const crashes =
+    (Number.isInteger(prefs?.consecutiveGpuLaunchCrashes) ? prefs.consecutiveGpuLaunchCrashes : 0) +
+    1;
+  if (crashes < MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES) {
+    return { consecutiveGpuLaunchCrashes: crashes };
+  }
+  const lower = rungBelow(attempt);
+  if (!lower) return { consecutiveGpuLaunchCrashes: crashes };
+  return { gpuBackendToAttempt: lower, consecutiveGpuLaunchCrashes: 0 };
+}
+
+/**
+ * The memory after a session ran HEALTHY on `rung` (the page reported its renderer and
+ * the session then survived SESSION_HEALTHY_AFTER_MS without a GPU-process death).
+ * Three things happen: the crash streak clears, Auto remembers this rung, and the proof
+ * is written when it improves on what is stored or when the stored one describes a
+ * machine that is no longer this one (a different driver, a different app version).
+ * That last arm is what keeps a stale high proof from aiming a new GPU at a rung it
+ * cannot run. Returns the fields to merge into the prefs.
+ */
+function gpuBackendMemoryAfterHealthySession({ prefs, rung, appVersion, gpuDriver }) {
+  if (rungIndex(rung) < 0) return null;
+  const next = { gpuBackendToAttempt: rung, consecutiveGpuLaunchCrashes: 0 };
+  const proof = prefs?.gpuBackendProof;
+  const known = proof && rungIndex(proof.backend) >= 0;
+  const describesThisMachine =
+    known && proof.appVersion === appVersion && proof.gpuDriver === gpuDriver;
+  if (!known || !describesThisMachine || isHigherRung(rung, proof.backend)) {
+    next.gpuBackendProof = { backend: rung, appVersion, gpuDriver };
+  }
+  return next;
+}
+
+/**
+ * The launch counter after an Auto launch: back to zero when this launch WAS the climb,
+ * one more otherwise. Only Auto counts; an explicit choice and an env override never
+ * read or write the memory. Returns the field to merge, or null when nothing changed.
+ */
+function launchCounterAfterAutoLaunch({ prefs, launch }) {
+  if (prefs?.gpuBackend !== 'auto') return null;
+  const since = Number.isInteger(prefs?.launchesSinceBackendReprobe)
+    ? prefs.launchesSinceBackendReprobe
+    : 0;
+  const next = launch?.reprobed === true ? 0 : since + 1;
+  return next === since ? null : { launchesSinceBackendReprobe: next };
+}
+
+/**
+ * Rescue: re-exec this process on the rung below `rung`, so a player whose GPU process
+ * died at launch gets a running game inside the same launch instead of a dead screen.
+ * Same binary (the outer AppImage when running from one), same argv, detached, with the
+ * rescue marker naming the child's rung.
+ *
+ * Returns true when a child was spawned, in which case the caller exits this process
+ * (app.exit(0)). False when there is no lower rung, when the chain has already spent its
+ * budget (the marker on this process names a rung at or below the target, so the child
+ * would repeat a rung this chain has already run), or when the spawn itself fails, in which case this process keeps running on whatever Chromium recovered rather
+ * than leaving the player with nothing.
+ */
+function relaunchOnLowerBackend(deps = {}, rung) {
   const env = deps.env ?? process.env;
   const log = deps.log;
-  const present = env[VULKAN_TRIAL_RELAUNCH_MARKER];
-  if (present === '1') return false;
-  if (marker === VULKAN_TRIAL_RELAUNCH_PLAIN && present === VULKAN_TRIAL_RELAUNCH_PLAIN)
-    return false;
+  const target = rungBelow(rung);
+  if (!target) return false;
+  // A chain only ever walks DOWN. If this process was itself rescued, the child may
+  // only go below where we already are; anything else would re-run a rung this chain
+  // has watched die. That is also what caps the chain: the ladder is three rungs, so at
+  // most two rescues can ever spawn, without a counter to keep in step.
+  const already = env[GPU_BACKEND_RESCUE_ENV];
+  if (rungIndex(already) >= 0 && !isHigherRung(already, target)) return false;
   const argv = deps.argv ?? process.argv.slice(1);
   try {
     const spawnTarget = spawnDetachedSelf({
-      env: { ...env, [VULKAN_TRIAL_RELAUNCH_MARKER]: marker },
+      env: { ...env, [GPU_BACKEND_RESCUE_ENV]: target },
       argv,
       execPath: deps.execPath ?? process.execPath,
       spawn: deps.spawn,
     });
-    log?.info?.(
-      marker === VULKAN_TRIAL_RELAUNCH_PLAIN
-        ? '[gpu] relaunching on plain Vulkan after a failed parallel-compile trial'
-        : '[gpu] relaunching on the default GL backend after a failed Vulkan trial',
-      { spawnTarget },
-    );
+    log?.info?.(`[gpu] the GPU process died on ${rung}; relaunching on ${target}`, {
+      spawnTarget,
+    });
     return true;
   } catch (err) {
-    log?.warn?.('[gpu] could not relaunch after the failed Vulkan trial', err);
+    log?.warn?.(`[gpu] could not relaunch on ${rungBelow(rung)} after a GPU-process death`, err);
     return false;
   }
 }
 
 module.exports = {
   GPU_BACKEND_ENV,
+  GPU_BACKEND_RESCUE_ENV,
+  GPU_BACKEND_RUNGS,
   GPU_BACKEND_SETTINGS,
+  MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES,
+  REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES,
+  REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES,
+  SESSION_HEALTHY_AFTER_MS,
+  TOP_GPU_BACKEND_RUNG,
   VULKAN_BACKEND_SWITCHES,
   VULKAN_PARALLEL_COMPILE_SWITCH,
-  VULKAN_TRIAL_RELAUNCH_MARKER,
-  VULKAN_TRIAL_RELAUNCH_PLAIN,
-  VULKAN_VERDICTS,
   applyGpuBackendSwitches,
   decideGpuBackendLaunch,
+  demoteAfterRepeatedCrashes,
+  gpuBackendMemoryAfterHealthySession,
   hasGetGpuInfoEvidence,
-  judgeVulkanLaunch,
-  relaunchAfterFailedTrial,
-  vulkanVerdictAfterGpuCrash,
+  isHigherRung,
+  judgeGpuBackendLaunch,
+  launchCounterAfterAutoLaunch,
+  relaunchOnLowerBackend,
+  rungAbove,
+  rungBelow,
 };

@@ -81,6 +81,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const pushed = matches(mainSide, /webContents\.send\('([^']+)'/g);
     expect([...subscribed].sort()).toEqual([
       'desktop-display-changed',
+      'desktop-gpu-backend-state',
       'desktop-gpu-status',
       'desktop-login-code',
       'desktop-presentation-changed',
@@ -186,32 +187,47 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     const body = main.slice(start, main.indexOf('\n});', start));
     expect(body).toContain('if (!GPU_BACKEND_SETTINGS.includes(value)) return false;');
     // The WHOLE record, spread from the live module-scope object (the
-    // anti-clobber contract with the other savers), the setting, and the
-    // verdict reset that only a real switch back to 'auto' triggers (the game
-    // re-pushes its stored value at every boot; a same-value write must not
-    // re-arm the trial, or every launch would trial anew).
+    // anti-clobber contract with the other savers), plus the memory reset that
+    // only a real switch back to 'auto' triggers: the game re-pushes its stored
+    // value at every boot, and a same-value write must not start detection over.
     const save = body.replace(/\s+/g, ' ');
     expect(save).toContain(
-      "const rearmTrial = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';",
+      "const backToAuto = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';",
     );
-    expect(save).toContain(
-      "if ( !saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, gpuBackend: value, vulkanVerdict: rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict, }) ) {",
-    );
+    expect(save).toContain('const next = { ...desktopPrefs, gpuBackend: value };');
+    // The GUESS is cleared and the PROOF is not: a session that ran healthy here
+    // still ran healthy here, whatever the player did with the setting since.
+    expect(save).toContain('next.gpuBackendToAttempt = undefined;');
+    expect(save).toContain('next.consecutiveGpuLaunchCrashes = 0;');
+    expect(save).toContain('next.launchesSinceBackendReprobe = 0;');
+    expect(save).not.toContain('next.gpuBackendProof');
     const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
     const commitAt = body.indexOf('desktopPrefs.gpuBackend = value;');
-    const verdictAt = body.indexOf(
-      "desktopPrefs.vulkanVerdict = rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict;",
-    );
+    const verdictAt = body.indexOf('desktopPrefs.gpuBackendToAttempt = undefined;');
     expect(commitAt).toBeGreaterThan(saveAt);
     expect(verdictAt).toBeGreaterThan(saveAt);
     expect(body.slice(commitAt)).toContain('return true;');
 
+    // The getter and the push answer from ONE builder, so the row cannot read
+    // one shape on open and another on the push that follows.
     const getterAt = main.indexOf("ipcMain.handle('desktop-get-gpu-backend'");
     expect(getterAt).toBeGreaterThan(-1);
     const getter = main.slice(getterAt, main.indexOf('\n});', getterAt)).replace(/\s+/g, ' ');
-    expect(getter, 'the getter must report the STORED values plus platform support').toContain(
-      "return { setting: desktopPrefs.gpuBackend, verdict: desktopPrefs.vulkanVerdict, supported: process.platform === 'linux', };",
+    expect(getter, 'the getter must answer through the shared builder').toContain(
+      'return gpuBackendState();',
     );
+    const stateAt = main.indexOf('function gpuBackendState() {');
+    expect(stateAt).toBeGreaterThan(-1);
+    const state = main.slice(stateAt, main.indexOf('\n}', stateAt)).replace(/\s+/g, ' ');
+    // The stored setting is what the NEXT launch does; `active` is what THIS one
+    // is really running, which is the whole point of the row: a player who
+    // picked Vulkan on a machine that cannot run it must not read "Vulkan".
+    expect(state).toContain('setting: desktopPrefs.gpuBackend,');
+    expect(state).toContain('active: boundRung,');
+    expect(state).toContain(
+      'requestedUnavailable: gpuBackendJudged && boundRung !== gpuBackendLaunch.rung,',
+    );
+    expect(state).toContain("supported: process.platform === 'linux',");
   });
 
   it('the display-mode setter takes only the two literals, persists, then applies live', () => {
@@ -677,13 +693,13 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the gpu-renderer report is a gated, string-only feed into the trial settle', () => {
     // A send, not an invoke: nothing is answered. The body is pinned because the
     // trusted-sender gate scan above covers ipcMain.handle registrations only,
-    // and a report from a stray frame could otherwise write a trial verdict.
+    // and a report from a stray frame could otherwise judge this launch.
     const main = read('electron/main.cjs');
     const start = main.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start)).replace(/\s+/g, ' ');
     expect(body).toContain('if (!trustedSender(event)) return;');
-    expect(body.indexOf('trustedSender(event)')).toBeLessThan(body.indexOf('settleVulkanTrial('));
+    expect(body.indexOf('trustedSender(event)')).toBeLessThan(body.indexOf('judgeThisLaunch('));
     // Strings only, never empty (no evidence, like an empty getGPUInfo reading),
     // and the game's own report is by definition not Chromium's software flag.
     expect(body).toContain("if (typeof renderer !== 'string' || renderer === '') return;");
@@ -691,7 +707,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain(
       'const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;',
     );
-    expect(body).toContain('settleVulkanTrial(renderer.slice(0, 256), false, parallel);');
+    expect(body).toContain('judgeThisLaunch(renderer.slice(0, 256), false, parallel);');
     expect(body).not.toContain('event.reply');
     expect(body).not.toContain('return true');
   });

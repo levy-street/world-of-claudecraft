@@ -77,11 +77,13 @@ const {
   GPU_BACKEND_SETTINGS,
   applyGpuBackendSwitches,
   decideGpuBackendLaunch,
+  demoteAfterRepeatedCrashes,
+  gpuBackendMemoryAfterHealthySession,
+  launchCounterAfterAutoLaunch,
   hasGetGpuInfoEvidence,
-  judgeVulkanLaunch,
-  relaunchAfterFailedTrial,
-  VULKAN_TRIAL_RELAUNCH_PLAIN,
-  vulkanVerdictAfterGpuCrash,
+  judgeGpuBackendLaunch,
+  relaunchOnLowerBackend,
+  SESSION_HEALTHY_AFTER_MS,
 } = require('./gpu_backend.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
@@ -245,18 +247,41 @@ if (gpuForceDisabledByEnv) {
 // per program the game cannot avoid); ANGLE's Vulkan backend links in about 10 ms. A
 // forced Vulkan backend has no OpenGL fallback (a machine without a working Vulkan driver
 // lands on SwiftShader), so with the default 'auto' setting the first launch is a TRIAL:
-// logGpuStatus below judges the renderer the GPU process actually bound, stores the
-// verdict in the prefs, and relaunches on the default backend when the trial failed. Runs
-// before app 'ready' (the switches are read there), after the discrete-GPU force. The
-// decision table (setting, stored verdict, WOC_GPU_BACKEND override, the no-lever rescue
-// env, the relaunch marker) lives in electron/gpu_backend.cjs.
+/**
+ * Merge a partial into the live prefs and persist them. The GPU-backend memory is written
+ * from several places (the launch counter, a healthy session, a launch-time death), each
+ * of which owns only its own fields, so every one of them goes through here rather than
+ * spreading `{ ...desktopPrefs, ... }` and racing the others' fields. A null or empty
+ * partial is a no-op, which is how the pure helpers say "nothing changed".
+ */
+function mergeDesktopPrefs(partial) {
+  if (!partial || Object.keys(partial).length === 0) return false;
+  const next = { ...desktopPrefs, ...partial };
+  if (!saveDesktopPrefs(desktopPrefsPath, next)) {
+    log.warn('[gpu] could not persist the GPU backend memory');
+    return false;
+  }
+  Object.assign(desktopPrefs, partial);
+  return true;
+}
+
+// Which rung this launch runs. logGpuStatus below judges what the GPU process ACTUALLY
+// bound and, once the session has proven healthy, writes the Auto memory; a GPU-process
+// death before that rescues the session onto a lower rung, in every mode. Runs before app
+// 'ready' (the switches are read there), after the discrete-GPU force. The decision table
+// (the rescue marker, WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto
+// memory and its climb) lives in electron/gpu_backend.cjs.
 const gpuBackendLaunch = decideGpuBackendLaunch({
   platform: process.platform,
   env: process.env,
   prefs: desktopPrefs,
+  appVersion: app.getVersion(),
 });
 applyGpuBackendSwitches(app, gpuBackendLaunch);
-log.info(`[gpu] backend launch: ${gpuBackendLaunch.backend} (${gpuBackendLaunch.reason})`);
+log.info(`[gpu] backend launch: ${gpuBackendLaunch.rung} (${gpuBackendLaunch.reason})`);
+// The climb counter moves on every Auto launch, whether or not this one climbed, so the
+// cadence measures launches since the last ATTEMPT rather than since anything at all.
+mergeDesktopPrefs(launchCounterAfterAutoLaunch({ prefs: desktopPrefs, launch: gpuBackendLaunch }));
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'
@@ -1092,42 +1117,64 @@ ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
 
 // The Linux GPU backend (Graphics > System). Stored, not applied live: the backend
 // switches land before Electron's own startup (see the gpuBackendLaunch block at the top
-// of this file), so a change takes effect at the NEXT launch. Choosing 'auto' again resets
-// the stored verdict, which re-arms exactly one Vulkan trial; 'vulkan' and 'opengl' are
-// explicit and never verified or relaunched. Persisted first, committed in memory only on
-// a successful write, so the getter never reports a value the next launch will not read.
+// of this file), so a change takes effect at the NEXT launch. 'vulkan' and 'opengl' are
+// explicit: the memory is neither read nor written under them, though the RESCUE still
+// applies to every launch. Persisted first, committed in memory only on a successful
+// write, so the getter never reports a value the next launch will not read.
 ipcMain.handle('desktop-set-gpu-backend', (event, value) => {
   if (!trustedSender(event)) return false;
   if (!GPU_BACKEND_SETTINGS.includes(value)) return false;
-  // Switching BACK to auto re-arms one trial; the same value written again
-  // (the game re-pushes its stored setting at every boot) must not, or every
-  // launch would trial anew and the ok verdict would never be kept.
-  const rearmTrial = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';
-  if (
-    !saveDesktopPrefs(desktopPrefsPath, {
-      ...desktopPrefs,
-      gpuBackend: value,
-      vulkanVerdict: rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict,
-    })
-  ) {
+  // Coming BACK to auto clears the GUESS and starts detection over: whatever this machine
+  // did under an explicit choice taught us nothing about what Auto should attempt, and a
+  // remembered rung from before the detour may describe a driver that has since changed.
+  // The PROOF survives: a session that once ran healthy here still ran healthy here, and
+  // it is what lets the climb aim straight instead of feeling its way up. The same value
+  // written again (the game re-pushes its stored setting at every boot) clears nothing,
+  // or every launch would start detection over.
+  const backToAuto = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';
+  const next = { ...desktopPrefs, gpuBackend: value };
+  if (backToAuto) {
+    next.gpuBackendToAttempt = undefined;
+    next.consecutiveGpuLaunchCrashes = 0;
+    next.launchesSinceBackendReprobe = 0;
+  }
+  if (!saveDesktopPrefs(desktopPrefsPath, next)) {
     log.warn('[gpu] could not persist the GPU backend preference');
     return false;
   }
   desktopPrefs.gpuBackend = value;
-  desktopPrefs.vulkanVerdict = rearmTrial ? 'untested' : desktopPrefs.vulkanVerdict;
+  if (backToAuto) {
+    desktopPrefs.gpuBackendToAttempt = undefined;
+    desktopPrefs.consecutiveGpuLaunchCrashes = 0;
+    desktopPrefs.launchesSinceBackendReprobe = 0;
+  }
   return true;
 });
 
-// The stored setting and verdict (what the NEXT launch will do), plus whether the lever
-// exists on this platform at all, so the options row can hide itself off Linux.
-ipcMain.handle('desktop-get-gpu-backend', (event) => {
-  if (!trustedSender(event)) return null;
+// What the options row shows: the stored setting (what the NEXT launch will do), the rung
+// this launch is ACTUALLY running, whether that fell short of what was asked for, and
+// whether the lever exists on this platform at all so the row can hide itself off Linux.
+// The active rung is the point of the row: a player who picked Vulkan on a machine that
+// cannot run it would otherwise read "Vulkan" and be playing on OpenGL.
+function gpuBackendState() {
   return {
     setting: desktopPrefs.gpuBackend,
-    verdict: desktopPrefs.vulkanVerdict,
+    active: boundRung,
+    requestedUnavailable: gpuBackendJudged && boundRung !== gpuBackendLaunch.rung,
     supported: process.platform === 'linux',
   };
+}
+
+ipcMain.handle('desktop-get-gpu-backend', (event) => {
+  if (!trustedSender(event)) return null;
+  return gpuBackendState();
 });
+
+/** Push the state the moment it is known, so a page open at the options row updates. */
+function sendGpuBackendState() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send('desktop-gpu-backend-state', gpuBackendState());
+}
 
 // How the shell presents its window (Graphics > Display). Unlike the GPU force this
 // applies LIVE as well as being stored: the player expects the mode to change under the
@@ -1303,7 +1350,7 @@ ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => 
   // The extension flag rides along as a strict boolean, or not at all (an
   // older game build reports the string alone: unknown, never false).
   const parallel = parallelCompile === true ? true : parallelCompile === false ? false : undefined;
-  settleVulkanTrial(renderer.slice(0, 256), false, parallel);
+  judgeThisLaunch(renderer.slice(0, 256), false, parallel);
 });
 
 ipcMain.on('desktop-renderer-error', (event, payload) => {
@@ -1356,81 +1403,116 @@ if (!singleInstance) {
 // dev-channel diagnostics; the whitelisted verdict pushed on 'desktop-gpu-status' is the one
 // user-facing product of this flow (the renderer localizes it, see src/game/).
 let lastGpuRendererLog = '';
-let vulkanTrialJudged = false;
+// Judged once per process; the rung that actually bound, and the driver string it bound
+// with (the proof records both). `sessionHealthy` latches the moment the session has run
+// long enough for its rung to count as proven.
+let gpuBackendJudged = false;
+let boundRung = gpuBackendLaunch.rung;
+let boundGpuDriver = '';
+let sessionHealthy = false;
+let healthySessionTimer = null;
 
-// The Vulkan trial verdict, judged ONCE per process from the first piece of real evidence
-// (a crash-recovery reload must not re-judge: the adapter it lands on is the post-crash
-// fallback, not the trial). Two sources feed it, both through this one function so the
-// handling has one shape: the getGPUInfo reading in logGpuStatus when it carries evidence,
-// and the renderer string the game reports over desktop-report-gpu-renderer (on Linux
-// getGPUInfo can leave glRenderer EMPTY on a healthy Vulkan session, so the game's own
-// WebGL renderer string is the usual verdict source). Stored before it is committed in
-// memory, like the setters, so what the next launch reads is what the log says. A failed
-// trial means the player is on SwiftShader right now: relaunch on the default backend
-// (the child reads the stored 'failed' verdict, and carries the relaunch marker as a
-// second lock) and exit this process. relaunchAfterFailedTrial refuses when the marker is
-// already present, so no chain of relaunches is possible. A trial that never gets judged
-// (the renderer never reports, e.g. WebGL creation failed entirely) leaves the stored
-// verdict at 'untested', so the next launch simply trials again: acceptable, since one
-// more trial costs nothing and there is no timer to get wrong.
-function settleVulkanTrial(glRenderer, softwareRendering, parallelCompile) {
-  if (gpuBackendLaunch.trial !== true || vulkanTrialJudged) return;
-  vulkanTrialJudged = true;
-  const vulkanVerdict = judgeVulkanLaunch({
+// What this launch actually bound, judged ONCE per process from the first piece of real
+// evidence (a crash-recovery reload must not re-judge: the adapter it lands on is the
+// post-crash fallback, not this launch's rung). Two sources feed it, both through this one
+// function so the handling has one shape: the getGPUInfo reading in logGpuStatus when it
+// carries evidence, and the renderer string the game reports over
+// desktop-report-gpu-renderer (on Linux getGPUInfo can leave glRenderer EMPTY on a healthy
+// Vulkan session, so the game's own WebGL renderer string is the usual source).
+//
+// Judging is NOT remembering. A launch that bound a lower rung than it asked for is
+// rescued right now, in every mode, because the player is on SwiftShader or worse as we
+// speak; the MEMORY only moves once the session has proven healthy (below), so an explicit
+// choice is rescued without ever being second-guessed on disk.
+function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
+  if (gpuBackendJudged) return;
+  gpuBackendJudged = true;
+  boundRung = judgeGpuBackendLaunch({
     glRenderer,
     softwareRendering,
     parallel: gpuBackendLaunch.parallel,
     parallelCompile,
   });
-  if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) {
-    desktopPrefs.vulkanVerdict = vulkanVerdict;
-  } else {
-    log.warn('[gpu] could not persist the Vulkan trial verdict');
-  }
-  log.info(`[gpu] vulkan trial verdict: ${vulkanVerdict}`, {
+  boundGpuDriver = typeof glRenderer === 'string' ? glRenderer : '';
+  log.info(`[gpu] backend bound: ${boundRung} (asked for ${gpuBackendLaunch.rung})`, {
     glRenderer,
     softwareRendering,
-    parallel: gpuBackendLaunch.parallel,
     parallelCompile,
   });
-  if (vulkanVerdict === 'failed') {
-    // The next rung: plain Vulkan after a failed parallel-compile rung, the
-    // default GL after a failed plain one (the child reads the marker).
-    const nextRung = gpuBackendLaunch.parallel ? VULKAN_TRIAL_RELAUNCH_PLAIN : '1';
-    log.warn(
-      '[gpu] the forced Vulkan backend did not bind a hardware Vulkan renderer; ' +
-        `relaunching on the next rung (${nextRung === '1' ? 'default GL' : 'plain Vulkan'})`,
-    );
-    if (relaunchAfterFailedTrial({ log }, nextRung)) {
-      app.exit(0);
-      return;
-    }
-  }
-}
-
-// The GPU process dying under a Vulkan session: during a trial not yet judged it IS the
-// verdict (the page will never report a renderer string; Chromium falls back to
-// SwiftShader), so it settles as failed and the ladder relaunches the next rung. After a
-// passed trial it steps the stored verdict one rung down for the NEXT launch ('ok' loses
-// the parallel-compile feature, 'ok-plain' falls back to GL), the only guard that reaches
-// the rare late crash the feature is known for; this session keeps whatever Chromium
-// recovers on. Explicit settings are never touched: explicit means unverified.
-app.on('child-process-gone', (_event, details) => {
-  if (details?.type !== 'GPU' || gpuBackendLaunch.backend !== 'vulkan') return;
-  if (gpuBackendLaunch.trial === true) {
-    settleVulkanTrial('', true, undefined);
+  sendGpuBackendState();
+  if (boundRung === gpuBackendLaunch.rung) {
+    armHealthySessionTimer();
     return;
   }
-  if (desktopPrefs.gpuBackend !== 'auto') return;
-  const vulkanVerdict = vulkanVerdictAfterGpuCrash(desktopPrefs.vulkanVerdict);
-  if (vulkanVerdict === desktopPrefs.vulkanVerdict) return;
-  if (saveDesktopPrefs(desktopPrefsPath, { ...desktopPrefs, vulkanVerdict })) {
-    desktopPrefs.vulkanVerdict = vulkanVerdict;
-  }
-  log.warn(`[gpu] GPU process gone under Vulkan; next launch steps down to ${vulkanVerdict}`, {
-    reason: details?.reason,
-    exitCode: details?.exitCode,
+  // It bound something lower than it asked for: the switches did not take. Step down for
+  // real rather than sit on a software rasterizer for the session.
+  log.warn(`[gpu] ${gpuBackendLaunch.rung} did not bind; rescuing onto the rung below it`, {
+    bound: boundRung,
   });
+  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) {
+    app.exit(0);
+    return;
+  }
+  // No rescue available (the chain is spent, or the spawn failed): run what we have, and
+  // still let a healthy session record it, since what bound IS what this machine can do.
+  armHealthySessionTimer();
+}
+
+// A session is HEALTHY when the page has reported its renderer AND the session then
+// survives SESSION_HEALTHY_AFTER_MS without a GPU-process death. That is the one signal
+// worth writing to the memory: it separates "this rung runs here" from "this rung started
+// here", which is the distinction the previous verdict never made.
+function armHealthySessionTimer() {
+  if (healthySessionTimer !== null || sessionHealthy) return;
+  healthySessionTimer = setTimeout(() => {
+    healthySessionTimer = null;
+    sessionHealthy = true;
+    if (desktopPrefs.gpuBackend !== 'auto') {
+      // An explicit choice never writes the memory: explicit means the player decided,
+      // not that we learned something about the machine.
+      log.info(`[gpu] session healthy on ${boundRung} (explicit setting, memory untouched)`);
+      return;
+    }
+    const next = gpuBackendMemoryAfterHealthySession({
+      prefs: desktopPrefs,
+      rung: boundRung,
+      appVersion: app.getVersion(),
+      gpuDriver: boundGpuDriver,
+    });
+    if (mergeDesktopPrefs(next)) {
+      log.info(`[gpu] session healthy on ${boundRung}; memory updated`, next);
+    }
+  }, SESSION_HEALTHY_AFTER_MS);
+  healthySessionTimer.unref?.();
+}
+
+// The GPU process dying. Two very different events wear the same name:
+//
+// BEFORE the session is healthy, it is a launch failure: rescue it onto the rung below,
+// in EVERY mode, so the player gets a running game inside this launch instead of the
+// white screen Chromium leaves behind when it blocks a page from WebGL. Only then, and
+// only on Auto, does the crash streak move; three consecutive ones step the memory down.
+//
+// AFTER a healthy session it is the rare late crash: Chromium restarts the GPU process on
+// its own and this session keeps whatever it recovers on. Nothing is counted and nothing
+// is written, because the rung has already proven itself here.
+app.on('child-process-gone', (_event, details) => {
+  if (details?.type !== 'GPU') return;
+  const context = { reason: details?.reason, exitCode: details?.exitCode };
+  if (sessionHealthy) {
+    log.warn(`[gpu] GPU process gone after a healthy session on ${boundRung}`, context);
+    return;
+  }
+  log.error(`[gpu] GPU process gone at launch on ${gpuBackendLaunch.rung}`, context);
+  if (healthySessionTimer !== null) {
+    clearTimeout(healthySessionTimer);
+    healthySessionTimer = null;
+  }
+  if (desktopPrefs.gpuBackend === 'auto') {
+    const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });
+    if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next);
+  }
+  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);
 });
 
 function logGpuStatus() {
@@ -1471,12 +1553,12 @@ function logGpuStatus() {
       // Judge the Vulkan trial from this reading ONLY when it carries evidence (Chromium's
       // softwareRendering flag, or a non-empty renderer string); an empty glRenderer with
       // no software flag is the healthy-Vulkan-on-Linux reading, and the verdict then
-      // waits for the renderer string the game reports (settleVulkanTrial).
+      // waits for the renderer string the game reports (judgeThisLaunch).
       if (hasGetGpuInfoEvidence(aux)) {
-        settleVulkanTrial(aux.glRenderer, aux.softwareRendering);
-      } else if (gpuBackendLaunch.trial === true && !vulkanTrialJudged) {
+        judgeThisLaunch(aux.glRenderer, aux.softwareRendering);
+      } else if (!gpuBackendJudged) {
         log.info(
-          "[gpu] vulkan trial: waiting for the renderer's report (no renderer string from getGPUInfo)",
+          "[gpu] backend: waiting for the renderer's report (no renderer string from getGPUInfo)",
         );
       }
       const line = {
