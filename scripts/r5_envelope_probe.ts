@@ -48,6 +48,7 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 import { armorReduction } from '../src/sim/types';
 import { anchorProbeInOpenField } from './probe_anchor';
+import { WARLOCK_FULL_BIS_GEAR } from './warlock_balance_probe';
 
 type Stats = Partial<Record<string, number>>;
 type SlotStats = Record<string, Stats>;
@@ -132,6 +133,35 @@ const SERPENT: Aura = {
   duration: 900,
   value: 12,
 } as unknown as Aura;
+// Per-KIND defs, never one def read for every kind. The three flasks and the
+// three plates are uniform today, but section 10.4 records "tune only
+// warboar_flask and runewater_flask" as an available and un-taken option: if a
+// future pass takes it, a single-def read would keep printing the stamina
+// value on the attack-power and intellect lanes and report an envelope that is
+// not the tree's.
+const FLASK_BY_KIND: Record<string, string> = {
+  buff_sta: 'ironhusk_flask',
+  buff_ap: 'warboar_flask',
+  buff_int: 'runewater_flask',
+};
+const PLATE_BY_KIND: Record<string, string> = {
+  buff_sta: 'stonepot_stew',
+  buff_ap: 'warspice_skewers',
+  buff_int: 'sageleaf_chowder',
+};
+const defValue = (
+  map: Record<string, string>,
+  kind: string,
+  field: 'elixir' | 'wellFed',
+): number => {
+  const id = map[kind];
+  if (!id) throw new Error(`no ${field} def for kind ${kind}`);
+  const payload = (ITEMS[id] as unknown as Record<string, unknown>)[field] as
+    | { value?: number }
+    | undefined;
+  if (typeof payload?.value !== 'number') throw new Error(`${id} carries no ${field} value`);
+  return payload.value;
+};
 const flaskAura = (kind: string, name: string): Aura =>
   ({
     id: `elixir_${kind}`,
@@ -139,7 +169,7 @@ const flaskAura = (kind: string, name: string): Aura =>
     kind,
     remaining: 1200,
     duration: 1200,
-    value: (ITEMS.ironhusk_flask as { elixir: { value: number } }).elixir.value,
+    value: defValue(FLASK_BY_KIND, kind, 'elixir'),
     flask: true,
     undispellable: true,
   }) as unknown as Aura;
@@ -150,7 +180,7 @@ const plateAura = (kind: string): Aura =>
     kind,
     remaining: 900,
     duration: 900,
-    value: (ITEMS.stonepot_stew as { wellFed: { value: number } }).wellFed.value,
+    value: defValue(PLATE_BY_KIND, kind, 'wellFed'),
   }) as unknown as Aura;
 
 // --- the fixture ------------------------------------------------------------
@@ -464,20 +494,12 @@ function furyLane(seed: number, arm: Arm, level: number, armor: number): number 
 // restoring a resource each tick, and this is not that: it is a real
 // consumable both arms carry.
 // ============================================================================
-const CASTER_BIS: PlayerEquipment = {
-  helmet: 'heroic_soulflame_cowl',
-  neck: 'zense_meridian',
-  shoulder: 'heroic_soulflame_mantle',
-  chest: 'heroic_necromancers_starshroud',
-  mainhand: 'heroic_deathless_heartwood',
-  offhand: 'heroic_wraithfire_orb',
-  gloves: 'soulflame_gloves',
-  waist: 'soulflame_cord',
-  legs: 'necromancers_legwraps',
-  feet: 'heroic_necromancers_soulsteps',
-  ring1: 'nielas_coldlight_band',
-  ring2: 'nielas_coldlight_band',
-};
+// IMPORTED, never re-typed. Section 3 fixes the caster baseline as the repo's
+// maintained set-complete caster BiS, so this must BE that list: a hand-copy
+// would leave the probe measuring a stale denominator, with nothing red, the
+// next time the maintained set is re-anchored (which the warlock viability
+// record shows has happened before).
+const CASTER_BIS: PlayerEquipment = { ...WARLOCK_FULL_BIS_GEAR } as PlayerEquipment;
 const CASTER_ENCH: SlotStats = {
   mainhand: { int: 5 },
   chest: { sta: 7 },
@@ -617,7 +639,7 @@ export interface TankBody {
   sta: number;
 }
 
-function tankBody(arm: 'base' | 'consumables' | 'consumablesEnchant' | 'full'): TankBody {
+export function tankBody(arm: 'base' | 'consumables' | 'consumablesEnchant' | 'full'): TankBody {
   const sim = new Sim({
     seed: 4242,
     playerClass: 'warrior',
@@ -677,7 +699,7 @@ function row(name: string, base: number[], arms: Record<string, number[]>): void
   console.log(`${name}: base ${b.toFixed(2)} | ${parts.join(' | ')}`);
 }
 
-function main(): void {
+export function main(): void {
   const only = process.argv[2];
   console.log(
     `TARGETS ${HEROIC_TARGET.name} armor=${HEROIC_TARGET.armor} DR=${(armorReduction(HEROIC_TARGET.armor, 20) * 100).toFixed(2)}% | ` +
