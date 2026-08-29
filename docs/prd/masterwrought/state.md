@@ -20952,8 +20952,10 @@ electron/gpu_preference and its d.cts, tests/electron_gpu_preference) with
 ZERO overlap against the packet's 1632 owned files; no route, WS command,
 i18n catalog key, or vi.mock('../server/db') site in the delta; the one
 signature change (isLinuxHybridGpu gaining an optional readFile) is called
-only from inside gpu_preference.cjs itself, and the branch owns no call
-site; monolith ceilings unmoved (the release touched no ratcheted file)
+from gpu_preference.cjs itself AND from scripts/electron-dev.mjs, and the
+branch owns neither file; both call it with no argument, so the new optional
+parameter defaults and no injection site needs re-binding; monolith ceilings
+unmoved (the release touched no ratcheted file)
 and tsc clean at the merge.
 
 ### THE PREMISE RE-AUTHORING, before any number was sealed
@@ -20995,13 +20997,22 @@ shelf.
    byte for byte, and caster chest Hit had ZERO other carriers, so it was
    the sole source of the scarcest double-value rating in the largest
    slot. Measured at an S-rift target it was worth 2.8 to 4.1 percent from
-   one slot. Haste still complements the reference's crit; the apex armour
-   set now carries no Hit at all, which the spread pin re-cuts.
+   one slot. Against the level-22 heroic target the piece is close to a
+   WASH rather than an outlier and the mechanism is a clamp, not a cap: the
+   caster BiS carries 160 hit rating and sits at 98 percent effective spell
+   hit, so half a further 40 hit clamps away and the hit line reads 2.04
+   percent against haste's 2.00. Fixing BOTH target levels is what made the
+   outlier visible. Haste still complements the reference's crit; the NINE
+   WEARABLE apex armour pieces now carry no Hit at all, which the spread pin
+   re-cuts. The apex SHIELD keeps its reference's Hit at 20, the
+   held-and-shield family's own band.
 3. duskforged_bulwark, armor 732 to 680 and blockValue 32 to 30. Both
    extrapolated two item levels past bonewrought_bulwark, which made the
    crafted shield the best mitigation item in the game: makeHeroicVariant
-   freezes both fields, so the ilvl-33 raid shield still reads 680 and 30
-   and no heroic upgrade could ever answer it. Measured at 1.0 percent
+   freezes both fields, so the ilvl-33 raid shield still reads 680 and 30,
+   which means it could never even MATCH a crafted shield. It now TIES it
+   exactly and the two are separated by ratings and strength; 680/30 is the
+   MAXIMUM permitted value, not a chosen one. Measured at 1.0 percent
    less physical damage taken on the reference tank, on the axis the
    protected asset is priced in. The other nine apex armour pieces already
    pin armour EQUAL to their reference's; the shield joins that rule.
@@ -21015,11 +21026,20 @@ shelf.
    ceiling of 12; duration untouched.
 
 CONSEQUENCE, recorded so no reader trusts the old number: the crafted
-stamina ceiling now reads flask 13 plus plate 6 for NINETEEN, not 21.
-Ruling 11c-D-2's outcome is unaffected (it rejected an apex food of 8
-because that broke the kit arithmetic; a smaller flask makes the sum
-smaller still), but every record quoting "21 stamina" is now describing
-the pre-Phase-15 tree.
+stamina ceiling now reads flask 13 plus plate 6 for NINETEEN, not 21, and
+every record quoting "21 stamina" is now describing the pre-Phase-15 tree.
+
+Ruling 11c-D-2's OUTCOME is unaffected, but its stated REASON no longer
+carries it and that is recorded here rather than left to be rediscovered.
+11c-D-2 rejected an apex food of 8 because "flask 15 plus food 6 equals 21"
+and an 8 broke that sum. At flask 13 an apex food of 8 sums to exactly 21,
+the number the ruling treated as acceptable, so the arithmetic branch it
+closed is arithmetically re-open. What keeps 8 rejected now is the LADDER,
+not the sum: the apex plate must sit exactly one rung above farming's top
+rung of 5, and that ordering is what the Well Fed band and dominance arms in
+tests/masterwrought_budget.test.ts pin. The ruling stands on the pinned rule;
+only its rationale is superseded. Recorded for the maintainer, not re-opened
+by this phase.
 
 ### THE MEASURED PASS
 Method per docs/design/spell-balance-framework.md, with two notes the
@@ -21127,7 +21147,11 @@ packet; the practice dummy's body as literals.
 ### THE KILL TABLE
 Twelve mutants in a throwaway worktree at the phase's own tip, every one
 a mutation that SURVIVED before this phase's work: a rating on an angler
-dish (previously green across the full 47,677-test suite), a rating on an
+dish (previously green across a full-suite run, the count recorded at the
+time as 47,677 with no bound or tip beside it; the packet's own frozen Phase
+14 stamp at d51139a103 reads 47738 passed under the gate's 8-worker bound, so
+the two are not the same measurement and only the SURVIVAL is load-bearing
+here), a rating on an
 apex feast, the jewelry anchor delisted from vendor stock, the shield's
 armour restored to 732, the flask strip shedding Well Fed, a flask
 refused while Well Fed rides, Well Fed's stamina never folding into the

@@ -117,8 +117,9 @@ kit definition must name the SPECIFIC aura and magnitude it measures, not the wo
 dated 2026-08-16, that the feast was dropped from the R5 full-kit premise per ruling (4)
 of the Phase 10 QA, on the finding that there was no feast buff source to measure, and
 that correction was applied to BOTH live copies: this file's Goal line and Arm 1, and
-`implementation-plan.md`'s Phase 15 deliverable. Farming's `harvest_feast` and 11e's apex
-Harvest Feasts falsify that finding. Revert both edits and re-record deviation (e) with
+`implementation-plan.md`'s Phase 15 deliverable. Farming's `harvest_feast` and the apex
+Harvest Feasts falsify that finding. (The apex feasts are 11k's, not 11e's; the label here
+is stale and the content is right.) Revert both edits and re-record deviation (e) with
 its new outcome in the state.md ledger, in the same change, before the measured pass
 starts. R5's correct kit definition becomes "the best available food, always on,
 delivered by feast", which is strictly stronger than what this phase was written to
@@ -126,8 +127,9 @@ measure.
 
 **Premise 3, added 2026-08-20 (qr-11o-WEAR, state.md row 118): the crafted rare tier was
 re-leveled before this phase runs.** Phase 11o moved recipe.level on the rung-50 gear
-recipes (20 to 15) and the three rung-75 grandfathered rares (20 to 17), so the crafted
-rares are wearable mid-leveling. That change was ruled R5-safe by construction (it moves
+recipes (20 to 15) and the rung-75 grandfathered rares (20 to 17), so the crafted rares are
+wearable mid-leveling. (Nineteen rows moved in all, two of them to 17; this line said
+"three" and the tree and commit 08ba6cf61f both say two.) That change was ruled R5-safe by construction (it moves
 WHEN gear can be worn, never any magnitude), and this phase VERIFIES the construction: the
 level-20 shelf this phase measures against (raid, heroic, apex) must be shown UNMOVED by
 11o (re-derive the shelf, do not assume it), and any 11o-side drift into the shelf is a
@@ -151,6 +153,15 @@ the judgment surface for the future-tier revisit brainstorm.md carries.
   plus food 6 equals 21 stamina, roughly 3 percent of physical white DPS from consumables
   and 4.2 to 4.7 percent for the full physical kit against the 5 percent cap. That is the
   entire reason to prefer that ladder over any other.
+  - **OUTCOME 2026-08-28: 11c landed exactly that ladder, and the premise above was then
+    falsified by the MEASUREMENT, not by 11c.** The measured full physical kit read 5.86
+    and 6.08 percent, outside the envelope, so the phase used its own named tune-down knob:
+    the flask came to 13 and the shipped consumable sum is **flask 13 plus food 6 equals
+    19 stamina**, not 21. No well-fed magnitude moved. Ruling 11c-D-2's outcome stands, but
+    its arithmetic rationale (an apex food of 8 breaks "15 plus 6 equals 21") no longer
+    carries it, because 13 plus 8 is exactly 21; what keeps 8 rejected is the ladder
+    ordering, which the Well Fed band and dominance arms pin. Full record:
+    `docs/prd/masterwrought/power-verification.md` sections 8.3 and 10.4.
 - IF 11c landed anything else, that is a code-versus-ruling mismatch and it is blocking on
   its own. This phase then requires a fresh run of
   `docs/design/spell-balance-framework.md` from the top, and it trips its own stopping rule:

@@ -10,7 +10,8 @@ The measured pass for masterwrought R5, the packet's defining gate:
 
 Everything needed to reproduce every number is in this file: the model, the kit,
 the baseline, the constants, the targets, the fixtures, and the arithmetic. No
-number here is quoted from another document.
+number here is quoted from another document. The fight harness itself is
+committed as `scripts/r5_envelope_probe.ts`; section 9.1 names the invocation.
 
 ## Verdict
 
@@ -26,12 +27,19 @@ phase measured OUTSIDE it.
 | warrior, fury (the tight lane) | **+4.94% +/-0.96** | **+4.50% +/-0.94** |
 | caster, 60 s burst profile | +4.55% | +4.58% |
 | caster, 180 s sustained profile | +5.06% +/-3.03 | +4.75% +/-4.17 |
+| caster, apex chest actually equipped, 60 s | +2.54% | +2.43% |
 | tank, effective health | +4.28% | +4.27% |
 
 The warrior-fury row is the binding one and is the tightest measurement in the
-table (60 seeds, 600 s, standard error under half a point). The caster's 180 s
-row is the only central estimate that touches the line; it is the resource-bound
-reading and section 9.4 says why it is reported rather than tuned against.
+table (60 seeds, 600 s, standard error under half a point). Read it honestly:
+its central estimate is inside at both targets and its 2-standard-error interval
+STRADDLES the line ([3.98, 5.90] at heroic, [3.56, 5.44] at S-rift). What the
+measurement establishes is a central estimate inside the envelope, not a
+demonstrated crossing, and the flask trim in section 10.4 is a conservative
+margin rather than a proof that 15 was outside and 13 is inside. The caster's
+180 s row is the only central estimate that touches the line; it is the
+resource-bound reading and section 9.4 says why it is reported rather than tuned
+against.
 
 Before the tunes the same fixtures read **+5.86% / +6.08%** on warrior fury and
 **+6.24%** on tank effective health, both outside the envelope.
@@ -74,36 +82,55 @@ supplies; the magnitude is the plate's.
 The three consumable aura ids are disjoint by construction, so the whole kit
 rides at once: `well_fed` can never equal `elixir_<kind>`, and the one-flask
 strip keys on the `flask` marker, which Well Fed never carries. The caster's
-maximal legal stack is three auras (int flask, stamina elixir, int plate); the
-physical kit is two, because every pre-packet elixir and scroll is `buff_sta` and
-a stamina flask refuses them downward. Both are pinned in
-`tests/flask_consumables.test.ts`, "the R5 full kit".
+and the physical melee's maximal legal stacks are three auras each (their own
+flask, a stamina elixir, their own plate): the downward refusal fires only inside
+one `elixir_<kind>` family and the singleton strip sheds only flask-marked auras,
+so an attack-power or intellect flask leaves a stamina elixir alone. Only the
+TANK kit is two, because its flask IS the stamina one and refuses the stamina
+elixir downward. All three are pinned in `tests/flask_consumables.test.ts`,
+"the R5 full kit".
 
 ## 3. The baseline, named exactly
 
 R5's baseline is "pre-packet raid BiS". That phrase resolves to three materially
 different numbers in the neck slot alone, so this document fixes it:
 
-> **The baseline pool is PvE, class-equippable, best-in-slot, INCLUDING
-> legendaries and held offhands, with the 17 masterwrought-flagged defs removed.**
+> **The baseline pool is PvE, class-equippable, best-in-slot, with the 17
+> masterwrought-flagged defs removed. The three THROUGHPUT lanes take the
+> repo's maintained EPIC-ONLY pickers; the derived TANK arm additionally takes
+> legendaries and held offhands.**
 
-Legendaries are IN because a raid-BiS character has them and excluding them
-would flatter the packet. The WARFARE honor set's SET BONUSES are out (they are
-paid entirely in PvP ratings and contribute exactly zero in PvE by design), but
-its pieces' raw armour and stamina do count in PvE, so a derived
-max-effective-health pick may take them and the tank baseline below does: three
-of its twelve slots are WARFARE armour. The three throughput lanes use named
-loadouts with no WARFARE piece in them.
+The split is stated rather than assumed because the two readings differ by 20
+stat points in the neck slot alone. The throughput loadouts are
+`bestEpicGearFor(cls, spec)` (`src/sim/dev/bis_gear.ts`, which filters
+`item.quality === 'epic'`, so legendaries and held offhands are excluded by
+construction) with the flagged picks swapped out, plus the fury lane's two
+greatswords; the maintained caster set is `WARLOCK_FULL_BIS_GEAR`. Using the
+epic-only pickers runs in the packet's DISFAVOUR and is therefore the safe
+choice: a legendary-inclusive denominator is stronger, so re-deriving with it
+moves every percentage DOWN, never up. `heart_of_the_rift` (legendary neck,
+primary sum 32) is the piece that would move most, and the tank arm does take it.
 
-The three measured baselines, by id. Every one is pre-packet; none is flagged.
+The WARFARE honor set's SET BONUSES are out (they are paid entirely in PvP
+ratings and contribute exactly zero in PvE by design), but its pieces' raw armour
+and stamina do count in PvE, so a derived max-effective-health pick may take them
+and the tank baseline below does: four of its twelve slots are WARFARE armour.
+The three throughput lanes use named loadouts with no WARFARE piece in them.
 
-**Rogue** (dual wield): `mistcallers_fang`, `heroic_duskwhisper`,
+The four measured baselines, by id. Every one is pre-packet; none is flagged.
+
+**Rogue** (dual wield; `bestEpicGearFor('rogue', spec)` with its two flagged
+picks `wyrmfall_pendant` and `prismglass_loop` replaced by
+`medallion_of_endless_profit` and `architects_cornerstone`): `mistcallers_fang`, `heroic_duskwhisper`,
 `heroic_nighttalon_crown`, `medallion_of_endless_profit`,
 `heroic_nighttalon_shoulderguards`, `basin_stalkers_tunic`, `bonechill_cord`,
 `heroic_wyrmshadow_legguards`, `heroic_wyrmshadow_talongrips`,
 `heroic_wyrmshadow_treads`, `abysswrought_band`, `architects_cornerstone`.
 
-**Warrior, fury** (dual two-handers, the `scripts/fury_dps_probe.ts` kit):
+**Warrior, fury** (dual two-handers: `scripts/fury_dps_probe.ts`'s two
+greatswords and rotation, with the remaining ten slots from
+`bestEpicGearFor('warrior', 'fury')` and its flagged neck pick replaced by
+`medallion_of_endless_profit`):
 `deathless_greatblade`, `bonewrought_greatsword`,
 `heroic_crownforged_dreadhelm`, `medallion_of_endless_profit`,
 `heroic_crownforged_warspaulders`, `emberforged_bulwark`, `gravescale_girdle`,
@@ -129,7 +156,10 @@ Only the DELTA is the packet's.
 
 ## 4. The constants, with anchors
 
-Every conversion below is a pure exported function or a named const in the sim.
+Every conversion below is a pure function or a named const in the sim. Two are
+module-private and must be read in place rather than imported: `apFromStats` is a
+function-local `const` inside `recalcPlayerStats`, and `hpFromStamina` is a
+module-private function, both in `src/sim/entity.ts`.
 
 | quantity | value | anchor |
 |---|---|---|
@@ -145,6 +175,7 @@ Every conversion below is a pure exported function or a named const in the sim.
 | spell hit | 96 percent at parity, minus the same above-level table | `src/sim/types.ts` `spellHitChance` |
 | health from stamina | first 20 points 1 each, the rest 10 each | `src/sim/entity.ts` `hpFromStamina` |
 | item stat budget | `round(level * QUALITY_STAT_MULT * SLOT_STAT_MULT * 0.7)` | `src/sim/item_budget.ts` `primaryStatBudget` |
+| epic item-level bonus | +6, so Perfected source 28 budgets at 34 and the recipe's own 25 at 31 | `src/sim/item_budget.ts` `QUALITY_ILVL_BONUS`, applied by `apexBudgetAtSource` (`src/sim/professions/perfecting.ts`) |
 | Perfected source level | 28 (the apex recipe's own level is 25) | `src/sim/professions/perfecting.ts` `PERFECTED_SOURCE_LEVEL` |
 | worn flagged pieces | 2 | `src/sim/equipment_rules.ts` `MASTERWROUGHT_EQUIP_CAP` |
 
@@ -167,7 +198,8 @@ shape, the tree fixes the target.
 **Heroic raid.** `HEROIC_DUNGEON_TUNING.nythraxis_boss_arena`
 (`src/sim/content/dungeon_difficulty.ts`): `level: 22`, `armorMultiplier: 1.2`.
 `createMob` gives a mob `armorPerLevel * (level - 1)` armor, and the Nythraxis
-template's `armorPerLevel` is 42, so:
+template's `armorPerLevel` is 42 (`nythraxis_scourge_of_thornpeak`,
+`src/sim/content/dungeons.ts`), so:
 
     armor = round(42 * 21 * 1.2) = 1058
     armorReduction(1058, 20) = 1058 / (1058 + 85*20 + 400) = 1058 / 3158 = 33.50%
@@ -182,9 +214,10 @@ template's `armorPerLevel` is 42, so:
 
 Both target levels are fixed here because the framework requires each profile to
 fix "target armor, resistances, level, and position", and R5 names both assets.
-The choice is load-bearing rather than cosmetic: a caster in raid BiS is already
-hit-capped against a level-20 raid boss, so a hit-rating term is worth nothing
-there and everything at level 23. Measuring only one target would have missed a
+The choice is load-bearing rather than cosmetic: a caster in raid BiS carries 160
+hit rating and lands at 98 percent effective spell hit against the level-22
+heroic boss, so most of a further hit term clamps away there and none of it does
+at level 23. Measuring only one target would have missed a
 single-slot outlier worth 2.8 to 4.1 percent (section 11.2).
 
 ## 6. Premise checks, run before any number was sealed
@@ -216,10 +249,12 @@ shelf 285 to 266, the leavers EXACTLY the nineteen movers, **zero joiners**, and
 zero movement in any derived value outside the movers. No apex, heroic, raid or
 vendor number moves on either axis.
 
-`recipe.level` has four consumers. Three feed access gating or pacing. The
-fourth, `perfectedBonusStats`, feeds a POWER magnitude and is the shelf's own
-top, but it is hard-gated to `masterwrought` defs, all of whose recipes sit at
-level 25 and were untouched by 11o. **No 11o-side drift into the shelf.**
+`recipe.level` has four consumers. `perfectedBonusStats` is the only one feeding
+a shelf-band POWER magnitude, and it is hard-gated to `masterwrought` defs, all
+of whose recipes sit at level 25 and were untouched by 11o. Of the other three,
+two feed access gating or pacing and the masterwork bake feeds a magnitude
+outside the shelf band, disclosed in the next paragraph.
+**No 11o-side drift into the shelf.**
 
 One derived magnitude did ride the level change down, disclosed rather than
 hidden: the masterwork proc's baked bonus reads raw `recipe.level`, so on the
@@ -254,6 +289,17 @@ Two notes the framework's own text requires:
   are the method and the probes satisfy them.
 - **The framework names no target level, and R5 names two protected assets.**
   Both are fixed in section 5.
+- **Two departures from the framework's letter, named rather than left silent.**
+  (a) The framework asks every damage specialization for an Area profile
+  (60 s, 5 targets). This pass runs single target only: R5's protected assets are
+  a heroic raid boss and an S-rift boss, and every term in the kit is a flat stat
+  with no area-specific component, so an Area profile would re-measure the same
+  delta against a different denominator. (b) The framework's required report lists
+  per-hand white damage, damage by ability, proc and pet attribution, resource
+  generated and wasted, cooldown uptime and an RNG digest. This pass reports the
+  throughput DELTA between two arms and its standard error, because the quantity
+  R5 governs is that delta and every other column cancels between two arms that
+  share a seed, a rotation, a target and a fixture.
 
 **Damage is summed from the sim's own damage EVENTS**, never from the target's
 health delta. A target that leaves combat regenerates, and an hp-delta reading
@@ -274,15 +320,19 @@ the table: at 5 seeds and 180 s its per-seed deltas ranged from minus 1.2 to plu
 Every apex ARMOUR piece is a stat-and-armour twin of a same-slot, same-armour-class,
 item-level-31 heroic five-man drop, so **base apex adds no shelf height at all**.
 Only Perfecting does, and it adds the difference between the piece's budget at
-source 28 and at its recipe's own level 25:
+source 28 and at its recipe's own level 25. Both levels are raised by
+`QUALITY_ILVL_BONUS.epic = 6` before the budget is taken, so 28 becomes 34 and
+25 becomes 31:
 
     primaryStatBudget(34, epic, chest) - primaryStatBudget(31, epic, chest)
       = round(34 * 1.0 * 1.0 * 0.7) - round(31 * 1.0 * 1.0 * 0.7)
       = 24 - 22 = 2
 
-which gives +2 on chest, mainhand, helmet, shoulder, held offhand, gloves and
-waist, and +1 on legs, feet, neck and ring; a two-hander takes +2 (the two-hand
+which gives +2 on chest, mainhand, held offhand, gloves, waist and the shield,
+and +1 on legs, feet, neck and ring; a two-hander takes +2 (the two-hand
 multiplier applies before the rounding on both sides, so it does not compound).
+The formula gives +2 on helmet and shoulder too, but the apex set occupies
+neither slot, so no piece collects it.
 
 Of that, **at most +1 lands on the lead throughput stat per piece**: the bonus is
 distributed by largest-remainder rounding over the piece's own stat profile, so a
@@ -294,7 +344,18 @@ figure the measurement uses for every lane. It is an upper bound in two ways: a
 character whose baseline in a slot is a legendary gains nothing there (the apex
 weapon is 20 to 25 points behind a legendary one, and `heart_of_the_rift` is 17
 ahead of the apex neck), and a set-complete caster who takes an apex chest breaks
-a set bonus worth more than the point.
+a set bonus worth more than the piece.
+
+The abstract term deliberately excludes the apex pieces' own RATING lines, and
+the caster chest is the slot where that exclusion could hide the most, so it is
+MEASURED rather than argued. The maximal caster loadout, `sunspun_vestments`
+actually equipped as one of the two Perfected pieces (its haste 40, its Perfected
+`{int:1, spi:1}`, and the Perfected-only `enchant_lucent_infusion` on that slot),
+runs as its own arm in section 9.2. It reads about 2.4 points BELOW the abstract
+term, not above it: the Mournweave 3-piece it breaks is +10 intellect and +10
+stamina, which 40 haste rating (2 percent cast rate) does not repay. So the
+abstract +2 lead-stat model is the conservative reading for the caster too, and
+the exclusion is a bound in the safe direction rather than a gap.
 
 Measured contribution: **+0.24% to +1.25%** across the lanes.
 
@@ -350,23 +411,39 @@ the envelope by a wide margin.
 
 ### 9.1 Fixture
 
+**The harness is committed: `scripts/r5_envelope_probe.ts`.** Run it whole with
+`npx tsx scripts/r5_envelope_probe.ts`, or one lane at a time by passing `rogue`,
+`fury`, `caster` or `tank`; `WOC_R5_SEEDS` and `WOC_R5_SECONDS` override the
+sample. Every figure in sections 9.2 and 9.5 comes out of it, and its constants
+(`HEROIC_TARGET`, `SRIFT_TARGET`, the baseline loadouts, the enchant maps, the
+kit deltas) are the section-3 and section-8 tables in executable form.
+
 Level 20, `autoEquip: false`, an ambient-free world (no camps, npcs or ground
 objects), the probe anchored in the open field, and an inert target: `hostile`,
 `aiState: 'idle'`, `moveSpeed: 0`, zero weapon damage, the section-5 level and
 armor. Resources are never refilled. Rotations are the repo's own: the rogue
 lane runs the `scripts/rogue_dps_probe.ts` priority list and the La Luna build;
 the fury lane runs the `scripts/fury_dps_probe.ts` rotation and rows; the caster
-lane spams frostbolt and drinks `sunpetal_mana_draught` on cooldown, both arms
+lane is a MAGE at the class's default spec (the probe calls no `setSpec`, so no
+spec mastery multiplier rides on either arm) spamming frostbolt, the level-20
+mage's own single-target filler, wearing the maintained caster BiS set that
+`WARLOCK_FULL_BIS_GEAR` happens to name (every piece of it lists `mage` in
+`requiredClass`), and drinking `sunpetal_mana_draught` on cooldown, both arms
 alike.
 
-The packet's delta is applied to the kit arm as instance `rolled.stats` and
-auras, which is the same channel an enchant and a Perfected bonus really use, so
-the kit arm is the baseline character plus exactly the section-8 terms.
+On the three THROUGHPUT lanes the packet's delta is applied to the kit arm as
+instance `rolled.stats` and auras, which is the same channel an enchant and a
+Perfected bonus really use, so the kit arm is the baseline character plus exactly
+the section-8 terms. Two arms depart from that model and say so where they are
+reported: the maximal caster arm (9.2) and the whole tank arm (9.5) SWAP ITEMS
+instead, because their gear term is a rating line or armour rather than a lead
+primary.
 
 ### 9.2 Results
 
-Rogue and caster: 25 seeds, 180 s. Warrior fury: 60 seeds, at both 180 s and
-600 s. Error bars are 2 standard errors on the difference.
+Rogue: 25 seeds, 180 s. Caster: 25 seeds, at both the 60 s burst and the 180 s
+sustained profile. Warrior fury: 60 seeds, at both 180 s and 600 s. Error bars
+are 2 standard errors on the difference.
 
 | lane | target | gear | gear + enchant | FULL KIT |
 |---|---|---|---|---|
@@ -376,12 +453,30 @@ Rogue and caster: 25 seeds, 180 s. Warrior fury: 60 seeds, at both 180 s and
 | warrior, fury | heroic | +1.25% | +2.15% | **+4.94% +/-0.96** |
 | caster, 60 s | heroic | +0.57% | +1.06% | **+4.55%** |
 | caster, 180 s | heroic | +0.50% | +1.11% | **+5.06% +/-3.03** |
+| caster, 60 s, apex chest equipped | heroic | (item swap) | (item swap) | **+2.54%** |
+| caster, 180 s, apex chest equipped | heroic | (item swap) | (item swap) | **+2.53%** |
 | rogue, combat | S-rift | +0.24% | +0.69% | **+3.22%** |
 | rogue, assassination | S-rift | +0.44% | +0.92% | **+3.86%** |
 | rogue, subtlety | S-rift | +0.44% | +0.89% | **+3.79%** |
 | warrior, fury | S-rift | +0.84% | +2.31% | **+4.50% +/-0.94** |
 | caster, 60 s | S-rift | +0.39% | +1.06% | **+4.58%** |
 | caster, 180 s | S-rift | +0.39% | +0.95% | **+4.75% +/-4.17** |
+| caster, 60 s, apex chest equipped | S-rift | (item swap) | (item swap) | **+2.43%** |
+| caster, 180 s, apex chest equipped | S-rift | (item swap) | (item swap) | **+2.36%** |
+
+The two "apex chest equipped" rows are the MAXIMAL caster loadout and the only
+throughput arm that swaps an item: `sunspun_vestments` replaces
+`heroic_necromancers_starshroud` as one of the two Perfected pieces, carrying its
+haste 40 and its Perfected `{int:1, spi:1}`, and the chest enchant becomes the
+Perfected-only `enchant_lucent_infusion` at 13 rather than the pre-packet 7.
+Their gear and enchant columns are blank because the swap is not decomposable
+into those terms. The loadout reads about 2.4 points BELOW the abstract kit
+because it breaks the Mournweave 3-piece (+10 intellect and +10 stamina), which
+the chest's rating line does not repay. A caster whose best chest is not a set
+piece would keep the haste and pay no set penalty, but that character's baseline
+is correspondingly weaker and the tree maintains no such BiS set to measure
+against; the effect is bounded by the +2.00 percent a 40-haste line is worth at
+either target.
 
 The fury FULL figures are the 600 s, 60-seed runs (base 167.82 to kit 176.10 at
 heroic; base 151.93 to kit 158.77 at S-rift). Its 180 s, 60-seed twins read
@@ -413,7 +508,23 @@ recorded so the coupling is visible.
 
 ### 9.5 The tank effective-health arm
 
-Effective health is `maxHp / (1 - armorReduction(armor, attackerLevel))`.
+Effective health is `maxHp / (1 - armorReduction(armor, attackerLevel))`. This
+arm SWAPS ITEMS rather than adding a stat delta, because its gear term is armour
+and stamina rather than a lead primary. Its inputs, all executable in
+`scripts/r5_envelope_probe.ts` (`TANK_BIS`, `TANK_ENCH`, `TANK_KIT_ITEMS`,
+`TANK_KIT_DELTA`):
+
+- the section-3 tank baseline in the `prot` spec at level 20;
+- the pre-packet enchant set both arms carry: mainhand str 5, gloves str 3,
+  shoulder and both rings str 2, helmet and legs sta 6, chest sta 7, waist and
+  offhand sta 3, feet sta 2, neck spi 3;
+- the two Perfected pieces a protection warrior can actually wear:
+  `duskforged_bulwark` in the offhand (Perfected `{str:1, sta:1}`) replacing
+  `heroic_bonewrought_bulwark`, and `forgefold_legguards` (Perfected `{str:1}`)
+  replacing `furyforged_legguards`;
+- a chest enchant step of +3, not +6: no mail or plate apex chest ships, so the
+  Perfected-only Lucent Infusion is unreachable for a plate wearer;
+- `ironhusk_flask` REPLACING the serpent elixir rather than riding beside it.
 
 | arm | hp | armor | EHP vs level 22 | delta |
 |---|---|---|---|---|
@@ -422,9 +533,19 @@ Effective health is `maxHp / (1 - armorReduction(armor, attackerLevel))`.
 | consumables + apex chest enchant | 3472 | 3369 | 8625 | +4.20% |
 | full kit (2 Perfected pieces) | 3472 | 3373 | 8631 | **+4.28%** |
 
+The last row's +4 armour with ZERO health is the piece swap, not a stat delta,
+and it is worth spelling out because no additive model produces it: the shield is
+armour-identical (680 on both sides) and nets +1 stamina from Perfecting, the
+legs are armour-identical (315 on both sides) and net minus 1 stamina (9 against
+10), so stamina lands at 326 either way and health does not move. Strength nets
++4 (shield 6 to 6, legs 8 to 12) and protection's `armorFromStrPct` turns that
+into the +4 on the stat book.
+
 Against a level-23 attacker: 8099 to 8445, **+4.27%**. Protection's stamina
-multiplier amplifies the flat stamina terms, which is why a +7 raw stamina
-consumable delta reads as +100 health.
+multiplier (`staPct: 0.40` on the prot mastery,
+`src/sim/content/talents_warrior.ts`, which also carries `armorPct: 0.10` and
+`armorFromStrPct: 0.70`) amplifies the flat stamina terms, which is why a +7 raw
+stamina consumable delta reads as +100 health.
 
 Before this phase's shield tune the same arm read **+6.24%**, most of it armour.
 
@@ -442,8 +563,13 @@ what the packet's ratified arithmetic counted ("the full physical kit at 4.2 to
 4.7 percent" was computed on a single-weapon model). At 6 it is the 2 the
 envelope was ratified on. The rung still sits strictly above Greater and the
 strength and intellect twins still match byte for byte, as ruling D10-D1
-requires. This is the one tune that is a CORRECTION rather than a nerf: it
-restores the number the packet was approved on.
+requires. This is the one tune that is a CORRECTION rather than a nerf: it puts
+the weapon term back at the size the packet's ratified arithmetic is consistent
+with. It does not by itself return the kit to the ratified 4.2 to 4.7 percent
+band. The measured post-tune physical kit is 4.94 at heroic and 4.50 at S-rift,
+inside the R5 envelope but above that band's top at heroic; the band was a
+ratified estimate, the envelope is the contract, and it is the envelope this
+phase measures against.
 
 ### 10.2 `sunspun_vestments`, hit rating 40 to haste rating 40
 
@@ -457,13 +583,20 @@ Lionheart shape the packet's own research names.
 
 Measured against an S-rift target, where spell hit is uncapped, that one slot was
 worth **+2.8 to +4.1 percent of throughput** against a 5 percent budget for the
-whole kit. Against a heroic raid boss a raid-BiS caster is already hit-capped and
-the same piece is a downgrade, which is why fixing both target levels mattered.
+whole kit. Against the heroic raid boss the same piece is close to a WASH rather
+than an outlier, and the mechanism is a clamp rather than a cap: a raid-BiS
+caster carries 160 hit rating and sits at 98 percent effective spell hit, so
+`min(1, ...)` clamps half of a further 40 hit away and the piece reads +2.04
+percent against haste-40's +2.00. That is exactly why fixing both target levels
+mattered. At one target the swap is a rounding error; at the other it removes
+2.4 points.
 
 Haste still complements the reference drop's crit, so the rule the other eight
-armour pieces follow is untouched. The apex armour set now hands out no hit at
-all: the complement rule forces the one hit slot to be the single piece whose
-reference does not carry hit, and that piece was the cloth chest.
+armour pieces follow is untouched. The nine WEARABLE apex armour pieces now hand
+out no hit at all: the complement rule forces the one hit slot to be the single
+piece whose reference does not carry hit, and that piece was the cloth chest.
+The apex shield keeps its reference's hit at 20, which is the held-and-shield
+family's own band and a threat stat rather than a caster one.
 
 ### 10.3 `duskforged_bulwark`, armor 732 to 680 and blockValue 32 to 30
 
@@ -471,8 +604,12 @@ Both numbers extrapolated the shield ladder two item levels past
 `bonewrought_bulwark` at the epic mail chest line's slope. The extrapolation is
 internally sound and it produced **the best mitigation item in the game**: the
 heroic variant generator passes armour and blockValue through untouched, so
-`heroic_bonewrought_bulwark` still reads 680 and 30 at item level 33 and no
-heroic upgrade could ever answer a crafted shield.
+`heroic_bonewrought_bulwark` still reads 680 and 30 at item level 33, so before
+the tune the item-level-33 raid shield could never even MATCH the crafted one.
+It now ties it exactly, and the two are separated by their ratings (the raid
+shield's hit 55 plus crit 20 against the crafted piece's hit 20) and by strength,
+which is the shape the packet wants: a crafted piece beside the raid line, never
+above it.
 
 Measured, the inversion took the reference tank's physical damage down about
 **1.0 percent** at both attacker levels, on the axis the protected asset is
@@ -501,19 +638,50 @@ is untouched at the ladder's own step. The sweep now pins both bounds, so neithe
 a climb back to the ladder step nor a slide under the ceiling can pass.
 
 The crafted stamina ceiling consequently reads **flask 13 plus plate 6 for 19**,
-not the 21 the packet's earlier records quote. Ruling 11c-D-2's outcome is
-unaffected: it rejected an apex food of 8 because that broke the kit arithmetic,
-and a smaller flask makes the sum smaller still.
+not the 21 the packet's earlier records quote. Ruling 11c-D-2's OUTCOME is
+unaffected, but its stated REASON no longer carries it, and that is recorded here
+rather than left to be rediscovered. 11c-D-2 rejected an apex food of 8 because
+"flask 15 plus food 6 equals 21" and an 8 broke that sum; at flask 13 an apex
+food of 8 sums to exactly 21, the number the ruling treated as acceptable. What
+keeps 8 rejected now is the LADDER, not the sum: the apex plate must sit exactly
+one rung above farming's top rung of 5, and that ordering is what the Well Fed
+band and dominance arms in `tests/masterwrought_budget.test.ts` pin. The ruling
+stands on the pinned rule; only its arithmetic rationale is superseded.
+
+Two smaller tunes were available and are recorded as NOT taken, with the reason.
+(a) **Flask 14.** By section 8.3's own sensitivity (0.13 to 0.18 points per stat)
+it would land the pre-tune fury reading at roughly 4.8 to 5.0, which is inside
+but with no margin at all over a measurement whose interval already straddles the
+line. (b) **Tune only `warboar_flask` and `runewater_flask`.** `ironhusk_flask`
+is `buff_sta` and contributes exactly zero to "total throughput", so leaving it
+at 15 would cost nothing on any throughput lane; the price is that the tank arm
+would move to roughly +5.1 percent and the three role flasks would lose their
+uniform magnitude. 13 across all three was chosen for the margin and the
+uniformity. Nothing structural forced it, and both alternatives remain open to a
+future tuning pass that wants the ladder step back.
 
 ## 11. The adversarial stat-shape audit (R14, Lionheart/Lariat)
 
 Every apex item was audited against the scarce-stat and stat-light-slot rules.
+"Apex" carries three scopes in this packet and they are distinguished wherever it
+matters: the **17 masterwrought-FLAGGED defs** (the equippable set), the **33
+apex recipe OUTPUTS** (which also include stations and consumables), and the **10
+apex ARMOUR pieces** (nine wearable plus the shield).
 
 **R14 passes cleanly.** All three jewelry pieces are pure primary plus stamina,
 each sums exactly `primaryStatBudget(31, epic, slot)`, each carries exactly one
-rating at the jewelry band's 25, and no apex def carries a proc, an on-use, or a
-spell-power line. No apex item offers a stat combination a wearer could not
-already assemble in that slot, so the Lariat "new shape" hazard is absent.
+rating at the jewelry band's 25, and no WEARABLE apex def carries a proc, an
+on-use, or a spell-power line. (Three apex OUTPUTS do carry `use` payloads:
+`masters_field_forge`, `grand_cauldron` and `laden_hearth`. None is equipment;
+all three are placeable stations, so R14's equipment rule is not in play.)
+
+The packet does introduce one combination the slot did not previously hold: a
+cloth chest carrying haste, since every pre-packet cloth chest carries either no
+rating or crit. It carries it at the ordinary armour-family rate of one rating at
+40, which is the same price every other apex armour piece pays, so it is a new
+SHAPE at a known rate rather than a Lariat's new-shape premium. It is also the
+least-bad option in the slot: the complement rule forbids crit (the reference
+carries it) and hit is the double-value field this phase tuned away from.
 
 **One outlier stood and was tuned down**: `sunspun_vestments` (section 10.2).
 
@@ -522,19 +690,28 @@ already assemble in that slot, so the Lariat "new shape" hazard is absent.
 - `wyrmfall_pendant` is the packet's dominant piece and the closest thing to a
   Lariat it contains: it is the only flagged def with neither an armour class nor
   a class restriction, so all nine classes wear the same neck, and the neck slot
-  has no pre-packet PvE item-level-31 incumbent at all (the field tops out at 12
-  at item level 26). Perfected 15 against 12 is the packet's largest single-slot
-  move. It sits exactly on its budget and its rating is the vendor band's, so
+  has no pre-packet PvE EPIC item-level-31 incumbent at all (the epic field tops
+  out at 12 at item level 26, and the three item-level-31 necks are PvP honor
+  rows). The legendary `heart_of_the_rift` sits 17 points ABOVE the Perfected
+  apex neck, so a character holding it gains nothing here, which is the same
+  bound section 8.1 states. Perfected 15 against the best epic 12 is the packet's
+  largest single-slot move against the throughput baseline. It sits exactly on its budget and its rating is the vendor band's, so
   there is no number to bring down; it is named here so the concentration is on
   the record.
 - `gyrelens_array` is the Lionheart shape in miniature and it is self-limiting:
-  its two-stat profile concentrates a smaller budget into +3 intellect over the
-  item-level-33 heroic orb, but it gives up 55 rating to do it, which is the
-  larger term. The compensating relation is now stated in the sweep.
+  its two-stat profile concentrates a smaller budget into +2 intellect over the
+  item-level-33 heroic orb (+3 once Perfected), but it gives up 55 rating to do
+  it, which is the larger term. The compensating relation is now stated in the sweep.
 - `warhewn_signet` is a strict superset of the item-level-26 vendor ring
   `seal_of_the_nine_oaths` by one point on each axis with the same rating field.
   That is what five item levels buy, and hit at 25 is the vendor band's own
-  allocation for a strength ring. The band-scoped twin sweep pins the rule that
+  allocation for a strength ring. It carries the same double-value rating that
+  made `sunspun_vestments` a tune, so the asymmetry is stated rather than left
+  implicit: the chest was the SOLE carrier of hit in its slot and family, at 40,
+  while the ring sits at the jewelry band's 25 beside a pre-packet vendor twin
+  that already allocates hit to a strength ring. Concentration at the band rate
+  beside an incumbent is progression; concentration with no incumbent at twice
+  the rate is the Lionheart shape. The band-scoped twin sweep pins the rule that
   actually matters (no two pieces the same shape in the same band).
 
 ## 12. The gray-grind record (qr-GRAY)
@@ -544,6 +721,8 @@ the 11e, 11f and 11i pacing models were all derived against the shipped
 multiplier. This is the judgment surface for the future-tier revisit.
 
 ### 12.1 The gain function
+
+Every symbol in this subsection is in `src/sim/professions/wheel.ts`.
 
 `tierForSkill(skill) = floor(skill / 25)` with `TIER_SKILL_STEP = 25`. A craft's
 capability tier is `tierForSkill(currentSkill)`; a recipe's tier is
@@ -564,18 +743,34 @@ Cheap = the lowest-`skillReq` recipe that still yields anything.
 | craft | intended | cheap path | ratio | the cheap recipe (skillReq, reagent value) |
 |---|---|---|---|---|
 | engineering | 125 | 375 | 3.00 | `recipe_cogwheel_blank` (0, 26c) |
-| alchemy | 125 | 375 | 3.00 | `recipe_growth_tonic` (0, 11c) |
+| alchemy | 150 | 375 | 2.50 | `recipe_growth_tonic` (0, 11c) |
 | cooking | 125 | 375 | 3.00 | `recipe_tough_jerky` (0, 4c) |
 | leatherworking | 125 | 375 | 3.00 | `recipe_fenbridge_hide_boots` (0, 14c) |
 | tailoring | 125 | 375 | 3.00 | `recipe_homespun_mitts` (0, 15c) |
 | inscription | 125 | 375 | 3.00 | `recipe_silverleaf_scroll` (0, 17c) |
-| enchanting | 150 | 250 | 1.67 | `recipe_gatherers_cache` (25, 383c) |
+| enchanting | 150 | 225 | 1.50 | `recipe_gatherers_cache` (25, 383c) |
 | jewelcrafting | 125 | 375 | 3.00 | `recipe_hammered_copper_band` (0, 33c) |
 | weaponcrafting | 125 | 375 | 3.00 | `recipe_copper_bearded_axe` (0, 29c) |
 | armorcrafting | 125 | 375 | 3.00 | `recipe_coppermail_sabatons` (0, 31c) |
 
-Worked by hand, cooking, so the table is reproducible from this document alone.
-Intended path, band-matched so the multiplier is 1 on every leg: 25 crafts of
+Two rows do not read 125 / 375 / 3.00 and both reasons are structural.
+**Alchemy's** intended path is 150 because it has no repeatable band-3 recipe
+(section 12.4): its repeatable `skillReq` set is 0, 25, 50, 100, 125, so the 75
+to 100 leg runs at the 0.5 multiplier and costs 50 crafts rather than 25.
+**Enchanting's** two columns BOTH start at skill 25, because its lowest
+`skillReq` is 25 and nothing on its roster is craftable at skill 0 at all; from
+that start the cheap path is 25 + 50 + 100 on `gatherers_cache` then 50 on
+`recipe_lucent_reagent`, which is 225.
+
+The CRAFT-COUNT columns are worked by hand below, so they reproduce from this
+document alone. The reagent-value column does NOT: "reagent value" means the sum
+over a recipe's reagents of each reagent's `sellValue` times its quantity, read
+out of the live catalog, so re-deriving it means re-running that read rather than
+working from anything printed here. The same applies to the 8075 copper below and
+to every cost figure in 12.3.
+
+Cooking, worked by hand. Intended path, band-matched so the multiplier is 1 on
+every leg: 25 crafts of
 `recipe_tough_jerky` (0 to 25), 25 of `recipe_ashwood_smoked_eel` (25 to 50), 25
 of `recipe_silvered_carp_supper` (50 to 75), 25 of
 `recipe_highwatch_barley_porridge` (75 to 100), 25 of
@@ -586,15 +781,27 @@ for 25 crafts, at 0.5 for 50, at 0.25 for 100 (it dies at 75), then the eel at
 
 ### 12.3 Three corrections the measurement forced
 
+The three paths compared here are, precisely: **intended**, the cheapest recipe
+whose tier equals the crafter's current tier (falling back to the highest tier
+available when the band has no row); **floor spam**, the lowest-`skillReq`
+recipe that still pays anything; and **cheapest**, the lowest reagent cost per
+skill point among the recipes that still pay. All three walk one craft at a time
+through the real `craftSkillGainMultiplier` and `gainCraftSkill`, exclude
+`oncePerDay` rows, refuse any recipe whose `skillReq` is above the current skill,
+and start at the craft's own lowest `skillReq`.
+
 - **The qr-GRAY row's own claim is false as literally written.** It says the
   cheapest path to any skill number is always bulk-spamming low recipes. Measured
   in reagent value, the tier-0 spam path is DEARER than the intended path for 8
   of the 10 crafts (only leatherworking and inscription come out cheaper), and it
   costs three times the crafts. The gray grind is real; its lever is not the
-  floor. The genuinely cheapest path in materials is **staying one or two tiers
-  under the band**, which beats the intended path for 10 of 10 crafts at 0.60 to
-  0.88 of the cost, taking 1.0x to 2.6x the crafts. That is the arbitrage a
-  future revisit should aim at.
+  floor. The genuinely cheapest path in materials is **the lowest reagent cost
+  per skill point among the recipes that still pay**, which in practice means
+  staying one or two tiers under the band rather than at the floor. It beats the
+  intended path for 9 of the 10 crafts at 0.66 to 0.88 of the cost, taking 1.0x
+  to 2.6x the crafts; enchanting is the tenth and it ties at 1.00, because with
+  only three rows its cheapest-per-point path IS its intended path. That
+  arbitrage, not the floor spam, is what a future revisit should aim at.
 - **Enchanting's cheapest path is not a recipe.** Its roster is three rows (two
   at 25, one at 75) with no tier-0, tier-2, tier-4 or tier-5 recipe at all, so
   its recipe path costs 150 crafts rather than 125. 125 disenchants of epic input
@@ -623,7 +830,7 @@ Each row names the tripwire and the guard that reds if it moves.
 
 | if this moved | the envelope moves by | pinned in |
 |---|---|---|
-| a flask value | about 2.4 points per 6 stat | `tests/masterwrought_budget.test.ts`, the flask band arm (both bounds) |
+| a flask value | about 0.8 to 1.1 points per 6 stat, from section 8.3's 0.13 to 0.18 points per stat | `tests/masterwrought_budget.test.ts`, the flask band arm (both bounds) |
 | an apex plate value or duration | the food term directly | the same file's Well Fed band and dominance arms |
 | an apex weapon enchant | 1 point per hand, so 2 on a dual-wielder | `tests/enchants_magnitude_invariants.test.ts` (magnitudes and the loadout-aware stacks) |
 | a Perfected piece's total against its slot | the gear term | `tests/masterwrought_budget.test.ts`, "a Perfected apex piece stays within its pinned lead" |
@@ -642,13 +849,29 @@ strip shedding Well Fed, a flask refused while Well Fed rides, Well Fed's stamin
 never folding into the stat book, a retired-namespace literal planted in
 `server/`, an unquoted retired key in the icon map, a per-kind aura id at the
 mint, an apex-band crafted output authored outside the apex arrays, and the apex
-plate's duration reverted. **All twelve red.** Each run proved its baseline green
-and its patch applied, and both worktrees ended with a clean porcelain.
+plate's duration reverted. **All twelve red.** Each run proved its baseline
+green, its patch applied and its tests actually executed, and every worktree
+ended with a clean porcelain. The worktrees were throwaway and are gone, so this
+is a maintainer RECORD of a run rather than a reproducible artifact; the twelve
+mutations are named above so any of them can be re-applied by hand.
 
 ## 14. Recorded, not acted on
 
 - **The framework's tool table is stale** (section 7). Its three named tools
-  cannot measure a gear kit; the probe family can and does.
+  cannot measure a gear kit; the probe family can and does. The committed
+  `scripts/r5_envelope_probe.ts` is a fourth member of that family and the table
+  should name them.
+- **The apex weapon rung is now +1 over Greater, which is a DEMAND risk under
+  R21.** `src/sim/content/enchants.ts` carries its own law that every Greater
+  enchant must beat the best base option on its slot and axis by at least 3, on
+  the stated reasoning that a shard tier collapsing to a point or two over base
+  kills the `arcane_shard` sink. The Lucent weapon rung now clears Greater by
+  exactly 1 while costing a `lucent_reagent`, an `arcane_shard` and two
+  `arcane_essence` at enchanting 100: the same shape, one tier up. The envelope
+  forced it (the term lands twice on a dual-wielder, so +2 over Greater is +4 on
+  the binding lane), and raising it is precisely the move R5 forbids. Recorded
+  as a judged risk to the `lucent_reagent` sink for a future demand pass, not
+  tuned here.
 - **The phase file's "11e decision 6"** is ruling 11g-D-C, landed in 11g. The
   content is correct; the label is stale.
 - **The server PBE boost gives a prot tank a caster belt.** `spiritweld_girdle`
@@ -658,7 +881,10 @@ and its patch applied, and both worktrees ended with a clean porcelain.
   is server scorer logic, which is outside this phase's scope. `spiritweld_girdle`
   is correct on its own budget and must not be nerfed for it.
 - **`REF_ARMOR = 2861` is a pinned calibration constant, not a live property of
-  the catalog.** The real max-armour kit is several hundred points above it and
+  the catalog** (`tests/heroic_difficulty_floors.test.ts` and its three sibling
+  floor suites, `tests/rift_difficulty_floors.test.ts`,
+  `tests/gravewyrm_normal_tuning.test.ts`,
+  `tests/wildheart_normal_tuning.test.ts`). The real max-armour kit is several hundred points above it and
   was already so before this packet. Raising it would move every difficulty floor,
   so this phase pinned the claim that protects the model instead: removing the
   packet's defs leaves the max-mitigation kit unchanged.
