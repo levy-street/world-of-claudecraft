@@ -32,6 +32,7 @@ vi.mock('../server/db', () => ({
   loadMarketState: vi.fn(async () => null),
   loadMailState: vi.fn(async () => null),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   acquireCharacterLease: vi.fn(async () => true),
   releaseCharacterLease: vi.fn(async () => {}),
   heartbeatCharacterLeases: vi.fn(async () => {}),

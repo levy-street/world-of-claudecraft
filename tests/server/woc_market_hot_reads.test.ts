@@ -1219,6 +1219,11 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // occupancy metric off the same instance.
     expect(code).toContain('if (!wocEscrowGate.saturated()) return false;');
     expect(code).toContain("gameMetricsCounters().wocEscrowQueue('realm_refused')");
+    // The background-gate starvation arm inside the FIFO job counts BEFORE it
+    // throws (the enum member alone proves nothing about emission; this is
+    // the realm_refused idiom for a closure only main.ts can host).
+    expect(code).toContain("gameMetricsCounters().wocEscrowQueue('permit_refused');");
+    expect(code).toContain("throw new Error('woc escrow refused: no background database permit');");
     expect(code).toContain('escrowGateInFlight: () => wocEscrowGate.stats().inFlight');
     // The stamp-ledger crossing counter rides the readout beside the
     // serialize stats.

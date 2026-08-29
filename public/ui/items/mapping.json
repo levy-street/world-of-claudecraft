@@ -6062,6 +6062,31 @@
         "ps_briny_lure",
         "ps_lustrous_pearl"
       ]
+    },
+    {
+      "batchId": "bank-storage-painted-bags-2026-08-25",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated under woc-item-icon-v1. Exact per-item prompts, ordered repository reference roles, original results, normalized masters, shipping hashes, processing, review evidence, and retired-placeholder supersession records are retained in docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json.",
+      "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+      "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/",
+      "provenanceRecords": [
+        "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+      ],
+      "itemIds": [
+        "burlap_reagent_pouch",
+        "duskweave_bag",
+        "foragers_haversack",
+        "loombound_reagent_satchel",
+        "necromancers_reagent_satchel",
+        "resonant_weave_bag",
+        "wayfarers_backpack"
+      ]
     }
   ]
 }

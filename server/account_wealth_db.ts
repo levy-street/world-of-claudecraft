@@ -19,6 +19,7 @@
 // doctrine), so any per-member share would be fiction. The account detail
 // endpoint surfaces each character's guild treasury as context instead.
 
+import { BANK_LEDGER_LARGE_MOVEMENT_PREDICATE_SQL } from './bank_ledger_indexes';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
 
 // account_wealth is bounded (one row per account, cascade-deleted with the
@@ -355,7 +356,7 @@ export interface LargeGoldMovementRow {
 
 // Far BELOW the pool default, same reasoning as GUILD_BANK_LOG_TIMEOUT_MS in
 // server/db.ts: the intended cost is a bounded backward scan of the
-// bank_ledger_account_recent index, but that index is built CONCURRENTLY after
+// bank_ledger_account_large_recent index, but that index is built CONCURRENTLY after
 // listen (server/bank_ledger_indexes.ts), so a realm can serve this read
 // before it exists, and a missing or INVALID index turns it into a sequential
 // scan of a keep-forever table. Two seconds fails this one admin read instead
@@ -367,7 +368,6 @@ export const LARGE_GOLD_MOVEMENTS_TIMEOUT_MS = 2_000;
  *  trade, and mail flows are not ledgered and cannot appear here). */
 export async function largeGoldMovementsForAccount(
   accountId: number,
-  thresholdCopper: number,
   limit: number,
 ): Promise<LargeGoldMovementRow[]> {
   const res = await runWithStatementTimeout(LARGE_GOLD_MOVEMENTS_TIMEOUT_MS, (query) =>
@@ -376,10 +376,10 @@ export async function largeGoldMovementsForAccount(
             l.copper_delta, l.created_at
      FROM bank_ledger l
      LEFT JOIN characters c ON c.id = l.character_id
-     WHERE l.account_id = $1 AND abs(l.copper_delta) >= $2
+     WHERE l.account_id = $1 AND ${BANK_LEDGER_LARGE_MOVEMENT_PREDICATE_SQL}
      ORDER BY l.id DESC
-     LIMIT $3`,
-      [accountId, thresholdCopper, limit],
+     LIMIT $2`,
+      [accountId, limit],
     ),
   );
   return res.rows.map((row) => ({

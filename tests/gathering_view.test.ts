@@ -33,6 +33,8 @@ function makeWorld(opts: {
   harvestable?: (nodeId: string) => boolean;
   proficiency?: Record<string, number>;
   inventory?: InvSlot[];
+  /** Equipped bag sockets; defaults to none (the base 16-slot general pool). */
+  bags?: (string | null)[];
   /** The R40 deny-mirror states (gatherEffectPrompt); default all clear. */
   dead?: boolean;
   inCombat?: boolean;
@@ -67,10 +69,11 @@ function makeWorld(opts: {
       drinking: null,
       auras: opts.auras ?? [],
     },
-    bags: [null, null, null, null],
-    // buildNearbyGatherNodes resolves the locked dimension from the
-    // viewer's bags; an empty bag reads as no tool owned at all (#2343:
-    // bare hands never gather, so every node locks without its tool).
+    bags: opts.bags ?? [null, null, null, null],
+    // buildNearbyGatherNodes resolves the locked dimension from the viewer's
+    // PACK (the inventory below, not the bag sockets above); an empty pack
+    // reads as no tool owned at all (#2343: bare hands never gather, so
+    // every node locks without its tool).
     inventory: opts.inventory ?? [],
     // The plain counter map the wield-filtered scan reads (R22), beside the
     // professionsState rows the display surfaces read: both derive from the
@@ -367,6 +370,39 @@ describe('tool-tier lock dimension', () => {
     // No slot, and an unknown node id: never ask.
     expect(gatherEffectPrompt(makeWorld({ inventory: T1_PICK }), NODE.id)).toBeNull();
     expect(gatherEffectPrompt(slotted(), 'no_such_node')).toBeNull();
+  });
+
+  it('gatherEffectPrompt is pool-aware: materials headroom keeps the ask alive past the flat total', () => {
+    // The discriminating fixture for the two-pool migration at
+    // gathering_view.ts (the countFit pre-gate): 17 non-material slots (the
+    // pick included) sit OVER the 16-slot general pool after a satchel swap,
+    // and 11 full ore stacks leave exactly one materials slot free. The old
+    // flat pooled-total model reads 28 used against a 28 total and would
+    // suppress the ask; the two-pool gate sees the free materials slot the
+    // fine yield can take, so it still asks. Dropping the satchel removes
+    // that headroom and the ask with it, which pins the pools READ as
+    // world.bags rather than any precomputed scalar.
+    const promptSlot = {
+      professionId: 'mining',
+      effectId: 'artisans_eye',
+      charges: 5,
+      maxCharges: 30,
+      confirmMode: 'prompt' as const,
+    };
+    const filler = Array.from({ length: 16 }, (_, i) => ({ itemId: `gear_${i}`, count: 1 }));
+    const ore = Array.from({ length: 11 }, () => ({ itemId: 'copper_ore', count: 20 }));
+    const packed = [...T1_PICK, ...filler, ...ore];
+    const withSatchel = makeWorld({
+      inventory: packed,
+      bags: ['foragers_haversack', null, null, null],
+      toolEffectSlots: [promptSlot],
+    });
+    expect(gatherEffectPrompt(withSatchel, NODE.id)).toEqual({
+      effectId: 'artisans_eye',
+      charges: 5,
+    });
+    const noSatchel = makeWorld({ inventory: packed, toolEffectSlots: [promptSlot] });
+    expect(gatherEffectPrompt(noSatchel, NODE.id)).toBeNull();
   });
 
   it('gatherEffectPrompt never asks about a use that cannot matter (tool past the rung)', () => {

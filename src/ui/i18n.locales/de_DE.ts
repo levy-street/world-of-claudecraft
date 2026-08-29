@@ -4233,6 +4233,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'Min',
   'itemUi.kind.bag': 'Tasche',
   'itemUi.tooltip.bagSlots': 'Tasche mit {slots} Plätzen',
+  'itemUi.tooltip.bagSlotsMaterials': 'Materialtasche mit {slots} Plätzen',
   'sim.delve.baptistryEggs':
     'Das Baptisterium wird still. Eikokons der Spinnen haften feucht am Beckenrand.',
   'sim.delve.baptistrySpidersSealed':

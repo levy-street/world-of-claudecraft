@@ -48,6 +48,7 @@ export const economy: GuidePage = {
           <p>${esc(t('guide.economy.bankBody'))}</p>
           <p>${esc(t('guide.economy.bankHow'))}</p>
           <p>${esc(t('guide.economy.bankSlots'))}</p>
+          <p>${esc(t('guide.economy.bankSockets'))}</p>
           <p>${esc(t('guide.economy.guildBankNote'))}</p>
         </section>
 

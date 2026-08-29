@@ -31,6 +31,7 @@
 // consistent with what the game itself would produce.
 
 import { randomInt } from 'node:crypto';
+import { bagSlotsOf, isMaterialsOnlyBag } from '../src/sim/bag_pools';
 import { BAG_SOCKETS } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -455,13 +456,26 @@ export function bisKit(cls: PlayerClass): Partial<Record<EquipSlot, string>> {
   return bisKitForRole(cls, CLASS_ROLES[cls][0]);
 }
 
-/** The best bag in the game: strictly the most slots (no tiebreak needed; the
- *  content has a single largest bag, and the test pins its id). */
+/** The best GENERAL bag in the game: the most slots, ties broken by ascending
+ *  id, the SAME deterministic argmax rule as dev_kit.ts bestBy, so the boost
+ *  and the dev kit can never disagree on the answer and a content-file
+ *  reorder can never flip which bag a boosted character persists (two general
+ *  bags tie at 16 slots since phase 05). */
 export function bestBoostBag(): string {
   let best: ItemDef | null = null;
   for (const item of Object.values(ITEMS)) {
     if (item.kind !== 'bag') continue;
-    if (!best || (item.bagSlots ?? 0) > (best.bagSlots ?? 0)) best = item;
+    // Materials-only bags are skipped: this one bag goes into EVERY socket, and
+    // a materials-only bag feeds the materials pool rather than the general one
+    // (src/sim/bag_pools.ts). Taking the biggest bag outright would hand a
+    // boosted character 4 sockets of materials capacity and a bare 16-slot
+    // backpack for their gear, which is the opposite of what the boost is for.
+    if (isMaterialsOnlyBag(item)) continue;
+    const slots = item.bagSlots ?? 0;
+    const bestSlots = best ? (best.bagSlots ?? 0) : Number.NEGATIVE_INFINITY;
+    if (slots > bestSlots || (slots === bestSlots && best !== null && item.id < best.id)) {
+      best = item;
+    }
   }
   if (!best) throw new Error('no bag items in content');
   return best.id;
@@ -496,15 +510,18 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 export const BOOST_KIT_VERSION = 3;
 
 /**
- * Bring one live player up to the current boost kit: level 20, four
- * best-in-game bags, the primary role's true-BiS kit equipped, every
- * alternate role's kit carried in the bags, riding trained, and the
- * Nythraxis attunement completed. Idempotent per BOOST_KIT_VERSION through
- * the persisted meta stamp; returns whether anything was applied. Shared by
- * the fresh-roster builder below and the world-join top-up (server/game.ts),
- * so a character created before the boost existed, or before a kit revision
- * (the PvP-geared pbe2 roster), is re-kitted at its next login. Displaced
- * gear and bags land in the (upgraded) bags; nothing is ever deleted.
+ * Bring one live player up to the current boost kit: level 20, the best
+ * general bag in every socket not already carrying an equal or larger one,
+ * the primary role's true-BiS kit equipped, every alternate role's kit
+ * carried in the bags, riding trained, and the Nythraxis attunement
+ * completed. Bag capacity only ever grows (a fresh roster, whose sockets are
+ * all empty, takes the boost bag in all four). Idempotent per
+ * BOOST_KIT_VERSION through the persisted meta stamp; returns whether
+ * anything was applied. Shared by the fresh-roster builder below and the
+ * world-join top-up (server/game.ts), so a character created before the boost
+ * existed, or before a kit revision (the PvP-geared pbe2 roster), is re-kitted
+ * at its next login. Displaced gear and bags land in the (upgraded) bags;
+ * nothing is ever deleted.
  */
 export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   const meta = sim.ctx.resolve(pid)?.meta;
@@ -514,13 +531,47 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   const cls = meta.cls;
   if (e.level < BOOST_LEVEL) sim.setPlayerLevel(BOOST_LEVEL, pid);
   // Bags first so the pooled capacity exists before the kits land. Equipping
-  // over an occupied socket swaps the old bag into the pool (src/sim/bags.ts)
-  // and the boost bag is the largest in the game, so capacity only grows.
+  // over an occupied socket swaps the old bag into the pool (src/sim/bags.ts
+  // equipBag), which REFUSES whenever the post-swap inventory would sit above
+  // the summed bagCapacity of the new bag set. The boost bag is the largest
+  // GENERAL bag, not the largest bag in the game: the materials-only satchels
+  // are bigger. So a socket whose incumbent bag is equal or larger is skipped.
+  //
+  // NOT because such a bag already serves the boost: an equal-or-larger
+  // MATERIALS satchel contributes ZERO general capacity (bestBoostBag's own
+  // rationale above), so it does not serve the boost's general-capacity
+  // purpose at all. It is skipped because swapping it out would override the
+  // player's deliberate satchel choice, and both outcomes of attempting that
+  // are bad. On a LIGHT inventory the shrinking swap SUCCEEDS (equipBag's
+  // guard refuses only when the post-swap load exceeds the NEW total, never
+  // merely because the budget shrank), yanking the satchel out of its socket
+  // and into the pool. On a loaded inventory it refuses and strands the
+  // grant. Skipping avoids both.
+  //
+  // Accepted consequence: a character wearing four large satchels keeps a
+  // general capacity of 16 (the backpack alone), so the alternate-role kits
+  // below land in the tolerated over-capacity state (non-destructive:
+  // Sim.addItem has no capacity gate). That is the price of never overriding
+  // a player's own bags.
+  //
+  // Skipping also keeps the "capacity only grows" invariant by construction:
+  // every equip attempted below either fills an empty socket or strictly
+  // grows the summed budget.
   const bagId = bestBoostBag();
+  const boostSlots = bagSlotsOf(ITEMS[bagId]);
   for (let socket = 0; socket < BOOST_BAG_SOCKETS; socket++) {
-    if (meta.bags[socket] === bagId) continue;
+    const incumbent = meta.bags[socket];
+    if (incumbent && bagSlotsOf(ITEMS[incumbent]) >= boostSlots) continue;
     sim.addItem(bagId, 1, pid, MOVEMENT);
     sim.equipBag(bagId, socket, pid);
+    // A growing swap can still be refused from a deeply over-capacity legacy
+    // state (an inventory longer than even the grown total), so take the
+    // granted bag back out instead of leaving it loose in the pool. Known
+    // residue: the addItem above already emitted its "You receive" line and
+    // entered the bag into the persisted deed discovery ledger, and removeItem
+    // undoes neither. Tolerated because deeds are cosmetic-only (titles and
+    // Renown, never power) and this is a PBE-only refusal recovery.
+    if (meta.bags[socket] !== bagId) sim.removeItem(bagId, 1, pid);
   }
   // Nythraxis attunement: run the chain through the real quest cores (accept,
   // satisfy objectives, turn in), never by poking questsDone, so XP, copper,

@@ -14,6 +14,7 @@
 // until the legacy ladder is removed.
 
 import type * as http from 'node:http';
+import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   type ClaudiumNativeRail,
@@ -55,6 +56,7 @@ import {
   claudiumMutationRateLimited,
   claudiumPreAuthRateLimited as claudiumPreAuthIpRateLimited,
 } from './ratelimit';
+import { STORAGE_KEY_PATTERN, STORAGE_MAX_EXPECTED_COST_CLAUDIUM } from './storage_purchases';
 
 const STRIPE_WEBHOOK_MAX_BYTES = 1024 * 1024;
 
@@ -92,8 +94,10 @@ function parseNativeRail(value: unknown): ClaudiumNativeRail | null {
   return value === 'sol' || value === 'usdc' || value === 'woc' ? value : null;
 }
 
-function parseSpendKind(value: unknown): 'cosmetic' | 'skin' | 'item' | null {
-  return value === 'cosmetic' || value === 'skin' || value === 'item' ? value : null;
+function parseSpendKind(value: unknown): 'cosmetic' | 'skin' | 'item' | 'storage' | null {
+  return value === 'cosmetic' || value === 'skin' || value === 'item' || value === 'storage'
+    ? value
+    : null;
 }
 
 function isKnownWeaponSkinId(itemId: string): boolean {
@@ -133,6 +137,24 @@ export function claudiumConfigured(): boolean {
 // session).
 interface ClaudiumGameHooks {
   grantWeaponSkins(accountId: number, skinIds: string[]): void;
+  /** The whole storage purchase flow (Bank Storage phase 11): resolve the
+   *  live character session, gate, persist the pending record, spend, and
+   *  apply the slots exactly once (server/storage_purchases.ts). The result
+   *  is the spend wire shape verbatim. Unlike the skin mirror there is NO
+   *  no-runtime fallback: a storage purchase REQUIRES the live game, so the
+   *  spend branch fails closed as 'unavailable' when the runtime itself is
+   *  not configured (tests/tools). */
+  storagePurchase(input: {
+    accountId: number;
+    itemId: string;
+    expectedCostClaudium: number;
+    idempotencyKey: string;
+  }): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
 }
 let claudiumRuntime: ClaudiumGameHooks | null = null;
 
@@ -231,12 +253,31 @@ export async function handleClaudiumApi(
   }
   if (req.method === 'GET' && path === '/api/claudium/store') {
     const store = await claudiumStore(accountId);
+    // The same allowlist rule per family: the service can never mint an id
+    // the game registry does not carry. Storage rows (Bank Storage phase 11)
+    // pass through for the phase 12 store category and the phase 13 banker
+    // price tag; their `owned` is false forever and is never interpreted.
     const supportedStore = {
       ...store,
-      items: store.items.filter((item) => item.kind === 'skin' && isKnownWeaponSkinId(item.itemId)),
+      items: store.items.filter(
+        (item) =>
+          (item.kind === 'skin' && isKnownWeaponSkinId(item.itemId)) ||
+          (item.kind === 'storage' && isKnownStorageSkuId(item.itemId)),
+      ),
     };
     // Reconcile: the service's grant ledger is authoritative for purchases, so
     // mirror any owned weapon skins the game DB does not know about yet.
+    // Filtering on `owned` alone is safe here, and it is worth saying why so a
+    // later reader does not "fix" it the wrong way. `owned` means the service
+    // holds a GRANT row, which only the skin family ever has: a storage spend
+    // writes no grant row, so a storage row's owned is false by construction and
+    // forever. Two independent gates keep a storage id out of the weapon-skin
+    // entitlement table even if the service ever set the flag on one: the filter
+    // just above admits a row only under its OWN family's registry, and
+    // noteWeaponSkinGrants re-filters its input through isKnownWeaponSkinId.
+    // Reaching the table would take an id carried by BOTH registries, and they
+    // are disjoint (tests/server/storage_gates.test.ts pins the tampered
+    // owned:true storage row never reaching the mirror).
     noteWeaponSkinGrants(
       accountId,
       supportedStore.items.filter((item) => item.owned).map((item) => item.itemId),
@@ -316,6 +357,64 @@ export async function handleClaudiumApi(
         costClaudium: null,
         reason: 'invalid_request',
       });
+    }
+    if (kind === 'storage') {
+      // Bank Storage phase 11: repeatable bank-capacity SKUs. The storage id
+      // allowlist mirrors the skin one (a skin id declared as storage falls
+      // through here as unknown_item, exactly as a storage id declared as
+      // skin falls through the gate below), and the flow itself lives behind
+      // the runtime hook: it must resolve the LIVE character session, hold
+      // the per-character purchase mutex, persist the pending record, and
+      // apply the slots exactly once against the idempotent receipt. The
+      // skin path's owned re-read mirror below deliberately does NOT run for
+      // storage: a storage spend writes no grant row, so `owned` stays false
+      // forever and re-reading it would refuse every purchase.
+      //
+      // The key and cost bounds are load-bearing, not hygiene: the key must
+      // fit the SHARED bound the sim persists and reloads (an overlong key
+      // would apply, save, and then vanish on the next load, voiding the
+      // exactly-once dedupe), and the declared cost must fit the pending
+      // row's INT column (it is fingerprint-bound and persisted verbatim).
+      if (
+        !STORAGE_KEY_PATTERN.test(idempotencyKey) ||
+        expectedCostClaudium > STORAGE_MAX_EXPECTED_COST_CLAUDIUM
+      ) {
+        return json(res, 200, {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'invalid_request',
+        });
+      }
+      if (!isKnownStorageSkuId(itemId)) {
+        return json(res, 200, {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unknown_item',
+        });
+      }
+      if (!claudiumRuntime?.storagePurchase) {
+        // No live game wired (tests/tools). Unlike noteWeaponSkinGrants there
+        // is no persist-directly fallback: without a live character session
+        // nothing may spend, so fail closed as unavailable.
+        return json(res, 200, {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        });
+      }
+      return json(
+        res,
+        200,
+        await claudiumRuntime.storagePurchase({
+          accountId,
+          itemId,
+          expectedCostClaudium,
+          idempotencyKey,
+        }),
+      );
     }
     if (kind !== 'skin' || !isKnownWeaponSkinId(itemId)) {
       return json(res, 200, {

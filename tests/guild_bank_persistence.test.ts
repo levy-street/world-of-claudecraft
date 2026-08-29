@@ -1,7 +1,7 @@
 // Guild Bank Phase 3, the wiring half: the boot load into a REAL Sim (empty
 // book on no row, oversized skip, the parsed-object pin), the round trip, the
 // dispatch observer (ledger row + dirty mark on success, neither on refusal),
-// the escrow save arm of GameServer.saveCharacter (null-serialize skip,
+// the escrow save arm of GameServer.saveCharacter (null-serialize refusal,
 // fence-miss keeps the dirty mark), the guild_create fee gate, and the
 // create/disband transport hooks. Drives the REAL GameServer + Sim with the db
 // layer mocked (the guild_stamp_fence idiom).
@@ -18,7 +18,15 @@ const dbMock = vi.hoisted(() => ({
   // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
   saveCharacterAndMarketState: vi.fn(async (..._args: any[]) => true),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
+  loadGuildBankRow: vi.fn(async (_guildId: number): Promise<unknown | null> => null),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
+}));
+
+const paidGuildCreateMock = vi.hoisted(() => vi.fn());
+
+vi.mock('../server/guild_create_db', () => ({
+  createPaidGuildWithLeaderAtomic: paidGuildCreateMock,
 }));
 
 // DURABLE guild membership, the source the escrow CARRIER is now chosen from
@@ -43,6 +51,8 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
+  loadGuildBankRow: dbMock.loadGuildBankRow,
   loadGuildBankRows: dbMock.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
@@ -52,9 +62,12 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   // The fence-miss arm kicks the displaced session; leave() releases its lease.
   releaseCharacterLease: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
+import { BankLedgerGrowthLimitExceeded } from '../server/bank_ledger_growth_budget';
 import { drainLinkChanges } from '../server/discord_link_changes';
 import { type ClientSession, GameServer } from '../server/game';
 import { compactGuildBankOpLog } from '../server/guild_bank_op_log';
@@ -74,12 +87,11 @@ import {
   setGameMetricsCounters,
 } from '../server/http/game_signals';
 import {
-  applyGuildBankDeltasTo,
   GUILD_CREATION_FEE_COPPER,
   type GuildBankOpDelta,
   type GuildBankState,
 } from '../src/sim/guild_bank';
-import { Sim } from '../src/sim/sim';
+import { type CharacterState, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 const GUILD_ID = 913;
@@ -192,11 +204,40 @@ function officerSetup(server: GameServer, session: ClientSession, treasury = 100
 const dispatch = (server: GameServer, session: ClientSession, msg: Record<string, unknown>) =>
   priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), 0);
 
+type CapturedLedgerEffects = {
+  batches?: readonly { rows?: readonly Record<string, unknown>[] }[];
+};
+
+const ledgerRowsFromEffects = (effects: unknown): readonly Record<string, unknown>[] =>
+  ((effects as CapturedLedgerEffects | undefined)?.batches ?? []).flatMap(
+    (batch) => batch.rows ?? [],
+  );
+
+const queuedLedgerRows = (session: ClientSession): readonly Record<string, unknown>[] =>
+  session.bankLedgerJournal.outbox
+    .snapshot()
+    .batches.flatMap((batch) => batch.rows as readonly Record<string, unknown>[]);
+
+const guildSaveLedgerRows = (callIndex = 0): readonly Record<string, unknown>[] => {
+  const call = dbMock.saveCharacterAndGuildBankState.mock.calls[callIndex] as unknown[] | undefined;
+  return ledgerRowsFromEffects(call?.[7]);
+};
+
 beforeEach(() => {
+  paidGuildCreateMock.mockReset();
+  paidGuildCreateMock.mockImplementation(
+    async (_deps: unknown, args: { fee: { batchKey: string } }) => ({
+      durability: 'committed',
+      guildId: GUILD_ID,
+      feeBatchKey: args.fee.batchKey,
+    }),
+  );
   dbMock.saveCharacterState.mockClear();
   dbMock.saveCharacterAndGuildBankState.mockClear();
   dbMock.saveCharacterAndMarketState.mockClear();
   dbMock.insertBankLedgerRow.mockClear();
+  dbMock.loadGuildBankRow.mockReset();
+  dbMock.loadGuildBankRow.mockResolvedValue(null);
   dbMock.loadGuildBankRows.mockClear();
   durableBooks.clear();
   durableChars.clear();
@@ -318,6 +359,58 @@ describe('loadGuildBanksIntoSim (the boot load, against a REAL Sim)', () => {
 });
 
 describe('GameServer.loadGuildBanks (boot retry)', () => {
+  it('lazy-loads a durable guild created after this process booted', async () => {
+    const server = new GameServer();
+    dbMock.loadGuildBankRow.mockResolvedValueOnce({
+      guildId: GUILD_ID,
+      data: { treasury: 321, inventory: [], purchasedSlots: 24 },
+      oversized: false,
+      dataBytes: 128,
+    });
+
+    await priv(server).guildBankLazyLoader.ensureLoaded(GUILD_ID);
+
+    expect(dbMock.loadGuildBankRow).toHaveBeenCalledWith(GUILD_ID);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual({
+      treasury: 321,
+      inventory: [],
+      purchasedSlots: 24,
+    });
+  });
+
+  it('bounds distinct lazy loads and memoizes failures briefly', async () => {
+    const server = new GameServer();
+    let release!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    dbMock.loadGuildBankRow.mockImplementation(async (guildId: number) => {
+      await blocked;
+      return {
+        guildId,
+        data: { treasury: guildId, inventory: [], purchasedSlots: 0 },
+        oversized: false,
+        dataBytes: 64,
+      };
+    });
+
+    const loads = [1, 2, 3, 4, 5].map((guildId) =>
+      priv(server).guildBankLazyLoader.ensureLoaded(guildId),
+    );
+    expect(dbMock.loadGuildBankRow).toHaveBeenCalledTimes(4);
+    release();
+    await Promise.all(loads);
+    expect(server.sim.guildBanks.has(5)).toBe(false);
+
+    dbMock.loadGuildBankRow.mockReset();
+    dbMock.loadGuildBankRow.mockRejectedValue(new Error('db down'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await priv(server).guildBankLazyLoader.ensureLoaded(99);
+    await priv(server).guildBankLazyLoader.ensureLoaded(99);
+    errSpy.mockRestore();
+    expect(dbMock.loadGuildBankRow).toHaveBeenCalledTimes(1);
+  });
+
   it('retries a transient read failure and loads on a later attempt', async () => {
     const server = new GameServer();
     dbMock.loadGuildBankRows
@@ -368,15 +461,14 @@ describe('the round trip (serialize -> reload on a fresh Sim)', () => {
 });
 
 describe('the dispatch observer: ledger rows + the dirty mark', () => {
-  it('a successful op writes exactly one guild row and marks the book dirty', async () => {
+  it('a successful op queues exactly one guild row and marks the book dirty', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Off');
     officerSetup(server, session);
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_500 });
     expect([...session.dirtyGuildBanks.keys()]).toEqual([GUILD_ID]);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       characterId: 1,
       op: 'deposit_gold',
       copperDelta: 1_500,
@@ -386,7 +478,7 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     });
   });
 
-  it('opening the bank (rung 0) writes an open_bank row: purse charged, treasury untouched', async () => {
+  it('opening the bank (rung 0) queues an open_bank row: purse charged, treasury untouched', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Opener');
     moveToBanker(server, session.pid);
@@ -421,9 +513,8 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
         purchasedSlotsAfter: 24,
       },
     ]);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       characterId: 1,
       op: 'open_bank',
       copperDelta: -90_000,
@@ -432,19 +523,15 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
       containerId: GUILD_ID,
     });
     // A later expansion still records plain buy_slots from the treasury.
-    dbMock.insertBankLedgerRow.mockClear();
     meta.copper = 100_000; // refill the purse for the treasury top-up deposit
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 30_000 });
     dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
-    await bankLedgerIdle();
-    const ops = dbMock.insertBankLedgerRow.mock.calls.map(
-      (c) => (c as unknown[])[0] as { op: string; copperDelta: number },
-    );
+    const ops = queuedLedgerRows(session).slice(-2);
     expect(ops.map((o) => o.op)).toEqual(['deposit_gold', 'buy_slots']);
     expect(ops[1].copperDelta).toBe(-25_000); // rung 1, treasury-paid
   });
 
-  it('a tampered below-base count still records open_bank (the rung derivation matches the sim)', async () => {
+  it('a tampered below-base count still records open_bank (the rung derivation matches the sim)', () => {
     // A live count below the opened base is NOT a valid ladder position, but
     // the sim's buy op floors it to rung 0 and charges the PURSE. The
     // observer must derive the rung the same way (guildBankRungsBought), not
@@ -465,9 +552,8 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
     expect(meta.copper).toBe(10_000); // rung 0: purse-paid
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(5_000); // never the treasury
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       op: 'open_bank',
       copperDelta: -90_000,
       // purchasedSlotsBefore is NOT a ledger column (insertBankLedgerRow picks
@@ -564,18 +650,27 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
   });
 
-  it('a null serializeGuildBank SKIPS that book (never an empty book over a real row)', async () => {
+  it('a dirty book that vanishes before save refuses the whole atomic escrow', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Skipper');
     officerSetup(server, session);
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 2_000 });
-    // The book vanishes before the save flushes (the evict-then-reload shape):
-    // serialize now returns null and the write for that guild must be skipped.
+    // The book vanishes before the save flushes (the evict-then-reload shape).
+    // Persisting the reduced purse and its ledger evidence without the book
+    // would split one accepted mutation across two durability boundaries.
     server.sim.evictGuildBank(GUILD_ID);
-    await priv(server).saveCharacter(session);
-    expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
-    const [, , , books] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as never[];
-    expect(books).toEqual([]);
+    await expect(priv(server).saveCharacter(session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
+    expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
+    expect(durableChars.has(session.characterId)).toBe(false);
+    expect(session.escrowQuarantined).toBe(true);
+    expect(session.dirtyGuildBanks.size).toBe(0);
+    expect(session.unflushedGuildBankOps.size).toBe(0);
+    await bankLedgerIdle();
+    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledWith(
+      expect.objectContaining({ op: 'escrow_deficit', containerId: GUILD_ID }),
+    );
+    await vi.waitFor(() => expect(session.left).toBe(true));
   });
 
   it("a fence-miss undoes ONLY this session's own ops on the live book", async () => {
@@ -602,6 +697,11 @@ describe('the escrow save arm (GameServer.saveCharacter)', () => {
     expect(durableBook()).toEqual({ treasury: 100_000, inventory: [], purchasedSlots: 24 });
     expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
     expect(session.unflushedGuildBankOps.has(GUILD_ID)).toBe(false);
+    await vi.waitFor(() => expect(session.left).toBe(true));
+    expect(session.escrowQuarantined).toBe(true);
+    // Teardown must not retry the now-reverted guild-ledger prefix through a
+    // final market save after the lease is already known to be gone.
+    expect(dbMock.saveCharacterAndMarketState).not.toHaveBeenCalled();
   });
 
   it('a fence-miss while ANOTHER session is dirty REVERTS only the fenced ops (no dupe)', async () => {
@@ -800,7 +900,7 @@ describe('the guild bank op guard (the keep-forever ledger write meter)', () => 
   ) =>
     priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), receivedAtMs);
 
-  it('caps a ledger-write flood at the bucket and refills over time', async () => {
+  it('caps a ledger-write flood at the bucket and refills over time', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Flooder');
     officerSetup(server, session);
@@ -811,95 +911,50 @@ describe('the guild bank op guard (the keep-forever ledger write meter)', () => 
       dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0);
     }
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_010);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(10);
+    expect(queuedLedgerRows(session)).toHaveLength(10);
     // Two tokens per second of refill: five seconds later the next op runs.
-    // The awaited ledger idle let the join-time social snapshot resolve
-    // against the EMPTY mocked social DB, which re-stamped membership null
-    // (correct server behavior; not under test here): re-stamp the officer.
+    // Re-stamp explicitly so this assertion does not depend on the async
+    // join-time social snapshot's scheduling against the mocked social DB.
     server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
     dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0 + 5_000);
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_011);
   });
 });
 
-describe('the unflushed-op log cap (bounded memory under a failing DB)', () => {
-  it('COMPACTS the log at the cap, semantics-preserving, and never drops it', () => {
-    // RETIRED (and replaced): this used to pin "the cap drops the log and the
-    // reconcile falls back to evict-and-reload from durable truth". Under the
-    // escrow root fix the log IS the write payload, so dropping it would
-    // discard committed-intent work, and there is no evict-and-reload arm to
-    // fall back to: the old pin's precondition is unconstructible. Its SOUND
-    // half (a partial log must never be trusted) survives here, strengthened
-    // from a prohibition into a positive obligation: the compacted log must
-    // replay to exactly the same book as the original.
-    // biome-ignore lint/suspicious/noExplicitAny: reading a private static pin
-    expect((GameServer as any).GUILD_BANK_UNFLUSHED_OP_CAP).toBe(500);
+describe('the exact unflushed-op journal (bounded memory under a failing DB)', () => {
+  it('keeps more than 500 commands exact and clears only their committed prefix', async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'Overflow').session;
     officerSetup(server, a);
-    // Fill A's log past the cap with a realistic mixture (gold both ways, an
-    // item in and out, and a ladder step), then one more op trips it.
-    const synthetic: GuildBankOpDelta[] = [];
-    for (let i = 0; i < 500; i++) {
-      const base = {
-        itemId: null,
-        count: null,
-        instance: null,
-        craftedRecipeId: null,
-        purchasedSlotsBefore: 0,
-        purchasedSlotsAfter: 0,
-      };
-      if (i % 4 === 0) synthetic.push({ ...base, op: 'deposit_gold', copperDelta: 7 });
-      else if (i % 4 === 1) synthetic.push({ ...base, op: 'withdraw_gold', copperDelta: -3 });
-      else if (i % 4 === 2) {
-        synthetic.push({ ...base, op: 'deposit', itemId: 'wolf_fang', count: 2, copperDelta: 0 });
-      } else {
-        synthetic.push({ ...base, op: 'withdraw', itemId: 'wolf_fang', count: 1, copperDelta: 0 });
-      }
+    const commandCount = 501;
+    const t0 = Date.now();
+    for (let i = 0; i < commandCount; i++) {
+      priv(server).dispatchMessage(
+        a,
+        { t: 'cmd', cmd: 'guild_bank_deposit_gold', amount: 1 },
+        '{"cmd":"guild_bank_deposit_gold","amount":1}',
+        t0 + i * 500,
+      );
     }
-    const original = synthetic.map((d) => ({ ...d }));
-    a.unflushedGuildBankOps.set(GUILD_ID, [...synthetic]);
-    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 500 });
-    const compacted = a.unflushedGuildBankOps.get(GUILD_ID) ?? [];
 
-    // 1. Memory is bounded: the whole run collapses to a handful of entries.
-    expect(compacted.length).toBeGreaterThan(0);
-    expect(compacted.length).toBeLessThan(10);
-    // 2. NOTHING was dropped: replaying the compacted log and replaying the
-    //    original leave a durable book in exactly the same state. This is the
-    //    positive obligation the retired pin's "must not trust a partial log"
-    //    rule becomes.
-    const withOp = [
-      ...original,
-      {
-        op: 'deposit_gold' as const,
-        itemId: null,
-        count: null,
-        instance: null,
-        craftedRecipeId: null,
-        copperDelta: 500,
-        purchasedSlotsBefore: 24,
-        purchasedSlotsAfter: 24,
-      },
-    ];
-    const base = (): GuildBankState => ({
-      treasury: 100_000,
-      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+    const log = a.unflushedGuildBankOps.get(GUILD_ID) ?? [];
+    expect(log).toHaveLength(commandCount);
+    expect(log.every((delta) => delta.op === 'deposit_gold' && delta.copperDelta === 1)).toBe(true);
+    const snapshot = a.bankLedgerJournal.outbox.snapshot();
+    expect(snapshot.batches).toHaveLength(commandCount);
+    expect(snapshot.rowCount).toBe(commandCount);
+    expect(queuedLedgerRows(a).map((row) => row.copperDelta)).toEqual(
+      Array.from({ length: commandCount }, () => 1),
+    );
+
+    await expect(priv(server).saveCharacter(a)).resolves.toBe(true);
+    expect(a.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]);
+    expect(a.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(durableBook()).toEqual({
+      treasury: 100_000 + commandCount,
+      inventory: [],
       purchasedSlots: 24,
     });
-    const fromOriginal = base();
-    const fromCompacted = base();
-    expect(applyGuildBankDeltasTo(fromOriginal, withOp)).toBeNull();
-    expect(applyGuildBankDeltasTo(fromCompacted, compacted)).toBeNull();
-    expect(fromCompacted.treasury).toBe(fromOriginal.treasury);
-    expect(fromCompacted.purchasedSlots).toBe(fromOriginal.purchasedSlots);
-    const multiset = (b: GuildBankState) => {
-      const m = new Map<string, number>();
-      for (const slot of b.inventory) m.set(slot.itemId, (m.get(slot.itemId) ?? 0) + slot.count);
-      return [...m.entries()].sort();
-    };
-    expect(multiset(fromCompacted)).toEqual(multiset(fromOriginal));
   });
 
   it('compaction keeps ladder steps verbatim and in place (they are order sensitive)', () => {
@@ -1256,27 +1311,148 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     });
   });
 
-  it('a short charge at the gate refuses and refunds; never a discounted guild', () => {
-    // The purse check and the charge run in the same synchronous block, but a
-    // pid can resolve meta-only (no live entity) and charge 0: the gate must
-    // refuse rather than reserve a short amount and found a free guild.
+  it('a zero/zero charge anomaly refuses inside the save FIFO without DB work', async () => {
     const server = new GameServer();
     const { session, sent } = joinServer(server, 1, 'ShortCharge');
+    session.leaseNonce = 'lease:short-charge';
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
     meta.copper = 150_000;
     vi.spyOn(server.sim, 'chargeGuildCreationFeeFor').mockReturnValueOnce(0);
-    const createSpy = vi.fn(async () => true);
-    priv(server).social.guildCreate = createSpy;
     dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
-    expect(createSpy).not.toHaveBeenCalled();
-    expect(priv(server).pendingGuildCreateFees.size).toBe(0);
+    await session.guildCreateSettlement;
+
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(150_000);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
     const events = sent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]);
     expect(events).toContainEqual({
       type: 'error',
       text: 'You need 1 gold to found a guild.',
     });
   });
+
+  it('refunds an exactly measured nonzero short charge and creates nothing', async () => {
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 1, 'ShortCharge');
+    session.leaseNonce = 'lease:short-charge-refund';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    vi.spyOn(server.sim, 'chargeGuildCreationFeeFor').mockImplementationOnce(() => {
+      meta.copper -= 5_000;
+      return 5_000;
+    });
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(150_000);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+    const events = sent.flatMap((message) => {
+      return ((message as { list?: unknown[] }).list ?? []) as never[];
+    });
+    expect(events).toContainEqual({ type: 'error', text: 'You need 1 gold to found a guild.' });
+  });
+
+  it('quarantines an unprovable charge mismatch without refunding or writing', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Mismatch');
+    session.leaseNonce = 'lease:charge-mismatch';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    vi.spyOn(server.sim, 'chargeGuildCreationFeeFor').mockImplementationOnce(() => {
+      meta.copper -= 5_000;
+      return GUILD_CREATION_FEE_COPPER;
+    });
+    const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+    errorSpy.mockRestore();
+
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(145_000);
+    expect(session.escrowQuarantined).toBe(true);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(1);
+    expect(await server.saveCharacter(session)).toBe(false);
+    expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
+    expect(kickSpy).toHaveBeenCalled();
+  });
+
+  it.each(['dirty_book', 'queued_guild_ledger'] as const)(
+    'refuses paid creation before charging when %s effects need an escrow save',
+    async (blocker) => {
+      const server = new GameServer();
+      const { session, sent } = joinServer(server, 1, 'EscrowFirst');
+      session.leaseNonce = `lease:${blocker}`;
+      const meta = server.sim.players.get(session.pid);
+      if (!meta) throw new Error('missing meta');
+      meta.copper = 150_000;
+      if (blocker === 'dirty_book') {
+        session.dirtyGuildBanks.set(GUILD_ID, 1);
+      } else {
+        const queued = session.bankLedgerJournal.admission.tryReserve(1, 1, 'guild');
+        if (!queued) throw new Error('missing guild ledger reservation');
+        expect(
+          queued.commit(
+            [
+              {
+                realm: session.bankLedgerJournal.outbox.owner.realm,
+                characterId: session.characterId,
+                accountId: session.accountId,
+                op: 'deposit_gold',
+                itemId: null,
+                count: null,
+                instance: null,
+                copperDelta: 1,
+                purchasedSlotsAfter: 0,
+                container: 'guild',
+                containerId: GUILD_ID,
+              },
+            ],
+            {
+              guildId: GUILD_ID,
+              deltas: [
+                {
+                  op: 'deposit_gold',
+                  itemId: null,
+                  count: null,
+                  instance: null,
+                  craftedRecipeId: null,
+                  copperDelta: 1,
+                  purchasedSlotsBefore: 0,
+                  purchasedSlotsAfter: 0,
+                },
+              ],
+            },
+          ),
+        ).toBe(true);
+      }
+      const chargeSpy = vi.spyOn(server.sim, 'chargeGuildCreationFeeFor');
+
+      dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+      await session.guildCreateSettlement;
+
+      expect(chargeSpy).not.toHaveBeenCalled();
+      expect(paidGuildCreateMock).not.toHaveBeenCalled();
+      expect(meta.copper).toBe(150_000);
+      expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+      expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+      const events = sent.flatMap((message) => {
+        return ((message as { list?: unknown[] }).list ?? []) as never[];
+      });
+      expect(events).toContainEqual({
+        type: 'error',
+        text: 'You are busy. Try again in a moment.',
+      });
+    },
+  );
 
   it('lets a founder at exactly the fee through to the create', () => {
     const server = new GameServer();
@@ -1290,175 +1466,620 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
     expect(createSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('a successful create charges at the GATE, seeds the book, writes create_fee, saves', async () => {
-    // Reserve-at-gate (Phase 3 QA): the fee leaves the purse synchronously at
-    // dispatch, BEFORE any DB work; the committed success arm consumes the
-    // reservation (ledger row + escrow save) and never charges again.
+  it('orders an older save before one atomic post-charge guild snapshot', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Founder');
+    session.leaseNonce = 'lease:atomic-success';
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
     meta.copper = 150_000;
-    // Stub the create as its committed success arm firing the transport hook.
-    priv(server).social.guildCreate = vi.fn(async () => {
-      priv(server).social.tx.onGuildCreated(1, GUILD_ID);
-      return true;
-    });
+
+    // Both enqueue in one turn. The older save must serialize before the fee
+    // mutation; charging synchronously at dispatch would make that queued save
+    // carry the fee ahead of the guild transaction.
+    const olderSave = server.saveCharacter(session);
     dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
-    // Charged exactly once, at the gate, synchronously.
+    expect(meta.copper).toBe(150_000);
+
+    await olderSave;
+    await session.guildCreateSettlement;
+    const oldState = dbMock.saveCharacterState.mock.calls[0]?.[2] as { copper?: number };
+    const atomicArgs = paidGuildCreateMock.mock.calls[0]?.[1] as {
+      state: { copper?: number };
+      fee: { batchKey: string; chargedCopper: number; purseCopperDelta: number };
+    };
+    expect(oldState.copper).toBe(150_000);
+    expect(atomicArgs.state.copper).toBe(140_000);
+    expect(atomicArgs.fee).toMatchObject({
+      chargedCopper: GUILD_CREATION_FEE_COPPER,
+      purseCopperDelta: -GUILD_CREATION_FEE_COPPER,
+    });
+    expect(atomicArgs.fee.batchKey).toMatch(/^ledger:/);
+    expect(paidGuildCreateMock).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
+    expect(queuedLedgerRows(session).filter((row) => row.op === 'create_fee')).toEqual([]);
+    expect(server.sim.guildBanks.get(GUILD_ID)).toEqual({
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
     expect(meta.copper).toBe(140_000);
-    // The seed: ops never lazily create a book, so without this the founder's
-    // bank would be silent-inert until a realm restart.
-    await vi.waitFor(() => {
-      expect(server.sim.guildBanks.get(GUILD_ID)).toEqual({
-        treasury: 0,
-        inventory: [],
-        purchasedSlots: 0,
-      });
-    });
-    // The fee save carries the charged purse and the seeded empty book
-    // together, and the create_fee row is written only AFTER it commits (the
-    // durability ordering: a row written first would book a payment that a
-    // fenced-out save never made).
-    await vi.waitFor(() => {
-      expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled();
-    });
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
-      op: 'create_fee',
-      characterId: 1,
-      copperDelta: -GUILD_CREATION_FEE_COPPER,
-      purchasedSlotsAfter: 0,
-      container: 'guild',
-      containerId: GUILD_ID,
-    });
-    // The seeded book carries no deltas, so what lands is the empty book the
-    // seed represents (which is also what a guild with no row loads at boot).
-    expect(durableBook()).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
-    // No stray refund: the purse stays exactly one fee lighter.
-    expect(meta.copper).toBe(140_000);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
   });
 
-  it('books NO create_fee (and counts the incident) when the fee save is fenced out', async () => {
-    // REGRESSION (create-then-never-persist-charge): the fee is deducted from
-    // the LIVE purse at the gate and reaches the database only through this
-    // session's character half. That save used to be fire-and-forget, so a
-    // fence-out (a same-account takeover discards the session's state) left
-    // the guild created, the durable purse untouched, and a create_fee row
-    // standing as if it had been paid: a free guild, booked as sold.
-    // revertOwnGuildBookOps cannot help, because the fee is not a BOOK delta.
+  it('commits one founder credit that survives restart without double-crediting live state', async () => {
     const server = new GameServer();
-    const { session } = joinServer(server, 1, 'Founder');
+    const { session } = joinServer(server, 1, 'DurableFounder');
+    session.leaseNonce = 'lease:durable-founder';
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
     meta.copper = 150_000;
-    const durableBefore = { ...(durableChars.get(session.characterId) ?? {}) };
-    priv(server).social.guildCreate = vi.fn(async () => {
-      priv(server).social.tx.onGuildCreated(1, GUILD_ID);
-      return true;
+    const durableStates: CharacterState[] = [];
+    paidGuildCreateMock.mockImplementationOnce(
+      async (_deps: unknown, args: { state: CharacterState; fee: { batchKey: string } }) => {
+        durableStates.push(JSON.parse(JSON.stringify(args.state)) as CharacterState);
+        return {
+          durability: 'committed',
+          guildId: GUILD_ID,
+          feeBatchKey: args.fee.batchKey,
+        };
+      },
+    );
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+
+    expect(meta.deedStats.counters.guildsFounded).toBe(1);
+    const durableState = durableStates[0];
+    expect(durableState?.deedStats?.counters?.guildsFounded).toBe(1);
+    if (!durableState) throw new Error('paid creator did not commit a character state');
+    const restarted = new Sim({ seed: 9913, playerClass: 'warrior', noPlayer: true });
+    const restoredPid = restarted.addPlayer('warrior', 'DurableFounder', {
+      state: durableState,
     });
-    const rec = recordingIncidents();
-    setGameMetricsCounters(rec.sink);
-    // The takeover fence: the write reports it did not land.
-    dbMock.saveCharacterAndGuildBankState.mockResolvedValue(false);
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(restarted.meta(restoredPid)?.deedStats.counters.guildsFounded).toBe(1);
+  });
+
+  it('refunds the exact origin and creates nothing when the atomic save loses its lease', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Founder');
+    session.leaseNonce = 'lease:fenced';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    paidGuildCreateMock.mockResolvedValueOnce({
+      durability: 'not_committed',
+      reason: 'lease_lost',
+    });
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
-    await vi.waitFor(() => expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled());
-    await bankLedgerIdle();
-    await vi.waitFor(() => expect(rec.kinds).toContain('create_fee_unpaid'));
-    warnSpy.mockRestore();
+    await session.guildCreateSettlement;
     errSpy.mockRestore();
 
-    // The audit does not claim a payment that never landed...
-    expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
-    // ...the durable character row was never advanced by this save...
-    expect(durableChars.get(session.characterId) ?? {}).toEqual(durableBefore);
-    // ...and the failure is machine-readable, not just a log line.
-    expect(rec.kinds).toContain('create_fee_unpaid');
-    dbMock.saveCharacterAndGuildBankState.mockReset();
+    expect(meta.copper).toBe(150_000);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
+    expect(queuedLedgerRows(session).filter((row) => row.op === 'create_fee')).toEqual([]);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
   });
 
-  it('a refused create REFUNDS the reserved fee exactly once, on every refusal arm', async () => {
+  it('refunds a proved rollback exactly once for name and database refusals', async () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Refused');
+    session.leaseNonce = 'lease:refused';
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
-    for (const failure of [
-      async () => false, // name taken / already in a guild: the refusal arm
-      async () => {
-        throw new Error('db down'); // the error arm refunds too
-      },
+    const chargeSpy = vi.spyOn(server.sim, 'chargeGuildCreationFeeFor');
+    for (const result of [
+      { durability: 'not_committed', reason: 'name_taken' } as const,
+      {
+        durability: 'not_committed',
+        reason: 'database_error',
+        error: new Error('db down'),
+      } as const,
     ]) {
       meta.copper = 150_000;
-      priv(server).social.guildCreate = vi.fn(failure);
+      paidGuildCreateMock.mockResolvedValueOnce(result);
       const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
-      // Reserved synchronously at the gate...
-      expect(meta.copper).toBe(140_000);
-      // ...and returned when the create reports failure.
-      await vi.waitFor(() => {
-        expect(meta.copper).toBe(150_000);
-      });
+      await session.guildCreateSettlement;
       errSpy.mockRestore();
-      // The reservation is consumed: nothing left to double-refund.
-      expect(priv(server).pendingGuildCreateFees.size).toBe(0);
-      await bankLedgerIdle();
-      expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled(); // no create_fee row
+
+      expect(meta.copper).toBe(150_000);
+      expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+      expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+      expect(queuedLedgerRows(session).filter((row) => row.op === 'create_fee')).toEqual([]);
+    }
+    expect(chargeSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('refunds then quarantines a paid create refused by the durable ledger ceiling', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'GrowthRefused');
+    session.leaseNonce = 'lease:growth-refused';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    paidGuildCreateMock.mockResolvedValueOnce({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: refusal,
+    });
+    let growthRefusals = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        growthRefusals++;
+      },
+    });
+    const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+      await session.guildCreateSettlement;
+
+      expect(meta.copper).toBe(150_000);
+      expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+      expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+      expect(session.escrowQuarantined).toBe(true);
+      expect(growthRefusals).toBe(1);
+      expect(kickSpy).toHaveBeenCalled();
+    } finally {
+      errSpy.mockRestore();
+      setGameMetricsCounters(noopGameMetricsCounters);
     }
   });
 
-  it('a pipelined spend can no longer dodge the fee (reserve-at-gate)', async () => {
-    // The old create-then-charge exploit: dispatch guild_create, then spend
-    // the purse before the deferred charge lands, founding the guild for
-    // residue. Now the fee is gone from the purse before the create's DB work
-    // even starts, so there is nothing left to spend out from under it.
+  it('re-checks funds after a queued spend and never founds a discounted guild', async () => {
     const server = new GameServer();
-    const { session } = joinServer(server, 1, 'Piper');
+    const { session, sent } = joinServer(server, 1, 'Piper');
+    session.leaseNonce = 'lease:pipeline';
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
-    meta.copper = GUILD_CREATION_FEE_COPPER; // exactly the fee
-    let resolveCreate: ((v: boolean) => void) | undefined;
-    priv(server).social.guildCreate = vi.fn(
-      () =>
-        new Promise<boolean>((resolve) => {
-          // Mirror the real contract: guildCreate returns true only AFTER the
-          // committed success arm fired onGuildCreated (which consumes the
-          // fee reservation).
-          resolveCreate = (v: boolean) => {
-            if (v) priv(server).social.tx.onGuildCreated(1, GUILD_ID);
-            resolve(v);
-          };
-        }),
-    );
-    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
-    // The purse is already empty while the create is in flight: any pipelined
-    // spend now fails for lack of copper instead of eating the fee.
-    expect(meta.copper).toBe(0);
-    // A pipelined SECOND create is dropped outright (one reservation per
-    // character), never double-charged.
-    dispatch(server, session, { cmd: 'guild_create', name: 'Second Banner' });
-    expect(priv(server).social.guildCreate).toHaveBeenCalledTimes(1);
-    resolveCreate?.(true);
-    await vi.waitFor(() => {
-      expect(priv(server).pendingGuildCreateFees.size).toBe(0);
+    meta.copper = GUILD_CREATION_FEE_COPPER;
+    let release!: () => void;
+    let started!: () => void;
+    const startedPromise = new Promise<void>((resolve) => {
+      started = resolve;
     });
-    expect(meta.copper).toBe(0); // the fee stayed paid
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const olderWrite = server.enqueueCharacterWrite(session.characterId, async () => {
+      started();
+      await blocked;
+    });
+    await startedPromise;
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    const settlement = session.guildCreateSettlement;
+    expect(meta.copper).toBe(GUILD_CREATION_FEE_COPPER);
+    // A second create cannot claim another fee while the first waits.
+    dispatch(server, session, { cmd: 'guild_create', name: 'Second Banner' });
+    // Model a valid spend that ran while the older persistence job held the
+    // FIFO. The creator must re-check at start, before charging or DB work.
+    meta.copper = 0;
+    release();
+    await olderWrite;
+    await settlement;
+
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(0);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+    const events = sent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]);
+    expect(events).toContainEqual({ type: 'error', text: 'You need 1 gold to found a guild.' });
   });
 
-  it('onGuildCreated for a vanished founder still seeds the book; the gate fee stands', async () => {
-    // The founder paid at the gate, so vanishing before the commit no longer
-    // yields a free guild: their leave flush persists the charged purse, and
-    // the success arm still writes the create_fee row from the reservation.
+  it('leave cancels an unstarted queued create and releases its exact reservation', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'QueuedLeaver');
+    session.leaseNonce = 'lease:queued-leaver';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+
+    let release!: () => void;
+    let started!: () => void;
+    const startedPromise = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const blocked = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const olderWrite = server.enqueueCharacterWrite(session.characterId, async () => {
+      started();
+      await blocked;
+    });
+    await startedPromise;
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    const settlement = session.guildCreateSettlement;
+    expect(settlement).toBeDefined();
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(1);
+    expect(session.bankLedgerJournal.outbox.usage.reservedEncodedBytes).toBeGreaterThan(0);
+
+    const leaving = server.leave(session, 'queued create cancellation');
+    await settlement;
+    const usageAfterCancellation = session.bankLedgerJournal.outbox.usage;
+    release();
+    await Promise.all([olderWrite, leaving]);
+
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(150_000);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(usageAfterCancellation.reservedRows).toBe(0);
+    expect(usageAfterCancellation.reservedEncodedBytes).toBe(0);
+  });
+
+  it('admits only two paid creates per process and refuses a third without reserving it', async () => {
+    const server = new GameServer();
+    const first = joinServer(server, 1, 'First');
+    const second = joinServer(server, 2, 'Second');
+    const third = joinServer(server, 3, 'Third');
+    for (const { session } of [first, second, third]) {
+      session.leaseNonce = `lease:${session.characterId}`;
+      const meta = server.sim.players.get(session.pid);
+      if (!meta) throw new Error('missing meta');
+      meta.copper = 150_000;
+    }
+
+    const releases: Array<() => void> = [];
+    const starts: Promise<void>[] = [];
+    const olderWrites = [first.session, second.session].map((session) => {
+      let started!: () => void;
+      let release!: () => void;
+      starts.push(new Promise<void>((resolve) => (started = resolve)));
+      const blocked = new Promise<void>((resolve) => (release = resolve));
+      releases.push(release);
+      return server.enqueueCharacterWrite(session.characterId, async () => {
+        started();
+        await blocked;
+      });
+    });
+    await Promise.all(starts);
+
+    dispatch(server, first.session, { cmd: 'guild_create', name: 'First Banner' });
+    dispatch(server, second.session, { cmd: 'guild_create', name: 'Second Banner' });
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(2);
+    dispatch(server, third.session, { cmd: 'guild_create', name: 'Third Banner' });
+
+    const thirdEvents = third.sent.flatMap(
+      (message) => ((message as { list?: unknown[] }).list ?? []) as never[],
+    );
+    expect(thirdEvents).toContainEqual({
+      type: 'error',
+      text: 'You are busy. Try again in a moment.',
+    });
+    expect(third.session.guildCreateSettlement).toBeUndefined();
+    expect(third.session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+    expect(paidGuildCreateMock).not.toHaveBeenCalled();
+
+    const settlements = [first.session, second.session].map((session) => {
+      priv(server).paidGuildCreation.cancelQueuedForLeave(session);
+      return session.guildCreateSettlement;
+    });
+    await Promise.all(settlements);
+    for (const release of releases) release();
+    await Promise.all(olderWrites);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+  });
+
+  it('aborts a paid create that remains queued for the full 70-second bound', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'TimedOut');
+    session.leaseNonce = 'lease:timed-out';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    let release!: () => void;
+    let started!: () => void;
+    const startedPromise = new Promise<void>((resolve) => (started = resolve));
+    const blocked = new Promise<void>((resolve) => (release = resolve));
+    const olderWrite = server.enqueueCharacterWrite(session.characterId, async () => {
+      started();
+      await blocked;
+    });
+    await startedPromise;
+
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+      const settlement = session.guildCreateSettlement;
+      expect(settlement).toBeDefined();
+      await vi.advanceTimersByTimeAsync(69_999);
+      expect(priv(server).paidGuildCreation.pendingCount).toBe(1);
+      expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(1);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await settlement;
+      expect(paidGuildCreateMock).not.toHaveBeenCalled();
+      expect(meta.copper).toBe(150_000);
+      expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+      expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+      expect(session.bankLedgerJournal.outbox.usage.reservedEncodedBytes).toBe(0);
+    } finally {
+      release();
+      await olderWrite;
+      vi.useRealTimers();
+    }
+  });
+
+  it('awaits a started atomic create before the leave flush and teardown', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Leaver');
+    session.leaseNonce = 'lease:leaver';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    let settleAtomic!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      settleAtomic = resolve;
+    });
+    paidGuildCreateMock.mockImplementationOnce(
+      async (_deps: unknown, args: { fee: { batchKey: string } }) => {
+        await blocked;
+        return {
+          durability: 'committed',
+          guildId: GUILD_ID,
+          feeBatchKey: args.fee.batchKey,
+        };
+      },
+    );
+    const order: string[] = [];
+    const created = priv(server).social.tx.onGuildCreated.bind(priv(server).social.tx);
+    vi.spyOn(priv(server).social.tx, 'onGuildCreated').mockImplementation((...args: unknown[]) => {
+      const [characterId, guildId] = args as [number, number];
+      order.push('created-hook');
+      created(characterId, guildId);
+    });
+    dbMock.saveCharacterAndMarketState.mockImplementationOnce(async () => {
+      order.push('final-save');
+      return true;
+    });
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await vi.waitFor(() => expect(paidGuildCreateMock).toHaveBeenCalledTimes(1));
+    const leaving = server.leave(session, 'test disconnect');
+    let left = false;
+    void leaving.then(() => {
+      left = true;
+    });
+    await Promise.resolve();
+    expect(left).toBe(false);
+    expect(server.sim.entities.has(session.pid)).toBe(true);
+
+    settleAtomic();
+    await leaving;
+    expect(order).toEqual(['created-hook', 'final-save']);
+    expect(server.sim.entities.has(session.pid)).toBe(false);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true);
+  });
+
+  it('never refunds a replacement session when the original rollback settles late', async () => {
+    const server = new GameServer();
+    const { session: origin } = joinServer(server, 1, 'Origin');
+    const { session: replacement } = joinServer(server, 2, 'Replacement');
+    origin.leaseNonce = 'lease:origin';
+    replacement.leaseNonce = 'lease:replacement';
+    const originMeta = server.sim.players.get(origin.pid);
+    const replacementMeta = server.sim.players.get(replacement.pid);
+    if (!originMeta || !replacementMeta) throw new Error('missing meta');
+    originMeta.copper = 150_000;
+    replacementMeta.copper = 777;
+    let settleAtomic!: () => void;
+    const blocked = new Promise<void>((resolve) => {
+      settleAtomic = resolve;
+    });
+    paidGuildCreateMock.mockImplementationOnce(async () => {
+      await blocked;
+      return { durability: 'not_committed', reason: 'name_taken' };
+    });
+    vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, origin, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await vi.waitFor(() => expect(paidGuildCreateMock).toHaveBeenCalledTimes(1));
+    // Simulate the authority slot changing while the original DB request is
+    // in flight. Refund logic must compare the exact session object, not only
+    // the reusable character id.
+    priv(server).sessionsByCharacterId.set(origin.characterId, replacement);
+    settleAtomic();
+    await origin.guildCreateSettlement;
+    errSpy.mockRestore();
+
+    expect(originMeta.copper).toBe(140_000);
+    expect(replacementMeta.copper).toBe(777);
+    expect(origin.escrowQuarantined).toBe(true);
+  });
+
+  it('never refunds or saves an unresolved COMMIT ambiguity', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Unknown');
+    session.leaseNonce = 'lease:ambiguous';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    paidGuildCreateMock.mockImplementationOnce(
+      async (_deps: unknown, args: { fee: { batchKey: string } }) => ({
+        durability: 'commit_ambiguous',
+        guildId: GUILD_ID,
+        feeBatchKey: args.fee.batchKey,
+        error: new Error('commit answer lost'),
+      }),
+    );
+    const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+
+    errSpy.mockRestore();
+    expect(meta.copper).toBe(140_000);
+    expect(session.escrowQuarantined).toBe(true);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(false);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(1);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(await server.saveCharacter(session)).toBe(false);
+    expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
+    expect(kickSpy).toHaveBeenCalled();
+  });
+
+  it('keeps committed success hooks authoritative when exact local acknowledgement fails', async () => {
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 1, 'Committed');
+    session.leaseNonce = 'lease:committed-ack-failure';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    vi.spyOn(session.bankLedgerJournal.outbox, 'canAcknowledge').mockReturnValue(false);
+    const membershipSpy = vi.spyOn(server.sim, 'setPlayerGuildMembership');
+    vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+
+    errSpy.mockRestore();
+    expect(meta.copper).toBe(140_000);
+    expect(session.escrowQuarantined).toBe(true);
+    expect(session.bankLedgerJournal.outbox.usage.reservedRows).toBe(0);
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true);
+    expect(membershipSpy).toHaveBeenCalledWith(session.pid, {
+      guildId: GUILD_ID,
+      rank: 'leader',
+    });
+    const events = sent.flatMap((m) => ((m as { list?: unknown[] }).list ?? []) as never[]);
+    expect(events).toContainEqual({
+      type: 'log',
+      text: 'You found the guild <Iron Vanguard>! You are its Guild Master.',
+      color: '#40ff7f',
+    });
+  });
+
+  it('quarantines a mismatched committed fee identity without undoing durable success', async () => {
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 1, 'CommittedMismatch');
+    session.leaseNonce = 'lease:committed-fee-mismatch';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    paidGuildCreateMock.mockResolvedValueOnce({
+      durability: 'committed',
+      guildId: GUILD_ID,
+      feeBatchKey: 'ledger:different-durable-fee',
+    });
+    const refundSpy = vi.spyOn(server.sim, 'refundGuildCreationFeeFor');
+    const membershipSpy = vi.spyOn(server.sim, 'setPlayerGuildMembership');
+    const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await session.guildCreateSettlement;
+
+    errSpy.mockRestore();
+    expect(refundSpy).not.toHaveBeenCalled();
+    expect(meta.copper).toBe(140_000);
+    expect(session.escrowQuarantined).toBe(true);
+    expect(priv(server).paidGuildCreation.pendingCount).toBe(0);
+    expect(session.bankLedgerJournal.outbox.usage).toMatchObject({
+      reservedRows: 0,
+      reservedEncodedBytes: 0,
+    });
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true);
+    expect(membershipSpy).toHaveBeenCalledWith(session.pid, {
+      guildId: GUILD_ID,
+      rank: 'leader',
+    });
+    expect(kickSpy).toHaveBeenCalled();
+    const events = sent.flatMap((message) => {
+      return ((message as { list?: unknown[] }).list ?? []) as never[];
+    });
+    expect(events).toContainEqual({
+      type: 'log',
+      text: 'You found the guild <Iron Vanguard>! You are its Guild Master.',
+      color: '#40ff7f',
+    });
+  });
+
+  it('acknowledges only the captured prefix and preserves a mid-transaction ledger suffix', async () => {
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'Suffix');
+    session.leaseNonce = 'lease:suffix';
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 150_000;
+    let settleAtomic!: () => void;
+    const atomicBlocked = new Promise<void>((resolve) => {
+      settleAtomic = resolve;
+    });
+    paidGuildCreateMock.mockImplementationOnce(
+      async (_deps: unknown, args: { fee: { batchKey: string } }) => {
+        await atomicBlocked;
+        return {
+          durability: 'committed',
+          guildId: GUILD_ID,
+          feeBatchKey: args.fee.batchKey,
+        };
+      },
+    );
+
+    dispatch(server, session, { cmd: 'guild_create', name: 'Iron Vanguard' });
+    await vi.waitFor(() => expect(paidGuildCreateMock).toHaveBeenCalledTimes(1));
+    const suffix = session.bankLedgerJournal.admission.tryReserve(1, 0, 'personal');
+    expect(suffix).not.toBeNull();
+    expect(
+      suffix?.commit([
+        {
+          realm: session.bankLedgerJournal.outbox.owner.realm,
+          characterId: session.characterId,
+          accountId: session.accountId,
+          op: 'deposit',
+          itemId: 'wolf_fang',
+          count: 1,
+          instance: null,
+          copperDelta: 0,
+          purchasedSlotsAfter: 0,
+          container: 'personal',
+          containerId: null,
+        },
+      ]),
+    ).toBe(true);
+    meta.bank.purchasedSlots = 6;
+    const storageSuffix = {
+      realm: session.bankLedgerJournal.outbox.owner.realm,
+      accountId: session.accountId,
+      characterId: session.characterId,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'guild-create-storage-suffix',
+      spendClaimToken: '00000000-0000-4000-8000-000000000001',
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    expect(server.stageStorageAppliedEffect(storageSuffix)).toBe(true);
+    settleAtomic();
+    await session.guildCreateSettlement;
+
+    const remaining = queuedLedgerRows(session);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0]).toMatchObject({ op: 'deposit', itemId: 'wolf_fang', count: 1 });
+    expect(session.pendingStorageAppliedEffects).toEqual([storageSuffix]);
+  });
+
+  it('onGuildCreated is a live-only durable-book mirror, even without a local founder', async () => {
     const server = new GameServer();
     joinServer(server, 1, 'Bystander');
     priv(server).social.tx.onGuildCreated(999999, GUILD_ID);
-    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true); // boot parity for the restart
+    expect(server.sim.guildBanks.has(GUILD_ID)).toBe(true);
     await bankLedgerIdle();
-    // No reservation existed here (the hook fired without a gate charge), so
-    // no ledger row: the row always mirrors an actual reservation.
+    // The atomic creator owns the durable fee. This transport hook can never
+    // enqueue a duplicate receipt or dirty the new empty book.
     expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
   });
 
@@ -1835,6 +2456,118 @@ describe('guild bank incident counters at their real emission sites', () => {
     expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
   });
 
+  it.each([
+    { label: 'guild-book', withMarket: false },
+    { label: 'market-and-guild-book', withMarket: true },
+  ])(
+    'a durable growth refusal on the $label save quarantines and reverts without escrow_save_failed',
+    async ({ withMarket }) => {
+      const server = new GameServer();
+      const { session } = joinServer(server, 1, 'GrowthBound');
+      officerSetup(server, session);
+      dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 5_000 });
+      expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(95_000);
+      expect(session.dirtyGuildBanks.has(GUILD_ID)).toBe(true);
+
+      const rec = recordingIncidents();
+      let growthRefusals = 0;
+      setGameMetricsCounters({
+        ...rec.sink,
+        bankLedgerGrowthLimitRefused() {
+          growthRefusals++;
+        },
+      });
+      const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+      const save = withMarket
+        ? dbMock.saveCharacterAndMarketState
+        : dbMock.saveCharacterAndGuildBankState;
+      save.mockRejectedValueOnce(refusal);
+      const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        await expect(priv(server).saveCharacter(session, { withMarket })).rejects.toBe(refusal);
+        await Promise.resolve();
+
+        expect(save).toHaveBeenCalledTimes(1);
+        expect(growthRefusals).toBe(1);
+        expect(rec.kinds).toEqual(['reconcile']);
+        expect(rec.kinds).not.toContain('escrow_save_failed');
+        expect(session.escrowQuarantined).toBe(true);
+        expect(session.dirtyGuildBanks.size).toBe(0);
+        expect(session.unflushedGuildBankOps.size).toBe(0);
+        expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_000);
+        expect(durableBook()).toEqual({
+          treasury: 100_000,
+          inventory: [],
+          purchasedSlots: 24,
+        });
+        expect(kickSpy).toHaveBeenCalledWith(
+          session,
+          'character state could not be saved',
+          'bank ledger full',
+        );
+
+        await expect(priv(server).saveCharacter(session, { withMarket })).resolves.toBe(false);
+        expect(save).toHaveBeenCalledTimes(1);
+      } finally {
+        errorSpy.mockRestore();
+        kickSpy.mockRestore();
+      }
+    },
+  );
+
+  it('a growth refusal reverts every guild-book prefix carried by one save', async () => {
+    const secondGuildId = GUILD_ID + 1;
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'MultiGuildGrowth');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 5_000 });
+
+    server.sim.loadGuildBank(secondGuildId, {
+      treasury: 200_000,
+      inventory: [],
+      purchasedSlots: 24,
+    });
+    server.sim.setPlayerGuildMembership(session.pid, {
+      guildId: secondGuildId,
+      rank: 'officer',
+    });
+    dispatch(server, session, { cmd: 'guild_bank_withdraw_gold', amount: 7_000 });
+    expect([...session.dirtyGuildBanks.keys()].sort((a, b) => a - b)).toEqual([
+      GUILD_ID,
+      secondGuildId,
+    ]);
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(95_000);
+    expect(server.sim.guildBanks.get(secondGuildId)?.treasury).toBe(193_000);
+
+    const rec = recordingIncidents();
+    let growthRefusals = 0;
+    setGameMetricsCounters({
+      ...rec.sink,
+      bankLedgerGrowthLimitRefused() {
+        growthRefusals++;
+      },
+    });
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 2, 10_000_000);
+    dbMock.saveCharacterAndGuildBankState.mockRejectedValueOnce(refusal);
+    const kickSpy = vi.spyOn(priv(server), 'kickSession').mockResolvedValue(undefined);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(priv(server).saveCharacter(session)).rejects.toBe(refusal);
+      await Promise.resolve();
+
+      expect(growthRefusals).toBe(1);
+      expect(rec.kinds).toEqual(['reconcile', 'reconcile']);
+      expect(session.dirtyGuildBanks.size).toBe(0);
+      expect(session.unflushedGuildBankOps.size).toBe(0);
+      expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_000);
+      expect(server.sim.guildBanks.get(secondGuildId)?.treasury).toBe(200_000);
+    } finally {
+      errorSpy.mockRestore();
+      kickSpy.mockRestore();
+    }
+  });
+
   it('books NO escrow_save_failed when the failed save carried no guild book', async () => {
     // The decisive negative: an ordinary character save that throws is not a
     // guild bank incident, or the series would be noise.
@@ -1977,20 +2710,25 @@ describe('guild bank incident counters at their real emission sites', () => {
     expect(server.sim.guildBanks.has(9)).toBe(true);
   });
 
-  it('counts ledger_write_failed when a guild bank_ledger insert rejects', async () => {
+  it('quarantines and counts ledger_write_failed when post-mutation projection fails', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Ledger');
     officerSetup(server, session);
     const rec = recordingIncidents();
     setGameMetricsCounters(rec.sink);
-    dbMock.insertBankLedgerRow.mockRejectedValueOnce(new Error('insert rejected'));
+    vi.spyOn(session.bankLedgerJournal.outbox, 'commit').mockImplementationOnce(() => {
+      throw new Error('projection rejected');
+    });
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
-    await bankLedgerIdle();
+    expect(() =>
+      dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 }),
+    ).toThrow('projection rejected');
     errSpy.mockRestore();
-    expect(rec.kinds).toEqual(['ledger_write_failed']);
-    // The op itself still landed: the observer never faults the dispatch path.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(101_000);
+    expect(rec.kinds).toEqual(['ledger_write_failed', 'reconcile']);
+    expect(session.escrowQuarantined).toBe(true);
+    // The mutation cannot be saved without its exact evidence, so the live
+    // shared book is restored before teardown can persist this character.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_000);
   });
 
   it('books nothing at all on a healthy op + save (the vacuity guard)', async () => {
@@ -2059,12 +2797,9 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       carrierCharacterId: session.characterId,
     });
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
-    // The observed mutation path did its two jobs: the audit row and the
-    // per-session unflushed delta the fence-out revert depends on.
-    await bankLedgerIdle();
-    const rows = (
-      dbMock.insertBankLedgerRow.mock.calls as unknown as Record<string, unknown>[][]
-    ).map((c) => c[0]);
+    // The observed mutation path carried both the audit row and the
+    // per-session delta through the same save transaction.
+    const rows = guildSaveLedgerRows();
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       op: 'admin_purge',
@@ -2078,7 +2813,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       characterId: session.characterId,
     });
     // Evidence: the REAL instance payload, not the wire projection.
-    expect(rows[0].instance).toEqual({ boundTo: 424242 });
+    expect(rows[0].instanceJson).toBe('{"boundTo":424242}');
     expect(session.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]); // consumed by the save
     // It rode the SAME fenced escrow save (never a standalone book write), and
     // the call awaited it: the mark is already released when the call returns.
@@ -2118,10 +2853,8 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     officerSetup(server, session);
     seatDormant(server);
     await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
-    await bankLedgerIdle();
-    const row = (
-      dbMock.insertBankLedgerRow.mock.calls as unknown as Record<string, unknown>[][]
-    )[0][0];
+    const row = guildSaveLedgerRows()[0];
+    if (!row) throw new Error('missing transactional admin-purge row');
     expect(row.accountId).toBe(OPERATOR);
     expect(row.accountId).not.toBe(session.accountId);
   });
@@ -2199,6 +2932,46 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
     await bankLedgerIdle();
     expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['already leaving', (session: ClientSession) => (session.left = true)],
+    ['quarantined', (session: ClientSession) => (session.escrowQuarantined = true)],
+  ])('never selects an %s session as the purge carrier', async (_label, makeUnusable) => {
+    const server = new GameServer();
+    const session = joinServer(server, 1, 'Unavailable').session;
+    stampMember(server, session, 'officer');
+    seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
+    makeUnusable(session);
+
+    await expect(
+      server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR),
+    ).resolves.toEqual({ ok: false, reason: 'no_carrier' });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+  });
+
+  it('rechecks the exact carrier after the fresh roster read', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, 1, 'LeavingDuringLookup').session;
+    stampMember(server, session, 'officer');
+    seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
+    let releaseLookup!: () => void;
+    vi.spyOn(priv(server).socialDb, 'guildMembersFresh').mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseLookup = () => resolve([{ id: session.characterId, rank: 'officer' }]);
+        }),
+    );
+
+    const purging = server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    await vi.waitFor(() => expect(releaseLookup).toBeTypeOf('function'));
+    session.left = true;
+    releaseLookup();
+
+    await expect(purging).resolves.toEqual({ ok: false, reason: 'no_carrier' });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
   });
 
   it('prefers an officer-plus carrier over a plain member', async () => {

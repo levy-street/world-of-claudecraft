@@ -233,6 +233,12 @@ export class PgSocialDb implements SocialDb {
 
   constructor(private readonly pool: Pool) {}
 
+  /** Atomic paid creation lives outside the SocialDb interface, but it still
+   *  has to invalidate this instance-local roster cache after commit. */
+  bustGuildRoster(guildId: number): void {
+    this.guildRoster.bust(guildId);
+  }
+
   async findCharacterByName(name: string): Promise<CharInfo | null> {
     // scoped to this realm: you can only friend/ignore/invite characters that
     // live on the same world as you. exact case wins; otherwise an unambiguous

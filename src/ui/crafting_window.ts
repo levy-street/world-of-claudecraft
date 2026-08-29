@@ -267,11 +267,28 @@ export function renderCraftingWindow(
     }
   }
 
+  const rows = selected !== null ? (sections.get(selected) ?? []) : [];
+  if (view.vaultNote && rows.some((row) => row.reagents.some((r) => !r.satisfied))) {
+    // Place-blocked vault draw with a short row ON THE VISIBLE TAB (Phase 04
+    // QA, the stationOutOfRange precedent): the reason is stated once for
+    // the window in words, location-scoped rather than per recipe, because
+    // the gate is about where the player stands. The core decides
+    // blocked-plus-short across the known recipes; this render additionally
+    // scopes to the selected section so an all-green tab stays quiet. A
+    // SIBLING of the scroll body, never its first child: the body's
+    // scrollTop is captured and restored across rebuilds, and a note
+    // prepended inside it would sit above the restored offset on the very
+    // repaint that introduces it. Plain text in document order (visible AND
+    // read by AT), so no aria duplication.
+    const vaultNote = document.createElement('div');
+    vaultNote.className = 'crafting-vault-note';
+    vaultNote.textContent = t('hudChrome.crafting.vaultUnreachable');
+    el.appendChild(vaultNote);
+  }
+
   const body = document.createElement('div');
   body.className = 'crafting-body';
   el.appendChild(body);
-
-  const rows = selected !== null ? (sections.get(selected) ?? []) : [];
   if (selected !== null) {
     const sectionName = craftNameText(selected);
     const sectionImageUrl = professionImageUrl(`prof_${selected}`);
@@ -320,6 +337,15 @@ export function renderCraftingWindow(
               count: formatNumber(count, { maximumFractionDigits: 0 }),
             })}`
           : '';
+      // The vault-draw suffix (Bank Storage Phase 04): stated in words beside
+      // the fine-substitution one, on the visible line AND the aria fold,
+      // never color alone (the same fairness rule).
+      const vaultDrawText = (count: number): string =>
+        count > 0
+          ? ` ${t('hudChrome.crafting.reagentVaultDraw', {
+              count: formatNumber(count, { maximumFractionDigits: 0 }),
+            })}`
+          : '';
       const reagentLines = row.reagents
         .map(
           (r) =>
@@ -327,7 +353,9 @@ export function renderCraftingWindow(
               name: r.item ? itemDisplayName(r.item) : r.itemId,
               have: formatNumber(r.have, { maximumFractionDigits: 0 }),
               required: formatNumber(r.required, { maximumFractionDigits: 0 }),
-            }) + fineSubText(r.fineSubstituted),
+            }) +
+            fineSubText(r.fineSubstituted) +
+            vaultDrawText(r.vaultDrawn),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -345,6 +373,10 @@ export function renderCraftingWindow(
             )}${
               r.fineSubstituted > 0
                 ? `<span class="crafting-fine-sub">${esc(fineSubText(r.fineSubstituted))}</span>`
+                : ''
+            }${
+              r.vaultDrawn > 0
+                ? `<span class="crafting-vault-draw">${esc(vaultDrawText(r.vaultDrawn))}</span>`
                 : ''
             }</span>`,
         )

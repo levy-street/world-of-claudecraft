@@ -214,6 +214,7 @@ describe('the classifier map is complete and its keys are real commands', () => 
       apply_enchant: 'craft',
       autoloot: 'loot',
       bank_buy_slots: 'bank',
+      bank_unlock_socket: 'bank',
       buy: 'vendor',
       buyback: 'vendor',
       collect_delve_chest_loot: 'delve',
@@ -249,6 +250,7 @@ describe('the classifier map is complete and its keys are real commands', () => 
       trade_confirm: 'trade',
       turnin: 'quest',
       unbind_item: 'craft',
+      vault_buy_upgrade: 'bank',
     });
   });
 

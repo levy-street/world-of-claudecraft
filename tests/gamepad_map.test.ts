@@ -4,6 +4,7 @@ import {
   BINDABLE_BUTTONS,
   DEFAULT_GAMEPAD_BINDINGS,
   detectGamepadKind,
+  fallingEdges,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GP,
@@ -133,6 +134,20 @@ describe('risingEdges', () => {
 
   it('reports nothing when held', () => {
     expect(risingEdges([true, true], [true, true])).toEqual([]);
+  });
+});
+
+describe('fallingEdges', () => {
+  it('reports only down to up transitions across multiple buttons', () => {
+    expect(fallingEdges([true, true, false, true], [false, true, true, false])).toEqual([0, 3]);
+  });
+
+  it('ignores rising edges', () => {
+    expect(fallingEdges([false, false], [true, false])).toEqual([]);
+  });
+
+  it('reports nothing for empty snapshots', () => {
+    expect(fallingEdges([], [])).toEqual([]);
   });
 });
 

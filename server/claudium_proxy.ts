@@ -15,7 +15,9 @@
 // The functions mirror the service SDK v1 surface; they do NOT recompute any
 // value, they only pass through what the service returns.
 
+import { parseClaudiumSpendWireResult } from './claudium_spend_wire';
 import { DESKTOP_WALLET_HANDOFF_TTL_MS, desktopWalletHandoffs } from './desktop_wallet_handoff';
+import { requestNeverReachedService } from './service_reachability';
 
 const SERVICE_TIMEOUT_MS = 5000;
 const NATIVE_CONFIRM_TIMEOUT_MS = 60_000;
@@ -148,11 +150,14 @@ export interface ClaudiumHistoryResult {
   entries: ClaudiumHistoryEntry[];
 }
 
-/** One cosmetic-store row: the item and its Claudium cost, both from the service. */
+/** One store row: the item and its Claudium cost, both from the service.
+ *  kind 'storage' (Bank Storage phase 11) sells repeatable bank capacity:
+ *  its spends never write a grant row service-side, so `owned` is false
+ *  FOREVER on a storage row and the game must never interpret it. */
 export interface ClaudiumStoreItem {
   itemId: string;
   name: string;
-  kind: 'cosmetic' | 'skin' | 'item';
+  kind: 'cosmetic' | 'skin' | 'item' | 'storage';
   costClaudium: number;
   owned: boolean;
 }
@@ -195,37 +200,80 @@ interface ServiceRequest {
   path: string;
   body?: unknown;
   timeoutMs?: number;
+  signal?: AbortSignal;
+}
+
+/** A call outcome that also reports whether the request PROVABLY never reached
+ *  the service, which is the one failure a money caller may treat as "no debit
+ *  is possible" (server/service_reachability.ts explains the narrowness). */
+interface ServiceCallOutcome<T> {
+  data: T | null;
+  neverReached: boolean;
 }
 
 /**
  * The one fetch wrapper. Returns the parsed JSON on a 2xx, or null on any
  * failure (unconfigured, non-2xx, network error, timeout, bad JSON). It NEVER
  * throws: every caller maps a null into its own typed unavailable result.
+ *
+ * The reachability flag can only be set on the two paths where nothing was
+ * sent (no service configured, an unbuildable URL) and on a REJECTED fetch
+ * whose cause is connect-level. A non-2xx and a bad body are deliberately
+ * ambiguous: bytes reached an application, so a debit is possible.
  */
-async function callService<T>(req: ServiceRequest): Promise<T | null> {
+async function callServiceDetailed<T>(req: ServiceRequest): Promise<ServiceCallOutcome<T>> {
   const base = serviceUrl();
   const secret = serviceSecret();
-  if (base === '' || secret === '') return null;
+  if (base === '' || secret === '') return { data: null, neverReached: true };
+  let url: URL;
   try {
-    const url = new URL(req.path.replace(/^\//, ''), base.endsWith('/') ? base : `${base}/`);
-    const headers: Record<string, string> = { 'x-woc-economy-secret': secret };
-    let body: string | undefined;
-    if (req.body !== undefined) {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(req.body);
-    }
-    const res = await fetch(url, {
+    url = new URL(req.path.replace(/^\//, ''), base.endsWith('/') ? base : `${base}/`);
+  } catch (err) {
+    logFailure(err);
+    return { data: null, neverReached: true };
+  }
+  const headers: Record<string, string> = { 'x-woc-economy-secret': secret };
+  let body: string | undefined;
+  if (req.body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(req.body);
+  }
+  let res: Response;
+  try {
+    const timeoutSignal = AbortSignal.timeout(req.timeoutMs ?? SERVICE_TIMEOUT_MS);
+    res = await fetch(url, {
       method: req.method,
       headers,
       body,
-      signal: AbortSignal.timeout(req.timeoutMs ?? SERVICE_TIMEOUT_MS),
+      // NEVER follow a redirect. Two reasons, both money-shaped. A 307 or 308
+      // preserves the method, so a POST that was DELIVERED, answered 3xx, and
+      // then failed at connect against the redirect target would reject with a
+      // connect-level error and classify as never-reached although bytes had
+      // already reached an application. And undici strips only Authorization,
+      // Cookie and Proxy-Authorization across origins, so the service secret
+      // header would ride along to whatever the redirect named. A redirect is
+      // no part of this service's contract; treating one as a failure keeps the
+      // ambiguous answer ambiguous, which is the safe direction.
+      redirect: 'error',
+      signal: req.signal ? AbortSignal.any([req.signal, timeoutSignal]) : timeoutSignal,
     });
+  } catch (err) {
+    // Coordinator shutdown is expected control flow. It remains an ambiguous
+    // money outcome, but should not page/log as an economy-service outage.
+    if (!req.signal?.aborted) logFailure(err);
+    return { data: null, neverReached: requestNeverReachedService(err) };
+  }
+  try {
     if (!res.ok) throw new Error(`${req.method} ${req.path} -> ${res.status}`);
-    return (await res.json()) as T;
+    return { data: (await res.json()) as T, neverReached: false };
   } catch (err) {
     logFailure(err);
-    return null;
+    return { data: null, neverReached: false };
   }
+}
+
+async function callService<T>(req: ServiceRequest): Promise<T | null> {
+  return (await callServiceDetailed<T>(req)).data;
 }
 
 export async function claudiumStripeWebhook(
@@ -576,27 +624,55 @@ export async function claudiumNativeConfirm(input: {
   };
 }
 
-/** POST spend. granted:false when the service is off. */
-export async function claudiumSpend(input: {
+/** POST spend. granted:false when the service is off. NOTE the 'unavailable'
+ *  reason it maps a null callService result to is AMBIGUOUS BY CONSTRUCTION:
+ *  it covers never-reached, timed-out-after-debiting, and reply-lost alike,
+ *  so a caller must never treat it as a definitive refusal; retrying the
+ *  SAME idempotency key is the one way to resolve it (the service replays a
+ *  completed spend as granted true + already_granted with no second debit). */
+export interface ClaudiumSpendInput {
   accountId: number;
   itemId: string;
-  kind: 'cosmetic' | 'skin' | 'item';
+  kind: 'cosmetic' | 'skin' | 'item' | 'storage';
   expectedCostClaudium: number;
   idempotencyKey: string;
-}): Promise<ClaudiumSpendResult> {
-  const data = await callService<{
-    granted: boolean;
-    balance: number;
-    costClaudium?: number;
-    reason?: string;
-  }>({ method: 'POST', path: 'spend', body: input });
-  if (!data) return { granted: false, balance: null, costClaudium: null, reason: 'unavailable' };
+}
+
+/** A spend result plus the transport fact behind it. `neverReached` is true
+ *  ONLY when the request provably never reached the service, so no debit is
+ *  possible; a timeout, any http status and a mid-request socket error are all
+ *  false. Kept OFF ClaudiumSpendResult on purpose: that shape is returned to
+ *  the client verbatim, and this fact is server-only. */
+export interface ClaudiumSpendOutcome {
+  result: ClaudiumSpendResult;
+  neverReached: boolean;
+}
+
+export async function claudiumSpendDetailed(
+  input: ClaudiumSpendInput,
+  signal?: AbortSignal,
+): Promise<ClaudiumSpendOutcome> {
+  const { data, neverReached } = await callServiceDetailed<unknown>({
+    method: 'POST',
+    path: 'spend',
+    body: input,
+    signal,
+  });
+  const parsed = parseClaudiumSpendWireResult(data);
+  if (!parsed) {
+    return {
+      result: { granted: false, balance: null, costClaudium: null, reason: 'unavailable' },
+      neverReached,
+    };
+  }
   return {
-    granted: Boolean(data.granted),
-    balance: typeof data.balance === 'number' ? data.balance : null,
-    costClaudium: typeof data.costClaudium === 'number' ? data.costClaudium : null,
-    reason: data.reason ?? null,
+    result: parsed,
+    neverReached: false,
   };
+}
+
+export async function claudiumSpend(input: ClaudiumSpendInput): Promise<ClaudiumSpendResult> {
+  return (await claudiumSpendDetailed(input)).result;
 }
 
 /** GET history/:accountId. Empty when the service is off. */
@@ -631,7 +707,7 @@ export async function claudiumStore(accountId: number): Promise<ClaudiumStoreRes
       typeof i.name === 'string' &&
       typeof i.costClaudium === 'number' &&
       typeof i.owned === 'boolean' &&
-      (i.kind === 'cosmetic' || i.kind === 'skin' || i.kind === 'item'),
+      (i.kind === 'cosmetic' || i.kind === 'skin' || i.kind === 'item' || i.kind === 'storage'),
   );
   return { available: true, items };
 }

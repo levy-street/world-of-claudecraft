@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { bagPools, canGrantItemInstance, fitsAll } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
@@ -417,7 +417,7 @@ export function harvestCorpse(
   // both gates upstream guarantee yieldingFocusComponents is non-empty, so
   // `wanted` always holds at least one row and the short-circuit's false arm is
   // unreachable. Dead since #2513, kept for the same reason the others are.
-  if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
+  if (wanted.length > 0 && !fitsAll(meta.inventory, bagPools(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
@@ -606,7 +606,7 @@ export function harvestCorpse(
     if (
       canGrantItemInstance(
         meta.inventory,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         grant.itemId,
         payload,
         grant.plainQty,
@@ -661,7 +661,7 @@ export function harvestCorpse(
   for (const grant of signedGrants) {
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
+    if (canGrantItemInstance(meta.inventory, bagPools(meta.bags), grant.itemId, payload)) {
       // Exactly one unit, deliberately: the specimen is a jackpot, not a
       // quantity, so it never carries the component's rolled count the way the
       // signed grant above does. The guard's count defaults to that same 1.

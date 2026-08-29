@@ -7,13 +7,17 @@ import {
   ARRIVAL_REVEAL_POLL_MS,
   type ArrivalRevealGate,
   arrivalCoverActive,
+  arrivalEstablishingShotActive,
   arrivalHeldImminentKeys,
   awaitArrivalReveals,
+  ENTRY_WAIT_ESTABLISHING_EVENT_KEY,
+  ENTRY_WAIT_EVENT_KEY,
   noteArrivalEvent,
   noteArrivalIfTeleported,
   registerRevealGateForArrival,
   resetArrivalCoverForTest,
   setArrivalCover,
+  setArrivalEstablishingShot,
 } from '../src/render/arrival_cover';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 
@@ -183,6 +187,67 @@ describe('awaitArrivalReveals', () => {
     expect(settled).toBe(true);
   });
 
+  it('records how long it waited, the bound and the keys still held, under the shot key when the establishing shot is up', async () => {
+    let t = 0;
+    const timer = fakeTimer();
+    const gate = fakeGate(2);
+    registerRevealGateForArrival(gate);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    const wait = awaitArrivalReveals(6_000, { now: () => t, schedule: timer.schedule });
+    t = 50;
+    timer.flush();
+    await Promise.resolve();
+    gate.held = 1;
+    t = 3_700;
+    timer.flush();
+    await Promise.resolve();
+    gate.held = 0;
+    t = 3_750;
+    timer.flush();
+    await wait;
+    setArrivalEstablishingShot(false);
+    setArrivalCover(false);
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      kind: 'arrival',
+      key: ENTRY_WAIT_ESTABLISHING_EVENT_KEY,
+      ageMs: 3_750,
+      units: 6_000,
+      totalRoots: 0,
+    });
+  });
+
+  it('records a wait that ran out of its bound with the keys it lifted on, under the plain key', async () => {
+    let t = 0;
+    const timer = fakeTimer();
+    registerRevealGateForArrival(fakeGate(5));
+    const wait = awaitArrivalReveals(3_000, { now: () => t, schedule: timer.schedule });
+    while (timer.pending() > 0) {
+      t += 50;
+      timer.flush();
+      await Promise.resolve();
+    }
+    await wait;
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      kind: 'arrival',
+      key: ENTRY_WAIT_EVENT_KEY,
+      ageMs: 3_000,
+      units: 3_000,
+      totalRoots: 5,
+    });
+  });
+
+  it('records nothing for a zero-budget wait', async () => {
+    const timer = fakeTimer();
+    registerRevealGateForArrival(fakeGate(4));
+    await awaitArrivalReveals(0, { now: () => 0, schedule: timer.schedule });
+    expect(gpuPrepEventsSnapshot().events).toHaveLength(0);
+  });
+
   it('keeps the floor inside maxMs, so a zero-budget wait still costs nothing', async () => {
     // The online arrival asks for no wait at all. The floor may not turn that
     // into a poll interval of curtain.
@@ -247,5 +312,45 @@ describe('awaitArrivalReveals', () => {
     const timer = fakeTimer();
     await awaitArrivalReveals(0, { now: () => 0, schedule: timer.schedule });
     expect(timer.pending()).toBe(0);
+  });
+});
+
+describe('arrival establishing shot', () => {
+  it('is inert while the cover is down, whatever its owner last wrote', () => {
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalEstablishingShot(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+  });
+
+  it('clears with its owner, so a later plain cover is not an establishing shot', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    setArrivalEstablishingShot(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(false);
+  });
+
+  it('a teleport cover nested inside the entry cover keeps the shot readable until the entry drops', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalEstablishingShot(false);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+  });
+
+  it('resets with the cover for tests', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    resetArrivalCoverForTest();
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
   });
 });
