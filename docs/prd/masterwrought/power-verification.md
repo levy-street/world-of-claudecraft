@@ -17,9 +17,37 @@ column (section 12.3 defines it).
 
 ## Verdict
 
-**INSIDE the envelope, on every measured kit and both protected targets, after
-four downward content tunes this phase applied.** The kit as it shipped into this
-phase measured OUTSIDE it.
+**SUSPENDED. The envelope question is RE-OPENED and this phase does not close
+it.** A fresh reader's adversarial pass found, and this document's own harness
+then confirmed, that the gear term measures a STAT MODEL of the kit rather than
+the kit. On the physical lanes that model is a LOWER bound, not the upper bound
+section 8.1 claims, and correcting it takes the binding lane from just over the
+line to roughly twice it. Section 9.6 carries the measurement and the mechanism.
+
+The verdict this phase originally reached, and which no longer stands as
+written, was "INSIDE the envelope on every measured kit and both protected
+targets, after four downward content tunes". The four tunes are all genuinely
+downward and all still correct; what fails is the measurement they were sized
+against, so the tunes are kept and the conclusion is withdrawn.
+
+WHAT THE MAINTAINER OWNS, because both are ratified definitions this phase may
+not rewrite on its own:
+
+1. **Section 3's baseline pool.** `bestEpicGearFor` scores by raw stat SUM,
+   class-agnostically, so the two physical baselines carry two rings worth zero
+   attack power and 355 hit rating against a need of 190 or 260. Section 3
+   calls the pool "best-in-slot" and names only the legendary exclusion as its
+   conservatism. Either the pool rule changes to mean throughput-optimal, or
+   the record says the physical denominators are roughly 3 percent under a
+   hand-optimised kit.
+2. **Section 8.1's gear term.** "+2 lead-stat points" excludes the apex pieces'
+   rating lines, which on a hit-capped physical baseline are the larger term.
+   Either the gear term becomes an item swap on every lane, as the tank arm and
+   the two new equipped arms already do, or the record states plainly that the
+   published percentages exclude apex rating deltas and are therefore floors.
+
+Both readings re-open R5 rather than settling it, which is why this is an
+escalation and not an in-phase re-tune.
 
 | lane | heroic raid, level 22 | S-rift, level 23 |
 |---|---|---|
@@ -45,6 +73,9 @@ against.
 
 Before the tunes the same fixtures read **+5.86% / +6.08%** on warrior fury and
 **+6.24%** on tank effective health, both outside the envelope.
+
+Every percentage in the table above is the MODELLED kit, and section 9.6 shows
+what the modelled term omits. Read them as floors, not as the envelope.
 
 ## 1. What R5 measures, and what it does not
 
@@ -343,7 +374,13 @@ delta of 1 goes entirely to the lead stat and a delta of 2 puts the second point
 on the secondary. Measured across all 17: every piece gains exactly +1 lead.
 
 With the equip cap at 2, **the gear term is +2 lead-stat points**, and that is the
-figure the measurement uses for every lane. It is an upper bound in two ways: a
+figure the measurement uses for every lane. **Section 9.6 shows that on the two
+PHYSICAL lanes this is a LOWER bound rather than an upper one, and by roughly
+the width of the envelope, so read the rest of this subsection with that
+correction in front of it.** The reasoning below was written before that was
+measured and is kept because it is still right about the caster.
+
+It is claimed as an upper bound in two ways: a
 character whose baseline in a slot is a legendary gains nothing there (the apex
 weapon is 20 to 25 points behind a legendary one, and `heart_of_the_rift` is 17
 ahead of the apex neck), and a set-complete caster who takes an apex chest breaks
@@ -574,6 +611,55 @@ multiplier (`staPct: 0.40` on the prot mastery,
 stamina consumable delta reads as +100 health.
 
 Before this phase's shield tune the same arm read **+6.24%**, most of it armour.
+
+### 9.6 What the modelled gear term omits, measured
+
+The gear term everywhere above is "+2 lead-stat points" (section 8.1), applied
+as an instance stat delta. Section 8.1 calls that an upper bound. On the two
+PHYSICAL lanes it is a lower bound, and the gap is larger than the envelope.
+
+**The mechanism.** `swingMissChance` is `max(0, miss - hitBonus)` and `hitBonus`
+is `hitRating / 1000`, so hit past the miss chance is worth exactly nothing.
+`WAR_BIS` carries **355 hit rating**; the heroic target needs 190 and the S-rift
+target 260. Its effective miss is already **0.0 percent at both targets**, and
+95 to 165 rating is dead weight. Now compare the two legs:
+
+| def | armour | str | sta | hit | crit |
+|---|---|---|---|---|---|
+| `bloodmane_war_legguards` (baseline) | 315 | 11 | 9 | 40 | 0 |
+| `forgefold_legguards` (apex) | 315 | 11 | 9 | 0 | 40 |
+
+They are byte-identical except that the apex piece's 40 hit is 40 CRIT.
+Equipping it converts dead rating into live rating, a gain the "+1 lead stat per
+piece" model scores as ZERO, because Perfecting moves primary stats only.
+
+**Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
+the only difference being whether the two Perfected pieces a fury warrior can
+actually wear (`forgefold_legguards` and `warhewn_signet`) are applied as a stat
+delta or EQUIPPED as items:
+
+| arm | heroic raid, L22 | S-rift, L23 |
+|---|---|---|
+| modelled, "+2 lead-stat points" | +4.97% +/-1.18 | +5.27% +/-1.03 |
+| **the same two pieces EQUIPPED** | **+10.42% +/-1.42** | **+10.21% +/-1.20** |
+
+Roughly twice the envelope, and about double what the modelled term reports.
+Reproduce with `WOC_R5_SEEDS=60 WOC_R5_SECONDS=300 WOC_R5_ARMS=FULL,FULL+equipped
+npx tsx scripts/r5_envelope_probe.ts fury`.
+
+**The bound on the bound.** This measurement uses section 3's baseline, which
+carries the dead hit above and two rings worth zero attack power, so it flatters
+the packet: a throughput-correct baseline is stronger and the percentage lower.
+The adversarial reader who first raised this measured +7.69 and +6.44 percent
+against an attack-power-correct baseline. Every reading, on every baseline
+tried, is above 5. That is why the verdict is suspended rather than restated
+with a new number: which baseline is correct is section 3's ruling to make, not
+this section's.
+
+Note what this does NOT say. The caster lane's equipped arm (section 9.2) reads
+BELOW its modelled arm, because a caster's apex chest breaks a set bonus and its
+baseline is not rating-capped. The direction of the omission is not uniform, and
+that is precisely why it has to be measured per lane rather than argued once.
 
 ## 10. What this phase changed, and why
 

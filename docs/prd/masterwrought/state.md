@@ -21286,3 +21286,51 @@ stays alive, and this is that shape one tier up. The envelope forced it
 binding lane) and raising it is exactly the move R5 forbids. It is a
 demand risk under R21 for a future pass, recorded in
 power-verification.md section 14 and beside the def.
+
+### THE VERDICT IS SUSPENDED, and why (2026-08-28, the fresh-reader round)
+The review-fix round's own fresh reader found what four earlier reviewers and
+the implementer all missed: the R5 gear term measures a STAT MODEL of the kit,
+not the kit, and on the physical lanes the model is a LOWER bound rather than
+the upper bound power-verification.md section 8.1 claims.
+
+THE MECHANISM, verified directly rather than accepted. swingMissChance is
+max(0, miss - hitBonus) and hitBonus is hitRating/1000, so hit past the miss
+chance is worth nothing. The fury baseline WAR_BIS carries 355 hit rating
+against a need of 190 at the heroic target and 260 at S-rift: its effective
+miss is already ZERO at both, and 95 to 165 rating is dead. forgefold_legguards
+is a byte-identical twin of the baseline legs except that its 40 HIT is 40
+CRIT, so equipping the apex piece converts dead rating into live rating. The
+"+1 lead stat per piece" model scores that as zero, because Perfecting moves
+primary stats only.
+
+MEASURED, same fixture and seeds, 60 seeds at 300 s, the only difference being
+whether the two Perfected pieces a fury warrior can actually wear are applied
+as a stat delta or EQUIPPED: modelled 4.97 percent heroic and 5.27 S-rift,
+equipped 10.42 and 10.21. Roughly twice the envelope. The arm is committed
+(WOC_R5_ARMS=FULL,FULL+equipped) so the finding is reproducible.
+
+THE MEASUREMENT IS ITSELF FLATTERING and the record says so: it runs against
+section 3's baseline, which carries that dead hit and two rings worth zero
+attack power, so a throughput-correct baseline is stronger and the percentage
+lower. The reader who raised it measured 7.69 and 6.44 percent against an
+attack-power-correct baseline. Every reading on every baseline tried is above
+5, which is why the verdict is SUSPENDED rather than restated with a new
+number.
+
+NOT UNIFORM, which is why it must be measured per lane: the caster's equipped
+arm reads BELOW its modelled arm (2.5 against 4.9), because an apex cloth chest
+breaks a set bonus and the caster baseline is not rating-capped.
+
+WHAT THE MAINTAINER OWNS. Both halves are ratified definitions this phase may
+not rewrite on its own, and either reading re-opens R5 rather than settling it:
+(1) section 3's baseline pool, since bestEpicGearFor scores by raw stat SUM
+class-agnostically and the record calls the result "best-in-slot"; (2) section
+8.1's gear term, since "+2 lead-stat points" excludes the rating lines that on
+a hit-capped physical baseline are the larger term. This is the phase file's
+own "the framework unable to measure a kit" stopping rule, so it is reported as
+an escalation and NOT re-tuned in phase.
+
+THE FOUR TUNES STAND. All four are downward, none moves a settled magnitude,
+and none is invalidated by this: what fails is the measurement they were sized
+against, not the tunes. Every other defect this round found is fixed and
+committed, and none of those fixes depends on how the ruling above lands.
