@@ -414,6 +414,18 @@ const ANGLER_OUTPUTS = ['peppered_deepbarb_catfish', 'roast_hollowgill_sturgeon'
 // masterwrought R14 satisfied by construction rather than by a magnitude check.
 const APEX_FEAST_OUTPUTS = ['stonepot_feast', 'warspice_feast', 'sageleaf_feast'] as const;
 
+// The five no-power outputs' sell values, as LITERALS. The whole-def arm below
+// used to pass `def.sellValue` as its own expected value, which is the constant
+// self-comparison trap: the key was whitelisted and the value unpinned, so any
+// number passed. Two of the five had no exact pin anywhere.
+const NO_POWER_SELL_VALUES: Record<string, number> = {
+  peppered_deepbarb_catfish: 75,
+  roast_hollowgill_sturgeon: 150,
+  stonepot_feast: 300,
+  warspice_feast: 300,
+  sageleaf_feast: 300,
+};
+
 // The deliberately UNFLAGGED tool outputs: tools, never counted combat power,
 // pinned the way APEX_BAG_ID is below. The phase 09 pair came off
 // APEX_GEAR_RECIPES at skillReq 100; the phase 10 capstones off
@@ -1434,7 +1446,9 @@ describe('masterwrought apex budget sweep', () => {
       for (const key of Object.keys(def)) {
         expect(allowed.has(key), `${id} carries unexpected field ${key}`).toBe(true);
       }
-      expectTradableTexture(def, def.sellValue as number);
+      const expectedSell = NO_POWER_SELL_VALUES[id];
+      expect(expectedSell, `${id} has a pinned sell value`).toBeDefined();
+      expectTradableTexture(def, expectedSell);
     },
   );
 
@@ -1486,7 +1500,14 @@ describe('masterwrought apex budget sweep', () => {
         d.pvpOffenseRating === undefined &&
         RATING_FIELDS.some((f) => typeof d[f] === 'number'),
     );
-    expect(bandRows.length, 'the apex jewelry band really has rows').toBeGreaterThanOrEqual(3);
+    // Exactly four, named: wyrmfall_pendant, warhewn_signet, prismglass_loop
+    // and abysswrought_band. A floor under the real count is what lets a row
+    // leave the sweep silently, so the uniqueness law below would then be
+    // enforced over a quietly smaller band.
+    expect(
+      bandRows.length,
+      `the apex jewelry band is four rows: ${bandRows.map((d) => d.id).join(', ')}`,
+    ).toBe(4);
     const shapeOf = (d: ItemDef & Record<string, unknown>): string =>
       `${d.slot}|${Object.keys(d.stats as Record<string, number>)
         .sort()
@@ -1507,12 +1528,15 @@ describe('masterwrought apex budget sweep', () => {
     // existing suite green. The other two axes this phase had to tune are
     // pinned elsewhere and deliberately not re-pinned here: ARMOUR by the
     // shield inversion guard, RATINGS by the per-family rating spread arm.
-    // Baseline pool: PvE, EPIC-ONLY (quality === 'epic', so no legendary and
-    // no held offhand), class-equippable, best-in-slot. That is the same pool
-    // power-verification.md section 3 fixes for its three THROUGHPUT lanes,
-    // and it is the conservative side: a legendary-inclusive pool is stronger,
-    // so it can only make an apex piece's lead SMALLER, never larger.
-    // Literal expectations, never a self-derived bound.
+    // Baseline pool, stated as the filter below actually runs it rather than
+    // as the doc's lane pool: NON-LEGENDARY, non-PvP equipment of ANY quality
+    // that carries a primary stat, held offhands included. It is deliberately
+    // WIDER than the epic-only loadouts power-verification.md section 3 fixes
+    // for its three throughput lanes, and wider is the strict side here: a
+    // bigger pool can only raise `best`, which can only SHRINK the lead an
+    // apex piece is allowed, never grow it. Legendaries are the one exclusion,
+    // because a legendary incumbent would mask a real lead behind a piece the
+    // packet never competes with. Literal caps, never a self-derived bound.
     const MAX_LEAD_BY_SLOT: Record<string, number> = {
       chest: 2,
       gloves: 2,
@@ -1528,6 +1552,14 @@ describe('masterwrought apex budget sweep', () => {
     // lead the best pre-packet piece CARRYING THE SAME lead stat. Throughput
     // is paid in the lead stat, so this is the bound that binds; the sum caps
     // above are the second arm.
+    // Every row is the EXACT measured lead, zero slack, so any widening reds.
+    // The offhand's 3 is gyrelens_array and it is the packet's largest
+    // single-axis lead: int 11 Perfected against the best pre-packet offhand
+    // carrying int (heroic_wraithfire_orb, 8). It is recorded rather than
+    // tuned because it BUYS that concentration, giving up 55 rating net to do
+    // it (power-verification.md section 11.2), which is the self-limiting
+    // shape R14 allows. The neck's and ring's 2 are wyrmfall_pendant and the
+    // two apex rings against pre-packet fields that top out at 7.
     const MAX_LEAD_STAT_BY_SLOT: Record<string, number> = {
       chest: 1,
       gloves: 1,
@@ -1536,7 +1568,7 @@ describe('masterwrought apex budget sweep', () => {
       feet: 0,
       neck: 2,
       ring: 2,
-      offhand: 1,
+      offhand: 3,
       mainhand: 1,
     };
     const slotKey = (d: ItemDef & Record<string, unknown>): string =>
@@ -1550,7 +1582,10 @@ describe('masterwrought apex budget sweep', () => {
         d.pvpOffenseRating === undefined &&
         (primaryStatSum(d) ?? 0) > 0,
     );
-    expect(pool.length, 'the baseline pool really has rows').toBeGreaterThan(100);
+    // Floor near the real count (470 today), not a decorative one: a floor far
+    // under it lets the pool quietly shrink, and a smaller pool lowers `best`,
+    // which is the direction that hides a lead.
+    expect(pool.length, 'the baseline pool really has rows').toBeGreaterThan(400);
     let checked = 0;
     for (const [id, def] of Object.entries(ITEMS) as Array<
       [string, ItemDef & Record<string, unknown>]
@@ -1582,9 +1617,20 @@ describe('masterwrought apex budget sweep', () => {
       // strength wearer takes) sets that bar at 13. Throughput is paid in the
       // LEAD stat, so the lead is compared to the best pre-packet piece that
       // carries the same stat. Literal caps, per slot.
-      const lead = Object.entries(bonus!).sort((x, y) => y[1] - x[1])[0][0];
-      const perfectedLead =
-        ((def.stats as Record<string, number> | undefined)?.[lead] ?? 0) + (bonus![lead] ?? 0);
+      // The axis comes from the DEF's own stat profile, never from the bonus
+      // map: the bonus ties at 1 on five of the seventeen, and a tie there
+      // resolves by object key insertion order, which silently measured
+      // gyrelens_array on stamina (delta -4 against a cap of 1, five points of
+      // dead slack) and duskforged_bulwark on strength. Both hid a real lead.
+      // Largest primary wins; ties inside the def resolve by the fixed order
+      // below so the pick is deterministic rather than authoring-order bound.
+      const AXES = ['str', 'agi', 'int', 'sta', 'spi'] as const;
+      const defStats = (def.stats ?? {}) as Record<string, number>;
+      const lead = [...AXES]
+        .filter((a) => (defStats[a] ?? 0) > 0)
+        .sort((a, b) => (defStats[b] ?? 0) - (defStats[a] ?? 0))[0];
+      expect(lead, `${id} carries at least one primary stat`).toBeDefined();
+      const perfectedLead = (defStats[lead] ?? 0) + (bonus![lead] ?? 0);
       const bestLead = pool
         .filter((d) => slotKey(d) === key && (d.hand === 'twohand') === (def.hand === 'twohand'))
         .reduce(
