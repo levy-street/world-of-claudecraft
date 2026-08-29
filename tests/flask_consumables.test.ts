@@ -16,9 +16,10 @@
 //
 // The role foods are the contrast: Well Fed rides one shared 'well_fed' id, is
 // owed only when the 18-second drain COMPLETES, and carries no marker, so it
-// dies with you. The def-level values (15/1200, 6/600, foodHp 1392) are pinned
-// in tests/masterwrought_budget.test.ts; this file pins what the sim DOES with
-// them.
+// dies with you. The def-level values (flasks 13/1200 after the Phase 15
+// envelope tune, the apex role plates 6/900, the farming rungs 2/3/4/5 at 600,
+// foodHp 1392) are pinned in tests/masterwrought_budget.test.ts; this file pins
+// what the sim DOES with them.
 import { describe, expect, it } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
 import { isCancelableAura } from '../src/sim/combat/aura_cancel';
@@ -37,6 +38,7 @@ const SERPENT = 'elixir_of_the_serpent'; // buff_sta 12 / 900, the top shipped r
 const BOAR = 'elixir_of_the_boar'; // buff_sta 6 / 600, the bottom rung
 const SUNPETAL_SCROLL = 'sunpetal_scroll'; // the serpent band's scroll twin
 const STEW = 'stonepot_stew'; // Well Fed buff_sta
+const SKEWERS = 'warspice_skewers'; // Well Fed buff_ap
 const CHOWDER = 'sageleaf_chowder'; // Well Fed buff_int
 
 const STA_FAMILY = 'elixir_buff_sta';
@@ -748,11 +750,15 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
 
   it('the maximal legal kit: an int flask, a stamina elixir and an int plate all ride', () => {
     // The widest stack the shipped catalog allows, and the reason it is worth
-    // its own arm: the elixir and scroll catalog is entirely buff_sta, so a
-    // STAMINA flask refuses every one of them downward and the physical kit can
-    // only ever be two auras. Put the flask on the int side and three ride at
-    // once, with two of them folding into the SAME stat. This is the caster arm
-    // of the R5 measurement.
+    // its own arm: the elixir and scroll catalog is entirely buff_sta, so the
+    // STAMINA flask (ironhusk, the TANK kit) refuses every one of them downward
+    // and that kit can only ever be two auras. The downward refusal fires only
+    // inside ONE elixir_<kind> family and the singleton strip sheds only
+    // flask-marked auras, so an int or AP flask leaves the stamina elixir alone
+    // and BOTH the caster and the physical melee kits ride three. This is the
+    // caster arm of the R5 measurement; the physical melee twin is the arm
+    // below, and it exists because the phase's own first draft claimed the
+    // physical kit was two and no arm here could say otherwise.
     const { sim, pid, p } = world();
     const base = { sta: p.stats.sta, int: p.stats.int };
     use(sim, pid, RUNEWATER);
@@ -766,5 +772,29 @@ describe('the R5 full kit: a flask and a Well Fed plate ride together, both magn
     expect(flaskAuras(p), 'exactly one marked aura').toHaveLength(1);
     expect(p.stats.int, 'flask 13 plus plate 6 on one stat').toBe(base.int + 13 + 6);
     expect(p.stats.sta, 'the elixir on the other').toBe(base.sta + 12);
+  });
+
+  it('the PHYSICAL melee kit is three too: an AP flask, a stamina elixir and an AP plate', () => {
+    // The arm that settles which kit is the two-aura one. R5's binding lane is
+    // physical, so a record claiming the physical kit can only be two auras
+    // would be a claim about the lane the whole envelope turns on. It is the
+    // TANK kit that is two (its flask IS the stamina one), and this arm proves
+    // the melee side by construction rather than by argument: warboar is
+    // buff_ap, so it never meets the buff_sta elixir at the downward refusal,
+    // and the singleton strip keys on the flask MARKER, which neither the
+    // elixir nor Well Fed carries.
+    const { sim, pid, p } = world();
+    const base = { sta: p.stats.sta, ap: p.attackPower };
+    use(sim, pid, WARBOAR);
+    use(sim, pid, SERPENT);
+    use(sim, pid, SKEWERS);
+    for (let i = 0; i < MEAL_TICKS; i++) sim.tick();
+
+    expect(aurasById(p, AP_FAMILY), 'the AP flask').toHaveLength(1);
+    expect(aurasById(p, STA_FAMILY), 'the stamina elixir beside it').toHaveLength(1);
+    expect(aurasById(p, WELL_FED), 'and the plate').toHaveLength(1);
+    expect(flaskAuras(p), 'exactly one marked aura').toHaveLength(1);
+    expect(p.attackPower, 'flask 13 plus plate 6 of attack power').toBe(base.ap + 13 + 6);
+    expect(p.stats.sta, 'the elixir untouched on the other stat').toBe(base.sta + 12);
   });
 });

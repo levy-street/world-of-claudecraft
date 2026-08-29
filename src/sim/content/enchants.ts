@@ -498,28 +498,44 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // consuming the lucent_reagent intermediate and gated on the enchanter's own
   // skill (skillReq, the first non-free-floor enchants; see the tier note in
   // the header). Each apex value continues its OWN slot ladder's step rather
-  // than inventing a magnitude: weapon str runs 2 (base), 3 (runed), 5
-  // (Greater) and steps to 6, and the weapon INT twin runs the identical
-  // ladder (Spellpower 2, Runed Sigil 3, Greater Spellpower 5) and steps to
-  // the same 6 with the byte-identical bill (the phase 10 QA D10-D1 ruling,
-  // taken 2026-08-16: every lower weapon rung pairs str with int, so the
-  // apex rung does too); chest sta runs 4 (base), 7 (Greater) and steps
-  // to 10; boots, which have no Greater rung by design, take the base-to-runed
-  // sized step 2 -> 3, kept deliberately small because R7 rules the boots
-  // enchant stats only (movement speed is not even expressible in statBonus,
-  // and it stays that way).
+  // than inventing a magnitude, WITH ONE NAMED EXCEPTION, the weapon rung,
+  // which is envelope-derived at HALF its ladder's step (see the block below,
+  // and do not "restore" it to 7 from the ladder): weapon str runs 2 (base), 3
+  // (runed), 5 (Greater), whose last step is +2, and steps to 6, a +1; the
+  // weapon INT twin runs the identical ladder (Spellpower 2, Runed Sigil 3,
+  // Greater Spellpower 5) and steps to the same 6 with the byte-identical bill
+  // (the phase 10 QA D10-D1 ruling, taken 2026-08-16: every lower weapon rung
+  // pairs str with int, so the apex rung does too). The two that DO continue
+  // their ladders: chest sta runs 4 (base), 7 (Greater) and steps to 10; boots,
+  // which have no Greater rung by design, take the base-to-runed sized step
+  // 2 -> 3, kept deliberately small because R7 rules the boots enchant stats
+  // only (movement speed is not even expressible in statBonus, and it stays
+  // that way).
   //
-  // THE WEAPON STEP IS 1, NOT 2, AND PHASE 15 MOVED IT (7 -> 6 on both twins).
-  // The step reaches BOTH HANDS on a dual-wield loadout: a one-hand weapon
+  // THE APEX WEAPON RUNG IS +1 OVER GREATER, HALF ITS LADDER'S OWN STEP, AND
+  // PHASE 15 MOVED IT THERE (7 -> 6 on both twins). It is envelope-derived, not
+  // ladder-derived, and the reason is multiplicity rather than magnitude.
+  // The rung reaches BOTH HANDS on a dual-wield loadout: a one-hand weapon
   // declares ItemDef.slot 'mainhand' and is legal in the offhand, and the
   // enchant slot gate compares itemDef.slot to enchant.itemSlot, so a fury
   // warrior, an enhancement shaman and a rogue all carry the weapon enchant
   // twice while recalcPlayerStats reads both instances. The packet's ratified
-  // R5 arithmetic (state.md, "the full physical kit at 4.2 to 4.7 percent")
-  // counted this term ONCE. At 7 the per-character delta over Greater was 4
-  // str for a dual-wielder against the 2 the record assumed; at 6 it is 2,
-  // which is the number the envelope was ratified on. The rung still sits
-  // strictly above Greater, and the str/int twins still match byte for byte.
+  // R5 arithmetic (state.md, "the full physical kit at 4.2 to 4.7 percent") is
+  // consistent only with counting this term ONCE; the record states the
+  // percentage, not the working, so that is an inference and is written as one.
+  // At 7 the per-character delta over Greater was 4 str for a dual-wielder
+  // against the 2 a single-weapon model gives; at 6 it is 2. The rung still
+  // sits strictly above Greater, and the str/int twins still match byte for
+  // byte. The INT twin moves with it under D10-D1 rather than under the
+  // measurement: no caster spec can dual wield (canDualWield is rogue,
+  // warrior-fury and shaman-enhancement, equipment_rules.ts), so the int rung
+  // lands once on every class the caster lanes model.
+  //
+  // KNOWN COST, recorded in docs/prd/masterwrought/power-verification.md
+  // section 14: this file's own Greater-tier law asks for at least +3 over the
+  // best base option so the arcane_shard sink stays alive, and a +1 apex rung
+  // behind a lucent_reagent gate is that same shape one tier up. It is a demand
+  // risk under R21 for a future pass, not a magnitude R5 will let us raise.
   // ---
   enchant_weapon_lucent_might: {
     id: 'enchant_weapon_lucent_might',

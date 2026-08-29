@@ -1378,8 +1378,11 @@ describe('masterwrought apex budget sweep', () => {
       // with no power pin at all: they appeared solely as census membership
       // plus a length check on their own local list, which is a constant
       // comparing to itself. Measured at the audit: critRating 40 planted on
-      // peppered_deepbarb_catfish survived the whole 47,677-test suite, and
-      // hitRating 40 on stonepot_feast survived ten targeted suites. The
+      // peppered_deepbarb_catfish survived a whole-suite run (the count noted
+      // at the time was 47,677, with no worker bound or tip recorded beside
+      // it, so it is not the packet's frozen 47738-at-d51139a103 stamp; the
+      // SURVIVAL is what this arm answers, not the count), and hitRating 40 on
+      // stonepot_feast survived ten targeted suites. The
       // masterwrought FLAG was already covered transitively (the census arm
       // reds); it is ratings and stats specifically that were open, which is
       // exactly the throttle-proof surface R14 and the Power placement name.
@@ -1498,12 +1501,18 @@ describe('masterwrought apex budget sweep', () => {
     // ADDED AT PHASE 15, because the packet's defining ruling had no guard.
     // The sweep pins each apex piece's BASE budget and the perfecting suite
     // pins its DELTA against the formula, but nothing anywhere pinned the R5
-    // quantity itself: the Perfected TOTAL measured against what the slot
-    // already offered. A later phase that lowers or re-sources a pre-packet
-    // epic silently widens the envelope with every existing suite green.
-    // Baseline pool: PvE, non-legendary, class-equippable, best-in-slot, which
-    // is the pool power-verification.md names as R5's reading of "pre-packet
-    // raid BiS". Literal expectations, never a self-derived bound.
+    // quantity itself ON THE PRIMARY-STAT AXIS: the Perfected TOTAL measured
+    // against what the slot already offered. A later phase that lowers or
+    // re-sources a pre-packet epic silently widens the envelope with every
+    // existing suite green. The other two axes this phase had to tune are
+    // pinned elsewhere and deliberately not re-pinned here: ARMOUR by the
+    // shield inversion guard, RATINGS by the per-family rating spread arm.
+    // Baseline pool: PvE, EPIC-ONLY (quality === 'epic', so no legendary and
+    // no held offhand), class-equippable, best-in-slot. That is the same pool
+    // power-verification.md section 3 fixes for its three THROUGHPUT lanes,
+    // and it is the conservative side: a legendary-inclusive pool is stronger,
+    // so it can only make an apex piece's lead SMALLER, never larger.
+    // Literal expectations, never a self-derived bound.
     const MAX_LEAD_BY_SLOT: Record<string, number> = {
       chest: 2,
       gloves: 2,
@@ -1514,6 +1523,21 @@ describe('masterwrought apex budget sweep', () => {
       ring: 1,
       offhand: 1,
       mainhand: 2,
+    };
+    // The identity-matched caps, per slot: how far a Perfected apex piece may
+    // lead the best pre-packet piece CARRYING THE SAME lead stat. Throughput
+    // is paid in the lead stat, so this is the bound that binds; the sum caps
+    // above are the second arm.
+    const MAX_LEAD_STAT_BY_SLOT: Record<string, number> = {
+      chest: 1,
+      gloves: 1,
+      waist: 1,
+      legs: 1,
+      feet: 0,
+      neck: 2,
+      ring: 2,
+      offhand: 1,
+      mainhand: 1,
     };
     const slotKey = (d: ItemDef & Record<string, unknown>): string =>
       d.slot === 'ring1' || d.slot === 'ring2' ? 'ring' : String(d.slot);
@@ -1549,6 +1573,30 @@ describe('masterwrought apex budget sweep', () => {
         perfected - best,
         `${id}: Perfected ${perfected} over the best pre-packet ${key} (${best})`,
       ).toBeLessThanOrEqual(cap);
+
+      // THE IDENTITY-MATCHED ARM, and it is the one that actually binds. The
+      // sum comparison above is stat-agnostic, so an off-axis piece can set
+      // the bar and hide a real lead: warhewn_signet (str 8 / sta 5, Perfected
+      // str 9) leads the best pre-packet STRENGTH ring by 2, and passes the
+      // sum arm only because abysswrought_band (sta 8 / spi 5 = 13, a ring no
+      // strength wearer takes) sets that bar at 13. Throughput is paid in the
+      // LEAD stat, so the lead is compared to the best pre-packet piece that
+      // carries the same stat. Literal caps, per slot.
+      const lead = Object.entries(bonus!).sort((x, y) => y[1] - x[1])[0][0];
+      const perfectedLead =
+        ((def.stats as Record<string, number> | undefined)?.[lead] ?? 0) + (bonus![lead] ?? 0);
+      const bestLead = pool
+        .filter((d) => slotKey(d) === key && (d.hand === 'twohand') === (def.hand === 'twohand'))
+        .reduce(
+          (a, d) => Math.max(a, (d.stats as Record<string, number> | undefined)?.[lead] ?? 0),
+          0,
+        );
+      const leadCap = MAX_LEAD_STAT_BY_SLOT[key];
+      expect(leadCap, `${key} has a pinned lead-stat cap`).toBeDefined();
+      expect(
+        perfectedLead - bestLead,
+        `${id}: Perfected ${lead} ${perfectedLead} over the best pre-packet ${key} carrying ${lead} (${bestLead})`,
+      ).toBeLessThanOrEqual(leadCap);
       checked++;
     }
     expect(checked, 'every flagged def was measured').toBe(17);

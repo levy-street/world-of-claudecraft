@@ -3055,13 +3055,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     // sound and it produced the game's single best mitigation item: the
     // heroic variant generator passes armor and blockValue through untouched
     // (heroic_variants.ts, normalizePrimaryStats), so heroic_bonewrought_
-    // bulwark still reads 680 and 30 at ilvl 33 and NO future heroic upgrade
-    // can ever out-armour a crafted shield. Measured, that inversion was
-    // worth 1.02 percent less physical damage taken on the reference tank at
-    // heroic and S-rift attacker levels, on the axis R5's protected asset is
-    // priced in, with nothing measuring or pinning it. The other nine apex
-    // armour pieces already pin armor EQUAL to their reference drop's; the
-    // shield was the only one that extrapolated, so it joins that rule here.
+    // bulwark still reads 680 and 30 at ilvl 33, which means the ilvl-33 raid
+    // shield could never even MATCH a crafted one, let alone beat it. It now
+    // TIES it exactly on both numbers, and the two are separated by their
+    // ratings (the raid shield's hit 55 plus crit 20 against this piece's hit
+    // 20) and by strength. Measured, that inversion was worth 1.02 percent less
+    // physical damage taken on the reference tank at heroic and S-rift attacker
+    // levels, on the axis R5's protected asset is priced in, with nothing
+    // measuring or pinning it. The other nine apex armour pieces already pin
+    // armor EQUAL to their reference drop's; the shield was the only one that
+    // extrapolated, so it joins that rule here. 680/30 is therefore the MAXIMUM
+    // permitted value, not a chosen one: anything above re-creates the
+    // inversion against a frozen heroic def.
     blockValue: 30,
     // ilvl-31 offhand epic budget = 16; sta:11+str:5 = 16, sta-lead for the
     // tank identity. The primary budget still reads at ilvl 31 (the budget is

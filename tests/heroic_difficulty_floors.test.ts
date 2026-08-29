@@ -288,6 +288,36 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     const b = characterDerivedStats('warrior', 20, withoutFlagged);
     expect(a.stats.armor).toBe(b.stats.armor);
     expect(a.maxHp).toBe(b.maxHp);
+    // THE RULE ITSELF, stated rather than left to the tie-break. The equality
+    // above holds today partly by accident: after the shield tune the
+    // prot-legal offhand pool is a three-way armour TIE at 680, and the id
+    // tie-break happens to hand both arms an unflagged def. Rename the crafted
+    // shield to sort earlier and the equality would red with no power change;
+    // add a future apex piece that TIES with a late-sorting id and it would
+    // stay green while a crafted piece matched the raid line. So the armour
+    // comparison is made directly, per slot: a crafted piece may sit beside
+    // the raid line, it may never take it.
+    for (const slot of ALL_EQUIP_SLOTS) {
+      let bestFlagged = 0;
+      let bestUnflagged = 0;
+      for (const def of Object.values(ITEMS)) {
+        if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
+        if ((requiredLevelFor(def) ?? 0) > 20) continue;
+        const armor = (def.stats as { armor?: number } | undefined)?.armor ?? 0;
+        if (def.masterwrought === true) bestFlagged = Math.max(bestFlagged, armor);
+        else bestUnflagged = Math.max(bestUnflagged, armor);
+      }
+      expect(
+        bestFlagged,
+        `${slot}: a flagged def out-armours every pre-packet piece a prot warrior can wear`,
+      ).toBeLessThanOrEqual(bestUnflagged);
+    }
+    // Non-vacuity for that sweep: the offhand really is a slot where a flagged
+    // def competes, and it really does reach the raid shield's own number.
+    const shieldArmor = (ITEMS.duskforged_bulwark.stats as { armor?: number }).armor;
+    expect(shieldArmor, 'the apex shield ties the raid shield').toBe(
+      (ITEMS.heroic_bonewrought_bulwark.stats as { armor?: number }).armor,
+    );
     // The derived values as literals, so a catalog move on EITHER side reds
     // here with a named cause instead of moving both together silently. These
     // are the raw kit numbers, without the prot mastery the header's

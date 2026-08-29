@@ -1569,9 +1569,16 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     // packet's own research names. Measured at an S-rift target (level 23,
     // where spell hit is uncapped) that was worth 2.8 to 4.1 percent of
     // throughput from one slot against an R5 budget of 5 percent for the
-    // whole kit. Haste still COMPLEMENTS the reference drop's crit, so the
-    // rule the other eight follow is untouched; the apex armour set now
-    // hands out no Hit at all, which is the conservative side of the band.
+    // whole kit. Against the level-22 heroic target the same piece is close to
+    // a wash rather than an outlier: a raid-BiS caster carries 160 hit rating
+    // and sits at 98 percent effective spell hit, so min(1, ...) clamps half a
+    // further 40 hit away and the hit line reads 2.04 percent against haste's
+    // 2.00. Fixing BOTH target levels is what made the outlier visible.
+    // Haste still COMPLEMENTS the reference drop's crit, so the rule the other
+    // eight follow is untouched; the nine WEARABLE apex armour pieces now hand
+    // out no Hit at all, which is the conservative side of the band. The apex
+    // SHIELD (duskforged_bulwark) keeps its reference's Hit at 20, which is the
+    // held-and-shield family's band and a threat stat, not a caster one.
     hasteRating: 40,
     sellValue: 200,
     masterwrought: true,
