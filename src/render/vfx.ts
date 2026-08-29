@@ -81,6 +81,24 @@ function projectileSchoolColors(
   return c;
 }
 
+// Legendary-regalia mote colors, the projectileSchoolColors shape: the emitter
+// is continuous (called per frame while any worn slot is legendary-rolled), so
+// its emit path must allocate nothing. spawn() copies components, never
+// retaining the reference, and the pair is keyed on GFX.composer because the
+// hdr() multiplier bakes into the cached values.
+let regaliaColorComposer: boolean | null = null;
+let regaliaColors: { ember: THREE.Color; gold: THREE.Color } | null = null;
+function legendaryRegaliaColors(): { ember: THREE.Color; gold: THREE.Color } {
+  if (regaliaColors === null || regaliaColorComposer !== GFX.composer) {
+    regaliaColorComposer = GFX.composer;
+    regaliaColors = {
+      ember: new THREE.Color(LEGENDARY_REGALIA_COLOR).multiplyScalar(hdr(2.1)),
+      gold: new THREE.Color(LEGENDARY_REGALIA_GOLD).multiplyScalar(hdr(1.6)),
+    };
+  }
+  return regaliaColors;
+}
+
 // ---------------------------------------------------------------------------
 // Sprite atlas: 16 cherry-picked Kenney sprites in a 4x4 grid. Order defines
 // the cell index used by the shader: append only.
@@ -1924,8 +1942,7 @@ export class Vfx {
     if (!n) return;
     const at = this.anchor(entityId, 0.4);
     if (!at) return;
-    const ember = new THREE.Color(LEGENDARY_REGALIA_COLOR).multiplyScalar(hdr(2.1));
-    const gold = new THREE.Color(LEGENDARY_REGALIA_GOLD).multiplyScalar(hdr(1.6));
+    const { ember, gold } = legendaryRegaliaColors();
     for (let k = 0; k < n; k++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.3 + Math.random() * 0.35;

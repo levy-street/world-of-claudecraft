@@ -82,6 +82,7 @@ import {
   TIER3_TOOL_GATE_PROFICIENCY,
 } from '../src/sim/content/vendor_row_gates';
 import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -114,6 +115,12 @@ import {
   MASTERWORK_SIGNED_CHANCE,
   MASTERWORK_SPECIALIZATION_CHANCE,
 } from '../src/sim/professions/masterwork';
+import {
+  WYRMFALL_BOSS_MAX,
+  WYRMFALL_BOSS_MIN,
+  WYRMFALL_CORE_ITEM_ID,
+} from '../src/sim/professions/masterwrought_materials';
+import { PERFECTING_SUCCESS_CHANCE } from '../src/sim/professions/perfecting';
 import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
 import { TRAINING_FEE_BY_TIER, trainingFeeFor } from '../src/sim/professions/training';
 import {
@@ -132,6 +139,7 @@ import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { itemStrings } from '../src/ui/i18n.catalog/items';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -3188,12 +3196,23 @@ describe('Guide professions pages and routes', () => {
     const hub = professionsPage.render(ctx([]));
     expect(hub, 'the hub renders the endgame section').toContain('id="prof-endgame"');
     expect(hub, 'the hub renders the perfecting section').toContain('id="prof-perfecting"');
-    // The materials, exact numbers per the transparency policy.
-    expect(hub).toContain('1 to 3 cores');
-    expect(hub).toContain('12 Heroic Marks');
+    // The materials, exact numbers per the transparency policy. The literal
+    // facts are CHAINED to the live constants (the pin-the-contract-beside-
+    // the-blob shape) so a retune reds HERE by intent, not only in the sim's
+    // own suites, and the wiki cannot go silently stale (the Phase 15 flask
+    // lesson).
+    // Derived from the live wyrmfall boss faucet: a drop-range retune reds here.
+    expect(hub).toContain(`${WYRMFALL_BOSS_MIN} to ${WYRMFALL_BOSS_MAX} cores`);
+    // Derived from the heroic vendor's live core row: a price retune reds here.
+    const coreMarks = HEROIC_VENDOR_STOCK.find((r) => r.itemId === WYRMFALL_CORE_ITEM_ID)?.marks;
+    expect(coreMarks, 'the wyrmfall core row left the heroic vendor').toBeDefined();
+    expect(hub).toContain(`${coreMarks} Heroic Marks`);
     expect(hub).toContain('exactly one essence');
     expect(hub).toContain('one per week per character');
     // The perfecting odds and fail-forward rule.
+    // 'four times in five' IS 0.8: the constant pins beside the prose so a
+    // perfecting retune reds this line, not only tests/perfecting.test.ts.
+    expect(PERFECTING_SUCCESS_CHANCE).toBe(0.8);
     expect(hub).toContain('succeeds four times in five');
     expect(hub).toContain('one Sundered Essence, and one Prismglass Setting');
     expect(hub).toContain('never harmed or set back');
@@ -3204,6 +3223,10 @@ describe('Guide professions pages and routes', () => {
     // The gear page's cap sentence moved to masterwroughtBodyLegendary: both
     // caps spelled (the words themselves are derived from the constants in
     // tests/masterwrought_cap.test.ts; these are the rendered-page halves).
+    // The cap constants pin beside the rendered words so a cap retune reds
+    // this anchor too, not only the derived catalog pins.
+    expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
+    expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
     const gearHtml =
       pageFor('gear')?.render({ params: [], sub: 'gear', titleKey: 'guide.nav.gear' } as never) ??
       '';
@@ -3232,6 +3255,19 @@ describe('Guide professions pages and routes', () => {
     expect(farmingHtml).toContain('the Cooking page carries every rung');
     // The farming-only related row links the cooking page it defers to.
     expect(farmingHtml).toContain(hrefFor('professions/cooking'));
+    // The TOOLTIP side of the coherence claim: the same sentence must sit in
+    // every itemUi wellFed row, so a tooltip reword (the write-game-tooltips
+    // flow edits exactly that file) reds this pin instead of silently breaking
+    // the guide-to-tooltip agreement the arm is named for.
+    const tooltip = itemStrings.en.itemUi.tooltip;
+    for (const row of [
+      tooltip.wellFed,
+      tooltip.wellFedAura,
+      tooltip.useFeastBuff,
+      tooltip.useFeastBuffAura,
+    ]) {
+      expect(row).toContain(ONE_MEAL);
+    }
   });
 
   it('renders every detail page with exactly one h1 and real generated tables', () => {

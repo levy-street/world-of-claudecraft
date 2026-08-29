@@ -659,6 +659,20 @@ RENAME, IN THIS PACKET (Phase 16 owns it, inside its merged naming-registry pass
   noun). Inlay is kept as the recorded fallback alternate (same structure, internally
   clean; jewelcraft-flavored semantic).
 
+  LOCALE CARVE-OUT (found by the phase's own review round, re-filled same-change
+  2026-08-29): the English verification above did not extend to the five non-Latin
+  fills, and two of the first fills landed on exactly the neighbour the registry
+  rejected in English. ja_JP's first fill was the scheme noun that Lost Ark's Japanese
+  localization uses for its Engravings system, and ru_RU's first fill (the noun for
+  engraving) is Lost Ark's Russian localized Engraving system noun. Both locales were
+  re-filled with clean common-vocabulary etching nouns: ja_JP now uses 銘刻
+  (inscription-etching; not the WoW enchant loanword, and it also stops doubling as the
+  Delve Marks noun the ja guide already uses), and ru_RU now uses Травление (literal
+  etching; not Наложение чар, WoW's ru enchant dress). ko_KR (새김, not Lost Ark's
+  각인) and both zh fills (蚀刻/蝕刻, not WoW's 附魔) had avoided their neighbours from
+  the start and are unchanged. Future locale fills of these rows check the target
+  locale's own Engraving/enchant trade dress, not only the English scheme noun.
+
 DO NOT RENAME, and do not re-raise:
 - ITEM 1, the zone families The Amberfall / The Frostveil Reach / The Nightbloom / Galecrest.
 - ITEM 3, the Voidscar zone family.

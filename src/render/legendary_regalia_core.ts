@@ -24,10 +24,12 @@
 // live crowd band edge, whose per-client per-frame reads would pulse one
 // wearer's glow with unrelated crowd churn and give co-located viewers
 // different results), eased to a floor at the anchor, quantized, never 0:
-// removal belongs to the far-LOD swap and the off-screen presentation skip the
-// entity loop already applies. The governor lever stays the pooled cloud's own
-// floored quality mult inside emitCount; no preset, tier, or governor read
-// lands here.
+// removal belongs to the entity-loop hysteresis cull
+// (characterViewOutsideHysteresis) and the off-screen presentation skip the
+// entity loop already applies (the far-LOD swap does not stop this emitter:
+// the motes are world-space pooled particles, not rig children). The governor
+// lever stays the pooled cloud's own floored quality mult inside emitCount;
+// no preset, tier, or governor read lands here.
 //
 // Three/DOM-free and deterministic (a registered RENDER_PURE_CORE).
 

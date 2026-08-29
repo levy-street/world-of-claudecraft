@@ -1580,6 +1580,7 @@ export interface PerfCaptureStatus {
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
+  private activityDeps: ActivityDetectDeps<ClientSession> | null = null; // built lazily once
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
@@ -9303,14 +9304,13 @@ export class GameServer {
     // durable character save (see below); only the cosmetic broadcast stays
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
-    // The card-emitting else-if chain is extracted to server/activity_detect.ts
-    // behind this deps bag; the loop delegates to it per event.
-    const activityDeps: ActivityDetectDeps<ClientSession> = {
+    this.activityDeps ??= {
       clients: this.clients,
       profileUrlFor: (n) => this.profileUrlFor(n),
       sessionByName: (n) => this.sessionByName(n),
       sendDailyRewardPointsGained: (s, points) => this.sendDailyRewardPointsGained(s, points),
     };
+    const activityDeps = this.activityDeps;
     for (const ev of events) {
       if (ev.type === 'unstuck' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
@@ -9456,8 +9456,8 @@ export class GameServer {
         if (s) trackLevelMilestoneCapi(s, ev.level);
       }
       // The significant-activity chain (Discord cards + the daily-reward
-      // arena/delve observers) lives in server/activity_detect.ts behind the
-      // deps bag above (a move-not-rewrite; the monolith ratchet).
+      // arena/delve observers) lives in server/activity_detect.ts (a move-not-
+      // rewrite) behind the lazily-built deps field: zero per-tick allocation.
       detectActivityEvent(ev, now, activityDeps);
     }
     // Durability ordering: the authoritative blob otherwise persists only on

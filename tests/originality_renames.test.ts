@@ -5,6 +5,8 @@
 // guide.test), so this file is the decisive guard that a content edit or a
 // bad merge cannot quietly reintroduce a colliding coin. Ids are frozen API
 // and deliberately keep their historical spellings.
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { ENCHANTS } from '../src/sim/content/enchants';
@@ -18,6 +20,7 @@ import { ABILITIES, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { armorySkinStrings } from '../src/ui/i18n.catalog/armory';
 import { en } from '../src/ui/i18n.resolved.generated/en';
 import { DICT } from '../src/ui/sim_i18n';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 describe('originality-sweep display literals stay renamed', () => {
   it('pins the renamed enchant display names', () => {
@@ -38,6 +41,30 @@ describe('originality-sweep display literals stay renamed', () => {
     for (const value of Object.values(en.hudChrome.enchantName)) {
       expect(value).not.toMatch(/^Enchant\s/);
     }
+  });
+
+  it('no locale overlay enchantName fill wears the WoW verb-formula dress either', () => {
+    // The release-time Latin refill lands in the overlay files, which the
+    // English-layer sweep above cannot see; the deleted stale fills were the
+    // same trade dress in translation ("Encantar arma - Poder"). A TEXT scan,
+    // not imports: loading 21 overlay modules for one shape check is heavy,
+    // and the flat-key rows are regular enough to scrape (both quote styles,
+    // values that wrap onto the next line included).
+    const overlaysRoot = fileURLToPath(new URL('../src/ui/i18n.locales', import.meta.url));
+    let scanned = 0;
+    for (const { file, full } of tsFilesUnder(overlaysRoot)) {
+      const source = readFileSync(full, 'utf8');
+      const rows = source.matchAll(
+        /'hudChrome\.enchantName\.[^']+':\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/g,
+      );
+      for (const row of rows) {
+        scanned++;
+        expect(row[1] ?? row[2], `${file}: ${row[0]}`).not.toMatch(/^Enchant\s/);
+      }
+    }
+    // Vacuity floor: the five shipped non-Latin fills alone carry 46 scheme
+    // rows plus the infusion row each, so an emptied scrape cannot pass.
+    expect(scanned).toBeGreaterThanOrEqual(5 * 46);
   });
 
   it('pins the renamed quest, deed, and tool-effect names', () => {

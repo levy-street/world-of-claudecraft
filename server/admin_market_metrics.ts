@@ -136,16 +136,23 @@ export function buildAdminMarketMetrics(
     // Sorted by item id so the readout is stable across book insertion order.
     const items = [...byItem.entries()]
       .sort(([a], [b]) => (a < b ? -1 : 1))
-      .map(
-        ([itemId, acc]): AdminMarketMetricsItemRow => ({
+      .map(([itemId, acc]): AdminMarketMetricsItemRow => {
+        // Loop-based min, copy-then-sort median: a spread argument list caps
+        // at the engine's argument limit, and a pathologically deep one-item
+        // book must degrade to slow, never throw.
+        let lowestPerUnit = acc.perUnit[0];
+        for (const perUnit of acc.perUnit) {
+          if (perUnit < lowestPerUnit) lowestPerUnit = perUnit;
+        }
+        return {
           itemId,
           name: ITEMS[itemId]?.name ?? itemId,
           listingCount: acc.listingCount,
           totalQuantity: acc.totalQuantity,
-          lowestPerUnit: Math.min(...acc.perUnit),
-          medianPerUnit: medianCopper([...acc.perUnit].sort((a, b) => a - b)),
-        }),
-      );
+          lowestPerUnit,
+          medianPerUnit: medianCopper(acc.perUnit.slice().sort((a: number, b: number) => a - b)),
+        };
+      });
     return {
       bucket,
       listingCount: items.reduce((sum, row) => sum + row.listingCount, 0),

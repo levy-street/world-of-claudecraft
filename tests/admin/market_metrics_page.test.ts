@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import './_setup';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { AdminMarketMetrics, AdminMarketMetricsBucket } from '../../src/admin/types';
 
@@ -69,10 +69,11 @@ vi.mock('../../src/admin/api', async (importOriginal) => ({
   clearSession: () => {},
 }));
 
-import { apiGet } from '../../src/admin/api';
+import { ApiError, apiGet } from '../../src/admin/api';
 import { fmtCopper, fmtNumber } from '../../src/admin/format';
 import { t } from '../../src/admin/i18n';
 import MarketMetrics from '../../src/admin/pages/MarketMetrics.svelte';
+import { auth } from '../../src/admin/state/auth.svelte';
 
 // The generic apiGet<T> cannot take a concrete mockImplementation without a
 // cast; unknown keeps the payload swap per test type-checked at the call site.
@@ -132,6 +133,21 @@ describe('Market Metrics page', () => {
     apiGetMock.mockRejectedValue(new Error('boom'));
     render(MarketMetrics);
     expect(await screen.findByText(t('marketMetrics.loadFailed'))).toBeInTheDocument();
+  });
+
+  it('routes an ApiError(401) through auth.handleAuthFailure, not the failure line', async () => {
+    // The api mock spreads the REAL module precisely so this arm can throw the
+    // real ApiError class (handleAuthFailure instanceof-checks it). The spy
+    // still calls through, so the real 401 arm (logout) runs.
+    const authSpy = vi.spyOn(auth, 'handleAuthFailure');
+    apiGetMock.mockRejectedValue(new ApiError(401, 'admin authentication required'));
+    render(MarketMetrics);
+    await waitFor(() => expect(authSpy).toHaveBeenCalledTimes(1));
+    expect(authSpy).toHaveReturnedWith(true);
+    // A 401 hands the operator to the login screen; the page must not ALSO
+    // paint its own failure line on top of the forced logout.
+    expect(screen.queryByText(t('marketMetrics.loadFailed'))).not.toBeInTheDocument();
+    authSpy.mockRestore();
   });
 
   it('shows the all-quiet line plus per-bucket empties when nothing is listed', async () => {

@@ -5024,6 +5024,8 @@ export class Renderer {
     // view - that dispose + re-upload cycle is the open-world "asset-upload"
     // travel hitch (Skeleton.dispose via CharacterVisual.dispose in
     // removeView, pinned by GPU-upload profiling). Players never pool (A6).
+    // The extracted zone_prewarm_groups builders call characterVisualPoolKey
+    // directly: mirror any logic added here, or re-point them at this wrapper.
     return characterVisualPoolKey(e);
   }
 

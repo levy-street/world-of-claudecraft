@@ -796,6 +796,14 @@ describe('significant-activity cards', () => {
       'A deed of renown',
     );
     expect(titleOf({ ...base, kind: 'golden_harvest', itemName: '' })).toBe('A golden harvest');
+    // The golden-harvest DESCRIPTION carries its own fallback (|| 'crops').
+    expect(
+      (
+        buildActivityMessage({ ...base, kind: 'golden_harvest', itemName: '' }) as {
+          embeds: Array<{ description: string }>;
+        }
+      ).embeds[0].description,
+    ).toContain('golden harvest of crops');
     expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_farming_100', deedName: '' })).toBe(
       'Harvestmaster',
     );

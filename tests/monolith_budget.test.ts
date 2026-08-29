@@ -667,12 +667,13 @@ const MONOLITHS: MonolithRow[] = [
     // moved-baseline arithmetic) by extracting the zone/archetype
     // prewarm-group builder family into src/render/zone_prewarm_groups.ts
     // (the mount_prewarm/great_tree_prewarm sibling shape). The file
-    // measures 13116 (wc -l < src/render/renderer.ts). Exact count, zero
-    // slack: any further growth reds again.
+    // measured 13116 at the extraction commit (wc -l < src/render/renderer.ts).
     // Adjusted in the same phase: Arm 1's orange-identity emit call and
-    // cached predicate add the lines between 13116 and this count; the paid
+    // cached predicate, plus the visualPoolKeyFor cross-pointer comment from
+    // the review round (2026-08-29, +2), add the lines between 13116 and this
+    // count. Exact count, zero slack: any further growth reds again; the paid
     // target 13333 stays cleared by more than 200 lines.
-    ceiling: 13131,
+    ceiling: 13133,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -38,6 +38,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { FIRST_KOI_DEED_ID as BOT_FIRST_KOI_DEED_ID, HARVESTMASTER_DEED_ID } from '../bot/logic';
+import { dailyRewardService } from '../server/daily_rewards';
 import * as db from '../server/db';
 import { discordFeedDeed, FIRST_KOI_DEED_ID } from '../server/deeds_records';
 import { claimDedupeKey, drainActivity, releaseDedupeKey } from '../server/discord_activity';
@@ -544,6 +545,101 @@ describe('detectActivity: professions arms (GameServer)', () => {
     ]);
     await flushAsync();
     expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('duelEnd resolves BOTH sessions by name and cards them together', async () => {
+    // The moved duel arm is the only one that rides deps.sessionByName (twice:
+    // winner and loser); driving it through the real detectActivity pins the
+    // game.ts deps-field wiring, not just the extracted module.
+    const winner = joinServer(server, fakeWs(), 141, 'Duelara');
+    const loser = joinServer(server, fakeWs(), 142, 'Duelbert');
+    (server as any).detectActivity([
+      { type: 'duelEnd', winnerName: winner.name, loserName: loser.name },
+    ]);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'duel',
+      accountIds: [141, 142],
+      names: ['Duelara', 'Duelbert'],
+      winnerName: 'Duelara',
+      loserName: 'Duelbert',
+    });
+  });
+
+  it('a won arenaEnd cards the rating delta AND pays the daily-reward observer', async () => {
+    // The arena arm carries the one deps.sendDailyRewardPointsGained wire; the
+    // service call is spied (its own suite owns the scoring), so the observer
+    // effect is the points frame the real sender pushes onto the session ws.
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 143, 'Gladiatra');
+    const arenaSpy = vi.spyOn(dailyRewardService, 'recordArenaResult').mockResolvedValue(7);
+    try {
+      (server as any).detectActivity([
+        {
+          type: 'arenaEnd',
+          format: '2v2',
+          won: true,
+          draw: false,
+          oppName: 'Rivals',
+          ratingBefore: 1500,
+          ratingAfter: 1516,
+          pid: session.pid,
+        },
+      ]);
+      await flushAsync();
+      const cards = drainActivity();
+      expect(cards).toHaveLength(1);
+      expect(cards[0]).toMatchObject({
+        kind: 'arena',
+        accountIds: [143],
+        names: ['Gladiatra'],
+        ratingDelta: 16,
+      });
+      expect(arenaSpy).toHaveBeenCalledWith(143, {
+        won: true,
+        format: '2v2',
+        ratingBefore: 1500,
+        ratingAfter: 1516,
+      });
+      const pointsFrames = fc.sent.filter(
+        (frame) =>
+          (frame as { t?: string; list?: { text?: string }[] }).t === 'events' &&
+          (frame as { list?: { text?: string }[] }).list?.some((e) =>
+            e.text?.includes('daily rewards points gained'),
+          ),
+      );
+      expect(pointsFrames).toHaveLength(1);
+    } finally {
+      arenaSpy.mockRestore();
+    }
+  });
+
+  it('a LOST arenaEnd runs the daily-reward observer but never cards', async () => {
+    // The !ev.won early return sits between the observer and the enqueue; a
+    // dropped return would card every loss.
+    const session = joinServer(server, fakeWs(), 144, 'Runnerup');
+    const arenaSpy = vi.spyOn(dailyRewardService, 'recordArenaResult').mockResolvedValue(0);
+    try {
+      (server as any).detectActivity([
+        {
+          type: 'arenaEnd',
+          format: '2v2',
+          won: false,
+          draw: false,
+          oppName: 'Winners',
+          ratingBefore: 1500,
+          ratingAfter: 1484,
+          pid: session.pid,
+        },
+      ]);
+      await flushAsync();
+      expect(drainActivity()).toHaveLength(0);
+      expect(arenaSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      arenaSpy.mockRestore();
+    }
   });
 
   it('a title-deed unlock enqueues a deed card behind the opt-out read', async () => {

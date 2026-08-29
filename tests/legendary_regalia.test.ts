@@ -124,8 +124,10 @@ describe('legendaryRegaliaEmitScale: the distance shed', () => {
   });
 
   it('holds its floor past the anchor and never reaches zero: a fade, not a cull', () => {
-    // Removal belongs to the far-LOD swap and the off-screen presentation
-    // skip; the shed may only thin the drift.
+    // Removal belongs to the entity-loop hysteresis cull
+    // (characterViewOutsideHysteresis) and the off-screen presentation skip;
+    // the shed may only thin the drift. (The far-LOD swap does not stop this
+    // emitter: the motes are world-space pooled particles, not rig children.)
     for (const distanceSq of [CHARACTER_LOD_RANGE_SQ, CHARACTER_LOD_RANGE_SQ * 1.001, 400 * 400]) {
       expect(legendaryRegaliaEmitScale(distanceSq)).toBeCloseTo(0.4, 5);
     }
@@ -135,10 +137,16 @@ describe('legendaryRegaliaEmitScale: the distance shed', () => {
   });
 
   it('keeps a visible emission under the pool quality floor at the shed floor', () => {
-    // emitCount scales rates by 0.35 + 0.65 * quality, so the worst case a
-    // governor can produce is rate * 0.4 * 0.35: still a spark every few
-    // seconds, never a silent removal.
-    expect(LEGENDARY_REGALIA_RATE_PER_SEC * 0.4 * 0.35).toBeGreaterThan(0.2);
+    // emitCount scales rates by floor + span * quality; the floor is SCRAPED
+    // from vfx.ts rather than hand-copied, and the shed floor is read from the
+    // live scale at the anchor, so a retune of either re-prices this bound.
+    // Worst case must stay a spark every few seconds, never a silent removal.
+    const m = read('src/render/vfx.ts').match(/([\d.]+) \+ ([\d.]+) \* this\.quality/);
+    expect(m, 'the emitCount quality-floor expression is missing from vfx.ts').not.toBeNull();
+    const poolFloor = Number((m as RegExpMatchArray)[1]);
+    expect(poolFloor).toBeGreaterThan(0);
+    const shedFloor = legendaryRegaliaEmitScale(CHARACTER_LOD_RANGE_SQ);
+    expect(LEGENDARY_REGALIA_RATE_PER_SEC * shedFloor * poolFloor).toBeGreaterThan(0.2);
   });
 
   it('treats nonsense distance as in close, matching the copied shed arm', () => {
@@ -217,8 +225,22 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // Source-scrape the eqi projection loop (the item_instance_transfer.test.ts
     // cross-pin) so widening the wire without re-judging this predicate reds.
     const game = read('server/game.ts');
-    const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]).sort();
+    const assigns = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)];
+    // no cross-wire: every projected field copies from ITS OWN source field
+    for (const m of assigns) expect(m[2], `cross-wired eqi projection: ${m[0]}`).toBe(m[1]);
+    const projected = assigns.map((m) => m[1]).sort();
     expect(projected).toEqual(['enchant', 'name', 'rolled', 'signer']);
+    // The pub block itself carries exactly the four assignment-shaped writes
+    // and no spread, so a widened wire SHAPE (a spread, a conditional copy in
+    // another form) reds this alarm instead of slipping past the scrape above.
+    const pubAt = game.indexOf('let eqi: Record<string, unknown> | undefined;');
+    expect(pubAt, 'the eqi projection block is missing').toBeGreaterThan(-1);
+    const pubEnd = game.indexOf('if (eqi) out.eqi = eqi;', pubAt);
+    expect(pubEnd).toBeGreaterThan(pubAt);
+    const pubBlock = game.slice(pubAt, pubEnd);
+    expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(4);
+    expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(4);
+    expect(pubBlock).not.toContain('...');
     const core = read(CORE);
     expect(core).toContain(".rolled?.quality === 'legendary'");
     for (const field of ['signer', 'enchant', 'craftedRecipeId', 'bindOnTrade', 'locked']) {
@@ -234,14 +256,22 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     const body = vfx.slice(start, vfx.indexOf('\n  }', start));
     expect(body).not.toMatch(/\.visible\s*=/);
     expect(body).not.toMatch(/new THREE\.PointLight/);
-    // pooled spawn only: the sole allocation is the hdr color pair
-    expect(body).not.toMatch(/new THREE\.(?!Color\b)/);
+    // allocation-free emit: the color pair rides the composer-keyed module
+    // cache (the projectileSchoolColors shape), so the body allocates nothing
+    expect(body).not.toMatch(/new THREE\./);
+    expect(body).toContain('legendaryRegaliaColors()');
     expect(body).toContain('this.emitCount(LEGENDARY_REGALIA_RATE_PER_SEC, dt)');
     expect(body).toContain('this.anchor(entityId');
     expect(body).toContain('this.spawn(');
     expect(body).toContain('SPR.sparkBurst');
     expect(body).toContain('SPR.star');
-    expect(body).toContain('hdr(');
+    // the cache still applies the HDR multipliers, keyed on GFX.composer so a
+    // tier flip rebuilds the pair rather than serving stale non-HDR colors
+    const cacheAt = vfx.indexOf('function legendaryRegaliaColors()');
+    expect(cacheAt, 'the regalia color cache is missing').toBeGreaterThan(-1);
+    const cacheBody = vfx.slice(cacheAt, vfx.indexOf('\n}', cacheAt));
+    expect(cacheBody).toContain('GFX.composer');
+    expect(cacheBody).toContain('multiplyScalar(hdr(');
   });
 
   it('the renderer wiring is cached, players-only, preset-gated, and shed by d2', () => {
@@ -267,10 +297,30 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect(slice).not.toMatch(/\.visible\s*=/);
     expect(slice).not.toMatch(/new THREE\.PointLight/);
     // the emit rides the same ambient !e.dead block as the form auras (a
-    // corpse must not smolder), under runCharacterPresentation
+    // corpse must not smolder), under runCharacterPresentation. NESTING, not
+    // source order: walk brace depth from the dead guard's open brace to its
+    // MATCHING close, and require the whole regalia gate INSIDE that span, so
+    // a regalia block moved past the guard's closing brace fails here.
     const deadGuardAt = renderer.lastIndexOf('if (!e.dead) {', gateAt);
     expect(deadGuardAt).toBeGreaterThan(-1);
-    expect(renderer.slice(deadGuardAt, gateAt)).toContain('formAura');
+    const openAt = renderer.indexOf('{', deadGuardAt + 'if (!e.dead)'.length);
+    let depth = 0;
+    let closeAt = -1;
+    for (let i = openAt; i < renderer.length; i++) {
+      if (renderer[i] === '{') depth++;
+      else if (renderer[i] === '}') {
+        depth--;
+        if (depth === 0) {
+          closeAt = i;
+          break;
+        }
+      }
+    }
+    expect(closeAt, 'the dead-guard block never closes').toBeGreaterThan(openAt);
+    const deadBlock = renderer.slice(openAt, closeAt);
+    expect(deadBlock).toContain('formAura');
+    expect(gateAt, 'the regalia gate must open inside the dead guard').toBeGreaterThan(openAt);
+    expect(emitAt, 'the regalia emit must land inside the dead guard').toBeLessThan(closeAt);
     // the cached pair lives on the view
     expect(renderer).toContain('legendaryRegalia?: boolean;');
     expect(renderer).toContain('legendaryRegaliaRef?: unknown;');
