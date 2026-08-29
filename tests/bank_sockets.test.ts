@@ -18,7 +18,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import {
   BANK_BAG_SOCKETS,
@@ -480,6 +480,44 @@ describe('bankSocketBag', () => {
     expect(m.inventory.filter((s) => s.itemId === GENERAL_6).length).toBe(1);
     expect(m.inventory.length).toBe(carriedLen);
     expect(holdings(sim)).toEqual(before);
+  });
+
+  it.each([
+    ['named stack', true],
+    ['newest stack', false],
+  ] as const)('returns an occupied socket bag to the vacated %s position', (_label, named) => {
+    const sim = simWithSockets(1);
+    const m = meta(sim);
+    m.bank.socketBags[0] = GENERAL_6;
+    m.inventory.length = 0;
+    m.inventory.push(
+      { itemId: BREAD, count: 1 },
+      { itemId: GENERAL_16, count: 1, slot: 10 },
+      { itemId: ORE, count: 1 },
+    );
+
+    sim.bankSocketBag(GENERAL_16, 0, named ? { slotIndex: 1 } : undefined);
+
+    expect(m.bank.socketBags[0]).toBe(GENERAL_16);
+    expect(m.inventory.map((slot) => slot.itemId)).toEqual([BREAD, GENERAL_6, ORE]);
+    expect(m.inventory[1]?.slot).toBe(10);
+  });
+
+  it.each([
+    ['empty socket', false, false, 2],
+    ['occupied id-only socket', true, false, 2],
+    ['occupied named-slot socket', true, true, 1],
+  ] as const)('notifies quests for the %s arm', (_label, occupied, named, expectedCalls) => {
+    const sim = simWithSockets(1);
+    const m = meta(sim);
+    m.bank.socketBags[0] = occupied ? GENERAL_6 : null;
+    m.inventory.length = 0;
+    m.inventory.push({ itemId: GENERAL_16, count: 1 });
+    const notify = vi.spyOn(sim.ctx, 'onInventoryChangedForQuests');
+
+    sim.bankSocketBag(GENERAL_16, 0, named ? { slotIndex: 0 } : undefined);
+
+    expect(notify).toHaveBeenCalledTimes(expectedCalls);
   });
 
   it('refuses with no open unlocked socket (zero unlocked, and all occupied)', () => {

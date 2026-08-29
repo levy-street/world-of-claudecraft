@@ -35,11 +35,13 @@ import { BANK_BAG_SOCKETS, bumpBankWireRev, nearBanker, nearBankerTemplateId } f
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
 import {
+  consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   newestMatchingSlot,
   selectedInventorySlot,
 } from './item_copy_ref';
 import type { SimContext } from './sim_context';
+import type { InventoryPlacement } from './types';
 
 const inRange = (socket: number): boolean =>
   Number.isInteger(socket) && socket >= 0 && socket < BANK_BAG_SOCKETS;
@@ -159,19 +161,26 @@ export function bankSocketBag(
     ctx.error(meta.entityId, 'That bag cannot be socketed while it carries a special property.');
     return;
   }
-  // A named slot consumes exactly that copy; an id-only call keeps the legacy
-  // newest-first walk (ctx.removeItem) untouched. Tri-state-aware like
-  // equipBag: a silent no-op keeps a peek/consume divergence from socketing a
-  // bag AND leaving its source copy behind.
+  const old = meta.bank.socketBags[target];
+  // A named slot consumes exactly that copy. An occupied id-only swap uses the
+  // same newest-first selection with placement capture; an empty socket keeps
+  // ctx.removeItem. The selected consumer is tri-state: this branch rules out
+  // undefined, and null is rechecked after the peek so a divergence cannot
+  // socket a bag while leaving its source copy behind.
+  let placement: InventoryPlacement | undefined;
   if (slotIndex !== undefined) {
-    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) return;
+    const consumed = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (consumed === null) return;
+    placement = consumed.placement;
+  } else if (old) {
+    placement = consumeNewestInventoryUnit(meta.inventory, itemId).placement;
+    ctx.onInventoryChangedForQuests(meta);
   } else {
     ctx.removeItem(itemId, 1, meta.entityId);
   }
-  const old = meta.bank.socketBags[target];
   // Raw addStacked, never the addItem hub (module header: a swap is a
   // movement, and the hub would inflate reliquary obtain tallies).
-  if (old) addStacked(meta.inventory, old, 1);
+  if (old) addStacked(meta.inventory, old, 1, undefined, undefined, placement);
   meta.bank.socketBags[target] = itemId;
   bumpBankWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);

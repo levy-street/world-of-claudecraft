@@ -8,7 +8,12 @@
 // claiming one cell all still lay out deterministically, with no stack lost or cloned.
 
 import { describe, expect, it } from 'vitest';
-import { cellOfIndex, layoutBagCells, moveStackToCell } from '../src/sim/inventory_order';
+import {
+  cellOfIndex,
+  insertInventoryEntryAtPlacement,
+  layoutBagCells,
+  moveStackToCell,
+} from '../src/sim/inventory_order';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 
@@ -56,6 +61,44 @@ describe('layoutBagCells', () => {
   it('an old save with no slots at all lays out exactly as it always did', () => {
     const inv = [stack('a'), stack('b'), stack('c')];
     expect(ids(layoutBagCells(inv, 5))).toEqual(['a', 'b', 'c', null, null]);
+  });
+});
+
+describe('insertInventoryEntryAtPlacement', () => {
+  it('inserts before the surviving anchor and restores the visual hint', () => {
+    const anchor = stack('last');
+    const inventory = [stack('first'), anchor];
+
+    insertInventoryEntryAtPlacement(inventory, stack('replacement'), {
+      anchor,
+      slotHint: 6,
+    });
+
+    expect(inventory).toEqual([stack('first'), stack('replacement', 6), anchor]);
+  });
+
+  it('appends when placement is absent, at the tail, or its anchor disappeared', () => {
+    const missingAnchor = stack('missing');
+    const inventory = [stack('first')];
+
+    insertInventoryEntryAtPlacement(inventory, stack('absent'));
+    insertInventoryEntryAtPlacement(inventory, stack('tail'), {
+      anchor: null,
+      slotHint: 7,
+    });
+    expect(inventory.at(-1)?.slot).toBe(7);
+    insertInventoryEntryAtPlacement(inventory, stack('missing-anchor'), {
+      anchor: missingAnchor,
+      slotHint: 8,
+    });
+    expect(inventory.at(-1)?.slot).toBe(8);
+
+    expect(inventory.map((slot) => slot.itemId)).toEqual([
+      'first',
+      'absent',
+      'tail',
+      'missing-anchor',
+    ]);
   });
 });
 

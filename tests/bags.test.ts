@@ -81,6 +81,44 @@ describe('stack sizes and stacking math', () => {
     ]);
   });
 
+  it('addStacked prefers an existing merge and drops the supplied placement', () => {
+    const anchor: InvSlot = { itemId: 'spring_water', count: 1 };
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19 }, anchor];
+
+    addStacked(inv, 'baked_bread', 2, undefined, undefined, {
+      anchor,
+      slotHint: 9,
+    });
+
+    expect(inv).toEqual([
+      { itemId: 'baked_bread', count: 20 },
+      { itemId: 'spring_water', count: 1 },
+      { itemId: 'baked_bread', count: 1 },
+    ]);
+    expect(inv.at(-1)?.slot).toBeUndefined();
+  });
+
+  it('addStacked inserts non-merging gear before the supplied anchor', () => {
+    const anchor: InvSlot = { itemId: 'cryptbone_helm', count: 1 };
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 1 },
+      anchor,
+      { itemId: 'spring_water', count: 1 },
+    ];
+
+    addStacked(inv, 'cryptbone_helm', 1, undefined, undefined, {
+      anchor,
+      slotHint: 10,
+    });
+
+    expect(inv).toEqual([
+      { itemId: 'baked_bread', count: 1 },
+      { itemId: 'cryptbone_helm', count: 1, slot: 10 },
+      anchor,
+      { itemId: 'spring_water', count: 1 },
+    ]);
+  });
+
   it('each copy of an unstackable item takes its own slot', () => {
     const inv: InvSlot[] = [];
     addStacked(inv, 'worn_sword', 3);

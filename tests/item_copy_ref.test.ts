@@ -14,6 +14,7 @@ import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   foldNamedSlotTarget,
+  inventoryPlacementForRemovedStack,
   itemCopyPin,
   newestMatchingSlot,
   selectedInventorySlot,
@@ -142,6 +143,20 @@ describe('consumeSelectedInventorySlot: the tri-state', () => {
     expect(unit?.instance).toEqual({ enchantId: 'power' });
     expect(unit?.instance).not.toBe(inv[0].instance);
   });
+
+  it('captures the following stack and visual hint only when removal vacates the slot', () => {
+    const following = plain('boots');
+    const removed: InvSlot[] = [plain('bread'), { ...plain('girdle'), slot: 7 }, following];
+
+    const consumed = consumeSelectedInventorySlot(removed, 'girdle', 1);
+
+    expect(consumed?.placement).toEqual({ anchor: following, slotHint: 7 });
+    expect(removed).toEqual([plain('bread'), following]);
+
+    const surviving: InvSlot[] = [{ ...plain('girdle', 2), slot: 7 }];
+    expect(consumeSelectedInventorySlot(surviving, 'girdle', 0)?.placement).toBeUndefined();
+    expect(surviving).toEqual([{ ...plain('girdle'), slot: 7 }]);
+  });
 });
 
 describe('consumeNewestInventoryUnit: the legacy fallback, unchanged', () => {
@@ -163,6 +178,36 @@ describe('consumeNewestInventoryUnit: the legacy fallback, unchanged', () => {
       craftedRecipeId: undefined,
     });
     expect(inv).toHaveLength(1);
+  });
+
+  it('captures the following stack when removal vacates the newest match', () => {
+    const following = plain('bread');
+    const inv = [{ ...plain('girdle'), slot: 9 }, following, plain('boots')];
+
+    const consumed = consumeNewestInventoryUnit(inv, 'girdle');
+
+    expect(consumed.placement).toEqual({ anchor: following, slotHint: 9 });
+    expect(consumed.placement?.anchor).toBe(following);
+  });
+
+  it('omits placement when the newest matching stack survives', () => {
+    const inv = [plain('bread'), { ...plain('girdle', 2), slot: 9 }];
+
+    expect(consumeNewestInventoryUnit(inv, 'girdle').placement).toBeUndefined();
+    expect(inv).toEqual([plain('bread'), { ...plain('girdle'), slot: 9 }]);
+  });
+});
+
+describe('inventoryPlacementForRemovedStack', () => {
+  it('captures the stack now at the vacated index or null at the tail', () => {
+    const following = plain('boots');
+    const inventory = [plain('bread'), following];
+
+    expect(inventoryPlacementForRemovedStack(inventory, 1, {})).toEqual({ anchor: following });
+    expect(inventoryPlacementForRemovedStack(inventory, 2, { slot: 11 })).toEqual({
+      anchor: null,
+      slotHint: 11,
+    });
   });
 });
 

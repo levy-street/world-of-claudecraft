@@ -31,7 +31,9 @@
 
 import { freePoolSlots, type PoolCapacity, poolCapacityOf, totalPoolCapacity } from './bag_pools';
 import { ITEMS } from './data';
+import { insertInventoryEntryAtPlacement } from './inventory_order';
 import {
+  consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
   newestMatchingSlot,
   selectedInventorySlot,
@@ -41,6 +43,7 @@ import { isMaterialItemId } from './material_ids';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
+  type InventoryPlacement,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
@@ -255,10 +258,12 @@ export function addStacked(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  placement?: InventoryPlacement,
 ): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let remaining = count;
+  let nextPlacement = placement;
   for (const s of inventory) {
     if (remaining <= 0) return;
     if (
@@ -271,6 +276,7 @@ export function addStacked(
     const take = Math.min(stack - s.count, remaining);
     s.count += take;
     remaining -= take;
+    nextPlacement = undefined;
   }
   const mergeable = isMergeableInstancePayload(instance);
   while (remaining > 0) {
@@ -281,7 +287,8 @@ export function addStacked(
       ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
       : { itemId, count: take };
     if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
-    inventory.push(slot);
+    insertInventoryEntryAtPlacement(inventory, slot, nextPlacement);
+    nextPlacement = undefined;
     remaining -= take;
   }
 }
@@ -480,21 +487,27 @@ export function equipBag(
     ctx.error(meta.entityId, 'That bag cannot be equipped while it carries a special property.');
     return;
   }
-  // A named slot consumes exactly that copy; an id-only call keeps the legacy
-  // newest-first walk (ctx.removeItem) untouched. Both consumers stay
-  // tri-state-aware even though the peek above already refused every
-  // legitimate case: a silent no-op keeps a future divergence between the
-  // peek and consume halves from equipping a bag AND leaving its source copy
-  // behind (item_copy_ref.ts's own "branch on all three" contract).
+  // A named slot consumes exactly that copy. An occupied id-only swap uses the
+  // same newest-first selection with placement capture; an empty socket keeps
+  // ctx.removeItem. The selected consumer is tri-state: this branch rules out
+  // undefined, and null is rechecked after the peek so future divergence cannot
+  // equip a bag while leaving its source copy behind.
+  let placement: InventoryPlacement | undefined;
   if (slotIndex !== undefined) {
     // No onInventoryChangedForQuests here: the shared call below already fires for
     // both arms, and running it twice re-evaluated collect objectives on one equip.
-    if (consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex) === null) return;
+    const consumed = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    if (consumed === null) return;
+    placement = consumed.placement;
+  } else if (old && peeked && peeked.count >= 1) {
+    // Bypass ctx.removeItem deliberately so the returned bag can inherit this position.
+    placement = consumeNewestInventoryUnit(meta.inventory, itemId).placement;
+    ctx.onInventoryChangedForQuests(meta);
   } else {
     ctx.removeItem(itemId, 1, meta.entityId);
   }
 
-  if (old) addStacked(meta.inventory, old, 1);
+  if (old) addStacked(meta.inventory, old, 1, undefined, undefined, placement);
   meta.bags[target] = itemId;
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });

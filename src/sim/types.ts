@@ -1302,6 +1302,11 @@ export interface InvSlot {
   slot?: number;
 }
 
+export interface InventoryPlacement {
+  anchor: InvSlot | null;
+  slotHint?: number;
+}
+
 // A shallow `{ ...slot }` aliases `instance` between the live slot and a
 // serialized/loaded copy; see cloneItemInstancePayload above (shared with the
 // equipped-instance map, src/sim/professions/enchanting.ts) for why that is
@@ -1328,6 +1333,10 @@ export interface InventoryUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
 }
+
+export type InventoryUnitWithPlacement = InventoryUnit & {
+  placement?: InventoryPlacement;
+};
 
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.

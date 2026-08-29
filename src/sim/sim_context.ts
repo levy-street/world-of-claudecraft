@@ -60,7 +60,7 @@ import type {
   ErrorReason,
   EscortRunState,
   GatherNodeDef,
-  InventoryUnit,
+  InventoryUnitWithPlacement,
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
@@ -640,7 +640,7 @@ export interface SimContextCallbacks {
   // masterwork bonus into the freshly-enchanted instance instead of dropping
   // them, and can re-stamp the craft marker a plain crafted stack carries on
   // the slot rather than in a payload.
-  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[];
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnitWithPlacement[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 

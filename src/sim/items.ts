@@ -45,7 +45,7 @@ import {
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
-import { moveStackToCell } from './inventory_order';
+import { insertInventoryEntryAtPlacement, moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
 import {
   consumeNewestInventoryUnit,
@@ -71,7 +71,9 @@ import {
   type Entity,
   type EquipSlot,
   INTERACT_RANGE,
+  type InventoryPlacement,
   type InventoryUnit,
+  type InventoryUnitWithPlacement,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
@@ -124,19 +126,24 @@ function returnEquippedItemToBags(
   meta: PlayerMeta,
   itemId: string,
   payload?: ItemInstancePayload,
+  placement?: InventoryPlacement,
 ): void {
   const craftedRecipeId = payload?.craftedRecipeId;
   const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
   if (instance || craftedRecipeId !== undefined) {
-    meta.inventory.push({
-      itemId,
-      count: 1,
-      ...(instance ? { instance } : {}),
-      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
-    });
+    insertInventoryEntryAtPlacement(
+      meta.inventory,
+      {
+        itemId,
+        count: 1,
+        ...(instance ? { instance } : {}),
+        ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+      },
+      placement,
+    );
     return;
   }
-  addItemSilent(itemId, 1, meta);
+  addItemSilent(itemId, 1, meta, undefined, undefined, placement);
 }
 
 function canReturnEquippedItemToBags(
@@ -546,8 +553,8 @@ export function equipItem(
   // flagged, warning that "a future picker UI should not assume the enchanted copy
   // is always favored". It is no longer the only option: a caller that knows which
   // copy the player meant passes slotIndex and gets exactly it. The id-only walk
-  // stays byte-identical for the callers that cannot (server/pbe_boost.ts, the RL
-  // host, the parity goldens).
+  // keeps the historical newest-first selection for callers that cannot
+  // (server/pbe_boost.ts, the RL host, the parity goldens).
   // A named slot equips exactly that copy. This is the surface the whole feature
   // exists for: with a plain and an enchanted copy of one piece, the legacy walk
   // takes whichever is NEWEST, so looting a plain duplicate silently benches your
@@ -558,7 +565,7 @@ export function equipItem(
   // An invalid selection refuses rather than falling back, because equipping the
   // wrong copy is silent: the piece looks right in the paperdoll and simply
   // carries none of the stats the player expected.
-  let consumed: InventoryUnit;
+  let consumed: InventoryUnitWithPlacement;
   if (slotIndex !== undefined) {
     const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
     // Unreachable in practice: the early gate above refuses an invalid selection
@@ -579,7 +586,7 @@ export function equipItem(
     // silently drop the enchant; worn kinds are 1-per-slot, so the
     // identical-payload merge arm of addItemInstance could
     // never apply here anyway).
-    returnEquippedItemToBags(meta, old, oldInstance);
+    returnEquippedItemToBags(meta, old, oldInstance, consumed.placement);
   }
   if (displacedId) {
     returnEquippedItemToBags(meta, displacedId, displacedInstance);
@@ -1533,6 +1540,7 @@ function addItemSilent(
   meta: PlayerMeta,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  placement?: InventoryPlacement,
 ): void {
-  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId);
+  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId, placement);
 }
