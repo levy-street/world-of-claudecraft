@@ -13,6 +13,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 import type { PlayerClass } from '../src/sim/types';
+import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
 const PROBE_CLASS: PlayerClass = 'warrior';
 
@@ -600,7 +601,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when an auth-world-20 client reaches an auth-world-9 server', () => {
+  it('fails closed when a current-epoch client reaches an auth-world-9 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -614,7 +615,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-20',
+          t: ONLINE_WORLD_AUTH_TYPE,
           token: 't',
           character: 1,
         }),

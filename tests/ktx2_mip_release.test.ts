@@ -379,6 +379,9 @@ describe('category policy', () => {
       'battleground',
       'biome',
       'city',
+      // the Drakelands rebuild kit: placer-built world dressing, drawn only
+      // by the world renderer through the env-prop template cache
+      'drakelands_kit',
       'dungeon',
       'foliage',
       'medieval_village_v2',

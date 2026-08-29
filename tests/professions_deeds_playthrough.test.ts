@@ -320,9 +320,15 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // so the shared stream forks again. Re-hunted once more for owner round 6b
     // (Gorrak's camp and its dressing rejoined the main bandit band, the
     // duplicate Vale Chapel graveyard retired with its spirit healer, and the
-    // market stalls and four town NPCs moved), all world-gen inputs again: the
-    // koi now lands on session index 7.
-    expect(koiSession).toBe(7);
+    // market stalls and four town NPCs moved), all world-gen inputs again.
+    // Re-hunted once more for the Drakelands site swap
+    // (docs/design/drakelands-improvements/plan.md: the Last Keep's castle
+    // removed to flat land on the old Trollmoot rise, the trolls and their
+    // henge onto the old keep grounds, Wyrmwatch's dressing stripped, roads
+    // re-aimed): terrain pads, props, camps, and roads are all world-gen
+    // inputs, so the shared stream forks again; the koi now lands on
+    // session index 37.
+    expect(koiSession).toBe(37);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -371,20 +377,22 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // world), and the market stalls plus four town NPCs moved. All world-gen
     // inputs, so the shared stream forks again and all three indices below
     // were re-recorded ONE AT A TIME, in order, each after the one above it
-    // was already green.
+    // was already green. Re-recorded the same way for the Drakelands site
+    // swap (the keep castle out, the sites traded, Wyrmwatch stripped): the
+    // reshaped world moves every shared-stream index downstream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 148 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 86 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 226,
+        hitAt: 235,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 95,
+        hitAt: 112,
       },
     ];
     for (const hunt of hunts) {
@@ -452,8 +460,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Re-hunted a final time for owner round 6b's own wave (Gorrak's camp and
     // dressing rejoined the bandit band, the duplicate Vale Chapel graveyard
     // and its spirit healer retired, the market stalls and four town NPCs
-    // moved): the specimen now lands on attempt index 5.
-    expect(hitAt).toBe(5);
+    // moved): the specimen landed on attempt index 5 there. Re-hunted for
+    // the Drakelands site swap (same cause as the beat 11 to 14 hunts): the
+    // specimen now lands on attempt index 3.
+    expect(hitAt).toBe(3);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

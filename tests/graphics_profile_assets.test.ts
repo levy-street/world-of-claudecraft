@@ -81,9 +81,6 @@ vi.mock('../src/render/noticeboard', () => ({
 vi.mock('../src/render/banker_chest', () => ({
   resetBankerChestProfileCaches: mocks.reset,
 }));
-vi.mock('../src/render/castle_features', () => ({
-  resetCastleFeatureProfileCaches: mocks.reset,
-}));
 vi.mock('../src/render/door_portal', () => ({
   resetDoorPortalProfileCaches: mocks.reset,
 }));
@@ -199,7 +196,6 @@ describe('graphics profile derived-cache reset', () => {
       'props',
       'characters',
       'stations',
-      'castle_features',
       'eastbrook_surface_atlas',
       'eastbrook_town',
       'banker_chest',

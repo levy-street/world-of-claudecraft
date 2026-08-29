@@ -236,6 +236,10 @@ const MONOLITHS: MonolithRow[] = [
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
     // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
+    // Held at the exact count through the drakelands placer freeze: the
+    // /dev sandbox scenario data moved out to dev/dev_sandbox_config.ts to
+    // make room for the freeze's coordinator touches (the loop skip and the
+    // aggroMob refusal must live here).
     ceiling: 12473,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
@@ -258,7 +262,10 @@ const MONOLITHS: MonolithRow[] = [
     // (the utc_day import consolidation shed one line).
     // Re-pinned after the /daynight dev-command extraction to
     // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    ceiling: 11495,
+    // Lowered after extracting the dev-only chat interceptors (day/night
+    // scrub + the placer rig) into src/game/dev_chat_hooks.ts. Exact count,
+    // zero slack.
+    ceiling: 11481,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

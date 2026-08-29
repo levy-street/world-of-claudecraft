@@ -33,11 +33,15 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // retribution unmoved. Re-pinned on the eastbrook-plus-tutorial integration
 // merge (the harbor town and the Proving Shore island land in one world),
 // which forks the shared stream again: holy 42.45 to 41.25, protection 42.7
-// to 41.7; retribution unmoved. The wide 35-65s design band still holds.
+// to 41.7; retribution unmoved. Re-pinned for the Drakelands site swap
+// (docs/design/drakelands-improvements/plan.md: the keep castle removed to
+// flat land, the troll sites traded, Wyrmwatch stripped), which forks the
+// shared stream again: protection 41.7 to 40.15, retribution 52.45 to
+// 55.75; holy unmoved. The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
-  protection: 41.7,
-  retribution: 52.45,
+  protection: 40.15,
+  retribution: 55.75,
 };
 
 function addDummy(sim: Sim): Entity {
