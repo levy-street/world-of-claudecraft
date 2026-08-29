@@ -2519,6 +2519,13 @@ const ITEM_ENTITY_IDS = [
   'ps_castaway_crate',
   'ps_ferry_bell',
   'dawnhold_posy',
+  'wayfarers_backpack',
+  'burlap_reagent_pouch',
+  'necromancers_reagent_satchel',
+  'duskweave_bag',
+  'resonant_weave_bag',
+  'foragers_haversack',
+  'loombound_reagent_satchel',
   'hammered_copper_band',
   'polished_copper_loop',
   'coiled_copper_torc',
@@ -2864,6 +2871,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ps_castaway_crate: 'Castaway Crate',
   ps_ferry_bell: 'Ferry Bell',
   dawnhold_posy: 'Dawnhold Garden Posy',
+  // The phase 05 bag catalog. English-appended like the quivers above until the
+  // release fill folds them into the per-locale arrays.
+  wayfarers_backpack: "Wayfarer's Backpack",
+  burlap_reagent_pouch: 'Burlap Reagent Pouch',
+  necromancers_reagent_satchel: "Necromancer's Reagent Satchel",
+  duskweave_bag: 'Duskweave Bag',
+  resonant_weave_bag: 'Resonantweave Bag',
+  foragers_haversack: "Forager's Haversack",
+  loombound_reagent_satchel: 'Loombound Reagent Satchel',
   // Jewelcrafting base catalog (Masterwrought phase 05): the thorium_* ids
   // display "Osmium" (the Osmium register in content/profession_items.ts).
   // English-appended like the quivers above until the release fill folds them

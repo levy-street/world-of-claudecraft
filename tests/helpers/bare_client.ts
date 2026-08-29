@@ -102,6 +102,9 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mailInfo = null;
   c.mailUnread = 0;
   c.bankInfo = null;
+  c.bankPurchasedSlots = null;
+  c.vaultInfo = null;
+  c.craftVaultStock = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();
   // IWorldReliquary sparse mirrors (heavy self `reliq`); empty until a snap.

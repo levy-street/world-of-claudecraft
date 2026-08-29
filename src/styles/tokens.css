@@ -548,6 +548,17 @@
        compute to `none` (no image), not an invalid/empty string, the same
        reasoning as the --perf-ornament-* mask fallbacks above. */
     --minimap-speckle: none;
+    /* Bank capacity meter's gilded near-full treatment (Bank Storage phase 08),
+       the third reader of the section 4.3 gold ramp after --perf-ornament-gilt /
+       --minimap-gilt above. Flat colors only (no mask, no animation, no
+       per-frame cost): the track border/glow anchor stays on the same gold-700
+       step the other two gilt aliases use; the general fill steps up from its
+       resting --gold-dim to gold-400 and the meter text warms to gold-300. The
+       glow is a static box-shadow color (components.css "bank footer" section). */
+    --bank-meter-gilt: var(--color-gold-700);
+    --bank-meter-gilt-fill: var(--color-gold-400);
+    --bank-meter-gilt-text: var(--color-gold-300);
+    --bank-meter-gilt-glow: color-mix(in srgb, var(--color-gold-600) 55%, transparent);
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal
@@ -606,5 +617,15 @@
        so it is shed at the low effect tier the same way. */
     --minimap-gilt: var(--color-gold-700) !important;
     --minimap-speckle: none !important;
+    /* The bank meter's gilt aliases are deliberately NOT shed: they are flat
+       colors with no per-frame or mask cost, and the near-full warmth is the
+       same at every tier (cosmetic emphasis with no tier knob, per the
+       graphics-fairness rule). Pinned here at their base values so the low
+       tier provably renders the identical treatment, the way the two gilt
+       aliases above stay paintable. */
+    --bank-meter-gilt: var(--color-gold-700) !important;
+    --bank-meter-gilt-fill: var(--color-gold-400) !important;
+    --bank-meter-gilt-text: var(--color-gold-300) !important;
+    --bank-meter-gilt-glow: color-mix(in srgb, var(--color-gold-600) 55%, transparent) !important;
   }
 }

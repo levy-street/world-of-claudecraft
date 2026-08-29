@@ -3914,6 +3914,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.str': 'Síla',
   'itemUi.tooltip.armorStat': '{value} brnění',
   'itemUi.tooltip.bagSlots': 'Batoh s {slots} sloty',
+  'itemUi.tooltip.bagSlotsMaterials': 'Batoh na materiály s {slots} sloty',
   'itemUi.tooltip.cannotMarket': 'Nelze prodat na trhu',
   'itemUi.tooltip.cannotVendor': 'Nelze prodat obchodníkům',
   'itemUi.tooltip.classes': 'Třídy: {classes}',

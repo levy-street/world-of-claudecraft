@@ -485,7 +485,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // (tests/market_filters.test.ts); the bags/bank chips deliberately do NOT
   // carry it: the 2026-08-01 settlement ruled grey trash and the five trophy
   // oddments out of every chip (Q3/Q4), and the six bag-kind items matched no
-  // chip before the narrowing either. This census makes the ruling
+  // chip before the narrowing either (phase 05 of the bank-storage packet grew
+  // that bag family from six to thirteen, materials-only satchels included:
+  // still no chip, since matchesCategory has no bag arm). This census makes the ruling
   // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
   // rescues one the settlement excluded) reds an exact-set diff naming it.
   // The nine Masterwrought phase 07 intermediates ride the wyrmfall_core
@@ -513,6 +515,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // phase.
     'bogiron_nugget',
     'briny_idol',
+    'burlap_reagent_pouch',
     // Back since the phase's sixth fix round output-excluded it: no recipe
     // consumes the chipped tusk, so it is poor grey trash outside the
     // material set again, All-only exactly as before the phase.
@@ -525,6 +528,8 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // ruled junk; the Materials chip correctly skips a non-material.
     'deed_of_making',
     'deepfen_pearl',
+    'duskweave_bag',
+    'foragers_haversack',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -536,8 +541,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
+    'loombound_reagent_satchel',
     'mistcallers_duffel',
     'moonpale_scale',
+    'necromancers_reagent_satchel',
     'ogre_toe_ring',
     'pale_pearl',
     // Masterwrought phase 11: the 28 apex patterns. Kind 'recipe' is
@@ -591,6 +598,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warspice_feast',
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
+    'resonant_weave_bag',
     // masterwrought Phase 11k's three apex feasts, the same shape as
     // harvest_feast and All-only for the same reason: a placeable crafted
     // junk-kind item whose click PLACES rather than uses or equips.
@@ -611,6 +619,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'tangled_weed',
     'travelers_knapsack',
     'warspice_feast',
+    'wayfarers_backpack',
     'wolfhide_satchel',
   ] as const;
 

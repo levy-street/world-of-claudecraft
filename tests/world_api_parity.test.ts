@@ -122,6 +122,7 @@ export const IWORLD_MEMBERS = [
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
+  { name: 'groundAimPlacementPreview', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -241,6 +242,7 @@ export const IWORLD_MEMBERS = [
   { name: 'duelDecline', kind: 'method' },
   { name: 'realm', kind: 'data' },
   { name: 'accountAdmin', kind: 'data' },
+  { name: 'spectating', kind: 'data' },
   { name: 'socialInfo', kind: 'data' },
   // --- social graph commands + async search ---
   { name: 'friendAdd', kind: 'method' },
@@ -300,6 +302,29 @@ export const IWORLD_MEMBERS = [
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
+  // Bank Storage phase 15 (ruling 17): the ALWAYS-available owner-only ladder
+  // counter the Strongbox store gates its charter list on. Unlike bankInfo it
+  // rides no proximity gate, which is the whole point; the craftVaultStock
+  // precedent below is the same shape.
+  { name: 'bankPurchasedSlots', kind: 'data' },
+  // Bank bag sockets (Bank Storage phase 06): unlock/socket/unsocket commands.
+  // The socket READOUTS ride BankInfo, so only the commands are new members.
+  // ClientWorld sends the real wire commands (phase 07 landed them); the
+  // phase-06 note that these were compile-complete no-ops is retired.
+  { name: 'bankUnlockSocket', kind: 'method' },
+  { name: 'bankSocketBag', kind: 'method' },
+  { name: 'bankUnsocketBag', kind: 'method' },
+  // --- Materials Vault (same facet, same bursars): proximity-gated stock read +
+  //     deposit/withdraw/buy-upgrade commands ---
+  { name: 'vaultInfo', kind: 'data' },
+  { name: 'vaultDeposit', kind: 'method' },
+  { name: 'vaultWithdraw', kind: 'method' },
+  { name: 'vaultDepositAll', kind: 'method' },
+  { name: 'vaultBuyUpgrade', kind: 'method' },
+  // Phase 04 craft-from-vault: the context-gated drawable-stock view the
+  // crafting window folds into availability (NOT banker-gated, unlike
+  // vaultInfo above; null inside instanced/competitive contexts).
+  { name: 'craftVaultStock', kind: 'data' },
   // --- guild bank: officer-plus proximity-gated read + gold/item/buy commands
   //     (Phase 1 stubs in both worlds; the wire lands in Phase 2) ---
   { name: 'guildBankInfo', kind: 'data' },
@@ -674,6 +699,32 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // removing cupInfo (data) plus the cup methods, and the tutorial greeting
     // adds startTutorial (IWorldQuests, a method). The merged tree carries
     // both arms.
+    // The bank-storage arm's own narrative from the same 323 point, kept
+    // whole: the release branch's Materials Vault adds one
+    // proximity-gated view (vaultInfo, data) plus the three vaultDeposit/
+    // vaultWithdraw/vaultBuyUpgrade commands (methods) to the same IWorldBank
+    // facet, leaving 327. The Phase 03 batched deposit-all sweep adds
+    // vaultDepositAll (IWorldBank, a method), leaving 328. The Phase 04
+    // craft-from-vault slice adds craftVaultStock (IWorldBank, data: the
+    // context-gated drawable-stock view), leaving 329. The Phase 06 bank bag
+    // sockets add the three socket commands bankUnlockSocket / bankSocketBag /
+    // bankUnsocketBag (IWorldBank, methods; the readouts ride BankInfo),
+    // leaving 332. The Phase 15 live-ladder read adds bankPurchasedSlots
+    // (IWorldBank, data: the always-available owner-only ladder counter, the
+    // one bank read with no proximity gate), leaving 333. The release's neutral
+    // trade close (tradeClose, a sibling of tradeCancel that ends a session
+    // without calling it a cancellation) is a command member and lands on top
+    // of every branch member at the v0.40.0 sync. The totals below are read off
+    // a run on the MERGED tree, never reconciled by arithmetic across a merge.
+    // The release arm then retires the Vale Cup facet with the New Eastbrook
+    // program (cupInfo plus the cup methods leave), adds guildRoster
+    // (IWorldProgressionXp, a method) for the signpost guild board, and adds
+    // startTutorial (IWorldQuests, a method) for the tutorial greeting. Both
+    // arms land in the merged tree and the totals below are read off a run on
+    // it, never reconciled by arithmetic across a merge.
+    // The PR 3676 arm's ground-aim landing preview adds groundAimPlacementPreview
+    // (IWorldCombat, a method) on top of the bank-storage members at the sixth
+    // v0.41.0 sync; the totals below are read off a run on the merged tree.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -700,9 +751,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // perfectingInfo (IWorldProfessions, both methods): 334 members, 87 data,
     // 247 method. PREDICTED 334/87/247 by the phase's contract before the
     // members landed, then set from a suite run.
-    expect(IWORLD_MEMBERS.length).toBe(334);
-    expect(DATA_MEMBERS.length).toBe(87);
-    expect(METHOD_MEMBERS.length).toBe(247);
+    // The 2026-08-29 v0.41.0 sync composes an EIGHTH time and CONFLICTED
+    // again: the release read 335 (89 data, 246 method) on its own after the
+    // bank-storage facet members, spectating, and the ground-aim landing
+    // preview; ours read 334 (87, 247). The merged tree carries both arms
+    // (the packet's twelve adds, the activeMobileStationCrafts rename
+    // included, plus the release's twelve adds; no overlap, no kind flips):
+    // 346 members, 91 data, 255 method, read off the merged member table and
+    // held to the suite run on the merged tree, never reconciled by
+    // arithmetic in the diff.
+    expect(IWORLD_MEMBERS.length).toBe(346);
+    expect(DATA_MEMBERS.length).toBe(91);
+    expect(METHOD_MEMBERS.length).toBe(255);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -744,6 +804,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bankBuySlots',
       'bankDeposit',
       'bankInfo',
+      'bankPurchasedSlots',
+      'bankSocketBag',
+      'bankUnlockSocket',
+      'bankUnsocketBag',
       'bankWithdraw',
       'bgFlagAction',
       'bgInfo',
@@ -782,6 +846,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'copper',
       'craftItem',
       'craftSkills',
+      'craftVaultStock',
       'craftingIdentity',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
@@ -837,6 +902,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendRemove',
       'friendlyTabTarget',
       'gatheringProficiency',
+      'groundAimPlacementPreview',
       'guildAccept',
       'guildBankBuySlots',
       'guildBankDeposit',
@@ -1008,6 +1074,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'socialInfo',
       'socketRiftGem',
       'sortInventory',
+      'spectating',
       'spinDailyReward',
       'startAutoAttack',
       'startTutorial',
@@ -1045,6 +1112,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'vaultBuyUpgrade',
+      'vaultDeposit',
+      'vaultDepositAll',
+      'vaultInfo',
+      'vaultWithdraw',
       'vendorBuyback',
       'xp',
     ]);
@@ -1066,6 +1138,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bagCapacity',
       'bags',
       'bankInfo',
+      'bankPurchasedSlots',
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
@@ -1075,6 +1148,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionUpgrades',
       'copper',
       'craftSkills',
+      'craftVaultStock',
       'craftingIdentity',
       'deedStats',
       'deedsEarned',
@@ -1129,6 +1203,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'riftCollisionToken',
       'riftFloor',
       'socialInfo',
+      'spectating',
       'stationPlacements',
       'talentRole',
       'talentSpec',
@@ -1137,6 +1212,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
+      'vaultInfo',
       'vendorBuyback',
       'xp',
     ]);
@@ -1161,6 +1237,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'autoLoot',
       'bankBuySlots',
       'bankDeposit',
+      'bankSocketBag',
+      'bankUnlockSocket',
+      'bankUnsocketBag',
       'bankWithdraw',
       'bgFlagAction',
       'bgQueueJoin',
@@ -1231,6 +1310,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
+      'groundAimPlacementPreview',
       'guildAccept',
       'guildBankBuySlots',
       'guildBankDeposit',
@@ -1391,6 +1471,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'vaultBuyUpgrade',
+      'vaultDeposit',
+      'vaultDepositAll',
+      'vaultWithdraw',
     ]);
   });
 });
@@ -1411,6 +1495,29 @@ describe('data members are present and readable (no throw) on both constructed w
       assertDataMember(client, m.name, 'ClientWorld');
     });
   }
+});
+
+describe('spectating is the VIEWER question, and the two worlds answer it differently', () => {
+  it('the OFFLINE world is never spectating, so its durability is never switched off', () => {
+    // assertDataMember above only proves the member reads without throwing. The
+    // VALUE is what a money path acts on: src/ui/purchase_intent_durability.ts
+    // treats a string here as identity-not-known and then writes nothing, so a
+    // Sim that answered a name would silently disable the durable purchase
+    // intent for the whole offline world.
+    expect(sim.spectating).toBeNull();
+  });
+
+  it('the ONLINE world starts not-spectating', () => {
+    expect(client.spectating).toBeNull();
+    // AND NOTHING MORE, deliberately. An earlier version of this arm assigned
+    // 'Elenwe' through the member and read it back, claiming that proved the seam
+    // and the spectate frame are not two fields sharing a name. It cannot: that
+    // round trip holds for any writable data property, so renaming the field the
+    // frame writes and leaving a vestigial `spectating` behind would keep it
+    // green. The link between the frame and the field is a WIRE claim and belongs
+    // where wire claims are pinned, not here.
+    expect(typeof (client as IWorldEntityRoster).spectating).not.toBe('undefined');
+  });
 });
 
 describe('membership, not equality: world extras do not fail the gate', () => {
@@ -1457,6 +1564,7 @@ const FACET_ENTITY_ROSTER = [
   'moveInput',
   'realm',
   'accountAdmin',
+  'spectating',
 ] as const satisfies readonly (keyof IWorldEntityRoster)[];
 type _ExhaustEntityRoster = AssertNever<
   Exclude<keyof IWorldEntityRoster, (typeof FACET_ENTITY_ROSTER)[number]>
@@ -1468,6 +1576,7 @@ const FACET_COMBAT = [
   'activeFrostRings',
   'activeTemporalHourglasses',
   'reactiveAbilityWindowRemaining',
+  'groundAimPlacementPreview',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1757,9 +1866,19 @@ type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[nu
 
 const FACET_BANK = [
   'bankInfo',
+  'bankPurchasedSlots',
   'bankDeposit',
   'bankWithdraw',
   'bankBuySlots',
+  'bankUnlockSocket',
+  'bankSocketBag',
+  'bankUnsocketBag',
+  'vaultInfo',
+  'vaultDeposit',
+  'vaultWithdraw',
+  'vaultDepositAll',
+  'vaultBuyUpgrade',
+  'craftVaultStock',
 ] as const satisfies readonly (keyof IWorldBank)[];
 type _ExhaustBank = AssertNever<Exclude<keyof IWorldBank, (typeof FACET_BANK)[number]>>;
 
@@ -2069,8 +2188,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(334);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(334);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(346);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(346);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

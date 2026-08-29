@@ -16,6 +16,16 @@ import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
+import {
+  type BankLedgerOutboxSnapshot,
+  serializeBankLedgerCommandBatch,
+} from '../../server/bank_ledger_outbox';
+import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
+import {
   ESCROW_LOCK_TIMEOUT_MS,
   PgWocMarketDb,
   SAVE_IDLE_TX_TIMEOUT_MS,
@@ -567,6 +577,113 @@ describe('the listing-id stamp rides the escrow transaction, atomically', () => 
       params: { ...LISTING.params, directedBuyerAccount: null },
     });
     expect(workload(publicArm.sql())).toHaveLength(4);
+  });
+
+  it('issues twelve workload statements at the ledger plus one-storage-effect maximum', async () => {
+    const batch = serializeBankLedgerCommandBatch('woc.max.query.shape', [
+      {
+        realm: REALM,
+        characterId: SAVE.characterId,
+        accountId: LISTING.sellerAccount,
+        op: 'deposit',
+        itemId: 'peacebloom',
+        count: 1,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 6,
+        container: 'personal',
+        containerId: null,
+      },
+    ]);
+    const bankLedgerSnapshot: BankLedgerOutboxSnapshot = Object.freeze({
+      owner: Object.freeze({
+        realm: REALM,
+        characterId: SAVE.characterId,
+        accountId: LISTING.sellerAccount,
+      }),
+      batches: Object.freeze([batch]),
+      rowCount: 1,
+      encodedBytes: batch.encodedBytes,
+      guildIds: Object.freeze([]),
+      hasUnscopedRows: true,
+    });
+    const storageEffect: StorageAppliedEffect = {
+      realm: REALM,
+      accountId: LISTING.sellerAccount,
+      characterId: SAVE.characterId,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'woc-max-query-shape-storage',
+      spendClaimToken: '00000000-0000-4000-8000-000000000001',
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    const tx = recordingTxPool((text, values) => {
+      if (text.includes('WITH receipt_input AS')) {
+        const params = values as unknown[];
+        const rowCounts = params[5] as number[];
+        return {
+          rows: (params[0] as number[]).map((ordinal, index) => ({
+            batch_ordinal: ordinal,
+            batch_key: (params[1] as string[])[index],
+            newly_claimed: true,
+            stored_batch_key: (params[1] as string[])[index],
+            stored_realm: (params[2] as string[])[index],
+            stored_character_id: (params[3] as number[])[index],
+            stored_account_id: (params[4] as number[])[index],
+            stored_row_count: rowCounts[index],
+            stored_payload_sha256: (params[6] as string[])[index],
+            inserted_row_count: rowCounts.reduce((sum, count) => sum + count, 0),
+          })),
+          rowCount: rowCounts.length,
+        };
+      }
+      if (text.includes('FROM storage_purchase_applied_receipts')) {
+        return { rows: [], rowCount: 0 };
+      }
+      if (text.includes('FROM storage_purchases') && text.includes('FOR UPDATE')) {
+        return {
+          rows: [
+            {
+              id: 81,
+              realm: storageEffect.realm,
+              account_id: storageEffect.accountId,
+              character_id: storageEffect.characterId,
+              item_id: storageEffect.itemId,
+              expected_cost_claudium: storageEffect.expectedCostClaudium,
+              idempotency_key: storageEffect.idempotencyKey,
+              spend_claim_token: storageEffect.spendClaimToken,
+              status: 'pending',
+            },
+          ],
+          rowCount: 1,
+        };
+      }
+      if (text.includes('INSERT INTO storage_purchase_applied_receipts')) {
+        return { rows: [{ source_purchase_id: 81 }], rowCount: 1 };
+      }
+      if (text.includes('RETURNING id')) return { rows: [{ id: 41 }], rowCount: 1 };
+      return undefined;
+    });
+
+    const out = await new PgWocMarketDb(tx.pool).escrowInsertListing(
+      { ...SAVE, storageEffects: [storageEffect], bankLedgerSnapshot },
+      { ...LISTING, directedOfferId: 9 },
+    );
+    expect(out).toEqual({ ok: true, id: 41 });
+    const workload = tx
+      .sql()
+      .filter(
+        (text) =>
+          text !== 'BEGIN' &&
+          text !== 'COMMIT' &&
+          text !== 'ROLLBACK' &&
+          !text.startsWith('SET LOCAL'),
+      );
+    expect(workload).toHaveLength(12);
+    expect(workload.filter((text) => text.includes('FROM accounts'))).toHaveLength(1);
+    expect(workload[0]).toContain('FOR NO KEY UPDATE');
+    expect(workload.some((text) => text.includes('FOR KEY SHARE'))).toBe(false);
   });
 
   it('resolveDirectedOffer compare-and-sets on pending and never writes listing_id', () => {
@@ -1225,16 +1342,19 @@ describe('the settlement guards ship their DDL (structural floor)', () => {
  *  responder overrides the answer for chosen statements (e.g. a close CAS
  *  that matches nothing, driving the already_final arm). */
 function recordingTxPool(
-  respond?: (text: string) => { rows: unknown[]; rowCount: number } | undefined,
+  respond?: (text: string, values?: unknown[]) => { rows: unknown[]; rowCount: number } | undefined,
 ): {
   pool: Pool;
   sql: () => string[];
 } {
   const seen: string[] = [];
-  const query = async (text: string) => {
+  const query = async (text: string, values?: unknown[]) => {
     seen.push(text);
-    const forced = respond?.(text);
+    const forced = respond?.(text, values);
     if (forced) return forced;
+    if (text.includes('FROM accounts') && text.includes('FOR NO KEY UPDATE')) {
+      return { rows: [{ id: Number(values?.[0]) }], rowCount: 1 };
+    }
     if (text.includes('FROM woc_market_listings') && text.includes('FOR NO KEY UPDATE')) {
       return { rows: [{ status: 'settling' }], rowCount: 1 };
     }
@@ -1305,12 +1425,20 @@ describe('every guard transaction bounds its idle holds', () => {
       readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
     );
     const narrowed = src.match(/FOR NO KEY UPDATE/g) ?? [];
-    expect(narrowed).toHaveLength(21);
+    expect(narrowed).toHaveLength(20);
     // 'FOR NO KEY UPDATE' does not contain the substring 'FOR UPDATE', so a
     // plain match here is a real regressed clause, not a narrowed one.
     expect(src.match(/FOR UPDATE/g) ?? []).toEqual([]);
     // The five sweep claims keep their non-blocking shape in the same mode.
     expect(src.match(/FOR NO KEY UPDATE( OF \w+)? SKIP LOCKED/g) ?? []).toHaveLength(5);
+    // The escrow account lock moved behind the opaque save-effect proof seam.
+    // Count its exact stronger lock separately so relocating the SQL cannot
+    // make the marketplace-wide narrowing floor silently shrink.
+    const saveEffectsSrc = stripComments(
+      readFileSync(new URL('../../server/bank_ledger_save_effects_db.ts', import.meta.url), 'utf8'),
+    );
+    expect(saveEffectsSrc.match(/FOR NO KEY UPDATE/g) ?? []).toHaveLength(1);
+    expect(saveEffectsSrc.match(/FOR UPDATE/g) ?? []).toEqual([]);
     // And no sibling module quietly grows its own lock clause outside this
     // scan (the review round's durability note). DISCOVERED, not enumerated:
     // a hand-kept list cannot see a NEW server/woc_market_*.ts module, which
@@ -2182,6 +2310,32 @@ describe('the atomic save-and-book, in SQL', () => {
     leaseNonce: 'nonce-1',
   };
 
+  it('passes the normalized ledger snapshot as argument seven at both WOC character-save sites', async () => {
+    // There are exactly two character-only marketplace transactions. Both
+    // must hand the generic save helper the captured snapshot NORMALIZED
+    // through the one snapshot-to-effects seam (bankLedgerSaveEffects, the
+    // paid_guild_creation shape): rebuilding or filtering a mixed prefix
+    // breaks receipt identity, while omitting one site makes that WOC rail
+    // commit state without its audit rows.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const calls = [...src.matchAll(/saveCharacterStateOnClient\s*\(([\s\S]*?)\n\s*\);/g)].map(
+      (match) => match[1] ?? '',
+    );
+    expect(calls).toHaveLength(2);
+    for (const args of calls) {
+      expect(
+        args.match(
+          /save\.bankLedgerSnapshot \? bankLedgerSaveEffects\(save\.bankLedgerSnapshot\) : undefined/g,
+        ),
+      ).toHaveLength(1);
+      expect(args).toMatch(/save\.storageEffects,\s*save\.bankLedgerSnapshot \?/);
+    }
+    expect(calls.filter((args) => /: undefined,\s*accountLock,/.test(args))).toHaveLength(1);
+  });
+
   it('persists the fenced character write and the booking in one transaction', async () => {
     const { pool, sql } = recordingTxPool();
     expect(await new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1')).toBe(
@@ -2243,6 +2397,38 @@ describe('the atomic save-and-book, in SQL', () => {
     await expect(
       new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1'),
     ).rejects.toThrow('transaction never started');
+  });
+
+  it('translates a deferred bank-ledger ceiling refusal from COMMIT', async () => {
+    const raw = {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 9_999_999,
+        attempted_rows: 2,
+        hard_limit_rows: 10_000_000,
+      }),
+    };
+    const seen: string[] = [];
+    const query = vi.fn(async (text: string) => {
+      seen.push(text);
+      if (text === 'COMMIT') throw raw;
+      return { rows: [], rowCount: 1 };
+    });
+    const client = { query, release: vi.fn(), on: () => {}, removeListener: () => {} };
+    const pool = { query, connect: async () => client } as unknown as Pool;
+
+    await expect(
+      new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-growth-limit'),
+    ).rejects.toMatchObject({
+      name: BankLedgerGrowthLimitExceeded.name,
+      committedRows: 9_999_999,
+      attemptedRows: 2,
+      hardLimitRows: 10_000_000,
+      cause: raw,
+    });
+    expect(seen).toContain('COMMIT');
+    expect(seen.at(-1)).toBe('ROLLBACK');
   });
 });
 

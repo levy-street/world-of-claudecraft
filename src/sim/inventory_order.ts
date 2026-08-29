@@ -46,8 +46,10 @@ export function layoutBagCells(inventory: readonly InvSlot[], capacity: number):
   for (const stack of unplaced) {
     while (next < cells.length && cells[next] !== null) next++;
     if (next >= cells.length) {
-      // Over capacity (a shrunken bag): keep the stack visible past the grid instead of
-      // vanishing it. The bag refuses new items long before this can be reached normally.
+      // Over capacity: keep the stack visible past the grid instead of vanishing
+      // it. Reachable two ways: a shrunken bag on a legacy save, and, since the
+      // two-pool mechanic (bag_pools.ts), normal play where the general pool sits
+      // over budget while materials headroom still accepts material pickups.
       cells.push(stack);
       continue;
     }

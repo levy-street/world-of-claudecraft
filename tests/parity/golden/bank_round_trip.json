@@ -8,7 +8,14 @@
     "bankDeposit whole: the remaining stack merges into the bank slot",
     "bankWithdraw partial then whole: bank -> bags, gated by bag capacity",
     "bankBuySlots: meta.copper - BANK_EXPANSION_PRICES[0] + purchasedSlots + 6",
-    "banker-proximity gate (nearBanker) satisfied by standing at a bursar"
+    "banker-proximity gate (nearBanker) satisfied by standing at a bursar",
+    "vaultBuyUpgrade rung 0: the unlock, meta.copper - VAULT_UPGRADE_PRICES[0]",
+    "vaultDeposit partial: a fraction of a material stack moves bags -> vault stock",
+    "vaultDeposit whole: a SECOND material id, so vault.stock is multi-key",
+    "multi-key stock in CANONICAL form: two ids, each count reconciled on its own",
+    "vaultWithdraw partial: vault stock -> bags, keyed by itemId (no slots)",
+    "vaultBuyUpgrade rung 1: meta.copper - VAULT_UPGRADE_PRICES[1], upgrades 1 -> 2",
+    "vaultDepositAll: the batched sweep stocks every eligible material, skips gear"
   ],
   "draws": 0,
   "drawDigest": "811c9dc5",
@@ -31,7 +38,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "223055c2",
+      "state": "58029bd2",
       "events": "951044eb",
       "rng": {
         "draws": 0,
@@ -50,7 +57,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -101,6 +115,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -174,7 +191,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "68e14c6a",
+      "state": "7675a604",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -199,6 +216,12 @@
                 "count": 2,
                 "itemId": "wolf_fang"
               }
+            ],
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
             ]
           },
           "bgRating": 1500,
@@ -254,6 +277,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -327,7 +353,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "07705212",
+      "state": "58cab562",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -352,6 +378,12 @@
                 "count": 5,
                 "itemId": "wolf_fang"
               }
+            ],
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
             ]
           },
           "bgRating": 1500,
@@ -403,6 +435,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -476,7 +511,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "c02e49ee",
+      "state": "adea5d00",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -501,6 +536,12 @@
                 "count": 4,
                 "itemId": "wolf_fang"
               }
+            ],
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
             ]
           },
           "bgRating": 1500,
@@ -556,6 +597,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -629,7 +673,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "23d1a288",
+      "state": "a4c16fcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -648,7 +692,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -702,6 +753,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -775,7 +829,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "765dc9e8",
+      "state": "1202b69a",
       "events": "035d09c2",
       "rng": {
         "draws": 0,
@@ -795,7 +849,13 @@
             null
           ],
           "bank": {
-            "purchasedSlots": 6
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
           },
           "bgRating": 1500,
           "cls": "warrior",
@@ -850,6 +910,1180 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "b947cc78",
+      "events": "c1ecd328",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-setup",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 71000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 10,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 4,
+              "itemId": "ashwood_log"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "2eb0a576",
+      "events": "25155f6c",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-unlocked",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 51000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 10,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 4,
+              "itemId": "ashwood_log"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {},
+            "upgrades": 1
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "4e5140a5",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-deposited-partial",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 51000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 4,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 4,
+              "itemId": "ashwood_log"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {
+              "copper_ore": 6
+            },
+            "upgrades": 1
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "053f09ce",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-deposited-second-material",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 51000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 4,
+              "itemId": "copper_ore"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {
+              "ashwood_log": 4,
+              "copper_ore": 6
+            },
+            "upgrades": 1
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "45905126",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-withdrew-partial",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 51000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 6,
+              "itemId": "copper_ore"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {
+              "ashwood_log": 4,
+              "copper_ore": 4
+            },
+            "upgrades": 1
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "7b8b6658",
+      "events": "de8ba08e",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-bought-rung",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 1000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "wolf_fang"
+            },
+            {
+              "count": 6,
+              "itemId": "copper_ore"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {
+              "ashwood_log": 4,
+              "copper_ore": 4
+            },
+            "upgrades": 2
+          },
+          "wyrmfallDaily": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1001
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -0.375214,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 1001,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 8.499821,
+            "y": -0.375214,
+            "z": -97.500179
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1002,
+      "state": "f0afd0a1",
+      "events": "94ebd53e",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "vault-deposit-all",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 1000,
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "ashwood_log",
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "rusty_dagger",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1001,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "rusty_dagger"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {
+              "ashwood_log": 4,
+              "copper_ore": 10,
+              "wolf_fang": 5
+            },
+            "upgrades": 2
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -923,7 +2157,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1002,
-      "state": "1739deea",
+      "state": "b7a71f5b",
       "events": "9419a441",
       "rng": {
         "draws": 0,
@@ -943,12 +2177,18 @@
             null
           ],
           "bank": {
-            "purchasedSlots": 6
+            "purchasedSlots": 6,
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
           },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 500,
+          "copper": 1000,
           "counters": {},
           "craftDaily": {},
           "craftSkills": {},
@@ -956,9 +2196,12 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "ashwood_log",
               "baked_bread",
+              "copper_ore",
               "eastbrook_buckler",
               "recruit_tunic",
+              "rusty_dagger",
               "wolf_fang",
               "worn_sword"
             ],
@@ -993,8 +2236,8 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 5,
-              "itemId": "wolf_fang"
+              "count": 1,
+              "itemId": "rusty_dagger"
             }
           ],
           "mailWelcomed": true,
@@ -1009,6 +2252,14 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {
+              "ashwood_log": 4,
+              "copper_ore": 10,
+              "wolf_fang": 5
+            },
+            "upgrades": 2
+          },
           "wyrmfallDaily": {}
         }
       ],

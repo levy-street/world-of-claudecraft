@@ -106,6 +106,26 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
+  // Bank bag sockets: the two ITEM MOVERS rewrite the carried inventory
+  // (socketing consumes the carried bag copy, unsocketing addStacks it back,
+  // and a swap does both), the heavy-gated `inv` key. bank_unlock_socket is
+  // deliberately absent on vault_buy_upgrade's exact terms: copper rides the
+  // ALWAYS-SENT base self object and the socket readouts ride the ungated
+  // proximity `bank` key, so listing it would only buy a redundant heavy
+  // re-serialize.
+  'bank_socket_bag',
+  'bank_unsocket_bag',
+  // Materials Vault item moves: both rewrite the carried inventory (deposit
+  // splices/decrements a slot, withdraw addStacks into it), the heavy-gated
+  // `inv` key. vault_buy_upgrade is deliberately absent: copper rides the
+  // ALWAYS-SENT base self object, and the vault view rides the ungated
+  // proximity section beside 'bank', so listing it would only buy a redundant
+  // heavy re-serialize (the guild bank's gold ops sit out for the same reason).
+  'vault_deposit',
+  'vault_withdraw',
+  // The batched sweep rewrites the carried inventory like the two above, only
+  // more so (up to every slot in one command).
+  'vault_deposit_all',
   // Guild bank ops that touch a HEAVY self field: the two item moves rewrite
   // the carried inventory (heavy-gated `inv`). The gold ops and buy_slots are
   // deliberately absent: copper rides the ALWAYS-SENT base self object (not

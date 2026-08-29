@@ -26,7 +26,8 @@ function writers(): PainterHostWriters {
       element.classList.toggle(className, enabled);
     },
     setAttr: (element, attribute, value) => {
-      element.setAttribute(attribute, value);
+      if (value === null) element.removeAttribute(attribute);
+      else element.setAttribute(attribute, value);
     },
   };
 }

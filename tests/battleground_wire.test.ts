@@ -31,6 +31,7 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   // bank_ledger.ts (imported via game.ts recordBankOp) reads this at call time.
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   acquireCharacterLease: vi.fn(async () => true),
   releaseCharacterLease: vi.fn(async () => {}),
   heartbeatCharacterLeases: vi.fn(async () => {}),

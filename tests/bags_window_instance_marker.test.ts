@@ -69,6 +69,7 @@ function windowFor(
     isBankOpen: () => false,
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
+    isVaultBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

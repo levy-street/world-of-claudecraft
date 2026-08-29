@@ -794,7 +794,37 @@ export const ja_JP: EnTranslations = {
       "applied": "適用中",
       "apply": "スキンを適用",
       "detach": "スキンを解除",
-      "equipHint": "このスキンを適用するには{type}を装備してください。"
+      "equipHint": "このスキンを適用するには{type}を装備してください。",
+      "charter": {
+        "eyebrow": "金庫",
+        "title": "金庫特許状",
+        "scope": "特許状はこのキャラクターの銀行だけを拡張します。同じスロットは出納官がゴールドでも販売しています。",
+        "grant": "銀行スロットを{slots}個追加",
+        "buy": "特許状を購入",
+        "buyAria": "{item}を購入",
+        "confirmTitle": "特許状の購入確認",
+        "confirmBody": "{item}を{cost} Claudiumで購入しますか？",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "特許状が適用されました。このキャラクターの銀行が広がりました。",
+        "alreadyGranted": "この特許状はすでにこのキャラクターに適用されています。二重に請求されることはありません。",
+        "applyDeferred": "支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。",
+        "grantUnresolved": "支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。",
+        "inProgress": "このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。",
+        "doesNotFit": "このキャラクターの銀行では、この特許状のスロットをすべて収めきれません。",
+        "notPurchasable": "この特許状は現在購入できません。",
+        "noRoom": "このキャラクターの銀行には、もう特許状を収める余地がありません。",
+        "noCharterFits": "このキャラクターの銀行に残された空きに収まる特許状はありません。",
+        "someHiddenByFit": "このキャラクターの銀行の空きに収まらない大きさの特許状は表示されません。",
+        "outage": "購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。",
+        "outageStale": "ストアに戻り、同じ「特許状を購入」操作をもう一度使用してください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。",
+        "failed": "購入を完了できませんでした。",
+        "names": {
+          "strongbox_charter_1": "下級金庫特許状",
+          "strongbox_charter_2": "上級金庫特許状",
+          "strongbox_charter_3": "大金庫特許状",
+          "strongbox_charter_complete": "完全金庫特許状"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -1562,6 +1592,8 @@ export const ja_JP: EnTranslations = {
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
       "mobileLeftHanded": "左利き用レイアウト",
+      "touchPreciseAim": "精密な地面指定",
+      "touchPreciseAimNote": "地面対象の呪文は指定してから発動します。オフにすると推奨地点ですぐに発動します。",
       "touchTapMenus": "タップメニュー",
       "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
@@ -1597,6 +1629,7 @@ export const ja_JP: EnTranslations = {
       "invertY": "カメラ反転（Y軸）",
       "deadzone": "スティックの遊び",
       "cameraSpeed": "カメラ速度",
+      "reticleSpeed": "レティクル速度",
       "vibration": "振動",
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
@@ -2465,7 +2498,10 @@ export const ja_JP: EnTranslations = {
       "backpack": "バックパック",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "空のバッグスロット",
-      "unequipHint": "クリックしてこのバッグを外す"
+      "unequipHint": "クリックしてこのバッグを外す",
+      "poolGeneral": "一般: {total}個中{used}個",
+      "poolMaterials": "素材: {total}個中{used}個",
+      "capacityPoolsAria": "使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -3111,6 +3147,26 @@ export const ja_JP: EnTranslations = {
       "buySlotsMaxed": "完全に拡張済み",
       "buyConfirm": "{price}で銀行スロットを追加で{count}個購入しますか？",
       "buyConfirmAccept": "購入",
+      "meterLabel": "スロット: {total}個中{used}個",
+      "meterPoolGeneral": "一般: {total}個中{used}個",
+      "meterPoolMaterials": "素材: {total}個中{used}個",
+      "meterPoolsAria": "使用中の銀行スロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。",
+      "meterMaterialsNote": "装着した素材サッチェルによる素材専用スペースです。ほかのアイテムには使えません。",
+      "priceDisclaimer": "価格はゲーム経済に応じて変動することがあります。",
+      "rungItemName": "銀行スロット{count}個",
+      "buySlotsDualAria": "{price}または{cost} Claudiumでスロットを{count}個購入",
+      "buyConfirmDual": "銀行スロットを追加で{count}個購入しますか？",
+      "buyConfirmGold": "{price}で購入",
+      "buyConfirmClaudium": "{cost} Claudiumで購入",
+      "rungGranted": "銀行スロットが追加されました。このキャラクターの銀行が広がりました。",
+      "rungAlreadyGranted": "これらのスロットはすでにこのキャラクターに適用されています。二重に請求されることはありません。",
+      "rungApplyDeferred": "支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。",
+      "rungGrantUnresolved": "支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。",
+      "rungInProgress": "このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。",
+      "rungDoesNotFit": "このキャラクターの銀行には、これ以上の拡張を収める余地がありません。",
+      "rungNotPurchasable": "これらの銀行スロットは現在購入できません。",
+      "rungFailed": "購入を完了できませんでした。",
+      "rungOutage": "購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。",
       "withdrawHint": "クリックで引き出す",
       "withdrawPartialHint": "Shift+クリックで一部だけ引き出す",
       "depositHint": "クリックで預ける",
@@ -3123,6 +3179,9 @@ export const ja_JP: EnTranslations = {
       "withdrawQuantityTitle": "{item}を引き出す",
       "withdrawQuantityInput": "引き出す数量",
       "withdrawQuantityConfirm": "引き出す",
+      "vaultRowWithdrawName": "{item}を引き出す",
+      "priceChanged": "購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。",
+      "withdrawQuantityAction": "{item}の引き出す数量を選択",
       "filterGroupAria": "銀行をカテゴリーで絞り込む",
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",
@@ -3144,6 +3203,34 @@ export const ja_JP: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。",
       "bonusSectionAria": "ボーナス銀行スロットと獲得方法",
+      "socketRowAria": "銀行バッグスロット",
+      "socketEmpty": "空の銀行バッグスロット",
+      "socketEmptyHint": "バッグ内のバッグをクリックして銀行に収納",
+      "socketLocked": "未解放のバッグスロット",
+      "socketLockedLater": "バッグスロットは安い順に解放されます",
+      "socketUnlockAria": "{price}で銀行バッグスロットを解放",
+      "socketUnlockHint": "クリックしてこのバッグスロットを解放",
+      "socketUnlockConfirm": "{price}で銀行バッグスロットを解放しますか？",
+      "socketUnlockAccept": "解放",
+      "unsocketHint": "クリックしてこのバッグをバッグに戻す",
+      "socketHint": "クリックしてこのバッグを銀行に装着",
+      "vaultTab": "保管庫",
+      "vaultCapacityNote": "各素材は最大{cap}個まで保管できます。",
+      "vaultEmpty": "素材保管庫は空です。バッグの素材をクリックすると預けられます。",
+      "vaultRowAria": "{item}：{count}/{cap}個保管中",
+      "vaultLockedIntro": "素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。",
+      "vaultUnlockButton": "素材保管庫を開放する",
+      "vaultUnlockConfirm": "{price}で素材保管庫を開放しますか？",
+      "vaultUpgrade": "上限を{cap}個に拡張",
+      "vaultUpgradeConfirm": "{price}で各素材の保管上限を{cap}個に拡張しますか？",
+      "vaultDepositAll": "素材をすべて預ける",
+      "vaultDepositAllTooltip": "バッグ内のすべての素材を一度に保管庫へ預けます。各素材は上限まで預けられます。装備、道具、クエストアイテム、消耗品は移動しません。",
+      "vaultDepositAllDone": "預けた素材：{count}個。",
+      "vaultDepositAllFull": "預けた素材：{count}個。上限に達した素材があります。",
+      "vaultDepositAllNone": "保管庫の上限に達しているため、何も預けられませんでした。",
+      "vaultWithdrawShort": "バッグには{count}個のうち{fit}個しか入りません。",
+      "vaultDepositHint": "クリックで保管庫に預ける",
+      "vaultCannotDeposit": "保管庫には預けられません",
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
       "guildTab": "ギルド",
@@ -3650,6 +3737,8 @@ export const ja_JP: EnTranslations = {
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
+      "reagentVaultDraw": "（素材保管庫から{count}個使用）",
+      "vaultUnreachable": "ここでは素材保管庫を利用できません。",
       "craftFeeLine": "製作手数料：1個あたり {fee}",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
@@ -4574,6 +4663,8 @@ export const ja_JP: EnTranslations = {
       "online": "キャラクターは現在オンラインです。",
       "rename_not_permitted": "このキャラクターの名前変更は許可されていません。",
       "delete_confirm": "削除を確認するにはキャラクター名を入力してください。",
+      "storage_purchase_open": "このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。",
+      "delete_busy": "サーバーが混み合っています。しばらくしてからこのキャラクターの削除をお試しください。",
       "already_in_world": "キャラクターは既に世界にいます。",
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
@@ -6639,6 +6730,7 @@ export const ja_JP: EnTranslations = {
       "bankBody": "各拠点の町には、この地の銀行商会である金張りの金庫の支店があります。そこの出納官に話しかけると自分の金庫が開きます。バッグとは別の私的な収納で、キャラクターが生涯持ち続けるものです。預けた品は、次にどの支店を訪れてもそのまま安全に待っています。",
       "bankHow": "金庫を開いた状態でバッグの品をクリックすると預けられ、金庫の品をクリックすると引き出せます。金庫に入るのは品物だけで、コインは預けられず、クエストアイテムも手元に残ります。旅の途中でバッグがいっぱいになったら、製作素材をまとめて預けるボタンもあります。",
       "bankSlots": "作りたての金庫は小さめですが、あなたとともに広がっていきます。出納官は追加の枠をコインで販売しており、値段は段階ごとに上がります。さらにオンラインでのプレイなら、メール認証やアカウント連携、友人の紹介などでボーナスの空きも手に入ります。",
+      "bankSockets": "枠の階段の先には、出納官が最大四つのバッグスロットも販売しています。安い順に解放され、値段は段階ごとに上がります。手持ちの余ったバッグをスロットに収めれば、そのバッグの枠が金庫の空きに加わります。普通のバッグは金庫全体を広げ、素材袋は製作素材だけが使える空きを加えます。バッグ欄のバッグをクリックすれば収まり、スロットをクリックすれば取り戻せます。取り戻しても預けた品を失うことはありません。金庫が縮んだ空きを上回っても、すべてはそのまま残り、新たな預け入れが空きを待つだけです。",
       "buyingTitle": "売買",
       "buyingBody": "商人に話しかけて品物を見せてもらうことを選ぶと、その店が「閲覧」「売却」「買い戻し」の三つのタブで開きます。「閲覧」には店の在庫がすべて並び、お金が足りればどれでも買えます。「売却」にはバッグの中で商人が買い取ってくれるものが並び、独自の品質がロールされた品を売るときは先に確認を求められるので、値打ちのある一点が誤って手放されることはありません。手放して後悔したものがあっても、「買い戻し」タブには最近の売却品が取り置かれており、売ったときと同じコインで買い戻せます。",
       "junkTitle": "がらくたの整理",
@@ -9777,7 +9869,8 @@ export const ja_JP: EnTranslations = {
       "clickSetOut": "クリックして設置",
       "clickSetUp": "クリックして設営",
       "clickBuyback": "クリックして買い戻す",
-      "bagSlots": "{slots}スロットのバッグ"
+      "bagSlots": "{slots}スロットのバッグ",
+      "bagSlotsMaterials": "{slots}スロットの素材バッグ"
     },
     "bags": {
       "title": "バッグ",
@@ -13211,6 +13304,27 @@ export const ja_JP: EnTranslations = {
       },
       "dawnhold_posy": {
         "name": "ドーンホールド庭園の小さな花束"
+      },
+      "wayfarers_backpack": {
+        "name": "旅人のバックパック"
+      },
+      "burlap_reagent_pouch": {
+        "name": "粗麻の素材ポーチ"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "死霊術師の素材サッチェル"
+      },
+      "duskweave_bag": {
+        "name": "宵織りのバッグ"
+      },
+      "resonant_weave_bag": {
+        "name": "共鳴織りのバッグ"
+      },
+      "foragers_haversack": {
+        "name": "採集者のハヴァサック"
+      },
+      "loombound_reagent_satchel": {
+        "name": "織機縛りの素材サッチェル"
       },
       "hammered_copper_band": {
         "name": "鎚打ちの銅指輪"

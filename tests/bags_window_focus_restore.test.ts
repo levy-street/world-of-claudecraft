@@ -66,6 +66,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; w: BagsWindow; inv:
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     isGuildBankTab: () => false,
+    isVaultBankTab: () => false,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
     openItemActionMenu: noop,

@@ -1223,11 +1223,37 @@ describe('masterwrought apex budget sweep', () => {
     // The bag sits outside R12: kind 'bag' fails the disenchant kind gate, and
     // this pin reds if enchanting.ts ever widens that gate past weapon/armor.
     expect(isDisenchantable(bag)).toBe(false);
-    // Strictly the largest bag: every other bag def sits below 16 slots.
+    // MERGE-INHERITED RESCOPE at the merge of release/v0.41.0 (tip
+    // e19d832b47): the packet ruled this bag STRICTLY the largest, and that
+    // held on the packet's tree. The release's Bank Storage Expansion ships
+    // two GENERAL 16-slot bags (resonant_weave_bag, wayfarers_backpack) that
+    // TIE it, and two materials-only satchels on the two-pool model whose
+    // slots serve only the materials pool (a different capacity axis, so the
+    // general-capacity claim does not cover them). Neither side's magnitude
+    // may be edited by a merge, so the pin is restated for the merged tree:
+    // no general bag EXCEEDS the apex bag, the ties are exactly the named
+    // set, and the materials-only satchels are pinned by exact id and size.
+    // Whether the apex bag should be re-distinguished (or the strictly-best
+    // ruling amended) is an OPEN maintainer ruling; re-tighten this to
+    // toBeLessThan when it is decided.
+    const APEX_TIE_BAGS = ['resonant_weave_bag', 'wayfarers_backpack'];
+    const ties: string[] = [];
     for (const def of Object.values(ITEMS)) {
       if (def.kind !== 'bag' || def.id === APEX_BAG_ID) continue;
-      expect(def.bagSlots ?? 0, `${def.id} must stay below the apex bag`).toBeLessThan(16);
+      if (def.materialsOnly === true) continue;
+      expect(def.bagSlots ?? 0, `${def.id} must not exceed the apex bag`).toBeLessThanOrEqual(16);
+      if ((def.bagSlots ?? 0) === 16) ties.push(def.id);
     }
+    expect(ties.sort()).toEqual(APEX_TIE_BAGS);
+    const materialsOnlyBags = Object.values(ITEMS).filter(
+      (d) => d.kind === 'bag' && d.materialsOnly === true,
+    );
+    expect(Object.fromEntries(materialsOnlyBags.map((d) => [d.id, d.bagSlots]))).toEqual({
+      burlap_reagent_pouch: 8,
+      foragers_haversack: 12,
+      necromancers_reagent_satchel: 20,
+      loombound_reagent_satchel: 24,
+    });
     const recipe = APEX_ARMOR_RECIPES.find((r) => r.resultItemId === APEX_BAG_ID);
     expect(recipe?.id).toBe(`recipe_${APEX_BAG_ID}`);
     expect(recipe?.professionId).toBe('tailoring');

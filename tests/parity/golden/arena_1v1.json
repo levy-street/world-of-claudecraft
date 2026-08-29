@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1003,
-      "state": "6497fd44",
+      "state": "e600d744",
       "events": "1332e9b6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1003,
-      "state": "36337fd1",
+      "state": "b3b7fca5",
       "events": "24d41bca",
       "rng": {
         "draws": 70,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1003,
-      "state": "1598ea47",
+      "state": "4ec88dd3",
       "events": "af45d864",
       "rng": {
         "draws": 292,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1003,
-      "state": "d9953fc6",
+      "state": "3834307e",
       "events": "0315818e",
       "rng": {
         "draws": 530,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1003,
-      "state": "1d731835",
+      "state": "84ed4987",
       "events": "fa0edf99",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1003,
-      "state": "aaab2912",
+      "state": "1bbab914",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -104,7 +104,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -188,6 +195,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -202,7 +212,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -291,6 +308,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

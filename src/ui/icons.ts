@@ -3336,10 +3336,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
-  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
-  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
-  // richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). Every shipped bag carries painted
+  // art (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; the
+  // pre-phase-05 family below keeps a drawn fallback recipe, newer bags rely on
+  // itemFallback's kind-aware sack arm. Palettes step up with the quality tier so the
+  // bag reads richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -5634,7 +5635,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  // bags (the six pre-phase-05 ids; the phase 05 catalog enters via the
+  // auto-derived non-weapon sweep below, so new bags never join this hand
+  // list; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
@@ -5943,6 +5946,13 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // note above). It carries NO title, so the Reliquary title-shelf rule that
   // forced prog_farming_100's crest to ship committed does not apply here.
   'prog_field_to_feast',
+  // The bank socket ladder pair (Bank Storage phase 06): both are 'social', so
+  // both fall back to the deed_cat_social crest until their commissioned art
+  // lands (docs/achievements/icon-brief.md). Neither carries a reward, so the
+  // title-shelf rule that forbids a title deed from riding this ledger does
+  // not apply.
+  'soc_strongbox_outfitter',
+  'soc_four_bags_deep',
   // The Proving Shore graduation deed rides the deed_cat_progression crest
   // until its commissioned art lands (docs/achievements/icon-brief.md). It
   // lands at the TAIL for the same load-bearing reason: the release merge

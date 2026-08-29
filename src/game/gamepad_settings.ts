@@ -30,6 +30,9 @@ export function createGamepadSettingApplier(
       case 'gamepadCameraSpeed':
         pad.setCameraSpeed(settings.set(key, Number(value)));
         return true;
+      case 'gamepadReticleSpeed':
+        settings.set(key, Number(value));
+        return true;
       case 'gamepadVibration':
         pad.setVibration(settings.set(key, Number(value)));
         return true;

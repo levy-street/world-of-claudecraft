@@ -139,6 +139,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'inventory',
   'bags',
   'bank',
+  'vault',
   'vendorBuyback',
   'questLog',
   'questsDone',

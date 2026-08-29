@@ -50,8 +50,13 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceOccluderFade,
+  applyOccluderFade,
+  type OccluderFadeMat,
+  occluderFadeRecordFor,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,
@@ -1335,6 +1340,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
     const matMap = new Map<THREE.Material, OccluderFadeMat>();
+    const mats: OccluderFadeMat[] = [];
     const bakeMeshes: HideableBakeMesh[] = [];
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -1358,14 +1364,19 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         // ghost's OPAQUE program is the source's own; only the transparent
         // fade variant remains a distinct (prewarmable) key.
         const ghostSrc = cloneMaterialWithHooks(src);
-        tm = occluderFadeMat(ghostSrc);
+        tm = occluderFadeRecordFor(mats, ghostSrc, mesh);
         matMap.set(src, tm);
+      } else {
+        // A second mesh of the same kit material on another program (an
+        // instanced part, another attribute set) gets its own record, so the
+        // fade gate links that program too before the shared clone flips.
+        occluderFadeRecordFor(mats, tm.mat, mesh);
       }
       mesh.material = tm.mat;
     });
     hideables.push({
       group: g,
-      mats: [...matMap.values()],
+      mats,
       hidden: false,
       alpha: 1,
       cellKey: propCellKey(fp.x, fp.z),
@@ -2556,11 +2567,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         }
         // Ghost on every tier with the same timing while keeping the obstacle's
         // silhouette and shadow. Per-structure clones keep the change local.
+        prefetchOccluderFadeWithin(h.mats, h.x, h.z, camX, camZ);
         const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
         h.hidden = hide;
-        if (occluderFadeSettled(h.alpha, hide)) continue;
-        h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
-        applyOccluderFade(h.mats, h.alpha);
+        h.alpha = advanceOccluderFade(h.mats, h.alpha, hide, dt, reducedMotion);
       }
     },
   };

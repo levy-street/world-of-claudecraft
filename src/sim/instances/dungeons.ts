@@ -198,17 +198,34 @@ export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
   return null;
 }
 
+// The generic instance-footprint HALF-WIDTH (x extent either side of a slot
+// origin). Exported because vault_craft_gate.ts claimWestReach derives its
+// west-reach envelope from this same constant: a bare literal widened here
+// would silently under-estimate that gate's reach and fail it open.
+export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
+
+// The one dungeon whose claim footprint is WIDER than the generic envelope
+// (the circle arm in instanceClaimContains below). Exported for the same
+// reason as the half-width above: vault_craft_gate.ts keys its wider-reach
+// derivation on this exact id.
+export const WIDE_CLAIM_DUNGEON_ID = 'nythraxis_boss_arena';
+
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
 function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
-  return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
+  return (
+    Math.abs(pos.x - origin.x) < INSTANCE_FOOTPRINT_HALF_WIDTH && Math.abs(pos.z - origin.z) < 250
+  );
 }
 
 function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
-  if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
-  const bossSpawn = DUNGEONS.nythraxis_boss_arena.spawns.find(
+  if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
+  // Looked up through the SAME constant the guard above compares, never a
+  // second hard-coded id: a rename via the constant would otherwise leave
+  // this literal lookup throwing on undefined.
+  const bossSpawn = DUNGEONS[WIDE_CLAIM_DUNGEON_ID].spawns.find(
     (spawn) => spawn.mobId === NYTHRAXIS_BOSS_ID,
   );
   // The raid room is wider than the generic instance footprint, so its claim

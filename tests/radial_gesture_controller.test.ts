@@ -42,6 +42,8 @@ interface Rig {
   cancels: number;
   suppressed: { value: boolean; takes: number };
   claimed: Set<number>;
+  activeAim: { buttonIndex: number; direction: RadialDirection } | null;
+  aimCancels: number;
   /** settings.touchTapMenus, flipped per test. */
   tapMenus: boolean;
   /** Every repaint the gesture asked for, each recording whether the petals were
@@ -123,6 +125,8 @@ function makeRig(
     cancels: 0,
     suppressed: { value: false, takes: 0 },
     claimed: new Set<number>(),
+    activeAim: null,
+    aimCancels: 0,
     tapMenus: options.tapMenus ?? false,
     repaints: [],
     focusedAtRepaint: [],
@@ -143,6 +147,11 @@ function makeRig(
     anchorRole: options.anchorRole,
     metricsHost: host,
     hasSlot: () => true,
+    aimOwnsButton: (buttonIndex) => rig.activeAim?.buttonIndex === buttonIndex,
+    cancelAim: () => {
+      rig.aimCancels++;
+      rig.activeAim = null;
+    },
     cast: (buttonIndex, direction) => rig.casts.push([buttonIndex, direction]),
     pressClaimed: (buttonIndex) => rig.claimed.has(buttonIndex),
     takeSuppressedPress: () => {
@@ -388,6 +397,60 @@ describe('RadialGesture: the cancel target', () => {
     up(rig, 0, 1, 100, 100);
     expect(rig.casts).toEqual([]);
     expect(rig.cancels).toBe(1);
+  });
+});
+
+describe('RadialGesture: re-pressing the button that owns a ground aim', () => {
+  it('claims the drag-path pointerdown before another gesture owner can take it', () => {
+    const rig = makeRig();
+    rig.activeAim = { buttonIndex: 0, direction: 'center' };
+    rig.claimed.add(0);
+
+    down(rig, 0, 1, 100, 100);
+    expect(rig.aimCancels).toBe(1);
+    expect(rig.activeAim).toBeNull();
+    expect(rig.gesture.heldButtonIndex()).toBe(-1);
+    expect(rig.gesture.isOpen()).toBe(false);
+
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+    expect(rig.cancels).toBe(0);
+  });
+
+  it('claims the tap-mode anchor press as a cancel and opens no sticky menu', () => {
+    const rig = makeRig({ tapMenus: true });
+    rig.activeAim = { buttonIndex: 0, direction: 'center' };
+
+    down(rig, 0, 1, 100, 100);
+    expect(rig.aimCancels).toBe(1);
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.casts).toEqual([]);
+
+    up(rig, 0, 1, 100, 100);
+    expect(rig.casts).toEqual([]);
+  });
+
+  it('cancels a petal-owned aim before the raw centre gesture can cast', () => {
+    const rig = makeRig();
+    rig.activeAim = { buttonIndex: 1, direction: 'left' };
+
+    down(rig, 1, 7, 300, 100);
+    up(rig, 1, 7, 300, 100);
+
+    expect(rig.aimCancels).toBe(1);
+    expect(rig.casts).toEqual([]);
+    expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('leaves another button on its ordinary cast path', () => {
+    const rig = makeRig();
+    rig.activeAim = { buttonIndex: 1, direction: 'up' };
+
+    down(rig, 0, 1, 100, 100);
+    up(rig, 0, 1, 100, 100);
+
+    expect(rig.aimCancels).toBe(0);
+    expect(rig.casts).toEqual([[0, 'center']]);
   });
 });
 
@@ -723,26 +786,36 @@ describe('RadialGesture: keyboard activation follows the live setting', () => {
 // directly rather than by re-activating the element. This is the pin that it
 // stays that way.
 describe('RadialGesture: a petal activation casts exactly once', () => {
-  it('casts once for a real touchscreen tap on a petal', () => {
+  it('casts from a non-primary touch petal tap that receives no compatibility click', () => {
     const rig = makeRig({ tapMenus: true });
     down(rig, 0, 1, 100, 100);
-    // The touch pointer pair a petal never listens for, then the compatibility
-    // click the browser synthesizes for it.
+    // Pointer 1 is already the movement thumb. A second touch gets only this
+    // raw pointer pair, since browsers synthesize click for the primary pointer.
     rig.petals[2].dispatchEvent(
       Object.assign(new MouseEvent('pointerdown', { bubbles: true, button: 0 }), {
-        pointerId: 2,
+        pointerId: 7,
         pointerType: 'touch',
       }),
     );
     rig.petals[2].dispatchEvent(
       Object.assign(new MouseEvent('pointerup', { bubbles: true, button: 0 }), {
-        pointerId: 2,
+        pointerId: 7,
         pointerType: 'touch',
       }),
     );
     rig.petals[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(rig.casts).toEqual([[0, PETAL_DIRECTIONS[2]]]);
     expect(rig.gesture.isOpen()).toBe(false);
+  });
+
+  it('cancels from a non-primary touch on the centre target', () => {
+    const rig = makeRig({ tapMenus: true });
+    down(rig, 0, 1, 100, 100);
+    rig.petalCancel.dispatchEvent(pointer('pointerdown', 7, 100, 100));
+    rig.petalCancel.dispatchEvent(pointer('pointerup', 7, 100, 100));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.cancels).toBe(1);
+    expect(rig.casts).toEqual([]);
   });
 
   it('casts once for an assistive click on a petal', () => {

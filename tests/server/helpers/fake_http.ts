@@ -13,6 +13,7 @@
 // `as unknown as` cast bridges each fake to its node type at the boundary.
 
 import { Buffer } from 'node:buffer';
+import { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import { Readable } from 'node:stream';
 
@@ -29,8 +30,11 @@ function chunkToString(chunk: string | Buffer | Uint8Array): string {
 /**
  * A faithful, framework-free fake of the http.ServerResponse surface the pipeline
  * uses. Header keys are lower-cased (node-faithful) so reads are case-insensitive.
+ * An EventEmitter like the real ServerResponse, so lifecycle listeners attach and
+ * a test can model a torn connection with `res.emit('close')` (node emits 'close'
+ * on every terminated connection, finished or not).
  */
-export class FakeRes {
+export class FakeRes extends EventEmitter {
   /** The response status; defaults to 200 and is settable directly or via writeHead. */
   statusCode = 200;
 

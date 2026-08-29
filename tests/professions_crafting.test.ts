@@ -4,6 +4,7 @@ import {
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
+  BAG_RECIPES,
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -457,6 +458,7 @@ describe('craftItem command (#1127)', () => {
       ...FARM_RECIPES,
       ...TROPHY_RECIPES,
       ...ENGINEERING_ONRAMP_RECIPES,
+      ...BAG_RECIPES,
     ]
       .map((r) => r.id)
       .sort();
@@ -481,7 +483,8 @@ describe('craftItem command (#1127)', () => {
         TROPHY_RECIPES.length +
         // Sibling literal: the two-row on-ramp pin in
         // tests/recipe_economy.test.ts (masterwrought Phase 11o).
-        ENGINEERING_ONRAMP_RECIPES.length,
+        ENGINEERING_ONRAMP_RECIPES.length +
+        BAG_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-10T04:33:00.640Z",
+  "generatedAt": "2026-08-26T05:07:29.368Z",
   "auditScope": {
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 913,
-    "liveItemDefinitions": 928,
+    "itemArtFilesReviewed": 920,
+    "liveItemDefinitions": 935,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -298,7 +298,7 @@
       "armor-ring": 26,
       "armor-shoulder": 49,
       "armor-waist": 28,
-      "bag": 7,
+      "bag": 14,
       "drink": 9,
       "elixir": 4,
       "flask": 3,
@@ -365,6 +365,25 @@
           "docs/achievements/icon-brief.md"
         ],
         "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-26",
+        "branch": "feature/bank-storage-pr",
+        "reviewer": "implementation agent",
+        "replacedIds": [
+          "burlap_reagent_pouch",
+          "duskweave_bag",
+          "foragers_haversack",
+          "loombound_reagent_satchel",
+          "necromancers_reagent_satchel",
+          "resonant_weave_bag",
+          "wayfarers_backpack"
+        ],
+        "provenance": [
+          "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json",
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -407,7 +426,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 913,
+    "passCount": 920,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -486,6 +505,7 @@
       "broodmother_silk_robe",
       "brutoks_maul",
       "bulwark_rusted_pauldrons",
+      "burlap_reagent_pouch",
       "burnished_thorium_amulet",
       "canopy_silk_hank",
       "cantors_drowned_sash",
@@ -587,6 +607,7 @@
       "duskforged_warblade",
       "duskhide_wraps",
       "duskthorn_mantle",
+      "duskweave_bag",
       "duskwhisper",
       "duskwisp_essence",
       "eastbrook_arming_sword",
@@ -654,6 +675,7 @@
       "first_blood_razor",
       "fleetblood_band",
       "footpad_jerkin",
+      "foragers_haversack",
       "forest_pink_armor_plate",
       "forgefold_legguards",
       "forgefold_plating",
@@ -847,6 +869,7 @@
       "litany_legs",
       "litany_plate_chest",
       "litany_shoulder",
+      "loombound_reagent_satchel",
       "lost_caravan_goods",
       "lucent_reagent",
       "lunar_choir_leggings",
@@ -924,6 +947,7 @@
       "mudfin_scale",
       "murloc_hut",
       "necromancers_legwraps",
+      "necromancers_reagent_satchel",
       "necromancers_soulspire_mantle",
       "necromancers_soulsteps",
       "necromancers_starshroud",
@@ -1044,6 +1068,7 @@
       "resonant_steel",
       "resonant_thread",
       "resonant_timber",
+      "resonant_weave_bag",
       "restless_skull",
       "revenant_silk_robe",
       "revenantstep_treads",
@@ -1276,6 +1301,7 @@
       "warhewn_signet",
       "warspice_skewers",
       "waterlogged_idol",
+      "wayfarers_backpack",
       "wayfarers_hood",
       "weathered_ledger_page",
       "webwood_silk",
@@ -1327,7 +1353,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 913 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
+    "summary": "All 920 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1484,8 +1510,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "3a42131ecf9206a42ba0254fab7ce31b46f58368ec617828b3357eaf2ac7a6c4",
-      "bytes": 501076
+      "sha256": "76eb2929f401f7a91422face6e0bc360348c2a3d22cd88dcbda0b11ac67c6755",
+      "bytes": 504725
     },
     "rendererFingerprint": "84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c",
     "sheetCount": 232,
@@ -1499,7 +1525,7 @@
       "small-multiview": 29,
       "identity": 29
     },
-    "sheetSetSha256": "5d5a419a2dab518fee96683084742fdf17823380360a81beb32c78b1500d3054",
+    "sheetSetSha256": "d7cce4b5c4160d7fc8a73aa0fcac6e536c991562b84f886956714b0ee0361177",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2207,66 +2233,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--128-color.png",
-        "sha256": "eb3278e94211a30588f2eac932dab17467b55ee633bd62920567b55856677986",
-        "bytes": 228921,
+        "sha256": "24de2edb72945ff0e4a9e8fd1314e4e6f4e5e7158759a1710e367df924307273",
+        "bytes": 437918,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--40-color.png",
-        "sha256": "9c5549b44119c45fbee64ecb9c4355f2e46c47f1d0d2f3f5eb4f2254590eec28",
-        "bytes": 42912,
+        "sha256": "2c8714829f86c8be3cad7867d407bd4948f2cbbfefcb74c4c6f36155b24c1cc5",
+        "bytes": 84069,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-color.png",
-        "sha256": "dd856d45b867679c30435a8732b38a6c045f8ab2af330ab9f59366895e5c8bc3",
-        "bytes": 31030,
+        "sha256": "39911382a3918b9daa4b5901d5779a5d6abef4c131c9268b301dd827f7566209",
+        "bytes": 59484,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--22-color.png",
-        "sha256": "60fdfa85242f9a6a061c3f0574b37e65ffd3da6209ad8c86f24ef5d84c4546a6",
-        "bytes": 24509,
+        "sha256": "88e49915a8581d04c4f20c811d05746c3a6cb2e34a03ee873af6ee315dca5007",
+        "bytes": 47209,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-grayscale.png",
-        "sha256": "32083029d4d1231652232608395491dd0c01e795788e2d63f7407534570a4734",
-        "bytes": 24576,
+        "sha256": "cd2d3dc4d13192a8fa39db0a5fe9093a8778b540c7b0dcfd44b5d7a2c3043f35",
+        "bytes": 44674,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "b18aad8c5dc3ac796ed2993f0d491ffb4382bfe507cc517d43d45c4f6caf00ce",
-        "bytes": 75533,
+        "sha256": "a007ce19e4aeadef75f80dba6b5a666940af1e8ad7b5b673de3a015158dc9ddc",
+        "bytes": 145653,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "50919aca0c4d2deac78c1ebdca3d26907285f9c8de100ff11efe35176ab46ae1",
-        "bytes": 136729,
+        "sha256": "ffbad13ac6bf39634a728a562e43163f604e138be353519bce0374491c23a573",
+        "bytes": 263504,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--identity.png",
-        "sha256": "c6a92dd83f8a3d23b8768c7fc3e2e920d05802389f4bd2c43be8396a85f8d227",
-        "bytes": 238771,
+        "sha256": "e7cac44cae96275a50f636ad95d5337219a1ede1263c0421a7e4c260efaa9507",
+        "bytes": 456819,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -3358,6 +3384,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "92e3a2f714540c3036afc85fedc0386158d4a69a5b9bf35abe6978749444289d"
+    "shippingCatalogSha256": "54ed87722fd4f1c6f6cd81d4982a4a7f7124f4f8e60d6984460579f8ff6fb608"
   }
 }

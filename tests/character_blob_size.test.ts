@@ -75,8 +75,11 @@ function oversizedCharacterState(): CharacterState {
 
 // A checked-out client that answers every statement, matching what
 // runWithStatementTimeout drives (BEGIN, SET LOCAL, the UPDATE, COMMIT).
+// The release/v0.41.0 save path wraps the client in DbTransactionDeadline,
+// which attaches and detaches an 'error' listener, so the fake carries the
+// EventEmitter pair too (no-ops: these tests never surface a client error).
 function transactionClient() {
-  const client = { query: vi.fn(), release: vi.fn() };
+  const client = { query: vi.fn(), release: vi.fn(), on: vi.fn(), removeListener: vi.fn() };
   client.query.mockResolvedValue({ rows: [], rowCount: 1 } as never);
   return client;
 }

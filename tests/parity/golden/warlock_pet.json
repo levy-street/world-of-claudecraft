@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "18d20955",
+      "state": "efa80e93",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,7 +36,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -84,6 +91,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -144,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1002,
-      "state": "ce4d1371",
+      "state": "37f74cb3",
       "events": "7b79de87",
       "rng": {
         "draws": 0,
@@ -155,7 +165,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1002,
-      "state": "99a45ea1",
+      "state": "66ecb223",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -166,7 +176,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1002,
-      "state": "8d75e2ea",
+      "state": "69058842",
       "events": "741638a5",
       "rng": {
         "draws": 146,
@@ -177,7 +187,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1002,
-      "state": "901eb5cb",
+      "state": "a8bf7c19",
       "events": "741638a5",
       "rng": {
         "draws": 335,
@@ -188,7 +198,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1003,
-      "state": "40f5904d",
+      "state": "3102dedf",
       "events": "72d56e08",
       "rng": {
         "draws": 487,
@@ -199,7 +209,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1004,
-      "state": "ee103bbc",
+      "state": "ef06faa4",
       "events": "97c6a02e",
       "rng": {
         "draws": 677,
@@ -210,7 +220,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1004,
-      "state": "4137dea9",
+      "state": "7e50e1d7",
       "events": "aee4529f",
       "rng": {
         "draws": 902,
@@ -221,7 +231,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1004,
-      "state": "7bc5a044",
+      "state": "adf07300",
       "events": "f708988e",
       "rng": {
         "draws": 1147,
@@ -232,7 +242,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1004,
-      "state": "15cd432b",
+      "state": "b664bb61",
       "events": "cb8c4dfa",
       "rng": {
         "draws": 1423,
@@ -243,7 +253,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1004,
-      "state": "91a3e6dc",
+      "state": "12532380",
       "events": "c33d19a0",
       "rng": {
         "draws": 1692,
@@ -254,7 +264,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1004,
-      "state": "496c3937",
+      "state": "32c53c95",
       "events": "9a142937",
       "rng": {
         "draws": 1853,
@@ -265,7 +275,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1004,
-      "state": "9d90146b",
+      "state": "838b44d9",
       "events": "741638a5",
       "rng": {
         "draws": 1853,
@@ -285,7 +295,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -356,6 +373,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -531,7 +551,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1004,
-      "state": "cbdd0fef",
+      "state": "907d4c1d",
       "events": "400d5e09",
       "rng": {
         "draws": 1890,
@@ -551,7 +571,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -622,6 +649,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

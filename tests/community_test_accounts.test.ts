@@ -6,8 +6,15 @@ import {
   configureCommunityTestAccounts,
   generatedTestCharacterName,
 } from '../server/community_test_accounts';
-import { BOOST_KIT_VERSION, bisKit, bisKitForRole, CLASS_ROLES } from '../server/pbe_boost';
-import { bagCapacity } from '../src/sim/bags';
+import {
+  BOOST_KIT_VERSION,
+  bestBoostBag,
+  bisKit,
+  bisKitForRole,
+  CLASS_ROLES,
+} from '../server/pbe_boost';
+import { isMaterialsOnlyBag } from '../src/sim/bag_pools';
+import { BACKPACK_SLOTS, bagCapacity } from '../src/sim/bags';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
@@ -52,11 +59,23 @@ describe('community test character templates', () => {
       // The worn set is exactly the class's primary BiS kit (a 2H class may
       // legitimately leave the offhand empty).
       expect(Object.keys(state.equipment).sort()).toEqual(Object.keys(bisKit(cls)).sort());
-      // The apex bag at phase 08 (ruled: a test-account template picks the
-      // true best bag, the bestBoostBag/dev_kit precedent; the packet ships
-      // as one PR with phase 11, so the bag is obtainable at ship time).
-      expect(state.bags).toEqual(Array(4).fill('sunspun_haversack'));
-      expect(bagCapacity(state.bags ?? [])).toBe(80);
+      // Derived from bestBoostBag(), never a literal id or total: on the
+      // merged tree THREE general 16-slot bags tie at the top
+      // (wayfarers_backpack, Bank Storage phase 05's resonant_weave_bag, and
+      // the Masterwrought apex sunspun_haversack; the phase 08 ruling that a
+      // test-account template picks the true best bag holds through the
+      // derivation) and bestBoostBag breaks the tie by ascending id,
+      // the same explicit rule as dev_kit's bestBy, so a content-table reorder
+      // cannot move the answer. Deriving keeps this suite agnostic to which
+      // bag wins if the catalog moves; the sibling suites (server/pbe_boost,
+      // dev_kit) pin the winner and picker agreement. What matters here is
+      // that every socket carries the boost pick and the total follows.
+      const boostBag = bestBoostBag();
+      expect(isMaterialsOnlyBag(ITEMS[boostBag])).toBe(false);
+      expect(state.bags).toEqual(Array(4).fill(boostBag));
+      expect(bagCapacity(state.bags ?? [])).toBe(
+        BACKPACK_SLOTS + 4 * (ITEMS[boostBag]?.bagSlots ?? 0),
+      );
 
       for (const itemId of Object.values(state.equipment)) {
         const item = ITEMS[itemId];

@@ -1156,10 +1156,36 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the fully resolved tree, with renderer.ts, eastbrook_town.ts and
 // eastbrook_layout.ts as the drifted inputs), committed with exactly the
 // bytes it read. No capture was retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
+// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
+// reveal-gated painters the horizon-capped cull far at both frame sites): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// first-order composite follows the merged renderer.ts (the entry-fade arm's
+// scenery cull beside this branch's aim blocked pass-through), then these
+// seals follow the swept evidence bytes. No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip d3f8bae369 onward) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts (the
+// release's entry-horizon cull, compile gate and ground-aim rounds beside
+// this branch's farm-visuals prewarm guard) and the release also moved
+// src/render/eastbrook_town.ts, so the merged tree mints values matching
+// NEITHER parent. Parent values for the record: metadata sha256 ours
+// 339dc137 / theirs 9688f7dd, composite ours 01fcf59e / theirs fd58a923.
+// The values below are the re-mint over the resolved tree, committed with
+// exactly the bytes it read. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '339dc137a34b693f16d8bae229eb74394cf7ff0f1b15d251afb95855395d7e01';
+  '8b7e09bd4c9b7aafdd4ef4897b51f7f23089b1e7e6c9b31645c291d1d81b9251';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '01fcf59e411c88182484ac1b1a598db19f0633f61905f8f9331ef5c5a3bcce64';
+  '92e85131521216db23a9315995919559f20da23e68522774beca72534e5a8e56';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2346,6 +2372,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the battleground field-stream compile gate (renderer.ts
+    // provenance input moved): same order, the composite first, then this
+    // seal. No capture was retaken.
+    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
+    // same order, the composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -2386,7 +2421,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // the first-order composite follows renderer.ts, then this second-order
       // performance seal follows the swept evidence bytes. No capture was
       // retaken.
-    ).toBe('90cf6f2f10321c0d8553c5fb17a0e067b462831dfa7e55980d26523709754dbe');
+      // Re-minted at the merge of release/v0.41.0 (tip d3f8bae369 onward)
+      // into feature/masterwrought: both parents edited renderer.ts again and
+      // the release also moved eastbrook_town.ts, so the merged tree is a
+      // third content once more. Parent values for the record: ours 90cf6f2f,
+      // the release edc42727. Same order, the composite first, then this
+      // seal, recomputed LAST per REMINT_COMMAND on the merged working tree.
+      // No capture was retaken.
+    ).toBe('02625ff3eb3bfb89ced93dfb8170d94cef34d7b499000fcd7d05cd2208e3c635');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

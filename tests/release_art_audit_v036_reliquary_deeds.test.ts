@@ -196,10 +196,11 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // inscription milestone deeds (phases 05 and 06) each shipped their
     // crest in the change that authored them, and the farming phase
     // committed the prog_farming_100 crest (the Reliquary title shelf
-    // forbids fallback art for title deeds), so 278 of the 287 live deeds
+    // forbids fallback art for title deeds), so 278 of the 293 live deeds
     // are painted. Deeds appended after the audit without art (the release's
-    // walk-in castle visit pair, the six farming celebration deeds, then the
-    // Phase 11e roster deed, nine in all and the list below in order)
+    // walk-in castle visit pair and its bank socket pair, the six farming
+    // celebration deeds, then the packet's parked rows, fifteen in all and
+    // the list below in order)
     // ride the DEED_ART_PENDING ledger until their art lands; the audit
     // holds exactly when the pending set and the artless set are the same
     // post-audit appends and every other deed is painted.
@@ -215,6 +216,10 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'col_golden_harvest',
       'col_farm_roster',
       'prog_field_to_feast',
+      // The release's bank socket ladder pair (Bank Storage phase 06),
+      // appended at the v0.41.0 release-batch sync in DEED_ORDER position.
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
       // The release's Proving Shore graduation deed, appended at the
       // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
       'prog_ready_for_an_adventure',
@@ -238,7 +243,10 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // 291 at masterwrought Phase 13: the promotion capstone prog_legendmaker
     // ships no crest either (no title, so none is forced), joining the
     // pending ledger at the tail with the PAINTED count still at 278.
-    expect(DEED_ORDER).toHaveLength(291);
+    // 293 at the v0.41.0 release-batch sync: the release's bank socket pair
+    // (Bank Storage phase 06, 274 to 276 on its own arm) ships no crest, so
+    // both join the pending ledger and the PAINTED count still holds at 278.
+    expect(DEED_ORDER).toHaveLength(293);
     expect(DEED_IMAGE_IDS.size).toBe(278);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

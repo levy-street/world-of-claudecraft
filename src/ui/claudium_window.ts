@@ -92,6 +92,14 @@ export class ClaudiumWindow {
   private pendingPurchase: { rail: ClaudiumRail; sku: string } | null = null;
   private purchaseError: string | null = null;
   private paintedWalletMarkup: string | null = null;
+  // The one-shot return path for a caller that HANDED OFF to this window (the
+  // WOC Store's "you need more Claudium" flow). Armed by toggle() on BOTH of its
+  // arms (an open arms it for the close that follows; a toggle that finds the
+  // window already open arms it for the close it performs), and cleared as it
+  // fires, so a handoff can never fire twice and a plain close with nothing
+  // armed fires nothing. Deliberately a per-handoff argument rather than module
+  // state or a timer: the store asks for exactly one callback and gets one.
+  private closeReturn: (() => void) | null = null;
 
   constructor(private readonly deps: ClaudiumWindowDeps) {}
 
@@ -109,11 +117,65 @@ export class ClaudiumWindow {
     void this.render(null, focused);
   }
 
-  toggle(): void {
+  /** Open for a HANDOFF, and unlike toggle() calling it while already open does
+   *  NOT close it (the Hud.openSpellbook idiom).
+   *
+   *  The distinction was believed unreachable: toggle()'s own already-open arm
+   *  says "deps.closeOthers means the store and this window are never open
+   *  together". Bank Storage phase 13's live rig MEASURED the opposite for the
+   *  bank, because Hud.closeOtherWindows ignores its argument and closes only the
+   *  context menu and the tooltip, so the top-up window opens OVER a bank that
+   *  stays open and the bank's "Buy Claudium" is reachable from there. Pressing
+   *  it then CLOSED this window and fired the return callback against an
+   *  unchanged balance, which is the opposite of what a top-up handoff is for.
+   *
+   *  The already-open arm still ARMS the return callback, so a handoff always
+   *  gets its one callback whichever state it found this window in, and close()'s
+   *  clear-before-fire keeps it single-shot. */
+  open(onClosed?: () => void): void {
     if (this.isOpen) {
+      if (onClosed) this.closeReturn = onClosed;
+      // ...and still RENDER, which is what the fresh-open path does through
+      // toggle() and what makes the handoff observable at all. Arming the
+      // callback and returning silently was the shape the review round caught: a
+      // player who has just accepted a top-up prompt would have been handed to a
+      // window still showing whatever it last painted, including a stale balance,
+      // which is the one number the handoff exists to change.
+      //
+      // Not captureFocus / closeOthers: this window is already open, so it
+      // already holds an opener to return to and has already displaced whatever
+      // it was going to.
+      //
+      // WHAT THIS DOES NOT FIX, stated because the first version of this comment
+      // claimed it did. render('open') focuses the close button synchronously,
+      // and the confirm dialog the player just accepted releases its focus trap
+      // on a deferred task (src/ui/focus_manager.ts restores the opener through a
+      // setTimeout so it wins over a close handler still settling the DOM), so
+      // that restore lands AFTER this one and focus returns to the surface the
+      // player was handed FROM. The FRESH-open path has the identical shape, so
+      // this is a pre-existing race rather than something the handoff change
+      // introduced, and closing it means changing when the trap restores, which
+      // is not this window's to decide.
+      void this.render('open');
+      return;
+    }
+    this.toggle(onClosed);
+  }
+
+  toggle(onClosed?: () => void): void {
+    if (this.isOpen) {
+      // A handoff asked for while this window is ALREADY open would otherwise be
+      // dropped silently. Today that cannot happen (deps.closeOthers means the
+      // store and this window are never open together, so the store's top-up
+      // button is unreachable in this state), but the at-most-once guarantee
+      // should not rest on the window-stacking policy staying that way. Arm it
+      // so the close below still honours it, and the clear-before-fire in
+      // close() keeps it single-shot.
+      if (onClosed) this.closeReturn = onClosed;
       this.close();
       return;
     }
+    this.closeReturn = onClosed ?? null;
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     const root = this.deps.root();
@@ -134,6 +196,11 @@ export class ClaudiumWindow {
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.deps.onVisibilityChange?.();
+    // Last, and cleared BEFORE the call: the callback reopens another window,
+    // so this window must already be fully closed and disarmed when it runs.
+    const armed = this.closeReturn;
+    this.closeReturn = null;
+    armed?.();
   }
 
   async render(

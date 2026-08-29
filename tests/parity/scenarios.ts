@@ -4526,9 +4526,26 @@ function inventoryVendor(): Scenario {
 //  - bankDeposit whole (the rest of the stack, merging into the bank slot);
 //  - bankWithdraw partial then whole (the mirror, gated by bag capacity);
 //  - bankBuySlots (copper - table price, purchasedSlots + 6).
-// The bank draws NO rng (it is pure pooled-list math), so the draw-order digest must
-// stay byte-identical; its behavior is pinned entirely through PlayerMeta (copper +
-// inventory + bank) and the emitted event stream. Modeled on market_round_trip.
+// It then walks the MATERIALS VAULT, the second store at the same banker counter,
+// through its own transitions (count-only storage, so a per-material count and a
+// rung ladder rather than slots):
+//  - vaultBuyUpgrade rung 0 (the unlock: copper - 20000, upgrades 0 -> 1);
+//  - vaultDeposit partial (a fraction of a material stack leaves the bags);
+//  - vaultDeposit whole, of a SECOND material id, so the stock is multi-key:
+//    two independent counts have to reconcile, which a single-key stock cannot
+//    show. Key ORDER is NOT what this proves and is not claimed anywhere below:
+//    tests/parity/trace.ts canonicalizes every object by sorting its keys, so
+//    the golden renders the same two lines whatever order the sim stored them
+//    in, and an insertion-ordered regression could never redden it;
+//  - vaultWithdraw partial (the mirror, gated by bag capacity);
+//  - vaultBuyUpgrade rung 1 (copper - 50000, upgrades 1 -> 2).
+// The per-material CEILING the rungs widen is deliberately not claimed here:
+// PlayerMeta carries stock and upgrades only, so the golden can show the rung
+// climbing but never the cap it derives.
+// Neither store draws any rng (both are pure pooled/count math), so the draw-order
+// digest must stay byte-identical; their behavior is pinned entirely through
+// PlayerMeta (copper + inventory + bank + vault) and the emitted event stream.
+// Modeled on market_round_trip.
 function bankRoundTrip(): Scenario {
   return {
     name: 'bank_round_trip',
@@ -4538,6 +4555,13 @@ function bankRoundTrip(): Scenario {
       'bankWithdraw partial then whole: bank -> bags, gated by bag capacity',
       'bankBuySlots: meta.copper - BANK_EXPANSION_PRICES[0] + purchasedSlots + 6',
       'banker-proximity gate (nearBanker) satisfied by standing at a bursar',
+      'vaultBuyUpgrade rung 0: the unlock, meta.copper - VAULT_UPGRADE_PRICES[0]',
+      'vaultDeposit partial: a fraction of a material stack moves bags -> vault stock',
+      'vaultDeposit whole: a SECOND material id, so vault.stock is multi-key',
+      'multi-key stock in CANONICAL form: two ids, each count reconciled on its own',
+      'vaultWithdraw partial: vault stock -> bags, keyed by itemId (no slots)',
+      'vaultBuyUpgrade rung 1: meta.copper - VAULT_UPGRADE_PRICES[1], upgrades 1 -> 2',
+      'vaultDepositAll: the batched sweep stocks every eligible material, skips gear',
     ],
     build: () => new Sim({ seed: 1024, playerClass: 'warrior', noPlayer: true }),
     drive(rec: Recorder) {
@@ -4574,6 +4598,63 @@ function bankRoundTrip(): Scenario {
       // 5) buy the first slot expansion: copper - 500, purchasedSlots 0 -> 6.
       sim.bankBuySlots(pid);
       rec.snapshot('bought-slots');
+
+      // The Materials Vault arm, at the same bursar (nearBanker is already
+      // satisfied). Count-only storage: PlayerMeta.vault holds one number per
+      // material id plus the rung ladder, both already sampled by samplePlayerMeta.
+      // 6) stock the purse and the bags for the vault ladder: 20000 + 50000 for
+      //    the two rungs, plus a 1000 REMAINDER on purpose. An exact 0 balance
+      //    is inert to the canonicalizer (trace.ts drops inert keys), so the
+      //    copper key would VANISH from the last snapshots and the second
+      //    purchase would be evidenced only by an absence. A nonzero remainder
+      //    makes the final price a value the golden actually shows.
+      //    TWO material ids, not one: a single-key stock cannot show two counts
+      //    reconciling independently (the deposit of one leaving the other
+      //    untouched, and the later withdraw moving only its own).
+      meta.copper = 71000;
+      sim.addItem('copper_ore', 10, pid);
+      sim.addItem('ashwood_log', 4, pid);
+      rec.snapshot('vault-setup');
+
+      // 7) unlock the vault (rung 0): copper - 20000, upgrades 0 -> 1. (The
+      //    per-material ceiling this rung widens is derived, not stored, so the
+      //    golden cannot show it; see the header.)
+      sim.vaultBuyUpgrade(pid);
+      rec.snapshot('vault-unlocked');
+
+      // 8) deposit a partial count: 6 of the 10-stack leaves the bags as stock.
+      const oreIdx = meta.inventory.findIndex((s) => s.itemId === 'copper_ore');
+      sim.vaultDeposit(oreIdx, 6, pid);
+      rec.snapshot('vault-deposited-partial');
+
+      // 9) deposit a SECOND material, whole stack, so the stock holds two keys.
+      //    ashwood_log arrives AFTER copper_ore and the golden renders it
+      //    first, but that is the canonicalizer sorting keys, NOT evidence
+      //    about storage order: the two lines would read identically either
+      //    way. What this step does pin is that the second deposit adds its own
+      //    key and leaves copper_ore's count alone.
+      const logIdx = meta.inventory.findIndex((s) => s.itemId === 'ashwood_log');
+      sim.vaultDeposit(logIdx, undefined, pid);
+      rec.snapshot('vault-deposited-second-material');
+
+      // 10) withdraw 2 back into the bags, keyed by itemId (the vault has no slots).
+      sim.vaultWithdraw('copper_ore', 2, pid);
+      rec.snapshot('vault-withdrew-partial');
+
+      // 11) the second rung: copper - 50000, upgrades 1 -> 2.
+      sim.vaultBuyUpgrade(pid);
+      rec.snapshot('vault-bought-rung');
+
+      // 12) the batched deposit-all sweep (Phase 03): ONE command sweeps every
+      //     eligible carried material into stock (the 6 copper_ore withdrawn in
+      //     step 10 AND the 5 wolf_fang the bank arm returned to the bags:
+      //     wolf_fang is a recipe reagent, so the honest material set admits
+      //     it), while the dagger added HERE (not in vault-setup, so the
+      //     earlier frames do not churn) pins the skips-non-materials arm by
+      //     surviving in the bags.
+      sim.addItem('rusty_dagger', 1, pid);
+      sim.vaultDepositAll(pid);
+      rec.snapshot('vault-deposit-all');
       rec.tick(2);
     },
   };
@@ -6118,6 +6199,199 @@ function professionsFarmingSession(seed = 1): Scenario {
   };
 }
 
+// The two-pool bag capacity mechanic (phase 05) across the bank counter. Every
+// OTHER scenario in this suite runs with empty bag sockets, and with no
+// materials-only bag socketed the two-pool arithmetic collapses to exactly the
+// flat scalar it replaced (general = the 16 base slots, materials = 0, one
+// number). So no golden here can tell the pool math from the old model, and a
+// regression in pool allocation, in the materials-first packing rule, or in the
+// headroom a spill leaves behind would keep the whole gate byte-identical.
+//
+// This scenario sockets a materials satchel (Forager's Haversack: 12
+// materialsOnly slots, so general 16 / materials 12) through the real equipBag
+// path, then drives a bank round trip whose withdrawals land on OPPOSITE sides
+// of the pool boundary. The pools themselves are NOT stored state: bag_pools.ts
+// recomputes the packing from the whole slot list at every check, so no sampled
+// field can ever show them and claiming otherwise would be false. They are
+// observable only through which transfers the capacity gate allows, so both
+// discriminating checkpoints below are withdrawal OUTCOMES, recorded in the
+// golden as which side of the counter an item finished on:
+//
+//  - With the general pool FULL (16 non-material slots) and the materials pool
+//    untouched, a MATERIAL withdrawal succeeds into satchel-only headroom and
+//    the very next NON-MATERIAL withdrawal is refused, with 11 slots of flat
+//    total still free (17 carried against a summed 28). Under a flat scalar
+//    both move, so the dagger sitting in `bank` at that checkpoint instead of
+//    in `inventory` is the pin that separates the two models.
+//  - The SAME refused withdrawal, retried after the carried materials overflow
+//    the materials pool: 13 material slots against a 12-slot materials pool
+//    spill exactly one material into the general pool, which under the
+//    materials-first rule leaves the general pool at 4 of 16 and the gear fits.
+//    Under a general-first packing regression those same 16 carried slots fill
+//    the general pool outright and the retry refuses again, so this checkpoint
+//    pins the allocation ORDER, which the flat-scalar arm above cannot see.
+//    Nothing changes between the two attempts except which pool the carried
+//    materials pack into: the command, the item, and the bank slot are the same.
+//
+// Neither the bank nor the pool math draws any rng (both are pure slot
+// arithmetic), so the draw-order digest must stay identical to a bare two-tick
+// tail; everything here is pinned through PlayerMeta (inventory + bags + bank)
+// and the event stream. Modeled on bank_round_trip, which owns the two stores'
+// own state transitions and deliberately keeps its sockets empty.
+function bankMaterialsSatchel(): Scenario {
+  return {
+    name: 'bank_materials_satchel',
+    coverage: [
+      'equipBag sockets a materialsOnly satchel: the split shows only as gate outcomes',
+      'bankDeposit of a material and of gear: both CARRIED pools get a return trip',
+      'the bank side of that trip stays a general-only pool',
+      'a MATERIAL withdrawal reaches satchel-only headroom past a FULL general pool',
+      'a NON-MATERIAL withdrawal is refused while flat total headroom remains',
+      'materials-first packing frees the general headroom the retry needs',
+      'the refused withdrawal succeeds on retry once the spill frees general headroom',
+      'the whole scenario is draw-free: the pool math and the bank both take no rng',
+    ],
+    build: () => new Sim({ seed: 2048, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Satchelbearer');
+      const meta = sim.players.get(pid) as PlayerMeta;
+      // Stand at a bursar so the nearBanker gate passes: the bank_round_trip
+      // idiom, bankerIds being the Sim anchor list the ctor seeds.
+      const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
+      teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
+      rec.notes.pid = pid;
+
+      // 1) socket the satchel through the real equipBag command (the grant is a
+      //    plain addItem; the SOCKET is what mints the second pool). Carried
+      //    afterwards: the 5 starting loaves alone, one general slot, against a
+      //    general 16 / materials 12 split.
+      sim.addItem('foragers_haversack', 1, pid);
+      sim.equipBag('foragers_haversack', 0, pid);
+      rec.snapshot('satchel-socketed');
+
+      // 2) the round trip's deposit half: one material stack and one piece of
+      //    gear cross into the bank, so each withdrawal arm below has its own
+      //    item waiting on the far side of the same counter.
+      sim.addItem('copper_ore', 20, pid);
+      sim.addItem('rusty_dagger', 1, pid);
+      const oreIdx = meta.inventory.findIndex((s) => s.itemId === 'copper_ore');
+      sim.bankDeposit(oreIdx, undefined, pid);
+      const gearIdx = meta.inventory.findIndex((s) => s.itemId === 'rusty_dagger');
+      sim.bankDeposit(gearIdx, undefined, pid);
+      rec.snapshot('deposited-material-and-gear');
+
+      // 3) pack the GENERAL pool to exactly its 16-slot budget with
+      //    non-materials: the loaves hold one slot and 15 daggers hold the rest
+      //    (gear never stacks, so each copy is its own slot). The materials pool
+      //    stays empty at 0 of 12, so a flat scalar still reads 12 free.
+      sim.addItem('rusty_dagger', 15, pid);
+      rec.snapshot('general-pool-full');
+
+      // 4) the material crosses back into satchel-only headroom. The general
+      //    pool has zero free slots, so this transfer is possible ONLY because
+      //    the materials pool is a second budget that materials alone may take;
+      //    the 20 ore land in a fresh slot and carry the bags to 17 slots
+      //    against a 16-slot general budget.
+      const bankOreIdx = meta.bank.inventory.findIndex((s) => s.itemId === 'copper_ore');
+      sim.bankWithdraw(bankOreIdx, undefined, pid);
+      rec.snapshot('material-withdrawn-into-satchel-headroom');
+
+      // 5) the discriminating refusal: the same counter, one slot of gear, and
+      //    11 slots of FLAT total still free (17 carried of a summed 28), but a
+      //    non-material may only take general headroom and there is none. The
+      //    dagger stays banked, which is the state a flat-scalar regression
+      //    cannot reproduce.
+      const bankGearIdx = meta.bank.inventory.findIndex((s) => s.itemId === 'rusty_dagger');
+      sim.bankWithdraw(bankGearIdx, undefined, pid);
+      rec.snapshot('non-material-refused-with-flat-headroom');
+
+      // 6) rearrange the carried slots so the materials pool OVERFLOWS: drop 13
+      //    of the 15 daggers (back to 3 non-material slots, the loaves plus 2)
+      //    and add 240 more ore, which is 12 more full stacks for 13 material
+      //    slots in all. Carried total is 16 slots, exactly the general budget,
+      //    so a general-first packing would leave zero general headroom while
+      //    materials-first parks 12 of the 13 material slots in the materials
+      //    pool and spills exactly one.
+      sim.discardItem('rusty_dagger', 13, pid);
+      sim.addItem('copper_ore', 240, pid);
+      rec.snapshot('materials-pool-overfilled');
+
+      // 7) retry the withdrawal step 5 refused. The general pool now holds 4 of
+      //    its 16 slots (the 3 non-materials plus the one spilled material), so
+      //    the gear fits and the bank empties. The same command answering
+      //    differently, with nothing between the two attempts but which pool the
+      //    carried materials pack into, is the allocation-order pin.
+      const retryIdx = meta.bank.inventory.findIndex((s) => s.itemId === 'rusty_dagger');
+      sim.bankWithdraw(retryIdx, undefined, pid);
+      rec.snapshot('gear-withdrawn-after-materials-first-packing');
+      rec.tick(2);
+    },
+  };
+}
+
+// Bank bag sockets (Bank Storage phase 07): the three socket verbs driven
+// through the real command bodies, so the unlock ladder, the first-empty scan,
+// the indexed swap (carried copy out, displaced bag back, no spare room
+// needed), the unsocket return, and the exact-copper refusal all pin into a
+// golden. Phase 06 shipped the sim bodies with unit tests but no scenario
+// drove a socket op, so the goldens only ever sampled the fields at rest.
+// Draw-free: socket commands take no rng.
+function bankSocketRoundTrip(): Scenario {
+  return {
+    name: 'bank_socket_round_trip',
+    coverage: [
+      'bankUnlockSocket: two in-order unlocks at exact table copper',
+      'bankSocketBag: first-empty scan, then the indexed swap returning the displaced bag',
+      'bankUnsocketBag: the socketed satchel returns to the bags',
+      'the unaffordable third unlock refuses without mutating anything',
+      'the whole scenario is draw-free: socket commands take no rng',
+    ],
+    build: () => new Sim({ seed: 4096, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Socketwright');
+      const meta = sim.players.get(pid) as PlayerMeta;
+      // Stand at a bursar so the nearBanker gate passes (the bank_round_trip
+      // idiom); fund exactly two unlocks (1000000 + 2000000) plus 500000 over.
+      const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
+      teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
+      rec.notes.pid = pid;
+      meta.copper = 3500000;
+      sim.addItem('linen_pouch', 1, pid);
+      sim.addItem('burlap_reagent_pouch', 1, pid);
+
+      // 1) two unlocks, cheapest first: the ladder charges 1000000 then
+      //    2000000, leaving 500000, with all sockets still empty.
+      sim.bankUnlockSocket(pid);
+      sim.bankUnlockSocket(pid);
+      rec.snapshot('two-sockets-unlocked');
+
+      // 2) the first-empty scan: no socket named, the pouch lands in socket 0
+      //    and leaves the carried inventory (6 general slots join the budget).
+      sim.bankSocketBag('linen_pouch', undefined, pid);
+      rec.snapshot('pouch-socketed-first-empty');
+
+      // 3) the indexed swap into OCCUPIED socket 0: the satchel goes in, the
+      //    displaced pouch returns to the slot the satchel freed (no spare
+      //    carried room needed), and the pools flip to the materials split.
+      sim.bankSocketBag('burlap_reagent_pouch', 0, pid);
+      rec.snapshot('swap-returns-the-pouch');
+
+      // 4) unsocket: the satchel comes back to the bags and the budget
+      //    shrinks to the base 24 (nothing banked, so no over-capacity arm).
+      sim.bankUnsocketBag(0, pid);
+      rec.snapshot('satchel-unsocketed');
+
+      // 5) the refusal arm: the third socket costs 3500000 and the purse
+      //    holds 500000, so nothing moves and nothing is charged.
+      sim.bankUnlockSocket(pid);
+      rec.snapshot('third-unlock-refused');
+      rec.tick(2);
+    },
+  };
+}
+
 // Rift boss floor: a real S-rank rift instance with a hand-placed, stamped
 // death-zone boss and a control-proc dais guard (the enterRiftWithBoss fixture
 // from tests/rift_boss_reactable_mechanics.test.ts). Before this scenario the
@@ -6852,6 +7126,15 @@ export const SCENARIOS: Scenario[] = [
   // last, so it lands in the final shard automatically like every other
   // addition; SHARD_BOUNDS ends at SCENARIOS.length and needs no edit.
   nythraxisHeroicClaim(),
+  // Appended, not filed beside bankRoundTrip: run_scenarios.ts tiles the gate
+  // into contiguous slices whose last bound is SCENARIOS.length, so a scenario
+  // added at the END lands in the final shard without moving any other
+  // scenario between shards.
+  bankMaterialsSatchel(),
+  // Appended on the same rule (Bank Storage phase 07).
+  bankSocketRoundTrip(),
+  // The release's own append, kept at the END for the same tiling rule; both
+  // arms of the v0.40.0 sync appended, so both land in the final shard.
   supportedElevationLineOfSight(),
   // The Perfecting stage (masterwrought Phase 12). Appended last, so it lands
   // in the final shard automatically; SHARD_BOUNDS needs no edit.

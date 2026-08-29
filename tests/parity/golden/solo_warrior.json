@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "a82ff3c2",
+      "state": "abeae35a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,7 +37,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -82,6 +89,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -155,7 +165,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1003,
-      "state": "480970fa",
+      "state": "73c8626a",
       "events": "73f12e6b",
       "rng": {
         "draws": 7,
@@ -166,7 +176,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1003,
-      "state": "cc98f446",
+      "state": "ef7c6706",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -177,7 +187,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1003,
-      "state": "9f97dc34",
+      "state": "92df7e98",
       "events": "cec0728d",
       "rng": {
         "draws": 174,
@@ -188,7 +198,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 1003,
-      "state": "aa980548",
+      "state": "920919cc",
       "events": "0d8d56d4",
       "rng": {
         "draws": 263,
@@ -208,7 +218,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -279,6 +296,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -421,7 +441,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 1003,
-      "state": "8739ff56",
+      "state": "e890cc62",
       "events": "5a57212b",
       "rng": {
         "draws": 309,
@@ -441,7 +461,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -516,6 +543,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

@@ -168,10 +168,14 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands.
-    // 317 since masterwrought Phase 11i put the apex fishing rod on the
-    // specimen page, the same +1 the character pair in
-    // tests/reliquary_content.test.ts carries.
-    expect(catalogTotal).toBe(317);
+    // 319 at the v0.41.0 final sync: the shared base read 311, masterwrought
+    // added 6 (Phase 11i's apex fishing rod on the specimen page plus its
+    // other catalogued slots, the same slots the character pair in
+    // tests/reliquary_content.test.ts carries) and the release added 2 (the
+    // two bank-storage bag drops, necromancers_reagent_satchel and
+    // wayfarers_backpack). The id sets are disjoint, so the merged catalog
+    // carries both sides' slots: 311 + 6 + 2.
+    expect(catalogTotal).toBe(319);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

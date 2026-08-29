@@ -1008,15 +1008,20 @@ export const INSTANCE_X_BASE = 99_400;
 export const DUNGEON_X_THRESHOLD = INSTANCE_X_BASE + 600; // x beyond this = inside an instance
 export const DUNGEON_FLOOR_Y = 0;
 
-export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
+/** The x half of instanceOrigin, allocation-free for hot callers that need no
+ *  z (the vault craft gate's derived west-reach walk runs per gate call).
+ *  instanceOrigin below composes THIS, so the band formula has one home. */
+export function instanceOriginX(dungeonIndex: number): number {
   // The original contiguous dungeon band is full at index 6 because the delve
   // band begins immediately after it. New dungeons use an overflow band east
   // of the bounded Yumi instances, preserving every shipped instance origin.
-  const x =
-    dungeonIndex >= DUNGEON_OVERFLOW_INDEX
-      ? DUNGEON_OVERFLOW_X_BASE + (dungeonIndex - DUNGEON_OVERFLOW_INDEX) * 600
-      : INSTANCE_X_BASE + 900 + dungeonIndex * 600;
-  return { x, z: -1250 + slot * 500 };
+  return dungeonIndex >= DUNGEON_OVERFLOW_INDEX
+    ? DUNGEON_OVERFLOW_X_BASE + (dungeonIndex - DUNGEON_OVERFLOW_INDEX) * 600
+    : INSTANCE_X_BASE + 900 + dungeonIndex * 600;
+}
+
+export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
+  return { x: instanceOriginX(dungeonIndex), z: -1250 + slot * 500 };
 }
 
 export const DUNGEON_OVERFLOW_INDEX = 7;

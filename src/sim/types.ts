@@ -1022,6 +1022,11 @@ interface BaseItemDef {
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
   bagSlots?: number;
+  // Materials-only bag (kind:'bag'): its bagSlots feed the materials pool, a
+  // second slot budget only honest materials may occupy (src/sim/bag_pools.ts;
+  // the material set is the derived taxonomy, never an item-kind test). An
+  // unrestricted bag omits this and feeds the general pool.
+  materialsOnly?: boolean;
   // Max copies per inventory slot. When omitted the default is derived from
   // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
   stackSize?: number;
@@ -6303,6 +6308,25 @@ export type SimEvent = { pid?: number } & (
       // no standing readout or snapshot field may ever mirror this.
       retryAfterSeconds?: number;
     }
+  // Materials Vault craft consumption (Bank Storage Phase 04): emitted at cast
+  // completion, AFTER the stock decrement, when a craft or enchant drew any
+  // reagent units from the vault. Always personal (carries pid). The server's
+  // tick observer turns it into bank_ledger rows (op 'craft_consume'): the
+  // craft resolves inside sim.tick() several ticks after the craft_item
+  // dispatch, so there is no dispatch bracket to diff across and the event IS
+  // the record (the deeds_records observer precedent). Text-free: no player
+  // copy rides here, so no sim/server i18n matcher rule is needed.
+  | {
+      type: 'vaultCraftConsume';
+      // One entry per material id drawn, sorted by id (the diffVaultOp row
+      // discipline: order is a function of the ids alone, never of object-key
+      // or plan iteration order), with counts aggregated across reagents that
+      // drew the same id. Distinct grades are distinct ids and stay separate.
+      takes: { itemId: string; count: number }[];
+      // The vault's upgrade rung at consumption time; rides to the ledger's
+      // NOT NULL purchased_slots_after column, same as every vault row.
+      upgrades: number;
+    }
   // Enchanting profession outcomes (Professions 2.0): mirror
   // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and
   // src/sim/professions/salvage.ts SalvageResult so the online client can reflect
@@ -7351,6 +7375,51 @@ export interface WorldContent {
   waterLevel?: number;
 }
 
+/** The resolved storage price tables every sim price read consumes: bank slot
+ *  expansions, bank bag sockets, and Materials Vault rungs (index 0 of
+ *  vaultUpgrades IS the vault unlock). Built once at Sim construction by
+ *  storage_prices.ts resolveStoragePrices, which guarantees each list keeps the
+ *  exact length of its compiled default table. Declared here (not in
+ *  storage_prices.ts) so bank.ts/materials_vault.ts never import that module:
+ *  it imports their price constants, and a types home keeps the graph acyclic. */
+export interface StoragePrices {
+  readonly bankExpansions: readonly number[];
+  readonly bankSockets: readonly number[];
+  readonly vaultUpgrades: readonly number[];
+}
+
+/** Host-supplied per-dimension override for StoragePrices. A dimension applies
+ *  only as an array of exactly the compiled default's length whose every entry
+ *  is a safe integer >= 0 (Number.isSafeInteger); anything else falls back to
+ *  the default for that dimension alone (storage_prices.ts owns the
+ *  validation). */
+export interface StoragePricesOverride {
+  readonly bankExpansions?: readonly number[];
+  readonly bankSockets?: readonly number[];
+  readonly vaultUpgrades?: readonly number[];
+}
+
+/** One identity-free Materials Vault unit draw offered to the authoritative
+ *  host before the sim mutates any character state. */
+export interface VaultConsumptionTake {
+  readonly itemId: string;
+  readonly count: number;
+}
+
+/** Opaque host reservation for one planned Materials Vault consumption. */
+export interface VaultConsumptionReservation {
+  commit(): void;
+  cancel(): void;
+}
+
+/** Host-side bounded-admission seam for craft/enchant vault consumption.
+ *  Returning null refuses the action before its first mutation. */
+export type VaultConsumptionAdmission = (
+  pid: number,
+  takes: readonly VaultConsumptionTake[],
+  vaultUpgrades: number,
+) => VaultConsumptionReservation | null;
+
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
@@ -7412,6 +7481,15 @@ export interface SimConfig {
   // of no queue activity, so a walk-up spectator always has a game to watch (and
   // bet on). Server + offline game enable it; tests/goldens leave it off so the
   // idle timer never perturbs a deterministic scenario.
+  // Storage price override (bank expansions/sockets, vault rungs). Boot-time
+  // construction input only: the Sim ctor resolves it ONCE into the frozen
+  // Sim.storagePrices table (never carried onto Sim.cfg, the noPlayer idiom)
+  // and no code reads it mid-tick.
+  storagePrices?: StoragePricesOverride;
+  // Authoritative hosts reserve bounded audit capacity through this callback
+  // before a craft or enchant consumes from the Materials Vault. Offline and
+  // headless hosts omit it and receive an inert successful reservation.
+  vaultConsumptionAdmission?: VaultConsumptionAdmission;
 }
 
 export function emptyMoveInput(): MoveInput {
@@ -7702,6 +7780,9 @@ export type DeedMeterId =
   | 'vcupWins'
   | 'vcupGuildWins'
   | 'bankPurchasedSlots'
+  // Gold-bought bank bag sockets unlocked (BankState.unlockedSockets, phase 06;
+  // monotonic: an unlock never reverts).
+  | 'bankSocketsUnlocked'
   | 'townFocusPoints'
   | 'delveLoreCount'
   | 'companionRankBest'

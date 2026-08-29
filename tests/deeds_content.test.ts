@@ -92,7 +92,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 291 deeds worth 3345 total Renown', () => {
+  it('ships exactly 293 deeds worth 3375 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -132,8 +132,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // effort-gated, never luck-gated, so positive Renown is legitimate under
     // rule 2): 290 / 3295 plus one deed at 50 gives 291 / 3345, written
     // BEFORE the run from the merged literals and matched by it.
-    expect(DEED_ORDER.length).toBe(291);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3345);
+    //
+    // Then the release/v0.41.0 merge (2026-08-29) appends the bank socket
+    // pair (soc_strongbox_outfitter 5 and soc_four_bags_deep 25, Bank Storage
+    // phase 06) and removes none: 291 / 3345 plus two deeds at 30 gives
+    // 293 / 3375, recomputed against the merged catalog rather than either
+    // parent's prose.
+    //
+    // The NAME carries the numbers too, deliberately: vitest prints it in the
+    // failure header, and a stale name there is the one part of this pin a
+    // reader can act on without seeing the diff. It went stale once already.
+    expect(DEED_ORDER.length).toBe(293);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3375);
   });
 
   it('ships the audited per-category counts', () => {
@@ -162,7 +172,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       collection: 40,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
-      social: 18,
+      // +2 bank socket ladder deeds (soc_strongbox_outfitter,
+      // soc_four_bags_deep; Bank Storage phase 06).
+      social: 20,
       exploration: 11,
       feat: 3,
       hidden: 9,
@@ -330,9 +342,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // literal end under the 11b three-tier ordering rule, which keeps the
       // farming block contiguous ahead of it.
       'prog_field_to_feast',
-      // The Proving Shore graduation closed the merged tail (appended at the
-      // release/v0.41.0 merge behind the branch's rows, keeping both sides'
-      // tails in their own authored order).
+      // The bank socket ladder pair (Bank Storage phase 06) rides in at the
+      // 2026-08-29 release/v0.41.0 merge behind the branch's rows, keeping
+      // both sides' tails in their own authored order.
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
+      // The Proving Shore graduation closed the earlier merged tail (appended
+      // at the previous release/v0.41.0 merge behind the branch's rows).
       'prog_ready_for_an_adventure',
       // The Phase 13 promotion capstone closes the tail (append-only:
       // DEED_ORDER cannot seat it beside its progression siblings).
@@ -844,7 +860,19 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduced 4533079d... EXACTLY, which is what distinguishes an append
   // from an edit. Only then was the digest re-minted with the one appended
   // tuple. No shipped trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = 'd69e3def57ec7bfb8d6dd71d674af29f76930718c57b7b960d7a620c680fc33e';
+  // Re-baselined at the 2026-08-29 release/v0.41.0 sync merge for the bank
+  // socket pair (Bank Storage phase 06: soc_strongbox_outfitter and
+  // soc_four_bags_deep, on the new bankSocketsUnlocked meter), which the
+  // release had itself re-baselined (its own literal was 9d39a371...) between
+  // the castle visit pair and the Proving Shore graduation deed; the merged
+  // order seats the pair behind this branch's tail rows, ahead of
+  // prog_ready_for_an_adventure. Re-minted THE AUDITABLE WAY: the merged
+  // canonical rows minus the soc pair (feat_book_complete's live deedIds
+  // filtered back) reproduce this branch's d69e3def... EXACTLY, and minus
+  // this branch's seventeen appended rows reproduce the release's
+  // 9d39a371... EXACTLY, so the merged catalog is a pure append on BOTH
+  // sides. No shipped trigger or renown changed on either side.
+  const FROZEN_CATALOG_SHA256 = 'd1c102c3eebce38a337164d7164d3954108393b9f9b93a5f2d14242c0c403530';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -869,17 +897,30 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // digest too, which the comment-only proof above could not show. Re-minting:
   // move FROZEN_CATALOG_SHA256 down into PRE_APPEND_CATALOG_SHA256, list the
   // new ids in APPENDED_SINCE, then mint the new frozen literal.
+  // At the merge of release/v0.41.0 (tip e19d832b47) the append set is the
+  // release's two bank-socket deeds, and the previous mint is this branch's
+  // own pre-merge frozen literal (which had already absorbed
+  // prog_legendmaker); the proof below reproduces it exactly, so no older
+  // row was retro-edited by the merge.
   const PRE_APPEND_CATALOG_SHA256 =
-    '4533079d9911b8dc0e20526ca330ff41196126ee9798f216fe5900ba781b9eae';
-  const APPENDED_SINCE: readonly string[] = ['prog_legendmaker'];
+    'd69e3def57ec7bfb8d6dd71d674af29f76930718c57b7b960d7a620c680fc33e';
+  const APPENDED_SINCE: readonly string[] = ['soc_strongbox_outfitter', 'soc_four_bags_deep'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The appended rows sit at the TAIL, in order: an append, never an insert.
-    expect(DEED_ORDER.slice(-APPENDED_SINCE.length)).toEqual([...APPENDED_SINCE]);
+    // The appended rows sit as one contiguous run at a PINNED position: this
+    // merge seats the release's soc pair ahead of the shared graduation tail
+    // (the release's own authored order), so the pin is the exact final four
+    // rather than a bare tail slice. Still an append into a known seat, never
+    // a scattered insert, and never a retro-edit (the digest below proves it).
+    expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
+      ...APPENDED_SINCE,
+      'prog_ready_for_an_adventure',
+      'prog_legendmaker',
+    ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
       const trigger = DEEDS[id].trigger;
       const priorTrigger =
@@ -1087,7 +1128,8 @@ describe('table shape', () => {
     // appends follow it in phase order; Phase 11k's prog_field_to_feast was
     // the branch's tail until the release/v0.41.0 merge, where the Proving
     // Shore graduation deed closed the merged tail (appended at the release
-    // merge behind the walk-in castle visit pair and the branch's rows), and
+    // merge behind the walk-in castle visit pair and the branch's rows; the
+    // 2026-08-29 sync merge seats the bank socket pair ahead of it), and
     // Phase 13's promotion capstone prog_legendmaker now closes it.
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_legendmaker');
   });

@@ -471,8 +471,33 @@ interface AttributionTargetFixture {
 // one-line renderer.ts change (prewarmWorldFrame gates the farm sync on the
 // world holding its own player) moved the runtimeRender renderer leaf; the
 // evidence seals were swept by the one-step re-mint. No capture was retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the release/v0.41.0 span, kept rather
+// than dropped (the block that follows is the release's record verbatim).
+// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
+// reveal-gated painters the horizon-capped cull far at both frame sites): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// merged renderer.ts carries the entry-fade arm's scenery cull beside this
+// branch's aim blocked pass-through, so the composite matches neither parent.
+// No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip d3f8bae369 onward) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts (the
+// release's entry-horizon cull, compile gate and ground-aim rounds beside
+// this branch's farm-visuals prewarm guard) and the release also moved
+// src/render/eastbrook_town.ts, so the merged tree mints a value matching
+// NEITHER parent. Parent values for the record: ours 01fcf59e, the release
+// fd58a923. The value below is the re-mint over the resolved tree, committed
+// with exactly the bytes it read. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '01fcf59e411c88182484ac1b1a598db19f0633f61905f8f9331ef5c5a3bcce64';
+  '92e85131521216db23a9315995919559f20da23e68522774beca72534e5a8e56';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

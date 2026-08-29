@@ -244,8 +244,22 @@ describe('World Market filters', () => {
     // The SOURCE stays derived (that is the point); this is the line that reddens if a
     // catalog-side bagSlots typo moves the derivation and its mirror in lockstep, and it
     // is deliberately the one place a new bag capacity has to be acknowledged by a human.
-    // '16' acknowledged at phase 08: the tailoring apex bag (sunspun_haversack).
-    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual(['all', '6', '8', '10', '12', '14', '16']);
+    // '16' acknowledged at masterwrought phase 08: the tailoring apex bag
+    // (sunspun_haversack). Acknowledged for phase 05 of the bank-storage packet:
+    // 16 (Wayfarer's Backpack, Resonantweave Bag), 20 (Necromancer's Reagent
+    // Satchel) and 24 (Loombound Reagent Satchel) are the new capacities that
+    // catalog shipped.
+    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual([
+      'all',
+      '6',
+      '8',
+      '10',
+      '12',
+      '14',
+      '16',
+      '20',
+      '24',
+    ]);
   });
 
   it('keeps a zero or missing bagSlots value as its own selectable option, not just under all', () => {

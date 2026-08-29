@@ -5,8 +5,18 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error - plain Node ESM script, no types
-import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_shot_targets.mjs';
+import {
+  classifyDiff,
+  diffChangedPaths,
+  resolveMobileViewport,
+  resolveTargets,
+  seedLowGraphicsPreset,
+  // The directive sits HERE, not above the statement: it applies to the next
+  // LINE, and a wrapped import reports its untyped-module error on the closing
+  // `from` line. Above the `import` keyword it is simply unused, which tsc
+  // reports as an error of its own.
+  // @ts-expect-error - plain Node ESM script, no types
+} from '../scripts/pr_shot_targets.mjs';
 import { ABILITIES } from '../src/sim/data';
 
 describe('classifyDiff', () => {
@@ -819,5 +829,167 @@ describe('the druid auto-unshift target', () => {
     for (const v of target.variants) expect(v.charClass).toBe('druid');
     expect(ABILITIES.healing_touch.class).toBe('druid');
     expect(ABILITIES.healing_touch.castTime).toBeGreaterThan(1);
+  });
+});
+
+describe('the bank-meter target routing (phase 08 QA)', () => {
+  it('both meter files classify to the bank-meter target with its two variants', () => {
+    // A `when` typo would silently disable the capture: nothing else pins
+    // that the meter's own files route to it (the market targets' precedent).
+    for (const path of [
+      'src/ui/bank_view.ts',
+      'src/ui/bank_window.ts',
+      // The extracted siblings that now own bank pixels (phase 17). Without these
+      // rows a bank change confined to one of them captures no bank evidence, and
+      // the loop below is the only thing that would ever say so.
+      'src/ui/bank_bonus_view.ts',
+      'src/ui/bank_rung_view.ts',
+      'src/ui/bank_rung_purchase_core.ts',
+      // Bank Storage phase 18's two: the chrome contract that decides whether
+      // the footer is inside the window at all, and the meter's own copy.
+      'src/ui/bank_chrome_layout_core.ts',
+      'src/ui/bank_meter_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      const keys = plan.specific.map((t: { key: string }) => t.key);
+      expect(keys, path).toContain('bank-meter');
+    }
+    const meter = classifyDiff(['src/ui/bank_view.ts']).specific.find(
+      (t: { key: string }) => t.key === 'bank-meter',
+    );
+    // THREE, since phase 18: the footer's defect was a height budget, so one
+    // mobile frame cannot show it. The second names its own viewport; the first
+    // deliberately does not, so it keeps tracking the house frame.
+    // Compared by SHAPE, not by identity, because beforeLoad is a function and
+    // toEqual would compare it structurally. The seed is asserted separately
+    // below so a leg that silently loses it is a failure, not a passing shot at
+    // the wrong tier.
+    expect(
+      (meter?.variants ?? []).map((v: Record<string, unknown>) => ({
+        key: v.key,
+        mobile: v.mobile,
+        viewport: v.viewport,
+      })),
+    ).toEqual([
+      { key: 'desktop', mobile: undefined, viewport: undefined },
+      { key: 'mobile', mobile: true, viewport: undefined },
+      { key: 'mobile-short', mobile: true, viewport: { width: 740, height: 360 } },
+    ]);
+    // The standing capture rule: every leg shoots the LOWEST graphics preset.
+    // The mobile legs go full frame, so the world behind the pane is in the shot
+    // and an unseeded leg is a different tier, not a cosmetic difference.
+    //
+    // IDENTITY, not `typeof === 'function'`: any function passes that, including
+    // a no-op or the deliberate HIGH comparison seed one target over. The
+    // subject here is a helper the target table shares with the runner, which is
+    // the case where a reference pin is the honest instrument rather than a
+    // self-comparison.
+    for (const v of meter?.variants ?? []) {
+      expect((v as { beforeLoad?: unknown }).beforeLoad, `${v.key} seeds LOW`).toBe(
+        seedLowGraphicsPreset,
+      );
+    }
+    // ...and that shared seeder really seeds the LOWEST preset. The identity pin
+    // above only says the table and the runner agree on WHICH function; both
+    // sides move together if its body changes, which is the self-comparison
+    // shape. The literal is what makes it LOW, so pin the literal once.
+    const targetSrc = readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8');
+    const lowSeedBody = targetSrc.slice(
+      targetSrc.indexOf('async function seedLowGraphicsPreset'),
+      targetSrc.indexOf('async function seedHighGraphicsPreset'),
+    );
+    expect(lowSeedBody.length, 'the LOW seeder must be found').toBeGreaterThan(0);
+    expect(lowSeedBody).toContain('s.graphicsPreset = 1');
+  });
+
+  it('the RUNNER applies a variant viewport, not just the table that declares one', () => {
+    // The pin above proves the table says 740x360. Nothing there proves the
+    // screenshot runner reads it, and a wrong property name would silently shoot
+    // two identical house frames in the phase whose evidence is that the shorter
+    // one differs. Three legs, including the default arm.
+    expect(resolveMobileViewport({ key: 'mobile', mobile: true })).toEqual({
+      width: 844,
+      height: 390,
+    });
+    expect(
+      resolveMobileViewport({
+        key: 'mobile-short',
+        mobile: true,
+        viewport: { width: 740, height: 360 },
+      }),
+    ).toEqual({ width: 740, height: 360 });
+    // A partial override keeps the house value for the axis it does not name.
+    expect(resolveMobileViewport({ key: 'x', mobile: true, viewport: { height: 360 } })).toEqual({
+      width: 844,
+      height: 360,
+    });
+    // ...and the RUNNER really routes through it. Everything above is about the
+    // pure function; `resolveMobileViewport({})` at the call site would leave all
+    // of it green while both phone legs shot the house frame. A source pin,
+    // because pr_screenshots.mjs launches a browser at import time and can never
+    // be imported here. An occurrence BOUND, so a reintroduced inline default
+    // cannot sit beside the call.
+    const runner = readFileSync(join(__dirname, '../scripts/pr_screenshots.mjs'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,
+      '',
+    );
+    expect(runner.match(/resolveMobileViewport\(variant\)/g)?.length).toBe(1);
+    expect(runner).not.toMatch(/width\s*=\s*844/);
+  });
+});
+
+describe('the Materials Vault evidence target', () => {
+  it('routes both vault modules and pins low graphics plus each intended theme', async () => {
+    for (const path of ['src/ui/vault_view.ts', 'src/ui/vault_window.ts']) {
+      expect(classifyDiff([path]).specific.map((target: { key: string }) => target.key)).toContain(
+        'bank-vault',
+      );
+    }
+    const target = classifyDiff(['src/ui/vault_window.ts']).specific.find(
+      (candidate: { key: string }) => candidate.key === 'bank-vault',
+    );
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'locked',
+      'locked-mobile',
+      'desktop',
+      'mobile',
+      'parchment',
+      'high-contrast',
+      'fine',
+      'fine-mobile',
+    ]);
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      const mediaCalls: Array<{ method: string; payload: unknown }> = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+        async createCDPSession() {
+          return {
+            async send(method: string, payload: unknown) {
+              mediaCalls.push({ method, payload });
+            },
+          };
+        },
+      });
+      expect(storageSeeds.join('\n')).toContain('s.graphicsPreset = 1');
+      const expectedTheme =
+        variant.key === 'parchment'
+          ? "preset: 'parchment'"
+          : variant.key === 'high-contrast'
+            ? "preset: 'highContrast'"
+            : "preset: 'classic'";
+      expect(storageSeeds.join('\n')).toContain(expectedTheme);
+      expect(mediaCalls).toHaveLength(variant.key === 'high-contrast' ? 1 : 0);
+    }
+    expect(
+      target.variants.find(
+        (variant: { key: string; forcedColors?: boolean }) => variant.key === 'high-contrast',
+      )?.forcedColors,
+    ).toBe(true);
+    expect(target.capture.toString()).toContain("matchMedia('(forced-colors: active)').matches");
+    expect(target.capture.toString()).toContain("getElementById('tutorial-greeting')");
+    expect(target.capture.toString()).toContain('signedSpecial');
   });
 });

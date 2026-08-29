@@ -4505,6 +4505,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'min',
   'itemUi.kind.bag': 'Sac',
   'itemUi.tooltip.bagSlots': 'Sac de {slots} emplacements',
+  'itemUi.tooltip.bagSlotsMaterials': 'Sac à matériaux de {slots} emplacements',
   'sim.delve.baptistryEggs':
     "Le baptistère retombe dans le silence. Des sacs d'œufs d'araignée s'accrochent, humides, à la margelle.",
   'sim.delve.baptistrySpidersSealed': "Vous devriez essayer de détruire les sacs d'araignée.",

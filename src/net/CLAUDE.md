@@ -125,7 +125,7 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 - **Interest scoping** mirrors the server's distance tiers: players and pets enter at
   `INTEREST_RADIUS` and drop at `INTEREST_DROP_RADIUS`, NPCs use the wider
   `NPC_INTEREST_RADIUS`/`NPC_DROP_RADIUS` (all four constants live in
-  `server/game.ts`), with enter/drop hysteresis to stop boundary
+  `server/interest_policy.ts`), with enter/drop hysteresis to stop boundary
   churn. Entities not in `ents`/`keep` are pruned each snapshot.
 
 ## Auth & connect flow

@@ -147,6 +147,15 @@ type FinalAuditVerdict = {
     modifiedItemArtCount: number;
     modifiedItemArtPaths: string[];
     groups: Record<string, number>;
+    incrementalReviews: Array<{
+      reviewedAt: string;
+      branch: string;
+      reviewer: string;
+      addedIds?: string[];
+      replacedIds?: string[];
+      provenance: string[];
+      note: string;
+    }>;
   };
   reviewContract: {
     everyShippingFileReviewedInModes: string[];
@@ -342,8 +351,13 @@ describe('item-art consistency accepted-art provenance', () => {
         // review entry, counts and passIds set from the merged catalog at 913
         // files, the Masterwrought 84 plus the release's six) and re-minted by
         // item_art_audit.mjs --refresh-verdict; this seal follows those bytes.
-        acceptedSha256: '85b9d26a7f0c17a7c4685e48e8926faea9b2a754de0fb89814541bd3289fd6f3',
-        acceptedBytes: 123_284,
+        // Merged again at the v0.41.0 release-batch sync (base d3f8bae369):
+        // the release's seven painted bank bags join the chain (920 files);
+        // the verdict was hand-merged the same way, re-minted by
+        // item_art_audit.mjs --refresh-verdict over the merged tree, and this
+        // seal follows those bytes.
+        acceptedSha256: 'd7b32b55fa63c13318c0e51c541f241a974c7ae076bc35e98ed640bd7ebeb495',
+        acceptedBytes: 124_757,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -451,22 +465,23 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final 817-item visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the final item-art visual audit, Heroic accounting, and evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    // See the sourceEvidence seal above: release-side bytes until the merged
-    // verdict is re-minted.
-    expect(verdictBytes.length).toBe(123_284);
+    // See the sourceEvidence seal above: the hand-merged, re-minted verdict
+    // bytes at the v0.41.0 release-batch sync.
+    expect(verdictBytes.length).toBe(124_757);
     expect(sha256(verdictBytes)).toBe(
-      '85b9d26a7f0c17a7c4685e48e8926faea9b2a754de0fb89814541bd3289fd6f3',
+      'd7b32b55fa63c13318c0e51c541f241a974c7ae076bc35e98ed640bd7ebeb495',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
     expect(verdict.schemaVersion).toBe(1);
+    expect(verdict.generatedAt).toBe('2026-08-26T05:07:29.368Z');
     expect(verdict.auditScope).toMatchObject({
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
@@ -474,9 +489,11 @@ describe('item-art consistency accepted-art provenance', () => {
       // 907 / 922 on the Masterwrought branch, 829 / 844 on release v0.41.0;
       // 913 / 928 at the merge (the release's six art-shipping ids join both
       // terms), measured as the committed .webp count under public/ui/items
-      // and as live ITEMS minus ITEM_ART_PENDING.
-      itemArtFilesReviewed: 913,
-      liveItemDefinitions: 928,
+      // and as live ITEMS minus ITEM_ART_PENDING. 920 / 935 at the v0.41.0
+      // release-batch sync: the release's seven painted bank bags join both
+      // terms.
+      itemArtFilesReviewed: 920,
+      liveItemDefinitions: 935,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -486,7 +503,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      913,
+      920,
     );
     // 23 -> 24 at Masterwrought phase 10: the three apex flasks are a new item
     // kind, and the audit groups by kind, so they form their own census group
@@ -494,6 +511,25 @@ describe('item-art consistency accepted-art provenance', () => {
     // 24 -> 25 at Masterwrought phase 11: the 28 apex recipe patterns are the
     // first kind:'recipe' items, forming their own census group and page.
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
+    expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
+      reviewedAt: '2026-08-26',
+      branch: 'feature/bank-storage-pr',
+      reviewer: 'implementation agent',
+      replacedIds: [
+        'burlap_reagent_pouch',
+        'duskweave_bag',
+        'foragers_haversack',
+        'loombound_reagent_satchel',
+        'necromancers_reagent_satchel',
+        'resonant_weave_bag',
+        'wayfarers_backpack',
+      ],
+      provenance: [
+        'docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json',
+        'public/ui/items/mapping.json',
+      ],
+      note: 'Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged.',
+    });
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
@@ -536,13 +572,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 913,
+      passCount: 920,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 913 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review.',
+        'All 920 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -587,10 +623,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // catalog byte count, and the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      // Release-side catalog seal at the v0.41.0 sync (see the verdict seal
-      // above): follows the re-minted verdict's evidence.catalog.
-      sha256: '3a42131ecf9206a42ba0254fab7ce31b46f58368ec617828b3357eaf2ac7a6c4',
-      bytes: 501_076,
+      // Measured by the --refresh-verdict re-mint over the merged tree at the
+      // v0.41.0 release-batch sync (the release did not touch the audit lib,
+      // so the lib fingerprint below is the Masterwrought arm's).
+      sha256: '76eb2929f401f7a91422face6e0bc360348c2a3d22cd88dcbda0b11ac67c6755',
+      bytes: 504_725,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
@@ -646,8 +683,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // the 232 contact sheets reproduced byte-for-byte, so the set digest held;
     // the per-sheet consistency arm below keeps it honest either way.
     expect(verdict.evidence.sheetSetSha256).toBe(
-      // Release-side set digest at the v0.41.0 sync; follows the re-mint.
-      '5d5a419a2dab518fee96683084742fdf17823380360a81beb32c78b1500d3054',
+      // Re-rendered by the --refresh-verdict re-mint over the merged tree at
+      // the v0.41.0 release-batch sync: the seven repainted bags move their
+      // sheets, so the set digest follows the fresh 232-sheet render.
+      'd7cce4b5c4160d7fc8a73aa0fcac6e536c991562b84f886956714b0ee0361177',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -657,7 +696,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '92e3a2f714540c3036afc85fedc0386158d4a69a5b9bf35abe6978749444289d',
+      '54ed87722fd4f1c6f6cd81d4982a4a7f7124f4f8e60d6984460579f8ff6fb608',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -786,8 +825,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // 16 -> 18 on the Masterwrought branch (masterwrought-phase06-inscription
     // and masterwrought-phase09-art), 16 -> 18 on release v0.41.0 (the two
     // Proving Shore batches), 20 at the merge: both pairs kept, ours first
-    // in authored order.
-    expect(mapping.generatedBatches).toHaveLength(20);
+    // in authored order. 21 at the v0.41.0 release-batch sync: the
+    // release's bank-storage-painted-bags-2026-08-25 batch joins the chain.
+    expect(mapping.generatedBatches).toHaveLength(21);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -809,15 +849,18 @@ describe('item-art consistency accepted-art provenance', () => {
     // ten per-item entries left in the same change).
     // 525 -> 531 at the release/v0.41.0 sync: the release's two Proving Shore
     // batches carry three ids each (509 to 515 on the release's own arm).
-    expect(oldGeneratedIds).toHaveLength(531);
+    // 531 -> 538 at the v0.41.0 release-batch sync: the seven painted bank
+    // bags land as one generatedBatches row.
+    expect(oldGeneratedIds).toHaveLength(538);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // 907 on the Masterwrought branch, 829 on release v0.41.0, 913 at the
-    // merge (the release's six batch-owned ids).
-    expect(allCurrentOwnerIds).toHaveLength(913);
-    expect(new Set(allCurrentOwnerIds).size).toBe(913);
+    // merge (the release's six batch-owned ids), 920 at the v0.41.0
+    // release-batch sync (the seven painted bank bags).
+    expect(allCurrentOwnerIds).toHaveLength(920);
+    expect(new Set(allCurrentOwnerIds).size).toBe(920);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -939,7 +982,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
   }, 30_000);
 
-  it('keeps the full 817-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
+  it('keeps the full shipping icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
@@ -953,8 +996,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 913) violations.push(`mapping owner count: ${ownerIds.length} != 913`);
-    if (fileIds.length !== 913) violations.push(`shipping WebP count: ${fileIds.length} != 913`);
+    if (ownerIds.length !== 920) violations.push(`mapping owner count: ${ownerIds.length} != 920`);
+    if (fileIds.length !== 920) violations.push(`shipping WebP count: ${fileIds.length} != 920`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

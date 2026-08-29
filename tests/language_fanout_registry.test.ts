@@ -263,9 +263,20 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bank_window.ts',
-    memos: ['lastRenderedGuildView', 'lastRenderedTab', 'lastSig'],
+    // RE-POINTED at Bank Storage phase 18, and the two that left are worth the
+    // sentence. lastRenderedTab and lastRenderedGuildView are still FIELDS here
+    // and still scope the scroll restore, but this module no longer COMPARES
+    // them: the comparison moved into src/ui/bank_chrome_layout_core.ts, which
+    // the sweep does not reach (it declares no memo of its own and emits no
+    // text). By this file's own rule a memo is a repaint gate only where it is
+    // compared, so they correctly leave the classification. Nothing about the
+    // language answer moves with them, because the row's own reasoning already
+    // called them text-INDEPENDENT: they gate a scroll offset, never a string.
+    // The full gate is what noticed; no targeted suite, source pin or mutation
+    // battery in the phase could see it.
+    memos: ['lastSig'],
     answer: 'this.bankWindow.render',
-    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended), plus lastRenderedTab and lastRenderedGuildView, two text-independent pane latches that only scope the scroll restore. render() carries no self-gate, so the arm rebuilds',
+    why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended). render() carries no self-gate, so the arm rebuilds',
   },
   {
     file: 'calendar_window.ts',
@@ -686,7 +697,19 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
 
   it('pins each classification to the memo fields it was made about', () => {
     const drift: string[] = [];
-    for (const row of ANSWERED) {
+    // BOTH classifications, which is the whole point of the row type's contract
+    // above: an exemption is granted about SPECIFIC fields. Running this over
+    // ANSWERED alone left the cheaper classification unchecked, so an EXEMPT
+    // module could grow a real data signature and inherit an exemption argued
+    // about two write-elision memos, with no red anywhere. Found in Bank Storage
+    // phase 15 QA, where daily_rewards_window.ts had grown exactly that.
+    // 'coordinator' is hud.ts's deliberate opt-out and is skipped by name.
+    const classified: ReadonlyArray<{ file: string; memos: readonly string[] | 'coordinator' }> = [
+      ...ANSWERED,
+      ...NOT_A_LANGUAGE_GATE,
+    ];
+    for (const row of classified) {
+      if (row.memos === 'coordinator') continue;
       const found = discoveredByFile.get(row.file);
       if (!found) continue; // reported by the stale-row test above
       if (found.memos.join(',') !== [...row.memos].sort().join(',')) {

@@ -4089,6 +4089,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!",
   'itemUi.kind.bag': 'Çanta',
   'itemUi.tooltip.bagSlots': '{slots} Yuvalı Çanta',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots} Yuvalı Malzeme Çantası',
   'questUi.tracker.hideFromMap': '{name} görevini haritadan gizle',
   'questUi.tracker.showOnMap': '{name} görevini haritada göster',
   'sim.delve.baptistryEggs':

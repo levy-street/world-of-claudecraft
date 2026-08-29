@@ -22,7 +22,7 @@
 // success is silent + callerLogs, so the sunder log line below owns both
 // halves of the grant feedback (#2458).
 
-import { bagCapacity, bagsFullError, fitsAll } from '../bags';
+import { bagPools, bagsFullError, fitsAll } from '../bags';
 import { ITEMS } from '../data';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { itemFromRaid } from '../item_level';
@@ -78,7 +78,7 @@ function sunderAdmitted(
     }
   }
   const adds: InvSlot[] = [{ itemId: SUNDERED_ESSENCE_ITEM_ID, count: SUNDERED_ESSENCE_YIELD }];
-  if (!fitsAll(scratch, bagCapacity(meta.bags), adds)) {
+  if (!fitsAll(scratch, bagPools(meta.bags), adds)) {
     bagsFullError(ctx, meta.entityId);
     return false;
   }

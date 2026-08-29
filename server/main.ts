@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
+import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
 import {
@@ -98,8 +99,10 @@ import {
   warmUsernameBanlist,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { createBackgroundDbGate } from './background_db_gate';
 import { computeBankBonus } from './bank_entitlements';
-import { bankLedgerIdle } from './bank_ledger';
+import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle, bankLedgerTailStats } from './bank_ledger';
+import { createBankLedgerGrowthMonitor } from './bank_ledger_growth_monitor';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
   BUG_DESCRIPTION_MAX,
@@ -108,6 +111,15 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import {
+  characterDeleteGateStats,
+  configureCharacterDeleteBackgroundGate,
+} from './character_delete_db';
+import {
+  characterDeleteClientGone,
+  characterDeleteHttpRefusal,
+  characterDeleteRequestSignal,
+} from './character_delete_http';
 import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
@@ -126,6 +138,7 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
+import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
@@ -151,6 +164,7 @@ import {
   createAccount,
   createCharacterCapped,
   createCompanionToken,
+  DB_POOL_MAX_CLIENTS,
   deedsBoardRanked,
   deleteCharacter,
   ensureSchema,
@@ -197,6 +211,7 @@ import {
   touchLogin,
   walletForAccount,
 } from './db';
+import { closeBackendCancelPool, getBackendCancelCounts } from './db_backend_cancel';
 import { configureDeedsRuntime } from './deeds';
 import {
   buildDeedsBoardEntries,
@@ -245,6 +260,7 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
+import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
@@ -297,6 +313,7 @@ import {
   readArenaLeaderboard,
   readProjectStats,
 } from './leaderboard';
+import { findLiveSessionForCharacter, resolveLiveCharacterFrom } from './live_character_resolver';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -377,6 +394,24 @@ import {
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
+import {
+  beginStoragePurchase,
+  claimStoragePurchaseSpend,
+  deletePendingStoragePurchaseWithoutDebit,
+  openStoragePurchaseForCharacter,
+  pendingStoragePurchasesForCharacter,
+  releaseStoragePurchaseSpendClaim,
+  renewStoragePurchaseSpendClaim,
+  settleStoragePurchase,
+  storagePurchaseByKey,
+} from './storage_purchase_db';
+import {
+  configureStoragePurchaseRuntime,
+  executeStoragePurchase,
+  type StoragePurchaseHost,
+  stopStoragePurchaseRecovery,
+  storagePurchaseRecoveryMetrics,
+} from './storage_purchases';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
@@ -532,12 +567,21 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // WITHOUT running startServer(), so their first request constructs the world
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
+const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS);
+// Paid guild creation's pool checkouts (the atomic create and its receipt
+// reconciliation) ride the SAME major-producer gate: game.ts builds the deps,
+// so the composition root registers the acquirer here (one gate instance).
+configurePaidGuildCreateBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal));
+// The character-delete cascade (a 65s wall over the two keep-forever ledger
+// tables) composes under the same realm background gate, so concurrent deletes
+// of ledger-heavy characters can never hold most of the pool at once.
+configureCharacterDeleteBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal));
 function liveGame(): GameServer {
   // LISTEN uses its own dedicated connection and quota consumes use their own
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
   // no pg waiters and leaves every shared-pool client to auth/save work. The
   // constructor default keeps DB-mocked unit worlds independent from config.
-  gameInstance ??= new GameServer();
+  gameInstance ??= new GameServer(undefined, majorBackgroundDbGate);
   return gameInstance;
 }
 
@@ -2057,7 +2101,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           code: 'character.delete_confirm',
         });
       }
-      const ok = await deleteCharacter(accountId, characterId);
+      let ok: boolean;
+      try {
+        ok = await deleteCharacter(accountId, characterId, characterDeleteRequestSignal(res));
+      } catch (error) {
+        // The requester vanished mid-wait: the socket is closed, write nothing
+        // (the delete never began; a booked 503 would misread as saturation).
+        if (characterDeleteClientGone(error)) return;
+        const refusal = characterDeleteHttpRefusal(error);
+        if (refusal === null) throw error;
+        return json(res, refusal.status, refusal.body);
+      }
       if (ok) {
         // The SAME world-state purge the migrated deleteHandler runs (R43), through
         // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.
@@ -2899,6 +2953,15 @@ const wocAuthGuardCache = configureWocAuthGuardCache({
 // constructed here, not inside the custody factory, so its stats can ride the
 // ops readout below alongside the counters it complements.
 const wocEscrowGate = createWocEscrowGate();
+// How long an escrow job may wait for its major-background permit INSIDE its
+// character save-FIFO slot. Sized 3x the custody waiter deadline
+// (ESCROW_QUEUE_WAIT_MS, 5s): a permit that arrives while the HTTP caller is
+// still waiting is never self-refused, and past the caller's deadline the job
+// is already cancelled, so this bound only caps how long a settled request's
+// background chain can occupy the FIFO slot and its escrow-gate hold (far
+// under the gate's 400s leak-reclaim ceiling, which was the old effective
+// bound).
+const WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS = 15_000;
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
@@ -2917,9 +2980,37 @@ const wocMarketService = new WocMarketService({
       wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
       persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
-        liveGame().enqueueCharacterWrite(characterId, job),
+        liveGame().enqueueCharacterWrite(characterId, async () => {
+          // BOUNDED gate wait, and the job NEVER runs without a permit. This
+          // closure runs inside the character's save-FIFO slot while the
+          // custody caller also holds a realm escrow-gate slot, so an
+          // unbounded acquire() here would pin both until the 400s leak
+          // reclaim; four such waits close the realm's listing path. The
+          // custody waiter's 5s deadline (ESCROW_QUEUE_WAIT_MS) has already
+          // refused 'contended' and cancelled the job by the time this bound
+          // can fire (started is only set after the permit grants), so a null
+          // permit loses no work: the throw terminates the settled caller's
+          // background chain and frees the FIFO slot and gate hold.
+          const permit = await majorBackgroundDbGate.acquire(
+            AbortSignal.timeout(WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS),
+          );
+          if (!permit) {
+            // Counted: a saturated background gate refusing escrow work was
+            // otherwise invisible next to its counted refusal siblings.
+            gameMetricsCounters().wocEscrowQueue('permit_refused');
+            throw new Error('woc escrow refused: no background database permit');
+          }
+          try {
+            return await job();
+          } finally {
+            permit.release();
+          }
+        }),
       serializeCharacterForPersist: (characterId) =>
         liveGame().serializeCharacterForPersist(characterId),
+      acknowledgeCharacterSaveEffects: (save) => liveGame().acknowledgeCharacterSaveEffects(save),
+      hasCharacterOnlySaveConflict: (characterId) =>
+        liveGame().hasCharacterOnlySaveConflict(characterId),
       hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
@@ -3007,6 +3098,11 @@ configureInternalWocMarketStuckRead(async () => ({
   // the join-veto refetch counter; a bust storm or eviction thrash here is
   // DB pressure returning to the guards.
   authGuard: wocAuthGuardCacheStats(),
+  // Shared named-producer admission and bounded paid-storage recovery. These
+  // are scrape-visible too, but colocating them with the custody readout makes
+  // a pool-pressure incident diagnosable from the existing secret ops page.
+  backgroundDbGate: majorBackgroundDbGate.stats(),
+  storageRecovery: storagePurchaseRecoveryMetrics(),
   // The price cache's memo ages (null on the dev economy, which has no
   // cache): a stale-served or blanked price during a brownout is a NUMBER
   // here, not an invisible state the module never logs.
@@ -3126,11 +3222,70 @@ configureDiscordRuntime({
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
 });
 
+// The live-game host behind the Claudium storage purchase flow (Bank
+// Storage phase 11; server/storage_purchases.ts owns the ordering). Built
+// per call off liveGame() so every read is against the current session
+// table; only PUBLIC GameServer surface is touched (clients, sim.ctx,
+// saveCharacter), so this stays a closure bundle instead of new game.ts
+// methods.
+function storagePurchaseHost(): StoragePurchaseHost {
+  const game = liveGame();
+  return {
+    // The quarantined-counts-as-absent predicate and the ambiguity rule live
+    // in server/live_character_resolver.ts (unit-tested there); this closure
+    // only binds the live session table.
+    resolveLiveCharacter: (accountId) => resolveLiveCharacterFrom(game.clients.values(), accountId),
+    // O(1) sessionsByCharacterId lookup. Recovery may evict only nonactive
+    // work for a character this process no longer owns; the next login safely
+    // re-arms its provisional hold and scan.
+    isCharacterLive: (characterId) => game.hasSessionForCharacter(characterId),
+    setRecoveryAdmissionPending: (characterId, pending) =>
+      void game.storageRecoveryAdmission(characterId, pending),
+    recoveryAdmissionPending: (characterId) => game.storageRecoveryAdmission(characterId),
+    acquireBackgroundPermit: (signal) => majorBackgroundDbGate.acquire(signal),
+    grant: (pid, skuId, purchaseKey, dryRun) =>
+      bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
+    stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect),
+    // Same absence rule as the resolver above (the selection semantics are
+    // documented and unit-tested in server/live_character_resolver.ts).
+    saveCharacter: (characterId, shouldStart, signal) => {
+      const session = findLiveSessionForCharacter(game.clients.values(), characterId);
+      if (!session) return Promise.resolve(false);
+      return game.saveCharacter(session, { shouldStart, signal, backgroundDbPermit: true });
+    },
+    // The DETAILED variant: the flow needs the transport fact behind an
+    // ambiguous answer, which is what lets an outage press settle without
+    // reserving the character's ladder against a gold buy.
+    spend: claudiumSpendDetailed,
+    db: {
+      begin: (row, signal) => beginStoragePurchase(pool, row, signal),
+      byKey: (key, signal) => storagePurchaseByKey(pool, key, signal),
+      claimSpend: (key, token, signal) => claimStoragePurchaseSpend(pool, key, token, signal),
+      renewSpendClaim: (key, token, signal) =>
+        renewStoragePurchaseSpendClaim(pool, key, token, signal),
+      releaseSpendClaim: (key, token, signal) =>
+        releaseStoragePurchaseSpendClaim(pool, key, token, signal),
+      settle: (key, status, token, signal) =>
+        settleStoragePurchase(pool, key, status, token, signal),
+      discardWithoutDebit: (key, token, signal) =>
+        deletePendingStoragePurchaseWithoutDebit(pool, key, token, signal),
+      pendingFor: (characterId, signal) =>
+        pendingStoragePurchasesForCharacter(pool, characterId, signal),
+      openFor: (characterId, signal) => openStoragePurchaseForCharacter(pool, characterId, signal),
+    },
+    realm: REALM,
+    warn: (message) => console.warn(`[storage-purchase] ${message}`),
+  };
+}
+configureStoragePurchaseRuntime(storagePurchaseHost);
+
 // Claudium routes mirror weapon-skin purchases into account cosmetics live (the
-// same deferred liveGame() closure pattern as the Discord hooks above).
+// same deferred liveGame() closure pattern as the Discord hooks above). The
+// storage arm runs the whole phase 11 purchase flow against the live game.
 configureClaudiumRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
+  storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
@@ -3405,6 +3560,13 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
+  const bankLedgerGrowthMonitor = createBankLedgerGrowthMonitor({
+    pool,
+    // Metrics yield immediately under durability pressure. The next minute's
+    // point read catches up; observation_age_seconds makes sustained skips loud.
+    tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire(),
+    onError: (error) => console.error('bank ledger growth monitor failed:', error),
+  });
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {
@@ -3596,6 +3758,9 @@ export async function startServer(): Promise<http.Server> {
     simTickHz: () => game.simTickHz(),
     savePendingKeys: () => game.characterSaveQueues.pendingKeys(),
     escrowGateInFlight: () => wocEscrowGate.stats().inFlight,
+    backgroundDbGate: () => majorBackgroundDbGate.stats(),
+    characterDeleteGate: () => characterDeleteGateStats(),
+    storageRecovery: () => storagePurchaseRecoveryMetrics(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,
     // so a pg upgrade that drops one type-checks clean and would otherwise
@@ -3606,6 +3771,8 @@ export async function startServer(): Promise<http.Server> {
       idle: Number(pool.idleCount) || 0,
       waiting: Number(pool.waitingCount) || 0,
     }),
+    dbBackendCancels: () => getBackendCancelCounts(),
+    bankLedgerTail: () => bankLedgerTailStats(),
     generalChatQuotaInFlight: () => game.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => game.generalChatQuotaCachedAccounts(),
     generalChatQuotaDbPool: () => generalChatQuotaDbPoolState(),
@@ -3657,6 +3824,7 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
+  bankLedgerGrowthMonitor.start();
 
   // The CONCURRENTLY index builds run AFTER listen, deliberately. They
   // serialize across every realm process on the schema advisory lock, and a
@@ -3696,13 +3864,28 @@ export async function startServer(): Promise<http.Server> {
       await saveWorldState('retention_sweep:last_run', { day });
     },
     // bank_ledger is deliberately ABSENT from this table list: it is kept
-    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // FOREVER. It is the anti-dupe audit trail for every container, and the
     // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
     // conservation replays the WHOLE per-guild history (items in-vs-out across
     // officers, the treasury balance), so pruning any prefix would turn every
     // later legitimate withdraw into a false negative_net/negative_treasury
     // finding and erase the evidence trail a real dupe investigation needs.
-    // Growth is accepted: one row per successful op, insert-only. It carries
+    // The Materials Vault (container 'vault', Bank Storage Phase 2) joins the
+    // SAME posture rather than getting one of its own: same table, same
+    // never-delete rule, and the same conservation replay, which reads a
+    // character's whole vault history for exactly the reason the two containers
+    // above do. Its rows are per-character (container_id null), so they are
+    // served by bank_ledger_character and add nothing to the guild-only partial
+    // index below.
+    // Growth is bounded database-wide: one row per successful op, except the
+    // vault sweep (vault_deposit_all), which writes one row per distinct
+    // carried slot (crafted/signer identities separate), at most the 112-slot
+    // inventory.
+    // The bank_ledger_growth_budget trigger covers EVERY insert writer and
+    // enforces the configured hard ceiling (10,000,000 by default) in the same
+    // transaction; rolled-back inserts and idempotent retries consume zero.
+    // Reaching the ceiling is an operator-visible refusal, not an invitation to
+    // prune this anti-dupe history. The table carries
     // three append-only indexes (bank_ledger_character, bank_ledger_created,
     // and bank_ledger_container_recent), and as of the in-game guild bank
     // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
@@ -3925,7 +4108,9 @@ export async function startServer(): Promise<http.Server> {
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
+    await bankLedgerGrowthMonitor.stop();
     game.beginShutdown();
+    await stopStoragePurchaseRecovery();
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
@@ -3960,7 +4145,16 @@ export async function startServer(): Promise<http.Server> {
     // audit rows this way (a crash still can; the audit tolerates that as a
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
-    await bankLedgerIdle();
+    //
+    // Bounded like every other drain here: the tail is only as fast as the
+    // database, and one that accepts the connection and never answers would
+    // otherwise hold the process past the supervisor's kill grace, losing the
+    // character saves already flushed above to SIGKILL. Rows the deadline
+    // abandons leave the same transient hole a crash does. The deadline race
+    // lives inside bankLedgerIdle (the queue owns its drain policy, as
+    // stopUnstuckRecords below does); this call site only picks the budget.
+    const bankLedgerDrained = await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS);
+    if (!bankLedgerDrained) console.warn('bank ledger drain deadline reached');
     // Drain queued suspicion-flag writes for the same reason: a detector
     // confirmation or burst flag still on the FIFO tail would be rejected by
     // pool.end(). Rejections log inside the writer, so the drain never throws.
@@ -4000,6 +4194,7 @@ export async function startServer(): Promise<http.Server> {
     await game.parseCapture.stop();
     await game.chatLog.stop();
     await closeGeneralChatQuotaPool();
+    await closeBackendCancelPool();
     await pool.end();
     process.exit(0);
   };

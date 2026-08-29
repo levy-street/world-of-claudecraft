@@ -19,6 +19,7 @@ import {
 } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
+  BAG_RECIPES,
   COMBO_RECIPES,
   ENGINEERING_ONRAMP_RECIPES,
   FARM_DROP_RUNG_FLOOR,
@@ -532,6 +533,19 @@ describe('REFERENTIAL INTEGRITY', () => {
     }
   });
 
+  it('no recipe names the same material id in two reagent rows', () => {
+    // THE PREMISE HOLDER for the vault conservation sweep
+    // (tests/audit_conservation_vault.test.ts): its event-vs-journal multiset
+    // comparison relies on the journal's per-take rows and the aggregated
+    // per-id vaultCraftConsume event agreeing per craft, which holds only
+    // while no recipe's reagent list repeats a material id (a duplicated id
+    // would journal two rows where the event aggregates one).
+    for (const recipe of ALL_RECIPES) {
+      const ids = recipe.reagents.map((reagent) => reagent.itemId);
+      expect(new Set(ids).size, `${recipe.id} repeats a reagent id`).toBe(ids.length);
+    }
+  });
+
   it('every trainer recipe has a teachable home (station type, station, master NPC)', () => {
     let trainerRecipes = 0;
     for (const recipe of ALL_RECIPES) {
@@ -561,7 +575,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     // the two masterwrought Phase 11o engineering on-ramp rows, and the
     // farm-economy set's ON-RAMP: the
     // pre-training id list is frozen, so anything authored after that switch
-    // has to be learned.
+    // has to be learned. Phase 05 of the bank-storage packet added
+    // BAG_RECIPES, another trainer-acquired array (the crafted bag catalog,
+    // held outside LADDER_RECIPES because an epic result has no legal rung
+    // there), so it joins the sum on the same "authored after the switch, so
+    // it has to be learned" reasoning.
     //
     // THE FARM TERM IS DERIVED FROM THE RUNG, not from FARM_RECIPES.length and
     // not from the acquisition field (masterwrought Phase 11f): the set is
@@ -596,6 +614,7 @@ describe('REFERENTIAL INTEGRITY', () => {
         HOE_RECIPES.length +
         TROPHY_RECIPES.length +
         ENGINEERING_ONRAMP_RECIPES.length +
+        BAG_RECIPES.length +
         farmTrainerRows,
     );
     // The sibling literal for the 11o term: two rows, both trainer-taught.

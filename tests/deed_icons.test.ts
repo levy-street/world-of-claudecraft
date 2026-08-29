@@ -396,7 +396,13 @@ describe('Book of Deeds webp icons', () => {
     // Reliquary title-shelf rule does not force a committed crest): LIVE
     // 290 + 1 = 291, PAINTED unmoved at 278, PENDING 12 + 1 = 13, which is
     // also the 291 - 278 cross-check.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(291);
+    // Then the release/v0.41.0 merge (2026-08-29) appends the bank socket
+    // deed pair (Bank Storage phase 06: soc_strongbox_outfitter and
+    // soc_four_bags_deep), both riding DEED_ART_PENDING until their
+    // commissioned art lands: LIVE 291 + 2 = 293, PAINTED unmoved at 278,
+    // PENDING 13 + 2 = 15, which is also the 293 - 278 cross-check. Measured
+    // on the merged tree rather than nudged from either parent's prose.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(293);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

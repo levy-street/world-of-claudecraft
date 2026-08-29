@@ -3978,6 +3978,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} reser sig över Törntoppshöjderna!',
   'itemUi.kind.bag': 'Väska',
   'itemUi.tooltip.bagSlots': 'Väska med {slots} platser',
+  'itemUi.tooltip.bagSlotsMaterials': 'Materialväska med {slots} platser',
   'questUi.tracker.hideFromMap': 'Dölj {name} på kartan',
   'questUi.tracker.showOnMap': 'Visa {name} på kartan',
   'sim.delve.baptistryEggs': 'Baptisteriet tystnar. Spindeläggsäckar klänger våta längs kanten.',

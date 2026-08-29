@@ -4140,6 +4140,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} powstaje nad Wyżynami Ciernistego Szczytu!',
   'itemUi.kind.bag': 'Torba',
   'itemUi.tooltip.bagSlots': 'Torba z {slots} miejscami',
+  'itemUi.tooltip.bagSlotsMaterials': 'Torba na surowce z {slots} miejscami',
   'questUi.tracker.hideFromMap': 'Ukryj {name} na mapie',
   'questUi.tracker.showOnMap': 'Pokaż {name} na mapie',
   'sim.delve.baptistryEggs':

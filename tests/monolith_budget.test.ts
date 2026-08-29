@@ -333,6 +333,26 @@ const MONOLITHS: MonolithRow[] = [
     // measured on the merged working tree (wc -l < src/ui/hud.ts), neither
     // parent's literal. Exact merged count, zero slack: any further growth
     // reds again.
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record (the release row rode the
+    // bank-storage branch; its full ledger lives in git on that arm):
+    // Re-pinned at the fifth release/v0.41.0 sync (release tip ddc8988185,
+    // the gamepad empower-hold batch). The release arm lowered its own pin
+    // by 2 when the charge state and the XHB slot lookup moved to
+    // src/ui/empower_hold_core.ts; the bank-storage arm stays its +3 store
+    // and vault chrome. Exact count, zero slack.
+    // Re-pinned at the sixth release/v0.41.0 sync, now on the PR 3676 arm: the
+    // ground-aim branch had down-ratcheted its own row via the quickAimPoint
+    // and reticle-sync-closure extractions (one under the empower-hold base),
+    // and the release arm carries the bank-storage +3 above. Exact count,
+    // zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 18731, the release 19002. The release arm nets zero lines
+    // on this file over the span (its adds land against equal sheds), so the
+    // merged file measures exactly ours' pin (wc -l < src/ui/hud.ts). Exact
+    // merged count, zero slack: any further growth reds again.
     ceiling: 18731,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -621,7 +641,28 @@ const MONOLITHS: MonolithRow[] = [
     // merged working tree (wc -l < src/render/renderer.ts), neither parent's
     // literal. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 13357,
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // +1 for the entry horizon's scenery cull far at the live frame (one local
+    // the four reveal-gated painters share); the prewarm frame inlines it.
+    // Re-pinned at the v0.41.0 sync merge: the release arm's battleground
+    // compile-gate wiring (net +1 after its comment rewording) lands beside
+    // the branch's +1 above, so the merged file is 13331. Exact merged count,
+    // zero headroom.
+    // Re-pinned again after PR 3670 (bank storage) merged: its arm carried the
+    // exact release-side count 13328 (it never touches renderer.ts), while
+    // that branch's renderer edits still land the merged file at 13331.
+    // Re-pinned at the PR 3676 sync after PR 3645 (entry fade gate) merged:
+    // that arm's entry-horizon cull and the ground-aim reticle pass-through
+    // both land in the merged file. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 13357, the release 13333. Both arms grew the file over the
+    // base and the union composes (ours +30, the release +6), so the merged
+    // file measures 13363 (wc -l < src/render/renderer.ts). INHERITED growth
+    // on the release arm (the entry-horizon cull and the compile gate). Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 13363,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -736,7 +777,31 @@ const MONOLITHS: MonolithRow[] = [
     // professions/crafting.ts emitCraftResult (the fourth copy of that emit;
     // rule of three), paying for the host-fed dailyResetRemainingSec field,
     // its buildSimContext getter, and the import. Exact count, zero slack.
-    ceiling: 12324,
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // Lowered after CharacterState and PetState moved to the type-only
+    // character_state.ts leaf. Persistence callers keep the sim.ts re-export,
+    // while the coordinator no longer owns the JSONB schema declaration.
+    // LOWERED again at the PR #3670 review-fix round: the named-slot target
+    // fold moved to item_copy_ref.ts, paying for the bankWireRev field and its
+    // delegate plus the corrected vault-load comments. Exact count, zero slack.
+    // Raised +3 at the third-round fixes for craftVaultDrawBlockedFor, the
+    // cvault wire signature's gate-only probe: a one-line delegate to the
+    // materials_vault module (which owns the logic), the same thin-consumer
+    // shape as its craftVaultStockFor neighbor.
+    // Plus 4 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into combat/heroic_leap.ts). Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 12324, the release 12359. The release's character_state
+    // extraction lands on top of the packet's own extractions, so the merged
+    // file falls BELOW both parent pins and the ratchet follows it down:
+    // measured 12128 (wc -l < src/sim/sim.ts), never reconciled by
+    // arithmetic. Exact merged count, zero slack: any further growth reds
+    // again.
+    ceiling: 12128,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -882,7 +947,23 @@ const MONOLITHS: MonolithRow[] = [
     // measured on the merged working tree (wc -l < src/main.ts), neither
     // parent's literal. Exact merged count, zero slack: any further growth
     // reds again.
-    ceiling: 11593,
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // Re-pinned across the v0.41.0 sync merges after the first-spawn intro's
+    // seen-marker persistence moved out into src/game/spawn_intro_seen.ts
+    // (the establishing-shot entry wait needed one line here, and the ratchet
+    // pays for it by extraction).
+    // The empower-hold sync merge lowered the release row by 1 (the pad cast
+    // routing lives in src/game/pad_cast_routing.ts), and the PR 3676 sync's
+    // reticle-sync closure extraction paid 2 more under the entry-fade row.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 11593, the release 11623. Both arms shed lines over the
+    // base (ours -6, the release -6 via the extractions above), so the merged
+    // file falls BELOW both parent pins and the ratchet follows it down:
+    // measured 11587 (wc -l < src/main.ts). Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 11587,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -984,7 +1065,25 @@ const MONOLITHS: MonolithRow[] = [
     // feed block (utcDay/resetDay/eventLeadDay plus its rationale comment)
     // moved into server/sim_calendar_feed.ts, which also feeds the new
     // dailyResetRemainingSec countdown; the ceiling follows the file down.
-    ceiling: 10465,
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // LOWERED 10644 -> 10632 after the paid guild creation, bounded lazy-load,
+    // guild mutation, ledger-prefix, and activity-log delivery coordinators
+    // moved behind narrow sibling seams. Exact count, zero slack.
+    // LOWERED again at the PR #3670 review-fix round: the interest-candidate
+    // helpers moved to server/interest_candidates.ts and the sweep dueness
+    // logic landed in storage_purchases.ts, paying for the ledger breach-hook
+    // wiring and the event-relay filter. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 10465, the release 10617. The resolution keeps the
+    // packet's heavy_self and interest_policy extractions (the release's five
+    // new heavy-self members were relocated into server/heavy_self.ts, and
+    // its inline interest helpers gave way to the packet's module), so the
+    // merged file falls BELOW both parent pins and the ratchet follows it
+    // down: measured 10462 (wc -l < server/game.ts). Exact merged count, zero
+    // slack: any further growth reds again.
+    ceiling: 10462,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1044,7 +1143,28 @@ const MONOLITHS: MonolithRow[] = [
     // top of ours (5926 - 38), so the merged file measures 5888
     // (wc -l < src/net/online.ts), neither parent's literal; the ratchet follows
     // it down. Exact merged count, zero slack.
-    ceiling: 5888,
+    //
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
+    // base (5855) the bank-storage file is +66: the ClientWorld half of the
+    // new bank/vault IWorld members, thin wiring by design. The review round
+    // then LOWERED it from 5939 by folding the four self-key decode blocks
+    // into the bank_snapshot_wire sibling.
+    // Plus 5 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into the shared sim gate). Exact merged count, zero
+    // slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 5888, the release 5888 (the same literal over different
+    // files). Both arms grew the mirror by 71 lines over the base 5817 (the
+    // packet's masterwrought client surface; the release's bank/vault mirror
+    // plus the ground-aim preview) and the union composes exactly: the merged
+    // file measures 5959 (wc -l < src/net/online.ts). INHERITED growth on the
+    // release arm; the known both-arms compound. Payback stays Phase 16.
+    // Exact merged count, zero slack: any further growth reds again.
+    ceiling: 5959,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1095,7 +1215,26 @@ const MONOLITHS: MonolithRow[] = [
     // for the lease-fenced offline writer saveOfflineCharacterState that the
     // clear-item-name strip now rides (the reconnect-window closure). Exact
     // merged count, zero slack.
-    ceiling: 4877,
+    // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
+    // merge drops neither parent's record:
+    // Raised +29 at the third-round fixes. The substance went to siblings
+    // (db_backend_cancel.ts owns the dedicated cancel side pool;
+    // BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL lives with its schema in
+    // bank_ledger_batch_db.ts; the readback SQL moved beside its builder in
+    // bank_ledger_growth_budget.ts); what remains is coordinator wiring none
+    // of those can own. Lowered -1 at the fourth-round fixes: the notice
+    // filter moved to schema_notices.ts and the connection-budget arithmetic
+    // to db_connection_budget.ts. Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
+    // record: ours 4877, the release 4959. Both arms grew the file (the
+    // release's transactional save family and vault ledger wiring; the
+    // packet's fence-built statement and offline writer, which the resolution
+    // routes every save site through while keeping the release's transactional
+    // bodies), so the merged file measures 4999 (wc -l < server/db.ts).
+    // INHERITED growth on the release arm. Exact merged count, zero slack:
+    // the fix stays a domain module, never a raise.
+    ceiling: 4999,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -1140,16 +1279,27 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
-    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
-    // woc_market_ops.ts instead of growing this coordinator.
-    ceiling: 3924,
+    // Down 3929 -> 3924 on the release arm: the operator listing and p2p row
+    // vocabulary moved to woc_market_ops.ts instead of growing this
+    // coordinator.
+    // Re-pinned at the third release/v0.41.0 sync into the bank-storage branch:
+    // the merged file lands six lines under the release's own pin, so the
+    // ratchet follows it down. Measured on the merged tree. Exact count.
+    // Re-pinned at the fourth release/v0.41.0 sync (release tip 8592df3866,
+    // the operator-listing batch above): the merged file again lands below
+    // both parent pins and the ratchet follows it down. Measured on the
+    // merged tree. Exact count.
+    ceiling: 3918,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
     file: 'src/render/foliage.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
-    ceiling: 4121,
+    // Lowered after extracting the world trees' camera-occluder fade (the
+    // hideable records, the trunk hit test, the gated instance/ghost swap)
+    // into src/render/tree_hide_fade.ts.
+    ceiling: 3996,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -1193,8 +1343,152 @@ const MONOLITHS: MonolithRow[] = [
     // current count per the ratchet's rule; any further growth reds, and the
     // fix is extraction behind the seam named here.
     file: 'src/render/dungeon.ts',
-    ceiling: 2882,
+    // Lowered after extracting the arena-wall camera-occluder fade (footprint
+    // hit test plus the per-frame gated step) into src/render/arena_wall_fade.ts.
+    ceiling: 2804,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
+  },
+  {
+    // Newly tracked, on the QA gate's finding rather than on a size threshold.
+    // Bank Storage phase 12 added the Strongbox Charters category here and grew
+    // the file by about sixty percent in one change. The logic itself went to
+    // siblings the right way (the fit gate lives in the DOM-free
+    // src/ui/woc_store_view.ts, the idempotency-key lifecycle in the pure
+    // src/ui/store_purchase_intent.ts), but the painter half, the purchase flow
+    // and the copy mappers all landed in this coordinator, and the file had no
+    // row, so it was drifting unwatched exactly like dungeon.ts above.
+    //
+    // Phase 12 QA TOOK that first extraction: the copy mappers (charterName,
+    // charterGrantedText, charterRefusalText) and charterCardHtml moved to the
+    // DOM-free src/ui/charter_card_view.ts, which needs none of this window's
+    // private mutable state. The ceiling is LOWERED to the post-extraction
+    // count, so the headroom the move bought is banked rather than spent. The
+    // QA took the section markup with it (charterSectionHtml), so the whole
+    // charter PRESENTATION half now lives behind the seam and the coordinator
+    // keeps only the purchase flow and the state it owns. The next clean
+    // extraction is the armory's twin (armoryCardHtml, armoryClassChipsHtml,
+    // armorySectionHtml).
+    file: 'src/ui/daily_rewards_window.ts',
+    // LOWERED 1365 -> 1343 by Bank Storage phase 15, which took the extraction
+    // named above: the armory's twin (armorySectionHtml, armoryCardHtml,
+    // armoryClassChipsHtml) moved to the DOM-free src/ui/armory_card_view.ts,
+    // beside charter_card_view.ts. The move bought forty-three lines and the
+    // phase's own two review rounds SPENT twenty-one of them on the fixes those
+    // rounds found (the background-paint focus exemption, the second call site
+    // round two caught, and the comments for both), which is why the honest
+    // number was 1343 rather than the 1322 the first pass measured. Spending the
+    // room on the change that bought it is the point: it is what let two reviewed
+    // fixes land at a file with zero slack, with no raise.
+    //
+    // LOWERED AGAIN 1343 -> 1331 by Phase 15 QA, which paid for four more fixes
+    // with two more extractions rather than a raise: the focus decision and its
+    // DOM ladder to src/ui/store_focus_policy.ts (the background exemption and
+    // the degrade rule are unit-tested there now), and the charter fit memory
+    // (the server's refusals plus the last painted ladder count, which
+    // invalidate each other) to the pure src/ui/charter_fit_memory.ts.
+    // (That comment's own next target, the spin/wheel overlay, SHIPPED in Bank
+    // Storage phase 17; the current one is named at the end of this row.)
+    // LOWERED 1331 -> 1329 at the fifth release/v0.40.0 sync. The release moved
+    // the dollar formatting into src/ui/usd_text.ts and this file's three call
+    // sites became one-liners, so the merged file is two lines smaller than the
+    // branch pin. The ratchet only works if it tightens after an extraction,
+    // including one the other arm owns: the slack is banked, never spent.
+    //
+    // LOWERED 1329 -> 1306 by Bank Storage phase 17, in two goes. The spin/wheel
+    // overlay this comment names as the next target split into a pure core
+    // (src/ui/daily_rewards_spin_view.ts) and a thin painter
+    // (src/ui/daily_rewards_spin_controller.ts, named for the suffix the painter
+    // gate sweeps, so the cold contract this code held inside the window came
+    // with it), which paid for the store's error-body focus fix. Then the
+    // phase's review round spent that room and more, so the rank panels
+    // (leaderboard and payout history) followed to
+    // src/ui/daily_rewards_ranks_view.ts rather than the ceiling going up: a
+    // raise is a maintainer decision, and the fixes were paid for the way
+    // everything else in the phase was.
+    //
+    // LOWERED AGAIN 1306 -> 1281 in the same phase's fix-round review, which found
+    // the error-body reachability claim wrong and cost three lines to correct in
+    // a file with none. The wallet LOCK card followed to
+    // src/ui/daily_rewards_wallet_card_view.ts rather than the ceiling going up,
+    // and its ban arm (which must render nothing, because a banned player is told
+    // elsewhere and must not be invited to connect a wallet) got the arm it never
+    // had. Three extractions in one phase is what a zero-slack file costs when
+    // its review round is doing its job.
+    //
+    // The next clean extraction is the summary / tasks markup pair, the last of
+    // the rewards tab still built inside the window.
+    // LOWERED 1281 -> 1264 by the Store lifecycle extraction: ordered snapshot
+    // ownership and prompt invalidation moved to store_surface_runtime.ts, and
+    // the full guarded skin purchase flow moved to store_armory_purchase.ts.
+    // The new Store-owned modal itself lives in store_decision_prompt.ts, while
+    // the cold shell markup moved to daily_rewards_chrome_view.ts.
+    ceiling: 1264,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
+  },
+  {
+    // ADDED by Bank Storage phase 13, for the reason phase 12 QA added the
+    // daily_rewards_window row above: this file had no row, and a file with no
+    // row is exactly where unwatched growth accumulates. It carried the
+    // Materials Vault tab, the socket row and the capacity meter across this
+    // packet and then took the Claudium rung purchase, and "not in the ratchet"
+    // is an argument from the gate, not from the module-first rule.
+    //
+    // The phase's own logic did go to siblings correctly (the pure model in
+    // src/ui/bank_view.ts, the copy mappers and both pieces of markup in
+    // src/ui/bank_rung_view.ts, the spend seam in
+    // src/ui/claudium_purchase_bridge.ts, the intent ledger reused whole); what
+    // stayed is the flow and the state it owns, which is the right side of the
+    // line. Pinned at the exact count, zero slack: any further growth reds.
+    //
+    // (That target, the bonus-slots footer, SHIPPED in Bank Storage phase 17
+    // alongside ruling 30's controller; the current one is named at the end of
+    // this row.)
+    file: 'src/ui/bank_window.ts',
+    // LOWERED 2127 -> 2124 by Bank Storage phase 16. Making the rung ledger
+    // DURABLE needed a line in a file with zero slack, and the wiring paid for
+    // itself: the ledger factory moved behind src/ui/purchase_intent_durability.ts,
+    // which owns the key minter too, so this file's five-line store_purchase_intent
+    // import and its separate minter import collapse into two lines and the field
+    // initializer stays one line for one line. The ratchet's own rule, an
+    // extraction lowers the ceiling in the same change. Exact count, zero slack.
+    //
+    // LOWERED 2124 -> 1945 by Bank Storage phase 17, which took BOTH of this
+    // row's named targets. The bonus-slots footer this comment names went to the
+    // pure src/ui/bank_bonus_view.ts, and the rung purchase state machine
+    // (ruling 30, deferred by three phases because moving a live money path
+    // during a QA round ships a large unreviewed refactor behind small reviewed
+    // ones) went to src/ui/bank_rung_purchase_core.ts. The window keeps what
+    // needs the window: the modal confirm and its focus capture, the live-DOM
+    // busy write, the live-region announcement, the repaint, and the two markup
+    // builders that read purchase state at build time.
+    //
+    // The pin is the HONEST post-fix-round count, not the number the extractions
+    // first measured: the phase's own review round spent part of what they
+    // bought on the fixes it found, which is what the room was for, and pinning
+    // the pre-fix number would have been a raise wearing a ratchet's clothes.
+    //
+    // LOWERED 1945 -> 1941 by Bank Storage phase 18, on the same terms. Making
+    // the pane's scroll offset FOLLOW its scroller needed lines in a file with
+    // zero slack, and the meter's copy paid for them: its accessible name and
+    // its tooltip body are a pure function of the meter model and went to
+    // src/ui/bank_meter_view.ts, while the window kept the element, the tab
+    // stop, the custom properties and the tooltip ATTACH. Measured after the
+    // review round rather than after the extraction, the phase 17 rule.
+    //
+    // The next clean extraction is the remaining bag-socket row
+    // (buildSocketRow), whose cells are already a pure model in bank_view.ts.
+    // LOWERED 1941 -> 1928 after the socket prompt's consent/echo state and
+    // DOM feedback moved behind bank_socket_purchase_core/controller, with the
+    // family live-region mechanics shared through bank_status_line.ts.
+    // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
+    // feature/masterwrought (base d3f8bae369). This row arrives WITH the
+    // merge (the release minted it at 1928); the packet's phase 14 arm had
+    // already grown the file by 13 (the wornItemCellParts worn-compare
+    // wiring), authored before the row existed on this branch. Measured on
+    // the merged tree: 1941 (wc -l < src/ui/bank_window.ts). Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 1941,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
 ];
 

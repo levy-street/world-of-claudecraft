@@ -34,9 +34,13 @@
 // link, upload and touch pieces at the imminent priority so the decor the
 // camera stands in is what the driver links first. Every gate joins the
 // arrival-cover registry on creation, so a teleport's loading screen can wait
-// on exactly those holds before it lifts.
+// on exactly those holds before it lifts. Under the entry cover's ESTABLISHING
+// SHOT (arrival_cover.ts: the first-spawn cinematic's wide opening view) every
+// consult is imminent, since everything that view reveals is what the player
+// sees first; that too only reorders and extends the covered wait, it never
+// reveals early.
 
-import { registerRevealGateForArrival } from './arrival_cover';
+import { arrivalEstablishingShotActive, registerRevealGateForArrival } from './arrival_cover';
 import {
   gpuPrepNow,
   noteRevealImminentHold,
@@ -62,8 +66,10 @@ export const REVEAL_SOFT_DEADLINE_MIN_MS = 1_000;
 export interface RevealCompileHost {
   /** Compile one root's programs; resolves (or rejects) when settled.
    *  `imminent` is the consult's answer to "is the camera already among this
-   *  key's objects", and the host turns it into queue priority. */
-  compile(root: object, imminent: boolean): Promise<unknown>;
+   *  key's objects", and the host turns it into queue priority; a caller that
+   *  owns a stronger claim (the occluder-fade gate's edge frame) may name the
+   *  priority outright. */
+  compile(root: object, imminent: boolean, priority?: number): Promise<unknown>;
   /** Optional page-entry barrier. Roots and holds are registered immediately,
    * but cosmetic GPU work and both timeout clocks begin only after it settles. */
   startAfterInitialPaint?: () => Promise<void> | null | undefined;
@@ -144,7 +150,9 @@ export function createRevealGate(
         let settled = false;
         let cancelSoftDeadline: () => void = noCancel;
         const cancelWatchdog = schedule(() => {
-          if (settled) return;
+          // A key another owner settled meanwhile (the occluder-fade gate's
+          // escalation) is warm: nothing to reveal, nothing to report.
+          if (settled || gate.state(key) === 'warm') return;
           settled = true;
           cancelSoftDeadline();
           console.warn(`Reveal gate watchdog revealed ${key} before its compiles settled`);
@@ -202,7 +210,11 @@ export function createRevealGate(
     },
     { onImminentHold: noteRevealImminentHold },
   );
+  const allow = gate.allow;
   const revealGate = Object.assign(gate, {
+    allow(key: string, imminent?: boolean): boolean {
+      return allow(key, imminent === true || arrivalEstablishingShotActive());
+    },
     noteRootRevealed(_key: string): void {
       noteRevealRootPiecewise();
     },

@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "66b21937",
+      "state": "1b0c322d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,7 +43,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -86,6 +93,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -147,7 +157,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1004,
-      "state": "80687e12",
+      "state": "82628ad6",
       "events": "1b2a018d",
       "rng": {
         "draws": 0,
@@ -167,7 +177,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -211,6 +228,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -315,7 +335,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1004,
-      "state": "10254781",
+      "state": "d0197eb3",
       "events": "1354399e",
       "rng": {
         "draws": 0,
@@ -335,7 +355,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -379,6 +406,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -497,7 +527,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1004,
-      "state": "6e760450",
+      "state": "8d06d168",
       "events": "4051110c",
       "rng": {
         "draws": 0,
@@ -508,7 +538,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1004,
-      "state": "26eb96c8",
+      "state": "e644e770",
       "events": "0d48fb2a",
       "rng": {
         "draws": 0,
@@ -519,7 +549,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1005,
-      "state": "49be4dee",
+      "state": "2c57af5a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -539,7 +569,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -601,6 +638,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -781,7 +821,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1005,
-      "state": "3617152a",
+      "state": "5eec5e96",
       "events": "e8441381",
       "rng": {
         "draws": 0,
@@ -801,7 +841,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -863,6 +910,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -980,7 +1030,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "2717cd85",
+      "state": "36011fb3",
       "events": "5dbe2ecf",
       "rng": {
         "draws": 0,
@@ -1000,7 +1050,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -1062,6 +1119,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1222,7 +1282,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "c9bc366c",
+      "state": "330e4c54",
       "events": "10e7f5fb",
       "rng": {
         "draws": 0,
@@ -1242,7 +1302,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -1304,6 +1371,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1464,7 +1534,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "3617152a",
+      "state": "5eec5e96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1484,7 +1554,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -1546,6 +1623,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1663,7 +1743,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1008,
-      "state": "3617152a",
+      "state": "5eec5e96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1683,7 +1763,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -1745,6 +1832,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1862,7 +1952,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1010,
-      "state": "1a2fa933",
+      "state": "13fc3dcb",
       "events": "0a8cb83b",
       "rng": {
         "draws": 0,
@@ -1882,7 +1972,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -1944,6 +2041,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -1957,7 +2057,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -2006,6 +2113,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -2221,7 +2331,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1010,
-      "state": "bca7a4fd",
+      "state": "089459d5",
       "events": "ce355bbc",
       "rng": {
         "draws": 151,
@@ -2232,7 +2342,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "1f594858",
+      "state": "a684c144",
       "events": "7c23d920",
       "rng": {
         "draws": 286,
@@ -2243,7 +2353,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "1f594858",
+      "state": "a684c144",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2263,7 +2373,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -2325,6 +2442,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -2338,7 +2458,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -2402,6 +2529,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -2621,7 +2751,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1012,
-      "state": "c2cddd5e",
+      "state": "6f78b19a",
       "events": "089025ba",
       "rng": {
         "draws": 286,
@@ -2641,7 +2771,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -2703,6 +2840,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -2716,7 +2856,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -2780,6 +2927,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -3000,7 +3150,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1014,
-      "state": "bcee1ddb",
+      "state": "5484f423",
       "events": "73b0b542",
       "rng": {
         "draws": 286,
@@ -3020,7 +3170,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -3082,6 +3239,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -3095,7 +3255,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -3159,6 +3326,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -3386,7 +3556,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1014,
-      "state": "bcee1ddb",
+      "state": "5484f423",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3406,7 +3576,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -3468,6 +3645,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         },
         {
@@ -3481,7 +3661,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
@@ -3545,6 +3732,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

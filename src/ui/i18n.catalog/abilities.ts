@@ -2466,7 +2466,7 @@ const classAbilityNamesEn = {
       [
         'multi_shot',
         'Splitshot',
-        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
       ],
       [
         'prayer_of_healing',

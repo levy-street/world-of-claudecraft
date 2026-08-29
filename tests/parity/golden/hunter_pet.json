@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "66b21937",
+      "state": "1b0c322d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,7 +35,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -78,6 +85,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -139,7 +149,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1005,
-      "state": "d11aca12",
+      "state": "ce2fb026",
       "events": "07ef4b42",
       "rng": {
         "draws": 10,
@@ -150,7 +160,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1005,
-      "state": "f9e5ed0d",
+      "state": "a05a1a7f",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -161,7 +171,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1005,
-      "state": "18c19d19",
+      "state": "eaf08d4b",
       "events": "fbdce57a",
       "rng": {
         "draws": 174,
@@ -172,7 +182,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1005,
-      "state": "c7b846da",
+      "state": "480bd076",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -183,7 +193,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1005,
-      "state": "e9e66769",
+      "state": "a1bd9607",
       "events": "25e65c32",
       "rng": {
         "draws": 533,
@@ -194,7 +204,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1005,
-      "state": "75b47886",
+      "state": "839beafe",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -205,7 +215,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1005,
-      "state": "75b47886",
+      "state": "839beafe",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -225,7 +235,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -292,6 +309,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

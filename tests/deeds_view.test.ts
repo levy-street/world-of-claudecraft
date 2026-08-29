@@ -872,10 +872,15 @@ describe('real catalog integration', () => {
     // promotion capstone: another visible non-feat PROGRESSION deed, so it
     // joins both counts too; 291 - 4 - 9 = 278, and the bucket sum adds the
     // 4 feat rows back = 282.
-    expect(view.summary.visibleTotal).toBe(278);
+    // 280 since the 2026-08-29 release/v0.41.0 merge brought in the bank
+    // socket ladder pair (Bank Storage phase 06: soc_strongbox_outfitter and
+    // soc_four_bags_deep), both visible non-feat SOCIAL deeds, so they join
+    // both counts; 293 - 4 - 9 = 280, and the bucket sum adds the 4 feat
+    // rows back = 284, recomputed against the merged catalog.
+    expect(view.summary.visibleTotal).toBe(280);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(282);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(284);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

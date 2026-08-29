@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "d55c40e8",
+      "state": "0069a3cc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,7 +35,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -79,6 +86,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],
@@ -148,7 +158,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1003,
-      "state": "77aa1e4f",
+      "state": "18503c79",
       "events": "36586a9c",
       "rng": {
         "draws": 12,
@@ -159,7 +169,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1003,
-      "state": "e6a85f8a",
+      "state": "41f113c6",
       "events": "b57508a6",
       "rng": {
         "draws": 19,
@@ -170,7 +180,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1003,
-      "state": "5c71b961",
+      "state": "ec5be04f",
       "events": "3e0353f1",
       "rng": {
         "draws": 162,
@@ -181,7 +191,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 1003,
-      "state": "ece66d75",
+      "state": "31119e13",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -201,7 +211,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -270,6 +287,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "wyrmfallDaily": {}
         }
       ],

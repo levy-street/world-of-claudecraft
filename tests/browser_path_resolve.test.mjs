@@ -34,6 +34,23 @@ describe('browser path resolver', () => {
     expect(findBrowserPath(playwrightBrowserCandidates({ homeDir: home }))).toBe(chrome);
   });
 
+  it('discovers current Playwright chrome-linux64 layouts', () => {
+    const home = tempHome();
+    const chrome = path.join(
+      home,
+      '.cache',
+      'ms-playwright',
+      'chromium-1228',
+      'chrome-linux64',
+      'chrome',
+    );
+    fs.mkdirSync(path.dirname(chrome), { recursive: true });
+    fs.writeFileSync(chrome, '');
+
+    expect(playwrightBrowserCandidates({ homeDir: home })).toContain(chrome);
+    expect(findBrowserPath(playwrightBrowserCandidates({ homeDir: home }))).toBe(chrome);
+  });
+
   it('keeps returning null when no candidate exists', () => {
     const home = tempHome();
 

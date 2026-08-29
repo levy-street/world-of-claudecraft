@@ -636,7 +636,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // release art audit painted those additions, and the six Masterwrought
     // jewelcrafting and inscription milestone deeds (phases 05 and 06) each
     // shipped their crest in the change that added them. The only artless ids
-    // are the release's walk-in castle visit pair and the six farming
+    // are the release's walk-in castle visit pair, its bank socket pair (Bank
+    // Storage phase 06), and the six farming
     // celebration deeds appended after the audit, riding the category-crest
     // fallback the Icons authoring rule in docs/design/deeds.md sanctions
     // until their 512px sources are commissioned (flagged in
@@ -657,8 +658,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // commissioned art lands. 291 at masterwrought Phase 13, whose promotion
     // capstone (prog_legendmaker) joins the same pending side on the same
     // crest: no title, so the Reliquary title-shelf rule does not force a
-    // committed crest.
-    expect(DEED_ORDER).toHaveLength(291);
+    // committed crest. 293 at the v0.41.0 release-batch sync: the release's
+    // bank socket pair (Bank Storage phase 06, 274 to 276 on its own arm)
+    // joins the same pending side.
+    expect(DEED_ORDER).toHaveLength(293);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

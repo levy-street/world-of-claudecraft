@@ -62,8 +62,11 @@ describe('reveal gate wiring (source pins)', () => {
     const host = read('../src/render/reveal_compile_host.ts');
     expect(host).toContain("export const REVEAL_GATE_PREP_KIND = 'reveal-gate';");
     expect(host).toContain(
-      'const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;',
+      '(imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM)',
     );
+    // A caller may name the priority outright (the occluder-fade gate's edge
+    // frame); the mapping above is the default, never overridden silently.
+    expect(host).toContain('namedPriority ??');
     expect(host).toContain('label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}`');
     // The link is cut into one queue unit per material group of the root
     // (compile_gate_pieces.ts), each running the colour arm, the shadow arm,

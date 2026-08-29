@@ -565,6 +565,8 @@ export function buildGraphicsSections(
         // concern for touch players.
         boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'),
         boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'),
+        boolToggle(s, 'touchPreciseGroundAim', 'hudChrome.options.touchPreciseAim'),
+        note('hudChrome.options.touchPreciseAimNote'),
         boolToggle(s, 'touchTapMenus', 'hudChrome.options.touchTapMenus'),
         note('hudChrome.options.touchTapMenusNote'),
       ],
@@ -607,7 +609,7 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
 }
 
 // ---------------------------------------------------------------------------
-// Controller panel (cluster 5) -- the enable/invert toggles + the three sliders.
+// Controller panel (cluster 5), with toggles and analog sensitivity sliders.
 // The per-button remap rows are bespoke (a dropdown per pad button) and live in
 // the painter.
 // ---------------------------------------------------------------------------
@@ -626,6 +628,7 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
     boolToggle(s, 'gamepadInvertY', 'hudChrome.controller.invertY'),
     slider(s, 'gamepadStickDeadzone', 'hudChrome.controller.deadzone'),
     slider(s, 'gamepadCameraSpeed', 'hudChrome.controller.cameraSpeed', 'oneDecimal'),
+    slider(s, 'gamepadReticleSpeed', 'hudChrome.controller.reticleSpeed', 'oneDecimal'),
     slider(s, 'gamepadVibration', 'hudChrome.controller.vibration'),
   ];
 }

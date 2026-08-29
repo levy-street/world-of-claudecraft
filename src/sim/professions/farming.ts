@@ -82,7 +82,7 @@
 // carries plantedAtMs and readyAtMs, which is everything a client needs to
 // compute the stage itself.
 
-import { bagCapacity, countFit } from '../bags';
+import { bagPools, countFit } from '../bags';
 import {
   FARM_COMPOST_ITEM_ID,
   FARM_GROWTH_TONIC_ITEM_ID,
@@ -1105,7 +1105,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // meta.inventory the first grant already mutated: the fine grade must
     // see the slots the base grade consumed. Do not "clean this up" by
     // snapshotting the inventory.
-    const capacity = bagCapacity(meta.bags);
+    const capacity = bagPools(meta.bags);
     let signatureTruncated = false;
     const grantGolden = (itemId: string, qty: number): void => {
       if (qty <= 0) return;

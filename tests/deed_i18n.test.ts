@@ -77,7 +77,11 @@ describe('deed_i18n English resolution', () => {
     // 291 since masterwrought Phase 13 (2026-08-27) appended the promotion
     // capstone prog_legendmaker, which carries NO title reward (R3 gives the
     // prestige to the named item itself), so the title count stays at 45.
-    expect(manifest.length).toBe(291 * 2 + 45);
+    // 293 since the release/v0.41.0 merge (2026-08-29) brought in the bank
+    // socket ladder pair (Bank Storage phase 06: soc_strongbox_outfitter and
+    // soc_four_bags_deep, both reward-free), so the title count stays at 45.
+    // MEASURED on the merged tree (274 base + 17 packet + 2 release).
+    expect(manifest.length).toBe(293 * 2 + 45);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

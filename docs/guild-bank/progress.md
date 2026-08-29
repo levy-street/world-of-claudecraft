@@ -89,11 +89,11 @@ the guild, which is the social check the permission model rests on.
       `server/discord_status_cache.ts` to `cached_read.ts` (re-exported there,
       so every existing caller and test keeps its import path): it is a generic,
       and a guild bank module importing the Discord module for it would have
-      been the wrong seam. The bust lives in `recordGuildBankDeltas`, the ONE
-      guild row writer, fires only for VISIBLE ops, and fires TWICE: at the op,
-      and again once THAT CALL's own inserts settle (chained on those promises,
-      never the process-global FIFO tail, which on a slow database is minutes
-      long). It MARKS dirty rather than dropping: see the coalescing floor.
+      been the wrong seam. Superseding outbox hardening moved the bust to the
+      exact post-commit acknowledgment: only guild ids with VISIBLE ops in the
+      committed prefix are marked, never a staged or lease-fenced command. The
+      paid create-fee commit follows the same rule. It MARKS dirty rather than
+      dropping: see the coalescing floor.
 - [x] **Withheld.** `escrow_deficit` / `counterparty_orphan` never leave the
       server (filtered in SQL, allowlist re-stated client-side). No account id,
       realm, or instance payload is selected; character ids resolve to display
@@ -784,9 +784,11 @@ Phase 3 (2026-08-02):
   leader check; refuses while copper/items remain AND fails CLOSED on null (unloaded
   book = the oversized-skip state; the cascade must not destroy the row). On the
   committed DELETE, `onGuildDisbanded` evicts the book (`Sim.evictGuildBank`).
-- Ledger + audit: `diffGuildBankOp` (pure) + `recordGuildBankDeltas` in
-  `server/bank_ledger.ts`; gold ops record the TREASURY delta, buy_slots the negated
-  BEFORE table price, create_fee the founder's purse (excluded from treasury replay).
+- Ledger + audit: `diffGuildBankOp` (pure) + `buildGuildBankLedgerRows` in
+  `server/bank_ledger.ts`, staged through the bounded character outbox; gold ops record
+  the TREASURY delta, buy_slots the negated BEFORE table price, and create_fee the
+  founder's purse (excluded from treasury replay). Terminal anomaly evidence alone
+  uses the legacy asynchronous writer because its quarantined session cannot save.
   `scripts/bank_audit.mjs` groups guild rows per GUILD (anonymous pipe), replays the
   treasury to non-negative, shape-checks the new ops, reconciles against `guild_banks`
   books (disbanded guilds reconcile items+treasury against empty, purchased skipped),

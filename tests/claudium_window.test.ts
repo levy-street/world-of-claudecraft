@@ -727,3 +727,142 @@ describe('ClaudiumWindow refresh stability', () => {
     expect(root.liveStatus.textContent).toBe('');
   });
 });
+
+describe('a HANDOFF opens rather than toggles (Bank Storage phase 17)', () => {
+  // Phase 13 QA recorded this and left it because "hud.ts is at its exact ceiling
+  // and the honest fix adds lines": the insufficient-balance handoff routed
+  // through toggle(), so pressing "Buy Claudium" while this window was ALREADY
+  // open CLOSED it and fired the return callback against an unchanged balance,
+  // which is the opposite of what a top-up is for.
+  //
+  // The state was believed unreachable: toggle()'s own comment says deps
+  // closeOthers means the store and this window are never open together. Bank
+  // Storage phase 13's live rig MEASURED the opposite for the bank, because
+  // Hud.closeOtherWindows ignores its argument and the top-up window opens OVER a
+  // bank that stays open, from which the bank's own Buy Claudium is reachable.
+  function harness(): {
+    window: ClaudiumWindow;
+    root: FakeRoot;
+    snapshots: { count: number };
+    captures: { count: number };
+    closeOthers: { count: number };
+  } {
+    vi.stubGlobal('document', fakeDocument);
+    const root = new FakeRoot();
+    const snapshots = { count: 0 };
+    const captures = { count: 0 };
+    const closeOthers = { count: 0 };
+    const deps: ClaudiumWindowDeps = {
+      root: () => asHtml(root),
+      closeOthers: () => {
+        closeOthers.count++;
+      },
+      captureFocus: () => {
+        captures.count++;
+        return null;
+      },
+      restoreFocus: () => {},
+      snapshot: () => {
+        snapshots.count++;
+        return Promise.resolve(nativeSnapshot());
+      },
+      buy: () => Promise.resolve(),
+    };
+    return { window: new ClaudiumWindow(deps), root, snapshots, captures, closeOthers };
+  }
+
+  it('opens a CLOSED window, exactly as the toggle did', () => {
+    const h = harness();
+    expect(h.window.isOpen).toBe(false);
+    h.window.open();
+    expect(h.window.isOpen).toBe(true);
+  });
+
+  it('still RENDERS on the already-open arm, so the handoff is observable', async () => {
+    // Arming the callback and returning silently satisfies "the window stayed
+    // open" perfectly, and leaves a keyboard player who just accepted a top-up
+    // prompt standing in the surface they were handed FROM. The fresh-open path
+    // renders; this one must too, or the two arms disagree about what a handoff
+    // does.
+    // Observed on the SNAPSHOT fetch, which every render performs: the painted
+    // markup is identical between two handoffs by construction, so asserting on
+    // the body would pass for the wrong reason.
+    const h = harness();
+    h.window.open();
+    for (let i = 0; i < 8; i++) await Promise.resolve();
+    const afterFirst = h.snapshots.count;
+    // Exact, not a floor: a double render is a real shape (a double fetch, a
+    // double announce, a second focus grab) that a floor cannot see.
+    expect(afterFirst, 'the fresh-open path rendered ONCE').toBe(1);
+
+    // Park focus somewhere else first, so the landing below is a MOVE.
+    fakeDocument.activeElement = null;
+    h.window.open();
+    for (let i = 0; i < 8; i++) await Promise.resolve();
+    expect(h.snapshots.count, 'the already-open handoff rendered ONCE too').toBe(afterFirst + 1);
+    // The 'open' ARGUMENT, not merely a render: its only effect is the close
+    // button landing, so render() without it survives an arm that counts
+    // snapshots alone. (What the window CANNOT decide is whether the confirm
+    // dialog the player just accepted then takes focus back on its own deferred
+    // trap release; open()'s header states that residual.)
+    expect(fakeDocument.activeElement, 'focus landed on the close button').toBe(
+      h.root.querySelector('[data-close]'),
+    );
+    // ...and it did NOT re-capture an opener or displace anything, which the
+    // fresh-open path does and this one must not.
+    expect(h.captures.count, 'no second opener capture').toBe(1);
+    expect(h.closeOthers.count, 'nothing else was displaced again').toBe(1);
+  });
+
+  it('leaves an ALREADY-OPEN window open, which the toggle did not', () => {
+    // THE FIX. Driven against the real window rather than a restatement of it,
+    // because a stub that re-declares the rule proves only that the test can
+    // read its own code.
+    const h = harness();
+    h.window.open();
+    expect(h.window.isOpen).toBe(true);
+    h.window.open();
+    expect(h.window.isOpen, 'a second handoff must not close the window').toBe(true);
+    // The negative control: toggle() on the same state still closes, so the arm
+    // above is about open() and not about the window having become un-closable.
+    h.window.toggle();
+    expect(h.window.isOpen).toBe(false);
+  });
+
+  it('still arms exactly ONE return callback whichever state it found', () => {
+    // The half that would have made the fix its own bug: a handoff that opened
+    // nothing and armed nothing leaves the caller waiting for a repaint forever.
+    for (const preOpen of [false, true]) {
+      const h = harness();
+      if (preOpen) h.window.open();
+      let backs = 0;
+      h.window.open(() => {
+        backs++;
+      });
+      h.window.close();
+      expect(backs, `preOpen=${preOpen}`).toBe(1);
+      // Single-shot: the clear-before-fire means a second close fires nothing.
+      h.window.close();
+      expect(backs, `preOpen=${preOpen}, second close`).toBe(1);
+    }
+  });
+
+  it("a SECOND handoff replaces the first one's return, which is a recorded residual", () => {
+    // The arm above says "exactly ONE callback whichever state it found", and a
+    // reader can take that as covering two surfaces handing off in sequence. It
+    // does not, and the truth is the opposite: the already-open arm ASSIGNS
+    // closeReturn, so the earlier handoff's return is dropped and only the later
+    // caller is told the window closed. Recorded in state.md's phase 17 residuals
+    // and pinned HERE so it is a decision with an arm rather than a silence, and
+    // so whoever gives closeReturn a queue reds this and re-points it deliberately.
+    //
+    // It is bounded: both callers only repaint themselves, so the dropped one
+    // shows a stale balance until its own next paint. No money moves either way.
+    const h = harness();
+    const fired: string[] = [];
+    h.window.open(() => fired.push('bank'));
+    h.window.open(() => fired.push('store'));
+    h.window.close();
+    expect(fired, 'the later handoff wins; the earlier one is dropped').toEqual(['store']);
+  });
+});

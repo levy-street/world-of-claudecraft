@@ -1034,6 +1034,9 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['gravewyrm_stalkers_treads', fromBoss('grand_necromancer_velkhar')],
       ['deathlord_legguards', fromBoss('grand_necromancer_velkhar')],
       ['necromancers_soulsteps', fromBoss('grand_necromancer_velkhar')],
+      // The dungeon rung of the materials-satchel ladder (bank-storage):
+      // velkhar_bonus 0.2, Velkhar's table only, so one door is the truth.
+      ['necromancers_reagent_satchel', fromBoss('grand_necromancer_velkhar')],
       ['wyrmshadow_legguards', fromBoss('grand_necromancer_velkhar')],
       // Korzul final
       ['wyrmfang_greatblade', fromBoss('korzul_the_gravewyrm')],
@@ -1519,6 +1522,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['crag_warden_cudgel', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
       ['skullsplitter_dirk', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
       ['stormroot_cowl', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
+      // The rare world-drop bag (bank-storage): Brutok's elevated row is the
+      // only rare-template carrier (the ordinary-mob world-drop rows are not
+      // in the slain walk), so the hint names him alone. The bag also drops
+      // off ordinary mobs in Mirefen Marsh (zone2's fen_troll) and Thornpeak,
+      // but the zone arm pins exactly ONE zone beside the boss hints and
+      // walks every hinted boss's camps against it (zoneHintShapeOk refuses
+      // a second zone, and Brutok camps in Thornpeak), so mirefen_marsh
+      // cannot be hinted; those farm rows are the acknowledged dominated
+      // routes in tests/reliquary_content.test.ts.
+      ['wayfarers_backpack', [fromBoss('brutok_skullsmasher'), fromZone('thornpeak_heights')]],
       // Voskar the Emberwing (Thornpeak Heights)
       ['emberwing_legguards', [fromBoss('voskar_emberwing'), fromZone('thornpeak_heights')]],
       ['emberfang_warblade', [fromBoss('voskar_emberwing'), fromZone('thornpeak_heights')]],

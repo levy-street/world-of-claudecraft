@@ -740,6 +740,9 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
+      // The one materials-only satchel a vendor stocks, sold beside the two
+      // general pouches above so the two-pool trade is legible at the counter.
+      'burlap_reagent_pouch',
     ],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
@@ -919,7 +922,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // and the vendor-only thread staple. thorium_ore used to sit here as a
     // premium reagent; it is a node yield, and no NPC stocks a gathered
     // material (professions.md, Locked rulings).
-    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle', 'spool_of_thread'],
+    vendorItems: [
+      'linen_pouch',
+      'travelers_knapsack',
+      'gathering_sickle',
+      'spool_of_thread',
+      'burlap_reagent_pouch',
+    ],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {

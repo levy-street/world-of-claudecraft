@@ -23,7 +23,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
+import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
@@ -385,7 +385,7 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
         }
       }
     }
-    if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
+    if (countFit(scratch, bagPools(meta.bags), rewardItem, 1) < 1) {
       bagsFullError(ctx, meta.entityId);
       return;
     }

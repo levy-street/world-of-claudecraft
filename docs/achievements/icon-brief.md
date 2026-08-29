@@ -106,6 +106,19 @@ Exploration (the walk-in castles):
 - [v1] `exp_the_last_keep`, The Quiet Halls: the Last Keep's gatehouse arch half in shadow, one banner stirring in a cold draught, dusk grey on ember red.
 - [v1] `exp_dawnhold_castle`, An Open Door in the Garden: Dawnhold's garden gate standing open, petals drifting across the threshold, warm morning gold on hedge green.
 
+## The bank socket crests (2026-08-20)
+
+Two new ids from Bank Storage phase 06 (the bank bag socket ladder), same
+delivery contract as above: one 512x512 RGBA PNG per deed, named exactly by
+deed id, ingested with `npm run assets:deeds <source-dir>`. Both ride the
+procedural social category crest until the paintings land (enumerated in
+`DEED_ART_PENDING`, `src/ui/icons.ts`).
+
+Social (the Gilded Strongbox socket ladder):
+
+- [v1] `soc_strongbox_outfitter`, Strongbox Outfitter: a sturdy leather bag being fitted into a brass-rimmed socket inside an open strongbox, one gold coin on the ledge, banker green on brass.
+- [v1] `soc_four_bags_deep`, Four Bags Deep: four matched bags seated in a row of brass sockets across a grand vault shelf, a wax-sealed bill of sale hanging below, deep green on gilt.
+
 ## The Proving Shore graduation crest (2026-08-17)
 
 One new id from the tutorial island pass, same delivery contract as above: a

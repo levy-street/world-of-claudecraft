@@ -268,6 +268,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'combo_recipe',
@@ -355,6 +356,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
@@ -413,6 +415,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'known_weapon',
@@ -706,6 +709,7 @@ describe('crafting window pins', () => {
     onSelectCraft: vi.fn(),
   });
   const comboRow = (unmetCrafts: string[]) => ({
+    vaultNote: false,
     recipes: [
       {
         recipeId: 'combo_recipe',
@@ -763,6 +767,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'gray_recipe',
@@ -817,6 +822,7 @@ describe('crafting window pins', () => {
       renderCraftingWindow(
         parent,
         {
+          vaultNote: false,
           recipes: [
             {
               recipeId: `tint_${difficulty}`,
@@ -874,7 +880,7 @@ describe('crafting window pins', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     try {
-      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
       const first = el.querySelector<HTMLElement>('.profession-skill-list');
       const firstCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(first).not.toBeNull();
@@ -885,7 +891,7 @@ describe('crafting window pins', () => {
       firstCard.scrollTop = 45;
       first.focus();
       expect(document.activeElement).toBe(first);
-      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
       const second = el.querySelector<HTMLElement>('.profession-skill-list');
       const secondCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(second).not.toBeNull();
@@ -905,7 +911,7 @@ describe('crafting window pins', () => {
     // the card into the scroll pane would keep every other assertion green
     // while silently voiding the cap's purpose.
     const el = document.createElement('div');
-    renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+    renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
     const card = el.querySelector('.profession-identity-card');
     const body = el.querySelector('.crafting-body');
     expect(card).not.toBeNull();
@@ -922,6 +928,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
@@ -953,6 +960,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
