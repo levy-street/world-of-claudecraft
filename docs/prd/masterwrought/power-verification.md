@@ -625,6 +625,23 @@ wins the dev best-in-slot picker's warrior offhand, so the reference tank's
 max-mitigation kit is now identical with and without the packet's defs. That
 equality is itself pinned.
 
+That picker feeds a SHIPPED body, so the tune has a live ripple and it is
+recorded rather than left to a reader to rediscover: the friendly practice
+dummy derives its vitals from `bestEpicGearFor('warrior', 'protection')`, and
+its body moved from **1702 health / 2993 armour to 1712 / 2941** with the
+offhand and neck re-pick. It is applied at every world construction, production
+included. `tests/practice_dummies.test.ts` pins the post-tune literals.
+
+A demand consequence, recorded and NOT tuned, the same treatment section 14
+gives the apex weapon rung. After the tie the crafted shield is dominated by
+the raid drop it now matches: both read armour 680 and block 30, and
+`heroic_bonewrought_bulwark` additionally carries hit 55 plus crit 20 and one
+more strength. Even Perfected the crafted piece trades 35 hit and 20 crit for
++1 primary, so a tank who already holds the heroic shield has no reason to
+craft one. The tie is R5-mandated and raising either number re-creates the
+inversion, so this is a judged R21 demand risk for a future pass rather than a
+magnitude R5 will let us move.
+
 ### 10.4 The apex flasks, 13 for 1200 s
 
 With the three tunes above applied the measured kit still sat at 5.1 to 5.3

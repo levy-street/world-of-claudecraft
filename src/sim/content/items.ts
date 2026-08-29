@@ -3067,6 +3067,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     // extrapolated, so it joins that rule here. 680/30 is therefore the MAXIMUM
     // permitted value, not a chosen one: anything above re-creates the
     // inversion against a frozen heroic def.
+    // KNOWN COST, recorded in power-verification.md section 10.3: at the tie
+    // this piece is DOMINATED by the raid drop it matches, which carries the
+    // same 680/30 plus hit 55, crit 20 and one more strength. Even Perfected
+    // it trades 35 hit and 20 crit for +1 primary, so a tank holding the
+    // heroic shield has no reason to craft it. That is an R21 demand risk for
+    // a future pass, not a number R5 will let us raise.
     blockValue: 30,
     // ilvl-31 offhand epic budget = 16; sta:11+str:5 = 16, sta-lead for the
     // tank identity. The primary budget still reads at ilvl 31 (the budget is
