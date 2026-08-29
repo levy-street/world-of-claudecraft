@@ -36,7 +36,6 @@ import {
 } from './data';
 import { GALE_HARBOR_DECKS } from './gale_harbor';
 import { REACH_DECKS } from './reach_decks';
-import { BANNER_POLES, BRAZIERS, GATE, PLINTH_POS } from './vale_cup_layout';
 import { WORLD_BOSSES } from './world_boss';
 
 // The skirt's own contribution to radial slope is bounded by
@@ -220,8 +219,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
       }
     }
   }
-  // Zone POIs: the Book of Deeds grants exploration marks within 20yd of
-  // each point, so every POI keeps a reachable stand.
+  // Zone POIs: the Book of Deeds grants exploration marks within
+  // deeds.ts's POI_VISIT_RADIUS of each point, so every POI keeps a
+  // reachable stand (this pad is 2.5/8, well inside that radius either way).
   for (const zone of ZONES) {
     for (const poi of zone.pois) pad('poi', poi.x, poi.z, 2.5, 8);
   }
@@ -233,11 +233,6 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
       pad('deckRoot', deck.ax2, deck.az2, 5, 12);
     }
   }
-  // Vale Cup open-world dressing outside the sowfield flat itself.
-  pad('valeCup', PLINTH_POS.x, PLINTH_POS.z, 3, 8);
-  pad('valeCup', GATE.x, GATE.z, 3, 8);
-  for (const pole of BANNER_POLES) pad('valeCup', pole.x, pole.z, 2, 7);
-  for (const brazier of BRAZIERS) pad('valeCup', brazier.x, brazier.z, 2, 7);
   // Structural props: anything with a modeled footprint a player walks up
   // to. Foliage-like dressing (marshReeds, greatTrees) and hub-internal
   // line work (fences, walls) are deliberately absent: a tree or a fence

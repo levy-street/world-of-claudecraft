@@ -26,7 +26,7 @@ export const BLOB_SHADOW_POOL = 64;
 /**
  * Plane half-extent per yard of footprint radius. The texture's alpha reaches
  * zero at the rim, so the plane has to overhang the footprint it darkens; 1.3
- * is the ball's own 2.6-across-per-radius plane (vale_cup_ball.ts).
+ * was the retired Vale Cup ball's own 2.6-across-per-radius plane.
  */
 const BLOB_PLANE_SPREAD = 1.3;
 

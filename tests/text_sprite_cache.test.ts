@@ -569,7 +569,9 @@ describe('text_sprite_cache: the bound and its eviction', () => {
   it('ships the budget it documents', () => {
     // Pinned to the literal: every other assertion here is parameterized on the
     // constant, so without this the budget could change with the suite green.
-    expect(TEXT_SPRITE_LIMIT).toBe(384);
+    // 384 -> 416: the tutorial-island + eastbrook quest tables carried the
+    // derived worst case to 385 (the assertion below is what caught it).
+    expect(TEXT_SPRITE_LIMIT).toBe(416);
   });
 
   it('stays above the largest label set one redraw can ask for', () => {

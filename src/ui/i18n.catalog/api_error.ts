@@ -90,6 +90,7 @@ export const apiErrorStrings = {
     // reuses hudChrome.account.deactivatedLocked
     deactivated: 'This account has been deactivated. Contact an admin to restore it.',
     not_found: 'Account not found.',
+    password_already_set: 'This account already has a password. Use Change Password instead.',
   },
   // character: character creation, selection, and world-entry failures.
   character: {
@@ -111,6 +112,10 @@ export const apiErrorStrings = {
     rename_not_permitted: 'Renaming this character is not allowed.',
     // reuses errors.api.deleteConfirm
     delete_confirm: 'Type the character name to confirm deletion.',
+    storage_purchase_open:
+      'A storage purchase must finish or be resolved before this character can be deleted.',
+    // the background-gate saturation refusal on the delete cascade (retryable)
+    delete_busy: 'The realm is busy. Try deleting this character again in a moment.',
     // reuses errors.api.alreadyInWorld
     already_in_world: 'Character is already in world.',
     // reuses errors.api.takenOver
@@ -173,6 +178,12 @@ export const apiErrorStrings = {
   },
   deeds: {
     invalid_input: 'Invalid input.',
+  },
+  // The public guild roster read behind the signpost guild board
+  // (server/guild_roster.ts).
+  guilds: {
+    invalid_roster_name: 'Invalid guild name.',
+    unknown: 'No guild by that name.',
   },
   // steam: the env-gated Steam link family (server/steam/). Linking mirrors
   // deed unlocks to Steam achievements; it is never a sign-in method.

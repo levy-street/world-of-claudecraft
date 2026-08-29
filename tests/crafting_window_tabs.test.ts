@@ -75,6 +75,7 @@ function rowFor(professionId: string, recipeId: string): CraftingRecipeRow {
     station: null,
     commissionEligible: false,
     durationSec: 1.75,
+    craftFeeCopper: 0,
     craftable: false,
   };
 }
@@ -82,6 +83,7 @@ function rowFor(professionId: string, recipeId: string): CraftingRecipeRow {
 describe('craftingTabs (the pure tab model)', () => {
   it('orders tabs by first appearance and sums an interleaved craft into ONE tab', () => {
     const view: CraftingView = {
+      vaultNote: false,
       recipes: [
         rowFor('craft_a', 'r1'),
         rowFor('craft_a', 'r2'),
@@ -97,7 +99,7 @@ describe('craftingTabs (the pure tab model)', () => {
   });
 
   it('an empty view yields no tabs', () => {
-    expect(craftingTabs({ recipes: [] })).toEqual([]);
+    expect(craftingTabs({ recipes: [], vaultNote: false })).toEqual([]);
   });
 });
 

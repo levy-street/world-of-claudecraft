@@ -13,6 +13,72 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': 'ページ{page}',
+  'hudChrome.bootcamp.promptHold': 'つかむ',
+  'hudChrome.bootcamp.promptJump': 'ジャンプ',
+  'hudChrome.bootcamp.promptPickUp': '拾う',
+  'hudChrome.bootcamp.promptRead': '読む',
+  'hudChrome.bootcamp.promptRing': '鳴らす',
+  'hudChrome.bootcamp.promptTalk': '話す',
+  'hudChrome.mobile.barEditor': 'バー編集',
+  'hudChrome.mobile.menuLabel': 'メニュー',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '下',
+  'hudChrome.mobile.radialLeft': '左',
+  'hudChrome.mobile.radialUp': '上',
+  'hudChrome.bootcamp.promptAttack': '攻撃',
+  'hudChrome.bootcamp.keycapThen': 'つぎに',
+  'hudChrome.bootcamp.promptSummon': '召喚',
+  'hudChrome.bootcamp.taskPearlBody':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、{bagsKey}を押してバッグを開き、潮の疑似餌を左クリックして奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上で{interactKey}を押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌をタップし、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻をタップして輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '金色の道をたどって、浜辺の西の端にある潮だまりへ向かおう。水際に立ち、バッグを開いて潮の疑似餌を選び、奴を呼び出そう。浜辺ガニと戦ったときのように戦い、奴が倒れたら殻の上でインタラクトボタンを押して輝く真珠を手に入れよう。',
+  'hudChrome.bootcamp.ringEquipTitle': '戦利品を身につけよう',
+  'hudChrome.bootcamp.ringEquipBody':
+    '真珠の母はバッグの中にある。{bagsKey}を押してバッグを開き、指輪を左クリックして指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '真珠の母はバッグの中にある。バッグを開いて指輪をタップし、指にはめよう。',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '真珠の母はバッグの中にある。バッグを開いて指輪を選び、指にはめよう。',
+  'hudChrome.bootcamp.ringAdmireTitle': 'よく似合っている',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'よく似合う。{charKey}を押してキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'よく似合う。メニューからキャラクターシートを開き、手にはめた指輪と、それが押し上げる数値を確かめよう。',
+  'entities.mobs.mister_crabs.name': 'ミスター・クラブス',
+  'entities.items.ps_briny_lure.name': '潮の疑似餌',
+  'entities.items.ps_lustrous_pearl.name': '輝く真珠',
+  'entities.items.mother_of_pearl.name': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.title': '真珠の母',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '殻を三つ割ったな、{playerName}。だが難破線には王がいて、この浜のどの木箱よりも値打ちのある宝を抱え込んでいる。この潮の疑似餌を持って、難破船の先、浜の西の果てにある潮だまりへ行け。水際に立ち、Bを押してバッグを開き、疑似餌を左クリックして王を起こすんだ。ミスター・クラブスの挟みは小物どもよりずっと重い。体力バーから目を離さず、打ち続け、息が要るなら砂の上へ下がれ。王が倒れたら、名前が見えるまで殻に歩み寄り、Fを押すか左クリックして、王が抱え込む輝く真珠をもぎ取れ。その真珠をわたしのところへ持ち帰るんだ。',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '輝く真珠、それも浅瀬の老王その者からもぎ取ったものだ。わたしの父は働きに出る朝のたびに、あのカニに帽子を傾けて挨拶していた。敬意は払われるべきものだ。じっとして...ほら。糸を通し、留めて、おまえのものだ、{playerName}。真珠の母だよ。Bを押してバッグを開き、指輪を左クリックしてはめてみろ。それからCを押してキャラクターシートを開けば、手に収まった指輪が見えるはずだ。ささやかな品だが、身につければ全てが少しずつ強くなる。',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'ミスター・クラブス討伐',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '輝く真珠を入手',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '藁のかかしに歩み寄り、左クリックしてターゲットにしよう。画面上部にその名前が表示される。そうしたら{attackKey}を押すか、アクションバーの二番目のボタンをクリックして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの二番目のボタンをタップして呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に二番目のアクションボタンを押して呪文を唱えよう。一体が崩れるまで唱え続けること。',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{abilityKey}を押して{ability}を使い、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの{ability}をタップして、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '浜辺ガニは挟み返してくる。一匹をターゲットにし、{ability}が入ったアクションボタンを押して、離れたまま唱え続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.voiceGraduate': '鐘はおまえさんのために鳴った。海の向こうでイーストブルックが待っておる。もう大丈夫だ。',
+  'hudChrome.bootcamp.voiceVeerOff': '待ちなさい、そっちは違う。金色の道は後ろだよ。',
+  'hudChrome.bootcamp.voiceStationDoneB': 'だいぶ様になってきたな、間違いない。',
+  'hudChrome.bootcamp.voiceStationDoneA': 'よくやった。次へ進みなさい、道はもう照らしてある。',
+  'hudChrome.bootcamp.voiceRunDone': '見事な走りだった。褒美は監督官ペルが持っておる。受け取りに行きなさい。',
+  'hudChrome.bootcamp.voiceFirstFlag': '旗をひとつ越えたな。その調子で足を止めるな、残りはふたつだ。',
+  'hudChrome.bootcamp.voiceArrival': '無事の上陸だ。足元の金色の道が見えるか？わしよりよほど道を知っておる。あれをたどりなさい。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': 'ウルフフォーム',
@@ -65,6 +131,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '退席',
   'hudChrome.nameplate.cheaterTag': '< チーター >',
+  'hudChrome.nameplate.pledgeTag': '{guild}への誓約者',
+  'hudChrome.pledge.open': '誓約受付中',
+  'hudChrome.pledge.closed': '誓約停止中',
+  'hudChrome.pledge.minLevel': 'レベル{level}以上',
+  'hudChrome.pledge.action': '誓約',
+  'hudChrome.pledge.actionTitle': '{guild}に誓約する',
+  'hudChrome.pledge.pledged': '誓約済み',
+  'hudChrome.pledge.yourGuild': '所属ギルド',
+  'hudChrome.pledge.tab': '誓約',
+  'hudChrome.pledge.tabWithCount': '誓約（{count}）',
+  'hudChrome.pledge.empty': 'まだ誰もギルドに誓約していません。',
+  'hudChrome.pledge.accept': '承認',
+  'hudChrome.pledge.acceptTitle': '{name}の誓約を承認',
+  'hudChrome.pledge.reject': '辞退',
+  'hudChrome.pledge.rejectTitle': '{name}の誓約を辞退',
+  'hudChrome.pledge.settings': '募集設定',
+  'hudChrome.pledge.acceptingLabel': '誓約を受け付ける',
+  'hudChrome.pledge.minLevelLabel': '最低レベル',
+  'hudChrome.pledge.noteLabel': '掲示メッセージ',
+  'hudChrome.pledge.notePlaceholder': 'ギルドが求める仲間について書きましょう',
+  'hudChrome.pledge.save': '保存',
+  'hudChrome.pledge.yourPledge': 'あなたの誓約：{guild}',
+  'hudChrome.pledge.since': '{date}に誓約',
+  'hudChrome.pledge.withdraw': '誓約を取り下げる',
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -456,6 +546,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': 'スキンを適用',
   'hudChrome.wocStore.detach': 'スキンを解除',
   'hudChrome.wocStore.equipHint': 'このスキンを適用するには{type}を装備してください。',
+  'hudChrome.wocStore.charter.eyebrow': '金庫',
+  'hudChrome.wocStore.charter.title': '金庫特許状',
+  'hudChrome.wocStore.charter.scope': '特許状はこのキャラクターの銀行だけを拡張します。同じスロットは出納官がゴールドでも販売しています。',
+  'hudChrome.wocStore.charter.grant': '銀行スロットを{slots}個追加',
+  'hudChrome.wocStore.charter.buy': '特許状を購入',
+  'hudChrome.wocStore.charter.buyAria': '{item}を購入',
+  'hudChrome.wocStore.charter.confirmTitle': '特許状の購入確認',
+  'hudChrome.wocStore.charter.confirmBody': '{item}を{cost} Claudiumで購入しますか？',
+  'hudChrome.wocStore.charter.granted': '特許状が適用されました。このキャラクターの銀行が広がりました。',
+  'hudChrome.wocStore.charter.alreadyGranted': 'この特許状はすでにこのキャラクターに適用されています。二重に請求されることはありません。',
+  'hudChrome.wocStore.charter.applyDeferred': '支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。',
+  'hudChrome.wocStore.charter.grantUnresolved': '支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。',
+  'hudChrome.wocStore.charter.inProgress': 'このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。',
+  'hudChrome.wocStore.charter.doesNotFit': 'このキャラクターの銀行では、この特許状のスロットをすべて収めきれません。',
+  'hudChrome.wocStore.charter.notPurchasable': 'この特許状は現在購入できません。',
+  'hudChrome.wocStore.charter.noCharterFits': 'このキャラクターの銀行に残された空きに収まる特許状はありません。',
+  'hudChrome.wocStore.charter.someHiddenByFit': 'このキャラクターの銀行の空きに収まらない大きさの特許状は表示されません。',
+  'hudChrome.wocStore.charter.noRoom': 'このキャラクターの銀行には、もう特許状を収める余地がありません。',
+  'hudChrome.wocStore.charter.outage': '購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
+  'hudChrome.wocStore.charter.outageStale': 'ストアに戻り、同じ「特許状を購入」操作をもう一度使用してください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
+  'hudChrome.wocStore.charter.failed': '購入を完了できませんでした。',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': '下級金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': '上級金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': '大金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': '完全金庫特許状',
   'hudChrome.claudium.title': 'Claudium',
   'hudChrome.claudium.open': 'Claudiumを開く',
   'hudChrome.claudium.close': 'Claudiumを閉じる',
@@ -525,8 +640,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',
   'hudChrome.auth.appleChoiceExpired':
     'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
-  'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
-  'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'mail@example.com',
@@ -543,6 +656,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '宛先',
   'itemUi.kind.bag': 'バッグ',
   'itemUi.tooltip.bagSlots': '{slots}スロットのバッグ',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots}スロットの素材バッグ',
   'hudChrome.auth.forgotPrompt': 'パスワードをお忘れですか？',
   'hudChrome.auth.forgotTitle': 'パスワードをリセット',
   'hudChrome.auth.forgotHint':
@@ -671,6 +785,59 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.petHealth': 'ペット{name}、体力{pct}',
   'hudChrome.partyFrames.showSelf': '自分のフレームを表示',
   'hudChrome.frameReset.label': 'フレーム位置をリセット',
+  'hudChrome.interfaceUnlock.label': 'フレーム編集',
+  'hudChrome.interfaceUnlock.unlock': 'インターフェースのロックを解除',
+  'hudChrome.interfaceUnlock.lock': 'インターフェースをロック',
+  'hudChrome.interfaceUnlock.lockAll': 'インターフェースをロック',
+  'hudChrome.interfaceUnlock.barsNote': '編集中はオンにしたアクションバーだけが表示されます。バーを増やして配置したい場合は、先にメインアクションバーのプラス／マイナスボタンで追加してください。',
+  'hudChrome.interfaceUnlock.frozenNote': '編集中はインターフェースとカメラが固定されます。ボタンやフレームは配置用の静止画となり、クリックはゲーム世界には届きません。',
+  'hudChrome.interfaceUnlock.unlockFrame': 'このフレームのロックを解除',
+  'hudChrome.interfaceUnlock.lockFrame': 'このフレームをロック',
+  'hudChrome.interfaceUnlock.resizeFrame': 'このフレームのサイズを変更',
+  'hudChrome.interfaceUnlock.frameNames.actionBar1': 'アクションバー',
+  'hudChrome.interfaceUnlock.frameNames.actionBar2': 'アクションバー 2',
+  'hudChrome.interfaceUnlock.frameNames.actionBar3': 'アクションバー 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'ウィッシュリストの通知',
+  'hudChrome.interfaceUnlock.frameNames.minimap': 'ミニマップ',
+  'hudChrome.interfaceUnlock.frameNames.stanceBar': 'スタンスバー',
+  'hudChrome.interfaceUnlock.frameNames.playerFrame': 'プレイヤー',
+  'hudChrome.interfaceUnlock.frameNames.targetFrame': 'ターゲット',
+  'hudChrome.interfaceUnlock.frameNames.partyFrames': 'パーティ',
+  'hudChrome.options.combineActionBars': 'アクションバーをまとめる',
+  'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'アクションバー',
+  'hudChrome.interfaceUnlock.frameNames.swingBar': 'オートアタック',
+  'hudChrome.interfaceUnlock.framesMenu': 'フレーム設定',
+  'hudChrome.interfaceUnlock.showHideFrames': 'フレームの表示・非表示',
+  'hudChrome.interfaceUnlock.buffsLeftToRight': 'バフを左から右へ',
+  'hudChrome.interfaceUnlock.debuffsLeftToRight': 'デバフを左から右へ',
+  'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'プレイヤーフレームをアクションバーに固定',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'アクションバーを縦向きに',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'アクションバーを縦向きに',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'アクションバー 2 を縦向きに',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'アクションバー 3 を縦向きに',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'メニューを横向きに',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'サイズをリセット',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': '{name}のサイズをリセット',
+  'hudChrome.partyFrames.optionsSection': 'パーティフレーム設定',
+  'hudChrome.interfaceUnlock.framesMenuTitle':
+    '各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。',
+  'hudChrome.interfaceUnlock.previewSpell': 'サンプル呪文',
+  'hudChrome.transfer.frameLayout': 'フレーム配置',
+  'hudChrome.transfer.allSettings': 'すべての設定',
+  'hudChrome.transfer.exportAction': 'エクスポート',
+  'hudChrome.transfer.importAction': 'インポート',
+  'hudChrome.transfer.copy': 'コピー',
+  'hudChrome.transfer.copied': 'クリップボードにコピーしました。',
+  'hudChrome.transfer.copyFailed': 'コピーに失敗しました。コードを選択して手動でコピーしてください。',
+  'hudChrome.transfer.applyReload': '適用して再読み込み',
+  'hudChrome.transfer.pastePlaceholder': 'エクスポートしたコードをここに貼り付けてください。',
+  'hudChrome.transfer.invalid': '有効なエクスポートコードではありません。',
+  'hudChrome.transfer.wrongKind': 'このコードは別の種類のエクスポートです。',
+  'hudChrome.actionBar.conflictTitle': 'キーは割り当て済み',
+  'hudChrome.actionBar.conflictBody': '{key} はすでに{other}に割り当てられています。{action}に割り当てると{other}の割り当ては解除されます。',
+  'hudChrome.actionBar.conflictAccept': 'それでも再割り当て',
+  'hudChrome.actionBar.showExtraBar': 'アクションバーをもう1本表示',
+  'hudChrome.actionBar.hideExtraBar': 'アクションバーを1本隠す',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
@@ -978,6 +1145,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',
   'hudChrome.theme.presets.classic': 'クラシックゴールド',
+  'hudChrome.theme.presets.fancyGold': 'ファンシーゴールド',
   'hudChrome.theme.presets.midnight': 'ミッドナイト',
   'hudChrome.theme.presets.parchment': '羊皮紙',
   'hudChrome.theme.presets.highContrast': 'ハイコントラスト',
@@ -1099,6 +1267,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': 'この試合は棄権で終了しました。',
   'hudChrome.bg.firstWinBonusLine': '本日の初勝利:名誉+{honor}',
   'hudChrome.bg.firstWinBonusLog': '本日の初勝利:追加で名誉を{honor}獲得しました。',
+  'hudChrome.bg.doubleHonorLine':
+    '名誉2倍ウィークエンド:本日のソーンホロウ平原の名誉獲得は{mult}倍、最後まで戦えば敗北でも勝利と同額',
   'hudChrome.bg.timeWarningMinutes': '残り{minutes}分',
   'hudChrome.bg.timeWarningOneMinute': '残り1分',
   'hudChrome.bg.timeWarningMinutesLog': '戦闘は残り{minutes}分です。',
@@ -1681,6 +1851,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このブラウザでウォレット拡張機能を選択してください。確認メッセージに署名した後、デスクトップアプリに戻ります。',
   'wallet.browser.paymentBody':
     'アカウントにリンクされたウォレットを選択し、このブラウザで取引を承認してください。',
+  'wallet.browser.stepUpBody':
+    'アカウントにリンクされたウォレットを選択し、$WOC 取引所の承認メッセージに署名してください。署名は無料で、資金は移動しません。',
   'wallet.browser.extensionHelp':
     '対応するウォレット拡張機能が見つかりません。Phantom、Solflare、または別のSolanaブラウザウォレットをインストールまたはロック解除して、再試行してください。',
   'wallet.browser.safety':
@@ -3062,7 +3234,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
-    '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
+    'ダスクヴェールを解除せず、戦闘も始めずに、対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
   'entities.abilities.crippling_poison.name': '鉛の毒',
   'entities.abilities.crippling_poison.description':
     '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
@@ -3136,7 +3308,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'テンの相',
   'entities.abilities.aspect_of_the_monkey.description': 'テンの姿をまとい、回避率を30分間8%高めます。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬の相',
-  'entities.abilities.aspect_of_the_cheetah.description': '駿馬の姿をまとい、移動速度を30分間30%高めます。',
+  'entities.abilities.aspect_of_the_cheetah.description': '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が4秒間半減します（被弾のたびによろめきが更新されます）。',
   'entities.abilities.aimed_shot.name': '引き絞り',
   'entities.abilities.aimed_shot.description': '対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
@@ -3324,7 +3496,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     'ウォーロックの命令に従うウォーフィーンドを召喚します。ウォーフィーンドは戦場に踏み込んで持ちこたえる頑丈な近接悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
   'entities.abilities.summon_infernal.name': 'パイアコロッサスの召喚',
-  'entities.abilities.summon_infernal.description': '対象範囲へパイアコロッサスを落とし、着弾時に58-72の火炎ダメージを与えます。デーモンを置き換えることなく30秒間戦い、2秒ごとに近くの敵を焼き、1秒ごとに破滅的猛攻を1生みます。',
+  'entities.abilities.summon_infernal.description': '対象範囲へパイアコロッサスを落とし、着弾時に64-79の火炎ダメージを与えます。デーモンを置き換えることなく30秒間戦い、2秒ごとに近くの敵を焼き、1秒ごとに破滅的猛攻を1生みます。',
   'entities.abilities.summon_doomguard.name': 'レイスボーンの召喚',
   'entities.abilities.summon_doomguard.description':
     'レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -3805,7 +3977,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '焼きたてのパン、澄んだ水、正直な値段です。何が必要ですか？',
   'entities.npcs.apothecary_lin.name': '薬師リン',
   'entities.npcs.apothecary_lin.title': '薬草師',
-  'entities.npcs.apothecary_lin.greeting': '東の森では足元に気をつけてください、友よ。',
+  'entities.npcs.apothecary_lin.greeting': '北東の森では足元に気をつけてください、友よ。',
   'entities.npcs.brother_aldric.name': 'アルドリック修道士',
   'entities.npcs.brother_aldric.title': '谷の司祭',
   'entities.npcs.brother_aldric.greeting':
@@ -3902,7 +4074,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
   'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
   'entities.quests.q_prof_intro.text':
-    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南東、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
+    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の北東、狼の道を過ぎたカッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
@@ -3919,12 +4091,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.objectives.0.label': '老グレイジョーの牙',
   'entities.quests.q_boars.title': '剛毛の猪の皮',
   'entities.quests.q_boars.text':
-    '猪の皮は旅袋に最適です。町外れの草地に獣が満ちています。剛毛猪の皮を5枚持ってきてください。',
+    '猪の皮は旅袋に最適です。町の北西の草地に獣が満ちています。剛毛猪の皮を5枚持ってきてくれれば、それに見合う礼をしましょう。',
   'entities.quests.q_boars.completion': 'いい剛毛の皮です。高く売れるでしょう。',
   'entities.quests.q_boars.objectives.0.label': '剛毛猪の皮',
   'entities.quests.q_spiders.title': 'セイブルウェブの脅威',
   'entities.quests.q_spiders.text':
-    '東の森の潜伏者は、私の湿布に必要な絹を紡ぎます。おまけに、あまりに数を増やしすぎました。セイブルウェブの潜伏者を6匹間引き、その腹から絹腺を4つ切り取ってください。',
+    '北東の森の潜伏者は、私の湿布に必要な絹を紡ぎます。おまけに、あまりに数を増やしすぎました。セイブルウェブの潜伏者を6匹間引き、その腹から絹腺を4つ切り取ってください。',
   'entities.quests.q_spiders.completion':
     'うう、まだ動いています。完璧です。これはあなたの取り分です。',
   'entities.quests.q_spiders.objectives.0.label': 'セイブルウェブの潜伏者を討伐',
@@ -3947,7 +4119,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '安らがぬ骨を安息させる',
   'entities.quests.q_supplies.title': '盗まれた物資',
   'entities.quests.q_supplies.text':
-    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南西の野営地から箱を4つ取り戻してください。',
+    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。北西の野営地から箱を4つ取り戻してください。',
   'entities.quests.q_supplies.completion':
     '私の箱です！傷もほとんどありません。あなたは大した人です。',
   'entities.quests.q_supplies.objectives.0.label': '盗まれた補給箱',
@@ -3996,7 +4168,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': 'モーセンの魔導書',
   'entities.quests.q_bandits.title': '谷の盗賊',
   'entities.quests.q_bandits.text':
-    '南西の丘に盗賊団がいます。今週だけで荷車を三台襲いました。谷の盗賊を10人倒してください。',
+    '北西の丘に盗賊団がいます。今週だけで荷車を三台襲いました。谷の盗賊を10人倒してください。',
   'entities.quests.q_bandits.completion': '闇の中の刃が十本減りました。これはあなたのものです。',
   'entities.quests.q_bandits.objectives.0.label': '谷の盗賊を討伐',
   'entities.quests.q_ringleader.title': '首領',
@@ -4570,6 +4742,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '引き裂かれた断崖',
   'entities.zones.farshore_isle.pois.4.label': '裂け目野',
   'entities.zones.eastbrook_vale.pois.11.label': '遠つ岸の砂州道',
+  'entities.zones.eastbrook_vale.pois.12.label': 'イーストブルック波止場',
   'entities.mobs.moor_ram.name': 'ムーアラム',
   'entities.mobs.gale_wisp.name': 'ゲイルウィスプ',
   'entities.mobs.shoal_scuttler.name': 'ショールスカトラー',
@@ -5823,6 +5996,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.many': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',
   'hudChrome.plurals.playersOnline.other': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',
   'hudChrome.controller.title': 'コントローラー',
+  'hudChrome.controller.glyphStyle': 'ボタン表示',
+  'hudChrome.controller.glyphStyleAuto': '自動',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': 'プレイステーション',
+  'hudChrome.controller.glyphStyleNintendo': 'ニンテンドー',
   'hudChrome.controller.enable': 'コントローラーを有効化',
   'hudChrome.controller.invertY': 'カメラ反転（Y軸）',
   'hudChrome.controller.deadzone': 'スティックの遊び',
@@ -6023,6 +6201,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': 'バックパック',
   'hudChrome.bags.socketEmpty': '空のバッグスロット',
   'hudChrome.bags.unequipHint': 'クリックしてこのバッグを外す',
+  'hudChrome.bags.poolGeneral': '一般: {total}個中{used}個',
+  'hudChrome.bags.poolMaterials': '素材: {total}個中{used}個',
+  'hudChrome.bags.capacityPoolsAria': '使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'ブラウザで無料で遊べる、クラシックスタイルのMMO。',
@@ -6280,7 +6461,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': '聖遺物庫',
   'guide.controls.sheathe': '武器を納刀/抜刀',
   'guide.controls.crafting': '製作',
-  'guide.controls.valeCup': 'ヴェイルカップ',
   'guide.controls.mount': '騎乗 / 降車',
   'guide.controls.calendar': 'イベントカレンダー',
   'guide.controls.dungeonFinder': 'ダンジョンファインダー',
@@ -7896,6 +8076,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
+  'desktop.titlebar.exitGame': 'ゲームを終了',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
@@ -8479,7 +8660,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': 'アルコン・ニクサリス',
   'entities.mobs.rift_boss_storm.name': '嵐のヴァロク',
   'entities.mobs.rift_boss_tide.name': '深淵の顎',
-  'entities.mobs.vale_cup_ball.name': 'ボアボール',
   'entities.npcs.brother_halven_marsh.name': 'ハルヴェン修道士',
   'entities.npcs.brother_halven_marsh.title': '聖遺物庫の番人',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8516,6 +8696,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
+  'apiError.guilds.invalid_roster_name': 'ギルド名が無効です。',
+  'apiError.guilds.unknown': 'その名前のギルドはありません。',
   'apiError.ota_updates.invalid_input': '入力が無効です。',
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
@@ -8582,6 +8764,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': 'キャラクターは現在オンラインです。',
   'apiError.character.rename_not_permitted': 'このキャラクターの名前変更は許可されていません。',
   'apiError.character.delete_confirm': '削除を確認するにはキャラクター名を入力してください。',
+  'apiError.character.storage_purchase_open':
+    'このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。',
+  'apiError.character.delete_busy':
+    'サーバーが混み合っています。しばらくしてからこのキャラクターの削除をお試しください。',
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
@@ -8614,6 +8800,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'ポイントが足りません。',
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
+  'hudChrome.noticeboard.subtitle': 'ワールドのギルド',
+  'hudChrome.noticeboard.rosterTitle': '{guild}のメンバー一覧を見る',
+  'hudChrome.noticeboard.back': '戻る',
+  'hudChrome.noticeboard.popupTitle': 'ギルドの掲示柱',
+  'hudChrome.noticeboard.close': '閉じる',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',
   'hudChrome.mailbox.tabInbox': '受信箱',
@@ -8831,9 +9022,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.disabledRealm': 'このレルムでは $WOC 取引所を利用できません。',
   'hudChrome.wocMarket.pausedBanner':
     '取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。',
-  'hudChrome.wocMarket.walletBanner':
-    'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
-  'hudChrome.wocMarket.walletBannerCta': 'ウォレットを接続',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    '公開アドレスはリンク済みです。$WOC で支払う際は、そのウォレットアプリに再接続してください。',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。',
+  'hudChrome.wocMarket.walletUsdUnknown': '不明',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',
   'hudChrome.wocMarket.browseEmpty': '現在出品はありません。また後で確認してください。',
@@ -9098,6 +9291,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.arenaClash.title': 'アリーナ激突',
   'hudChrome.calendar.events.arenaClash.note':
     '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',
+  'hudChrome.calendar.events.doubleHonor.title': '名誉2倍ウィークエンド',
+  'hudChrome.calendar.events.doubleHonor.note':
+    '戦陣が召集の号令を上げる。週末の間、ソーンホロウ平原の名誉報酬が2倍になり、最後まで戦えば敗北でも勝利と同額を得られる。',
   'hudChrome.calendar.events.fishingDerby.title': 'フィッシングダービー',
   'hudChrome.calendar.events.fishingDerby.note': '釣り人が湖に並ぶ。竿を持って釣り話を交わそう。',
   'hudChrome.calendar.events.delveDay.title': 'デルヴの日',
@@ -9209,6 +9405,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': '皮革加工',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（上質な等級を{count}個消費）',
+  'hudChrome.crafting.reagentVaultDraw': '（素材保管庫から{count}個使用）',
+  'hudChrome.crafting.vaultUnreachable': 'ここでは素材保管庫を利用できません。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
   'yumi.hud.expand': 'Protect Yumiのバーを展開する',
@@ -9306,7 +9504,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.questStripAriaSingle': '追跡中のクエスト: {title}',
   'hudChrome.mobile.questStripMore': '他 {count} 件',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.keybinds.categoryPet': 'ペット',
   'hudChrome.keybinds.petAttack': 'ペット：攻撃',
   'hudChrome.keybinds.petStop': 'ペット：停止',
@@ -9314,176 +9511,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': 'ペット：挑発',
   'hudChrome.keybinds.petDefensive': 'ペット：防御',
   'hudChrome.keybinds.petAggressive': 'ペット：攻撃的',
-  'hudChrome.vcup.title': 'ヴェイルカップ',
-  'hudChrome.vcup.close': 'ヴェイルカップウィンドウを閉じる',
-  'hudChrome.vcup.offlineNote': '対戦簿は閉じられている。ヴェイルカップは現在利用できない。',
-  'hudChrome.vcup.recordLine': '戦績:{wins} 勝 {losses} 敗 {draws} 分。',
-  'hudChrome.vcup.bracketsAria': '試合の階級',
-  'hudChrome.vcup.bracketLabel': '{n}対{n}',
-  'hudChrome.vcup.waitingCount': '{count} 人待機中',
-  'hudChrome.vcup.nationsHeading': '旗の国',
-  'hudChrome.vcup.nation.vale': 'イーストブルック渓谷',
-  'hudChrome.vcup.nation.mirefen': 'マイアフェン',
-  'hudChrome.vcup.nation.thornpeak': 'ソーンピーク',
-  'hudChrome.vcup.nation.coliseum': '灰の闘技場',
-  'hudChrome.vcup.nation.choir': '青ざめた聖歌隊',
-  'hudChrome.vcup.nation.ogre': 'オーガの氏族',
-  'hudChrome.vcup.nation.moon': '蒼白の月',
-  'hudChrome.vcup.nation.copperdig': '銅鉱山',
-  'hudChrome.vcup.awayNote': '両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。',
-  'hudChrome.vcup.rolesHeading': 'ポジション',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    '1対1と2対2の階級では全員がオールラウンダーとして出場する。3対3以上の階級を求める功績はここでは達成できない。',
-  'hudChrome.vcup.role.allrounder.name': 'オールラウンダー',
-  'hudChrome.vcup.role.allrounder.desc': '何でもこなす:キック、ロングキック、正々堂々の肩当たり。',
-  'hudChrome.vcup.role.striker.name': 'ストライカー',
-  'hudChrome.vcup.role.striker.desc': 'ロングキックと素早いサイドステップに生きる。',
-  'hudChrome.vcup.role.sweeper.name': 'スイーパー',
-  'hudChrome.vcup.role.sweeper.desc': 'ボール保持者を弾き飛ばし、遠くへクリアする。',
-  'hudChrome.vcup.role.keeper.name': 'キーパー',
-  'hudChrome.vcup.role.keeper.desc': 'キャッチ、ダイブ、パントでゴールエリアを守る。',
-  'hudChrome.vcup.queue': 'キューに参加',
-  'hudChrome.vcup.leaveQueue': 'キューを離れる',
-  'hudChrome.vcup.queueNote': 'どこからでも並べる。笛が鳴ればソウフィールドへ呼ばれる。',
-  'hudChrome.vcup.queuedStatus': '{bracket} で待機中:{count} 人中 {position} 番目。',
-  'hudChrome.vcup.blockNation': 'まずは旗の国を選ぼう。',
-  'hudChrome.vcup.blockPartySize': 'その階級にはもっと小さなパーティーが必要だ。',
-  'hudChrome.vcup.blockNotLeader': 'チームを並べられるのはパーティーリーダーだけだ。',
-  'hudChrome.vcup.inMatchNote': 'あなたのチームはピッチにいる。プレイを続けよう!',
-  'hudChrome.vcup.deserterNote': '整備人は覚えている。再び並べるまであと {seconds} 秒。',
-  'hudChrome.vcup.liveHeading': 'ソウフィールドの現在',
-  'hudChrome.vcup.liveAria': 'ヴェイルカップ:{nationA} {scoreA}、{nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': 'ソウフィールドまで歩いて、スタンドから観戦しよう。',
-  'hudChrome.vcup.noLive': 'ピッチは静かだ。試合は行われていない。',
-  'hudChrome.vcup.boardHeading': '勝者の掲示板',
-  'hudChrome.vcup.boardEmpty': 'まだ勝者の記録はない。銅のミルク桶が待っている。',
-  'hudChrome.vcup.enterAsGuild': '{guild} の旗の下で参加',
-  'hudChrome.vcup.guildRecordLine': 'ギルド成績：{wins} 勝 {losses} 敗。',
-  'hudChrome.vcup.guildBoardHeading': 'ギルド旗',
-  'hudChrome.vcup.guildBoardEmpty': 'まだ参加したギルドはない。旗を掲げよう！',
-  'hudChrome.vcup.practicingNow': '練習中（{count}）：',
-  'hudChrome.vcup.boardWins': '{count} 勝',
-  'hudChrome.vcup.practice': 'ボット練習試合',
-  'hudChrome.vcup.practiceNote': 'ソウフィールドでボットとのフル試合をすぐに始める。',
-  'hudChrome.vcup.practiceUnratedNote':
-    '練習試合はレート対象外。戦績も功績の書の進行も数えられない。',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': 'ヴェイルカップ待機中:{bracket}、{count} 人中 {position} 番目',
-  'hudChrome.vcup.indicatorLive': 'ヴェイルカップ',
-  'hudChrome.vcup.indicatorOpen': 'ヴェイルカップウィンドウを開く',
-  'hudChrome.vcup.phaseCountdown': 'キックオフまで {seconds}',
-  'hudChrome.vcup.phaseGoal': 'ゴール!',
-  'hudChrome.vcup.phaseGolden': 'ゴールデンゴール',
-  'hudChrome.vcup.phaseOver': '試合終了',
-  'hudChrome.vcup.bannerFound': 'ヴェイルカップの呼び声:{nationA} 対 {nationB}!',
-  'hudChrome.vcup.bannerCountdown': 'キックオフまで {seconds} 秒...',
-  'hudChrome.vcup.bannerKickoff': 'キックオフ!',
-  'hudChrome.vcup.bannerGoal': 'ゴール!{nation} が決めた!',
-  'hudChrome.vcup.bannerSave': '{name} のセーブ!',
-  'hudChrome.vcup.bannerGolden': 'ゴールデンゴール:次の得点で決着!',
-  'hudChrome.vcup.bannerEnd': '試合終了:{nationA} {scoreA}、{nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': 'ソウフィールドでの勝利!',
-  'hudChrome.vcup.bannerDraw': 'ソウフィールドの一戦は引き分け。',
-  'hudChrome.vcup.bannerLoss': 'ソウフィールドでの敗北。',
-  'hudChrome.vcup.logQueued': '{bracket} のヴェイルカップキューに参加した({position} 番目)。',
-  'hudChrome.vcup.logUnqueued': 'ヴェイルカップのキューを離れた。',
-  'hudChrome.vcup.logFound': 'ヴェイルカップの試合が整った:{nationA} 対 {nationB}。',
-  'hudChrome.vcup.logRoster': '味方:{allies}。相手:{enemies}。',
-  'hudChrome.vcup.logGoal':
-    '{name} が {nation} のために決めた!{nationA} {scoreA}、{nationB} {scoreB}。',
-  'hudChrome.vcup.logSave': '{name} がセーブした!',
-  'hudChrome.vcup.logWin': 'ソウフィールドの一戦に勝利した。',
-  'hudChrome.vcup.logDraw': 'ソウフィールドの一戦は引き分けに終わった。',
-  'hudChrome.vcup.logLoss': 'ソウフィールドの一戦に敗れた。',
-  'hudChrome.vcup.gossipOpen': '対戦簿',
-  'hudChrome.vcup.gossipOpenAria': 'ヴェイルカップウィンドウを開く',
-  'hudChrome.vcup.mobileLabel': 'カップ',
-  'hudChrome.vcup.briefing.subtitle': '試合前ブリーフィング',
-  'hudChrome.vcup.briefing.vs': '対',
-  'hudChrome.vcup.briefing.rulesHeading': '遊び方',
-  'hudChrome.vcup.briefing.rule1': 'ボールを相手ゴールへ蹴るかパスして得点しよう。',
-  'hudChrome.vcup.briefing.rule2': '先に5点取れば勝ち、フルタイム時に得点が多い方が勝ち。',
-  'hudChrome.vcup.briefing.rule3': '同点でフルタイムならゴールデンゴール、次の得点で勝ち。',
-  'hudChrome.vcup.briefing.rule4': 'タックルは転ぶだけ。収穫祭の休戦で誰も怪我はしない。',
-  'hudChrome.vcup.briefing.rule5': '誰でも近づいて、スタンドから声援を送れる。',
-  'hudChrome.vcup.briefing.kitHeading': 'あなたの技',
-  'hudChrome.vcup.briefing.kitNote': '試合中はこれらの技がクラスのアビリティと入れ替わる。',
-  'hudChrome.vcup.briefing.unratedNote':
-    'ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'これは練習試合のためレート対象外。戦績は動かず、功績の書の進行も数えられない。',
-  'hudChrome.vcup.briefing.rosterHeading': 'メンバー表',
-  'hudChrome.vcup.briefing.you': 'あなた',
-  'hudChrome.vcup.briefing.bot': 'ボット',
-  'hudChrome.vcup.briefing.ready': '準備完了',
-  'hudChrome.vcup.briefing.readyDone': '準備OK',
-  'hudChrome.vcup.briefing.readyAria': 'キックオフの準備をする',
-  'hudChrome.vcup.briefing.waiting': '相手側の準備を待っています…',
-  'hudChrome.vcup.briefing.whistle': '{seconds}秒後にホイッスルが鳴る。',
-  'hudChrome.vcup.briefing.readyCount': '準備完了 {ready}/{total}',
-  'hudChrome.vcup.bet.title': '試合ベット',
-  'hudChrome.vcup.bet.aria': 'ヴェイルカップの試合ベット',
-  'hudChrome.vcup.bet.closesIn': '締切まで{seconds}秒',
-  'hudChrome.vcup.bet.closed': 'ベット締切',
-  'hudChrome.vcup.bet.prize': 'プール {amount}',
-  'hudChrome.vcup.bet.splitAria': '両チームのベット配分',
-  'hudChrome.vcup.bet.expand': 'ベットを見て賭ける',
-  'hudChrome.vcup.bet.collapse': 'ベットを隠す',
-  'hudChrome.vcup.bet.oddsLabel': '配当',
-  'hudChrome.vcup.bet.back': '{team}に賭ける',
-  'hudChrome.vcup.bet.form': '{wins}勝{losses}敗',
-  'hudChrome.vcup.bet.mine': 'あなたのベット：{amount}を{team}に',
-  'hudChrome.vcup.bet.none': 'まだこの試合に賭けていません。',
-  'hudChrome.vcup.bet.record': 'ベット成績：{wins}勝{losses}敗、{sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': 'ベット的中！',
-  'hudChrome.vcup.bet.wonLog': 'ヴェイルカップのベット的中：{amount}を獲得。',
-  'hudChrome.vcup.bet.lostLog': 'ヴェイルカップのベットは外れ：{amount}。',
-  'hudChrome.vcup.bet.refundLog': 'ベット無効、賭け金{amount}を返却しました。',
-  'guide.nav.valeCup': 'ヴェイルカップ',
-  'guide.valeCupPage.heading': 'ヴェイルカップ',
-  'guide.valeCupPage.intro':
-    'ソウフィールドのボアボール:旗を選び、ポジションを選び、藁を詰めた猪皮のボールをキーパーの脇へ蹴り込んで銅のミルク桶を目指せ。血は流れず、戦利品もなく、あるのはスタンドの歓声だけ。',
-  'guide.valeCupPage.loreHeading': 'ボアボールと収穫休戦',
-  'guide.valeCupPage.loreOldSow':
-    '死者が目覚めるずっと前、イーストブルックの農夫たちは刈り入れ後の切り株畑でボアボールに興じていた。二つの群れ、藁を詰めた一枚の猪皮、緑地の両端まで引きずられた二枚の荷馬車の門。最初のボール「オールドソウ」は、銅をまとって酒場の炉の上に飾られている。',
-  'guide.valeCupPage.loreTruce':
-    '灰の闘技場が戦争競技を公認し始めたとき、レッドブルック元帥はもっと穏やかなもので応えた。古い緑地に恒久の収穫休戦を布いたのだ。荷馬車の門はゴールポストになり、緑地には壁とスタンドと「ソウフィールド」という名が与えられた。賞品はいつも同じ、勝者たちが回し飲みするへこんだミルク桶:銅のミルク桶だ。',
-  'guide.valeCupPage.howHeading': '遊び方',
-  'guide.valeCupPage.howQueue':
-    'ヴェイルカップウィンドウからどこでも並べるほか、ソウフィールドの門にいる整備人ブラムに話しかけてもよい。1対1から5対5までの階級、旗の国、ポジションを選ぶ。ソロでもパーティーでも参加できる。',
-  'guide.valeCupPage.howMatch':
-    'キックオフと同時にクラスのスキルはスポーツキットに置き換わり、試合後に元通り復元される。キックは地面のレティクルで狙い、ボールはボードで跳ね返り、ドリブルはボールと一緒に走るだけ。試合終了までに相手より多く得点すること。引き分けはゴールデンゴールへ。',
-  'guide.valeCupPage.howTruce':
-    'ソウフィールドで血は流れない。タックルは転がすだけで、何も傷つけず、ペットは試合の間お休みだ。',
-  'guide.valeCupPage.spectateBody':
-    'スタジアムで行われる試合は同時に一つだけ。誰でも歩いて行ってスタンドから観戦できる。',
-  'guide.valeCupPage.nationsHeading': '八つの旗の国',
-  'guide.valeCupPage.nationsBody':
-    'どのチームも旗の下で戦う。キャプテンが国を選び、両者が同じ旗を掲げたときはアウェー側が反転配色でプレイする。',
-  'guide.valeCupPage.nationVale': '緑と金、麦束の旗:地元チーム、骨の髄まで農夫たち。',
-  'guide.valeCupPage.nationMirefen': '青緑と灰、鷺の旗の下:辛抱強く、足が長く、決して急がない。',
-  'guide.valeCupPage.nationThornpeak': '氷青と白、山嶺の旗の下:足取り確かで頑固者。',
-  'guide.valeCupPage.nationColiseum': '赤と黒、交差する剣:まだ戦争のつもりでプレイする連中。',
-  'guide.valeCupPage.nationChoir': '淡青と銀、鐘の旗の下:不気味で、精密で、とても静か。',
-  'guide.valeCupPage.nationOgre': '橙と焦茶、拳を掲げて:肩から突っ込み、それを誇る。',
-  'guide.valeCupPage.nationMoon': '紫と銀、三日月の旗の下:夜のプレイヤーたち、足取り軽やか。',
-  'guide.valeCupPage.nationCopperdig': '銅と茶、鶴嘴を携えて:走り止まない坑夫たち。',
-  'guide.valeCupPage.rolesHeading': 'ポジション',
-  'guide.valeCupPage.rolesBody':
-    'あなたのポジションが、ピッチに持ち込むキットを決めます。誰もが蹴れます。あとは気性次第です。一対一と二対二のブラケットでは全員がオールラウンダーのキットで戦うため、ポジション選びが本領を発揮するのは三対三以上からです。',
-  'guide.valeCupPage.rewardsHeading': '休戦の掟',
-  'guide.valeCupPage.rewardsBody':
-    '休戦の掟のもとでは経験値も戦利品もありません。決着のついた試合は戦績と勝者の掲示板に刻まれ、勝利はその日の報酬課題にも加算されます。試合を放棄すれば席はベンチ送りとなり、整備人はそれを覚えています。',
-  'guide.valeCupPage.bettingHeading': '柵際のひと賭け',
-  'guide.valeCupPage.bettingBody':
-    'ソウフィールドの観客は、試合が組まれている間にどちらかの側を後押しできる。賭け金はひとつのプールにまとめられ、終了の笛が鳴れば、勝った側が自分の賭けた額に応じて負けた側のプールを分け合う。引き分けの試合や、誰も賭けなかった側の番狂わせでは、コインはすべて払い戻される。試合に出る本人はその試合には賭けられず、柵際にはあなたの生涯のベット成績、勝ち、負け、そして純収支が刻まれていく。',
-  'guide.valeCupPage.practiceHeading': '練習試合と、静かなピッチ',
-  'guide.valeCupPage.practiceBody':
-    'ヴェイルカップウィンドウでは練習もできる。ボットが両チームを埋める専用コピーのピッチで、何ひとつ戦績には数えられない。本番に一人か二人足りないときも、少し待てばボットが人数を埋めてくれるし、ボットがピッチにいる試合はすべて親善試合で、決してレート戦にはならない。そしてソウフィールドが空いている間は、ボットたちがエキシビションを繰り広げる。スタンドから観戦もでき、賭けることもできる。本物のプレイヤーが準備を整えた瞬間、エキシビションはピッチを譲り、賭け金はすべて返される。',
-  'entities.npcs.groundskeeper_bram.name': '整備人ブラム',
-  'entities.npcs.groundskeeper_bram.title': 'ソウフィールドの番人',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'ソウフィールドでは休戦が守られている、{className}よ。使っていいのは足と肩だけだ。銅のミルク桶を懸けて一戦どうだ?',
   'entities.npcs.chronicler_saul.name': '年代記官ソール',
   'entities.npcs.chronicler_saul.title': 'イーストブルック渓谷の年代記',
   'entities.npcs.chronicler_saul.greeting':
@@ -9593,6 +9620,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '金庫を開いた状態でバッグの品をクリックすると預けられ、金庫の品をクリックすると引き出せます。金庫に入るのは品物だけで、コインは預けられず、クエストアイテムも手元に残ります。旅の途中でバッグがいっぱいになったら、製作素材をまとめて預けるボタンもあります。',
   'guide.economy.bankSlots':
     '作りたての金庫は小さめですが、あなたとともに広がっていきます。出納官は追加の枠をコインで販売しており、値段は段階ごとに上がります。さらにオンラインでのプレイなら、メール認証やアカウント連携、友人の紹介などでボーナスの空きも手に入ります。',
+  'guide.economy.bankSockets':
+    '枠の階段の先には、出納官が最大四つのバッグスロットも販売しています。安い順に解放され、値段は段階ごとに上がります。手持ちの余ったバッグをスロットに収めれば、そのバッグの枠が金庫の空きに加わります。普通のバッグは金庫全体を広げ、素材袋は製作素材だけが使える空きを加えます。バッグ欄のバッグをクリックすれば収まり、スロットをクリックすれば取り戻せます。取り戻しても預けた品を失うことはありません。金庫が縮んだ空きを上回っても、すべてはそのまま残り、新たな預け入れが空きを待つだけです。',
   'guide.economy.bankTitle': '銀行',
   'hudChrome.bank.title': '銀行',
   'hudChrome.bank.subtitle': '金張りの金庫',
@@ -9605,18 +9634,53 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': '完全に拡張済み',
   'hudChrome.bank.buyConfirm': '{price}で銀行スロットを追加で{count}個購入しますか？',
   'hudChrome.bank.buyConfirmAccept': '購入',
+  'hudChrome.bank.meterLabel': 'スロット: {total}個中{used}個',
+  'hudChrome.bank.meterPoolGeneral': '一般: {total}個中{used}個',
+  'hudChrome.bank.meterPoolMaterials': '素材: {total}個中{used}個',
+  'hudChrome.bank.meterPoolsAria': '使用中の銀行スロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
+  'hudChrome.bank.meterMaterialsNote': '装着した素材サッチェルによる素材専用スペースです。ほかのアイテムには使えません。',
+  'hudChrome.bank.priceDisclaimer': '価格はゲーム経済に応じて変動することがあります。',
+  'hudChrome.bank.rungItemName': '銀行スロット{count}個',
+  'hudChrome.bank.buySlotsDualAria': '{price}または{cost} Claudiumでスロットを{count}個購入',
+  'hudChrome.bank.buyConfirmDual': '銀行スロットを追加で{count}個購入しますか？',
+  'hudChrome.bank.buyConfirmGold': '{price}で購入',
+  'hudChrome.bank.buyConfirmClaudium': '{cost} Claudiumで購入',
+  'hudChrome.bank.rungGranted': '銀行スロットが追加されました。このキャラクターの銀行が広がりました。',
+  'hudChrome.bank.rungAlreadyGranted': 'これらのスロットはすでにこのキャラクターに適用されています。二重に請求されることはありません。',
+  'hudChrome.bank.rungApplyDeferred': '支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。',
+  'hudChrome.bank.rungGrantUnresolved': '支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。',
+  'hudChrome.bank.rungInProgress': 'このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。',
+  'hudChrome.bank.rungDoesNotFit': 'このキャラクターの銀行には、これ以上の拡張を収める余地がありません。',
+  'hudChrome.bank.rungNotPurchasable': 'これらの銀行スロットは現在購入できません。',
+  'hudChrome.bank.rungFailed': '購入を完了できませんでした。',
+  'hudChrome.bank.rungOutage':
+    '購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
   'hudChrome.bank.withdrawHint': 'クリックで引き出す',
   'hudChrome.bank.withdrawPartialHint': 'Shift+クリックで一部だけ引き出す',
   'hudChrome.bank.depositHint': 'クリックで預ける',
   'hudChrome.bank.depositPartialHint': 'Shift+クリックで一部だけ預ける',
   'hudChrome.bank.cannotDeposit': '銀行に預けられません',
   'hudChrome.bank.cannotDepositNow': '今は預けられません',
+  'hudChrome.bank.socketRowAria': '銀行バッグスロット',
+  'hudChrome.bank.socketEmpty': '空の銀行バッグスロット',
+  'hudChrome.bank.socketEmptyHint': 'バッグ内のバッグをクリックして銀行に収納',
+  'hudChrome.bank.socketLocked': '未解放のバッグスロット',
+  'hudChrome.bank.socketLockedLater': 'バッグスロットは安い順に解放されます',
+  'hudChrome.bank.socketUnlockAria': '{price}で銀行バッグスロットを解放',
+  'hudChrome.bank.socketUnlockHint': 'クリックしてこのバッグスロットを解放',
+  'hudChrome.bank.socketUnlockConfirm': '{price}で銀行バッグスロットを解放しますか？',
+  'hudChrome.bank.socketUnlockAccept': '解放',
+  'hudChrome.bank.unsocketHint': 'クリックしてこのバッグをバッグに戻す',
+  'hudChrome.bank.socketHint': 'クリックしてこのバッグを銀行に装着',
   'hudChrome.bank.depositQuantityTitle': '{item}を預ける',
   'hudChrome.bank.depositQuantityInput': '預ける数量',
   'hudChrome.bank.depositQuantityConfirm': '預ける',
   'hudChrome.bank.withdrawQuantityTitle': '{item}を引き出す',
+  'hudChrome.bank.vaultRowWithdrawName': '{item}を引き出す',
+  'hudChrome.bank.priceChanged': '購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。',
   'hudChrome.bank.withdrawQuantityInput': '引き出す数量',
   'hudChrome.bank.withdrawQuantityConfirm': '引き出す',
+  'hudChrome.bank.withdrawQuantityAction': '{item}の引き出す数量を選択',
   'hudChrome.bank.filterGroupAria': '銀行をカテゴリーで絞り込む',
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
@@ -9640,6 +9704,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。',
   'hudChrome.bank.bonusSectionAria': 'ボーナス銀行スロットと獲得方法',
+  'hudChrome.bank.vaultTab': '保管庫',
+  'hudChrome.bank.vaultCapacityNote': '各素材は最大{cap}個まで保管できます。',
+  'hudChrome.bank.vaultEmpty': '素材保管庫は空です。バッグの素材をクリックすると預けられます。',
+  'hudChrome.bank.vaultRowAria': '{item}：{count}/{cap}個保管中',
+  'hudChrome.bank.vaultLockedIntro':
+    '素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。',
+  'hudChrome.bank.vaultUnlockButton': '素材保管庫を開放する',
+  'hudChrome.bank.vaultUnlockConfirm': '{price}で素材保管庫を開放しますか？',
+  'hudChrome.bank.vaultUpgrade': '上限を{cap}個に拡張',
+  'hudChrome.bank.vaultUpgradeConfirm': '{price}で各素材の保管上限を{cap}個に拡張しますか？',
+  'hudChrome.bank.vaultDepositAll': '素材をすべて預ける',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'バッグ内のすべての素材を一度に保管庫へ預けます。各素材は上限まで預けられます。装備、道具、クエストアイテム、消耗品は移動しません。',
+  'hudChrome.bank.vaultDepositAllDone': '預けた素材：{count}個。',
+  'hudChrome.bank.vaultDepositAllFull': '預けた素材：{count}個。上限に達した素材があります。',
+  'hudChrome.bank.vaultDepositAllNone': '保管庫の上限に達しているため、何も預けられませんでした。',
+  'hudChrome.bank.vaultWithdrawShort': 'バッグには{count}個のうち{fit}個しか入りません。',
+  'hudChrome.bank.vaultDepositHint': 'クリックで保管庫に預ける',
+  'hudChrome.bank.vaultCannotDeposit': '保管庫には預けられません',
   'hudChrome.bank.tabsAria': '銀行タブ',
   'hudChrome.bank.personalTab': '個人',
   'hudChrome.bank.guildTab': 'ギルド',
@@ -9857,6 +9940,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。',
   'hudChrome.steam.noTicket':
     'Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。',
+  'hudChrome.steam.wishlist': 'Steam でウィッシュリストに追加',
+  'hudChrome.steam.wishlistAria': 'Steam でウィッシュリストに追加: World of ClaudeCraft のストアページを開く',
+  'hudChrome.steam.wishlistShort': 'ウィッシュリスト',
   'hudChrome.epic.link': 'Epicと連携',
   'hudChrome.epic.unlink': 'Epic連携を解除',
   'hudChrome.epic.linked': 'Epicアカウント {id} と連携済み',
@@ -10222,7 +10308,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description': '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
-  'entities.abilities.shadowstep.description': '影を通り抜けて対象へ近づく。（ローグのタレント）',
+  'entities.abilities.shadowstep.description': '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
@@ -10324,7 +10410,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の詠唱時間のある呪文2回を移動しながら発動できます。15秒間持続します。（メイジタレント）',
   'entities.abilities.ignition.name': 'イグニッション',
   'entities.abilities.ignition.description':
-    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの40%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
+    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの30%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
   'entities.abilities.mass_barrier.name': 'マスバリア',
   'entities.abilities.mass_barrier.description':
     '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
@@ -10732,6 +10818,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': '鍍金織りのローブ',
   'entities.items.goldweave_leggings.name': '鍍金織りのレギンス',
   'entities.items.silkspun_satchel.name': '絹紡ぎのサッチェル',
+  'entities.items.wayfarers_backpack.name': '旅人のバックパック',
+  'entities.items.burlap_reagent_pouch.name': '粗麻の素材ポーチ',
+  'entities.items.necromancers_reagent_satchel.name': '死霊術師の素材サッチェル',
+  'entities.items.duskweave_bag.name': '宵織りのバッグ',
+  'entities.items.resonant_weave_bag.name': '共鳴織りのバッグ',
+  'entities.items.foragers_haversack.name': '採集者のハヴァサック',
+  'entities.items.loombound_reagent_satchel.name': '織機縛りの素材サッチェル',
   'entities.items.silkbinders_raiment.name': '絹縛りの法衣',
   'entities.items.sunweave_mantle.name': '陽織りのマント',
   'entities.items.sunweave_treads.name': '陽織りの足具',
@@ -11240,13 +11333,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '森の狼を討伐',
   'entities.quests.q_prof_amends_outfitter.title': '再びつなぐ糸',
   'entities.quests.q_prof_amends_outfitter.text':
-    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
+    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。北東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
   'entities.quests.q_prof_amends_outfitter.completion':
     'また落ち着きましたね。皮革加工と裁縫は、主専攻としてあなたの手に戻ります。今度こそ、さまよう前に二度測りなさい。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'セイブルウェブの潜伏者を討伐',
   'entities.quests.q_prof_amends_apothecary.title': 'また竈の前へ',
   'entities.quests.q_prof_amends_apothecary.text':
-    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
+    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。北西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
   'entities.quests.q_prof_amends_apothecary.completion':
     'ほら、昔なじみの味だ。錬金術と料理は、主専攻としてお前の竈に戻ってきた。今度はしばらくいてくれよ。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '野生の猪を狩る',
@@ -11671,7 +11764,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの製作にも品質が1段階高く仕上がる小さな確率（3%から上限15%）があり、レイドの下限を超えることはありません。',
   'guide.profPages.faq.q6': '「作り手：」とは何の意味ですか？',
   'guide.profPages.faq.a6':
-    '九つの共通の野外レシピと道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つの上級レシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピはスキル0、25、50の段階に分かれ、一度きりの料金として無料、銀25、金1で習えます。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
+    '九つの共通の野外レシピと道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つのレシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピはスキル0、25、50の段階に分かれ、一度きりの料金として無料、銀25、金1で習えます。エンチャントの魔除けレシピ2つは25の段にあり、工作場の親方はスキル75と125で釣り竿2種を教え、それぞれ金4枚と16枚です。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
   'guide.profPages.faq.q7': '作り手の絆とは何ですか？',
   'guide.profPages.faq.a7':
     '受注品は取引で受け取った相手にバインドされ、どの作業場の師匠でも段階料金で解除できます。',
@@ -11689,7 +11782,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
-    'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
+    'イーストブルックに着いたばかりなら、監督官オデルを訪ね、「剣以外にも稼ぎはある」を受けましょう。町の北東、銅鉱山周辺の鉱脈へ案内してくれ、最初のまめを授けてくれます。鉱山そのものには要注意です。そこに陣取るディープロックの掘削者たちは駆け出しより数段強いので、まずは外縁の鉱脈から手をつけ、野営地の中心は少しレベルを上げてから狙いましょう。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。習熟は旅を重ねる者に自然と身につきます。\n\n町ではTキーで製作ウィンドウを開き、誰もが最初から知っている初期レシピをこなしましょう。鍛冶場、厨房、織機、工作場の師匠たちを訪ねて何を教えてくれるか確かめ、作業依頼を受けて堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
   'guide.profPages.yieldsHeading': '採集の実り',
   'guide.profPages.yieldsBody':
     '採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。',
@@ -11755,16 +11848,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'RaimentのPristine Silkはそれだけで署名素材ボーナスを満たし、goldleafとsunpetalは素材段階1と2に数えられるので、レア段が最も発動しやすい場所です。鞄のような無能力値の品は決して発動しません。道はhomespunで25、鍍金織りで50、レア段で75。75からはWardweave Cowl（第3段レシピ、99まで全速、以降半減）が引き継ぎ、最後の50ポイントはおよそ75回、1回にPristine Silk 2枚、蜘蛛の糸4本、sunpetalとgoldleafの薬草を各2、糸2。鞄は文字通り全員に売れ、Ottilieの依頼は30分ごとに蜘蛛の糸6本。スキル50でA Fine Seam、125でGrandmaster Tailoringです。',
   'guide.profPages.craftProse.leatherworking.identityHeading': '俊敏な者の革',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "梯子は素朴なFenbridgeの硬革の脚絆、靴、帯から、良質のmarshstalker一式を経て、職人が裁てる最高の革であるレアのmirewarden一式へ。術者向けの二着、野外コモンのEastbrook Druid's Hideとスキル75のDuskhide Wrapsが陣容を締めます。環では料理と裁縫の間。生きた対は装具師（皮革加工と裁縫）でEastbrookのWeaver Ottilieの前で誓い、料理との対Trapperには誓いのクエストがまだありません。",
+    '梯子は素朴なフェンブリッジ革の脚絆、ブーツ、ベルトから、アンコモンの沼追跡者一式（ジャーキン、フード、肩当て）を経て、職人が裁てる最高の革であるレアの泥沼の番人一式へ。術者向けの二着、野外コモンのイーストブルックのドルイドの皮とスキル50のダスクハイドの手甲が陣容を締めます。\n\n環では料理と裁縫の間。生きた対は装具師（皮革加工と裁縫）で、イーストブルックの織り手オッティリーの前で誓います。料理との対、罠師は環に名はあるものの、まだ誓いのクエストがありません。',
   'guide.profPages.craftProse.leatherworking.materialsHeading': '狩りこそが収穫',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '皮革加工ではレベリングの道と補給線が同じ一本道です。粗皮は皮を持つ亡骸、とりわけ狼と猪から直接剥ぎ、亡骸一体につき早い者勝ちの一人だけ。レア以上の採集判定はPristine Hideも授け、Mirewarden Jerkinがまさにそれを求めるので、見つけたら必ず取っておくこと。脇役は少なめで、蜘蛛の脚と糸、人型の手織り布、mirewardenのレア各着にオスミウム1個（Duskhide Wrapsの上級品は6個）、そしてなめし場カウンターのTanning Agent（16銅）。掘りたくなければTanner Heskがオスミウムも売っています。',
+    '皮革加工では、レベリングの道と補給線がまったく同じものです。粗皮は皮を持つ亡骸、とりわけ狼と猪から直接剥ぎ取り、亡骸一体につき早い者勝ちの一人だけが手にできます。レア以上の採集判定は極上の獣皮も授け、泥沼の番人のジャーキンがまさにそれを求めるので、見つけたら必ず取っておくこと。\n\n脇役は少なめです。蜘蛛の脚と糸、人型の敵からの手織り布、泥沼の番人のレア各着に入るオスミウム鉱石1個（ダスクハイドの手甲は6個）、そしてなめし場カウンターのなめし剤（16銅）。オスミウムそのものは店売りされません。ソーンピークか、ほとんどの若いゾーンの初心者向け鉱脈で自分の手で掘るか（遠つ岸だけは鉄を掘ります）、他のプレイヤーから買うかです。',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Fenbridgeで修行',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "ひとつだけ違うところ。なめし場はMirefen Marsh街道のFenbridgeにあり、Eastbrookの外で修行する唯一の本格職です。Tanner Heskが桶のそばで教えます。硬革段はスキル0無料、marshstalker段はスキル25から各25銀、mirewarden段はスキル50から各1金。二つのレシピは師匠を飛ばします。野外コモン（Tanned Leather JerkinとDruid's Hide）は最初からどこでも、Duskhide Wrapsは全員が知っていますがスキル75かつなめし場限定。装具師の誓い自体はEastbrookのOttilieの前です。沼で行うのは修行だけ。",
+    '仕掛けが一つあります。なめし場はマイアフェン湿地街道のフェンブリッジにあり、皮革加工はイーストブルックの外、湿地で修行する唯一の本格職です。皮なめし職人ヘスクが桶のそばで梯子を教えます。フェンブリッジ革段はスキル0無料、沼追跡者段はスキル25から各25銀、泥沼の番人段はスキル50から各1金で、それぞれの段はあなたの階級が届き次第開きます。\n\n三つのレシピは師匠を飛ばします。野外コモン（なめし革のジャーキンとイーストブルックのドルイドの皮）は最初からどこでも作れ、ダスクハイドの手甲はスキル50で全員が知っており、なめし場限定です。装具師の誓い自体はイーストブルックのオッティリーの前で立てるもので、湿地で行うのは修行だけです。',
   'guide.profPages.craftProse.leatherworking.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker段以上はすべて傑作の抽選があり、Mirewarden JerkinのPristine Hideが署名素材ボーナスを自動で満たします。オスミウムは素材段階1。無能力値の硬革コモンは発動しません。自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。marshstalkerで50、mirewardenで75、以降はDuskhide Wraps（第3段レシピ、オスミウム6個、Pristine Hide 3枚、粗皮2枚、Tanning Agent 1）が99まで全速、以降半減で、最後の50ポイントはおよそ75回。75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、Fenbridgeへの往復が消えます。Heskの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
+    "能力値を持つ品はどれも、より上位の品質があなたの段階の上限に収まっている限り傑作の抽選判定があり、能力値付きのイーストブルックのドルイドの皮も含まれます。泥沼の番人のジャーキンに収めた極上の獣皮は署名素材ボーナスを自動で満たし、オスミウムは素材段階1としてこの判定に数えられます。能力値を持たない硬革コモンは決して発動しません。\n\n自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。沼追跡者で50、そして泥沼の番人一式とダスクハイドの手甲がレア段階を50から75まで運びます。75を過ぎるとこの第2段のレシピ群は半減、その後4分の1まで薄れ、最後の50ポイントにおよそ150回。主専攻でない場合でも、この段はレア品質の製作上限と同じ扱いのままで、完全にゼロにはなりません。\n\n75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、フェンブリッジへの往復が消えます。ヘスクの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
   'guide.profPages.craftProse.cooking.identityHeading': '一行を養う鍋',
   'guide.profPages.craftProse.cooking.identityBody':
     "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、現存最大の座り回復であるMarlow's Grand Roast（980）まで。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
@@ -12319,7 +12412,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。',
   'entities.abilities.hammer_of_grace.name': '恩寵の槌',
   'entities.abilities.hex_of_violence.description':
-    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。',
+    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、17の影ダメージで反撃します。',
   'entities.abilities.hex_of_violence.name': '暴虐の呪い',
   'entities.abilities.hour_of_judgment.description':
     '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
@@ -12548,7 +12641,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。',
   'entities.abilities.vowkeeper_strike.name': '誓守の一撃',
   'entities.abilities.warspirit_cadence.description':
-    'パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）',
+    'パッシブ：武器攻撃が3回命中するたび、25%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次の電弧の矢、ジョルト、または癒しの水流を即時発動かつ消費マナ半減にする。祖霊の一撃は2回分として数える。（ウォースピリット）',
   'entities.abilities.warspirit_cadence.name': '戦霊の律動',
   'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
   'entities.abilities.wildheart.name': '野生の心',
@@ -13434,6 +13527,277 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '利用不可',
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '新しい顔でまた来たのかい？なら勝手は分かっているね。それでも旅立つ前におさらいがしたければ、修練の浜は出戻りの生徒を追い返したりしない。渡し船はいつでも出せるよ。',
+  'hudChrome.tutorialGreeting.play': 'チュートリアルを受ける',
+  'hudChrome.tutorialGreeting.declineNote':
+    'お好きにどうぞ、旅の人。気が変わったら、レイヴンポストの郵便柱のそばの渡しの鐘がいつでも修練の浜へ運んでくれる。昼でも夜でもね。狼は待ってくれないが、あの鐘は待っていてくれるよ。',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
+  'hudChrome.tutorialGreeting.noteClose': 'わかった',
+  'hudChrome.tutorialGreeting.skip': 'チュートリアルを飛ばす',
+  'hudChrome.bootcamp.title': '最初の一歩',
+  'hudChrome.bootcamp.talkTitle': 'ウォーデン・タムと話す',
+  'hudChrome.bootcamp.talkBody':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.talkBodyTouch':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、彼をタップするか、使用ボタンをタップして話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.talkBodyPad':
+    'ウォーデン・タムがすぐ先でガントレットの門を守っている。名前が見えるところまで歩み寄り、インタラクトボタンを押して話しかけよう。走りの課題を出してくれる。',
+  'hudChrome.bootcamp.forwardTitle': '最初のレーンを歩く',
+  'hudChrome.bootcamp.forwardBody':
+    'タムの横のレーンに入り、{forwardKey}を押したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    'タムの横のレーンに入り、移動スティックを上に倒したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.forwardBodyPad':
+    'タムの横のレーンに入り、左スティックを上に倒したまま西の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkTitle': '向きを変えて歩く',
+  'hudChrome.bootcamp.turnwalkBody':
+    '旗一本目、よし。{turnKey}を押したままその場で回り、南へ延びる柵のレーンを正面に見たら、もう一度{forwardKey}を押したまま二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '旗一本目、よし。（移動スティックではなく）世界を指でドラッグして回り、南へ延びる柵のレーンを正面に見たら、スティックを上に倒して二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '旗一本目、よし。右スティックを倒して回り、南へ延びる柵のレーンを正面に見たら、左スティックを上に倒して二本目の旗まで歩こう。',
+  'hudChrome.bootcamp.strafeTitle':
+    '向きを変えて歩く',
+  'hudChrome.bootcamp.strafeBody':
+    '残るは角ひとつ。{turnLeftKey}を押したままその場で回り、最後のレーンを正面に見たら、もう一度{forwardKey}を押したまま赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '残るは角ひとつ。（移動スティックではなく）画面を指でなぞって向きを変え、最後のレーンを正面に見たら、スティックを上に倒して赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '残るは角ひとつ。右スティックを倒して向きを変え、最後のレーンを正面に見たら、左スティックを上に倒して赤い旗が背後に来るまで歩こう。',
+  'hudChrome.bootcamp.cameraTitle': '視点を回す',
+  'hudChrome.bootcamp.cameraBody':
+    '走りを納める前に最後の一課だ。マウスの右ボタンを押したままドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '走りを納める前に最後の一課だ。世界を指でドラッグして、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '走りを納める前に最後の一課だ。右スティックを倒して、視点を自分のまわりでぐるりと一周させよう。背後に何が立っているかを知る者が、戦いを制する。',
+  'hudChrome.bootcamp.courseProgress': '旗 {current} / {total}',
+  'hudChrome.bootcamp.doneTitle': '走破',
+  'hudChrome.bootcamp.doneBody':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。彼に{interactKey}を押すか、左クリックして走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。彼をタップして走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.doneBodyPad':
+    '体の動かし方はこれで全部だ。監督官ペルが赤い旗のそばに立っている。インタラクトボタンを押して走りを納め、最初の報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachNextTitle': '次は{npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、{interactKey}を押すか、左クリックして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、相手をタップするか、使用ボタンをタップして次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '金色の道をたどって{npc}のところへ。名前が見えるところまで歩み寄り、インタラクトボタンを押して次の仕事を受けよう。',
+  'hudChrome.bootcamp.coachTaskBody':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら{mapKey}で地図が開ける。',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '金色の道をたどって仕事へ向かおう。右側のトラッカーが数を数えてくれるし、道に迷ったら地図ボタンが道を示してくれる。',
+  'hudChrome.bootcamp.coachReadyTitle': '任務完了',
+  'hudChrome.bootcamp.coachReadyBody':
+    '{npc}のもとへ行き、{interactKey}を押すか、左クリックして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    '{npc}のもとへ行き、相手をタップして納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '{npc}のもとへ行き、インタラクトボタンを押して納め、報酬を受け取ろう。',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '藁のかかしに歩み寄り、左クリックしてターゲットにしよう。画面上部にその名前が表示される。そうしたら{attackKey}を押すか、アクションバーの最初のボタンをクリックして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '藁のかかしに歩み寄り、タップしてターゲットにしよう。次にアクションバーの最初のボタンをタップして打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.promptTurnIn':
+    'クエスト報告',
+  'hudChrome.bootcamp.promptSelect':
+    '選択',
+  'hudChrome.bootcamp.promptUseAbility':
+    'アビリティ使用',
+  'hudChrome.bootcamp.taskHoneBody':
+    'かかしを左クリックしてターゲットにし、{abilityKey}を押して{ability}を使おう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    'かかしをタップしてターゲットにし、アクションバーの{ability}をタップしよう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    'かかしをターゲットにし、{ability}が入ったアクションボタンを押そう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.promptOpenBags': 'かばんを開く',
+  'hudChrome.bootcamp.promptCharacterSheet': 'キャラクター画面を開く',
+  'hudChrome.bootcamp.promptLookAround': '右クリックを押したまま動かして見回す',
+  'hudChrome.bootcamp.promptKneel':
+    'ひざまずく',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '{bagsKey}を押して持ち物を開き、たましいの石を左クリックしよう。その場で君を横たえてくれる。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '浜辺の道を南へ進み、たましいの石まで歩いてタップし、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '浜辺の道を南へ進み、たましいの石まで歩いて操作ボタンを押し、ひざまずこう。ここでは何にも襲われないし、これで失うものは何もない。',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '君は死んだ。だが失ったものはない。「魂を解放」を押せば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '君は死んだ。だが失ったものはない。「魂を解放」をタップすれば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '君は死んだ。だが失ったものはない。「魂を解放」を選べば、野営地の裏の墓地で霊として立ち上がる。',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを押せば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。タップすれば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '今の君は霊で、何も君に触れられない。自分の亡骸は地図に印がついている。歩いて戻れば、近づいたところで「亡骸で復活」のボタンが現れる。それを選べば、何の代償もなく元どおりだ。',
+  'hudChrome.bootcamp.promptLootPearl':
+    '真珠を回収',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '藁のかかしに歩み寄り、ターゲットボタンを押してターゲットにしよう。次に最初のアクションボタンを押して打ち込もう。一体が崩れるまで打ち続けること。',
+  'hudChrome.bootcamp.taskShellBody':
+    '浜辺ガニは挟み返してくる。左クリックで一匹をターゲットにし、{abilityKey}を押して{ability}を使い、攻撃を続けよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '浜辺ガニは挟み返してくる。一匹をタップしてターゲットにし、アクションバーの{ability}をタップしよう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '浜辺ガニは挟み返してくる。一匹をターゲットにし、{ability}が入ったアクションボタンを押そう。一度に多くに襲われたら、道を引き返して退くこと。連中はすぐ追うのをあきらめるし、休んでいる間に体力は戻ってくる。',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、{interactKey}を押すか、木箱を左クリックして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、木箱をタップするか、使用ボタンをタップして拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '漂着した木箱は暁の野営地へ続く道沿いに並んでいる。名前が見えるところまで漂着した木箱に歩み寄り、インタラクトボタンを押して拾い上げよう。六つで荷は満ちる。',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}に向かって{interactKey}を押すか、左クリックして露店を開き、亜麻のポーチを左クリックして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}をタップして露店を開き、亜麻のポーチをタップして買おう。',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}に向かってインタラクトボタンを押して露店を開き、亜麻のポーチを選んで買おう。',
+  'hudChrome.bootcamp.readyPouchBody':
+    'ポーチは買えた。{bagsKey}を押してバッグを開き、亜麻のポーチを左クリックして空いた鞄留めに締めよう。それから{npc}のもとへ行き、{interactKey}を押して見せよう。',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'ポーチは買えた。バッグを開き、亜麻のポーチをタップして空いた鞄留めに締めよう。それから{npc}のもとへ行き、相手をタップして見せよう。',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'ポーチは買えた。バッグを開き、亜麻のポーチを選んで空いた鞄留めに締めよう。それから{npc}のもとへ行き、インタラクトボタンを押して見せよう。',
+  'hudChrome.bootcamp.bellTitle': '鐘を鳴らす',
+  'hudChrome.bootcamp.bellBody':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、{interactKey}を押すか、左クリックして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、鐘をタップして、イーストブルックへ出航しよう。',
+  'hudChrome.bootcamp.bellBodyPad':
+    '渡りは勝ち取った。桟橋のそばの渡しの鐘まで歩き、インタラクトボタンを押して、イーストブルックへ出航しよう。',
+  'entities.zones.proving_shore.pois.4.label': 'ガントレット',
+  'entities.items.ps_castaway_crate.name': '漂着した木箱',
+  'entities.items.ps_ferry_bell.name': '渡しの鐘',
+  'entities.mobs.training_effigy.name': '訓練用のかかし',
+  'entities.mobs.shore_scuttler.name': '浜辺ガニ',
+  'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
+  'entities.npcs.wayfarer_bryn.title': '港の案内人',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+  'entities.npcs.instructor_maren.name': '教官マレン',
+  'entities.npcs.instructor_maren.title': '修練の師',
+  'entities.npcs.instructor_maren.greeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた、{className}。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。この浜はそのためにある。問い、鍛え、失敗しても構わない場所で存分に失敗するといい。',
+  'entities.npcs.quartermaster_finch.name': '補給係フィンチ',
+  'entities.npcs.quartermaster_finch.title': '野営地の商人',
+  'entities.npcs.quartermaster_finch.greeting':
+    '私の店先に並ぶ売り物はきっかり一つだけだよ、{playerName}。道すがら拾ったものを入れる予備のポーチ、それも課題がそれを求めたときだけ。ほかにここにあるのは全部、渓谷へ送る引き揚げ品さ。銅貨がポーチを買い、働きが銅貨を稼ぐ。それが経済のすべてで、これ以上難しくはならない。大きくなるだけさ。',
+  'entities.npcs.ferryman_odo.name': '渡し守オド',
+  'entities.npcs.ferryman_odo.title': '渡し場の番人',
+  'entities.npcs.ferryman_odo.greeting':
+    '渡ってきたばかりかい、{playerName}？ウォーデン・タムが桟橋のすぐ南の浜でガントレットを預かっている。まず彼のレーンを走ってくれば、足が礼を言うだろう。この浜の番人たちは、仕事を終えるたびに君を次の一人へ引き継いでくれるし、画面の上のカードはいつでも次の道を知っている。渓谷が君を呼び戻したら、私の桟橋のそばに立つ鐘を鳴らせば、渡しがイーストブルックの町まで送り届けてくれる。',
+  'entities.npcs.warden_tam.name': 'ウォーデン・タム',
+  'entities.npcs.warden_tam.title': 'ガントレットの番人',
+  'entities.npcs.warden_tam.greeting':
+    'このレーンがガントレットだ、{playerName}。渓谷に名を知られた冒険者は皆ここを走った。柵のランタンは夜通し灯っているから、レーンが閉まることはない。',
+  'entities.npcs.overseer_pell.name': '監督官ペル',
+  'entities.npcs.overseer_pell.title': 'ガントレットの監督官',
+  'entities.npcs.overseer_pell.greeting':
+    'このレーンを下ってくる走りは全部私が計っている、{playerName}。もっとひどい足さばきなら山ほど見てきたよ。私の後ろの道は練習場へ続いている。足さばきが剣さばきに変わるのは、あそこだ。',
+  'entities.npcs.drillmaster_rook.name': '訓練長ルーク',
+  'entities.npcs.drillmaster_rook.title': '練習場の主',
+  'entities.npcs.drillmaster_rook.greeting':
+    'まず藁、次に甲羅だ、{playerName}。かかしは腕に振り方を教え、浜の先の蟹どもは、嫌がる相手に当てる術を教えてくれる。',
+  'entities.npcs.tidewarden_nel.name': '潮守ネル',
+  'entities.npcs.tidewarden_nel.title': '浜辺の番人',
+  'entities.npcs.tidewarden_nel.greeting':
+    '潮は奪い、潮は払う、{playerName}。私はその両方の帳簿をつけている。蟹どもが難破船から掠め取るものと、正直な手がこの道を運び上げてくるものとをね。',
+  'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、その場で向きを変え、南のレーンを二本目の旗まで歩き、それから最後のレーンを赤い旗まで横歩きで進むんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。監督官ペルがレーンの先で走りをすべて計っている。赤い旗を越えれば、彼がすぐそこに立って走りを受け取ってくれるよ。',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '今の走り、しかと計った、{playerName}。もっと速い足を落第させたこともある。ガントレットは君のものだ。私の後ろの道を上れば練習場で、そこでは訓練長ルークが足さばきを剣さばきに変えてくれる。次の仕事は彼が持っているよ。',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'ガントレットの旗を通過',
+  'entities.npcs.bursar_wick.name': '出納係ウィック',
+  'entities.npcs.bursar_wick.title': '金張りの金庫',
+  'entities.npcs.bursar_wick.greeting':
+    '金張りの金庫は、こんな浜にも机を置いているんだよ、{playerName}。私に預けたものは、どの町のどの出納係の後ろにもある同じ金庫で待っている。狼にも、水にも、君自身のまずい思いつきにも手は届かない。',
+  'entities.quests.q_ps_strike_true.title': '確かな一撃',
+  'entities.quests.q_ps_strike_true.text':
+    '足の次は腕だ、{playerName}。練習場は私の後ろの道を上った先にあって、そこの藁のかかしは打たれるために作られている。道に迷ったらMを押して地図を開きなさい。引き受けた仕事はすべてそこに印がつく。かかしに歩み寄ってTabを押すか、左クリックすれば、それが君のターゲットになる。次に1を押すか、画面下のアクションバーの最初のアイコンをクリックすれば、刃が振れる。一体が崩れるまで打ち続けること。かかしは打ち返してこない。かかしとはそういうものだ。訓練長ルークは、浜辺への道が始まる練習場の西の肩から場を見ている。彼にFを押して、討ち取りの報告を納めなさい。',
+  'entities.quests.q_ps_strike_true.completion':
+    '見事に一体、握りももう確かになってきた。その感覚を忘れるな、{playerName}。狙いを定め、打ち込み、打ち続ける。藁は何をされても気にしない。だが次に君が刃を向ける相手は、そうはいかないぞ。',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '訓練用のかかしを倒す',
+  'entities.quests.q_ps_shell_and_claw.title': '甲羅と爪',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '藁は気にしないが、{playerName}、今度は気にする相手だ。浜辺ガニが遠い浜の難破の浜で残骸を漁っている。練習場から西へ道なりに進めば、まっすぐ奴らのところへ出る。奴らは挟み返してくるから、体力バーに気を配りつつ打ち続けろ。左クリックで一匹をターゲットにして、練習場で覚えた技を使い、甲羅が割れるまで手を止めるな。三匹で足りる。終わったら北の丘へ道を上りなさい。潮守ネルが浜の帳簿をつけていて、君の甲羅も数えてくれる。',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '甲羅を三つ割って、指は一本も欠けていない。初陣としては上出来だよ、{playerName}。あの蟹どもは潮が漂着物を運ぶより速く難破船から掠め取っていくから、君が一匹間引くたびに、誰かの銅貨が守られるんだ。',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '浜辺ガニを間引く',
+  'entities.quests.q_ps_the_wreck_line.title': '難破の浜',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '私の運び手たちは古い難破船から漂着物を下ろし、暁の野営地へ向かう丘を運び上げるんだ、{playerName}。ところが木箱の半分は登り切らない。道すがら置かれて、そのまま忘れられてしまう。私の道を野営地のほうへ辿れば、そのはぐれ荷のすぐ脇を通る。開けるのは簡単だよ。名前が見えるところまで木箱に歩み寄って、Fを押すか、木箱そのものを左クリックすれば、中身を差し出してくれる。六つ開ければ道は片づく。そしてFは、この先出会うどんな宝箱にも、採集場所にも、扉にも使う同じキーだと覚えておきなさい。補給係フィンチが野営地の露店を構えていて、漂着物なら棒切れ一本でも買い取ってくれる。獲物は彼女に渡すんだ。',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'ロープに、タールに、海がなぜか見逃したチーズが半玉。全部引き取ろう、{playerName}。拾ったものを担いで運べる背中は、この野営地にとってどんな刃より値打ちがある。そして君のその背中は、たった一登りで道を丸ごと片づけてくれた。',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '漂着した木箱を開ける',
+  'entities.quests.q_ps_pouch_and_purse.title': 'ポーチと財布',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '渓谷へ発つ前にもうひとつ、冒険者の命を守る授業だよ、{playerName}。君の持ち物の話だ。背嚢には十六の枠があり、その横に空の鞄留めが四つ待っている。鞄を留めるたびに、その分の空きが全体に加わる。では、もう一度私にFを押して店を開き、並んだ品の中の亜麻のポーチを左クリックして買い、それからBを押してバッグを開き、そこのポーチを左クリックして空いた留めに締めなさい。教官マレンは数歩東の集合の焚き火のそばで稽古をつけている。腰のポーチを彼女に見せておいで。',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '良いポーチだ。まだ締めていないなら締めておきなさい。Bを押してバッグを開き、ポーチを左クリックして空いた鞄留めに収めれば、厄介ごとを詰める枠が六つ増える。ここからは、どんな鞄にも収まらない残り半分の授業だよ、{playerName}。持ちきれないものは金張りの金庫が預かる。出納係ウィックが西の道を上った先に金庫の机を構えていて、どの町のどの出納係とも共通の金庫を開けてくれる。財布が育てば金庫の枠も買い足せる。値打ち物は金庫へ、鞄には余裕を。狼よりも多くの冒険を終わらせてきたのは、はち切れた背嚢のほうなんだ。',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '亜麻のポーチを購入する',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '刃を研ぐ',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '振るだけなら誰でもできる、{playerName}。藁は一日中でも受け止めてくれるが、それで勝てるものは何もない。画面の下に並んだボタンの列を見ろ。あれが君の技だ。どれも腕一本ではできないことをやってのける。君はもう一つ持っている。かかしに向き直って使え。ターゲットを取り、この庭が示すボタンを押す。それを三度。藁をただ叩くな、君の知っている技を実際に起こすんだ。それができたら戻ってこい。',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    'これでようやく、めちゃくちゃに振り回すのではなく戦っている。あの列はレベルを上げるたびに増えていく、{playerName}。長生きするのは、あれを読む者だ。藁はどのボタンを使われようが気にしない。谷は気にする。',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    'かかしに技を当てた',
+  'entities.quests.q_ps_the_long_walk.title':
+    '長い帰り道',
+  'entities.quests.q_ps_the_long_walk.text':
+    '残る教えは一つ、{playerName}。そしてこれは口では伝えられない。一度やってみるしかないものだ。君は外で必ず死ぬ。誰もが死ぬし、それで終わりになるわけではない。このたましいの石を持っていけ。Bを押して持ち物を開き、左クリックすれば、その場で君を横たえてくれる。あとは画面の指示に従え。魂を解放し、自分の亡骸まで歩いて戻り、そこへ踏み入る。亡骸は待っている。その道のりに代償はなく、歩いても失うものは何もない。',
+  'entities.quests.q_ps_the_long_walk.completion':
+    'そして君は戻ってきた、何ひとつ悪くならずに。あの感じを覚えておけ、{playerName}。次に起きるときには牙が絡んでいるし、横で説明してくれる者もいない。亡骸は待っている。道のりは無料で、死が本当に奪うのは戻るまでの時間だけだ。',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '死から歩いて戻った',
+  'entities.items.ps_passing_stone.name':
+    'たましいの石',
+  'entities.quests.q_ps_the_signpost.title': '風の便り',
+  'entities.quests.q_ps_the_signpost.text':
+    '学ぶ習慣はあとひとつ、{playerName}、これに刃は要らない。掲示板を読むことだ。ギルドの掲示柱は私の焚き火から南西へ数歩、野営地の門のところに立っていて、ギルドや旅の一団が呼びかけを貼っていく。柱の正面まで歩み寄ってFを押すか、左クリックして貼られたものを読み、それから戻って、風が何を運んできたか聞かせておくれ。この先君が足を踏み入れるどの町にも、同じような掲示板が立っているよ。',
+  'entities.quests.q_ps_the_signpost.completion':
+    'これで渓谷での知らせの巡り方が分かったね、{playerName}。使者ではなく、掲示板で巡るんだ。通る町ごとに確かめなさい。冒険の半分は、板の上の三行の墨から始まるのだから。',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': 'ギルドの掲示柱を読む',
+  'entities.quests.q_ps_set_sail.title': '出航',
+  'entities.quests.q_ps_set_sail.text':
+    'この浜には、君がまだ走っていない、倒していない、開けていない、買っていないものは何も残っていないよ、{playerName}。準備はできた。イーストブルックには本物の仕事が待っている。浜の道を下って桟橋へ戻り、渡し守オドにFを押して、マレンが、君は渡りを勝ち取ったと言っていた、と伝えなさい。誰に何を頼まれていたか分からなくなったら、いつでもLを押しなさい。それが君のクエストログだよ。',
+  'entities.quests.q_ps_set_sail.completion':
+    'マレンがそう言ったのかい？私に一週間も舫い結びの稽古をさせた人からの、これは大した誉め言葉だ。支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい、{playerName}。渡しがイーストブルックの町の真ん中に降ろしてくれる。狼には気をつけて。',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '渡し守オドに報告する',
+  'entities.zones.proving_shore.name': '修練の浜',
+  'entities.zones.proving_shore.welcome':
+    '修練の浜が君に求めるのは時間だけ。野営地を覚え、かかしを打ち、難破の浜を歩き、支度ができたら渡し守オドが渓谷まで送り届けてくれる。',
+  'entities.zones.proving_shore.pois.0.label': '暁の野営地',
+  'entities.zones.proving_shore.pois.1.label': '古い桟橋',
+  'entities.zones.proving_shore.pois.2.label': '練習場',
+  'entities.zones.proving_shore.pois.3.label': '難破の浜',
+  'guide.home.world.provingName': '修練の浜',
+  'guide.home.world.provingBlurb':
+    '海峡の向こうの静かな訓練の島。渓谷が何かを求めてくる前に、新米冒険者はここで足場を固める。',
+  'guide.worldPage.provingBlurb':
+    '渓谷から海峡を隔てた静かな島で、訓練場として保たれている。野営地がひとつ、練習場がひとつ、残骸の散らばる浜、そして行きも帰りも通う渡し船。',
+  'guide.worldPage.provingGreeting':
+    '渓谷が感謝を捧げてきた英雄は皆、今君が立っているその場所に立っていた。そして当時は誰一人、剣のどちらを握るのかさえ知らなかった。',
+  'guide.worldPage.provingGreeter': '教官マレン、暁の野営地',
+  'guide.worldPage.provingPlaceNotes':
+    '暁の野営地が島の集落のすべてで、テントが数張り、売店がひとつ、集いの焚き火がひとつ。古い桟橋は渓谷に面し、渡しの円環が卒業生を海峡の向こうへ運ぶ。野営地の南の練習場には、必要とする者のために藁のかかしが立ち続け、難破の浜は潮が漂着した木箱で島に払いをする、残骸の散らばる海岸だ。',
   'hudChrome.perf.diagnostics.report.status.healthy': '正常',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':
@@ -13537,6 +13901,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'アクションバーの配置を編集',
   'hudChrome.barEditor.title': 'アクションバーの編集',
   'hudChrome.barEditor.close': 'アクションバー編集を閉じる',
@@ -13552,4 +13917,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'スロットをクリア',
   'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
   'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
+  'hudChrome.meters.threatFrozen': '{name}への最終脅威',
+  'hudChrome.account.setPasswordTitle': 'パスワードを設定',
+  'hudChrome.account.setPasswordHint':
+    'このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードがありません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他の端末でもサインインでき、追加のサインイン方法も連携できます。',
+  'hudChrome.account.setPasswordSubmit': 'パスワードを設定',
+  'hudChrome.account.passwordSet':
+    'パスワードを設定しました。これでどこでもユーザー名とパスワードでサインインできます。',
+  'hudChrome.crafting.craftFeeLine': '製作手数料：1個あたり {fee}',
+  'hudChrome.deeds.stillToVisit': '未訪問：{places}',
+  'apiError.account.password_already_set':
+    'このアカウントにはすでにパスワードがあります。代わりにパスワード変更を使用してください。',
+  'sim.rift.lootRecoveryNotice':
+    '裂け目の入口はまだしばらく保たれます。パーティーが倒れても、得たものを取り戻しに歩いて戻れます。',
+  'abilityUi.tooltip.anyTarget': '敵または味方の対象',
+  'entities.abilities.melting_acid.name': '溶解酸',
+  'entities.abilities.melting_acid.description':
+    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。',
+  'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
+  'entities.abilities.nightshade_coating.description':
+    '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
 };

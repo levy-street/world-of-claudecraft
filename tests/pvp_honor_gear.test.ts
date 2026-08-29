@@ -190,8 +190,16 @@ describe('FURY WARFARE stock', () => {
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
     expect(NPCS.fury.name).toBe('FURY');
     expect(NPCS.fury.title).toBe('Honor Quartermaster');
-    expect(NPCS.fury.pos).toEqual({ x: -22.5, z: -7.5 });
-    expect(NPCS.fury.facing).toBe(1.171280832795522);
+    // Re-pinned 2026-08: FURY moved with the town in the harbor move
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md); the placement
+    // derives from EASTBROOK_NPC_PLACEMENTS_BY_ID.fury, now by the chapel
+    // green facing the civic square.
+    // Re-pinned for owner round 6b: FURY is a service NPC, so he left the
+    // chapel step (7 yd from Brother Aldric) for the town's eastern edge. The
+    // placement still derives from EASTBROOK_NPC_PLACEMENTS_BY_ID.fury, so his
+    // facing moved with him.
+    expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
+    expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
     expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
   });

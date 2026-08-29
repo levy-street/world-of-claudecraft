@@ -116,7 +116,13 @@ class Lab {
       world: EMPTY_TEST_WORLD,
     });
     this.srv.setPlayerLevel(60);
-    const start = opts.start ?? { x: 0, z: -80 };
+    // Default start re-pinned 2026-08 for the Eastbrook harbor move
+    // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): (0,-80) now
+    // sits inside the relocated chapel's footprint, whose collider mangles
+    // every default-start run. Use the collider-free open-field lane this
+    // file already documents for the stall labs, so the default and explicit
+    // lanes stay identical.
+    const start = opts.start ?? { x: 0, z: -1000 };
     teleport(this.srv, start.x, start.z);
     this.facing = opts.facing ?? 0;
     this.srv.player.facing = this.facing; // run straight north (+z) by default
@@ -323,7 +329,7 @@ describe('SelfMotionPredictor', () => {
     }
     expect(moved).toBeGreaterThan(0.2); // ~4 frames of RUN_SPEED
     // the server has not even received the input yet (120ms lag > 4 frames)
-    expect(lab.srv.player.pos.z).toBeCloseTo(-80, 3);
+    expect(lab.srv.player.pos.z).toBeCloseTo(-1000, 3);
   });
 
   // Running into a blocker (the Grand Armoury's flat south face at z = -12) is

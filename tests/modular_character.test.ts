@@ -51,6 +51,7 @@ import {
   OUTFIT_COLORWAY_IDS,
   OUTFIT_COLORWAYS,
   outfitDye,
+  outfitDyeFallbackHex,
   outfitSwatchHex,
   outfitSwatchHexes,
   randomHairStyles,
@@ -765,6 +766,28 @@ describe('outfit colorways', () => {
     // a hue colorway stays a flat single-stop chip
     expect(outfitSwatchHexes('knight', 'crimson')).toHaveLength(1);
   });
+
+  it('normalizes the low-tier dye fallback to full brightness on its dominant channel', () => {
+    for (const set of ARMOR_SETS) {
+      for (const id of OUTFIT_COLORWAY_IDS) {
+        const hex = outfitDyeFallbackHex(set, id);
+        const r = (hex >> 16) & 0xff;
+        const g = (hex >> 8) & 0xff;
+        const b = hex & 0xff;
+        // the brightest channel of the swatch's own colour reads at full
+        // strength once scaled up, or the fallback is still crushing the
+        // atlas toward black exactly like the bug it exists to fix
+        expect(Math.max(r, g, b), `${set}/${id}`).toBe(255);
+      }
+    }
+  });
+
+  it('keeps the fallback hue distinct across colorways, like the swatch chip it is derived from', () => {
+    const hexes = OUTFIT_COLORWAY_IDS.map((id) => outfitDyeFallbackHex('mage', id));
+    // classic shares a native hue family with at most one dye target, same
+    // tolerance as the swatch-chip distinctness test above
+    expect(new Set(hexes).size).toBeGreaterThanOrEqual(OUTFIT_COLORWAY_IDS.length - 2);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -1037,6 +1060,105 @@ describe('head shading', () => {
       if ([a, b, c].every((i) => Math.abs(dot(unit(N[i]), fn)) > 0.999)) flat++;
     }
     expect(flat / tris.length, `${node} share of flat-shaded triangles`).toBeLessThan(0.12);
+  });
+
+  // Regression pin for the male-only "open top of the nose" bug report: the
+  // ten vertices ringing the bridge of the nose (theta ~77 to ~136 in the
+  // headAngles frame, see src/render/characters/stubble.ts) formed a closed
+  // boundary loop with no triangles capping it, so the mesh was open there
+  // and looking down the nose (from above or the side) showed straight into
+  // the empty head interior. scripts/fix_male_head_nose_hole.mjs closes it.
+  // This walks every edge and demands every one be shared by exactly two
+  // triangles (a watertight mesh) EXCEPT the small, intentional cutouts the
+  // other modular parts (eyes/ears/mouth) and the isNoseUnderside decal
+  // plug into, which stay open by design. A regression that reopens the
+  // bridge hole (or opens a new one) shows up as an edge used by only one
+  // triangle outside that allowance.
+  // Baseline open-edge counts once the bridge hole is closed: the eyes, ears,
+  // mouth, and (male only) nostril-underside cutouts the other modular parts
+  // plug into. The two heads are separate sculpts with different cutout
+  // counts, so each gets its own pin rather than a shared cap; a tolerance
+  // band catches a reopened bridge hole (adds ~10 edges) without hand-pinning
+  // every legitimate cutout edge.
+  const OPEN_EDGES: Record<string, number> = { M_Head: 76, F_Head: 116 };
+  it.each(['M_Head', 'F_Head'])('%s has no unintended open edges', async (node) => {
+    const { tris } = await decode(node);
+    const edgeCount = new Map<string, number>();
+    const key = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
+    for (const [a, b, c] of tris) {
+      for (const [x, y] of [
+        [a, b],
+        [b, c],
+        [c, a],
+      ])
+        edgeCount.set(key(x, y), (edgeCount.get(key(x, y)) ?? 0) + 1);
+    }
+    let openEdges = 0;
+    for (const count of edgeCount.values()) if (count === 1) openEdges++;
+    const expected = OPEN_EDGES[node];
+    expect(openEdges, `${node} open (non-manifold) edges`).toBeGreaterThanOrEqual(expected - 4);
+    expect(openEdges, `${node} open (non-manifold) edges`).toBeLessThanOrEqual(expected + 4);
+  });
+});
+
+// Regression pin for the "mullet clips through the forehead" bug report: one
+// vertex on H2_mullet's front-fringe centerline (index 253) sat noticeably
+// further from its own topological neighbors than the fringe otherwise does,
+// reading on screen as a sharp downward notch cutting into the browline.
+// scripts/fix_mullet_forehead_clip.mjs pulls it back toward its neighbor
+// average. This decodes the shipped position directly rather than depending
+// on any other test's helper, since it targets one specific known vertex.
+describe('mullet front-fringe fit', () => {
+  const def = VISUALS[MODULAR_WARRIOR_KEY];
+  const path = fileURLToPath(new URL(`../public/${def.url}`, import.meta.url));
+
+  it('vertex 253 stays close to its neighbor average, not overshot into the browline', async () => {
+    const { NodeIO } = await import('@gltf-transform/core');
+    const { ALL_EXTENSIONS } = await import('@gltf-transform/extensions');
+    const { MeshoptDecoder } = await import('meshoptimizer');
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const doc = await io.read(path);
+    const node = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'H2_mullet');
+    expect(node, 'H2_mullet present').toBeTruthy();
+    const prim = node?.getMesh()?.listPrimitives()[0];
+    const pos = prim?.getAttribute('POSITION');
+    const idx = prim?.getIndices();
+    expect(pos, 'H2_mullet positions').toBeTruthy();
+    expect(idx, 'H2_mullet indices').toBeTruthy();
+
+    const count = pos?.getCount() ?? 0;
+    const P: number[][] = [];
+    for (let i = 0; i < count; i++) P.push(pos?.getElement(i, [0, 0, 0]) as number[]);
+
+    const idxArr = Array.from(idx?.getArray() ?? []);
+    const neighbors = new Set<number>();
+    const TARGET = 253;
+    for (let t = 0; t < idxArr.length / 3; t++) {
+      const tri = [idxArr[t * 3], idxArr[t * 3 + 1], idxArr[t * 3 + 2]];
+      if (!tri.includes(TARGET)) continue;
+      for (const v of tri) if (v !== TARGET) neighbors.add(v);
+    }
+    expect(neighbors.size, 'v253 topological neighbors').toBeGreaterThan(0);
+
+    const avg = [0, 0, 0];
+    for (const n of neighbors) {
+      avg[0] += P[n][0];
+      avg[1] += P[n][1];
+      avg[2] += P[n][2];
+    }
+    avg[0] /= neighbors.size;
+    avg[1] /= neighbors.size;
+    avg[2] /= neighbors.size;
+
+    const p = P[TARGET];
+    const dist = Math.hypot(p[0] - avg[0], p[1] - avg[1], p[2] - avg[2]);
+    // Unfixed, this measures ~0.173; fixed, ~0.052. 0.10 sits cleanly between.
+    expect(dist, 'v253 distance from its neighbor average').toBeLessThan(0.1);
   });
 });
 

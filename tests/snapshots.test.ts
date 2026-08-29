@@ -2,12 +2,17 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { completeCraftCast } from './helpers/enchant_family_cast';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -24,10 +29,18 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { createBackgroundDbGate } from '../server/background_db_gate';
 import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
-import { saveCharacterState } from '../server/db';
+import {
+  saveCharacterAndGuildBankState,
+  saveCharacterAndMarketState,
+  saveCharacterState,
+  saveMailState,
+  saveMarketState,
+} from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -782,6 +795,7 @@ describe('loot FFA lapse over the wire', () => {
     const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = 45;
     mob.tappedById = TAPPER;
     // claimed: keeps the harvest arm closed so canOpen isolates loot rights
     mob.harvestClaimedBy = TAPPER;
@@ -829,6 +843,60 @@ describe('loot FFA lapse over the wire', () => {
     const alive = createMob(9104, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     alive.lootFfaTimer = 0;
     expect(wireEntity(alive)).not.toHaveProperty('ffa');
+  });
+});
+
+// Corpse decay over the wire, the same shape as the ffa suite above: offline
+// the Sim entity carries the real corpseTimer countdown, so online the DECAY
+// must ride the sparse terse key `cd` or a self-scheduled rare's aged-out
+// corpse (Grix the Tunnelking: a 15 to 30 minute respawnWindow far outlasts
+// his 60s corpseTimer, see tests/respawn_policy.test.ts) stays a rendered,
+// unclickable "stuck corpse" for the rest of the respawn wait, the reported
+// bug entity_view_policy_core.ts's admission check now fixes.
+describe('corpse decay over the wire', () => {
+  function deadMob(id: number, corpseTimer: number): ReturnType<typeof createMob> {
+    const template = MOBS.grix_the_tunnelking;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.corpseTimer = corpseTimer;
+    mob.respawnTimer = 1800; // far outside the corpse window, like Grix's real one
+    return mob;
+  }
+
+  it('a fresh corpse stays sparse (no cd key) while inside its loot window', () => {
+    const w = wireEntity(deadMob(9201, 45));
+    // Absent, not `cd: 0`: an undecayed corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('cd');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(9201)!.corpseTimer).toBeGreaterThan(0);
+  });
+
+  it('the decay rides cd:1 once the corpse window elapses, and mirrors as decayed', () => {
+    const w = wireEntity(deadMob(9202, 0));
+    expect(w.cd).toBe(1);
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(9202)!.corpseTimer).toBeLessThanOrEqual(0);
+  });
+
+  it('a record without the flag resets a stale mirrored decay (respawn reuses the id)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(deadMob(9203, 0))] });
+    expect(client.entities.get(9203)!.corpseTimer).toBeLessThanOrEqual(0);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(deadMob(9203, 45))] });
+    expect(client.entities.get(9203)!.corpseTimer).toBeGreaterThan(0);
+  });
+
+  it('never emits cd for a live mob, even with a stale zero corpseTimer field', () => {
+    const template = MOBS.forest_wolf;
+    const alive = createMob(9204, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    alive.corpseTimer = 0;
+    expect(wireEntity(alive)).not.toHaveProperty('cd');
   });
 });
 
@@ -1999,6 +2067,14 @@ describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndGuildBankState).mockReset();
+    vi.mocked(saveCharacterAndGuildBankState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndMarketState).mockReset();
+    vi.mocked(saveCharacterAndMarketState).mockResolvedValue(true);
+    vi.mocked(saveMarketState).mockReset();
+    vi.mocked(saveMarketState).mockResolvedValue();
+    vi.mocked(saveMailState).mockReset();
+    vi.mocked(saveMailState).mockResolvedValue();
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -2054,6 +2130,209 @@ describe('autosaves', () => {
 
     const savedCharacterIds = vi.mocked(saveCharacterState).mock.calls.map((call) => call[0]);
     expect(savedCharacterIds.sort((a, b) => a - b)).toEqual([1, 1, 2, 2]);
+  });
+
+  it('holds each character save under the shared major-producer permit', async () => {
+    const gate = createBackgroundDbGate(3, 2); // one admitted producer
+    const server = new GameServer(undefined, gate);
+    joinServer(server, fakeWs(), 1, 'Testa');
+    joinServer(server, fakeWs(), 2, 'Testb');
+    joinServer(server, fakeWs(), 3, 'Testc');
+    let releaseDb!: () => void;
+    const dbHold = new Promise<void>((resolve) => {
+      releaseDb = resolve;
+    });
+    vi.mocked(saveCharacterState).mockImplementation(async () => {
+      await dbHold;
+      return true;
+    });
+
+    const saving = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      expect(saveCharacterState).toHaveBeenCalledTimes(1);
+      expect(gate.stats()).toMatchObject({ inFlight: 1, waiting: 2, max: 1 });
+    });
+    releaseDb();
+    await saving;
+
+    expect(saveCharacterState).toHaveBeenCalledTimes(3);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 3 });
+  });
+
+  it('joins the character FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const order: string[] = [];
+    let markHeadStarted!: () => void;
+    const headStarted = new Promise<void>((resolve) => {
+      markHeadStarted = resolve;
+    });
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => {
+      markHeadStarted();
+      await headHold;
+    });
+    await headStarted;
+
+    // Model the marketplace custody adapter: it already owns the character
+    // FIFO before asking for a background permit.
+    const custody = server.enqueueCharacterWrite(session.characterId, async () => {
+      const permit = await gate.acquire();
+      if (!permit) throw new Error('custody permit unexpectedly refused');
+      try {
+        order.push('custody');
+      } finally {
+        permit.release();
+      }
+    });
+    vi.mocked(saveCharacterState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('autosave');
+      return true;
+    });
+    const autosave = server.saveAll('autosave');
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // The old permit->FIFO order held this one permit here. Custody was ahead
+    // in the same FIFO and waited for it forever, while autosave waited behind
+    // custody. No producer may consume the permit until its FIFO turn begins.
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, custody, autosave]);
+    expect(order).toEqual(['custody', 'autosave']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('joins the market FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 913;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => headHold) as Promise<void>;
+    const order: string[] = [];
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('character');
+      return true;
+    });
+    vi.mocked(saveMarketState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('market');
+    });
+
+    // The dirty-book autosave owns the character FIFO and queues first on the
+    // market writer. A periodic market save queues behind it. Neither may take
+    // the sole DB permit before its market-FIFO turn begins: the old
+    // permit->market order made the market save hold the permit while waiting
+    // behind a character save that needed that same permit.
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const characterSave = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      // The character FIFO is running and has reached the held market writer,
+      // so its market entry necessarily precedes the periodic one below.
+      expect(serialize).toHaveBeenCalled();
+    });
+    const marketSave = server.saveMarket();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, characterSave, marketSave]);
+    expect(order).toEqual(['character', 'market']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
+    const gate = createBackgroundDbGate(1, 0);
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 914;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      return true;
+    });
+    vi.mocked(saveMailState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+    });
+
+    await server.flushDirtyGuildBooks(session.characterId);
+    await server.persistMailBlob();
+
+    expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
+    expect(saveMailState).toHaveBeenCalledTimes(1);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the character FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterState).mockClear();
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => headHold);
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, { signal: controller.signal });
+    await Promise.resolve();
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    releaseHead();
+    await head;
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the market FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    let releaseMarket!: () => void;
+    const marketHold = new Promise<void>((resolve) => {
+      releaseMarket = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => marketHold) as Promise<void>;
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, {
+      withMarket: true,
+      signal: controller.signal,
+    });
+    await vi.waitFor(() => {
+      // The character FIFO is already running; its synchronous snapshot work
+      // completed before it queued behind the held market writer.
+      expect(serialize).toHaveBeenCalled();
+    });
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterAndMarketState).not.toHaveBeenCalled();
+    releaseMarket();
+    await head;
   });
 });
 
@@ -2768,7 +3047,11 @@ describe('guild nameplate wire', () => {
         motdSetBy: '',
         members: [],
         events: [],
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
       },
+      myPledge: null,
     };
     (client as any).socialDirty = false;
     const internals = client as unknown as { onMessage(raw: string): void };
@@ -2780,7 +3063,7 @@ describe('guild nameplate wire', () => {
       }),
     );
 
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(true);
 
     internals.onMessage(
@@ -2789,7 +3072,7 @@ describe('guild nameplate wire', () => {
         list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
       }),
     );
-    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.socialInfo?.guild?.name).toBe('Dawn Guard');
     expect(client.consumeSocialChanged()).toBe(false);
   });
 
@@ -4122,11 +4405,13 @@ describe('online mount command and race-event transport', () => {
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
 // source, so any unregistered delta key reddens this gate. All but three ride
-// via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
-// fragments, each serialized at most once per tick by a realm-readout memo and
-// shared across viewers), and `reliq` is `maybeRaw(...)` too but for a different
+// via `maybe(...)`; `dfb` is written with `maybeRaw(...)` (a realm-wide
+// fragment, serialized at most once per tick by a realm-readout memo and
+// shared across viewers), `reliq` is `maybeRaw(...)` too but for a different
 // memo: a PER-CHARACTER blob serialized once per state revision
-// (reliquaryWireJson), never shared across viewers. The count is the union of the
+// (reliquaryWireJson), never shared across viewers, and `app` is `maybeRaw(...)`
+// over the memoized authored-look JSON (per-viewer, re-serialized only when the
+// look changes). The count is the union of the
 // release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
 // and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
 // crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
@@ -4145,6 +4430,7 @@ const ALL_DELTA_KEYS = [
   'bank',
   'bg',
   'blk',
+  'bpsl',
   'buyback',
   'bval',
   'cardDuel',
@@ -4156,6 +4442,7 @@ const ALL_DELTA_KEYS = [
   'cprof',
   'crat',
   'crit',
+  'cvault',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -4210,14 +4497,12 @@ const ALL_DELTA_KEYS = [
   'salv',
   'sh',
   'sp',
-  'sport',
   'stats',
   'tal',
   'tfocus',
   'trade',
   'tslot',
-  'vcup',
-  'vcupb',
+  'vault',
   'weapon',
   'xp',
 ] as const;
@@ -4237,9 +4522,6 @@ const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
 // carries the always-present self scalars (res/mres/rtype/lxp/rxp/prk) plus every
 // delta key whose IWorld name differs from its terse key (stats/weapon/delveDaily
 // keep their name; tal fans out to several members and is asserted directly).
-// vcup/vcupb are likewise excluded and asserted directly in the round-trip test:
-// they merge into one `cupInfo` (per-viewer remainder on vcup, realm-wide fragment
-// on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
   aborder: 'activeBorder',
   achg: 'abilityCharges',
@@ -4257,6 +4539,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
+  cvault: 'craftVaultStock',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
@@ -4308,9 +4591,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   salv: 'lastSalvageResult',
   sh: 'spellHaste',
   sp: 'spellPower',
-  sport: 'sportRole',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
+  vault: 'vaultInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -4388,6 +4671,19 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `vault`: vaultInfoFor shares the bank's proximity gate (the bursar relocated
+  // above covers it), so only the contents need dirtying. Stocked AND upgraded,
+  // because a locked empty vault still encodes as a non-null all-zero object:
+  // without a rung the mirrored numbers would be indistinguishable from the
+  // default and the decode-target assertion could not tell them apart.
+  meta.vault.stock = { copper_ore: 7 };
+  meta.vault.upgrades = 2;
+  // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
+  // not the banker. This harness player carries a live DELVE RUN (the drun
+  // key's seeding below), which the gate refuses by design, so cvault's
+  // dirtied value is the EXPLICIT NULL arrival: presence still pinned by the
+  // all-keys sweep, and the non-null arrival is pinned in
+  // tests/vault_wire.test.ts where no delve run competes for the player.
   // `guildBank`: guildBankInfoFor additionally needs a guild membership stamp
   // (any rank; officer-plus here also exercises canEdit true over the wire)
   // and a loaded guild book (the banker relocated above covers proximity);
@@ -4514,8 +4810,6 @@ function dirtyEveryDeltaField(): {
   // dungeonClears assignment in the deed-stats block above.)
   noteRelicItemFind(meta, 'cryptbone_helm');
   noteRelicObtain(meta, 'cryptbone_helm', 3);
-  // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
-  meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
   meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }];
   meta.activeLoadout = 0;
@@ -4676,8 +4970,11 @@ describe('full self-state snapshot delta fixture', () => {
     meta.craftSkills.weaponcrafting = 25; // forgeguard is weaponcrafting
     meta.copper = 10000;
     // Stand at the Eastbrook forge: training is gated on the STATIC station.
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): station_eastbrook_forge moved
+    // with the smithy to (-5.80, -123.90); stand ~0.2yd from its center.
     const player = server.sim.entities.get(session.pid)!;
-    player.pos = { ...player.pos, x: 7, z: 16.5 };
+    player.pos = { ...player.pos, x: -6, z: -124 };
     player.prevPos = { ...player.pos };
 
     broadcast(server);
@@ -4723,6 +5020,16 @@ describe('full self-state snapshot delta fixture', () => {
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
+      // EXCEPT cvault: this harness player carries a live delve run (the drun
+      // key's own seeding), and the craft-draw gate refuses vault draw inside
+      // a delve, so cvault's dirtied first-snapshot value IS the explicit
+      // gated null: the two keys are mutually exclusive on one player by
+      // design. Its non-null arrival (and the by-reference mirror) is pinned
+      // in tests/vault_wire.test.ts instead.
+      if (key === 'cvault') {
+        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+        continue;
+      }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
   });
@@ -4737,8 +5044,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
     expect(client.player.abilityCharges?.ice_block?.charges).toBe(1); // achg -> e.abilityCharges
     // achr -> the same records' recharge timer (legacy wire: raw [remaining, length]);
-    // like vcup/vcupb it is hand-decoded inside the achg block, so it has no
-    // TERSE_TO_IWORLD rename entry.
+    // it is hand-decoded inside the achg block, so it has no TERSE_TO_IWORLD
+    // rename entry.
     expect(client.player.abilityCharges?.ice_block?.recharge).toBe(10);
     expect(client.player.abilityCharges?.ice_block?.rechargeLength).toBe(240);
     expect(client.player.stats).toMatchObject({
@@ -4807,6 +5114,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
+    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // from the rung-2 literal in src/sim/materials_vault.ts).
+    expect(client.vaultInfo).toEqual({
+      stock: { copper_ore: 7 },
+      special: [],
+      upgrades: 2,
+      perMaterialCap: 80,
+      nextUpgradeCost: 100000,
+    });
+    // cvault -> craftVaultStock: this harness player is inside a delve run
+    // (see the seeding comment), so the gated null is all that can arrive
+    // here, and null is ALSO the mirror default: this line alone cannot prove
+    // the decode. The decisive decode pins (stocked non-null arrival, the
+    // by-reference adoption, the gate-flip explicit null) live in
+    // tests/vault_wire.test.ts.
+    expect(client.craftVaultStock).toBeNull();
     expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
     // guild bank mirror: the membership-gated boundary clone survives the wire
     // whole, canEdit included (the client renders read-only panes from it)
@@ -4967,15 +5291,6 @@ describe('full self-state snapshot delta fixture', () => {
         forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
       },
     });
-
-    // vcup + vcupb -> cupInfo (merged from both fragments; neither key alone
-    // equals the full CupInfo, so both are excluded from TERSE_TO_IWORLD and
-    // asserted directly here, the same way tal is above). The reassembled client
-    // mirror must deep-equal exactly what the server computes for this viewer.
-    expect(client.cupInfo).toEqual(server.sim.cupInfoFor(leader.pid));
-    expect(client.cupInfo?.role).toBe('keeper'); // per-viewer field, arrived on vcup
-    expect(Object.keys(client.cupInfo?.queueSizes ?? {}).sort()).toEqual(['1', '2', '3', '4', '5']); // realm-wide field, arrived on vcupb
-    expect(client.cupInfo?.live).toBeNull(); // no live match in the fixture
   });
 
   it('mirrors canEdit FALSE for a member-rank viewer (the read-only arm over the real wire)', () => {
@@ -5058,6 +5373,7 @@ describe('full self-state snapshot delta fixture', () => {
     const weaponRef = client.player.weapon;
     const partyRef = client.partyInfo;
     const delveRunRef = client.delveRun;
+    const vaultRef = client.vaultInfo;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
     // maybe() closure sees byte-identical JSON for every registered key and omits every one
@@ -5077,6 +5393,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.weapon).toBe(weaponRef); // s.weapon ?? e.weapon (inline, player entity)
     expect(client.partyInfo).toBe(partyRef);
     expect(client.delveRun).toBe(delveRunRef);
+    // an omitted `vault` must leave an open vault window's mirror alone, not
+    // reset it to null (the omission-is-unchanged half of the delta contract)
+    expect(client.vaultInfo).toBe(vaultRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
     expect(client.honor).toBe(321);
@@ -5153,16 +5472,32 @@ describe('delta-key contract pins (anti-drift)', () => {
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
-    // for 86. Every v0.36.0 sync conflicts here because each side pins its own
-    // additions alone; the merged tree carries all of them, and this number
-    // came from a run on the merged tree.
+    // for 86, then +1: the Materials Vault's owner-only vault key
+    // (bank-storage phase 02), +1: the craft-from-vault cvault key
+    // (bank-storage phase 04, context-gated), and +1: the always-available
+    // owner-only ladder key bpsl (bank-storage phase 15, the one bank-family
+    // key with NO proximity gate, emitted for the VIEWING session rather than
+    // the spectate anchor). The release arm's Vale Cup retirement then removes
+    // sport/vcup/vcupb. Every release sync conflicts here because each side
+    // pins its own additions alone; this number is MEASURED on the merged tree.
     expect(ALL_DELTA_KEYS).toHaveLength(86);
     expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
-    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from every server emitter (multi-line lockouts incl.)', () => {
+    // Scan the whole recursive server tree: game.ts is the original emitter,
+    // while Bank Storage moved the bank family into bank_wire.ts and the
+    // Materials Vault family into vault_wire.ts. New wire surface belongs in
+    // siblings too, including nested ones, and must join this registry without
+    // relying on a hand-maintained emitter-file inventory.
+    const serverSources = tsFilesUnder(resolve(process.cwd(), 'server'));
+    expect(
+      serverSources.length,
+      'the delta-emitter scrape reads the whole server tree, not one level',
+    ).toBeGreaterThanOrEqual(300);
+    expect(serverSources.map(({ file }) => file)).toContain('vault_wire.ts');
+    const raw = serverSources.map(({ full }) => readFileSync(full, 'utf8')).join('\n');
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -5170,13 +5505,40 @@ describe('delta-key contract pins (anti-drift)', () => {
     // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted;
     // the optional `(?:Raw)?` also captures the maybeRaw realm-wide calls
     // ('vcupb' and the multi-line 'dfb')
-    const re = /\bmaybe(?:Raw)?\(\s*['"](\w+)['"]/g;
+    // `emit(...)` is the same call under the name the extracted emitter gives
+    // the delta-eliding closure its caller hands it; without this arm the two
+    // relocated bank keys stay invisible even with the file in the list.
+    // The lookbehind keeps `emit` to that BARE parameter form: `\b` would also
+    // match a member call (`this.emit('spikeReport', ...)`, `bus.emit(...)`),
+    // whose key is not a delta key at all, and the obvious repair for the red
+    // that would cause is to add it to ALL_DELTA_KEYS, permanently weakening the
+    // registry this pin exists to police.
+    const DELTA_CALL = /(?<![.\w$])(?:maybe(?:Raw)?|emit)\(\s*['"](\w+)['"]/g;
+    const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
+    expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
     expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
+    // Both relocated bank keys, BY NAME: the extraction that moved them out of
+    // game.ts left this scrape one short and only the count said so.
+    expect(scraped.has('bank')).toBe(true);
+    expect(scraped.has('bpsl')).toBe(true);
+    expect(scraped.has('vault')).toBe(true);
+    expect(scraped.has('cvault')).toBe(true);
+    // ...and the narrowing really narrows. A member `emit` is not a delta call,
+    // and asserting it on a synthetic source keeps the claim honest even while
+    // neither emitter file happens to contain one.
+    // THROUGH the same pattern the scrape above uses, not a copy of it: a second
+    // literal here would keep passing while the real one was widened back.
+    const memberEmit = new Set<string>();
+    const narrowed = new RegExp(DELTA_CALL.source, 'g');
+    const sample = "this.emit('spikeReport', x); bus.emit('tick', y); emit('bpsl', z);";
+    for (let m = narrowed.exec(sample); m !== null; m = narrowed.exec(sample)) {
+      memberEmit.add(m[1]);
+    }
+    expect([...memberEmit]).toEqual(['bpsl']);
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
@@ -5187,9 +5549,21 @@ describe('delta-key contract pins (anti-drift)', () => {
     // key ptime for 67, then the 16 static combat-rating/progression scalars
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
-    // border echo aborder for 85, and the authored modular look `app` for 86.
+    // border echo aborder for 85, and the authored modular look `app` for 86,
+    // then the Materials Vault's vault key for 87, the craft-from-vault cvault
+    // key for 88 and the always-available ladder key bpsl for 89, less the three
+    // the Vale Cup retirement removes (sport/vcup/vcupb), for 86.
     expect(scraped.size).toBe(86);
+    // Both halves of the relocated bank family are still in reach. These two
+    // are what the phase 15 extraction broke, so they are named rather than
+    // left to the set compare.
+    expect(scraped.has('bank')).toBe(true);
+    expect(scraped.has('bpsl')).toBe(true);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('scans server emitters only through the shared recursive TypeScript walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
   it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {
@@ -5267,12 +5641,6 @@ describe('delta-key contract pins (anti-drift)', () => {
     // renown keeps the same name on both sides, so it must NEVER grow a rename
     // entry (one would imply a wire key the decoder does not read)
     expect('renown' in TERSE_TO_IWORLD).toBe(false);
-    // vcup/vcupb merge into one `cupInfo` on the client (hand-written in
-    // applySnapshot, not via this table), so neither may ever grow a rename entry.
-    // Both ARE in ALL_DELTA_KEYS, so a stale re-add of `vcup: 'cupInfo'` would slip
-    // past the sorted-membership and delta-key-or-scalar checks; pin it out here.
-    expect('vcup' in TERSE_TO_IWORLD).toBe(false);
-    expect('vcupb' in TERSE_TO_IWORLD).toBe(false);
     // reliq fans out to three IWorld members (firstFind / marks / recent), so it
     // is asserted directly and must never grow a single-target rename entry.
     expect('reliq' in TERSE_TO_IWORLD).toBe(false);
@@ -5405,7 +5773,7 @@ describe('dfb realm-readout memo (shared board bytes, per-session cadence)', () 
 
   it('keeps the cadence gate per-session: staggered sessions receive a change at their OWN ticks', () => {
     // The dfb gate is per-session state (session.lastDfWireTick), NOT a
-    // realm-global dueness tracker like vcup's: two sessions with offset gates
+    // realm-global dueness tracker: two sessions with offset gates
     // receive a board change at DIFFERENT broadcast passes, each at its own
     // next due tick. A realm-global gate would deliver the change to both
     // sessions in the SAME pass and red the not-yet-delivered assertion below.

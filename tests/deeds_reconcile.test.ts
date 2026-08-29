@@ -16,6 +16,7 @@ vi.mock('../server/db', () => ({
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -269,12 +270,16 @@ describe('reconcile through GameServer.join', () => {
       motdSetBy: '',
       members: [],
       events: [],
+      pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+      pledges: [],
+      tier: 0,
     };
     vi.spyOn(server.social, 'snapshot').mockResolvedValue({
       friends: [],
       blocks: [],
       ignores: [],
       guild,
+      myPledge: null,
     });
     const setPlayerGuild = vi.spyOn(server.sim, 'setPlayerGuild');
     const fc = fakeWs();

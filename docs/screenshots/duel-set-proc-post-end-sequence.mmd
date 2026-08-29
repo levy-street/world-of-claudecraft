@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant AA as auto_attack.ts / effect_dispatch.ts<br/>swing shell or ability cast
+    participant DD as combat/damage.ts<br/>dealDamage()
+    participant D as social/duel.ts<br/>endDuel()
+    participant P as set_procs.ts / equip_procs.ts /<br/>effect_dispatch.ts 'dot' case
+    participant G as social/duel.ts<br/>duelJustEndedBetween()
+    participant L as Loser entity
+
+    Note over AA,L: Same tick, same swing or cast: the winner's hit lands the duel-ending blow
+
+    AA->>DD: dealDamage(winner, loser, lethalAmount)
+    DD->>DD: target.hp - amount < 1, clamp to 1 hp
+    DD->>D: endDuel(duel, winner)
+    D->>L: clearAurasFromController(loser, winner)<br/>strips every aura winner inflicted
+    D-->>DD: duel.endedTick = tickCount
+    DD-->>AA: return amount
+
+    Note over AA,P: Same synchronous call chain, right after dealDamage() returns
+    Note over AA,P: a 4pc set-bonus proc, a legendary weapon proc, or a dot RIDING<br/>the same cast's own direct hit (Fireball, Immolate) all fire right here
+
+    AA->>P: apply the hostile persistent effect(winner, loser)
+    alt before fix
+        P->>L: applyAura(hostile dot/attackSlow, sourceId=winner)
+        Note over L: duel already purged next tick,<br/>no clamp left, dot kills the loser seconds later
+    else after fix
+        P->>G: duelJustEndedBetween(ctx, loser, winner)?
+        G->>G: ctx.duels.get(loser.id).endedTick === tickCount<br/>AND pvpController(winner) is the OPPOSITE side of loser
+        G-->>P: true, only for a HOSTILE persistent effect<br/>(dot / attackSlow); heals and self-buffs are untouched
+        Note over P: skip applying the effect, no rng drawn
+    end

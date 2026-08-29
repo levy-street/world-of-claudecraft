@@ -2,10 +2,12 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import {
   applyMaterials,
+  recolorMesh,
   tintedFarMaterials,
   tintedMaterial,
 } from '../src/render/characters/assets';
 import type { VisualDef } from '../src/render/characters/manifest';
+import { type ModularLook, normalizeAppearance } from '../src/render/characters/modular';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { createWeaponVfx, type WeaponVfxSpec } from '../src/render/weapon_vfx';
 
@@ -14,6 +16,13 @@ vi.mock('../src/render/assets/loader', () => ({
   loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
   loadTexture: vi.fn(() => new Promise(() => undefined)),
 }));
+
+function luminance(hex: number): number {
+  const r = ((hex >> 16) & 0xff) / 255;
+  const g = ((hex >> 8) & 0xff) / 255;
+  const b = (hex & 0xff) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
 
 vi.mock('../src/render/assets/preload', () => ({
   registerPreload: vi.fn(),
@@ -190,6 +199,98 @@ describe('tinted character materials', () => {
     } finally {
       vi.doUnmock('../src/render/assets/loader');
       vi.resetModules();
+    }
+  });
+
+  it('falls back to a flat colour so an outfit colorway still shows on low graphics', () => {
+    // Low tier rebuilds every rig material as Lambert from scratch, which has
+    // no onBeforeCompile and so never runs the armour dye shader (see
+    // recolored's armorDyeFallbackHex comment in assets.ts): without the
+    // fallback this mesh would stay whatever colour the atlas ships, whichever
+    // colorway the player picked. Compares two colorways against the classic
+    // (undyed) baseline rather than pinning an exact hex, so the readability
+    // lift buildTintedClone always applies on low tier (a separate, unrelated
+    // accessibility pass) cannot make this test brittle.
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const lowTierColor = (outfit: 'classic' | 'obsidian' | 'crimson'): number => {
+        const src = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        src.name = 'mage';
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), src);
+        mesh.name = 'Armor_mage_Chest';
+        const root = new THREE.Group();
+        root.add(mesh);
+        const look: ModularLook = { app: normalizeAppearance({ outfit }), worn: {} };
+        recolorMesh(mesh, look);
+        applyMaterials(root, {} as VisualDef, 0xffffff);
+        const finalMat = mesh.material as unknown as THREE.MeshLambertMaterial;
+        expect(finalMat.isMeshLambertMaterial).toBe(true);
+        return finalMat.color.getHex();
+      };
+      const classic = lowTierColor('classic');
+      const obsidian = lowTierColor('obsidian');
+      const crimson = lowTierColor('crimson');
+      // classic never carries a dye (outfitDye returns null for it), so it
+      // stays the atlas's own white multiplier; a real colorway must differ
+      // from that AND from every other colorway.
+      expect(obsidian).not.toBe(classic);
+      expect(crimson).not.toBe(classic);
+      expect(obsidian).not.toBe(crimson);
+      // outfitDyeFallbackHex value-normalizes before it lands here (see its
+      // own comment): a naive multiply of the swatch chip's own half-bright
+      // hex would crush the whole armour toward black, which is nearly as
+      // invisible as the bug this fix exists to solve.
+      expect(luminance(obsidian)).toBeGreaterThan(0.4);
+      expect(luminance(crimson)).toBeGreaterThan(0.4);
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  it('never touches a non-armour material: skin/hair keep their own colour path on low graphics', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      src.name = 'mod_skin';
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), src);
+      mesh.name = 'Head';
+      const root = new THREE.Group();
+      root.add(mesh);
+      // An outfit colorway is active, but this mesh is skin, not armour:
+      // outfitDye (and so armorDyeFallbackHex) must never apply to it. Skin's
+      // own hex path is pre-existing behaviour (recolored's `hex !== null`
+      // arm), not this fix; the decisive check here is that the fallback
+      // metadata never leaks onto a mesh outfitDye was never meant to touch.
+      const look: ModularLook = { app: normalizeAppearance({ outfit: 'obsidian' }), worn: {} };
+      recolorMesh(mesh, look);
+      expect((mesh.material as THREE.Material).userData.armorDyeFallbackHex).toBeUndefined();
+      applyMaterials(root, {} as VisualDef, 0xffffff);
+      const finalMat = mesh.material as unknown as THREE.MeshLambertMaterial;
+      expect(finalMat.isMeshLambertMaterial).toBe(true);
+      expect(finalMat.color.getHex()).not.toBe(0xffffff);
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  it('leaves the standard-tier dyed material color untouched (the shader carries the dye, not .color)', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      src.name = 'mage';
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), src);
+      mesh.name = 'Armor_mage_Chest';
+      const root = new THREE.Group();
+      root.add(mesh);
+      const look: ModularLook = { app: normalizeAppearance({ outfit: 'obsidian' }), worn: {} };
+      recolorMesh(mesh, look);
+      applyMaterials(root, {} as VisualDef, 0xffffff);
+      const finalMat = mesh.material as THREE.MeshStandardMaterial;
+      expect(finalMat.isMeshStandardMaterial).toBe(true);
+      expect(finalMat.color.getHex()).toBe(0xffffff);
+      expect(finalMat.userData.armorDye).toBeTruthy();
+    } finally {
+      restoreGfx();
     }
   });
 });

@@ -166,7 +166,10 @@ void main() {`,
  * The isMeshStandardMaterial guard mirrors where the factories actually attach
  * the layer (recolored() dyes the standard GLB material, and the standard arm
  * of buildTintedClone re-attaches it): the low tier rebuilds rig materials as
- * Lambert from scratch and so never carries the spec at all.
+ * Lambert from scratch and so never carries the SHADER SPEC at all. Low tier
+ * is not left with no dye, though: recolored() also stashes a flat,
+ * multiply-safe `userData.armorDyeFallbackHex` (assets.ts), which the
+ * Lambert branch of buildTintedClone reads instead.
  */
 export function reapplyArmorDyeToClone(clone: THREE.Material): void {
   if (!(clone as THREE.MeshStandardMaterial).isMeshStandardMaterial) return;

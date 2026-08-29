@@ -1,6 +1,10 @@
 # The Vale Cup: boarball at the Sowfield (1v1 to 5v5)
 
-Status: in development (feature/vale-cup, based on release/v0.21.0)
+Status: shipped, now SCHEDULED FOR REMOVAL. The New Eastbrook program
+(docs/design/eastbrook-revamp/master-plan.md) reserves the Sowfield site for
+the town's southern expansion and retires the minigame with it; this PRD
+stays as the historical record of what was built. Note its compass words are
+screen-space (its "west" is the world's east).
 
 A World Cup inspired football minigame played IN the world: a permanent stadium,
 the Sowfield, at the southern edge of Eastbrook Vale. Teams of 1 to 5 pick a

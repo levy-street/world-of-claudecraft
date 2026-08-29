@@ -8,6 +8,7 @@ function corpse(overrides: Partial<Entity>): Entity {
     id: 2,
     kind: 'mob',
     templateId: 'test',
+    ownerId: null,
     loot: null,
     harvestClaimedBy: null,
     ...overrides,
@@ -41,6 +42,26 @@ describe('corpseLootAvailability', () => {
     expect(result.canOpen).toBe(true);
   });
 
+  it('closes a decayed corpse even if stale loot and harvest fields remain', () => {
+    const result = corpseLootAvailability(
+      corpse({
+        templateId: 'forest_wolf',
+        dead: true,
+        corpseTimer: 0,
+        lootable: true,
+        loot: { copper: 25, items: [{ itemId: 'wolf_fang', count: 1 }] },
+        harvestClaimedBy: null,
+      }),
+      1,
+    );
+
+    expect(result.hasLoot).toBe(false);
+    expect(result.visibleCopper).toBe(0);
+    expect(result.visibleItems).toEqual([]);
+    expect(result.harvestable).toBe(false);
+    expect(result.canOpen).toBe(false);
+  });
+
   it('keeps a depleted skinnable corpse open for harvesting', () => {
     const result = corpseLootAvailability(
       corpse({ templateId: 'forest_wolf', loot: null, harvestClaimedBy: null }),
@@ -50,6 +71,37 @@ describe('corpseLootAvailability', () => {
     expect(result.hasLoot).toBe(false);
     expect(result.harvestable).toBe(true);
     expect(result.canOpen).toBe(true);
+  });
+
+  it('keeps an owned skinnable pet corpse closed', () => {
+    const result = corpseLootAvailability(
+      corpse({ templateId: 'forest_wolf', ownerId: 1, loot: null, harvestClaimedBy: null }),
+      1,
+    );
+
+    expect(result.hasLoot).toBe(false);
+    expect(result.harvestable).toBe(false);
+    expect(result.canOpen).toBe(false);
+  });
+
+  it('closes a decayed corpse even when stale loot fields remain mirrored', () => {
+    const result = corpseLootAvailability(
+      corpse({
+        templateId: 'forest_wolf',
+        dead: true,
+        lootable: true,
+        corpseTimer: 0,
+        loot: { copper: 50, items: [{ itemId: 'wolf_fang', count: 1 }] },
+        harvestClaimedBy: null,
+      }),
+      1,
+    );
+
+    expect(result.harvestable).toBe(false);
+    expect(result.hasLoot).toBe(false);
+    expect(result.visibleCopper).toBe(0);
+    expect(result.visibleItems).toEqual([]);
+    expect(result.canOpen).toBe(false);
   });
 
   it('closes a depleted corpse whose every component family is unmapped (#2513)', () => {

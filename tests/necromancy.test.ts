@@ -5,6 +5,7 @@ import { emptyModifiers, specLabel } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { petCleaveAttack, petRangedAttack } from '../src/sim/pet/pet_ai';
+import { isLivingSecondaryPetEntity } from '../src/sim/pet/pet_selection';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -1837,6 +1838,42 @@ describe('Necromancy Warlock', () => {
 
     expect(gravewing.aggroTargetId).toBe(target.id);
     expect(graveguard.aggroTargetId).toBe(target.id);
+  });
+
+  it('still commands a surviving Dominion servant once Graveguard dies (issue: hidden pet bar)', () => {
+    const sim = makeNecromancer();
+    const target = addTarget(sim);
+    finishCast(sim, 'army_of_the_dead');
+    finishCast(sim, 'raise_graveguard');
+    const gravewing = ownedUndead(sim).find((pet) => pet.templateId === 'necromancy_gravewing');
+    const graveguard = ownedUndead(sim).find((pet) => pet.templateId === 'graveguard');
+    if (!gravewing || !graveguard) throw new Error('Expected a Gravewing and a Graveguard');
+    gravewing.aggroTargetId = null;
+    gravewing.inCombat = false;
+
+    sim.dealDamage(
+      sim.player,
+      graveguard,
+      graveguard.hp + 1000,
+      false,
+      'shadow',
+      'Test Kill',
+      'hit',
+    );
+
+    expect(graveguard.dead).toBe(true);
+    // The primary-pet resolver (petOf/findOwnPet's authority) now sees nothing:
+    // this is exactly what left the HUD pet bar hidden.
+    expect(sim.petOf(sim.playerId)).toBeNull();
+    // Gravewing fights on and still qualifies as a commandable secondary, which
+    // is what the pet bar now falls back to instead of hiding.
+    expect(gravewing.dead).toBe(false);
+    expect(isLivingSecondaryPetEntity(gravewing, sim.playerId)).toBe(true);
+
+    sim.petAttack();
+
+    expect(gravewing.aggroTargetId).toBe(target.id);
+    expect(gravewing.inCombat).toBe(true);
   });
 
   it('applies the primary pet stance to existing and newly raised Dominion servants', () => {

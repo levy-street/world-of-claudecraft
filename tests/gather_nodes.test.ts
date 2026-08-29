@@ -64,11 +64,21 @@ describe('gather node content', () => {
     // starting zone had to backtrack to eastbrook_vale for ore (nodes respawn
     // per player and session-only, see gathering.ts, so this was never about
     // node camping contention, just discoverability and travel distance).
+    // The Proving Shore (the tutorial island) is the one deliberate absence:
+    // its professions rollout row is 'none', so it ships NO gather nodes of
+    // any type by design (mirrors the fishing rod-row exemption in
+    // tests/fishing_zones.test.ts; tests/professions_zone_rollout.test.ts
+    // pins the rollout row itself).
     for (const zone of ZONES) {
+      if (zone.id === 'proving_shore') continue;
       for (const type of GATHER_NODE_TYPES) {
         const count = GATHER_NODES.filter((n) => n.zoneId === zone.id && n.type === type).length;
         expect(count, `${zone.id} should have at least one ${type} node`).toBeGreaterThan(0);
       }
     }
+    expect(
+      GATHER_NODES.filter((n) => n.zoneId === 'proving_shore'),
+      'proving_shore is professions-free by design and must ship zero nodes',
+    ).toHaveLength(0);
   });
 });

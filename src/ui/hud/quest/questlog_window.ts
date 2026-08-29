@@ -150,6 +150,9 @@ export class QuestLogWindow {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `ql-item${item.selected ? ' sel' : ''}`;
+      // Row identity for the island coach's press-this-next glow (the
+      // bootcamp overlay toggles .qd-coach by this attribute).
+      button.dataset.quest = item.questId;
       button.setAttribute('aria-pressed', item.selected ? 'true' : 'false');
       button.setAttribute(
         'aria-label',

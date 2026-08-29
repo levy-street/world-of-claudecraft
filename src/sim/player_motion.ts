@@ -904,10 +904,20 @@ function standoffPass(
       // surface (ride_height.ts): on dry ground it is exactly the memoized
       // terrain view this comment describes, and a nudge toward water never
       // reads a submerged bed bump as a wall.
+      // The same mount water wall the main step enforces (a ground mount never
+      // steps off dry land into swimming depth) applies to this nudge too: an
+      // ungraded terrain wall right at the edge of undeclared deep water (open
+      // sea the generator carved outside any authored lake, so it never got a
+      // shore's smoothed approach) can press a mounted rider's body against it,
+      // and without this guard the standoff push carries them straight through
+      // the wall into water the horizontal step above never got a chance to
+      // wall off. Skipping the nudge leaves the rider pressed against the wall
+      // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        standSteep <= MAX_CLIMB_SLOPE ||
-        standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed)
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed)) &&
+        (standSteep <= MAX_CLIMB_SLOPE ||
+          standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {
         p.pos.x = standX;
         p.pos.z = standZ;

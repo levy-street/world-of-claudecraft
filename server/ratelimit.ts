@@ -284,12 +284,18 @@ export function resetRateLimits(): void {
 
 export const CARD_UPLOAD_MAX_PER_MINUTE = 10;
 export const WALLET_LINK_MAX_PER_MINUTE = 10;
+// The desktop handoff result poll runs at 1 Hz per signing attempt (60/min),
+// woken early by the deep-link return; this cap admits two concurrent
+// handoffs plus headroom while ending an unmetered poll loop.
+export const WALLET_HANDOFF_RESULT_MAX_PER_MINUTE = 150;
 export const SEEKER_SPIN_VERIFY_MAX_PER_MINUTE = 5;
 
 const cardUploadIpAttempts = new Map<string, number[]>();
 const cardUploadAccountAttempts = new Map<number, number[]>();
 const walletLinkIpAttempts = new Map<string, number[]>();
 const walletLinkAccountAttempts = new Map<number, number[]>();
+const walletHandoffResultIpAttempts = new Map<string, number[]>();
+const walletHandoffResultAccountAttempts = new Map<number, number[]>();
 const seekerSpinVerifyIpAttempts = new Map<string, number[]>();
 const seekerSpinVerifyAccountAttempts = new Map<number, number[]>();
 
@@ -494,6 +500,29 @@ export function walletLinkRateLimited(
     WALLET_LINK_MAX_PER_MINUTE,
   );
   return mergeFusedOutcomes(ip, account);
+}
+
+export function walletHandoffResultRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    walletHandoffResultIpAttempts,
+    requestIp(req),
+    WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    walletHandoffResultAccountAttempts,
+    accountId,
+    WALLET_HANDOFF_RESULT_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset the desktop handoff result-poll throttle. Test-only. */
+export function resetWalletHandoffResultRateLimits(): void {
+  walletHandoffResultIpAttempts.clear();
+  walletHandoffResultAccountAttempts.clear();
 }
 
 /** Reset wallet-link verification throttles. Test-only: keeps scoped buckets isolated. */
@@ -855,6 +884,64 @@ export function reportsCreateRateLimited(
 export function resetReportsCreateRateLimits(): void {
   reportsCreateIpAttempts.clear();
   reportsCreateAccountAttempts.clear();
+}
+
+// ---------------------------------------------------------------------------
+// Admin economy-oversight endpoints (player search / wealth / flagged
+// workflow). Dedicated buckets, NOT the shared `attempts` map, so dashboard
+// polling can never burn anyone's login budget (the cardUpload precedent).
+// Reads get headroom for several admins polling with the dashboard's 5 s
+// refresh plus debounced search keystrokes; flag-workflow writes are
+// deliberate clicks and get a tighter cap.
+// ---------------------------------------------------------------------------
+export const ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE = 120;
+export const ADMIN_FLAG_WRITE_MAX_PER_MINUTE = 30;
+
+const adminOversightReadIpAttempts = new Map<string, number[]>();
+const adminOversightReadAccountAttempts = new Map<number, number[]>();
+const adminFlagWriteIpAttempts = new Map<string, number[]>();
+const adminFlagWriteAccountAttempts = new Map<number, number[]>();
+
+export function adminOversightReadRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminOversightReadIpAttempts,
+    requestIp(req),
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminOversightReadAccountAttempts,
+    accountId,
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+export function adminFlagWriteRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminFlagWriteIpAttempts,
+    requestIp(req),
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminFlagWriteAccountAttempts,
+    accountId,
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset admin economy-oversight throttles. Test-only. */
+export function resetAdminOversightRateLimits(): void {
+  adminOversightReadIpAttempts.clear();
+  adminOversightReadAccountAttempts.clear();
+  adminFlagWriteIpAttempts.clear();
+  adminFlagWriteAccountAttempts.clear();
 }
 
 // ---------------------------------------------------------------------------

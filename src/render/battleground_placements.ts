@@ -19,6 +19,7 @@ import type { BgAssetGroup, ThFieldPlacement } from './battleground_core';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   occluderFadeSettled,
+  occluderKeepsInstances,
   occluderSegmentHitsBox,
   stepOccluderFade,
 } from './occluder_fade_core';
@@ -330,7 +331,7 @@ export async function buildBattlegroundPlacements(
         const hide =
           dx * dx + dz * dz <= span * span &&
           occluderSegmentHitsBox(o.x, o.z, o.hw, o.hd, o.topY, ex, eyeY, ez, cx, camY, cz);
-        if (!hide && o.parts[0].ghost === null) {
+        if (occluderKeepsInstances(hide, o.parts[0].ghost !== null, ghosts, o.parts)) {
           o.alpha = 1;
           continue;
         }

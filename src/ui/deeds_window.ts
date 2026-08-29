@@ -11,6 +11,14 @@ import { audio } from '../game/audio';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
+import {
+  borderAccent,
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_MOTIF_ATTR,
+  deedBorderSlug,
+  deedHeraldryMotifSvg,
+  deedHeraldryStyle,
+} from './deed_border_view';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
   buildDeedsView,
@@ -29,10 +37,12 @@ import {
   toggleWatch,
 } from './deeds_view';
 import { markDialogRoot } from './dialog_root';
+import { poiMarkLabel } from './entity_i18n';
 import { esc } from './esc';
 import { focusedWithin } from './focus_restore';
 import {
   formatDateTime,
+  formatList,
   formatNumber,
   getLanguage,
   languageTag,
@@ -525,6 +535,19 @@ export class DeedsWindow {
     return `<div class="deeds-list">${model.entries.map((entry) => this.entryHtml(entry)).join('')}</div>`;
   }
 
+  /** Resolve poi:<zoneId>:<poiId> marks (the core's missingPoiMarkIds) to
+   *  their localized display names via the shared poiMarkLabel resolver
+   *  (entity_i18n.ts), which drops a mark whose zone/poi no longer resolves
+   *  rather than showing a raw id. */
+  private missingPoiLabels(markIds: readonly string[]): string[] {
+    const labels: string[] = [];
+    for (const markId of markIds) {
+      const label = poiMarkLabel(markId);
+      if (label !== null) labels.push(label);
+    }
+    return labels;
+  }
+
   private entryHtml(entry: DeedEntryModel): string {
     const name = deedName(entry.id);
     const chips: string[] = [];
@@ -582,6 +605,19 @@ export class DeedsWindow {
       });
       body += `<div class="deed-rarity">${esc(t('hudChrome.deeds.rarityLine', { percent }))}</div>`;
     }
+    // Which named places are still outstanding on an exploration wayfarer
+    // deed (single-zone like Wayfarer of the Heights, or cross-zone like The
+    // Long Road North), so a player is never left re-walking ground to find
+    // the one mark that never registered (it did; they just could not see
+    // which one). The .deed-rarity class is reused rather than a bespoke
+    // one: both lines are the same "muted secondary fact under the blurb"
+    // role.
+    const missingPlaces = this.missingPoiLabels(entry.missingPoiMarkIds);
+    if (missingPlaces.length > 0) {
+      body += `<div class="deed-rarity">${esc(
+        t('hudChrome.deeds.stillToVisit', { places: formatList(missingPlaces) }),
+      )}</div>`;
+    }
     let foot = '';
     if (entry.earnedDay !== null) {
       const date = formatDateTime(new Date(`${entry.earnedDay}T00:00:00Z`), {
@@ -622,6 +658,7 @@ export class DeedsWindow {
    *  mobile tap floor and the focus ring already cover both); the pick
    *  ATTRIBUTE is what keeps their click delegations apart. */
   private titlesHtml(model: DeedsViewModel): string {
+    const activeBorder = model.borders.find((option) => option.active)?.id ?? null;
     return (
       this.pickerGroupHtml({
         cls: 'deeds-titles',
@@ -640,8 +677,59 @@ export class DeedsWindow {
         emptyKey: 'hudChrome.deeds.bordersEmpty',
         options: model.borders,
         label: (id) => (id === null ? t('hudChrome.deeds.bordersNone') : deedName(id)),
-      })
+        decorate: (id, label) => this.borderOptionInner(id, label),
+      }) +
+      `<div class="deeds-border-preview-slot">${this.borderPreviewHtml(activeBorder)}</div>`
     );
+  }
+
+  /** Canonical seal plus a small material sample and the existing deed name.
+   *  None retains the same footprint but contains no earned material. */
+  private borderOptionInner(id: string | null, label: string): string {
+    const name = esc(label);
+    if (!id) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    const accent = borderAccent(deedBorderSlug(id));
+    if (!accent) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    return (
+      `<span class="deed-border-swatch" aria-hidden="true" ${DEED_HERALDRY_ATTR}="${esc(deedBorderSlug(id))}" ${DEED_HERALDRY_MOTIF_ATTR}="${accent.motif}" style="${esc(deedHeraldryStyle(accent))}">` +
+      `<span class="deed-heraldry-seal">${deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<span class="deed-border-material">${deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-pattern')}</span></span>` +
+      name
+    );
+  }
+
+  /** Representative world token plus interaction reveal. This is rebuilt only
+   *  on picker hover/focus events and carries no command path. */
+  private borderPreviewHtml(id: string | null): string {
+    const slug = deedBorderSlug(id);
+    const accent = borderAccent(slug);
+    const deedId = id ?? '';
+    if (!id || !accent) {
+      return `<div class="deed-heraldry-preview" data-preview-deed="${esc(deedId)}" ${DEED_HERALDRY_ATTR}="" aria-hidden="true"></div>`;
+    }
+    const playerName = esc(this.deps.world().player.name);
+    const grantingDeed = esc(deedName(id));
+    const seal =
+      `<span class="deed-heraldry-seal">` +
+      deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-seal-art') +
+      `</span>`;
+    const pattern = deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-pattern');
+    return (
+      `<div class="deed-heraldry-preview" data-preview-deed="${esc(id)}" ${DEED_HERALDRY_ATTR}="${esc(slug)}" ${DEED_HERALDRY_MOTIF_ATTR}="${accent.motif}" style="${esc(deedHeraldryStyle(accent))}" aria-hidden="true">` +
+      `<div class="deed-heraldry-preview-world">${seal}<span class="deed-heraldry-preview-ribbon deed-heraldry-plaque">${playerName}</span></div>` +
+      `<div class="deed-heraldry-preview-interaction"><span class="deed-heraldry-preview-portrait"></span>${seal}` +
+      `<span class="deed-heraldry-preview-header deed-heraldry-plaque">${pattern}<span class="deed-heraldry-preview-name">${playerName}</span>` +
+      `<span class="deed-heraldry-preview-deed">${grantingDeed}</span></span></div></div>`
+    );
+  }
+
+  private paintBorderPreview(id: string | null): void {
+    const slot = this.deps.root().querySelector<HTMLElement>('.deeds-border-preview-slot');
+    if (slot) slot.innerHTML = this.borderPreviewHtml(id);
   }
 
   /** One cosmetic picker group. The option array arrives in catalog order
@@ -661,12 +749,14 @@ export class DeedsWindow {
     emptyKey: TranslationKey;
     options: readonly { id: string | null; active: boolean }[];
     label(id: string | null): string;
+    decorate?(id: string | null, label: string): string;
   }): string {
     const rows = group.options
-      .map(
-        (option) =>
-          `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${esc(group.label(option.id))}</button>`,
-      )
+      .map((option) => {
+        const label = group.label(option.id);
+        const inner = group.decorate ? group.decorate(option.id, label) : esc(label);
+        return `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${inner}</button>`;
+      })
       .join('');
     const empty =
       group.options.length <= 1 ? `<div class="deeds-empty">${esc(t(group.emptyKey))}</div>` : '';
@@ -767,6 +857,18 @@ export class DeedsWindow {
       });
     }
     for (const btn of el.querySelectorAll<HTMLElement>('[data-border-pick]')) {
+      const preview = (): void => this.paintBorderPreview(btn.dataset.borderPick || null);
+      const restorePreview = (): void => {
+        const focused = el.querySelector<HTMLElement>('[data-border-pick]:focus');
+        const focusedId = focused?.dataset.borderPick;
+        this.paintBorderPreview(
+          focusedId !== undefined ? focusedId || null : this.deps.world().activeBorder,
+        );
+      };
+      btn.addEventListener('mouseenter', preview);
+      btn.addEventListener('focus', preview);
+      btn.addEventListener('mouseleave', restorePreview);
+      btn.addEventListener('blur', restorePreview);
       btn.addEventListener('click', () => {
         if (this.deps.consumePeek()) {
           this.deps.hideTooltip();

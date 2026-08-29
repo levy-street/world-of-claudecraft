@@ -38,7 +38,6 @@ import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
-import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
 import type { DamageEventKind, Entity } from '../types';
 import {
@@ -506,15 +505,6 @@ export function dealDamage(
     ctx.isHostileTo(source, target)
   ) {
     amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
-  }
-
-  // The Vale Cup: nobody bleeds at the Sowfield. Any damage between two seated
-  // cup fighters is floored to 0 BEFORE absorb shields soak it, belt and
-  // braces: the sport kit has no damage abilities, but a stray consumable,
-  // proc, or reflect must neither hurt a fighter nor eat their shield.
-  if (amount > 0 && sourcePlayer && target.kind === 'player') {
-    const cupMatch = ctx.vcup.match;
-    if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
   }
 
   if (

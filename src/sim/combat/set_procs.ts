@@ -1,4 +1,5 @@
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import type { Aura, AuraKind, Entity, SetProc } from '../types';
 
 export function applySetProcs(
@@ -19,6 +20,16 @@ export function applySetProcs(
     // differently than before, keeping the rng stream stable for old procs.
     const recipient = proc.applyTo === 'target' ? target : source;
     if (!recipient || recipient.dead) continue;
+    // A target-applied proc landing on the killing blow's own opponent must
+    // not outlive the duel it just ended (see duelJustEndedBetween, social/
+    // duel.ts). Self-applied procs are never something the OPPONENT inflicted,
+    // so endDuel's own clear was never going to touch them either; they are
+    // correctly out of scope for this check regardless of who lands the hit.
+    // Ungated on aura kind (unlike equip_procs.ts's dot/attackSlow narrowing):
+    // 'target' is definitionally the struck enemy (SetProc.applyTo, types.ts),
+    // never a heal/ally recipient, so every shipped and future target-applied
+    // set proc is safe to gate here without a per-kind check.
+    if (proc.applyTo === 'target' && duelJustEndedBetween(ctx, recipient, source)) continue;
     // WARFARE gating, checked BEFORE the chance roll so a gated proc draws no
     // rng outside hostile player-versus-player combat and every PvE run stays
     // byte-identical. isHostileTo comes off the SimContext seam rather than

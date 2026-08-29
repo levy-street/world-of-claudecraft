@@ -25,7 +25,7 @@ export type ThemeKnob =
 
 export type ThemeKnobs = Record<ThemeKnob, string>;
 
-export type PresetId = 'classic' | 'midnight' | 'parchment' | 'highContrast';
+export type PresetId = 'classic' | 'midnight' | 'parchment' | 'highContrast' | 'fancyGold';
 
 export interface ThemeState {
   preset: PresetId;
@@ -59,7 +59,13 @@ export const THEME_KNOB_LABEL_KEY: Record<ThemeKnob, string> = {
   energy: 'energy',
 };
 
-export const PRESET_ORDER: PresetId[] = ['classic', 'midnight', 'parchment', 'highContrast'];
+export const PRESET_ORDER: PresetId[] = [
+  'classic',
+  'fancyGold',
+  'midnight',
+  'parchment',
+  'highContrast',
+];
 
 // `classic` reproduces the shipped gold/dark palette; the others are alternates.
 export const THEME_PRESETS: Record<PresetId, ThemeKnobs> = {
@@ -106,6 +112,29 @@ export const THEME_PRESETS: Record<PresetId, ThemeKnobs> = {
     mana: '#00b0ff',
     rage: '#ff3030',
     energy: '#ffe000',
+  },
+  // "Fancy Gold": the hand-gilded look. WORK IN PROGRESS (owner decision):
+  // the preset is selectable and labelled "(WIP)" in the options menu while
+  // the gilded treatment is still being iterated on; expect its palette and
+  // ornament coverage to change, and do not pin new work to its current
+  // values. Selecting it does two things: these knobs retune the whole UI's
+  // palette, and applyTheme (main.ts) stamps the .fancy-gold-ui root class
+  // that turns on the gilded filigree window frame (perf_ornament_svg.ts +
+  // components.css); every other preset keeps the classic flat panels.
+  // Accent/border are drawn from the same --color-gold-* ramp the filigree
+  // paints with (accent = gold-400's warm gilt, border = gold-700's deep
+  // leaf), over a warm near-black panel, so the general chrome reads as one
+  // hand-gilded set with the ornament.
+  fancyGold: {
+    accent: '#f0c86d',
+    border: '#926321',
+    panel: '#1d1508',
+    text: '#f6ecd2',
+    textMuted: '#c0a468',
+    hp: '#1eb838',
+    mana: '#2b7bd4',
+    rage: '#c0392b',
+    energy: '#e4c531',
   },
 };
 

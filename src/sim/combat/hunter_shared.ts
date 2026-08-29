@@ -301,7 +301,16 @@ export function noteHunterFocusSpend(
   }
 }
 
-function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
+// The one canonical "how hard does this pet hit" multiplier: pet_damage_pct
+// auras, the owner's petDmgPct mod (Packlord's Packbond mastery), Unleashed
+// Frenzy's +25% (owner carries hunter_frenzy while the post-Unleash-Beast
+// window runs), and Pack Ferocity's up-to-30% (hunterPetFerocityDamageMultiplier).
+// Every pet damage site (auto-attack swings, ranged bolts, cleave, Pack
+// Command/Unleash Beast/Frenzy Cleave's own strikes, Fang Chorus) must read
+// THIS function rather than a local copy: a prior drift left Unleashed
+// Frenzy's bonus applied to the ability strikes but not the pet's ordinary
+// swings, which are the bulk of its damage.
+export function hunterPetDamageMultiplier(ctx: SimContext, pet: Entity): number {
   let multiplier = 1;
   for (const aura of pet.auras) {
     if (aura.kind === 'pet_damage_pct') multiplier += pctValue(aura.value);
@@ -309,6 +318,8 @@ function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId !== null) {
     const ownerMeta = ctx.players.get(pet.ownerId);
     if (ownerMeta) multiplier *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
+    const owner = ctx.entities.get(pet.ownerId);
+    if (owner?.auras.some((aura) => aura.kind === 'hunter_frenzy')) multiplier *= 1.25;
   }
   multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
   return multiplier;
@@ -329,7 +340,7 @@ function runFangChorus(ctx: SimContext, hunter: Entity, target: Entity): void {
     (ctx.rng.range(pet.weapon.min, pet.weapon.max) +
       (ctx.effectiveAttackPower(pet) / 14) * pet.weapon.speed) *
     0.5;
-  damage *= petDamageMultiplier(ctx, pet);
+  damage *= hunterPetDamageMultiplier(ctx, pet);
   const targets = clap
     ? ctx
         .hostilesInRadius(pet, target.pos, 4)

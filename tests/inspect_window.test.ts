@@ -4,6 +4,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { PlayerClass } from '../src/sim/types';
+import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view';
+import { deedName, deedTitleText } from '../src/ui/deed_i18n';
+import { classColorCss } from '../src/ui/inspect_view';
 import { type InspectEntity, InspectWindow } from '../src/ui/inspect_window';
 
 // The inspect ("Profile") window painter is a DOM module. Most guards below are
@@ -92,11 +95,10 @@ describe('inspect_window: thin painter, deps-only Hud access', () => {
 describe('inspect_window: the Curator standing surfaces', () => {
   it('renders the sigil badge AFTER the three older ones, in the same card', () => {
     // Array/append ORDER is a contract here: the four badge rows are string
-    // concatenation inside .inspect-card, so the sigil landing before devHtml
-    // would silently re-rank the column. Pin the sequence, not just presence.
-    const card = code.slice(code.indexOf('<div class="inspect-card">'));
+    // concatenation inside one honor rail, so the sigil landing before devHtml
+    // would silently re-rank the collection. Pin the sequence, not just presence.
+    const card = code.slice(code.indexOf('const honorHtml ='));
     const order = [
-      'this.curatorLineHtml(model.curator)',
       'this.holderHtml(model.badges.holder)',
       'this.discordHtml(model.badges.discord)',
       'this.devHtml(model.badges.dev)',
@@ -169,20 +171,15 @@ describe('inspect_window: the Curator standing surfaces', () => {
     }
   });
 
-  it('writes the border accent as the slug plus the SAME three ring properties', () => {
+  it('E51: writes the banner accent through the canonical heraldry style helper', () => {
     // One convention across the two surfaces: tests/deed_border_accent.test.ts
     // pins these literals against the unit_frame_painter constants, so a rename
     // there cannot leave this card writing properties no stylesheet reads.
     const at = code.indexOf('private borderAttrs(');
     const body = code.slice(at, code.indexOf('private curatorLineHtml('));
-    expect(body).toContain('data-border="${esc(border.slug)}"');
-    // Every interpolated value in the style attribute is escaped, not only the
-    // data-border beside it (moved at Phase 20 QA): the palette is frozen today,
-    // so this is about the attribute never being the one unescaped hole a future
-    // palette source could inject through.
-    expect(body).toContain('--border-accent-frame:${esc(border.frame)}');
-    expect(body).toContain('--border-accent-edge:${esc(border.edge)}');
-    expect(body).toContain('--border-accent-glow:${esc(border.glow)}');
+    expect(body).toMatch(/\$\{DEED_HERALDRY_ATTR\}="\$\{esc\(border\.slug\)\}"/);
+    expect(body).toMatch(/\$\{DEED_HERALDRY_MOTIF_ATTR\}="\$\{border\.motif\}"/);
+    expect(body).toContain('esc(deedHeraldryStyle(border))');
   });
 
   it('feeds the entity border and Curator standing into the pure core', () => {
@@ -229,10 +226,17 @@ describe('inspect_window: the Curator standing surfaces', () => {
 
   it('leaves the out-of-range remote card flairless (no sigil, no standing, no accent)', () => {
     const remote = code.slice(code.indexOf('openRemote('));
-    const body = remote.slice(0, remote.indexOf('private panelTitleHtml('));
-    for (const token of ['curatorHtml', 'curatorLineHtml', 'borderAttrs', 'data-border']) {
+    const body = remote.slice(0, remote.indexOf('private buildSlotRow('));
+    for (const token of [
+      'curatorHtml',
+      'curatorLineHtml',
+      'borderAttrs',
+      'data-border',
+      'deed-heraldry',
+    ]) {
       expect(body, `the remote card must not paint ${token}`).not.toContain(token);
     }
+    expect(body).toContain('class="inspect-card inspect-card-remote"');
   });
 
   it('the Reliquary line joins the .inspect-meta pill family, and CSS reaches it', () => {
@@ -255,6 +259,39 @@ describe('inspect_window: the Curator standing surfaces', () => {
     // The semantic hook stays rule-free (occurrence bound, not a bare
     // negative: the two positive matches above prove this scan sees the file).
     expect(shell.match(/\.inspect-meta\.inspect-reliquary\s*\{/g) ?? []).toHaveLength(0);
+  });
+
+  it('E52: keeps the forged face compact and its attached deed tab below 18 percent of the stage', () => {
+    const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
+    const banner = shell.match(/\n {2}\.inspect-heraldry-banner \{([^}]*)\}/)?.[1];
+    const face = shell.match(/\n {2}\.inspect-heraldry-face \{([^}]*)\}/)?.[1];
+    const seal = shell.match(
+      /\n {2}\.inspect-heraldry-banner \.deed-heraldry-seal \{([^}]*)\}/,
+    )?.[1];
+    const deed = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
+    const honors = shell.match(/\n {2}\.inspect-honor-rail \{([^}]*)\}/)?.[1];
+    const stage = shell.match(/\n {2}#inspect-window \.inspect-model-panel \{([^}]*)\}/)?.[1];
+    expect(banner, 'inspect heraldry banner rule missing').toBeTruthy();
+    expect(face, 'inspect heraldry face rule missing').toBeTruthy();
+    expect(banner).toContain('width: min(100%, 580px);');
+    expect(banner).toContain('height: 72px;');
+    expect(face).toContain('height: 60px;');
+    expect(seal).toContain('top: 30px;');
+    expect(seal).toContain('left: 0;');
+    expect(seal).toContain('width: 64px;');
+    expect(seal).toContain('height: 64px;');
+    expect(deed).toContain('height: 18px;');
+    expect(deed).toContain('max-width: 260px;');
+    expect(honors).toContain(
+      'grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 300px));',
+    );
+    expect(honors).toContain('justify-content: center;');
+    expect(stage).toContain('min-height: 400px;');
+    const mantleHeight = Number(banner?.match(/height:\s*(\d+)px/)?.[1]);
+    const faceHeight = Number(face?.match(/height:\s*(\d+)px/)?.[1]);
+    const stageHeight = Number(stage?.match(/min-height:\s*(\d+)px/)?.[1]);
+    expect(faceHeight).toBeLessThanOrEqual(stageHeight * 0.15);
+    expect(mantleHeight).toBeLessThanOrEqual(stageHeight * 0.18);
   });
 });
 
@@ -302,6 +339,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+    showDevBadges = false,
   ): HTMLElement => {
     const realCreate = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
@@ -321,7 +359,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       captureFocus: () => null,
       restoreFocus: vi.fn(),
       slotName: (slot) => slot,
-      showDevBadges: () => false,
+      showDevBadges: () => showDevBadges,
       mountPreview: vi.fn(),
       // A real data URL, not '': an empty-string src resolves against the
       // document URL in happy-dom and fetches. NOTE the honest scope: this
@@ -372,27 +410,124 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(sub?.textContent?.length, 'the sigil row needs its visible sub-line').toBeGreaterThan(0);
   });
 
-  it('hangs the border accent on the NAME row, and omits it entirely when borderless', () => {
-    // Added at Phase 20 QA to close a real hole: every other guard on the accent
-    // reads borderAttrs' own body, so deleting the ${this.borderAttrs(...)}
-    // interpolation from the .inspect-name line left the whole tree green while
-    // no card painted an accent at all. PLACEMENT is what this arm owns.
-    const root = openWith({ ...baseEntity, border: 'col_reliquary_rank_5' });
-    const name = root.querySelector('.inspect-name');
-    expect(name, 'the accented card must still paint a name row').not.toBeNull();
+  it('E51: renders the seal banner with real name, title, and localized granting deed', () => {
+    const root = openWith({
+      ...baseEntity,
+      border: 'col_reliquary_rank_5',
+      title: 'prog_veteran',
+    });
+    const banner = root.querySelector('.inspect-heraldry-banner');
+    expect(banner, 'the accented card must paint a heraldry banner').not.toBeNull();
     // The SLUG, resolved from the deed id through deed_border_view's palette
     // gate, not the deed id itself: the stylesheet keys on the slug.
-    expect(name?.getAttribute('data-border')).toBe('reliquary_gilt');
-    expect(name?.getAttribute('style')).toContain('--border-accent-frame');
+    expect(banner?.getAttribute('data-border')).toBe('reliquary_gilt');
+    expect(banner?.getAttribute('data-motif')).toBe('vault');
+    expect(banner?.getAttribute('style')).toContain('--border-accent-frame:#f4ca43;');
+    expect(banner?.getAttribute('style')).toContain('--deed-heraldry-well:#14110c;');
+    const face = banner?.querySelector('.inspect-heraldry-face');
+    const seal = banner?.querySelector('.deed-heraldry-seal');
+    const deedTab = banner?.querySelector('.inspect-heraldry-deed');
+    expect(face?.getAttribute('data-border')).toBe('reliquary_gilt');
+    expect(face?.getAttribute('data-motif')).toBe('vault');
+    expect(seal).not.toBeNull();
+    expect(face?.contains(seal ?? null)).toBe(false);
+    expect(face?.parentElement).toBe(banner);
+    expect(seal?.parentElement).toBe(banner);
+    expect(face?.nextElementSibling).toBe(seal);
+    expect(deedTab?.parentElement).toBe(banner);
+    expect(face?.contains(deedTab ?? null)).toBe(false);
+    expect(seal?.nextElementSibling).toBe(deedTab);
+    expect(deedTab?.classList.contains('deed-heraldry-plaque-tab')).toBe(true);
+    expect(deedTab?.getAttribute('data-border')).toBe('reliquary_gilt');
+    expect(face?.querySelector('.deed-heraldry-pattern')).not.toBeNull();
+    const accent = borderAccent('reliquary_gilt');
+    expect(borderMotifPrimitives('vault')).toHaveLength(5);
+    for (const path of banner?.querySelectorAll('path') ?? []) {
+      expect(path.getAttribute('d')).toBe(accent?.motifPath);
+    }
+    expect(banner?.querySelector('.inspect-name')?.textContent).toBe('Aurelia');
+    expect(banner?.querySelector('.inspect-title')?.textContent).toBe(
+      deedTitleText('prog_veteran'),
+    );
+    expect(banner?.querySelector('.inspect-heraldry-deed')?.textContent).toBe(
+      deedName('col_reliquary_rank_5'),
+    );
   });
 
-  it('leaves data-border OFF a borderless name row (absence, not an empty value)', () => {
+  it('composes standing and every earned honor into one stable ceremonial hierarchy', () => {
+    const root = openWith(
+      {
+        ...baseEntity,
+        border: 'col_reliquary_rank_5',
+        curatorRank: 5,
+        relicsOwned: 300,
+        relicsTotal: 300,
+        holderTier: 3,
+        holderBalance: 4200,
+        discordTier: 1,
+        discordName: 'Aurelia',
+        discordJoined: 1_699_000_000_000,
+        devTier: 2,
+        devMergedPrs: 17,
+        githubLogin: 'aurelia',
+      },
+      null,
+      true,
+    );
+    const standing = root.querySelector('.inspect-standing-row');
+    const standingItems = [...(standing?.children ?? [])];
+    expect(standingItems).toHaveLength(2);
+    expect(standingItems[0]?.className).toBe('inspect-meta');
+    expect(standingItems[0]?.textContent).toContain('60');
+    expect(standingItems[1]?.classList.contains('inspect-reliquary')).toBe(true);
+    expect(standingItems[1]?.textContent).toContain('300');
+    const rail = root.querySelector('.inspect-honor-rail');
+    const honors = [...root.querySelectorAll('.inspect-holder')];
+    expect(honors).toHaveLength(4);
+    expect(honors.every((honor) => honor.parentElement === rail)).toBe(true);
+    const modelPanel = root.querySelector<HTMLElement>('.inspect-model-panel');
+    expect(modelPanel?.style.getPropertyValue('--inspect-class-color')).toBe(
+      classColorCss(baseEntity.templateId),
+    );
+  });
+
+  it('keeps a bordered no-title long Unicode identity inside the fixed ceremonial face', () => {
+    const name = 'Æthelflæd 星渡りの守護者 Zorya-of-the-Long-Road';
+    const root = openWith({
+      ...baseEntity,
+      name,
+      border: 'col_reliquary_rank_5',
+      title: null,
+    });
+    const face = root.querySelector('.inspect-heraldry-face');
+    const deedTab = root.querySelector('.inspect-heraldry-deed');
+    expect(face?.querySelector('.inspect-name')?.textContent).toBe(name);
+    expect(face?.querySelector('.inspect-title')).toBeNull();
+    expect(face?.querySelector('.inspect-heraldry-deed')).toBeNull();
+    expect(deedTab?.parentElement).toBe(root.querySelector('.inspect-heraldry-banner'));
+    expect(deedTab?.textContent).toBe(deedName('col_reliquary_rank_5'));
+    const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
+    const nameRule = shell.match(/\n {2}\.inspect-heraldry-banner \.inspect-name \{([^}]*)\}/)?.[1];
+    const deedRule = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
+    expect(nameRule).toContain('overflow: hidden;');
+    expect(nameRule).toContain('text-overflow: ellipsis;');
+    expect(nameRule).toContain('white-space: nowrap;');
+    expect(deedRule).toContain('overflow: hidden;');
+    expect(deedRule).toContain('text-overflow: ellipsis;');
+    expect(deedRule).toContain('white-space: nowrap;');
+  });
+
+  it('leaves a borderless card clean, with no empty heraldry shell', () => {
     // The stylesheet gates on :not([data-border='']), so an empty attribute
     // would still match the accent rules. Absence is the contract.
     const root = openWith(baseEntity);
     const name = root.querySelector('.inspect-name');
     expect(name?.textContent).toBe('Aurelia');
     expect(name?.hasAttribute('data-border')).toBe(false);
+    expect(root.querySelector('.inspect-heraldry-banner')).toBeNull();
+    expect(root.querySelector('.deed-heraldry-seal')).toBeNull();
+    expect(root.querySelector('.deed-heraldry-pattern')).toBeNull();
+    expect(root.querySelector('.inspect-heraldry-deed')).toBeNull();
   });
 
   it('renders a rank-4 entity WITHOUT the sigil but WITH the line', () => {

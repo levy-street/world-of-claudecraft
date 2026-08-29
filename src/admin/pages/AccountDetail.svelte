@@ -10,8 +10,10 @@
     forceRename,
     type PendingAction,
   } from '../moderation_actions';
+  import AccountFlagsPanel from '../components/AccountFlagsPanel.svelte';
   import AccountFlairControls from '../components/AccountFlairControls.svelte';
   import AccountModerationActions from '../components/AccountModerationActions.svelte';
+  import AccountWealthPanel from '../components/AccountWealthPanel.svelte';
   import AccountNote from '../components/AccountNote.svelte';
   import ChatModerationControls from '../components/ChatModerationControls.svelte';
   import CheaterMarkControls from '../components/CheaterMarkControls.svelte';
@@ -161,6 +163,11 @@
       {/if}
     </div>
   </div>
+
+  <AccountWealthPanel accountId={detail.id} />
+  {#if auth.can('moderation.read')}
+    <AccountFlagsPanel accountId={detail.id} />
+  {/if}
 
   {#if includeAdminControls}
     <AccountNote accountId={detail.id} onSubmit={submitPending} />

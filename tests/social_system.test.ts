@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { resolveRealm } from '../server/realm';
 import {
   type CharInfo,
   type CharRef,
   type GuildEventRow,
   type GuildRank,
+  PLEDGE_REPLEDGE_COOLDOWN_MS,
   type Presence,
   type SocialDb,
   type SocialEvent,
@@ -22,6 +23,77 @@ import type { SimEvent } from '../src/sim/types';
 
 class FakeDb implements SocialDb {
   private chars = new Map<number, CharInfo & { activeTitle: string | null }>();
+  // guild pledges (docs/prd/guild-pledge-board.md)
+  pledges = new Map<number, { guildId: number; sinceMs: number }>();
+  pledgeSettingsByGuild = new Map<number, { enabled: boolean; minLevel: number; note: string }>();
+  ladder = new Map<string, { rejectCount: number; rejectedAtMs: number }>();
+  accountOf = new Map<number, number>();
+  guildXpTotals = new Map<number, number>();
+
+  async guildByName(name: string): Promise<{ id: number; name: string } | null> {
+    for (const [id, gname] of this.guilds) {
+      if (gname.toLowerCase() === name.toLowerCase()) return { id, name: gname };
+    }
+    return null;
+  }
+  async guildPledgeSettings(guildId: number) {
+    return this.pledgeSettingsByGuild.get(guildId) ?? { enabled: true, minLevel: 1, note: '' };
+  }
+  async setGuildPledgeSettings(
+    guildId: number,
+    settings: { enabled: boolean; minLevel: number; note: string },
+  ) {
+    this.pledgeSettingsByGuild.set(guildId, settings);
+  }
+  async guildPledges(guildId: number) {
+    const rows: (CharInfo & { sinceMs: number })[] = [];
+    for (const [charId, p] of this.pledges) {
+      if (p.guildId !== guildId) continue;
+      const c = this.chars.get(charId);
+      if (c) rows.push({ ...c, sinceMs: p.sinceMs });
+    }
+    return rows;
+  }
+  async pledgeOf(charId: number) {
+    const p = this.pledges.get(charId);
+    if (!p) return null;
+    return { guildId: p.guildId, guildName: this.guilds.get(p.guildId) ?? '', sinceMs: p.sinceMs };
+  }
+  async upsertPledge(charId: number, guildId: number) {
+    this.pledges.set(charId, { guildId, sinceMs: 0 });
+  }
+  async deletePledge(charId: number) {
+    this.pledges.delete(charId);
+  }
+  pledgeCooldowns = new Map<number, number>();
+  cooldownClock = () => 0;
+  async lastPledgeAtMs(charId: number) {
+    return this.pledgeCooldowns.get(charId) ?? null;
+  }
+  async touchPledgeCooldown(charId: number) {
+    this.pledgeCooldowns.set(charId, this.cooldownClock());
+  }
+  async accountIdForCharacter(charId: number) {
+    return this.accountOf.get(charId) ?? charId + 1000;
+  }
+  async pledgeLadder(guildId: number, accountId: number) {
+    return this.ladder.get(`${guildId}:${accountId}`) ?? null;
+  }
+  async bumpPledgeLadder(guildId: number, accountId: number) {
+    const key = `${guildId}:${accountId}`;
+    const prior = this.ladder.get(key);
+    const next = { rejectCount: (prior?.rejectCount ?? 0) + 1, rejectedAtMs: this.nowMs };
+    this.ladder.set(key, next);
+    return next.rejectCount;
+  }
+  async wipePledgeLadder(guildId: number, accountId: number) {
+    this.ladder.delete(`${guildId}:${accountId}`);
+  }
+  async guildLifetimeXpTotal(guildId: number) {
+    return this.guildXpTotals.get(guildId) ?? 0;
+  }
+  /** The fake clock bumpPledgeLadder stamps rejections with (tests advance it). */
+  nowMs = 1_000_000;
   private friends = new Map<number, Set<number>>();
   blocks = new Map<number, Set<number>>();
   ignores = new Map<number, Set<number>>();
@@ -236,6 +308,10 @@ class FakeDb implements SocialDb {
 }
 
 class FakeTransport implements SocialTransport {
+  pledgeStamps: { characterId: number; pledgeGuild: string; guildTier: number }[] = [];
+  applyPledge(characterId: number, pledgeGuild: string, guildTier: number): void {
+    this.pledgeStamps.push({ characterId, pledgeGuild, guildTier });
+  }
   online = new Set<number>();
   presence = new Map<number, Presence>();
   delivered = new Map<number, SocialEvent[]>();
@@ -372,13 +448,25 @@ class FakeTransport implements SocialTransport {
 
 // Test harness: characters 1..N, with helpers to flip presence. Tests that
 // exercise guild-name screening inject their own predicate; everything else
-// runs with the harness default (screen nothing). The constructor itself has
-// no default: every host must decide what it screens.
-function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
+// runs with the harness default (screen nothing). The constructors themselves
+// have no defaults: every host must decide what it screens.
+function setup(
+  cfg: {
+    isNameOffensive?: (name: string) => boolean;
+    findHardHit?: (text: string) => string | null;
+  } = {},
+) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive ?? (() => false));
+  db.cooldownClock = () => clock;
+  const svc = new SocialService(
+    db,
+    tx,
+    () => clock,
+    cfg.isNameOffensive ?? (() => false),
+    cfg.findHardHit ?? (() => null),
+  );
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -401,6 +489,7 @@ function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
     advance: (ms: number) => {
       clock += ms;
     },
+    now: () => clock,
   };
 }
 
@@ -891,10 +980,11 @@ describe('guilds', () => {
   it('requires every SocialService construction site to choose a screening predicate', () => {
     const db = new FakeDb();
     const tx = new FakeTransport(db);
-    // Fail-closed pin: the 4th constructor param deliberately has no default,
-    // so a host that forgets it fails to compile. Restoring a fail-open
-    // default makes this construction legal and tsc then rejects the
-    // unused expect-error, failing the gate.
+    // Fail-closed pin: the 4th and 5th constructor params (the offensive-name
+    // and hard-word screens) deliberately have no defaults, so a host that
+    // forgets either fails to compile. Restoring a fail-open default makes
+    // this construction legal and tsc then rejects the unused expect-error,
+    // failing the gate.
     // @ts-expect-error three args must not construct a SocialService
     const svc = new SocialService(db, tx, () => 1000);
     expect(svc).toBeInstanceOf(SocialService);
@@ -909,7 +999,61 @@ describe('guilds', () => {
     const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
     const site = game.slice(game.indexOf('new SocialService('));
     expect(site.length).toBeGreaterThan(0);
-    expect(site.slice(0, 400)).toContain('offensiveName(');
+    expect(site.slice(0, 700)).toContain('offensiveName(');
+    // The 5th param must be the real chat filter's hard tier, same rationale.
+    expect(site.slice(0, 700)).toContain('chatFilter.findHardHit(');
+  });
+
+  it('runs an injected guild creator only after validation and content screening', async () => {
+    const screened = setup({ isNameOffensive: (name) => name === 'Blocked Banner' });
+    screened.add(1, 'Aleph');
+    const calls: Array<[string, number]> = [];
+    const create = async (name: string, leaderId: number) => {
+      calls.push([name, leaderId]);
+      return { guildId: 41 } as const;
+    };
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'no', create)).toBe(false);
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Blocked Banner', create)).toBe(false);
+    expect(calls).toEqual([]);
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Atomic Banner', create)).toBe(true);
+    expect(calls).toEqual([['Atomic Banner', 1]]);
+    expect(screened.tx.membershipStamps).toContainEqual({
+      id: 1,
+      membership: { guildId: 41, guildName: 'Atomic Banner', rank: 'leader' },
+    });
+    expect(screened.tx.created).toContainEqual({ id: 1, guildId: 41 });
+    expect(screened.tx.founded).toEqual([1]);
+  });
+
+  it('never turns a committed guild into a refusal when a live follow-up hook throws', async () => {
+    const isolated = setup();
+    isolated.add(1, 'Aleph');
+    isolated.tx.onGuildMembershipChanged = () => {
+      throw new Error('live stamp failed');
+    };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const created = await isolated.svc.guildCreate(
+        isolated.actor(1),
+        'Durable Banner',
+        async () => ({
+          guildId: 42,
+        }),
+      );
+
+      expect(created).toBe(true);
+      expect(isolated.tx.created).toEqual([{ id: 1, guildId: 42 }]);
+      expect(isolated.tx.founded).toEqual([1]);
+      expect(isolated.tx.textFor(1).join()).toContain('Durable Banner');
+      expect(logged).toHaveBeenCalledWith(
+        'guild create post-commit membership stamp failed:',
+        expect.any(Error),
+      );
+    } finally {
+      logged.mockRestore();
+    }
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
@@ -2145,9 +2289,9 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
   });
 
   it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
-    // The boolean is the reserve-at-gate refund signal (Guild Bank Phase 3
-    // QA): FALSE on every refusal arm (the dispatch gate refunds the reserved
-    // fee), TRUE only on the committed success arm (the hook consumed it).
+    // The default creator still reports false for every refusal and true only
+    // after its guild/member transaction commits. GameServer injects the paid,
+    // fully atomic creator in production.
     await expect(h.svc.guildCreate(h.actor(1), 'no')).resolves.toBe(false); // invalid name
     expect(h.tx.created).toEqual([]);
     await expect(h.svc.guildCreate(h.actor(1), 'Iron Vanguard')).resolves.toBe(true);
@@ -2157,8 +2301,7 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
     expect(h.tx.membershipStamps).toEqual([
       { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
     ]);
-    // Refusals after: duplicate name, already guilded. No further hook calls,
-    // and both report false so the gate refunds.
+    // Refusals after: duplicate name, already guilded. No further hook calls.
     await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
     await expect(h.svc.guildCreate(h.actor(1), 'Second Banner')).resolves.toBe(false);
     expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
@@ -2283,5 +2426,210 @@ describe('guild bank guard on last-member guildLeave (Guild Bank Phase 3)', () =
     expect(await h.db.guildMembership(2)).toBeNull(); // the leave went through
     expect(h.db.guildCount()).toBe(1); // guild survives with its bank
     expect(h.tx.disbanded).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild pledges (docs/prd/guild-pledge-board.md)
+// ---------------------------------------------------------------------------
+
+describe('guild pledges', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+
+  async function seed(cfg: Parameters<typeof setup>[0] = {}) {
+    const h = setup(cfg);
+    h.add(1, 'Leader');
+    h.add(2, 'Officer');
+    h.add(3, 'Plain');
+    h.add(4, 'Aspirant', { level: 10 });
+    const created = await h.db.createGuildWithLeader('Bookbinders', 1);
+    if ('error' in created) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(created.guildId, 2, 'officer', 50);
+    await h.db.addGuildMemberAtomic(created.guildId, 3, 'member', 50);
+    return { ...h, guildId: created.guildId };
+  }
+
+  it('pledges to an open guild, notifies online officers only, stamps the badge', async () => {
+    const h = await seed();
+    h.tx.setOnline(1);
+    h.tx.setOnline(4);
+    // Plain member 3 online too: never notified, wrong rank.
+    h.tx.setOnline(3);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    const leaderLines = (h.tx.delivered.get(1) ?? []).map((e) => (e.type === 'log' ? e.text : ''));
+    expect(leaderLines).toContain('Aspirant has pledged to your guild.');
+    // Officer 2 is OFFLINE: nothing delivered.
+    expect(h.tx.delivered.get(2) ?? []).toEqual([]);
+    const plainLines = (h.tx.delivered.get(3) ?? []).map((e) => (e.type === 'log' ? e.text : ''));
+    expect(plainLines).not.toContain('Aspirant has pledged to your guild.');
+    // The badge stamp rode the pledge (tier 0: the fake guild has no xp).
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({
+      characterId: 4,
+      pledgeGuild: 'Bookbinders',
+      guildTier: 0,
+    });
+  });
+
+  it('refuses a closed guild, an under-level pledger, and a member', async () => {
+    const h = await seed();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: false, minLevel: 1, note: '' });
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 20, note: '' });
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    await h.db.setGuildPledgeSettings(h.guildId, { enabled: true, minLevel: 1, note: '' });
+    await h.svc.guildPledge(h.actor(3), 'Bookbinders');
+    expect(await h.db.pledgeOf(3)).toBeNull();
+  });
+
+  it('walks the rejection ladder: a day, a week, then forever', async () => {
+    const h = await seed();
+    const account = await h.db.accountIdForCharacter(4);
+    const pledgeAndReject = async () => {
+      await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+      expect(await h.db.pledgeOf(4)).not.toBeNull();
+      h.db.nowMs = h.now();
+      await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+      expect(await h.db.pledgeOf(4)).toBeNull();
+    };
+    await pledgeAndReject();
+    // Inside the day: refused. Past it: allowed.
+    h.advance(23 * 60 * 60 * 1000);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(2 * 60 * 60 * 1000);
+    await pledgeAndReject();
+    // Second rejection: a week.
+    h.advance(6 * DAY);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(2 * DAY);
+    await pledgeAndReject();
+    // Third rejection: forever.
+    h.advance(365 * DAY);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect((await h.db.pledgeLadder(h.guildId, account!))?.rejectCount).toBe(3);
+  });
+
+  it('a real guild invite wipes the ladder', async () => {
+    const h = await seed();
+    const account = await h.db.accountIdForCharacter(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    h.db.nowMs = h.now();
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+    expect(await h.db.pledgeLadder(h.guildId, account!)).not.toBeNull();
+    h.tx.setOnline(4);
+    await h.svc.guildInvite(h.actor(2), 'Aspirant');
+    expect(await h.db.pledgeLadder(h.guildId, account!)).toBeNull();
+    // And once the global re-pledge cooldown passes, the aspirant may pledge
+    // again with no ladder in the way.
+    h.advance(PLEDGE_REPLEDGE_COOLDOWN_MS);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).not.toBeNull();
+  });
+
+  it('refuses a re-pledge inside the cooldown window, to any guild', async () => {
+    const h = await seed();
+    await h.db.createGuildWithLeader('Inkwrights', 5);
+    h.add(5, 'Scribe');
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // Switching targets inside the window is refused with the remaining time.
+    h.advance(60_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 4 more minutes.');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    // The last minute reads singular.
+    h.advance(PLEDGE_REPLEDGE_COOLDOWN_MS - 90_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 1 more minute.');
+    // Past the window the switch goes through.
+    h.advance(31_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Inkwrights' });
+  });
+
+  it('withdrawing does not dodge the cooldown: the stamp survives the row delete', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeWithdraw(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(60_000);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 4 more minutes.');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+  });
+
+  it('accept resolves the pledge into the standard invite', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    const invites = (h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite');
+    expect(invites).toHaveLength(1);
+    // Accepting the invite seats them; joining clears any pledge state.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
+  it('withdraw clears the pledge and restamps the badge', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeWithdraw(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+  });
+
+  it('officer-plus gates and note truncation on settings', async () => {
+    const h = await seed();
+    await h.svc.setGuildPledgeSettings(h.actor(3), { enabled: false, minLevel: 5, note: 'x' });
+    expect((await h.db.guildPledgeSettings(h.guildId)).enabled).toBe(true);
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: false,
+      minLevel: 5,
+      note: 'a'.repeat(200),
+    });
+    const after = await h.db.guildPledgeSettings(h.guildId);
+    expect(after.enabled).toBe(false);
+    expect(after.minLevel).toBe(5);
+    expect(after.note).toHaveLength(90);
+  });
+
+  it('refuses a board note the chat filter hard tier hits, storing nothing', async () => {
+    const h = await seed({
+      findHardHit: (text) => (text.includes('slurword') ? 'slurword' : null),
+    });
+    const before = await h.db.guildPledgeSettings(h.guildId);
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: false,
+      minLevel: 7,
+      note: 'we are a slurword guild',
+    });
+    // The whole write is refused, not just the note: nothing changed.
+    expect(await h.db.guildPledgeSettings(h.guildId)).toEqual(before);
+    expect(h.tx.errorsFor(1).at(-1)).toBe('That board note is not allowed.');
+    // A clean note from the same guild still writes.
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: true,
+      minLevel: 7,
+      note: 'we are a friendly guild',
+    });
+    expect((await h.db.guildPledgeSettings(h.guildId)).note).toBe('we are a friendly guild');
+  });
+
+  it('the snapshot shows pledges to officers only, and myPledge to the pledger', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    const officer = await h.svc.snapshot(2);
+    expect(officer.guild?.pledges.map((r) => r.name)).toEqual(['Aspirant']);
+    const plain = await h.svc.snapshot(3);
+    expect(plain.guild?.pledges).toEqual([]);
+    expect(plain.guild?.pledgeSettings.enabled).toBe(true);
+    const mine = await h.svc.snapshot(4);
+    expect(mine.myPledge?.guildName).toBe('Bookbinders');
   });
 });

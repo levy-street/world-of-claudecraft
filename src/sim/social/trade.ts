@@ -14,7 +14,7 @@
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
 
 import type { TradeInfo } from '../../world_api';
-import { addStacked, bagCapacity, countFit } from '../bags';
+import { addStacked, bagPools, countFit } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { itemCopyPin } from '../item_copy_ref';
@@ -514,7 +514,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     // stack removal could miss).
     const scratchOwn = meta.inventory.map((s) => ({ ...s }));
     shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn);
-    const capacity = bagCapacity(meta.bags);
+    const pools = bagPools(meta.bags);
     // What the GIVER ships, resolved by the same walk over the giver's own
     // scratch, then landed unit by unit (sequential add-then-check, so a
     // stack with room for one of three units refuses the third, #2473).
@@ -533,7 +533,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
           u.instance.boundTo === undefined
             ? { ...u.instance, boundTo: meta.entityId }
             : u.instance;
-        if (countFit(scratchOwn, capacity, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
+        if (countFit(scratchOwn, pools, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
           return false;
         }
         addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId);

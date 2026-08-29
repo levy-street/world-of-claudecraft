@@ -16,6 +16,8 @@
 // (instant, zone): it draws no randomness and reads no live clock, using only
 // Intl.DateTimeFormat, new Date(ms), and Date.UTC.
 
+import { DOUBLE_HONOR_LEAD_MS } from '../src/sim/pvp/honor_event';
+
 export const DEFAULT_RAID_RESET_TIME_ZONE = 'America/New_York';
 
 // The civil-time hour of the daily raid reset: 03:00, the classic 3 AM daily reset.
@@ -142,11 +144,44 @@ function pad2(n: number): string {
  * randomness. A caller reads the clock and passes the instant in, which is what
  * keeps the sim deterministic.
  */
+// resetDayKey and its eventLeadDayKey twin below run in the 20 Hz world loop,
+// and each computation builds two Intl.DateTimeFormat instances (~0.1ms). The
+// answer can only change on an epoch-minute boundary (the reset hour is a whole
+// hour and modern zone offsets are whole minutes), so memoize per (epoch
+// minute, zone). Still pure: the memo key is derived from the arguments alone,
+// so the same inputs always give the same output. The map is tiny (the loop
+// alternates two buckets per zone); the cap is a leak guard for many-zone
+// callers like the tests.
+const DAY_KEY_MEMO_MAX = 16;
+const dayKeyMemo = new Map<string, string>();
+
 export function resetDayKey(nowMs: number, zone: string = DEFAULT_RAID_RESET_TIME_ZONE): string {
+  const memoKey = `${Math.floor(nowMs / 60_000)}:${zone}`;
+  const memoized = dayKeyMemo.get(memoKey);
+  if (memoized !== undefined) return memoized;
   const { y, mo, d } = zoneDate(nowMs, zone);
   // Date.UTC normalizes the day-before rollback across month and year edges. The
   // arithmetic is on a pure calendar triple, never on an instant, so no offset or
   // DST transition can shift which date comes out.
   const at = new Date(Date.UTC(y, mo - 1, zoneHour(nowMs, zone) < RAID_RESET_HOUR ? d - 1 : d));
-  return `${at.getUTCFullYear()}-${pad2(at.getUTCMonth() + 1)}-${pad2(at.getUTCDate())}`;
+  const key = `${at.getUTCFullYear()}-${pad2(at.getUTCMonth() + 1)}-${pad2(at.getUTCDate())}`;
+  if (dayKeyMemo.size >= DAY_KEY_MEMO_MAX) dayKeyMemo.clear();
+  dayKeyMemo.set(memoKey, key);
+  return key;
+}
+
+/**
+ * The weekend event's early-open probe: the reset-day window this realm will
+ * be in DOUBLE_HONOR_LEAD_MS from the given instant. The game loop feeds it to
+ * the sim beside `resetDayKey` (Sim.eventLeadDay), and honor_event.ts opens
+ * the Double Honor window when either key reads a weekend day, which is what
+ * moves the open from Saturday 3 AM back to Friday 3 PM realm time. Pure in
+ * (instant, zone), like everything else here; the offline twin is
+ * `eventLeadDayOf` in src/game/utc_day.ts.
+ */
+export function eventLeadDayKey(
+  nowMs: number,
+  zone: string = DEFAULT_RAID_RESET_TIME_ZONE,
+): string {
+  return resetDayKey(nowMs + DOUBLE_HONOR_LEAD_MS, zone);
 }

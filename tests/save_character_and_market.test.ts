@@ -32,7 +32,7 @@ beforeEach(() => {
 function clientStub() {
   const query = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 } as any);
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
 }
 
 const STATE = {
@@ -83,7 +83,9 @@ describe('saveCharacterAndMarketState', () => {
   it('rolls back and rethrows if the character write fails, leaving no half-commit', async () => {
     const client = clientStub();
     client.query.mockImplementation((sql: string) => {
-      if (/UPDATE characters/i.test(sql)) throw new Error('boom');
+      if (/UPDATE characters/i.test(sql)) {
+        throw Object.assign(new Error('boom'), { code: 'XX000' });
+      }
       return Promise.resolve({ rows: [], rowCount: 0 } as any);
     });
     dbMock.connect.mockResolvedValueOnce(client as any);
@@ -99,7 +101,9 @@ describe('saveCharacterAndMarketState', () => {
   it('rolls back and rethrows if the market write fails, undoing the character write', async () => {
     const client = clientStub();
     client.query.mockImplementation((sql: string) => {
-      if (/world_state/i.test(sql)) throw new Error('market boom');
+      if (/world_state/i.test(sql)) {
+        throw Object.assign(new Error('market boom'), { code: 'XX000' });
+      }
       return Promise.resolve({ rows: [], rowCount: 0 } as any);
     });
     dbMock.connect.mockResolvedValueOnce(client as any);

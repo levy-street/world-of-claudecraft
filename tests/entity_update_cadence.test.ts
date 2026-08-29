@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { isUpdateDue } from '../server/entity_update_cadence';
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import type { Entity } from '../src/sim/types';
 
 // A minimal entity: isUpdateDue reads only id, templateId, aggroTargetId (plus
@@ -16,14 +15,6 @@ function mkEntity(overrides: Partial<Entity> = {}): Entity {
 }
 
 describe('entity_update_cadence: isUpdateDue', () => {
-  it('the Vale Cup ball is always due, regardless of distance or how long ago it last sent', () => {
-    const ball = mkEntity({ id: 5, templateId: VALE_CUP_BALL_TEMPLATE_ID });
-    const viewer = mkEntity({ id: 1 });
-    // far beyond quarter-rate radius, and just sent last tick (divisor not owed)
-    expect(isUpdateDue(100, ball, 200 * 200, viewer, 99)).toBe(true);
-    expect(isUpdateDue(100, ball, 200 * 200, viewer, 100)).toBe(true);
-  });
-
   it('is always due inside the 55yd full-rate radius, even freshly sent', () => {
     const e = mkEntity({ id: 2 });
     const viewer = mkEntity({ id: 1 });

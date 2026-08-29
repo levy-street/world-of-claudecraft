@@ -26,6 +26,7 @@ const base: InspectInput = {
   skinCatalog: 'class',
   deedTitleText: '',
   border: null,
+  borderDeedName: '',
   curatorRank: 0,
   relicsOwned: null,
   relicsTotal: null,
@@ -334,19 +335,29 @@ describe('buildInspectView: the header border accent', () => {
     expect(buildInspectView(base, ITEMS).header.border).toBeNull();
   });
 
-  it('resolves a worn border deed id to its slug AND that slug palette', () => {
+  it('E51: resolves a worn deed to its slug, motif, palette, and localized granting name', () => {
     // Deed id in, slug + colors out: the painter must receive resolved colors so
     // it holds no palette of its own. The expected colors come from the ONE
     // table, so this cannot drift from what the nameplate and portrait ring draw.
     const accent = borderAccent('reliquary_gilt');
     expect(accent).not.toBeNull();
     expect(
-      buildInspectView({ ...base, border: 'col_reliquary_rank_5' }, ITEMS).header.border,
+      buildInspectView(
+        {
+          ...base,
+          border: 'col_reliquary_rank_5',
+          borderDeedName: 'Reliquary Eternal',
+        },
+        ITEMS,
+      ).header.border,
     ).toEqual({
       slug: 'reliquary_gilt',
       frame: accent?.frame,
       edge: accent?.edge,
       glow: accent?.glow,
+      motif: accent?.motif,
+      motifPath: accent?.motifPath,
+      deedName: 'Reliquary Eternal',
     });
   });
 

@@ -16,16 +16,19 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
     p.gm = true; // an L19 elite would otherwise grind the warrior down mid-loop
-    // flat starting ground (Eastbrook town) so the shove isn't terrain-clamped
-    p.pos.x = 2;
-    p.pos.z = 0;
+    // flat starting ground (the harbor-town plat) so the shove isn't
+    // terrain-clamped. Re-staged 2026-08-18 for the Eastbrook harbor move
+    // (d19aa33f76): the vacated town ground at (0,0) is no longer
+    // street-flattened and its slope clamped the 6yd shove at 4.14yd.
+    p.pos.x = -18;
+    p.pos.z = -100;
     p.pos.y = 0;
     const tmpl = MOBS.marrowlord_varkas;
     const saved = tmpl.knockback!.chance;
     tmpl.knockback!.chance = 1; // force the proc; misses/dodges still possible
     try {
       // spawn at the player's level for an even hit table, on top of the player
-      const mob = createMob(900700, tmpl, p.level, { x: 0, y: 0, z: 0 });
+      const mob = createMob(900700, tmpl, p.level, { x: -20, y: 0, z: -100 });
       const startGap = dist2d(p.pos, mob.pos);
       let moved = false;
       for (let i = 0; i < 80 && !moved; i++) {
@@ -34,7 +37,7 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
       }
       expect(moved).toBe(true);
       // pushed outward along the +x line it started on (away, not toward, the mob)
-      expect(p.pos.x).toBeGreaterThan(2);
+      expect(p.pos.x).toBeGreaterThan(-18);
       expect(dist2d(p.pos, mob.pos)).toBeGreaterThan(startGap + 3);
     } finally {
       tmpl.knockback!.chance = saved;

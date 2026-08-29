@@ -163,6 +163,9 @@ function guildRows(tag: string): GuildLeaderRow[] {
       memberCount: 5,
       totalLifetimeXp: 5_000,
       topLevel: 60,
+      pledgesEnabled: true,
+      pledgeMinLevel: 1,
+      pledgeNote: '',
     },
   ];
 }

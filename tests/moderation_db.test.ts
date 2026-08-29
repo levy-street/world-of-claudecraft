@@ -6,13 +6,33 @@ type TestQuery = (
   values?: readonly unknown[],
 ) => Promise<QueryResult<Record<string, unknown>>>;
 
-const db = vi.hoisted(() => ({
-  query: vi.fn<TestQuery>(),
-  connect: vi.fn<() => Promise<PoolClient>>(),
-}));
+const db = vi.hoisted(() => {
+  const query = vi.fn<TestQuery>();
+  // The statement handed to a runWithStatementTimeout callback: forwards to the
+  // shared query spy (so every test's result chain keeps its order) through a
+  // DISTINCT spy, so a test can tell a bounded statement from a bare pool one.
+  const boundedQuery = vi.fn<TestQuery>((text, values) => query(text, values));
+  const runWithStatementTimeout = vi.fn(
+    (_timeoutMs: number, fn: (q: TestQuery) => Promise<unknown>) => fn(boundedQuery),
+  );
+  return {
+    query,
+    boundedQuery,
+    runWithStatementTimeout,
+    connect: vi.fn<() => Promise<PoolClient>>(),
+  };
+});
 
 vi.mock('../server/db', () => ({
-  pool: db,
+  pool: { query: db.query, connect: db.connect },
+  runWithStatementTimeout: db.runWithStatementTimeout,
+}));
+
+// The suspicion-flag emitter is its own unit (tests/suspicion_flags.test.ts);
+// here it only matters that the burst path hands it the report's signals and
+// cohort, so it is mocked inert.
+vi.mock('../server/suspicion_flags', () => ({
+  flagRegistrationBurst: vi.fn(),
 }));
 
 import {
@@ -29,6 +49,7 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   prunePlayerReportsBatch,
+  RECENT_REGISTRATIONS_TIMEOUT_MS,
   reactivateAccountAudited,
   recordInGameAction,
   resetChatStrikesAudited,
@@ -37,8 +58,9 @@ import {
   setOnAccountModerated,
   setOnModerationQueueChanged,
 } from '../server/moderation_db';
+import { flagRegistrationBurst } from '../server/suspicion_flags';
 
-const { query, connect } = db;
+const { query, boundedQuery, runWithStatementTimeout, connect } = db;
 
 function queryResult<T extends QueryResultRow>(rows: T[], rowCount = rows.length): QueryResult<T> {
   return {
@@ -62,6 +84,9 @@ function clientStub() {
 beforeEach(() => {
   query.mockReset();
   connect.mockReset();
+  // mockClear only: the pass-through implementations must survive resets.
+  boundedQuery.mockClear();
+  runWithStatementTimeout.mockClear();
 });
 
 describe('moderation report helpers', () => {
@@ -103,10 +128,10 @@ describe('moderation report helpers', () => {
 
   it('creates a system moderation report for suspicious sequential registration bursts', async () => {
     query
-      .mockResolvedValueOnce(queryResult([{ n: 31 }])) // same numeric prefix
-      .mockResolvedValueOnce(queryResult([{ n: 1 }])) // same IP
-      .mockResolvedValueOnce(queryResult([{ n: 1 }])) // same /24
-      .mockResolvedValueOnce(queryResult([{ n: 1 }])) // same UA
+      .mockResolvedValueOnce(queryResult([{ n: 31, cohort_ids: [42, 41] }])) // same numeric prefix
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same IP
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same /24
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same UA
       .mockResolvedValueOnce(queryResult([])) // duplicate report check
       .mockResolvedValueOnce(queryResult([{ id: 123 }])); // insert
 
@@ -119,6 +144,37 @@ describe('moderation report helpers', () => {
 
     expect(result.created).toBe(true);
     expect(result.signals).toContain('31 accounts with username prefix "aintgrave" in 10 minutes');
+    // Each signal is ONE read: the count and the newest-first burst cohort ride
+    // the same window/ban predicate, so a tripped signal never re-scans the
+    // window with a second per-signal id query. The match is materialised once
+    // in a CTE and the cohort is a LIMIT-bounded top-N over it (never an
+    // in-aggregate sort of the whole match set, which IS the flood).
+    const [countSql, countParams] = query.mock.calls[0];
+    expect(countSql).toMatch(/WITH m AS \(\s*SELECT id FROM accounts/);
+    expect(countSql).toContain('(SELECT count(*)::int FROM m) AS n');
+    expect(countSql).toContain('ARRAY(SELECT id FROM m ORDER BY id DESC LIMIT 50) AS cohort_ids');
+    expect(countSql).not.toMatch(/array_agg/);
+    expect(countSql).toContain("created_at > now() - ($1 || ' minutes')::interval");
+    expect(countSql).toContain('banned_at IS NULL');
+    expect(countSql).toContain("lower(username) LIKE $2 || '%'");
+    expect(countParams).toEqual(['10', 'aintgrave']);
+    // Every burst read is bounded: they run detached on the registration path
+    // with no concurrency cap, so a flood-sized match must die at 2 s rather
+    // than pin pooled clients for the 15 s session default.
+    expect(RECENT_REGISTRATIONS_TIMEOUT_MS).toBe(2_000);
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(4);
+    for (const [timeoutMs] of runWithStatementTimeout.mock.calls) expect(timeoutMs).toBe(2_000);
+    expect(boundedQuery).toHaveBeenCalledTimes(4);
+    expect(boundedQuery.mock.calls.map(([sql]) => sql)).toEqual(
+      query.mock.calls.slice(0, 4).map(([sql]) => sql),
+    );
+    // The duplicate check and the insert stay on the bare pool.
+    expect(boundedQuery.mock.calls.map(([sql]) => sql)).not.toContainEqual(
+      expect.stringMatching(/player_reports/),
+    );
+    expect(query.mock.calls[1][1]).toEqual(['10', '203.0.113.44']);
+    expect(query.mock.calls[2][1]).toEqual(['10', '203.0.113.%']);
+    expect(query.mock.calls[3][1]).toEqual(['10', 'Mozilla/5.0']);
     expect(query.mock.calls[4][0]).toMatch(/FROM player_reports/);
     expect(query.mock.calls[5][0]).toMatch(/INSERT INTO player_reports/);
     expect(query.mock.calls[5][1]).toEqual([
@@ -126,6 +182,115 @@ describe('moderation report helpers', () => {
       'spam',
       expect.stringContaining('Automated registration pattern'),
     ]);
+    expect(query).toHaveBeenCalledTimes(6);
+    // No second per-signal id query: the ONLY statements reading accounts are
+    // the four CTE-shaped burst reads, and none starts as a bare id rescan.
+    const accountReads = query.mock.calls
+      .map(([sql]) => sql)
+      .filter((sql) => /FROM accounts/.test(sql));
+    expect(accountReads).toHaveLength(4);
+    for (const sql of accountReads) expect(sql).toMatch(/^\s*WITH m AS/);
+    expect(query.mock.calls.map(([sql]) => sql)).not.toContainEqual(
+      expect.stringMatching(/^\s*SELECT id FROM accounts/),
+    );
+    // The suspicion flag mirrors the report, carrying the tripped signals and
+    // the burst cohort of the TRIPPED signal only as related accounts.
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [42, 41],
+    });
+  });
+
+  it('degrades a failed signal read instead of losing the report and the flag', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    query
+      .mockResolvedValueOnce(queryResult([{ n: 31, cohort_ids: [42, 41] }])) // same numeric prefix
+      .mockRejectedValueOnce(new Error('statement timeout')) // same IP: the flood-sized read dies
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same /24
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same UA
+      .mockResolvedValueOnce(queryResult([])) // duplicate report check
+      .mockResolvedValueOnce(queryResult([{ id: 123 }])); // insert
+
+    const result = await createSuspiciousRegistrationReport({
+      accountId: 42,
+      username: 'aintgrave1031',
+      ip: '203.0.113.44',
+      userAgent: 'Mozilla/5.0',
+    });
+
+    // The failed signal reads as no matches; the others still earn the report
+    // and the flag (the loss would land exactly when the box is busiest).
+    expect(result.created).toBe(true);
+    expect(result.signals).toContain('31 accounts with username prefix "aintgrave" in 10 minutes');
+    expect(result.signals.some((s) => s.includes('from IP'))).toBe(false);
+    expect(query.mock.calls[5][0]).toMatch(/INSERT INTO player_reports/);
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [42, 41],
+    });
+    expect(err).toHaveBeenCalledWith('registration burst signal read failed:', expect.any(Error));
+    err.mockRestore();
+  });
+
+  it('unions the burst cohorts of every tripped signal in signal order, deduped', async () => {
+    vi.mocked(flagRegistrationBurst).mockClear();
+    query
+      .mockResolvedValueOnce(queryResult([{ n: 31, cohort_ids: [42, 41, 40] }])) // prefix trips
+      .mockResolvedValueOnce(queryResult([{ n: 9, cohort_ids: [42, 39] }])) // IP trips
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [99] }])) // /24 does not
+      .mockResolvedValueOnce(queryResult([{ n: 61, cohort_ids: [42, 41, 38] }])) // UA trips
+      .mockResolvedValueOnce(queryResult([])) // duplicate report check
+      .mockResolvedValueOnce(queryResult([{ id: 124 }])); // insert
+
+    const result = await createSuspiciousRegistrationReport({
+      accountId: 42,
+      username: 'aintgrave1031',
+      ip: '203.0.113.44',
+      userAgent: 'Mozilla/5.0',
+    });
+
+    expect(result.created).toBe(true);
+    expect(result.signals).toHaveLength(3);
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [42, 41, 40, 39, 38],
+    });
+    // Only TRIPPED signals contribute: the untripped /24 read carried an id
+    // (99) that no tripped cohort holds, and it never reaches the flag.
+    const { cohortAccountIds } = vi.mocked(flagRegistrationBurst).mock.calls[0][0];
+    expect(cohortAccountIds).not.toContain(99);
+  });
+
+  it('reads an empty burst cohort when the window matched no account', async () => {
+    vi.mocked(flagRegistrationBurst).mockClear();
+    // ARRAY(subselect) over zero rows is an empty array ({}), never NULL; the
+    // Array.isArray guard still tolerates a NULL cell (the second read) so a
+    // driver quirk degrades to an empty cohort rather than a throw. A tripped
+    // signal can still carry an empty cohort when the mock forces the count.
+    query
+      .mockResolvedValueOnce(queryResult([{ n: 31, cohort_ids: [] }]))
+      .mockResolvedValueOnce(queryResult([{ n: 0, cohort_ids: null }]))
+      .mockResolvedValueOnce(queryResult([{ n: 0, cohort_ids: [] }]))
+      .mockResolvedValueOnce(queryResult([{ n: 0, cohort_ids: [] }]))
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([{ id: 125 }]));
+
+    const result = await createSuspiciousRegistrationReport({
+      accountId: 42,
+      username: 'aintgrave1031',
+      ip: '203.0.113.44',
+      userAgent: 'Mozilla/5.0',
+    });
+
+    expect(result.created).toBe(true);
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [],
+    });
   });
 
   it('does not create a system moderation report without a suspicious registration signal', async () => {

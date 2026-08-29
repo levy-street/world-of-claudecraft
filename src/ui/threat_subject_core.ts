@@ -75,3 +75,26 @@ export function resolveThreatSubject(input: ThreatSubjectInput): number | null {
   }
   return best ? best.id : fallbackMobId;
 }
+
+/**
+ * The hate-table values the Threat tab should paint, once the subject mob is
+ * decided: its LIVE table while it holds one, otherwise the most recent
+ * snapshot the caller latched from that table before it died or left the
+ * world view.
+ *
+ * This is what keeps a fight's real threat numbers on screen through the kill
+ * that just proved them: the mob's hate table is wiped the instant it dies,
+ * so a subject that reads as merely "dead" a moment after the killing blow
+ * would otherwise fall straight to the raw-damage fallback, and a tank who
+ * watched their threat climb to 3000 on a 1000 hp mob would watch it "drop"
+ * to 1000 the moment the mob fell over. The frozen snapshot is honest hate,
+ * not a different metric, so it is never marked as the fallback.
+ */
+export function resolveThreatValues(
+  mob: ThreatSubjectMob | null,
+  frozenSnapshot: Map<number, number> | null,
+): { values: Map<number, number> | null; frozen: boolean } {
+  if (mob && !mob.dead && mob.threat.size > 0) return { values: mob.threat, frozen: false };
+  if (frozenSnapshot && frozenSnapshot.size > 0) return { values: frozenSnapshot, frozen: true };
+  return { values: null, frozen: false };
+}

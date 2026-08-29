@@ -110,7 +110,10 @@ interface TextInk {
  *  plus the phase 23 repeat glyph: more zones means more POI labels and more
  *  overworld doors, and the quest tables grew with them.
  *  tests/text_sprite_cache.ts derives it from content.) */
-export const TEXT_SPRITE_LIMIT = 384;
+// 416: the tutorial-island + eastbrook quest tables carried the derived worst
+// case to 385, past the old 384; the next power-of-two-ish step keeps a small
+// content margin (the test reddens again the day it is outgrown).
+export const TEXT_SPRITE_LIMIT = 416;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).

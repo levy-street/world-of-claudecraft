@@ -36,10 +36,9 @@
 
 import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
-import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
+import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
-import { pctValue } from '../entity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
@@ -363,10 +362,11 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
  * Re-derive the owner-inherited half of a hunter pet's stats (pet/pet_scaling.ts).
  *
  * Idempotent, so updatePet can call it every tick and pick up a gear swap the moment
- * it lands: armor and attack power are recomputed from the template base plus the
- * current share, while the health share is swapped as a DELTA rather than recomputed,
- * because the raid stat auras (applyNonPlayerStatAura) write maxHp too and rebuilding
- * the pool from the template would silently eat their contribution.
+ * it lands: armor, attack power, and melee haste are recomputed from the template base
+ * (or, for haste, straight from the owner) plus the current share, while the health
+ * share is swapped as a DELTA rather than recomputed, because the raid stat auras
+ * (applyNonPlayerStatAura) write maxHp too and rebuilding the pool from the template
+ * would silently eat their contribution.
  *
  * Hunter-only on purpose. A warlock demon and the mage Water Elemental are authored
  * as pets with their own tuned pools; a tamed beast is a wild mob template that was
@@ -398,8 +398,10 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
     maxHp: owner.maxHp,
     armor: owner.stats.armor,
     rangedPower: owner.rangedPower,
+    meleeHaste: owner.meleeHaste,
   });
   pet.attackPower = share.attackPower;
+  pet.meleeHaste = share.meleeHaste;
   pet.stats.armor = Math.round(template.armorPerLevel * (pet.level - 1)) + share.armor;
   const gained = share.hp - pet.petOwnerHpBonus;
   if (gained === 0) return;
@@ -412,14 +414,7 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
 
 export function petDamageMult(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId === null) return 1;
-  let mult = 1;
-  for (const a of pet.auras) {
-    if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-  }
-  const ownerMeta = ctx.players.get(pet.ownerId);
-  if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
-  mult *= hunterPetFerocityDamageMultiplier(ctx, pet);
-  return mult;
+  return hunterPetDamageMultiplier(ctx, pet);
 }
 
 export function petCleaveAttack(

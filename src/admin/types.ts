@@ -124,7 +124,8 @@ export interface SuspiciousPlayer {
     name: string;
     ip: string;
   };
-  // CONFIRMED = an automated moderator report went out for this session.
+  // CONFIRMED = an automated case (a suspicion flag, or a moderator report on a
+  // host without the flag store) went out for this session.
   state: 'SUSPICIOUS' | 'CONFIRMED';
   snapshot: {
     capturedAt: number;
@@ -211,6 +212,120 @@ export interface AccountRow {
   characterCount: number;
   maxLevel: number;
   playtimeSeconds: number;
+  // Materialised total gold (purse + mail/market escrow); 0 until the server's
+  // wealth sweep first runs.
+  totalCopper: number;
+  // Present only when the operator holds moderation.read (the server strips it
+  // otherwise); count of active suspicion flags on the account.
+  activeFlagCount?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Economy oversight: wealth breakdown + the suspicion-flag workflow. Shapes
+// mirror server/account_wealth_db.ts and server/suspicion_flags_db.ts exactly.
+// ---------------------------------------------------------------------------
+
+export interface TopWealthHolderRow {
+  accountId: number;
+  username: string;
+  purseCopper: number;
+  mailCopper: number;
+  marketCopper: number;
+  totalCopper: number;
+  maxLevel: number;
+  lastLogin: string | null;
+  bannedAt: string | null;
+  suspendedUntil: string | null;
+  // Present only when the operator holds moderation.read (the server strips
+  // it otherwise, the same rule as the accounts list).
+  activeFlagCount?: number;
+  updatedAt: string;
+}
+
+export interface AccountWealthCharacterRow {
+  characterId: number;
+  name: string;
+  realm: string;
+  level: number;
+  copper: number;
+  guildId: number | null;
+  guildName: string | null;
+  guildTreasuryCopper: number | null;
+  guildMemberCount: number | null;
+}
+
+export interface LargeGoldMovementRow {
+  id: number;
+  characterId: number;
+  characterName: string | null;
+  op: string;
+  container: string;
+  copperDelta: number;
+  createdAt: string;
+}
+
+export interface AccountWealthData {
+  accountId: number;
+  purseCopper: number;
+  mailCopper: number;
+  marketCopper: number;
+  totalCopper: number;
+  updatedAt: string | null;
+  characters: AccountWealthCharacterRow[];
+  largeMovements: LargeGoldMovementRow[];
+  /** The ledger read failed (timed out) after the breakdown was computed:
+   *  largeMovements is empty because it is unknown, not because it is none. */
+  largeMovementsUnavailable?: boolean;
+}
+
+export interface RelatedAccountRef {
+  accountId: number;
+  username: string | null;
+}
+
+export interface SuspicionFlagRow {
+  id: number;
+  accountId: number;
+  username: string;
+  bannedAt: string | null;
+  suspendedUntil: string | null;
+  source: string;
+  kind: string;
+  severity: 'low' | 'medium' | 'high';
+  details: string;
+  relatedAccounts: RelatedAccountRef[];
+  status: 'new' | 'under_review' | 'cleared' | 'actioned';
+  copperAtFlag: number | null;
+  copperNow: number | null;
+  occurrences: number;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  updatedAt: string;
+}
+
+export interface SuspicionFlagEventRow {
+  id: number;
+  flagId: number;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+  fromStatus: SuspicionFlagRow['status'] | null;
+  toStatus: SuspicionFlagRow['status'] | null;
+  note: string;
+  createdAt: string;
+}
+
+export interface FlagListData {
+  rows: SuspicionFlagRow[];
+  total: number;
+  page: number;
+  limit: number;
+  counts: Record<SuspicionFlagRow['status'], number>;
+  truncated: boolean;
+}
+
+export interface AccountFlagsData {
+  flags: SuspicionFlagRow[];
+  events: SuspicionFlagEventRow[];
 }
 
 export interface CharacterRow {

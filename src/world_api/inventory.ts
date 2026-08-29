@@ -6,8 +6,11 @@ export interface IWorldInventory {
   inventory: InvSlot[];
   // The 4 equippable bag sockets (kind:'bag' item ids, null = empty socket).
   bags: (string | null)[];
-  // Total pooled slot budget: the implicit 16-slot backpack plus every
-  // equipped bag's bagSlots (see src/sim/bags.ts). Used slots is inventory.length.
+  // Total pooled slot budget, both pools summed: the implicit 16-slot backpack
+  // plus every equipped bag's bagSlots (see src/sim/bags.ts). Used slots is
+  // inventory.length. Deliberately the TOTAL, not a fit answer: the bag grid
+  // and the used/total readout span both pools, while fit questions go through
+  // the PoolCapacity-taking gates (src/sim/bag_pools.ts).
   bagCapacity: number;
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;

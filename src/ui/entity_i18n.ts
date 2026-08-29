@@ -515,6 +515,25 @@ export function zonePoiLabel(zoneId: string, poiIndex: number): string {
   return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
 }
 
+/** Resolve a deed poi:<zoneId>:<poiId> mark (src/sim/deeds.ts markVisited) to
+ *  its localized display name, the one place the mark's stable-id keying
+ *  (deeds.ts) and the map label's positional keying (zonePoiLabel above)
+ *  meet: the sim intentionally keys on poi.id, never array position, so a
+ *  content edit that reorders a zone's pois must not silently mislabel an
+ *  old mark, and this is where that id -> index bridge is pinned instead of
+ *  re-derived ad hoc at each call site. Returns null for a malformed mark, an
+ *  unknown zone, or a poi id no longer in that zone (content can retire one;
+ *  the mark itself stays parked in an old save either way). */
+export function poiMarkLabel(markId: string): string | null {
+  const parts = markId.split(':');
+  if (parts.length !== 3 || parts[0] !== 'poi') return null;
+  const [, zoneId, poiId] = parts;
+  const zone = ZONES.find((z) => z.id === zoneId);
+  const poiIndex = zone?.pois.findIndex((p) => p.id === poiId) ?? -1;
+  if (poiIndex < 0) return null;
+  return zonePoiLabel(zoneId, poiIndex);
+}
+
 export function dungeonDisplayName(dungeonId: string): string {
   return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }

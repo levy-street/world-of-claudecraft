@@ -1,8 +1,12 @@
 import type {
   DevLeaderboardPage,
   GuildLeaderboardPage,
+  GuildRosterInfo,
   LeaderboardPage,
 } from '../sim/leaderboard_page';
+
+export type { GuildRosterEntry, GuildRosterInfo } from '../sim/leaderboard_page';
+
 import type { PlayerClass } from '../sim/types';
 
 // One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
@@ -39,6 +43,14 @@ export interface GuildLeaderboardEntry {
   totalLifetimeXp: number;
   topLevel: number;
   realm?: string; // present on the global (cross-realm) board
+  // Guild pledge board (docs/prd/guild-pledge-board.md): the recruiting status
+  // the Guild Master sets. pledgesOpen absent means the server predates the
+  // pledge board, so the client shows NO pledge affordances at all (never a
+  // guessed default). The note is the Master's free-text recruiting line
+  // ('' omitted from the wire); minLevel 1 means no floor.
+  pledgesOpen?: boolean;
+  pledgeMinLevel?: number;
+  pledgeNote?: string;
 }
 
 // One ranked row of the DEVELOPER high-score board: contributors ranked by how
@@ -87,6 +99,14 @@ export interface IWorldProgressionXp {
   // lifetime XP), paged server-side the same way as the player board. Guilds are
   // a server-only social system, so the offline Sim resolves an empty page.
   guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
+  /** The public roster drill-in behind the signpost guild board: the Guild
+   *  Master, then officers, then members, each rank tier ranked by lifetime
+   *  XP. Guilds are online-only, so the offline Sim resolves null, and null
+   *  also answers an unknown guild (both render the localized empty state).
+   *  ClientWorld fetches the cached server read and REJECTS on a transport
+   *  failure or malformed body, so the window can show its retry state
+   *  instead of misreading a dead server as an empty board. */
+  guildRoster(name: string): Promise<GuildRosterInfo | null>;
   // The developer high-score board (contributors ranked by merged PRs), sourced
   // from the repo's GitHub pulls API and paged the same way. The same data for
   // every realm; the offline Sim resolves an empty page.

@@ -19,6 +19,8 @@ import { dist2d, type Entity, INTERACT_RANGE, type LootSlot } from '../src/sim/t
 import type { PartyMemberInfo } from '../src/world_api';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
+const FRESH_CORPSE_TIMER = 60;
+
 function mustParty(sim: Sim, pid: number): Party {
   const party = sim.partyOf(pid);
   if (!party) throw new Error(`missing party for ${pid}`);
@@ -66,6 +68,7 @@ describe('parties', () => {
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.tappedById = tapper;
     mob.lootRecipientIds = recipients;
     mob.loot = loot;
@@ -348,8 +351,16 @@ describe('parties', () => {
   it('party members share kill xp with the group bonus and quest credit', () => {
     const { sim, a, b } = makeDuo(makeFullWorld()); // hunts a live camp wolf
     // both accept the wolf quest
-    teleport(sim, a, 4, 4);
-    teleport(sim, b, 4, 5);
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): marshal_redbrook (the
+    // q_wolves giver) now stands at (10, -97.5) by the noticeboard; stand the
+    // duo just south of him so acceptQuest's interact-range gate passes.
+    // Re-pinned for owner refinement round 6b, which redistributed the town's
+    // NPCs by role along the dock road: Redbrook moved out to the harbour
+    // market at (-58, -102), so the duo stands 2 and 3 yards south of his new
+    // stand, both well inside the 5 yard interact gate.
+    teleport(sim, a, -58, -100);
+    teleport(sim, b, -58, -99);
     sim.acceptQuest('q_wolves', a);
     sim.acceptQuest('q_wolves', b);
     const wolf = nearestMob(sim, 'forest_wolf');

@@ -38,6 +38,10 @@ export interface InspectBorderModel {
   frame: string;
   edge: string;
   glow: string;
+  motif: import('./deed_border_view').BorderMotifKind;
+  motifPath: string;
+  /** Existing localized name of the deed that granted this heraldry. */
+  deedName: string;
 }
 
 /** The compact inspect header: name, the optional active-deed title, level, the
@@ -139,6 +143,8 @@ export interface InspectInput {
   /** The active Book of Deeds BORDER as a deed ID (the raw wire value, never a
    *  slug and never display text); null for a borderless player. */
   border: string | null;
+  /** Existing localized name for `border`, resolved by the painter. */
+  borderDeedName: string;
   /** Server-computed Curator rank: 0 unranked, 1-5 Apprentice…Eternal Curator. */
   curatorRank: number;
   /** Character-scoped relics owned / total behind that rank, both null when the
@@ -206,7 +212,15 @@ export function buildInspectView(
     cls: input.cls,
     classColor: classColorCss(input.cls),
     border: accent
-      ? { slug: borderSlug, frame: accent.frame, edge: accent.edge, glow: accent.glow }
+      ? {
+          slug: borderSlug,
+          frame: accent.frame,
+          edge: accent.edge,
+          glow: accent.glow,
+          motif: accent.motif,
+          motifPath: accent.motifPath,
+          deedName: input.borderDeedName,
+        }
       : null,
   };
 

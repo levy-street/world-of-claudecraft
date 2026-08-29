@@ -73,9 +73,9 @@ const logicalUrl = (url: string): string => url.replace(/^\//, '');
 const onDisk = (url: string): string => path.join(ROOT, 'public', logicalUrl(url));
 const u32 = (buf: Buffer, off: number): number => buf.readUInt32LE(off);
 
-/** 15 shipped skies, three variants each: the vacuity floor a dropped table
+/** 14 shipped skies, three variants each: the vacuity floor a dropped table
  *  entry or a half-finished encode run cannot hide under (tests/CLAUDE.md). */
-const SHIPPED_SKY_FILES = 45;
+const SHIPPED_SKY_FILES = 42;
 
 describe('biome sky KTX2 assets (shipped)', () => {
   it('ships a valid KTX2 UASTC HDR file for every sky url sky.ts references', () => {

@@ -28,9 +28,14 @@ import type { Entity } from '../types';
 //
 // Draws no rng and iterates the roster once, only on the occasional stealth-enter
 // cast (never per tick).
-export function dropTargetsOnStealth(ctx: SimContext, hidden: Entity): void {
+export function dropTargetsOnStealth(
+  ctx: SimContext,
+  hidden: Entity,
+  alsoHidden: readonly number[] = [],
+): void {
+  const hiddenIds = alsoHidden.length === 0 ? [hidden.id] : [hidden.id, ...alsoHidden];
   for (const e of ctx.entities.values()) {
-    if (e.id === hidden.id) continue;
+    if (hiddenIds.includes(e.id)) continue;
     if (e.kind === 'mob') {
       // Only a live ENEMY mob loses its lock: skip corpses and any non-hostile
       // owned mob (the caster's own pet, an allied pet). The hostility check puts
@@ -40,10 +45,23 @@ export function dropTargetsOnStealth(ctx: SimContext, hidden: Entity): void {
       // player branch below, which asks whether the enemy player holding the lock
       // is hostile to the caster.
       if (e.dead || !ctx.isHostileTo(hidden, e)) continue;
-      if (e.aggroTargetId === hidden.id) e.aggroTargetId = null;
-      if (e.targetId === hidden.id) e.targetId = null;
-    } else if (e.kind === 'player' && e.targetId === hidden.id && ctx.isHostileTo(e, hidden)) {
+      if (e.aggroTargetId !== null && hiddenIds.includes(e.aggroTargetId)) e.aggroTargetId = null;
+      if (e.targetId !== null && hiddenIds.includes(e.targetId)) e.targetId = null;
+      if (e.forcedTargetId !== null && hiddenIds.includes(e.forcedTargetId)) {
+        e.forcedTargetId = null;
+        e.forcedTargetTimer = 0;
+      }
+    } else if (
+      e.kind === 'player' &&
+      e.targetId !== null &&
+      hiddenIds.includes(e.targetId) &&
+      ctx.isHostileTo(e, hidden)
+    ) {
       e.targetId = null;
+      e.autoAttack = false;
+      e.queuedOnSwing = null;
+      delete e.queuedOnSwingFree;
+      delete e.queuedOnSwingCostMultiplier;
     }
   }
 }

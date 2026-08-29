@@ -8,6 +8,8 @@ import {
   guildRosterItems,
   guildView,
   ignoreRows,
+  myPledgeView,
+  pledgePanelView,
   raidView,
   type SocialTab,
   socialDot,
@@ -90,6 +92,7 @@ const SOCIAL: SocialInfo = {
       guildMember({ name: 'Grunt', rank: 'member', online: false }),
     ],
   } as GuildInfo,
+  myPledge: null,
 };
 
 describe('socialStructSig', () => {
@@ -113,6 +116,18 @@ describe('socialStructSig', () => {
       guild: { ...(SOCIAL.guild as GuildInfo), rank: 'member' },
     };
     expect(socialStructSig('friends', demoted, null)).not.toBe(base);
+  });
+
+  it('changes when the open-pledge count changes (the Pledges tab label carries it)', () => {
+    const base = socialStructSig('guild', SOCIAL, null);
+    const pledged: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        pledges: [{ id: 21, name: 'Hopeful', cls: 'mage', level: 12, realm: 'Test', sinceMs: 5 }],
+      },
+    };
+    expect(socialStructSig('guild', pledged, null)).not.toBe(base);
   });
 
   it('encodes the raid roster shape so a regroup forces a rebuild', () => {
@@ -486,6 +501,49 @@ describe('raidView', () => {
     );
     const g1 = view.groups![0];
     expect(g1.members[0].moveTo).toBeNull();
+  });
+});
+
+describe('pledgePanelView (the officer Pledges tab)', () => {
+  const withPledges = (rank: 'leader' | 'officer' | 'member'): SocialInfo => ({
+    ...SOCIAL,
+    guild: {
+      ...(SOCIAL.guild as GuildInfo),
+      rank,
+      pledgeSettings: { enabled: false, minLevel: 20, note: 'serious guild' },
+      pledges: [
+        { id: 21, name: 'Hopeful', cls: 'mage', level: 12, realm: 'Test', sinceMs: 5 },
+        { id: 22, name: 'Eager', cls: 'rogue', level: 30, realm: 'Test', sinceMs: 9 },
+      ],
+    },
+  });
+
+  it('exists for the leader and officers, with settings + rows in server order', () => {
+    for (const rank of ['leader', 'officer'] as const) {
+      const panel = pledgePanelView(withPledges(rank));
+      expect(panel).not.toBeNull();
+      expect(panel?.settings).toEqual({ enabled: false, minLevel: 20, note: 'serious guild' });
+      expect(panel?.rows.map((r) => r.name)).toEqual(['Hopeful', 'Eager']);
+      expect(panel?.rows[0]).toEqual({ name: 'Hopeful', cls: 'mage', level: 12, sinceMs: 5 });
+    }
+  });
+
+  it('is null for plain members, the unguilded, and offline', () => {
+    expect(pledgePanelView(withPledges('member'))).toBeNull();
+    expect(pledgePanelView({ ...SOCIAL, guild: null })).toBeNull();
+    expect(pledgePanelView(null)).toBeNull();
+  });
+});
+
+describe('myPledgeView (the unguilded viewer standing pledge)', () => {
+  it('passes the pledge through only while unguilded', () => {
+    const pledge = { guildName: 'Wolves', sinceMs: 7, tier: 2 };
+    expect(myPledgeView({ ...SOCIAL, guild: null, myPledge: pledge })).toEqual(pledge);
+    // Guilded: the pledge line never shows (joining cleared it server-side;
+    // a stale field must not resurrect it).
+    expect(myPledgeView({ ...SOCIAL, myPledge: pledge })).toBeNull();
+    expect(myPledgeView({ ...SOCIAL, guild: null, myPledge: null })).toBeNull();
+    expect(myPledgeView(null)).toBeNull();
   });
 });
 

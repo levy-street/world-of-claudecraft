@@ -1,4 +1,3 @@
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import type { Entity } from '../src/sim/types';
 
 // Distance-tiered update rates: full snapshot rate inside nameplate range
@@ -22,11 +21,6 @@ export function isUpdateDue(
   viewer: Entity,
   sentAtTick: number,
 ): boolean {
-  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
-  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
-  // ball turns visibly steppy at half/quarter rate. One entity at full rate
-  // costs one lite record per tick, so it is always due.
-  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
   if (d2 <= FULL_RATE_RADIUS_SQ) return true;
   if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
   const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;

@@ -13,6 +13,7 @@
 
 import { STRIP_MAX_X, STRIP_MIN_X } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
+import { streamableZones } from './island_isolation_core';
 
 // The outdoor visibility envelope: no biome fog preset may exceed this, and
 // terrain/prop/foliage culling all key off the live fog far, so this is the
@@ -77,6 +78,11 @@ export function zonesWithinStreamingHorizon(
   forwardX = 0,
   forwardZ = 0,
 ): ZoneDef[] {
+  // The Proving Shore streams alone. A tutorial arrival sits 101 yd from
+  // Eastbrook Vale's rectangle, well inside every radius this function is
+  // called with, so without this the island's first load pays for the vale
+  // as well (island_isolation_core.ts). Presentation scope only.
+  const scoped = streamableZones(zones, cameraX, cameraZ);
   const radius = Math.max(0, horizon);
   const radiusSq = radius * radius;
   const forwardLength = Math.hypot(forwardX, forwardZ);
@@ -84,8 +90,8 @@ export function zonesWithinStreamingHorizon(
   const fz = forwardLength > 0 ? forwardZ / forwardLength : 0;
   const candidates: Candidate[] = [];
 
-  for (let order = 0; order < zones.length; order++) {
-    const zone = zones[order];
+  for (let order = 0; order < scoped.length; order++) {
+    const zone = scoped[order];
     const distanceSq = distanceSqToZone(zone, cameraX, cameraZ);
     if (distanceSq > radiusSq) continue;
     const minX = zone.xMin ?? STRIP_MIN_X;

@@ -146,12 +146,13 @@ describe('spec masteries', () => {
         { ability: 'crippling_poison', dmgPct: 0.1 },
       ],
     });
-    // Balance pass: tuned down plus the Duskveil stealth-speed identity.
+    // Balance pass: tuned down plus the Duskveil stealth-speed identity, now the
+    // full removal of the stealth slow (buffPct 1 doubles the 0.5 aura to 1.0).
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
@@ -266,6 +267,85 @@ describe('spec masteries', () => {
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
     expect(rangedBm / rangedNone).toBeCloseTo(1.25, 2);
+  });
+
+  it("applies Unleashed Frenzy (+25% pet damage) at BOTH the melee and ranged pet damage sites, not only Pack Command/Unleash Beast's own strikes", () => {
+    // Regression: hunter_packlord.ts, hunter_shared.ts, pet_ai.ts, and sim.ts each had
+    // their own copy of "the pet damage multiplier", and only the hunter_packlord.ts
+    // copy (used by Pack Command/Unleash Beast/Frenzy Cleave's own petStrike calls)
+    // carried the Unleashed Frenzy 1.25x term. The pet's ordinary auto-attacks
+    // (mobSwing) and ranged bolts (updateRangedPetAttack), which are the bulk of its
+    // damage, silently kept dealing normal damage through the whole frenzy window.
+    // Same setup as the petDmgPct test above, marksmanship (0 petDmgPct) isolates the
+    // frenzy term specifically.
+    const setup = (frenzied: boolean) => {
+      const sim = new Sim({ seed: 13, playerClass: 'hunter', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec('marksmanship');
+      (sim as unknown as { rng: { next: () => number } }).rng.next = () => 0.5;
+      if (frenzied) {
+        sim.player.auras.push({
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: sim.player.id,
+          school: 'physical',
+        });
+      }
+      const pet = createMob(9201, MOBS.forest_wolf, 20, sim.player.pos);
+      pet.ownerId = sim.player.id;
+      pet.weapon = { ...pet.weapon, min: 100, max: 100 };
+      pet.swingTimer = 0;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+      const dummy = createMob(9202, MOBS.forest_wolf, 20, {
+        x: sim.player.pos.x,
+        y: sim.player.pos.y,
+        z: sim.player.pos.z + 2,
+      });
+      dummy.maxHp = dummy.hp = 100000;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      return { sim, pet, dummy };
+    };
+    const dealtMelee = (frenzied: boolean): number => {
+      const { sim, pet, dummy } = setup(frenzied);
+      const before = dummy.hp;
+      (sim as unknown as { mobSwing(a: Entity, b: Entity): void }).mobSwing(pet, dummy);
+      return before - dummy.hp;
+    };
+    const dealtRanged = (frenzied: boolean): number => {
+      const { sim, pet, dummy } = setup(frenzied);
+      const spell = {
+        name: 'Test Bolt',
+        school: 'nature' as const,
+        min: 100,
+        max: 100,
+        range: 100,
+        every: 2,
+      };
+      const before = dummy.hp;
+      (
+        sim as unknown as { updateRangedPetAttack(p: Entity, t: Entity, s: typeof spell): void }
+      ).updateRangedPetAttack(pet, dummy, spell);
+      return before - dummy.hp;
+    };
+
+    const meleeCalm = dealtMelee(false);
+    const meleeFrenzied = dealtMelee(true);
+    expect(meleeCalm).toBeGreaterThan(0);
+    // A wider window than toBeCloseTo(1.25, 2): both sites deal a small integer
+    // amount, so a single Math.round can move the ratio a few percent off 1.25.
+    // Still decisive against a missing multiplier (ratio ~1.0) or a doubled one.
+    expect(meleeFrenzied / meleeCalm).toBeGreaterThan(1.15);
+    expect(meleeFrenzied / meleeCalm).toBeLessThan(1.35);
+
+    const rangedCalm = dealtRanged(false);
+    const rangedFrenzied = dealtRanged(true);
+    expect(rangedCalm).toBeGreaterThan(0);
+    expect(rangedFrenzied / rangedCalm).toBeGreaterThan(1.15);
+    expect(rangedFrenzied / rangedCalm).toBeLessThan(1.35);
   });
 
   it('replaces Veinleech with the Evil Eye Condemnation signature', () => {

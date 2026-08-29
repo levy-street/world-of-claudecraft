@@ -500,6 +500,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Sets a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account); once one exists it 409s to the change flow above.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/account/password/set-initial',
+    handler: 'handleApi arm: /api/account/password/set-initial (handleAccountSetInitialPassword)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Unauthenticated by design: forgot takes a username and always answers 200
   // (anti-enumeration); reset is authorized by the emailed token.
   {
@@ -1144,6 +1156,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/api/deeds/rarity',
     handler: 'server/deeds.ts rarityHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  // The signpost guild board's roster drill-in: registry-only RouteDef born
+  // after the migration, no legacy ladder arm (server/http/CLAUDE.md).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/guilds/roster',
+    handler: 'server/guild_roster.ts rosterHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.public,
     limiter: 'publicReadRateLimited',
@@ -1920,6 +1944,72 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
+  },
+  // Economy oversight (p2p market launch): the rich list, per-account gold
+  // breakdown, and the persisted suspicion-flag workflow.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/wealth/top',
+    handler: 'handleAdminApi arm: /admin/api/wealth/top',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/accounts/:id/wealth',
+    handler: 'accountWealthMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/wealth$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/accounts/:id/flags',
+    handler: 'accountFlagsMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/flags$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/flags',
+    handler: 'handleAdminApi arm: /admin/api/flags',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/flags/:id/status',
+    handler: 'flagStatusMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminFlagWriteRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/flags\/(\d+)\/status$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/flags/:id/note',
+    handler: 'flagNoteMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: 'adminFlagWriteRateLimited',
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/flags\/(\d+)\/note$/,
   },
   // Account flair: the operator-set AI mark and an official streamer's links.
   {

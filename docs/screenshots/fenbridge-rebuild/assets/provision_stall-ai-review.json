@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "assetId": "provision_stall",
-  "sourceFingerprint": "538c9cd2859080544cab150a614021fa520e41d56e400297280c8240d4b1c668",
+  "sourceFingerprint": "df2a510f1c210007c6c33713810682b319d51a64aac6c56a7371ccadf9284f43",
   "reference": "docs/design/fenbridge-rebuild/references/provision-stall-turnaround.png",
   "minimumOverallScore": 0.7,
   "requiredViews": [

@@ -62,7 +62,6 @@ const GROUPS: Group[] = [
       { keys: ['T'], label: 'guide.controls.crafting' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['G'], label: 'guide.controls.arena' },
-      { keys: ['Y'], label: 'guide.controls.valeCup' },
       { keys: ['`'], label: 'guide.controls.mount' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },
       { keys: ['Shift+H'], label: 'guide.controls.meters' },

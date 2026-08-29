@@ -39,6 +39,7 @@ import {
   awardBattlegroundHonor,
   awardBattlegroundKillHonor,
   bgFirstWinBonusAvailable,
+  doubleHonorActive,
   honorTeamIdentity,
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
@@ -328,6 +329,17 @@ export function bgActiveMatchForFighter(ctx: SimContext, pid: number): BgMatch |
     if (match.state === 'active' && bgAllPids(match).includes(pid)) return match;
   }
   return null;
+}
+
+/** Allocation-free seated fast path of `bgActiveMatchForFighter`: true only
+ *  while the per-pid index seats `pid` in an ACTIVE match. Callers on per-tick
+ *  paths (the pet corpse hold) use this instead of the general helper, which
+ *  spreads both teams into a fresh array per call and walks every match on
+ *  its miss path; a stale index entry simply answers false. */
+export function bgActiveSeatedFighter(ctx: SimContext, pid: number): boolean {
+  const match = ctx.bgMatches.get(pid);
+  if (match?.state !== 'active') return false;
+  return match.teams[0].includes(pid) || match.teams[1].includes(pid);
 }
 
 export function bgActiveFighterPids(ctx: SimContext, match: BgMatch): number[] {
@@ -1226,8 +1238,9 @@ function spawnRuneEntity(ctx: SimContext, rune: BgRuneState): void {
 // One team-wide respawn clock per side, period BG_WAVE_PERIOD, the two clocks
 // offset by BG_WAVE_OFFSET (staggered half-cycles, never synchronized). The
 // wave raises every RELEASED spirit waiting in the team graveyard, together,
-// in place; a corpse that never released waits for a later wave (release is
-// the classic rite, and auto-release makes sure nobody waits forever).
+// in place; a corpse that never released waits for a later wave. Release is
+// the player's own press: there is no in-match auto-release (only relog
+// releases for you, sim.ts), and the match cap bounds the longest wait.
 function tickWaveRespawns(ctx: SimContext, match: BgMatch): void {
   for (const team of [0, 1] as BgTeam[]) {
     match.waveIn[team] -= DT;
@@ -2171,6 +2184,11 @@ export function bgInfoFor(
     // date that is not today as re-armed without writing anything, because a
     // per-viewer wire builder must not mutate the daily window it reports on.
     firstWinBonusReady: bgFirstWinBonusAvailable(ctx.resetDay, meta),
+    // The weekly Double Honor window, read off the same host-provided reset
+    // day the first-win flag above rolls on plus the early-open lead probe.
+    // Realm-wide fact, not per-viewer state, so the read is trivially
+    // mutation-free.
+    doubleHonorActive: doubleHonorActive(ctx.resetDay, ctx.eventLeadDay),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };

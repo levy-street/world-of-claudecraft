@@ -19,6 +19,7 @@
 // Deterministic: a pure argmax over the static content tables. No rng, no clock, so
 // the same spec always yields byte-identical gear and a balance run is repeatable.
 
+import { isMaterialsOnlyBag } from './bag_pools';
 import { BAG_SOCKETS } from './bags';
 import { type DevKitRole, devKitRole } from './content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
@@ -215,9 +216,18 @@ function bestBy(items: readonly ItemDef[], score: (item: ItemDef) => number): It
   return best;
 }
 
-/** The largest-capacity bag in the fresh-20 pool, or null if there is none. */
+/** The largest-capacity bag in the fresh-20 pool, or null if there is none.
+ *  Materials-only bags are excluded on purpose: the kit fills EVERY socket with
+ *  this one bag, and a materials-only bag feeds the materials pool instead of
+ *  the general one, so picking the biggest one outright would leave the tester
+ *  with a bare backpack for everything that is not a raw material. The kit
+ *  wants general capacity; specialty satchels are equipped deliberately. */
 export function bestKitBag(): ItemDef | null {
-  const bags = Object.values(ITEMS).filter((item) => (item.bagSlots ?? 0) > 0);
+  // Deliberately the same kind-based filter server/pbe_boost.ts bestBoostBag
+  // uses, so a mis-authored bag def cannot make the two pickers disagree.
+  const bags = Object.values(ITEMS).filter(
+    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item),
+  );
   return bestBy(bags, (item) => item.bagSlots ?? 0);
 }
 

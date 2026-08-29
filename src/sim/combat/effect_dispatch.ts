@@ -20,6 +20,7 @@ import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { incapacitateDrCategory } from '../incapacitate_dr';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import {
@@ -38,6 +39,7 @@ import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import { summonSoulwell } from '../soulwell';
 import {
   abilityScalingPower,
@@ -50,6 +52,7 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -274,7 +277,13 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
   return ability.id === 'vanish';
 }
 
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+/**
+ * The combat-drop half of Vanish / Greater Invisibility: clear the caster's own
+ * combat state, clear the escaping pet, wipe both ids from hostile mob hate, and
+ * return the extra ids the live-target sweep must clear. Ordinary stealth uses
+ * only that live-target sweep, so it never becomes a full threat dump.
+ */
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -311,6 +320,7 @@ function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
       entity.inCombat = false;
     }
   }
+  return pet ? [pet.id] : [];
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -413,6 +423,14 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  // The island's ability drill (tutorial/ability_drill.ts): the lesson is
+  // "use your own button on an effigy", so it credits on DELIVERY, not on
+  // damage. Here rather than in dealDamage for two reasons: this runs once
+  // per cast instead of once per damage instance, and a hit that lands for
+  // zero (a resisted bolt, a full absorb) was still the press the coach
+  // asked for. The resist branch that returns before this point credits
+  // itself (combat/casting_lifecycle.ts). Draws no rng.
+  if (target) creditAbilityDrill(ctx, p, target, ability.id);
   const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const initialTarget = target;
   const ascensionFxTargetId = target?.id ?? p.id;
@@ -1831,6 +1849,19 @@ export function runEffects(
       }
       case 'dot': {
         if (!target || target.dead) break;
+        // Any hostile dot must not outlive a duel between its caster and its
+        // target that ended on THIS tick: see duelJustEndedBetween (social/
+        // duel.ts). The reachable case today is a dot riding the SAME cast's
+        // own direct/AoE component (Fireball, Immolate): the direct hit
+        // resolves first in this same effects[] pass, so if IT is the
+        // clamp-and-end blow, endDuel() has already stripped everything the
+        // caster inflicted by the time this case runs, and the dot below
+        // would otherwise be stamped a beat later with no clamp left to
+        // catch it. A pure DoT (Corruption, SW:P) completing or refreshing
+        // on the same ending tick from an unrelated source is equally out of
+        // scope: it was never something the end's own clear was going to
+        // touch, so it correctly gates the same way.
+        if (duelJustEndedBetween(ctx, target, p)) break;
         // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
         // classic-style: the total DoT coefficient spread across its ticks. A DoT
         // that RIDES a direct/AoE nuke (Fireball, Pyroblast, Immolate) does NOT also
@@ -2084,8 +2115,13 @@ export function runEffects(
       }
       case 'incapacitate': {
         if (!target || target.dead) break;
-        const remaining = ability.fearDr
-          ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
+        // Fear keeps its own ladder; every other incapacitate asks
+        // incapacitateDrCategory, which today diminishes Sap alone (and returns
+        // null, meaning "no ladder", for the rest). Deterministic either way:
+        // the resolver draws no rng.
+        const incapDrCategory = ability.fearDr ? 'fear' : incapacitateDrCategory(ability.id);
+        const remaining = incapDrCategory
+          ? ctx.diminishedCrowdControlDuration(p, target, incapDrCategory, eff.duration)
           : eff.duration;
         if (remaining === null) break;
         const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, target.maxHp);
@@ -2141,7 +2177,11 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
-        ctx.enterCombat(p, target);
+        // Sap (noCombatEntry) is the classic out-of-combat setup tool: it must
+        // leave BOTH sides out of combat. Entering combat here aggroed the
+        // victim on the spot, so the moment the incapacitate expired it charged
+        // the rogue who was still standing there in Duskveil.
+        if (!ability.noCombatEntry) ctx.enterCombat(p, target);
         break;
       }
       case 'polymorph': {
@@ -3106,8 +3146,8 @@ export function runEffects(
         // player's lock (pets already go blind via petCanSeeStealthedTarget).
         // Same order and same p.stealthed gate as the selfBuff/Vanish path above.
         if (p.stealthed) {
-          dropSelfFromHostileFocus(ctx, p);
-          dropTargetsOnStealth(ctx, p);
+          const alsoHidden = dropSelfFromHostileFocus(ctx, p);
+          dropTargetsOnStealth(ctx, p, alsoHidden);
         }
         break;
       }
@@ -3551,16 +3591,17 @@ export function runEffects(
         // pass's "did I drop anything" detection so the evade / combat-exit flip
         // would never fire (a Kidney Shot into Vanish would leave the stunned mob
         // chasing in combat for the whole stun).
-        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
-          dropSelfFromHostileFocus(ctx, p);
-        }
+        const alsoHidden =
+          eff.kind === 'stealth' && dropsCombatOnStealth(ability)
+            ? dropSelfFromHostileFocus(ctx, p)
+            : [];
         // Entering stealth (Duskveil/Smokestep/Stalk/Vanish) releases every hostile
         // hunter's live lock on the caster. Gated on p.stealthed (applyAura sets it
         // synchronously) so an aura rejected by an early return never wipes the
         // board while the caster never actually hid. The toggle-OFF path above
         // breaks before this apply, so it only fires on the way IN.
         if (eff.kind === 'stealth' && p.kind === 'player' && p.stealthed) {
-          dropTargetsOnStealth(ctx, p);
+          dropTargetsOnStealth(ctx, p, alsoHidden);
         }
         recalcPlayerStats(
           p,
@@ -3919,30 +3960,6 @@ export function runEffects(
           p.resource = Math.min(p.maxResource, p.resource + amount);
         }
         ctx.enterCombat(p, target);
-        break;
-      }
-      // The Vale Cup sport moves (docs/prd/vale-cup.md). All three route to the
-      // vale_cup module through the seam and silently no-op unless the caster
-      // is seated in the live Sowfield match's play phase.
-      case 'ballKick': {
-        ctx.vcupBallKick(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'ballPass': {
-        ctx.vcupBallPass(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'ballShoot': {
-        ctx.vcupShoot(p, eff.power, eff.loft, ability.range);
-        break;
-      }
-      case 'sportDash': {
-        ctx.vcupSportDash(p, eff.distance, eff.catchBall === true);
-        break;
-      }
-      case 'sportShove': {
-        if (!target || target.dead) break;
-        ctx.vcupSportShove(p, target, eff.distance);
         break;
       }
       case 'sunder': {

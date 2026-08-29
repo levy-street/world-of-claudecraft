@@ -12,8 +12,8 @@ import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
-import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
+import { DEFAULT_STORAGE_PRICES } from '../src/sim/storage_prices';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 // Every cross-system callback on the seam. The list IS the contract: each must be a
@@ -22,6 +22,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 const CALLBACK_KEYS = [
   'emit',
   'error',
+  'reserveVaultConsumption',
   'dealDamage',
   'handleDeath',
   'cancelCast',
@@ -244,14 +245,9 @@ const CALLBACK_KEYS = [
   'applySetProcs',
   // Book of Deeds lifetime-counter bump (deeds.ts owns the body).
   'bumpDeedStat',
-  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
-  'vcupSeatedOrQueued',
-  // The Vale Cup sport-move arms (social/vale_cup.ts).
-  'vcupBallKick',
-  'vcupBallPass',
-  'vcupShoot',
-  'vcupSportDash',
-  'vcupSportShove',
+  // The six vcup* callbacks were removed here with the Vale Cup retirement
+  // (docs/design/eastbrook-revamp/master-plan.md), the sanctioned exception to
+  // this list's append-only rule.
   // Thornhollow Fields battleground hooks (social/battleground.ts).
   'bgOnPlayerDeath',
 ] as const;
@@ -264,6 +260,7 @@ function makeFakeHost() {
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
     nextRiftInstanceId: 1,
@@ -332,6 +329,7 @@ function makeFakeHost() {
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
+    eventLeadDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -341,12 +339,12 @@ function makeFakeHost() {
     pendingLootRolls: new Map(),
     nextLootRollId: 1,
     devCommands: false,
+    compulsoryTutorial: false,
     marketListings: [],
     commissionOrderBoard: [],
     nextCommissionOrderId: 1,
     bankerIds: [],
     guildBanks: new Map(),
-    vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
@@ -361,6 +359,7 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
+    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
@@ -581,14 +580,6 @@ function makeFakeHost() {
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
-    // Vale Cup <-> Arena queue exclusion.
-    vcupSeatedOrQueued: vi.fn(() => false),
-    // The Vale Cup sport-move arms.
-    vcupBallKick: vi.fn(),
-    vcupBallPass: vi.fn(),
-    vcupShoot: vi.fn(),
-    vcupSportDash: vi.fn(),
-    vcupSportShove: vi.fn(),
     // Thornhollow Fields battleground hooks.
     bgOnPlayerDeath: vi.fn(),
     bgOnPlayerDamaged: vi.fn(),

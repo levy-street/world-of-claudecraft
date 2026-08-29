@@ -314,6 +314,66 @@
     pointer-events: none;
   }
 
+  .desktop-login-exit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 7px 14px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    box-shadow: inset 0 1px 0 var(--color-primary-glow);
+    transition:
+      color var(--transition-speed) var(--transition-ease),
+      border-color var(--transition-speed) var(--transition-ease),
+      background-color var(--transition-speed) var(--transition-ease),
+      box-shadow var(--transition-speed) var(--transition-ease);
+  }
+
+  .desktop-login-exit[hidden] {
+    display: none;
+  }
+
+  .desktop-login-exit:hover {
+    color: var(--color-primary);
+    border-color: var(--color-border-focus);
+    background: var(--color-bg-dark);
+    box-shadow:
+      0 0 10px var(--color-primary-glow),
+      inset 0 1px 0 var(--color-primary-glow-heavy);
+  }
+
+  .desktop-login-exit:active {
+    color: var(--color-text-light);
+    border-color: var(--color-primary-dim);
+    background: var(--color-bg-dark);
+    box-shadow: inset 0 2px 4px var(--color-primary-glow);
+  }
+
+  .desktop-login-exit:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    .desktop-login-exit {
+      border-color: ButtonText;
+    }
+
+    .desktop-login-exit:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+
   /* Donate: the header's primary call-to-action (filled gold so it reads as the
      main action, unlike the ghost nav links). Mirrored as a footer social link
      and an in-game community button. */
@@ -356,6 +416,68 @@
     width: 16px;
     height: 16px;
     display: block;
+  }
+
+  /* Steam wishlist reminder, the header companion to the Donate CTA above.
+     Deliberately the quieter of the pair: at most one gold action per surface
+     (DESIGN.md 10.1), and Donate already holds it, so the wishlist takes the
+     ink-and-silver ghost variant at the same 40px height and reads as a second
+     option rather than a second shout. Steam's #66c0f4 arrives on hover and
+     keyboard focus only. hud.css owns the in-game chip and the one rule that
+     suppresses every wishlist surface at once. */
+  .steam-wishlist-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: linear-gradient(180deg, #1b1b26 0%, #0d0d14 100%);
+    /* This control keeps a fixed dark plate under every theme, so its resting
+       ink must stay fixed too. Theme gold becomes dark brown on Parchment and
+       falls below AA against this plate; this silver holds above 7:1. */
+    color: #b8bcc8;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition:
+      color var(--transition-speed) var(--transition-ease),
+      border-color var(--transition-speed) var(--transition-ease),
+      box-shadow var(--transition-speed) var(--transition-ease);
+  }
+  .steam-wishlist-cta:hover,
+  .steam-wishlist-cta:focus-visible {
+    color: #eaf4ff;
+    border-color: #66c0f4;
+    box-shadow:
+      0 2px 12px rgba(102, 192, 244, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .steam-wishlist-cta .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  /* The footer twin keeps every .social-link behaviour, including the gold hover
+     the row shares and the icon-only collapse on narrow viewports; it only needs
+     the hydrated glyph sized like the inline marks beside it. Left at the base
+     .social-link svg specificity on purpose, so the narrow-viewport 18px rule
+     later in this sheet still wins over it. */
+  .social-link.steam-wishlist-social {
+    /* .social-link uses themed gold, but this sibling retains the fixed dark
+       plate above; keep the small label AA-safe on Parchment too. */
+    color: #b8bcc8;
+  }
+  .steam-wishlist-social svg {
+    width: 16px;
+    height: 16px;
   }
 
   /* Wallet verification CTA. It is a gold action until the account has a
@@ -6102,15 +6224,18 @@
   #inspect-window {
     width: 740px;
   }
-  /* Compact rich-card header: name + level/class chip + badge rows (the big
-     portrait chip is dropped for the rich card; the remote card keeps it below). */
+  /* The rich profile opens with one centered ceremonial mantle: earned identity,
+     standing, and honors stay composed above the read-only paperdoll. The remote
+     card keeps its simpler portrait treatment below. */
   .inspect-card {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 2px 2px 10px;
-    text-align: left;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 2px 10px;
+    box-sizing: border-box;
+    text-align: center;
   }
   /* The out-of-range remote card is unchanged: centered portrait + name + a plain
      level/class line + optional guild. */
@@ -6129,40 +6254,164 @@
     font-size: 20px;
     color: #f0ead8;
   }
-  /* Book of Deeds border accent on the inspect header: the resting form of the
-     cartouche the overhead nameplate draws around a player's name, and the cold
-     twin of the unit-frame portrait ring. The painter writes the SLUG into
-     data-border (this rule gates on a non-empty value) and that slug's palette
-     into the same three custom properties the ring reads, so ONE treatment lives
-     here and zero per-slug colors do: src/ui/deed_border_view.ts stays the single
-     source of truth. Identity, never actionable info, so it renders at every
-     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
-     the ring. */
-  .inspect-name[data-border]:not([data-border=""]) {
-    padding: 2px 12px;
-    border: 2px solid var(--border-accent-frame, transparent);
-    border-radius: 8px;
-    outline: 1px solid var(--border-accent-edge, transparent);
-    outline-offset: -4px;
-    box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  /* Largest member of the Deed Heraldry family. The face stays a shallow 60px,
+     while the medallion keys into a blackened collar and the granting deed hangs
+     from one quiet provenance tab below it. */
+  .inspect-heraldry-banner {
+    position: relative;
+    box-sizing: border-box;
+    width: min(100%, 580px);
+    height: 72px;
+    padding-left: 48px;
+    overflow: visible;
   }
-  /* The forced palette does not blank the accent custom properties (the card
-     writes all three together with the data-border slug this rule gates on, so
-     the var() fallbacks cannot engage): it replaces the computed colors with the
-     system palette. This arm chooses that replacement rather than taking the
-     UA's. Three things: frame -> CanvasText and edge -> Canvas, the same pair
-     the nameplate cartouche uses in src/render/nameplate_canvas.ts, so the two
-     surfaces of one identity agree under high contrast; the outline is remapped
-     rather than left to be forced onto the frame's color, which would flatten
-     the two-tone contour into a single line; and the decorative bloom is dropped
-     explicitly, since box-shadow is stripped in forced-colors regardless and a
-     surviving declaration would read load-bearing. Collapsing all four slugs
-     onto one system pair hides nothing: cosmetic identity carries nothing a
-     player acts on. */
+  .inspect-heraldry-banner::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: 36px;
+    z-index: 2;
+    width: 28px;
+    height: 16px;
+    box-sizing: border-box;
+    border-top: 1px solid var(--border-accent-frame, transparent);
+    border-bottom: 1px solid var(--border-accent-edge, transparent);
+    background: var(--deed-heraldry-well, transparent);
+    pointer-events: none;
+  }
+  .inspect-heraldry-face {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 60px;
+    padding: 5px 68px 5px 28px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .inspect-heraldry-face[data-border]:not([data-border=""]) {
+    border: 1px solid var(--border-accent-frame, transparent);
+    outline: 1px solid var(--border-accent-edge, transparent);
+    outline-offset: -2px;
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 94%,
+      var(--border-accent-edge, transparent)
+    );
+    --deed-heraldry-plaque-top: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 90%,
+      var(--border-accent-frame, transparent)
+    );
+    --deed-heraldry-plaque-bottom: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 88%,
+      var(--border-accent-edge, transparent)
+    );
+    box-shadow: 0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  .inspect-heraldry-banner .deed-heraldry-seal {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    z-index: 3;
+    width: 64px;
+    height: 64px;
+    transform: translateY(-50%);
+  }
+  .inspect-heraldry-face .deed-heraldry-pattern {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+    transform: translateY(-50%);
+    opacity: 0.09;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.25;
+    pointer-events: none;
+  }
+  .inspect-heraldry-copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    height: 100%;
+    text-align: center;
+  }
+  .inspect-heraldry-banner .inspect-name {
+    overflow: hidden;
+    font-size: 21px;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .inspect-heraldry-banner .inspect-title {
+    overflow: hidden;
+    color: var(--color-text-overlay);
+    font-style: italic;
+    line-height: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .inspect-heraldry-deed {
+    position: absolute;
+    left: calc(50% + 24px);
+    bottom: 0;
+    z-index: 4;
+    box-sizing: border-box;
+    width: min(52%, 260px);
+    max-width: 260px;
+    height: 18px;
+    padding: 2px 18px;
+    overflow: hidden;
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 92%,
+      var(--border-accent-edge, transparent)
+    );
+    color: var(--color-text-overlay);
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-overflow: ellipsis;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
   @media (forced-colors: active) {
-    .inspect-name[data-border]:not([data-border=""]) {
+    .inspect-heraldry-face[data-border]:not([data-border=""]) {
       border-color: CanvasText;
-      outline-color: Canvas;
+      outline-color: CanvasText;
+      box-shadow: none;
+      background-color: CanvasText;
+    }
+    .inspect-heraldry-banner .deed-heraldry-seal {
+      border-color: CanvasText;
+      background-color: Canvas;
+      box-shadow: none;
+    }
+    .inspect-heraldry-banner::before {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    .inspect-heraldry-face .deed-heraldry-pattern {
+      stroke: CanvasText;
+    }
+    .inspect-heraldry-deed {
+      color: CanvasText;
+      background-color: CanvasText;
+      box-shadow: none;
+    }
+    .inspect-honor-rail::before {
+      background: CanvasText;
+    }
+    .inspect-honor-rail .inspect-holder {
+      border-color: CanvasText;
+      background: Canvas;
       box-shadow: none;
     }
   }
@@ -6182,6 +6431,13 @@
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
+  .inspect-standing-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    width: min(100%, 620px);
+  }
   /* The Reliquary standing line (labeled completion pair + named Curator rank)
      reuses the level/class chip family UNCHANGED, so the card keeps one pill
      language and the two lines render identically by design. .inspect-reliquary
@@ -6195,16 +6451,44 @@
     border: none;
     background: none;
   }
-  /* $WOC holder-tier flair badge in the inspect/profile window */
+  .inspect-honor-rail {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 300px));
+    justify-content: center;
+    gap: 6px;
+    width: min(100%, 620px);
+  }
+  .inspect-honor-rail::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 0;
+    width: min(76%, 360px);
+    height: 1px;
+    background: color-mix(in srgb, var(--color-border-showcase) 46%, transparent);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  /* Earned honors become a secondary ledger beneath the mantle instead of a
+     loose column of capsules. Badge art and tier halos remain unchanged. */
   .inspect-holder {
-    display: inline-flex;
+    position: relative;
+    z-index: 1;
+    display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 6px;
-    padding: 5px 14px 5px 6px;
+    min-width: 0;
+    margin: 0;
+    padding: 6px 10px 6px 7px;
     border: 1px solid var(--color-border-default);
-    border-radius: 999px;
-    background: rgba(11, 11, 18, 0.55);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--panel-base) 28%, #08080d);
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.04),
+      inset 3px 0 var(--color-border-showcase);
+    text-align: left;
   }
   .inspect-holder-badge {
     width: 32px;
@@ -6248,16 +6532,24 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    min-width: 0;
     line-height: 1.2;
   }
   .inspect-holder-name {
+    max-width: 100%;
+    overflow: hidden;
     font-family: var(--title-font);
     font-size: 14px;
     color: #f0ead8;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .inspect-holder-sub {
     font-size: 11px;
     color: var(--color-text-muted);
+  }
+  .inspect-honor-rail .inspect-holder-sub {
+    color: color-mix(in srgb, var(--color-text-overlay) 72%, transparent);
   }
   /* Worn-gear paperdoll in the inspect/profile window (read-only). It reuses the
      shared .paperdoll / .equip-col / .equip-slot showcase family (44px sockets,
@@ -6268,11 +6560,28 @@
     margin-top: 4px;
   }
   .inspect-equip-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
     font-family: var(--title-font);
     font-size: 13px;
     color: var(--color-text-muted);
     text-align: center;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
+  }
+  .inspect-equip-title::before,
+  .inspect-equip-title::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--color-border-showcase) 35%,
+      var(--color-border-showcase) 65%,
+      transparent
+    );
   }
   /* The model stage takes the inspected player's CLASS color, delivered as the
      --inspect-class-color custom property the painter sets. Fixed width so the
@@ -6280,27 +6589,30 @@
      taller than the sheet stage to frame the pulled-back inspect camera. */
   #inspect-window .inspect-model-panel {
     min-height: 400px;
-    border: 1px solid var(--inspect-class-color, #5a4a20);
+    border: 1px solid var(--color-border-showcase);
+    outline: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 38%, transparent);
+    outline-offset: -5px;
     box-shadow:
-      0 0 14px 0 color-mix(in srgb, var(--inspect-class-color, #5a4a20) 35%, transparent),
+      0 0 10px 0 color-mix(in srgb, var(--inspect-class-color, #5a4a20) 18%, transparent),
       inset 0 0 0 1px rgba(0, 0, 0, 0.8),
       inset 0 0 60px rgba(0, 0, 0, 0.55);
     background:
       radial-gradient(
-        ellipse 62% 46% at 50% 58%,
-        color-mix(in srgb, var(--inspect-class-color, #5a4a20) 13%, transparent),
-        transparent 72%
+        ellipse 66% 48% at 50% 62%,
+        color-mix(in srgb, var(--inspect-class-color, #5a4a20) 15%, transparent),
+        transparent 74%
       ),
-      linear-gradient(to bottom, rgba(20, 16, 8, 0.35), rgba(0, 0, 0, 0.5));
+      linear-gradient(to bottom, rgba(20, 16, 8, 0.22), rgba(0, 0, 0, 0.54));
   }
   #inspect-window .inspect-model-panel::after {
     content: "";
     position: absolute;
-    left: 22%;
-    right: 22%;
-    bottom: 40px;
-    height: 26px;
-    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 0, 0, 0.55), transparent 70%);
+    left: 18%;
+    right: 18%;
+    bottom: 34px;
+    height: 30px;
+    border-top: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 32%, transparent);
+    background: radial-gradient(ellipse 50% 50% at 50% 45%, rgba(0, 0, 0, 0.62), transparent 72%);
     pointer-events: none;
   }
 
@@ -7017,7 +7329,10 @@
     width: 100%;
   }
 
-  @media (max-width: 860px) {
+  /* The added wishlist action makes the full localized desktop header too wide
+     below 1121px. Collapse the menu before any action is clipped by
+     #start-screen's intentional horizontal overflow guard. */
+  @media (max-width: 1120px) {
     /* Mobile First Homepage Header and Hamburger Menu */
     .mobile-menu-toggle {
       display: flex;
@@ -7128,6 +7443,36 @@
     .social-link svg {
       width: 18px;
       height: 18px;
+    }
+  }
+
+  /* Between the collapsed-menu breakpoint and a comfortably wide desktop,
+     retain the wishlist action as an icon-labelled-by-aria. This keeps long
+     locale nav labels (notably German) inside the viewport at 1200px. */
+  @media (min-width: 1121px) and (max-width: 1280px) {
+    .steam-wishlist-cta {
+      width: 40px;
+      padding-inline: 0;
+      justify-content: center;
+    }
+    .steam-wishlist-cta span {
+      display: none;
+    }
+  }
+
+  /* Borderless desktop builds add Exit Game to the action group. Keep that
+     desktop-only combination on its own centered row until the full German
+     header has reliable one-row clearance; web and windowed shells retain the
+     ordinary layout because their exit control remains hidden. */
+  @media (min-width: 1121px) and (max-width: 1440px) {
+    body.desktop-app:has(.desktop-login-exit:not([hidden])) .homepage-header {
+      grid-template-rows: auto auto;
+      row-gap: var(--spacing-xs);
+    }
+    body.desktop-app:has(.desktop-login-exit:not([hidden])) .header-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: center;
     }
   }
 

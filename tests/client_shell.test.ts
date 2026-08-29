@@ -5,6 +5,8 @@ import {
   QUEST_STRIP_MAX_OBJECTIVES,
   QUEST_STRIP_TARGET_FRAME_GAP_PX,
 } from '../src/ui/hud/quest/quest_strip_core';
+import { shellStrings } from '../src/ui/i18n.catalog/shell';
+import { es_ES, fr_CA } from '../src/ui/i18n.resolved.generated';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -94,6 +96,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
 );
 const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const gamepadSettingsTs = readFileSync(
+  new URL('../src/game/gamepad_settings.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
 // A raw source pin is satisfied by a commented-out occurrence, so the pad pins
@@ -262,6 +268,45 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('id="chat-input"');
   });
 
+  it('pins the approved Exit Game values in every locale overlay and dialect resolution', () => {
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    expect(shellStrings.en.desktop.titlebar.exitGame).toBe('Exit Game');
+    for (const [locale, translation] of [
+      ['cs_CZ', 'Ukončit hru'],
+      ['da_DK', 'Afslut spillet'],
+      ['de_DE', 'Spiel beenden'],
+      ['es', 'Salir del juego'],
+      ['fr_FR', 'Quitter le jeu'],
+      ['id_ID', 'Keluar dari Gim'],
+      ['it_IT', 'Esci dal gioco'],
+      ['ja_JP', 'ゲームを終了'],
+      ['ko_KR', '게임 종료'],
+      ['nl_NL', 'Spel afsluiten'],
+      ['pl_PL', 'Zakończ grę'],
+      ['pt_BR', 'Sair do jogo'],
+      ['ru_RU', 'Выйти из игры'],
+      ['sv_SE', 'Avsluta spelet'],
+      ['tr_TR', 'Oyundan Çık'],
+      ['vi_VN', 'Thoát trò chơi'],
+      ['zh_CN', '退出游戏'],
+      ['zh_TW', '離開遊戲'],
+    ]) {
+      const overlay = readFileSync(
+        new URL(`../src/ui/i18n.locales/${locale}.ts`, import.meta.url),
+        'utf8',
+      )
+        .replace(/(^|[^:])\/\/[^\n]*/gm, '$1')
+        .replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(overlay).toMatch(
+        new RegExp(
+          `['"]desktop\\.titlebar\\.exitGame['"]:\\s*['"]${escapeRegExp(translation)}['"]`,
+        ),
+      );
+    }
+    expect(es_ES.desktop.titlebar.exitGame).toBe('Salir del juego');
+    expect(fr_CA.desktop.titlebar.exitGame).toBe('Quitter le jeu');
+  });
+
   it('carries the concise live map summary and detailed non-live description in BOTH entries', () => {
     // updateMapWindow() writes the sr-only summary on every redraw via
     // setText($('#map-summary'), ...), which is not null-guarded, so the element
@@ -345,7 +390,7 @@ describe('client HTML shell', () => {
   });
 
   it('keeps live graphics rebuilds bound to the existing world and online session', () => {
-    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const buildAt = mainTs.indexOf('buildRenderer: (_target, recycled) => {');
     const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);
@@ -1151,11 +1196,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
+    // Two Ko-fi taps per entry (the marketing donate-cta and the mobile
+    // drawer): the in-game community tray's third one left with the tray's
+    // GitHub/Donate links (owner request, the tray is wishlist-only now).
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(2);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1246,7 +1294,8 @@ describe('client HTML shell', () => {
     }
     // The seat is styled off the shared gesture-menu token, and its row carries
     // the two geometry literals the strip gesture controller reads back.
-    expect(hudMobileCss).not.toContain('#mobile-consumables');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-consumables');
+    expect(hudMobileCss).not.toContain('id="mobile-consumables"');
     expect(hudMobileCss).not.toContain('.mobile-consumable-slot');
     expect(hudMobileCss).toContain('    --strip-gap: 8px;');
     expect(hudMobileCss).toContain('    --strip-margin: 6px;');
@@ -1587,10 +1636,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
-  it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
+  it('carries a wishlist-only community tray in BOTH entries, with no duplicate Discord entry', () => {
+    // The tray's GitHub and Donate links were removed (owner request); the
+    // Steam wishlist chip is the tray's one remaining entry, and the
+    // homepage marketing links stay where they are.
     for (const entry of [html, playHtml]) {
-      expect(entry).toContain('<a class="community-link github"');
-      expect(entry).toContain('<a class="community-link donate"');
+      expect(entry).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+      expect(entry).not.toContain('<a class="community-link github"');
+      expect(entry).not.toContain('<a class="community-link donate"');
       expect(entry).not.toContain('<a class="community-link discord"');
     }
   });
@@ -1684,8 +1737,11 @@ describe('client HTML shell', () => {
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
     expect(html).toContain('<div class="community-tray">');
-    expect(html).toContain('<a class="community-link github"');
-    expect(html).toContain('<a class="community-link donate"');
+    // The tray is wishlist-only now (its GitHub/Donate links were removed,
+    // owner request); the marketing donate-cta above stays.
+    expect(html).toContain('<a class="community-link steam-wishlist steam-wishlist-chip"');
+    expect(html).not.toContain('<a class="community-link github"');
+    expect(html).not.toContain('<a class="community-link donate"');
     // No separate Discord invite link here: it duplicated the Discord (U)
     // icon-rail button (#mm-discord), the game HUD's single Discord entry
     // point (see the fix/inspect-camera-talent-overlap-discord-dup PR).
@@ -1741,6 +1797,19 @@ describe('client HTML shell', () => {
     expect(hudTs).not.toMatch(
       /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
     );
+  });
+
+  it('ships both death action groups as standalone controller-navigation surfaces', () => {
+    for (const [entry, source] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(source, entry).toMatch(
+        /<div id="death-overlay" data-pad-nav-root data-pad-nav-required>/,
+      );
+      expect(source, entry).toMatch(/<div id="ghost-prompt" data-pad-nav-root>/);
+    }
+    expect(hudCss).toContain('content: attr(data-gamepad-confirm-label);');
   });
 
   it('keeps desktop community links open after HUD clicks', () => {
@@ -2554,7 +2623,10 @@ describe('client HTML shell', () => {
     // #mobile-more is an absolutely seated strip item now, never a static grid cell.
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
+      'body.mobile-touch #petbar {\n    position: fixed;\n    left: max(\n      50%,\n      calc(',
+    );
+    expect(hudMobileCss).toContain(
+      '338px *\n          var(--btn-scale, 1) *\n          var(--mobile-chrome-scale, 1) +\n          50px\n        ) /\n        var(--ui-scale, 1) +\n        121px',
     );
     // Every strip action routes to the handler its own button already had: four
     // keep the row's bindings, five are promoted out of the More tray onto the
@@ -2778,13 +2850,11 @@ describe('client HTML shell', () => {
     expect(mainTsCode).toContain(
       'const padTargetPick = createPadTargetPick({ world, interactKey });',
     );
-    // Pad mode is a body class only syncPadMode writes, and gamepad.stop() releases
-    // the pad without an onConnectionChange, so the Controller settings arm has to
-    // re-read it: otherwise turning the setting off leaves the desktop rows hidden
-    // behind a cross hotbar no longer driven by anything.
-    expect(mainTsCode).toMatch(
-      /else gamepad\.stop\(\);[\s\S]{0,400}?crossHotbar\.syncPadMode\(gamepad\);/,
-    );
+    // Pad mode is a body class only syncPadMode writes, and pad.stop() releases
+    // the pad without an onConnectionChange, so the extracted Controller settings
+    // arm has to re-read it: otherwise turning the setting off leaves the desktop
+    // rows hidden behind a cross hotbar no longer driven by anything.
+    expect(gamepadSettingsTs).toMatch(/else pad\.stop\(\);[\s\S]{0,100}?syncPadMode\(\);/);
     // The pad layout is per character, like the keybinds it is scoped alongside.
     expect(mainTsCode).toContain('createCrossHotbar(() => hud, keybindScope)');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');

@@ -31,6 +31,7 @@
 //
 // DOM-free and deterministic so tests/vendor_buy_stack.test.ts drives it directly.
 
+import type { PoolCapacity } from './bag_pools';
 import { countFit, stackSizeOf } from './bags';
 import type { InvSlot, ItemDef } from './types';
 import { vendorStackSize } from './vendor_stack';
@@ -136,7 +137,11 @@ export function buyPurchaseTotals(
  * shows the fit maximum and lets an unaffordable amount refuse whole with
  * the money toast.
  */
-export function maxBuyCount(inventory: readonly InvSlot[], capacity: number, def: ItemDef): number {
-  const unitFit = countFit(inventory, capacity, def.id, Number.MAX_SAFE_INTEGER);
+export function maxBuyCount(
+  inventory: readonly InvSlot[],
+  pools: PoolCapacity,
+  def: ItemDef,
+): number {
+  const unitFit = countFit(inventory, pools, def.id, Number.MAX_SAFE_INTEGER);
   return Math.floor(unitFit / vendorStackSize(def));
 }

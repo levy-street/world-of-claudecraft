@@ -11,7 +11,8 @@ import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 // refused write into a stable error code without parsing prose. The module is a
 // pure leaf (schemas + codes, no db), so importing it here adds no cycle.
 import { CheaterMarkRefused } from './cheater_mark_api';
-import { pool } from './db';
+import { pool, runWithStatementTimeout } from './db';
+import { flagRegistrationBurst } from './suspicion_flags';
 import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
 export const REPORT_REASONS = [
@@ -182,16 +183,68 @@ function ipv4Subnet24(ip: string | null | undefined): string | null {
   return `${octets[0]}.${octets[1]}.${octets[2]}.`;
 }
 
-async function countRecentRegistrations(whereSql: string, params: unknown[]): Promise<number> {
-  const res = await pool.query(
-    `SELECT count(*)::int AS n
-     FROM accounts
-     WHERE created_at > now() - ($1 || ' minutes')::interval
-       AND banned_at IS NULL
-       AND ${whereSql}`,
-    [String(REGISTRATION_BURST_WINDOW_MINUTES), ...params],
+// The burst cohort for the suspicion flag's related-accounts field rides the
+// count query (newest ids first, sliced to this cap) instead of re-running the
+// same window/ban predicate per tripped signal: the re-scan landed exactly
+// when the box was under a registration flood. Bounded: the flag row caps how
+// many related ids it stores anyway.
+const REGISTRATION_COHORT_MAX = 50;
+
+// The burst reads run detached on the registration path with no concurrency
+// cap, and their match set IS the flood they exist to catch: two seconds drops
+// one signal read instead of pinning pooled clients under it for the 15 s
+// session default.
+export const RECENT_REGISTRATIONS_TIMEOUT_MS = 2_000;
+
+interface RecentRegistrations {
+  count: number;
+  cohortIds: number[];
+}
+
+const NO_RECENT_REGISTRATIONS: RecentRegistrations = { count: 0, cohortIds: [] };
+
+async function recentRegistrations(
+  whereSql: string,
+  params: unknown[],
+): Promise<RecentRegistrations> {
+  // Degrade, never fail: one timed-out signal read must not cost the report
+  // and the flag that the OTHER signals earned (the loss would land exactly
+  // when the box is busiest, which is when the report is wanted). The failed
+  // signal reads as no matches; the readLargeMovementsPane shape.
+  try {
+    return await readRecentRegistrations(whereSql, params);
+  } catch (err) {
+    console.error('registration burst signal read failed:', err);
+    return NO_RECENT_REGISTRATIONS;
+  }
+}
+
+async function readRecentRegistrations(
+  whereSql: string,
+  params: unknown[],
+): Promise<RecentRegistrations> {
+  // The window match is materialised once (the CTE is referenced twice) and
+  // the cohort is a top-N over it, so the per-registration cost stays one
+  // round trip with bounded memory even when the match set is the flood.
+  const res = await runWithStatementTimeout(RECENT_REGISTRATIONS_TIMEOUT_MS, (query) =>
+    query(
+      `WITH m AS (
+         SELECT id FROM accounts
+         WHERE created_at > now() - ($1 || ' minutes')::interval
+           AND banned_at IS NULL
+           AND ${whereSql}
+       )
+       SELECT (SELECT count(*)::int FROM m) AS n,
+              ARRAY(SELECT id FROM m ORDER BY id DESC LIMIT ${REGISTRATION_COHORT_MAX}) AS cohort_ids`,
+      [String(REGISTRATION_BURST_WINDOW_MINUTES), ...params],
+    ),
   );
-  return Number(res.rows[0]?.n ?? 0);
+  const row = res.rows[0];
+  const ids: unknown = row?.cohort_ids;
+  return {
+    count: Number(row?.n ?? 0),
+    cohortIds: Array.isArray(ids) ? ids.map((id) => Number(id)) : [],
+  };
 }
 
 export async function createSuspiciousRegistrationReport(input: {
@@ -201,46 +254,59 @@ export async function createSuspiciousRegistrationReport(input: {
   userAgent?: string | null;
 }): Promise<{ created: boolean; signals: string[] }> {
   const signals: string[] = [];
+  // The cohort of every TRIPPED signal, in signal order, so the suspicion flag
+  // can carry the burst cohort as related accounts (see the flag call below).
+  const trippedCohorts: number[][] = [];
   const prefix = numericPrefix(input.username);
   const ip = cleanText(input.ip, 128);
   const userAgent = cleanText(input.userAgent, 512);
   const subnet24 = ipv4Subnet24(ip);
 
-  const prefixCount = prefix
-    ? await countRecentRegistrations(
-        `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
-        [prefix],
-      )
-    : 0;
-  if (prefix && prefixCount >= REGISTRATION_PREFIX_THRESHOLD) {
+  const prefixClause = {
+    whereSql: `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
+    params: [prefix],
+  };
+  const byPrefix = prefix
+    ? await recentRegistrations(prefixClause.whereSql, prefixClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (prefix && byPrefix.count >= REGISTRATION_PREFIX_THRESHOLD) {
     signals.push(
-      `${prefixCount} accounts with username prefix "${prefix}" in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byPrefix.count} accounts with username prefix "${prefix}" in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byPrefix.cohortIds);
   }
 
-  const ipCount = ip ? await countRecentRegistrations('created_ip = $2', [ip]) : 0;
-  if (ip && ipCount >= REGISTRATION_IP_THRESHOLD) {
+  const ipClause = { whereSql: 'created_ip = $2', params: [ip] };
+  const byIp = ip
+    ? await recentRegistrations(ipClause.whereSql, ipClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (ip && byIp.count >= REGISTRATION_IP_THRESHOLD) {
     signals.push(
-      `${ipCount} accounts from IP ${ip} in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byIp.count} accounts from IP ${ip} in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byIp.cohortIds);
   }
 
-  const subnetCount = subnet24
-    ? await countRecentRegistrations('created_ip LIKE $2', [`${subnet24}%`])
-    : 0;
-  if (subnet24 && subnetCount >= REGISTRATION_SUBNET_THRESHOLD) {
+  const subnetClause = { whereSql: 'created_ip LIKE $2', params: [`${subnet24}%`] };
+  const bySubnet = subnet24
+    ? await recentRegistrations(subnetClause.whereSql, subnetClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (subnet24 && bySubnet.count >= REGISTRATION_SUBNET_THRESHOLD) {
     signals.push(
-      `${subnetCount} accounts from subnet ${subnet24}0/24 in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${bySubnet.count} accounts from subnet ${subnet24}0/24 in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(bySubnet.cohortIds);
   }
 
-  const userAgentCount = userAgent
-    ? await countRecentRegistrations('created_user_agent = $2', [userAgent])
-    : 0;
-  if (userAgent && userAgentCount >= REGISTRATION_USER_AGENT_THRESHOLD) {
+  const userAgentClause = { whereSql: 'created_user_agent = $2', params: [userAgent] };
+  const byUserAgent = userAgent
+    ? await recentRegistrations(userAgentClause.whereSql, userAgentClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (userAgent && byUserAgent.count >= REGISTRATION_USER_AGENT_THRESHOLD) {
     signals.push(
-      `${userAgentCount} accounts with the same user agent in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byUserAgent.count} accounts with the same user agent in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byUserAgent.cohortIds);
   }
 
   if (signals.length === 0) return { created: false, signals };
@@ -277,6 +343,15 @@ export async function createSuspiciousRegistrationReport(input: {
      ) VALUES (NULL, NULL, '', $1, NULL, '', $2, $3)`,
     [input.accountId, 'spam', details],
   );
+  // Mirror the report into the persisted suspicion-flag workflow, carrying the
+  // burst cohort (the newest accounts matching each tripped signal in the
+  // window, already read alongside the counts above) as related accounts.
+  // Fire-and-forget inside the emitter.
+  const cohort = new Set<number>();
+  for (const ids of trippedCohorts) {
+    for (const id of ids) cohort.add(id);
+  }
+  flagRegistrationBurst({ accountId: input.accountId, signals, cohortAccountIds: [...cohort] });
   return { created: true, signals };
 }
 

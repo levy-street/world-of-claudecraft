@@ -40,6 +40,9 @@ function makeInput(userAgent?: string) {
   // Input's optional "a menu owns the keyboard right now" gate; true unless a
   // test flips it, so every existing expectation is unaffected.
   let gameKeysAllowed = true;
+  // The optional "Unlock interface" arrange-mode gate: while true, no camera
+  // drag / mouselook / click-pick may start. False unless a test flips it.
+  let cameraLocked = false;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -86,6 +89,7 @@ function makeInput(userAgent?: string) {
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
     canUseGameKeys: () => gameKeysAllowed,
+    isCameraLocked: () => cameraLocked,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -103,6 +107,9 @@ function makeInput(userAgent?: string) {
     },
     setGameKeysAllowed: (allowed: boolean) => {
       gameKeysAllowed = allowed;
+    },
+    setCameraLocked: (locked: boolean) => {
+      cameraLocked = locked;
     },
   };
 }
@@ -1163,6 +1170,121 @@ describe('Input Space handling', () => {
   });
 });
 
+describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space/Enter)', () => {
+  it('blurs a HUD button left focused by a real mouse click', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A real mouse click reports a click count (detail) of 1 or more.
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('parks mouse-click focus on an enclosing dialog root instead of blurring to the body', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const focus = vi.fn();
+    const root = {
+      focus,
+      hasAttribute: (name: string) => name === 'tabindex',
+    };
+    const button = {
+      tagName: 'BUTTON',
+      blur,
+      closest: (selector: string) => (selector === '[role="dialog"]' ? root : null),
+    };
+    (globalThis as any).document.activeElement = button;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('leaves a button focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')!({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch focus when nothing HUD-button-like is focused', () => {
+    const { windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+
+    // Would throw if the guard assumed activeElement always has a blur().
+    expect(() => windowListeners.get('click')!({ type: 'click', detail: 1 })).not.toThrow();
+  });
+
+  it('blurs a focused role="button" control left focused by a real mouse click (chat quest/deed links, the quest tracker header)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const link = {
+      tagName: 'SPAN',
+      getAttribute: (name: string) => (name === 'role' ? 'button' : null),
+      blur,
+    };
+    (globalThis as any).document.activeElement = link;
+
+    windowListeners.get('click')?.({ type: 'click', detail: 1, target: link });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a role="button" control focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const link = {
+      tagName: 'SPAN',
+      getAttribute: (name: string) => (name === 'role' ? 'button' : null),
+      blur,
+    };
+    (globalThis as any).document.activeElement = link;
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')?.({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch a focused element with neither BUTTON tag nor role="button"', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const span = { tagName: 'SPAN', getAttribute: () => null, blur };
+    (globalThis as any).document.activeElement = span;
+
+    windowListeners.get('click')?.({ type: 'click', detail: 1, target: span });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('blurs a focused HUD button on a right-click release (equip-via-right-click has no click event)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a primary-button mouseup to the click handler (no double-fire)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 0, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input attack move', () => {
   it('reserves only the attack-move key and keeps other movement keys working', () => {
     const { input, cb, windowListeners, canvasListeners } = makeInput();
@@ -1826,5 +1948,56 @@ describe('Input mouse-button bindings', () => {
 
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+});
+
+// The "Unlock interface" arrange mode claims the mouse for HUD-frame drags: a
+// canvas press while the gate reports locked must start NO camera drag,
+// mouselook, or click-pick, or a grab that misses a frame spins the camera (the
+// exact complaint the gate exists for). Wheel zoom and keyboard movement are
+// deliberately outside the gate.
+describe('Input camera lock (interface unlock arrange mode)', () => {
+  it('starts no camera drag or mouselook while the arrange mode owns the mouse', () => {
+    const { canvas, input, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    const yaw = input.camYaw;
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+
+    expect(input.isCameraDragActive()).toBe(false);
+    expect(input.camYaw).toBe(yaw);
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('synthesizes no click-pick from a press that started while locked', () => {
+    const { canvas, cb, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+
+    canvasListeners.get('mousedown')!({ button: 0, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mouseup')!({ button: 0, ...CENTER, target: canvas });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('restores the normal camera drag the moment the mode is left', () => {
+    const { input, canvasListeners, windowListeners, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    expect(input.isCameraDragActive()).toBe(false);
+
+    setCameraLocked(false);
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(input.isCameraDragActive()).toBe(true);
+  });
+
+  it('still zooms with the wheel while locked (zoom is not a drag)', () => {
+    const { canvasListeners, input, setCameraLocked } = makeInput();
+    setCameraLocked(true);
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(13.4);
   });
 });

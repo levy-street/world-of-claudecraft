@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Pronto para uma Aventura',
+    desc: 'Forme-se na Costa da Provação: termine cada lição na ilha e depois toque o sino da balsa para voltar a Eastbrook.',
+  },
   exp_dawnhold_castle: {
     name: 'Uma Porta Aberta no Jardim',
     desc: 'Visite o Castelo Dawnhold e passeie por seus salões ensolarados do jardim.',

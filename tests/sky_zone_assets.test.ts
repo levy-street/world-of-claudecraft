@@ -122,8 +122,8 @@ describe('zone-scoped sky assets', () => {
   it('releases exactly the asked biomes and lets a later ensure re-fetch', async () => {
     const sky = await import('../src/render/sky');
     await sky.ensureSkyBiomeAssets(['vale', 'marsh']);
-    // North of the Sowfield bowl, so the dome's start pair is the vale alone
-    // (the Vale Cup practice sky overlaps the world origin).
+    // Well clear of the marsh band, so the dome's start pair is the vale
+    // alone: a biome bound into the live dome refuses release.
     const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
     const marshDome = view.domeTexture('marsh');
     const marshEnv = view.envTexture('marsh');
@@ -271,10 +271,9 @@ describe('zone-scoped sky assets', () => {
 
   it('maps every sky key to the rectangles it is drawn over', async () => {
     const sky = await import('../src/render/sky');
-    const { SOWFIELD_CENTER } = await import('../src/sim/vale_cup_layout');
     const regions = sky.skyResidencyRegions();
-    // One region per zone (several zones share the vale sky) plus the two
-    // place-keyed windows.
+    // One region per zone (several zones share the vale sky) plus the
+    // place-keyed Farshore window.
     expect(regions.filter((region) => region.key === 'vale').length).toBeGreaterThan(1);
 
     const isle = regions.find((region) => region.key === 'farshore');
@@ -289,16 +288,6 @@ describe('zone-scoped sky assets', () => {
     expect(sky.skyBiomesAt(300, isle.minZ - 5)).not.toContain('farshore');
     expect(sky.skyBiomesAt(300, isle.maxZ - 5)).toContain('farshore');
     expect(sky.skyBiomesAt(300, isle.maxZ + 5)).not.toContain('farshore');
-
-    const cup = regions.find((region) => region.key === 'vale_cup');
-    if (!cup) throw new Error('expected a Vale Cup sky region');
-    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z)).toContain('vale_cup');
-    // The rect covers the whole 120 yd disc (over-covering at the corners).
-    expect(cup.minX).toBeLessThanOrEqual(SOWFIELD_CENTER.x - 119);
-    expect(cup.maxX).toBeGreaterThanOrEqual(SOWFIELD_CENTER.x + 119);
-    expect(cup.minZ).toBeLessThanOrEqual(SOWFIELD_CENTER.z - 119);
-    expect(cup.maxZ).toBeGreaterThanOrEqual(SOWFIELD_CENTER.z + 119);
-    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x + 125, SOWFIELD_CENTER.z)).not.toContain('vale_cup');
   });
 
   it('renders the shipping HDRI dome after opaques at far depth', async () => {
@@ -345,7 +334,7 @@ describe('zone-scoped sky assets', () => {
     // every approach forever. Every sky key REACHABLE in a world must
     // therefore map to a region: zone biomes through the zones the renderer
     // passes (the LIVE world's list, so a custom map's paint-only biome is
-    // covered too), the place-keyed skies through their override windows.
+    // covered too), the place-keyed Farshore sky through its override window.
     const sky = await import('../src/render/sky');
     const { ZONES } = await import('../src/sim/data');
     const builtIn = new Set(sky.skyResidencyRegions().map((r: { key: string }) => r.key));
@@ -354,9 +343,7 @@ describe('zone-scoped sky assets', () => {
         true,
       );
     }
-    for (const key of ['farshore', 'vale_cup']) {
-      expect(builtIn.has(key), `place-keyed sky ${key} has no residency region`).toBe(true);
-    }
+    expect(builtIn.has('farshore'), 'place-keyed sky farshore has no residency region').toBe(true);
     // The custom-map arm: a paint-only biome present in the PASSED zone list
     // gets a region, which is what makes the renderer's live-zone wiring
     // sufficient for editor worlds.

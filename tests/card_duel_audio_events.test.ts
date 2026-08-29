@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CARD_MASTER_NPC_ID } from '../src/sim/content/card_master';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -14,8 +15,14 @@ function makeWorld(seed = 42) {
 
 function teleportToCardMaster(sim: Sim, pid: number) {
   const e = sim.entities.get(pid)!;
-  const x = 13;
-  const z = 2;
+  // Stand at the live card master (joinCardDuelQueue gates on cardMasterInRange);
+  // resolved from the world rather than a literal since the Eastbrook harbor
+  // move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md) relocated the
+  // inn he anchors to.
+  const master = [...sim.entities.values()].find((n) => n.templateId === CARD_MASTER_NPC_ID);
+  if (!master) throw new Error('card_master missing');
+  const x = master.pos.x;
+  const z = master.pos.z;
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);

@@ -24,6 +24,11 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
 - `backoff.ts`: pure full-jitter reconnect schedule (`computeBackoffDelay`: 0.5x to
   1.5x of the exponential step, clamped at the max delay AFTER jitter, rng injected
   so tests pin exact delays; `tests/backoff.test.ts`).
+- `entry_watch.ts`: `watchWorldEntry`, the world-entry poll loop `main.ts`'s
+  `enterWorld` drives: polls a connecting world for readiness, gives up after
+  `ENTRY_TIMEOUT_MS` with no sign of life, and exposes `noteActivity()` so a
+  legitimate transient-rejection retry (see Reconnect below) pushes that deadline
+  out instead of being killed mid-backoff (`tests/entry_watch.test.ts`).
 - `realm_population.ts`: pure, i18n-KEY-returning realm-list population banding core
   (Low/Medium/High/Full labels plus tooltip keys from online count vs the advertised
   cap; `tests/realm_population.test.ts`).
@@ -156,13 +161,28 @@ over for good (retries exhausted, or a fatal server `error` frame).
   capacity refusals (`'realm is full'`, `'too many connections from your network'`)
   rely on that default so a full realm is never hammered by auto-retry. Keep every
   one of these literals byte-identical on both sides in the same change.
+  **The tolerance applies to the very FIRST join attempt a `ClientWorld` makes, not
+  only a mid-session auto-reconnect** (`isTransientReconnectRejection`/
+  `isTransientTimeoutRejection` take no `reconnectAttempts` argument): a char-select
+  "Enter World" click, or a page reload after a client-side bug, lands in the exact
+  same "server has not yet noticed the old socket died" window a later drop does,
+  since the roster's `online` flag that routed the click can lag a real drop by
+  seconds. The deliberate "this character is actively played elsewhere" case stays
+  fast and explicit through its own UI (the char-select Take Over button + confirm,
+  `takeoverCharacter`), which never reaches this rejection at all. `main.ts`'s
+  `enterWorld` entry poll cooperates via `entry_watch.ts` (`watchWorldEntry`, the
+  poll loop + dead-time budget extracted so the boot coordinator only wires
+  callbacks): its `noteActivity()` is called on every `onConnectionLost` tick, so
+  an active, visibly-retrying first attempt is never killed out from under itself
+  by the flat "nothing ever responded" timeout.
 - A `visibilitychange` handler schedules a near-immediate retry (a 0 to 1000 ms
   random spread in the same `reconnectTimer` slot, so foregrounded tabs do not
   stampede together) when a suspended mobile tab foregrounds, and drives the close
   path itself when `onclose` was never delivered (the zombie-socket case).
   `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
   call it before a page reload.
-Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`.
+Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`,
+`tests/entry_watch.test.ts`.
 A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
 handled by `resume_play.ts`, above.
 

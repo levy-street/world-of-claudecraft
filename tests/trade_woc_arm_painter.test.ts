@@ -705,8 +705,12 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // bearer-only (their money path signs its own payment later).
     const iRole = accept.indexOf("if (offer.role === 'seller') {", accept.indexOf('stepUpFields'));
     const iMint = accept.indexOf('client.stepUpChallenge({');
-    const iSign = accept.indexOf('hooks.signMessageBase58(issued.challenge.message)');
+    const iSign = accept.indexOf('hooks.signMessageBase58(');
     const iSend = accept.indexOf('client.acceptOffer(');
+    // The signer receives the SERVER message and the challenge nonce (the
+    // desktop arm resolves the server-stored message by that nonce).
+    expect(accept).toContain('issued.challenge.message,');
+    expect(accept).toContain('issued.challenge.nonce,');
     expect(iRole, 'the seller-role gate').toBeGreaterThanOrEqual(0);
     expect(iMint, 'the mint').toBeGreaterThan(iRole);
     expect(iSign, 'the wallet signs the server message').toBeGreaterThan(iMint);

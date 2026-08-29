@@ -635,6 +635,9 @@ describe('Eastbrook Grand Armoury capture contract', () => {
       },
       {
         name: 'armoury-relation',
+        // HISTORICAL: frozen at the capture-time aim (the committed evidence
+        // records it); the round-4 barracks re-aim lives in the matched
+        // override table.
         camera: { x: 34, y: 15, z: 25 },
         target: { x: 10, y: 4, z: -2 },
       },

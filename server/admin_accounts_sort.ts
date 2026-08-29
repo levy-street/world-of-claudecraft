@@ -10,7 +10,8 @@ export type AdminAccountSort =
   | 'max_level'
   | 'playtime_seconds'
   | 'created_at'
-  | 'last_login';
+  | 'last_login'
+  | 'total_copper';
 
 export type AdminAccountSortDirection = 'asc' | 'desc';
 
@@ -28,6 +29,9 @@ export const ADMIN_ACCOUNT_SORTS: readonly AdminAccountSort[] = [
   'playtime_seconds',
   'created_at',
   'last_login',
+  // The materialised account_wealth total (admin_db.ts joins it), so admins
+  // can sort the playerbase by gold in either direction.
+  'total_copper',
 ];
 
 export function parseAdminAccountSort(params: URLSearchParams): AdminAccountSortParams {

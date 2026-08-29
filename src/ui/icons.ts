@@ -2693,6 +2693,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   vanish: r('shadow', 'shadowPurple', ['shield'], ['motion', 'glow']),
   instant_poison: r('nature', 'venom', ['droplet'], ['glow']),
   deadly_poison: r('nature', 'venom', ['fang'], ['drips']),
+  // The two utility poisons: the venom palette they share with the rest of the
+  // rogue's poisons, distinguished by what each one eats (armor / healing).
+  melting_acid: r('nature', 'venom', ['chestplate', { p: 'droplet', ...TR }], ['drips']),
+  nightshade_coating: r('nature', 'venom', ['heart', { p: 'droplet', ...TR }], ['drips']),
   blind: r('shadow', 'shadowPurple', ['eye'], ['arcs']),
   // paladin
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
@@ -2813,17 +2817,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['tendrils', { p: 'claw_slash', ...BR }],
     ['motion', 'crack'],
   ),
-  // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
-  sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
-  sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_pass: r('nature', 'gold', ['coin', { p: 'boot', ...TL }], ['motion']),
-  sport_boot: r('fury', 'gold', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_hoof: r('fury', 'steel', ['boot', { p: 'coin', ...TR }], ['arcs']),
-  sport_punt: r('nature', 'leafGreen', ['coin', { p: 'sunburst', ...TL }], ['motion']),
-  sport_feint: r('shadow', 'steel', ['boot'], ['arcs']),
-  sport_dive: r('earth', 'leather', ['gauntlet', { p: 'coin', ...TR }], ['motion']),
-  sport_shoulder: r('fury', 'steel', ['pauldron', { p: 'claw_slash', ...BR }]),
-  sport_second_wind: r('nature', 'leafGreen', ['boot', { p: 'leaf', ...TR }], ['glow']),
   // priest
   smite: r('holy', 'holyGold', ['bolt', { p: 'sunburst', ...TL }], ['glow']),
   lesser_heal: r('holy', 'silverWhite', ['cross'], ['glow']),
@@ -3343,10 +3336,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
-  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
-  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
-  // richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). Every shipped bag carries painted
+  // art (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; the
+  // pre-phase-05 family below keeps a drawn fallback recipe, newer bags rely on
+  // itemFallback's kind-aware sack arm. Palettes step up with the quality tier so the
+  // bag reads richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -4443,6 +4437,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'instant_poison',
   'adrenaline_rush',
   'deadly_poison',
+  'melting_acid',
+  'nightshade_coating',
   'stealth',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.
@@ -4749,16 +4745,6 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'enrage_passive',
   'measured_fury',
   'seasoned_soldier',
-  'sport_boot',
-  'sport_dive',
-  'sport_feint',
-  'sport_hoof',
-  'sport_kick',
-  'sport_pass',
-  'sport_punt',
-  'sport_second_wind',
-  'sport_shoot',
-  'sport_shoulder',
   'sudden_death',
 ]);
 
@@ -5188,7 +5174,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  // bags (the six pre-phase-05 ids; the phase 05 catalog enters via the
+  // auto-derived non-weapon sweep below, so new bags never join this hand
+  // list; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
@@ -5297,7 +5285,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it.
+// Empty again after the hunter quiver art landed in the same branch that enumerated it,
+// and still empty with the Proving Shore pair: the island's castaway crate and ferry
+// bell icons are rendered from their own world models
+// (scripts/render_island_item_icons.mjs), so they ship with committed art like
+// every other item.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
@@ -5328,6 +5320,16 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The bank socket ladder pair (Bank Storage phase 06): both are 'social', so
+  // both fall back to the deed_cat_social crest until their commissioned art
+  // lands (docs/achievements/icon-brief.md). Neither carries a reward, so the
+  // title-shelf rule that forbids a title deed from riding this ledger does
+  // not apply.
+  'soc_strongbox_outfitter',
+  'soc_four_bags_deep',
+  // The Proving Shore graduation deed rides the deed_cat_progression crest
+  // until its commissioned art lands (docs/achievements/icon-brief.md).
+  'prog_ready_for_an_adventure',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

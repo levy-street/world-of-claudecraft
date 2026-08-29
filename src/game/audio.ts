@@ -38,7 +38,6 @@ export const UI_CUES = {
   duelChallenge: 'ui_duel_challenge',
   duelCountdown: 'ui_duel_countdown',
   duelStart: 'ui_duel_start',
-  vcupKickoff: 'ui_vcup_kickoff',
   duelEnd: 'ui_duel_end',
   fiestaWords: ['ui_fiesta_word_0', 'ui_fiesta_word_1', 'ui_fiesta_word_2', 'ui_fiesta_word_3'],
   fiestaScoreMine: 'ui_fiesta_score_mine',
@@ -295,10 +294,6 @@ export class GameAudio {
 
   duelStart(): void {
     this.play(UI_CUES.duelStart);
-  }
-
-  vcupKickoff(): void {
-    this.play(UI_CUES.vcupKickoff);
   }
 
   duelEnd(): void {

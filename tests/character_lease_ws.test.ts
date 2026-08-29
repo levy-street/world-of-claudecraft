@@ -73,6 +73,10 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
       resolve: (policy: unknown) => policy,
       release: vi.fn(),
     })),
+    beginChatModerationHydration: vi.fn(() => ({
+      resolve: (moderation: unknown) => moderation,
+      release: vi.fn(),
+    })),
   };
   const deps: any = {
     game,
@@ -94,6 +98,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     acquireCharacterLease: acquireSpy,
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
+    characterCountForAccount: vi.fn(async () => 1),
   };
   return {
     deps,

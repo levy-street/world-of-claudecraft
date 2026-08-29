@@ -1072,7 +1072,13 @@ describe('minimap_painter: gathering state cues (decisive trace)', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
-      inventory: over.locked ? [] : [{ itemId: 'copper_mining_pick', count: 1 }],
+      inventory: over.locked
+        ? []
+        : [
+            { itemId: 'copper_mining_pick', count: 1 },
+            { itemId: 'handaxe', count: 1 },
+            { itemId: 'gathering_sickle', count: 1 },
+          ],
       gatheringProficiency: {},
       stationPlacements: [],
       nodeHarvestableByMe: () => over.ready,

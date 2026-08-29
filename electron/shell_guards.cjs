@@ -184,8 +184,15 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
   // by turning them into blob: object URLs and then fetch()ing those URLs (a connect-src
   // request, not img-src). Without blob: here every model renders untextured. img-src and
   // worker-src already list blob: for the same reason (texture <img> decode, decoder workers).
+  // data: is here for the same class of reason: three's ZSTDDecoder (KTX2Loader's Zstandard
+  // path, taken by every UASTC normal/occlusion map) instantiates its WASM with
+  // fetch("data:application/wasm;base64,...").then(r => r.arrayBuffer()), a connect-src request
+  // to a data: URI. Without data: here every Zstandard-supercompressed KTX2 GLB throws
+  // "Refused to connect" and world entry dies on the desktop shell (the only host that ships a
+  // CSP). data: is a self-contained inline scheme, not a network origin, so unlike a remote
+  // host it opens no exfiltration path; img-src already lists it for the same texture reason.
   const connectSrc = [
-    "connect-src 'self' blob:",
+    "connect-src 'self' blob: data:",
     apiOrigin,
     deriveWebSocketOrigin(apiOrigin),
     'wss:',

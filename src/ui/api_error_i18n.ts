@@ -63,6 +63,7 @@ export const API_ERROR_KEYS = {
   'account.characters_online': 'apiError.account.characters_online',
   'account.deactivated': 'apiError.account.deactivated',
   'account.not_found': 'apiError.account.not_found',
+  'account.password_already_set': 'apiError.account.password_already_set',
 
   // character: creation, selection, and world-entry failures.
   'character.name_invalid': 'apiError.character.name_invalid',
@@ -74,6 +75,8 @@ export const API_ERROR_KEYS = {
   'character.online': 'apiError.character.online',
   'character.rename_not_permitted': 'apiError.character.rename_not_permitted',
   'character.delete_confirm': 'apiError.character.delete_confirm',
+  'character.storage_purchase_open': 'apiError.character.storage_purchase_open',
+  'character.delete_busy': 'apiError.character.delete_busy',
   'character.already_in_world': 'apiError.character.already_in_world',
   'character.taken_over': 'apiError.character.taken_over',
   'character.rename_required': 'apiError.character.rename_required',
@@ -111,6 +114,8 @@ export const API_ERROR_KEYS = {
   'discord.swag_tier': 'apiError.discord.swag_tier',
   'discord.swag_points': 'apiError.discord.swag_points',
   'deeds.invalid_input': 'apiError.deeds.invalid_input',
+  'guilds.invalid_roster_name': 'apiError.guilds.invalid_roster_name',
+  'guilds.unknown': 'apiError.guilds.unknown',
 
   // steam: the env-gated Steam link family (server/steam/).
   'steam.disabled': 'apiError.steam.disabled',

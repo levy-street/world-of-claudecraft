@@ -92,10 +92,11 @@ STEP 5 - ACCEPTANCE:
 - [ ] Disband (after the empty-bank guard passes) EVICTS the guild's book from
       Sim.guildBanks and deletes/ignores its row, so the map stays bounded on a
       long-lived realm and a re-created guild id can never inherit a stale book.
-- [ ] A null serializeGuildBank return SKIPS the DB write, pinned by test (never
-      persist an empty book over a real row); the DB read hands loadGuildBank a PARSED
-      object, pinned by test (a raw JSON string yields an empty book by design); the
-      raw row size is bounded server-side before load.
+- [ ] A null serializeGuildBank return SKIPS the book write, pinned by test (never
+      persist an empty book over a real row), and refuses the whole escrow when the
+      session carries accepted deltas; the DB read hands loadGuildBank a PARSED object,
+      pinned by test (a raw JSON string yields an empty book by design); the raw row
+      size is bounded server-side before load.
 - [ ] The Phase 2 silent-inert live wire is released ONLY by this phase: books
       boot-load before players join, and the ledger observer is live BEFORE any
       Phase 4 UI ships (economy mutations must never run unaudited).

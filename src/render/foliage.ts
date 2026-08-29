@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { DRAKELANDS_FLOWER_MEADOWS } from '../sim/content/drakelands';
-import { GALECREST_FLOWER_MEADOWS } from '../sim/content/galecrest';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
-import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
 import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
@@ -17,7 +14,6 @@ import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
-import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
 import {
   generateDecorations,
@@ -30,6 +26,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
+import { flowerMeadowsInChunk } from './flower_meadows_core';
 import {
   type FoliageBucketRevealGate,
   type FoliageBucketRevealState,
@@ -98,6 +95,7 @@ import {
   shadowRowVisible,
   shadowVolumeMoved,
 } from './foliage_shadow_core';
+import { foliageShoreSkip } from './foliage_shore_gate_core';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
@@ -122,8 +120,7 @@ import {
   buildGroundDecorPrewarmTwins,
   registerGroundDecorPrewarmDraw,
 } from './ground_decor_prewarm';
-import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   advanceInstanceCountInto,
   farFieldDensityFractionForValues,
@@ -135,6 +132,7 @@ import { makeShadowOnlyMaterial } from './shadow_only_material';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
+import { hideableGhostSources, type TreeHideable, updateTreeHides } from './tree_hide_fade';
 import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -767,26 +765,6 @@ interface FoliagePrewarmDraw {
   path: FoliageDrawPath;
 }
 let foliagePrewarmDraws: readonly FoliagePrewarmDraw[] = [];
-
-interface TreeHidePart {
-  mesh: THREE.InstancedMesh;
-  index: number;
-  visibleMatrix: THREE.Matrix4;
-  hiddenMatrix: THREE.Matrix4;
-}
-
-interface TreeHideable {
-  x: number;
-  z: number;
-  r: number;
-  topY: number;
-  hidden: boolean;
-  /** Animated fade level (1 = opaque instance, 0.2 = occluding ghost). */
-  alpha: number;
-  /** Live ghost stand-ins while the fade is active (empty = instanced). */
-  ghosts: InstancedGhostHandle[];
-  parts: TreeHidePart[];
-}
 
 // distance caps for the LOD windows. The dense sculpted barks are ~70% of a
 // tree's triangles but read as a thin pole beyond the fog midpoint — hide
@@ -1583,6 +1561,7 @@ function placeSpecies(
         alpha: 1,
         ghosts: [],
         parts: [],
+        prefetched: false,
       }));
       hideRegistry.push(...handles);
       return { ...g, handles };
@@ -2268,7 +2247,6 @@ function generateDressing(seed: number): DressingSpot[] {
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
-      if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       // no scrub in the worked stable yard or up through the harbor decks
       if (biome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
       // the fen's floor dressing grows in CLUMPED patches, not an even
@@ -2984,6 +2962,19 @@ function buildGrassRing(
     // below), so its chunks carry a near-garden flower buffer
     // the Drakelands' authored firebloom fields bloom on near-bare ground
     // (ember grass density is 0), so their chunks need a field-sized buffer
+    // authored flower meadows overlapping this chunk (flower_meadows_core
+    // owns the biome registry); resolved before the buffer so a meadow chunk
+    // gets a field-sized cap even in a sparse biome (the vale's 0.14 would
+    // clip the drifts)
+    const chunkMinX = chunk.cx * GRASS_CHUNK_SIZE;
+    const chunkMinZ = chunk.cz * GRASS_CHUNK_SIZE;
+    const meadowsInChunk = flowerMeadowsInChunk(
+      chunkBiome,
+      chunkMinX,
+      chunkMinX + GRASS_CHUNK_SIZE,
+      chunkMinZ,
+      chunkMinZ + GRASS_CHUNK_SIZE,
+    );
     const flowerCap = Math.max(
       8,
       Math.floor(
@@ -2992,7 +2983,7 @@ function buildGrassRing(
             ? 1.2
             : chunkBiome === 'fen'
               ? 0.8
-              : fieldChunk || stableBandChunk || chunkBiome === 'ember'
+              : fieldChunk || stableBandChunk || chunkBiome === 'ember' || meadowsInChunk.length > 0
                 ? 0.45
                 : 0.14),
       ),
@@ -3015,23 +3006,6 @@ function buildGrassRing(
     const i1 = Math.ceil(maxX / step) + 1;
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
-    // authored flower meadows overlapping this chunk (the dusk realm's
-    // meadow bowls, the Galecrest's house gardens + tarn shore rings, and
-    // the Drakelands' firebloom fields around Wyrmwatch)
-    const meadowSource =
-      chunkBiome === 'dusk'
-        ? REALM_FLOWER_MEADOWS
-        : chunkBiome === 'gale'
-          ? GALECREST_FLOWER_MEADOWS
-          : chunkBiome === 'ember'
-            ? DRAKELANDS_FLOWER_MEADOWS
-            : null;
-    const meadowsInChunk = meadowSource
-      ? meadowSource.filter(
-          (mw) =>
-            mw.x + mw.r > minX && mw.x - mw.r < maxX && mw.z + mw.r > minZ && mw.z - mw.r < maxZ,
-        )
-      : [];
     yield; // setup (buffer allocation + chunk classification) is one sub-unit
 
     for (let i = i0; i <= i1 && n < chunkCap; i++) {
@@ -3063,13 +3037,12 @@ function buildGrassRing(
           (0.25 + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
-        if (h < WATER_LEVEL + 1.6) continue;
+        if (foliageShoreSkip(x, z, h, seed)) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
-        if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
         // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower
@@ -3110,7 +3083,7 @@ function buildGrassRing(
         if (FLOWERLESS_BIOMES.has(tuftBiome)) continue;
         // roughly one tuft in nine sprouts a flower cluster beside it; in
         // the field realms, coarse field cells bloom into dense drifts, and
-        // the authored meadow circles (REALM_FLOWER_MEADOWS) always bloom
+        // the authored meadow circles (flower_meadows_core) always bloom
         const fieldCell = fieldChunk ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
         const inMeadow = meadowsInChunk.some((mw) => {
           const mdx = x - mw.x;
@@ -3145,9 +3118,8 @@ function buildGrassRing(
             const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
             const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
             if (tuftBiome === 'garden' && inDawnholdBailey(fx, fz, 0.5)) continue;
@@ -3184,9 +3156,8 @@ function buildGrassRing(
             const mdz = fz - mw.z;
             if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-              continue;
-            }
+            if (foliageShoreSkip(fx, fz, fh, seed)) continue;
+            if (tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) continue;
             const fs = 0.55 + hashAt(i + rep, j, 17) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j + rep, 18) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3217,7 +3188,7 @@ function buildGrassRing(
             if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);
             if (tint < 0) continue;
             const fh = terrainHeight(fx, fz, seed);
-            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed)) continue;
+            if (foliageShoreSkip(fx, fz, fh, seed) || tooSteep(fx, fz, seed)) continue;
             const fs = 0.6 + hashAt(i + rep, j, 17) * 0.4;
             q.setFromAxisAngle(up, hashAt(i, j, 18 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3603,112 +3574,6 @@ export const foliageDressingInternalsForTest = { generateDressing, dressStep };
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
-
-function pointInsideTree(t: TreeHideable, x: number, z: number): boolean {
-  const dx = x - t.x,
-    dz = z - t.z;
-  return dx * dx + dz * dz < t.r * t.r;
-}
-
-function segmentCircleEntry(
-  ax: number,
-  az: number,
-  bx: number,
-  bz: number,
-  cx: number,
-  cz: number,
-  r: number,
-): number {
-  const dx = bx - ax,
-    dz = bz - az;
-  const a = dx * dx + dz * dz;
-  if (a < 1e-12) return Infinity;
-  const fx = ax - cx,
-    fz = az - cz;
-  const c0 = fx * fx + fz * fz - r * r;
-  if (c0 < 0) return 0;
-  const b = 2 * (fx * dx + fz * dz);
-  const disc = b * b - 4 * a * c0;
-  if (disc < 0) return Infinity;
-  return (-b - Math.sqrt(disc)) / (2 * a);
-}
-
-function cameraSegmentHitsTree(
-  t: TreeHideable,
-  eyeX: number,
-  eyeY: number,
-  eyeZ: number,
-  camX: number,
-  camY: number,
-  camZ: number,
-): boolean {
-  if (
-    (eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ)) ||
-    (camY < t.topY && pointInsideTree(t, camX, camZ))
-  ) {
-    return true;
-  }
-  const hitT = segmentCircleEntry(eyeX, eyeZ, camX, camZ, t.x, t.z, t.r);
-  if (hitT < 0 || hitT > 1) return false;
-  return eyeY + (camY - eyeY) * hitT < t.topY;
-}
-
-/** Every InstancedMesh a hideable tree can ghost, repeats included: the ghost
- *  pool clones per SOURCE mesh, so this is the set its programs come from. */
-function* hideableGhostSources(trees: readonly TreeHideable[]): Generator<THREE.InstancedMesh> {
-  for (const t of trees) for (const part of t.parts) yield part.mesh;
-}
-
-function updateTreeHides(
-  trees: TreeHideable[],
-  ghosts: InstancedOccluderGhosts,
-  eyeX: number,
-  eyeY: number,
-  eyeZ: number,
-  camX: number,
-  camY: number,
-  camZ: number,
-  dt: number,
-  reducedMotion: boolean,
-): void {
-  // This scans every world tree each frame (3k+ in the shipped field). An
-  // indexed loop avoids one iterator result allocation per tree per frame.
-  // A tree crossing the eye-to-camera segment swaps its instances for pooled
-  // ghost meshes and fades toward 20% opacity; once clear and fully opaque the
-  // ghosts return to the pool and the instances come back. The build-time
-  // shadow clones are untouched either way, so faded trees keep their shadows.
-  for (let i = 0; i < trees.length; i++) {
-    const t = trees[i];
-    const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    if (!hide && t.ghosts.length === 0) {
-      t.hidden = false;
-      t.alpha = 1;
-      continue;
-    }
-    t.hidden = hide;
-    if (t.ghosts.length === 0) {
-      for (let j = 0; j < t.parts.length; j++) {
-        const part = t.parts[j];
-        part.mesh.setMatrixAt(part.index, part.hiddenMatrix);
-        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
-        part.mesh.instanceMatrix.needsUpdate = true;
-        t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
-      }
-    }
-    t.alpha = stepOccluderFade(t.alpha, hide, dt, reducedMotion);
-    for (let j = 0; j < t.ghosts.length; j++) ghosts.setAlpha(t.ghosts[j], t.alpha);
-    if (!hide && occluderFadeSettled(t.alpha, false)) {
-      for (let j = 0; j < t.parts.length; j++) {
-        const part = t.parts[j];
-        part.mesh.setMatrixAt(part.index, part.visibleMatrix);
-        part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
-        part.mesh.instanceMatrix.needsUpdate = true;
-      }
-      for (let j = 0; j < t.ghosts.length; j++) ghosts.release(t.ghosts[j]);
-      t.ghosts.length = 0;
-    }
-  }
-}
 
 export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): FoliageView {
   const group = new THREE.Group();

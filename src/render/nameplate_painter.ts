@@ -35,6 +35,7 @@ import {
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
@@ -221,16 +222,6 @@ export class NameplatePainter {
       const screenY = (-this.tmpV.y * 0.5 + 0.5) * height;
       if (!isNameplateScreenAnchorVisible(screenX, screenY, width, height)) continue;
 
-      const anchor = this.anchorScratch[this.anchorCount];
-      if (anchor) {
-        anchor.id = id;
-        anchor.sx = screenX;
-        anchor.sy = screenY;
-      } else {
-        this.anchorScratch.push({ id, sx: screenX, sy: screenY });
-      }
-      this.anchorCount++;
-
       let state = this.states.get(id);
       if (!state) {
         state = createNameplateCanvasState();
@@ -240,6 +231,18 @@ export class NameplatePainter {
       if (!state.initialized || fullPass || plan.urgent || languageChanged) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
+
+      const anchor = this.anchorScratch[this.anchorCount];
+      const extraLift = nameplateHeraldryLift(state.border);
+      if (anchor) {
+        anchor.id = id;
+        anchor.sx = screenX;
+        anchor.sy = screenY;
+        anchor.extraLift = extraLift;
+      } else {
+        this.anchorScratch.push({ id, sx: screenX, sy: screenY, extraLift });
+      }
+      this.anchorCount++;
     }
 
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
@@ -319,6 +322,7 @@ export class NameplatePainter {
     state.levelColor = '#fff';
     state.guild = '';
     state.guildLabel = '';
+    state.guildTier = 0;
     state.title = '';
     state.border = '';
     state.marker = '';
@@ -370,12 +374,22 @@ export class NameplatePainter {
       const baseName = roleTag ? `[${roleTag}] ${entity.name}` : entity.name;
       state.name = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
       state.nameColor = roleColor ?? '#7fb8ff';
-      state.guild = entity.guild;
+      // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
+      // borrows the same line with the localized pledge wording, so an
+      // aspiring character never reads as a member. Either way the fill tiers
+      // by the guild's collective lifetime XP (entity.guildTier).
+      // The `|| ''` / `?? 0` arms cover mirrors that predate the pledge fields
+      // (a partial test fixture, an older server's wire): the plate state must
+      // never hold undefined (the ai_tag pairing pin).
+      state.guild = entity.guild || entity.pledgeGuild || '';
+      state.guildTier = entity.guildTier ?? 0;
       // Build the drawn `<guild>` wrapper here, not in the per-frame drawBase:
       // resolveContent is guild's only writer and runs strictly less often (the
       // init / fullPass / urgent / languageChanged gate), so the label can
       // never diverge from the guild it wraps.
       if (entity.guild) state.guildLabel = `<${entity.guild}>`;
+      else if (entity.pledgeGuild)
+        state.guildLabel = t('hudChrome.nameplate.pledgeTag', { guild: entity.pledgeGuild });
       state.hpVisible = !entity.dead;
       state.title = entity.title ? deedTitleText(entity.title) : '';
       state.border = deedBorderSlug(entity.border);

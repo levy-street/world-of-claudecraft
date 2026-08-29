@@ -29,7 +29,6 @@ import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { isVcupCrossTeam } from './social/vale_cup';
 import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
 import type { Entity } from './types';
 
@@ -182,16 +181,7 @@ export class Targeting {
     ) {
       return true;
     }
-    // The Vale Cup: opposing fighters are keyboard-targetable from the whistle
-    // (countdown) through play, so the Shoulder has a target to land on.
-    // isHostileTo only opens during active/golden play, mirroring the arena's
-    // countdown-targeting asymmetry.
-    const cupMatch = this.ctx.vcup.match;
-    return (
-      !!cupMatch &&
-      cupMatch.phase !== 'over' &&
-      isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
-    );
+    return false;
   }
 
   // Nearby allies a beneficial spell can land on: other players (and friendly

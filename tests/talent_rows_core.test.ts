@@ -110,12 +110,13 @@ describe('canonical Talents V2 row registry', () => {
       global: { critDmgHealPct: 0.5 },
     });
     // Balance pass: False Face is +25% crit damage plus the Duskveil
-    // stealth-speed identity.
+    // stealth-speed identity, now the full removal of the stealth slow
+    // (buffPct 1 doubles the 0.5 aura multiplier to 1.0).
     expect(TALENTS.rogue.specs.find((spec) => spec.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     });
 

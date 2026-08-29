@@ -6,7 +6,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 describe('live interface-mode viewport wiring', () => {
   it('activates touch controls before the immediate and settled viewport measurements', () => {
     const caseStart = mainTs.indexOf("case 'interfaceMode':");
-    const caseEnd = mainTs.indexOf("case 'gamepadStickDeadzone':", caseStart);
+    // The controller-setting dispatch extraction moved the gamepad cases into
+    // src/game/gamepad_settings.ts, so the branch now ends at the next case
+    // still owned by main.ts.
+    const caseEnd = mainTs.indexOf("case 'tooltipScale':", caseStart);
     const branch = mainTs.slice(caseStart, caseEnd);
     const setMode = branch.indexOf('setInterfaceMode(interfaceModeFromSetting(v));');
     const syncClass = branch.indexOf('syncPhoneTouchClass();');

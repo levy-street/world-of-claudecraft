@@ -30,6 +30,7 @@ const ZONE_ALIASES: Record<string, string> = {
   evergarden: 'garden',
   galecrest: 'gale',
   farshore_isle: 'isle',
+  proving_shore: 'proving',
 };
 
 export function installDevTeleports(

@@ -3,7 +3,6 @@
 
 import { DUNGEON_X_THRESHOLD, getActiveWorldContent } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { AmbientPointSource, Surface } from './audio_sink';
 
@@ -29,16 +28,6 @@ export function footstepSurfaceAt(
   if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
   if (biome === 'amber' || biome === 'fen') return 'grass';
   return weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
-}
-
-export function crowdAmbienceAt(
-  x: number,
-  z: number,
-  inDungeon: boolean,
-  matchLive: boolean,
-): number {
-  if (inDungeon || !isAtSowfield(x, z)) return 0;
-  return matchLive ? 1 : 0.4;
 }
 
 export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {

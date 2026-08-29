@@ -167,8 +167,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
   it('pins the interpolated total to the live-catalog literal', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
-    // the literal anchors them. Literal: update when catalog content lands.
-    expect(catalogTotal).toBe(311);
+    // the literal anchors them. Literal: update when catalog content lands
+    // (313 since the v0.37.0 merge paged the two bank-storage bag drops).
+    expect(catalogTotal).toBe(313);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

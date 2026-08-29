@@ -42,12 +42,16 @@ const guildSnap = (rank: 'leader' | 'officer' | 'member'): SocialSnapshot => ({
   friends: [],
   blocks: [],
   ignores: [],
+  myPledge: null,
   guild: {
     id: 7,
     name: 'Iron Vanguard',
     rank,
     motd: '',
     motdSetBy: '',
+    pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+    pledges: [],
+    tier: 0,
     members: [],
     events: [],
   },
@@ -214,6 +218,7 @@ describe('the guild membership stamp fence (guildStampSeq)', () => {
       friends: [],
       blocks: [],
       ignores: [],
+      myPledge: null,
       guild: null,
     });
     await priv(server).sendSocialSnapshot(3);

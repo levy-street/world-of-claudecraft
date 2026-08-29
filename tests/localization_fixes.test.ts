@@ -611,6 +611,30 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('matches every tide-pool summon emit (crab_summon + the Mister Crabs yell)', () => {
+    // The four emits added with the island miniboss: the three REASON_MESSAGE
+    // toasts (src/sim/interactions/crab_summon.ts) and the summon yell
+    // (src/sim/encounters/quest_summon.ts). Each must round-trip through the
+    // matcher, or every non-English locale ships raw English.
+    setLanguage('de_DE');
+    // The toasts route through EXACT rows (English until the release fill,
+    // so only non-null is asserted); the yell has real per-locale rows in
+    // QUEST_EXTRA and must come back re-localized.
+    const toasts = [
+      'You have what you came for. Tidewarden Nel waits on your prize.',
+      'Carry the lure to the tide pool west of the wreck line.',
+      'Mister Crabs already prowls the pool!',
+    ];
+    for (const text of toasts) {
+      expect(localizeSimText(text), text).not.toBeNull();
+    }
+    const yell = 'Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"';
+    const out = localizeSimText(yell);
+    expect(out).not.toBeNull();
+    expect(out).not.toBe(yell);
+    setLanguage('en');
+  });
+
   it('localizes the flavor aura name Tamed and reuses talent/ability titles', () => {
     setLanguage('de_DE');
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
@@ -828,10 +852,11 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     // and must update this pin, the matcher arm, and the frame pins together.
     expect(exported?.[1]).toBe('message rate exceeded');
 
-    // All five flood kick arms (the pre-parse gate in handleMessage, the
+    // All six flood kick arms (the pre-parse gate in handleMessage, the
     // post-parse lane path in consumeLane, the list-read guard path in
     // consumeListRead per the phase 06 maintainer ruling, the guild-bank
-    // op guard path in consumeGuildBankOp per the Guild Bank Phase 3 QA
+    // bank/vault retained-ledger refusal callback, the guild-bank op guard path
+    // in consumeGuildBankOp per the Guild Bank Phase 3 QA
     // database ruling, and the cosmetic-set guard path in consumeCosmeticOp
     // per the Reliquary border security review) pass the CONSTANT, never an
     // inline literal, with the grep-ability 'message flood' leaveReason label;
@@ -844,7 +869,7 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     const kickArms = gameSrc.match(
       /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
     );
-    expect(kickArms, 'all five flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(5);
+    expect(kickArms, 'all six flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(6);
     expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
 
     // The matcher arm recognizes the same bytes and returns the loading key. A
@@ -922,8 +947,11 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // bare `ctx.error` from free-function modules (G1a progression/talents.ts, I1
   // instances/dungeons.ts, C4a combat/casting_lifecycle.ts, P1b pet/pet_commands.ts) are
   // the same player-facing error sink. `(?:this|ctx)\.error` matches all three (it catches
-  // this.ctx.error via the trailing ctx.error).
-  const er = new RegExp(`(?:this|ctx)\\.error\\([^,]+,\\s*${lit}\\s*\\)`, 'g');
+  // this.ctx.error via the trailing ctx.error). The close tolerates a trailing
+  // comma before `)`: a biome-wrapped multi-line emit gains one, and without
+  // the tolerance the whole emit is invisible to this guard (its green is then
+  // vacuous for that literal).
+  const er = new RegExp(`(?:this|ctx)\\.error\\([^,]+,\\s*${lit}\\s*,?\\s*\\)`, 'g');
   for (const m of simSrc.matchAll(er)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   // Variable-routed sim emits: this/ctx.notice(pid, '<lit>') (emits 'log') and
   // this/ctx.stopFollow(p, '<lit>') (arg2 routes through error) — blind spots.
@@ -931,9 +959,16 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // `this.stopFollow(p);`) cannot span into the NEXT call's literal.
   const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()\\n]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
-  // Ternary args to error/notice/stopFollow (both branches).
+  // Ternary args to error/notice/stopFollow (both branches). The first-arg
+  // class spans newlines (a biome-wrapped call puts each arg on its own line)
+  // but still excludes parens, so a single-arg call cannot bleed into the NEXT
+  // call's literal. The condition class also spans newlines and admits `??`
+  // PAIRS (a lone `?` still terminates it, and the no-comma rule keeps it from
+  // crossing an argument boundary or a trailing comma), so a wrapped ternary
+  // emit, nullish-coalescing condition included, stays under the guard.
+  const condw = '(?:[^?,{}]|\\?\\?)*?';
   const ert = new RegExp(
-    `(?:this|ctx)\\.(?:error|notice|stopFollow)\\([^,()\\n]+,\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`,
+    `(?:this|ctx)\\.(?:error|notice|stopFollow)\\([^,()]+,\\s*${condw}\\?\\s*${lit}\\s*:\\s*${lit}`,
     'g',
   );
   for (const m of simSrc.matchAll(ert)) {
@@ -1050,6 +1085,23 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // The tutorial greeting (spawn greeting event + the startTutorial ferry):
+    // the ferry log line and the two gate denials are matched by the sim_i18n
+    // EXACT map (log.provingFerry, error.tutorialFromHere,
+    // error.tutorialOutleveled); scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
+    // The clicked ferry bells (tutorial island): the two crossing lines and
+    // the combat denial are matched by the sim_i18n EXACT map
+    // (log.provingEnter, log.provingLeave, error.tutorialFromHere).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/ferry_bell.ts'), 'utf8'),
+    // The death lesson (tutorial island): the rite's kneel line and refusal,
+    // and the two resurrection notes, matched by the sim_i18n EXACT map
+    // (log.passingStoneKneel, error.passingStoneCold, log.longWalkCorpse,
+    // log.longWalkHealer). Scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/death_lesson.ts'), 'utf8'),
+    // The ability drill (tutorial island): it emits no literals of its own
+    // (credit rides emitQuestProgress), and scanning keeps that true.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/ability_drill.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
@@ -1084,6 +1136,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/nythraxis.ts'), 'utf8'),
+    // N2: the shared quest-mob summon, moved verbatim OUT of nythraxis.ts (the
+    // "<name> awakens!" log and the four boss yells live here now, so the guard
+    // follows the emits to their new home instead of going quietly blind).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/quest_summon.ts'), 'utf8'),
+    // N3: the tide-pool summon's refusal toasts (crab_summon.ts REASON_MESSAGE)
+    // plus any future island summon emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/crab_summon.ts'), 'utf8'),
     // H1 (#1141): the interaction command bodies (corpse harvest + loot/pickup). The two
     // corpse-harvest deny strings ("That corpse has nothing to harvest." / "This corpse
     // has already been harvested.") have their ONLY emitter occurrences here; the file's
@@ -1205,8 +1264,18 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // file's sites was invisible to the guard before this entry.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_commands.ts'), 'utf8'),
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
-    // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
+    // emit the quest-item/full/only-materials-space/afford/max-slots refusals
+    // + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Materials Vault: the deposit/withdraw/buy-upgrade command bodies emit the
+    // only-materials/locked/material-full/afford/max-upgrades refusals plus the
+    // unlock/upgrade notices (sim_i18n error.vault* / log.vault* rows); the
+    // too-far and bags-full refusals reuse literals matched from bank.ts and
+    // bags.ts, but the ONLY emitter occurrences of the vault strings live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/materials_vault.ts'), 'utf8'),
+    // Text-free today (a pure derivation leaf with no SimContext), scanned so
+    // any future inline emit lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/material_derivation.ts'), 'utf8'),
     // Guild Bank: the officer-plus shared treasury + item store op bodies emit
     // the rank/full/treasury-cap/short/carry-cap/afford/max-slots refusals plus
     // the four money/item success notices (sim_i18n error.guildBank* /
@@ -1255,6 +1324,17 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // treatment src/sim/social and src/sim/professions get above, so a new
     // emit there sits under the drift guard from day one.
     socialSourceUnder(path.resolve(process.cwd(), 'src/sim/interactions')),
+    // server/bank_wire.ts (Bank Storage phase 11): the FIRST server module
+    // outside game.ts to emit player text, via sim.ctx.error (the storage
+    // purchase-mutex refusal of a gold rung buy). It rides the ordinary sim
+    // error stream, but its matcher ROW lives in server_i18n.ts beside its
+    // true origin (a server module's emit): the client's error chain runs
+    // localizeServerText before localizeSimText, and recognized() below
+    // accepts either matcher, so the row's home is a provenance question,
+    // not a mechanism one. The file stays in THIS corpus (the ctx.error
+    // scan below catches sim.ctx.error), keeping a reword of the emit or
+    // the matcher from drifting apart silently.
+    fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized
@@ -1458,8 +1538,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'party.ts',
       'ready_check.ts',
       'trade.ts',
-      'vale_cup.ts',
-      'vale_cup_bots.ts',
       'yumi.ts',
     ]);
     expect(
@@ -1547,6 +1625,14 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     "this.notice(p.id, 'SYNTH_NOTICE');", // nr (notice)
     "this.stopFollow(p, 'SYNTH_STOPFOLLOW');", // nr (stopFollow)
     "this.error(p.id, flag ? 'SYNTH_ERR_TERN_A' : 'SYNTH_ERR_TERN_B');", // ert
+    // er, biome-wrapped: each arg on its own line and a trailing comma before
+    // the close (the shape that was invisible before the `,?` close tolerance).
+    "ctx.error(\n  p.id,\n  'SYNTH_WRAPPED_ERR',\n);",
+    // ert, biome-wrapped ternary: wrapped args, wrapped branches, trailing comma.
+    "this.ctx.error(\n  p.id,\n  flag === 'x'\n    ? 'SYNTH_WRAPPED_TERN_A'\n    : 'SYNTH_WRAPPED_TERN_B',\n);",
+    // ert, wrapped ternary whose CONDITION contains a `??` pair (the lone-`?`
+    // terminator must not choke on nullish coalescing).
+    "ctx.error(\n  p.id,\n  (p.mana ?? 0) === 0\n    ? 'SYNTH_WRAPPED_NULLISH_A'\n    : 'SYNTH_WRAPPED_NULLISH_B',\n);",
     "return 'Synth returns a sentence here.';", // rr
     // nr anti-bleed: a single-arg stopFollow() must stop its first-arg scan at ')'
     // (the [^,()\\n]+ class) and NOT span into a following call's literal.
@@ -1572,6 +1658,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['sim this.stopFollow literal (nr)', 'log', 'SYNTH_STOPFOLLOW'],
     ['sim this.error ternary, branch A (ert)', 'error', 'SYNTH_ERR_TERN_A'],
     ['sim this.error ternary, branch B (ert)', 'error', 'SYNTH_ERR_TERN_B'],
+    ['sim ctx.error biome-wrapped, trailing comma (er)', 'error', 'SYNTH_WRAPPED_ERR'],
+    ['sim wrapped ternary error, branch A (ert)', 'error', 'SYNTH_WRAPPED_TERN_A'],
+    ['sim wrapped ternary error, branch B (ert)', 'error', 'SYNTH_WRAPPED_TERN_B'],
+    ['sim wrapped nullish-condition ternary, branch A (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_A'],
+    ['sim wrapped nullish-condition ternary, branch B (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_B'],
     ['sim return-sentence (rr)', 'error', 'Synth returns a sentence here.'],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],

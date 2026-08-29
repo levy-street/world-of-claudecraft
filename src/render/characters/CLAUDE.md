@@ -33,6 +33,10 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   `../material_clone_hooks.ts` must re-attach it on every program-preserving
   clone and cannot depend on the whole of `assets.ts` to do it; the spec rides
   `Material.userData.armorDye`, which `clone()` copies while it drops the hook.
+  A sibling key on the same material, `userData.armorDyeFallbackHex`
+  (`assets.ts` `recolored()`), carries a flat, multiply-safe approximation of
+  the same colorway for the low tier, which has no shader stage to run the
+  spec in at all; `buildTintedClone`'s Lambert branch reads it instead.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
   ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
   effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig

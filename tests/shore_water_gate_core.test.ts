@@ -150,8 +150,10 @@ describe('shoreWaterGate', () => {
       const h = terrainHeight(x, z, WORLD_SEED);
       return h >= WATER_LEVEL && h <= WATER_LEVEL + SHORE_BAND_HEIGHT;
     };
-    // The Eastbrook -> Mirefen pass: inside the band the whole way, dry.
-    for (const z of [140, 150, 160, 170, 180, 190]) {
+    // The Eastbrook -> Mirefen pass north of the Copper Dig plat (its phase
+    // 0b level stamp grades the approach below z~170 above the band): inside
+    // the band the whole way, dry.
+    for (const z of [175, 180, 185, 190, 195, 200]) {
       expect(inBand(0, z), `pass floor at z=${z} should sit in the beach band`).toBe(true);
       expect(
         shoreWaterGate(0, z, terrainHeight(0, z, WORLD_SEED), WATER_LEVEL, probe),

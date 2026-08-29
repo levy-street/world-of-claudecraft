@@ -230,10 +230,10 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('message rate exceeded')).toBe(t('loading.messageRateExceeded'));
     expect(userFacingApiError('message rate exceeded')).not.toBe(t('loading.connectionRejected'));
     // Session-fatal by design: an immediately reconnecting flooder re-floods,
-    // so neither transient-rejection helper may match it even mid-reconnect
-    // with a fresh counter.
-    expect(isTransientReconnectRejection('message rate exceeded', 1, 0)).toBe(false);
-    expect(isTransientTimeoutRejection('message rate exceeded', 1, 0)).toBe(false);
+    // so neither transient-rejection helper may match it even with a fresh
+    // rejection counter.
+    expect(isTransientReconnectRejection('message rate exceeded', 0)).toBe(false);
+    expect(isTransientTimeoutRejection('message rate exceeded', 0)).toBe(false);
   });
 
   it('re-localizes a moderation kick through tServer', () => {

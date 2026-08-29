@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
+  foldNamedSlotTarget,
   itemCopyPin,
   newestMatchingSlot,
   selectedInventorySlot,
@@ -226,5 +227,37 @@ describe('selectedInventorySlot: resolve without consuming', () => {
 
   it('returns undefined for no selection, so the caller falls back', () => {
     expect(selectedInventorySlot([plain('girdle')], 'girdle', undefined)).toBeUndefined();
+  });
+});
+
+describe("foldNamedSlotTarget: the shared entry points' overloaded trailing pair", () => {
+  it('takes the slotIndex from an object target, ignoring the trailing index', () => {
+    // The IWorld target names the copy; a trailing index alongside it is the
+    // pid-arity leftover and must not win.
+    expect(foldNamedSlotTarget({ slotIndex: 3 }, 9)).toEqual({ pid: undefined, named: 3 });
+  });
+
+  it('reads a number as the host pid, with the trailing index as the selection', () => {
+    expect(foldNamedSlotTarget(7, 2)).toEqual({ pid: 7, named: 2 });
+    expect(foldNamedSlotTarget(7, undefined)).toEqual({ pid: 7, named: undefined });
+  });
+
+  it('null falls through to the trailing slotIndex (the widened guard)', () => {
+    // typeof null === 'object': without the null guard this would throw on
+    // .slotIndex. The bankSocketBag precedent reads a null target as "no
+    // target given", so the trailing arm answers.
+    expect(foldNamedSlotTarget(null as never, 5)).toEqual({ pid: undefined, named: 5 });
+    expect(foldNamedSlotTarget(null as never, undefined)).toEqual({
+      pid: undefined,
+      named: undefined,
+    });
+  });
+
+  it('undefined target uses the trailing arm', () => {
+    expect(foldNamedSlotTarget(undefined, 4)).toEqual({ pid: undefined, named: 4 });
+    expect(foldNamedSlotTarget(undefined, undefined)).toEqual({
+      pid: undefined,
+      named: undefined,
+    });
   });
 });

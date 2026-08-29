@@ -48,6 +48,7 @@ import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -517,16 +518,24 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       fireChannelTick();
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
-      // Flush any fixed-count tick the timer has not reached yet: the tick
-      // accumulator and the channel's end advance separately, so floating-point
-      // drift can leave the final tick a hair short exactly when they coincide,
-      // silently dropping the last missile (the Arcane Missiles 5-barrage bug). A
-      // fixed-count channel must always land exactly channelTicks ticks. Inert for
+      // Flush a fixed-count tick only when its OWN schedule has also reached
+      // (or is a hair past) zero here: the tick accumulator and the channel's
+      // end advance separately, so floating-point drift can leave the final
+      // tick a hair short exactly when they coincide, silently dropping the
+      // last missile (the Arcane Missiles 5-barrage bug). A tick still
+      // meaningfully in the future was not lost to drift: pushbackCast's
+      // channel-fraction branch shortens castRemaining without rescheduling
+      // channelTickTimer, so a big enough pushback can end the channel before
+      // a later tick's timer ever comes due. Classic-era pushback trims the
+      // trailing tick count along with the time, so that tick is dropped too,
+      // never forced out as a same-instant completion burst. Inert for
       // duration-based channels, whose channelTicksLeft is 0.
-      while (p.channelTicksLeft > 0) {
+      while (p.channelTicksLeft > 0 && p.channelTickTimer <= CAST_COMPLETE_EPS) {
         p.channelTicksLeft -= 1;
+        p.channelTickTimer += p.channelTickEvery;
         fireChannelTick();
       }
+      p.channelTicksLeft = 0; // any tick pushback orphaned here owes nothing
       const completed = p.castingAbility ? ctx.resolvedAbility(p.castingAbility, p.id) : null;
       if (completed) completePaladinAegis(ctx, p, completed);
       stopChannelVisual(ctx, p);
@@ -1795,7 +1804,7 @@ function spendAbilityCost(
   p: Entity,
   meta: PlayerMeta,
   res: ResolvedAbility,
-  target: Entity | null = null,
+  _target: Entity | null = null,
 ): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
   if (res.def.devotionCost) spendDevotion(p, res.def.devotionCost);
@@ -2289,11 +2298,6 @@ const SELF_ANNOUNCING_EFFECTS: ReadonlySet<AbilityEffect['type']> = new Set([
   'feralCharge',
   'blinkForward',
   'repositionToAim',
-  'ballKick',
-  'ballPass',
-  'ballShoot',
-  'sportDash',
-  'sportShove',
 ]);
 
 function applyAbility(
@@ -2704,6 +2708,11 @@ function applyAbility(
             ability: ability.name,
             kind: 'resist',
           });
+          // A resisted bolt never reaches runEffects, but the player still
+          // pressed the button the island asked for, so the drill credits
+          // here too. Without this the lesson stalls on an unlucky roll and
+          // the coach keeps asking for a press that already happened.
+          creditAbilityDrill(ctx, src, tgt, ability.id);
           ctx.enterCombat(src, tgt);
           restoreStormcastReservation(ctx, src, stormcastReservation);
           return;

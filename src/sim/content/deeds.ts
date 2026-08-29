@@ -1803,11 +1803,16 @@ export const DEEDS: Record<string, DeedDef> = {
   // be created. Holders earn it at login or receipt (the items are unbound,
   // so they still trade); a fresh realm can never mint a first earner. That
   // is the intended nature of this feat class, it stays visible as a history
-  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS.
+  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS. The
+  // desc states the no-longer-drops fact directly (the col_reliquary_complete
+  // caveat-sentence precedent) since players otherwise read a stuck 0/1 as a
+  // broken achievement and report it as a bug.
   feat_brightwood_relic: {
     id: 'feat_brightwood_relic',
     name: 'Brightwood Remembered',
-    desc: "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown.",
+    desc:
+      "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown. " +
+      'The relics no longer drop; only a trade with an existing holder can pass one on.',
     category: 'feat',
     renown: 0,
     trigger: {
@@ -2839,6 +2844,41 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'exploration',
     renown: 5,
     trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
+  },
+  // Bank bag sockets (Bank Storage phase 06): the socket ladder's two rungs of
+  // recognition, beside soc_room_for_more / soc_gilded_strongbox for the slot
+  // ladder. The meter reads BankState.unlockedSockets, bumped only by
+  // bankUnlockSocket (bank_sockets.ts), which marks deeds dirty on purchase.
+  soc_strongbox_outfitter: {
+    id: 'soc_strongbox_outfitter',
+    name: 'Strongbox Outfitter',
+    desc: 'Unlock your first bank bag socket.',
+    category: 'social',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 1 },
+  },
+  soc_four_bags_deep: {
+    id: 'soc_four_bags_deep',
+    name: 'Four Bags Deep',
+    desc: 'Unlock all four bank bag sockets.',
+    category: 'social',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 4 },
+  },
+  // The Proving Shore graduation: every lesson on the tutorial island handed
+  // in, then the ferry bell rung for the ride home. The stat is bumped by
+  // interactions/ferry_bell.ts on the island bell's home crossing, only once
+  // the whole rail sits in questsDone, so the deed can never fire on a
+  // mid-lesson misclick ride or a veteran's refresher visit. Appended at the
+  // release merge behind the castle visits, keeping both sides' tails in
+  // their own authored order.
+  prog_ready_for_an_adventure: {
+    id: 'prog_ready_for_an_adventure',
+    name: 'Ready for an Adventure',
+    desc: 'Graduate the Proving Shore: finish every lesson on the island, then ring the ferry bell home to Eastbrook.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
   },
 };
 

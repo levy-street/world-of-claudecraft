@@ -109,6 +109,7 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 // router-owned-only shape instead (the same assertion pair as the orphan).
 const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
+  '/api/guilds/roster',
   '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
   '/api/characters/:id/deeds-recent',
@@ -268,6 +269,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The account portal (server/account.ts).
     { method: 'GET', path: '/api/account' },
     { method: 'POST', path: '/api/account/password' },
+    { method: 'POST', path: '/api/account/password/set-initial' },
     { method: 'POST', path: '/api/account/logout' },
     { method: 'POST', path: '/api/account/email' },
     { method: 'POST', path: '/api/account/deactivate' },
@@ -341,6 +343,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // never an inline ladder arm), so they have no legacy twin to retain; the
     // REGISTRY_ONLY_PATHS branch below asserts the router-owned-only shape.
     { method: 'GET', path: '/api/deeds/rarity' },
+    // The signpost guild board's roster drill-in (server/guild_roster.ts):
+    // registry-only on the same terms as the deeds family.
+    { method: 'GET', path: '/api/guilds/roster' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
     // The reliquary rarity read (server/reliquary.ts): registry-only on the

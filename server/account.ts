@@ -52,6 +52,7 @@ import {
   scopeAllowsMutation,
   setAccountDeactivated,
   setAccountMarketingOptIn,
+  setInitialPasswordHashIfUnset,
   setTotpPending,
   updatePasswordHash,
 } from './db';
@@ -131,6 +132,10 @@ export async function handleAccountWhoami(
     createdAt: acct.created_at,
     characterCount,
     twoFactorEnabled,
+    // False for an Apple- or Discord-provisioned account that never got a real,
+    // owner-chosen password (see handleAccountSetInitialPassword below): the
+    // client uses this to show "Set a Password" instead of "Change Password".
+    passwordSet: acct.password_set,
   });
 }
 
@@ -307,6 +312,60 @@ export async function handleAccountSetInitialEmail(
   const filled = await backfillAccountEmailIfEmpty(accountId, email, false);
   if (!filled) return json(res, 409, { error: 'use verified email change' });
   return json(res, 200, { ok: true, email });
+}
+
+// POST /api/account/password/set-initial: set a real, owner-chosen password on an
+// account that still has none (password_set = false). This is the account created
+// through Apple or Discord sign-in, whose only credential is a random placeholder
+// hash the owner never saw: they cannot log in with a username + password on a
+// platform that has no federated sign-in button (e.g. the Mac desktop client only
+// offers Continue with Apple on native iOS), and cannot use the first-time-login
+// chooser to add Discord as an alternate credential either, since that chooser also
+// re-verifies the very password they were never given. The bearer session IS the
+// authorization, exactly like email/set-initial above: the caller already proved
+// ownership through the federated login that minted this session, and there is no
+// existing real password to re-verify. Once a real password is set the account is
+// an ordinary password account; /api/account/password (change) is the only way to
+// rotate it from here, so a repeat call here is a 409 steering to that flow.
+export async function handleAccountSetInitialPassword(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  accountId: number,
+): Promise<void> {
+  if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
+  const body = await readBody(req);
+  const acct = await accountById(accountId);
+  if (!acct) return json(res, 404, { error: 'account not found', code: 'account.not_found' });
+  if (acct.password_set) {
+    return json(res, 409, {
+      error: 'this account already has a password, use change password instead',
+      code: 'account.password_already_set',
+    });
+  }
+  const next = body.next;
+  if (typeof next !== 'string' || next.length < MIN_PASSWORD_LENGTH) {
+    return json(res, 400, {
+      error: `password must be at least ${MIN_PASSWORD_LENGTH} chars`,
+      code: 'account.password_too_short',
+    });
+  }
+  if (next.length > MAX_PASSWORD_LENGTH) {
+    return json(res, 400, {
+      error: `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
+      code: 'account.password_too_long',
+    });
+  }
+  const changed = await setInitialPasswordHashIfUnset(accountId, await hashPassword(next));
+  if (!changed) {
+    return json(res, 409, {
+      error: 'this account already has a password, use change password instead',
+      code: 'account.password_already_set',
+    });
+  }
+  // Best-effort security notice, same as the change/reset flows; never blocks on
+  // mail state (a no-op when the account has no recovery email yet).
+  emailPasswordChanged(acct);
+  return json(res, 200, { ok: true });
 }
 
 // POST /api/account/deactivate: re-confirm password + username, require all
@@ -771,6 +830,11 @@ async function passwordHandler(ctx: Ctx): Promise<void> {
   );
 }
 
+/** POST /api/account/password/set-initial: set a real password on a passwordless account. */
+async function passwordSetInitialHandler(ctx: Ctx): Promise<void> {
+  return handleAccountSetInitialPassword(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
 /** POST /api/account/logout: revoke this device's bearer token. */
 async function logoutHandler(ctx: Ctx): Promise<void> {
   const callerToken = bearerToken(ctx.req);
@@ -898,6 +962,13 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [activeGuard],
     handler: passwordHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/account/password/set-initial',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: passwordSetInitialHandler,
   },
   {
     method: 'POST',

@@ -55,7 +55,11 @@ describe('resized-window fill CSS', () => {
     // The painter opens it with an inline display:flex (pinned in
     // leaderboard_window.test.ts); with the shell default (row) the header, tabs
     // and board would lay out side by side instead.
-    expect(components).toContain('#leaderboard-window { flex-direction: column; }');
+    // The guild board window shares the rule (one grouped selector, same
+    // family: it opens display:flex the same way).
+    expect(components).toContain(
+      '#leaderboard-window, #guild-board-window { flex-direction: column; }',
+    );
   });
 
   it('drops the tab strip margin that block-flow used to collapse', () => {

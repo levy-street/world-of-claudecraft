@@ -9,8 +9,12 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { poolCapacityOf, poolOccupancyOf } from '../sim/bag_pools';
+import { BACKPACK_SLOTS } from '../sim/bags';
 import { type BagCells, layoutBagCells } from '../sim/inventory_order';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { Quality } from '../sim/loot_master';
+import { isMaterialItemId } from '../sim/material_ids';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import {
   applyBagFilter,
@@ -28,6 +32,8 @@ export interface BagItemInfo {
   noMarketList?: boolean;
   /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
   noVendorSell?: boolean;
+  /** Rarity tier; only 'poor' is instant-sellable (vendorSellIsInstant below). */
+  quality?: Quality;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
@@ -36,6 +42,11 @@ export interface BagItemInfo {
   soulbound?: boolean;
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
+  /** The id is in the Materials Vault's honest material set
+   *  (vaultMaterialIds()). Computed by the CALLER (this info shape carries no
+   *  id to test); read only by the vaultDeposit mode arm, so every other
+   *  caller may omit it. */
+  vaultMaterial?: boolean;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -60,9 +71,24 @@ export interface BagMode {
   bankOpen: boolean;
   /** The bank window is open ON ITS PERSONAL TAB: a click deposits the stack. */
   bankDeposit: boolean;
+  /** An unlocked bank bag socket is EMPTY right now (hasOpenBankSocket over
+   *  the live bankInfo; meaningful only beside bankDeposit): a clicked
+   *  payload-free bag SOCKETS into the bank instead of depositing as an item,
+   *  the carried equip grammar aimed at the bank's socket row. False keeps
+   *  every bag click a plain deposit, so storing spare bags stays possible
+   *  once the sockets are full (and a payload-bearing bag always deposits:
+   *  sockets store bare ids, the sim's #2837 peek would refuse it). */
+  bankSocketable: boolean;
   /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
-   *  bank instead. The wiring sets at most one of bankDeposit/guildBankDeposit. */
+   *  bank instead. The wiring sets at most ONE of the three bank deposit
+   *  modes (see vaultDeposit below). */
   guildBankDeposit: boolean;
+  /** The bank window is open ON ITS VAULT TAB with the Materials Vault
+   *  unlocked: a click deposits the material into the vault. The wiring sets
+   *  at most ONE of the three bank deposit modes (keyed off the bank window's
+   *  active tab); the LOCKED vault pane arms none of them, so its clicks fall
+   *  to the bankOpen no-target rung like the guild Log view's. */
+  vaultDeposit: boolean;
   /** Pet-feed cursor mode is armed. */
   petFeed: boolean;
 }
@@ -83,12 +109,17 @@ export type BagAction =
   | 'vendorSellBlocked'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
+  /** Socket the clicked bag into the bank's first empty unlocked socket. */
+  | 'bankSocketBag'
   /** The bank window is open with NEITHER grid on screen to deposit into. */
   | 'bankDepositBlockedNoTarget'
   | 'guildBankDeposit'
   | 'guildBankDepositBlockedQuest'
   | 'guildBankDepositBlockedSoulbound'
   | 'guildBankDepositBlockedNoTransfer'
+  | 'vaultDeposit'
+  /** Not in the honest material set: the vault stores materials only. */
+  | 'vaultDepositBlockedNotMaterial'
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
@@ -106,8 +137,11 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
   | 'hudChrome.bank.cannotDepositNow'
+  | 'hudChrome.bank.socketHint'
   | 'hudChrome.bank.guildDepositHint'
   | 'hudChrome.bank.guildCannotDeposit'
+  | 'hudChrome.bank.vaultDepositHint'
+  | 'hudChrome.bank.vaultCannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
   | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
@@ -124,8 +158,9 @@ export type BagTooltipHintKey =
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
  *  priority order exactly: trade > mail-attach > market-sell > vendor >
- *  guild-bank-deposit > bank-deposit > bank-open-no-target > pet-feed > quest >
- *  use (the wiring sets at most one of the two bank modes).
+ *  guild-bank-deposit > bank-deposit > vault-deposit > bank-open-no-target >
+ *  pet-feed > quest > use (the wiring sets at most one of the THREE bank
+ *  deposit modes, keyed off the bank window's active tab).
  *  `instance` is the clicked SLOT's payload (issue 1165):
  *  a transfer-locked copy (bindOnTrade-armed or boundTo-bound,
  *  isTransferLockedInstance, the sim's pipe rule) blocks mail-attach and
@@ -134,6 +169,10 @@ export function bagItemAction(
   item: BagItemInfo,
   mode: BagMode,
   instance?: ItemInstancePayload,
+  /** The slot's crafting provenance marker (InvSlot.craftedRecipeId): read
+   *  by the bank socket arm (bank sockets store bare ids, so a marked bag
+   *  deposits instead). The vault preserves it, so it never blocks there. */
+  craftedRecipeId?: string,
 ): BagAction {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'transferBlockedSoulbound';
@@ -171,7 +210,25 @@ export function bagItemAction(
       return 'guildBankDepositBlockedNoTransfer';
     return 'guildBankDeposit';
   }
-  if (mode.bankDeposit) return item.kind === 'quest' ? 'bankDepositBlockedQuest' : 'bankDeposit';
+  if (mode.bankDeposit) {
+    if (item.kind === 'quest') return 'bankDepositBlockedQuest';
+    // The socket arm (Bank Storage phase 07): a payload-free bag with an open
+    // socket waiting SOCKETS (the carried equip grammar, bank-aimed); a
+    // payload-bearing copy or a full/locked socket row falls through to the
+    // plain deposit, so the click always still banks the bag somewhere. The
+    // hover hint (bagTooltipHintKey) names which outcome this click takes.
+    if (item.kind === 'bag' && mode.bankSocketable && !instance && craftedRecipeId === undefined) {
+      return 'bankSocketBag';
+    }
+    return 'bankDeposit';
+  }
+  // The VAULT tab: materials only (membership computed by the caller from the
+  // honest id set, never approximated by kind). Identity payloads and crafted
+  // provenance are accepted and preserved by the vault's special collection.
+  if (mode.vaultDeposit) {
+    if (!item.vaultMaterial) return 'vaultDepositBlockedNotMaterial';
+    return 'vaultDeposit';
+  }
   // The bank window is open but NEITHER grid is on screen to drop into (today:
   // its guild pane's Log view, a reading surface). This arm is stated
   // EXPLICITLY rather than left to fall out the bottom of the ladder, because
@@ -207,10 +264,38 @@ export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
   // no player action can clear. The personal pane keeps its deposit: its only
   // refusal is quest, and its owner can always withdraw again.
   if (mode.guildBankDeposit) return 'none';
+  // The VAULT tab likewise offers nothing on an unknown cell: the honest
+  // material set is derived from THIS bundle's content tables, so a def-less
+  // id is never a member and the sim would refuse the deposit anyway.
+  if (mode.vaultDeposit) return 'none';
   // bankOpen-with-no-target needs no arm of its own here: an unknown cell has
   // no use/equip ladder below it to fall into, so the closing 'none' is already
   // the right answer. The ITEM ladder needed an explicit rung; this one does not.
   return mode.bankDeposit ? 'bankDeposit' : 'none';
+}
+
+/** Whether a plain vendor-window click may sell `item` immediately, with no
+ *  confirm step. Only true junk qualifies: poor quality AND no instance
+ *  payload of any kind (an enchant, masterwork bake, signer, rolled stats, a
+ *  bound-to owner, or a player lock all make a copy non-interchangeable with
+ *  a plain one; item_copy_ref.ts's whole reason two copies of an id stopped
+ *  being safe to treat as one) AND no crafted-recipe marker (InvSlot's OWN
+ *  `craftedRecipeId`, kept off the instance payload on purpose so common
+ *  crafted gear does not gain a signer/masterwork/enchant identity, item
+ *  types.ts). Mirrors src/sim/items.ts junkSellableSlot's poor-quality gate,
+ *  widened to ANY instance payload or crafted marker rather than only a
+ *  bound/locked one: this gate exists to protect VALUE from an accidental
+ *  click, not merely to mirror what the sim would refuse outright. False
+ *  routes the caller to a confirm prompt instead of an instant sale, closing
+ *  the gap where selling gray junk one item at a time (no per-item
+ *  confirmation existed) could vendor an adjacent, unrelated valuable item on
+ *  a single stray click. */
+export function vendorSellIsInstant(
+  item: BagItemInfo,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): boolean {
+  return item.quality === 'poor' && instance === undefined && craftedRecipeId === undefined;
 }
 
 /** Whether a shift-click on a bag item should link it into chat (classic
@@ -224,7 +309,7 @@ export function bagUnknownAction(mode: BagMode): 'bankDeposit' | 'none' {
  *  Linking a stack into chat is inert and available on every other surface, so
  *  the reading view keeps it. */
 export function bagShiftLinks(mode: BagMode): boolean {
-  return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit;
+  return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit && !mode.vaultDeposit;
 }
 
 /** Resolve the exact inventory index of a clicked bag stack by REFERENCE identity,
@@ -316,11 +401,27 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.petFeed ||
     mode.bankOpen ||
     mode.bankDeposit ||
-    mode.guildBankDeposit
+    mode.guildBankDeposit ||
+    mode.vaultDeposit
   )
     return 'none';
   if (item.noDiscard) return 'discardBlocked';
   return 'discard';
+}
+
+/** The slot-count line key for a bag-kind item's tooltip and the bag-socket
+ *  aria-label: a materialsOnly bag says so ('{slots} Slot Materials Bag'), an
+ *  unrestricted bag keeps the plain family line. Returns null ONLY for a
+ *  non-bag; whether a line renders at all stays each consumer's decision
+ *  (the hud tooltip also gates on bagSlots, the socket aria always speaks),
+ *  so the leaf answers the variant question alone and cannot silently drop
+ *  the materials claim on a degenerate zero-slot def. Pure key choice so
+ *  hud.ts and bags_window.ts share ONE decision instead of two ternaries. */
+export function bagSlotsLineKey(
+  item: { kind: string; bagSlots?: number; materialsOnly?: boolean } | undefined,
+): 'itemUi.tooltip.bagSlots' | 'itemUi.tooltip.bagSlotsMaterials' | null {
+  if (item?.kind !== 'bag') return null;
+  return item.materialsOnly ? 'itemUi.tooltip.bagSlotsMaterials' : 'itemUi.tooltip.bagSlots';
 }
 
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
@@ -331,6 +432,9 @@ export function bagTooltipHintKey(
   item: BagItemInfo,
   mode: BagMode,
   instance?: ItemInstancePayload,
+  /** The slot's crafting provenance marker, the bagItemAction twin: read only
+   *  by the vaultDeposit arm. */
+  craftedRecipeId?: string,
 ): BagTooltipHintKey {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
@@ -362,8 +466,23 @@ export function bagTooltipHintKey(
       ? 'hudChrome.bank.guildCannotDeposit'
       : 'hudChrome.bank.guildDepositHint';
   }
-  if (mode.bankDeposit)
-    return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
+  if (mode.bankDeposit) {
+    if (item.kind === 'quest') return 'hudChrome.bank.cannotDeposit';
+    // The hover previews exactly which outcome the click takes (the socket
+    // arm's condition, mirrored from bagItemAction): socket when a payload-free
+    // bag has an open socket waiting, plain deposit otherwise.
+    if (item.kind === 'bag' && mode.bankSocketable && !instance && craftedRecipeId === undefined) {
+      return 'hudChrome.bank.socketHint';
+    }
+    return 'hudChrome.bank.depositHint';
+  }
+  // The vault twin: only a non-material is refused. Identity-bearing materials
+  // keep the same deposit hint because the vault preserves their visuals.
+  if (mode.vaultDeposit) {
+    return !item.vaultMaterial
+      ? 'hudChrome.bank.vaultCannotDeposit'
+      : 'hudChrome.bank.vaultDepositHint';
+  }
   // Twin of bagItemAction's no-target rung: with the bank open and no grid on
   // screen, the hint must NOT fall through to the kind branch and advertise
   // "Click to equip" for a click that will be refused. The hover previews the
@@ -539,6 +658,50 @@ export interface BagBarModel {
   sockets: BagSocketModel[];
   used: number;
   capacity: number;
+}
+
+/** One pool of the carried split: its occupancy and its budget. */
+export interface CarriedPool {
+  used: number;
+  capacity: number;
+}
+
+/** The carried inventory's per-pool split for the bag-bar counter's tooltip
+ *  and split aria (the Bank Storage phase 08 carried follow-up). */
+export interface CarriedPoolsModel {
+  general: CarriedPool;
+  materials: CarriedPool;
+  /** The materials pool has something to say: capacity from an equipped
+   *  materials-only bag. Occupancy alone can never trip it: poolOccupancyOf
+   *  clamps materialsUsed to the pool capacity, so occupancy stranded by an
+   *  unequip re-accounts to the GENERAL pool (only general reads over). */
+  showMaterials: boolean;
+}
+
+/** The per-pool split for the CARRIED bags, from the SAME shared helpers the
+ *  sim's own carried gates consume (src/sim/bags.ts bagPools is
+ *  poolCapacityOf over BACKPACK_SLOTS + the equipped bag ids, and its fit
+ *  gates run poolOccupancyOf over the inventory with the honest-taxonomy
+ *  isMaterialItemId predicate), so the readout can never drift from the
+ *  sim's allocation rule. Unlike the bank there is no wire split to read:
+ *  both hosts mirror `bags` and `inventory`, and this derives through the
+ *  one shared module. Occupancies always sum to inventory.length and the
+ *  capacities to the summed budget; either pool may sit over budget
+ *  (tolerated over-capacity, never repaired here). */
+export function carriedPools(
+  bags: readonly (string | null)[],
+  inventory: readonly InvSlot[],
+): CarriedPoolsModel {
+  const pools = poolCapacityOf(BACKPACK_SLOTS, bags);
+  const { generalUsed, materialsUsed } = poolOccupancyOf(inventory, pools, isMaterialItemId);
+  return {
+    general: { used: generalUsed, capacity: pools.general },
+    materials: { used: materialsUsed, capacity: pools.materials },
+    // No occupancy disjunct: unlike the bank's wire-fed pool four, this
+    // derives locally through the clamped helper, so materialsUsed > 0
+    // without capacity is unconstructible here.
+    showMaterials: pools.materials > 0,
+  };
 }
 
 export function buildBagBar(

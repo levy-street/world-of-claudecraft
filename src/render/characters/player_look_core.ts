@@ -16,7 +16,7 @@
 // it, and would silently dress every peer in whatever set this machine last
 // picked.
 
-import type { Entity, PlayerClass } from '../../sim/types';
+import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { sameAppearance } from '../../world_api/appearance';
 import {
   type ArmorSetId,
@@ -25,6 +25,7 @@ import {
   type ModularAppearance,
   type ModularLook,
   normalizeAppearance,
+  slotCovered,
 } from './modular';
 
 /** The roster-row fields a look is composed from. Structural on purpose: the
@@ -147,4 +148,33 @@ export function modularLookChanged(
   if (prevLook === null && nextLook === null) return false;
   if (prevLook === null || nextLook === null) return true;
   return !sameAppearance(prevLook, nextLook);
+}
+
+/**
+ * Whether the paperdoll's helm-visibility eye could ever change anything for
+ * a `cls` character. False for a class kit whose set ships no helm geometry
+ * at all (druid, the hunter's ranger kit, rogue; see ARMOR_BY_SET in
+ * modular.ts) and false for a Combat Mech wearer, whose replacement body
+ * never composes the kit either (the `isMechWearer` guard the renderer's live
+ * helm-toggle diff already applies). Toggling `helmHidden` when this is false
+ * still flips the flag, but nothing about the drawn body ever changes, so the
+ * eye must not be offered at all (issue: "hide helmet does nothing").
+ */
+export function helmSlotAvailable(cls: PlayerClass, isMech: boolean): boolean {
+  return !isMech && slotCovered(fullSet(classArmorSet(cls)), 'head');
+}
+
+/** Whether an already-composed look has a removable head piece. */
+export function helmSlotAvailableForLook(look: ModularLook | null): boolean {
+  return look !== null && slotCovered(look.worn, 'head');
+}
+
+export function helmSlotAvailableForEntity(
+  e: Entity | null | undefined,
+  lookFor: (e: Entity) => ModularLook | null,
+): boolean {
+  if (!e || isMechWearer(e)) return false;
+  return helmSlotAvailableForLook(
+    lookFor(e.helmHidden ? ({ ...e, helmHidden: false } as Entity) : e),
+  );
 }

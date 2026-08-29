@@ -28,6 +28,7 @@ import {
   handleAccountMarketing,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
+  handleAccountSetInitialPassword,
   handleAccountWhoami,
   handleEmailUnsubscribe,
 } from '../server/account';
@@ -80,6 +81,7 @@ let writes: { sql: string; params: any[] }[];
 let pendingChange: any;
 // Rows the atomic set-initial backfill UPDATE reports (1 = filled, 0 = race-loser).
 let emailBackfillRows: number;
+let passwordBackfillRows: number;
 
 function routeQuery(sql: string, params: any[]) {
   writes.push({ sql, params });
@@ -103,6 +105,10 @@ function routeQuery(sql: string, params: any[]) {
   // The atomic recovery-email backfill (set-initial): rowCount drives filled vs.
   // race-loser. `emailBackfillRows` lets a test simulate the loser (0 rows).
   if (sql.includes("email IS NULL OR email = ''")) return { rows: [], rowCount: emailBackfillRows };
+  // The atomic initial-password write: rowCount drives filled vs. race-loser.
+  if (sql.includes('password_hash = $2') && sql.includes('password_set = FALSE')) {
+    return { rows: [], rowCount: passwordBackfillRows };
+  }
   return { rows: [] }; // UPDATE / DELETE / INSERT writes
 }
 
@@ -115,6 +121,7 @@ beforeEach(async () => {
     id: 1,
     username: 'Aelwyn',
     password_hash: pwHash,
+    password_set: true,
     email: null,
     created_at: '2026-01-15T10:00:00.000Z',
     deactivated_at: null,
@@ -126,6 +133,7 @@ beforeEach(async () => {
   charCount = 2;
   pendingChange = { account_id: 1, new_email: 'new@example.com' };
   emailBackfillRows = 1;
+  passwordBackfillRows = 1;
   writes = [];
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string, params: any[]) => routeQuery(sql, params));
@@ -159,6 +167,17 @@ describe('handleAccountWhoami', () => {
     const res = makeRes();
     await handleAccountWhoami(res, 1);
     expect(parse(res).status).toBe(404);
+  });
+  it('reports passwordSet:false for an Apple/Discord-provisioned account', async () => {
+    accountRow.password_set = false;
+    const res = makeRes();
+    await handleAccountWhoami(res, 1);
+    expect(parse(res).data.passwordSet).toBe(false);
+  });
+  it('reports passwordSet:true once a real password exists', async () => {
+    const res = makeRes();
+    await handleAccountWhoami(res, 1);
+    expect(parse(res).data.passwordSet).toBe(true);
   });
 });
 
@@ -202,6 +221,61 @@ describe('handleAccountSetInitialEmail (mandatory recovery-email backfill)', () 
     accountRow = null;
     const res = makeRes();
     await handleAccountSetInitialEmail(makeReq({ email: 'new@example.com' }), res, 1);
+    expect(parse(res).status).toBe(404);
+  });
+});
+
+describe('handleAccountSetInitialPassword (Apple/Discord passwordless-account bootstrap)', () => {
+  beforeEach(() => {
+    accountRow.password_set = false;
+  });
+  it('sets a real password on an account that has none (200)', async () => {
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'brandnew1' }), res, 1);
+    const { status, data } = parse(res);
+    expect(status).toBe(200);
+    expect(data).toEqual({ ok: true });
+    const write = writes.find((w) => w.sql.includes('UPDATE accounts SET password_hash'));
+    expect(write).toBeTruthy();
+    expect(write!.params[0]).toBe(1);
+    expect(write!.sql).toContain('password_set = FALSE');
+  });
+  it('returns 409 when a concurrent initial-password request wins first', async () => {
+    // The read-side guard passed (acct.password_set false) but the atomic UPDATE
+    // matched 0 rows because another request filled it first. The loser must
+    // not silently replace that first password.
+    passwordBackfillRows = 0;
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'brandnew1' }), res, 1);
+    const { status, data } = parse(res);
+    expect(status).toBe(409);
+    expect(data.code).toBe('account.password_already_set');
+  });
+  it('rejects a too-short password without writing (400)', async () => {
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'short' }), res, 1);
+    expect(parse(res).status).toBe(400);
+    expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(false);
+  });
+  it('rejects a too-long password without writing (400)', async () => {
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'x'.repeat(129) }), res, 1);
+    expect(parse(res).status).toBe(400);
+    expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(false);
+  });
+  it('refuses when a real password already exists, steering to change-password (409)', async () => {
+    accountRow.password_set = true;
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'brandnew1' }), res, 1);
+    const { status, data } = parse(res);
+    expect(status).toBe(409);
+    expect(data.code).toBe('account.password_already_set');
+    expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(false);
+  });
+  it('404s when the account row is gone', async () => {
+    accountRow = null;
+    const res = makeRes();
+    await handleAccountSetInitialPassword(makeReq({ next: 'brandnew1' }), res, 1);
     expect(parse(res).status).toBe(404);
   });
 });

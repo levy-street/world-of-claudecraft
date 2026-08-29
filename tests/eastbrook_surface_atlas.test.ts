@@ -130,7 +130,18 @@ describe('Eastbrook shared surface atlas', () => {
     );
     const roots = [town.group, armoury, chest];
     const maps = roots.flatMap((root) => atlasMaps(root, atlas));
-    const expectedBindings = [9, 1, 1];
+    // Town bindings re-pinned 2026-08: the harbor move's layout v3 retired the
+    // ring wall (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), so the
+    // two wall materials (opaque and emissive, each shared across its
+    // original/mirrored batch pair) are no longer created: 9 became 7. Then
+    // the KTX2 kit-building path moved the five hexb shells onto their own
+    // GLB materials, leaving only the chapel pair on the atlas: 7 became 2.
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church, so the
+    // last town building leaves the template pipeline too and the town's only
+    // remaining atlas binding is the merged eastbrookTownMicroOpaqueBatch
+    // (the wells, stalls, benches and fences): 2 became 1. The Armoury and the
+    // banker chest are untouched, so their bindings hold at 1 each.
+    const expectedBindings = [1, 1, 1];
 
     expect(maps.length).toBeGreaterThan(0);
     expect(new Set(maps)).toEqual(new Set([atlas]));
@@ -143,8 +154,17 @@ describe('Eastbrook shared surface atlas', () => {
       });
       root.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
+        // Kit buildings (the KTX2 kit-building path) carry their own palette
+        // maps instead of atlas vertex colors; on Low they must still be
+        // Lambert, which is the tier contract this audit guards.
+        let kitAncestor = false;
+        for (let node: THREE.Object3D | null = object; node; node = node.parent) {
+          const assetId = node.userData?.assetId as string | undefined;
+          if (assetId?.startsWith('/models/biome/')) kitAncestor = true;
+        }
         const material = object.material as THREE.MeshLambertMaterial;
         expect(material).toBeInstanceOf(THREE.MeshLambertMaterial);
+        if (kitAncestor) return;
         expect(material.vertexColors).toBe(true);
         if (material.map) expect(material.map).toBe(atlas);
       });

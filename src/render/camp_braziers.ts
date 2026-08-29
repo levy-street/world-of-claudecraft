@@ -194,6 +194,8 @@ export function planCampBraziers(seed = 0): BrazierSite[] {
       roll: propPlacementRoll,
     },
     WATER_LEVEL,
+    // A practice dummy is furniture: it tends no fire, whatever its family is.
+    (mobId) => MOBS[mobId]?.dummy === true,
   );
 }
 

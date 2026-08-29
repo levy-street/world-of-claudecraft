@@ -47,7 +47,7 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { professionImageUrl } from './profession_art';
@@ -267,11 +267,28 @@ export function renderCraftingWindow(
     }
   }
 
+  const rows = selected !== null ? (sections.get(selected) ?? []) : [];
+  if (view.vaultNote && rows.some((row) => row.reagents.some((r) => !r.satisfied))) {
+    // Place-blocked vault draw with a short row ON THE VISIBLE TAB (Phase 04
+    // QA, the stationOutOfRange precedent): the reason is stated once for
+    // the window in words, location-scoped rather than per recipe, because
+    // the gate is about where the player stands. The core decides
+    // blocked-plus-short across the known recipes; this render additionally
+    // scopes to the selected section so an all-green tab stays quiet. A
+    // SIBLING of the scroll body, never its first child: the body's
+    // scrollTop is captured and restored across rebuilds, and a note
+    // prepended inside it would sit above the restored offset on the very
+    // repaint that introduces it. Plain text in document order (visible AND
+    // read by AT), so no aria duplication.
+    const vaultNote = document.createElement('div');
+    vaultNote.className = 'crafting-vault-note';
+    vaultNote.textContent = t('hudChrome.crafting.vaultUnreachable');
+    el.appendChild(vaultNote);
+  }
+
   const body = document.createElement('div');
   body.className = 'crafting-body';
   el.appendChild(body);
-
-  const rows = selected !== null ? (sections.get(selected) ?? []) : [];
   if (selected !== null) {
     const sectionName = craftNameText(selected);
     const sectionImageUrl = professionImageUrl(`prof_${selected}`);
@@ -320,6 +337,15 @@ export function renderCraftingWindow(
               count: formatNumber(count, { maximumFractionDigits: 0 }),
             })}`
           : '';
+      // The vault-draw suffix (Bank Storage Phase 04): stated in words beside
+      // the fine-substitution one, on the visible line AND the aria fold,
+      // never color alone (the same fairness rule).
+      const vaultDrawText = (count: number): string =>
+        count > 0
+          ? ` ${t('hudChrome.crafting.reagentVaultDraw', {
+              count: formatNumber(count, { maximumFractionDigits: 0 }),
+            })}`
+          : '';
       const reagentLines = row.reagents
         .map(
           (r) =>
@@ -327,7 +353,9 @@ export function renderCraftingWindow(
               name: r.item ? itemDisplayName(r.item) : r.itemId,
               have: formatNumber(r.have, { maximumFractionDigits: 0 }),
               required: formatNumber(r.required, { maximumFractionDigits: 0 }),
-            }) + fineSubText(r.fineSubstituted),
+            }) +
+            fineSubText(r.fineSubstituted) +
+            vaultDrawText(r.vaultDrawn),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -345,6 +373,10 @@ export function renderCraftingWindow(
             )}${
               r.fineSubstituted > 0
                 ? `<span class="crafting-fine-sub">${esc(fineSubText(r.fineSubstituted))}</span>`
+                : ''
+            }${
+              r.vaultDrawn > 0
+                ? `<span class="crafting-vault-draw">${esc(vaultDrawText(r.vaultDrawn))}</span>`
                 : ''
             }</span>`,
         )
@@ -381,6 +413,18 @@ export function renderCraftingWindow(
             )
         : '';
       const comboAccessible = comboLine ? `. ${comboLine} ${comboStatus}` : '';
+
+      // The #1301 gold-sink fee (crafting.ts resolveCraftForRecipe): charged
+      // on every successful craft but never shown anywhere before this
+      // (issue: crafting reads as a guaranteed net loss when the fee is
+      // invisible). The line is worded as a per-craft amount because Create
+      // and Create All can submit batches. Zero for a recipe with no
+      // itemLevelBudget, so a fee-free recipe renders no line at all.
+      const craftFeeLine =
+        row.craftFeeCopper > 0
+          ? t('hudChrome.crafting.craftFeeLine', { fee: formatMoney(row.craftFeeCopper) })
+          : '';
+      const craftFeeAccessible = craftFeeLine ? `. ${craftFeeLine}` : '';
 
       // Legibility: the skill-req line, the skill-gain difficulty
       // label, and the hub-station badge. All three are actionable info, so
@@ -426,7 +470,7 @@ export function renderCraftingWindow(
       // Duration is actionable pace info (fairness): always in the name, never color-only.
       craftBtn.setAttribute(
         'aria-label',
-        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
+        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}${craftFeeAccessible}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
       );
       const resultCountSuffix =
         row.resultCount > 1
@@ -441,14 +485,17 @@ export function renderCraftingWindow(
         : '';
       const chipLabel =
         btnState === 'casting' ? t('hudChrome.crafting.crafting') : t('hudChrome.crafting.create');
-      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span></span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
+      const craftFeeHtml = craftFeeLine
+        ? `<span class="vi-sub crafting-fee-line">${esc(craftFeeLine)}</span>`
+        : '';
+      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span>${craftFeeHtml}<span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span></span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
       craftBtn.addEventListener('click', () => {
         if (canCraft) deps.onCraft(row.recipeId, qty);
       });
       deps.attachTooltip(
         craftBtn,
         () =>
-          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
+          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div>${craftFeeLine ? `<div class="tt-sub">${esc(craftFeeLine)}</div>` : ''}<div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
 

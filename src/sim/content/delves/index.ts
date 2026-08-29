@@ -12,9 +12,13 @@ export const BROTHER_HALVEN: NpcDef = {
   id: 'brother_halven',
   name: 'Brother Halven',
   title: 'Reliquary Keeper',
-  pos: { x: -5, z: -52 },
-  // Faces +z (north), toward the town/hub up the road, so he greets arrivals
-  // with the glowing delve mouth framed behind him (was Math.PI, facing away).
+  // At the relocated Collapsed Reliquary mouth on the Mirror Lake rise (round
+  // 6b moved the marker; the keeper was left stranded at the old (-5,-52)
+  // site until the owner spotted it, round 6e). Exactly on the zone1
+  // delveMarker and DELVES doorPos, the drowned-litany convention.
+  pos: { x: -136, z: 112 },
+  // Faces +z (north), so he greets arrivals walking down to the mouth with
+  // the glowing delve arch framed behind him (the arch slab sits south).
   facing: 0,
   // Near-black charcoal: the hooded keeper reads dark/dirty under the 'entity'
   // tint of npc_reliquary_keeper (was 0xd4c5a0 light tan, too friendly).

@@ -29,7 +29,6 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
-import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
@@ -293,7 +292,21 @@ const SAUL_TALKS_REQUIRED = 9;
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
 // Exported for the placement suite's mirror-lake standability arm, which used
 // to carry its own copy of this number and could drift silently.
-export const POI_VISIT_RADIUS = 20;
+// 24, not a rounder number: within a zone a single-zone all-poi 'visits' deed
+// draws from (today: Wayfarer of the Vale/Marsh/Heights), the tightest
+// as-authored gap between two of its named places is Eastbrook Vale's
+// eastbrook<->reliquary_hill pair at ~49.2yd. A visit radius has to stay
+// under half of that or two distinct places on the same checklist could both
+// grant from one spot; 24 is the most forgiving value that still clears it
+// with margin, and tests/deeds.test.ts (POI_VISIT_RADIUS describe block)
+// pins every such zone's tightest gap against it, so a content edit that
+// narrows one can't silently break this. A cross-zone deed (The Long Road
+// North) is exempt: a player occupies exactly one zone at a time, so two of
+// its marks can never be satisfied from the same spot regardless of radius.
+// Zones with no all-poi wayfarer deed (e.g. Veiled Hollow) sit closer than
+// this in places, which is harmless today since nothing reads two of their
+// poi marks together; the pinned test would catch it the day that changes.
+export const POI_VISIT_RADIUS = 24;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------
@@ -350,7 +363,10 @@ export function restoreDeedStats(saved: SavedDeedStats | undefined): DeedStats {
   // Bounded on load exactly like the write sites: only real item ids enter
   // itemsDiscovered, and only marks in an authored namespace enter visited,
   // so a hand-edited save cannot grow either set unboundedly.
-  for (const id of saved.itemsDiscovered ?? []) if (ITEMS[id]) stats.itemsDiscovered.add(id);
+  // hasOwn for the same reason as markItemDiscovered: a prototype-named id in
+  // a tampered save indexes an inherited value and must not restore as real.
+  for (const id of saved.itemsDiscovered ?? [])
+    if (Object.hasOwn(ITEMS, id)) stats.itemsDiscovered.add(id);
   for (const mark of saved.visited ?? []) {
     if (typeof mark !== 'string') continue;
     const ns = mark.slice(0, mark.indexOf(':'));
@@ -573,7 +589,10 @@ export function markItemDiscovered(
   for (let depth = 0; id !== undefined && depth < 3; depth++) {
     // Annotated: indexing by the reassigned `id` would otherwise circularly
     // infer through def.heroicOf (TS7022).
-    const def: ItemDef | undefined = ITEMS[id];
+    // hasOwn, not truthiness: ITEMS carries Object.prototype, so a tampered
+    // container key like '__proto__' or 'toString' indexes an inherited value
+    // and would otherwise enter the PERSISTED discovery ledger as a real id.
+    const def: ItemDef | undefined = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
     if (!def) return; // bounded by construction: only real item ids enter the set
     if (!meta.deedStats.itemsDiscovered.has(id)) {
       meta.deedStats.itemsDiscovered.add(id);
@@ -745,6 +764,7 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
+  bankSocketsUnlocked: [],
   townFocusPoints: [],
   delveLoreCount: [],
   companionRankBest: [],
@@ -855,6 +875,7 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
+  bankSocketsUnlocked: (m) => m.bank.unlockedSockets,
   townFocusPoints: (m) => {
     // Allocation-free sum (tick-tail predicate: no Object.values array).
     let n = 0;
@@ -1096,8 +1117,8 @@ export function updateDeeds(ctx: SimContext): void {
   }
 }
 
-// The 1 Hz sweep behind the poisVisited marks (within 20 yd of a named
-// ZoneDef poi), the Thunzharr witness mark, and the roster-restriction fold
+// The 1 Hz sweep behind the poisVisited marks (within POI_VISIT_RADIUS of a
+// named ZoneDef poi), the Thunzharr witness mark, and the roster-restriction fold
 // (every live hate-table member of a participant-tracked boss, so a non-damager
 // who leaves before the kill still counts against the trio cap). Deterministic:
 // fixed cadence on the sim clock, insertion-order iteration, zero rng.
@@ -1189,9 +1210,10 @@ export function recomputeRenown(meta: PlayerMeta): void {
 const RETRO_SEED = { retro: true } as const;
 
 /** Seed the discovery ledger from what the character already holds (bags,
- *  bank, equipment, and the vendor buyback list, whose entries were all once
- *  possessed), so veterans keep credit for what they still own. Runs on
- *  every join; the set only grows, so re-seeding is idempotent.
+ *  bank, the Materials Vault, equipment, and the vendor buyback list, whose
+ *  entries were all once possessed), so veterans keep credit for what they
+ *  still own. Runs on every join; the set only grows, so re-seeding is
+ *  idempotent.
  *
  *  Every call here is RETRO: the character already owned these before the
  *  join, so the Reliquary fills silently (no recent push, no invented clear
@@ -1213,10 +1235,30 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.bank.inventory) {
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
-  for (const [slot, itemId] of Object.entries(meta.equipment) as [
-    EquipSlot,
-    string | undefined,
-  ][]) {
+  // Ordinary vault stock carries no instance quality. Sorted: stock is
+  // persisted as an object keyed by item id and Postgres jsonb re-orders object
+  // keys, so the raw walk order differs between a server-loaded and an offline
+  // character. The PERSISTED itemsDiscovered array is already host-identical
+  // (serializeDeedStats sorts on the way out); this protects the LIVE Set order
+  // that rides the dstats self wire.
+  for (const itemId of Object.keys(meta.vault.stock).sort()) {
+    markItemDiscovered(ctx, meta, itemId, undefined, RETRO_SEED);
+  }
+  // Identity-preserving vault rows retain rolled quality. Sort on every field
+  // that can affect the discovery marks, rather than on JSON serialization
+  // whose nested key order differs after a Postgres jsonb round trip.
+  for (const slot of [...meta.vault.special].sort((a, b) => {
+    const ak = `${a.itemId}\u0000${a.instance?.rolled?.quality ?? ''}\u0000${a.craftedRecipeId ?? ''}`;
+    const bk = `${b.itemId}\u0000${b.instance?.rolled?.quality ?? ''}\u0000${b.craftedRecipeId ?? ''}`;
+    return ak < bk ? -1 : ak > bk ? 1 : 0;
+  })) {
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
+  }
+  // Sorted for the same reason: meta.equipment is rebuilt by spreading the save
+  // blob, so its key order is jsonb-hostage too.
+  for (const [slot, itemId] of (
+    Object.entries(meta.equipment) as [EquipSlot, string | undefined][]
+  ).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
     if (itemId)
       markItemDiscovered(
         ctx,
@@ -1227,6 +1269,11 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
       );
   }
   for (const bagId of meta.bags) {
+    if (bagId) markItemDiscovered(ctx, meta, bagId, undefined, RETRO_SEED);
+  }
+  // Bank socket bags (phase 06): a persisted container position like the
+  // carried sockets above, so a bag parked in the bank still seeds discovery.
+  for (const bagId of meta.bank.socketBags) {
     if (bagId) markItemDiscovered(ctx, meta, bagId, undefined, RETRO_SEED);
   }
   for (const slot of meta.vendorBuyback) {
@@ -1813,126 +1860,12 @@ export function onArenaMatchEndForDeeds(
 }
 
 // ---------------------------------------------------------------------------
-// Vale Cup sites
+// Vale Cup sites: REMOVED with the minigame (the New Eastbrook program,
+// docs/design/eastbrook-revamp/master-plan.md). The vale cup deed CATALOG
+// rows stay retired-in-place: their meters persist on PlayerMeta and the
+// meter map below keeps historical progress readable, but no live site
+// grants them anymore.
 // ---------------------------------------------------------------------------
-
-// The Cup match shape the deed sites read. Kept structural (vale_cup.ts owns
-// the real VcMatch) so this module never imports the cup module.
-export interface CupMatchForDeeds {
-  id: number;
-  bracket: number;
-  rated: boolean;
-  golden: boolean;
-  scoreA: number;
-  scoreB: number;
-  teamA: number[];
-  teamB: number[];
-  roles: Record<number, string>;
-  benched: Set<number>;
-  practice: unknown | null;
-}
-
-// Personal outcomes count only in QUEUED bouts (rated or bot-backfilled);
-// practice bouts and offline-staged bouts never count for any Cup deed.
-function cupQueuedBout(match: CupMatchForDeeds): boolean {
-  return match.practice === null;
-}
-
-/** A personal ball touch (kick, grip, trap, or dribble nudge). Feeds the
- *  Chronicle debut immediately and the per-match memory pvp_vcup_first_match
- *  reads at full time. Backfill bots are real PlayerMeta players, so they are
- *  skipped explicitly (a bot must never accrue deed state). */
-export function onCupTouchForDeeds(ctx: SimContext, match: CupMatchForDeeds, pid: number): void {
-  if (!cupQueuedBout(match)) return;
-  if (ctx.vcup.botPids.includes(pid)) return;
-  let touched = ctx.deedRuntime.cupTouched.get(match.id);
-  if (!touched) {
-    touched = new Set();
-    ctx.deedRuntime.cupTouched.set(match.id, touched);
-  }
-  touched.add(pid);
-  const meta = ctx.players.get(pid);
-  if (meta) grantDeed(ctx, meta, 'chr_vale_cup_debut');
-}
-
-/** A goal was scored by `team`; resolve the scoring pid exactly like the
- *  scorer-name banner (last kicker within the kick window, else last
- *  toucher; an own goal never credits an opponent). Rated matches only. */
-export function onCupGoalForDeeds(
-  ctx: SimContext,
-  match: CupMatchForDeeds,
-  _team: 'A' | 'B',
-  scorerPid: number | null,
-): void {
-  if (!match.rated || scorerPid === null) return;
-  const meta = ctx.players.get(scorerPid);
-  if (!meta) return;
-  grantDeed(ctx, meta, 'pvp_vcup_first_goal');
-  if (match.golden) grantDeed(ctx, meta, 'pvp_vcup_golden_goal');
-  if (match.bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET) {
-    let goals = ctx.deedRuntime.cupGoals.get(match.id);
-    if (!goals) {
-      goals = new Map();
-      ctx.deedRuntime.cupGoals.set(match.id, goals);
-    }
-    const n = (goals.get(scorerPid) ?? 0) + 1;
-    goals.set(scorerPid, n);
-    if (n >= 3) grantDeed(ctx, meta, 'pvp_vcup_hat_trick');
-  }
-}
-
-/** A keeper save (shot at or above the save speed floor), rated only. The
- *  description also promises the 3v3 bracket or larger; today that holds
- *  emergently (normalizeRole seats no small-bracket keeper), so the explicit
- *  gate enforces the published rule rather than inferring it. */
-export function onCupSaveForDeeds(
-  ctx: SimContext,
-  match: CupMatchForDeeds,
-  keeperPid: number,
-): void {
-  if (!match.rated || match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
-  const meta = ctx.players.get(keeperPid);
-  if (meta) grantDeed(ctx, meta, 'pvp_vcup_first_save');
-}
-
-/** Standing applied for one pid inside the rated result loop: the win meters
- *  move here, and a winning keeper with a clean sheet earns it now (roles and
- *  scores are final; the meta is still seated). */
-export function onCupStandingForDeeds(
-  ctx: SimContext,
-  match: CupMatchForDeeds,
-  pid: number,
-  team: 'A' | 'B',
-  winner: 'A' | 'B' | null,
-): void {
-  // The Cup win meters moved in the caller's standing loop: full pass.
-  markDeedsDirty(ctx, pid);
-  if (winner !== team) return;
-  // Clean sheet promises the 3v3 bracket or larger, like the save deed above:
-  // enforce the published rule directly instead of leaning on normalizeRole.
-  if (match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
-  if (match.roles[pid] !== 'keeper' || match.benched.has(pid)) return;
-  const opposingScore = team === 'A' ? match.scoreB : match.scoreA;
-  if (opposingScore !== 0) return;
-  const meta = ctx.players.get(pid);
-  if (meta) grantDeed(ctx, meta, 'pvp_vcup_clean_sheet');
-}
-
-/** Full time: seeing the match out seated with a personal touch earns the
- *  debut match deed (bot-backfilled queued bouts count for this debut only).
- *  Also drops the per-match memory. */
-export function onCupMatchEndForDeeds(ctx: SimContext, match: CupMatchForDeeds): void {
-  const touched = ctx.deedRuntime.cupTouched.get(match.id);
-  if (cupQueuedBout(match) && touched) {
-    for (const pid of [...match.teamA, ...match.teamB]) {
-      if (match.benched.has(pid) || !touched.has(pid)) continue;
-      const meta = ctx.players.get(pid);
-      if (meta) grantDeed(ctx, meta, 'pvp_vcup_first_match');
-    }
-  }
-  ctx.deedRuntime.cupTouched.delete(match.id);
-  ctx.deedRuntime.cupGoals.delete(match.id);
-}
 
 // ---------------------------------------------------------------------------
 // Delve sites

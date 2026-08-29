@@ -90,8 +90,6 @@ export interface MobileActionRingDeps {
   takeSuppressedClick(): boolean;
   castSlot(slot: number): void;
   cyclePage(): void;
-  /** The sport ability that replaces Attack during a Vale Cup match. */
-  firstSportAbility(): ActionBarAbility | null;
   activateFixedAttackSlot(): void;
   attackNearest: (() => void) | null;
   attackTapState(): { autoAttack: boolean; hasLiveHostileTarget: boolean };
@@ -221,9 +219,9 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
       slots: [
         {
           slotIndex: 0,
-          isAttack: () => deps.firstSportAbility() === null,
-          hasAction: () => deps.firstSportAbility() !== null,
-          ability: () => deps.firstSportAbility(),
+          isAttack: () => true,
+          hasAction: () => false,
+          ability: () => null,
           item: () => null,
           keybindLabel: () => '',
         },
@@ -292,11 +290,6 @@ function wireAttackButton(attackBtn: HTMLButtonElement, deps: MobileActionRingDe
     deps.consumePeekGuard();
     deps.hideTooltip();
     audio.click();
-    if (deps.firstSportAbility()) {
-      deps.activateFixedAttackSlot();
-      attackBtn.blur();
-      return;
-    }
     handleMobileAttackTap(deps.attackTapState(), {
       activateAttack: () => deps.activateFixedAttackSlot(),
       attackNearest: deps.attackNearest,

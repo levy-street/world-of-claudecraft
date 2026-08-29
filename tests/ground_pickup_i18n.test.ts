@@ -88,11 +88,12 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 85 distinct lines with groundPickup.* keys', () => {
+  it('covers 89 distinct lines with groundPickup.* keys', () => {
     // 42 through the Veiled Hollow merge, plus 40 (20 deny/enough pairs) from
     // the new-realm quest pass, plus the murloc hut pair from the quest-dedupe
-    // pass and the item-agnostic already-credited refusal.
-    expect(GROUND_PICKUP_KEYS.length).toBe(85);
+    // pass and the item-agnostic already-credited refusal, plus the tutorial
+    // island's castaway crate pair.
+    expect(GROUND_PICKUP_KEYS.length).toBe(89);
   });
 
   it('recognizes the already-credited refusal via the EXACT matcher', () => {

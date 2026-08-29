@@ -19,6 +19,7 @@ const facts = (over: Partial<BankBonusFacts> = {}): BankBonusFacts => ({
   discordLinked: false,
   walletLinked: false,
   qualifiedReferrals: 0,
+  characterCount: 1,
   ...over,
 });
 

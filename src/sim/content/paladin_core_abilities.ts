@@ -70,7 +70,15 @@ const common: AbilityDef[] = [
     id: 'hammer_of_grace',
     name: 'Hammer of Grace',
     class: 'paladin',
-    learnLevel: 3,
+    // Level 1, not 3: a paladin was the ONE class that reached the Proving
+    // Shore's effigy yard with no offensive press at all. Their level-1 kit
+    // was Mending Light (a heal) and Divine Ascension, which needs 20
+    // Devotion that only healing generates, so the bar's other button did
+    // nothing when a new player pressed it. Vowkeeper Strike is Protection
+    // only and Crusader Strike is level 10, which left this, already
+    // spec-free, free to cast and ranked from here, as the honest fix. Its
+    // numbers are untouched; the change is two levels of availability.
+    learnLevel: 1,
     cost: 0,
     castTime: 0,
     cooldown: 7,

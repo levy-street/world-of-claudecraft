@@ -99,6 +99,25 @@ function walletConnectionSupported({ distribution }) {
   return distribution === 'website';
 }
 
+// Whether the $WOC Exchange may surface in this shell: website distribution
+// only, and deliberately STRICTER than resolveDistribution. That resolver
+// collapses a missing or invalid stamp to 'website' so a half-stamped build
+// still launches on the safe updater channel; for the Exchange the safe
+// answer is the opposite (tradeable-token UI must never appear in a Steam or
+// Epic build), so only an EXPLICIT website verdict counts: a packaged build
+// must carry a literal 'website' stamp, an unpackaged checkout must name the
+// channel via WOC_DISTRIBUTION=website, and anything else (absent, unknown,
+// tampered, a store stamp) answers false. As with the updater there is no
+// env escape hatch on packaged builds. Accepted residual, same as the other
+// stances here: an attacker with full local control can run the bundle
+// unpackaged with the env set, which only surfaces UI; the server's
+// WOC_MARKET_ENABLED gate and the player's own wallet signature stay the
+// real authority.
+function wocExchangeSupported({ packagedMetadata, env, isPackaged } = {}) {
+  if (isPackaged === true) return packagedMetadata?.wocDesktop?.distribution === 'website';
+  return env?.WOC_DISTRIBUTION === 'website';
+}
+
 // One-call summary used by electron/main.cjs at startup. updateChannel is a
 // pure function of the resolved apiOrigin (electron/update_guard.cjs): there
 // is deliberately no stamp and no env hatch for it, so a build baked with a
@@ -110,6 +129,7 @@ function resolveDesktopConfig({ packagedMetadata, env, isPackaged } = {}) {
   return {
     distribution,
     updaterEnabled: updaterAllowed({ distribution, isPackaged }),
+    wocExchangeEnabled: wocExchangeSupported({ packagedMetadata, env, isPackaged }),
     crashSubmitUrl: resolveCrashSubmitUrl({ packagedMetadata, env, isPackaged }),
     updateChannel: updateChannelForOrigin(origins.apiOrigin),
     ...origins,
@@ -122,5 +142,6 @@ module.exports = {
   resolveDesktopOrigins,
   updaterAllowed,
   walletConnectionSupported,
+  wocExchangeSupported,
   resolveDesktopConfig,
 };
