@@ -8,10 +8,12 @@ The measured pass for masterwrought R5, the packet's defining gate:
 > clear difficulty is the protected asset.
 > (`docs/prd/masterwrought/state.md`, locked ruling 5.)
 
-Everything needed to reproduce every number is in this file: the model, the kit,
-the baseline, the constants, the targets, the fixtures, and the arithmetic. No
-number here is quoted from another document. The fight harness itself is
-committed as `scripts/r5_envelope_probe.ts`; section 9.1 names the invocation.
+The model, the kit, the baseline, the constants, the targets, the fixture and the
+arithmetic are all in this file, and no number here is quoted from another
+document. The two things a reader must RUN rather than read are named where they
+are used: the fight harness, committed as `scripts/r5_envelope_probe.ts` (section
+9.1 gives the invocation), and the catalog read behind section 12's reagent-cost
+column (section 12.3 defines it).
 
 ## Verdict
 
@@ -793,8 +795,10 @@ and start at the craft's own lowest `skillReq`.
 - **The qr-GRAY row's own claim is false as literally written.** It says the
   cheapest path to any skill number is always bulk-spamming low recipes. Measured
   in reagent value, the tier-0 spam path is DEARER than the intended path for 8
-  of the 10 crafts (only leatherworking and inscription come out cheaper), and it
-  costs three times the crafts. The gray grind is real; its lever is not the
+  of the 10 crafts (only leatherworking and inscription come out cheaper), and on
+  the eight crafts with a tier-0 row it costs three times the crafts (alchemy 2.5
+  times, enchanting 1.5, both because their columns do not start at the same
+  place the other eight do). The gray grind is real; its lever is not the
   floor. The genuinely cheapest path in materials is **the lowest reagent cost
   per skill point among the recipes that still pay**, which in practice means
   staying one or two tiers under the band rather than at the floor. It beats the
