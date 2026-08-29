@@ -19,10 +19,13 @@
 // pass, not in the suite; what the Phase 15 QA added for them is (a) the
 // dress-only furyBody readout, which pins the ESCALATION'S MECHANISM (the
 // dead 355 hit, the equipped arm's hit-to-crit conversion) without a fight,
-// and (b) one single-seed smoke per lane, floored far under the measured
-// value, so a dead rotation or a renamed ability reds instead of no-opping.
+// and (b) one single-seed smoke per lane, floored between the measured
+// dead-rotation and live values, so a dead or gutted rotation reds (a single
+// renamed ability among several is not guaranteed to; the smoke arm's own
+// comment carries the measured margins).
 import { describe, expect, it } from 'vitest';
 import {
+  CASTER_APEX_CHEST_DELTA,
   CHEST_STA_STEP_PERFECTED,
   CHEST_STA_STEP_PLATE,
   casterLane,
@@ -35,6 +38,7 @@ import {
   TANK_KIT_DELTA,
   TANK_KIT_ITEMS,
   tankBody,
+  WAR_EQUIPPED_DELTA,
   WAR_EQUIPPED_ITEMS,
   WEAPON_INT_STEP,
   WEAPON_STR_STEP,
@@ -58,13 +62,16 @@ describe('the R5 envelope harness', () => {
     expect(SRIFT_TARGET.armor).toBe(1294);
     // The WELD to the live tables (the Phase 15 QA: the probe used to bake the
     // level and multiplier as literals while this arm's title claimed a live
-    // derivation). The probe now reads these rows; pinning them HERE too means
-    // a tuning retune reds this suite and forces a re-measure, the correct
-    // failure, instead of silently moving the record's targets.
+    // derivation). The probe now reads these rows, so the pins here are
+    // LITERALS on the rows themselves, never row-vs-target comparisons (the
+    // probe builds the target FROM the row, which would make those
+    // self-comparisons): a tuning retune reds this suite and forces a
+    // re-measure, the correct failure, instead of silently moving the
+    // record's targets.
     const heroicRow = HEROIC_DUNGEON_TUNING.nythraxis_boss_arena;
-    expect(heroicRow?.level, 'the boss-arena tuning row level').toBe(HEROIC_TARGET.level);
+    expect(heroicRow?.level, 'the boss-arena tuning row level').toBe(22);
     expect(heroicRow?.armorMultiplier, 'the boss-arena armour multiplier').toBe(1.2);
-    expect(RIFT_S_LEVEL, 'the S rift level').toBe(SRIFT_TARGET.level);
+    expect(RIFT_S_LEVEL, 'the S rift level').toBe(23);
     expect(RIFT_HEROIC_TUNING.S?.armorMultiplier, 'the S rank armour multiplier').toBe(1.4);
     // The mitigation the record prints, to the same two decimals.
     expect((armorReduction(HEROIC_TARGET.armor, 20) * 100).toFixed(2)).toBe('33.50');
@@ -174,8 +181,11 @@ describe('the R5 envelope harness', () => {
     }
 
     // The probe's DERIVED step constants, pinned both ways (the Phase 15 QA):
-    // to the def relation each derives, so re-baking one as a literal in the
-    // probe reds here, and to its literal, so a def move reds here too.
+    // to the def relation each derives and to its literal. A def move reds
+    // both pins immediately; a re-baked literal in the probe is caught the
+    // moment a def moves (today it would equal the derivation, so the re-bake
+    // itself does not red; the harmful END STATE, a stale baked step after a
+    // def move, is what these pins refuse).
     const steps: Array<[string, number, number, string, string, string]> = [
       [
         'weapon str',
@@ -254,15 +264,46 @@ describe('the R5 envelope harness', () => {
     expect(TANK_KIT_DELTA.chest, 'the chest delta is the plate enchant step').toEqual({
       sta: CHEST_STA_STEP_PLATE,
     });
+
+    // The SAME weld for the other two item-swapping arms (the round-2 reader:
+    // welding only the tank kit left the fury equipped and caster apexChest
+    // Perfecting components as unwelded hand literals, the exact drift class
+    // this file exists to refuse). Enchant-step entries are excluded: they are
+    // welded to the derived constants above.
+    const perfectingPart = (id: string): Record<string, number> => {
+      const recipe = ALL_RECIPES.find((r) => r.resultItemId === id);
+      expect(recipe, `${id} has an apex recipe`).toBeTruthy();
+      const bonusStats = perfectedBonusStats(ITEMS[id] as ItemDef, recipe as { level: number });
+      return Object.fromEntries(
+        Object.entries(bonusStats ?? {}).filter(([, v]) => (v as number) !== 0),
+      ) as Record<string, number>;
+    };
+    expect(perfectingPart('forgefold_legguards'), 'fury equipped legs delta').toEqual(
+      WAR_EQUIPPED_DELTA.legs,
+    );
+    expect(perfectingPart('warhewn_signet'), 'fury equipped ring2 delta').toEqual(
+      WAR_EQUIPPED_DELTA.ring2,
+    );
+    const casterChest = { ...CASTER_APEX_CHEST_DELTA.chest } as Record<string, number>;
+    delete casterChest.sta; // the enchant step rides the same slot entry
+    expect(perfectingPart('sunspun_vestments'), 'caster apex chest delta').toEqual(casterChest);
+    expect(
+      CASTER_APEX_CHEST_DELTA.chest?.sta,
+      'the caster chest sta entry is the Perfected enchant step',
+    ).toBe(CHEST_STA_STEP_PERFECTED);
   });
 
-  it('smokes each throughput lane on one seed so a dead rotation reds', () => {
-    // Floors sit far under the measured values (fury 183, rogue 198, caster
-    // 91 at these exact inputs) but far above what a no-op rotation reaches,
-    // so a renamed ability or a broken cast path fails here while ordinary
-    // sim tuning stays green.
-    expect(furyLane(4242, 'full', 22, 1058), 'fury').toBeGreaterThan(100);
-    expect(rogueLane(4242, 'combat', 'full', 22, 1058), 'rogue').toBeGreaterThan(100);
+  it('smokes each throughput lane on one seed so a dead or gutted rotation reds', () => {
+    // Floors sit between the measured DEAD-rotation values (fury 65.5, rogue
+    // 96.9, caster 0 when the rotation is a no-op with auto-attack still on)
+    // and the live values (fury 183, rogue 198, caster 91 at these exact
+    // inputs). A dead or gutted rotation reds; a SINGLE renamed ability among
+    // several is not guaranteed to (castAbility no-ops silently on an unknown
+    // id, e.g. renaming only bloodthirst measures 134, above the fury floor),
+    // and ordinary sim tuning stays green. Durations are explicit so an
+    // ambient WOC_R5_SECONDS cannot change what this arm measures.
+    expect(furyLane(4242, 'full', 22, 1058, 180), 'fury').toBeGreaterThan(100);
+    expect(rogueLane(4242, 'combat', 'full', 22, 1058, 180), 'rogue').toBeGreaterThan(150);
     expect(casterLane(4242, 'full', 22, 1058, 60), 'caster').toBeGreaterThan(40);
   });
 });

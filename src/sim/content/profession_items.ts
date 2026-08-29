@@ -1178,11 +1178,14 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // has ever had (every pre-packet elixir and scroll is stamina), and its
   // whole magnitude lands as new throughput with nothing to net it off. The
   // measured pass (docs/prd/masterwrought/power-verification.md) read the
-  // full kit at 5.86 / 6.08 percent on the highest-throughput physical spec
-  // with the flask at 15; at 13 the central estimate is inside the 5 percent
-  // envelope with an interval that straddles the line, and the R5 verdict is
-  // SUSPENDED pending the gear-term ruling (that file's Verdict and section
-  // 9.6), so 13 is a conservative margin rather than a proven crossing. The
+  // full kit at 5.86 / 6.08 percent with every value up; with the other three
+  // tunes applied and the flask still at 15 it read 5.1 to 5.3 on fury, the
+  // number this 15-to-13 trim was sized against (a 2-stat trim buys 0.26 to
+  // 0.36 points by 8.3's own sensitivity); at 13 the central estimate is
+  // inside the 5 percent envelope with an interval that straddles the line,
+  // and the R5 verdict is SUSPENDED pending the section 3 and 8.1 rulings
+  // (that file's Verdict and section 9.6), so 13 is a conservative margin
+  // rather than a proven crossing. The
   // value is ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract
   // and the packet's own record names flask 15 as the first tune-down knob.
   // 13 is still strictly above the elixir ceiling of 12, which is what keeps

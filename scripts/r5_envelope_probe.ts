@@ -121,12 +121,29 @@ export const CHEST_STA_STEP_PLATE =
 
 const SEED_COUNT = Number(process.env.WOC_R5_SEEDS ?? 25);
 const SECONDS = Number(process.env.WOC_R5_SECONDS ?? 180);
+// The always-on consumable premise breaks before the plate's 900 s duration:
+// auras are applied once at dress time and never refreshed, and the rogue lane
+// burns a 2 s poison-prep window before its fight starts, so the guard sits at
+// 897 and lives HERE, at the parse site, so every consumer inherits it (the
+// exported lanes included, not just main()). Re-apply the auras inside act()
+// before raising it.
+if (SECONDS > 897) {
+  throw new Error('WOC_R5_SECONDS above 897 breaks the always-on consumable premise');
+}
 // WOC_R5_ARMS restricts which kit arms run, for a PRECISION pass on one number
 // rather than the whole table. It gates all three THROUGHPUT lanes by each
 // arm's printed label; the tank lane always runs (deterministic, effectively
 // free). The baseline always runs (every delta is against it). Unset means
-// every arm, which is what the record's tables report.
+// every arm, which is what the record's tables report. An unknown label
+// throws: a typo used to silently drop every arm and print baseline-only rows,
+// the same silent-truncation class the SEEDS comment below refuses.
+const KNOWN_ARM_LABELS = ['gear', 'gear+ench', 'FULL', 'FULL+equipped', 'FULL+apexChest'];
 const WANTED_ARMS = (process.env.WOC_R5_ARMS ?? '').split(',').filter(Boolean);
+for (const label of WANTED_ARMS) {
+  if (!KNOWN_ARM_LABELS.includes(label)) {
+    throw new Error(`unknown WOC_R5_ARMS label ${label}; known: ${KNOWN_ARM_LABELS.join(', ')}`);
+  }
+}
 const WANT = (arm: string): boolean => WANTED_ARMS.length === 0 || WANTED_ARMS.includes(arm);
 // Never a SILENT truncation: WOC_R5_SEEDS above the curated list's length used
 // to slice down to it and print the smaller sample under the larger label. The
@@ -375,6 +392,7 @@ export function rogueLane(
   arm: Arm,
   level: number,
   armor: number,
+  seconds: number = SECONDS,
 ): number {
   laneArms('rogue', ['base', 'gear', 'ench', 'full'], arm);
   const sim = new Sim({
@@ -405,7 +423,7 @@ export function rogueLane(
   const t = inertTarget(sim, level, armor);
   s.startAutoAttack();
   return (
-    fight(sim, t, SECONDS, () => {
+    fight(sim, t, seconds, () => {
       const sndUp = p.auras.some((a) => a.kind === 'buff_haste' && a.id === 'slice_and_dice');
       if (!p.cooldowns.has('adrenaline_rush')) s.castAbility('adrenaline_rush');
       if (!p.cooldowns.has('flurry_of_knives')) s.castAbility('flurry_of_knives');
@@ -421,7 +439,7 @@ export function rogueLane(
       else if (p.comboPoints >= 5) {
         if (spec !== 'combat' || p.resource >= 70) s.castAbility('eviscerate');
       } else s.castAbility('sinister_strike');
-    }) / SECONDS
+    }) / seconds
   );
 }
 
@@ -461,11 +479,15 @@ const WAR_ENCH: SlotStats = {
 };
 // The gear term is the upper bound a strength archetype can reach with two
 // Perfected pieces (+1 lead stat each), applied to the highest-throughput
-// strength spec. A fury warrior's own best realisable pair is smaller: the
-// only mail or plate apex armour piece it can use is forgefold_legguards, and
-// the apex two-hander is a weapon-dps loss against deathless_greatblade.
-// The chest step is +3 rather than +6 because no mail or plate apex CHEST
-// ships, so enchant_lucent_infusion (requiresPerfected) is unreachable here.
+// strength spec. A fury warrior's own realisable pair is smaller:
+// forgefold_legguards is the only apex armour piece it can take without
+// giving up a primary-stat line (spiritweld_girdle and wardspeaker_sabatons
+// are also mail and class-free, but each trades the slot's strength for
+// caster primaries to buy the same rating conversion, and neither is
+// measured), and the apex two-hander is a weapon-dps loss against
+// deathless_greatblade. The chest step is +3 rather than +6 because no mail
+// or plate apex CHEST ships, so enchant_lucent_infusion (requiresPerfected)
+// is unreachable here.
 const WAR_GEAR: SlotStats = { legs: { str: 2 } };
 // THE EQUIPPED ARM, and it exists because the modelled term above is NOT the
 // upper bound section 8.1 claims on this lane. WAR_BIS carries 355 hit rating
@@ -475,14 +497,18 @@ const WAR_GEAR: SlotStats = { legs: { str: 2 } };
 // to 165 rating is DEAD. forgefold_legguards is a stat-and-armour identical
 // twin of the baseline legs except that its 40 HIT is 40 CRIT, so equipping
 // it converts dead rating into live rating, a gain "+2 lead stat" scores as
-// nothing. warhewn_signet is the second Perfected piece this arm equips (the
-// lane's best realisable pair). Both are swapped as ITEMS with their real
-// Perfecting bonuses, which is what a player would actually hold.
-export const WAR_EQUIPPED_ITEMS: Record<string, string> = {
+// nothing. warhewn_signet is the second piece of the pair this arm equips,
+// the phase's ARITHMETIC pick rather than a measured argmax: spiritweld_girdle
+// and wardspeaker_sabatons offer the same dead-hit-to-live-rating conversion
+// at the cost of a strength line and are unmeasured, which is one more reason
+// ruling 2's item-swap option needs its piece-choice rule measured, not
+// asserted. Both are swapped as ITEMS with their real Perfecting bonuses,
+// which is what a player would actually hold.
+export const WAR_EQUIPPED_ITEMS: Record<string, string> = Object.freeze({
   legs: 'forgefold_legguards',
   ring2: 'warhewn_signet',
-};
-const WAR_EQUIPPED_DELTA: SlotStats = {
+});
+export const WAR_EQUIPPED_DELTA: SlotStats = {
   legs: { str: 1 },
   ring2: { str: 1 },
   mainhand: { str: WEAPON_STR_STEP },
@@ -574,19 +600,25 @@ export function furyBody(arm: Arm): FuryBody {
   };
 }
 
-export function furyLane(seed: number, arm: Arm, level: number, armor: number): number {
+export function furyLane(
+  seed: number,
+  arm: Arm,
+  level: number,
+  armor: number,
+  seconds: number = SECONDS,
+): number {
   const { sim, s, p } = furyDress(seed, arm);
   const t = inertTarget(sim, level, armor);
   p.autoAttack = true;
   s.castAbility('battle_shout');
   const rotation = ['recklessness', 'red_harvest', 'bloodthirst', 'raging_gale', 'whirlwind'];
   return (
-    fight(sim, t, SECONDS, () => {
+    fight(sim, t, seconds, () => {
       for (const id of rotation) {
         if (id === 'red_harvest' && p.resource < 80) continue;
         s.castAbility(id);
       }
-    }) / SECONDS
+    }) / seconds
   );
 }
 
@@ -600,7 +632,8 @@ export function furyLane(seed: number, arm: Arm, level: number, armor: number): 
 // LEGENDARY mainhand heroic_deathless_heartwood, the one departure from the
 // epic-only baseline rule (a stronger denominator, so the caster rows read
 // LOWER, the safe direction; recorded in section 3).
-// Both arms drink sunpetal_mana_draught on cooldown. The framework forbids
+// Both arms drink sunpetal_mana_draught when mana falls below 45 percent of
+// max. The framework forbids
 // restoring a resource each tick, and this is not that: it is a real
 // consumable both arms carry.
 // ============================================================================
@@ -637,8 +670,10 @@ const CASTER_ENCH_D: SlotStats = {
 // CHEST, which breaks the Mournweave 3-piece but brings a 40-rating line and
 // unlocks the Perfected-only Lucent Infusion on that slot. Whether that is a
 // gain is not a thing to reason about; it is measured here.
-const CASTER_APEX_CHEST_ITEMS: Record<string, string> = { chest: 'sunspun_vestments' };
-const CASTER_APEX_CHEST_DELTA: SlotStats = {
+export const CASTER_APEX_CHEST_ITEMS: Record<string, string> = Object.freeze({
+  chest: 'sunspun_vestments',
+});
+export const CASTER_APEX_CHEST_DELTA: SlotStats = {
   chest: { int: 1, spi: 1, sta: CHEST_STA_STEP_PERFECTED },
   gloves: { int: 1 },
   mainhand: { int: WEAPON_INT_STEP },
@@ -704,8 +739,10 @@ export function casterLane(
 // This lane is the ONE that swaps ITEMS rather than adding a stat delta,
 // because its gear term is armour and stamina rather than a lead primary. Its
 // baseline is the max-effective-health pre-packet pick per slot; its kit swaps
-// in the only two apex pieces a protection warrior can wear (the shield and
-// the mail legs) and takes the Perfected bonus each carries. Its chest enchant
+// in the max-effective-health apex pair (the shield and the mail legs; the
+// other class-free apex mail, spiritweld_girdle and wardspeaker_sabatons,
+// trades stamina-bearing baseline pieces for caster primaries and strictly
+// lowers effective health) and takes the Perfected bonus each carries. Its chest enchant
 // step is +3, not +6: no mail or plate apex chest ships, so the Perfected-only
 // Lucent Infusion is unreachable for a plate wearer. Its flask REPLACES the
 // serpent elixir rather than riding beside it (same aura id, and the flask
@@ -740,10 +777,10 @@ const TANK_ENCH: SlotStats = {
   shoulder: { str: 2 },
   waist: { sta: 3 },
 };
-export const TANK_KIT_ITEMS: Record<string, string> = {
+export const TANK_KIT_ITEMS: Record<string, string> = Object.freeze({
   offhand: 'duskforged_bulwark',
   legs: 'forgefold_legguards',
-};
+});
 export const TANK_KIT_DELTA: SlotStats = {
   offhand: { str: 1, sta: 1 },
   legs: { str: 1 },
@@ -822,13 +859,6 @@ function row(name: string, base: number[], arms: Record<string, number[]>): void
 
 export function main(): void {
   const only = process.argv[2];
-  if (SECONDS > 900) {
-    // The always-on consumable premise breaks past the plate's 900 s duration
-    // (the flask holds to 1200): auras are applied once at dress time and
-    // never refreshed, so a longer fight quietly measures a kit that fell
-    // off mid-run. Re-apply the auras inside act() before raising this.
-    throw new Error('WOC_R5_SECONDS above 900 breaks the always-on consumable premise');
-  }
   console.log(
     `TARGETS ${HEROIC_TARGET.name} armor=${HEROIC_TARGET.armor} DR=${(armorReduction(HEROIC_TARGET.armor, 20) * 100).toFixed(2)}% | ` +
       `${SRIFT_TARGET.name} armor=${SRIFT_TARGET.armor} DR=${(armorReduction(SRIFT_TARGET.armor, 20) * 100).toFixed(2)}%`,

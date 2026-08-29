@@ -1248,6 +1248,27 @@ describe('apply enchant to WORN gear (in place)', () => {
     sim.equipItemToSlot(WORN_SWORD, 'offhand', pid);
     const before = sim.player.stats.str;
 
+    // The FORFEITED line first, the other arm of the same gate (the Phase 15
+    // QA): the offhand hand holding a mainhand-kind weapon REFUSES an
+    // offhand-slot enchant, because the gate compares the ITEM's declared
+    // slot, not the hand it sits in. Probed BEFORE any enchant lands so the
+    // copy is fresh: a broken gate here would APPLY the enchant and red on
+    // ok:true, not merely on a different deny reason (the round-2 mutation
+    // pass proved the after-the-fact probe killed only through the reason
+    // pin, via already_enchanted).
+    const refused = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      WORN_SWORD,
+      'enchant_offhand_stamina',
+      'offhand',
+    );
+    expect(refused.ok, 'an offhand enchant on a mainhand-kind weapon').toBe(false);
+    expect((refused as { reason?: string }).reason).toBe('wrong_slot');
+    expect(meta.equipmentInstance.offhand?.enchant, 'nothing landed on the fresh copy').toBe(
+      undefined,
+    );
+
     expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
     expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'offhand').ok).toBe(true);
     expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
@@ -1259,21 +1280,6 @@ describe('apply enchant to WORN gear (in place)', () => {
       sim.player.stats.str - before,
       'both payloads reach the derived stat book, so the term is 2x',
     ).toBe(bonus * 2);
-
-    // The FORFEITED line, the other arm of the same gate (the Phase 15 QA):
-    // the offhand hand holding a mainhand-kind weapon REFUSES an offhand-slot
-    // enchant, because the gate compares the ITEM's declared slot, not the
-    // hand it sits in. Without this, only the accepting arm of the either/or
-    // claim above was pinned.
-    const refused = resolveApplyEnchant(
-      sim.ctx,
-      pid,
-      WORN_SWORD,
-      'enchant_offhand_stamina',
-      'offhand',
-    );
-    expect(refused.ok, 'an offhand enchant on a mainhand-kind weapon').toBe(false);
-    expect((refused as { reason?: string }).reason).toBe('wrong_slot');
   });
 
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {

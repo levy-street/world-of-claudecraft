@@ -57,8 +57,12 @@ not rewrite on its own:
    The piece-choice rule for the item-swap option: the equipped arm is the
    throughput argmax over class-legal kits wearing at most
    `MASTERWROUGHT_EQUIP_CAP` flagged pieces (what a player optimises); under
-   it the caster arm equips the chest alone while the fury arm's two pieces
-   are forced. Note that the floors reading does not by itself close R5: an
+   it the caster arm equips the chest alone, and the fury pair must be
+   established by measurement rather than asserted: the phase's arithmetic
+   pick is `forgefold_legguards` plus `warhewn_signet`, but
+   `spiritweld_girdle` and `wardspeaker_sabatons` are class-free mail
+   offering the same dead-hit-to-live-rating conversion at the cost of a
+   strength line, and neither is measured. Note that the floors reading does not by itself close R5: an
    at-most bound cannot be verified from floors, so taking this arm means
    ratifying the modelled term as the R5 quantity and accepting on the record
    that the equipped kit moves the binding lane roughly twice the envelope.
@@ -499,9 +503,10 @@ than the others and a single default run would print a different fury row:
 
 `WOC_R5_SEEDS`, `WOC_R5_SECONDS` and `WOC_R5_ARMS` override the sample and
 restrict which kit arms run. The binding-row invocation's 60 seeds at 600 s is
-the recorded sample. At the post-ruling re-cut, either record the table at the
-documented invocation's sample or change the documented invocation to the
-recorded sample: the two must agree. Its constants (`HEROIC_TARGET`,
+the recorded sample, and the two now agree; keep the documented invocation and
+the recorded sample identical at the post-ruling re-cut. The fury gear and
+gear+ench cells predate the harness like the rest of the stale fury row; a
+re-cut takes them from the same command without `WOC_R5_ARMS`. Its constants (`HEROIC_TARGET`,
 `SRIFT_TARGET`, the baseline loadouts, the enchant maps, the kit deltas) are
 the section-3 and section-8 tables in executable form, and the enchant and
 consumable deltas are READ from the catalog rather than written as literals,
@@ -539,12 +544,14 @@ rating line or armour rather than a lead primary.
 
 > **STALE AGAINST THE COMMITTED HARNESS, and deliberately not refreshed.** The
 > fury and caster rows below predate `scripts/r5_envelope_probe.ts` and do not
-> reproduce from it. Measured at the stated samples, the harness gives fury
-> 4.55 / 5.76 at 60 seeds and 5.06 / 5.24 at 300 s, against the 4.94 / 4.50
-> printed here, and caster 4.90 / 4.93 / 4.74 / 4.63 against the 4.55 / 5.06 /
-> 4.58 / 4.75 printed here (the four caster figures re-measured from the
-> committed harness by the Phase 15 QA, 2026-08-29: the first capture predated
-> the final harness commits). Three causes, all now understood: the caster figures
+> reproduce from it. Measured from the committed harness (the Phase 15 QA,
+> 2026-08-29, both fury pairs at 600 s), fury reads 4.60 / 5.76 at 60 seeds
+> and 5.06 / 5.24 at 300 seeds, against the 4.94 / 4.50 printed here (the
+> first capture quoted 4.55 for the 60-seed heroic cell; that figure predated
+> the final harness commits, and the 300-seed pair reproduces exactly), and
+> caster reads 4.90 / 4.93 / 4.74 / 4.63 against the 4.55 / 5.06 / 4.58 /
+> 4.75 printed here (the four caster figures likewise re-measured; the first
+> capture's 4.92 and 4.75 predated the final harness commits). Three causes, all now understood: the caster figures
 > were taken at 10 seeds while this section claimed 25; the harness's first
 > version refilled the player's resource, which handed a fury warrior 100 rage
 > it must earn; and its error bars were computed unpaired on a paired design,
@@ -659,10 +666,13 @@ and stamina rather than a lead primary. Its inputs, all executable in
 - the pre-packet enchant set both arms carry: mainhand str 5, gloves str 3,
   shoulder and both rings str 2, helmet and legs sta 6, chest sta 7, waist and
   offhand sta 3, feet sta 2, neck spi 3;
-- the two Perfected pieces this arm equips (the lane's best realisable pair):
-  `duskforged_bulwark` in the offhand (Perfected `{str:1, sta:1}`) replacing
-  `heroic_bonewrought_bulwark`, and `forgefold_legguards` (Perfected `{str:1}`)
-  replacing `furyforged_legguards`;
+- the two Perfected pieces this arm equips (the max-effective-health pair:
+  the other class-free apex mail, `spiritweld_girdle` and
+  `wardspeaker_sabatons`, trades stamina-bearing baseline pieces for caster
+  primaries and strictly lowers effective health): `duskforged_bulwark` in the
+  offhand (Perfected `{str:1, sta:1}`) replacing `heroic_bonewrought_bulwark`,
+  and `forgefold_legguards` (Perfected `{str:1}`) replacing
+  `furyforged_legguards`;
 - a chest enchant step of +3, not +6: no mail or plate apex chest ships, so the
   Perfected-only Lucent Infusion is unreachable for a plate wearer;
 - `ironhusk_flask` REPLACING the serpent elixir rather than riding beside it.
@@ -724,8 +734,9 @@ piece" model scores as ZERO, because Perfecting moves primary stats only.
 
 **Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
 the only difference being whether the two Perfected pieces this arm equips
-(the lane's best realisable pair, `forgefold_legguards` and `warhewn_signet`)
-are applied as a stat delta or EQUIPPED as items:
+(the phase's arithmetic pick, `forgefold_legguards` and `warhewn_signet`; the
+Verdict's piece-choice note names the unmeasured alternates) are applied as a
+stat delta or EQUIPPED as items:
 
 | arm | heroic raid, L22 | S-rift, L23 |
 |---|---|---|

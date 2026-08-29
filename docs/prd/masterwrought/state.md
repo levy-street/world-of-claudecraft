@@ -20951,8 +20951,10 @@ standing sets are binding.
 STATUS: **BUILT AND ESCALATED, verdict SUSPENDED.** The phase ran the
 measured pass, applied four downward content tunes, and then its own fresh
 reader found that the R5 gear term measures a stat MODEL of the kit rather
-than the kit: on the physical lanes it is a LOWER bound, not the upper
-bound the record claimed. Modelled 4.97 / 5.27 percent on the binding
+than the kit: on the measured fury lane it is a LOWER bound, not the upper
+bound the record claimed (the rogue equipped arm is unmeasured; its
+baseline carries 190 hit, exactly the heroic need: the Phase 15 QA,
+2026-08-29). Modelled 4.97 / 5.27 percent on the binding
 lane against the same two Perfected pieces EQUIPPED at 10.42 / 10.21,
 against a 5 percent envelope. See "THE VERDICT IS SUSPENDED, and why" at
 the end of this ledger, and section 9.6 of
@@ -21080,19 +21082,23 @@ target that leaves combat regenerates, and the caster lane read 2.2 dps by
 hp delta against 72.7 by event sum on the same fight.
 
 Results, full kit over pre-packet raid BiS, heroic raid level 22 and
-S-rift level 23: rogue combat 3.28 / 3.22, assassination 3.78 / 3.86,
-subtlety 3.78 / 3.79; warrior fury 4.94 +/-0.96 and 4.50 +/-0.94 (60
-seeds, 600 s, the binding lane); caster 4.55 / 4.58 on the mana-stable
-60 s profile and 5.06 / 4.75 on the mana-bound 180 s one; tank effective
-health 4.28 / 4.27. Pre-tune the same fixtures read 5.86 / 6.08 on fury
-and 6.24 on tank EHP. Figures as measured by the phase's fixture: the fury
-and caster rows are marked STALE against the committed harness in
+S-rift level 23: rogue combat 3.28 / 3.22, assassination 3.79 / 3.86
+(the heroic cell corrected 3.78 to 3.79 by the Phase 15 QA, 2026-08-29,
+to the committed harness's deterministic output; the original was
+captured at an intermediate harness state), subtlety 3.78 / 3.79;
+warrior fury 4.94 +/-0.96 and 4.50 +/-0.94 (60 seeds, 600 s, the binding
+lane); caster 4.55 / 4.58 on the mana-stable 60 s profile and 5.06 /
+4.75 on the mana-bound 180 s one; tank effective health 4.28 / 4.27.
+Pre-tune the same fixtures read 5.86 / 6.08 on fury and 6.24 on tank
+EHP. Figures as measured by the phase's fixture: the fury and caster
+rows are marked STALE against the committed harness in
 power-verification.md section 9.2 and read as floors.
 
 Term by term the consumables are 2.4 to 3.5 points of it, the enchants
 0.4 to 1.5, and the gear 0.24 to 1.25: base apex adds no shelf height at
-all (every apex armour piece is a stat-and-armour twin of a same-slot
-ilvl-31 drop) and Perfecting puts at most +1 on the lead stat per piece.
+all (each of the nine wearable pieces is a stat-and-armour twin of a
+same-slot ilvl-31 drop; the shield ties the ilvl-33 raid shield) and
+Perfecting puts at most +1 on the lead stat per piece.
 
 ### JUDGED THIS PHASE, do not re-raise
 - The framework's stale tool table is a maintainer read, not a stopping-
@@ -21212,11 +21218,13 @@ re-derive. The harness is now COMMITTED as `scripts/r5_envelope_probe.ts`
 (73ef1d6c0c), runnable whole or per lane, with `WOC_R5_SEEDS` and
 `WOC_R5_SECONDS` overriding the sample. Its constants ARE sections 3 and
 8 in executable form. Reproduction is scoped (the Phase 15 QA, 2026-08-29):
-the rogue rows and the whole of section 9.5 reproduce exactly; the fury and
+the rogue rows and the whole of section 9.5 reproduce exactly (one
+hundredth-cell corrected, see THE MEASURED PASS above); the fury and
 caster rows are marked STALE against the committed harness in section 9.2
-and read as floors from a superseded fixture. The caster figures this ledger
-quotes (4.55 / 5.06 / 4.58 / 4.75) are that superseded fixture's; the
-committed harness reads 4.90 / 4.93 / 4.74 / 4.63 on the same four arms.
+and read as floors from a superseded fixture. The caster FULL figures this
+ledger quotes are that superseded fixture's; per arm, the committed
+harness reads 60 s heroic 4.90 (was 4.55), 180 s heroic 4.93 (was 5.06),
+60 s S-rift 4.74 (was 4.58), 180 s S-rift 4.63 (was 4.75).
 
 THE SECOND BLOCKING GAP, also closed by measurement. The caster gear term
 was modelled as "+2 lead-stat points" and never measured the loadout where
@@ -21256,12 +21264,13 @@ too", the twin of the caster arm beside it, reading `attackPower` off the
 stat book so an aura that rides without folding in cannot pass.
 
 THE POOL AMBIGUITY, the finding two readers raised independently. Section
-3 declared a legendary-inclusive baseline and then listed loadouts built
-by `bestEpicGearFor` (which filters `quality === 'epic'`) minus the
-flagged picks. (AMENDED 2026-08-29, the Phase 15 QA: "three loadouts
-containing no legendary" overstated; the caster's maintained set carries
-the LEGENDARY mainhand heroic_deathless_heartwood, a stronger denominator
-and so the safe direction, now stated in section 3.) The document states
+3 declared a legendary-inclusive baseline and then listed three loadouts
+containing no legendary, the two picker-built ones (rogue, fury) coming
+from `bestEpicGearFor` (which filters `quality === 'epic'`) minus the
+flagged picks. (AMENDED 2026-08-29, the Phase 15 QA: that "no legendary"
+reading itself overstated; the caster's maintained set carries the
+LEGENDARY mainhand heroic_deathless_heartwood, a stronger denominator and
+so the safe direction, now stated in section 3.) The document states
 the rule the loadouts actually follow, per arm, and says why it is the
 safe side: a legendary-inclusive denominator is STRONGER, so re-deriving
 with it moves every percentage DOWN. `heart_of_the_rift` at primary sum

@@ -155,18 +155,27 @@ describe('enchant table magnitude invariants', () => {
     expect(loadoutStack('agi', 'dualWield')).toBe(28);
     expect(loadoutStack('int', 'dualWield')).toBe(31);
     expect(loadoutStack('sta', 'dualWield')).toBe(30);
-    // The weapon rung is the whole difference, in the direction the envelope
-    // pays for: the dual-wield lead over the per-slot model IS one more copy
-    // of the best weapon enchant on that axis. ALL FOUR axes (the Phase 15
-    // QA: str and int alone left agi's positive lead and sta's NEGATIVE lead,
-    // trading enchant_offhand_stamina away for a second weapon, riding on the
-    // literals above with no relation behind them).
-    for (const axis of ['str', 'agi', 'sta', 'int'] as const) {
-      expect(
-        loadoutStack(axis, 'dualWield') - loadoutStack(axis, 'shieldOrHeld'),
-        `${axis}: the dual-wield lead is one extra weapon rung minus the offhand line`,
-      ).toBe(bestValue('mainhand', axis, () => true) - bestValue('offhand', axis, () => true));
-    }
+    // The per-axis dual-wield lead, pinned as LITERALS (the Phase 15 QA,
+    // round 2: a relation comparing loadoutStack's columns to
+    // bestValue(mainhand) - bestValue(offhand) is an algebraic identity of
+    // loadoutStack's own construction and can never red on a content change,
+    // proven by mutation). The leads: a second weapon rung on str and int, a
+    // second boot-adjacent weapon line on agi, and a NEGATIVE sta lead from
+    // trading enchant_offhand_stamina away for the second weapon.
+    const dwLead = (axis: 'str' | 'agi' | 'sta' | 'int'): number =>
+      loadoutStack(axis, 'dualWield') - loadoutStack(axis, 'shieldOrHeld');
+    expect(dwLead('str')).toBe(6);
+    expect(dwLead('agi')).toBe(2);
+    expect(dwLead('int')).toBe(6);
+    expect(dwLead('sta')).toBe(-3);
+    // The sta lead's two DIRECT def welds, bypassing the shared helper: the
+    // forfeited line is exactly enchant_offhand_stamina's own magnitude, and
+    // no mainhand enchant carries stamina to offset it.
+    expect(ENCHANTS.enchant_offhand_stamina.statBonus.sta, 'the forfeited offhand line').toBe(3);
+    expect(
+      bestValue('mainhand', 'sta', () => true),
+      'no mainhand stamina enchant exists',
+    ).toBe(0);
   });
 
   it('every Greater enchant beats the best base option on its slot and axis by at least 3', () => {
