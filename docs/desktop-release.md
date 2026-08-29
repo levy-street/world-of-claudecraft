@@ -160,7 +160,10 @@ game that never renders. Two separate answers, and keeping them separate is the 
 - `gpuBackendToAttempt`: the rung Auto starts on. ABSENT means the top rung, not the
   bottom one: a first launch is optimistic, and the rescue is what covers a machine
   that cannot follow.
-- `gpuBackendProof`: the certainty beside the guess. `{ backend, appVersion, gpuDriver }`,
+- `gpuBackendProof`: the certainty beside the guess. `{ backend, appVersion, gpuAdapter }`,
+  the adapter being the active GPU's `vendorId:deviceId` from `app.getGPUInfo` (the same on
+  every backend, where the ANGLE renderer string names the backend and would read one card
+  on OpenGL as another machine; empty reads as unknown, the same machine),
   written only by a HEALTHY session, absent meaning "no launch has ever succeeded here".
 - `consecutiveGpuLaunchCrashes`, `launchesSinceBackendReprobe`: the two counters below.
 
@@ -181,7 +184,12 @@ can ever spawn, with no counter to keep in step.
   change takes effect at the next launch.
 - `decideGpuBackendLaunch` picks the rung, first match wins: the rescue marker, then
   `WOC_GPU_BACKEND`, then `WOC_DISABLE_GPU_FORCE=1`, then an explicit setting, then the
-  Auto memory. An explicit setting neither reads nor writes the memory.
+  Auto memory. The launch carries `auto` (this launch belongs to the memory: no env
+  override, no `WOC_DISABLE_GPU_FORCE=1`, no explicit setting), `rescued` (a rescue
+  spawned it; it inherits `auto` from its chain) and `ladder` (Linux). Every memory write
+  in `main.cjs` is gated on those flags, never on the setting alone: the setting reads
+  Auto under every override, so `WOC_DISABLE_GPU_FORCE=1` used to demote the next
+  ordinary launch.
 - `judgeGpuBackendLaunch` answers the rung this launch ACTUALLY bound, from the WebGL
   renderer string the game reports over the preload bridge (`reportGpuRenderer`,
   channel `desktop-report-gpu-renderer`). On Linux `app.getGPUInfo('complete')` can
@@ -190,33 +198,53 @@ can ever spawn, with no counter to keep in step.
   when it carries evidence of its own (`hasGetGpuInfoEvidence`: Chromium's
   `softwareRendering` flag, or a non-empty renderer string); an empty reading logs
   `[gpu] backend: waiting for the renderer's report` and leaves the launch unjudged.
-  Judging is NOT remembering: a launch that bound something LOWER than it asked for is
-  rescued right now, whatever the mode, and only a healthy session writes the memory.
+  Judging is NOT remembering: a Vulkan launch that bound something that is NOT Vulkan
+  (`backendDidNotBind`, by family) is rescued right now, whatever the mode, and only a
+  healthy session writes the memory. A parallel-compile launch whose page reports the
+  extension absent is healthy Vulkan: no rescue, the memory just remembers `vulkan-plain`.
 - A session is HEALTHY once it has survived `SESSION_HEALTHY_AFTER_MS` (60 s) without a
   GPU-process death. The window is armed from the LAUNCH, not from the judgement, so a
   page that never reports its renderer cannot leave the session in "launch" state for
-  its whole life and have a late crash treated as a launch failure. On Auto, a healthy
-  session clears the crash streak, remembers its rung, and writes the proof when it
-  improves on the stored one or when the stored one describes another machine (a
-  different driver or app version).
-- A GPU-process death BEFORE that is a launch failure: on Auto the crash streak grows,
-  and `MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES` (3) consecutive ones step the guess down.
+  its whole life and have a late crash treated as a launch failure. On an Auto launch, a
+  healthy session clears the crash streak, remembers its rung, and writes the proof when
+  it improves on the stored one or when the stored one describes another machine (a
+  different adapter or app version). A RESCUED child gets the proof arm only: its
+  parent's death already counted, and letting the child write the attempt demoted Auto on
+  the very first death (through the child instead of the counter) and cleared the streak
+  the parent had just started, so the threshold could never be reached.
+- A GPU-process death BEFORE that is a launch failure: on an Auto parent (never a rescued
+  child) the crash streak grows, and `MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES` (3) consecutive
+  ones step the guess down, one count per process (the streak counts launches, not gone
+  events). A `clean-exit` (the shell's own quit inside the window) or a `killed` reason
+  (a kill from outside the process: the OS OOM killer, the shell's own shutdown) is not
+  a crash: nothing is counted and nothing is rescued, since no rung below answers either
+  and Chromium restarts the GPU process itself. A re-probe that dies above the remembered
+  rung counts nothing; its rescued child lands ON the remembered rung, and if that dies
+  too, that death counts (the rung compare in `demoteAfterRepeatedCrashes` is what tells
+  the two kinds of child apart).
   Three, not one: a single death is what a transient compositor or driver hiccup
   produces, and demoting on it walked healthy machines down to the slowest backend. The
   PROOF is never touched by a crash. A death AFTER a healthy session is the rare late
   crash: Chromium restarts the GPU process itself, and nothing is counted or written.
-- Auto climbs back on a cadence, and the proof is what sets it: with a valid proof,
-  every `REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES` (10) launches, aiming STRAIGHT at the
-  proven rung rather than one rung at a time; with none, every
-  `REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES` (50), one rung at a time. A machine that has
-  never run the higher rung is not worth a rescue relaunch every ten launches for life,
-  and one that has is. An app version the proof does not know re-opens the ladder at
+- Auto climbs back on a cadence, and the proof is what sets it: with a valid proof
+  ABOVE the remembered rung, every `REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES` (10) launches,
+  aiming STRAIGHT at the proven rung rather than one rung at a time; otherwise (no proof,
+  or one at or below the attempt, which is what a rescued child proving OpenGL leaves),
+  every `REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES` (50), one rung at a time. A machine that
+  has never run the higher rung is not worth a rescue relaunch every ten launches for
+  life, and one that has is. Only Auto parents advance the counter (a rescue chain is one
+  launch to the player). An app version the proof does not know re-opens the ladder at
   once.
 - Coming back to `auto` from an explicit setting clears the GUESS and the counters and
   starts detection over; the PROOF survives, because a session that ran healthy here
   still ran healthy here.
 - `WOC_GPU_BACKEND=vulkan|opengl` overrides the setting for that launch and is never
-  judged into the memory; `WOC_DISABLE_GPU_FORCE=1` disables the lever with the others.
+  judged into the memory; `WOC_DISABLE_GPU_FORCE=1` disables the lever with the others,
+  and is never remembered either.
+- The rescue hands the single-instance lock over once the child is spawned
+  (`app.releaseSingleInstanceLock`, through `relaunchOnLowerBackend`'s `onSpawned`,
+  never on a refused or failed spawn): a child requesting its own lock while the parent
+  still held it would see itself as a second instance and quit.
 
 ### What the player sees
 
@@ -236,18 +264,18 @@ on `desktop-gpu-backend-state` when the launch is judged.
 `[gpu] session healthy on <rung>; memory updated` or, on a death,
 `[gpu] GPU process gone at launch on <rung>` followed by the relaunch line.
 
-A machine stuck on the wrong backend: start the game with `WOC_GPU_BACKEND=opengl` in
-the environment, or quit and delete `desktop-prefs.json` (the defaults are `auto` with
-no memory at all, which is one fresh optimistic launch that self-corrects). In the dev
-loop (`npm run electron:dev`) a rescued launch takes the loop down once: the
-orchestrator tears Vite down when its Electron child exits, and the relaunched process
-is left against a dead dev server; the next `npm run electron:dev` reads the stepped-down
-memory. On a desktop whose NVIDIA card drives the screen next to an integrated GPU left
-enabled, the Linux PRIME hybrid detection (`isLinuxHybridGpu`) reads `boot_vga` and
-skips the offload; should any GPU lever still misfire in the dev loop, run it with
-`WOC_DISABLE_GPU_FORCE=1` (it skips the PRIME config in `scripts/electron-dev.mjs`
-and every GPU lever in the shell) and pick the backend with
-`WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
+A machine stuck on the wrong backend: start the game with `WOC_GPU_BACKEND=opengl` in the
+environment, or quit and delete `desktop-prefs.json` (the defaults are `auto` with no
+memory at all, which is one fresh optimistic launch that self-corrects). In the dev loop
+(`npm run electron:dev`) a rescued launch takes the loop down once: the orchestrator tears
+Vite down when its Electron child exits, and the relaunched process is left against a dead
+dev server and never judges; only the crash streak moved, so the next `npm run
+electron:dev` starts on the same rung until three such deaths in a row. On a desktop whose
+NVIDIA card drives the screen next to an integrated GPU left enabled, the Linux PRIME
+hybrid detection (`isLinuxHybridGpu`) reads `boot_vga` and skips the offload; should any
+GPU lever still misfire in the dev loop, run it with `WOC_DISABLE_GPU_FORCE=1` (it skips
+the PRIME config in `scripts/electron-dev.mjs` and every GPU lever in the shell) and pick
+the backend with `WOC_GPU_BACKEND=vulkan`, which wins over the rescue env.
 
 ## What the maintainer must provision (one-time)
 

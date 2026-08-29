@@ -58,6 +58,7 @@ const {
   MAX_FORWARDED_ERRORS,
   MAX_MIRRORED_CONSOLE_LINES,
   clampText,
+  classifyRendererExit,
   escapeNotificationMarkup,
   normalizeConsoleMessage,
   rendererErrorLogEntry,
@@ -75,13 +76,14 @@ const {
 } = require('./gpu_preference.cjs');
 const {
   GPU_BACKEND_SETTINGS,
+  activeGpuAdapterKey,
   applyGpuBackendSwitches,
+  backendDidNotBind,
   decideGpuBackendLaunch,
   demoteAfterRepeatedCrashes,
   gpuBackendMemoryAfterHealthySession,
   launchCounterAfterAutoLaunch,
   hasGetGpuInfoEvidence,
-  isHigherRung,
   judgeGpuBackendLaunch,
   relaunchOnLowerBackend,
   requestedBackendUnavailable,
@@ -282,8 +284,9 @@ const gpuBackendLaunch = decideGpuBackendLaunch({
 });
 applyGpuBackendSwitches(app, gpuBackendLaunch);
 log.info(`[gpu] backend launch: ${gpuBackendLaunch.rung} (${gpuBackendLaunch.reason})`);
-// The climb counter moves on every Auto launch, whether or not this one climbed, so the
-// cadence measures launches since the last ATTEMPT rather than since anything at all.
+// The climb counter moves on every Auto launch (never a rescued child, never an explicit
+// one), whether or not this launch climbed, so the cadence measures launches since the
+// last ATTEMPT rather than since anything at all.
 mergeDesktopPrefs(launchCounterAfterAutoLaunch({ prefs: desktopPrefs, launch: gpuBackendLaunch }));
 
 // Player-visible strings for main-process dialogs (crash recovery): the
@@ -1353,10 +1356,15 @@ ipcMain.handle('desktop-set-discord-presence-enabled', (event, enabled) => {
 // (electron/diagnostics.cjs); a malformed payload is dropped silently.
 let rendererErrorsLogged = 0;
 // The game's own WebGL renderer string (src/game/, sent once the game context exists).
-// Its one consumer is the pending Vulkan trial: getGPUInfo can leave glRenderer empty on
+// Its one consumer is the backend judgement: getGPUInfo can leave glRenderer empty on
 // a healthy Linux Vulkan session, so this is the usual verdict source. Strings only, and
 // never an empty one (no evidence, same as an empty getGPUInfo reading); a SwiftShader
-// string still judges failed through judgeVulkanLaunch. Nothing is answered.
+// string still judges as OpenGL through judgeGpuBackendLaunch. Nothing is answered.
+// This makes a page-reported string a LAUNCH-CONTROL input: a reading below the rung
+// asked for re-execs the shell onto the rung below (rescueOntoLowerBackend, app.exit).
+// The blast radius is bounded by construction: trusted senders only, judged once per
+// process, one rescue per process, and a chain capped by the rescue marker, so the
+// worst a hostile page could do is cost the player one relaunch onto a slower backend.
 ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => {
   if (!trustedSender(event)) return;
   if (typeof renderer !== 'string' || renderer === '') return;
@@ -1416,16 +1424,22 @@ if (!singleInstance) {
 // dev-channel diagnostics; the whitelisted verdict pushed on 'desktop-gpu-status' is the one
 // user-facing product of this flow (the renderer localizes it, see src/game/).
 let lastGpuRendererLog = '';
-// Judged once per process; the rung that actually bound, and the driver string it bound
-// with (the proof records both). `sessionHealthy` latches the moment the session has run
-// long enough for its rung to count as proven.
+// Judged once per process; the rung that actually bound, and the active adapter this
+// machine reports (the proof records both: the adapter is what tells "this machine" from
+// another one, and it reads the same on every backend where the renderer string does
+// not). `sessionHealthy` latches the moment the session has run long enough for its rung
+// to count as proven.
 let gpuBackendJudged = false;
 let boundRung = gpuBackendLaunch.rung;
-let boundGpuDriver = '';
+let boundGpuAdapter = '';
 let sessionHealthy = false;
 let healthySessionTimer = null;
 // One rescue per process, whichever trigger reaches it first.
 let gpuRescueSpawned = false;
+// One counted death per process: the GPU process can report gone more than once inside
+// the launch window (a refused rescue keeps this process alive through Chromium's own
+// restarts), and the streak counts LAUNCHES, not events.
+let gpuLaunchDeathCounted = false;
 
 // What this launch actually bound, judged ONCE per process from the first piece of real
 // evidence (a crash-recovery reload must not re-judge: the adapter it lands on is the
@@ -1440,7 +1454,10 @@ let gpuRescueSpawned = false;
 // speak; the MEMORY only moves once the session has proven healthy (below), so an explicit
 // choice is rescued without ever being second-guessed on disk.
 function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
-  if (gpuBackendJudged) return;
+  if (gpuBackendJudged) {
+    refineParallelCompile(parallelCompile);
+    return;
+  }
   gpuBackendJudged = true;
   boundRung = judgeGpuBackendLaunch({
     glRenderer,
@@ -1448,19 +1465,17 @@ function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
     parallel: gpuBackendLaunch.parallel,
     parallelCompile,
   });
-  // Capped here rather than at each caller: this value is written to disk, and
-  // the getGPUInfo arm hands it over uncapped.
-  boundGpuDriver = typeof glRenderer === 'string' ? glRenderer.slice(0, 256) : '';
   log.info(`[gpu] backend bound: ${boundRung} (asked for ${gpuBackendLaunch.rung})`, {
     glRenderer,
     softwareRendering,
     parallelCompile,
   });
   sendGpuBackendState();
-  if (!isHigherRung(gpuBackendLaunch.rung, boundRung)) return;
-  // It bound something LOWER than it asked for: the switches did not take. Step down for
-  // real rather than sit on a software rasterizer for the session. A reading that is not
-  // lower (the rung we asked for, or somehow a higher one) changes nothing.
+  if (!backendDidNotBind(gpuBackendLaunch.rung, boundRung)) return;
+  // A Vulkan rung bound something that is not Vulkan: the switches did not take. Step
+  // down for real rather than sit on a software rasterizer for the session. Vulkan
+  // without the parallel-compile feature is NOT this case (backendDidNotBind): the
+  // window is healthy, and the memory remembers the rung that bound.
   log.warn(`[gpu] ${gpuBackendLaunch.rung} did not bind; rescuing onto the rung below it`, {
     bound: boundRung,
   });
@@ -1468,17 +1483,43 @@ function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
 }
 
 /**
+ * The one reading the getGPUInfo arm cannot make: whether the page's context got the
+ * parallel-compile extension. When that arm judged first (it can win the race against
+ * the page's report), a top-rung launch was read as bound in full; the page's later
+ * report is the only evidence for the feature, so it may still lower the bound rung
+ * to plain Vulkan. A memory matter only (the healthy session then remembers the rung
+ * that really bound, and the options row says so); never a rescue, see
+ * backendDidNotBind.
+ */
+function refineParallelCompile(parallelCompile) {
+  if (parallelCompile !== false || boundRung !== 'vulkan-parallel-compile') return;
+  boundRung = 'vulkan-plain';
+  log.info('[gpu] backend bound refined: vulkan-plain (the page reports the extension absent)');
+  sendGpuBackendState();
+}
+
+/**
  * The one way this process rescues itself onto a lower rung. Three triggers can reach it
  * (the GPU process dying at launch, a judged lower binding, and a Vulkan rung that never
  * got a GPU at all), and they can overlap: a pending getGPUInfo promise resolving after a
  * death handler has already spawned would otherwise spawn a second child on the same rung.
- * Latched, so the first one wins and the rest are no-ops.
+ * Latched, so the first one wins and the rest are no-ops. Off the ladder (not Linux)
+ * there is nothing to rescue onto, so nothing is logged as a rescue either.
+ *
+ * The single-instance lock is handed over once the child is spawned (and only then):
+ * this process is about to exit, and a child that requested its own lock while the
+ * parent still held it would see itself as a second instance and quit. Not before the
+ * spawn: a spawn that throws keeps this process running, and it must keep its lock.
  */
 function rescueOntoLowerBackend(why) {
-  if (gpuRescueSpawned || sessionHealthy) return;
+  if (!gpuBackendLaunch.ladder || gpuRescueSpawned || sessionHealthy) return;
   gpuRescueSpawned = true;
   log.warn(`[gpu] rescuing off ${gpuBackendLaunch.rung}: ${why}`);
-  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);
+  const spawned = relaunchOnLowerBackend(
+    { log, onSpawned: () => app.releaseSingleInstanceLock() },
+    gpuBackendLaunch.rung,
+  );
+  if (spawned) app.exit(0);
   // No lower rung, a spent chain or a failed spawn: run on whatever we have rather than
   // leave the player with nothing.
 }
@@ -1493,9 +1534,10 @@ function rescueOntoLowerBackend(why) {
 // session in "launch" state for its whole life, and a GPU-process death three hours in
 // would be counted as a launch failure, demote the memory, and re-exec a live session out
 // from under the player. Writing the MEMORY still requires a judged rung, because an
-// unjudged one is not evidence of anything.
+// unjudged one is not evidence of anything. Off the ladder (not Linux) nothing is armed:
+// there is no memory to write and no launch failure to tell from a late crash.
 function armHealthySessionTimer() {
-  if (healthySessionTimer !== null || sessionHealthy) return;
+  if (!gpuBackendLaunch.ladder || healthySessionTimer !== null || sessionHealthy) return;
   healthySessionTimer = setTimeout(() => {
     healthySessionTimer = null;
     sessionHealthy = true;
@@ -1505,20 +1547,28 @@ function armHealthySessionTimer() {
       log.info('[gpu] session healthy, but the launch was never judged (memory untouched)');
       return;
     }
-    if (desktopPrefs.gpuBackend !== 'auto') {
-      // An explicit choice never writes the memory: explicit means the player decided,
-      // not that we learned something about the machine.
-      log.info(`[gpu] session healthy on ${boundRung} (explicit setting, memory untouched)`);
+    if (!gpuBackendLaunch.auto) {
+      // Only a launch the memory DECIDED writes it back. An explicit setting, an env
+      // override or the no-lever env are the player's (or the developer's) decision, not
+      // something learned about the machine: WOC_DISABLE_GPU_FORCE=1 must not demote the
+      // next ordinary launch. The launch's flag, never the setting alone: the setting
+      // says Auto under every override.
+      log.info(
+        `[gpu] session healthy on ${boundRung} (${gpuBackendLaunch.reason}, memory untouched)`,
+      );
       return;
     }
     const next = gpuBackendMemoryAfterHealthySession({
       prefs: desktopPrefs,
       rung: boundRung,
       appVersion: app.getVersion(),
-      gpuDriver: boundGpuDriver,
+      gpuAdapter: boundGpuAdapter,
+      rescued: gpuBackendLaunch.rescued,
     });
     if (mergeDesktopPrefs(next)) {
       log.info(`[gpu] session healthy on ${boundRung}; memory updated`, next);
+    } else {
+      log.info(`[gpu] session healthy on ${boundRung}; memory already says so`);
     }
   }, SESSION_HEALTHY_AFTER_MS);
   healthySessionTimer.unref?.();
@@ -1542,6 +1592,19 @@ app.whenReady().then(armHealthySessionTimer);
 app.on('child-process-gone', (_event, details) => {
   if (details?.type !== 'GPU') return;
   const context = { reason: details?.reason, exitCode: details?.exitCode };
+  // Off the ladder the shell has no rung to step to and no memory to move: the crash
+  // guard's own listener already logs every child gone, so this one stays quiet.
+  if (!gpuBackendLaunch.ladder) return;
+  // A clean exit is the process lifecycle (our own quit inside the launch window):
+  // counting it would spawn a rescue child at quit and walk the memory down on a
+  // player who only looked and left. A kill came from outside the process (the OS OOM
+  // killer, the shell's own shutdown): no rung below answers it, and Chromium restarts
+  // the GPU process on its own; logged at warn so a shipped build shows it.
+  if (classifyRendererExit(details?.reason) === 'benign') {
+    const level = details?.reason === 'killed' ? 'warn' : 'info';
+    log[level](`[gpu] GPU process gone (not a crash) on ${boundRung}`, context);
+    return;
+  }
   if (sessionHealthy) {
     log.warn(`[gpu] GPU process gone after a healthy session on ${boundRung}`, context);
     return;
@@ -1551,7 +1614,13 @@ app.on('child-process-gone', (_event, details) => {
     clearTimeout(healthySessionTimer);
     healthySessionTimer = null;
   }
-  if (desktopPrefs.gpuBackend === 'auto') {
+  // Only an Auto launch counts, and only a death ON the remembered rung moves the
+  // streak (demoteAfterRepeatedCrashes compares the rung with the attempt): a parent's
+  // death on the attempt counts, its rescued child runs a rung below and counts
+  // nothing more; a re-probe's death above the attempt counts nothing, and its
+  // rescued child, which lands ON the attempt, is then the one that counts.
+  if (gpuBackendLaunch.auto && !gpuLaunchDeathCounted) {
+    gpuLaunchDeathCounted = true;
     const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });
     if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next);
   }
@@ -1587,6 +1656,9 @@ function logGpuStatus() {
         log.warn('[gpu] GPU process reports softwareRendering: the game is on a CPU rasterizer');
       }
       const { devices, discreteInactive } = summarizeGpuDevices(info?.gpuDevice);
+      // The proof's machine key. Latched on the first reading that names an active
+      // adapter; a crash-recovery reload may report the same one again, or nothing.
+      if (boundGpuAdapter === '') boundGpuAdapter = activeGpuAdapterKey(devices);
       // Push the verdict BEFORE the log dedup below: the dedup exists only to keep the log
       // quiet, and after a crash-recovery reload the reading is usually identical, so a send
       // placed after it would never reach the freshly loaded page. This resolves async, so

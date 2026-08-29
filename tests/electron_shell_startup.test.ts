@@ -382,17 +382,34 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     const judgeEnd = code.indexOf('\n}', defAt);
     expect(judgeEnd).toBeGreaterThan(defAt);
     const judge = code.slice(defAt, judgeEnd).replace(/\s+/g, ' ');
-    expect(judge).toContain('if (gpuBackendJudged) return;');
+    // Judged once; a later report may only REFINE the parallel-compile reading
+    // (the getGPUInfo arm cannot see the extension and can judge first), never
+    // re-judge the rung or rescue.
+    expect(judge).toContain(
+      'if (gpuBackendJudged) { refineParallelCompile(parallelCompile); return; }',
+    );
     expect(judge).toContain('gpuBackendJudged = true;');
+    const refine = block('function refineParallelCompile(parallelCompile) {', '\n}', 'refine');
+    const refineFlat = refine.replace(/\s+/g, ' ');
+    expect(refineFlat).toContain(
+      "if (parallelCompile !== false || boundRung !== 'vulkan-parallel-compile') return;",
+    );
+    expect(refineFlat).toContain("boundRung = 'vulkan-plain';");
+    expect(refineFlat).toContain('sendGpuBackendState();');
+    expect(refine).not.toContain('rescueOntoLowerBackend(');
+    expect(refine).not.toContain('mergeDesktopPrefs');
     expect(count(code, 'gpuBackendJudged = true;')).toBe(1);
     expect(code.indexOf('let gpuBackendJudged = false;')).toBeLessThan(defAt);
     // The rung asked for and the page's extension report decide what bound.
     expect(judge).toContain(
       'boundRung = judgeGpuBackendLaunch({ glRenderer, softwareRendering, parallel: gpuBackendLaunch.parallel, parallelCompile, });',
     );
-    // ONLY a rung below the one asked for is a failure to enable it: a reading
-    // that is not lower changes nothing. `!==` would also fire on a higher one.
-    expect(judge).toContain('if (!isHigherRung(gpuBackendLaunch.rung, boundRung)) return;');
+    // ONLY a Vulkan rung that bound something that is not Vulkan is a failure to
+    // enable it (backendDidNotBind, by FAMILY). A rung compare would re-exec a
+    // healthy Vulkan window whose page reports the extension absent onto the
+    // backend it is already on; `!==` would also fire on a higher one.
+    expect(judge).toContain('if (!backendDidNotBind(gpuBackendLaunch.rung, boundRung)) return;');
+    expect(judge).not.toContain('isHigherRung(');
     expect(judge).not.toContain('boundRung === gpuBackendLaunch.rung');
     expect(judge).toContain('rescueOntoLowerBackend(`it bound ${boundRung} instead`);');
     // Judging is not remembering, and it is not mode-aware either: a rescue
@@ -405,12 +422,15 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // The page is told which rung actually bound; without this call the options
     // row would sit on its pre-judgement reading for the whole session.
     expect(judge).toContain('sendGpuBackendState();');
-    expect(count(code, 'sendGpuBackendState();')).toBe(1);
-    // The driver string the proof records comes from here, capped once for both
-    // evidence arms (the getGPUInfo one hands it over uncapped).
-    expect(judge).toContain(
-      "boundGpuDriver = typeof glRenderer === 'string' ? glRenderer.slice(0, 256) : '';",
-    );
+    expect(count(code, 'sendGpuBackendState();')).toBe(2);
+    // The proof's machine key is the active ADAPTER, never the renderer string:
+    // that string names the backend, so a rescue ending on OpenGL would read as
+    // another machine and replace a top-rung proof. Latched from getGPUInfo.
+    expect(judge).not.toContain('boundGpuDriver');
+    expect(code).not.toContain('boundGpuDriver');
+    expect(
+      count(code, "if (boundGpuAdapter === '') boundGpuAdapter = activeGpuAdapterKey(devices);"),
+    ).toBe(1);
     // The launch window is armed from the launch, never from here: a page that
     // never reports would otherwise leave the session in "launch" state for its
     // whole life, and a death hours in would re-exec it out from under the player.
@@ -452,7 +472,7 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(count(code, 'judgeThisLaunch(')).toBe(3);
   });
 
-  it('rescues a launch-time GPU death in EVERY mode, and counts one only on Auto', () => {
+  it('rescues a launch-time GPU death in EVERY mode, and counts one only on an Auto parent', () => {
     // The defect this replaces: an explicit choice had no rescue at all, so a
     // player who picked Vulkan on a machine that cannot run it was left on a
     // dead screen they could not click out of. The rescue is unconditional; the
@@ -463,12 +483,33 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(goneEnd).toBeGreaterThan(goneAt);
     const gone = code.slice(goneAt, goneEnd).replace(/\s+/g, ' ');
     expect(gone).toContain("if (details?.type !== 'GPU') return;");
+    // Off the ladder (Windows, macOS) there is no rung to step to and no memory
+    // to move; without this every platform logged "rescuing off opengl".
+    expect(gone).toContain('if (!gpuBackendLaunch.ladder) return;');
+    // A clean exit or a kill (our own quit inside the window) is lifecycle, not
+    // a launch failure: it must return BEFORE anything is counted or rescued.
+    expect(gone).toContain("if (classifyRendererExit(details?.reason) === 'benign') {");
+    expect(gone.indexOf("classifyRendererExit(details?.reason) === 'benign'")).toBeLessThan(
+      gone.indexOf('if (sessionHealthy) {'),
+    );
+    expect(gone).toContain(
+      'log[level](`[gpu] GPU process gone (not a crash) on ${boundRung}`, context); return; }',
+    );
     // After a healthy session it is the rare late crash: Chromium restarts the
     // GPU process itself, nothing is counted and nothing is written.
     expect(gone).toContain('if (sessionHealthy) {');
-    // Before that it is a launch failure: count it on Auto, then rescue whatever
-    // the mode. The rescue call carries no mode condition of its own.
-    expect(gone).toContain("if (desktopPrefs.gpuBackend === 'auto') {");
+    // Before that it is a launch failure: count it on an Auto launch (the
+    // launch's flag, never the setting, which says Auto under
+    // WOC_DISABLE_GPU_FORCE=1 and the env override too), once per process (the
+    // streak counts launches, not gone events), then rescue whatever the mode.
+    // No rescued-child guard here: demoteAfterRepeatedCrashes compares the rung
+    // with the attempt, which is what lets a re-probe's child, landing ON the
+    // attempt, count the remembered rung's failure.
+    expect(gone).toContain(
+      'if (gpuBackendLaunch.auto && !gpuLaunchDeathCounted) { gpuLaunchDeathCounted = true;',
+    );
+    expect(gone).not.toContain('gpuBackendLaunch.rescued');
+    expect(gone).not.toContain('desktopPrefs.gpuBackend');
     expect(gone).toContain(
       'const next = demoteAfterRepeatedCrashes({ prefs: desktopPrefs, rung: gpuBackendLaunch.rung });',
     );
@@ -498,13 +539,21 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // there is, and the shell already reads it.
     const rescue = block('function rescueOntoLowerBackend(why) {', '\n}', 'rescueOntoLowerBackend');
     const flat = rescue.replace(/\s+/g, ' ');
-    // Latched, and never after the session has proven healthy: a late crash is
-    // Chromium's to recover, not ours to re-exec a live session for.
-    expect(flat).toContain('if (gpuRescueSpawned || sessionHealthy) return;');
-    expect(flat).toContain('gpuRescueSpawned = true;');
+    // Latched, off the ladder never, and never after the session has proven
+    // healthy: a late crash is Chromium's to recover, not ours to re-exec a live
+    // session for.
     expect(flat).toContain(
-      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
+      'if (!gpuBackendLaunch.ladder || gpuRescueSpawned || sessionHealthy) return;',
     );
+    expect(flat).toContain('gpuRescueSpawned = true;');
+    // The single-instance lock is handed over once the child has spawned, through
+    // the module's onSpawned hook (never on a refused or failed spawn, which keep
+    // this process running): a child that requested its own lock while the parent
+    // still held it would see itself as a second instance and quit.
+    expect(flat).toContain(
+      'const spawned = relaunchOnLowerBackend( { log, onSpawned: () => app.releaseSingleInstanceLock() }, gpuBackendLaunch.rung, ); if (spawned) app.exit(0);',
+    );
+    expect(count(code, 'releaseSingleInstanceLock()')).toBe(1);
     // The spawn lives there and nowhere else, so no trigger can bypass the latch.
     expect(count(code, 'relaunchOnLowerBackend(')).toBe(1);
     expect(count(code, 'rescueOntoLowerBackend(')).toBe(4);
@@ -523,9 +572,11 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     const armEnd = code.indexOf('\n}', armAt);
     expect(armEnd).toBeGreaterThan(armAt);
     const arm = code.slice(armAt, armEnd).replace(/\s+/g, ' ');
-    // Armed once, on the shell's own clock, and a launch-time death disarms it
-    // (pinned in the death handler above).
-    expect(arm).toContain('if (healthySessionTimer !== null || sessionHealthy) return;');
+    // Armed once, on the shell's own clock, never off the ladder, and a
+    // launch-time death disarms it (pinned in the death handler above).
+    expect(arm).toContain(
+      'if (!gpuBackendLaunch.ladder || healthySessionTimer !== null || sessionHealthy) return;',
+    );
     // A session nobody judged is still HEALTHY (a death from here is late), but
     // it records nothing: an unjudged rung is not evidence of anything.
     expect(arm).toContain(
@@ -536,17 +587,21 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     );
     expect(arm).toContain('}, SESSION_HEALTHY_AFTER_MS);');
     expect(arm).toContain('sessionHealthy = true;');
-    // An explicit choice never writes the memory: explicit means the player
-    // decided, not that we learned something about the machine.
-    // The guard must RETURN: pinning its presence alone let a mutation that
-    // dropped the return (so an explicit choice DID write the memory) pass.
+    // Only a launch the memory DECIDED writes it back (the launch's `auto` flag,
+    // never the setting: the setting reads Auto under WOC_DISABLE_GPU_FORCE=1 and
+    // under the env override, and both used to be remembered). The guard must
+    // RETURN: pinning its presence alone let a mutation that dropped the return
+    // (so an explicit choice DID write the memory) pass.
     expect(arm).toContain(
-      "if (desktopPrefs.gpuBackend !== 'auto') { log.info(`[gpu] session healthy on ${boundRung} (explicit setting, memory untouched)`); return; }",
+      'if (!gpuBackendLaunch.auto) { log.info( `[gpu] session healthy on ${boundRung} (${gpuBackendLaunch.reason}, memory untouched)`, ); return; }',
     );
+    expect(arm).not.toContain('desktopPrefs.gpuBackend');
+    // The proof is keyed on the adapter, and a rescued child is told it is one so
+    // it writes the proof it earned and never the attempt or the streak.
     expect(arm).toContain(
-      'const next = gpuBackendMemoryAfterHealthySession({ prefs: desktopPrefs, rung: boundRung, appVersion: app.getVersion(), gpuDriver: boundGpuDriver, });',
+      'const next = gpuBackendMemoryAfterHealthySession({ prefs: desktopPrefs, rung: boundRung, appVersion: app.getVersion(), gpuAdapter: boundGpuAdapter, rescued: gpuBackendLaunch.rescued, });',
     );
-    const explicitAt = arm.indexOf("if (desktopPrefs.gpuBackend !== 'auto') {");
+    const explicitAt = arm.indexOf('if (!gpuBackendLaunch.auto) {');
     expect(arm.indexOf('gpuBackendMemoryAfterHealthySession(')).toBeGreaterThan(explicitAt);
     expect(count(code, 'gpuBackendMemoryAfterHealthySession(')).toBe(1);
     // The write itself, not only the computation: deleting the merge left every

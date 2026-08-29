@@ -136,18 +136,32 @@ function isHigherRung(rung, other) {
 }
 
 /**
- * The launch a rung describes: which switches, the rung itself for the judge, and
- * whether this launch is an Auto CLIMB (a rung above the remembered one, tried on the
- * cadence). The climb flag is what the launch counter keys off, so the counter measures
- * launches since the last attempt rather than launches since anything at all.
+ * The launch a rung describes: which switches, the rung itself for the judge, and four
+ * flags the shell keys its behavior off, so no caller has to parse `reason`:
+ * - `ladder`: the rungs apply at all (Linux). Off it, nothing is rescued, counted or
+ *   remembered, and a GPU-process death is only logged.
+ * - `auto`: this launch belongs to the Auto MEMORY: it reads it and, once judged, writes
+ *   it. False for every explicit input (the setting, WOC_GPU_BACKEND, the no-lever env),
+ *   which are never remembered: explicit means the player decided, not that we learned
+ *   something about the machine.
+ * - `rescued`: a rescue spawned this process. It inherits `auto` from the chain it
+ *   prolongs, but the ATTEMPT and the crash streak are the parent's to move: a rescued
+ *   child that runs healthy writes the proof it earned and nothing else, otherwise one
+ *   launch-time death would still walk Auto down a rung (through the child instead of
+ *   the counter).
+ * - `reprobed`: an Auto CLIMB (a rung above the remembered one, tried on the cadence);
+ *   what the launch counter resets on, so it measures launches since the last attempt.
  */
-function launchForRung(rung, reason, reprobed = false) {
+function launchForRung(rung, reason, flags = {}) {
   return {
     backend: rung === 'opengl' ? 'default' : 'vulkan',
     parallel: rung === 'vulkan-parallel-compile',
     rung,
-    reprobed,
+    reprobed: flags.reprobed === true,
     reason,
+    ladder: flags.ladder !== false,
+    auto: flags.auto === true,
+    rescued: flags.rescued === true,
   };
 }
 
@@ -175,10 +189,57 @@ function validProof(prefs, appVersion) {
  *   a periodic climb back up (see reprobe below).
  */
 function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
-  if (platform !== 'linux') return launchForRung('opengl', 'platform default');
+  if (platform !== 'linux') return launchForRung('opengl', 'platform default', { ladder: false });
   const environment = env ?? {};
+  const explicit = explicitGpuBackendLaunch(environment, prefs);
   const rescued = environment[GPU_BACKEND_RESCUE_ENV];
-  if (rungIndex(rescued) >= 0) return launchForRung(rescued, `rescued to ${rescued}`);
+  if (rungIndex(rescued) >= 0) {
+    // The chain's mode is decided by what the PARENT ran on; the marker only names the
+    // rung. An explicit chain stays out of the memory down to its last child.
+    return launchForRung(rescued, `rescued to ${rescued}`, {
+      rescued: true,
+      auto: explicit === null,
+    });
+  }
+  if (explicit) return explicit;
+  const auto = { auto: true };
+
+  const stored = prefs?.gpuBackendToAttempt;
+  const attempt = rungIndex(stored) >= 0 ? stored : TOP_GPU_BACKEND_RUNG;
+  if (attempt === TOP_GPU_BACKEND_RUNG) return launchForRung(attempt, 'auto, best rung', auto);
+
+  // The climb back. Two cadences, and the proof is what tells them apart: a machine that
+  // once ran a HIGHER rung than the one remembered is worth retrying often, a machine
+  // that never has is not. A proof at or below the attempt (a rescued child proving the
+  // bottom rung on a machine whose Vulkan dies every time) says nothing about the climb,
+  // so it keeps the rare cadence.
+  const proof = validProof(prefs, appVersion);
+  const staleProof =
+    !!prefs?.gpuBackendProof && !proof && rungIndex(prefs.gpuBackendProof.backend) >= 0;
+  const provenAbove = proof !== null && isHigherRung(proof.backend, attempt);
+  const every = provenAbove
+    ? REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES
+    : REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES;
+  const since = Number.isInteger(prefs?.launchesSinceBackendReprobe)
+    ? prefs.launchesSinceBackendReprobe
+    : 0;
+  // An app version the proof does not know is a changed environment: re-probe now
+  // rather than waiting out a counter that describes the old one.
+  if (!staleProof && since < every) return launchForRung(attempt, 'auto, remembered rung', auto);
+  const target = provenAbove ? proof.backend : rungAbove(attempt);
+  if (!target) return launchForRung(attempt, 'auto, remembered rung', auto);
+  return launchForRung(
+    target,
+    provenAbove ? `auto, re-probing the proven ${target}` : `auto, re-probing ${target}`,
+    { ...auto, reprobed: true },
+  );
+}
+
+/**
+ * The explicit inputs, first match wins, or null when the launch is Auto's to decide.
+ * None of these is ever judged into the memory or remembered.
+ */
+function explicitGpuBackendLaunch(environment, prefs) {
   const override = environment[GPU_BACKEND_ENV];
   if (override === 'opengl') return launchForRung('opengl', `${GPU_BACKEND_ENV}=opengl`);
   if (override === 'vulkan') {
@@ -190,34 +251,7 @@ function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
   const setting = prefs?.gpuBackend;
   if (setting === 'opengl') return launchForRung('opengl', 'setting opengl');
   if (setting === 'vulkan') return launchForRung(TOP_GPU_BACKEND_RUNG, 'setting vulkan');
-
-  const stored = prefs?.gpuBackendToAttempt;
-  const attempt = rungIndex(stored) >= 0 ? stored : TOP_GPU_BACKEND_RUNG;
-  if (attempt === TOP_GPU_BACKEND_RUNG) return launchForRung(attempt, 'auto, best rung');
-
-  // The climb back. Two cadences, and the proof is what tells them apart: a machine that
-  // once ran the higher rung is worth retrying often, a machine that never has is not.
-  const proof = validProof(prefs, appVersion);
-  const staleProof =
-    !!prefs?.gpuBackendProof && !proof && rungIndex(prefs.gpuBackendProof.backend) >= 0;
-  const every = proof
-    ? REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES
-    : REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES;
-  const since = Number.isInteger(prefs?.launchesSinceBackendReprobe)
-    ? prefs.launchesSinceBackendReprobe
-    : 0;
-  // An app version the proof does not know is a changed environment: re-probe now
-  // rather than waiting out a counter that describes the old one.
-  if (!staleProof && since < every) return launchForRung(attempt, 'auto, remembered rung');
-  const target = proof && isHigherRung(proof.backend, attempt) ? proof.backend : rungAbove(attempt);
-  if (!target) return launchForRung(attempt, 'auto, remembered rung');
-  return launchForRung(
-    target,
-    proof && target === proof.backend
-      ? `auto, re-probing the proven ${target}`
-      : `auto, re-probing ${target}`,
-    true,
-  );
+  return null;
 }
 
 /**
@@ -256,6 +290,40 @@ function judgeGpuBackendLaunch({ glRenderer, softwareRendering, parallel, parall
   if (renderer.includes('swiftshader')) return 'opengl';
   if (parallel !== true) return 'vulkan-plain';
   return parallelCompile === false ? 'vulkan-plain' : 'vulkan-parallel-compile';
+}
+
+/**
+ * Whether the backend a launch asked for failed to come up, judged by FAMILY: a Vulkan
+ * rung that bound anything but Vulkan (SwiftShader, OpenGL). That is what the in-launch
+ * rescue is for. The exact rung is NOT compared: a parallel-compile launch whose page
+ * reports the extension absent is running healthy Vulkan, and re-exec'ing it onto plain
+ * Vulkan would kill a working window to land on the backend it is already on, minus a
+ * switch that was doing nothing. The missing feature is the memory's business (the
+ * healthy session remembers the rung that actually bound), never the rescue's.
+ */
+function backendDidNotBind(askedRung, boundRung) {
+  if (rungIndex(askedRung) < 0 || rungIndex(boundRung) < 0) return false;
+  return askedRung.startsWith('vulkan') && !boundRung.startsWith('vulkan');
+}
+
+/**
+ * What identifies THIS machine in a proof: the active adapter's vendor and device ids
+ * from app.getGPUInfo (`0x10de:0x2204` for an RTX 3090), which read the same on every
+ * backend. The ANGLE renderer string cannot serve: it names the backend ("Vulkan
+ * 1.4.312" vs "OpenGL 4.5.0" for the same card), so a rescue ending on OpenGL would
+ * read as another machine and replace a top-rung proof with an OpenGL one. Empty when
+ * no adapter is reported active, or when the active one carries no ids (the summary
+ * pads a missing id to `0x0000`, and two unknown cards must not read as one), which
+ * the proof reads as "unknown, assume the same machine": the app version alone then
+ * decides.
+ */
+function activeGpuAdapterKey(devices) {
+  const active = (Array.isArray(devices) ? devices : []).find((d) => d?.active === true);
+  if (!active) return '';
+  const id = (value) => (typeof value === 'string' && value !== '0x0000' ? value : '');
+  const vendorId = id(active.vendorId);
+  const deviceId = id(active.deviceId);
+  return vendorId === '' && deviceId === '' ? '' : `${vendorId}:${deviceId}`;
 }
 
 /**
@@ -343,38 +411,50 @@ function demoteAfterRepeatedCrashes({ prefs, rung }) {
 }
 
 /**
- * The memory after a session ran HEALTHY on `rung` (the page reported its renderer and
- * the session then survived SESSION_HEALTHY_AFTER_MS without a GPU-process death).
- * Three things happen: the crash streak clears, Auto remembers this rung, and the proof
- * is written when it improves on what is stored or when the stored one describes a
- * machine that is no longer this one (a different driver, a different app version).
- * That last arm is what keeps a stale high proof from aiming a new GPU at a rung it
- * cannot run. Returns the fields to merge into the prefs.
+ * The memory after a session ran HEALTHY on `rung` (the launch was judged and the
+ * session then survived SESSION_HEALTHY_AFTER_MS without a GPU-process death).
+ * Three things can happen: the crash streak clears, Auto remembers this rung, and the
+ * proof is written when it improves on what is stored or when the stored one describes
+ * a machine that is no longer this one (another adapter, another app version). That
+ * last arm is what keeps a stale high proof from aiming a new GPU at a rung it cannot
+ * run.
+ *
+ * A RESCUED child gets the proof arm only. Its parent's death already counted against
+ * the attempt, and the child runs a rung the parent chose for it, not one the memory
+ * chose: letting it write the attempt would demote Auto on the very first death and
+ * clear the streak the parent just started, so the threshold could never be reached.
+ * Returns the fields to merge into the prefs, or null when nothing changed.
  */
-function gpuBackendMemoryAfterHealthySession({ prefs, rung, appVersion, gpuDriver }) {
+function gpuBackendMemoryAfterHealthySession({ prefs, rung, appVersion, gpuAdapter, rescued }) {
   if (rungIndex(rung) < 0) return null;
-  const next = { gpuBackendToAttempt: rung, consecutiveGpuLaunchCrashes: 0 };
+  const next =
+    rescued === true ? {} : { gpuBackendToAttempt: rung, consecutiveGpuLaunchCrashes: 0 };
+  const adapter = typeof gpuAdapter === 'string' ? gpuAdapter : '';
   const proof = prefs?.gpuBackendProof;
   const known = proof && rungIndex(proof.backend) >= 0;
-  const describesThisMachine =
-    known && proof.appVersion === appVersion && proof.gpuDriver === gpuDriver;
+  const storedAdapter = typeof proof?.gpuAdapter === 'string' ? proof.gpuAdapter : '';
+  const sameAdapter = adapter === '' || storedAdapter === '' || adapter === storedAdapter;
+  const describesThisMachine = known && proof.appVersion === appVersion && sameAdapter;
   if (!known || !describesThisMachine || isHigherRung(rung, proof.backend)) {
-    next.gpuBackendProof = { backend: rung, appVersion, gpuDriver };
+    next.gpuBackendProof = { backend: rung, appVersion, gpuAdapter: adapter };
   }
-  return next;
+  return Object.keys(next).length === 0 ? null : next;
 }
 
 /**
- * The launch counter after an Auto launch: back to zero when this launch WAS the climb,
- * one more otherwise. Only Auto counts; an explicit choice and an env override never
- * read or write the memory. Returns the field to merge, or null when nothing changed.
+ * The launch counter after a launch: back to zero when this launch WAS the climb, one
+ * more otherwise. Only an Auto launch counts, and never a rescued child: an explicit
+ * choice and an env override are not the memory's business, and a rescue chain is one
+ * launch to the player, so its children must not move the cadence by two or three (and
+ * a re-probe's zero must not be followed at once by its rescued child's one). Returns
+ * the field to merge, or null when nothing changed.
  */
 function launchCounterAfterAutoLaunch({ prefs, launch }) {
-  if (prefs?.gpuBackend !== 'auto') return null;
+  if (launch?.auto !== true || launch.rescued === true) return null;
   const since = Number.isInteger(prefs?.launchesSinceBackendReprobe)
     ? prefs.launchesSinceBackendReprobe
     : 0;
-  const next = launch?.reprobed === true ? 0 : since + 1;
+  const next = launch.reprobed === true ? 0 : since + 1;
   return next === since ? null : { launchesSinceBackendReprobe: next };
 }
 
@@ -387,8 +467,18 @@ function launchCounterAfterAutoLaunch({ prefs, launch }) {
  * Returns true when a child was spawned, in which case the caller exits this process
  * (app.exit(0)). False when there is no lower rung, when the chain has already spent its
  * budget (the marker on this process names a rung at or below the target, so the child
- * would repeat a rung this chain has already run), or when the spawn itself fails, in which case this process keeps running on whatever Chromium recovered rather
- * than leaving the player with nothing.
+ * would repeat a rung this chain has already run), or when the spawn itself fails, in
+ * which case this process keeps running on whatever Chromium recovered rather than
+ * leaving the player with nothing.
+ *
+ * `deps.onSpawned` runs once the child HAS been spawned, before this returns true: the
+ * shell hands over the single-instance lock there, so the child cannot reach its own
+ * requestSingleInstanceLock while this process still holds it, see itself as a second
+ * instance and quit, which is the one outcome the rescue exists to prevent. After the
+ * spawn and not before it, because a spawn that throws leaves this process running,
+ * and a running process without its lock would let the next launch open a second
+ * game beside it. The child needs far longer to boot to its own lock request than
+ * this process needs to release and exit.
  */
 function relaunchOnLowerBackend(deps = {}, rung) {
   const env = deps.env ?? process.env;
@@ -409,6 +499,7 @@ function relaunchOnLowerBackend(deps = {}, rung) {
       execPath: deps.execPath ?? process.execPath,
       spawn: deps.spawn,
     });
+    deps.onSpawned?.();
     log?.info?.(`[gpu] the GPU process died on ${rung}; relaunching on ${target}`, {
       spawnTarget,
     });
@@ -431,7 +522,9 @@ module.exports = {
   TOP_GPU_BACKEND_RUNG,
   VULKAN_BACKEND_SWITCHES,
   VULKAN_PARALLEL_COMPILE_SWITCH,
+  activeGpuAdapterKey,
   applyGpuBackendSwitches,
+  backendDidNotBind,
   decideGpuBackendLaunch,
   demoteAfterRepeatedCrashes,
   gpuBackendMemoryAfterHealthySession,

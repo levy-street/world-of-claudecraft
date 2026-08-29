@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  activeGpuAdapterKey,
   applyGpuBackendSwitches,
+  backendDidNotBind,
   decideGpuBackendLaunch,
   demoteAfterRepeatedCrashes,
   GPU_BACKEND_ENV,
@@ -31,13 +33,17 @@ const VULKAN_SOFTWARE =
   'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)';
 const OPENGL = 'ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)';
 
+// The active adapter as app.getGPUInfo lists it (an RTX 3090), the proof's machine key.
+const ADAPTER = '0x10de:0x2204';
+const OTHER_ADAPTER = '0x8086:0x7d67';
+
 const VERSION = '0.41.0';
 type Rung = (typeof GPU_BACKEND_RUNGS)[number];
 type Memory = Parameters<typeof decideGpuBackendLaunch>[0]['prefs'];
-const proof = (backend: Rung, appVersion = VERSION, gpuDriver = VULKAN_OK) => ({
+const proof = (backend: Rung, appVersion = VERSION, gpuAdapter = ADAPTER) => ({
   backend,
   appVersion,
-  gpuDriver,
+  gpuAdapter,
 });
 const linux = (prefs: Memory, env: Record<string, string | undefined> = {}) =>
   decideGpuBackendLaunch({ platform: 'linux', env, prefs, appVersion: VERSION });
@@ -105,7 +111,32 @@ describe('decideGpuBackendLaunch', () => {
         rung: 'opengl',
         reprobed: false,
         reason: 'platform default',
+        ladder: false,
+        auto: false,
+        rescued: false,
       });
+    }
+  });
+
+  it('flags the launches the memory owns, and only those', () => {
+    // The shell keys every memory write on `auto`, never on the setting: the
+    // setting reads Auto under every env override, and both overrides used to
+    // be remembered (WOC_DISABLE_GPU_FORCE=1 demoted the next ordinary launch).
+    expect(linux({ gpuBackend: 'auto' })).toMatchObject({
+      ladder: true,
+      auto: true,
+      rescued: false,
+    });
+    expect(linux({ gpuBackend: 'auto', gpuBackendToAttempt: 'opengl' }).auto).toBe(true);
+    expect(linux({})).toMatchObject({ auto: true });
+    for (const explicit of [
+      linux({ gpuBackend: 'vulkan' }),
+      linux({ gpuBackend: 'opengl' }),
+      linux({ gpuBackend: 'auto' }, { [GPU_BACKEND_ENV]: 'vulkan' }),
+      linux({ gpuBackend: 'auto' }, { [GPU_BACKEND_ENV]: 'opengl' }),
+      linux({ gpuBackend: 'auto' }, { WOC_DISABLE_GPU_FORCE: '1' }),
+    ]) {
+      expect(explicit).toMatchObject({ ladder: true, auto: false, rescued: false });
     }
   });
 
@@ -164,6 +195,33 @@ describe('decideGpuBackendLaunch', () => {
     expect(linux(due).reprobed).toBe(true);
   });
 
+  it('keeps the rarer cadence when the proof is not ABOVE the attempt', () => {
+    // The machine whose Vulkan dies every time: the rescue chain ends on OpenGL,
+    // that child runs healthy and writes an `opengl` proof, and the memory
+    // settles on opengl. A proof at the attempt says nothing about the climb, so
+    // reading "any proof" as the frequent cadence cost this machine a rescue
+    // relaunch every ten launches for good.
+    const settled = {
+      gpuBackend: 'auto',
+      gpuBackendToAttempt: 'opengl',
+      gpuBackendProof: proof('opengl'),
+      launchesSinceBackendReprobe: REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES,
+    };
+    expect(linux(settled).rung).toBe('opengl');
+    expect(linux(settled).reprobed).toBe(false);
+    const due = { ...settled, launchesSinceBackendReprobe: REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES };
+    expect(linux(due).rung).toBe('vulkan-plain');
+    expect(linux(due).reprobed).toBe(true);
+    expect(linux(due).reason).not.toContain('proven');
+    // Same with a proof AT the attempt one rung up.
+    const plain = {
+      ...settled,
+      gpuBackendToAttempt: 'vulkan-plain',
+      gpuBackendProof: proof('vulkan-plain'),
+    };
+    expect(linux(plain).reprobed).toBe(false);
+  });
+
   it('treats a proof from another app version as no proof, and re-probes at once', () => {
     // The environment changed, so the counter describes a machine that no longer
     // exists: climb now rather than wait it out, and climb one rung because the
@@ -209,6 +267,15 @@ describe('decideGpuBackendLaunch', () => {
       'opengl',
     );
     expect(linux({ gpuBackend: 'auto' }, env).reason).toContain('rescued to opengl');
+    // A rescued child knows it is one, and inherits the MODE of the chain it
+    // prolongs: an explicit chain stays out of the memory down to its last child.
+    expect(linux({ gpuBackend: 'auto' }, env)).toMatchObject({ rescued: true, auto: true });
+    expect(linux({ gpuBackend: 'vulkan' }, env)).toMatchObject({ rescued: true, auto: false });
+    expect(linux({ gpuBackend: 'auto' }, { ...env, [GPU_BACKEND_ENV]: 'vulkan' })).toMatchObject({
+      rescued: true,
+      auto: false,
+    });
+    expect(linux({ gpuBackend: 'auto' }, { ...env, WOC_DISABLE_GPU_FORCE: '1' }).auto).toBe(false);
     // A junk marker is ignored rather than obeyed.
     expect(linux({ gpuBackend: 'auto' }, { [GPU_BACKEND_RESCUE_ENV]: 'nonsense' }).rung).toBe(
       TOP_GPU_BACKEND_RUNG,
@@ -260,6 +327,9 @@ describe('applyGpuBackendSwitches', () => {
       rung: 'vulkan-parallel-compile',
       reprobed: false,
       reason: 'auto, best rung',
+      ladder: true,
+      auto: true,
+      rescued: false,
     });
     expect(switches).toEqual([
       ['use-gl', 'angle'],
@@ -274,6 +344,9 @@ describe('applyGpuBackendSwitches', () => {
       rung: 'vulkan-plain',
       reprobed: false,
       reason: 'auto, remembered rung',
+      ladder: true,
+      auto: true,
+      rescued: false,
     });
     expect(plain.switches).toEqual([
       ['use-gl', 'angle'],
@@ -290,6 +363,9 @@ describe('applyGpuBackendSwitches', () => {
       rung: 'opengl',
       reprobed: false,
       reason: 'platform default',
+      ladder: false,
+      auto: false,
+      rescued: false,
     });
     applyGpuBackendSwitches(app, null);
     applyGpuBackendSwitches(app, undefined);
@@ -484,13 +560,73 @@ describe('gpuBackendMemoryAfterHealthySession', () => {
       prefs: { gpuBackend: 'auto', consecutiveGpuLaunchCrashes: 2 },
       rung: 'vulkan-plain',
       appVersion: VERSION,
-      gpuDriver: VULKAN_OK,
+      gpuAdapter: ADAPTER,
+      rescued: false,
     });
     expect(next).toEqual({
       gpuBackendToAttempt: 'vulkan-plain',
       consecutiveGpuLaunchCrashes: 0,
-      gpuBackendProof: { backend: 'vulkan-plain', appVersion: VERSION, gpuDriver: VULKAN_OK },
+      gpuBackendProof: { backend: 'vulkan-plain', appVersion: VERSION, gpuAdapter: ADAPTER },
     });
+  });
+
+  it('lets a RESCUED child write the proof it earned, and nothing else', () => {
+    // Its parent's death already counted against the attempt; the child runs a
+    // rung the parent chose. Writing the attempt here demoted Auto on the very
+    // first death (through the child rather than the counter) and cleared the
+    // streak the parent had just started, so the threshold was unreachable.
+    const first = gpuBackendMemoryAfterHealthySession({
+      prefs: { gpuBackend: 'auto', consecutiveGpuLaunchCrashes: 1 },
+      rung: 'vulkan-plain',
+      appVersion: VERSION,
+      gpuAdapter: ADAPTER,
+      rescued: true,
+    });
+    expect(first).toEqual({ gpuBackendProof: proof('vulkan-plain') });
+    // Nothing to write when the stored proof already sits higher on this machine.
+    expect(
+      gpuBackendMemoryAfterHealthySession({
+        prefs: { gpuBackend: 'auto', gpuBackendProof: proof('vulkan-parallel-compile') },
+        rung: 'opengl',
+        appVersion: VERSION,
+        gpuAdapter: ADAPTER,
+        rescued: true,
+      }),
+    ).toBeNull();
+  });
+
+  it('keeps the proof across backends of the SAME adapter: the key is not the renderer string', () => {
+    // The ANGLE string names the backend ("Vulkan 1.4.312" on one launch, "OpenGL
+    // 4.5.0" on the next, same card), so keying on it read a rescue that ended on
+    // OpenGL as another machine and replaced the top-rung proof.
+    const next = gpuBackendMemoryAfterHealthySession({
+      prefs: { gpuBackend: 'auto', gpuBackendProof: proof('vulkan-parallel-compile') },
+      rung: 'opengl',
+      appVersion: VERSION,
+      gpuAdapter: ADAPTER,
+      rescued: false,
+    });
+    expect(next).not.toHaveProperty('gpuBackendProof');
+    // An unknown adapter (getGPUInfo listed none) reads as the same machine, on
+    // either side: the app version alone decides.
+    for (const [stored, seen] of [
+      ['', ADAPTER],
+      [ADAPTER, ''],
+      ['', ''],
+    ]) {
+      expect(
+        gpuBackendMemoryAfterHealthySession({
+          prefs: {
+            gpuBackend: 'auto',
+            gpuBackendProof: proof('vulkan-parallel-compile', VERSION, stored),
+          },
+          rung: 'opengl',
+          appVersion: VERSION,
+          gpuAdapter: seen,
+          rescued: false,
+        }),
+      ).not.toHaveProperty('gpuBackendProof');
+    }
   });
 
   it('raises the proof when a higher rung proves out', () => {
@@ -498,7 +634,8 @@ describe('gpuBackendMemoryAfterHealthySession', () => {
       prefs: { gpuBackend: 'auto', gpuBackendProof: proof('vulkan-plain') },
       rung: 'vulkan-parallel-compile',
       appVersion: VERSION,
-      gpuDriver: VULKAN_OK,
+      gpuAdapter: ADAPTER,
+      rescued: false,
     });
     expect(next?.gpuBackendProof).toEqual(proof('vulkan-parallel-compile'));
   });
@@ -511,26 +648,28 @@ describe('gpuBackendMemoryAfterHealthySession', () => {
       prefs: { gpuBackend: 'auto', gpuBackendProof: stored },
       rung: 'opengl',
       appVersion: VERSION,
-      gpuDriver: VULKAN_OK,
+      gpuAdapter: ADAPTER,
+      rescued: false,
     });
     expect(next).toEqual({ gpuBackendToAttempt: 'opengl', consecutiveGpuLaunchCrashes: 0 });
     expect(next).not.toHaveProperty('gpuBackendProof');
   });
 
   it('REPLACES a proof that describes another machine, even with a lower rung', () => {
-    // A different driver means the old proof is about hardware that is no longer
+    // A different adapter means the old proof is about hardware that is no longer
     // here; keeping it would aim the climb at a rung this machine cannot run.
-    const stored = proof('vulkan-parallel-compile', VERSION, 'ANGLE (Old GPU, Vulkan 1.1, Old)');
+    const stored = proof('vulkan-parallel-compile', VERSION, OTHER_ADAPTER);
     const next = gpuBackendMemoryAfterHealthySession({
       prefs: { gpuBackend: 'auto', gpuBackendProof: stored },
       rung: 'opengl',
       appVersion: VERSION,
-      gpuDriver: OPENGL,
+      gpuAdapter: ADAPTER,
+      rescued: false,
     });
     expect(next?.gpuBackendProof).toEqual({
       backend: 'opengl',
       appVersion: VERSION,
-      gpuDriver: OPENGL,
+      gpuAdapter: ADAPTER,
     });
   });
 
@@ -539,7 +678,8 @@ describe('gpuBackendMemoryAfterHealthySession', () => {
       prefs: { gpuBackend: 'auto', gpuBackendProof: proof('vulkan-parallel-compile', '0.40.0') },
       rung: 'vulkan-plain',
       appVersion: VERSION,
-      gpuDriver: VULKAN_OK,
+      gpuAdapter: ADAPTER,
+      rescued: false,
     });
     expect(next?.gpuBackendProof).toEqual(proof('vulkan-plain'));
   });
@@ -550,15 +690,16 @@ describe('gpuBackendMemoryAfterHealthySession', () => {
         prefs: {},
         rung: 'nonsense',
         appVersion: VERSION,
-        gpuDriver: VULKAN_OK,
+        gpuAdapter: ADAPTER,
+        rescued: false,
       }),
     ).toBeNull();
   });
 });
 
 describe('launchCounterAfterAutoLaunch', () => {
-  const climb = { reprobed: true } as never;
-  const plain = { reprobed: false } as never;
+  const climb = { auto: true, rescued: false, reprobed: true } as never;
+  const plain = { auto: true, rescued: false, reprobed: false } as never;
 
   it('counts up on an ordinary Auto launch and resets on a climb', () => {
     expect(
@@ -575,12 +716,18 @@ describe('launchCounterAfterAutoLaunch', () => {
     ).toEqual({ launchesSinceBackendReprobe: 0 });
   });
 
-  it('does not count an explicit setting: the memory is not its business', () => {
-    for (const gpuBackend of ['vulkan', 'opengl']) {
+  it('does not count an explicit launch, nor a rescued child', () => {
+    // Explicit: the memory is not its business (the launch's flag, not the
+    // setting, which reads Auto under an env override). Rescued: a chain is one
+    // launch to the player, and a re-probe's zero used to be followed at once
+    // by its rescued child's one.
+    const explicit = { auto: false, rescued: false, reprobed: false } as never;
+    const rescuedChild = { auto: true, rescued: true, reprobed: false } as never;
+    for (const launch of [explicit, rescuedChild]) {
       expect(
         launchCounterAfterAutoLaunch({
-          prefs: { gpuBackend, launchesSinceBackendReprobe: 4 },
-          launch: plain,
+          prefs: { gpuBackend: 'auto', launchesSinceBackendReprobe: 4 },
+          launch,
         }),
       ).toBeNull();
     }
@@ -619,6 +766,171 @@ describe('hasGetGpuInfoEvidence', () => {
     expect(hasGetGpuInfoEvidence({})).toBe(false);
     expect(hasGetGpuInfoEvidence(null)).toBe(false);
     expect(hasGetGpuInfoEvidence(undefined)).toBe(false);
+  });
+});
+
+describe('backendDidNotBind', () => {
+  it('fires only when a Vulkan rung bound something that is not Vulkan', () => {
+    expect(backendDidNotBind('vulkan-parallel-compile', 'opengl')).toBe(true);
+    expect(backendDidNotBind('vulkan-plain', 'opengl')).toBe(true);
+    expect(backendDidNotBind('opengl', 'opengl')).toBe(false);
+  });
+
+  it('does NOT fire on a parallel-compile launch that bound plain Vulkan', () => {
+    // The page reported the extension absent: the window is healthy Vulkan, and
+    // re-exec'ing it onto plain Vulkan would kill it to land on the backend it is
+    // already on. The missing feature is the memory's business, never a rescue.
+    expect(backendDidNotBind('vulkan-parallel-compile', 'vulkan-plain')).toBe(false);
+    expect(backendDidNotBind('vulkan-plain', 'vulkan-parallel-compile')).toBe(false);
+  });
+
+  it('answers false for anything off the ladder', () => {
+    expect(backendDidNotBind('vulkan-plain', 'nonsense')).toBe(false);
+    expect(backendDidNotBind('nonsense', 'opengl')).toBe(false);
+    expect(backendDidNotBind(undefined, 'opengl')).toBe(false);
+  });
+});
+
+describe('activeGpuAdapterKey', () => {
+  it('names the ACTIVE adapter by vendor and device id, whatever else is listed', () => {
+    expect(
+      activeGpuAdapterKey([
+        { vendorId: '0x8086', deviceId: '0x7d67', active: false },
+        { vendorId: '0x10de', deviceId: '0x2204', active: true },
+      ]),
+    ).toBe(ADAPTER);
+  });
+
+  it('answers empty with no active adapter, no list, or ids that are not strings', () => {
+    expect(activeGpuAdapterKey([{ vendorId: '0x10de', deviceId: '0x2204', active: false }])).toBe(
+      '',
+    );
+    expect(activeGpuAdapterKey([])).toBe('');
+    expect(activeGpuAdapterKey(undefined)).toBe('');
+    expect(activeGpuAdapterKey([{ vendorId: 4318, deviceId: 8708, active: true }])).toBe('');
+    // The device summary pads a missing id to 0x0000: two cards with no ids must
+    // not read as the same one, so that reads as unknown too.
+    expect(activeGpuAdapterKey([{ vendorId: '0x0000', deviceId: '0x0000', active: true }])).toBe(
+      '',
+    );
+    expect(activeGpuAdapterKey([{ vendorId: '0x10de', deviceId: '0x0000', active: true }])).toBe(
+      '0x10de:',
+    );
+  });
+});
+
+describe('the memory across one launch-time death and its rescue chain', () => {
+  // The composite the unit pins missed: a parent on the top rung dies once, the
+  // rescued child runs healthy. The attempt and the streak must be where the
+  // PARENT left them, or one death still demotes (through the child).
+  function merge(memory: Record<string, unknown>, next: Record<string, unknown> | null) {
+    return next ? { ...memory, ...next } : memory;
+  }
+
+  it('leaves one death as one death: the child neither demotes nor clears the streak', () => {
+    let memory: Record<string, unknown> = { gpuBackend: 'auto' };
+    const parent = linux(memory);
+    expect(parent).toMatchObject({ rung: TOP_GPU_BACKEND_RUNG, auto: true, rescued: false });
+    memory = merge(memory, launchCounterAfterAutoLaunch({ prefs: memory, launch: parent }));
+    // The parent's GPU process dies at launch: its death counts, once.
+    memory = merge(memory, demoteAfterRepeatedCrashes({ prefs: memory, rung: parent.rung }));
+    expect(memory.consecutiveGpuLaunchCrashes).toBe(1);
+    // The rescued child comes up on plain Vulkan and runs healthy.
+    const child = linux(memory, { [GPU_BACKEND_RESCUE_ENV]: 'vulkan-plain' });
+    expect(child).toMatchObject({ rung: 'vulkan-plain', auto: true, rescued: true });
+    expect(launchCounterAfterAutoLaunch({ prefs: memory, launch: child })).toBeNull();
+    memory = merge(
+      memory,
+      gpuBackendMemoryAfterHealthySession({
+        prefs: memory,
+        rung: child.rung,
+        appVersion: VERSION,
+        gpuAdapter: ADAPTER,
+        rescued: child.rescued,
+      }),
+    );
+    expect(memory.gpuBackendToAttempt).toBeUndefined();
+    expect(memory.consecutiveGpuLaunchCrashes).toBe(1);
+    expect(memory.gpuBackendProof).toEqual(proof('vulkan-plain'));
+    // The next launch is the top rung again, and only the threshold steps it down.
+    expect(linux(memory).rung).toBe(TOP_GPU_BACKEND_RUNG);
+    for (let i = 1; i < MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES; i++) {
+      memory = merge(
+        memory,
+        demoteAfterRepeatedCrashes({ prefs: memory, rung: TOP_GPU_BACKEND_RUNG }),
+      );
+    }
+    expect(memory).toMatchObject({
+      gpuBackendToAttempt: 'vulkan-plain',
+      consecutiveGpuLaunchCrashes: 0,
+    });
+  });
+
+  it('counts a re-probe chain on the rung it lands back on: the remembered one', () => {
+    // A climb dies above the attempt (nothing to count: that rung was not the
+    // memory's guess), and its rescued child lands ON the attempt. If that child
+    // dies too, the remembered rung just failed, and the shell counts it: the
+    // rung compare inside demoteAfterRepeatedCrashes is what tells the two
+    // children apart, so the shell needs no rescued-child guard of its own.
+    let memory: Record<string, unknown> = {
+      gpuBackend: 'auto',
+      gpuBackendToAttempt: 'vulkan-plain',
+      gpuBackendProof: proof('vulkan-parallel-compile'),
+      launchesSinceBackendReprobe: REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES,
+      consecutiveGpuLaunchCrashes: 0,
+    };
+    const climb = linux(memory);
+    expect(climb).toMatchObject({ rung: 'vulkan-parallel-compile', reprobed: true, auto: true });
+    expect(demoteAfterRepeatedCrashes({ prefs: memory, rung: climb.rung })).toBeNull();
+    const child = linux(memory, { [GPU_BACKEND_RESCUE_ENV]: 'vulkan-plain' });
+    expect(child).toMatchObject({ rung: 'vulkan-plain', rescued: true, auto: true });
+    memory = merge(memory, demoteAfterRepeatedCrashes({ prefs: memory, rung: child.rung }));
+    expect(memory.consecutiveGpuLaunchCrashes).toBe(1);
+    // Whereas a parent's OWN death on the attempt, then its child one rung
+    // below, is one death: the child's rung is not the attempt.
+    const parent = linux({ gpuBackend: 'auto' });
+    let fresh: Record<string, unknown> = { gpuBackend: 'auto' };
+    fresh = merge(fresh, demoteAfterRepeatedCrashes({ prefs: fresh, rung: parent.rung }));
+    expect(demoteAfterRepeatedCrashes({ prefs: fresh, rung: 'vulkan-plain' })).toBeNull();
+    expect(fresh.consecutiveGpuLaunchCrashes).toBe(1);
+  });
+
+  it('settles a machine with no Vulkan on OpenGL, then re-probes on the RARE cadence only', () => {
+    let memory: Record<string, unknown> = { gpuBackend: 'auto' };
+    // Every Vulkan rung dies; the chain ends on OpenGL, whose child proves opengl.
+    const chain = () => {
+      const parent = linux(memory);
+      memory = merge(memory, launchCounterAfterAutoLaunch({ prefs: memory, launch: parent }));
+      memory = merge(memory, demoteAfterRepeatedCrashes({ prefs: memory, rung: parent.rung }));
+      const child = linux(memory, { [GPU_BACKEND_RESCUE_ENV]: 'opengl' });
+      memory = merge(
+        memory,
+        gpuBackendMemoryAfterHealthySession({
+          prefs: memory,
+          rung: 'opengl',
+          appVersion: VERSION,
+          gpuAdapter: ADAPTER,
+          rescued: child.rescued,
+        }),
+      );
+    };
+    for (let i = 0; i < MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES * 2; i++) chain();
+    expect(memory).toMatchObject({
+      gpuBackendToAttempt: 'opengl',
+      gpuBackendProof: proof('opengl'),
+    });
+    // From here Auto runs OpenGL, and the opengl proof does not earn the frequent
+    // climb: the first re-probe comes when the counter reaches the RARE cadence.
+    const counted = memory.launchesSinceBackendReprobe as number;
+    let launches = 0;
+    for (;;) {
+      const launch = linux(memory);
+      if (launch.reprobed) break;
+      launches++;
+      memory = merge(memory, launchCounterAfterAutoLaunch({ prefs: memory, launch }));
+    }
+    expect(launches).toBe(REPROBE_WITHOUT_PROOF_EVERY_LAUNCHES - counted);
+    expect(launches).toBeGreaterThan(REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES);
   });
 });
 
@@ -732,6 +1044,34 @@ describe('relaunchOnLowerBackend', () => {
         'vulkan-plain',
       ),
     ).toBe(true);
+  });
+
+  it('runs onSpawned only once a child HAS spawned, and never on a refused or failed spawn', () => {
+    // The shell hands the single-instance lock over there; releasing it while
+    // this process keeps running (a refused rescue, a spawn that threw) would
+    // let the next launch open a second game beside it.
+    const { spawn, calls } = fakeSpawn();
+    const order: string[] = [];
+    const onSpawned = vi.fn(() => order.push(`spawned:${calls.length}`));
+    const base = { env: {}, argv: [], execPath: '/bin/app', spawn, onSpawned };
+    expect(relaunchOnLowerBackend(base, 'vulkan-plain')).toBe(true);
+    expect(order).toEqual(['spawned:1']);
+    // No lower rung, a spent chain: not called.
+    expect(relaunchOnLowerBackend(base, 'opengl')).toBe(false);
+    expect(
+      relaunchOnLowerBackend(
+        { ...base, env: { [GPU_BACKEND_RESCUE_ENV]: 'opengl' } },
+        'vulkan-plain',
+      ),
+    ).toBe(false);
+    // A spawn that throws: the process keeps running, so it keeps its lock.
+    const throwing = vi.fn(() => {
+      throw new Error('ENOENT');
+    });
+    expect(
+      relaunchOnLowerBackend({ ...base, spawn: throwing as never, log: {} }, 'vulkan-plain'),
+    ).toBe(false);
+    expect(onSpawned).toHaveBeenCalledTimes(1);
   });
 
   it('refuses a rung that is not on the ladder', () => {

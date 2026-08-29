@@ -73,7 +73,7 @@ describe('desktop prefs schema', () => {
       gpuBackendProof: {
         backend: 'vulkan-parallel-compile',
         appVersion: '0.41.0',
-        gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+        gpuAdapter: '0x10de:0x2204',
       },
       consecutiveGpuLaunchCrashes: 2,
       launchesSinceBackendReprobe: 7,
@@ -94,7 +94,7 @@ describe('desktop prefs schema', () => {
       gpuBackendProof: {
         backend: 'vulkan-parallel-compile',
         appVersion: '0.41.0',
-        gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+        gpuAdapter: '0x10de:0x2204',
       },
       consecutiveGpuLaunchCrashes: 2,
       launchesSinceBackendReprobe: 7,
@@ -240,23 +240,43 @@ describe('desktop prefs schema', () => {
     expect(prefs.consecutiveGpuLaunchCrashes).toBe(0);
   });
 
-  it('takes a proof only whole: a backend without its version and driver is not one', () => {
+  it('takes a proof only with its version; the adapter may be unknown but never junk', () => {
     // A proof that cannot be checked for staleness would aim the climb at a
-    // machine that no longer exists, so a partial one is no proof at all.
+    // machine that no longer exists, so one without its version is no proof at
+    // all. The adapter key is allowed to be empty or absent (getGPUInfo lists no
+    // active device on some machines, and the memory reads that as "the same
+    // machine"), but a non-string one is a hand edit and drops the proof.
     const whole = {
       backend: 'vulkan-parallel-compile',
       appVersion: '0.41.0',
-      gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)',
+      gpuAdapter: '0x10de:0x2204',
     };
     expect(sanitizeDesktopPrefs({ version: 1, gpuBackendProof: whole }).gpuBackendProof).toEqual(
       whole,
     );
+    for (const unknownAdapter of [
+      { ...whole, gpuAdapter: '' },
+      { ...whole, gpuAdapter: undefined },
+    ]) {
+      expect(
+        sanitizeDesktopPrefs({ version: 1, gpuBackendProof: unknownAdapter }).gpuBackendProof,
+      ).toEqual({ ...whole, gpuAdapter: '' });
+    }
+    // The renderer string a previous build stored is not the key: it names the
+    // backend, so it is dropped rather than carried.
+    expect(
+      sanitizeDesktopPrefs({
+        version: 1,
+        gpuBackendProof: { ...whole, gpuDriver: 'ANGLE (NVIDIA, Vulkan 1.4.312, NVIDIA)' },
+      }).gpuBackendProof,
+    ).toEqual(whole);
     for (const partial of [
       { ...whole, backend: undefined },
       { ...whole, backend: 'vulkan' },
       { ...whole, appVersion: '' },
       { ...whole, appVersion: 42 },
-      { ...whole, gpuDriver: undefined },
+      { ...whole, gpuAdapter: 42 },
+      { ...whole, gpuAdapter: null },
       'vulkan-parallel-compile',
       [whole],
       null,

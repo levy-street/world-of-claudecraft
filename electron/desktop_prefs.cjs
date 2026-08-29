@@ -86,23 +86,25 @@ const readGpuBackendRung = (value) => (GPU_BACKEND_RUNGS.includes(value) ? value
 const readCount = (value) => (isInteger(value) && value >= 0 ? value : 0);
 
 /**
- * The proof that a session once ran healthy here, or null. All three fields or
- * none: a backend without the version and driver it was proven under cannot be
- * checked for staleness, and an unverifiable proof would aim the climb at a
- * machine that no longer exists. Strings are capped because they come from a
- * renderer string the page reported, and a prefs file is not a log.
+ * The proof that a session once ran healthy here, or null. A backend without the
+ * version it was proven under cannot be checked for staleness, and an unverifiable
+ * proof would aim the climb at a machine that no longer exists. The adapter key
+ * (`vendorId:deviceId` of the active GPU) may be EMPTY: getGPUInfo lists no active
+ * device on some machines, and the memory reads an unknown adapter as "the same
+ * machine", so an absent one is kept rather than costing the proof. Strings are
+ * capped because a prefs file is not a log.
  */
 function readGpuBackendProof(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const backend = readGpuBackendRung(value.backend);
   if (!backend) return null;
-  const { appVersion, gpuDriver } = value;
+  const { appVersion, gpuAdapter } = value;
   if (typeof appVersion !== 'string' || appVersion === '') return null;
-  if (typeof gpuDriver !== 'string' || gpuDriver === '') return null;
+  if (gpuAdapter !== undefined && typeof gpuAdapter !== 'string') return null;
   return {
     backend,
     appVersion: appVersion.slice(0, GPU_PROOF_FIELD_MAX),
-    gpuDriver: gpuDriver.slice(0, GPU_PROOF_FIELD_MAX),
+    gpuAdapter: (gpuAdapter ?? '').slice(0, GPU_PROOF_FIELD_MAX),
   };
 }
 

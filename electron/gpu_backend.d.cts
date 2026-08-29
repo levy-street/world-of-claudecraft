@@ -9,11 +9,16 @@ export type GpuBackendSetting = 'auto' | 'vulkan' | 'opengl';
 export type GpuBackendRung = 'vulkan-parallel-compile' | 'vulkan-plain' | 'opengl';
 export type GpuBackend = 'vulkan' | 'default';
 
-/** The certainty that a session once ran healthy here, and under what. */
+/**
+ * The certainty that a session once ran healthy here, and under what. The adapter is
+ * the active GPU's `vendorId:deviceId` from app.getGPUInfo, or '' when none was listed
+ * (read as "unknown, the same machine"); never the renderer string, which names the
+ * backend and would read the same card on OpenGL as another machine.
+ */
 export interface GpuBackendProof {
   backend: GpuBackendRung;
   appVersion: string;
-  gpuDriver: string;
+  gpuAdapter: string;
 }
 
 /** The Auto memory, as it sits in desktop-prefs.json. */
@@ -46,6 +51,12 @@ export interface GpuBackendLaunch {
   /** This launch is Auto's periodic climb back to a higher rung. */
   reprobed: boolean;
   reason: string;
+  /** The ladder applies (Linux); off it nothing is rescued, counted or remembered. */
+  ladder: boolean;
+  /** This launch belongs to the Auto memory (reads it, and writes it once judged). */
+  auto: boolean;
+  /** A rescue spawned this process; it inherits `auto` from its chain. */
+  rescued: boolean;
 }
 
 export interface DecideGpuBackendLaunchInput {
@@ -82,6 +93,14 @@ export function judgeGpuBackendLaunch(reading: {
   parallelCompile?: boolean;
 }): GpuBackendRung;
 
+/** A Vulkan rung that bound something other than Vulkan: the rescue's judged trigger. */
+export function backendDidNotBind(askedRung: unknown, boundRung: unknown): boolean;
+
+/** The proof's machine key from app.getGPUInfo's device list, or '' when none is active. */
+export function activeGpuAdapterKey(
+  devices: ReadonlyArray<{ vendorId?: unknown; deviceId?: unknown; active?: unknown }> | undefined,
+): string;
+
 export function rungAbove(rung: unknown): GpuBackendRung | null;
 export function rungBelow(rung: unknown): GpuBackendRung | null;
 export function isHigherRung(rung: unknown, other: unknown): boolean;
@@ -105,7 +124,9 @@ export function gpuBackendMemoryAfterHealthySession(input: {
   prefs?: GpuBackendMemory | null;
   rung: unknown;
   appVersion: string;
-  gpuDriver: string;
+  gpuAdapter: string;
+  /** A rescued child writes the proof it earned and never the attempt or the streak. */
+  rescued?: boolean;
 }): Partial<GpuBackendMemory> | null;
 
 export function launchCounterAfterAutoLaunch(input: {
@@ -122,6 +143,8 @@ export interface RelaunchOnLowerBackendDeps {
     info?(...args: unknown[]): void;
     warn?(...args: unknown[]): void;
   };
+  /** Runs once the child HAS spawned, before the true return (the shell releases its lock). */
+  onSpawned?: () => void;
 }
 /** Rescue: spawn a child on the rung BELOW `rung`; true when one was spawned. */
 export function relaunchOnLowerBackend(
