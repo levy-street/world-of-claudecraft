@@ -170,7 +170,11 @@ the activity-card union members, and where the RL action space enumerates comman
   farming's art-subject split shape with re-derived literals. Masterwrought's asserted-empty
   pending set is RETIRED, and its retirement is recorded here. Farming also left a pending
   rationale-comment sweep in that file ("no faucet until go-live" for compost) which 11e's
-  seed faucet has made stale; fix the comment in this phase. The promotion deed joins the
+  seed faucet has made stale; fix the comment in this phase.
+  (DISCHARGED BEFORE THIS PHASE: the Phase 11e QA already rewrote the block as the honest
+  scheduled-ART-PARK rationale, src/ui/icons.ts:5763; Phase 16 verified it 2026-08-29 and
+  instead trued the one genuinely stale neighbour, the future-tense compost vendor comment
+  in src/sim/content/items.ts.) The promotion deed joins the
   merged `DEED_ART_PENDING` list alongside farming's eight rows and the commissioned
   `prog_farming_100` crest brief.
 - The naming registry owes ONE merged pass, and its answer is SETTLED (2026-08-20, row

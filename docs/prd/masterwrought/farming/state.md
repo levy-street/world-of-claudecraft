@@ -451,7 +451,10 @@ closed-by-X.
    lines (VOICE_ALIAS rows only; scripts/gen_npc_lines.mjs is the
    follow-up; the LOOK rows were CLOSED by the nineteenth-absorb npc_looks
    heal); the src/ui/icons.ts ITEM_ART_PENDING rationale comment sweep (it
-   still says "no faucet until go-live" for compost); DEED_ART_PENDING at
+   still says "no faucet until go-live" for compost; DISCHARGED at the
+   Phase 11e QA, which rewrote the block as the honest scheduled-ART-PARK
+   rationale, icons.ts:5763, verified again by Phase 16 on 2026-08-29);
+   DEED_ART_PENDING at
    8 untitled deeds plus the commissioned prog_farming_100 crest
    replacement (docs/achievements/icon-brief.md); the Phase 11 buff-bar
    and tooltip capture offer; the A4 pairwise-distinctness pin extension
