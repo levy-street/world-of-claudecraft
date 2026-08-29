@@ -18,8 +18,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { NodeIO } from '@gltf-transform/core';
-import { getBounds } from '@gltf-transform/core';
+import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune, simplify, textureCompress, weld } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
@@ -111,7 +110,9 @@ for (const item of ITEMS) {
   if (size[2] > size[0]) [size[0], size[2]] = [size[2], size[0]];
   const longest = Math.max(...size);
   const r = (v) => Math.round((v / longest) * 100) / 100;
-  nativeRows.push(`  ${item.name}: { len: ${r(size[0])}, hei: ${r(size[1])}, dep: ${r(size[2])} },`);
+  nativeRows.push(
+    `  ${item.name}: { len: ${r(size[0])}, hei: ${r(size[1])}, dep: ${r(size[2])} },`,
+  );
   await doc.transform(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   const root = doc.getRoot();
   for (const node of root.listNodes())
