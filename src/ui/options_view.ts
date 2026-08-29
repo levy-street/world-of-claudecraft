@@ -127,6 +127,15 @@ export interface ChoiceControl {
   options: ChoiceOption[];
   /** True when selecting an option re-renders the panel (preset + interfaceMode). */
   rerender: boolean;
+  /** A live reading rendered INSIDE this row, under its buttons: what the
+   *  setting is actually doing right now, as opposed to what it asks for.
+   *
+   *  A row of its own rather than a NoteControl beside the row, because the
+   *  wide graphics cards flow their children two-up (control, note, control,
+   *  note) and a third child for one control shifts every row after it by a
+   *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
+  statusKey?: TranslationKey;
+  statusValueKeys?: Record<string, TranslationKey>;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -569,24 +578,19 @@ export function buildGraphicsSections(
   // the next-launch caveat. Not a rebuild key: it writes live, and the shell
   // reads the stored choice at its next launch.
   if (env.desktopGpuBackend) {
-    system.push(choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions));
-    // The rung this launch is ACTUALLY running, under the buttons and above the
-    // explanation, where every other note in this panel sits relative to its
-    // row. It is the point of the row on a machine where the choice did not
-    // take: a player who picked Vulkan would otherwise read "Vulkan" while
-    // playing on OpenGL. Absent until the shell has judged the launch.
+    // The rung this launch is ACTUALLY running rides INSIDE the row, under its
+    // buttons: it is the point of the row on a machine where the choice did not
+    // take, since a player who picked Vulkan would otherwise read "Vulkan"
+    // while playing on OpenGL. Absent until the shell has judged the launch.
     const active = env.desktopGpuBackendActive;
+    const backendRow = choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions);
     if (active) {
-      system.push(
-        note(
-          active.requestedUnavailable
-            ? 'hudChrome.options.gpuBackendActiveUnavailable'
-            : 'hudChrome.options.gpuBackendActive',
-          { backend: gpuBackendActiveNameKey(active.active) },
-        ),
-      );
+      backendRow.statusKey = active.requestedUnavailable
+        ? 'hudChrome.options.gpuBackendActiveUnavailable'
+        : 'hudChrome.options.gpuBackendActive';
+      backendRow.statusValueKeys = { backend: gpuBackendActiveNameKey(active.active) };
     }
-    system.push(note('hudChrome.options.gpuBackendNote'));
+    system.push(backendRow, note('hudChrome.options.gpuBackendNote'));
   }
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {

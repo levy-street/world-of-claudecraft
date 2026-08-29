@@ -891,6 +891,17 @@ export class OptionsWindow {
       wrap.appendChild(btn);
     }
     row.append(name, wrap);
+    // The live reading, inside the row under its buttons. Not a sibling note:
+    // the wide graphics cards flow their children two-up, so a third child for
+    // one control would shift every row after it by a cell.
+    if (c.statusKey) {
+      const status = document.createElement('div');
+      status.className = 'set-note set-note-inline';
+      const values: Record<string, string> = {};
+      for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
+      status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
+      row.appendChild(status);
+    }
     parent.appendChild(row);
     sync();
   }

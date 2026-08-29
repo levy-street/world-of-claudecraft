@@ -337,66 +337,84 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env).find(
         (section) => section.titleKey === 'hudChrome.options.gfxSectionSystem',
       );
+    const backendRow = (active: OptionsEnv['desktopGpuBackendActive']) =>
+      find(
+        system({ ...WEB_ENV, desktopGpuBackend: true, desktopGpuBackendActive: active })
+          ?.controls ?? [],
+        'gpuBackend',
+      );
+
+    // The reading rides INSIDE the row, never as a note beside it: the wide
+    // graphics cards flow their children two-up (control, note, control, note),
+    // so a third child for one control shifts every row after it by a cell.
+    // That is a real layout break, not a nicety.
     const running = system({
       ...WEB_ENV,
       desktopGpuBackend: true,
       desktopGpuBackendActive: { active: 'vulkan-parallel-compile', requestedUnavailable: false },
     });
     const keys = keysOf(running?.controls ?? []);
-    // Between the buttons and the description, where every note in this panel
-    // sits relative to its row.
-    expect(keys.slice(keys.indexOf('gpuBackend'), keys.indexOf('gpuBackend') + 3)).toEqual([
+    expect(keys.slice(keys.indexOf('gpuBackend'), keys.indexOf('gpuBackend') + 2)).toEqual([
       'gpuBackend',
-      'note:hudChrome.options.gpuBackendActive',
       'note:hudChrome.options.gpuBackendNote',
     ]);
-    const noteWithKey = (controls: OptionsControl[], textKey: string) =>
-      controls.find((c) => c.control === 'note' && c.textKey === textKey);
-    const line = noteWithKey(running?.controls ?? [], 'hudChrome.options.gpuBackendActive');
+    const row = find(running?.controls ?? [], 'gpuBackend');
+    expect(row?.control === 'choice' && row.statusKey).toBe('hudChrome.options.gpuBackendActive');
     // The name is a placeholder KEY the painter resolves, never a concatenation
     // and never a raw rung: both Vulkan rungs read as the one name the picker
     // offered.
-    expect(line?.control === 'note' && line.valueKeys).toEqual({
+    expect(row?.control === 'choice' && row.statusValueKeys).toEqual({
       backend: 'hudChrome.options.gpuBackendActiveNameVulkan',
     });
 
-    const plain = system({
-      ...WEB_ENV,
-      desktopGpuBackend: true,
-      desktopGpuBackendActive: { active: 'vulkan-plain', requestedUnavailable: false },
-    });
-    const plainLine = noteWithKey(plain?.controls ?? [], 'hudChrome.options.gpuBackendActive');
-    expect(plainLine?.control === 'note' && plainLine.valueKeys).toEqual({
+    const plain = backendRow({ active: 'vulkan-plain', requestedUnavailable: false });
+    expect(plain?.control === 'choice' && plain.statusValueKeys).toEqual({
       backend: 'hudChrome.options.gpuBackendActiveNameVulkan',
     });
 
-    // Fell short of the setting: the line says so, in its own sentence.
-    const fallen = system({
-      ...WEB_ENV,
-      desktopGpuBackend: true,
-      desktopGpuBackendActive: { active: 'opengl', requestedUnavailable: true },
-    });
-    const fallenKeys = keysOf(fallen?.controls ?? []);
-    expect(fallenKeys).toContain('note:hudChrome.options.gpuBackendActiveUnavailable');
-    expect(fallenKeys).not.toContain('note:hudChrome.options.gpuBackendActive');
-    const fallenLine = noteWithKey(
-      fallen?.controls ?? [],
+    // Fell short of the setting: its own sentence, and the OpenGL name.
+    const fallen = backendRow({ active: 'opengl', requestedUnavailable: true });
+    expect(fallen?.control === 'choice' && fallen.statusKey).toBe(
       'hudChrome.options.gpuBackendActiveUnavailable',
     );
-    expect(fallenLine?.control === 'note' && fallenLine.valueKeys).toEqual({
+    expect(fallen?.control === 'choice' && fallen.statusValueKeys).toEqual({
       backend: 'hudChrome.options.gpuBackendActiveNameOpenGL',
     });
 
-    // Nothing to say yet: no line at all rather than a guessed reading, and the
-    // row keeps its description.
+    // Nothing to say yet: no reading at all rather than a guessed one, and the
+    // row keeps its description and its single note.
     for (const active of [null, undefined]) {
-      const quiet = keysOf(
+      const quiet = backendRow(active);
+      expect(quiet?.control === 'choice' && quiet.statusKey).toBeUndefined();
+      expect(quiet?.control === 'choice' && quiet.statusValueKeys).toBeUndefined();
+      const quietKeys = keysOf(
         system({ ...WEB_ENV, desktopGpuBackend: true, desktopGpuBackendActive: active })
           ?.controls ?? [],
       );
-      expect(quiet).not.toContain('note:hudChrome.options.gpuBackendActive');
-      expect(quiet).not.toContain('note:hudChrome.options.gpuBackendActiveUnavailable');
-      expect(quiet).toContain('note:hudChrome.options.gpuBackendNote');
+      expect(quietKeys).toContain('note:hudChrome.options.gpuBackendNote');
+    }
+  });
+
+  it('keeps every wide-card control paired with exactly one note', () => {
+    // The wide graphics cards lay their children out two-up, control then note,
+    // so the whole card depends on that alternation: one extra note for one row
+    // pushes every row after it into the wrong cell (seen in the System card
+    // when the backend reading was first added as a note of its own).
+    const env = { ...WEB_ENV, desktopGpuBackend: true, desktopDisplayMode: true };
+    for (const section of buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env)) {
+      if (section.column !== 'full') continue;
+      let noteRun = 0;
+      for (const control of section.controls) {
+        if (control.control === 'note') {
+          noteRun += 1;
+          expect(
+            noteRun,
+            `${section.titleKey} has two notes in a row, which shifts the card's grid`,
+          ).toBeLessThan(2);
+        } else {
+          noteRun = 0;
+        }
+      }
     }
   });
 

@@ -14051,6 +14051,14 @@
   .gfx-card .set-row:has(.set-choice) > .set-choice {
     grid-column: auto;
   }
+  /* A live reading inside a control row (the graphics backend's "currently
+     using X"), under its buttons rather than beside the row: the wide cards
+     below flow their children two-up, so a note of its own would shift every
+     row after it by a cell. Tighter above than a standalone note, which
+     separates two rows; this one belongs to the buttons over it. */
+  .set-note-inline {
+    margin: 2px 0 0;
+  }
   /* Full-width cards (Display / System / Touch) span both columns below the
      dial cards; their single-height rows flow two-up so the closing band
      stays compact, with a lone trailing row spanning rather than stranding a
