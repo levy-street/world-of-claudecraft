@@ -89,8 +89,9 @@ flask, a stamina elixir, their own plate): the downward refusal fires only insid
 one `elixir_<kind>` family and the singleton strip sheds only flask-marked auras,
 so an attack-power or intellect flask leaves a stamina elixir alone. Only the
 TANK kit is two, because its flask IS the stamina one and refuses the stamina
-elixir downward. All three are pinned in `tests/flask_consumables.test.ts`,
-"the R5 full kit".
+elixir downward. The caster and physical melee stacks are pinned in
+`tests/flask_consumables.test.ts`, "the R5 full kit"; the tank's two-aura kit is
+the downward-refusal arm in the same file's "flasks: one at a time" block.
 
 ## 3. The baseline, named exactly
 
@@ -407,7 +408,9 @@ The attack-power term is further multiplied by the spec's own `apPct` before it
 reaches the stat book, so a combat rogue's +19 raw reads +21 on the sheet.
 
 Measured contribution: **+2.4 to +3.5 percentage points**, the largest term in
-the envelope by a wide margin.
+the envelope by a wide margin. Over a 19-stat term that is **0.13 to 0.18
+points per stat**, which is the sensitivity sections 10.4 and 13 size their
+arguments with.
 
 ## 9. The measured pass
 
@@ -438,8 +441,9 @@ the fury lane runs the `scripts/fury_dps_probe.ts` rotation and rows; the caster
 lane is a MAGE at the class's default spec (the probe calls no `setSpec`, so no
 spec mastery multiplier rides on either arm) spamming frostbolt, the level-20
 mage's own single-target filler, wearing the maintained caster BiS set that
-`WARLOCK_FULL_BIS_GEAR` happens to name (every piece of it lists `mage` in
-`requiredClass`), and drinking `sunpetal_mana_draught` on cooldown, both arms
+`WARLOCK_FULL_BIS_GEAR` happens to name (every piece is mage-legal: nine list
+`mage` in `requiredClass`, and the neck and the two rings carry no class
+restriction at all), and drinking `sunpetal_mana_draught` on cooldown, both arms
 alike.
 
 On the three THROUGHPUT lanes the packet's delta is applied to the kit arm as
@@ -688,10 +692,11 @@ band and dominance arms in `tests/masterwrought_budget.test.ts` pin. The ruling
 stands on the pinned rule; only its arithmetic rationale is superseded.
 
 Two smaller tunes were available and are recorded as NOT taken, with the reason.
-(a) **Flask 14.** By section 8.3's own sensitivity (0.13 to 0.18 points per stat)
-it would land the pre-tune fury reading at roughly 4.8 to 5.0, which is inside
-but with no margin at all over a measurement whose interval already straddles the
-line. (b) **Tune only `warboar_flask` and `runewater_flask`.** `ironhusk_flask`
+(a) **Flask 14.**
+By section 8.3's sensitivity of 0.13 to 0.18 points per stat, a one-point trim
+moves the pre-tune fury reading of 5.1 to 5.3 down to roughly **4.9 to 5.2**,
+whose top half is still OUTSIDE the envelope. That is the argument against 14
+rather than a near miss: it does not reliably land the kit inside. (b) **Tune only `warboar_flask` and `runewater_flask`.** `ironhusk_flask`
 is `buff_sta` and contributes exactly zero to "total throughput", so leaving it
 at 15 would cost nothing on any throughput lane; the price is that the tank arm
 would move to roughly +5.1 percent and the three role flasks would lose their
@@ -709,16 +714,19 @@ apex ARMOUR pieces** (nine wearable plus the shield).
 
 **R14 passes cleanly.** All three jewelry pieces are pure primary plus stamina,
 each sums exactly `primaryStatBudget(31, epic, slot)`, each carries exactly one
-rating at the jewelry band's 25, and no WEARABLE apex def carries a proc, an
-on-use, or a spell-power line. (Three apex OUTPUTS do carry `use` payloads:
-`masters_field_forge`, `grand_cauldron` and `laden_hearth`. None is equipment;
-all three are placeable stations, so R14's equipment rule is not in play.)
+rating at the jewelry band's 25, and no apex EQUIPMENT def carries a proc, an
+on-use, or a spell-power line: not one of the 17, weapons, shield and jewelry
+included. (FOUR apex OUTPUTS carry `use` payloads: the three
+placeable stations `masters_field_forge`, `grand_cauldron` and `laden_hearth`,
+plus `makers_charm`, the apex tool-effect charm. None of the four is equipment,
+so R14's equipment rule is not in play for any of them.)
 
 The packet does introduce one combination the slot did not previously hold: a
 cloth chest carrying haste, since every pre-packet cloth chest carries either no
 rating or crit. It carries it at the ordinary armour-family rate of one rating at
-40, which is the same price every other apex armour piece pays, so it is a new
-SHAPE at a known rate rather than a Lariat's new-shape premium. It is also the
+40, the same price the other eight body armour pieces pay (the shield sits on
+the held-and-shield band at 20 instead), so it is a new SHAPE at a known rate
+rather than a Lariat's new-shape premium. It is also the
 least-bad option in the slot: the complement rule forbids crit (the reference
 carries it) and hit is the double-value field this phase tuned away from.
 
@@ -761,7 +769,10 @@ multiplier. This is the judgment surface for the future-tier revisit.
 
 ### 12.1 The gain function
 
-Every symbol in this subsection is in `src/sim/professions/wheel.ts`.
+Every symbol in this subsection is in `src/sim/professions/wheel.ts`, with two
+exceptions a reader must read in place: `CRAFT_SKILL_GAIN` is a module-private
+const in `src/sim/professions/crafting.ts`, and each craft's `maxSkill` sits on
+`CRAFT_RING` in `src/sim/content/professions.ts` (read via `craftMaxSkillFor`).
 
 `tierForSkill(skill) = floor(skill / 25)` with `TIER_SKILL_STEP = 25`. A craft's
 capability tier is `tierForSkill(currentSkill)`; a recipe's tier is
@@ -832,10 +843,13 @@ and start at the craft's own lowest `skillReq`.
 - **The qr-GRAY row's own claim is false as literally written.** It says the
   cheapest path to any skill number is always bulk-spamming low recipes. Measured
   in reagent value, the tier-0 spam path is DEARER than the intended path for 8
-  of the 10 crafts (only leatherworking and inscription come out cheaper), and on
-  the eight crafts with a tier-0 row it costs three times the crafts (alchemy 2.5
-  times, enchanting 1.5, both because their columns do not start at the same
-  place the other eight do). The gray grind is real; its lever is not the
+  of the 10 crafts (only leatherworking and inscription come out cheaper). On the
+  NINE crafts with a tier-0 row, alchemy included, the floor path is the same 375
+  crafts: three times the intended 125 on eight of them, and 2.5 times alchemy's
+  longer intended 150, which comes from its missing band-3 rung rather than from
+  where its floor column starts. Enchanting is the tenth and the only one whose
+  columns start elsewhere: its roster has no tier-0 row at all, so both columns
+  start at skill 25 and the floor path is 225 against an intended 150. The gray grind is real; its lever is not the
   floor. The genuinely cheapest path in materials is **the lowest reagent cost
   per skill point among the recipes that still pay**, which in practice means
   staying one or two tiers under the band rather than at the floor. It beats the
