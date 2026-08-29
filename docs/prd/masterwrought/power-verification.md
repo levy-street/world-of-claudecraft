@@ -20,9 +20,12 @@ column (section 12.3 defines it).
 **SUSPENDED. The envelope question is RE-OPENED and this phase does not close
 it.** A fresh reader's adversarial pass found, and this document's own harness
 then confirmed, that the gear term measures a STAT MODEL of the kit rather than
-the kit. On the physical lanes that model is a LOWER bound, not the upper bound
-section 8.1 claims, and correcting it takes the binding lane from just over the
-line to roughly twice it. Section 9.6 carries the measurement and the mechanism.
+the kit. On the FURY lane, the one measured, that model is a LOWER bound, not
+the upper bound section 8.1 claims, and correcting it takes the binding lane
+from just over the line to roughly twice it. The rogue lane's equipped arm is
+UNMEASURED and its hit arithmetic differs, so its expected sign is at or below
+its modelled row. Section 9.6 carries the measurement, the mechanism and the
+rogue scoping.
 
 The verdict this phase originally reached, and which no longer stands as
 written, was "INSIDE the envelope on every measured kit and both protected
@@ -33,26 +36,46 @@ against, so the tunes are kept and the conclusion is withdrawn.
 WHAT THE MAINTAINER OWNS, because both are ratified definitions this phase may
 not rewrite on its own:
 
-1. **Section 3's baseline pool.** `bestEpicGearFor` scores by raw stat SUM,
-   class-agnostically, so the two physical baselines carry two rings worth zero
-   attack power and 355 hit rating against a need of 190 or 260. Section 3
-   calls the pool "best-in-slot" and names only the legendary exclusion as its
-   conservatism. Either the pool rule changes to mean throughput-optimal, or
-   the record says the physical denominators are roughly 3 percent under a
-   hand-optimised kit.
+1. **Section 3's baseline pool.** `bestEpicGearFor` filters class-legally
+   (`canEquipItemInSlot`) but SCORES by raw stat SUM, class-agnostically and
+   rating-blind (ratings and spellPower score zero, armor counts), so the two
+   physical baselines carry two rings worth zero attack power, and the fury
+   baseline carries 355 hit rating against a need of 190 or 260 (the rogue
+   baseline carries 190, exactly the heroic need). Section 3 calls the pool
+   "best-in-slot" and names only the legendary exclusion as its conservatism.
+   Either the pool rule changes to mean throughput-optimal, or the record says
+   the physical denominators are roughly 3 percent under a hand-optimised kit.
+   The +7.69 / +6.44 percent readings behind that second option are a
+   non-reproducible throwaway measurement (the adversarial reader's AP-correct
+   baseline was never committed as an arm), so the maintainer prices the
+   second option with that uncertainty on the record.
 2. **Section 8.1's gear term.** "+2 lead-stat points" excludes the apex pieces'
    rating lines, which on a hit-capped physical baseline are the larger term.
    Either the gear term becomes an item swap on every lane, as the tank arm and
    the two new equipped arms already do, or the record states plainly that the
    published percentages exclude apex rating deltas and are therefore floors.
+   The piece-choice rule for the item-swap option: the equipped arm is the
+   throughput argmax over class-legal kits wearing at most
+   `MASTERWROUGHT_EQUIP_CAP` flagged pieces (what a player optimises); under
+   it the caster arm equips the chest alone while the fury arm's two pieces
+   are forced. Note that the floors reading does not by itself close R5: an
+   at-most bound cannot be verified from floors, so taking this arm means
+   ratifying the modelled term as the R5 quantity and accepting on the record
+   that the equipped kit moves the binding lane roughly twice the envelope.
 
 Both readings re-open R5 rather than settling it, which is why this is an
 escalation and not an in-phase re-tune.
 
+A latent third decision rides beside those two: whether R5 closes on the four
+measured lanes with enhancement bounded by argument (section 9.3), or requires
+an enhancement lane once the baseline pool is settled. The lane is roughly a
+day of work: the harness fixture and `scripts/owned_class_balance_probe.ts`'s
+enhancement rotation are reusable; only the baseline list is missing.
+
 | lane | heroic raid, level 22 | S-rift, level 23 |
 |---|---|---|
 | rogue, combat | +3.28% | +3.22% |
-| rogue, assassination | +3.78% | +3.86% |
+| rogue, assassination | +3.79% | +3.86% |
 | rogue, subtlety | +3.78% | +3.79% |
 | warrior, fury (the tight lane) | **+4.94% +/-0.96** | **+4.50% +/-0.94** |
 | caster, 60 s burst profile | +4.55% | +4.58% |
@@ -129,16 +152,23 @@ the downward-refusal arm in the same file's "flasks: one at a time" block.
 R5's baseline is "pre-packet raid BiS". That phrase resolves to three materially
 different numbers in the neck slot alone, so this document fixes it:
 
-> **The baseline pool is PvE, class-equippable, best-in-slot, with the 17
-> masterwrought-flagged defs removed. The three THROUGHPUT lanes take the
-> repo's maintained EPIC-ONLY pickers; the derived TANK arm additionally takes
-> legendaries and held offhands.**
+> **The baseline pool is PvE, class-equippable, best-in-slot (this phrase is
+> under Verdict item 1's ruling), with the 17 masterwrought-flagged defs
+> removed. The three THROUGHPUT lanes take the repo's maintained EPIC-ONLY
+> pickers; the derived TANK arm additionally takes legendaries and held
+> offhands.**
+
+QA note (the Phase 15 QA, 2026-08-29): the caster lane's maintained set is not
+epic-only. `WARLOCK_FULL_BIS_GEAR` carries the LEGENDARY mainhand
+`heroic_deathless_heartwood`, a STRONGER denominator, so the caster rows read
+lower than an epic-only pool would print, which is the safe direction.
 
 The split is stated rather than assumed because the two readings differ by 20
 stat points in the neck slot alone. The throughput loadouts are
-`bestEpicGearFor(cls, spec)` (`src/sim/dev/bis_gear.ts`, which filters
-`item.quality === 'epic'`, so legendaries and held offhands are excluded by
-construction) with the flagged picks swapped out, plus the fury lane's two
+`bestEpicGearFor(cls, spec)` (`src/sim/dev/bis_gear.ts`, which filters on
+quality epic AND kind armor-or-weapon: legendaries fall to the quality
+filter, held offhands to the kind filter) with the flagged picks swapped out,
+plus the fury lane's two
 greatswords; the maintained caster set is `WARLOCK_FULL_BIS_GEAR`. Using the
 epic-only pickers runs in the packet's DISFAVOUR and is therefore the safe
 choice: a legendary-inclusive denominator is stronger, so re-deriving with it
@@ -173,7 +203,8 @@ greatswords and rotation, with the remaining ten slots from
 
 **Caster**: `WARLOCK_FULL_BIS_GEAR` (`scripts/warlock_balance_probe.ts`), the
 repo's maintained set-complete caster BiS: Wraithfire Regalia 4-piece plus
-Mournweave 3-piece plus hit jewelry. Using it rather than a hand-picked kit
+Mournweave 3-piece plus hit jewelry, with the LEGENDARY mainhand
+`heroic_deathless_heartwood`. Using it rather than a hand-picked kit
 matters: a set-incomplete caster benches 21 to 33 percent under this one, and a
 weaker denominator would inflate the measured percentage.
 
@@ -252,7 +283,7 @@ The choice is load-bearing rather than cosmetic: a caster in raid BiS carries 16
 hit rating and lands at 98 percent effective spell hit against the level-22
 heroic boss, so most of a further hit term clamps away there and none of it does
 at level 23. Measuring only one target would have missed a
-single-slot outlier worth 2.8 to 4.1 percent (section 11.2).
+single-slot outlier worth 2.8 to 4.1 percent (section 10.2).
 
 ## 6. Premise checks, run before any number was sealed
 
@@ -351,8 +382,10 @@ the table: at 5 seeds and 180 s its per-seed deltas ranged from minus 1.2 to plu
 
 ### 8.1 Gear
 
-Every apex ARMOUR piece is a stat-and-armour twin of a same-slot, same-armour-class,
-item-level-31 heroic five-man drop, so **base apex adds no shelf height at all**.
+Each of the nine WEARABLE apex armour pieces is a stat-and-armour twin of a
+same-slot, same-armour-class, item-level-31 heroic five-man drop (the shield's
+reference is the item-level-33 raid shield, section 10.3), so **base apex adds
+no shelf height at all**.
 Only Perfecting does, and it adds the difference between the piece's budget at
 source 28 and at its recipe's own level 25. Both levels are raised by
 `QUALITY_ILVL_BONUS.epic = 6` before the budget is taken, so 28 becomes 34 and
@@ -364,7 +397,8 @@ source 28 and at its recipe's own level 25. Both levels are raised by
 
 which gives +2 on chest, mainhand, held offhand, gloves, waist and the shield,
 and +1 on legs, feet, neck and ring; a two-hander takes +2 (the two-hand
-multiplier applies before the rounding on both sides, so it does not compound).
+multiplier applies to the budget before the rounding, identically on both
+sides, so the delta stays 2).
 The formula gives +2 on helmet and shoulder too, but the apex set occupies
 neither slot, so no piece collects it.
 
@@ -374,10 +408,11 @@ delta of 1 goes entirely to the lead stat and a delta of 2 puts the second point
 on the secondary. Measured across all 17: every piece gains exactly +1 lead.
 
 With the equip cap at 2, **the gear term is +2 lead-stat points**, and that is the
-figure the measurement uses for every lane. **Section 9.6 shows that on the two
-PHYSICAL lanes this is a LOWER bound rather than an upper one, and by roughly
-the width of the envelope, so read the rest of this subsection with that
-correction in front of it.** The reasoning below was written before that was
+figure the measurement uses for every lane. **Section 9.6 shows that on the
+FURY lane this is a LOWER bound rather than an upper one, and by roughly the
+width of the envelope (the rogue lane's equipped arm is unmeasured and its
+expected sign is at or below the modelled row), so read the rest of this
+subsection with that correction in front of it.** The reasoning below was written before that was
 measured and is kept because it is still right about the caster.
 
 It is claimed as an upper bound in two ways: a
@@ -442,7 +477,8 @@ and the two throughput arms do not, which is exactly why the throughput arms are
 the binding ones.
 
 The attack-power term is further multiplied by the spec's own `apPct` before it
-reaches the stat book, so a combat rogue's +19 raw reads +21 on the sheet.
+reaches the stat book, so a combat rogue's +19 raw reads +23 on the sheet (a
+subtlety rogue's reads +21).
 
 Measured contribution: **+2.4 to +3.5 percentage points**, the largest term in
 the envelope by a wide margin. Over a 19-stat term that is **0.13 to 0.18
@@ -458,47 +494,57 @@ table takes TWO invocations, because the binding lane needs a bigger sample
 than the others and a single default run would print a different fury row:
 
     npx tsx scripts/r5_envelope_probe.ts                       # rogue, caster, tank
-    WOC_R5_SEEDS=1200 WOC_R5_SECONDS=600 \
+    WOC_R5_SEEDS=60 WOC_R5_SECONDS=600 \
       WOC_R5_ARMS=FULL npx tsx scripts/r5_envelope_probe.ts fury   # the binding row
 
 `WOC_R5_SEEDS`, `WOC_R5_SECONDS` and `WOC_R5_ARMS` override the sample and
-restrict which kit arms run. Its constants (`HEROIC_TARGET`, `SRIFT_TARGET`,
-the baseline loadouts, the enchant maps, the kit deltas) are the section-3 and
-section-8 tables in executable form, and the deltas are READ from the catalog
-rather than written as literals, so a magnitude the packet later moves moves
-the harness with it. `tests/r5_envelope_probe.test.ts` pins the deterministic
-tank lane and the target derivations against this document.
+restrict which kit arms run. The binding-row invocation's 60 seeds at 600 s is
+the recorded sample. At the post-ruling re-cut, either record the table at the
+documented invocation's sample or change the documented invocation to the
+recorded sample: the two must agree. Its constants (`HEROIC_TARGET`,
+`SRIFT_TARGET`, the baseline loadouts, the enchant maps, the kit deltas) are
+the section-3 and section-8 tables in executable form, and the enchant and
+consumable deltas are READ from the catalog rather than written as literals,
+so a magnitude the packet later moves moves the harness with it; the gear and
+Perfecting deltas are literals cross-pinned by
+`tests/masterwrought_budget.test.ts`'s Perfected-lead arm.
+`tests/r5_envelope_probe.test.ts` pins the deterministic tank lane and the
+target derivations against this document.
 
 Level 20, `autoEquip: false`, an ambient-free world (no camps, npcs or ground
 objects), the probe anchored in the open field, and an inert target: `hostile`,
 `aiState: 'idle'`, `moveSpeed: 0`, zero weapon damage, the section-5 level and
 armor. Resources are never refilled. Rotations are the repo's own: the rogue
-lane runs the `scripts/rogue_dps_probe.ts` priority list and the La Luna build;
+lane runs the La Luna build with `scripts/rogue_dps_probe.ts`'s COMBAT
+priority list applied to all three specs (the probe's per-spec rotation
+branches are not carried over);
 the fury lane runs the `scripts/fury_dps_probe.ts` rotation and rows; the caster
 lane is a MAGE at the class's default spec (the probe calls no `setSpec`, so no
 spec mastery multiplier rides on either arm) spamming frostbolt, the level-20
 mage's own single-target filler, wearing the maintained caster BiS set that
 `WARLOCK_FULL_BIS_GEAR` happens to name (every piece is mage-legal: nine list
 `mage` in `requiredClass`, and the neck and the two rings carry no class
-restriction at all), and drinking `sunpetal_mana_draught` on cooldown, both arms
-alike.
+restriction at all), and drinking `sunpetal_mana_draught` when mana falls
+below 45 percent, both arms alike.
 
 On the three THROUGHPUT lanes the packet's delta is applied to the kit arm as
 instance `rolled.stats` and auras, which is the same channel an enchant and a
 Perfected bonus really use, so the kit arm is the baseline character plus exactly
-the section-8 terms. Two arms depart from that model and say so where they are
-reported: the maximal caster arm (9.2) and the whole tank arm (9.5) SWAP ITEMS
-instead, because their gear term is a rating line or armour rather than a lead
-primary.
+the section-8 terms. Three arms depart from that model and say so where they
+are reported: the maximal caster arm (9.2), the whole tank arm (9.5) and the
+fury equipped arm (9.6) SWAP ITEMS instead, because their gear term is a
+rating line or armour rather than a lead primary.
 
 ### 9.2 Results
 
 > **STALE AGAINST THE COMMITTED HARNESS, and deliberately not refreshed.** The
 > fury and caster rows below predate `scripts/r5_envelope_probe.ts` and do not
 > reproduce from it. Measured at the stated samples, the harness gives fury
-> 4.55 / 5.76 at 60 seeds and 5.06 / 5.24 at 300, against the 4.94 / 4.50
-> printed here, and caster 4.92 / 4.93 / 4.75 / 4.63 against the 4.55 / 5.06 /
-> 4.58 / 4.75 printed here. Three causes, all now understood: the caster figures
+> 4.55 / 5.76 at 60 seeds and 5.06 / 5.24 at 300 s, against the 4.94 / 4.50
+> printed here, and caster 4.90 / 4.93 / 4.74 / 4.63 against the 4.55 / 5.06 /
+> 4.58 / 4.75 printed here (the four caster figures re-measured from the
+> committed harness by the Phase 15 QA, 2026-08-29: the first capture predated
+> the final harness commits). Three causes, all now understood: the caster figures
 > were taken at 10 seeds while this section claimed 25; the harness's first
 > version refilled the player's resource, which handed a fury warrior 100 rage
 > it must earn; and its error bars were computed unpaired on a paired design,
@@ -506,8 +552,10 @@ primary.
 > fixed in the harness. The TABLE is left as measured rather than refreshed
 > because section 9.6 shows the quantity itself is under a maintainer ruling:
 > refreshing a modelled number now would have to be redone once the gear term
-> is settled. **Read every row here as a floor from a superseded fixture.** The
-> rogue rows and the whole of 9.5 do reproduce exactly.
+> is settled. **Read every row here as a floor from a superseded fixture.**
+> The rogue rows and the whole of 9.5 do reproduce exactly (the assassination
+> heroic cell read +3.78 from an intermediate harness state; the Phase 15 QA
+> corrected it to the committed +3.79, 2026-08-29).
 
 Rogue: 25 seeds, 180 s. Caster: 25 seeds, at both the 60 s burst and the 180 s
 sustained profile. Warrior fury: 60 seeds, at both 180 s and 600 s. Error bars
@@ -516,7 +564,7 @@ are 2 standard errors on the difference.
 | lane | target | gear | gear + enchant | FULL KIT |
 |---|---|---|---|---|
 | rogue, combat | heroic | +0.28% | +0.76% | **+3.28%** |
-| rogue, assassination | heroic | +0.37% | +0.82% | **+3.78%** |
+| rogue, assassination | heroic | +0.37% | +0.82% | **+3.79%** |
 | rogue, subtlety | heroic | +0.48% | +0.91% | **+3.78%** |
 | warrior, fury | heroic | +1.25% | +2.15% | **+4.94% +/-0.96** |
 | caster, 60 s | heroic | +0.57% | +1.06% | **+4.55%** |
@@ -564,6 +612,20 @@ because enhancement is not rage-driven, so what bounds it is the weapon term
 landing twice, which fury already pays. That is an argument, not a measurement,
 and the record says so rather than implying the set is complete.
 
+QA addendum (the Phase 15 QA, 2026-08-29): the QA ran an exploratory
+enhancement measurement, a throwaway probe adapted from this file's fury lane
+and `scripts/owned_class_balance_probe.ts`'s maintained warspirit fixture, not
+committed and re-derivable in about a day. The modelled kit read +3.0 percent
+at both targets (12 seeds at 150 s), inside the envelope and below fury,
+supporting this section's transfer argument. The realisable S-rift kit read
++5.41 (32 seeds at 180 s) against the maintained baseline and +7.64 against an
+epic-only baseline via `duskforged_warblade`'s crit-for-hit twin mechanism,
+but +2.87 against a hit-corrected pre-packet baseline that itself beats the
+maintained fixture by +2.56 percent, so the lane's envelope answer inverts on
+the section 3 pool choice alone, which is Verdict item 1's ruling. These are
+QA-run throwaway numbers, with the same non-reproducibility caveat as the
+7.69 / 6.44 figures.
+
 
 Fury is the highest-throughput physical spec, it dual-wields (so it pays the
 weapon-enchant term twice), and it is rage-starved about a fifth of the time in
@@ -597,7 +659,7 @@ and stamina rather than a lead primary. Its inputs, all executable in
 - the pre-packet enchant set both arms carry: mainhand str 5, gloves str 3,
   shoulder and both rings str 2, helmet and legs sta 6, chest sta 7, waist and
   offhand sta 3, feet sta 2, neck spi 3;
-- the two Perfected pieces a protection warrior can actually wear:
+- the two Perfected pieces this arm equips (the lane's best realisable pair):
   `duskforged_bulwark` in the offhand (Perfected `{str:1, sta:1}`) replacing
   `heroic_bonewrought_bulwark`, and `forgefold_legguards` (Perfected `{str:1}`)
   replacing `furyforged_legguards`;
@@ -631,28 +693,39 @@ Before this phase's shield tune the same arm read **+6.24%**, most of it armour.
 ### 9.6 What the modelled gear term omits, measured
 
 The gear term everywhere above is "+2 lead-stat points" (section 8.1), applied
-as an instance stat delta. Section 8.1 calls that an upper bound. On the two
-PHYSICAL lanes it is a lower bound, and the gap is larger than the envelope.
+as an instance stat delta. Section 8.1 calls that an upper bound. On the FURY
+lane it is a measured lower bound, and the gap is larger than the envelope.
+The rogue lane's equipped arm is UNMEASURED and its hit arithmetic differs:
+the rogue baseline carries exactly 190 hit rating, at the heroic cap with zero
+headroom and 70 short at S-rift, so the fury dead-rating mechanism does not
+transfer, and the rogue equipped arm's expected sign is at or below its
+modelled row (converting live hit to crit is a loss at both targets there).
 
 **The mechanism.** `swingMissChance` is `max(0, miss - hitBonus)` and `hitBonus`
 is `hitRating / 1000`, so hit past the miss chance is worth exactly nothing.
 `WAR_BIS` carries **355 hit rating**; the heroic target needs 190 and the S-rift
-target 260. Its effective miss is already **0.0 percent at both targets**, and
-95 to 165 rating is dead weight. Now compare the two legs:
+target 260. Its effective miss on SPECIAL attacks is already **0.0 percent at
+both targets**, and 95 to 165 rating is dead weight. White swings additionally
+carry the flat dual-wield 10 percent penalty
+(`DUAL_WIELD_WHITE_MISS_PENALTY`, `src/sim/combat/auto_attack.ts`), added
+after the `max(0, ...)` floor, which no amount of hit rating reduces, so the
+dead-rating conclusion is unchanged. Now compare the two legs:
 
 | def | armour | str | sta | hit | crit |
 |---|---|---|---|---|---|
 | `bloodmane_war_legguards` (baseline) | 315 | 11 | 9 | 40 | 0 |
 | `forgefold_legguards` (apex) | 315 | 11 | 9 | 0 | 40 |
 
-They are byte-identical except that the apex piece's 40 hit is 40 CRIT.
+They are stat-and-armour identical except that the apex piece's 40 hit is 40
+CRIT (the defs also differ on sellValue, requiredLevel, requiredClass and the
+masterwrought flag, none of which moves combat stats).
 Equipping it converts dead rating into live rating, a gain the "+1 lead stat per
 piece" model scores as ZERO, because Perfecting moves primary stats only.
 
 **Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
-the only difference being whether the two Perfected pieces a fury warrior can
-actually wear (`forgefold_legguards` and `warhewn_signet`) are applied as a stat
-delta or EQUIPPED as items:
+the only difference being whether the two Perfected pieces this arm equips
+(the lane's best realisable pair, `forgefold_legguards` and `warhewn_signet`)
+are applied as a stat delta or EQUIPPED as items:
 
 | arm | heroic raid, L22 | S-rift, L23 |
 |---|---|---|
@@ -667,7 +740,9 @@ npx tsx scripts/r5_envelope_probe.ts fury`.
 carries the dead hit above and two rings worth zero attack power, so it flatters
 the packet: a throughput-correct baseline is stronger and the percentage lower.
 The adversarial reader who first raised this measured +7.69 and +6.44 percent
-against an attack-power-correct baseline. Every reading, on every baseline
+against an attack-power-correct baseline (a throwaway measurement: that
+baseline was never committed as an arm, so the two figures are not
+reproducible from the harness). Every reading, on every baseline
 tried, is above 5. That is why the verdict is suspended rather than restated
 with a new number: which baseline is correct is section 3's ruling to make, not
 this section's.
@@ -837,9 +912,10 @@ carries it) and hit is the double-value field this phase tuned away from.
 **Recorded, measured, not defects:**
 
 - `wyrmfall_pendant` is the packet's dominant piece and the closest thing to a
-  Lariat it contains: it is the only flagged def with neither an armour class nor
-  a class restriction, so all nine classes wear the same neck, and the neck slot
-  has no pre-packet PvE EPIC item-level-31 incumbent at all (the epic field tops
+  Lariat it contains: it is the only flagged NECK with neither an armour class
+  nor a class restriction (the two apex rings share that pair), so all nine
+  classes wear the same neck, and it is the only flagged def in a slot with no
+  pre-packet PvE EPIC item-level-31 incumbent at all (the epic field tops
   out at 12 at item level 26, and the three item-level-31 necks are PvP honor
   rows). The legendary `heart_of_the_rift` sits 17 points ABOVE the Perfected
   apex neck, so a character holding it gains nothing here, which is the same
