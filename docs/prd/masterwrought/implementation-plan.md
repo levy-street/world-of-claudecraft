@@ -912,6 +912,8 @@ apex chest's rating field, the apex shield's armour and block, and the apex flas
 none of them a magnitude 11c-D-2 settled: the well-fed ladder is untouched. The kit sum above
 therefore reads flask 13 plus food 6 for NINETEEN on the shipped tree; the 21 is the
 pre-Phase-15 number. Record: `power-verification.md` and the Phase 15 ledger in `state.md`.
+FINAL 2026-08-28: the phase then ESCALATED under the phase file's own stopping rule; the
+R5 verdict is SUSPENDED (power-verification.md Verdict, state.md Phase 15 ledger).
 
 ## Phase 16: Polish and content surfaces (ultracode sweep)
 

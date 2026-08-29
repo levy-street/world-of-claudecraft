@@ -162,6 +162,9 @@ the judgment surface for the future-tier revisit brainstorm.md carries.
     carries it, because 13 plus 8 is exactly 21; what keeps 8 rejected is the ladder
     ordering, which the Well Fed band and dominance arms pin. Full record:
     `docs/prd/masterwrought/power-verification.md` sections 8.3 and 10.4.
+    FINAL 2026-08-28: the phase then ESCALATED under this file's own stopping rule;
+    the R5 verdict is SUSPENDED (power-verification.md Verdict, state.md Phase 15
+    ledger).
 - IF 11c landed anything else, that is a code-versus-ruling mismatch and it is blocking on
   its own. This phase then requires a fresh run of
   `docs/design/spell-balance-framework.md` from the top, and it trips its own stopping rule:

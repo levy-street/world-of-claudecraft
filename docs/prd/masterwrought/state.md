@@ -42,8 +42,8 @@ next is Phase 09 QA (fresh session, own release sync first per the delivery
 contract).
 Packet authored 2026-08-07.
 Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on
-`origin/release/v0.38.0`; carries every release sync through `origin/release/v0.40.0`
-(65b91fa190) and, since 11b, all of `origin/feature/farming-plan` (8cd964d599).
+`origin/release/v0.38.0`; carries every release sync through `origin/release/v0.41.0`
+(e19d832b47) and, since 11b, all of `origin/feature/farming-plan` (8cd964d599).
 
 ## Delivery contract (non-negotiable)
 - The ENTIRE system ships in ONE branch and ONE PR from `feature/masterwrought`. There are
@@ -21050,6 +21050,12 @@ CONSEQUENCE, recorded so no reader trusts the old number: the crafted
 stamina ceiling now reads flask 13 plus plate 6 for NINETEEN, not 21, and
 every record quoting "21 stamina" is now describing the pre-Phase-15 tree.
 
+BISECT NOTE (the Phase 15 QA, 2026-08-29): the flask tune reddened
+provisioning_supply_line_apex and elixir_tooltip_view for a 12-commit window
+mid-span (a6981112b3 to 018b81e9f8), so intermediate build-span commits do
+not all pass the suite; only the tip stamps are green, and a future bisect
+over this span should expect it.
+
 Ruling 11c-D-2's OUTCOME is unaffected, but its stated REASON no longer
 carries it and that is recorded here rather than left to be rediscovered.
 11c-D-2 rejected an apex food of 8 because "flask 15 plus food 6 equals 21"
@@ -21079,7 +21085,9 @@ subtlety 3.78 / 3.79; warrior fury 4.94 +/-0.96 and 4.50 +/-0.94 (60
 seeds, 600 s, the binding lane); caster 4.55 / 4.58 on the mana-stable
 60 s profile and 5.06 / 4.75 on the mana-bound 180 s one; tank effective
 health 4.28 / 4.27. Pre-tune the same fixtures read 5.86 / 6.08 on fury
-and 6.24 on tank EHP.
+and 6.24 on tank EHP. Figures as measured by the phase's fixture: the fury
+and caster rows are marked STALE against the committed harness in
+power-verification.md section 9.2 and read as floors.
 
 Term by term the consumables are 2.4 to 3.5 points of it, the enchants
 0.4 to 1.5, and the gear 0.24 to 1.25: base apex adds no shelf height at
@@ -21203,7 +21211,12 @@ the packet's defining gate rested on numbers nothing in the repo could
 re-derive. The harness is now COMMITTED as `scripts/r5_envelope_probe.ts`
 (73ef1d6c0c), runnable whole or per lane, with `WOC_R5_SEEDS` and
 `WOC_R5_SECONDS` overriding the sample. Its constants ARE sections 3 and
-8 in executable form, and every printed figure reproduces from it.
+8 in executable form. Reproduction is scoped (the Phase 15 QA, 2026-08-29):
+the rogue rows and the whole of section 9.5 reproduce exactly; the fury and
+caster rows are marked STALE against the committed harness in section 9.2
+and read as floors from a superseded fixture. The caster figures this ledger
+quotes (4.55 / 5.06 / 4.58 / 4.75) are that superseded fixture's; the
+committed harness reads 4.90 / 4.93 / 4.74 / 4.63 on the same four arms.
 
 THE SECOND BLOCKING GAP, also closed by measurement. The caster gear term
 was modelled as "+2 lead-stat points" and never measured the loadout where
@@ -21286,8 +21299,9 @@ STRADDLES the line ([3.98, 5.90] heroic, [3.56, 5.44] S-rift). What the
 measurement establishes is a central estimate inside the envelope, not a
 demonstrated crossing, and the flask trim is stated as a conservative
 margin rather than a proof. Two smaller tunes are recorded as available
-and not taken, with the reason: flask 14 (inside, but with no margin over
-an interval that already straddles) and tuning only the two throughput
+and not taken, with the reason: flask 14 (does not reliably land inside:
+the trimmed range 4.9 to 5.2 still tops outside, per section 10.4) and
+tuning only the two throughput
 flasks (free on every throughput lane, but it moves the tank arm to about
 +5.1 percent and breaks the three role flasks' uniform magnitude).
 
@@ -21313,16 +21327,21 @@ power-verification.md section 14 and beside the def.
 ### THE VERDICT IS SUSPENDED, and why (2026-08-28, the fresh-reader round)
 The review-fix round's own fresh reader found what four earlier reviewers and
 the implementer all missed: the R5 gear term measures a STAT MODEL of the kit,
-not the kit, and on the physical lanes the model is a LOWER bound rather than
-the upper bound power-verification.md section 8.1 claims.
+not the kit, and on the fury lane, the one physical lane measured, the model is
+a LOWER bound rather than the upper bound power-verification.md section 8.1
+claims (the rogue equipped arm is recorded as unmeasured).
 
 THE MECHANISM, verified directly rather than accepted. swingMissChance is
 max(0, miss - hitBonus) and hitBonus is hitRating/1000, so hit past the miss
-chance is worth nothing. The fury baseline WAR_BIS carries 355 hit rating
-against a need of 190 at the heroic target and 260 at S-rift: its effective
-miss is already ZERO at both, and 95 to 165 rating is dead. forgefold_legguards
-is a byte-identical twin of the baseline legs except that its 40 HIT is 40
-CRIT, so equipping the apex piece converts dead rating into live rating. The
+chance is worth nothing. That zero is scoped to SPECIAL attacks: white swings
+on a dual-wielder carry the flat dual-wield 10 percent penalty, added outside
+the hit subtraction, which no amount of hit rating reduces. The fury baseline
+WAR_BIS carries 355 hit rating against a need of 190 at the heroic target and
+260 at S-rift: its effective special-attack miss is already ZERO at both, and
+95 to 165 rating is dead, the conclusion unchanged. forgefold_legguards
+is a stat-and-armour identical twin of the baseline legs except that its 40
+HIT is 40 CRIT, so equipping the apex piece converts dead rating into live
+rating. The
 "+1 lead stat per piece" model scores that as zero, because Perfecting moves
 primary stats only.
 
@@ -21346,14 +21365,27 @@ breaks a set bonus and the caster baseline is not rating-capped.
 
 WHAT THE MAINTAINER OWNS. Both halves are ratified definitions this phase may
 not rewrite on its own, and either reading re-opens R5 rather than settling it:
-(1) section 3's baseline pool, since bestEpicGearFor scores by raw stat SUM
-class-agnostically and the record calls the result "best-in-slot"; (2) section
-8.1's gear term, since "+2 lead-stat points" excludes the rating lines that on
-a hit-capped physical baseline are the larger term. This is the phase file's
+(1) section 3's baseline pool, since bestEpicGearFor filters class-legally but
+scores by raw stat SUM, rating-blind, and the record calls the result
+"best-in-slot"; (2) section 8.1's gear term, since "+2 lead-stat points"
+excludes the rating lines that on a hit-capped physical baseline are the larger
+term; and an at-most bound cannot be verified from floors, so the exclusion
+reading means ratifying the modelled term as the R5 quantity and accepting on
+the record that the equipped kit moves the binding lane roughly twice the
+envelope. The ruling also settles the lane set: whether R5 closes on the four
+measured lanes with enhancement bounded by argument, or requires an enhancement
+lane once the pool is settled (about a day; the harness fixture and
+owned_class_balance_probe.ts's enhancement rotation are reusable). Scope note
+(the Phase 15 QA, 2026-08-29): the 355 hit figure belongs to the fury baseline
+alone; the rogue baseline carries 190, exactly the heroic need and 70 short at
+S-rift, so the measured lower bound is the fury lane's and the rogue equipped
+arm is unmeasured, while the zero-attack-power rings clause holds for both
+physical baselines. This is the phase file's
 own "the framework unable to measure a kit" stopping rule, so it is reported as
 an escalation and NOT re-tuned in phase.
 
-AMENDED 2026-08-29 (the seventh v0.41.0 sync, release tip e19d832b47): a THIRD
+AMENDED 2026-08-29 (the seventh v0.41.0 sync, six merges plus Phase 14's
+recorded no-op sync, release tip e19d832b47): a THIRD
 open maintainer question joined the two above, merge-inherited rather than
 R5-related. The release's Bank Storage batch ships two GENERAL 16-slot bags
 (resonant_weave_bag epic, wayfarers_backpack rare) that TIE the apex bag
@@ -21362,14 +21394,33 @@ holds on the merged tree; the budget test's apex-bag arm was rescoped to
 no-general-bag-exceeds plus the named tie set (see the MERGE-INHERITED RESCOPE
 comment in tests/masterwrought_budget.test.ts), and whether to re-distinguish
 the apex bag or amend the strictly-best position is the maintainer's call.
+Per-option cost: re-distinguishing (for example bagSlots 16 to 18) is about
+half a day (the def edit, re-tightening the budget arm to toBeLessThan,
+dropping the tie set, wiki regen) plus cross-packet coordination with the
+release's Bank Storage batch, since it outbids the release's 16-slot epics
+and flips bestBoostBag and the community template back to the apex bag;
+amending the strictly-best position is near zero (the rescoped pin stays as
+the final shape).
 Side effect already shipped by the release's own rules: bestBoostBag and the
 community test-account template now hand out resonant_weave_bag (ascending-id
 tie-break), not the packet's apex bag. The sync merge was also audited against
 the R5 fixture surface and found CLEAN: no epic armor or weapon joined the
 pool, no rating constant, enchant, flask, Perfecting arm, or probe input
-moved, WAR_BIS still sums 355 hit, the legs twins are still byte-twins, and
+moved, WAR_BIS still sums 355 hit, the legs twins are still stat-and-armour
+twins, and
 the deterministic tank lane byte-reproduces section 9.5, so the suspended
 escalation's evidence stands unmodified.
+
+ENHANCEMENT EXPLORATORY (the Phase 15 QA, 2026-08-29): the QA ran an
+exploratory enhancement-shaman measurement (a throwaway probe built from the
+fury lane plus the maintained warspirit fixture, not committed). The modelled
+kit reads +3.0 percent at both targets, inside the envelope and below fury.
+The realisable S-rift kit reads +5.41 against the maintained baseline, +7.64
+against an epic-only baseline, and +2.87 against a hit-corrected pre-packet
+baseline that itself beats the maintained fixture by +2.56 percent, so the
+lane's answer inverts on the section 3 pool ruling alone. Recorded as QA-run
+throwaway numbers; detail in power-verification.md section 9.3's dated
+addendum.
 
 THE FOUR TUNES STAND. All four are downward, none moves a settled magnitude,
 and none is invalidated by this: what fails is the measurement they were sized
@@ -21399,10 +21450,15 @@ clean, so both regens are zero-diff at this tip.
 
 DRIFT versus the Phase 14 QA frozen stamp (d51139a103: 3234 / 22 files
 (3256), 47738 / 2 / 381 (48121)): +1 file and +25 tests, skipped and
-expected-fail both unchanged. The +1 file is tests/r5_envelope_probe.test.ts,
-which contributes 3 of the +25; the other +22 are arms added to the eleven
-pre-existing test files this phase edited. The per-file decomposition of
-those 22 is arithmetic inference, not a measured before/after count.
+expected-fail both unchanged. Decomposition, measured by the Phase 15 QA
+(2026-08-29) in throwaway worktrees at both stamp tips: +3 from
+tests/r5_envelope_probe.test.ts (the new file), +19 across eight of the
+eleven phase-edited files (dev_bis_gear +1, enchants_magnitude_invariants
++1, flask_consumables +4, guide +1, heroic_difficulty_floors +1,
+masterwrought_budget +8, professions_enchanting +1, wellfed +2;
+elixir_tooltip_view, practice_dummies and provisioning_supply_line_apex
+contributed 0), and +3 in tests/electron_gpu_preference.test.ts inherited
+from the release merge c78a9e962f (PR #3728).
 
 The corpse_harvest_sim contention timeout that reddened two UNBOUNDED runs
 during the Phase 14 QA did not appear here; this run was bounded, which is
