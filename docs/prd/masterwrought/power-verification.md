@@ -413,12 +413,21 @@ the envelope by a wide margin.
 
 ### 9.1 Fixture
 
-**The harness is committed: `scripts/r5_envelope_probe.ts`.** Run it whole with
-`npx tsx scripts/r5_envelope_probe.ts`, or one lane at a time by passing `rogue`,
-`fury`, `caster` or `tank`; `WOC_R5_SEEDS` and `WOC_R5_SECONDS` override the
-sample. Every figure in sections 9.2 and 9.5 comes out of it, and its constants
-(`HEROIC_TARGET`, `SRIFT_TARGET`, the baseline loadouts, the enchant maps, the
-kit deltas) are the section-3 and section-8 tables in executable form.
+**The harness is committed: `scripts/r5_envelope_probe.ts`.** The documented
+table takes TWO invocations, because the binding lane needs a bigger sample
+than the others and a single default run would print a different fury row:
+
+    npx tsx scripts/r5_envelope_probe.ts                       # rogue, caster, tank
+    WOC_R5_SEEDS=1200 WOC_R5_SECONDS=600 \
+      WOC_R5_ARMS=FULL npx tsx scripts/r5_envelope_probe.ts fury   # the binding row
+
+`WOC_R5_SEEDS`, `WOC_R5_SECONDS` and `WOC_R5_ARMS` override the sample and
+restrict which kit arms run. Its constants (`HEROIC_TARGET`, `SRIFT_TARGET`,
+the baseline loadouts, the enchant maps, the kit deltas) are the section-3 and
+section-8 tables in executable form, and the deltas are READ from the catalog
+rather than written as literals, so a magnitude the packet later moves moves
+the harness with it. `tests/r5_envelope_probe.test.ts` pins the deterministic
+tank lane and the target derivations against this document.
 
 Level 20, `autoEquip: false`, an ambient-free world (no camps, npcs or ground
 objects), the probe anchored in the open field, and an inert target: `hostile`,
@@ -486,7 +495,18 @@ heroic; base 151.93 to kit 158.77 at S-rift). Its 180 s, 60-seed twins read
 lane, three sample sizes, converging as the samples grow. The 600 s row is the
 authority because within-fight variance falls with the fight length.
 
-### 9.3 Why fury is the binding lane
+### 9.3 Why fury is the binding lane, and the one lane not measured
+
+**Named gap, stated rather than argued away: enhancement shaman is not
+measured.** `canDualWield` is rogue, warrior-fury and shaman-enhancement, and
+`apFromStats` gives strength times 2 to warrior, paladin, shaman and druid, so
+enhancement is the only unmeasured spec carrying BOTH multipliers this section
+uses to explain why fury binds. The measured throughput set is rogue (str plus
+agi), warrior fury and mage. The rage argument below does not transfer to it,
+because enhancement is not rage-driven, so what bounds it is the weapon term
+landing twice, which fury already pays. That is an argument, not a measurement,
+and the record says so rather than implying the set is complete.
+
 
 Fury is the highest-throughput physical spec, it dual-wields (so it pays the
 weapon-enchant term twice), and it is rage-starved about a fifth of the time in
@@ -882,6 +902,14 @@ mutations are named above so any of them can be re-applied by hand.
   cannot measure a gear kit; the probe family can and does. The committed
   `scripts/r5_envelope_probe.ts` is a fourth member of that family and the table
   should name them.
+- **Two tooltips change their text and no screenshot was captured.** The apex
+  cloth chest's rating line moves from Hit 40 to Haste 40 and the three flask
+  tooltips move from 15 to 13, both rendered from the live def. The repo's
+  default workflow asks a visual change for before/after screenshots; this
+  phase judged a changed stat NUMBER and a changed rating FIELD in an existing,
+  already-screenshotted tooltip layout to sit below that bar, since no layout,
+  no string and no surface moved. Recorded as a judgment rather than an
+  omission, so a reviewer can overrule it.
 - **The apex weapon rung is now +1 over Greater, which is a DEMAND risk under
   R21.** `src/sim/content/enchants.ts` carries its own law that every Greater
   enchant must beat the best base option on its slot and axis by at least 3, on
