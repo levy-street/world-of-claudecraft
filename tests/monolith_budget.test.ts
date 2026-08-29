@@ -662,7 +662,14 @@ const MONOLITHS: MonolithRow[] = [
     // file measures 13363 (wc -l < src/render/renderer.ts). INHERITED growth
     // on the release arm (the entry-horizon cull and the compile gate). Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 13363,
+    // LOWERED at Phase 16 (2026-08-29): the farming absorb's recorded +30
+    // raise is PAID (rulings 11d-D-4 and 11d-U6-FIFTH; target 13333 by the
+    // moved-baseline arithmetic) by extracting the zone/archetype
+    // prewarm-group builder family into src/render/zone_prewarm_groups.ts
+    // (the mount_prewarm/great_tree_prewarm sibling shape). The file
+    // measures 13116 (wc -l < src/render/renderer.ts). Exact count, zero
+    // slack: any further growth reds again.
+    ceiling: 13116,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1083,7 +1090,13 @@ const MONOLITHS: MonolithRow[] = [
     // merged file falls BELOW both parent pins and the ratchet follows it
     // down: measured 10462 (wc -l < server/game.ts). Exact merged count, zero
     // slack: any further growth reds again.
-    ceiling: 10462,
+    // LOWERED at Phase 16 (2026-08-29): the activity-detection chain
+    // (detectActivity's else-if body) moved to server/activity_detect.ts
+    // behind a deps bag, which also pays for the golden_harvest arm the N10
+    // Discord card added there. The file measures 10329
+    // (wc -l < server/game.ts). Exact count, zero slack: any further growth
+    // reds again.
+    ceiling: 10329,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1164,7 +1177,13 @@ const MONOLITHS: MonolithRow[] = [
     // file measures 5959 (wc -l < src/net/online.ts). INHERITED growth on the
     // release arm; the known both-arms compound. Payback stays Phase 16.
     // Exact merged count, zero slack: any further growth reds again.
-    ceiling: 5959,
+    // LOWERED at Phase 16 (2026-08-29): the absorb's recorded +17 raise is
+    // PAID (target 5942 by the moved-baseline arithmetic) by folding the mst
+    // and cprof self-key decodes into src/net/crafting_wire.ts (the
+    // bank_snapshot_wire/mount_race_wire fold shape the row's own history
+    // records). The file measures 5922 (wc -l < src/net/online.ts). Exact
+    // count, zero slack: any further growth reds again.
+    ceiling: 5922,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

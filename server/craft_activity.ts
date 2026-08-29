@@ -1,9 +1,11 @@
-// The crafting-moment Discord activity card emit (masterwork procs, and since
-// Masterwrought phase 13 the legendary forging), extracted from game.ts
-// detectActivity as a move-not-rewrite (server/CLAUDE.md module-first; the
-// monolith ratchet): the dedupe/opt-out/release body is byte-identical to the
-// masterwork arm it came from, parameterized by kind. game.ts keeps thin
-// per-event calls that resolve the session and the card's item name.
+// The profession-moment Discord activity card emit (masterwork procs,
+// legendary forgings, and since N10 the golden harvest), extracted from
+// game.ts detectActivity as a move-not-rewrite (server/CLAUDE.md
+// module-first; the monolith ratchet): the dedupe/opt-out/release body is
+// byte-identical to the masterwork arm it came from, parameterized by kind.
+// The activity chain (server/activity_detect.ts since the N10 extraction)
+// keeps thin per-event calls that resolve the session and the card's item
+// name.
 //
 // The contract the body carries (R60 and the fix-round P1):
 // - The ACCOUNT-scoped dedupe key (`<kind>:<accountId>`, unlike rareloot's
@@ -31,7 +33,7 @@ import { getDeedBroadcasts } from './deeds_db';
 import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
 
 export function emitCraftActivityCard(opts: {
-  kind: 'masterwork' | 'legendary';
+  kind: 'masterwork' | 'legendary' | 'golden_harvest';
   accountId: number;
   name: string;
   itemName: string;

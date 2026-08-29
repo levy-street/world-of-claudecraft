@@ -567,8 +567,8 @@ export function buildRelayMessage(item: RelayItem, gameUrl: string): Record<stri
   return payload;
 }
 
-// ── Significant-activity feed (level 20 / rare drop / duel / arena / Vale Cup /
-// masterwork / deed) ──────────────────────────────────────────────────────────
+// ── Significant-activity feed (level 20 / rare drop / duel / arena /
+// masterwork / legendary / deed / golden harvest) ─────────────────────────────
 export interface ActivityParticipant {
   name: string;
   discordUserId: string | null;
@@ -576,12 +576,21 @@ export interface ActivityParticipant {
 }
 
 export interface ActivityItem {
-  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'legendary' | 'deed';
+  kind:
+    | 'levelup'
+    | 'rareloot'
+    | 'duel'
+    | 'arena'
+    | 'masterwork'
+    | 'legendary'
+    | 'deed'
+    | 'golden_harvest';
   realm: string;
   profileUrl: string | null;
   level?: number;
-  // rareloot; masterwork; the first-koi deed's catch. For 'legendary' this is
-  // the PLAYER-CHOSEN legendary name: render it as plain embed text (data,
+  // rareloot; masterwork; the first-koi deed's catch; for 'golden_harvest'
+  // the crop's item name from the server's ITEMS table. For 'legendary' this
+  // is the PLAYER-CHOSEN legendary name: render it as plain embed text (data,
   // never our own markdown), exactly the way the masterwork card treats it.
   itemName?: string;
   quality?: string;
@@ -598,6 +607,12 @@ export interface ActivityItem {
 // what arrives as deedName): the one feed-visible deed whose card reads as a
 // catch rather than a deed record.
 export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
+
+// The Harvestmaster deed (prog_farming_100, the farming capstone title): the
+// one deed whose card reads as a farming triumph rather than a deed record
+// (the FIRST_KOI shape; the id is a copy, pinned against the DEEDS catalog in
+// tests/discord_activity_professions.test.ts, never an import).
+export const HARVESTMASTER_DEED_ID = 'prog_farming_100';
 
 // Per-quality embed accent for a rare drop (epic purple, legendary orange).
 function qualityColor(quality: string | undefined): number {
@@ -725,6 +740,18 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
       color = 0xff8000;
       break;
     }
+    case 'golden_harvest':
+      // The farming zone celebration: a five-fold crop windfall. itemName is
+      // the crop's item name from the server's ITEMS table; || so an empty
+      // name degrades to the generic title (never ??, Discord rejects a blank
+      // title).
+      author = ':ear_of_rice: Golden Harvest';
+      title = item.itemName || 'A golden harvest';
+      description =
+        `${mentionFor(subjectName, item.participants)} reaped a golden harvest ` +
+        `of ${item.itemName || 'crops'} on ${item.realm}!`;
+      color = 0xf5c242;
+      break;
     case 'deed':
       if (item.deedId === FIRST_KOI_DEED_ID) {
         // The first-koi moment reads as a catch, not a deed record.
@@ -734,6 +761,14 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
           `${mentionFor(subjectName, item.participants)} landed their ` +
           `first ${item.itemName || 'rare catch'} on ${item.realm}!`;
         color = 0x3fa7d6;
+      } else if (item.deedId === HARVESTMASTER_DEED_ID) {
+        // The farming capstone reads as a harvest triumph, not a deed record.
+        author = ':ear_of_rice: Harvestmaster';
+        title = item.deedName || 'Harvestmaster';
+        description =
+          `${mentionFor(subjectName, item.participants)} reached 100 Farming and ` +
+          `earned the title "${item.deedTitle || 'Harvestmaster'}" on ${item.realm}!`;
+        color = 0xf5c242;
       } else {
         author = ':scroll: Deed Complete';
         title = item.deedName || 'A deed of renown';

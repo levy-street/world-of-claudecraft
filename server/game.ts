@@ -92,7 +92,6 @@ import {
   type ItemInstancePayload,
   isDungeonDifficulty,
   isEquipSlot,
-  MAX_LEVEL,
   type MobFamily,
   RUN_SPEED,
   type SimEvent,
@@ -112,6 +111,7 @@ import {
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { sameAppearance } from '../src/world_api/appearance';
+import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -180,7 +180,6 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
-import { emitCraftActivityCard } from './craft_activity';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -9304,6 +9303,14 @@ export class GameServer {
     // durable character save (see below); only the cosmetic broadcast stays
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
+    // The card-emitting else-if chain is extracted to server/activity_detect.ts
+    // behind this deps bag; the loop delegates to it per event.
+    const activityDeps: ActivityDetectDeps<ClientSession> = {
+      clients: this.clients,
+      profileUrlFor: (n) => this.profileUrlFor(n),
+      sessionByName: (n) => this.sessionByName(n),
+      sendDailyRewardPointsGained: (s, points) => this.sendDailyRewardPointsGained(s, points),
+    };
     for (const ev of events) {
       if (ev.type === 'unstuck' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
@@ -9448,150 +9455,10 @@ export class GameServer {
         // (ua_capi.ts); other levels no-op inside the module.
         if (s) trackLevelMilestoneCapi(s, ev.level);
       }
-      if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        enqueueActivity(
-          {
-            kind: 'levelup',
-            accountIds: [s.accountId],
-            names: [s.name],
-            realm: REALM,
-            profileUrl: this.profileUrlFor(s.name),
-            level: ev.level,
-          },
-          `levelup:${s.accountId}`,
-          now,
-        );
-      } else if (
-        (ev.type === 'lootRoll' || ev.type === 'masterLoot') &&
-        (ev.quality === 'epic' || ev.quality === 'legendary')
-      ) {
-        // A genuinely rare item dropped (roll-worthy); one card per drop (rollId).
-        const s = ev.pid !== undefined ? this.clients.get(ev.pid) : undefined;
-        enqueueActivity(
-          {
-            kind: 'rareloot',
-            accountIds: s ? [s.accountId] : [],
-            names: s ? [s.name] : [],
-            realm: REALM,
-            profileUrl: s ? this.profileUrlFor(s.name) : null,
-            itemName: ev.itemName,
-            quality: ev.quality,
-          },
-          `rareloot:${ev.rollId}`,
-          now,
-        );
-      } else if (ev.type === 'masterwork' && ev.pid !== undefined) {
-        // A masterwork proc: the professions moment the rareloot arm above
-        // cannot see (a craft fires no loot roll). The dedupe/opt-out/release
-        // body lives in server/craft_activity.ts (shared with the legendary
-        // arm below). Bots have no session, so this.clients.get filters them.
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        emitCraftActivityCard({
-          kind: 'masterwork',
-          accountId: s.accountId,
-          name: s.name,
-          itemName: ITEMS[ev.itemId]?.name ?? ev.itemId,
-          realm: REALM,
-          now,
-          profileUrlFor: (n) => this.profileUrlFor(n),
-        });
-      } else if (ev.type === 'legendaryForged' && ev.pid !== undefined) {
-        // The orange promotion (Masterwrought phase 13), at masterwork parity:
-        // the PERSONAL event only (legendaryForgedZone copies never card, the
-        // masterworkZone rule). itemName is the PLAYER-CHOSEN name: data only.
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        emitCraftActivityCard({
-          kind: 'legendary',
-          accountId: s.accountId,
-          name: s.name,
-          itemName: ev.name,
-          realm: REALM,
-          now,
-          profileUrlFor: (n) => this.profileUrlFor(n),
-        });
-      } else if (ev.type === 'duelEnd') {
-        const w = this.sessionByName(ev.winnerName);
-        const l = this.sessionByName(ev.loserName);
-        const accountIds: number[] = [];
-        const names: string[] = [];
-        if (w) {
-          accountIds.push(w.accountId);
-          names.push(w.name);
-        }
-        if (l) {
-          accountIds.push(l.accountId);
-          names.push(l.name);
-        }
-        enqueueActivity(
-          {
-            kind: 'duel',
-            accountIds,
-            names,
-            realm: REALM,
-            profileUrl: this.profileUrlFor(ev.winnerName),
-            winnerName: ev.winnerName,
-            loserName: ev.loserName,
-          },
-          `duel:${ev.winnerName}:${ev.loserName}`,
-          now,
-        );
-      } else if (ev.type === 'arenaEnd' && !ev.draw && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        void dailyRewardService
-          .recordArenaResult(s.accountId, {
-            won: ev.won,
-            format: ev.format,
-            ratingBefore: ev.ratingBefore,
-            ratingAfter: ev.ratingAfter,
-          })
-          .then((points) => {
-            if (points > 0) this.sendDailyRewardPointsGained(s, points);
-          })
-          .catch((err) => console.error('daily reward arena task failed:', err));
-        if (!ev.won) continue;
-        enqueueActivity(
-          {
-            kind: 'arena',
-            accountIds: [s.accountId],
-            names: [s.name],
-            realm: REALM,
-            profileUrl: this.profileUrlFor(s.name),
-            ratingDelta: ev.ratingAfter - ev.ratingBefore,
-          },
-          `arena:${s.accountId}:${ev.ratingAfter}`,
-          now,
-        );
-      } else if (ev.type === 'delveObjectiveComplete' && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        void dailyRewardService
-          .recordDelveClear(s.accountId, s.characterId, ev.delveId, ev.tierId)
-          .then((points) => {
-            if (points > 0) this.sendDailyRewardPointsGained(s, points);
-          })
-          .catch((err) => console.error('daily reward delve task failed:', err));
-      } else if (ev.type === 'delveChestLoot' && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        if (!s) continue;
-        void dailyRewardService
-          .recordDelveChestOpen(
-            s.accountId,
-            s.characterId,
-            ev.delveId,
-            ev.tierId,
-            ev.lootTier,
-            ev.bountiful,
-          )
-          .then((points) => {
-            if (points > 0) this.sendDailyRewardPointsGained(s, points);
-          })
-          .catch((err) => console.error('daily reward delve chest task failed:', err));
-      }
+      // The significant-activity chain (Discord cards + the daily-reward
+      // arena/delve observers) lives in server/activity_detect.ts behind the
+      // deps bag above (a move-not-rewrite; the monolith ratchet).
+      detectActivityEvent(ev, now, activityDeps);
     }
     // Durability ordering: the authoritative blob otherwise persists only on
     // the 30s autosave, so an unlock recorded inline could sit in

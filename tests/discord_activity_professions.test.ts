@@ -1,6 +1,7 @@
-// Discord activity feed, professions moments (phase 15): the pure deed
-// feed-worthiness gate (discordFeedDeed) and the two new detectActivity arms,
-// masterwork procs and feed-worthy deed unlocks (titles + the first koi). The
+// Discord activity feed, professions moments (phase 15, extended by N10): the
+// pure deed feed-worthiness gate (discordFeedDeed) and the detectActivity
+// professions arms: masterwork procs, legendary forgings, golden harvests,
+// and feed-worthy deed unlocks (titles + the first koi). The
 // server rig mirrors tests/vale_cup_online.test.ts (GameServer over a mocked
 // db) and drives detectActivity with synthetic events, the
 // tests/game_sessions.test.ts precedent. Each test joins a DISTINCT account:
@@ -36,11 +37,12 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { FIRST_KOI_DEED_ID as BOT_FIRST_KOI_DEED_ID } from '../bot/logic';
+import { FIRST_KOI_DEED_ID as BOT_FIRST_KOI_DEED_ID, HARVESTMASTER_DEED_ID } from '../bot/logic';
 import * as db from '../server/db';
 import { discordFeedDeed, FIRST_KOI_DEED_ID } from '../server/deeds_records';
 import { claimDedupeKey, drainActivity, releaseDedupeKey } from '../server/discord_activity';
 import { type ClientSession, GameServer } from '../server/game';
+import { DEEDS } from '../src/sim/content/deeds';
 import type { PlayerClass } from '../src/sim/types';
 
 interface FakeClient {
@@ -139,6 +141,25 @@ describe('discordFeedDeed: the feed-worthiness gate', () => {
     // degrades the first koi to a generic deed card (the ActivityKind class
     // of bug, caught at the constant instead of in production).
     expect(BOT_FIRST_KOI_DEED_ID).toBe(FIRST_KOI_DEED_ID);
+  });
+
+  it('maps the Harvestmaster deed to its name and title (the bespoke card premise)', () => {
+    // Cheap insurance that the title arm keeps feeding the bot's bespoke
+    // Harvestmaster render (bot/logic.ts): a reward retune that stops this
+    // deed feeding degrades the capstone card to nothing, silently.
+    expect(discordFeedDeed(HARVESTMASTER_DEED_ID)).toEqual({
+      deedName: 'Harvestmaster',
+      deedTitle: 'Harvestmaster',
+    });
+  });
+
+  it('names the SAME Harvestmaster deed on both sides of the process boundary', () => {
+    // The bot special-cases the farming-capstone card by this id; unlike the
+    // koi there is no server-side constant to compare (the deed arm re-skins
+    // the one 'deed' payload), so the DEEDS catalog is the other side of this
+    // boundary: the id must exist and still reward the Harvestmaster title.
+    expect(HARVESTMASTER_DEED_ID).toBe('prog_farming_100');
+    expect(DEEDS[HARVESTMASTER_DEED_ID]?.reward).toEqual({ kind: 'title', text: 'Harvestmaster' });
   });
 });
 
@@ -381,6 +402,144 @@ describe('detectActivity: professions arms (GameServer)', () => {
         itemName: 'Dawnbreaker',
         zoneId: 'eastbrook_vale',
         pid: session.pid,
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a golden harvest finder copy enqueues one card behind the opt-out read', async () => {
+    // N10: the crop flavor of the gather rare event cards through the same
+    // consent contract as masterwork (server/craft_activity.ts, widened by
+    // one kind); the card's itemName is the crop's item name from ITEMS.
+    const session = joinServer(server, fakeWs(), 131, 'Reaper');
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'golden_harvest',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    // Golden harvests repeat (1 in 90 harvests), so like masterwork the card
+    // waits on the async consent read; nothing may enqueue synchronously.
+    expect(drainActivity()).toHaveLength(0);
+    await flushAsync();
+    const cards = drainActivity();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      kind: 'golden_harvest',
+      accountIds: [131],
+      names: ['Reaper'],
+      itemName: 'Vale Wheat',
+    });
+  });
+
+  it('a zone bystander copy never enqueues a golden-harvest card and never reads', async () => {
+    // announceGatherRareEvent fans one pid-scoped copy per player in the
+    // zone; only the FINDER's own copy may card (the masterworkZone rule),
+    // and a bystander copy must not even touch the opt-out read.
+    const finder = joinServer(server, fakeWs(), 132, 'Grower');
+    const bystander = joinServer(server, fakeWs(), 133, 'Watcher');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: bystander.pid,
+        flavor: 'golden_harvest',
+        finderName: finder.name,
+        finderPid: finder.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+    expect(optOutReads()).toBe(0);
+  });
+
+  it('a non-crop rare event never cards (the two-card ruling)', async () => {
+    // pristine_vein / ancient_heartwood / moonlit_bloom deliberately never
+    // reach the feed: the flavor guard, not the event type, is the gate.
+    const session = joinServer(server, fakeWs(), 134, 'Miner');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'pristine_vein',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        itemId: 'copper_ore',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+    expect(optOutReads()).toBe(0);
+  });
+
+  it('a same-account golden burst collapses to one card and ONE read', async () => {
+    // The account-scoped golden_harvest:<id> key is claimed synchronously
+    // BEFORE the opt-out read (the masterwork fix-round P1 contract).
+    const session = joinServer(server, fakeWs(), 135, 'Bumper');
+    const ev = (itemId: string) => ({
+      type: 'gatherRareEvent',
+      pid: session.pid,
+      flavor: 'golden_harvest',
+      finderName: session.name,
+      finderPid: session.pid,
+      zoneId: 'evergarden',
+      nodeType: 'crop',
+      itemId,
+    });
+    (db.pool.query as ReturnType<typeof vi.fn>).mockClear();
+    (server as any).detectActivity([ev('vale_wheat'), ev('vale_wheat')]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(1);
+    expect(optOutReads()).toBe(1);
+  });
+
+  it('the deed-broadcasts opt-out suppresses the golden-harvest card', async () => {
+    const session = joinServer(server, fakeWs(), 136, 'Hermit');
+    (db.pool.query as ReturnType<typeof vi.fn>).mockImplementation(async (sql: string) =>
+      typeof sql === 'string' && sql.includes('deed_broadcasts')
+        ? { rows: [{ deed_broadcasts: false }] }
+        : { rows: [] },
+    );
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: session.pid,
+        flavor: 'golden_harvest',
+        finderName: session.name,
+        finderPid: session.pid,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
+      },
+    ]);
+    await flushAsync();
+    expect(drainActivity()).toHaveLength(0);
+  });
+
+  it('a golden harvest with no session (a bot finder) enqueues nothing', async () => {
+    (server as any).detectActivity([
+      {
+        type: 'gatherRareEvent',
+        pid: 424242,
+        flavor: 'golden_harvest',
+        finderName: 'Botfarmer',
+        finderPid: 424242,
+        zoneId: 'evergarden',
+        nodeType: 'crop',
+        itemId: 'vale_wheat',
       },
     ]);
     await flushAsync();

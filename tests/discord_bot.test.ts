@@ -743,6 +743,41 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].description).toContain('<@111>');
   });
 
+  it('harvestmaster card reads as a farming capstone, not a generic deed', () => {
+    const msg = buildActivityMessage({
+      kind: 'deed',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      deedId: 'prog_farming_100',
+      deedName: 'Harvestmaster',
+      deedTitle: 'Harvestmaster',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].author.name).toBe(':ear_of_rice: Harvestmaster');
+    expect(msg.embeds[0].title).toBe('Harvestmaster');
+    expect(msg.embeds[0].description).toContain('100 Farming');
+    expect(msg.embeds[0].description).toContain('"Harvestmaster"');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].color).toBe(0xf5c242);
+  });
+
+  it('golden harvest card names the crop and pings the finder', () => {
+    // 'Vale Wheat' is the real produce name (src/sim/content/items.ts, farm
+    // crop vale_wheat); the shared harvest gold 0xf5c242 pairs it with the
+    // Harvestmaster card as one farming family.
+    const msg = buildActivityMessage({
+      kind: 'golden_harvest',
+      realm: 'Claudemoon',
+      profileUrl: null,
+      itemName: 'Vale Wheat',
+      participants: [linked('Aldric', '111')],
+    }) as { embeds: Array<Record<string, any>> };
+    expect(msg.embeds[0].title).toBe('Vale Wheat');
+    expect(msg.embeds[0].description).toContain('golden harvest of Vale Wheat');
+    expect(msg.embeds[0].description).toContain('<@111>');
+    expect(msg.embeds[0].color).toBe(0xf5c242);
+  });
+
   // Same empty-embed class, one layer in: an item name the server sends as an
   // EMPTY string (not absent) must fall back to the generic title. `??` keeps
   // the empty string and Discord rejects a blank embed title, so every title
@@ -759,6 +794,10 @@ describe('significant-activity cards', () => {
     );
     expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_masterwright', deedName: '' })).toBe(
       'A deed of renown',
+    );
+    expect(titleOf({ ...base, kind: 'golden_harvest', itemName: '' })).toBe('A golden harvest');
+    expect(titleOf({ ...base, kind: 'deed', deedId: 'prog_farming_100', deedName: '' })).toBe(
+      'Harvestmaster',
     );
   });
 
@@ -790,6 +829,7 @@ describe('significant-activity cards', () => {
     'masterwork',
     'legendary',
     'deed',
+    'golden_harvest',
   ] as const satisfies readonly ActivityKind[];
   type MissingServerKind = Exclude<ActivityKind, (typeof SERVER_KINDS)[number]>;
   // Deliberately a TYPE-level pin: the initializer is literally null, so the

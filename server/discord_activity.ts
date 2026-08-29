@@ -1,9 +1,9 @@
 // Significant-activity feed: the game loop detects notable moments (a character
-// reaching max level, a rare drop, a duel result, an arena win, a decided Vale
-// Cup match, a masterwork craft, a feed-worthy deed) and enqueues a structured
-// item here; the bot drains it through the consolidated GET
-// /internal/discord/outbox poll and posts a rich card to the activity channel,
-// tagging the linked Discord user(s) involved.
+// reaching max level, a rare drop, a duel result, an arena win, a masterwork
+// craft, a legendary forging, a feed-worthy deed, a golden harvest) and
+// enqueues a structured item here; the bot drains it through the consolidated
+// GET /internal/discord/outbox poll and posts a rich card to the activity
+// channel, tagging the linked Discord user(s) involved.
 //
 // Pure + dependency-free (no Discord IO, no DB), so it is trivially testable. The
 // outbox drain resolves accountIds to Discord identities; this layer is just the
@@ -16,7 +16,8 @@ export type ActivityKind =
   | 'arena'
   | 'masterwork'
   | 'legendary'
-  | 'deed';
+  | 'deed'
+  | 'golden_harvest';
 
 export interface QueuedActivity {
   kind: ActivityKind;
@@ -30,10 +31,12 @@ export interface QueuedActivity {
   profileUrl: string | null;
   // Type-specific payload (only the relevant fields are set):
   level?: number; // levelup
-  // rareloot; masterwork; the first-koi deed's catch name. For 'legendary'
-  // (Masterwrought phase 13) this is the PLAYER-CHOSEN legendary name:
-  // player-authored text carried as data; the bot renders it as plain embed
-  // text at masterwork parity (bot/logic.ts buildActivityMessage).
+  // rareloot; masterwork; the first-koi deed's catch name; for
+  // 'golden_harvest' the crop's item name (resolved from the server's ITEMS
+  // table). For 'legendary' (Masterwrought phase 13) this is the PLAYER-CHOSEN
+  // legendary name: player-authored text carried as data; the bot renders it
+  // as plain embed text at masterwork parity (bot/logic.ts
+  // buildActivityMessage).
   itemName?: string;
   quality?: string; // rareloot ('epic' | 'legendary')
   winnerName?: string; // duel
