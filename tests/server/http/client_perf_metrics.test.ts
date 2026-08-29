@@ -20,6 +20,7 @@ vi.mock('../../../server/db', () => ({
 }));
 
 import { insertClientPerfReport } from '../../../server/db';
+import { GL_BACKEND_LABELS } from '../../../server/gl_backend';
 import {
   CLIENT_PERF_DEVICE_CLASSES,
   CLIENT_PERF_FPS_AVG_BUCKETS,
@@ -50,6 +51,7 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     mobileTouch: false,
     osFamily: 'windows',
     glRendererBucket: 'nvidia',
+    glBackend: 'd3d11',
     zoneOrScenario: 'thornpeak_heights',
     fpsAvg: 48,
     frameP95Ms: 33.4,
@@ -152,6 +154,15 @@ describe('vocabulary pins', () => {
       'instance',
       'other',
     ]);
+    expect([...GL_BACKEND_LABELS]).toEqual([
+      'd3d11',
+      'd3d9',
+      'vulkan',
+      'metal',
+      'opengl-es',
+      'opengl',
+      'unknown',
+    ]);
     expect(CLIENT_PERF_JANK_THRESHOLD_MS).toBe(250);
   });
 
@@ -191,7 +202,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
       ),
     ).toBeCloseTo(0.0334, 5);
     expect(
@@ -209,7 +220,9 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(text, /^woc_client_effective_render_scale_sum\{gfx_tier="high"\} ([\d.]+)$/m),
     ).toBeCloseTo(0.85, 5);
-    expect(value(text, /^woc_client_context_losses_total\{os="windows"\} (\d+)$/m)).toBe(2);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="windows",backend="d3d11"\} (\d+)$/m),
+    ).toBe(2);
     expect(
       value(text, /^woc_client_suggestions_total\{suggestion="browser-stalls"\} (\d+)$/m),
     ).toBe(1);
@@ -267,7 +280,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
+        /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop",backend="d3d11"\} ([\d.]+)$/m,
       ),
     ).toBe(0);
     // Neither a NaN nor an Infinity worst-10s satisfies the jank threshold
@@ -276,7 +289,9 @@ describe('registerClientPerfMetrics', () => {
       value(text, /^woc_client_jank_reports_total\{gfx_tier="high",device="desktop"\} (\d+)$/m),
     ).toBe(0);
     // A negative loss count never decrements the primed counter.
-    expect(value(text, /^woc_client_context_losses_total\{os="windows"\} (\d+)$/m)).toBe(0);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="windows",backend="d3d11"\} (\d+)$/m),
+    ).toBe(0);
   });
 
   it('never throws on a malformed direct-caller sample', () => {
@@ -310,7 +325,7 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop",backend="vulkan"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
@@ -319,7 +334,9 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_worst10s_frame_p95_seconds_count\{scene="rift",device="mobile"\} (\d+)$/m,
       ),
     ).toBe(0);
-    expect(value(text, /^woc_client_context_losses_total\{os="linux"\} (\d+)$/m)).toBe(0);
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="linux",backend="opengl"\} (\d+)$/m),
+    ).toBe(0);
     expect(value(text, /^woc_client_suggestions_total\{suggestion="context-loss"\} (\d+)$/m)).toBe(
       0,
     );
@@ -342,9 +359,51 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(
         text,
-        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop"\} (\d+)$/m,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop",backend="d3d11"\} (\d+)$/m,
       ),
     ).toBe(0);
+  });
+
+  it('bounds the backend label: the series count is fixed and no report can grow it', async () => {
+    // The whole point of a closed vocabulary. Pre-seeding means every cross
+    // product already exists at registration, so the count below IS the
+    // ceiling, and the second half proves traffic cannot push past it.
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+    const countSeries = (text: string, name: string): number =>
+      text.split('\n').filter((line) => line.startsWith(`${name}{`)).length;
+
+    const atRegistration = await registry.metrics();
+    // 5 tiers x 2 device classes x 7 backends.
+    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(
+      CLIENT_PERF_GFX_TIERS.length * CLIENT_PERF_DEVICE_CLASSES.length * GL_BACKEND_LABELS.length,
+    );
+    expect(countSeries(atRegistration, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    // 6 OS families x 7 backends.
+    expect(countSeries(atRegistration, 'woc_client_context_losses_total')).toBe(
+      CLIENT_PERF_OS_FAMILIES.length * GL_BACKEND_LABELS.length,
+    );
+    expect(countSeries(atRegistration, 'woc_client_context_losses_total')).toBe(42);
+
+    // Every real backend, plus invented ones, plus the shapes a hostile beacon
+    // would try. None of it may add a series to either family.
+    for (const glBackend of [
+      ...GL_BACKEND_LABELS,
+      'directx-42',
+      'D3D11',
+      '',
+      'd3d11 ',
+      'opengl-es-3.2',
+      'x'.repeat(200),
+    ]) {
+      sink.perfReportStored(sample({ glBackend, contextLostCount: 1 }));
+    }
+
+    const afterTraffic = await registry.metrics();
+    expect(countSeries(afterTraffic, 'woc_client_frame_p95_seconds_count')).toBe(70);
+    expect(countSeries(afterTraffic, 'woc_client_context_losses_total')).toBe(42);
+    // The unrecognised spellings all landed on 'unknown', never on a new label.
+    expect(afterTraffic).not.toMatch(/backend="(directx-42|D3D11|d3d11 |opengl-es-3\.2|xxxx|)"/);
   });
 
   it('never mints labels outside the vocabularies for hostile field values', async () => {
@@ -356,6 +415,7 @@ describe('registerClientPerfMetrics', () => {
         gfxTier: 'god-mode',
         osFamily: 'templeos',
         glRendererBucket: 'quantum-9000',
+        glBackend: 'directx-42',
         zoneOrScenario: 'z'.repeat(80),
         mobileTouch: true,
         contextLostCount: 1,
@@ -373,8 +433,14 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_reports_total\{gfx_tier="low",device="mobile",gpu_family="other"\} (\d+)$/m,
       ),
     ).toBe(1);
-    expect(value(text, /^woc_client_context_losses_total\{os="other"\} (\d+)$/m)).toBe(1);
-    expect(text).not.toMatch(/god-mode|templeos|quantum-9000|zzzz|not-a-real-suggestion/);
+    // An invented backend falls back to 'unknown', the same way the tier and
+    // os fallbacks work, so a direct caller cannot mint a label value.
+    expect(
+      value(text, /^woc_client_context_losses_total\{os="other",backend="unknown"\} (\d+)$/m),
+    ).toBe(1);
+    expect(text).not.toMatch(
+      /god-mode|templeos|quantum-9000|zzzz|not-a-real-suggestion|directx-42/,
+    );
   });
 });
 
