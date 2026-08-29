@@ -10,6 +10,7 @@ import { MOBS } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { Sim } from '../../src/sim/sim';
 import type { Entity, SimEvent } from '../../src/sim/types';
+import { EMPTY_TEST_WORLD } from '../sim_shared';
 import { expectDefined } from './defined';
 import { placePlayerInOpenField } from './open_field';
 
@@ -20,7 +21,15 @@ function makeMage(spec: Spec, level = 20, seed = 2) {
   // construction-time draws move the sampled rotations; same reason this
   // file previously hopped 41 to 1). The DPS-gap floor deliberately
   // does NOT ride one seed: it takes the min over several.
-  const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true });
+  // EMPTY_TEST_WORLD (no camps/npcs/ground objects): this harness measures a
+  // bare mage against a dummy it spawns itself, so the ambient overworld mob
+  // population is pure overhead, and worse, noise: any full-world change
+  // (terrain, content, or otherwise) forks the shared rng stream through
+  // ambient mob AI over the harness's long (up to 200s / 4000-tick) runs,
+  // even though nothing here targets, spawns from, or asserts on ambient
+  // content. Same trim already applied to tests/chronomancy.test.ts,
+  // chronomancy_surge.test.ts, and chronomancy_buffs.test.ts.
+  const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   placePlayerInOpenField(sim);
   sim.setSpec(spec);

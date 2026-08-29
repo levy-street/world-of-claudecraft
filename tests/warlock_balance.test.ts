@@ -171,7 +171,9 @@ describe('warlock low-level sustained damage tuning', () => {
       20,
     );
     expect(amplified.global.dotDmgPct).toBe(0);
-    expect(amplified.global.spellDmgPct).toBe(0);
+    // The 0.07 is the affliction viability-floor baseline (spec_baselines.ts,
+    // 2026-08-23), not anything Deepened Hex adds: the row stays cost-only.
+    expect(amplified.global.spellDmgPct).toBeCloseTo(0.07);
     expect(amplified.abilities.needle_of_fate?.dmgPct).toBeCloseTo(0.18);
     expect(amplified.abilities.sentence?.dmgPct).toBeCloseTo(0.1);
     expect(amplified.abilities.needle_of_fate?.costPct).toBe(-0.33);

@@ -1401,7 +1401,6 @@ describe('Guide deeds cross-page surfaces', () => {
       titleKey: 'guide.nav.controls',
     });
     expect(html).toContain('<kbd>T</kbd></td><td>Crafting</td>');
-    expect(html).toContain('<kbd>Y</kbd></td><td>Vale Cup</td>');
     expect(html).toContain('<kbd>I</kbd></td><td>Event Calendar</td>');
     expect(html).toContain('<kbd>U</kbd></td><td>Discord</td>');
     expect(html).toContain('<kbd>Ctrl+1</kbd> <kbd>Ctrl+5</kbd>');
@@ -1410,7 +1409,6 @@ describe('Guide deeds cross-page surfaces', () => {
   it('keeps the documented binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('crafting')).toEqual(['KeyT']);
-    expect(defaults.get('valecup')).toEqual(['KeyY']);
     expect(defaults.get('calendar')).toEqual(['KeyI']);
     expect(defaults.get('discord')).toEqual(['KeyU']);
     expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);

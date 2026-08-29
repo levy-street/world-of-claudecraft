@@ -516,6 +516,9 @@ const KIT_FALLBACK: Record<string, WornFamilyPick | null> = {
   shroom: null, // mushroom caps read as clean color cards
   tent: { family: 'fabric', strength: 0.3 }, // colorRed/colorRedDark canvas
   pirate: { family: 'wood', strength: 0.35 }, // colormap docks/rowboats
+  // the sea half of the old shared pirate kit (hulls and buoys, which ship
+  // their own atlas); same painted-plank treatment as the dock half
+  pirateSea: { family: 'wood', strength: 0.35 },
   town: { family: 'wood', strength: 0.35 }, // colormap timber pillar
   grave: { family: 'stone', strength: 0.45 }, // colormap gravestones
   dungeon: { family: 'rock', strength: 0.45 }, // 'texture' atlas delve cave mouths

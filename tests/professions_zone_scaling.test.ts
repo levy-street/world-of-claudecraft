@@ -103,11 +103,18 @@ describe('per-zone content tables derive from the zone list', () => {
     // literal-matrix restatement lives in tests/node_material_table.test.ts;
     // this arm is what fails when a zone ships without its rows).
     expect(Object.keys(NODE_MATERIAL_TABLE).sort()).toEqual([...GATHER_NODE_TYPES].sort());
-    const zoneIds = ZONES.map((z) => z.id).sort();
+    // The Proving Shore (the tutorial island) is the one deliberate absence:
+    // its R37 rollout row is 'none' (professions-free by design), so it ships
+    // NO material rows (tests/professions_zone_rollout.test.ts pins the
+    // absence); every other zone must cover every type.
+    const zoneIds = ZONES.map((z) => z.id)
+      .filter((id) => id !== 'proving_shore')
+      .sort();
     for (const type of GATHER_NODE_TYPES) {
       expect(Object.keys(NODE_MATERIAL_TABLE[type]).sort(), `material rows for ${type}`).toEqual(
         zoneIds,
       );
+      expect(NODE_MATERIAL_TABLE[type].proving_shore, `${type} proving_shore`).toBeUndefined();
     }
   });
 

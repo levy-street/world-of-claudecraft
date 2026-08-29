@@ -875,10 +875,18 @@ function portalLabelText(): string {
 
 /** Every label this world must put on the canvas, sourced from the content
  *  tables rather than from the painter's own localizers. */
+// A hideOnMap POI keeps its record (deed visit marks reference it, and the
+// labels resolve through positional locale keys) but the model skips its
+// marker, so it rasterizes no sprite and blits nothing. Derived rather than
+// listed, so a future hide or unhide needs no edit here.
+function drawnLabelPois() {
+  return LABEL_ZONE.pois.filter((poi) => !poi.hideOnMap);
+}
+
 function expectedLabels(): Set<string> {
   return new Set<string>([
     LABEL_ZONE.name,
-    ...LABEL_ZONE.pois.map((poi) => poi.label),
+    ...drawnLabelPois().map((poi) => poi.label),
     ...overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map((portal) =>
       dungeonName(portal.id),
     ),
@@ -1931,7 +1939,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     const badges = result.questAreas.reduce((n, area) => n + area.numbers.length, 0);
     const expected =
       1 + // the zone title
-      LABEL_ZONE.pois.length +
+      drawnLabelPois().length + // hidden POIs draw no label, see expectedLabels
       overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).length +
       2 + // the two allies
       badges;

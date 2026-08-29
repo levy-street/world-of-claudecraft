@@ -111,12 +111,6 @@ vi.mock('../src/render/stations', () => ({
 vi.mock('../src/render/temporal_hourglass_visual', () => ({
   resetTemporalHourglassProfileCaches: mocks.reset,
 }));
-vi.mock('../src/render/vale_cup_ball', () => ({
-  resetValeCupBallProfileCaches: mocks.reset,
-}));
-vi.mock('../src/render/vale_cup_stadium', () => ({
-  resetValeCupStadiumProfileCaches: mocks.reset,
-}));
 vi.mock('../src/render/wildheart_terrain', () => ({
   resetWildheartTerrainProfileCaches: mocks.reset,
 }));
@@ -216,8 +210,6 @@ describe('graphics profile derived-cache reset', () => {
       'jail_scene',
       'cliff_scree',
       'door_portal',
-      'vale_cup_ball',
-      'vale_cup_stadium',
       'wildheart_terrain',
       'fireball_travel_visual',
       'frost_nova_root_visual',

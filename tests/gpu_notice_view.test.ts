@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   dismissGpuNotice,
   formatGpuNoticeSignature,
+  GPU_NOTICE_COMPONENTS,
   type GpuNoticeComponent,
   gpuNoticeBodyKey,
   gpuNoticeComponents,
@@ -284,5 +286,20 @@ describe('gpuNoticeBodyKey', () => {
         verdict: SOFTWARE_AND_HYBRID,
       }),
     ).toBe('gpuNotice.bodyWeb');
+  });
+});
+
+describe('the capture helper suppresses every component, not just software', () => {
+  it('seeds the full sorted component signature (scripts/lib/gpu_notice_suppress.mjs)', () => {
+    // The helper is plain .mjs and cannot import this module, so its literal is
+    // pinned here: a new component makes the helper's value incomplete, the
+    // notice re-arms on every headless capture, and it lands in the frames.
+    const helper = readFileSync('scripts/lib/gpu_notice_suppress.mjs', 'utf8');
+    const full = formatGpuNoticeSignature([...GPU_NOTICE_COMPONENTS]);
+    expect(helper, 'the capture helper must seed the full component signature').toContain(
+      `'${full}'`,
+    );
+    // And that value really does cover every component.
+    expect(parseGpuNoticeSignature(full).sort()).toEqual([...GPU_NOTICE_COMPONENTS].sort());
   });
 });

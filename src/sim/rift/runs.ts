@@ -36,7 +36,12 @@ import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
-import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
+import {
+  RIFT_LOOT_RECOVERY_GRACE,
+  RIFT_MIN_LEVEL,
+  RIFT_TIER_INFO,
+  sealNaturalRiftPortalForRecovery,
+} from './portals';
 import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
 import {
@@ -88,6 +93,12 @@ function inIceZone(
 // out-of-combat run, enterRift's death rules): portals sit anywhere in the
 // world, so a 60s window regularly stranded corpses behind a freed slot.
 const RIFT_EMPTY_TIMEOUT = 180;
+// A WON run's corpse and its loot linger for the same window its portal does
+// (RIFT_LOOT_RECOVERY_GRACE): a clean kill that wipes the whole party, with
+// nobody left to resurrect, must not be an unrecoverable total loss. Every
+// other outcome (still active, or lost the race) keeps the shorter timeout
+// above so an abandoned or non-winning run frees its slot promptly.
+const RIFT_WON_EMPTY_TIMEOUT = RIFT_LOOT_RECOVERY_GRACE;
 
 // Deterministic per-channel colour jitter (server-side; the result rides the
 // entity snapshot to the client, so it need not be client-reproducible).
@@ -578,11 +589,14 @@ export function enterRift(
     candidate.partyKey !== null && candidate.outcome === 'active' && matchesEvent(candidate);
 
   if (eventId !== null && !deadEntry) {
-    // A resolved event denies every LIVING entrant outright. No re-entry
-    // exemption is needed: sealing or collapsing always deletes the portal
-    // entity in the same call chain, so this eventId path cannot even be
-    // reached once the event is cleared or collapsed, and mid-run groups
-    // simply keep playing inside their instance.
+    // A resolved event denies every LIVING entrant outright, no exemption. A
+    // COLLAPSED event's portal is always gone by the time this runs (dropped
+    // in the same call chain), but a CLEARED one is not: a won natural
+    // portal deliberately outlives its clear (sealNaturalRiftPortalForRecovery,
+    // RIFT_LOOT_RECOVERY_GRACE), so this check is exactly what stops a living
+    // stranger, or the still-alive winner, from walking back into a decided
+    // run for the whole grace window. Mid-run groups simply keep playing
+    // inside their own instance regardless.
     const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
     if (!event || event.status === 'cleared' || event.status === 'collapsed') {
       if (ctx.time >= (r.e.riftPoolFullAt ?? -Infinity) + POOL_FULL_NOTICE_COOLDOWN) {
@@ -1386,11 +1400,14 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
   if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
-  // A cleared rift seals its way in: the entry portal despawns, so a finished
-  // run can never be walked into and re-farmed. Ranked natural portals seal
-  // through the race claim below (closeNaturalRiftPortal); this arm covers
-  // portals outside the race (dev portals), whose entity would otherwise stay
-  // open forever.
+  // A cleared rift seals its way in: no LIVING entrant may ever walk into a
+  // finished run and farm it (enterRift denies every one the moment the event
+  // reads 'cleared'). Ranked natural portals seal through the race claim
+  // below (sealNaturalRiftPortalForRecovery), which keeps the entrance itself
+  // standing a while longer so the winning party's dead can still walk back
+  // in for their corpse loot; this arm covers portals outside the race (dev
+  // portals), which carry no such recovery window and whose entity would
+  // otherwise stay open forever.
   if (!claim.event && inst.portalId !== null) {
     if (ctx.entities.has(inst.portalId)) ctx.dropEntity(inst.portalId);
     inst.portalId = null;
@@ -1409,7 +1426,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
       );
     }
     const portalId = claim.event.portalId ?? inst.portalId;
-    if (portalId !== null) closeNaturalRiftPortal(ctx, portalId, 'sealed');
+    // False means the portal's own RIFT_PORTAL_LIFETIME already collapsed it
+    // out from under an unusually long clear (the entity is long gone): never
+    // promise the party a standing entrance that does not exist.
+    const recoveryOpen = portalId !== null && sealNaturalRiftPortalForRecovery(ctx, portalId);
     const firstClear = claim.event.firstClear;
     const winnerNames = firstClear?.memberNames ?? [];
     const clearTime = firstClear?.duration ?? Math.max(0, ctx.time - inst.startedAt);
@@ -1423,6 +1443,16 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
         winnerNames,
         clearTime,
       });
+      // Tell the winners directly: a wipe here is not a total loss, the way
+      // in still stands for the loot they just earned.
+      if (recoveryOpen) {
+        ctx.emit({
+          type: 'log',
+          text: "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+          color: '#adf',
+          pid,
+        });
+      }
     }
     ctx.emit({
       type: 'riftRaceWorld',
@@ -1819,9 +1849,21 @@ export function updateRiftInstances(ctx: SimContext): void {
     const occupied = instancePlayerIds(ctx, inst).length > 0;
     if (occupied) {
       inst.emptyFor = 0;
+      // A won run's entrance shares this same clock while someone is
+      // actually back inside recovering loot: without this, a staggered
+      // multi-member corpse run (one ghost makes it back, others are still
+      // running) could have its portal expire out from under the stragglers
+      // even though the instance itself just had its own countdown reset.
+      if (inst.outcome === 'won' && inst.eventId !== null) {
+        const portal = ctx.naturalRiftPortals.find(
+          (candidate) => candidate.eventId === inst.eventId && candidate.recoveryOnly,
+        );
+        if (portal) portal.expiresAt = ctx.time + RIFT_LOOT_RECOVERY_GRACE;
+      }
     } else {
       inst.emptyFor += 1;
-      if (inst.emptyFor >= RIFT_EMPTY_TIMEOUT) freeRiftInstance(ctx, inst);
+      const emptyTimeout = inst.outcome === 'won' ? RIFT_WON_EMPTY_TIMEOUT : RIFT_EMPTY_TIMEOUT;
+      if (inst.emptyFor >= emptyTimeout) freeRiftInstance(ctx, inst);
     }
   }
 

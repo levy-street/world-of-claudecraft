@@ -752,6 +752,22 @@ function upgradedFloor(base: RiftFloorPlan, upgrade?: RiftUpgradeManifest | null
 }
 const CACHE_LIMIT = 128;
 
+/** LRU insert. The old clear-all at the limit wiped every LIVE floor's plan
+ * the moment the 128th distinct floor generated, and the very next tick
+ * regenerated all of them at once (liftRiftEntities and advanceRiftRollers
+ * read every active instance's floor every tick), a periodic whole-server
+ * spike that scaled with rift concurrency. Evicting only the coldest key
+ * keeps the hot set (at most 64 live floors, each refreshed by every read)
+ * out of the victim slot entirely. Pure cache policy: generation is
+ * deterministic per key, so results are identical either way. */
+function cacheFloor(key: string, plan: RiftFloorPlan): void {
+  if (FLOOR_CACHE.size >= CACHE_LIMIT) {
+    const coldest = FLOOR_CACHE.keys().next();
+    if (!coldest.done) FLOOR_CACHE.delete(coldest.value);
+  }
+  FLOOR_CACHE.set(key, plan);
+}
+
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
   return riftFloorLevel(baseLevel, floorIndex);
 }
@@ -791,7 +807,13 @@ export function generateRiftFloor(
 ): RiftFloorPlan {
   const key = `${seed >>> 0}:${Math.round(baseLevel)}:${floorIndex}`;
   const cached = FLOOR_CACHE.get(key);
-  if (cached) return upgradedFloor(cached, upgrade);
+  if (cached) {
+    // LRU refresh: Map iteration is insertion-ordered, so delete+set marks the
+    // hit newest and leaves the coldest key first for cacheFloor's eviction.
+    FLOOR_CACHE.delete(key);
+    FLOOR_CACHE.set(key, cached);
+    return upgradedFloor(cached, upgrade);
+  }
 
   // Authored set-piece runs short-circuit the whole procedural chain BEFORE any
   // draw is made, so the procedural draw order for every other run is untouched.
@@ -803,8 +825,7 @@ export function generateRiftFloor(
       floorLevelFor(baseLevel, setIndex),
       setIndex,
     );
-    if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
-    FLOOR_CACHE.set(key, setPiece);
+    cacheFloor(key, setPiece);
     return upgradedFloor(setPiece, upgrade);
   }
 
@@ -869,8 +890,7 @@ export function generateRiftFloor(
     gate,
   };
 
-  if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
-  FLOOR_CACHE.set(key, plan);
+  cacheFloor(key, plan);
   return upgradedFloor(plan, upgrade);
 }
 

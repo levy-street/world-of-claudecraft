@@ -11,6 +11,7 @@ import type * as http from 'node:http';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { ChatModerationLiveState } from '../../server/chat_mod_live';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
@@ -77,6 +78,7 @@ function setup() {
   const ws = new FakeWs();
   const session = { pid: 1, tag: 'fake-session' };
   const generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  const chatModerationLiveState = new ChatModerationLiveState();
   const game = {
     isIpBlocked: vi.fn((_ip: string) => false),
     countIpSessions: vi.fn((_ip: string) => 0),
@@ -89,6 +91,9 @@ function setup() {
     socketClosed: vi.fn(() => true),
     beginGeneralChatRateLimitHydration: vi.fn((accountId: number) =>
       generalChatRateLimitLiveState.beginHydration(accountId),
+    ),
+    beginChatModerationHydration: vi.fn((accountId: number) =>
+      chatModerationLiveState.beginHydration(accountId),
     ),
   };
   const deps: WsAuthDeps = {
@@ -123,7 +128,7 @@ function setup() {
     // Bank bonus deps: the fresh-join arm recomputes the bank bonus and stamps it into the join
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
-    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
+    bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [], characterCount: 1 })),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -134,7 +139,7 @@ function setup() {
     maxPlayersPerRealm: 0,
   };
   const req = {} as http.IncomingMessage;
-  return { ws, game, session, deps, req, generalChatRateLimitLiveState };
+  return { ws, game, session, deps, req, generalChatRateLimitLiveState, chatModerationLiveState };
 }
 
 function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unknown> {
@@ -244,13 +249,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-6 client on the auth-world-7 server before all admission work', async () => {
+  it('2c. rejects an auth-world-10 client before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-6', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-10', token: 'tok', character: 7 }),
       req,
     );
 
@@ -261,7 +266,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each(['auth-world', 'auth-world-8', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+  it.each(['auth-world', 'auth-world-12', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
     '2d. rejects the non-current world auth discriminator %s before all admission work',
     async (authType) => {
       const fixture = setup();
@@ -777,7 +782,7 @@ describe('createWsAuth: realm admission cap', () => {
     // createWsAuth destructures the deps at construction, so the three joins'
     // behaviors are queued up front: join 1 has its lease refused (a live foreign
     // lease), join 2 throws on the bank-bonus DB read, join 3 is clean.
-    const bankOk = { bonusSlots: 0, sources: [] };
+    const bankOk = { bonusSlots: 0, sources: [], characterCount: 1 };
     deps.bankBonusForAccount = vi
       .fn(async () => bankOk)
       .mockResolvedValueOnce(bankOk)
@@ -1042,6 +1047,101 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     },
   );
 
+  it.each([
+    {
+      label: 'mute',
+      hydrated: null,
+      committed: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'spam', strikes: 4 },
+      expected: { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'spam', chatStrikes: 4 },
+    },
+    {
+      label: 'unmute',
+      hydrated: '2099-01-01T00:00:00.000Z',
+      committed: { mutedUntil: null, reason: '', strikes: 1 },
+      expected: { mutedUntil: null, reason: '', chatStrikes: 1 },
+    },
+  ])(
+    // Reproduces the RESUME race server/chat_mod_live.ts exists to close (the
+    // reported bug: a linkdead session's reconnect): a mute or committed admin
+    // unmute pushed onto this account WHILE the auth query snapshot below is
+    // still in flight must win over that now-stale snapshot. Strikes remain
+    // independently fenced.
+    'uses a committed chat-moderation $label that arrives during auth hydration on resume',
+    async ({ hydrated, committed, expected }) => {
+      const current = setup();
+      current.game.hasSessionForCharacter.mockReturnValue(true);
+      let resolveCharacter!: (character: CharacterRow | null) => void;
+      current.deps.moderationStatusForAccount = vi.fn(async () =>
+        modStatus({ chatMutedUntil: hydrated }),
+      );
+      current.deps.getCharacter = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<CharacterRow | null>((resolve) => {
+              resolveCharacter = resolve;
+            }),
+        )
+        .mockResolvedValue(baseChar());
+      const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+        asWs(current.ws),
+        authRaw(),
+        current.req,
+      );
+      await vi.waitFor(() =>
+        expect(current.deps.moderationStatusForAccount).toHaveBeenCalledOnce(),
+      );
+
+      current.chatModerationLiveState.muteChanged(1, committed);
+      current.chatModerationLiveState.strikesChanged(1, committed.strikes);
+      resolveCharacter(baseChar());
+      await authenticating;
+
+      expect(joinedMeta(current.game)).toMatchObject(expected);
+    },
+  );
+
+  it('still catches a push landing after chatMuteStatusForAccount but before the synchronous join boundary', async () => {
+    // The fence must resolve AT the game.join call, not right after its own
+    // DB reads: loadAccountCosmetics (and, on other arms, adminRolesForAccount
+    // / bankBonusForAccount / the lease acquire / the character reload) all
+    // still run between those reads and the actual join, and a push landing
+    // in that later window must not be lost either.
+    const current = setup();
+    current.game.hasSessionForCharacter.mockReturnValue(true);
+    type Cosmetics = Awaited<ReturnType<typeof current.deps.loadAccountCosmetics>>;
+    let resolveCosmetics!: (cosmetics: Cosmetics) => void;
+    current.deps.loadAccountCosmetics = vi.fn(
+      () =>
+        new Promise<Cosmetics>((resolve) => {
+          resolveCosmetics = resolve;
+        }),
+    );
+    const authenticating = createWsAuth(current.deps).authenticateWebSocket(
+      asWs(current.ws),
+      authRaw(),
+      current.req,
+    );
+    await vi.waitFor(() => expect(current.deps.loadAccountCosmetics).toHaveBeenCalledOnce());
+
+    const committed = { mutedUntil: '2099-01-01T00:00:00.000Z', reason: 'late push', strikes: 3 };
+    current.chatModerationLiveState.muteChanged(1, committed);
+    current.chatModerationLiveState.strikesChanged(1, committed.strikes);
+    resolveCosmetics({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    });
+    await authenticating;
+
+    expect(joinedMeta(current.game)).toMatchObject({
+      mutedUntil: committed.mutedUntil,
+      reason: committed.reason,
+      chatStrikes: committed.strikes,
+    });
+  });
+
   it('falls back to the chat-level mute when the account has no mute', async () => {
     const { ws, game, deps, req } = setup();
     deps.chatMuteStatusForAccount = vi.fn(async () => ({
@@ -1069,6 +1169,7 @@ describe('createWsAuth: bank bonus stamp', () => {
     const { ws, game, deps, req } = setup();
     const grant = {
       bonusSlots: 6,
+      characterCount: 1,
       sources: [
         { id: 'email', slots: 2, maxSlots: 2 },
         { id: 'referral', slots: 4, maxSlots: 10, count: 2, cap: 5 },
@@ -1101,6 +1202,49 @@ describe('createWsAuth: bank bonus stamp', () => {
     expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
     const joinMeta = (game.join as any).mock.calls[0][7] as { bankBonus?: unknown };
     expect(joinMeta.bankBonus).toBeUndefined();
+  });
+});
+
+describe('createWsAuth: firstCharacter stamp (the tutorial greeting account fact)', () => {
+  it('stamps firstCharacter true when the account-wide count is at most 1', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 1,
+    }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(deps.bankBonusForAccount).toHaveBeenCalledTimes(1);
+    expect(deps.bankBonusForAccount).toHaveBeenCalledWith(1);
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBe(true);
+  });
+
+  it('stamps firstCharacter false for an account with other characters', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.bankBonusForAccount = vi.fn(async () => ({
+      bonusSlots: 0,
+      sources: [],
+      characterCount: 3,
+    }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBe(false);
+  });
+
+  it('never recomputes on the resume arm, like bankBonus (locked policy)', async () => {
+    const { ws, game, deps, req } = setup();
+    game.hasSessionForCharacter = vi.fn(() => true);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(deps.bankBonusForAccount).not.toHaveBeenCalled();
+    const joinMeta = (game.join as any).mock.calls[0][7] as { firstCharacter?: unknown };
+    expect(joinMeta.firstCharacter).toBeUndefined();
   });
 });
 

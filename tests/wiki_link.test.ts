@@ -31,6 +31,11 @@ describe('resolveWikiUrl', () => {
     );
     expect(resolveWikiUrl({ nativeApp: false, origin: 'file://' })).toBe(CANONICAL_WIKI_URL);
     expect(resolveWikiUrl({ nativeApp: false, origin: '' })).toBe(CANONICAL_WIKI_URL);
+    // The PACKAGED desktop shell loads app://worldofclaudecraft, not the live
+    // site: not an http(s) origin, so it takes the canonical URL too.
+    expect(resolveWikiUrl({ nativeApp: false, origin: 'app://worldofclaudecraft' })).toBe(
+      CANONICAL_WIKI_URL,
+    );
   });
 
   it('pins the canonical wiki URL to its literal', () => {

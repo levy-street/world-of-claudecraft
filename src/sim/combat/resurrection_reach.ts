@@ -8,7 +8,7 @@
 // mid-cast, and finish), the mass-resurrection roster sweep, and the accept-time
 // arrival anchor in resurrection_offer.ts.
 
-import { lineOfSightClear } from '../colliders';
+import { entityToBodyLineOfSightClear } from '../line_of_sight_elevation';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type Vec3 } from '../types';
 
@@ -36,16 +36,13 @@ export function resurrectionReachError(
 ): ResurrectionReachErrorKind | null {
   const body = resurrectionBodyPos(dead);
   if (dist2d(caster.pos, body) > maxRange + rangeSlack) return 'range';
-  // The third sibling of the lineOfSightClear recipe, beside Sim.hasLineOfSight
-  // (sim.ts) and the pet recovery probe (pet/pet_ai.ts): same probe radius, same
-  // delve-module and rift-token wiring. It cannot reuse the ctx.lineOfSightBlocked
-  // seam because reach measures the CORPSE position, not the entity's (a released
-  // ghost stands at the graveyard), and both ends here are players, so only their
-  // delve runs (never a mob's) can supply interior modules.
+  // Reach measures the CORPSE position, not the entity's (a released ghost
+  // stands at the graveyard), so it uses the entity-to-body elevation arm.
+  // Both ends are players, so only their delve runs can supply interior modules.
   const run = ctx.delveRunForPlayer(caster.id) ?? ctx.delveRunForPlayer(dead.id);
-  const clear = lineOfSightClear(
+  const clear = entityToBodyLineOfSightClear(
     ctx.cfg.seed,
-    caster.pos,
+    caster,
     body,
     0.05,
     run?.modules,

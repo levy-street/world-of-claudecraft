@@ -10,7 +10,8 @@ import {
   technicalErrorMessage,
   userFacingApiError,
 } from '../src/ui/api_error_i18n';
-import { formatDateTime, formatDuration, setLanguage, t } from '../src/ui/i18n';
+import { durationText } from '../src/ui/duration_text';
+import { formatDateTime, formatDuration, formatNumber, setLanguage, t } from '../src/ui/i18n';
 import { tServer } from '../src/ui/server_i18n';
 
 // The matcher and the formatters both default to the active language; pin English so
@@ -116,6 +117,35 @@ describe('userFacingApiError parametric codes', () => {
     // The prose arm for the Discord bare "rate limited" maps to tooManyAttempts.
     expect(userFacingApiError(err)).toBe(t('errors.api.tooManyAttempts'));
   });
+
+  it('names the buy-now cooldown remaining time as a multi-unit duration, never raw seconds', () => {
+    // The common answer is the half-hour per-listing cooldown: "30 minutes",
+    // not "1,800 seconds" (the old pin compared formatDuration against itself
+    // and could not see the raw count).
+    const err = userFacingApiError({
+      code: 'woc_market.claim_cooldown',
+      params: { retryAfterSeconds: 1800 },
+    });
+    expect(err).toBe(t('hudChrome.wocMarket.claimCooldownRetry', { duration: durationText(1800) }));
+    expect(err).toContain(formatNumber(30, { style: 'unit', unit: 'minute', unitDisplay: 'long' }));
+    expect(err).not.toContain('1,800');
+    // Sub-minute answers keep the seconds phrase (the 1s floor case).
+    expect(
+      userFacingApiError({ code: 'woc_market.claim_cooldown', params: { retryAfterSeconds: 1 } }),
+    ).toContain(formatDuration(1));
+  });
+
+  it('renders the plain cooldown sentence when no remaining time rides (older server)', () => {
+    // NEVER the prose fallback here: the plain apiError copy is real text, so
+    // a param-less refusal still explains itself instead of leaking the code.
+    expect(userFacingApiError({ code: 'woc_market.claim_cooldown' })).toBe(
+      t('apiError.woc_market.claim_cooldown'),
+    );
+    // A junk param value takes the plain arm too, not a NaN duration.
+    expect(
+      userFacingApiError({ code: 'woc_market.claim_cooldown', params: { retryAfterSeconds: 'x' } }),
+    ).toBe(t('apiError.woc_market.claim_cooldown'));
+  });
 });
 
 describe('userFacingApiError transport / server-unreachable failures', () => {
@@ -200,10 +230,10 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('message rate exceeded')).toBe(t('loading.messageRateExceeded'));
     expect(userFacingApiError('message rate exceeded')).not.toBe(t('loading.connectionRejected'));
     // Session-fatal by design: an immediately reconnecting flooder re-floods,
-    // so neither transient-rejection helper may match it even mid-reconnect
-    // with a fresh counter.
-    expect(isTransientReconnectRejection('message rate exceeded', 1, 0)).toBe(false);
-    expect(isTransientTimeoutRejection('message rate exceeded', 1, 0)).toBe(false);
+    // so neither transient-rejection helper may match it even with a fresh
+    // rejection counter.
+    expect(isTransientReconnectRejection('message rate exceeded', 0)).toBe(false);
+    expect(isTransientTimeoutRejection('message rate exceeded', 0)).toBe(false);
   });
 
   it('re-localizes a moderation kick through tServer', () => {

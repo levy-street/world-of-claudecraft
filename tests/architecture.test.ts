@@ -62,8 +62,12 @@ function onDiskCores(dir: string): string[] {
 
 // Blank out comments while preserving line count and column positions, so prose
 // (a code comment that names Math.random, or "the search window") cannot create a
-// false positive. String literals are left intact: the dotted patterns matched
-// below (Math.random, window., ...) do not appear inside the sim's player text.
+// false positive. A shared twin lives at tests/helpers/strip_comments.ts; this
+// copy stays local ON PURPOSE (a load-bearing guard stays self-contained) and
+// the two may drift independently. String literals are left intact: the dotted patterns matched
+// below (Math.random, window., ...) do not appear inside the sim's player text, and neither does
+// the $WOC firewall's vocabulary, whose two words the game DOES use of its own accord (treasury,
+// signature) are matched only in their money-affixed compound forms for exactly that reason.
 // One alternation, so leftmost-first matching decides precedence: a line comment
 // whose text contains /* is consumed AS a line comment instead of opening a
 // bogus block that swallows everything to the next */ elsewhere in the file
@@ -214,11 +218,13 @@ const UI_PURE_CORES = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
-  'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
+  'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
+  'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
+  'src/ui/error_text_i18n_core.ts',
   'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
@@ -238,6 +244,8 @@ const UI_PURE_CORES = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/quest/quest_strip_core.ts',
+  'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
@@ -254,6 +262,9 @@ const UI_PURE_CORES = [
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
   'src/ui/meters_breakdown_view.ts',
+  'src/ui/interface_unlock_core.ts',
+  'src/ui/interface_unlock_menu_core.ts',
+  'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
   'src/ui/meters_rows_view.ts',
@@ -287,6 +298,13 @@ const UI_PURE_CORES = [
   'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
+  // The bank's bonus-slot breakdown footer: the KNOWN account-source table and the
+  // markup it projects a BankBonusModel into (Bank Storage phase 17, the extraction
+  // this window's ratchet row named).
+  'src/ui/bank_bonus_view.ts',
+  'src/ui/bank_socket_purchase_core.ts',
+  'src/ui/storage_rung_echo_core.ts',
+  'src/ui/vault_view.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
@@ -301,7 +319,67 @@ const UI_PURE_CORES = [
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_launcher_balance_core.ts',
   'src/ui/claudium_view.ts',
+  'src/ui/charter_card_view.ts',
+  // The Season 1 Armory's section / card / class-chip markup, the charter_card_view
+  // twin on the other half of the same store body (Bank Storage phase 15).
+  'src/ui/armory_card_view.ts',
+  // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
+  // phase 17). The overlay ELEMENT lives in the thin painter beside it.
+  'src/ui/daily_rewards_spin_view.ts',
+  // The rewards tab's leaderboard and payout-history panels, pure functions of the
+  // wire records (Bank Storage phase 17's review round, which spent the room the
+  // spin extraction bought and paid for it here rather than raising a ceiling).
+  'src/ui/daily_rewards_ranks_view.ts',
+  // The rewards tab's wallet LOCK card, a pure three-way branch on the lock reason
+  // (Bank Storage phase 17's review round, paying for a comment correction the way
+  // the phase paid for everything else).
+  'src/ui/daily_rewards_wallet_card_view.ts',
   'src/ui/woc_store_view.ts',
+  // The banker rung purchase's copy mappers and its second price tag's markup
+  // (Bank Storage phase 13), the charter_card_view twin one surface over.
+  'src/ui/bank_rung_view.ts',
+  // The capacity meter's copy: its accessible name and its tooltip body
+  // (Bank Storage phase 18, the same extraction shape one surface over).
+  'src/ui/bank_meter_view.ts',
+  // The banker rung purchase's money STATE MACHINE (Bank Storage phase 17,
+  // ruling 30): the sent latch, the in-flight SKU, the result band, the confirm
+  // latch and the re-prompt cap, plus the spend and its refusal handling. Every
+  // host effect is an injected closure, so it is DOM-free by construction. It is
+  // registered by name here rather than only swept: the determinism scan is what
+  // this file is for on this path, because a clock or an rng draw inside a
+  // purchase state machine is what mints a second key.
+  'src/ui/bank_rung_purchase_core.ts',
+  // The bank pane's short-phone chrome contract (Bank Storage phase 18): which
+  // bands must never scroll out of view, the compact-regime breakpoint the
+  // stylesheet also states, and where the pane's scroll offset lives. Pure
+  // numbers and selector strings; the sheet is held to it by
+  // tests/bank_chrome_layout.test.ts.
+  'src/ui/bank_chrome_layout_core.ts',
+  // The Claudium spend seam both spending windows consume. Not a *_view/*_core
+  // name, so registered by hand: it holds no state of its own and reads its
+  // host lazily, and a clock or an rng draw in here would reach the money path.
+  'src/ui/claudium_purchase_bridge.ts',
+  // The store's purchase-intent ledger. Not a *_view/*_core name, so the
+  // completeness scan below would never adopt it: registered by hand so the
+  // purity and determinism scans cover it. It holds one idempotency key per
+  // open purchase intent, and a clock or an rng draw in here would make a
+  // retry mint a new key, which is a second real charge.
+  'src/ui/store_purchase_intent.ts',
+  // The DURABLE half of that ledger: the row codec plus every guard that decides
+  // whether a stored intent may be handed back (scope, charset, cost, age, cap).
+  // Registered by hand for the same reason and with more force: it is the module
+  // a staleness rule would tempt someone to give a clock, and a clock in here
+  // would make the age check untestable and the ledger's own purity pointless.
+  // The clock and the browser storage live one door over, in the deliberately
+  // impure src/ui/purchase_intent_durability.ts.
+  'src/ui/purchase_intent_record.ts',
+  // What the open store remembers about charter FIT between paints: the server's
+  // refusals plus the ladder count last painted against, and the rule by which a
+  // count that moves DOWN invalidates the refusals (Bank Storage phase 15 QA).
+  // Not a *_view/*_core name, so registered by hand like the intent ledger above.
+  // It is deliberately DOM-free and clock-free: a wall-clock expiry in here would
+  // make a refusal lapse mid-visit and repaint a guaranteed-to-fail card enabled.
+  'src/ui/charter_fit_memory.ts',
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
@@ -309,18 +387,38 @@ const UI_PURE_CORES = [
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/crafting_deny_core.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
+  'src/ui/bootcamp_view.ts',
+  'src/ui/coach_prompt_view.ts',
+  'src/ui/objective_glow_view.ts',
+  'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_search_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_affordable_core.ts',
+  'src/ui/woc_market_poll_core.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
@@ -344,24 +442,22 @@ const UI_PURE_CORES = [
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
-  'src/ui/vale_cup_window_view.ts',
-  'src/ui/vale_cup_indicator_view.ts',
-  'src/ui/vale_cup_hud_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
-  'src/ui/vale_cup_briefing_view.ts',
-  'src/ui/vale_cup_betting_view.ts',
-  'src/ui/vale_cup_charge_view.ts',
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
+  // The signpost guild board's roster drill-in core (the board itself reuses
+  // guild_leaderboard_view above).
+  'src/ui/hud/guild_board/guild_roster_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deed_border_view.ts',
+  'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/reliquary_view.ts',
@@ -374,12 +470,20 @@ const UI_PURE_CORES = [
   'src/ui/unit_frame.ts',
   'src/ui/hud_frames.ts',
   'src/ui/stance_bar_view.ts',
+  'src/ui/hud/stance/stance_radial_core.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
+  'src/ui/hud/action_bar/action_bar_toggle_core.ts',
   'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
+  'src/ui/hud/action_bar/consumable_strip_core.ts',
+  'src/ui/hud/action_bar/radial_action_core.ts',
+  'src/ui/hud/action_bar/bar_editor/bar_editor_core.ts',
+  'src/ui/hud/menu/menu_strip_core.ts',
+  'src/ui/hud/action_bar/radial_gesture_core.ts',
+  'src/ui/hud/tap_menu_core.ts',
   'src/ui/hud/warlock/destruction_resource_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
@@ -397,6 +501,7 @@ const UI_PURE_CORES = [
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
+  'src/ui/target_frame_pos.ts',
   'src/ui/focus_order.ts',
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',
@@ -423,7 +528,9 @@ const UI_PURE_CORES = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
+  'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -462,8 +569,12 @@ const RENDER_PURE_CORES = [
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
+  'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
+  'src/render/quest_beacon_core.ts',
+  'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
@@ -507,16 +618,21 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
+  'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_decimation_core.ts',
+  'src/render/foliage_shore_gate_core.ts',
   'src/render/gpu_queue_window_core.ts',
   'src/render/compile_priority_core.ts',
   'src/render/view_create_budget_core.ts',
   'src/render/gpu_prep_budget_core.ts',
   'src/render/evil_eye_marker_core.ts',
+  'src/render/kit_uv_surface_core.ts',
+  'src/render/kit_window_panes_core.ts',
   'src/render/lich_audio_state_core.ts',
   'src/render/needle_of_fate_vfx_core.ts',
   'src/render/prewarm_resume_ledger_core.ts',
+  'src/render/prewarm_resume_start_gate_core.ts',
   'src/render/preview_prewarm_lane.ts',
   'src/render/sentence_vfx_core.ts',
   'src/render/umbral_anchor_vfx_core.ts',
@@ -547,6 +663,7 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
@@ -633,6 +750,17 @@ const BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
   'src/game/presentation_gate.ts',
@@ -671,6 +799,7 @@ const BARE_NAMED = [
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/target_frame_pos.ts',
   'src/ui/unit_frame.ts',
   'src/ui/hud_frames.ts',
   'src/ui/minimap_markers.ts',
@@ -688,6 +817,10 @@ const BARE_NAMED = [
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/claudium_purchase_bridge.ts',
+  'src/ui/store_purchase_intent.ts',
+  'src/ui/purchase_intent_record.ts',
+  'src/ui/charter_fit_memory.ts',
 ].map((rel) => join(repoRoot, rel));
 
 function importSpecs(src: string): string[] {
@@ -1154,6 +1287,259 @@ describe('server host-layer import invariants', () => {
   });
 });
 
+// The $WOC token firewall (docs/prd/woc/marketplace.md "Constraints"): no
+// wallet, token, or settlement code may live in src/sim. The PRD names this
+// scan as the mechanical enforcement, so it exists here rather than as prose.
+// The allowlist is read-only projections of chain state, never money logic.
+describe('the $WOC token firewall over src/sim', () => {
+  // The ONE tenant: daily_rewards_stub.ts, the offline daily-rewards readout
+  // (#1307), which is a constant literal with no logic behind it. It was carved
+  // out of sim.ts precisely so the coordinator is scanned like every other
+  // file. holder_tier.ts and types.ts came OFF this list when they were
+  // measured against the pattern: the cosmetic holder ladder and the holder
+  // field declarations name none of this vocabulary outside comments, and an
+  // allowlist entry that is not covering a real hit only hides the next one.
+  // A NEW file wanting on this list is the signal the firewall is being
+  // breached, not extended.
+  const FIREWALL_ALLOWED = new Set(['src/sim/daily_rewards_stub.ts']);
+  // The shape every allowlisted file must keep to stay exempt: a read-only
+  // projection. Exactly ONE `export function`, and the only other statements
+  // allowed are type-only lines (`export type`, `import type`). Everything
+  // that could grow money LOGIC behind the exemption is refused by name:
+  // any other export form (const/let/var/class/default/interface/enum), a
+  // re-export (`export {}` / `export *`, which would let the file front a
+  // module nothing scans), a generator, control flow, try/catch, the logical
+  // operators, a ternary or optional, a value import, and a dynamic
+  // `import(...)`. Each rule is proven to bite against a synthetic offender
+  // below, so none of them is passing merely because the file never had the
+  // construct; the non-vacuity check additionally requires each entry to
+  // still carry a real pattern hit, so a stale entry cannot linger as a
+  // whole-file blind spot.
+  const PROJECTION_RULES: [string, RegExp][] = [
+    ['a non-function export', /\bexport\s+(?!(?:async\s+)?function\b|type\b)/],
+    ['a re-export', /\bexport\s*[{*]/],
+    ['a generator', /\bfunction\s*\*/],
+    ['control flow', /\b(?:if|for|while|switch)\s*\(/],
+    ['a try or catch', /\b(?:try|catch)\b/],
+    ['a logical operator', /&&|\|\||\?\?/],
+    ['a ternary or optional', /\?/],
+    ['a value import', /^import\b(?!\s+type\s)/m],
+    ['a dynamic import', /\bimport\s*\(/],
+  ];
+  const projectionViolations = (src: string): string[] =>
+    PROJECTION_RULES.filter(([, re]) => re.test(src)).map(([rule]) => rule);
+  // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
+  // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
+  // the scan strips comments first, exactly like the sibling purity scans.
+  // No trailing \b on purpose: the leak shapes are COMPOUND identifiers
+  // (sellerWallet, walletForAccount, quoteUsdCents), which a closed word
+  // boundary would miss entirely.
+  // The compound arms carry NO LEFT boundary either, and that asymmetry is
+  // deliberate: a sim file named orderSignature or blockHash over-matches and
+  // reds at PR time, which costs one reviewer glance, while a missed leak
+  // costs the firewall. Failing toward MORE scanning is the direction this
+  // guard prefers.
+  // `treasury` carries a REQUIRED money suffix, unlike the rest. A bare match was
+  // too broad to survive contact with the game's own vocabulary: v0.34.0 added a
+  // keep room whose id is literally 'treasury' (src/sim/dungeon_layout.ts), which
+  // is a place on a map, not a fee destination. Every shape this firewall exists
+  // to catch is compound anyway (treasuryWallet, treasuryBps), and the bare word
+  // was the one token here that could flag ordinary content.
+  // `signature` is narrowed the same way and for the same reason: the bare word
+  // is the game's own vocabulary (the talent-spec `signature` field, ability and
+  // reliquary descriptions calling something a signature move), while every leak
+  // shape is a money-affixed compound (txSignature, signature_reused,
+  // signatureRequired). Bare `token` is left out entirely on the same grounds
+  // (riftToken, chatTokens).
+  // The affix sets are calibrated against the REAL identifier corpus of the
+  // excluded modules (server/woc_market_*, claudium_proxy, native_attestation,
+  // woc_balance), not invented examples: treasuryBase, signatureAtMs,
+  // derSignature, signatureHeader, bs58 (the npm package name, which the
+  // literal 'base58' misses), keypair, the secret- and private-key shapes,
+  // blockhash, and the transaction verbs all exist server-side today. (The
+  // key shapes are spelled with their optional separator in the pattern
+  // below and hyphenated here so the malware scanner's own key-exfil
+  // signature, which hunts the contiguous identifiers, does not flag the
+  // very guard that forbids them in the sim.)
+  const FIREWALL_RE =
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share|base|cut|fee|account)|custodyclaim|lamports|base58|bs58|keypair|secret[_-]?key|private[_-]?key|blockhash|spl[_-]?token|(?:send|sign)[_-]?transaction|woc[_-]?(?:balance|price|amount|payout|transfer)|(?:tx|txn|bond|settlement|burn|transfer|der|escrow|payer|seller|mint)[_-]?signature|signature[_-]?(?:reused|required|field|header|verified|at[_-]?ms|bytes))/i;
+
+  it('exempts exactly one file, by exact membership', () => {
+    // Set EQUALITY, not a lower bound: widening the exemption has to be a
+    // deliberate visible edit to this line, never a quiet extra entry that
+    // takes a whole sim file out of the scan.
+    expect([...FIREWALL_ALLOWED]).toEqual(['src/sim/daily_rewards_stub.ts']);
+    expect(FIREWALL_ALLOWED.size).toBe(1);
+  });
+
+  it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
+    const offenders: string[] = [];
+    for (const file of simFiles) {
+      const rel = relative(repoRoot, file).replace(/\\/g, '/');
+      if (FIREWALL_ALLOWED.has(rel)) continue;
+      const stripped = stripComments(readFileSync(file, 'utf8'));
+      const hit = FIREWALL_RE.exec(stripped);
+      if (hit) offenders.push(`${rel}: ${hit[0]}`);
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
+    // Near the real count (492 today) per the tests/CLAUDE.md floor rule: a
+    // walk that quietly lost most of the tree must fail here, because with
+    // sim.ts off the allowlist the corpus IS the firewall.
+    expect(simFiles.length).toBeGreaterThan(480);
+    // Every allowlisted file still exists, still trips the pattern (a stale
+    // entry is a whole-file blind spot), and still has the read-only
+    // projection shape spelled out at PROJECTION_RULES above.
+    for (const rel of FIREWALL_ALLOWED) {
+      const src = readFileSync(join(repoRoot, rel), 'utf8');
+      const stripped = stripComments(src);
+      expect(FIREWALL_RE.test(stripped), `${rel} no longer trips the pattern`).toBe(true);
+      // \b, not a trailing space: `export function* rows()` is a generator
+      // whose exported name a space-anchored count never sees.
+      expect(
+        stripped.match(/\bexport\s+(?:async\s+)?function\b/g),
+        `${rel} export count`,
+      ).toHaveLength(1);
+      expect(projectionViolations(stripped), `${rel} left the read-only projection shape`).toEqual(
+        [],
+      );
+      // Inline type imports (import { type X }) are deliberately refused by
+      // the value-import rule too: write them as import type instead.
+    }
+    // Both compound shapes must bite, and ordinary custody vocabulary must not.
+    expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
+    expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const escrowed = extractTradableCopy(inv, ref, def);')).toBe(false);
+    // The narrowed treasury arm, both directions: a fee destination or a split
+    // still bites, a room on a dungeon map does not.
+    expect(FIREWALL_RE.test('const dest = cfg.treasuryWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const bps = TREASURY_BPS;')).toBe(true);
+    expect(FIREWALL_RE.test("{ id: 'treasury', x0: 32, x1: 42 }")).toBe(false);
+    // The chain-settlement arms: an on-chain amount, an address encoding, and
+    // both compound signature shapes.
+    expect(FIREWALL_RE.test('const sig = row.txSignature;')).toBe(true);
+    expect(FIREWALL_RE.test('const b = toBase58(pk);')).toBe(true);
+    expect(FIREWALL_RE.test('const fee = LAMPORTS_PER_SOL / 2;')).toBe(true);
+    expect(FIREWALL_RE.test("if (reason === 'signature_reused') {")).toBe(true);
+    // ...and the game's own `signature`, which the narrowing must leave alone:
+    // player copy, the talent-spec field, and an ordinary derived-key helper.
+    expect(
+      FIREWALL_RE.test("description: 'Blasts nearby enemies with frost. (Frost signature)'"),
+    ).toBe(false);
+    expect(FIREWALL_RE.test("signature: 'mortal_strike',")).toBe(false);
+    expect(FIREWALL_RE.test('stationTypesSignature(types)')).toBe(false);
+  });
+
+  // One realistic usage per pattern arm the checks above do not already reach.
+  // An arm nobody probes is an arm a careless narrowing can delete for free,
+  // which is how a firewall loses a lane while staying green.
+  //
+  // The key shapes and the two transaction verbs are ASSEMBLED from fragments
+  // rather than spelled contiguously: the repo's malware scanner hunts exactly
+  // those source shapes (its key-exfil and web3-drain signatures), and the
+  // guard that forbids them in the sim must not read as one itself (the same
+  // hyphenation workaround the pattern comment describes). Each probe still
+  // carries the whole identifier at RUNTIME, which is what the pattern sees.
+  const CAMEL_KEY = 'Key';
+  const SNAKE_KEY = '_key';
+  const TX = 'Transaction';
+  const FIREWALL_ARM_PROBES: [string, string][] = [
+    ['bs58', 'const enc = bs58.encode(bytes);'],
+    ['keypair', 'const kp = keypairFromSeed(seed);'],
+    ['a camel-cased secret key', `const k = cfg.secret${CAMEL_KEY};`],
+    ['a snake-cased secret key', `const k = row.secret${SNAKE_KEY};`],
+    ['a private key', `const k = cfg.private${CAMEL_KEY};`],
+    ['blockhash', 'const { blockhash } = await conn.getLatest();'],
+    ['splToken', 'const mint = splToken.createMint(conn, payer);'],
+    ['sendTransaction', `await conn.send${TX}(tx);`],
+    ['signTransaction', `const signed = await provider.sign${TX}(tx);`],
+    ['wocBalance', 'const bal = row.wocBalance;'],
+    ['wocPrice', 'const price = quote.wocPrice;'],
+    ['wocAmount', 'const amount = order.wocAmount;'],
+    ['wocPayout', 'const payout = leg.wocPayout;'],
+    ['wocTransfer', 'await wocTransfer(from, to, amount);'],
+    ['treasuryPubkey', 'const dest = cfg.treasuryPubkey;'],
+    ['treasuryAddress', 'const dest = cfg.treasuryAddress;'],
+    ['treasuryBase', 'const base = split.treasuryBase;'],
+    ['treasuryCents', 'const cents = split.treasuryCents;'],
+    ['treasuryLeg', 'const leg = split.treasuryLeg;'],
+    ['treasuryShare', 'const share = split.treasuryShare;'],
+    ['treasuryCut', 'const cut = split.treasuryCut;'],
+    ['treasuryFee', 'const fee = split.treasuryFee;'],
+    ['treasuryAccount', 'const acct = cfg.treasuryAccount;'],
+    ['txnSignature', 'const sig = row.txnSignature;'],
+    ['derSignature', 'const sig = row.derSignature;'],
+    ['bondSignature', 'const sig = row.bondSignature;'],
+    ['settlementSignature', 'const sig = row.settlementSignature;'],
+    ['burnSignature', 'const sig = row.burnSignature;'],
+    ['transferSignature', 'const sig = row.transferSignature;'],
+    ['escrowSignature', 'const sig = row.escrowSignature;'],
+    ['payerSignature', 'const sig = row.payerSignature;'],
+    ['sellerSignature', 'const sig = row.sellerSignature;'],
+    ['mintSignature', 'const sig = row.mintSignature;'],
+    ['signatureRequired', 'const need = rules.signatureRequired;'],
+    ['signatureField', 'const field = body.signatureField;'],
+    ['signatureHeader', 'const header = req.signatureHeader;'],
+    ['signatureVerified', 'const ok = row.signatureVerified;'],
+    ['signatureAtMs', 'const at = row.signatureAtMs;'],
+    ['signatureBytes', 'const raw = row.signatureBytes;'],
+    ['custodyClaim', 'const claim = row.custodyClaim;'],
+    ['usdCents', 'const usd = quote.usdCents;'],
+    ['priceCents', 'const price = row.priceCents;'],
+    ['bondCents', 'const bond = order.bondCents;'],
+    ['amountBase', 'const amount = order.amountBase;'],
+    ['settlementQuote', 'const quote = order.settlementQuote;'],
+    ['pubkey', 'const pk = session.pubkey;'],
+    ['solana', 'const rpc = cfg.solanaRpcUrl;'],
+  ];
+
+  it.each(FIREWALL_ARM_PROBES)('bites on %s', (_arm, probe) => {
+    expect(FIREWALL_RE.test(probe)).toBe(true);
+  });
+
+  // The read-only-projection shape, proven rule by rule. Each offender names
+  // the rule it must trip, so deleting or loosening one rule reds here even
+  // though the one allowlisted file never carried the construct.
+  const PROJECTION_OFFENDERS: [string, string, string][] = [
+    ['a generator export', 'export function* rows() { yield 1; }', 'a generator'],
+    ['a named re-export', "export { dailyRewardsStub } from './other';", 'a re-export'],
+    ['a star re-export', "export * from './other';", 'a re-export'],
+    ['an exported interface', 'export interface Shape { a: number }', 'a non-function export'],
+    ['an exported enum', 'export enum Tier { One }', 'a non-function export'],
+    ['an exported const', 'export const rate = 1;', 'a non-function export'],
+    ['a loop', 'for (const row of rows) sum += row.a;', 'control flow'],
+    ['a try block', 'try { run(); } catch { }', 'a try or catch'],
+    ['a logical and', 'const v = a && b;', 'a logical operator'],
+    ['a logical or', 'const v = a || b;', 'a logical operator'],
+    ['a nullish fallback', 'const v = a ?? b;', 'a logical operator'],
+    ['a ternary', 'const v = a > 1 ? a : b;', 'a ternary or optional'],
+    ['a value import', "import { ITEMS } from './data';", 'a value import'],
+    ['a dynamic import', "const m = await import('./other');", 'a dynamic import'],
+  ];
+
+  it.each(PROJECTION_OFFENDERS)('refuses %s in an allowlisted file', (_label, src, rule) => {
+    expect(projectionViolations(src)).toContain(rule);
+  });
+
+  it('probes every projection rule, and still allows the one sanctioned shape', () => {
+    // Completeness both ways: a new rule with no offender above is unproven
+    // (the distinct rule names the offenders trip must cover the whole list),
+    // and the shape the exemption exists for must keep passing.
+    const probed = new Set(PROJECTION_OFFENDERS.map(([, , rule]) => rule));
+    expect(probed.size).toBe(PROJECTION_RULES.length);
+    const sanctioned = [
+      "import type { DailyRewardStatus } from '../world_api';",
+      'export type Readout = DailyRewardStatus;',
+      'export function readout(): Promise<Readout> {',
+      "  return Promise.resolve({ day: '1970-01-01' } as Readout);",
+      '}',
+    ].join('\n');
+    expect(projectionViolations(sanctioned)).toEqual([]);
+  });
+});
+
 describe('src/ui pure-core invariants', () => {
   it('lists only files that exist (the curated pure cores)', () => {
     const missing = UI_PURE_CORES.filter((f) => !statSync(f).isFile());
@@ -1450,15 +1836,19 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/charter_fit_memory.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/ui/claudium_purchase_bridge.ts',
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/duration_text.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
+  'src/ui/guild_tag.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud_frames.ts',
@@ -1480,16 +1870,28 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/party_collapse.ts',
   'src/ui/party_frames.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/target_frame_pos.ts',
+  'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_tokens_text.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -1682,12 +2084,13 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
-// `typeof window !== 'undefined'`, `(window as X).y`. Anchored on a code delimiter
-// at BOTH ends so prose ("close the window, then click") cannot match, and the
-// open brace refuses a `${...}` interpolation so a template variable named
-// `window` (talent_i18n has one) is not mistaken for the global.
+// `typeof window !== 'undefined'`, `(window as X).y`, and ternary value arms such
+// as `enabled ? window : fallback`. Anchored on a code delimiter at BOTH ends so
+// prose ("close the window, then click") cannot match, and the open brace refuses
+// a `${...}` interpolation so a template variable named `window` (talent_i18n has
+// one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|\\?\\s*(?:${UI_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -1748,7 +2151,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|\\?\\s*(?:${HELPER_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -1811,16 +2214,29 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
+  'src/ui/bank_status_line.ts',
   'src/ui/bank_window.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
-  'src/ui/camera_prompt.ts',
+  'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
+  'src/ui/hud/action_bar/consumable_seat_controller.ts',
+  'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
+  'src/ui/hud/action_bar/radial_gesture_controller.ts',
+  'src/ui/hud/menu/menu_control_controller.ts',
+  'src/ui/hud/stance/stance_bar_controller.ts',
+  'src/ui/hud/stance/stance_control_controller.ts',
+  'src/ui/hud/tap_menu.ts',
+  'src/ui/hud/strip_gesture_controller.ts',
+  'src/ui/hud/quest/quest_strip_controller.ts',
+  'src/ui/hud/quest/quest_strip_gesture_controller.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
@@ -1831,6 +2247,14 @@ const UI_DOM_MODULES = [
   'src/ui/continent_art.ts',
   'src/ui/crafting_window.ts',
   'src/ui/commission_order_window.ts',
+  // The spin celebration's live element: created, listened to, mounted on
+  // document.body and torn down (Bank Storage phase 17). Its markup and geometry
+  // are in the pure src/ui/daily_rewards_spin_view.ts. Named `_controller` so the
+  // painter gate's filename sweep keeps the cold contract this code held while it
+  // lived in the window, WITHOUT the stricter facet-routed contract a `_painter`
+  // carries or the by-name sweep that would drop this very row. The double
+  // coverage is the deliberate one this file's own header describes.
+  'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',
@@ -1847,6 +2271,7 @@ const UI_DOM_MODULES = [
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
   'src/ui/hud.ts',
+  'src/ui/hud/action_bar/action_bar_toggle_controller.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',
   'src/ui/hud/cosmetics/skin_event_controller.ts',
@@ -1869,11 +2294,14 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
+  'src/ui/hud/woc_trade/woc_trade_controller.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
   'src/ui/inspect_window.ts',
+  'src/ui/interface_unlock.ts',
+  'src/ui/settings_transfer.ts',
   'src/ui/item_drop_hit_test.ts',
   'src/ui/loading_backdrop.ts',
   'src/ui/loading_slow_hint.ts',
@@ -1884,10 +2312,12 @@ const UI_DOM_MODULES = [
   'src/ui/map_marker_icon_loader.ts',
   'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
+  'src/ui/woc_market_window.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/wallet_verify_request.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
   'src/ui/aura_overlay_config.ts',
@@ -1895,6 +2325,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
@@ -1910,12 +2341,26 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/professions_window.ts',
+  // The binder that gives a purchase-intent ledger a durable half. It reaches
+  // localStorage (through the safe_local_storage seam, the one sanctioned door)
+  // and the clock, which is precisely why it is not in the pure record core it
+  // wraps: the age bound has to be injectable or it cannot be tested, and a
+  // clock inside a registered core would break the scan the ledger's whole
+  // testability rests on. Its sibling src/ui/purchase_intent_key.ts is listed
+  // here too, for the same reason on the other half of the split.
+  'src/ui/purchase_intent_durability.ts',
+  // The ONE Claudium idempotency-key minter. It reaches globalThis.crypto and,
+  // on the fallback arm, the clock and an rng, which is exactly why it is NOT
+  // in store_purchase_intent.ts: that ledger is a pure core whose determinism
+  // scan is what lets a caller inject a minter and test it deterministically.
+  'src/ui/purchase_intent_key.ts',
   'src/ui/reconnect_overlay.ts',
   // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
   // pinned page set persists per character in localStorage (the deeds_window
@@ -1927,6 +2372,8 @@ const UI_DOM_MODULES = [
   'src/ui/spellbook_window.ts',
   'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
+  'src/ui/steam_wishlist.ts',
+  'src/ui/store_decision_prompt.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
@@ -1940,13 +2387,11 @@ const UI_DOM_MODULES = [
   // pure core.
   'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
+  'src/ui/bootcamp.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',
-  'src/ui/vale_cup_betting.ts',
-  'src/ui/vale_cup_briefing.ts',
-  'src/ui/vale_cup_charge.ts',
-  'src/ui/vale_cup_hud.ts',
+  'src/ui/vault_window.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
@@ -2157,6 +2602,8 @@ describe('src/ui module classification (every module is swept by exactly one gat
       'const deps = { document };',
       'const hosts = [document, window];',
       'const merged = { ...globalThis };',
+      'const host = enabled ? window : fallback;',
+      'const doc = enabled ? document : fallback;',
     ]) {
       expect(UI_HOST_VALUE_RE.test(positive), positive).toBe(true);
     }
@@ -2232,6 +2679,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect(HELPER_HOST_PATTERNS[0][1].test('document.createElement(x)')).toBe(false);
     expect(HELPER_HOST_PATTERNS[0][1].test('window.innerWidth')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test("typeof localStorage !== 'undefined'")).toBe(true);
+    expect(HELPER_HOST_PATTERNS[1][1].test('const host = enabled ? window : fallback;')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test('return document;')).toBe(false);
     // The helper document rule counts every access, so a second, live-tree call
     // cannot hide behind the sanctioned one.
@@ -2244,5 +2692,88 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect('rgba(0, 0, 0, .5)'.match(COLOR_FUNC_RE)).toEqual(['rgba(']);
     expect('rgb(1 2 3)'.match(COLOR_FUNC_RE)).toEqual(['rgb(']);
     expect('const hex = colorToken;'.match(COLOR_HEX_RE)).toBeNull();
+  });
+});
+
+// Shipping source (src/ and server/) must stay free of raw C0 control bytes.
+// This is not style: a single NUL makes the whole file BINARY to the grep-family
+// tools the repo's own sweeps are built on, and they fail SILENTLY. On this
+// machine `grep` is ugrep, which skips a binary file outright: before the Bank
+// Storage phase 11 QA fix, `grep -c export server/storage_purchases.ts` printed
+// nothing and exited 1 while `grep --binary-files=text` found ten, so the
+// phase's largest money-path module read as an EMPTY file to every source sweep.
+// tests/ is deliberately exempt: a test legitimately embeds a control byte as
+// INPUT (appearance_wire_bounds pins one inside a name, enchant_apply_view builds
+// a NUL-separated composite key, glb_assets feeds a sanitizer), and those files
+// are not what a source sweep is trying to read.
+const CONTROL_BYTE_ROOTS = ['src', 'server'] as const;
+
+/** Index of the first raw C0 control byte (or DEL), else -1. A codepoint scan
+ *  rather than a regex on purpose: a regex literal holding control characters
+ *  is itself a biome error (noControlCharactersInRegex), and a character class
+ *  is easy to widen or invert by accident, whereas this predicate is directly
+ *  unit-testable. Tab and newline are the only legal ones; carriage return is
+ *  banned with the rest because this repo is LF-only, so a CR here is
+ *  corruption too. */
+function firstControlByteIndex(text: string): number {
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code === 0x09 || code === 0x0a) continue;
+    if (code < 0x20 || code === 0x7f) return i;
+  }
+  return -1;
+}
+
+describe('shipping source carries no raw control bytes', () => {
+  const files = CONTROL_BYTE_ROOTS.flatMap((root) => walk(join(repoRoot, root)));
+
+  it('finds both shipping source trees', () => {
+    expect(files.length).toBeGreaterThan(400);
+  });
+
+  it('has no control byte in any src/ or server/ TypeScript file', () => {
+    const offenders: string[] = [];
+    for (const file of files) {
+      const text = readFileSync(file, 'utf8');
+      const at = firstControlByteIndex(text);
+      if (at === -1) continue;
+      const line = text.slice(0, at).split('\n').length;
+      const code = text.charCodeAt(at).toString(16).padStart(4, '0');
+      offenders.push(`${file.slice(repoRoot.length)}:${line} carries U+${code.toUpperCase()}`);
+    }
+    expect(
+      offenders,
+      'A raw control byte makes the file binary to grep, so every source sweep ' +
+        'silently skips it. Write the character as an escape in a string literal ' +
+        `instead:\n${offenders.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('the ban FIRES on every control byte and spares tab, newline, and real text', () => {
+    // Mutation-proof for the predicate itself: the sweep above is only as strong
+    // as this scan, and an off-by-one in either bound would silently disarm it.
+    const nul = String.fromCharCode(0);
+    const del = String.fromCharCode(0x7f);
+    const esc = String.fromCharCode(0x1b);
+    // The exact regression this guard was written for.
+    expect(firstControlByteIndex(`const K = '${nul}recovery-scan';`)).toBe(11);
+    expect(firstControlByteIndex(del)).toBe(0);
+    expect(firstControlByteIndex(esc)).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x0d))).toBe(0);
+    // Both edges of the legal window, so neither bound can drift.
+    expect(firstControlByteIndex(String.fromCharCode(0x08))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x0b))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x1f))).toBe(0);
+    expect(firstControlByteIndex(String.fromCharCode(0x20))).toBe(-1);
+    expect(firstControlByteIndex(String.fromCharCode(0x7e))).toBe(-1);
+    // Tab and newline stay legal, and the shipped fix uses a real SPACE.
+    expect(firstControlByteIndex('\t')).toBe(-1);
+    expect(firstControlByteIndex('\n')).toBe(-1);
+    expect(firstControlByteIndex(`const K = ' recovery-scan';`)).toBe(-1);
+    // The escaped SPELLING of a control byte stays legal: only the raw byte is
+    // banned, so a module that genuinely needs one can still express it.
+    expect(firstControlByteIndex(`const sep = '\\u0000';`)).toBe(-1);
+    // It reports the FIRST offender, not merely "some", so the message locates it.
+    expect(firstControlByteIndex(`ab${del}c${nul}`)).toBe(2);
   });
 });

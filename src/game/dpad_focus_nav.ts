@@ -9,9 +9,14 @@
 
 import { type NavDirection, type NavRect, nextFocusIndex } from '../ui/dpad_nav_core';
 import { FOCUSABLE_SELECTOR } from '../ui/focus_manager';
+import { PAD_ACTIVE_CLASS } from './input_hint_mode';
 
 // The roots a pad player can be navigating, most specific first.
 const WINDOW_SELECTOR = '[role="dialog"], .window.panel';
+// Non-modal gameplay actions that still need a controller selection. Unlike a
+// window, these must not put the pad into pointer mode: the ghost prompt appears
+// while the player is still walking back to their body.
+const STANDALONE_SELECTOR = '[data-pad-nav-root]';
 
 function isVisible(el: HTMLElement): boolean {
   const rect = el.getBoundingClientRect();
@@ -82,6 +87,16 @@ function activeRoot(): HTMLElement | null {
   if (spanWindows) return null;
   const open = [...document.querySelectorAll<HTMLElement>(WINDOW_SELECTOR)].filter(isVisible);
   // Last in document order is the most recently mounted, which is the one on top.
+  if (open.length > 0) return open[open.length - 1];
+  return activeStandaloneRoot();
+}
+
+function activeStandaloneRoot(): HTMLElement | null {
+  if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function')
+    return null;
+  const open = [...document.querySelectorAll<HTMLElement>(STANDALONE_SELECTOR)].filter(
+    (el) => el.hasAttribute?.('data-pad-nav-root') && isVisible(el),
+  );
   return open.length > 0 ? open[open.length - 1] : null;
 }
 
@@ -267,6 +282,20 @@ export function clearPadFocus(): void {
 }
 
 /**
+ * Let Cancel relinquish an optional HUD selection without dismissing a required
+ * action. Release Spirit is the only way out of the death overlay, so making B
+ * clear its selection leaves a controller player with no visible way forward.
+ * Ghost resurrection remains optional: B can still hand its d-pad back to the
+ * world while the player decides whether to keep moving.
+ */
+export function cancelPadFocus(): boolean {
+  const standalone = activeStandaloneRoot();
+  if (standalone?.hasAttribute('data-pad-nav-required')) return false;
+  clearPadFocus();
+  return true;
+}
+
+/**
  * Land focus on the first control of a newly opened window, so a pad player does
  * not have to press a direction just to get in. Answers false when no window is
  * open or it holds nothing focusable, which leaves the pointer alone.
@@ -276,6 +305,7 @@ export function clearPadFocus(): void {
  * HUD instead of landing inside the thing that just opened.
  */
 let lastRoot: HTMLElement | null = null;
+let lastStandaloneRoot: HTMLElement | null = null;
 
 export function focusFirstInWindow(): boolean {
   lastRoot = null; // force the next sync to treat this as a fresh surface
@@ -305,6 +335,72 @@ export function syncWindowFocus(): boolean {
   landing.focus();
   markPadFocus(landing);
   return true;
+}
+
+/**
+ * Focus a non-modal gameplay action on its HIDDEN -> VISIBLE edge.
+ *
+ * Death controls need the same visible selection and confirm path as a window,
+ * but pointer mode would suspend movement and trap a ghost the instant it came
+ * within resurrection range. This edge-triggered path leaves movement live. If
+ * movement or Cancel clears the selection, the still-visible prompt does not
+ * steal it back; leaving and re-entering range rearms it. A button that becomes
+ * hidden while its sibling remains visible is the sole same-root rehome case.
+ */
+export function syncStandalonePadFocus(): boolean {
+  if (typeof document === 'undefined') return false;
+
+  // Merely having a controller connected is not an invitation to take focus.
+  // The last-used input signal is set before this sync on real pad activity and
+  // cleared by keyboard/mouse input, protecting chat and assistive technology.
+  if (document.body?.classList?.contains?.(PAD_ACTIVE_CLASS) !== true) {
+    if (lastStandaloneRoot && marked) {
+      const priorControls = [
+        ...lastStandaloneRoot.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ];
+      if (priorControls.includes(marked)) clearPadFocus();
+    }
+    lastStandaloneRoot = null;
+    return false;
+  }
+
+  const root = activeStandaloneRoot();
+  if (!root) {
+    if (lastStandaloneRoot && marked && typeof lastStandaloneRoot.querySelectorAll === 'function') {
+      const priorControls = [
+        ...lastStandaloneRoot.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ];
+      if (priorControls.includes(marked)) clearPadFocus();
+    }
+    lastStandaloneRoot = null;
+    return false;
+  }
+
+  const controls = focusables(root);
+  if (root !== lastStandaloneRoot) {
+    const landing = firstMeaningful(controls);
+    if (!landing) return false;
+    lastStandaloneRoot = root;
+    landing.focus();
+    markPadFocus(landing);
+    return true;
+  }
+
+  // The player may remain in the ghost-prompt root while its available action
+  // changes (corpse left range, healer still nearby). Rehome only when the pad
+  // still owns the now-hidden control; a deliberately cleared mark stays clear.
+  if (marked && !controls.includes(marked)) {
+    const allControls = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+    if (allControls.includes(marked)) {
+      const landing = firstMeaningful(controls);
+      if (landing) {
+        landing.focus();
+        markPadFocus(landing);
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 /** Press whatever the d-pad has focused. Answers false when nothing is focused,

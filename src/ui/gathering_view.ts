@@ -18,7 +18,7 @@
 // for a node is independent. This core never assumes otherwise: it always
 // re-resolves through the passed-in `world`, never caches across callers.
 
-import { bagCapacity, countFit } from '../sim/bags';
+import { bagPools, countFit } from '../sim/bags';
 import { isActionLockingFormAuraKind } from '../sim/combat/forms';
 import {
   GATHERING_PROFESSION_IDS,
@@ -257,7 +257,7 @@ export function gatherEffectPrompt(
   // and declining sends a plain harvest the sim's own pre-gate refuses
   // with its bags-full toast; asking is the arm that lets the harvest
   // succeed at all there.
-  if (countFit(world.inventory, bagCapacity(world.bags), assistedYield, 1) < 1) return null;
+  if (countFit(world.inventory, bagPools(world.bags), assistedYield, 1) < 1) return null;
   return { effectId: slot.effectId, charges: slot.durability };
 }
 

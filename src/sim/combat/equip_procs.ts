@@ -7,8 +7,9 @@
 // Determinism / parity: the proc's rng roll only happens when the wielder actually
 // carries a proc weapon with a proc for THIS trigger. Ordinary gear (everything but
 // the two legendaries) draws no rng here, so the shared draw order, and every parity
-// golden that equips no legendary, is unchanged. The `proc.trigger !== trigger` skip
-// and the `target.dead` guard both short-circuit BEFORE the rng draw.
+// golden that equips no legendary, is unchanged. The `proc.trigger !== trigger` skip,
+// the `target.dead` guard, and the duel-end grace check on a persistent hostile
+// effect (see duelJustEndedBetween below) all short-circuit BEFORE the rng draw.
 //
 // src/sim-pure: reaches Sim only through SimContext (rng/emit/applyAura/dealDamage/
 // hostilesInRadius); no DOM/Three/Math.random.
@@ -16,6 +17,7 @@
 import { ITEMS } from '../data';
 import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
@@ -48,6 +50,19 @@ export function runWeaponProcs(
   const procs = item.weaponProcs;
   for (const proc of procs) {
     if (proc.trigger !== trigger) continue;
+    // A hostile persistent-aura proc (dot/attackSlow) landing on the killing
+    // blow's own opponent must not outlive the duel it just ended: see
+    // duelJustEndedBetween (social/duel.ts). Scoped to persistent effects
+    // only, so a heal/hot proc on an ally (or a self-buff) is unaffected. A
+    // chainArc-ONLY proc is unaffected too: its damage already goes through
+    // dealDamage's own duel-aware clamp, which is where that race is closed.
+    // A proc that bundles chainArc WITH a persistent hostile effect (e.g.
+    // Thronebane's arc + slow) is skipped whole when gated, which costs only
+    // that one already-safe tick of arc damage.
+    const isHostilePersistent = proc.effects.some(
+      (eff) => eff.kind === 'dot' || eff.kind === 'attackSlow',
+    );
+    if (isHostilePersistent && duelJustEndedBetween(ctx, target, wielder)) continue;
     if (!ctx.rng.chance(proc.chance)) continue;
     for (const eff of proc.effects) fireEffect(ctx, wielder, target, proc, eff);
   }

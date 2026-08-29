@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "fae50bb5",
+      "nextId": 998,
+      "state": "2c73aa2a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,7 +36,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -53,7 +60,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -78,7 +85,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -91,10 +101,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 963,
+          "id": 993,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -112,17 +122,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -146,9 +156,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 982,
-      "state": "c2068e20",
-      "events": "c4223b9a",
+      "nextId": 1012,
+      "state": "52ce9ee1",
+      "events": "8bff4d15",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -157,9 +167,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 982,
-      "state": "16c83cea",
-      "events": "155f3705",
+      "nextId": 1012,
+      "state": "c931df23",
+      "events": "7fe4245a",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -168,8 +178,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 982,
-      "state": "22e249e8",
+      "nextId": 1012,
+      "state": "b21ffeb9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,8 +189,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 982,
-      "state": "b0b531be",
+      "nextId": 1012,
+      "state": "b9b9b5df",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -190,8 +200,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 982,
-      "state": "ca1abf00",
+      "nextId": 1012,
+      "state": "682e2801",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -201,8 +211,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 982,
-      "state": "0dad47da",
+      "nextId": 1012,
+      "state": "6126d4f3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -212,9 +222,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 983,
-      "state": "a0e7f67a",
-      "events": "9384acd8",
+      "nextId": 1013,
+      "state": "c16e88f9",
+      "events": "e3146949",
       "rng": {
         "draws": 5,
         "digest": "50aeceb5"
@@ -233,7 +243,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -291,7 +308,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -319,6 +336,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
@@ -334,7 +354,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -360,9 +380,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -391,7 +411,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 981,
+          "id": 1011,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -424,8 +444,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 983,
-      "state": "2bf31f0c",
+      "nextId": 1013,
+      "state": "0a348c6b",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -435,8 +455,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 983,
-      "state": "72001682",
+      "nextId": 1013,
+      "state": "6aaf1731",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -456,7 +476,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -514,7 +541,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 963,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -542,6 +569,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
@@ -557,7 +587,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 963,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -583,9 +613,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -614,7 +644,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 981,
+          "id": 1011,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

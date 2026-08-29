@@ -39,6 +39,7 @@ import {
   SEEKER_SPIN_VERIFY_POLICY,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
+  WOC_MARKET_READ_POLICY,
 } from '../../../server/http/middleware/rate_limit';
 import type { RateLimitOutcome, RateLimitStore } from '../../../server/http/types';
 import {
@@ -57,12 +58,14 @@ import {
   resetRateLimitClock,
   resetWalletLinkRateLimits,
   resetWocBalanceRateLimits,
+  resetWocMarketMutationRateLimits,
   SEEKER_SPIN_VERIFY_MAX_PER_MINUTE,
   setRateLimitClock,
   setRateLimitTier2Store,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
+  WOC_MARKET_READ_MAX_PER_MINUTE,
 } from '../../../server/ratelimit';
 import { createPgRateLimitStore } from '../../../server/ratelimit_db';
 import { fakeCtx } from '../helpers/fake_ctx';
@@ -409,6 +412,34 @@ describe('rateLimit: policy derivation guard', () => {
       // Every mounted-and-unmounted policy is pg-global backed in the table.
       expect(policy.tier2, `${policy.name} tier2`).toBe('global');
     }
+    // The ONE sanctioned tier-1-only opt-out, pinned beside the rule it
+    // excepts: the marketplace's polled GET surface, where tier-2 'global'
+    // would spend two rate_limits UPSERTs per ALLOWED poll. A second silent
+    // 'none' belongs in this test or it does not ship.
+    expect(WOC_MARKET_READ_POLICY.tier2).toBe('none');
+    expect(WOC_MARKET_READ_POLICY.limit).toBe(WOC_MARKET_READ_MAX_PER_MINUTE);
+    expect(WOC_MARKET_READ_POLICY.windowSeconds).toBe(WINDOW_SECONDS);
+  });
+
+  it("tier2 'none' SKIPS the store on an allowed request (the opt-out is real, not a label)", async () => {
+    const store = new RecordingRateLimitStore(() => ALWAYS_ALLOWED);
+    setRateLimitTier2Store(store);
+    const ctx = fakeCtx({ account: { accountId: 7, scope: 'read' } });
+    // Positive control FIRST: a 'global' policy through the same store
+    // records hits, proving the store is wired (a zero against an unwired
+    // store would be vacuous).
+    await rateLimit(WOC_BALANCE_POLICY)(ctx, async () => {});
+    const wired = store.hits.length;
+    expect(wired).toBeGreaterThan(0);
+    let nextRan = false;
+    await rateLimit(WOC_MARKET_READ_POLICY)(ctx, async () => {
+      nextRan = true;
+    });
+    expect(nextRan).toBe(true);
+    // The allowed read-policy request never touched the pg store: this is
+    // the whole point of the tier-1-only retune.
+    expect(store.hits.length).toBe(wired);
+    resetWocMarketMutationRateLimits();
   });
 });
 

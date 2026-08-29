@@ -32,7 +32,6 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -40,8 +39,10 @@ import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
+import { corpseHasDecayed } from '../respawn_policy';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -131,6 +132,51 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
+  if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
+  if (!mob.lootable) return;
+  mob.lootable = false;
+  for (const meta of ctx.players.values()) {
+    const player = ctx.entities.get(meta.entityId);
+    if (player?.targetId === mob.id) player.targetId = null;
+  }
+}
+
+/**
+ * Is this dead mob an INSTANCE corpse whose per-tick dead-branch has become a
+ * provable no-op? Instance mobs (dungeon/rift/delve bands) never corpse-decay
+ * or respawn in place (the `!isInstanceMob` gates in updateMob's dead branch),
+ * so once the detonate fuse is spent and the FFA loot window has lapsed, the
+ * only thing the dead branch does is decrement two timers nothing reads. The
+ * Sim idle-cull uses this to stop far-from-player corpse fields (a cleared
+ * rift floor's packs) from paying updateMob every tick for the rest of the
+ * run. Exclusions, each load-bearing:
+ * - owned corpses: pets/demons unravel via their corpseTimer;
+ * - detonate fuses: Death Throes must still burst;
+ * - FFA windows: the owner-lock lapse must still count down;
+ * - auras: the caller would also skip updateAuras (whose dead arm still
+ *   recomputes `stealthed`), and unbreakable-control auras survive death, so
+ *   such corpses simply keep ticking rather than risk frozen aura state;
+ * - a stealth-flagged corpse: the dead updateAuras arm is what clears the
+ *   flag, so it must run at least until the flag settles;
+ * - Nythraxis: onBossDeath drives its death dialogue from the dead branch;
+ * - worldBoss templates: the world-boss scheduler reads boss.corpseTimer to
+ *   reclaim the corpse (none spawn in an instance band today; insurance).
+ */
+export function isInertInstanceCorpse(mob: Entity): boolean {
+  return (
+    mob.dead &&
+    mob.spawnPos.x > DUNGEON_X_THRESHOLD &&
+    mob.ownerId === null &&
+    mob.detonateTimer === Infinity &&
+    mob.lootFfaTimer <= 0 &&
+    mob.auras.length === 0 &&
+    !mob.stealthed &&
+    !mob.nythraxis &&
+    MOBS[mob.templateId]?.worldBoss !== true
+  );
+}
+
 export function updateMob(ctx: SimContext, mob: Entity): void {
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
@@ -148,6 +194,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
+    expireDecayedCorpseInteractions(ctx, mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -161,6 +208,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.ownerId !== null &&
       (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
     ) {
+      // A dead battleground fighter is owed THIS corpse back as a revive-in-place
+      // on the next respawn wave: freeze the decay window (undo this tick's
+      // shared decrement above) so the wave reuses the entity instead of
+      // rebuilding a new one every wave, which forced every nearby client to
+      // re-mint the entity and its character view (pet/pet_corpse_hold.ts has
+      // the full why and the narrowness rules). Decay resumes, with the window
+      // it still had, the moment the hold lifts. An UNDO rather than a skip on
+      // purpose: the corpse-interaction expiry and the detonate fuse above must
+      // keep reading the decremented value, in their existing order, so a held
+      // tick stays byte-identical to an unheld one for every draw site.
+      // Pure state, no rng.
+      if (holdPetCorpseForBgWave(ctx, mob)) {
+        mob.corpseTimer += DT;
+        return;
+      }
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
@@ -251,19 +313,6 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
   if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
-    mob.hostile = false;
-    mob.aiState = 'idle';
-    mob.inCombat = false;
-    mob.aggroTargetId = null;
-    clearThreat(mob);
-    return;
-  }
-
-  // The Vale Cup boarball is moved exclusively by the match driver
-  // (social/vale_cup.ts): no aggro, no wander (an idle wander would also draw
-  // rng inside golden-scenario ticks), no evade-home, and the hostility safety
-  // net below must not re-hostile it. Bell pattern, verbatim.
-  if (mob.templateId === VALE_CUP_BALL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;

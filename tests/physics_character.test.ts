@@ -176,7 +176,9 @@ describe('swept collision and sliding', () => {
     expect(out.blocked).toBe(true);
     // Stopped clear of the crate: distance from its center is at least the
     // sum of the radii (crate 0.65 + body 0.5), inside a skin's tolerance.
-    expect(Math.hypot(out.x - SPOT.x, out.z - cz)).toBeGreaterThan(0.65 + R - 0.02);
+    expect(Math.hypot(out.x - SPOT.x, out.z - cz)).toBeGreaterThan(
+      campCrateShape(SPOT.x, cz, 0).r + R - 0.02,
+    );
     expect(out.z).toBeLessThan(cz);
   });
 

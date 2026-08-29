@@ -93,8 +93,10 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it('the compact-tier tracker count chip: a 24px visual whose ::after hit extension is LIVE on all four sides', () => {
-    // The compact chip (both #deed-tracker and #reliquary-tracker share the
-    // rule in hud.mobile.css) is deliberately a 24px visual under the scaled
+    // The compact chip rule names both trackers in hud.mobile.css, but only
+    // #deed-tracker can be measured on touch here: body.mobile-touch hides
+    // #reliquary-tracker outright on this branch, so the deed arm is the live
+    // one. It is deliberately a 24px visual under the scaled
     // minimap column; its 40px floor rides an invisible ::after hit extension
     // (DESIGN.md 10.1, the char-playtime-eye idiom) instead of the box itself.
     // getBoundingClientRect cannot see a pseudo-element, so expectAtLeastFloor
@@ -105,10 +107,10 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     // not some larger overlay), and visual + 2x reach clears the floor.
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const stack = el('div', { id: 'right-tracker-stack' });
-    const tracker = el('div', { id: 'reliquary-tracker' });
+    const tracker = el('div', { id: 'deed-tracker' });
     const chip = el('button', { class: 'dt-header', 'aria-haspopup': 'dialog' });
     const label = el('span', { class: 'dt-label' });
-    label.textContent = 'Reliquary';
+    label.textContent = 'Deeds';
     const tally = el('span', { class: 'dt-tally' });
     tally.textContent = '(3)';
     chip.append(el('span', { class: 'dt-chevron' }), label, tally);
@@ -146,20 +148,26 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     );
   });
 
-  it('the left utility cluster (Autorun/Jump) and the Chat/More pair', () => {
+  it('the left utility cluster (Autorun/Jump) and the menu control with its strip', () => {
     const cluster = el('div', { id: 'mobile-utility-cluster' });
     const autorun = el('button', { id: 'mobile-autorun', class: 'mobile-btn' });
     const jump = el('button', { id: 'mobile-jump', class: 'mobile-btn' });
     cluster.append(autorun, jump);
     const combat = el('div', { id: 'mobile-combat-controls' });
-    const chat = el('button', { id: 'mobile-chat', class: 'mobile-btn' });
-    const more = el('button', { id: 'mobile-more', class: 'mobile-btn' });
-    combat.append(chat, more);
-    document.body.append(cluster, combat);
+    const anchor = el('button', { id: 'mobile-menu-anchor', class: 'mobile-btn' });
+    combat.append(anchor);
+    // The strip's items and its cancel target are tap targets too, and they size
+    // off --menu-btn-size rather than the retired row's 58x54 box.
+    const strip = el('div', { id: 'mobile-menu-strip', class: 'open' });
+    const item = el('button', { id: 'mobile-menu-mount', class: 'mobile-menu-item' });
+    const cancel = el('button', { id: 'mobile-menu-cancel' });
+    strip.append(item, cancel);
+    document.body.append(cluster, combat, strip);
     expectAtLeastFloor(autorun, '#mobile-autorun');
     expectAtLeastFloor(jump, '#mobile-jump');
-    expectAtLeastFloor(chat, '#mobile-chat');
-    expectAtLeastFloor(more, '#mobile-more');
+    expectAtLeastFloor(anchor, '#mobile-menu-anchor');
+    expectAtLeastFloor(item, '.mobile-menu-item');
+    expectAtLeastFloor(cancel, '#mobile-menu-cancel');
   });
 
   it('party-member rows (role=button tap targets)', () => {
@@ -227,6 +235,22 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     tray.appendChild(grid);
     document.body.appendChild(tray);
     expectAtLeastFloor(donate, '#mobile-donate');
+  });
+
+  it('the Wishlist link in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const wishlist = el('a', {
+      id: 'mobile-steam-wishlist',
+      class: 'mobile-btn steam-wishlist',
+      href: 'https://store.steampowered.com/',
+    });
+    wishlist.textContent = 'Wishlist';
+    grid.appendChild(wishlist);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(wishlist, '#mobile-steam-wishlist');
   });
 
   it('the Crafting button in the mobile More tray', () => {

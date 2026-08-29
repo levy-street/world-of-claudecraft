@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "75161a3d97b57b528d1f944c8dc76785862414b34f39fc57458bd20d92839943",
+  "catalogHash": "9a31e1e35398a332b675f1ecf36e40f0dc1ba69f58328d4f34e5d094bec9c93f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -4433,18 +4433,6 @@
           "url": "/audio/sfx/ui_sheep.mp3?v=70d353a7b3a0",
           "bytes": 18224,
           "sha256": "70d353a7b3a0c912c7aba97ea7f878f7784ceddc370e2d439640aacb0abe6a6c"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_vcup_kickoff": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/ui_vcup_kickoff.mp3?v=b29c56adf6c7",
-          "bytes": 20732,
-          "sha256": "b29c56adf6c7b91a0e2ca050d0765a7101a769e9b305db1f2792f1bf3c2ea687"
         }
       ],
       "gain": 1,

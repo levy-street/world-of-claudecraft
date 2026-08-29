@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { SET_GREYJAW_STALKER } from '../src/sim/content/item_sets';
+import { ITEMS, MOBS } from '../src/sim/data';
+import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { applyPetOwnerScaling } from '../src/sim/pet/pet_ai';
 import {
   abandonPet,
@@ -18,7 +19,7 @@ import {
   petOwnerScaling,
 } from '../src/sim/pet/pet_scaling';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
+import { DT, type Entity, type ItemDef, RUN_SPEED, type Vec3 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 // A hunter pet used to be frozen at tame time: its health and damage came only
@@ -56,6 +57,19 @@ function templateHp(templateId: string, level: number): number {
   return Math.round(t.hpBase + t.hpPerLevel * (level - 1));
 }
 
+/** One item per equip slot for a set, mirroring tests/haste_set_bonus.test.ts. */
+function setMembers(setId: string): ItemDef[] {
+  const bySlot = new Map<string, ItemDef>();
+  for (const i of Object.values(ITEMS)) {
+    if (i.set === setId && i.slot && !bySlot.has(i.slot)) bySlot.set(i.slot, i);
+  }
+  return [...bySlot.values()];
+}
+
+function equipmentOf(items: ItemDef[]): PlayerEquipment {
+  return Object.fromEntries(items.map((i) => [i.slot, i.id])) as PlayerEquipment;
+}
+
 function tamedWolf(level = 20): {
   sim: AnySim;
   hid: number;
@@ -69,28 +83,35 @@ function tamedWolf(level = 20): {
 
 describe('pet_scaling: owner share math', () => {
   it('splits the owner into the documented shares', () => {
-    // Literal pin of the ratios themselves (0.25 hp, 0.35 armor, 0.22 ranged AP),
-    // so a retune has to come here and be deliberate.
-    expect(petOwnerScaling({ maxHp: 1000, armor: 400, rangedPower: 300 })).toEqual({
-      hp: 250,
-      armor: 140,
-      attackPower: 66,
-    });
+    // Literal pin of the ratios themselves (0.25 hp, 0.35 armor, 0.22 ranged AP, 1.0
+    // melee haste), so a retune has to come here and be deliberate.
+    expect(petOwnerScaling({ maxHp: 1000, armor: 400, rangedPower: 300, meleeHaste: 0.2 })).toEqual(
+      {
+        hp: 250,
+        armor: 140,
+        attackPower: 66,
+        meleeHaste: 0.2,
+      },
+    );
   });
 
-  it('rounds rather than truncates each share', () => {
-    expect(petOwnerScaling({ maxHp: 101, armor: 101, rangedPower: 101 })).toEqual({
+  it('rounds rather than truncates each rounded share, and mirrors haste exactly', () => {
+    expect(
+      petOwnerScaling({ maxHp: 101, armor: 101, rangedPower: 101, meleeHaste: 0.075 }),
+    ).toEqual({
       hp: 25,
       armor: 35,
       attackPower: 22,
+      meleeHaste: 0.075,
     });
   });
 
   it('never returns a negative share for a drained owner', () => {
-    expect(petOwnerScaling({ maxHp: -50, armor: -10, rangedPower: -1 })).toEqual({
+    expect(petOwnerScaling({ maxHp: -50, armor: -10, rangedPower: -1, meleeHaste: -0.1 })).toEqual({
       hp: 0,
       armor: 0,
       attackPower: 0,
+      meleeHaste: 0,
     });
   });
 });
@@ -153,6 +174,60 @@ describe('pet_scaling: a tamed beast inherits from its hunter', () => {
     expect(hunter.rangedPower).toBeGreaterThan(0);
     expect(pet.attackPower).toBe(petOwnerScaling(ownerStats(hunter)).attackPower);
     expect(pet.attackPower).toBeGreaterThan(0);
+  });
+
+  it('mirrors the owner melee haste, which was previously always zero', () => {
+    // Regression: the pet's meleeHaste stayed at the baseEntity default of 0 for its
+    // whole life, so a hunter's attack-and-casting-speed set bonuses (item_sets.ts,
+    // hasteRating -> recalcPlayerStats) sped up the hunter's own swings but never the
+    // pet's, contradicting Unleash Beast's own "attacks faster" precedent.
+    const { sim, hid, hunter } = hunterWorld();
+    hunter.meleeHaste = 0.075; // e.g. a tier-2 3-piece haste set bonus
+    completeTame(sim.ctx, hunter, spawnWolf(sim, hunter));
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    applyPetOwnerScaling(sim.ctx, pet);
+    expect(pet.meleeHaste).toBe(hunter.meleeHaste);
+    expect(pet.meleeHaste).toBeGreaterThan(0);
+
+    // And it actually speeds up the pet's swing cadence: swingIntervalMult divides
+    // by (1 + haste), so a hasted pet's interval multiplier must be smaller.
+    const hastedInterval = sim.swingIntervalMult(pet);
+    pet.meleeHaste = 0;
+    const baselineInterval = sim.swingIntervalMult(pet);
+    expect(hastedInterval).toBeLessThan(baselineInterval);
+    expect(hastedInterval).toBeCloseTo(baselineInterval / 1.075, 5);
+  });
+
+  it('propagates real item-set haste (not just a hand-assigned owner.meleeHaste) to the pet', () => {
+    // The tests above hand-assign hunter.meleeHaste directly; this drives the real
+    // gear pipeline (recalcPlayerStats reading an equipped item-set haste bonus)
+    // so a break anywhere between equipment and pet.meleeHaste is caught.
+    const { sim, hid, hunter } = hunterWorld();
+    const [a, b, c] = setMembers(SET_GREYJAW_STALKER);
+    expect(c, 'fixture needs a 3-piece leveling haste kit').toBeDefined();
+    recalcPlayerStats(hunter, 'hunter', equipmentOf([a, b, c]), undefined, {});
+    expect(hunter.meleeHaste).toBeGreaterThan(0);
+
+    completeTame(sim.ctx, hunter, spawnWolf(sim, hunter));
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    expect(pet.meleeHaste).toBe(hunter.meleeHaste);
+  });
+
+  it('re-derives melee haste every tick through the real updatePet path, tracking a mid-fight gear change', () => {
+    // Drives sim.tick() rather than calling applyPetOwnerScaling directly, so this
+    // actually proves the per-tick updatePet wiring (pet_ai.ts:105), not just the
+    // helper in isolation. The precondition (pet.meleeHaste starts at 0) is not
+    // itself the claim under test: the decisive assertions are the two changes
+    // AFTER a tick, which only pass if updatePet keeps re-deriving from the live
+    // owner value.
+    const { sim, hunter, pet } = tamedWolf();
+    expect(pet.meleeHaste).toBe(0);
+    hunter.meleeHaste = 0.1;
+    sim.tick();
+    expect(pet.meleeHaste).toBeCloseTo(0.1, 10);
+    hunter.meleeHaste = 0;
+    sim.tick();
+    expect(pet.meleeHaste).toBe(0);
   });
 
   it('inherits on a same-level tame, where syncPetLevel does nothing', () => {
@@ -398,8 +473,18 @@ describe('pet_scaling: heeling a mounted owner', () => {
   });
 });
 
-function ownerStats(owner: AnyEntity): { maxHp: number; armor: number; rangedPower: number } {
-  return { maxHp: owner.maxHp, armor: owner.stats.armor, rangedPower: owner.rangedPower };
+function ownerStats(owner: AnyEntity): {
+  maxHp: number;
+  armor: number;
+  rangedPower: number;
+  meleeHaste: number;
+} {
+  return {
+    maxHp: owner.maxHp,
+    armor: owner.stats.armor,
+    rangedPower: owner.rangedPower,
+    meleeHaste: owner.meleeHaste,
+  };
 }
 
 function place(e: AnyEntity, x: number, z: number): void {

@@ -13,14 +13,15 @@
 // and recorded on the persisted QuestProgress.
 
 import { describe, expect, it } from 'vitest';
+import { BOOTCAMP_COURSE_CHECKPOINTS } from '../src/sim/content/proving_shore';
 import { DUNGEONS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
-  questProgressForWire,
   recordInteractObjectCredit,
   sanitizeCreditedObjects,
 } from '../src/sim/quests/interact_object_credit';
+import { isObjectOpenedByViewer } from '../src/sim/quests/opened_object_view';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import { Sim } from '../src/sim/sim';
 import type { Entity, QuestProgress } from '../src/sim/types';
@@ -176,21 +177,43 @@ describe('every multi-count interact objective has enough distinct objects to fi
     ),
   );
 
-  it('covers the 21 multi-count objectives the exploit applied to', () => {
+  it('covers the 24 multi-count objectives the exploit applied to', () => {
     // 20 at the ledger's introduction, plus the quest-dedupe murloc-hut burn
     // (q_deepfen_purge, count 5 over 5 authored huts). The huts route to the
     // firebottle handler before the generic interact path, so their re-credit
     // pacing is the timed burnedObjects cooldown, not this ledger; the
-    // distinct-objects floor above still holds for them.
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(21);
+    // distinct-objects floor above still holds for them. Plus the tutorial
+    // island's castaway crates (q_ps_the_wreck_line, count 3 over 3 spots)
+    // and the Gauntlet's flag sentinel (q_ps_the_gauntlet, count 3, credited
+    // by ORDERED POSITION in tutorial/gauntlet_run.ts, never by this
+    // ledger's object path: its count doubles as the next-flag index, so a
+    // flag can only ever credit once and only in sequence).
+    //
+    // Plus the ability drill (q_ps_hone_the_edge, count 3), a fourth
+    // sentinel: tutorial/ability_drill.ts credits it off the DAMAGE the
+    // class's taught attack delivers, never through this ledger's object
+    // path, so it has no objects to be distinct about.
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(24);
   });
 
-  it.each(interactObjectives.filter((o) => o.count > 1))(
-    '$questId can reach $count on distinct $itemId objects',
-    ({ itemId, count }) => {
-      expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
-    },
-  );
+  it.each(
+    interactObjectives.filter(
+      (o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag' && o.itemId !== 'ps_ability_drill',
+    ),
+  )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
+    expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
+  });
+
+  it('the Gauntlet flag sentinel can reach its count on distinct authored checkpoints', () => {
+    // No ground objects exist for ps_gauntlet_flag: the run's "objects" are
+    // the authored checkpoint flags, credited sequentially by position.
+    const objective = QUESTS.q_ps_the_gauntlet?.objectives.find(
+      (o) => o.type === 'interact' && o.targetObjectItemId === 'ps_gauntlet_flag',
+    );
+    expect(objective?.count).toBe(BOOTCAMP_COURSE_CHECKPOINTS.length);
+    const distinct = new Set(BOOTCAMP_COURSE_CHECKPOINTS.map((c) => `${c.x},${c.z}`));
+    expect(distinct.size).toBe(BOOTCAMP_COURSE_CHECKPOINTS.length);
+  });
 
   it('places every one of them at a DISTINCT authored spot', () => {
     // Two objects authored at the same spot would share a ledger key and only
@@ -222,16 +245,31 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('places every interact target in the world table, bar the riding-lesson sentinel', () => {
-    // train_valorsteed is a sentinel targetObjectItemId with no object at all
-    // (mounts_training.ts credits it off the trainer NPC), so it never reaches
-    // the ledger. Anything ELSE missing from the world table would mean an
-    // objective whose object spawns somewhere this reasoning has not checked.
+  it('places every interact target in the world table, bar the five sentinels', () => {
+    // train_valorsteed (mounts_training.ts credits it off the trainer NPC),
+    // ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
+    // position against the authored checkpoints), ps_guild_signpost
+    // (tutorial/signpost_read.ts credits it off the camp noticeboard's own
+    // interaction arm) and ps_ability_drill (tutorial/ability_drill.ts
+    // credits it off the damage the class's taught attack delivers) are
+    // sentinels with no object of their own, so they never reach the ledger.
+    // ps_passing_stone joined them when the death lesson became a CARRIED
+    // single-use item instead of a fixture to walk to (CX): its objective is
+    // credited by the resurrection that ends the corpse run
+    // (tutorial/death_lesson.ts), never by an object click. Anything ELSE missing from the world table
+    // would mean an objective whose object spawns somewhere this reasoning
+    // has not checked.
     const worldItemIds = new Set(GROUND_OBJECTS.map((d) => d.itemId));
     const unplaced = [...new Set(interactObjectives.map((o) => o.itemId))].filter(
       (id) => !worldItemIds.has(id),
     );
-    expect(unplaced).toEqual(['train_valorsteed']);
+    expect(unplaced.sort()).toEqual([
+      'ps_ability_drill',
+      'ps_gauntlet_flag',
+      'ps_guild_signpost',
+      'ps_passing_stone',
+      'train_valorsteed',
+    ]);
   });
 });
 
@@ -464,32 +502,34 @@ describe('abandoning the quest clears the ledger', () => {
   });
 });
 
-describe('questProgressForWire (the server-only ledger never ships to clients)', () => {
-  it('strips the ledger and leaves every field the client reads', () => {
+describe('the ledger ships to clients (the opened-crate per-viewer hide)', () => {
+  it('round-trips creditedObjects so a mirrored row still hides the object', () => {
+    // The old questProgressForWire strip is deliberately GONE: the client
+    // reads the ledger through opened_object_view.ts to render a credited
+    // ground object as gone for this player. Behavioral, not a source-text
+    // pin: a reintroduced strip (or a JSON-hostile shape) fails this.
+    // The crate line's own authored spot, since the hide is scoped to that
+    // class (opened_object_view.ts OPENED_OBJECT_HIDE_ITEM_IDS).
+    const crate = GROUND_OBJECTS.find((o) => o.itemId === 'ps_castaway_crate')!.positions[0];
     const qp: QuestProgress = {
-      questId: BELLS_QUEST,
-      counts: [2],
+      questId: 'q_ps_the_wreck_line',
+      counts: [1],
       state: 'active',
-      selection: 'pick',
-      resolvedCounts: [3],
-      creditedObjects: ['0@256.0,0.0'],
+      creditedObjects: [interactObjectCreditKey(0, crate)],
     };
-    const wire = questProgressForWire(qp);
-    expect(wire.creditedObjects).toBeUndefined();
-    expect(wire).toEqual({
-      questId: BELLS_QUEST,
-      counts: [2],
-      state: 'active',
-      selection: 'pick',
-      resolvedCounts: [3],
-    });
-    expect(JSON.stringify(wire)).not.toContain('creditedObjects');
-    expect(qp.creditedObjects, 'the live progress is not mutated').toEqual(['0@256.0,0.0']);
-  });
-
-  it('passes a ledger-free progress through without allocating a copy', () => {
-    const qp: QuestProgress = { questId: BELLS_QUEST, counts: [0], state: 'active' };
-    expect(questProgressForWire(qp)).toBe(qp);
+    const wire = JSON.parse(JSON.stringify([qp])) as QuestProgress[];
+    expect(wire[0].creditedObjects).toEqual([interactObjectCreditKey(0, crate)]);
+    const mirrored = new Map(wire.map((q) => [q.questId, q]));
+    // The predicate the renderer, coach, and interact scan all share.
+    expect(
+      isObjectOpenedByViewer({ objectItemId: 'ps_castaway_crate', pos: crate }, mirrored),
+    ).toBe(true);
+    expect(
+      isObjectOpenedByViewer(
+        { objectItemId: 'ps_castaway_crate', pos: { x: crate.x + 40, z: crate.z } },
+        mirrored,
+      ),
+    ).toBe(false);
   });
 });
 
@@ -511,11 +551,16 @@ describe('the sibling interact-credit paths this fix does NOT cover', () => {
     );
     expect(unguarded).toEqual([]);
 
-    // The sentinel is object-keyed by type but has no object, so it rides the
-    // same "count 1 is the only guard" reasoning.
+    // The sentinels are object-keyed by type but have no object, so they ride
+    // the same "count 1 is the only guard" reasoning (signpost_read.ts and
+    // mounts_training.ts each gate on `counts >= required` and nothing else).
     const sentinel = QUESTS.q_riding_lessons?.objectives.find(
       (o) => o.type === 'interact' && o.targetObjectItemId === 'train_valorsteed',
     );
     expect(sentinel?.count).toBe(1);
+    const signpost = QUESTS.q_ps_the_signpost?.objectives.find(
+      (o) => o.type === 'interact' && o.targetObjectItemId === 'ps_guild_signpost',
+    );
+    expect(signpost?.count).toBe(1);
   });
 });

@@ -91,6 +91,17 @@ interface TrapState {
   opener: HTMLElement | null;
 }
 
+/**
+ * Whether an element can actually take focus right now: connected AND rendered.
+ * A control inside a closed overlay has zero client rects, so focus() on it is a
+ * silent no-op that drops the caller to <body>. Exported because callers outside
+ * a trap need the same test before they hand focus somewhere (the More tray's
+ * trigger lives inside the collapsible menu strip).
+ */
+export function canTakeFocus(el: HTMLElement | null): el is HTMLElement {
+  return Boolean(el?.isConnected && el.getClientRects().length > 0);
+}
+
 export class FocusManager {
   private readonly stack: TrapState[] = [];
   private listening = false;
@@ -174,7 +185,7 @@ export class FocusManager {
   }
 
   private canFocus(el: HTMLElement | null): el is HTMLElement {
-    return Boolean(el?.isConnected && el.getClientRects().length > 0);
+    return canTakeFocus(el);
   }
 
   private ensureListening(): void {

@@ -120,7 +120,8 @@ The activity wire crosses two processes as unchecked JSON, so a kind the server
 enqueues but `buildActivityMessage` has no case for maps to `null` and is
 DROPPED SILENTLY at the outbox io seam (`outbox_consumer.ts` skips the null
 payload; before that guard the unmatched kind rendered an empty embed Discord
-rejects, the shipped vale_cup failure, and a silent drop is deliberately the
+rejects, a shipped failure from the retired boarball kind, and a silent drop
+is deliberately the
 quieter failure: no log line marks it). A new `ActivityKind` in
 `server/discord_activity.ts` therefore needs BOTH, in the same change: a `case`
 in `buildActivityMessage` (`logic.ts`) and a row in `SERVER_KINDS` in
@@ -137,9 +138,8 @@ Every builder in `logic.ts` writes English literals, deliberately. The repo's
 (client HUD, guide, admin), not to this bot: the official Discord server is one
 English-speaking channel with no per-viewer locale to resolve, and the bot has
 no i18n runtime by design (zero dependencies, standalone bundle). English
-copy the game also renders (Vale Cup nation names) is a copy pinned to the
-catalog in `tests/discord_bot.test.ts`, not an import, so `logic.ts` stays free
-of `src/ui/` imports.
+copy the game also renders is a copy pinned in `tests/discord_bot.test.ts`,
+not an import, so `logic.ts` stays free of `src/ui/` imports.
 
 ## Invariants
 - **The game server is the authority for rewards.** The bot never computes points

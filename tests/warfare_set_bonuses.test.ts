@@ -182,6 +182,7 @@ describe('the crowd-control duration hook', () => {
   // unreduced and silently green.
   const CATEGORIES: CrowdControlDrCategory[] = [
     'root',
+    'incapacitate',
     'polymorph',
     'fear',
     'lockout',
@@ -217,6 +218,7 @@ describe('the crowd-control duration hook', () => {
     // assignable, and the count must match what types.ts declares.
     const declared: Record<CrowdControlDrCategory, true> = {
       root: true,
+      incapacitate: true,
       polymorph: true,
       fear: true,
       lockout: true,

@@ -29,7 +29,7 @@ function entity(id: number, kind: Entity['kind'], templateId = 'warrior'): Entit
 }
 
 interface LedgerRenderer {
-  createView(e: Entity, opts?: AssembleOptions): void;
+  createView(e: Entity, opts?: AssembleOptions, requiredForEntry?: boolean): void;
   timedBuild<T>(name: string, build: (seed: number) => T): T;
 }
 
@@ -60,7 +60,7 @@ describe('createView records one `view:<class>` build per entity view', () => {
     const now = vi.spyOn(performance, 'now');
     now.mockReturnValueOnce(1000).mockReturnValueOnce(1007.5);
     renderer.createView(composed, { deferDecals: true });
-    expect(buildView).toHaveBeenCalledWith(composed, { deferDecals: true });
+    expect(buildView).toHaveBeenCalledWith(composed, { deferDecals: true }, false);
     // the ms is the build's own span, the timestamp its start
     expect(record).toHaveBeenLastCalledWith('view:composed', 7.5, 1000);
     now.mockRestore();
@@ -120,11 +120,15 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
 
   it('records every entity view under its class and the lazy mount under view:mount', () => {
     const create = source.slice(
-      source.indexOf('private createView(e: Entity, opts?: AssembleOptions): void {'),
-      source.indexOf('private buildView(e: Entity, opts?: AssembleOptions): void {'),
+      source.indexOf(
+        'private createView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {',
+      ),
+      source.indexOf(
+        'private buildView(e: Entity, opts?: AssembleOptions, requiredForEntry = false): void {',
+      ),
     );
     expect(create).toContain('const started = performance.now();');
-    expect(create).toContain('this.buildView(e, opts);');
+    expect(create).toContain('this.buildView(e, opts, requiredForEntry);');
     expect(create).toContain('const kind = viewBuildClass(e, this.sim.player.id, view.visual);');
     expect(create).toContain(
       'this.buildLedger.record(`view:${kind}`, performance.now() - started, started);',

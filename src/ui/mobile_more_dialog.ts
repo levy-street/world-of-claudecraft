@@ -3,6 +3,12 @@ import type { FocusManager, FocusTrapHandle } from './focus_manager';
 export interface MobileMoreDialogElements {
   trigger: () => HTMLElement | null;
   dialog: () => HTMLElement | null;
+  /**
+   * The always-visible control focus falls back to when the trigger cannot take
+   * it. #mobile-more is a Quick Actions strip item, so it is unrendered whenever
+   * that strip is closed, which is the ordinary state after the tray closes.
+   */
+  fallback: () => HTMLElement | null;
 }
 
 /**
@@ -16,7 +22,7 @@ export class MobileMoreDialogController {
   private open = false;
 
   constructor(
-    private readonly focusManager: Pick<FocusManager, 'open'>,
+    private readonly focusManager: Pick<FocusManager, 'open' | 'restore'>,
     private readonly elements: MobileMoreDialogElements,
   ) {}
 
@@ -38,7 +44,10 @@ export class MobileMoreDialogController {
       return;
     }
 
-    this.trap?.release(restoreFocus);
+    // Released WITHOUT the trap's own restore so the fallback is in play: the
+    // trap restores the opener or nothing, and nothing means <body>.
+    this.trap?.release(false);
     this.trap = null;
+    if (restoreFocus) this.focusManager.restore(trigger, this.elements.fallback());
   }
 }

@@ -50,6 +50,18 @@ function info(overrides: Partial<MarketInfo> = {}): MarketInfo {
   };
 }
 
+function listing(id: number, sellerName: string, price: number): MarketInfo['listings'][number] {
+  return {
+    id,
+    sellerName,
+    itemId: 'apprentice_robe',
+    count: 1,
+    price,
+    mine: false,
+    house: false,
+  };
+}
+
 function harness(): {
   root: HTMLElement;
   window: MarketWindow;
@@ -137,6 +149,17 @@ const onlineQueryRebuildCases: Array<{
     },
     expectedQuery: { collapseLowest: true },
   },
+];
+
+const inlineEchoCases: Array<{
+  name: string;
+  key: 'subtype' | 'armorClass' | 'primaryStat';
+  value: string;
+  echo: Partial<MarketInfo>;
+}> = [
+  { name: 'subtype', key: 'subtype', value: 'chest', echo: { subtype: 'chest' } },
+  { name: 'armor class', key: 'armorClass', value: 'cloth', echo: { armorClass: 'cloth' } },
+  { name: 'primary stat', key: 'primaryStat', value: 'int', echo: { primaryStat: 'int' } },
 ];
 
 describe('World Market localized search query construction', () => {
@@ -424,6 +447,55 @@ describe('World Market localized search query construction', () => {
       expect(h.queries.at(-1)).toMatchObject(expectedQuery);
       expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Current Results');
       expect(h.root.querySelector('.mkt-status')?.textContent).toBe(priorStatus);
+    },
+  );
+
+  it.each(inlineEchoCases)(
+    'rejects a stale $name echo until the matching authoritative response arrives',
+    ({ key, value, echo }) => {
+      const h = harness();
+      h.world.marketInfo = info({
+        listings: [listing(1, 'Initial Results', 100)],
+        totalCount: 1,
+      });
+      h.window.open();
+
+      chooseMarketFilter(h.root, 'itemType', 'armor');
+      h.world.marketInfo = info({
+        listings: [listing(2, 'Settled Armor', 200)],
+        totalCount: 1,
+        itemType: 'armor',
+      });
+      h.window.refreshIfChanged();
+      const priorStatus = h.root.querySelector('.mkt-status')?.textContent;
+      expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Settled Armor');
+
+      chooseMarketFilter(h.root, key, value);
+      expect(h.queries.at(-1)).toMatchObject({ itemType: 'armor', [key]: value });
+      h.world.marketInfo = info({
+        listings: [listing(3, 'Stale Secondary Echo', 300)],
+        totalCount: 2,
+        itemType: 'armor',
+      });
+      h.window.refreshIfChanged();
+
+      expect(h.root.querySelector('.mkt-list')?.textContent).toContain('Settled Armor');
+      expect(h.root.textContent).not.toContain('Stale Secondary Echo');
+      expect(h.root.querySelector('.mkt-status')?.textContent).toBe(priorStatus);
+
+      h.world.marketInfo = info({
+        listings: [listing(4, 'Authoritative Secondary Echo', 400)],
+        totalCount: 3,
+        itemType: 'armor',
+        ...echo,
+      });
+      h.window.refreshIfChanged();
+
+      expect(h.root.querySelector('.mkt-list')?.textContent).toContain(
+        'Authoritative Secondary Echo',
+      );
+      expect(h.root.textContent).not.toContain('Settled Armor');
+      expect(h.root.querySelector('.mkt-status')?.textContent).not.toBe(priorStatus);
     },
   );
 

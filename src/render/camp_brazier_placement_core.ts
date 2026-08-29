@@ -48,6 +48,9 @@ export const ROAD_CLEAR = 2.0;
  * because a camp with no fire at all is the worse bug either way. "No fire in
  * the road" is therefore a property the camp DATA upholds (and the real-world
  * suite pins), not one this code can promise for arbitrary future camps.
+ *
+ * `isInert` is forwarded to fireBuildingCamps, where it is documented: an inert
+ * camp mob (a practice dummy) tends no fire whatever its family says.
  */
 export function planCampBrazierSites(
   camps: readonly { mobId: string; center: { x: number; z: number } }[],
@@ -55,9 +58,10 @@ export function planCampBrazierSites(
   familyOf: (mobId: string) => MobFamily | undefined,
   probes: BrazierProbes,
   waterLevel: number,
+  isInert: (mobId: string) => boolean = () => false,
 ): BrazierSite[] {
   const sites: BrazierSite[] = [];
-  for (const camp of uncoveredCampSites(campfires, fireBuildingCamps(camps, familyOf))) {
+  for (const camp of uncoveredCampSites(campfires, fireBuildingCamps(camps, familyOf, isInert))) {
     let x = camp.x;
     let z = camp.z;
     if (probes.blocked(x, z) || probes.roadClear(x, z) < ROAD_CLEAR) {

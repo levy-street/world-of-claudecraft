@@ -39,7 +39,11 @@ entirely (the stamp is final), so a local env var cannot steer an installed app 
 another API, login page, updater state, or crash endpoint. The updater runs only
 for a PACKAGED WEBSITE build; there is deliberately no way to force it on in a
 Steam or Epic build. To try a channel unpacked, set
-`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`.
+`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`. That env opt-in
+is also what makes the $WOC Exchange visible in the dev shell: the Exchange gate
+requires an explicit website verdict even on unpackaged checkouts
+(`wocExchangeSupported` in `electron/desktop_config.cjs`), so without
+`WOC_DISTRIBUTION=website` the dev shell shows no Exchange launcher.
 
 Update tracks (prod/dev split): the publish channel is derived from the baked
 `apiOrigin` by one rule shared between build and runtime
@@ -74,6 +78,15 @@ smoke-test a packaged build against a local server:
 `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a BUILD-time
 value: baked into the bundle and stamped into the app; such a build lands on the
 `dev` update channel automatically and cannot produce production feed files).
+
+For a fast CSP regression check without packaging at all, run
+`node scripts/csp_shell_smoke.mjs` against a running dev server: it attaches the real
+`buildContentSecurityPolicy()` output (electron/shell_guards.cjs) to the dev document,
+drives offline world entry in a real browser, and fails on any first-party CSP
+violation. Only packaged builds serve the CSP, so this is the only pre-pack way to see
+a policy break like the v0.39.0 zstd KTX2 world-entry hang. Its unit-level twin,
+`tests/gltf_decoder_csp.test.ts`, welds the CSP to the vendored three decoder sources
+and runs in every CI test pass.
 
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.
@@ -607,8 +620,12 @@ product exist. Coding and merge stay dark-safe without those credentials.
    never an `appendSwitch` call in the running process.
    `main.cjs` therefore calls `relaunchForLinuxPrime` as the very first thing it
    does (before crash reporting, logging, or any window): on a HYBRID Linux
-   machine (two or more GPUs under `/sys/class/drm`; single-GPU machines are left
-   completely untouched), it re-execs the app with the PRIME variables baked into
+   machine (two or more GPUs under `/sys/class/drm` whose display card, the one
+   sysfs marks `boot_vga`, is not the NVIDIA one; single-GPU machines, and desktops
+   where the NVIDIA card already drives the screen next to an enabled integrated
+   GPU, are left completely untouched: on the latter the offload env fails every
+   EGL display type and Chromium disables the GPU for the session), it re-execs
+   the app with the PRIME variables baked into
    the new process's environment from birth plus `--ozone-platform=x11` appended
    to argv, and the original process exits immediately. The spawn source is
    `$APPIMAGE` (the outer AppImage file, the same source electron-updater restarts
@@ -644,13 +661,31 @@ product exist. Coding and merge stay dark-safe without those credentials.
    `apiOrigin` channel (`updateChannel: latest`). Steam and Epic channels: confirm
    the log says the updater is disabled and no update network traffic occurs
    (SteamPipe / BPT own patches).
-6. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
+6. $WOC Exchange gating: on the website channel, an online character with a
+   linked wallet sees the Exchange launcher (server `WOC_MARKET_ENABLED=1`);
+   on the Steam and Epic channels no Exchange UI exists anywhere (no launcher,
+   no menu entry, no trade-window $WOC arm), even with a linked wallet, since
+   tradeable-token functionality violates both stores' terms. The gate is the
+   `desktop-exchange-capability` IPC over the distribution stamp
+   (`electron/desktop_config.cjs` `wocExchangeSupported`, consumed by
+   `src/game/woc_market_wiring.ts`); for this gate specifically, a build with
+   an absent or unknown stamp behaves like a store build (the wallet-connect
+   and updater gates read the collapsed channel and are unchanged). On the
+   website channel the launcher appears one IPC round trip after world entry,
+   so give it a beat before calling it missing. The shell startup banner logs
+   `wocExchangeEnabled` per channel, so the log alone answers this step (on an
+   unstamped build `distribution` collapses to website while
+   `wocExchangeEnabled` correctly says false). Also smoke one signature on the
+   website channel: starting a listing (or paying a bond) must hand off to the
+   default browser for the wallet signature and complete on return, the same
+   handoff the Claudium checkout uses.
+7. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded
    auto-reload; the third reaches the localized Reload/Quit dialog (the auto-
    reload budget is 2 per 60s, electron/diagnostics.cjs). Each SEGV lands a
    minidump in crashDumps.
-7. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
+8. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
    shell's pure logic.
 
 ## Version pinning

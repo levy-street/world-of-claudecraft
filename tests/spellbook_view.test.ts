@@ -165,8 +165,23 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
     }
   });
 
-  it('assigns page 1 for a bar-assigned row on slots 6-10', () => {
-    for (const slot of [6, 7, 8, 9, 10]) {
+  it('assigns page 0 for every bar slot the ring reaches on its first page', () => {
+    // The radial ring reaches 20 slots per page (4 buttons x 5 directions), so
+    // slots 1 to 20 are all one page flip away from resting.
+    for (const slot of [6, 10, 11, 15, 16, 20]) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(0);
+    }
+  });
+
+  it('assigns page 1 for the second half of the span, the last page there is', () => {
+    for (const slot of [21, 22, 26, 31, 33]) {
       const v = buildSpellbookView(
         input({
           known: [known('sim', KIT[0])],
@@ -175,52 +190,6 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
         }),
       );
       expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(1);
-    }
-  });
-
-  it('assigns page 2 for a bar-assigned row on slots 11-15', () => {
-    for (const slot of [11, 12, 13, 14, 15]) {
-      const v = buildSpellbookView(
-        input({
-          known: [known('sim', KIT[0])],
-          barAbilityIds: [KIT[0]],
-          abilityIdByBarSlot: slotsWith(KIT[0], slot),
-        }),
-      );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(2);
-    }
-  });
-
-  it('assigns page 3 for a bar-assigned row on slots 16-20', () => {
-    for (const slot of [16, 17, 18, 19, 20]) {
-      const v = buildSpellbookView(
-        input({
-          known: [known('sim', KIT[0])],
-          barAbilityIds: [KIT[0]],
-          abilityIdByBarSlot: slotsWith(KIT[0], slot),
-        }),
-      );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(3);
-    }
-  });
-
-  it('assigns pages 4 through 6 for the remaining secondary and third-row slots', () => {
-    for (const [slot, page] of [
-      [21, 4],
-      [22, 4],
-      [23, 4],
-      [26, 5],
-      [31, 6],
-      [33, 6],
-    ] as const) {
-      const v = buildSpellbookView(
-        input({
-          known: [known('sim', KIT[0])],
-          barAbilityIds: [KIT[0]],
-          abilityIdByBarSlot: slotsWith(KIT[0], slot),
-        }),
-      );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(page);
     }
   });
 
@@ -279,7 +248,7 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
 
   it('derives identical decision state regardless of the known object shape', () => {
     const simDerived = derived('sim');
-    expect(simDerived.find((row) => row.abilityId === KIT[0])?.mobilePage).toBe(3);
+    expect(simDerived.find((row) => row.abilityId === KIT[0])?.mobilePage).toBe(0);
     expect(simDerived).toEqual(derived('client'));
   });
 

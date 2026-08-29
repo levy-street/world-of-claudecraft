@@ -59,20 +59,26 @@ export function initialFrameDeferral(
 /** The entry's progress and detail arms for the manifest receipt: a deferred
  *  pass reports partial (planned 1, done 0, trimmed) with the debt it refused
  *  to wait for; a run pass reports complete. */
-export function initialFrameArms(deferred: () => LinkDebt | null): {
-  progress: () => { done: number; planned: number; trimmed: boolean };
+export function deferredPassArms(
+  deferred: () => LinkDebt | null,
+  reportCompletion = true,
+): {
+  progress: () => { done: number; planned: number; trimmed: boolean } | null;
   detail: () => string;
 } {
   return {
     progress: () => {
       const debt = deferred();
-      return { done: debt ? 0 : 1, planned: 1, trimmed: debt !== null };
+      if (debt) return { done: 0, planned: 1, trimmed: true };
+      return reportCompletion ? { done: 1, planned: 1, trimmed: false } : null;
     },
     detail: () => {
       const debt = deferred();
       return debt
         ? `deferred;link-debt:deferred=${debt.deferredUnits},unsettled=${debt.unsettledUnits}`
-        : 'drawn';
+        : reportCompletion
+          ? 'drawn'
+          : 'eligible';
     },
   };
 }

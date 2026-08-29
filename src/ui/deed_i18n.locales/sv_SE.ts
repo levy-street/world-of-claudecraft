@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Redo för äventyr',
+    desc: 'Ta examen från Prövostranden: klara varje lektion på ön, och ring sedan i färjklockan hem till Östbäck.',
+  },
   exp_dawnhold_castle: {
     name: 'En öppen dörr i trädgården',
     desc: 'Besök Dawnholds slott och strosa genom dess solbelysta trädgårdssalar.',

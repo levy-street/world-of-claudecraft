@@ -441,7 +441,7 @@ export const de_DE: EnTranslations = {
       "remainingDaysHours": "{days} T {hours} Std",
       "score": "Punktzahl",
       "walletValue": "Wallet-Wert (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Unbekannt",
       "spinTitle": "Täglicher Dreh",
@@ -480,6 +480,88 @@ export const de_DE: EnTranslations = {
         "price_unavailable": "Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt.",
         "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}",
         "bannedUntil": "Du bist noch für {remaining} von den täglichen Belohnungen ausgeschlossen. Der Zugang wird am {until} wiederhergestellt. Grund: {reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "Handelsfenster geschlossen.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Zahlungswährung",
+        "tabWocHint": "Die Zahlung in $WOC ist möglich, wenn deine Seite des Tisches leer ist und kein Gold angeboten wird.",
+        "priceLabel": "Preis in USD",
+        "pricePlaceholder": "0,00",
+        "equivalent": "Etwa {tokens} $WOC zum aktuellen Kurs",
+        "variableWarning": "Der $WOC-Betrag ist eine Vorschau, kein Festpreis. Die genaue Zahl wird durch ein neues Zahlungsangebot beim Bezahlen festgelegt.",
+        "feeLine": "Börsengebühr {fee}, vom Preis abgezogen.",
+        "netLine": "Du erhältst {net}",
+        "netLineBuyer": "Der Verkäufer erhält {net}",
+        "sendOffer": "$WOC anbieten",
+        "offerSent": "Angebot gesendet. Es läuft in 10 Minuten ab, sofern {name} nicht annimmt.",
+        "offerSentUntil": "Angebot gesendet. Es läuft um {time} ab, sofern {name} nicht annimmt.",
+        "incomingAccept": "{name} bietet {price} für deine Gegenstände.",
+        "notInstant": "Ein $WOC-Verkauf geschieht nicht sofort. Der Gegenstand geht in Treuhandverwahrung, sobald beide Seiten zustimmen, und erreicht den Käufer, sobald die Zahlung bestätigt ist.",
+        "blockDisabled": "Die $WOC-Börse ist auf dieser Welt nicht verfügbar.",
+        "blockNoWallet": "Verknüpfe und verifiziere eine Wallet, um Gegenstände für $WOC zu verkaufen.",
+        "blockPartnerUnknown": "Wird geprüft, ob dieser Spieler $WOC annehmen kann ...",
+        "blockRecipientNoWallet": "Dieser Spieler muss eine Wallet verbinden, um $WOC-Zahlungen anzunehmen.",
+        "hintClearYourItems": "Entferne deine eigenen Gegenstände: Ein $WOC-Angebot kauft, was die Gegenseite anbietet.",
+        "hintAwaitTheirItems": "Warte darauf, dass die Gegenseite etwas anbietet, das für $WOC verkauft werden kann.",
+        "hintOneItem": "Ein $WOC-Geschäft umfasst genau einen Gegenstand. Nur der verkaufte Gegenstand darf auf dem Tisch liegen.",
+        "hintEnterPrice": "Gib einen Preis in USD ein.",
+        "hintAcceptNeedsItem": "Füge den Gegenstand hinzu, den du verkaufst, bevor du annimmst.",
+        "hintAcceptLocked": "Dieser Gegenstand ist gesperrt. Entsperre ihn in deinen Taschen, entferne ihn dann aus dem Handel und füge ihn erneut hinzu.",
+        "hintGoldOffered": "Entferne zuerst dein Goldangebot: Ein Handel läuft entweder über Gold oder $WOC, nicht beides.",
+        "ineligibleReason": "Seelengebundene, questgebundene und gesperrte Gegenstände sowie Gegenstände außerhalb der Börsenkategorien können nicht für $WOC verkauft werden.",
+        "incomingTitle": "$WOC-Angebot von {name}",
+        "incomingBody": "{name} bietet an, dir {item} für {price} zu verkaufen.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Angebot angenommen. Warte darauf, dass der andere Spieler annimmt.",
+        "payNow": "{usd} zahlen",
+        "awaitingPayment": "Warte auf Zahlungsbestätigung ...",
+        "paying": "Bestätige die Zahlung in deiner Wallet ...",
+        "settled": "Bezahlt. Dein Gegenstand ist in deinen Taschen, oder kommt per Rabenpost, falls sie voll waren.",
+        "settledSeller": "Bezahlt. Der Gegenstand wurde dem Käufer geliefert.",
+        "accept": "Angebot annehmen",
+        "accepted": "Angebot angenommen. Dein Gegenstand wird zurückgehalten, bis die Zahlung bestätigt ist.",
+        "decline": "Ablehnen",
+        "withdraw": "Angebot zurückziehen",
+        "hintInsufficientBalance": "Das ist mehr $WOC, als deine verbundene Wallet enthält.",
+        "statusAwaitingBuyer": "Warte darauf, dass der Käufer zahlt.",
+        "statusPayingBuyer": "Deine Zahlung wird im Netzwerk bestätigt ...",
+        "statusPayingSeller": "Die Zahlung des Käufers wird im Netzwerk bestätigt ...",
+        "statusReviewBuyer": "Deine Zahlung wird geprüft.",
+        "statusReviewSeller": "Die Zahlung des Käufers wird geprüft.",
+        "paidSeller": "Du hast eine Zahlung von {price} für {item} erhalten.",
+        "paidBuyer": "Du hast eine Zahlung von {price} für {item} gesendet.",
+        "closedCancelled": "Dieser Verkauf wurde abgebrochen. Der Gegenstand kehrt per Rabenpost zum Verkäufer zurück.",
+        "closedSuspended": "Dieser Verkauf wurde von einem Moderator ausgesetzt. Der Gegenstand kehrt per Rabenpost zum Verkäufer zurück.",
+        "closedUnpaid": "Dieser Verkauf endete ohne Zahlung. Der Gegenstand kehrt per Rabenpost zum Verkäufer zurück.",
+        "closedUnpaidBuyer": "Dieser Verkauf endete ohne deine Zahlung. Der Gegenstand kehrt per Rabenpost zum Verkäufer zurück; ein angenommenes Geschäft nicht zu bezahlen bringt eine Börsen-Verwarnung ein.",
+        "cancelSale": "Verkauf abbrechen",
+        "cancelPendingSeller": "Abbruch angefordert. Der Verkauf endet von selbst, sofern der Käufer nicht zuerst zahlt.",
+        "youDeclined": "Du hast das Angebot abgelehnt.",
+        "youWithdrew": "Du hast dein Angebot zurückgezogen.",
+        "offerNotPending": "Dieses Angebot steht nicht mehr aus.",
+        "offerDeclined": "Das $WOC-Angebot wurde abgelehnt.",
+        "offerWithdrawn": "Das $WOC-Angebot wurde zurückgezogen.",
+        "offerExpired": "Das $WOC-Angebot ist abgelaufen.",
+        "offerExpiresAt": "Das Angebot läuft um {time} ab.",
+        "offerStandsUntil": "Dein $WOC-Angebot gilt noch bis {time}. Handle erneut mit dem Verkäufer, um das Geschäft abzuschließen, falls es angenommen wird.",
+        "dealAwaitsPayment": "Dein $WOC-Kauf ist noch unbezahlt. Handle erneut mit dem Verkäufer, um zu zahlen; sonst läuft das Geschäft von selbst ab, und Nichtzahlen bringt eine Börsen-Verwarnung ein.",
+        "closeSellerHold": "Dein Gegenstand bleibt für die Zahlung des Käufers zurückgehalten. Brich den Verkauf im Aktivitäten-Reiter der Börse ab, falls du es dir anders überlegst.",
+        "closePaymentContinuesBuyer": "Deine Zahlung wird noch bestätigt. Die Lieferung schließt sich von selbst ab.",
+        "closePaymentContinuesSeller": "Die Zahlung des Käufers wird noch bestätigt. Der Verkauf schließt sich von selbst ab.",
+        "p2pBindingNote": "Sobald beide Seiten annehmen, ist die Zahlung innerhalb von {duration} fällig, oder innerhalb des kürzeren Zeitfensters, das sich öffnet, wenn du auf Zahlen drückst. Nichtzahlen bringt eine Börsen-Verwarnung ein.",
+        "p2pBindingNoteUntimed": "Sobald beide Seiten annehmen, ist die Zahlung kurz danach fällig, oder innerhalb des kürzeren Zeitfensters, das sich öffnet, wenn du auf Zahlen drückst. Nichtzahlen bringt eine Börsen-Verwarnung ein.",
+        "p2pPaymentDueAt": "Die Zahlung ist bis {time} fällig. Nichtzahlen bringt eine Börsen-Verwarnung ein.",
+        "quoteExpiredTrade": "Das Zahlungsangebot ist abgelaufen. Drücke Nicht jetzt und dann erneut Zahlen für ein neues.",
+        "quoteStaged": "Zahlungsangebot bereit für {usd}: {tokens} $WOC, gültig bis {time}.",
+        "paymentConfirmed": "Zahlung bestätigt. Dein Gegenstand landet in deinen Taschen, oder per Rabenpost, falls sie voll sind, sobald die Lieferung abgeschlossen ist.",
+        "statusConfirmedBuyer": "Zahlung bestätigt. Die Lieferung wird abgeschlossen ...",
+        "statusConfirmedSeller": "Zahlung bestätigt. Der Verkauf wird abgeschlossen ...",
+        "hintBelowMin": "Der Mindestpreis der Börse liegt bei {usd}."
       }
     },
     "wocStore": {
@@ -707,7 +789,37 @@ export const de_DE: EnTranslations = {
       "applied": "Angewendet",
       "apply": "Skin anwenden",
       "detach": "Skin entfernen",
-      "equipHint": "Rüste eine Waffe des Typs {type} aus, um diesen Skin anzuwenden."
+      "equipHint": "Rüste eine Waffe des Typs {type} aus, um diesen Skin anzuwenden.",
+      "charter": {
+        "eyebrow": "Strongbox",
+        "title": "Strongbox Charters",
+        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
+        "grant": "Adds {slots} bank slots",
+        "buy": "Purchase Charter",
+        "buyAria": "Purchase {item}",
+        "confirmTitle": "Confirm Charter Purchase",
+        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "The charter was applied. The bank of this character is larger now.",
+        "alreadyGranted": "This charter is already on this character. You were not charged again.",
+        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
+        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
+        "notPurchasable": "This charter cannot be purchased right now.",
+        "noRoom": "The bank of this character has no room left for a charter.",
+        "noCharterFits": "No charter fits the room left in the bank of this character.",
+        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
+        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
+        "failed": "The purchase could not be completed.",
+        "names": {
+          "strongbox_charter_1": "Lesser Strongbox Charter",
+          "strongbox_charter_2": "Greater Strongbox Charter",
+          "strongbox_charter_3": "Grand Strongbox Charter",
+          "strongbox_charter_complete": "Complete Strongbox Charter"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -734,6 +846,9 @@ export const de_DE: EnTranslations = {
       "showAmounts": "Alle Claudium-Mengen anzeigen",
       "hideAmounts": "Zusätzliche Claudium-Mengen ausblenden",
       "skuRow": "{claudium} Claudium für {usd}",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Kaufen",
       "buyUnavailable": "Käufe sind derzeit nicht verfügbar.",
       "storeTitle": "Kosmetikshop",
@@ -760,6 +875,7 @@ export const de_DE: EnTranslations = {
       "reset": "Zurücksetzen",
       "presets": {
         "classic": "Klassisches Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Mitternacht",
         "parchment": "Pergament",
         "highContrast": "Hoher Kontrast"
@@ -853,6 +969,7 @@ export const de_DE: EnTranslations = {
       "jump": "Springen",
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
+      "wocMarket": "Tausch",
       "deeds": "Taten",
       "mounts": "Reittiere",
       "professions": "Berufe",
@@ -866,11 +983,62 @@ export const de_DE: EnTranslations = {
       "actionRing": "Kampfhandlungen",
       "actionPageToggle": "Aktionsseite wechseln",
       "actionPageIndicator": "Seite {page}",
+      "actionRadial": "Aktionsrichtungen",
+      "actionRadialCancel": "Aktion abbrechen",
+      "radialCenter": "Mitte",
+      "radialUp": "Oben",
+      "radialRight": "Rechts",
+      "radialDown": "Unten",
+      "radialLeft": "Links",
+      "consumableSeat": "Verbrauchsgüter",
+      "menuControl": "Menüs",
+      "menuControlAria": "Menüs. Tippen öffnet den Chat, oder halte gedrückt und wische nach rechts für Reittiere, Karte, Taschen und mehr.",
+      "menuControlAriaTap": "Menüs. Tippen öffnet die Menüreihe: Reittiere, Karte, Taschen und mehr. Noch einmal tippen öffnet den Chat.",
+      "menuLabel": "Menü",
+      "quickActions": "Schnellaktionen",
+      "quickActionsAria": "Schnellaktionen. Tippen öffnet die Reihe mit Reittier, Chat, Karte, Taschen und mehr, oder halte gedrückt und wische nach rechts, um eines auszuwählen.",
+      "quickActionsAriaTap": "Schnellaktionen. Tippen öffnet die Reihe mit Reittier, Chat, Karte, Taschen und mehr, dann tippe einen Eintrag an. Tippe die Steuerung erneut an, um sie zu schließen.",
+      "quickActionsLabel": "Aktionen",
+      "stanceRadial": "Haltungen",
+      "stanceAnchorAria": "Haltung: {stance}. Tippen öffnet den Haltungsring, dann wähle eine andere Haltung.",
+      "stanceAnchorEmptyAria": "Keine Haltung. Tippen öffnet den Haltungsring, dann wähle eine Haltung.",
+      "questStripAria": "Verfolgte Quest {position} von {total}: {title}. Aktivieren für die nächste Quest.",
+      "questStripAriaSingle": "Verfolgte Quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} weitere",
       "targetCycle": "Ziel tauschen",
       "targetCycleShort": "Ziel",
       "spellbookPageLabel": "Seite {page}",
       "hideKeyboard": "Tastatur ausblenden",
-      "chatPlaceholder": "Sag etwas..."
+      "chatPlaceholder": "Sag etwas...",
+      "barEditor": "Leisten bearbeiten",
+      "barEditorAria": "Das Layout der Aktionsleiste bearbeiten"
+    },
+    "barEditor": {
+      "title": "Aktionsleiste bearbeiten",
+      "close": "Leisteneditor schließen",
+      "pages": "Aktionsleisten-Seiten",
+      "pageTab": "Seite {page}",
+      "buttonHeader": "Taste {button}",
+      "cellAria": "Taste {button}, {direction}: {action}",
+      "emptyCellAria": "Taste {button}, {direction}: leer",
+      "hint": "Tippe einen Platz an, dann einen weiteren, um sie zu tauschen.",
+      "armed": "Tippe einen Platz an, um {name} zu platzieren.",
+      "picked": "Tippe einen weiteren Platz an, um ihn mit {name} zu tauschen.",
+      "locked": "Aktionsleisten sind in den Einstellungen unter Benutzeroberfläche gesperrt.",
+      "clear": "Leeren",
+      "clearAria": "Platz leeren",
+      "clearArmed": "Tippe einen Platz an, um ihn zu leeren."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "Ich habe dich hier noch nicht gesehen, Freund. Es ist Brauch in diesen Landen, dass alle, die ihr Abenteuer beginnen, die Bewährungsküste besuchen, eine stille Insel jenseits der Meerenge. Dort kannst du deine Fertigkeiten schärfen und dich an die Welt gewöhnen, bevor du dich ihren Herausforderungen stellst. Die Fähre fährt in beide Richtungen, und niemand wird schlechter von dir denken, wofür du dich auch entscheidest.",
+      "bodyRefresher": "Wieder da, mit einem neuen Gesicht, wie? Dann kennst du den Ablauf ja schon. Doch falls du dir eine Auffrischung wünschst, bevor du aufbrichst: Die Bewährungsküste weist nie einen wiederkehrenden Schüler ab, und die Fähre ist bereit, sobald du es bist.",
+      "play": "Das Tutorial beginnen",
+      "skip": "Tutorial überspringen",
+      "declineNote": "Wie du willst, Freund. Solltest du es dir je anders überlegen: Die Fährglocke beim Briefkasten der Rabenpost bringt dich jederzeit hinüber zur Bewährungsküste, bei Tag wie bei Nacht. Sie wird noch hier sein, wenn die Wölfe es nicht mehr sind.",
+      "bellHomeNote": "Schon zurück von der Küste? Das war die Fährglocke, die du geläutet hast. Ihr Zwilling hängt gleich dort beim Briefkasten der Rabenpost: Läute sie jederzeit, und die Überfahrt bringt dich zurück zur Bewährungsküste. So oder so kein Schaden.",
+      "islandArrivalNote": "Willkommen auf der Bewährungsküste. Wärter Tam wartet gleich den Strand hinauf: Geh zu ihm.",
+      "noteClose": "Verstanden"
     },
     "tutorial": {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
@@ -883,6 +1051,117 @@ export const de_DE: EnTranslations = {
       "nextTipQuestLog": "Öffne dein Questlog ({key}), um deine nächste Aufgabe in der Nähe zu finden.",
       "nextTipMap": "Sieh auf der Weltkarte ({key}) nach, wo Quests auf dich warten.",
       "nextTipSocial": "Öffne Soziales ({key}), um eine Gruppe für schwierigere Kämpfe zu finden."
+    },
+    "bootcamp": {
+      "title": "Erste Schritte",
+      "talkTitle": "Sprich mit Wärter Tam",
+      "talkBody": "Wärter Tam bewacht das Tor zum Spießrutenlauf gleich voraus. Geh auf ihn zu, bis sein Name erscheint, dann drücke {interactKey}, oder klicke ihn mit der linken Maustaste an, um mit ihm zu sprechen: Er gibt dir den Lauf auf.",
+      "talkBodyTouch": "Wärter Tam bewacht das Tor zum Spießrutenlauf gleich voraus. Geh auf ihn zu, bis sein Name erscheint, dann tippe ihn an, oder tippe die Schaltfläche Benutzen an, um mit ihm zu sprechen: Er gibt dir den Lauf auf.",
+      "talkBodyPad": "Wärter Tam bewacht das Tor zum Spießrutenlauf gleich voraus. Geh auf ihn zu, bis sein Name erscheint, dann drücke deine Interaktionstaste, um mit ihm zu sprechen: Er gibt dir den Lauf auf.",
+      "forwardTitle": "Laufe die erste Bahn",
+      "forwardBody": "Tritt in die Bahn neben Tam und halte {forwardKey} gedrückt, um sie nach Westen bis zu ihrer Flagge zu laufen.",
+      "forwardBodyTouch": "Tritt in die Bahn neben Tam und drücke den Bewegungsstick nach oben, um sie nach Westen bis zu ihrer Flagge zu laufen.",
+      "forwardBodyPad": "Tritt in die Bahn neben Tam und drücke den linken Stick nach oben, um sie nach Westen bis zu ihrer Flagge zu laufen.",
+      "turnwalkTitle": "Drehen, dann laufen",
+      "turnwalkBody": "Erste Flagge geschafft. Halte {turnKey} gedrückt, um dich auf der Stelle zu drehen, bis du die ummauerte Bahn nach Süden vor dir hast, dann halte {forwardKey} erneut gedrückt und laufe sie bis zur zweiten Flagge.",
+      "turnwalkBodyTouch": "Erste Flagge geschafft. Ziehe einen Finger über die Welt (nicht den Bewegungsstick), um dich zu drehen, bis du die ummauerte Bahn nach Süden vor dir hast, dann drücke den Stick nach oben und laufe sie bis zur zweiten Flagge.",
+      "turnwalkBodyPad": "Erste Flagge geschafft. Drücke den rechten Stick, um dich zu drehen, bis du die ummauerte Bahn nach Süden vor dir hast, dann drücke den linken Stick nach oben und laufe sie bis zur zweiten Flagge.",
+      "strafeTitle": "Drehen, dann laufen",
+      "strafeBody": "Noch eine Ecke. Halte {turnLeftKey} gedrückt, um dich auf der Stelle zu drehen, bis du die letzte Bahn vor dir hast, dann halte {forwardKey} erneut gedrückt und laufe sie, bis die rote Flagge hinter dir liegt.",
+      "strafeBodyTouch": "Noch eine Ecke. Ziehe einen Finger über die Welt (nicht den Bewegungsstick), um dich zu drehen, bis du die letzte Bahn vor dir hast, dann drücke den Stick nach oben und laufe sie, bis die rote Flagge hinter dir liegt.",
+      "strafeBodyPad": "Noch eine Ecke. Drücke den rechten Stick, um dich zu drehen, bis du die letzte Bahn vor dir hast, dann drücke den linken Stick nach oben und laufe sie, bis die rote Flagge hinter dir liegt.",
+      "cameraTitle": "Schwenke die Kamera",
+      "cameraBody": "Eine letzte Lehre, bevor du deinen Lauf abgibst: Halte die rechte Maustaste gedrückt und ziehe, um die Kamera einmal ganz um dich herumzuschwenken. Zu wissen, was hinter dir steht, gewinnt Kämpfe.",
+      "cameraBodyTouch": "Eine letzte Lehre, bevor du deinen Lauf abgibst: Ziehe einen Finger über die Welt, um die Kamera einmal ganz um dich herumzuschwenken. Zu wissen, was hinter dir steht, gewinnt Kämpfe.",
+      "cameraBodyPad": "Eine letzte Lehre, bevor du deinen Lauf abgibst: Drücke den rechten Stick, um die Kamera einmal ganz um dich herumzuschwenken. Zu wissen, was hinter dir steht, gewinnt Kämpfe.",
+      "courseProgress": "Flagge {current} von {total}",
+      "doneTitle": "Lauf abgeschlossen",
+      "doneBody": "Das ist alles, was deine Beine wissen müssen. Aufseher Pell steht neben der roten Flagge: Drücke {interactKey} bei ihm, oder klicke ihn mit der linken Maustaste an, um deinen Lauf abzugeben und deine erste Belohnung entgegenzunehmen.",
+      "doneBodyTouch": "Das ist alles, was deine Beine wissen müssen. Aufseher Pell steht neben der roten Flagge: Tippe ihn an, um deinen Lauf abzugeben und deine erste Belohnung entgegenzunehmen.",
+      "doneBodyPad": "Das ist alles, was deine Beine wissen müssen. Aufseher Pell steht neben der roten Flagge: Drücke deine Interaktionstaste bei ihm, um deinen Lauf abzugeben und deine erste Belohnung entgegenzunehmen.",
+      "coachNextTitle": "Als Nächstes: {npc}",
+      "coachNextBody": "Folge der goldenen Spur zu {npc}. Geh nah heran, bis der Name erscheint, dann drücke {interactKey}, oder klicke die Person mit der linken Maustaste an, um deine nächste Aufgabe anzunehmen.",
+      "coachNextBodyTouch": "Folge der goldenen Spur zu {npc}. Geh nah heran, bis der Name erscheint, dann tippe die Person an, oder tippe die Schaltfläche Benutzen an, um deine nächste Aufgabe anzunehmen.",
+      "coachNextBodyPad": "Folge der goldenen Spur zu {npc}. Geh nah heran, bis der Name erscheint, dann drücke deine Interaktionstaste, um deine nächste Aufgabe anzunehmen.",
+      "coachTaskBody": "Folge der goldenen Spur zu deiner Aufgabe. Die Anzeige rechts hält den Fortschritt fest, und {mapKey} öffnet die Karte, falls du den Weg verlierst.",
+      "coachTaskBodyTouch": "Folge der goldenen Spur zu deiner Aufgabe. Die Anzeige rechts hält den Fortschritt fest, und die Kartenschaltfläche zeigt dir den Weg, falls du ihn verlierst.",
+      "coachTaskBodyPad": "Folge der goldenen Spur zu deiner Aufgabe. Die Anzeige rechts hält den Fortschritt fest, und deine Kartentaste zeigt dir den Weg, falls du ihn verlierst.",
+      "coachReadyTitle": "Aufgabe abgeschlossen",
+      "coachReadyBody": "Geh zu {npc} und drücke {interactKey}, oder klicke die Person mit der linken Maustaste an, um abzugeben und deine Belohnung entgegenzunehmen.",
+      "coachReadyBodyTouch": "Geh zu {npc} und tippe die Person an, um abzugeben und deine Belohnung entgegenzunehmen.",
+      "coachReadyBodyPad": "Geh zu {npc} und drücke deine Interaktionstaste, um abzugeben und deine Belohnung entgegenzunehmen.",
+      "taskStrikeTrueBody": "Geh zu einer Strohpuppe und klicke sie mit der linken Maustaste an, um sie als Ziel zu wählen: Ihr Name erscheint oben auf deinem Bildschirm. Drücke dann {attackKey}, um mit dem Schlagen zu beginnen. Diese erste Taste ist dein einfacher Angriff, kein Zauber. Schlage weiter zu, bis eine aufgibt.",
+      "taskStrikeTrueBodyTouch": "Geh zu einer Strohpuppe und tippe sie an, um sie als Ziel zu wählen. Tippe dann die erste Schaltfläche auf der Aktionsleiste an, um zuzuschlagen. Schlage weiter zu, bis eine aufgibt.",
+      "taskStrikeTrueBodyPad": "Geh zu einer Strohpuppe und drücke deine Zieltaste, um sie als Ziel zu wählen. Drücke dann deine erste Aktionstaste, um zuzuschlagen. Schlage weiter zu, bis eine aufgibt.",
+      "taskHoneBody": "Klicke eine Strohpuppe mit der linken Maustaste an, um sie als Ziel zu wählen, dann drücke {abilityKey}, um {ability} einzusetzen. Das ist deine eigene Fähigkeit, kein einfacher Schlag. Triff damit dreimal.",
+      "taskHoneBodyTouch": "Tippe eine Strohpuppe an, um sie als Ziel zu wählen, dann tippe {ability} auf der Aktionsleiste an. Das ist deine eigene Fähigkeit, kein einfacher Schlag. Triff damit dreimal.",
+      "taskHoneBodyPad": "Wähle eine Strohpuppe als Ziel, dann drücke die Aktionstaste, die {ability} trägt. Das ist deine eigene Fähigkeit, kein einfacher Schlag. Triff damit dreimal.",
+      "taskLongWalkBody": "Drücke {bagsKey}, um deine Taschen zu öffnen, dann klicke den Übergangsstein mit der linken Maustaste an. Er lässt dich dort niedersinken, wo du stehst. Hier kann dir nichts etwas anhaben, und das kostet dich nichts.",
+      "taskLongWalkBodyTouch": "Öffne deine Taschen und tippe den Übergangsstein an. Er lässt dich dort niedersinken, wo du stehst. Hier kann dir nichts etwas anhaben, und das kostet dich nichts.",
+      "taskLongWalkBodyPad": "Öffne deine Taschen und wähle den Übergangsstein. Er lässt dich dort niedersinken, wo du stehst. Hier kann dir nichts etwas anhaben, und das kostet dich nichts.",
+      "taskLongWalkDeadBody": "Du bist gestorben, und du hast nichts verloren: keine Gegenstände, keine Münzen, keine Erfahrung. Schritt 1 von 2: Klicke die Schaltfläche Geist freigeben in der Mitte deines Bildschirms an. Du erhebst dich als Geist auf dem Friedhof hinter dem Lager.",
+      "taskLongWalkDeadBodyTouch": "Du bist gestorben, und du hast nichts verloren: keine Gegenstände, keine Münzen, keine Erfahrung. Schritt 1 von 2: Tippe die Schaltfläche Geist freigeben in der Mitte deines Bildschirms an. Du erhebst dich als Geist auf dem Friedhof hinter dem Lager.",
+      "taskLongWalkDeadBodyPad": "Du bist gestorben, und du hast nichts verloren: keine Gegenstände, keine Münzen, keine Erfahrung. Schritt 1 von 2: Wähle Geist freigeben in der Mitte deines Bildschirms. Du erhebst dich als Geist auf dem Friedhof hinter dem Lager.",
+      "taskLongWalkGhostBody": "Schritt 2 von 2: Du bist ein Geist, und nichts kann dir etwas anhaben. Dein Körper ist die Markierung auf deiner Minikarte. Geh zu ihr hin. Sobald du nah genug bist, erscheint die Schaltfläche Am Leichnam wiederbeleben: Klicke sie an, und du bist wieder lebendig, ganz ohne Strafe. Dieser Weg ist IMMER kostenlos, und so kehrst du jedes Mal zurück, wenn du stirbst.",
+      "taskLongWalkGhostBodyTouch": "Schritt 2 von 2: Du bist ein Geist, und nichts kann dir etwas anhaben. Dein Körper ist die Markierung auf deiner Minikarte. Geh zu ihr hin. Sobald du nah genug bist, erscheint die Schaltfläche Am Leichnam wiederbeleben: Tippe sie an, und du bist wieder lebendig, ganz ohne Strafe. Dieser Weg ist IMMER kostenlos, und so kehrst du jedes Mal zurück, wenn du stirbst.",
+      "taskLongWalkGhostBodyPad": "Schritt 2 von 2: Du bist ein Geist, und nichts kann dir etwas anhaben. Dein Körper ist die Markierung auf deiner Minikarte. Geh zu ihr hin. Sobald du nah genug bist, erscheint die Schaltfläche Am Leichnam wiederbeleben: Wähle sie, und du bist wieder lebendig, ganz ohne Strafe. Dieser Weg ist IMMER kostenlos, und so kehrst du jedes Mal zurück, wenn du stirbst.",
+      "taskShellBody": "Die Krabbler wehren sich mit ihren Scheren. Klicke einen mit der linken Maustaste an, um ihn als Ziel zu wählen, dann drücke {abilityKey} für {ability}, und greife weiter an. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskShellBodyTouch": "Die Krabbler wehren sich mit ihren Scheren. Tippe einen an, um ihn als Ziel zu wählen, dann tippe {ability} auf der Aktionsleiste an. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskShellBodyPad": "Die Krabbler wehren sich mit ihren Scheren. Wähle einen als Ziel, dann drücke die Aktionstaste, die {ability} trägt. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskStrikeTrueBodyCaster": "Geh zu einer Strohpuppe und klicke sie mit der linken Maustaste an, um sie als Ziel zu wählen: Ihr Name erscheint oben auf deinem Bildschirm. Drücke dann {attackKey}, oder klicke die zweite Schaltfläche auf der Aktionsleiste an, um deinen Zauber zu wirken. Wirke weiter, bis eine aufgibt.",
+      "taskStrikeTrueBodyCasterTouch": "Geh zu einer Strohpuppe und tippe sie an, um sie als Ziel zu wählen. Tippe dann die zweite Schaltfläche auf der Aktionsleiste an, um deinen Zauber zu wirken. Wirke weiter, bis eine aufgibt.",
+      "taskStrikeTrueBodyCasterPad": "Geh zu einer Strohpuppe und drücke deine Zieltaste, um sie als Ziel zu wählen. Drücke dann deine zweite Aktionstaste, um deinen Zauber zu wirken. Wirke weiter, bis eine aufgibt.",
+      "taskShellBodyCaster": "Die Krabbler wehren sich mit ihren Scheren. Klicke einen mit der linken Maustaste an, um ihn als Ziel zu wählen, dann drücke {abilityKey} für {ability}, und wirke weiter aus der Ferne. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskShellBodyCasterTouch": "Die Krabbler wehren sich mit ihren Scheren. Tippe einen an, um ihn als Ziel zu wählen, dann tippe {ability} auf der Aktionsleiste an, und wirke weiter aus der Ferne. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskShellBodyCasterPad": "Die Krabbler wehren sich mit ihren Scheren. Wähle einen als Ziel, dann drücke die Aktionstaste, die {ability} trägt, und wirke weiter aus der Ferne. Greifen dich zu viele auf einmal an, zieh dich den Weg zurück: Sie geben die Verfolgung schnell auf, und deine Gesundheit erholt sich, während du rastest.",
+      "taskPearlBody": "Folge der goldenen Spur zum Gezeitentümpel am Westende des Strandes. Am Wasserrand stehend, drücke {bagsKey}, um deine Taschen zu öffnen, und klicke den Salzigen Köder mit der linken Maustaste an, um ihn heraufzulocken. Kämpfe gegen ihn wie gegen die Krabbler, und wenn er fällt, drücke {interactKey} auf seiner Schale, um die Schimmernde Perle zu beanspruchen.",
+      "taskPearlBodyTouch": "Folge der goldenen Spur zum Gezeitentümpel am Westende des Strandes. Am Wasserrand stehend, öffne deine Taschen und tippe den Salzigen Köder an, um ihn heraufzulocken. Kämpfe gegen ihn wie gegen die Krabbler, und wenn er fällt, tippe seine Schale an, um die Schimmernde Perle zu beanspruchen.",
+      "taskPearlBodyPad": "Folge der goldenen Spur zum Gezeitentümpel am Westende des Strandes. Am Wasserrand stehend, öffne deine Taschen und wähle den Salzigen Köder, um ihn heraufzulocken. Kämpfe gegen ihn wie gegen die Krabbler, und wenn er fällt, drücke deine Interaktionstaste auf seiner Schale, um die Schimmernde Perle zu beanspruchen.",
+      "taskWreckLineBody": "Die Strandgutkisten säumen den Pfad zum Dawnrest-Lager. Geh zu einer heran, bis ihr Name erscheint, dann drücke {interactKey}, oder klicke die Kiste mit der linken Maustaste an, um sie aufzunehmen. Sechs machen die Ladung voll.",
+      "taskWreckLineBodyTouch": "Die Strandgutkisten säumen den Pfad zum Dawnrest-Lager. Geh zu einer heran, bis ihr Name erscheint, dann tippe die Kiste an, oder tippe die Schaltfläche Benutzen an, um sie aufzunehmen. Sechs machen die Ladung voll.",
+      "taskWreckLineBodyPad": "Die Strandgutkisten säumen den Pfad zum Dawnrest-Lager. Geh zu einer heran, bis ihr Name erscheint, dann drücke deine Interaktionstaste, um sie aufzunehmen. Sechs machen die Ladung voll.",
+      "taskPouchBody": "Drücke {interactKey} bei {npc}, oder klicke die Person mit der linken Maustaste an, um den Stand zu öffnen, dann klicke den Leinenbeutel mit der linken Maustaste an, um ihn zu kaufen.",
+      "taskPouchBodyTouch": "Tippe {npc} an, um den Stand zu öffnen, dann tippe den Leinenbeutel an, um ihn zu kaufen.",
+      "taskPouchBodyPad": "Drücke deine Interaktionstaste bei {npc}, um den Stand zu öffnen, dann wähle den Leinenbeutel, um ihn zu kaufen.",
+      "readyPouchBody": "Beutel gekauft. Drücke {bagsKey}, um deine Taschen zu öffnen, und klicke den Leinenbeutel mit der linken Maustaste an, um ihn in einen freien Taschenplatz zu stecken. Geh dann zu {npc} und drücke {interactKey}, um ihn vorzuzeigen.",
+      "readyPouchBodyTouch": "Beutel gekauft. Öffne deine Taschen und tippe den Leinenbeutel an, um ihn in einen freien Taschenplatz zu stecken. Geh dann zu {npc} und tippe die Person an, um ihn vorzuzeigen.",
+      "readyPouchBodyPad": "Beutel gekauft. Öffne deine Taschen und wähle den Leinenbeutel, um ihn in einen freien Taschenplatz zu stecken. Geh dann zu {npc} und drücke deine Interaktionstaste, um ihn vorzuzeigen.",
+      "promptTalk": "Sprechen",
+      "promptTurnIn": "Quest abgeben",
+      "promptPickUp": "Aufheben",
+      "promptLootPearl": "Plündere die Perle",
+      "promptRead": "Lesen",
+      "promptRing": "Läuten",
+      "promptHold": "Halten",
+      "promptSelect": "Auswählen",
+      "promptAttack": "Angreifen",
+      "promptUseAbility": "Fähigkeit einsetzen",
+      "promptKneel": "Knien",
+      "promptOpenBags": "Öffne deine Taschen",
+      "promptCharacterSheet": "Öffne dein Charakterfenster",
+      "promptLookAround": "Halte die rechte Maustaste gedrückt und ziehe, um dich umzusehen.",
+      "promptJump": "Springen",
+      "promptSummon": "Herbeirufen",
+      "ringEquipTitle": "Trage deinen Preis",
+      "ringEquipBody": "Du hast das Perlmutt erhalten, und eine Belohnung nützt nichts, solange sie in einer Tasche liegt. Schritt 1 von 2: Drücke {bagsKey}, um deine Taschen zu öffnen, dann klicke den Ring mit der linken Maustaste an, um ihn anzulegen.",
+      "ringEquipBodyTouch": "Du hast das Perlmutt erhalten, und eine Belohnung nützt nichts, solange sie in einer Tasche liegt. Schritt 1 von 2: Öffne deine Taschen und tippe den Ring an, um ihn anzulegen.",
+      "ringEquipBodyPad": "Du hast das Perlmutt erhalten, und eine Belohnung nützt nichts, solange sie in einer Tasche liegt. Schritt 1 von 2: Öffne deine Taschen und wähle den Ring, um ihn anzulegen.",
+      "ringAdmireTitle": "Sieh dich nur an",
+      "ringAdmireBody": "Schritt 2 von 2: Drücke {charKey}, um dein Charakterfenster zu öffnen. Dieser Bildschirm zeigt alles, was du trägst, und die Werte, die es dir gibt, und der Ring sitzt jetzt an deiner Hand. Sieh hier nach, sobald du neue Ausrüstung findest.",
+      "ringAdmireBodyTouch": "Schritt 2 von 2: Öffne dein Charakterfenster über das Menü. Dieser Bildschirm zeigt alles, was du trägst, und die Werte, die es dir gibt, und der Ring sitzt jetzt an deiner Hand. Sieh hier nach, sobald du neue Ausrüstung findest.",
+      "ringAdmireBodyPad": "Schritt 2 von 2: Öffne dein Charakterfenster über das Menü. Dieser Bildschirm zeigt alles, was du trägst, und die Werte, die es dir gibt, und der Ring sitzt jetzt an deiner Hand. Sieh hier nach, sobald du neue Ausrüstung findest.",
+      "keycapThen": "dann",
+      "voiceArrival": "Ruhig an Land, Freund. Siehst du den goldenen Pfad zu deinen Füßen? Er kennt den Weg besser als ich. Folge ihm.",
+      "voiceFirstFlag": "Das wäre eine Flagge geschafft. Halt die Beine in Bewegung, nur noch zwei.",
+      "voiceRunDone": "Ein sauberer Lauf, das. Aufseher Pell hält deine Belohnung bereit, hol sie dir.",
+      "voiceStationDoneA": "Gute Arbeit. Weiter zum Nächsten, der Pfad leuchtet dir schon den Weg.",
+      "voiceStationDoneB": "Du bekommst den Dreh raus, keine Frage.",
+      "voiceVeerOff": "Halt, Freund, das ist der falsche Weg. Der goldene Pfad liegt hinter dir.",
+      "voiceGraduate": "Die Glocke ist für dich geläutet. Eastbrook wartet jenseits des Wassers, und du bist bereit dafür.",
+      "bellTitle": "Läute die Glocke",
+      "bellBody": "Deine Überfahrt ist verdient. Geh zur Fährglocke bei der Anlegestelle und drücke {interactKey}, oder klicke sie mit der linken Maustaste an, um nach Eastbrook zu segeln.",
+      "bellBodyTouch": "Deine Überfahrt ist verdient. Geh zur Fährglocke bei der Anlegestelle und tippe sie an, um nach Eastbrook zu segeln.",
+      "bellBodyPad": "Deine Überfahrt ist verdient. Geh zur Fährglocke bei der Anlegestelle und drücke deine Interaktionstaste, um nach Eastbrook zu segeln."
     },
     "widgets": {
       "clockTitle": "Ortszeit - klicken, um zwischen 12-/24-Stunden zu wechseln",
@@ -935,6 +1214,31 @@ export const de_DE: EnTranslations = {
       "mergedPrs": "Zusammengeführte PRs",
       "devEmpty": "Noch keine platzierten Mitwirkenden."
     },
+    "pledge": {
+      "open": "Nimmt Gelöbnisse an",
+      "closed": "Nimmt keine Gelöbnisse an",
+      "minLevel": "Stufe {level}+",
+      "action": "Geloben",
+      "actionTitle": "{guild} die Treue geloben",
+      "pledged": "Gelobt",
+      "yourGuild": "Deine Gilde",
+      "tab": "Gelöbnisse",
+      "tabWithCount": "Gelöbnisse ({count})",
+      "empty": "Noch niemand hat deiner Gilde die Treue gelobt.",
+      "accept": "Annehmen",
+      "acceptTitle": "Gelöbnis von {name} annehmen",
+      "reject": "Ablehnen",
+      "rejectTitle": "Gelöbnis von {name} ablehnen",
+      "settings": "Rekrutierung",
+      "acceptingLabel": "Gelöbnisse annehmen",
+      "minLevelLabel": "Mindeststufe",
+      "noteLabel": "Pinnwandnotiz",
+      "notePlaceholder": "Erzähl angehenden Mitgliedern, wonach deine Gilde sucht",
+      "save": "Speichern",
+      "yourPledge": "Dein Gelöbnis: {guild}",
+      "since": "Gelobt am {date}",
+      "withdraw": "Gelöbnis zurückziehen"
+    },
     "raidLockout": {
       "title": "Schlachtzug-Sperren",
       "allReady": "Alle Schlachtzüge bereit",
@@ -986,6 +1290,7 @@ export const de_DE: EnTranslations = {
       "seconds": "{s} Sek.",
       "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
       "threatFallback": "Keine aktive Bedrohung: zeigt Schaden an {name}",
+      "threatFrozen": "Endgültige Bedrohung gegen {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Andere ({count})",
@@ -1025,7 +1330,6 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "targetPrev": "Ziel rückwärts wechseln",
       "discord": "Discord",
-      "valecup": "Talpokal",
       "bgFlag": "Schlachtfeld-Flaggenaktion",
       "sheathe": "Waffe einstecken/ziehen",
       "dive": "Nach unten schwimmen",
@@ -1048,6 +1352,11 @@ export const de_DE: EnTranslations = {
       "reset": "Zurücksetzen",
       "done": "Fertig",
       "cancel": "Abbrechen",
+      "showExtraBar": "Show Another Action Bar",
+      "hideExtraBar": "Hide an Action Bar",
+      "conflictTitle": "Key Already Bound",
+      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
+      "conflictAccept": "Rebind Anyway",
       "resetConfirmTitle": "Aktionsleisten-Tasten zurücksetzen?",
       "resetConfirmBody": "Die erste Leiste kehrt zu ihren Standardtasten zurück. Die zweite und dritte Leiste verlieren ihre Belegung. Das lässt sich nicht rückgängig machen."
     },
@@ -1182,6 +1491,7 @@ export const de_DE: EnTranslations = {
       "endedForfeitLog": "Das Spiel wurde aufgegeben.",
       "firstWinBonusLine": "Erster Sieg des Tages: +{honor} Ehre",
       "firstWinBonusLog": "Erster Sieg des Tages: Ihr erhaltet {honor} Bonus-Ehre.",
+      "doubleHonorLine": "Doppelte-Ehre-Wochenende: Ehre auf den Thornhollow-Feldern zahlt heute das {mult}-Fache, und eine ausgetragene Niederlage zahlt wie ein Sieg",
       "timeWarningMinutes": "{minutes} Minuten verbleiben",
       "timeWarningOneMinute": "Eine Minute verbleibt",
       "timeWarningMinutesLog": "{minutes} Minuten verbleiben im Kampf.",
@@ -1191,146 +1501,6 @@ export const de_DE: EnTranslations = {
         "azureKeep": "Azurfeste",
         "ruinCourtyard": "Der Ruinenhof",
         "graveyard": "Friedhof"
-      }
-    },
-    "vcup": {
-      "title": "Der Talpokal",
-      "shootPower": "KRAFT",
-      "close": "Das Talpokal-Fenster schließen",
-      "offlineNote": "Das Spielplanbuch ist geschlossen. Der Talpokal ist gerade nicht verfügbar.",
-      "recordLine": "Deine Bilanz: {wins} Siege, {losses} Niederlagen, {draws} Unentschieden.",
-      "bracketsAria": "Spielstaffel",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "Wartende: {count}",
-      "nationsHeading": "Bannernation",
-      "nation": {
-        "vale": "Eastbrook-Tal",
-        "mirefen": "Das Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Das Aschene Kolosseum",
-        "choir": "Der Bleiche Chor",
-        "ogre": "Die Oger-Clans",
-        "moon": "Der Bleiche Mond",
-        "copperdig": "Die Kupfergrube"
-      },
-      "awayNote": "Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
-      "rolesHeading": "Sportrolle",
-      "rolesSmallBracketNote": "In den Staffeln 1v1 und 2v2 spielt jeder Kämpfer das Allrounder-Repertoire. Taten, die die Staffel 3v3 oder größer verlangen, lassen sich hier nicht erringen.",
-      "role": {
-        "allrounder": {
-          "name": "Allrounder",
-          "desc": "Von allem etwas: Kick, Weitschlag und ein fairer Rempler."
-        },
-        "striker": {
-          "name": "Stürmer",
-          "desc": "Lebt für den weiten Schlag und den schnellen Haken."
-        },
-        "sweeper": {
-          "name": "Ausputzer",
-          "desc": "Rempelt Läufer vom Ball und schlägt ihn weit nach vorn."
-        },
-        "keeper": {
-          "name": "Torhüter",
-          "desc": "Hütet den Torraum mit Griff, Hechtsprung und Abschlag."
-        }
-      },
-      "queue": "In die Warteschlange",
-      "leaveQueue": "Warteschlange verlassen",
-      "queueNote": "Stell dich von überall an; der Anpfiff ruft dich zum Saufeld.",
-      "queuedStatus": "In der Warteschlange für {bracket}: Position {position} von {count}.",
-      "blockNation": "Wähle zuerst eine Bannernation.",
-      "blockPartySize": "Diese Staffel braucht eine kleinere Gruppe.",
-      "blockNotLeader": "Nur der Gruppenanführer kann das Team in die Warteschlange stellen.",
-      "inMatchNote": "Dein Team steht auf dem Platz. Weiterspielen!",
-      "deserterNote": "Der Platzwart vergisst nicht. Du kannst dich in {seconds} Sek. wieder anstellen.",
-      "liveHeading": "Jetzt auf dem Saufeld",
-      "liveAria": "Talpokal: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Komm zum Saufeld, um von den Rängen aus zuzusehen.",
-      "noLive": "Der Platz ruht. Es wird gerade kein Spiel gespielt.",
-      "boardHeading": "Siegertafel",
-      "boardEmpty": "Noch keine Sieger verzeichnet. Der Kupfereimer wartet.",
-      "boardWins": "{count} Siege",
-      "enterAsGuild": "Unter dem Banner von {guild} antreten",
-      "guildRecordLine": "Deine Gildenbilanz: {wins} Siege, {losses} Niederlagen.",
-      "guildBoardHeading": "Gildenbanner",
-      "guildBoardEmpty": "Noch keine Gilde hat den Platz betreten. Zeig dein Banner!",
-      "guildBoardWl": "{wins} S, {losses} N",
-      "practice": "Training gegen Bots",
-      "practiceNote": "Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.",
-      "practiceUnratedNote": "Trainingsspiele sind ungewertet: Siegertafel und Fortschritt im Buch der Taten zählen nicht.",
-      "practicingNow": "Gerade im Training ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Talpokal-Warteschlange: {bracket}, Position {position} von {count}",
-      "indicatorLive": "Talpokal",
-      "indicatorOpen": "Das Talpokal-Fenster öffnen",
-      "phaseCountdown": "Anstoß in {seconds}",
-      "phaseGoal": "TOR!",
-      "phaseGolden": "GOLDEN GOAL",
-      "phaseOver": "ABPFIFF",
-      "bannerFound": "Der Talpokal ruft: {nationA} gegen {nationB}!",
-      "bannerCountdown": "Anstoß in {seconds}...",
-      "bannerKickoff": "ANSTOSS!",
-      "bannerGoal": "TOR! {nation} trifft!",
-      "bannerSave": "{name} HÄLT!",
-      "bannerGolden": "GOLDEN GOAL: Der nächste Treffer gewinnt!",
-      "bannerEnd": "Abpfiff: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Sieg auf dem Saufeld!",
-      "bannerDraw": "Unentschieden auf dem Saufeld.",
-      "bannerLoss": "Niederlage auf dem Saufeld.",
-      "logQueued": "Du reihst dich in die Talpokal-Warteschlange für {bracket} ein (Position {position}).",
-      "logUnqueued": "Du verlässt die Talpokal-Warteschlange.",
-      "logFound": "Dein Talpokal-Spiel ist bereit: {nationA} gegen {nationB}.",
-      "logRoster": "Deine Seite: {allies}. Die Gegenseite: {enemies}.",
-      "logGoal": "{name} trifft für {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} hält den Ball!",
-      "logWin": "Du gewinnst die Partie auf dem Saufeld.",
-      "logDraw": "Die Partie auf dem Saufeld endet unentschieden.",
-      "logLoss": "Du verlierst die Partie auf dem Saufeld.",
-      "gossipOpen": "Das Spielplanbuch",
-      "gossipOpenAria": "Das Talpokal-Fenster öffnen",
-      "mobileLabel": "Pokal",
-      "briefing": {
-        "subtitle": "Besprechung vor dem Spiel",
-        "vs": "gegen",
-        "rulesHeading": "So wird gespielt",
-        "rule1": "Schieße oder passe den Ball ins gegnerische Tor, um zu punkten.",
-        "rule2": "Wer zuerst 5 Tore erzielt, gewinnt, oder wer beim Abpfiff die meisten Tore hat.",
-        "rule3": "Steht es beim Abpfiff unentschieden, geht es ins Golden Goal: Der nächste Treffer gewinnt.",
-        "rule4": "Tacklings werfen dich nur um. Unter dem Erntefrieden wird niemand verletzt.",
-        "rule5": "Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.",
-        "kitHeading": "Deine Ausrüstung",
-        "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
-        "unratedNote": "Bots stehen auf dem Platz, daher ist diese Partie ungewertet: Die Siegertafel bewegt sich nicht, und Taten für Tore, Paraden und Spiele ohne Gegentor zählen nicht.",
-        "practiceUnratedNote": "Dies ist ein Trainingsspiel und damit ungewertet: Die Siegertafel bewegt sich nicht, und Fortschritt im Buch der Taten zählt nicht.",
-        "rosterHeading": "Die Aufstellung",
-        "you": "Du",
-        "bot": "Bot",
-        "ready": "Ich bin bereit",
-        "readyDone": "Bereit",
-        "readyAria": "Bereit machen für den Anstoß",
-        "waiting": "Warte, bis die andere Seite bereit ist...",
-        "whistle": "Der Anpfiff ertönt in {seconds}s.",
-        "readyCount": "{ready} von {total} bereit"
-      },
-      "bet": {
-        "title": "Spielwetten",
-        "aria": "Talpokal-Spielwetten",
-        "closesIn": "Wettschluss in {seconds}s",
-        "closed": "Wetten geschlossen",
-        "prize": "Topf {amount}",
-        "splitAria": "Anteil des Wett-Topfs je Team",
-        "expand": "Wetten ansehen und setzen",
-        "collapse": "Wetten ausblenden",
-        "oddsLabel": "Quote",
-        "back": "Auf {team} setzen",
-        "form": "{wins}S-{losses}N",
-        "mine": "Deine Wette: {amount} auf {team}",
-        "none": "Du hast auf dieses Spiel noch keine Wette platziert.",
-        "record": "Wettbilanz: {wins}S-{losses}N, {sign}{net}",
-        "wonBanner": "Deine Wette hat gewonnen!",
-        "wonLog": "Deine Talpokal-Wette hat gewonnen: {amount} ausgezahlt.",
-        "lostLog": "Deine Talpokal-Wette ist verloren: {amount}.",
-        "refundLog": "Wetten annulliert, dein Einsatz von {amount} wurde zurückgezahlt."
       }
     },
     "options": {
@@ -1402,11 +1572,12 @@ export const de_DE: EnTranslations = {
       "mouseoverCast": "Mouseover-Wirken auf Gruppenfenstern",
       "stickyTarget": "Ziel bei Bodenklick behalten",
       "showItemLevel": "Gegenstandsstufe anzeigen",
-      "showReliquaryTracker": "Show Reliquary Tracker",
+      "showReliquaryTracker": "Reliquiar-Tracker anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
+      "combineActionBars": "Combine Action Bars",
       "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
@@ -1415,7 +1586,9 @@ export const de_DE: EnTranslations = {
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
-      "mobileLeftHanded": "Linkshänder-Layout"
+      "mobileLeftHanded": "Linkshänder-Layout",
+      "touchTapMenus": "Menüs antippen",
+      "touchTapMenusNote": "Öffne die Aktions-, Verbrauchsgüter- und Menüsteuerung mit einem Tipp statt mit einem Wischen. Tippe einen Gegenstand an, um ihn zu benutzen, tippe die Steuerung erneut an für ihre übliche Aktion, oder tippe außerhalb, um zu schließen."
     },
     "talentRows": {
       "tab": "Auswahl",
@@ -1440,6 +1613,11 @@ export const de_DE: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Tastenbeschriftung",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Controller aktivieren",
       "invertY": "Kamera invertieren (Y)",
       "deadzone": "Stick-Totzone",
@@ -1448,29 +1626,29 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
-      "confirmAction": "Confirm / Select",
+      "confirmAction": "Bestätigen / Auswählen",
       "zoomIn": "Einzoomen",
       "zoomOut": "Auszoomen",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden.",
-      "crossHotbar": "Cross Hotbar",
-      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbar": "Überqueren Sie die Hotbar",
+      "crossHotbarEnable": "Aktivieren Sie Cross Hotbar",
       "crossHotbarExpand": "Double Cross Hotbar",
-      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
-      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarHelp": "Halten Sie einen Auslöser gedrückt, um acht Aktionsleisten-Slots auf dem Steuerkreuz und den Gesichtstasten zu beleuchten. Tippen Sie auf den anderen Auslöser, um zum zweiten Satz zu wechseln.",
+      "crossHotbarResetLayout": "Cross Hotbar zurücksetzen",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
-      "cancelAction": "Cancel / Back",
-      "subcommandsAction": "Subcommands / Map",
-      "cycleHudAction": "Cycle Interface",
-      "cycleSetAction": "Change Hotbar Set",
-      "crossHotbarDisplay": "Bar Display",
-      "crossHotbarDisplayFull": "Full",
-      "crossHotbarDisplayCompact": "Compact",
-      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarOwnsButtons": "Die Auslöser und das D-Pad gehören zur Cross-Hotbar, solange diese aktiviert ist, daher werden sie unten und nicht hier eingerichtet.",
+      "cancelAction": "Abbrechen / Zurück",
+      "subcommandsAction": "Unterbefehle / Karte",
+      "cycleHudAction": "Zyklusschnittstelle",
+      "cycleSetAction": "Hotbar-Set ändern",
+      "crossHotbarDisplay": "Balkenanzeige",
+      "crossHotbarDisplayFull": "Voll",
+      "crossHotbarDisplayCompact": "Kompakt",
+      "crossHotbarDisplayMinimal": "Nur solange gehalten",
       "crossHotbarArrangeChord": "{bumper} + {button}",
-      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
-      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
-      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
+      "crossHotbarCarrying": "Tragen von {action}: Bestätigen Sie auf einer Zelle, um sie zu platzieren, und brechen Sie ab, um sie zurückzusetzen.",
+      "crossHotbarEditHint": "Ordnen: Bestätigen: Nimmt eine Zelle oder das Zauberbuch auf und legt sie auf eine Zelle ab, Abbrechen löscht eine.",
+      "crossHotbarEditHelp": "Halten Sie den linken Stoßfänger fest und drücken Sie die Taste auf der Oberseite, um die Leiste mit dem Controller auszurichten."
     },
     "perf": {
       "title": "Leistungsanzeige",
@@ -1589,7 +1767,7 @@ export const de_DE: EnTranslations = {
           "render": "Render  Submit {submit} ms | Welt {world} ms | Entitäten {entities} ms",
           "scene": "Szene   {calls} Aufrufe | {triangles} Tris | {views} Ansichten",
           "hitches": "Ruckler {hitches} | Shader {shaders} | Uploads {uploads} | Ansichten {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
+          "hitchesBuild": "Zone baut {zoneBuilds} | Off-Frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "wartet"
         },
@@ -1641,10 +1819,10 @@ export const de_DE: EnTranslations = {
             "eventCpu": "Die Ereignisverarbeitung beansprucht den Frame",
             "shaderCompile": "Shader werden während des Spiels kompiliert",
             "textureUpload": "Textur-Uploads verursachen Spielruckler",
-            "zoneBuild": "Zone streaming builds are causing hitches",
+            "zoneBuild": "Zonen-Streaming-Builds verursachen Probleme",
             "viewCreate": "Die Erstellung von Entitäts-Ansichten verursacht Ruckler",
-            "gcHitch": "Garbage collections are running inside long frames",
-            "offFrameHitch": "Long frames come from work outside the render callback",
+            "gcHitch": "Garbage Collections laufen in langen Frames",
+            "offFrameHitch": "Lange Frames stammen von Arbeiten außerhalb des Render-Callbacks",
             "otherHitch": "Nicht zugeordnete lange Frames bleiben bestehen",
             "assetStartup": "Der Spielstart wird durch Asset-Arbeit verzögert",
             "longTasks": "Lange Browser-Aufgaben blockieren Frames",
@@ -1929,6 +2107,18 @@ export const de_DE: EnTranslations = {
         "many": "Ihr seid {rank}, {count} Mitglieder",
         "other": "Ihr seid {rank}, {count} Mitglieder"
       },
+      "wocMarketSellChoose": {
+        "one": "Wähle aus {count} Gegenstand",
+        "few": "Wähle aus {count} Gegenständen",
+        "many": "Wähle aus {count} Gegenständen",
+        "other": "Wähle aus {count} Gegenständen"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} platzierter Gegenstand kann nicht für $WOC verkauft werden.",
+        "few": "{count} platzierte Gegenstände können nicht für $WOC verkauft werden.",
+        "many": "{count} platzierte Gegenstände können nicht für $WOC verkauft werden.",
+        "other": "{count} platzierte Gegenstände können nicht für $WOC verkauft werden."
+      },
       "finderPartySize": {
         "one": "{count} Spieler",
         "few": "{count} Spieler",
@@ -2063,6 +2253,10 @@ export const de_DE: EnTranslations = {
       "errPasswordLong": "Das neue Passwort darf höchstens 128 Zeichen lang sein.",
       "errPasswordUnchanged": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
       "errPasswordConfirm": "Die neuen Passwörter stimmen nicht überein.",
+      "setPasswordTitle": "Legen Sie ein Passwort fest",
+      "setPasswordHint": "Dieses Konto wurde mit „Mit Apple anmelden“ oder „Discord“ erstellt und hat noch kein Passwort. Legen Sie eine fest, um sich auf anderen Geräten wie den Mac- und Windows-Desktop-Apps oder im Internet anzumelden und zusätzliche Anmeldemethoden zu verknüpfen.",
+      "setPasswordSubmit": "Passwort festlegen",
+      "passwordSet": "Passwort festgelegt. Sie können sich jetzt überall mit Ihrem Benutzernamen und Passwort anmelden.",
       "emailLabel": "E-Mail (optional)",
       "emailHint": "Wird nur zur Kontowiederherstellung verwendet. Wir versenden niemals Werbe-E-Mails.",
       "saveEmail": "E-Mail speichern",
@@ -2276,7 +2470,10 @@ export const de_DE: EnTranslations = {
       "backpack": "Rucksack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leerer Taschenplatz",
-      "unequipHint": "Klicke, um diese Tasche abzulegen"
+      "unequipHint": "Klicke, um diese Tasche abzulegen",
+      "poolGeneral": "General: {used} of {total}",
+      "poolMaterials": "Materials: {used} of {total}",
+      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -2504,13 +2701,15 @@ export const de_DE: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} zur Aktionsleiste hinzufügen",
-      "removeFromBarAria": "{name} von der Aktionsleiste entfernen"
+      "removeFromBarAria": "{name} von der Aktionsleiste entfernen",
+      "assignAria": "Einen Platz für {name} wählen"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Schummler >"
+      "cheaterTag": "< Schummler >",
+      "pledgeTag": "Gelöbnis: {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Stufe {level} {family}",
@@ -2530,6 +2729,7 @@ export const de_DE: EnTranslations = {
     },
     "partyFrames": {
       "section": "Gruppen- und Schlachtzugsrahmen",
+      "optionsSection": "Party Frame Options",
       "unlock": "Gruppen- und Schlachtzugsrahmen verschieben",
       "lock": "Gruppen- und Schlachtzugsrahmen sperren",
       "style": "Rahmenstil",
@@ -2559,6 +2759,62 @@ export const de_DE: EnTranslations = {
     },
     "frameReset": {
       "label": "Fensterpositionen zurücksetzen"
+    },
+    "interfaceUnlock": {
+      "label": "Edit Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "lockAll": "Lock Interface",
+      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
+      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Resize this frame",
+      "frameNames": {
+        "actionBar1": "Action Bar",
+        "actionBar2": "Action Bar 2",
+        "actionBar3": "Action Bar 3",
+        "steamWishlist": "Wishlist Reminder",
+        "menu": "Menu",
+        "minimap": "Minimap",
+        "stanceBar": "Stance Bar",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "Action Bars",
+        "playerFrame": "Player",
+        "targetFrame": "Target",
+        "partyFrames": "Party",
+        "swingBar": "Auto Attack"
+      },
+      "framesMenu": "Frames Settings",
+      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
+      "showHideFrames": "Show or Hide Frames",
+      "buffsLeftToRight": "Buffs left to right",
+      "debuffsLeftToRight": "Debuffs left to right",
+      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
+      "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
+      "menuRailHorizontal": "Horizontal Menu",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Reset size",
+      "resetFrameSizeFor": "Reset size for {name}",
+      "previewSpell": "Example Spell"
+    },
+    "transfer": {
+      "frameLayout": "Frame Layout",
+      "allSettings": "All Settings",
+      "exportAction": "Export",
+      "importAction": "Import",
+      "copy": "Copy",
+      "copied": "Copied to clipboard.",
+      "copyFailed": "Copy failed. Select the code and copy it yourself.",
+      "applyReload": "Apply and Reload",
+      "pastePlaceholder": "Paste an exported code here.",
+      "invalid": "That is not a valid export code.",
+      "wrongKind": "That code is a different export type."
     },
     "itemTooltip": {
       "requiresLevel": "Benötigt Stufe {level}",
@@ -2767,7 +3023,10 @@ export const de_DE: EnTranslations = {
       "unlink": "Steam-Verknüpfung lösen",
       "linked": "Mit Steam-Konto {id} verknüpft",
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
-      "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut."
+      "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",
@@ -2834,7 +3093,12 @@ export const de_DE: EnTranslations = {
       "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
     },
     "noticeboard": {
-      "empty": "Hier scheint nichts ausgehängt zu sein."
+      "empty": "Hier scheint nichts ausgehängt zu sein.",
+      "subtitle": "Gilden des Reichs",
+      "rosterTitle": "Die Mitgliederliste von {guild} ansehen",
+      "back": "Zurück",
+      "popupTitle": "Gilden-Wegweiser",
+      "close": "Schließen"
     },
     "bank": {
       "title": "Bank",
@@ -2848,6 +3112,26 @@ export const de_DE: EnTranslations = {
       "buySlotsMaxed": "Vollständig erweitert",
       "buyConfirm": "{count} zusätzliche Bankfächer für {price} kaufen?",
       "buyConfirmAccept": "Kaufen",
+      "meterLabel": "{used} of {total} slots",
+      "meterPoolGeneral": "General: {used} of {total}",
+      "meterPoolMaterials": "Materials: {used} of {total}",
+      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
+      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
+      "priceDisclaimer": "Prices may change with the game economy.",
+      "rungItemName": "{count} bank slots",
+      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
+      "buyConfirmDual": "Purchase {count} additional bank slots?",
+      "buyConfirmGold": "Purchase for {price}",
+      "buyConfirmClaudium": "Purchase for {cost} Claudium",
+      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
+      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
+      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
+      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
+      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
+      "rungFailed": "The purchase could not be completed.",
+      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
       "withdrawHint": "Klicke, um zu entnehmen",
       "withdrawPartialHint": "Umschalt-Klick, um eine Teilmenge zu entnehmen",
       "depositHint": "Klicke, um einzulagern",
@@ -2860,6 +3144,9 @@ export const de_DE: EnTranslations = {
       "withdrawQuantityTitle": "{item} entnehmen",
       "withdrawQuantityInput": "Zu entnehmende Menge",
       "withdrawQuantityConfirm": "Entnehmen",
+      "vaultRowWithdrawName": "Withdraw {item}",
+      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Bank nach Kategorie filtern",
       "sortAria": "Bankgegenstände sortieren",
       "searchAria": "Bankgegenstände nach Namen durchsuchen",
@@ -2881,6 +3168,34 @@ export const de_DE: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Lade einen Freund ein: Erreicht er Stufe 10, erhaltet ihr beide 2 Fächer, bis zu 5 Freunde.",
       "bonusSectionAria": "Bonus-Bankfächer und wie du mehr davon verdienst",
+      "socketRowAria": "Bank bag sockets",
+      "socketEmpty": "Empty bank bag socket",
+      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
+      "socketLocked": "Locked bag socket",
+      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
+      "socketUnlockAria": "Unlock a bank bag socket for {price}",
+      "socketUnlockHint": "Click to unlock this bag socket",
+      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
+      "socketUnlockAccept": "Unlock",
+      "unsocketHint": "Click to return this bag to your bags",
+      "socketHint": "Click to socket this bag into your bank",
+      "vaultTab": "Vault",
+      "vaultCapacityNote": "Each material holds up to {cap}.",
+      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
+      "vaultRowAria": "{item}: {count} of {cap} stored",
+      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
+      "vaultUnlockButton": "Unlock the Materials Vault",
+      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
+      "vaultUpgrade": "Widen every ceiling to {cap}",
+      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
+      "vaultDepositAll": "Deposit all materials",
+      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
+      "vaultDepositAllDone": "Materials deposited: {count}.",
+      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
+      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
+      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
+      "vaultDepositHint": "Click to deposit into your vault",
+      "vaultCannotDeposit": "Cannot go in the vault",
       "tabsAria": "Bank-Reiter",
       "personalTab": "Persönlich",
       "guildTab": "Gilde",
@@ -2966,6 +3281,10 @@ export const de_DE: EnTranslations = {
         "arenaClash": {
           "title": "Arena-Schlagabtausch",
           "note": "Duellanten strömen zum Aschenkolosseum. Stell dich an und erklimm die Rangliste."
+        },
+        "doubleHonor": {
+          "title": "Doppelte-Ehre-Wochenende",
+          "note": "Die Kriegslager blasen zur Musterung: Das ganze Wochenende zahlt Ehre auf den Thornhollow-Feldern doppelt, und eine ausgetragene Niederlage zahlt wie ein Sieg."
         },
         "fishingDerby": {
           "title": "Angelderby",
@@ -3276,6 +3595,9 @@ export const de_DE: EnTranslations = {
       "reagentsNeeded": "Erfordert:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbraucht {count} feiner Güte)",
+      "reagentVaultDraw": "(draws {count} from your vault)",
+      "vaultUnreachable": "The Materials Vault is out of reach here.",
+      "craftFeeLine": "Herstellungsgebühr: {fee} je Stück",
       "empty": "Noch keine Rezepte bekannt.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
@@ -3764,9 +4086,9 @@ export const de_DE: EnTranslations = {
       "pinFull": "Der Verfolger ist voll (bis zu {cap} Seiten)",
       "pinAria": "{name} an den Verfolger der Benutzeroberfläche anheften",
       "unpinAria": "{name} lösen",
-      "trackerToggleLabel": "HUD tracker",
-      "trackerToggleShowHint": "Show the Reliquary tracker on your screen",
-      "trackerToggleHideHint": "Hide the Reliquary tracker from your screen",
+      "trackerToggleLabel": "HUD-Tracker",
+      "trackerToggleShowHint": "Zeigen Sie den Reliquiar-Tracker auf Ihrem Bildschirm an",
+      "trackerToggleHideHint": "Blenden Sie den Reliquiar-Tracker auf Ihrem Bildschirm aus",
       "rarityLine": "Von {percent} der Sammler gefunden",
       "pageRarityLine": "Von {percent} der Sammler illuminiert",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3827,6 +4149,7 @@ export const de_DE: EnTranslations = {
       "unlockedBorderHint": "Neuer Rahmen errungen: {name}. Trage ihn über das Buch der Taten.",
       "broadcastLine": "{name} hat eine Tat vollbracht: {deed}",
       "rarityLine": "Errungen von {percent} der Abenteurer",
+      "stillToVisit": "Noch zu besuchen: {places}",
       "trackerLabel": "Taten",
       "collapseHint": "Tatenverfolgung einklappen",
       "expandHint": "Tatenverfolgung ausklappen",
@@ -3854,6 +4177,222 @@ export const de_DE: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Erfordert Stufe {level}"
+    },
+    "walletBridge": {
+      "cancelled": "Die Wallet-Anfrage wurde abgebrochen. Es wurde nichts gesendet.",
+      "timeout": "Deine Wallet hat nicht rechtzeitig geantwortet. Öffne die Wallet und versuche es erneut.",
+      "notConnected": "Verbinde und verifiziere eine Wallet, dann versuche es erneut.",
+      "unsupported": "Diese Wallet kann diese Aktion nicht ausführen. Verbinde eine andere Wallet.",
+      "unavailable": "Hier ist keine Wallet-Verbindung verfügbar. Verbinde deine Wallet erneut und versuche es dann noch einmal.",
+      "badResponse": "Deine Wallet hat eine unbrauchbare Antwort zurückgegeben. Versuche es erneut."
+    },
+    "wocMarket": {
+      "title": "$WOC-Börse",
+      "close": "Die Börse schließen",
+      "launcherLabel": "$WOC-Börse",
+      "tabBrowse": "Durchsuchen",
+      "tabSell": "Verkaufen",
+      "tabActivity": "Meine Aktivitäten",
+      "tabsLabel": "Bereiche der $WOC-Börse",
+      "loading": "Die Börse wird geladen...",
+      "loadFailed": "Die Börse konnte nicht erreicht werden. Versuch es in Kürze erneut.",
+      "disabledRealm": "Die $WOC-Börse ist auf dieser Welt nicht verfügbar.",
+      "pausedBanner": "Der Handel ist pausiert. Auktionen laufen weiter herunter; neue Angebote, Gebote, Offerten und Zahlungen warten, bis der Handel fortgesetzt wird, und eine bereits gesendete Zahlung wird trotzdem abgewickelt.",
+      "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
+      "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Unknown",
+      "rateNote": "Kurs: etwa {tokens} $WOC pro 1,00 USD, Stand {time}.",
+      "rateNotePaused": "Letzter bekannter Kurs: etwa {tokens} $WOC pro 1,00 USD, Stand {time}.",
+      "estimateNote": "Etwa {tokens} $WOC für {usd} zum aktuellen Kurs.",
+      "browseEmpty": "Derzeit keine Angebote. Schau bald wieder vorbei.",
+      "browseError": "Angebote konnten nicht geladen werden.",
+      "colItem": "Gegenstand",
+      "colSeller": "Verkäufer",
+      "colCurrentBid": "Aktuelles Gebot",
+      "colBuyNow": "Sofortkauf",
+      "colTimeLeft": "Verbleibende Zeit",
+      "reserveMet": "Mindestpreis erreicht",
+      "reserveNotMet": "Mindestpreis nicht erreicht",
+      "yourListing": "Dein Angebot",
+      "buyNowLockedBadge": "Kauf läuft",
+      "reserveMetTip": "Der Verkäufer hat einen versteckten Mindestpreis festgelegt, und das aktuelle Gebot erreicht ihn.",
+      "reserveNotMetTip": "Der Verkäufer hat einen versteckten Mindestpreis festgelegt. Liegt das Höchstgebot bei Ablauf darunter, wird der Gegenstand nicht verkauft, und jedes Pfand wird zurückgezahlt.",
+      "yourListingTip": "Du hast diesen Gegenstand eingestellt. Du kannst nicht auf dein eigenes Angebot bieten; solange es keine Gebote hat, kannst du es hier oder unter Aktivitäten zurückziehen.",
+      "buyNowLockedTip": "Ein anderer Käufer hält dieses Angebot, während er bezahlt. Zahlt er nicht rechtzeitig, wird es wieder freigegeben.",
+      "pagePrev": "Vorherige Seite",
+      "pageNext": "Nächste Seite",
+      "pageNumber": "Seite {current}",
+      "sortLabel": "Sortieren",
+      "sortEnding": "Endet als Nächstes",
+      "sortNewest": "Neueste",
+      "sortPriceAsc": "Preis: niedrig bis hoch",
+      "sortPriceDesc": "Preis: hoch bis niedrig",
+      "filterQuality": "Qualität",
+      "filterFormat": "Format",
+      "filterAny": "Beliebig",
+      "filterFormatAuction": "Auktion",
+      "filterFormatBuyNow": "Sofortkauf",
+      "filterItemLabel": "Gegenstand",
+      "filterItemPlaceholder": "Nach Gegenstandsnamen suchen",
+      "filterCategory": "Kategorie",
+      "filterCategoryWeapon": "Waffen",
+      "filterCategoryArmor": "Rüstung",
+      "filterCategoryMount": "Reittiere",
+      "filterSubcategory": "Typ",
+      "sellerLinkAria": "Letzte Geschäfte von {name} ansehen",
+      "sellerTitle": "Letzte Geschäfte von {name}",
+      "sellerBack": "Zurück zu Durchsuchen",
+      "sellerEmpty": "Noch keine abgeschlossenen Geschäfte.",
+      "sellerError": "Letzte Geschäfte konnten nicht geladen werden.",
+      "sellerSaleRow": "{time}: {item} an {buyer} für {usd}",
+      "detailTitle": "Angebot",
+      "detailSeller": "Verkauft von {name}",
+      "detailEndsAt": "Endet {utc} UTC ({local} lokal)",
+      "detailStartingBid": "Startgebot: {usd}",
+      "detailCurrentBid": "Aktuelles Gebot: {usd}",
+      "detailNoBids": "Noch keine Gebote",
+      "detailMinNext": "Nächstes Mindestgebot: {usd}",
+      "detailBuyNow": "Sofortkauf: {usd}",
+      "detailSales": "Letzte Verkäufe",
+      "detailSaleRow": "{time}: {seller} verkaufte an {buyer} für {usd}",
+      "detailNoSales": "Für diesen Gegenstand liegen noch keine erfassten Verkäufe vor.",
+      "detailSalesLoading": "Letzte Verkäufe werden geladen...",
+      "bidLabel": "Dein Gebot (USD)",
+      "bidPlaceholder": "Einen USD-Betrag eingeben",
+      "bidButton": "Gebot abgeben",
+      "bidAria": "Ein Gebot auf {item} abgeben",
+      "bidTermsToggle": "Gebotsbedingungen",
+      "rowOpenAria": "Das Angebot für {item} ansehen",
+      "buyNowButton": "Jetzt kaufen für {usd}",
+      "buyNowAria": "{item} jetzt für {usd} kaufen",
+      "cancelButton": "Angebot zurückziehen",
+      "cancelAria": "Dein Angebot für {item} zurückziehen",
+      "bidBondNote": "Ein Gebot abzugeben hält zusätzlich zum Gebot ein rückzahlbares Pfand in $WOC zurück: {bond} bei einem Gebot von {bid}, mehr bei einem höheren Gebot. Es wird zurückgezahlt, wenn du überboten wirst oder verlierst, oder nach deiner Zahlung, wenn du gewinnst; ein Zweitchancen-Angebot hält es erneut zurück.",
+      "bidBondSchedule": "Das Pfand beträgt {rate} Prozent deines Gebots, mindestens {min} und höchstens {max}.",
+      "bidBondPayWindow": "Zahle das Pfand innerhalb von {duration} nach Abgabe deines Gebots, sonst verfällt das Gebot.",
+      "bidBindingNote": "Ein Gebot ist bindend, sobald du die zugehörige Pfand-Transaktion signierst: Es kann nicht zurückgezogen werden, und gewinnst du und zahlst nicht, verfällt das Pfand, und dein Konto erhält eine Börsen-Verwarnung.",
+      "bidCloseNote": "Ein Gebot, dessen Pfand sich in den letzten 2 Minuten bestätigt, verlängert die Auktion auf 2 Minuten nach diesem Gebot, bis zu 30 Minuten über das angegebene Ende hinaus. Ein Pfand, das sich erst nach Ende der Auktion bestätigt, zählt nicht und wird zurückgezahlt.",
+      "offerNextNote": "Zahlt der Gewinner nicht, kannst du zu deinem eigenen Gebot Käufer werden: Dein Pfand wird erneut einbehalten (oder erneut angefordert, falls es bereits zurückgezahlt wurde), und die Zahlung ist innerhalb von {duration} fällig.",
+      "buyNowNote": "Sofortkauf hält dieses Angebot etwa viereinhalb Minuten lang für dich, während du bezahlst. Zahlst du nicht rechtzeitig, kannst du es 30 Minuten lang nicht erneut versuchen, und drei unbezahlte Sofortkäufe innerhalb einer Stunde setzen den Sofortkauf für dich aus, bis der älteste eine Stunde alt ist.",
+      "variableTokenWarning": "Du verpflichtest dich, einen USD-Wert in $WOC zu bezahlen. Der genaue Token-Betrag wird bei Zahlungsanforderung durch ein neues Angebot festgelegt und kann von der Schätzung abweichen.",
+      "quoteFixedNote": "Dieses Kursangebot legt den $WOC-Betrag bis zum Ablauf fest. Ein neues Kursangebot kann abweichen.",
+      "settlementDeadlineNote": "Gewinnst du, ist die Zahlung innerhalb von {duration} nach Ende der Auktion fällig.",
+      "claimCooldownRetry": "Du hast dich kürzlich von einem Sofortkauf zurückgezogen. Versuch es in {duration} erneut.",
+      "termsLabel": "Ich akzeptiere die Marktplatz-Bedingungen.",
+      "termsLink": "Die Marktplatz-Bedingungen ansehen (öffnet in einem neuen Tab)",
+      "quoteTitle": "Zahlung bestätigen",
+      "quoteTotal": "Gesamt: {tokens} $WOC",
+      "quoteSeller": "Verkäufer erhält: {tokens} $WOC",
+      "quoteBurn": "Verbrannt (aus dem Umlauf entfernt): {tokens} $WOC",
+      "quoteTreasury": "An die Schatzkammer: {tokens} $WOC",
+      "quoteExpires": "Kursangebot läuft ab in {duration}",
+      "quoteExpiresAt": "Kursangebot läuft ab um {time}.",
+      "quoteExpired": "Das Kursangebot ist abgelaufen. Fordere ein neues an.",
+      "quoteSign": "Signieren und bezahlen",
+      "quoteRefresh": "Neues Kursangebot",
+      "quoteCancel": "Nicht jetzt",
+      "quoteBondFor": "Rückerstattbares Gebotspfand: {usd}",
+      "quoteBondForItem": "Rückerstattbares Gebotspfand für {item}: {usd}",
+      "quoteSettlementFor": "Abrechnung für {item}: {usd}",
+      "paymentDueAt": "Die Zahlung ist fällig bis {time}.",
+      "signing": "Warten auf deine Wallet...",
+      "signFailed": "Deine Wallet hat die Zahlung nicht abgeschlossen. Prüfe die Wallet und versuch es erneut.",
+      "signFailedConfirm": "Deine Wallet hat die Bestätigung nicht signiert. Prüfe die Wallet und versuch es erneut.",
+      "confirming": "Wird auf der Blockchain bestätigt...",
+      "listing": "Dein Gegenstand wird eingestellt...",
+      "activityCancelPending": "Ausstehendes abbrechen",
+      "activityDirected": "Gezielter Verkauf",
+      "bidPlacedStanding": "Dein Gebot steht. Du hast das höchste Gebot.",
+      "bidPlacedOutbid": "Dein Pfand wurde bestätigt, aber ein höheres Gebot kam zuerst an.",
+      "purchaseComplete": "Kauf abgeschlossen. Dein Gegenstand kommt per Rabenpost an.",
+      "paymentConfirmedDelivering": "Zahlung bestätigt. Dein Gegenstand kommt per Rabenpost an, sobald die Lieferung abgeschlossen ist.",
+      "listingCreated": "Dein Angebot ist live.",
+      "listingCancelled": "Angebot zurückgezogen. Dein Gegenstand kehrt per Rabenpost zurück.",
+      "listingCancelPending": "Rückzug ausstehend: Ein Käufer hält das Kauffenster. Zahlt er nicht, schließt das Angebot, und dein Gegenstand kehrt per Rabenpost zurück.",
+      "sellTitle": "Ein Angebot erstellen",
+      "sellEmptyFloor": "Keine geeigneten Gegenstände in deinen Taschen. Diese Welt nimmt ungebundene Ausrüstung der Qualität {floor} oder besser.",
+      "sellCollectiblesBoth": "Reittiere und Mech-Chromaplatten können ebenfalls eingestellt werden.",
+      "sellCollectiblesMounts": "Reittiere können ebenfalls eingestellt werden.",
+      "sellCollectiblesChromas": "Mech-Chromaplatten können ebenfalls eingestellt werden.",
+      "sellLockedHidden": "Gesperrte Gegenstände werden hier nicht aufgeführt. Entsperre sie in deinen Taschen, um sie zu verkaufen.",
+      "sellSearchPlaceholder": "Tippe, um deine Taschen zu filtern",
+      "sellClear": "{item} entfernen und einen anderen wählen",
+      "sellChoose": "Einzustellender Gegenstand",
+      "sellNoMatches": "Keine Gegenstände entsprechen dieser Suche",
+      "sellBuyNowAboveStart": "Der Sofortkaufpreis muss höher sein als das Startgebot.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auktion",
+      "sellFormatBuyNow": "Nur Sofortkauf",
+      "sellFormatAuctionBuyNow": "Auktion mit Sofortkauf",
+      "sellStart": "Startgebot (USD)",
+      "sellReserve": "Mindestpreis (USD, optional)",
+      "sellReserveNote": "Optional, mindestens das Startgebot. Bieter sehen nur, ob er erreicht wurde; liegt das Höchstgebot bei Ablauf darunter, kommt der Gegenstand unverkauft zu dir zurück, und jedes Pfand wird zurückgezahlt.",
+      "sellBuyNowNote": "Erforderlich. Ein Sofortkauf-Angebot wird zu diesem Preis ohne Gebote verkauft.",
+      "sellBuyNowAuctionNote": "Optional. Lege einen Preis fest, zu dem ein Käufer die Auktion vorzeitig beenden kann; er muss über dem Startgebot und dem Mindestpreis liegen.",
+      "sellBuyNowPrice": "Sofortkaufpreis (USD)",
+      "sellDuration": "Dauer",
+      "sellOfferNext": "Zahlt der Gewinner nicht, verkaufe an den nächsthöchsten Bieter, dessen Gebot den Mindestpreis erreicht, zu dessen Gebot, statt unverkauft zu enden.",
+      "sellSubmit": "Gegenstand einstellen",
+      "sellSubmitAria": "{item} auf der Börse einstellen",
+      "sellFeeNote": "Ein abgeschlossener Verkauf zahlt eine Börsengebühr aus dem Preis: Ein Teil wird verbrannt, ein Teil geht an die Schatzkammer, und den Rest erhältst du bei der Abrechnung an deine verknüpfte Wallet. Die Gebühr für den eingegebenen Preis wird hier angezeigt; bei einer Auktion richtet sie sich nach dem Endpreis.",
+      "activityListings": "Meine Angebote",
+      "activityBids": "Meine Gebote",
+      "activitySettlements": "Meine Abwicklungen",
+      "activityEmpty": "Du hast noch keine Gebote, Angebote oder Abwicklungen. Deine Börsenaktivität erscheint hier.",
+      "activityNoListings": "Du hast keine Angebote.",
+      "activityNoBids": "Du hast keine Gebote.",
+      "activityNoSettlements": "Du hast keine Abwicklungen.",
+      "activityPayNow": "Jetzt zahlen",
+      "activityPayNowAria": "Jetzt für Abwicklung {id} zahlen",
+      "activityPayNowItemAria": "Jetzt {usd} für {item} zahlen",
+      "activityDeadline": "Zahlung fällig in {duration}",
+      "dueAt": "Fällig {utc} UTC ({local} lokal)",
+      "activityStrikes": "Börsen-Verwarnungen: {count}",
+      "activitySuspended": "Börse für {duration} gesperrt nach unbezahlten Geschäften: bis dahin keine Gebote, Käufe, Angebote oder $WOC-Handel.",
+      "strikesTip": "Ein Verstoß wird jedes Mal vermerkt, wenn du ein zugesagtes Geschäft nicht bezahlst. Ab dem ersten sperrt jeder weitere Verstoß dich länger von der Börse: 3 Tage, dann 14, dann 90, dann ein Jahr.",
+      "bidStatusPending": "Pfand ausstehend",
+      "bidStatusActive": "Höchstes Gebot",
+      "bidStatusOutbid": "Überboten",
+      "bidStatusLapsed": "Verfallen",
+      "bidStatusWon": "Gewonnen",
+      "bidStatusDefaulted": "Ausgefallen",
+      "bidStatusCancelled": "Storniert",
+      "bidBondPay": "Pfand zahlen",
+      "bidBondPayAria": "Das Pfand für dein Gebot auf Angebot {id} zahlen",
+      "bidBondPayItemAria": "Das Pfand von {bond} für dein Gebot auf {item} zahlen",
+      "settlementOffered": "Zahlung fällig",
+      "settlementConfirming": "Wird bestätigt",
+      "settlementConfirmedDelivering": "Zahlung bestätigt, wird geliefert",
+      "settlementReview": "Zahlung wird geprüft",
+      "settlementDelivered": "Geliefert",
+      "settlementExpired": "Unbezahlt abgelaufen",
+      "settlementFailed": "Zahlung fehlgeschlagen",
+      "settlementFailBurnMissing": "Die Zahlung enthielt nicht die erforderliche Token-Verbrennung.",
+      "settlementFailBurnMismatch": "Die Zahlung hat den falschen Token-Betrag verbrannt.",
+      "settlementFailBurnAuthority": "Die Token-Verbrennung stammte von einer Wallet, die für diesen Kauf nicht angegeben wurde.",
+      "settlementFailUnexpectedCredit": "Die Transaktion zahlte an eine Wallet außerhalb dieses Kaufs.",
+      "settlementFailQuoteExpired": "Das Kursangebot ist vor der Nutzung abgelaufen. Fordere ein neues an und bezahle erneut.",
+      "settlementFailTransaction": "Die Zahlungstransaktion ist im Netzwerk fehlgeschlagen. Fordere ein neues Angebot an und versuch es erneut.",
+      "settlementFailRefunded": "Diese Zahlung wurde an deine Wallet zurückgegeben.",
+      "settlementFailSuperseded": "Dieser Zahlungsversuch wurde durch einen neueren ersetzt.",
+      "settlementFailConfirmingOverdue": "Diese Zahlung brauchte zu lange zur Bestätigung und konnte nicht verifiziert werden.",
+      "settlementFailGeneric": "Diese Zahlung konnte nicht abgeschlossen werden.",
+      "paymentSeenAwaitingFinality": "Zahlung im Hauptbuch gesehen. Warten auf endgültige Bestätigung.",
+      "paymentNotYetVisible": "Im Hauptbuch ist noch keine Zahlung sichtbar. Es kann einen Moment dauern, bis sie erscheint.",
+      "paymentServiceUnreachable": "Der Zahlungsdienst ist nicht erreichbar. Deine Zahlung bleibt erfasst und wird erneut geprüft.",
+      "paymentPendingGeneric": "Deine Zahlung wurde übermittelt und wartet auf Bestätigung.",
+      "bondSeenAwaitingFinality": "Pfandzahlung im Hauptbuch gesehen. Warten auf endgültige Bestätigung.",
+      "bondNotYetVisible": "Im Hauptbuch ist noch keine Pfandzahlung sichtbar. Es kann einen Moment dauern, bis sie erscheint.",
+      "bondServiceUnreachable": "Der Zahlungsdienst ist nicht erreichbar. Deine Pfandzahlung bleibt erfasst und wird erneut geprüft.",
+      "bondPendingGeneric": "Deine Pfandzahlung wurde übermittelt und wartet auf Bestätigung.",
+      "listingStatusActive": "Aktiv",
+      "listingStatusSettling": "Zahlung ausstehend",
+      "listingStatusSold": "Verkauft",
+      "listingStatusReturned": "Zurückgegeben",
+      "listingStatusCancelled": "Zurückgezogen",
+      "listingStatusSuspended": "Ausgesetzt",
+      "listingStatusUnsold": "Nicht verkauft"
     }
   },
   "gatherEvent": {
@@ -3903,7 +4442,8 @@ export const de_DE: EnTranslations = {
       "password_too_long": "Das neue Passwort darf höchstens 128 Zeichen lang sein.",
       "characters_online": "Melde alle deine Charaktere ab, bevor du das Konto deaktivierst.",
       "deactivated": "Dieses Konto wurde deaktiviert. Wende dich an einen Administrator, um es wiederherzustellen.",
-      "not_found": "Konto nicht gefunden."
+      "not_found": "Konto nicht gefunden.",
+      "password_already_set": "Dieses Konto hat bereits ein Passwort. Verwenden Sie stattdessen „Passwort ändern“."
     },
     "character": {
       "name_invalid": "Ungültiger Charaktername. Verwende 2-16 Buchstaben.",
@@ -3915,6 +4455,8 @@ export const de_DE: EnTranslations = {
       "online": "Der Charakter ist derzeit online.",
       "rename_not_permitted": "Das Umbenennen dieses Charakters ist nicht erlaubt.",
       "delete_confirm": "Gib den Charakternamen ein, um das Löschen zu bestätigen.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Der Charakter ist bereits in der Welt.",
       "taken_over": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "rename_required": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",
@@ -3954,6 +4496,10 @@ export const de_DE: EnTranslations = {
     "deeds": {
       "invalid_input": "Ungültige Eingabe."
     },
+    "guilds": {
+      "invalid_roster_name": "Ungültiger Gildenname.",
+      "unknown": "Keine Gilde mit diesem Namen."
+    },
     "steam": {
       "disabled": "Die Steam-Verknüpfung ist derzeit nicht verfügbar.",
       "invalid_ticket": "Steam konnte diese Verknüpfungsanfrage nicht bestätigen. Versuch es erneut über die Desktop-App.",
@@ -3991,6 +4537,55 @@ export const de_DE: EnTranslations = {
       "reason_required": "Ein Grund ist erforderlich.",
       "invalid_duration": "Gib eine Markierungsdauer von mindestens einer Sekunde ein.",
       "not_marked": "Dieses Konto ist nicht markiert."
+    },
+    "woc_market": {
+      "invalid_input": "Ungültige Eingabe.",
+      "disabled": "Die $WOC-Börse ist auf diesem Realm nicht verfügbar.",
+      "paused": "Der Handel an der Börse ist pausiert. Auktionen laufen trotzdem weiter herunter.",
+      "wallet_required": "Verknüpfe und verifiziere ein Wallet, bevor du auf der Börse handelst.",
+      "recipient_wallet_required": "Dieser Spieler muss zuerst ein Wallet verbinden, bevor er $WOC-Zahlungen annehmen kann.",
+      "self_offer": "Du kannst kein $WOC-Angebot an dich selbst senden.",
+      "offer_expired": "Dieses $WOC-Angebot ist abgelaufen. Bitte um ein neues.",
+      "terms_required": "Akzeptiere die Bedingungen des Marktplatzes, um fortzufahren.",
+      "totp_required": "Dieser Betrag erfordert Zwei-Faktor-Authentifizierung. Aktiviere sie in den Kontoeinstellungen und gib dann deinen Code ein.",
+      "totp_invalid": "Dieser Zwei-Faktor-Code konnte nicht verifiziert werden. Versuche es erneut.",
+      "suspended": "Dein Zugang zur Börse ist wegen unbezahlter Geschäfte gesperrt: keine Gebote, Käufe, Angebote oder $WOC-Handel.",
+      "character_invalid": "Spiele den Charakter, von dem aus du einstellst, und versuch es erneut.",
+      "not_found": "Dieser Börseneintrag existiert nicht mehr.",
+      "not_yours": "Dieser Börseneintrag existiert nicht mehr.",
+      "not_active": "Dieses Angebot ist für diese Aktion nicht mehr offen.",
+      "own_listing": "Du kannst nicht auf dein eigenes Angebot bieten oder es kaufen.",
+      "has_bids": "Ein Angebot mit Geboten kann nicht zurückgezogen werden. Wende dich an den Support, wenn du es unbedingt stornieren musst.",
+      "bid_too_low": "Dein Gebot erreicht nicht das aktuelle Gebot zuzüglich des Mindestschritts.",
+      "already_pending": "Bestätige oder verwirf zuerst dein ausstehendes Gebot für dieses Angebot.",
+      "insufficient_balance": "Dein Wallet enthält nicht genug $WOC für dieses Gebot und das zugehörige Pfand.",
+      "quote_unavailable": "Gerade konnte kein Kursangebot ausgestellt werden. Versuche es in Kürze erneut.",
+      "quote_expired": "Dieses Kursangebot ist abgelaufen. Fordere ein neues an; wird keines angeboten, ist dieses Zeitfenster geschlossen.",
+      "not_pending": "Dieses Gebot wartet nicht mehr auf sein Pfand.",
+      "confirm_failed": "Die Transaktion konnte nicht bestätigt werden. Fordere ein neues Kursangebot an und versuche es erneut.",
+      "confirm_in_flight": "Deine Zahlung wird noch bestätigt. Versuche es erneut, sobald sie abgeschlossen ist.",
+      "buy_now_locked": "Ein anderer Käufer schließt diesen Kauf gerade ab. Versuch es gleich noch einmal.",
+      "cancel_pending": "Der Verkäufer zieht dieses Angebot gerade zurück.",
+      "claim_cooldown": "Du hast dich kürzlich von einem Sofortkauf zurückgezogen. Versuch es später erneut.",
+      "bond_window_closed": "Dieses Gebot kann nicht mehr bezahlt werden: Sein Zahlungsfenster ist geschlossen. Biete erneut für ein neues.",
+      "settlement_in_flight": "Ein Käufer bezahlt gerade für dieses Angebot. Versuche es erneut, sobald die Zahlung abgeschlossen ist.",
+      "contended": "Die Börse ist mit diesem Angebot beschäftigt. Versuche es gleich noch einmal.",
+      "sale_conflict": "Für dieses Angebot besteht bereits ein laufender Verkaufsvorgang. Schließe ihn zuerst aus.",
+      "no_buy_now": "Dieses Angebot hat keinen Sofortkaufpreis.",
+      "cap_reached": "Du hast dein Limit für Börsenangebote erreicht.",
+      "stale_item": "Dieser Gegenstand hat sich verändert oder wurde bewegt. Wähle ihn erneut aus und versuche es noch einmal.",
+      "item_mismatch": "Das ist nicht genau die Kopie, der der Käufer zugestimmt hat, oder ihr Zustand hat sich geändert (auch eine Sperre zählt dazu). Beginne einen neuen Handel dafür.",
+      "offer_pending": "Du hast bereits einen offenen Handel mit diesem Spieler. Kläre ihn zuerst.",
+      "not_eligible": "Dieser Gegenstand kann nicht auf der $WOC-Börse eingestellt werden.",
+      "invalid_params": "Prüfe Startgebot, Mindestpreis, Sofortkaufpreis und Laufzeit.",
+      "signature_reused": "Diese Transaktion wurde bereits eingereicht.",
+      "item_locked": "Dieser Gegenstand ist gesperrt. Entsperre ihn in deinen Taschen, bevor du ihn verkaufst.",
+      "stepup_required": "Der Verkauf auf der Börse erfordert eine Signatur deines verknüpften Wallets.",
+      "stepup_challenge_invalid": "Diese Wallet-Bestätigung ist nicht mehr gültig. Starte den Verkauf erneut.",
+      "stepup_challenge_expired": "Die Wallet-Bestätigung ist abgelaufen. Starte den Verkauf erneut.",
+      "stepup_wallet_mismatch": "Dein verknüpftes Wallet hat sich geändert, seit diese Bestätigung ausgestellt wurde. Starte den Verkauf erneut.",
+      "stepup_binding_mismatch": "Diese Wallet-Bestätigung passt nicht zu diesem Verkauf. Starte den Verkauf erneut.",
+      "stepup_signature_invalid": "Die Wallet-Signatur konnte nicht verifiziert werden. Starte den Verkauf erneut."
     }
   },
   "guide": {
@@ -4028,7 +4623,6 @@ export const de_DE: EnTranslations = {
       "combat": "Kampf",
       "talents": "Talente",
       "arena": "Arena und PvP",
-      "valeCup": "Talpokal",
       "thornhollow": "Thornhollow-Felder",
       "deeds": "Buch der Taten",
       "reliquary": "Das Reliquiar",
@@ -4138,6 +4732,8 @@ export const de_DE: EnTranslations = {
         "fenBlurb": "Hinter der herbstlichen Krone ein helles Sumpfland aus Weiden und stillem Wasser, und eine Stadt hinter einem Wallgraben.",
         "farshoreName": "Die Fernküste",
         "farshoreBlurb": "Eine Insel jenseits der Sandbank, wo der Himmel über den Rissfeldern aufreißt und Gullhaven für jeden Bruch seine Glocke läutet.",
+        "provingName": "Die Bewährungsküste",
+        "provingBlurb": "Eine ruhige Übungsinsel jenseits der Meerenge, wo neue Abenteurer Tritt fassen, bevor das Tal etwas von ihnen verlangt.",
         "nightName": "Die Nachtblüte",
         "nightBlurb": "Ein Land sternenklarer Mitternacht, in dem die Blüten die Pfade erleuchten und Moonrest seine Wache hält.",
         "hauntName": "Der Gespensterwald",
@@ -4238,7 +4834,6 @@ export const de_DE: EnTranslations = {
       "reliquary": "Das Reliquiar",
       "sheathe": "Waffe einstecken/ziehen",
       "crafting": "Handwerk",
-      "valeCup": "Talpokal",
       "mount": "Aufsitzen / Absitzen",
       "calendar": "Ereigniskalender",
       "dungeonFinder": "Instanzfinder",
@@ -4367,7 +4962,7 @@ export const de_DE: EnTranslations = {
       "ifHighContrastBackground": "Ein schlichterer Hintergrund mit höherem Kontrast hinter dem Start- und dem Charakterbildschirm.",
       "ifInvertLookY": "Kehrt die Auf- und Abwärtsrichtung der Mausumsicht um.",
       "ifShowItemLevel": "Fügt jedem Gegenstands-Tooltip eine Zeile mit der Gegenstandsstufe hinzu. Standardmäßig aus, was den klassischen, reinen Werte-Tooltip beibehält.",
-      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
+      "ifShowReliquaryTracker": "Ob sich der Reliquiar-Tracker (Ihre angehefteten Seiten und deren Fortschritt) auf Ihrem HUD befindet. Das Reliquiar-Fenster verfügt über eine entsprechende Augenschaltfläche und durch das Anheften einer Seite wird der Tracker wieder aktiviert.",
       "ifShowPlaytime": "Zeigt Ihre gesamte Spielzeit auf dem Charakterbogen. Standardmäßig an, und der Bogen hat eine Augen-Schaltfläche, die es pro Gerät umschaltet, praktisch, wenn Sie streamen oder Screenshots machen. Die Gesamtzeit läuft so oder so weiter mit.",
       "ifShowOwnNameplate": "Zeichnet Ihre eigene Namensplakette über dem Kopf genau so, wie andere Spieler sie sehen, mit allem Schnickschnack. Schalten Sie sie für die klassische Ansicht aus.",
       "ifShowPlayerNameplates": "Zeichnet die Namensplaketten anderer Spieler. Aus entrümpelt einen überfüllten Hub, und Ihr aktuelles Ziel bleibt so oder so lesbar.",
@@ -5100,6 +5695,10 @@ export const de_DE: EnTranslations = {
       "farshoreGreeting": "Du kamst über den Fährweg? Dann bist du der Erste seit einer Woche, und der Wächter wird dich in Augenschein nehmen wollen.",
       "farshoreGreeter": "Glockenwärter Tam, die Anlegestelle",
       "farshorePlaceNotes": "Gullhaven ist die einzige Stadt der Insel und ihre Schanze. Die Anlegestelle ist, wo der Fährweg an Land kommt, mit einer Wachglocke über der Landspitze; die Wachwiese hält das Hochland südöstlich der Stadt, wo ein Risswächter auf den nächsten Bruch lauscht; die Zerklüfteten Klippen brechen am Südende der Insel auf; und die Rissfelder sind die verwüsteten Getreidereihen östlich von Gullhaven, die noch immer von dem wimmeln, was durch den dortigen Riss kam.",
+      "provingBlurb": "Eine ruhige Insel jenseits der Meerenge vom Tal, als Übungsgelände gehalten: ein Lager, ein Übungsplatz, ein von Wracks übersäter Strand und eine Fähre, die in beide Richtungen fährt.",
+      "provingGreeting": "Jeder Held, dem das Tal je gedankt hat, stand einmal genau da, wo du jetzt stehst, und keiner von ihnen wusste, an welchem Ende man eine Klinge hält.",
+      "provingGreeter": "Ausbilderin Maren, Morgenrast-Lager",
+      "provingPlaceNotes": "Morgenrast-Lager ist die gesamte Siedlung der Insel: ein paar Zelte, ein Stand und ein Sammelfeuer. Der Alte Steg blickt zum Tal, wo der Überfahrtskreis die Absolventen über die Meerenge trägt; der Übungsplatz südlich des Lagers hält seine Strohpuppen für jeden bereit, der sie braucht; und die Wracklinie ist der von Bergegut übersäte Strand, auf dem die Flut der Insel in Strandkisten zahlt.",
       "travelTitle": "Unterwegs",
       "travelBody": "Jede Straße im Reich wird zu Fuß oder zu Pferd zurückgelegt. Es gibt keine Flugrouten, keine Droschken und kein Teleportnetz: Die Karte ist eine einzige zusammenhängende Landmasse, und jede Verbindung ist etwas, worauf du stehen kannst. Grate trennen ein Reich vom nächsten, und wo zwei Reiche sich einen Grat teilen, steigt die Straße durch einen Pass. Nicht jede Grenze funktioniert jedoch so. Im Norden trägt ein langer Damm die Straße über das Wasser hinaus, von der Schleiersenke ins Schneeland dahinter, und im Süden verläuft eine schmale natürliche Sandbank namens Fährweg von der Küste des Tals ostwärts zur Anlegestelle auf der Insel der Fernküste, die überhaupt keine Landgrenze hat. Und es gibt genau eine echte Tür in der ganzen Oberwelt: einen Dämmerschleier hoch auf dem Thornpeak, der sich zur Schleiersenke hin öffnet. Der südliche Grat der Senke ist versiegelt und hat keinen Pass hindurch, sodass dieser Schleier dein erster Weg hinein ist, und er schließt sich hinter dir auf dem Rückweg.\n\nWo auch immer du fällst, der Weg zurück ist kurz. Jede Zone unterhält mindestens einen Friedhof mit einem Bleichen Hüter, der über den Steinen schwebt, und ein befreiter Geist erhebt sich am nächstgelegenen von ihnen.\n\nDie Karte endet nicht an einer unsichtbaren Wand. Das Land läuft in Strände und Landzungen aus, und dann in offenes Wasser. Die Überquerungen, die die Welt für dich zum Schwimmen vorsieht, die Meerengen und Seen zwischen einem Reich und dem nächsten, sind ruhig und sicher zu überqueren. Hältst du stattdessen auf die offene See zu, dreht dich die Entfernung selbst wieder um: Du wirst gewarnt, und noch einmal gewarnt, und schwimmst du weiter, zehrt dich die See aus, bis sie dich tötet. Tauchen hat sein eigenes Limit, da dir unter der Oberfläche der Atem ausgeht, komm also nach Luft, wenn das Wasser es dir sagt, und kehre um.",
       "mountsTitle": "Reittiere",
@@ -5316,36 +5915,6 @@ export const de_DE: EnTranslations = {
       "ladderBody": "Jedes Spiel verändert eine dauerhafte, charaktergebundene Schlachtfeld-Wertung, ob Sieg oder Niederlage, und die Bestenliste aller Zeiten führt die Champions des Reichs.",
       "rewardsHeading": "Was ein Spiel einbringt",
       "rewardsBody": "Jedes beendete Spiel zahlt Ehre: mehr für einen Sieg, einen Trost für eine Niederlage oder ein Unentschieden, dazu einen kleinen Betrag für jeden tödlichen Treffer, den du landest, und jeden, an dem du beteiligt warst, sodass sich das Kämpfen abseits der Flaggen weiterhin lohnt. Dein erster Sieg jedes Tages zahlt zusätzlich einen Bonus, und das Panel zeigt dir an, solange dieser Bonus noch auf dich wartet. Dieser Tag gehört allein der Ehre und läuft nach seiner eigenen Uhr, statt mit der Instanz-Zurücksetzung des Reichs. Triffst du immer wieder auf dasselbe Team, zahlt das Spiel selbst nach dem ersten Mal weniger, pendelt sich aber rasch auf einem Sockel ein, statt auf null abzusinken, und ein aufgegebenes Spiel zahlt überhaupt nichts. Gib, was du verdienst, bei einem der beiden Kriegsführungs-Quartiermeister aus."
-    },
-    "valeCupPage": {
-      "heading": "Der Talpokal",
-      "intro": "Keilerball auf dem Saufeld: Wähle ein Banner, wähle eine Rolle und schieß eine ausgestopfte Eberhaut an einem Torhüter vorbei, um den Kupfereimer zu holen. Kein Blut, keine Beute, nur das Tosen der Ränge.",
-      "loreHeading": "Keilerball und der Erntefrieden",
-      "loreOldSow": "Lange bevor die Toten erwachten, spielten Eastbrooks Feldarbeiter nach der Ernte Keilerball auf den Stoppelfeldern: zwei Haufen Leute, eine mit Stroh ausgestopfte Eberhaut und zwei Wagentore, an beide Enden des Angers gezerrt. Der erste Ball, die Alte Sau, hängt in Bronze über dem Kamin der Taverne.",
-      "loreTruce": "Als das Aschene Kolosseum begann, Kriegsspiele auszurichten, antwortete Marschall Redbrook mit etwas Sanfterem: einem ständigen Erntefrieden auf dem alten Anger. Die Wagentore wurden zu Torpfosten, der Anger bekam Wände, Ränge und einen Namen, das Saufeld, und der Preis war immer derselbe verbeulte Milcheimer, aus dem die Sieger tranken: der Kupfereimer.",
-      "howHeading": "So wird gespielt",
-      "howQueue": "Stell dich von überall über das Talpokal-Fenster an, oder sprich mit Platzwart Bram am Tor des Saufelds. Wähle eine Staffel von eins gegen eins bis fünf gegen fünf, eine Bannernation und eine Sportrolle; stell dich allein an oder bring deine Gruppe mit.",
-      "howMatch": "Beim Anstoß werden deine Klassenfähigkeiten gegen eine Sportausrüstung getauscht und danach exakt wiederhergestellt. Kicks zielen auf das Fadenkreuz am Boden, der Ball prallt von der Bande ab, und Dribbeln heißt einfach, mit dem Ball zu laufen. Erziele bis zum Abpfiff mehr Tore als die Gegenseite; ein Unentschieden geht ins Golden Goal.",
-      "howTruce": "Auf dem Saufeld blutet niemand: Tacklings lassen dich nur purzeln, nichts tut weh, und Begleiter setzen das Spiel aus.",
-      "spectateBody": "Im Stadion läuft immer nur ein Spiel, und jeder kann einfach vorbeikommen und von den Rängen aus zusehen.",
-      "bettingHeading": "Ein kleiner Einsatz an der Bande",
-      "bettingBody": "Zuschauer am Saufeld können auf eine Seite setzen, während sich ein Spiel zusammenfindet: Die Einsätze werden zusammengelegt, und beim Schlusspfiff teilen sich die Gewinner den Topf der Verlierer im Verhältnis zu ihrem Einsatz. Ein Unentschieden, oder eine Überraschung, auf die niemand gesetzt hat, erstattet jede Münze zurück. Spieler, die im Spiel sitzen, können nicht darauf wetten, und die Bande führt deine Gesamtbilanz aus Siegen, Niederlagen und Nettomünzen.",
-      "practiceHeading": "Übungsspiele und das leere Feld",
-      "practiceBody": "Das Talpokal-Fenster bietet auch ein Training: eine private Kopie des Platzes, auf der Bots beide Seiten füllen und nichts für deine Bilanz zählt. Fehlt dir für das echte Spiel ein Spieler oder zwei? Nach einer kurzen Wartezeit füllen Bots die Mannschaften auf, und jedes Spiel mit Bots auf dem Platz ist ein Freundschaftsspiel, nie gewertet. Und wenn das Saufeld leer steht, geben die Bots eine Vorführung, die du von den Rängen aus ansehen und beim Wetten begleiten kannst; sobald echte Spieler sich bereit melden, gibt die Vorführung den Platz frei und jeder Einsatz wird zurückerstattet.",
-      "nationsHeading": "Die acht Bannernationen",
-      "nationsBody": "Jedes Team spielt unter einem Banner. Der Kapitän wählt die Nation, und fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
-      "nationVale": "Grün und Gold unter der Weizengarbe: die Heimmannschaft, Feldarbeiter bis ins Mark.",
-      "nationMirefen": "Blaugrün und Grau unter dem Reiher: geduldig, langbeinig, nie in Eile.",
-      "nationThornpeak": "Eisblau und Weiß unter dem Berggipfel: trittsicher und stur.",
-      "nationColiseum": "Rot und Schwarz mit gekreuzten Schwertern: Sie spielen, als wäre es noch immer ein Kriegsspiel.",
-      "nationChoir": "Fahlblau und Silber unter der Glocke: unheimlich, präzise und sehr still.",
-      "nationOgre": "Orange und Umbra hinter der Faust: Schulter voran und stolz darauf.",
-      "nationMoon": "Violett und Silber unter der Mondsichel: Nachtspieler, leicht auf den Beinen.",
-      "nationCopperdig": "Kupfer und Braun mit der Spitzhacke: Schaufler, die nie aufhören zu rennen.",
-      "rolesHeading": "Sportrollen",
-      "rolesBody": "Deine Rolle bestimmt die Ausrüstung, die du auf den Platz trägst. Kicken kann jeder; der Rest ist Temperament. In den Wertungsklassen eins gegen eins und zwei gegen zwei spielen alle das Allrounder-Repertoire, sodass die Rollenwahl erst ab drei gegen drei zur Geltung kommt.",
-      "rewardsHeading": "Friedensregeln",
-      "rewardsBody": "Friedensregeln bedeuten keine Erfahrung und keine Beute: Ein entschiedenes Spiel zählt für deine Bilanz und die Siegertafel, und ein Sieg zählt zudem für die täglichen Belohnungsaufgaben. Wer ein Spiel im Stich lässt, kassiert eine Sperre auf seinem Platz, und der Platzwart vergisst nicht."
     },
     "deedsPage": {
       "intro": "Im Buch der Taten führt die Welt Buch über alles, was du vollbracht hast: von deinen ersten Schritten aus dem Starttal bis zu den härtesten Kämpfen, die das Reich zu bieten hat. Erringe Taten, während du spielst, trage die Titel, die sie verleihen, und sieh zu, wie dein Ansehen wächst.",
@@ -5576,7 +6145,7 @@ export const de_DE: EnTranslations = {
       "deedsHeading": "Taten, die die Reise erinnern",
       "deedsBody": "Das Buch der Taten begleitet jeden Schritt davon. Deine erste Einstimmung verdient Handwerksgeschworen und dein erstes Meisterwerk verdient Meisterwerk-Macher, beides als Titel tragbar. Jeder der acht erwerbbaren Berufe verzeichnet eine Meilenstein-Tat bei 50 Fertigkeit und krönt seine Obergrenze mit einem Großmeister-Titel, während Angeln ab 100 Fertigkeit den Alten Salzfisch und den Meisterangler-Titel ab 200 erhält.\n\nEs gibt auch ruhigere Seiten: Taten für deine erste Ernte und erste Herstellung, für die seltenen Funde, die das Glück im Feld aufdeckt, und für das Aufnehmen von Zerlegen. All das ist kosmetisch, nur Titel und Ansehen. Eine Tat verleiht nie Macht; sie beweist nur, dass du dabei warst.",
       "startHeading": "Wo man anfängt",
-      "startBody": "Frisch von der Straße in Eastbrook angekommen? Such Vorarbeiter Odell und nimm Ein Handwerk für jede Hand an: Er weist dich auf die Erzadern rund um die Kupfergrube südöstlich der Stadt hin und verschafft dir deine ersten Schwielen. Aber Vorsicht bei der Grube selbst: Die Deeprock-Gräber, die dort lagern, stehen ein paar Stufen über einem frischen Ankömmling, arbeite also zuerst die äußeren Adern ab und heb dir das Herz des Lagers auf, bis du ein wenig aufgestiegen bist. Von da an ernte jede Ader, jede Baumgruppe und jede Kräuterpflanze, an der du beim Questen vorbeikommst; Reisenden fällt die Fertigkeit von allein zu.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und arbeitest die gewöhnlichen Rezepte ab, die jeder Charakter von Anfang an kennt. Besuch die Meister an der Schmiede, den Küchen, dem Webstuhl und der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Werkaufträge für stetige Münzen an. Wenn dich der Gildenbrief erreicht, weißt du längst, welches Paar sich wie Zuhause anfühlt.",
+      "startBody": "Frisch von der Straße in Eastbrook angekommen? Such Vorarbeiter Odell und nimm Ein Handwerk für jede Hand an: Er weist dich auf die Erzadern rund um die Kupfergrube nordöstlich der Stadt hin und verschafft dir deine ersten Schwielen. Aber Vorsicht bei der Grube selbst: Die Deeprock-Gräber, die dort lagern, stehen ein paar Stufen über einem frischen Ankömmling, arbeite also zuerst die äußeren Adern ab und heb dir das Herz des Lagers auf, bis du ein wenig aufgestiegen bist. Von da an ernte jede Ader, jede Baumgruppe und jede Kräuterpflanze, an der du beim Questen vorbeikommst; Reisenden fällt die Fertigkeit von allein zu.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und arbeitest die gewöhnlichen Rezepte ab, die jeder Charakter von Anfang an kennt. Besuch die Meister an der Schmiede, den Küchen, dem Webstuhl und der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Werkaufträge für stetige Münzen an. Wenn dich der Gildenbrief erreicht, weißt du längst, welches Paar sich wie Zuhause anfühlt.",
       "colStation": "Station",
       "colHub": "Knotenpunkt",
       "colMaster": "Meister",
@@ -5661,13 +6230,13 @@ export const de_DE: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Leder für die Schnellen",
-          "identityBody": "Die Leiter steigt von den schlichten Fenbridge-Leder-Beinlingen, -Stiefeln und -Gürteln über die ungewöhnliche Marschpirscherwams, -kapuze und -schultern bis zum seltenen Sumpfwächter-Set, dem besten Leder, das ein Handwerker zuschneiden kann. Zwei Zauberwirker-Stücke runden es ab: das Eastbrook-Druiden-Leder-Feld-Allgemeinstück und die Dämmerfell-Wickel bei Fertigkeit 75.\n\nAuf dem Rad sitzt es zwischen Kochen und Schneiderei. Sein lebendes Paar ist der Ausrüster, Lederverarbeitung und Schneiderei, geschworen vor Weberin Ottilie in Eastbrook; das Fallensteller-Paar mit Kochen ist auf dem Rad benannt, hat aber noch keine Eid-Quest.",
+          "identityBody": "Die Leiter steigt von den schlichten Fenbridge-Leder-Beinlingen, -Stiefeln und -Gürteln über die ungewöhnliche Marschpirscherwams, -kapuze und -schultern bis zum seltenen Sumpfwächter-Set, dem besten Leder, das ein Handwerker zuschneiden kann. Zwei Zauberwirker-Stücke runden es ab: das Eastbrook-Druiden-Leder-Feld-Allgemeinstück und die Dämmerfell-Wickel bei Fertigkeit 50.\n\nAuf dem Rad sitzt es zwischen Kochen und Schneiderei. Sein lebendes Paar ist der Ausrüster, Lederverarbeitung und Schneiderei, geschworen vor Weberin Ottilie in Eastbrook; das Fallensteller-Paar mit Kochen ist auf dem Rad benannt, hat aber noch keine Eid-Quest.",
           "materialsHeading": "Die Jagd ist die Ernte",
-          "materialsBody": "Lederverarbeitung ist das Handwerk, bei dem dein Aufstiegsweg und deine Versorgungslinie dasselbe sind: Raues Fell wird direkt von fellführenden Leichen geerntet, vor allem von Wölfen und Ebern, und jede Leiche bedient nur einen Ernter, wer zuerst kommt, mahlt zuerst. Ein seltener oder besserer Erntewurf gewährt außerdem ein Unberührtes Fell, ein signiertes Exemplar, nach dem das Sumpfwächterwams verlangt, also lege jedes zur Bank, das du findest.\n\nDie Nebenrollen sind wenige: Spinnenbeine und Spinnenseide, Selbstgesponnener Stoff von Humanoiden, ein einzelnes Osmiumerz in jedem seltenen Sumpfwächter-Stück (sechs im Abschlussrezept der Dämmerfell-Wickel) und ein Gerbmittel für 16 Kupfer am Tresen der Gerberei. Osmium selbst wird nie beim Händler gekauft: Bau es selbst ab, in Thornpeak oder an den Startadern fast jeder jüngeren Zone (allein die Fernküste gräbt Eisen), oder kaufe es einem anderen Spieler ab.",
+          "materialsBody": "Lederverarbeitung ist das Handwerk, bei dem dein Aufstiegsweg und deine Versorgungslinie dasselbe sind: Raues Fell wird direkt von fellführenden Leichen geerntet, vor allem von Wölfen und Ebern, und jede Leiche bedient nur einen Ernter, wer zuerst kommt, mahlt zuerst. Ein seltener oder besserer Erntewurf gewährt außerdem ein Unberührtes Fell, ein signiertes Exemplar, nach dem das Sumpfwächterwams verlangt, also lege jedes zur Bank, das du findest.\n\nDie Nebenrollen sind wenige: Spinnenbeine und Spinnenseide, Selbstgesponnener Stoff von Humanoiden, ein einzelnes Osmiumerz in jedem seltenen Sumpfwächter-Stück (sechs in den Dämmerfell-Wickeln) und ein Gerbmittel für 16 Kupfer am Tresen der Gerberei. Osmium selbst wird nie beim Händler gekauft: Bau es selbst ab, in Thornpeak oder an den Startadern fast jeder jüngeren Zone (allein die Fernküste gräbt Eisen), oder kaufe es einem anderen Spieler ab.",
           "ladderHeading": "Ausgebildet in Fenbridge",
-          "ladderBody": "Hier ist der Haken: Die Gerberei steht in Fenbridge, an der Straße ins Mirefen-Moor, was Lederverarbeitung zum einzigen Tiefhandwerk macht, das draußen im Moor ausgebildet wird. Gerber Hesk lehrt die Leiter an seinen Bottichen: die Fenbridge-Leder-Sprosse kostenlos bei Fertigkeit 0, die Marschpirscher-Sprosse für 25 Silber pro Rezept ab Fertigkeit 25 und die Sumpfwächter-Sprosse für je 1 Gold ab Fertigkeit 50, wobei sich jede Sprosse öffnet, sobald dein Rang sie erreicht.\n\nDrei Rezepte umgehen den Lehrmeister: Die Feld-Allgemeinstücke (das Gegerbte Lederwams und die Eastbrook-Druidenhaut) lassen sich von Anfang an überall herstellen, und die Dämmerfell-Wickel kennt jeder, doch sie sitzen bei Fertigkeit 75 und sind an die Gerberei gebunden. Beachte, dass der Ausrüster-Eid selbst zurück in Eastbrook bei Ottilie geschworen wird; nur der Unterricht findet im Moor statt.",
+          "ladderBody": "Hier ist der Haken: Die Gerberei steht in Fenbridge, an der Straße ins Mirefen-Moor, was Lederverarbeitung zum einzigen Tiefhandwerk macht, das draußen im Moor ausgebildet wird. Gerber Hesk lehrt die Leiter an seinen Bottichen: die Fenbridge-Leder-Sprosse kostenlos bei Fertigkeit 0, die Marschpirscher-Sprosse für 25 Silber pro Rezept ab Fertigkeit 25 und die Sumpfwächter-Sprosse für je 1 Gold ab Fertigkeit 50, wobei sich jede Sprosse öffnet, sobald dein Rang sie erreicht.\n\nDrei Rezepte umgehen den Lehrmeister: Die Feld-Allgemeinstücke (das Gegerbte Lederwams und die Eastbrook-Druidenhaut) lassen sich von Anfang an überall herstellen, und die Dämmerfell-Wickel kennt jeder bei Fertigkeit 50, an die Gerberei gebunden. Beachte, dass der Ausrüster-Eid selbst zurück in Eastbrook bei Ottilie geschworen wird; nur der Unterricht findet im Moor statt.",
           "routeHeading": "Meisterwerke und ein funktionierender Weg auf 125",
-          "routeBody": "Jedes Stück mit echten Attributen würfelt auf die Meisterwerk-Chance, solange die feinere Qualität in deine Rang-Grenze passt, die attributtragende Eastbrook-Druidenhaut eingeschlossen, und ein signiertes Unberührtes Fell in einem Sumpfwächterwams liefert den Signiert-Reagenz-Bonus automatisch; Osmium zählt für den Proc als Rang-1-Material. Die attributlosen Leder-Allgemeinstücke können nicht proc’en.\n\nSteigere es auf natürlichem Weg: Ernte ab Stufe eins jeden Wolf und jeden Eber, den du erlegst, lass dich von den beiden Feld-Allgemeinstücken bis 25 tragen, wo immer du gerade stehst, und lerne dann die Leder-Sprosse an den Bottichen, wenn dich die Quests ohnehin ins Moor ziehen. Marschpirscher trägt dich auf 50 und Sumpfwächter auf 75; danach zahlen die Dämmerfell-Wickel, ein Rang-3-Rezept aus sechs Osmiumerz, drei Unberührten Fellen, zwei Rauen Fellen und einem Gerbmittel, einem abgestimmten Ausrüster vollen Gewinn bis 99 und danach die Hälfte, rund 75 Herstellungen für die letzten fünfzig Punkte bis zur Obergrenze von 125; unterhalb der Grenze eines Hauptberufs lehrt das Rang-3-Rezept nichts.\n\nDie mobile Gerberei zählt für dieses Handwerk mehr als für jedes andere: Spezialisiere dich bei 75, und eine Satteltasche voller Felle wird am Lagerfeuer zu fertiger Ausrüstung statt zu einem Rückweg nach Fenbridge. Hesks Gerberei-Arbeitsauftrag kauft alle 30 Minuten acht Raue Felle, ein hübscher Ertrag für Häute, die du ohnehin gesammelt hast, und das Buch der Taten markiert Das Gerberhandwerk bei Fertigkeit 50, mit Großmeister-Lederverarbeitung an der Obergrenze."
+          "routeBody": "Jedes Stück mit echten Attributen würfelt auf die Meisterwerk-Chance, solange die feinere Qualität in deine Rang-Grenze passt, die attributtragende Eastbrook-Druidenhaut eingeschlossen, und ein signiertes Unberührtes Fell in einem Sumpfwächterwams liefert den Signiert-Reagenz-Bonus automatisch; Osmium zählt für den Proc als Rang-1-Material. Die attributlosen Leder-Allgemeinstücke können nicht proc'en.\n\nSteigere es auf natürlichem Weg: Ernte ab Stufe eins jeden Wolf und jeden Eber, den du erlegst, lass dich von den beiden Feld-Allgemeinstücken bis 25 tragen, wo immer du gerade stehst, und lerne dann die Leder-Sprosse an den Bottichen, wenn dich die Quests ohnehin ins Moor ziehen. Marschpirscher trägt dich auf 50, und die Sumpfwächter-Stücke sowie die Dämmerfell-Wickel tragen die seltene Stufe von 50 auf 75. Nach 75 fällt der Gewinn dieser Rang-2-Rezepte erst auf die Hälfte und dann auf ein Viertel, rund 150 Herstellungen für die letzten fünfzig Punkte bis zur Obergrenze von 125; unterhalb der Grenze eines Hauptberufs erreichen sie immer noch die Herstellungsgrenze für seltene Qualität, statt hart auf null zu fallen.\n\nDie mobile Gerberei zählt für dieses Handwerk mehr als für jedes andere: Spezialisiere dich bei 75, und eine Satteltasche voller Felle wird am Lagerfeuer zu fertiger Ausrüstung statt zu einem Rückweg nach Fenbridge. Hesks Gerberei-Arbeitsauftrag kauft alle 30 Minuten acht Raue Felle, ein hübscher Ertrag für Häute, die du ohnehin gesammelt hast, und das Buch der Taten markiert Das Gerberhandwerk bei Fertigkeit 50, mit Großmeister-Lederverarbeitung an der Obergrenze."
         },
         "cooking": {
           "identityHeading": "Der Topf, der die Gruppe ernährt",
@@ -5867,7 +6436,7 @@ export const de_DE: EnTranslations = {
         "q5": "Wie entbinde ich eine Auftragsarbeit und was kostet es?",
         "a5": "Gehe zu einer Handwerksstation mit dem Stück in deinen Beuteln und bezahle den Meister. Die Gebühr richtet sich nach der Qualität des Gegenstands: 25 Silber für ein ungewöhnliches Stück, 1 Gold für ein seltenes, 4 Gold für ein episches; ein legendäres zahlt den Episch-Tarif, und ein beauftragtes gewöhnliches Stück den Ungewöhnlich-Tarif. Es muss eine echte Station sein: eine mobile Station bietet diesen Dienst nie.\n\nDie Gebühr kauft eine saubere Weste, keine Heilung: Das Stück bleibt eine Auftragsarbeit, also bindet es sich beim nächsten Handel erneut an denjenigen, der es erhält. Wenn mehrere gebundene Kopien einen Stapel teilen, wird eine Kopie abgelöst und pro Zahlung entbunden.",
         "q6": "Wo lerne ich Rezepte und was kosten sie?",
-        "a6": "Die neun gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte kennt jeder von Anfang an, ebenso drei stationsgebundene Abschlussrezepte (den Brennschuppenmantel, die Banngewebe-Gugel und die Dämmerfell-Wickel), die keinen Ausbilder brauchen, nur ihre Station. Alles andere lehren die ansässigen Meister an ihren Stationen in den drei größeren Städten: Die meisten stehen in Eastbrook, der Gerber führt die Gerberei in Fenbridge, und der Alchemist führt die Apotheke in Highwatch.\n\nAusbilderrezepte laufen in Sprossen: Fertigkeit 0, 25 und 50 für die Ausrüstungs- und Verbrauchsgüterberufe, als einmalige Gebühren kostenlos, 25 Silber und 1 Gold; die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, und der Werkzeugmacher lehrt die beiden herstellbaren Angelruten bei 75 und 125 für 4 und 16 Gold. Ein Meister lehrt ein Rezept, sobald deine Stufe in diesem Handwerk die Stufe des Rezepts erreicht hat, und du musst zum Lernen an seiner Station stehen: Eine mobile Station zählt nicht.",
+        "a6": "Die neun gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte kennt jeder von Anfang an, ebenso drei stationsgebundene Rezepte (den Brennschuppenmantel, die Banngewebe-Gugel und die Dämmerfell-Wickel), die keinen Ausbilder brauchen, nur ihre Station. Alles andere lehren die ansässigen Meister an ihren Stationen in den drei größeren Städten: Die meisten stehen in Eastbrook, der Gerber führt die Gerberei in Fenbridge, und der Alchemist führt die Apotheke in Highwatch.\n\nAusbilderrezepte laufen in Sprossen: Fertigkeit 0, 25 und 50 für die Ausrüstungs- und Verbrauchsgüterberufe, als einmalige Gebühren kostenlos, 25 Silber und 1 Gold; die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, und der Werkzeugmacher lehrt die beiden herstellbaren Angelruten bei 75 und 125 für 4 und 16 Gold. Ein Meister lehrt ein Rezept, sobald deine Stufe in diesem Handwerk die Stufe des Rezepts erreicht hat, und du musst zum Lernen an seiner Station stehen: Eine mobile Station zählt nicht.",
         "q7": "Warum hat sich mein Sammeln plötzlich verlangsamt?",
         "a7": "Der Sammelvorgang beginnt bei 2,5 Sekunden und wird auf zwei Wegen gekürzt: um 0,4 Sekunden für jede Werkzeugstufe, die du über der Stufe des Knotens mitführst und auch führen darfst, und um 0,15 Sekunden, sobald der Zähler deines Berufs seine 100er-Stufe überschreitet, bei einem Minimum von 1,5 Sekunden. Wechselst du von Knoten der Stufe 1 hinauf zu Knoten der Stufe 3, verschwindet dein Überschuss, und dieselbe Spitzhacke schwingt wieder langsamer. Genau die geforderte Stufe zu halten kauft kein Tempo; sie öffnet nur den Knoten.\n\nDer Fertigkeitszuwachs verblasst genauso wie beim Herstellen: Ein Knoten wird grau, während deine Fertigkeit über seine Stufe hinaussteigt (Knoten der Stufe 1 lehren ab Fertigkeit 75 nichts mehr), die Antwort auf langsamen Zuwachs sind also Knoten höherer Stufe. Die verlangen ein Werkzeug mindestens ihrer eigenen Stufe in deinen Taschen (kein Knoten wird je mit bloßen Händen bearbeitet, Stufe 1 eingeschlossen), und ein Landwerkzeug über Stufe 1 will zuerst seine Führungsmarke, 40/70/85/100 im eigenen Beruf für die Stufen 2 bis 5. Angeln folgt seiner eigenen Verjüngung: voller Zuwachs unter Fertigkeit 50, die Hälfte unter 100, ein Rinnsal von 0,1 unter 150 und 0,02 unter 200, Plunderfänge lehren ab 100 überhaupt nichts mehr, und das Gewässer selbst deckelt die Lektion (Gewässer der Stufe 1 hören bei 100 auf zu lehren, das Moor bei 150), ein stockender Zähler kann also auch bedeuten, dass du dem Gewässer entwachsen bist.",
         "q8": "Kann ich außerhalb der Stadt herstellen?",
@@ -5892,6 +6461,7 @@ export const de_DE: EnTranslations = {
       "bankBody": "Jede größere Stadt beherbergt eine Filiale der Vergoldeten Schatulle, des Bankhauses des Reichs. Sprich dort mit dem Kämmerer, um deinen Tresor zu eröffnen: einen privaten Stauraum jenseits deiner Taschen, der deinem Charakter ein Leben lang erhalten bleibt. Was du dort zurücklässt, wartet sicher auf dich, welche Filiale du auch als Nächstes besuchst.",
       "bankHow": "Ist der Tresor geöffnet, klicke einen Gegenstand in deinen Taschen an, um ihn einzulagern, und klicke ihn im Tresor an, um ihn zurückzuholen. Der Tresor fasst nur Waren, niemals Münzen, und Questgegenstände bleiben bei dir. Wenn deine Taschen unterwegs überquellen, fegt ein einziger Knopf alle deine Handwerksmaterialien auf einmal hinein.",
       "bankSlots": "Ein frischer Tresor beginnt klein und wächst mit dir. Der Kämmerer verkauft weitere Fächer für Münzen zu immer steileren Preisen, und Online-Spielen bringt obendrein Bonusfächer ein, etwa für eine bestätigte E-Mail-Adresse, verknüpfte Konten und Freunde, die du ins Spiel holst.",
+      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
       "buyingTitle": "Kaufen und Verkaufen",
       "buyingBody": "Sprich mit einem Händler und wähle, seine Waren durchzusehen, und sein Laden öffnet sich mit drei Reitern: Kaufen, Verkaufen und Rückkauf. Kaufen enthält alles, was er führt, deins, sofern du es dir leisten kannst. Verkaufen listet auf, was aus deinen Taschen er dir abkauft, und ein Stück mit eigener gewürfelter Güte zu verkaufen verlangt zuerst eine Bestätigung, sodass ein wertvolles Exemplar nie versehentlich verloren geht. Trennst du dich von etwas, das du bereust, hebt der Reiter Rückkauf deine jüngsten Verkäufe auf, sodass du sie für die Münzen zurückkaufen kannst, die du erhalten hast.",
       "junkTitle": "Plunder loswerden",
@@ -6928,6 +7498,7 @@ export const de_DE: EnTranslations = {
       "title": "Solana-Wallet verbinden",
       "linkBody": "Wähle eine Wallet-Erweiterung in diesem Browser. Du wirst eine Verifizierungsnachricht unterschreiben und dann zur Desktop-App zurückkehren.",
       "paymentBody": "Wähle die mit deinem Konto verknüpfte Wallet und genehmige die Transaktion in diesem Browser.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Es wurde keine kompatible Wallet-Erweiterung gefunden. Installiere oder entsperre Phantom, Solflare oder eine andere Solana-Browser-Wallet und versuche es erneut.",
       "safety": "World of ClaudeCraft fragt niemals nach deiner Wiederherstellungsphrase oder deinem privaten Schlüssel.",
       "continueWith": "Weiter mit {wallet}",
@@ -7118,6 +7689,7 @@ export const de_DE: EnTranslations = {
       "portalOpens": "Ein Riss vom Rang {tier} reißt in {zone} auf!",
       "portalSealed": "Der Riss vom Rang {tier} in {zone} wurde versiegelt.",
       "portalCollapses": "Der Riss vom Rang {tier} in {zone} bricht zusammen.",
+      "lootRecoveryNotice": "Der Zugang zum Riss bleibt noch eine Weile offen: Fällt deine Gruppe, kannst du trotzdem zurückgehen, um dir zu holen, was du dir verdient hast.",
       "levelGate": "Nur Abenteurer der Stufe {level} oder höher dürfen diesen Riss betreten.",
       "deadEntry": "Du kannst keinen Riss betreten, während du tot bist.",
       "deadEntryCombat": "Deine Gruppe befindet sich noch im Kampf. Die Toten können erneut eintreten, sobald der Kampf endet.",
@@ -7856,6 +8428,9 @@ export const de_DE: EnTranslations = {
       "reload": "Neu laden",
       "quit": "Beenden",
       "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
+    },
+    "titlebar": {
+      "exitGame": "Spiel beenden"
     }
   },
   "gpuNotice": {
@@ -8793,6 +9368,7 @@ export const de_DE: EnTranslations = {
       "offGlobalCooldown": "Außerhalb der globalen Abklingzeit",
       "friendlyTarget": "Freundliches Ziel",
       "enemyTarget": "Feindliches Ziel",
+      "anyTarget": "Feindliches oder freundliches Ziel",
       "selfOnly": "Nur auf Euch selbst",
       "damageRange": "{min} bis {max}",
       "finisherDamage": "{base} plus {perCombo} pro Combopunkt"
@@ -9008,7 +9584,8 @@ export const de_DE: EnTranslations = {
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
       "clickBuyback": "Zum Rückkaufen klicken",
-      "bagSlots": "Tasche mit {slots} Plätzen"
+      "bagSlots": "Tasche mit {slots} Plätzen",
+      "bagSlotsMaterials": "Materialtasche mit {slots} Plätzen"
     },
     "bags": {
       "title": "Taschen",
@@ -9405,7 +9982,7 @@ export const de_DE: EnTranslations = {
       },
       "ignition": {
         "name": "Entzündung",
-        "description": "Passiv: Kritische Treffer Eurer Zauber verbrennen das Ziel und verursachen im Verlauf von 6 Sek. 40% des verursachten Schadens; stapelbar. (Feuermeisterschaft)"
+        "description": "Passiv: Kritische Treffer Eurer Zauber verbrennen das Ziel und verursachen im Verlauf von 6 Sek. 30% des verursachten Schadens; stapelbar. (Feuermeisterschaft)"
       },
       "mass_barrier": {
         "name": "Massenbarriere",
@@ -9575,11 +10152,19 @@ export const de_DE: EnTranslations = {
       },
       "sap": {
         "name": "Kopfnuss",
-        "description": "Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt."
+        "description": "Macht das Ziel 8 Sek. lang handlungsunfähig, ohne Duskveil zu brechen oder einen Kampf auszulösen. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt."
       },
       "crippling_poison": {
         "name": "Bleiernes Gift",
         "description": "Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verlangsamt sein Bewegungstempo 12 Sek. lang um 50%."
+      },
+      "melting_acid": {
+        "name": "Schmelzende Säure",
+        "description": "Bespritzt das Ziel mit einem ätzenden Gift, das {damage} Naturschaden verursacht und seine Rüstung 12 Sek. lang um 5 % verringert."
+      },
+      "nightshade_coating": {
+        "name": "Nachtschattenbeschichtung",
+        "description": "Hüllt das Ziel in Nachtschatten, verursacht {damage} Naturschaden und verringert die erhaltene Heilung 12 Sek. lang um 25 %."
       },
       "expose_armor": {
         "name": "Rüstungsbruch",
@@ -9839,7 +10424,7 @@ export const de_DE: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gestalt des Renners",
-        "description": "Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%."
+        "description": "Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%. Solange aktiv, macht euch erlittener Schaden benommen, wodurch sich euer Bewegungstempo 4 Sek. lang um 50% verringert (jeder Treffer erneuert die Benommenheit)."
       },
       "aimed_shot": {
         "name": "Langer Zug",
@@ -10003,7 +10588,7 @@ export const de_DE: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Belegt den Gegner 8 Sek. lang mit einem Hex. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 16 Schattenschaden."
+        "description": "Belegt den Gegner 8 Sek. lang mit einem Hex. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 17 Schattenschaden."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10209,7 +10794,7 @@ export const de_DE: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Kriegsgeistkadenz",
-        "description": "Passiv: Jeder 3. gelandete Waffenangriff löst 2 Sturmherzechos für 50% Naturschaden aus und gewährt 12 Sek. lang ein Sturmzeichen. Das Sturmzeichen macht Euren nächsten Lichtbogenblitz, Erdstoß oder Eure nächsten Heilenden Wasser sofort wirkbar und senkt deren Manakosten um 50%. Der Ahnenschlag zählt als 2 Angriffe. (Kriegsgeist)"
+        "description": "Passiv: Dual-wield-Angriffe haben keine zusätzliche Fehlchance. Jeder 3. gelandete Waffenangriff löst 2 Sturmherzechos für 25% Naturschaden aus und gewährt 12 Sek. lang ein Sturmzeichen. Das Sturmzeichen macht Euren nächsten Lichtbogenblitz, Erdstoß oder Eure nächsten Heilenden Wasser sofort wirkbar und senkt deren Manakosten um 50%. Der Ahnenschlag zählt als 2 Angriffe. (Kriegsgeist)"
       },
       "stormsurge": {
         "name": "Sturmflut",
@@ -10421,7 +11006,7 @@ export const de_DE: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Pyre Colossus beschwören",
-        "description": "Ruft einen Pyre Colossus im Zielbereich herab, der beim Aufprall 58-72 Feuerschaden verursacht. Er kämpft 30 Sek. lang, ohne Euren Dämon zu ersetzen, verbrennt alle 2 Sek. Gegner in der Nähe und erzeugt jede Sekunde 1 Ruin."
+        "description": "Ruft einen Pyre Colossus im Zielbereich herab, der beim Aufprall 64-79 Feuerschaden verursacht. Er kämpft 30 Sek. lang, ohne Euren Dämon zu ersetzen, verbrennt alle 2 Sek. Gegner in der Nähe und erzeugt jede Sekunde 1 Ruin."
       },
       "summon_doomguard": {
         "name": "Wraithborn beschwören",
@@ -10769,7 +11354,7 @@ export const de_DE: EnTranslations = {
       },
       "shadowstep": {
         "name": "Schattengleiten",
-        "description": "Tretet durch die Schatten auf Euer Ziel zu. (Schurkentalent)"
+        "description": "Tretet durch die Schatten auf Euer Ziel zu, Freund oder Feind, ohne Duskveil zu brechen. (Schurkentalent)"
       },
       "silence": {
         "name": "Stille",
@@ -12425,8 +13010,47 @@ export const de_DE: EnTranslations = {
       "pristine_claw": {
         "name": "Unberührte Klaue"
       },
+      "ps_castaway_crate": {
+        "name": "Strandkiste"
+      },
+      "ps_ferry_bell": {
+        "name": "Fährglocke"
+      },
       "dawnhold_posy": {
         "name": "Gartensträußchen von Dawnhold"
+      },
+      "wayfarers_backpack": {
+        "name": "Wayfarer's Backpack"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Burlap Reagent Pouch"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Necromancer's Reagent Satchel"
+      },
+      "duskweave_bag": {
+        "name": "Duskweave Bag"
+      },
+      "resonant_weave_bag": {
+        "name": "Resonantweave Bag"
+      },
+      "foragers_haversack": {
+        "name": "Forager's Haversack"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Loombound Reagent Satchel"
+      },
+      "ps_briny_lure": {
+        "name": "Salzköder"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Glänzende Perle"
+      },
+      "mother_of_pearl": {
+        "name": "Perlmutt"
+      },
+      "ps_passing_stone": {
+        "name": "Übergangsstein"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -13468,9 +14092,6 @@ export const de_DE: EnTranslations = {
       "tolling_bell": {
         "name": "Läutende Glocke"
       },
-      "vale_cup_ball": {
-        "name": "Keilerball"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, der Erwachende Gipfel"
       },
@@ -13768,6 +14389,15 @@ export const de_DE: EnTranslations = {
       "fisher_bram": {
         "name": "Fischer Bram"
       },
+      "training_effigy": {
+        "name": "Übungspuppe"
+      },
+      "shore_scuttler": {
+        "name": "Strandkrabbler"
+      },
+      "mister_crabs": {
+        "name": "Herr Krabbe"
+      },
       "rift_hellguard": {
         "name": "Höllenwächter"
       },
@@ -13926,7 +14556,7 @@ export const de_DE: EnTranslations = {
       "apothecary_lin": {
         "name": "Apothekerin Lin",
         "title": "Kräuterkundige",
-        "greeting": "Pass im östlichen Wald auf, wohin du trittst, Freund."
+        "greeting": "Pass im nordöstlichen Wald auf, wohin du trittst, Freund."
       },
       "brother_aldric": {
         "name": "Bruder Aldric",
@@ -14067,11 +14697,6 @@ export const de_DE: EnTranslations = {
         "name": "Der Bleiche Hüter",
         "title": "Wächter der Toten",
         "greeting": "Ruhe nun, Geist. Ich kann dich in deinen Körper zurückbringen, doch die Rückkehr lässt dich geschwächt zurück."
-      },
-      "groundskeeper_bram": {
-        "name": "Platzwart Bram",
-        "title": "Hüter des Saufelds",
-        "greeting": "Auf dem Saufeld gilt der Erntefrieden, {className}: nur Kicks und Rempler. Lust auf ein Spiel um den Kupfereimer?"
       },
       "chronicler_saul": {
         "name": "Saul der Chronist",
@@ -14358,6 +14983,51 @@ export const de_DE: EnTranslations = {
         "title": "Meister der Apotheke",
         "greeting": "Zweimal messen, einmal gießen, {className}. In der Apotheke hat niemand Geduld mit verschütteten Reagenzien."
       },
+      "wayfarer_bryn": {
+        "name": "Wanderin Bryn",
+        "title": "Hafenführerin",
+        "greeting": "Eastbrook nimmt jeden auf, Freund. Und für die Unsicheren gibt es immer die Bewährungsküste: Die Fährglocke am Briefkasten der Rabenpost läutet dich das ganze Jahr über hinüber, und ihr Zwilling auf der Insel läutet dich wieder heim."
+      },
+      "instructor_maren": {
+        "name": "Ausbilderin Maren",
+        "title": "Meisterin der Bewährung",
+        "greeting": "Jeder Held, dem das Tal je gedankt hat, stand einmal genau da, wo du jetzt stehst, {className}, und keiner von ihnen wusste, an welchem Ende man eine Klinge hält. Dafür ist diese Küste da. Frag, übe und scheitere dort, wo Scheitern nichts kostet."
+      },
+      "quartermaster_finch": {
+        "name": "Quartiermeisterin Finch",
+        "title": "Lagerausrüsterin",
+        "greeting": "Mein Tresen führt genau eine Ware, {playerName}: einen Ersatzbeutel für das, was du unterwegs aufliest, wenn deine Lektion danach verlangt. Alles andere hier ist Bergegut, bestimmt fürs Tal. Münze kauft den Beutel, und Arbeit bringt die Münze. Das ist die ganze Wirtschaft, und sie wird nie komplizierter. Nur größer."
+      },
+      "ferryman_odo": {
+        "name": "Fährmann Odo",
+        "title": "Hüter der Überfahrt",
+        "greeting": "Frisch von der Überfahrt, {playerName}? Wärter Tam hält den Spießrutenlauf am Strand gleich südlich meines Stegs bereit: Lauf zuerst seine Gassen, und deine Beine werden es dir danken. Jeder Hüter an dieser Küste reicht dich an den nächsten weiter, sobald dein Werk getan ist, und die Anzeige oben auf deinem Bildschirm kennt immer den Weg. Ruft dich das Tal zurück, läute die Glocke neben meinem Steg, und die Überfahrt setzt dich in der Stadt Eastbrook ab."
+      },
+      "bursar_wick": {
+        "name": "Kämmerer Wick",
+        "title": "Die Vergoldete Schatulle",
+        "greeting": "Selbst hier hat die Vergoldete Schatulle einen Schreibtisch, {playerName}. Was du bei mir hinterlegst, wartet im selben Tresor wie hinter jedem Kämmerer in jeder Stadt, sicher vor Wölfen, Wasser und deinem eigenen schlechteren Urteilsvermögen."
+      },
+      "warden_tam": {
+        "name": "Wärter Tam",
+        "title": "Hüter des Spießrutenlaufs",
+        "greeting": "Diese Gassen sind der Spießrutenlauf, {playerName}, und jeder Abenteurer, den das Tal achtet, ist sie gelaufen. Die Laternenpfosten bleiben die ganze Nacht erleuchtet, die Gassen schließen also nie."
+      },
+      "overseer_pell": {
+        "name": "Aufseher Pell",
+        "title": "Aufseher des Spießrutenlaufs",
+        "greeting": "Ich stoppe jeden Lauf, der diese Gassen entlangkommt, {playerName}, und ich habe schon weit schlechtere Beinarbeit gesehen. Der Pfad hinter mir steigt zum Übungsplatz hinauf: Dort wird aus Beinarbeit Schwertarbeit."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmeister Rook",
+        "title": "Meister des Übungsplatzes",
+        "greeting": "Erst Stroh, dann Schalen, {playerName}. Eine Übungspuppe bringt deinem Arm den Schwung bei; die Krabbler unten am Strand bringen ihm bei, auf etwas zu treffen, das sich auch wehrt."
+      },
+      "tidewarden_nel": {
+        "name": "Gezeitenwärterin Nel",
+        "title": "Hüterin des Strands",
+        "greeting": "Die Flut nimmt, und die Flut zahlt, {playerName}. Ich führe die Rechnung über beides: was die Krabbler von den Wracks zwicken, und was ehrliche Hände diesen Pfad wieder heraufbringen."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gezeitenwächter",
@@ -14367,7 +15037,7 @@ export const de_DE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ein Handwerk für jede Hand",
-        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südöstlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
+        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe nordöstlich der Stadt, vorbei an den Wolfsläufen, gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
         "completion": "Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.",
         "objectives": {
           "0": {
@@ -14397,7 +15067,7 @@ export const de_DE: EnTranslations = {
       },
       "q_boars": {
         "title": "Borstige Eberhäute",
-        "text": "Eberhäute ergeben beste Reisetaschen, und die Wiesen wimmeln von ihnen. Bring mir 5 borstige Häute.",
+        "text": "Eberhäute ergeben beste Reisetaschen, und die Wiesen nordwestlich der Stadt wimmeln von ihnen. Bring mir 5 borstige Häute.",
         "completion": "Ah, feine borstige Häute. Dafür bekomme ich einen guten Preis.",
         "objectives": {
           "0": {
@@ -14407,7 +15077,7 @@ export const de_DE: EnTranslations = {
       },
       "q_spiders": {
         "title": "Bedrohung aus Sableweb",
-        "text": "Die Lauerer in den östlichen Wäldern spinnen eine Seide, die ich für meine Umschläge brauche, und sie sind überdies viel zu zahlreich geworden. Töte 6 Sableweb-Lauerer und schneide 4 Seidendrüsen aus ihren Bäuchen.",
+        "text": "Die Lauerer in den nordöstlichen Wäldern spinnen eine Seide, die ich für meine Umschläge brauche, und sie sind überdies viel zu zahlreich geworden. Töte 6 Sableweb-Lauerer und schneide 4 Seidendrüsen aus ihren Bäuchen.",
         "completion": "Igitt, sie zucken noch. Perfekt. Das hast du dir verdient.",
         "objectives": {
           "0": {
@@ -14450,7 +15120,7 @@ export const de_DE: EnTranslations = {
       },
       "q_supplies": {
         "title": "Gestohlene Vorräte",
-        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Südwesten zurück.",
+        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Nordwesten zurück.",
         "completion": "Meine Kisten! Kaum ein Kratzer. Du bist ein Wunder.",
         "objectives": {
           "0": {
@@ -14543,7 +15213,7 @@ export const de_DE: EnTranslations = {
       },
       "q_bandits": {
         "title": "Banditen des Tals",
-        "text": "Eine Rotte Halsabschneider lagert in den südwestlichen Hügeln. Drei Wagen wurden diese Woche beraubt. Töte 10 Talbanditen.",
+        "text": "Eine Rotte Halsabschneider lagert in den nordwestlichen Hügeln. Drei Wagen wurden diese Woche beraubt. Töte 10 Talbanditen.",
         "completion": "Zehn Klingen weniger in der Dunkelheit. Nimm das, du hast es verdient.",
         "objectives": {
           "0": {
@@ -15223,7 +15893,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fäden wiederverknüpft",
-        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den östlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
+        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den nordöstlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
         "completion": "Wieder stabil. Lederverarbeitung und Schneiderei kehren als Hauptberufe in deine Hände zurück. Miss zweimal ab, bevor du das nächste Mal wanderst.",
         "objectives": {
           "0": {
@@ -15233,7 +15903,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Zurück am Herd",
-        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der westlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
+        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der nordwestlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
         "completion": "Da ist der alte Geschmack. Alchemie und Kochen sind wieder als Hauptberufe auf deinem Herd. Bleib diesmal eine Weile.",
         "objectives": {
           "0": {
@@ -16324,6 +16994,109 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Den Spießrutenlauf laufen",
+        "text": "Jedes Beinpaar, das das Tal achtet, ist zuerst diese Gassen gelaufen, {playerName}. Lauf die erste Gasse westlich zu ihrer Flagge, schwenk herum, lauf die südliche Gasse zur zweiten, dann seitwärts durch die letzte Gasse zur roten Flagge. Passiere die Flaggen der Reihe nach, und die Anzeige oben auf deinem Bildschirm zeigt dir dabei jeden Knopf. Aufseher Pell stoppt jeden Lauf vom fernen Ende aus: Ist die rote Flagge hinter dir, steht er genau dort, um es aufzunehmen.",
+        "completion": "Ich habe diesen Lauf gestoppt, {playerName}, und ich habe schon schnellere Füße durchfallen lassen. Der Spießrutenlauf gehört dir. Der Pfad hinter mir steigt zum Übungsplatz hinauf, wo Drillmeister Rook aus Beinarbeit Schwertarbeit macht: Er hat deine nächste Aufgabe.",
+        "objectives": {
+          "0": {
+            "label": "Flagge des Spießrutenlaufs passiert"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Treffsicher zuschlagen",
+        "text": "Erst die Beinarbeit, jetzt der Arm, {playerName}. Der Übungsplatz liegt den Pfad hinter mir hinauf, und seine Strohpuppen wurden gebaut, um getroffen zu werden. Verlierst du den Weg, drücke M, um die Karte zu öffnen: Jede Aufgabe, die du trägst, ist darauf markiert. Geh zu einer Übungspuppe und klicke sie mit der linken Maustaste an: Das macht sie zu deinem Ziel, und ihr Name erscheint am oberen Bildschirmrand. Erst dann drückst du 1, oder klickst das erste Symbol auf der Aktionsleiste am unteren Rand an, um zuzuschlagen. Schlag weiter zu, bis eine nachgibt; sie schlägt nicht zurück, Übungspuppen tun das nie. Drillmeister Rook beobachtet den Platz von seiner Westseite aus, wo der Strandpfad beginnt: Drücke F auf ihm, um den Fall zu melden.",
+        "completion": "Ein sauberer Fall, und dein Griff schon sicherer. Merk dir das Gefühl, {playerName}: Ziel wählen, zuschlagen und weiter zuschlagen. Stroh kümmert sich nie. Das Nächste, worauf du einschlägst, wird es tun.",
+        "objectives": {
+          "0": {
+            "label": "Übungspuppe gefällt"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Die Klinge schärfen",
+        "text": "Ein Hieb ist ein Hieb, {playerName}, und Stroh steckt das den ganzen Tag weg. Das gewinnt dir gar nichts. Sieh dir die Reihe der Knöpfe am unteren Bildschirmrand an: Diese Reihe ist dein Handwerk, und jeder Einzelne davon tut etwas, das dein Arm allein nicht kann. Einen hast du bereits. Geh zurück zu den Übungspuppen und setz ihn ein: Wähle dein Ziel, dann drücke dreimal den Knopf, den der Übungsplatz dir markiert. Hack nicht einfach nur auf das Stroh ein; lass das, was du kannst, wirklich geschehen. Dann komm zu mir zurück.",
+        "completion": "Jetzt kämpfst du, statt nur wild draufloszuschlagen. Diese Reihe wächst mit jeder Stufe, die du erreichst, {playerName}, und wer am längsten lebt, ist, wer sie zu lesen weiß. Stroh ist es egal, welchen Knopf du benutzt hast. Dem Tal nicht.",
+        "objectives": {
+          "0": {
+            "label": "Fähigkeit auf einer Übungspuppe gelandet"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Schale und Klaue",
+        "text": "Stroh kümmert sich nie, {playerName}, hier ist also etwas, das es tut. Strandkrabbler durchwühlen die Wracklinie am fernen Strand: Folge dem Pfad westlich von meinem Platz, und er führt dich geradewegs zu ihnen. Sie kneifen zurück, behalte also deine Gesundheitsanzeige im Blick und schlag weiter zu: Klicke einen mit der linken Maustaste an, um ihn zum Ziel zu machen, setz dann die Fähigkeit ein, die dir der Platz beigebracht hat (der Ausbilder nennt dir deinen Knopf), und hör nicht auf, bis seine Schale knackt. Drei reichen. Klettere dann den Pfad zur nördlichen Anhöhe hinauf: Gezeitenwärterin Nel führt die Strandzählung, und sie zählt deine Schalen.",
+        "completion": "Drei Schalen geknackt und alle Finger behalten: ein anständiger erster Kampf, {playerName}. Die Krabbler zwicken schneller von den Wracks ab, als die Flut Bergegut heranträgt, jeder, den du erlegst, ist also Münze, die jemand behält.",
+        "objectives": {
+          "0": {
+            "label": "Strandkrabbler erlegt"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Perlmutt",
+        "text": "Drei Schalen geknackt, {playerName}, aber die Wracklinie birgt einen König, und der sitzt auf einem Schatz, der mehr wert ist als jede Kiste an diesem Strand. Bring diesen Salzköder zum Gezeitentümpel am äußersten Westende des Strands, hinter den Wracks. Stell dich an den Wasserrand, drücke B, um deine Taschen zu öffnen, und klicke den Köder mit der linken Maustaste an, um ihn zu wecken. Herr Krabbe kneift weit härter zu als seine kleinen Vettern, behalte also deine Gesundheitsanzeige im Blick, schlag weiter zu und weiche in den Sand zurück, wenn du Luft brauchst. Fällt er, geh direkt zu seiner Schale und drücke F, um ihm die Glänzende Perle abzunehmen. Bring mir diese Perle zurück.",
+        "completion": "Die Glänzende Perle, gelöst vom alten König der Untiefen persönlich. Mein Vater zog vor dieser Krabbe jeden Morgen seines Arbeitslebens den Hut; ein bisschen Respekt ist geschuldet. Halt still... so. Gefasst, fertig und dein, {playerName}: das Perlmutt. Drücke B, um deine Taschen zu öffnen, und klicke den Ring mit der linken Maustaste an, um ihn überzustreifen, dann drücke C, um dein Charakterblatt zu öffnen und ihn an deiner Hand zu sehen. Eine kleine Sache, aber du bist in jeder Hinsicht besser dran, wenn du ihn trägst.",
+        "objectives": {
+          "0": {
+            "label": "Herrn Krabbe erlegt"
+          },
+          "1": {
+            "label": "Glänzende Perle erhalten"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "Die Wracklinie",
+        "text": "Meine Träger schleppen Bergegut von den alten Wracks und tragen es die Anhöhe hinauf zum Morgenrast-Lager, {playerName}, und die Hälfte der Kisten schafft den Aufstieg nie: Sie werden am Pfad abgesetzt und vergessen. Folg meinem Pfad zum Lager, und du kommst genau an den Nachzüglern vorbei. Eine zu öffnen ist einfach: Geh zu einer Kiste, bis ihr Name erscheint, dann drücke F, oder klicke die Kiste selbst mit der linken Maustaste an, und sie gibt heraus, was sie birgt. Sechs davon räumen die Linie, und denk daran: F ist dieselbe Taste für jede Truhe, jeden Knoten und jede Tür, der du je begegnen wirst. Quartiermeisterin Finch führt den Lagerstand und kauft jedes Stück Bergegut: Übergib ihr den Fund.",
+        "completion": "Seil, Teer und ein halber Käselaib, den das Meer irgendwie verschont hat: Ich nehme alles, {playerName}. Ein Rücken, der trägt, was er findet, ist diesem Lager mehr wert als jede Klinge, und deiner hat gerade die ganze Linie in einem Durchgang geräumt.",
+        "objectives": {
+          "0": {
+            "label": "Strandkiste geöffnet"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Beutel und Börse",
+        "text": "Noch eine Lektion vor dem Tal, {playerName}, und es ist die, die Abenteurer am Leben hält: was du bei dir trägst. Dein Rucksack fasst sechzehn Plätze, und daneben warten vier leere Taschenschlaufen; jede Tasche, die du dir umschnallst, fügt dem Vorrat ihren eigenen Platz hinzu. Also: Drücke noch einmal F auf mir, um meinen Stand zu öffnen, klicke den Leinenbeutel in meiner Ware mit der linken Maustaste an, um ihn zu kaufen, dann drücke B, um deine Taschen zu öffnen, und klicke den Beutel dort an, um ihn in eine freie Schlaufe zu schnallen. Ausbilderin Maren drillt ein paar Schritte östlich am Sammelfeuer: Zeig ihr den Beutel an deinem Gürtel.",
+        "completion": "Ein feiner Beutel. Schnall ihn um, falls noch nicht geschehen: Drücke B, um deine Taschen zu öffnen, dann klicke den Beutel mit der linken Maustaste an, um ihn in eine freie Taschenschlaufe zu setzen, und sechs weitere Plätze gehören dir, um sie mit Ärger zu füllen. Jetzt die Hälfte der Lektion, die kein Beutel fassen kann, {playerName}: Was du nicht tragen kannst, bewahrt die Vergoldete Schatulle auf. Kämmerer Wick führt seinen Schatullen-Schreibtisch oben am Westpfad, und er öffnet denselben Tresor, den sich jeder Kämmerer in jeder Stadt teilt; mehr Tresorplatz lässt sich kaufen, sobald deine Börse hineinwächst. Halte deine Wertsachen gebankt und deine Taschen geräumig. Ein voller Rucksack hat schon mehr Abenteuer beendet als je ein Wolf.",
+        "objectives": {
+          "0": {
+            "label": "Leinenbeutel gekauft"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Kunde im Wind",
+        "text": "Eine Angewohnheit bleibt noch zu lernen, {playerName}, und die braucht keine Klinge: die Tafeln lesen. Das Gildenschild steht am Lagertor, ein paar Schritte südwestlich meines Feuers, und Gilden sowie fahrende Trupps schlagen dort ihre Aufrufe an. Geh zu seiner Vorderseite und drücke F, oder klicke es mit der linken Maustaste an, um zu lesen, was angeschlagen ist, dann komm zurück und sag mir, was der Wind hereingetragen hat. So eine Tafel steht in jeder Stadt, in die du je gehen wirst.",
+        "completion": "Jetzt weißt du, wie sich Neuigkeiten im Tal verbreiten, {playerName}: nicht durch Boten, sondern durch Anschlagtafeln. Prüf sie in jeder Stadt, durch die du kommst; das halbe Abenteuer beginnt als drei Zeilen Tinte auf einer davon.",
+        "objectives": {
+          "0": {
+            "label": "Gildenschild gelesen"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "Der lange Weg",
+        "text": "Eine Lektion bleibt, {playerName}, und es ist die, die ich dir nicht erzählen kann: Du musst sie einmal selbst durchgemacht haben. Du wirst da draußen sterben. Jeder tut das, und es ist von nichts das Ende. Nimm diesen Übergangsstein. Drücke B, um deine Taschen zu öffnen, und klicke ihn mit der linken Maustaste an, und er legt dich genau dort nieder, wo du stehst. Folge dann den Anweisungen auf deinem Bildschirm: Lass deinen Geist los, geh zurück zu deinem eigenen Körper und tritt in ihn ein. Dein Körper wartet, der Weg ist umsonst, und du verlierst nichts dabei, ihn zu gehen.",
+        "completion": "Und da bist du wieder, keinen Deut schlechter dran. Merk dir, wie sich das angefühlt hat, {playerName}, denn beim nächsten Mal sind Zähne im Spiel, und niemand steht daneben, um es zu erklären. Dein Körper wartet, der Weg ist umsonst, und das Einzige, was der Tod dich wirklich kostet, ist die Zeit, die die Rückkehr braucht.",
+        "objectives": {
+          "0": {
+            "label": "Von den Toten zurückgewandert"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "In See stechen",
+        "text": "An dieser Küste gibt es nichts mehr, das du nicht schon gelaufen, bezwungen, geöffnet oder gekauft hast, {playerName}. Du bist bereit, und in Eastbrook wartet echte Arbeit. Geh die Küstenstraße zurück zum Steg, drücke F auf Fährmann Odo und sag ihm, ich hätte gesagt, du hast dir deine Überfahrt verdient. Drücke L, sobald du den Überblick verlierst, wem du was schuldest: Das ist dein Questlog.",
+        "completion": "Das hat Maren gesagt, ja? Hohes Lob von einer Frau, die mich einst eine Woche lang Vertäuungsknoten üben ließ. Läute die Glocke neben meinem Steg, sobald du bereit bist, {playerName}, und die Überfahrt setzt dich mitten in der Stadt Eastbrook ab. Pass auf die Wölfe auf.",
+        "objectives": {
+          "0": {
+            "label": "Bei Fährmann Odo melden"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Den Windweg hinab",
         "text": "Du hast den Aufstieg geschafft, {playerName}, also hat der Wind beschlossen, dich zu behalten. Wickharbor liegt östlich an der Hügellandstraße, geschützt im Windschatten seiner Bucht. Hafenmeisterin Odile zählt jede Seele, die über den Pass kommt, und sie wird dich zählen wollen. Sag ihr, der Windweg sei noch offen.",
@@ -16521,6 +17294,9 @@ export const de_DE: EnTranslations = {
           },
           "11": {
             "label": "Der Farshore-Damm"
+          },
+          "12": {
+            "label": "Eastbrook-Docks"
           }
         }
       },
@@ -16883,6 +17659,27 @@ export const de_DE: EnTranslations = {
             "label": "Die Rissfelder"
           }
         }
+      },
+      "proving_shore": {
+        "name": "Die Bewährungsküste",
+        "welcome": "Die Bewährungsküste verlangt nichts von dir als Zeit. Lerne das Lager kennen, schlage auf die Übungspuppen ein, geh die Wracklinie ab, und wenn du bereit bist, bringt dich Fährmann Odo hinüber ins Tal.",
+        "pois": {
+          "0": {
+            "label": "Morgenrast-Lager"
+          },
+          "1": {
+            "label": "Der Alte Steg"
+          },
+          "2": {
+            "label": "Der Übungsplatz"
+          },
+          "3": {
+            "label": "Die Wracklinie"
+          },
+          "4": {
+            "label": "Der Spießrutenlauf"
+          }
+        }
       }
     },
     "dungeons": {
@@ -17124,6 +17921,21 @@ export const de_DE: EnTranslations = {
         "sender": "Tüftler Gizzel",
         "subject": "MEISTERSCHAFT, kabumm",
         "body": "Ein Hauptberuf von euch hat die Meisterschaft erreicht, die alleroberste SPITZE, kabumm, die ganze Leiter, erledigt. Ich verteile kein Lob, ich verteile Zündschnüre, aber hier, nehmt beides: ihr seid brilliant und leicht einschüchternd. Geht und macht die Berge nervös."
+      },
+      "woc_market_delivery": {
+        "sender": "Der Börsenmakler",
+        "subject": "Euer Kauf an der Börse",
+        "body": "Der Verkauf ist abgeschlossen, und die Ware gehört Euch. Das beigefügte Paket trägt genau den Gegenstand, für den Ihr bezahlt habt, verwahrt vom Moment der Einstellung bis zum Eingang Eurer Zahlung.\n\nEin Eintrag über den Verkauf steht im Hauptbuch der Börse.\n\n- Der Börsenmakler"
+      },
+      "woc_market_return": {
+        "sender": "Der Börsenmakler",
+        "subject": "Euer Angebot an der Börse ist beendet",
+        "body": "Euer Angebot endete ohne abgeschlossenen Verkauf: Die Auktion fand keinen Käufer, der Mindestpreis wurde nicht erreicht, das Angebot wurde zurückgezogen, oder der Höchstbietende hat nicht bezahlt. Eure Ware kehrt mit diesem Brief unversehrt zu Euch zurück, genau so, wie sie verwahrt wurde.\n\n- Der Börsenmakler"
+      },
+      "woc_market_sold": {
+        "sender": "Der Börsenmakler",
+        "subject": "Euer Angebot an der Börse wurde verkauft",
+        "body": "Euer Angebot wurde verkauft, und der Käufer hat vollständig bezahlt. Das Hauptbuch der Börse führt den Eintrag über den Verkauf, und Eure Börsenaktivität zeigt den abgerechneten Betrag samt Aufschlüsselung.\n\n- Der Börsenmakler"
       }
     },
     "itemSets": {

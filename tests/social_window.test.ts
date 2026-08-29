@@ -357,8 +357,8 @@ describe('social_window: guild billboard', () => {
     // content changes; the draft capture keys off defaultValue (the motd
     // rendered at the last paint) so an untouched input takes server updates
     // while a touched or focused one survives the swap.
-    expect(painter).toContain('prevMotd.value !== prevMotd.defaultValue');
-    expect(painter).toContain('document.activeElement === prevMotd');
+    expect(painter).toContain('prev.value !== prev.defaultValue');
+    expect(painter).toContain('document.activeElement === prev');
     expect(painter).toContain('next.setSelectionRange(draft.selStart, draft.selEnd)');
   });
 
@@ -397,7 +397,11 @@ describe('social_window: guild billboard', () => {
 
 describe('social_window: guild header copy', () => {
   it('renders the guild name without decorative angle brackets', () => {
-    expect(painter).toContain('<div class="soc-guild-head">$' + '{esc(g.name)} <span class="gm">');
+    expect(painter).toContain(
+      '<div class="soc-guild-head"><span class="guild-tier-$' +
+        '{g.tier}">$' +
+        '{esc(g.name)}</span> <span class="gm">',
+    );
     expect(painter).not.toContain('&lt;$' + '{esc(g.name)}&gt;');
   });
 

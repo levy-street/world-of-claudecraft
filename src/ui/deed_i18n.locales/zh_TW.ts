@@ -728,4 +728,8 @@ export const table: DeedLocaleTable = {
     name: '鍛造至完美',
     desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
   },
+  prog_ready_for_an_adventure: {
+    name: '整裝待發',
+    desc: '從試煉之濱畢業：完成島上的每一堂課，然後敲響渡船鈴回到東溪鎮。',
+  },
 };

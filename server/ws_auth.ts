@@ -31,6 +31,7 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
@@ -143,10 +144,13 @@ export interface WsAuthDeps {
   // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
   // referrals) so a fresh join stamps the current entitlement into the character state.
   // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
-  // rejection fails the handshake exactly like a getCharacter failure.
+  // rejection fails the handshake exactly like a getCharacter failure. characterCount
+  // (the tutorial greeting's firstCharacter fact; the row being joined is already
+  // counted, so first means <= 1) rides the same single round trip rather than a
+  // second serial await on every handshake.
   bankBonusForAccount: (
     accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
 }
 
 export interface WsAuthHandlers {
@@ -289,6 +293,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // notification received during later handshake awaits overrides this query's
     // stale value at the synchronous game.join boundary, with no second DB read.
     const generalChatRateLimitHydration = game.beginGeneralChatRateLimitHydration(accountId);
+    // Same capture-before-the-read contract as above, for the sibling
+    // mute/reason/strikes snapshot: see chat_mod_live.ts for why this fence
+    // exists (a live push landing on this same still-linkdead session during
+    // the reads below must never be discarded by the stale snapshot they'd
+    // otherwise resolve to).
+    const chatModerationHydration = game.beginChatModerationHydration(accountId);
     try {
       const status = await moderationStatusForAccount(accountId);
       if (status.locked) {
@@ -305,6 +315,17 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const chatMute = await chatMuteStatusForAccount(accountId);
+      // Resolved at each game.join call below, not here: like
+      // generalChatRateLimitHydration, resolving early would leave every
+      // await between here and the synchronous join boundary (adminRolesForAccount,
+      // loadAccountCosmetics, and on the fresh arm bankBonusForAccount, the lease
+      // acquire, and the character reload) unfenced against a live push landing
+      // in that window.
+      const freshModeration = {
+        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
+        reason: chatMute.reason,
+        strikes: status.chatStrikes,
+      };
       // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
       // is handled inside game.join(); this guard blocks egregious bot farms before
       // they consume a session slot.
@@ -329,9 +350,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
-        reason: chatMute.reason,
-        chatStrikes: status.chatStrikes,
         accountCosmetics,
         isAdmin,
         adminPermissions,
@@ -374,6 +392,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
             accountId,
@@ -384,6 +403,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.is_gm,
             {
               ...joinMeta,
+              mutedUntil: moderation.mutedUntil,
+              reason: moderation.reason,
+              chatStrikes: moderation.strikes,
               generalChatRateLimit: generalChatRateLimitHydration.resolve(
                 status.generalChatRateLimit ?? null,
               ),
@@ -431,6 +453,11 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
+            // The tutorial greeting's account fact: this join's character is
+            // the account's first when the account-wide count is at most 1
+            // (the row being joined is already counted). Fresh-join arm only,
+            // like bankBonus, whose single query carries the count.
+            const firstCharacter = bankBonus.characterCount <= 1;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -471,6 +498,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               leaseNonce = undefined;
               throw err;
             }
+            const moderation = chatModerationHydration.resolve(freshModeration);
             result = game.join(
               ws,
               accountId,
@@ -483,6 +511,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
+                firstCharacter,
+                mutedUntil: moderation.mutedUntil,
+                reason: moderation.reason,
+                chatStrikes: moderation.strikes,
                 generalChatRateLimit: generalChatRateLimitHydration.resolve(
                   status.generalChatRateLimit ?? null,
                 ),
@@ -514,6 +546,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );
+        // Bank Storage phase 11: settle any pending Claudium storage purchase
+        // against the freshly loaded state (fire-and-forget; never gates the
+        // join). A join that internally resumed a linkdead session is safe
+        // here too: an in-flight purchase still holds the per-character mutex
+        // and the recovery yields to it immediately.
+        kickStoragePurchaseRecovery(session.characterId);
         ws.on('message', (data) => {
           game.handleMessage(session, String(data));
         });
@@ -572,6 +610,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
     } finally {
       generalChatRateLimitHydration.release();
+      chatModerationHydration.release();
     }
   }
 

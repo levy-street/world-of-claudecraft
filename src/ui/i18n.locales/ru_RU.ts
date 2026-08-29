@@ -13,6 +13,72 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': 'Страница {page}',
+  'hudChrome.bootcamp.promptHold': 'Удерживать',
+  'hudChrome.bootcamp.promptJump': 'Прыгнуть',
+  'hudChrome.bootcamp.promptPickUp': 'Подобрать',
+  'hudChrome.bootcamp.promptRead': 'Прочитать',
+  'hudChrome.bootcamp.promptRing': 'Позвонить',
+  'hudChrome.bootcamp.promptTalk': 'Поговорить',
+  'hudChrome.mobile.barEditor': 'Редактор панелей',
+  'hudChrome.mobile.menuLabel': 'Меню',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': 'Вниз',
+  'hudChrome.mobile.radialLeft': 'Влево',
+  'hudChrome.mobile.radialUp': 'Вверх',
+  'hudChrome.bootcamp.promptAttack': 'Атака',
+  'hudChrome.bootcamp.keycapThen': 'затем',
+  'hudChrome.bootcamp.promptSummon': 'Призыв',
+  'hudChrome.bootcamp.taskPearlBody':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, нажми {bagsKey}, чтобы открыть сумки, и щелкни левой кнопкой мыши по Просоленной приманке, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, нажми {interactKey} на его панцире, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, открой сумки и коснись Просоленной приманки, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, коснись его панциря, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, открой сумки и выбери Просоленную приманку, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, нажми кнопку взаимодействия у его панциря, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.ringEquipTitle': 'Надень свой трофей',
+  'hudChrome.bootcamp.ringEquipBody':
+    'Мать жемчуга лежит в твоих сумках. Нажми {bagsKey}, чтобы открыть их, затем щелкни по кольцу левой кнопкой мыши, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    'Мать жемчуга лежит в твоих сумках. Открой их и коснись кольца, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    'Мать жемчуга лежит в твоих сумках. Открой их и выбери кольцо, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringAdmireTitle': 'Только посмотри',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'Оно тебе идет. Нажми {charKey}, чтобы открыть лист персонажа и увидеть кольцо на руке и каждую цифру, которую оно поднимает.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'Оно тебе идет. Открой лист персонажа через меню и увидишь кольцо на руке и каждую цифру, которую оно поднимает.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'Оно тебе идет. Открой лист персонажа через меню и увидишь кольцо на руке и каждую цифру, которую оно поднимает.',
+  'entities.mobs.mister_crabs.name': 'Господин Краб',
+  'entities.items.ps_briny_lure.name': 'Просоленная приманка',
+  'entities.items.ps_lustrous_pearl.name': 'Лучистая жемчужина',
+  'entities.items.mother_of_pearl.name': 'Мать жемчуга',
+  'entities.quests.q_ps_mother_of_pearl.title': 'Мать жемчуга',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    'Три панциря расколоты, {playerName}, но у линии крушений есть король, и он сидит на сокровище, что дороже всех ящиков этого берега. Отнеси эту Просоленную приманку к приливной заводи на дальнем западном конце берега, за обломками. Встань у кромки воды, нажми B, чтобы открыть сумки, и щелкни по приманке левой кнопкой мыши, чтобы разбудить его. Господин Краб щиплется куда больнее своих мелких сородичей, так что следи за полосой здоровья, не переставай бить и отступай по песку, если нужно перевести дух. Когда он падет, подойди к его панцирю, пока не покажется имя, и нажми F или щелкни левой кнопкой, чтобы забрать Лучистую жемчужину, которую он стережет. Принеси эту жемчужину мне.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    'Лучистая жемчужина, снятая с самого старого короля отмелей. Мой отец каждое рабочее утро приподнимал шляпу перед этим крабом; уважение положено. Не шевелись... вот так. Нанизана, закреплена, и она твоя, {playerName}: Мать жемчуга. Нажми B, чтобы открыть сумки, и щелкни по кольцу левой кнопкой мыши, чтобы надеть его, а затем нажми C, чтобы открыть лист персонажа и увидеть кольцо на руке. Вещица скромная, но с ней каждая твоя черта станет чуть крепче.',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'Господин Краб повержен',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': 'Лучистая жемчужина добыта',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    'Подойди к соломенному чучелу и щелкни по нему левой кнопкой мыши, чтобы взять его в цель: его имя появится вверху экрана. Затем нажми {attackKey} или щелкни по второй кнопке на панели действий, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    'Подойди к соломенному чучелу и коснись его, чтобы взять его в цель. Затем коснись второй кнопки на панели действий, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    'Подойди к соломенному чучелу и нажми кнопку выбора цели, чтобы взять его в цель. Затем нажми вторую кнопку действия, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    'Крабы щиплются в ответ. Возьми одного в цель щелчком левой кнопки мыши, затем нажми {abilityKey} и примени способность {ability}, продолжая бить с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    'Крабы щиплются в ответ. Коснись одного, чтобы взять его в цель, затем коснись способности {ability} на панели действий и бей с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    'Крабы щиплются в ответ. Возьми одного в цель, затем нажми кнопку действия со способностью {ability} и бей с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.voiceGraduate': 'Колокол звонил по тебе. За водой ждет Истврук, и ты к нему готов.',
+  'hudChrome.bootcamp.voiceVeerOff': 'Постой, дружок, не туда. Золотая тропа осталась позади.',
+  'hudChrome.bootcamp.voiceStationDoneB': 'Дело у тебя спорится, точно говорю.',
+  'hudChrome.bootcamp.voiceStationDoneA': 'Славная работа. Дальше, тропа для тебя уже светится.',
+  'hudChrome.bootcamp.voiceRunDone': 'Чистый забег, ничего не скажешь. Награда у надзирателя Пелла, ступай за ней.',
+  'hudChrome.bootcamp.voiceFirstFlag': 'Один флаг пройден. Не сбавляй шагу, осталось всего два.',
+  'hudChrome.bootcamp.voiceArrival': 'Вот ты и на берегу, дружок. Видишь золотую тропу под ногами? Она знает дорогу лучше меня. Иди по ней.',
   'hudChrome.lastkeepMap.title': '{keep}: {story}',
   'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': 'Облик волка',
@@ -65,6 +131,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': 'AFK',
   'hudChrome.nameplate.cheaterTag': '< Читер >',
+  'hudChrome.nameplate.pledgeTag': 'Присяга: {guild}',
+  'hudChrome.pledge.open': 'Принимает присяги',
+  'hudChrome.pledge.closed': 'Не принимает присяги',
+  'hudChrome.pledge.minLevel': 'Уровень {level}+',
+  'hudChrome.pledge.action': 'Присягнуть',
+  'hudChrome.pledge.actionTitle': 'Присягнуть гильдии {guild}',
+  'hudChrome.pledge.pledged': 'Присяга принесена',
+  'hudChrome.pledge.yourGuild': 'Ваша гильдия',
+  'hudChrome.pledge.tab': 'Присяги',
+  'hudChrome.pledge.tabWithCount': 'Присяги ({count})',
+  'hudChrome.pledge.empty': 'Пока никто не присягнул вашей гильдии.',
+  'hudChrome.pledge.accept': 'Принять',
+  'hudChrome.pledge.acceptTitle': 'Принять присягу {name}',
+  'hudChrome.pledge.reject': 'Отклонить',
+  'hudChrome.pledge.rejectTitle': 'Отклонить присягу {name}',
+  'hudChrome.pledge.settings': 'Набор',
+  'hudChrome.pledge.acceptingLabel': 'Принимать присяги',
+  'hudChrome.pledge.minLevelLabel': 'Минимальный уровень',
+  'hudChrome.pledge.noteLabel': 'Заметка на доске',
+  'hudChrome.pledge.notePlaceholder': 'Расскажите соискателям, кого ищет ваша гильдия',
+  'hudChrome.pledge.save': 'Сохранить',
+  'hudChrome.pledge.yourPledge': 'Ваша присяга: {guild}',
+  'hudChrome.pledge.since': 'Присяга от {date}',
+  'hudChrome.pledge.withdraw': 'Отозвать присягу',
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -456,6 +546,32 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': 'Применить облик',
   'hudChrome.wocStore.detach': 'Снять облик',
   'hudChrome.wocStore.equipHint': 'Чтобы применить этот облик, возьмите в руки {type}.',
+  'hudChrome.wocStore.charter.eyebrow': 'Сундук',
+  'hudChrome.wocStore.charter.title': 'Грамоты на сундук',
+  'hudChrome.wocStore.charter.scope': 'Грамота расширяет банк только этого персонажа. Казначей продаёт те же ячейки за золото.',
+  'hudChrome.wocStore.charter.grant': 'Добавляет ячеек банка: {slots}',
+  'hudChrome.wocStore.charter.buy': 'Купить грамоту',
+  'hudChrome.wocStore.charter.buyAria': 'Купить: {item}',
+  'hudChrome.wocStore.charter.confirmTitle': 'Подтвердите покупку грамоты',
+  'hudChrome.wocStore.charter.confirmBody': 'Купить {item} за {cost} Claudium?',
+  'hudChrome.wocStore.charter.granted': 'Грамота применена. Банк этого персонажа стал больше.',
+  'hudChrome.wocStore.charter.alreadyGranted': 'Эта грамота уже есть у персонажа. Повторно средства не списаны.',
+  'hudChrome.wocStore.charter.applyDeferred': 'Оплата прошла. Ячейки появятся автоматически при следующем входе этим персонажем.',
+  'hudChrome.wocStore.charter.grantUnresolved': 'Оплата прошла, но ячейки пока не выданы. Покупка записана, и поддержка сможет её завершить.',
+  'hudChrome.wocStore.charter.inProgress': 'Покупка для этого персонажа еще завершается. Повторите попытку через мгновение.',
+  'hudChrome.wocStore.charter.doesNotFit': 'В банке этого персонажа не поместятся все ячейки этой грамоты.',
+  'hudChrome.wocStore.charter.notPurchasable': 'Эту грамоту сейчас нельзя купить.',
+  'hudChrome.wocStore.charter.noCharterFits': 'Ни одна грамота не помещается в оставшееся место в банке этого персонажа.',
+  'hudChrome.wocStore.charter.someHiddenByFit':
+    'Грамоты, слишком большие для оставшегося места в банке этого персонажа, не показываются.',
+  'hudChrome.wocStore.charter.noRoom': 'В банке этого персонажа больше нет места ни для одной грамоты.',
+  'hudChrome.wocStore.charter.outage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
+  'hudChrome.wocStore.charter.outageStale': 'Вернитесь в магазин и снова используйте то же действие «Купить грамоту». Средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
+  'hudChrome.wocStore.charter.failed': 'Не удалось завершить покупку.',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Малая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Большая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': 'Великая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': 'Полная грамота на сундук',
   'hudChrome.claudium.title': 'Claudium',
   'hudChrome.claudium.open': 'Открыть Claudium',
   'hudChrome.claudium.close': 'Закрыть Claudium',
@@ -484,6 +600,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.storeTitle': 'Магазин косметики',
   'hudChrome.claudium.storeEmpty': 'Сейчас косметические предметы недоступны.',
   'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.priceWoc': '{amount} WOC',
+  'hudChrome.claudium.priceUsdc': '{amount} USDC',
+  'hudChrome.claudium.priceSol': '{amount} SOL',
   'hudChrome.claudium.spendButton': 'Обменять',
   'hudChrome.claudium.kindCosmetic': 'Косметика',
   'hudChrome.claudium.kindItem': 'Предмет',
@@ -521,8 +640,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro':
     'Создайте новую учётную запись или привяжите Apple к существующей.',
   'hudChrome.auth.appleChoiceExpired': 'Вход через Apple истёк. Войдите через Apple ещё раз.',
-  'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
-  'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'ivan@example.com',
@@ -539,6 +656,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': 'Кому',
   'itemUi.kind.bag': 'Сумка',
   'itemUi.tooltip.bagSlots': 'Сумка на {slots} ячеек',
+  'itemUi.tooltip.bagSlotsMaterials': 'Сумка для материалов на {slots} ячеек',
   'hudChrome.auth.forgotPrompt': 'Забыли пароль?',
   'hudChrome.auth.forgotTitle': 'Сброс пароля',
   'hudChrome.auth.forgotHint':
@@ -665,6 +783,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.petHealth': 'Питомец {name}, здоровье {pct}',
   'hudChrome.partyFrames.showSelf': 'Показывать вашу рамку',
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
+  'hudChrome.interfaceUnlock.label': 'Редактирование фреймов',
+  'hudChrome.interfaceUnlock.unlock': 'Разблокировать интерфейс',
+  'hudChrome.interfaceUnlock.lock': 'Заблокировать интерфейс',
+  'hudChrome.interfaceUnlock.lockAll': 'Заблокировать интерфейс',
+  'hudChrome.interfaceUnlock.barsNote': 'Во время редактирования видны только включённые панели действий. Чтобы разместить больше панелей, сначала добавьте их кнопками плюс и минус на основной панели.',
+  'hudChrome.interfaceUnlock.frozenNote': 'Во время редактирования интерфейс и камера заморожены: кнопки и рамки становятся неподвижными картинками для расстановки, а щелчки не попадают в игровой мир.',
+  'hudChrome.interfaceUnlock.unlockFrame': 'Разблокировать эту рамку',
+  'hudChrome.interfaceUnlock.lockFrame': 'Заблокировать эту рамку',
+  'hudChrome.interfaceUnlock.resizeFrame': 'Изменить размер этой рамки',
+  'hudChrome.interfaceUnlock.frameNames.actionBar1': 'Панель команд',
+  'hudChrome.interfaceUnlock.frameNames.actionBar2': 'Панель команд 2',
+  'hudChrome.interfaceUnlock.frameNames.actionBar3': 'Панель команд 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Напоминание о списке желаемого',
+  'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
+  'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
+  'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
+  'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
+  'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
+  'hudChrome.options.combineActionBars': 'Объединить панели действий',
+  'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'Панели действий',
+  'hudChrome.interfaceUnlock.frameNames.swingBar': 'Автоатака',
+  'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
+  'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
+  'hudChrome.interfaceUnlock.buffsLeftToRight': 'Усиления слева направо',
+  'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Ослабления слева направо',
+  'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Закрепить фрейм игрока над панелью действий',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'Вертикальные панели действий',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'Вертикальная панель команд',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'Вертикальная панель команд 2',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'Вертикальная панель команд 3',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'Горизонтальное меню',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'Сбросить размер',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': 'Сбросить размер: {name}',
+  'hudChrome.partyFrames.optionsSection': 'Настройки фреймов группы',
+  'hudChrome.interfaceUnlock.framesMenuTitle':
+    'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',
+  'hudChrome.interfaceUnlock.previewSpell': 'Пример заклинания',
+  'hudChrome.transfer.frameLayout': 'Расположение фреймов',
+  'hudChrome.transfer.allSettings': 'Все настройки',
+  'hudChrome.transfer.exportAction': 'Экспорт',
+  'hudChrome.transfer.importAction': 'Импорт',
+  'hudChrome.transfer.copy': 'Копировать',
+  'hudChrome.transfer.copied': 'Скопировано в буфер обмена.',
+  'hudChrome.transfer.copyFailed': 'Не удалось скопировать. Выделите код и скопируйте его вручную.',
+  'hudChrome.transfer.applyReload': 'Применить и перезагрузить',
+  'hudChrome.transfer.pastePlaceholder': 'Вставьте сюда экспортированный код.',
+  'hudChrome.transfer.invalid': 'Это не действительный код экспорта.',
+  'hudChrome.transfer.wrongKind': 'Этот код относится к другому типу экспорта.',
+  'hudChrome.actionBar.conflictTitle': 'Клавиша уже занята',
+  'hudChrome.actionBar.conflictBody': '{key} уже назначена на «{other}». Назначение на «{action}» снимет привязку с «{other}».',
+  'hudChrome.actionBar.conflictAccept': 'Всё равно переназначить',
+  'hudChrome.actionBar.showExtraBar': 'Показать ещё одну панель действий',
+  'hudChrome.actionBar.hideExtraBar': 'Скрыть панель действий',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
@@ -985,6 +1156,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.customColors': 'Настраиваемые цвета',
   'hudChrome.theme.reset': 'Сброс',
   'hudChrome.theme.presets.classic': 'Классическое золото',
+  'hudChrome.theme.presets.fancyGold': 'Роскошное золото',
   'hudChrome.theme.presets.midnight': 'Полночь',
   'hudChrome.theme.presets.parchment': 'Пергамент',
   'hudChrome.theme.presets.highContrast': 'Высокий контраст',
@@ -1106,6 +1278,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': 'Бой завершён отказом.',
   'hudChrome.bg.firstWinBonusLine': 'Первая победа за день: +{honor} чести',
   'hudChrome.bg.firstWinBonusLog': 'Первая победа за день: вы получаете {honor} очк. чести дополнительно.',
+  'hudChrome.bg.doubleHonorLine':
+    'Выходные двойной чести: сегодня награды чести Терновой Лощины умножаются на {mult}, а сыгранное до конца поражение оплачивается как победа',
   'hudChrome.bg.timeWarningMinutes': 'Осталось {minutes} мин.',
   'hudChrome.bg.timeWarningOneMinute': 'Осталась одна минута',
   'hudChrome.bg.timeWarningMinutesLog': 'До конца боя осталось {minutes} мин.',
@@ -1369,6 +1543,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
+  'hudChrome.options.touchTapMenus': 'Меню по нажатию',
+  'hudChrome.options.touchTapMenusNote': 'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',
@@ -1697,6 +1873,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выберите расширение кошелька в этом браузере. Подпишите сообщение проверки, затем вернитесь в приложение.',
   'wallet.browser.paymentBody':
     'Выберите кошелек, привязанный к аккаунту, и подтвердите транзакцию в этом браузере.',
+  'wallet.browser.stepUpBody':
+    'Выберите кошелек, привязанный к аккаунту, и подпишите сообщение авторизации Биржи $WOC. Подпись бесплатна и не переводит средства.',
   'wallet.browser.extensionHelp':
     'Совместимое расширение кошелька не найдено. Установите или разблокируйте Phantom, Solflare либо другой браузерный кошелек Solana и повторите попытку.',
   'wallet.browser.safety':
@@ -3082,7 +3260,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Дает 2 очка серии.',
   'entities.abilities.sap.name': 'Ошеломление',
   'entities.abilities.sap.description':
-    'Выводит цель из строя на 8 сек. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',
+    'Выводит цель из строя на 8 сек, не прерывая Сумеречную завесу и не начиная бой. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',
   'entities.abilities.crippling_poison.name': 'Свинцовый яд',
   'entities.abilities.crippling_poison.description':
     'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек.',
@@ -3156,7 +3334,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Облик куницы',
   'entities.abilities.aspect_of_the_monkey.description': 'Вы принимаете облик куницы, повышая свой шанс уклонения на 8% на 30 мин.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Облик скакуна',
-  'entities.abilities.aspect_of_the_cheetah.description': 'Вы принимаете облик скакуна, повышая своё скорость передвижения на 30% на 30 мин.',
+  'entities.abilities.aspect_of_the_cheetah.description': 'Вы принимаете Облик скакуна, повышая свою скорость передвижения на 30% на 30 мин. Пока эффект активен, получение урона дезориентирует вас, вдвое снижая скорость передвижения на 4 сек (каждый удар обновляет дезориентацию).',
   'entities.abilities.aimed_shot.name': 'Долгий натяг',
   'entities.abilities.aimed_shot.description': 'Стреляет в цель, нанося {damage} физического урона. Урон растёт с силой атаки в дальнем бою.',
   'entities.abilities.rapid_fire.name': 'Лихорадочный натяг',
@@ -3346,7 +3524,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     'Призывает Боевого беса под командование чернокнижника. Боевой бес, выносливый демон ближнего боя, который врывается в гущу битвы и стойко держится. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
   'entities.abilities.summon_infernal.name': 'Призыв Погребального колосса',
-  'entities.abilities.summon_infernal.description': 'Обрушивает Погребального колосса на область цели, нанося 58-72 урона от огня при падении. Он сражается 30 сек., не заменяя вашего демона, жжёт ближних врагов каждые 2 сек. и даёт 1 Опустошение каждую 1 сек.',
+  'entities.abilities.summon_infernal.description': 'Обрушивает Погребального колосса на область цели, нанося 64-79 урона от огня при падении. Он сражается 30 сек., не заменяя вашего демона, жжёт ближних врагов каждые 2 сек. и даёт 1 Опустошение каждую 1 сек.',
   'entities.abilities.summon_doomguard.name': 'Призыв Духорождённого',
   'entities.abilities.summon_doomguard.description':
     'Подчиняет вашей воле Духорождённого, элитного демона, который издалека обрушивает тяжёлый урон от Тьмы. Долгое время восстановления сдерживает его разрушительную мощь. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
@@ -3826,7 +4004,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.trader_wilkes.greeting': 'Свежий хлеб, чистая вода, честные цены. Что вам нужно?',
   'entities.npcs.apothecary_lin.name': 'Аптекарь Лин',
   'entities.npcs.apothecary_lin.title': 'Травница',
-  'entities.npcs.apothecary_lin.greeting': 'Осторожнее ступайте в восточных лесах, друг.',
+  'entities.npcs.apothecary_lin.greeting': 'Осторожнее ступайте в северо-восточных лесах, друг.',
   'entities.npcs.brother_aldric.name': 'Брат Алдрик',
   'entities.npcs.brother_aldric.title': 'Жрец долины',
   'entities.npcs.brother_aldric.greeting':
@@ -3924,7 +4102,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
   'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
   'entities.quests.q_prof_intro.text':
-    'В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-востоку от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.',
+    'В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к северо-востоку от города, за Волчьей тропой, есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.',
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
@@ -3941,12 +4119,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.objectives.0.label': 'Клык старого Серочелюста',
   'entities.quests.q_boars.title': 'Шкуры щетинистых кабанов',
   'entities.quests.q_boars.text':
-    'Кабанья шкура годится для лучших дорожных сумок, а луга полны зверья. Принесите мне 5 щетинистых шкур.',
+    'Кабанья шкура годится для лучших дорожных сумок, а луга к северо-западу от города кишат этим зверьём. Принесите мне 5 щетинистых кабаньих шкур, и я не останусь в долгу.',
   'entities.quests.q_boars.completion': 'Отличные щетинистые шкуры. За них дадут хорошую цену.',
   'entities.quests.q_boars.objectives.0.label': 'Щетинистая кабанья шкура',
   'entities.quests.q_spiders.title': 'Угроза Сейблвеба',
   'entities.quests.q_spiders.text':
-    'Скрытни в восточных лесах прядут шёлк, что нужен мне для припарок, да к тому же расплодились сверх меры. Перебейте 6 Пауков-скрытней Сейблвеба и вырежьте 4 шёлковые железы из их брюшек.',
+    'Скрытни в северо-восточных лесах прядут шёлк, что нужен мне для припарок, да к тому же расплодились сверх меры. Перебейте 6 Пауков-скрытней Сейблвеба и вырежьте 4 шёлковые железы из их брюшек.',
   'entities.quests.q_spiders.completion': 'Фу, еще дергаются. Прекрасно. Вы это заслужили.',
   'entities.quests.q_spiders.objectives.0.label': 'Паук-скрытень Сейблвеба: убито',
   'entities.quests.q_spiders.objectives.1.label': 'Шёлковая железа Сейблвеба',
@@ -3968,7 +4146,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': 'Беспокойные кости: упокоено',
   'entities.quests.q_supplies.title': 'Украденные припасы',
   'entities.quests.q_supplies.text':
-    'Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на юго-западе.',
+    'Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на северо-западе.',
   'entities.quests.q_supplies.completion': 'Мои ящики! Почти без царапин. Вы просто чудо.',
   'entities.quests.q_supplies.objectives.0.label': 'Украденный ящик припасов',
   'entities.quests.q_whispers.title': 'Шепот внизу',
@@ -4016,7 +4194,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': 'Гримуар Мортена',
   'entities.quests.q_bandits.title': 'Бандиты долины',
   'entities.quests.q_bandits.text':
-    'Шайка головорезов стоит лагерем в юго-западных холмах. За неделю они ограбили три воза. Убейте 10 долинных бандитов.',
+    'Шайка головорезов стоит лагерем в северо-западных холмах. За неделю они ограбили три воза. Убейте 10 долинных бандитов.',
   'entities.quests.q_bandits.completion': 'На десять ножей меньше во тьме. Возьмите, вы заслужили.',
   'entities.quests.q_bandits.objectives.0.label': 'Долинный бандит: убито',
   'entities.quests.q_ringleader.title': 'Главарь',
@@ -4594,6 +4772,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': 'Расколотые Утёсы',
   'entities.zones.farshore_isle.pois.4.label': 'Поля Разломов',
   'entities.zones.eastbrook_vale.pois.11.label': 'Коса Дальнего Берега',
+  'entities.zones.eastbrook_vale.pois.12.label': 'Истврукские причалы',
   'entities.mobs.moor_ram.name': 'Вересковый баран',
   'entities.mobs.gale_wisp.name': 'Штормовой дух',
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
@@ -5787,6 +5966,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.autoShowHint':
     'Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.',
   'hudChrome.mobile.actionPageToggle': 'Переключить страницу действий',
+  'hudChrome.mobile.actionRadial': 'Направления действий',
+  'hudChrome.mobile.actionRadialCancel': 'Отменить действие',
+  'hudChrome.mobile.radialCenter': 'Центр',
+  'hudChrome.mobile.radialRight': 'Вправо',
   'hudChrome.mobile.actionRing': 'Боевые действия',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
@@ -5795,6 +5978,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.jump': 'Прыжок',
   'hudChrome.mobile.leaderboard': 'Рейтинг',
   'hudChrome.mobile.dailyRewards': 'Магазин',
+  'hudChrome.mobile.wocMarket': 'Биржа',
   'hudChrome.mobile.deeds': 'Деяния',
   'hudChrome.mobile.nameplates': 'Имена',
   'hudChrome.mobile.targetCycle': 'Сменить цель',
@@ -5863,6 +6047,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.many': 'Список игроков: на {realm} в сети {count} игроков.',
   'hudChrome.plurals.playersOnline.other': 'Список игроков: на {realm} в сети {count} игрока.',
   'hudChrome.controller.title': 'Геймпад',
+  'hudChrome.controller.glyphStyle': 'Обозначения кнопок',
+  'hudChrome.controller.glyphStyleAuto': 'Авто',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': 'Плейстейшен',
+  'hudChrome.controller.glyphStyleNintendo': 'Нинтендо',
   'hudChrome.controller.enable': 'Включить геймпад',
   'hudChrome.controller.invertY': 'Инверсия камеры (Y)',
   'hudChrome.controller.deadzone': 'Мёртвая зона стика',
@@ -6069,6 +6258,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': 'Рюкзак',
   'hudChrome.bags.socketEmpty': 'Пустая ячейка для сумки',
   'hudChrome.bags.unequipHint': 'Нажмите, чтобы снять эту сумку',
+  'hudChrome.bags.poolGeneral': 'Общие: {used} из {total}',
+  'hudChrome.bags.poolMaterials': 'Материалы: {used} из {total}',
+  'hudChrome.bags.capacityPoolsAria': 'Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'Классическая MMO, в которую можно играть бесплатно прямо в браузере.',
@@ -6325,7 +6517,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': 'Реликварий',
   'guide.controls.sheathe': 'Убрать/обнажить оружие',
   'guide.controls.crafting': 'Крафт',
-  'guide.controls.valeCup': 'Кубок Долины',
   'guide.controls.mount': 'Сесть / Спешиться',
   'guide.controls.calendar': 'Календарь событий',
   'guide.controls.dungeonFinder': 'Поиск подземелий',
@@ -8002,6 +8193,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
+  'desktop.titlebar.exitGame': 'Выйти из игры',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':
@@ -8595,7 +8787,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': 'Архонт Никсарис',
   'entities.mobs.rift_boss_storm.name': 'Буревой Вхарок',
   'entities.mobs.rift_boss_tide.name': 'Бездонная Пасть',
-  'entities.mobs.vale_cup_ball.name': 'Кабаний мяч',
   'entities.npcs.brother_halven_marsh.name': 'Брат Хальвен',
   'entities.npcs.brother_halven_marsh.title': 'Хранитель Реликвария',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8610,7 +8801,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1м',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
-  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.usd': '{amount}',
   'guide.professions.intro':
     'Помимо боя и заданий, мир вознаграждает тех, кто трудится на земле и у горна: собирайте сырьё, превращайте его в снаряжение и товары в десяти ремёслах и обретайте облик одного из десяти призваний, которые эти ремёсла олицетворяют.',
   'guide.professions.harvestTitle': 'Добыча с самой охоты',
@@ -8633,6 +8824,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
+  'apiError.guilds.invalid_roster_name': 'Недопустимое название гильдии.',
+  'apiError.guilds.unknown': 'Гильдии с таким названием нет.',
   'apiError.ota_updates.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
@@ -8697,6 +8890,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': 'Персонаж сейчас в сети.',
   'apiError.character.rename_not_permitted': 'Переименование этого персонажа не разрешено.',
   'apiError.character.delete_confirm': 'Введите имя персонажа, чтобы подтвердить удаление.',
+  'apiError.character.storage_purchase_open':
+    'Перед удалением этого персонажа покупка хранилища должна быть завершена или урегулирована.',
+  'apiError.character.delete_busy':
+    'Сервер перегружен. Повторите попытку удаления этого персонажа чуть позже.',
   'apiError.character.already_in_world': 'Персонаж уже находится в мире.',
   'apiError.character.taken_over': 'Вашего персонажа перехватила другая сессия.',
   'apiError.character.rename_required': 'Перед входом в мир этому персонажу нужно сменить имя.',
@@ -8724,6 +8921,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'Недостаточно очков.',
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.noticeboard.empty': 'Похоже, здесь ничего не опубликовано.',
+  'hudChrome.noticeboard.subtitle': 'Гильдии мира',
+  'hudChrome.noticeboard.rosterTitle': 'Просмотреть состав гильдии {guild}',
+  'hudChrome.noticeboard.back': 'Назад',
+  'hudChrome.noticeboard.popupTitle': 'Гильдейский столб',
+  'hudChrome.noticeboard.close': 'Закрыть',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
   'hudChrome.mailbox.close': 'Закрыть почтовый ящик',
   'hudChrome.mailbox.tabInbox': 'Входящие',
@@ -8848,6 +9050,356 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.mastery_reset_notice.subject': 'Мастерство по-честному',
   'entities.letters.mastery_reset_notice.body':
     'Собрат по гильдии!\n\nГильдия приняла новую меру мастерства. Каждый начинает подъём заново: ваши навыки ремесла и сноровка добытчика обнулены.\n\nВсё остальное осталось при вас, нетронутым: рецепты, инструменты и материалы, банк и золото, настройки и титулы, деяния и известность, задания и почта.\n\nТеперь подъём честен. Дешёвая работа наверх не вывезет. Ищите рецепты посложнее, жилы побогаче и воды поглубже.\n\nС уважением,\nДом гильдии',
+  'entities.letters.woc_market_delivery.sender': 'Биржевой маклер',
+  'entities.letters.woc_market_delivery.subject': 'Ваша покупка на бирже',
+  'entities.letters.woc_market_delivery.body':
+    'Сделка завершена, и товар теперь ваш. В приложенной посылке именно тот предмет, за который вы заплатили: с момента выставления лота и до подтверждения оплаты он находился на хранении биржи.\n\nЗапись о сделке хранится в биржевой книге.\n\n- Биржевой маклер',
+  'entities.letters.woc_market_return.sender': 'Биржевой маклер',
+  'entities.letters.woc_market_return.subject': 'Ваш лот на бирже завершился',
+  'entities.letters.woc_market_return.body':
+    'Ваш лот завершился без состоявшейся продажи: покупатель не нашёлся, резервная цена не была достигнута, лот был отозван, либо победитель торгов не оплатил покупку. Ваш товар возвращается с этим письмом в целости, ровно таким, каким был передан на хранение.\n\n- Биржевой маклер',
+  'entities.letters.woc_market_sold.sender': 'Биржевой маклер',
+  'entities.letters.woc_market_sold.subject': 'Ваш лот на бирже продан',
+  'entities.letters.woc_market_sold.body':
+    'Ваш лот продан, и покупатель полностью рассчитался. Выручка за вычетом биржевого сбора отправлена на ваш привязанный кошелёк прямо в расчётной транзакции; биржа никогда не держала ваши деньги.\n\nЗапись о сделке хранится в биржевой книге.\n\n- Биржевой маклер',
+  'apiError.woc_market.invalid_input': 'Недопустимый ввод.',
+  'apiError.woc_market.disabled': 'Биржа $WOC недоступна в этом мире.',
+  'apiError.woc_market.paused': 'Торги на бирже приостановлены. Отсчёт аукционов продолжается.',
+  'apiError.woc_market.wallet_required':
+    'Перед торговлей на бирже привяжите и подтвердите кошелёк.',
+  'apiError.woc_market.recipient_wallet_required': 'Этот игрок должен подключить кошелёк, прежде чем сможет принимать платежи в $WOC.',
+  'apiError.woc_market.self_offer': 'Нельзя отправить предложение $WOC самому себе.',
+  'apiError.woc_market.offer_expired': 'Это предложение $WOC истекло. Запросите новое.',
+  'apiError.woc_market.terms_required': 'Чтобы продолжить, примите условия Торговой площадки.',
+  'apiError.woc_market.totp_required':
+    'Для этой суммы требуется двухфакторная аутентификация. Включите её в настройках аккаунта и введите код.',
+  'apiError.woc_market.totp_invalid':
+    'Этот код двухфакторной аутентификации не подтвердился. Попробуйте ещё раз.',
+  'apiError.woc_market.suspended':
+    'Ваш доступ к бирже приостановлен из-за неоплаченных сделок: нельзя делать ставки, покупать, выставлять лоты и торговать за $WOC.',
+  'apiError.woc_market.character_invalid':
+    'Войдите в игру персонажем, от имени которого выставляете лот, и попробуйте снова.',
+  'apiError.woc_market.not_found': 'Эта запись биржи больше не существует.',
+  'apiError.woc_market.not_yours': 'Эта запись биржи больше не существует.',
+  'apiError.woc_market.not_active': 'Этот лот больше не принимает такое действие.',
+  'apiError.woc_market.own_listing': 'Нельзя делать ставки на собственный лот или покупать его.',
+  'apiError.woc_market.has_bids':
+    'Лот со ставками нельзя отозвать. Если отмена необходима, обратитесь в поддержку.',
+  'apiError.woc_market.bid_too_low':
+    'Ваша ставка не превышает текущую ставку плюс минимальный шаг.',
+  'apiError.woc_market.already_pending':
+    'Сначала подтвердите или отмените свою незавершённую ставку на этот лот.',
+  'apiError.woc_market.insufficient_balance':
+    'В вашем кошельке недостаточно $WOC для этой ставки и её залога.',
+  'apiError.woc_market.quote_unavailable':
+    'Сейчас не удалось получить котировку. Попробуйте чуть позже.',
+  'apiError.woc_market.quote_expired': 'Эта котировка истекла. Запросите новую; если новая не предлагается, это окно уже закрылось.',
+  'apiError.woc_market.not_pending': 'Эта ставка больше не ожидает залога.',
+  'apiError.woc_market.confirm_failed':
+    'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
+  'apiError.woc_market.confirm_in_flight':
+    'Платеж ещё подтверждается. Повторите попытку, когда он завершится.',
+  'apiError.woc_market.cancel_pending': 'Продавец отменяет этот лот.',
+  'apiError.woc_market.item_locked':
+    'Этот предмет заблокирован. Снимите блокировку в сумке, прежде чем продавать его.',
+  'apiError.woc_market.item_mismatch':
+    'Это не тот самый экземпляр, на который согласился покупатель, либо его состояние изменилось (блокировка тоже считается). Начните новую сделку.',
+  'apiError.woc_market.offer_pending':
+    'У вас уже есть незавершённая сделка с этим игроком. Сначала завершите её.',
+  'apiError.woc_market.bond_window_closed':
+    'Эту ставку больше нельзя оплатить: окно оплаты закрылось. Сделайте ставку заново, чтобы получить новое.',
+  'apiError.woc_market.claim_cooldown':
+    'Вы недавно отказались от быстрой покупки. Повторите попытку позже.',
+  'apiError.woc_market.buy_now_locked':
+    'Другой покупатель завершает эту покупку. Попробуйте чуть позже.',
+  'apiError.woc_market.settlement_in_flight':
+    'Покупатель оплачивает этот лот. Повторите попытку, когда платёж завершится.',
+  'apiError.woc_market.contended': 'Биржа занята другой операцией с этим лотом. Повторите попытку через мгновение.',
+  'apiError.woc_market.sale_conflict':
+    'Для этого лота уже существует другая действующая запись о продаже. Сначала исключите её.',
+  'apiError.woc_market.no_buy_now': 'У этого лота нет цены мгновенной покупки.',
+  'apiError.woc_market.cap_reached': 'Вы достигли лимита лотов на бирже.',
+  'apiError.woc_market.stale_item':
+    'Этот предмет изменился или был перемещён. Выберите его заново и повторите попытку.',
+  'apiError.woc_market.not_eligible': 'Этот предмет нельзя выставить на биржу $WOC.',
+  'apiError.woc_market.invalid_params':
+    'Проверьте стартовую ставку, резервную цену, цену выкупа и длительность.',
+  'apiError.woc_market.signature_reused': 'Эта транзакция уже была отправлена.',
+  'apiError.woc_market.stepup_required':
+    'Для продажи на бирже нужна подпись привязанного кошелька.',
+  'apiError.woc_market.stepup_challenge_invalid':
+    'Это подтверждение кошелька больше недействительно. Начните продажу заново.',
+  'apiError.woc_market.stepup_challenge_expired':
+    'Срок подтверждения кошелька истёк. Начните продажу заново.',
+  'apiError.woc_market.stepup_wallet_mismatch':
+    'Привязанный кошелёк изменился после выдачи этого подтверждения. Начните продажу заново.',
+  'apiError.woc_market.stepup_binding_mismatch':
+    'Это подтверждение кошелька не соответствует этой продаже. Начните продажу заново.',
+  'apiError.woc_market.stepup_signature_invalid':
+    'Подпись кошелька не прошла проверку. Начните продажу заново.',
+  'hudChrome.wocMarket.title': 'Биржа $WOC',
+  'hudChrome.wocMarket.close': 'Закрыть биржу',
+  'hudChrome.wocMarket.launcherLabel': 'Биржа $WOC',
+  'hudChrome.wocMarket.tabBrowse': 'Обзор',
+  'hudChrome.wocMarket.tabSell': 'Продажа',
+  'hudChrome.wocMarket.tabActivity': 'Моя активность',
+  'hudChrome.wocMarket.loading': 'Загрузка биржи...',
+  'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
+  'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
+  'hudChrome.wocMarket.pausedBanner':
+    'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    'Ваш публичный адрес привязан. Чтобы платить в $WOC, снова подключите это приложение-кошелёк.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
+  'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
+  'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
+  'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
+  'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
+  'hudChrome.wocMarket.browseError': 'Не удалось загрузить список лотов.',
+  'hudChrome.wocMarket.colItem': 'Предмет',
+  'hudChrome.wocMarket.filterQuality': 'Качество',
+  'hudChrome.wocMarket.filterFormat': 'Формат',
+  'hudChrome.wocMarket.filterAny': 'Все',
+  'hudChrome.wocMarket.filterFormatAuction': 'Аукцион',
+  'hudChrome.wocMarket.filterFormatBuyNow': 'Купить сейчас',
+  'hudChrome.wocMarket.filterItemLabel': 'Предмет',
+  'hudChrome.wocMarket.filterItemPlaceholder': 'Поиск по названию предмета',
+  'hudChrome.wocMarket.filterCategory': 'Категория',
+  'hudChrome.wocMarket.filterCategoryWeapon': 'Оружие',
+  'hudChrome.wocMarket.filterCategoryArmor': 'Броня',
+  'hudChrome.wocMarket.filterCategoryMount': 'Средства передвижения',
+  'hudChrome.wocMarket.filterSubcategory': 'Тип',
+  'hudChrome.wocMarket.sellerLinkAria': 'Посмотреть недавние сделки продавца {name}',
+  'hudChrome.wocMarket.sellerTitle': 'Недавние сделки продавца {name}',
+  'hudChrome.wocMarket.sellerBack': 'Назад к обзору',
+  'hudChrome.wocMarket.sellerEmpty': 'Завершённых сделок пока нет.',
+  'hudChrome.wocMarket.sellerError': 'Не удалось загрузить недавние сделки.',
+  'hudChrome.wocMarket.sellerSaleRow': '{time}: {item} продан {buyer} за {usd}',
+  'hudChrome.wocMarket.colSeller': 'Продавец',
+  'hudChrome.wocMarket.colCurrentBid': 'Текущая ставка',
+  'hudChrome.wocMarket.colBuyNow': 'Выкуп',
+  'hudChrome.wocMarket.colTimeLeft': 'Осталось',
+  'hudChrome.wocMarket.reserveMet': 'Резерв достигнут',
+  'hudChrome.wocMarket.reserveNotMet': 'Резерв не достигнут',
+  'hudChrome.wocMarket.yourListing': 'Ваш лот',
+  'hudChrome.wocMarket.buyNowLockedBadge': 'Идёт покупка',
+  'hudChrome.wocMarket.pagePrev': 'Предыдущая страница',
+  'hudChrome.wocMarket.pageNext': 'Следующая страница',
+  'hudChrome.wocMarket.pageNumber': 'Страница {current}',
+  'hudChrome.wocMarket.sortLabel': 'Сортировка',
+  'hudChrome.wocMarket.sortEnding': 'Скоро завершатся',
+  'hudChrome.wocMarket.sortNewest': 'Новые',
+  'hudChrome.wocMarket.sortPriceAsc': 'Цена: по возрастанию',
+  'hudChrome.wocMarket.sortPriceDesc': 'Цена: по убыванию',
+  'hudChrome.wocMarket.detailTitle': 'Лот',
+  'hudChrome.wocMarket.detailSeller': 'Продавец: {name}',
+  'hudChrome.wocMarket.detailEndsAt': 'Завершение: {utc} UTC ({local} по местному времени)',
+  'hudChrome.wocMarket.detailStartingBid': 'Стартовая ставка: {usd}',
+  'hudChrome.wocMarket.detailCurrentBid': 'Текущая ставка: {usd}',
+  'hudChrome.wocMarket.detailNoBids': 'Ставок нет',
+  'hudChrome.wocMarket.detailMinNext': 'Минимальная следующая ставка: {usd}',
+  'hudChrome.wocMarket.detailBuyNow': 'Выкуп: {usd}',
+  'hudChrome.wocMarket.detailSales': 'Недавние продажи',
+  'hudChrome.wocMarket.detailSaleRow': '{time}: {seller} продал(а) {buyer} за {usd}',
+  'hudChrome.wocMarket.detailNoSales': 'Для этого предмета пока нет записей о продажах.',
+  'hudChrome.wocMarket.bidLabel': 'Ваша ставка (USD)',
+  'hudChrome.wocMarket.bidPlaceholder': 'Введите сумму в USD',
+  'hudChrome.wocMarket.bidButton': 'Сделать ставку',
+  'hudChrome.wocMarket.bidAria': 'Сделать ставку на {item}',
+  'hudChrome.wocMarket.bidTermsToggle': 'Условия ставок',
+  'hudChrome.wocMarket.buyNowButton': 'Купить сейчас за {usd}',
+  'hudChrome.wocMarket.buyNowAria': 'Купить {item} сейчас за {usd}',
+  'hudChrome.wocMarket.cancelButton': 'Отменить лот',
+  'hudChrome.wocMarket.cancelAria': 'Отменить ваш лот {item}',
+  'hudChrome.wocMarket.bidBondNote':
+    'Ставка удерживает возвращаемый залог в $WOC сверх самой ставки: {bond} при ставке {bid}, а при более высокой ставке больше. Он возвращается, если вас перебили или вы не выиграли, а если выиграли, то после вашей оплаты; при повторном предложении он удерживается снова.',
+  'hudChrome.wocMarket.bidBondSchedule': 'Залог составляет {rate}% от ставки: не менее {min} и не более {max}.',
+  'hudChrome.wocMarket.bidBondPayWindow': 'Оплатите залог в течение {duration} после ставки, иначе ставка будет аннулирована.',
+  'hudChrome.wocMarket.variableTokenWarning':
+    'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
+  'hudChrome.wocMarket.claimCooldownRetry':
+    'Вы недавно отказались от быстрой покупки. Повторите попытку через {duration}.',
+  'hudChrome.wocMarket.termsLink': 'Открыть условия Торговой площадки (в новой вкладке)',
+  'hudChrome.wocMarket.quoteExpiresAt': 'Котировка истекает в {time}.',
+  'hudChrome.wocMarket.bidBindingNote':
+    'Ставка становится обязательной, как только вы подписываете транзакцию залога: отозвать её нельзя, а если вы выиграете и не оплатите покупку, залог будет удержан, и на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.wocMarket.bidCloseNote':
+    'Ставка, залог которой подтверждается в последние 2 минуты, продлевает аукцион до 2 минут после этой ставки, но не более чем на 30 минут после объявленного завершения. Залог, подтверждённый после завершения аукциона, не засчитывается и возвращается.',
+  'hudChrome.wocMarket.offerNextNote':
+    'Если победитель не оплатит покупку, покупателем по вашей собственной ставке можете стать вы: залог удержат снова (или запросят повторно, если он уже был возвращён), а оплатить нужно в течение {duration}.',
+  'hudChrome.wocMarket.buyNowNote':
+    '«Купить сейчас» закрепляет этот лот за вами примерно на четыре с половиной минуты, пока вы платите. Если не оплатить вовремя, повторить попытку с этим лотом можно будет только через 30 минут, а три неоплаченных «Купить сейчас» за час приостанавливают для вас «Купить сейчас», пока самому раннему из них не исполнится час.',
+  'hudChrome.walletBridge.cancelled': 'Запрос к кошельку отменён. Ничего не отправлено.',
+  'hudChrome.walletBridge.timeout':
+    'Кошелёк не ответил вовремя. Откройте кошелёк и повторите попытку.',
+  'hudChrome.walletBridge.notConnected':
+    'Сначала подключите и подтвердите кошелёк, затем повторите попытку.',
+  'hudChrome.walletBridge.unsupported':
+    'Этот кошелёк не может выполнить это действие. Подключите другой кошелёк.',
+  'hudChrome.walletBridge.unavailable':
+    'Здесь нет доступного подключения к кошельку. Переподключите кошелёк и повторите попытку.',
+  'hudChrome.walletBridge.badResponse': 'Кошелёк вернул непригодный ответ. Повторите попытку.',
+  'hudChrome.wocMarket.bondSeenAwaitingFinality':
+    'Платёж залога виден в реестре. Ожидается окончательное подтверждение.',
+  'hudChrome.wocMarket.bondNotYetVisible':
+    'Платёж залога пока не виден в реестре. Он может появиться через некоторое время.',
+  'hudChrome.wocMarket.bondServiceUnreachable':
+    'Платёжный сервис недоступен. Ваш платёж залога записан и будет проверен повторно.',
+  'hudChrome.wocMarket.bondPendingGeneric': 'Ваш платёж залога отправлен и ожидает подтверждения.',
+  'hudChrome.wocMarket.settlementFailQuoteExpired':
+    'Расчёт платежа истёк до использования. Запросите новый и оплатите ещё раз.',
+  'hudChrome.wocMarket.settlementFailTransaction':
+    'Платёжная транзакция не прошла в сети. Запросите новый расчёт и повторите попытку.',
+  'hudChrome.wocMarket.settlementFailRefunded': 'Этот платёж возвращён в ваш кошелёк.',
+  'hudChrome.wocMarket.settlementFailSuperseded': 'Эта попытка оплаты заменена более новой.',
+  'hudChrome.wocMarket.settlementFailConfirmingOverdue': 'Этот платёж подтверждался слишком долго, и проверить его не удалось.',
+  'hudChrome.wocMarket.settlementDeadlineNote':
+    'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
+  'hudChrome.wocMarket.termsLabel': 'Я принимаю условия Торговой площадки.',
+  'hudChrome.wocMarket.quoteTitle': 'Подтверждение оплаты',
+  'hudChrome.wocMarket.quoteTotal': 'Итого: {tokens} $WOC',
+  'hudChrome.wocMarket.quoteSeller': 'Продавец получает: {tokens} $WOC',
+  'hudChrome.wocMarket.quoteBurn': 'Сжигается (изымается из обращения): {tokens} $WOC',
+  'hudChrome.wocMarket.quoteTreasury': 'В казну игры: {tokens} $WOC',
+  'hudChrome.wocMarket.quoteExpires': 'Котировка истечёт через {duration}',
+  'hudChrome.wocMarket.quoteExpired': 'Котировка истекла. Запросите новую.',
+  'hudChrome.wocMarket.quoteSign': 'Подписать и оплатить',
+  'hudChrome.wocMarket.quoteRefresh': 'Новая котировка',
+  'hudChrome.wocMarket.quoteCancel': 'Не сейчас',
+  'hudChrome.wocMarket.activityCancelPending': 'Ожидает отмены',
+  'hudChrome.wocMarket.activityDirected': 'Прямая продажа',
+  'hudChrome.wocMarket.quoteBondFor': 'Возвращаемый залог за ставку: {usd}',
+  'hudChrome.wocMarket.quoteSettlementFor': 'Расчёт за {item}: {usd}',
+  'hudChrome.wocMarket.signing': 'Ожидание вашего кошелька...',
+  'hudChrome.wocMarket.signFailed':
+    'Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.',
+  'hudChrome.wocMarket.signFailedConfirm':
+    'Кошелёк не подписал подтверждение. Проверьте кошелёк и повторите попытку.',
+  'hudChrome.wocMarket.listing': 'Размещение предмета...',
+  'hudChrome.wocMarket.confirming': 'Подтверждение в сети...',
+  'hudChrome.wocMarket.bidPlacedStanding': 'Ваша ставка принята. Вы лидируете в торгах.',
+  'hudChrome.wocMarket.bidPlacedOutbid': 'Ваш залог подтверждён, но кто-то успел поставить больше.',
+  'hudChrome.wocMarket.purchaseComplete':
+    'Покупка завершена. Предмет прибудет почтой Вороньей службы.',
+  'hudChrome.wocMarket.paymentConfirmedDelivering': 'Оплата подтверждена. Когда доставка завершится, предмет прибудет почтой Вороньей службы.',
+  'hudChrome.wocMarket.listingCreated': 'Ваш лот выставлен.',
+  'hudChrome.wocMarket.listingCancelled': 'Лот отменён. Предмет вернётся почтой Вороньей службы.',
+  'hudChrome.wocMarket.listingCancelPending':
+    'Отмена ожидает: покупатель удерживает окно покупки. Если он не заплатит, лот закроется, а предмет вернётся почтой Вороньей службы.',
+  'hudChrome.wocMarket.sellTitle': 'Создание лота',
+  'hudChrome.wocMarket.sellEmptyFloor':
+    'В сумках нет подходящих предметов. Этот мир принимает неприсоединённую экипировку качества {floor} и выше.',
+  'hudChrome.wocMarket.sellCollectiblesBoth':
+    'Также можно выставлять средства передвижения и пластины окраски мехов.',
+  'hudChrome.wocMarket.sellCollectiblesMounts': 'Также можно выставлять средства передвижения.',
+  'hudChrome.wocMarket.sellCollectiblesChromas': 'Также можно выставлять пластины окраски мехов.',
+  'hudChrome.wocMarket.sellFormat': 'Формат',
+  'hudChrome.wocMarket.sellFormatAuction': 'Аукцион',
+  'hudChrome.plurals.wocMarketSellChoose.one': 'Выберите из {count} предмета',
+  'hudChrome.plurals.wocMarketSellChoose.few': 'Выберите из {count} предметов',
+  'hudChrome.plurals.wocMarketSellChoose.many': 'Выберите из {count} предметов',
+  'hudChrome.plurals.wocMarketSellChoose.other': 'Выберите из {count} предметов',
+  'hudChrome.plurals.wocTradeIneligible.other':
+    '{count} выставленных предметов нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.many':
+    '{count} выставленных предметов нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.few':
+    '{count} выставленных предмета нельзя продать за $WOC.',
+  'hudChrome.plurals.wocTradeIneligible.one':
+    '{count} выставленный предмет нельзя продать за $WOC.',
+  'hudChrome.wocMarket.sellClear': 'Убрать {item} и выбрать другой',
+  'hudChrome.wocMarket.sellSearchPlaceholder': 'Введите текст для фильтра сумок',
+  'hudChrome.wocMarket.sellChoose': 'Предмет для продажи',
+  'hudChrome.wocMarket.sellNoMatches': 'Нет предметов по этому запросу',
+  'hudChrome.wocMarket.sellBuyNowAboveStart':
+    'Цена немедленной покупки должна быть выше начальной ставки.',
+  'hudChrome.wocMarket.sellFormatBuyNow': 'Только выкуп',
+  'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'Аукцион с выкупом',
+  'hudChrome.wocMarket.sellStart': 'Стартовая ставка (USD)',
+  'hudChrome.wocMarket.sellReserve': 'Резервная цена (USD, необязательно)',
+  'hudChrome.wocMarket.sellBuyNowNote': 'Обязательно. Такой лот продаётся по этой цене без торгов.',
+  'hudChrome.wocMarket.sellBuyNowAuctionNote': 'Необязательно. Цена, заплатив которую покупатель завершит аукцион досрочно; она должна быть выше стартовой и резервной.',
+  'hudChrome.wocMarket.sellReserveNote':
+    'Необязательно, не ниже стартовой ставки. Участники видят только, достигнут он или нет; если высшая ставка на момент завершения окажется ниже, предмет вернётся к вам непроданным, а все залоги будут возвращены.',
+  'hudChrome.wocMarket.sellBuyNowPrice': 'Цена выкупа (USD)',
+  'hudChrome.wocMarket.sellDuration': 'Длительность',
+  'hudChrome.wocMarket.sellOfferNext':
+    'Если победитель не заплатит, продать предмет следующему по величине участнику, чья ставка достигает резерва, по его ставке, а не завершать торги без продажи.',
+  'hudChrome.wocMarket.sellSubmit': 'Выставить предмет',
+  'hudChrome.wocMarket.sellSubmitAria': 'Выставить {item} на биржу',
+  'hudChrome.wocMarket.sellFeeNote':
+    'При завершённой продаже из цены удерживается сбор биржи: часть сжигается, часть уходит в казну, а остаток приходит на ваш привязанный кошелёк в расчётной транзакции. Сбор для введённой вами цены показан здесь; на аукционе он рассчитывается от итоговой цены.',
+  'hudChrome.wocMarket.activityListings': 'Мои лоты',
+  'hudChrome.wocMarket.activityBids': 'Мои ставки',
+  'hudChrome.wocMarket.activitySettlements': 'Мои расчёты',
+  'hudChrome.wocMarket.activityEmpty':
+    'У вас пока нет ставок, лотов или расчётов. Здесь появится ваша активность на бирже.',
+  'hudChrome.wocMarket.activityPayNow': 'Оплатить сейчас',
+  'hudChrome.wocMarket.activityPayNowAria': 'Оплатить расчёт {id} сейчас',
+  'hudChrome.wocMarket.activityDeadline': 'Оплата в течение {duration}',
+  'hudChrome.wocMarket.activityStrikes': 'Штрафы на бирже: {count}',
+  'hudChrome.wocMarket.activitySuspended':
+    'Доступ к бирже приостановлен на {duration} из-за неоплаченных сделок: до тех пор нельзя делать ставки, покупать, выставлять лоты и торговать за $WOC.',
+  'hudChrome.wocMarket.bidStatusPending': 'Ожидает залога',
+  'hudChrome.wocMarket.bidStatusActive': 'Лидирующая ставка',
+  'hudChrome.wocMarket.bidStatusOutbid': 'Перебита',
+  'hudChrome.wocMarket.bidStatusLapsed': 'Просрочена',
+  'hudChrome.wocMarket.bidStatusWon': 'Выиграна',
+  'hudChrome.wocMarket.bidStatusDefaulted': 'Не оплачена',
+  'hudChrome.wocMarket.bidStatusCancelled': 'Отменена',
+  'hudChrome.wocMarket.bidBondPay': 'Оплатить залог',
+  'hudChrome.wocMarket.bidBondPayAria': 'Оплатить залог по ставке на лот {id}',
+  'hudChrome.wocMarket.settlementOffered': 'Ожидает оплаты',
+  'hudChrome.wocMarket.settlementConfirming': 'Подтверждается',
+  'hudChrome.wocMarket.settlementConfirmedDelivering': 'Оплата подтверждена, доставляется',
+  'hudChrome.wocMarket.settlementReview': 'Платеж на проверке',
+  'hudChrome.wocMarket.settlementDelivered': 'Доставлено',
+  'hudChrome.wocMarket.settlementExpired': 'Просрочено без оплаты',
+  'hudChrome.wocMarket.settlementFailed': 'Оплата не прошла',
+  'hudChrome.wocMarket.settlementFailBurnMissing': 'В платеже отсутствует требуемое сжигание токенов.',
+  'hudChrome.wocMarket.settlementFailBurnMismatch': 'В платеже сожжено неверное количество токенов.',
+  'hudChrome.wocMarket.settlementFailBurnAuthority': 'Сжигание токенов выполнено с кошелька, не указанного в этой покупке.',
+  'hudChrome.wocMarket.settlementFailUnexpectedCredit': 'Транзакция отправила средства на кошелек вне этой покупки.',
+  'hudChrome.wocMarket.settlementFailGeneric': 'Не удалось завершить этот платеж.',
+  'hudChrome.wocMarket.paymentSeenAwaitingFinality': 'Платеж виден в реестре. Ожидается окончательное подтверждение.',
+  'hudChrome.wocMarket.paymentNotYetVisible': 'Платеж пока не виден в реестре. Он может появиться через некоторое время.',
+  'hudChrome.wocMarket.paymentServiceUnreachable': 'Платежный сервис недоступен. Ваш платеж записан и будет проверен повторно.',
+  'hudChrome.wocMarket.paymentPendingGeneric': 'Ваш платеж отправлен и ожидает подтверждения.',
+  'hudChrome.wocMarket.listingStatusActive': 'Активен',
+  'hudChrome.wocMarket.listingStatusSettling': 'Ожидает оплаты',
+  'hudChrome.wocMarket.listingStatusSold': 'Продан',
+  'hudChrome.wocMarket.listingStatusReturned': 'Возвращён',
+  'hudChrome.wocMarket.listingStatusCancelled': 'Отменён',
+  'hudChrome.wocMarket.listingStatusSuspended': 'Приостановлен',
+  'hudChrome.wocMarket.listingStatusUnsold': 'Не продан',
+  'hudChrome.wocMarket.bidBondPayItemAria': 'Оплатить залог {bond} за ставку на {item}',
+  'hudChrome.wocMarket.strikesTip':
+    'Штраф начисляется каждый раз, когда вы не оплачиваете сделку, на которую согласились. После первого каждый следующий штраф отстраняет вас от биржи на всё больший срок: 3 дня, затем 14, затем 90, затем год.',
+  'hudChrome.wocMarket.dueAt': 'Срок: {utc} UTC ({local} по местному времени)',
+  'hudChrome.wocMarket.activityPayNowItemAria': 'Оплатить {usd} за {item} сейчас',
+  'hudChrome.wocMarket.activityNoSettlements': 'У вас нет расчётов.',
+  'hudChrome.wocMarket.activityNoBids': 'У вас нет ставок.',
+  'hudChrome.wocMarket.activityNoListings': 'У вас нет лотов.',
+  'hudChrome.wocMarket.sellLockedHidden':
+    'Заблокированные предметы здесь не показываются. Чтобы продать их, снимите блокировку в сумке.',
+  'hudChrome.wocMarket.paymentDueAt': 'Оплата должна поступить до {time}.',
+  'hudChrome.wocMarket.quoteBondForItem': 'Возвращаемый залог за ставку на {item}: {usd}',
+  'hudChrome.wocMarket.quoteFixedNote':
+    'Эта котировка фиксирует сумму в $WOC до своего истечения. Новая котировка может отличаться.',
+  'hudChrome.wocMarket.rowOpenAria': 'Открыть лот: {item}',
+  'hudChrome.wocMarket.detailSalesLoading': 'Загружаем недавние продажи...',
+  'hudChrome.wocMarket.buyNowLockedTip':
+    'Другой покупатель удерживает этот лот, пока платит. Если он не оплатит вовремя, лот откроется снова.',
+  'hudChrome.wocMarket.yourListingTip':
+    'Это ваш лот. Делать ставки на свой лот нельзя; пока на него нет ставок, его можно отменить здесь или во вкладке «Активность».',
+  'hudChrome.wocMarket.reserveNotMetTip':
+    'Продавец установил скрытую минимальную цену. Если высшая ставка на момент завершения окажется ниже неё, предмет не будет продан, а все залоги вернутся.',
+  'hudChrome.wocMarket.reserveMetTip':
+    'Продавец установил скрытую минимальную цену, и текущая ставка её достигает.',
+  'hudChrome.wocMarket.rateNotePaused':
+    'Последний известный курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
+  'hudChrome.wocMarket.tabsLabel': 'Разделы биржи $WOC',
   'hudChrome.calendar.title': 'Календарь событий',
   'hudChrome.calendar.close': 'Закрыть календарь',
   'hudChrome.calendar.keybindLabel': 'Календарь событий',
@@ -8882,6 +9434,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.arenaClash.title': 'Битва на арене',
   'hudChrome.calendar.events.arenaClash.note':
     'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Выходные двойной чести',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Военные лагеря трубят сбор: все выходные награды чести Терновой Лощины удваиваются, а сыгранное до конца поражение оплачивается как победа.',
   'hudChrome.calendar.events.fishingDerby.title': 'Рыбацкое дерби',
   'hudChrome.calendar.events.fishingDerby.note':
     'Рыбаки выстраиваются вдоль озёр. Берите удочку и делитесь байками.',
@@ -8995,6 +9550,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': 'Кожевничество',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '(потратит отборный сорт: {count})',
+  'hudChrome.crafting.reagentVaultDraw': '(возьмёт из хранилища материалов: {count})',
+  'hudChrome.crafting.vaultUnreachable': 'Хранилище материалов здесь недоступно.',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
@@ -9073,8 +9630,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение... (! команды сообщества)',
+  'hudChrome.mobile.consumableSeat': 'Расходники',
+  'hudChrome.mobile.menuControl': 'Меню',
+  'hudChrome.mobile.menuControlAria':
+    'Меню. Нажмите, чтобы открыть чат, или удерживайте и проведите вправо для транспорта, карты, сумок и других разделов.',
+  'hudChrome.mobile.menuControlAriaTap':
+    'Меню. Нажмите, чтобы открыть ряд меню: транспорт, карта, сумки и другие разделы. Нажмите ещё раз, чтобы открыть чат.',
+  'hudChrome.mobile.quickActions': 'Быстрые действия',
+  'hudChrome.mobile.quickActionsAria':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, либо удерживайте и проведите вправо, чтобы выбрать.',
+  'hudChrome.mobile.quickActionsAriaTap':
+    'Быстрые действия. Нажмите, чтобы открыть ряд: транспорт, чат, карта, сумки и другие разделы, затем нажмите нужный значок. Нажмите на элемент управления ещё раз, чтобы закрыть.',
+  'hudChrome.mobile.quickActionsLabel': 'Действия',
+  'hudChrome.mobile.stanceRadial': 'Стойки',
+  'hudChrome.mobile.stanceAnchorAria': 'Стойка: {stance}. Нажмите, чтобы открыть круг стоек, затем выберите другую стойку.',
+  'hudChrome.mobile.stanceAnchorEmptyAria': 'Без стойки. Нажмите, чтобы открыть круг стоек, затем выберите стойку.',
+  'hudChrome.mobile.questStripAria':
+    'Отслеживаемое задание {position} из {total}: {title}. Нажмите, чтобы перейти к следующему.',
+  'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',
+  'hudChrome.mobile.questStripMore': 'ещё {count}',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',
   'hudChrome.keybinds.petAttack': 'Питомец: атака',
   'hudChrome.keybinds.petStop': 'Питомец: стоп',
@@ -9082,187 +9657,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': 'Питомец: провокация',
   'hudChrome.keybinds.petDefensive': 'Питомец: защита',
   'hudChrome.keybinds.petAggressive': 'Питомец: агрессия',
-  'hudChrome.vcup.title': 'Кубок Долины',
-  'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
-  'hudChrome.vcup.offlineNote': 'Книга матчей закрыта. Кубок Долины сейчас недоступен.',
-  'hudChrome.vcup.recordLine': 'Ваш счёт: побед {wins}, поражений {losses}, ничьих {draws}.',
-  'hudChrome.vcup.bracketsAria': 'Формат матча',
-  'hudChrome.vcup.bracketLabel': '{n} на {n}',
-  'hudChrome.vcup.waitingCount': 'в очереди: {count}',
-  'hudChrome.vcup.nationsHeading': 'Знамённая нация',
-  'hudChrome.vcup.nation.vale': 'Истврукская долина',
-  'hudChrome.vcup.nation.mirefen': 'Мирефен',
-  'hudChrome.vcup.nation.thornpeak': 'Терновый пик',
-  'hudChrome.vcup.nation.coliseum': 'Пепельный Колизей',
-  'hudChrome.vcup.nation.choir': 'Бледный хор',
-  'hudChrome.vcup.nation.ogre': 'Кланы огров',
-  'hudChrome.vcup.nation.moon': 'Бледная луна',
-  'hudChrome.vcup.nation.copperdig': 'Медный рудник',
-  'hudChrome.vcup.awayNote':
-    'Если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
-  'hudChrome.vcup.rolesHeading': 'Игровая роль',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'В категориях 1 на 1 и 2 на 2 каждый игрок выходит как Универсал. Деяния, требующие категории 3 на 3 или больше, здесь получить нельзя.',
-  'hudChrome.vcup.role.allrounder.name': 'Универсал',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Всего понемногу: удар, дальний удар и честный толчок плечом.',
-  'hudChrome.vcup.role.striker.name': 'Нападающий',
-  'hudChrome.vcup.role.striker.desc': 'Живёт дальним ударом и резким финтом.',
-  'hudChrome.vcup.role.sweeper.name': 'Чистильщик',
-  'hudChrome.vcup.role.sweeper.desc': 'Сбивает бегущих с мяча и выносит его подальше.',
-  'hudChrome.vcup.role.keeper.name': 'Вратарь',
-  'hudChrome.vcup.role.keeper.desc': 'Держит ворота хватом, броском и длинным выбросом.',
-  'hudChrome.vcup.queue': 'Встать в очередь',
-  'hudChrome.vcup.leaveQueue': 'Покинуть очередь',
-  'hudChrome.vcup.queueNote':
-    'Вставайте в очередь откуда угодно; свисток позовёт вас на Свиное поле.',
-  'hudChrome.vcup.queuedStatus': 'В очереди на {bracket}: место {position} из {count}.',
-  'hudChrome.vcup.blockNation': 'Сначала выбери знамённую нацию.',
-  'hudChrome.vcup.blockPartySize': 'Для этой категории нужна группа поменьше.',
-  'hudChrome.vcup.blockNotLeader': 'Поставить команду в очередь может только лидер группы.',
-  'hudChrome.vcup.inMatchNote': 'Ваша команда на поле. Играйте!',
-  'hudChrome.vcup.deserterNote':
-    'Смотритель поля помнит. Снова встать в очередь можно через {seconds} сек.',
-  'hudChrome.vcup.liveHeading': 'Сейчас на Свином поле',
-  'hudChrome.vcup.liveAria': 'Кубок Долины: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': 'Подойдите к Свиному полю и смотрите с трибун.',
-  'hudChrome.vcup.noLive': 'На поле тихо. Матч не идёт.',
-  'hudChrome.vcup.boardHeading': 'Доска победителей',
-  'hudChrome.vcup.boardEmpty': 'Победителей пока нет. Медное ведро ждёт.',
-  'hudChrome.vcup.enterAsGuild': 'Выступить под знаменем гильдии {guild}',
-  'hudChrome.vcup.guildRecordLine': 'Счёт вашей гильдии: {wins} побед, {losses} поражений.',
-  'hudChrome.vcup.guildBoardHeading': 'Знамёна гильдий',
-  'hudChrome.vcup.guildBoardEmpty': 'Пока ни одна гильдия не вышла на поле. Поднимите своё знамя!',
-  'hudChrome.vcup.practicingNow': 'Сейчас тренируются ({count}):',
-  'hudChrome.vcup.boardWins': 'побед: {count}',
-  'hudChrome.vcup.practice': 'Тренировка с ботами',
-  'hudChrome.vcup.practiceNote': 'Немедленно начинает полный матч с ботами на Свином поле.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Тренировочные матчи не рейтинговые: счёт и прогресс Книги деяний не засчитываются.',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': 'Очередь Кубка Долины: {bracket}, место {position} из {count}',
-  'hudChrome.vcup.indicatorLive': 'Кубок Долины',
-  'hudChrome.vcup.indicatorOpen': 'Открыть окно Кубка Долины',
-  'hudChrome.vcup.phaseCountdown': 'До начала {seconds}',
-  'hudChrome.vcup.phaseGoal': 'ГОЛ!',
-  'hudChrome.vcup.phaseGolden': 'ЗОЛОТОЙ ГОЛ',
-  'hudChrome.vcup.phaseOver': 'ФИНАЛЬНЫЙ СВИСТОК',
-  'hudChrome.vcup.bannerFound': 'Кубок Долины зовёт: {nationA} против {nationB}!',
-  'hudChrome.vcup.bannerCountdown': 'До начала {seconds} сек...',
-  'hudChrome.vcup.bannerKickoff': 'НАЧАЛО МАТЧА!',
-  'hudChrome.vcup.bannerGoal': 'ГОЛ! Забивает {nation}!',
-  'hudChrome.vcup.bannerSave': '{name} СПАСАЕТ!',
-  'hudChrome.vcup.bannerGolden': 'ЗОЛОТОЙ ГОЛ: следующий гол решает всё!',
-  'hudChrome.vcup.bannerEnd': 'Финальный свисток: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': 'Победа на Свином поле!',
-  'hudChrome.vcup.bannerDraw': 'Ничья на Свином поле.',
-  'hudChrome.vcup.bannerLoss': 'Поражение на Свином поле.',
-  'hudChrome.vcup.logQueued': 'Вы встали в очередь Кубка Долины на {bracket} (место {position}).',
-  'hudChrome.vcup.logUnqueued': 'Вы покинули очередь Кубка Долины.',
-  'hudChrome.vcup.logFound': 'Ваш матч Кубка Долины готов: {nationA} против {nationB}.',
-  'hudChrome.vcup.logRoster': 'Ваша сторона: {allies}. Их сторона: {enemies}.',
-  'hudChrome.vcup.logGoal': '{name} забивает за {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logSave': '{name} делает сейв!',
-  'hudChrome.vcup.logWin': 'Вы выиграли встречу на Свином поле.',
-  'hudChrome.vcup.logDraw': 'Встреча на Свином поле закончилась вничью.',
-  'hudChrome.vcup.logLoss': 'Вы проиграли встречу на Свином поле.',
-  'hudChrome.vcup.gossipOpen': 'Книга матчей',
-  'hudChrome.vcup.gossipOpenAria': 'Открыть окно Кубка Долины',
-  'hudChrome.vcup.mobileLabel': 'Кубок',
-  'hudChrome.vcup.briefing.subtitle': 'Предматчевый инструктаж',
-  'hudChrome.vcup.briefing.vs': 'против',
-  'hudChrome.vcup.briefing.rulesHeading': 'Как играть',
-  'hudChrome.vcup.briefing.rule1': 'Забейте, пробив или отдав пас в ворота соперника.',
-  'hudChrome.vcup.briefing.rule2': 'Побеждает первый до 5 голов или лучший по голам к финалу.',
-  'hudChrome.vcup.briefing.rule3': 'Ничья к финалу ведёт к золотому голу: следующий гол решает.',
-  'hudChrome.vcup.briefing.rule4':
-    'Подкаты лишь сбивают с ног. Под перемирием жатвы никто не страдает.',
-  'hudChrome.vcup.briefing.rule5': 'Любой может подойти и поболеть за вас с трибун.',
-  'hudChrome.vcup.briefing.kitHeading': 'Ваш набор',
-  'hudChrome.vcup.briefing.kitNote': 'На время матча эти приёмы заменяют способности класса.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.',
-  'hudChrome.vcup.briefing.rosterHeading': 'Список состава',
-  'hudChrome.vcup.briefing.you': 'Вы',
-  'hudChrome.vcup.briefing.bot': 'Бот',
-  'hudChrome.vcup.briefing.ready': 'Я готов',
-  'hudChrome.vcup.briefing.readyDone': 'Готов',
-  'hudChrome.vcup.briefing.readyAria': 'Приготовиться к вбрасыванию',
-  'hudChrome.vcup.briefing.waiting': 'Ожидание готовности другой стороны...',
-  'hudChrome.vcup.briefing.whistle': 'Свисток прозвучит через {seconds} с.',
-  'hudChrome.vcup.briefing.readyCount': 'Готовы: {ready} из {total}',
-  'hudChrome.vcup.bet.title': 'Ставки на матч',
-  'hudChrome.vcup.bet.aria': 'Ставки на матч Кубка Долины',
-  'hudChrome.vcup.bet.closesIn': 'Приём ставок закроется через {seconds} с',
-  'hudChrome.vcup.bet.closed': 'Приём ставок закрыт',
-  'hudChrome.vcup.bet.prize': 'Банк {amount}',
-  'hudChrome.vcup.bet.splitAria': 'Доля банка на каждую команду',
-  'hudChrome.vcup.bet.expand': 'Ставки и сделать ставку',
-  'hudChrome.vcup.bet.collapse': 'Скрыть ставки',
-  'hudChrome.vcup.bet.oddsLabel': 'Выплата',
-  'hudChrome.vcup.bet.back': 'Ставка на {team}',
-  'hudChrome.vcup.bet.form': 'В{wins}-П{losses}',
-  'hudChrome.vcup.bet.mine': 'Ваша ставка: {amount} на {team}',
-  'hudChrome.vcup.bet.none': 'Вы ещё не сделали ставку на этот матч.',
-  'hudChrome.vcup.bet.record': 'История ставок: {wins}-{losses}, {sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': 'Ваша ставка сыграла!',
-  'hudChrome.vcup.bet.wonLog': 'Ставка на Кубок Долины сыграла: возвращено {amount}.',
-  'hudChrome.vcup.bet.lostLog': 'Ставка на Кубок Долины проиграна: {amount}.',
-  'hudChrome.vcup.bet.refundLog': 'Ставки аннулированы, ваша ставка {amount} возвращена.',
-  'guide.nav.valeCup': 'Кубок Долины',
-  'guide.valeCupPage.heading': 'Кубок Долины',
-  'guide.valeCupPage.intro':
-    'Кабанбол на Свином поле: выбери знамя, выбери роль и загони набитую соломой кабанью шкуру мимо вратаря ради Медного ведра. Ни крови, ни добычи, только рёв трибун.',
-  'guide.valeCupPage.loreHeading': 'Кабанбол и жатвенное перемирие',
-  'guide.valeCupPage.loreOldSow':
-    'Задолго до того, как проснулись мёртвые, батраки Иструка играли в кабанбол на стерне после жатвы: две ватаги, одна кабанья шкура, набитая соломой, и двое ворот от повозок, притащенных на края луга. Первый мяч, Старая Свинья, покрыт бронзой и висит над очагом таверны.',
-  'guide.valeCupPage.loreTruce':
-    'Когда Пепельный Колизей начал устраивать военные игрища, маршал Редбрук ответил чем-то более мягким: объявил на старом лугу постоянное жатвенное перемирие. Ворота повозок стали штангами, луг получил стены, трибуны и имя, Свиное поле, а призом всегда было одно и то же мятое молочное ведро, из которого пили победители: Медное ведро.',
-  'guide.valeCupPage.howHeading': 'Как играть',
-  'guide.valeCupPage.howQueue':
-    'Вставайте в очередь откуда угодно через окно Кубка Долины или поговорите со смотрителем поля Брамом у ворот Свиного поля. Выберите формат от один на один до пять на пять, знамённую нацию и роль; идите в одиночку или с группой.',
-  'guide.valeCupPage.howMatch':
-    'С началом матча ваш классовый набор заменяется спортивным и после точно восстанавливается. Удары целятся наземным прицелом, мяч отскакивает от бортов, а вести мяч значит просто бежать вместе с ним. Забейте больше соперника до финального свистка; ничья ведёт к золотому голу.',
-  'guide.valeCupPage.howTruce':
-    'На Свином поле никто не проливает кровь: подкаты лишь опрокидывают, ничто не ранит, а питомцы пережидают матч в стороне.',
-  'guide.valeCupPage.spectateBody':
-    'На стадионе идёт только один матч за раз, и любой может подойти и смотреть с трибун.',
-  'guide.valeCupPage.nationsHeading': 'Восемь знамённых наций',
-  'guide.valeCupPage.nationsBody':
-    'Каждая команда играет под знаменем. Капитан выбирает нацию, а если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
-  'guide.valeCupPage.nationVale':
-    'Зелёный и золотой, сноп пшеницы на знамени: хозяева поля, батраки до мозга костей.',
-  'guide.valeCupPage.nationMirefen':
-    'Бирюзовый и серый под цаплей: терпеливы, длинноноги, никогда не спешат.',
-  'guide.valeCupPage.nationThornpeak':
-    'Ледяная синь и белый под горной вершиной: твёрдый шаг и упрямый нрав.',
-  'guide.valeCupPage.nationColiseum':
-    'Красный и чёрный со скрещёнными мечами: играют так, будто это всё ещё война.',
-  'guide.valeCupPage.nationChoir':
-    'Бледно-голубой и серебро под колоколом: жуткие, точные и очень тихие.',
-  'guide.valeCupPage.nationOgre': 'Оранжевый и умбра за кулаком: плечом вперёд, и этим гордятся.',
-  'guide.valeCupPage.nationMoon':
-    'Фиолетовый и серебро под полумесяцем: ночные игроки, лёгкие на ногу.',
-  'guide.valeCupPage.nationCopperdig':
-    'Медь и бурый с киркой: рудокопы, которые не перестают бегать.',
-  'guide.valeCupPage.rolesHeading': 'Игровые роли',
-  'guide.valeCupPage.rolesBody':
-    'Роль определяет набор, который вы выносите на поле. Бить по мячу умеют все; остальное дело характера. В категориях один на один и два на два все играют набором универсала, так что выбор роли раскрывается начиная с трёх на трёх.',
-  'guide.valeCupPage.rewardsHeading': 'Правила перемирия',
-  'guide.valeCupPage.rewardsBody':
-    'Правила перемирия означают: ни опыта, ни добычи. Результативный матч идёт в ваш счёт и на доску победителей, а победа также засчитывается в дневные задачи наград. Дезертирство оставляет ваше место пустым, и смотритель поля это помнит.',
-  'guide.valeCupPage.bettingHeading': 'Ставка у бортика',
-  'guide.valeCupPage.bettingBody':
-    'Зрители на Свином поле могут поддержать одну из сторон, пока матч собирается: ставки складываются в общий банк, и с финальным свистком победители делят банк проигравших соразмерно поставленному. Ничья или сенсация, на которую никто не ставил, возвращает каждую монету. Игроки, заявленные на матч, ставить на него не могут, а у бортика хранится ваш итоговый счёт побед, поражений и чистых монет.',
-  'guide.valeCupPage.practiceHeading': 'Тренировочные встречи и пустующее поле',
-  'guide.valeCupPage.practiceBody':
-    'Окно Кубка Долины предлагает и тренировку: личную копию поля, где обе стороны заполняют боты и ничто не идёт в ваш счёт. Не хватает игрока-другого для настоящего матча? После недолгого ожидания боты дополнят команды, а любой матч с ботами на поле, это товарищеская встреча, никогда не рейтинговая. А когда Свиное поле пустует, боты устраивают показательный матч, который можно смотреть с трибун и ставить на него; в тот же миг, как настоящие игроки готовы, показательный матч уступает поле, и каждая ставка возвращается.',
-  'entities.npcs.groundskeeper_bram.name': 'Смотритель поля Брам',
-  'entities.npcs.groundskeeper_bram.title': 'Хранитель Свиного поля',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'На Свином поле действует перемирие, {className}: только ноги и плечи. Сыграем за Медное ведро?',
   'entities.npcs.chronicler_saul.name': 'Летописец Саул',
   'entities.npcs.chronicler_saul.title': 'Летопись Истврукской долины',
   'entities.npcs.chronicler_saul.greeting':
@@ -9375,6 +9769,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пока хранилище открыто, щёлкните предмет в сумках, чтобы положить его, и щёлкните предмет в хранилище, чтобы забрать обратно. Хранилище принимает только вещи, но не монеты, а квестовые предметы всегда остаются при вас. Если сумки переполнились в дороге, отдельная кнопка разом убирает все ремесленные материалы.',
   'guide.economy.bankSlots':
     'Свежее хранилище невелико, но растёт вместе с вами. Казначей продаёт дополнительные ячейки за монеты, и каждая следующая ступень дороже прежней. Игра онлайн приносит и бонусное место: за подтверждённую почту, привязанные аккаунты и друзей, которых вы привели в игру.',
+  'guide.economy.bankSockets':
+    'Помимо лестницы ячеек казначей продаёт до четырёх ячеек для сумок: они открываются по порядку, и каждая следующая дороже прежней. Вложите запасную сумку из своего набора, и её ячейки прибавятся к месту в хранилище: обычная сумка расширяет всё хранилище, а сумка для реагентов добавляет место только под материалы для ремесла. Нажмите на сумку в сумках, чтобы вложить её, и на ячейку, чтобы забрать обратно. Забирая сумку, вы никогда не теряете сохранённое: если хранилище окажется полнее уменьшившегося места, всё остаётся на месте, а новые вклады просто ждут свободного места.',
   'guide.economy.bankTitle': 'Банк',
   'hudChrome.bank.title': 'Банк',
   'hudChrome.bank.subtitle': 'Золочёный сундук',
@@ -9387,18 +9783,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': 'Полностью расширен',
   'hudChrome.bank.buyConfirm': 'Купить {count} дополнительных ячеек банка за {price}?',
   'hudChrome.bank.buyConfirmAccept': 'Купить',
+  'hudChrome.bank.meterLabel': 'Занято {used} из {total} ячеек',
+  'hudChrome.bank.meterPoolGeneral': 'Общие: {used} из {total}',
+  'hudChrome.bank.meterPoolMaterials': 'Материалы: {used} из {total}',
+  'hudChrome.bank.meterPoolsAria': 'Занято ячеек банка: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
+  'hudChrome.bank.meterMaterialsNote': 'Место только для материалов из вставленных сумок для материалов. Другие предметы не могут его занимать.',
+  'hudChrome.bank.priceDisclaimer': 'Цены могут меняться вместе с игровой экономикой.',
+  'hudChrome.bank.rungItemName': '{count} ячеек банка',
+  'hudChrome.bank.buySlotsDualAria': 'Купить {count} ячеек за {price} или {cost} Claudium',
+  'hudChrome.bank.buyConfirmDual': 'Купить {count} дополнительных ячеек банка?',
+  'hudChrome.bank.buyConfirmGold': 'Купить за {price}',
+  'hudChrome.bank.buyConfirmClaudium': 'Купить за {cost} Claudium',
+  'hudChrome.bank.rungGranted': 'Ячейки банка добавлены. Банк этого персонажа стал больше.',
+  'hudChrome.bank.rungAlreadyGranted':
+    'Эти ячейки уже есть у персонажа. Повторно средства не списаны.',
+  'hudChrome.bank.rungApplyDeferred':
+    'Оплата прошла. Ячейки появятся автоматически при следующем входе этим персонажем.',
+  'hudChrome.bank.rungGrantUnresolved':
+    'Оплата прошла, но ячейки пока не выданы. Покупка записана, и поддержка сможет её завершить.',
+  'hudChrome.bank.rungInProgress':
+    'Покупка для этого персонажа еще завершается. Повторите попытку через мгновение.',
+  'hudChrome.bank.rungDoesNotFit':
+    'В банке этого персонажа больше не поместится ни одно расширение.',
+  'hudChrome.bank.rungNotPurchasable': 'Эти ячейки банка сейчас нельзя купить.',
+  'hudChrome.bank.rungFailed': 'Не удалось завершить покупку.',
+  'hudChrome.bank.rungOutage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.bank.withdrawHint': 'Нажмите, чтобы забрать',
   'hudChrome.bank.withdrawPartialHint': 'Shift+клик, чтобы забрать часть',
   'hudChrome.bank.depositHint': 'Нажмите, чтобы положить',
   'hudChrome.bank.depositPartialHint': 'Shift+клик, чтобы положить часть',
   'hudChrome.bank.cannotDeposit': 'Нельзя хранить в банке',
   'hudChrome.bank.cannotDepositNow': 'Сейчас положить нельзя',
+  'hudChrome.bank.socketRowAria': 'Ячейки для сумок в банке',
+  'hudChrome.bank.socketEmpty': 'Пустая банковская ячейка для сумки',
+  'hudChrome.bank.socketEmptyHint': 'Нажмите на сумку в сумках, чтобы поместить ее в банк',
+  'hudChrome.bank.socketLocked': 'Закрытая ячейка для сумки',
+  'hudChrome.bank.socketLockedLater':
+    'Ячейки для сумок открываются по порядку, начиная с самой дешевой',
+  'hudChrome.bank.socketUnlockAria': 'Открыть банковскую ячейку для сумки за {price}',
+  'hudChrome.bank.socketUnlockHint': 'Нажмите, чтобы открыть эту ячейку для сумки',
+  'hudChrome.bank.socketUnlockConfirm': 'Открыть банковскую ячейку для сумки за {price}?',
+  'hudChrome.bank.socketUnlockAccept': 'Открыть',
+  'hudChrome.bank.unsocketHint': 'Нажмите, чтобы вернуть эту сумку в сумки',
+  'hudChrome.bank.socketHint': 'Нажмите, чтобы вложить эту сумку в банк',
   'hudChrome.bank.depositQuantityTitle': 'Положить {item}',
   'hudChrome.bank.depositQuantityInput': 'Количество для внесения',
   'hudChrome.bank.depositQuantityConfirm': 'Положить',
   'hudChrome.bank.withdrawQuantityTitle': 'Забрать {item}',
+  'hudChrome.bank.vaultRowWithdrawName': 'Забрать {item}',
+  'hudChrome.bank.priceChanged':
+    'Цена изменилась до завершения покупки. Проверьте обновлённую цену и подтвердите покупку ещё раз.',
   'hudChrome.bank.withdrawQuantityInput': 'Количество для получения',
   'hudChrome.bank.withdrawQuantityConfirm': 'Забрать',
+  'hudChrome.bank.withdrawQuantityAction': 'Выбрать количество для получения: {item}',
   'hudChrome.bank.filterGroupAria': 'Фильтровать банк по категории',
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
@@ -9422,6 +9859,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
+  'hudChrome.bank.vaultTab': 'Хранилище',
+  'hudChrome.bank.vaultCapacityNote': 'Каждый материал можно хранить в количестве до {cap} шт.',
+  'hudChrome.bank.vaultEmpty':
+    'Ваше хранилище пусто. Щелкните по материалу в сумке, чтобы поместить его сюда.',
+  'hudChrome.bank.vaultRowAria': '{item}: хранится {count} из {cap}',
+  'hudChrome.bank.vaultLockedIntro':
+    'Откройте хранилище материалов, чтобы запасать ремесленные материалы рядом с банком. У каждого материала свое место, до {cap} шт.',
+  'hudChrome.bank.vaultUnlockButton': 'Открыть хранилище материалов',
+  'hudChrome.bank.vaultUnlockConfirm': 'Открыть хранилище материалов за {price}?',
+  'hudChrome.bank.vaultUpgrade': 'Расширить предел до {cap}',
+  'hudChrome.bank.vaultUpgradeConfirm':
+    'Расширить предел хранения каждого материала до {cap} за {price}?',
+  'hudChrome.bank.vaultDepositAll': 'Сложить все материалы',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'Отправляет все материалы из ваших сумок в хранилище за один раз, заполняя каждый материал до его предела. Экипировка, инструменты, предметы заданий и расходуемые предметы остаются на месте.',
+  'hudChrome.bank.vaultDepositAllDone': 'Сложено материалов: {count}.',
+  'hudChrome.bank.vaultDepositAllFull': 'Сложено материалов: {count}. Часть пределов заполнена.',
+  'hudChrome.bank.vaultDepositAllNone': 'Пределы хранилища заполнены: ничего не сложено.',
+  'hudChrome.bank.vaultWithdrawShort': 'В сумки помещается только {fit} из {count}.',
+  'hudChrome.bank.vaultDepositHint': 'Щелкните, чтобы поместить в хранилище',
+  'hudChrome.bank.vaultCannotDeposit': 'Нельзя поместить в хранилище',
   'hudChrome.bank.tabsAria': 'Вкладки банка',
   'hudChrome.bank.personalTab': 'Личный',
   'hudChrome.bank.guildTab': 'Гильдия',
@@ -9641,6 +10099,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.',
   'hudChrome.steam.noTicket':
     'Steam не выдал билет для привязки. Запустите Steam и повторите попытку.',
+  'hudChrome.steam.wishlist': 'Добавить в желаемое в Steam',
+  'hudChrome.steam.wishlistAria': 'Добавить в желаемое в Steam: открыть страницу World of ClaudeCraft в магазине',
+  'hudChrome.steam.wishlistShort': 'В желаемое',
   'hudChrome.epic.link': 'Привязать Epic',
   'hudChrome.epic.unlink': 'Отвязать Epic',
   'hudChrome.epic.linked': 'Привязан аккаунт Epic {id}',
@@ -10014,7 +10475,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
   'entities.abilities.psychic_scream.description': 'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
   'entities.abilities.shadowstep.description':
-    'Вы проходите сквозь тени к своей цели. (талант разбойника)',
+    'Вы проходите сквозь тени к своей цели, союзнику или врагу, не прерывая Сумеречную завесу. (талант разбойника)',
   'entities.abilities.silence.description':
     'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
   'entities.abilities.tranquility.description':
@@ -10125,7 +10586,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Следующие два заклинания со временем произнесения можно применять в движении. Время действия: 15 сек. (талант мага)',
   'entities.abilities.ignition.name': 'Воспламенение',
   'entities.abilities.ignition.description':
-    'Пассивно: критические эффекты ваших заклинаний поджигают цель, нанося 40% от причинённого урона за 6 сек. Эффект суммируется. (искусность ветки «Огонь»)',
+    'Пассивно: критические эффекты ваших заклинаний поджигают цель, нанося 30% от причинённого урона за 6 сек. Эффект суммируется. (искусность ветки «Огонь»)',
   'entities.abilities.mass_barrier.name': 'Массовый барьер',
   'entities.abilities.mass_barrier.description':
     'Окружает щитами вас и до 4 ближайших союзников в радиусе 30 м. Каждый щит поглощает 130 ед. урона в течение 60 сек. (талант мага)',
@@ -10540,6 +11001,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': 'Золочёное одеяние',
   'entities.items.goldweave_leggings.name': 'Золочёные поножи',
   'entities.items.silkspun_satchel.name': 'Шёлкопряденая сумка',
+  'entities.items.wayfarers_backpack.name': 'Ранец странника',
+  'entities.items.burlap_reagent_pouch.name': 'Холщовый мешочек для материалов',
+  'entities.items.necromancers_reagent_satchel.name': 'Сумка некроманта для материалов',
+  'entities.items.duskweave_bag.name': 'Сумеречнотканая сумка',
+  'entities.items.resonant_weave_bag.name': 'Резонанснотканая сумка',
+  'entities.items.foragers_haversack.name': 'Ранец собирателя',
+  'entities.items.loombound_reagent_satchel.name': 'Станкотканая сумка для материалов',
   'entities.items.silkbinders_raiment.name': 'Облачение шёлкоткача',
   'entities.items.sunweave_mantle.name': 'Солнцетканая мантия',
   'entities.items.sunweave_treads.name': 'Солнцетканая поступь',
@@ -11054,13 +11522,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': 'Лесной волк убит',
   'entities.quests.q_prof_amends_outfitter.title': 'Нити воссоединены',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили восточный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.',
+    'Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили северо-восточный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.',
   'entities.quests.q_prof_amends_outfitter.completion':
     'Снова твёрдо. Кожевничество и портняжное дело возвращаются к тебе основными ремёслами. На этот раз отмерь дважды, прежде чем уходить.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Паук-скрытень Сейблвеба истреблён',
   'entities.quests.q_prof_amends_apothecary.title': 'Снова на плите',
   'entities.quests.q_prof_amends_apothecary.text':
-    'Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на западном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.',
+    'Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на северо-западном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.',
   'entities.quests.q_prof_amends_apothecary.completion':
     'Вот он, прежний вкус. Алхимия и кулинария снова на твоей плите как основные ремёсла. На этот раз задержись подольше.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Дикий кабан добыт',
@@ -11491,7 +11959,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'У каждого изделия есть небольшой шанс (от 3% до предела 15%) выйти на ступень качества выше, но никогда выше рейдового порога.',
   'guide.profPages.faq.q6': 'Что значит подпись мастера на вещи?',
   'guide.profPages.faq.a6':
-    'Девять общих полевых рецептов и рецепты инструментов известны каждому с самого начала, как и три привязанных к станции высших рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат мастера при своих станциях в трёх узловых городах: большинство находится в Истбруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями на уровнях навыка 0, 25 и 50 и стоят единовременно бесплатно, 25 серебра и 1 золото. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно стоя у его станции: передвижная станция не считается.',
+    'Девять общих полевых рецептов и шесть рецептов ремесленных инструментов сбора известны каждому с самого начала, как и три привязанных к станции рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат местные мастера при своих станциях в трёх узловых городах: большинство находится в Иствруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями: 0, 25 и 50 навыка для снаряжения и расходуемых ремёсел, единовременная плата бесплатно, 25 серебра и 1 золото; два рецепта талисманов Наложения чар стоят на ступени 25 навыка, а Механик Гиззел учит двум скрафченным удочкам на 75 и 125 навыке за 4 и 16 золота. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно, стоя у его станции: передвижная станция не считается.',
   'guide.profPages.faq.q7': 'Что такое Узы мастера?',
   'guide.profPages.faq.a7':
     'Изделие на заказ привязывается к тому, кто получит его в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.',
@@ -11506,7 +11974,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
   'guide.professions.startHeading': 'С чего начать',
   'guide.professions.startBody':
-    'Только с дороги в Eastbrook? Найдите Foreman Odell и возьмите A Trade for Every Hand: он укажет вам на рудные жилы вокруг Copper Dig к юго-востоку от города и набьет вам первые мозоли. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла и работать над общими рецептами, которые каждый персонаж знает с самого начала. Загляните к мастерам у forge, kitchens, loom и toolworks, посмотрите, чему они учат, и берите их рабочие заказы ради устойчивого дохода. К тому времени, как вас найдет письмо Гильдии, вы уже будете знать, какая пара ощущается домом.',
+    'Только с дороги в Иствруке? Найдите Прораба Оделла и возьмите задание «Ремесло для каждой руки»: он укажет вам на рудные жилы вокруг Медного прииска к северо-востоку от города и набьёт вам первые мозоли. Берегитесь самого прииска: Глубокоскальные туннельщики, что лагерем стоят на нём, на несколько уровней превосходят свежего новичка, так что сперва разрабатывайте окраинные жилы и оставьте сердце лагеря на потом, когда немного прокачаетесь. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла, и осваивайте общие рецепты, которые каждый персонаж знает с самого начала. Загляните к мастерам в кузницу, на кухни, к ткацкому станку и в мастерскую, чтобы увидеть, чему они учат, и берите их рабочие заказы ради стабильного дохода. К тому времени, как вас найдёт письмо Гильдии, вы уже будете знать, какая пара ощущается родной.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Клинок, за которым идет каждый боец',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
@@ -11546,16 +12014,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Pristine Silk в raiment сам по себе покрывает бонус шедевра за подписанный реагент, а goldleaf и sunpetal считаются материалами 1-го и 2-го уровня для срабатывания, так что редкая ступень, это где шансы на пике. Простая безхарактерная работа вроде satchel не срабатывает никогда: шедевр улучшает характеристики, а у сумки их нет.\n\nШейте ступень homespun до 25, обучите gildenweave в день ее открытия и катитесь до 50, затем редкую ступень до 75. С 75 бразды берет Wardweave Cowl: рецепт 3-го уровня, полная отдача до 99 и половина за ним, примерно 75 изделий на последние пятьдесят очков, каждое ценой два Pristine Silk, четыре spider silk, по паре трав sunpetal и goldleaf и две нити.\n\nПусть подъем окупается: satchels продаются буквально всем, а рабочий заказ loom Ottilie покупает шесть spider silk каждые 30 минут. Книга деяний отмечает A Fine Seam на 50 навыке, а Grandmaster Tailoring ждет на пределе в 125.',
   'guide.profPages.craftProse.leatherworking.identityHeading': 'Кожа для быстрых',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "Лестница поднимается от простых Fenbridge hide leggings, boots и belt через необычные marshstalker jerkin, hood и spaulders к редкому набору mirewarden, лучшей коже, что может выкроить ремесленник. Две вещи заклинателя ее дополняют: полевой обычок Eastbrook Druid's Hide и Duskhide Wraps на 75 навыке.\n\nНа кольце оно сидит между Cooking и Tailoring. Его живая пара, это Outfitter, Leatherworking и Tailoring, присягаемая перед Weaver Ottilie в Eastbrook; пара Trapper с Cooking названа на кольце, но пока не имеет задания клятвы.",
+    'Лестница поднимается от простых поножей, сапог и пояса из кожи Фенбриджа через необычные куртку, капюшон и наплечники болотного охотника к редкому набору стража трясины, лучшей коже, что способен выкроить ремесленник. Её дополняют две вещи для заклинателей: полевой обычный предмет, Друидская шкура Иствбрука, и Обмотки Сумеречной шкуры на 50 навыке.\n\nНа кольце ремёсел оно стоит между Кулинарией и Портняжным делом. Его живая пара — Экипировщик, кожевничество и портняжное дело, приносимая в клятве перед Ткачихой Оттилией в Иствруке; пара Зверолова с Кулинарией названа на кольце, но пока не имеет задания на клятву.',
   'guide.profPages.craftProse.leatherworking.materialsHeading': 'Охота, это и есть добыча',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    'Leatherworking, это ремесло, где ваш маршрут прокачки и линия снабжения, это одно и то же: rough hide снимается прямо с туш, несущих шкуру, прежде всего волков и вепрей, и каждая туша служит лишь одному сборщику, кто первый, того и добыча. Редкий или лучше бросок сбора также дает Pristine Hide, подписанный образец, что зовет Mirewarden Jerkin, так что берегите каждый, что найдете.\n\nВспомогательный состав невелик: spider legs и silk, homespun cloth с гуманоидов, одна osmium ore в каждой редкой вещи mirewarden (шесть в капстоуне Duskhide Wraps) и Tanning Agent за 16 меди у прилавка tannery. Tanner Hesk продает osmium ore тоже, если вы предпочитаете не добывать.',
+    'Кожевничество — это ремесло, где ваш маршрут прокачки и линия снабжения — одно и то же: грубая шкура добывается прямо с туш, несущих шкуру, прежде всего волков и вепрей, и каждая туша служит лишь одному добытчику — кто первый, тот и берёт. Редкий или лучший бросок сбора также даёт Безупречную шкуру, подписанный образец, который требуется для Куртки стража трясины, так что берегите каждую найденную.\n\nВспомогательный состав невелик: паучьи ноги и шёлк, домотканое полотно с гуманоидов, одна осмиевая руда в каждой редкой вещи стража трясины (шесть в Обмотках Сумеречной шкуры) и Дубильное средство за 16 меди у прилавка дубильни. Саму осмиевую руду никогда не купить у прилавка: добывайте её сами, на Терновых высотах или почти на любых начальных жилах более молодой зоны (только на Дальнем Берегу добывают железо), либо покупайте у другого игрока.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Обучение в Fenbridge',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "Вот загвоздка: tannery стоит в Fenbridge, на дороге Mirefen Marsh, что делает Leatherworking единственным глубоким ремеслом, которому учат за пределами Eastbrook. Tanner Hesk учит лестнице у своих чанов: ступень Fenbridge hide бесплатна на 0 навыке, ступень marshstalker по 25 серебра за рецепт с 25 навыка, а ступень mirewarden по 1 золоту каждый с 50 навыка, и каждая ступень открывается, как только ваш разряд ее достигает.\n\nДва рецепта минуют тренера: полевые обычки (Tanned Leather Jerkin и Druid's Hide) куются где угодно с начала, а Duskhide Wraps известны всем, но сидят на 75 навыке, привязанные к tannery. Заметьте, что сама клятва Outfitter приносится обратно в Eastbrook у Ottilie; только обучение происходит на болоте.",
+    'Вот в чём загвоздка: дубильня стоит в Фенбридже, на дороге к Мирефенской топи, что делает кожевничество единственным глубоким ремеслом, обучение которому идёт за пределами Истврука, на болоте. Кожевник Хеск учит лестнице ремесла у своих чанов: ступень кожи Фенбриджа бесплатна на 0 навыке, ступень болотного охотника по 25 серебра за рецепт с 25 навыка, а ступень стража трясины по 1 золоту за рецепт с 50 навыка, и каждая ступень открывается, как только ваш разряд её достигает.\n\nТри рецепта обходятся без наставника: полевые обычные вещи (Куртка из дубленой кожи и Друидская шкура Иствбрука) куются где угодно с самого начала, а Обмотки Сумеречной шкуры известны всем уже на 50 навыке, но привязаны к дубильне. Заметьте, что сама клятва Экипировщика приносится в Иствруке, у Оттилии; на болоте происходит только обучение.',
   'guide.profPages.craftProse.leatherworking.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "От ступени marshstalker и выше каждое изделие катит шанс шедевра, а Pristine Hide в Mirewarden Jerkin дает бонус за подписанный реагент автоматически; osmium считается материалом 1-го уровня для срабатывания. Безхарактерные обычки из hide сработать не могут.\n\nПрокачивайте естественным путем: собирайте с каждого волка и вепря, которых убиваете с первого уровня, куйте ступень hide до 25 где стоите, затем учитесь в Fenbridge, ведь задания все равно тянут вас на болото. Marshstalker несет вас до 50, а mirewarden до 75; за этим Duskhide Wraps, рецепт 3-го уровня ценой шесть osmium ore, три Pristine Hide, два rough hide и Tanning Agent, платит полную отдачу до 99 и половину после, около 75 изделий на последние пятьдесят очков до предела в 125.\n\nМобильная tannery значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Fenbridge. Рабочий заказ tannery Hesk покупает восемь rough hides каждые 30 минут, ладный доход со шкур, что вы и так собирали, а Книга деяний отмечает Tanner's Trade на 50 навыке и Grandmaster Leatherworking на пределе.",
+    'Любое изделие с реальными характеристиками получает шанс на шедевр, пока более высокое качество укладывается в предел вашего разряда, включая обладающую характеристиками Друидскую шкуру Иствбрука, а подписанная Безупречная шкура в Куртке стража трясины даёт бонус за подписанный реагент автоматически; осмий засчитывается как материал 1-го уровня для срабатывания. Безхарактерные полевые обычные вещи из шкуры сработать не могут.\n\nПрокачивайте её естественным путём: собирайте с каждого волка и вепря, которых убиваете с первого уровня, пусть два полевых обычных предмета несут вас до 25 навыка, где бы вы ни находились, а затем обучитесь ступени кожи у чанов, когда задания всё равно потянут вас на болото. Болотный охотник несёт вас до 50, а вещи стража трясины и Обмотки Сумеречной шкуры несут редкий разряд с 50 до 75. После 75 эти рецепты 2-го уровня приносят половинную, а затем четвертную отдачу — около 150 изделий на последние пятьдесят очков до предела в 125; ниже потолка главного ремесла они всё равно соответствуют потолку изделий редкого качества, а не обнуляются вовсе.\n\nМобильная дубильня значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75 навыке, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Фенбридж. Рабочий заказ дубильни Хеска покупает восемь грубых шкур каждые 30 минут — неплохой доход со шкур, которые вы и так собирали, а Книга деяний отмечает «Дело кожевника» на 50 навыке и «Гранд-мастер кожевничества» на пределе.',
   'guide.profPages.craftProse.cooking.identityHeading': 'Котел, что кормит группу',
   'guide.profPages.craftProse.cooking.identityBody':
     "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья до самого Marlow's Grand Roast на 980, крупнейшего сидячего лечения, что существует.\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
@@ -12138,7 +12606,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно бросает священный молот во врага в пределах 20 м, нанося {damage} ед. урона, восстанавливая 70 маны, исцеляя вас на 50% нанесенного урона и создавая 1 ед. Преданности при нанесении урона. «Солнечное возмездие» позволяет «Молоту благодати» игнорировать время восстановления и исцелять вас на 100% нанесенного урона.',
   'entities.abilities.hammer_of_grace.name': 'Молот благодати',
   'entities.abilities.hex_of_violence.description':
-    'Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 22 ед. урона от Тьмы.',
+    'Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 17 ед. урона от Тьмы.',
   'entities.abilities.hex_of_violence.name': 'Проклятие насилия',
   'entities.abilities.hour_of_judgment.description':
     'Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения.',
@@ -12374,7 +12842,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Наносит удар с высокой угрозой и создает 1 ед. Преданности. Успешный удар с вероятностью 20% дает «Солнечное возмездие» на 8 сек., а каждый успешный блок с вероятностью 25%. «Солнечное возмездие» усиливает следующий «Солнечный диск», «Молот благодати» или «Целительный свет». Вознесение также дает небольшой поглощающий щит.',
   'entities.abilities.vowkeeper_strike.name': 'Удар хранителя обета',
   'entities.abilities.warspirit_cadence.description':
-    'Пассивно: каждая 3-я попавшая атака оружием вызывает 2 Эха бурного сердца по 50% урона от сил природы и дает Бурезаклятие на 12 сек. Бурезаклятие делает следующую Дугу молнии, Толчок или Целебные воды мгновенными и снижает расход маны на 50%. Удар предков считается за 2 атаки. (Дух войны)',
+    'Пассивно: атаки при бое двумя оружиями не получают дополнительный шанс промаха. Каждая 3-я попавшая атака оружием вызывает 2 Эха бурного сердца, наносящих 25% урона от сил природы, и даёт Бурезаклятие на 12 сек. Бурезаклятие делает следующую Дуговую стрелу, Толчок или Целебные воды мгновенными и снижает их расход маны на 50%. Удар предков считается за 2 атаки. (Дух войны)',
   'entities.abilities.warspirit_cadence.name': 'Ритм духа войны',
   'entities.abilities.wildheart.description':
     'Мгновенно восстанавливает 30% от максимального запаса здоровья.',
@@ -13249,6 +13717,277 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': 'недоступно',
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    'Раньше я тебя здесь не видела, друг. В этих краях есть традиция: те, кто начинает свой путь, посещают Берег Испытаний, тихий остров за проливом. Там можно отточить навыки и освоиться в мире, прежде чем принимать его вызовы. Паром ходит в обе стороны, и никто не подумает о тебе хуже, как бы ты ни решил.',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    'Снова здесь, и с новым лицом? Значит, порядок ты знаешь. Но если перед дорогой хочется освежить память, Берег Испытаний никогда не отказывает вернувшимся ученикам, а паром готов, когда готов ты.',
+  'hudChrome.tutorialGreeting.play': 'Пройти обучение',
+  'hudChrome.tutorialGreeting.declineNote':
+    'Как пожелаешь, друг. Передумаешь - паромный колокол у почтового столба Вранопочты в любой час, днем и ночью, перезвонит тебя на Берег Испытаний. Волки ждать не станут, а он подождет.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    'Только с переправы? Добро пожаловать на Берег Испытаний. Страж Там держит Полосу на берегу прямо перед тобой: подойди к нему вплотную, пока не покажется его имя, затем нажми F или щелкни по нему левой кнопкой мыши, и его дорожки научат твои ноги всему, что им нужно. А когда соберешься уходить, позвони в колокол, что стоит рядом с моим причалом, и переправа отвезет тебя домой, в Истврук.',
+  'hudChrome.tutorialGreeting.noteClose': 'Понятно',
+  'hudChrome.tutorialGreeting.skip': 'Пропустить обучение',
+  'hudChrome.bootcamp.title': 'Первые шаги',
+  'hudChrome.bootcamp.talkTitle': 'Поговори со Стражем Тамом',
+  'hudChrome.bootcamp.talkBody':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем нажми {interactKey} или щелкни по нему левой кнопкой мыши, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем коснись его или коснись кнопки использования, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.talkBodyPad':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем нажми кнопку взаимодействия, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.forwardTitle': 'Пройди первую дорожку',
+  'hudChrome.bootcamp.forwardBody':
+    'Шагни на дорожку рядом с Тамом и, удерживая {forwardKey}, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    'Шагни на дорожку рядом с Тамом и, толкая стик движения вверх, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.forwardBodyPad':
+    'Шагни на дорожку рядом с Тамом и, толкая левый стик вверх, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.turnwalkTitle': 'Повернись и иди',
+  'hudChrome.bootcamp.turnwalkBody':
+    'Первый флаг взят. Удерживай {turnKey}, чтобы развернуться на месте, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем снова удерживай {forwardKey} и пройди ее до второго флага.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    'Первый флаг взят. Проведи пальцем по миру (не по стику движения), чтобы повернуться, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем толкни стик вверх и пройди ее до второго флага.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    'Первый флаг взят. Наклони правый стик, чтобы повернуться, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем толкни левый стик вверх и пройди ее до второго флага.',
+  'hudChrome.bootcamp.strafeTitle':
+    'Развернись и иди',
+  'hudChrome.bootcamp.strafeBody':
+    'Остался один поворот. Удерживай {turnLeftKey}, чтобы развернуться на месте, пока не встанешь лицом к последней дорожке, затем снова удерживай {forwardKey} и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    'Остался один поворот. Проведи пальцем по миру (не по стику движения), чтобы развернуться лицом к последней дорожке, затем толкни стик вверх и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    'Остался один поворот. Толкни правый стик, чтобы развернуться лицом к последней дорожке, затем толкни левый стик вверх и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.cameraTitle': 'Поверни обзор',
+  'hudChrome.bootcamp.cameraBody':
+    'Последний урок перед тем, как сдать забег: зажми правую кнопку мыши и поводи ею, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    'Последний урок перед тем, как сдать забег: проведи пальцем по миру, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.cameraBodyPad':
+    'Последний урок перед тем, как сдать забег: наклони правый стик, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.courseProgress': 'Флаг {current} из {total}',
+  'hudChrome.bootcamp.doneTitle': 'Полоса пройдена',
+  'hudChrome.bootcamp.doneBody':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: нажми {interactKey} на нем или щелкни по нему левой кнопкой мыши, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: коснись его, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.doneBodyPad':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: нажми на нем кнопку взаимодействия, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.coachNextTitle': 'Дальше: {npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем нажми {interactKey} или щелкни левой кнопкой мыши, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем коснись его или коснись кнопки использования, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем нажми кнопку взаимодействия, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachTaskBody':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а {mapKey} открывает карту, если собьешься с пути.',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а кнопка карты покажет дорогу, если собьешься с пути.',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а кнопка карты покажет дорогу, если собьешься с пути.',
+  'hudChrome.bootcamp.coachReadyTitle': 'Поручение выполнено',
+  'hudChrome.bootcamp.coachReadyBody':
+    'Подойди к персонажу {npc} и нажми {interactKey} или щелкни левой кнопкой мыши, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    'Подойди к персонажу {npc} и коснись его, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    'Подойди к персонажу {npc} и нажми кнопку взаимодействия, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    'Подойди к соломенному чучелу и щелкни по нему левой кнопкой мыши, чтобы взять его в цель: его имя появится вверху экрана. Затем нажми {attackKey} или щелкни по первой кнопке на панели действий, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    'Подойди к соломенному чучелу и коснись его, чтобы взять его в цель. Затем коснись первой кнопки на панели действий, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.promptTurnIn':
+    'Сдать задание',
+  'hudChrome.bootcamp.promptSelect':
+    'Выбрать',
+  'hudChrome.bootcamp.promptUseAbility':
+    'Применить способность',
+  'hudChrome.bootcamp.taskHoneBody':
+    'Щелкни по чучелу левой кнопкой мыши, чтобы взять его в цель, затем нажми {abilityKey} и примени способность {ability}. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    'Коснись чучела, чтобы взять его в цель, затем коснись способности {ability} на панели действий. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    'Возьми чучело в цель, затем нажми кнопку действия со способностью {ability}. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.promptOpenBags': 'Открой сумки',
+  'hudChrome.bootcamp.promptCharacterSheet': 'Открой лист персонажа',
+  'hudChrome.bootcamp.promptLookAround': 'Зажми правую кнопку мыши и веди, чтобы осмотреться',
+  'hudChrome.bootcamp.promptKneel':
+    'Преклонить колени',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    'Нажми {bagsKey}, чтобы открыть сумки, и щелкни по Камню Ухода. Он уложит тебя там, где ты стоишь. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    'Иди на юг по береговой дороге до Камня Ухода и коснись его, чтобы преклонить колени. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    'Иди на юг по береговой дороге до Камня Ухода и нажми кнопку взаимодействия, чтобы преклонить колени. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    'Ты погиб. Ничего не потеряно. Нажми «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    'Ты погиб. Ничего не потеряно. Коснись «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    'Ты погиб. Ничего не потеряно. Выбери «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Нажми ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Коснись ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Выбери ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.promptLootPearl':
+    'Забрать жемчужину',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    'Подойди к соломенному чучелу и нажми кнопку выбора цели, чтобы взять его в цель. Затем нажми первую кнопку действия, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.taskShellBody':
+    'Крабы щиплются в ответ. Возьми одного в цель щелчком левой кнопки мыши, затем нажми {abilityKey} и примени способность {ability}, и не останавливайся. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    'Крабы щиплются в ответ. Коснись одного, чтобы взять его в цель, затем коснись способности {ability} на панели действий. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    'Крабы щиплются в ответ. Возьми одного в цель, затем нажми кнопку действия со способностью {ability}. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем нажми {interactKey} или щелкни по ящику левой кнопкой мыши, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем коснись ящика или коснись кнопки использования, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем нажми кнопку взаимодействия, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskPouchBody':
+    'Нажми {interactKey} рядом с персонажем {npc} или щелкни по нему левой кнопкой мыши, чтобы открыть прилавок, затем щелкни по льняному мешочку левой кнопкой мыши, чтобы купить его.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    'Коснись персонажа {npc}, чтобы открыть прилавок, затем коснись льняного мешочка, чтобы купить его.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    'Нажми кнопку взаимодействия рядом с персонажем {npc}, чтобы открыть прилавок, затем выбери льняной мешочек, чтобы купить его.',
+  'hudChrome.bootcamp.readyPouchBody':
+    'Мешочек куплен. Нажми {bagsKey}, чтобы открыть сумки, и щелкни по льняному мешочку левой кнопкой мыши, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и нажми {interactKey}, чтобы показать обновку.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'Мешочек куплен. Открой сумки и коснись льняного мешочка, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и коснись его, чтобы показать обновку.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'Мешочек куплен. Открой сумки и выбери льняной мешочек, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и нажми кнопку взаимодействия, чтобы показать обновку.',
+  'hudChrome.bootcamp.bellTitle': 'Позвони в колокол',
+  'hudChrome.bootcamp.bellBody':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и нажми {interactKey} или щелкни по нему левой кнопкой мыши, чтобы отплыть в Истврук.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и коснись его, чтобы отплыть в Истврук.',
+  'hudChrome.bootcamp.bellBodyPad':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и нажми кнопку взаимодействия, чтобы отплыть в Истврук.',
+  'entities.zones.proving_shore.pois.4.label': 'Полоса испытаний',
+  'entities.items.ps_castaway_crate.name': 'Выброшенный морем ящик',
+  'entities.items.ps_ferry_bell.name': 'Паромный колокол',
+  'entities.mobs.training_effigy.name': 'Тренировочное чучело',
+  'entities.mobs.shore_scuttler.name': 'Береговой краб',
+  'entities.npcs.wayfarer_bryn.name': 'Странница Брин',
+  'entities.npcs.wayfarer_bryn.title': 'Проводница гавани',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'Истврукская долина принимает всех, друг. А для тех, кто еще нетвердо стоит на ногах, всегда есть Берег Испытаний: паромный колокол у почтового столба Вранопочты перезвонит тебя туда в любой день года, а его близнец на острове позвонит домой.',
+  'entities.npcs.instructor_maren.name': 'Наставница Марен',
+  'entities.npcs.instructor_maren.title': 'Мастер испытаний',
+  'entities.npcs.instructor_maren.greeting':
+    'Каждый герой, которого когда-либо благодарила долина, стоял там, где сейчас стоишь ты, {className}, и ни один из них тогда не знал, за какой конец держат клинок. Для того этот берег и нужен. Спрашивай, упражняйся и ошибайся там, где ошибки ничего не стоят.',
+  'entities.npcs.quartermaster_finch.name': 'Интендант Финч',
+  'entities.npcs.quartermaster_finch.title': 'Снабженец лагеря',
+  'entities.npcs.quartermaster_finch.greeting':
+    'На моем прилавке продается ровно одна вещь, {playerName}: запасной мешочек для всего, что подберешь в дороге, и лишь тогда, когда его требует урок. Все остальное здесь просто спасенный груз, которому дорога в долину. Монета покупает мешочек, а труд зарабатывает монету. Вот и вся экономика, и сложнее она не становится. Только больше.',
+  'entities.npcs.ferryman_odo.name': 'Паромщик Одо',
+  'entities.npcs.ferryman_odo.title': 'Хранитель переправы',
+  'entities.npcs.ferryman_odo.greeting':
+    'Только с переправы, {playerName}? Страж Там держит Полосу на берегу сразу к югу от моего причала: сперва пробеги его дорожки, и твои ноги скажут тебе спасибо. Каждый хранитель на этом берегу передает тебя следующему, когда твоя работа сделана, а карточка наверху экрана всегда знает дорогу. А когда долина позовет обратно, позвони в колокол, что стоит рядом с моим причалом, и переправа высадит тебя прямо в Иствруке.',
+  'entities.npcs.warden_tam.name': 'Страж Там',
+  'entities.npcs.warden_tam.title': 'Хранитель Полосы',
+  'entities.npcs.warden_tam.greeting':
+    'Эти дорожки и есть Полоса, {playerName}, и каждый искатель приключений, кого уважает долина, пробегал их. Фонари на оградах горят всю ночь, так что дорожки не закрываются никогда.',
+  'entities.npcs.overseer_pell.name': 'Надзиратель Пелл',
+  'entities.npcs.overseer_pell.title': 'Надзиратель Полосы',
+  'entities.npcs.overseer_pell.greeting':
+    'Я засекаю каждый забег, что сходит с этих дорожек, {playerName}, и видал работу ног куда хуже твоей. Тропа за моей спиной поднимается к учебной площадке: там работа ног превращается в работу клинка.',
+  'entities.npcs.drillmaster_rook.name': 'Мастер муштры Рук',
+  'entities.npcs.drillmaster_rook.title': 'Хозяин площадки',
+  'entities.npcs.drillmaster_rook.greeting':
+    'Сперва солома, потом панцири, {playerName}. Чучело учит руку замаху, а крабы дальше по берегу учат ее попадать по тому, кому это не все равно.',
+  'entities.npcs.tidewarden_nel.name': 'Страж приливов Нел',
+  'entities.npcs.tidewarden_nel.title': 'Хранительница побережья',
+  'entities.npcs.tidewarden_nel.greeting':
+    'Прилив берет, и прилив платит, {playerName}. Я веду счет и тому и другому: тому, что крабы таскают с обломков, и тому, что честные руки несут вверх по этой тропе.',
+  'entities.quests.q_ps_the_gauntlet.title': 'Пробеги Полосу',
+  'entities.quests.q_ps_the_gauntlet.text':
+    'Каждая пара ног, которую уважает долина, сперва пробегала эти дорожки, {playerName}. Пройди первую дорожку на запад до флага, развернись на месте, пройди южную дорожку до второго флага, а последнюю дорожку пройди приставным шагом до красного флага. Флаги проходи по порядку: карточка вверху экрана покажет тебе каждую нужную кнопку по ходу дела. Надзиратель Пелл засекает каждый забег с дальнего конца: когда красный флаг останется позади, он будет стоять прямо там, чтобы принять твой забег.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    'Этот забег я засек, {playerName}, а заваливал я и более быстрые ноги. Полоса твоя. Тропа за моей спиной поднимается к учебной площадке, где мастер муштры Рук превращает работу ног в работу клинка: следующее поручение у него.',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'Флаг Полосы пройден',
+  'entities.npcs.bursar_wick.name': 'Казначей Уик',
+  'entities.npcs.bursar_wick.title': 'Золочёный сундук',
+  'entities.npcs.bursar_wick.greeting':
+    'У Золочёного сундука даже здесь есть свой стол, {playerName}. Все, что ты сдашь мне, будет ждать в одном и том же хранилище за спиной каждого казначея в каждом городе: его не достанут ни волки, ни вода, ни твои собственные опрометчивые решения.',
+  'entities.quests.q_ps_strike_true.title': 'Бей верно',
+  'entities.quests.q_ps_strike_true.text':
+    'Сперва ноги, теперь рука, {playerName}. Учебная площадка лежит вверх по тропе за моей спиной, и ее соломенные чучела сделаны, чтобы их били. Если собьешься с пути, нажми M и открой карту: каждое взятое поручение отмечено на ней. Подойди к чучелу и нажми Tab или щелкни по нему левой кнопкой мыши, чтобы взять его в цель, потом нажми 1 или щелкни по первому значку на панели действий внизу экрана, чтобы ударить. Бей, пока одно не развалится; сдачи оно не даст, чучела не дают никогда. Мастер муштры Рук смотрит за площадкой с ее западного плеча, там, где начинается тропа к берегу: нажми F на нем, чтобы сдать поручение.',
+  'entities.quests.q_ps_strike_true.completion':
+    'Одно чистое падение, и хватка уже увереннее. Запомни это чувство, {playerName}: взял цель, ударил и бей дальше. Соломе все равно. А вот тому, на кого ты замахнешься в следующий раз, будет не все равно.',
+  'entities.quests.q_ps_strike_true.objectives.0.label': 'Повалить тренировочное чучело',
+  'entities.quests.q_ps_shell_and_claw.title': 'Панцирь и клешня',
+  'entities.quests.q_ps_shell_and_claw.text':
+    'Соломе все равно, {playerName}, так что вот тебе тот, кому не все равно. Береговые крабы роются в обломках на дальнем берегу, вдоль полосы кораблекрушений: иди по тропе на запад от моей площадки, и она выведет тебя прямо к ним. Они щиплются в ответ, так что следи за полосой здоровья и не прекращай бить: возьми одного в цель щелчком левой кнопки мыши, примени способность, которой тебя научил двор, и не останавливайся, пока его панцирь не треснет. Трех хватит. Потом поднимись по тропе на северный склон: Страж приливов Нел ведет счет всему на берегу, и твои панцири она тоже сочтет.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    'Три панциря треснули, и все пальцы целы: достойный первый бой, {playerName}. Крабы растаскивают обломки быстрее, чем прилив приносит новые, так что каждый, кого ты выбраковал, - это монета, которую кто-то сохранит.',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': 'Береговой краб истреблен',
+  'entities.quests.q_ps_the_wreck_line.title': 'Полоса кораблекрушений',
+  'entities.quests.q_ps_the_wreck_line.text':
+    'Мои носильщики снимают добро со старых обломков и тащат его вверх по склону к лагерю Рассветный Привал, {playerName}, и половина ящиков до верха не доходит: их ставят у тропы и забывают. Иди по моей тропе к лагерю, и ты пройдешь прямо мимо этих отставших. Открыть такой ящик просто: подойди к нему вплотную, пока не покажется название, затем нажми F или щелкни по самому ящику левой кнопкой мыши, и он отдаст все, что хранит. Шесть штук расчистят всю полосу, и запомни: F - это одна и та же клавиша для любого сундука, любой жилы и любой двери, какие тебе только встретятся. Интендант Финч держит лагерную лавку и скупает обломки до последней щепки: отнеси добычу ей.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'Веревка, смола и полголовы сыра, который море почему-то пощадило: беру все, {playerName}. Спина, что несет найденное, для этого лагеря дороже любого клинка, а твоя только что расчистила всю полосу за один подъем.',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': 'Вскрыть выброшенный морем ящик',
+  'entities.quests.q_ps_pouch_and_purse.title': 'Мешочек и кошелек',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    'Еще один урок перед долиной, {playerName}, и он из тех, что сохраняют искателям приключений жизнь: что ты носишь. В твоем заплечном мешке шестнадцать ячеек, а рядом ждут четыре пустые петли для сумок: каждая пристегнутая сумка добавляет свое место в общий запас. Итак: нажми F на мне еще раз, чтобы открыть мою лавку, щелкни левой кнопкой мыши по льняному мешочку в моих товарах, чтобы купить его, затем нажми B, чтобы открыть сумки, и щелкни там по мешочку левой кнопкой мыши, чтобы пристегнуть его в свободную петлю. Наставница Марен ведет учения у сборного костра в нескольких шагах к востоку: покажи ей мешочек на своем поясе.',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    'Славный мешочек. Если еще не пристегнул его, пристегни: нажми B, чтобы открыть сумки, и щелкни по мешочку левой кнопкой мыши, чтобы усадить его в свободную петлю, и еще шесть ячеек под будущие неприятности твои. А теперь та половина урока, которую не вместит ни одна сумка, {playerName}: что не унесешь, то сбережет Золочёный сундук. Казначей Уик держит свой стол вверх по западной тропе и открывает то самое хранилище, что и любой казначей в любом городе; а когда кошелек подрастет, можно докупить и место в хранилище. Ценное держи в хранилище, а сумки просторными. Набитый доверху мешок оборвал больше приключений, чем любой волк.',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': 'Купить льняной мешочек',
+  'entities.quests.q_ps_hone_the_edge.title':
+    'Наточить клинок',
+  'entities.quests.q_ps_hone_the_edge.text':
+    'Удар есть удар, {playerName}, и солома примет их хоть весь день. Только этим ничего не выигрывают. Посмотри на ряд кнопок внизу экрана: этот ряд и есть твое ремесло, и каждая из них делает то, чего одна рука не может. Одна у тебя уже есть. Вернись к чучелам и примени ее: возьми цель, затем нажми кнопку, которую тебе указывает двор, и так трижды. Не молоти солому просто так, а сделай то, что ты умеешь. Потом возвращайся ко мне.',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    'Вот теперь ты дерешься, а не машешь руками. Этот ряд растет с каждым уровнем, {playerName}, и дольше всех живут те, кто его читает. Соломе все равно, какой кнопкой ты бил. Долине не все равно.',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    'Способность применена по чучелу',
+  'entities.quests.q_ps_the_long_walk.title':
+    'Долгий путь назад',
+  'entities.quests.q_ps_the_long_walk.text':
+    'Остался один урок, {playerName}, и его я не могу тебе рассказать: это надо пройти самому. Ты погибнешь там, снаружи. Погибают все, и это ничего не заканчивает. Возьми этот Камень Ухода. Нажми B, открой сумки и щелкни по нему, и он уложит тебя прямо там, где ты стоишь. Дальше следуй указаниям на экране: освободи дух, дойди до собственного тела и вернись в него. Тело ждет, дорога ничего не стоит, и, пройдя ее, ты ничего не теряешь.',
+  'entities.quests.q_ps_the_long_walk.completion':
+    'И вот ты вернулся, целым и невредимым. Запомни это чувство, {playerName}, потому что в следующий раз в деле будут зубы и рядом не будет никого, кто все объяснит. Тело ждет, дорога бесплатна, и единственное, что смерть действительно забирает, это время на возвращение.',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    'Возвращение из мертвых пешком',
+  'entities.items.ps_passing_stone.name':
+    'Камень Ухода',
+  'entities.quests.q_ps_the_signpost.title': 'Весть на ветру',
+  'entities.quests.q_ps_the_signpost.text':
+    'Осталась последняя привычка, {playerName}, и клинок для нее не нужен: читай доски. Гильдейский столб объявлений стоит у ворот лагеря, в нескольких шагах к юго-западу от моего костра, и гильдии с бродячими артелями вывешивают на нем свои призывы. Подойди к нему вплотную и нажми F или щелкни по нему левой кнопкой мыши, чтобы прочесть, что вывешено, а потом вернись и расскажи мне, что принес ветер. Такая доска стоит в каждом городе, куда ты когда-нибудь войдешь.',
+  'entities.quests.q_ps_the_signpost.completion':
+    'Теперь ты знаешь, как в долине расходятся вести, {playerName}: не с гонцами, а по доскам. Заглядывай на них в каждом городе, что пройдешь; половина приключений начинается с трех строк чернил на такой доске.',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': 'Прочесть гильдейский столб',
+  'entities.quests.q_ps_set_sail.title': 'Отплытие',
+  'entities.quests.q_ps_set_sail.text':
+    'На этом берегу не осталось ничего, что ты бы уже не пробежал, не победил, не открыл или не купил, {playerName}. Ты готов, а в Иствруке ждет настоящая работа. Спустись по береговой дороге обратно к причалу, нажми F на паромщике Одо и передай ему: я сказала, что ты заслужил переправу. А если забудешь, кому и что ты должен, нажми L в любой момент: это твой журнал заданий.',
+  'entities.quests.q_ps_set_sail.completion':
+    'Марен так сказала? Высокая похвала от женщины, что неделю заставляла меня вязать швартовые узлы. Позвони в колокол, что стоит рядом с моим причалом, когда будешь готов, {playerName}, и переправа высадит тебя прямо в Иствруке, посреди города. Берегись волков.',
+  'entities.quests.q_ps_set_sail.objectives.0.label': 'Доложить паромщику Одо',
+  'entities.zones.proving_shore.name': 'Берег Испытаний',
+  'entities.zones.proving_shore.welcome':
+    'Берег Испытаний не просит у тебя ничего, кроме времени. Освойся в лагере, поработай по чучелам, пройди полосу кораблекрушений, а когда будешь готов, паромщик Одо переправит тебя в долину.',
+  'entities.zones.proving_shore.pois.0.label': 'Лагерь Рассветный Привал',
+  'entities.zones.proving_shore.pois.1.label': 'Старый причал',
+  'entities.zones.proving_shore.pois.2.label': 'Тренировочная площадка',
+  'entities.zones.proving_shore.pois.3.label': 'Полоса кораблекрушений',
+  'guide.home.world.provingName': 'Берег Испытаний',
+  'guide.home.world.provingBlurb':
+    'Тихий учебный остров за проливом, где новые искатели приключений встают на ноги, прежде чем долина что-то с них спросит.',
+  'guide.worldPage.provingBlurb':
+    'Тихий остров за проливом от долины, отведенный под учебный лагерь: стоянка, тренировочная площадка, усыпанный обломками берег и паром, который ходит в обе стороны.',
+  'guide.worldPage.provingGreeting':
+    'Каждый герой, которого когда-либо благодарила долина, стоял там, где сейчас стоишь ты, и ни один из них тогда не знал, за какой конец держат клинок.',
+  'guide.worldPage.provingGreeter': 'Наставница Марен, лагерь Рассветный Привал',
+  'guide.worldPage.provingPlaceNotes':
+    'Лагерь Рассветный Привал и есть все поселение острова: несколько палаток, лавка и общий костер. Старый причал смотрит на долину, и круг переправы уносит выпускников через пролив; на Тренировочной площадке к югу от лагеря стоят соломенные чучела для всех, кому они нужны; а Полоса кораблекрушений, усыпанный обломками берег, где прилив расплачивается с островом выброшенными ящиками.',
   'hudChrome.perf.diagnostics.report.status.healthy': 'норма',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':
@@ -13259,6 +13998,90 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выйти из идущего матча значит дезертировать, а рейтинговая лестница не может поощрять тех, кто отключается при проигрышном счете: дезертир тут же получает поражение и связанную с ним потерю рейтинга, роняет флаг, если нес его, а его команда доигрывает вчетвером. Ради этого и существует пустое место. Пока в матче не хватает бойца, очередь может предложить это место тому, кто ждет, и это всегда предложение, которое вы принимаете или отклоняете, а не телепорт, случающийся с вами; отказ ничего не стоит и передает место следующему. Предлагают только одиночкам из очереди, так что группу, вставшую в очередь вместе, никогда не разделят ради заполнения дыры.',
   'guide.thornhollowPage.backfillNote':
     'Занять место по добору намеренно ничем не грозит: вы попадаете в счет, к которому не имели отношения, поэтому матч не тронет ваш рейтинг ни при победе, ни при поражении, а уход из такого матча ничего не стоит. Предложение перестает приходить и тогда, когда матч подошел к концу настолько, что новый боец уже ничего не изменит, так что вас никогда не посадят в чужую развязку.',
+  'hudChrome.trade.windowClosed': 'Окно обмена закрыто.',
+  'hudChrome.trade.woc.hintInsufficientBalance': 'Это больше $WOC, чем есть в подключённом кошельке.',
+  'hudChrome.trade.woc.priceLabel': 'Цена в долларах',
+  'hudChrome.trade.woc.equivalent': 'Примерно {tokens} $WOC по текущему курсу',
+  'hudChrome.trade.woc.variableWarning': 'Сумма в $WOC — предварительная оценка, а не фиксированная цена. Точное количество определит свежая котировка в момент вашей оплаты.',
+  'hudChrome.trade.woc.feeLine': 'Комиссия биржи {fee}, вычитается из цены.',
+  'hudChrome.trade.woc.netLine': 'Вы получите {net}',
+  'hudChrome.trade.woc.netLineBuyer': 'Продавец получает {net}',
+  'hudChrome.trade.woc.offerSent': 'Предложение отправлено. Оно истечёт через 10 минут, если {name} не примет его.',
+  'hudChrome.trade.woc.notInstant': 'Сделка за $WOC не мгновенна. Предмет уходит в эскроу, как только обе стороны примут сделку, и попадает к покупателю после подтверждения оплаты.',
+  'hudChrome.trade.woc.blockDisabled': 'Биржа $WOC недоступна на этом мире.',
+  'hudChrome.trade.woc.blockNoWallet': 'Подключите и подтвердите кошелёк, чтобы продавать предметы за $WOC.',
+  'hudChrome.trade.woc.blockPartnerUnknown': 'Проверяем, может ли этот игрок принять $WOC…',
+  'hudChrome.trade.woc.blockRecipientNoWallet': 'Этот игрок должен подключить кошелёк, чтобы принимать платежи в $WOC.',
+  'hudChrome.trade.woc.hintClearYourItems': 'Уберите свои предметы: предложение $WOC покупает то, что продают вам.',
+  'hudChrome.trade.woc.hintAwaitTheirItems': 'Ждём, когда они выставят что-то, что можно продать за $WOC.',
+  'hudChrome.trade.woc.hintOneItem':
+    'Сделка за $WOC охватывает ровно один предмет. На столе может быть только продаваемый предмет.',
+  'hudChrome.trade.woc.sendOffer': 'Предложить $WOC',
+  'hudChrome.trade.woc.incomingAccept': '{name} предлагает {price} за ваши предметы.',
+  'hudChrome.trade.woc.hintAcceptLocked':
+    'Этот предмет заблокирован. Снимите блокировку в сумке, затем уберите его из сделки и добавьте снова.',
+  'hudChrome.trade.woc.hintAcceptNeedsItem': 'Прежде чем принять, добавьте предмет, который продаёте.',
+  'hudChrome.trade.woc.hintEnterPrice': 'Укажите цену в долларах.',
+  'hudChrome.trade.woc.hintGoldOffered': 'Сначала уберите предложение золота: обмен идёт либо за золото, либо за $WOC.',
+  'hudChrome.trade.woc.incomingTitle': 'Предложение $WOC от {name}',
+  'hudChrome.trade.woc.incomingBody': '{name} предлагает продать вам {item} за {price}.',
+  'hudChrome.trade.woc.moneyUsd': '{usd}',
+  'hudChrome.trade.woc.waitingOther': 'Предложение принято. Ждём согласия второго игрока.',
+  'hudChrome.trade.woc.payNow': 'Оплатить {usd}',
+  'hudChrome.trade.woc.awaitingPayment': 'Ожидаем подтверждения оплаты…',
+  'hudChrome.trade.woc.paying': 'Подтвердите платёж в кошельке…',
+  'hudChrome.trade.woc.settled': 'Оплачено. Предмет уже в ваших сумках, а если места не было, прибудет почтой Вороньей службы.',
+  'hudChrome.trade.woc.settledSeller': 'Оплачено. Предмет доставлен покупателю.',
+  'hudChrome.trade.woc.accept': 'Принять предложение',
+  'hudChrome.trade.woc.accepted': 'Предложение принято. Предмет удерживается до подтверждения оплаты.',
+  'hudChrome.trade.woc.decline': 'Отклонить',
+  'hudChrome.trade.woc.withdraw': 'Отозвать предложение',
+  'hudChrome.trade.woc.statusAwaitingBuyer': 'Ожидание оплаты от покупателя.',
+  'hudChrome.trade.woc.statusPayingBuyer': 'Подтверждение вашего платежа в сети...',
+  'hudChrome.trade.woc.statusPayingSeller': 'Платёж покупателя подтверждается в сети...',
+  'hudChrome.trade.woc.statusReviewBuyer': 'Ваш платёж на проверке.',
+  'hudChrome.trade.woc.statusReviewSeller': 'Платёж покупателя на проверке.',
+  'hudChrome.trade.woc.closedCancelled': 'Эта продажа отменена. Предмет вернётся продавцу почтой Вороньей службы.',
+  'hudChrome.trade.woc.closedSuspended': 'Эта продажа приостановлена гейм-мастером. Предмет вернётся продавцу почтой Вороньей службы.',
+  'hudChrome.trade.woc.closedUnpaid': 'Эта продажа завершилась без оплаты. Предмет вернётся продавцу почтой Вороньей службы.',
+  'hudChrome.trade.woc.closedUnpaidBuyer': 'Эта продажа завершилась без вашей оплаты. Предмет вернётся продавцу почтой Вороньей службы; за неоплату принятой сделки на счёт записывают нарушение правил Торговой площадки.',
+  'hudChrome.trade.woc.cancelSale': 'Отменить продажу',
+  'hudChrome.trade.woc.cancelPendingSeller': 'Отмена запрошена. Продажа завершится сама, если покупатель не оплатит её раньше.',
+  'hudChrome.trade.woc.youDeclined': 'Вы отклонили предложение.',
+  'hudChrome.trade.woc.youWithdrew': 'Вы отозвали своё предложение.',
+  'hudChrome.trade.woc.offerNotPending': 'Это предложение больше не ожидает ответа.',
+  'hudChrome.trade.woc.offerDeclined': 'Предложение $WOC отклонено.',
+  'hudChrome.trade.woc.offerWithdrawn': 'Предложение $WOC отозвано.',
+  'hudChrome.trade.woc.offerExpired': 'Срок предложения $WOC истёк.',
+  'hudChrome.trade.woc.offerExpiresAt': 'Предложение истекает в {time}.',
+  'hudChrome.trade.woc.offerStandsUntil':
+    'Ваше предложение $WOC действует до {time}. Если продавец примет его, снова откройте обмен с ним, чтобы завершить сделку.',
+  'hudChrome.trade.woc.dealAwaitsPayment': 'Ваша покупка за $WOC ещё не оплачена. Снова начните обмен с продавцом, чтобы оплатить; иначе сделка истечёт сама, а за неоплату на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.trade.woc.closeSellerHold': 'Ваш предмет остаётся удержанным до оплаты покупателем. Если передумали, отмените продажу во вкладке «Активность» биржи.',
+  'hudChrome.trade.woc.closePaymentContinuesBuyer': 'Ваш платёж всё ещё подтверждается. Доставка завершится сама.',
+  'hudChrome.trade.woc.closePaymentContinuesSeller': 'Платёж покупателя всё ещё подтверждается. Продажа завершится сама.',
+  'hudChrome.trade.woc.p2pBindingNote': 'Как только обе стороны примут сделку, оплата должна поступить в течение {duration} или в более короткий срок, который начинается с нажатия «Оплатить». За неоплату на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.trade.woc.p2pBindingNoteUntimed': 'Как только обе стороны примут сделку, оплата должна поступить вскоре после этого или в более короткий срок, который начинается с нажатия «Оплатить». За неоплату на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.trade.woc.p2pPaymentDueAt': 'Оплата должна поступить до {time}. За неоплату на счёт запишут нарушение правил Торговой площадки.',
+  'hudChrome.trade.woc.quoteExpiredTrade': 'Котировка истекла. Нажмите «Не сейчас», затем снова «Оплатить», чтобы получить свежую.',
+  'hudChrome.trade.woc.quoteStaged': 'Котировка на оплату {usd} готова: {tokens} $WOC, действует до {time}.',
+  'hudChrome.trade.woc.paymentConfirmed': 'Оплата подтверждена. Когда доставка завершится, предмет окажется в ваших сумках или, если места нет, прибудет почтой Вороньей службы.',
+  'hudChrome.trade.woc.statusConfirmedBuyer': 'Оплата подтверждена. Доставка завершается...',
+  'hudChrome.trade.woc.statusConfirmedSeller': 'Оплата подтверждена. Сделка завершается...',
+  'hudChrome.trade.woc.hintBelowMin': 'Минимальная цена на бирже: {usd}.',
+  'hudChrome.trade.woc.pricePlaceholder': '0.00',
+  'hudChrome.trade.woc.tabWoc': '$WOC',
+  'hudChrome.trade.woc.tabGold': 'Золото',
+  'hudChrome.trade.woc.offerSentUntil':
+    'Предложение отправлено. Оно истечёт в {time}, если {name} не примет его.',
+  'hudChrome.trade.woc.moneyLine': '{usd} (~ {tokens} $WOC)',
+  'hudChrome.trade.woc.ineligibleReason':
+    'Персональные, квестовые и заблокированные предметы, а также предметы вне категорий биржи нельзя продать за $WOC.',
+  'hudChrome.trade.woc.tabWocHint':
+    'Оплата в $WOC доступна, когда ваша сторона стола пуста и золото не предложено.',
+  'hudChrome.trade.woc.modesLabel': 'Валюта оплаты',
+  'hudChrome.trade.woc.paidSeller': 'Вы получили платёж {price} за ваш предмет {item}.',
+  'hudChrome.trade.woc.paidBuyer': 'Вы отправили платёж {price} за {item}.',
   'hudChrome.bags.lockItem': 'Заблокировать предмет',
   'hudChrome.otaUpdate.applying': 'Обновление загружено. Игра перезапускается для его применения.',
   'hudChrome.otaUpdate.continueAnyway': 'Продолжить без обновления',
@@ -13266,4 +14089,40 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.mobile.barEditorAria': 'Изменить раскладку панели действий',
+  'hudChrome.barEditor.title': 'Редактор панели действий',
+  'hudChrome.barEditor.close': 'Закрыть редактор панели',
+  'hudChrome.barEditor.pages': 'Страницы панели действий',
+  'hudChrome.barEditor.buttonHeader': 'Кнопка {button}',
+  'hudChrome.barEditor.cellAria': 'Кнопка {button}, {direction}: {action}',
+  'hudChrome.barEditor.emptyCellAria': 'Кнопка {button}, {direction}: пусто',
+  'hudChrome.barEditor.hint': 'Коснитесь одной ячейки, затем другой, чтобы поменять их местами.',
+  'hudChrome.barEditor.armed': 'Коснитесь ячейки, чтобы поместить туда {name}.',
+  'hudChrome.barEditor.picked': 'Коснитесь другой ячейки, чтобы поменять местами с {name}.',
+  'hudChrome.barEditor.locked': 'Панели действий заблокированы в настройках интерфейса.',
+  'hudChrome.barEditor.clear': 'Очистить',
+  'hudChrome.barEditor.clearAria': 'Очистить ячейку',
+  'hudChrome.barEditor.clearArmed': 'Нажмите на ячейку, чтобы очистить её.',
+  'hudChrome.spellbook.assignAria': 'Выберите ячейку для {name}',
+  'hudChrome.meters.threatFrozen': 'Итоговая угроза против {name}',
+  'hudChrome.account.setPasswordTitle': 'Задать пароль',
+  'hudChrome.account.setPasswordHint':
+    'Эта учётная запись создана через вход Apple или Discord и пока не имеет пароля. Задайте его, чтобы входить на других устройствах, например в приложениях для Mac и Windows или в веб-версии, а также привязать дополнительные способы входа.',
+  'hudChrome.account.setPasswordSubmit': 'Задать пароль',
+  'hudChrome.account.passwordSet':
+    'Пароль задан. Теперь вы можете входить с именем пользователя и паролем где угодно.',
+  'hudChrome.crafting.craftFeeLine': 'Плата за изготовление: {fee} за штуку',
+  'hudChrome.deeds.stillToVisit': 'Ещё нужно посетить: {places}',
+  'apiError.account.password_already_set':
+    'У этой учётной записи уже есть пароль. Используйте смену пароля.',
+  'sim.rift.lootRecoveryNotice':
+    'Вход в разлом ещё продержится: если ваша группа падёт, вы всё ещё сможете вернуться пешком за добытым.',
+  'abilityUi.tooltip.anyTarget': 'Вражеская или дружественная цель',
+  'entities.abilities.melting_acid.name': 'Плавящая кислота',
+  'entities.abilities.melting_acid.description':
+    'Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая её броню на 5% на 12 сек.',
+  'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
+  'entities.abilities.nightshade_coating.description':
+    'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
 };

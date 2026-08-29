@@ -28,6 +28,8 @@ export interface IndexedLetter {
   recipientKey: string;
   read: boolean;
   deliverAt: number;
+  /** Exchange custody parcels only; absent on ordinary letters. */
+  custodyRef?: string;
 }
 
 // Shared empty result for recipients with no letters; never mutated.
@@ -46,12 +48,22 @@ export class MailIndex<M extends IndexedLetter> {
   // The small set of still-in-flight letters, so a delivery transition updates
   // the unread count at the exact tick the old per-call scan would have.
   private undelivered = new Set<M>();
+  // Custody-parcel refs currently in the book, refcounted so the booking
+  // dedupe (PostOffice.hasCustodyParcel, called on EVERY Exchange delivery
+  // and twice per custody retry) is a lookup instead of a whole-book scan.
+  // Refcounted rather than a Set on purpose: the dedupe normally keeps refs
+  // unique, but the index must stay correct even if two letters ever carry
+  // one ref (an untrack of one must not erase the other's presence).
+  private custodyRefs = new Map<string, number>();
 
   // Fold a freshly booked or loaded letter in: an already-due letter counts as
   // unread now (unless read); one still on the wing waits in `undelivered`
   // until deliverDue lands it.
   track(m: M, now: number): void {
     this.bucketAdd(m);
+    if (m.custodyRef !== undefined) {
+      this.custodyRefs.set(m.custodyRef, (this.custodyRefs.get(m.custodyRef) ?? 0) + 1);
+    }
     if (now >= m.deliverAt) {
       if (!m.read) this.inc(m.recipientKey);
     } else {
@@ -65,6 +77,11 @@ export class MailIndex<M extends IndexedLetter> {
     // Idempotent: the unread decrement rides only on an ACTUAL bucket
     // removal, so a double untrack (unreachable today) under-counts nothing.
     if (!this.bucketRemove(m)) return;
+    if (m.custodyRef !== undefined) {
+      const left = (this.custodyRefs.get(m.custodyRef) ?? 0) - 1;
+      if (left > 0) this.custodyRefs.set(m.custodyRef, left);
+      else this.custodyRefs.delete(m.custodyRef);
+    }
     if (!m.read && now >= m.deliverAt) this.dec(m.recipientKey);
     this.undelivered.delete(m);
   }
@@ -116,7 +133,14 @@ export class MailIndex<M extends IndexedLetter> {
     this.buckets.clear();
     this.unread.clear();
     this.undelivered.clear();
+    this.custodyRefs.clear();
     for (const m of book) this.track(m, now);
+  }
+
+  // Is any letter in the book a custody parcel for this ref? The Exchange
+  // booking dedupe; O(1) where the pre-index read walked the whole book.
+  hasCustodyRef(ref: string): boolean {
+    return this.custodyRefs.has(ref);
   }
 
   // Delivered-and-unread count for one key bucket (callers union the stable

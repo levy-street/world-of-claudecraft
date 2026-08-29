@@ -67,6 +67,79 @@ describe('char_window: WCAG 2.2 AA', () => {
   });
 });
 
+describe('char_window: paperdoll helm-visibility eye', () => {
+  function renderHelmetSlot(helmSlotAvailable: boolean) {
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    const world = {
+      cfg: { playerClass: 'rogue' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      professionsState: { skills: [] },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => helmSlotAvailable,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+    win.render();
+    return root;
+  }
+
+  it('omits the eye for a class kit with no head piece to hide (issue: hide helmet does nothing)', () => {
+    const root = renderHelmetSlot(false);
+    expect(root.querySelector('.equip-helm-eye')).toBeNull();
+  });
+
+  it('shows the eye for a class kit that has a head piece', () => {
+    const root = renderHelmetSlot(true);
+    expect(root.querySelector('.equip-helm-eye')).not.toBeNull();
+  });
+});
+
 describe('char_window: profession art placements', () => {
   it('renders gathering rows with their dedicated painted icons', () => {
     expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
@@ -139,6 +212,7 @@ describe('char_window: profession art placements', () => {
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => true,
@@ -262,6 +336,7 @@ describe('char_window: profession art placements', () => {
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => true,
@@ -404,6 +479,7 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => true,
@@ -689,6 +765,7 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => visible,

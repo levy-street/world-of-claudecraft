@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { emptyAllocation } from '../src/sim/content/talents';
-import { MOBS } from '../src/sim/data';
+import { MOBS, ZONES } from '../src/sim/data';
 import {
   bumpDeedStat,
   checkDeedTrigger,
@@ -285,13 +285,21 @@ describe('the scheduler-resolved witness sweep', () => {
 
   it('with no boss up the sweep marks nothing and the POI sweep still runs', () => {
     const sim = makeSim();
-    const { meta } = primary(sim);
+    const { meta, e } = primary(sim);
+    const poi = ZONES.find((z) => z.id === 'eastbrook_vale')!.pois.find(
+      (p) => p.id === 'eastbrook',
+    )!;
+    e.pos.x = poi.x;
+    e.pos.z = poi.z;
+    e.prevPos = { ...e.pos };
     for (let i = 0; i < 21; i++) sim.tick();
     expect(meta.deedStats.visited.has('witness:thunzharr_waking_peak')).toBe(false);
-    // The spawn-square POI mark proves the sweep itself ran (the deeds.test
+    // The hub-POI mark (the player parked on it; the harbor-town spawn sits
+    // outside every POI radius) proves the sweep itself ran (the deeds.test
     // namespace suite pins the same landmark). The mark is poi:<zone.id>:<poi.id>,
     // and the Eastbrook landmark's id is the lowercase slug 'eastbrook' (its
-    // display label stays 'Eastbrook').
+    // display label stays 'Eastbrook'). Re-pinned 2026-08 for the Eastbrook
+    // harbor move (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md).
     expect(meta.deedStats.visited.has('poi:eastbrook_vale:eastbrook')).toBe(true);
   });
 });

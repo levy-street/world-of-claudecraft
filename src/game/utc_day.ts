@@ -1,10 +1,13 @@
-// The offline sim wants two wall-clock day strings but must not read the clock
-// itself, so the frame loop supplies them: `currentUtcDay` stamps WHEN something
-// happened (the Book of Deeds earn date) and `currentResetDay` says which daily
-// window we are in (the first battleground win, honor DR, the delve daily).
-// Building either string is a Date allocation plus some formatting; at 60 Hz that
-// is pure churn for a value that changes once a day, so cache and re-derive at
-// most once a second.
+// The offline sim wants its wall-clock day strings but must not read the clock
+// itself, so the frame loop supplies them (via `feedSimCalendar` below):
+// `currentUtcDay` stamps WHEN something happened (the Book of Deeds earn date),
+// `currentResetDay` says which daily window we are in (the first battleground
+// win, honor DR, the delve daily), and `currentEventLeadDay` is the weekend
+// event's early-open probe of the same boundary. Building any of the strings is
+// a Date allocation plus some formatting; at 60 Hz that is pure churn for a
+// value that changes once a day, so cache and re-derive at most once a second.
+
+import { DOUBLE_HONOR_LEAD_MS } from '../sim/pvp/honor_event';
 
 // The civil hour a daily window opens. Mirrors RAID_RESET_HOUR in
 // server/raid_reset.ts, which is the authority for the online realm; the two are
@@ -56,4 +59,45 @@ export function currentResetDay(): string {
     resetRefreshAtMs = now + 1000;
   }
   return cachedResetDay;
+}
+
+/**
+ * The weekend event's early-open probe: the daily-reset window the player will
+ * be in DOUBLE_HONOR_LEAD_MS from the given instant, in their OWN local zone
+ * (offline there is no realm). honor_event.ts opens the Double Honor window
+ * when either this key or `resetDayOf` reads a weekend day, which moves the
+ * open from Saturday 3 AM back to Friday 3 PM. The server twin is
+ * `eventLeadDayKey` in server/raid_reset.ts.
+ */
+export function eventLeadDayOf(at: Date): string {
+  return resetDayOf(new Date(at.getTime() + DOUBLE_HONOR_LEAD_MS));
+}
+
+let cachedEventLeadDay = '';
+let eventLeadRefreshAtMs = 0;
+
+/** The current early-open probe key, recomputed at most once per second. */
+export function currentEventLeadDay(): string {
+  const now = Date.now();
+  if (now >= eventLeadRefreshAtMs) {
+    cachedEventLeadDay = eventLeadDayOf(new Date(now));
+    eventLeadRefreshAtMs = now + 1000;
+  }
+  return cachedEventLeadDay;
+}
+
+/**
+ * Feed the offline sim its whole host calendar in one call: the frame loop's
+ * single entry point, so a new calendar key lands here rather than as another
+ * assignment in main.ts. Mutating the sim's host-fed fields in place is the
+ * calendar seam's contract (the server loop feeds the same fields each tick).
+ */
+export function feedSimCalendar(sim: {
+  utcDay: string;
+  resetDay: string;
+  eventLeadDay: string;
+}): void {
+  sim.utcDay = currentUtcDay();
+  sim.resetDay = currentResetDay();
+  sim.eventLeadDay = currentEventLeadDay();
 }

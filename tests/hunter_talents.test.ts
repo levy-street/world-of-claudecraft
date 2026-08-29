@@ -347,6 +347,55 @@ describe('Hunter v0.29 choice-row mechanics', () => {
     expect(clapTargets).toContain(nearby.id);
   });
 
+  it("applies Unleashed Frenzy (+25% pet damage) to Fang Chorus, not only the pet's ordinary damage sites", () => {
+    // Fang Chorus is reachable while beast_mastery specced (talent rows are shared
+    // across specs, per the Pack Rally test below), so a Packlord who also picks
+    // hun_r20_fang_chorus can be mid-Unleashed-Frenzy when it procs. Regression
+    // guard for the pet-damage-multiplier consolidation: runFangChorus previously
+    // read a local copy of the multiplier that never carried the hunter_frenzy term.
+    function fangChorusDamage(frenzied: boolean): number {
+      const sim = hunter('beast_mastery', { 20: 'hun_r20_fang_chorus' }, 2937);
+      anchorProbeInOpenField(sim);
+      addPet(sim);
+      const primary = addMob(sim, 20);
+      sim.targetEntity(primary.id);
+      if (frenzied) {
+        sim.player.auras.push({
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: sim.playerId,
+          school: 'physical',
+        });
+      }
+      const allEvents: SimEvent[] = [];
+      for (let cast = 0; cast < 2; cast++) {
+        sim.player.resource = sim.player.maxResource;
+        ready(sim, 'arcane_shot');
+        sim.castAbility('arcane_shot');
+        allEvents.push(...advance(sim, 2));
+      }
+      const event = allEvents.find(
+        (candidate) => candidate.type === 'damage' && candidate.ability === 'Fang Chorus',
+      );
+      if (!event || event.type !== 'damage') throw new Error('missing Fang Chorus damage');
+      return event.amount;
+    }
+
+    const calm = fangChorusDamage(false);
+    const frenzied = fangChorusDamage(true);
+    expect(calm).toBeGreaterThan(0);
+    // A wide window rather than toBeCloseTo: Fang Chorus hits for a small integer
+    // amount, so Math.round alone can move the ratio a few percent off 1.25 (e.g.
+    // 42 -> round(52.5) reads 1.238, not 1.25). Still decisive against a missing
+    // multiplier (ratio ~1.0) or a doubled one (~1.5).
+    expect(frenzied / calm).toBeGreaterThan(1.15);
+    expect(frenzied / calm).toBeLessThan(1.35);
+  });
+
   it('Pack Rally transforms Courser in combat and returns to Courser on cooldown', () => {
     const sim = hunter('beast_mastery', { 17: 'hun_r17_pack_rally' }, 2926);
     sim.player.inCombat = true;

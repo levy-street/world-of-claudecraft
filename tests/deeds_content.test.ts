@@ -63,22 +63,26 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 273 deeds worth 3155 total Renown', () => {
-    // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
-    // four Reliquary Curator rank bridges and the five Phase 18 completion
-    // ladder deeds (all nine renown 0, so the Renown sum is UNCHANGED from
-    // the release base: catalog prestige never scores the board), plus the
-    // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle,
-    // renown 5 each).
-    expect(DEED_ORDER.length).toBe(273);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3155);
+  it('ships exactly 276 deeds worth 3190 total Renown', () => {
+    // MEASURED across the release/v0.41.0 merge rather than reconciled by
+    // arithmetic, because each arm can only count its own additions. The
+    // release arm ships 274 deeds worth 3160; this branch adds the bank socket
+    // pair (soc_strongbox_outfitter 5 and soc_four_bags_deep 25, Bank Storage
+    // phase 06) and removes none, so the merged catalog is 276 worth 3190.
+    //
+    // The NAME carries the numbers too, deliberately: vitest prints it in the
+    // failure header, and a stale name there is the one part of this pin a
+    // reader can act on without seeing the diff. It went stale once already.
+    expect(DEED_ORDER.length).toBe(276);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3190);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      progression: 57,
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure).
+      progression: 58,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
@@ -89,7 +93,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       collection: 37,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
-      social: 18,
+      // +2 bank socket ladder deeds (soc_strongbox_outfitter,
+      // soc_four_bags_deep; Bank Storage phase 06).
+      social: 20,
       exploration: 11,
       feat: 3,
       hidden: 9,
@@ -216,11 +222,15 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
-      // The walk-in castle visit pair appends last: the Last Keep's deed
-      // retro-fixes its shipped-without-deeds gap, Dawnhold's lands with
-      // its castle (both keyed on the enterDungeon markVisited emit).
+      // The walk-in castle visit pair: the Last Keep's deed retro-fixes its
+      // shipped-without-deeds gap, Dawnhold's lands with its castle (both
+      // keyed on the enterDungeon markVisited emit).
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
+      // The Proving Shore graduation closes the merged tail.
+      'prog_ready_for_an_adventure',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -578,11 +588,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  // Re-baselined for the walk-in castle visit pair (exp_the_last_keep,
-  // exp_dawnhold_castle), which appends last; no shipped trigger or renown
-  // changed (the pair is new, every prior row reproduces the previous
-  // literal exactly).
-  const FROZEN_CATALOG_SHA256 = '36e9f3077709035c6f617f355572d5d911a0bde1ff6dd2676aace5505dd70a21';
+  // Re-baselined at the release/v0.41.0 sync merge, which interleaves the
+  // walk-in castle visit pair, the bank socket pair (Bank Storage phase 06,
+  // on the new bankSocketsUnlocked meter) and the Proving Shore graduation
+  // deed (on the new tutorialGraduations stat) at the tail; no shipped
+  // trigger or renown changed on either side. MEASURED on the merged tree.
+  const FROZEN_CATALOG_SHA256 = '9d39a3715925fc1232cfb4be7a1a7caffdc0a303e91655f224a30dbe9f4f380e';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -780,9 +791,9 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The walk-in castle visit pair appends after the Phase 18 Reliquary
-    // completion ladder; Dawnhold's deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_dawnhold_castle');
+    // The Proving Shore graduation deed closes the merged tail (appended at
+    // the release merge behind the bank socket pair).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -827,6 +838,13 @@ describe('table shape', () => {
       expect(banned.test(def.name), `${def.id} name`).toBe(false);
       expect(banned.test(def.desc), `${def.id} desc`).toBe(false);
     }
+  });
+
+  it('the Brightwood relic feat desc states the relics can no longer be found', () => {
+    // feat_brightwood_relic is permanently unobtainable by design (both source
+    // items only ever dropped from retired Brightwood content); players who
+    // read a stuck 0/1 without this caveat report it as a broken achievement.
+    expect(DEEDS.feat_brightwood_relic.desc).toContain('no longer drop');
   });
 
   it('the Peaks chapter descs carry the renamed Thornpeak chronicler', () => {

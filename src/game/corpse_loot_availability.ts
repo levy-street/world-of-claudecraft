@@ -1,6 +1,7 @@
 import { MOBS } from '../sim/data';
 import { hasSharedLootRights, lootHasGoneFfa } from '../sim/loot/loot_ffa';
 import { isHarvestableCorpse } from '../sim/professions/gathering';
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
@@ -44,6 +45,16 @@ export function corpseLootAvailability(
   harvestStateReliable = true,
   partyMemberIds: readonly number[] | null = null,
 ) {
+  if (corpseHasDecayed(mob.dead, mob.corpseTimer)) {
+    return {
+      componentTags: MOBS[mob.templateId]?.componentTags,
+      harvestable: false,
+      visibleItems: [],
+      visibleCopper: 0,
+      hasLoot: false,
+      canOpen: false,
+    };
+  }
   const componentTags = MOBS[mob.templateId]?.componentTags;
   // isHarvestableCorpse, the sim's own predicate, not a tag count of our own
   // (#2513): a corpse whose every family is unmapped (no shipped template
@@ -53,7 +64,10 @@ export function corpseLootAvailability(
   // function that restated a sim rule instead of importing it, which is exactly
   // how it drifted: the rest already delegate (hasSharedLootRights below).
   const harvestable =
-    harvestStateReliable && isHarvestableCorpse(componentTags) && mob.harvestClaimedBy === null;
+    mob.ownerId == null &&
+    harvestStateReliable &&
+    isHarvestableCorpse(componentTags) &&
+    mob.harvestClaimedBy === null;
   const tappedById = mob.tappedById ?? null;
   const tapperParty =
     tappedById !== null && partyMemberIds?.includes(tappedById) ? partyMemberIds : null;

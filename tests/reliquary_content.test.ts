@@ -362,7 +362,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    // The v0.37.0 bank-storage merge pages the branch's two live bag drops
+    // (wayfarers_backpack on Spoils, necromancers_reagent_satchel on
+    // Gravewyrm Sanctum), the derivation-equality pins' own demand: 342.
+    expect(full).toEqual({ owned: 342, total: 342 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -370,10 +373,10 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same deltas as the overview
-    // pair above, including the three release-merged daggers; marks are
-    // character-scoped, so this trails the overview by the 29 account-scoped
-    // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    // pair above, including the three release-merged daggers and the two
+    // bank-storage bag drops; marks are character-scoped, so this trails the
+    // overview by the 29 account-scoped weapon skins).
+    expect(character).toEqual({ owned: 313, total: 313 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -388,13 +391,16 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
     // number exceeds the overview total above by more than the mark count.
+    // Plus the two bank-storage bag drops the v0.37.0 merge paged
+    // (wayfarers_backpack on Spoils, necromancers_reagent_satchel on
+    // Gravewyrm Sanctum): 377.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
     // moved instead of only that the sum did.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(377);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -606,10 +612,11 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // isCataloguedRelicItem-vs-index agreement pin would be vacuous: the
     // predicate IS the index membership test.)
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
-    // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
+    // ids, plus the three daggers the v0.36.0 release merge added, plus the
+    // two bank-storage bag drops the v0.37.0 merge paged: 242 (the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(242);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1092,7 +1099,7 @@ describe('Reliquary Rares of the Realm pages pin against the live rare tables', 
     expect(itemRelicIds(page)).toEqual(derived);
     // Snug vacuity floor: an emptied loot merge would otherwise shrink the
     // walk (and the page) silently while the equality stayed green.
-    expect(derived.length).toBeGreaterThanOrEqual(31);
+    expect(derived.length).toBeGreaterThanOrEqual(33);
     // Per-item boss hints EQUAL the carrier set in walk order (the 13a
     // every-door standard: a shared drop names every rare that carries it),
     // plus exactly one zone hint. gutripper_shiv also names its quest door,
@@ -1476,7 +1483,7 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
 const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   sunken_bastion: { pageId: 'conquerors_sunken_bastion', floor: 8 },
   drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
-  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 31 },
+  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 32 },
   wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
   nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
 };
@@ -3426,6 +3433,75 @@ describe('Reliquary source hint coverage', () => {
     expect(shared.length).toBeGreaterThanOrEqual(28);
   });
 
+  // Curated dominated-route exceptions, keyed page:slot:route: the listed
+  // row exists but is not a comparable route, because the hinted door
+  // dominates it on per-kill rate. Three relics under two rate rulings: the
+  // SET_MEMBER_SOURCES pair (rare 0.25 vs trash 0.001, a 250 to 1 gap) and
+  // the bank-storage world-drop bag (rare 0.25 vs 0.005 to 0.008 designed
+  // farm rows, 31 to 50 to 1). The dominance premise is PINNED by the
+  // "every acknowledged mob route stays dominated" arm below, so a balance
+  // pass raising a trash row toward the hinted door reds instead of leaving
+  // a stale hint. The consumed-set guard below reds any entry the sweep
+  // stops needing.
+  const ACKNOWLEDGED_SECONDARY_ROUTES = new Set<string>([
+    'conquerors_set_deathlord:deathlord_sabatons:mob:deeprock_kobold',
+    'conquerors_set_necromancers:necromancers_legwraps:mob:boneclad_revenant',
+    // The same two relics on their Phase 21 Spoils page rows: identical
+    // hints (the cross-page agreement pin holds them equal), so the same
+    // dominated trash routes go unacknowledged there too.
+    'conquerors_spoils_of_the_realm:deathlord_sabatons:mob:deeprock_kobold',
+    'conquerors_spoils_of_the_realm:necromancers_legwraps:mob:boneclad_revenant',
+    // The bank-storage world-drop bag: Brutok's elevated 0.25 row is the
+    // hinted door; the three ordinary-mob rows (0.005 to 0.008 per kill, a
+    // 31-to-50x per-kill gap held deliberately at background-farm rate, per
+    // the loot-table comments in zone2/zone3) are the same rate-ruling
+    // class as the rows above. Structural constraint, not only a rate call:
+    // the Spoils page pin holds boss hints EQUAL to the rare-template
+    // carrier set, so an ordinary mob cannot be named on the page at all,
+    // and its zone hint already points two of the three farms at Thornpeak.
+    'conquerors_spoils_of_the_realm:wayfarers_backpack:mob:fen_troll',
+    'conquerors_spoils_of_the_realm:wayfarers_backpack:mob:deeprock_kobold',
+    'conquerors_spoils_of_the_realm:wayfarers_backpack:mob:thornpeak_ogre',
+  ]);
+
+  it('every acknowledged mob route stays dominated by its hinted door', () => {
+    // The ruling premise behind every exceptions row, pinned: the row is
+    // acknowledged rather than hinted BECAUSE the hinted door dominates it on
+    // per-kill rate. Require at least 20x; today's smallest live gap is 31x
+    // (thornpeak_ogre 0.008 vs Brutok 0.25) and the historical pair sits at
+    // 250x, so the floor bites a balance pass raising a trash row long before
+    // the routes become comparable, without hair-triggering on a retune.
+    // Premise guard (the :3477 style): an emptied set would pass this loop
+    // vacuously, so pin today's exact row count. A NON-mob route kind added
+    // to the set reds the toBe('mob') below BY DESIGN: a new kind needs a
+    // fresh dominance ruling, not a silent pass through this one.
+    expect(ACKNOWLEDGED_SECONDARY_ROUTES.size).toBe(7);
+    const maxChanceOn = (mobId: string, itemId: string): number =>
+      Math.max(
+        0,
+        ...(MOBS[mobId]?.loot ?? [])
+          .filter((entry) => entry.itemId === itemId)
+          .map((entry) => entry.chance ?? 0),
+      );
+    for (const key of ACKNOWLEDGED_SECONDARY_ROUTES) {
+      const [pageId, slotId, routeKind, mobId] = key.split(':');
+      expect(routeKind, key).toBe('mob');
+      const page = RELIQUARY_PAGES_BY_ID[pageId];
+      expect(page, key).toBeDefined();
+      const relic = page.relics.find((r) => r.kind === 'item' && r.itemId === slotId);
+      expect(relic, key).toBeDefined();
+      if (!relic) continue;
+      const hints = reliquaryRelicSource(page, relic);
+      const hintedChance = Math.max(
+        0,
+        ...hints.filter((h) => h.sourceKind === 'boss').map((h) => maxChanceOn(h.sourceId, slotId)),
+      );
+      const trashChance = maxChanceOn(mobId, slotId);
+      expect(trashChance, `${key} names a dead route`).toBeGreaterThan(0);
+      expect(hintedChance / trashChance, `${key} dominance`).toBeGreaterThanOrEqual(20);
+    }
+  });
+
   it('every hinted relic acknowledges every comparable live award route', () => {
     // The wyrmcult_grand_robe class of error: a hint that names one live route
     // while another comparable route exists unacknowledged sends a player
@@ -3470,19 +3546,6 @@ describe('Reliquary source hint coverage', () => {
     expect(ROUTE_MAPS.recipesByItem.size).toBeGreaterThan(0);
     expect(ROUTE_MAPS.storeSkinIds.size).toBeGreaterThan(0);
 
-    // Curated dominated-route exceptions, keyed page:slot:route. Both are the
-    // SET_MEMBER_SOURCES rate ruling (rare at 0.25 vs trash at 0.001, a 250 to
-    // 1 expectation gap): the trash row exists but is not a comparable route.
-    // The consumed-set guard below reds any entry the sweep stops needing.
-    const ACKNOWLEDGED_SECONDARY_ROUTES = new Set<string>([
-      'conquerors_set_deathlord:deathlord_sabatons:mob:deeprock_kobold',
-      'conquerors_set_necromancers:necromancers_legwraps:mob:boneclad_revenant',
-      // The same two relics on their Phase 21 Spoils page rows: identical
-      // hints (the cross-page agreement pin holds them equal), so the same
-      // dominated trash routes go unacknowledged there too.
-      'conquerors_spoils_of_the_realm:deathlord_sabatons:mob:deeprock_kobold',
-      'conquerors_spoils_of_the_realm:necromancers_legwraps:mob:boneclad_revenant',
-    ]);
     const consumed = new Set<string>();
     const offenders: string[] = [];
     const routesByFamily: Record<RouteFamily, number> = {
@@ -3525,8 +3588,11 @@ describe('Reliquary source hint coverage', () => {
     // the quest family gains gutripper_shiv's q_drogmar door. The Warfare
     // pages grow the vendor family by 94 (47 slots on two counters each) and
     // the rods add their Litany board keeper (2) plus their two engineering
-    // recipes on the recipe family.
-    expect(routesByFamily.mob).toBeGreaterThanOrEqual(209);
+    // recipes on the recipe family. The v0.37.0 bank-storage merge adds 5 mob
+    // routes (wayfarers_backpack's Brutok door plus its three acknowledged
+    // ordinary-mob farms on Spoils; the satchel's Velkhar door on Gravewyrm),
+    // re-measured exact at 216.
+    expect(routesByFamily.mob).toBeGreaterThanOrEqual(216);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
@@ -3536,7 +3602,7 @@ describe('Reliquary source hint coverage', () => {
     expect(routesByFamily.store).toBeGreaterThanOrEqual(29);
     expect(routesByFamily.activity).toBeGreaterThanOrEqual(10);
     const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
-    expect(checkedRoutes).toBeGreaterThanOrEqual(422);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(429);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {

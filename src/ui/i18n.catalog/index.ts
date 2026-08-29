@@ -732,6 +732,8 @@ export const en = {
         'Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.',
       paymentBody:
         'Choose the wallet linked to your account and approve the transaction in this browser.',
+      stepUpBody:
+        'Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.',
       extensionHelp:
         'No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.',
       safety: 'World of ClaudeCraft never asks for your recovery phrase or private key.',
@@ -881,6 +883,8 @@ export const en = {
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
+      lootRecoveryNotice:
+        "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
       deadEntry: 'You cannot enter a rift while dead.',
       deadEntryCombat:

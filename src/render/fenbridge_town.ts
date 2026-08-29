@@ -31,8 +31,12 @@ import {
 } from './fenbridge_town_visibility_core';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceOccluderFade,
+  type OccluderFadeMat,
+  occluderFadeMat,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
   newTownPiecewiseReveal,
@@ -497,7 +501,7 @@ function buildBuilding(
   group.rotation.y = building.rotation;
   group.add(opaqueMesh);
 
-  const materials = [opaqueMaterial];
+  const materials = [occluderFadeMat(opaqueMaterial, opaqueMesh)];
   if (template.emissive) {
     const emissiveMaterial = townMaterial(true, textures, true);
     emissiveMaterial.name = `fenbridgeTownEmissive:${building.id}`;
@@ -510,14 +514,14 @@ function buildBuilding(
     emissiveMesh.receiveShadow = false;
     emissiveMesh.userData.placementId = building.id;
     group.add(emissiveMesh);
-    materials.push(emissiveMaterial);
+    materials.push(occluderFadeMat(emissiveMaterial, emissiveMesh));
   }
 
   return {
     group,
     hideTarget: {
       group,
-      materials: materials.map(occluderFadeMat),
+      materials,
       hidden: false,
       alpha: 1,
       x: building.position.x,
@@ -1414,10 +1418,15 @@ function buildFromTemplates(
           visibilityPlan.visible &&
           townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!visibilityPlan.visible) continue;
+        prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
         target.hidden = visibilityPlan.hidden;
-        if (occluderFadeSettled(target.alpha, target.hidden)) continue;
-        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt, reducedMotion);
-        applyOccluderFade(target.materials, target.alpha);
+        target.alpha = advanceOccluderFade(
+          target.materials,
+          target.alpha,
+          target.hidden,
+          dt,
+          reducedMotion,
+        );
       }
     },
   };

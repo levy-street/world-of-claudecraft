@@ -23,6 +23,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'sunder',
   'corrode',
   'faerie_fire',
+  'melting_acid',
   'mortal_wound',
   'silence',
   'disarm',

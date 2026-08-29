@@ -24,7 +24,11 @@ High flywheel: visible status creates social demand to hold.
 - Balance refresh is periodic and read-only; the flair is not a tradeable asset.
 
 ## Constraints (non-negotiable)
-- **Cosmetic-only / no pay-to-win** - token utility is appearance, convenience, access, or realm-operation; never power.
+- **The game never sells power / no pay-to-win** - token utility is appearance,
+  convenience, access, realm-operation, or player-to-player trade (the $WOC
+  marketplace, `docs/prd/woc/marketplace.md`, ships disabled pending counsel
+  sign-off: players selling already-earned eligible items to each other, never
+  the game selling power). Holder flair itself grants no gameplay effect.
 - **Non-custodial** - the chain owns assets; `src/sim/` stays pure and deterministic.
 
 ## Open questions

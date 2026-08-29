@@ -11,6 +11,10 @@ const store = readFileSync(new URL('../src/ui/daily_rewards_window.ts', import.m
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const core = readFileSync(new URL('../src/ui/preview_prewarm_core.ts', import.meta.url), 'utf8');
+const wiring = readFileSync(
+  new URL('../src/ui/preview_prewarm_wiring.ts', import.meta.url),
+  'utf8',
+);
 const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 const visual = readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8');
 
@@ -126,6 +130,12 @@ describe('Armory preview lifecycle', () => {
     expect(composeStart).toBeGreaterThan(-1);
     const compose = hud.slice(composeStart, hud.indexOf('\n  }', composeStart));
     expect(compose.toLowerCase()).not.toContain('armory');
+    // The Hud composes through preview_prewarm_wiring.ts, so the deps surface
+    // has two layers: HudPreviewPrewarmDeps there and PreviewPrewarmPlanDeps
+    // in the core. Same domain-word pin over the wiring (the file carries no
+    // armory text), so a re-added wiring dep fails here, not only via the
+    // hud slice or the core.
+    expect(wiring.toLowerCase()).not.toContain('armory');
     // And the deps SURFACE itself, which is the other way it could come back:
     // a new optional dep would leave both the plan test and tsc silent.
     expect(core.toLowerCase()).not.toContain('armoryskinids');
@@ -158,13 +168,19 @@ describe('Armory preview lifecycle', () => {
     );
     expect(hudStart).toBeGreaterThan(-1);
     const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
-    expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
+    // The Hud composes through the stateless wiring module (the monolith
+    // ratchet extraction), which is where the plan call and the async portrait
+    // routing now live.
+    expect(compose).toContain('buildHudPreviewPrewarmUnits');
+    expect(wiring).toContain('buildPostEntryPreviewPrewarmUnits');
     // Login warms headshots only; the body framing is deferred to Inspect open.
+    // The Hud passes the framing list through the wiring module verbatim.
     expect(compose).toContain("portraitFramings: ['headshot']");
+    expect(wiring).toContain('portraitFramings: deps.portraitFramings');
     // The prewarm variant, not the sync playerPortraitDataUrl: uploads prepaid
     // in bounded slices and the PNG encode off-thread (the sync capture books
     // 43 to 201 ms per cold portrait); a later sync call is a cache hit.
-    expect(compose).toContain('prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing)');
+    expect(wiring).toContain('prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing)');
   });
 
   it('prewarms player-card poses and never resizes the live preview to capture them', () => {

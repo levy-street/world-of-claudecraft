@@ -441,7 +441,7 @@ export const sv_SE: EnTranslations = {
       "remainingDaysHours": "{days} dagar {hours} timmar",
       "score": "Poäng",
       "walletValue": "Plånbokens värde (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Okänd",
       "spinTitle": "Dagligt snurr",
@@ -480,6 +480,88 @@ export const sv_SE: EnTranslations = {
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
         "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}",
         "bannedUntil": "Du är avstängd från dagliga belöningar i ytterligare {remaining}. Åtkomsten återkommer {until}. Orsak: {reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "Handelsfönstret stängt.",
+      "woc": {
+        "tabGold": "Guld",
+        "tabWoc": "$WOC",
+        "modesLabel": "Betalningsvaluta",
+        "tabWocHint": "Att betala med $WOC är möjligt när din sida av bordet är tom och inget guld erbjuds.",
+        "priceLabel": "Pris i USD",
+        "pricePlaceholder": "0,00",
+        "equivalent": "Ungefär {tokens} $WOC till aktuell kurs",
+        "variableWarning": "$WOC-beloppet är en förhandsvisning, inte ett fast pris. Det exakta beloppet fastställs av en ny kurs när du betalar.",
+        "feeLine": "Börsavgift {fee}, dras från priset.",
+        "netLine": "Du får {net}",
+        "netLineBuyer": "Säljaren får {net}",
+        "sendOffer": "Erbjud $WOC",
+        "offerSent": "Erbjudande skickat. Det går ut om 10 minuter om inte {name} godkänner det.",
+        "offerSentUntil": "Erbjudande skickat. Det går ut {time} om inte {name} godkänner det.",
+        "incomingAccept": "{name} erbjuder {price} för dina föremål.",
+        "notInstant": "En $WOC-försäljning sker inte omedelbart. Föremålet läggs i säkert förvar när båda parter godkänner, och når köparen när betalningen har verifierats.",
+        "blockDisabled": "$WOC-börsen är inte tillgänglig på den här världen.",
+        "blockNoWallet": "Länka och verifiera en plånbok för att sälja föremål för $WOC.",
+        "blockPartnerUnknown": "Kontrollerar om den spelaren kan ta emot $WOC...",
+        "blockRecipientNoWallet": "Den spelaren måste ansluta en plånbok för att kunna ta emot $WOC-betalningar.",
+        "hintClearYourItems": "Ta bort dina egna föremål: ett $WOC-erbjudande köper det de säljer.",
+        "hintAwaitTheirItems": "Väntar på att de erbjuder något som kan säljas för $WOC.",
+        "hintOneItem": "En $WOC-affär omfattar exakt ett föremål. Endast föremålet som säljs får ligga på bordet.",
+        "hintEnterPrice": "Ange ett pris i USD.",
+        "hintAcceptNeedsItem": "Lägg till föremålet du säljer innan du godkänner.",
+        "hintAcceptLocked": "Det föremålet är låst. Lås upp det i dina väskor, ta sedan bort det från handeln och lägg till det igen.",
+        "hintGoldOffered": "Ta bort ditt guld-erbjudande först: en handel sker i guld eller $WOC, inte båda.",
+        "ineligibleReason": "Själsbundna föremål, uppdragsföremål, låsta föremål och föremål utanför Börsens kategorier kan inte säljas för $WOC.",
+        "incomingTitle": "$WOC-erbjudande från {name}",
+        "incomingBody": "{name} erbjuder sig att sälja {item} till dig för {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Erbjudande godkänt. Väntar på att den andra spelaren godkänner.",
+        "payNow": "Betala {usd}",
+        "awaitingPayment": "Väntar på betalningsbekräftelse...",
+        "paying": "Bekräfta betalningen i din plånbok...",
+        "settled": "Betalt. Ditt föremål finns i dina väskor, eller anländer via Korpposten om de var fulla.",
+        "settledSeller": "Betalt. Föremålet levererades till köparen.",
+        "accept": "Godkänn erbjudande",
+        "accepted": "Erbjudande godkänt. Ditt föremål hålls i förvar tills betalningen är verifierad.",
+        "decline": "Avvisa",
+        "withdraw": "Dra tillbaka erbjudande",
+        "hintInsufficientBalance": "Det är mer $WOC än din anslutna plånbok har.",
+        "statusAwaitingBuyer": "Väntar på att köparen betalar.",
+        "statusPayingBuyer": "Bekräftar din betalning på nätverket...",
+        "statusPayingSeller": "Köparens betalning bekräftas på nätverket...",
+        "statusReviewBuyer": "Din betalning granskas.",
+        "statusReviewSeller": "Köparens betalning granskas.",
+        "paidSeller": "Du har fått en betalning på {price} för ditt {item}.",
+        "paidBuyer": "Du har skickat en betalning på {price} för {item}.",
+        "closedCancelled": "Denna försäljning avbröts. Föremålet återgår till säljaren via Korpposten.",
+        "closedSuspended": "Denna försäljning stängdes av en spelledare. Föremålet återgår till säljaren via Korpposten.",
+        "closedUnpaid": "Denna försäljning avslutades utan betalning. Föremålet återgår till säljaren via Korpposten.",
+        "closedUnpaidBuyer": "Denna försäljning avslutades utan din betalning. Föremålet återgår till säljaren via Korpposten. Att inte betala en godkänd affär ger en Börsvarning.",
+        "cancelSale": "Avbryt försäljning",
+        "cancelPendingSeller": "Avbrytande begärt. Försäljningen avslutas av sig själv om inte köparen betalar först.",
+        "youDeclined": "Du avvisade erbjudandet.",
+        "youWithdrew": "Du drog tillbaka ditt erbjudande.",
+        "offerNotPending": "Detta erbjudande väntar inte längre på svar.",
+        "offerDeclined": "$WOC-erbjudandet avvisades.",
+        "offerWithdrawn": "$WOC-erbjudandet drogs tillbaka.",
+        "offerExpired": "$WOC-erbjudandet gick ut.",
+        "offerExpiresAt": "Erbjudandet går ut {time}.",
+        "offerStandsUntil": "Ditt $WOC-erbjudande gäller fortfarande fram till {time}. Handla med säljaren igen för att slutföra affären om de godkänner.",
+        "dealAwaitsPayment": "Ditt $WOC-köp är fortfarande obetalt. Handla med säljaren igen för att betala. Affären löper ut av sig själv om du inte gör det, och att inte betala ger en Börsvarning.",
+        "closeSellerHold": "Ditt föremål stannar i förvar i väntan på köparens betalning. Avbryt försäljningen via fliken Aktivitet i Börsen om du ändrar dig.",
+        "closePaymentContinuesBuyer": "Din betalning bekräftas fortfarande. Leveransen slutförs av sig själv.",
+        "closePaymentContinuesSeller": "Köparens betalning bekräftas fortfarande. Försäljningen slutförs av sig själv.",
+        "p2pBindingNote": "När båda sidor har godkänt ska betalning ske inom {duration}, eller inom det kortare tidsfönster som öppnas när du trycker på Betala. Att inte betala ger en Börsvarning.",
+        "p2pBindingNoteUntimed": "När båda sidor har godkänt ska betalning ske strax efter, eller inom det kortare tidsfönster som öppnas när du trycker på Betala. Att inte betala ger en Börsvarning.",
+        "p2pPaymentDueAt": "Betalning ska ske senast {time}. Att inte betala ger en Börsvarning.",
+        "quoteExpiredTrade": "Kursen gick ut. Tryck på Inte nu, och sedan Betala igen för en ny.",
+        "quoteStaged": "Betalningskurs klar för {usd}: {tokens} $WOC, giltig till {time}.",
+        "paymentConfirmed": "Betalningen bekräftad. Ditt föremål anländer i dina väskor, eller via Korpposten om de är fulla, när leveransen slutförs.",
+        "statusConfirmedBuyer": "Betalningen bekräftad. Leveransen slutförs...",
+        "statusConfirmedSeller": "Betalningen bekräftad. Försäljningen slutförs...",
+        "hintBelowMin": "Börsens lägsta pris är {usd}."
       }
     },
     "wocStore": {
@@ -707,7 +789,37 @@ export const sv_SE: EnTranslations = {
       "applied": "Aktivt",
       "apply": "Använd skin",
       "detach": "Ta bort skin",
-      "equipHint": "Utrusta ett vapen av typen {type} för att använda detta skin."
+      "equipHint": "Utrusta ett vapen av typen {type} för att använda detta skin.",
+      "charter": {
+        "eyebrow": "Strongbox",
+        "title": "Strongbox Charters",
+        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
+        "grant": "Adds {slots} bank slots",
+        "buy": "Purchase Charter",
+        "buyAria": "Purchase {item}",
+        "confirmTitle": "Confirm Charter Purchase",
+        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "The charter was applied. The bank of this character is larger now.",
+        "alreadyGranted": "This charter is already on this character. You were not charged again.",
+        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
+        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
+        "notPurchasable": "This charter cannot be purchased right now.",
+        "noRoom": "The bank of this character has no room left for a charter.",
+        "noCharterFits": "No charter fits the room left in the bank of this character.",
+        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
+        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
+        "failed": "The purchase could not be completed.",
+        "names": {
+          "strongbox_charter_1": "Lesser Strongbox Charter",
+          "strongbox_charter_2": "Greater Strongbox Charter",
+          "strongbox_charter_3": "Grand Strongbox Charter",
+          "strongbox_charter_complete": "Complete Strongbox Charter"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -734,6 +846,9 @@ export const sv_SE: EnTranslations = {
       "showAmounts": "Visa alla Claudium-belopp",
       "hideAmounts": "Dölj extra Claudium-belopp",
       "skuRow": "{usd} för {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Köp",
       "buyUnavailable": "Det går inte att genomföra köp just nu.",
       "storeTitle": "Kosmetisk butik",
@@ -760,6 +875,7 @@ export const sv_SE: EnTranslations = {
       "reset": "Återställ",
       "presets": {
         "classic": "Klassiskt guld",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Midnatt",
         "parchment": "Pergament",
         "highContrast": "Hög kontrast"
@@ -853,6 +969,7 @@ export const sv_SE: EnTranslations = {
       "jump": "Hoppa",
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
+      "wocMarket": "Börsen",
       "deeds": "Bedrifter",
       "mounts": "Riddjur",
       "professions": "Yrken",
@@ -866,11 +983,62 @@ export const sv_SE: EnTranslations = {
       "actionRing": "Stridsaktioner",
       "actionPageToggle": "Byt åtgärdssida",
       "actionPageIndicator": "Sida {page}",
+      "actionRadial": "Handlingsriktningar",
+      "actionRadialCancel": "Avbryt handling",
+      "radialCenter": "Mitten",
+      "radialUp": "Upp",
+      "radialRight": "Höger",
+      "radialDown": "Ner",
+      "radialLeft": "Vänster",
+      "consumableSeat": "Förbrukningsvaror",
+      "menuControl": "Menyer",
+      "menuControlAria": "Menyer. Tryck för att öppna chatten, eller håll nedtryckt och svep höger för riddjur, karta, väskor och mer.",
+      "menuControlAriaTap": "Menyer. Tryck för att öppna menyraden: riddjur, karta, väskor och mer. Tryck igen för chatten.",
+      "menuLabel": "Meny",
+      "quickActions": "Snabbhandlingar",
+      "quickActionsAria": "Snabbhandlingar. Tryck för att öppna raden med riddjur, chatt, karta, väskor och mer, eller håll nedtryckt och svep höger för att välja en.",
+      "quickActionsAriaTap": "Snabbhandlingar. Tryck för att öppna raden med riddjur, chatt, karta, väskor och mer, tryck sedan på ett alternativ. Tryck på kontrollen igen för att stänga.",
+      "quickActionsLabel": "Handlingar",
+      "stanceRadial": "Ställningar",
+      "stanceAnchorAria": "Ställning: {stance}. Tryck för att öppna ställningsringen, välj sedan en annan ställning.",
+      "stanceAnchorEmptyAria": "Ingen ställning. Tryck för att öppna ställningsringen, välj sedan en ställning.",
+      "questStripAria": "Spårat uppdrag {position} av {total}: {title}. Aktivera för nästa uppdrag.",
+      "questStripAriaSingle": "Spårat uppdrag: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} till",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Sida {page}",
       "hideKeyboard": "Dölj tangentbordet",
-      "chatPlaceholder": "Säg något..."
+      "chatPlaceholder": "Säg något...",
+      "barEditor": "Redigera fält",
+      "barEditorAria": "Redigera handlingsfältets layout"
+    },
+    "barEditor": {
+      "title": "Redigera handlingsfält",
+      "close": "Stäng fältredigeraren",
+      "pages": "Handlingsfältets sidor",
+      "pageTab": "Sida {page}",
+      "buttonHeader": "Knapp {button}",
+      "cellAria": "Knapp {button}, {direction}: {action}",
+      "emptyCellAria": "Knapp {button}, {direction}: tom",
+      "hint": "Tryck på en plats, sedan en annan, för att byta plats på dem.",
+      "armed": "Tryck på en plats för att placera {name}.",
+      "picked": "Tryck på en annan plats för att byta med {name}.",
+      "locked": "Handlingsfälten är låsta under Gränssnitt-alternativen.",
+      "clear": "Rensa",
+      "clearAria": "Rensa en plats",
+      "clearArmed": "Tryck på en plats för att rensa den."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "Jag har inte sett dig här förut, min vän. Det är tradition i dessa trakter att den som ger sig ut på sitt äventyr besöker Prövostranden, en stillsam ö utanför sundet. Där kan du slipa dina färdigheter och vänja dig vid världen innan du tar dig an dess prövningar. Färjan går åt båda hållen, och ingen kommer att tänka sämre om dig oavsett vad du väljer.",
+      "bodyRefresher": "Tillbaka igen med ett nytt ansikte, är du? Då vet du hur det här går till. Men om du ändå vill friska upp minnet innan du ger dig av, avvisar Prövostranden aldrig en återvändande elev, och färjan är redo när du är det.",
+      "play": "Starta handledningen",
+      "skip": "Hoppa över handledningen",
+      "declineNote": "Som du vill, min vän. Skulle du någonsin ändra dig, så för färjeklockan vid Korppostens brevlåda dig över till Prövostranden när som helst, dag som natt. Den finns kvar här när vargarna inte gör det.",
+      "bellHomeNote": "Redan tillbaka från stranden? Det var färjeklockan du ringde i. Dess tvilling hänger där borta vid Korppostens brevlåda: ring i den när som helst, så bär överfarten dig tillbaka till Prövostranden. Ingen skada skedd, hur du än väljer.",
+      "islandArrivalNote": "Välkommen till Prövostranden. Väktaren Tam väntar strax uppe på stranden: gå och hälsa på honom.",
+      "noteClose": "Förstått"
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -883,6 +1051,117 @@ export const sv_SE: EnTranslations = {
       "nextTipQuestLog": "Öppna din uppdragslogg ({key}) för att hitta nästa uppgift i närheten.",
       "nextTipMap": "Kolla världskartan ({key}) för att se var uppdragen väntar.",
       "nextTipSocial": "Öppna Socialt ({key}) för att hitta en grupp för tuffare slagsmål."
+    },
+    "bootcamp": {
+      "title": "Första stegen",
+      "talkTitle": "Tala med Väktaren Tam",
+      "talkBody": "Väktaren Tam vaktar porten till Gatloppet en bit framför dig. Gå fram till honom tills namnet visas, tryck sedan på {interactKey}, eller vänsterklicka på honom, för att tala: han sätter dig på loppet.",
+      "talkBodyTouch": "Väktaren Tam vaktar porten till Gatloppet en bit framför dig. Gå fram till honom tills namnet visas, tryck sedan på honom, eller tryck på Använd-knappen, för att tala: han sätter dig på loppet.",
+      "talkBodyPad": "Väktaren Tam vaktar porten till Gatloppet en bit framför dig. Gå fram till honom tills namnet visas, tryck sedan på din Interagera-knapp för att tala: han sätter dig på loppet.",
+      "forwardTitle": "Gå den första banan",
+      "forwardBody": "Kliv in i banan bredvid Tam och håll {forwardKey} nedtryckt för att gå den västerut till dess flagga.",
+      "forwardBodyTouch": "Kliv in i banan bredvid Tam och för rörelsespaken framåt för att gå den västerut till dess flagga.",
+      "forwardBodyPad": "Kliv in i banan bredvid Tam och för vänster spak framåt för att gå den västerut till dess flagga.",
+      "turnwalkTitle": "Vrid dig, gå sedan",
+      "turnwalkBody": "Flagga ett avklarad. Håll {turnKey} nedtryckt för att vrida dig på stället tills du ser rakt ner i den murade banan som går söderut, håll sedan {forwardKey} igen och gå den till den andra flaggan.",
+      "turnwalkBodyTouch": "Flagga ett avklarad. Dra ett finger över världen (inte rörelsespaken) för att vrida dig tills du ser rakt ner i den murade banan som går söderut, för sedan spaken framåt och gå den till den andra flaggan.",
+      "turnwalkBodyPad": "Flagga ett avklarad. För höger spak för att vrida dig tills du ser rakt ner i den murade banan som går söderut, för sedan vänster spak framåt och gå den till den andra flaggan.",
+      "strafeTitle": "Vrid dig, gå sedan",
+      "strafeBody": "Ett hörn kvar. Håll {turnLeftKey} nedtryckt för att vrida dig på stället tills du ser rakt ner i den sista banan, håll sedan {forwardKey} igen och gå den tills den röda flaggan ligger bakom dig.",
+      "strafeBodyTouch": "Ett hörn kvar. Dra ett finger över världen (inte rörelsespaken) för att vrida dig tills du ser rakt ner i den sista banan, för sedan spaken framåt och gå den tills den röda flaggan ligger bakom dig.",
+      "strafeBodyPad": "Ett hörn kvar. För höger spak för att vrida dig tills du ser rakt ner i den sista banan, för sedan vänster spak framåt och gå den tills den röda flaggan ligger bakom dig.",
+      "cameraTitle": "Sväng kameran",
+      "cameraBody": "En sista lektion innan du lämnar in loppet: håll höger musknapp nedtryckt och dra för att svänga kameran hela vägen runt dig. Att veta vad som står bakom dig vinner strider.",
+      "cameraBodyTouch": "En sista lektion innan du lämnar in loppet: dra ett finger över världen för att svänga kameran hela vägen runt dig. Att veta vad som står bakom dig vinner strider.",
+      "cameraBodyPad": "En sista lektion innan du lämnar in loppet: för höger spak för att svänga kameran hela vägen runt dig. Att veta vad som står bakom dig vinner strider.",
+      "courseProgress": "Flagga {current} av {total}",
+      "doneTitle": "Loppet slutfört",
+      "doneBody": "Det är allt dina ben behöver veta. Uppsyningsmannen Pell står bredvid den röda flaggan: tryck på {interactKey} på honom, eller vänsterklicka på honom, för att lämna in ditt lopp och ta din första belöning.",
+      "doneBodyTouch": "Det är allt dina ben behöver veta. Uppsyningsmannen Pell står bredvid den röda flaggan: tryck på honom för att lämna in ditt lopp och ta din första belöning.",
+      "doneBodyPad": "Det är allt dina ben behöver veta. Uppsyningsmannen Pell står bredvid den röda flaggan: tryck på din Interagera-knapp på honom för att lämna in ditt lopp och ta din första belöning.",
+      "coachNextTitle": "Nästa: {npc}",
+      "coachNextBody": "Följ den gyllene stigen till {npc}. Gå fram tills namnet visas, tryck sedan på {interactKey}, eller vänsterklicka på personen, för att ta din nästa uppgift.",
+      "coachNextBodyTouch": "Följ den gyllene stigen till {npc}. Gå fram tills namnet visas, tryck sedan på personen, eller tryck på Använd-knappen, för att ta din nästa uppgift.",
+      "coachNextBodyPad": "Följ den gyllene stigen till {npc}. Gå fram tills namnet visas, tryck sedan på din Interagera-knapp för att ta din nästa uppgift.",
+      "coachTaskBody": "Följ den gyllene stigen till din uppgift. Spåraren till höger håller räkningen, och {mapKey} öppnar kartan om du tappar bort vägen.",
+      "coachTaskBodyTouch": "Följ den gyllene stigen till din uppgift. Spåraren till höger håller räkningen, och kartknappen visar vägen om du tappar bort den.",
+      "coachTaskBodyPad": "Följ den gyllene stigen till din uppgift. Spåraren till höger håller räkningen, och din kartknapp visar vägen om du tappar bort den.",
+      "coachReadyTitle": "Uppgift slutförd",
+      "coachReadyBody": "Bege dig till {npc} och tryck på {interactKey}, eller vänsterklicka på personen, för att lämna in den och ta din belöning.",
+      "coachReadyBodyTouch": "Bege dig till {npc} och tryck på personen för att lämna in den och ta din belöning.",
+      "coachReadyBodyPad": "Bege dig till {npc} och tryck på din Interagera-knapp för att lämna in den och ta din belöning.",
+      "taskStrikeTrueBody": "Gå fram till en halmdocka och vänsterklicka på den för att göra den till ditt mål: namnet visas högst upp på skärmen. Tryck sedan på {attackKey} för att börja svinga. Den första knappen är din vanliga attack, inte en besvärjelse. Fortsätt slå tills en ger vika.",
+      "taskStrikeTrueBodyTouch": "Gå fram till en halmdocka och tryck på den för att göra den till ditt mål. Tryck sedan på den första knappen på handlingsfältet för att svinga. Fortsätt slå tills en ger vika.",
+      "taskStrikeTrueBodyPad": "Gå fram till en halmdocka och tryck på din målknapp för att göra den till ditt mål. Tryck sedan på din första handlingsknapp för att svinga. Fortsätt slå tills en ger vika.",
+      "taskHoneBody": "Vänsterklicka på en halmdocka för att sikta in dig på den, tryck sedan på {abilityKey} för att använda {ability}. Det är din egen, inte ett vanligt svingslag. Landa det tre gånger.",
+      "taskHoneBodyTouch": "Tryck på en halmdocka för att sikta in dig på den, tryck sedan på {ability} på handlingsfältet. Det är din egen, inte ett vanligt svingslag. Landa det tre gånger.",
+      "taskHoneBodyPad": "Sikta in dig på en halmdocka, tryck sedan på handlingsknappen som håller {ability}. Det är din egen, inte ett vanligt svingslag. Landa det tre gånger.",
+      "taskLongWalkBody": "Tryck på {bagsKey} för att öppna dina väskor, vänsterklicka sedan på Övergångsstenen. Den lägger dig ner precis där du står. Ingenting här kan skada dig, och det här kostar dig ingenting.",
+      "taskLongWalkBodyTouch": "Öppna dina väskor och tryck på Övergångsstenen. Den lägger dig ner precis där du står. Ingenting här kan skada dig, och det här kostar dig ingenting.",
+      "taskLongWalkBodyPad": "Öppna dina väskor och välj Övergångsstenen. Den lägger dig ner precis där du står. Ingenting här kan skada dig, och det här kostar dig ingenting.",
+      "taskLongWalkDeadBody": "Du har dött, och du har inte förlorat något: inga föremål, inga mynt, ingen erfarenhet. Steg 1 av 2: klicka på knappen Släpp anden fri mitt på skärmen. Du reser dig som en ande vid kyrkogården bakom lägret.",
+      "taskLongWalkDeadBodyTouch": "Du har dött, och du har inte förlorat något: inga föremål, inga mynt, ingen erfarenhet. Steg 1 av 2: tryck på knappen Släpp anden fri mitt på skärmen. Du reser dig som en ande vid kyrkogården bakom lägret.",
+      "taskLongWalkDeadBodyPad": "Du har dött, och du har inte förlorat något: inga föremål, inga mynt, ingen erfarenhet. Steg 1 av 2: välj Släpp anden fri mitt på skärmen. Du reser dig som en ande vid kyrkogården bakom lägret.",
+      "taskLongWalkGhostBody": "Steg 2 av 2: du är en ande, och ingenting kan röra dig. Din kropp är markören på din minikarta. Gå fram till den. När du kommer nära dyker knappen Återuppstå vid liket upp: klicka på den så är du levande igen, helt utan påföljd. Den promenaden är ALLTID gratis, och det är så du kommer tillbaka varje gång du dör.",
+      "taskLongWalkGhostBodyTouch": "Steg 2 av 2: du är en ande, och ingenting kan röra dig. Din kropp är markören på din minikarta. Gå fram till den. När du kommer nära dyker knappen Återuppstå vid liket upp: tryck på den så är du levande igen, helt utan påföljd. Den promenaden är ALLTID gratis, och det är så du kommer tillbaka varje gång du dör.",
+      "taskLongWalkGhostBodyPad": "Steg 2 av 2: du är en ande, och ingenting kan röra dig. Din kropp är markören på din minikarta. Gå fram till den. När du kommer nära dyker knappen Återuppstå vid liket upp: välj den så är du levande igen, helt utan påföljd. Den promenaden är ALLTID gratis, och det är så du kommer tillbaka varje gång du dör.",
+      "taskShellBody": "Strandkrabborna nyper tillbaka. Vänsterklicka på en för att göra den till ditt mål, tryck sedan på {abilityKey} för {ability}, och fortsätt anfalla. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskShellBodyTouch": "Tryck på en för att sikta in dig på den, tryck sedan på {ability} på handlingsfältet. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskShellBodyPad": "Sikta in dig på en, tryck sedan på handlingsknappen som håller {ability}. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskStrikeTrueBodyCaster": "Gå fram till en halmdocka och vänsterklicka på den för att göra den till ditt mål: namnet visas högst upp på skärmen. Tryck sedan på {attackKey}, eller klicka på den andra knappen på handlingsfältet, för att kasta din besvärjelse. Fortsätt kasta tills en ger vika.",
+      "taskStrikeTrueBodyCasterTouch": "Gå fram till en halmdocka och tryck på den för att göra den till ditt mål. Tryck sedan på den andra knappen på handlingsfältet för att kasta din besvärjelse. Fortsätt kasta tills en ger vika.",
+      "taskStrikeTrueBodyCasterPad": "Gå fram till en halmdocka och tryck på din målknapp för att göra den till ditt mål. Tryck sedan på din andra handlingsknapp för att kasta din besvärjelse. Fortsätt kasta tills en ger vika.",
+      "taskShellBodyCaster": "Strandkrabborna nyper tillbaka. Vänsterklicka på en för att göra den till ditt mål, tryck sedan på {abilityKey} för {ability}, och fortsätt kasta på avstånd. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskShellBodyCasterTouch": "Tryck på en för att sikta in dig på den, tryck sedan på {ability} på handlingsfältet, och fortsätt kasta på avstånd. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskShellBodyCasterPad": "Sikta in dig på en, tryck sedan på handlingsknappen som håller {ability}, och fortsätt kasta på avstånd. Om för många anfaller dig samtidigt, dra dig tillbaka uppför stigen: de ger snabbt upp jakten, och din hälsa återhämtar sig medan du vilar.",
+      "taskPearlBody": "Följ den gyllene stigen till tidvattenpölen vid strandens västra ände. Stå vid vattenbrynet, tryck på {bagsKey} för att öppna dina väskor och vänsterklicka på Saltlockbetet för att kalla fram honom. Slåss mot honom som du slogs mot strandkrabborna, och när han faller, tryck på {interactKey} på hans skal för att ta den glänsande pärlan.",
+      "taskPearlBodyTouch": "Följ den gyllene stigen till tidvattenpölen vid strandens västra ände. Stå vid vattenbrynet, öppna dina väskor och tryck på Saltlockbetet för att kalla fram honom. Slåss mot honom som du slogs mot strandkrabborna, och när han faller, tryck på hans skal för att ta den glänsande pärlan.",
+      "taskPearlBodyPad": "Följ den gyllene stigen till tidvattenpölen vid strandens västra ände. Stå vid vattenbrynet, öppna dina väskor och välj Saltlockbetet för att kalla fram honom. Slåss mot honom som du slogs mot strandkrabborna, och när han faller, tryck på din Interagera-knapp på hans skal för att ta den glänsande pärlan.",
+      "taskWreckLineBody": "De strandsatta lådorna kantar stigen mot Gryningslägret. Gå fram till en tills namnet visas, tryck sedan på {interactKey}, eller vänsterklicka på lådan, för att plocka upp den. Sex stycken fyller lasten.",
+      "taskWreckLineBodyTouch": "De strandsatta lådorna kantar stigen mot Gryningslägret. Gå fram till en tills namnet visas, tryck sedan på lådan, eller tryck på Använd-knappen, för att plocka upp den. Sex stycken fyller lasten.",
+      "taskWreckLineBodyPad": "De strandsatta lådorna kantar stigen mot Gryningslägret. Gå fram till en tills namnet visas, tryck sedan på din Interagera-knapp för att plocka upp den. Sex stycken fyller lasten.",
+      "taskPouchBody": "Tryck på {interactKey} på {npc}, eller vänsterklicka på personen, för att öppna ståndet, vänsterklicka sedan på Linnepungen för att köpa den.",
+      "taskPouchBodyTouch": "Tryck på {npc} för att öppna ståndet, tryck sedan på Linnepungen för att köpa den.",
+      "taskPouchBodyPad": "Tryck på din Interagera-knapp på {npc} för att öppna ståndet, välj sedan Linnepungen för att köpa den.",
+      "readyPouchBody": "Pungen köpt. Tryck på {bagsKey} för att öppna dina väskor och vänsterklicka på Linnepungen för att spänna fast den i en ledig väskögla. Bege dig sedan till {npc} och tryck på {interactKey} för att visa upp den.",
+      "readyPouchBodyTouch": "Pungen köpt. Öppna dina väskor och tryck på Linnepungen för att spänna fast den i en ledig väskögla. Bege dig sedan till {npc} och tryck på personen för att visa upp den.",
+      "readyPouchBodyPad": "Pungen köpt. Öppna dina väskor och välj Linnepungen för att spänna fast den i en ledig väskögla. Bege dig sedan till {npc} och tryck på din Interagera-knapp för att visa upp den.",
+      "promptTalk": "Tala",
+      "promptTurnIn": "Lämna in uppdrag",
+      "promptPickUp": "Plocka upp",
+      "promptLootPearl": "Plundra pärlan",
+      "promptRead": "Läs",
+      "promptRing": "Ring",
+      "promptHold": "Håll",
+      "promptSelect": "Välj",
+      "promptAttack": "Anfall",
+      "promptUseAbility": "Använd förmåga",
+      "promptKneel": "Knäböj",
+      "promptOpenBags": "Öppna dina väskor",
+      "promptCharacterSheet": "Öppna ditt karaktärsblad",
+      "promptLookAround": "Håll högerklick nedtryckt och dra för att se dig omkring",
+      "promptJump": "Hoppa",
+      "promptSummon": "Frammana",
+      "ringEquipTitle": "Bär ditt pris",
+      "ringEquipBody": "Du har fått Pärlemor, och en belöning gör ingen nytta liggande i en väska. Steg 1 av 2: tryck på {bagsKey} för att öppna dina väskor, vänsterklicka sedan på ringen för att sätta på den.",
+      "ringEquipBodyTouch": "Du har fått Pärlemor, och en belöning gör ingen nytta liggande i en väska. Steg 1 av 2: öppna dina väskor och tryck på ringen för att sätta på den.",
+      "ringEquipBodyPad": "Du har fått Pärlemor, och en belöning gör ingen nytta liggande i en väska. Steg 1 av 2: öppna dina väskor och välj ringen för att sätta på den.",
+      "ringAdmireTitle": "Titta på dig",
+      "ringAdmireBody": "Steg 2 av 2: tryck på {charKey} för att öppna ditt karaktärsblad. Den skärmen visar allt du bär och de egenskaper det ger dig, och ringen sitter nu på din hand. Kolla den varje gång du plockar upp ny utrustning.",
+      "ringAdmireBodyTouch": "Steg 2 av 2: öppna ditt karaktärsblad från menyn. Den skärmen visar allt du bär och de egenskaper det ger dig, och ringen sitter nu på din hand. Kolla den varje gång du plockar upp ny utrustning.",
+      "ringAdmireBodyPad": "Steg 2 av 2: öppna ditt karaktärsblad från menyn. Den skärmen visar allt du bär och de egenskaper det ger dig, och ringen sitter nu på din hand. Kolla den varje gång du plockar upp ny utrustning.",
+      "keycapThen": "sedan",
+      "voiceArrival": "Lugnt i land, vän. Ser du den gyllene stigen vid dina fötter? Den kan vägen bättre än jag. Följ den.",
+      "voiceFirstFlag": "Det är en flagga avklarad. Håll benen i rörelse, bara två kvar.",
+      "voiceRunDone": "Ett rent lopp, det där. Uppsyningsmannen Pell håller din belöning, gå och hämta den.",
+      "voiceStationDoneA": "Fint arbete. Vidare till nästa, stigen är redan upplyst åt dig.",
+      "voiceStationDoneB": "Du börjar få kläm på det här, ingen tvekan om det.",
+      "voiceVeerOff": "Vänta lite, vän, det där är fel väg. Den gyllene stigen ligger bakom dig.",
+      "voiceGraduate": "Klockan är ringd för dig. Eastbrook väntar på andra sidan vattnet, och du är redo för det.",
+      "bellTitle": "Ring i klockan",
+      "bellBody": "Din överfart är förtjänad. Gå fram till färjeklockan bredvid piren och tryck på {interactKey}, eller vänsterklicka på den, för att segla till Eastbrook.",
+      "bellBodyTouch": "Din överfart är förtjänad. Gå fram till färjeklockan bredvid piren och tryck på den för att segla till Eastbrook.",
+      "bellBodyPad": "Din överfart är förtjänad. Gå fram till färjeklockan bredvid piren och tryck på din Interagera-knapp på den för att segla till Eastbrook."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klicka för att växla mellan 12/24-timmar",
@@ -935,6 +1214,31 @@ export const sv_SE: EnTranslations = {
       "mergedPrs": "Sammanslagna PR:er",
       "devEmpty": "Inga rankade bidragsgivare ännu."
     },
+    "pledge": {
+      "open": "Tar emot löften",
+      "closed": "Tar inte emot löften",
+      "minLevel": "Nivå {level}+",
+      "action": "Lova",
+      "actionTitle": "Lova {guild}",
+      "pledged": "Lovat",
+      "yourGuild": "Ditt gille",
+      "tab": "Löften",
+      "tabWithCount": "Löften ({count})",
+      "empty": "Ingen har gett ett löfte till ditt gille än.",
+      "accept": "Godkänn",
+      "acceptTitle": "Godkänn {name}s löfte",
+      "reject": "Avvisa",
+      "rejectTitle": "Avvisa {name}s löfte",
+      "settings": "Rekrytering",
+      "acceptingLabel": "Ta emot löften",
+      "minLevelLabel": "Lägsta nivå",
+      "noteLabel": "Anslag",
+      "notePlaceholder": "Berätta för blivande medlemmar vad ditt gille söker",
+      "save": "Spara",
+      "yourPledge": "Ditt löfte: {guild}",
+      "since": "Lovade {date}",
+      "withdraw": "Dra tillbaka löfte"
+    },
     "raidLockout": {
       "title": "Raidlåsningar",
       "allReady": "Alla raider redo",
@@ -986,6 +1290,7 @@ export const sv_SE: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
       "threatFallback": "Inget levande hot: visar skada mot {name}",
+      "threatFrozen": "Slutligt hot mot {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Övrigt ({count})",
@@ -1025,7 +1330,6 @@ export const sv_SE: EnTranslations = {
       "targetFriendlyNext": "Växla vänligt mål",
       "targetPrev": "Växla mål bakåt",
       "discord": "Discord",
-      "valecup": "Dalcupen",
       "bgFlag": "Slagfältets flaggåtgärd",
       "sheathe": "Slida/Ta fram vapen",
       "dive": "Simma nedåt",
@@ -1048,6 +1352,11 @@ export const sv_SE: EnTranslations = {
       "reset": "Återställ",
       "done": "Klar",
       "cancel": "Avbryt",
+      "showExtraBar": "Show Another Action Bar",
+      "hideExtraBar": "Hide an Action Bar",
+      "conflictTitle": "Key Already Bound",
+      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
+      "conflictAccept": "Rebind Anyway",
       "resetConfirmTitle": "Återställa handlingsfältets tangenter?",
       "resetConfirmBody": "Det första fältet återgår till sina standardtangenter. Det andra och tredje fältet blir obundna. Detta kan inte ångras."
     },
@@ -1182,6 +1491,7 @@ export const sv_SE: EnTranslations = {
       "endedForfeitLog": "Matchen gavs förlorad.",
       "firstWinBonusLine": "Dagens första seger: +{honor} heder",
       "firstWinBonusLog": "Dagens första seger: du får {honor} extra heder.",
+      "doubleHonorLine": "Dubbel Heder-helg: Heder på Törnhålefälten betalar {mult}x idag, och en utspelad förlust betalar som en vinst",
       "timeWarningMinutes": "{minutes} minuter kvar",
       "timeWarningOneMinute": "En minut kvar",
       "timeWarningMinutesLog": "{minutes} minuter återstår av striden.",
@@ -1191,146 +1501,6 @@ export const sv_SE: EnTranslations = {
         "azureKeep": "Azurblå fästning",
         "ruinCourtyard": "Ruingården",
         "graveyard": "Kyrkogård"
-      }
-    },
-    "vcup": {
-      "title": "Dalcupen",
-      "shootPower": "KRAFT",
-      "close": "Stäng Dalcupsfönstret",
-      "offlineNote": "Matchboken är stängd. Dalcupen är inte tillgänglig just nu.",
-      "recordLine": "Ditt facit: {wins} vinster, {losses} förluster, {draws} oavgjorda.",
-      "bracketsAria": "Spelform",
-      "bracketLabel": "{n} mot {n}",
-      "waitingCount": "{count} väntar",
-      "nationsHeading": "Banérnation",
-      "nation": {
-        "vale": "Östbäcksdalen",
-        "mirefen": "Dykärret",
-        "thornpeak": "Törntoppen",
-        "coliseum": "Askgrå kolosseum",
-        "choir": "Bleka kören",
-        "ogre": "Ogerklanerna",
-        "moon": "Bleka månen",
-        "copperdig": "Kopparbrottet"
-      },
-      "awayNote": "Om båda sidor för samma banér spelar bortalaget i inverterade färger.",
-      "rolesHeading": "Sportroll",
-      "rolesSmallBracketNote": "I spelformerna 1 mot 1 och 2 mot 2 spelar varje deltagare Allroundspelarens uppsättning. Bedrifter som kräver spelformen 3 mot 3 eller större kan inte fullbordas här.",
-      "role": {
-        "allrounder": {
-          "name": "Allroundspelare",
-          "desc": "Lite av allt: spark, storspark och en ärlig axel."
-        },
-        "striker": {
-          "name": "Anfallare",
-          "desc": "Lever för den långa sparken och det snabba sidosteget."
-        },
-        "sweeper": {
-          "name": "Libero",
-          "desc": "Knuffar löpare av bollen och rensar undan den."
-        },
-        "keeper": {
-          "name": "Målvakt",
-          "desc": "Vaktar målområdet med grepp, dyk och utspark."
-        }
-      },
-      "queue": "Ställ dig i kön",
-      "leaveQueue": "Lämna kön",
-      "queueNote": "Köa varifrån som helst; visslan kallar dig till Suggfältet.",
-      "queuedStatus": "Köad för {bracket}: plats {position} av {count}.",
-      "blockNation": "Välj en banérnation först.",
-      "blockPartySize": "Den spelformen kräver ett mindre sällskap.",
-      "blockNotLeader": "Bara sällskapets ledare kan köa laget.",
-      "inMatchNote": "Ditt lag är på planen. Spela vidare!",
-      "deserterNote": "Vaktmästaren minns. Du får köa igen om {seconds} sek.",
-      "liveHeading": "Nu på Suggfältet",
-      "liveAria": "Dalcupen: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Gå fram till Suggfältet för att titta från läktarna.",
-      "noLive": "Planen är tyst. Ingen match spelas.",
-      "boardHeading": "Vinnartavlan",
-      "boardEmpty": "Inga vinnare noterade ännu. Kopparspannen väntar.",
-      "boardWins": "{count} vinster",
-      "enterAsGuild": "Träd in under banéret för {guild}",
-      "guildRecordLine": "Ditt gilles facit: {wins} vinster, {losses} förluster.",
-      "guildBoardHeading": "Gillesbanér",
-      "guildBoardEmpty": "Inget gille har beträtt planen ännu. Hissa ert banér!",
-      "guildBoardWl": "{wins} V, {losses} F",
-      "practice": "Träning mot bottar",
-      "practiceNote": "Startar genast en privat botmatch på din egen träningsplan.",
-      "practiceUnratedNote": "Träningsmatcher är orankade: ställningen och framsteg i Bedrifternas bok räknas inte.",
-      "practicingNow": "Tränar just nu ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Dalcupskö: {bracket}, plats {position} av {count}",
-      "indicatorLive": "Dalcupen",
-      "indicatorOpen": "Öppna Dalcupsfönstret",
-      "phaseCountdown": "Avspark om {seconds}",
-      "phaseGoal": "MÅL!",
-      "phaseGolden": "GYLLENE MÅL",
-      "phaseOver": "FULL TID",
-      "bannerFound": "Dalcupen kallar: {nationA} mot {nationB}!",
-      "bannerCountdown": "Avspark om {seconds}...",
-      "bannerKickoff": "AVSPARK!",
-      "bannerGoal": "MÅL! {nation} gör mål!",
-      "bannerSave": "{name} RÄDDAR!",
-      "bannerGolden": "GYLLENE MÅL: nästa mål vinner!",
-      "bannerEnd": "Full tid: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Seger på Suggfältet!",
-      "bannerDraw": "Oavgjort på Suggfältet.",
-      "bannerLoss": "Nederlag på Suggfältet.",
-      "logQueued": "Du ställer dig i Dalcupskön för {bracket} (plats {position}).",
-      "logUnqueued": "Du lämnar Dalcupskön.",
-      "logFound": "Din Dalcupsmatch är redo: {nationA} mot {nationB}.",
-      "logRoster": "Din sida: {allies}. Deras sida: {enemies}.",
-      "logGoal": "{name} gör mål för {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} står för räddningen!",
-      "logWin": "Du vinner drabbningen på Suggfältet.",
-      "logDraw": "Drabbningen på Suggfältet slutar oavgjort.",
-      "logLoss": "Du förlorar drabbningen på Suggfältet.",
-      "gossipOpen": "Matchboken",
-      "gossipOpenAria": "Öppna Dalcupsfönstret",
-      "mobileLabel": "Cupen",
-      "briefing": {
-        "subtitle": "Genomgång före matchen",
-        "vs": "mot",
-        "rulesHeading": "Så spelar du",
-        "rule1": "Sparka eller passa in bollen i motståndarnas mål för att göra poäng.",
-        "rule2": "Först till 5 mål vinner, eller flest mål när det blåses för full tid.",
-        "rule3": "En jämn match vid full tid går till gyllene mål: nästa mål vinner.",
-        "rule4": "Tacklingar får dig bara att tumla omkull. Ingen kommer till skada under skördefreden.",
-        "rule5": "Vem som helst kan gå fram och heja på dig från läktarna.",
-        "kitHeading": "Din uppsättning",
-        "kitNote": "De här dragen ersätter dina klassförmågor under matchen.",
-        "unratedNote": "Bottar är på planen, så den här matchen är orankad: ställningen påverkas inte, och bedrifter för mål, räddningar och hållna nollor räknas inte.",
-        "practiceUnratedNote": "Det här är en träningsmatch, så den är orankad: ställningen påverkas inte, och framsteg i Bedrifternas bok räknas inte.",
-        "rosterHeading": "Laguppställningen",
-        "you": "Du",
-        "bot": "Bot",
-        "ready": "Jag är redo",
-        "readyDone": "Redo",
-        "readyAria": "Gör dig redo för avspark",
-        "waiting": "Väntar på att andra sidan ska bli redo...",
-        "whistle": "Visslan ljuder om {seconds}s.",
-        "readyCount": "{ready} av {total} redo"
-      },
-      "bet": {
-        "title": "Matchvad",
-        "aria": "Vadslagning på Dalcupsmatch",
-        "closesIn": "Vadslagningen stänger om {seconds}s",
-        "closed": "Vadslagningen stängd",
-        "prize": "Pott {amount}",
-        "splitAria": "Andel av vadslagningspotten på varje lag",
-        "expand": "Visa vad och satsa",
-        "collapse": "Dölj vad",
-        "oddsLabel": "Betalar",
-        "back": "Satsa på {team}",
-        "form": "{wins}V-{losses}F",
-        "mine": "Ditt vad: {amount} på {team}",
-        "none": "Du har inget vad på den här matchen ännu.",
-        "record": "Vadslagningsfacit: {wins}V-{losses}F, {sign}{net}",
-        "wonBanner": "Ditt vad vann!",
-        "wonLog": "Ditt Dalcupsvad vann: {amount} tillbaka.",
-        "lostLog": "Ditt Dalcupsvad förlorade: {amount}.",
-        "refundLog": "Vaden ogiltigförklarades, din insats på {amount} återlämnades."
       }
     },
     "options": {
@@ -1402,11 +1572,12 @@ export const sv_SE: EnTranslations = {
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
       "stickyTarget": "Behåll mål vid markklick",
       "showItemLevel": "Visa föremålsnivå",
-      "showReliquaryTracker": "Show Reliquary Tracker",
+      "showReliquaryTracker": "Visa Relikviespårare",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
+      "combineActionBars": "Combine Action Bars",
       "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
@@ -1415,7 +1586,9 @@ export const sv_SE: EnTranslations = {
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Vänsterhänt layout"
+      "mobileLeftHanded": "Vänsterhänt layout",
+      "touchTapMenus": "Tryckmenyer",
+      "touchTapMenusNote": "Öppna handlings-, förbruknings- och menykontrollerna med ett tryck i stället för ett svep. Tryck på ett föremål för att använda det, tryck på kontrollen igen för dess vanliga funktion, eller tryck utanför för att stänga."
     },
     "talentRows": {
       "tab": "Val",
@@ -1440,6 +1613,11 @@ export const sv_SE: EnTranslations = {
     },
     "controller": {
       "title": "Handkontroll",
+      "glyphStyle": "Knappsymboler",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Aktivera handkontroll",
       "invertY": "Invertera kamera (Y)",
       "deadzone": "Spakens dödzon",
@@ -1448,29 +1626,29 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
-      "confirmAction": "Confirm / Select",
+      "confirmAction": "Bekräfta / Välj",
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.",
       "crossHotbar": "Cross Hotbar",
-      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarEnable": "Aktivera Cross Hotbar",
       "crossHotbarExpand": "Double Cross Hotbar",
-      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
-      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarHelp": "Håll en avtryckare för att tända åtta action-bar-fack på d-pad- och ansiktsknapparna. Tryck på den andra utlösaren för att byta till den andra uppsättningen.",
+      "crossHotbarResetLayout": "Återställ Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
-      "cancelAction": "Cancel / Back",
-      "subcommandsAction": "Subcommands / Map",
-      "cycleHudAction": "Cycle Interface",
-      "cycleSetAction": "Change Hotbar Set",
+      "crossHotbarOwnsButtons": "Triggarna och d-paden tillhör cross hotbar medan den är på, så de ställs in nedan istället för här.",
+      "cancelAction": "Avbryt / Tillbaka",
+      "subcommandsAction": "Underkommandon / Karta",
+      "cycleHudAction": "Cykelgränssnitt",
+      "cycleSetAction": "Ändra Hotbar Set",
       "crossHotbarDisplay": "Bar Display",
       "crossHotbarDisplayFull": "Full",
-      "crossHotbarDisplayCompact": "Compact",
-      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarDisplayCompact": "Kompakt",
+      "crossHotbarDisplayMinimal": "Endast medan den hålls",
       "crossHotbarArrangeChord": "{bumper} + {button}",
-      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
-      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
-      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
+      "crossHotbarCarrying": "Bär {action}: bekräfta på en cell för att placera den, avbryt för att sätta tillbaka den.",
+      "crossHotbarEditHint": "Ordna: bekräfta plockar upp från en cell eller stavningsboken och släpper på en cell, avbryt rensar en.",
+      "crossHotbarEditHelp": "Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen."
     },
     "perf": {
       "title": "Prestandaöverlägg",
@@ -1589,7 +1767,7 @@ export const sv_SE: EnTranslations = {
           "render": "render  inskickning {submit} ms | värld {world} ms | entiteter {entities} ms",
           "scene": "scen    {calls} anrop | {triangles} tri | {views} vyer",
           "hitches": "hack    {hitches} | shaders {shaders} | uppladdningar {uploads} | vyer {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
+          "hitchesBuild": "zon bygger {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "väntar"
         },
@@ -1641,10 +1819,10 @@ export const sv_SE: EnTranslations = {
             "eventCpu": "Händelsehantering förbrukar bildtiden",
             "shaderCompile": "Shaders kompileras under spelets gång",
             "textureUpload": "Texturuppladdningar orsakar hack i spelet",
-            "zoneBuild": "Zone streaming builds are causing hitches",
+            "zoneBuild": "Strömmande zoner orsakar problem",
             "viewCreate": "Skapande av entitetsvyer orsakar hack",
-            "gcHitch": "Garbage collections are running inside long frames",
-            "offFrameHitch": "Long frames come from work outside the render callback",
+            "gcHitch": "Sophämtning körs inuti långa ramar",
+            "offFrameHitch": "Långa ramar kommer från arbete utanför återuppringningen",
             "otherHitch": "Otillskrivna långa bilder kvarstår",
             "assetStartup": "Speluppstarten fördröjs av resursarbete",
             "longTasks": "Långa webbläsaruppgifter blockerar bilder",
@@ -1929,6 +2107,18 @@ export const sv_SE: EnTranslations = {
         "many": "du är {rank}, {count} medlemmar",
         "other": "du är {rank}, {count} medlemmar"
       },
+      "wocMarketSellChoose": {
+        "one": "Välj bland {count} föremål",
+        "few": "Välj bland {count} föremål",
+        "many": "Välj bland {count} föremål",
+        "other": "Välj bland {count} föremål"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} föremål i handeln kan inte säljas för $WOC.",
+        "few": "{count} föremål i handeln kan inte säljas för $WOC.",
+        "many": "{count} föremål i handeln kan inte säljas för $WOC.",
+        "other": "{count} föremål i handeln kan inte säljas för $WOC."
+      },
       "finderPartySize": {
         "one": "{count} spelare",
         "few": "{count} spelare",
@@ -2063,6 +2253,10 @@ export const sv_SE: EnTranslations = {
       "errPasswordLong": "Det nya lösenordet får vara högst 128 tecken.",
       "errPasswordUnchanged": "Det nya lösenordet måste skilja sig från det nuvarande.",
       "errPasswordConfirm": "De nya lösenorden stämmer inte överens.",
+      "setPasswordTitle": "Ange ett lösenord",
+      "setPasswordHint": "Det här kontot skapades med Logga in med Apple eller Discord och har inget lösenord än. Ställ in en för att logga in på andra enheter, som Mac- och Windows-skrivbordsappar eller webben, och för att länka ytterligare inloggningsmetoder.",
+      "setPasswordSubmit": "Ange lösenord",
+      "passwordSet": "Lösenord inställt. Du kan nu logga in med ditt användarnamn och lösenord var som helst.",
       "emailLabel": "E-post (valfritt)",
       "emailHint": "Används endast för kontoåterställning. Använd Ändra e-post nedan för att uppdatera den.",
       "saveEmail": "Spara e-post",
@@ -2276,7 +2470,10 @@ export const sv_SE: EnTranslations = {
       "backpack": "Ryggsäck",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom väskplats",
-      "unequipHint": "Klicka för att ta bort den här väskan"
+      "unequipHint": "Klicka för att ta bort den här väskan",
+      "poolGeneral": "General: {used} of {total}",
+      "poolMaterials": "Materials: {used} of {total}",
+      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",
@@ -2504,13 +2701,15 @@ export const sv_SE: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",
-      "removeFromBarAria": "Ta bort {name} från handlingsfältet"
+      "removeFromBarAria": "Ta bort {name} från handlingsfältet",
+      "assignAria": "Välj en handlingsplats för {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
-      "cheaterTag": "< Fuskare >"
+      "cheaterTag": "< Fuskare >",
+      "pledgeTag": "Trogen {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -2530,6 +2729,7 @@ export const sv_SE: EnTranslations = {
     },
     "partyFrames": {
       "section": "Grupp- och raidramar",
+      "optionsSection": "Party Frame Options",
       "unlock": "Flytta grupp- och raidramar",
       "lock": "Lås grupp- och raidramar",
       "style": "Ramstil",
@@ -2559,6 +2759,62 @@ export const sv_SE: EnTranslations = {
     },
     "frameReset": {
       "label": "Återställ ramarnas positioner"
+    },
+    "interfaceUnlock": {
+      "label": "Edit Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "lockAll": "Lock Interface",
+      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
+      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Resize this frame",
+      "frameNames": {
+        "actionBar1": "Action Bar",
+        "actionBar2": "Action Bar 2",
+        "actionBar3": "Action Bar 3",
+        "steamWishlist": "Wishlist Reminder",
+        "menu": "Menu",
+        "minimap": "Minimap",
+        "stanceBar": "Stance Bar",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "Action Bars",
+        "playerFrame": "Player",
+        "targetFrame": "Target",
+        "partyFrames": "Party",
+        "swingBar": "Auto Attack"
+      },
+      "framesMenu": "Frames Settings",
+      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
+      "showHideFrames": "Show or Hide Frames",
+      "buffsLeftToRight": "Buffs left to right",
+      "debuffsLeftToRight": "Debuffs left to right",
+      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
+      "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
+      "menuRailHorizontal": "Horizontal Menu",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Reset size",
+      "resetFrameSizeFor": "Reset size for {name}",
+      "previewSpell": "Example Spell"
+    },
+    "transfer": {
+      "frameLayout": "Frame Layout",
+      "allSettings": "All Settings",
+      "exportAction": "Export",
+      "importAction": "Import",
+      "copy": "Copy",
+      "copied": "Copied to clipboard.",
+      "copyFailed": "Copy failed. Select the code and copy it yourself.",
+      "applyReload": "Apply and Reload",
+      "pastePlaceholder": "Paste an exported code here.",
+      "invalid": "That is not a valid export code.",
+      "wrongKind": "That code is a different export type."
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",
@@ -2767,7 +3023,10 @@ export const sv_SE: EnTranslations = {
       "unlink": "Koppla bort Steam",
       "linked": "Länkat till Steam-kontot {id}",
       "benefits": "Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.",
-      "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen."
+      "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",
@@ -2834,7 +3093,12 @@ export const sv_SE: EnTranslations = {
       "tip": "Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen."
     },
     "noticeboard": {
-      "empty": "Inget verkar vara uppsatt."
+      "empty": "Inget verkar vara uppsatt.",
+      "subtitle": "Rikets gillen",
+      "rosterTitle": "Visa medlemslistan för {guild}",
+      "back": "Tillbaka",
+      "popupTitle": "Gillesskylt",
+      "close": "Stäng"
     },
     "bank": {
       "title": "Bank",
@@ -2848,6 +3112,26 @@ export const sv_SE: EnTranslations = {
       "buySlotsMaxed": "Fullt utbyggd",
       "buyConfirm": "Köp {count} extra bankfack för {price}?",
       "buyConfirmAccept": "Köp",
+      "meterLabel": "{used} of {total} slots",
+      "meterPoolGeneral": "General: {used} of {total}",
+      "meterPoolMaterials": "Materials: {used} of {total}",
+      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
+      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
+      "priceDisclaimer": "Prices may change with the game economy.",
+      "rungItemName": "{count} bank slots",
+      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
+      "buyConfirmDual": "Purchase {count} additional bank slots?",
+      "buyConfirmGold": "Purchase for {price}",
+      "buyConfirmClaudium": "Purchase for {cost} Claudium",
+      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
+      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
+      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
+      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
+      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
+      "rungFailed": "The purchase could not be completed.",
+      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
       "withdrawHint": "Klicka för att ta ut",
       "withdrawPartialHint": "Skift-klicka för att ta ut en del av antalet",
       "depositHint": "Klicka för att sätta in",
@@ -2860,6 +3144,9 @@ export const sv_SE: EnTranslations = {
       "withdrawQuantityTitle": "Ta ut {item}",
       "withdrawQuantityInput": "Antal att ta ut",
       "withdrawQuantityConfirm": "Ta ut",
+      "vaultRowWithdrawName": "Withdraw {item}",
+      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filtrera banken efter kategori",
       "sortAria": "Sortera bankföremål",
       "searchAria": "Sök bankföremål efter namn",
@@ -2881,6 +3168,34 @@ export const sv_SE: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Bjud in en vän: när vännen når nivå 10 tjänar ni 2 fack var, upp till 5 vänner.",
       "bonusSectionAria": "Bonusbankfack och hur du tjänar fler",
+      "socketRowAria": "Bank bag sockets",
+      "socketEmpty": "Empty bank bag socket",
+      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
+      "socketLocked": "Locked bag socket",
+      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
+      "socketUnlockAria": "Unlock a bank bag socket for {price}",
+      "socketUnlockHint": "Click to unlock this bag socket",
+      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
+      "socketUnlockAccept": "Unlock",
+      "unsocketHint": "Click to return this bag to your bags",
+      "socketHint": "Click to socket this bag into your bank",
+      "vaultTab": "Vault",
+      "vaultCapacityNote": "Each material holds up to {cap}.",
+      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
+      "vaultRowAria": "{item}: {count} of {cap} stored",
+      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
+      "vaultUnlockButton": "Unlock the Materials Vault",
+      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
+      "vaultUpgrade": "Widen every ceiling to {cap}",
+      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
+      "vaultDepositAll": "Deposit all materials",
+      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
+      "vaultDepositAllDone": "Materials deposited: {count}.",
+      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
+      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
+      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
+      "vaultDepositHint": "Click to deposit into your vault",
+      "vaultCannotDeposit": "Cannot go in the vault",
       "tabsAria": "Bankflikar",
       "personalTab": "Personligt",
       "guildTab": "Gille",
@@ -2966,6 +3281,10 @@ export const sv_SE: EnTranslations = {
         "arenaClash": {
           "title": "Arenadrabbning",
           "note": "Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen."
+        },
+        "doubleHonor": {
+          "title": "Dubbel Heder-helg",
+          "note": "Krigslägren blåser till samling: hela helgen betalar Heder på Törnhålefälten dubbelt, och en utspelad förlust betalar som en vinst."
         },
         "fishingDerby": {
           "title": "Fisketävling",
@@ -3276,6 +3595,9 @@ export const sv_SE: EnTranslations = {
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
+      "reagentVaultDraw": "(draws {count} from your vault)",
+      "vaultUnreachable": "The Materials Vault is out of reach here.",
+      "craftFeeLine": "Hantverksavgift: {fee} styck",
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
@@ -3765,8 +4087,8 @@ export const sv_SE: EnTranslations = {
       "pinAria": "Fäst {name} i gränssnittets spårare",
       "unpinAria": "Lossa {name}",
       "trackerToggleLabel": "HUD tracker",
-      "trackerToggleShowHint": "Show the Reliquary tracker on your screen",
-      "trackerToggleHideHint": "Hide the Reliquary tracker from your screen",
+      "trackerToggleShowHint": "Visa Reliquary-spåraren på din skärm",
+      "trackerToggleHideHint": "Göm Reliquary-spåraren från skärmen",
       "rarityLine": "Funnen av {percent} av samlarna",
       "pageRarityLine": "Illuminerad av {percent} av samlarna",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3827,6 +4149,7 @@ export const sv_SE: EnTranslations = {
       "unlockedBorderHint": "Ny ram förtjänad: {name}. Bär den via Bedrifternas bok.",
       "broadcastLine": "{name} har fullbordat en bedrift: {deed}",
       "rarityLine": "Fullbordad av {percent} av äventyrarna",
+      "stillToVisit": "Återstår att besöka: {places}",
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fäll ihop bedriftsspåraren",
       "expandHint": "Fäll ut bedriftsspåraren",
@@ -3854,6 +4177,222 @@ export const sv_SE: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Kräver nivå {level}"
+    },
+    "walletBridge": {
+      "cancelled": "Plånboksbegäran avbröts. Inget skickades.",
+      "timeout": "Din plånbok svarade inte i tid. Öppna plånboken och försök igen.",
+      "notConnected": "Anslut och verifiera en plånbok, försök sedan igen.",
+      "unsupported": "Den här plånboken kan inte slutföra den åtgärden. Anslut en annan plånbok.",
+      "unavailable": "Ingen plånboksanslutning är tillgänglig här. Återanslut din plånbok och försök igen.",
+      "badResponse": "Din plånbok returnerade ett svar som inte kunde användas. Försök igen."
+    },
+    "wocMarket": {
+      "title": "$WOC-börsen",
+      "close": "Stäng $WOC-börsen",
+      "launcherLabel": "$WOC-börsen",
+      "tabBrowse": "Bläddra",
+      "tabSell": "Sälj",
+      "tabActivity": "Mina aktiviteter",
+      "tabsLabel": "Delar av $WOC-börsen",
+      "loading": "Laddar $WOC-börsen...",
+      "loadFailed": "$WOC-börsen kunde inte nås. Försök igen om en liten stund.",
+      "disabledRealm": "$WOC-börsen är inte tillgänglig på den här världen.",
+      "pausedBanner": "Handeln är pausad. Auktioner fortsätter att räkna ner; nya annonser, bud, erbjudanden och betalningar väntar tills handeln återupptas, och en betalning som redan skickats slutförs ändå.",
+      "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
+      "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Unknown",
+      "rateNote": "Kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
+      "rateNotePaused": "Senast kända kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
+      "estimateNote": "Ungefär {tokens} $WOC för {usd} till aktuell kurs.",
+      "browseEmpty": "Inga annonser just nu. Titta tillbaka snart.",
+      "browseError": "Annonserna kunde inte laddas.",
+      "colItem": "Föremål",
+      "colSeller": "Säljare",
+      "colCurrentBid": "Aktuellt bud",
+      "colBuyNow": "Köp nu",
+      "colTimeLeft": "Tid kvar",
+      "reserveMet": "Reservationspris uppnått",
+      "reserveNotMet": "Reservationspris inte uppnått",
+      "yourListing": "Din annons",
+      "buyNowLockedBadge": "Köp pågår",
+      "reserveMetTip": "Säljaren har satt ett dolt lägsta pris, och det aktuella budet når upp till det.",
+      "reserveNotMetTip": "Säljaren har satt ett dolt lägsta pris. Om det högsta budet vid stängning ligger under det säljs inte föremålet, och varje pant återbetalas.",
+      "yourListingTip": "Du annonserade det här föremålet. Du kan inte bjuda på din egen annons; så länge den saknar bud kan du avbryta den här eller från Aktivitet.",
+      "buyNowLockedTip": "En annan köpare håller den här annonsen medan de betalar. Betalar de inte i tid öppnas den igen.",
+      "pagePrev": "Föregående sida",
+      "pageNext": "Nästa sida",
+      "pageNumber": "Sida {current}",
+      "sortLabel": "Sortera",
+      "sortEnding": "Avslutas snarast",
+      "sortNewest": "Nyast",
+      "sortPriceAsc": "Pris: lågt till högt",
+      "sortPriceDesc": "Pris: högt till lågt",
+      "filterQuality": "Kvalitet",
+      "filterFormat": "Format",
+      "filterAny": "Alla",
+      "filterFormatAuction": "Auktion",
+      "filterFormatBuyNow": "Köp nu",
+      "filterItemLabel": "Föremål",
+      "filterItemPlaceholder": "Sök efter föremålsnamn",
+      "filterCategory": "Kategori",
+      "filterCategoryWeapon": "Vapen",
+      "filterCategoryArmor": "Rustning",
+      "filterCategoryMount": "Riddjur",
+      "filterSubcategory": "Typ",
+      "sellerLinkAria": "Visa senaste affärer av {name}",
+      "sellerTitle": "Senaste affärer av {name}",
+      "sellerBack": "Tillbaka till Bläddra",
+      "sellerEmpty": "Inga genomförda affärer än.",
+      "sellerError": "Senaste affärerna kunde inte laddas.",
+      "sellerSaleRow": "{time}: {item} till {buyer} för {usd}",
+      "detailTitle": "Annons",
+      "detailSeller": "Såld av {name}",
+      "detailEndsAt": "Slutar {utc} UTC ({local} lokal tid)",
+      "detailStartingBid": "Startbud: {usd}",
+      "detailCurrentBid": "Aktuellt bud: {usd}",
+      "detailNoBids": "Inga bud än",
+      "detailMinNext": "Lägsta nästa bud: {usd}",
+      "detailBuyNow": "Köp nu: {usd}",
+      "detailSales": "Senaste försäljningar",
+      "detailSaleRow": "{time}: {seller} sålde till {buyer} för {usd}",
+      "detailNoSales": "Inga registrerade försäljningar för det här föremålet än.",
+      "detailSalesLoading": "Laddar senaste försäljningar...",
+      "bidLabel": "Ditt bud (USD)",
+      "bidPlaceholder": "Ange ett belopp i USD",
+      "bidButton": "Lägg bud",
+      "bidAria": "Lägg ett bud på {item}",
+      "bidTermsToggle": "Budvillkor",
+      "rowOpenAria": "Visa annonsen för {item}",
+      "buyNowButton": "Köp nu för {usd}",
+      "buyNowAria": "Köp {item} nu för {usd}",
+      "cancelButton": "Avbryt annons",
+      "cancelAria": "Avbryt din annons för {item}",
+      "bidBondNote": "Att lägga ett bud håller kvar en återbetalningsbar pant i $WOC utöver budet: {bond} för ett bud på {bid}, mer för ett högre bud. Den betalas tillbaka när du blir överbjuden eller förlorar, eller efter att du har betalat om du vinner. Erbjuds en andra chans hålls panten kvar på nytt.",
+      "bidBondSchedule": "Panten är {rate} procent av ditt bud, minst {min} och högst {max}.",
+      "bidBondPayWindow": "Betala panten inom {duration} efter att du lagt ditt bud, annars förfaller budet.",
+      "bidBindingNote": "Ett bud är bindande så snart du signerar dess pant-transaktion: det kan inte dras tillbaka, och om du vinner men inte betalar förverkas panten och ditt konto får en Börsvarning.",
+      "bidCloseNote": "Ett bud vars pant bekräftas under de sista 2 minuterna förlänger auktionen till 2 minuter efter det budet, upp till 30 minuter efter den utsatta sluttiden. En pant som bekräftas efter att auktionen stängt räknas inte och betalas tillbaka.",
+      "offerNextNote": "Om vinnaren inte betalar kan du bli köpare till ditt eget bud: din pant hålls kvar igen (eller begärs på nytt om den redan har återbetalats), och betalningen ska ske inom {duration}.",
+      "buyNowNote": "Köp nu håller den här annonsen åt dig i ungefär fyra och en halv minut medan du betalar. Betalar du inte i tid kan du inte försöka med den här annonsen igen på 30 minuter, och tre obetalda Köp nu inom en timme pausar Köp nu för dig tills den äldsta är en timme gammal.",
+      "variableTokenWarning": "Du åtar dig att betala ett USD-värde i $WOC. Den exakta tokenmängden fastställs av en ny prisuppgift när betalning begärs och kan skilja sig från uppskattningen.",
+      "quoteFixedNote": "Den här prisuppgiften fastställer $WOC-beloppet tills den går ut. En ny prisuppgift kan skilja sig.",
+      "settlementDeadlineNote": "Om du vinner måste betalningen ske inom {duration} efter att auktionen stängt.",
+      "claimCooldownRetry": "Du drog dig nyligen ur ett Köp nu. Försök igen om {duration}.",
+      "termsLabel": "Jag godkänner villkoren för marknadsplatsen.",
+      "termsLink": "Visa marknadsplatsens villkor (öppnas i en ny flik)",
+      "quoteTitle": "Bekräfta betalning",
+      "quoteTotal": "Totalt: {tokens} $WOC",
+      "quoteSeller": "Säljaren får: {tokens} $WOC",
+      "quoteBurn": "Bränt (borttaget från utbudet): {tokens} $WOC",
+      "quoteTreasury": "Till spelets kassa: {tokens} $WOC",
+      "quoteExpires": "Prisuppgiften går ut om {duration}",
+      "quoteExpiresAt": "Prisuppgiften går ut kl. {time}.",
+      "quoteExpired": "Prisuppgiften gick ut. Begär en ny.",
+      "quoteSign": "Signera och betala",
+      "quoteRefresh": "Ny prisuppgift",
+      "quoteCancel": "Inte nu",
+      "quoteBondFor": "Återbetalningsbar budpant: {usd}",
+      "quoteBondForItem": "Återbetalningsbar budpant för {item}: {usd}",
+      "quoteSettlementFor": "Betalning för {item}: {usd}",
+      "paymentDueAt": "Betalningen ska ske senast {time}.",
+      "signing": "Väntar på din plånbok...",
+      "signFailed": "Din plånbok slutförde inte betalningen. Kontrollera plånboken och försök igen.",
+      "signFailedConfirm": "Din plånbok signerade inte bekräftelsen. Kontrollera plånboken och försök igen.",
+      "confirming": "Bekräftar på kedjan...",
+      "listing": "Annonserar ditt föremål...",
+      "activityCancelPending": "Avbryt väntande",
+      "activityDirected": "Riktad försäljning",
+      "bidPlacedStanding": "Ditt bud gäller. Du är högstbjudande.",
+      "bidPlacedOutbid": "Din pant bekräftades, men ett högre bud kom in först.",
+      "purchaseComplete": "Köpet är slutfört. Ditt föremål anländer med Korpposten.",
+      "paymentConfirmedDelivering": "Betalning bekräftad. Ditt föremål anländer med Korpposten så snart leveransen är klar.",
+      "listingCreated": "Din annons är nu aktiv.",
+      "listingCancelled": "Annonsen avbruten. Ditt föremål returneras med Korpposten.",
+      "listingCancelPending": "Avbrytning pågår: en köpare håller köpfönstret just nu. Om de inte betalar stängs annonsen, och ditt föremål returneras med Korpposten.",
+      "sellTitle": "Skapa en annons",
+      "sellEmptyFloor": "Inga kvalificerade föremål i dina väskor. Den här världen tar emot obunden utrustning av kvaliteten {floor} eller bättre.",
+      "sellCollectiblesBoth": "Riddjur och Mech-färgplattor kan också annonseras.",
+      "sellCollectiblesMounts": "Riddjur kan också annonseras.",
+      "sellCollectiblesChromas": "Mech-färgplattor kan också annonseras.",
+      "sellLockedHidden": "Låsta föremål visas inte här. Lås upp dem i dina väskor för att sälja dem.",
+      "sellSearchPlaceholder": "Skriv för att filtrera dina väskor",
+      "sellClear": "Rensa {item} och välj ett annat",
+      "sellChoose": "Föremål att annonsera",
+      "sellNoMatches": "Inga föremål matchar den sökningen",
+      "sellBuyNowAboveStart": "Köp nu-priset måste vara högre än startbudet.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auktion",
+      "sellFormatBuyNow": "Endast köp nu",
+      "sellFormatAuctionBuyNow": "Auktion med köp nu",
+      "sellStart": "Startbud (USD)",
+      "sellReserve": "Reservationspris (USD, valfritt)",
+      "sellReserveNote": "Valfritt, minst startbudet. Budgivare ser bara om det är uppnått; om det högsta budet vid stängning ligger under det kommer föremålet tillbaka till dig osålt, och varje pant återbetalas.",
+      "sellBuyNowNote": "Obligatoriskt. En köp nu-annons säljs till detta pris utan budgivning.",
+      "sellBuyNowAuctionNote": "Valfritt. Ange ett pris en köpare kan betala för att avsluta auktionen i förtid; det måste vara högre än startbudet och reservationspriset.",
+      "sellBuyNowPrice": "Köp nu-pris (USD)",
+      "sellDuration": "Varaktighet",
+      "sellOfferNext": "Om vinnaren inte betalar, sälj till den näst högsta budgivaren vars bud uppfyller reservationspriset, till deras bud, i stället för att sluta osåld.",
+      "sellSubmit": "Annonsera föremål",
+      "sellSubmitAria": "Annonsera {item} på $WOC-börsen",
+      "sellFeeNote": "En genomförd försäljning betalar en börsavgift ur priset: en del bränns och en del går till spelets kassa, och du får resten till din länkade plånbok i betalningstransaktionen. Avgiften för det pris du anger visas här; för en auktion följer den slutpriset.",
+      "activityListings": "Mina annonser",
+      "activityBids": "Mina bud",
+      "activitySettlements": "Mina avslut",
+      "activityEmpty": "Du har inga bud, annonser eller avslut än. Din aktivitet i Börsen visas här.",
+      "activityNoListings": "Du har inga annonser.",
+      "activityNoBids": "Du har inga bud.",
+      "activityNoSettlements": "Du har inga avslut.",
+      "activityPayNow": "Betala nu",
+      "activityPayNowAria": "Betala för avslut {id} nu",
+      "activityPayNowItemAria": "Betala {usd} för {item} nu",
+      "activityDeadline": "Betalning ska ske inom {duration}",
+      "dueAt": "Förfaller {utc} UTC ({local} lokal tid)",
+      "activityStrikes": "Börsvarningar: {count}",
+      "activitySuspended": "Börsen avstängd i {duration} efter obetalda affärer: inga bud, köp, annonser eller $WOC-handel förrän dess.",
+      "strikesTip": "En prick registreras varje gång du inte betalar för en affär du åtagit dig. Efter den första stänger varje prick av dig från $WOC-börsen under en allt längre tid: 3 dagar, sedan 14, sedan 90, sedan ett år.",
+      "bidStatusPending": "Väntar på pant",
+      "bidStatusActive": "Högstbjudande",
+      "bidStatusOutbid": "Överbjudet",
+      "bidStatusLapsed": "Förfallet",
+      "bidStatusWon": "Vunnet",
+      "bidStatusDefaulted": "Uteblivet",
+      "bidStatusCancelled": "Avbrutet",
+      "bidBondPay": "Betala pant",
+      "bidBondPayAria": "Betala panten för ditt bud på annons {id}",
+      "bidBondPayItemAria": "Betala panten på {bond} för ditt bud på {item}",
+      "settlementOffered": "Betalning krävs",
+      "settlementConfirming": "Bekräftar",
+      "settlementConfirmedDelivering": "Betalning bekräftad, levererar",
+      "settlementReview": "Betalning granskas",
+      "settlementDelivered": "Levererad",
+      "settlementExpired": "Utgången, obetald",
+      "settlementFailed": "Betalning misslyckades",
+      "settlementFailBurnMissing": "Betalningen innehöll inte den obligatoriska tokenbränningen.",
+      "settlementFailBurnMismatch": "Betalningen brände fel tokenbelopp.",
+      "settlementFailBurnAuthority": "Tokenbränningen kom från en plånbok som inte angavs för det här köpet.",
+      "settlementFailUnexpectedCredit": "Transaktionen betalade en plånbok utanför det här köpet.",
+      "settlementFailQuoteExpired": "Betalningens prisuppgift gick ut innan den användes. Begär en ny och betala igen.",
+      "settlementFailTransaction": "Betalningstransaktionen misslyckades på nätverket. Begär en ny prisuppgift och försök igen.",
+      "settlementFailRefunded": "Den här betalningen återfördes till din plånbok.",
+      "settlementFailSuperseded": "Det här betalningsförsöket ersattes av ett nyare.",
+      "settlementFailConfirmingOverdue": "Den här betalningen tog för lång tid att bekräfta och kunde inte verifieras.",
+      "settlementFailGeneric": "Den här betalningen kunde inte slutföras.",
+      "paymentSeenAwaitingFinality": "Betalningen syns i liggaren. Väntar på slutgiltig bekräftelse.",
+      "paymentNotYetVisible": "Ingen betalning syns i liggaren än. Det kan ta en liten stund innan den visas.",
+      "paymentServiceUnreachable": "Betaltjänsten kan inte nås. Din betalning förblir registrerad och kontrolleras igen.",
+      "paymentPendingGeneric": "Din betalning är skickad och väntar på bekräftelse.",
+      "bondSeenAwaitingFinality": "Pantbetalningen har setts i liggaren. Väntar på slutgiltig bekräftelse.",
+      "bondNotYetVisible": "Ingen pantbetalning syns i liggaren än. Det kan ta en liten stund innan den dyker upp.",
+      "bondServiceUnreachable": "Betaltjänsten går inte att nå. Din pantbetalning finns kvar registrerad och kommer att kontrolleras igen.",
+      "bondPendingGeneric": "Din pantbetalning är inskickad och väntar på bekräftelse.",
+      "listingStatusActive": "Aktiv",
+      "listingStatusSettling": "Väntar på betalning",
+      "listingStatusSold": "Såld",
+      "listingStatusReturned": "Returnerad",
+      "listingStatusCancelled": "Avbruten",
+      "listingStatusSuspended": "Avstängd",
+      "listingStatusUnsold": "Osåld"
     }
   },
   "gatherEvent": {
@@ -3903,7 +4442,8 @@ export const sv_SE: EnTranslations = {
       "password_too_long": "Det nya lösenordet får vara högst 128 tecken.",
       "characters_online": "Logga ut alla dina karaktärer innan du inaktiverar kontot.",
       "deactivated": "Detta konto har inaktiverats. Kontakta en administratör för att återställa det.",
-      "not_found": "Kontot hittades inte."
+      "not_found": "Kontot hittades inte.",
+      "password_already_set": "Detta konto har redan ett lösenord. Använd Ändra lösenord istället."
     },
     "character": {
       "name_invalid": "Ogiltigt karaktärsnamn. Använd 2-16 bokstäver.",
@@ -3915,6 +4455,8 @@ export const sv_SE: EnTranslations = {
       "online": "Karaktären är för närvarande online.",
       "rename_not_permitted": "Det är inte tillåtet att byta namn på denna karaktär.",
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
       "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
@@ -3954,6 +4496,10 @@ export const sv_SE: EnTranslations = {
     "deeds": {
       "invalid_input": "Ogiltig indata."
     },
+    "guilds": {
+      "invalid_roster_name": "Ogiltigt gillesnamn.",
+      "unknown": "Inget gille med det namnet."
+    },
     "steam": {
       "disabled": "Steam-länkning är inte tillgänglig just nu.",
       "invalid_ticket": "Steam kunde inte verifiera länkbegäran. Försök igen från skrivbordsappen.",
@@ -3991,6 +4537,55 @@ export const sv_SE: EnTranslations = {
       "reason_required": "En anledning krävs.",
       "invalid_duration": "Ange en märkningslängd på minst en sekund.",
       "not_marked": "Det kontot är inte märkt."
+    },
+    "woc_market": {
+      "invalid_input": "Ogiltig inmatning.",
+      "disabled": "$WOC-börsen är inte tillgänglig på det här riket.",
+      "paused": "Handeln på börsen är pausad. Auktioner fortsätter räkna ner.",
+      "wallet_required": "Länka och verifiera en plånbok innan du handlar på börsen.",
+      "recipient_wallet_required": "Den spelaren måste ansluta en plånbok innan de kan ta emot $WOC-betalningar.",
+      "self_offer": "Du kan inte skicka ett $WOC-erbjudande till dig själv.",
+      "offer_expired": "Det där $WOC-erbjudandet gick ut. Be om ett nytt.",
+      "terms_required": "Godkänn börsens villkor för att fortsätta.",
+      "totp_required": "Det här beloppet kräver tvåfaktorsautentisering. Aktivera det i kontoinställningarna och ange sedan din kod.",
+      "totp_invalid": "Den tvåfaktorskoden kunde inte verifieras.",
+      "suspended": "Din tillgång till börsen är avstängd efter obetalda affärer: inga bud, köp, annonser eller $WOC-handel.",
+      "character_invalid": "Spela karaktären du annonserar från, och försök igen.",
+      "not_found": "Den börsposten finns inte längre.",
+      "not_yours": "Den börsposten finns inte längre.",
+      "not_active": "Den annonsen är inte längre öppen för den här åtgärden.",
+      "own_listing": "Du kan inte lägga bud på eller köpa din egen annons.",
+      "has_bids": "En annons med bud kan inte dras tillbaka. Kontakta supporten om du måste avbryta.",
+      "bid_too_low": "Ditt bud täcker inte det aktuella budet plus dess budsteg.",
+      "already_pending": "Bekräfta eller avbryt ditt väntande bud på den här annonsen först.",
+      "insufficient_balance": "Din plånbok innehåller inte tillräckligt med $WOC för det här budet och dess säkerhet.",
+      "quote_unavailable": "En prisuppgift kunde inte utfärdas just nu. Försök igen om en liten stund.",
+      "quote_expired": "Den prisuppgiften gick ut. Begär en ny; om ingen erbjuds har det fönstret stängts.",
+      "not_pending": "Det budet väntar inte längre på sin säkerhet.",
+      "confirm_failed": "Transaktionen kunde inte bekräftas. Begär en ny prisuppgift och försök igen.",
+      "confirm_in_flight": "Din betalning bekräftas fortfarande. Försök igen när den har slutförts.",
+      "buy_now_locked": "En annan köpare slutför just det här köpet. Försök igen om en liten stund.",
+      "cancel_pending": "Säljaren avbryter den här annonsen.",
+      "claim_cooldown": "Du drog dig nyligen ur ett Köp nu. Försök igen senare.",
+      "bond_window_closed": "Det här budet kan inte längre betalas: dess betalningsfönster har stängts. Bjud igen för ett nytt.",
+      "settlement_in_flight": "En köpare håller på att betala för den här annonsen. Försök igen när betalningen har gått igenom.",
+      "contended": "Börsen är upptagen med den här annonsen. Försök igen om en stund.",
+      "sale_conflict": "En annan aktiv försäljningspost finns redan för den här annonsen. Uteslut den först.",
+      "no_buy_now": "Den här annonsen har inget köp nu-pris.",
+      "cap_reached": "Du har nått din annonsgräns på $WOC-börsen.",
+      "stale_item": "Det föremålet ändrades eller flyttades. Välj det på nytt och försök igen.",
+      "item_mismatch": "Det där är inte exakt den kopia köparen kom överens om, eller så har dess tillstånd ändrats (en låsning räknas). Starta en ny affär för den.",
+      "offer_pending": "Du har redan en pågående affär med den spelaren. Lös den först.",
+      "not_eligible": "Det föremålet kan inte listas på $WOC-börsen.",
+      "invalid_params": "Kontrollera startbudet, reservationspriset, köp nu-priset och löptiden.",
+      "signature_reused": "Den transaktionen har redan skickats in.",
+      "item_locked": "Det föremålet är låst. Lås upp det i dina väskor innan du säljer det.",
+      "stepup_required": "Att sälja på börsen kräver en signatur från din länkade plånbok.",
+      "stepup_challenge_invalid": "Den plånboksbekräftelsen är inte längre giltig. Starta försäljningen igen.",
+      "stepup_challenge_expired": "Plånboksbekräftelsen gick ut. Starta försäljningen igen.",
+      "stepup_wallet_mismatch": "Din länkade plånbok har ändrats sedan den här bekräftelsen utfärdades. Starta försäljningen igen.",
+      "stepup_binding_mismatch": "Den plånboksbekräftelsen matchar inte den här försäljningen. Starta försäljningen igen.",
+      "stepup_signature_invalid": "Plånbokssignaturen kunde inte verifieras. Starta försäljningen igen."
     }
   },
   "guide": {
@@ -4028,7 +4623,6 @@ export const sv_SE: EnTranslations = {
       "combat": "Strid",
       "talents": "Talanger",
       "arena": "Arena och PvP",
-      "valeCup": "Dalcupen",
       "thornhollow": "Törnhålefälten",
       "deeds": "Bedrifternas bok",
       "reliquary": "Relikvariet",
@@ -4138,6 +4732,8 @@ export const sv_SE: EnTranslations = {
         "fenBlurb": "Bortom höstens krona, ett ljust kärr av pilar och stilla vatten, och en stad bakom en vallgrav.",
         "farshoreName": "Fjärrkusten",
         "farshoreBlurb": "En ö bortom sandreveln, där himlen brister upp över Revfälten och Måshamn ringer sin klocka för varje bräsch.",
+        "provingName": "Prövostranden",
+        "provingBlurb": "En stillsam träningsö på andra sidan sundet, där nya äventyrare hittar fotfästet innan dalen begär något av dem.",
         "nightName": "Nattblomstret",
         "nightBlurb": "Ett land av stjärnklar midnatt där blommorna lyser upp stigarna och Månvila håller sin vaka.",
         "hauntName": "Vålnadsskogen",
@@ -4238,7 +4834,6 @@ export const sv_SE: EnTranslations = {
       "reliquary": "Relikvariet",
       "sheathe": "Slida/Ta fram vapen",
       "crafting": "Hantverk",
-      "valeCup": "Dalcupen",
       "mount": "Sitt upp / Stig av",
       "calendar": "Händelsekalender",
       "dungeonFinder": "Fängelsehålsletaren",
@@ -4367,7 +4962,7 @@ export const sv_SE: EnTranslations = {
       "ifHighContrastBackground": "En enklare bakgrund med högre kontrast bakom start- och karaktärsskärmarna.",
       "ifInvertLookY": "Vänder upp- och nedriktningen för musblicken.",
       "ifShowItemLevel": "Lägger till en rad med föremålsnivå på varje föremåls verktygstips. Avstängt som standard, vilket behåller det klassiska verktygstipset med bara statistik.",
-      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
+      "ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
       "ifShowPlaytime": "Visar din livstids speltid på karaktärsbladet. Aktiverat som standard, och bladet har en ögonknapp som slår av och på det per enhet, vilket är praktiskt om du strömmar eller tar skärmbilder. Totalen fortsätter räkna oavsett.",
       "ifShowOwnNameplate": "Ritar din egen namnskylt ovanför huvudet precis som andra spelare ser den, med all dess utsmyckning. Stäng av den för den klassiska vyn.",
       "ifShowPlayerNameplates": "Ritar andra spelares namnskyltar. Avstängt städar upp i en fullpackad knutpunkt, och ditt nuvarande mål förblir läsbart oavsett.",
@@ -5100,6 +5695,10 @@ export const sv_SE: EnTranslations = {
       "farshoreGreeting": "Du kom över Färjeleden? Då är du den första på en vecka, och Väktaren kommer vilja se på dig.",
       "farshoreGreeter": "Klockväktaren Tam, Landningsplatsen",
       "farshorePlaceNotes": "Måshamn är öns enda stad och dess sista skans. Landningsplatsen är där Färjeleden går i land, med en vaktklocka som står över udden; Vaktängen håller höjdmarken sydost om staden, där en revvakt lyssnar efter nästa bräsch; De klyvda klipporna spricker upp vid öns södra ände; och Revfälten är de sönderslitna sädesraderna öster om Måshamn, fortfarande fulla av vad som kom igenom bräschen där.",
+      "provingBlurb": "En stillsam ö på andra sidan sundet från dalen, hållen som träningsmark: ett läger, en övningsgård, en vrakströdd strand och en färja som går åt båda hållen.",
+      "provingGreeting": "Varje hjälte dalen någonsin tackat stod där du står nu, och ingen av dem visste vilken ände av ett svärd de skulle hålla i.",
+      "provingGreeter": "Instruktör Maren, Gryningsvilan",
+      "provingPlaceNotes": "Gryningsvilan är öns hela bosättning: några tält, ett stånd och en mönstringseld. Den gamla piren vetter mot dalen, där överfartscirkeln bär utexaminerade över sundet; Övningsgården söder om lägret håller sina halmdockor stående åt den som behöver dem; och Vraklinjen är den bärgningsströdda stranden där tidvattnet betalar ön i vrakkistor.",
       "travelTitle": "Att ta sig fram",
       "travelBody": "Varje väg i riket vandras eller rids. Det finns inga flygvägar, inga taxitjänster och inget teleportnätverk: kartan är en enda sammanhängande landmassa, och varje förbindelse är något du kan stå på. Höjdryggar skiljer ett rike från nästa, och där två riken delar en höjdrygg klättrar vägen genom ett pass. Men inte varje gräns fungerar så. I norr bär en lång vägbank vägen ut över vattnet från Slöjhålan in i snölandet bortom, och längre söderut löper en smal, naturlig sandrevel som kallas Färjeleden österut från Dalens kust till Landningsplatsen på Fjärrkustens ö, som inte har någon landgräns alls. Och det finns exakt en enda sann dörr i hela överjorden: en skymningsslöja högt uppe på Törntoppen som öppnar in i Slöjhålan. Hålans södra höjdrygg är förseglad utan pass genom den, så den slöjan är hur du först kommer in, och den stängs bakom dig på vägen tillbaka.\n\nVar du än faller är vägen tillbaka kort. Varje zon har minst en kyrkogård med Den bleka väktaren svävande över stenarna, och en frigjord ande stiger upp vid den närmaste av dem.\n\nKartan slutar inte i en osynlig vägg. Landet rinner ut i stränder och uddar, och sedan i öppet vatten. De passager världen menar att du ska simma, sunden och fjärdarna mellan ett rike och nästa, är lugna och säkra att korsa. Ge dig istället ut på öppet hav och avståndet självt vänder dig om: du varnas, och varnas igen, och om du fortsätter simma tröttar havet ut dig tills det dödar dig. Dykning har sin egen gräns, eftersom din andedräkt tar slut under ytan, så kom upp för luft och vänd om när vattnet säger åt dig.",
       "mountsTitle": "Riddjur",
@@ -5316,36 +5915,6 @@ export const sv_SE: EnTranslations = {
       "ladderBody": "Varje match flyttar en bestående slagfältsrankning knuten till rollpersonen, vinst eller förlust, och tabellen genom tiderna rangordnar rikets mästare.",
       "rewardsHeading": "Vad en match ger",
       "rewardsBody": "Varje avslutad match ger Heder: mer för en vinst, en tröstepremie för en förlust eller oavgjort, plus ett litet tillägg för varje dödsstöt du delar ut och varje du bidrar till, så att slåss borta från flaggorna ändå lönar sig. Din första vinst varje dag ger en bonus utöver detta, och panelen visar det medan den bonusen fortfarande väntar på dig. Den dagen är Hederns egen, och den rullar över på sitt eget klockslag snarare än med rikets instansåterställning. Att möta samma lag om och om igen ger mindre för själva matchen efter den första gången, och sjunker snabbt till ett golv i stället för att falla bort till noll, och en uppgiven match ger ingenting alls. Spendera det du tjänar hos endera Krigföringskvartersmästaren."
-    },
-    "valeCupPage": {
-      "heading": "Dalcupen",
-      "intro": "Vildsvinsboll på Suggfältet: välj ett banér, välj en roll och sparka en uppstoppad vildsvinshud förbi en målvakt i kampen om Kopparspannen. Inget blod, inget byte, bara vrålet från läktarna.",
-      "loreHeading": "Vildsvinsboll och skördefreden",
-      "loreOldSow": "Långt innan de döda vaknade spelade Östbäcks lantarbetare vildsvinsboll på stubbåkrarna efter skörden: två hopar, en vildsvinshud fylld med halm och två vagnsgrindar släpade till var sin ände av ängen. Den första bollen, Gamla suggan, hänger bronserad ovanför värdshusets härd.",
-      "loreTruce": "När Askgrå kolosseum började sanktionera krigslekar svarade marskalk Redbrook med något mildare: en stående skördefred på den gamla ängen. Vagnsgrindarna blev målstolpar, ängen fick väggar, läktare och ett namn, Suggfältet, och priset var alltid samma buckliga mjölkspann som vinnarna drack ur: Kopparspannen.",
-      "howHeading": "Så spelar du",
-      "howQueue": "Ställ dig i kö varifrån som helst via Dalcupsfönstret, eller prata med Vaktmästare Bram vid Suggfältets port. Välj en spelform från en mot en upp till fem mot fem, en banérnation och en sportroll; köa ensam eller ta med ditt sällskap.",
-      "howMatch": "Vid avspark byts din klassuppsättning ut mot en sportuppsättning och återställs exakt efteråt. Sparkar siktar mot marksiktet, bollen studsar mot sargen, och att dribbla är bara att springa med bollen. Gör fler mål än motståndarna före full tid; oavgjort går till gyllene mål.",
-      "howTruce": "Ingen blöder på Suggfältet: tacklingar tumlar, inget gör ont, och husdjur sitter över matchen.",
-      "spectateBody": "En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.",
-      "bettingHeading": "En vadslagning vid räcket",
-      "bettingBody": "Åskådare vid Suggfältet kan hålla på en sida medan en match formas: insatserna läggs i en pott, och vid slutsignalen delar vinnarna på förlorarnas pott i proportion till vad de satsade. En oavgjord match, eller en skräll ingen höll på, återbetalar varje mynt. Spelare som sitter med i matchen kan inte satsa på den, och räcket håller ditt facit över vinster, förluster och nettomynt för hela livet.",
-      "practiceHeading": "Träningsmatcher och den tomma planen",
-      "practiceBody": "Dalcupen-fönstret erbjuder också träning: en privat kopia av planen där bottar fyller båda sidorna och inget räknas mot ditt facit. Saknar du en spelare eller två till det riktiga? Efter en kort väntan rundar bottar ut lagen, och varje match med bottar på planen är en vänskapsmatch, aldrig rankad. Och när Suggfältet står tomt sätter bottarna upp en uppvisning du kan se på, och satsa på, från läktaren; i samma stund riktiga spelare gör sig redo lämnar uppvisningen planen och varje insats återbetalas.",
-      "nationsHeading": "De åtta banérnationerna",
-      "nationsBody": "Varje lag spelar under ett banér. Kaptenen väljer nation, och om båda sidor för samma banér spelar bortalaget i inverterade färger.",
-      "nationVale": "Grönt och guld under vetekärven: hemmalaget, lantarbetare in i märgen.",
-      "nationMirefen": "Blågrönt och grått under hägern: tålmodiga, långbenta, aldrig jäktade.",
-      "nationThornpeak": "Isblått och vitt under bergstoppen: stadiga på foten och envisa.",
-      "nationColiseum": "Rött och svart med korsade svärd: de spelar som om det fortfarande vore en krigslek.",
-      "nationChoir": "Blekblått och silver under klockan: kusliga, precisa och mycket tysta.",
-      "nationOgre": "Orange och umbra bakom näven: axeln först och stolta över det.",
-      "nationMoon": "Violett och silver under månskäran: nattspelare, lätta på foten.",
-      "nationCopperdig": "Koppar och brunt med hackan: grävare som aldrig slutar springa.",
-      "rolesHeading": "Sportroller",
-      "rolesBody": "Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament. I divisionerna en mot en och två mot två spelar alla allroundsuppsättningen, så rollval kommer till sin rätt först från tre mot tre och uppåt.",
-      "rewardsHeading": "Fredsregler",
-      "rewardsBody": "Fredsreglerna innebär ingen erfarenhet och inget byte: en avgjord match räknas in i ditt facit och på vinnartavlan, och en seger räknas också mot dagens belöningsuppgifter. Att överge en match bänkar din plats, och Vaktmästaren minns."
     },
     "deedsPage": {
       "intro": "Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.",
@@ -5576,7 +6145,7 @@ export const sv_SE: EnTranslations = {
       "deedsHeading": "Bedrifter som minns resan",
       "deedsBody": "Bedriftboken vandrar bredvid varje steg av detta. Din första inriktning förtjänar Hantverkssvuren och ditt första mästerverk förtjänar Mästerhantverkaren, båda bärbara som titlar. Var och en av de åtta hantverken med innehåll markerar en milstolpebedrift vid 50 skicklighet och kröner sitt tak med en Stormästare-titel, medan Fiske får Gamla saltet vid 100 skicklighet och titeln Mästarfiskare vid 200.\n\nDet finns tystare sidor också: bedrifter för din första skörd och ditt första hantverk, för de sällsynta fynd som turen bjuder på i fält, och för att ta upp avförtrollning. Allt är kosmetiskt, titlar och Ryktbarhet enbart. En bedrift ger aldrig kraft; den bevisar bara att du var där.",
       "startHeading": "Var börjar man",
-      "startBody": "Nyss anländ till Östbäck? Leta upp Förman Odell och ta Ett yrke för varje hand: han pekar ut malmådrorna runt Kopparbrottet sydost om staden och ger dig dina första valkar. Akta dig för själva brottet: Djupbergsgrävarna som slagit läger på det står några nivåer över en färsk ankomst, så bearbeta de yttre ådrorna först och spara lägrets hjärta till dess att du levlat lite. Från och med då: skörda varje åder, varje timmerbestånd och varje örtfläck du passerar medan du gör uppdrag; skicklighet kommer naturligt för den som reser.\n\nTillbaka i staden trycker du T för att öppna hantverksfönstret och arbetar med de vanliga recepten som varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verktygsverkstaden för att se vad de lär ut, och ta deras arbetsordrar för stadiga mynt. När Gillets brev når dig vet du redan vilket par som känns som hemma.",
+      "startBody": "Nyss anländ till Östbäck? Leta upp Förman Odell och ta Ett yrke för varje hand: han pekar ut malmådrorna runt Kopparbrottet nordost om staden och ger dig dina första valkar. Akta dig för själva brottet: Djupbergsgrävarna som slagit läger på det står några nivåer över en färsk ankomst, så bearbeta de yttre ådrorna först och spara lägrets hjärta till dess att du levlat lite. Från och med då: skörda varje åder, varje timmerbestånd och varje örtfläck du passerar medan du gör uppdrag; skicklighet kommer naturligt för den som reser.\n\nTillbaka i staden trycker du T för att öppna hantverksfönstret och arbetar med de vanliga recepten som varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verktygsverkstaden för att se vad de lär ut, och ta deras arbetsordrar för stadiga mynt. När Gillets brev når dig vet du redan vilket par som känns som hemma.",
       "colStation": "Station",
       "colHub": "Ort",
       "colMaster": "Mästare",
@@ -5661,13 +6230,13 @@ export const sv_SE: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Läder för de snabbfotade",
-          "identityBody": "Stegen klättrar från de enkla Fenbroskinnbenskydden, stövlarna och bältet via den ovanliga träskjägarstyvkjorteln, huvan och axelplåtarna till det sällsynta myrväktarsetet, det bästa läder en hantverkare kan skära. Två kastestableringsdelar kompletterar det: Östbäcks Druidhid fältvanligt och Skymningshudlindorna vid skicklighet 75.\n\nPå hjulet sitter det mellan Matlagning och Skrädderi. Dess levande par är Utrustaren, Läderhantverkeri och Skrädderi, svuren inför Vävare Ottilie i Östbäck; Jägareparet med Matlagning är namngivet på hjulet men saknar ännu ett löfteuppdrag.",
+          "identityBody": "Stegen klättrar från de enkla Fenbroskinnbenskydden, stövlarna och bältet via den ovanliga träskjägarstyvkjorteln, huvan och axelplåtarna till det sällsynta myrväktarsetet, det bästa läder en hantverkare kan skära. Två kastestableringsdelar kompletterar det: Östbäcks Druidhid fältvanligt och Skymningshudlindorna vid skicklighet 50.\n\nPå hjulet sitter det mellan Matlagning och Skrädderi. Dess levande par är Utrustaren, Läderhantverkeri och Skrädderi, svuren inför Vävare Ottilie i Östbäck; Jägareparet med Matlagning är namngivet på hjulet men saknar ännu ett löfteuppdrag.",
           "materialsHeading": "Jakten är skörden",
-          "materialsBody": "Läderhantverkeri är hantverket där din levlingsväg och din försörjningslinje är samma sak: grovt skinn skördas rakt av kroppar som bär hud, vargar och vildsvin framför allt, och varje kropp tjänar bara en enda skördare, först till kvarn. En skörderullning på sällsynt eller bättre ger dessutom ett Orört skinn, det signerade exemplar som Myrväktarjackan kräver, så banka varenda ett du hittar.\n\nBirollerna är få: spindelben och spindelsilke, hemspunnet tyg från humanoider, en enda osmiummalm i varje sällsynt myrväktarpjäs (sex i toppstycket Skymningshudslindorna), och ett Garvningsmedel för 16 koppar från garveriets disk. Osmium självt köps aldrig över disk: bryt det själv, på Törntoppen eller i startådrorna i nästan varje yngre zon (Fjärrkusten ensam gräver järn), eller köp det av en annan spelare.",
+          "materialsBody": "Läderhantverkeri är hantverket där din levlingsväg och din försörjningslinje är samma sak: grovt skinn skördas rakt av kroppar som bär hud, vargar och vildsvin framför allt, och varje kropp tjänar bara en enda skördare, först till kvarn. En skörderullning på sällsynt eller bättre ger dessutom ett Orört skinn, det signerade exemplar som Myrväktarjackan kräver, så banka varenda ett du hittar.\n\nBirollerna är få: spindelben och spindelsilke, hemspunnet tyg från humanoider, en enda osmiummalm i varje sällsynt myrväktarpjäs (sex i Skymningshudslindorna), och ett Garvningsmedel för 16 koppar från garveriets disk. Osmium självt köps aldrig över disk: bryt det själv, på Törntoppen eller i startådrorna i nästan varje yngre zon (Fjärrkusten ensam gräver järn), eller köp det av en annan spelare.",
           "ladderHeading": "Lärd i Fenbridge",
-          "ladderBody": "Här är hakan: garveriet står i Fenbridge, vid vägen till Dykärrsträsket, vilket gör Läderhantverkeri till det enda djupa hantverk som lärs ut ute i kärret. Garvare Hesk lär ut stegen vid sina kar: Fenbridges skinnsteg gratis vid skicklighet 0, myrjägarsteget för 25 silver per recept från skicklighet 25, och myrväktarsteget för 1 guld styck från skicklighet 50, där varje steg öppnas när din nivå når det.\n\nTre recept hoppar över tränaren: fältvanligheterna (Garvad läderväst och Östbäcksdruidens Hud) tillverkas var som helst från start, och Skymningshudslindorna är kända för alla men sitter vid skicklighet 75, garveribundna. Notera att själva Utrustar-eden svärs hemma i Östbäck hos Ottilie; bara undervisningen sker ute i kärret.",
+          "ladderBody": "Här är hakan: garveriet står i Fenbridge, vid vägen till Dykärrsträsket, vilket gör Läderhantverkeri till det enda djupa hantverk som lärs ut ute i kärret. Garvare Hesk lär ut stegen vid sina kar: Fenbridges skinnsteg gratis vid skicklighet 0, myrjägarsteget för 25 silver per recept från skicklighet 25, och myrväktarsteget för 1 guld styck från skicklighet 50, där varje steg öppnas när din nivå når det.\n\nTre recept hoppar över tränaren: fältvanligheterna (Garvad läderväst och Östbäcksdruidens Hud) tillverkas var som helst från start, och Skymningshudslindorna är kända för alla vid skicklighet 50, garveribundna. Notera att själva Utrustar-eden svärs hemma i Östbäck hos Ottilie; bara undervisningen sker ute i kärret.",
           "routeHeading": "Mästerverk, och en fungerande väg till 125",
-          "routeBody": "Varje pjäs med riktiga egenskaper rullar mästerverkschansen så länge den finare kvaliteten ryms inom ditt nivåtak, inklusive den egenskapsbärande Östbäcksdruidens Hud, och ett signerat Orört skinn i en Myrväktarjacka ger bonusen för signerat reagens automatiskt; osmium räknas som ett nivå 1-material för procen. De egenskapslösa skinnvanligheterna kan inte procca.\n\nLevla det på det naturliga sättet: skörda varje varg och vildsvin du dödar från nivå ett, låt de två fältvanligheterna bära dig till 25 var du än står, och träna sedan skinnsteget vid karen när uppdragen ändå drar dig ut i kärret. Myrjägarsteget bär dig till 50 och myrväktarsteget till 75; bortom det ger Skymningshudslindorna, ett nivå 3-recept på sex osmiummalm, tre Orört skinn, två grovt skinn och ett Garvningsmedel, en inriktad Utrustare full vinst till 99 och halv därefter, ungefär 75 tillverkningar för de sista femtio poängen till 125-taket; under ett huvudyrkes tak lär nivå 3-receptet ut ingenting.\n\nDet mobila garveriet betyder mer för det här hantverket än för något annat: specialisera dig vid 75 och en sadelväska full av skinn blir färdig utrustning vid lägerelden i stället för en vandring tillbaka till Fenbridge. Hesks garveriarbetsorder köper åtta grova skinn var 30:e minut, en prydlig avkastning på skinn du ändå samlade in, och Bedrifternas bok markerar Garvarens hantverk vid skicklighet 50 med Stormästare i Läderhantverkeri vid taket."
+          "routeBody": "Varje pjäs med riktiga egenskaper rullar mästerverkschansen så länge den finare kvaliteten ryms inom ditt nivåtak, inklusive den egenskapsbärande Östbäcksdruidens Hud, och ett signerat Orört skinn i en Myrväktarjacka ger bonusen för signerat reagens automatiskt; osmium räknas som ett nivå 1-material för procen. De egenskapslösa skinnvanligheterna kan inte procca.\n\nLevla det på det naturliga sättet: skörda varje varg och vildsvin du dödar från nivå ett, låt de två fältvanligheterna bära dig till 25 var du än står, och träna sedan skinnsteget vid karen när uppdragen ändå drar dig ut i kärret. Myrjägarsteget bär dig till 50, och myrväktarpjäserna och Skymningshudslindorna bär den sällsynta nivån från 50 till 75. Bortom 75 tunnas nivå 2-recepten ut till halv och sedan kvarts vinst, ungefär 150 tillverkningar för de sista femtio poängen till 125-taket; under ett huvudyrkes tak matchar de ändå det sällsynta hantverkstaket i stället för att nollas.\n\nDet mobila garveriet betyder mer för det här hantverket än för något annat: specialisera dig vid 75 och en sadelväska full av skinn blir färdig utrustning vid lägerelden i stället för en vandring tillbaka till Fenbridge. Hesks garveriarbetsorder köper åtta grova skinn var 30:e minut, en prydlig avkastning på skinn du ändå samlade in, och Bedrifternas bok markerar Garvarens hantverk vid skicklighet 50 med Stormästare i Läderhantverkeri vid taket."
         },
         "cooking": {
           "identityHeading": "Grytan som mättar sällskapet",
@@ -5867,7 +6436,7 @@ export const sv_SE: EnTranslations = {
         "q5": "Hur löser jag upp ett bestellt stycke, och vad kostar det?",
         "a5": "Gå till valfri hantverksstation med pjäsen i din väska och betala mästaren. Avgiften följer föremålets kvalitet: 25 silver för ett ovanligt stycke, 1 guld för ett sällsynt, 4 guld för ett episkt; ett legendariskt betalar den episka taxan, och ett beställt vanligt stycke betalar den ovanliga. Det måste vara en riktig station: en mobil station erbjuder aldrig tjänsten.\n\nAvgiften köper en ren tavla, inte ett botemedel: pjäsen förblir en beställning, så det binds igen till vem som tar emot det i nästa handel. Om flera bundna kopior delar en stapel lossas en kopia av och löses upp per betalning.",
         "q6": "Var lär jag mig recept, och vad kostar de?",
-        "a6": "De nio vanliga fältrecepten och de sex tillverkade landverktygsrecepten är kända för alla från start, och det är även tre stationsbundna slutstycken (Sotskalets mantel, Skyddsvävd Huva och Skymningshudslindor), som inte kräver någon tränare, bara sin station. Allt annat lärs ut av de stationerade mästarna vid deras stationer i de tre stadsorterna: de flesta står i Östbäck, garvaren håller garveriet i Fenbron och alkemisten håller apoteket i Högvakt.\n\nTränarrecept löper i steg: skicklighet 0, 25 och 50 för utrustnings- och förbrukningshantverken, prissatta gratis, 25 silver och 1 guld som engångsavgifter; Förtrollnings två berlockrecept sitter på 25-steget, och verktygsmakaren lär ut de två tillverkade fiskespöna vid 75 och 125 för 4 respektive 16 guld. En mästare lär ut ett recept när din nivå i det hantverket har nått receptets egen nivå, och du måste stå vid deras station för att lära dig: en mobil station räknas inte.",
+        "a6": "De nio vanliga fältrecepten och de sex tillverkade landverktygsrecepten är kända för alla från start, och det är även tre stationsbundna recept (Sotskalets mantel, Skyddsvävd Huva och Skymningshudslindor), som inte kräver någon tränare, bara sin station. Allt annat lärs ut av de stationerade mästarna vid deras stationer i de tre stadsorterna: de flesta står i Östbäck, garvaren håller garveriet i Fenbron och alkemisten håller apoteket i Högvakt.\n\nTränarrecept löper i steg: skicklighet 0, 25 och 50 för utrustnings- och förbrukningshantverken, prissatta gratis, 25 silver och 1 guld som engångsavgifter; Förtrollnings två berlockrecept sitter på 25-steget, och verktygsmakaren lär ut de två tillverkade fiskespöna vid 75 och 125 för 4 respektive 16 guld. En mästare lär ut ett recept när din nivå i det hantverket har nått receptets egen nivå, och du måste stå vid deras station för att lära dig: en mobil station räknas inte.",
         "q7": "Varfor gick min insamling plötsligt langsamt?",
         "a7": "Skördekanaliseringen börjar på 2,5 sekunder och kortas ner på två sätt: 0,4 sekunder för varje verktygsnivå du bär och kan hantera över nodens egen nivå, och 0,15 sekunder när ditt yrkes räknare passerar sitt 100-band, med ett golv på 1,5 sekunder. Flytta dig från nivå 1-noder upp till nivå 3-noder så försvinner ditt överskott, och samma hacka svingar långsamt igen. Att hålla exakt den nivå som krävs köper ingen fart; den öppnar bara noden.\n\nSkicklighetsvinsten bleknar på samma sätt som vid hantverk: en nod grånar när din skicklighet klättrar förbi dess nivå (nivå 1-noder lär inte ut något från skicklighet 75 och uppåt), så svaret på långsamma vinster är noder av högre nivå. De kräver ett verktyg av minst sin egen nivå i väskorna (ingen nod bearbetas någonsin med bara händerna, nivå 1 inräknad), och ett landverktyg över nivå 1 kräver dessutom att du först nått dess hanteringsgräns, 40/70/85/100 i sitt eget yrke för nivå 2 till 5. Fiske följer sin egen avsmalning: full vinst under 50 skicklighet, hälften under 100, ett sipprande på 0,1 under 150 och 0,02 under 200, skräpfångster lär inte ut något alls från 100 och uppåt, och vattnet självt sätter tak för lärdomen (nivå 1-vatten slutar lära ut vid 100, träskets vid 150), så en stillastående räknare kan också betyda att du vuxit ur vattnet.",
         "q8": "Kan jag tillverka utanfor staden?",
@@ -5892,6 +6461,7 @@ export const sv_SE: EnTranslations = {
       "bankBody": "Varje huvudort har en filial av Förgyllda kassakistan, rikets bankhus. Tala med kamreren där för att öppna ditt valv, ett privat förvaringsutrymme bortom dina väskor som din karaktär behåller livet ut. Vad du än lämnar hos dem väntar tryggt, oavsett vilken filial du besöker härnäst.",
       "bankHow": "Med valvet öppet klickar du på ett föremål i dina väskor för att sätta in det, och klickar på det i valvet för att ta tillbaka det. Valvet rymmer bara varor, aldrig mynt, och uppdragsföremål stannar hos dig. När väskorna blir fulla mitt under färden sveper en enda knapp in alla dina hantverksmaterial på en gång.",
       "bankSlots": "Ett nytt valv börjar smått och växer med dig. Kamreren säljer fler fack för mynt till allt brantare priser, och den som spelar online tjänar bonusutrymme därtill, för sådant som en verifierad e-post, länkade konton och vänner du tar med in i spelet.",
+      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
       "buyingTitle": "Köpa och sälja",
       "buyingBody": "Tala med en köpman och välj att bläddra bland deras varor, så öppnas butiken med tre flikar: Bläddra, Sälj och Återköp. Bläddra rymmer allt de har i lager, ditt om du har råd. Sälj listar det i dina väskor som de betalar för, och att sälja en pjäs som bär sin egen slumpade kvalitet ber dig bekräfta först, så att en dyrbar kopia aldrig glider iväg av misstag. Om du gör dig av med något du ångrar håller fliken Återköp kvar dina senaste försäljningar så att du kan köpa tillbaka dem för myntet du fick.",
       "junkTitle": "Rensa bort skräp",
@@ -6928,6 +7498,7 @@ export const sv_SE: EnTranslations = {
       "title": "Anslut en Solana-plånbok",
       "linkBody": "Välj ett plånbokstillägg i denna webbläsare. Du signerar ett verifieringsmeddelande och återvänder sedan till skrivbordsappen.",
       "paymentBody": "Välj plånboken länkad till ditt konto och godkänn transaktionen i denna webbläsare.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.",
       "safety": "World of ClaudeCraft ber aldrig om din återställningsfras eller privata nyckel.",
       "continueWith": "Fortsätt med {wallet}",
@@ -7118,6 +7689,7 @@ export const sv_SE: EnTranslations = {
       "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
       "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
       "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",
+      "lootRecoveryNotice": "Revans ingång håller sig öppen ett tag till: om din grupp faller kan du fortfarande gå tillbaka för det du tjänat.",
       "levelGate": "Endast äventyrare på nivå {level} eller högre får gå in i denna reva.",
       "deadEntry": "Du kan inte gå in i en reva medan du är död.",
       "deadEntryCombat": "Din grupp är fortfarande i strid. De döda kan gå in igen när striden upphör.",
@@ -7856,6 +8428,9 @@ export const sv_SE: EnTranslations = {
       "reload": "Ladda om",
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
+    },
+    "titlebar": {
+      "exitGame": "Avsluta spelet"
     }
   },
   "gpuNotice": {
@@ -8793,6 +9368,7 @@ export const sv_SE: EnTranslations = {
       "offGlobalCooldown": "Utanför den globala nedkylningen",
       "friendlyTarget": "Vänligt mål",
       "enemyTarget": "Fiendemål",
+      "anyTarget": "Fiende eller vänligt mål",
       "selfOnly": "Endast dig själv",
       "damageRange": "{min} till {max}",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
@@ -9008,7 +9584,8 @@ export const sv_SE: EnTranslations = {
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
       "clickBuyback": "Klicka för att köpa tillbaka",
-      "bagSlots": "Väska med {slots} platser"
+      "bagSlots": "Väska med {slots} platser",
+      "bagSlotsMaterials": "Materialväska med {slots} platser"
     },
     "bags": {
       "title": "Väskor",
@@ -9405,7 +9982,7 @@ export const sv_SE: EnTranslations = {
       },
       "ignition": {
         "name": "Antändning",
-        "description": "Passiv: kritiska träffar med dina besvärjelser bränner målet för 40% av den utdelade skadan under 6 sek. och kan staplas. (Eldmästerskap)"
+        "description": "Passiv: kritiska träffar med dina besvärjelser bränner målet för 30% av den utdelade skadan under 6 sek. och kan staplas. (Eldmästerskap)"
       },
       "mass_barrier": {
         "name": "Massbarriär",
@@ -9575,11 +10152,19 @@ export const sv_SE: EnTranslations = {
       },
       "sap": {
         "name": "Klubba ner",
-        "description": "Slår målet medvetslöst i 8 sek. Du måste vara smygande och utanför strid. All skada bryter effekten."
+        "description": "Slår målet medvetslöst i 8 sek. utan att bryta Duskveil eller starta strid. Du måste vara smygande och utanför strid. All skada bryter effekten."
       },
       "crippling_poison": {
         "name": "Blytungt gift",
         "description": "Träffar målet med ett blytungt gift som vållar {damage} naturskada och saktar dess förflyttningshastighet med 50 % i 12 sek."
+      },
+      "melting_acid": {
+        "name": "Smältande syra",
+        "description": "Stänker målet med ett frätande gift, gör {damage} naturskada och minskar dess rustning med 5 % i 12 sekunder."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade beläggning",
+        "description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbräsch",
@@ -9839,7 +10424,7 @@ export const sv_SE: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Springarens skepnad",
-        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min."
+        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 4 sek. (varje träff förnyar omtöckningen)"
       },
       "aimed_shot": {
         "name": "Långt drag",
@@ -10003,7 +10588,7 @@ export const sv_SE: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 16 skuggskada."
+        "description": "Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10209,7 +10794,7 @@ export const sv_SE: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Krigsandens kadens",
-        "description": "Passiv: var 3:e landad vapenattack utlöser 2 Stormhjärteekon för 50% naturskada och ger ett Stormtecken i 12 sek. Stormtecknet gör din nästa Bågblixt, Stöt eller Lagande vatten omedelbar och sänker manakostnaden med 50%. Förfäderslaget räknas som 2 attacker. (Krigsande)"
+        "description": "Passiv: attacker med två vapen har ingen extra chans att missa. Var 3:e landad vapenattack utlöser 2 Stormhjärteekon för 25% naturskada och ger ett Stormtecken i 12 sek. Stormtecknet gör din nästa Bågblixt, Stöt eller Lagande vatten omedelbar och sänker manakostnaden med 50%. Förfäderslaget räknas som 2 attacker. (Krigsande)"
       },
       "stormsurge": {
         "name": "Stormsvall",
@@ -10421,7 +11006,7 @@ export const sv_SE: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Frammana Pyre Colossus",
-        "description": "Kallar ner en Pyre Colossus i målområdet och orsakar 58-72 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Wrack varje sekund."
+        "description": "Kallar ner en Pyre Colossus i målområdet och orsakar 64-79 Eldskada vid nedslaget. Den strider i 30 sek. utan att ersätta din demon, bränner fiender i närheten varannan sekund och genererar 1 Wrack varje sekund."
       },
       "summon_doomguard": {
         "name": "Frammana Wraithborn",
@@ -10769,7 +11354,7 @@ export const sv_SE: EnTranslations = {
       },
       "shadowstep": {
         "name": "Skuggkliv",
-        "description": "Kliver genom skuggorna mot ditt mål. (skurktalang)"
+        "description": "Kliver genom skuggorna till ditt mål, vän eller fiende, utan att bryta Duskveil. (skurktalang)"
       },
       "silence": {
         "name": "Tystnad",
@@ -12425,8 +13010,47 @@ export const sv_SE: EnTranslations = {
       "pristine_claw": {
         "name": "Orörd klo"
       },
+      "ps_castaway_crate": {
+        "name": "Vrakkista"
+      },
+      "ps_ferry_bell": {
+        "name": "Färjklocka"
+      },
       "dawnhold_posy": {
         "name": "Bukett från Dawnholds trädgård"
+      },
+      "wayfarers_backpack": {
+        "name": "Wayfarer's Backpack"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Burlap Reagent Pouch"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Necromancer's Reagent Satchel"
+      },
+      "duskweave_bag": {
+        "name": "Duskweave Bag"
+      },
+      "resonant_weave_bag": {
+        "name": "Resonantweave Bag"
+      },
+      "foragers_haversack": {
+        "name": "Forager's Haversack"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Loombound Reagent Satchel"
+      },
+      "ps_briny_lure": {
+        "name": "Salt lockbete"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Glänsande pärla"
+      },
+      "mother_of_pearl": {
+        "name": "Pärlemor"
+      },
+      "ps_passing_stone": {
+        "name": "Övergångssten"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -13468,9 +14092,6 @@ export const sv_SE: EnTranslations = {
       "tolling_bell": {
         "name": "Klämtande klocka"
       },
-      "vale_cup_ball": {
-        "name": "Vildsvinsboll"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den vaknande toppen"
       },
@@ -13768,6 +14389,15 @@ export const sv_SE: EnTranslations = {
       "fisher_bram": {
         "name": "Fiskaren Bram"
       },
+      "training_effigy": {
+        "name": "Övningsdocka"
+      },
+      "shore_scuttler": {
+        "name": "Strandkrabba"
+      },
+      "mister_crabs": {
+        "name": "Herr Krabba"
+      },
       "rift_hellguard": {
         "name": "Helvetesvakt"
       },
@@ -13926,7 +14556,7 @@ export const sv_SE: EnTranslations = {
       "apothecary_lin": {
         "name": "Apotekare Lin",
         "title": "Örtkännare",
-        "greeting": "Se dig för var du sätter foten i de östra skogarna, vän."
+        "greeting": "Se dig för var du sätter foten i de nordöstra skogarna, vän."
       },
       "brother_aldric": {
         "name": "Broder Aldric",
@@ -14067,11 +14697,6 @@ export const sv_SE: EnTranslations = {
         "name": "Den bleka väktaren",
         "title": "De dödas väktare",
         "greeting": "Vila nu, ande. Jag kan återbörda dig till din kropp, men överfarten tillbaka lämnar dig svag."
-      },
-      "groundskeeper_bram": {
-        "name": "Vaktmästare Bram",
-        "title": "Suggfältets vårdare",
-        "greeting": "Freden håller på Suggfältet, {className}: bara sparkar och axeltacklingar. Vill du spela om Kopparspannen?"
       },
       "chronicler_saul": {
         "name": "Krönikören Saul",
@@ -14358,6 +14983,51 @@ export const sv_SE: EnTranslations = {
         "title": "Apotekerns mästare",
         "greeting": "Mät två gånger och häll en gång, {className}. Apotekaren har inget tålamod för utspillda reagenser."
       },
+      "wayfarer_bryn": {
+        "name": "Vägfarande Bryn",
+        "title": "Hamnguide",
+        "greeting": "Östbäck tar emot alla som kommer, vän. Och för de osäkra finns alltid Prövostranden: färjklockan vid Korppostens brevlåda ringer dig över vilken dag på året som helst, och dess tvilling på ön ringer dig hem."
+      },
+      "instructor_maren": {
+        "name": "Instruktör Maren",
+        "title": "Prövomästare",
+        "greeting": "Varje hjälte dalen någonsin tackat stod där du står nu, {className}, och ingen av dem visste vilken ände av ett svärd de skulle hålla i. Det är vad den här stranden är till för. Fråga, öva och misslyckas där det är gratis att misslyckas."
+      },
+      "quartermaster_finch": {
+        "name": "Kvartersmästare Finch",
+        "title": "Lägrets utrustare",
+        "greeting": "Min disk har precis en sak till salu, {playerName}: en extra pung för det du plockar upp på vägen, när lektionen kräver det. Allt annat här är bärgat gods på väg till dalen. Mynt köper pungen, och arbete tjänar mynten. Det är hela ekonomin, och den blir aldrig mer invecklad. Bara större."
+      },
+      "ferryman_odo": {
+        "name": "Färjkarl Odo",
+        "title": "Väktare av Överfarten",
+        "greeting": "Nyss över sundet, {playerName}? Väktaren Tam håller Gatloppet på stranden strax söder om min brygga: spring hans banor först, så tackar dina ben dig. Varje väktare på den här stranden skickar dig vidare till nästa när ditt arbete är gjort, och kortet högst upp på din skärm vet alltid vägen. När dalen kallar dig tillbaka, ring i klockan som står bredvid min brygga, så sätter överfarten dig av i Östbäck."
+      },
+      "bursar_wick": {
+        "name": "Kamrer Wick",
+        "title": "Förgyllda kassakistan",
+        "greeting": "Förgyllda kassakistan håller disk även här, {playerName}. Allt du sätter in hos mig väntar i samma valv bakom varje kamrer i varje stad, tryggt för vargar, vatten och ditt eget sämre omdöme."
+      },
+      "warden_tam": {
+        "name": "Väktaren Tam",
+        "title": "Väktare av Gatloppet",
+        "greeting": "De här banorna är Gatloppet, {playerName}, och varje äventyrare dalen respekterar har sprungit dem. Lyktstolparna förblir tända hela natten, så banorna stänger aldrig."
+      },
+      "overseer_pell": {
+        "name": "Uppsyningsman Pell",
+        "title": "Gatloppets uppsyningsman",
+        "greeting": "Jag tidtar varje löpning som kommer ner för de här banorna, {playerName}, och jag har sett betydligt sämre fotarbete. Stigen bakom mig klättrar upp till övningsgården: det är där fotarbete blir svärdsarbete."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmästare Rook",
+        "title": "Gårdsmästare",
+        "greeting": "Halm först, skal sedan, {playerName}. En övningsdocka lär din arm svingen; krabborna nere vid stranden lär den att träffa något som bryr sig."
+      },
+      "tidewarden_nel": {
+        "name": "Tidvattenväktaren Nel",
+        "title": "Väktare av Stranden",
+        "greeting": "Tidvattnet tar och tidvattnet betalar, {playerName}. Jag för räkenskap över båda: det krabborna knipsar loss från vraken, och det ärliga händer bär tillbaka upp den här stigen."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidvattenväktare",
@@ -14367,7 +15037,7 @@ export const sv_SE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ett yrke för varje hand",
-        "text": "Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydöst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.",
+        "text": "Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, nordöst om staden, förbi Vargstråket. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.",
         "completion": "Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.",
         "objectives": {
           "0": {
@@ -14397,7 +15067,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_boars": {
         "title": "Borstiga vildsvinsskinn",
-        "text": "Vildsvinsskinn ger de bästa färdväskorna, och ängarna väster om staden kryllar av bestarna. Hämta mig 5 Borstiga vildsvinsskinn så ska jag göra det värt din tid.",
+        "text": "Vildsvinsskinn ger de bästa färdväskorna, och ängarna nordväster om staden kryllar av bestarna. Hämta mig 5 Borstiga vildsvinsskinn så ska jag göra det värt din tid.",
         "completion": "Ah, fina borstiga skinn! Dessa kommer att inbringa ett bra pris.",
         "objectives": {
           "0": {
@@ -14407,7 +15077,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sablewebs plåga",
-        "text": "Lurkarna i de östra skogarna spinner ett silke jag behöver till mina omslag - och de har dessutom blivit alldeles för talrika. Gallra 6 Sableweb-lurkare och skär ut 4 silkeskörtlar ur deras bukar.",
+        "text": "Lurkarna i de nordöstra skogarna spinner ett silke jag behöver till mina omslag - och de har dessutom blivit alldeles för talrika. Gallra 6 Sableweb-lurkare och skär ut 4 silkeskörtlar ur deras bukar.",
         "completion": "Usch, rycker fortfarande. Perfekt. Här, du har förtjänat detta.",
         "objectives": {
           "0": {
@@ -14450,7 +15120,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stulna förråd",
-        "text": "De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de sydvästra kullarna. Stjäl tillbaka dem åt mig, är du snäll?",
+        "text": "De där banditerna slog till mot min senaste vagn och kom undan med fyra lådor varor - verktyg, salt, fint Östbäckslinne. Lådorna är staplade runt deras läger i de nordvästra kullarna. Stjäl tillbaka dem åt mig, är du snäll?",
         "completion": "Mina lådor! Knappt en repa på dem. Du är ett under.",
         "objectives": {
           "0": {
@@ -14543,7 +15213,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_bandits": {
         "title": "Dalens banditer",
-        "text": "En flock banditer har slagit läger i de sydvästra kullarna. De har rånat tre vagnar denna vecka. Driv ut dem - dräp 10 Dalbanditer.",
+        "text": "En flock banditer har slagit läger i de nordvästra kullarna. De har rånat tre vagnar denna vecka. Driv ut dem - dräp 10 Dalbanditer.",
         "completion": "Tio knivar färre i mörkret. Ta detta - du har förtjänat det.",
         "objectives": {
           "0": {
@@ -15223,7 +15893,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Trådar åter sammanfogade",
-        "text": "Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på östra skogen, och arbetet lugnar dina händer innan de rör god siden igen.",
+        "text": "Tillbaka vid min vävstol trots allt. Jag bär inget agg, {playerName}, men tråden minns en hand som lät den gå, och kostnaden att ta upp den igen mäts ut längre varje gång. Döda spindelvävsedderkopparna som tränger sig på nordöstra skogen, och arbetet lugnar dina händer innan de rör god siden igen.",
         "completion": "Stadigt igen. Läderbearbetning och Skrädderi återvänder till dina händer som ämnen. Mät dubbelt den här gången innan du vandrar.",
         "objectives": {
           "0": {
@@ -15233,7 +15903,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tillbaka på spisen",
-        "text": "Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på västängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.",
+        "text": "Nå, se vem som är tillbaka vid min gryta. Inga hårda känslor, {playerName}, ett kök har alltid plats, men du vet att notan löper längre varje gång du går ut på den. Gå och tunna ut vildsvinsstammen på nordvästängen, för ärlig svett är den första ingrediensen, och det kommer påminna dina händer om arbetet.",
         "completion": "Där är den gamla smaken. Alkemi och Matlagning är tillbaka på din spis som ämnen. Stanna ett tag den här gången.",
         "objectives": {
           "0": {
@@ -16324,6 +16994,109 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Spring Gatloppet",
+        "text": "Varje par ben dalen respekterar har sprungit de här banorna först, {playerName}. Gå den första banan västerut till dess flagga, sväng runt, gå den södra banan till den andra, och sidosteg sedan den sista banan till den röda flaggan. Passera flaggorna i ordning, så visar kortet högst upp på din skärm varje knapp längs vägen. Uppsyningsman Pell tidtar varje löpning från bortre änden: när den röda flaggan ligger bakom dig står han precis där för att ta emot dig.",
+        "completion": "Jag tidtog den löpningen, {playerName}, och jag har underkänt snabbare fötter. Gatloppet är ditt. Stigen bakom mig klättrar upp till övningsgården, där Drillmästare Rook gör fotarbete till svärdsarbete: han har din nästa uppgift.",
+        "objectives": {
+          "0": {
+            "label": "Gatloppets flagga passerad"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Träffa säkert",
+        "text": "Fotarbete först, nu armen, {playerName}. Övningsgården ligger uppe längs stigen bakom mig, och dess halmdockor är byggda för att slås på. Om du tappar bort vägen, tryck på M för att öppna kartan: varje uppgift du bär på är markerad där. Gå fram till en docka och vänsterklicka på den: det gör den till ditt mål, och dess namn visas högst upp på din skärm. Först då trycker du på 1, eller klickar på den första ikonen på handlingsfältet längs botten, för att svinga. Fortsätt slå tills en ger vika; den slår inte tillbaka, dockor gör aldrig det. Drillmästare Rook vaktar gården från dess västra kant, där strandstigen tar sin början: tryck på F på honom för att lämna in fällningen.",
+        "completion": "En ren fällning, och greppet redan säkrare. Kom ihåg känslan av det, {playerName}: rikta in, slå till, och fortsätt slå. Halmen bryr sig aldrig. Nästa sak du svingar mot kommer att göra det.",
+        "objectives": {
+          "0": {
+            "label": "Övningsdocka fälld"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Slipa eggen",
+        "text": "Ett hugg är ett hugg, {playerName}, och halmen tar emot det hela dagen. Det vinner dig ingenting. Titta på raden med knappar längs botten av din skärm: den raden är ditt hantverk, och var och en av dem gör något din arm ensam inte kan. Du har redan en. Vänd tillbaka till dockorna och använd den: välj ditt mål, tryck sedan på knappen gården märker ut åt dig, tre gånger om. Hacka inte bara på halmen; låt det du kan göra faktiskt hända. Kom sedan tillbaka till mig.",
+        "completion": "Nu slåss du i stället för att vifta vilt. Den där raden växer för varje nivå du tar, {playerName}, och de som lever längst är de som läser den. Halmen bryr sig inte om vilken knapp du använde. Det gör dalen.",
+        "objectives": {
+          "0": {
+            "label": "Förmåga landad på en övningsdocka"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Skal och klo",
+        "text": "Halmen bryr sig aldrig, {playerName}, så här är något som gör det. Strandkrabbor pickar över vraklinjen på den bortre stranden: följ stigen väster om min gård så leder den dig raka vägen till dem. De klämmer tillbaka, så håll koll på din hälsomätare och fortsätt slå: vänsterklicka på en för att göra den till ditt mål, använd sedan förmågan gården lärde dig (tränaren namnger din knapp), och sluta inte förrän dess skal knäcks. Tre räcker. Klättra sedan upp stigen mot den norra höjden: Tidvattenväktaren Nel för strandens räkenskap, och hon räknar dina skal.",
+        "completion": "Tre skal knäckta och alla fingrar i behåll: en rättvis första strid, {playerName}. Krabborna klämmer loss från vraken snabbare än tidvattnet för in bärgat gods, så varje en du gallrar bort är mynt någon får behålla.",
+        "objectives": {
+          "0": {
+            "label": "Strandkrabba gallrad"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Pärlemor",
+        "text": "Tre skal knäckta, {playerName}, men vraklinjen håller en kung, och han sitter på en skatt värd mer än varenda kista på den här stranden. Ta det här Salta lockbetet till tidvattenpölen längst västerut på stranden, bortom vraken. Ställ dig vid vattenbrynet, tryck på B för att öppna dina väskor, och vänsterklicka på lockbetet för att väcka honom. Herr Krabba klämmer betydligt hårdare än sina små kusiner, så håll koll på din hälsomätare, fortsätt slå, och backa upp mot sanden om du behöver hämta andan. När han faller, gå fram till hans skal och tryck på F för att plundra Glänsande pärlan från honom. Ta med dig pärlan tillbaka till mig.",
+        "completion": "Den Glänsande pärlan, bänd loss från själva den gamla kungen av grundens vatten. Min far lyfte på hatten för den krabban varje morgon i sitt arbetsliv; viss respekt är man skyldig. Håll stilla... där. Trädd, fattad och din, {playerName}: Pärlemor. Tryck på B för att öppna dina väskor och vänsterklicka på ringen för att sätta på den, tryck sedan på C för att öppna ditt karaktärsblad och se den sitta på din hand. En liten sak, men varje del av dig blir bättre av att bära den.",
+        "objectives": {
+          "0": {
+            "label": "Herr Krabba dräpt"
+          },
+          "1": {
+            "label": "Glänsande pärla hämtad"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "Vraklinjen",
+        "text": "Mina bärare släpar bärgat gods från de gamla vraken och bär det upp mot höjden mot Gryningsvilan, {playerName}, och hälften av kistorna klarar aldrig hela klättringen: de sätts ner längs stigen och glöms bort. Följ min stig mot lägret så går du rakt förbi de bortglömda. Att öppna en är enkelt: gå fram till en kista tills dess namn visas, tryck sedan på F, eller vänsterklicka på själva kistan, så lämnar den ifrån sig vad den håller. Sex av dem rensar linjen, och kom ihåg att F är samma knapp för varje kista, nod och dörr du någonsin kommer att möta. Kvartersmästare Finch håller lägrets stånd och köper varenda pinne bärgat gods: lämna fyndet till henne.",
+        "completion": "Rep, tjära och ett halvt hjul ost som havet på något sätt skonade: jag tar hela högen, {playerName}. En rygg som bär det den hittar är värd mer för det här lägret än något blad, och din klarade nyss hela linjen i en enda klättring.",
+        "objectives": {
+          "0": {
+            "label": "Vrakkista öppnad"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pung och börs",
+        "text": "En lektion till innan dalen, {playerName}, och det är den som håller äventyrare vid liv: vad du bär med dig. Din ryggsäck rymmer sexton platser, och bredvid den väntar fyra tomma väskögleor; varje väska du spänner fast lägger sitt eget utrymme till förrådet. Så: tryck på F på mig igen för att öppna mitt stånd, vänsterklicka på Linnepungen bland mina varor för att köpa den, tryck sedan på B för att öppna dina väskor och vänsterklicka på pungen där för att spänna fast den i en ledig ögla. Instruktör Maren drillar vid mönstringselden några steg österut: visa henne pungen på ditt bälte.",
+        "completion": "En fin pung. Spänn fast den om du inte redan gjort det: tryck på B för att öppna dina väskor, vänsterklicka sedan på pungen för att sätta den i en ledig väskögla, så är sex nya platser dina att fylla med trubbel. Nu den halva lektionen ingen väska kan rymma, {playerName}: det du inte kan bära håller Förgyllda kassakistan åt dig. Kamrer Wick håller sitt kassaskrivbord uppe vid västra stigen, och han öppnar samma valv som varje kamrer i varje stad delar; mer valvutrymme kan köpas när din börs växer in i det. Håll dina dyrgripar bankade och dina väskor rymliga. En full packning har avslutat fler äventyr än någon varg någonsin gjort.",
+        "objectives": {
+          "0": {
+            "label": "Linnepung köpt"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Bud på vinden",
+        "text": "En vana kvar att lära sig, {playerName}, och den kräver inget blad: läs tavlorna. Gillets anslagstavla står vid lägerporten några steg sydväst om min eld, och gillen och resande arbetslag sätter upp sina rop på den. Gå fram till den och tryck på F, eller vänsterklicka på den, för att läsa vad som är uppsatt, kom sedan tillbaka och berätta för mig vad vinden förde med sig. En tavla likadan står i varje stad du någonsin kommer att gå in i.",
+        "completion": "Så nu vet du hur budskap rör sig i dalen, {playerName}: inte med bud, utan med anslagstavlor. Kolla dem i varje stad du passerar; hälften av alla äventyr börjar som tre rader bläck på en sådan.",
+        "objectives": {
+          "0": {
+            "label": "Gillets anslagstavla läst"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "Den långa vandringen",
+        "text": "En lektion kvar, {playerName}, och det är den jag inte kan berätta för dig: du måste ha gjort det en gång. Du kommer att dö där ute. Alla gör det, och det är inte slutet på något. Ta den här Övergångsstenen. Tryck på B för att öppna dina väskor och vänsterklicka på den, så lägger den ner dig precis där du står. Följ sedan instruktionerna på din skärm: släpp din ande, vandra tillbaka till din egen kropp, och kliv in i den. Din kropp väntar, vandringen är gratis, och du förlorar ingenting på att göra den.",
+        "completion": "Och tillbaka kommer du, oskadd. Kom ihåg hur det kändes, {playerName}, för nästa gång det händer kommer tänder att vara inblandade och ingen som står bredvid för att förklara. Din kropp väntar, vandringen är gratis, och det enda döden verkligen kostar dig är tiden det tar att komma tillbaka.",
+        "objectives": {
+          "0": {
+            "label": "Vandrat tillbaka från de döda"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Sätt segel",
+        "text": "Det finns inget kvar på den här stranden som du inte redan sprungit, besegrat, öppnat eller köpt, {playerName}. Du är redo, och Östbäck har riktigt arbete som väntar. Gå tillbaka nerför strandvägen till bryggan, tryck på F på Färjkarl Odo, och berätta för honom att jag sagt att du förtjänat din överfart. Tryck på L närhelst du tappar räkningen på vad du är skyldig vem: det är din uppdragslogg.",
+        "completion": "Sa Maren det, jaså? Höga lovord från en kvinna som en gång fick mig att öva förtöjningsknopar i en hel vecka. Ring i klockan som står bredvid min brygga när du är redo, {playerName}, så sätter överfarten dig av mitt i Östbäck. Se upp för vargarna.",
+        "objectives": {
+          "0": {
+            "label": "Rapportera till Färjkarl Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Ner för Vindleden",
         "text": "Du klarade klättringen, {playerName}, så vinden har bestämt sig för att behålla dig. Vikhamn ligger österut längs hedvägen, insvept i lä av sin vik. Hamnmästaren Odile räknar varje själ som kommer över passet, och hon kommer vilja räkna dig. Berätta för henne att Vindleden fortfarande är öppen.",
@@ -16521,6 +17294,9 @@ export const sv_SE: EnTranslations = {
           },
           "11": {
             "label": "Fjärrkustens vägbank"
+          },
+          "12": {
+            "label": "Östbäcks hamn"
           }
         }
       },
@@ -16883,6 +17659,27 @@ export const sv_SE: EnTranslations = {
             "label": "Revfälten"
           }
         }
+      },
+      "proving_shore": {
+        "name": "Prövostranden",
+        "welcome": "Prövostranden begär inget av dig utom tid. Lär känna lägret, slå på övningsdockorna, gå längs vraklinjen, och när du är redo tar Färjkarl Odo dig över till dalen.",
+        "pois": {
+          "0": {
+            "label": "Gryningsvilan"
+          },
+          "1": {
+            "label": "Den gamla piren"
+          },
+          "2": {
+            "label": "Övningsgården"
+          },
+          "3": {
+            "label": "Vraklinjen"
+          },
+          "4": {
+            "label": "Gatloppet"
+          }
+        }
       }
     },
     "dungeons": {
@@ -17124,6 +17921,21 @@ export const sv_SE: EnTranslations = {
         "sender": "Fixare Gizzel",
         "subject": "MÄSTERSKAP, kaboom",
         "body": "Ett av dina ämnen nådde mästerskap, absoluta TOPPEN, kaboom, hela stegen, klart. Jag delar inte ut beröm, jag delar ut stubiner, men här, ta båda: du är briljant och lite skrämmande. Gå och få bergen att skaka."
+      },
+      "woc_market_delivery": {
+        "sender": "Börsmäklaren",
+        "subject": "Ditt köp på börsen",
+        "body": "Försäljningen är avslutad och varorna är dina. Det bifogade paketet bär exakt det föremål du betalade för, hållet i depå från stunden det listades tills din betalning gick igenom.\n\nEn uppgift om försäljningen finns i börsens liggare.\n\n- Börsmäklaren"
+      },
+      "woc_market_return": {
+        "sender": "Börsmäklaren",
+        "subject": "Din annons på börsen har avslutats",
+        "body": "Din annons avslutades utan en genomförd försäljning: auktionen hittade ingen köpare, reservationspriset uppnåddes inte, annonsen drogs tillbaka, eller den vinnande budgivaren fullföljde inte betalningen. Dina varor återvänder till dig oskadda med det här brevet, precis som de hölls i depå.\n\n- Börsmäklaren"
+      },
+      "woc_market_sold": {
+        "sender": "Börsmäklaren",
+        "subject": "Din annons på börsen såldes",
+        "body": "Din annons såldes och köparen betalade fullt ut. Börsens liggare bär uppgiften om försäljningen, och din börsaktivitet visar det slutförda beloppet och dess uppdelning.\n\n- Börsmäklaren"
       }
     },
     "itemSets": {

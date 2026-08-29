@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
+import { MobileMoreDialogController } from '../src/ui/mobile_more_dialog';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
 
 // The shared focus-manager TRAP wiring. The pure boundary math (nextFocusIndex)
@@ -93,6 +94,16 @@ class FakeHTMLElement {
 
   matches(sel: string): boolean {
     return sel === '[data-close]' ? this.dataClose : false;
+  }
+
+  private readonly attrs = new Map<string, string>();
+
+  setAttribute(name: string, value: string): void {
+    this.attrs.set(name, value);
+  }
+
+  getAttribute(name: string): string | null {
+    return this.attrs.get(name) ?? null;
   }
 
   focus(): void {
@@ -399,5 +410,53 @@ describe('opener capture vs the pointer-only focus drop (src/ui/pointer_blur.ts)
     const trap = new FocusManager().open({ root: () => el(nextRoot) });
     expect(trap.opener()).toBe(parkedRoot);
     trap.release(false);
+  });
+});
+
+// The mobile More tray's return-focus chain, end to end over the real manager.
+// Its trigger (#mobile-more) is a Quick Actions STRIP item, so it is unrendered
+// whenever that strip is closed, which is the ordinary state by the time the
+// tray closes: focusing it is a silent no-op that drops the user to <body>.
+describe('the mobile More tray return-focus chain', () => {
+  function rig(triggerVisible: boolean) {
+    const manager = new FocusManager();
+    const trigger = new FakeHTMLElement({ focusable: true, visible: triggerVisible });
+    const anchor = new FakeHTMLElement({ focusable: true });
+    const closeX = new FakeHTMLElement({ focusable: true, dataClose: true });
+    const dialog = new FakeHTMLElement();
+    dialog.append(closeX);
+    const controller = new MobileMoreDialogController(manager, {
+      trigger: () => el(trigger),
+      dialog: () => el(dialog),
+      fallback: () => el(anchor),
+    });
+    return { controller, trigger, anchor, closeX };
+  }
+
+  it('falls back to the Quick Actions anchor when the strip holding the trigger is closed', () => {
+    const { controller, trigger, anchor, closeX } = rig(false);
+    controller.sync(true);
+    expect(fakeDoc.activeElement).toBe(closeX);
+
+    controller.sync(false);
+    expect(fakeDoc.activeElement).toBe(anchor);
+    expect(fakeDoc.activeElement).not.toBe(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('still returns to the trigger itself while the strip holding it is open', () => {
+    const { controller, trigger, anchor } = rig(true);
+    controller.sync(true);
+    controller.sync(false);
+    expect(fakeDoc.activeElement).toBe(trigger);
+    expect(fakeDoc.activeElement).not.toBe(anchor);
+  });
+
+  it('restores nothing during a More-to-window handoff', () => {
+    const { controller, trigger, anchor } = rig(false);
+    controller.sync(true);
+    controller.sync(false, false);
+    expect(fakeDoc.activeElement).not.toBe(anchor);
+    expect(fakeDoc.activeElement).not.toBe(trigger);
   });
 });

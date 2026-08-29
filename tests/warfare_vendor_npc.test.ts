@@ -21,7 +21,6 @@ import {
   WARFARE_QUARTERMASTER_NPC_ID,
 } from '../src/sim/pvp/warfare_quartermaster';
 import { Sim } from '../src/sim/sim';
-import { VALE_CUP_BRAM_ID } from '../src/sim/social/vale_cup';
 import { townPropPlacements } from '../src/sim/town_props';
 import { STATIC_WORLD_SERVICE_ENTITY_ID_MIN } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -90,12 +89,11 @@ describe('Warmarshal Draven Kole: the definition', () => {
   it('reserves the next free singleton entity id and opts out of the generic loop', () => {
     // Both halves are required. Either one alone moves the id sequence.
     expect(KOLE.dynamic).toBe(true);
+    // Groundskeeper Bram's 1_000_000_000 is retired with the Vale Cup and never
+    // reused, so the two live singletons keep their minted ids above it.
     expect(WARFARE_QUARTERMASTER_ENTITY_ID).toBe(1_000_000_002);
-    expect(VALE_CUP_BRAM_ID).toBe(1_000_000_000);
     expect(FURY_ENTITY_ID).toBe(1_000_000_001);
-    expect(new Set([VALE_CUP_BRAM_ID, FURY_ENTITY_ID, WARFARE_QUARTERMASTER_ENTITY_ID]).size).toBe(
-      3,
-    );
+    expect(new Set([FURY_ENTITY_ID, WARFARE_QUARTERMASTER_ENTITY_ID]).size).toBe(2);
     // Still below the static world-service band, which owns everything above it.
     expect(WARFARE_QUARTERMASTER_ENTITY_ID).toBeLessThan(STATIC_WORLD_SERVICE_ENTITY_ID_MIN);
   });

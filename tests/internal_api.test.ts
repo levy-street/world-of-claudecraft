@@ -6,7 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // the restart-countdown endpoint and never issues a query, so set a dummy URL
 // before the module graph loads (the pg Pool stays lazy and never connects).
 vi.hoisted(() => {
-  process.env.DATABASE_URL ??= 'postgres://localhost:5432/woc_test';
+  // Port 5433 like every other deliberately-dead fallback URL: 5432 is LIVE
+  // inside the CI legs since the R16 Postgres service landed, and the dead
+  // letters must stay on the port CI never opens.
+  process.env.DATABASE_URL ??= 'postgres://localhost:5433/woc_test';
 });
 
 import { handleInternalApi } from '../server/internal';

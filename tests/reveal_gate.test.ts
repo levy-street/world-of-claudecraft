@@ -1,10 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { arrivalHeldImminentKeys, resetArrivalCoverForTest } from '../src/render/arrival_cover';
+import {
+  arrivalHeldImminentKeys,
+  resetArrivalCoverForTest,
+  setArrivalCover,
+  setArrivalEstablishingShot,
+} from '../src/render/arrival_cover';
 import {
   gpuPrepEventsSnapshot,
   resetGpuPrepEventsForTest,
   setGpuPrepClockForTest,
 } from '../src/render/gpu_prep_events';
+import {
+  createPrewarmResumeStartGate,
+  PREWARM_RESUME_START_BACKSTOP_MS,
+} from '../src/render/prewarm_resume_start_gate_core';
 import {
   createRevealGate,
   REVEAL_GATE_WATCHDOG_MS,
@@ -172,6 +181,60 @@ describe('reveal gate driver', () => {
     state.fire();
     expect(gate.allow('cell')).toBe(true);
     expect(warns).toHaveBeenCalledOnce();
+  });
+
+  it('starts reveal work and its watchdog clock only after the initial paint gate', async () => {
+    const start = deferred();
+    const compile = vi.fn(() => new Promise(() => undefined));
+    const { state, schedule } = fakeSchedule();
+    let clock = 26_000;
+    setGpuPrepClockForTest(() => clock);
+    const gate = createRevealGate(
+      { compile, schedule, startAfterInitialPaint: () => start.promise as Promise<void> },
+      () => [{}],
+    );
+
+    expect(gate.allow('cull:thornpeak')).toBe(false);
+    expect(compile).not.toHaveBeenCalled();
+    expect(state.armedMs).toEqual([]);
+
+    clock = 35_000;
+    start.resolve();
+    await flushMicrotasks();
+    expect(compile).toHaveBeenCalledOnce();
+    expect(state.armedMs).toEqual([REVEAL_GATE_WATCHDOG_MS]);
+
+    clock = 45_000;
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    state.fireAt(REVEAL_GATE_WATCHDOG_MS);
+    expect(gpuPrepEventsSnapshot().events[0].ageMs).toBe(REVEAL_GATE_WATCHDOG_MS);
+  });
+
+  it('still reveals when the initial-paint owner never releases its bounded barrier', async () => {
+    const start = fakeSchedule();
+    const reveal = fakeSchedule();
+    const compile = vi.fn(() => new Promise(() => undefined));
+    const startGate = createPrewarmResumeStartGate({
+      timeoutMs: PREWARM_RESUME_START_BACKSTOP_MS,
+      schedule: start.schedule,
+    });
+    const gate = createRevealGate(
+      {
+        compile,
+        schedule: reveal.schedule,
+        startAfterInitialPaint: () => startGate.wait,
+      },
+      () => [{}],
+    );
+
+    expect(gate.allow('cull:stuck-entry')).toBe(false);
+    expect(compile).not.toHaveBeenCalled();
+    start.state.fireAt(PREWARM_RESUME_START_BACKSTOP_MS);
+    await flushMicrotasks();
+    expect(compile).toHaveBeenCalledOnce();
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    reveal.state.fireAt(REVEAL_GATE_WATCHDOG_MS);
+    expect(gate.allow('cull:stuck-entry')).toBe(true);
   });
 
   it('the watchdog reveal lands in the GPU-preparation ring, not only the console', () => {
@@ -598,5 +661,62 @@ describe('reveal gate imminent holds', () => {
     expect(gate.allow('town', true)).toBe(true);
     expect(arrivalHeldImminentKeys()).toBe(0);
     expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(1);
+  });
+});
+
+describe('reveal gate under the entry establishing shot', () => {
+  function recordingGate(roots: readonly object[]) {
+    const { schedule } = fakeSchedule();
+    const compiled: { root: object; imminent: boolean }[] = [];
+    const gate = createRevealGate(
+      {
+        compile: (root, imminent) => {
+          compiled.push({ root, imminent });
+          return new Promise<void>(() => undefined);
+        },
+        schedule,
+      },
+      () => roots,
+    );
+    return { gate, compiled };
+  }
+
+  it('turns an ordinary consult imminent while the cover is up on the establishing shot', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: true }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(1);
+    // ... and the entry wait sees it as a held imminent key.
+    expect(arrivalHeldImminentKeys()).toBe(1);
+  });
+
+  it('a plain arrival cover (a teleport) is NOT an establishing shot: consults stay ordinary', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalCover(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: false }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(0);
+  });
+
+  it('leaves a consult ordinary once the cover is down, even with the flag still set', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: false }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(0);
+  });
+
+  it('never reveals early: an imminent establishing consult still holds', () => {
+    const { gate } = recordingGate([{}]);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('eastbrook-town-static')).toBe(false);
+    expect(gate.allow('eastbrook-town-static')).toBe(false);
+    expect(gate.state('eastbrook-town-static')).toBe('compiling');
   });
 });

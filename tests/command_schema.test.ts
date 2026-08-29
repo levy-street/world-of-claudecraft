@@ -51,16 +51,32 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // arrangement deterministically), and bg_respond as a send + dispatch pair
 // (the release's battleground queue-pop confirmation).
 // The Reliquary packet's nameplate border adds deed_set_border as a send +
-// dispatch pair, the exact sibling of deed_set_title, and this branch adds
+// dispatch pair, the exact sibling of deed_set_title, and the release adds
 // tabPrev as a send + dispatch pair (the backward half of the Tab target
 // cycle, Shift+Tab by default; no payload, the sim walks the same ordered
-// list in reverse). NOTE (merge trap): both
-// sides of every v0.36.0 sync bump these counts independently, and git has
+// list in reverse) plus, at the v0.40.0 syncs, trade_close (the sibling of
+// trade_cancel) and lock_item (the player item lock, issue 3042). Bank Storage
+// adds the Materials Vault trio (vault_deposit, vault_withdraw,
+// vault_buy_upgrade: the per-material material store beside the personal slot
+// bank, appended at the end of COMMAND_NAMES because wire tokens are never
+// reordered) plus vault_deposit_all, the batched server-side sweep (one
+// command, one batched ledger write), each a send + dispatch pair.
+// Bank Storage phase 07 adds the bag-socket trio (bank_unlock_socket,
+// bank_socket_bag, bank_unsocket_bag), each a send + dispatch pair appended at
+// the END of COMMAND_NAMES; the dispatch bodies live in server/bank_wire.ts
+// behind the six-label bank case group, and bank_socket_bag reuses the
+// equip_bag wire shape (`item` + optional `socket` + optional `slot`).
+// NOTE (merge trap): both
+// sides of every release sync bump these counts independently, and git has
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+// The New Eastbrook program retires the Vale Cup minigame (six vcup_* send +
+// dispatch pairs), the Proving Shore tutorial adds its start_tutorial pair, and
+// the Bank Storage branch adds its vault and bank-socket pairs. Both arms land
+// in the merged tree, so the counts below are MEASURED from a suite run on it.
+const EXPECTED_SEND_COUNT = 206;
+const EXPECTED_DISPATCH_COUNT = 219;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

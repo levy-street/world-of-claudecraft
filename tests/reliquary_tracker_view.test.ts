@@ -977,16 +977,20 @@ describe('tracker chrome', () => {
     );
   });
 
-  it('folds the tracker to a count chip on the compact tier', () => {
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch\.hud-mobile-compact #reliquary-tracker \.dt-list \{\s*display: none;/,
-    );
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch\.hud-mobile-compact #reliquary-tracker \.dt-chevron \{\s*display: none;/,
-    );
-    expect(hudMobile).toMatch(
-      /body\.mobile-touch #reliquary-tracker \.dt-list \{\s*max-height: 88px;\s*overflow: hidden;/,
-    );
+  // The tracker used to fold to a count chip on the compact touch tier. It is now
+  // hidden on touch outright: the folded line still landed directly under the
+  // minimap in #right-tracker-stack, and the Reliquary window keeps its own touch
+  // entry point in the More tray, so hiding it strands nothing.
+  it('is hidden outright on touch, and only on touch', () => {
+    expect(hudMobile).toMatch(/body\.mobile-touch #reliquary-tracker \{\s*display: none;\s*\}/);
+    // The per-tier folds went with it: a hidden element cannot fold.
+    expect(hudMobile).not.toContain('#reliquary-tracker .dt-list');
+    expect(hudMobile).not.toContain('#reliquary-tracker .dt-chevron');
+    // Desktop is untouched: the base rule still paints the strip.
+    expect(hudCss).not.toMatch(/#reliquary-tracker \{[^}]*display: none/);
+    // And the touch path to the window itself survives the hide.
+    expect(read('../index.html')).toContain('id="mobile-reliquary"');
+    expect(read('../play.html')).toContain('id="mobile-reliquary"');
   });
 
   it('never positions itself: the stack wrapper owns the placement', () => {

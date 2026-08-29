@@ -17,21 +17,15 @@ function mountSeekerHud(compact: boolean): {
     .filter(Boolean)
     .join(' ');
 
+  // The five-button row collapsed into ONE menu control; the promoted chest is
+  // appended after it and the container's column-reverse puts it above.
   const controls = document.createElement('div');
   controls.id = 'mobile-combat-controls';
   controls.style.setProperty('--btn-scale', '1.3');
-  for (const id of [
-    'mobile-chat',
-    'mobile-social',
-    'mobile-quests',
-    'mobile-settings',
-    'mobile-more',
-  ]) {
-    const button = document.createElement('button');
-    button.id = id;
-    button.className = 'mobile-btn';
-    controls.appendChild(button);
-  }
+  const anchor = document.createElement('button');
+  anchor.id = 'mobile-menu-anchor';
+  anchor.className = 'mobile-btn';
+  controls.appendChild(anchor);
   const chest = document.createElement('button');
   chest.id = 'mobile-daily-rewards';
   chest.className = 'mobile-btn';

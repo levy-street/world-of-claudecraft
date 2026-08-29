@@ -272,7 +272,7 @@ describe('auraEffectDescriptor', () => {
   it('teaches the Galeheart Weapon echo mechanic instead of the generic imbue line', () => {
     expect(desc({ id: 'galeheart_weapon', kind: 'imbue', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.galeheartWeapon',
-      nums: { steps: 3, count: 2, pct: 50 },
+      nums: { steps: 3, count: 2, pct: 25 },
     });
   });
 

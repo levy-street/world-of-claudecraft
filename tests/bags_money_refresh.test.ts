@@ -389,15 +389,26 @@ describe('async balance reads repaint the FOOTER, not the whole window', () => {
       expect(end, `anchor missing: ${to}`).toBeGreaterThan(start);
       return hud.slice(start, end);
     };
-    expect(between('storeSnapshot: async () => {', 'spendStoreItem:')).toContain(
+    expect(between('storeSnapshot: async () => {', 'confirmDialog:')).toContain(
       'this.claudiumBalance.set(snapshot.balance);',
-    );
-    expect(between('spendStoreItem: async (', 'openClaudium:')).toContain(
-      'this.claudiumBalance.set(result.balance);',
     );
     expect(between('new ClaudiumWindow({', 'buy: (rail, sku)')).toContain(
       'this.claudiumBalance.set(snapshot.balance);',
     );
+    // The SPEND writer moved out of this file with the Claudium spend seam
+    // (Bank Storage phase 13): a second window now spends, so the closure that
+    // used to sit in the DailyRewardsWindow deps literal lives in
+    // src/ui/claudium_purchase_bridge.ts and BOTH windows spread it. The claim
+    // is unchanged and is pinned in TWO halves, because that is now where it
+    // can go wrong: the bridge must write the balance the SERVICE reported,
+    // and hud.ts must hand it the converging seam rather than some other sink.
+    const bridge = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/claudium_purchase_bridge.ts'), 'utf8'),
+    );
+    expect(bridge).toContain('host.setBalance(result.balance);');
+    // ...and never a value it already held, which is the swap that typechecks.
+    expect(bridge).not.toMatch(/host\.setBalance\(host\.cachedBalance\(\)/);
+    expect(hud).toContain('setBalance: (balance) => this.claudiumBalance.set(balance)');
   });
 
   it('keeps the launcher label starting the throttled read it renders from', () => {

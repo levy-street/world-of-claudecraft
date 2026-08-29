@@ -20,9 +20,11 @@ describe('dev-tier canvas nameplate glow stays crisp (#1639)', () => {
       "devStyle.stroke = this.forcedColorsActive() ? 'Highlight' : state.devOutline;",
     );
     expect(canvas).toContain('devStyle.lineWidth = 4;');
-    expect(canvas).toContain('this.text.draw(this.ctx, state.name, nameX, bottomY - 3, devStyle);');
     expect(canvas).toContain(
-      'this.text.draw(this.ctx, state.name, nameX, bottomY - 3, nameStyle);',
+      'this.text.draw(this.ctx, state.name, nameX, nameBaseline, devStyle);',
+    );
+    expect(canvas).toContain(
+      'this.text.draw(this.ctx, state.name, nameX, nameBaseline, nameStyle);',
     );
     expect(canvas).not.toContain('shadowBlur = 4');
   });

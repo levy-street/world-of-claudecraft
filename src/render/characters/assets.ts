@@ -49,6 +49,7 @@ import {
 } from './manifest';
 import { meshProgramShapeKey } from './material_program_shape_core';
 import {
+  armorMaterialSet,
   bandMaterialSpec,
   DEFAULT_LOOK,
   earringMaterialSpec,
@@ -70,6 +71,7 @@ import {
   modularPartNames,
   morphInfluences,
   outfitDye,
+  outfitDyeFallbackHex,
   skinColor,
   stubbleDecals,
   wearsFaceDecal,
@@ -1276,6 +1278,18 @@ function recolored(
       ? (armorDyed(src, dye) as THREE.MeshStandardMaterial)
       : (src.clone() as THREE.MeshStandardMaterial);
   if (hex !== null) mat.color.setHex(hex);
+  // Low tier rebuilds every rig material as flat Lambert from scratch
+  // (buildTintedClone's non-standard branch), which drops onBeforeCompile and
+  // so the shader dye entirely: picking any outfit colorway would otherwise be
+  // a silent no-op on low graphics. Stash a flat, multiply-safe approximation
+  // as inert metadata so that branch can stand in for the dye instead of
+  // showing nothing; this material's own .color stays untouched so the
+  // standard-tier shader path (and this cache entry across a live tier
+  // switch) are unaffected.
+  if (dye !== null) {
+    const dyeSet = armorMaterialSet(src.name);
+    if (dyeSet) mat.userData.armorDyeFallbackHex = outfitDyeFallbackHex(dyeSet, look.app.outfit);
+  }
   // HAIR IS DOUBLE-SIDED. The sculpts ship as the designer anchored them
   // (hairimp.FAITHFUL_SCULPT), and a sculpt is a one-sided open shell: seen
   // from inside, through the gaps between strands, up under a fringe, along
@@ -1987,12 +2001,27 @@ function buildTintedClone(
     if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
+      // Armour materials are always MeshStandardMaterial (the KayKit atlases),
+      // so armorDyeFallbackHex never applies here; a Basic armour material
+      // would silently lose its outfit colorway on low tier exactly like the
+      // bug this file's dye fallback exists to fix.
       mat = (src as THREE.MeshBasicMaterial).clone();
     } else {
-      // low tier: Lambert with the same texture map (no PBR, no rim)
+      // low tier: Lambert with the same texture map (no PBR, no rim). An
+      // active outfit colorway has no shader here to dye it (see recolored's
+      // armorDyeFallbackHex comment), so a flat, value-normalized multiply
+      // stands in for the zone-selective dye: a rougher result, but visible,
+      // where the alternative was invisible.
+      const armorDyeFallbackHex = (s.userData as { armorDyeFallbackHex?: number })
+        .armorDyeFallbackHex;
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
-        color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
+        color:
+          armorDyeFallbackHex !== undefined
+            ? new THREE.Color(armorDyeFallbackHex)
+            : s.color
+              ? s.color.clone()
+              : new THREE.Color(0xffffff),
         vertexColors: s.vertexColors,
         transparent: s.transparent,
         opacity: s.opacity,

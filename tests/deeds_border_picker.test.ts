@@ -12,6 +12,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { freshDeedStats } from '../src/sim/deeds';
+import { borderAccent, deedBorderSlug } from '../src/ui/deed_border_view';
+import { deedName } from '../src/ui/deed_i18n';
 import { DeedsWindow, type DeedsWindowDeps } from '../src/ui/deeds_window';
 
 // jsdom ships no 2D canvas, so the procedural crest compositor cannot run
@@ -239,6 +241,130 @@ describe('Book of Deeds border picker', () => {
       expect(group.getAttribute('aria-label')).toBeNull();
     }
   });
+
+  it('E28: picker None is empty, not a fake metal swatch', () => {
+    const state = baseState();
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    const { el } = makeWindow(state);
+    const none = el.querySelector<HTMLElement>('[data-border-pick=""]');
+    const swatch = none?.querySelector('.deed-border-swatch');
+    expect(swatch, 'None must keep an empty swatch slot').toBeTruthy();
+    expect(swatch?.classList.contains('deed-border-swatch-empty')).toBe(true);
+    expect(swatch?.getAttribute('style') ?? '').toBe('');
+    expect(swatch?.textContent).toBe('');
+    const style = swatch?.getAttribute('style') ?? '';
+    expect(style).not.toContain('--border-accent-frame');
+    expect(style).not.toContain('#');
+    expect(none?.querySelector('.deed-heraldry-seal')).toBeNull();
+    expect(none?.querySelector('.deed-border-material')).toBeNull();
+    const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    const forcedEmpty = components.match(
+      /@media \(forced-colors: active\) \{[\s\S]*?\.deed-border-swatch-empty \{([^}]*)\}/,
+    )?.[1];
+    expect(forcedEmpty, 'forced colors must keep the None swatch empty').toBeTruthy();
+    expect(forcedEmpty).toContain('background: none;');
+    expect(forcedEmpty).toContain('border: 0;');
+    expect(forcedEmpty).toContain('outline: 0;');
+  });
+
+  it('E53: earned options show the canonical seal and material; active and 40x40 stay', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el } = makeWindow(state);
+    for (const id of [PRESTIGE, DEEPWARD]) {
+      const btn = el.querySelector<HTMLElement>(`[data-border-pick="${id}"]`);
+      expect(btn?.classList.contains('deed-title-option')).toBe(true);
+      const swatch = btn?.querySelector('.deed-border-swatch');
+      expect(swatch?.classList.contains('deed-border-swatch-empty')).toBe(false);
+      const slug = deedBorderSlug(id);
+      const accent = borderAccent(slug);
+      expect(accent).not.toBeNull();
+      expect(swatch?.getAttribute('data-border')).toBe(slug);
+      expect(swatch?.getAttribute('data-motif')).toBe(accent?.motif);
+      const style = swatch?.getAttribute('style') ?? '';
+      expect(style).toContain(`--border-accent-frame:${accent?.frame}`);
+      expect(style).toContain(`--border-accent-edge:${accent?.edge}`);
+      expect(style).toContain(`--border-accent-glow:${accent?.glow}`);
+      expect(style).toContain('--deed-heraldry-well:#14110c');
+      expect(swatch?.querySelector('.deed-heraldry-seal')).not.toBeNull();
+      expect(swatch?.querySelector('.deed-border-material')).not.toBeNull();
+      const paths = swatch?.querySelectorAll<SVGPathElement>('path') ?? [];
+      expect(paths.length).toBeGreaterThanOrEqual(2);
+      for (const path of paths) expect(path.getAttribute('d')).toBe(accent?.motifPath);
+      if (id === DEEPWARD) {
+        expect(accent?.frame).toBe('#4fb3c8');
+        expect(style).toContain('--border-accent-frame:#4fb3c8');
+      }
+      expect(btn?.textContent).toContain(deedName(id));
+    }
+    expect(el.querySelector(`[data-border-pick="${DEEPWARD}"]`)?.classList.contains('active')).toBe(
+      true,
+    );
+    const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+    expect(components).toMatch(
+      /\.deed-title-option:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
+    );
+    expect(components).toMatch(
+      /body\.mobile-touch \.deed-title-option \{\s*min-width: 40px;\s*min-height: 40px;/,
+    );
+    expect(components).toMatch(/\.deed-title-option\.active \{/);
+  });
+
+  it('E54: hover and focus swap the live preview without equipping', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(PRESTIGE, '2026-08-01');
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el, setActiveBorder } = makeWindow(state);
+    const preview = () => el.querySelector<HTMLElement>('.deed-heraldry-preview');
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(DEEPWARD);
+    expect(preview()?.getAttribute('data-border')).toBe(deedBorderSlug(DEEPWARD));
+    const expectPreviewFamily = (id: string): void => {
+      const root = preview();
+      const accent = borderAccent(deedBorderSlug(id));
+      expect(root?.querySelector('.deed-heraldry-preview-world')).not.toBeNull();
+      expect(root?.querySelector('.deed-heraldry-preview-interaction')).not.toBeNull();
+      expect(root?.querySelector('.deed-heraldry-preview-ribbon')?.textContent).toBe('Hero');
+      expect(root?.querySelector('.deed-heraldry-preview-name')?.textContent).toBe('Hero');
+      expect(root?.querySelector('.deed-heraldry-preview-deed')?.textContent).toBe(deedName(id));
+      const paths = root?.querySelectorAll<SVGPathElement>('path') ?? [];
+      expect(paths.length).toBeGreaterThanOrEqual(3);
+      for (const path of paths) expect(path.getAttribute('d')).toBe(accent?.motifPath);
+    };
+    expectPreviewFamily(DEEPWARD);
+
+    const prestige = el.querySelector<HTMLElement>(`[data-border-pick="${PRESTIGE}"]`);
+    prestige?.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(PRESTIGE);
+    expect(preview()?.getAttribute('data-border')).toBe(deedBorderSlug(PRESTIGE));
+    expectPreviewFamily(PRESTIGE);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
+
+    prestige?.focus();
+    prestige?.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(PRESTIGE);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+
+    prestige?.blur();
+    expect(preview()?.getAttribute('data-preview-deed')).toBe(DEEPWARD);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
+  });
+
+  it('E54: previewing None is genuinely empty and still does not unequip', () => {
+    const state = baseState({ activeBorder: DEEPWARD });
+    state.deedsEarned.set(DEEPWARD, '2026-08-02');
+    const { el, setActiveBorder } = makeWindow(state);
+    const none = el.querySelector<HTMLElement>('[data-border-pick=""]');
+    none?.dispatchEvent(new MouseEvent('mouseenter'));
+    const preview = el.querySelector<HTMLElement>('.deed-heraldry-preview');
+    expect(preview?.getAttribute('data-preview-deed')).toBe('');
+    expect(preview?.getAttribute('data-border')).toBe('');
+    expect(preview?.children).toHaveLength(0);
+    expect(setActiveBorder).not.toHaveBeenCalled();
+    expect(state.activeBorder).toBe(DEEPWARD);
+  });
 });
 
 // CSS REACH, not class presence: every selector this feature added rides a
@@ -267,6 +393,17 @@ describe('picker and note CSS reach (grouped selectors, not just classes)', () =
     expect(rule).toContain('font-weight: 400;');
   });
 
+  it('stacks preview labels and the touch layout without relying on viewport width', () => {
+    const labels = components.match(
+      /\.deed-heraldry-preview-name,\s*\n?\s*\.deed-heraldry-preview-deed \{([^}]*)\}/,
+    )?.[1];
+    expect(labels, 'preview label rule missing').toBeTruthy();
+    expect(labels).toContain('display: block;');
+    const touch = components.match(/body\.mobile-touch \.deed-heraldry-preview \{([^}]*)\}/)?.[1];
+    expect(touch, 'landscape touch preview stack rule missing').toBeTruthy();
+    expect(touch).toContain('grid-template-columns: 1fr;');
+  });
+
   it('styles the WORN border badge through its full compound selector', () => {
     // The base badge and the worn state are separate rules; the worn one is
     // reachable only as the three-class compound the painter writes.
@@ -274,6 +411,14 @@ describe('picker and note CSS reach (grouped selectors, not just classes)', () =
     const worn = components.match(/\.ms-badge\.ms-deed-border\.ms-active \{([^}]*)\}/)?.[1];
     expect(worn, 'the worn-border badge must keep its compound rule').toBeTruthy();
     expect(worn).toContain('border-color:');
+  });
+
+  it('E28: the empty swatch rule paints no metal', () => {
+    const empty = components.match(/\n\s*\.deed-border-swatch-empty \{([^}]*)\}/)?.[1];
+    expect(empty, '.deed-border-swatch-empty must have a rule').toBeTruthy();
+    expect(empty).toContain('background: none;');
+    expect(empty).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
+    expect(empty).not.toContain('--border-accent-frame');
   });
 
   it('styles the Reliquary border note through its grouping with the uniques note', () => {

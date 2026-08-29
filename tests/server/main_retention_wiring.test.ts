@@ -6,8 +6,16 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from '../helpers/strip_comments';
 
-const MAIN = readFileSync(join(__dirname, '..', '..', 'server', 'main.ts'), 'utf8');
+// Comment-stripped so a commented-out call can never satisfy an order pin.
+const MAIN_PATH = join(__dirname, '..', '..', 'server', 'main.ts');
+const MAIN = stripComments(readFileSync(MAIN_PATH, 'utf8'));
+// The RAW read, for the ONE pin whose subject IS a comment: the bank_ledger
+// no-sweep asymmetry is a decision that lives beside the table list, and reading
+// it out of MAIN would ask a comment-stripped source for a comment. Everything
+// else keeps MAIN, so a commented-out call still cannot satisfy an order pin.
+const MAIN_RAW = readFileSync(MAIN_PATH, 'utf8');
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
 describe('retention sweep wiring in server/main.ts', () => {
@@ -47,6 +55,13 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      'pruneLevelUpEventsBatch(',
+      'pruneFtueEventsBatch(',
+      'pruneWocBuyNowAbandonsBatch(',
+      'pruneResolvedWocOffersBatch(',
+      'pruneBookedWocCustodyClaimsBatch(',
+      'pruneExpiredWocStepUpChallengesBatch(',
+      'pruneClosedWocListingsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -105,6 +120,15 @@ describe('retention sweep wiring in server/main.ts', () => {
       // per event; each registers its bounded prune with the sweep.
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
+      // The $WOC Exchange retention set; exactly-once is what catches the
+      // splice-duplication hazard the listings entry's own comment records.
+      // Custody claims prune BOOKED rows only (unbooked rows are the operator
+      // queue) and the step-up drain exists for realms that stopped issuing.
+      'pruneWocBuyNowAbandonsBatch(',
+      'pruneResolvedWocOffersBatch(',
+      'pruneBookedWocCustodyClaimsBatch(',
+      'pruneExpiredWocStepUpChallengesBatch(',
+      'pruneClosedWocListingsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
@@ -157,6 +181,72 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain('prunePlayerReportsBatch(config.playerReportRetentionDays, n)');
     expect(MAIN).toContain('pruneBugReportsBatch(config.bugReportRetentionDays, n)');
     expect(MAIN).toContain('pruneChatViolationsBatch(config.chatViolationRetentionDays, n)');
+    expect(MAIN).toContain(
+      'pruneWocBuyNowAbandonsBatch(pool, config.wocMarketAbandonsRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
+      'pruneResolvedWocOffersBatch(pool, config.wocMarketOffersRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
+      'pruneBookedWocCustodyClaimsBatch(pool, config.wocMarketCustodyClaimsRetentionDays, n)',
+    );
+    // Deliberately knobless: expired step-up nonces are garbage, not history,
+    // so the drain takes no retention-days argument to misthread.
+    expect(MAIN).toContain('pruneExpiredWocStepUpChallengesBatch(pool, n)');
+    // The custody-claims window relation check must actually be WIRED (the
+    // helper is unit-tested in the market SQL floor; this catches dead code),
+    // with both knobs threaded in the documented order (whitespace-collapsed
+    // so a formatter reflow cannot red it).
+    const flat = MAIN.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      'wocCustodyClaimsRetentionWarning( config.wocMarketCustodyClaimsRetentionDays, config.wocMarketListingsRetentionDays, )',
+    );
+    // And the answer must reach an operator, not be computed and dropped.
+    expect(flat).toContain('if (claimsRetentionWarn !== null) console.warn(claimsRetentionWarn)');
+    expect(MAIN).toContain(
+      'pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n)',
+    );
+  });
+
+  it('keeps the woc listings prune LAST in the table array', () => {
+    // The tail is the one position a rebase auto-merge cannot splice a new
+    // entry into the preceding object (it has happened twice; the comment at
+    // the entry records it). Order also carries semantics: abandons cascades
+    // and directed offers SET NULL on listing_id, so sweeping listings first
+    // would forge "this offer never became a listing". The old pin only
+    // compared two indexOf positions, so a new entry appended AFTER listings
+    // (the natural landing spot for a merge) stayed green; this one scrapes
+    // the real array and pins the whole order plus the tail.
+    const start = MAIN.indexOf('tables: [');
+    expect(start).toBeGreaterThan(-1);
+    const block = MAIN.slice(start, MAIN.indexOf('onlineSamples:', start));
+    const names = [...block.matchAll(/name: '([a-z_]+)'/g)].map((m) => m[1]);
+    expect(names).toEqual([
+      'chat_logs',
+      'client_perf_reports',
+      'daily_reward_events',
+      'player_activity_daily',
+      'admin_site_presence_samples',
+      'site_presence_sessions',
+      'play_sessions',
+      'account_ip_associations',
+      'unstuck_reports',
+      'password_reset_requests',
+      'email_change_requests',
+      'email_log',
+      'player_reports',
+      'bug_reports',
+      'chat_violations',
+      'level_up_events',
+      'ftue_events',
+      'woc_market_buy_now_abandons',
+      'woc_market_directed_offers',
+      'woc_market_custody_claims',
+      'woc_market_stepup_challenges',
+      'woc_market_listings',
+    ]);
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.at(-1)).toBe('woc_market_listings');
   });
 
   it('sweeps the play-session fold before the association ager', () => {
@@ -213,5 +303,168 @@ describe('retention sweep wiring in server/main.ts', () => {
     ]) {
       expect(interval).toContain(call);
     }
+  });
+
+  it('neither storage receipts nor bank_ledger are placed on the retention sweep', () => {
+    // Refusals now delete synchronously, while successful receipts and the
+    // audit ledger are durable exactly-once evidence. Neither has a sweep arm.
+    const listStart = MAIN.indexOf('saveLastSweepDay:');
+    expect(listStart).toBeGreaterThan(-1);
+    expect(MAIN).not.toContain('pruneRefusedStoragePurchasesBatch');
+    expect(MAIN).not.toContain('storagePurchaseRetentionDays');
+    expect(MAIN).not.toContain('pruneBankLedger');
+    expect(MAIN).not.toContain('DELETE FROM bank_ledger');
+    // And the reason survives next to the list, so the asymmetry reads as a
+    // decision rather than an omission.
+    expect(MAIN_RAW).toContain('bank_ledger is deliberately ABSENT from this table list');
+  });
+
+  it('the login recovery kick is armed BEFORE the socket can deliver a command', () => {
+    // server/ws_auth.ts arms the provisional gold-rail hold synchronously on a
+    // fresh join, and the whole point is that it happens before the message
+    // handler exists: a gold rung buy arriving first would race the
+    // pending-row scan after a restart. This pin is STRUCTURAL and that is all
+    // it is: it compares the index of two literals in a file it never loads, so
+    // it catches deletion and a straight relocation and nothing else. The
+    // EXECUTED covenant, which catches a deferred, conditional or arm-scoped
+    // kick, lives in tests/server/ws_auth_login_covenant.test.ts (ws_auth IS
+    // importable, unlike main.ts; an earlier version of this comment said
+    // otherwise and that is why the behaviour went undriven for nineteen
+    // phases). Both are kept: this one is free and guards the call site's
+    // existence next to the rest of the retention wiring.
+    // Comment-stripped, like MAIN above: read RAW, a commented-out
+    // `// kickStoragePurchaseRecovery(session.characterId);` sitting anywhere
+    // above the handler satisfied both halves of this pin while the real call
+    // was gone.
+    const WS_AUTH = stripComments(
+      readFileSync(join(__dirname, '..', '..', 'server', 'ws_auth.ts'), 'utf8'),
+    );
+    const kick = WS_AUTH.indexOf('kickStoragePurchaseRecovery(session.characterId)');
+    expect(kick).toBeGreaterThan(-1);
+    const handler = WS_AUTH.indexOf("ws.on('message'", kick - 4000 > 0 ? kick - 4000 : 0);
+    expect(handler).toBeGreaterThan(-1);
+    expect(kick).toBeLessThan(handler);
+  });
+
+  it('the storage purchase host resolves sessions through the live-character resolver module', () => {
+    // The quarantined-counts-as-absent predicate and the ambiguity rule moved
+    // to server/live_character_resolver.ts, where they are behaviorally
+    // unit-tested (tests/server/live_character_resolver.test.ts). main.ts's
+    // remaining job, pinned here because main.ts boots a server on import, is
+    // to wire the IMPORTED module functions against the live session table,
+    // exactly once each, and to keep the save flags the flow depends on.
+    expect(MAIN).toContain(
+      'resolveLiveCharacter: (accountId) => resolveLiveCharacterFrom(game.clients.values(), accountId)',
+    );
+    expect(count(MAIN, 'resolveLiveCharacterFrom(')).toBe(1);
+
+    const saveAt = MAIN.indexOf('saveCharacter: (characterId, shouldStart, signal) => {');
+    expect(saveAt).toBeGreaterThan(-1);
+    const saveEnd = MAIN.indexOf('\n    },', saveAt);
+    expect(saveEnd).toBeGreaterThan(saveAt);
+    const saveBody = MAIN.slice(saveAt, saveEnd);
+    expect(saveBody).toContain('findLiveSessionForCharacter(game.clients.values(), characterId)');
+    expect(saveBody).toContain(
+      'game.saveCharacter(session, { shouldStart, signal, backgroundDbPermit: true })',
+    );
+    expect(count(MAIN, 'findLiveSessionForCharacter(')).toBe(1);
+    expect(count(MAIN, 'saveCharacter: (characterId, shouldStart, signal) => {')).toBe(1);
+  });
+
+  it('the storage purchase host stages the atomic save effect on the live game', () => {
+    // The database helper owns receipt + Claudium ledger insertion now. Main's
+    // security-critical job is to stage that immutable payload synchronously
+    // on the exact live GameServer before the coordinator requests its save.
+    const factory = MAIN.indexOf('function storagePurchaseHost()');
+    expect(factory).toBeGreaterThan(-1);
+    // End-anchored to the factory's own registration call, never a fixed
+    // character window (a window overruns into the sibling closures below,
+    // exactly what the resolver pin above rejects).
+    const factoryEnd = MAIN.indexOf(
+      'configureStoragePurchaseRuntime(storagePurchaseHost)',
+      factory,
+    );
+    expect(factoryEnd).toBeGreaterThan(factory);
+    const body = MAIN.slice(factory, factoryEnd);
+    expect(body).toContain(
+      'stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect)',
+    );
+    expect(count(MAIN, 'stageAppliedEffect:')).toBe(1);
+  });
+
+  it('shares one major-background database gate across game, market, storage, and metrics', () => {
+    // Independent subsystem tests can each pass with independent gates while
+    // their combined production concurrency exceeds the pool headroom. Pin the
+    // composition root: one instance, threaded into every major producer and
+    // the readout that operators use to judge its aggregate pressure.
+    expect(count(MAIN, 'createBackgroundDbGate(')).toBe(1);
+    expect(MAIN).toContain(
+      'const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS)',
+    );
+    expect(MAIN).toContain('new GameServer(undefined, majorBackgroundDbGate)');
+    expect(MAIN).toContain(
+      'acquireBackgroundPermit: (signal) => majorBackgroundDbGate.acquire(signal)',
+    );
+    expect(MAIN).toContain('tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire()');
+    expect(MAIN).toContain('backgroundDbGate: () => majorBackgroundDbGate.stats()');
+    // Paid guild creation composes under the SAME gate: game.ts builds the
+    // deps, so the composition root registers the acquirer, exactly once.
+    expect(count(MAIN, 'configurePaidGuildCreateBackgroundGate(')).toBe(1);
+    expect(MAIN).toContain(
+      'configurePaidGuildCreateBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal))',
+    );
+
+    // The escrow enqueue closure: a BOUNDED permit wait (the unbounded form
+    // pinned the character FIFO slot and an escrow-gate hold until the 400s
+    // leak reclaim), and the job NEVER runs on a null permit (the refusal
+    // throw precedes job()).
+    expect(MAIN).toContain('const WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS = 15_000');
+    const custodyStart = MAIN.indexOf('enqueueCharacterWrite: (characterId, job) =>');
+    const custodyEnd = MAIN.indexOf('serializeCharacterForPersist:', custodyStart);
+    const custody = MAIN.slice(custodyStart, custodyEnd);
+    expect(custodyStart).toBeGreaterThan(-1);
+    expect(custodyEnd).toBeGreaterThan(custodyStart);
+    // Whitespace-tolerant (the guild_create pin shape): an indentation-only
+    // reformat must not break the wiring pin.
+    expect(custody).toMatch(
+      /majorBackgroundDbGate\.acquire\(\s*AbortSignal\.timeout\(WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS\),?\s*\)/,
+    );
+    expect(custody.indexOf('enqueueCharacterWrite(characterId, async () => {')).toBeLessThan(
+      custody.indexOf('majorBackgroundDbGate.acquire('),
+    );
+    expect(custody.indexOf('majorBackgroundDbGate.acquire(')).toBeLessThan(
+      custody.indexOf('job()'),
+    );
+    const refusal = custody.indexOf(
+      "throw new Error('woc escrow refused: no background database permit')",
+    );
+    expect(refusal).toBeGreaterThan(-1);
+    expect(custody.indexOf('if (!permit)')).toBeGreaterThan(-1);
+    expect(custody.indexOf('if (!permit)')).toBeLessThan(custody.indexOf('job()'));
+    expect(refusal).toBeLessThan(custody.indexOf('job()'));
+  });
+
+  it('stops admitting storage recovery before the database pool closes', () => {
+    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const stopRecovery = MAIN.indexOf('await stopStoragePurchaseRecovery();', shutdown);
+    const closePool = MAIN.indexOf('await pool.end();', shutdown);
+    expect(shutdown).toBeGreaterThan(-1);
+    expect(stopRecovery).toBeGreaterThan(shutdown);
+    expect(stopRecovery).toBeLessThan(closePool);
+    expect(count(MAIN, 'await stopStoragePurchaseRecovery();')).toBe(1);
+  });
+
+  it('starts the ledger-growth monitor after listen and drains it before pool close', () => {
+    const listen = MAIN.indexOf('server.listen(');
+    const start = MAIN.indexOf('bankLedgerGrowthMonitor.start()');
+    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const stop = MAIN.indexOf('await bankLedgerGrowthMonitor.stop();', shutdown);
+    const closePool = MAIN.indexOf('await pool.end();', shutdown);
+    expect(listen).toBeGreaterThan(-1);
+    expect(start).toBeGreaterThan(listen);
+    expect(stop).toBeGreaterThan(shutdown);
+    expect(stop).toBeLessThan(closePool);
+    expect(count(MAIN, 'bankLedgerGrowthMonitor.start()')).toBe(1);
+    expect(count(MAIN, 'await bankLedgerGrowthMonitor.stop();')).toBe(1);
   });
 });

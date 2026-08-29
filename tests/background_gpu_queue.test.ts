@@ -1398,8 +1398,8 @@ describe('createBackgroundGpuQueue', () => {
     expect(initial).toContain(
       'const priority = debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME;',
     );
-    expect(initial).toContain(
-      'this.backgroundGpuWork.run(piece.run, priority, piece.id, {\n                    releaseTail: true,\n                  }),',
+    expect(initial).toMatch(
+      /this\.backgroundGpuWork\.run\(piece\.run, priority, piece\.id, \{\s+releaseTail: true,\s+\}\),/,
     );
     // A debt ROOT piece is one link and releases its tail under the cap; a
     // debt BATCH (no pieces) still holds it, cosmetic resume releases it.

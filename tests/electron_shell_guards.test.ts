@@ -169,11 +169,16 @@ describe('buildContentSecurityPolicy', () => {
     expect(directive('script-src')).toContain("'sha256-abc123'");
   });
 
-  it('lists the HTTPS API origin, wss:, and blob: explicitly in connect-src', () => {
+  it('lists the HTTPS API origin, wss:, blob:, and data: explicitly in connect-src', () => {
     expect(directive('connect-src')).toContain('https://worldofclaudecraft.com');
     expect(directive('connect-src')).toContain('wss:');
     // blob: is required: GLTFLoader fetch()es a model's embedded textures as blob: URLs.
     expect(directive('connect-src')).toContain('blob:');
+    // data: is required: three's ZSTDDecoder (KTX2Loader's Zstandard path for UASTC
+    // normal/occlusion maps) instantiates its WASM via fetch("data:application/wasm;base64,..."),
+    // a connect-src request to a data: URI. Without it every Zstandard KTX2 GLB is refused and
+    // world entry dies on the desktop shell (issue: desktop CSP blocked the KTX2 zstd decoder).
+    expect(directive('connect-src')).toContain('data:');
   });
 
   it('allows the matching WebSocket origin for a local HTTP API', () => {

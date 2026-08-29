@@ -19,7 +19,10 @@
 import * as THREE from 'three';
 import { TH_PLACEMENTS } from '../sim/thornhollow_field.generated';
 import { loadGltf, loadTexture } from './assets/loader';
-import { registerDeferredPreload } from './assets/preload';
+import {
+  type BattlegroundAssetPrewarmUnit,
+  createBattlegroundAssetPrewarm,
+} from './battleground_asset_prewarm';
 import {
   BG_FLOOR_Y,
   BG_TEXTURE_DIR,
@@ -35,7 +38,9 @@ import { type BgPlacementsView, buildBattlegroundPlacements } from './battlegrou
 import { type BgTerrainView, buildBattlegroundTerrain } from './battleground_terrain';
 import { type BgWardState, type BgWardView, buildBgWards } from './battleground_ward';
 import { ensureDungeonAssets } from './dungeon';
+import { attachSceneGroupGated } from './gated_scene_attach';
 import { GFX } from './gfx';
+import { idleSlot } from './idle_queue';
 import { freezeStaticMatrices } from './static_matrix';
 
 export * from './battleground_core';
@@ -68,31 +73,49 @@ export function battlegroundPreloadAssetPaths(): BattlegroundPreloadAssetPaths {
   };
 }
 
-let battlegroundAssetsPromise: Promise<void> | null = null;
+const BG_PREWARM_IDLE_TIMEOUT_MS = 120;
+const BG_PREWARM_BATCH_SIZE = 2;
 
-export function ensureBattlegroundAssets(): Promise<void> {
-  battlegroundAssetsPromise ??= (() => {
-    const assets = battlegroundPreloadAssetPaths();
-    return Promise.all([
-      ensureDungeonAssets(),
-      ...assets.models.map((path) => loadGltf(path)),
-      ...assets.textures.map(({ path, srgb }) => loadTexture(path, { srgb })),
-    ]).then(() => undefined);
-  })();
-  return battlegroundAssetsPromise;
+const structuralModel = (path: string): boolean =>
+  /\/(?:wall|barrier|fence|pillar|tower|arch|gate|banner)/.test(path);
+
+/** Lazily materialized so players who never show PvP intent do not even decode
+ * the generated placement table to build this ordering. Ground comes first,
+ * then collision-readable structures, ordinary props, foliage, and decals. */
+function battlegroundAssetPrewarmUnits(): BattlegroundAssetPrewarmUnit[] {
+  const assets = battlegroundPreloadAssetPaths();
+  const paint = assets.textures.filter((texture) => !texture.srgb);
+  const decals = assets.textures.filter((texture) => texture.srgb);
+  const structures = assets.models.filter(structuralModel);
+  const props = assets.models.filter(
+    (path) => !structuralModel(path) && !path.includes('/foliage/'),
+  );
+  const foliage = assets.models.filter((path) => path.includes('/foliage/'));
+  return [
+    { id: 'shared:dungeon-kit', run: ensureDungeonAssets },
+    ...paint.map(({ path, srgb }) => ({
+      id: `texture:${path}`,
+      run: () => loadTexture(path, { srgb }),
+    })),
+    ...[...structures, ...props, ...foliage].map((path) => ({
+      id: `model:${path}`,
+      run: () => loadGltf(path),
+    })),
+    ...decals.map(({ path, srgb }) => ({
+      id: `texture:${path}`,
+      run: () => loadTexture(path, { srgb }),
+    })),
+  ];
 }
 
-// The BACKGROUND lane, not just deferred: the field's art is only ever needed
-// by a player who enters the band, and buildBattleground() (below) already
-// streams its own pieces in as they resolve rather than reading the cache
-// synchronously (a player who arrives mid-stream sees the field fill in
-// rather than nothing at all), so it tolerates its preload finishing after
-// first frame too. Boot must not spend time on tens of MB of match art most
-// sessions never load into, on top of not competing with the launcher's own
-// fetches.
-if (typeof window !== 'undefined') {
-  registerDeferredPreload(() => ensureBattlegroundAssets(), 'background');
-}
+export const battlegroundAssetPrewarm = createBattlegroundAssetPrewarm(
+  battlegroundAssetPrewarmUnits,
+  {
+    idle: () =>
+      idleSlot(BG_PREWARM_IDLE_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }).then(() => undefined),
+    batchSize: BG_PREWARM_BATCH_SIZE,
+  },
+);
 
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {
@@ -107,6 +130,12 @@ export interface BattlegroundLightHooks {
   /** Called after the field pushes lights into, or splices them out of,
    *  `fireLights`, so the renderer can rebuild its light rank. */
   onFireLightsChanged?: () => void;
+  /** The renderer's async shader-compile gate (renderer.compileGate). When
+   *  present, every streamed field piece attaches hidden and reveals only once
+   *  its programs are linked (gated_scene_attach.ts); absent means no
+   *  KHR_parallel_shader_compile, so pieces attach direct and link at first
+   *  draw, exactly as before. */
+  compileGate?: (target: THREE.Object3D) => Promise<unknown>;
 }
 
 /** Authored intensities are map units; the renderer's lights are much dimmer. */
@@ -256,19 +285,27 @@ function buildGrass(): THREE.Mesh | null {
   return mesh;
 }
 
-/** The authored blood decals in the Fightpit: flat, ground-hugging quads. */
+/** The authored blood decals in the Fightpit: flat, ground-hugging quads.
+ *  ONE material per texture, shared across every quad that paints it: the
+ *  compile gate cuts its queue units per material, so a per-quad material
+ *  would submit a dozen units for one program's worth of work. */
 async function buildDecals(heightAt: (x: number, z: number) => number): Promise<THREE.Mesh[]> {
   const out: THREE.Mesh[] = [];
+  const matByTex = new Map<string, THREE.MeshBasicMaterial>();
   for (const d of bgFieldDecals()) {
     try {
-      const tex = await loadTexture(`${BG_TEXTURE_DIR}/decals/${d.tex}.webp`, { srgb: true });
+      let mat = matByTex.get(d.tex);
+      if (!mat) {
+        const tex = await loadTexture(`${BG_TEXTURE_DIR}/decals/${d.tex}.webp`, { srgb: true });
+        mat = new THREE.MeshBasicMaterial({
+          map: tex,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0.85,
+        });
+        matByTex.set(d.tex, mat);
+      }
       const geo = new THREE.PlaneGeometry(d.size, d.size);
-      const mat = new THREE.MeshBasicMaterial({
-        map: tex,
-        transparent: true,
-        depthWrite: false,
-        opacity: 0.85,
-      });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.rotation.set(-Math.PI / 2, 0, d.rot);
       mesh.position.set(d.x, heightAt(d.x, d.z) + BG_FLOOR_Y, d.z);
@@ -305,6 +342,33 @@ export function buildBattleground(
   // (the paint texture array, one GLB per asset group), and the renderer's
   // build call is synchronous. Everything lands in the same group, so a player
   // who arrives mid-stream sees the field fill in rather than nothing at all.
+  // Queue intent normally commits the prewarm first; reconnecting directly
+  // into an active match deliberately takes this fail-soft streaming path.
+  //
+  // Gate COMPILATION, not availability: the group is already live in the scene
+  // while the field streams, so a piece added visible would link its shader
+  // programs synchronously on its first visible frame (the first-match hitch).
+  // Each piece still attaches the moment its load lands, hidden, and reveals
+  // once its own programs are linked; each piece submits its own gate, and the
+  // renderer's shared queue owns pacing and order, so the field keeps filling
+  // in piece by piece. Dispose cancels a pending reveal; the dispose()/disposed
+  // guards below keep owning every resource release, exactly as ungated.
+  //
+  // The trade this inherits from the interiors seam, stated out loud: on a
+  // reconnect into a live match the client stays responsive while collider-
+  // bearing pieces (the terrain and placements ARE the colliders) are still
+  // linking, so a wall can block invisibly for the link duration, where it
+  // used to freeze the whole frame for that same time. The mirror image also
+  // holds: entity views carry their own gate and reveal independently, so for
+  // the same window a fighter can be visible THROUGH a keep wall that has not
+  // drawn yet. Both are transient, tier-neutral, and the same trade the
+  // interiors seam ships. A reach floor or imminence elevation is the tracked
+  // follow-up if fleet attach-watchdog captures show that window mattering.
+  const attachPieceGated = (piece: THREE.Object3D): void => {
+    void attachSceneGroupGated(group, piece, opts.compileGate, () => disposed).catch(() => {
+      // A field retired mid-gate cancels its reveal; dispose() owns teardown.
+    });
+  };
   void (async () => {
     try {
       const { bgFieldHeightLocal } = await import('../sim/battleground_field');
@@ -313,12 +377,21 @@ export function buildBattleground(
         terrain.dispose();
         return;
       }
-      group.add(terrain.group);
+      attachPieceGated(terrain.group);
 
-      // The wards go up with the ground: they are the visible half of rules the
-      // sim already enforces, so they must not wait on the art stream.
+      // The wards go up with the ground: they are the visible half of rules
+      // the sim already enforces, so their AVAILABILITY is never gated (a
+      // rule enforced behind a hidden ward is exactly the invisible refusal
+      // this module exists to prevent, and a gated reveal rides the queue's
+      // priority and the initial-paint barrier, seconds behind on a slow
+      // driver). They attach visible immediately; the gate is only their fast
+      // path for the link itself: prewarm the one small shared ward program
+      // off-thread now, so the first countdown reveal finds it already linked
+      // instead of paying a first-draw sync link. Fail-soft on rejection: the
+      // ungated first-draw link is the same tiny cost as before this seam.
       wards = buildBgWards();
       group.add(wards.group);
+      void opts.compileGate?.(wards.group).catch(() => undefined);
       if (pendingWard) wards.setState(pendingWard);
 
       placements = await buildBattlegroundPlacements(bgAssetGroups(), { lowGfx: opts.lowGfx });
@@ -326,17 +399,42 @@ export function buildBattleground(
         placements.dispose();
         return;
       }
-      group.add(placements.group);
+      attachPieceGated(placements.group);
 
       const grass = buildGrass();
       if (grass) {
+        // Named so a stuck gate's watchdog event attributes to the field.
+        grass.name = 'battleground-grass';
         owned.push(grass.geometry, grass.material as THREE.Material);
-        group.add(grass);
+        attachPieceGated(grass);
       }
 
-      for (const mesh of await buildDecals(bgFieldHeightLocal)) {
-        owned.push(mesh.geometry, mesh.material as THREE.Material);
-        group.add(mesh);
+      const decalMeshes = await buildDecals(bgFieldHeightLocal);
+      // The decal load has no early-out of its own: on a field retired while
+      // it was in flight, release the meshes inline (their maps stay owned by
+      // the loader cache) instead of attaching them to a dead group.
+      if (disposed) {
+        const releasedMats = new Set<THREE.Material>();
+        for (const mesh of decalMeshes) {
+          mesh.geometry.dispose();
+          releasedMats.add(mesh.material as THREE.Material);
+        }
+        for (const mat of releasedMats) mat.dispose();
+        return;
+      }
+      if (decalMeshes.length > 0) {
+        // One gate for the whole decal family: one shared material per
+        // texture (buildDecals), so the queue sees a couple of pieces.
+        const decalGroup = new THREE.Group();
+        decalGroup.name = 'battleground-decals';
+        const decalMats = new Set<THREE.Material>();
+        for (const mesh of decalMeshes) {
+          owned.push(mesh.geometry);
+          decalMats.add(mesh.material as THREE.Material);
+          decalGroup.add(mesh);
+        }
+        owned.push(...decalMats);
+        attachPieceGated(decalGroup);
       }
 
       // Fire: one Points draw per fixture family for the WHOLE field, animated
@@ -357,13 +455,12 @@ export function buildBattleground(
         });
         if (flames) {
           owned.push(flames.geometry, flames.material as THREE.Material);
-          group.add(flames);
+          attachPieceGated(flames);
         }
       }
 
-      // The awaits above can resolve after the view was torn down (the decal
-      // load has no early-out of its own): a light registered then would rank,
-      // and shine, for a field that no longer exists.
+      // Belt over the early-outs above: a light registered on a torn-down
+      // field would rank, and shine, for a field that no longer exists.
       if (disposed) return;
       for (const light of buildBgFieldLights(opts.fireLights)) {
         lights.push(light);

@@ -44,9 +44,19 @@ import {
   isFenbridgeRebuildWell,
 } from './fenbridge_town';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import {
+  type KitSurfaceFamily,
+  kitHasUvSurfaceRouting,
+  splitKitSurfacesByUv,
+} from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceOccluderFade,
+  applyOccluderFade,
+  type OccluderFadeMat,
+  occluderFadeRecordFor,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,
@@ -57,7 +67,7 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
-import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
+import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -110,11 +120,11 @@ export interface PropsResult {
   /**
    * The same gate for the merged and instanced BANDS: a band's first fog
    * reveal on a walking approach is held hidden until the gate warms its key
-   * (prop_cull_core). Armed separately, at world entry: under the curtain
-   * the bands beyond half the fog would otherwise queue their compiles
-   * beside the manifest's near-first units, while the initial frame links
-   * whatever is visible anyway; unarmed, a band keeps the historical
-   * immediate cull and latches as revealed.
+   * (prop_cull_core). Installed at the start of every scene prewarm, including
+   * graphics rebuilds. The initial-entry first-paint barrier keeps its work
+   * behind the manifest; rebuild prewarms have no barrier and preserve the
+   * historical immediate compile start. Without a gate, a band keeps the
+   * historical immediate cull and latches as revealed.
    */
   setBandRevealGate(gate: RevealGateCore | null): void;
   /** The compile roots behind a gate key: a far cell's bake meshes, its
@@ -284,6 +294,18 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // ship memorial on the Wickharbor dock plaza, the golden horse for the
   // stable yard
   shipMonument: { url: '/models/props/ship_monument.glb', kit: 'kgale' },
+  // A kit is a material-dedup NAMESPACE: every file in one must share the
+  // same flat atlas. These four /models/biome/ hulls and buoys ship a
+  // different atlas from the two /models/props/ pirate files, so holding
+  // them all in one kit made the materials collide and the first file
+  // extracted handed its atlas to the rest: the rowboats rendered in the
+  // sea atlas's near-white palette cell instead of their authored brown,
+  // and the dock platforms washed out to pink-grey. Separate namespace,
+  // separate atlas, both correct again.
+  seaBoatSailA: { url: '/models/biome/sea_boat_sail_a.glb', kit: 'pirateSea' },
+  seaBoatFishing: { url: '/models/biome/sea_boat_fishing.glb', kit: 'pirateSea' },
+  seaBuoy: { url: '/models/biome/sea_buoy.glb', kit: 'pirateSea' },
+  seaBuoyFlag: { url: '/models/biome/sea_buoy_flag.glb', kit: 'pirateSea' },
   goldenHorseStatue: { url: '/models/props/golden_horse_statue.glb', kit: 'kgale' },
   // a placeable oak (the foliage kit's biggest crown) for authored shade
   // spots like the Garden Gate lawns; decor entries set scale, r is trunk
@@ -645,6 +667,11 @@ function convertMaterial(
   src: THREE.Material,
   kit: string,
   hasVertexColors: boolean,
+  /** When present, overrides the (kit, material name) surface-detail routing
+   *  for this one material: the per-triangle UV router below resolves a family
+   *  the shared atlas material name cannot express. `undefined` keeps the
+   *  normal routing; an explicit `null` means "no detail layer". */
+  familyOverride?: WornFamilyPick | null,
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
@@ -657,7 +684,15 @@ function convertMaterial(
   // cutout one (the placeable oak's leaf cards) renders as opaque quads without
   // them, and would otherwise share a cached material with an opaque namesake.
   const alphaTest = s.alphaTest ?? 0;
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}`;
+  // The surface-detail family must key the cache too. One kit atlas serves
+  // hulls, sails and masonry alike, so the SAME (kit, material name) pair
+  // now resolves to different families per triangle group; without this the
+  // first group extracted would hand its detail layer to all the others.
+  const famKey =
+    familyOverride === undefined
+      ? ''
+      : `${familyOverride?.family ?? 'none'}${familyOverride?.strength ?? ''}`;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}|f${famKey}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -723,11 +758,14 @@ function convertMaterial(
   // the SOURCE material name (s.name), which keys the cache; the context
   // flags keep emissive/transparent surfaces clean and let Tripo props that
   // ship their own PBR maps skip the bare-coverage fallback.
-  const worn = wornFamilyFor(kit, s.name, {
-    emissive: !!hollowEmissive || (ov?.emissive ?? 0) !== 0,
-    transparent: s.transparent === true,
-    hasOwnMaps: !!(s.normalMap || s.roughnessMap),
-  });
+  const worn =
+    familyOverride !== undefined
+      ? familyOverride
+      : wornFamilyFor(kit, s.name, {
+          emissive: !!hollowEmissive || (ov?.emissive ?? 0) !== 0,
+          transparent: s.transparent === true,
+          hasOwnMaps: !!(s.normalMap || s.roughnessMap),
+        });
   if (worn) {
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, {
       strength: worn.strength,
@@ -743,6 +781,97 @@ function convertMaterial(
 
 /** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
  *  footprint center with min-y at 0, materials converted + deduped */
+// Props whose ONE atlas material covers genuinely different surfaces, so the
+// detail layer has to be chosen per triangle from the UV swatch rather than
+// per material. Scoped to this list on purpose: the same kit's buildings read
+// correctly on the kit-wide routing today, and re-splitting all 65 of them
+// would churn the town's draw and material counts for no reported problem.
+const UV_SURFACE_SPLIT_KEYS: ReadonlySet<string> = new Set([
+  'hexShipBlue',
+  'hexShipRed',
+  'hexShipGreen',
+  'hexBoat',
+  'hexWatchtower',
+]);
+
+/** Detail family per UV group. Stone stays stone: on these models it is the
+ *  ship's deck plate and the tower's footing pads and iron hoop, which are
+ *  authored as masonry and metal and should not read as planking. */
+const UV_GROUP_FAMILY: Readonly<Record<KitSurfaceFamily, WornFamilyPick>> = Object.freeze({
+  wood: { family: 'wood', strength: 0.35 },
+  cloth: { family: 'fabric', strength: 0.3 },
+  stone: { family: 'stone', strength: 0.4 },
+});
+
+/**
+ * Split one extracted geometry into per-family sub-geometries by UV swatch.
+ * Returns null when the kit has no routing, the mesh has no index or uvs, or
+ * ANY triangle came back unresolved: a partial split would silently drop
+ * geometry, so the whole mesh falls back to normal routing instead.
+ */
+function splitGeometryBySurface(
+  geo: THREE.BufferGeometry,
+  kit: string,
+): { family: KitSurfaceFamily; geo: THREE.BufferGeometry }[] | null {
+  if (!kitHasUvSurfaceRouting(kit)) return null;
+  const uv = geo.getAttribute('uv');
+  const index = geo.getIndex();
+  if (!uv || !index) return null;
+  const split = splitKitSurfacesByUv(
+    kit,
+    uv.array as ArrayLike<number>,
+    index.array as ArrayLike<number>,
+  );
+  if (split.unresolved > 0) return null;
+  const out: { family: KitSurfaceFamily; geo: THREE.BufferGeometry }[] = [];
+  for (const [family, indices] of Object.entries(split.groups)) {
+    if (!indices?.length) continue;
+    // Clone rather than share attribute buffers: each part is translated
+    // independently when the origin is normalized below, and shared buffers
+    // would take that translation once per part.
+    const part = geo.clone();
+    part.setIndex(indices);
+    out.push({ family: family as KitSurfaceFamily, geo: part });
+  }
+  return out.length > 1 ? out : null;
+}
+
+/**
+ * Atlas-cell corrections applied to a prop's uvs at extraction.
+ *
+ * Some kit models are AUTHORED reading a palette cell that is wrong for the
+ * part: the fishing hull samples a near-white lavender swatch, so it renders
+ * as a white boat sitting in a working harbour. Retargeting the uv here rather
+ * than editing the shipped GLB keeps the asset, its fingerprint pins and its
+ * media-manifest entry untouched, and keeps the correction reviewable in code
+ * next to the reason for it.
+ *
+ * `shiftU` moves a matched vertex by whole palette columns (the atlas is a
+ * 16-cell grid, so one column is 0.0625).
+ */
+const UV_CELL_FIXES: Readonly<
+  Record<string, { matchU: number; minV: number; maxV: number; shiftU: number }>
+> = Object.freeze({
+  // hull only: its cell is shared with nothing else on this mesh, and the
+  // blue cabin and grey fittings sample other columns, so they keep their
+  // authored colours.
+  seaBoatFishing: { matchU: 0.71868, minV: 0.77, maxV: 0.98, shiftU: 0.125 },
+});
+
+/** Apply the atlas-cell correction for a key, in place, if it has one. */
+function applyUvCellFix(geo: THREE.BufferGeometry, key: PropKey): void {
+  const fix = UV_CELL_FIXES[key];
+  const uv = geo.getAttribute('uv') as THREE.BufferAttribute | undefined;
+  if (!fix || !uv) return;
+  const arr = uv.array as Float32Array;
+  for (let i = 0; i < arr.length; i += 2) {
+    if (Math.abs(arr[i] - fix.matchU) > 0.002) continue;
+    if (arr[i + 1] < fix.minV || arr[i + 1] > fix.maxV) continue;
+    arr[i] += fix.shiftU;
+  }
+  uv.needsUpdate = true;
+}
+
 function propAsset(key: PropKey): PropAsset {
   const cached = extractCache.get(key);
   if (cached) return cached;
@@ -776,11 +905,24 @@ function propAsset(key: PropKey): PropAsset {
     // toFloatAttr denormalizes the uint8 COLOR_0, alpha is 1.0 kit-wide
     const col = src.getAttribute('color');
     if (col) geo.setAttribute('color', toFloatAttr(col, 3));
+    applyUvCellFix(geo, key);
     if (src.index) geo.setIndex(src.index.clone());
     geo.applyMatrix4(mesh.matrixWorld);
     if (yawM) geo.applyMatrix4(yawM);
     if (!geo.getAttribute('normal')) geo.computeVertexNormals();
-    parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col), name: mesh.name });
+    const bySurface = UV_SURFACE_SPLIT_KEYS.has(key) ? splitGeometryBySurface(geo, def.kit) : null;
+    if (bySurface) {
+      for (const group of bySurface) {
+        parts.push({
+          geo: group.geo,
+          mat: convertMaterial(srcMat, def.kit, !!col, UV_GROUP_FAMILY[group.family]),
+          name: `${mesh.name}:${group.family}`,
+        });
+      }
+      geo.dispose();
+    } else {
+      parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col), name: mesh.name });
+    }
   });
   if (!parts.length) throw new Error(`prop asset has no meshes: ${key}`);
   // normalize origin: xz-center at 0, base at y=0
@@ -1198,6 +1340,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
     const matMap = new Map<THREE.Material, OccluderFadeMat>();
+    const mats: OccluderFadeMat[] = [];
     const bakeMeshes: HideableBakeMesh[] = [];
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -1221,14 +1364,19 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         // ghost's OPAQUE program is the source's own; only the transparent
         // fade variant remains a distinct (prewarmable) key.
         const ghostSrc = cloneMaterialWithHooks(src);
-        tm = occluderFadeMat(ghostSrc);
+        tm = occluderFadeRecordFor(mats, ghostSrc, mesh);
         matMap.set(src, tm);
+      } else {
+        // A second mesh of the same kit material on another program (an
+        // instanced part, another attribute set) gets its own record, so the
+        // fade gate links that program too before the shared clone flips.
+        occluderFadeRecordFor(mats, tm.mat, mesh);
       }
       mesh.material = tm.mat;
     });
     hideables.push({
       group: g,
-      mats: [...matMap.values()],
+      mats,
       hidden: false,
       alpha: 1,
       cellKey: propCellKey(fp.x, fp.z),
@@ -1684,18 +1832,32 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
-  getActiveWorldContent().props.crates.forEach(([x, z], i) => {
+  getActiveWorldContent().props.crates.forEach(([x, z, stack], i) => {
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
+    // Unit height mirrors campCrateShape (prop_layout.ts): barrel 1.13,
+    // crate 0.878 * scale. Stacked levels sit flush on each other's tops so
+    // the drawn pile and the collider top agree.
+    const unitH = kind === 'barrel' ? 1.13 : 0.878 * s;
     const y = ground(x, z);
     const g = new THREE.Group();
-    addParts(g, kind, {
-      scale: s,
-      euler: new THREE.Euler((propRand(x, z, 7) - 0.5) * 0.05, ((x * 13 + z * 7) % 1) * Math.PI, 0),
-    });
+    const levels = stack ?? 1;
+    for (let level = 0; level < levels; level++) {
+      const holder = new THREE.Group();
+      addParts(holder, kind, {
+        scale: s,
+        euler: new THREE.Euler(
+          level === 0 ? (propRand(x, z, 7) - 0.5) * 0.05 : 0,
+          ((x * 13 + z * 7 + level * 5) % 1) * Math.PI,
+          0,
+        ),
+      });
+      holder.position.y = level * unitH;
+      g.add(holder);
+    }
     g.position.set(x, y - 0.04, z);
     group.add(shadowed(g));
-    registerHideable(g, circleFootprint(x, z, 0.65, y + 1.35));
+    registerHideable(g, circleFootprint(x, z, 0.65, y + 1.35 + (levels - 1) * unitH));
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --
@@ -1908,21 +2070,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
+    // The dock's uniform scale (dock_layout.ts): the surface line lives in
+    // UNIT-local z, so world placement multiplies by ds and the pitch reads
+    // the slope back through it.
+    const ds = d.scale ?? 1;
     const surfaceLine = dockSurfaceLine(d, ground);
-    const pitch = -Math.atan(surfaceLine.slope);
-    const zScale = 0.85 / Math.cos(pitch);
+    const pitch = -Math.atan(surfaceLine.slope / ds);
+    const zScale = (0.85 / Math.cos(pitch)) * ds;
     for (let i = 0; i < DOCK_SECTION_LOCAL_Z.length; i++) {
       const lz = DOCK_SECTION_LOCAL_Z[i];
       const section = new THREE.Group();
-      section.position.set(0, dockSurfaceYAt(surfaceLine, lz) - y, lz);
+      section.position.set(0, dockSurfaceYAt(surfaceLine, lz) - y, lz * ds);
       section.rotation.x = pitch;
       g.add(section);
       // Pivot around the plank surface, not the post feet. Every section then
       // lies on the same analytic plane exposed by groundHeight. Compensating
       // z scale preserves the authored footprint after the pitch projection.
       addParts(section, 'dockPlatform', {
-        y: -DOCK_SECTION_SURFACE_Y,
-        scale: [0.78, 0.52, zScale],
+        y: -DOCK_SECTION_SURFACE_Y * ds,
+        scale: [0.78 * ds, 0.52 * ds, zScale],
       });
     }
     // hw/hd 0 means this dock carries no stone hut (e.g. the Farshore Landing).
@@ -1948,22 +2114,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // ground sample: the shore undulates around the anchor.
       DOCK_DRESSING.forEach((dd, i) => {
         const off = {
-          x: dd.x * Math.cos(d.rot) + dd.z * Math.sin(d.rot),
-          z: -dd.x * Math.sin(d.rot) + dd.z * Math.cos(d.rot),
+          x: (dd.x * Math.cos(d.rot) + dd.z * Math.sin(d.rot)) * ds,
+          z: (-dd.x * Math.sin(d.rot) + dd.z * Math.cos(d.rot)) * ds,
         };
         addParts(g, i === 2 ? 'crateWooden' : 'barrel', {
-          x: dd.x,
+          x: dd.x * ds,
           y: ground(d.x + off.x, d.z + off.z) - y,
-          z: dd.z,
+          z: dd.z * ds,
           rot: keyRand(key, 5 + i) * Math.PI,
-          scale: dd.scale ?? 1,
+          scale: (dd.scale ?? 1) * ds,
         });
       });
     }
     // rowboat beside the deck's far end: floats at water level when the
     // shore dips below it, otherwise sits hauled up on the bank
-    const boatLx = DOCK_BOAT.x,
-      boatLz = DOCK_BOAT.z;
+    const boatLx = DOCK_BOAT.x * ds,
+      boatLz = DOCK_BOAT.z * ds;
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
@@ -1974,7 +2140,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       z: boatLz,
       y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
       rot: DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4,
-      scale: 0.85,
+      scale: 0.85 * ds,
       euler: isAfloat
         ? undefined
         : new THREE.Euler(0.04, DOCK_BOAT.rot + (keyRand(key, 8) - 0.5) * 0.4, 0.16),
@@ -2401,11 +2567,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         }
         // Ghost on every tier with the same timing while keeping the obstacle's
         // silhouette and shadow. Per-structure clones keep the change local.
+        prefetchOccluderFadeWithin(h.mats, h.x, h.z, camX, camZ);
         const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
         h.hidden = hide;
-        if (occluderFadeSettled(h.alpha, hide)) continue;
-        h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
-        applyOccluderFade(h.mats, h.alpha);
+        h.alpha = advanceOccluderFade(h.mats, h.alpha, hide, dt, reducedMotion);
       }
     },
   };

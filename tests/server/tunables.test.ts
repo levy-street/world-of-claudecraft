@@ -25,6 +25,9 @@ import { describe, expect, it, vi } from 'vitest';
 // capture recipe passes the knob on the command line for exactly that
 // reason.
 delete process.env.DB_POOL_MAX_CLIENTS;
+// Same protection for the storage-price knob (server/storage_prices.ts), which
+// is likewise reached EXCLUSIVELY through dynamic imports inside its tests.
+delete process.env.STORAGE_PRICES;
 
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
@@ -109,9 +112,12 @@ const count = (haystack: string, needle: string): number => haystack.split(needl
 // A raw-source .toContain() is comment-gameable: commenting the pinned line out
 // leaves its text sitting in the comment, so the pin stays falsely green while
 // the wiring is dead (confirmed by experiment against the env-wiring pin
-// below). Strip // line comments before any structural match, keeping ://
-// protocol slashes.
-const codeOnly = (src: string): string => src.replace(/(^|[^:])\/\/.*$/gm, '$1');
+// below). Strip whole-line /* */ blocks first (anchored to line starts: an
+// UNANCHORED match lets a '/*' inside a // comment open a false block that
+// swallows hundreds of live lines), then // line comments, keeping ://
+// protocol slashes: either comment form around a pinned line must red it.
+const codeOnly = (src: string): string =>
+  src.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 describe('server timeouts (server/http/server_timeouts.ts)', () => {
   it('the four constants equal the installed Node http defaults', () => {
@@ -480,6 +486,209 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(getPoolClientErrorCount()).toBe(before + 1);
   });
 
+  it('the escrow listing allowance sits between the lock ceiling and the session default', async () => {
+    const { DB_STATEMENT_TIMEOUT_MS, DB_HEAVY_STATEMENT_TIMEOUT_MS } = await import(
+      '../../server/db'
+    );
+    const {
+      ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS,
+      ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS,
+      ESCROW_LEDGER_WORKLOAD_STATEMENTS,
+      ESCROW_STATEMENT_TIMEOUT_MS,
+      ESCROW_LOCK_TIMEOUT_MS,
+      GUARD_IDLE_TX_TIMEOUT_MS,
+      SAVE_IDLE_TX_TIMEOUT_MS,
+    } = await import('../../server/woc_market_db');
+    const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
+      await import('../../server/woc_market_custody');
+    // The statement allowance applies per query. Pin all three supported
+    // shapes so adding a save effect cannot leave the occupancy math stale.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(4_000);
+    expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
+    expect(ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS).toBe(5);
+    expect(ESCROW_LEDGER_WORKLOAD_STATEMENTS).toBe(6);
+    expect(ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS).toBe(12);
+    // Equal BY RULING (the idle bound and the lock wait tell one story).
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
+    expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(ESCROW_LOCK_TIMEOUT_MS);
+    // The save-bearing pair's wider idle bound: the character serialize runs
+    // between statements (idle to Postgres), so the 2s guard bound would
+    // false-fire on an ordinary stall and lose the grant for the pass. It
+    // must sit strictly above the guard bound and stay finite.
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBe(10_000);
+    expect(SAVE_IDLE_TX_TIMEOUT_MS).toBeGreaterThan(GUARD_IDLE_TX_TIMEOUT_MS);
+    // The HTTP-side queue bounds: the wait deadline mirrors the pool's own
+    // 5s checkout deadline, and slow waits warn before they refuse.
+    expect(ESCROW_QUEUE_WAIT_MS).toBe(5_000);
+    expect(ESCROW_QUEUE_WARN_MS).toBe(2_000);
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBe(30_000);
+    // The warn must be REACHABLE before the deadline refuses: a warn sitting at
+    // or above the wait would only ever fire on waits that already failed, so
+    // the slow-but-served band (the one an operator wants to see coming) would
+    // never log at all.
+    expect(ESCROW_QUEUE_WARN_MS).toBeLessThan(ESCROW_QUEUE_WAIT_MS);
+    // And the throttle covers at least one whole wait, which is what makes it
+    // one line per burst rather than one line per waiter: a throttle shorter
+    // than the deadline would let a single pile-up log repeatedly.
+    expect(ESCROW_QUEUE_WARN_THROTTLE_MS).toBeGreaterThanOrEqual(ESCROW_QUEUE_WAIT_MS);
+    // The escrow transaction heads a character's save FIFO (the H5 custody
+    // entry), so its allowance must sit under the ordinary session default
+    // and far under one autosave period; the 60s heavy allowance stays
+    // reserved for the logout-shaped saves whose loss is data loss. It must
+    // also sit ABOVE the 2s lock-wait ceiling so a contended row surfaces as
+    // the typed 55P03 refusal, never as a statement cancel.
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+    expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
+    // The escrow FIFO-occupancy relation, and it bounds exactly this much: the
+    // workload statements plus the lock wait plus the pool checkout. Only the
+    // five-statement base stays under one autosave period; a personal-ledger
+    // prefix is six statements and the live ledger-plus-one-storage maximum is
+    // twelve. It is NOT the whole worst case: BEGIN and the SET
+    // LOCAL that installs the allowance run under the 15s session default, the
+    // two LATER SET LOCALs run under the 4s allowance but are protocol
+    // statements with no locks, IO, or planning (excluded from the sum on
+    // that ground), COMMIT's only hard bound is the 65s driver
+    // query_timeout backstop, and the PRE-JOB GUILD FLUSH (an ordinary
+    // saveCharacter the escrow path triggers first, on the SAME FIFO) rides
+    // the 60s heavy allowance, the dominant term of the whole tail (its own
+    // relation is pinned below), so a genuinely wedged sequence CAN exceed
+    // one autosave interval. What bounds the player-facing impact there is
+    // the queue wait deadline plus the depth cap, not this sum.
+    // AUTOSAVE_SECONDS is a game.ts MODULE-PRIVATE const, so a re-typed 30_000
+    // here would stay green after a re-tuned save cadence; scrape it (comments
+    // stripped first, the file's own idiom) and let the relation follow it.
+    const { DB_POOL_CONNECT_TIMEOUT_MS } = await import('../../server/db');
+    const autosaveMatch = codeOnly(read('server/game.ts')).match(
+      /^const AUTOSAVE_SECONDS = (\d+);$/m,
+    );
+    expect(autosaveMatch).not.toBeNull();
+    // A failed scrape yields NaN, and the relation below would then red with a
+    // comparison message that says nothing about the real cause, so the parse
+    // asserts for itself first.
+    const autosaveMs = Number(autosaveMatch?.[1]) * 1000;
+    expect(autosaveMs).toBeGreaterThan(0);
+    const workloadCeiling = (statements: number): number =>
+      ESCROW_STATEMENT_TIMEOUT_MS * statements +
+      ESCROW_LOCK_TIMEOUT_MS +
+      DB_POOL_CONNECT_TIMEOUT_MS;
+    const baseWorkloadCeilingMs = workloadCeiling(ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS);
+    const ledgerWorkloadCeilingMs = workloadCeiling(ESCROW_LEDGER_WORKLOAD_STATEMENTS);
+    const maxWorkloadCeilingMs = workloadCeiling(ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS);
+    expect(baseWorkloadCeilingMs).toBe(27_000);
+    expect(baseWorkloadCeilingMs).toBeLessThan(autosaveMs);
+    expect(ledgerWorkloadCeilingMs).toBe(31_000);
+    expect(ledgerWorkloadCeilingMs).toBeGreaterThan(autosaveMs);
+    expect(maxWorkloadCeilingMs).toBe(55_000);
+    // The honest occupancy tail (the escrow write-path rider). The pre-job
+    // guild flush is an ordinary saveCharacter on the SAME per-character
+    // FIFO, and its statements ride the 60s heavy allowance, so that ONE
+    // term exceeds the entire pinned workload sum above on its own: any
+    // occupancy story quoting the 27s sum without the flush term is
+    // dishonest, and this relation is what keeps the two numbers from
+    // quietly converging (a heavy-allowance cut below the workload sum
+    // would make the exclusion comment above overstate the tail). Threading
+    // a workload-scoped allowance through saveCharacter stays REJECTED as
+    // invasive (the 06 ruling, re-affirmed by the rider with the file
+    // open): the heavy allowance is correct for the logout-shaped saves
+    // whose loss is data loss, and the flush IS one of those saves.
+    const { DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(maxWorkloadCeilingMs);
+    // The started-request ceiling, DERIVED so the docblocks can state a
+    // number that cannot drift from the constants: once the escrow job has
+    // STARTED, the request rides pool checkout + BEGIN and the installing
+    // SET LOCAL under the session default + the twelve workload statements +
+    // the lock wait + twelve inter-statement idle windows under the SAVE
+    // bound (the review round's term: the character serialize and every
+    // round-trip gap run between statements, each bounded only by the
+    // idle-in-transaction kill) + COMMIT under the driver backstop. The
+    // wait deadline bounds only the un-started stage. The ceiling must stay
+    // under the HTTP layer's 300s so a wedged escrow surfaces as a typed or
+    // coded answer, never as a socket the client gave up on first.
+    const startedCeilingMs =
+      DB_POOL_CONNECT_TIMEOUT_MS +
+      DB_STATEMENT_TIMEOUT_MS +
+      ESCROW_STATEMENT_TIMEOUT_MS * ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS +
+      SAVE_IDLE_TX_TIMEOUT_MS * ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS +
+      ESCROW_LOCK_TIMEOUT_MS +
+      DB_QUERY_TIMEOUT_MS;
+    expect(startedCeilingMs).toBe(255_000);
+    expect(startedCeilingMs).toBeLessThan(300_000);
+    // The docblocks that QUOTE the ceiling scrape-pin against the derived
+    // figure, so re-tuning a constant cannot leave prose lying (the audit
+    // round's drift note).
+    const ceilingLabel = `${startedCeilingMs / 1000}s`;
+    expect(read('server/woc_market_custody.ts')).toContain(ceilingLabel);
+    expect(read('server/woc_market_db.ts')).toContain(ceilingLabel);
+    // The realm-global escrow gate's sizing (the write-path rider). Equal to
+    // the autosave wave's SAVE_CONCURRENCY by decision: the realm already
+    // prices in that many concurrent character-save writes, so the gate adds
+    // at most the same load again. SAVE_CONCURRENCY is game.ts
+    // module-private, so scrape it like AUTOSAVE_SECONDS above; a re-tune of
+    // either side reds this pin and forces the sizing to be re-decided
+    // rather than silently diverging. Both saturated must still leave the
+    // pool headroom for the guard transactions and the sweep's locked
+    // segments (two clients at the default sizing).
+    const { WOC_ESCROW_GATE_MAX_IN_FLIGHT } = await import('../../server/woc_market_escrow_gate');
+    const { parseDbPoolMaxClients } = await import('../../server/db');
+    // The SHARED block-aware stripper for the scrapes, not the file's local
+    // line-only codeOnly: a block-commented decoy declaration would otherwise
+    // feed the relation a wrong number (the stripper contract lives in
+    // tests/helpers/strip_comments.ts).
+    const { stripComments } = await import('../helpers/strip_comments');
+    const saveConcurrencyMatch = stripComments(read('server/game.ts')).match(
+      /^const SAVE_CONCURRENCY = (\d+);$/m,
+    );
+    expect(saveConcurrencyMatch).not.toBeNull();
+    const saveConcurrency = Number(saveConcurrencyMatch?.[1]);
+    expect(saveConcurrency).toBeGreaterThan(0);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(4);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBe(saveConcurrency);
+    const poolDefault = parseDbPoolMaxClients(undefined);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT).toBeLessThan(poolDefault);
+    expect(WOC_ESCROW_GATE_MAX_IN_FLIGHT + saveConcurrency).toBeLessThanOrEqual(poolDefault - 2);
+    // The gate's leak-reclaim ceiling sits above a legitimate sequence, and
+    // the hold spans MORE than the sequence: the slot is taken before the
+    // guild flush and before the FIFO enqueue (woc_market_custody.ts
+    // runSerialized), so it also covers whatever that character already had
+    // queued, and the 5s waiter deadline does not end it (a cancelled job
+    // still settles only when the FIFO reaches it). So the comparand is the
+    // honest started ceiling plus the pre-job guild flush's heavy allowance
+    // plus a HEAD-OF-LINE term, and the pin states how many queued heavy
+    // saves the ceiling actually buys: exactly one. A second one exceeds it,
+    // which is the recorded degradation at the constant (a reclaim that can
+    // also fire on a still-legitimate hold, costing one over-admitted slot
+    // and a misleading line, never correctness). Re-tuning any term moves
+    // this arithmetic, which is the point: the slack is decided, not assumed.
+    const { WOC_ESCROW_GATE_HOLD_CEILING_MS } = await import('../../server/woc_market_escrow_gate');
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(400_000);
+    const holdFloor = startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS;
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(holdFloor);
+    // One queued heavy save fits.
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS,
+    );
+    // Two do NOT: the ceiling's honest limit, asserted so the docblock's
+    // stated degradation cannot quietly become false in either direction.
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeLessThan(
+      holdFloor + DB_HEAVY_STATEMENT_TIMEOUT_MS * 2,
+    );
+    // The park-ledger cap (the rider's growth bound) sits many multiples
+    // above the sweep batch: each pass can park at most one batch per arm,
+    // so the cap only bites a mass-park event while steady state never
+    // grazes it. SWEEP_BATCH moved to woc_market_budgets.ts (the ratchet's
+    // sibling split) and is exported there, so import it instead of the old
+    // module-private source scrape.
+    const { WOC_LOCAL_PARK_MAX_ENTRIES } = await import('../../server/woc_market_local_ledgers');
+    const { SWEEP_BATCH: sweepBatch } = await import('../../server/woc_market_budgets');
+    expect(sweepBatch).toBeGreaterThan(0);
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeGreaterThanOrEqual(sweepBatch * 8);
+    // And it stays SQL-sane: the cap bounds the batch reads' exclusion
+    // array, which must never grow toward the territory where a linear
+    // `<> ALL($n)` scan starts pricing the read.
+    expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeLessThanOrEqual(4_096);
+  });
+
   it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {
     // SET LOCAL cannot bind a parameter, so the timeout is interpolated into the
     // statement text as an integer; the safe-integer validation is therefore the
@@ -569,6 +778,7 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const unstuckDbSrc = read('server/unstuck_db.ts');
   const unstuckRecordsSrc = read('server/unstuck_records.ts');
   const retentionSrc = read('server/play_session_retention_db.ts');
+  const bankLedgerSrc = read('server/bank_ledger.ts');
 
   // Slice a function BODY: from its declaration to the next top-level export,
   // so a neighbor's match can never satisfy a body that lost its own.
@@ -653,6 +863,31 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(mainSrc).not.toContain('await unstuckRecordsIdle();');
   });
 
+  it('bounds the bank-ledger shutdown drain with a named timeout the queue owns', () => {
+    // Same shape as the unstuck drain above, and for the same reason: the FIFO
+    // tail is only as fast as the database, so the shutdown path must not await
+    // it unbounded. The deadline race lives INSIDE bankLedgerIdle (the queue
+    // owns its drain policy), so main.ts only picks the budget. Comment
+    // stripped on the positive pins, like the pool pins below: a commented-out
+    // drain line must not keep this green.
+    const mainCode = codeOnly(mainSrc);
+    const bankLedgerCode = codeOnly(bankLedgerSrc);
+    expect(bankLedgerCode).toContain('export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;');
+    expect(mainCode).toContain(
+      'const bankLedgerDrained = await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS);',
+    );
+    // The deadline-expired warn is the only operator-visible sign the drain
+    // abandoned rows (the metric counts insert failures, not abandonment), so
+    // its deletion must red here too.
+    expect(mainCode).toContain(
+      "if (!bankLedgerDrained) console.warn('bank ledger drain deadline reached');",
+    );
+    // The retired UNBOUNDED call form at zero occurrences: re-inlining a bare
+    // drain (or a hand-rolled Promise.race beside it) reds here.
+    expect(mainSrc).not.toContain('await bankLedgerIdle();');
+    expect(mainSrc).not.toContain('Promise.race([bankLedgerIdle(');
+  });
+
   it('bounds unstuck recorder memory and rate-limits overflow warnings', () => {
     expect(unstuckRecordsSrc).toContain('export const UNSTUCK_RECORD_MAX_PENDING = 256;');
     expect(unstuckRecordsSrc).toContain(
@@ -719,22 +954,37 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // -> configuredRealmCount derivation stays pinned end to end: the env
     // literal must still feed the directory parser where it now lives.
     expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
-    const warnStart = dbCode.indexOf(
-      'if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING)',
-    );
+    // The warn itself now consumes the pure core in db_connection_budget.ts
+    // (its behavior, including the seven-realm cancel-peak arithmetic from
+    // DEPLOY.md, is pinned in tests/server/db_connection_budget.test.ts);
+    // here pin that db.ts actually wires the core to the parsed realm count,
+    // the live pool size, and the parser's ceiling, and warns on its verdict.
+    const warnStart = dbCode.indexOf('const budgetWarning = dbConnectionBudgetWarning(');
     expect(warnStart).toBeGreaterThan(-1);
-    const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
-    expect(warnBranch).toContain('console.warn(');
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
-    expect(warnBranch).toContain('${configuredRealmCount}');
+    // Slice to the next top-level declaration, not a fixed width: a fixed
+    // window drifts as the call grows (pushing the console.warn out of it) or
+    // reaches into unrelated code, either way changing what the pins below
+    // actually see. The next `export const` after the warning pair is the
+    // statement boundary that follows the whole wired region.
+    const warnEnd = dbCode.indexOf('\nexport const', warnStart);
+    expect(warnEnd).toBeGreaterThan(warnStart);
+    const warnBranch = dbCode.slice(warnStart, warnEnd);
+    // Argument ORDER pinned too: (realmCount, poolMaxClients, ceiling) are all
+    // numbers, so a swapped call type-checks and warns on nonsense arithmetic.
+    expect(warnBranch).toMatch(
+      /dbConnectionBudgetWarning\(\s*configuredRealmCount,\s*DB_POOL_MAX_CLIENTS,\s*DB_POOL_MAX_CLIENTS_CEILING,?\s*\)/,
+    );
+    expect(warnBranch).toContain('if (budgetWarning !== null) console.warn(budgetWarning)');
+    // The per-realm term lives in the pure core and must count all FOUR
+    // pools: the shared pool plus the quota, listener, and deadline-cancel
+    // constants their owner modules export.
+    const budgetCode = codeOnly(read('server/db_connection_budget.ts'));
+    expect(budgetCode).toMatch(
+      /realmCount\s*\*[\s\S]*poolMaxClients[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS[\s\S]*DB_CANCEL_POOL_MAX_CLIENTS/,
+    );
     // The threshold IS the parser's accepted ceiling (one constant, so the two
     // can never drift), pinned here to its literal value, and to the default
     // beside it: the derivation plus the number, the trap this file exists for.
-    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS');
-    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS');
-    expect(dbCode).toMatch(
-      /configuredSteadyConnections\s*=\s*configuredRealmCount\s*\*[\s\S]*DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS/,
-    );
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_CEILING = 97;');
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');
     // No re-inlined ceiling anywhere in the module (the parser bound and the
@@ -770,16 +1020,23 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
       'export async function topLifetimeXp',
       'export async function topGuilds',
       'export async function deedsBoardRanked',
-      'export async function saveCharacterState',
     ]) {
       expect(bodyOf(dbSrc, decl)).toContain(
         'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
       );
     }
-    // saveCharacterAndMarketState owns its escrow transaction and inlines the raise.
-    expect(bodyOf(dbSrc, 'export async function saveCharacterAndMarketState')).toContain(
-      'SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}',
-    );
+    // Character saves share one owner that bounds BEGIN through COMMIT, rather
+    // than the read-only wrapper used by aggregates. Since the pg_cancel
+    // wiring, every save path rides db.ts's beginSaveTx wrapper (the ONE
+    // direct beginCharacterSaveTx call, pinned with its cancel forwarding in
+    // tests/character_db.test.ts), so the per-body pin follows the wrapper.
+    for (const decl of [
+      'export async function saveCharacterState',
+      'export async function saveCharacterAndMarketState',
+      'export async function saveCharacterAndGuildBankState',
+    ]) {
+      expect(bodyOf(dbSrc, decl)).toContain('beginSaveTx(');
+    }
     const adminSrc = read('server/admin_db.ts');
     expect(bodyOf(adminSrc, 'export async function overviewCounts')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
@@ -959,13 +1216,18 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   });
 
   it('the heavy-statement exemption interpolates the named constant and validates the integer', () => {
-    // runWithStatementTimeout is the single SET LOCAL site; it interpolates the raw
-    // integer (SET LOCAL cannot bind a parameter) after a safe-integer guard, which
-    // is the injection guard. The named heavy constant is what the exempt call sites
-    // pass, never a re-inlined 60000.
+    // The read helper interpolates the raw integer (SET LOCAL cannot bind a
+    // parameter) after a safe-integer guard. Character saves use their fixed
+    // sibling transaction bound, never a re-inlined 60000 in db.ts.
     expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{timeoutMs\}/);
     expect(dbSrc).toContain('Number.isSafeInteger(timeoutMs)');
-    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{DB_HEAVY_STATEMENT_TIMEOUT_MS\}/);
+    const saveTxSrc = read('server/character_save_transaction.ts');
+    expect(saveTxSrc).toContain('const statementTimeoutMs = signal');
+    expect(saveTxSrc).toContain('CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS');
+    expect(saveTxSrc).toContain('CHARACTER_SAVE_STATEMENT_TIMEOUT_MS');
+    expect(saveTxSrc).toContain('SET LOCAL statement_timeout = $' + '{statementTimeoutMs}');
+    expect(saveTxSrc).toContain("SET LOCAL lock_timeout = '2s'");
+    expect(saveTxSrc).toContain("SET LOCAL idle_in_transaction_session_timeout = '10s'");
     // Boot DDL disables the timeout entirely for its advisory-lock-serialized wait.
     expect(dbSrc).toContain('SET LOCAL statement_timeout = 0');
     expect(dbSrc).not.toContain('SET LOCAL statement_timeout = 60000');
@@ -1021,5 +1283,341 @@ describe('the DB pool knob reaches the shipped container', () => {
     expect(gameService).toContain('DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}');
     // Documented for operators, commented out so the built-in default applies.
     expect(read('.env.example')).toContain('#DB_POOL_MAX_CLIENTS=10');
+  });
+
+  it('passes STORAGE_PRICES through to the game service, and documents it', () => {
+    const compose = read('docker-compose.yml');
+    // Same game-service slicing as the pool-knob arm above: bounded at the
+    // NEXT top-level service key so the row cannot sit on the wrong service.
+    const gameStart = compose.indexOf('\n  game:');
+    expect(gameStart).toBeGreaterThanOrEqual(0);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
+    expect(gameService).toContain('STORAGE_PRICES: ${STORAGE_PRICES:-}');
+    // Documented for operators, commented out so the compiled defaults apply.
+    // Pinned on the bare commented name only, so the example JSON payload can
+    // change without touching this arm.
+    expect(read('.env.example')).toContain('#STORAGE_PRICES=');
+  });
+
+  it('passes BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS through to the game service, and documents it', () => {
+    const compose = read('docker-compose.yml');
+    // Same game-service slicing as the pool-knob arm above: bounded at the
+    // NEXT top-level service key so the row cannot sit on the wrong service.
+    const gameStart = compose.indexOf('\n  game:');
+    expect(gameStart).toBeGreaterThanOrEqual(0);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
+    // Without this row the shipped compose path (explicit allowlist, no
+    // env_file) never hands a raised limit to the process: the compiled
+    // default then disagrees with the raised singleton and the boot DO block
+    // raises 22023, so every realm fails to boot.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
+    expect(gameService).toContain(
+      'BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS: ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS:-}',
+    );
+    // Documented for operators, commented out so the built-in default applies.
+    expect(read('.env.example')).toContain('#BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS=10000000');
+  });
+});
+
+// The storage-price knob (server/storage_prices.ts): one JSON env var handing a
+// validated StoragePricesOverride to the realm Sim at construction (through
+// server/sim_boot_config.ts). Same contract family as DB_POOL_MAX_CLIENTS:
+// strict and fail-safe per dimension, and a rejected value can never come back
+// looking identical to unset (rejections always say why). The compiled
+// dimension lengths (12 bank expansions, 4 bank sockets, 5 vault rungs) are
+// pinned implicitly by the accepted-full arm: a length change reds it.
+describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
+  it('unset / blank / whitespace are the silent defaults: no override, NO rejections', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // The AUTHORITATIVE default pins: pure parser calls no shell export or
+    // local .env can perturb. Number('') is 0, so the blank arms also pin that
+    // an empty string never half-parses into anything (the empty-numeric trap).
+    expect(parseStoragePrices(undefined)).toStrictEqual({ override: undefined, rejections: [] });
+    expect(parseStoragePrices('')).toStrictEqual({ override: undefined, rejections: [] });
+    expect(parseStoragePrices('   ')).toStrictEqual({ override: undefined, rejections: [] });
+  });
+
+  it('the module constant is the parser result in a clean environment', async () => {
+    // The env-dependent readout of the default, like the DB_POOL_MAX_CLIENTS
+    // note above: it only adds that the exported constant is the parser's
+    // result under the delete at the top of this file; the pure arms above
+    // stay the authoritative default pins.
+    const { STORAGE_PRICES } = await import('../../server/storage_prices');
+    expect(STORAGE_PRICES).toBeUndefined();
+  });
+
+  it('malformed JSON is rejected LOUDLY, never treated as unset', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    for (const raw of ['not json', '{bad']) {
+      const { override, rejections } = parseStoragePrices(raw);
+      expect(override).toBeUndefined();
+      expect(rejections).toHaveLength(1);
+    }
+  });
+
+  it('JSON that is not a plain object is rejected LOUDLY', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    for (const raw of ['7', '"cheap"', 'true', 'null', '[1,2,3]']) {
+      const { override, rejections } = parseStoragePrices(raw);
+      expect(override).toBeUndefined();
+      expect(rejections).toHaveLength(1);
+    }
+  });
+
+  it('a too-short dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('a too-long dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3,4,5]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('a non-integer entry drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[500.5,1000,2000,3000]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a non-integer entry');
+  });
+
+  it('a negative entry drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"vaultUpgrades":[20000,50000,-1,200000,400000]}',
+    );
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('vaultUpgrades');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a negative entry');
+  });
+
+  it('a string entry drops its whole dimension (numeric-looking strings included)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansions":["500",1000,2500,5000,10000,20000,40000,80000,150000,300000,600000,1200000]}',
+    );
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankExpansions');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a non-number entry');
+  });
+
+  it('a non-array dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":1000000}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('one bad entry drops ONLY its dimension; a good sibling still applies', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankSockets":[9,8,7,6],"vaultUpgrades":[1,2,3,4,-5]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [9, 8, 7, 6] });
+    expect(override).not.toHaveProperty('vaultUpgrades');
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('vaultUpgrades');
+  });
+
+  it('an unknown key is rejected BY NAME while known siblings still apply', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // The typo case: bankExpansion (no s) must never silently look like unset.
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansion":[1],"bankSockets":[1,2,3,4]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankExpansion');
+  });
+
+  it('a full valid override round-trips (fresh literal expectations)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansions":[1,2,3,4,5,6,7,8,9,10,11,12],"bankSockets":[13,14,15,16],"vaultUpgrades":[17,18,19,20,21]}',
+    );
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({
+      bankExpansions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      bankSockets: [13, 14, 15, 16],
+      vaultUpgrades: [17, 18, 19, 20, 21],
+    });
+  });
+
+  it('a partial override applies its one dimension and nothing else', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3,4]}');
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+  });
+
+  it('zero is a LEGAL price (free sockets are an operator choice, not a typo)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[0,0,0,0]}');
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({ bankSockets: [0, 0, 0, 0] });
+  });
+
+  it('an unsafely large entry (past Number.MAX_SAFE_INTEGER) drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // 1e300 IS an integer to Number.isInteger; only the safe-integer bound
+    // refuses it, so a mistyped exponent rejects loudly instead of applying
+    // as an unpayable price.
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1e300,2,3,4]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('unsafely large');
+  });
+
+  it('a JSON __proto__ key is rejected as unknown and never pollutes (prototype-pollution pin)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // JSON.parse creates __proto__ as an OWN property; the Object.entries plus
+    // allowlist shape routes it into the unknown-key rejection. Pinned so a
+    // refactor to Object.assign or for...in cannot regress silently.
+    const { override, rejections } = parseStoragePrices(
+      '{"__proto__":{"polluted":1},"bankSockets":[1,2,3,4]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('__proto__');
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('the unknown-key boot echo is sanitized and bounded', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // A control character in a key cannot forge a second boot line, and a
+    // pathologically long key truncates at 40 printable characters.
+    const forged = parseStoragePrices('{"x\\nSTORAGE_PRICES: overrides bankSockets":1}');
+    expect(forged.rejections).toHaveLength(1);
+    expect(forged.rejections[0]).not.toContain('\n');
+    expect(forged.rejections[0]).toContain('x?STORAGE_PRICES');
+    const long = parseStoragePrices(`{"${'k'.repeat(80)}":1}`);
+    expect(long.rejections[0]).toContain(`${'k'.repeat(40)}...`);
+    expect(long.rejections[0]).not.toContain('k'.repeat(41));
+  });
+
+  it('a flood of junk keys is capped at 8 rejections plus an honest summary line', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const junk = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`junk${i}`, 1]));
+    const { rejections } = parseStoragePrices(JSON.stringify(junk));
+    expect(rejections).toHaveLength(9);
+    expect(rejections[8]).toBe('...and 4 more rejections');
+  });
+
+  it('the cap boundary is exact: 8 rejections stay uncapped, 9 cap with a summary (QA 09)', async () => {
+    // The off-by-one arms: a '>' to '>=' mutant would emit '...and 0 more
+    // rejections' at exactly 8; a '>=' to '>' one would leak a 9th line.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const junkOf = (n: number) =>
+      JSON.stringify(Object.fromEntries(Array.from({ length: n }, (_, i) => [`junk${i}`, 1])));
+    const eight = parseStoragePrices(junkOf(8)).rejections;
+    expect(eight).toHaveLength(8);
+    for (const r of eight) expect(r.startsWith('...')).toBe(false);
+    const nine = parseStoragePrices(junkOf(9)).rejections;
+    expect(nine).toHaveLength(9);
+    expect(nine[8]).toBe('...and 1 more rejection'); // singular at exactly one
+  });
+
+  it('the key echo truncates at EXACTLY 40 printable characters (QA 09)', async () => {
+    // Boundary arms for describeKey: a 40-char key echoes verbatim with no
+    // ellipsis (a '>' to '>=' mutant reds here), 41 truncates to 40 + '...'.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const at = parseStoragePrices(`{"${'k'.repeat(40)}":1}`);
+    expect(at.rejections[0]).toContain(`"${'k'.repeat(40)}"`);
+    expect(at.rejections[0]).not.toContain('...');
+    const over = parseStoragePrices(`{"${'k'.repeat(41)}":1}`);
+    expect(over.rejections[0]).toContain(`${'k'.repeat(40)}...`);
+    expect(over.rejections[0]).not.toContain('k'.repeat(41));
+  });
+
+  it('the parser safe-integer bound is exact at Number.MAX_SAFE_INTEGER (QA 09)', async () => {
+    // The resolver suite pins this edge sim-side; these arms pin the SERVER
+    // parser to the same boundary so the two validators cannot drift apart at
+    // it: 9007199254740991 is the last accepted price, 9007199254740992 (2^53,
+    // exactly representable, so JSON.parse hands it over intact) rejects.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const edge = parseStoragePrices('{"bankSockets":[9007199254740991,2,3,4]}');
+    expect(edge.rejections).toStrictEqual([]);
+    expect(edge.override).toStrictEqual({ bankSockets: [9007199254740991, 2, 3, 4] });
+    const past = parseStoragePrices('{"bankSockets":[9007199254740992,2,3,4]}');
+    expect(past.override).toBeUndefined();
+    expect(past.rejections[0]).toContain('unsafely large');
+  });
+
+  it('an EMPTY object is loud, never a second silent path beside unset (QA 09)', async () => {
+    // STORAGE_PRICES='{}' is a set-but-inert knob; silence is the unset
+    // signal, so the empty object reports like every other refusal.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{}');
+    expect(override).toBeUndefined();
+    expect(rejections).toStrictEqual(['the object names no price dimensions']);
+  });
+
+  it('the .env.example example payload actually parses clean to the compiled defaults (QA 09)', async () => {
+    // The documented operator example is EXECUTED through the real parser
+    // (an unexecuted embedded probe string can rot silently): it must apply
+    // all three dimensions with zero rejections, and its values must be the
+    // compiled defaults restated, so a table retune that forgets the doc row
+    // reds here instead of shipping a stale example.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const row = read('.env.example')
+      .split('\n')
+      .find((l) => l.startsWith('#STORAGE_PRICES='));
+    expect(row).toBeDefined();
+    const { override, rejections } = parseStoragePrices(
+      (row as string).slice('#STORAGE_PRICES='.length),
+    );
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({
+      bankExpansions: [
+        500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1200000,
+      ],
+      bankSockets: [1000000, 2000000, 3500000, 5000000],
+      vaultUpgrades: [20000, 50000, 100000, 200000, 400000],
+    });
+  });
+
+  it('the override constant is genuinely FED by the env (the tunability claim itself)', () => {
+    // The DB_POOL_MAX_CLIENTS scrape idiom: comment-stripped first, so
+    // commenting the wiring out and re-exporting a hardcoded constant reds.
+    expect(codeOnly(read('server/storage_prices.ts'))).toContain(
+      'parseStoragePrices(process.env.STORAGE_PRICES)',
+    );
+  });
+
+  it('the boot SimConfig genuinely passes the constant into the Sim', () => {
+    // The assembly moved out of server/game.ts (monolith ratchet), so the
+    // owning file for this wiring pin is the boot-config builder.
+    expect(codeOnly(read('server/sim_boot_config.ts'))).toContain('storagePrices: STORAGE_PRICES');
+  });
+
+  it('the realm boot path genuinely consumes the boot-config builder', () => {
+    // Closes the chain the two pins above leave open: without this, game.ts
+    // could stop calling buildRealmSimConfig (re-inlining its own config) and
+    // both scrape pins would stay green while the knob went dead. The
+    // behavioral half rides tests/idle_mob_tick_radius.test.ts, which pins a
+    // BUILDER-set field on the constructed server sim's cfg.
+    // Whitespace-tolerant: biome wraps the call across lines.
+    expect(codeOnly(read('server/game.ts'))).toMatch(/new Sim\(\s*buildRealmSimConfig\(/);
   });
 });

@@ -102,7 +102,7 @@ describe('tight-memory residency diet', () => {
   });
 
   it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
-    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell();');
+    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell()');
     expect(callAt).toBeGreaterThan(-1);
     // Anchor on the NEAREST preceding gate, not the first one in the file: a
     // plain indexOf-ordering check (gate index before call index) would still
@@ -115,6 +115,7 @@ describe('tight-memory residency diet', () => {
     // unconditionally, even though the ordering check above would still hold.
     const between = mainSource.slice(gateAt, callAt);
     expect(between).not.toMatch(/\n {2}\}/);
+    expect(between).toContain("loadSpan('char-preview-shell', () =>");
   });
 });
 

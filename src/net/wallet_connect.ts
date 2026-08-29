@@ -7,6 +7,7 @@
 import type { Provider } from '@reown/appkit-adapter-solana';
 import { Transaction, VersionedTransaction } from '@solana/web3.js';
 import bs58 from 'bs58';
+import { CANONICAL_TERMS_URL } from '../client_origin';
 
 export interface WalletConnectState {
   address: string | null;
@@ -127,7 +128,7 @@ export async function createWalletConnectClient(projectId: string): Promise<Wall
     enableMobileFullScreen: true,
     experimental_preferUniversalLinks: true,
     themeMode: 'dark',
-    termsConditionsUrl: 'https://worldofclaudecraft.com/terms',
+    termsConditionsUrl: CANONICAL_TERMS_URL,
     privacyPolicyUrl: 'https://worldofclaudecraft.com/privacy',
     features: {
       analytics: false,

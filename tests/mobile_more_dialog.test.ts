@@ -18,10 +18,12 @@ describe('MobileMoreDialogController', () => {
     const release = vi.fn();
     const handle = { focusFirst, release, opener: vi.fn(() => null) } satisfies FocusTrapHandle;
     const open = vi.fn((_options: FocusTrapOptions) => handle);
-    const controller = new MobileMoreDialogController({ open } as Pick<FocusManager, 'open'>, {
-      trigger: () => trigger,
-      dialog: () => dialog,
-    });
+    const restore = vi.fn();
+    const anchor = element();
+    const controller = new MobileMoreDialogController(
+      { open, restore } as unknown as Pick<FocusManager, 'open' | 'restore'>,
+      { trigger: () => trigger, dialog: () => dialog, fallback: () => anchor },
+    );
 
     controller.sync(true);
     controller.sync(true);
@@ -40,7 +42,12 @@ describe('MobileMoreDialogController', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(dialog.getAttribute('aria-hidden')).toBe('true');
     expect(release).toHaveBeenCalledOnce();
-    expect(release).toHaveBeenCalledWith(true);
+    // The trap never restores on its own any more: the controller does it, so
+    // the always-visible anchor is in play as a fallback when the trigger (a
+    // Quick Actions strip item) is unrendered because that strip is closed.
+    expect(release).toHaveBeenCalledWith(false);
+    expect(restore).toHaveBeenCalledOnce();
+    expect(restore).toHaveBeenCalledWith(trigger, anchor);
   });
 
   it('releases without restoring focus during a More-to-window handoff', () => {
@@ -52,14 +59,16 @@ describe('MobileMoreDialogController', () => {
       release,
       opener: vi.fn(() => null),
     } satisfies FocusTrapHandle;
+    const restore = vi.fn();
     const controller = new MobileMoreDialogController(
-      { open: vi.fn((_options: FocusTrapOptions) => handle) },
-      { trigger: () => trigger, dialog: () => dialog },
+      { open: vi.fn((_options: FocusTrapOptions) => handle), restore },
+      { trigger: () => trigger, dialog: () => dialog, fallback: () => null },
     );
 
     controller.sync(true);
     controller.sync(false, false);
 
     expect(release).toHaveBeenCalledWith(false);
+    expect(restore).not.toHaveBeenCalled();
   });
 });

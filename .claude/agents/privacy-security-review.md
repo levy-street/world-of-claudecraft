@@ -204,7 +204,10 @@ production.
   schedule and the excluded-accounts moderation view; flag a client-influenced payout amount,
   an exclusion bypass, or a grant path that skips the seed gate.
 - Real-money purchases ride the external Claudium service (`server/claudium_proxy.ts`,
-  `src/net/stripe_checkout.ts`); the repo holds no card data. Flag any change that credits a
+  `src/net/stripe_checkout.ts`), and the $WOC marketplace (`server/woc_market*.ts`,
+  config-off) runs real-money item trading with custody, bonds, and settlements in this
+  repo (token math and chain confirmation stay in the economy service); the repo holds no
+  card data and no keys. Flag any change that credits a
   purchase from client-supplied data instead of the service confirmation, or that persists
   card/payment details in this repo.
 

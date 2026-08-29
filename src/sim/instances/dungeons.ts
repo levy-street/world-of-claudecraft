@@ -50,6 +50,21 @@ const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door telepor
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
 const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
+// A claim whose final boss is already dead (inst.clearedBy is non-empty) idles
+// this much longer than INSTANCE_EMPTY_TIMEOUT before the reaper frees it: a
+// clean kill that wipes the whole party, with nobody left to resurrect, must
+// not be an unrecoverable total loss for the boss's dropped gear. The door
+// itself never despawns (unlike a Rift portal), so this timeout alone decides
+// how long a corpse run has to make it back. Every other claim state (still
+// being fought, or freed and reclaimed at a new difficulty) keeps the
+// shorter, standard timeout so an abandoned attempt frees its slot promptly.
+// Deliberately HEROIC-ONLY: clearedBy is the only cheap "the final boss is
+// genuinely dead" signal that exists today (lockToHeroicClaim, stamped only
+// from the heroic mark payout), so a normal-difficulty or raid final-boss
+// kill still relies on the shorter INSTANCE_EMPTY_TIMEOUT alone. Extending
+// this further would need its own finalBossDeadAt-style marker on every
+// InstanceSlot, not just the heroic ledger; out of scope here.
+export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
@@ -183,17 +198,34 @@ export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
   return null;
 }
 
+// The generic instance-footprint HALF-WIDTH (x extent either side of a slot
+// origin). Exported because vault_craft_gate.ts claimWestReach derives its
+// west-reach envelope from this same constant: a bare literal widened here
+// would silently under-estimate that gate's reach and fail it open.
+export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
+
+// The one dungeon whose claim footprint is WIDER than the generic envelope
+// (the circle arm in instanceClaimContains below). Exported for the same
+// reason as the half-width above: vault_craft_gate.ts keys its wider-reach
+// derivation on this exact id.
+export const WIDE_CLAIM_DUNGEON_ID = 'nythraxis_boss_arena';
+
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
 function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
-  return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
+  return (
+    Math.abs(pos.x - origin.x) < INSTANCE_FOOTPRINT_HALF_WIDTH && Math.abs(pos.z - origin.z) < 250
+  );
 }
 
 function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
-  if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
-  const bossSpawn = DUNGEONS.nythraxis_boss_arena.spawns.find(
+  if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
+  // Looked up through the SAME constant the guard above compares, never a
+  // second hard-coded id: a rename via the constant would otherwise leave
+  // this literal lookup throwing on undefined.
+  const bossSpawn = DUNGEONS[WIDE_CLAIM_DUNGEON_ID].spawns.find(
     (spawn) => spawn.mobId === NYTHRAXIS_BOSS_ID,
   );
   // The raid room is wider than the generic instance footprint, so its claim
@@ -418,6 +450,16 @@ export function enterDungeon(
   p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
+  // Land settled: no carried-over jump arc or fall distance from the overworld
+  // side of the door (the same recipe as every other sim teleport, portals.ts
+  // included). Without this, a player who jumps into the door mid-air keeps
+  // its stale overworld fallStartY/onGround=false, and the next vertical pass
+  // computes a bogus drop against the unrelated instance floor height and
+  // deals fall damage that has nothing to do with any real fall.
+  p.vy = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   inst.emptyFor = 0;
   // Session participation record for this run: awardHeroicMarks pays the mail
   // arm only to locked players who actually walked through the door.
@@ -547,6 +589,14 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
+  // Land settled (see the matching comment in enterDungeon above): the exit
+  // side of the door needs the same reset, or leaving mid-air over an
+  // instance's interior geometry carries that fall state back out onto the
+  // overworld door and deals the same bogus fall damage in reverse.
+  p.vy = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
   return true;
 }
@@ -1000,7 +1050,9 @@ export function updateInstances(ctx: SimContext): void {
       inst.emptyFor = 0;
     } else {
       inst.emptyFor += 1;
-      if (inst.emptyFor >= INSTANCE_EMPTY_TIMEOUT) freeInstance(ctx, inst);
+      const emptyTimeout =
+        inst.clearedBy.size > 0 ? INSTANCE_CLEARED_EMPTY_TIMEOUT : INSTANCE_EMPTY_TIMEOUT;
+      if (inst.emptyFor >= emptyTimeout) freeInstance(ctx, inst);
     }
   }
 }

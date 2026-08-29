@@ -37,6 +37,7 @@ import {
   farRenderedCellHeight,
   farVertexClearance,
 } from './far_surface_core';
+import { islandHorizonHaze, islandIsolationActive } from './island_isolation_core';
 import { clamp01 } from './num_clamp';
 import {
   makeShoreProbe,
@@ -156,7 +157,18 @@ export const FOGLESS_DETAIL_FAR = 700;
  * content is ever repainted by it (which is what the day/night fog grade
  * would otherwise flatten at dawn).
  */
-export function horizonHazePlan(envelopeFar: number): { near: number; far: number } {
+export function horizonHazePlan(
+  envelopeFar: number,
+  view?: { x: number; z: number },
+): { near: number; far: number } {
+  // The Proving Shore breaks the assumption this band is built on. The
+  // envelope-scaled near edge lands roughly 1200 units out because the far
+  // mesh normally paints ranges that ARE that distant; Eastbrook's shore sits
+  // about 100 to 400 units across the island's strait, closer than any haze
+  // the envelope would ever reach, so it read as flat crisp cardboard rather
+  // than distant land. The island's own band starts just past its shore,
+  // which is what turns that far coast back into a backdrop.
+  if (view && islandIsolationActive(view.x, view.z)) return islandHorizonHaze();
   return { near: envelopeFar * 0.42, far: envelopeFar * 1.35 };
 }
 

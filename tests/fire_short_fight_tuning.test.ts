@@ -30,10 +30,12 @@
 // Ignite contract at duration (pre-fix, sustained fire ran 2.2x-2.9x frost
 // at every duration and Ignite was 46% of all damage).
 import { afterAll, describe, expect, it } from 'vitest';
+import { TALENTS } from '../src/sim/content/talents';
 import { ABILITIES, BUILTIN_WORLD, ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 const FIGHT_SECONDS = 27; // the reported Nythraxis kill length
 const SHORT_FIGHT_DPS_CEILING = 1.6; // x the sustained comparator, 27s window
@@ -119,6 +121,11 @@ function gearedMage(spec: Spec, seed = 41, rows?: Rows): { sim: Sim; p: Entity }
   if (rows) expect(sim.applyTalents({ spec, rows } as never)).toBe(true);
   else expect(sim.setSpec(spec)).toBe(true);
   sim.tick();
+  // The harbor-move quay spawn (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md) puts seed-jittered harbor
+  // colliders in the 6yd LoS lane to the dummy; fight on the open-field lane
+  // like the chronomancy harness does.
+  placePlayerInOpenField(sim);
   const p = sim.player;
   const ctx = (sim as unknown as { ctx: CtxLike }).ctx;
   const meta = ctx.players.get(p.id);
@@ -165,12 +172,22 @@ function canPress(p: Entity, id: string): boolean {
   return bank ? bank.charges > 0 : offCooldown(p, id);
 }
 
+// The Ignite bank fraction, read from the live fire mastery so a mastery
+// re-tune moves this estimator with it instead of silently skewing the
+// conservation gate (it was hardcoded 0.4 before the 0.3 re-band).
+const IGNITION_PCT = (() => {
+  const fire = TALENTS.mage.specs.find((s) => s.id === 'fire');
+  const pct = fire?.mastery.effect.global?.ignitionPct;
+  if (!pct) throw new Error('fire mastery ignitionPct missing');
+  return pct;
+})();
+
 interface BurstResult {
   dps: number;
   damage: number;
   byAbility: Record<string, number>;
   ignitePaid: number; // Ignite damage actually received by the dummy
-  igniteBanked: number; // estimate: 40% of fire crit damage + 40% of non-crit Meteor impacts
+  igniteBanked: number; // estimate: ignitionPct of fire crit damage and of non-crit Meteor impacts
 }
 
 // Drive one spec's short-fight loop for `seconds` and sum every point of
@@ -259,8 +276,8 @@ function runShortFight(spec: Spec, seconds: number, seed = 41, rows?: Rows): Bur
         byAbility[key] = (byAbility[key] ?? 0) + e.amount;
         if (e.ability === 'Ignite') ignitePaid += e.amount;
         else if (e.school === 'fire' && e.sourceId === p.id) {
-          if (e.crit) igniteBanked += Math.round(e.amount * 0.4);
-          else if (e.ability === 'Meteor') igniteBanked += Math.round(e.amount * 0.4);
+          if (e.crit) igniteBanked += Math.round(e.amount * IGNITION_PCT);
+          else if (e.ability === 'Meteor') igniteBanked += Math.round(e.amount * IGNITION_PCT);
         }
       }
     }

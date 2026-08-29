@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   acquireCharacterLease: vi.fn(async () => true),
   releaseCharacterLease: vi.fn(async () => {}),
   heartbeatCharacterLeases: vi.fn(async () => {}),
@@ -199,6 +200,52 @@ describe('mailSend: instanced attachments', () => {
       expect(kept[0].instance).toEqual(locked);
       expect(sim.players.get(sender)!.copper).toBe(10000);
     }
+  });
+
+  it('the SAME payload minus bindOnTrade rides the raven: the flag is the cause', () => {
+    // The control for the refusal above, and the reason it is worth a case of
+    // its own: without it, "noMailBound" could be coming from anything about
+    // the fixture. Ravenpost is one of the anonymous pipes the exchange rules
+    // name as siblings (market escrow, guild bank), so the armed state has to
+    // be refused HERE, at the same staging check, and only the armed state.
+    const { sim, sender, recipient } = mailSetup();
+    const disarmed: ItemInstancePayload = { signer: 'Sender' };
+    sim.addItemInstance(HIDE, { ...ARMED, ...disarmed }, sender);
+    sim.mailSend(
+      'Rex',
+      'armed',
+      'nope',
+      0,
+      [{ itemId: HIDE, count: 1, instance: { ...ARMED, ...disarmed } }],
+      sender,
+    );
+    expect(mailCodes(sim.drainEvents())).toContain('noMailBound');
+    expect(slotsOf(sim, sender, HIDE)).toHaveLength(1);
+
+    sim.addItemInstance(HIDE, { ...disarmed }, sender);
+    sim.mailSend(
+      'Rex',
+      'clean',
+      'yours',
+      0,
+      [{ itemId: HIDE, count: 1, instance: disarmed }],
+      sender,
+    );
+    const codes = mailCodes(sim.drainEvents());
+    expect(codes).toContain('sent');
+    expect(codes).not.toContain('noMailBound');
+    // The armed copy stayed behind while its disarmed twin left, which is the
+    // whole claim: same item, same sender, same mailbox, one flag apart.
+    const kept = slotsOf(sim, sender, HIDE);
+    expect(kept).toHaveLength(1);
+    expect(kept[0].instance).toEqual({ ...ARMED, ...disarmed });
+
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim, recipient);
+    sim.mailTake(firstPlayerLetterId(sim, recipient), recipient);
+    const got = slotsOf(sim, recipient, HIDE);
+    expect(got).toHaveLength(1);
+    expect(got[0].instance).toEqual(disarmed);
   });
 
   it('a forged needle naming a payload the sender does not hold escrows nothing', () => {

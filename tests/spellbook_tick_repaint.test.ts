@@ -146,6 +146,7 @@ function harness(): Harness {
     resetFormBar: noop,
     setDragAction: noop,
     clearActionDropTargets: noop,
+    openBarEditor: noop,
   };
   const win = new SpellbookWindow(deps);
   return {

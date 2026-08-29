@@ -29,6 +29,7 @@ describe('admin nav visibility', () => {
       'characters',
       'online-players',
       'guilds',
+      'top-holders',
     ]);
     expect(players.defaultPage).toBe('accounts');
   });

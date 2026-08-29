@@ -80,6 +80,7 @@ function harness(inventory: InvSlot[]): {
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     isGuildBankTab: () => false,
+    isVaultBankTab: () => false,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
@@ -162,7 +163,9 @@ describe('bagUnknownAction mirrors the bagItemAction ladder', () => {
       vendorOpen: false,
       bankOpen: false,
       bankDeposit: false,
+      bankSocketable: false,
       guildBankDeposit: false,
+      vaultDeposit: false,
       petFeed: false,
     },
   };

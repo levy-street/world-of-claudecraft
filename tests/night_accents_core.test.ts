@@ -56,6 +56,27 @@ describe('fireBuildingCamps (only mobs that would build a fire get one)', () => 
     expect(kept).toHaveLength(0);
   });
 
+  // A practice dummy is family 'humanoid' but is furniture: it tends no fire.
+  // Without this the Highwatch practice row lit one campfire per dummy.
+  it('drops an inert camp mob even when its family builds fires', () => {
+    const withDummy = [...camps, { mobId: 'training_dummy', center: { x: 40, z: 40 } }];
+    const familyWithDummy = (mobId: string) =>
+      mobId === 'training_dummy' ? ('humanoid' as const) : familyOf(mobId);
+
+    // Family alone still keeps it: the dummy is a humanoid.
+    expect(fireBuildingCamps(withDummy, familyWithDummy).map((c) => c.mobId)).toEqual([
+      'bandit',
+      'grump',
+      'training_dummy',
+    ]);
+    // The inert predicate is what removes it, and it removes nothing else.
+    expect(
+      fireBuildingCamps(withDummy, familyWithDummy, (id) => id === 'training_dummy').map(
+        (c) => c.mobId,
+      ),
+    ).toEqual(['bandit', 'grump']);
+  });
+
   it('counts trolls and ogres as fire-builders, spiders and elementals not', () => {
     expect(FIRE_BUILDING_FAMILIES.has('humanoid')).toBe(true);
     expect(FIRE_BUILDING_FAMILIES.has('troll')).toBe(true);

@@ -176,11 +176,6 @@ function sameArea(a: UnstuckArea, b: UnstuckArea): boolean {
   );
 }
 
-function isValeCupPlayer(ctx: SimContext, pid: number): boolean {
-  const matches = ctx.vcup.match ? [ctx.vcup.match, ...ctx.vcup.practices] : ctx.vcup.practices;
-  return matches.some((match) => match.teamA.includes(pid) || match.teamB.includes(pid));
-}
-
 function hasMoveInput(meta: PlayerMeta): boolean {
   const input = meta.moveInput;
   return input.forward || input.back || input.strafeLeft || input.strafeRight || input.jump;
@@ -196,12 +191,7 @@ function forcedAction(p: Entity): boolean {
 
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
   if (ctx.bgMatches.has(pid) && isBgPos(p.pos.x)) return false;
-  return (
-    ctx.duels.has(pid) ||
-    ctx.arenaMatches.has(pid) ||
-    isValeCupPlayer(ctx, pid) ||
-    isArenaPos(p.pos.x)
-  );
+  return ctx.duels.has(pid) || ctx.arenaMatches.has(pid) || isArenaPos(p.pos.x);
 }
 
 /**

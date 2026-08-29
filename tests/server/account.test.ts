@@ -238,12 +238,13 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('account route table', () => {
-  it('registers exactly the 17 account-portal routes (method + path)', () => {
+  it('registers exactly the 18 account-portal routes (method + path)', () => {
     const pairs = routes.map((r) => `${r.method} ${r.path}`).sort();
     expect(pairs).toEqual(
       [
         'GET /api/account',
         'POST /api/account/password',
+        'POST /api/account/password/set-initial',
         'POST /api/account/logout',
         'POST /api/account/email',
         'POST /api/account/email/set-initial',

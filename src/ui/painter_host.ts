@@ -123,8 +123,11 @@ export interface SingleSlotEntry {
   value: string;
 }
 
-/** The shared single-slot elision cache (Hud's private `hotWriteCache` field). */
-export type SingleSlotCache = Map<HTMLElement, SingleSlotEntry>;
+/** The shared single-slot elision cache (Hud's private `hotWriteCache` field).
+ * A WeakMap on purpose: entries are keyed by element and never enumerated, and
+ * a strong Map pinned every element ever routed through a writer, including
+ * DOM-removed party/raid rows, for the whole session. */
+export type SingleSlotCache = WeakMap<HTMLElement, SingleSlotEntry>;
 
 /**
  * The single-slot elision decision, shared VERBATIM by Hud's private writers and
@@ -168,9 +171,9 @@ export function shouldWriteSingleSlot(
  */
 export function makeWriterFacet(
   cache: SingleSlotCache,
-  stylePropCache: Map<HTMLElement, Map<string, string>>,
-  classCache: Map<HTMLElement, Map<string, string>>,
-  attrCache: Map<HTMLElement, Map<string, string>>,
+  stylePropCache: WeakMap<HTMLElement, Map<string, string>>,
+  classCache: WeakMap<HTMLElement, Map<string, string>>,
+  attrCache: WeakMap<HTMLElement, Map<string, string>>,
   onWrite: () => void,
   onSkip: () => void,
 ): PainterHostWriters {
@@ -186,7 +189,7 @@ export function makeWriterFacet(
   // elides per (element, slot). Used by setStyleProp/toggleClass so one element can
   // hold many independent props/classes without them clobbering each other's cache.
   const shouldWriteSlot = (
-    store: Map<HTMLElement, Map<string, string>>,
+    store: WeakMap<HTMLElement, Map<string, string>>,
     el: HTMLElement,
     slot: string,
     value: string,

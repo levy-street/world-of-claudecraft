@@ -99,7 +99,7 @@ const SECONDARY_CONTROLS: UiIconName[] = [
   // it means moving it to CHROME_ART_IDS, a deliberate reclassification.
   'wiki',
 ];
-const BRAND_MARKS: UiIconName[] = ['discord', 'kick', 'twitch', 'x', 'youtube'];
+const BRAND_MARKS: UiIconName[] = ['discord', 'kick', 'steam', 'twitch', 'x', 'youtube'];
 
 // Minimal DOM stand-ins: hydrateIcons walks [data-icon] hosts, prepends markup, and arms
 // painted images for load failure. The fake image exposes decode() only as a tripwire: the

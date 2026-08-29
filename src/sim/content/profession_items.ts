@@ -419,6 +419,50 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     bagSlots: 10,
     sellValue: 150,
   },
+  // The crafted bag ladder above the Silkspun Satchel (BAG_RECIPES in
+  // content/recipes.ts). Every one of these vendors cheap for its tier the way
+  // the satchel does: a crafted bag is worth its slots, not its gold, and the
+  // economy invariant holds each output under its own reagent bill.
+  duskweave_bag: {
+    id: 'duskweave_bag',
+    name: 'Duskweave Bag',
+    kind: 'bag',
+    quality: 'rare',
+    bagSlots: 12,
+    sellValue: 450,
+  },
+  // The deterministic top general bag: 16 slots without a drop roll, which is
+  // why it costs the most cloth of any general bag.
+  resonant_weave_bag: {
+    id: 'resonant_weave_bag',
+    name: 'Resonantweave Bag',
+    kind: 'bag',
+    quality: 'epic',
+    bagSlots: 16,
+    sellValue: 900,
+  },
+  // Materials-only satchels (materialsOnly: true): their slots feed the
+  // materials pool, never the general one. See src/sim/bag_pools.ts.
+  foragers_haversack: {
+    id: 'foragers_haversack',
+    name: "Forager's Haversack",
+    kind: 'bag',
+    quality: 'uncommon',
+    bagSlots: 12,
+    materialsOnly: true,
+    sellValue: 200,
+  },
+  // The top materials satchel at 24 slots, and the priciest bag bill in the
+  // game: the whole materials pool ceiling runs through this one recipe.
+  loombound_reagent_satchel: {
+    id: 'loombound_reagent_satchel',
+    name: 'Loombound Reagent Satchel',
+    kind: 'bag',
+    quality: 'epic',
+    bagSlots: 24,
+    materialsOnly: true,
+    sellValue: 1200,
+  },
   silkbinders_raiment: {
     id: 'silkbinders_raiment',
     name: "Silkbinder's Raiment",

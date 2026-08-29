@@ -227,7 +227,20 @@ describe('World Market filters', () => {
     // The SOURCE stays derived (that is the point); this is the line that reddens if a
     // catalog-side bagSlots typo moves the derivation and its mirror in lockstep, and it
     // is deliberately the one place a new bag capacity has to be acknowledged by a human.
-    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual(['all', '6', '8', '10', '12', '14']);
+    // Acknowledged for phase 05 of the bank-storage packet: 16 (Wayfarer's Backpack,
+    // Resonantweave Bag), 20 (Necromancer's Reagent Satchel) and 24 (Loombound Reagent
+    // Satchel) are the new capacities that catalog shipped.
+    expect([...MARKET_BAG_SIZE_FILTERS]).toEqual([
+      'all',
+      '6',
+      '8',
+      '10',
+      '12',
+      '14',
+      '16',
+      '20',
+      '24',
+    ]);
   });
 
   it('keeps a zero or missing bagSlots value as its own selectable option, not just under all', () => {
@@ -535,7 +548,10 @@ describe('World Market filters', () => {
 
   it('encodes localized matches against one stable code-unit-sorted item catalog', () => {
     expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS).toEqual(Object.keys(ITEMS).sort());
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_IDS.length).toBe(851);
     expect(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE).toMatch(/^m1-[0-9a-f]{8}$/);
+    expect(MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE).toBe('m1-18c837e0');
+    expect(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH).toBe(213);
 
     const forward = encodeMarketLocalizedItemMask(['woven_robe', 'worn_sword']);
     const reordered = encodeMarketLocalizedItemMask([
@@ -594,19 +610,30 @@ describe('World Market filters', () => {
       }).localizedItemMask,
     ).toBe('');
 
-    const lastNibbleBase = `${signature}:${'0'.repeat(209)}`;
+    const usedBitsInLastNibble = MARKET_LOCALIZED_ITEM_CATALOG_IDS.length % 4;
+    const validLastNibble = usedBitsInLastNibble === 0 ? 0xf : (1 << usedBitsInLastNibble) - 1;
+    const invalidUnusedBitNibble =
+      usedBitsInLastNibble === 0 ? undefined : 1 << usedBitsInLastNibble;
+    const lastNibbleBase = `${signature}:${'0'.repeat(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH - 1)}`;
+    const canonicalLastNibbleMask = `${lastNibbleBase}${validLastNibble.toString(16)}`;
     expect(
-      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${lastNibbleBase}3` })
+      sanitizeMarketQuery({ search: 'x', localizedItemMask: canonicalLastNibbleMask })
         .localizedItemMask,
-    ).toBe(`${lastNibbleBase}3`);
-    expect(
-      sanitizeMarketQuery({ search: 'x', localizedItemMask: `${lastNibbleBase}4` })
-        .localizedItemMask,
-    ).toBe('');
+    ).toBe(canonicalLastNibbleMask);
+    if (invalidUnusedBitNibble !== undefined) {
+      expect(
+        sanitizeMarketQuery({
+          search: 'x',
+          localizedItemMask: `${lastNibbleBase}${invalidUnusedBitNibble.toString(16)}`,
+        }).localizedItemMask,
+      ).toBe('');
+    }
   });
 
   it('matches canonical English, item ids, or localized membership before applying filters', () => {
     const localizedItemMask = encodeMarketLocalizedItemMask(['woven_robe']);
+    const unrelatedLocalizedItemMask = encodeMarketLocalizedItemMask(['worn_sword']);
+    const zeroMembershipLocalizedItemMask = encodeMarketLocalizedItemMask([]);
     const localizedSearch = { search: 'vestimenta', localizedItemMask };
 
     expect(filterIds(['woven_robe', 'worn_sword'], localizedSearch)).toEqual(['woven_robe']);
@@ -614,9 +641,21 @@ describe('World Market filters', () => {
     expect(filterIds(['woven_robe'], { search: 'WOVEN ROBE', localizedItemMask: '' })).toEqual([
       'woven_robe',
     ]);
+    expect(
+      filterIds(['woven_robe'], {
+        search: 'WOVEN ROBE',
+        localizedItemMask: unrelatedLocalizedItemMask,
+      }),
+    ).toEqual(['woven_robe']);
     expect(filterIds(['woven_robe'], { search: 'woven_ro', localizedItemMask: '' })).toEqual([
       'woven_robe',
     ]);
+    expect(
+      filterIds(['woven_robe'], {
+        search: 'woven_ro',
+        localizedItemMask: zeroMembershipLocalizedItemMask,
+      }),
+    ).toEqual(['woven_robe']);
     expect(
       filterIds(['woven_robe'], {
         search: 'vestimenta',

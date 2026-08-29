@@ -441,7 +441,7 @@ export const da_DK: EnTranslations = {
       "remainingDaysHours": "{days} dage {hours} timer",
       "score": "Score",
       "walletValue": "Wallet-værdi (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Ukendt",
       "spinTitle": "Daglig drejning",
@@ -480,6 +480,88 @@ export const da_DK: EnTranslations = {
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
         "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}",
         "bannedUntil": "Du er udelukket fra daglige belønninger i yderligere {remaining}. Adgangen vender tilbage {until}. Begrundelse: {reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "Handelsvinduet er lukket.",
+      "woc": {
+        "tabGold": "Guld",
+        "tabWoc": "$WOC",
+        "modesLabel": "Betalingsvaluta",
+        "tabWocHint": "At betale med $WOC er muligt, når din side af bordet er tom, og der ikke tilbydes guld.",
+        "priceLabel": "Pris i USD",
+        "pricePlaceholder": "0,00",
+        "equivalent": "Cirka {tokens} $WOC til den nuværende kurs",
+        "variableWarning": "$WOC-beløbet er en forhåndsvisning, ikke en fast pris. Det præcise beløb fastsættes af en ny kurs, når du betaler.",
+        "feeLine": "Børsgebyr {fee}, trukket fra prisen.",
+        "netLine": "Du modtager {net}",
+        "netLineBuyer": "Sælgeren modtager {net}",
+        "sendOffer": "Tilbyd $WOC",
+        "offerSent": "Tilbud sendt. Det udløber om 10 minutter, medmindre {name} accepterer.",
+        "offerSentUntil": "Tilbud sendt. Det udløber kl. {time}, medmindre {name} accepterer.",
+        "incomingAccept": "{name} tilbyder {price} for dine genstande.",
+        "notInstant": "Et $WOC-salg sker ikke øjeblikkeligt. Genstanden deponeres, så snart begge parter accepterer, og når frem til køberen, når betalingen er bekræftet.",
+        "blockDisabled": "$WOC-børsen er ikke tilgængelig på denne verden.",
+        "blockNoWallet": "Tilknyt og verificer en pung for at sælge genstande for $WOC.",
+        "blockPartnerUnknown": "Undersøger, om den spiller kan modtage $WOC...",
+        "blockRecipientNoWallet": "Den spiller skal tilslutte en pung for at kunne modtage $WOC-betalinger.",
+        "hintClearYourItems": "Fjern dine egne genstande: et $WOC-tilbud køber det, de sælger.",
+        "hintAwaitTheirItems": "Venter på, at de tilbyder noget, der kan sælges for $WOC.",
+        "hintOneItem": "En $WOC-handel dækker præcis én genstand. Kun den genstand, der sælges, kan ligge på bordet.",
+        "hintEnterPrice": "Angiv en pris i USD.",
+        "hintAcceptNeedsItem": "Tilføj den genstand, du sælger, før du accepterer.",
+        "hintAcceptLocked": "Den genstand er låst. Lås den op i dine tasker, fjern den derefter fra handlen, og tilføj den igen.",
+        "hintGoldOffered": "Fjern dit guldtilbud først: en handel er guld eller $WOC, ikke begge dele.",
+        "ineligibleReason": "Sjælebundne genstande, questgenstande og låste genstande, samt genstande uden for Børsens kategorier, kan ikke sælges for $WOC.",
+        "incomingTitle": "$WOC-tilbud fra {name}",
+        "incomingBody": "{name} tilbyder at sælge dig {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Tilbud accepteret. Venter på, at den anden spiller accepterer.",
+        "payNow": "Betal {usd}",
+        "awaitingPayment": "Venter på betalingsbekræftelse...",
+        "paying": "Bekræft betalingen i din pung...",
+        "settled": "Betalt. Din genstand er i dine tasker, eller ankommer via Ravneposten, hvis de var fulde.",
+        "settledSeller": "Betalt. Genstanden blev leveret til køberen.",
+        "accept": "Accepter tilbud",
+        "accepted": "Tilbud accepteret. Din genstand holdes tilbage, indtil betalingen er bekræftet.",
+        "decline": "Afvis",
+        "withdraw": "Træk tilbud tilbage",
+        "hintInsufficientBalance": "Det er mere $WOC, end din tilsluttede pung indeholder.",
+        "statusAwaitingBuyer": "Venter på, at køberen betaler.",
+        "statusPayingBuyer": "Bekræfter din betaling på netværket...",
+        "statusPayingSeller": "Køberens betaling bekræftes på netværket...",
+        "statusReviewBuyer": "Din betaling gennemgås.",
+        "statusReviewSeller": "Køberens betaling gennemgås.",
+        "paidSeller": "Du har modtaget en betaling på {price} for din {item}.",
+        "paidBuyer": "Du har sendt en betaling på {price} for {item}.",
+        "closedCancelled": "Dette salg blev annulleret. Genstanden returneres til sælgeren via Ravneposten.",
+        "closedSuspended": "Dette salg blev suspenderet af en spilmester. Genstanden returneres til sælgeren via Ravneposten.",
+        "closedUnpaid": "Dette salg sluttede uden betaling. Genstanden returneres til sælgeren via Ravneposten.",
+        "closedUnpaidBuyer": "Dette salg sluttede uden din betaling. Genstanden returneres til sælgeren via Ravneposten; ikke at betale en accepteret handel giver en handelsadvarsel.",
+        "cancelSale": "Annuller salg",
+        "cancelPendingSeller": "Annullering anmodet. Salget slutter af sig selv, medmindre køberen betaler først.",
+        "youDeclined": "Du afviste tilbuddet.",
+        "youWithdrew": "Du trak dit tilbud tilbage.",
+        "offerNotPending": "Dette tilbud afventer ikke længere.",
+        "offerDeclined": "$WOC-tilbuddet blev afvist.",
+        "offerWithdrawn": "$WOC-tilbuddet blev trukket tilbage.",
+        "offerExpired": "$WOC-tilbuddet udløb.",
+        "offerExpiresAt": "Tilbuddet udløber kl. {time}.",
+        "offerStandsUntil": "Dit $WOC-tilbud står stadig ved magt indtil {time}. Handl med sælgeren igen for at fuldføre handlen, hvis de accepterer.",
+        "dealAwaitsPayment": "Dit $WOC-køb er stadig ubetalt. Handl med sælgeren igen for at betale; handlen udløber af sig selv, hvis du ikke gør, og ikke at betale giver en handelsadvarsel.",
+        "closeSellerHold": "Din genstand holdes tilbage, indtil køberen betaler. Annuller salget fra fanen Aktivitet på Børsen, hvis du fortryder.",
+        "closePaymentContinuesBuyer": "Din betaling bliver stadig bekræftet. Leveringen fuldføres af sig selv.",
+        "closePaymentContinuesSeller": "Køberens betaling bliver stadig bekræftet. Salget fuldføres af sig selv.",
+        "p2pBindingNote": "Så snart begge parter accepterer, forfalder betalingen inden for {duration}, eller inden for det kortere vindue, der åbner, når du trykker på Betal. Ikke at betale giver en handelsadvarsel.",
+        "p2pBindingNoteUntimed": "Så snart begge parter accepterer, forfalder betalingen kort efter, eller inden for det kortere vindue, der åbner, når du trykker på Betal. Ikke at betale giver en handelsadvarsel.",
+        "p2pPaymentDueAt": "Betalingen forfalder senest kl. {time}. Ikke at betale giver en handelsadvarsel.",
+        "quoteExpiredTrade": "Kursen udløb. Tryk på Ikke nu, og tryk så på Betal igen for at få en ny.",
+        "quoteStaged": "Betalingskurs klar til {usd}: {tokens} $WOC, gyldig indtil {time}.",
+        "paymentConfirmed": "Betaling bekræftet. Din genstand ankommer i dine tasker, eller via Ravneposten hvis de er fulde, når leveringen er fuldført.",
+        "statusConfirmedBuyer": "Betaling bekræftet. Leveringen fuldføres...",
+        "statusConfirmedSeller": "Betaling bekræftet. Salget fuldføres...",
+        "hintBelowMin": "Børsens mindstepris er {usd}."
       }
     },
     "wocStore": {
@@ -707,7 +789,37 @@ export const da_DK: EnTranslations = {
       "applied": "I brug",
       "apply": "Anvend skin",
       "detach": "Fjern skin",
-      "equipHint": "Udstyr et våben af typen {type} for at anvende dette skin."
+      "equipHint": "Udstyr et våben af typen {type} for at anvende dette skin.",
+      "charter": {
+        "eyebrow": "Strongbox",
+        "title": "Strongbox Charters",
+        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
+        "grant": "Adds {slots} bank slots",
+        "buy": "Purchase Charter",
+        "buyAria": "Purchase {item}",
+        "confirmTitle": "Confirm Charter Purchase",
+        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "The charter was applied. The bank of this character is larger now.",
+        "alreadyGranted": "This charter is already on this character. You were not charged again.",
+        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
+        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
+        "notPurchasable": "This charter cannot be purchased right now.",
+        "noRoom": "The bank of this character has no room left for a charter.",
+        "noCharterFits": "No charter fits the room left in the bank of this character.",
+        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
+        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
+        "failed": "The purchase could not be completed.",
+        "names": {
+          "strongbox_charter_1": "Lesser Strongbox Charter",
+          "strongbox_charter_2": "Greater Strongbox Charter",
+          "strongbox_charter_3": "Grand Strongbox Charter",
+          "strongbox_charter_complete": "Complete Strongbox Charter"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -734,6 +846,9 @@ export const da_DK: EnTranslations = {
       "showAmounts": "Vis alle Claudium-beløb",
       "hideAmounts": "Skjul ekstra Claudium-beløb",
       "skuRow": "{usd} til {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Køb",
       "buyUnavailable": "Det er ikke muligt at foretage køb lige nu.",
       "storeTitle": "Kosmetisk butik",
@@ -760,6 +875,7 @@ export const da_DK: EnTranslations = {
       "reset": "Nulstil",
       "presets": {
         "classic": "Klassisk guld",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Midnat",
         "parchment": "Pergament",
         "highContrast": "Høj kontrast"
@@ -853,6 +969,7 @@ export const da_DK: EnTranslations = {
       "jump": "Hop",
       "leaderboard": "Rangliste",
       "dailyRewards": "Butik",
+      "wocMarket": "Veksl",
       "deeds": "Bedrifter",
       "mounts": "Ridedyr",
       "professions": "Erhverv",
@@ -866,11 +983,62 @@ export const da_DK: EnTranslations = {
       "actionRing": "Kamphandlinger",
       "actionPageToggle": "Skift handlingsside",
       "actionPageIndicator": "Side {page}",
+      "actionRadial": "Handlingsretninger",
+      "actionRadialCancel": "Annuller handling",
+      "radialCenter": "Midte",
+      "radialUp": "Op",
+      "radialRight": "Højre",
+      "radialDown": "Ned",
+      "radialLeft": "Venstre",
+      "consumableSeat": "Forbrugsvarer",
+      "menuControl": "Menuer",
+      "menuControlAria": "Menuer. Tryk for at åbne chatten, eller hold nede og stryg til højre for ridedyr, kort, tasker og mere.",
+      "menuControlAriaTap": "Menuer. Tryk for at åbne menurækken: ridedyr, kort, tasker og mere. Tryk igen for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Hurtige Handlinger",
+      "quickActionsAria": "Hurtige Handlinger. Tryk for at åbne rækken med ridedyr, chat, kort, tasker og mere, eller hold nede og stryg til højre for at vælge en.",
+      "quickActionsAriaTap": "Hurtige Handlinger. Tryk for at åbne rækken med ridedyr, chat, kort, tasker og mere, og tryk så på en genstand. Tryk på kontrollen igen for at lukke.",
+      "quickActionsLabel": "Handlinger",
+      "stanceRadial": "Stillinger",
+      "stanceAnchorAria": "Stilling: {stance}. Tryk for at åbne stillingsringen, og vælg så en anden stilling.",
+      "stanceAnchorEmptyAria": "Ingen stilling. Tryk for at åbne stillingsringen, og vælg så en stilling.",
+      "questStripAria": "Sporet opgave {position} af {total}: {title}. Aktivér for den næste opgave.",
+      "questStripAriaSingle": "Sporet opgave: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} mere",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Side {page}",
       "hideKeyboard": "Skjul tastatur",
-      "chatPlaceholder": "Sig noget..."
+      "chatPlaceholder": "Sig noget...",
+      "barEditor": "Rediger handlingslinjerne",
+      "barEditorAria": "Rediger handlingslinjernes layout"
+    },
+    "barEditor": {
+      "title": "Rediger handlingslinjen",
+      "close": "Luk redigering af handlingslinjer",
+      "pages": "Handlingslinjens sider",
+      "pageTab": "Side {page}",
+      "buttonHeader": "Knap {button}",
+      "cellAria": "Knap {button}, {direction}: {action}",
+      "emptyCellAria": "Knap {button}, {direction}: tom",
+      "hint": "Tryk på en plads, og så på en anden, for at bytte dem.",
+      "armed": "Tryk på en plads for at placere {name}.",
+      "picked": "Tryk på en anden plads for at bytte med {name}.",
+      "locked": "Handlingslinjerne er låst i grænsefladeindstillingerne.",
+      "clear": "Ryd",
+      "clearAria": "Ryd en plads",
+      "clearArmed": "Tryk på en plads for at rydde den."
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "Jeg har ikke set dig heromkring før, ven. Det er tradition i disse lande, at de, der begynder deres eventyr, besøger Prøvestranden, en stille ø ud for strædet. Der kan du finpudse dine færdigheder og vænne dig til verden, før du tager dens udfordringer op. Færgen sejler begge veje, og ingen vil tænke mindre om dig, uanset hvad du vælger.",
+      "bodyRefresher": "Tilbage igen med et nyt ansigt, hvad? Så kender du proceduren. Men skulle du ønske en opfriskning, før du drager af sted, afviser Prøvestranden aldrig en elev, der vender tilbage, og færgen er klar, når du er.",
+      "play": "Gennemfør vejledningen",
+      "skip": "Spring vejledningen over",
+      "declineNote": "Som du vil, ven. Skulle du nogensinde ombestemme dig, ringer færgeklokken ved Ravnepostens postkasse dig over til Prøvestranden når som helst, dag eller nat. Den vil stadig være her, når ulvene ikke er det.",
+      "bellHomeNote": "Tilbage fra kysten allerede? Det var færgeklokken, du ringede med. Dens tvilling hænger lige der ved Ravnepostens postkasse: ring med den når som helst, og overfarten vil bringe dig tilbage til Prøvestranden. Ingen skade sket, uanset hvad du vælger.",
+      "islandArrivalNote": "Velkommen til Prøvestranden. Vogter Tam venter lidt længere oppe ad stranden: gå hen og find ham.",
+      "noteClose": "Forstået"
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -883,6 +1051,117 @@ export const da_DK: EnTranslations = {
       "nextTipQuestLog": "Åbn din questlog ({key}) for at finde den næste opgave i nærheden.",
       "nextTipMap": "Tjek verdenskortet ({key}) for at se, hvor quests venter.",
       "nextTipSocial": "Åbn panelet Socialt ({key}) for at finde en gruppe til sværere kampe."
+    },
+    "bootcamp": {
+      "title": "De første skridt",
+      "talkTitle": "Tal med Vogter Tam",
+      "talkBody": "Vogter Tam bevogter Gauntlet-porten lige forude. Gå hen til ham, indtil hans navn vises, og tryk så på {interactKey}, eller venstreklik på ham, for at tale med ham: han sætter dig til løbet.",
+      "talkBodyTouch": "Vogter Tam bevogter Gauntlet-porten lige forude. Gå hen til ham, indtil hans navn vises, og tryk så på ham, eller tryk på Brug-knappen, for at tale med ham: han sætter dig til løbet.",
+      "talkBodyPad": "Vogter Tam bevogter Gauntlet-porten lige forude. Gå hen til ham, indtil hans navn vises, og tryk så på din interaktionsknap for at tale med ham: han sætter dig til løbet.",
+      "forwardTitle": "Gå den første bane",
+      "forwardBody": "Træd ind på banen ved siden af Tam, og hold {forwardKey} nede for at gå den mod vest til dens flag.",
+      "forwardBodyTouch": "Træd ind på banen ved siden af Tam, og skub bevægelsesstikken opad for at gå den mod vest til dens flag.",
+      "forwardBodyPad": "Træd ind på banen ved siden af Tam, og skub venstre stik opad for at gå den mod vest til dens flag.",
+      "turnwalkTitle": "Drej, og gå så",
+      "turnwalkBody": "Ét flag i hus. Hold {turnKey} nede for at dreje på stedet, indtil du vender ned ad den indhegnede bane, der løber mod syd, og hold så {forwardKey} nede igen, og gå den til det andet flag.",
+      "turnwalkBodyTouch": "Ét flag i hus. Træk en finger hen over skærmen (ikke bevægelsesstikken) for at dreje, indtil du vender ned ad den indhegnede bane, der løber mod syd, og skub så stikken opad, og gå den til det andet flag.",
+      "turnwalkBodyPad": "Ét flag i hus. Skub højre stik for at dreje, indtil du vender ned ad den indhegnede bane, der løber mod syd, og skub så venstre stik opad, og gå den til det andet flag.",
+      "strafeTitle": "Drej, og gå så",
+      "strafeBody": "Ét hjørne tilbage. Hold {turnLeftKey} nede for at dreje på stedet, indtil du vender ned ad den sidste bane, og hold så {forwardKey} nede igen, og gå den, til det røde flag er bag dig.",
+      "strafeBodyTouch": "Ét hjørne tilbage. Træk en finger hen over skærmen (ikke bevægelsesstikken) for at dreje, indtil du vender ned ad den sidste bane, og skub så stikken opad, og gå den, til det røde flag er bag dig.",
+      "strafeBodyPad": "Ét hjørne tilbage. Skub højre stik for at dreje, indtil du vender ned ad den sidste bane, og skub så venstre stik opad, og gå den, til det røde flag er bag dig.",
+      "cameraTitle": "Sving kameraet",
+      "cameraBody": "Én sidste lektion, før du afleverer løbet: hold højre museknap nede, og træk for at svinge kameraet hele vejen rundt om dig selv. At vide, hvad der står bag dig, vinder kampe.",
+      "cameraBodyTouch": "Én sidste lektion, før du afleverer løbet: træk en finger hen over skærmen for at svinge kameraet hele vejen rundt om dig selv. At vide, hvad der står bag dig, vinder kampe.",
+      "cameraBodyPad": "Én sidste lektion, før du afleverer løbet: skub højre stik for at svinge kameraet hele vejen rundt om dig selv. At vide, hvad der står bag dig, vinder kampe.",
+      "courseProgress": "Flag {current} af {total}",
+      "doneTitle": "Løb gennemført",
+      "doneBody": "Det er alt, dine ben behøver at vide. Opsynsmand Pell står ved det røde flag: tryk på {interactKey} på ham, eller venstreklik på ham, for at aflevere dit løb og få din første belønning.",
+      "doneBodyTouch": "Det er alt, dine ben behøver at vide. Opsynsmand Pell står ved det røde flag: tryk på ham for at aflevere dit løb og få din første belønning.",
+      "doneBodyPad": "Det er alt, dine ben behøver at vide. Opsynsmand Pell står ved det røde flag: tryk på din interaktionsknap på ham for at aflevere dit løb og få din første belønning.",
+      "coachNextTitle": "Næste: {npc}",
+      "coachNextBody": "Følg den gyldne sti til {npc}. Gå hen til dem, indtil navnet vises, og tryk så på {interactKey}, eller venstreklik på dem, for at få din næste opgave.",
+      "coachNextBodyTouch": "Følg den gyldne sti til {npc}. Gå hen til dem, indtil navnet vises, og tryk så på dem, eller tryk på Brug-knappen, for at få din næste opgave.",
+      "coachNextBodyPad": "Følg den gyldne sti til {npc}. Gå hen til dem, indtil navnet vises, og tryk så på din interaktionsknap for at få din næste opgave.",
+      "coachTaskBody": "Følg den gyldne sti til din opgave. Sporeren i højre side holder styr på tallet, og {mapKey} åbner kortet, hvis du farer vild.",
+      "coachTaskBodyTouch": "Følg den gyldne sti til din opgave. Sporeren i højre side holder styr på tallet, og kortknappen viser vejen, hvis du farer vild.",
+      "coachTaskBodyPad": "Følg den gyldne sti til din opgave. Sporeren i højre side holder styr på tallet, og din kortknap viser vejen, hvis du farer vild.",
+      "coachReadyTitle": "Opgave fuldført",
+      "coachReadyBody": "Gå hen til {npc}, og tryk på {interactKey}, eller venstreklik på dem, for at aflevere den og få din belønning.",
+      "coachReadyBodyTouch": "Gå hen til {npc}, og tryk på dem for at aflevere den og få din belønning.",
+      "coachReadyBodyPad": "Gå hen til {npc}, og tryk på din interaktionsknap for at aflevere den og få din belønning.",
+      "taskStrikeTrueBody": "Gå hen til en halmdukke, og venstreklik på den for at gøre den til dit mål: dens navn dukker op øverst på din skærm. Tryk så på {attackKey} for at begynde at svinge. Den første knap er dit almindelige angreb, ikke en besværgelse. Bliv ved med at slå, indtil en går i stykker.",
+      "taskStrikeTrueBodyTouch": "Gå hen til en halmdukke, og tryk på den for at gøre den til dit mål. Tryk så på den første knap på handlingsbjælken for at svinge. Bliv ved med at slå, indtil en går i stykker.",
+      "taskStrikeTrueBodyPad": "Gå hen til en halmdukke, og tryk på din målknap for at gøre den til dit mål. Tryk så på din første handlingsknap for at svinge. Bliv ved med at slå, indtil en går i stykker.",
+      "taskHoneBody": "Venstreklik på en halmdukke for at gøre den til dit mål, og tryk så på {abilityKey} for at bruge {ability}. Det er din egen evne, ikke et almindeligt sving. Land det tre gange.",
+      "taskHoneBodyTouch": "Tryk på en halmdukke for at gøre den til dit mål, og tryk så på {ability} på handlingsbjælken. Det er din egen evne, ikke et almindeligt sving. Land det tre gange.",
+      "taskHoneBodyPad": "Vælg en halmdukke som mål, og tryk så på handlingsknappen med {ability}. Det er din egen evne, ikke et almindeligt sving. Land det tre gange.",
+      "taskLongWalkBody": "Tryk på {bagsKey} for at åbne dine tasker, og venstreklik så på Hvilestenen. Den lægger dig ned, hvor du står. Intet her kan skade dig, og det koster dig ingenting.",
+      "taskLongWalkBodyTouch": "Åbn dine tasker, og tryk på Hvilestenen. Den lægger dig ned, hvor du står. Intet her kan skade dig, og det koster dig ingenting.",
+      "taskLongWalkBodyPad": "Åbn dine tasker, og vælg Hvilestenen. Den lægger dig ned, hvor du står. Intet her kan skade dig, og det koster dig ingenting.",
+      "taskLongWalkDeadBody": "Du er død, og du har ikke mistet noget: ingen genstande, ingen mønter, ingen erfaring. Trin 1 af 2: klik på knappen Frigiv Ånd midt på din skærm. Du rejser dig som et genfærd ved kirkegården bag lejren.",
+      "taskLongWalkDeadBodyTouch": "Du er død, og du har ikke mistet noget: ingen genstande, ingen mønter, ingen erfaring. Trin 1 af 2: tryk på knappen Frigiv Ånd midt på din skærm. Du rejser dig som et genfærd ved kirkegården bag lejren.",
+      "taskLongWalkDeadBodyPad": "Du er død, og du har ikke mistet noget: ingen genstande, ingen mønter, ingen erfaring. Trin 1 af 2: vælg Frigiv Ånd midt på din skærm. Du rejser dig som et genfærd ved kirkegården bag lejren.",
+      "taskLongWalkGhostBody": "Trin 2 af 2: du er et genfærd, og intet kan røre dig. Din krop er mærket på dit minikort. Gå hen til det. Når du kommer tæt på, dukker en knap ved navn Genopstå ved liget op: klik på den, og du er i live igen, helt uden straf. Den gåtur er ALTID gratis, og det er sådan, du kommer tilbage, hver gang du dør.",
+      "taskLongWalkGhostBodyTouch": "Trin 2 af 2: du er et genfærd, og intet kan røre dig. Din krop er mærket på dit minikort. Gå hen til det. Når du kommer tæt på, dukker en knap ved navn Genopstå ved liget op: tryk på den, og du er i live igen, helt uden straf. Den gåtur er ALTID gratis, og det er sådan, du kommer tilbage, hver gang du dør.",
+      "taskLongWalkGhostBodyPad": "Trin 2 af 2: du er et genfærd, og intet kan røre dig. Din krop er mærket på dit minikort. Gå hen til det. Når du kommer tæt på, dukker en knap ved navn Genopstå ved liget op: vælg den, og du er i live igen, helt uden straf. Den gåtur er ALTID gratis, og det er sådan, du kommer tilbage, hver gang du dør.",
+      "taskShellBody": "Skrablerne bider fra sig. Venstreklik på en for at gøre den til dit mål, og tryk så på {abilityKey} for {ability}, og bliv ved med at angribe. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskShellBodyTouch": "Skrablerne bider fra sig. Tryk på en for at gøre den til dit mål, og tryk så på {ability} på handlingsbjælken. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskShellBodyPad": "Skrablerne bider fra sig. Vælg en som mål, og tryk så på handlingsknappen med {ability}. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskStrikeTrueBodyCaster": "Gå hen til en halmdukke, og venstreklik på den for at gøre den til dit mål: dens navn dukker op øverst på din skærm. Tryk så på {attackKey}, eller klik på den anden knap på handlingsbjælken, for at kaste din besværgelse. Bliv ved med at kaste, indtil en går i stykker.",
+      "taskStrikeTrueBodyCasterTouch": "Gå hen til en halmdukke, og tryk på den for at gøre den til dit mål. Tryk så på den anden knap på handlingsbjælken for at kaste din besværgelse. Bliv ved med at kaste, indtil en går i stykker.",
+      "taskStrikeTrueBodyCasterPad": "Gå hen til en halmdukke, og tryk på din målknap for at gøre den til dit mål. Tryk så på din anden handlingsknap for at kaste din besværgelse. Bliv ved med at kaste, indtil en går i stykker.",
+      "taskShellBodyCaster": "Skrablerne bider fra sig. Venstreklik på en for at gøre den til dit mål, og tryk så på {abilityKey} for {ability}, og bliv ved med at kaste på afstand. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskShellBodyCasterTouch": "Skrablerne bider fra sig. Tryk på en for at gøre den til dit mål, og tryk så på {ability} på handlingsbjælken, og bliv ved med at kaste på afstand. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskShellBodyCasterPad": "Skrablerne bider fra sig. Vælg en som mål, og tryk så på handlingsknappen med {ability}, og bliv ved med at kaste på afstand. Angriber for mange dig på én gang, så træk dig tilbage op ad stien: de opgiver hurtigt jagten, og dit helbred vender tilbage, mens du hviler.",
+      "taskPearlBody": "Følg den gyldne sti til tidevandspølen i strandens vestlige ende. Stå ved vandkanten, tryk på {bagsKey} for at åbne dine tasker, og venstreklik på Saltlokkemaden for at kalde ham frem. Kæmp mod ham, som du kæmpede mod skrablerne, og når han falder, tryk på {interactKey} på hans skal for at kræve den Skinnende Perle.",
+      "taskPearlBodyTouch": "Følg den gyldne sti til tidevandspølen i strandens vestlige ende. Stå ved vandkanten, åbn dine tasker, og tryk på Saltlokkemaden for at kalde ham frem. Kæmp mod ham, som du kæmpede mod skrablerne, og når han falder, tryk på hans skal for at kræve den Skinnende Perle.",
+      "taskPearlBodyPad": "Følg den gyldne sti til tidevandspølen i strandens vestlige ende. Stå ved vandkanten, åbn dine tasker, og vælg Saltlokkemaden for at kalde ham frem. Kæmp mod ham, som du kæmpede mod skrablerne, og når han falder, tryk på din interaktionsknap på hans skal for at kræve den Skinnende Perle.",
+      "taskWreckLineBody": "Vragkasserne står langs stien mod Daggryhvile Lejr. Gå hen til en, indtil dens navn vises, og tryk så på {interactKey}, eller venstreklik på kassen, for at samle den op. Seks fylder hele lasten.",
+      "taskWreckLineBodyTouch": "Vragkasserne står langs stien mod Daggryhvile Lejr. Gå hen til en, indtil dens navn vises, og tryk så på kassen, eller tryk på Brug-knappen, for at samle den op. Seks fylder hele lasten.",
+      "taskWreckLineBodyPad": "Vragkasserne står langs stien mod Daggryhvile Lejr. Gå hen til en, indtil dens navn vises, og tryk så på din interaktionsknap for at samle den op. Seks fylder hele lasten.",
+      "taskPouchBody": "Tryk på {interactKey} på {npc}, eller venstreklik på dem, for at åbne boden, og venstreklik så på Lærredspungen for at købe den.",
+      "taskPouchBodyTouch": "Tryk på {npc} for at åbne boden, og tryk så på Lærredspungen for at købe den.",
+      "taskPouchBodyPad": "Tryk på din interaktionsknap på {npc} for at åbne boden, og vælg så Lærredspungen for at købe den.",
+      "readyPouchBody": "Pungen er købt. Tryk på {bagsKey} for at åbne dine tasker, og venstreklik på Lærredspungen for at spænde den fast i en ledig taskeplads. Gå så hen til {npc}, og tryk på {interactKey} for at vise den frem.",
+      "readyPouchBodyTouch": "Pungen er købt. Åbn dine tasker, og tryk på Lærredspungen for at spænde den fast i en ledig taskeplads. Gå så hen til {npc}, og tryk på dem for at vise den frem.",
+      "readyPouchBodyPad": "Pungen er købt. Åbn dine tasker, og vælg Lærredspungen for at spænde den fast i en ledig taskeplads. Gå så hen til {npc}, og tryk på din interaktionsknap for at vise den frem.",
+      "promptTalk": "Tal",
+      "promptTurnIn": "Aflever opgave",
+      "promptPickUp": "Saml op",
+      "promptLootPearl": "Plyndr perlen",
+      "promptRead": "Læs",
+      "promptRing": "Ring",
+      "promptHold": "Hold",
+      "promptSelect": "Vælg",
+      "promptAttack": "Angrib",
+      "promptUseAbility": "Brug evne",
+      "promptKneel": "Knæl",
+      "promptOpenBags": "Åbn dine tasker",
+      "promptCharacterSheet": "Åbn dit karakterark",
+      "promptLookAround": "Hold højreklik nede, og træk for at se dig omkring",
+      "promptJump": "Hop",
+      "promptSummon": "Tilkald",
+      "ringEquipTitle": "Bær din præmie",
+      "ringEquipBody": "Du har fået Perlemor, og en belønning gør ingen nytte, hvis den bare ligger i en taske. Trin 1 af 2: tryk på {bagsKey} for at åbne dine tasker, og venstreklik så på ringen for at tage den på.",
+      "ringEquipBodyTouch": "Du har fået Perlemor, og en belønning gør ingen nytte, hvis den bare ligger i en taske. Trin 1 af 2: åbn dine tasker, og tryk på ringen for at tage den på.",
+      "ringEquipBodyPad": "Du har fået Perlemor, og en belønning gør ingen nytte, hvis den bare ligger i en taske. Trin 1 af 2: åbn dine tasker, og vælg ringen for at tage den på.",
+      "ringAdmireTitle": "Se dig lige!",
+      "ringAdmireBody": "Trin 2 af 2: tryk på {charKey} for at åbne dit karakterark. Den skærm viser alt, du har på, og de statistikker, det giver dig, og ringen sidder nu på din hånd. Tjek det, hver gang du samler nyt udstyr op.",
+      "ringAdmireBodyTouch": "Trin 2 af 2: åbn dit karakterark fra menuen. Den skærm viser alt, du har på, og de statistikker, det giver dig, og ringen sidder nu på din hånd. Tjek det, hver gang du samler nyt udstyr op.",
+      "ringAdmireBodyPad": "Trin 2 af 2: åbn dit karakterark fra menuen. Den skærm viser alt, du har på, og de statistikker, det giver dig, og ringen sidder nu på din hånd. Tjek det, hver gang du samler nyt udstyr op.",
+      "keycapThen": "så",
+      "voiceArrival": "Tag det roligt i land, ven. Kan du se den gyldne sti for dine fødder? Den kender vejen bedre end jeg gør. Følg den.",
+      "voiceFirstFlag": "Så er der ét flag i hus. Hold benene i gang, kun to tilbage.",
+      "voiceRunDone": "Sikke et rent løb. Opsynsmand Pell har din belønning, gå hen og kræv den.",
+      "voiceStationDoneA": "Flot arbejde. Videre til det næste, vejen er allerede oplyst for dig.",
+      "voiceStationDoneB": "Du er ved at få styr på det her, ingen tvivl om det.",
+      "voiceVeerOff": "Vent lidt, ven, det er den forkerte vej. Den gyldne sti er bag dig.",
+      "voiceGraduate": "Klokken er ringet for dig. Eastbrook venter på den anden side af vandet, og du er klar til det.",
+      "bellTitle": "Ring med klokken",
+      "bellBody": "Din overfart er fortjent. Gå hen til færgeklokken ved siden af molen, og tryk på {interactKey}, eller venstreklik på den, for at sejle til Eastbrook.",
+      "bellBodyTouch": "Din overfart er fortjent. Gå hen til færgeklokken ved siden af molen, og tryk på den for at sejle til Eastbrook.",
+      "bellBodyPad": "Din overfart er fortjent. Gå hen til færgeklokken ved siden af molen, og tryk på din interaktionsknap på den for at sejle til Eastbrook."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klik for at skifte mellem 12/24-timers",
@@ -935,6 +1214,31 @@ export const da_DK: EnTranslations = {
       "mergedPrs": "Flettede PR'er",
       "devEmpty": "Ingen rangerede bidragydere endnu."
     },
+    "pledge": {
+      "open": "Accepterer løfter",
+      "closed": "Accepterer ikke løfter",
+      "minLevel": "Niveau {level}+",
+      "action": "Afgiv løfte",
+      "actionTitle": "Afgiv løfte til {guild}",
+      "pledged": "Løfte afgivet",
+      "yourGuild": "Dit laug",
+      "tab": "Løfter",
+      "tabWithCount": "Løfter ({count})",
+      "empty": "Ingen har endnu afgivet et løfte til dit laug.",
+      "accept": "Accepter",
+      "acceptTitle": "Accepter {name}s løfte",
+      "reject": "Afvis",
+      "rejectTitle": "Afvis {name}s løfte",
+      "settings": "Rekruttering",
+      "acceptingLabel": "Accepter løfter",
+      "minLevelLabel": "Minimumsniveau",
+      "noteLabel": "Opslagsbesked",
+      "notePlaceholder": "Fortæl håbefulde medlemmer, hvad jeres laug søger",
+      "save": "Gem",
+      "yourPledge": "Dit løfte: {guild}",
+      "since": "Løfte afgivet {date}",
+      "withdraw": "Træk løfte tilbage"
+    },
     "raidLockout": {
       "title": "Raidlåse",
       "allReady": "Alle raids klar",
@@ -986,6 +1290,7 @@ export const da_DK: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "Rækker vises automatisk, når din gruppe påfører skade eller heling, og dette segment lukker et par sekunder efter kampens afslutning.",
       "threatFallback": "Ingen aktiv trussel: viser skade til {name}",
+      "threatFrozen": "Endelig trussel mod {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Andet ({count})",
@@ -1025,7 +1330,6 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "targetPrev": "Skift mål baglæns",
       "discord": "Discord",
-      "valecup": "Dalpokalen",
       "bgFlag": "Flaghandling på slagmarken",
       "sheathe": "Gem/fremvis våben",
       "dive": "Svøm ned",
@@ -1048,6 +1352,11 @@ export const da_DK: EnTranslations = {
       "reset": "Nulstil",
       "done": "Færdig",
       "cancel": "Annuller",
+      "showExtraBar": "Show Another Action Bar",
+      "hideExtraBar": "Hide an Action Bar",
+      "conflictTitle": "Key Already Bound",
+      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
+      "conflictAccept": "Rebind Anyway",
       "resetConfirmTitle": "Nulstil handlingslinjens taster?",
       "resetConfirmBody": "Den første linje vender tilbage til sine standardtaster. Den anden og tredje linje bliver ubundne. Dette kan ikke fortrydes."
     },
@@ -1182,6 +1491,7 @@ export const da_DK: EnTranslations = {
       "endedForfeitLog": "Kampen blev opgivet.",
       "firstWinBonusLine": "Dagens første sejr: +{honor} Ære",
       "firstWinBonusLog": "Dagens første sejr: du får {honor} bonus-Ære.",
+      "doubleHonorLine": "Dobbelt Ære-weekend: Ære fra Tornehulemarkerne udbetales {mult}x i dag, og et udkæmpet nederlag udbetales som en sejr",
       "timeWarningMinutes": "{minutes} minutter tilbage",
       "timeWarningOneMinute": "Ét minut tilbage",
       "timeWarningMinutesLog": "{minutes} minutter tilbage af kampen.",
@@ -1191,146 +1501,6 @@ export const da_DK: EnTranslations = {
         "azureKeep": "Azurblå Borg",
         "ruinCourtyard": "Ruingården",
         "graveyard": "Kirkegård"
-      }
-    },
-    "vcup": {
-      "title": "Dalpokalen",
-      "shootPower": "KRAFT",
-      "close": "Luk Dalpokal-vinduet",
-      "offlineNote": "Kampbogen er lukket. Dalpokalen er ikke tilgængelig lige nu.",
-      "recordLine": "Din statistik: {wins} sejre, {losses} nederlag, {draws} uafgjorte.",
-      "bracketsAria": "Kamprække",
-      "bracketLabel": "{n} mod {n}",
-      "waitingCount": "{count} venter",
-      "nationsHeading": "Bannernation",
-      "nation": {
-        "vale": "Østbæk Dal",
-        "mirefen": "Mosekæret",
-        "thornpeak": "Tornetop",
-        "coliseum": "Askekolosseet",
-        "choir": "Det Blege Kor",
-        "ogre": "Ogreklanerne",
-        "moon": "Den Blege Måne",
-        "copperdig": "Kobbergraven"
-      },
-      "awayNote": "Fører begge sider det samme banner, spiller udeholdet i den omvendte palet.",
-      "rolesHeading": "Sportsrolle",
-      "rolesSmallBracketNote": "I 1v1- og 2v2-rækkerne spiller alle kæmpere med Allrounder-sættet. Bedrifter, der kræver 3v3-rækken eller større, kan ikke opnås her.",
-      "role": {
-        "allrounder": {
-          "name": "Allrounder",
-          "desc": "Lidt af det hele: spark, kæmpespark og et fair skulderpuf."
-        },
-        "striker": {
-          "name": "Angriber",
-          "desc": "Lever for det lange spark og det hurtige sidespring."
-        },
-        "sweeper": {
-          "name": "Libero",
-          "desc": "Puffer løbere væk fra bolden og rydder den langt op ad banen."
-        },
-        "keeper": {
-          "name": "Målmand",
-          "desc": "Vogter målfeltet med greb, dyk og udspark."
-        }
-      },
-      "queue": "Stil dig i kø",
-      "leaveQueue": "Forlad køen",
-      "queueNote": "Stil dig i kø hvor som helst; fløjten kalder dig til Somarken.",
-      "queuedStatus": "I kø til {bracket}: plads {position} af {count}.",
-      "blockNation": "Vælg en bannernation først.",
-      "blockPartySize": "Den række kræver en mindre gruppe.",
-      "blockNotLeader": "Kun gruppelederen kan sætte holdet i kø.",
-      "inMatchNote": "Dit hold er på banen. Spil videre!",
-      "deserterNote": "Banemesteren husker det. Du kan stille dig i kø igen om {seconds} sek.",
-      "liveHeading": "Lige nu på Somarken",
-      "liveAria": "Dalpokalen: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Gå hen til Somarken for at se med fra tribunerne.",
-      "noLive": "Banen er stille. Der spilles ingen kamp.",
-      "boardHeading": "Vindertavlen",
-      "boardEmpty": "Ingen vindere noteret endnu. Kobberspanden venter.",
-      "boardWins": "{count} sejre",
-      "enterAsGuild": "Stil op under {guild}s banner",
-      "guildRecordLine": "Dit laugs statistik: {wins} sejre, {losses} nederlag.",
-      "guildBoardHeading": "Laugsbannere",
-      "guildBoardEmpty": "Intet laug har endnu været på banen. Hejs jeres banner!",
-      "guildBoardWl": "{wins} S, {losses} N",
-      "practice": "Træning mod bots",
-      "practiceNote": "Starter straks en privat botkamp på din egen træningsbane.",
-      "practiceUnratedNote": "Træningskampe er urangerede: stilling og fremgang i Bedrifternes Bog tæller ikke.",
-      "practicingNow": "Træner lige nu ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Dalpokal-kø: {bracket}, plads {position} af {count}",
-      "indicatorLive": "Dalpokalen",
-      "indicatorOpen": "Åbn Dalpokal-vinduet",
-      "phaseCountdown": "Kampstart om {seconds}",
-      "phaseGoal": "MÅL!",
-      "phaseGolden": "GYLDENT MÅL",
-      "phaseOver": "FULD TID",
-      "bannerFound": "Dalpokalen kalder: {nationA} mod {nationB}!",
-      "bannerCountdown": "Kampstart om {seconds}...",
-      "bannerKickoff": "KAMPSTART!",
-      "bannerGoal": "MÅL! {nation} scorer!",
-      "bannerSave": "{name} REDDER!",
-      "bannerGolden": "GYLDENT MÅL: næste scoring vinder!",
-      "bannerEnd": "Fuld tid: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Sejr på Somarken!",
-      "bannerDraw": "Uafgjort på Somarken.",
-      "bannerLoss": "Nederlag på Somarken.",
-      "logQueued": "Du stiller dig i Dalpokal-køen til {bracket} (plads {position}).",
-      "logUnqueued": "Du forlader Dalpokal-køen.",
-      "logFound": "Din Dalpokal-kamp er klar: {nationA} mod {nationB}.",
-      "logRoster": "Din side: {allies}. Deres side: {enemies}.",
-      "logGoal": "{name} scorer for {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} redder!",
-      "logWin": "Du vinder dysten på Somarken.",
-      "logDraw": "Dysten på Somarken ender uafgjort.",
-      "logLoss": "Du taber dysten på Somarken.",
-      "gossipOpen": "Kampbogen",
-      "gossipOpenAria": "Åbn Dalpokal-vinduet",
-      "mobileLabel": "Pokal",
-      "briefing": {
-        "subtitle": "Briefing før kampen",
-        "vs": "mod",
-        "rulesHeading": "Sådan spiller du",
-        "rule1": "Spark eller aflever bolden i modstandernes mål for at score.",
-        "rule2": "Først til 5 mål vinder, eller flest mål når der fløjtes af.",
-        "rule3": "Står det lige ved fuld tid, går kampen til gyldent mål: næste scoring vinder.",
-        "rule4": "Tacklinger vælter dig kun omkuld. Ingen kommer til skade under høstfreden.",
-        "rule5": "Enhver kan gå hen og heppe på dig fra tribunerne.",
-        "kitHeading": "Dit sæt",
-        "kitNote": "Disse træk erstatter dine klasseevner under kampen.",
-        "unratedNote": "Der er bots på banen, så denne kamp er urangeret: stillingen rykker sig ikke, og bedrifter for mål, redninger og kampe uden mål imod tæller ikke.",
-        "practiceUnratedNote": "Dette er en træningskamp, så den er urangeret: stillingen rykker sig ikke, og fremgang i Bedrifternes Bog tæller ikke.",
-        "rosterHeading": "Holdkortet",
-        "you": "Dig",
-        "bot": "Bot",
-        "ready": "Jeg er klar",
-        "readyDone": "Klar",
-        "readyAria": "Meld dig klar til kampstart",
-        "waiting": "Venter på, at den anden side melder klar...",
-        "whistle": "Fløjten lyder om {seconds}s.",
-        "readyCount": "{ready} af {total} klar"
-      },
-      "bet": {
-        "title": "Kampvæddemål",
-        "aria": "Væddemål på Dalpokal-kamp",
-        "closesIn": "Væddemål lukker om {seconds}s",
-        "closed": "Væddemål lukket",
-        "prize": "Pulje {amount}",
-        "splitAria": "Andel af væddepuljen på hvert hold",
-        "expand": "Se væddemål og sats",
-        "collapse": "Skjul væddemål",
-        "oddsLabel": "Udbetaler",
-        "back": "Hold på {team}",
-        "form": "{wins}S-{losses}N",
-        "mine": "Dit væddemål: {amount} på {team}",
-        "none": "Du har endnu ikke væddet på denne kamp.",
-        "record": "Væddestatistik: {wins}S-{losses}N, {sign}{net}",
-        "wonBanner": "Dit væddemål vandt!",
-        "wonLog": "Dit Dalpokal-væddemål vandt: {amount} retur.",
-        "lostLog": "Dit Dalpokal-væddemål tabte: {amount}.",
-        "refundLog": "Væddemål annulleret, din indsats på {amount} blev returneret."
       }
     },
     "options": {
@@ -1402,11 +1572,12 @@ export const da_DK: EnTranslations = {
       "mouseoverCast": "Museover-kast på grupperammer",
       "stickyTarget": "Bevar mål ved jordklik",
       "showItemLevel": "Vis genstandsniveau",
-      "showReliquaryTracker": "Show Reliquary Tracker",
+      "showReliquaryTracker": "Vis Relikviesporer",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showThirdActionBar": "Vis tredje handlingslinje",
+      "combineActionBars": "Combine Action Bars",
       "hideUnusedActionSlots": "Skjul ubrugte handlingsfelter",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
@@ -1415,7 +1586,9 @@ export const da_DK: EnTranslations = {
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Venstrehånds layout"
+      "mobileLeftHanded": "Venstrehånds layout",
+      "touchTapMenus": "Tryk-menuer",
+      "touchTapMenusNote": "Åbn kontrollerne for kamphandlinger, forbrugsvarer og menu med et tryk i stedet for et strøg. Tryk på en genstand for at bruge den, tryk på kontrollen igen for dens sædvanlige handling, eller tryk udenfor for at lukke."
     },
     "talentRows": {
       "tab": "Valg",
@@ -1440,6 +1613,11 @@ export const da_DK: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Knapikoner",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Aktivér controller",
       "invertY": "Vend kamera om (Y)",
       "deadzone": "Stikkets dødzone",
@@ -1448,29 +1626,29 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
-      "confirmAction": "Confirm / Select",
+      "confirmAction": "Bekræft/Vælg",
       "zoomIn": "Zoom ind",
       "zoomOut": "Zoom ud",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren.",
       "crossHotbar": "Cross Hotbar",
-      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarEnable": "Aktiver Cross Hotbar",
       "crossHotbarExpand": "Double Cross Hotbar",
-      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
-      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarHelp": "Hold en trigger for at tænde otte action-bar slots på d-pad og ansigtsknapperne. Tryk på den anden udløser for at skifte til det andet sæt.",
+      "crossHotbarResetLayout": "Nulstil Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
-      "cancelAction": "Cancel / Back",
-      "subcommandsAction": "Subcommands / Map",
+      "crossHotbarOwnsButtons": "Triggerne og d-pad'en hører til cross hotbaren, mens den er tændt, så de er sat op nedenfor i stedet for her.",
+      "cancelAction": "Annuller / Tilbage",
+      "subcommandsAction": "Underkommandoer / kort",
       "cycleHudAction": "Cycle Interface",
-      "cycleSetAction": "Change Hotbar Set",
+      "cycleSetAction": "Skift Hotbar-sæt",
       "crossHotbarDisplay": "Bar Display",
-      "crossHotbarDisplayFull": "Full",
-      "crossHotbarDisplayCompact": "Compact",
-      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarDisplayFull": "Fuld",
+      "crossHotbarDisplayCompact": "Kompakt",
+      "crossHotbarDisplayMinimal": "Kun under afholdelse",
       "crossHotbarArrangeChord": "{bumper} + {button}",
-      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
-      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
-      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
+      "crossHotbarCarrying": "Bærer {action}: bekræft på en celle for at placere den, annuller for at sætte den tilbage.",
+      "crossHotbarEditHint": "Arrangering: bekræft henter fra en celle eller stavebogen og falder på en celle, annuller sletter en.",
+      "crossHotbarEditHelp": "Hold den venstre kofanger, og tryk på den øverste knap for at arrangere stangen med controlleren."
     },
     "perf": {
       "title": "Ydelsesoverlay",
@@ -1589,7 +1767,7 @@ export const da_DK: EnTranslations = {
           "render": "render  indsendelse {submit} ms | verden {world} ms | enheder {entities} ms",
           "scene": "scene   {calls} kald | {triangles} tri | {views} visninger",
           "hitches": "hak {hitches} | shaders {shaders} | uploads {uploads} | visninger {views}",
-          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
+          "hitchesBuild": "zone bygger {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "venter"
         },
@@ -1641,10 +1819,10 @@ export const da_DK: EnTranslations = {
             "eventCpu": "Hændelsesbehandling opbruger billedtiden",
             "shaderCompile": "Shaders kompileres under spillet",
             "textureUpload": "Teksturupload forårsager hak i spillet",
-            "zoneBuild": "Zone streaming builds are causing hitches",
+            "zoneBuild": "Opbygning af zonestreaming forårsager problemer",
             "viewCreate": "Oprettelse af enhedsvisninger forårsager hak",
-            "gcHitch": "Garbage collections are running inside long frames",
-            "offFrameHitch": "Long frames come from work outside the render callback",
+            "gcHitch": "Affaldsindsamlinger kører inde i lange rammer",
+            "offFrameHitch": "Lange rammer kommer fra arbejde uden for genkaldet tilbagekald",
             "otherHitch": "Der er stadig uforklarede lange billeder",
             "assetStartup": "Spillets opstart forsinkes af assetarbejde",
             "longTasks": "Lange browseropgaver blokerer billeder",
@@ -1929,6 +2107,18 @@ export const da_DK: EnTranslations = {
         "many": "du er {rank}, {count} medlemmer",
         "other": "du er {rank}, {count} medlemmer"
       },
+      "wocMarketSellChoose": {
+        "one": "Vælg blandt {count} genstand",
+        "few": "Vælg blandt {count} genstande",
+        "many": "Vælg blandt {count} genstande",
+        "other": "Vælg blandt {count} genstande"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} klargjort genstand kan ikke sælges for $WOC.",
+        "few": "{count} klargjorte genstande kan ikke sælges for $WOC.",
+        "many": "{count} klargjorte genstande kan ikke sælges for $WOC.",
+        "other": "{count} klargjorte genstande kan ikke sælges for $WOC."
+      },
       "finderPartySize": {
         "one": "{count} spiller",
         "few": "{count} spillere",
@@ -2063,6 +2253,10 @@ export const da_DK: EnTranslations = {
       "errPasswordLong": "Den nye adgangskode må højst være 128 tegn.",
       "errPasswordUnchanged": "Den nye adgangskode skal være forskellig fra den nuværende.",
       "errPasswordConfirm": "De nye adgangskoder stemmer ikke overens.",
+      "setPasswordTitle": "Indstil en adgangskode",
+      "setPasswordHint": "Denne konto blev oprettet med Log ind med Apple eller Discord og har endnu ingen adgangskode. Indstil en til at logge ind på andre enheder, såsom Mac- og Windows-skrivebordsapps eller internettet, og til at linke yderligere login-metoder.",
+      "setPasswordSubmit": "Indstil adgangskode",
+      "passwordSet": "Adgangskode indstillet. Du kan nu logge ind med dit brugernavn og adgangskode hvor som helst.",
       "emailLabel": "E-mail (valgfri)",
       "emailHint": "Bruges kun til kontogendannelse. Brug Skift e-mail nedenfor for at opdatere den.",
       "saveEmail": "Gem e-mail",
@@ -2276,7 +2470,10 @@ export const da_DK: EnTranslations = {
       "backpack": "Rygsæk",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom taskeplads",
-      "unequipHint": "Klik for at fjerne denne taske"
+      "unequipHint": "Klik for at fjerne denne taske",
+      "poolGeneral": "General: {used} of {total}",
+      "poolMaterials": "Materials: {used} of {total}",
+      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -2504,13 +2701,15 @@ export const da_DK: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
-      "removeFromBarAria": "Fjern {name} fra handlingslinjen"
+      "removeFromBarAria": "Fjern {name} fra handlingslinjen",
+      "assignAria": "Vælg en plads til {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Snyder >"
+      "cheaterTag": "< Snyder >",
+      "pledgeTag": "Løfte til {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -2530,6 +2729,7 @@ export const da_DK: EnTranslations = {
     },
     "partyFrames": {
       "section": "Gruppe- og raidrammer",
+      "optionsSection": "Party Frame Options",
       "unlock": "Flyt gruppe- og raidrammer",
       "lock": "Lås gruppe- og raidrammer",
       "style": "Rammestil",
@@ -2559,6 +2759,62 @@ export const da_DK: EnTranslations = {
     },
     "frameReset": {
       "label": "Nulstil rammepositioner"
+    },
+    "interfaceUnlock": {
+      "label": "Edit Frames",
+      "unlock": "Unlock interface",
+      "lock": "Lock interface",
+      "lockAll": "Lock Interface",
+      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
+      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
+      "unlockFrame": "Unlock this frame",
+      "lockFrame": "Lock this frame",
+      "resizeFrame": "Resize this frame",
+      "frameNames": {
+        "actionBar1": "Action Bar",
+        "actionBar2": "Action Bar 2",
+        "actionBar3": "Action Bar 3",
+        "steamWishlist": "Wishlist Reminder",
+        "menu": "Menu",
+        "minimap": "Minimap",
+        "stanceBar": "Stance Bar",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "Action Bars",
+        "playerFrame": "Player",
+        "targetFrame": "Target",
+        "partyFrames": "Party",
+        "swingBar": "Auto Attack"
+      },
+      "framesMenu": "Frames Settings",
+      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
+      "showHideFrames": "Show or Hide Frames",
+      "buffsLeftToRight": "Buffs left to right",
+      "debuffsLeftToRight": "Debuffs left to right",
+      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
+      "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
+      "menuRailHorizontal": "Horizontal Menu",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Reset size",
+      "resetFrameSizeFor": "Reset size for {name}",
+      "previewSpell": "Example Spell"
+    },
+    "transfer": {
+      "frameLayout": "Frame Layout",
+      "allSettings": "All Settings",
+      "exportAction": "Export",
+      "importAction": "Import",
+      "copy": "Copy",
+      "copied": "Copied to clipboard.",
+      "copyFailed": "Copy failed. Select the code and copy it yourself.",
+      "applyReload": "Apply and Reload",
+      "pastePlaceholder": "Paste an exported code here.",
+      "invalid": "That is not a valid export code.",
+      "wrongKind": "That code is a different export type."
     },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}",
@@ -2767,7 +3023,10 @@ export const da_DK: EnTranslations = {
       "unlink": "Fjern Steam-tilknytning",
       "linked": "Tilknyttet Steam-kontoen {id}",
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
-      "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen."
+      "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",
@@ -2834,7 +3093,12 @@ export const da_DK: EnTranslations = {
       "tip": "Salgsprovenu eller returnerede genstande venter på dig hos Købmanden."
     },
     "noticeboard": {
-      "empty": "Der ser ikke ud til at være slået noget op."
+      "empty": "Der ser ikke ud til at være slået noget op.",
+      "subtitle": "Rigets laug",
+      "rosterTitle": "Se medlemslisten for {guild}",
+      "back": "Tilbage",
+      "popupTitle": "Laugsskilt",
+      "close": "Luk"
     },
     "bank": {
       "title": "Bank",
@@ -2848,6 +3112,26 @@ export const da_DK: EnTranslations = {
       "buySlotsMaxed": "Fuldt udvidet",
       "buyConfirm": "Køb {count} ekstra bankpladser for {price}?",
       "buyConfirmAccept": "Køb",
+      "meterLabel": "{used} of {total} slots",
+      "meterPoolGeneral": "General: {used} of {total}",
+      "meterPoolMaterials": "Materials: {used} of {total}",
+      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
+      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
+      "priceDisclaimer": "Prices may change with the game economy.",
+      "rungItemName": "{count} bank slots",
+      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
+      "buyConfirmDual": "Purchase {count} additional bank slots?",
+      "buyConfirmGold": "Purchase for {price}",
+      "buyConfirmClaudium": "Purchase for {cost} Claudium",
+      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
+      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
+      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
+      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
+      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
+      "rungFailed": "The purchase could not be completed.",
+      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
       "withdrawHint": "Klik for at tage ud",
       "withdrawPartialHint": "Shift-klik for at tage et mindre antal ud",
       "depositHint": "Klik for at indsætte",
@@ -2860,6 +3144,9 @@ export const da_DK: EnTranslations = {
       "withdrawQuantityTitle": "Tag {item} ud",
       "withdrawQuantityInput": "Antal at tage ud",
       "withdrawQuantityConfirm": "Tag ud",
+      "vaultRowWithdrawName": "Withdraw {item}",
+      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filtrér banken efter kategori",
       "sortAria": "Sortér bankens genstande",
       "searchAria": "Søg i bankens genstande efter navn",
@@ -2881,6 +3168,34 @@ export const da_DK: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invitér en ven: når din ven når niveau 10, optjener I hver især 2 pladser, op til 5 venner.",
       "bonusSectionAria": "Bonuspladser i banken, og hvordan du optjener flere",
+      "socketRowAria": "Bank bag sockets",
+      "socketEmpty": "Empty bank bag socket",
+      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
+      "socketLocked": "Locked bag socket",
+      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
+      "socketUnlockAria": "Unlock a bank bag socket for {price}",
+      "socketUnlockHint": "Click to unlock this bag socket",
+      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
+      "socketUnlockAccept": "Unlock",
+      "unsocketHint": "Click to return this bag to your bags",
+      "socketHint": "Click to socket this bag into your bank",
+      "vaultTab": "Vault",
+      "vaultCapacityNote": "Each material holds up to {cap}.",
+      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
+      "vaultRowAria": "{item}: {count} of {cap} stored",
+      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
+      "vaultUnlockButton": "Unlock the Materials Vault",
+      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
+      "vaultUpgrade": "Widen every ceiling to {cap}",
+      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
+      "vaultDepositAll": "Deposit all materials",
+      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
+      "vaultDepositAllDone": "Materials deposited: {count}.",
+      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
+      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
+      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
+      "vaultDepositHint": "Click to deposit into your vault",
+      "vaultCannotDeposit": "Cannot go in the vault",
       "tabsAria": "Bankfaneblade",
       "personalTab": "Personlig",
       "guildTab": "Laug",
@@ -2966,6 +3281,10 @@ export const da_DK: EnTranslations = {
         "arenaClash": {
           "title": "Arenasammenstød",
           "note": "Duellanter strømmer til Askekolosseet. Stil dig i kø, og klatr op ad ranglisten."
+        },
+        "doubleHonor": {
+          "title": "Dobbelt Ære-weekend",
+          "note": "Krigslejrene lyder til mønstring: hele weekenden udbetales Ære fra Tornehulemarkerne dobbelt, og et udkæmpet nederlag udbetales som en sejr."
         },
         "fishingDerby": {
           "title": "Fiskederby",
@@ -3276,6 +3595,9 @@ export const da_DK: EnTranslations = {
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(bruger {count} af fin kvalitet)",
+      "reagentVaultDraw": "(draws {count} from your vault)",
+      "vaultUnreachable": "The Materials Vault is out of reach here.",
+      "craftFeeLine": "Gebyr: {fee} pr. stk.",
       "empty": "Ingen opskrifter kendt endnu.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",
@@ -3765,8 +4087,8 @@ export const da_DK: EnTranslations = {
       "pinAria": "Fastgør {name} til sporeren på brugerfladen",
       "unpinAria": "Frigør {name}",
       "trackerToggleLabel": "HUD tracker",
-      "trackerToggleShowHint": "Show the Reliquary tracker on your screen",
-      "trackerToggleHideHint": "Hide the Reliquary tracker from your screen",
+      "trackerToggleShowHint": "Vis Reliquary-trackeren på din skærm",
+      "trackerToggleHideHint": "Skjul Reliquary-trackeren fra din skærm",
       "rarityLine": "Fundet af {percent} af samlerne",
       "pageRarityLine": "Illumineret af {percent} af samlerne",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3827,6 +4149,7 @@ export const da_DK: EnTranslations = {
       "unlockedBorderHint": "Ny ramme optjent: {name}. Bær den fra Bedrifternes Bog.",
       "broadcastLine": "{name} har fuldbragt en bedrift: {deed}",
       "rarityLine": "Opnået af {percent} af eventyrerne",
+      "stillToVisit": "Stadig at besøge: {places}",
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fold bedriftssporing sammen",
       "expandHint": "Fold bedriftssporing ud",
@@ -3854,6 +4177,222 @@ export const da_DK: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Kræver niveau {level}"
+    },
+    "walletBridge": {
+      "cancelled": "Pung-anmodningen blev annulleret. Intet blev sendt.",
+      "timeout": "Din pung svarede ikke i tide. Åbn pungen, og prøv så igen.",
+      "notConnected": "Tilslut og verificer en pung, og prøv så igen.",
+      "unsupported": "Denne pung kan ikke gennemføre den handling. Tilslut en anden pung.",
+      "unavailable": "Ingen pungforbindelse er tilgængelig her. Gentilslut din pung, og prøv så igen.",
+      "badResponse": "Din pung gav et svar, der ikke kunne bruges. Prøv igen."
+    },
+    "wocMarket": {
+      "title": "$WOC-Børsen",
+      "close": "Luk Børsen",
+      "launcherLabel": "$WOC-Børsen",
+      "tabBrowse": "Gennemse",
+      "tabSell": "Sælg",
+      "tabActivity": "Mine aktiviteter",
+      "tabsLabel": "Sektioner i $WOC-Børsen",
+      "loading": "Indlæser Børsen...",
+      "loadFailed": "Børsen kunne ikke nås. Prøv igen om lidt.",
+      "disabledRealm": "$WOC-Børsen er ikke tilgængelig på dette rige.",
+      "pausedBanner": "Handel er sat på pause. Auktioner tæller stadig ned; nye noteringer, bud, tilbud og betalinger venter, til handlen genoptages, og en betaling, der allerede er sendt, afregnes stadig.",
+      "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
+      "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Unknown",
+      "rateNote": "Kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
+      "rateNotePaused": "Sidst kendte kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
+      "estimateNote": "Omkring {tokens} $WOC for {usd} til den aktuelle kurs.",
+      "browseEmpty": "Ingen noteringer lige nu. Kig forbi igen snart.",
+      "browseError": "Noteringerne kunne ikke indlæses.",
+      "colItem": "Vare",
+      "colSeller": "Sælger",
+      "colCurrentBid": "Nuværende bud",
+      "colBuyNow": "Køb nu",
+      "colTimeLeft": "Tid tilbage",
+      "reserveMet": "Mindstepris nået",
+      "reserveNotMet": "Mindstepris ikke nået",
+      "yourListing": "Din notering",
+      "buyNowLockedBadge": "Køb i gang",
+      "reserveMetTip": "Sælgeren har fastsat en skjult mindstepris, og det nuværende bud opfylder den.",
+      "reserveNotMetTip": "Sælgeren har fastsat en skjult mindstepris. Er det højeste bud ved lukketid under den, sælges varen ikke, og alle depositummer returneres.",
+      "yourListingTip": "Du har noteret denne vare. Du kan ikke byde på din egen notering; så længe den ikke har nogen bud, kan du annullere den her eller fra Aktiviteter.",
+      "buyNowLockedTip": "En anden køber holder denne notering, mens de betaler. Betaler de ikke rettidigt, åbner den igen.",
+      "pagePrev": "Forrige side",
+      "pageNext": "Næste side",
+      "pageNumber": "Side {current}",
+      "sortLabel": "Sortering",
+      "sortEnding": "Slutter snarest",
+      "sortNewest": "Nyeste",
+      "sortPriceAsc": "Pris: lav til høj",
+      "sortPriceDesc": "Pris: høj til lav",
+      "filterQuality": "Kvalitet",
+      "filterFormat": "Format",
+      "filterAny": "Alle",
+      "filterFormatAuction": "Auktion",
+      "filterFormatBuyNow": "Køb nu",
+      "filterItemLabel": "Vare",
+      "filterItemPlaceholder": "Søg efter varens navn",
+      "filterCategory": "Kategori",
+      "filterCategoryWeapon": "Våben",
+      "filterCategoryArmor": "Rustning",
+      "filterCategoryMount": "Ridedyr",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "Vis seneste handler af {name}",
+      "sellerTitle": "Seneste handler af {name}",
+      "sellerBack": "Tilbage til Gennemse",
+      "sellerEmpty": "Ingen gennemførte handler endnu.",
+      "sellerError": "Seneste handler kunne ikke indlæses.",
+      "sellerSaleRow": "{time}: {item} til {buyer} for {usd}",
+      "detailTitle": "Notering",
+      "detailSeller": "Solgt af {name}",
+      "detailEndsAt": "Slutter {utc} UTC ({local} lokal tid)",
+      "detailStartingBid": "Startbud: {usd}",
+      "detailCurrentBid": "Nuværende bud: {usd}",
+      "detailNoBids": "Ingen bud endnu",
+      "detailMinNext": "Minimum for næste bud: {usd}",
+      "detailBuyNow": "Køb nu: {usd}",
+      "detailSales": "Seneste salg",
+      "detailSaleRow": "{time}: {seller} solgte til {buyer} for {usd}",
+      "detailNoSales": "Ingen registrerede salg af denne vare endnu.",
+      "detailSalesLoading": "Indlæser seneste salg...",
+      "bidLabel": "Dit bud (USD)",
+      "bidPlaceholder": "Angiv et beløb i USD",
+      "bidButton": "Afgiv bud",
+      "bidAria": "Afgiv et bud på {item}",
+      "bidTermsToggle": "Budvilkår",
+      "rowOpenAria": "Vis noteringen for {item}",
+      "buyNowButton": "Køb nu for {usd}",
+      "buyNowAria": "Køb {item} nu for {usd}",
+      "cancelButton": "Annuller notering",
+      "cancelAria": "Annuller din notering af {item}",
+      "bidBondNote": "At afgive et bud holder et refunderbart depositum i $WOC oven i buddet: {bond} for et bud på {bid}, mere for et højere bud. Det returneres, når du bliver overbudt eller taber, eller efter du har betalt, hvis du vinder; et tilbud om en ny chance holder det igen.",
+      "bidBondSchedule": "Depositummet udgør {rate} procent af dit bud, mindst {min} og højst {max}.",
+      "bidBondPayWindow": "Betal depositummet inden for {duration} efter at have afgivet dit bud, ellers bortfalder buddet.",
+      "bidBindingNote": "Et bud er bindende, så snart du underskriver dets depositumtransaktion: det kan ikke trækkes tilbage, og hvis du vinder og ikke betaler, mistes depositummet, og din konto får en handelsadvarsel.",
+      "bidCloseNote": "Et bud, hvis depositum bekræftes inden for de sidste 2 minutter, forlænger auktionen til 2 minutter efter det bud, op til 30 minutter ud over den oplyste slutning. Et depositum, der bekræftes, efter auktionen er lukket, tæller ikke og bliver refunderet.",
+      "offerNextNote": "Betaler vinderen ikke, kan du blive køberen til dit eget bud: dit depositum holdes igen (eller anmodes om igen, hvis det allerede er returneret), og betalingen forfalder inden for {duration}.",
+      "buyNowNote": "Køb nu holder denne notering til dig i omkring fire og et halvt minut, mens du betaler. Betaler du ikke rettidigt, kan du ikke forsøge dig med den notering igen i 30 minutter, og tre ubetalte Køb nu inden for en time sætter Køb nu på pause for dig, indtil den ældste er en time gammel.",
+      "variableTokenWarning": "Du forpligter dig til at betale en USD-værdi i $WOC. Det præcise antal tokens fastsættes af et nyt tilbud, når betalingen anmodes, og kan afvige fra estimatet.",
+      "quoteFixedNote": "Dette tilbud fastlåser $WOC-beløbet, indtil det udløber. Et nyt tilbud kan afvige.",
+      "settlementDeadlineNote": "Vinder du, forfalder betalingen inden for {duration} efter auktionens afslutning.",
+      "claimCooldownRetry": "Du gik for nylig fra et Køb nu. Prøv igen om {duration}.",
+      "termsLabel": "Jeg accepterer Markedspladsens vilkår.",
+      "termsLink": "Se Markedspladsens vilkår (åbner i en ny fane)",
+      "quoteTitle": "Bekræft betaling",
+      "quoteTotal": "I alt: {tokens} $WOC",
+      "quoteSeller": "Sælger modtager: {tokens} $WOC",
+      "quoteBurn": "Brændt (fjernet fra udbuddet): {tokens} $WOC",
+      "quoteTreasury": "Til spillets skatkammer: {tokens} $WOC",
+      "quoteExpires": "Tilbuddet udløber om {duration}",
+      "quoteExpiresAt": "Tilbuddet udløber kl. {time}.",
+      "quoteExpired": "Tilbuddet udløb. Anmod om et nyt.",
+      "quoteSign": "Underskriv og betal",
+      "quoteRefresh": "Nyt tilbud",
+      "quoteCancel": "Ikke nu",
+      "quoteBondFor": "Refunderbart buddepositum: {usd}",
+      "quoteBondForItem": "Refunderbart buddepositum for {item}: {usd}",
+      "quoteSettlementFor": "Afregning for {item}: {usd}",
+      "paymentDueAt": "Betalingen forfalder senest {time}.",
+      "signing": "Venter på din pung...",
+      "signFailed": "Din pung gennemførte ikke betalingen. Tjek pungen, og prøv igen.",
+      "signFailedConfirm": "Din pung underskrev ikke bekræftelsen. Tjek pungen, og prøv igen.",
+      "confirming": "Bekræfter på kæden...",
+      "listing": "Noterer din vare...",
+      "activityCancelPending": "Annullering afventer",
+      "activityDirected": "Direkte salg",
+      "bidPlacedStanding": "Dit bud står ved magt. Du er den højestbydende.",
+      "bidPlacedOutbid": "Dit depositum blev bekræftet, men et højere bud kom først.",
+      "purchaseComplete": "Køb gennemført. Din vare ankommer med Ravnepost.",
+      "paymentConfirmedDelivering": "Betaling bekræftet. Din vare ankommer med Ravnepost, når leveringen er gennemført.",
+      "listingCreated": "Din notering er nu aktiv.",
+      "listingCancelled": "Notering annulleret. Din vare vender tilbage med Ravnepost.",
+      "listingCancelPending": "Annullering afventer: en køber holder købsvinduet. Betaler de ikke, lukker noteringen, og din vare vender tilbage med Ravnepost.",
+      "sellTitle": "Opret en notering",
+      "sellEmptyFloor": "Ingen kvalificerede varer i dine tasker. Dette rige tager kun ubundet udstyr af kvaliteten {floor} eller bedre.",
+      "sellCollectiblesBoth": "Ridedyr og Mech-kromplader kan også noteres.",
+      "sellCollectiblesMounts": "Ridedyr kan også noteres.",
+      "sellCollectiblesChromas": "Mech-kromplader kan også noteres.",
+      "sellLockedHidden": "Låste varer vises ikke her. Lås dem op i dine tasker for at sælge dem.",
+      "sellSearchPlaceholder": "Skriv for at filtrere dine tasker",
+      "sellClear": "Fjern {item}, og vælg en anden",
+      "sellChoose": "Vare til notering",
+      "sellNoMatches": "Ingen varer matcher den søgning",
+      "sellBuyNowAboveStart": "Køb nu-prisen skal være højere end startbuddet.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auktion",
+      "sellFormatBuyNow": "Kun køb nu",
+      "sellFormatAuctionBuyNow": "Auktion med køb nu",
+      "sellStart": "Startbud (USD)",
+      "sellReserve": "Mindstepris (USD, valgfrit)",
+      "sellReserveNote": "Valgfrit, mindst startbuddet. Bydere ser kun, om den er opfyldt; er det højeste bud ved lukketid under den, kommer varen tilbage til dig usolgt, og alle depositummer returneres.",
+      "sellBuyNowNote": "Påkrævet. En Køb nu-notering sælges til denne pris uden budgivning.",
+      "sellBuyNowAuctionNote": "Valgfrit. Angiv en pris, en køber kan betale for at afslutte auktionen tidligt; den skal ligge over startbuddet og mindsteprisen.",
+      "sellBuyNowPrice": "Køb nu-pris (USD)",
+      "sellDuration": "Varighed",
+      "sellOfferNext": "Betaler vinderen ikke, sælges der i stedet til den næsthøjeste byder, hvis bud opfylder mindsteprisen, til deres bud, frem for at ende usolgt.",
+      "sellSubmit": "Notér vare",
+      "sellSubmitAria": "Notér {item} på Børsen",
+      "sellFeeNote": "Et gennemført salg betaler et Børs-gebyr af prisen: en del brændes, og en del går til skatkammeret, og du modtager resten i din tilknyttede pung i afregningstransaktionen. Gebyret for den pris, du angiver, vises her; på en auktion følger det den endelige pris.",
+      "activityListings": "Mine noteringer",
+      "activityBids": "Mine bud",
+      "activitySettlements": "Mine handler",
+      "activityEmpty": "Du har endnu ingen bud, noteringer eller handler. Din aktivitet på Børsen vises her.",
+      "activityNoListings": "Du har ingen noteringer.",
+      "activityNoBids": "Du har ingen bud.",
+      "activityNoSettlements": "Du har ingen handler.",
+      "activityPayNow": "Betal nu",
+      "activityPayNowAria": "Betal for handel {id} nu",
+      "activityPayNowItemAria": "Betal {usd} for {item} nu",
+      "activityDeadline": "Betaling forfalder om {duration}",
+      "dueAt": "Forfalder {utc} UTC ({local} lokal tid)",
+      "activityStrikes": "Handelsadvarsler: {count}",
+      "activitySuspended": "Børsen er suspenderet i {duration} efter ubetalte handler: ingen bud, køb, noteringer eller $WOC-handler før da.",
+      "strikesTip": "Du får et klip, hver gang du ikke betaler for en handel, du har forpligtet dig til. Efter det første klip bliver hver ny suspendering fra Børsen længere: 3 dage, så 14, så 90, og til sidst et år.",
+      "bidStatusPending": "Afventer depositum",
+      "bidStatusActive": "Højestbydende",
+      "bidStatusOutbid": "Overbudt",
+      "bidStatusLapsed": "Bortfaldet",
+      "bidStatusWon": "Vundet",
+      "bidStatusDefaulted": "Misligholdt",
+      "bidStatusCancelled": "Annulleret",
+      "bidBondPay": "Betal depositum",
+      "bidBondPayAria": "Betal depositummet for dit bud på notering {id}",
+      "bidBondPayItemAria": "Betal depositummet på {bond} for dit bud på {item}",
+      "settlementOffered": "Betaling forfalder",
+      "settlementConfirming": "Bekræfter",
+      "settlementConfirmedDelivering": "Betaling bekræftet, leverer",
+      "settlementReview": "Betaling under gennemgang",
+      "settlementDelivered": "Leveret",
+      "settlementExpired": "Udløbet ubetalt",
+      "settlementFailed": "Betaling mislykkedes",
+      "settlementFailBurnMissing": "Betalingen indeholdt ikke den påkrævede token-brænding.",
+      "settlementFailBurnMismatch": "Betalingen brændte det forkerte antal tokens.",
+      "settlementFailBurnAuthority": "Token-brændingen kom fra en pung, dette køb ikke navngav.",
+      "settlementFailUnexpectedCredit": "Transaktionen betalte en pung uden for dette køb.",
+      "settlementFailQuoteExpired": "Betalingstilbuddet udløb, før det blev brugt. Anmod om et nyt, og betal igen.",
+      "settlementFailTransaction": "Betalingstransaktionen mislykkedes på netværket. Anmod om et nyt tilbud, og prøv igen.",
+      "settlementFailRefunded": "Denne betaling blev returneret til din pung.",
+      "settlementFailSuperseded": "Dette betalingsforsøg blev erstattet af et nyere.",
+      "settlementFailConfirmingOverdue": "Denne betaling tog for lang tid at bekræfte og kunne ikke verificeres.",
+      "settlementFailGeneric": "Denne betaling kunne ikke gennemføres.",
+      "paymentSeenAwaitingFinality": "Betaling set i hovedbogen. Venter på endelig bekræftelse.",
+      "paymentNotYetVisible": "Ingen betaling er endnu synlig i hovedbogen. Det kan tage et øjeblik, før den vises.",
+      "paymentServiceUnreachable": "Betalingstjenesten kan ikke nås. Din betaling forbliver registreret og vil blive kontrolleret igen.",
+      "paymentPendingGeneric": "Din betaling er indsendt og afventer bekræftelse.",
+      "bondSeenAwaitingFinality": "Depositumbetaling set i registret. Venter på endelig bekræftelse.",
+      "bondNotYetVisible": "Ingen depositumbetaling er synlig i registret endnu. Det kan tage et øjeblik, før den viser sig.",
+      "bondServiceUnreachable": "Betalingstjenesten kan ikke nås. Din depositumbetaling forbliver registreret og vil blive kontrolleret igen.",
+      "bondPendingGeneric": "Din depositumbetaling er indsendt og afventer bekræftelse.",
+      "listingStatusActive": "Aktiv",
+      "listingStatusSettling": "Afventer betaling",
+      "listingStatusSold": "Solgt",
+      "listingStatusReturned": "Returneret",
+      "listingStatusCancelled": "Annulleret",
+      "listingStatusSuspended": "Suspenderet",
+      "listingStatusUnsold": "Usolgt"
     }
   },
   "gatherEvent": {
@@ -3903,7 +4442,8 @@ export const da_DK: EnTranslations = {
       "password_too_long": "Den nye adgangskode må højst være på 128 tegn.",
       "characters_online": "Log ud af alle dine karakterer, før du deaktiverer.",
       "deactivated": "Denne konto er blevet deaktiveret. Kontakt en administrator for at genoprette den.",
-      "not_found": "Kontoen blev ikke fundet."
+      "not_found": "Kontoen blev ikke fundet.",
+      "password_already_set": "Denne konto har allerede en adgangskode. Brug Skift adgangskode i stedet."
     },
     "character": {
       "name_invalid": "Ugyldigt karakternavn. Brug 2-16 bogstaver.",
@@ -3915,6 +4455,8 @@ export const da_DK: EnTranslations = {
       "online": "Karakteren er i øjeblikket online.",
       "rename_not_permitted": "Det er ikke tilladt at omdøbe denne karakter.",
       "delete_confirm": "Skriv karakterens navn for at bekræfte sletning.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Karakteren er allerede i verdenen.",
       "taken_over": "Din karakter blev overtaget af en anden session.",
       "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
@@ -3954,6 +4496,10 @@ export const da_DK: EnTranslations = {
     "deeds": {
       "invalid_input": "Ugyldig indtastning."
     },
+    "guilds": {
+      "invalid_roster_name": "Ugyldigt laugsnavn.",
+      "unknown": "Intet laug med det navn."
+    },
     "steam": {
       "disabled": "Steam-tilknytning er ikke tilgængelig lige nu.",
       "invalid_ticket": "Steam kunne ikke bekræfte denne tilknytningsanmodning. Prøv igen fra skrivebordsappen.",
@@ -3991,6 +4537,55 @@ export const da_DK: EnTranslations = {
       "reason_required": "Der skal angives en grund.",
       "invalid_duration": "Angiv en markeringsvarighed på mindst ét sekund.",
       "not_marked": "Den konto er ikke markeret."
+    },
+    "woc_market": {
+      "invalid_input": "Ugyldigt input.",
+      "disabled": "$WOC-Børsen er ikke tilgængelig på dette rige.",
+      "paused": "Handel på Børsen er sat på pause. Auktioner tæller stadig ned.",
+      "wallet_required": "Tilknyt og verificer en pung, før du handler på Børsen.",
+      "recipient_wallet_required": "Den spiller skal tilslutte en pung, før de kan modtage $WOC-betalinger.",
+      "self_offer": "Du kan ikke sende et $WOC-tilbud til dig selv.",
+      "offer_expired": "Det $WOC-tilbud er udløbet. Bed om et nyt.",
+      "terms_required": "Accepter Markedspladsens vilkår for at fortsætte.",
+      "totp_required": "Dette beløb kræver to-faktor-godkendelse. Slå det til i kontoindstillingerne, og indtast så din kode.",
+      "totp_invalid": "Den to-faktor-kode kunne ikke verificeres. Prøv igen.",
+      "suspended": "Din adgang til Børsen er suspenderet efter ubetalte handler: ingen bud, køb, noteringer eller $WOC-handler.",
+      "character_invalid": "Spil den karakter, du noterer fra, og prøv igen.",
+      "not_found": "Den børspost findes ikke længere.",
+      "not_yours": "Den børspost findes ikke længere.",
+      "not_active": "Den notering er ikke længere åben for denne handling.",
+      "own_listing": "Du kan ikke byde på eller købe din egen notering.",
+      "has_bids": "En notering med bud kan ikke trækkes tilbage. Kontakt support, hvis du er nødt til at annullere den.",
+      "bid_too_low": "Dit bud er ikke højere end det nuværende bud plus dets forhøjelse.",
+      "already_pending": "Bekræft eller opgiv dit afventende bud på denne notering først.",
+      "insufficient_balance": "Din pung indeholder ikke nok $WOC til dette bud og dets buddepositum.",
+      "quote_unavailable": "Der kunne ikke udstedes et tilbud lige nu. Prøv igen om lidt.",
+      "quote_expired": "Det tilbud udløb. Anmod om et nyt; tilbydes der ingen, er det vindue lukket.",
+      "not_pending": "Det bud afventer ikke længere sit buddepositum.",
+      "confirm_failed": "Transaktionen kunne ikke bekræftes. Anmod om et nyt tilbud, og prøv igen.",
+      "confirm_in_flight": "Din betaling bekræftes stadig. Prøv igen, når den er afgjort.",
+      "buy_now_locked": "En anden køber er ved at gennemføre dette køb. Prøv igen om et øjeblik.",
+      "cancel_pending": "Sælgeren er ved at annullere denne notering.",
+      "claim_cooldown": "Du gik for nylig fra et Køb nu. Prøv igen senere.",
+      "bond_window_closed": "Dette bud kan ikke længere betales: dets betalingsvindue er lukket. Byd igen for at få et nyt.",
+      "settlement_in_flight": "En køber betaler for denne notering. Prøv igen, når betalingen er afregnet.",
+      "contended": "Børsen er optaget med denne notering. Prøv igen om et øjeblik.",
+      "sale_conflict": "En anden aktiv salgspost står allerede til denne notering. Udelad den først.",
+      "no_buy_now": "Denne notering har ingen Køb nu-pris.",
+      "cap_reached": "Du har nået din grænse for noteringer på Børsen.",
+      "stale_item": "Den genstand har ændret sig eller er blevet flyttet. Vælg den igen, og prøv igen.",
+      "item_mismatch": "Det er ikke nøjagtig den kopi, køberen indgik aftale om, eller dens tilstand har ændret sig (en lås tæller også). Start en ny handel for den.",
+      "offer_pending": "Du har allerede en handel stående med denne spiller. Afslut den først.",
+      "not_eligible": "Den genstand kan ikke noteres på $WOC-Børsen.",
+      "invalid_params": "Tjek startbuddet, mindsteprisen, Køb nu-prisen og varigheden.",
+      "signature_reused": "Den transaktion er allerede indsendt.",
+      "item_locked": "Den genstand er låst. Lås den op i dine tasker, før du sælger den.",
+      "stepup_required": "Salg på Børsen kræver en underskrift fra din tilknyttede pung.",
+      "stepup_challenge_invalid": "Den pungbekræftelse er ikke længere gyldig. Start salget forfra.",
+      "stepup_challenge_expired": "Pungbekræftelsen er udløbet. Start salget forfra.",
+      "stepup_wallet_mismatch": "Din tilknyttede pung har ændret sig, siden denne bekræftelse blev udstedt. Start salget forfra.",
+      "stepup_binding_mismatch": "Den pungbekræftelse passer ikke til dette salg. Start salget forfra.",
+      "stepup_signature_invalid": "Pungens underskrift kunne ikke verificeres. Start salget forfra."
     }
   },
   "guide": {
@@ -4028,7 +4623,6 @@ export const da_DK: EnTranslations = {
       "combat": "Kamp",
       "talents": "Talenter",
       "arena": "Arena & PvP",
-      "valeCup": "Dalpokalen",
       "thornhollow": "Tornehulemarkerne",
       "deeds": "Bedrifternes Bog",
       "reliquary": "Relikvariet",
@@ -4138,6 +4732,8 @@ export const da_DK: EnTranslations = {
         "fenBlurb": "Forbi efterårskronen, et lyst kær af pil og stille vand, og en by bag en voldgrav.",
         "farshoreName": "Fjernkysten",
         "farshoreBlurb": "En ø hinsides sandbanken, hvor himlen river sig op over Riftmarkerne, og Mågehavn ringer med klokken ved hvert brud.",
+        "provingName": "Prøvestranden",
+        "provingBlurb": "En stille træningsø hinsides strædet, hvor nye eventyrere finder deres ben, før dalen beder om noget af dem.",
         "nightName": "Natblomsten",
         "nightBlurb": "Et land af stjerneklar midnat, hvor blomsterne lyser stierne op, og Månero holder sin vagt.",
         "hauntName": "Genfærdsskoven",
@@ -4238,7 +4834,6 @@ export const da_DK: EnTranslations = {
       "reliquary": "Relikvariet",
       "sheathe": "Gem/fremvis våben",
       "crafting": "Håndværk",
-      "valeCup": "Dalpokalen",
       "mount": "Stig op / Stig af",
       "calendar": "Begivenhedskalender",
       "dungeonFinder": "Fangekældersfinder",
@@ -4367,7 +4962,7 @@ export const da_DK: EnTranslations = {
       "ifHighContrastBackground": "En enklere baggrund med højere kontrast bag start- og karakterskærmene.",
       "ifInvertLookY": "Vender op- og ned-retningen af musekiget om.",
       "ifShowItemLevel": "Tilføjer en genstandsniveau-linje til hvert genstands-værktøjstip. Fra som standard, hvilket bevarer det klassiske, rent statistikbaserede værktøjstip.",
-      "ifShowReliquaryTracker": "Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.",
+      "ifShowReliquaryTracker": "Om Reliquary-trackeren (dine fastgjorte sider og deres fremskridt) sidder på din HUD. Reliquary-vinduet har en matchende øjenknap, og fastgørelse af en side tænder trackeren igen.",
       "ifShowPlaytime": "Viser din samlede spilletid gennem hele karakterens levetid på karakterarket. Til som standard, og arket har en øjeknap, der slår det til og fra per enhed, hvilket er praktisk, hvis du streamer eller tager skærmbilleder. Det samlede tal bliver ved med at tælle under alle omstændigheder.",
       "ifShowOwnNameplate": "Tegner dit eget navneskilt over hovedet, præcis som andre spillere ser det, pynt og det hele. Slå det fra for det klassiske udseende.",
       "ifShowPlayerNameplates": "Tegner andre spilleres navneskilte. Fra rydder op i en overfyldt hjemmebase, og dit nuværende mål forbliver læsbart under alle omstændigheder.",
@@ -5100,6 +5695,10 @@ export const da_DK: EnTranslations = {
       "farshoreGreeting": "Du kom over Færgestien? Så er du den første i en uge, og Vogteren vil se dig efter.",
       "farshoreGreeter": "Klokkevogter Tam, Landgangen",
       "farshorePlaceNotes": "Mågehavn er øens eneste by og dens fæstning. Landgangen er, hvor Færgestien kommer i land, med en vagtklokke stående over odden; Vagteng holder det høje terræn sydøst for byen, hvor en riftvagt lytter efter det næste brud; De Splittede Klipper revner op ved øens sydlige ende; og Riftmarkerne er de forkrøblede kornrækker øst for Mågehavn, stadig myldrende med det, der kom igennem bruddet der.",
+      "provingBlurb": "En stille ø hinsides strædet fra dalen, holdt som træningsgrund: en lejr, en træningsplads, en strand strøet med vrag, og en færge, der sejler begge veje.",
+      "provingGreeting": "Enhver helt, dalen nogensinde har takket, har stået, hvor du står nu, og ikke én af dem vidste, hvilken ende af et blad man holder i.",
+      "provingGreeter": "Instruktør Maren, Daggryhvile Lejr",
+      "provingPlaceNotes": "Daggryhvile Lejr er øens hele bebyggelse: nogle få telte, en bod og et mønstringsbål. Den Gamle Mole vender mod dalen, hvor overfartscirklen bærer dimittender over strædet; Træningspladsen syd for lejren holder sine halmdukker stående for enhver, der har brug for dem; og Vraglinjen er den bjærgegods-strøede strand, hvor tidevandet betaler øen i vragkasser.",
       "travelTitle": "Sådan kommer du rundt",
       "travelBody": "Hver vej i riget vandres eller rides. Der er ingen flyveruter, ingen taxier og intet teleportnet: kortet er én sammenhængende landmasse, og hver forbindelse er noget, du kan stå på. Højderygge skiller det ene rige fra det næste, og hvor to riger deler en højderyg, klatrer vejen gennem et pas. Ikke hver grænse fungerer sådan, dog. I nord bærer en lang dæmningsvej vejen ud over vandet fra Den Tilslørede Hule og ind i snelandet bagved, og længere sydpå løber en tynd, naturlig sandbanke kaldet Færgestien østpå fra Dalens kyst til Landgangen på øen Fjernkysten, som slet ingen landgrænse har. Og der findes præcis én sand dør i hele oververdenen: et skumringsslør højt på Tornetop, der åbner ind til Den Tilslørede Hule. Hulens sydlige højderyg er forseglet uden noget pas igennem den, så det slør er, hvordan du først kommer ind, og det lukker sig bag dig på vejen tilbage.\n\nUanset hvor du falder, er turen tilbage kort. Hver zone holder mindst én kirkegård med Den Blege Vogter svævende over stenene, og en frigivet ånd rejser sig ved den nærmeste af dem.\n\nKortet ender ikke i en usynlig mur. Landet løber ud i strande og næs og derefter i åbent vand. De overgange, verden mener, du skal svømme, sundene og fjordene mellem det ene rige og det næste, er rolige og sikre at krydse. Styr i stedet ud mod det åbne hav, og selve afstanden vender dig om: du bliver advaret, og advaret igen, og bliver du ved med at svømme, slider havet dig ned, indtil det dræber dig. Dykning har sin egen grænse, siden din vejrtrækning slipper op under overfladen, så kom op efter luft, og vend om, når vandet siger til.",
       "mountsTitle": "Ridedyr",
@@ -5316,36 +5915,6 @@ export const da_DK: EnTranslations = {
       "ladderBody": "Hver kamp flytter en vedvarende slagmarksrangering knyttet til figuren, sejr eller nederlag, og tavlen gennem alle tider rangordner rigets mestre.",
       "rewardsHeading": "Hvad en kamp udbetaler",
       "rewardsBody": "Hver afsluttet kamp udbetaler Ære: mere for en sejr, en trøstepræmie for et nederlag eller en uafgjort, plus et lille beløb for hvert dræbende slag, du lander, og hvert ét, du medvirker til, så det stadig kan betale sig at kæmpe væk fra flagene. Din første sejr hver dag udbetaler en bonus oveni, og panelet fortæller dig det, mens den bonus stadig venter på dig. Den dag er Ærens egen, og den ruller videre efter sit eget ur i stedet for med rigets instans-nulstilling. At møde det samme hold igen og igen betaler mindre for selve kampen efter den første gang, og det falder hurtigt til ro på et gulv i stedet for at forsvinde helt, og en opgivet kamp betaler slet intet. Brug det, du tjener, hos en af Krigsførelsens kvartermestre."
-    },
-    "valeCupPage": {
-      "heading": "Dalpokalen",
-      "intro": "Vildsvinebold på Somarken: vælg et banner, vælg en rolle, og spark et udstoppet vildsvineskind forbi en målmand for at vinde Kobberspanden. Intet blod, intet bytte, kun tribunernes brøl.",
-      "loreHeading": "Vildsvinebold og høstfreden",
-      "loreOldSow": "Længe før de døde vågnede, spillede Østbæks karle vildsvinebold på stubmarkerne efter høst: to flokke, ét vildsvineskind stoppet med halm og to vognporte slæbt til hver sin ende af grønningen. Den første bold, Den Gamle So, hænger bronzeret over kroens ildsted.",
-      "loreTruce": "Da Askekolosseet begyndte at godkende krigslege, svarede Marskal Redbrook med noget mildere: en stående høstfred på den gamle grønning. Vognportene blev til målstolper, grønningen fik mure, tribuner og et navn, Somarken, og præmien var altid den samme bulede mælkespand, som vinderne drak af: Kobberspanden.",
-      "howHeading": "Sådan spiller du",
-      "howQueue": "Stil dig i kø hvor som helst gennem Dalpokal-vinduet, eller tal med Banemester Bram ved Somarkens port. Vælg en række fra en mod en op til fem mod fem, en bannernation og en sportsrolle; stil op alene, eller tag din gruppe med.",
-      "howMatch": "Ved kampstart byttes dit klassesæt ud med et sportssæt og gendannes nøjagtigt bagefter. Spark sigter mod jordsigtet, bolden preller af på banderne, og driblinger er bare at løbe med bolden. Scor flere mål end den anden side inden fuld tid; uafgjort går til gyldent mål.",
-      "howTruce": "Ingen bløder på Somarken: tacklinger ender i kolbøtter, intet gør ondt, og kæledyr sidder kampen over.",
-      "spectateBody": "Én kamp spilles ad gangen på stadion, og enhver kan gå hen og se med fra tribunerne.",
-      "bettingHeading": "Et lille væddemål ved rækværket",
-      "bettingBody": "Tilskuere ved Somarken kan bakke en side op, mens en kamp danner sig: indsatserne samles i en pulje, og ved slutfløjtet deler vinderne tabernes pulje i forhold til, hvad de satsede. En uafgjort kamp, eller en overraskelse, som ingen bakkede op, refunderer hver mønt. Spillere, der er sat ind i kampen, kan ikke vædde på den, og rækværket fører din livstidsstatistik over sejre, nederlag og nettomønter.",
-      "practiceHeading": "Træningskampe og den tomme bane",
-      "practiceBody": "Dalpokal-vinduet tilbyder også træning: en privat kopi af banen, hvor bots fylder begge sider ud, og intet tæller med i din statistik. Mangler du en spiller eller to til det virkelige? Efter en kort ventetid runder bots holdene af, og enhver kamp med bots på banen er en venskabskamp, aldrig rangeret. Og når Somarken står tom, giver botsene en opvisning, du kan se, og vædde på, fra tribunerne; i det øjeblik rigtige spillere melder sig klar, overlader opvisningen banen, og hver indsats gives tilbage.",
-      "nationsHeading": "De otte bannernationer",
-      "nationsBody": "Hvert hold spiller under et banner. Anføreren vælger nationen, og fører begge sider det samme, spiller udeholdet i den omvendte palet.",
-      "nationVale": "Grøn og guld under hvedeneget: hjemmeholdet, bondekarle ind til benet.",
-      "nationMirefen": "Blågrøn og grå under hejren: tålmodige, langbenede, aldrig forjagede.",
-      "nationThornpeak": "Isblå og hvid under bjergtinden: sikre på fødderne og stædige.",
-      "nationColiseum": "Rød og sort med korslagte sværd: de spiller, som var det stadig en krigsleg.",
-      "nationChoir": "Lyseblå og sølv under klokken: uhyggelige, præcise og meget stille.",
-      "nationOgre": "Orange og umbra bag næven: skulderen først, og stolte af det.",
-      "nationMoon": "Violet og sølv under halvmånen: natspillere, lette på fødderne.",
-      "nationCopperdig": "Kobber og brun med hakken: gravere, der aldrig holder op med at løbe.",
-      "rolesHeading": "Sportsroller",
-      "rolesBody": "Din rolle afgør det sæt, du bærer med ind på banen. Alle sparker; resten er temperament. I kategorierne en-mod-en og to-mod-to spiller alle allround-sættet, så rollevalg kommer først til deres ret fra tre-mod-tre og opefter.",
-      "rewardsHeading": "Fredens regler",
-      "rewardsBody": "Fredens regler betyder ingen erfaring og intet bytte: en afgjort kamp tæller med i din statistik og på vindertavlen, og en sejr tæller også med i dagens belønningsopgaver. Deserterer du en kamp, sættes din plads på bænken, og Banemesteren husker det."
     },
     "deedsPage": {
       "intro": "Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.",
@@ -5576,7 +6145,7 @@ export const da_DK: EnTranslations = {
       "deedsHeading": "Bedrifter, der husker rejsen",
       "deedsBody": "Bedrifternes Bog går ved siden af hvert skridt af dette. Din første afstemning optjener Håndværkssvoren og dit første mesterværk optjener Mesterbygger, begge kan bæres som titler. Hvert af de otte optjenbare håndværk markerer en milepæls-bedrift ved 50 færdighed og kroner sin grænse med en Grandmestertitel, mens Fiskeri får Gammel Søulk ved 100 færdighed og Mesterangler-titlen ved 200.\n\nDer er stille sider også: bedrifter for din første høst og første fremstilling, for de sjældne fund, som held bringer frem i felten, og for at tage fat på ophug. Alt dette er kosmetisk, titler og Hæder alene. En bedrift giver aldrig magt; den beviser kun, at du var der.",
       "startHeading": "Hvor du begynder",
-      "startBody": "Lige kommet ind ad vejen i Østbæk? Find Formand Odell og tag Et håndværk til hver hånd: han peger dig mod malmårerne omkring Kobbergraven sydøst for byen og giver dig dine første vabler. Pas på selve udgravningen: de Dybsten-Gravere, der har slået lejr på den, står nogle niveauer over en nyankommen, så bearbejd de yderste årer først, og gem lejrens hjerte til, du har fået lidt niveauer. Fra da af skal du høste hver eneste åre, tømmerlund og urteplette, du kommer forbi, mens du løser opgaver; proficiens kommer naturligt til rejsende.\n\nTilbage i byen trykker du på T for at åbne håndværksvinduet og arbejder med de almindelige opskrifter, som enhver karakter kender fra starten. Besøg mestrene ved smedjen, køkkenerne, væven og værktøjsværkerne for at se, hvad de underviser i, og tag deres arbejdsordrer for stabil mønt. Når Laugets brev når frem til dig, ved du allerede, hvilket par der føles som hjemme.",
+      "startBody": "Lige kommet ind ad vejen i Østbæk? Find Formand Odell og tag Et håndværk til hver hånd: han peger dig mod malmårerne omkring Kobbergraven nordøst for byen og giver dig dine første vabler. Pas på selve udgravningen: de Dybsten-Gravere, der har slået lejr på den, står nogle niveauer over en nyankommen, så bearbejd de yderste årer først, og gem lejrens hjerte til, du har fået lidt niveauer. Fra da af skal du høste hver eneste åre, tømmerlund og urteplette, du kommer forbi, mens du løser opgaver; proficiens kommer naturligt til rejsende.\n\nTilbage i byen trykker du på T for at åbne håndværksvinduet og arbejder med de almindelige opskrifter, som enhver karakter kender fra starten. Besøg mestrene ved smedjen, køkkenerne, væven og værktøjsværkerne for at se, hvad de underviser i, og tag deres arbejdsordrer for stabil mønt. Når Laugets brev når frem til dig, ved du allerede, hvilket par der føles som hjemme.",
       "colStation": "Station",
       "colHub": "Knudepunkt",
       "colMaster": "Mester",
@@ -5661,13 +6230,13 @@ export const da_DK: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Læder til de hurtige",
-          "identityBody": "Stigen klatrer fra de slette Fenbro-skind-benbeklædning, støvler og bælte over den ualmindelige sumpstrejfer-trøje, hætte og skulderplader til det sjældne sumpvogter-sæt, det bedste læder en håndværker kan skære. To trolddomsstykker runder det af: det Østbækske Druid-Skind-fæltes almenvæsen og Skumrings-Ombindingerne ved færdighed 75.\n\nPå hjulet sidder det mellem Madlavning og Skrædderkunst. Dens levende par er Udstyrsmager, Lærbearbejdning og Skrædderkunst, svoret over for Væver Ottilie i Østbæk; Fælder-parret med Madlavning er navngivet på hjulet men har endnu ingen edquest.",
+          "identityBody": "Stigen klatrer fra de slette Fenbro-skind-benbeklædning, støvler og bælte over den ualmindelige sumpstrejfer-trøje, hætte og skulderplader til det sjældne sumpvogter-sæt, det bedste læder en håndværker kan skære. To trolddomsstykker runder det af: markopskriften Østbæk-druidens Skind og Skumringsskindsbind ved færdighed 50.\n\nPå hjulet sidder det mellem Madlavning og Skrædderkunst. Dens levende par er Udstyrsmager, Lærbearbejdning og Skrædderkunst, svoret over for Væver Ottilie i Østbæk; Fælder-parret med Madlavning er navngivet på hjulet men har endnu ingen edquest.",
           "materialsHeading": "Jagten er høsten",
-          "materialsBody": "Lærbearbejdning er det håndværk, hvor din niveaurute og din forsyningslinje er én og samme ting: groft skind høstes direkte fra skindbærende lig, ulve og vildsvin frem for alt, og hvert lig tjener kun én høster, først til mølle. Et sjældent eller bedre høstkast giver også et Uberørt skind, et signeret eksemplar, som Mosevogterjakken kræver, så læg hvert eneste, du finder, i banken.\n\nBirollerne er få: edderkoppeben og edderkoppesilke, hjemmespundet klæde fra humanoider, en enkelt osmiummalm i hvert sjældent sumpvogter-stykke (seks i Skumringsskindsbind-toppunktet), og et Garvemiddel til 16 kobber fra garveriets disk. Selve osmiummet købes aldrig over disken: grav det selv, på Tornetop eller i næsten enhver yngre zones startårer (Fjernkysten alene graver jern), eller køb det af en anden spiller.",
+          "materialsBody": "Lærbearbejdning er det håndværk, hvor din niveaurute og din forsyningslinje er én og samme ting: groft skind høstes direkte fra skindbærende lig, ulve og vildsvin frem for alt, og hvert lig tjener kun én høster, først til mølle. Et sjældent eller bedre høstkast giver også et Uberørt skind, et signeret eksemplar, som Mosevogterjakken kræver, så læg hvert eneste, du finder, i banken.\n\nBirollerne er få: edderkoppeben og edderkoppesilke, hjemmespundet klæde fra humanoider, en enkelt osmiummalm i hvert sjældent sumpvogter-stykke (seks i Skumringsskindsbind), og et Garvemiddel til 16 kobber fra garveriets disk. Selve osmiummet købes aldrig over disken: grav det selv, på Tornetop eller i næsten enhver yngre zones startårer (Fjernkysten alene graver jern), eller køb det af en anden spiller.",
           "ladderHeading": "Undervist i Fenbro",
-          "ladderBody": "Her er krøllen: garveriet står i Fenbro, ved vejen til Mosekær Sump, hvilket gør Lærbearbejdning til det ene dybe håndværk, der trænes ude i mosen. Garver Hesk underviser i stigen ved sine kar: Fenbro-skind-trinnet gratis ved færdighed 0, sumpstrejfer-trinnet til 25 sølv per opskrift fra færdighed 25, og sumpvogter-trinnet til 1 guld per stk. fra færdighed 50, og hvert trin åbner, efterhånden som dit niveau når det.\n\nTre opskrifter springer læreren over: markopskrifterne (Garvet Lædervams og Østbæk-druidens Skind) fremstilles overalt fra starten, og Skumringsskindsbind kendes af alle, men ligger ved færdighed 75 og er garveribundet. Bemærk, at selve Udstyrer-eden sværges tilbage i Østbæk hos Ottilie; kun undervisningen foregår i mosen.",
+          "ladderBody": "Her er krøllen: garveriet står i Fenbro, ved vejen til Mosekær Sump, hvilket gør Lærbearbejdning til det ene dybe håndværk, der trænes ude i mosen. Garver Hesk underviser i stigen ved sine kar: Fenbro-skind-trinnet gratis ved færdighed 0, sumpstrejfer-trinnet til 25 sølv per opskrift fra færdighed 25, og sumpvogter-trinnet til 1 guld per stk. fra færdighed 50, og hvert trin åbner, efterhånden som dit niveau når det.\n\nTre opskrifter springer læreren over: markopskrifterne (Garvet Lædervams og Østbæk-druidens Skind) fremstilles overalt fra starten, og Skumringsskindsbind kendes af alle ved færdighed 50 og er garveribundet. Bemærk, at selve Udstyrer-eden sværges tilbage i Østbæk hos Ottilie; kun undervisningen foregår i mosen.",
           "routeHeading": "Mesterværker, og en praktisk vej til 125",
-          "routeBody": "Ethvert stykke med rigtige statistikker ruller mesterværkschancen, så længe den finere kvalitet er inden for dit niveauloft, det statistikbærende Østbæk-druidens Skind medregnet, og et signeret Uberørt skind i en Mosevogterjakke giver signeret-reagens-bonussen automatisk; osmium tæller som et niveau 1-materiale for proccen. De statistikløse skind-markopskrifter kan ikke udløse proc.\n\nHæv den på den naturlige måde: høst hver eneste ulv og hvert vildsvin, du dræber, fra niveau et, lad de to markopskrifter bære dig til 25, hvor end du står, og træn så skind-trinnet ved karrene, når opgaverne alligevel trækker dig ud i mosen. Sumpstrejfer bærer dig til 50 og sumpvogter til 75; derefter betaler Skumringsskindsbind, en niveau 3-opskrift på seks osmiummalm, tre Uberørt skind, to grove skind og et Garvemiddel, en indstillet Udstyrer fuld gevinst til 99 og halvt derefter, omkring 75 fremstillinger for de sidste halvtreds point til 125-loftet; under et hovedfags loft lærer niveau 3-opskriften intet fra sig.\n\nDet mobile garveri betyder mere for dette håndværk end for noget andet: specialiser dig ved 75, og en sadeltaske fuld af skind bliver til færdigt udstyr ved lejrbålet i stedet for en gåtur tilbage til Fenbro. Hesks garveri-arbejdsordre køber otte grove skind hvert 30. minut, et pænt afkast på skind, du alligevel samlede, og Bedrifternes Bog markerer Garverens Fag ved færdighed 50 med Stormester i Lærbearbejdning ved loftet."
+          "routeBody": "Ethvert stykke med rigtige statistikker ruller mesterværkschancen, så længe den finere kvalitet er inden for dit niveauloft, det statistikbærende Østbæk-druidens Skind medregnet, og et signeret Uberørt skind i en Mosevogterjakke giver signeret-reagens-bonussen automatisk; osmium tæller som et niveau 1-materiale for proccen. De statistikløse skind-markopskrifter kan ikke udløse proc.\n\nHæv den på den naturlige måde: høst hver eneste ulv og hvert vildsvin, du dræber, fra niveau et, lad de to markopskrifter bære dig til 25, hvor end du står, og træn så skind-trinnet ved karrene, når opgaverne alligevel trækker dig ud i mosen. Sumpstrejfer bærer dig til 50, og sumpvogter-stykkerne og Skumringsskindsbind bærer den sjældne kvalitet fra 50 til 75. Efter 75 falder disse niveau 2-opskrifter til halv og siden kvart gevinst, omkring 150 fremstillinger for de sidste halvtreds point til 125-loftet; under et hovedfags loft matcher de stadig det sjældne håndværks kvalitetsloft i stedet for at gå helt i nul.\n\nDet mobile garveri betyder mere for dette håndværk end for noget andet: specialiser dig ved 75, og en sadeltaske fuld af skind bliver til færdigt udstyr ved lejrbålet i stedet for en gåtur tilbage til Fenbro. Hesks garveri-arbejdsordre køber otte grove skind hvert 30. minut, et pænt afkast på skind, du alligevel samlede, og Bedrifternes Bog markerer Garverens Fag ved færdighed 50 med Stormester i Lærbearbejdning ved loftet."
         },
         "cooking": {
           "identityHeading": "Gryden der mætter gruppen",
@@ -5867,7 +6436,7 @@ export const da_DK: EnTranslations = {
         "q5": "Hvordan afbinder jeg et kommissioneret stykke, og hvad koster det?",
         "a5": "Gå til en hvilken som helst håndværksstation med stykket i dine tasker og betal mesteren. Gebyret følger genstandens kvalitet: 25 sølv for et ualmindeligt stykke, 1 guld for et sjældent, 4 guld for et episk; et legendarisk betaler den episke takst, og et kommissioneret almindeligt stykke betaler den ualmindelige takst. Det skal være en rigtig station: en mobil station tilbyder aldrig tjenesten.\n\nGebyret køber en ren tavle, ikke en kur: stykket forbliver en kommission, så det binder sig igen til den, der modtager det i næste handel. Hvis flere bundne eksemplarer deler en stak, skrælles ét eksemplar af og afbindes pr. betaling.",
         "q6": "Hvor lærer jeg opskrifter, og hvad koster de?",
-        "a6": "De ni almindelige markopskrifter og de seks fremstillede landværktøjsopskrifter kendes af alle fra starten, og det samme gør tre stationsbundne topstykker (Sodskæl-Kappen, den Værnevævede Hætte og Skumringsskindsbindene), som ikke kræver nogen træner, kun deres station. Alt andet undervises af de tilstedeværende mestre ved deres stationer i de tre knudepunktsbyer: de fleste står i Østbæk, garveren passer garveriet i Fenbridge, og alkymisten passer apoteket i Højvagt.\n\nTræneropskrifter løber i trin: færdighed 0, 25 og 50 for udstyrs- og forbrugsvarehåndværkene, prissat gratis, 25 sølv og 1 guld som engangsgebyrer; Fortryllelses to amulet-opskrifter sidder på 25-trinnet, og værktøjsmageren underviser i de to fremstillede fiskestænger ved 75 og 125 for 4 og 16 guld. En mester underviser i en opskrift, så snart dit trin i det håndværk har nået opskriftens eget trin, og du skal stå ved deres station for at lære: en mobil station tæller ikke.",
+        "a6": "De ni almindelige markopskrifter og de seks fremstillede landværktøjsopskrifter kendes af alle fra starten, og det samme gør tre stationsbundne opskrifter (Sodskæl-Kappen, den Værnevævede Hætte og Skumringsskindsbindene), som ikke kræver nogen træner, kun deres station. Alt andet undervises af de tilstedeværende mestre ved deres stationer i de tre knudepunktsbyer: de fleste står i Østbæk, garveren passer garveriet i Fenbridge, og alkymisten passer apoteket i Højvagt.\n\nTræneropskrifter løber i trin: færdighed 0, 25 og 50 for udstyrs- og forbrugsvarehåndværkene, prissat gratis, 25 sølv og 1 guld som engangsgebyrer; Fortryllelses to amulet-opskrifter sidder på 25-trinnet, og værktøjsmageren underviser i de to fremstillede fiskestænger ved 75 og 125 for 4 og 16 guld. En mester underviser i en opskrift, så snart dit trin i det håndværk har nået opskriftens eget trin, og du skal stå ved deres station for at lære: en mobil station tæller ikke.",
         "q7": "Hvorfor gik min indsamling pludselig langsommere?",
         "a7": "Indsamlingskastet starter på 2,5 sekunder og trimmes ned ad to veje: 0,4 sekunder for hvert værktøjsniveau, du bærer og kan håndtere over ressourcekildens eget niveau, og 0,15 sekunder, når dit fags tæller krydser sit 100-bånd, med et gulv på 1,5 sekunder. Flyt fra niveau 1-ressourcekilder op til niveau 3-ressourcekilder, og dit overskud forsvinder, så den samme hakke svinger langsommere igen. At holde præcis det krævede niveau køber ingen hastighed; det åbner kun ressourcekilden.\n\nFærdighedsoptjeningen falmer på samme måde som ved fremstilling: en ressourcekilde grånes, efterhånden som din proficiens klatrer forbi dens niveau (niveau 1-ressourcekilder lærer intet fra proficiens 75 og opefter), så svaret på langsom optjening er ressourcekilder på højere niveau. De kræver et værktøj på mindst deres eget niveau i dine tasker (ingen ressourcekilde bearbejdes nogensinde med bare hænder, niveau 1 inklusive), og et landværktøj over niveau 1 vil desuden først have sit håndteringsmærke, 40/70/85/100 i dets eget fag for niveau 2 til 5. Fiskeri følger sin egen aftrapning: fuld optjening under 50 proficiens, halvt under 100, et dryp på 0,1 under 150 og 0,02 under 200, skrammelfangster lærer slet intet fra 100 og opefter, og selve vandet sætter loft over lektien (niveau 1-vande holder op med at undervise ved 100, sumpens ved 150), så en tæller, der står stille, kan også betyde, at du er vokset fra vandet.",
         "q8": "Kan jeg lave håndværk væk fra byen?",
@@ -5892,6 +6461,7 @@ export const da_DK: EnTranslations = {
       "bankBody": "Hver hjemmebase har en filial af Det Forgyldte Pengeskrin, rigets bankhus. Tal med skatmesteren der for at åbne din boks, en privat opbevaringsplads ud over dine tasker, som din karakter beholder livet ud. Hvad end du efterlader hos dem, venter i sikkerhed, uanset hvilken filial du besøger næste gang.",
       "bankHow": "Med boksen åben klikker du på en genstand i dine tasker for at indsætte den, og klikker på den i boksen for at tage den tilbage. Boksen rummer kun varer, aldrig mønter, og opgavegenstande bliver hos dig. Når dine tasker fyldes op undervejs, fejer én knap alle dine håndværksmaterialer ind på én gang.",
       "bankSlots": "En ny boks starter i det små og vokser med dig. Skatmesteren sælger flere pladser for mønter til stadigt stejlere priser, og at spille online giver bonusplads oveni, for ting som en bekræftet e-mail, forbundne konti og venner, du bringer ind i spillet.",
+      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
       "buyingTitle": "Køb og salg",
       "buyingBody": "Tal med en købmand og vælg at gennemse deres varer, så åbner butikken med tre faneblade: Gennemse, Sælg og Tilbagekøb. Gennemse rummer alt, de har på lager, dit hvis du har råd. Sælg viser, hvad i dine tasker de vil betale for, og at sælge et stykke, der bærer sin egen rullede kvalitet, beder dig bekræfte først, så en værdsat kopi aldrig glider væk ved en fejl. Skiller du dig af med noget, du fortryder, holder Tilbagekøb-fanebladet på dine seneste salg, så du kan købe dem tilbage for de mønter, du fik.",
       "junkTitle": "Rydde ud i skrammel",
@@ -6928,6 +7498,7 @@ export const da_DK: EnTranslations = {
       "title": "Tilslut en Solana-pung",
       "linkBody": "Vælg en pung-udvidelse i denne browser. Du underskriver en bekræftelsesbesked og vender derefter tilbage til skrivebordsappen.",
       "paymentBody": "Vælg den pung, der er tilknyttet din konto, og godkend transaktionen i denne browser.",
+      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
       "extensionHelp": "Ingen kompatibel pung-udvidelse blev fundet. Installer eller lås Phantom, Solflare eller en anden Solana-browserpung op og prøv derefter igen.",
       "safety": "World of ClaudeCraft beder aldrig om din genoprettelsesfrase eller private nøgle.",
       "continueWith": "Fortsæt med {wallet}",
@@ -7118,6 +7689,7 @@ export const da_DK: EnTranslations = {
       "portalOpens": "En {tier}-rangs rift river sig åben i {zone}!",
       "portalSealed": "{tier}-rangs riften i {zone} er blevet forseglet.",
       "portalCollapses": "{tier}-rangs riften i {zone} kollapser.",
+      "lootRecoveryNotice": "Riftens indgang holder sig åben endnu et stykke tid: skulle din gruppe falde, kan I stadig gå tilbage efter det, I har optjent.",
       "levelGate": "Kun eventyrere på niveau {level} eller højere må gå ind i denne rift.",
       "deadEntry": "Du kan ikke gå ind i en rift, mens du er død.",
       "deadEntryCombat": "Din gruppe er stadig i kamp. De døde kan gå ind igen, når kampen stopper.",
@@ -7856,6 +8428,9 @@ export const da_DK: EnTranslations = {
       "reload": "Genindlæs",
       "quit": "Afslut",
       "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
+    },
+    "titlebar": {
+      "exitGame": "Afslut spillet"
     }
   },
   "gpuNotice": {
@@ -8793,6 +9368,7 @@ export const da_DK: EnTranslations = {
       "offGlobalCooldown": "Uden for den globale nedkøling",
       "friendlyTarget": "Venligt mål",
       "enemyTarget": "Fjendtligt mål",
+      "anyTarget": "Fjende eller venligt mål",
       "selfOnly": "Kun på dig selv",
       "damageRange": "{min} til {max}",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
@@ -9008,7 +9584,8 @@ export const da_DK: EnTranslations = {
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
       "clickBuyback": "Klik for at købe tilbage",
-      "bagSlots": "Taske med {slots} pladser"
+      "bagSlots": "Taske med {slots} pladser",
+      "bagSlotsMaterials": "Materialetaske med {slots} pladser"
     },
     "bags": {
       "title": "Tasker",
@@ -9405,7 +9982,7 @@ export const da_DK: EnTranslations = {
       },
       "ignition": {
         "name": "Antændelse",
-        "description": "Passiv: kritiske træffere med dine besværgelser brænder målet for 40% af den påførte skade over 6 sek. og kan stables. (Ildbeherskelse)"
+        "description": "Passiv: kritiske træffere med dine besværgelser brænder målet for 30% af den påførte skade over 6 sek. og kan stables. (Ildbeherskelse)"
       },
       "mass_barrier": {
         "name": "Massebarriere",
@@ -9575,11 +10152,19 @@ export const da_DK: EnTranslations = {
       },
       "sap": {
         "name": "Bedøvelse",
-        "description": "Sætter målet ud af spillet i 8 sek. Du skal være i snigen og uden for kamp. Enhver skade bryder effekten."
+        "description": "Sætter målet ud af spillet i 8 sek. uden at bryde Skumringsslør eller starte en kamp. Du skal være i snigen og uden for kamp. Enhver skade bryder effekten."
       },
       "crippling_poison": {
         "name": "Blytung Gift",
         "description": "Slår målet med en blytung gift, der giver {damage} Natur-skade og nedsætter dets bevægelseshastighed med 50% i 12 sek."
+      },
+      "melting_acid": {
+        "name": "Smeltende syre",
+        "description": "Sprøjter målet med en ætsende gift, giver {damage} naturskade og reducerer dets rustning med 5 % i 12 sek."
+      },
+      "nightshade_coating": {
+        "name": "Natskygge belægning",
+        "description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbrud",
@@ -9839,7 +10424,7 @@ export const da_DK: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gangerens Skikkelse",
-        "description": "Antag løberens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min."
+        "description": "Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 4 sek. (hvert træf genopfrisker omtågningen)."
       },
       "aimed_shot": {
         "name": "Langt Optræk",
@@ -10003,7 +10588,7 @@ export const da_DK: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Forhekser fjenden i 8 sek. Dens næste 3 skadevoldende handlinger genererer hver 7 Fordømmelse og pisker den for 16 Skyggeskade."
+        "description": "Forhekser fjenden i 8 sek. Dens næste 3 skadevoldende handlinger genererer hver 7 Fordømmelse og pisker den for 17 Skyggeskade."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10209,7 +10794,7 @@ export const da_DK: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Krigsåndens Kadence",
-        "description": "Passiv: hvert 3. landede våbenangreb udløser 2 Stormhjerteekkoer for 50% naturskade og giver et Stormtegn i 12 sek. Stormtegnet gør dit næste Lysbuelyn, Stød eller Lægende Vande øjeblikkeligt og sænker manaomkostningen med 50%. Forfædreslaget tæller som 2 angreb. (Krigsånd)"
+        "description": "Passiv: Angreb med et våben i hver hånd har ingen ekstra chance for at ramme forbi. Hvert 3. landede våbenangreb udløser 2 Stormhjerteekkoer for 25% naturskade og giver et Stormtegn i 12 sek. Stormtegnet gør dit næste Lysbuelyn, Stød eller Lægende Vande øjeblikkeligt og sænker manaomkostningen med 50%. Forfædreslaget tæller som 2 angreb. (Krigsånd)"
       },
       "stormsurge": {
         "name": "Stormflod",
@@ -10421,7 +11006,7 @@ export const da_DK: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Tilkald Pyre Colossus",
-        "description": "Kalder en Pyre Colossus ned i målområdet og giver 58-72 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund."
+        "description": "Kalder en Pyre Colossus ned i målområdet og giver 64-79 ildskade ved nedslaget. Den kæmper i 30 sek. uden at erstatte din dæmon, brænder fjender i nærheden hvert 2. sek. og genererer 1 Wrack hvert sekund."
       },
       "summon_doomguard": {
         "name": "Tilkald Wraithborn",
@@ -10769,7 +11354,7 @@ export const da_DK: EnTranslations = {
       },
       "shadowstep": {
         "name": "Skyggesmut",
-        "description": "Træder gennem skyggerne mod dit mål. (slyngeltalent)"
+        "description": "Træder gennem skyggerne til dit mål, ven eller fjende, uden at bryde Skumringsslør. (slyngeltalent)"
       },
       "silence": {
         "name": "Tavshed",
@@ -12425,8 +13010,47 @@ export const da_DK: EnTranslations = {
       "pristine_claw": {
         "name": "Uberørt Klo"
       },
+      "ps_castaway_crate": {
+        "name": "Vragkasse"
+      },
+      "ps_ferry_bell": {
+        "name": "Færgeklokke"
+      },
       "dawnhold_posy": {
         "name": "Buket fra Dawnholds have"
+      },
+      "wayfarers_backpack": {
+        "name": "Wayfarer's Backpack"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Burlap Reagent Pouch"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Necromancer's Reagent Satchel"
+      },
+      "duskweave_bag": {
+        "name": "Duskweave Bag"
+      },
+      "resonant_weave_bag": {
+        "name": "Resonantweave Bag"
+      },
+      "foragers_haversack": {
+        "name": "Forager's Haversack"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Loombound Reagent Satchel"
+      },
+      "ps_briny_lure": {
+        "name": "Saltlokkemad"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Skinnende Perle"
+      },
+      "mother_of_pearl": {
+        "name": "Perlemor"
+      },
+      "ps_passing_stone": {
+        "name": "Hvilesten"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -13468,9 +14092,6 @@ export const da_DK: EnTranslations = {
       "tolling_bell": {
         "name": "Klemtende Klokke"
       },
-      "vale_cup_ball": {
-        "name": "Vildsvinebold"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
@@ -13768,6 +14389,15 @@ export const da_DK: EnTranslations = {
       "fisher_bram": {
         "name": "Fisker Bram"
       },
+      "training_effigy": {
+        "name": "Halmdukke"
+      },
+      "shore_scuttler": {
+        "name": "Strandskrabler"
+      },
+      "mister_crabs": {
+        "name": "Hr. Krabbe"
+      },
       "rift_hellguard": {
         "name": "Helvedesvagt"
       },
@@ -13926,7 +14556,7 @@ export const da_DK: EnTranslations = {
       "apothecary_lin": {
         "name": "Apoteker Lin",
         "title": "Urtekyndig",
-        "greeting": "Pas på hvor du træder i de østlige skove, ven."
+        "greeting": "Pas på hvor du træder i de nordøstlige skove, ven."
       },
       "brother_aldric": {
         "name": "Broder Aldric",
@@ -14067,11 +14697,6 @@ export const da_DK: EnTranslations = {
         "name": "Den Blege Vogter",
         "title": "De Dødes Vogter",
         "greeting": "Hvil nu, ånd. Jeg kan føre dig tilbage til din krop, men overfarten tilbage efterlader dig svækket."
-      },
-      "groundskeeper_bram": {
-        "name": "Banemester Bram",
-        "title": "Somarkens Vogter",
-        "greeting": "Freden holder på Somarken, {className}: kun spark og skulderpuf. Har du lyst til at spille om Kobberspanden?"
       },
       "chronicler_saul": {
         "name": "Krønikeskriveren Saul",
@@ -14358,6 +14983,51 @@ export const da_DK: EnTranslations = {
         "title": "Apothekermester",
         "greeting": "Mål to gange og hæld én gang, {className}. Apotekeren har ingen tålmodighed med spildte reagenser."
       },
+      "wayfarer_bryn": {
+        "name": "Vejfarer Bryn",
+        "title": "Havnens Guide",
+        "greeting": "Østbæk tager imod alle, ven. Og for de usikre er der altid Prøvestranden: færgeklokken ved Ravnepostens postkasse ringer dig over på enhver dag af året, og dens tvilling på øen ringer dig hjem igen."
+      },
+      "instructor_maren": {
+        "name": "Instruktør Maren",
+        "title": "Prøvemester",
+        "greeting": "Enhver helt, dalen nogensinde har takket, har stået, hvor du står nu, {className}, og ikke én af dem vidste, hvilken ende af et blad man holder i. Det er, hvad denne kyst er til. Spørg, øv dig, og fejl, hvor det ikke koster noget."
+      },
+      "quartermaster_finch": {
+        "name": "Kvartermester Finch",
+        "title": "Lejrudstyrsmager",
+        "greeting": "Min disk har præcis én ting til salg, {playerName}: en ekstra pung til det, du samler op undervejs, når din lektie kræver det. Alt andet her er bjærgegods på vej mod dalen. Mønt køber pungen, og arbejde tjener mønten. Det er hele økonomien, og den bliver aldrig mere indviklet. Kun større."
+      },
+      "ferryman_odo": {
+        "name": "Færgemand Odo",
+        "title": "Vogter af Overfarten",
+        "greeting": "Lige kommet fra overfarten, {playerName}? Vogter Tam passer Gauntlet på stranden lige syd for min mole: løb hans baner først, så vil dine ben takke dig. Hver vogter på denne kyst sender dig videre til den næste, når dit arbejde er gjort, og kortet øverst på din skærm kender altid vejen. Når dalen kalder dig tilbage, så ring på klokken, der står ved siden af min mole, og overfarten sætter dig af i Østbæk by."
+      },
+      "bursar_wick": {
+        "name": "Skatmester Wick",
+        "title": "Det Forgyldte Pengeskrin",
+        "greeting": "Det Forgyldte Pengeskrin holder skranke selv her, {playerName}. Hvad du end sætter i depot hos mig, venter i det samme hvælv bag enhver skatmester i enhver by, sikkert for ulve, vand og din egen dårligere dømmekraft."
+      },
+      "warden_tam": {
+        "name": "Vogter Tam",
+        "title": "Vogter af Gauntlet",
+        "greeting": "Disse baner er Gauntlet, {playerName}, og enhver eventyrer, dalen respekterer, har løbet dem. Lygtepælene bliver ved med at brænde hele natten, så banerne aldrig lukker."
+      },
+      "overseer_pell": {
+        "name": "Opsynsmand Pell",
+        "title": "Gauntlet-opsynsmand",
+        "greeting": "Jeg tager tid på hvert eneste løb ned ad disse baner, {playerName}, og jeg har set langt værre fodarbejde. Stien bag mig klatrer op til Træningspladsen: det er der, fodarbejde bliver til sværdarbejde."
+      },
+      "drillmaster_rook": {
+        "name": "Eksercermester Rook",
+        "title": "Træningspladsens Mester",
+        "greeting": "Halm først, skaller dernæst, {playerName}. En halmdukke lærer din arm svinget; skrablerne nede på stranden lærer den at ramme noget, der lægger mærke til det."
+      },
+      "tidewarden_nel": {
+        "name": "Tidevandsvogter Nel",
+        "title": "Vogter af Stranden",
+        "greeting": "Tidevandet tager, og tidevandet betaler, {playerName}. Jeg holder regnskab med begge dele: hvad skrablerne napper fra vragene, og hvad ærlige hænder bærer med op ad denne sti."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidevogter",
@@ -14367,7 +15037,7 @@ export const da_DK: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Et håndværk til hver hånd",
-        "text": "Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydøst for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.",
+        "text": "Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, nordøst for byen, forbi ulveløbene. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.",
         "completion": "Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med Byfokus-opslagstavlen ved markedet og den nærliggende håndværksbænk. Der er en god handel at finde i alt dette, hvis du vil have det.",
         "objectives": {
           "0": {
@@ -14397,7 +15067,7 @@ export const da_DK: EnTranslations = {
       },
       "q_boars": {
         "title": "Børstede Vildsvineskind",
-        "text": "Vildsvineskind giver de fineste rejsetasker, og engene vest for byen vrimler med bæsterne. Bring mig 5 Børstede Vildsvineskind, så skal jeg gøre det umagen værd.",
+        "text": "Vildsvineskind giver de fineste rejsetasker, og engene nordvest for byen vrimler med bæsterne. Bring mig 5 Børstede Vildsvineskind, så skal jeg gøre det umagen værd.",
         "completion": "Ah, fine børstede skind! Disse vil indbringe en god pris.",
         "objectives": {
           "0": {
@@ -14407,7 +15077,7 @@ export const da_DK: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sablewebs Trussel",
-        "text": "Luskerne i de østlige skove spinder en silke, jeg har brug for til mine omslag - og de er desuden blevet alt for talrige. Nedlæg 6 Sableweb-Luskere og skær 4 silkekirtler ud af deres maver.",
+        "text": "Luskerne i de nordøstlige skove spinder en silke, jeg har brug for til mine omslag - og de er desuden blevet alt for talrige. Nedlæg 6 Sableweb-Luskere og skær 4 silkekirtler ud af deres maver.",
         "completion": "Uha, stadig rykker det. Perfekt. Her, du har fortjent dette.",
         "objectives": {
           "0": {
@@ -14450,7 +15120,7 @@ export const da_DK: EnTranslations = {
       },
       "q_supplies": {
         "title": "Stjålne Forsyninger",
-        "text": "De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod sydvest. Stjæl dem tilbage for mig, vil du ikke?",
+        "text": "De banditter ramte min sidste vogn og stak af med fire kasser varer - værktøj, salt, godt Østbæk-linned. Kasserne er stablet rundt om deres lejr i bakkerne mod nordvest. Stjæl dem tilbage for mig, vil du ikke?",
         "completion": "Mine kasser! Knap en skramme på dem. Du er et under.",
         "objectives": {
           "0": {
@@ -14543,7 +15213,7 @@ export const da_DK: EnTranslations = {
       },
       "q_bandits": {
         "title": "Dalens Røvere",
-        "text": "En flok halsafskærere har slået lejr i de sydvestlige bakker. De har plyndret tre vogne i denne uge. Driv dem ud - dræb 10 Dalrøvere.",
+        "text": "En flok halsafskærere har slået lejr i de nordvestlige bakker. De har plyndret tre vogne i denne uge. Driv dem ud - dræb 10 Dalrøvere.",
         "completion": "Ti færre knive i mørket. Tag dette - du har fortjent det.",
         "objectives": {
           "0": {
@@ -15223,7 +15893,7 @@ export const da_DK: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Tråde genforenet",
-        "text": "Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den østlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.",
+        "text": "Tilbage ved min væv alligevel. Jeg bærer intet nag, {playerName}, men tråden husker en hånd, der slap den, og prisen for at tage den op igen måles ud længere, hver gang. Dræb nettedskov-edderkopperne i den nordøstlige skov, og arbejdet vil sætte dine hænder til ro, inden de rører god silke igen.",
         "completion": "Stødig igen. Lærbearbejdning og Skrædderkunst vender tilbage til dine hænder som hovedfag. Mål to gange, inden du vandrer næste gang.",
         "objectives": {
           "0": {
@@ -15233,7 +15903,7 @@ export const da_DK: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Tilbage på komfuret",
-        "text": "Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til vestmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.",
+        "text": "Se hvem der er tilbage ved min gryde. Ingen hårde følelser, {playerName}, et køkken har altid plads, men du ved, at regningen løber højere, hver gang du går. Gå til nordvestmarken og tyn vildsvinene, for ærligt sved er den første ingrediens, og det vil minde dine hænder om arbejdet.",
         "completion": "Der er den gamle smag. Alkymi og Madlavning er tilbage på dit komfur som hovedfag. Bliv lidt denne gang.",
         "objectives": {
           "0": {
@@ -16324,6 +16994,109 @@ export const da_DK: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Løb Gauntlet",
+        "text": "Ethvert par ben, dalen respekterer, har løbet disse baner først, {playerName}. Gå den første bane mod vest til dens flag, sving dig rundt om det, gå den sydlige bane til det andet, og sidestep så den sidste bane til det røde flag. Passer du flagene i rækkefølge, viser kortet øverst på din skærm dig hver eneste knap undervejs. Opsynsmand Pell tager tid på hvert løb fra den fjerne ende: når det røde flag ligger bag dig, står han lige der og tager imod det.",
+        "completion": "Jeg tog tid på det løb, {playerName}, og jeg har dumpet hurtigere fødder. Gauntlet er dit. Stien bag mig klatrer op til Træningspladsen, hvor Eksercermester Rook gør fodarbejde til sværdarbejde: han har din næste opgave.",
+        "objectives": {
+          "0": {
+            "label": "Gauntlet-flag passeret"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Slå Rent",
+        "text": "Fodarbejde først, så armen, {playerName}. Træningspladsen ligger oppe ad stien bag mig, og dens halmdukker er bygget til at blive ramt. Hvis du mister vejen, tryk på M for at åbne kortet: hver opgave, du bærer, er markeret på det. Gå hen til en halmdukke, og venstreklik på den: det gør den til dit mål, og dens navn dukker op øverst på din skærm. Først da trykker du på 1, eller klikker på det første ikon på handlingsbjælken forneden, for at slå. Bliv ved med at slå, til én giver efter; den slår ikke igen, det gør halmdukker aldrig. Eksercermester Rook holder øje med pladsen fra dens vestlige side, hvor strandstien begynder: tryk på F på ham for at aflevere fældningen.",
+        "completion": "Ét rent fald, og dit greb allerede sikrere. Husk fornemmelsen af det, {playerName}: mål, slå, og bliv ved med at slå. Halmen er aldrig sur over det. Det næste, du svinger efter, vil være det.",
+        "objectives": {
+          "0": {
+            "label": "Halmdukke fældet"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Skærp Æggen",
+        "text": "Et hug er et hug, {playerName}, og halmen tager imod det hele dagen. Det er ikke det, der vinder dig noget. Se på rækken af knapper nederst på din skærm: den række er dit håndværk, og hver eneste af dem gør noget, din arm alene ikke kan. Du har allerede én. Vend tilbage til halmdukkerne, og brug den: vælg dit mål, tryk så på den knap, Træningspladsen viser dig, tre gange i træk. Hak ikke bare løs på halmen; få den ting, du kan, til rent faktisk at ske. Kom så tilbage til mig.",
+        "completion": "Nu kæmper du i stedet for at flagre om dig. Den række vokser for hvert niveau, du tager, {playerName}, og dem, der lever længst, er dem, der læser den. Halmen er ligeglad med, hvilken knap du brugte. Det er dalen ikke.",
+        "objectives": {
+          "0": {
+            "label": "Evne landet på en halmdukke"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Skjold og Klo",
+        "text": "Halmen er aldrig sur over det, {playerName}, så her er noget, der er. Strandskrablere roder gennem vraglinjen på den fjerne strand: følg stien mod vest fra min plads, og den fører dig lige til dem. De napper igen, så hold øje med din helbredsbjælke, og bliv ved med at slå: venstreklik på en for at gøre den til dit mål, brug så den evne, Træningspladsen lærte dig (træneren navngiver din knap), og stop ikke, før dens skal knækker. Tre klarer det. Klatr så op ad stien mod den nordlige bakke: Tidevandsvogter Nel holder strandregnskabet, og hun tæller dine skaller.",
+        "completion": "Tre skaller knækket, og alle dine fingre i behold: en fair første kamp, {playerName}. Skrablerne napper løs af vragene hurtigere, end tidevandet bringer bjærgegods ind, så hver eneste, du nedlægger, er en mønt, nogen får lov at beholde.",
+        "objectives": {
+          "0": {
+            "label": "Strandskrabler nedlagt"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Perlemor",
+        "text": "Tre skaller knækket, {playerName}, men vraglinjen gemmer på en konge, og han sidder på en skat, der er mere værd end hver eneste kasse på denne strand. Tag denne Saltlokkemad til tidevandspølen i strandens yderste vestlige ende, forbi vragene. Stil dig ved vandkanten, tryk på B for at åbne dine tasker, og venstreklik på lokkemaden for at vække ham. Hr. Krabbe knivper langt hårdere end sine små fættere, så hold øje med din helbredsbjælke, bliv ved med at slå, og træk dig op på sandet, hvis du har brug for luft. Når han falder, går du lige hen til hans skal og trykker på F for at plyndre den Skinnende Perle af ham. Bring den perle tilbage til mig.",
+        "completion": "Den Skinnende Perle, brækket løs fra selveste den gamle konge af lavvandet. Min far løftede sin hat for den krabbe hver eneste morgen af sit arbejdsliv; der skyldes en smule respekt. Hold stille... sådan. Snoet, sat og din, {playerName}: Perlemor. Tryk på B for at åbne dine tasker, og venstreklik på ringen for at tage den på, tryk så på C for at åbne dit karakterark og se den sidde på din hånd. En lille ting, men hver del af dig er bedre for at bære den.",
+        "objectives": {
+          "0": {
+            "label": "Hr. Krabbe dræbt"
+          },
+          "1": {
+            "label": "Skinnende Perle indsamlet"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "Vraglinjen",
+        "text": "Mine bærere slæber bjærgegods fra de gamle vrag og bærer det op ad skråningen mod Daggryhvile Lejr, {playerName}, og halvdelen af vragkasserne når aldrig hele vejen op: de bliver sat ned langs stien og glemt. Følg min sti mod lejren, så går du lige forbi de tabte. At åbne en er enkelt: gå hen til en vragkasse, til dens navn vises, tryk så på F, eller venstreklik på selve kisten, så giver den slip på, hvad den rummer. Seks af dem rydder hele linjen, og husk, F er den samme tast for enhver kiste, knude og dør, du nogensinde vil møde. Kvartermester Finch holder lejrens bod og køber hver eneste smule bjærgegods: aflever fangsten til hende.",
+        "completion": "Reb, tjære og en halv ost, havet på en eller anden måde skånede: jeg tager det hele, {playerName}. En ryg, der bærer det, den finder, er mere værd for denne lejr end noget blad, og din har lige ryddet hele linjen i én tur.",
+        "objectives": {
+          "0": {
+            "label": "Vragkasse åbnet"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pung og Pengepung",
+        "text": "Én lektie mere før dalen, {playerName}, og det er den, der holder eventyrere i live: det, du bærer. Din rygsæk har seksten pladser, og ved siden af den venter fire tomme taskepladser; hver taske, du spænder på, lægger sin egen plads til puljen. Så: tryk på F på mig igen for at åbne min bod, venstreklik på Lærredspungen blandt mine varer for at købe den, tryk så på B for at åbne dine tasker, og venstreklik på pungen der for at spænde den fast i en ledig plads. Instruktør Maren driller ved mønstringsbålet nogle skridt mod øst: vis hende pungen på dit bælte.",
+        "completion": "En fin pung. Spænd den på, hvis du ikke allerede har: tryk på B for at åbne dine tasker, venstreklik så på pungen for at sætte den i en ledig taskeplads, og seks flere pladser er dine at fylde med ballade. Nu den halvdel af lektien, ingen taske kan rumme, {playerName}: det, du ikke kan bære, opbevarer Det Forgyldte Pengeskrin. Skatmester Wick holder sin skranke oppe ad vestenstien, og han åbner det samme hvælv, som enhver skatmester i enhver by deler; mere hvælvplads kan købes, når din pengepung vokser til det. Hold dine kostbarheder i banken, og dine tasker rummelige. En fuld rygsæk har afsluttet flere eventyr, end nogen ulv nogensinde har.",
+        "objectives": {
+          "0": {
+            "label": "Lærredspung købt"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Ord på Vinden",
+        "text": "Én vane tilbage at lære, {playerName}, og den kræver intet blad: læs opslagstavlerne. Laugets opslagstavle står ved lejrporten nogle skridt mod sydvest for mit bål, og laug og rejsende flokke slår deres kald op på den. Gå hen foran den, og tryk på F, eller venstreklik på den, for at læse, hvad der er opslået, kom så tilbage og fortæl mig, hvad vinden bar med sig ind. En tavle som den står i enhver by, du nogensinde kommer til at gå ind i.",
+        "completion": "Så nu ved du, hvordan ord bevæger sig i dalen, {playerName}: ikke ved bude, ved opslagstavler. Tjek dem i hver by, du kommer forbi; halvdelen af et eventyr starter som tre linjer blæk på én af dem.",
+        "objectives": {
+          "0": {
+            "label": "Laugets opslagstavle læst"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "Den Lange Gåtur",
+        "text": "Én lektie tilbage, {playerName}, og det er den, jeg ikke kan fortælle dig: du er nødt til at have prøvet det én gang. Du kommer til at dø derude. Det gør alle, og det er ikke enden på noget. Tag denne Hvilesten. Tryk på B for at åbne dine tasker, og venstreklik på den, så lægger den dig ned, hvor du står. Følg så anvisningerne på din skærm: slip din ånd fri, gå tilbage til din egen krop, og træd ind i den. Din krop venter, gåturen er gratis, og du mister intet ved at gå den.",
+        "completion": "Og tilbage kommer du, intet værre for det. Husk, hvordan det føltes, {playerName}, for næste gang, det sker, vil der være tænder involveret, og ingen stående ved siden af til at forklare. Din krop venter, gåturen er gratis, og det eneste, døden virkelig koster dig, er den tid, det tager at komme tilbage.",
+        "objectives": {
+          "0": {
+            "label": "Gik tilbage fra de døde"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Sæt Sejl",
+        "text": "Der er intet tilbage på denne kyst, du ikke allerede har løbet, besejret, åbnet eller købt, {playerName}. Du er klar, og Østbæk har rigtigt arbejde, der venter. Gå tilbage ad kystvejen til molen, tryk på F på Færgemand Odo, og fortæl ham, at jeg siger, du har fortjent din overfart. Tryk på L, når som helst du mister overblikket over, hvad du skylder hvem: det er din opgavelog.",
+        "completion": "Sagde Maren det, gjorde hun? Høj ros fra en kvinde, der engang fik mig til at øve fortøjningsknob i en hel uge. Ring på klokken, der står ved siden af min mole, når som helst du er klar, {playerName}, og overfarten sætter dig af midt i Østbæk by. Pas på ulvene.",
+        "objectives": {
+          "0": {
+            "label": "Meld dig hos Færgemand Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Ned ad Vindvejen",
         "text": "Du klarede klatreturen, {playerName}, så vinden har besluttet at beholde dig. Vighavn ligger østpå langs bakkevejen, gemt i læ af sin vig. Havnefoged Odile tæller hver sjæl, der kommer over passet, og hun vil tælle dig. Fortæl hende, at Vindvejen stadig er åben.",
@@ -16521,6 +17294,9 @@ export const da_DK: EnTranslations = {
           },
           "11": {
             "label": "Fjernkyst-Dæmningen"
+          },
+          "12": {
+            "label": "Østbæk Havn"
           }
         }
       },
@@ -16883,6 +17659,27 @@ export const da_DK: EnTranslations = {
             "label": "Riftmarkerne"
           }
         }
+      },
+      "proving_shore": {
+        "name": "Prøvestranden",
+        "welcome": "Prøvestranden beder kun om én ting af dig: tid. Lær lejren at kende, slå til halmdukkerne, gå Vraglinjen igennem, og når du er klar, sejler Færgemand Odo dig over til dalen.",
+        "pois": {
+          "0": {
+            "label": "Daggryhvile Lejr"
+          },
+          "1": {
+            "label": "Den Gamle Mole"
+          },
+          "2": {
+            "label": "Træningspladsen"
+          },
+          "3": {
+            "label": "Vraglinjen"
+          },
+          "4": {
+            "label": "Gauntlet"
+          }
+        }
       }
     },
     "dungeons": {
@@ -17124,6 +17921,21 @@ export const da_DK: EnTranslations = {
         "sender": "Tinker Gizel",
         "subject": "MESTERSKAB, kaboom",
         "body": "Et af dine hovedfag ramte mesterskab, det absolutte TOP, kaboom, hele stigen, klaret. Jeg uddeler ikke ros, jeg uddeler lunter, men tag begge her: du er strålende og en smule skræmmende. Gå og gør bjergene nervøse."
+      },
+      "woc_market_delivery": {
+        "sender": "Børsmægleren",
+        "subject": "Dit køb på Børsen",
+        "body": "Salget er afregnet, og varen er din. Den vedhæftede pakke indeholder nøjagtig den genstand, du betalte for, holdt i depot fra det øjeblik, den blev noteret, til din betaling var gennemført.\n\nEt regnskab over salget føres i Børsens hovedbog.\n\n- Børsmægleren"
+      },
+      "woc_market_return": {
+        "sender": "Børsmægleren",
+        "subject": "Din notering på Børsen er sluttet",
+        "body": "Din notering sluttede uden et gennemført salg: auktionen fandt ingen køber, mindsteprisen blev ikke nået, noteringen blev trukket tilbage, eller den vindende byder fik ikke betalt. Din vare vender uskadt tilbage til dig med dette brev, nøjagtig som den blev lagt i depot.\n\n- Børsmægleren"
+      },
+      "woc_market_sold": {
+        "sender": "Børsmægleren",
+        "subject": "Din notering på Børsen blev solgt",
+        "body": "Din notering blev solgt, og køberen har betalt fuldt ud. Børsens hovedbog bærer regnskabet for salget, og din Børs-aktivitet viser det afregnede beløb og dets opdeling.\n\n- Børsmægleren"
       }
     },
     "itemSets": {

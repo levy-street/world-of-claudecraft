@@ -23,6 +23,7 @@ const social = (over: Partial<SocialInfo> = {}): SocialInfo => ({
   blocks: [],
   ignores: [],
   guild: null,
+  myPledge: null,
   ...over,
 });
 
@@ -70,7 +71,18 @@ describe('resolvePlayerSocialFlags online (the server graph is the source of tru
 
   it('resolves guild-invite permission from rank', () => {
     const asMember = social({
-      guild: { id: 1, name: 'G', rank: 'member', motd: '', motdSetBy: '', members: [], events: [] },
+      guild: {
+        id: 1,
+        name: 'G',
+        rank: 'member',
+        motd: '',
+        motdSetBy: '',
+        members: [],
+        events: [],
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
+      },
     });
     expect(resolvePlayerSocialFlags('Bob', asMember, new Set()).canGuildInvite).toBe(false);
 
@@ -83,6 +95,9 @@ describe('resolvePlayerSocialFlags online (the server graph is the source of tru
         motdSetBy: '',
         members: [],
         events: [],
+        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledges: [],
+        tier: 0,
       },
     });
     expect(resolvePlayerSocialFlags('Bob', asOfficer, new Set()).canGuildInvite).toBe(true);

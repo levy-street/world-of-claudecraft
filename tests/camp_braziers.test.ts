@@ -153,6 +153,22 @@ describe('planCampBraziers on the real world', () => {
     }
   });
 
+  // The Highwatch practice row is four camps of inert straw targets, all family
+  // 'humanoid', so before the inert predicate each one earned a fire of its own
+  // and the row burned like a war camp. The row keeps exactly one fire now, and
+  // it is the AUTHORED campfire in front of the normal boss dummy, not a brazier.
+  it('lights no fire at a practice dummy camp', () => {
+    const sites = plan();
+    const dummyCamps = CAMPS.filter((camp) => MOBS[camp.mobId]?.dummy === true);
+    expect(dummyCamps.length).toBeGreaterThanOrEqual(4);
+
+    for (const camp of dummyCamps) {
+      for (const site of sites) {
+        expect(Math.hypot(camp.center.x - site.x, camp.center.z - site.z)).toBeGreaterThan(4.2);
+      }
+    }
+  });
+
   it('never lights a drowned camp or the middle of a road', () => {
     const sites = plan();
     for (const site of sites) {

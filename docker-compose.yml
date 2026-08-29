@@ -65,6 +65,18 @@ services:
       # Empty (unset) yields the built-in default of 10; accepted range is 1 to
       # 97 and anything else falls back to the default with an error at boot.
       DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
+      # Runtime: storage price override (server/storage_prices.ts), one JSON object
+      # of copper price lists, e.g. {"bankSockets":[4 ints]} (bankExpansions and
+      # vaultUpgrades too), kept on ONE line in a .env file. Empty (unset) keeps the
+      # compiled defaults; a rejected dimension falls back by itself and is reported
+      # on the console at boot.
+      STORAGE_PRICES: ${STORAGE_PRICES:-}
+      # Runtime: database-wide lifetime insert ceiling for the keep-forever
+      # bank_ledger (server/bank_ledger_growth_budget.ts). Empty (unset) yields
+      # the built-in default of 10,000,000 rows. Every process sharing
+      # DATABASE_URL must use the same value as the stored singleton or boot
+      # fails; raising it is a maintenance-window operation (DEPLOY.md).
+      BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS: ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
@@ -106,6 +118,20 @@ services:
       # heartbeat log line (tickHz, per-phase p95/max) plus over-budget stutter
       # traces. Off by default so production logs stay quiet.
       PERF_TICK_LOG: ${PERF_TICK_LOG:-}
+      # Runtime: client perf beacon retention in days for the nightly sweep
+      # (server/http/config.ts, code default 14). The host .env sets a longer
+      # window (90) so device/FPS history spans release cycles; without this
+      # passthrough the container silently runs the code default and discards
+      # the longitudinal data the perf investigations rely on.
+      PERF_REPORT_RETENTION_DAYS: ${PERF_REPORT_RETENTION_DAYS:-}
+      # Runtime: the sibling retention knobs config.ts reads that were missing
+      # the same passthrough, so a host .env override silently fell back to the
+      # code defaults exactly like PERF_REPORT_RETENTION_DAYS did. Empty is
+      # safe: numberOr treats the empty string as absent.
+      CHAT_LOG_RETENTION_DAYS: ${CHAT_LOG_RETENTION_DAYS:-}
+      UNSTUCK_REPORT_RETENTION_DAYS: ${UNSTUCK_REPORT_RETENTION_DAYS:-}
+      DAILY_REWARD_EVENTS_RETENTION_DAYS: ${DAILY_REWARD_EVENTS_RETENTION_DAYS:-}
+      ONLINE_SAMPLES_RETENTION_DAYS: ${ONLINE_SAMPLES_RETENTION_DAYS:-}
       # Runtime: the published OTA bundle manifest POST /api/ota/updates reads
       # (server/ota_updates.ts). Empty (unset) keeps OTA dark: the endpoint
       # answers "no update" and the native apps keep their current bundle. Must
@@ -148,6 +174,23 @@ services:
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
       WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
       WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      # The $WOC Exchange. Ships disabled: unset leaves every path answering
+      # woc_market.disabled and the sweep never starts. WOC_MARKET_SERVICE_URL
+      # points at the economy service's /v1/market/ prefix, authenticated with
+      # the WOC_ECONOMY_INTERNAL_SECRET above (the market proxy shares it).
+      # The DEV arms are deliberately absent here: they are dev-only and this
+      # compose is the production deployment.
+      WOC_MARKET_ENABLED: ${WOC_MARKET_ENABLED:-}
+      WOC_MARKET_SERVICE_URL: ${WOC_MARKET_SERVICE_URL:-}
+      WOC_MARKET_EXCLUDED_ITEM_IDS: ${WOC_MARKET_EXCLUDED_ITEM_IDS:-}
+      WOC_MARKET_LISTINGS_RETENTION_DAYS: ${WOC_MARKET_LISTINGS_RETENTION_DAYS:-}
+      WOC_MARKET_ABANDONS_RETENTION_DAYS: ${WOC_MARKET_ABANDONS_RETENTION_DAYS:-}
+      WOC_MARKET_OFFERS_RETENTION_DAYS: ${WOC_MARKET_OFFERS_RETENTION_DAYS:-}
+      WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS: ${WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS:-}
+      WOC_MARKET_CONFIRMING_REVIEW_HOURS: ${WOC_MARKET_CONFIRMING_REVIEW_HOURS:-}
+      # WOC_MARKET_DEV_SERVICE / WOC_MARKET_DEV_PRICE_MICRO_USD are deliberately
+      # NOT passed through: compose is the production deployment and the dev
+      # economy must be unreachable from it (the ALLOW_DEV_COMMANDS posture).
       SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
       WOC_MINT: ${WOC_MINT:-}
       META_CAPI_PIXEL_ID: ${META_CAPI_PIXEL_ID:-}

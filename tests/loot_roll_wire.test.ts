@@ -18,6 +18,8 @@ import { createMob } from '../src/sim/entity';
 import { RAID_MAX } from '../src/sim/social/party';
 import { bareClient as sharedBareClient } from './helpers/bare_client';
 
+const FRESH_CORPSE_TIMER = 60;
+
 function fakeWs() {
   const sent: any[] = [];
   return { sent, ws: { readyState: 1, send: (p: string) => sent.push(JSON.parse(p)) } };
@@ -65,6 +67,7 @@ describe('loot roll self-snapshot parity', () => {
 
     const mob = createMob(990800, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -113,6 +116,7 @@ describe('loot roll self-snapshot parity', () => {
     const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -233,6 +237,7 @@ describe('a repeated pid in a masterAssign frame, through a real GameServer (#25
     const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -407,6 +412,7 @@ describe('the masterAssign pids length cap (#2524)', () => {
     const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
     const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = leader;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };

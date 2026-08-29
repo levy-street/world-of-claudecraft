@@ -19,6 +19,7 @@ import {
   onDelveClearForDeeds,
   onDungeonFinalBossKilledForDeeds,
   onFishCaughtForDeeds,
+  POI_VISIT_RADIUS,
   restoreDeedStats,
   updateDeeds,
 } from '../src/sim/deeds';
@@ -47,6 +48,18 @@ function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }
   return evs.filter((ev): ev is Extract<SimEvent, { type: 'deedUnlocked' }> => {
     return ev.type === 'deedUnlocked';
   });
+}
+
+function stageFallLanding(e: Entity, drop: number): void {
+  const supportY = e.pos.y;
+  e.pos.y = supportY + 0.01;
+  e.prevPos = { ...e.pos };
+  e.fallStartY = supportY + drop;
+  e.onGround = false;
+  e.jumping = false;
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
 }
 
 // Seat a live 2v2 Fiesta bout (four solo-queuers, countdown run out) so the
@@ -1149,14 +1162,23 @@ describe('persistence', () => {
 
   it('every visited mark a live sim writes stays inside the authored namespaces', () => {
     const sim = makeSim();
-    const { meta } = primary(sim);
+    const { meta, e } = primary(sim);
+    const poi = ZONES.find((z) => z.id === 'eastbrook_vale')!.pois.find(
+      (p) => p.id === 'eastbrook',
+    )!;
+    e.pos.x = poi.x;
+    e.pos.z = poi.z;
+    e.prevPos = { ...e.pos };
     for (let i = 0; i < 25; i++) sim.tick(); // let the 1 Hz proximity sweep run
     for (const mark of meta.deedStats.visited) {
       expect(mark).toMatch(
         /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness):/,
       );
     }
-    // The spawn-square sweep marked the hub POI (bounded, authored input).
+    // Parked on the hub POI (the harbor-town spawn quay sits outside every POI
+    // radius), the sweep marked it (bounded, authored input). Re-pinned 2026-08
+    // for the Eastbrook harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md).
     expect(meta.deedStats.visited.has('poi:eastbrook_vale:eastbrook')).toBe(true);
   });
 });
@@ -1541,8 +1563,13 @@ describe('bounded sets on load', () => {
     // serialized fine but were dropped on load while the namespace was missing
     // from VISITED_MARK_NAMESPACES, so a mid-hunt save silently lost rare-event
     // deed progress. The mark must survive the round trip.
+    // 'toString' and 'constructor' give the Object.hasOwn arm its teeth: under
+    // the old `if (ITEMS[id])` truthiness check both index an INHERITED function
+    // off Object.prototype and would be restored into the persisted discovery
+    // ledger as real items; hasOwn drops them. 'not_a_real_item' alone cannot
+    // distinguish the two checks (undefined is falsy under both).
     const stats = restoreDeedStats({
-      itemsDiscovered: ['glimmerfin_koi', 'not_a_real_item'],
+      itemsDiscovered: ['glimmerfin_koi', 'not_a_real_item', 'toString', 'constructor'],
       visited: [
         'poi:eastbrook_vale:eastbrook',
         'gather_event:perfect_specimen',
@@ -1566,6 +1593,50 @@ describe('bounded sets on load', () => {
 });
 
 describe('site wiring (real modules, not direct bumps)', () => {
+  it('does not award Gravity Always Wins when an already-dead ghost lands', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    e.dead = true;
+    e.hp = 0;
+    sim.releaseSpirit();
+    expect(e.dead).toBe(true);
+    expect(e.ghost).toBe(true);
+
+    stageFallLanding(e, 30);
+    const evs = sim.tick();
+
+    expect(e.onGround).toBe(true);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(false);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(0);
+  });
+
+  it('awards Gravity Always Wins when a fall transitions a living player to dead', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    e.hp = 1;
+
+    stageFallLanding(e, 30);
+    const evs = sim.tick();
+
+    expect(e.dead).toBe(true);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(true);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(1);
+  });
+
+  it('does not award Gravity Always Wins for a damaging nonlethal fall', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    const hpBefore = e.hp;
+
+    stageFallLanding(e, 13);
+    const evs = sim.tick();
+
+    expect(e.hp).toBeLessThan(hpBefore);
+    expect(e.dead).toBe(false);
+    expect(meta.deedsEarned.has('hid_fall_death')).toBe(false);
+    expect(deedEvents(evs).filter((ev) => ev.deedId === 'hid_fall_death')).toHaveLength(0);
+  });
+
   it('a decided duel bumps duelsWon and duelsLost through endDuel', () => {
     const sim = makeSim();
     const a = sim.playerId;
@@ -2446,6 +2517,81 @@ describe('exploration poi identity (marks key on the stable id, not the label)',
       updateDeeds(sim.ctx);
     }
     expect(meta.deedsEarned.has('exp_vale_wayfarer')).toBe(true);
+  });
+});
+
+describe('POI_VISIT_RADIUS: no two marks a single-zone wayfarer deed needs can overlap', () => {
+  it('every zone a single-zone all-poi visits deed draws from keeps its tightest poi gap over double the radius', () => {
+    // A cross-zone deed (exp_long_road_north) can never have two of its own
+    // marks satisfied from one spot: a player occupies exactly one zone at a
+    // time, and the sweep only matches pois in the zone they are currently in
+    // (src/sim/deeds.ts sweepProximityMarks). Only a SINGLE-zone all-poi deed
+    // is at risk, so that is the only shape this derives zones from.
+    const singleZoneWayfarerZoneIds = new Set<string>();
+    for (const def of Object.values(DEEDS)) {
+      if (def.trigger.kind !== 'visits') continue;
+      const marks = def.trigger.markIds;
+      if (marks.length < 2 || !marks.every((m) => m.startsWith('poi:'))) continue;
+      const zoneIds = new Set(marks.map((m) => m.split(':')[1]));
+      if (zoneIds.size === 1) for (const zoneId of zoneIds) singleZoneWayfarerZoneIds.add(zoneId);
+    }
+    // Non-vacuity: today this is eastbrook_vale/mirefen_marsh/thornpeak_heights
+    // (Wayfarer of the Vale/Marsh/Heights). A future content change that
+    // retires the last one would silently empty this loop.
+    expect([...singleZoneWayfarerZoneIds].sort()).toEqual([
+      'eastbrook_vale',
+      'mirefen_marsh',
+      'thornpeak_heights',
+    ]);
+    // One authored exception: the New Eastbrook program built the town on the
+    // demolished Sowfield parcel (docs/design/eastbrook-revamp/master-plan.md),
+    // and the frozen the_sowfield mark is deliberately earned by visiting the
+    // town that replaced it (src/sim/content/zone1.ts keeps the hidden POI row
+    // so the append-only deeds catalog never strands the trigger). That one
+    // pair may overlap; every other pair keeps the distinct-visit guarantee.
+    const deliberateOverlaps = new Set(['eastbrook_vale:eastbrook|the_sowfield']);
+    for (const zoneId of singleZoneWayfarerZoneIds) {
+      const zone = ZONES.find((z) => z.id === zoneId)!;
+      const pois = zone.pois.filter((p) => p.id !== undefined);
+      let tightest = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < pois.length; i++) {
+        for (let j = i + 1; j < pois.length; j++) {
+          const pairKey = `${zoneId}:${[pois[i].id, pois[j].id].sort().join('|')}`;
+          if (deliberateOverlaps.has(pairKey)) continue;
+          const d = Math.hypot(pois[i].x - pois[j].x, pois[i].z - pois[j].z);
+          if (d < tightest) tightest = d;
+        }
+      }
+      // Strictly over double the radius: standing exactly at the midpoint of
+      // the tightest pair must still leave both marks outside catch range.
+      expect(tightest, `${zoneId} tightest poi gap vs 2x POI_VISIT_RADIUS`).toBeGreaterThan(
+        2 * POI_VISIT_RADIUS,
+      );
+    }
+  });
+
+  it('the actual behavior delta: grants inside the new 24yd band, still refuses just past it', () => {
+    const zone = ZONES.find((z) => z.id === 'thornpeak_heights')!;
+    const poi = zone.pois.find((p) => p.id === 'highwatch')!;
+    const markId = `poi:${zone.id}:${poi.id}`;
+
+    const inside = makeSim();
+    const { meta: metaInside, e: eInside } = primary(inside);
+    eInside.pos.x = poi.x + 22; // between the old 20yd radius and the new 24yd one
+    eInside.pos.z = poi.z;
+    eInside.prevPos = { ...eInside.pos };
+    inside.tickCount = 20;
+    updateDeeds(inside.ctx);
+    expect(metaInside.deedStats.visited.has(markId)).toBe(true);
+
+    const outside = makeSim();
+    const { meta: metaOutside, e: eOutside } = primary(outside);
+    eOutside.pos.x = poi.x + 26; // just past the new radius too
+    eOutside.pos.z = poi.z;
+    eOutside.prevPos = { ...eOutside.pos };
+    outside.tickCount = 20;
+    updateDeeds(outside.ctx);
+    expect(metaOutside.deedStats.visited.has(markId)).toBe(false);
   });
 });
 

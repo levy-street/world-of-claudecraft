@@ -53,7 +53,14 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 - Linking is opt-in; the game is fully playable without ever connecting a wallet.
 
 ## Constraints (non-negotiable)
-- **Cosmetic-only / no pay-to-win** - token utility is appearance, convenience, access, or realm-operation; never power.
+- **The game never sells power / no pay-to-win** - token utility is appearance,
+  convenience, access, realm-operation, or player-to-player trade. The $WOC
+  marketplace (`docs/prd/woc/marketplace.md`, ships disabled pending counsel
+  sign-off) lets players sell already-earned eligible items, stat-bearing gear
+  included, to each other; that is a transfer between players, never the game
+  selling power. Nothing bought FROM the game with tokens ever grants stats,
+  drop rates, or progression. The wallet link itself stays cosmetic and
+  read-only.
 - **Non-custodial** - the chain owns assets; `src/sim/` stays pure and deterministic.
 
 ## Open questions
@@ -64,5 +71,7 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 
 ## Out of scope
 Custody, arbitrary transactions, staking, and gameplay power remain out of scope.
-The only transaction handoff is a server-built Claudium purchase that is already
-bound to the linked wallet and existing purchase intent.
+Every transaction handoff is a service-built intent already bound to the linked
+wallet: the Claudium purchase, and the $WOC marketplace's bond and settlement
+transactions (`docs/prd/woc/marketplace.md`); the wallet-link feature itself
+still moves no funds.

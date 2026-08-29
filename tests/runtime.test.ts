@@ -39,6 +39,7 @@ describe('desktop runtime helpers', () => {
         onLoginCode: () => () => {},
       };
       expect(desktopBridge()).not.toBeNull();
+      expect(desktopBridge()?.quitApp).toBeUndefined();
     } finally {
       globalWithBridge.wocDesktop = previous;
     }

@@ -643,7 +643,7 @@ The More hub is a compact anchored panel (not a new full window) that organizes 
 destination as list rows or small tiles, grouped:
 
 - Progression: Spellbook (P), Talents (N), Crafting (T), Book of Deeds (Shift+Z).
-- Activities: Arena (G), Dungeon Finder (Shift+I), Vale Cup (Y), Leaderboard (K), Event
+- Activities: Arena (G), Dungeon Finder (Shift+I), Leaderboard (K), Event
   Calendar (I), Damage Meters (Shift+H), Town Focus (in town only).
 - Community: Emote wheel (X), Discord (U; this row carries the full account-link and rank
   panel behavior of the `#mm-discord` button, not a plain link), plus the GitHub and
@@ -796,8 +796,10 @@ Every window adopts the grammar; these carry specific intent:
   form controls (section 10.7) restyle every row for free; new settings this program adds
   (the sound mute, the chat idle state if it needs a knob) enter as declarative entries,
   never bespoke DOM.
-- **Book of Deeds, social, spellbook, talents, crafting, market, mailbox, arena, dungeon
-  finder, Vale Cup, leaderboard, calendar, meters, trade, inspect, loot settings**:
+- **Book of Deeds, social, spellbook, talents, crafting, market (the gold World Market
+  and the $WOC Exchange, `woc_market_window.ts`, which ships config-off), mailbox, arena,
+  dungeon finder, leaderboard, calendar, meters, trade (including its $WOC arm,
+  `src/ui/hud/woc_trade/`), inspect, loot settings**:
   grammar plus tokens, preserving each window's existing information design. Talents 2.0
   (`docs/prd/talents-2.0.md`) and the Encounter UI draft
   (`docs/prd/dungeon-mechanic-primitives.md`) inherit this language when built.
@@ -1162,7 +1164,7 @@ only; behavior changes are named in the linked section.
 | `#meters-window` | Restyle; gains a More hub entry (7.9, 8.2) | 5 |
 | All `.window` feature windows (8.2 list) | Window grammar | 5 |
 | `#loot-window`, `#quest-dialog`, delve board and rite panels, lockpick panel | Window grammar | 5 |
-| `#arena-status`, `#vcup-indicator`, spectate badge, reconnect overlay, tutorial cards | Restyle | 5 |
+| `#arena-status`, spectate badge, reconnect overlay, tutorial cards | Restyle | 5 |
 | Discord surfaces (`#mm-discord` panel behavior, `#discord-window`, index-only CTA) | Panel behavior moves into the More hub (7.9); window restyles | 3, 5 |
 | `#perf-overlay`, `#click-move-marker`, skip links, live regions | Unchanged | n/a |
 | Mobile touch controls and sheets | Restyled by the shared tokens, theme, type, and chrome phases (with mobile screenshots per 13.6); mobile LAYOUT is a separate program | 1, 2, 4, 5 |

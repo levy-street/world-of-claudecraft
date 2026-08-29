@@ -63,6 +63,12 @@ the throw (#2499, #2502).
   `tests/fct_mobile_css.test.ts`.
 - **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
   are where the new pins land.
+- **A `var(--name)` read must name something that DECLARES it.** `tests/css_token_resolution.test.ts`
+  resolves every fallback-free `var()` in this directory against the sheets, the
+  `themeCssVars` emissions and the inline `--name:` setters, with today's known-undeclared
+  names ratcheted as an exact set (a new one fails; a fixed one must leave the list). It
+  exists because `var(--accent)`, defined nowhere, shipped for months resolving to
+  `inherit` / `currentColor` on the marketplace's accent text and both spinner arcs.
 
 ## Token system + NO magic values in painters
 - **Tokens, not literals.** Colors, accents, and tunables live as `--color-*` / `--fx-*`
@@ -80,7 +86,11 @@ the throw (#2499, #2502).
   custom property per plate per frame, and the portrait ring receives those same literals
   through the painter rather than duplicating them in `hud.css`
   (`tests/deed_border_accent.test.ts` pins the single source); `arena_window` renders DOM
-  from the stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
+  from the stylesheet, not canvas; `woc_log_tones.ts` is the sanctioned home of the three
+  chat-log tone literals (good, bad, note), because a chat line is written as an inline
+  `color:` on a span the log owns and cannot read a stylesheet rule, and naming them once
+  replaced the same three values repeated across the $WOC log call sites
+  (`tests/woc_log_tones.test.ts` pins the single source). Guarded by the per-painter no-magic source scans (e.g.
   `tests/auras_painter.test.ts`, `tests/minimap_painter.test.ts`,
   `tests/action_bar_painter.test.ts`) and `tests/focus_visible_guard.test.ts`; there is no
   single central no-magic guard, each migrated painter scans its own source.

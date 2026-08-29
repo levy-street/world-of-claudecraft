@@ -905,4 +905,8 @@ export const table: DeedLocaleTable = {
     name: '完璧な装甲',
     desc: '防具鍛冶で初めてのレア級アイテムを作る。',
   },
+  prog_ready_for_an_adventure: {
+    name: '冒険の準備は万端',
+    desc: '修練の浜を卒業する。島でのすべての課題を終え、渡しの鐘を鳴らしてイーストブルックへ帰る。',
+  },
 };

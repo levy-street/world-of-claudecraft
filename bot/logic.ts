@@ -5,7 +5,6 @@
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
 import { specialRoleByKey, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
-import type { VcNationId } from '../src/sim/types';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
 // Intents we need: guild metadata, members (privileged), voice states (who is in
@@ -577,7 +576,7 @@ export interface ActivityParticipant {
 }
 
 export interface ActivityItem {
-  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'vale_cup' | 'masterwork' | 'deed';
+  kind: 'levelup' | 'rareloot' | 'duel' | 'arena' | 'masterwork' | 'deed';
   realm: string;
   profileUrl: string | null;
   level?: number;
@@ -586,38 +585,10 @@ export interface ActivityItem {
   winnerName?: string;
   loserName?: string;
   ratingDelta?: number;
-  bracket?: number; // vale_cup (1..5, an NvN bout)
-  scoreA?: number; // vale_cup
-  scoreB?: number; // vale_cup
-  winnerNation?: string; // vale_cup (VcNationId of the winning side)
   deedId?: string; // deed
   deedName?: string; // deed (English deed name; Discord posts are English)
   deedTitle?: string; // deed, when the deed rewards a title
   participants: ActivityParticipant[];
-}
-
-// English banner-nation names for the Vale Cup card. Discord posts are English
-// by design (every builder in this file), so this mirrors the game catalog's
-// hudChrome.vcup.nation.* English values; typing the record over VcNationId
-// makes a future nation fail the build here until it is labeled. Exported so
-// tests/discord_bot.test.ts can pin the values against that catalog (the test
-// imports both; this file must NOT import the ui catalog, the bot stays
-// standalone), so a catalog reword reddens this copy.
-export const VC_NATION_LABELS: Record<VcNationId, string> = {
-  vale: 'Eastbrook Vale',
-  mirefen: 'The Mirefen',
-  thornpeak: 'Thornpeak',
-  coliseum: 'The Ashen Coliseum',
-  choir: 'The Pale Choir',
-  ogre: 'The Ogre Clans',
-  moon: 'The Pale Moon',
-  copperdig: 'The Copper Dig',
-};
-
-/** English nation label, falling back to the raw id for a nation this bot
- *  build does not know (a newer server mid-deploy). */
-export function vcNationLabel(id: string): string {
-  return VC_NATION_LABELS[id as VcNationId] ?? id;
 }
 
 // The first-koi deed (col_glimmerfin, "Glimmer of Hope"; the deed NAME is
@@ -696,22 +667,6 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
         ` on ${item.realm}.`;
       color = 0x9b59b6;
       break;
-    case 'vale_cup': {
-      // One card per decided rated match; participants are the winning side.
-      // The winner's score reads first whichever column (A or B) it sat in.
-      const nation = vcNationLabel(item.winnerNation ?? '');
-      const hi = Math.max(item.scoreA ?? 0, item.scoreB ?? 0);
-      const lo = Math.min(item.scoreA ?? 0, item.scoreB ?? 0);
-      const bracket = item.bracket !== undefined ? ` ${item.bracket}v${item.bracket}` : '';
-      const winners = item.participants.length
-        ? item.participants.map((p) => mentionFor(p.name, item.participants)).join(', ')
-        : subjectName;
-      author = ':trophy: Vale Cup';
-      title = `${nation} win the${bracket} match!`;
-      description = `${winners} took the Sowfield ${hi} to ${lo} for ${nation} on ${item.realm}.`;
-      color = 0xf0b743;
-      break;
-    }
     case 'masterwork':
       author = ':hammer: Masterwork';
       title = item.itemName || 'A masterwork piece';

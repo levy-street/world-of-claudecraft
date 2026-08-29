@@ -141,13 +141,33 @@ describe('warlock class talent tree', () => {
     base.sim.castAbility('demon_skin');
     deepened.sim.castAbility('demon_skin');
 
-    expect(base.player.stats.armor - baseArmor).toBe(80);
-    expect(deepened.player.stats.armor - deepenedArmor).toBe(160);
+    // 88/176, not the authored 80/160: Fiendhide's armor is a flat-magnitude
+    // buff kind, which deliberately scales with the destruction viability
+    // floor's spellDmgPct 0.1 (SCALABLE_BUFF_KINDS in content/classes.ts).
+    expect(base.player.stats.armor - baseArmor).toBe(88);
+    expect(deepened.player.stats.armor - deepenedArmor).toBe(176);
     expect(base.player.auras.find((aura) => aura.id === 'demon_skin')?.value2).toBeUndefined();
     expect(deepened.player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 160,
+      value: 176,
       value2: 0.05,
     });
+  });
+
+  it('keeps Hard Bargain a symmetric conversion under the viability floors', () => {
+    // The 2026-08-23 spellDmgPct floors must not reach the mana economy: the
+    // scaleEffect lifeTap arm passes through untouched, so the authored
+    // hp == mana symmetry the tooltip promises survives the damage knob.
+    const { sim, player } = rig({});
+    const tap = sim.resolvedAbility('life_tap');
+    const effect = tap?.effects.find((candidate) => candidate.type === 'lifeTap');
+    if (effect?.type !== 'lifeTap') throw new Error('missing Hard Bargain effect');
+    expect(effect).toMatchObject({ hp: 85, mana: 85 });
+
+    player.resource = 100;
+    const hpBefore = player.hp;
+    sim.castAbility('life_tap');
+    expect(player.hp).toBe(hpBefore - 85);
+    expect(player.resource).toBe(185);
   });
 
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
@@ -172,8 +192,10 @@ describe('warlock class talent tree', () => {
     const { sim, player } = rig({});
     const baseArmor = player.stats.armor;
     sim.castAbility('demon_skin');
+    // 88/176 through the destruction viability floor, same reasoning as the
+    // Pact Deepened doubling test above.
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 80,
+      value: 88,
       value2: undefined,
     });
 
@@ -184,17 +206,17 @@ describe('warlock class talent tree', () => {
       }),
     ).toBe(true);
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 160,
+      value: 176,
       value2: 0.05,
     });
-    expect(player.stats.armor - baseArmor).toBe(160);
+    expect(player.stats.armor - baseArmor).toBe(176);
 
     expect(sim.applyTalents({ spec: 'destruction', rows: {} })).toBe(true);
     expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
-      value: 80,
+      value: 88,
       value2: undefined,
     });
-    expect(player.stats.armor - baseArmor).toBe(80);
+    expect(player.stats.armor - baseArmor).toBe(88);
   });
 
   it('awards one or two Shadow Credit charges from real specialization spending', () => {

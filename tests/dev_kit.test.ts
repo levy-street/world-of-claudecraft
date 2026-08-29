@@ -7,6 +7,7 @@ import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import {
   applyDevKit,
+  bestKitBag,
   buildDevKit,
   DEV_KIT_EXCLUDED_DUNGEON,
   DEV_KIT_LEVEL,
@@ -198,20 +199,28 @@ describe('kit construction', () => {
     }
   });
 
-  it('leaves neck and rings empty, because no fresh-20 jewelry exists', () => {
-    // Not a filter bug: every neck/ring in the game is either Heroic-badge-vendor
-    // stock or source level 22+, so a genuinely fresh 20 wears none. Documented as a
-    // test so the day content adds fresh-20 jewelry, this reds and the presets get
-    // revisited rather than silently continuing to ship three empty slots.
+  it('wears the tutorial keepsake as the ONE fresh-20 ring, neck empty', () => {
+    // Revisited when the Proving Shore's Mother of Pearl landed (+1 all
+    // stats, the tutorial quest reward every fresh 20 realistically owns):
+    // it is the single piece of fresh-20 jewelry in the game, worn in ring1
+    // for every class. Every OTHER neck/ring stays Heroic-badge-vendor stock
+    // or source level 22+, so ring2 and neck stay empty. The day more
+    // fresh-20 jewelry lands, this reds and the presets get revisited again.
     const jewelry = Object.values(ITEMS).filter(
       (item) => item.slot === 'neck' || item.slot === 'ring',
     );
     expect(jewelry.length).toBeGreaterThan(0);
     for (const cls of ALL_CLASSES) {
       expect(
-        jewelry.filter((item) => isFreshTwentyItem(cls, item)),
-        `${cls} has fresh-20 jewelry now: revisit the kit slots`,
-      ).toEqual([]);
+        jewelry.filter((item) => isFreshTwentyItem(cls, item)).map((item) => item.id),
+        `${cls} fresh-20 jewelry changed: revisit the kit slots`,
+      ).toEqual(['mother_of_pearl']);
+    }
+    for (const { cls, spec } of everySpec()) {
+      const kit = buildDevKit(cls, spec);
+      expect(kit?.equip.ring1, `${cls}/${spec} ring1`).toBe('mother_of_pearl');
+      expect(kit?.equip.ring2, `${cls}/${spec} ring2`).toBeUndefined();
+      expect(kit?.equip.neck, `${cls}/${spec} neck`).toBeUndefined();
     }
   });
 
@@ -313,6 +322,32 @@ describe('/dev kit against a real Sim', () => {
     sim.chat(`/dev kit ${spec}`);
     return sim;
   }
+
+  it('fills the sockets with the largest GENERAL bag, never a materials-only satchel', () => {
+    // The kit puts ONE bag in every socket, so the choice decides the whole carried
+    // budget. A materialsOnly bag feeds the materials pool instead of the general one
+    // (src/sim/bag_pools.ts): picking the biggest bag outright would leave the tester a
+    // bare backpack for gear and four sockets only raw materials could use, which is the
+    // opposite of what a gear command is for.
+    const best = bestKitBag();
+    expect(best).not.toBeNull();
+    expect(best?.materialsOnly).toBeUndefined();
+    const generalMax = Math.max(
+      ...Object.values(ITEMS)
+        .filter((item) => item.kind === 'bag' && item.materialsOnly !== true)
+        .map((item) => item.bagSlots ?? 0),
+    );
+    expect(best?.bagSlots).toBe(generalMax);
+    // Non-vacuity: the exclusion only proves something while a materials-only bag that
+    // WOULD have won exists. If the catalog ever loses that bag, this arm must be
+    // re-derived rather than left quietly passing.
+    const materialsOnlyMax = Math.max(
+      ...Object.values(ITEMS)
+        .filter((item) => item.kind === 'bag' && item.materialsOnly === true)
+        .map((item) => item.bagSlots ?? 0),
+    );
+    expect(materialsOnlyMax).toBeGreaterThan(generalMax);
+  });
 
   it('dresses the character and fills all four bag sockets', () => {
     const sim = kitted('warrior', 'prot');

@@ -295,7 +295,7 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
-  (`vale_cup_hud.ts`, `dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
+  (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
   by the module sweep in `tests/architecture.test.ts`.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
@@ -330,15 +330,17 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   owned item stack wears (the masterwork seal, the enchanted/signed/bound glyphs, the generic
   instance wedge, the fine-grade rim + seal, and any future grade/purpose/per-copy mark) paints
   identically on EVERY surface that renders owned stacks: the bag grid, the personal bank grid,
-  and the guild bank grid. A new mark, or a new surface that shows owned stacks, wires all of
+  the guild bank grid, and the Materials Vault row strip (`vault_window.ts` wires the full
+  family). A new mark, or a new surface that shows owned stacks, wires all of
   them in the SAME change: decision logic in a pure core beside `bag_corner_mark_view.ts`
   (which owns the corner priority), markup minted in `item_instance_glyph_mark.ts` (never an
-  inline span in one painter), CSS as dual `.bag-item` / `.bank-item` selector rules (one
-  definition; note both grids have a common/poor neutral reset the rim rule must FOLLOW), and
-  the three `*_instance_marker` suites extended together. The one deliberate exception is the
-  quest seal, bag-only because quest items cannot enter either bank. This rule exists because
-  the fine mark shipped bag-only and losing the mark on deposit was reported as a bug (the
-  same shape as the earlier bank-missed masterwork seal): a mark describes the ITEM, so no
+  inline span in one painter), CSS as triple `.bag-item` / `.bank-item` / `.vault-row` selector
+  rules (one definition; note the grids have a common/poor neutral reset the rim rule must
+  FOLLOW), and the mark coverage extended together: the three `*_instance_marker` suites plus
+  the vault's mark-family block in `tests/vault_window.test.ts`. The one deliberate exception
+  is the quest seal, bag-only because quest items cannot enter either bank. This rule exists
+  because the fine mark shipped bag-only and losing the mark on deposit was reported as a bug
+  (the same shape as the earlier bank-missed masterwork seal): a mark describes the ITEM, so no
   window it appears in may drop it.
 - **`Hud` stays the orchestrator.** Keep `open<Window>`/`close<Window>` in `Hud` (cross-window
   coordination needs its private state); the per-render method shrinks to: resolve the entity,
@@ -470,10 +472,12 @@ byte-identical to a historical hand-rolled form, pass `useGrouping: false` + mat
 fraction-digit options (see `coords.ts`, `meters.ts`, `xp_bar.ts`, `clock.ts`).
 
 **Three client-side matchers re-localize `src/sim`/`server` English** (which stay
-language-agnostic): the hud-local `localizeErrorText`/`localizeSystemText`/`localizeLootText`,
-then `server_i18n.ts` (`localizeServerText`), then `sim_i18n.ts` (`localizeSimText`), in that
-order; the S3 drift guard accepts recognition by any of the three. Dev-channel text
-(`console.*`, thrown errors) stays English and is NOT matched.
+language-agnostic): `localizeErrorText` (the registered pure core
+`error_text_i18n_core.ts`; Hud keeps a thin delegator) plus the hud-local
+`localizeSystemText`/`localizeLootText`, then `server_i18n.ts` (`localizeServerText`), then
+`sim_i18n.ts` (`localizeSimText`), in that order; the S3 drift guard resolves each arm
+through its per-arm file table and accepts recognition by any of the three. Dev-channel
+text (`console.*`, thrown errors) stays English and is NOT matched.
 
 **Entity & talent names** localize through their own resolvers, not raw `t()`:
 `world_entity_i18n.ts` is the single ENGLISH source for mob/NPC/quest/zone/dungeon names +
@@ -599,6 +603,21 @@ same file), and each module's header carries its own contract.
   Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
   and compositor-only until it commits through Hud's shared position clamp. Bump
   `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
+- **interface_unlock.ts** (pure `interface_unlock_core.ts`): the "Unlock interface" Interface
+  option (Combat tab). It owns no geometry: it is a registry of `MovableFrame`s plus one flag,
+  and a flip asks each entry's `isActive()` before loosening it, so a character with no pet out
+  and a disabled action bar never gain a draggable frame. Adding a frame is a row in
+  `HUD_FRAME_SPECS` plus its `isActive` probe in `Hud.initInterfaceUnlock`, never a branch in
+  the coordinator. `movable_frame.ts` carries two config shapes for this: the three unit frames
+  keep an always-visible corner button and move only, while the frames this option governs pass
+  `buttonOnlyWhenUnlocked` + `scalable` and so carry no chrome until they are unlocked. It is
+  also the SINGLE `relocalize()` fan-out arm for every `MovableFrame` in the HUD.
+  **Both frame gestures are keyboard-operable, and a new one must be:** the corner button takes
+  arrow keys to position and the SE grip (a real named `button`, not a decorative div like the
+  chat box's) takes arrow keys to size, Shift for the fine step, each stepping through a pure
+  helper in `target_frame_pos.ts` (`scaleFromKeyStep`). A frame gesture with no keyboard path is
+  a defect: unlocking is the only route to these frames, so a pointer-only affordance leaves a
+  keyboard-only player unable to reach what it changes at all.
 - **deeds_view.ts** / **deeds_window.ts** (+ the `deed_*` siblings): the Book of Deeds
   window: DOM-free category/entry/unlock model, a cold window painter, and the write-elided
   HUD watch tracker. `deed_i18n.ts` re-localizes deed names/descriptions/titles from ids
@@ -614,6 +633,68 @@ same file), and each module's header carries its own contract.
   `_tracker_` pair memoizes its whole-catalog default scan on an ownership signature because
   `reliquaryPageCompletion` mints a fresh ownership bag per call in BOTH hosts; per-cell art
   resolution and the opaque-cell carve-out live in `reliquary_cell_art.ts` (see its header).
+- **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
+  (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
+  economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  **woc_market_chrome.ts** is the emit-only markup seam the window composes (browse
+  strip, sales list, sell-empty caption, bond disclosure notes); it spells its focus
+  keys through `FOCUS_KEY_ATTR` from `focus_restore.ts`.
+  Custody moves run the wallet STEP-UP first (B6/R1): the submit mints a challenge,
+  hands the SERVER-built message to `hooks.signMessageBase58` (same lazy bridge as the
+  payment signer), and sends the proof with the request; the trade window's $WOC arm
+  does the same on the SELLER's acceptance only. Devsig skips the wallet ONLY on an
+  explicit `signatureRequired: false`; absent means sign.
+  Payment-verdict words (the server's screened vocabulary: pending kinds incl. the
+  bond leg's own voice, settlement fail reasons) localize through
+  `woc_market_reason_text.ts`, which owns the word-to-copy maps with a generic
+  fallback in each direction; never map a verdict word to text inline in a painter.
+  Wallet-bridge failures classify through `wallet_bridge_reason_text.ts` (structural
+  cancel names, a byte-exact map over the bridge's thrown strings with a drift pin
+  over src/net plus `mobile_wallet_launcher.ts` and the desktop hand-off's throw
+  sites, caller-flavored generics): a catch site never renders `err.message`, it logs
+  the raw error on the dev channel and renders the classified line; rewording one of
+  those throws updates the map in the same change. The window's toast
+  (`notice`) stores UNRESOLVED state (keys, codes, screened words) and resolves at
+  render via `resolveNotice`, so a language switch never strands stale text. USD
+  amounts spell through `usd_text.ts` (Intl currency; the src/{ui,game,net} grep pin in
+  `tests/usd_text.test.ts` keeps the hardcoded-`$` and appended-code classes extinct);
+  multi-unit durations (countdowns, the claim cooldown's retry time, the p2p payment
+  hold) through `duration_text.ts`, never a raw `formatDuration` seconds count. The
+  seller's Cancel gate is ONE predicate, `canCancelListing` in the view core, for the
+  browse detail pane and the Activity rows alike. TOKEN figures spell through
+  `woc_tokens_text.ts` (one fraction-digit count for the Exchange, the trade arm and the
+  bag chip, which each formatted their own; `tests/woc_tokens_text.test.ts` pins that no
+  caller re-spells them), and the bag's balance chip itself is `woc_balance_chip.ts`, not
+  a `hud.ts` member. BEHAVIOR lives in `tests/woc_market_window_rig.test.ts` (the real
+  window over happy-dom with a recording fake client: the busyGen close guard, the poll
+  gate, the draft and focus carry, the combobox, the settlement faces);
+  `tests/woc_market_window.test.ts` is its source-scan twin and holds only what a regex
+  can (no magic values, no layout read, no driver, CSS specificity order, class
+  coverage). Copy that spells a server rule in words (the anti-snipe window, the Buy Now
+  hold and cooldowns, the strike ladder) is pinned to those constants in
+  `tests/woc_market_copy_figures.test.ts`; the seller's fee is RESOLVED from the
+  estimate's split rather than named as a percentage, because the schedule is economy
+  SERVICE configuration and is not on `/status`.
+  The trade window's $WOC arm is `trade_woc_view.ts` (pure model: faces, the fee block
+  for both sides, the buyer's commitment note, review/delivering status keys) plus the
+  cold painter `trade_woc_arm_painter.ts`, driven by `hud/woc_trade/` (the controller and
+  `woc_trade_offer_view.ts`, which owns `wocOfferPhase`/`wocOfferClosedReason`: 'settled'
+  requires resolution 'sold', a closed-not-sold listing is 'closed', a delivered or
+  review-parked settlement is still 'paying'). The controller keys the claimed
+  settlement and the staged quote to their offer id, guards every post-await write on
+  the deal still standing, and holds the local 'paying' face only while a signature is
+  out with the wallet (never through the claim round trips).
+  Both consent controls satisfy draft Terms 10.3: the Exchange checkbox and the
+  trade arm's consent row (`trade_woc_arm_painter.ts`) share ONE label key, link the
+  Marketplace terms, and send the player's REAL choice; the R9 hard-coded
+  `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
+  The link's href comes from `terms_link.ts` (same-origin on the site, the canonical
+  page from the packaged desktop and Capacitor shells, where a bare '/terms' was a
+  dead link or an in-app navigation); the DOM host passes the origin in.
+  CAVEAT the code cannot show: the deployed `public/terms.html` does not yet carry
+  its Marketplace section (the draft lives at the repo root), so the link points at
+  a page missing the terms being accepted until the pre-enable Terms publication
+  lands (owned by the packet's close-out audit; the market ships config-off).
 - **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
   **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
   and Season 1 Armory. The pure projection reads the skin catalog

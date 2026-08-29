@@ -5,6 +5,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { describe, expect, it } from 'vitest';
 import {
   createEastbrookCivicBeaconState,
@@ -64,7 +65,26 @@ function compileMaterial(
 
 function sourceAsset(withEmissive: boolean): THREE.Group {
   const source = new THREE.Group();
-  source.add(new THREE.Mesh(new THREE.BoxGeometry(2, 3, 4), new THREE.MeshStandardMaterial()));
+  // Round 5: kit fixtures carry a window-assembly component INSIDE the first
+  // mesh's geometry, merged into the shell the way the single-mesh hexb GLBs
+  // model their windows: a frame box at mid-height on the +z face PLUS a
+  // recessed pane box sharing one exact corner vertex (max corner
+  // (0.8, 1.5, 2.0)), so the pane detector (kit_window_panes_core.ts) finds
+  // exactly one window per kit building and emits the pane box's back face
+  // as its recessed glass plane. The opaque merge keeps the extra triangles
+  // off the TownEmissive mesh, so the civic mask counts below stay authored.
+  const shell = withEmissive
+    ? mergeGeometries(
+        [
+          new THREE.BoxGeometry(2, 3, 4),
+          new THREE.BoxGeometry(0.4, 0.6, 0.08).translate(0.6, 1.2, 1.96),
+          new THREE.BoxGeometry(0.2, 0.3, 0.02).translate(0.7, 1.35, 1.99),
+        ],
+        false,
+      )
+    : new THREE.BoxGeometry(2, 3, 4);
+  if (!shell) throw new Error('failed to merge the kit fixture shell');
+  source.add(new THREE.Mesh(shell, new THREE.MeshStandardMaterial()));
   if (withEmissive) {
     const emissive = new THREE.MeshStandardMaterial({ emissive: 0xffffff });
     emissive.name = 'TownEmissive';
@@ -229,17 +249,52 @@ describe('Eastbrook civic beacon shader animation', () => {
     expect(mask.count).toBe(micro.geometry.getAttribute('position').count);
     expect(selectedCount).toBe(civicTemplateVertexCount);
     expect(bytes.length - selectedCount).toBeGreaterThan(0);
+    // Re-staged 2026-08 for the KTX2 kit-building path (buildKitBuilding in
+    // src/render/eastbrook_town.ts,
+    // docs/design/eastbrook-revamp/site-plan.md): the five hexb kit buildings
+    // render raw GLB clones with no eastbrookBuildingEmissive mesh, so the
+    // material-independence pin runs against the chapel, the one building
+    // still on the template pipeline, and additionally checks no kit clone
+    // material was reused for the micro batch.
+    // Round 6b (owner) re-shelled the chapel onto the KayKit church, so the
+    // town has NO template-pipeline building left. The pin keeps running
+    // against the chapel by id: buildKitBuilding names its window-pane mesh
+    // eastbrookBuildingEmissive:<id>, exactly as the template path named its
+    // emissive mesh, so the same lookup resolves and the same comparison
+    // holds. The traverse below is unchanged and still proves the micro
+    // batch's material is reused by no mesh anywhere in the town.
+    const chapel = EASTBROOK_LAYOUT.buildings.find((building) => building.kind === 'chapel');
+    if (!chapel) throw new Error('missing chapel building');
     const buildingMaterial = (
-      view.group.getObjectByName(
-        `eastbrookBuildingEmissive:${EASTBROOK_LAYOUT.buildings[0].id}`,
-      ) as THREE.Mesh
+      view.group.getObjectByName(`eastbrookBuildingEmissive:${chapel.id}`) as THREE.Mesh
     ).material;
     expect(micro.material).not.toBe(buildingMaterial);
+    view.group.traverse((child) => {
+      if (!(child instanceof THREE.Mesh) || child === micro) return;
+      const materials = Array.isArray(child.material) ? child.material : [child.material];
+      expect(materials.includes(micro.material as THREE.Material)).toBe(false);
+    });
     expect((micro.material as THREE.Material).userData.eastbrookCivicBeacon).toEqual({
       maskAttribute: EASTBROOK_CIVIC_MASK_ATTRIBUTE,
       programCacheKey: 'eastbrook-civic-beacon-v1',
     });
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    // Draw stats re-pinned 2026-08: harbor-move layout v3 retired the ring
+    // wall (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md), removing
+    // the 4 wall color draws and 2 wall shadow draws; then the KTX2
+    // kit-building path (buildKitBuilding in src/render/eastbrook_town.ts,
+    // same site plan) put five raw-clone kit buildings in whose every mesh
+    // casts shadows, so under round 4 (nine buildings, kit windows derived
+    // from the fixtures' window-assembly components) the two-mesh fixtures
+    // give colorDraws 28 and shadowDraws 18. Both counts moved again when the
+    // town gained the harbour quarter's three coastal buildings: ten kit lots
+    // now, so colorDraws 34 (20 clone materials + 10 window panes + the chapel
+    // opaque and emissive pair + the 2 micro batches) and shadowDraws 22 (the
+    // 20 clones + the chapel opaque + the micro opaque batch).
+    // Round 6b re-shelled the chapel onto a kit asset, so it renders as an
+    // eleventh kit lot instead of a template pair: colorDraws 35 (22 clone
+    // materials + 11 window panes + the 2 micro batches) and shadowDraws 23
+    // (the 22 clones + the micro opaque batch).
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 35, shadowDraws: 23 });
 
     view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
@@ -312,7 +367,18 @@ describe('Eastbrook civic beacon shader animation', () => {
       }
     });
     expect(decoratedMeshes).toEqual(['eastbrookTownMicroEmissiveBatch']);
-    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
+    // Re-pinned 2026-08 with the harbor move's wall retirement (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md) and the KTX2 kit-building
+    // path (buildKitBuilding in src/render/eastbrook_town.ts): the kit
+    // clones cast shadows from every mesh, so under round 4 the two-mesh
+    // fixtures give shadowDraws 18 and colorDraws 28 (the window panes,
+    // derived from the fixtures' window-assembly components, never cast).
+    // Re-pinned again once the town gained the harbour quarter's three coastal
+    // buildings: ten kit lots give shadowDraws 22 and colorDraws 34, and the
+    // window panes still never cast. Round 6b re-shelled the chapel onto the
+    // KayKit church, making it an eleventh kit lot: shadowDraws 23 and
+    // colorDraws 35, and the panes still never cast.
+    expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 35, shadowDraws: 23 });
   });
 
   it('does not instantiate the animation or any town geometry for a custom world', () => {
@@ -326,7 +392,26 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
   });
 
-  it('preserves the committed 28,902 runtime triangle budget without another draw', async () => {
+  // Committed budget re-minted 2026-08: 26 wall-wing instances (5,356
+  // triangles) left the layout with the Eastbrook harbor move (d19aa33f76,
+  // docs/design/eastbrook-revamp/site-plan.md): 23,474 asset triangles plus
+  // the 72-triangle foundation allowance.
+  // Round 6 (owner): the rise house left the chapel green, so the town draws one
+  // fewer kit shell and the budget RATCHETS DOWN with it (24,793 to 23,770), the
+  // same discipline the monolith ceilings use: a real reduction lowers the pin in
+  // the change that earned it, so the number keeps meaning what it says.
+  // The same round's harbour quarter then moved it the other way: three coastal
+  // buildings add 5,529 asset triangles (the first hexb_market lot the town has
+  // ever seated at 3,125, one hexb_home_b at 1,393, one hexb_home_a at 1,011)
+  // plus 36 triangles of foundation allowance, so 23,770 becomes 29,335. The
+  // quarter was composed to fit: the inland fourth lot came back out rather than
+  // the 30,000 target being relaxed, so meetsTarget below still asserts true.
+  // Round 6b (owner) re-shelled the chapel onto the KayKit church: the bespoke
+  // eastbrook_chapel.glb (4,120) leaves the town's asset set and hex_church.glb
+  // (1,601) takes its one instance, so the budget RATCHETS DOWN again by 2,519,
+  // 29,335 to 26,816, with the building count and the 132-triangle skirt
+  // allowance unchanged. meetsTarget stays true with more headroom, not less.
+  it('preserves the committed 26,816 runtime triangle budget without another draw', async () => {
     await MeshoptDecoder.ready;
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
@@ -346,7 +431,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       triangleCountByAsset[assetUrl] = triangles;
     }
     expect(eastbrookTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      maximumRuntimeTriangles: 28_902,
+      maximumRuntimeTriangles: 26_816,
       withinHardCeiling: true,
       meetsTarget: true,
     });

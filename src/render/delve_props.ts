@@ -4,9 +4,14 @@
 // The chest prefers the real dungeon-kit GLB (chest_gold) when loaded and falls
 // back to procedural geometry otherwise. The grave/wall/crate props each
 // prefer a small Tripo-generated GLB (see public/models/props/CLAUDE.md), same
-// fallback contract. No DOM, no sim imports (render-only).
+// fallback contract. No DOM, sim imports limited to pure view predicates (render-only otherwise).
 
 import * as THREE from 'three';
+import {
+  isObjectOpenedByViewer,
+  type OpenedObjectEntity,
+  type OpenedObjectQuestRow,
+} from '../sim/quests/opened_object_view';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { delveInteractableVisible } from './delve_interactable_visibility_core';
@@ -17,6 +22,7 @@ import {
 } from './detail_normals';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 // Small standalone GLB props (not part of the shared dungeon-kit pack): load
 // once, clone per placement, and normalize to a target height like the reward
@@ -46,6 +52,17 @@ if (typeof window !== 'undefined') {
   for (const [key, url] of Object.entries(STANDALONE_PROP_URL) as [StandalonePropKey, string][]) {
     registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
+        // Per-view clones share this cached original's geometry and materials
+        // by reference; tag both shared so the renderer's per-view disposal
+        // never frees them (untagged, the first delve prop leaving interest
+        // disposed the template's geometry out from under every later clone).
+        gltf.scene.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          markSharedGeometry(mesh.geometry);
+          const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+          for (const m of mats) markSharedMaterial(m);
+        });
         loadedStandaloneProp.set(key, gltf.scene);
       }),
     );
@@ -855,16 +872,22 @@ function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; h
 // ---------------------------------------------------------------------------
 type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
 
-/** Apply the object-view visibility policy after a delve prop mesh is rebuilt. */
+/** Apply the object-view visibility policy after a delve prop mesh is
+ *  rebuilt. Takes the entity and the viewer's quest log so an interact
+ *  objective's already-credited ground object (an opened castaway crate)
+ *  renders as gone for THIS player while everyone else still sees it. */
 export function syncDelveInteractableVisibility(
   group: THREE.Object3D,
-  templateId: string | null,
-  lootable: boolean,
+  entity: OpenedObjectEntity & { templateId?: string | null; lootable: boolean },
+  questLog: ReadonlyMap<string, OpenedObjectQuestRow>,
   compilePending: boolean,
   withinPortalRange = true,
 ): boolean {
   const visible =
-    !compilePending && delveInteractableVisible(templateId, lootable) && withinPortalRange;
+    !compilePending &&
+    delveInteractableVisible(entity.templateId ?? null, entity.lootable) &&
+    withinPortalRange &&
+    !isObjectOpenedByViewer(entity, questLog);
   group.visible = visible;
   return visible;
 }

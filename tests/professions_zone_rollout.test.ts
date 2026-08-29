@@ -65,6 +65,10 @@ const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, RolloutState>> = {
   evergarden: 'starter',
   galecrest: 'starter',
   farshore_isle: 'starter',
+  // The tutorial island ships professions-FREE by design (the R37 default):
+  // its chain pays the copper for the tier-1 tool kit, and the vale's own
+  // counters sell it. Every absence arm below enforces the 'none' row.
+  proving_shore: 'none',
 };
 
 /** The zones the assert-complete arms sweep: every 'complete' ledger row. */
@@ -106,13 +110,13 @@ describe('the R37 professions zone-rollout guard', () => {
     expect([...ZONES.map((z) => z.id)].sort()).toEqual(
       [...Object.keys(PROFESSIONS_ZONE_ROLLOUT)].sort(),
     );
-    expect(ZONES.length).toBe(14);
+    expect(ZONES.length).toBe(15);
     expect(ROLLED_OUT.size).toBe(3);
     expect(STARTER_ZONES.size).toBe(11);
-    // The 'none' state is real, not decorative: no shipped row uses it yet,
-    // so without this arm the complete-filter could silently degrade to a
-    // bare key read and a future professions-free zone would sweep as
-    // rolled out, defeating the guard's whole purpose.
+    // The 'none' state is real, not decorative: the Proving Shore ships on
+    // it, and this arm keeps the complete-filter honest against a bare key
+    // read that would sweep a professions-free zone as rolled out.
+    expect(zonesInState('none')).toEqual(new Set(['proving_shore']));
     expect(rolledOutFrom({ ...PROFESSIONS_ZONE_ROLLOUT, zone_x: 'none' })).toEqual(ROLLED_OUT);
   });
 

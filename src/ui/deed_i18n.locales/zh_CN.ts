@@ -713,4 +713,8 @@ export const table: DeedLocaleTable = {
     name: '锻造至完美',
     desc: '在护甲锻造中制作你的第一件稀有品质物品。',
   },
+  prog_ready_for_an_adventure: {
+    name: '整装待发',
+    desc: '从试炼之滨毕业：完成岛上的每一堂课，然后敲响渡船铃回到东溪镇。',
+  },
 };

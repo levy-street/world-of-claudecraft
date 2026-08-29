@@ -39,6 +39,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_leaderboard_view';
+import { guildTagHtml } from './guild_tag';
 import { formatNumber, t } from './i18n';
 import {
   buildLeaderboardView,
@@ -72,7 +73,7 @@ export interface LeaderboardWindowDeps {
 /** Where focus should land after a (re)render: into the window on open, back onto
  *  the page control the keyboard user just activated, or onto the freshly active
  *  tab (a tab switch rebuilds the strip, so the roving focus must follow). */
-type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | null;
+type FocusTarget = 'open' | 'prev' | 'next' | 'tab' | 'action' | null;
 
 export class LeaderboardWindow {
   // The current tab + a page index PER board. The server clamps the requested
@@ -91,7 +92,6 @@ export class LeaderboardWindow {
   // pager state (this.page dispatches on the CURRENT this.board).
   private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
-
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
   private get page(): number {
@@ -267,8 +267,11 @@ export class LeaderboardWindow {
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
+    // The plain ranking: the recruiting column and the pledge affordances
+    // moved to the signpost guild board (src/ui/hud/guild_board/), so this
+    // tab passes no viewer facts and renders the bare ranked rows.
     const view = buildGuildLeaderboardView(
-      result === null ? { kind: 'error' } : { kind: 'page', page: result },
+      result === null ? { kind: 'error' } : { kind: 'page', page: result, viewer: null },
     );
 
     if (view.kind === 'error') {
@@ -536,10 +539,13 @@ export class LeaderboardWindow {
     );
   }
 
+  // One guild entry: the bare ranked grid row. The recruiting sub-line and
+  // the pledge affordance moved to the signpost guild board window; the name
+  // keeps the guild's lifetime-XP colour tier (the nameplate ladder).
   private guildRowHtml(r: GuildLeaderboardRow): string {
     return (
       `<div class="lb-row lb-row-guild"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-name">${esc(r.name)}</span>` +
+      `<span class="lb-name guild-tier-${r.tier}">${esc(r.name)}</span>` +
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
@@ -657,17 +663,6 @@ export class LeaderboardWindow {
     );
   }
 
-  // The `<Guild>` tag that rides INSIDE the name cell, the treatment the Renown
-  // tab already uses for its realm tag, so the guild reads beside the name without
-  // adding a column to the shared row grid (and the mobile stack keeps working).
-  // Angle brackets are HTML entities: the classic nameplate convention
-  // (nameplate_painter.ts), not markup. Empty for an unguilded row, so the cell is
-  // byte-unchanged for a player with no guild.
-  private guildTagHtml(guild: string | null): string {
-    if (!guild) return '';
-    return ` <span class="lb-guild" title="${esc(t('hudChrome.leaderboard.guildName'))}">&lt;${esc(guild)}&gt;</span>`;
-  }
-
   private rowHtml(r: LeaderboardRow): string {
     // &starf; renders the prestige star without a literal symbol glyph in source.
     const star =
@@ -681,7 +676,7 @@ export class LeaderboardWindow {
     const deedTitle = r.title ? deedTitleText(r.title) : '';
     return (
       `<div class="lb-row lb-row-players${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-name"${title}>${star}${esc(r.name)}${this.guildTagHtml(r.guild)}${you}</span>` +
+      `<span class="lb-name"${title}>${star}${esc(r.name)}${guildTagHtml(r.guild, 'lb-guild')}${you}</span>` +
       `<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div>`
@@ -698,7 +693,7 @@ export class LeaderboardWindow {
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
       `<div class="lb-sticky"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">&mdash;</span>` +
-      `<span class="lb-name">${esc(standing.name)}${this.guildTagHtml(standing.guild)} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
+      `<span class="lb-name">${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
@@ -741,11 +736,12 @@ export class LeaderboardWindow {
     }
   }
 
-  // After an async page-change swap that has no pager (the error / empty / single-page
-  // states), keep keyboard focus inside the window by landing it on the close button
-  // rather than letting it fall to <body> (WCAG 2.4.3).
+  // After an async swap that destroyed the activated control (a page change
+  // with no pager in the error / empty / single-page states), keep keyboard
+  // focus inside the window by landing it on the close button rather than
+  // letting it fall to <body> (WCAG 2.4.3).
   private focusCloseAfterPage(focus: FocusTarget): void {
-    if (focus !== 'prev' && focus !== 'next') return;
+    if (focus !== 'prev' && focus !== 'next' && focus !== 'action') return;
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 }

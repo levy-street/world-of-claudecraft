@@ -322,7 +322,9 @@ describe('the World Market: the Merchant', () => {
       'linen_pouch',
     ]);
 
-    // gravewoven_bag is the 12-slot bag; the 6-slot Linen Pouch must drop out.
+    // gravewoven_bag is a 12-slot bag (duskweave_bag matches too since phase 05;
+    // this arm builds its own two-row book, so only the label matters); the
+    // 6-slot Linen Pouch must drop out.
     sim.marketSearch(q('', { itemType: 'bag', subtype: '12' }), viewer);
     expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
       'gravewoven_bag',
@@ -336,33 +338,50 @@ describe('the World Market: the Merchant', () => {
     // A fresh world must not answer the new Bags category with an empty list.
     sim.marketSearch(q('', { itemType: 'bag' }), viewer);
     const listings = sim.marketInfoFor(viewer)?.listings ?? [];
+    // Browse order, which is the book's name-then-price sort (Market.sortedBook), NOT
+    // the seed-array order: Burlap, Linen, Traveler's. The seed array's own tail-append
+    // ordering is what the listing-id case below pins.
     expect(listings.map((listing) => listing.itemId)).toEqual([
+      'burlap_reagent_pouch',
       'linen_pouch',
       'travelers_knapsack',
     ]);
     // At the vendor price, not an invented one: a house row cheaper than buyValue would
     // undercut the vendor selling the same bag, and house rows never deplete.
     expect(listings.map((listing) => listing.price)).toEqual([
+      ITEMS.burlap_reagent_pouch?.buyValue,
       ITEMS.linen_pouch?.buyValue,
       ITEMS.travelers_knapsack?.buyValue,
     ]);
     expect(ITEMS.linen_pouch?.buyValue).toBeGreaterThan(0);
+    // Only the VENDOR-sold bags are seeded. The crafted and drop-only bags phase 05
+    // added have no counter price to anchor a house row against, so they stay
+    // player-listed; this arm is what keeps a future bag from drifting into the seed.
+    expect(ITEMS.burlap_reagent_pouch?.buyValue).toBeGreaterThan(0);
   });
 
   // House ids come off one counter in stock-array order, house rows are reseeded every
   // boot and never persisted, and market_buy carries only the listing id. So a row added
   // anywhere but the END renumbers every row after it, and a client holding a browse list
   // across a server restart could click Buy on an id that now means a different item.
-  // This pins the two new bags as the LAST house rows, which is what makes that safe.
+  // This pins the bag rows as the LAST house rows, which is what makes that safe.
+  // Phase 05 of the bank-storage packet appended a third (burlap_reagent_pouch) behind
+  // the original two, so the block grew at the tail exactly as the rule requires.
   it('appends new standing stock so existing house listing ids keep their goods', () => {
     const sim = makeWorld();
     const house = sim.market.marketListings.filter((listing) => listing.house);
+    const BAG_STOCK = ['linen_pouch', 'travelers_knapsack', 'burlap_reagent_pouch'];
     const bagIds = house
-      .filter(
-        (listing) => listing.itemId === 'linen_pouch' || listing.itemId === 'travelers_knapsack',
-      )
+      .filter((listing) => BAG_STOCK.includes(listing.itemId))
       .map((listing) => listing.id);
-    expect(bagIds).toHaveLength(2);
+    expect(bagIds).toHaveLength(3);
+    // The tail order matters, not just the membership: the newest row must carry the
+    // highest id, or an older client's cached listing id would resolve to a new item.
+    expect(
+      house
+        .filter((listing) => BAG_STOCK.includes(listing.itemId))
+        .map((listing) => listing.itemId),
+    ).toEqual(BAG_STOCK);
     // Non-vacuity: there is a substantial block of older stock they must sit behind.
     expect(house.length).toBeGreaterThan(10);
     const olderIds = house.filter((listing) => !bagIds.includes(listing.id)).map((l) => l.id);

@@ -1,0 +1,85 @@
+{
+  "baseRelease": "origin/release/v0.40.0@14ab2e8630",
+  "integrationCommit": "2e15170f9c",
+  "normalDistance": {
+    "judgedBeforeCrops": true,
+    "hierarchy": ["name", "seal", "metal"],
+    "graphicsPreset": 1,
+    "fxLevel": "low",
+    "screenshot": "all-four-world-normal-low.png"
+  },
+  "worldRewards": [
+    {
+      "deedId": "prog_prestige_10",
+      "slug": "prestige_laurels",
+      "name": "LAUREL"
+    },
+    {
+      "deedId": "dgn_deepward",
+      "slug": "deepward",
+      "name": "DEEPWARD"
+    },
+    {
+      "deedId": "col_discovery_250",
+      "slug": "curators_gilt",
+      "name": "GRAND CATALOGUE"
+    },
+    {
+      "deedId": "col_reliquary_rank_5",
+      "slug": "reliquary_gilt",
+      "name": "ETERNAL SPOILS"
+    }
+  ],
+  "grayscale": {
+    "distinctWithoutColor": true,
+    "comparison": "all-four-color-grayscale-comparison.png",
+    "catalogueRead": "horizontal pages",
+    "vaultRead": "diamond",
+    "wardRead": "vertical key",
+    "laurelRead": "fan"
+  },
+  "tierComparison": {
+    "low": {
+      "graphicsPreset": 1,
+      "fxLevel": "low",
+      "fxShadow": "0",
+      "screenshot": "01-deed-heraldry-unit-frames-desktop-low.png"
+    },
+    "high": {
+      "graphicsPreset": 3,
+      "fxLevel": "high",
+      "fxShadow": "1",
+      "screenshot": "02-deed-heraldry-unit-frames-desktop-high.png"
+    },
+    "identityGeometryUnchanged": true,
+    "onlyBloomReadsFxShadow": true,
+    "occluded": false
+  },
+  "forcedColors": {
+    "active": true,
+    "playerSlug": "curators_gilt",
+    "targetSlug": "curators_gilt",
+    "pickerSlug": "curators_gilt",
+    "screenshot": "forced-colors-player-target-picker.png"
+  },
+  "responsive": {
+    "mobileUnitFrame": "03-deed-heraldry-unit-frames-mobile.png",
+    "parchmentUnitFrame": "04-deed-heraldry-unit-frames-parchment.png",
+    "picker": [
+      "deed-border-picker-desktop.png",
+      "deed-border-picker-mobile.png",
+      "deed-border-picker-parchment.png"
+    ],
+    "inspect": [
+      "inspect-border-cartouche-desktop.png",
+      "inspect-border-cartouche-mobile.png",
+      "inspect-border-cartouche-parchment.png"
+    ]
+  },
+  "captureNotes": {
+    "offlineProxyWarnings": "non-blocking",
+    "mobileSkippedNpcAssets": 7,
+    "reviewedHeraldrySurfacesObscured": false,
+    "generatedConceptUsedAsQaEvidence": false
+  }
+}

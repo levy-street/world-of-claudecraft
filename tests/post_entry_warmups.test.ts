@@ -12,8 +12,6 @@ function dependencies(
   return {
     settleFarVista: vi.fn().mockResolvedValue(true),
     onFarVistaSettled: vi.fn(),
-    startBackgroundPreloads: vi.fn().mockReturnValue(5),
-    onBackgroundPreloadsStarted: vi.fn(),
     onWarmupError: vi.fn(),
     ...overrides,
   };
@@ -53,7 +51,7 @@ describe('kickCharacterPreloadStream', () => {
 });
 
 describe('runPostEntryWarmups', () => {
-  it('starts fail-soft streaming without automatic secondary-context GPU work', async () => {
+  it('settles only the far vista without automatic secondary-context work', async () => {
     const deps = dependencies();
 
     await runPostEntryWarmups(deps);
@@ -61,7 +59,6 @@ describe('runPostEntryWarmups', () => {
 
     expect(deps.settleFarVista).toHaveBeenCalledOnce();
     expect(deps.onFarVistaSettled).toHaveBeenCalledWith(true);
-    expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).not.toHaveBeenCalled();
   });
 
@@ -72,8 +69,6 @@ describe('runPostEntryWarmups', () => {
     await runPostEntryWarmups(deps);
     await Promise.resolve();
 
-    expect(deps.startBackgroundPreloads).toHaveBeenCalledOnce();
-    expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).toHaveBeenCalledWith('far-vista', failure);
   });
 
@@ -87,8 +82,6 @@ describe('runPostEntryWarmups', () => {
 
     await runPostEntryWarmups(deps);
 
-    expect(deps.startBackgroundPreloads).toHaveBeenCalledOnce();
-    expect(deps.onBackgroundPreloadsStarted).toHaveBeenCalledWith(5);
     expect(deps.onWarmupError).toHaveBeenCalledWith('far-vista', failure);
   });
 });

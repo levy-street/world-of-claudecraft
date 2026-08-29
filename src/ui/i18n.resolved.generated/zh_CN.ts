@@ -441,7 +441,7 @@ export const zh_CN: EnTranslations = {
       "remainingDaysHours": "{days}天{hours}小时",
       "score": "得分",
       "walletValue": "钱包价值 (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "未知",
       "spinTitle": "每日转盘",
@@ -480,6 +480,88 @@ export const zh_CN: EnTranslations = {
         "price_unavailable": "WOC 价格不可用，奖励暂时锁定。",
         "banned": "您已被禁止参加每日奖励。原因：{reason}",
         "bannedUntil": "您还将被禁止参加每日奖励 {remaining}。恢复时间：{until}。原因：{reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "交易窗口已关闭。",
+      "woc": {
+        "tabGold": "金币",
+        "tabWoc": "$WOC",
+        "modesLabel": "付款货币",
+        "tabWocHint": "当你这一侧的交易栏为空且未提供金币时，才能用 $WOC 付款。",
+        "priceLabel": "价格（美元）",
+        "pricePlaceholder": "0.00",
+        "equivalent": "按当前汇率约为 {tokens} $WOC",
+        "variableWarning": "$WOC 数额只是预览，不是固定价格。确切数量由你付款时的最新报价决定。",
+        "feeLine": "交易所手续费 {fee}，从价格中扣除。",
+        "netLine": "你将收到 {net}",
+        "netLineBuyer": "卖家所得 {net}",
+        "sendOffer": "出价 $WOC",
+        "offerSent": "报价已发送。若 {name} 未接受，将在 10 分钟后过期。",
+        "offerSentUntil": "报价已发送。若 {name} 未接受，将在 {time} 过期。",
+        "incomingAccept": "{name} 出价 {price} 购买你的物品。",
+        "notInstant": "$WOC 交易并非即时完成。双方接受后物品进入托管，付款核实后送达买家。",
+        "blockDisabled": "本服务器未提供 $WOC 交易所。",
+        "blockNoWallet": "请先绑定并验证钱包，才能出售物品换取 $WOC。",
+        "blockPartnerUnknown": "正在检查该玩家能否接受 $WOC…",
+        "blockRecipientNoWallet": "该玩家必须先连接钱包，才能接受 $WOC 付款。",
+        "hintClearYourItems": "请先移出你自己的物品：$WOC 报价用于购买对方出售的物品。",
+        "hintAwaitTheirItems": "正在等待对方拿出可用 $WOC 出售的物品。",
+        "hintOneItem": "$WOC 交易一次只包含一件物品。交易栏中只能放要出售的那一件。",
+        "hintEnterPrice": "请输入美元价格。",
+        "hintAcceptNeedsItem": "接受前请先放入你要出售的物品。",
+        "hintAcceptLocked": "该物品已锁定。请先在背包中解锁，然后把它从交易中移除并重新放入。",
+        "hintGoldOffered": "请先移除你的金币报价：一笔交易只能用金币或 $WOC，不能兼有。",
+        "ineligibleReason": "灵魂绑定物品、任务物品、已锁定物品以及交易所类别之外的物品都无法出售换取 $WOC。",
+        "incomingTitle": "来自 {name} 的 $WOC 报价",
+        "incomingBody": "{name} 提出以 {price} 将 {item} 出售给你。",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd}（约 {tokens} $WOC）",
+        "waitingOther": "已接受报价。正在等待对方接受。",
+        "payNow": "支付 {usd}",
+        "awaitingPayment": "正在等待付款确认…",
+        "paying": "请在钱包中确认付款…",
+        "settled": "已付款。物品已在你的背包中；若背包已满，将经乌鸦邮局寄达。",
+        "settledSeller": "已付款。物品已交付给买家。",
+        "accept": "接受报价",
+        "accepted": "报价已接受。你的物品将被托管，直至付款完成验证。",
+        "decline": "拒绝",
+        "withdraw": "撤回报价",
+        "hintInsufficientBalance": "这超出了你已连接钱包持有的 $WOC 数量。",
+        "statusAwaitingBuyer": "等待买家付款。",
+        "statusPayingBuyer": "正在网络上确认你的付款……",
+        "statusPayingSeller": "正在网络上确认买家的付款……",
+        "statusReviewBuyer": "你的付款正在审核中。",
+        "statusReviewSeller": "买家的付款正在审核中。",
+        "paidSeller": "你的 {item} 已收到 {price} 的付款。",
+        "paidBuyer": "你已为 {item} 支付 {price}。",
+        "closedCancelled": "本次出售已取消。物品将经乌鸦邮局退回卖家。",
+        "closedSuspended": "本次出售已被游戏管理员暂停。物品将经乌鸦邮局退回卖家。",
+        "closedUnpaid": "本次出售在未付款的情况下结束。物品将经乌鸦邮局退回卖家。",
+        "closedUnpaidBuyer": "本次出售因你未付款而结束。物品将经乌鸦邮局退回卖家；对已接受的交易不付款会记一次市场违约。",
+        "cancelSale": "取消出售",
+        "cancelPendingSeller": "已申请取消。除非买家先行付款，出售将自行结束。",
+        "youDeclined": "你已拒绝该报价。",
+        "youWithdrew": "你已撤回报价。",
+        "offerNotPending": "此报价已不再处于待处理状态。",
+        "offerDeclined": "$WOC 报价已被拒绝。",
+        "offerWithdrawn": "$WOC 报价已被撤回。",
+        "offerExpired": "$WOC 报价已过期。",
+        "offerExpiresAt": "报价将于 {time} 过期。",
+        "offerStandsUntil": "你的 $WOC 报价在 {time} 前仍然有效。若对方接受，请再次与卖家交易以完成这笔交易。",
+        "dealAwaitsPayment": "你的 $WOC 购买尚未付款。请再次与卖家交易以完成付款；否则交易将自行过期，未付款还会记一次市场违约。",
+        "closeSellerHold": "你的物品仍为买家的付款保留中。如果改变主意，可在交易所的“动态”页签取消出售。",
+        "closePaymentContinuesBuyer": "你的付款仍在确认中。配送会自行完成。",
+        "closePaymentContinuesSeller": "买家的付款仍在确认中。出售会自行完成。",
+        "p2pBindingNote": "双方接受后，须在 {duration} 内付款，或在按下“支付”后开始的更短期限内付款。未付款会记一次市场违约。",
+        "p2pBindingNoteUntimed": "双方接受后，须在短时间内付款，或在按下“支付”后开始的更短期限内付款。未付款会记一次市场违约。",
+        "p2pPaymentDueAt": "须在 {time} 前付款。未付款会记一次市场违约。",
+        "quoteExpiredTrade": "报价已失效。请先按“暂不”，再按一次“支付”以获取新报价。",
+        "quoteStaged": "{usd} 的付款报价已就绪：{tokens} $WOC，有效期至 {time}。",
+        "paymentConfirmed": "付款已确认。配送完成后物品将进入你的背包，若背包已满则经乌鸦邮局寄达。",
+        "statusConfirmedBuyer": "付款已确认。正在完成配送...",
+        "statusConfirmedSeller": "付款已确认。交易正在完成...",
+        "hintBelowMin": "交易所最低价格为 {usd}。"
       }
     },
     "wocStore": {
@@ -707,7 +789,37 @@ export const zh_CN: EnTranslations = {
       "applied": "已装备",
       "apply": "装备外观",
       "detach": "卸下外观",
-      "equipHint": "装备{type}后才能使用此外观。"
+      "equipHint": "装备{type}后才能使用此外观。",
+      "charter": {
+        "eyebrow": "保险箱",
+        "title": "保险箱特许状",
+        "scope": "特许状只会扩展当前角色的银行。司库同样以金币出售这些格子。",
+        "grant": "增加 {slots} 个银行格子",
+        "buy": "购买特许状",
+        "buyAria": "购买{item}",
+        "confirmTitle": "确认购买特许状",
+        "confirmBody": "花费 {cost} Claudium 购买{item}？",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "特许状已生效。当前角色的银行已经变大。",
+        "alreadyGranted": "当前角色已拥有该特许状，不会重复扣费。",
+        "applyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
+        "grantUnresolved": "付款完成，但格子尚未发放。此次购买已记录，客服可以为你处理完成。",
+        "inProgress": "当前角色的一笔购买仍在完成中，请稍候再试。",
+        "doesNotFit": "当前角色的银行无法容纳该特许状的全部格子。",
+        "notPurchasable": "该特许状目前无法购买。",
+        "noRoom": "当前角色的银行已没有空间容纳任何特许状。",
+        "noCharterFits": "当前角色的银行剩余空间已放不下任何特许状。",
+        "someHiddenByFit": "超出当前角色银行剩余空间的特许状不会显示。",
+        "outage": "无法确认此次购买。使用此按钮重试不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
+        "outageStale": "返回商店，再次使用同一个“购买特许状”操作。系统不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
+        "failed": "此次购买未能完成。",
+        "names": {
+          "strongbox_charter_1": "次级保险箱特许状",
+          "strongbox_charter_2": "高级保险箱特许状",
+          "strongbox_charter_3": "宏伟保险箱特许状",
+          "strongbox_charter_complete": "完整保险箱特许状"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -734,6 +846,9 @@ export const zh_CN: EnTranslations = {
       "showAmounts": "显示所有 Claudium 数量",
       "hideAmounts": "隐藏其他 Claudium 数量",
       "skuRow": "{usd} 可购买 {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "购买",
       "buyUnavailable": "暂时无法购买。",
       "storeTitle": "外观商店",
@@ -760,6 +875,7 @@ export const zh_CN: EnTranslations = {
       "reset": "重置",
       "presets": {
         "classic": "经典金色",
+        "fancyGold": "华丽金色",
         "midnight": "午夜",
         "parchment": "羊皮纸",
         "highContrast": "高对比度"
@@ -853,6 +969,7 @@ export const zh_CN: EnTranslations = {
       "jump": "跳跃",
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
+      "wocMarket": "交易所",
       "deeds": "功绩",
       "mounts": "坐骑",
       "professions": "专业",
@@ -866,11 +983,62 @@ export const zh_CN: EnTranslations = {
       "actionRing": "战斗动作",
       "actionPageToggle": "切换动作页",
       "actionPageIndicator": "第{page}页",
+      "actionRadial": "技能方向",
+      "actionRadialCancel": "取消动作",
+      "radialCenter": "中心",
+      "radialUp": "上",
+      "radialRight": "右",
+      "radialDown": "下",
+      "radialLeft": "左",
+      "consumableSeat": "消耗品",
+      "menuControl": "菜单",
+      "menuControlAria": "菜单。点按打开聊天，或按住并向右滑动以使用坐骑、地图、背包等。",
+      "menuControlAriaTap": "菜单。点按打开菜单行：坐骑、地图、背包等。再次点按可打开聊天。",
+      "menuLabel": "菜单",
+      "quickActions": "快捷操作",
+      "quickActionsAria": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，或按住并向右滑动进行选择。",
+      "quickActionsAriaTap": "快捷操作。点按打开坐骑、聊天、地图、背包等操作行，然后点按其中一项。再次点按该控件可关闭。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "姿态",
+      "stanceAnchorAria": "姿态：{stance}。点按打开姿态环，然后选择其他姿态。",
+      "stanceAnchorEmptyAria": "无姿态。点按打开姿态环，然后选择一种姿态。",
+      "questStripAria": "追踪任务 {position}/{total}：{title}。点按可切换到下一个任务。",
+      "questStripAriaSingle": "追踪任务：{title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "还有 {count} 项",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
-      "chatPlaceholder": "说点什么...（! 显示社区指令）"
+      "chatPlaceholder": "说点什么...（! 显示社区指令）",
+      "barEditor": "编辑动作条",
+      "barEditorAria": "编辑动作条布局"
+    },
+    "barEditor": {
+      "title": "编辑动作条",
+      "close": "关闭动作条编辑器",
+      "pages": "动作条页面",
+      "pageTab": "第{page}页",
+      "buttonHeader": "按钮{button}",
+      "cellAria": "按钮{button}，{direction}：{action}",
+      "emptyCellAria": "按钮{button}，{direction}：空",
+      "hint": "点按一个栏位，再点按另一个，即可交换。",
+      "armed": "点按一个栏位以放置{name}。",
+      "picked": "点按另一个栏位以与{name}交换。",
+      "locked": "动作条已在界面选项中锁定。",
+      "clear": "清除",
+      "clearAria": "清除一个槽位",
+      "clearArmed": "点击一个槽位即可清除。"
+    },
+    "tutorialGreeting": {
+      "bodyFirst": "这张面孔我可没见过，朋友。在这片土地上，初次踏上冒险之路的人照传统都会去试炼之滨走一趟，那是海峡对面的一座安静小岛。在那里你可以先磨练身手、熟悉这个世界，再去迎接它的挑战。渡船来回都通，去或不去都没人会小看你。",
+      "bodyRefresher": "又换了一副新面孔回来了？那你知道该怎么做。不过，出发前若想温习一遍，试炼之滨从不拒绝回炉的学生，渡船随时候着你。",
+      "play": "进行新手教学",
+      "skip": "跳过新手教学",
+      "declineNote": "随你的意，朋友。哪天改了主意，鸦邮信箱旁的渡船铃随时都能送你去试炼之滨，不分昼夜。狼群不等人，它等。",
+      "bellHomeNote": "这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。",
+      "islandArrivalNote": "刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。",
+      "noteClose": "明白了"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -883,6 +1051,117 @@ export const zh_CN: EnTranslations = {
       "nextTipQuestLog": "打开任务日志（{key}）查找附近的下一个任务。",
       "nextTipMap": "查看世界地图（{key}）了解任务所在位置。",
       "nextTipSocial": "打开社交面板（{key}）寻找队伍应对更强的战斗。"
+    },
+    "bootcamp": {
+      "title": "最初的脚步",
+      "talkTitle": "与看守塔姆交谈",
+      "talkBody": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击他，与他交谈：他会给你安排这趟跑道。",
+      "talkBodyTouch": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后点按他，或点按使用按钮，与他交谈：他会给你安排这趟跑道。",
+      "talkBodyPad": "看守塔姆就在前方守着试炼跑道的大门。走到他跟前，直到他的名字显示出来，然后按下互动键与他交谈：他会给你安排这趟跑道。",
+      "forwardTitle": "走过第一条跑道",
+      "forwardBody": "走进塔姆身旁的跑道，按住 {forwardKey}，沿跑道向西走到旗帜处。",
+      "forwardBodyTouch": "走进塔姆身旁的跑道，把移动摇杆推向上方，沿跑道向西走到旗帜处。",
+      "forwardBodyPad": "走进塔姆身旁的跑道，把左摇杆推向上方，沿跑道向西走到旗帜处。",
+      "turnwalkTitle": "转身，再走",
+      "turnwalkBody": "第一面旗到手。按住 {turnKey} 原地转身，直到正对向南延伸的围栏跑道，然后再次按住 {forwardKey}，沿跑道走到第二面旗。",
+      "turnwalkBodyTouch": "第一面旗到手。用手指拖动世界画面（不是移动摇杆）来转身，直到正对向南延伸的围栏跑道，然后把摇杆推向上方，沿跑道走到第二面旗。",
+      "turnwalkBodyPad": "第一面旗到手。推动右摇杆转身，直到正对向南延伸的围栏跑道，然后把左摇杆推向上方，沿跑道走到第二面旗。",
+      "strafeTitle": "转身，然后前进",
+      "strafeBody": "只剩最后一个弯。按住 {turnLeftKey} 原地转身，直到正对最后一条跑道，然后再次按住 {forwardKey}，一直走到红旗被你甩在身后。",
+      "strafeBodyTouch": "只剩最后一个弯。用手指划动画面（不是移动摇杆）转身，直到正对最后一条跑道，然后把摇杆上推，一直走到红旗被你甩在身后。",
+      "strafeBodyPad": "只剩最后一个弯。推动右摇杆转身，直到正对最后一条跑道，然后把左摇杆上推，一直走到红旗被你甩在身后。",
+      "cameraTitle": "转动视角",
+      "cameraBody": "交上成绩之前还有最后一课：按住鼠标右键并拖动，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "cameraBodyTouch": "交上成绩之前还有最后一课：用手指拖动世界画面，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "cameraBodyPad": "交上成绩之前还有最后一课：推动右摇杆，把视角绕着自己整整转上一圈。知道身后站着什么，才能打赢仗。",
+      "courseProgress": "旗帜 {current}/{total}",
+      "doneTitle": "跑完全程",
+      "doneBody": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：对着他按 {interactKey}，或者用鼠标左键点击他，交上你的成绩，领取你的第一份报酬。",
+      "doneBodyTouch": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：点按他，交上你的成绩，领取你的第一份报酬。",
+      "doneBodyPad": "腿上的功夫就这些了。监工佩尔就站在红旗旁边：按下互动键，交上你的成绩，领取你的第一份报酬。",
+      "coachNextTitle": "下一位：{npc}",
+      "coachNextBody": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按 {interactKey}，或者用鼠标左键点击对方，接下你的下一件差事。",
+      "coachNextBodyTouch": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后点按对方，或点按使用按钮，接下你的下一件差事。",
+      "coachNextBodyPad": "沿着金色路径去找{npc}。走到跟前直到名字显示出来，然后按下互动键，接下你的下一件差事。",
+      "coachTaskBody": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按 {mapKey} 打开地图。",
+      "coachTaskBodyTouch": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就点按地图按钮看路。",
+      "coachTaskBodyPad": "沿着金色路径去完成差事。右侧的追踪栏随时记着进度，迷了路就按下地图按钮看路。",
+      "coachReadyTitle": "差事办妥",
+      "coachReadyBody": "前往{npc}身边，按 {interactKey}，或者用鼠标左键点击对方，交上差事，领取报酬。",
+      "coachReadyBodyTouch": "前往{npc}身边，点按对方，交上差事，领取报酬。",
+      "coachReadyBodyPad": "前往{npc}身边，按下互动键，交上差事，领取报酬。",
+      "taskStrikeTrueBody": "走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。",
+      "taskStrikeTrueBodyTouch": "走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第一个按钮，挥出这一刀。一直打到一个散架为止。",
+      "taskStrikeTrueBodyPad": "走到一个草人跟前，按下目标键把它设为目标。然后按下第一个动作键，挥出这一刀。一直打到一个散架为止。",
+      "taskHoneBody": "用鼠标左键点击一个草人把它设为目标，然后按 {abilityKey} 使用{ability}。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskHoneBodyTouch": "点击一个草人把它设为目标，然后点击动作条上的{ability}。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskHoneBodyPad": "把一个草人设为目标，然后按放着{ability}的动作按钮。那是你自己的本事，不是随手一挥。命中三次。",
+      "taskLongWalkBody": "按 {bagsKey} 打开背包，然后点击往生石。它会让你就地倒下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkBodyTouch": "沿着海岸路往南走到往生石前，点击它跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkBodyPad": "沿着海岸路往南走到往生石前，按互动按钮跪下。这里没有任何东西能伤到你，这么做也不会让你损失什么。",
+      "taskLongWalkDeadBody": "你死了。什么也没丢。按下释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkDeadBodyTouch": "你死了。什么也没丢。点击释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkDeadBodyPad": "你死了。什么也没丢。选择释放灵魂，你会在营地后面的墓地化作幽魂站起来。",
+      "taskLongWalkGhostBody": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。按下它，你就完好如初，没有任何惩罚。",
+      "taskLongWalkGhostBodyTouch": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。点击它，你就完好如初，没有任何惩罚。",
+      "taskLongWalkGhostBodyPad": "你现在是幽魂，没有东西碰得到你。你的尸体在地图上有标记：走回去，靠近之后就会出现在尸体处复活的按钮。选择它，你就完好如初，没有任何惩罚。",
+      "taskShellBody": "掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，不停攻击。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyTouch": "掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyPad": "掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskStrikeTrueBodyCaster": "走到一个草人跟前，用鼠标左键点击它，把它设为目标：它的名字会出现在屏幕上方。然后按 {attackKey}，或者点击动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。",
+      "taskStrikeTrueBodyCasterTouch": "走到一个草人跟前，点按它，把它设为目标。然后点按动作条上的第二个按钮，施放你的法术。一直施放到一个散架为止。",
+      "taskStrikeTrueBodyCasterPad": "走到一个草人跟前，按下目标键把它设为目标。然后按下第二个动作键，施放你的法术。一直施放到一个散架为止。",
+      "taskShellBodyCaster": "掠蟹是会回击的。用鼠标左键点击一只，把它设为目标，然后按 {abilityKey} 使用{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyCasterTouch": "掠蟹是会回击的。点击一只把它设为目标，然后点击动作条上的{ability}，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskShellBodyCasterPad": "掠蟹是会回击的。把一只设为目标，然后按放着{ability}的动作按钮，保持距离不停施放。要是一次有太多只扑上来，就沿小路往回撤：它们很快就会放弃追赶，休息时你的生命值也会慢慢回满。",
+      "taskPearlBody": "沿着金色路径走到沙滩最西端的潮池。站在水边，按 {bagsKey} 打开背包，用鼠标左键点击咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按 {interactKey}，取走莹润珍珠。",
+      "taskPearlBodyTouch": "沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包点按咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，点按它的蟹壳，取走莹润珍珠。",
+      "taskPearlBodyPad": "沿着金色路径走到沙滩最西端的潮池。站在水边，打开背包选择咸水诱饵把它引出来。像对付掠蟹那样和它战斗，等它倒下后，对着它的蟹壳按下互动键，取走莹润珍珠。",
+      "taskWreckLineBody": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按 {interactKey}，或者用鼠标左键点击货箱，把它捡起来。凑满六只，这批海货就齐了。",
+      "taskWreckLineBodyTouch": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后点按货箱，或点按使用按钮，把它捡起来。凑满六只，这批海货就齐了。",
+      "taskWreckLineBodyPad": "漂流货箱沿着通往晨憩营地的小路一路排开。走到一只漂流货箱跟前，直到它的名字显示出来，然后按下互动键把它捡起来。凑满六只，这批海货就齐了。",
+      "taskPouchBody": "对着{npc}按 {interactKey}，或者用鼠标左键点击对方，打开货摊，然后用鼠标左键点击亚麻小袋买下它。",
+      "taskPouchBodyTouch": "点按{npc}打开货摊，然后点按亚麻小袋买下它。",
+      "taskPouchBodyPad": "对着{npc}按下互动键打开货摊，然后选中亚麻小袋买下它。",
+      "readyPouchBody": "小袋已买下。按 {bagsKey} 打开背包，用鼠标左键点击亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按 {interactKey}，把小袋亮给对方看。",
+      "readyPouchBodyTouch": "小袋已买下。打开背包，点按亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，点按对方，把小袋亮给对方看。",
+      "readyPouchBodyPad": "小袋已买下。打开背包，选中亚麻小袋，把它系进一个空着的袋扣。然后前往{npc}身边，按下互动键，把小袋亮给对方看。",
+      "promptTalk": "交谈",
+      "promptTurnIn": "交任务",
+      "promptPickUp": "拾取",
+      "promptLootPearl": "拾取珍珠",
+      "promptRead": "阅读",
+      "promptRing": "敲响",
+      "promptHold": "按住",
+      "promptSelect": "选择目标",
+      "promptAttack": "攻击",
+      "promptUseAbility": "使用技能",
+      "promptKneel": "跪下",
+      "promptOpenBags": "打开背包",
+      "promptCharacterSheet": "打开角色面板",
+      "promptLookAround": "按住右键拖动来环视四周",
+      "promptJump": "跳跃",
+      "promptSummon": "召唤",
+      "ringEquipTitle": "戴上你的战利品",
+      "ringEquipBody": "珍珠之母就在你的背包里。按 {bagsKey} 打开背包，然后用鼠标左键点击戒指，把它戴上手指。",
+      "ringEquipBodyTouch": "珍珠之母就在你的背包里。打开背包，点按戒指把它戴上手指。",
+      "ringEquipBodyPad": "珍珠之母就在你的背包里。打开背包，选择戒指把它戴上手指。",
+      "ringAdmireTitle": "瞧瞧你",
+      "ringAdmireBody": "很衬你。按 {charKey} 打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "ringAdmireBodyTouch": "很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "ringAdmireBodyPad": "很衬你。从菜单打开角色面板，看看戴在手上的戒指，以及它提升的每一项属性。",
+      "keycapThen": "然后",
+      "voiceArrival": "平安上岸啦，朋友。看见脚下这条金色路径了吗？它比我还认得路，跟着走就是。",
+      "voiceFirstFlag": "过了一面旗了。腿别停，还剩两面。",
+      "voiceRunDone": "跑得干净利落。奖赏在监工佩尔那里，去领吧。",
+      "voiceStationDoneA": "干得好。往下一处去吧，路已经为你点亮了。",
+      "voiceStationDoneB": "你越来越上手了，错不了。",
+      "voiceVeerOff": "慢着，朋友，走反了。金色路径在你身后呢。",
+      "voiceGraduate": "钟为你敲响了。海那头的东溪正等着你，你也准备好了。",
+      "bellTitle": "敲响渡船铃",
+      "bellBody": "你的航程已经挣到了。走到码头旁的渡船铃跟前，按 {interactKey}，或者用鼠标左键点击它，扬帆前往东溪镇。",
+      "bellBodyTouch": "你的航程已经挣到了。走到码头旁的渡船铃跟前，点按它，扬帆前往东溪镇。",
+      "bellBodyPad": "你的航程已经挣到了。走到码头旁的渡船铃跟前，按下互动键，扬帆前往东溪镇。"
     },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
@@ -935,6 +1214,31 @@ export const zh_CN: EnTranslations = {
       "mergedPrs": "已合并 PR",
       "devEmpty": "还没有上榜的贡献者。"
     },
+    "pledge": {
+      "open": "接受宣誓",
+      "closed": "不接受宣誓",
+      "minLevel": "{level}级以上",
+      "action": "宣誓",
+      "actionTitle": "向{guild}宣誓",
+      "pledged": "已宣誓",
+      "yourGuild": "你的公会",
+      "tab": "宣誓",
+      "tabWithCount": "宣誓（{count}）",
+      "empty": "还没有人向你的公会宣誓。",
+      "accept": "接受",
+      "acceptTitle": "接受{name}的宣誓",
+      "reject": "拒绝",
+      "rejectTitle": "拒绝{name}的宣誓",
+      "settings": "招募",
+      "acceptingLabel": "接受宣誓",
+      "minLevelLabel": "最低等级",
+      "noteLabel": "榜单留言",
+      "notePlaceholder": "告诉有意加入的玩家你的公会在寻找什么",
+      "save": "保存",
+      "yourPledge": "你的宣誓：{guild}",
+      "since": "宣誓于{date}",
+      "withdraw": "撤回宣誓"
+    },
     "raidLockout": {
       "title": "团队副本锁定",
       "allReady": "所有团队副本就绪",
@@ -986,6 +1290,7 @@ export const zh_CN: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。",
       "threatFallback": "无实时仇恨：显示对{name}造成的伤害",
+      "threatFrozen": "对{name}的最终威胁",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
@@ -1025,7 +1330,6 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "targetPrev": "反向切换目标",
       "discord": "Discord",
-      "valecup": "溪谷杯",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
       "dive": "下潜",
@@ -1048,6 +1352,11 @@ export const zh_CN: EnTranslations = {
       "reset": "重置",
       "done": "完成",
       "cancel": "取消",
+      "showExtraBar": "显示更多动作条",
+      "hideExtraBar": "隐藏一条动作条",
+      "conflictTitle": "按键已被占用",
+      "conflictBody": "{key} 已绑定到{other}。将其绑定到{action}会解除{other}的绑定。",
+      "conflictAccept": "仍然重新绑定",
       "resetConfirmTitle": "重置动作条按键？",
       "resetConfirmBody": "第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。"
     },
@@ -1182,6 +1491,7 @@ export const zh_CN: EnTranslations = {
       "endedForfeitLog": "本场比赛以弃权告终。",
       "firstWinBonusLine": "每日首胜:+{honor}荣誉",
       "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
+      "doubleHonorLine": "双倍荣誉周末:今日荆谷原野荣誉奖励均为{mult}倍,打满全场的败方也按胜方奖励结算",
       "timeWarningMinutes": "还剩{minutes}分钟",
       "timeWarningOneMinute": "还剩一分钟",
       "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
@@ -1191,146 +1501,6 @@ export const zh_CN: EnTranslations = {
         "azureKeep": "蔚蓝要塞",
         "ruinCourtyard": "废墟庭院",
         "graveyard": "墓地"
-      }
-    },
-    "vcup": {
-      "title": "溪谷杯",
-      "shootPower": "力度",
-      "close": "关闭溪谷杯窗口",
-      "offlineNote": "赛程簿已合上。溪谷杯目前不可用。",
-      "recordLine": "你的战绩：{wins} 胜，{losses} 负，{draws} 平。",
-      "bracketsAria": "比赛赛级",
-      "bracketLabel": "{n}对{n}",
-      "waitingCount": "{count} 人等待中",
-      "nationsHeading": "旗帜国度",
-      "nation": {
-        "vale": "东溪谷",
-        "mirefen": "泥沼",
-        "thornpeak": "荆峰",
-        "coliseum": "灰烬斗技场",
-        "choir": "苍白唱诗班",
-        "ogre": "食人魔氏族",
-        "moon": "苍白之月",
-        "copperdig": "铜矿坑"
-      },
-      "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
-      "rolesHeading": "运动位置",
-      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。",
-      "role": {
-        "allrounder": {
-          "name": "全能型",
-          "desc": "样样都会：踢球、长传，还有一记正当的肩撞。"
-        },
-        "striker": {
-          "name": "前锋",
-          "desc": "为大脚开球和灵巧侧身而生。"
-        },
-        "sweeper": {
-          "name": "清道夫",
-          "desc": "把持球者撞开，再把球大脚解围。"
-        },
-        "keeper": {
-          "name": "守门员",
-          "desc": "用抓球、扑救和长踢守住球门区。"
-        }
-      },
-      "queue": "加入队列",
-      "leaveQueue": "离开队列",
-      "queueNote": "随时随地排队；哨声会召唤你前往母猪场。",
-      "queuedStatus": "已排入 {bracket}：第 {position} 位，共 {count} 人。",
-      "blockNation": "请先选择一个旗帜国度。",
-      "blockPartySize": "这个赛级需要更小的队伍。",
-      "blockNotLeader": "只有队长才能为队伍排队。",
-      "inMatchNote": "你的队伍正在场上。继续比赛！",
-      "deserterNote": "场地管理员记着呢。{seconds} 秒后才能再次排队。",
-      "liveHeading": "母猪场现况",
-      "liveAria": "溪谷杯：{nationA} {scoreA}，{nationB} {scoreB}",
-      "walkUp": "走到母猪场，从看台上观赛。",
-      "noLive": "球场很安静。目前没有比赛。",
-      "boardHeading": "优胜者榜",
-      "boardEmpty": "尚无优胜记录。铜奶桶还在等待。",
-      "boardWins": "{count} 胜",
-      "enterAsGuild": "以 {guild} 的旗号参赛",
-      "guildRecordLine": "你的公会战绩：{wins} 胜，{losses} 负。",
-      "guildBoardHeading": "公会旗帜榜",
-      "guildBoardEmpty": "还没有公会上场。扬起你的旗帜吧！",
-      "guildBoardWl": "{wins} 胜，{losses} 负",
-      "practice": "与机器人练习赛",
-      "practiceNote": "立即在母猪场开始一场完整的机器人比赛。",
-      "practiceUnratedNote": "练习赛不计入评级：战绩与功绩之书进度均不计算。",
-      "practicingNow": "正在练习（{count}）：",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人",
-      "indicatorLive": "溪谷杯",
-      "indicatorOpen": "打开溪谷杯窗口",
-      "phaseCountdown": "{seconds} 秒后开球",
-      "phaseGoal": "进球！",
-      "phaseGolden": "金球制",
-      "phaseOver": "全场结束",
-      "bannerFound": "溪谷杯开赛：{nationA} 对阵 {nationB}！",
-      "bannerCountdown": "{seconds} 秒后开球...",
-      "bannerKickoff": "开球！",
-      "bannerGoal": "进球！{nation} 破门！",
-      "bannerSave": "{name} 扑救成功！",
-      "bannerGolden": "金球制：下一球定胜负！",
-      "bannerEnd": "全场结束：{nationA} {scoreA}，{nationB} {scoreB}",
-      "bannerWin": "母猪场的胜利！",
-      "bannerDraw": "母猪场的比赛以平局收场。",
-      "bannerLoss": "在母猪场落败。",
-      "logQueued": "你加入了 {bracket} 溪谷杯队列（第 {position} 位）。",
-      "logUnqueued": "你离开了溪谷杯队列。",
-      "logFound": "你的溪谷杯比赛已就绪：{nationA} 对阵 {nationB}。",
-      "logRoster": "你方：{allies}。对方：{enemies}。",
-      "logGoal": "{name} 为 {nation} 破门！{nationA} {scoreA}，{nationB} {scoreB}。",
-      "logSave": "{name} 完成扑救！",
-      "logWin": "你赢下了母猪场的这一战。",
-      "logDraw": "母猪场的这一战以平局告终。",
-      "logLoss": "你输掉了母猪场的这一战。",
-      "gossipOpen": "赛程簿",
-      "gossipOpenAria": "打开溪谷杯窗口",
-      "mobileLabel": "杯赛",
-      "briefing": {
-        "subtitle": "赛前简报",
-        "vs": "对",
-        "rulesHeading": "玩法",
-        "rule1": "把球踢或传进对方球门即可得分。",
-        "rule2": "先进 5 球者胜，或全场结束时进球最多者胜。",
-        "rule3": "全场打平则进入金球赛：下一个进球者获胜。",
-        "rule4": "铲球只会把人撞倒，没有人会受伤，丰收休战为证。",
-        "rule5": "任何人都可以走上前，在看台上为你助威。",
-        "kitHeading": "你的技能",
-        "kitNote": "比赛期间，这些动作将取代你的职业技能。",
-        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。",
-        "practiceUnratedNote": "这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。",
-        "rosterHeading": "出场名单",
-        "you": "你",
-        "bot": "电脑",
-        "ready": "我准备好了",
-        "readyDone": "已准备",
-        "readyAria": "准备开球",
-        "waiting": "正在等待对方准备……",
-        "whistle": "开球哨将在 {seconds} 秒后吹响。",
-        "readyCount": "已准备 {ready}/{total}"
-      },
-      "bet": {
-        "title": "本场投注",
-        "aria": "溪谷杯比赛投注",
-        "closesIn": "{seconds} 秒后停止投注",
-        "closed": "投注已截止",
-        "prize": "奖池 {amount}",
-        "splitAria": "两队投注池占比",
-        "expand": "查看并下注",
-        "collapse": "收起投注",
-        "oddsLabel": "赔率",
-        "back": "押注 {team}",
-        "form": "{wins}胜-{losses}负",
-        "mine": "你的投注：{amount} 押 {team}",
-        "none": "你还没有在本场比赛下注。",
-        "record": "投注战绩：{wins}胜-{losses}负，{sign}{net}",
-        "wonBanner": "你赢了这注！",
-        "wonLog": "你的溪谷杯投注赢了：返还 {amount}。",
-        "lostLog": "你的溪谷杯投注输了：{amount}。",
-        "refundLog": "投注作废，已退还你的 {amount} 本金。"
       }
     },
     "options": {
@@ -1407,6 +1577,7 @@ export const zh_CN: EnTranslations = {
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
       "showThirdActionBar": "显示第三动作条",
+      "combineActionBars": "合并动作条",
       "hideUnusedActionSlots": "隐藏未使用的动作栏位",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
@@ -1415,7 +1586,9 @@ export const zh_CN: EnTranslations = {
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "touchTapMenus": "点击菜单",
+      "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },
     "talentRows": {
       "tab": "抉择",
@@ -1440,6 +1613,11 @@ export const zh_CN: EnTranslations = {
     },
     "controller": {
       "title": "手柄",
+      "glyphStyle": "按键标签",
+      "glyphStyleAuto": "自动",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation（索尼）",
+      "glyphStyleNintendo": "任天堂",
       "enable": "启用手柄",
       "invertY": "反转镜头（Y轴）",
       "deadzone": "摇杆死区",
@@ -1929,6 +2107,18 @@ export const zh_CN: EnTranslations = {
         "many": "你是{rank}，{count}名成员",
         "other": "你是{rank}，{count}名成员"
       },
+      "wocMarketSellChoose": {
+        "one": "从 {count} 件物品中选择",
+        "few": "从 {count} 件物品中选择",
+        "many": "从 {count} 件物品中选择",
+        "other": "从 {count} 件物品中选择"
+      },
+      "wocTradeIneligible": {
+        "one": "有 {count} 件暂存物品无法出售换取 $WOC。",
+        "few": "有 {count} 件暂存物品无法出售换取 $WOC。",
+        "many": "有 {count} 件暂存物品无法出售换取 $WOC。",
+        "other": "有 {count} 件暂存物品无法出售换取 $WOC。"
+      },
       "finderPartySize": {
         "one": "{count} 名玩家",
         "few": "{count} 名玩家",
@@ -2063,6 +2253,10 @@ export const zh_CN: EnTranslations = {
       "errPasswordLong": "新密码最多只能包含 128 个字符。",
       "errPasswordUnchanged": "新密码必须与当前密码不同。",
       "errPasswordConfirm": "两次输入的新密码不一致。",
+      "setPasswordTitle": "设置密码",
+      "setPasswordHint": "此账号是通过 Apple 登录或 Discord 创建的，目前还没有密码。设置密码后，你就可以在 Mac、Windows 桌面应用或网页等其他设备上用它登录，并关联其他登录方式。",
+      "setPasswordSubmit": "设置密码",
+      "passwordSet": "密码已设置。你现在可以在任何地方使用用户名和密码登录。",
       "emailLabel": "邮箱（可选）",
       "emailHint": "仅用于账户找回。我们绝不发送营销邮件。",
       "saveEmail": "保存邮箱",
@@ -2276,7 +2470,10 @@ export const zh_CN: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
-      "unequipHint": "点击移除此背包"
+      "unequipHint": "点击移除此背包",
+      "poolGeneral": "通用：{used}/{total}",
+      "poolMaterials": "材料：{used}/{total}",
+      "capacityPoolsAria": "背包格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -2504,13 +2701,15 @@ export const zh_CN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
-      "removeFromBarAria": "从动作条移除{name}"
+      "removeFromBarAria": "从动作条移除{name}",
+      "assignAria": "为{name}选择一个栏位"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
-      "cheaterTag": "< 作弊者 >"
+      "cheaterTag": "< 作弊者 >",
+      "pledgeTag": "{guild}的宣誓者"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -2530,6 +2729,7 @@ export const zh_CN: EnTranslations = {
     },
     "partyFrames": {
       "section": "队伍和团队框体",
+      "optionsSection": "队伍框体选项",
       "unlock": "移动队伍和团队框体",
       "lock": "锁定队伍和团队框体",
       "style": "框体样式",
@@ -2559,6 +2759,62 @@ export const zh_CN: EnTranslations = {
     },
     "frameReset": {
       "label": "重置框体位置"
+    },
+    "interfaceUnlock": {
+      "label": "编辑框体",
+      "unlock": "解锁界面",
+      "lock": "锁定界面",
+      "lockAll": "锁定界面",
+      "barsNote": "编辑时只会显示你已开启的动作条。若要摆放更多动作条，请先用主动作条上的加减按钮添加。",
+      "frozenNote": "编辑期间界面和镜头会被冻结：按钮和框体只是待摆放的静态图片，点击不会传入游戏世界。",
+      "unlockFrame": "解锁此框体",
+      "lockFrame": "锁定此框体",
+      "resizeFrame": "调整此框体大小",
+      "frameNames": {
+        "actionBar1": "动作条",
+        "actionBar2": "动作条 2",
+        "actionBar3": "动作条 3",
+        "steamWishlist": "愿望单提醒",
+        "menu": "Menu",
+        "minimap": "小地图",
+        "stanceBar": "姿态栏",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "动作条组",
+        "playerFrame": "玩家",
+        "targetFrame": "目标",
+        "partyFrames": "队伍",
+        "swingBar": "自动攻击"
+      },
+      "framesMenu": "框体设置",
+      "framesMenuTitle": "显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。",
+      "showHideFrames": "显示或隐藏框体",
+      "buffsLeftToRight": "增益从左到右",
+      "debuffsLeftToRight": "减益从左到右",
+      "lockPlayerFrameToBar": "玩家框体锁定在动作条上方",
+      "actionBarsVertical": "动作条纵向排列",
+      "actionBar1Vertical": "动作条纵向",
+      "actionBar2Vertical": "动作条 2 纵向",
+      "actionBar3Vertical": "动作条 3 纵向",
+      "menuRailHorizontal": "菜单横向排列",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "重置尺寸",
+      "resetFrameSizeFor": "重置{name}的尺寸",
+      "previewSpell": "示例法术"
+    },
+    "transfer": {
+      "frameLayout": "框体布局",
+      "allSettings": "全部设置",
+      "exportAction": "导出",
+      "importAction": "导入",
+      "copy": "复制",
+      "copied": "已复制到剪贴板。",
+      "copyFailed": "复制失败。请选中代码后手动复制。",
+      "applyReload": "应用并重新载入",
+      "pastePlaceholder": "在此粘贴导出的代码。",
+      "invalid": "这不是有效的导出代码。",
+      "wrongKind": "该代码属于另一种导出类型。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
@@ -2767,7 +3023,10 @@ export const zh_CN: EnTranslations = {
       "unlink": "取消关联 Steam",
       "linked": "已关联 Steam 账号 {id}",
       "benefits": "在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。",
-      "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。"
+      "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。",
+      "wishlist": "在 Steam 上加入愿望单",
+      "wishlistAria": "在 Steam 上加入愿望单：打开 World of ClaudeCraft 商店页面",
+      "wishlistShort": "加入愿望单"
     },
     "epic": {
       "title": "Epic",
@@ -2834,7 +3093,12 @@ export const zh_CN: EnTranslations = {
       "tip": "销售收益或退回物品正在商人处等待你领取。"
     },
     "noticeboard": {
-      "empty": "看起来没有张贴任何内容。"
+      "empty": "看起来没有张贴任何内容。",
+      "subtitle": "本服务器的公会",
+      "rosterTitle": "查看{guild}的成员名单",
+      "back": "返回",
+      "popupTitle": "公会告示柱",
+      "close": "关闭"
     },
     "bank": {
       "title": "银行",
@@ -2848,6 +3112,26 @@ export const zh_CN: EnTranslations = {
       "buySlotsMaxed": "已完全扩展",
       "buyConfirm": "花费 {price} 购买 {count} 个额外的银行格子吗？",
       "buyConfirmAccept": "购买",
+      "meterLabel": "已用 {used}/{total} 格",
+      "meterPoolGeneral": "通用：{used}/{total}",
+      "meterPoolMaterials": "材料：{used}/{total}",
+      "meterPoolsAria": "银行格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。",
+      "meterMaterialsNote": "来自已装入的材料背包的材料专用空间。其他物品无法使用。",
+      "priceDisclaimer": "价格可能随游戏经济而变动。",
+      "rungItemName": "{count} 个银行格子",
+      "buySlotsDualAria": "花费 {price} 或 {cost} Claudium 购买 {count} 个格子",
+      "buyConfirmDual": "购买 {count} 个额外的银行格子吗？",
+      "buyConfirmGold": "花费 {price} 购买",
+      "buyConfirmClaudium": "花费 {cost} Claudium 购买",
+      "rungGranted": "银行格子已添加。当前角色的银行已经变大。",
+      "rungAlreadyGranted": "当前角色已拥有这些格子，不会重复扣费。",
+      "rungApplyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
+      "rungGrantUnresolved": "付款完成，但格子尚未发放。此次购买已记录，客服可以为你处理完成。",
+      "rungInProgress": "当前角色的一笔购买仍在完成中，请稍候再试。",
+      "rungDoesNotFit": "当前角色的银行已无法再进行一次扩容。",
+      "rungNotPurchasable": "这些银行格子目前无法购买。",
+      "rungFailed": "此次购买未能完成。",
+      "rungOutage": "无法确认此次购买。使用此按钮重试不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
       "withdrawHint": "点击取出",
       "withdrawPartialHint": "Shift+点击取出部分数量",
       "depositHint": "点击存入",
@@ -2860,6 +3144,9 @@ export const zh_CN: EnTranslations = {
       "withdrawQuantityTitle": "取出 {item}",
       "withdrawQuantityInput": "要取出的数量",
       "withdrawQuantityConfirm": "取出",
+      "vaultRowWithdrawName": "取出 {item}",
+      "priceChanged": "购买完成前价格已发生变化。请查看刷新后的价格并再次确认。",
+      "withdrawQuantityAction": "选择 {item} 要取出的数量",
       "filterGroupAria": "按类别筛选银行",
       "sortAria": "排序银行物品",
       "searchAria": "按名称搜索银行物品",
@@ -2881,6 +3168,34 @@ export const zh_CN: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。",
       "bonusSectionAria": "奖励银行格子及获取方式",
+      "socketRowAria": "银行背包插槽",
+      "socketEmpty": "空的银行背包插槽",
+      "socketEmptyHint": "点击背包栏中的背包即可存入银行",
+      "socketLocked": "未解锁的背包插槽",
+      "socketLockedLater": "背包插槽按顺序解锁，先解锁最便宜的",
+      "socketUnlockAria": "花费{price}解锁一个银行背包插槽",
+      "socketUnlockHint": "点击解锁此背包插槽",
+      "socketUnlockConfirm": "花费{price}解锁一个银行背包插槽？",
+      "socketUnlockAccept": "解锁",
+      "unsocketHint": "点击将此背包取回背包栏",
+      "socketHint": "点击将此背包装入银行插槽",
+      "vaultTab": "仓库",
+      "vaultCapacityNote": "每种材料最多可存放{cap}个。",
+      "vaultEmpty": "你的材料仓库是空的。点击背包中的材料即可存入。",
+      "vaultRowAria": "{item}：已存{count}/{cap}",
+      "vaultLockedIntro": "解锁材料仓库，在银行旁囤积制造材料。每种材料都有自己的空间，最多可存{cap}个。",
+      "vaultUnlockButton": "解锁材料仓库",
+      "vaultUnlockConfirm": "花费{price}解锁材料仓库？",
+      "vaultUpgrade": "将上限提升至{cap}",
+      "vaultUpgradeConfirm": "花费{price}将每种材料的存放上限提升至{cap}？",
+      "vaultDepositAll": "存入全部材料",
+      "vaultDepositAllTooltip": "一次性将背包中的所有材料存入仓库，每种材料存至其上限为止。装备、工具、任务物品和消耗品不会被移动。",
+      "vaultDepositAllDone": "已存入材料：{count}。",
+      "vaultDepositAllFull": "已存入材料：{count}。部分材料已达上限。",
+      "vaultDepositAllNone": "仓库已满：未存入任何材料。",
+      "vaultWithdrawShort": "背包只装得下{count}个中的{fit}个。",
+      "vaultDepositHint": "点击存入材料仓库",
+      "vaultCannotDeposit": "无法存入材料仓库",
       "tabsAria": "银行标签页",
       "personalTab": "个人",
       "guildTab": "公会",
@@ -2966,6 +3281,10 @@ export const zh_CN: EnTranslations = {
         "arenaClash": {
           "title": "竞技场之战",
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
+        },
+        "doubleHonor": {
+          "title": "双倍荣誉周末",
+          "note": "战营吹响集结号：整个周末，荆谷原野荣誉奖励翻倍，打满全场的败方也按胜方奖励结算。"
         },
         "fishingDerby": {
           "title": "钓鱼大赛",
@@ -3276,6 +3595,9 @@ export const zh_CN: EnTranslations = {
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 个优质品级）",
+      "reagentVaultDraw": "（从材料仓库取用 {count}）",
+      "vaultUnreachable": "此处无法使用材料仓库。",
+      "craftFeeLine": "制作费：每件 {fee}",
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
@@ -3827,6 +4149,7 @@ export const zh_CN: EnTranslations = {
       "unlockedBorderHint": "获得新边框：{name}。可在功绩之书中佩戴。",
       "broadcastLine": "{name} 达成了功绩：{deed}",
       "rarityLine": "{percent} 的冒险者已达成",
+      "stillToVisit": "仍需造访：{places}",
       "trackerLabel": "功绩",
       "collapseHint": "折叠功绩追踪器",
       "expandHint": "展开功绩追踪器",
@@ -3854,6 +4177,222 @@ export const zh_CN: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"
+    },
+    "walletBridge": {
+      "cancelled": "钱包请求已取消。未发送任何内容。",
+      "timeout": "你的钱包未及时响应。请打开钱包后重试。",
+      "notConnected": "请先连接并验证钱包，然后重试。",
+      "unsupported": "此钱包无法完成该操作。请连接其他钱包。",
+      "unavailable": "当前没有可用的钱包连接。请重新连接钱包后重试。",
+      "badResponse": "你的钱包返回了无法使用的结果。请重试。"
+    },
+    "wocMarket": {
+      "title": "$WOC 交易所",
+      "close": "关闭交易所",
+      "launcherLabel": "$WOC 交易所",
+      "tabBrowse": "浏览",
+      "tabSell": "出售",
+      "tabActivity": "我的动态",
+      "tabsLabel": "$WOC 交易所分区",
+      "loading": "正在加载交易所...",
+      "loadFailed": "无法连接交易所，请稍后再试。",
+      "disabledRealm": "本服务器未开放 $WOC 交易所。",
+      "pausedBanner": "交易已暂停。拍卖倒计时照常进行；新的挂单、出价、报价和付款需等交易恢复后再进行，已发出的付款仍会照常结算。",
+      "walletLinkedDisconnected": "您的公开地址已关联。需要使用 $WOC 付款时，请重新连接该钱包应用。",
+      "walletLinkedConnected": "已关联的钱包应用已连接，可用于 $WOC 付款。",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "未知",
+      "rateNote": "汇率：截至 {time}，约每美元 {tokens} $WOC。",
+      "rateNotePaused": "最近已知汇率：截至 {time}，约每美元 {tokens} $WOC。",
+      "estimateNote": "{usd} 按当前汇率约合 {tokens} $WOC。",
+      "browseEmpty": "目前没有挂单，稍后再来看看。",
+      "browseError": "无法加载挂单列表。",
+      "colItem": "物品",
+      "colSeller": "卖家",
+      "colCurrentBid": "当前出价",
+      "colBuyNow": "一口价",
+      "colTimeLeft": "剩余时间",
+      "reserveMet": "已达底价",
+      "reserveNotMet": "未达底价",
+      "yourListing": "你的挂单",
+      "buyNowLockedBadge": "购买进行中",
+      "reserveMetTip": "卖家设定了隐藏底价，当前出价已达到。",
+      "reserveNotMetTip": "卖家设定了隐藏底价。若结束时最高出价低于底价，物品不会售出，所有保证金都会退还。",
+      "yourListingTip": "这是你上架的物品。你不能对自己的挂单出价；在尚无出价时，你可以在此处或“活动”页取消它。",
+      "buyNowLockedTip": "另一位买家正在付款期间持有这份挂单。若对方未按时付款，挂单会重新开放。",
+      "pagePrev": "上一页",
+      "pageNext": "下一页",
+      "pageNumber": "第 {current} 页",
+      "sortLabel": "排序",
+      "sortEnding": "即将结束",
+      "sortNewest": "最新上架",
+      "sortPriceAsc": "价格从低到高",
+      "sortPriceDesc": "价格从高到低",
+      "filterQuality": "品质",
+      "filterFormat": "方式",
+      "filterAny": "不限",
+      "filterFormatAuction": "拍卖",
+      "filterFormatBuyNow": "立即购买",
+      "filterItemLabel": "物品",
+      "filterItemPlaceholder": "按物品名称搜索",
+      "filterCategory": "类别",
+      "filterCategoryWeapon": "武器",
+      "filterCategoryArmor": "护甲",
+      "filterCategoryMount": "坐骑",
+      "filterSubcategory": "类型",
+      "sellerLinkAria": "查看 {name} 最近的成交",
+      "sellerTitle": "{name} 最近的成交",
+      "sellerBack": "返回浏览",
+      "sellerEmpty": "暂无成交记录。",
+      "sellerError": "无法加载最近的成交。",
+      "sellerSaleRow": "{time}：{item} 以 {usd} 售予 {buyer}",
+      "detailTitle": "挂单详情",
+      "detailSeller": "卖家：{name}",
+      "detailEndsAt": "结束于 {utc} UTC（当地时间 {local}）",
+      "detailStartingBid": "起拍价：{usd}",
+      "detailCurrentBid": "当前出价：{usd}",
+      "detailNoBids": "尚无出价",
+      "detailMinNext": "最低下一口价：{usd}",
+      "detailBuyNow": "一口价：{usd}",
+      "detailSales": "近期成交",
+      "detailSaleRow": "{time}：{seller} 以 {usd} 售予 {buyer}",
+      "detailNoSales": "该物品尚无成交记录。",
+      "detailSalesLoading": "正在加载近期成交...",
+      "bidLabel": "你的出价（美元）",
+      "bidPlaceholder": "输入美元金额",
+      "bidButton": "出价",
+      "bidAria": "对 {item} 出价",
+      "bidTermsToggle": "出价条款",
+      "rowOpenAria": "查看 {item} 的挂单",
+      "buyNowButton": "以 {usd} 立即购买",
+      "buyNowAria": "以 {usd} 立即购买 {item}",
+      "cancelButton": "取消挂单",
+      "cancelAria": "取消你的 {item} 挂单",
+      "bidBondNote": "出价时会在出价之外冻结一笔可退还的 $WOC 保证金：出价 {bid} 时为 {bond}，出价越高保证金越多。被超越或未中标时退还；若中标，则在你付款后退还；二次机会转让会再次冻结它。",
+      "bidBondSchedule": "保证金为出价的{rate}%，最低{min}，最高{max}。",
+      "bidBondPayWindow": "请在出价后{duration}内支付保证金，否则出价将失效。",
+      "bidBindingNote": "一旦签署保证金交易，出价即具有约束力：出价无法撤回；若你中标却未付款，保证金将被没收，且你的账号会记一次市场违约。",
+      "bidCloseNote": "若某笔出价的保证金在最后 2 分钟内获得确认，拍卖会延长到该出价后 2 分钟，最多延至原定结束后 30 分钟。拍卖结束后才确认的保证金不计入，并会退款。",
+      "offerNextNote": "若中标者未付款，你可能按自己的出价成为买家：保证金会再次被冻结（若已退还则会再次收取），且须在 {duration} 内付款。",
+      "buyNowNote": "“立即购买”会在你付款期间为你保留这份挂单约四分半钟。若未按时付款，30 分钟内你无法再次尝试这份挂单；一小时内三次未付款的“立即购买”会暂停你的“立即购买”，直到最早的一次满一小时。",
+      "variableTokenWarning": "你承诺以 $WOC 支付一笔美元价值。具体代币数量由请求付款时的最新报价确定，可能与估算不同。",
+      "quoteFixedNote": "此报价在到期前锁定 $WOC 数额。新的报价可能会不同。",
+      "settlementDeadlineNote": "若你中标，须在拍卖结束后 {duration} 内付款。",
+      "claimCooldownRetry": "你最近放弃过一次直购。请在{duration}后再试。",
+      "termsLabel": "我接受市场条款。",
+      "termsLink": "查看市场条款（在新标签页中打开）",
+      "quoteTitle": "确认付款",
+      "quoteTotal": "合计：{tokens} $WOC",
+      "quoteSeller": "卖家所得：{tokens} $WOC",
+      "quoteBurn": "销毁（从供应量中移除）：{tokens} $WOC",
+      "quoteTreasury": "进入游戏国库：{tokens} $WOC",
+      "quoteExpires": "报价将在 {duration} 后过期",
+      "quoteExpiresAt": "报价将于 {time} 失效。",
+      "quoteExpired": "报价已过期，请重新获取。",
+      "quoteSign": "签名并付款",
+      "quoteRefresh": "新报价",
+      "quoteCancel": "暂不",
+      "quoteBondFor": "可退还的出价保证金：{usd}",
+      "quoteBondForItem": "{item} 的可退还出价保证金：{usd}",
+      "quoteSettlementFor": "{item} 的结算：{usd}",
+      "paymentDueAt": "须在 {time} 前付款。",
+      "signing": "等待钱包确认...",
+      "signFailed": "你的钱包未能完成付款。请检查钱包后重试。",
+      "signFailedConfirm": "你的钱包未能签署确认。请检查钱包后重试。",
+      "confirming": "正在链上确认...",
+      "listing": "正在上架你的物品...",
+      "activityCancelPending": "待取消",
+      "activityDirected": "定向出售",
+      "bidPlacedStanding": "你的出价已生效，你是当前最高出价者。",
+      "bidPlacedOutbid": "你的保证金已确认，但有人抢先出了更高的价。",
+      "purchaseComplete": "购买完成。物品将经乌鸦邮局寄达。",
+      "paymentConfirmedDelivering": "付款已确认。配送完成后物品将经乌鸦邮局寄达。",
+      "listingCreated": "你的挂单已上架。",
+      "listingCancelled": "挂单已取消。物品将经乌鸦邮局退回。",
+      "listingCancelPending": "取消待定：一位买家正持有购买窗口。若其未付款，挂单将关闭，物品经乌鸦邮局退回。",
+      "sellTitle": "创建挂单",
+      "sellEmptyFloor": "背包中没有符合条件的物品。本服交易所接受{floor}品质及以上的未绑定装备。",
+      "sellCollectiblesBoth": "坐骑和机甲涂装板也可以上架。",
+      "sellCollectiblesMounts": "坐骑也可以上架。",
+      "sellCollectiblesChromas": "机甲涂装板也可以上架。",
+      "sellLockedHidden": "已锁定的物品不会在此列出。请在背包中解锁后再出售。",
+      "sellSearchPlaceholder": "输入以筛选背包",
+      "sellClear": "清除 {item} 并另选一件",
+      "sellChoose": "要上架的物品",
+      "sellNoMatches": "没有物品符合该搜索",
+      "sellBuyNowAboveStart": "一口价必须高于起拍价。",
+      "sellFormat": "形式",
+      "sellFormatAuction": "拍卖",
+      "sellFormatBuyNow": "仅一口价",
+      "sellFormatAuctionBuyNow": "拍卖并设一口价",
+      "sellStart": "起拍价（美元）",
+      "sellReserve": "底价（美元，可选）",
+      "sellReserveNote": "可选，且不低于起拍价。出价者只能看到是否已达底价；若结束时最高出价低于底价，物品会原样退回给你，所有保证金都会退还。",
+      "sellBuyNowNote": "必填。一口价商品将以此价格出售，不接受竞价。",
+      "sellBuyNowAuctionNote": "可选。设置一个买家可直接支付以提前结束拍卖的价格；该价格必须高于起拍价和保留价。",
+      "sellBuyNowPrice": "一口价（美元）",
+      "sellDuration": "时长",
+      "sellOfferNext": "若中标者未付款，按次高出价者的出价卖给达到底价的次高出价者，而不是流拍。",
+      "sellSubmit": "上架物品",
+      "sellSubmitAria": "将 {item} 上架到交易所",
+      "sellFeeNote": "成交后会从价格中扣除交易所手续费：一部分销毁，一部分进入国库，其余随结算交易进入你绑定的钱包。你输入价格后，对应的手续费会显示在这里；拍卖的手续费按最终成交价计算。",
+      "activityListings": "我的挂单",
+      "activityBids": "我的出价",
+      "activitySettlements": "我的结算",
+      "activityEmpty": "您还没有出价、挂单或结算。您的交易所动态会显示在这里。",
+      "activityNoListings": "你没有挂单。",
+      "activityNoBids": "你没有出价。",
+      "activityNoSettlements": "你没有结算。",
+      "activityPayNow": "立即付款",
+      "activityPayNowAria": "立即支付结算 {id}",
+      "activityPayNowItemAria": "立即为 {item} 支付 {usd}",
+      "activityDeadline": "付款截止：{duration} 内",
+      "dueAt": "截止 {utc} UTC（当地时间 {local}）",
+      "activityStrikes": "交易所警告次数：{count}",
+      "activitySuspended": "因未付款的交易，交易所资格暂停 {duration}：在此期间无法出价、购买、挂单或进行 $WOC 交易。",
+      "strikesTip": "每当你未为已承诺的交易付款，就会记一次违约。首次之外，每次违约都会让你被交易所暂停更长时间：3 天，然后 14 天、90 天，再然后一年。",
+      "bidStatusPending": "等待保证金",
+      "bidStatusActive": "最高出价者",
+      "bidStatusOutbid": "已被超越",
+      "bidStatusLapsed": "已失效",
+      "bidStatusWon": "已中标",
+      "bidStatusDefaulted": "未付款",
+      "bidStatusCancelled": "已取消",
+      "bidBondPay": "支付保证金",
+      "bidBondPayAria": "为挂单 {id} 的出价支付保证金",
+      "bidBondPayItemAria": "为你对 {item} 的出价支付 {bond} 保证金",
+      "settlementOffered": "待付款",
+      "settlementConfirming": "确认中",
+      "settlementConfirmedDelivering": "付款已确认，配送中",
+      "settlementReview": "付款审核中",
+      "settlementDelivered": "已送达",
+      "settlementExpired": "逾期未付",
+      "settlementFailed": "付款失败",
+      "settlementFailBurnMissing": "付款中未包含所需的代币销毁。",
+      "settlementFailBurnMismatch": "付款销毁的代币数量不正确。",
+      "settlementFailBurnAuthority": "代币销毁来自本次购买未指定的钱包。",
+      "settlementFailUnexpectedCredit": "该交易向本次购买之外的钱包付了款。",
+      "settlementFailQuoteExpired": "付款报价在使用前已过期。请获取新的报价后再次付款。",
+      "settlementFailTransaction": "付款交易在网络上失败。请获取新的报价后重试。",
+      "settlementFailRefunded": "这笔付款已退回你的钱包。",
+      "settlementFailSuperseded": "这次付款尝试已被更新的一次取代。",
+      "settlementFailConfirmingOverdue": "这笔付款确认耗时过长，无法核实。",
+      "settlementFailGeneric": "这笔付款未能完成。",
+      "paymentSeenAwaitingFinality": "账本上已看到付款。正在等待最终确认。",
+      "paymentNotYetVisible": "账本上尚未看到付款。可能需要片刻才会出现。",
+      "paymentServiceUnreachable": "无法连接支付服务。你的付款已被记录，稍后会重新核验。",
+      "paymentPendingGeneric": "你的付款已提交，正在等待确认。",
+      "bondSeenAwaitingFinality": "账本上已看到保证金付款。正在等待最终确认。",
+      "bondNotYetVisible": "账本上尚未看到保证金付款。可能需要片刻才会出现。",
+      "bondServiceUnreachable": "无法连接支付服务。你的保证金付款已被记录，稍后会重新核验。",
+      "bondPendingGeneric": "你的保证金付款已提交，正在等待确认。",
+      "listingStatusActive": "进行中",
+      "listingStatusSettling": "等待付款",
+      "listingStatusSold": "已售出",
+      "listingStatusReturned": "已退回",
+      "listingStatusCancelled": "已取消",
+      "listingStatusSuspended": "已冻结",
+      "listingStatusUnsold": "未售出"
     }
   },
   "gatherEvent": {
@@ -3903,7 +4442,8 @@ export const zh_CN: EnTranslations = {
       "password_too_long": "新密码最多只能包含 128 个字符。",
       "characters_online": "请先登出所有角色再进行注销。",
       "deactivated": "此账户已注销。请联系管理员以恢复。",
-      "not_found": "未找到账户。"
+      "not_found": "未找到账户。",
+      "password_already_set": "此账号已经设置了密码。请改用更改密码。"
     },
     "character": {
       "name_invalid": "角色名称无效。请使用 2-16 个字母。",
@@ -3915,6 +4455,8 @@ export const zh_CN: EnTranslations = {
       "online": "角色当前在线。",
       "rename_not_permitted": "不允许为此角色改名。",
       "delete_confirm": "输入角色名称以确认删除。",
+      "storage_purchase_open": "此储物空间购买必须完成或解决后，才能删除该角色。",
+      "delete_busy": "服务器繁忙，请稍后再尝试删除该角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",
@@ -3954,6 +4496,10 @@ export const zh_CN: EnTranslations = {
     "deeds": {
       "invalid_input": "输入无效。"
     },
+    "guilds": {
+      "invalid_roster_name": "公会名称无效。",
+      "unknown": "没有这个名字的公会。"
+    },
     "steam": {
       "disabled": "Steam 关联当前不可用。",
       "invalid_ticket": "Steam 无法验证此关联请求。请在桌面客户端中重试。",
@@ -3991,6 +4537,55 @@ export const zh_CN: EnTranslations = {
       "reason_required": "必须填写原因。",
       "invalid_duration": "标记时长至少需为 1 秒。",
       "not_marked": "该账号未被标记。"
+    },
+    "woc_market": {
+      "invalid_input": "输入无效。",
+      "disabled": "本服务器未开放 $WOC 交易所。",
+      "paused": "交易所交易已暂停。拍卖倒计时照常进行。",
+      "wallet_required": "在交易所交易前，请先绑定并验证钱包。",
+      "recipient_wallet_required": "该玩家必须先连接钱包，才能接受 $WOC 付款。",
+      "self_offer": "你不能向自己发送 $WOC 报价。",
+      "offer_expired": "该 $WOC 报价已过期。请重新索取。",
+      "terms_required": "请先接受市场条款再继续。",
+      "totp_required": "该金额需要两步验证。请在账户设置中启用后输入验证码。",
+      "totp_invalid": "两步验证码未通过验证，请重试。",
+      "suspended": "因未付款的交易，你的交易所资格已被暂停：无法出价、购买、挂单或进行 $WOC 交易。",
+      "character_invalid": "请使用你要挂单的角色登录游戏后再试。",
+      "not_found": "该交易所条目已不存在。",
+      "not_yours": "该交易所条目已不存在。",
+      "not_active": "该挂单已不再接受此操作。",
+      "own_listing": "不能竞拍或购买自己的挂单。",
+      "has_bids": "已有出价的挂单无法撤回。如必须取消，请联系客服。",
+      "bid_too_low": "你的出价未达到当前出价加最小加价幅度。",
+      "already_pending": "请先确认或放弃你在该挂单上的待定出价。",
+      "insufficient_balance": "你的钱包中的 $WOC 不足以支付该出价及其保证金。",
+      "quote_unavailable": "目前无法生成报价，请稍后再试。",
+      "quote_expired": "该报价已过期。请重新获取；若无法获取新报价，说明该支付窗口已关闭。",
+      "not_pending": "该出价已不在等待保证金的状态。",
+      "confirm_failed": "交易未能确认。请重新获取报价后再试。",
+      "confirm_in_flight": "你的付款仍在确认中。待其完成后再试。",
+      "buy_now_locked": "另一位买家正在完成这笔购买，请稍后再试。",
+      "cancel_pending": "卖家正在取消该挂单。",
+      "claim_cooldown": "你最近放弃过一次直购。请稍后再试。",
+      "bond_window_closed": "该出价已无法支付：支付窗口已关闭。请重新出价以获得新的支付窗口。",
+      "settlement_in_flight": "有买家正在为该挂单付款。请等付款结算完成后再试。",
+      "contended": "交易所正在处理该挂单的其他操作。请稍后再试。",
+      "sale_conflict": "该挂单已有另一条有效的成交记录。请先将其排除。",
+      "no_buy_now": "该挂单没有一口价。",
+      "cap_reached": "你已达到交易所挂单数量上限。",
+      "stale_item": "该物品已变动或被移动。请重新选择后再试。",
+      "item_mismatch": "这不是买家同意购买的那件物品，或它的状态已发生变化（被锁定也算）。请重新发起一笔交易。",
+      "offer_pending": "你与该玩家已有一笔进行中的交易。请先处理完它。",
+      "not_eligible": "该物品不能在 $WOC 交易所挂单。",
+      "invalid_params": "请检查起拍价、底价、一口价与拍卖时长。",
+      "signature_reused": "该交易已提交过。",
+      "item_locked": "该物品已锁定。出售前请先在背包中解锁。",
+      "stepup_required": "在交易所出售需要已绑定钱包的签名。",
+      "stepup_challenge_invalid": "该钱包确认已失效。请重新发起出售。",
+      "stepup_challenge_expired": "钱包确认已过期。请重新发起出售。",
+      "stepup_wallet_mismatch": "该确认签发后绑定的钱包已变更。请重新发起出售。",
+      "stepup_binding_mismatch": "该钱包确认与本次出售不符。请重新发起出售。",
+      "stepup_signature_invalid": "钱包签名验证失败。请重新发起出售。"
     }
   },
   "guide": {
@@ -4028,7 +4623,6 @@ export const zh_CN: EnTranslations = {
       "combat": "战斗",
       "talents": "天赋",
       "arena": "竞技场与 PvP",
-      "valeCup": "溪谷杯",
       "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
       "reliquary": "圣物库",
@@ -4138,6 +4732,8 @@ export const zh_CN: EnTranslations = {
         "fenBlurb": "越过秋色之冠，是一片垂柳与静水的明亮沼泽，还有一座护城河环绕的小镇。",
         "farshoreName": "远岸",
         "farshoreBlurb": "沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。",
+        "provingName": "试炼之滨",
+        "provingBlurb": "海峡对面一座安静的训练之岛，新冒险者在谷地对他们提出任何要求之前，先在这里站稳脚跟。",
         "nightName": "夜绽花野",
         "nightBlurb": "一片繁星午夜的国度，花朵照亮小径，月栖镇彻夜守望。",
         "hauntName": "怨灵林",
@@ -4238,7 +4834,6 @@ export const zh_CN: EnTranslations = {
       "reliquary": "圣物库",
       "sheathe": "收起/拔出武器",
       "crafting": "制作",
-      "valeCup": "溪谷杯",
       "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
       "dungeonFinder": "地下城查找器",
@@ -5100,6 +5695,10 @@ export const zh_CN: EnTranslations = {
       "farshoreGreeting": "你是从沙洲堤道过来的？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。",
       "farshoreGreeter": "守钟人塔姆，登岸口",
       "farshorePlaceNotes": "鸥港是岛上唯一的城镇，也是它的堡垒。登岸口是沙洲堤道上岸的地方，岬角上立着一口警钟；守望草甸占着镇子东南的高地，一位裂察在那里聆听下一次裂开；碎裂断崖在岛的南端豁然裂开；裂野则是鸥港以东那片被摧残的麦田，至今仍爬满了从那道裂口涌出来的东西。",
+      "provingBlurb": "谷地海峡对面的一座安静小岛，被辟为训练场：一处营地、一片练武场、一段布满残骸的海滩，还有一班双向通行的渡船。",
+      "provingGreeting": "谷地感激过的每一位英雄，都曾站在你现在站的地方，而且当时没有一个人分得清剑该握哪头。",
+      "provingGreeter": "教官玛伦，晨憩营地",
+      "provingPlaceNotes": "晨憩营地是岛上唯一的聚居点：几顶帐篷、一个货摊和一堆集合篝火。旧码头面向谷地，渡送法阵从那里送毕业生跨过海峡；营地以南的练武场为任何需要的人立着稻草人；沉船滩则是潮水用漂流货箱付账的那段满是残骸的海岸。",
       "travelTitle": "四处走动",
       "travelBody": "王国里的每一条路，都得靠走或者骑。这里没有飞行路线，没有马车，也没有传送网络：地图是一整块相连的陆地，每一处连接都是你可以踩上去的东西。山脊把一片土地与下一片隔开，两地共享一道山脊时，道路便会翻过一处山口。不过并非每一处边界都是这样。北面有一条长长的堤道，载着道路从帷幕幽谷跨过水面，通往更北的雪国；而回到南边，有一道细细的天然沙洲，名叫沙洲堤道，自东溪谷海岸向东延伸，直抵远岸岛上的登岸口，那座岛根本没有陆上边界。整个地表世界里恰好只有一道真正的门户：荆峰高处的一层暮色之幕，通往帷幕幽谷。幽谷的南侧山脊被封死，没有山口可以穿过，所以那层幕正是你最初进去的方式，而回程时它会在你身后合上。\n\n无论你倒在哪里，走回来的路都不长。每一片区域至少有一座墓地，一位灵魂医者悬在墓碑上方，释放出的灵魂会在最近的那一座升起。\n\n地图不会终结于一堵看不见的墙。陆地会一路铺展成海滩与岬角，然后没入开阔的水面。世界本就打算让你游过去的那些地方，也就是两片土地之间的海峡与湖泊，都平静而安全。若你偏要向外海进发，距离本身会把你劝回来：你会被警告一次，再警告一次，而如果你还继续游，大海就会把你耗到死。下潜也有它自己的限度，因为你的气在水下会用尽，所以水一提醒你，就浮上来换口气、掉头回去吧。",
       "mountsTitle": "坐骑",
@@ -5316,36 +5915,6 @@ export const zh_CN: EnTranslations = {
       "ladderBody": "每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。",
       "rewardsHeading": "一场比赛给什么",
       "rewardsBody": "每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。"
-    },
-    "valeCupPage": {
-      "heading": "溪谷杯",
-      "intro": "母猪场上的野猪球：选一面旗帜、选一个位置，把塞满稻草的野猪皮球踢过守门员，去争夺铜奶桶。不流血，无战利品，只有看台的欢呼。",
-      "loreHeading": "野猪球与丰收休战",
-      "loreOldSow": "早在亡者苏醒之前，东溪的农工们就在收割后的麦茬地上玩野猪球：两群人，一张塞满稻草的野猪皮，和拖到绿地两端的两扇货车门。第一颗球，“老母猪”，如今镀铜挂在酒馆壁炉上方。",
-      "loreTruce": "当灰烬斗技场开始批准战争竞技时，红溪元帅以更温和的方式回应：在老绿地上立下长期的丰收休战。货车门变成了球门，绿地有了围墙、看台和一个名字：母猪场。而奖品始终是优胜者们共饮的那只瘪了的奶桶：铜奶桶。",
-      "howHeading": "怎么玩",
-      "howQueue": "通过溪谷杯窗口随处排队，或到母猪场大门找场地管理员布拉姆。选择从一对一到五对五的赛级、一面旗帜国度和一个运动位置；可以单排，也可以带上队伍。",
-      "howMatch": "开球时你的职业技能会被换成运动技能，赛后原样恢复。踢球以地面准星瞄准，球会在挡板上反弹，带球就是推着球跑。在全场结束前比对方进更多球；平局进入金球制。",
-      "howTruce": "母猪场上无人流血：铲抢只会让人翻滚，什么都不会造成伤害，宠物也会场外休息。",
-      "spectateBody": "球场同一时间只进行一场比赛，任何人都可以走到看台观赛。",
-      "bettingHeading": "栏杆边的小赌怡情",
-      "bettingBody": "比赛组建期间，母猪场的观众可以押注其中一方：赌注汇入同一个奖池，终场哨响时，赢家按各自下注的比例瓜分输家的奖池。平局，或是一场无人押中的爆冷，会退还每一枚钱币。上场比赛的球员不能给本场下注，而栏杆边会记着你终身的投注胜负与净得钱币。",
-      "practiceHeading": "练习赛与空闲的球场",
-      "practiceBody": "溪谷杯窗口还提供练习：一份专属的球场副本，双方都由机器人补满，任何结果都不计入你的战绩。正式比赛还差一两个人？稍等片刻，机器人便会补齐两队，而只要场上有机器人，比赛就只是友谊赛，绝不计入评级。当母猪场空闲时，机器人还会上演一场表演赛，你可以从看台上观赛、下注；一旦有真正的玩家准备就绪，表演赛便会让出球场，所有赌注原数退还。",
-      "nationsHeading": "八个旗帜国度",
-      "nationsBody": "每支队伍都在一面旗帜下比赛。队长选择国度；若双方举同一面旗，客队使用反转配色。",
-      "nationVale": "绿与金，扬着麦捆旗：主场球队，骨子里都是农工。",
-      "nationMirefen": "青与灰，苍鹭旗下：耐心、腿长、从不着急。",
-      "nationThornpeak": "冰蓝与白，山峰旗下：步伐稳健、性子倔强。",
-      "nationColiseum": "红与黑，交叉双剑：他们踢起球来仍像在打仗。",
-      "nationChoir": "淡蓝与银，铃铛旗下：诡异、精准、非常安静。",
-      "nationOgre": "橙与棕，铁拳当先：肩膀开路，并引以为豪。",
-      "nationMoon": "紫与银，弯月旗下：夜行的球员，脚步轻盈。",
-      "nationCopperdig": "铜与褐，别着镐头：跑不停歇的矿工。",
-      "rolesHeading": "运动位置",
-      "rolesBody": "你的位置决定你带上球场的技能。人人都会踢球；其余看性情。在一人组和二人组的对局中，所有人都使用全能型的技能套装，因此位置选择要从三人组往上才真正发挥作用。",
-      "rewardsHeading": "休战规矩",
-      "rewardsBody": "休战规矩意味着没有经验也没有战利品：一场分出胜负的比赛会计入你的战绩和优胜者榜，而一场胜利也会计入当天的奖励任务。中途弃赛会让你的位置空缺，而场地管理员记着呢。"
     },
     "deedsPage": {
       "intro": "功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。",
@@ -5576,7 +6145,7 @@ export const zh_CN: EnTranslations = {
       "deedsHeading": "铭记旅程的功业",
       "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
-      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东北Copper Dig一带的矿脉，让你磨出最初的老茧。留意矿坑本身：驻扎在那里的深岩挖掘者等级比新手高出几级，所以先采外围的矿脉，等级练起来一些之后再去碰营地核心。此后旅途中经过的每处矿脉、树木与草药都值得采集，熟练度自然而然会随旅途积累。\n\n回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，看看他们教些什么，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",
       "colHub": "主城",
       "colMaster": "大师",
@@ -5661,13 +6230,13 @@ export const zh_CN: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "迅捷者的皮甲",
-          "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能75的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
+          "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能50的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
           "materialsHeading": "狩猎即收获",
-          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖锇矿。",
+          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps要六块），以及制革坊柜台16铜的Tanning Agent。锇矿本身从不在柜台出售：只能自己开采，无论是在荆峰还是几乎任何新手区域的入门矿脉（唯独远岸只挖得到铁矿），或是向其他玩家购买。",
           "ladderHeading": "在Fenbridge受训",
-          "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。两件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会但要技能75且绑定制革坊。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
+          "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。三件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会，技能50起即可在制革坊制作。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
+          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，而mirewarden各件与Duskhide Wraps会将稀有档从50带到75。过了75，这些二层配方的收益减半、再减至四分之一，最后五十点约需150次才能到达125点上限；未达到主修上限时，它们仍与精良品质的制作上限持平，而不会直接归零。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
         },
         "cooking": {
           "identityHeading": "喂饱队伍的锅",
@@ -5867,7 +6436,7 @@ export const zh_CN: EnTranslations = {
         "q5": "什么是杰作？",
         "a5": "每次制作都有一个小几率（3%起，上限15%）产出品质高一层的成品，但绝不会超过团队副本的底线。",
         "q6": "“由某某制作”是什么意思？",
-        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的三层压轴配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
+        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
         "q7": "什么是制作者之约？",
         "a7": "委托制品会绑定给交易中收到它的人，而任意工位大师都可按层级费用为其解绑。",
         "q8": "我能更换命途吗？",
@@ -5892,6 +6461,7 @@ export const zh_CN: EnTranslations = {
       "bankBody": "每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。",
       "bankHow": "保险库打开后，点击背包中的物品即可存入，点击保险库中的物品即可取回。保险库只存放物品，不存放钱币，任务物品也会留在你身上。旅途中背包装满时，还有一个按钮可将全部制造材料一键存入。",
       "bankSlots": "新开的保险库空间不大，但会随你一同成长。司库出售更多格位，价格逐级走高；在线游玩还能获得额外空间，例如验证邮箱、关联账号，以及引荐好友加入游戏。",
+      "bankSockets": "在格位阶梯之上，司库还出售最多四个背包插槽，按顺序解锁，价格逐级走高。把携带的闲置背包装入插槽，它的格位便并入保险库空间：普通背包扩充整个仓储，而材料袋只为制作材料增添空间。点击背包栏中的背包即可装入，点击插槽即可取回。取回背包绝不会损失任何存放之物：若保险库因此超出缩减后的空间，一切物品原地保留，新的存入只需等待腾出空间。",
       "buyingTitle": "买入与卖出",
       "buyingBody": "与商人交谈并选择浏览他的货物，他的商店便会打开，分为三个标签页：浏览、出售和买回。浏览页陈列着他的全部存货，只要付得起钱就归你。出售页列出你背包中他愿意收购的物品，而出售一件带有自身随机品质的物品时会先请你确认，这样一件珍视的物品就绝不会因失误而溜走。若你卖掉了让自己后悔的东西，买回标签页会保留你近期的售出记录，让你能按当初卖出的价钱把它们买回来。",
       "junkTitle": "清理废品",
@@ -6928,6 +7498,7 @@ export const zh_CN: EnTranslations = {
       "title": "连接 Solana 钱包",
       "linkBody": "在此浏览器中选择钱包扩展。签署验证消息后返回桌面应用。",
       "paymentBody": "选择已关联到账号的钱包，并在此浏览器中批准交易。",
+      "stepUpBody": "选择已关联到账号的钱包，并签署 $WOC 交易所的授权消息。签名免费，不会转移任何资金。",
       "extensionHelp": "未找到兼容的钱包扩展。请安装或解锁 Phantom、Solflare 或其他 Solana 浏览器钱包，然后重试。",
       "safety": "World of ClaudeCraft 绝不会索要助记词或私钥。",
       "continueWith": "使用 {wallet} 继续",
@@ -7118,6 +7689,7 @@ export const zh_CN: EnTranslations = {
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
+      "lootRecoveryNotice": "裂隙入口还会维持一段时间：如果你的队伍倒下，仍可返回取回已获得的东西。",
       "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
       "deadEntry": "死亡状态下无法进入裂隙。",
       "deadEntryCombat": "你的队伍仍在战斗中。战斗结束后，死者方可重新进入。",
@@ -7856,6 +8428,9 @@ export const zh_CN: EnTranslations = {
       "reload": "重新加载",
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
+    },
+    "titlebar": {
+      "exitGame": "退出游戏"
     }
   },
   "gpuNotice": {
@@ -8793,6 +9368,7 @@ export const zh_CN: EnTranslations = {
       "offGlobalCooldown": "不触发公共冷却",
       "friendlyTarget": "友方目标",
       "enemyTarget": "敌方目标",
+      "anyTarget": "敌方或友方目标",
       "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
@@ -9008,7 +9584,8 @@ export const zh_CN: EnTranslations = {
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickBuyback": "点击回购",
-      "bagSlots": "{slots} 格背包"
+      "bagSlots": "{slots} 格背包",
+      "bagSlotsMaterials": "{slots} 格材料背包"
     },
     "bags": {
       "title": "背包",
@@ -9405,7 +9982,7 @@ export const zh_CN: EnTranslations = {
       },
       "ignition": {
         "name": "点燃",
-        "description": "被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 40% 的伤害，可叠加。（火焰精通）"
+        "description": "被动：你的法术暴击会灼烧目标，在 6 秒内造成相当于该次伤害 30% 的伤害，可叠加。（火焰精通）"
       },
       "mass_barrier": {
         "name": "群体屏障",
@@ -9575,11 +10152,19 @@ export const zh_CN: EnTranslations = {
       },
       "sap": {
         "name": "闷棍",
-        "description": "使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。"
+        "description": "使目标无法行动，持续 8 秒，且不会打破暮帷或引发战斗。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。"
       },
       "crippling_poison": {
         "name": "沉铅毒液",
         "description": "以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。"
+      },
+      "melting_acid": {
+        "name": "溶解酸",
+        "description": "向目标泼洒腐蚀性毒液，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。"
+      },
+      "nightshade_coating": {
+        "name": "夜影涂层",
+        "description": "用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。"
       },
       "expose_armor": {
         "name": "护甲突破",
@@ -9839,7 +10424,7 @@ export const zh_CN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
-        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。"
+        "description": "化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。"
       },
       "aimed_shot": {
         "name": "引弓长射",
@@ -10003,7 +10588,7 @@ export const zh_CN: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "暴行咒",
-        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。"
+        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。"
       },
       "cruel_pact": {
         "name": "残酷契约",
@@ -10209,7 +10794,7 @@ export const zh_CN: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "战魂节律",
-        "description": "被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
+        "description": "被动：双持攻击不会有额外的落空几率。每第3次命中的武器攻击会触发2次裂风回响，各造成25%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）"
       },
       "stormsurge": {
         "name": "风暴涌动",
@@ -10421,7 +11006,7 @@ export const zh_CN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召唤焚炎巨像",
-        "description": "将一尊焚炎巨像召至目标区域，落地时造成 58-72 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。"
+        "description": "将一尊焚炎巨像召至目标区域，落地时造成 64-79 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。"
       },
       "summon_doomguard": {
         "name": "召唤亡魂裔",
@@ -10769,7 +11354,7 @@ export const zh_CN: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿过暗影，向你的目标迈进。（潜行者天赋）"
+        "description": "穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。（潜行者天赋）"
       },
       "silence": {
         "name": "沉默",
@@ -12425,8 +13010,47 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "ps_castaway_crate": {
+        "name": "漂流货箱"
+      },
+      "ps_ferry_bell": {
+        "name": "渡船铃"
+      },
       "dawnhold_posy": {
         "name": "晨曦堡花园小花束"
+      },
+      "wayfarers_backpack": {
+        "name": "旅者背包"
+      },
+      "burlap_reagent_pouch": {
+        "name": "粗麻材料袋"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "死灵法师的材料挎包"
+      },
+      "duskweave_bag": {
+        "name": "暮织袋"
+      },
+      "resonant_weave_bag": {
+        "name": "共鸣织袋"
+      },
+      "foragers_haversack": {
+        "name": "采集者行囊"
+      },
+      "loombound_reagent_satchel": {
+        "name": "织缚材料挎包"
+      },
+      "ps_briny_lure": {
+        "name": "咸水诱饵"
+      },
+      "ps_lustrous_pearl": {
+        "name": "莹润珍珠"
+      },
+      "mother_of_pearl": {
+        "name": "珍珠之母"
+      },
+      "ps_passing_stone": {
+        "name": "往生石"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -13468,9 +14092,6 @@ export const zh_CN: EnTranslations = {
       "tolling_bell": {
         "name": "鸣钟"
       },
-      "vale_cup_ball": {
-        "name": "野猪皮球"
-      },
       "thunzharr_waking_peak": {
         "name": "桑扎尔，觉醒之峰"
       },
@@ -13768,6 +14389,15 @@ export const zh_CN: EnTranslations = {
       "fisher_bram": {
         "name": "渔民布拉姆"
       },
+      "training_effigy": {
+        "name": "训练草人"
+      },
+      "shore_scuttler": {
+        "name": "滩涂掠蟹"
+      },
+      "mister_crabs": {
+        "name": "螃蟹先生"
+      },
       "rift_hellguard": {
         "name": "地狱卫士"
       },
@@ -13926,7 +14556,7 @@ export const zh_CN: EnTranslations = {
       "apothecary_lin": {
         "name": "林药剂师",
         "title": "草药师",
-        "greeting": "在东边林地里落脚要小心，朋友。"
+        "greeting": "在东北边林地里落脚要小心，朋友。"
       },
       "brother_aldric": {
         "name": "奥德里克修士",
@@ -14067,11 +14697,6 @@ export const zh_CN: EnTranslations = {
         "name": "灵魂医者",
         "title": "亡者的守护者",
         "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
-      },
-      "groundskeeper_bram": {
-        "name": "场地管理员布拉姆",
-        "title": "母猪场看守",
-        "greeting": "休战约定在母猪场依然有效，{className}：只许用脚和肩膀。想为铜奶桶一战吗？"
       },
       "chronicler_saul": {
         "name": "编年史者绍尔",
@@ -14358,6 +14983,51 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "wayfarer_bryn": {
+        "name": "旅人布琳",
+        "title": "港口向导",
+        "greeting": "东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。"
+      },
+      "instructor_maren": {
+        "name": "教官玛伦",
+        "title": "试炼导师",
+        "greeting": "谷地感激过的每一位英雄，都曾站在你现在站的地方，{className}，而且当时没有一个人分得清剑该握哪头。这片海滨就是为此而设。尽管问，尽管练，在失败不要紧的地方尽管失败。"
+      },
+      "quartermaster_finch": {
+        "name": "军需官芬奇",
+        "title": "营地补给商",
+        "greeting": "我的柜台只卖一样东西，{playerName}：一只装路上零碎的备用小袋，等课业用得着它的时候才卖。这里其余的都是要运回谷地的打捞货。铜板能买下小袋，而铜板要靠干活挣来。这就是全部的经济学，它永远不会变得更复杂。只会变得更大。"
+      },
+      "ferryman_odo": {
+        "name": "渡船人奥多",
+        "title": "渡口看守",
+        "greeting": "刚下渡船吗，{playerName}？看守塔姆就在码头正南的海滩上守着试炼跑道：先去跑一趟他的跑道，你的双腿会感谢你的。这片海滨的每一位看守都会在你办完差事后把你交给下一位，屏幕顶端的那张卡片永远知道下一步该往哪儿走。等谷地召唤你回去时，敲响立在我码头旁的那口铃，渡航会把你送到东溪镇上。"
+      },
+      "bursar_wick": {
+        "name": "司库威克",
+        "title": "镀金保险箱",
+        "greeting": "镀金保险箱连这里也设了一张桌子，{playerName}。凡是存到我这里的东西，都躺在每座城镇每位司库身后的同一座金库里，狼咬不着，水泡不着，连你自己的糊涂决定也碰不着。"
+      },
+      "warden_tam": {
+        "name": "看守塔姆",
+        "title": "试炼跑道的看守",
+        "greeting": "这几条跑道就是试炼跑道，{playerName}，谷地敬重的每一位冒险者都跑过它。栏杆上的灯柱整夜不灭，跑道从不打烊。"
+      },
+      "overseer_pell": {
+        "name": "监工佩尔",
+        "title": "试炼跑道监工",
+        "greeting": "每一趟从这几条跑道下来的成绩都由我掐表，{playerName}，比这难看得多的脚步我也见过。我身后的路通往练武场：脚上功夫变成剑上功夫，就在那里。"
+      },
+      "drillmaster_rook": {
+        "name": "操练官鲁克",
+        "title": "练武场主管",
+        "greeting": "先打稻草，再打壳，{playerName}。草人教你的手臂怎么挥刀；海滩那头的掠蟹教它落在一个会计较的对象身上。"
+      },
+      "tidewarden_nel": {
+        "name": "守潮人奈尔",
+        "title": "海滩的看守",
+        "greeting": "潮水会拿走，潮水也会偿还，{playerName}。这两笔账都由我来记：掠蟹从残骸里夹走的，和诚实的双手沿这条路扛上来的。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -14367,7 +15037,7 @@ export const zh_CN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之长",
-        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
+        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东北方、狼径外的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
         "completion": "看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。",
         "objectives": {
           "0": {
@@ -14397,7 +15067,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_boars": {
         "title": "粗鬃野猪皮",
-        "text": "野猪皮能做最好的行囊，镇外草地到处都是野猪。带回5张硬鬃野猪皮。",
+        "text": "野猪皮能做最好的行囊，镇子西北的草地到处都是野猪。带回5张硬鬃野猪皮，我必有重谢。",
         "completion": "好结实的硬鬃皮！这些能卖个好价钱。",
         "objectives": {
           "0": {
@@ -14407,7 +15077,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_spiders": {
         "title": "墨网之患",
-        "text": "东部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。",
+        "text": "东北部林中的潜伏者会吐出一种丝，我制作药膏正需要它，何况它们的数量也已经太过泛滥。清剿 6 只墨网潜伏者，再从它们腹中割下 4 枚丝腺。",
         "completion": "呃，还在抽动。正合适。这是你应得的。",
         "objectives": {
           "0": {
@@ -14450,7 +15120,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_supplies": {
         "title": "被盗的补给",
-        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西南山丘的营地夺回4个补给箱。",
+        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西北山丘的营地夺回4个补给箱。",
         "completion": "我的箱子！几乎没有划痕。你真让人惊喜。",
         "objectives": {
           "0": {
@@ -14543,7 +15213,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_bandits": {
         "title": "谷地强盗",
-        "text": "一群割喉强盗在西南山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
+        "text": "一群割喉强盗在西北山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
         "completion": "黑夜里少了十把刀。拿着吧，这是你挣来的。",
         "objectives": {
           "0": {
@@ -15223,7 +15893,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "重续经纬",
-        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
+        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东北边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
         "completion": "又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。",
         "objectives": {
           "0": {
@@ -15233,7 +15903,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "重回灶台",
-        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
+        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西北边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
         "completion": "这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。",
         "objectives": {
           "0": {
@@ -16324,6 +16994,109 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "跑过试炼跑道",
+        "text": "谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。",
+        "completion": "这一趟我掐了表，{playerName}，比你脚快的人我也刷下去过。试炼跑道是你的了。我身后的路通往练武场，操练官鲁克在那里把脚上功夫变成剑上功夫：你的下一件差事在他手里。",
+        "objectives": {
+          "0": {
+            "label": "经过试炼跑道旗帜"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "击中要害",
+        "text": "练完了脚，该练手臂了，{playerName}。练武场就在我身后沿路而上的地方，那里的草人生来就是挨打的。要是找不着路，按 M 打开地图：你身上的每件差事都会标在上面。走到一个草人跟前，按 Tab 或用鼠标左键点击它，把它设为目标，然后按 1，或者点击屏幕底部动作条上的第一个图标，挥出这一刀。一直打到一个散架为止；它不会还手，草人从来不还手。操练官鲁克在练武场西侧、通往海滩的小路启程的地方看着场子：对着他按 F，交上这份战果。",
+        "completion": "干净利落的一击，手也已经稳多了。记住这种感觉，{playerName}：选定目标，挥刀，然后一直打下去。稻草挨打从不计较。你下一个挥刀的对象可就计较了。",
+        "objectives": {
+          "0": {
+            "label": "击倒训练草人"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "磨利锋刃",
+        "text": "挥砍就只是挥砍，{playerName}，草人能挨上一整天，可那赢不来任何东西。看看屏幕下方那一排按钮：那一排才是你的本事，每一个都能做到你光靠胳膊做不到的事。你已经有一个了。回到草人跟前用出来：选好目标，按下这座校场为你标出的那个按钮，做满三次。别只是乱砍草垛，要真正把你会的那一手打出来。做完就回来找我。",
+        "completion": "现在你是在战斗，而不是在瞎挥了。那一排会随着你每升一级变长，{playerName}，活得最久的，永远是会读那一排的人。草人不在乎你用了哪个按钮。山谷会在乎。",
+        "objectives": {
+          "0": {
+            "label": "对草人命中技能"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "甲壳与利螯",
+        "text": "稻草从不计较，{playerName}，所以给你找个计较的。滩涂掠蟹正在远滩的沉船滩上翻拣残骸：从我的练武场沿小路向西走，它会一直把你领到它们跟前。它们会夹回来，所以盯着你的生命条，别停下挥刀：用鼠标左键选定一只，然后使用校场教你的那个技能，打到它的壳裂开为止。三只就够。然后沿路爬上北边的坡：守潮人奈尔管着海滩的账，你的蟹壳她都记数。",
+        "completion": "敲开三只壳，十根手指一根没少：头一仗打得不赖，{playerName}。掠蟹从残骸里夹走东西的速度，比潮水送来的还快，所以你每除掉一只，就有人多保住一枚铜板。",
+        "objectives": {
+          "0": {
+            "label": "除灭滩涂掠蟹"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "珍珠之母",
+        "text": "三只蟹壳都敲开了，{playerName}。但沉船线上还有一位王，他守着的宝贝比这片沙滩上所有木箱加起来还值钱。带上这枚咸水诱饵，穿过残骸，去沙滩最西端的潮池。站在水边，按 B 打开背包，用鼠标左键点击诱饵，把他唤醒。螃蟹先生的钳子比他那些小个子亲戚狠得多，盯紧你的生命条，别停下攻击，喘不过气就沿着沙滩往后退。等他倒下，走到他的蟹壳前直到名字浮现，按 F 或用左键点击，取走他攥着的莹润珍珠。把那颗珍珠带回来给我。",
+        "completion": "莹润珍珠，还是从浅滩老王自己身上撬下来的。我父亲干活的每个清晨都会对那只螃蟹脱帽致意；该给的敬意总要给。别动... 好了。穿好线，镶好座，归你了，{playerName}：珍珠之母。按 B 打开背包，用左键点击戒指戴上它，再按 C 打开角色面板，看看它戴在你手上的样子。小小一件东西，戴上它，你的每一分都会更强。",
+        "objectives": {
+          "0": {
+            "label": "击败螃蟹先生"
+          },
+          "1": {
+            "label": "取得莹润珍珠"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "沉船滩",
+        "text": "我的搬运工把海货从旧沉船上卸下来，沿坡道扛往晨憩营地，{playerName}，可半数货箱从来到不了坡顶：它们被搁在路边，就此没人记得。沿我这条路朝营地走，你正好会从这些落单的货箱旁边经过。开箱很简单：走到货箱跟前，直到它的名字显示出来，然后按 F，或者用鼠标左键点击货箱本身，它就会把里面的东西交出来。开六只就能清完这条线，并且记住：你今后遇到的每一只箱子、每一处采集点、每一道门扉，用的都是同一个 F 键。军需官芬奇守着营地的货摊，残骸海货连一根木棍都收：把这批货交给她。",
+        "completion": "绳子、焦油，还有半轮大海竟然放过的奶酪：我全要了，{playerName}。一副肯弯腰扛货的脊背，对这座营地来说比任何刀剑都值钱，而你这一趟就把整条线清了个干净。",
+        "objectives": {
+          "0": {
+            "label": "开启漂流货箱"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "钱囊与背袋",
+        "text": "去谷地之前还有最后一课，{playerName}，也是保住冒险者性命的一课：你随身带的东西。你的背包有十六格，旁边还空着四个袋扣；每系上一只袋子，它的空间就并入总容量。所以：再对我按一次 F，打开我的货摊，在我的货品里用鼠标左键点击亚麻小袋买下它，然后按 B 打开背包，再用鼠标左键点击袋中的亚麻小袋，把它系进一个空着的袋扣。教官玛伦就在东边几步外的集合篝火旁操练：把你腰带上的小袋给她看看。",
+        "completion": "好袋子。要是还没系上，现在就系：按 B 打开背包，用鼠标左键点击小袋，把它系进一个空着的袋扣，多出的六格就归你装麻烦了。接下来是任何袋子都装不下的另一半课，{playerName}：背不下的，交给镀金保险箱。司库威克的保险箱桌就设在西边沿路而上的地方，他为你打开的正是每座城镇每位司库共用的同一座金库；等你的钱袋鼓起来，还能购买更多金库空间。贵重的存进金库，袋子留出空当。塞满的行囊断送过的冒险，比任何狼都多。",
+        "objectives": {
+          "0": {
+            "label": "购买亚麻小袋"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "风中传信",
+        "text": "还剩最后一个习惯要学，{playerName}，而且用不着刀剑：读告示板。公会告示柱就立在营地大门口，离我的篝火西南边几步远，公会和过路的队伍都把召集令贴在上面。走到柱面跟前，按 F，或者用鼠标左键点击它，读一读贴着的内容，然后回来告诉我风里捎来了什么。你今后走进的每一座城镇，都立着一块这样的告示板。",
+        "completion": "这下你知道消息在谷地里是怎么传的了，{playerName}：不靠信使，靠告示板。每过一座城镇都去看看；半数冒险的开头，不过是板上三行墨字。",
+        "objectives": {
+          "0": {
+            "label": "读过公会告示柱"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "漫长的归途",
+        "text": "只剩最后一课了，{playerName}，而这一课我说不明白：你得亲自经历一次。你在外头一定会死。谁都会死，而那并不是任何事情的终点。拿上这块往生石。按 B 打开背包，用鼠标左键点它，它就会让你在原地倒下。接着照屏幕上的指示做：释放灵魂，走回你自己的尸体，再走进去。尸体会等着你，那段路不要钱，走完它你什么也不会失去。",
+        "completion": "你就这样回来了，一点没少。记住那种感觉，{playerName}，因为下一次会牵扯到獠牙，而且没人站在旁边给你解释。尸体会等着你，那段路不要钱，死亡真正拿走的，只有你走回来的那点时间。",
+        "objectives": {
+          "0": {
+            "label": "从死亡中走了回来"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "扬帆起航",
+        "text": "这片海滨上已经没有你没跑过、没打倒过、没打开过、没买下过的东西了，{playerName}。你准备好了，而东溪谷有真正的差事在等着。沿海滨大道走回码头，对着渡船人奥多按 F，告诉他，就说是我说的，你挣到了这趟航程。什么时候记不清自己欠了谁什么，随时按 L：那是你的任务日志。",
+        "completion": "玛伦这么说了？能从一个曾让我练了一星期系缆绳的女人嘴里说出来，这可是极高的评价。等你准备好了就敲响立在我码头旁的那口铃，{playerName}，渡航会把你送到东溪镇的正中央。当心狼群。",
+        "objectives": {
+          "0": {
+            "label": "向渡船人奥多报到"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "沿风道而下",
         "text": "你爬上来了，{playerName}，看来风决定留下你了。烛港在丘陵路的东头，藏在小湾的背风处。港务长奥黛尔清点每一个翻过隘口的人，她也会想把你点上一笔。告诉她风道还开着。",
@@ -16521,6 +17294,9 @@ export const zh_CN: EnTranslations = {
           },
           "11": {
             "label": "远岸沙洲堤道"
+          },
+          "12": {
+            "label": "东溪码头"
           }
         }
       },
@@ -16883,6 +17659,27 @@ export const zh_CN: EnTranslations = {
             "label": "裂野"
           }
         }
+      },
+      "proving_shore": {
+        "name": "试炼之滨",
+        "welcome": "试炼之滨对你别无所求，只求时间。熟悉营地，砍倒草人，走一趟沉船滩，等你准备好了，渡船人奥多会送你过海去谷地。",
+        "pois": {
+          "0": {
+            "label": "晨憩营地"
+          },
+          "1": {
+            "label": "旧码头"
+          },
+          "2": {
+            "label": "练武场"
+          },
+          "3": {
+            "label": "沉船滩"
+          },
+          "4": {
+            "label": "试炼跑道"
+          }
+        }
       }
     },
     "dungeons": {
@@ -17124,6 +17921,21 @@ export const zh_CN: EnTranslations = {
         "sender": "吉泽尔修补匠",
         "subject": "大师级，轰",
         "body": "你有一门主修技艺到了大师级，最顶上，轰，整架梯子，爬完了。我不派发夸奖，我派发引线，不过这次两样都给你：你既出色，又有那么点吓人。去让群山紧张紧张吧。"
+      },
+      "woc_market_delivery": {
+        "sender": "交易所经纪人",
+        "subject": "你的交易所购得之物",
+        "body": "交易已结清，货物归你所有。随信的包裹装着你所购买的那一件物品：自挂单之时起，它便由交易所托管，直到你的付款结清为止。\n\n这笔交易的记录已存入交易所账册。\n\n- 交易所经纪人"
+      },
+      "woc_market_return": {
+        "sender": "交易所经纪人",
+        "subject": "你的交易所挂单已结束",
+        "body": "你的挂单结束，交易未能完成：拍卖无人问津、底价未达、挂单被撤回，或中标者未能付款。你的货物随信原样奉还，与托管之时分毫不差。\n\n- 交易所经纪人"
+      },
+      "woc_market_sold": {
+        "sender": "交易所经纪人",
+        "subject": "你的交易所挂单已售出",
+        "body": "你的挂单已售出，买家已足额付款。所得款项在结算交易中直接汇入你绑定的钱包（已扣除交易所费用）；交易所从未经手你的钱款。\n\n这笔交易的记录已存入交易所账册。\n\n- 交易所经纪人"
       }
     },
     "itemSets": {

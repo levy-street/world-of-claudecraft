@@ -13,8 +13,10 @@ export type AdminPage =
   | 'characters'
   | 'online-players'
   | 'guilds'
+  | 'top-holders'
   | 'moderation'
   | 'moderation-history'
+  | 'flags'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -64,6 +66,9 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
       // keeps the already-localized title that panel used.
       { id: 'online-players', labelKey: 'online.title', permission: 'accounts.read' },
       { id: 'guilds', labelKey: 'nav.guilds', permission: 'accounts.read' },
+      // The rich list (economy oversight): reads the same materialised wealth
+      // data the accounts list sorts by, so it rides the same permission.
+      { id: 'top-holders', labelKey: 'nav.topHolders', permission: 'accounts.read' },
     ],
   },
   {
@@ -72,6 +77,9 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     defaultPage: 'moderation',
     items: [
       { id: 'moderation', labelKey: 'nav.reports', permission: 'moderation.read' },
+      // Persisted suspicion flags (economy oversight): the workflow queue over
+      // the flag store the monitoring emitters feed.
+      { id: 'flags', labelKey: 'nav.flags', permission: 'moderation.read' },
       { id: 'moderation-history', labelKey: 'nav.history', permission: 'moderation.read' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps', permission: 'moderation.read' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps', permission: 'moderation.read' },

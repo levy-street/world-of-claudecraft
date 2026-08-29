@@ -21,4 +21,7 @@ export interface IWorldTrade {
   tradeSetOffer(items: InvSlot[], copper: number): void;
   tradeConfirm(): void;
   tradeCancel(): void;
+  /** End the session without calling it a cancellation, for when the business
+   *  the window existed for has concluded elsewhere. */
+  tradeClose(): void;
 }

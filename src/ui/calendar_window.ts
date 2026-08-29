@@ -37,6 +37,10 @@ const SYSTEM_EVENT_TEXT: Record<string, { title: TranslationKey; note: Translati
     title: 'hudChrome.calendar.events.arenaClash.title',
     note: 'hudChrome.calendar.events.arenaClash.note',
   },
+  double_honor: {
+    title: 'hudChrome.calendar.events.doubleHonor.title',
+    note: 'hudChrome.calendar.events.doubleHonor.note',
+  },
   fishing_derby: {
     title: 'hudChrome.calendar.events.fishingDerby.title',
     note: 'hudChrome.calendar.events.fishingDerby.note',

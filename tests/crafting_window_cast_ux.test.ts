@@ -8,6 +8,8 @@
 // cold batch label. Announcements ride deps.announce (the static
 // #crafting-live region), never a node inside the rebuilt subtree.
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import { CRAFT_CAST_ID } from '../src/sim/types';
@@ -311,5 +313,186 @@ describe('renderCraftingWindow craft-cast UX', () => {
     inc!.click();
     expect(d.onCraftQty).toHaveBeenCalledWith('recipe_test_stew', 3);
     expect(d.announce).toHaveBeenCalledWith(expect.stringMatching(/3/));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Craft-from-vault render sink (Bank Storage Phase 04): the vault-draw suffix
+// is stated in WORDS on the visible reagent line AND the aria fold (never
+// color alone), exactly like the fine-substitution suffix it sits beside.
+// ---------------------------------------------------------------------------
+describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
+  function vaultBackedView(): CraftingView {
+    // 0 carried, 2 in the vault, 1 required: the whole requirement is a
+    // vault draw, so the suffix must render with count 1.
+    return buildCraftingView(
+      [
+        {
+          id: 'recipe_test_stew',
+          professionId: 'cooking',
+          resultItemId: 'test_stew',
+          resultCount: 1,
+          reagents: [{ itemId: 'copper_ore', count: 1 }],
+          skillReq: 0,
+        },
+      ],
+      [],
+      ITEMS,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set(),
+      null,
+      { copper_ore: 2 },
+    );
+  }
+
+  it('renders the suffix in the visible line and the aria fold, and enables the Craft button', () => {
+    const el = document.createElement('div');
+    renderCraftingWindow(el, vaultBackedView(), deps());
+    const marker = el.querySelector('.crafting-vault-draw');
+    expect(marker).not.toBeNull();
+    // The resolved ENGLISH copy (hudChrome.crafting.reagentVaultDraw), a
+    // literal so a key rename or param break reds here.
+    expect(marker?.textContent).toContain('(draws 1 from your vault)');
+    // The aria fold carries the same words (the fairness rule: never a
+    // visual-only signal).
+    const ariaCarrier = el.querySelector('[aria-label*="draws 1 from your vault"]');
+    expect(ariaCarrier, 'no element carries the suffix in its aria-label').not.toBeNull();
+    // The vault-backed row is CRAFTABLE: the send gate agrees with the sim.
+    const craftBtn = el.querySelector<HTMLButtonElement>('button.crafting-recipe-btn');
+    expect(craftBtn).not.toBeNull();
+    expect(craftBtn?.disabled).toBe(false);
+  });
+
+  it('a carried-only view renders NO vault-draw marker (the control)', () => {
+    const el = document.createElement('div');
+    renderCraftingWindow(el, craftableView(), deps());
+    expect(el.querySelector('.crafting-vault-draw')).toBeNull();
+  });
+
+  it('BOTH suffixes compose when the same units are fine-grade AND vault-drawn (reviewed order)', () => {
+    // The overlap the two docblocks call deliberate (one suffix warns about
+    // grade VALUE, the other about SOURCE): a vault holding only fine-grade
+    // units against a bags-empty requirement makes fineSubstituted and
+    // vaultDrawn describe the SAME three units. This pin makes the wording
+    // and order a reviewed decision (fine first, vault second, matching the
+    // painter's concatenation) rather than an emergent one; if the copy is
+    // ever judged double-counting, this is the arm to move with the fix.
+    const bothItems = Object.fromEntries(
+      ['copper_ore', 'fine_copper_ore', 'test_stew'].map((id) => [id, item(id)]),
+    );
+    const view = buildCraftingView(
+      [
+        {
+          id: 'recipe_test_stew',
+          professionId: 'cooking',
+          resultItemId: 'test_stew',
+          resultCount: 1,
+          reagents: [{ itemId: 'copper_ore', count: 3 }],
+          skillReq: 0,
+        },
+      ],
+      [],
+      bothItems,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set(),
+      null,
+      { fine_copper_ore: 3 },
+    );
+    const reagent = view.recipes[0].reagents[0];
+    expect(reagent).toMatchObject({ fineSubstituted: 3, vaultDrawn: 3, satisfied: true });
+
+    const el = document.createElement('div');
+    renderCraftingWindow(el, view, deps());
+    const line = el.querySelector('.crafting-reagent-line, .crafting-vault-draw')?.parentElement;
+    const text = (line ?? el).textContent ?? '';
+    const fineAt = text.indexOf('(spends 3 fine-grade)');
+    const vaultAt = text.indexOf('(draws 3 from your vault)');
+    expect(fineAt).toBeGreaterThan(-1);
+    expect(vaultAt).toBeGreaterThan(fineAt); // fine first, vault second
+    const ariaCarrier = el.querySelector('[aria-label*="draws 3 from your vault"]');
+    expect(ariaCarrier?.getAttribute('aria-label') ?? '').toContain('(spends 3 fine-grade)');
+  });
+
+  it('renders the vault-unreachable note once, OUTSIDE the scroll body, on a short visible tab', () => {
+    // The place-blocked reason (Phase 04 QA, the stationOutOfRange
+    // precedent): stated in words, location-scoped (one note for the
+    // window), rendered only when the core derived it AND the visible
+    // section has a short row (the fix-round scoping), and a SIBLING of the
+    // scroll body (a first child would hide above the restored scrollTop on
+    // the very repaint that introduces it, the fix-round S2 finding).
+    const blockedShort = buildCraftingView(
+      [
+        {
+          id: 'recipe_test_stew',
+          professionId: 'cooking',
+          resultItemId: 'test_stew',
+          resultCount: 1,
+          reagents: [{ itemId: 'copper_ore', count: 3 }],
+          skillReq: 0,
+        },
+      ],
+      [],
+      ITEMS,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set(),
+      null,
+      null,
+      true,
+    );
+    expect(blockedShort.vaultNote).toBe(true);
+    const el = document.createElement('div');
+    renderCraftingWindow(el, blockedShort, deps());
+    const notes = el.querySelectorAll('.crafting-vault-note');
+    expect(notes).toHaveLength(1);
+    // The resolved ENGLISH copy (hudChrome.crafting.vaultUnreachable): a
+    // literal so a key rename or a fallback idiom reds here.
+    expect(notes[0]?.textContent).toBe('The Materials Vault is out of reach here.');
+    // Outside the scroll container, before it in document order.
+    expect(notes[0]?.closest('.crafting-body')).toBeNull();
+    const body = el.querySelector('.crafting-body');
+    expect(body).not.toBeNull();
+    expect(
+      notes[0] && body
+        ? notes[0].compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING
+        : 0,
+    ).toBeTruthy();
+
+    // Satisfied visible tab: the note stays quiet even when the core flag is
+    // set (a short recipe on ANOTHER tab is not this tab's business).
+    const noted = { ...vaultBackedView(), vaultNote: true };
+    const control = document.createElement('div');
+    renderCraftingWindow(control, noted, deps());
+    expect(control.querySelector('.crafting-vault-note')).toBeNull();
+
+    // And without the core flag, a short tab renders no note either.
+    const unflagged = { ...blockedShort, vaultNote: false };
+    const control2 = document.createElement('div');
+    renderCraftingWindow(control2, unflagged, deps());
+    expect(control2.querySelector('.crafting-vault-note')).toBeNull();
+  });
+
+  it('both suffix classes carry their token rule in components.css (deleting either reds)', () => {
+    // The render tests above assert the CLASS lands on the span; without this
+    // pin, deleting the CSS rule renders both suffixes in inherited grey with
+    // every suite still green. The two rules are deliberately separate
+    // duplicates (divergence hooks under the rule of three); each is pinned
+    // to the same token so a silent drop of either one reds by name.
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    for (const cls of ['.crafting-fine-sub', '.crafting-vault-draw']) {
+      const at = css.indexOf(`${cls} {`);
+      expect(at, `${cls} rule missing from components.css`).toBeGreaterThan(-1);
+      const body = css.slice(at, css.indexOf('}', at));
+      expect(body, `${cls} lost its token tint`).toContain('color: var(--gold-dim)');
+    }
+    // The vault note's own rule (the fix-round S1 finding: the family
+    // selector is direct-child scoped to the recipe item and cannot reach a
+    // window-level sibling, so a bare class here rendered UNstyled).
+    const noteAt = css.indexOf('.crafting-vault-note {');
+    expect(noteAt, '.crafting-vault-note rule missing from components.css').toBeGreaterThan(-1);
+    const noteBody = css.slice(noteAt, css.indexOf('}', noteAt));
+    expect(noteBody).toContain('color: var(--color-text-muted)');
   });
 });

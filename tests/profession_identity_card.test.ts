@@ -253,6 +253,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'combo_recipe',
@@ -266,6 +267,7 @@ describe('profession identity card painter contract', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
             comboRequirement: {
               craftA: 'armorcrafting',
               craftB: 'weaponcrafting',
@@ -339,6 +341,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
@@ -352,6 +355,7 @@ describe('profession identity card painter contract', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -396,6 +400,7 @@ describe('profession identity card painter contract', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'known_weapon',
@@ -409,6 +414,7 @@ describe('profession identity card painter contract', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
           {
             recipeId: 'known_armor',
@@ -422,6 +428,7 @@ describe('profession identity card painter contract', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -689,6 +696,7 @@ describe('crafting window pins', () => {
     onSelectCraft: vi.fn(),
   });
   const comboRow = (unmetCrafts: string[]) => ({
+    vaultNote: false,
     recipes: [
       {
         recipeId: 'combo_recipe',
@@ -702,6 +710,7 @@ describe('crafting window pins', () => {
         craftable: false,
         commissionEligible: false,
         durationSec: 1.75,
+        craftFeeCopper: 0,
         comboRequirement: {
           craftA: 'armorcrafting',
           craftB: 'weaponcrafting',
@@ -745,6 +754,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'gray_recipe',
@@ -758,6 +768,7 @@ describe('crafting window pins', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -799,6 +810,7 @@ describe('crafting window pins', () => {
       renderCraftingWindow(
         parent,
         {
+          vaultNote: false,
           recipes: [
             {
               recipeId: `tint_${difficulty}`,
@@ -812,6 +824,7 @@ describe('crafting window pins', () => {
               craftable: true,
               commissionEligible: false,
               durationSec: 1.75,
+              craftFeeCopper: 0,
             },
           ],
         },
@@ -855,7 +868,7 @@ describe('crafting window pins', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     try {
-      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
       const first = el.querySelector<HTMLElement>('.profession-skill-list');
       const firstCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(first).not.toBeNull();
@@ -866,7 +879,7 @@ describe('crafting window pins', () => {
       firstCard.scrollTop = 45;
       first.focus();
       expect(document.activeElement).toBe(first);
-      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
       const second = el.querySelector<HTMLElement>('.profession-skill-list');
       const secondCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(second).not.toBeNull();
@@ -886,7 +899,7 @@ describe('crafting window pins', () => {
     // the card into the scroll pane would keep every other assertion green
     // while silently voiding the cap's purpose.
     const el = document.createElement('div');
-    renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+    renderCraftingWindow(el, { recipes: [], vaultNote: false }, deps(), attunedIdentity());
     const card = el.querySelector('.profession-identity-card');
     const body = el.querySelector('.crafting-body');
     expect(card).not.toBeNull();
@@ -903,6 +916,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
@@ -916,6 +930,7 @@ describe('crafting window pins', () => {
             craftable: true,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -933,6 +948,7 @@ describe('crafting window pins', () => {
     renderCraftingWindow(
       parent,
       {
+        vaultNote: false,
         recipes: [
           {
             recipeId: 'station_recipe',
@@ -946,6 +962,7 @@ describe('crafting window pins', () => {
             craftable: false,
             commissionEligible: false,
             durationSec: 1.75,
+            craftFeeCopper: 0,
           },
         ],
       },
@@ -1017,25 +1034,29 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
 });
 
 describe('craftResult deny toast names the station (source pins)', () => {
+  // The reason-to-key mapping moved out of hud.ts into the
+  // src/ui/crafting_deny_core.ts pure core (whose own suite pins the table
+  // behaviorally and exhaustively); these pins follow the code they pin.
   const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  const core = readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_deny_core.ts'), 'utf8');
 
   it('station_required resolves the type from recipe content (no station field rides the event)', () => {
-    expect(hud).toMatch(
-      /ev\.reason === 'station_required' \? recipeById\(ev\.recipeId\)\?\.stationType : undefined/,
+    expect(core).toMatch(
+      /reason === 'station_required' \? recipeById\(recipeId\)\?\.stationType : undefined/,
     );
   });
 
   it('a resolved type renders the NAMED toast via stationRequired + stationNameText', () => {
     expect(hud).toContain("t('hudChrome.crafting.stationRequired', {");
-    expect(hud).toContain('station: stationNameText(deniedStationType),');
+    expect(hud).toContain('station: stationNameText(deny.stationType),');
   });
 
   it('no_bag_space pairs with the noBagSpace toast, insufficientMaterials as the chain tail', () => {
     // The reason chain reads no_bag_space ? noBagSpace : insufficientMaterials,
     // so pin the pairing (a key swap in the ternary tail must fail here) rather
     // than a bare presence check that two swapped keys could still satisfy.
-    expect(hud).toMatch(
-      /ev\.reason === 'no_bag_space'\s*\?\s*'hudChrome\.crafting\.noBagSpace'\s*:\s*'hudChrome\.crafting\.insufficientMaterials'/,
+    expect(core).toMatch(
+      /reason === 'no_bag_space'\s*\?\s*'hudChrome\.crafting\.noBagSpace'\s*:\s*'hudChrome\.crafting\.insufficientMaterials'/,
     );
   });
 });

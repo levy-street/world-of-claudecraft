@@ -103,6 +103,7 @@ describe('the wired roots (the surfaces the fix covers)', () => {
       '#deeds-window',
       '#reliquary-window',
       '#professions-window',
+      '#woc-market-window',
       '#side-buttons',
     ]);
   });

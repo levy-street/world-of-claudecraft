@@ -28,7 +28,6 @@ export const SKY_HDR_STEMS = [
   'nightbloom_dream',
   'palmreach_day',
   'peaks_dawn',
-  'vale_cup',
   'vale_day',
   'wraithwood_gloom',
 ];

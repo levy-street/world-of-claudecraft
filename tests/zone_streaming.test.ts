@@ -36,6 +36,7 @@ describe('renderer zone-streaming horizon', () => {
       'farshore_isle',
       'mirefen_marsh',
       'galecrest',
+      'proving_shore', // the tutorial island, one cell west of the vale
       'willowfen',
     ]);
     expect(ids.length).toBeLessThan(ZONES.length / 2);
@@ -47,6 +48,7 @@ describe('renderer zone-streaming horizon', () => {
       'eastbrook_vale',
       'farshore_isle',
       'mirefen_marsh',
+      'proving_shore', // the tutorial island shares the vale biome, so no new sky
     ]);
     expect([...new Set(nearby.map((zone) => zone.biome))]).toEqual(['vale', 'marsh']);
   });

@@ -21,7 +21,6 @@ import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
-import { SPORT_ABILITIES } from './vale_cup';
 
 // ---------------------------------------------------------------------------
 // Player classes — per-level base stats follow classic-era growth curves.
@@ -260,6 +259,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'instant_poison',
       'adrenaline_rush',
       'deadly_poison',
+      'melting_acid',
+      'nightshade_coating',
       'blind',
       'stealth',
       'kick',
@@ -3258,9 +3259,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresStealth: true,
     requiresOutOfCombat: true,
+    // The classic setup tool: it neither reveals the rogue (preservesStealth in
+    // effect_dispatch) nor starts a fight, so the victim wakes where it stood.
+    // Its PvP diminishing returns ride the 'incapacitate' category, the same
+    // full/half/quarter/immune ladder Gripping Roots uses (src/sim/incapacitate_dr.ts).
+    noCombatEntry: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
-      'Incapacitates the target for 8 sec. Must be stealthed and out of combat. Any damage breaks the effect.',
+      'Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect.',
   },
   crippling_poison: {
     id: 'crippling_poison',
@@ -3362,6 +3368,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'imbue', bonus: 14, duration: 1800 }],
     description:
       'Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage.',
+  },
+  // The two utility poisons. Both are STRIKE poisons in the Leaden Venom
+  // (crippling_poison) mould rather than weapon coats: same class, cost, school,
+  // melee range, and the same small 3 to 5 Nature hit that carries the strike
+  // into combat and gives the debuff something to ride in on. Only the rider
+  // differs, so no new balance number is invented beyond the two the design
+  // asked for (5% armor, 25% healing taken, 12 sec each, matching Leaden
+  // Venom's 12 sec snare).
+  melting_acid: {
+    id: 'melting_acid',
+    name: 'Melting Acid',
+    class: 'rogue',
+    learnLevel: 16,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 3, max: 5 },
+      { type: 'buffTarget', kind: 'melting_acid', value: 0.05, duration: 12 },
+    ],
+    description:
+      'Splashes the target with a caustic poison, dealing $d Nature damage and reducing its armor by 5% for 12 sec.',
+  },
+  nightshade_coating: {
+    id: 'nightshade_coating',
+    name: 'Nightshade Coating',
+    class: 'rogue',
+    learnLevel: 18,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 3, max: 5 },
+      // Reuses the existing healing-taken debuff kind (combat/heal.ts folds
+      // every mortal_wound aura in). Its aura id is the ability id (the first
+      // buffTarget of a def), so it never evicts a warrior's Maiming Strike
+      // debuff or vice versa.
+      { type: 'buffTarget', kind: 'mortal_wound', value: 0.25, duration: 12 },
+    ],
+    description:
+      'Coats the target in nightshade, dealing $d Nature damage and reducing the healing it receives by 25% for 12 sec.',
   },
   blind: {
     id: 'blind',
@@ -4059,7 +4112,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
-    description: "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min.",
+    description:
+      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
   },
   pack_rally: {
     id: 'pack_rally',
@@ -4607,7 +4661,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
   },
   stormsurge: {
     id: 'stormsurge',
@@ -5111,7 +5165,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
+      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
   },
   cruel_pact: {
     id: 'cruel_pact',
@@ -5721,7 +5775,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'summonPyreColossus', duration: 30 },
     ],
     description:
-      'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+      'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
   },
   soul_harvest: {
     id: 'soul_harvest',
@@ -8251,7 +8305,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+      'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
   },
   hot_streak: {
     id: 'hot_streak',
@@ -8341,7 +8395,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants
   // them outside a match (resolveSportKit is the only entry).
-  ...SPORT_ABILITIES,
 };
 
 const PALADIN_LEGACY_ABILITY_IDS = [
@@ -8583,7 +8636,13 @@ function scaleEffect(
         ? { ...eff, value: Math.round(eff.value * dmgMult + flat) }
         : eff;
     case 'lifeTap':
-      return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
+      // Same policy as gainResource below: a health-to-mana conversion is
+      // economy, not damage. Scaling only the mana half would also break the
+      // authored hp == mana symmetry the Hard Bargain tooltip promises
+      // ("Converts {damage} health into {damage} mana"). Intentional yield
+      // scaling rides the per-ability buffPct (Blood Credit), applied at the
+      // effect_dispatch lifeTap arm.
+      return eff;
     case 'gainResource':
       // Resource generation is economy, not damage. Damage modifiers must not
       // alter an authored Focus, Rage, or Energy gain.

@@ -7,7 +7,7 @@
   import { auth } from '../state/auth.svelte';
   import { SEARCH_DEBOUNCE_MS } from '../state/poll';
   import { t } from '../i18n';
-  import { fmtDate, fmtDuration, fmtNumber, fmtRelative } from '../format';
+  import { fmtCopper, fmtDate, fmtDuration, fmtNumber, fmtRelative } from '../format';
   import Panel from '../components/Panel.svelte';
   import Badge from '../components/Badge.svelte';
   import AccountLink from '../components/AccountLink.svelte';
@@ -20,7 +20,8 @@
     | 'max_level'
     | 'playtime_seconds'
     | 'created_at'
-    | 'last_login';
+    | 'last_login'
+    | 'total_copper';
 
   const accountModal = getAccountModalController();
   let accounts = $state<Paginated<AccountRow> | null>(null);
@@ -142,6 +143,11 @@
               {t('accounts.colPlaytime')}<span aria-hidden="true">{sortArrow('playtime_seconds')}</span>
             </button>
           </th>
+          <th class="num sortable" aria-sort={ariaSort('total_copper')}>
+            <button type="button" onclick={() => changeSort('total_copper')}>
+              {t('accounts.colGold')}<span aria-hidden="true">{sortArrow('total_copper')}</span>
+            </button>
+          </th>
           <th class="sortable" aria-sort={ariaSort('created_at')}>
             <button type="button" onclick={() => changeSort('created_at')}>
               {t('accounts.colRegistered')}<span aria-hidden="true">{sortArrow('created_at')}</span>
@@ -177,10 +183,16 @@
               {:else if status === 'suspended'}
                 <Badge variant="warn">{t('accounts.badgeSuspended')}</Badge>
               {/if}
+              {#if (account.activeFlagCount ?? 0) > 0}
+                <Badge variant="bad">
+                  {t('flags.badgeFlagged', { n: fmtNumber(account.activeFlagCount ?? 0) })}
+                </Badge>
+              {/if}
             </td>
             <td class="num">{account.characterCount}</td>
             <td class="num">{account.maxLevel}</td>
             <td class="num">{fmtDuration(account.playtimeSeconds)}</td>
+            <td class="num">{fmtCopper(account.totalCopper)}</td>
             <td>{fmtDate(account.createdAt)}</td>
             <td>{fmtRelative(account.lastLogin)}</td>
           </tr>

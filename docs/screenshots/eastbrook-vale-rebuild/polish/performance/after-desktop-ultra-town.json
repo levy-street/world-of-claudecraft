@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "e922918ac730f196234a3d450f04845affc5d5986804dff6135fe36efe94b4d2",
+    "fingerprint": "731a596facf6af99bde5a2f1bf1298c633b5e955820baea45dc87d12b7c4c995",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -22,7 +22,7 @@
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
-        "sha256": "a2f80d23e3eb68b404e756b83a95d034eb8fc1f8b439470fea911c8389769fcd"
+        "sha256": "d53f5425a23e3f30a61d604edbdedc3c9a46bd8803f942ee41b470f0ce92669e"
       },
       "civicShader": {
         "path": "src/render/eastbrook_civic_beacon.ts",
@@ -31,7 +31,7 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "36414538cf9aa5ffdff045c52c781ab60cf8b07eb34d105afc4c9e92e4b2775f"
+          "sha256": "f6f9d96f92aef1957c2489d5a0a4b39cca134a48296966205fbce63c0581a7c6"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
@@ -43,15 +43,15 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "8d468dd58f33df5e1efdd83c5844dacbaef9defd0030a6020e286ad044a22962"
+          "sha256": "df4d13bf67771bb9e661c100266fb5ec30630d7fa4c7291ebdafb980b30ec888"
         },
         "entityViewPolicy": {
           "path": "src/render/entity_view_policy_core.ts",
-          "sha256": "da1c6dbbe69f79e06405a643c5bbed24b2f136b7c6ead75a4ce38657ddfbbc2d"
+          "sha256": "4fedae25b651e82b34a35c21cb203c68496fc06a6c574d87c06a42c4edcb8413"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
-          "sha256": "d5c6d2aaf19cae072081b64d59084f6bd9795c3a9ffbc61fe991f0a323bcb51b"
+          "sha256": "813884bb2c85fcb187c890715a8ef360d54ae25b9fadfbdafe2cf86c543004db"
         }
       },
       "mailbox": {
@@ -72,7 +72,7 @@
       },
       "captureContract": {
         "id": "polish-v2",
-        "sha256": "707e9616d704ebf2865766dcdd7e8eac71659aab0691ce0ccb5c8aa3d28d0cd4"
+        "sha256": "d2d299894a4b668bfacff8883eb49a51793b2160d80b17ff6938afc3dc98ea55"
       }
     }
   },

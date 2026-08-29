@@ -138,7 +138,9 @@ describe('tradeSetOffer bound-copy clamp (partial stock + deny-once)', () => {
     // The line clamped to the 2 unbound copies rather than dropping entirely.
     const session = tradeMod.tradeFor(sim.ctx, a);
     const aOffer = session?.a === a ? session?.offerA : session?.offerB;
-    expect(aOffer?.items).toEqual([{ itemId: STEEL, count: 2 }]);
+    // The staged slot carries the armed payload since the per-copy staging
+    // change (the clamp still keeps the BOUND copy off the table).
+    expect(aOffer?.items).toEqual([{ itemId: STEEL, count: 2, instance: { bindOnTrade: true } }]);
 
     // The completed swap moves ONLY the unbound copies: B receives 2 (stamped
     // to B on grant), A keeps exactly the A-bound copy.

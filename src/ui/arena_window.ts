@@ -80,6 +80,19 @@ export interface ArenaWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
 }
 
+export interface ThornhollowPrewarmHooks {
+  startPreview(): void;
+  pausePreview(): void;
+  commit(): void;
+}
+
+let thornhollowPrewarm: ThornhollowPrewarmHooks | null = null;
+
+/** main.ts injects render ownership without making this UI painter import it. */
+export function setThornhollowPrewarmHooks(hooks: ThornhollowPrewarmHooks): void {
+  thornhollowPrewarm = hooks;
+}
+
 export class ArenaWindow {
   /** The active tab; Thornhollow Fields is the window's primary tab. */
   private tab: PvpTabId = 'ravenrift';
@@ -147,6 +160,7 @@ export class ArenaWindow {
       return;
     }
     el.style.display = 'none';
+    thornhollowPrewarm?.pausePreview();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -217,9 +231,11 @@ export class ArenaWindow {
     if (strip.commit) this.tab = strip.active;
 
     if (this.tab === 'ravenrift') {
+      thornhollowPrewarm?.startPreview();
       this.renderThornhollowFields(el, world, strip);
       return;
     }
+    thornhollowPrewarm?.pausePreview();
     this.renderArena(el, world, strip, this.tab);
   }
 
@@ -252,6 +268,7 @@ export class ArenaWindow {
     el.innerHTML = this.bgTitleHtml() + this.stripHtml(strip) + this.bgBodyHtml(view);
     this.wireChrome(el);
     el.querySelector('[data-act="queue"]')?.addEventListener('click', () => {
+      thornhollowPrewarm?.commit();
       this.deps.world().bgQueueJoin();
       audio.click();
     });
@@ -370,6 +387,9 @@ export class ArenaWindow {
     return (
       blurb +
       rank +
+      // Event chip above the daily chip: the realm-wide, rarer fact reads
+      // first, and both sit against the queue affordance they advertise.
+      this.bgDoubleHonorChipHtml(view.doubleHonor) +
       this.bgFirstWinChipHtml(view.firstWinBonus) +
       this.bgActionHtml(view.action) +
       onlineSection +
@@ -388,6 +408,18 @@ export class ArenaWindow {
   private bgFirstWinChipHtml(bonus: { honor: number } | null): string {
     if (!bonus) return '';
     const label = t('hudChrome.bg.firstWinBonusLine', { honor: num(bonus.honor) });
+    return (
+      `<div class="bg-firstwin-chip"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
+      `<span>${esc(label)}</span></div>`
+    );
+  }
+
+  /** The Double Honor Weekend event chip: same accessibility posture (and the
+   *  same chip styling) as the first-win chip above, absent outside the
+   *  weekend window (the pure view decides, never this painter). */
+  private bgDoubleHonorChipHtml(event: { multiplier: number } | null): string {
+    if (!event) return '';
+    const label = t('hudChrome.bg.doubleHonorLine', { mult: num(event.multiplier) });
     return (
       `<div class="bg-firstwin-chip"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
       `<span>${esc(label)}</span></div>`

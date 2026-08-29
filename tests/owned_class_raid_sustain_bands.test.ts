@@ -42,14 +42,21 @@ describe('owned-class raid-level balance harness (sustain bands)', () => {
         // (seeds 29_930/29_931 roll Warspirit low), so the diet floor is 0.76
         // and ceiling 1.05, the same relative margins at the diet actual.
         expect(warspirit.dps).toBeGreaterThanOrEqual(vespers.dps * band(0.81, 0.76));
-        // Full-sweep ceiling kept at 1.12 (level-22 measured 1.0568 that
-        // round). Re-author the pair when the owned-class stack integrates.
+        // Full-sweep ceiling kept at 1.12 (210 softening round full-sweep
+        // actuals: level-22 1.0851, level-23 1.0860, level-24 1.0216; was
+        // 1.0568 at level 22 the round before). Re-author the pair when the
+        // owned-class stack integrates.
         expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * band(1.12, 1.05));
-        // Warspirit readyIdle actuals 19.40 full / 19.00 diet; buttons 72.0 /
-        // 72.5; vespers resourceEnd 2201.0 / 2133.5. Same-relative-margin
-        // re-pins at the diet actuals.
-        expect(warspirit.readyIdleSeconds).toBeLessThanOrEqual(band(40, 39));
-        expect(warspirit.buttonsPressed).toBeGreaterThanOrEqual(55);
+        // 200 DPS convergence package re-measure (echo 0.25, baseline apPct
+        // 0.05, Ancestral Strike 0.5, BiS-anchored fixture with the Unleash
+        // weave): readyIdle actuals 44.6 to 45.5 full / 45.05 diet, buttons
+        // 54.0 to 54.6 full / 54.5 diet; the trimmed AP and mana economy
+        // waits on the cadence more (proc-and-react idle is the design, per
+        // the spec-by-spec study). Bounds re-pinned at about a 10 percent
+        // margin instead of the old 2x slack so the tripwire stays meaningful;
+        // vespers resourceEnd unchanged (2201.0 / 2133.5).
+        expect(warspirit.readyIdleSeconds).toBeLessThanOrEqual(band(50, 50));
+        expect(warspirit.buttonsPressed).toBeGreaterThanOrEqual(50);
         expect(vespers.resourceEnd).toBeGreaterThanOrEqual(band(800, 775));
         // Nonzero avoidance pins hold with margin at the diet configuration
         // too (resist 15.5 / 1.5 averaged, miss+dodge 29).

@@ -156,6 +156,8 @@ export function eventDigest(events: readonly unknown[]): string {
 export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'name', // display/identity
   'guild', // server-set display only
+  'pledgeGuild', // server-set display only (guild pledge board)
+  'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
   'prevFacing',
   'netUpdatedAt', // online wire cadence
@@ -207,6 +209,11 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
 // drift and large nested blobs while their inputs stay pinned.
 export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'characterId', // DB id; not sim-deterministic offline
+  // Server-supplied account fact (ws_auth's fresh-join stamp for the tutorial
+  // greeting), documented transient on PlayerMeta: never serialized, recomputed
+  // at every join. The characterId/bankBonusSources class: the two hosts must
+  // not digest an account-table readout.
+  'firstCharacter',
   'name', // identity
   'skin', // appearance
   'skinCatalog',
@@ -243,6 +250,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments
   'fiestaSpecial', // derived from augments
+  'bankWireRev', // runtime-only bank snapshot dirty counter; never serialized/persisted
+  'vaultWireRev', // runtime-only vault snapshot dirty counter; never serialized/persisted
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
 ]);
 

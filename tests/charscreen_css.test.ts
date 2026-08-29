@@ -74,9 +74,14 @@ describe('inspect showcase CSS', () => {
 
   it('the model stage takes the inspected player class color via a CSS custom property', () => {
     expect(shell).toContain(
-      '#inspect-window .inspect-model-panel { min-height: 400px; border: 1px solid var(--inspect-class-color',
+      '#inspect-window .inspect-model-panel { min-height: 400px; border: 1px solid var(--color-border-showcase);',
     );
-    expect(shell).toContain('var(--inspect-class-color, #5a4a20) 35%, transparent)');
+    expect(shell).toContain(
+      'outline: 1px solid color-mix(in srgb, var(--inspect-class-color, #5a4a20) 38%, transparent);',
+    );
+    expect(shell).toContain(
+      'color-mix(in srgb, var(--inspect-class-color, #5a4a20) 15%, transparent),',
+    );
   });
 
   it('the honor chip drops its gold override to the shared muted chip color', () => {

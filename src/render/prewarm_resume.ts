@@ -3,6 +3,8 @@
 // no whole-entry callback: requestIdleCallback cannot preempt synchronous work
 // once it starts, including Three r165's compileAsync traversal prologue.
 
+import type { PrewarmCompileLifecycle } from './prewarm_compile_lifecycle';
+
 /** One root's share of a batch unit, runnable as its own queue unit. */
 export interface PrewarmResumeUnitPiece {
   /** `${unit.id}:${index}`: the same kind prefix as the unit, so the budget
@@ -334,6 +336,29 @@ export async function runPrewarmPiecesSerially(
     }
   }
   if (failure) throw failure.reason;
+}
+
+/**
+ * Keep a compile unit's original lifecycle record live when the post-entry
+ * lane resumes it. Without these transitions the unit remains permanently
+ * `submittedAtMs=null`, so admission sees compile debt even after every piece
+ * has settled and the progressive detail horizon never advances.
+ */
+export async function runPrewarmCompileResumeUnit(
+  unit: PrewarmResumeUnit,
+  lifecycle: PrewarmCompileLifecycle,
+  lane: string,
+  run: () => Promise<unknown>,
+): Promise<void> {
+  const record = lifecycle.recordFor(unit, lane);
+  lifecycle.markSubmitted(record);
+  try {
+    await run();
+    lifecycle.markSettled(record);
+  } catch (error) {
+    lifecycle.markFailed(record);
+    throw error;
+  }
 }
 
 /**

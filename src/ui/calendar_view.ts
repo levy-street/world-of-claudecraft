@@ -22,6 +22,13 @@ export const SYSTEM_EVENTS: SystemEventDef[] = [
   { id: 'raid_call', rule: { kind: 'weekly', weekday: 2 } }, // Tuesday
   { id: 'market_day', rule: { kind: 'weekly', weekday: 3 } }, // Wednesday
   { id: 'arena_clash', rule: { kind: 'weekly', weekday: 6 } }, // Saturday
+  // The Double Honor Weekend takes one def per weekend day (a day matches at
+  // most one, so no day lists the id twice). Saturday deliberately carries
+  // two rows: the clash names the ladder, this names the payout. The activity
+  // both point at is real (queue Thornhollow Fields;
+  // src/sim/pvp/honor_event.ts doubles its honor awards on these windows).
+  { id: 'double_honor', rule: { kind: 'weekly', weekday: 6 } }, // Saturday
+  { id: 'double_honor', rule: { kind: 'weekly', weekday: 0 } }, // Sunday
   { id: 'fishing_derby', rule: { kind: 'weekly', weekday: 0 } }, // Sunday
   { id: 'delve_day', rule: { kind: 'monthly', day: 7 } },
   { id: 'moongate_communion', rule: { kind: 'monthly', day: 15 } },

@@ -28,30 +28,39 @@ try {
 
 const { Pool } = pg;
 
-const SERVER_URL = (
-  process.env.SERVER_URL ??
-  process.env.GAME_URL ??
-  'http://localhost:8787'
-).replace(/\/+$/, '');
+const SERVER_URL =
+  // biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
+  (process.env.SERVER_URL ?? process.env.GAME_URL ?? 'http://localhost:8787').replace(/\/+$/, '');
 const WS_URL = `${SERVER_URL.replace(/^http/, 'ws')}/ws`;
 const DATABASE_URL = process.env.DATABASE_URL;
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const REALM = process.env.REALM_NAME ?? 'Claudemoon';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const BOT_COUNT = boundedInt(process.env.BOT_COUNT, 25, 1, 100);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const BOT_LEVEL = boundedInt(process.env.BOT_LEVEL, 18, 1, 60);
 const DURATION_MS = boundedInt(
+  // biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
   process.env.DURATION_MS ?? secondsToMs(process.env.DURATION_SECONDS),
   120_000,
   1_000,
   24 * 60 * 60 * 1000,
 );
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const CONNECT_CONCURRENCY = boundedInt(process.env.CONNECT_CONCURRENCY, 10, 1, 50);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const TICK_MS = boundedInt(process.env.TICK_MS, 250, 50, 5_000);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const REPORT_MS = boundedInt(process.env.REPORT_MS, 5_000, 1_000, 60_000);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const SPREAD_RADIUS = boundedInt(process.env.SPREAD_RADIUS, 8, 0, 30);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const MOB_SEARCH_RANGE = boundedInt(process.env.MOB_SEARCH_RANGE, 55, 5, 150);
 const RUN_ID =
+  // biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
   (process.env.LOAD_RUN_ID ?? randomLetters(5)).replace(/[^A-Za-z]/g, '').slice(0, 8) ||
   randomLetters(5);
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Load-test CLI input is not a Turbo task dependency.
 const CLEANUP = process.env.CLEANUP === '1';
 
 const CLASSES = [
@@ -73,7 +82,7 @@ const SPOTS = [
   { name: 'boars ridge', x: 84, z: -27, radius: 23.5 },
   { name: 'spiders', x: -68, z: 2, radius: 28.5 },
   { name: 'murlocs', x: -75, z: 57, radius: 15 },
-  { name: 'rats', x: -82, z: -62, radius: 33 },
+  { name: 'rats', x: -142, z: -86, radius: 33 },
   { name: 'bandits west', x: 50, z: -72, radius: 28.5 },
   { name: 'bandits east', x: 90, z: -90, radius: 16 },
   { name: 'bones', x: 82, z: 78, radius: 28.5 },

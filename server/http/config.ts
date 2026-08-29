@@ -41,7 +41,8 @@
 //   (3) Domain feature-config getters that own their own env (discord.ts, github.ts
 //       OAuth, oauth.ts, native_attestation.ts, email/, auth.ts banlist,
 //       chat_filter_db.ts, woc_balance.ts, perf_report.ts, TRUSTED_PROXY_IPS in
-//       ratelimit.ts), plus daily_rewards.ts's module-load cache-TTL test knob
+//       ratelimit.ts, and woc_market_routes.ts's wocMarketConfig with its
+//       clamped WOC_MARKET_CONFIRMING_REVIEW_HOURS read), plus daily_rewards.ts's module-load cache-TTL test knob
 //       WOC_DAILY_REWARD_CONFIG_TTL_MS (a garbage value degrades to cache-off,
 //       never breaks a request).
 //   (4) The security-header / enforce-flag middlewares keep their own
@@ -104,7 +105,7 @@ export interface Config {
   readonly githubToken: string;
   readonly chatLogRetentionDays: number;
   readonly perfReportRetentionDays: number;
-  // The six retention keys below follow the chatLogRetentionDays contract: 0 =
+  // The retention keys below follow the chatLogRetentionDays contract: 0 =
   // keep forever, and the read is deliberately UNTRIMMED, so a whitespace-only
   // value falls to 0, the SAFE side for a destructive delete (keep, never prune).
   readonly dailyRewardEventsRetentionDays: number;
@@ -152,6 +153,24 @@ export interface Config {
   // 0-keeps-forever retention contract above.
   readonly levelUpEventsRetentionDays: number;
   readonly ftueEventsRetentionDays: number;
+  // How many days a CLOSED, fully-disposed $WOC Exchange listing (and, via
+  // FK cascade, its bids and settlements) is kept. Sales are the permanent
+  // provenance record and never prune. 0 keeps listings forever.
+  readonly wocMarketListingsRetentionDays: number;
+  // How many days a buy-now abandon-ledger row (the claim-cooldown evidence)
+  // is kept. Rows are dead once outside every cooldown window; 0 keeps them
+  // forever.
+  readonly wocMarketAbandonsRetentionDays: number;
+  // How many days a RESOLVED directed p2p offer (accepted, declined,
+  // withdrawn, expired) is kept. Pending offers never prune (they expire
+  // through the sweep first); 0 keeps resolved rows forever.
+  readonly wocMarketOffersRetentionDays: number;
+  // How many days a BOOKED custody-claim row (delivery provenance) is kept.
+  // Unbooked rows are the operator queue and never prune regardless of this
+  // knob; 0 keeps booked rows forever. Must stay comfortably above the
+  // listings window: a booked claim is the exactly-once evidence and has to
+  // outlive every settlement/listing row that could re-drive its delivery.
+  readonly wocMarketCustodyClaimsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -219,6 +238,23 @@ const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
 // during a paid-campaign burst.
 const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
 const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
+const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
+// Abandon rows are dead once outside every cooldown window (an hour); 30 days
+// keeps generous forensics for tuning the cooldown numbers.
+const DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS = 30;
+// A resolved directed offer is inbox history (the SALE rows carry the durable
+// deal provenance); half a year matches the listings window so a deal's offer
+// and listing rows age out together.
+const DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS = 180;
+// A full year, comfortably above the listings window on purpose and never
+// matched to it: a booked claim
+// is the exactly-once delivery evidence, and it must provably outlive the
+// settlement and listing rows (180-day window, aged on updated_at) that could
+// still reach bookCustodyOnce with the same custody ref. booked_at is stamped
+// at delivery, at or before the listing's closing updated_at, so an equal
+// window could prune the claim FIRST and re-arm the duplication the ledger
+// exists to prevent.
+const DEFAULT_WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS = 365;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -441,6 +477,22 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,
       DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
+    ),
+    wocMarketListingsRetentionDays: numberOr(
+      env.WOC_MARKET_LISTINGS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS,
+    ),
+    wocMarketAbandonsRetentionDays: numberOr(
+      env.WOC_MARKET_ABANDONS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_ABANDONS_RETENTION_DAYS,
+    ),
+    wocMarketOffersRetentionDays: numberOr(
+      env.WOC_MARKET_OFFERS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_OFFERS_RETENTION_DAYS,
+    ),
+    wocMarketCustodyClaimsRetentionDays: numberOr(
+      env.WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_CUSTODY_CLAIMS_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

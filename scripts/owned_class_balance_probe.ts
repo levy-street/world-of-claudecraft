@@ -273,19 +273,24 @@ const THUNDERCALL_PBE_LOADOUT: PbeLoadout = {
   ring2: 'architects_cornerstone',
 };
 
+// The 200 DPS convergence sweep (2026-08-23) re-anchored this fixture on the
+// kit the top live Warspirits actually wear now that the Bonewrought mail
+// carries its shaman tag: Thronebane plus the crownforged/deathlord strength
+// pieces. The old caster-mail loadout no longer represents best-in-slot, and
+// the tripwire guards the real ceiling.
 const WARSPIRIT_PBE_LOADOUT: PbeLoadout = {
-  mainhand: 'gravewyrm_cleaver',
+  mainhand: 'kingsbane_last_oath',
   offhand: 'gravewyrm_cleaver',
-  helmet: 'heroic_stormcallers_crown',
-  neck: 'swiftfang_talisman',
-  shoulder: 'heroic_stormcallers_spaulders',
-  chest: 'morthens_cryptforged_hauberk',
-  waist: 'stormcallers_waistguard',
-  legs: 'heroic_deathlord_legguards',
-  gloves: 'stormcallers_handguards',
-  feet: 'tideworn_warboots',
+  helmet: 'heroic_crownforged_dreadhelm',
+  neck: 'medallion_of_endless_profit',
+  shoulder: 'heroic_crownforged_warspaulders',
+  chest: 'deathlord_warplate',
+  waist: 'crownforged_girdle',
+  legs: 'deathlord_legguards',
+  gloves: 'crownforged_gauntlets',
+  feet: 'deathlord_sabatons',
   ring1: 'seal_of_the_nine_oaths',
-  ring2: 'sutils_gambit',
+  ring2: 'seal_of_the_nine_oaths',
 };
 
 const VESPERS_PBE_LOADOUT: PbeLoadout = {
@@ -660,6 +665,12 @@ function castThundercall(state: RunState): void {
 
 function castWarspirit(state: RunState): void {
   if (tryCast(state, 'primal_exaltation')) return;
+  // Unleash Weapon rides the priority ahead of the strike: every top live
+  // Warspirit weaves it on cooldown (it advances the cadence AND buys the
+  // Galeheart haste window), and the 200 DPS convergence sweep measured the
+  // unleash-first ordering as the strongest real rotation. The fixture plays
+  // the ceiling players actually reach, not the pre-sweep priority.
+  if (tryCast(state, 'unleash_weapon')) return;
   if (hasAura(state.sim.player, 'shaman_stormcast') && tryCast(state, 'lightning_bolt')) return;
   if (tryCast(state, 'stormstrike')) return;
   if (!ownAura(state.primary, 'flame_shock', state.sim.playerId)) {

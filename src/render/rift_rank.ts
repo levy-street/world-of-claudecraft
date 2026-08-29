@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
+import { markSharedMaterial } from './shared_resource';
 
 const BADGE_CANVAS = 128; // px; crisp enough at the sprite's world size
 const BADGE_WORLD_SIZE = 2.4; // yards square
@@ -50,14 +51,28 @@ function badgeTexture(tier: RiftTier): THREE.CanvasTexture {
   return tex;
 }
 
+// One SpriteMaterial per tier, matching the badge texture's process lifetime.
+// A per-badge material leaked on every portal view churn (Sprites sit outside
+// the renderer's mesh-scoped view disposal, so nothing ever freed it).
+const badgeMats = new Map<RiftTier, THREE.SpriteMaterial>();
+
+function badgeMaterial(tier: RiftTier): THREE.SpriteMaterial {
+  let mat = badgeMats.get(tier);
+  if (mat) return mat;
+  mat = markSharedMaterial(
+    new THREE.SpriteMaterial({
+      map: badgeTexture(tier),
+      transparent: true,
+      depthWrite: false,
+    }),
+  );
+  badgeMats.set(tier, mat);
+  return mat;
+}
+
 /** Camera-facing rank badge sprite; caller adds it to the portal body group. */
 export function buildRiftRankBadge(tier: RiftTier): THREE.Sprite {
-  const mat = new THREE.SpriteMaterial({
-    map: badgeTexture(tier),
-    transparent: true,
-    depthWrite: false,
-  });
-  const sprite = new THREE.Sprite(mat);
+  const sprite = new THREE.Sprite(badgeMaterial(tier));
   sprite.scale.set(BADGE_WORLD_SIZE, BADGE_WORLD_SIZE, 1);
   sprite.position.y = BADGE_HEIGHT;
   return sprite;

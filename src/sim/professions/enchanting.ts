@@ -55,19 +55,28 @@
 // Math.random/Date.now (uses ctx.rng only), host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, consumeOneScratch, countFit, fitsAll, removeStacked } from '../bags';
+import { bagPools, consumeOneScratch, countFit, fitsAll, removeStacked } from '../bags';
 import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
+import {
+  consumePlayerVaultStock,
+  drawableCounterFor,
+  emitVaultCraftConsume,
+} from '../materials_vault';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
 // shape, never the Sim class, so this module stays host-agnostic.
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import {
+  reservePlannedVaultConsumption,
+  type SimContext,
+  settleVaultConsumptionReservation,
+} from '../sim_context';
 import {
   cloneItemInstancePayload,
   DISENCHANT_CAST_ID,
@@ -80,8 +89,16 @@ import {
   type ItemInstancePayload,
   isConsuming,
 } from '../types';
+import { vaultDrawStock } from '../vault_craft_gate';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
+import type { GradeRemoval } from './material_grades';
+import {
+  countMinusPlanned,
+  planReagentSourceDraw,
+  type ReagentSourcePlan,
+  tallyPlannedTakes,
+} from './reagent_sources';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
@@ -396,7 +413,7 @@ export function resolveDisenchant(
         instance: { bindOnTrade: true },
       });
     }
-    if (!fitsAll(scratch, bagCapacity(meta.bags), adds)) {
+    if (!fitsAll(scratch, bagPools(meta.bags), adds)) {
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
@@ -508,7 +525,7 @@ export function evaluateDisenchantAdmission(
       instance: { bindOnTrade: true },
     });
   }
-  if (!fitsAll(scratch, bagCapacity(meta.bags), adds)) {
+  if (!fitsAll(scratch, bagPools(meta.bags), adds)) {
     return { ok: false, itemId, reason: 'no_bag_space' };
   }
   return null;
@@ -667,6 +684,14 @@ export interface ApplyEnchantResult {
   /** True when the command admitted and started an ENCHANT_CAST_ID cast
    *  (no reagents consumed yet). Absent on complete resolves and denials. */
   casting?: boolean;
+  /** Bank Storage phase 04: the reagent units this apply drew out of the
+   *  Materials Vault rather than the bags, in spend order. Present ONLY when
+   *  at least one unit actually moved. Never covers the VICTIM copy, which is
+   *  always a carried (or worn) item and is out of the two-pool mechanic's
+   *  scope entirely. The observability half is separate and lives beside the
+   *  consume, not on this field: applyEnchantReagentDraw hands the same takes
+   *  to emitVaultCraftConsume (materials_vault.ts) once they have moved. */
+  vaultDraws?: readonly GradeRemoval[];
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'
@@ -779,13 +804,127 @@ export function replacedEnchantPayloadFor(
   return merged;
 }
 
+/**
+ * Plan every reagent one enchant consumes, bags first and then the Materials
+ * Vault, through the shared sourcing entry point every craft path uses
+ * (professions/reagent_sources.ts). Returns null when ANY reagent is short,
+ * which is the `insufficient_materials` deny each arm below already returned.
+ *
+ * gradeIds is pinned to the reagent's own id, deliberately. Enchant reagents
+ * are grade-BLIND today (nothing in this module walks countAcrossGrades), and
+ * the two-pool mechanic only ever changes where a unit comes FROM, never how
+ * many are owed or which ids may stand in for one another.
+ *
+ * Nothing is spent while planning, and these plans are applied later (after
+ * the capacity gate and the victim removal), so BOTH pools are tallied across
+ * reagents: two reagents naming the same material must not both be promised
+ * the same units, or the admission approves a draw the apply can only half
+ * pay. No shipped enchant names one reagent twice, so this guards the shape.
+ */
+function planEnchantReagentDraw(
+  ctx: SimContext,
+  pid: number,
+  enchant: EnchantDef,
+): readonly ReagentSourcePlan[] | null {
+  const vaultStock = vaultDrawStock(ctx, pid);
+  const carriedPlanned = new Map<string, number>();
+  const vaultPlanned = new Map<string, number>();
+  const carriedCount = countMinusPlanned((id) => ctx.countItem(id, pid), carriedPlanned);
+  const vaultCount = countMinusPlanned(drawableCounterFor(vaultStock), vaultPlanned);
+  const plans: ReagentSourcePlan[] = [];
+  for (const reagent of enchant.reagents) {
+    const plan = planReagentSourceDraw(reagent.itemId, reagent.count, carriedCount, vaultCount, [
+      reagent.itemId,
+    ]);
+    if (plan.shortfall !== 0) return null;
+    tallyPlannedTakes(carriedPlanned, plan.carried);
+    tallyPlannedTakes(vaultPlanned, plan.vault);
+    plans.push(plan);
+  }
+  return plans;
+}
+
+/** Spend a planned reagent draw for real: bag takes through ctx.removeItem,
+ *  vault takes through consumePlayerVaultStock. Returns the vault units that
+ *  actually moved, in spend order, for the caller's result field. */
+function applyEnchantReagentDraw(
+  ctx: SimContext,
+  pid: number,
+  meta: PlayerMeta | undefined,
+  plans: readonly ReagentSourcePlan[],
+): GradeRemoval[] {
+  const drawn: GradeRemoval[] = [];
+  for (const plan of plans) {
+    for (const take of plan.carried) ctx.removeItem(take.itemId, take.count, pid);
+    // REACHABLE ONLY BY A BUG, both guards. The whole draw was planned before
+    // any of it was applied (planEnchantReagentDraw), off drawableVaultCount
+    // over this same live record, tallying both pools, so no take names an
+    // undrawable row, exceeds what its row held, or double-claims another
+    // reagent's units; and with no meta the planner saw a null vault and
+    // produced no vault takes at all. They stay because a take in this list is
+    // a claim that units really moved, and recording only what committed is
+    // the safe direction if that ever stops being true.
+    for (const take of plan.vault) {
+      if (meta && consumePlayerVaultStock(meta, take.itemId, take.count)) drawn.push(take);
+    }
+  }
+  // ONE emission site for all three apply arms: the tick-side ledger record
+  // for what just left the vault (see emitVaultCraftConsume). Silent for a
+  // bags-only enchant, so the pre-vault event stream is byte-identical.
+  if (drawn.length > 0 && meta) {
+    emitVaultCraftConsume(ctx, meta, drawn);
+    // What this fire is FOR on a vault draw: the wireRev bump, the dirty flag
+    // that makes hosts re-send the derived state whose inputs just moved. Its
+    // collect-objective recompute reads ctx.countItem (CARRIED inventory
+    // only), so the vault units themselves change no objective; and quest
+    // presence (quest_item_presence.ts playerHoldsQuestItem, which does read
+    // meta.vault) is a live predicate needing no recompute. DELIBERATE
+    // asymmetry with crafting.ts's fire-once-at-the-end shape: the carried
+    // takes above go through ctx.removeItem, which fires the hook itself as
+    // part of its contract for every caller, and forking that contract for
+    // this one call site is not worth the handful of redundant idempotent
+    // fires a per-enchant-command reagent list can produce (this path runs
+    // per player command, never per tick).
+    ctx.onInventoryChangedForQuests(meta);
+  }
+  return drawn;
+}
+
+/** The success result the three apply arms return, carrying the vault ledger
+ *  ONLY when at least one unit really came out of the vault: a bags-only
+ *  enchant (every enchant before this feature) returns the byte-identical
+ *  two-field object it always did. */
+function enchantSuccess(
+  itemId: string,
+  enchantId: string,
+  vaultDraws: readonly GradeRemoval[],
+): ApplyEnchantResult {
+  const result: ApplyEnchantResult = { ok: true, itemId, enchantId };
+  if (vaultDraws.length > 0) result.vaultDraws = vaultDraws;
+  return result;
+}
+
+/** Model a planned reagent draw on a bag SCRATCH for the #2350 capacity gates:
+ *  ONLY the carried takes. A vault-sourced unit never occupied a bag slot, so
+ *  it frees none, and removing it from the scratch would over-credit room and
+ *  admit an enchant whose minted copy then has nowhere to land. */
+function removePlannedReagentsFromScratch(
+  scratch: InvSlot[],
+  plans: readonly ReagentSourcePlan[],
+): void {
+  for (const plan of plans) {
+    for (const take of plan.carried) removeStacked(scratch, take.itemId, take.count);
+  }
+}
+
 /** Resolve one apply-enchant attempt against the copy WORN in `slot`, enchanting
  *  it in place (the classic behavior: no unequip / enchant / re-equip dance).
  *  Every gate mirrors the bagged arm below one for one: the enchant must target
  *  this item's slot (checked by the shared caller), the named slot must actually
  *  be wearing this exact item id, the worn copy must NOT already be enchanted,
- *  every reagent must be held IN THE BAGS (all-or-nothing), and the shared
- *  action throttle applies. On success the merged payload (the SAME
+ *  every reagent must be payable from the bags and then the Materials Vault
+ *  (all-or-nothing across both pools), and the shared action throttle applies.
+ *  On success the merged payload (the SAME
  *  enchantedPayloadFor the bagged arm mints, so signer / masterwork / legacy
  *  rolled.quality survival is one contract, not two) is written straight onto
  *  PlayerMeta.equipmentInstance[slot] and the stats are re-baked.
@@ -842,18 +981,36 @@ function resolveApplyEnchantWorn(
       return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
     }
   }
-  for (const reagent of enchant.reagents) {
-    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-    }
+  const reagentPlans = planEnchantReagentDraw(ctx, pid, enchant);
+  if (!reagentPlans) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
   }
   // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // NO #2350 bag-capacity gate on this arm, deliberately: nothing enters the
   // bags. The enchanted copy is rewritten in place on the worn slot and the
   // reagents only leave, so this action can never need a free bag slot. The
   // capacity gate belongs to the bagged arm alone, where the mint really does
-  // land in the inventory.
-  for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
+  // land in the inventory. (Which pool a reagent came out of changes nothing
+  // here for the same reason: this arm has no bag-space question to answer.)
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta.vault.upgrades,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
+  const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   meta.equipmentInstance ??= {};
   meta.equipmentInstance[slot] = replacing
     ? // The replace mint: old enchant peeled off exactly, new one applied,
@@ -871,7 +1028,7 @@ function resolveApplyEnchantWorn(
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   // Same skill gain as the bagged arm: the applied enchant's reagent-derived tier.
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
-  return { ok: true, itemId, enchantId };
+  return enchantSuccess(itemId, enchantId, vaultDraws);
 }
 
 /** The #2415 bagged replace arm: resolve one CONFIRMED apply onto the pinned
@@ -925,10 +1082,9 @@ function resolveReplaceEnchantBagged(
   if (victim.enchant !== undefined && !ENCHANTS[victim.enchant]) {
     return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
   }
-  for (const reagent of enchant.reagents) {
-    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-    }
+  const reagentPlans = planEnchantReagentDraw(ctx, pid, enchant);
+  if (!reagentPlans) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
   }
   // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // #2350 capacity gate. Replacement is nearly always net-neutral (one copy
@@ -945,11 +1101,13 @@ function resolveReplaceEnchantBagged(
     instance: victim,
     craftedRecipeId: meta.inventory[victimIdx]?.craftedRecipeId,
   };
-  for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+  // Carried takes only: a vault-sourced reagent frees no bag slot (the victim
+  // above is a separate matter and is always a carried copy).
+  removePlannedReagentsFromScratch(scratch, reagentPlans);
   if (
     countFit(
       scratch,
-      bagCapacity(meta.bags),
+      bagPools(meta.bags),
       itemId,
       1,
       replacedEnchantPayloadFor(scratchVictim.instance ?? victim, enchant),
@@ -957,6 +1115,15 @@ function resolveReplaceEnchantBagged(
     ) < 1
   ) {
     return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
+  }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta.vault.upgrades,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
   }
   const consumed = consumeEnchantedVictim(meta.inventory, itemId);
   // Deny rather than mint when nothing was consumed. Note what this does and
@@ -967,9 +1134,21 @@ function resolveReplaceEnchantBagged(
   // destroyed the copy by the time we get here, and this return would skip the
   // mint, losing the item rather than duping it. Any such change has to keep
   // the removal and the mint atomic here, not lean on this line.
-  if (!consumed?.instance) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  if (!consumed?.instance) {
+    vaultReservation?.cancel();
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
   ctx.onInventoryChangedForQuests(meta);
-  for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
+  const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   // silent + callerLogs, exactly like the plain apply mint below: the
   // enchantResult event fires its own dedicated cue (audio.enchant in
   // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
@@ -991,7 +1170,7 @@ function resolveReplaceEnchantBagged(
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
-  return { ok: true, itemId, enchantId };
+  return enchantSuccess(itemId, enchantId, vaultDraws);
 }
 
 /** Resolve one apply-enchant attempt against a HELD (bagged, not currently
@@ -1074,19 +1253,20 @@ export function resolveApplyEnchant(
       reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
     };
   }
-  for (const reagent of enchant.reagents) {
-    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-    }
+  const reagentPlans = planEnchantReagentDraw(ctx, pid, enchant);
+  if (!reagentPlans) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
   }
   const meta = ctx.players.get(pid);
   // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // #2350 capacity gate: the freshly-enchanted instance must fit AFTER the
-  // consumed copy and every reagent leave, so model all of it on a scratch
-  // copy: the victim via consumeOneScratch (the isEnchantedInstance exclusion
-  // mirrors removeEnchantableItem's victim order, and the not_held gate above
-  // already proved an eligible copy exists), the reagents via removeStacked
-  // (the removeItem walk), and the grant via the SAME enchantedPayloadFor the
+  // consumed copy and every CARRIED reagent leave, so model all of it on a
+  // scratch copy: the victim via consumeOneScratch (the isEnchantedInstance
+  // exclusion mirrors removeEnchantableItem's victim order, and the not_held
+  // gate above already proved an eligible copy exists), the reagents via the
+  // plan's carried takes ONLY (a vault-sourced unit was never in a bag, so it
+  // frees no room and modeling it here would admit an enchant whose mint has
+  // nowhere to land), and the grant via the SAME enchantedPayloadFor the
   // success path mints below, so a byte-equal enchanted stack with room still
   // counts as fitting. Denies with no side effect and draws nothing.
   // The mint below also re-stamps the victim's craftedRecipeId, which this
@@ -1101,15 +1281,37 @@ export function resolveApplyEnchant(
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
-    for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+    removePlannedReagentsFromScratch(scratch, reagentPlans);
     if (
-      countFit(scratch, bagCapacity(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1
+      countFit(scratch, bagPools(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1
     ) {
       return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
     }
   }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta?.vault.upgrades ?? 0,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
   const [consumed] = ctx.removeEnchantableItem(itemId, 1, pid);
-  for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
+  if (!consumed) {
+    vaultReservation?.cancel();
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
+  const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
@@ -1135,7 +1337,7 @@ export function resolveApplyEnchant(
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
-  return { ok: true, itemId, enchantId };
+  return enchantSuccess(itemId, enchantId, vaultDraws);
 }
 
 /**
@@ -1181,10 +1383,11 @@ export function evaluateApplyEnchantAdmission(
         return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
       }
     }
-    for (const reagent of enchant.reagents) {
-      if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-        return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-      }
+    // The SAME two-pool plan the worn resolver runs, so a cast can never start
+    // on materials the resolve then cannot source, or be refused at start for
+    // materials the resolve would have found in the vault.
+    if (!planEnchantReagentDraw(ctx, pid, enchant)) {
+      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
     return null;
   }
@@ -1201,21 +1404,20 @@ export function evaluateApplyEnchantAdmission(
     if (victim.enchant !== undefined && !ENCHANTS[victim.enchant]) {
       return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
     }
-    for (const reagent of enchant.reagents) {
-      if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-        return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-      }
+    const reagentPlans = planEnchantReagentDraw(ctx, pid, enchant);
+    if (!reagentPlans) {
+      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
     const scratch = meta.inventory.map((s) => ({ ...s }));
     const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? {
       instance: victim,
       craftedRecipeId: meta.inventory[victimIdx]?.craftedRecipeId,
     };
-    for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+    removePlannedReagentsFromScratch(scratch, reagentPlans);
     if (
       countFit(
         scratch,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         itemId,
         1,
         replacedEnchantPayloadFor(scratchVictim.instance ?? victim, enchant),
@@ -1234,17 +1436,14 @@ export function evaluateApplyEnchantAdmission(
       reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
     };
   }
-  for (const reagent of enchant.reagents) {
-    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
-      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
-    }
+  const reagentPlans = planEnchantReagentDraw(ctx, pid, enchant);
+  if (!reagentPlans) {
+    return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
   }
   const scratch = meta.inventory.map((s) => ({ ...s }));
   const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
-  for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
-  if (
-    countFit(scratch, bagCapacity(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1
-  ) {
+  removePlannedReagentsFromScratch(scratch, reagentPlans);
+  if (countFit(scratch, bagPools(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1) {
     return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
   }
   return null;

@@ -30,8 +30,6 @@ import { ensureSkyAssetsAt } from '../sky';
 import { resetStationProfileCaches } from '../stations';
 import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visual';
 import { prepareTerrainProfileAssets } from '../terrain';
-import { resetValeCupBallProfileCaches } from '../vale_cup_ball';
-import { resetValeCupStadiumProfileCaches } from '../vale_cup_stadium';
 import { prepareWaterProfileAssets } from '../water';
 import { resetWildheartTerrainProfileCaches } from '../wildheart_terrain';
 import { prepareSurfaceDetailProfileAssets, resetSurfaceDetailProfileCaches } from '../worn_stone';
@@ -83,8 +81,6 @@ const RESETTERS = [
   ['jail_scene', resetJailSceneProfileCaches],
   ['cliff_scree', resetCliffScreeProfileCaches],
   ['door_portal', resetDoorPortalProfileCaches],
-  ['vale_cup_ball', resetValeCupBallProfileCaches],
-  ['vale_cup_stadium', resetValeCupStadiumProfileCaches],
   ['wildheart_terrain', resetWildheartTerrainProfileCaches],
   ['fireball_travel_visual', resetFireballTravelProfileCaches],
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],

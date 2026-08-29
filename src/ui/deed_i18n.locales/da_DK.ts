@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Klar til et Eventyr',
+    desc: 'Dimitter fra Prøvestranden: fuldfør hver lektie på øen, og ring så på færgeklokken hjem til Østbæk.',
+  },
   exp_dawnhold_castle: {
     name: 'En Åben Dør i Haven',
     desc: 'Besøg Dawnhold Slot og vandr gennem dets solbeskinnede havesale.',

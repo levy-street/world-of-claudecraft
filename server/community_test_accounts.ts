@@ -46,7 +46,11 @@ function templateStates(): ReadonlyMap<PlayerClass, CharacterState> {
   const sim = new Sim({ seed: TEMPLATE_SEED, playerClass: 'warrior', noPlayer: true });
   const templates = new Map<PlayerClass, CharacterState>();
   for (const cls of ALL_CLASSES) {
-    const pid = sim.addPlayer(cls, `${cls}template`);
+    // bot: this throwaway template Sim's mail book is discarded, but the flag
+    // keeps the no-mail-for-synthetic-players rule uniform across every
+    // non-player addPlayer site (the flip itself is unchanged: templates
+    // already carried mailWelcomed true into cloned characters).
+    const pid = sim.addPlayer(cls, `${cls}template`, { bot: true });
     sim.setPlayerLevel(MAX_LEVEL, pid);
     // Remove starter gear before applying the kit. With live offhands and
     // dual wielding, leaving it equipped can route the intended mainhand into

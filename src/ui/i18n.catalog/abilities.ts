@@ -51,6 +51,8 @@ const abilityStringsEn = {
       offGlobalCooldown: 'Off the global cooldown',
       friendlyTarget: 'Friendly target',
       enemyTarget: 'Enemy target',
+      // targetType 'any': the cast works on an enemy or an ally (Shadeslip).
+      anyTarget: 'Enemy or friendly target',
       selfOnly: 'Self only',
       damageRange: '{min} to {max}',
       finisherDamage: '{base} plus {perCombo} per combo point',
@@ -830,7 +832,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+        'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -1038,12 +1040,22 @@ const classAbilityNamesEn = {
       [
         'sap',
         'Sap',
-        'Incapacitates the target for 8 sec. Must be stealthed and out of combat. Any damage breaks the effect.',
+        'Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect.',
       ],
       [
         'crippling_poison',
         'Leaden Venom',
         'Strikes the target with a leaden venom, dealing {damage} Nature damage and slowing its movement speed by 50% for 12 sec.',
+      ],
+      [
+        'melting_acid',
+        'Melting Acid',
+        'Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec.',
+      ],
+      [
+        'nightshade_coating',
+        'Nightshade Coating',
+        'Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec.',
       ],
       [
         'expose_armor',
@@ -1356,7 +1368,7 @@ const classAbilityNamesEn = {
       [
         'aspect_of_the_cheetah',
         "Courser's Guise",
-        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min.",
+        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
       ],
       [
         'aimed_shot',
@@ -1557,7 +1569,7 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
+        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
       ],
       [
         'cruel_pact',
@@ -1804,7 +1816,7 @@ const classAbilityNamesEn = {
       [
         'warspirit_cadence',
         'Warspirit Cadence',
-        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
       ],
       [
         'stormsurge',
@@ -2069,7 +2081,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+        'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
       ],
       [
         'summon_doomguard',
@@ -2489,7 +2501,7 @@ const classAbilityNamesEn = {
       [
         'shadowstep',
         'Shadeslip',
-        'Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)',
+        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
       ],
       ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
       [

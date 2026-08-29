@@ -66,14 +66,18 @@ describe('player pathfinding', () => {
   });
 
   it('routes around static blockers instead of walking straight through them', () => {
+    // Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76): the old
+    // blocker at (0,2) was a town building on the now-open vacated ground. The
+    // chapel at (2,-78) blocks the straight line across the chapel green, with
+    // walkable ground on both sides to detour over.
     const seed = 20061;
-    const from = { x: -4, z: 2 };
-    const to = { x: 4, z: 2 };
+    const from = { x: -2, z: -78 };
+    const to = { x: 6, z: -78 };
     const path = findPlayerPath(seed, from, to);
 
-    expect(isBlocked(seed, 0, 2)).toBe(true);
+    expect(isBlocked(seed, 2, -78)).toBe(true);
     expect(path.length).toBeGreaterThan(1);
-    expect(path.some((p) => Math.abs(p.z - 2) > 0.5)).toBe(true);
+    expect(path.some((p) => Math.abs(p.z + 78) > 0.5)).toBe(true);
     expect(path[path.length - 1]).toEqual(to);
   });
 

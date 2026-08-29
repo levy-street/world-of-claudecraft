@@ -35,6 +35,11 @@ export const CHROME_GUARDED_PANELS: readonly string[] = [
   '#deeds-window',
   '#reliquary-window',
   '#professions-window',
+  // The $WOC Exchange: markDialogRoot with no FocusManager trap and not in
+  // isModalOpen, the exact enrolled profile (the deeds/reliquary shape), so
+  // without the guard a focused Exchange button swallows Space/Enter meant
+  // for the game while the window is open.
+  '#woc-market-window',
   '#side-buttons',
 ];
 

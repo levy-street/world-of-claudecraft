@@ -593,6 +593,17 @@ function snapshot(): PerfSnapshot {
       },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
+      entryDetailHorizon: {
+        active: false,
+        cap: 700,
+        sceneryCap: null,
+        targetFar: 700,
+        nextCap: null,
+        stableFrames: 0,
+        armedAtMs: null,
+        holdReason: 'inactive',
+        transitions: [],
+      },
     },
     hud: null,
     assets: { preload: { tasks: 0, waitMs: 0, complete: true }, byType: {}, files: [] },
@@ -674,6 +685,15 @@ describe('perf reporter payload', () => {
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
+    // The entry reveal wait rides in rawSummary too (the fleet-side watch for the
+    // establishing-shot bound): the counters verbatim, the waits from the ring.
+    expect((body.rawSummary as { entryReveal?: unknown }).entryReveal).toEqual({
+      keysHeld: 0,
+      rootsHeld: 0,
+      rootsAtWatchdog: 0,
+      imminentHolds: 0,
+      waits: [],
+    });
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })
         .rendererQualityBuckets?.levels?.foliage,
