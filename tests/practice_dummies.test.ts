@@ -209,6 +209,16 @@ describe('the Highwatch practice row', () => {
     expect(d.maxHp).toBe(vitals.maxHp);
     expect(d.stats.armor).toBe(vitals.armor);
     expect(d.hp).toBe(playerDummyRestHp(vitals.maxHp));
+    // THE DERIVED BODY AS LITERALS, added at Phase 15. Every assertion above
+    // compares the entity to playerDummyVitals(), which is the same function
+    // the entity was built from: both sides move together, so a catalog change
+    // that moves this SHIPPED body (it is applied at every world construction,
+    // production included) passes silently. The vitals derive from
+    // bestEpicGearFor, so any new epic entering a slot moves them. Pinned here
+    // so the move reds with a named cause and a reviewer decides whether the
+    // reference player body should have changed.
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1712);
+    expect(vitals.armor, 'and its armor').toBe(2941);
     // A player-sized pool, not the practice targets near-immortal one: heals
     // have to read as a real fraction of the bar.
     expect(d.maxHp).toBeGreaterThan(1000);

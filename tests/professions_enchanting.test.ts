@@ -1232,6 +1232,35 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(meta.equipmentInstance.offhand).toBeUndefined();
   });
 
+  it('dual wield, BOTH hands enchanted: the weapon term lands TWICE on the character', () => {
+    // ADDED AT PHASE 15, the R5 weapon-term MULTIPLICITY, and the arm above is
+    // exactly why it was needed: read alone, "the mainhand slot enchants ONLY
+    // the mainhand copy" invites the inference that a weapon enchant applies
+    // once per character. It does not. A one-hand weapon declares
+    // ItemDef.slot 'mainhand' and is legal in the offhand, and the enchant
+    // slot gate compares itemDef.slot to enchant.itemSlot, so both worn
+    // weapons accept every mainhand enchant and recalcPlayerStats reads both
+    // instances in the same loop. The packet's ratified R5 arithmetic counted
+    // this term once, which is why the apex weapon rung was trimmed to half
+    // its ladder step; this pin is what keeps the reason visible.
+    const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, { dust: 20 });
+    sim.addItem(WORN_SWORD, 1, pid);
+    sim.equipItemToSlot(WORN_SWORD, 'offhand', pid);
+    const before = sim.player.stats.str;
+
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(true);
+    expect(resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'offhand').ok).toBe(true);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
+    expect(meta.equipmentInstance.offhand?.enchant).toBe(WORN_ENCHANT);
+
+    const bonus = ENCHANTS[WORN_ENCHANT].statBonus.str ?? 0;
+    expect(bonus, 'the fixture enchant really carries strength').toBeGreaterThan(0);
+    expect(
+      sim.player.stats.str - before,
+      'both payloads reach the derived stat book, so the term is 2x',
+    ).toBe(bonus * 2);
+  });
+
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {
     const RING = 'seal_of_the_nine_oaths'; // slot 'ring', covers ring1 AND ring2
     const RING_ENCHANT = 'enchant_ring_spirit';

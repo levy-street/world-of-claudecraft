@@ -17,7 +17,9 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ARMOR_RATING, FIVE_MAN_WEAPON_RATING } from '../src/sim/content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
+  ALL_RECIPES,
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
@@ -37,6 +39,7 @@ import {
   typedSecondaryFor,
 } from '../src/sim/professions/disenchant_reagents';
 import { isDisenchantable } from '../src/sim/professions/enchanting';
+import { perfectedBonusStats } from '../src/sim/professions/perfecting';
 import type { EquipSlot, ItemDef, ItemSlot } from '../src/sim/types';
 
 type RatingField = 'hitRating' | 'critRating' | 'hasteRating';
@@ -1057,6 +1060,24 @@ describe('masterwrought apex budget sweep', () => {
     expect(row.rating[1]).toBe(
       (ITEMS.zense_meridian as unknown as Record<string, unknown>).critRating,
     );
+    // THE ANCHOR'S IDENTITY, added at Phase 15: the tie above pinned only the
+    // NUMBER, so delisting zense_meridian from the vendor left the sweep fully
+    // green while the pin still read "tied to the same-band heroic-vendor
+    // jewelry" (mutation-proven). It is heroic-vendor jewelry and it is a
+    // neck; it is also ilvl 26, NOT the apex band, so a second tie names an
+    // ilvl-31 ring carrying the same 25 and the rule is satisfied on both
+    // halves at once.
+    const vendorAnchor = ITEMS.zense_meridian as ItemDef & Record<string, unknown>;
+    expect(vendorAnchor.slot).toBe('neck');
+    expect(vendorAnchor.quality).toBe('epic');
+    expect(itemLevel(vendorAnchor)).toBe(26);
+    expect(
+      HEROIC_VENDOR_STOCK.some((o) => o.itemId === 'zense_meridian'),
+      'the jewelry anchor is really heroic-vendor stock',
+    ).toBe(true);
+    const bandAnchor = ITEMS.abysswrought_band as ItemDef & Record<string, unknown>;
+    expect(itemLevel(bandAnchor), 'the same-BAND anchor is ilvl 31').toBe(31);
+    expect(row.rating[1], 'and carries the same jewelry band value').toBe(bandAnchor.hasteRating);
 
     expectTradableTexture(def, row.sellValue);
     for (const key of Object.keys(def)) {
@@ -1096,6 +1117,13 @@ describe('masterwrought apex budget sweep', () => {
     expect(row.rating[1]).toBe(
       (ITEMS.wraithfire_orb as unknown as Record<string, unknown>).critRating,
     );
+    // The anchor's identity, added at Phase 15 for the same reason as the
+    // jewelry arm: the number alone cannot tell a real anchor from a
+    // coincidentally equal piece.
+    const heldAnchor = ITEMS.wraithfire_orb as ItemDef & Record<string, unknown>;
+    expect(heldAnchor.kind).toBe('held_offhand');
+    expect(heldAnchor.slot).toBe('offhand');
+    expect(itemLevel(heldAnchor)).toBe(29);
 
     expectTradableTexture(def, row.sellValue);
     for (const key of Object.keys(def)) {
@@ -1406,6 +1434,160 @@ describe('masterwrought apex budget sweep', () => {
       expectTradableTexture(def, def.sellValue as number);
     },
   );
+
+  it('the rating relationship to each reference is STATED, duplicate or complement', () => {
+    // ADDED AT PHASE 15. The complement rule ("the apex rating complements its
+    // reference drop, never duplicates it") is asserted as a LAW for the nine
+    // armour pieces only. Four of the other eight deliberately DO duplicate
+    // their named reference's rating field, each for a reason its def comment
+    // gives, and the suite said nothing either way: a reader could not tell an
+    // intentional duplicate from a missing arm, and a future jewelry append
+    // (the stat-light slot the Lariat rule is about) would get no check at
+    // all. Both halves are stated here as literals, so a change of mind about
+    // any one of them reds.
+    const soleRating = (id: string): [RatingField, number] => {
+      const def = ITEMS[id] as ItemDef & Record<string, unknown>;
+      const found = RATING_FIELDS.filter((f) => typeof def[f] === 'number');
+      expect(found, `${id} carries exactly one rating`).toHaveLength(1);
+      return [found[0], def[found[0]] as number];
+    };
+    // The four deliberate duplicates: same field, same value, on purpose.
+    for (const [apex, ref] of [
+      ['duskforged_warblade', 'greatfang_of_the_basin'],
+      ['ridgebreaker', 'greatfang_of_the_basin'],
+      ['duskforged_bulwark', 'bonewrought_bulwark'],
+      ['gyrelens_array', 'wraithfire_orb'],
+    ] as Array<[string, string]>) {
+      expect(soleRating(apex), `${apex} deliberately shares ${ref}'s rating`).toEqual(
+        soleRating(ref),
+      );
+    }
+    // And the one held offhand that complements instead.
+    expect(soleRating('voidbound_grimoire')[0]).toBe('hasteRating');
+    expect(soleRating('wraithfire_orb')[0]).toBe('critRating');
+    // The JEWELRY arm, swept rather than hand-listed, and scoped to the BAND:
+    // no ilvl-31 jewelry piece may be another one's twin (the same stat axes
+    // AND the same rating field). That is the Lariat failure form in the two
+    // stat-light slots: two pieces the same shape in the same band means one
+    // of them is strictly the better and the choice is not a choice. Scoped to
+    // ilvl 31 on purpose. A cross-band comparison would flag ordinary
+    // progression: warhewn_signet (ring, str/sta, hit 25) IS a strict superset
+    // of the ilvl-26 vendor ring seal_of_the_nine_oaths (str/sta, hit 25) by
+    // one point on each axis, which is what five item levels buy and what the
+    // vendor band's own rating allocation for a strength ring already reads.
+    // Recorded in power-verification.md rather than pinned as a defect.
+    const bandRows = (Object.values(ITEMS) as Array<ItemDef & Record<string, unknown>>).filter(
+      (d) =>
+        (d.slot === 'neck' || d.slot === 'ring') &&
+        itemLevel(d) === 31 &&
+        d.pvpOffenseRating === undefined &&
+        RATING_FIELDS.some((f) => typeof d[f] === 'number'),
+    );
+    expect(bandRows.length, 'the apex jewelry band really has rows').toBeGreaterThanOrEqual(3);
+    const shapeOf = (d: ItemDef & Record<string, unknown>): string =>
+      `${d.slot}|${Object.keys(d.stats as Record<string, number>)
+        .sort()
+        .join(',')}|${soleRating(d.id)[0]}`;
+    const shapes = bandRows.map(shapeOf);
+    expect(new Set(shapes).size, `two ilvl-31 jewelry twins: ${shapes.join(' / ')}`).toBe(
+      shapes.length,
+    );
+  });
+
+  it('R5: a Perfected apex piece stays within its pinned lead over the pre-packet slot', () => {
+    // ADDED AT PHASE 15, because the packet's defining ruling had no guard.
+    // The sweep pins each apex piece's BASE budget and the perfecting suite
+    // pins its DELTA against the formula, but nothing anywhere pinned the R5
+    // quantity itself: the Perfected TOTAL measured against what the slot
+    // already offered. A later phase that lowers or re-sources a pre-packet
+    // epic silently widens the envelope with every existing suite green.
+    // Baseline pool: PvE, non-legendary, class-equippable, best-in-slot, which
+    // is the pool power-verification.md names as R5's reading of "pre-packet
+    // raid BiS". Literal expectations, never a self-derived bound.
+    const MAX_LEAD_BY_SLOT: Record<string, number> = {
+      chest: 2,
+      gloves: 2,
+      waist: 2,
+      legs: 1,
+      feet: 1,
+      neck: 3,
+      ring: 1,
+      offhand: 1,
+      mainhand: 2,
+    };
+    const slotKey = (d: ItemDef & Record<string, unknown>): string =>
+      d.slot === 'ring1' || d.slot === 'ring2' ? 'ring' : String(d.slot);
+    const pool = (Object.values(ITEMS) as Array<ItemDef & Record<string, unknown>>).filter(
+      (d) =>
+        d.masterwrought !== true &&
+        !!d.slot &&
+        d.quality !== 'legendary' &&
+        (d.kind === 'armor' || d.kind === 'weapon' || d.kind === 'held_offhand') &&
+        d.pvpOffenseRating === undefined &&
+        (primaryStatSum(d) ?? 0) > 0,
+    );
+    expect(pool.length, 'the baseline pool really has rows').toBeGreaterThan(100);
+    let checked = 0;
+    for (const [id, def] of Object.entries(ITEMS) as Array<
+      [string, ItemDef & Record<string, unknown>]
+    >) {
+      if (def.masterwrought !== true) continue;
+      const recipe = ALL_RECIPES.find((r) => r.resultItemId === id);
+      expect(recipe, `${id} has an apex recipe`).toBeTruthy();
+      const bonus = perfectedBonusStats(def, recipe!) as Record<string, number> | null;
+      expect(bonus, `${id} takes a Perfected bonus`).toBeTruthy();
+      const bonusSum = Object.values(bonus!).reduce((a, b) => a + b, 0);
+      const perfected = (primaryStatSum(def) ?? 0) + bonusSum;
+      const key = slotKey(def);
+      const best = pool
+        .filter((d) => slotKey(d) === key && (d.hand === 'twohand') === (def.hand === 'twohand'))
+        .reduce((a, d) => Math.max(a, primaryStatSum(d) ?? 0), 0);
+      expect(best, `${id}: the slot has a pre-packet incumbent`).toBeGreaterThan(0);
+      const cap = MAX_LEAD_BY_SLOT[key];
+      expect(cap, `${key} has a pinned lead`).toBeDefined();
+      expect(
+        perfected - best,
+        `${id}: Perfected ${perfected} over the best pre-packet ${key} (${best})`,
+      ).toBeLessThanOrEqual(cap);
+      checked++;
+    }
+    expect(checked, 'every flagged def was measured').toBe(17);
+  });
+
+  it('no crafted output outside the apex arrays reaches the apex item level', () => {
+    // ADDED AT PHASE 15. The completeness arm above enumerates only three of
+    // ALL_RECIPES' arrays, so an unflagged, full-budget, item-level-31 epic
+    // authored into any OTHER recipe array passes the whole budget suite and
+    // is invisible to the two-piece family cap (masterwroughtConflictSlot
+    // returns null on an unflagged def). Mutation-proven at the audit. This
+    // arm closes the hole from the other side: over EVERY recipe in the game,
+    // any output that reaches the apex band must be flagged, which is what
+    // puts it back inside the census.
+    const apexOutputs = new Set(
+      [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES, ...APEX_CONSUMABLE_RECIPES].map(
+        (r) => r.resultItemId,
+      ),
+    );
+    let scanned = 0;
+    const offenders: string[] = [];
+    for (const recipe of ALL_RECIPES) {
+      scanned++;
+      const def = ITEMS[recipe.resultItemId] as (ItemDef & Record<string, unknown>) | undefined;
+      if (!def) continue;
+      const ilvl = itemLevel(def);
+      if (ilvl === undefined || ilvl < 31) continue;
+      if (def.masterwrought === true) continue;
+      offenders.push(`${recipe.id} -> ${recipe.resultItemId} (ilvl ${ilvl})`);
+    }
+    expect(scanned, 'the sweep really walked every recipe').toBeGreaterThan(150);
+    // Non-vacuity: the sweep's own filter really finds the apex band when it
+    // is there, so an empty offender list means "all flagged", not "none
+    // reached the band".
+    const atBand = ALL_RECIPES.filter((r) => (itemLevel(ITEMS[r.resultItemId]) ?? 0) >= 31);
+    expect(atBand.length, 'recipes really do reach the apex band').toBe(17);
+    for (const r of atBand) expect(apexOutputs.has(r.resultItemId), r.id).toBe(true);
+    expect(offenders, 'an unflagged crafted output reached the apex item level').toEqual([]);
+  });
 
   it('economy: every apex output vendors strictly below its reagent input value', () => {
     // recipe_economy.test.ts owns the invariant repo-wide; this arm keeps the

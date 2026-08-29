@@ -52,6 +52,31 @@ function bestPerSlotTotal(axis: Axis, include: (e: EnchantDef) => boolean = () =
   return total;
 }
 
+/** The same best-per-slot stack, but over a LOADOUT rather than the slot list.
+ *  bestPerSlotTotal counts each ItemSlot once (rings twice) and treats the
+ *  offhand as a slot with its own enchant line. A DUAL-WIELDER's offhand holds
+ *  a 'mainhand'-kind item, so it takes a MAINHAND enchant and no offhand one:
+ *  the reachable stack is different in both directions, and it is the one the
+ *  R5 envelope pays for. */
+function loadoutStack(axis: Axis, loadout: 'shieldOrHeld' | 'dualWield'): number {
+  const best = (slot: string): number => bestValue(slot, axis, () => true);
+  const slots = [
+    'mainhand',
+    'chest',
+    'feet',
+    'gloves',
+    'helmet',
+    'legs',
+    'neck',
+    'shoulder',
+    'waist',
+  ];
+  let total = slots.reduce((a, slot) => a + best(slot), 0);
+  total += best('ring') * 2;
+  total += loadout === 'dualWield' ? best('mainhand') : best('offhand');
+  return total;
+}
+
 /** Best value on `slot`+`axis` among enchants passing `include`, 0 when none. */
 function bestValue(slot: string, axis: Axis, include: (e: EnchantDef) => boolean): number {
   let best = 0;
@@ -106,6 +131,39 @@ describe('enchant table magnitude invariants', () => {
     // padded with new enchants.
     expect(bestPerSlotTotal('spi')).toBe(12); // 13 percent of the 93 spi budget
     expect(bestPerSlotTotal('armor')).toBe(35); // helmet 15 plus chest 20, the halved reinforcement pair
+  });
+
+  it('the LOADOUT-aware stacks: a dual-wielder reaches a different ceiling', () => {
+    // ADDED AT PHASE 15. The stack above is a per-ItemSlot model: rings count
+    // twice, the mainhand once, and the offhand is treated as a slot with its
+    // own enchant line. A dual-wielder's offhand holds a 'mainhand'-kind item,
+    // so it takes a MAINHAND enchant and never enchant_offhand_stamina, and
+    // the reachable stack moves in BOTH directions: str, agi and int go UP by
+    // one weapon rung, sta goes DOWN by the offhand line it forfeits. The
+    // per-slot model cannot see the loadout that maximises three of the four
+    // axes it exists to bound, which is exactly how the apex weapon rung's
+    // real per-character size went unnoticed until the R5 measurement.
+    // Literals in both columns so a rung retune re-cuts this table beside the
+    // defs, and the same-loadout column is asserted equal to the per-slot
+    // model so the two can never silently disagree about a non-weapon axis.
+    for (const axis of ['str', 'agi', 'sta', 'int'] as const) {
+      expect(loadoutStack(axis, 'shieldOrHeld'), `${axis} shield/held`).toBe(
+        bestPerSlotTotal(axis),
+      );
+    }
+    expect(loadoutStack('str', 'dualWield')).toBe(26);
+    expect(loadoutStack('agi', 'dualWield')).toBe(28);
+    expect(loadoutStack('int', 'dualWield')).toBe(31);
+    expect(loadoutStack('sta', 'dualWield')).toBe(30);
+    // The weapon rung is the whole difference, in the direction the envelope
+    // pays for: the dual-wield lead over the per-slot model IS one more copy
+    // of the best weapon enchant on that axis.
+    for (const axis of ['str', 'int'] as const) {
+      expect(
+        loadoutStack(axis, 'dualWield') - loadoutStack(axis, 'shieldOrHeld'),
+        `${axis}: the dual-wield lead is one extra weapon rung`,
+      ).toBe(bestValue('mainhand', axis, () => true) - bestValue('offhand', axis, () => true));
+    }
   });
 
   it('every Greater enchant beats the best base option on its slot and axis by at least 3', () => {

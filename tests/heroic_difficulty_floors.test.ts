@@ -18,14 +18,16 @@ import {
   HEROIC_DUNGEON_TUNING,
   NORMAL_DUNGEON_TUNING,
 } from '../src/sim/content/dungeon_difficulty';
-import { DUNGEONS, MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
+import { characterDerivedStats, createMob } from '../src/sim/entity';
+import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import {
   type HeroicSpawnRole,
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
-import type { DungeonDifficulty } from '../src/sim/types';
-import { armorReduction } from '../src/sim/types';
+import { requiredLevelFor } from '../src/sim/item_level_req';
+import type { DungeonDifficulty, ItemDef, PlayerEquipment } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, armorReduction } from '../src/sim/types';
 
 const REF_ARMOR = 2861;
 const DEFENSIVE_STANCE_TAKEN = 0.9;
@@ -227,5 +229,72 @@ describe('heroic tuning data contract', () => {
         expect(MOBS[mobId], `${tuning.id}: ${mobId}`).toBeTruthy();
       }
     }
+  });
+});
+
+describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must not out-run it', () => {
+  // ADDED AT PHASE 15. REF_ARMOR is a hardcoded literal in four floors suites
+  // and is quoted as fact in two shipped sim comments, but nothing derives it
+  // from the catalog, so the whole floors model is structurally blind to GEAR
+  // drift: any new armour piece that becomes a max-mitigation pick moves real
+  // tank intake with zero test signal. That is not hypothetical here. The
+  // packet's apex shield shipped at armor 732 / blockValue 32 against the
+  // heroic raid shield's frozen 680 / 30, which made a CRAFTED item the best
+  // mitigation piece in the game and took the reference tank's physical
+  // damage down about 1.0 percent, unmeasured and unpinned, on exactly the
+  // axis R5's protected asset is priced in.
+  //
+  // Raising REF_ARMOR is not the fix: it would move every floor. The claim
+  // pinned instead is the one that actually protects the model, and it is a
+  // pure equality rather than a tolerance: REMOVING the packet's flagged defs
+  // must leave the max-mitigation kit unchanged. A crafted piece may sit
+  // beside the raid line; it may never take it.
+  const maxArmorKit = (includeFlagged: boolean): PlayerEquipment => {
+    const eq: Record<string, string> = {};
+    for (const slot of ALL_EQUIP_SLOTS) {
+      let best: (ItemDef & Record<string, unknown>) | null = null;
+      let bestArmor = -1;
+      for (const def of Object.values(ITEMS) as Array<ItemDef & Record<string, unknown>>) {
+        if (!includeFlagged && def.masterwrought === true) continue;
+        if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
+        if ((requiredLevelFor(def) ?? 0) > 20) continue;
+        const armor = (def.stats as Record<string, number> | undefined)?.armor ?? 0;
+        // Deterministic tie-break by id so the pick cannot drift with table order.
+        if (armor > bestArmor || (armor === bestArmor && best !== null && def.id < best.id)) {
+          bestArmor = armor;
+          best = def;
+        }
+      }
+      if (best) eq[slot] = best.id;
+    }
+    return eq as PlayerEquipment;
+  };
+
+  it('the max-mitigation prot kit is UNCHANGED by the packet, slot for slot', () => {
+    const withFlagged = maxArmorKit(true);
+    const withoutFlagged = maxArmorKit(false);
+    // Non-vacuity: the picker really filled the paperdoll, and the flagged
+    // family really exists to be excluded.
+    expect(Object.keys(withFlagged).length, 'the picker filled every slot').toBe(
+      ALL_EQUIP_SLOTS.length,
+    );
+    expect(
+      Object.values(ITEMS).filter((d) => (d as Record<string, unknown>).masterwrought === true)
+        .length,
+      'the flagged family is really there to exclude',
+    ).toBe(17);
+    expect(withFlagged, 'a flagged def won a max-mitigation slot').toEqual(withoutFlagged);
+    const a = characterDerivedStats('warrior', 20, withFlagged);
+    const b = characterDerivedStats('warrior', 20, withoutFlagged);
+    expect(a.stats.armor).toBe(b.stats.armor);
+    expect(a.maxHp).toBe(b.maxHp);
+    // The derived values as literals, so a catalog move on EITHER side reds
+    // here with a named cause instead of moving both together silently. These
+    // are the raw kit numbers, without the prot mastery the header's
+    // derivation folds in; REF_ARMOR above stays the pinned calibration
+    // constant it has always been and is deliberately not asserted equal to
+    // this, because it is not a live property of the catalog.
+    expect(a.stats.armor, 'the live max-armor kit').toBe(2969);
+    expect(a.maxHp, 'and its pool').toBe(1672);
   });
 });

@@ -82,17 +82,16 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
       expect(flagged.length, `${cls} dev bis flagged picks: ${flagged.join(', ')}`).toBe(2);
     }
-    // Warrior wears flagged pieces in BOTH hand slots. The winners are NOT
+    // Warrior wears a flagged mainhand. The winner is NOT
     // pinned by id (the argmax-literal-winner trap: the warblade's margin
     // over gravewyrm_cleaver is 0.46 points on ~214, so any unrelated
     // content retune flips a literal); instead the test re-derives the
     // mainhand argmax with the module's own documented scoring (weapon
     // avg x 12 / speed plus the raw stat sum, ratings invisible) over the
     // same candidate shape (epic, warrior-legal, one-handed preferred), and
-    // asserts the pick IS that argmax AND flagged. Today both derive to
-    // duskforged_warblade / duskforged_bulwark; a legitimate content change
-    // moves the derivation with the pick, while a selection-rule regression
-    // splits them.
+    // asserts the pick IS that argmax AND flagged. Today it derives to
+    // duskforged_warblade; a legitimate content change moves the derivation
+    // with the pick, while a selection-rule regression splits them.
     const devScore = (item: (typeof ITEMS)[string]): number => {
       let total = 0;
       if (item.kind === 'weapon' && item.weapon)
@@ -135,6 +134,39 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       'mainhand',
       'neck',
     ]);
+  });
+
+  it('the flagged picks are pinned BY ID per class, so a catalog move reds on GEAR', () => {
+    // ADDED AT PHASE 15. bestEpicGearFor is the live-derived loadout behind
+    // six consumers, two of them shipped code (the friendly practice dummy's
+    // vitals and the server PBE boost kit) and two of them balance-band tests
+    // (the rogue DPS bands and the druid harness). When the packet's defs
+    // landed, every one of those fixtures silently re-geared: the rogue bands
+    // were re-cut deliberately, the druid harness drifted 12 percent on its
+    // tank arm and was never re-pinned, and the dummy's body moved. A band
+    // assertion cannot say WHY it moved; this can. Any future def that enters
+    // or leaves a pick reds here first, naming the class and the slot, and a
+    // reviewer decides before a band is re-cut around it.
+    const flaggedPicks = (cls: (typeof CLASSES)[number]): string[] =>
+      Object.entries(bestEpicGearFor(cls, null))
+        .filter(([, id]) => id && ITEMS[id as string]?.masterwrought)
+        .map(([slot, id]) => `${slot}:${id}`)
+        .sort();
+    const JEWELRY_PAIR = ['neck:wyrmfall_pendant', 'ring2:prismglass_loop'];
+    expect(flaggedPicks('warrior')).toEqual([
+      'mainhand:duskforged_warblade',
+      'neck:wyrmfall_pendant',
+    ]);
+    for (const cls of CLASSES) {
+      if (cls === 'warrior') continue;
+      expect(flaggedPicks(cls), `${cls} flagged picks`).toEqual(JEWELRY_PAIR);
+    }
+    // Non-vacuity: the helper really reads the flag (an unflagged catalog
+    // would make every row above an empty-equals-empty pass).
+    expect(
+      Object.values(ITEMS).filter((d) => d.masterwrought).length,
+      'the flagged family is really there',
+    ).toBe(17);
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {
