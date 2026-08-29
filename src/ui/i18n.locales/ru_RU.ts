@@ -1535,6 +1535,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendAuto': 'Авто',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL (медленно)',
+  'hudChrome.options.gpuBackendActive': 'Сейчас используется {backend}.',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    'Сейчас используется {backend} (не удалось включить Vulkan).',
   'hudChrome.options.gpuBackendNote':
     'Авто выбирает лучший вариант за вас. Vulkan быстрее и рекомендуется большинству игроков. OpenGL медленнее, но может помочь, если Vulkan работает неправильно.',
   'hudChrome.options.discordPresence': 'Статус в Discord',

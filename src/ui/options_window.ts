@@ -23,7 +23,10 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { CROSS_HOTBAR_TRIGGERS, isCrossHotbarButton } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
-import { desktopGpuBackendSupported } from '../game/desktop_gpu_backend_sync';
+import {
+  desktopGpuBackendActive,
+  desktopGpuBackendSupported,
+} from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
@@ -678,7 +681,7 @@ export class OptionsWindow {
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey);
+          this.noteRow(parent, c.textKey, c.valueKeys);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
@@ -892,10 +895,18 @@ export class OptionsWindow {
     sync();
   }
 
-  private noteRow(parent: HTMLElement, textKey: TranslationKey): void {
+  private noteRow(
+    parent: HTMLElement,
+    textKey: TranslationKey,
+    valueKeys?: Record<string, TranslationKey>,
+  ): void {
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = t(textKey);
+    // The view names its placeholders as keys and this resolves them, so the
+    // whole sentence including the value stays one translatable string.
+    const values: Record<string, string> = {};
+    for (const [name, key] of Object.entries(valueKeys ?? {})) values[name] = t(key);
+    note.textContent = valueKeys ? t(textKey, values) : t(textKey);
     parent.appendChild(note);
   }
 
@@ -1193,6 +1204,7 @@ export class OptionsWindow {
               // The Linux graphics backend row in the System card: the bridge
               // methods AND the shell's platform answer, folded into one flag.
               desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
+              desktopGpuBackendActive: desktopGpuBackendActive(),
             },
           )
         : [];

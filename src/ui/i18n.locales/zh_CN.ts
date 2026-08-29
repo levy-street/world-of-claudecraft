@@ -1471,6 +1471,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendAuto': '自动',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL（较慢）',
+  'hudChrome.options.gpuBackendActive': '当前使用 {backend}。',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '当前使用 {backend}（无法启用 Vulkan）。',
   'hudChrome.options.gpuBackendNote':
     '自动会为你选择最合适的选项。Vulkan 更快，推荐大多数玩家使用。OpenGL 较慢，但在 Vulkan 无法正常工作时可能会有帮助。',
   'hudChrome.options.discordPresence': 'Discord 游戏状态',

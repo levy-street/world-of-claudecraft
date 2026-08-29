@@ -390,18 +390,35 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(judge).toContain(
       'boundRung = judgeGpuBackendLaunch({ glRenderer, softwareRendering, parallel: gpuBackendLaunch.parallel, parallelCompile, });',
     );
-    // Bound what it asked for: arm the healthy-session timer and nothing else.
+    // ONLY a rung below the one asked for is a failure to enable it: a reading
+    // that is not lower changes nothing. `!==` would also fire on a higher one.
+    expect(judge).toContain('if (!isHigherRung(gpuBackendLaunch.rung, boundRung)) return;');
+    expect(judge).not.toContain('boundRung === gpuBackendLaunch.rung');
     expect(judge).toContain(
-      'if (boundRung === gpuBackendLaunch.rung) { armHealthySessionTimer(); return; }',
+      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
     );
-    // Bound something lower: rescue now, and still arm the timer when no rescue
-    // is available, since what bound IS what this machine can do.
+    // Judging is not remembering, and it is not mode-aware either: a rescue
+    // wrapped in an Auto guard here would strand exactly the explicit-choice
+    // player this commit exists to rescue, and a flattened toContain on the
+    // inner statement alone survives any enclosing guard.
+    expect(judge, 'the judge must not read the setting at all').not.toContain(
+      'desktopPrefs.gpuBackend',
+    );
+    // The page is told which rung actually bound; without this call the options
+    // row would sit on its pre-judgement reading for the whole session.
+    expect(judge).toContain('sendGpuBackendState();');
+    expect(count(code, 'sendGpuBackendState();')).toBe(1);
+    // The driver string the proof records comes from here, capped once for both
+    // evidence arms (the getGPUInfo one hands it over uncapped).
     expect(judge).toContain(
-      'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) { app.exit(0); return; }',
+      "boundGpuDriver = typeof glRenderer === 'string' ? glRenderer.slice(0, 256) : '';",
     );
-    expect(judge.lastIndexOf('armHealthySessionTimer();')).toBeGreaterThan(
-      judge.indexOf('relaunchOnLowerBackend('),
-    );
+    // The launch window is armed from the launch, never from here: a page that
+    // never reports would otherwise leave the session in "launch" state for its
+    // whole life, and a death hours in would re-exec it out from under the player.
+    expect(judge).not.toContain('armHealthySessionTimer()');
+    expect(code).toContain('app.whenReady().then(armHealthySessionTimer);');
+    expect(count(code, 'armHealthySessionTimer)')).toBe(1);
     // The memory is NOT written here.
     expect(judge).not.toContain('saveDesktopPrefs');
     expect(judge).not.toContain('mergeDesktopPrefs');
@@ -460,10 +477,22 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(gone).toContain(
       'if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);',
     );
-    const autoAt = gone.indexOf("if (desktopPrefs.gpuBackend === 'auto') {");
-    const rescueAt = gone.indexOf('if (relaunchOnLowerBackend(');
-    expect(rescueAt, 'the rescue must not sit inside the Auto-only arm').toBeGreaterThan(autoAt);
-    expect(gone.slice(autoAt, rescueAt)).toContain('}');
+    // The CONTIGUOUS text, not a brace count: the Auto arm's slice carries
+    // braces from its own object literals, so counting them let the exact
+    // pre-fix defect (the rescue moved inside the arm) pass green.
+    expect(gone, 'the rescue must sit OUTSIDE the Auto-only arm, which is the whole fix').toContain(
+      "if (mergeDesktopPrefs(next)) log.warn('[gpu] backend memory updated after the death', next); } if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);",
+    );
+    // A late crash RETURNS: without it, a death after a healthy session would
+    // demote the memory and re-exec a live session, the defect this replaces.
+    expect(gone).toContain(
+      'log.warn(`[gpu] GPU process gone after a healthy session on ${boundRung}`, context); return; }',
+    );
+    // And a launch-time death disarms the window, or a launch that died and
+    // could not be rescued would still record itself healthy sixty seconds on.
+    expect(gone).toContain(
+      'if (healthySessionTimer !== null) { clearTimeout(healthySessionTimer); healthySessionTimer = null; }',
+    );
   });
 
   it('writes the memory only after a session has PROVEN healthy, and never on explicit', () => {
@@ -477,17 +506,64 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // Armed once, on the shell's own clock, and a launch-time death disarms it
     // (pinned in the death handler above).
     expect(arm).toContain('if (healthySessionTimer !== null || sessionHealthy) return;');
+    // A session nobody judged is still HEALTHY (a death from here is late), but
+    // it records nothing: an unjudged rung is not evidence of anything.
+    expect(arm).toContain(
+      "if (!gpuBackendJudged) { log.info('[gpu] session healthy, but the launch was never judged (memory untouched)'); return; }",
+    );
+    expect(arm.indexOf('if (!gpuBackendJudged) {')).toBeLessThan(
+      arm.indexOf('gpuBackendMemoryAfterHealthySession('),
+    );
     expect(arm).toContain('}, SESSION_HEALTHY_AFTER_MS);');
     expect(arm).toContain('sessionHealthy = true;');
     // An explicit choice never writes the memory: explicit means the player
     // decided, not that we learned something about the machine.
-    expect(arm).toContain("if (desktopPrefs.gpuBackend !== 'auto') {");
+    // The guard must RETURN: pinning its presence alone let a mutation that
+    // dropped the return (so an explicit choice DID write the memory) pass.
+    expect(arm).toContain(
+      "if (desktopPrefs.gpuBackend !== 'auto') { log.info(`[gpu] session healthy on ${boundRung} (explicit setting, memory untouched)`); return; }",
+    );
     expect(arm).toContain(
       'const next = gpuBackendMemoryAfterHealthySession({ prefs: desktopPrefs, rung: boundRung, appVersion: app.getVersion(), gpuDriver: boundGpuDriver, });',
     );
     const explicitAt = arm.indexOf("if (desktopPrefs.gpuBackend !== 'auto') {");
     expect(arm.indexOf('gpuBackendMemoryAfterHealthySession(')).toBeGreaterThan(explicitAt);
     expect(count(code, 'gpuBackendMemoryAfterHealthySession(')).toBe(1);
+    // The write itself, not only the computation: deleting the merge left every
+    // pin green while no proof was ever written and the climb never aimed.
+    expect(arm).toContain(
+      'if (mergeDesktopPrefs(next)) { log.info(`[gpu] session healthy on ${boundRung}; memory updated`, next); }',
+    );
+  });
+
+  it('persists the memory before committing it, through one writer', () => {
+    // The discipline every other setter in this shell is pinned on: a value
+    // that could not reach disk must never be the one the process believes,
+    // or the getter reports a memory the next launch will not read. One writer
+    // because three sites own three different fields of the same record.
+    const merge = block('function mergeDesktopPrefs(partial) {', '\n}', 'mergeDesktopPrefs');
+    const flat = merge.replace(/\s+/g, ' ');
+    expect(flat).toContain(
+      "if (!saveDesktopPrefs(desktopPrefsPath, next)) { log.warn('[gpu] could not persist the GPU backend memory'); return false; } Object.assign(desktopPrefs, partial);",
+    );
+    // A no-op partial writes nothing at all: the pure helpers answer null to
+    // say "nothing changed", and a write per launch would be a write per boot.
+    expect(flat).toContain('if (!partial || Object.keys(partial).length === 0) return false;');
+    // Every memory write goes through it, and only through it.
+    expect(count(code, 'function mergeDesktopPrefs(')).toBe(1);
+    expect(count(code, 'mergeDesktopPrefs(')).toBe(4);
+
+    // The climb cadence's only driver. Deleting this line left the counter at
+    // zero for ever, so a demoted machine never climbed back and the whole
+    // proof-cadence mechanism was dead code with every unit test green.
+    expect(code).toContain(
+      'mergeDesktopPrefs(launchCounterAfterAutoLaunch({ prefs: desktopPrefs, launch: gpuBackendLaunch }));',
+    );
+    const counterAt = code.indexOf('launchCounterAfterAutoLaunch({');
+    expect(counterAt).toBeGreaterThan(
+      code.indexOf('applyGpuBackendSwitches(app, gpuBackendLaunch);'),
+    );
+    expect(counterAt).toBeLessThan(code.indexOf('app.whenReady()'));
   });
 
   it('constructs the window at the restored geometry rather than resizing it after', () => {

@@ -360,6 +360,9 @@ describe('demoteAfterRepeatedCrashes', () => {
     for (let i = 1; i < MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES; i++) {
       const next = demoteAfterRepeatedCrashes({ prefs: memory, rung: memory.gpuBackendToAttempt });
       expect(next).toEqual({ consecutiveGpuLaunchCrashes: i });
+      // toEqual ignores an undefined-valued key, so the proof is checked by
+      // absence: this branch must not carry it either.
+      expect(next).not.toHaveProperty('gpuBackendProof');
       memory = { ...memory, ...next };
       // The rung has NOT moved yet: one death is not a verdict.
       expect(memory.gpuBackendToAttempt).toBe('vulkan-parallel-compile');

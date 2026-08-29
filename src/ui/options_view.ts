@@ -135,6 +135,11 @@ export interface ChoiceControl {
 export interface NoteControl {
   control: 'note';
   textKey: TranslationKey;
+  /** Placeholders for a note whose text carries a live reading, given as KEYS
+   *  the painter resolves: this module stays string-free, and a translator
+   *  keeps the whole sentence including where the value sits (never a
+   *  concatenation). */
+  valueKeys?: Record<string, TranslationKey>;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -208,6 +213,11 @@ export interface OptionsEnv {
    *  capability plus a platform gate: Windows and macOS shells expose the
    *  methods but have no choice to make, so they show no row. */
   desktopGpuBackend?: boolean;
+  /** What the shell answered about THIS launch: the rung it actually bound and
+   *  whether that fell short of the setting. Absent until the shell has judged
+   *  it (and on every non-desktop caller), which is why the status line is
+   *  conditional rather than showing an empty reading. */
+  desktopGpuBackendActive?: { active: string; requestedUnavailable: boolean } | null;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -279,7 +289,23 @@ const choice = (
   rerender,
 });
 
-const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
+const note = (
+  textKey: TranslationKey,
+  valueKeys?: Record<string, TranslationKey>,
+): NoteControl => ({
+  control: 'note',
+  textKey,
+  ...(valueKeys ? { valueKeys } : {}),
+});
+
+/** What the player calls the rung the shell reports. Both Vulkan rungs read as
+ *  "Vulkan": the parallel-compile feature is an internal distinction, and a
+ *  picker that offered "Vulkan" must not answer with a name it never offered. */
+function gpuBackendActiveNameKey(active: string): TranslationKey {
+  return active.startsWith('vulkan')
+    ? 'hudChrome.options.gpuBackendActiveNameVulkan'
+    : 'hudChrome.options.gpuBackendActiveNameOpenGL';
+}
 
 // The shader warm-up worker: auto follows the GPU backend (on where the
 // compile runs off the presenting thread, off on OpenGL); the stored numbers
@@ -543,10 +569,24 @@ export function buildGraphicsSections(
   // the next-launch caveat. Not a rebuild key: it writes live, and the shell
   // reads the stored choice at its next launch.
   if (env.desktopGpuBackend) {
-    system.push(
-      choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions),
-      note('hudChrome.options.gpuBackendNote'),
-    );
+    system.push(choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions));
+    // The rung this launch is ACTUALLY running, under the buttons and above the
+    // explanation, where every other note in this panel sits relative to its
+    // row. It is the point of the row on a machine where the choice did not
+    // take: a player who picked Vulkan would otherwise read "Vulkan" while
+    // playing on OpenGL. Absent until the shell has judged the launch.
+    const active = env.desktopGpuBackendActive;
+    if (active) {
+      system.push(
+        note(
+          active.requestedUnavailable
+            ? 'hudChrome.options.gpuBackendActiveUnavailable'
+            : 'hudChrome.options.gpuBackendActive',
+          { backend: gpuBackendActiveNameKey(active.active) },
+        ),
+      );
+    }
+    system.push(note('hudChrome.options.gpuBackendNote'));
   }
   // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
   if (!env.nativeShell) {

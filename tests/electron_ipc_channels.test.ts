@@ -114,7 +114,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // The channel existing is not enough: the settle signal exists ONLY so the
     // shell CancelAuthTickets the live handle promptly (Valve's contract), so
     // the handler body must actually reach steamShell.cancelLinkTicket.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-steam-link-settled'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -124,7 +124,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the epic-link-settled handler body cancels the live proof handle', () => {
     // Mirror of the Steam settle contract: the channel exists so the shell can
     // release any cancelable EOS adapter handle promptly after the link POST.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-epic-link-settled'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -132,7 +132,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   });
 
   it('reports whether the external wallet authorization page actually opened', () => {
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-wallet-open-browser'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('});', start));
@@ -144,7 +144,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // PRIME) and writes a Windows per-app preference, so a junk value must not
     // reach the file, and the renderer must learn when the write failed rather
     // than showing a toggle the next launch will not honor.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-gpu-force-opt-out'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -181,7 +181,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // Linux, and 'auto' re-arms one Vulkan trial by resetting the verdict, so
     // a junk value must not reach the file and the mirror must follow the
     // write, never lead it.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-gpu-backend'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -223,9 +223,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // is really running, which is the whole point of the row: a player who
     // picked Vulkan on a machine that cannot run it must not read "Vulkan".
     expect(state).toContain('setting: desktopPrefs.gpuBackend,');
-    expect(state).toContain('active: boundRung,');
+    // Empty until the launch is judged: `boundRung` starts as the rung that was
+    // ASKED for, and reporting that as active is the lie the row exists to stop.
+    expect(state).toContain("active: gpuBackendJudged ? boundRung : '',");
+    // Only a rung BELOW the one asked for is the setting falling short.
     expect(state).toContain(
-      'requestedUnavailable: gpuBackendJudged && boundRung !== gpuBackendLaunch.rung,',
+      'requestedUnavailable: gpuBackendJudged && isHigherRung(gpuBackendLaunch.rung, boundRung),',
     );
     expect(state).toContain("supported: process.platform === 'linux',");
   });
@@ -235,7 +238,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // live apply is what the player sees under the click, so a junk value must
     // reach neither, and a failed write must not leave the window in a mode the
     // next launch would not reproduce.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-set-display-mode'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -285,7 +288,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   it('the gamepad-activity handler feeds the display-sleep lease', () => {
     // The channel existing proves nothing: it exists ONLY so controller input
     // keeps the display awake, and nothing else in the shell pings the lease.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-gamepad-activity'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start));
@@ -346,7 +349,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // unknown kind, an unbounded string, a focused window, and a repeat inside
     // the floor each have to be answered by value rather than by a call some
     // later line could ignore.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.handle('desktop-show-notification'");
     expect(start).toBeGreaterThan(-1);
     const end = main.indexOf('\n});', start);
@@ -642,7 +645,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
   });
 
   it('activates the macOS app when the browser returns a wallet handoff', () => {
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf('function deliverWalletHandoffCode');
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n}', start));
@@ -694,7 +697,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // A send, not an invoke: nothing is answered. The body is pinned because the
     // trusted-sender gate scan above covers ipcMain.handle registrations only,
     // and a report from a stray frame could otherwise judge this launch.
-    const main = read('electron/main.cjs');
+    const main = stripComments(read('electron/main.cjs'));
     const start = main.indexOf("ipcMain.on('desktop-report-gpu-renderer'");
     expect(start).toBeGreaterThan(-1);
     const body = main.slice(start, main.indexOf('\n});', start)).replace(/\s+/g, ' ');

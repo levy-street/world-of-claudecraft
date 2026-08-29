@@ -1512,6 +1512,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendAuto': '자동',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL(느림)',
+  'hudChrome.options.gpuBackendActive': '현재 {backend}을(를) 사용 중입니다.',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '현재 {backend}을(를) 사용 중입니다(Vulkan을 활성화할 수 없음).',
   'hudChrome.options.gpuBackendNote':
     '자동은 가장 알맞은 옵션을 대신 선택합니다. Vulkan이 더 빠르며 대부분의 플레이어에게 권장됩니다. OpenGL은 더 느리지만 Vulkan이 제대로 작동하지 않을 때 도움이 될 수 있습니다.',
   'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',

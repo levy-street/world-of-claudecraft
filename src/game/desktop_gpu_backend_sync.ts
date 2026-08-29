@@ -78,7 +78,61 @@ export async function syncDesktopGpuBackendSetting(
     return;
   }
   if (!state || typeof state !== 'object') return;
+  // The same answer carries the rung this launch is running: latch it here
+  // rather than asking the shell twice for one payload. The latch and the row's
+  // reader are at the foot of this module.
+  activeState = readActive(state) ?? activeState;
   const { setting } = state as { setting?: unknown };
   if (setting !== 'auto' && setting !== 'vulkan' && setting !== 'opengl') return;
   createSettings().set('gpuBackend', gpuBackendValueFromSetting(setting));
+}
+
+/** What the options row shows about THIS launch, or null when the shell has not
+ *  judged it yet (and on every non-desktop caller). Only the two fields the row
+ *  reads: the row is about telling a player their choice did not take, not
+ *  about mirroring the shell's whole state. */
+export interface DesktopGpuBackendActive {
+  active: string;
+  requestedUnavailable: boolean;
+}
+
+/** The latched reading, refreshed by the shell's push. Latched rather than
+ *  awaited per open, because the options row is built synchronously and a
+ *  promise would paint the row once without the line and never again. */
+let activeState: DesktopGpuBackendActive | null = null;
+
+function readActive(state: unknown): DesktopGpuBackendActive | null {
+  if (!state || typeof state !== 'object') return null;
+  const { active, requestedUnavailable } = state as {
+    active?: unknown;
+    requestedUnavailable?: unknown;
+  };
+  // A rung the shell has not judged yet is absent, not a guess: showing the
+  // asked-for backend as the active one is exactly the lie the row exists to
+  // stop. Same for the flag, which is a strict boolean or nothing.
+  if (typeof active !== 'string' || active === '') return null;
+  if (typeof requestedUnavailable !== 'boolean') return null;
+  return { active, requestedUnavailable };
+}
+
+/** Subscribe to the shell's push. The FIRST reading comes from the boot sync
+ *  above, which already asks for the same payload; this is only how the row
+ *  learns the rung once the shell has judged the launch, which happens after
+ *  that read. Returns the unsubscribe. */
+export function initDesktopGpuBackendActive(bridge: DesktopBridge | null | undefined): () => void {
+  const subscribe = bridge?.onGpuBackendState;
+  if (typeof subscribe !== 'function') return () => {};
+  return subscribe.call(bridge, (state) => {
+    activeState = readActive(state) ?? activeState;
+  });
+}
+
+/** The reading the options row paints, or null while there is nothing to say. */
+export function desktopGpuBackendActive(): DesktopGpuBackendActive | null {
+  return activeState;
+}
+
+/** Tests only: forget the latched reading between cases. */
+export function resetDesktopGpuBackendActiveForTest(): void {
+  activeState = null;
 }

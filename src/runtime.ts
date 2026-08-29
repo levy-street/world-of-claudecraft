@@ -129,7 +129,14 @@ export type DesktopGpuBackendSetting = 'auto' | 'vulkan' | 'opengl';
  *  the renderer reads only what a surface consumes: the platform gate is the
  *  synchronous hasGpuBackendChoice below, never an awaited field. */
 export interface DesktopGpuBackendState {
+  /** What the NEXT launch will do (the stored preference). */
   setting: DesktopGpuBackendSetting;
+  /** The rung THIS launch is actually running, once the shell has judged it.
+   *  A rung, not a setting: the two Vulkan rungs differ by an ANGLE feature the
+   *  player never picks, and the options row reads both as "Vulkan". */
+  active?: string;
+  /** The launch bound something lower than the setting asked for. */
+  requestedUnavailable?: boolean;
 }
 
 export interface DesktopBridge {
@@ -203,6 +210,9 @@ export interface DesktopBridge {
   // the window opens. Absent on older shells: feature-check before use.
   getGpuBackend?(): Promise<DesktopGpuBackendState>;
   setGpuBackend?(setting: DesktopGpuBackendSetting): Promise<boolean>;
+  /** The same state, pushed when the shell judges the launch: a page already on
+   *  the options row would otherwise show the pre-judgement reading all session. */
+  onGpuBackendState?(callback: (state: DesktopGpuBackendState) => void): () => void;
   hasGpuBackendChoice?: boolean;
   // The page's WebGL renderer string, the evidence the shell judges its Linux
   // Vulkan trial on (getGPUInfo carries no renderer string there). A send, no

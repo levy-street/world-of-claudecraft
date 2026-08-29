@@ -11,6 +11,7 @@ import {
 } from './desktop_display_mode_sync';
 import {
   type DesktopGpuBackendSettings,
+  initDesktopGpuBackendActive,
   pushDesktopGpuBackend,
   syncDesktopGpuBackendSetting,
 } from './desktop_gpu_backend_sync';
@@ -26,9 +27,10 @@ export type DesktopShellSettings = DesktopGpuPrefSettings &
   DesktopGpuBackendSettings &
   DesktopDisplayModeSettings;
 
-/** Reflect every shell-stored value at boot, and report the page's renderer
- *  string the shell judges its Vulkan trial on. Each reflection is its own
- *  fire-and-forget round trip; none blocks the others or the boot. */
+/** Reflect every shell-stored value at boot, report the page's renderer string
+ *  the shell judges this launch on, and start listening for the rung it
+ *  actually bound. Each reflection is its own fire-and-forget round trip; none
+ *  blocks the others or the boot. */
 export function syncDesktopShellSettings(
   bridge: DesktopBridge | null | undefined,
   createSettings: () => DesktopShellSettings,
@@ -36,6 +38,10 @@ export function syncDesktopShellSettings(
   reportDesktopGpuRenderer(bridge);
   void syncDesktopGpuPrefSetting(bridge, createSettings);
   void syncDesktopGpuBackendSetting(bridge, createSettings);
+  // The judgement lands AFTER the renderer report above, so this is a
+  // subscription rather than a read: the options row reads the latched value
+  // whenever the player opens it.
+  initDesktopGpuBackendActive(bridge);
   void syncDesktopDisplayModeSetting(bridge, createSettings);
 }
 

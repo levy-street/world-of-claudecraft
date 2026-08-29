@@ -1516,6 +1516,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendAuto': '自動',
   'hudChrome.options.gpuBackendVulkan': 'Vulkan',
   'hudChrome.options.gpuBackendOpenGL': 'OpenGL（低速）',
+  'hudChrome.options.gpuBackendActive': '現在は {backend} を使用しています。',
+  'hudChrome.options.gpuBackendActiveUnavailable':
+    '現在は {backend} を使用しています（Vulkan を有効にできませんでした）。',
   'hudChrome.options.gpuBackendNote':
     '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',

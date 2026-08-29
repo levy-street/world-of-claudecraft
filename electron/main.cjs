@@ -81,6 +81,7 @@ const {
   gpuBackendMemoryAfterHealthySession,
   launchCounterAfterAutoLaunch,
   hasGetGpuInfoEvidence,
+  isHigherRung,
   judgeGpuBackendLaunch,
   relaunchOnLowerBackend,
   SESSION_HEALTHY_AFTER_MS,
@@ -1159,8 +1160,13 @@ ipcMain.handle('desktop-set-gpu-backend', (event, value) => {
 function gpuBackendState() {
   return {
     setting: desktopPrefs.gpuBackend,
-    active: boundRung,
-    requestedUnavailable: gpuBackendJudged && boundRung !== gpuBackendLaunch.rung,
+    // Empty until the launch is judged: `boundRung` starts as the rung we ASKED
+    // for, and reporting that as the active one is exactly the lie the status
+    // line exists to stop (the page reads an empty rung as "nothing to say").
+    active: gpuBackendJudged ? boundRung : '',
+    // Only a rung BELOW the one asked for is a failure to enable it. A page
+    // reporting something higher is not the player's setting falling short.
+    requestedUnavailable: gpuBackendJudged && isHigherRung(gpuBackendLaunch.rung, boundRung),
     supported: process.platform === 'linux',
   };
 }
@@ -1433,40 +1439,50 @@ function judgeThisLaunch(glRenderer, softwareRendering, parallelCompile) {
     parallel: gpuBackendLaunch.parallel,
     parallelCompile,
   });
-  boundGpuDriver = typeof glRenderer === 'string' ? glRenderer : '';
+  // Capped here rather than at each caller: this value is written to disk, and
+  // the getGPUInfo arm hands it over uncapped.
+  boundGpuDriver = typeof glRenderer === 'string' ? glRenderer.slice(0, 256) : '';
   log.info(`[gpu] backend bound: ${boundRung} (asked for ${gpuBackendLaunch.rung})`, {
     glRenderer,
     softwareRendering,
     parallelCompile,
   });
   sendGpuBackendState();
-  if (boundRung === gpuBackendLaunch.rung) {
-    armHealthySessionTimer();
-    return;
-  }
-  // It bound something lower than it asked for: the switches did not take. Step down for
-  // real rather than sit on a software rasterizer for the session.
+  if (!isHigherRung(gpuBackendLaunch.rung, boundRung)) return;
+  // It bound something LOWER than it asked for: the switches did not take. Step down for
+  // real rather than sit on a software rasterizer for the session. A reading that is not
+  // lower (the rung we asked for, or somehow a higher one) changes nothing.
   log.warn(`[gpu] ${gpuBackendLaunch.rung} did not bind; rescuing onto the rung below it`, {
     bound: boundRung,
   });
-  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) {
-    app.exit(0);
-    return;
-  }
-  // No rescue available (the chain is spent, or the spawn failed): run what we have, and
-  // still let a healthy session record it, since what bound IS what this machine can do.
-  armHealthySessionTimer();
+  if (relaunchOnLowerBackend({ log }, gpuBackendLaunch.rung)) app.exit(0);
+  // No rescue available (the chain is spent, or the spawn failed): run what we have. The
+  // healthy-session timer is already running, and what bound IS what this machine can do,
+  // so a session that survives still records the truth.
 }
 
-// A session is HEALTHY when the page has reported its renderer AND the session then
-// survives SESSION_HEALTHY_AFTER_MS without a GPU-process death. That is the one signal
-// worth writing to the memory: it separates "this rung runs here" from "this rung started
-// here", which is the distinction the previous verdict never made.
+// A session is HEALTHY once it has survived SESSION_HEALTHY_AFTER_MS without a
+// GPU-process death. That is what separates "this rung runs here" from "this rung started
+// here", the distinction the previous verdict never made, and it is also what tells a LATE
+// crash apart from a launch failure.
+//
+// Armed from the launch itself, never from the judgement: a page that never reports its
+// renderer (WebGL creation failed outright is exactly that case) would otherwise leave the
+// session in "launch" state for its whole life, and a GPU-process death three hours in
+// would be counted as a launch failure, demote the memory, and re-exec a live session out
+// from under the player. Writing the MEMORY still requires a judged rung, because an
+// unjudged one is not evidence of anything.
 function armHealthySessionTimer() {
   if (healthySessionTimer !== null || sessionHealthy) return;
   healthySessionTimer = setTimeout(() => {
     healthySessionTimer = null;
     sessionHealthy = true;
+    if (!gpuBackendJudged) {
+      // Nothing reported its renderer, so there is no rung to record. The
+      // session still counts as healthy: a death from here is a late crash.
+      log.info('[gpu] session healthy, but the launch was never judged (memory untouched)');
+      return;
+    }
     if (desktopPrefs.gpuBackend !== 'auto') {
       // An explicit choice never writes the memory: explicit means the player decided,
       // not that we learned something about the machine.
@@ -1496,6 +1512,11 @@ function armHealthySessionTimer() {
 // AFTER a healthy session it is the rare late crash: Chromium restarts the GPU process on
 // its own and this session keeps whatever it recovers on. Nothing is counted and nothing
 // is written, because the rung has already proven itself here.
+// The launch window opens now, not when something reports a renderer: see
+// armHealthySessionTimer. Deferred to whenReady only because Electron's timers are the
+// shell's own clock, and nothing before ready can die anyway.
+app.whenReady().then(armHealthySessionTimer);
+
 app.on('child-process-gone', (_event, details) => {
   if (details?.type !== 'GPU') return;
   const context = { reason: details?.reason, exitCode: details?.exitCode };
