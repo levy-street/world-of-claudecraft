@@ -615,6 +615,24 @@ never a second knownness rule. Specialization: threshold and discounts in
 `SPECIALIZATION_THRESHOLDS` rows (`src/sim/content/professions.ts`,
 `specializedSkillThreshold` 75, `materialDiscountPct` 0.2).
 
+HOW CRAFTING GATES (added 2026-08-29, qr-GATE-DOC; the design is good and
+was undocumented, and it reads like a bug until traced, so this paragraph
+is what stops a future contributor from "fixing" it). There is deliberately
+NO skillReq admission gate at craft time: `src/sim/professions/crafting.ts`
+states it at its header ("There is still NO skillReq admission gate: any
+known recipe is attemptable on materials alone"), so a low-skill crafter
+holding the materials can always craft a KNOWN recipe, for themselves or
+for a friend. The skill bands are still real, through three other gates:
+the TEACHING gate (`teachTierMet`, `src/sim/professions/training.ts`,
+applied on both acquisition channels, trainer and pattern item alike:
+you cannot LEARN a recipe above your tier), the SKILL-GAIN curve (the
+archetype empowerment ceilings and the tier-distance multipliers shape
+what an attempt is worth, so off-tier crafting advances you slowly or not
+at all), and the masterwork ceiling (proc chance and eligibility read the
+tier and the ceiling, so the empowered outcome stays band-gated even when
+the craft itself succeeds). Knowledge is the gate; materials are the cost;
+tier shapes growth and excellence, never admission.
+
 ### Quests, nudges, work orders, letters
 Attunement rides the archetype chooser quests
 (`src/sim/quests/profession_quest_effects.ts`); while any attunement quest is

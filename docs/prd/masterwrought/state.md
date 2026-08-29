@@ -5668,6 +5668,11 @@ recorded, or refuted with the file open)
     the art wave runs on the maintainer's own schedule after the packet.
     The growth is ACCEPTED, and each phase re-derives the pending size
     from the previous phase's observed value.
+    (CORRECTED 2026-08-29, Phase 16, per 11f's correction 5: a PARKED id
+    carries NO mapping.json owner; adding one reds the art gate's
+    bijection arm. "Exactly one mapping.json owner" is the rule for art
+    that LANDS. The tree already follows the corrected rule: all 81
+    parked ids are unowned and the gate is green.)
   - CLOSED, see 11j-D-F and state-GATE-6. THE R17 GATHERING-TOOL CARVE-OUT
     STANDS, scoped by TEXT to the hoe ladder alone and recorded as a
     CLARIFICATION beside R17, never as a change to R17. R17's text above is
@@ -5689,7 +5694,9 @@ recorded, or refuted with the file open)
 - SAME-CHANGE OBLIGATIONS, restated because this program mints more
   content ids than any phase before it: every new id carries committed
   WebP art (which needs the maintainer's master SHA, so new ids park in
-  ITEM_ART_PENDING with exactly one mapping.json owner), non-Latin name
+  ITEM_ART_PENDING; CORRECTED 2026-08-29 per 11f's correction 5, a parked
+  id carries NO mapping.json owner, the exactly-one-owner rule binds when
+  art LANDS), non-Latin name
   fills for wordy English names (M16), wiki regen through
   npm run wiki:content, Book of Deeds records where the content is
   conquerable, src/ui/world_entity_i18n.ts rows for named entities, and

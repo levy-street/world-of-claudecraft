@@ -15,6 +15,30 @@ seed, which is the whole point of using it for RL. The Python half is `python/`.
 - Input validation (action bounds, player-class names, the 1 MiB stdin line cap)
   lives in the pure sibling `headless/protocol.ts`, not `env_server.ts`.
 
+## Scope: what the env covers, and the recorded farming CUT
+The action space is combat, movement, targeting, `interact`, `stop`, and
+`eat_drink` (`ACTIONS` in `src/sim/obs.ts`); professions are OUT of the RL
+action space. In particular the Masterwrought packet's farming system (five
+wire commands and an eight-member `IWorldFarming` facet) is an explicit CUT
+for that packet, recorded 2026-08-29 (Phase 16; rows ip-16-SURFACES c and
+the packet's in-or-CUT contract), not an oversight. Two reasons, one of
+them structural:
+- **Growth resolves against `ctx.lockoutNowMs()`** (absolute
+  `readyAtMs` timestamps written at plant time). On this host that clock is
+  the UNINJECTED fallback, sim-clock ms from zero, so a tier-1 crop
+  (45 min) needs 54,000 ticks: 10,800 steps at the default `frameSkip` 5,
+  above `DEFAULT_CONFIG.maxSteps` 8000. Any episode that plants is also
+  non-replayable across host boundaries where a wall clock is injected.
+  The re-admission condition is a VIRTUAL CLOCK: a deterministic,
+  seed-stable `lockoutNowMs` injection plus an episode-time compression
+  story, decided as its own design change in `src/sim/obs.ts` terms, never
+  a quiet flag here.
+- Adding farming verbs would grow `ACTIONS` (append-only: every trained
+  policy's action head is positional) and the obs vector for state no
+  current reward term reads.
+The one-sim-three-hosts claim is intact: the sim CODE is identical here;
+what this host does not do is expose those commands as actions.
+
 ## Wire protocol: NDJSON over stdin/stdout
 **IMPORTANT:** transport is line-delimited JSON on **stdin/stdout** (one object
 per line via `node:readline`). Not a socket / WS / HTTP. The Python client in

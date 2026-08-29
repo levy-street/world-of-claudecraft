@@ -164,7 +164,9 @@ the activity-card union members, and where the RL action space enumerates comman
   SETTLED (2026-08-20, rows state-GATE-5 and ip-16-ICON): they PARK. Masterwrought's items
   park against the merged table and the merged pending allowlist exactly like farming's 44,
   said explicitly in this phase's record; this packet ships no committed WebP art, every new
-  id carries a pending row with exactly ONE mapping.json owner, and the merged icon test keeps
+  id carries a pending row with exactly ONE mapping.json owner (CORRECTED 2026-08-29 per 11f's
+  correction 5: a PARKED id carries NO mapping.json owner; the exactly-one rule binds when art
+  LANDS), and the merged icon test keeps
   farming's art-subject split shape with re-derived literals. Masterwrought's asserted-empty
   pending set is RETIRED, and its retirement is recorded here. Farming also left a pending
   rationale-comment sweep in that file ("no faucet until go-live" for compost) which 11e's

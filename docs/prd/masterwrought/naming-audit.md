@@ -375,6 +375,14 @@ Vellum.
       (genre-standard condition vocabulary describing the character's state
       rather than a coined mark), per the ruling; any future trade-dress
       tightening starts here.
+      AMENDED 2026-08-29 (Phase 16, row state-OPEN-WELLFED): the
+      generic-with-caveat caveat from ruling (9) is RETIRED by the 11c
+      unification. The merged-registry question ("two mechanics share the
+      name, rename one?") DISSOLVED at 11c: after the unification there is
+      exactly ONE Well Fed (one aura id, one mechanic, one ladder, farming
+      2/3/4/5 and the apex 6 as rungs of the same ladder), so NEITHER
+      mechanic is renamed and no rename branch exists. The row's own
+      trade-dress note above stands unchanged.
 
 - MINTED AT PHASE 11e (the four upper-tier crop names, web-verified 2026-08-21
   by a proposing exact-phrase pass and an adversarial pass scoped to the major

@@ -1085,8 +1085,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // invent a second consumption route the command already owns.
   //
   // VALUES ARE PROVISIONAL and flagged for the maintainer. Compost carries a
-  // vendor buyValue NOW per D9 (priced when the item lands, stocked by the
-  // farmer NPCs in the go-live phase) at the four-times-sell convention, and
+  // vendor buyValue per D9 (priced when the item landed; the farmer NPCs in
+  // all four zones stock it today, see their vendorItems arrays) at the
+  // four-times-sell convention, and
   // sits at twice a husk's value so the husk conversion (2 husks to 1
   // compost) is value-neutral at the vendor. The growth tonic is NEVER
   // vendor-stocked: its one faucet is recipe_growth_tonic, brewed by an
