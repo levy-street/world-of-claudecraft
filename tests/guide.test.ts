@@ -3792,6 +3792,45 @@ describe('the craft ladder prose keeps its counts derived or count-free (Masterw
     expect(body).toContain('skill 25 rung');
   });
 
+  it('the alchemy ladder body carries the live ELIXIR and FLASK magnitudes', () => {
+    // ADDED AT PHASE 15, because the arm above pins the draughts and the rung
+    // counts but nothing read the two magnitude sentences below them. The R5
+    // envelope tune moved the flask band 15 to 13 and this prose kept saying
+    // 15, in English and in all five non-Latin overlays, so the public wiki
+    // told players a number the tooltip contradicted and nothing went red.
+    // Every figure is derived from the item table, never restated.
+    const body = t('guide.profPages.craftProse.alchemy.ladderBody');
+    const elixir = (id: string): { value?: number; duration?: number } =>
+      (ITEMS[id] as unknown as { elixir?: { value?: number; duration?: number } }).elixir ?? {};
+
+    // The three elixir rungs, each "<value> [Stamina] for <minutes> minutes".
+    // The first names the stat and the other two lean on it, which is why the
+    // needle allows the word rather than pinning three separate sentences.
+    // venomfire_elixir is the Vipersear Elixir's id: the display name and the
+    // id diverge here, which is exactly why the arm reads the def rather than
+    // trusting the prose's own words.
+    for (const id of ['elixir_of_the_boar', 'venomfire_elixir', 'elixir_of_the_serpent'] as const) {
+      const e = elixir(id);
+      expect(e.value, `${id} value`).toBeGreaterThan(0);
+      expect(e.duration, `${id} duration`).toBeGreaterThan(0);
+      expect(body, id).toMatch(
+        new RegExp(`\\b${e.value}(?: Stamina)? for ${(e.duration ?? 0) / 60} minutes\\b`),
+      );
+    }
+
+    // The flask rung. All three role flasks share one band, so the sentence is
+    // magnitude-only and the arm holds all three to it.
+    const flask = elixir('ironhusk_flask');
+    expect(flask.value, 'the flask band').toBe(13);
+    expect(flask.duration, 'the flask duration').toBe(1200);
+    for (const id of ['ironhusk_flask', 'warboar_flask', 'runewater_flask'] as const) {
+      expect(elixir(id).value, `${id} shares the band`).toBe(flask.value);
+    }
+    expect(body).toContain(
+      `A flask grants ${flask.value} for ${(flask.duration ?? 0) / 60} minutes`,
+    );
+  });
+
   it('the engineering ladder body spells no ladder count (the hoes and the chassis grew it)', () => {
     const body = t('guide.profPages.craftProse.engineering.ladderBody');
     // Any spelled or numeric "<count> recipes" is the retired claim; the
