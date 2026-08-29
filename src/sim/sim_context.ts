@@ -951,6 +951,11 @@ export interface SimContextCallbacks {
   // /dev sandbox: a generic practice scenario (dummy + regen-frozen raid bots at a 10k
   // pool). Returns the number of allies spawned. Stays on Sim.
   startDevSandbox(pid?: number): number;
+  // /dev freezemobs: the sim-wide dev freeze for placement work (dev_commands.ts,
+  // gated by devCommands): mobs skip their AI update and acquire no aggro while
+  // set. undefined toggles; returns the resulting state. State is
+  // Sim.devMobsFrozen, never persisted. Stays on Sim.
+  setDevMobsFrozen(on?: boolean): boolean;
   // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (dev_commands.ts,
   // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
   seedDungeonFinderDev(
@@ -1592,6 +1597,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     spawnDevVendor: host.spawnDevVendor,
     startCascadePlaytest: host.startCascadePlaytest,
     startDevSandbox: host.startDevSandbox,
+    setDevMobsFrozen: host.setDevMobsFrozen,
     seedDungeonFinderDev: host.seedDungeonFinderDev,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,

@@ -421,4 +421,39 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
   });
+
+  it('freezes every mob in place with no aggro, and releases on off', () => {
+    const sim = devSim();
+    // an aggressive mob right beside the player: without the freeze this
+    // pulls within a tick (aggroRadius far exceeds the spawn offset)
+    sim.chat('/dev freezemobs on');
+    expect(sim.devMobsFrozen).toBe(true);
+    sim.chat('/dev spawn forest_wolf 1 17');
+    const wolf = devSpawns(sim)[0];
+    expect(wolf).toBeTruthy();
+    const frozenAt = { ...wolf.pos };
+    for (let i = 0; i < 100; i++) sim.tick();
+    expect(wolf.aiState, 'a frozen mob never acquires aggro').toBe('idle');
+    expect(wolf.inCombat).toBe(false);
+    expect(wolf.pos, 'a frozen mob never moves').toEqual(frozenAt);
+
+    // explicit on is idempotent (the placer asserts state, never toggles)
+    sim.chat('/dev freezemobs on');
+    expect(sim.devMobsFrozen).toBe(true);
+
+    sim.chat('/dev freezemobs off');
+    expect(sim.devMobsFrozen).toBe(false);
+    let pulled = false;
+    for (let i = 0; i < 40 && !pulled; i++) {
+      sim.tick();
+      pulled = wolf.inCombat;
+    }
+    expect(pulled, 'an unfrozen mob pulls again').toBe(true);
+
+    // the bare form toggles
+    sim.chat('/dev freezemobs');
+    expect(sim.devMobsFrozen).toBe(true);
+    sim.chat('/dev freezemobs');
+    expect(sim.devMobsFrozen).toBe(false);
+  });
 });

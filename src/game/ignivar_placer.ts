@@ -35,6 +35,9 @@ export interface IgnivarPlacerDeps {
   scene: THREE.Scene;
   getPlayer: () => Entity | undefined;
   log: (text: string, color?: string) => void;
+  /** the chat send path, for the dev commands the rig drives itself
+   *  (the mob freeze on open/close) */
+  chat: (text: string) => void;
 }
 
 interface PlacedEntry {
@@ -158,10 +161,19 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
   'tower_top',
 ];
 
-type AssetKit = 'interior' | 'exterior';
+/** The owner's NEW asset kit for the Drakelands rebuild (the Last Keep and
+ *  Wyrmwatch placer passes): a dedicated picker section that holds ONLY the
+ *  new assets the owner provides, never a key from the interior or exterior
+ *  rosters. Empty until those assets land; each one registers in
+ *  IGNIVAR_ENV_PROP_URLS (plus its native dims) and then joins this list. */
+const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [];
+
+type AssetKit = 'interior' | 'exterior' | 'custom';
+
+const KIT_CYCLE: readonly AssetKit[] = ['interior', 'exterior', 'custom'];
 
 /** null = follow the site (exterior site shows the exterior kit); the panel
- *  button overrides so either kit is reachable anywhere. */
+ *  button cycles the three kits so any of them is reachable anywhere. */
 let kitOverride: AssetKit | null = null;
 
 function activeKit(): AssetKit {
@@ -169,7 +181,9 @@ function activeKit(): AssetKit {
 }
 
 function kitKeys(): readonly IgnivarEnvPropKey[] {
-  return activeKit() === 'exterior'
+  const kit = activeKit();
+  if (kit === 'custom') return CUSTOM_KIT;
+  return kit === 'exterior'
     ? EXTERIOR_KIT
     : (Object.keys(IGNIVAR_ENV_PROP_URLS) as IgnivarEnvPropKey[]);
 }
@@ -229,6 +243,21 @@ const WORKLIGHT_INTENSITY = 1.4;
 let worklightOn = true;
 
 const worklightLabel = (): string => (worklightOn ? 'work light: on' : 'work light: off');
+
+// The placement mob freeze: the rig drives /dev freezemobs itself so opening
+// the placer never draws aggro mid-layout (frozen mobs skip their whole AI
+// update: no wander, no pulls, no swings). On by default every open, released
+// on close; the panel button flips it for anyone who wants the world moving
+// while they place. Explicit on/off forms keep the rig idempotent against
+// hand-typed toggles.
+let freezeMobsOn = true;
+
+const freezeLabel = (): string => (freezeMobsOn ? 'mobs: frozen' : 'mobs: live');
+
+function sendFreeze(on: boolean): void {
+  freezeMobsOn = on;
+  state.deps?.chat(on ? '/dev freezemobs on' : '/dev freezemobs off');
+}
 
 function applyWorklight(): void {
   const deps = state.deps;
@@ -500,7 +529,17 @@ function renderPicker(): void {
   const picker = state.pickerEl;
   if (!picker) return;
   picker.textContent = '';
-  for (const key of kitKeys()) picker.appendChild(button(key, () => placeProp(key)));
+  const keys = kitKeys();
+  for (const key of keys) picker.appendChild(button(key, () => placeProp(key)));
+  if (keys.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'font-size:11px;color:#9a917f;padding:2px 0;';
+    empty.textContent =
+      activeKit() === 'custom'
+        ? 'custom kit is empty: the new assets join CUSTOM_KIT as they land'
+        : 'this kit is empty';
+    picker.appendChild(empty);
+  }
   if (state.kitBtn) state.kitBtn.textContent = kitLabel();
 }
 
@@ -688,8 +727,12 @@ function buildPanel(): void {
     setWorklight(!worklightOn);
     worklightBtn.textContent = worklightLabel();
   });
+  const freezeBtn = button(freezeLabel(), () => {
+    sendFreeze(!freezeMobsOn);
+    freezeBtn.textContent = freezeLabel();
+  });
   const kitBtn = button(kitLabel(), () => {
-    kitOverride = activeKit() === 'exterior' ? 'interior' : 'exterior';
+    kitOverride = KIT_CYCLE[(KIT_CYCLE.indexOf(activeKit()) + 1) % KIT_CYCLE.length];
     renderPicker();
   });
   state.kitBtn = kitBtn;
@@ -704,6 +747,7 @@ function buildPanel(): void {
     ),
     kitBtn,
     worklightBtn,
+    freezeBtn,
     button('close', closePlacer),
   ]);
 
@@ -731,6 +775,10 @@ function closePlacer(): void {
     window.clearInterval(state.timer);
     state.timer = null;
   }
+  // release the placement freeze before anything else tears down (explicit
+  // off, so a hand-typed toggle mid-session cannot leave the world stuck)
+  sendFreeze(false);
+  freezeMobsOn = true; // next open freezes again by default
   state.panel?.remove();
   state.panel = null;
   state.listEl = null;
@@ -754,6 +802,7 @@ function openPlacer(deps: IgnivarPlacerDeps): void {
     if (state.panel) return;
     buildPanel();
     applyWorklight();
+    sendFreeze(true);
     const room = roomForPlayer(deps.getPlayer());
     if (room) enterRoom(room);
     tickStatus();

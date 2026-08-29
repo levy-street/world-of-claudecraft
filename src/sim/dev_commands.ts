@@ -715,6 +715,24 @@ export function handleDevChat(
     return null;
   }
 
+  const freezeMatch = /^\/(?:dev\s+freezemobs|devfreezemobs)(?:\s+(on|off))?\s*$/i.exec(raw);
+  if (freezeMatch) {
+    // Sim-wide, unlike noaggro's per-player flag: the placer wants the whole
+    // pack statue-still, not just blind to one designer. Bare form toggles;
+    // an explicit on/off is idempotent so the placer can assert a state on
+    // open and close without tracking what the user toggled by hand.
+    const wanted = freezeMatch[1] ? freezeMatch[1].toLowerCase() === 'on' : undefined;
+    const frozen = ctx.setDevMobsFrozen(wanted);
+    emitDevLog(
+      ctx,
+      pid,
+      frozen
+        ? '[dev] Mobs FROZEN in place: no wander, no aggro, no swings (place freely).'
+        : '[dev] Mobs unfrozen: the world moves again.',
+    );
+    return null;
+  }
+
   if (/^\/(?:dev\s+noaggro|devnoaggro)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity) {
@@ -910,7 +928,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

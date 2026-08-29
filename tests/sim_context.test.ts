@@ -218,6 +218,7 @@ const CALLBACK_KEYS = [
   'spawnDevVendor',
   'startCascadePlaytest',
   'startDevSandbox',
+  'setDevMobsFrozen',
   'seedDungeonFinderDev',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
@@ -557,6 +558,7 @@ function makeFakeHost() {
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),
+    setDevMobsFrozen: vi.fn(() => false),
     seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),

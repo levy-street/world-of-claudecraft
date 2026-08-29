@@ -1771,6 +1771,7 @@ async function startGame(
           scene: renderer.scene,
           getPlayer: () => world.player,
           log: (text, color) => hud.log(text, color),
+          chat: (text) => world.chat(text),
         })
       ) {
         chatInput.value = '';
