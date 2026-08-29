@@ -158,6 +158,9 @@ describe('buildEntityPrewarmGroup copy counts and session dedupe', () => {
     // the copy split is the pool-depth rule the extraction carried over.
     const host = makeHost(['forest_wolf', 'rare_oddity']);
     const built = buildEntityPrewarmGroup(host, ZONE);
+    // Decisiveness floor: at 1 copy the split this case is named for
+    // collapses and every assertion below passes vacuously.
+    expect(PREWARM_MOB_POOL_COPIES).toBeGreaterThan(1);
     expect(state.createCalls.filter((id) => id === 'forest_wolf')).toHaveLength(
       PREWARM_MOB_POOL_COPIES,
     );
@@ -230,6 +233,9 @@ describe('buildObjectPrewarmGroup pooled copies and the point-light hide', () =>
       return { group } as unknown as PooledObjectView;
     };
     const group = buildObjectPrewarmGroup(host);
+    // Vacuity floor: with an emptied id list every count below is 0 == 0.
+    expect(PREWARM_OBJECT_ITEM_IDS.length).toBeGreaterThan(0);
+    expect(PREWARM_OBJECT_POOL_COPIES).toBeGreaterThan(0);
     expect(group.children).toHaveLength(
       PREWARM_OBJECT_ITEM_IDS.length * PREWARM_OBJECT_POOL_COPIES,
     );

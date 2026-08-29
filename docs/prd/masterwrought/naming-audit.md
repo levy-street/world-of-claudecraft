@@ -672,6 +672,11 @@ RENAME, IN THIS PACKET (Phase 16 owns it, inside its merged naming-registry pass
   각인) and both zh fills (蚀刻/蝕刻, not WoW's 附魔) had avoided their neighbours from
   the start and are unchanged. Future locale fills of these rows check the target
   locale's own Engraving/enchant trade dress, not only the English scheme noun.
+  One recorded in-family doubling accepted (the fix-round reader's find): ja's
+  pre-existing Deed of Making tooltip already reads 銘刻の証書, so the new
+  scheme noun shares 銘刻 with the legendary-naming writ; both belong to the
+  same masterwrought making family, so the shared noun reads as consistency,
+  not collision, and is kept deliberately.
 
 DO NOT RENAME, and do not re-raise:
 - ITEM 1, the zone families The Amberfall / The Frostveil Reach / The Nightbloom / Galecrest.

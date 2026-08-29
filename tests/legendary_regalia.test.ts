@@ -141,9 +141,16 @@ describe('legendaryRegaliaEmitScale: the distance shed', () => {
     // from vfx.ts rather than hand-copied, and the shed floor is read from the
     // live scale at the anchor, so a retune of either re-prices this bound.
     // Worst case must stay a spark every few seconds, never a silent removal.
-    const m = read('src/render/vfx.ts').match(/([\d.]+) \+ ([\d.]+) \* this\.quality/);
+    // Anchor the scrape INSIDE emitCount's body: scaledCount above it carries
+    // its own floor + span * quality expression with a DIFFERENT floor, and an
+    // unanchored match reads that one first (the fix-round reader proved it).
+    const vfxSource = read('src/render/vfx.ts');
+    const emitCountAt = vfxSource.indexOf('private emitCount(');
+    expect(emitCountAt, 'emitCount is missing from vfx.ts').toBeGreaterThan(-1);
+    const m = vfxSource.slice(emitCountAt).match(/([\d.]+) \+ ([\d.]+) \* this\.quality/);
     expect(m, 'the emitCount quality-floor expression is missing from vfx.ts').not.toBeNull();
     const poolFloor = Number((m as RegExpMatchArray)[1]);
+    expect(poolFloor, 'the scrape must land on the 0.35 emit floor, not a sibling').toBe(0.35);
     expect(poolFloor).toBeGreaterThan(0);
     const shedFloor = legendaryRegaliaEmitScale(CHARACTER_LOD_RANGE_SQ);
     expect(LEGENDARY_REGALIA_RATE_PER_SEC * shedFloor * poolFloor).toBeGreaterThan(0.2);

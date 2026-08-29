@@ -59,7 +59,16 @@ describe('originality-sweep display literals stay renamed', () => {
       );
       for (const row of rows) {
         scanned++;
-        expect(row[1] ?? row[2], `${file}: ${row[0]}`).not.toMatch(/^Enchant\s/);
+        // The English formula AND the known localized WoW enchant-formula
+        // verbs (the deleted stale fills were exactly these: es/pt Encantar,
+        // fr Enchanter/Enchantement, de Verzauberung/Verzaubern, it Incanta,
+        // nl Betovering/Betover, pl Zaklecie/Zaklinanie, cs Ocarovani,
+        // sv Fortrolla, da Fortryl, tr Buyule, id Sihir, vi Phu phep). A
+        // refill in one of these dresses reds here; a wholly new dress is
+        // the release fill reviewer's to catch.
+        expect(row[1] ?? row[2], `${file}: ${row[0]}`).not.toMatch(
+          /^(Enchant|Encantar|Enchanter|Enchantement|Verzauber|Verzaubern|Verzauberung|Incanta|Betover|Zakl|Ocarov|Očarov|Fortroll|Förtroll|Fortryl|Buyule|Büyüle|Sihir|Phu phép|Phù phép)\s?/i,
+        );
       }
     }
     // Vacuity floor: the five shipped non-Latin fills alone carry 46 scheme
