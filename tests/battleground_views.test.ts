@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 const { built, commit } = vi.hoisted(() => ({
   built: [] as { origin: { x: number; z: number }; seed: number; opts: unknown }[],
@@ -112,7 +113,10 @@ describe('prebuildBattlegroundView', () => {
 });
 
 describe('the streamed parts and the renderer wiring (source pins)', () => {
-  const source = (rel: string) => readFileSync(new URL(rel, import.meta.url), 'utf8');
+  // Comment-stripped, like the sibling gate suite: a comment near-quoting a
+  // pinned call must never be what satisfies a positive pin.
+  const source = (rel: string) =>
+    stripComments(readFileSync(new URL(rel, import.meta.url), 'utf8'));
 
   it('attaches the yumi maze and every field part through the compile gate, and prebuilds at the proposal', () => {
     const renderer = source('../src/render/renderer.ts');

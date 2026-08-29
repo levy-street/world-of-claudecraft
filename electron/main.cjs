@@ -1090,7 +1090,7 @@ ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
   return desktopPrefs.gpuForceOptOut === true;
 });
 
-// The Linux GPU backend (Options > Interface). Stored, not applied live: the backend
+// The Linux GPU backend (Graphics > System). Stored, not applied live: the backend
 // switches land before Electron's own startup (see the gpuBackendLaunch block at the top
 // of this file), so a change takes effect at the NEXT launch. Choosing 'auto' again resets
 // the stored verdict, which re-arms exactly one Vulkan trial; 'vulkan' and 'opengl' are
@@ -1129,7 +1129,7 @@ ipcMain.handle('desktop-get-gpu-backend', (event) => {
   };
 });
 
-// How the shell presents its window (Options > Interface). Unlike the GPU force this
+// How the shell presents its window (Graphics > Display). Unlike the GPU force this
 // applies LIVE as well as being stored: the player expects the mode to change under the
 // click, and the next launch reads the same stored value at the reveal. Persisted first,
 // so a mode that could not be written is not applied to a window the next launch would

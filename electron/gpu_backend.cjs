@@ -27,7 +27,7 @@
 
 const { spawnDetachedSelf } = require('./gpu_preference.cjs');
 
-/** What the player can ask for (Options > Interface); 'auto' is the shipped default. */
+/** What the player can ask for (Graphics > System); 'auto' is the shipped default. */
 const GPU_BACKEND_SETTINGS = ['auto', 'vulkan', 'opengl'];
 
 /**
