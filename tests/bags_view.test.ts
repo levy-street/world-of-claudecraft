@@ -11,14 +11,17 @@ import {
   bagQualityKey,
   bagQuestSectionHeadersAllowed,
   bagShiftLinks,
+  bagSlotsLineKey,
   bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
   bagsWindowShown,
   bagTooltipHintKey,
+  bagUnknownAction,
   bankDepositOpensPrompt,
   buildBagGrid,
   buildBagListRows,
+  carriedPools,
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from '../src/ui/bags_view';
@@ -36,7 +39,9 @@ const NO_MODE: BagMode = {
   vendorOpen: false,
   bankOpen: false,
   bankDeposit: false,
+  bankSocketable: false,
   guildBankDeposit: false,
+  vaultDeposit: false,
   petFeed: false,
 };
 
@@ -70,6 +75,7 @@ const ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   } as ItemDef,
+  pouch: { kind: 'bag', name: 'Linen Pouch', quality: 'common', bagSlots: 6 } as ItemDef,
   junk: { kind: 'junk', name: 'Vendor Trash', quality: 'poor' } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
@@ -83,6 +89,7 @@ describe('bagShiftLinks', () => {
     expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
     expect(bagShiftLinks({ ...NO_MODE, bankDeposit: true })).toBe(false);
     expect(bagShiftLinks({ ...NO_MODE, guildBankDeposit: true })).toBe(false);
+    expect(bagShiftLinks({ ...NO_MODE, vaultDeposit: true })).toBe(false);
     // bankOpen is the ONE consumer that deliberately does not read the superset:
     // the gate here is "does something else already own shift-click", and a bank
     // view with no deposit target has no split prompt to collide with. Pinned so
@@ -141,6 +148,7 @@ describe('bagDestroyAction', () => {
       'bankOpen',
       'bankDeposit',
       'guildBankDeposit',
+      'vaultDeposit',
     ] as const) {
       expect(bagDestroyAction(ITEMS.sword, { ...NO_MODE, [mode]: true })).toBe('none');
       // even a normally-blocked item is 'none' (not 'discardBlocked') in these modes.
@@ -168,6 +176,42 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('bagItemAction vault arms (the Materials Vault tab)', () => {
+  const VAULT_MODE: BagMode = { ...NO_MODE, bankOpen: true, vaultDeposit: true };
+  // The caller computes membership from the honest id set (the info shape has
+  // no id); a material def here is just any def with the flag stamped on.
+  const material = { ...ITEMS.potion, vaultMaterial: true };
+
+  it('deposits a flagged material; refuses everything else with the not-material arm', () => {
+    expect(bagItemAction(material, VAULT_MODE)).toBe('vaultDeposit');
+    expect(bagItemAction(ITEMS.sword, VAULT_MODE)).toBe('vaultDepositBlockedNotMaterial');
+    // A quest item is refused as a NON-MATERIAL (the set excludes it), never
+    // via a quest-specific arm: the sim gates in the same order.
+    expect(bagItemAction(ITEMS.questItem, VAULT_MODE)).toBe('vaultDepositBlockedNotMaterial');
+  });
+
+  it('deposits instance payloads and crafted provenance on a real material', () => {
+    expect(bagItemAction(material, VAULT_MODE, { signer: 'Ana' })).toBe('vaultDeposit');
+    expect(bagItemAction(material, VAULT_MODE, undefined, 'recipe_x')).toBe('vaultDeposit');
+    // Identity does not widen eligibility: a non-material stays blocked.
+    expect(bagItemAction(ITEMS.sword, VAULT_MODE, { signer: 'Ana' })).toBe(
+      'vaultDepositBlockedNotMaterial',
+    );
+  });
+
+  it('hints the vault pair on hover and offers nothing on an unknown cell', () => {
+    expect(bagTooltipHintKey(material, VAULT_MODE)).toBe('hudChrome.bank.vaultDepositHint');
+    expect(bagTooltipHintKey(ITEMS.sword, VAULT_MODE)).toBe('hudChrome.bank.vaultCannotDeposit');
+    expect(bagTooltipHintKey(material, VAULT_MODE, { signer: 'Ana' })).toBe(
+      'hudChrome.bank.vaultDepositHint',
+    );
+    expect(bagTooltipHintKey(material, VAULT_MODE, undefined, 'recipe_x')).toBe(
+      'hudChrome.bank.vaultDepositHint',
+    );
+    expect(bagUnknownAction(VAULT_MODE)).toBe('none');
   });
 });
 
@@ -304,6 +348,54 @@ describe('soulbound transfer affordances', () => {
   });
 });
 
+describe('bagItemAction bank socket arm (phase 07)', () => {
+  const SOCKET_MODE: BagMode = {
+    ...NO_MODE,
+    bankOpen: true,
+    bankDeposit: true,
+    bankSocketable: true,
+  };
+
+  it('sockets a payload-free bag while an unlocked socket is empty', () => {
+    expect(bagItemAction(ITEMS.pouch, SOCKET_MODE)).toBe('bankSocketBag');
+  });
+
+  it('falls back to the plain deposit per blocked dimension, one arm each', () => {
+    // No open socket: the click still banks the bag, as an item.
+    expect(bagItemAction(ITEMS.pouch, { ...SOCKET_MODE, bankSocketable: false })).toBe(
+      'bankDeposit',
+    );
+    // An instance payload: sockets store bare ids (the sim's #2837 peek would
+    // refuse), so the copy deposits instead of erroring.
+    expect(bagItemAction(ITEMS.pouch, SOCKET_MODE, { signer: 'Maker' })).toBe('bankDeposit');
+    // Crafted provenance: same bare-id rule, same deposit fallback.
+    expect(bagItemAction(ITEMS.pouch, SOCKET_MODE, undefined, 'tailoring_linen_pouch')).toBe(
+      'bankDeposit',
+    );
+    // A non-bag never sockets, whatever the mode says.
+    expect(bagItemAction(ITEMS.sword, SOCKET_MODE)).toBe('bankDeposit');
+  });
+
+  it('keeps the quest block ABOVE the socket arm', () => {
+    expect(bagItemAction(ITEMS.questItem, SOCKET_MODE)).toBe('bankDepositBlockedQuest');
+  });
+
+  it('the hover hint mirrors the click arm exactly, dimension for dimension', () => {
+    expect(bagTooltipHintKey(ITEMS.pouch, SOCKET_MODE)).toBe('hudChrome.bank.socketHint');
+    expect(bagTooltipHintKey(ITEMS.pouch, { ...SOCKET_MODE, bankSocketable: false })).toBe(
+      'hudChrome.bank.depositHint',
+    );
+    expect(bagTooltipHintKey(ITEMS.pouch, SOCKET_MODE, { signer: 'Maker' })).toBe(
+      'hudChrome.bank.depositHint',
+    );
+    expect(bagTooltipHintKey(ITEMS.pouch, SOCKET_MODE, undefined, 'tailoring_linen_pouch')).toBe(
+      'hudChrome.bank.depositHint',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, SOCKET_MODE)).toBe('hudChrome.bank.depositHint');
+    expect(bagTooltipHintKey(ITEMS.questItem, SOCKET_MODE)).toBe('hudChrome.bank.cannotDeposit');
+  });
+});
+
 describe('bag mode chain order pin (insertion guard)', () => {
   // Pins the RELATIVE order between simultaneously-on modes, not just each mode
   // alone (the priority-order test above flips one flag at a time, so a ladder
@@ -318,11 +410,19 @@ describe('bag mode chain order pin (insertion guard)', () => {
     vendorOpen: true,
     bankOpen: true,
     bankDeposit: true,
+    // ON like every rung, even though it is a MODIFIER inside the bankDeposit
+    // rung rather than a rung of its own: the cascade's bankDeposit step walks
+    // its bag arm too (socket over deposit for a payload-free bag).
+    bankSocketable: true,
     guildBankDeposit: true,
+    // ON, like every other rung: the guard's whole job is to walk EVERY rung
+    // in ladder order (an off flag would let the vault rung move without a
+    // red, defeating the insertion guard by value).
+    vaultDeposit: true,
     petFeed: true,
   };
 
-  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > guild-bank-deposit > bank-deposit > bank-open-no-target > pet-feed > kind fallbacks', () => {
+  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > guild-bank-deposit > bank-deposit > vault-deposit > bank-open-no-target > pet-feed > kind fallbacks', () => {
     let mode = { ...ALL_MODES };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('trade');
     mode = { ...mode, tradeOpen: false };
@@ -337,7 +437,19 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, guildBankDeposit: false };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('bankDeposit');
     expect(bagItemAction(ITEMS.questItem, mode)).toBe('bankDepositBlockedQuest');
+    // The bankDeposit rung's bag arm (phase 07): socket while a payload-free
+    // bag has an open socket; peel the modifier and the same click deposits.
+    expect(bagItemAction(ITEMS.pouch, mode)).toBe('bankSocketBag');
+    mode = { ...mode, bankSocketable: false };
+    expect(bagItemAction(ITEMS.pouch, mode)).toBe('bankDeposit');
     mode = { ...mode, bankDeposit: false };
+    // The VAULT rung sits below the personal deposit and ABOVE the no-target
+    // stop (the real wiring arms it with bankOpen: true, so a rung below the
+    // stop would never fire): a material deposits, everything else speaks the
+    // not-material line.
+    expect(bagItemAction({ ...ITEMS.potion, vaultMaterial: true }, mode)).toBe('vaultDeposit');
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('vaultDepositBlockedNotMaterial');
+    mode = { ...mode, vaultDeposit: false };
     // The no-target rung: the bank is still OPEN, so the click stops here for
     // every item kind rather than dropping to the rungs that act on the item.
     expect(bagItemAction(ITEMS.sword, mode)).toBe('bankDepositBlockedNoTarget');
@@ -458,6 +570,7 @@ describe('bag mode chain order pin (insertion guard)', () => {
         marketSell: false,
         vendorOpen: false,
         guildBankDeposit: false,
+        vaultDeposit: false,
       }),
     ).toBe('bankDepositBlockedQuest');
   });
@@ -486,7 +599,18 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, guildBankDeposit: false };
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.depositHint');
     expect(bagTooltipHintKey(ITEMS.questItem, mode)).toBe('hudChrome.bank.cannotDeposit');
+    // The bag arm's hint, then its peel (the action cascade's twin).
+    expect(bagTooltipHintKey(ITEMS.pouch, mode)).toBe('hudChrome.bank.socketHint');
+    mode = { ...mode, bankSocketable: false };
+    expect(bagTooltipHintKey(ITEMS.pouch, mode)).toBe('hudChrome.bank.depositHint');
     mode = { ...mode, bankDeposit: false };
+    // The vault rung's hint pair, in the same ladder slot as its action rung:
+    // a material advertises the deposit, everything else the cannot line.
+    expect(bagTooltipHintKey({ ...ITEMS.potion, vaultMaterial: true }, mode)).toBe(
+      'hudChrome.bank.vaultDepositHint',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.vaultCannotDeposit');
+    mode = { ...mode, vaultDeposit: false };
     // The no-target rung: still an OPEN bank, so the hint says so instead of
     // advertising an equip the click will refuse.
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.cannotDepositNow');
@@ -509,6 +633,7 @@ describe('bag mode chain order pin (insertion guard)', () => {
         vendorOpen: false,
         bankDeposit: false,
         guildBankDeposit: false,
+        vaultDeposit: false,
       }),
     ).toBe(true);
   });
@@ -562,6 +687,115 @@ describe('bagTooltipHintKey', () => {
       expect(bagItemAction(rawCatch, NO_MODE), id).toBe('use');
       expect(bagItemAction(rawCatch, { ...NO_MODE, petFeed: true }), id).toBe('petFeedBlocked');
     }
+  });
+});
+
+describe('buildBagGrid in the two-pool tolerated-overflow state', () => {
+  it('models a general-over-budget inventory as overflow, never dropping a cell', () => {
+    // The state normal play reaches since phase 05 (general pool over budget
+    // after a satchel swap, materials headroom then consumed): 29 stacks
+    // against a 28 summed budget. The grid appends the excess past its cells
+    // (layoutBagCells' tolerated-overflow tail) and reports it, so nothing
+    // vanishes and the counter can wear its `over` state.
+    const inv: InvSlot[] = Array.from({ length: 29 }, (_, i) => ({
+      itemId: `stack_${i}`,
+      count: 1,
+    }));
+    const lookup: ItemLookup = () => undefined;
+    const model = buildBagGrid(inv, lookup, DEFAULT_BAG_FILTER, 28);
+    expect(model.state).toBe('items');
+    expect(model.overflow).toBe(1);
+    expect(model.emptyCells).toBe(0);
+    expect(model.cells).toHaveLength(29); // 28 real cells + the appended tail
+  });
+});
+
+describe('carriedPools (the phase 08 carried split readout)', () => {
+  // Real catalog ids on purpose: the split reads the live ITEMS table through
+  // the SAME shared helpers the sim's carried gates consume (poolCapacityOf
+  // over BACKPACK_SLOTS + the equipped bags, poolOccupancyOf with the
+  // honest-taxonomy isMaterialItemId predicate), so a synthetic lookup would
+  // test a rig, not the readout.
+  const HAVERSACK = 'foragers_haversack'; // 12-slot materialsOnly satchel
+  const WAYFARER = 'wayfarers_backpack'; // 16-slot unrestricted bag
+  const mats = (n: number): InvSlot[] =>
+    Array.from({ length: n }, () => ({ itemId: 'iron_ore', count: 1 }));
+  const gear = (n: number): InvSlot[] =>
+    Array.from({ length: n }, () => ({ itemId: 'worn_sword', count: 1 }));
+
+  it('splits capacity by bag type: backpack + unrestricted general, satchel materials', () => {
+    expect(carriedPools([WAYFARER, HAVERSACK, null, null], [])).toEqual({
+      general: { used: 0, capacity: 32 }, // 16 backpack + 16 wayfarer
+      materials: { used: 0, capacity: 12 },
+      showMaterials: true,
+    });
+  });
+
+  it('without a satchel the readout stays simple even when materials are carried', () => {
+    // A material with NO materials pool occupies general (the allocation
+    // rule's clamp), so showMaterials stays false and the counter keeps its
+    // plain aria.
+    expect(carriedPools([WAYFARER, null, null, null], [...gear(2), ...mats(1)])).toEqual({
+      general: { used: 3, capacity: 32 },
+      materials: { used: 0, capacity: 0 },
+      showMaterials: false,
+    });
+  });
+
+  it('materials pack materials-first and spill into general once the satchel fills', () => {
+    expect(carriedPools([HAVERSACK, null, null, null], [...mats(15), ...gear(5)])).toEqual({
+      general: { used: 8, capacity: 16 }, // 5 gear + 3 spilled materials
+      materials: { used: 12, capacity: 12 },
+      showMaterials: true,
+    });
+  });
+
+  it('the honest taxonomy decides membership: junk-kind grey trash stays general', () => {
+    // amber_hide is kind junk but OUTSIDE the taxonomy (poor quality): a
+    // kind-based approximation would park it in the satchel.
+    const split = carriedPools([HAVERSACK, null, null, null], [{ itemId: 'amber_hide', count: 1 }]);
+    expect(split.general.used).toBe(1);
+    expect(split.materials.used).toBe(0);
+  });
+
+  it('the compounded over-capacity state stays honest and the split sums to the pair', () => {
+    // 16+12 budget, 22 non-materials + 14 materials carried (reachable: an
+    // unequip chain or a legacy save): general sits over budget while the
+    // satchel is full; nothing is clamped away and the pools still sum to the
+    // summed used/capacity pair the counter shows.
+    const inventory = [...gear(22), ...mats(14)];
+    const split = carriedPools([HAVERSACK, null, null, null], inventory);
+    expect(split.general).toEqual({ used: 24, capacity: 16 }); // 22 gear + 2 spill: over budget
+    expect(split.materials).toEqual({ used: 12, capacity: 12 });
+    expect(split.general.used + split.materials.used).toBe(inventory.length);
+    expect(split.general.capacity + split.materials.capacity).toBe(28);
+    expect(split.showMaterials).toBe(true);
+  });
+});
+
+describe('bagSlotsLineKey (the shared tooltip/aria slot-count line)', () => {
+  it('picks the materials variant exactly for materialsOnly bags, and nothing for non-bags', () => {
+    // The ONE decision hud.ts (item tooltip) and bags_window.ts (socket
+    // aria-label) share, extracted per the phase 05 frontend review. Driven
+    // against real catalog defs so a content reclassification moves this pin.
+    expect(bagSlotsLineKey(CATALOG_ITEMS.linen_pouch)).toBe('itemUi.tooltip.bagSlots');
+    expect(bagSlotsLineKey(CATALOG_ITEMS.foragers_haversack)).toBe(
+      'itemUi.tooltip.bagSlotsMaterials',
+    );
+    expect(bagSlotsLineKey(CATALOG_ITEMS.loombound_reagent_satchel)).toBe(
+      'itemUi.tooltip.bagSlotsMaterials',
+    );
+    expect(bagSlotsLineKey(CATALOG_ITEMS.worn_sword)).toBe(null);
+    expect(bagSlotsLineKey(CATALOG_ITEMS.baked_bread)).toBe(null);
+    expect(bagSlotsLineKey(undefined)).toBe(null);
+    // The leaf answers the VARIANT question alone: a degenerate slotless bag
+    // still gets its truthful family key (the hud consumer separately gates
+    // the line on bagSlots; the socket aria always speaks), so a zero-slot
+    // materials def can never silently downgrade to the plain wording.
+    expect(bagSlotsLineKey({ kind: 'bag' })).toBe('itemUi.tooltip.bagSlots');
+    expect(bagSlotsLineKey({ kind: 'bag', materialsOnly: true })).toBe(
+      'itemUi.tooltip.bagSlotsMaterials',
+    );
   });
 });
 

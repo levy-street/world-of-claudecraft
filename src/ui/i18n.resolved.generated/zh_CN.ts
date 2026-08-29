@@ -789,7 +789,37 @@ export const zh_CN: EnTranslations = {
       "applied": "已装备",
       "apply": "装备外观",
       "detach": "卸下外观",
-      "equipHint": "装备{type}后才能使用此外观。"
+      "equipHint": "装备{type}后才能使用此外观。",
+      "charter": {
+        "eyebrow": "保险箱",
+        "title": "保险箱特许状",
+        "scope": "特许状只会扩展当前角色的银行。司库同样以金币出售这些格子。",
+        "grant": "增加 {slots} 个银行格子",
+        "buy": "购买特许状",
+        "buyAria": "购买{item}",
+        "confirmTitle": "确认购买特许状",
+        "confirmBody": "花费 {cost} Claudium 购买{item}？",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "特许状已生效。当前角色的银行已经变大。",
+        "alreadyGranted": "当前角色已拥有该特许状，不会重复扣费。",
+        "applyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
+        "grantUnresolved": "付款完成，但格子尚未发放。此次购买已记录，客服可以为你处理完成。",
+        "inProgress": "当前角色的一笔购买仍在完成中，请稍候再试。",
+        "doesNotFit": "当前角色的银行无法容纳该特许状的全部格子。",
+        "notPurchasable": "该特许状目前无法购买。",
+        "noRoom": "当前角色的银行已没有空间容纳任何特许状。",
+        "noCharterFits": "当前角色的银行剩余空间已放不下任何特许状。",
+        "someHiddenByFit": "超出当前角色银行剩余空间的特许状不会显示。",
+        "outage": "无法确认此次购买。使用此按钮重试不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
+        "outageStale": "返回商店，再次使用同一个“购买特许状”操作。系统不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
+        "failed": "此次购买未能完成。",
+        "names": {
+          "strongbox_charter_1": "次级保险箱特许状",
+          "strongbox_charter_2": "高级保险箱特许状",
+          "strongbox_charter_3": "宏伟保险箱特许状",
+          "strongbox_charter_complete": "完整保险箱特许状"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -2440,7 +2470,10 @@ export const zh_CN: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
-      "unequipHint": "点击移除此背包"
+      "unequipHint": "点击移除此背包",
+      "poolGeneral": "通用：{used}/{total}",
+      "poolMaterials": "材料：{used}/{total}",
+      "capacityPoolsAria": "背包格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -3079,6 +3112,26 @@ export const zh_CN: EnTranslations = {
       "buySlotsMaxed": "已完全扩展",
       "buyConfirm": "花费 {price} 购买 {count} 个额外的银行格子吗？",
       "buyConfirmAccept": "购买",
+      "meterLabel": "已用 {used}/{total} 格",
+      "meterPoolGeneral": "通用：{used}/{total}",
+      "meterPoolMaterials": "材料：{used}/{total}",
+      "meterPoolsAria": "银行格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。",
+      "meterMaterialsNote": "来自已装入的材料背包的材料专用空间。其他物品无法使用。",
+      "priceDisclaimer": "价格可能随游戏经济而变动。",
+      "rungItemName": "{count} 个银行格子",
+      "buySlotsDualAria": "花费 {price} 或 {cost} Claudium 购买 {count} 个格子",
+      "buyConfirmDual": "购买 {count} 个额外的银行格子吗？",
+      "buyConfirmGold": "花费 {price} 购买",
+      "buyConfirmClaudium": "花费 {cost} Claudium 购买",
+      "rungGranted": "银行格子已添加。当前角色的银行已经变大。",
+      "rungAlreadyGranted": "当前角色已拥有这些格子，不会重复扣费。",
+      "rungApplyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
+      "rungGrantUnresolved": "付款完成，但格子尚未发放。此次购买已记录，客服可以为你处理完成。",
+      "rungInProgress": "当前角色的一笔购买仍在完成中，请稍候再试。",
+      "rungDoesNotFit": "当前角色的银行已无法再进行一次扩容。",
+      "rungNotPurchasable": "这些银行格子目前无法购买。",
+      "rungFailed": "此次购买未能完成。",
+      "rungOutage": "无法确认此次购买。使用此按钮重试不会重复扣费。若先重新加载游戏，可能会失去这一保护。",
       "withdrawHint": "点击取出",
       "withdrawPartialHint": "Shift+点击取出部分数量",
       "depositHint": "点击存入",
@@ -3091,6 +3144,9 @@ export const zh_CN: EnTranslations = {
       "withdrawQuantityTitle": "取出 {item}",
       "withdrawQuantityInput": "要取出的数量",
       "withdrawQuantityConfirm": "取出",
+      "vaultRowWithdrawName": "取出 {item}",
+      "priceChanged": "购买完成前价格已发生变化。请查看刷新后的价格并再次确认。",
+      "withdrawQuantityAction": "选择 {item} 要取出的数量",
       "filterGroupAria": "按类别筛选银行",
       "sortAria": "排序银行物品",
       "searchAria": "按名称搜索银行物品",
@@ -3112,6 +3168,34 @@ export const zh_CN: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。",
       "bonusSectionAria": "奖励银行格子及获取方式",
+      "socketRowAria": "银行背包插槽",
+      "socketEmpty": "空的银行背包插槽",
+      "socketEmptyHint": "点击背包栏中的背包即可存入银行",
+      "socketLocked": "未解锁的背包插槽",
+      "socketLockedLater": "背包插槽按顺序解锁，先解锁最便宜的",
+      "socketUnlockAria": "花费{price}解锁一个银行背包插槽",
+      "socketUnlockHint": "点击解锁此背包插槽",
+      "socketUnlockConfirm": "花费{price}解锁一个银行背包插槽？",
+      "socketUnlockAccept": "解锁",
+      "unsocketHint": "点击将此背包取回背包栏",
+      "socketHint": "点击将此背包装入银行插槽",
+      "vaultTab": "仓库",
+      "vaultCapacityNote": "每种材料最多可存放{cap}个。",
+      "vaultEmpty": "你的材料仓库是空的。点击背包中的材料即可存入。",
+      "vaultRowAria": "{item}：已存{count}/{cap}",
+      "vaultLockedIntro": "解锁材料仓库，在银行旁囤积制造材料。每种材料都有自己的空间，最多可存{cap}个。",
+      "vaultUnlockButton": "解锁材料仓库",
+      "vaultUnlockConfirm": "花费{price}解锁材料仓库？",
+      "vaultUpgrade": "将上限提升至{cap}",
+      "vaultUpgradeConfirm": "花费{price}将每种材料的存放上限提升至{cap}？",
+      "vaultDepositAll": "存入全部材料",
+      "vaultDepositAllTooltip": "一次性将背包中的所有材料存入仓库，每种材料存至其上限为止。装备、工具、任务物品和消耗品不会被移动。",
+      "vaultDepositAllDone": "已存入材料：{count}。",
+      "vaultDepositAllFull": "已存入材料：{count}。部分材料已达上限。",
+      "vaultDepositAllNone": "仓库已满：未存入任何材料。",
+      "vaultWithdrawShort": "背包只装得下{count}个中的{fit}个。",
+      "vaultDepositHint": "点击存入材料仓库",
+      "vaultCannotDeposit": "无法存入材料仓库",
       "tabsAria": "银行标签页",
       "personalTab": "个人",
       "guildTab": "公会",
@@ -3511,6 +3595,8 @@ export const zh_CN: EnTranslations = {
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 个优质品级）",
+      "reagentVaultDraw": "（从材料仓库取用 {count}）",
+      "vaultUnreachable": "此处无法使用材料仓库。",
       "craftFeeLine": "制作费：每件 {fee}",
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
@@ -4369,6 +4455,8 @@ export const zh_CN: EnTranslations = {
       "online": "角色当前在线。",
       "rename_not_permitted": "不允许为此角色改名。",
       "delete_confirm": "输入角色名称以确认删除。",
+      "storage_purchase_open": "此储物空间购买必须完成或解决后，才能删除该角色。",
+      "delete_busy": "服务器繁忙，请稍后再尝试删除该角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",
@@ -6373,6 +6461,7 @@ export const zh_CN: EnTranslations = {
       "bankBody": "每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。",
       "bankHow": "保险库打开后，点击背包中的物品即可存入，点击保险库中的物品即可取回。保险库只存放物品，不存放钱币，任务物品也会留在你身上。旅途中背包装满时，还有一个按钮可将全部制造材料一键存入。",
       "bankSlots": "新开的保险库空间不大，但会随你一同成长。司库出售更多格位，价格逐级走高；在线游玩还能获得额外空间，例如验证邮箱、关联账号，以及引荐好友加入游戏。",
+      "bankSockets": "在格位阶梯之上，司库还出售最多四个背包插槽，按顺序解锁，价格逐级走高。把携带的闲置背包装入插槽，它的格位便并入保险库空间：普通背包扩充整个仓储，而材料袋只为制作材料增添空间。点击背包栏中的背包即可装入，点击插槽即可取回。取回背包绝不会损失任何存放之物：若保险库因此超出缩减后的空间，一切物品原地保留，新的存入只需等待腾出空间。",
       "buyingTitle": "买入与卖出",
       "buyingBody": "与商人交谈并选择浏览他的货物，他的商店便会打开，分为三个标签页：浏览、出售和买回。浏览页陈列着他的全部存货，只要付得起钱就归你。出售页列出你背包中他愿意收购的物品，而出售一件带有自身随机品质的物品时会先请你确认，这样一件珍视的物品就绝不会因失误而溜走。若你卖掉了让自己后悔的东西，买回标签页会保留你近期的售出记录，让你能按当初卖出的价钱把它们买回来。",
       "junkTitle": "清理废品",
@@ -9495,7 +9584,8 @@ export const zh_CN: EnTranslations = {
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickBuyback": "点击回购",
-      "bagSlots": "{slots} 格背包"
+      "bagSlots": "{slots} 格背包",
+      "bagSlotsMaterials": "{slots} 格材料背包"
     },
     "bags": {
       "title": "背包",
@@ -12928,6 +13018,27 @@ export const zh_CN: EnTranslations = {
       },
       "dawnhold_posy": {
         "name": "晨曦堡花园小花束"
+      },
+      "wayfarers_backpack": {
+        "name": "旅者背包"
+      },
+      "burlap_reagent_pouch": {
+        "name": "粗麻材料袋"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "死灵法师的材料挎包"
+      },
+      "duskweave_bag": {
+        "name": "暮织袋"
+      },
+      "resonant_weave_bag": {
+        "name": "共鸣织袋"
+      },
+      "foragers_haversack": {
+        "name": "采集者行囊"
+      },
+      "loombound_reagent_satchel": {
+        "name": "织缚材料挎包"
       },
       "ps_briny_lure": {
         "name": "咸水诱饵"

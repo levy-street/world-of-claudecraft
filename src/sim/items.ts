@@ -19,6 +19,7 @@
 import {
   addStacked,
   bagCapacity,
+  bagPools,
   bagsFullError,
   countFit,
   equipBag as equipBagCmd,
@@ -145,9 +146,7 @@ function canReturnEquippedItemToBags(
 ): boolean {
   const craftedRecipeId = payload?.craftedRecipeId;
   const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
-  return (
-    countFit(meta.inventory, bagCapacity(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1
-  );
+  return countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1;
 }
 
 function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
@@ -1477,14 +1476,8 @@ export function buyBackItem(
   // regrant with the row's own instance instead of always checking room for
   // a generic plain copy.
   const fits =
-    countFit(
-      meta.inventory,
-      bagCapacity(meta.bags),
-      itemId,
-      1,
-      slot.instance,
-      slot.craftedRecipeId,
-    ) >= 1;
+    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, slot.instance, slot.craftedRecipeId) >=
+    1;
   if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;

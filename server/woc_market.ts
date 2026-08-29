@@ -20,7 +20,6 @@ import { ITEMS } from '../src/sim/data';
 import { exchangeBrowseCategory, exchangeBrowseSubcategory } from '../src/sim/exchange_eligibility';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
-import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
@@ -28,6 +27,7 @@ import {
   SWEEP_BATCH,
   WOC_MARKET_ME_READOUT_DEADLINE_MS,
 } from './woc_market_budgets';
+import type { CharacterSaveArgs } from './woc_market_character_save';
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
 import {
   registerWocQuoteHandoff,
@@ -342,12 +342,7 @@ export interface WocSellerHistoryReadout {
   profile: WocSellerProfile | null;
 }
 
-export interface CharacterSaveArgs {
-  characterId: number;
-  level: number;
-  state: CharacterState;
-  leaseNonce: string | undefined;
-}
+export type { CharacterSaveArgs } from './woc_market_character_save';
 
 export interface WocMarketDb {
   // Listing custody edge: character UPDATE (the bags just lost the copy) and
@@ -993,11 +988,9 @@ export interface WocMarketCustody {
   /** Hand a held copy straight to a live buyer's bags. Returns the save the
    *  caller must persist before treating the delivery as done. */
   grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant;
-  /** Re-serialize a live session WITHOUT granting anything: the resume path
-   *  for a direct hand-off whose atomic save threw mid-flight. The bags in
-   *  the returned save already hold the earlier grant (same live session), so
-   *  persisting it retries the delivery without minting a second copy. */
+  /** Re-serialize after an ambiguous hand-off; retrying the held grant cannot mint. */
   snapshotCopy(accountId: number, characterId: number): WocCustodyGrant;
+  acknowledgeCharacterSave?(save: CharacterSaveArgs): void;
   /** The delivered-save FIFO entry (the write-path rider closed the
    *  commitGrant carve-out): run `persist` with a snapshot serialized INSIDE
    *  the character's save-FIFO slot, so the grant's blob orders against the
@@ -1767,6 +1760,7 @@ export class WocMarketService {
           this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return { refusal: inserted.reason };
         }
+        this.deps.custody.acknowledgeCharacterSave?.(extract.save);
         return { id: inserted.id };
       },
     );

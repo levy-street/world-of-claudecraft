@@ -13,11 +13,13 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { normalizeGraphicsSettingsSnapshot } from '../../src/game/graphics_rebuild_core';
+import { storageRungSkuForLadderIndex } from '../../src/sim/content/storage_charters';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
+import { BankWindow } from '../../src/ui/bank_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
@@ -1347,6 +1349,168 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
     for (const chip of chips) {
       expect(chip.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     }
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bank (#bank-window) - the phase 08 footer meter joined in QA 08: the split
+// aria (meterPoolsAria), the focusable meter group, the socket row, and the
+// buy button are all live in this staged near-full, socketed, stocked state,
+// so the whole personal pane meets axe rather than only the bags half of the
+// new aria pair.
+// ---------------------------------------------------------------------------
+
+describe('axe: bank window personal pane (footer meter)', () => {
+  it('a split, near-full, socketed bank axes clean', async () => {
+    const root = host('bank-window');
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    const world = {
+      bankInfo: {
+        slots: Array.from({ length: 23 }, () => ({ itemId: 'iron_ore', count: 1 })),
+        capacity: 32,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: 500,
+        bonusSources: [],
+        socketsUnlocked: 1,
+        socketBags: ['burlap_reagent_pouch', null, null, null],
+        nextSocketCost: 2000000,
+        generalCapacity: 24,
+        materialsCapacity: 8,
+        generalUsed: 21,
+        materialsUsed: 2,
+      },
+      guildBankInfo: null,
+      vaultInfo: null,
+      inventory: [],
+      bags: [null, null, null, null],
+      copper: 1000,
+    };
+    const win = new BankWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        itemIcon: () => '<span class="item-icon"></span>',
+        moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
+        itemTooltip: () => '',
+        captureFocus: () => null,
+        consumePeek: () => false,
+      }),
+    );
+    win.open();
+    // The staged state is the fullest one: gilded near-full footer, both meter
+    // segments, the split aria, and the focusable group all up before axe runs.
+    expect(root.querySelector('.bank-footer.near-full')).not.toBeNull();
+    expect(root.querySelector('.bank-meter[role="group"][tabindex="0"]')).not.toBeNull();
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bank (#bank-window) - the phase 13 Claudium rung purchase, which puts four
+// nodes in the SAME personal-pane footer that the meter arm above can never
+// reach: the second price tag inside the one expand button, that button's
+// aria-busy + disabled in-flight state, the purchase-result band, and the
+// visually hidden region that announces it. They are staged together because
+// that is the one moment all four coexist: a spend still on the wire with the
+// previous result's band still on screen.
+// ---------------------------------------------------------------------------
+
+describe('axe: bank window personal pane (Claudium rung purchase)', () => {
+  it('a dual-tag buy button, busy mid-spend, over a result band axes clean', async () => {
+    const root = host('bank-window');
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    // The SKU the staged wire is selling, resolved the way the view core does
+    // (ladder index = purchasedSlots / block), so the busy state below is
+    // latched against the id the painter will actually compare rather than a
+    // `strongbox_rung_NN` literal that drifts when the ladder is re-cut.
+    const sku = storageRungSkuForLadderIndex(0);
+    expect(sku).toBeDefined();
+    const world = {
+      bankInfo: {
+        slots: Array.from({ length: 23 }, () => ({ itemId: 'iron_ore', count: 1 })),
+        capacity: 32,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: 500,
+        // The wire's own Claudium price for that same next rung. Absent, this
+        // is the normal service-outage shape and the footer stays gold-only.
+        nextRungClaudiumPrice: 1200,
+        bonusSources: [],
+        socketsUnlocked: 1,
+        socketBags: ['burlap_reagent_pouch', null, null, null],
+        nextSocketCost: 2000000,
+        generalCapacity: 24,
+        materialsCapacity: 8,
+        generalUsed: 21,
+        materialsUsed: 2,
+      },
+      guildBankInfo: null,
+      vaultInfo: null,
+      inventory: [],
+      bags: [null, null, null, null],
+      copper: 1000,
+    };
+    const win = new BankWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        itemIcon: () => '<span class="item-icon"></span>',
+        moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
+        itemTooltip: () => '',
+        captureFocus: () => null,
+        consumePeek: () => false,
+        // The host-side gate: with no Claudium hooks attached the view core
+        // suppresses the second tag outright and this arm would silently be a
+        // duplicate of the gold-only footer above.
+        storeEnabled: () => true,
+      }),
+    );
+    // Both are read at MARKUP-BUILD time (a repaint may not hand back an
+    // enabled button mid-spend), so they have to be latched before the first
+    // paint, and neither the window nor the controller exposes a public setter.
+    //
+    // RE-POINTED at Bank Storage phase 17, which moved the rung money state
+    // machine out of the window into src/ui/bank_rung_purchase_core.ts. This rig
+    // stages state by NAME, so the move silently turned two writes into
+    // properties nobody reads: the button came back enabled with no band, and
+    // this file is the ONLY guard in the tree that could say so. The full gate
+    // caught it; no unit suite, source pin or review lane did. If these names
+    // move again, they move here in the same change.
+    const state = win as unknown as {
+      rungPurchase: {
+        inFlight: string | null;
+        band: { granted: boolean; reason: string | null } | null;
+      };
+    };
+    state.rungPurchase.inFlight = sku?.id ?? null;
+    state.rungPurchase.band = { granted: false, reason: 'purchase_in_progress' };
+    win.open();
+    // WHY THE PRE-CHECKS: axe over a scope that lost these nodes passes just as
+    // cleanly as one that audits them, so every claim this arm makes rests on
+    // the nodes really being on the page. A gate flipping the tag off, a
+    // renamed wire field, or a busy state that stops reaching the button would
+    // otherwise leave a green arm auditing markup that is not there.
+    const tag = root.querySelector('.bank-buy-tag.bank-buy-tag-claudium');
+    expect(tag).not.toBeNull();
+    expect(tag?.querySelector('img[alt=""]')).not.toBeNull();
+    expect(tag?.querySelector('strong')).not.toBeNull();
+    const btn = root.querySelector<HTMLButtonElement>('.bank-buy-btn[data-focus-key="bank:buy"]');
+    expect(btn).not.toBeNull();
+    expect(btn?.getAttribute('aria-busy')).toBe('true');
+    expect(btn?.disabled).toBe(true);
+    // The accessible name has to be the dual one, not the two prices read back
+    // to back: it is the whole reason the aria-label exists on this button.
+    expect((btn?.getAttribute('aria-label') ?? '').length).toBeGreaterThan(0);
+    expect(root.querySelector('.bank-rung-notice.failure')).not.toBeNull();
+    expect(
+      root.querySelector('span.visually-hidden[data-rung-live][role="status"][aria-live="polite"]'),
+    ).not.toBeNull();
     await expectClean(root);
   });
 });

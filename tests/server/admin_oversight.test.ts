@@ -275,7 +275,7 @@ describe('GET /admin/api/accounts/:id/wealth', () => {
     });
     expect(r.status).toBe(200);
     expect(accountWealthBreakdown).toHaveBeenCalledWith(42);
-    expect(largeGoldMovementsForAccount).toHaveBeenCalledWith(42, 100_000, 25);
+    expect(largeGoldMovementsForAccount).toHaveBeenCalledWith(42, 25);
     expect(r.body).toEqual({
       success: true,
       data: { ...breakdown, largeMovements: movements },

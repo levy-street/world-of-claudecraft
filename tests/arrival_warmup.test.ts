@@ -3,20 +3,24 @@
 // the ORDER the steps run in, the curtain flag's lifetime (including on a
 // failure), the bounded wait for the held reveals, and the frame-loop state
 // main.ts gets back.
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   ARRIVAL_REVEAL_SETTLE_MAX_MS,
   arrivalRevealSettleMaxMs,
   type BlockingArrivalWarmupDeps,
+  ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS,
   runBlockingArrivalWarmup,
   settleWorldEntryCover,
 } from '../src/game/arrival_warmup';
 import { WORLD_ENTRY_GPU_SETTLE_COVER_MS } from '../src/game/ui_effects_profile';
 import {
   arrivalCoverActive,
+  arrivalEstablishingShotActive,
   resetArrivalCoverForTest,
   setArrivalCover,
 } from '../src/render/arrival_cover';
+import { REVEAL_GATE_WATCHDOG_MS } from '../src/render/reveal_gate';
 
 interface Rig {
   calls: string[];
@@ -399,5 +403,152 @@ describe('settleWorldEntryCover', () => {
     expect(calls).toEqual(['cover:on', 'cover:off']);
     expect(report).toHaveBeenCalledWith('World reveal failed', expect.any(Error));
     report.mockRestore();
+  });
+});
+
+describe('the entry cover on the establishing shot', () => {
+  afterEach(() => resetArrivalCoverForTest());
+
+  it('is the one online entry that waits, bounded, for the held reveals', () => {
+    expect(arrivalRevealSettleMaxMs(true, true)).toBe(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS);
+    expect(arrivalRevealSettleMaxMs(true, false)).toBe(0);
+    expect(arrivalRevealSettleMaxMs(true)).toBe(0);
+    expect(arrivalRevealSettleMaxMs(false, true)).toBe(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS);
+    expect(arrivalRevealSettleMaxMs(false, false)).toBe(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+  });
+
+  it('pins the establishing-shot bound between the town-kit bound and the reveal watchdog', () => {
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBe(6_000);
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBeGreaterThan(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBeLessThan(REVEAL_GATE_WATCHDOG_MS);
+  });
+
+  function shotRig(online: boolean, establishingShot: boolean | undefined) {
+    const calls: string[] = [];
+    const waited: number[] = [];
+    let flush = (): void => {};
+    settleWorldEntryCover({
+      adaptiveBudget: true,
+      constrainedMemory: false,
+      online,
+      establishingShot,
+      revealWorld: () => calls.push(`revealWorld:shot=${arrivalEstablishingShotActive()}`),
+      afterActiveAnimationMs: (_ms, callback) => {
+        flush = callback;
+      },
+      awaitReveals: async (maxMs) => {
+        waited.push(maxMs);
+        calls.push(`awaitReveals:shot=${arrivalEstablishingShotActive()}`);
+      },
+    });
+    return { calls, waited, flush: () => flush() };
+  }
+
+  it('online: the shot arms the flag for the whole cover and gets the bounded wait', async () => {
+    const r = shotRig(true, true);
+    expect(arrivalCoverActive()).toBe(true);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    r.flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(r.waited).toEqual([ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS]);
+    // The flag stands through the wait and the reveal, and drops with the cover.
+    expect(r.calls).toEqual(['awaitReveals:shot=true', 'revealWorld:shot=true']);
+    expect(arrivalCoverActive()).toBe(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+  });
+
+  it('online without the shot: no flag, no wait (the live-character rule stands)', async () => {
+    const r = shotRig(true, undefined);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    r.flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(r.waited).toEqual([0]);
+    expect(r.calls).toEqual(['awaitReveals:shot=false', 'revealWorld:shot=false']);
+  });
+
+  it('never leaves the flag armed for a later plain cover', async () => {
+    const r = shotRig(true, true);
+    r.flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(false);
+  });
+
+  it('drops the flag with the cover when revealWorld throws', async () => {
+    const report = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let flush = (): void => {};
+    settleWorldEntryCover({
+      adaptiveBudget: true,
+      constrainedMemory: false,
+      online: true,
+      establishingShot: true,
+      revealWorld: () => {
+        throw new Error('reveal failed');
+      },
+      afterActiveAnimationMs: (_ms, callback) => {
+        flush = callback;
+      },
+      awaitReveals: async () => undefined,
+    });
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(report).toHaveBeenCalled();
+    expect(arrivalCoverActive()).toBe(false);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(false);
+  });
+
+  it('drops the flag with the cover when the wait itself rejects', async () => {
+    const calls: string[] = [];
+    let flush = (): void => {};
+    settleWorldEntryCover({
+      adaptiveBudget: true,
+      constrainedMemory: false,
+      online: true,
+      establishingShot: true,
+      revealWorld: () => calls.push('revealWorld'),
+      afterActiveAnimationMs: (_ms, callback) => {
+        flush = callback;
+      },
+      awaitReveals: async () => {
+        throw new Error('wait failed');
+      },
+    });
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(calls).toEqual(['revealWorld']);
+    expect(arrivalCoverActive()).toBe(false);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(false);
+  });
+
+  it('main.ts arms the shot exactly when the intro cinematic is about to play', () => {
+    // Comments stripped, so a commented-out line cannot satisfy the pin.
+    const src = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
+      /^\s*\/\/.*$/gm,
+      '',
+    );
+    const start = src.indexOf('settleWorldEntryCover({');
+    expect(start).toBeGreaterThan(-1);
+    const call = src.slice(start, src.indexOf('});', start));
+    expect(call).toContain('establishingShot: intro !== null');
+    expect(call).toContain('online: online !== null');
+    // The intro is decided (and `intro` assigned) before the cover call.
+    expect(src.indexOf('intro = {')).toBeGreaterThan(-1);
+    expect(src.indexOf('intro = {')).toBeLessThan(start);
+    // Both halves of the seen marker read the same per-character scope.
+    expect(src).toContain('readSpawnIntroSeen(keybindScope)');
+    expect(src).toContain('markSpawnIntroSeen(keybindScope)');
   });
 });

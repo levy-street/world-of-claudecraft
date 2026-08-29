@@ -26,7 +26,7 @@
 // net imports, no randomness at all (the board draws nothing), no Sim import
 // (PlayerMeta arrives type-only, the crafting.ts/commission.ts idiom).
 
-import { bagCapacity, countFit } from '../bags';
+import { bagPools, countFit } from '../bags';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
@@ -292,9 +292,7 @@ export function deliverCommissionOrder(
     return { ok: false, orderId, itemId: order.itemId, reason: 'not_crafted' };
   const freed = cloneItemInstancePayload(instance);
   freed.boundTo = order.requesterId;
-  if (
-    countFit(requesterMeta.inventory, bagCapacity(requesterMeta.bags), order.itemId, 1, freed) < 1
-  ) {
+  if (countFit(requesterMeta.inventory, bagPools(requesterMeta.bags), order.itemId, 1, freed) < 1) {
     return { ok: false, orderId, itemId: order.itemId, reason: 'no_space' };
   }
   // Commission-eligible kinds (weapon/armor/held_offhand) never stack past

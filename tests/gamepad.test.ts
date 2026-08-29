@@ -176,6 +176,7 @@ describe('GamepadManager window focus', () => {
     });
     const onInputEdge = vi.fn();
     const onAction = vi.fn();
+    const onCastRelease = vi.fn();
     const setGamepadMove = vi.fn();
     const clearGamepadMove = vi.fn();
     const input = {
@@ -187,15 +188,19 @@ describe('GamepadManager window focus', () => {
     } as unknown as Input;
     const callbacks = {
       onAction,
+      onCastRelease,
       onInputEdge,
       isPointerMode: () => false,
     } satisfies GamepadCallbacks;
-    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    const bindings = new GamepadBindings();
+    const manager = new GamepadManager(input, bindings, callbacks);
     (manager as unknown as { index: number | null }).index = 0;
     return {
       manager,
+      bindings,
       onInputEdge,
       onAction,
+      onCastRelease,
       setGamepadMove,
       clearGamepadMove,
       setPad: (p: Gamepad) => {
@@ -248,6 +253,21 @@ describe('GamepadManager window focus', () => {
 
     expect(onInputEdge).toHaveBeenCalledTimes(1);
     expect(setGamepadMove).toHaveBeenCalled();
+  });
+
+  it('releases a held cast when the window loses focus', () => {
+    const { manager, bindings, onCastRelease, setPad } = setup();
+    let focused = true;
+    vi.stubGlobal('document', { hasFocus: () => focused });
+    bindings.bind(GP.A, 'slot6');
+
+    manager.poll(1 / 60);
+    setPad(gamepadWithPressed(GP.A));
+    manager.poll(1 / 60);
+    focused = false;
+    manager.poll(1 / 60);
+
+    expect(onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'slot', slot: 6 });
   });
 });
 
@@ -880,6 +900,7 @@ describe('GamepadManager cross hotbar', () => {
     const onConnectionChange = vi.fn();
     const onCrossHotbar = vi.fn();
     const onCrossHotbarCast = vi.fn();
+    const onCastRelease = vi.fn();
     const onCrossHotbarEdit = vi.fn();
     const onOpenSpellbook = vi.fn();
     // Which cell the bar reports as focused, driven per case; null is "focus is
@@ -904,6 +925,7 @@ describe('GamepadManager cross hotbar', () => {
       onConnectionChange,
       onCrossHotbar,
       onCrossHotbarCast,
+      onCastRelease,
       onCrossHotbarEdit,
       onOpenSpellbook,
       focusedCrossHotbarCell: () => focusedCell,
@@ -925,6 +947,7 @@ describe('GamepadManager cross hotbar', () => {
       onAction,
       onConnectionChange,
       onCrossHotbarCast,
+      onCastRelease,
       onCrossHotbar,
       onCrossHotbarEdit,
       onOpenSpellbook,
@@ -993,6 +1016,87 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
     // The bar owns its actions, so nothing goes out as an action-bar slot.
     expect(h.onAction).not.toHaveBeenCalled();
+  });
+
+  it('releases a cross hotbar cast with the press-time action', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.RT);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+    expect(h.onCastRelease.mock.calls[0]?.[0].action).toBe(action);
+  });
+
+  it('keeps the press-time action after its trigger is released first', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.A);
+    expect(h.onCastRelease).not.toHaveBeenCalled();
+    h.press();
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+  });
+
+  it('ignores a falling edge without a recorded cast', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.Y);
+    h.press();
+
+    expect(h.onCastRelease).not.toHaveBeenCalled();
+  });
+
+  it('releases a flat slot binding when the cross hotbar is off', () => {
+    const h = setupCrossHotbar(false);
+    h.bindings.bind(GP.DPAD_UP, 'slot5');
+    h.press(GP.DPAD_UP);
+    h.press();
+
+    expect(h.onAction).toHaveBeenCalledWith('slot5');
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'slot', slot: 5 });
+  });
+
+  it('releases a held cast when pointer mode takes the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.setPointerMode(true);
+    h.press(GP.RT, GP.A);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+  });
+
+  it('releases all held casts in press order when the active pad disappears', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.start();
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    h.press(GP.RT, GP.A, GP.X);
+    const actions = h.onCrossHotbarCast.mock.calls.map(([action]) => action);
+    h.disconnectPad(0);
+    h.press();
+    h.press();
+
+    expect(h.onCastRelease.mock.calls.map(([hold]) => hold)).toEqual([
+      { kind: 'xhb', action: actions[0] },
+      { kind: 'xhb', action: actions[1] },
+    ]);
+  });
+
+  it('releases a held cast when the virtual mouse takes the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.RT, GP.A, GP.LB);
+    h.press(GP.RT, GP.A, GP.LB, GP.R3);
+    h.press(GP.RT, GP.A, GP.LB, GP.R3);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
   });
 
   it('reaches the second eight through the right trigger', () => {

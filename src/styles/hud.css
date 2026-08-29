@@ -8673,6 +8673,12 @@
     flex-direction: column;
     gap: 10px;
   }
+  /* Store decisions must clear the Armory inspector (z90), and async results
+     remain readable after the Store itself has closed. */
+  #prompt-stack.store-decision-active,
+  #prompt-stack.store-result-active {
+    z-index: 96;
+  }
   .prompt {
     padding: 14px 18px;
     text-align: center;

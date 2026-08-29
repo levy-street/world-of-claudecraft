@@ -175,12 +175,16 @@ Rules of the road:
   requires the first WebSocket frame's discriminator to equal
   `auth-world-<ONLINE_WORLD_LAYOUT_VERSION>` exactly (`src/world_api.ts`) and
   rejects anything else outright, so a bundle only has to agree with the running
-  server on that constant, which changes rarely and only when the authoritative
-  town layout does. Practical consequence, and the reason OTA is worth having: a
-  JS, UI, or content fix can be built from the currently DEPLOYED commit and
+  server on that constant, which changes rarely and whenever the authoritative
+  town layout or a required world snapshot shape becomes incompatible.
+  Practical consequence, and the reason OTA is worth having: a JS, UI, or
+  content fix can be built from the currently DEPLOYED commit and
   published on its own, with no server deploy and no restart. Ordering only
   becomes load-bearing on a release that bumps the epoch (or the sibling
   `STABLE_TIMER_WIRE_VERSION`), where the server must be deployed first.
+  Epoch 11 is such a release: Materials Vault snapshots require the
+  identity-preserving `special` collection, so an epoch-10 client or server
+  must be rejected before admission rather than strand a stored special item.
   `npm run ota:publish` does not check this; the CI workflow does, via
   `scripts/ota/check_server_layout.mjs`, so prefer the workflow for real
   publishes and run that script by hand before a manual one.

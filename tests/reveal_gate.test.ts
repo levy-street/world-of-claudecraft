@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { arrivalHeldImminentKeys, resetArrivalCoverForTest } from '../src/render/arrival_cover';
+import {
+  arrivalHeldImminentKeys,
+  resetArrivalCoverForTest,
+  setArrivalCover,
+  setArrivalEstablishingShot,
+} from '../src/render/arrival_cover';
 import {
   gpuPrepEventsSnapshot,
   resetGpuPrepEventsForTest,
@@ -656,5 +661,62 @@ describe('reveal gate imminent holds', () => {
     expect(gate.allow('town', true)).toBe(true);
     expect(arrivalHeldImminentKeys()).toBe(0);
     expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(1);
+  });
+});
+
+describe('reveal gate under the entry establishing shot', () => {
+  function recordingGate(roots: readonly object[]) {
+    const { schedule } = fakeSchedule();
+    const compiled: { root: object; imminent: boolean }[] = [];
+    const gate = createRevealGate(
+      {
+        compile: (root, imminent) => {
+          compiled.push({ root, imminent });
+          return new Promise<void>(() => undefined);
+        },
+        schedule,
+      },
+      () => roots,
+    );
+    return { gate, compiled };
+  }
+
+  it('turns an ordinary consult imminent while the cover is up on the establishing shot', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: true }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(1);
+    // ... and the entry wait sees it as a held imminent key.
+    expect(arrivalHeldImminentKeys()).toBe(1);
+  });
+
+  it('a plain arrival cover (a teleport) is NOT an establishing shot: consults stay ordinary', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalCover(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: false }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(0);
+  });
+
+  it('leaves a consult ordinary once the cover is down, even with the flag still set', () => {
+    const roots = [{}];
+    const { gate, compiled } = recordingGate(roots);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('cull:12')).toBe(false);
+    expect(compiled).toEqual([{ root: roots[0], imminent: false }]);
+    expect(gpuPrepEventsSnapshot().reveal.imminentHolds).toBe(0);
+  });
+
+  it('never reveals early: an imminent establishing consult still holds', () => {
+    const { gate } = recordingGate([{}]);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    expect(gate.allow('eastbrook-town-static')).toBe(false);
+    expect(gate.allow('eastbrook-town-static')).toBe(false);
+    expect(gate.state('eastbrook-town-static')).toBe('compiling');
   });
 });

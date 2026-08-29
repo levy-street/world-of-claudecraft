@@ -2845,6 +2845,26 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
   },
+  // Bank bag sockets (Bank Storage phase 06): the socket ladder's two rungs of
+  // recognition, beside soc_room_for_more / soc_gilded_strongbox for the slot
+  // ladder. The meter reads BankState.unlockedSockets, bumped only by
+  // bankUnlockSocket (bank_sockets.ts), which marks deeds dirty on purchase.
+  soc_strongbox_outfitter: {
+    id: 'soc_strongbox_outfitter',
+    name: 'Strongbox Outfitter',
+    desc: 'Unlock your first bank bag socket.',
+    category: 'social',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 1 },
+  },
+  soc_four_bags_deep: {
+    id: 'soc_four_bags_deep',
+    name: 'Four Bags Deep',
+    desc: 'Unlock all four bank bag sockets.',
+    category: 'social',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 4 },
+  },
   // The Proving Shore graduation: every lesson on the tutorial island handed
   // in, then the ferry bell rung for the ride home. The stat is bumped by
   // interactions/ferry_bell.ts on the island bell's home crossing, only once

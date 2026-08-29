@@ -4090,6 +4090,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} rejser sig over Tornetop Højder!',
   'itemUi.kind.bag': 'Taske',
   'itemUi.tooltip.bagSlots': 'Taske med {slots} pladser',
+  'itemUi.tooltip.bagSlotsMaterials': 'Materialetaske med {slots} pladser',
   'questUi.tracker.hideFromMap': 'Skjul {name} på kortet',
   'questUi.tracker.showOnMap': 'Vis {name} på kortet',
   'sim.delve.baptistryEggs':

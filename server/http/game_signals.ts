@@ -2,7 +2,8 @@
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
 // woc_chat_messages_total, woc_characters_created_total,
-// woc_guild_bank_incidents_total, woc_rift_forge_refused_total) reach the exporter
+// woc_guild_bank_incidents_total, woc_rift_forge_refused_total,
+// woc_vault_ledger_incidents_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -17,8 +18,9 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
-// inbound drop cause (the fixed eight-value WS_DROP_CAUSES set), the guild-bank
-// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the copper-flow
+// inbound drop cause (the fixed nine-value WS_DROP_CAUSES set), the guild-bank
+// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the vault-ledger
+// incident kind (the fixed VAULT_LEDGER_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
 // fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
@@ -55,10 +57,11 @@ export const GENERAL_CHAT_QUOTA_DB_OUTCOMES = [
 export type GeneralChatQuotaDbOutcome = (typeof GENERAL_CHAT_QUOTA_DB_OUTCOMES)[number];
 
 /**
- * The fixed eight causes an inbound ws frame can be dropped for: the two
+ * The fixed nine causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
  * lanes (server/msg_lanes.ts), the list-read guard on the ignore/block
- * readouts (server/list_read_guard.ts), the guild-bank op guard
+ * readouts (server/list_read_guard.ts), the personal-bank/materials-vault
+ * retained-row guard (server/bank_vault_ledger_guard.ts), the guild-bank op guard
  * (server/guild_bank_op_guard.ts, each allowed op is a keep-forever ledger
  * write), and the cosmetic-set guard on the two Book of Deeds pickers
  * (server/cosmetic_op_guard.ts, each allowed set re-wires a full identity
@@ -72,11 +75,12 @@ export const WS_DROP_CAUSES = [
   'lane_command',
   'lane_chat',
   'list_read',
+  'bank_vault',
   'guild_bank',
   'cosmetic',
 ] as const;
 
-/** One of the fixed eight inbound drop causes. */
+/** One of the fixed nine inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
@@ -116,10 +120,11 @@ export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
  *   session that can never commit again held book ops for it (a fence-out, an
  *   exhausted leave flush, a teardown, or the quarantine above). Counted per
  *   GUILD, the unit the remedy applies to.
- * - `book_unloaded`: a book was left unloaded after a failed / oversized /
- *   malformed durable read at boot. That guild's ops are inert and its disband
- *   is refused fail-closed until the process restarts, which is an
- *   operator-visible outage for that guild, not a transient.
+ * - `book_unloaded`: a book remains unloaded after an oversized / malformed
+ *   durable read, or after the bounded lazy-load recovery budget is exhausted.
+ *   Lazy transient attempts do NOT count. That guild's ops stay inert and its
+ *   disband stays fail-closed until a later lazy trigger succeeds or the
+ *   process restarts, so every sample represents an operator-visible outage.
  * - `ledger_write_failed`: a bank_ledger insert rejected, so the audit trail
  *   (scripts/bank_audit.mjs) has a hole the replay cannot see.
  * - `counterparty_orphan`: a guild bank op moved the acting character's purse
@@ -154,12 +159,9 @@ export const GUILD_BANK_INCIDENTS = [
   // is byte-identical to "you are not an officer", so without this a total read
   // outage is indistinguishable from ordinary refusals at the wire.
   'log_read_failed',
-  // A guild was CREATED but its creation fee never became durable: the charge
-  // lives only on a live purse whose session was fenced out or abandoned, so
-  // the founder holds a guild the database was never paid for. Its own kind
-  // because it is a single-sample defect (unlike the retryable save kinds
-  // beside it) and it is the only one that leaves value UNCOLLECTED rather
-  // than at risk of being double-counted.
+  // Legacy cardinality retained for mixed-release dashboards. Current paid
+  // creation commits the guild and fee in one transaction, so a new sample is
+  // a single-sample mixed-release or invariant defect and remains page-worthy.
   'create_fee_unpaid',
 ] as const;
 
@@ -184,7 +186,11 @@ export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
  *  'grant_busy' is the delivered-save twin's head-of-line park (the
  *  bounded grant entry found the buyer's FIFO wedged past the deadline and
  *  the delivery row parked): the one failure mode the FIFO close
- *  introduced, counted so it is never silent. */
+ *  introduced, counted so it is never silent.
+ *  'permit_refused' is the background-gate starvation arm inside the FIFO
+ *  job (the bounded majorBackgroundDbGate wait returned no permit): realm
+ *  background-DB saturation seen from the escrow chain, counted because a
+ *  saturated gate is otherwise invisible next to its counted siblings. */
 export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'started',
   'deadline_refused',
@@ -194,8 +200,28 @@ export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'realm_refused',
   'settled',
   'grant_busy',
+  'permit_refused',
 ] as const;
 export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
+
+/**
+ * The Materials Vault ledger incident kinds (Bank Storage Phase 2). Its own
+ * closed set rather than a member of GUILD_BANK_INCIDENTS above: the vault is
+ * a PERSONAL, per-character store with no guild, no escrow, and no book, so
+ * folding its rows into the guild series would make every guild-bank alert
+ * rule fire on an unrelated container and make the guild numbers unreadable.
+ * - `ledger_write_failed`: a bank_ledger insert for a container='vault' row
+ *   rejected, so the audit trail (scripts/bank_audit.mjs) has a hole its
+ *   replay cannot see: that character's vault will reconcile as a permanent
+ *   ledger_state_mismatch and a real investigation would come up clean.
+ * This closed set IS the kind label's whole vocabulary; it never grows
+ * per-player (character id is NEVER a label; the log line beside each
+ * increment carries the identifying detail).
+ */
+export const VAULT_LEDGER_INCIDENTS = ['ledger_write_failed'] as const;
+
+/** One of the fixed vault-ledger incident kinds. */
+export type VaultLedgerIncident = (typeof VAULT_LEDGER_INCIDENTS)[number];
 
 /**
  * The game-state throughput emission hooks. Implementations must never
@@ -235,6 +261,8 @@ export interface GameMetricsCounters {
   generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void;
   /** One character successfully created. */
   characterCreated(): void;
+  /** One database-wide bank-ledger hard-ceiling refusal. Label-free. */
+  bankLedgerGrowthLimitRefused(): void;
   /**
    * One guild-bank incident on a dupe-sensitive path, by kind (see
    * GUILD_BANK_INCIDENTS). Always emitted BESIDE the existing loud log, never
@@ -245,6 +273,16 @@ export interface GameMetricsCounters {
    *  production readout for the listing FIFO coupling, since a refused or
    *  slow queue is otherwise visible only as a throttled warn line. */
   wocEscrowQueue(outcome: WocEscrowQueueOutcome): void;
+  /**
+   * One Materials Vault ledger incident, by kind (see VAULT_LEDGER_INCIDENTS).
+   * The vault-container sibling of guildBankIncident above, emitted BESIDE the
+   * existing loud log and never instead of it. The personal-bank container has
+   * no counter of its own yet (a recorded follow-up), so a hole in a personal
+   * bank's trail is still log-only.
+   */
+  vaultLedgerIncident(kind: VaultLedgerIncident): void;
+  /** One realm row-bucket breach (telemetry-only guard admission). */
+  bankVaultRealmRowBreach(): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -324,8 +362,11 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   generalChatQuota() {},
   generalChatQuotaDbCall() {},
   characterCreated() {},
+  bankLedgerGrowthLimitRefused() {},
   guildBankIncident() {},
   wocEscrowQueue() {},
+  vaultLedgerIncident() {},
+  bankVaultRealmRowBreach() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},

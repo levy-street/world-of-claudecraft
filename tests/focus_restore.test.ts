@@ -23,7 +23,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { captureFocusKey, focusedWithin, restoreFirstEnabled } from '../src/ui/focus_restore';
+import {
+  captureFocusKey,
+  findFocusKey,
+  focusedWithin,
+  restoreFirstEnabled,
+} from '../src/ui/focus_restore';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 afterEach(() => {
@@ -212,6 +217,20 @@ describe('focusedWithin', () => {
     expect(focusedWithin(root)).toBeNull();
     other.btn.blur();
     expect(focusedWithin(root)).toBeNull();
+  });
+});
+
+describe('findFocusKey', () => {
+  it('resolves by exact dataset equality without selector interpolation', () => {
+    const hostile = 'vault:row:pooled:a"b]';
+    const { root, btn } = windowWithKeyedButton(hostile);
+    const neighbor = document.createElement('button');
+    neighbor.dataset.focusKey = 'vault:row:pooled:copper_ore';
+    root.appendChild(neighbor);
+
+    expect(() => findFocusKey(root, hostile)).not.toThrow();
+    expect(findFocusKey(root, hostile)).toBe(btn);
+    expect(findFocusKey(root, `${hostile}:missing`)).toBeNull();
   });
 });
 

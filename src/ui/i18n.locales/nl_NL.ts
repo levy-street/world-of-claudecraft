@@ -4326,6 +4326,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} verrijst boven Doorntop-Hoogten!',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas met {slots} vakken',
+  'itemUi.tooltip.bagSlotsMaterials': 'Materialentas met {slots} vakken',
   'questUi.tracker.hideFromMap': 'Verberg {name} op de kaart',
   'questUi.tracker.showOnMap': 'Toon {name} op de kaart',
   'sim.delve.baptistryEggs':

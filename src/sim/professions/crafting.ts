@@ -68,17 +68,30 @@
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, fitsAll } from '../bags';
+import { bagPools, fitsAll } from '../bags';
 import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import {
+  consumePlayerVaultStock,
+  consumeVaultStock,
+  craftVaultStockFor,
+  drawableCounterFor,
+  emitVaultCraftConsume,
+  type MaterialsVaultState,
+} from '../materials_vault';
 import { forceDismount } from '../mounts';
 import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import {
+  reservePlannedVaultConsumption,
+  type SimContext,
+  settleVaultConsumptionReservation,
+} from '../sim_context';
 import type { Entity, InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { CRAFT_CAST_ID, isConsuming } from '../types';
+import { vaultDrawStock } from '../vault_craft_gate';
 import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
@@ -98,10 +111,16 @@ import {
   masterworkBumpedQuality,
   masterworkProcChance,
 } from './masterwork';
-import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
+import { countAcrossGrades, type GradeRemoval, materialGradeIds } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
+import {
+  countMinusPlanned,
+  planReagentSourceDraw,
+  type ReagentSourcePlan,
+  tallyPlannedTakes,
+} from './reagent_sources';
 import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import {
@@ -171,6 +190,15 @@ export interface CraftResult {
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
   selfSignedBonusApplied?: boolean;
+  // Bank Storage phase 04: the units this craft drew out of the Materials
+  // Vault rather than the bags, in the order they were spent. Present ONLY
+  // when at least one unit actually moved, so a bags-only craft (every craft
+  // before this feature, and every craft by a player with no vault or standing
+  // outside the open world) carries no new field at all. The observability
+  // half is separate and lives beside the consume, not on this field: the
+  // resolve path hands the same takes to emitVaultCraftConsume
+  // (materials_vault.ts) once the units have moved.
+  vaultDraws?: readonly GradeRemoval[];
   // Commissions (Professions 2.0): true only when the opt-in flag
   // was honored, i.e. the output is an eligible equipment kind and every
   // granted copy was minted armed with bindOnTrade (commission.ts). Absent
@@ -398,49 +426,139 @@ export function requiredReagentCountFor(
   };
 }
 
+/** The vault-side counting callback for one craft evaluation, or null when
+ *  this player draws from their bags alone (no vault stock, or standing
+ *  somewhere vault draw is refused: vault_craft_gate.ts).
+ *
+ *  Built ONCE per evaluation and shared by every reagent in the recipe, so the
+ *  place gate is asked once rather than per reagent, and so the availability
+ *  check, the capacity gate, the consumption and the batch simulation can
+ *  never disagree about whether the vault is in play for this attempt. A null
+ *  return is the byte-identical-to-before path: every plan below then reduces
+ *  to the carried-only walk the craft has always performed. The adapter body
+ *  is the shared drawableCounterFor (materials_vault.ts, the rule of three);
+ *  this alias keeps the craft-side name its call sites and pins read. */
+const vaultCounterFor = drawableCounterFor;
+
+/**
+ * THE craft-side planner: resolve where EVERY reagent of one attempt comes
+ * from, bags first and then the Materials Vault, and answer null the moment
+ * any of them cannot be paid in full.
+ *
+ * Four sites consume this and none of them re-derives the order: the
+ * availability check, the bag-capacity scratch gate, the real consumption, and
+ * the Create All batch simulation. PLAN-THEN-APPLY is the shape, deliberately:
+ * every site learns the whole attempt is payable before any of it is spent, so
+ * a craft is all-or-nothing across both pools and a reagent list that fails on
+ * its LAST line cannot leave the earlier lines already consumed.
+ *
+ * BOTH pools are tallied across reagents, because planning spends nothing.
+ * Without the tallies, two reagents naming one material (or two whose grade
+ * ladders overlap) are each promised the same units, and the attempt is
+ * admitted for a price it can only half pay: the consume drains the first
+ * line, the second finds nothing, and the output is granted anyway. That
+ * conservation hole is closed on the CARRIED side as well as the new vault
+ * side, even though the carried half predates this phase, and it changes no
+ * shipped answer: no recipe in content names one material twice or overlaps
+ * two reagents' grade ladders, which is exactly why it survived this long.
+ *
+ * Callers supply their own `carriedCount` (countUnlockedInSlots over the live
+ * inventory for the real paths and over a scratch copy for the simulating
+ * ones, so every plan spends only unlocked units, issue 3042; the lock-only
+ * denial probe alone counts locked copies too, via ctx.countItem) and their own
+ * `requiredFor` (the batch simulation re-derives the hold-keyed self-signed
+ * discount per iteration; everyone else reads it off the meta). One plan per
+ * reagent, in reagent order, so callers may pair the two by index.
+ */
+function planCraftReagentDraw(
+  reagents: readonly ProfessionReagent[],
+  requiredFor: (reagent: ProfessionReagent) => number,
+  carriedCount: (id: string) => number,
+  vaultStock: Record<string, number> | null,
+): readonly ReagentSourcePlan[] | null {
+  const carriedPlanned = new Map<string, number>();
+  const vaultPlanned = new Map<string, number>();
+  const carried = countMinusPlanned(carriedCount, carriedPlanned);
+  const vault = countMinusPlanned(vaultCounterFor(vaultStock), vaultPlanned);
+  const plans: ReagentSourcePlan[] = [];
+  for (const reagent of reagents) {
+    // Planned across the reagent's grades, in the same order and from the same
+    // pools the consumption spends them, so no gate can promise units the
+    // removal would not find.
+    const plan = planReagentSourceDraw(reagent.itemId, requiredFor(reagent), carried, vault);
+    if (plan.shortfall !== 0) return null;
+    tallyPlannedTakes(carriedPlanned, plan.carried);
+    tallyPlannedTakes(vaultPlanned, plan.vault);
+    plans.push(plan);
+  }
+  return plans;
+}
+
 /** Whether the given player currently holds every reagent a recipe requires,
  *  in the required quantities, after that player's #1145 self-signed
  *  reduction and #1134 specialization discount compose. Read-only: never
- *  mutates inventory.
+ *  mutates inventory OR vault stock.
  *
- *  Counts only UNLOCKED units (issue 3042, item_lock.ts): a player-locked
- *  reagent copy is not spendable material, exactly like a held-but-bound
- *  copy is not sellable, so it can never satisfy this gate. */
+ *  Bank Storage phase 04: "holds" now spans BOTH pools, bags first and then
+ *  the Materials Vault, through the one shared sourcing entry point
+ *  (professions/reagent_sources.ts). A player with no vault, a locked one, or
+ *  one they may not reach from where they stand plans a carried-only draw and
+ *  answers exactly as before.
+ *
+ *  The carried half counts only UNLOCKED units (issue 3042, item_lock.ts): a
+ *  player-locked reagent copy is not spendable material, exactly like a
+ *  held-but-bound copy is not sellable, so it can never satisfy this gate.
+ *  The drawable vault view deliberately exposes only ordinary pooled stock.
+ *  Identity-bearing special rows can be locked and are excluded from every
+ *  automatic craft and Create All plan.
+ *
+ *  `vaultStock` lets a caller that has ALREADY resolved the place gate hand
+ *  its answer in rather than making this resolve it again (the gate walks the
+ *  live instance and rift pools, so it is not free). Omitted, this resolves
+ *  its own; the only production caller (evaluateCraftAdmission, in-module)
+ *  passes it, so the omitted arm serves the TEST callers and any future
+ *  external consumer. */
 export function hasRecipeMaterials(
   ctx: SimContext,
   recipe: ProfessionRecipeRecord,
   pid: number,
+  vaultStock: Record<string, number> | null = vaultDrawStock(ctx, pid),
 ): boolean {
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
-  return recipe.reagents.every(
-    (r) =>
-      // Counted across the reagent's grades, in the same order the
-      // consumption below spends them, so the gate can never promise units the
-      // removal would not find.
-      countAcrossGrades(r.itemId, (id) => countUnlockedInSlots(meta?.inventory ?? [], id)) >=
-      requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
+  return (
+    planCraftReagentDraw(
+      recipe.reagents,
+      (r) => requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
+      (id) => countUnlockedInSlots(meta?.inventory ?? [], id),
+      vaultStock,
+    ) !== null
   );
 }
 
 /** True when the recipe WOULD pass hasRecipeMaterials if locked copies
  *  counted too: the player holds every reagent in the required quantity in
- *  AGGREGATE, so a locked copy (never a genuine shortfall) is what is
- *  denying the craft. Distinguishes the 'locked' CraftResult reason from
- *  plain 'insufficient_materials' (issue 3042 acceptance: "each refused
- *  action surfaces a clear locked-item message"). Called only after
- *  hasRecipeMaterials has already returned false. */
+ *  AGGREGATE across both pools, so a locked copy (never a genuine shortfall)
+ *  is what is denying the craft. Distinguishes the 'locked' CraftResult
+ *  reason from plain 'insufficient_materials' (issue 3042 acceptance: "each
+ *  refused action surfaces a clear locked-item message"). Called only after
+ *  hasRecipeMaterials has already returned false, with the SAME vault stock,
+ *  so the two answers differ only in whether locked carried copies count. */
 function insufficientMaterialsIsLockOnly(
   ctx: SimContext,
   recipe: ProfessionRecipeRecord,
   pid: number,
+  vaultStock: Record<string, number> | null,
 ): boolean {
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
-  return recipe.reagents.every(
-    (r) =>
-      countAcrossGrades(r.itemId, (id) => ctx.countItem(id, pid)) >=
-      requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
+  return (
+    planCraftReagentDraw(
+      recipe.reagents,
+      (r) => requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
+      (id) => ctx.countItem(id, pid),
+      vaultStock,
+    ) !== null
   );
 }
 
@@ -507,11 +625,16 @@ export function evaluateCraftAdmission(
   if (!isRecipeKnown(meta, recipe)) {
     return { ok: false, recipeId: recipe.id, reason: 'recipe_not_learned' };
   }
-  if (!hasRecipeMaterials(ctx, recipe, pid)) {
+  // The live vault stock this attempt may draw from, resolved ONCE for the
+  // gates below (the place gate walks the live instance and rift pools, so
+  // asking it twice per admission is waste, not safety). Read-only on all
+  // paths: each models the draw on a tally and none spends any of it.
+  const vaultStock = vaultDrawStock(ctx, pid);
+  if (!hasRecipeMaterials(ctx, recipe, pid, vaultStock)) {
     return {
       ok: false,
       recipeId: recipe.id,
-      reason: insufficientMaterialsIsLockOnly(ctx, recipe, pid)
+      reason: insufficientMaterialsIsLockOnly(ctx, recipe, pid, vaultStock)
         ? 'locked'
         : 'insufficient_materials',
     };
@@ -522,7 +645,6 @@ export function evaluateCraftAdmission(
   // read (content lookups plus archetype state; none reads the inventory and
   // none draws rng).
   const def: ItemDef | undefined = ITEMS[recipe.resultItemId];
-  const outputQuality = defOutputQuality(def);
   // #1129/#1148: the archetype empowerment ceiling.
   const ceilingTier = meta
     ? archetypeCeilingFor(
@@ -545,23 +667,38 @@ export function evaluateCraftAdmission(
   // #2350 capacity gate: the output must fit AFTER the reagents leave, so
   // simulate the consumption on a scratch copy and require EVERY possible
   // grant shape to fit. Denies with no side effect and draws nothing.
+  //
+  // Bank Storage phase 04: ONLY THE CARRIED TAKES ARE APPLIED TO THE SCRATCH.
+  // A vault-sourced unit never sat in a bag, so it frees no bag space, and
+  // modeling it as a bag removal would over-credit room and admit a craft
+  // whose output then has nowhere to land. The scratch must therefore end up
+  // missing exactly the units that really leave the bags, no more, which is
+  // why this walks `plan.carried` and drops `plan.vault` on the floor: the
+  // shared planner already accounted for the vault half.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    for (const reagent of recipe.reagents) {
-      const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
-      // Lock-aware, mirroring the real removal below exactly (issue 3042):
-      // hasRecipeMaterials already refused a craft that needs a locked
-      // reagent, so this only has to keep agreeing with the real removal
-      // about WHICH slots free up, or the capacity gate could approve a
-      // craft the real removal then finds no room for.
-      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
-        countUnlockedInSlots(scratch, id),
-      )) {
-        removeUnlockedFromSlots(scratch, take.itemId, take.count);
-      }
+    const plans = planCraftReagentDraw(
+      recipe.reagents,
+      (reagent) => requiredReagentCount(meta, reagent, craftSkills, recipe.professionId).count,
+      // Lock-aware (issue 3042), mirroring the real removal exactly (the same
+      // countUnlockedInSlots/removeUnlockedFromSlots pair), so the capacity
+      // gate can never approve a craft the real removal then finds no room
+      // for.
+      (id) => countUnlockedInSlots(scratch, id),
+      vaultStock,
+    );
+    // Unreachable: hasRecipeMaterials above just planned the same attempt from
+    // the same two pools and admitted it. Kept as the honest all-or-nothing
+    // answer rather than a non-null assertion, and it repeats that gate's own
+    // reason so the denial order is unchanged.
+    if (plans === null) {
+      return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
+    }
+    for (const plan of plans) {
+      for (const take of plan.carried) removeUnlockedFromSlots(scratch, take.itemId, take.count);
     }
     const shapes: InvSlot[][] = [];
-    if (isSignableMaterialRarity(outputQuality)) {
+    if (mintsSignedCraftOutput(def)) {
       const payload: ItemInstancePayload = { signer: meta.name };
       if (commissioned) payload.bindOnTrade = true;
       shapes.push([{ itemId: recipe.resultItemId, count: recipe.resultCount, instance: payload }]);
@@ -592,8 +729,8 @@ export function evaluateCraftAdmission(
       }
       shapes.push(adds);
     }
-    const capacity = bagCapacity(meta.bags);
-    if (!shapes.every((adds) => fitsAll(scratch, capacity, adds))) {
+    const pools = bagPools(meta.bags);
+    if (!shapes.every((adds) => fitsAll(scratch, pools, adds))) {
       return { ok: false, recipeId: recipe.id, reason: 'no_bag_space' };
     }
   }
@@ -663,6 +800,40 @@ export function resolveCraftForRecipe(
   // rather than denied, so a broke player still crafts, just contributes
   // nothing to the sink that trip. Content-driven via
   // CRAFT_GOLD_SINK_COPPER_PER_BUDGET.
+  //
+  // PLAN BEFORE ANY OF THIS. The whole reagent list is sourced first, and a
+  // list that cannot be paid in full denies here, before the gold fee and
+  // before the first removal, so a craft is all-or-nothing over gold AND both
+  // material pools. This is defence in depth rather than a live gate: the
+  // admission above planned the identical attempt from the identical pools an
+  // instant ago and nothing between the two mutates either one, so this can
+  // only fire on a bug. It draws no rng and mutates nothing, so a denial here
+  // keeps the 0-draws-on-denial contract exactly.
+  const vaultStock = vaultDrawStock(ctx, pid);
+  const plans = planCraftReagentDraw(
+    recipe.reagents,
+    (reagent) => requiredReagentCount(meta, reagent, craftSkills, recipe.professionId).count,
+    // Lock-aware (issue 3042): counted over unlocked units only, so no plan
+    // can promise a take the lock-aware removal below would not find.
+    (id) => countUnlockedInSlots(meta?.inventory ?? [], id),
+    vaultStock,
+  );
+  if (plans === null) {
+    // Unreachable defence in depth (the admission just admitted this exact
+    // attempt). Deliberately the plain reason without the admission's
+    // 'locked' split: re-probing lock-only here would be dead branching on
+    // an arm only a bug can reach.
+    return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
+  }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    plans,
+    meta?.vault.upgrades ?? 0,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, recipeId: recipe.id, reason: 'busy' };
+  }
   if (meta) {
     const goldFee = Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     meta.copper = Math.max(0, meta.copper - goldFee);
@@ -671,29 +842,73 @@ export function resolveCraftForRecipe(
   // The masterwork signed-reagent input: a holding check over the recipe's
   // reagents BEFORE consumption (removeItem consumes end-backward, so the
   // signed copy itself may be what gets consumed), any signer counting.
+  // Deliberately still an INVENTORY-only check: drawable vault stock excludes
+  // identity-bearing special rows, so nothing it can spend carries a signer.
   let signedReagentUsed = false;
-  for (const reagent of recipe.reagents) {
+  // Apply the plans decided above, one per reagent in reagent order. The two
+  // flags are read off the SAME reagent this plan belongs to (the planner
+  // returns one plan per reagent, in order), and both are read BEFORE that
+  // reagent's removal so a signed copy that is itself consumed still counts.
+  // NOTE (the Phase 04 review round): this recompute of requiredReagentCount
+  // runs AFTER earlier reagents' removals, while the CHARGED amount is the
+  // planner's pre-removal value. The two can only disagree when an earlier
+  // reagent's removal changes a later reagent's self-signed hold, which needs
+  // overlapping grade ladders; no shipped recipe has them (the content guard
+  // in tests/crafting_view.test.ts pins that), and the charged amount is
+  // always the plan's. If overlapping content ever lands, hoist the planner's
+  // required values here instead of recomputing.
+  const vaultDraws: GradeRemoval[] = [];
+  recipe.reagents.forEach((reagent, i) => {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
-    // Lock-aware removal (issue 3042): mirrors the #2350 capacity scratch
-    // simulation above exactly (same countUnlockedInSlots/removeUnlockedFromSlots
-    // pair), so the two can never disagree about which slots free up. No meta
-    // to remove from is the same no-op ctx.removeItem already was for an
-    // unresolved pid.
+    const plan = plans[i];
+    // Lock-aware removal (issue 3042): the plan's carried takes were counted
+    // over unlocked units only (the planner call above), and
+    // removeUnlockedFromSlots frees exactly those units, so the #2350
+    // capacity scratch simulation and this real removal can never disagree
+    // about which slots free up. No meta to remove from is the same no-op
+    // ctx.removeItem already was for an unresolved pid.
     if (meta) {
-      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
-        countUnlockedInSlots(meta.inventory, id),
-      )) {
+      for (const take of plan.carried) {
         removeUnlockedFromSlots(meta.inventory, take.itemId, take.count);
       }
     }
-  }
+    // REACHABLE ONLY BY A BUG. consumePlayerVaultStock re-checks the row it is about
+    // to spend, and it cannot refuse one of these: the plan was built from
+    // drawableVaultCount over this same live record, no take exceeds what its
+    // row held, and no reagent's take was promised twice (the planner tallies
+    // both pools). If it ever does refuse, recording only what committed is
+    // the safe direction, since a take in this list is a claim that units
+    // really moved. (`meta &&` is unreachable for the same class of reason:
+    // with no meta, vaultDrawStock returned null and plan.vault is empty.)
+    for (const take of plan.vault) {
+      if (meta && consumePlayerVaultStock(meta, take.itemId, take.count)) vaultDraws.push(take);
+    }
+  });
+  // The host reservation becomes durable only after the exact planned vault
+  // draw has landed: commit when every planned take moved, cancel on any
+  // shortfall (see the "recording only what committed" rule above; the
+  // shortfall arm is unreachable-by-construction, and under-claiming is the
+  // safe direction for the durable audit record). A bags-only craft has no
+  // handle and stays allocation-free.
+  const plannedVaultTakes = plans.reduce((n, plan) => n + plan.vault.length, 0);
+  settleVaultConsumptionReservation(vaultReservation, plannedVaultTakes, vaultDraws.length);
   // removeUnlockedFromSlots mutates the array only, unlike ctx.removeItem
   // (which fires this itself): fire it once for the whole reagent consumption,
   // the same one-call-at-the-end contract items.ts's own hand-rolled removal
-  // walks (removePreferFungible, removeVendorSellUnits) follow.
-  if (meta) ctx.onInventoryChangedForQuests?.(meta);
+  // walks (removePreferFungible, removeVendorSellUnits) follow. The gate
+  // covers BOTH pools, and be precise about WHY: the hook's collect-objective
+  // recompute reads ctx.countItem, which walks CARRIED inventory only, so a
+  // vault-only draw changes no collect objective; and quest PRESENCE
+  // (quests/quest_item_presence.ts playerHoldsQuestItem, which does read
+  // meta.vault) is a live predicate that needs no recompute at all. What a
+  // vault-only draw DOES need from this call is its wireRev bump: the dirty
+  // flag that makes hosts re-send the derived state whose inputs just moved.
+  // Only a craft that drew from neither pool skips the fire.
+  if (meta && plans.some((plan) => plan.carried.length > 0 || plan.vault.length > 0)) {
+    ctx.onInventoryChangedForQuests?.(meta);
+  }
   // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
   // output-side draw, ONLY for a Jack-attuned crafter, positioned
   // immediately before the masterwork proc draw below. Every non-Jack
@@ -813,7 +1028,7 @@ export function resolveCraftForRecipe(
         });
       }
     }
-  } else if (meta && isSignableMaterialRarity(outputQuality)) {
+  } else if (meta && mintsSignedCraftOutput(def)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
     ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
@@ -879,6 +1094,12 @@ export function resolveCraftForRecipe(
     quality: outputQuality,
     selfSignedBonusApplied,
   };
+  if (vaultDraws.length > 0) result.vaultDraws = vaultDraws;
+  // The tick-side ledger record for what just left the vault (the server has
+  // no dispatch bracket here; see emitVaultCraftConsume). Emitted only when a
+  // unit really moved, so a carried-only craft's event stream is
+  // byte-identical to the pre-vault one.
+  if (vaultDraws.length > 0 && meta) emitVaultCraftConsume(ctx, meta, vaultDraws);
   if (masterwork) result.masterwork = true;
   if (commissioned) result.commission = true;
   if (jackVariance !== null) result.variance = jackVariance;
@@ -896,6 +1117,19 @@ function defOutputQuality(def: ItemDef | undefined): MaterialRarity {
   return quality === undefined || quality === 'poor' ? 'common' : quality;
 }
 
+/** Whether a successful craft of `def` mints a signed instance payload:
+ *  isSignableMaterialRarity over the output quality, EXCEPT bag-kind defs. A
+ *  worn bag stores only its bare item id, and bags.ts equipBag refuses a
+ *  payload-carrying copy rather than dropping its provenance (issue #2837),
+ *  so signing a crafted bag would only mint a copy whose primary purpose is
+ *  refused. Crafted rare-or-better bags (the phase 05 tailoring ladder)
+ *  grant plain and fungible instead; the per-craft rare-tier milestone deed
+ *  below stays quality-keyed and still counts them. Shared by the #2350
+ *  admission shape model and the real grant so the two can never disagree. */
+export function mintsSignedCraftOutput(def: ItemDef | undefined): boolean {
+  return isSignableMaterialRarity(defOutputQuality(def)) && def?.kind !== 'bag';
+}
+
 /** Pure resolution of one craft attempt against one recipe id, given an
  *  already-resolved player entity id: denies with `unknown_recipe` if the id
  *  does not resolve, otherwise delegates to `resolveCraftForRecipe`. */
@@ -910,7 +1144,8 @@ export function resolveCraft(
   return resolveCraftForRecipe(ctx, pid, recipe, commission);
 }
 
-/** How many full crafts of `recipe` the player's current bags can pay for,
+/** How many full crafts of `recipe` the player's current bags AND (where the
+ *  place gate allows) vault stock can pay for,
  *  capped at CRAFT_BATCH_MAX, simulated craft by craft so the conditional
  *  self-signed discount expires mid-batch when its copy is consumed (the
  *  discount is hold-keyed, see hasSelfSignedInstance). Bag space is
@@ -947,40 +1182,62 @@ export function maxCraftCountForRecipe(
   // signed copy is consumed mid-batch. A one-shot division assumed the
   // discount for the whole batch, overestimated for signed crafters, and
   // ended Create All on a spurious insufficient_materials denial. Same
-  // removal walk as the real consumption (planGradeRemoval over grades).
+  // sourcing plan as the real consumption (professions/reagent_sources.ts).
   // Pure, draw-free, bounded at CRAFT_BATCH_MAX iterations.
+  //
+  // Bank Storage phase 04: the vault is simulated alongside the bags, on its
+  // OWN throwaway scratch (craftVaultStockFor hands back a boundary clone of
+  // the drawable rows), so a batch spends down both pools exactly the way the
+  // per-craft consumption will and Create All offers a count the player can
+  // actually pay. The clone is wrapped in a bare holder purely so the batch
+  // applies its vault takes through the SAME consumeVaultStock the real
+  // consumption uses; `upgrades` is irrelevant to it (the applier is
+  // rung-ungated) and is not modeled.
   const scratch = meta.inventory.map((s) => ({ ...s }));
+  const scratchVaultStock = craftVaultStockFor(ctx, pid);
+  const scratchVault: MaterialsVaultState | null =
+    scratchVaultStock === null ? null : { stock: scratchVaultStock, special: [], upgrades: 0 };
   const isJack = !!meta.archetype?.isJackOfAllTrades;
   let crafts = 0;
   while (crafts < CRAFT_BATCH_MAX) {
-    const takes: { itemId: string; count: number }[] = [];
-    let payable = true;
-    for (const reagent of recipe.reagents) {
-      const hasSelfSigned = materialGradeIds(reagent.itemId).some((gradeId) =>
-        holdsSelfSignedInstance(scratch, meta.name, gradeId),
-      );
-      const required = requiredReagentCountFor(
-        hasSelfSigned,
-        reagent,
-        craftSkills,
-        recipe.professionId,
-        isJack,
-      ).count;
-      if (required <= 0) continue;
+    // One iteration is one craft, and a craft is all-or-nothing, so BOTH
+    // scratches are applied only after the whole reagent list proves payable:
+    // a list that fails on its last reagent must leave both untouched for the
+    // count we return. The shared planner is exactly that shape, tallies for
+    // both pools included, so Create All can never offer a count the per-craft
+    // consumption then refuses.
+    const plans = planCraftReagentDraw(
+      recipe.reagents,
+      (reagent) =>
+        requiredReagentCountFor(
+          // Inventory-only, and it stays that way: the discount is keyed on
+          // HOLDING a signed instance, and drawable vault stock excludes every
+          // identity-bearing special row, so the discount can never derive
+          // from the vault. Re-derived per
+          // iteration because the hold expires when the last signed copy is
+          // consumed mid-batch.
+          materialGradeIds(reagent.itemId).some((gradeId) =>
+            holdsSelfSignedInstance(scratch, meta.name, gradeId),
+          ),
+          reagent,
+          craftSkills,
+          recipe.professionId,
+          isJack,
+        ).count,
       // Lock-aware (issue 3042), matching hasRecipeMaterials: a locked
       // reagent copy cannot pay for a batch craft any more than a single one.
-      if (countAcrossGrades(reagent.itemId, (id) => countUnlockedInSlots(scratch, id)) < required) {
-        payable = false;
-        break;
-      }
-      for (const take of planGradeRemoval(reagent.itemId, required, (id) =>
-        countUnlockedInSlots(scratch, id),
-      )) {
-        takes.push(take);
+      (id) => countUnlockedInSlots(scratch, id),
+      scratchVault?.stock ?? null,
+    );
+    if (plans === null) break;
+    for (const plan of plans) {
+      for (const take of plan.carried) removeUnlockedFromSlots(scratch, take.itemId, take.count);
+      if (scratchVault) {
+        for (const take of plan.vault) {
+          consumeVaultStock(scratchVault, take.itemId, take.count);
+        }
       }
     }
-    if (!payable) break;
-    for (const take of takes) removeUnlockedFromSlots(scratch, take.itemId, take.count);
     crafts++;
   }
   return crafts;

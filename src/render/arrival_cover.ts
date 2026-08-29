@@ -37,6 +37,15 @@ export interface ArrivalRevealGate {
  *  costs at most one poll of curtain time, coarse enough to be free. */
 export const ARRIVAL_REVEAL_POLL_MS = 50;
 
+/** The `arrival` event keys the wait's outcome rides under (gpu_prep_events):
+ *  `ageMs` is the time actually waited, `units` the bound it was given,
+ *  `totalRoots` the imminent keys still held when the curtain lifted. A
+ *  zero-budget wait records nothing. The perf beacon summarizes them beside
+ *  the reveal counters (src/game/perf_entry_reveal_core.ts), so the fleet can
+ *  read how long the establishing-shot curtain really holds. */
+export const ENTRY_WAIT_EVENT_KEY = 'entry-wait';
+export const ENTRY_WAIT_ESTABLISHING_EVENT_KEY = 'entry-wait:establishing-shot';
+
 export interface ArrivalRevealWaitOptions {
   /** Clock, defaulting to the shared GPU-prep clock the gates measure on. */
   now?: () => number;
@@ -52,6 +61,14 @@ export interface ArrivalRevealWaitOptions {
 // bare boolean let whichever dropped first clear the other's cover and
 // un-refuse the boot-debt and background admission lanes mid-arrival.
 let coverDepth = 0;
+// The ESTABLISHING SHOT: the world-entry cover is about to lift on the
+// first-spawn cinematic (spawn_cinematic.ts), whose opening pose is a wide,
+// high view of the whole spawn village rather than the chase camera among the
+// buildings. Under it every reveal consult counts as IMMINENT (reveal_gate.ts):
+// what that shot sees is what the player sees first, and the entry wait
+// (arrival_warmup.ts settleWorldEntryCover) is what gives it time to link.
+// Set only by the entry-cover owner, read only while the cover is up.
+let establishingShot = false;
 const gates = new Set<WeakRef<ArrivalRevealGate>>();
 // Module-level like the flag: a graphics rebuild mints a fresh renderer, and
 // the player's last position is not something a rebuild should forget.
@@ -76,6 +93,16 @@ export function registerRevealGateForArrival(gate: ArrivalRevealGate): void {
 
 export function arrivalCoverActive(): boolean {
   return coverDepth > 0;
+}
+
+export function setArrivalEstablishingShot(active: boolean): void {
+  establishingShot = active;
+}
+
+/** True while the entry cover is up on an establishing shot: with the cover
+ *  down the flag is inert, whatever its owner last wrote. */
+export function arrivalEstablishingShotActive(): boolean {
+  return establishingShot && coverDepth > 0;
 }
 
 /** Imminent keys still held across every registered gate. */
@@ -123,11 +150,26 @@ export function awaitArrivalReveals(
       setTimeout(poll, ms);
     });
   const pollMs = options.pollMs ?? ARRIVAL_REVEAL_POLL_MS;
-  const deadline = now() + (Number.isFinite(maxMs) && maxMs > 0 ? maxMs : 0);
+  const boundMs = Number.isFinite(maxMs) && maxMs > 0 ? maxMs : 0;
+  const startedAt = now();
+  const deadline = startedAt + boundMs;
+  const establishing = arrivalEstablishingShotActive();
   return new Promise<void>((resolve) => {
+    const finish = (): void => {
+      if (boundMs > 0) {
+        recordGpuPrepEvent({
+          kind: 'arrival',
+          key: establishing ? ENTRY_WAIT_ESTABLISHING_EVENT_KEY : ENTRY_WAIT_EVENT_KEY,
+          ageMs: now() - startedAt,
+          units: Math.round(boundMs),
+          totalRoots: arrivalHeldImminentKeys(),
+        });
+      }
+      resolve();
+    };
     const poll = (): void => {
       if (arrivalHeldImminentKeys() === 0 || now() >= deadline) {
-        resolve();
+        finish();
         return;
       }
       schedule(poll, pollMs);
@@ -166,6 +208,7 @@ export function noteArrivalIfTeleported(x: number, z: number, missingViews: numb
 
 export function resetArrivalCoverForTest(): void {
   coverDepth = 0;
+  establishingShot = false;
   gates.clear();
   arrivalDetector = createArrivalDetector();
 }

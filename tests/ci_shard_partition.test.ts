@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
@@ -199,6 +199,12 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     ) as { __provenance?: { run?: string; files?: number } };
     expect(raw.__provenance?.run).toMatch(/^\d+$/);
     expect(raw.__provenance?.files).toBe(Object.keys(MEASURED_WEIGHTS).length);
+    // Every row must name a file that exists on disk: absent-file rows are
+    // exactly this table's own failure story (an interim hand-merge imported
+    // 94 rows from an unmerged branch and they rode along until pruned), and
+    // a stale row silently skews the pack it lands in.
+    const stale = Object.keys(MEASURED_WEIGHTS).filter((file) => !existsSync(join(root, file)));
+    expect(stale).toEqual([]);
     for (const [file, ms] of Object.entries(MEASURED_WEIGHTS)) {
       expect(file.startsWith('tests/'), file).toBe(true);
       expect(ms).toBeGreaterThan(0);

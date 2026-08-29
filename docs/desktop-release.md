@@ -620,8 +620,12 @@ product exist. Coding and merge stay dark-safe without those credentials.
    never an `appendSwitch` call in the running process.
    `main.cjs` therefore calls `relaunchForLinuxPrime` as the very first thing it
    does (before crash reporting, logging, or any window): on a HYBRID Linux
-   machine (two or more GPUs under `/sys/class/drm`; single-GPU machines are left
-   completely untouched), it re-execs the app with the PRIME variables baked into
+   machine (two or more GPUs under `/sys/class/drm` whose display card, the one
+   sysfs marks `boot_vga`, is not the NVIDIA one; single-GPU machines, and desktops
+   where the NVIDIA card already drives the screen next to an enabled integrated
+   GPU, are left completely untouched: on the latter the offload env fails every
+   EGL display type and Chromium disables the GPU for the session), it re-execs
+   the app with the PRIME variables baked into
    the new process's environment from birth plus `--ozone-platform=x11` appended
    to argv, and the original process exits immediately. The spawn source is
    `$APPIMAGE` (the outer AppImage file, the same source electron-updater restarts

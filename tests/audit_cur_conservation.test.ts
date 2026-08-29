@@ -7,6 +7,30 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type Book = { treasury: number; inventory: unknown[]; purchasedSlots: number };
 type CharRow = { level: number; state: { copper?: number; inventory?: unknown[] } };
+type DurableLedgerAuditRow = BankLedgerAuditRow & { account_id: number };
+type LedgerRowInput = {
+  realm: string;
+  characterId: number;
+  accountId: number;
+  op: string;
+  itemId: string | null;
+  count: number | null;
+  instance?: unknown;
+  instanceJson?: string | null;
+  copperDelta: number;
+  purchasedSlotsAfter: number;
+  container: string;
+  containerId: number | null;
+  counterpartyCopperDelta?: number | null;
+  counterpartyCount?: number | null;
+};
+type LedgerEffectsInput = {
+  batches: readonly {
+    batchKey: string;
+    rows: readonly LedgerRowInput[];
+  }[];
+};
+type PendingLedgerRow = Omit<DurableLedgerAuditRow, 'id'>;
 
 const dbMock = vi.hoisted(() => {
   // The in-memory DURABLE store: guild books + character blobs. The book half
@@ -15,6 +39,9 @@ const dbMock = vi.hoisted(() => {
   // inside the fenced transaction.
   const durableBooks = new Map<number, unknown>();
   const durableChars = new Map<number, unknown>();
+  const durableLedger: DurableLedgerAuditRow[] = [];
+  const committedLedgerBatches = new Set<string>();
+  let nextLedgerId = 1;
   let fenceFor: number | null = null; // characterId whose next save is fenced out
   const merge = {
     // biome-ignore lint/suspicious/noExplicitAny: bound to the real merge below
@@ -22,12 +49,12 @@ const dbMock = vi.hoisted(() => {
     // biome-ignore lint/suspicious/noExplicitAny: bound to the real error below
     refused: null as null | (new (results: any[]) => Error),
   };
-  const writeBooks = (
+  const prepareBooks = (
     // biome-ignore lint/suspicious/noExplicitAny: the delta payload shape
     books: { guildId: number; deltas: any }[] | undefined,
     // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
     results?: any[],
-  ) => {
+  ): [number, unknown][] => {
     // A refused book half aborts the whole transaction, character row
     // included, exactly as server/db.ts does it.
     // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
@@ -44,20 +71,78 @@ const dbMock = vi.hoisted(() => {
       if (!merge.refused) throw new Error('refusal not wired');
       throw new merge.refused(written);
     }
-    for (const [guildId, data] of pending) durableBooks.set(guildId, data);
+    return pending;
+  };
+  const prepareLedgerRow = (row: LedgerRowInput): PendingLedgerRow => {
+    const instanceJson = row.instanceJson;
+    return {
+      realm: row.realm,
+      character_id: row.characterId,
+      account_id: row.accountId,
+      op: row.op,
+      item_id: row.itemId,
+      count: row.count,
+      instance:
+        typeof instanceJson === 'string' ? JSON.parse(instanceJson) : (row.instance ?? null),
+      copper_delta: row.copperDelta,
+      purchased_slots_after: row.purchasedSlotsAfter,
+      container: row.container,
+      container_id: row.containerId,
+      counterparty_copper_delta: row.counterpartyCopperDelta ?? null,
+      counterparty_count: row.counterpartyCount ?? null,
+    };
+  };
+  const appendLedgerRow = (row: LedgerRowInput): void => {
+    durableLedger.push({ id: nextLedgerId++, ...prepareLedgerRow(row) });
+  };
+  const prepareLedgerEffects = (
+    effects: LedgerEffectsInput | undefined,
+  ): { batchKey: string; rows: PendingLedgerRow[] }[] => {
+    const pending: { batchKey: string; rows: PendingLedgerRow[] }[] = [];
+    for (const batch of effects?.batches ?? []) {
+      if (committedLedgerBatches.has(batch.batchKey)) continue;
+      pending.push({ batchKey: batch.batchKey, rows: batch.rows.map(prepareLedgerRow) });
+    }
+    return pending;
+  };
+  const commitLedgerEffects = (
+    batches: readonly { batchKey: string; rows: readonly PendingLedgerRow[] }[],
+  ): void => {
+    for (const batch of batches) {
+      for (const row of batch.rows) durableLedger.push({ id: nextLedgerId++, ...row });
+      committedLedgerBatches.add(batch.batchKey);
+    }
   };
   return {
     durableBooks,
     durableChars,
+    durableLedger,
     merge,
+    resetLedger: () => {
+      durableLedger.length = 0;
+      committedLedgerBatches.clear();
+      nextLedgerId = 1;
+    },
     setFence: (id: number | null) => {
       fenceFor = id;
     },
-    saveCharacterState: vi.fn(async (characterId: number, _level: number, state: unknown) => {
-      if (fenceFor === characterId) return false;
-      durableChars.set(characterId, JSON.parse(JSON.stringify(state)));
-      return true;
-    }),
+    saveCharacterState: vi.fn(
+      async (
+        characterId: number,
+        _level: number,
+        state: unknown,
+        _nonce?: string,
+        _storageEffects?: unknown,
+        ledgerEffects?: LedgerEffectsInput,
+      ) => {
+        if (fenceFor === characterId) return false;
+        const pendingCharacter = JSON.parse(JSON.stringify(state));
+        const pendingLedger = prepareLedgerEffects(ledgerEffects);
+        durableChars.set(characterId, pendingCharacter);
+        commitLedgerEffects(pendingLedger);
+        return true;
+      },
+    ),
     saveCharacterAndGuildBankState: vi.fn(
       async (
         characterId: number,
@@ -68,15 +153,50 @@ const dbMock = vi.hoisted(() => {
         _nonce?: string,
         // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
         results?: any[],
+        _storageEffects?: unknown,
+        ledgerEffects?: LedgerEffectsInput,
       ) => {
         if (fenceFor === characterId) return false; // lease fence: NOTHING lands
-        writeBooks(books, results);
-        durableChars.set(characterId, JSON.parse(JSON.stringify(state)));
+        const pendingBooks = prepareBooks(books, results);
+        const pendingCharacter = JSON.parse(JSON.stringify(state));
+        const pendingLedger = prepareLedgerEffects(ledgerEffects);
+        for (const [guildId, data] of pendingBooks) durableBooks.set(guildId, data);
+        durableChars.set(characterId, pendingCharacter);
+        commitLedgerEffects(pendingLedger);
         return true;
       },
     ),
-    saveCharacterAndMarketState: vi.fn(async () => true),
-    insertBankLedgerRow: vi.fn(async () => {}),
+    saveCharacterAndMarketState: vi.fn(
+      async (
+        characterId: number,
+        _level: number,
+        state: unknown,
+        _market: unknown,
+        _mail: unknown,
+        _nonce?: string,
+        // biome-ignore lint/suspicious/noExplicitAny: the delta payload shape
+        books?: { guildId: number; deltas: any }[],
+        // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
+        results?: any[],
+        _storageEffects?: unknown,
+        ledgerEffects?: LedgerEffectsInput,
+      ) => {
+        if (fenceFor === characterId) return false;
+        const pendingBooks = prepareBooks(books, results);
+        const pendingCharacter = JSON.parse(JSON.stringify(state));
+        const pendingLedger = prepareLedgerEffects(ledgerEffects);
+        for (const [guildId, data] of pendingBooks) durableBooks.set(guildId, data);
+        durableChars.set(characterId, pendingCharacter);
+        commitLedgerEffects(pendingLedger);
+        return true;
+      },
+    ),
+    insertBankLedgerRow: vi.fn(async (row: LedgerRowInput) => {
+      appendLedgerRow(row);
+    }),
+    insertBankLedgerRows: vi.fn(async (rows: readonly LedgerRowInput[]) => {
+      for (const row of rows) appendLedgerRow(row);
+    }),
     loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
   };
 });
@@ -88,11 +208,14 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
   loadGuildBankRows: dbMock.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   releaseCharacterLease: vi.fn(async () => {}),
@@ -187,35 +310,24 @@ const purse = (server: GameServer, session: ClientSession): number =>
 const durablePurse = (characterId: number): number =>
   (dbMock.durableChars.get(characterId) as CharRow['state'] | undefined)?.copper ?? -1;
 
-// The bank_ledger rows the fire-and-forget observer actually wrote, in the
-// snake_case shape scripts/bank_audit.mjs consumes.
+// The bank_ledger rows the fake transaction actually committed, in the
+// snake_case shape scripts/bank_audit.mjs consumes. Direct anomaly recorders
+// use the same durable sink, while command batches materialize only when their
+// paired character/book transaction succeeds.
 function capturedLedgerRows(): BankLedgerAuditRow[] {
-  return dbMock.insertBankLedgerRow.mock.calls.map((call, i) => {
-    const r = (call as unknown[])[0] as Record<string, unknown>;
-    return {
-      id: i + 1,
-      realm: r.realm,
-      character_id: r.characterId,
-      op: r.op,
-      item_id: r.itemId,
-      count: r.count,
-      instance: r.instance,
-      copper_delta: r.copperDelta,
-      purchased_slots_after: r.purchasedSlotsAfter,
-      container: r.container,
-      container_id: r.containerId,
-    } as BankLedgerAuditRow;
-  });
+  return dbMock.durableLedger.map((row) => ({ ...row }));
 }
 
 beforeEach(() => {
   dbMock.durableBooks.clear();
   dbMock.durableChars.clear();
+  dbMock.resetLedger();
   dbMock.setFence(null);
   dbMock.saveCharacterState.mockClear();
   dbMock.saveCharacterAndGuildBankState.mockClear();
   dbMock.saveCharacterAndMarketState.mockClear();
   dbMock.insertBankLedgerRow.mockClear();
+  dbMock.insertBankLedgerRows.mockClear();
   dbMock.loadGuildBankRows.mockClear();
 });
 
@@ -276,7 +388,7 @@ describe("another officer's save can no longer launder an unflushed deposit into
     expect(endTotal - startTotal).toBe(0);
   });
 
-  it("leaves the fenced ops' ledger rows behind, which the auditor DOES flag", async () => {
+  it("commits only the surviving officer's row, so the durable audit stays clean", async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'MintA');
     const b = joinServer(server, 2, 'MintB');
@@ -306,11 +418,19 @@ describe("another officer's save can no longer launder an unflushed deposit into
       ],
       guildBanks: [{ guild_id: GUILD_ID, realm: 'Claudemoon', data: book }],
     });
-    // Nothing was minted. The ledger rows of the fenced (undone) ops remain by
-    // design (docs/guild-bank/state.md, the evidence trail), so a LIVE realm's
-    // replay disagrees with the book: that is the documented operator caveat
-    // in scripts/bank_audit.mjs (audit a quiesced realm), not a dupe.
-    expect(findings.map((f: { kind: string }) => f.kind)).toEqual(['treasury_mismatch']);
+    // B's character, book delta, and ledger evidence committed atomically.
+    // A's fenced transaction committed none of the three, so replay matches
+    // durable truth instead of retaining an obsolete phantom deposit.
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      character_id: 2,
+      account_id: 2,
+      op: 'deposit_gold',
+      copper_delta: 1_000,
+      container: 'guild',
+      container_id: GUILD_ID,
+    });
+    expect(findings).toEqual([]);
   });
 });
 
@@ -379,11 +499,17 @@ describe('consume-then-fence can no longer duplicate across two accounts', () =>
     expect(durableBookFangs).toBe(0);
     // And the incident is on the record, once.
     await bankLedgerIdle();
-    const anomalies = capturedLedgerRows().filter(
-      (r) => (r as unknown as { op: string }).op === 'escrow_deficit',
-    );
-    expect(anomalies).toHaveLength(1);
-    expect((anomalies[0] as unknown as { count: number }).count).toBe(-4);
+    const rows = capturedLedgerRows();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      character_id: 2,
+      account_id: 2,
+      op: 'escrow_deficit',
+      item_id: 'wolf_fang',
+      count: -4,
+      container: 'guild',
+      container_id: GUILD_ID,
+    });
   });
 
   it('REPEATING it gains nothing: every attempt rolls the consumer back', async () => {
@@ -467,7 +593,9 @@ describe('F: treasury cap and purse overflow boundaries', () => {
   it('never lets treasury wealth pay for rung 0, nor the purse pay for rungs 1+', () => {
     // Rung 0 with an enormous treasury and an empty purse: refused.
     const { server, s } = soloOfficer(GUILD_BANK_TREASURY_CAP, 0);
-    server.sim.guildBanks.get(GUILD_ID)!.purchasedSlots = 0;
+    const unopened = server.sim.guildBanks.get(GUILD_ID);
+    if (!unopened) throw new Error('missing unopened guild bank');
+    unopened.purchasedSlots = 0;
     dispatch(server, s, { cmd: 'guild_bank_buy_slots' });
     expect(server.sim.guildBanks.get(GUILD_ID)?.purchasedSlots).toBe(0);
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(GUILD_BANK_TREASURY_CAP);
@@ -489,9 +617,12 @@ describe('F: treasury cap and purse overflow boundaries', () => {
     for (let i = 0; i < 8; i++) {
       // Keep the treasury funded from outside the purse so the two pockets
       // stay independently observable.
-      server.sim.guildBanks.get(GUILD_ID)!.treasury += 2_000_000;
+      const funded = server.sim.guildBanks.get(GUILD_ID);
+      if (!funded) throw new Error('missing ladder guild bank');
+      funded.treasury += 2_000_000;
       dispatch(server, s, { cmd: 'guild_bank_buy_slots' });
-      const b = server.sim.guildBanks.get(GUILD_ID)!;
+      const b = server.sim.guildBanks.get(GUILD_ID);
+      if (!b) throw new Error('missing ladder guild bank after purchase');
       positions.push(b.purchasedSlots);
       purses.push(purse(server, s));
       treasuries.push(b.treasury);
@@ -510,8 +641,8 @@ describe('F: treasury cap and purse overflow boundaries', () => {
 // ---------------------------------------------------------------------------
 // I: revert-path ledger truth.
 // ---------------------------------------------------------------------------
-describe('I: the revert path writes no compensating ledger rows', () => {
-  it('a surgical revert leaves the ledger claiming ops that no longer exist', async () => {
+describe('I: the revert path atomically drops the fenced ledger prefix', () => {
+  it('a surgical revert leaves only the operation that actually committed', async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'RevA');
     const b = joinServer(server, 2, 'RevB');
@@ -529,8 +660,16 @@ describe('I: the revert path writes no compensating ledger rows', () => {
     await priv(server).saveCharacter(b);
     await bankLedgerIdle();
     const rows = capturedLedgerRows();
-    // Two deposit_gold rows were written; only one op survives in the book.
-    expect(rows.filter((r) => (r as { op: string }).op === 'deposit_gold')).toHaveLength(2);
+    // A's character and book halves fenced out, so its ledger prefix did too.
+    // Only B's later atomic transaction is durable in all three stores.
+    const deposits = rows.filter((r) => (r as { op: string }).op === 'deposit_gold');
+    expect(deposits).toHaveLength(1);
+    expect(deposits[0]).toMatchObject({
+      character_id: 2,
+      account_id: 2,
+      copper_delta: 1_000,
+      container_id: GUILD_ID,
+    });
     expect((dbMock.durableBooks.get(GUILD_ID) as Book).treasury).toBe(1_000);
     const findings = auditBank({
       ledgerRows: rows,
@@ -539,18 +678,17 @@ describe('I: the revert path writes no compensating ledger rows', () => {
         { guild_id: GUILD_ID, realm: 'Claudemoon', data: dbMock.durableBooks.get(GUILD_ID) },
       ],
     });
-    // This one the audit DOES catch (treasury_mismatch) -- documented as the
-    // "evidence trail". Pinned so the contrast with the silent arms is explicit.
-    expect(findings.map((f: { kind: string }) => f.kind)).toEqual(['treasury_mismatch']);
+    expect(findings).toEqual([]);
   });
 });
 
 // ---------------------------------------------------------------------------
-// I/J: the overflow (revertLost) evict-and-reload arm runs even while ANOTHER
-// session holds unflushed ops, and it reloads the book OVER them.
+// I/J: an outbox at its hard bound refuses BEFORE a guild mutation. This is
+// the bounded replacement for the retired 500-entry op-log compaction model:
+// operation logs now stay byte-aligned with transactional receipt sidecars.
 // ---------------------------------------------------------------------------
-describe('an overflowing op log never restores a live withdraw', () => {
-  it('leaves the withdrawn copy where the withdrawer put it', async () => {
+describe('a saturated ledger outbox cannot mutate the shared guild book', () => {
+  it("refuses C before mutation and preserves A's live withdrawal", async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'HolderA');
     const c = joinServer(server, 3, 'OverflowC');
@@ -575,36 +713,40 @@ describe('an overflowing op log never restores a live withdraw', () => {
     expect(countFangs({ inventory: aMeta.inventory })).toBe(4);
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
 
-    // C dirties the same book and its unflushed log overflows the cap
-    // (GUILD_BANK_UNFLUSHED_OP_CAP = 500 ops), which COMPACTS it rather than
-    // dropping it, so C keeps a faithful undo list.
+    // Occupy the session's complete row budget without mutating gameplay.
+    // runGuildBankOp must fail its own reservation and return before it reads
+    // or calls the Sim command.
+    const saturation = c.bankLedgerJournal.outbox.tryReserve({
+      maxRows: c.bankLedgerJournal.outbox.limits.maxRows,
+      maxEncodedBytes: 1,
+      batchKey: 'audit:outbox-saturated',
+    });
+    expect(saturation).not.toBeNull();
+    expect(c.bankLedgerJournal.outbox.usage).toMatchObject({
+      queuedRows: 0,
+      reservedRows: c.bankLedgerJournal.outbox.limits.maxRows,
+    });
+    const cPurseBefore = purse(server, c);
+    const bookBefore = server.sim.serializeGuildBank(GUILD_ID);
+    const durableLedgerBefore = capturedLedgerRows();
+    expect(bookBefore).not.toBeNull();
     dispatch(server, c, { cmd: 'guild_bank_deposit_gold', amount: 1 });
-    c.unflushedGuildBankOps.set(GUILD_ID, [
-      ...Array.from({ length: 500 }, () => ({
-        op: 'deposit_gold' as const,
-        itemId: null,
-        count: null,
-        instance: null,
-        craftedRecipeId: null,
-        copperDelta: 0,
-        purchasedSlotsBefore: 24,
-        purchasedSlotsAfter: 24,
-      })),
-      ...(c.unflushedGuildBankOps.get(GUILD_ID) ?? []),
-    ]);
-    dispatch(server, c, { cmd: 'guild_bank_deposit_gold', amount: 1 });
-    expect((c.unflushedGuildBankOps.get(GUILD_ID) ?? []).length).toBeLessThan(500);
+    expect(server.sim.serializeGuildBank(GUILD_ID)).toEqual(bookBefore);
+    expect(purse(server, c)).toBe(cPurseBefore);
+    expect(c.unflushedGuildBankOps.has(GUILD_ID)).toBe(false);
+    expect(c.dirtyGuildBanks.has(GUILD_ID)).toBe(false);
+    expect(c.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(capturedLedgerRows()).toEqual(durableLedgerBefore);
 
-    // C fences out. Only C's OWN ops are undone; A's withdrawal stands.
-    dbMock.setFence(3);
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    await priv(server).saveCharacter(c);
-    warn.mockRestore();
+    // Releasing test-only pressure changes no durable or live state. A's own
+    // withdrawal remains the only pending book delta and commits normally.
+    if (!saturation) throw new Error('outbox saturation reservation missing');
+    expect(c.bankLedgerJournal.outbox.cancel(saturation)).toBe(true);
     stamp(server, a);
     expect(countFangs({ inventory: server.sim.guildBanks.get(GUILD_ID)?.inventory })).toBe(0);
     expect(countFangs({ inventory: aMeta.inventory })).toBe(4);
 
-    // A's own save now commits both halves of the duplicate.
+    // A's own save commits the paired character, book, and ledger prefix.
     await priv(server).saveCharacter(a);
     const durableTotal =
       countFangs(dbMock.durableChars.get(1)) +

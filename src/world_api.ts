@@ -114,10 +114,11 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
-// Online world-layout compatibility is encoded in the first WebSocket frame's
-// discriminator. Changing the authoritative town layout requires a new epoch:
-// the strict discriminator makes both rolling-deploy directions fail closed
-// before either binary loads a character into a differently shaped world.
+// Online world and required-snapshot compatibility is encoded in the first
+// WebSocket frame's discriminator. Changing the authoritative town layout or
+// a required snapshot shape requires a new epoch: the strict discriminator
+// makes both rolling-deploy directions fail closed before either binary loads
+// a character into an incompatible world.
 // 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
 // disagree about the authoritative resource carrier, so they must fail closed.
 // 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
@@ -128,7 +129,13 @@ export type {
 // ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
+// 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
+// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
+// rejected before the new client can consume the old six-field snapshot.
+// 11 = Materials Vault snapshots require the identity-preserving `special`
+// collection. An epoch-10 client can neither render nor select those rows, and
+// an epoch-10 server would omit them, stranding deposited special materials.
+export const ONLINE_WORLD_LAYOUT_VERSION = 11 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -162,7 +169,7 @@ export type {
   ActionBarLayoutRestore,
   ActionBarSlotAction,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo } from './world_api/bank';
+export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
@@ -614,6 +621,34 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // The Materials Vault: the per-material, gold-upgraded material store beside the
+  // personal slot bank (src/sim/materials_vault.ts). Appended at the END because
+  // wire tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. `slot` is a carried-inventory index
+  // and `count` optional (the bank_* wire idiom); withdraw is keyed by `itemId`
+  // instead, because the vault has no slots to index. The Sim owns every gameplay
+  // rule (banker proximity, material scope, per-material cap, exact copper).
+  'vault_deposit',
+  'vault_withdraw',
+  'vault_buy_upgrade',
+  // The vault's batched deposit-all sweep (Bank Storage Phase 03): ONE
+  // server-side command, argument-free, so even a full carried sweep (112
+  // slots at the phase 05 bag ceiling) costs one
+  // command-lane token and one batched ledger write instead of a send per
+  // slot. Appended at the END because wire tokens are never reordered.
+  'vault_deposit_all',
+  // Bank bag sockets (Bank Storage phase 07): the three socket commands the
+  // phase 06 sim bodies gate (unlock in order for exact copper; socket a
+  // CARRIED payload-free bag, `item` + optional integer `socket` + optional
+  // integer `slot` naming the exact carried copy, the equip_bag wire shape
+  // verbatim; unsocket by integer `socket`). Appended at the END because wire
+  // tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. The Sim owns every gameplay rule
+  // (banker proximity, unlock order and price, the payload peek, the
+  // carried-side unsocket fit); dispatch is shape-only in server/bank_wire.ts.
+  'bank_unlock_socket',
+  'bank_socket_bag',
+  'bank_unsocket_bag',
   // The tutorial greeting's accept: the ferry ride to the Proving Shore
   // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
   // life, and band server-side). Appended because wire tokens are never
@@ -852,6 +887,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  lock_item: 'IWorldInventory',
   market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
@@ -892,6 +928,19 @@ export const COMMAND_FACETS = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // The Materials Vault rides the SAME facet as the personal bank (same bursars,
+  // same proximity gate); vaultInfo is a proximity-gated snapshot read (no send,
+  // untagged), exactly like bankInfo above.
+  vault_deposit: 'IWorldBank',
+  vault_withdraw: 'IWorldBank',
+  vault_buy_upgrade: 'IWorldBank',
+  vault_deposit_all: 'IWorldBank',
+  // The bank bag sockets ride the SAME facet again (same bursars, same
+  // proximity gate; Bank Storage phase 07); the socket readouts ride the
+  // bankInfo snapshot read above (no send, untagged).
+  bank_unlock_socket: 'IWorldBank',
+  bank_socket_bag: 'IWorldBank',
+  bank_unsocket_bag: 'IWorldBank',
   // IWorldGuildBank: the officer-plus shared guild treasury + item store
   // (snake_case wire strings, by design; its OWN tokens, never a bank_* reuse).
   // guildBankInfo is a proximity + rank gated snapshot read (no send, untagged).

@@ -19,6 +19,18 @@ vi.mock('../server/admin_guilds_read', () => ({
   bustAdminGuildListReads: dbMock.bustGuildList,
 }));
 
+import {
+  CHARACTER_DELETE_PERMIT_SUB_CAP,
+  CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS,
+  CHARACTER_DELETE_VERIFY_SQL,
+  CharacterDeleteClientGone,
+  CharacterDeleteQueueSaturated,
+  CharacterStoragePurchaseOpen,
+  characterDeleteGateStats,
+  configureCharacterDeleteBackgroundGate,
+  DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+} from '../server/character_delete_db';
+import { CHARACTER_SAVE_STATEMENT_TIMEOUT_MS } from '../server/character_save_transaction';
 import { configureCommunityTestAccounts } from '../server/community_test_accounts';
 import {
   backfillAccountEmailIfEmpty,
@@ -143,16 +155,56 @@ describe('community test account transaction', () => {
 function clientStub() {
   const query = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 } as any);
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
+}
+
+function deleteClient(
+  options: {
+    account?: boolean;
+    character?: boolean;
+    openStatus?: 'pending' | 'unresolved';
+    deleted?: boolean;
+    deleteError?: Error;
+  } = {},
+) {
+  const client = clientStub();
+  client.query.mockImplementation(async (sql: string) => {
+    if (/SELECT id FROM accounts/i.test(sql)) {
+      return options.account === false
+        ? { rows: [], rowCount: 0 }
+        : { rows: [{ id: 7 }], rowCount: 1 };
+    }
+    if (/SELECT id FROM characters/i.test(sql)) {
+      return options.character === false
+        ? { rows: [], rowCount: 0 }
+        : { rows: [{ id: 42 }], rowCount: 1 };
+    }
+    if (/FROM storage_purchases/i.test(sql)) {
+      return options.openStatus
+        ? { rows: [{ status: options.openStatus }], rowCount: 1 }
+        : { rows: [], rowCount: 0 };
+    }
+    if (/DELETE FROM characters/i.test(sql)) {
+      if (options.deleteError) throw options.deleteError;
+      return { rows: [], rowCount: options.deleted === false ? 0 : 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  });
+  return client;
 }
 
 describe('deleteCharacter', () => {
   it('scopes the delete to the current realm so cross-realm characters are safe', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const client = deleteClient();
+    dbMock.connect.mockResolvedValueOnce(client);
 
     await deleteCharacter(7, 42);
 
-    const [sql, params] = dbMock.query.mock.calls[0];
+    const deletionCall = client.query.mock.calls.find((call) =>
+      /DELETE FROM characters/i.test(call[0]),
+    );
+    expect(deletionCall).toBeDefined();
+    const [sql, params] = deletionCall ?? [];
     expect(sql).toMatch(/realm/i);
     expect(params).toContain(REALM);
     // id + account + realm: the same three predicates getCharacter/renameCharacter use
@@ -161,21 +213,646 @@ describe('deleteCharacter', () => {
   });
 
   it('reports whether a row was actually deleted', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient({ character: false }));
     expect(await deleteCharacter(7, 42)).toBe(false);
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
 
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient());
     expect(await deleteCharacter(7, 42)).toBe(true);
     expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
   });
 
+  it('takes parent, character, and fresh open-purchase locks in lifecycle order', async () => {
+    const client = deleteClient();
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await deleteCharacter(7, 42);
+
+    const sql = client.query.mock.calls.map((call) => String(call[0]));
+    const account = sql.findIndex((statement) => /FROM accounts/.test(statement));
+    const character = sql.findIndex((statement) => /FROM characters/.test(statement));
+    const purchase = sql.findIndex((statement) => /FROM storage_purchases/.test(statement));
+    const deletion = sql.findIndex((statement) => /DELETE FROM characters/.test(statement));
+    expect(sql).toHaveLength(9);
+    expect(sql[0]).toBe('BEGIN');
+    expect(sql[1]).toContain('statement_timeout = 15000');
+    expect(sql[1]).toContain("lock_timeout = '2s'");
+    expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
+    expect(account).toBeLessThan(character);
+    expect(character).toBeLessThan(purchase);
+    expect(purchase).toBeLessThan(deletion);
+    // The keep-forever bank_ledger / bank_ledger_batch_receipts cascade rides
+    // ONLY the DELETE under the widened 60s bound (the shared character-save
+    // allowance); the tighter 15s bound is restored immediately after so
+    // COMMIT keeps the transaction's ceiling. Literal ms pins beside the
+    // identity checks, so a drifted constant is a conscious edit here.
+    expect(sql[deletion - 1]).toBe('SET LOCAL statement_timeout = 60000');
+    expect(sql[deletion + 1]).toBe('SET LOCAL statement_timeout = 15000');
+    expect(CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBe(60_000);
+    expect(DELETE_RESTORE_STATEMENT_TIMEOUT_MS).toBe(15_000);
+    expect(sql.at(-1)).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledOnce();
+  });
+
+  it.each(['pending', 'unresolved'] as const)(
+    'refuses deletion while a %s storage purchase remains open',
+    async (openStatus) => {
+      const client = deleteClient({ openStatus });
+      dbMock.connect.mockResolvedValueOnce(client);
+
+      await expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: CharacterStoragePurchaseOpen.name,
+        code: 'CHARACTER_STORAGE_PURCHASE_OPEN',
+        characterId: 42,
+        status: openStatus,
+      });
+
+      expect(client.query.mock.calls.some((call) => /DELETE FROM characters/.test(call[0]))).toBe(
+        false,
+      );
+      expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+    },
+  );
+
   it('does not invalidate the guild directory when the delete fails', async () => {
-    dbMock.query.mockRejectedValueOnce(new Error('delete failed'));
+    const error = Object.assign(new Error('delete failed'), { code: 'XX000' });
+    const client = deleteClient({ deleteError: error });
+    dbMock.connect.mockResolvedValueOnce(client);
 
     await expect(deleteCharacter(7, 42)).rejects.toThrow('delete failed');
 
+    expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+    expect(client.release).toHaveBeenCalledOnce();
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+    // A NON-ambiguous rollback skips the verify checkout entirely: the one
+    // connect is the transaction's own. Dropping the ambiguity guard on the
+    // resolver would double pool checkouts under exactly the saturation the
+    // delete gate exists to bound, and only this count sees it.
+    expect(dbMock.connect).toHaveBeenCalledTimes(1);
+  });
+
+  it('composes under the registered background gate: permit before checkout, released after the client', async () => {
+    const client = deleteClient();
+    const order: string[] = [];
+    const release = vi.fn(() => order.push('permit_released'));
+    const acquire = vi.fn(async () => {
+      order.push('permit_acquired');
+      return { release };
+    });
+    // Record the CLIENT release into the same order stream, so the
+    // permit-outlives-the-client contract is a real ordering pin rather than
+    // an unobserved claim (swapping the two finally arms must red here).
+    client.release.mockImplementation(() => {
+      order.push('client_released');
+    });
+    dbMock.connect.mockImplementationOnce(async () => {
+      order.push('connect');
+      return client;
+    });
+    configureCharacterDeleteBackgroundGate(acquire);
+    try {
+      expect(await deleteCharacter(7, 42)).toBe(true);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    // Gate-then-checkout, and the permit outlives the client (the
+    // clientWithPermit lifetime contract from the paid-guild sibling).
+    expect(order).toEqual(['permit_acquired', 'connect', 'client_released', 'permit_released']);
+    expect(client.release).toHaveBeenCalledOnce();
+  });
+
+  it('refuses promptly with a retryable saturation error when the gate has no permit, touching no pool client', async () => {
+    const acquire = vi.fn(async () => null);
+    configureCharacterDeleteBackgroundGate(acquire);
+    try {
+      // Three sequential refusals, one past the sub-cap of 2: a refusal that
+      // leaked its sub-cap slot would park the third call on the delete sub
+      // gate (a test timeout here) instead of refusing promptly through the
+      // realm gate again.
+      for (let round = 0; round < 3; round++) {
+        await expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+          name: CharacterDeleteQueueSaturated.name,
+          code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+          characterId: 42,
+        });
+      }
+      expect(acquire).toHaveBeenCalledTimes(3);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    expect(dbMock.connect).not.toHaveBeenCalled();
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+
+  it('sub-caps concurrent deletes on the realm gate, FIFO-parking the overflow', async () => {
+    // Deletes hold the longest walls the realm gate admits (65s), and its
+    // other consumers wait UNBOUNDED (autosave, market/mail, shutdown), so a
+    // stampede must never claim more than the sub-cap of the gate's permits.
+    let held = 0;
+    let maxHeld = 0;
+    const acquire = vi.fn(async () => {
+      held++;
+      maxHeld = Math.max(maxHeld, held);
+      return {
+        release: () => {
+          held--;
+        },
+      };
+    });
+    configureCharacterDeleteBackgroundGate(acquire);
+    const connects: Array<(client: ReturnType<typeof deleteClient>) => void> = [];
+    dbMock.connect.mockImplementation(() => new Promise((resolve) => connects.push(resolve)));
+    try {
+      const deletes = [deleteCharacter(7, 42), deleteCharacter(7, 43), deleteCharacter(7, 44)];
+      await new Promise((resolve) => setImmediate(resolve));
+      // Two deletes hold realm permits inside their checkouts; the third is
+      // parked on the sub-cap and never reached the realm gate at all.
+      expect(CHARACTER_DELETE_PERMIT_SUB_CAP).toBe(2);
+      expect(acquire).toHaveBeenCalledTimes(2);
+      expect(connects).toHaveLength(2);
+      connects[0](deleteClient());
+      connects[1](deleteClient());
+      await new Promise((resolve) => setImmediate(resolve));
+      // A finished delete frees its sub slot, admitting the parked one.
+      expect(acquire).toHaveBeenCalledTimes(3);
+      expect(connects).toHaveLength(3);
+      connects[2](deleteClient());
+      await expect(Promise.all(deletes)).resolves.toEqual([true, true, true]);
+      expect(maxHeld).toBeLessThanOrEqual(CHARACTER_DELETE_PERMIT_SUB_CAP);
+      expect(held).toBe(0);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+      dbMock.connect.mockReset();
+    }
+  });
+
+  it('a sub-cap-parked delete refuses within the 15s bound without touching the realm gate', async () => {
+    vi.useFakeTimers();
+    const acquire = vi.fn(async () => ({ release: vi.fn() }));
+    configureCharacterDeleteBackgroundGate(acquire);
+    const connects: Array<(client: ReturnType<typeof deleteClient>) => void> = [];
+    dbMock.connect.mockImplementation(() => new Promise((resolve) => connects.push(resolve)));
+    try {
+      const first = deleteCharacter(7, 42);
+      const second = deleteCharacter(7, 43);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(acquire).toHaveBeenCalledTimes(2);
+      // Attach the rejection handler BEFORE advancing the clock: the refusal
+      // fires inside the awaited timer flush, and a handler attached after
+      // that flush leaves the rejection momentarily unhandled on CI.
+      const refused = expect(deleteCharacter(7, 44)).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+        characterId: 44,
+      });
+      await vi.advanceTimersByTimeAsync(15_000);
+      await refused;
+      // The parked delete claimed no realm permit and no pool client.
+      expect(acquire).toHaveBeenCalledTimes(2);
+      expect(connects).toHaveLength(2);
+      // Land the two held deletes so no sub slot leaks into later tests.
+      connects[0](deleteClient());
+      connects[1](deleteClient());
+      await expect(first).resolves.toBe(true);
+      await expect(second).resolves.toBe(true);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+      dbMock.connect.mockReset();
+      vi.useRealTimers();
+    }
+  });
+
+  it('bounds the permit wait at 15s and lets the caller signal cut it shorter', async () => {
+    vi.useFakeTimers();
+    try {
+      // The gate acquirer receives ONE composed signal (the caller's, if any,
+      // joined with the wait timer): resolve null only when it aborts, the
+      // real majorBackgroundDbGate contract.
+      const seenSignals: AbortSignal[] = [];
+      const acquire = vi.fn(
+        (signal: AbortSignal) =>
+          new Promise<null>((resolve) => {
+            seenSignals.push(signal);
+            signal.addEventListener('abort', () => resolve(null), { once: true });
+          }),
+      );
+      configureCharacterDeleteBackgroundGate(acquire as never);
+      const busyBefore = characterDeleteGateStats().busyRefusals;
+      // Attach the rejection handler BEFORE advancing the clock: the refusal
+      // fires inside the awaited timer flush, and a handler attached after
+      // that flush leaves the rejection momentarily unhandled, which CI's
+      // runner rightly reports as an unhandled error.
+      const refused = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+      });
+      // Under the wall, the wait holds; AT the wall it aborts and refuses.
+      await vi.advanceTimersByTimeAsync(14_999);
+      expect(seenSignals[0]?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      await refused;
+      expect(dbMock.connect).not.toHaveBeenCalled();
+      // The wall refusal is real saturation and books the busy counter.
+      expect(characterDeleteGateStats().busyRefusals).toBe(busyBefore + 1);
+
+      // A caller-side abort composes in and cuts the wait short of the wall,
+      // but it is an ABANDONMENT (the socket is gone), never saturation: the
+      // distinct error keeps the 503 and its counter meaning saturation.
+      const controller = new AbortController();
+      const early = expect(deleteCharacter(7, 42, controller.signal)).rejects.toMatchObject({
+        name: CharacterDeleteClientGone.name,
+        code: 'CHARACTER_DELETE_CLIENT_GONE',
+        characterId: 42,
+      });
+      await vi.advanceTimersByTimeAsync(1_000);
+      controller.abort();
+      await early;
+      expect(seenSignals[1]?.aborted).toBe(true);
+      // The abandonment never books the saturation counter.
+      expect(characterDeleteGateStats().busyRefusals).toBe(busyBefore + 1);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+      vi.useRealTimers();
+    }
+  });
+
+  it('releases the permit when the checkout itself rejects', async () => {
+    const release = vi.fn();
+    configureCharacterDeleteBackgroundGate(async () => ({ release }));
+    dbMock.connect.mockRejectedValueOnce(new Error('pool exhausted'));
+    try {
+      await expect(deleteCharacter(7, 42)).rejects.toThrow('pool exhausted');
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    expect(release).toHaveBeenCalledOnce();
+  });
+
+  it('applies the sub-cap even when no realm gate is registered', async () => {
+    vi.useFakeTimers();
+    // Deliberately NO configureCharacterDeleteBackgroundGate call: the
+    // delete-local bound must hold on its own, so an unregistered realm gate
+    // (tests, a boot window) can never admit an unbounded delete stampede.
+    const connects: Array<(client: ReturnType<typeof deleteClient>) => void> = [];
+    dbMock.connect.mockImplementation(() => new Promise((resolve) => connects.push(resolve)));
+    try {
+      const first = deleteCharacter(7, 42);
+      const second = deleteCharacter(7, 43);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(connects).toHaveLength(2);
+      // Attach the rejection handler BEFORE advancing the clock (the CI
+      // unhandled-rejection rule the sibling tests follow).
+      const refused = expect(deleteCharacter(7, 44)).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+        characterId: 44,
+      });
+      await vi.advanceTimersByTimeAsync(15_000);
+      await refused;
+      // The parked third delete never touched the pool.
+      expect(connects).toHaveLength(2);
+      connects[0](deleteClient());
+      connects[1](deleteClient());
+      await expect(first).resolves.toBe(true);
+      await expect(second).resolves.toBe(true);
+    } finally {
+      dbMock.connect.mockReset();
+      vi.useRealTimers();
+    }
+  });
+
+  it('releases the sub slot when the realm gate acquire rejects, keeping later deletes admitted', async () => {
+    configureCharacterDeleteBackgroundGate(async () => {
+      throw new Error('realm gate exploded');
+    });
+    try {
+      await expect(deleteCharacter(7, 42)).rejects.toThrow('realm gate exploded');
+      await expect(deleteCharacter(7, 43)).rejects.toThrow('realm gate exploded');
+      // The decisive leak check (mutation-proven gap: dropping the
+      // subPermit.release() from the acquire catch leaves in_flight pinned at
+      // the sub-cap here, and every later delete would park forever).
+      expect(characterDeleteGateStats().inFlight).toBe(0);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    // A restored gate admits the next deletes: both slots really came back.
+    const release = vi.fn();
+    configureCharacterDeleteBackgroundGate(async () => ({ release }));
+    dbMock.connect.mockResolvedValueOnce(deleteClient()).mockResolvedValueOnce(deleteClient());
+    try {
+      await expect(deleteCharacter(7, 44)).resolves.toBe(true);
+      await expect(deleteCharacter(7, 45)).resolves.toBe(true);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    expect(release).toHaveBeenCalledTimes(2);
+  });
+
+  it('releases the sub slot even when the realm permit release throws', async () => {
+    configureCharacterDeleteBackgroundGate(async () => ({
+      release: () => {
+        throw new Error('realm release failed');
+      },
+    }));
+    dbMock.connect.mockResolvedValueOnce(deleteClient());
+    try {
+      // The composed release runs in the checkout finally, so the throw
+      // surfaces to the caller; the guarded ordering must still return the
+      // delete slot (unguarded, the throw skips subSlot.release()).
+      await expect(deleteCharacter(7, 42)).rejects.toThrow('realm release failed');
+      expect(characterDeleteGateStats().inFlight).toBe(0);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+  });
+
+  it('a client disconnect after BEGIN no longer tears the transaction: the DELETE still commits', async () => {
+    const client = clientStub();
+    const deleteReleases: Array<(result: { rows: unknown[]; rowCount: number }) => void> = [];
+    client.query.mockImplementation(async (sql: string) => {
+      if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+      if (/SELECT id FROM characters/i.test(sql)) return { rows: [{ id: 42 }], rowCount: 1 };
+      if (/FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 0 };
+      if (/DELETE FROM characters/i.test(sql)) {
+        return new Promise((resolve) => {
+          deleteReleases.push(resolve);
+        });
+      }
+      return { rows: [], rowCount: 0 };
+    });
+    dbMock.connect.mockResolvedValueOnce(client);
+    const controller = new AbortController();
+    const done = deleteCharacter(7, 42, controller.signal);
+    await vi.waitFor(() => {
+      if (deleteReleases.length === 0) throw new Error('the DELETE has not started yet');
+    });
+    // The client tears the connection while the cascade is mid-flight. The
+    // request signal is spent at the permit wait; threaded into the deadline
+    // it destroyed the socket HERE, and an abort landing during COMMIT could
+    // commit the DELETE while the caller skipped the world-state purge.
+    controller.abort();
+    deleteReleases[0]({ rows: [], rowCount: 1 });
+    await expect(done).resolves.toBe(true);
+    expect(client.query.mock.calls.map((call) => String(call[0]))).toContain('COMMIT');
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+  });
+
+  /** A delete client whose COMMIT hangs until the wall deadline destroys the
+   * socket; release(error) then rejects the hung COMMIT the way pg rejects
+   * the active query of a destroyed connection. */
+  function hungCommitClient() {
+    const client = clientStub();
+    let rejectCommit: ((error: Error) => void) | null = null;
+    client.query.mockImplementation(async (sql: string) => {
+      if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+      if (/SELECT id FROM characters/i.test(sql)) return { rows: [{ id: 42 }], rowCount: 1 };
+      if (/FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 0 };
+      if (/DELETE FROM characters/i.test(sql)) return { rows: [], rowCount: 1 };
+      if (sql === 'COMMIT') {
+        return new Promise((_resolve, reject) => {
+          rejectCommit = reject;
+        });
+      }
+      return { rows: [], rowCount: 0 };
+    });
+    client.release.mockImplementation(() => {
+      rejectCommit?.(new Error('Connection terminated unexpectedly'));
+    });
+    return client;
+  }
+
+  it('verifies an ambiguous COMMIT and reports success when the row is gone', async () => {
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      const landedBefore = characterDeleteGateStats().verifyLanded;
+      // The fresh verification read finds no row: the COMMIT landed, so the
+      // delete must report success (link change, busts, and the HTTP arms'
+      // world-state purge all key off it) instead of stranding the escrow.
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      const done = deleteCharacter(7, 42);
+      await vi.advanceTimersByTimeAsync(0);
+      // The 65s transaction wall expires while COMMIT is in flight: the one
+      // remaining ambiguity carrier now that no caller signal reaches it.
+      await vi.advanceTimersByTimeAsync(65_000);
+      await expect(done).resolves.toBe(true);
+      // The verify WAITS the hung COMMIT out instead of racing it: its read
+      // runs row-locked inside its own bounded transaction (a plain SELECT's
+      // READ COMMITTED snapshot sees the deleted-but-uncommitted row as
+      // present and answers "not landed" for a delete that then commits).
+      const sql = verifyClient.query.mock.calls.map((call) => String(call[0]));
+      expect(sql[0]).toBe('BEGIN');
+      expect(sql[1]).toContain(`lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS}`);
+      expect(sql[1]).toContain(`statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS}`);
+      expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
+      const read = verifyClient.query.mock.calls.find((call) =>
+        /SELECT 1 FROM characters/.test(String(call[0])),
+      );
+      expect(String(read?.[0])).toBe(CHARACTER_DELETE_VERIFY_SQL);
+      // Literal pins on the constant itself (never a self-comparison): the
+      // lock clause and the whole identity predicate are load-bearing. KEY
+      // SHARE, not FOR UPDATE: it queues behind the in-flight DELETE
+      // identically, but in the not-landed case it briefly holds a LIVE
+      // character's row, where FOR UPDATE blocked a concurrent character
+      // save into its 2s lock_timeout (measured; see the SQL's doc).
+      expect(CHARACTER_DELETE_VERIFY_SQL).toContain('FOR KEY SHARE');
+      expect(CHARACTER_DELETE_VERIFY_SQL).toContain(
+        'WHERE id = $1 AND account_id = $2 AND realm = $3',
+      );
+      expect(read?.[1]).toEqual([42, 7, REALM]);
+      expect(sql.at(-1)).toBe('ROLLBACK');
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      // A clean verify returns the client to the pool, never discards it.
+      expect(verifyClient.release.mock.calls[0]).toEqual([]);
+      // The FATAL guard wraps the whole checkout window (pg-pool detaches
+      // its own idle listener on acquire) and detaches before release.
+      expect(verifyClient.on).toHaveBeenCalledWith('error', expect.any(Function));
+      expect(verifyClient.removeListener).toHaveBeenCalledWith('error', expect.any(Function));
+      // The landed outcome is counted (the resolver was production-invisible
+      // without it).
+      expect(characterDeleteGateStats().verifyLanded).toBe(landedBefore + 1);
+      expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+      expect(drainLinkChanges()).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('propagates an ambiguous COMMIT when the verification still finds the row', async () => {
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      const notLandedBefore = characterDeleteGateStats().verifyNotLanded;
+      // Row present ONLY on the verify read: BEGIN/SET LOCAL/ROLLBACK keep
+      // their empty results, so the present answer is the SELECT's own.
+      verifyClient.query.mockImplementation(async (sql: string) =>
+        /SELECT 1 FROM characters/.test(sql)
+          ? { rows: [{ found: 1 }], rowCount: 1 }
+          : { rows: [], rowCount: 0 },
+      );
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      // Attach the rejection handler BEFORE advancing the clock (the CI
+      // unhandled-rejection rule the sibling tests follow).
+      const failed = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: true,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await failed;
+      // The row survived, so the failure stands and no success side runs.
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+      expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyNotLanded).toBe(notLandedBefore + 1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('bounds the verify lock wait UNDER its statement bound', () => {
+    // The wait must expire as a coded 55P03 lock_not_available, which the
+    // resolver's catch maps to honest ambiguity; with the statement bound at
+    // or under the lock bound, statement_timeout fires first and cancels the
+    // read without saying WHY (measured: a blocked locked read under the
+    // inverted ordering dies 57014). The pg suite drives the live
+    // semantics; this ordering is the always-run half, and the literal makes
+    // a drifted wait a conscious edit.
+    expect(CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS).toBe(10_000);
+    expect(CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS).toBeLessThan(
+      DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+    );
+  });
+
+  it('propagates the ambiguity when the verify CHECKOUT itself rejects', async () => {
+    // One of the resolver's two catch-and-return-false error arms: flipping
+    // it to true would run the world-state purge for a delete that never
+    // provably landed. The pool refusing a second client under exactly the
+    // saturation that expired the wall is the realistic shape.
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const failedBefore = characterDeleteGateStats().verifyFailed;
+      dbMock.connect
+        .mockResolvedValueOnce(txClient)
+        .mockRejectedValueOnce(new Error('pool exhausted'));
+      const failed = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: true,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await failed;
+      // The checkout was really ATTEMPTED (the rejection above was consumed,
+      // not skipped): a resolver that never tried would also pass the rest.
+      expect(dbMock.connect).toHaveBeenCalledTimes(2);
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+      expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyFailed).toBe(failedBefore + 1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('propagates the ambiguity when the verify READ rejects, discarding the verify client', async () => {
+    // The other error arm: a lock_timeout expiry (the hung COMMIT outlasting
+    // the bounded wait) rejects the verify read. The ORIGINAL ambiguity must
+    // stand (never the verify error), and the client, mid-transaction in an
+    // unknown state, must be DISCARDED (release with an error), not returned
+    // to the pool; dropping that release leaks a client on every
+    // ambiguous-commit-plus-failed-verify.
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      const failedBefore = characterDeleteGateStats().verifyFailed;
+      verifyClient.query.mockImplementation(async (sql: string) => {
+        if (/SELECT 1 FROM characters/.test(sql)) {
+          throw Object.assign(new Error('canceling statement due to lock timeout'), {
+            code: '55P03',
+          });
+        }
+        return { rows: [], rowCount: 0 };
+      });
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      const failed = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: true,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await failed;
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(verifyClient.release.mock.calls[0][0]).toBeInstanceOf(Error);
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+      expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyFailed).toBe(failedBefore + 1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('still reports a landed verify when only the cleanup ROLLBACK fails, discarding the client', async () => {
+    // The one arm that returns the computed answer despite a failed cleanup,
+    // deliberately: the row-gone reading was already definitive, and
+    // demoting it back to ambiguity would skip the world-state purge for a
+    // delete that provably landed (the exact bug the resolver fixes).
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      verifyClient.query.mockImplementation(async (sql: string) => {
+        if (sql === 'ROLLBACK') throw new Error('Connection terminated unexpectedly');
+        return { rows: [], rowCount: 0 };
+      });
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      const done = deleteCharacter(7, 42);
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await expect(done).resolves.toBe(true);
+      expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+      // Discarded exactly ONCE, with the error: the cleanup failure must
+      // never be followed by a second release (pg throws on double release).
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(verifyClient.release.mock.calls[0][0]).toBeInstanceOf(Error);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('holds the delete permit across the ambiguity verify (the wait rides the admission)', async () => {
+    // The docstring claim, pinned as an ordering: the verify checkout lands
+    // BEFORE the permit release. Moved after the finally, the verify would
+    // start stacking over the sub-cap under exactly the saturation that
+    // produced the ambiguity, with every test still green but this one.
+    vi.useFakeTimers();
+    const order: string[] = [];
+    configureCharacterDeleteBackgroundGate(async () => ({
+      release: () => {
+        order.push('permit_released');
+      },
+    }));
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      dbMock.connect
+        .mockImplementationOnce(async () => {
+          order.push('connect_tx');
+          return txClient;
+        })
+        .mockImplementationOnce(async () => {
+          order.push('connect_verify');
+          return verifyClient;
+        });
+      const done = deleteCharacter(7, 42);
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await expect(done).resolves.toBe(true);
+      expect(order).toEqual(['connect_tx', 'connect_verify', 'permit_released']);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -895,11 +1572,11 @@ describe('character roster feed enqueues', () => {
   });
 
   it('enqueues for a delete that matched a row, never for one that matched none', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient({ character: false }));
     expect(await deleteCharacter(7, 42)).toBe(false);
     expect(drainLinkChanges()).toEqual([]);
 
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient());
     expect(await deleteCharacter(7, 42)).toBe(true);
     expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });
@@ -944,5 +1621,42 @@ describe('character roster feed enqueues', () => {
     // Three characters inserted before the failure, all of them rolled back: a feed
     // item here would tell the bot to re-read a roster that does not exist.
     expect(drainLinkChanges()).toEqual([]);
+  });
+});
+
+describe('save-backend cancel wiring (db.ts and character_delete_db.ts source pins)', () => {
+  // A deadline that destroys the save socket must also pg_cancel the backend,
+  // or the accounts/characters/guild_banks locks ride out the full server-side
+  // statement_timeout. The wrapper is the enforcement point: every character
+  // save in db.ts must go through beginSaveTx, which forwards cancelSaveBackend.
+  it('routes every db.ts character save through the cancel-wired wrapper', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const src = stripComments(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
+    // The dedicated canceller, never backendCancelViaPool(pool): an expiry
+    // cancel fires exactly when the main pool is the saturated thing.
+    expect(src).toContain('const cancelSaveBackend = cancelDetachedBackend;');
+    expect(src).not.toContain('backendCancelViaPool(pool)');
+    expect(src).toContain('beginCharacterSaveTx(c, op, s, cancelSaveBackend);');
+    // Exactly one direct call: the wrapper. A new save path calling
+    // beginCharacterSaveTx directly would bypass the cancel wiring.
+    expect(src.split('beginCharacterSaveTx(').length - 1).toBe(1);
+    expect(src.split("beginSaveTx(client, '").length - 1).toBe(3);
+  });
+
+  it('wires backend cancel into the character delete transaction', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../server/character_delete_db.ts', import.meta.url), 'utf8'),
+    );
+    expect(src).toContain('db.cancelBackend ??');
+    expect(src).toContain('(db.query ? backendCancelViaPool(');
+    // db.ts hands the delete its dedicated side-pool canceller, so the
+    // pool-derived fallback only serves narrow test worlds.
+    const dbSrc = stripComments(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
+    expect(dbSrc).toContain(
+      '{ connect: () => pool.connect(), cancelBackend: cancelDetachedBackend }',
+    );
   });
 });

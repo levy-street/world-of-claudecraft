@@ -291,11 +291,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap raid-lockout badge class, value-diffed',
   },
   {
-    call: 'this.refreshDailyRewardsLauncher',
+    call: 'this.dailyRewardsLauncher.refresh',
     band: 'slow',
     gate: '',
     surface: 'chrome',
-    why: 'the daily-rewards launcher button state (not the window)',
+    why: 'the daily-rewards launcher button state (not the window). Bank Storage phase 15 moved the poll state machine out of hud.ts into daily_rewards_launcher_core.ts, where its throttle is executed-tested; a chrome row carries no guard field, so the pin lives there rather than here',
   },
   {
     call: 'this.maybeRestoreActionBarLayout',
@@ -364,7 +364,10 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'hud',
       proof:
-        'if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
+        // Phase 04 (craft-from-vault) moved this pin: the guard gained the
+        // craftVaultStock term so a vault-only stock change repaints an open
+        // window (the signature's V-prefixed vault rows).
+        'if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
     },
     why: 'the other half of the Craft gate: rebuilds the crafting window when the bags move',
   },
@@ -1207,6 +1210,22 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the bank window; it also closes itself when the bank mirror goes null',
   },
   {
+    call: 'this.dailyRewardsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.dailyRewardsWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'daily_rewards_window.ts',
+      // Phase 15 QA moved the signature into src/ui/charter_fit_memory.ts, beside
+      // the refusals it invalidates. The guard the row names is still the ONE
+      // line that decides whether the poll paints, which is what this registry
+      // is checking; the memory's own suite pins the comparison itself.
+      proof: 'if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
+    },
+    why: "the WOC Store's charter fit gate, which reads live ladder state no store event observes (Bank Storage phase 15, ruling 21): the reachable case is the store and the bank open together at a bursar while a copper rung is bought in the bank",
+  },
+  {
     call: 'this.bagsWindow.refreshIfChanged',
     band: 'slow',
     gate: '',
@@ -1627,20 +1646,19 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
       // Both sides of every v0.36.0 sync move this bucket split independently
-      // (each side's window and chrome churn lands against the other's), so it
-      // cannot be reconciled by arithmetic across a merge. The numbers below
-      // were set from a suite run on the merged tree, not from either side's
-      // narrative.
-      // chrome 83 -> 84: the tracker-stack anchor apply (seats the stack below
-      // the minimap column; tracker_stack_anchor.ts).
-      // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
-      // Eastbrook program) removed the cup rows on this branch.
-      // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
-      // window 43 -> 44: the release arm's woc_market window row rides the
-      // v0.40.0 sync merge back in.
-      // chrome 82 -> 83: the controller-tutorial merge's gamepad control
-      // hint apply.
-    ).toEqual({ window: 44, chrome: 83, none: 17 });
+      // (the branch's reliquary window row, its char-sheet latch and its WOC
+      // Store slow-band row against the release's own window/chrome churn and
+      // its woc_market row), so it cannot be reconciled by arithmetic across a
+      // merge. The numbers below were set from a suite run ON THE MERGED TREE,
+      // not from either side's narrative. At the fifth v0.40.0 sync the
+      // release's tracker-stack anchor apply (seats the stack below the minimap
+      // column; tracker_stack_anchor.ts) had already taken chrome to 84 on both
+      // arms, and the release's woc_market window row lands on top of the
+      // branch's own window rows.
+      // At the release/v0.41.0 sync the Vale Cup retirement removes the cup
+      // window and chrome rows from the branch arm while the release's tutorial
+      // coach strip and gamepad hint applies land on top. MEASURED, not derived.
+    ).toEqual({ window: 45, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1654,19 +1672,16 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       // Reliquary cold window (module) + craft-cast single-surface strip (hud)
       // both land on this pin; keep both counts, do not drop either side.
-      // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
-      // reliquary module guard vs the release's new module-guarded row).
-      // Down to 21 with the Vale Cup retirement (the New Eastbrook program):
-      // the cup window/briefing/betting module guards left with their painters.
-      // Up to 23 with the v0.40.0 sync merge: the release arm's
-      // woc_market_window row plus the trade-window row (its guard moved from
-      // a hud latch to the woc_trade controller in the extraction).
-      module: 23,
-      // 6 = Phase 20's refreshCharSheetIfChanged and its siblings. Their
-      // latches are HUD fields (lastCharSheetSig et al) because the cold
-      // char_window painter holds no signature of its own to diff. Down one
-      // with the v0.40.0 sync: the trade row's lastTradeSig latch now lives
-      // in the woc_trade module.
+      // Both arms grow this bucket independently, so it is set from a suite run
+      // on the MERGED tree: the branch's reliquary module guard and its WOC
+      // Store ladder-signature row (phase 15) land beside the release's
+      // woc_market_window and trade-window rows, less the Vale Cup window,
+      // briefing and betting module guards the retirement takes with it.
+      module: 24,
+      // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
+      // HUD fields (lastCharSheetSig et al) because the cold char_window painter
+      // holds no signature of its own to diff. The release's trade row left this
+      // bucket when its lastTradeSig latch moved into the woc_trade module.
       hud: 6,
       callsite: 11,
       none: 4,
@@ -1704,12 +1719,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',
         'card_duel_window.ts: if (sig === this.lastSig) return;',
+        'daily_rewards_window.ts: if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
-        'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
+        'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
         // Phase 20: the progression-block latch for the open character sheet.
         'hud.ts: if (sig === this.lastCharSheetSig) return;',

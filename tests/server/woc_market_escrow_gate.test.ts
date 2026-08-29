@@ -208,6 +208,6 @@ describe('woc escrow gate', () => {
     expect(gate.stats().max).toBe(WOC_ESCROW_GATE_MAX_IN_FLIGHT);
     // The ceiling constant itself: the tunables ladder pins its relation to
     // the honest sequence ceiling; here only the literal.
-    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(300_000);
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(400_000);
   });
 });

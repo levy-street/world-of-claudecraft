@@ -49,6 +49,7 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { bagPools } from '../sim/bags';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
@@ -100,22 +101,10 @@ import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/s
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
-import type {
-  AbilityDef,
-  CalendarResultCode,
-  EquipSlot,
-  HonorReason,
-  InvSlot,
-  ItemInstancePayload,
-  MailResultCode,
-  MotdResultCode,
-  PetMode,
-  PlayerClass,
-  ResourceType,
-  SkinCatalog,
-} from '../sim/types';
 import {
+  type AbilityDef,
   type AuraKind,
+  type CalendarResultCode,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
   canPrestige,
@@ -123,15 +112,25 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   type Entity,
+  type EquipSlot,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
+  type HonorReason,
+  type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   isMechWearer,
   isPetClass,
   MAX_LEVEL,
+  type MailResultCode,
   MILESTONES,
+  type MotdResultCode,
+  type PetMode,
+  type PlayerClass,
+  type ResourceType,
   SALVAGE_CAST_ID,
   type SimEvent,
+  type SkinCatalog,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
   virtualLevel,
@@ -171,7 +170,7 @@ import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, auraCancelNeedsConfirm, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
-import { bagsWindowShown } from './bags_view';
+import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import {
@@ -201,8 +200,8 @@ import {
 import { cheaterTagLabel } from './cheater_tag';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
-import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
-import { ClaudiumWindow } from './claudium_window';
+import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
+import { type ClaudiumRail, type ClaudiumSnapshot, ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -251,8 +250,8 @@ import {
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
-import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
-import { DailyRewardsWindow } from './daily_rewards_window';
+import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
+import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
@@ -283,6 +282,7 @@ import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
+import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
   applyEnchantResultToast,
   disenchantResultToast,
@@ -739,6 +739,7 @@ import {
   statNameKey,
   statTooltipHtml,
 } from './stat_tooltip_view';
+import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
@@ -883,16 +884,15 @@ export interface ClaudiumHooks {
   }>;
   snapshot(): Promise<ClaudiumSnapshot>;
   buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  // `idempotencyKey` is OPTIONAL and caller-held. A repeatable 'storage' SKU
+  // writes no grant row and dedupes only on this key, so its caller reuses ONE
+  // key per purchase intent; omit it (skins) and main.ts mints one per attempt.
   spend(
     itemId: string,
-    kind: 'cosmetic' | 'skin' | 'item',
+    kind: 'cosmetic' | 'skin' | 'item' | 'storage',
     expectedCostClaudium: number,
-  ): Promise<{
-    granted: boolean;
-    balance: number | null;
-    costClaudium: number | null;
-    reason: string | null;
-  }>;
+    idempotencyKey?: string,
+  ): Promise<StoreSpendResult>;
 }
 
 export interface HudFeatures {
@@ -1357,7 +1357,7 @@ export class Hud {
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
   private groundAimClamped = false;
-  private empowerCharge: { slot: number; abilityId: string } | null = null;
+  private readonly empowerHold = new EmpowerHold();
   private dragAction: {
     action: Exclude<HotbarAction, null>;
     sourceIndex: number | null;
@@ -2067,8 +2067,6 @@ export class Hud {
   // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
-  private dailyRewardsLauncherSeq = 0;
-  private lastDailyRewardsLauncherRefreshAt = 0;
   // Per-element tier cadence stamps (graphics-tier knobs). Each gates a non-self /
   // canvas redraw to a slower interval on the LOW static preset; on every other tier the
   // interval is 0 (cadenceDue is always true), so these are no-ops and the path is the
@@ -2720,7 +2718,7 @@ export class Hud {
         event.preventDefault();
         event.stopPropagation();
       });
-      this.refreshDailyRewardsLauncher(true);
+      this.dailyRewardsLauncher.refresh(true);
     }
     this.clock24 = (() => {
       try {
@@ -5114,6 +5112,7 @@ export class Hud {
     isBankOpen: () => this.bankWindow.isOpen,
     isPersonalBankTab: () => this.bankWindow.personalTabActive,
     isGuildBankTab: () => this.bankWindow.guildTabActive,
+    isVaultBankTab: () => this.bankWindow.vaultTabActive,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
@@ -5226,8 +5225,22 @@ export class Hud {
   // through IWorld. Non-trapping focus capture/return (NOT windowFocus, which would
   // install a Tab trap and break the bank + bags cluster); onClosed drops the docking
   // body class and resyncs bags.
+  // The one Claudium spend seam both spending windows consume (the bank's
+  // dual-price rung purchase and the store's charters). Declared here because
+  // class fields initialize in source order and bankWindow is the first
+  // consumer; every closure inside reads this.claudiumHooks lazily, so the
+  // hooks field being declared further down is irrelevant.
+  private readonly claudiumPurchase = createClaudiumPurchaseFacet({
+    hooks: () => this.claudiumHooks,
+    cachedBalance: () => this.claudiumBalance.balance,
+    setBalance: (balance) => this.claudiumBalance.set(balance),
+    openClaudium: (onClosed) => this.claudiumHooks !== null && this.claudiumWindow.open(onClosed),
+    confirmDialog: (title, body, okText, cancelText, onOk, onCancel) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk, onCancel),
+  });
   private readonly bankWindow = new BankWindow({
     ...this.presentationBag,
+    ...this.claudiumPurchase,
     root: () => $('#bank-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows(['#bank-window', '#bags']),
@@ -5636,18 +5649,11 @@ export class Hud {
     root: () => $('#daily-rewards-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#daily-rewards-window'),
-    // A status delivered by the window's render or spin is as fresh as a launcher
-    // fetch: invalidate any in-flight launcher fetch (seq bump) so a slower older
-    // response cannot overwrite it, and stamp the throttle so the next slowHud
-    // tick does not redundantly re-fetch.
-    onStatus: (status) => {
-      this.dailyRewardsLauncherSeq++;
-      this.lastDailyRewardsLauncherRefreshAt = performance.now();
-      this.applyDailyRewardsLauncherStatus(status);
-    },
-    onClose: () => this.refreshDailyRewardsLauncher(true),
+    // A status delivered here is as fresh as a fetch, so the poll adopts it.
+    onStatus: (status) => this.dailyRewardsLauncher.observeFresh(status),
+    onClose: () => this.dailyRewardsLauncher.refresh(true),
     onWalletConnect: requestWalletVerify,
-    storeEnabled: () => this.claudiumHooks !== null,
+    ...this.claudiumPurchase,
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
       if (!snapshot) return { available: false, balance: null, items: [] };
@@ -5658,23 +5664,6 @@ export class Hud {
         items: [...snapshot.storeItems],
       };
     },
-    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
-      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
-      if (result?.balance !== null && result?.balance !== undefined) {
-        this.claudiumBalance.set(result.balance);
-      }
-      return (
-        result ?? {
-          granted: false,
-          balance: null,
-          costClaudium: null,
-          reason: 'unavailable',
-        }
-      );
-    },
-    openClaudium: () => this.toggleClaudium(),
-    confirmDialog: (title, body, okText, cancelText, onOk) =>
-      this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
@@ -6567,8 +6556,14 @@ export class Hud {
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
-    if (item.kind === 'bag' && item.bagSlots)
-      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    {
+      const slotsKey = bagSlotsLineKey(item);
+      // The bagSlots guard is load-bearing twice over: it keeps the old
+      // no-line behavior for a slotless bag def AND narrows the number for
+      // itemNumber (the leaf's null covers only the non-bag arm).
+      if (slotsKey && item.bagSlots)
+        html += `<div class="tt-stat">${esc(t(slotsKey, { slots: itemNumber(item.bagSlots) }))}</div>`;
+    }
     // Collectible mount reins: the mount's flavor + specialty numbers + its
     // ride-level gate (red below the gate, like gear's requires-level line).
     if (item.kind === 'mount') {
@@ -7259,26 +7254,14 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
-    const empowered = this.empoweredAbilityIdForSlot(slot);
-    if (empowered) {
-      if (this.empowerCharge) return;
-      this.empowerCharge = { slot, abilityId: empowered };
-      this.sim.castAbility(empowered);
-      return;
-    }
+    if (this.empowerHold.press(slot, this.empoweredAbilityIdForSlot(slot), this.sim)) return;
     this.castSlot(slot);
   }
 
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
-    if (this.empowerCharge?.slot === slot) {
-      const charge = this.empowerCharge;
-      this.empowerCharge = null;
-      this.sim.releaseEmpoweredAbility(charge.abilityId);
-      this.flashActionSlot(slot);
-      return;
-    }
+    this.empowerHold.releaseSlot(slot, this.sim, (released) => this.flashActionSlot(released));
   }
 
   private bindEmpoweredActionHold(btn: HTMLButtonElement, resolveSlot: () => number): void {
@@ -7289,7 +7272,7 @@ export class Hud {
       if (this.actionBarBind) return; // bind mode owns clicks/holds on the bar
       const slot = resolveSlot();
       if (!this.empoweredAbilityIdForSlot(slot)) return;
-      if (this.empowerCharge) return;
+      if (this.empowerHold.active) return;
       heldPointer = event.pointerId;
       heldSlot = slot;
       this.pressSlot(slot);
@@ -7406,34 +7389,43 @@ export class Hud {
     this.flashActionSlot(0);
   }
 
-  // Shared entry point for hotbar clicks and the 1..0-= keybinds.
-  /**
-   * Fire an action the cross hotbar holds. Routed through castSlot by finding the
-   * action on the bar, so a pad press gets the SAME semantics a key press does
-   * (ground-aim reticle, empower release, sport tap, mouseover cast, the
-   * auto-attack QoL) rather than a second cast path that would drift from it.
-   *
-   * The bar is seeded from the action bar, so the lookup almost always hits. An
-   * action arranged onto the pad and nowhere else falls back to a plain cast (the
-   * one case without a reticle) or, for an item, to the shared item-use seam.
-   */
+  // Pad press edge for a cross hotbar cell. Routed through pressSlot when the bar
+  // holds the action, so a pad press gets the SAME semantics a key press does
+  // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
+  // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
+  pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
+      this.castCrossHotbarAction(action);
+      return;
+    }
+    const slot = crossHotbarActionSlot(action, this.hotbarActions.length, (barSlot) =>
+      this.actionForSlot(barSlot),
+    );
+    if (slot >= 0) {
+      this.pressSlot(slot);
+      return;
+    }
+    const known = this.sim.known.find((ability) => ability.def.id === action.id);
+    if (known?.def.empowerStages && this.empowerHold.press(-1, action.id, this.sim)) return;
+    this.castCrossHotbarAction(action);
+  }
+
+  releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
+  }
+
+  // Tap-shaped cross hotbar fire (no hold edge available). The bar is seeded from
+  // the action bar, so the slot lookup almost always hits; an action arranged onto
+  // the pad and nowhere else falls back to a plain cast or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
       this.activateFixedAttackSlot();
       return;
     }
-    // Matched against the EFFECTIVE action of each slot, never the raw array: with
-    // the Attack button on, slot 0 IS Attack and whatever the array holds at index
-    // 0 is not reachable there, so delegating by array index fired auto-attack
-    // instead of the ability the player pressed.
-    let slot = -1;
-    // barSlot 0 is that Attack seat and 1..length are the configurable slots, so
-    // the last one is length itself, not length - 1.
-    for (let i = 0; i <= this.hotbarActions.length && slot < 0; i++) {
-      const onBar = this.actionForSlot(i);
-      if (onBar?.type === action.type && onBar.id === action.id) slot = i;
-    }
+    const slot = crossHotbarActionSlot(action, this.hotbarActions.length, (barSlot) =>
+      this.actionForSlot(barSlot),
+    );
     if (slot >= 0) {
       this.castSlot(slot);
       return;
@@ -8839,7 +8831,7 @@ export class Hud {
 
   setDailyRewardsChestButtonVisible(show: boolean): void {
     this.applyDailyRewardsChestButtonVisibility(show);
-    if (show) this.refreshDailyRewardsLauncher(true);
+    if (show) this.dailyRewardsLauncher.refresh(true);
   }
 
   setDailyRewardsChestButtonPreference(show: boolean): void {
@@ -8865,31 +8857,21 @@ export class Hud {
     button.classList.toggle('spin-ready', spinReady);
   }
 
-  private refreshDailyRewardsLauncher(force = false): void {
-    if (!this.dailyRewardsEnabled()) return;
-    const button = this.dailyRewardsButtonEl;
-    const mobileButton = this.mobileDailyRewardsButtonEl;
-    if (!button && !mobileButton) return;
-    this.applyDailyRewardsChestButtonVisibility();
-    const now = performance.now();
-    // Slow closed-window poll; the why and the arithmetic live in the core.
-    if (!shouldRefreshDailyRewardsLauncher(force, now, this.lastDailyRewardsLauncherRefreshAt)) {
-      return;
-    }
-    this.lastDailyRewardsLauncherRefreshAt = now;
-    const seq = ++this.dailyRewardsLauncherSeq;
-    void this.sim
-      .dailyRewards()
-      .then((status) => {
-        if (seq !== this.dailyRewardsLauncherSeq) return;
-        this.applyDailyRewardsLauncherStatus(status);
-      })
-      .catch(() => {
-        if (seq !== this.dailyRewardsLauncherSeq) return;
-        button?.classList.remove('spin-ready');
-        mobileButton?.classList.remove('spin-ready');
-      });
-  }
+  // The launcher's status poll (sequence guard, throttle stamp, fetch chain)
+  // lives beside its own predicate in daily_rewards_launcher_core.ts, the
+  // ClaudiumLauncherBalance precedent; the HUD keeps the DOM wiring only.
+  private readonly dailyRewardsLauncher = new DailyRewardsLauncherPoll({
+    enabled: () => this.dailyRewardsEnabled(),
+    mounted: () => !!(this.dailyRewardsButtonEl || this.mobileDailyRewardsButtonEl),
+    syncVisibility: () => this.applyDailyRewardsChestButtonVisibility(),
+    fetch: () => this.sim.dailyRewards(),
+    applyStatus: (status) => this.applyDailyRewardsLauncherStatus(status),
+    onFailure: () => {
+      this.dailyRewardsButtonEl?.classList.remove('spin-ready');
+      this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
+    },
+    now: () => performance.now(),
+  });
 
   update(paint = true): void {
     const sim = this.sim;
@@ -8956,7 +8938,7 @@ export class Hud {
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
-    if (slowHud) this.refreshDailyRewardsLauncher();
+    if (slowHud) this.dailyRewardsLauncher.refresh();
     this.maybeRestoreActionBarLayout();
     this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
@@ -9735,6 +9717,9 @@ export class Hud {
     if (slowHud && this.wocMarketWindow.isOpen) this.wocMarketWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    // The store's charter fit gate reads live ladder state that no store event
+    // observes, so an open store notices a rung bought behind it (ruling 21).
+    if (slowHud && this.dailyRewardsWindow.isOpen) this.dailyRewardsWindow.refreshIfChanged();
     // The bag money row is a cold painter, and several copper credits reach no bags
     // arm in EITHER host (a trainer fee, a settled Vale Cup bet, delve and lockpick
     // copper), so this is the backstop that converges them all (#2373). Online the
@@ -12672,7 +12657,7 @@ export class Hud {
           if (quota) {
             this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered);
           } else {
-            this.showError(this.localizeErrorText(ev.text));
+            this.showError(this.localizeErrorText(this.bankWindow.observeStorageText(ev.text)));
           }
           break;
         }
@@ -13605,7 +13590,7 @@ export class Hud {
           break;
         }
         case 'log': {
-          const text = this.localizeSystemText(ev.text);
+          const text = this.localizeSystemText(this.bankWindow.observeStorageText(ev.text));
           // Route mob/boss combat-flavor chatter to the Combat Log tab instead of
           // General/Chat (see log_event_route.ts): pid-scoped personal narrative and
           // entityId-anchored actionable mechanic telegraphs both stay in General/Chat,
@@ -15285,7 +15270,7 @@ export class Hud {
         // prompt's floor-of-1 lets the server answer honestly.
         buyCustomMax: (itemId) => {
           const def = ITEMS[itemId];
-          return def ? maxBuyCount(this.sim.inventory, this.sim.bagCapacity, def) : 0;
+          return def ? maxBuyCount(this.sim.inventory, bagPools(this.sim.bags), def) : 0;
         },
         onBuyBack: (itemId, index, instance, craftedRecipeId) =>
           buyAndRefresh(() => this.sim.buyBackItem(itemId, index, instance, craftedRecipeId)),
@@ -15897,7 +15882,15 @@ export class Hud {
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
     // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
     // from one edge never leaves another edge owing a second one (#2375).
-    this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
+    // ONE craftVaultStock read feeds the signature and the build below: the
+    // offline Sim clones per read, so a second read would both waste the
+    // clone and (worse) let the two see different snapshots across a tick.
+    const craftVaultStock = this.sim.craftVaultStock;
+    this.lastCraftingReagentSig = craftingReagentSig(
+      this.sim.inventory,
+      this.sim.player.name,
+      craftVaultStock,
+    );
     const session = this.craftCastSessionForPlayer();
     this.lastCraftingCastSig = craftCastActivitySig(session);
     // The window lists only KNOWN recipes, so an unlearned trainer
@@ -15919,6 +15912,11 @@ export class Hud {
         this.sim.craftingIdentity,
         inRangeStations,
         this.sim.player.name,
+        craftVaultStock,
+        // Blocked-here is exactly the null contract (never "no vault":
+        // PlayerMeta.vault is non-optional, so an open-world player always
+        // reports a record, {} when empty). Reuses the single-read local.
+        craftVaultStock === null,
       ),
       {
         ...this.presentationBag,
@@ -16408,7 +16406,8 @@ export class Hud {
   private refreshOpenCraftingIfReagentsChanged(): void {
     if ($('#crafting-window').style.display !== 'flex') return;
     if (
-      craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig
+      craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) ===
+      this.lastCraftingReagentSig
     )
       return;
     this.renderCrafting();
@@ -17371,13 +17370,13 @@ export class Hud {
     // Close refreshes via onClose; force only the open direction here. The open
     // force stays as the fallback for tabs that render without a status fetch
     // (the store tab), where no onStatus push would arrive.
-    if (this.dailyRewardsWindow.isOpen) this.refreshDailyRewardsLauncher(true);
+    if (this.dailyRewardsWindow.isOpen) this.dailyRewardsLauncher.refresh(true);
   }
 
   openWocStore(): void {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.openStore();
-    this.refreshDailyRewardsLauncher(true);
+    this.dailyRewardsLauncher.refresh(true);
   }
 
   /** Inject the $WOC Exchange hooks (main.ts, online, browser web + website
@@ -17426,10 +17425,11 @@ export class Hud {
   /**
    * Open or close the Claudium store. Always renders: with no hooks (offline or the
    * service off) the window shows its clean disabled state, never a boot crash.
+   * `onClosed` is the store top-up return: armed by either toggle arm, fired once on close.
    */
-  toggleClaudium(): void {
+  toggleClaudium(onClosed?: () => void): void {
     if (!this.claudiumHooks) return;
-    this.claudiumWindow.toggle();
+    this.claudiumWindow.toggle(onClosed);
   }
 
   async refreshClaudium(): Promise<void> {
@@ -18727,6 +18727,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (clearOpenStoreResult()) return true;
     if (closeOpenTouchMenu()) return true;
     if (this.lootWindow.hasOpenChest) {
       this.closeLoot();

@@ -4169,6 +4169,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
   'itemUi.kind.bag': 'Bolsa',
   'itemUi.tooltip.bagSlots': 'Bolsa de {slots} espaços',
+  'itemUi.tooltip.bagSlotsMaterials': 'Bolsa de materiais de {slots} espaços',
   'sim.delve.baptistryEggs':
     'O batistério fica em silêncio. Sacos de ovos de aranha se agarram, úmidos, à borda.',
   'sim.delve.baptistrySpidersSealed': 'Você deveria tentar destruir os sacos de aranha.',

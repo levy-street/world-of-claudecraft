@@ -37,15 +37,17 @@
 // the repo's cached-read seam (server/cached_read.ts): per-guild TTL +
 // single-flight (two officers racing a cold window share ONE query) +
 // stale-on-error, in a map bounded by maxEntries with LRU eviction. Freshness
-// does not rest on the TTL: server/bank_ledger.ts busts the guild's entry on
-// every guild row it writes, both when the op happens and again once the
-// inserts have actually settled, so the next reader sees the new row rather
-// than a snapshot taken microseconds before it landed.
+// does not rest on the TTL. Normal command rows invalidate the guild only
+// after their exact outbox prefix commits atomically with the character and
+// book. Hidden anomaly writers do not invalidate because they cannot change
+// this projection. The next eligible reader therefore sees durable history,
+// while a staged or fenced command can never appear as a phantom action.
 //
 // A guild lives on exactly one realm process, and every writer of its book
 // (player ops, the operator purge, the create fee) runs in that process through
-// server/bank_ledger.ts, so the bust is COMPLETE rather than best-effort: there
-// is no peer-process writer whose row this cache could miss until TTL.
+// the character-save acknowledgment seams, so
+// the bust is COMPLETE rather than best-effort: there is no peer-process writer
+// whose row this cache could miss until TTL.
 
 import {
   type GuildBankLogEntry,
@@ -259,11 +261,10 @@ export function readGuildBankLog(guildId: number): Promise<readonly GuildBankLog
 }
 
 /**
- * Mark one guild's cached log stale. Called by server/bank_ledger.ts for every
- * guild row it writes whose op a player can actually SEE: once when the op
- * happens, and once more after that call's own inserts have settled (a read
- * racing the write would otherwise refresh from a table that does not contain
- * the new row yet and then serve that pre-op snapshot).
+ * Mark one guild's cached log stale. Normal operations call this only after
+ * their exact character-save outbox prefix commits and is acknowledged.
+ * Callers must never bust for staged evidence because a lease fence may still
+ * roll it back.
  *
  * This does NOT drop the entry (see readGuildBankLog for why): it records the
  * earliest instant the entry may be refreshed, and the next read past that

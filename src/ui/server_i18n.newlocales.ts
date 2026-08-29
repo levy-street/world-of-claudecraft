@@ -1,6 +1,7 @@
 // GENERATED new-locale server-message blocks. Spread into DICT in server_i18n.ts.
 export const SERVER_NEW = {
   cs_CZ: {
+    'error.bankPurchaseInProgress': 'V tvé bance právě probíhá nákup.',
     'pledge.noGuild': 'Žádná gilda s tímto jménem.',
     'pledge.noneToWithdraw': 'Nemáš žádný slib, který bys mohl(a) stáhnout.',
     'pledge.onlyOfficers': 'Sliby mohou spravovat jen důstojníci a mistr gildy.',
@@ -136,6 +137,7 @@ export const SERVER_NEW = {
     'world.left': '{name} opustil(a) svět. ({reason})',
   },
   da_DK: {
+    'error.bankPurchaseInProgress': 'Din bank har et igangværende køb.',
     'pledge.noGuild': 'Ingen guild med det navn.',
     'pledge.noneToWithdraw': 'Du har intet løfte at trække tilbage.',
     'pledge.onlyOfficers': 'Kun officerer og guildmesteren kan håndtere løfter.',
@@ -271,6 +273,7 @@ export const SERVER_NEW = {
     'world.left': '{name} har forladt verdenen. ({reason})',
   },
   id_ID: {
+    'error.bankPurchaseInProgress': 'Bankmu memiliki pembelian yang sedang berlangsung.',
     'pledge.noGuild': 'Tidak ada guild dengan nama itu.',
     'pledge.noneToWithdraw': 'Kamu tidak punya ikrar untuk ditarik.',
     'pledge.onlyOfficers': 'Hanya perwira dan Guild Master yang dapat mengelola ikrar.',
@@ -411,6 +414,7 @@ export const SERVER_NEW = {
     'world.left': '{name} telah meninggalkan dunia. ({reason})',
   },
   nl_NL: {
+    'error.bankPurchaseInProgress': 'Je bank heeft een lopende aankoop.',
     'pledge.noGuild': 'Geen gilde met die naam.',
     'pledge.noneToWithdraw': 'Je hebt geen gelofte om in te trekken.',
     'pledge.onlyOfficers': 'Alleen officieren en de gildemeester kunnen geloftes beheren.',
@@ -549,6 +553,7 @@ export const SERVER_NEW = {
     'world.left': '{name} heeft de wereld verlaten. ({reason})',
   },
   pl_PL: {
+    'error.bankPurchaseInProgress': 'W twoim banku trwa zakup.',
     'pledge.noGuild': 'Nie ma gildii o tej nazwie.',
     'pledge.noneToWithdraw': 'Nie masz ślubowania do wycofania.',
     'pledge.onlyOfficers': 'Ślubowaniami mogą zarządzać tylko oficerowie i mistrz gildii.',
@@ -690,6 +695,7 @@ export const SERVER_NEW = {
     'world.left': '{name} opuścił świat. ({reason})',
   },
   sv_SE: {
+    'error.bankPurchaseInProgress': 'Din bank har ett pågående köp.',
     'pledge.noGuild': 'Ingen guild med det namnet.',
     'pledge.noneToWithdraw': 'Du har inget löfte att dra tillbaka.',
     'pledge.onlyOfficers': 'Bara officerare och guildmästaren kan hantera löften.',
@@ -828,6 +834,7 @@ export const SERVER_NEW = {
     'world.left': '{name} har lämnat världen. ({reason})',
   },
   tr_TR: {
+    'error.bankPurchaseInProgress': 'Bankanda devam eden bir satın alma var.',
     'pledge.noGuild': 'Bu isimde bir lonca yok.',
     'pledge.noneToWithdraw': 'Geri çekecek bir yeminin yok.',
     'pledge.onlyOfficers': 'Yeminleri yalnızca subaylar ve Lonca Ustası yönetebilir.',
@@ -964,6 +971,7 @@ export const SERVER_NEW = {
     'world.left': '{name} dünyadan ayrıldı. ({reason})',
   },
   vi_VN: {
+    'error.bankPurchaseInProgress': 'Ngân hàng của bạn có một giao dịch mua đang xử lý.',
     'pledge.noGuild': 'Không có bang hội nào tên như vậy.',
     'pledge.noneToWithdraw': 'Bạn không có lời thề nào để rút lại.',
     'pledge.onlyOfficers': 'Chỉ sĩ quan và Bang chủ mới được quản lý lời thề.',
