@@ -1,6 +1,13 @@
 # Masterwrought: cross-phase state
 
-Current phase: 11b BUILT (2026-08-20), THE FARMING ABSORB. This packet now
+Current phase: 15 BUILT (2026-08-28), POWER VERIFICATION. R5 is proven
+inside its envelope; the record is docs/prd/masterwrought/power-verification.md
+and the decisions are the Phase 15 ledger at the END of this file. Next:
+Phase 15 QA (phase-15-qa.md, fresh session). The header below is the
+absorb-era orientation, kept because a fresh session still needs both
+worlds loaded; only the "Current phase" and "Next" lines in it are stale.
+
+Previously: 11b BUILT (2026-08-20), THE FARMING ABSORB. This packet now
 holds BOTH absorbed states, and a fresh session must load BOTH worlds: (1)
 Masterwrought through Phase 11 incl. its QA (tip before the absorb
 d5304a78c4; ledgers below), and (2) the COMPLETE farming packet (fourteen
@@ -20927,3 +20934,205 @@ fresh-reader rounds and 39 mutants. Phase 15 (power verification,
 ultracode) starts FRESH from d51139a103 with origin/release/v0.41.0's
 move to d3f8bae369 as its STEP 0 sync; the judged lists above and the
 standing sets are binding.
+
+## Phase 15 ledger (2026-08-28, power verification, the R5 gate)
+
+STATUS: BUILT. The envelope is proven INSIDE 5 percent on every measured
+kit and both protected targets, after four downward content tunes this
+phase applied. The kit as it arrived measured OUTSIDE it. The full
+record, reproducible from the doc alone, is
+docs/prd/masterwrought/power-verification.md; this ledger carries the
+decisions, the judged list, and the frozen stamp.
+
+### STEP 0 (the sync, paid as its own step)
+origin/release/v0.41.0 moved to d3f8bae369 (PR #3728) during the Phase 14
+QA and was merged here as c78a9e962f. The release-merge audit ran on that
+merge and is CLEAN: the incoming delta is four files (docs/desktop-release,
+electron/gpu_preference and its d.cts, tests/electron_gpu_preference) with
+ZERO overlap against the packet's 1632 owned files; no route, WS command,
+i18n catalog key, or vi.mock('../server/db') site in the delta; the one
+signature change (isLinuxHybridGpu gaining an optional readFile) is called
+only from inside gpu_preference.cjs itself, and the branch owns no call
+site; monolith ceilings unmoved (the release touched no ratcheted file)
+and tsc clean at the merge.
+
+### THE PREMISE RE-AUTHORING, before any number was sealed
+Deviation (e) is RE-RECORDED with a new dated outcome beside the old one
+(the deviations list above): its 2026-08-16 finding, "there is no feast
+buff source to measure", is falsified by farming's harvest_feast and 11k's
+three apex Harvest Feasts, all shipped. Both live edits the drop justified
+are reverted (phase-15-power-verification.md's Goal and Arm 1,
+implementation-plan.md's Phase 15 deliverable), all three now reading "the
+best available food, always on, delivered by feast". R5's own wording is
+untouched: the feast is the DELIVERY of the food term, not a fifth term
+(ip-15-ACCESS), and the re-authored premise is strictly stronger than the
+dropped one.
+
+Premises checked before measuring, all in the tree: 11c's ladder landed
+EXACTLY as 11c-D-2 settled it (one aura id, farming 2/3/4/5 at 600s, apex
+plates 6/900, the apex strictly dominant on both axes), so this phase's
+arithmetic proceeded rather than tripping its own stopping rule; 11e's
+tier 3 and 4 seed faucet is stocked at both farmers with positive
+buyValues; recipe_seasoned_stock carries marsh_rice 2 plus bog_beet 2.
+The level-20 shelf is UNMOVED by 11o, re-derived not assumed: the
+counterfactual (all nineteen movers back to level 20 in memory, the
+memoised source index rebuilt) gives 285 to 266 with the leavers EXACTLY
+the nineteen movers, ZERO joiners, and zero derived movement outside them.
+recipe.level has four consumers; the only one feeding a shelf-band POWER
+magnitude (perfectedBonusStats) is hard-gated to masterwrought defs, whose
+recipes all sit at level 25 and were untouched. No 11o-side drift into the
+shelf.
+
+### THE FOUR TUNES (Arm 4), all DOWNWARD, none a settled magnitude
+1. enchant_weapon_lucent_might and its int twin, 7 to 6. A CORRECTION
+   rather than a nerf: the weapon slot lands TWICE on a dual-wielder (a
+   one-hand weapon declares slot 'mainhand' and is legal in the offhand,
+   and the enchant slot gate compares itemDef.slot), so at 7 the
+   per-character step over Greater was 4 str where the ratified
+   arithmetic ("4.2 to 4.7 percent", computed single-weapon) counted 2.
+2. sunspun_vestments, hitRating 40 to hasteRating 40. Hit converts at
+   twice the rate of crit and haste, this def clones the caster BiS chest
+   byte for byte, and caster chest Hit had ZERO other carriers, so it was
+   the sole source of the scarcest double-value rating in the largest
+   slot. Measured at an S-rift target it was worth 2.8 to 4.1 percent from
+   one slot. Haste still complements the reference's crit; the apex armour
+   set now carries no Hit at all, which the spread pin re-cuts.
+3. duskforged_bulwark, armor 732 to 680 and blockValue 32 to 30. Both
+   extrapolated two item levels past bonewrought_bulwark, which made the
+   crafted shield the best mitigation item in the game: makeHeroicVariant
+   freezes both fields, so the ilvl-33 raid shield still reads 680 and 30
+   and no heroic upgrade could ever answer it. Measured at 1.0 percent
+   less physical damage taken on the reference tank, on the axis the
+   protected asset is priced in. The other nine apex armour pieces already
+   pin armour EQUAL to their reference's; the shield joins that rule.
+4. The three apex flasks, 15 to 13. With the first three applied the kit
+   still measured 5.1 to 5.3 percent on fury and 5.2 to 5.5 on the caster
+   sustained profile. The value is now ENVELOPE-derived rather than
+   ladder-derived and the def, the sweep and their comments say so: the
+   elixir ladder's own +3 step says 15, R5 says 13, R5 is the contract,
+   and state.md's own Phase 10 QA row names flask 15 as the first
+   tune-down knob for exactly this. Still strictly above the elixir
+   ceiling of 12; duration untouched.
+
+CONSEQUENCE, recorded so no reader trusts the old number: the crafted
+stamina ceiling now reads flask 13 plus plate 6 for NINETEEN, not 21.
+Ruling 11c-D-2's outcome is unaffected (it rejected an apex food of 8
+because that broke the kit arithmetic; a smaller flask makes the sum
+smaller still), but every record quoting "21 stamina" is now describing
+the pre-Phase-15 tree.
+
+### THE MEASURED PASS
+Method per docs/design/spell-balance-framework.md, with two notes the
+framework's own text forces: its "Existing tools" table is STALE (all
+three tools it names build their reference character from the class
+starter kit and cannot accept a gear kit at all; the repo's gear-aware
+probe family is what implements its profiles), and it names no target
+level while R5 names two protected assets, so both are fixed in the doc.
+Damage is summed from the sim's damage EVENTS, never an hp delta: a
+target that leaves combat regenerates, and the caster lane read 2.2 dps by
+hp delta against 72.7 by event sum on the same fight.
+
+Results, full kit over pre-packet raid BiS, heroic raid level 22 and
+S-rift level 23: rogue combat 3.28 / 3.22, assassination 3.78 / 3.86,
+subtlety 3.78 / 3.79; warrior fury 4.94 +/-0.96 and 4.50 +/-0.94 (60
+seeds, 600 s, the binding lane); caster 4.55 / 4.58 on the mana-stable
+60 s profile and 5.06 / 4.75 on the mana-bound 180 s one; tank effective
+health 4.28 / 4.27. Pre-tune the same fixtures read 5.86 / 6.08 on fury
+and 6.24 on tank EHP.
+
+Term by term the consumables are 2.4 to 3.5 points of it, the enchants
+0.4 to 1.5, and the gear 0.24 to 1.25: base apex adds no shelf height at
+all (every apex armour piece is a stat-and-armour twin of a same-slot
+ilvl-31 drop) and Perfecting puts at most +1 on the lead stat per piece.
+
+### JUDGED THIS PHASE, do not re-raise
+- The framework's stale tool table is a maintainer read, not a stopping-
+  rule trip: the framework's PROFILES and REPORT are the method, and the
+  probe family satisfies them.
+- The caster's 180 s central estimate (5.06 percent heroic) is REPORTED
+  with its mechanism, not tuned against. A level-20 mage has no mana-free
+  filler, so the profile is mana-bound by construction even with potions
+  on both arms, and the framework's own balancing rule 7 disqualifies a
+  starving fixture as a parity gate. The mana-stable reading is 4.55.
+- wyrmfall_pendant is the packet's dominant piece (universal, and the neck
+  has no pre-packet PvE ilvl-31 incumbent at all) and is NOT tuned: it
+  sits exactly on its budget and its rating is the vendor band's. Named on
+  the record so the concentration is visible.
+- warhewn_signet being a strict superset of the ilvl-26 vendor ring is
+  five item levels of ordinary progression, not a Lariat. The band-scoped
+  twin sweep pins the rule that matters.
+- gyrelens_array's +3 int at minus 2 ilvl is self-limiting: it gives up 55
+  rating to get it. The compensating relation is stated in the sweep.
+- The dev BiS picker's warrior offhand moving to the raid shield is the
+  shield tune working, not a regression, and is pinned by id in both
+  directions.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+- The phase file's "11e decision 6" is ruling 11g-D-C and landed in 11g.
+  The content is correct; the label is stale.
+- server/pbe_boost.ts gives a boosted prot tank a CASTER belt
+  (spiritweld_girdle wins the tank waist: a tank role adds any armour to
+  identity, so the rating term breaks the tie), costing 60 hp, 9 str and
+  6 sta for 9 dead int. Server scorer logic, out of this phase's scope;
+  spiritweld_girdle is correct on its own budget and must not be nerfed
+  for it. The tripwire test the audit proposed would ship RED, so it is
+  CUT rather than added.
+- REF_ARMOR 2861 is a pinned calibration constant, not a live property of
+  the catalog, and was already several hundred points stale before this
+  packet. Raising it would move every floor, so the claim pinned instead
+  is the one that protects the model: the max-mitigation kit is IDENTICAL
+  with and without the packet's defs.
+- The two-piece bound is an equip-TRANSITION rule; a save already over cap
+  keeps everything, deliberately and pinned. Closing it needs a load-time
+  bench, which is sim logic and out of scope.
+- The druid balance harness drifted when the packet's defs landed (its
+  bear arm takes 12 percent more damage) and was never re-pinned; its
+  assertions are "> 0" so nothing reds. The per-class gear-identity pin
+  added this phase reds on the CAUSE instead.
+- Alchemy has no repeatable band-3 recipe (its only tier-3 row is
+  oncePerDay), so an alchemist at 75 without a flask pattern has one
+  catalyst a day or a hundred grey-rate crafts. Cannot be closed by tuning
+  down; new content is out of scope.
+- The public wiki prints craft gain boundaries above the reachable cap (63
+  of 166 rows, all 12 skill-125 rows print all three). The fix is a clamp
+  in scripts/wiki/build_content.mjs, outside this phase's scope.
+- qr-GRAY's own row wording is measurably false as written: the tier-0
+  spam path is DEARER in materials than the intended path for 8 of the 10
+  crafts. The real arbitrage is staying one or two tiers under the band.
+  The record states both; the row itself is left for the maintainer.
+
+### PINS ADDED OR MOVED
+Moved by the tunes: the sunspun_vestments rating row and the armour and
+union rating spreads; the shield's armour, blockValue and derivation, with
+a NEW two-sided inversion guard against the heroic shield; the apex weapon
+enchant magnitudes, the per-slot stacks, and the ladder arm (now "the
+weapon rung at HALF its step", with the reason); the flask band arm (now
+both bounds, envelope-derived); the dev BiS warrior offhand.
+
+Added: the five apex outputs that had NO power pin of any kind (two angler
+dishes, three apex feasts) get the bag-and-tools treatment with whole-def
+whitelists; anchor IDENTITY for the jewelry and held ties plus a genuinely
+same-band jewelry tie; the rating relationship to each reference stated
+outright, duplicate or complement, with a band-scoped twin sweep; the R5
+QUANTITY itself (Perfected total against the best pre-packet in-slot, per
+slot, literal); "no crafted output outside the apex arrays reaches the
+apex item level"; the weapon-enchant multiplicity as behaviour and as a
+loadout-aware stack table; the R5 kit's exact stack in both orders with
+the arithmetic read off the stat book; the retired-namespace sweep widened
+to seven roots and a second kind-shaped needle, plus a runtime one-id twin
+and a catalog-wide disjointness arm; the per-class flagged BiS picks by
+id; the reference tank's max-mitigation kit equal with and without the
+packet; the practice dummy's body as literals.
+
+### THE KILL TABLE
+Twelve mutants in a throwaway worktree at the phase's own tip, every one
+a mutation that SURVIVED before this phase's work: a rating on an angler
+dish (previously green across the full 47,677-test suite), a rating on an
+apex feast, the jewelry anchor delisted from vendor stock, the shield's
+armour restored to 732, the flask strip shedding Well Fed, a flask
+refused while Well Fed rides, Well Fed's stamina never folding into the
+stat book, a retired-namespace literal planted in server/, an unquoted
+retired key in the icon map, a per-kind aura id at the mint, an apex-band
+crafted output authored outside the apex arrays, and the apex plate's
+duration reverted. ALL TWELVE RED. Every run proved its baseline green and
+its patch applied; both worktrees ended porcelain-clean.
