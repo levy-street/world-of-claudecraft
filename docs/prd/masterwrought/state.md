@@ -21674,3 +21674,48 @@ Perfecting-formula weld, the per-lane smoke); every other QA test edit
 extended existing cases in place. The stamp says the tree is green and the
 QA's fixes hold; the envelope verdict stays suspended above, owed to the
 maintainer's rulings.
+
+## Maintainer rulings (2026-08-29): the R5 packet, RATIFIED
+
+Delivered by the maintainer at the Phase 16 gate, against the priced packet
+in power-verification.md's Verdict (mirrored by WHAT THE MAINTAINER OWNS
+above). The ruling lines in the phase prompt arrived as unfilled option
+menus, so the four choices were confirmed by direct question and answer in
+the same session; each row quotes the maintainer's selection verbatim. The
+maintainer's accompanying directive, also verbatim: "Do whatever is best
+for the project and for this feature. We want it absolutely perfect."
+
+1. RULING 1, section 3's baseline pool. RATIFIED 2026-08-29:
+   "1a: keep pool, record caveat". bestEpicGearFor's raw-stat-sum pool
+   stands as the R5 baseline definition; the record states the physical
+   denominators are roughly 3 percent under a hand-optimised kit (the
+   7.69/6.44 readings behind that figure stay marked non-reproducible).
+2. RULING 2, section 8.1's gear term. RATIFIED 2026-08-29:
+   "2b: ratify modelled term". The published percentages exclude apex
+   rating deltas and are therefore FLOORS; the modelled term is ratified
+   as the R5 quantity, accepting on the record that the equipped kit
+   moves the binding fury lane roughly twice the envelope (the 9.6
+   measurement, fury-scoped; the rogue equipped arm unmeasured, expected
+   at or below modelled).
+3. RULING 3, the lane set. RATIFIED 2026-08-29: "3a: bounded by
+   argument". R5 closes on the four measured lanes; enhancement stays
+   bounded by section 9.3's argument plus its dated throwaway addendum,
+   and no committed enhancement lane is added.
+4. RULING 4, the apex-bag tie. RATIFIED 2026-08-29: "4-amend: rescoped
+   pin final". The strictly-largest-bag position is amended to the
+   merged-tree shape: the rescoped no-general-bag-exceeds arm plus the
+   named tie set in tests/masterwrought_budget.test.ts is the FINAL form;
+   sunspun_haversack keeps bagSlots 16, and the release's bestBoostBag /
+   community-template side effect (resonant_weave_bag by ascending-id
+   tie-break) stands.
+
+CONSEQUENCE: rulings 1a + 2b + 3a are the documentation-and-probe closure
+branch. Phase 16's STEP 0.5 executes them: state the pool caveat, ratify
+the modelled term as the R5 quantity with the Verdict's stated acceptance,
+refresh the deliberately-stale 9.2 fury and caster rows from the committed
+harness at the committed tip, flip the Verdict from SUSPENDED to the
+ratified closure in every home (this file's header, both ledgers,
+progress.md), and re-run the probe suite. Ruling 4-amend executes inline
+(doc record only; the pin already carries the final shape). The R5-surface
+stop rules relax only to this exact extent; everything the rulings do not
+name stays frozen.
