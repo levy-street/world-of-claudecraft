@@ -58,3 +58,28 @@ STEP 5 - REPORT: PASS / PASS-WITH-FOLLOWUPS / FAIL, the independently recomputed
 envelope verdict, counts found and fixed, handoff to Phase 16. Follow-ups are
 CUT-or-fix decisions, never future-PR items.
 ```
+
+### Amendments (2026-08-29, the QA as run)
+
+- STEP 0's sync was already paid before the QA started (the seventh v0.41.0 sync:
+  release tip e19d832b47 merged as 720fd90168, pin recompute 6708036eb3, audit fix
+  71246dca4e, the release-merge-audit run as its own step, frozen EXIT=0 at
+  71246dca4e), so the QA skipped the re-merge and restarted at STEP 1.
+- The Goal's "independently confirm the R5 envelope verdict is reproducible" is
+  RE-SCOPED: Phase 15 stopped under its own "the framework cannot measure a kit"
+  rule with the verdict SUSPENDED, so this QA verified the ESCALATION instead:
+  that it is real and correctly framed, that the rulings it hands the maintainer
+  are the right ones stated decision-ready and priced, that the 24 commits of
+  repair are sound and complete with no smuggled magnitude, and that the tree is
+  green.
+- The reproducibility agent's "the recomputed verdict matches the recorded one" is
+  judged against the modelled-vs-equipped split the record actually carries: the
+  9.6 measurement reproduced byte-exact at the documented invocation (modelled
+  4.97/5.27, equipped 10.42/10.21), section 9.5 and the rogue rows reproduced
+  with one corrected hundredth cell (assassination heroic 3.78 to 3.79), and the
+  fury and caster 9.2 rows stayed deliberately stale per their own blockquote,
+  whose correction figures the QA re-measured.
+- STEP 5's "handoff to Phase 16" is a CLOSED GATE: nothing merges beyond Phase 15
+  until the maintainer's rulings land; the handoff is the priced ruling packet
+  (section 3's baseline pool, section 8.1's gear term, the lane-set question,
+  plus the merge-inherited apex-bag tie), not an open gate.

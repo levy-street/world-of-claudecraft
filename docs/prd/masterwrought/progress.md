@@ -59,7 +59,7 @@
 | 14 | Crafting UX beauty pass | complete (one professions interface out of two families, DESIGN.md governed, seven commits: the ip-14-UI migration (src/ui/hud/professions/ minted, 42 modules moved zero-logic), the three-slice feature wave (the Perfecting window + naming dialog + apex surfacing; cap visibility + the commission quality signal + the catalyst refusal countdown; four dedicated cues + the kind-fair tray + the copy carries), the unification slice, and three review-round commits with every finding applied or recorded. THE STOP RULE FIRED: the commission minimum-fee floor is PARKED, a maintainer ruling owed on the fee's mechanics and the floor's basis (state.md, "Phase 14 ledger"). hud.ts fell 18242 to 18217 with sim.ts and game.ts also lowered, all ceilings exact; parity goldens byte-unmoved; screenshots under docs/screenshots/masterwrought-phase-14. FROZEN at 6ed1915a4e EXIT=0: 3220/22 files (3242), 47435 passed / 2 expected fail / 380 skipped, tsc / error-level changed-files biome / both regens clean after the last commit, drift exactly the eight new suites plus their extended arms. Full record: state.md, "Phase 14 ledger"; the live monolith ceilings were later re-pinned by the v0.41.0 sync preceding the QA (release-attributed, see the amendment in this file's Phase 14 section). LOCAL only, no push, no PR | 2026-08-28 | 2026-08-28 |
 | 14 QA | verify | complete (verdict PASS: the beauty pass audited against the ledger's decisions, never the phase file's stale sentences: the PARKED fee floor audited as a park, the monolith rule judged per merge parent, the sync already paid. Eight audit lanes plus twelve adversarial verifiers, the test-coverage auditor, the frontend seam reviewer, and the qa-checklist gate (READY, zero blocking) re-derived every build claim; the VERIFY set the build could not run ran for real: the browser suite 276/276, the real-GPU perf tour with ARM 3 green after a same-machine three-way A/B attributed the desktop bypass growth to the release span, and the two mobile scripts shown byte-identical on the pre-phase base. Thirteen fix commits plus the docs stamp over sixteen fresh-reader rounds and 39 mutants, none dropped, with three blocking and eleven should-fix coverage gaps closed by decisive pins. FROZEN at d51139a103 EXIT=0 under the gate's 8-worker bound (two unbounded runs each red only on the known corpse_harvest_sim contention timeout, green standalone): 3234/22 files (3256), 47738 passed / 2 expected fail / 381 skipped (48121), tsc / ci:changed / both regens clean after the last commit, drift attributed exactly in the ledger. Full record: state.md, "Phase 14 QA ledger". LOCAL only, no push, no PR | 2026-08-28 | 2026-08-28 |
 | 15 | Power verification | BUILT AND ESCALATED, verdict SUSPENDED (the measured pass ran and four downward content tunes landed, then the phase's own fresh reader found the R5 gear term measures a stat MODEL of the kit rather than the kit: on the measured fury lane it is a LOWER bound, not the upper bound the record claimed (the rogue equipped arm is unmeasured; its baseline carries 190 hit, exactly the heroic need: the Phase 15 QA). swingMissChance is max(0, miss - hitRating/1000), the fury baseline carries 355 hit against a need of 190 heroic and 260 S-rift so its effective special-attack miss is already ZERO, and forgefold_legguards is a stat-and-armour identical twin of the baseline legs except 40 hit becomes 40 CRIT, so equipping the apex piece converts dead rating into live rating that '+1 lead stat per piece' scores as nothing. Measured on the binding fury lane, same fixture and seeds, 60 seeds at 300 s: modelled 4.97 / 5.27 percent, the same two Perfected pieces EQUIPPED 10.42 / 10.21, against a 5 percent envelope; the caster's equipped arm reads BELOW its modelled arm, so the omission is not uniform and must be measured per lane. The measurement itself flatters the packet, since the baseline carries that dead hit and two rings worth zero attack power, and every reading on every baseline tried is still above 5. TWO RATIFIED DEFINITIONS ARE OWED THE MAINTAINER: section 3's baseline pool (bestEpicGearFor scores by raw stat SUM class-agnostically while the record calls it best-in-slot) and section 8.1's gear term (item swap on every lane, or a stated exclusion making every published percentage a floor). Escalated under the phase file's own 'the framework cannot measure a kit' stopping rule rather than re-tuned. The four tunes stand: apex weapon enchants 7 to 6 on both twins, sunspun_vestments hitRating 40 to hasteRating 40, duskforged_bulwark armor 732 to 680 and blockValue 32 to 30, the three apex flasks 15 to 13. Everything else the phase and its FOUR review rounds found is fixed and committed across 24 commits: TWO RED TESTS the flask tune had left on the branch (provisioning_supply_line_apex, the Phase 11h tripwire written to catch exactly this move, and elixir_tooltip_view), the public wiki telling players the pre-tune flask value in English plus five non-Latin overlays with nothing red because the generated guide bundle carries no consumable magnitudes, four false shipped comments the tunes had invalidated including the enchants.ts file header that would have led a reader to restore 7, six pin defects (two passing on an alphabetical tie-break and an off-axis maximum), and three harness defects (a resource refill handing a fury warrior 100 rage it must earn, a silent seed-list truncation, and an unpaired estimator that inflated the rogue and caster error bars about 35-fold). The measurement harness is now COMMITTED as scripts/r5_envelope_probe.ts, typechecked (tsconfig's include was widened to reach it), test-imported via tests/r5_envelope_probe.test.ts, and reads its tuned terms from the catalog rather than baking them, all mutation-verified. FROZEN STAMP at e611b0639d, EXIT=0 first try under the gate's bounded form: 3235 / 22 files (3257), 47763 / 2 xfail / 381 skipped (48146), tsc and ci:changed clean, both regens zero-diff; drift vs d51139a103 is +1 file and +25 tests. LOCAL only, no push, no PR. NEXT = Phase 15 QA, which must verify the ESCALATION rather than confirm a verdict) | 2026-08-28 | 2026-08-29 |
-| 15 QA | verify | pending | | |
+| 15 QA | verify | complete: PASS on the phase's work; THE ESCALATION HOLDS, verified four independent ways (byte-exact reproduction of 9.6 at the documented invocation, analytic decomposition of the 5.45-point gap with no harness artifact, an adversarial strength-ring baseline, and an exploratory enhancement-shaman measurement whose S-rift answer inverts on the open pool ruling). Twelve audit lanes plus adversarial verification (168 agents, 104 findings, one dissenting vote in the whole set); 52 actionable findings all applied across seven fix commits over three fresh-reader rounds to convergence; 38 mutants killed across the rounds including the prior tank-kit survivor. Substance: three record cells did not reproduce from the committed harness and were corrected dated; the 355-hit and lower-bound claims scoped to the fury lane (rogue baseline carries exactly 190); the stamp's drift decomposition re-measured (+3/+19/+3, not +22); the harness gained the escalation-mechanism pin, live-table targets, arm validation, and per-lane smokes; the ruling packet priced. The two rulings stay the maintainer's; a third lane-set question recorded beside them. LOCAL only, no push, no PR. | 2026-08-29 | 2026-08-29 |
 | 16 | Polish and content surfaces | pending | | |
 | 16 QA | verify | pending | | |
 | 17 | Final integration QA and PR | pending | | |
@@ -1077,3 +1077,55 @@ state.md, "Phase 15 ledger". LOCAL only, no push, no PR.
 NEXT = Phase 15 QA (phase-15-qa.md, FRESH session), which must verify the
 ESCALATION rather than confirm a verdict, and whose own starter prompt is
 stale on exactly that point.
+
+## Phase 15 QA (2026-08-29): PASS on the phase's work; THE ESCALATION HOLDS
+
+The QA verified the escalation rather than a verdict (its own starter prompt
+was stale on that point; the dated Amendments in phase-15-qa.md record the
+re-scope). Four independent verifications: the section 9.6 measurement
+reproduces byte-exact from the committed harness at the documented invocation
+(modelled 4.97/5.27, equipped 10.42/10.21); an analytic decomposition of the
+5.45-point gap (+8 str, +40 live crit, -25 haste, -15 dead hit, amplified by
+white-only rage minting) lands at 4 to 5.5 points with no harness artifact; an
+adversarial strength-ring baseline collapses the equipped premium to the legs
+conversion while the kit stays at or above 5; and an exploratory
+enhancement-shaman measurement reads +3.0 modelled (inside, below fury) with a
+realisable S-rift kit that inverts on the section 3 pool choice alone, which
+is the escalation's own point.
+
+Structure: a six-reader context workflow, twelve audit lanes plus the
+coverage-auditor charter (the typed agent returned empty a third time and was
+re-run general-purpose), then per-finding adversarial verification, 168 agents
+in all: 104 findings, exactly one dissenting vote (judged, applied anyway).
+52 actionable findings were applied across seven fix commits (f2a2243735 to
+f72edc4d59) over three fresh-reader rounds to convergence; 38 mutants killed
+across the rounds, including the prior survivor (the tank-kit identity swap),
+and one of the QA's own round-1 pins was proven an algebraic identity by its
+own round-2 mutation pass and replaced with literals.
+
+Substance corrected in the record: three cells did not reproduce from the
+committed harness (rogue assassination heroic 3.78 to 3.79; the blockquote's
+caster 4.92/4.75 and fury 4.55 figures re-measured, with the 300-seed fury
+pair reproducing 5.06/5.24 exactly); the 355-hit and lower-bound claims are
+scoped to the measured fury lane (the rogue baseline carries exactly 190 hit,
+the heroic need, so the dead-rating mechanism does not transfer); the frozen
+stamp's drift decomposition was re-measured (+3 probe suite, +19 across eight
+of the eleven files, +3 release-inherited electron_gpu_preference); the
+caster baseline's legendary mainhand is now stated everywhere the pool is
+described; and the ruling packet is priced (floors cannot close an at-most
+bound; the item-swap option's piece choice must be measured, not asserted;
+the enhancement lane-set question recorded beside the two rulings).
+
+Harness hardening, all output-invariant: the escalation-mechanism pin
+(furyBody: 355 base hit, zero effective special miss both arms both targets,
+the dead-hit-to-live-crit conversion by exact deltas), live-tuning-table
+targets, kit identity and Perfecting-formula welds on all three item-swapping
+arms, derived-step and serpent welds, per-lane smoke floors between the
+measured dead and live values, arm-label validation, a parse-site lapsed-kit
+guard, and frozen kit maps. The two lead-cap tables now enforce their own
+zero-slack claim (two authored-slack rows trimmed to the measured leads).
+
+Full record: state.md, "Phase 15 QA ledger". LOCAL only, no push, no PR.
+NEXT = the maintainer's rulings (section 3's baseline pool, section 8.1's
+gear term, the lane set, the apex-bag tie); Phase 16 stays gated until they
+land.

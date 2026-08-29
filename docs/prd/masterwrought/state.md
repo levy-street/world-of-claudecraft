@@ -1,16 +1,17 @@
 # Masterwrought: cross-phase state
 
-Current phase: 15 BUILT AND ESCALATED (2026-08-28), POWER VERIFICATION.
-**R5 IS NOT PROVEN: the envelope verdict is SUSPENDED** and two ratified
-definitions are owed the maintainer, because the gear term was found to
-measure a stat MODEL of the kit rather than the kit (modelled 4.97 / 5.27
-percent against the same pieces EQUIPPED at 10.42 / 10.21). The four
-content tunes stand. The record is
-docs/prd/masterwrought/power-verification.md, whose Verdict section states
-the suspension and what the maintainer owns; the decisions, the judged
-list, the frozen stamp and the suspension block are the Phase 15 ledger at
-the END of this file. Next: Phase 15 QA (phase-15-qa.md, fresh session),
-which must verify the ESCALATION rather than confirm a verdict. The header below is the
+Current phase: 15 QA COMPLETE (2026-08-29): PASS on the phase's work, and
+THE ESCALATION HOLDS, verified four independent ways. **R5 IS NOT PROVEN:
+the envelope verdict is SUSPENDED** and the ruling packet is now priced
+and decision-ready for the maintainer: section 3's baseline pool, section
+8.1's gear term (355 hit and the measured lower bound are the FURY lane's;
+the rogue baseline carries exactly 190), the lane-set question
+(enhancement), and the merge-inherited apex-bag tie. The four content
+tunes stand. The record is docs/prd/masterwrought/power-verification.md,
+whose Verdict section states the suspension and what the maintainer owns;
+the Phase 15 ledger and the Phase 15 QA ledger sit at the END of this
+file. Next: the maintainer's rulings; Phase 16 stays gated until they
+land. The header below is the
 absorb-era orientation, kept because a fresh session still needs both
 worlds loaded; only the "Current phase" and "Next" lines in it are stale.
 
@@ -21482,3 +21483,170 @@ the record's defects are fixed. It does NOT close the phase: the envelope
 verdict is suspended above, and no suite can settle it, because what is in
 question is which quantity the measurement should compute, not whether the
 tree passes its pins.
+
+## Phase 15 QA ledger (2026-08-29, verify the escalation)
+
+STATUS: **COMPLETE. PASS on the phase's WORK; THE ESCALATION HOLDS.** The QA
+verified the escalation rather than a verdict (the dated Amendments in
+phase-15-qa.md record the re-scope; the envelope itself stays the
+maintainer's to rule on). Everything the audit found is applied or recorded;
+follow-ups were CUT-or-fixed, none deferred.
+
+### STEP 0 (paid before the QA started)
+The seventh v0.41.0 sync (release tip e19d832b47, merge 720fd90168, pins
+6708036eb3, audit fix 71246dca4e, five-lane merge audit, frozen EXIT=0 at
+71246dca4e: 3337/29 files (3366), 50314/2/452 (50768)) ran as its own step
+the same day; the QA restarted at STEP 1 and did not re-merge. Verified at
+the QA's own STEP 0: origin/release/v0.41.0 unmoved at e19d832b47 and an
+ancestor of HEAD; porcelain clean.
+
+### THE ESCALATION, VERIFIED FOUR INDEPENDENT WAYS
+1. REPRODUCTION: the section 9.6 measurement reproduces BYTE-EXACT from the
+   committed harness at the documented invocation (60 seeds, 300 s: modelled
+   +4.97 +/-1.18 heroic, +5.27 +/-1.03 S-rift; equipped +10.42 +/-1.42,
+   +10.21 +/-1.20), run twice in the main loop. The caster direction
+   reproduces per arm (equipped 2.53/2.36 below modelled 4.93/4.63 at 180 s).
+2. DECOMPOSITION: dress-only instrumentation shows the equipped arm differs
+   from the modelled arm by exactly +8 str, +40 crit rating (2.00 percent),
+   -25 haste rating (1.25 percent) and -15 dead hit; crit feeds white swings,
+   hasteRating speeds melee, rage is minted from white damage only (so
+   special frequency is superlinear in white throughput), and the analytic
+   estimate of the gap is 4 to 5.5 points against the measured 5.45. No
+   double count, no rigged arm, no artifact.
+3. ADVERSARIAL BASELINE: a strength-ring baseline (seal_of_the_nine_oaths on
+   both rings) collapses the equipped premium to roughly the legs conversion
+   and the kit still reads at or above 5, consistent with the record's
+   "every baseline tried is above 5".
+4. A THIRD MEASURED LANE: the exploratory enhancement-shaman run (throwaway
+   probe on the maintained warspirit fixture; recorded in section 9.3's
+   dated addendum) reads +3.0 modelled at both targets, inside and below
+   fury, and its realisable S-rift kit inverts on the section 3 pool choice
+   alone: the escalation's own point, measured from a new direction.
+Two new derivations the record lacked, both now in it: the rogue baseline
+sums exactly 190 hit (at the heroic cap with zero headroom), so the
+dead-rating mechanism is fury-scoped; dual-wield white swings carry the flat
+10 percent penalty outside the max(0, ...) floor, so "effective miss zero"
+is a special-attack claim.
+
+### STRUCTURE
+Six-reader context workflow; twelve audit lanes (escalation, harness
+honesty, fix-round, pin decisiveness, three record lanes, content sweep,
+rulings pricing, enhancement measurement, drift attribution, the
+coverage-auditor charter) plus per-finding adversarial verification under
+three lenses (two for nits): 168 agents, 104 findings, ONE dissenting vote
+in the entire set (the floors-cannot-close note, argued already-recorded;
+judged against the dissent and applied as one clarifying sentence). The
+typed test-coverage-auditor returned EMPTY on first dispatch (the third
+occurrence of the pattern this packet) and was re-run general-purpose with
+the charter inlined, per protocol. Round-2 fresh readers (three, plus a
+nine-mutant checker) found 21 defects in the QA's own fixes, all applied;
+the round-3 reader returned CLEAN with one cosmetic nit, applied. All
+lanes' detail lives in the session record; the counts here are the binding
+summary.
+
+### FINDINGS AND FIXES (seven commits, f2a2243735 3544075337 9efa01f2ae
+6de3b198b9 3c76ef8331 110d814f7c f72edc4d59, each round read fresh)
+52 actionable findings (30 should-fix, 22 nits) applied; 52 info items
+recorded. The substance:
+- THREE RECORD CELLS did not reproduce from the committed harness and were
+  corrected, dated: rogue assassination heroic FULL 3.78 to 3.79
+  (deterministic, confirmed twice); the 9.2 blockquote's caster 4.92/4.75
+  to 4.90/4.74 and its fury 4.55 (60-seed heroic at 600 s) to 4.60; the
+  300-seed fury pair was re-run and reproduces 5.06/5.24 EXACTLY, settling
+  the blockquote's sample labels (both fury pairs at 600 s).
+- SCOPING: the Verdict's 355-hit clause and every lower-bound plural now
+  name the fury lane; the rogue equipped arm is recorded unmeasured with
+  its expected sign (at or below modelled).
+- THE DRIFT DECOMPOSITION was measured, not inferred: +25 = +3
+  (r5_envelope_probe suite) +19 (eight of the eleven edited files, per-file
+  counts in the stamp block) +3 (tests/electron_gpu_preference.test.ts,
+  release-inherited via c78a9e962f, PR #3728). The stamp's "+22 across the
+  eleven" was wrong by exactly the release-inherited 3.
+- THE CASTER BASELINE'S LEGENDARY MAINHAND (heroic_deathless_heartwood)
+  surfaced and is now stated in section 3, the probe headers, and the
+  pool-ambiguity amendment.
+- RULING PACKET PRICED: the floors option cannot verify an at-most bound
+  (taking it ratifies the modelled term as the R5 quantity, roughly twice
+  the envelope on the record); the item-swap option's piece choice must be
+  measured, not asserted (spiritweld_girdle and wardspeaker_sabatons are
+  class-free mail with the same rating conversion, unmeasured); the
+  7.69/6.44 figures are marked non-reproducible; the lane-set question
+  (enhancement) is recorded beside the two rulings; the apex-bag options
+  carry costs.
+- HARNESS PINS (all output-invariant, verified against pre-edit runs): the
+  escalation-mechanism pin, live-table targets, kit identity and
+  Perfecting-formula welds on all three item-swapping arms, derived-step
+  and serpent welds, per-lane smoke floors between measured dead and live
+  values, arm-label validation, the parse-site lapsed-kit guard at 897 s,
+  frozen kit maps, La Luna rows imported from their source probe.
+- PIN TIGHTENINGS: the two R5 lead-cap tables enforce their own zero-slack
+  claim (mainhand 2 to 1 and feet 1 to 0 trimmed to the measured leads);
+  the dual-wield lead pinned per axis as literals with two direct def welds
+  (the QA's own round-1 four-axis relation was proven an ALGEBRAIC IDENTITY
+  by its round-2 mutation pass and replaced); the forfeited-offhand refusal
+  probes a fresh copy so a broken gate reds on ok, not a reason string.
+
+### KILL TABLE (throwaway worktrees, porcelain-verified, all removed)
+Round 1: harness lane 3/3 (flask restore, enchant restore, shield restore);
+pin lane 25/26 with the ONE survivor (tank-table blind to an EHP-identical
+legs re-point) closed by the identity weld. Round 2: 9/9 including that
+re-point (killed by exactly the new pin) plus a green negative control; M9
+proved the four-axis relation vacuous (fixed round 2, re-killed round 3).
+Round 3: 3/3 (offhand-stamina def, gate carve-out on the ok pin, ring-delta
+weld). Total 38 discrete mutants killed, 1 survivor found and closed, plus
+the two tautological self-comparisons found by reading and replaced.
+
+### JUDGED THIS ROUND, do not re-raise
+1. The one dissenting verification vote (floors-note already-recorded):
+   judged with the file open; the sentence prices the decision rather than
+   re-stating it, applied.
+2. The EPIC-ONLY inline flag inside section 3's ratified blockquote (round-2
+   F8): the dissent stands; the boxed pool rule is maintainer-owned text
+   under an open ruling, the beside-the-text QA note is the judged
+   correction mechanism, NOT ACTED beyond the existing note.
+3. The 9.2 fury/caster rows stay deliberately stale pending the gear-term
+   ruling: judged the right call; the QA corrected only the blockquote's
+   own correction figures and the claimed-reproducible rogue cell.
+4. The "seventh v0.41.0 sync" ordinal is CORRECT under the ledger's own
+   counting convention (Phase 14 build's STEP 0 was a recorded no-op sync);
+   annotated rather than renumbered.
+5. The step-pin relation's deferred protection (a re-baked literal reds
+   only when a def next moves): accepted with the comment stating exactly
+   that; the harmful end state is what the pins refuse.
+6. The enhancement numbers enter the record under the same
+   non-reproducible-throwaway caveat as the 7.69/6.44 figures, symmetric by
+   design; re-derivable in about a day from the named committed parts.
+7. The smoke floors catch dead or gutted rotations, NOT a single renamed
+   ability (castAbility no-ops silently); comments claim exactly that, and
+   the rogue floor sits at 150 between dead 97 and live 198.
+
+### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
+1. Frozen phase packets (11b/11c/11h/11i and the dated ledgers) still state
+   the pre-tune flask 15 and 21-stamina premises as their own era's facts:
+   historical by the blanket declaration at the CONSEQUENCE paragraph;
+   optionally a one-line dated outcome note at phase-11c-food-and-feast.md.
+2. PLAYER_DUMMY_REST_HP_FRACTION is only self-compared (pre-existing,
+   outside this span).
+3. The guide flask prose is pinned in English only; the five non-Latin
+   overlay fills ride the release fill lane.
+4. The tank baseline carries two legendaries by its own stated
+   max-effective-health rule (named in section 3's surroundings).
+5. WAR_ENCH is AP-maximising rather than throughput-maximising (legs sta 6
+   over agi 4, gloves str 3 over agi 6): folded into the section 3 ruling
+   material.
+6. The raw-sum dev picker hands an enhancement shaman a shield and a caster
+   staff (a dev-tool read beside the recorded pbe_boost one).
+7. bestEpicGearFor's score is rating-blind BY SHAPE (ratings are top-level
+   fields): the fact under ruling 1, stated there.
+8. The 897 s guard is one second stricter than its own arithmetic needs;
+   fails safe.
+9. mediawiki/seed/pages.xml predates the packet entirely (re-verified; the
+   11n QA's release-time wiki:seed regen obligation stands).
+
+### SESSION RECORD
+The audit ran through two account-limit outages (nine of twelve lanes and
+later the verify stage died mid-run and were resumed from the workflow
+cache; the fresh-reader round died whole once on a model limit and was
+resumed). After each outage the real worktree's porcelain was verified
+clean and leftover throwaway worktrees were removed before resuming.
+Every number in this ledger post-dates the resumes.
