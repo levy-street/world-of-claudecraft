@@ -9248,6 +9248,8 @@ export const cs_CZ: EnTranslations = {
       "tool_recharge": "Dobíjení",
       "demonHeal": "Léčení démona",
       "thunzharrStormcall": "Volání bouře",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Ledovcový hrob",
       "rift_frost_strike": "Absolutní nula",
       "rift_ember_execution": "Magmová studna",

@@ -9248,6 +9248,8 @@ export const sv_SE: EnTranslations = {
       "tool_recharge": "Omladdning",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Glaciärgraven",
       "rift_frost_strike": "Absoluta nollpunkten",
       "rift_ember_execution": "Magmakällan",
