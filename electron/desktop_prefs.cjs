@@ -61,8 +61,8 @@ const DISPLAY_MODES = ['borderless', 'windowed'];
 
 /**
  * The window presentation mode off disk. Exact-literal only: no case folding and
- * no aliases, because the value is fed straight to setFullScreen at the reveal,
- * and a near-miss ('Borderless', 'fullscreen') has to resolve to the default
+ * no aliases, because the value is fed straight to setFullScreen once the page
+ * has loaded, and a near-miss ('Borderless', 'fullscreen') has to resolve to the default
  * rather than to whichever branch a loose comparison happened to take.
  */
 const readDisplayMode = (value, fallback) => (DISPLAY_MODES.includes(value) ? value : fallback);

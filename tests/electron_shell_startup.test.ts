@@ -471,7 +471,7 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       'a constructor-time maximize would show the unpainted window for the whole load',
     ).not.toContain('if (restore.maximized) mainWindow.maximize();');
     const reveal = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
-    const revealMaximizeAt = reveal.indexOf('if (restore.maximized) win.maximize();');
+    const revealMaximizeAt = reveal.indexOf('} else if (restore.maximized) win.maximize();');
     expect(
       revealMaximizeAt,
       'a maximized session must be restored maximized at the reveal',
@@ -515,32 +515,83 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     expect(wiring).toContain('now: () => Date.now(),');
   });
 
-  it('applies the stored display mode at the reveal, never at construction', () => {
-    // Same reasoning as the maximize above: setFullScreen on a hidden window is
-    // window state the reveal discipline owns, and a `fullscreen` key in the
-    // constructor options would both skip that discipline and (as an explicit
-    // false) disable the macOS full-screen button for the whole session.
-    const reveal = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
-    const fullScreenAt = reveal.indexOf(
-      "if (desktopPrefs.displayMode === 'borderless') win.setFullScreen(true);",
-    );
-    expect(fullScreenAt, 'a borderless session must be revealed full screen').toBeGreaterThan(-1);
-    expect(
-      fullScreenAt,
-      'the mode must be applied before show() so the first visible frame is the right one',
-    ).toBeLessThan(reveal.indexOf('win.show();'));
-    // Borderless supersedes maximize: doing both would leave the window
-    // remembering a maximized state it never presented.
-    expect(reveal, 'the maximize must be the else arm of the borderless branch').toContain(
-      'else if (restore.maximized) win.maximize();',
-    );
-    expect(count(code, 'win.setFullScreen(true);'), 'one reveal-time apply only').toBe(1);
+  it('applies the stored display mode at the reveal, and on Linux after the page loads', () => {
+    // A `fullscreen` key in the constructor options would skip the reveal
+    // discipline entirely and, as an explicit false, disable the macOS
+    // full-screen button for the whole session.
     const options = block('new BrowserWindow({', '\n  });', 'BrowserWindow options');
     expect(
       options,
       'an explicit fullscreen option would disable the macOS full-screen button',
     ).not.toContain('fullscreen:');
     expect(options).not.toContain('setFullScreen');
+    // Borderless supersedes maximize on BOTH arms: a session that will go full
+    // screen (now or after the load) must not maximize first, or the window
+    // would remember a maximized state it never presented.
+    const reveal = block('const showMainWindow = () => {', '\n  };', 'showMainWindow');
+    const revealApplyAt = reveal.indexOf(
+      "if (desktopPrefs.displayMode === 'borderless') {\n      if (!DEFER_DISPLAY_MODE_TO_LOAD) win.setFullScreen(true);\n    } else if (restore.maximized) win.maximize();",
+    );
+    expect(
+      revealApplyAt,
+      'the reveal must apply full screen on a non-deferring platform, and never also maximize a borderless session',
+    ).toBeGreaterThan(-1);
+    expect(
+      revealApplyAt,
+      'the mode must be applied before show() so the first visible frame is the right one',
+    ).toBeLessThan(reveal.indexOf('win.show();'));
+  });
+
+  it('defers the display-mode apply on Linux, where the reveal-time one is dropped', () => {
+    // The window manager can only honor presentation state for a window it has
+    // already mapped. Full screen asked for inside the reveal is dropped by
+    // mutter (GNOME/X11), leaving a borderless session in a plain window while
+    // isFullScreen() answers true, and the geometry it thrashes on the way out
+    // invalidates the compositor's Vulkan swapchain, which kills the GPU
+    // process and intermittently leaves the page blocked from WebGL for the
+    // rest of the session: a game that never renders. Measured on the packaged
+    // build, 15 of 15 reveal-time borderless Vulkan launches lost the GPU
+    // process and none presented full screen; 11 of 11 deferred ones did
+    // neither. Linux only: the other platforms honor the reveal-time apply and
+    // are not measurable from here.
+    expect(code, 'the deferral must be scoped to Linux, not applied everywhere').toContain(
+      "const DEFER_DISPLAY_MODE_TO_LOAD = process.platform === 'linux';",
+    );
+    expect(
+      count(code, 'DEFER_DISPLAY_MODE_TO_LOAD'),
+      'one definition, one reveal guard, one deferred-apply guard',
+    ).toBe(3);
+    // A signal, never a delay: a wall-clock constant tuned on one machine is
+    // not a gate anywhere else.
+    const deferred = block(
+      '  if (DEFER_DISPLAY_MODE_TO_LOAD) {',
+      '\n  }',
+      'deferred display-mode apply',
+    );
+    expect(deferred, 'the deferred apply must ride did-finish-load').toContain(
+      "mainWindow.webContents.once('did-finish-load', () => {",
+    );
+    expect(deferred, 'the apply must skip a window that is already gone').toContain(
+      'if (win.isDestroyed()) return;',
+    );
+    expect(
+      deferred,
+      'the stored mode must be re-read at apply time, so a mode the player changed while the page loaded is left alone',
+    ).toContain("if (desktopPrefs.displayMode !== 'borderless') return;");
+    expect(deferred, 'a borderless session must end up full screen').toContain(
+      'win.setFullScreen(true);',
+    );
+    expect(
+      count(code, 'win.setFullScreen(true);'),
+      'exactly two applies: the reveal-time one and the deferred one',
+    ).toBe(2);
+    // .once, not .on: the reveal it replaces ran once per window creation, and
+    // re-applying on a crash-recovery reload would snap back a window the
+    // player has fullscreened or restored by hand since.
+    expect(
+      count(code, "mainWindow.webContents.once('did-finish-load'"),
+      'the display-mode apply must be the only once-bound did-finish-load listener',
+    ).toBe(1);
   });
 
   it('remembers the window geometry on settle and once more at close', () => {

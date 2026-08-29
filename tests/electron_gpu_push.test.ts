@@ -31,7 +31,17 @@ describe('the GPU verdict push to the renderer', () => {
     expect(bindings.length, 'no did-finish-load binding found in main.cjs').toBe(1);
     expect(bindings[0][1]).toBe('on');
     expect(bindings[0][2]).toBe('logGpuStatus');
-    expect(main).not.toContain("webContents.once('did-finish-load'");
+    // The reveal's deferred display-mode apply is a legitimate .once binding
+    // (pinned in tests/electron_shell_startup.test.ts), so the blanket "no once
+    // in this file" guard narrows to what it was always protecting: the GPU
+    // readout itself must never ride one, inline arrow included.
+    for (const [onceBinding] of main.matchAll(
+      /webContents\.once\('did-finish-load'[\s\S]*?\n {2}\}\);/g,
+    )) {
+      expect(onceBinding, 'the GPU readout must not ride a once binding').not.toContain(
+        'logGpuStatus',
+      );
+    }
   });
 
   it('sends the verdict BEFORE the log dedup early-return', () => {

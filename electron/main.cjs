@@ -386,6 +386,29 @@ const MOVE_DISPLAY_DEBOUNCE_MS = 250;
 const DEFAULT_WINDOW_WIDTH = 1440;
 const DEFAULT_WINDOW_HEIGHT = 900;
 
+// Where a borderless preference is applied: at the reveal, or once the page has
+// loaded. Linux defers it, the other platforms do not.
+//
+// The window manager owns presentation state and can only honor a request for a
+// window it has already mapped. Asked for during the reveal on GNOME/X11, mutter
+// drops it, so the session runs in a plain window while isFullScreen() keeps
+// answering true. The bounds Chromium applies on the way in and the window
+// manager undoes on the way out then resize the compositor surface twice inside
+// one frame, which invalidates its Vulkan swapchain: vkAcquireNextImageKHR
+// returns VK_ERROR_OUT_OF_DATE_KHR, Chromium calls that unrecoverable and kills
+// the GPU process, and roughly half of those launches leave the page blocked
+// from WebGL for the rest of the session ("Web page caused context loss and was
+// blocked"), which is a game that never renders. Measured on the packaged build
+// (RTX 3090, GNOME/X11, ANGLE Vulkan): 15 of 15 reveal-time borderless launches
+// lost the GPU process and none of them presented full screen; 11 of 11 deferred
+// ones did neither.
+//
+// Linux only, deliberately: macOS and Windows honor the reveal-time apply today,
+// their compositors are not the one that drops it, and neither is measurable
+// from here. Widening this is a one-word change once someone can hold a
+// before/after on those platforms.
+const DEFER_DISPLAY_MODE_TO_LOAD = process.platform === 'linux';
+
 // How long a resize or a drag must settle before the window geometry is written
 // to disk. Both events fire continuously, and the file is rewritten whole, so
 // this is what keeps a single drag from being hundreds of writes.
@@ -566,18 +589,19 @@ function createMainWindow() {
   // (documented BrowserWindow contract, verified against Electron 43), so a
   // constructor-time maximize would present an unpainted frame for the whole
   // load, defeating show:false. Placed before show() so the first visible
-  // frame is the already-maximized one.
+  // frame is the already-maximized one. Full screen is the opposite case on a
+  // deferring platform; see DEFER_DISPLAY_MODE_TO_LOAD.
   const win = mainWindow;
   const showMainWindow = () => {
     if (win.isDestroyed() || win.isVisible()) return false;
     // Borderless SUPERSEDES a maximized session: full screen already covers the
     // display, and doing both would leave the window remembering a maximized
-    // state it never presented. Applied here for the same reason as the
-    // maximize (and never as a `fullscreen` option on the constructor: an
-    // explicit fullscreen:false disables the macOS full-screen button, and
-    // constructor-time state would skip this reveal discipline entirely).
-    if (desktopPrefs.displayMode === 'borderless') win.setFullScreen(true);
-    else if (restore.maximized) win.maximize();
+    // state it never presented. On a deferring platform the full screen itself
+    // is not applied here (see DEFER_DISPLAY_MODE_TO_LOAD), but borderless still
+    // supersedes: a session that will go full screen must not maximize first.
+    if (desktopPrefs.displayMode === 'borderless') {
+      if (!DEFER_DISPLAY_MODE_TO_LOAD) win.setFullScreen(true);
+    } else if (restore.maximized) win.maximize();
     win.show();
     return true;
   };
@@ -602,6 +626,23 @@ function createMainWindow() {
     clearReadyToShowFallback();
     showMainWindow();
   });
+
+  // The deferred half of DEFER_DISPLAY_MODE_TO_LOAD, on did-finish-load: the
+  // signal the GPU readout and the presentation re-push already ride, and a
+  // real event rather than a delay, because a wall-clock constant tuned on one
+  // machine would not be a gate on any other. Bound with .once, so the mode is
+  // applied once per window creation exactly like the reveal it replaces, and a
+  // crash-recovery reload cannot snap back a window the player has fullscreened
+  // or restored by hand since. The stored mode is re-read at apply time, so a
+  // mode the player changed while the page was still loading (already applied
+  // live by desktop-set-display-mode) is left alone.
+  if (DEFER_DISPLAY_MODE_TO_LOAD) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      if (win.isDestroyed()) return;
+      if (desktopPrefs.displayMode !== 'borderless') return;
+      win.setFullScreen(true);
+    });
+  }
 
   // Window hidden-ness, pushed from here because the page can never observe it.
   // Each event just re-derives (see sendPresentationState above), so none of
