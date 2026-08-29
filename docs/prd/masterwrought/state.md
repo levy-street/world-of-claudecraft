@@ -2667,7 +2667,9 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   briarstep_jerkin chest / fenbloom_breeches legs / barksong_handguards gloves;
   cloth sunspun_vestments chest / sunspun_leggings legs / sunspun_handwraps gloves)
   plus the tailoring apex bag sunspun_haversack (16 slots, one 2-slot step past the
-  duffel, NO masterwrought flag). Every primary sum EQUALS primaryStatBudget(31,
+  duffel, NO masterwrought flag; AMENDED 2026-08-29: tied at 16 by the release's
+  bags at the seventh v0.41.0 sync, an open re-distinguish ruling, see the
+  budget test's rescope note). Every primary sum EQUALS primaryStatBudget(31,
   'epic', slot); exactly one rating at the band's 40, each COMPLEMENTING its
   same-slot reference drop (spread: crit x5, haste x3, hit x1); armor values copied
   byte-equal from the named ilvl-31 references; equip level DERIVED (source 25
@@ -2801,7 +2803,9 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   ilvl 31), derived equip gate, R2 texture, R14 whole-def whitelist (bag gets its
   own), the full recipe row with the literal bill, the per-def R12 surface
   (isDisenchantable + typedSecondaryFor vs the literally-pinned weave mapping),
-  the rating-spread table, the bag capacity ceiling (strictly largest), and an
+  the rating-spread table, the bag capacity ceiling (strictly largest as shipped;
+  AMENDED 2026-08-29 to a pinned tie set at the seventh v0.41.0 sync, see the
+  budget test's rescope note), and an
   apex-scoped economy arm. Decisiveness: five mutation probes red-as-expected
   (stat retune, rating swap, flag drop, R1 guard revert, plus the pin-audit's
   hand-traced synthetic arms). PHASE 09 NOTE: jewelry pins against the
@@ -21131,7 +21135,9 @@ ilvl-31 drop) and Perfecting puts at most +1 on the lead stat per piece.
   catalyst a day or a hundred grey-rate crafts. Cannot be closed by tuning
   down; new content is out of scope.
 - The public wiki prints craft gain boundaries above the reachable cap (63
-  of 166 rows, all 12 skill-125 rows print all three). The fix is a clamp
+  of 166 rows, all 12 skill-125 rows print all three; 63 of 170 after the
+  2026-08-29 v0.41.0 sync brought the release's four tailoring bag recipes,
+  numerator re-verified unchanged). The fix is a clamp
   in scripts/wiki/build_content.mjs, outside this phase's scope.
 - qr-GRAY's own row wording is measurably false as written: the tier-0
   spam path is DEARER in materials than the intended path for 8 of the 10
@@ -21346,6 +21352,24 @@ class-agnostically and the record calls the result "best-in-slot"; (2) section
 a hit-capped physical baseline are the larger term. This is the phase file's
 own "the framework unable to measure a kit" stopping rule, so it is reported as
 an escalation and NOT re-tuned in phase.
+
+AMENDED 2026-08-29 (the seventh v0.41.0 sync, release tip e19d832b47): a THIRD
+open maintainer question joined the two above, merge-inherited rather than
+R5-related. The release's Bank Storage batch ships two GENERAL 16-slot bags
+(resonant_weave_bag epic, wayfarers_backpack rare) that TIE the apex bag
+sunspun_haversack, so the phase 08 "strictly largest bag" position no longer
+holds on the merged tree; the budget test's apex-bag arm was rescoped to
+no-general-bag-exceeds plus the named tie set (see the MERGE-INHERITED RESCOPE
+comment in tests/masterwrought_budget.test.ts), and whether to re-distinguish
+the apex bag or amend the strictly-best position is the maintainer's call.
+Side effect already shipped by the release's own rules: bestBoostBag and the
+community test-account template now hand out resonant_weave_bag (ascending-id
+tie-break), not the packet's apex bag. The sync merge was also audited against
+the R5 fixture surface and found CLEAN: no epic armor or weapon joined the
+pool, no rating constant, enchant, flask, Perfecting arm, or probe input
+moved, WAR_BIS still sums 355 hit, the legs twins are still byte-twins, and
+the deterministic tank lane byte-reproduces section 9.5, so the suspended
+escalation's evidence stands unmodified.
 
 THE FOUR TUNES STAND. All four are downward, none moves a settled magnitude,
 and none is invalidated by this: what fails is the measurement they were sized

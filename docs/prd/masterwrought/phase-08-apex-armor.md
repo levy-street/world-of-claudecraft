@@ -47,7 +47,9 @@ chest/legs/waist (armorcrafting), chest/shoulders/feet (leatherworking),
 robe/leggings/gloves (tailoring). Final slot picks come from the audit.
 Then fan out:
 Slice 1: armorcrafting's 3 pieces. Slice 2: leatherworking's 3. Slice 3: tailoring's 3
-plus the apex bag (best capacity in the game, NO masterwrought flag). Slice 4: the apex
+plus the apex bag (best capacity in the game as ruled here; tied at 16 by the release's
+bags since the 2026-08-29 v0.41.0 sync, an open re-distinguish ruling, see the budget
+test's rescope note; NO masterwrought flag). Slice 4: the apex
 budget sweep test, tests/masterwrought_budget.test.ts.
 Every piece: recipe.level 25, quality epic, skillReq 100 (R13), masterwrought: true
 (the phase 01 flag), acquisition per R8 (pattern drop; NOT a trainer row; patterns land

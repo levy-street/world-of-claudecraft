@@ -28,6 +28,7 @@ import {
   WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
   WOC_BANK_LEDGER_TAIL,
   WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL,
+  WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL,
   WOC_BATTLEGROUND_CAPTURES_TOTAL,
   WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
   WOC_BATTLEGROUND_MATCHES_TOTAL,
@@ -1016,6 +1017,21 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     );
   });
 
+  it('pre-registers the realm row-breach counter at zero and increments unlabeled', async () => {
+    // The one release/v0.41.0 metric family that shipped without a pin (found
+    // at the sync-merge audit): telemetry-only, label-free, alert on rate.
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    expect(WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL).toBe('woc_bank_vault_realm_row_breaches_total');
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL} counter`);
+    expect(sampleValue(zeroed, /^woc_bank_vault_realm_row_breaches_total (\d+)$/m)).toBe('0');
+    counters.bankVaultRealmRowBreach();
+    counters.bankVaultRealmRowBreach();
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_bank_vault_realm_row_breaches_total (\d+)$/m)).toBe('2');
+  });
+
   it('pre-registers every vault ledger incident kind at zero and increments by kind', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
@@ -1176,6 +1192,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
       WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
+      WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL,
       WOC_ESCROW_QUEUE_TOTAL,
       WOC_BATTLEGROUND_MATCHES_TOTAL,
       WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
@@ -1219,6 +1236,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
     expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
     expect(() => counters.vaultLedgerIncident('ledger_write_failed')).not.toThrow();
+    expect(() => counters.bankVaultRealmRowBreach()).not.toThrow();
     // The escrow-queue counter sits on the listing request path: a prom failure
     // there must never turn an observable refusal into a thrown 500.
     expect(() => counters.wocEscrowQueue('started')).not.toThrow();

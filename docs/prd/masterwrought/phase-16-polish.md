@@ -201,7 +201,10 @@ explicit RECORD, never as a deferral. The packet's contract is in-or-CUT.
   Steam table is byte-equivalent to the Epic one. Neither branch touched `server/steam/`
   or `server/epic/`. The absorb itself adds 13 deeds (six masterwrought plus seven
   farming, the total 11d re-derived), and 11e and Phase 13 each appended after that, so
-  DERIVE the packet's new-deed count off the final DEED_ORDER for the record. Headroom was
+  DERIVE the packet's new-deed count off the final DEED_ORDER for the record (and
+  derive by the packet's own deed ids, not table growth: the 2026-08-29 v0.41.0
+  sync merged the release's soc_strongbox_outfitter and soc_four_bags_deep into
+  DEED_ORDER, which a naive final-table count would misattribute to the packet). Headroom was
   never the question: 16 slots against a count in the mid-teens means it would have fit, and
   decision 8 CUT it anyway.
   Nothing goes red automatically because the exhaustive coverage test is scoped to
@@ -295,8 +298,18 @@ tests/monolith_budget.test.ts and state.md's Phase 11d ledger):
   back inherited growth. Paying back exactly this packet's +30 against the
   moved upstream baseline is 13548. If a later sync moves upstream's row again,
   move this target with it by the same arithmetic rather than re-deriving it.
+  TARGET MOVED 13548 -> 13333 at the 2026-08-29 seventh v0.41.0 sync (release
+  tip e19d832b47): the merged file and its re-pinned ceiling are 13363 (both
+  arms' growth composes; see the ratchet row), and the packet's owed share is
+  still exactly +30, so the target is 13363 minus 30. Without this move the
+  old 13548 target would be VACUOUS (already satisfied at 13363) and the +30
+  would go permanently unpaid.
 - src/net/online.ts: raised 5950 to 5967 (+17, both packets' new command
   mirrors). Payback target: 5950 or lower, same rule.
+  TARGET MOVED 5950 -> 5942 at the 2026-08-29 seventh v0.41.0 sync: the merged
+  file and its re-pinned ceiling are 5959 (base 5817 plus 71 on each arm; see
+  the ratchet row), the owed share is still exactly +17, so the target is 5959
+  minus 17 by the renderer row's arithmetic.
 The hud.ts Phase 14 carry (11d-U6-PAYBACK) needs nothing here: the merged
 file fell to 19248, and then to 19235 at the Phase 11d QA release sync
 (35a6481825, PR #3506, which extracted the chrome focus wiring), already well
@@ -309,9 +322,10 @@ made both raises permanent, which is the exact outcome ruling 11d-D-4's
 rationale exists to prevent ("a raise with no payback number is a permanent
 raise"). Phase 14 already carries its equivalent. Both rows sit at zero slack,
 so nothing else forces the extraction.
-- [ ] src/render/renderer.ts extracted back to 13548 or lower (was 13546 before
-      the Phase 11e QA sync moved upstream's own row; see the reasoning above),
+- [ ] src/render/renderer.ts extracted back to 13333 or lower (target moved at
+      the 2026-08-29 sync; see the reasoning above),
       with the ceiling in tests/monolith_budget.test.ts LOWERED in the same change.
-- [ ] src/net/online.ts extracted back to 5950 or lower, same rule.
+- [ ] src/net/online.ts extracted back to 5942 or lower, same rule (target
+      moved at the 2026-08-29 sync).
 Both lines are also exit criteria for this phase: it does not pass with either
 row still above its parent pin.

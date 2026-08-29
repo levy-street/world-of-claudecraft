@@ -1653,8 +1653,15 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 170,
     masterwrought: true,
   },
-  // The apex bag: best carried capacity in the game, one 2-slot step past
-  // mistcallers_duffel (14) on the shipped quality ladder. Deliberately NOT
+  // The apex bag: tied-largest general capacity at 16 slots. It shipped as
+  // strictly the largest (one 2-slot step past mistcallers_duffel, 14); the
+  // v0.41.0 sync merge brought the release's resonant_weave_bag (epic) and
+  // wayfarers_backpack (rare) at the same 16, and its materials-only satchels
+  // sit on a different capacity axis. Whether the apex bag should be
+  // re-distinguished is an OPEN maintainer ruling; the merged tie set is
+  // pinned in tests/masterwrought_budget.test.ts (the apex bag arm's
+  // MERGE-INHERITED RESCOPE comment). Do NOT bump this bag's slots to
+  // restore the old superlative without that ruling. Deliberately NOT
   // masterwrought (bags carry no combat power, so it never spends a slot in
   // the counted equip family) and not item-level eligible (kind bag).
   sunspun_haversack: {

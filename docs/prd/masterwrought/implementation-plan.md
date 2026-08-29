@@ -488,7 +488,9 @@ Deliverables:
   legs, waist for armorcrafting; chest, shoulders, feet for leatherworking; robe,
   leggings, gloves for tailoring).
 - 9 apex pieces (`recipe.level: 25`, quality epic, skillReq 100, `masterwrought: true`,
-  acquisition per R8) + the tailoring apex bag (best capacity, no cap flag).
+  acquisition per R8) + the tailoring apex bag (best capacity as planned; tied
+  at 16 general slots by the release's bags since the v0.41.0 sync, see the
+  budget test's rescope note; no cap flag).
 - Reagents: intermediates + Wyrmfall Cores + gathered mats (quantities in `state.md`).
 - The apex budget sweep test (`tests/masterwrought_budget.test.ts`): every apex item's
   primary stat sum EQUALS the formula budget; rating allocations pinned to same-band raid

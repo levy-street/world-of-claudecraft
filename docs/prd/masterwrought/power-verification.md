@@ -977,7 +977,10 @@ and start at the craft's own lowest `skillReq`.
   cannot be closed by tuning down, and new content is out of this phase's scope.
 - **The public wiki prints gain boundaries above the reachable cap.** 63 of the
   166 crafting rows print at least one boundary past 125, and all 12 skill-125
-  rows print all three. The fix is a clamp in `scripts/wiki/build_content.mjs`
+  rows print all three. (AMENDED 2026-08-29: 63 of 170 after the seventh
+  v0.41.0 sync brought the release's four tailoring bag recipes; the numerator
+  and the 12 skill-125 rows re-verified unchanged, since the new rows sit at
+  skillReq 25/50 whose boundaries top out at 125.) The fix is a clamp in `scripts/wiki/build_content.mjs`
   plus an arm in the guide test, which is a `scripts/` change outside this phase's
   content-plus-tests-plus-docs scope.
 

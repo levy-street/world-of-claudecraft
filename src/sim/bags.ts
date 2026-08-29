@@ -370,7 +370,7 @@ export function bagsFullError(ctx: SimContext, pid: number): void {
 // against the live content table by tests/bags.test.ts so a content re-tune
 // cannot silently under-grant a pre-bag save. The crafted apex bag
 // (sunspun_haversack, 16 slots, phase 08) is deliberately absent too, since
-// a save migration must never hand out the best bag in the game for free:
+// a save migration must never hand out a top-capacity epic bag for free:
 // the migration ceiling stays at the duffel while the true pooled general
 // ceiling is now 16 + 4 x 16.
 export const MIGRATION_BAGS: { id: string; slots: number; tier: number }[] = [
