@@ -493,6 +493,22 @@ primary.
 
 ### 9.2 Results
 
+> **STALE AGAINST THE COMMITTED HARNESS, and deliberately not refreshed.** The
+> fury and caster rows below predate `scripts/r5_envelope_probe.ts` and do not
+> reproduce from it. Measured at the stated samples, the harness gives fury
+> 4.55 / 5.76 at 60 seeds and 5.06 / 5.24 at 300, against the 4.94 / 4.50
+> printed here, and caster 4.92 / 4.93 / 4.75 / 4.63 against the 4.55 / 5.06 /
+> 4.58 / 4.75 printed here. Three causes, all now understood: the caster figures
+> were taken at 10 seeds while this section claimed 25; the harness's first
+> version refilled the player's resource, which handed a fury warrior 100 rage
+> it must earn; and its error bars were computed unpaired on a paired design,
+> which inflated the rogue and caster intervals about 35-fold. All three are
+> fixed in the harness. The TABLE is left as measured rather than refreshed
+> because section 9.6 shows the quantity itself is under a maintainer ruling:
+> refreshing a modelled number now would have to be redone once the gear term
+> is settled. **Read every row here as a floor from a superseded fixture.** The
+> rogue rows and the whole of 9.5 do reproduce exactly.
+
 Rogue: 25 seeds, 180 s. Caster: 25 seeds, at both the 60 s burst and the 180 s
 sustained profile. Warrior fury: 60 seeds, at both 180 s and 600 s. Error bars
 are 2 standard errors on the difference.
