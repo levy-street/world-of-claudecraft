@@ -21650,3 +21650,27 @@ cache; the fresh-reader round died whole once on a model limit and was
 resumed). After each outage the real worktree's porcelain was verified
 clean and leftover throwaway worktrees were removed before resuming.
 Every number in this ledger post-dates the resumes.
+
+### THE FROZEN STAMP: EXIT=0 at da7b164b36, the gate's bounded form
+Taken 2026-08-29T19:24:26Z to 19:34:25Z, one run, first try, at the QA docs
+tip da7b164b36 (porcelain clean before and after; HEAD unchanged across the
+run; DATABASE_URL confirmed unset; npm test -- --maxWorkers=8; zero vitest
+processes before launch).
+  Test Files  3337 passed | 29 skipped (3366)
+       Tests  50317 passed | 2 expected fail | 452 skipped (50771)
+    Duration  594.87 s
+   SUITE_EXIT 0, zero failing files
+Follow-ons, all clean at this span: npx tsc --noEmit zero diagnostics;
+npm run ci:changed exit 0 after the last commit (1056 files, zero errors,
+no format diffs; warnings are pre-existing debt); wiki:content and i18n:gen
+both byte-clean (porcelain empty after each). The section 9.6 measurement
+was re-run at this exact tip immediately before the freeze and reproduces
+byte-exact (modelled 4.97/5.27, equipped 10.42/10.21).
+DRIFT vs the seventh-sync stamp at 71246dca4e (3337/29 files (3366),
+50314/2/452 (50768)): +0 files, +3 tests, skipped and expected-fail
+unchanged. The +3 are measured, not inferred: tests/r5_envelope_probe.test.ts
+went 3 to 6 (the escalation-mechanism pin, the kit-identity and
+Perfecting-formula weld, the per-lane smoke); every other QA test edit
+extended existing cases in place. The stamp says the tree is green and the
+QA's fixes hold; the envelope verdict stays suspended above, owed to the
+maintainer's rulings.
