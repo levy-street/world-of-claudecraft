@@ -31,6 +31,15 @@ function boundedInt(value: unknown, max: number): number {
   return Math.floor(Math.min(max, Math.max(0, n)));
 }
 
+/** The bound a block's GATING field runs on: only a real finite number opens
+ *  the block. Coercion is deliberately absent here, because `Number(false)` and
+ *  `Number([])` are both 0, so `{ windowMs: false }` would plant a zero-window
+ *  row instead of being dropped. */
+function gatingIntOrNull(value: unknown, max: number): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.floor(Math.min(max, Math.max(0, value)));
+}
+
 /** Same bound, but null / undefined / '' and non-numbers stay null (the
  *  perf_report.ts nullableNumberIn contract). */
 function boundedIntOrNull(value: unknown, max: number): number | null {
@@ -52,10 +61,11 @@ export interface PostRevealLinksBlock {
   baselineLost: boolean;
 }
 
-/** Undefined without a finite windowMs: an empty record is not a window. */
+/** Undefined without a finite NUMERIC windowMs: an empty record is not a
+ *  window, and neither is one whose window is a boolean, a list or a string. */
 export function sanitizePostRevealLinks(value: unknown): PostRevealLinksBlock | undefined {
   if (!isRecord(value)) return undefined;
-  const windowMs = boundedIntOrNull(value.windowMs, WINDOW_MS_MAX);
+  const windowMs = gatingIntOrNull(value.windowMs, WINDOW_MS_MAX);
   if (windowMs === null) return undefined;
   return {
     reveals: boundedInt(value.reveals, REVEALS_MAX),
@@ -78,10 +88,11 @@ export interface BootPhasesBlock {
   prewarmInitialMs: number | null;
 }
 
-/** Undefined without a finite entry root: the client sends null for that. */
+/** Undefined without a finite NUMERIC entry root: the client sends null for
+ *  that, and a non-number is not an entry either. */
 export function sanitizeBootPhases(value: unknown): BootPhasesBlock | undefined {
   if (!isRecord(value)) return undefined;
-  const entryMs = boundedIntOrNull(value.entryMs, PHASE_MS_MAX);
+  const entryMs = gatingIntOrNull(value.entryMs, PHASE_MS_MAX);
   if (entryMs === null) return undefined;
   return {
     entryMs,

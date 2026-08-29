@@ -11,6 +11,21 @@ describe('sanitizePostRevealLinks', () => {
     expect(sanitizePostRevealLinks({ windowMs: '' })).toBeUndefined();
   });
 
+  it('drops a window whose gating field is not a number, coercible or not', () => {
+    // Number(false) and Number([]) are both 0, so a coercing gate would plant a
+    // zero-window row for a payload that carries no window at all.
+    expect(sanitizePostRevealLinks({ windowMs: false })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: true })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: [] })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: [12] })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: '12' })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: null })).toBeUndefined();
+    expect(sanitizePostRevealLinks({ windowMs: Number.NaN })).toBeUndefined();
+    // A real number still opens the block, whatever the rest of it says.
+    expect(sanitizePostRevealLinks({ windowMs: 0 })?.windowMs).toBe(0);
+    expect(sanitizePostRevealLinks({ windowMs: 20_000 })?.windowMs).toBe(20_000);
+  });
+
   it('keeps a well-formed client block verbatim', () => {
     const block = {
       reveals: 1,
@@ -61,6 +76,18 @@ describe('sanitizeBootPhases', () => {
     expect(sanitizeBootPhases({ rendererCtorMs: 5 })).toBeUndefined();
     expect(sanitizeBootPhases({ entryMs: 'soon' })).toBeUndefined();
     expect(sanitizeBootPhases({ entryMs: '' })).toBeUndefined();
+  });
+
+  it('drops a block whose entry root is not a number, coercible or not', () => {
+    expect(sanitizeBootPhases({ entryMs: false })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: true })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: [] })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: [6120] })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: '6120' })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: null })).toBeUndefined();
+    expect(sanitizeBootPhases({ entryMs: Number.NaN })).toBeUndefined();
+    // The non-gating phases keep their coercing bound: only the root gates.
+    expect(sanitizeBootPhases({ entryMs: 6120, rendererCtorMs: '813' })?.rendererCtorMs).toBe(813);
   });
 
   it('keeps the phases, null per unstamped phase, and bounds a hostile span', () => {
