@@ -1,17 +1,24 @@
 # Masterwrought: cross-phase state
 
-Current phase: 15 QA COMPLETE (2026-08-29): PASS on the phase's work, and
-THE ESCALATION HOLDS, verified four independent ways. **R5 IS NOT PROVEN:
-the envelope verdict is SUSPENDED** and the ruling packet is now priced
-and decision-ready for the maintainer: section 3's baseline pool, section
-8.1's gear term (355 hit and the measured lower bound are the FURY lane's;
-the rogue baseline carries exactly 190), the lane-set question
-(enhancement), and the merge-inherited apex-bag tie. The four content
-tunes stand. The record is docs/prd/masterwrought/power-verification.md,
-whose Verdict section states the suspension and what the maintainer owns;
-the Phase 15 ledger and the Phase 15 QA ledger sit at the END of this
-file. Next: the maintainer's rulings; Phase 16 stays gated until they
-land. The header below is the
+Current phase: 16 IN PROGRESS (2026-08-29). **THE R5 GATE IS CLOSED BY
+RULING**: the maintainer delivered all four priced rulings at the Phase 16
+gate (1a keep the baseline pool with the denominator caveat recorded, 2b
+ratify the modelled term as the R5 quantity with the floors stated, 3a
+close on the four measured lanes with enhancement bounded by argument,
+4-amend the rescoped apex-bag pin is final; the verbatim dated rows sit in
+"Maintainer rulings (2026-08-29)" at the END of this file, followed by the
+R5 closure record). Phase 16's STEP 0.5 executed the closure: the section
+9.2 fury and caster rows re-cut from the COMMITTED harness at the closure
+tip, the Verdict flipped from SUSPENDED to CLOSED BY RULING in every home
+(power-verification.md, both Phase 15 ledgers here, progress.md), and the
+probe suite green. The four content tunes stand. The record is
+docs/prd/masterwrought/power-verification.md. Next: Phase 16's arms
+(polish and content surfaces, the phase file as amended 2026-08-29), then
+Phase 16 QA.
+
+Previously: 15 QA COMPLETE (2026-08-29): PASS on the phase's work and THE
+ESCALATION HOLDS, verified four independent ways; the ruling packet priced
+and handed to the maintainer (resolved above). The header below is the
 absorb-era orientation, kept because a fresh session still needs both
 worlds loaded; only the "Current phase" and "Next" lines in it are stale.
 
@@ -20968,6 +20975,12 @@ other defect the phase and its review rounds found is fixed and committed.
 This ledger carries the decisions, the judged list, the frozen stamp and
 the suspension block.
 
+RESOLVED 2026-08-29 (Phase 16 STEP 0.5): both owed definitions were
+delivered at the Phase 16 gate as rulings 1a and 2b (with 3a and 4-amend
+beside them; the verbatim rows sit in "Maintainer rulings (2026-08-29)" at
+the end of this file), and the verdict flipped from SUSPENDED to CLOSED BY
+RULING. The closure record follows the rulings section.
+
 ### STEP 0 (the sync, paid as its own step)
 origin/release/v0.41.0 moved to d3f8bae369 (PR #3728) during the Phase 14
 QA and was merged here as c78a9e962f. The release-merge audit ran on that
@@ -21440,6 +21453,12 @@ and none is invalidated by this: what fails is the measurement they were sized
 against, not the tunes. Every other defect this round found is fixed and
 committed, and none of those fixes depends on how the ruling above lands.
 
+RESOLVED 2026-08-29 (Phase 16 STEP 0.5): the rulings above landed as 1a and
+2b (with 3a on the lane set and 4-amend on the apex bag), the suspension is
+lifted, and the verdict is CLOSED BY RULING. The verbatim ruling rows and
+the closure record sit at the end of this file; power-verification.md's
+Verdict section carries the flip.
+
 ### THE FROZEN STAMP: EXIT=0 at e611b0639d, the gate's bounded form
 Taken 2026-08-29T12:38:33Z to 12:48:32Z, one run, first try, at the phase
 tip e611b0639d (porcelain clean before and after; HEAD unchanged across the
@@ -21482,7 +21501,9 @@ NOTE ON WHAT THIS STAMP DOES AND DOES NOT SAY. It says the tree is green and
 the record's defects are fixed. It does NOT close the phase: the envelope
 verdict is suspended above, and no suite can settle it, because what is in
 question is which quantity the measurement should compute, not whether the
-tree passes its pins.
+tree passes its pins. (Resolved 2026-08-29: ruling 2b settled which quantity,
+and the verdict is CLOSED BY RULING; see the sections at the end of this
+file.)
 
 ## Phase 15 QA ledger (2026-08-29, verify the escalation)
 
@@ -21491,6 +21512,14 @@ verified the escalation rather than a verdict (the dated Amendments in
 phase-15-qa.md record the re-scope; the envelope itself stays the
 maintainer's to rule on). Everything the audit found is applied or recorded;
 follow-ups were CUT-or-fixed, none deferred.
+
+RESOLVED 2026-08-29 (Phase 16 STEP 0.5): the priced ruling packet this QA
+handed to the maintainer came back ratified the same day (1a, 2b, 3a,
+4-amend; verbatim rows and the closure record at the end of this file),
+and the envelope verdict flipped from SUSPENDED to CLOSED BY RULING. The
+deliberately-stale 9.2 rows this ledger's judged item 3 parked were re-cut
+from the committed harness as part of the closure, exactly as that item
+anticipated.
 
 ### STEP 0 (paid before the QA started)
 The seventh v0.41.0 sync (release tip e19d832b47, merge 720fd90168, pins
@@ -21673,7 +21702,8 @@ went 3 to 6 (the escalation-mechanism pin, the kit-identity and
 Perfecting-formula weld, the per-lane smoke); every other QA test edit
 extended existing cases in place. The stamp says the tree is green and the
 QA's fixes hold; the envelope verdict stays suspended above, owed to the
-maintainer's rulings.
+maintainer's rulings. (Resolved 2026-08-29: the rulings landed and the
+verdict is CLOSED BY RULING; see the sections below.)
 
 ## Maintainer rulings (2026-08-29): the R5 packet, RATIFIED
 
@@ -21719,3 +21749,56 @@ progress.md), and re-run the probe suite. Ruling 4-amend executes inline
 (doc record only; the pin already carries the final shape). The R5-surface
 stop rules relax only to this exact extent; everything the rulings do not
 name stays frozen.
+
+## R5 closure record (2026-08-29, Phase 16 STEP 0.5)
+
+EXECUTED the same day the rulings landed. The inventory:
+
+1. THE RE-CUT, all from the committed harness `scripts/r5_envelope_probe.ts`
+   at the closure tip, never a mid-span capture
+   (record-cells-need-committed-tip-remeasure):
+   - fury, the recorded sample (60 seeds at 600 s, the fury command with no
+     WOC_R5_ARMS): gear +0.53 / +1.14, gear+ench +0.64 / +2.00, FULL
+     **+4.60 +/-0.91** heroic and **+5.76 +/-0.90** S-rift (equipped
+     +9.33 / +10.39 printed by the same run); the 180 s 60-seed twins
+     +4.82 / +5.36; the 25-seed 180 s pair +4.17 / +5.25.
+   - caster, the default run: FULL +4.90 / +4.93 / +4.74 / +4.63; apex
+     chest equipped +2.53 / +2.53 / +2.41 / +2.36; gear and gear+ench
+     columns as printed in 9.2.
+   - the 9.4 coupling row, WOC_R5_SECONDS=300: +7.67 heroic (base falls
+     101.11 to 81.34, the starvation visible), retiring the mid-span +8.3.
+   - CONTROLS, all byte-reproduced at this tip: every rogue cell (all three
+     specs, both targets, all three columns), the whole 9.5 tank table, and
+     the section 9.6 escalation pair (modelled 4.97/5.27, equipped
+     10.42/10.21), so the committed harness at this tip prints the record's
+     deterministic and previously-reproducible cells exactly.
+   - the 300-seed precision pair at 600 s reads +5.06 / +5.24, +/-0.40 each
+     (the Phase 15 QA's committed-harness re-run, byte-reproduced again at
+     the closure tip by a fresh 300-seed run of the same invocation).
+2. THE FLIP, every home: power-verification.md (Verdict rewritten to CLOSED
+   BY RULING with the suspension kept as dated HISTORY; sections 3, 8.1 and
+   9.3 carry the dated ruling paragraphs; 9.1, 9.2, 9.4, 9.6 re-cut or
+   trued), this file (header, Phase 15 ledger STATUS, the suspension
+   block's tail, Phase 15 QA ledger STATUS and stamp tail), progress.md
+   (row 15 cell, both Phase 15 section tails, the R5 closure entry), the
+   probe's own file header, and the two stale test comments
+   (tests/masterwrought_budget.test.ts flask rationale,
+   tests/r5_envelope_probe.test.ts escalation-driver note).
+3. RULING 4-AMEND, executed as a record only: the strictly-largest-bag
+   position is amended to the merged-tree shape; the rescoped
+   no-general-bag-exceeds arm plus the named tie set in
+   tests/masterwrought_budget.test.ts is FINAL, sunspun_haversack keeps
+   bagSlots 16, and the release-side bestBoostBag / community-template
+   effect stands. No def, pin, wiki, or i18n change.
+4. WHAT DID NOT MOVE, per the stop rules: no magnitude, no def, no envelope
+   number, no probe logic (the harness's only edit is its header comment),
+   no pin semantics; craftBonusStatsFor, the per-slot tripwires,
+   masterwork.ts, the sim Perfecting arms and the equip cap untouched.
+5. THE HONEST VERDICT SENTENCE, mirrored from the record: the closure is
+   SETTLED BY RATIFICATION, not by a demonstrated bound; the binding fury
+   lane's recorded sample is inside at heroic and above the nominal 5 at
+   S-rift (5.76 +/-0.90), the tightest committed estimate (300 seeds) sits
+   AT the line (5.06 / 5.24), and both ratified caveats frame it (floors
+   per 2b; the roughly-3-percent-weak denominator per 1a). The four tunes
+   stand. Validation: tests/r5_envelope_probe.test.ts and
+   tests/masterwrought_budget.test.ts green at the closure tip, tsc clean.

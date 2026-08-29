@@ -914,6 +914,9 @@ therefore reads flask 13 plus food 6 for NINETEEN on the shipped tree; the 21 is
 pre-Phase-15 number. Record: `power-verification.md` and the Phase 15 ledger in `state.md`.
 FINAL 2026-08-28: the phase then ESCALATED under the phase file's own stopping rule; the
 R5 verdict is SUSPENDED (power-verification.md Verdict, state.md Phase 15 ledger).
+RESOLVED 2026-08-29: the maintainer ratified all four priced rulings at the Phase 16 gate
+(1a, 2b, 3a, 4-amend) and the verdict is CLOSED BY RULING; Phase 16's STEP 0.5 executed
+the closure (state.md, "Maintainer rulings (2026-08-29)" and the R5 closure record).
 
 ## Phase 16: Polish and content surfaces (ultracode sweep)
 

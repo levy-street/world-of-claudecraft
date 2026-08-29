@@ -329,3 +329,38 @@ so nothing else forces the extraction.
       moved at the 2026-08-29 sync).
 Both lines are also exit criteria for this phase: it does not pass with either
 row still above its parent pin.
+
+### Amendments (2026-08-29, the gate resolution)
+
+- The base prompt's "Out of scope: any balance or content number (phase 15
+  sealed them)" premise was STALE as written. Phase 15 did not seal them: it
+  escalated under its own stopping rule, the R5 verdict went SUSPENDED, and
+  the Phase 15 QA (complete 2026-08-29, PASS, the escalation verified four
+  independent ways) priced four maintainer decisions. The out-of-scope line
+  is re-read as: no balance or content number moves EXCEPT to the exact
+  extent the maintainer's rulings direct.
+- The maintainer delivered all four rulings at this phase's gate
+  (2026-08-29), recorded verbatim in state.md, "Maintainer rulings
+  (2026-08-29)": RULING 1 = 1a (keep the baseline pool, record the
+  denominator caveat), RULING 2 = 2b (ratify the modelled term as the R5
+  quantity, floors stated), RULING 3 = 3a (the lane set closes on the four
+  measured lanes, enhancement bounded by argument), RULING 4 = 4-amend (the
+  rescoped apex-bag pin in tests/masterwrought_budget.test.ts is final).
+- STEP 0.5, THE R5 CLOSURE, ran before the phase's arms as the rulings'
+  doc-and-probe branch: the pool caveat stated in section 3, the modelled
+  term ratified in section 8.1 with the Verdict's own acceptance, the
+  deliberately-stale 9.2 fury and caster rows re-cut from the COMMITTED
+  harness at the closure tip (never a mid-span capture), the Verdict flipped
+  from SUSPENDED to CLOSED BY RULING in every home (power-verification.md,
+  state.md header and both Phase 15 ledgers, progress.md), and the probe
+  suite re-run green. Ruling 4-amend executed as a record only: no def, pin,
+  or wiki change, since the rescoped arm already carries the final shape.
+- STEP 0's release sync was a recorded NO-OP: origin/release/v0.41.0
+  unmoved at e19d832b47 and already an ancestor of HEAD, so no merge, no
+  release-merge-audit, and the monolith payback targets stand exactly as
+  the seventh-sync arithmetic moved them (renderer.ts 13333, online.ts
+  5942).
+- The R5-surface stop rules RELAX only to the exact extent the four rulings
+  direct. Everything they do not name stays frozen: no other magnitude, no
+  envelope change, no touching craftBonusStatsFor, the per-slot tripwires,
+  masterwork.ts, the sim Perfecting arms, or the equip cap.

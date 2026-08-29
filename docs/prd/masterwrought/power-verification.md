@@ -17,92 +17,85 @@ column (section 12.3 defines it).
 
 ## Verdict
 
-**SUSPENDED. The envelope question is RE-OPENED and this phase does not close
-it.** A fresh reader's adversarial pass found, and this document's own harness
-then confirmed, that the gear term measures a STAT MODEL of the kit rather than
-the kit. On the FURY lane, the one measured, that model is a LOWER bound, not
-the upper bound section 8.1 claims, and correcting it takes the binding lane
-from just over the line to roughly twice it. The rogue lane's equipped arm is
-UNMEASURED and its hit arithmetic differs, so its expected sign is at or below
-its modelled row. Section 9.6 carries the measurement, the mechanism and the
-rogue scoping.
+**CLOSED BY RULING (2026-08-29).** The maintainer delivered all four priced
+rulings at the Phase 16 gate (the verbatim dated rows: state.md, "Maintainer
+rulings (2026-08-29)"): the baseline pool stands as written with its
+denominator caveat on the record (ruling 1a, section 3); the modelled
+"+2 lead-stat points" term is RATIFIED as the R5 quantity, its published
+percentages stated as floors (ruling 2b, section 8.1); R5 closes on the four
+measured lanes with enhancement bounded by argument (ruling 3a, section
+9.3); and the merge-inherited apex-bag tie is resolved by amending the
+strictly-best position (ruling 4-amend: the rescoped no-general-bag-exceeds
+arm plus the named tie set in `tests/masterwrought_budget.test.ts` is
+final). The envelope question this Verdict re-opened on 2026-08-28 is
+thereby SETTLED BY RATIFICATION, not by a demonstrated bound: the ratified
+quantity is a floor, an at-most bound cannot be verified from floors, and
+the maintainer accepts the measured record below, together with section
+9.6's equipped-kit measurement (roughly twice the envelope on the binding
+fury lane), as the closure. The four downward content tunes stand.
 
-The verdict this phase originally reached, and which no longer stands as
-written, was "INSIDE the envelope on every measured kit and both protected
-targets, after four downward content tunes". The four tunes are all genuinely
-downward and all still correct; what fails is the measurement they were sized
-against, so the tunes are kept and the conclusion is withdrawn.
-
-WHAT THE MAINTAINER OWNS, because both are ratified definitions this phase may
-not rewrite on its own:
-
-1. **Section 3's baseline pool.** `bestEpicGearFor` filters class-legally
-   (`canEquipItemInSlot`) but SCORES by raw stat SUM, class-agnostically and
-   rating-blind (ratings and spellPower score zero, armor counts), so the two
-   physical baselines carry two rings worth zero attack power, and the fury
-   baseline carries 355 hit rating against a need of 190 or 260 (the rogue
-   baseline carries 190, exactly the heroic need). Section 3 calls the pool
-   "best-in-slot" and names only the legendary exclusion as its conservatism.
-   Either the pool rule changes to mean throughput-optimal, or the record says
-   the physical denominators are roughly 3 percent under a hand-optimised kit.
-   The +7.69 / +6.44 percent readings behind that second option are a
-   non-reproducible throwaway measurement (the adversarial reader's AP-correct
-   baseline was never committed as an arm), so the maintainer prices the
-   second option with that uncertainty on the record.
-2. **Section 8.1's gear term.** "+2 lead-stat points" excludes the apex pieces'
-   rating lines, which on a hit-capped physical baseline are the larger term.
-   Either the gear term becomes an item swap on every lane, as the tank arm and
-   the two new equipped arms already do, or the record states plainly that the
-   published percentages exclude apex rating deltas and are therefore floors.
-   The piece-choice rule for the item-swap option: the equipped arm is the
-   throughput argmax over class-legal kits wearing at most
-   `MASTERWROUGHT_EQUIP_CAP` flagged pieces (what a player optimises); under
-   it the caster arm equips the chest alone, and the fury pair must be
-   established by measurement rather than asserted: the phase's arithmetic
-   pick is `forgefold_legguards` plus `warhewn_signet`, but
-   `spiritweld_girdle` and `wardspeaker_sabatons` are class-free mail
-   offering the same dead-hit-to-live-rating conversion at the cost of a
-   strength line, and neither is measured. Note that the floors reading does not by itself close R5: an
-   at-most bound cannot be verified from floors, so taking this arm means
-   ratifying the modelled term as the R5 quantity and accepting on the record
-   that the equipped kit moves the binding lane roughly twice the envelope.
-
-Both readings re-open R5 rather than settling it, which is why this is an
-escalation and not an in-phase re-tune.
-
-A latent third decision rides beside those two: whether R5 closes on the four
-measured lanes with enhancement bounded by argument (section 9.3), or requires
-an enhancement lane once the baseline pool is settled. The lane is roughly a
-day of work: the harness fixture and `scripts/owned_class_balance_probe.ts`'s
-enhancement rotation are reusable; only the baseline list is missing.
+The table below is the ratified quantity, RE-CUT 2026-08-29 from the
+committed harness at the closure tip (the section 9.2 re-cut; every cell
+reproduces from `scripts/r5_envelope_probe.ts` at the documented
+invocations):
 
 | lane | heroic raid, level 22 | S-rift, level 23 |
 |---|---|---|
 | rogue, combat | +3.28% | +3.22% |
 | rogue, assassination | +3.79% | +3.86% |
 | rogue, subtlety | +3.78% | +3.79% |
-| warrior, fury (the tight lane) | **+4.94% +/-0.96** | **+4.50% +/-0.94** |
-| caster, 60 s burst profile | +4.55% | +4.58% |
-| caster, 180 s sustained profile | +5.06% +/-3.03 | +4.75% +/-4.17 |
-| caster, apex chest actually equipped, 60 s | +2.54% | +2.43% |
+| warrior, fury (the binding lane) | **+4.60% +/-0.91** | **+5.76% +/-0.90** |
+| caster, 60 s burst profile | +4.90% | +4.74% |
+| caster, 180 s sustained profile | +4.93% +/-0.26 | +4.63% +/-0.25 |
+| caster, apex chest actually equipped, 60 s | +2.53% | +2.41% |
 | tank, effective health | +4.28% | +4.27% |
 
-The warrior-fury row is the binding one and is the tightest measurement in the
-table (60 seeds, 600 s, standard error under half a point). Read it honestly:
-its central estimate is inside at both targets and its 2-standard-error interval
-STRADDLES the line ([3.98, 5.90] at heroic, [3.56, 5.44] at S-rift). What the
-measurement establishes is a central estimate inside the envelope, not a
-demonstrated crossing, and the flask trim in section 10.4 is a conservative
-margin rather than a proof that 15 was outside and 13 is inside. The caster's
-180 s row is the only central estimate that touches the line; it is the
-resource-bound reading and section 9.4 says why it is reported rather than tuned
-against.
+Read the binding row honestly. At the recorded sample (60 seeds, 600 s) its
+central estimate is INSIDE the envelope at heroic (2-standard-error interval
+[3.69, 5.51]) and ABOVE the nominal 5 at S-rift (interval [4.86, 6.66]); the
+300-seed precision pair at 600 s reads **+5.06% / +5.24%** (+/-0.40 each,
+byte-reproduced at the closure tip), the tightest
+committed estimate of the lane, sitting AT the line; and resolving 5.0 from
+5.2 on this lane needs roughly 1200 seeds at 600 s, so what the sample
+establishes is proximity to the line, not a crossing in either direction.
+Two ratified caveats frame those numbers, both stated by the rulings: the
+percentages are FLOORS that exclude the apex rating deltas (ruling 2b), and
+they are measured against the ratified raw-stat-sum pool, which the record
+states runs roughly 3 percent under a hand-optimised kit on the physical
+lanes (ruling 1a), so the premium over an optimised denominator reads lower
+than printed (the size of that margin rests on the non-reproducible
+throwaway readings ruling 1a prices with their uncertainty on the record).
+Every other measured lane's central estimate
+is inside the envelope at both targets. The caster's 180 s row is
+mana-stable and reads with its 60 s twin; the mana-bound coupling begins
+past 180 s (section 9.4). The flask trim in section 10.4 remains a
+conservative margin rather than a proof that 15 was outside and 13 is
+inside.
 
 Before the tunes the same fixtures read **+5.86% / +6.08%** on warrior fury and
 **+6.24%** on tank effective health, both outside the envelope.
 
-Every percentage in the table above is the MODELLED kit, and section 9.6 shows
-what the modelled term omits. Read them as floors, not as the envelope.
+Every percentage in the table above is the MODELLED kit, the ratified R5
+quantity: a floor, not the equipped premium. Section 9.6 carries what the
+modelled term omits, measured (fury equipped +10.42 / +10.21 against
+modelled +4.97 / +5.27 at 60 seeds, 300 s), kept on the record as the
+acceptance ruling 2b names.
+
+HISTORY, kept for the trail. On 2026-08-28 this Verdict was **SUSPENDED**
+and the envelope question RE-OPENED: a fresh reader's adversarial pass
+found, and this document's own harness then confirmed, that the gear term
+measures a STAT MODEL of the kit rather than the kit, and on the measured
+fury lane the model is a LOWER bound rather than the claimed upper one
+(section 9.6 carries the measurement, the mechanism and the rogue scoping),
+so the phase escalated under its own stopping rule instead of closing. The
+verdict the phase had originally reached, "INSIDE the envelope on every
+measured kit and both protected targets, after four downward content
+tunes", was withdrawn as written. The Phase 15 QA (2026-08-29) verified the
+escalation four independent ways and priced the two owed definitions, the
+lane-set question and the apex-bag tie; the full pricing text (including
+the item-swap arm's piece-choice rule and its unmeasured class-free mail
+alternates, `spiritweld_girdle` and `wardspeaker_sabatons`) is preserved in
+state.md's "WHAT THE MAINTAINER OWNS" mirror and this file's git history.
 
 ## 1. What R5 measures, and what it does not
 
@@ -156,8 +149,10 @@ the downward-refusal arm in the same file's "flasks: one at a time" block.
 R5's baseline is "pre-packet raid BiS". That phrase resolves to three materially
 different numbers in the neck slot alone, so this document fixes it:
 
-> **The baseline pool is PvE, class-equippable, best-in-slot (this phrase is
-> under Verdict item 1's ruling), with the 17 masterwrought-flagged defs
+> **The baseline pool is PvE, class-equippable, best-in-slot (this phrase was
+> under Verdict item 1's ruling; RATIFIED as written 2026-08-29, ruling 1a,
+> with the denominator caveat recorded below), with the 17
+> masterwrought-flagged defs
 > removed. The three THROUGHPUT lanes take the repo's maintained EPIC-ONLY
 > pickers; the derived TANK arm additionally takes legendaries and held
 > offhands.**
@@ -166,6 +161,20 @@ QA note (the Phase 15 QA, 2026-08-29): the caster lane's maintained set is not
 epic-only. `WARLOCK_FULL_BIS_GEAR` carries the LEGENDARY mainhand
 `heroic_deathless_heartwood`, a STRONGER denominator, so the caster rows read
 lower than an epic-only pool would print, which is the safe direction.
+
+RULING 1a, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
+dated row is in state.md, "Maintainer rulings"): the pool rule above STANDS
+AS WRITTEN. `bestEpicGearFor`'s raw-stat-sum scoring (class-agnostic and
+rating-blind: ratings and spellPower score zero, armor counts) remains the
+R5 baseline definition, and THE CAVEAT IS THE RECORD: the physical
+denominators are roughly 3 percent under a hand-optimised kit (the two
+physical baselines carry two rings worth zero attack power, and the fury
+baseline carries 355 hit against a need of 190 or 260). The +7.69 / +6.44
+percent readings behind that figure are a non-reproducible throwaway
+measurement (the AP-correct baseline was never committed as an arm) and are
+priced with that uncertainty. The caveat cuts in the packet's favour when
+reading the table: a throughput-correct denominator is stronger, so every
+published percentage would read LOWER against it, never higher.
 
 The split is stated rather than assumed because the two readings differ by 20
 stat points in the neck slot alone. The throughput loadouts are
@@ -419,6 +428,18 @@ expected sign is at or below the modelled row), so read the rest of this
 subsection with that correction in front of it.** The reasoning below was written before that was
 measured and is kept because it is still right about the caster.
 
+RULING 2b, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
+dated row is in state.md, "Maintainer rulings"): the modelled "+2 lead-stat
+points" term IS the R5 quantity. The record states plainly that the
+published percentages EXCLUDE the apex pieces' rating deltas and are
+therefore FLOORS, and the maintainer accepts on the record, per the
+Verdict's own pricing of this arm, that an at-most bound cannot be verified
+from floors and that the equipped fury kit moves the binding lane roughly
+twice the envelope (section 9.6's 10.42 / 10.21 against modelled
+4.97 / 5.27). The gear term does NOT become an item swap on any lane; the
+three item-swapping arms (tank, maximal caster, fury equipped) remain
+reported evidence beside the ratified quantity, not the quantity itself.
+
 It is claimed as an upper bound in two ways: a
 character whose baseline in a slot is a legendary gains nothing there (the apex
 weapon is 20 to 25 points behind a legendary one, and `heart_of_the_rift` is 17
@@ -499,14 +520,21 @@ than the others and a single default run would print a different fury row:
 
     npx tsx scripts/r5_envelope_probe.ts                       # rogue, caster, tank
     WOC_R5_SEEDS=60 WOC_R5_SECONDS=600 \
-      WOC_R5_ARMS=FULL npx tsx scripts/r5_envelope_probe.ts fury   # the binding row
+      npx tsx scripts/r5_envelope_probe.ts fury                # the binding row
+
+The binding-row command runs WITHOUT `WOC_R5_ARMS`, so it prints the fury
+gear and gear+ench columns and the equipped aside alongside FULL (the
+2026-08-29 re-cut took all four fury cells from that one command;
+`WOC_R5_ARMS` remains available for a precision pass on one arm, e.g.
+`WOC_R5_ARMS=FULL` at 300 seeds).
 
 `WOC_R5_SEEDS`, `WOC_R5_SECONDS` and `WOC_R5_ARMS` override the sample and
 restrict which kit arms run. The binding-row invocation's 60 seeds at 600 s is
-the recorded sample, and the two now agree; keep the documented invocation and
-the recorded sample identical at the post-ruling re-cut. The fury gear and
-gear+ench cells predate the harness like the rest of the stale fury row; a
-re-cut takes them from the same command without `WOC_R5_ARMS`. Its constants (`HEROIC_TARGET`,
+the recorded sample, and the documented invocation and the recorded sample
+were kept identical at the post-ruling re-cut (executed 2026-08-29, the R5
+closure: the fury row including its gear and gear+ench cells was taken from
+the fury command above run WITHOUT `WOC_R5_ARMS`, and the rogue, caster and
+tank rows from the default run). Its constants (`HEROIC_TARGET`,
 `SRIFT_TARGET`, the baseline loadouts, the enchant maps, the kit deltas) are
 the section-3 and section-8 tables in executable form, and the enchant and
 consumable deltas are READ from the catalog rather than written as literals,
@@ -542,49 +570,48 @@ rating line or armour rather than a lead primary.
 
 ### 9.2 Results
 
-> **STALE AGAINST THE COMMITTED HARNESS, and deliberately not refreshed.** The
-> fury and caster rows below predate `scripts/r5_envelope_probe.ts` and do not
-> reproduce from it. Measured from the committed harness (the Phase 15 QA,
-> 2026-08-29, both fury pairs at 600 s), fury reads 4.60 / 5.76 at 60 seeds
-> and 5.06 / 5.24 at 300 seeds, against the 4.94 / 4.50 printed here (the
-> first capture quoted 4.55 for the 60-seed heroic cell; that figure predated
-> the final harness commits, and the 300-seed pair reproduces exactly), and
-> caster reads 4.90 / 4.93 / 4.74 / 4.63 against the 4.55 / 5.06 / 4.58 /
-> 4.75 printed here (the four caster figures likewise re-measured; the first
-> capture's 4.92 and 4.75 predated the final harness commits). Three causes, all now understood: the caster figures
-> were taken at 10 seeds while this section claimed 25; the harness's first
-> version refilled the player's resource, which handed a fury warrior 100 rage
-> it must earn; and its error bars were computed unpaired on a paired design,
-> which inflated the rogue and caster intervals about 35-fold. All three are
-> fixed in the harness. The TABLE is left as measured rather than refreshed
-> because section 9.6 shows the quantity itself is under a maintainer ruling:
-> refreshing a modelled number now would have to be redone once the gear term
-> is settled. **Read every row here as a floor from a superseded fixture.**
-> The rogue rows and the whole of 9.5 do reproduce exactly (the assassination
-> heroic cell read +3.78 from an intermediate harness state; the Phase 15 QA
-> corrected it to the committed +3.79, 2026-08-29).
+> **RE-CUT 2026-08-29 FROM THE COMMITTED HARNESS** (Phase 16 STEP 0.5, the
+> R5 closure, under ruling 2b; the refresh this blockquote's earlier form
+> deliberately deferred pending that ruling). Every fury and caster cell
+> below now REPRODUCES from `scripts/r5_envelope_probe.ts` at the
+> documented invocations (fury: 60 seeds at 600 s; everything else: the
+> default run), measured at the closure tip, never a mid-span capture. The
+> superseded-fixture figures this table carried until the re-cut (fury
+> 4.94 / 4.50, caster 4.55 / 5.06 / 4.58 / 4.75, and their gear columns),
+> and the three understood causes of their staleness (caster figures taken
+> at 10 seeds while the section claimed 25; a first-version resource refill
+> handing a fury warrior 100 rage it must earn; unpaired error bars on a
+> paired design inflating the rogue and caster intervals about 35-fold, all
+> three fixed in the committed harness), are preserved in this file's git
+> history and the Phase 15 ledgers. The rogue rows and the whole of 9.5
+> reproduced unchanged throughout (the assassination heroic cell read +3.78
+> from an intermediate harness state; the Phase 15 QA corrected it to the
+> committed +3.79, 2026-08-29). The fury gear and gear+enchant columns sit
+> inside their own noise at this sample (bars near +/-0.8 on centrals at or
+> under 2 points, per-seed spreads over 10 points) and are reported as
+> printed.
 
 Rogue: 25 seeds, 180 s. Caster: 25 seeds, at both the 60 s burst and the 180 s
 sustained profile. Warrior fury: 60 seeds, at both 180 s and 600 s. Error bars
-are 2 standard errors on the difference.
+are 2 standard errors on the paired difference.
 
 | lane | target | gear | gear + enchant | FULL KIT |
 |---|---|---|---|---|
 | rogue, combat | heroic | +0.28% | +0.76% | **+3.28%** |
 | rogue, assassination | heroic | +0.37% | +0.82% | **+3.79%** |
 | rogue, subtlety | heroic | +0.48% | +0.91% | **+3.78%** |
-| warrior, fury | heroic | +1.25% | +2.15% | **+4.94% +/-0.96** |
-| caster, 60 s | heroic | +0.57% | +1.06% | **+4.55%** |
-| caster, 180 s | heroic | +0.50% | +1.11% | **+5.06% +/-3.03** |
-| caster, 60 s, apex chest equipped | heroic | (item swap) | (item swap) | **+2.54%** |
+| warrior, fury | heroic | +0.53% | +0.64% | **+4.60% +/-0.91** |
+| caster, 60 s | heroic | +0.50% | +1.00% | **+4.90%** |
+| caster, 180 s | heroic | +0.49% | +1.03% | **+4.93% +/-0.26** |
+| caster, 60 s, apex chest equipped | heroic | (item swap) | (item swap) | **+2.53%** |
 | caster, 180 s, apex chest equipped | heroic | (item swap) | (item swap) | **+2.53%** |
 | rogue, combat | S-rift | +0.24% | +0.69% | **+3.22%** |
 | rogue, assassination | S-rift | +0.44% | +0.92% | **+3.86%** |
 | rogue, subtlety | S-rift | +0.44% | +0.89% | **+3.79%** |
-| warrior, fury | S-rift | +0.84% | +2.31% | **+4.50% +/-0.94** |
-| caster, 60 s | S-rift | +0.39% | +1.06% | **+4.58%** |
-| caster, 180 s | S-rift | +0.39% | +0.95% | **+4.75% +/-4.17** |
-| caster, 60 s, apex chest equipped | S-rift | (item swap) | (item swap) | **+2.43%** |
+| warrior, fury | S-rift | +1.14% | +2.00% | **+5.76% +/-0.90** |
+| caster, 60 s | S-rift | +0.44% | +1.00% | **+4.74%** |
+| caster, 180 s | S-rift | +0.47% | +0.99% | **+4.63% +/-0.25** |
+| caster, 60 s, apex chest equipped | S-rift | (item swap) | (item swap) | **+2.41%** |
 | caster, 180 s, apex chest equipped | S-rift | (item swap) | (item swap) | **+2.36%** |
 
 The two "apex chest equipped" rows are the MAXIMAL caster loadout and the only
@@ -601,11 +628,15 @@ is correspondingly weaker and the tree maintains no such BiS set to measure
 against; the effect is bounded by the +2.00 percent a 40-haste line is worth at
 either target.
 
-The fury FULL figures are the 600 s, 60-seed runs (base 167.82 to kit 176.10 at
-heroic; base 151.93 to kit 158.77 at S-rift). Its 180 s, 60-seed twins read
-+4.21% and +4.97%, and its 25-seed 180 s runs read +5.65% and +5.94%: the same
-lane, three sample sizes, converging as the samples grow. The 600 s row is the
-authority because within-fight variance falls with the fight length.
+The fury FULL figures are the 600 s, 60-seed runs (base 168.35 at heroic,
+base 151.18 at S-rift; all re-cut 2026-08-29 from the committed harness).
+Its 180 s, 60-seed twins read +4.82% and +5.36%, and its 25-seed 180 s runs
+read +4.17% and +5.25%: the same lane, three sample sizes, every draw within
+a point of the recorded row. The 600 s row is the recorded sample because
+within-fight variance falls with the fight length; the 300-seed precision
+pair at 600 s reads **+5.06% / +5.24%** (+/-0.40 each, byte-reproduced at
+the closure tip), the tightest committed estimate of
+the binding lane and the pair the Verdict reads beside the recorded row.
 
 ### 9.3 Why fury is the binding lane, and the one lane not measured
 
@@ -629,9 +660,19 @@ supporting this section's transfer argument. The realisable S-rift kit read
 epic-only baseline via `duskforged_warblade`'s crit-for-hit twin mechanism,
 but +2.87 against a hit-corrected pre-packet baseline that itself beats the
 maintained fixture by +2.56 percent, so the lane's envelope answer inverts on
-the section 3 pool choice alone, which is Verdict item 1's ruling. These are
+the section 3 pool choice alone, which was the pool ruling's question
+(settled 2026-08-29 as ruling 1a). These are
 QA-run throwaway numbers, with the same non-reproducibility caveat as the
 7.69 / 6.44 figures.
+
+RULING 3a, RATIFIED 2026-08-29 (the maintainer, at the Phase 16 gate; the
+dated row is in state.md, "Maintainer rulings"): R5 CLOSES ON THE FOUR
+MEASURED LANES. Enhancement stays bounded by this section's transfer
+argument plus the QA addendum above (the modelled kit measured inside and
+below fury; the realisable-kit inversion rides the pool question ruling 1a
+settled), and no committed enhancement lane is added. The lane remains
+re-derivable in about a day from the named committed parts if a future
+pass wants it measured.
 
 
 Fury is the highest-throughput physical spec, it dual-wields (so it pays the
@@ -642,16 +683,23 @@ real coupling, not a fixture artefact: it is also why the analytic white-damage
 bound (+5.3% before the tunes) under-predicted the measured total (+5.9%) on this
 lane while over-predicting it on every other one.
 
-### 9.4 Why the caster's 180 s row is reported and not tuned against
+### 9.4 The caster's mana coupling, and why a mana-bound profile is not a gate
 
 A level-20 mage has no mana-free filler: every ability in its book costs mana.
-So a 180 s single-target fixture is mana-bound by construction even with mana
-potions on both arms, and the framework's own balancing rule 7 ("a correct
-continuous rotation neither starves indefinitely") disqualifies a starving
-fixture as a parity gate. Intellect buys the mana pool as well as spell power, so
-in the mana-bound regime the kit gains twice and the reading rises: the same lane
-reads +4.55% at 60 s, +5.06% at 180 s, and (measured while diagnosing this) +8.3%
-at 300 s. The mana-stable reading is the throughput number; the mana-bound one is
+With mana potions on both arms the committed fixture stays mana-stable
+through 180 s (the 180 s base holds the 60 s rate, 101.11 against 100.60),
+which is why the re-cut 180 s row reads with its 60 s twin (+4.93 against
++4.90 at heroic); the superseded fixture had read the 180 s profile
+noticeably higher, which is what this section's earlier form explained.
+Past 180 s the fixture starves by construction, and the framework's own
+balancing rule 7 ("a correct continuous rotation neither starves
+indefinitely") disqualifies a starving fixture as a parity gate. Intellect
+buys the mana pool as well as spell power, so in the mana-bound regime the
+kit gains twice and the reading rises: re-cut 2026-08-29 from the committed
+harness, the same lane reads +4.90% at 60 s, +4.93% at 180 s, and +7.67% at
+300 s (base 81.34 at 300 s against 101.11 at 180 s, the starvation made
+visible; the earlier mid-span diagnostic capture had read +8.3%). The
+mana-stable readings are the throughput numbers; the mana-bound one is
 recorded so the coupling is visible.
 
 ### 9.5 The tank effective-health arm
@@ -703,7 +751,8 @@ Before this phase's shield tune the same arm read **+6.24%**, most of it armour.
 ### 9.6 What the modelled gear term omits, measured
 
 The gear term everywhere above is "+2 lead-stat points" (section 8.1), applied
-as an instance stat delta. Section 8.1 calls that an upper bound. On the FURY
+as an instance stat delta. Section 8.1 claimed that as an upper bound before
+the 2026-08-29 ruling ratified it as a floor. On the FURY
 lane it is a measured lower bound, and the gap is larger than the envelope.
 The rogue lane's equipped arm is UNMEASURED and its hit arithmetic differs:
 the rogue baseline carries exactly 190 hit rating, at the heroic cap with zero
@@ -734,8 +783,10 @@ piece" model scores as ZERO, because Perfecting moves primary stats only.
 
 **Measured**, same fixture, same seeds, same consumables, 60 seeds at 300 s,
 the only difference being whether the two Perfected pieces this arm equips
-(the phase's arithmetic pick, `forgefold_legguards` and `warhewn_signet`; the
-Verdict's piece-choice note names the unmeasured alternates) are applied as a
+(the phase's arithmetic pick, `forgefold_legguards` and `warhewn_signet`;
+the not-taken item-swap arm's piece-choice note, preserved in state.md's
+ruling mirror, named `spiritweld_girdle` and `wardspeaker_sabatons` as the
+unmeasured class-free mail alternates) are applied as a
 stat delta or EQUIPPED as items:
 
 | arm | heroic raid, L22 | S-rift, L23 |
@@ -754,9 +805,11 @@ The adversarial reader who first raised this measured +7.69 and +6.44 percent
 against an attack-power-correct baseline (a throwaway measurement: that
 baseline was never committed as an arm, so the two figures are not
 reproducible from the harness). Every reading, on every baseline
-tried, is above 5. That is why the verdict is suspended rather than restated
-with a new number: which baseline is correct is section 3's ruling to make, not
-this section's.
+tried, is above 5. That is why the 2026-08-28 verdict was suspended rather
+than restated with a new number: which baseline is correct was section 3's
+ruling to make, not this section's, and ruling 1a (2026-08-29) made it by
+keeping the pool with the caveat on record. This measurement stays on the
+record as the acceptance ruling 2b names.
 
 Note what this does NOT say. The caster lane's equipped arm (section 9.2) reads
 BELOW its modelled arm, because a caster's apex chest breaks a set bonus and its
@@ -780,10 +833,14 @@ strength and intellect twins still match byte for byte, as ruling D10-D1
 requires. This is the one tune that is a CORRECTION rather than a nerf: it puts
 the weapon term back at the size the packet's ratified arithmetic is consistent
 with. It does not by itself return the kit to the ratified 4.2 to 4.7 percent
-band. The measured post-tune physical kit is 4.94 at heroic and 4.50 at S-rift,
-inside the R5 envelope but above that band's top at heroic; the band was a
-ratified estimate, the envelope is the contract, and it is the envelope this
-phase measures against.
+band. The measured post-tune physical kit (re-cut 2026-08-29 from the
+committed harness; the superseded fixture had printed 4.94 / 4.50 here) is
+4.60 at heroic and 5.76 at S-rift at the recorded 60-seed sample, with the
+300-seed precision pair at 5.06 / 5.24: above the ratified band's top, and
+at or above the nominal envelope line within the sample's resolving power
+(the Verdict reads it honestly, framed by the two ratified caveats); the
+band was a ratified estimate, the envelope is the contract, and it is the
+envelope this phase measured against.
 
 ### 10.2 `sunspun_vestments`, hit rating 40 to haste rating 40
 

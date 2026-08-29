@@ -1861,9 +1861,10 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // SO (15 to 13). The ladder's own step would put the flask at 15, and that
     // is where it shipped. The measured R5 pass
     // (docs/prd/masterwrought/power-verification.md) read the full kit at 5.86
-    // and 6.08 percent at 15; at 13 the central estimate sits inside with a
-    // straddling interval, and the R5 verdict is SUSPENDED pending the
-    // gear-term ruling (its Verdict and section 9.6), so 13 is a conservative
+    // and 6.08 percent at 15; at 13 the central estimates straddle the line,
+    // and the R5 verdict, SUSPENDED on 2026-08-28 pending the gear-term
+    // ruling, is CLOSED BY RULING since 2026-08-29 (its Verdict and section
+    // 9.6), so 13 is a conservative
     // margin, not a proven crossing. The flask is the single largest term,
     // because it is the first offensive consumable the game has ever had (every
     // pre-packet elixir and scroll is stamina) and its whole magnitude lands as

@@ -79,7 +79,9 @@ describe('the R5 envelope harness', () => {
   });
 
   it('pins the escalation mechanism: dead hit on the base arm, live crit on the equipped arm', () => {
-    // Section 9.6's suspension driver, as assertions (the Phase 15 QA). The
+    // Section 9.6's escalation driver, as assertions (the Phase 15 QA; the
+    // 2026-08-28 suspension it drove is closed by ruling since 2026-08-29,
+    // and the mechanism stays pinned as the record's accepted evidence). The
     // dress-only readout runs no fight, so this is deterministic.
     const base = furyBody('base');
     const full = furyBody('full');

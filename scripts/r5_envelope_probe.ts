@@ -1,10 +1,11 @@
 // THE R5 ENVELOPE PROBE (masterwrought Phase 15).
 //
-// Produces docs/prd/masterwrought/power-verification.md section 9.5 and the
-// rogue rows of section 9.2 exactly; the fury and caster rows of 9.2 came from
-// a superseded fixture and are marked STALE there (the 9.2 blockquote), so
-// this probe deliberately does NOT reproduce them. R5 is the packet's
-// defining gate:
+// Produces docs/prd/masterwrought/power-verification.md sections 9.2 and 9.5
+// exactly: the rogue rows and the tank table from the start, and the fury and
+// caster rows since the 2026-08-29 re-cut (the R5 closure re-measured them
+// from this committed harness at the documented invocations, retiring the
+// superseded-fixture figures the 9.2 blockquote had marked stale). R5 is the
+// packet's defining gate:
 //
 //   "full kit (2 Perfected pieces + apex enchants + flask + food) at most
 //    5 percent total throughput over pre-packet raid BiS, measured via

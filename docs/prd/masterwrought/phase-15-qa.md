@@ -83,3 +83,8 @@ CUT-or-fix decisions, never future-PR items.
   until the maintainer's rulings land; the handoff is the priced ruling packet
   (section 3's baseline pool, section 8.1's gear term, the lane-set question,
   plus the merge-inherited apex-bag tie), not an open gate.
+- RESOLVED 2026-08-29: the gate opened the same day. All four rulings were
+  ratified (1a, 2b, 3a, 4-amend) and executed at Phase 16 STEP 0.5; the verdict
+  is CLOSED BY RULING and the deliberately-stale 9.2 rows were re-cut from the
+  committed harness. The record: state.md, "Maintainer rulings (2026-08-29)" and
+  the R5 closure record beneath it.

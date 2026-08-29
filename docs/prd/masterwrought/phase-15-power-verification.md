@@ -165,6 +165,10 @@ the judgment surface for the future-tier revisit brainstorm.md carries.
     FINAL 2026-08-28: the phase then ESCALATED under this file's own stopping rule;
     the R5 verdict is SUSPENDED (power-verification.md Verdict, state.md Phase 15
     ledger).
+    RESOLVED 2026-08-29: the maintainer ratified the priced rulings (1a, 2b, 3a,
+    4-amend) at the Phase 16 gate and the verdict is CLOSED BY RULING; the closure
+    ran as Phase 16 STEP 0.5 (state.md, "Maintainer rulings (2026-08-29)" and the
+    R5 closure record).
 - IF 11c landed anything else, that is a code-versus-ruling mismatch and it is blocking on
   its own. This phase then requires a fresh run of
   `docs/design/spell-balance-framework.md` from the top, and it trips its own stopping rule:
