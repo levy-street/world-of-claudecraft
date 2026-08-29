@@ -10,6 +10,11 @@ export const USAGE_WINDOWS = [
 ] as const;
 
 const USAGE_METRICS = [
+  {
+    key: 'wallet.handoff.authorization_evicted',
+    labelKey: 'usage.metric.walletHandoffAuthorizationEvicted',
+  },
+  { key: 'wallet.handoff.create_rejected', labelKey: 'usage.metric.walletHandoffCreateRejected' },
   { key: 'woc.balance.api', labelKey: 'usage.metric.wocBalanceApi' },
   { key: 'woc.balance.rate_limited', labelKey: 'usage.metric.wocBalanceRateLimited' },
   { key: 'woc.balance.rpc', labelKey: 'usage.metric.wocBalanceRpc' },

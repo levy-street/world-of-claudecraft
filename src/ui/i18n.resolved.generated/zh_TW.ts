@@ -789,7 +789,37 @@ export const zh_TW: EnTranslations = {
       "applied": "已裝備",
       "apply": "裝備外觀",
       "detach": "卸下外觀",
-      "equipHint": "裝備{type}後才能使用此外觀。"
+      "equipHint": "裝備{type}後才能使用此外觀。",
+      "charter": {
+        "eyebrow": "保險箱",
+        "title": "保險箱特許狀",
+        "scope": "特許狀只會擴充目前角色的銀行。司庫同樣以金幣出售這些格子。",
+        "grant": "增加 {slots} 個銀行格子",
+        "buy": "購買特許狀",
+        "buyAria": "購買{item}",
+        "confirmTitle": "確認購買特許狀",
+        "confirmBody": "花費 {cost} Claudium 購買{item}？",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "特許狀已生效。目前角色的銀行已經變大。",
+        "alreadyGranted": "目前角色已擁有該特許狀，不會重複扣款。",
+        "applyDeferred": "付款完成。該角色下次登入時會自動取得這些格子。",
+        "grantUnresolved": "付款完成，但格子尚未發放。此次購買已記錄，客服可以為你處理完成。",
+        "inProgress": "目前角色的一筆購買仍在完成中，請稍候再試。",
+        "doesNotFit": "目前角色的銀行無法容納該特許狀的全部格子。",
+        "notPurchasable": "該特許狀目前無法購買。",
+        "noRoom": "目前角色的銀行已沒有空間容納任何特許狀。",
+        "noCharterFits": "目前角色的銀行剩餘空間已放不下任何特許狀。",
+        "someHiddenByFit": "超出目前角色銀行剩餘空間的特許狀不會顯示。",
+        "outage": "無法確認此次購買。使用此按鈕重試不會重複扣款。若先重新載入遊戲，可能會失去這項保護。",
+        "outageStale": "返回商店，再次使用相同的「購買特許狀」操作。系統不會重複扣款。若先重新載入遊戲，可能會失去這項保護。",
+        "failed": "此次購買未能完成。",
+        "names": {
+          "strongbox_charter_1": "次級保險箱特許狀",
+          "strongbox_charter_2": "高級保險箱特許狀",
+          "strongbox_charter_3": "宏偉保險箱特許狀",
+          "strongbox_charter_complete": "完整保險箱特許狀"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const zh_TW: EnTranslations = {
       "reset": "重設",
       "presets": {
         "classic": "經典金色",
+        "fancyGold": "華麗金色",
         "midnight": "午夜",
         "parchment": "羊皮紙",
         "highContrast": "高對比"
@@ -1321,6 +1352,11 @@ export const zh_TW: EnTranslations = {
       "reset": "重設",
       "done": "完成",
       "cancel": "取消",
+      "showExtraBar": "顯示更多動作列",
+      "hideExtraBar": "隱藏一列動作列",
+      "conflictTitle": "按鍵已被佔用",
+      "conflictBody": "{key} 已綁定到{other}。將其綁定到{action}會解除{other}的綁定。",
+      "conflictAccept": "仍然重新綁定",
       "resetConfirmTitle": "重設動作列按鍵？",
       "resetConfirmBody": "第一列動作列將恢復為預設按鍵，第二列與第三列將變為未綁定狀態。此操作無法復原。"
     },
@@ -1541,6 +1577,7 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "combineActionBars": "合併動作列",
       "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
@@ -2433,7 +2470,10 @@ export const zh_TW: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包欄位",
-      "unequipHint": "點擊移除此背包"
+      "unequipHint": "點擊移除此背包",
+      "poolGeneral": "一般：{used}/{total}",
+      "poolMaterials": "材料：{used}/{total}",
+      "capacityPoolsAria": "背包格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。"
     },
     "raidConvert": {
       "toPartyDone": "你的團隊已轉換回隊伍。",
@@ -2689,6 +2729,7 @@ export const zh_TW: EnTranslations = {
     },
     "partyFrames": {
       "section": "隊伍和團隊框體",
+      "optionsSection": "隊伍框體選項",
       "unlock": "移動隊伍和團隊框體",
       "lock": "鎖定隊伍和團隊框體",
       "style": "框體樣式",
@@ -2718,6 +2759,62 @@ export const zh_TW: EnTranslations = {
     },
     "frameReset": {
       "label": "重置框體位置"
+    },
+    "interfaceUnlock": {
+      "label": "編輯框體",
+      "unlock": "解鎖介面",
+      "lock": "鎖定介面",
+      "lockAll": "鎖定介面",
+      "barsNote": "編輯時只會顯示你已開啟的動作列。若要擺放更多動作列，請先用主動作列上的加減按鈕新增。",
+      "frozenNote": "編輯期間介面和鏡頭會被凍結：按鈕和框體只是待擺放的靜態圖片，點擊不會傳入遊戲世界。",
+      "unlockFrame": "解鎖此框體",
+      "lockFrame": "鎖定此框體",
+      "resizeFrame": "調整此框體大小",
+      "frameNames": {
+        "actionBar1": "動作條",
+        "actionBar2": "動作條 2",
+        "actionBar3": "動作條 3",
+        "steamWishlist": "願望清單提醒",
+        "menu": "Menu",
+        "minimap": "小地圖",
+        "stanceBar": "姿態欄",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "動作列群組",
+        "playerFrame": "玩家",
+        "targetFrame": "目標",
+        "partyFrames": "隊伍",
+        "swingBar": "自動攻擊"
+      },
+      "framesMenu": "框體設定",
+      "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",
+      "showHideFrames": "顯示或隱藏框體",
+      "buffsLeftToRight": "增益從左到右",
+      "debuffsLeftToRight": "減益從左到右",
+      "lockPlayerFrameToBar": "玩家框體鎖定在動作列上方",
+      "actionBarsVertical": "動作條縱向排列",
+      "actionBar1Vertical": "動作條縱向",
+      "actionBar2Vertical": "動作條 2 縱向",
+      "actionBar3Vertical": "動作條 3 縱向",
+      "menuRailHorizontal": "選單橫向排列",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "重置尺寸",
+      "resetFrameSizeFor": "重置{name}的尺寸",
+      "previewSpell": "示範法術"
+    },
+    "transfer": {
+      "frameLayout": "框體佈局",
+      "allSettings": "全部設定",
+      "exportAction": "匯出",
+      "importAction": "匯入",
+      "copy": "複製",
+      "copied": "已複製到剪貼簿。",
+      "copyFailed": "複製失敗。請選取代碼後自行複製。",
+      "applyReload": "套用並重新載入",
+      "pastePlaceholder": "在此貼上匯出的代碼。",
+      "invalid": "這不是有效的匯出代碼。",
+      "wrongKind": "該代碼屬於另一種匯出類型。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",
@@ -2926,7 +3023,10 @@ export const zh_TW: EnTranslations = {
       "unlink": "取消連結 Steam",
       "linked": "已連結 Steam 帳號 {id}",
       "benefits": "在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。",
-      "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。"
+      "noTicket": "Steam 未提供連結憑證。請先啟動 Steam，然後重試。",
+      "wishlist": "在 Steam 上加入願望清單",
+      "wishlistAria": "在 Steam 上加入願望清單：開啟 World of ClaudeCraft 商店頁面",
+      "wishlistShort": "加入願望清單"
     },
     "epic": {
       "title": "Epic",
@@ -3012,6 +3112,26 @@ export const zh_TW: EnTranslations = {
       "buySlotsMaxed": "已完全擴展",
       "buyConfirm": "花費 {price} 購買 {count} 個額外的銀行格子嗎？",
       "buyConfirmAccept": "購買",
+      "meterLabel": "已用 {used}/{total} 格",
+      "meterPoolGeneral": "一般：{used}/{total}",
+      "meterPoolMaterials": "材料：{used}/{total}",
+      "meterPoolsAria": "銀行格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。",
+      "meterMaterialsNote": "來自已裝入的材料背包的材料專用空間。其他物品無法使用。",
+      "priceDisclaimer": "價格可能隨遊戲經濟而變動。",
+      "rungItemName": "{count} 個銀行格子",
+      "buySlotsDualAria": "花費 {price} 或 {cost} Claudium 購買 {count} 個格子",
+      "buyConfirmDual": "購買 {count} 個額外的銀行格子嗎？",
+      "buyConfirmGold": "花費 {price} 購買",
+      "buyConfirmClaudium": "花費 {cost} Claudium 購買",
+      "rungGranted": "銀行格子已新增。目前角色的銀行已經變大。",
+      "rungAlreadyGranted": "目前角色已擁有這些格子，不會重複扣款。",
+      "rungApplyDeferred": "付款完成。該角色下次登入時會自動取得這些格子。",
+      "rungGrantUnresolved": "付款完成，但格子尚未發放。此次購買已記錄，客服可以為你處理完成。",
+      "rungInProgress": "目前角色的一筆購買仍在完成中，請稍候再試。",
+      "rungDoesNotFit": "目前角色的銀行已無法再進行一次擴充。",
+      "rungNotPurchasable": "這些銀行格子目前無法購買。",
+      "rungFailed": "此次購買未能完成。",
+      "rungOutage": "無法確認此次購買。使用此按鈕重試不會重複扣款。若先重新載入遊戲，可能會失去這項保護。",
       "withdrawHint": "點擊取出",
       "withdrawPartialHint": "Shift+點擊取出部分數量",
       "depositHint": "點擊存入",
@@ -3024,6 +3144,9 @@ export const zh_TW: EnTranslations = {
       "withdrawQuantityTitle": "取出 {item}",
       "withdrawQuantityInput": "要取出的數量",
       "withdrawQuantityConfirm": "取出",
+      "vaultRowWithdrawName": "取出 {item}",
+      "priceChanged": "購買完成前價格已變更。請查看刷新後的價格並再次確認。",
+      "withdrawQuantityAction": "選擇 {item} 要取出的數量",
       "filterGroupAria": "依類別篩選銀行",
       "sortAria": "排序銀行物品",
       "searchAria": "依名稱搜尋銀行物品",
@@ -3045,6 +3168,34 @@ export const zh_TW: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。",
       "bonusSectionAria": "獎勵銀行格子及獲取方式",
+      "socketRowAria": "銀行背包插槽",
+      "socketEmpty": "空的銀行背包插槽",
+      "socketEmptyHint": "點擊背包欄中的背包即可存入銀行",
+      "socketLocked": "未解鎖的背包插槽",
+      "socketLockedLater": "背包插槽按順序解鎖，先解鎖最便宜的",
+      "socketUnlockAria": "花費{price}解鎖一個銀行背包插槽",
+      "socketUnlockHint": "點擊解鎖此背包插槽",
+      "socketUnlockConfirm": "花費{price}解鎖一個銀行背包插槽？",
+      "socketUnlockAccept": "解鎖",
+      "unsocketHint": "點擊將此背包取回背包欄",
+      "socketHint": "點擊將此背包裝入銀行插槽",
+      "vaultTab": "倉庫",
+      "vaultCapacityNote": "每種材料最多可存放{cap}個。",
+      "vaultEmpty": "你的材料倉庫是空的。點擊背包中的材料即可存入。",
+      "vaultRowAria": "{item}：已存{count}/{cap}",
+      "vaultLockedIntro": "解鎖材料倉庫，在銀行旁囤積製造材料。每種材料都有自己的空間，最多可存{cap}個。",
+      "vaultUnlockButton": "解鎖材料倉庫",
+      "vaultUnlockConfirm": "花費{price}解鎖材料倉庫？",
+      "vaultUpgrade": "將上限提升至{cap}",
+      "vaultUpgradeConfirm": "花費{price}將每種材料的存放上限提升至{cap}？",
+      "vaultDepositAll": "存入全部材料",
+      "vaultDepositAllTooltip": "一次將背包中的所有材料存入倉庫，每種材料存至其上限為止。裝備、工具、任務物品和消耗品不會被移動。",
+      "vaultDepositAllDone": "已存入材料：{count}。",
+      "vaultDepositAllFull": "已存入材料：{count}。部分材料已達上限。",
+      "vaultDepositAllNone": "倉庫已滿：未存入任何材料。",
+      "vaultWithdrawShort": "背包只裝得下{count}個中的{fit}個。",
+      "vaultDepositHint": "點擊存入材料倉庫",
+      "vaultCannotDeposit": "無法存入材料倉庫",
       "tabsAria": "銀行標籤頁",
       "personalTab": "個人",
       "guildTab": "公會",
@@ -3444,6 +3595,8 @@ export const zh_TW: EnTranslations = {
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 個優質品級）",
+      "reagentVaultDraw": "（從材料倉庫取用 {count}）",
+      "vaultUnreachable": "此處無法使用材料倉庫。",
       "craftFeeLine": "製作費：每件 {fee}",
       "empty": "尚無已知配方。",
       "resultAria": "製作{name}",
@@ -4302,6 +4455,8 @@ export const zh_TW: EnTranslations = {
       "online": "角色目前在線上。",
       "rename_not_permitted": "不允許為此角色更名。",
       "delete_confirm": "輸入角色名稱以確認刪除。",
+      "storage_purchase_open": "此儲物空間購買必須完成或解決後，才能刪除該角色。",
+      "delete_busy": "伺服器繁忙，請稍後再嘗試刪除該角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一個工作階段接管。",
       "rename_required": "此角色必須先更名才能進入世界。",
@@ -6306,6 +6461,7 @@ export const zh_TW: EnTranslations = {
       "bankBody": "每座主城都設有鍍金保險箱的分號，它是這片大陸的銀行商號。與那裡的司庫交談即可打開你的保險庫：一處背包之外的私人儲物空間，伴隨角色終身。無論你下次造訪哪家分號，寄存的物品都會安然等候。",
       "bankHow": "保險庫打開後，點擊背包中的物品即可存入，點擊保險庫中的物品即可取回。保險庫只存放物品，不存放錢幣，任務物品也會留在你身上。旅途中背包裝滿時，還有一個按鈕可將全部製造材料一鍵存入。",
       "bankSlots": "新開的保險庫空間不大，但會隨你一同成長。司庫出售更多格位，價格逐級走高；線上遊玩還能獲得額外空間，例如驗證信箱、連結帳號，以及引薦好友加入遊戲。",
+      "bankSockets": "在格位階梯之上，司庫還出售最多四個背包插槽，按順序解鎖，價格逐級走高。把攜帶的閒置背包裝入插槽，它的格位便併入保險庫空間：普通背包擴充整個倉儲，而材料袋只為製作材料增添空間。點擊背包欄中的背包即可裝入，點擊插槽即可取回。取回背包絕不會損失任何存放之物：若保險庫因此超出縮減後的空間，一切物品原地保留，新的存入只需等待騰出空間。",
       "buyingTitle": "買與賣",
       "buyingBody": "與商人交談並選擇瀏覽他的貨品，他的商店便會開啟，內含三個分頁：選購、出售與買回。選購分頁陳列他所有的存貨，只要你負擔得起便能買下。出售分頁列出你背包中他願意收購的物品，而出售一件帶有自身擲選品質的物品時，會先請你確認，好讓珍貴的一件絕不會因失誤而流失。若你割捨了某樣讓你後悔的東西，買回分頁會保留你近期的售出物，讓你能以當初賣得的錢幣把它們買回來。",
       "junkTitle": "清理雜物",
@@ -7342,6 +7498,7 @@ export const zh_TW: EnTranslations = {
       "title": "連接 Solana 錢包",
       "linkBody": "在此瀏覽器中選擇錢包擴充功能。簽署驗證訊息後返回桌面應用程式。",
       "paymentBody": "選擇已連結至帳號的錢包，並在此瀏覽器中核准交易。",
+      "stepUpBody": "選擇已連結至帳號的錢包，並簽署 $WOC 交易所的授權訊息。簽署免費，不會轉移任何資金。",
       "extensionHelp": "找不到相容的錢包擴充功能。請安裝或解鎖 Phantom、Solflare 或其他 Solana 瀏覽器錢包，然後再試一次。",
       "safety": "World of ClaudeCraft 絕不會要求復原短語或私鑰。",
       "continueWith": "使用 {wallet} 繼續",
@@ -9427,7 +9584,8 @@ export const zh_TW: EnTranslations = {
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
       "clickBuyback": "點擊買回",
-      "bagSlots": "{slots}格背包"
+      "bagSlots": "{slots}格背包",
+      "bagSlotsMaterials": "{slots}格材料背包"
     },
     "bags": {
       "title": "背包",
@@ -12860,6 +13018,27 @@ export const zh_TW: EnTranslations = {
       },
       "dawnhold_posy": {
         "name": "晨曦堡花園小花束"
+      },
+      "wayfarers_backpack": {
+        "name": "旅者背包"
+      },
+      "burlap_reagent_pouch": {
+        "name": "粗麻材料袋"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "死靈法師的材料挎包"
+      },
+      "duskweave_bag": {
+        "name": "暮織袋"
+      },
+      "resonant_weave_bag": {
+        "name": "共鳴織袋"
+      },
+      "foragers_haversack": {
+        "name": "採集者行囊"
+      },
+      "loombound_reagent_satchel": {
+        "name": "織縛材料挎包"
       },
       "ps_briny_lure": {
         "name": "鹹水誘餌"

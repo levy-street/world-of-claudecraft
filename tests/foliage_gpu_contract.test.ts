@@ -50,9 +50,15 @@ describe('foliage GPU optimization production wiring', () => {
   });
 
   it('limits each occluder matrix upload to exactly one mat4', () => {
-    expect(foliage.match(/instanceMatrix\.addUpdateRange\(part\.index \* 16, 16\);/g)).toHaveLength(
-      2,
+    // The tree hide/unhide swap lives beside the tree fade (tree_hide_fade.ts).
+    const treeHide = readFileSync(
+      new URL('../src/render/tree_hide_fade.ts', import.meta.url),
+      'utf8',
     );
+    expect(
+      treeHide.match(/instanceMatrix\.addUpdateRange\(part\.index \* 16, 16\);/g),
+    ).toHaveLength(2);
+    expect(foliage).not.toContain('instanceMatrix.addUpdateRange(');
   });
 
   it('freezes static bucket and streamed chunk transforms after construction', () => {

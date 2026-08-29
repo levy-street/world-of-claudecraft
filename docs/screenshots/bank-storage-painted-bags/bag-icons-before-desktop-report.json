@@ -1,0 +1,21 @@
+{
+  "bagBar": [
+    "http://127.0.0.1:5174/ui/items/backpack.webp",
+    "http://127.0.0.1:5174/ui/items/duskweave_bag.webp",
+    "http://127.0.0.1:5174/ui/items/wayfarers_backpack.webp",
+    "http://127.0.0.1:5174/ui/items/necromancers_reagent_satchel.webp",
+    "http://127.0.0.1:5174/ui/items/loombound_reagent_satchel.webp"
+  ],
+  "grid": [
+    "http://127.0.0.1:5174/ui/items/baked_bread.webp",
+    "http://127.0.0.1:5174/ui/items/resonant_weave_bag.webp",
+    "http://127.0.0.1:5174/ui/items/burlap_reagent_pouch.webp",
+    "http://127.0.0.1:5174/ui/items/foragers_haversack.webp",
+    "http://127.0.0.1:5174/ui/items/linen_pouch.webp",
+    "http://127.0.0.1:5174/ui/items/travelers_knapsack.webp",
+    "http://127.0.0.1:5174/ui/items/wolfhide_satchel.webp",
+    "http://127.0.0.1:5174/ui/items/silkspun_satchel.webp",
+    "http://127.0.0.1:5174/ui/items/gravewoven_bag.webp",
+    "http://127.0.0.1:5174/ui/items/mistcallers_duffel.webp"
+  ]
+}

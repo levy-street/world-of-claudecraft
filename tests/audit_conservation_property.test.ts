@@ -26,15 +26,12 @@
 // Every run is reproducible from a printed seed; failures are minimized to the
 // shortest still-failing op sequence by delta debugging (shrinkSteps below).
 //
-// PERMANENT characterization suite. Most of it is a property that must simply
-// hold; the blocks labelled P4-RESIDUE and P5 are CHARACTERIZATIONS of residues
-// the design deliberately leaves open (docs/guild-bank/state.md), pinned with
-// their exact witnesses and their exact sizes so a change to either is loud
-// rather than silent. A few sweeps carry a generator restriction labelled
-// "D5 MARKER": that is what keeps a sweep from re-deriving a pinned residue,
-// and each one names the residue it marks. Restrictions that existed only to
-// steer sweeps away from the OLD shared-book save window are gone: every sweep
-// now runs both officers acting and both officers saving.
+// PERMANENT characterization suite. The properties must simply hold; the
+// named P4 blocks preserve the exact witnesses for conservation holes that are
+// now closed, while P5 pins the remaining documented availability/fairness
+// behavior. Restrictions that existed only to steer sweeps away from the OLD
+// shared-book save window are gone: every sweep now runs both officers acting
+// and both officers saving.
 
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -50,6 +47,7 @@ const store = vi.hoisted(() => {
   const chars = new Map<number, Record<string, unknown>>();
   const bookRows = new Map<number, unknown>();
   const ledger: Record<string, unknown>[] = [];
+  const committedLedgerBatches = new Set<string>();
   let ledgerId = 0;
   const fenced = (nonce: unknown): boolean =>
     typeof nonce === 'string' && nonce.startsWith('stale');
@@ -87,6 +85,43 @@ const store = vi.hoisted(() => {
     }
     for (const [guildId, data] of pending) bookRows.set(guildId, data);
   };
+  const appendLedgerRow = (row: Record<string, unknown>): void => {
+    ledgerId += 1;
+    const instanceJson = row.instanceJson;
+    ledger.push({
+      id: ledgerId,
+      realm: row.realm,
+      character_id: row.characterId,
+      account_id: row.accountId,
+      op: row.op,
+      item_id: row.itemId,
+      count: row.count,
+      instance:
+        typeof instanceJson === 'string' ? JSON.parse(instanceJson) : (row.instance ?? null),
+      copper_delta: row.copperDelta,
+      purchased_slots_after: row.purchasedSlotsAfter,
+      container: row.container,
+      container_id: row.containerId,
+      counterparty_copper_delta: row.counterpartyCopperDelta ?? null,
+      counterparty_count: row.counterpartyCount ?? null,
+    });
+  };
+  const writeLedgerEffects = (
+    effects:
+      | {
+          batches: readonly {
+            batchKey: string;
+            rows: readonly Record<string, unknown>[];
+          }[];
+        }
+      | undefined,
+  ): void => {
+    for (const batch of effects?.batches ?? []) {
+      if (committedLedgerBatches.has(batch.batchKey)) continue;
+      for (const row of batch.rows) appendLedgerRow(row);
+      committedLedgerBatches.add(batch.batchKey);
+    }
+  };
   return {
     clone,
     chars,
@@ -97,11 +132,20 @@ const store = vi.hoisted(() => {
       chars.clear();
       bookRows.clear();
       ledger.length = 0;
+      committedLedgerBatches.clear();
       ledgerId = 0;
     },
     saveCharacterState: vi.fn(
-      async (characterId: number, _level: number, state: unknown, nonce?: unknown) => {
+      async (
+        characterId: number,
+        _level: number,
+        state: unknown,
+        nonce?: unknown,
+        _storageEffects?: unknown,
+        ledgerEffects?: Parameters<typeof writeLedgerEffects>[0],
+      ) => {
         if (fenced(nonce)) return false;
+        writeLedgerEffects(ledgerEffects);
         chars.set(characterId, clone(state) as Record<string, unknown>);
         return true;
       },
@@ -116,9 +160,12 @@ const store = vi.hoisted(() => {
         nonce?: unknown,
         // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
         results?: any[],
+        _storageEffects?: unknown,
+        ledgerEffects?: Parameters<typeof writeLedgerEffects>[0],
       ) => {
         if (fenced(nonce)) return false;
         writeBooks(books, results);
+        writeLedgerEffects(ledgerEffects);
         chars.set(characterId, clone(state) as Record<string, unknown>);
         return true;
       },
@@ -135,35 +182,23 @@ const store = vi.hoisted(() => {
         books?: { guildId: number; deltas: any }[],
         // biome-ignore lint/suspicious/noExplicitAny: the write-result shape
         results?: any[],
+        _storageEffects?: unknown,
+        ledgerEffects?: Parameters<typeof writeLedgerEffects>[0],
       ) => {
         if (fenced(nonce)) return false;
         writeBooks(books, results);
+        writeLedgerEffects(ledgerEffects);
         chars.set(characterId, clone(state) as Record<string, unknown>);
         return true;
       },
     ),
     insertBankLedgerRow: vi.fn(async (row: Record<string, unknown>) => {
-      ledgerId += 1;
-      ledger.push({
-        id: ledgerId,
-        realm: row.realm,
-        character_id: row.characterId,
-        account_id: row.accountId,
-        op: row.op,
-        item_id: row.itemId,
-        count: row.count,
-        instance: row.instance ?? null,
-        copper_delta: row.copperDelta,
-        purchased_slots_after: row.purchasedSlotsAfter,
-        container: row.container,
-        container_id: row.containerId,
-        // The COUNTERPARTY (payer/payee) side. Carried through here so the P3
-        // audit reconciliation below checks the per-op balance identity on
-        // rows the REAL server wrote, over every sequence the sweeps generate,
-        // not only on the hand-built fixtures in tests/bank_audit.test.ts.
-        counterparty_copper_delta: row.counterpartyCopperDelta,
-        counterparty_count: row.counterpartyCount,
-      });
+      appendLedgerRow(row);
+    }),
+    // The batched sibling records through the same recorder so vault
+    // deposit-all rows land in the ledger with the same id sequence and shape.
+    insertBankLedgerRows: vi.fn(async (rows: Record<string, unknown>[]) => {
+      for (const row of rows) await store.insertBankLedgerRow(row);
     }),
     loadGuildBankRows: vi.fn(async () =>
       [...bookRows.entries()].map(([guildId, data]) => ({
@@ -189,6 +224,7 @@ const clearStoreHistory = (): void => {
   store.saveCharacterAndGuildBankState.mockClear();
   store.saveCharacterAndMarketState.mockClear();
   store.insertBankLedgerRow.mockClear();
+  store.insertBankLedgerRows.mockClear();
   store.loadGuildBankRows.mockClear();
 };
 
@@ -211,6 +247,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: store.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: store.saveCharacterAndMarketState,
   insertBankLedgerRow: store.insertBankLedgerRow,
+  insertBankLedgerRows: store.insertBankLedgerRows,
   loadGuildBankRows: store.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
@@ -223,7 +260,7 @@ vi.mock('../server/db', () => ({
   // copper or items, but an undefined export throws into the join path.
   grantAccountWeaponSkins: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   heartbeatCharacterLeases: vi.fn(async () => {}),
-  loadAccountFlair: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   loadMailState: vi.fn(async () => null),
   loadMarketState: vi.fn(async () => null),
   loadRiftState: vi.fn(async () => null),
@@ -334,12 +371,8 @@ interface GenConfig {
    *  written deterministically; the sweeps no longer need it, because
    *  consume-then-fence is refused rather than carried. */
   fenceActor?: ActorIndex;
-  /** Op kinds a given officer is restricted to. Used to keep the SECOND
-   *  officer from consuming the fenced officer's un-durable value (withdrawing
-   *  the copper or the copy) or advancing the ladder past the opened base:
-   *  both are documented CLAMPED-RESIDUE arms of revertGuildBankDeltas, pinned
-   *  separately below, and excluding them is what turns the surgical-revert
-   *  property into an exact equality. */
+  /** Op kinds a given officer is restricted to. Retained only for explicit
+   *  deterministic scenarios; the full sweeps use every operation. */
   opKindsByActor?: Partial<Record<ActorIndex, Step['k'][]>>;
 }
 
@@ -586,6 +619,8 @@ interface World {
   server: GameServer;
   actors: Actor[];
   clock: number;
+  /** Run-local observer for command batches accepted into a session outbox. */
+  observeLedgerOps?: (session: ClientSession) => void;
   /** True once ANY session's escrow was rolled back. From that moment the LIVE
    *  snapshot is mid-repair: a session that consumed value the rolled-back one
    *  had not made durable is itself condemned (its every save is refused until
@@ -799,6 +834,7 @@ function stampAll(w: World): void {
 const dispatch = (w: World, a: Actor, msg: Record<string, unknown>): void => {
   w.clock += 1000; // one op per second: never throttled by guild_bank_op_guard
   priv(w.server).dispatchMessage(a.session, { t: 'cmd', ...msg }, JSON.stringify(msg), w.clock);
+  w.observeLedgerOps?.(a.session);
 };
 
 /** Execute one OP (synchronous by construction: every guild bank command
@@ -911,8 +947,8 @@ async function applyEvent(w: World, s: Step): Promise<void> {
       // matches no row, so its character half rolls back to the durable row
       // and revertOwnGuildBookOps must return the live book to
       // what the next durable commit will contain. `left` is pre-set only to
-      // suppress the fire-and-forget kick (the harness models the death
-      // itself, deterministically).
+      // suppress the asynchronous kick (the harness models the death itself,
+      // deterministically).
       a.session.left = true;
       a.session.leaseNonce = 'stale-nonce';
       const dirty = a.session.dirtyGuildBanks.size;
@@ -1074,11 +1110,9 @@ const coverage = {
 type Check =
   | 'effective'
   | 'durable-after-quiesce'
-  /** Same as above minus the ledger reconciliation: a sequence containing a
-   *  fence-out leaves the reverted op's ledger rows behind BY DESIGN
-   *  (docs/guild-bank/state.md, "Ledger rows for fenced-out (reverted) ops
-   *  remain in bank_ledger by design"), so the audit script correctly flags a
-   *  live realm there. Pinned separately below; conservation still must hold. */
+  /** Same as above minus ledger reconciliation. Used by properties that care
+   *  only about value conservation; transactional command rows are still
+   *  committed atomically with their character and guild-book state. */
   | 'durable-after-quiesce-no-ledger'
   | 'durable-crash';
 
@@ -1088,6 +1122,18 @@ async function runSteps(steps: Step[], check: Check): Promise<RunResult> {
   const w = await makeWorld();
   const initial = effectiveTotals(w);
   const opsSeen = new Set<string>();
+  const observedBatchKeys = new Set<string>();
+  w.observeLedgerOps = (session) => {
+    for (const batch of session.bankLedgerJournal.outbox.snapshot().batches) {
+      const identity = `${session.characterId}:${batch.batchKey}`;
+      if (observedBatchKeys.has(identity)) continue;
+      observedBatchKeys.add(identity);
+      for (const row of batch.rows) {
+        opsSeen.add(row.op);
+        coverage.bump(coverage.ops, row.op);
+      }
+    }
+  };
   let detail = '';
 
   const failEffective = (at: string): boolean => {
@@ -1119,13 +1165,11 @@ async function runSteps(steps: Step[], check: Check): Promise<RunResult> {
       return { ok: false, detail, ledgerRows: store.ledger.length, opsSeen };
     }
   }
-  // The ledger is fire-and-forget: drain the FIFO tail before reading it, or
-  // the coverage read (and the audit replay below) sees an empty table.
+  // Outbox admission above is the synchronous proof that an operation
+  // succeeded. Durable rows appear only with a later character transaction,
+  // so using the table for this coverage floor would miss valid unsaved ops
+  // and let the dormant seed rows satisfy the deposit arm vacuously.
   await bankLedgerIdle();
-  for (const row of store.ledger) {
-    opsSeen.add(String(row.op));
-    coverage.bump(coverage.ops, String(row.op));
-  }
 
   // A run that rolled a session back is judged on DURABLE state after a full
   // quiesce, whatever check it asked for: the repair converges there, and
@@ -1408,11 +1452,7 @@ describe('P4 conservation across lease fences (self-takeover + own-ops undo)', (
     expect(reportFailures('P4-other-dirty', failures)).toBe('');
   }, 240_000);
 
-  it('leaves the ledger rows of a reverted op behind, as the accepted risk records', async () => {
-    // docs/guild-bank/state.md: "Ledger rows for fenced-out (reverted) ops
-    // remain in bank_ledger by design: the audit script may flag them against
-    // the book". Pinned so the caveat stays true and visible: conservation is
-    // intact, the AUDIT REPLAY is what disagrees.
+  it('commits neither state nor command evidence when a save is lease-fenced', async () => {
     const steps: Step[] = [
       { k: 'deposit_gold', a: 0, amt: 5_000 },
       { k: 'fence', a: 0 },
@@ -1420,10 +1460,12 @@ describe('P4 conservation across lease fences (self-takeover + own-ops undo)', (
     const conserved = await runSteps(steps, 'durable-after-quiesce-no-ledger');
     expect(conserved.detail).toBe('');
     const audited = await runSteps(steps, 'durable-after-quiesce');
-    expect(audited.ok).toBe(false);
-    expect(audited.detail).toContain('treasury_mismatch');
-    expect(audited.detail).toContain('ledger treasury replay 5000');
-    expect(audited.detail).toContain('guild book treasury 0');
+    expect(audited).toMatchObject({
+      ok: true,
+      detail: '',
+      ledgerRows: DORMANT_SEED.length,
+    });
+    expect(store.ledger.filter((row) => row.op === 'deposit_gold')).toEqual([]);
   }, 60_000);
 });
 

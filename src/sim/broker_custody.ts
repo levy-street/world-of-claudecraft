@@ -7,7 +7,7 @@
 //
 // `src/sim`-pure: no rng, no clock (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, canGrantCopies } from './bags';
+import { bagPools, canGrantCopies } from './bags';
 import { ITEMS } from './data';
 import { type ExtractOutcome, type ExtractRef, extractTradableCopy } from './inventory_extract';
 import { grantCopies } from './item_instance_transfer';
@@ -76,7 +76,7 @@ export function grantTradableCopyImpl(
   if (
     !canGrantCopies(
       meta.inventory,
-      bagCapacity(meta.bags),
+      bagPools(meta.bags),
       slot.itemId,
       slot.count,
       slot.instance,

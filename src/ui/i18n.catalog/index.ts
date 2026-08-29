@@ -732,6 +732,8 @@ export const en = {
         'Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.',
       paymentBody:
         'Choose the wallet linked to your account and approve the transaction in this browser.',
+      stepUpBody:
+        'Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.',
       extensionHelp:
         'No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.',
       safety: 'World of ClaudeCraft never asks for your recovery phrase or private key.',

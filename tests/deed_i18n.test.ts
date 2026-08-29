@@ -49,7 +49,7 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 273 deeds x (name + desc) + the 42 shipped title rewards (both counts
+    // 275 deeds x (name + desc) + the 42 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
@@ -57,9 +57,10 @@ describe('deed_i18n English resolution', () => {
     // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
     // title manifest row), the three WARFARE lifetime-honor rank titles, the
     // five Phase 18 Reliquary completion-ladder titles, the walk-in castle
-    // visit pair (no title reward), and the Proving Shore graduation deed
-    // (no title reward).
-    expect(manifest.length).toBe(274 * 2 + 42);
+    // visit pair, the bank socket ladder pair (Bank Storage phase 06) and the
+    // Proving Shore graduation deed. All three appends are reward-free, so the
+    // title count stays 42. MEASURED on the merged tree.
+    expect(manifest.length).toBe(276 * 2 + 42);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

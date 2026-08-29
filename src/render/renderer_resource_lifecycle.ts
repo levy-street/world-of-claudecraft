@@ -1,3 +1,5 @@
+import { uninstallOccluderFadeGate } from './occluder_fade_gate';
+
 export interface RendererDisposable {
   dispose(): void;
 }
@@ -26,4 +28,7 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.warlockMeteorFx?.dispose());
   bestEffort(() => resources.abilityVfxFx?.dispose());
   bestEffort(() => resources.vfx?.dispose());
+  // The occluder-fade gate and its twins were linked on this renderer's
+  // context; a later renderer installs its own (occluder_fade_gate.ts).
+  bestEffort(() => uninstallOccluderFadeGate());
 }

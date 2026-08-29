@@ -14,7 +14,10 @@ export function buildLinuxPrimeEnv(
   fileExists?: (path: string) => boolean,
 ): Record<string, string>;
 export function hasExplicitOzonePlatformArg(argv?: string[]): boolean;
-export function isLinuxHybridGpu(readdir?: (path: string) => string[]): boolean;
+export function isLinuxHybridGpu(
+  readdir?: (path: string) => string[],
+  readFile?: (path: string, encoding: 'utf8') => string,
+): boolean;
 export function shouldRelaunchForLinuxPrime(
   env?: Record<string, string | undefined>,
   argv?: string[],

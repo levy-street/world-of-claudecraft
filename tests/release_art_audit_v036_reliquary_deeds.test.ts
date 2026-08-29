@@ -193,15 +193,19 @@ describe('v0.36 release-audit Reliquary deed art', () => {
   it('closes the exhaustive live deed debt ledger at 271 painted deeds', () => {
     // The audit's own claim is historical: the 271 deeds live at the v0.36
     // audit are ALL painted. Deeds appended after it (the walk-in castle
-    // visit pair) ride the DEED_ART_PENDING ledger until their art lands;
-    // the audit holds exactly when the pending set and the artless set are
-    // the same post-audit appends and every other deed is painted.
+    // visit pair, the bank socket pair from Bank Storage phase 06, then the
+    // Proving Shore graduation deed) ride the DEED_ART_PENDING ledger until
+    // their art lands; the audit holds exactly when the pending set and the
+    // artless set are the same post-audit appends and every other deed is
+    // painted.
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
       'prog_ready_for_an_adventure',
     ]);
-    expect(DEED_ORDER).toHaveLength(274);
+    expect(DEED_ORDER).toHaveLength(276);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

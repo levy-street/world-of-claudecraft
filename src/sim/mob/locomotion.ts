@@ -39,6 +39,7 @@ import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import { corpseHasDecayed } from '../respawn_policy';
@@ -207,6 +208,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.ownerId !== null &&
       (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
     ) {
+      // A dead battleground fighter is owed THIS corpse back as a revive-in-place
+      // on the next respawn wave: freeze the decay window (undo this tick's
+      // shared decrement above) so the wave reuses the entity instead of
+      // rebuilding a new one every wave, which forced every nearby client to
+      // re-mint the entity and its character view (pet/pet_corpse_hold.ts has
+      // the full why and the narrowness rules). Decay resumes, with the window
+      // it still had, the moment the hold lifts. An UNDO rather than a skip on
+      // purpose: the corpse-interaction expiry and the detonate fuse above must
+      // keep reading the decremented value, in their existing order, so a held
+      // tick stays byte-identical to an unheld one for every draw site.
+      // Pure state, no rng.
+      if (holdPetCorpseForBgWave(ctx, mob)) {
+        mob.corpseTimer += DT;
+        return;
+      }
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the

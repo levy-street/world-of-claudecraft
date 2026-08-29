@@ -1,12 +1,15 @@
-// Hand-gilded filigree ornament for the Performance Overlay window
-// (#options-menu.perf-wide only; see components.css). A narrow, deliberately
-// scoped pilot: it does not touch the shared .panel/.window primitive or any
-// other window, and reads its own --perf-ornament-* / --color-gold-* tokens
-// (tokens.css) rather than retuning --gold/--border. See PR body for the scope
-// rationale; a repo-wide DESIGN.md rollout is tracked separately.
+// Hand-gilded filigree ornament for the game's windows. Two consumers share
+// the one shape vocabulary: the original Performance Overlay pilot
+// (#options-menu.perf-wide, colorless masks + a gilt gradient behind them)
+// and the Fancy Gold theme's window frame (every desktop .window.panel while
+// that preset is active, the same tiles tinted and consumed as background
+// layers; see the "Fancy Gold gilded window frame" section below for why
+// that surface cannot use the mask mechanism). Both
+// read the --color-gold-* ramp (tokens.css), never --gold/--border, so the
+// gilding stays its own metal rather than following the accent theme.
 //
 // Adapts the proven techniques from the (unmerged, closed) PR #2152 fantasy-HUD
-// ornament redesign: shapes are COLORLESS SVG, consumed only as CSS
+// ornament redesign: the pilot's shapes are COLORLESS SVG, consumed only as CSS
 // `mask-image` data-URIs (never inserted into the DOM), so the element's own
 // `background` supplies the visible color and the ornament repaints for free on
 // a token change. Noise is a small seeded PRNG picking amplitude/phase for a
@@ -538,6 +541,15 @@ const EDGE_TILE_THICKNESS = 12;
 const EDGE_BASE_WIDTH = 2.6;
 const EDGE_MIN_HALF_WIDTH = 0.6;
 
+/** The edge tile's full SVG markup with its transposable viewBox, shared by
+ * the colorless mask export below and the tinted window-frame composite. */
+function noisyEdgeSvg(seed: number, vertical: boolean, inner: string): string {
+  const viewBox = vertical
+    ? `0 0 ${EDGE_TILE_THICKNESS} ${EDGE_TILE_LENGTH}`
+    : `0 0 ${EDGE_TILE_LENGTH} ${EDGE_TILE_THICKNESS}`;
+  return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${viewBox}'>${inner}</svg>`;
+}
+
 /** `vertical` swaps the sampled axis so the SAME noise profile tiles along a
  * vertical (left/right) edge instead of a horizontal (top/bottom) one. */
 function noisyEdgeInner(seed: number, vertical: boolean): string {
@@ -575,15 +587,66 @@ function noisyEdgeInner(seed: number, vertical: boolean): string {
  * lockstep.
  */
 export function perfNoisyEdgeMaskImage(seed: number, vertical: boolean): string {
-  const viewBox = vertical
-    ? `0 0 ${EDGE_TILE_THICKNESS} ${EDGE_TILE_LENGTH}`
-    : `0 0 ${EDGE_TILE_LENGTH} ${EDGE_TILE_THICKNESS}`;
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${viewBox}'>${noisyEdgeInner(seed, vertical)}</svg>`;
+  const svg = noisyEdgeSvg(seed, vertical, noisyEdgeInner(seed, vertical));
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
 export const PERF_EDGE_TILE_LENGTH = EDGE_TILE_LENGTH;
 export const PERF_EDGE_TILE_THICKNESS = EDGE_TILE_THICKNESS;
+
+// ---------- Fancy Gold gilded window frame (the "look like the Performance
+// Overlay" treatment, gated behind the fancyGold theme preset): the SAME
+// tiles, ink baked to resolved gold-ramp tones, consumed as BACKGROUND layers
+// on every desktop `.window.panel` under `.fancy-gold-ui` (components.css). A
+// background layer is the one paint surface that works there: every window is
+// its OWN scroll container (sticky titles depend on it), which both clips and
+// scrolls a ::before pseudo-element away with the content, while the
+// container's own background stays pinned to the border box -- the exact
+// mechanism the resize grip already uses (layout.css). Colors are baked
+// because a background paints the image itself (there is no separate
+// gilt-gradient background to shine through a mask); the tones are RESOLVED
+// from the --color-gold-* tokens at boot (applyWindowOrnamentVars), never
+// literal hexes in this module, and vary per tile so the frame keeps the
+// hand-gilded unevenly-toned read the pilot's conic gradient supplies. ----------
+
+/** Bake one ink tone into a tile's inner markup: the explicit stroke="#000"
+ * strokes swap to the tone, and the leaf fills (no explicit fill attribute)
+ * inherit it from the wrapping group. */
+function tinted(inner: string, tone: string): string {
+  return `<g fill="${tone}">${inner.replaceAll('stroke="#000"', `stroke="${tone}"`)}</g>`;
+}
+
+/** The 12 window-frame tiles in the FIXED layer order the components.css
+ * background-position/size/repeat lists are written against: corners (tl, tr,
+ * bl, br), mid-edges (top, bottom, left, right), edge ribbons (top, bottom,
+ * left, right). `tones` supplies one resolved color per layer, in that order. */
+export function windowOrnamentFrameImage(tones: readonly string[]): string {
+  const corner = (x: boolean, y: boolean, tone: string) =>
+    svgDataUri(tinted(cornerMotifPath({ x, y, size: CORNER_SIZE }), tone), CORNER_SIZE);
+  const mid = (deg: number, seed: number, tone: string) =>
+    svgDataUri(tinted(midEdgeMotifPath(deg, seed), tone), MID_EDGE_SIZE);
+  const edge = (seed: number, vertical: boolean, tone: string) =>
+    `url("data:image/svg+xml,${encodeURIComponent(
+      noisyEdgeSvg(seed, vertical, tinted(noisyEdgeInner(seed, vertical), tone)),
+    )}")`;
+  const t = (i: number) => tones[i % tones.length] ?? '#000';
+  return [
+    corner(false, false, t(0)),
+    corner(true, false, t(1)),
+    corner(false, true, t(2)),
+    corner(true, true, t(3)),
+    mid(-90, 501, t(4)),
+    mid(90, 502, t(5)),
+    mid(180, 503, t(6)),
+    mid(0, 504, t(7)),
+    edge(1, false, t(8)),
+    edge(3, false, t(9)),
+    edge(2, true, t(10)),
+    edge(4, true, t(11)),
+  ].join(', ');
+}
+
+export const WINDOW_ORNAMENT_LAYERS = 12;
 
 // ---------- boot wiring ----------
 
@@ -612,4 +675,43 @@ export function applyPerfOrnamentVars(root: HTMLElement = document.documentEleme
   root.style.setProperty('--perf-ornament-edge-left', perfNoisyEdgeMaskImage(2, true));
   root.style.setProperty('--perf-ornament-edge-right', perfNoisyEdgeMaskImage(4, true));
   root.style.setProperty('--perf-ornament-gilt', perfGiltGradientBackground());
+}
+
+/** The gold-ramp token each of the 12 window-frame layers paints with, in the
+ * windowOrnamentFrameImage layer order. Mixed tones per tile stand in for the
+ * pilot's perimeter-sweeping conic gradient (a background layer paints its own
+ * colors, so the gradient-through-a-mask trick is unavailable): opposite
+ * corners share a tone, mid-edges alternate, and the long ribbons run darker
+ * so the flourishes read brighter than the rails they sit on. */
+const WINDOW_ORNAMENT_TONE_TOKENS: readonly string[] = [
+  '--color-gold-500',
+  '--color-gold-400',
+  '--color-gold-600',
+  '--color-gold-500',
+  '--color-gold-500',
+  '--color-gold-600',
+  '--color-gold-600',
+  '--color-gold-500',
+  '--color-gold-600',
+  '--color-gold-700',
+  '--color-gold-700',
+  '--color-gold-600',
+];
+
+/**
+ * Sets `--window-ornament-frame` (the 12-layer colored composite every desktop
+ * `.window.panel` consumes as background layers while the Fancy Gold theme is
+ * active; components.css). Called once at game boot beside
+ * applyPerfOrnamentVars, UNCONDITIONALLY: the theme can switch to fancyGold
+ * live in the options window, and the var must already hold the layers when
+ * the .fancy-gold-ui gate class lands. Tones are resolved from the live
+ * --color-gold-* tokens at call time, so the module itself stays literal-free;
+ * the ramp is static (tokens.css), so like the masks this never re-runs.
+ */
+export function applyWindowOrnamentVars(root: HTMLElement = document.documentElement): void {
+  const styles = getComputedStyle(root);
+  const tones = WINDOW_ORNAMENT_TONE_TOKENS.map(
+    (token) => styles.getPropertyValue(token).trim() || '#926321',
+  );
+  root.style.setProperty('--window-ornament-frame', windowOrnamentFrameImage(tones));
 }

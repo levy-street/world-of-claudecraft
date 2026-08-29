@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   buildFullGateSteps,
@@ -77,6 +77,77 @@ describe('gate cache inventory vs turbo.json', () => {
     const inputs = turboJson.tasks['i18n:gen'].inputs ?? [];
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
+    // The sim/server matcher DICTs are i18n:gen inputs too: without these rows a
+    // warm turbo cache restores a stale i18n.status.json over freshly added sim
+    // rows (the exact bug the bank-storage phase 01 rider fixed; the sync pin
+    // above only proves turbo.json and gate_task_cache.mjs agree WITH EACH OTHER,
+    // so deleting the rows from both together would otherwise stay green).
+    expect(inputs.some((p) => p.includes('sim_i18n'))).toBe(true);
+    expect(inputs.some((p) => p.includes('server_i18n'))).toBe(true);
+  });
+
+  it('the i18n DICT input globs resolve to the real files on disk', () => {
+    // The includes() pins above prove a ROW exists, not that it matches
+    // anything: a typo'd glob resolving to zero files still contains the
+    // substring while a warm turbo cache restores stale i18n output over a
+    // changed DICT module (the exact bug these rows exist to prevent). So
+    // resolve the patterns against the real directory and pin the result.
+    const inputs = turboJson.tasks['i18n:gen'].inputs ?? [];
+    const dictPatterns = inputs.filter(
+      (p) => p.startsWith('src/ui/') && p.includes('_i18n') && p.endsWith('.ts'),
+    );
+    expect(dictPatterns.length).toBeGreaterThan(0);
+    // Minimal matcher for the only wildcard these rows use: `*` within one
+    // path segment, anchored over the whole repo-relative path.
+    const toRe = (pattern: string) =>
+      new RegExp(`^${pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*')}$`);
+    const uiFiles = readdirSync(new URL('../src/ui', import.meta.url))
+      .filter((f) => f.endsWith('.ts'))
+      .map((f) => `src/ui/${f}`);
+    const resolved = new Map(dictPatterns.map((p) => [p, uiFiles.filter((f) => toRe(p).test(f))]));
+    for (const [pattern, files] of resolved) {
+      expect(files.length, `i18n:gen input ${pattern} resolves to no file on disk`).toBeGreaterThan(
+        0,
+      );
+    }
+    // The current on-disk DICT-family files, pinned as literals: an addition
+    // to a family (a new overlay or override module) EXTENDS this list.
+    const matched = [...new Set([...resolved.values()].flat())].sort();
+    expect(matched).toEqual([
+      // entity_i18n.ts is transitively imported by the sim/server DICTs
+      // (tEntity), so its edits change scan output and it must key the cache.
+      'src/ui/entity_i18n.ts',
+      'src/ui/server_i18n.newlocales.ts',
+      'src/ui/server_i18n.ts',
+      'src/ui/server_i18n_moderation.ts',
+      'src/ui/sim_i18n.newlocales.ts',
+      'src/ui/sim_i18n.ts',
+      'src/ui/talent_i18n.newlocales.ts',
+      'src/ui/talent_i18n.row_description_overrides.ts',
+      'src/ui/talent_i18n.row_title_overrides.ts',
+      'src/ui/talent_i18n.ts',
+      'src/ui/world_entity_i18n.ts',
+    ]);
+    // Reverse arm: every on-disk file in these DICT families must be
+    // matched by SOME input pattern, so a family file the globs miss cannot
+    // change scan output while riding a warm cache.
+    const familyStems = [
+      'sim_i18n',
+      'server_i18n',
+      'talent_i18n',
+      'world_entity_i18n',
+      'entity_i18n',
+    ];
+    const familyFiles = uiFiles.filter((f) => {
+      const base = f.slice('src/ui/'.length);
+      return familyStems.some(
+        (s) => base === `${s}.ts` || base.startsWith(`${s}.`) || base.startsWith(`${s}_`),
+      );
+    });
+    expect(familyFiles.length).toBeGreaterThanOrEqual(11);
+    for (const f of familyFiles) {
+      expect(matched.includes(f), `${f} is not matched by any i18n:gen input pattern`).toBe(true);
+    }
   });
 
   it('invalidates the server bundle when either Rift rollback migration source changes', () => {

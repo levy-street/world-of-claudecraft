@@ -2338,6 +2338,14 @@ describe('the dashboard ops reads: filters and the default window', () => {
     expect((seen[0] as { status: string }).status).toBe('active');
   });
 
+  it('passes sold and cancelled listing display categories through', async () => {
+    await hit('/internal/woc-market/listings', { status: 'sold' });
+    expect((seen[0] as { status: string }).status).toBe('sold');
+    seen = [];
+    await hit('/internal/woc-market/listings', { status: 'cancelled' });
+    expect((seen[0] as { status: string }).status).toBe('cancelled');
+  });
+
   it('caps the page size, so a caller cannot ask for an unbounded read', async () => {
     await hit('/internal/woc-market/listings', { pageSize: '100000' });
     expect((seen[0] as { pageSize: number }).pageSize).toBe(200);

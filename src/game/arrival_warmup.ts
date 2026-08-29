@@ -18,6 +18,7 @@
 
 import {
   awaitArrivalReveals as awaitRevealsDefault,
+  setArrivalEstablishingShot,
   setArrivalCover as setCoverDefault,
 } from '../render/arrival_cover';
 import { afterActiveAnimationMs as afterActiveAnimationMsDefault } from './active_animation_timer';
@@ -36,10 +37,27 @@ import { worldEntryGpuSettleCoverMs } from './ui_effects_profile';
  * cover still puts the admission on its arrival rule for the prepare's own
  * duration, and whatever is unlinked at the lift keeps linking behind the
  * reach floors.
+ *
+ * The ONE online exception is the entry that opens on the first-spawn
+ * cinematic's ESTABLISHING SHOT (arrival_cover.ts): a level-1 character's
+ * first seconds are that wide view of the village, nothing is actionable
+ * while the cinematic runs, and the curtain lifting on a village still
+ * revealing piecewise is the only thing that shot can show. That entry waits
+ * longer, online and offline alike: the town-kit bound below was sized for
+ * the decor a chase camera lands among, while the opening view marks the
+ * whole village imminent, and the offline probe still showed the village
+ * linking after a 3 s wait. Six seconds is the maintainer's call on the
+ * trade (a longer first loading screen on a slow machine, once per new
+ * character, against a cinematic that pops), between the town-kit bound and
+ * the reveal watchdog past which nothing can still be held. Both are bounds
+ * on the WAIT: what is held past them lifts with the curtain and reveals as
+ * its own compile lands.
  */
 export const ARRIVAL_REVEAL_SETTLE_MAX_MS = 3_000;
+export const ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS = 6_000;
 
-export function arrivalRevealSettleMaxMs(online: boolean): number {
+export function arrivalRevealSettleMaxMs(online: boolean, establishingShot = false): number {
+  if (establishingShot) return ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS;
   return online ? 0 : ARRIVAL_REVEAL_SETTLE_MAX_MS;
 }
 
@@ -201,12 +219,17 @@ export function runBlockingArrivalWarmup(deps: BlockingArrivalWarmupDeps): Promi
  * long as the curtain is up, so those compiles and their tail pieces are what
  * the covered frames run. `settleMs` is the existing GPU-settle cover (zero
  * online, per the same live-character rule); the offline reveal also waits,
- * bounded, for the imminent held keys.
+ * bounded, for the imminent held keys, and so does an entry that opens on the
+ * cinematic's establishing shot (`establishingShot`), online included: for as
+ * long as this cover is up, every reveal consult is imminent (arrival_cover.ts
+ * arrivalEstablishingShotActive), so the wait covers what that shot sees.
  */
 export function settleWorldEntryCover(deps: {
   adaptiveBudget: boolean;
   constrainedMemory: boolean;
   online: boolean;
+  /** The curtain lifts on the first-spawn cinematic's wide opening view. */
+  establishingShot?: boolean;
   revealWorld: () => void;
   afterActiveAnimationMs?: (ms: number, callback: () => void) => void;
   setCover?: (active: boolean) => void;
@@ -220,18 +243,21 @@ export function settleWorldEntryCover(deps: {
     constrainedMemory: deps.constrainedMemory,
     online: deps.online,
   });
+  const establishingShot = deps.establishingShot === true;
   setCover(true);
+  if (establishingShot) setArrivalEstablishingShot(true);
   const reveal = (): void => {
     try {
       deps.revealWorld();
     } finally {
       setCover(false);
+      if (establishingShot) setArrivalEstablishingShot(false);
     }
   };
   afterActiveAnimationMs(settleMs, () => {
     // The wait never rejects on its own; a throw out of revealWorld is a real
     // bug the console must show, but the cover has already been dropped above.
-    awaitReveals(arrivalRevealSettleMaxMs(deps.online))
+    awaitReveals(arrivalRevealSettleMaxMs(deps.online, establishingShot))
       .then(reveal, reveal)
       .catch((err) => console.error('World reveal failed', err));
   });

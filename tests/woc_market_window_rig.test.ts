@@ -257,6 +257,7 @@ interface Rig {
   fake: FakeClient;
   hooks: WocMarketHooks;
   signMessage: ReturnType<typeof vi.fn>;
+  signAndSend: ReturnType<typeof vi.fn>;
   world: { inventory: InvSlot[] };
   tooltips: Map<Element, () => string>;
   closeOthers: ReturnType<typeof vi.fn<() => void>>;
@@ -270,12 +271,14 @@ function rig(
 ): Rig {
   const fake = fakeClient(over.rows);
   const signMessage = vi.fn(async () => 'sig');
+  const signAndSend = vi.fn(async () => 'txsig');
   const hooks: WocMarketHooks = {
     client: fake.client,
     characterId: () => 1,
     walletLinked: () => over.walletLinked ?? true,
-    signAndSendTransactionBase64: async () => 'txsig',
-    signMessageBase58: signMessage as unknown as (m: string) => Promise<string>,
+    signAndSendTransactionBase64:
+      signAndSend as unknown as WocMarketHooks['signAndSendTransactionBase64'],
+    signMessageBase58: signMessage as unknown as WocMarketHooks['signMessageBase58'],
   };
   const root = document.createElement('div');
   root.id = 'woc-market-window';
@@ -309,6 +312,7 @@ function rig(
     fake,
     hooks,
     signMessage,
+    signAndSend,
     world,
     tooltips,
     closeOthers,
@@ -1287,6 +1291,55 @@ describe('WocMarketWindow live rig: payment balance refresh', () => {
       expect(r.refreshWocBalance).toHaveBeenCalledWith(true);
     },
   );
+});
+
+describe('WocMarketWindow live rig: desktop signer arguments', () => {
+  it('the step-up signer receives the SERVER message AND the challenge nonce', async () => {
+    // The desktop arm resolves the server-stored message by the nonce, so a
+    // dropped or transposed second argument silently strands every desktop
+    // listing; both parameters are strings, so only a runtime assertion
+    // catches it (the source pins cannot: the stepUp proof line carries the
+    // same substring).
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    const input = q<HTMLInputElement>(r.root, '.wm-combo-input');
+    input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    q<HTMLInputElement>(r.root, 'input[data-field="sell-start"]').value = '25';
+    q<HTMLButtonElement>(r.root, 'button[data-action="sell-submit"]').click();
+    await flush();
+    expect(r.signMessage).toHaveBeenCalledWith('sign me', 'n1');
+  });
+
+  it('the payment signer receives the transaction bytes AND the quote reference', async () => {
+    // Same shape for payments: the desktop arm resolves the registered quote
+    // by reference; a null second argument makes every desktop payment throw.
+    const r = rig();
+    r.win.open();
+    await flush();
+    r.hooks.client.confirmBond = vi.fn(async () => ({ ok: true as const, standing: true }));
+    Reflect.set(r.win, 'pendingQuote', {
+      kind: 'bond',
+      bidId: 7,
+      itemId: EPIC,
+      usdCents: 250,
+      quote: {
+        signatureRequired: true,
+        reference: 'WOC_pay_ref_1',
+        transactionBase64: 'payable-transaction',
+        amount: null,
+        seller: null,
+        burn: null,
+        treasury: null,
+        expiresAtMs: NOW + 60_000,
+      },
+    });
+    await (r.win as unknown as { signPendingQuote(): Promise<void> }).signPendingQuote();
+    expect(r.signAndSend).toHaveBeenCalledWith('payable-transaction', 'WOC_pay_ref_1');
+  });
 });
 
 describe('WocMarketWindow live rig: the platform gate', () => {

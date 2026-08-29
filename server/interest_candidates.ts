@@ -1,3 +1,4 @@
+import { bgOriginAt, isBgPos } from '../src/sim/data';
 import type { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
@@ -137,4 +138,31 @@ export function buildSharedInterestCandidates(
     },
     cellQueryCount,
   };
+}
+
+// Both endpoints inside the SAME battleground slot: the necessary condition for
+// the raised match-wide interest (never across slots, never to the open world).
+function inSameBgSlot(a: Entity, b: Entity): boolean {
+  if (!isBgPos(a.pos.x) || !isBgPos(b.pos.x)) return false;
+  return bgOriginAt(a.pos.z).slot === bgOriginAt(b.pos.z).slot;
+}
+
+// The raised battleground interest, narrowed to what the mode actually needs a
+// client to hold (see BG_MATCH_INTEREST_RADIUS): a same-slot TEAMMATE, or a
+// same-slot non-player entity (flag, rune, prop). `viewerBgTeam` is the pid
+// list of the viewer's own team, or null when the viewer is not in a match.
+// An enemy player, and anything an enemy owns, returns false and falls back to
+// the open-world radii in the broadcast loop's interestLimitSq. Moved here from
+// game.ts: an interest predicate over the shared candidate walk this module owns.
+export function bgWideInterestApplies(
+  viewer: Entity,
+  e: Entity,
+  viewerBgTeam: readonly number[] | null,
+): boolean {
+  if (!inSameBgSlot(viewer, e)) return false;
+  // A summoned mob (pet, guardian, totem) inherits its OWNER's arm: an enemy's
+  // pet trails the enemy, so widening it would leak the same position by proxy.
+  const subjectId = e.kind === 'player' ? e.id : e.ownerId;
+  if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
+  return viewerBgTeam?.includes(subjectId) ?? false;
 }

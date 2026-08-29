@@ -34,7 +34,10 @@ export interface ClaudiumSku {
 export interface ClaudiumStoreItem {
   itemId: string;
   name: string;
-  kind: 'cosmetic' | 'skin' | 'item';
+  // 'storage' is the Strongbox charter kind (Bank Storage phase 11): a
+  // REPEATABLE spend that writes no grant row, so its exactly-once guarantee
+  // rides entirely on the caller-held idempotencyKey below.
+  kind: 'cosmetic' | 'skin' | 'item' | 'storage';
   costClaudium: number;
   owned: boolean;
 }
@@ -352,7 +355,7 @@ export class EconomyClient {
 
   spend(input: {
     itemId: string;
-    kind: 'cosmetic' | 'skin' | 'item';
+    kind: 'cosmetic' | 'skin' | 'item' | 'storage';
     expectedCostClaudium: number;
     idempotencyKey: string;
   }): Promise<ClaudiumSpend> {

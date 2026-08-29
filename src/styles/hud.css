@@ -859,7 +859,19 @@
     position: relative;
     top: auto;
     left: auto;
-    width: 612px;
+    /* The children zoom with the Player Frame Scale slider (the rule further
+       down), so the box carries the same factor: a fixed 612px box around
+       zoomed content leaves the unlock outline and the drag clamp working a
+       frame edge the player cannot see (90px of dead band per side at 0.75).
+       The content stays centred, so the locked HUD renders exactly as before
+       at every scale; only the invisible box edges move. The base width is
+       the playerFrameWidth setting (the interface editor's edge drags), a
+       real layout dimension so the bars reflow instead of stretching. */
+    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
+    /* Bar thickness for this frame's hp/resource bars (playerFrameHeight):
+       .bar and .bar-text read the var, so a height drag thickens the bars at
+       crisp text instead of distorting them through a transform. */
+    --uf-bar-height: var(--player-frame-height, 15px);
     margin: 0 auto 8px;
     display: flex;
     align-items: center;
@@ -1183,7 +1195,11 @@
     flex: 1;
     width: auto;
     min-width: 0;
-    max-width: 520px;
+    /* Rides the playerFrameWidth setting minus the frame's fixed chrome
+       (92px: portrait plus the centring margins), so the bar panel takes the
+       whole width change and the content inset below stays constant. Stock
+       612px - 92px = the historical 520px. */
+    max-width: calc(var(--player-frame-width, 612px) - 92px);
   }
   /* How far the player frame's centred content row sits from the left edge of its
      612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
@@ -1202,9 +1218,15 @@
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: 612px;
+    /* Same width and centring as the docked seat above: the class flips at the
+       first grab (MovableFrame applies the position before measuring the grab
+       offset), so any difference between the two seats renders as the visible
+       content jumping sideways under the cursor the moment a drag starts
+       (18px at the default scale, 85px at 0.75 back when this was
+       flex-start over a fixed 612px). */
+    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
     margin: 0;
-    justify-content: flex-start;
+    justify-content: center;
     z-index: 6;
   }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
@@ -1271,6 +1293,9 @@
     top: 12px;
     display: none;
     z-index: 6;
+    /* Bar thickness for this frame's bars (targetFrameHeight): the nested
+       target-of-target frame inherits the var, so its strip thickens in step. */
+    --uf-bar-height: var(--target-frame-height, 15px);
   }
   /* Target Frame Scale (--target-frame-scale, targetFrameScale setting): the
      player frame's twin. Children only, never the drag-positioned frame itself
@@ -1385,7 +1410,8 @@
     pointer-events: auto;
   }
   .unitframe .tf-move-btn::before,
-  .warlock-doom-frame > .tf-move-btn::before {
+  .warlock-doom-frame > .tf-move-btn::before,
+  #chatlog-wrap .chat-move-btn::before {
     content: "";
     position: absolute;
     inset: 5px;
@@ -1428,9 +1454,9 @@
   /* The frame while unlocked: a dashed gold hint and a move cursor over the body. */
   .unitframe.tf-unlocked,
   .warlock-doom-frame.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
-    outline-offset: 2px;
+    outline-offset: -1px;
     touch-action: none;
   }
   .warlock-doom-frame.tf-unlocked {
@@ -1446,6 +1472,635 @@
   }
   body.mobile-touch .unitframe .tf-move-btn,
   body.mobile-touch .warlock-doom-frame > .tf-move-btn {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+     "Unlock interface" (interface_unlock.ts): the action bars, cast bar, menu
+     rail, minimap and pet frame become movable + scalable while body carries
+     .interface-unlocked. They share the unit frames' MovableFrame controller, so
+     the chrome is the same corner button plus the shared .panel-resize-grip; the
+     only difference is that neither is present until the interface is unlocked,
+     which keeps the stock HUD exactly as it was. Desktop only, like every other
+     frame gesture here.
+     --------------------------------------------------------------------------- */
+  #actionbar.tf-unlocked,
+  #actionbar2.tf-unlocked,
+  #actionbar3.tf-unlocked,
+  #castbar.tf-unlocked,
+  #swingbar.tf-unlocked,
+  #side-buttons.tf-unlocked,
+  #minimap-wrap.tf-unlocked,
+  #pet-frame.tf-unlocked,
+  #stancebar.tf-unlocked,
+  #xpbar.tf-unlocked,
+  #buff-bar.tf-unlocked,
+  #debuff-bar.tf-unlocked {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+    touch-action: none;
+  }
+  /* The corner button and grip need a positioned host to hang off. Only the
+     action bars lack one: the cast bar, the menu rail and the minimap wrap are
+     already absolute and the pet frame already relative. Re-stating the menu rail
+     here would ALSO shadow its real rule from the crafting-launcher rail budget,
+     which reads the FIRST wrapper block it finds by regex (and that regex scans
+     comments too, so do not spell the selector-plus-brace pattern in prose). */
+  #actionbar,
+  #actionbar2,
+  #actionbar3,
+  #stancebar {
+    position: relative;
+  }
+  /* A frame re-homed onto #ui (interface_unlock.ts makeUiRootDetacher: the action
+     bars and the pet frame, which otherwise resolve their left/top against
+     #bottom-bar's centering transform) must position off its own left/top. The
+     selectors are id-qualified because #pet-frame's own `position: relative` and
+     the action bars' rule above would otherwise win on specificity, leaving a
+     dragged frame stuck at its docked spot with the coordinates silently ignored.
+     Mirrors what pf-detached does for the player frame. */
+  #actionbar.hud-frame-detached,
+  #actionbar2.hud-frame-detached,
+  #actionbar3.hud-frame-detached,
+  #pet-frame.hud-frame-detached,
+  #stancebar.hud-frame-detached,
+  #xpbar.hud-frame-detached,
+  #buff-bar.hud-frame-detached,
+  #debuff-bar.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+  }
+  #actionbar .tf-move-btn,
+  #actionbar2 .tf-move-btn,
+  #actionbar3 .tf-move-btn,
+  #castbar .tf-move-btn,
+  #side-buttons .tf-move-btn,
+  #minimap-wrap .tf-move-btn,
+  #pet-frame .tf-move-btn,
+  #stancebar .tf-move-btn,
+  #xpbar .tf-move-btn,
+  #buff-bar .tf-move-btn,
+  #debuff-bar .tf-move-btn,
+  #chatlog-wrap .chat-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    cursor: var(--cursor-point);
+    z-index: 21;
+  }
+  #actionbar .tf-move-btn:focus-visible,
+  #actionbar2 .tf-move-btn:focus-visible,
+  #actionbar3 .tf-move-btn:focus-visible,
+  #castbar .tf-move-btn:focus-visible,
+  #side-buttons .tf-move-btn:focus-visible,
+  #minimap-wrap .tf-move-btn:focus-visible,
+  #pet-frame .tf-move-btn:focus-visible,
+  #stancebar .tf-move-btn:focus-visible,
+  #xpbar .tf-move-btn:focus-visible,
+  #buff-bar .tf-move-btn:focus-visible,
+  #debuff-bar .tf-move-btn:focus-visible,
+  #chatlog-wrap .chat-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The button is built once and hidden until unlocked (the controller also sets
+     the `hidden` attribute, which takes it out of the tab order). */
+  /* The chat box's arrange-mode keyboard move button: the same chrome as
+     every other frame's corner toggle, but the chat drags while LOCKED too
+     (its tab strip), so this extra affordance shows only in arrange mode
+     and the stock HUD gains no new tab stop. */
+  .chat-move-btn {
+    display: none;
+  }
+  body.interface-unlocked .chat-move-btn {
+    display: block;
+  }
+  .tf-move-btn-hidden {
+    display: none;
+  }
+  /* MovableFrame's own grip carries a second class so this gate cannot reach the
+     chat box or the meter panels, whose grips are always live. It only appears on
+     a frame that is actually loose, mirroring the target aura panel's
+     .ta-unlocked gate. Unlike those other grips this one is a real <button> (it
+     owns the arrow-key resize a keyboard player has no other route to), so the
+     button chrome is reset back to the shared hatch look. */
+  .mf-resize-grip {
+    display: none;
+    appearance: none;
+    padding: 0;
+    border: 0;
+  }
+  .tf-unlocked > .mf-resize-grip {
+    display: block;
+  }
+  /* While a frame is unlocked its grip is a primary affordance, not passive
+     chrome: the full 24px target at raised opacity and the game-styled
+     resize cursor (live play-testing found the dim hatch hard to discover
+     and grab). The chat grip joins in arrange mode; its LOCKED-mode base is
+     already 24px since it is an always-on focusable control. */
+  .tf-unlocked > .mf-resize-grip,
+  body.interface-unlocked .chat-resize-grip {
+    width: 24px;
+    height: 24px;
+    opacity: 0.85;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
+  }
+  /* The border bands advertise themselves on hover: the hovered side paints
+     an inset gold bar (data-resize-edge, written by the edge hover hit test),
+     so edge resizing is discoverable before the cursor change is noticed.
+     The bar is drawn by a dedicated overlay CHILD (.tf-edge-glow, minted by
+     MovableFrame and the chat controller) stacked over the frame's own
+     content: an inset shadow on the frame itself painted UNDER the bars and
+     buttons inside it, which mostly hid the highlight. */
+  .tf-edge-glow {
+    display: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 120;
+  }
+  .tf-unlocked > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap > .tf-edge-glow {
+    display: block;
+  }
+  .tf-unlocked[data-resize-edge="n"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="n"] > .tf-edge-glow {
+    box-shadow: inset 0 3px 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="s"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="s"] > .tf-edge-glow {
+    box-shadow: inset 0 -3px 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="e"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="e"] > .tf-edge-glow {
+    box-shadow: inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="w"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="w"] > .tf-edge-glow {
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="ne"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="ne"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 3px 0 var(--gold),
+      inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="nw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="nw"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 3px 0 var(--gold),
+      inset 3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="se"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="se"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 -3px 0 var(--gold),
+      inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="sw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="sw"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 -3px 0 var(--gold),
+      inset 3px 0 0 var(--gold);
+  }
+  .mf-resize-grip:focus-visible {
+    opacity: 0.9;
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The cast bar is hidden except while casting (and the auto-attack swing
+     timer except while swinging), so unlocking shows each as a dimmed
+     placeholder that can be positioned. !important is load-bearing: both
+     painters write `display` inline through the elided writers, and an
+     inline value beats an ordinary rule. A real cast repaints over the top of
+     this, so it never suppresses live cast information. */
+  body.interface-unlocked #castbar,
+  body.interface-unlocked #swingbar {
+    display: block !important;
+    opacity: 0.55;
+  }
+  /* Unlocking shows the frames the class could have that are merely EMPTY
+     right now (a target frame with nothing selected, a pet frame with no pet
+     out, the stance bar), so the layout is arrangeable in one session. Gated
+     on .tf-unlocked (not the body class alone) so a frame the coordinator
+     refused to loosen (the pet frame on a petless class) stays hidden;
+     !important beats the painters' inline display writes exactly as the
+     cast-bar rule above. The dim matches the cast-bar placeholder treatment:
+     while unlocked a frame is an inert arrangement proxy, not live combat
+     information. The optional action bars are deliberately NOT here: a bar the
+     player has switched OFF stays hidden while editing, and the options note
+     points at the plus/minus buttons for turning more on. */
+  body.interface-unlocked #target-frame.tf-unlocked,
+  body.interface-unlocked #pet-frame.tf-unlocked,
+  body.interface-unlocked #stancebar.tf-unlocked {
+    display: flex !important;
+    opacity: 0.55;
+  }
+  /* A resizable unit frame needs a positioned host for its grip; the three
+     already carry one (.unitframe and #party-frames are absolute, #player-frame
+     relative), so only the grip's own stacking is restated here, above the
+     frame's portrait and bars. */
+  #player-frame > .mf-resize-grip,
+  #target-frame > .mf-resize-grip,
+  #party-frames > .mf-resize-grip {
+    z-index: 21;
+  }
+  /* Containers that are invisible while EMPTY (no party, no auras) keep a
+     graspable placeholder box; the dashed .tf-unlocked outline draws its shape.
+     Unconditional minimums rather than :empty so a pooled-but-hidden child
+     cannot defeat the placeholder; a populated container already exceeds them. */
+  body.interface-unlocked #party-frames.tf-unlocked {
+    min-width: 220px;
+    min-height: 120px;
+  }
+  body.interface-unlocked #stancebar.tf-unlocked {
+    min-width: 160px;
+    min-height: 30px;
+  }
+  /* The arrange-mode name chip: which frame is which, sitting just ABOVE the
+     frame so it never covers the frame's own contents. A frame parked against
+     the viewport top has no room up there and its chip would clip away
+     entirely (that is how a frame ends up looking nameless), so the controller
+     stamps .tf-label-below on those and the chip hangs underneath instead.
+     Hidden until the frame is unlocked (the chat box gates on the body class
+     instead: its controller has no .tf-unlocked state). Inert text only, so it
+     never intercepts the drag it annotates. */
+  .tf-frame-label {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: -2px;
+    z-index: 22;
+    padding: 1px 7px;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+    color: var(--gold);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+  .tf-unlocked > .tf-frame-label,
+  body.interface-unlocked #chatlog-wrap > .tf-frame-label {
+    display: inline-block;
+  }
+  .tf-frame-label.tf-label-below {
+    bottom: auto;
+    top: calc(100% + 4px);
+  }
+  /* The XP bar and the cast bar both clip their overflow (a rounded fill, a
+     sliding cast fill), which silently swallowed their name chips: those were
+     the two frames that read as unnamed. While unlocked they are dimmed
+     placeholders, so letting them spill costs nothing. */
+  body.interface-unlocked #xpbar.tf-unlocked,
+  body.interface-unlocked #castbar.tf-unlocked,
+  body.interface-unlocked #swingbar.tf-unlocked {
+    overflow: visible;
+  }
+  /* While unlocked a frame's CONTENTS are a static picture: pointer-inert so a
+     grab anywhere on the frame starts the drag instead of pressing an action
+     button, selecting a unit, or scrubbing the minimap. Every descendant with
+     !important, because several controls inside governed frames re-enable
+     themselves with their own id-specific rules (the daily rewards chest's
+     pointer-events, the target debuff strip) and each would otherwise stay
+     clickable inside an "inert" frame. The frame's own chrome, the move button
+     and the resize grip, is carved back out. */
+  body.interface-unlocked .tf-unlocked :not(.tf-move-btn):not(.mf-resize-grip) {
+    pointer-events: none !important;
+  }
+  /* While unlocked each aura row keeps a graspable minimum box (the dashed
+     .tf-unlocked outline draws its shape), so an empty row is still there to
+     take hold of; a stretched row may also grow past its stylesheet width cap
+     while it carries a custom box. */
+  body.interface-unlocked #buff-bar.tf-unlocked,
+  body.interface-unlocked #debuff-bar.tf-unlocked {
+    min-width: 160px;
+    min-height: 30px;
+  }
+  #buff-bar.hud-frame-detached,
+  #debuff-bar.hud-frame-detached {
+    max-width: none;
+  }
+  /* The chat box rides the same arrange mode through its own geometry
+     controller: the whole box drags (its panes go pointer-inert so the wrap is
+     the event target) and wears the same dashed outline as every other frame. */
+  body.interface-unlocked #chatlog-wrap {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+  }
+  body.interface-unlocked #chatlog-wrap * {
+    pointer-events: none !important;
+  }
+  /* Edit-mode sample content (interface_unlock_preview.ts): example buffs,
+     party members, a mid-cast bar, laid over the otherwise-empty placeholder
+     frames so each can be sized against real proportions. Absolutely
+     positioned overlays, never children the frames' own painters manage;
+     inert like everything else inside an unlocked frame. */
+  .tf-preview {
+    position: absolute;
+    inset: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px;
+    pointer-events: none;
+    z-index: 4;
+  }
+  /* The aura sample rows mirror the LIVE bars' direction contract
+     (--buff-bar-direction / --debuff-bar-direction, the buffsLeftToRight /
+     debuffsLeftToRight toggles): row-reverse packs the samples against the
+     box's right end reading right to left, exactly like the live painter's
+     aura order in the row-reverse bar, and the menu toggle flips the sample
+     the same moment it flips the live rows. Without these the sample shell
+     was a plain LTR flex, so the editing box contradicted the live layout
+     (owner report). The on-frame twin below mirrors aurasOnPlayerFrame's
+     placement, whose live row is forced LTR regardless of the toggle. */
+  #buff-bar > .tf-preview-auras {
+    flex-direction: var(--buff-bar-direction, row-reverse);
+  }
+  #debuff-bar > .tf-preview-auras {
+    flex-direction: var(--debuff-bar-direction, row-reverse);
+  }
+  #player-frame > #buff-bar > .tf-preview-auras {
+    flex-direction: row;
+  }
+  .tf-preview-icon {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: #0c0a07;
+  }
+  /* The party sample host: REAL party-frame rows rendered inside by a second
+     PartyFramesPainter instance (interface_unlock_preview.ts), so the sample
+     is pixel-identical to a live party. IN FLOW (not the absolute overlay the
+     other samples use) so the force-shown #party-frames box grows to the
+     rows' true footprint; the column + spacing mirror #party-frames' own, so
+     the nested rows lay out exactly as direct members would. */
+  .tf-preview.tf-preview-party {
+    position: static;
+    inset: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--party-frame-spacing, 4px);
+  }
+  /* lockPlayerFrameToActionBar (Frames Settings menu): the bars own the
+     frame's spot, so its corner move button folds away entirely (display
+     none also drops it from the tab order); the interface-unlock
+     registration refuses to loosen the frame for the same reason (hud.ts,
+     setLockPlayerFrameToActionBar). */
+  body.pf-locked-to-bar #player-frame > .tf-move-btn {
+    display: none;
+  }
+  /* While that preview owns the party box, the LIVE rows fold away: the
+     preview re-renders the player's real members itself (padded with dummies
+     to the 10-slot sample roster), so leaving the live painter's rows visible
+     stacked N + 10 frames for a player in a party (owner report). DIRECT
+     child only, deliberately: the preview's own rows sit one level deeper
+     (.tf-preview-party > .party-rows, the throwaway painter mints its own
+     wrapper) and a descendant selector would hide those too, leaving the
+     editing box empty. Locking removes the body class, so the live rows
+     return the moment editing ends. */
+  body.interface-unlocked #party-frames > .party-rows {
+    display: none;
+  }
+  .tf-preview-unit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .tf-preview-portrait {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a3a4c, #15151f);
+  }
+  .tf-preview-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .tf-preview-name {
+    font-size: 10px;
+    line-height: 12px;
+    color: #fff0d0;
+    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .tf-preview-hp {
+    height: 8px;
+    width: 78%;
+    border-radius: 2px;
+    background: linear-gradient(#7ddb8a, #2e8f3e 60%, #1d5c28);
+  }
+  .tf-preview-mp {
+    height: 5px;
+    width: 62%;
+    border-radius: 2px;
+    background: linear-gradient(#8fb6e6, #3d6ea8 60%, #274a74);
+  }
+  /* The filled cast/swing samples: a fill under the frame's own label layer. */
+  .tf-preview-bar {
+    inset: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  .tf-preview-fill {
+    height: 100%;
+    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+    box-shadow: inset 0 1px 0 #fff4;
+  }
+  .tf-preview-bar-label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 11px;
+    line-height: 24px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--title-font);
+  }
+  /* The arrange mode's own controls: the floating Lock Interface exit (so
+     finishing an arrangement never means hunting for the options menu again)
+     plus the frames show/hide menu beside it. Centred at the top, clear of
+     every frame's default spot, and above the frame chrome. These are the ONLY
+     controls that stay live while the interface is unlocked, so they sit
+     outside the pointer-inert sweep by not being inside a frame. */
+  /* The Snap to Grid alignment grid (frameSnapToGrid): one faint gold line
+     every 16 VISUAL px, the exact FRAME_SNAP_GRID pitch snapped drags land
+     on (src/ui/target_frame_pos.ts). The overlay lives inside #ui, which
+     carries zoom: var(--ui-scale), so the author-space pitch divides by the
+     scale and the zoom multiplies it back to 16 visual px, the same
+     compensation #ui's own width uses; a plain 16px here drew the grid
+     offset from where snaps actually land at any other UI Scale (review
+     round four, blocker 1). First child of #ui at z-index 0, so it paints
+     over the world but under every frame being arranged; the coordinator
+     shows it only while the interface is unlocked AND the setting is on
+     (interface_unlock.ts refreshGridOverlay). */
+  #interface-grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      );
+  }
+  #interface-edit-controls {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    z-index: 40;
+    pointer-events: auto;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  #interface-edit-controls[hidden] {
+    display: none;
+  }
+  /* The dropdown beside the exit: a .panel anchored under the buttons, one
+     checkbox row per live frame. [hidden] must be restated because the flex
+     display above would otherwise defeat the attribute. */
+  #interface-frames-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #interface-frames-menu[hidden] {
+    display: none;
+  }
+  .frames-menu-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 6px;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .frames-menu-row:hover {
+    background: #ffffff14;
+  }
+  /* The discrete numeric rows (party columns): label left, a compact native
+     select pushed to the row's right edge, themed to the panel palette so it
+     never reads as default browser chrome. */
+  .frames-menu-select select {
+    margin-left: auto;
+    background: #0008;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font: inherit;
+    padding: 1px 4px;
+  }
+  /* A show/hide row: the checkbox label (grows) plus the per-frame
+     size-reset button, side by side. The button sits OUTSIDE the label so a
+     click can never double as the checkbox's activation. */
+  .frames-menu-row-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .frames-menu-row-wrap > .frames-menu-row {
+    flex: 1;
+    min-width: 0;
+  }
+  .frames-menu-reset {
+    flex: none;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #0008;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .frames-menu-reset:hover {
+    background: #ffffff14;
+  }
+  /* The show/hide sub-menu: a native details/summary fold, styled to read as
+     a menu heading, with the frame rows indented beneath it. */
+  .frames-menu-sub summary {
+    padding: 4px 6px;
+    cursor: var(--cursor-point);
+    font-size: 13px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .frames-menu-sub summary:hover {
+    background: #ffffff14;
+  }
+  .frames-menu-sub .frames-menu-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 12px;
+  }
+  /* The frame-behavior toggles below the fold (combine bars, hide unused
+     slots, ...), separated so the two groups read as distinct. */
+  .frames-menu-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 4px;
+  }
+  /* Frames the player hid via the frames menu. !important on purpose: it must
+     beat the painters' inline display writes while locked, and the force-shown
+     placeholder rules above while editing (those carry an id plus two classes,
+     so the second selector matches that strength and lands later in the
+     sheet). The menu row stays listed, which is the way back. */
+  #ui .tf-user-hidden {
+    display: none !important;
+  }
+  body.interface-unlocked #ui .tf-user-hidden {
+    display: none !important;
+  }
+  body.hud-frame-dragging,
+  body.hud-frame-dragging * {
+    user-select: none;
+  }
+  body.mobile-touch .tf-move-btn,
+  body.mobile-touch .tf-unlocked > .mf-resize-grip {
     display: none;
   }
   .portrait-wrap {
@@ -1620,6 +2275,9 @@
     margin-right: -18px;
     border-radius: 6px 11px 11px 6px;
     padding: 5px 26px 5px 8px;
+    /* The targetFrameWidth setting (the interface editor's edge drags): a real
+       layout width over the base .uf-bars 190px, so the bars reflow. */
+    width: var(--target-frame-width, 190px);
   }
   #target-frame .level-chip {
     left: auto;
@@ -1753,7 +2411,10 @@
   }
   .bar {
     position: relative;
-    height: 15px;
+    /* Var-driven thickness: #player-frame / #target-frame scope the var to
+       their height settings (the interface editor's vertical drags); every
+       other host (pet frame) keeps the stock 15px fallback. */
+    height: var(--uf-bar-height, 15px);
     background: #1a1a1a;
     border: 1px solid #000;
     margin-top: 3px;
@@ -1776,7 +2437,9 @@
     inset: 0;
     text-align: center;
     font-size: 11px;
-    line-height: 15px;
+    /* Tracks the var-driven bar thickness above so the text stays vertically
+       centred at any playerFrameHeight / targetFrameHeight. */
+    line-height: var(--uf-bar-height, 15px);
     color: #fff;
     text-shadow: 1px 1px 1px #000;
     font-weight: bold;
@@ -2208,7 +2871,10 @@
     right: 196px;
     top: 14px;
     display: flex;
-    flex-direction: row-reverse;
+    /* Icon flow rides the buffsLeftToRight setting (Frames Settings menu):
+       stock row-reverse grows right-to-left from the minimap-side anchor;
+       main.ts flips the var to `row` for left-to-right reading. */
+    flex-direction: var(--buff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
     max-width: 320px;
@@ -2222,7 +2888,9 @@
     right: 196px;
     top: 172px;
     display: flex;
-    flex-direction: row-reverse;
+    /* The debuff row's twin of the #buff-bar direction var above
+       (debuffsLeftToRight). */
+    flex-direction: var(--debuff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
     max-width: 320px;
@@ -2797,6 +3465,134 @@
   body.show-actionbar3 #actionbar3 {
     display: flex;
   }
+  /* Vertical action bars (actionBar1/2/3Vertical, the Frames Settings menu,
+     PER BAR): the flipped bar lays its slots out as a COLUMN. The width must
+     be its own (fit-content, centred): a bar docked in #actionbar-stack is a
+     stretched flex item, and a stretched column kept the full 612px stack
+     width, painting its panel background as a huge dark box with the edit
+     outline around it until the frame was moved (owner report). The
+     plus/minus toggle goes back to a ROW on a vertical bar, so the pair sits
+     side by side under the column instead of stacking it taller. */
+  #actionbar.bar-vertical,
+  #actionbar2.bar-vertical,
+  #actionbar3.bar-vertical {
+    flex-direction: column;
+    align-self: center;
+    width: fit-content;
+  }
+  #actionbar.bar-vertical .bar-toggle,
+  #actionbar2.bar-vertical .bar-toggle,
+  #actionbar3.bar-vertical .bar-toggle {
+    flex-direction: row;
+    justify-content: center;
+  }
+  /* The combined block follows bar 1's orientation (body class stamped by
+     main.ts): vertical bars sit side by side, bottom-aligned so bar 1 keeps
+     the ground line the plus/minus buttons live on. */
+  body.combined-bars-vertical.combined-action-bars #actionbar-group {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  /* The three action bars share a wrapper so the "Combine Action Bars" option
+     can move them as ONE frame. Off (the default) the wrapper has no box at
+     all, so the stack lays the three rows out exactly as it always did and each
+     row stays independently movable. On, it becomes a real column box: it is
+     the movable frame, and the rows inside it ride along. */
+  #actionbar-group {
+    display: contents;
+  }
+  body.combined-action-bars #actionbar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    /* Sized to the bars, not the stack: a block-level flex child stretches to
+       its parent's full width, which drew the arrange-mode outline across the
+       whole screen instead of around the combined block. */
+    width: fit-content;
+    margin: 0 auto;
+  }
+  /* A combined group re-homed onto #ui positions off its own left/top, exactly
+     as each bar does when moved on its own. The body-qualified selector is
+     load-bearing: the combined rule above carries `position: relative;
+     margin: 0 auto` at higher specificity than a bare
+     `#actionbar-group.hud-frame-detached`, and losing that tie left the
+     detached group IN FLOW, where the auto margins centered it and the inline
+     left offset applied relative on top, ratcheting the group to the right
+     screen edge on every grab. */
+  body.combined-action-bars #actionbar-group.hud-frame-detached,
+  #actionbar-group.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+  }
+  #actionbar-group.tf-unlocked {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+    touch-action: none;
+  }
+  #actionbar-group .tf-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    cursor: var(--cursor-point);
+    z-index: 21;
+  }
+  #actionbar-group .tf-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* While combined, only the rows the player has TURNED ON appear inside the
+     group, editing or not: the stock body.show-actionbar2/3 rules keep working
+     inside the wrapper, and a switched-off row never renders as a placeholder
+     (the options note points at the plus/minus buttons for turning more on). */
+  /* The plus/minus optional-row toggle at the end of the primary bar: a slim
+     vertical pair matching the slot chrome. 24x24 per button is the WCAG 2.2
+     SC 2.5.8 absolute target-size floor (src/ui/CLAUDE.md); do not shrink it. */
+  .bar-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .bar-toggle-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    line-height: 1;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: #d8c98f;
+    border: 1px solid #4a3d1d;
+    border-radius: 4px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    cursor: var(--cursor-point);
+    text-shadow: 1px 1px 2px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+  }
+  .bar-toggle-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  .bar-toggle-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .bar-toggle-btn:disabled {
+    opacity: 0.35;
+    cursor: var(--cursor-arrow);
+  }
   .action-btn {
     width: 46px;
     height: 46px;
@@ -3140,6 +3936,39 @@
     position: relative;
     z-index: 1;
   }
+  /* Horizontal menu rail (menuRailHorizontal, the Frames Settings menu): the
+     rail's two stacked columns become two side-by-side ROWS, reading as one
+     horizontal strip. The explicit 34px column width is dropped (a row sizes
+     to its buttons), and the rows bottom-align so the taller daily-rewards
+     chest never staggers the strip. */
+  body.menu-rail-horizontal #side-buttons {
+    flex-direction: column;
+    align-items: flex-end;
+    /* The stock 2px sat BETWEEN the two columns; between two stacked rows it
+       read as a stray horizontal seam, so the rows touch (owner request). */
+    gap: 0;
+  }
+  body.menu-rail-horizontal .side-buttons-col {
+    flex-direction: row;
+    align-items: flex-end;
+    width: auto;
+    /* The column's 4px button gap read as spacing BETWEEN items in a row;
+       the horizontal strip packs its buttons flush (owner request). */
+    gap: 0;
+  }
+  /* The daily-rewards chest's 46px box plus its 14px column spacing
+     inflated its row to 60px, floating the row's top edge 30px above the
+     30px buttons: exactly the seam the rows-touch rule above closes. In
+     the strip it takes a standard 30px slot and its art (overflow is
+     visible on the button) simply pokes past the box. */
+  body.menu-rail-horizontal #daily-rewards-button {
+    height: 30px;
+    margin-bottom: 0;
+  }
+  body.menu-rail-horizontal #daily-rewards-button .daily-rewards-icon {
+    width: 44px;
+    height: 44px;
+  }
   .micro-btn {
     width: 34px;
     height: 30px;
@@ -3443,8 +4272,8 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     cursor: nwse-resize;
     z-index: 3;
     opacity: 0.45;
@@ -5486,6 +6315,91 @@
     display: none !important;
   }
 
+  /* ---------- Steam wishlist reminder ---------- */
+  /* One permanently visible ask, never a takeover. src/ui/steam_wishlist.ts owns
+     the store URL and the policy for who must never see it; the reminder repeats
+     on every surface that already carries Donate (homepage header and footer in
+     shell.css, this in-game rail, and the mobile More tray).
+     What keeps it quiet, and what to preserve if this is ever restyled:
+       - it wears the chrome of the rail it sits in, never Steam's blue as a fill,
+         and never the gold call-to-action fill this HUD reserves for rewards;
+       - it takes quiet silver ink, so the fixed dark plate stays AA-readable
+         even when the surrounding theme switches to light Parchment;
+       - its only motion is a single slow sheen that crosses the plate about once
+         every 14 seconds and spends the rest of the cycle parked off the left
+         edge, so it registers peripherally and never asks to be looked at.
+     Steam's own #66c0f4 arrives on hover and keyboard focus only, identifying the
+     destination the way each sibling link's brand colour already does. */
+  .community-link.steam-wishlist-chip {
+    position: relative;
+    width: auto;
+    gap: 7px;
+    padding: 0 11px;
+    overflow: hidden;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    /* The plate itself is fixed dark across themes, so the ink is fixed too.
+       Parchment's repaired themed token is dark brown for light panels and
+       fails here; this muted silver holds above 7:1 on both gradient stops. */
+    color: #b8bcc8;
+  }
+  .community-link.steam-wishlist-chip span {
+    display: inline;
+    line-height: 1;
+  }
+  .community-link.steam-wishlist-chip .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  /* The sheen: a narrow warm highlight swept across the plate once per cycle.
+     Ambient by definition, so it pauses at the low effects tier and under
+     reduced motion, and its duration rides --motion-scale like every other
+     ambient loop in this sheet. */
+  .community-link.steam-wishlist-chip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 36%,
+      rgb(255 238 190 / 22%) 50%,
+      transparent 64%
+    );
+    transform: translateX(-140%);
+    animation: steam-wishlist-sheen 14s linear infinite;
+    animation-duration: calc(14s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  @keyframes steam-wishlist-sheen {
+    0%,
+    88% {
+      transform: translateX(-140%);
+    }
+    100% {
+      transform: translateX(140%);
+    }
+  }
+  .community-link.steam-wishlist-chip:hover,
+  .community-link.steam-wishlist-chip:focus-visible {
+    color: #fff;
+    border-color: #66c0f4;
+  }
+  /* Two audiences never see the reminder: a player already inside the Steam
+     build of the desktop app (body.steam-build, stamped from the shell's own
+     answer by syncSteamWishlistVisibility), and the native store shells, which
+     drop outbound store links exactly as they already drop Donate above. This
+     lives in @layer components with !important so it also reaches the shell
+     surfaces in the later @layer shell (important declarations reverse layer
+     order), which is the same mechanism the body.native-app block above uses. */
+  body.steam-wishlist-pending .steam-wishlist,
+  body.native-app .steam-wishlist,
+  body.steam-build .steam-wishlist {
+    display: none !important;
+  }
+
   /* ---------- tooltip ---------- */
   #tooltip {
     position: absolute;
@@ -7288,7 +8202,13 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   .party-frame .bar {
-    height: 9px;
+    /* The hp/resource bars absorb a height drag the way the player and
+       target frames' --uf-bar-height does (partyFrameHeight is the ROW
+       height: the name line plus padding cost about 24px, the remainder
+       splits across the two bars, landing on the stock 9px at the stock
+       42px row). The raid presentation overrides this with its own
+       full-cell bar geometry. */
+    height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));
     margin-top: 2px;
   }
   .party-frame .bar.hp {
@@ -7416,7 +8336,7 @@
     border-color: var(--gold);
   }
   #party-frames.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: 4px;
     touch-action: none;
@@ -7752,6 +8672,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  /* Store decisions must clear the Armory inspector (z90), and async results
+     remain readable after the Store itself has closed. */
+  #prompt-stack.store-decision-active,
+  #prompt-stack.store-result-active {
+    z-index: 96;
   }
   .prompt {
     padding: 14px 18px;

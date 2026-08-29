@@ -103,6 +103,10 @@ export const ERROR_CODES = deepFreeze({
   'character.rename_not_permitted': { params: [] },
   // identity: "type the character name to confirm deletion"
   'character.delete_confirm': { params: [] },
+  // identity: an open paid storage purchase must settle before character deletion
+  'character.storage_purchase_open': { params: [] },
+  // identity: the realm background gate refused the delete; retry in a moment
+  'character.delete_busy': { params: [] },
   // identity: "character already in world"
   'character.already_in_world': { params: [] },
   // identity: "character taken over"

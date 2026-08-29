@@ -709,7 +709,10 @@ export class WocTradeController {
         } else {
           this.log(t('hudChrome.wocMarket.signing'), WOC_LOG_NOTE);
           try {
-            signature = await hooks.signMessageBase58(issued.challenge.message);
+            signature = await hooks.signMessageBase58(
+              issued.challenge.message,
+              issued.challenge.nonce,
+            );
           } catch (err) {
             // Dev channel keeps the raw error; the player line is CLASSIFIED
             // (a decline, a timeout, a missing wallet), never the bridge's or
@@ -935,7 +938,10 @@ export class WocTradeController {
       } else {
         this.log(t('hudChrome.trade.woc.paying'), WOC_LOG_NOTE);
         try {
-          signature = await hooks.signAndSendTransactionBase64(staged.transactionBase64);
+          signature = await hooks.signAndSendTransactionBase64(
+            staged.transactionBase64,
+            staged.reference ?? null,
+          );
         } catch (err) {
           // Dev channel keeps the raw error; the player line is classified,
           // never rendered from err.message (the wallet-bridge i18n medium).

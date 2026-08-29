@@ -3,6 +3,8 @@
 // gating, take/delete rules, quest thank-you letters, persistence round-trip,
 // and rename rekeying. Pure sim tests: construct a Sim, advance fixed ticks.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
@@ -461,6 +463,118 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     // Attachments remain: the letter stays on its original attachment window,
     // neither emptied-clock started nor window restarted by the partial take.
     expect(raw.expiresAt).toBe(sentAt + MAIL_ATTACHMENT_EXPIRY_SECONDS);
+  });
+
+  // Phase 05 made the take POOL-AWARE: mailTake asks canGrantCopies with
+  // bagPools(meta.bags), the general/materials split, instead of a flat
+  // capacity. The two arms below cover both halves of that: this one the
+  // materials-pool-of-zero case (every socket empty), and the mixed-letter test
+  // after it the real split, driven through a shipped materialsOnly satchel.
+  // The same rule is pinned at the gate itself in tests/bags.test.ts.
+  it('keeps a MATERIAL parcel attached too: materials get no free pass without a materials bag', () => {
+    // The regression this closes is a take that treats materials as always
+    // grantable. linen_scrap is a real member of the derived material set, and
+    // with every socket empty the materials pool is 0, so it must be held back
+    // exactly like the food parcel above.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    sim.addItem('linen_scrap', 2, alice);
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Scraps', 'For you.', 0, [{ itemId: 'linen_scrap', count: 2 }], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+
+    moveToMailbox(sim, bob);
+    fillBags(sim, bob);
+    expect(bobMeta.bags).toEqual([null, null, null, null]); // no materials pool
+    sim.drainEvents();
+
+    const parcel = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'Scraps');
+    if (!parcel) throw new Error('parcel not delivered');
+    sim.mailTake(parcel.id, bob);
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+    const still = sim.mailInfoFor(bob)?.messages.find((m) => m.id === parcel.id);
+    expect(still?.items).toEqual([{ itemId: 'linen_scrap', count: 2 }]); // kept, not destroyed
+    expect(sim.countItem('linen_scrap', bob)).toBe(0);
+
+    // Free one general slot and the same material parcel arrives.
+    bobMeta.inventory = bobMeta.inventory.slice(0, 15);
+    sim.mailTake(parcel.id, bob);
+    const empty = sim.mailInfoFor(bob)?.messages.find((m) => m.id === parcel.id);
+    expect(empty?.items ?? []).toHaveLength(0);
+    expect(sim.countItem('linen_scrap', bob)).toBe(2);
+  });
+
+  it('splits a mixed letter by pool: the material lands, the non-material stays attached', () => {
+    // The two-pool contract end to end on shipped content. Bob equips a real
+    // materialsOnly satchel, so his general pool is the bare backpack while 12
+    // materials slots stand free. One letter carries both kinds: the material
+    // parcel is delivered into the materials pool and the food parcel, which
+    // can only take general headroom, is kept for a later take.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    sim.addItem('linen_scrap', 2, alice);
+    sim.addItem('roasted_boar', 2, alice);
+    moveToMailbox(sim, alice);
+    sim.mailSend(
+      'Bob',
+      'Mixed',
+      'Some of each.',
+      0,
+      [
+        { itemId: 'linen_scrap', count: 2 },
+        { itemId: 'roasted_boar', count: 2 },
+      ],
+      alice,
+    );
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+
+    moveToMailbox(sim, bob);
+    sim.addItem('foragers_haversack', 1, bob);
+    sim.equipBag('foragers_haversack', 0, bob);
+    expect(bobMeta.bags[0]).toBe('foragers_haversack');
+    // General exactly full with food stacks at their 20 cap, so the food parcel
+    // has neither a free slot nor top-up room; the materials pool is untouched.
+    bobMeta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'roasted_boar', count: 20 }));
+    sim.drainEvents();
+
+    const letter = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'Mixed');
+    if (!letter) throw new Error('letter not delivered');
+    sim.mailTake(letter.id, bob);
+    const events = sim.drainEvents();
+
+    expect(sim.countItem('linen_scrap', bob)).toBe(2); // delivered into the satchel
+    const still = sim.mailInfoFor(bob)?.messages.find((m) => m.id === letter.id);
+    expect(still?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]); // kept, not destroyed
+    expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+
+    // Free one general slot and the held food parcel arrives on the next take.
+    bobMeta.inventory = bobMeta.inventory.slice(0, 15);
+    sim.mailTake(letter.id, bob);
+    const empty = sim.mailInfoFor(bob)?.messages.find((m) => m.id === letter.id);
+    expect(empty?.items ?? []).toHaveLength(0);
+  });
+
+  it('asks the fit gate with the two-pool SPLIT, never a flat capacity', () => {
+    // The materialsOnly satchels shipped in this same phase, so the Sim-level
+    // arms above now discriminate the pool read behaviorally; this source pin
+    // stays as the cheap wiring guard beside them (it caught the contract
+    // during the phase, and it names the exact call shape), pinned the same
+    // way the hud's maxBuyCount call site
+    // is in tests/vendor_window_painter.test.ts.
+    const source = readFileSync(join(__dirname, '../src/sim/mail/post_office.ts'), 'utf8');
+    expect(source).toContain('bagPools(meta.bags),');
+    expect(source).not.toContain('bagCapacity(meta.bags)');
   });
 });
 

@@ -521,4 +521,13 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       'the per-window menu strip is replaced by the app-level guard',
     ).toBe(0);
   });
+
+  it('the startup banner logs the Exchange verdict for the per-channel smoke', () => {
+    // docs/desktop-release.md step 6 reads this field: on an unstamped build
+    // `distribution` collapses to website while this correctly says false, so
+    // the log alone answers the smoke. Sliced from the banner call so a field
+    // elsewhere cannot satisfy it.
+    const banner = block("log.info('[shell] starting'", '});', 'startup banner');
+    expect(banner).toContain('wocExchangeEnabled: desktopConfig.wocExchangeEnabled,');
+  });
 });
