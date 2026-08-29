@@ -26,6 +26,7 @@ import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import {
   desktopGpuBackendActive,
   desktopGpuBackendSupported,
+  onDesktopGpuBackendActiveChange,
 } from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
@@ -432,6 +433,10 @@ export class OptionsWindow {
   // its draft. The coordinator still finishes safely; the closed painter simply
   // does not rebuild hidden DOM with stale local state.
   private graphicsApplyGeneration = 0;
+  // Live only while the Graphics panel is on screen: the shell judges the
+  // launch seconds after boot, so a panel opened before that verdict painted
+  // the backend row without its reading and never refreshed.
+  private gpuBackendWatch: (() => void) | null = null;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
@@ -475,6 +480,7 @@ export class OptionsWindow {
     this.graphicsBusy = false;
     this.graphicsOutcome = null;
     this.opened = false;
+    this.syncGpuBackendWatch();
     this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
@@ -532,6 +538,7 @@ export class OptionsWindow {
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
     this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
+    this.syncGpuBackendWatch();
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -574,6 +581,21 @@ export class OptionsWindow {
     // (perf_overlay_settings.ts) rebuilds only its own subtree and never
     // touches this display value, which is already correct while that view stays open.
     if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
+  }
+
+  // The desktop shell's backend verdict lands on its own schedule, so the
+  // Graphics panel follows it while it is open, through the same rebuild a dial
+  // change uses. Held for exactly that view: nothing else paints the reading,
+  // and a subscription outliving the panel would rebuild hidden DOM.
+  private syncGpuBackendWatch(): void {
+    const wanted = this.opened && this.view === 'graphics';
+    if (wanted === (this.gpuBackendWatch !== null)) return;
+    if (!wanted) {
+      this.gpuBackendWatch?.();
+      this.gpuBackendWatch = null;
+      return;
+    }
+    this.gpuBackendWatch = onDesktopGpuBackendActiveChange(() => this.render());
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back

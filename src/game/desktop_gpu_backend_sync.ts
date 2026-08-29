@@ -81,7 +81,7 @@ export async function syncDesktopGpuBackendSetting(
   // The same answer carries the rung this launch is running: latch it here
   // rather than asking the shell twice for one payload. The latch and the row's
   // reader are at the foot of this module.
-  activeState = readActive(state) ?? activeState;
+  latchActive(state);
   const { setting } = state as { setting?: unknown };
   if (setting !== 'auto' && setting !== 'vulkan' && setting !== 'opengl') return;
   createSettings().set('gpuBackend', gpuBackendValueFromSetting(setting));
@@ -100,6 +100,36 @@ export interface DesktopGpuBackendActive {
  *  awaited per open, because the options row is built synchronously and a
  *  promise would paint the row once without the line and never again. */
 let activeState: DesktopGpuBackendActive | null = null;
+
+const activeListeners = new Set<() => void>();
+
+/** Subscribe to a CHANGE of the latched reading. The shell judges the launch a
+ *  few seconds in, so a surface built before that verdict (the options graphics
+ *  panel) would otherwise paint without the reading and never learn it. No
+ *  payload: every reader goes through desktopGpuBackendActive() below, so there
+ *  is one answer, not two. Returns the unsubscribe. */
+export function onDesktopGpuBackendActiveChange(listener: () => void): () => void {
+  activeListeners.add(listener);
+  return () => activeListeners.delete(listener);
+}
+
+/** Latch a reading the shell just handed us and wake the subscribers, keeping
+ *  what we had when the payload says nothing. Silent on an identical re-push:
+ *  the shell resends the same state on its own schedule, and a rebuild there
+ *  would throw away the control a player is standing on. */
+function latchActive(state: unknown): void {
+  const next = readActive(state);
+  if (!next) return;
+  const previous = activeState;
+  activeState = next;
+  if (
+    previous &&
+    previous.active === next.active &&
+    previous.requestedUnavailable === next.requestedUnavailable
+  )
+    return;
+  for (const listener of activeListeners) listener();
+}
 
 function readActive(state: unknown): DesktopGpuBackendActive | null {
   if (!state || typeof state !== 'object') return null;
@@ -123,7 +153,7 @@ export function initDesktopGpuBackendActive(bridge: DesktopBridge | null | undef
   const subscribe = bridge?.onGpuBackendState;
   if (typeof subscribe !== 'function') return () => {};
   return subscribe.call(bridge, (state) => {
-    activeState = readActive(state) ?? activeState;
+    latchActive(state);
   });
 }
 
@@ -132,7 +162,8 @@ export function desktopGpuBackendActive(): DesktopGpuBackendActive | null {
   return activeState;
 }
 
-/** Tests only: forget the latched reading between cases. */
+/** Tests only: forget the latched reading and its subscribers between cases. */
 export function resetDesktopGpuBackendActiveForTest(): void {
   activeState = null;
+  activeListeners.clear();
 }
