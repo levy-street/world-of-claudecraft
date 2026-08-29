@@ -91,7 +91,7 @@ export const gear: GuidePage = {
 
         ${section('guide.gear.uniqueTitle', p('guide.gear.uniqueBody'))}
 
-        ${section('guide.gear.masterwroughtTitle', p('guide.gear.masterwroughtBody'))}
+        ${section('guide.gear.masterwroughtTitle', p('guide.gear.masterwroughtBodyLegendary'))}
 
         ${section('guide.gear.setsTitle', p('guide.gear.setsBody'))}
 

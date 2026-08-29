@@ -337,7 +337,7 @@ function farmingSection(): string {
     </section>
     <section class="guide-block" id="prof-farm-table">
       <h2>${esc(t('guide.profPages.farm.tableHeading'))}</h2>
-      ${paras('guide.profPages.farm.tableBody')}
+      ${paras('guide.profPages.farm.tableBodyOneMeal')}
     </section>`;
 }
 
@@ -362,6 +362,17 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       ${deedsSection(g)}
       ${related([
         { href: hrefFor('professions'), key: 'guide.nav.professions' },
+        // Farming's table section hands its dish ladder to Cooking, so the
+        // farming page alone links the craft page it defers to (reusing the
+        // provisioning page's shipped 'Cooking' key: zero new rows).
+        ...(isFarming
+          ? [
+              {
+                href: hrefFor('professions/cooking'),
+                key: 'guide.profPages.prov.cookingLink' as const,
+              },
+            ]
+          : []),
         { href: hrefFor('professions/economy'), key: 'guide.profPages.econ.title' },
         { href: hrefFor('world'), key: 'guide.nav.world' },
       ])}

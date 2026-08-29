@@ -203,11 +203,19 @@ function factsHtml(c: GuideProfCraft): string {
 // ------------------------------------------------ per-craft prose sections
 // Craft-specific narrative (identity, materials, ladder, route; enchanting:
 // identity, leveling, market) from guide.profPages.craftProse.<craftId>.*,
-// the craft-specific prose the shared sections cannot carry.
-function proseSection(craftId: string, slot: string, sectionId: string): string {
+// the craft-specific prose the shared sections cannot carry. The optional
+// bodyKey override exists for a retired-and-re-keyed body (the reword-is-a-
+// new-key convention) whose replacement suffix the template cannot build;
+// the heading key always stays the template's.
+function proseSection(
+  craftId: string,
+  slot: string,
+  sectionId: string,
+  bodyKey?: TranslationKey,
+): string {
   return `<section class="guide-block" id="${esc(sectionId)}">
       <h2>${esc(t(`guide.profPages.craftProse.${craftId}.${slot}Heading` as TranslationKey))}</h2>
-      ${paras(`guide.profPages.craftProse.${craftId}.${slot}Body` as TranslationKey)}
+      ${paras(bodyKey ?? (`guide.profPages.craftProse.${craftId}.${slot}Body` as TranslationKey))}
     </section>`;
 }
 
@@ -287,7 +295,7 @@ function enchantingSections(): string {
     </section>
     <section class="guide-block" id="prof-enchants">
       <h2>${esc(t('guide.profPages.ench.enchantsHeading'))}</h2>
-      ${paras('guide.profPages.ench.enchantsNoteOffhand')}
+      ${paras('guide.profPages.ench.enchantsNoteInfusionLive')}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.ench.colEnchant'))}</th>
@@ -332,7 +340,15 @@ export function craftDetailHtml(c: GuideProfCraft): string {
     c.id === 'enchanting'
       ? proseSection(c.id, 'identity', 'prof-identity') +
         proseSection(c.id, 'leveling', 'prof-leveling')
-      : proseSection(c.id, 'identity', 'prof-identity') +
+      : proseSection(
+          c.id,
+          'identity',
+          'prof-identity',
+          // Cooking's identity body was retired and re-keyed for the
+          // canonical one-meal Well Fed sentence (the reword-is-a-new-key
+          // convention); the heading key is unchanged.
+          c.id === 'cooking' ? 'guide.profPages.craftProse.cooking.identityBodyOneMeal' : undefined,
+        ) +
         proseSection(c.id, 'materials', 'prof-materials') +
         proseSection(c.id, 'ladder', 'prof-ladder');
   const postSections =

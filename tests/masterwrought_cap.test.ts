@@ -213,20 +213,27 @@ describe('masterwrought cap constants', () => {
     // chain from test literal to matcher to emit with no self-comparison link.
     expect(DICT.en['error.masterwroughtCap']).toBe(CAP_ERROR);
     expect(DICT.en['error.masterwroughtLegendary']).toBe(LEGENDARY_ERROR);
-    // The guide gear page (phase 08) spells the equip cap as prose too, in
-    // English and five non-Latin fills: one more copy site the cap retune
-    // sweep above must reach. The expected word is DERIVED from the constant
-    // so the retune itself reds here, not only a reword.
+    // The guide gear page spells BOTH caps as prose too, in English and five
+    // non-Latin fills: one more copy site the cap retune sweep above must
+    // reach. The live key is masterwroughtBodyLegendary (phase 13 reword-as-
+    // new-key; the retired masterwroughtBody stays in the catalog until the
+    // release fill retires it and is no longer pinned here). Both expected
+    // words are DERIVED from the constants so a retune itself reds here, not
+    // only a reword.
     const CAP_WORDS: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four' };
-    expect(guideStrings.gear.masterwroughtBody).toContain(
+    expect(guideStrings.gear.masterwroughtBodyLegendary).toContain(
       `at most ${CAP_WORDS[MASTERWROUGHT_EQUIP_CAP]} Masterwrought`,
     );
-    // The five non-Latin fills restate the number in their own scripts; each
+    expect(guideStrings.gear.masterwroughtBodyLegendary).toContain(
+      `at most ${CAP_WORDS[MASTERWROUGHT_LEGENDARY_CAP]} legendary Masterwrought`,
+    );
+    // The five non-Latin fills restate both numbers in their own scripts; each
     // is pinned by the wording that carries the cap in that locale, so a
     // stale fill after a cap retune reds per locale instead of hiding behind
-    // the English pin. The table is the cap-2 edition: a retune re-cuts it
-    // beside the copy, which is the point.
+    // the English pin. The tables are the cap-2/legendary-1 edition: a retune
+    // re-cuts them beside the copy, which is the point.
     expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
+    expect(MASTERWROUGHT_LEGENDARY_CAP).toBe(1);
     const CAP_PROSE_BY_LOCALE: Record<string, string> = {
       ru_RU: 'не более двух',
       ja_JP: '最大2つまで',
@@ -234,10 +241,24 @@ describe('masterwrought cap constants', () => {
       zh_CN: '最多只能穿戴两件',
       zh_TW: '最多只能穿戴兩件',
     };
+    const LEGENDARY_PROSE_BY_LOCALE: Record<string, string> = {
+      ru_RU: 'не более одного',
+      ja_JP: '伝説の名匠鍛造の品は最大1つまで',
+      ko_KR: '전설 명장 제작 장비는 동시에 최대 한 개까지만',
+      zh_CN: '最多只能有一件传说品质的大师锻造装备',
+      zh_TW: '最多只能有一件傳說品質的大師鍛造裝備',
+    };
     for (const [locale, prose] of Object.entries(CAP_PROSE_BY_LOCALE)) {
-      expect(GUIDE_FILL_BY_LOCALE[locale]?.['guide.gear.masterwroughtBody'], locale).toContain(
-        prose,
-      );
+      expect(
+        GUIDE_FILL_BY_LOCALE[locale]?.['guide.gear.masterwroughtBodyLegendary'],
+        locale,
+      ).toContain(prose);
+    }
+    for (const [locale, prose] of Object.entries(LEGENDARY_PROSE_BY_LOCALE)) {
+      expect(
+        GUIDE_FILL_BY_LOCALE[locale]?.['guide.gear.masterwroughtBodyLegendary'],
+        locale,
+      ).toContain(prose);
     }
   });
 

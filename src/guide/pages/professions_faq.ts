@@ -9,7 +9,7 @@ import { type TranslationKey, t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import { paras, related } from './ui';
 
-export const PROF_FAQ_COUNT = 10;
+export const PROF_FAQ_COUNT = 11;
 
 /**
  * The answer key per row, NAMED rather than built from the index.
@@ -37,6 +37,7 @@ export const FAQ_ANSWER_KEYS: readonly TranslationKey[] = [
   'guide.profPages.faq.a8',
   'guide.profPages.faq.a9',
   'guide.profPages.faq.a10',
+  'guide.profPages.faq.a11Promotion',
 ];
 
 export function faqDetailHtml(): string {

@@ -156,6 +156,17 @@ function overviewHtml(): string {
         <h2>${esc(t('guide.professions.provenanceHeading'))}</h2>
         ${paras('guide.professions.provenanceBody')}
       </section>
+      <section class="guide-block" id="prof-endgame">
+        <h2>${esc(t('guide.professions.endgameHeading'))}</h2>
+        ${paras('guide.professions.endgameBody')}
+        ${paras('guide.professions.endgamePatternsBody')}
+        ${paras('guide.professions.endgameMaterialsBody')}
+      </section>
+      <section class="guide-block" id="prof-perfecting">
+        <h2>${esc(t('guide.professions.perfectingHeading'))}</h2>
+        ${paras('guide.professions.perfectingBody')}
+        ${paras('guide.professions.promotionBody')}
+      </section>
       ${stationsSection()}
       <section class="guide-block" id="prof-deeds">
         <h2>${esc(t('guide.professions.deedsHeading'))}</h2>
