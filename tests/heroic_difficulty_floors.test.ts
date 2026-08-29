@@ -19,6 +19,7 @@ import {
   NORMAL_DUNGEON_TUNING,
 } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
+import type { PlayerEquipment } from '../src/sim/entity';
 import { characterDerivedStats, createMob } from '../src/sim/entity';
 import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import {
@@ -26,7 +27,7 @@ import {
   mobTemplateForDungeonDifficulty,
 } from '../src/sim/instances/difficulty';
 import { requiredLevelFor } from '../src/sim/item_level_req';
-import type { DungeonDifficulty, ItemDef, PlayerEquipment } from '../src/sim/types';
+import type { DungeonDifficulty, ItemDef } from '../src/sim/types';
 import { ALL_EQUIP_SLOTS, armorReduction } from '../src/sim/types';
 
 const REF_ARMOR = 2861;
@@ -252,13 +253,13 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
   const maxArmorKit = (includeFlagged: boolean): PlayerEquipment => {
     const eq: Record<string, string> = {};
     for (const slot of ALL_EQUIP_SLOTS) {
-      let best: (ItemDef & Record<string, unknown>) | null = null;
+      let best: ItemDef | null = null;
       let bestArmor = -1;
-      for (const def of Object.values(ITEMS) as Array<ItemDef & Record<string, unknown>>) {
+      for (const def of Object.values(ITEMS)) {
         if (!includeFlagged && def.masterwrought === true) continue;
         if (!canEquipItemInSlot('warrior', def, slot, 'prot')) continue;
         if ((requiredLevelFor(def) ?? 0) > 20) continue;
-        const armor = (def.stats as Record<string, number> | undefined)?.armor ?? 0;
+        const armor = (def.stats as { armor?: number } | undefined)?.armor ?? 0;
         // Deterministic tie-break by id so the pick cannot drift with table order.
         if (armor > bestArmor || (armor === bestArmor && best !== null && def.id < best.id)) {
           bestArmor = armor;
@@ -279,8 +280,7 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
       ALL_EQUIP_SLOTS.length,
     );
     expect(
-      Object.values(ITEMS).filter((d) => (d as Record<string, unknown>).masterwrought === true)
-        .length,
+      Object.values(ITEMS).filter((d) => d.masterwrought === true).length,
       'the flagged family is really there to exclude',
     ).toBe(17);
     expect(withFlagged, 'a flagged def won a max-mitigation slot').toEqual(withoutFlagged);
