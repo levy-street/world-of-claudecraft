@@ -86,6 +86,7 @@ function encounterInstance(
     resetAvailableAt: 0,
     clearedBy: new Set(),
     enteredBy: new Set(),
+    raidReturnKeys: new Set(),
     raidBossWelcomeKeys: new Set(),
     combatExitMemory: new Map(),
   };

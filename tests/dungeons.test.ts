@@ -2783,7 +2783,7 @@ describe('dungeons: a cleared heroic claim outlives the ordinary empty-timeout',
     expect(inst.partyKey, 'freed once the extended grace elapses').toBeNull();
   });
 
-  it('a normal-difficulty run never earns the extended grace (clearedBy is heroic-only)', () => {
+  it('an ordinary normal-difficulty run never earns the extended grace (no clearedBy stamp)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
     enterDungeon(sim.ctx, 'hollow_crypt', pid);

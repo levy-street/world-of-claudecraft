@@ -86,12 +86,12 @@ export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
 // how long a corpse run has to make it back. Every other claim state (still
 // being fought, or freed and reclaimed at a new difficulty) keeps the
 // shorter, standard timeout so an abandoned attempt frees its slot promptly.
-// Deliberately HEROIC-ONLY: clearedBy is the only cheap "the final boss is
-// genuinely dead" signal that exists today (lockToHeroicClaim, stamped only
-// from the heroic mark payout), so a normal-difficulty or raid final-boss
-// kill still relies on the shorter INSTANCE_EMPTY_TIMEOUT alone. Extending
-// this further would need its own finalBossDeadAt-style marker on every
-// InstanceSlot, not just the heroic ledger; out of scope here.
+// clearedBy is the cheap "the final boss is genuinely dead" signal: heroic
+// kills stamp it via lockToHeroicClaim, and the weekly raid rooms' NORMAL
+// kills stamp it via awardHeroicMarks' weekly arm, so both take this longer
+// grace. An ordinary normal-difficulty kill stamps nothing and still relies
+// on the shorter INSTANCE_EMPTY_TIMEOUT alone; extending that further would
+// need its own finalBossDeadAt-style marker on every InstanceSlot.
 export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
@@ -529,6 +529,19 @@ export function enterDungeon(
   }
   const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
   const returningForLoot = inst !== undefined && corpseRunClaim === inst;
+  // The cleared-run door exception, the heroic idiom extended to the weekly
+  // rooms: the live claim this kill's own lock came from stays re-enterable
+  // for loot and corpse runs once its final boss is down. raidReturnKeys
+  // holds exactly that kill's participants who actually entered, on the
+  // DURABLE key, so a relog after a wipe cannot strand a raider outside
+  // their own cleared claim; a player locked by an EARLIER run still cannot
+  // walk into someone else's cleared claim, and a claim whose boss is up is
+  // a fresh farm no locked player may join.
+  const returningToClearedClaim =
+    WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) &&
+    inst !== undefined &&
+    !finalBossAlive(ctx, inst) &&
+    inst.raidReturnKeys.has(durableMemberKey(ctx, r.meta.entityId));
   // The raid rooms keep their at-the-door lockout, scoped to the difficulty
   // actually being entered: the live claim's when one exists, else the current
   // selection. A loot-eligible ghost may return to its party's defeated live
@@ -537,17 +550,6 @@ export function enterDungeon(
   if (DAILY_LOCKOUT_RAID_ROOMS.has(dungeonId) || WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)) {
     const doorDifficulty = inst?.difficulty ?? difficulty;
     const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
-    // The cleared-run door exception, the heroic idiom extended to the weekly
-    // rooms: the live claim this kill's own lock came from stays re-enterable
-    // for loot and corpse runs once its final boss is down. clearedBy holds
-    // exactly that kill's participants, so a player locked by an EARLIER run
-    // still cannot walk into someone else's cleared claim, and a claim whose
-    // boss is up is a fresh farm no locked player may join.
-    const returningToClearedClaim =
-      WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) &&
-      inst !== undefined &&
-      !finalBossAlive(ctx, inst) &&
-      inst.clearedBy.has(r.meta.entityId);
     if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot && !returningToClearedClaim) {
       ctx.error(
         r.meta.entityId,
@@ -571,6 +573,7 @@ export function enterDungeon(
     inst &&
     inst.difficulty === 'heroic' &&
     !returningForLoot &&
+    !returningToClearedClaim &&
     isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId)) &&
     (finalBossAlive(ctx, inst) || !inst.clearedBy.has(r.meta.entityId))
   ) {
@@ -937,6 +940,7 @@ function claimInstance(
   inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
   inst.combatExitMemory = new Map();
   const origin = instanceOriginOf(inst);
@@ -1049,6 +1053,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
   inst.combatExitMemory = new Map();
 }
@@ -1184,12 +1189,24 @@ export function instanceLockoutMetas(ctx: SimContext, inst: InstanceSlot): Playe
   return out;
 }
 
+// The durable per-player membership key for a claim's session ledgers: the
+// server's stable character id when present (it survives the relog or
+// character-select Take Over that mints a new entity id), the entity id for
+// offline and sim-only callers (the raidBossWelcomeKeys idiom).
+function durableMemberKey(ctx: SimContext, entityId: number): string {
+  const characterId = ctx.players.get(entityId)?.characterId;
+  return characterId === undefined ? `entity:${entityId}` : `character:${characterId}`;
+}
+
 // Stamp one player's heroic daily lockout for this claim. A player whose lock
 // FIRST lands with this kill also joins the claim's `clearedBy` set: the
 // heroic door's cleared-run exception (enterDungeon) admits only them, so a
 // player locked by an EARLIER run can never treat someone else's cleared claim
 // as their own loot run (corpse loot rights ride the tapper's current party,
-// so an open door would hand them the epics too).
+// so an open door would hand them the epics too). Participants who actually
+// stepped through the door also mint a durable raidReturnKeys entry, the key
+// the weekly rooms' door exception reads (a parked alt the lockout strikes
+// without pay never entered, so it earns no return key either).
 function lockToHeroicClaim(
   ctx: SimContext,
   inst: InstanceSlot,
@@ -1197,7 +1214,12 @@ function lockToHeroicClaim(
   lockedUntil: number,
 ): void {
   const lockId = heroicLockoutId(inst.dungeonId);
-  if (!isRaidLocked(ctx, meta, lockId)) inst.clearedBy.add(meta.entityId);
+  if (!isRaidLocked(ctx, meta, lockId)) {
+    inst.clearedBy.add(meta.entityId);
+    if (inst.enteredBy.has(meta.entityId)) {
+      inst.raidReturnKeys.add(durableMemberKey(ctx, meta.entityId));
+    }
+  }
   meta.raidLockouts.set(lockId, lockedUntil);
 }
 
@@ -1241,7 +1263,13 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
       for (const meta of lockoutRecipients.values()) {
         // The cleared-run door exception admits exactly this kill's own
         // participants back for loot and corpse runs (the heroic idiom).
-        if (!isRaidLocked(ctx, meta, inst.dungeonId)) inst.clearedBy.add(meta.entityId);
+        // Only players who actually entered mint the durable return key.
+        if (!isRaidLocked(ctx, meta, inst.dungeonId)) {
+          inst.clearedBy.add(meta.entityId);
+          if (inst.enteredBy.has(meta.entityId)) {
+            inst.raidReturnKeys.add(durableMemberKey(ctx, meta.entityId));
+          }
+        }
         meta.raidLockouts.set(inst.dungeonId, lockedUntil);
       }
     }
@@ -1338,8 +1366,15 @@ export function updateInstances(ctx: SimContext): void {
       inst.emptyFor = 0;
     } else {
       inst.emptyFor += 1;
-      const emptyTimeout =
-        inst.clearedBy.size > 0 ? INSTANCE_CLEARED_EMPTY_TIMEOUT : INSTANCE_EMPTY_TIMEOUT;
+      // The Ignivar rooms free as a whole family, so a bossless room's shorter
+      // empty timeout must not reap a sibling's cleared claim (and its boss
+      // corpse) out from under the loot-and-corpse-run grace window: any
+      // cleared claim in the family extends the grace to all of it.
+      const clearedGrace =
+        inst.clearedBy.size > 0 ||
+        (isIgnivarRaidRoom(inst.dungeonId) &&
+          ignivarRaidClaimsForKey(ctx, inst.partyKey).some((claim) => claim.clearedBy.size > 0));
+      const emptyTimeout = clearedGrace ? INSTANCE_CLEARED_EMPTY_TIMEOUT : INSTANCE_EMPTY_TIMEOUT;
       if (inst.emptyFor >= emptyTimeout) {
         if (isIgnivarRaidRoom(inst.dungeonId)) {
           for (const claim of ignivarRaidClaimsForKey(ctx, inst.partyKey)) {

@@ -1178,6 +1178,13 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Durable-character (or offline-entity) identities of THIS kill's own locked
+  // participants who actually stepped through the door: the weekly raid rooms'
+  // cleared-run door exception re-admits exactly these for loot and corpse
+  // runs. Durable-keyed (the raidBossWelcomeKeys idiom) so the relog that
+  // mints a new entity id after a wipe cannot strand a raider outside their
+  // own cleared claim. Session-only, cleared with the claim.
+  raidReturnKeys: Set<string>;
   // Durable-character or offline-entity identities that already heard this
   // claim's first-entry raid-boss welcome. Session-only and cleared with the
   // claim so a relog cannot replay it while a fresh instance can.
