@@ -4764,6 +4764,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritcall signature)',
   },
+  // ---- Spiritmend out-of-combat mass resurrection, the Chronomancy
+  // collective_reversal twin. The five-minute cooldown is the real throttle:
+  // requiresOutOfCombat alone is not one, because a backline healer who never draws
+  // aggro drops combat mid-fight the moment combatTimer passes the 5s linger (see the
+  // engagedPids pass in sim.ts), so a zero-cooldown mass rez could be chained
+  // repeatedly inside a single encounter. Kept equal to collective_reversal so the two
+  // mass rezzes cannot be played against each other; both are pinned to that equality.
   ancestor_return: {
     id: 'ancestor_return',
     name: "Ancestors' Return",
@@ -4772,7 +4779,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 0,
+    cooldown: 300,
     range: 0,
     school: 'nature',
     requiresTarget: false,
