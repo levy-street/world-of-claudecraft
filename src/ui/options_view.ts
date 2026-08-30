@@ -226,7 +226,12 @@ export interface OptionsEnv {
    *  whether that fell short of the setting. Absent until the shell has judged
    *  it (and on every non-desktop caller), which is why the status line is
    *  conditional rather than showing an empty reading. */
-  desktopGpuBackendActive?: { active: string; requestedUnavailable: boolean } | null;
+  desktopGpuBackendActive?: {
+    active: string;
+    requestedUnavailable: boolean;
+    /** Auto held at OpenGL by the shell's GPU policy (an excluded card). */
+    autoCapped?: boolean;
+  } | null;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -583,11 +588,24 @@ export function buildGraphicsSections(
     // take, since a player who picked Vulkan would otherwise read "Vulkan"
     // while playing on OpenGL. Absent until the shell has judged the launch.
     const active = env.desktopGpuBackendActive;
-    const backendRow = choice(s, 'gpuBackend', 'hudChrome.options.gpuBackend', gpuBackendOptions);
+    // Re-renders on a pick: the restart strip at the panel's foot reads the
+    // live value against the launch snapshot, so the panel must rebuild for
+    // the offer to appear (or withdraw) under the click.
+    const backendRow = choice(
+      s,
+      'gpuBackend',
+      'hudChrome.options.gpuBackend',
+      gpuBackendOptions,
+      true,
+    );
     if (active) {
+      // A choice that fell short wins over a capped Auto: the two cannot both
+      // hold (a cap only ever applies to Auto), and the order is a pin.
       backendRow.statusKey = active.requestedUnavailable
         ? 'hudChrome.options.gpuBackendActiveUnavailable'
-        : 'hudChrome.options.gpuBackendActive';
+        : active.autoCapped
+          ? 'hudChrome.options.gpuBackendActiveAutoCapped'
+          : 'hudChrome.options.gpuBackendActive';
       backendRow.statusValueKeys = { backend: gpuBackendActiveNameKey(active.active) };
     }
     system.push(backendRow, note('hudChrome.options.gpuBackendNote'));
@@ -774,7 +792,9 @@ export function buildInterfaceControls(
   // next-launch caveat (the shell applies the choice at startup, not live).
   if (env?.desktopGpuPref) {
     general.push(
-      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
+      // Re-renders on a flip: the restart strip at the tab's foot reads the
+      // live value against the launch snapshot (same reason as the backend row).
+      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu', { rerender: true }),
       note('hudChrome.options.forceHighPerfGpuNote'),
     );
   }

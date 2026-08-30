@@ -558,6 +558,12 @@ describe('relaunchForLinuxPrime', () => {
         ...LINUX_PRIME_ENV,
         UNRELATED: 'x',
         WOC_PRIME_RELAUNCHED: '1',
+        // The record of what THIS relaunch planted (the player-requested restart in
+        // electron/launch_settings.cjs takes back exactly these): every offload
+        // variable, since the player had set none, and the ozone argument it appended.
+        WOC_PRIME_RELAUNCH_ADDED: [...Object.keys(LINUX_PRIME_ENV), '--ozone-platform=x11'].join(
+          ',',
+        ),
       },
       stdio: 'inherit',
       detached: true,

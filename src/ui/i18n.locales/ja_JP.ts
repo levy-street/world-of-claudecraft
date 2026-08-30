@@ -1520,7 +1520,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendActiveUnavailable':
     '現在は {backend} を使用しています（Vulkan を有効にできませんでした）。',
   'hudChrome.options.gpuBackendNote':
-    '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。',
+    '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。次回のゲーム起動時に反映されます。',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    '現在 {backend} を使用中です。このグラフィックカードでは自動はまだVulkanを試しません。試すにはVulkanを選んでください。',
+  'hudChrome.options.restartPending': '一部の変更は再起動後に反映されます。',
+  'hudChrome.options.restartGame': 'ゲームを再起動',
+  'hudChrome.options.restartInProgress': 'ゲームを再起動しています...',
+  'hudChrome.options.restartFailed': 'ゲームを自動で再起動できませんでした。終了してからもう一度起動してください。',
   'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
   'hudChrome.options.discordPresenceNote':
     'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',

@@ -29,6 +29,11 @@ import {
   onDesktopGpuBackendActiveChange,
 } from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
+import {
+  desktopRestartSupported,
+  pendingRestartKeys,
+  requestDesktopRestart,
+} from '../game/desktop_next_launch_settings';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
   GAMEPAD_CANCEL,
@@ -117,6 +122,8 @@ import {
   withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
+import { buildRestartStrip, paintRestartStrip } from './restart_strip';
+import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
 import { settingsCard, subhead } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
@@ -429,6 +436,10 @@ export class OptionsWindow {
   private graphicsApplied: GraphicsSettingsSnapshot | null = null;
   private graphicsBusy = false;
   private graphicsOutcome: GraphicsApplyOutcome | null = null;
+  // Where the restart strip's own request stands (restart_strip_core.ts). The
+  // strip is composed at the foot of every panel that hosts a next-launch
+  // setting, so the phase lives on the window, not on a panel.
+  private restartPhase: RestartRequestPhase = 'idle';
   // Invalidates an async settlement after the window has closed and discarded
   // its draft. The coordinator still finishes safely; the closed painter simply
   // does not rebuild hidden DOM with stale local state.
@@ -1135,6 +1146,52 @@ export class OptionsWindow {
     this.render();
   }
 
+  // The restart strip (restart_strip.ts) for the panel being painted, or null
+  // when it has nothing to offer: no next-launch setting differs from what this
+  // launch runs on (whichever panel its row is on: the offer follows what is
+  // pending, so a player who toggled the GPU force under Interface and opened
+  // Graphics still sees the way to apply it), the shell cannot restart itself,
+  // or the host panel's own Apply comes first. The pending check reads the live
+  // settings against the shell's launch snapshot (desktop_next_launch_settings.ts),
+  // so a value put back to what is running withdraws the offer without any
+  // bookkeeping here. The click repaints the strip IN PLACE rather than through
+  // render(): a rebuild would replace the live region with its text and drop
+  // focus to the body (restart_strip.ts).
+  private restartStrip(dirty: boolean, busy: boolean): HTMLElement | null {
+    const hooks = this.deps.options();
+    if (!hooks) return null;
+    const bridge = desktopBridge();
+    if (!desktopRestartSupported(bridge)) return null;
+    const pending = pendingRestartKeys(bridge, hooks.settings).length > 0;
+    const state = restartStripState({ pending, dirty, busy, phase: this.restartPhase });
+    if (state === 'hidden') {
+      // Nothing to offer means nothing to have failed: a stale failure would
+      // otherwise greet the next change.
+      if (!pending) this.restartPhase = 'idle';
+      return null;
+    }
+    let strip: HTMLElement | null = null;
+    strip = buildRestartStrip(state, {
+      onRestart: () => {
+        if (this.restartPhase === 'restarting' || !strip) return;
+        audio.click();
+        this.restartPhase = 'restarting';
+        paintRestartStrip(strip, 'restarting');
+        void requestDesktopRestart(bridge).then((started) => {
+          // On success the shell quits this process and nothing runs here; a
+          // false answer is the child that never started, and the offer stands.
+          if (started) return;
+          this.restartPhase = 'failed';
+          // The panel may have been rebuilt meanwhile (a setting changed while
+          // the request was out): only a strip still in the tree is repainted,
+          // the next render reads the phase anyway.
+          if (strip?.isConnected) paintRestartStrip(strip, 'failed');
+        });
+      },
+    });
+    return strip;
+  }
+
   // The panel's ONE inline action row (playtest feedback): Back at the inline
   // start, the async status stretching between, then Reset to Defaults as a
   // quiet text button beside the primary Apply at the inline end. It replaces
@@ -1279,6 +1336,11 @@ export class OptionsWindow {
     note.className = 'set-note';
     note.textContent = t('hud.options.graphicsNote');
     el.appendChild(note);
+    // A next-launch change (the Linux backend row here, the GPU force under
+    // Interface) is applied by a restart, not by Apply: the strip offers it
+    // once the in-page draft is settled.
+    const restartStrip = this.restartStrip(this.graphicsDirty(), this.graphicsBusy);
+    if (restartStrip) el.appendChild(restartStrip);
     el.appendChild(this.graphicsFooter(controls, unavailable));
     // The generic settingsViewFooter is not used here (the inline action row
     // replaces it), so wire the title-bar close control directly.
@@ -1612,6 +1674,12 @@ export class OptionsWindow {
       chat: [],
       combat: [],
     };
+    // The dedicated-GPU row lives on General: that tab hosts the strip (the
+    // others have no next-launch row to stand it beside).
+    if (tab === 'general') {
+      const restartStrip = this.restartStrip(false, false);
+      if (restartStrip) body.appendChild(restartStrip);
+    }
     this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {
       const allKeys = [...keys, ...offMenuTabKeys[tab]];
       hooks.settings.reset(allKeys);

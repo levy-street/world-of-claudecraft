@@ -308,6 +308,11 @@ function buildLinuxPrimeEnv(existingEnv, fileExists = nodeExistsSync) {
 // check instead: every relaunch produces a child whose argv carries an explicit
 // --ozone-platform, and a marked process with one never relaunches.
 const PRIME_RELAUNCH_MARKER = 'WOC_PRIME_RELAUNCHED';
+// Beside the marker, WHAT the relaunch added, comma-separated: the env names buildLinuxPrimeEnv
+// planted (never one the player had already set) and LINUX_OZONE_X11_ARG when it was appended.
+// A player-requested restart (electron/launch_settings.cjs) strips exactly these and nothing of
+// the player's own, so a shell relaunch stays invisible to the environment it inherited.
+const PRIME_RELAUNCH_ADDED_ENV = 'WOC_PRIME_RELAUNCH_ADDED';
 
 /**
  * Whether this process should re-exec itself with the Linux PRIME env applied.
@@ -450,7 +455,13 @@ function relaunchForLinuxPrime(deps = {}) {
     ? baseArgv
     : [...baseArgv, LINUX_OZONE_X11_ARG];
   const additions = buildLinuxPrimeEnv(env, fileExists);
-  const childEnv = { ...env, ...additions, [PRIME_RELAUNCH_MARKER]: '1' };
+  const added = [...Object.keys(additions), ...(argv === baseArgv ? [] : [LINUX_OZONE_X11_ARG])];
+  const childEnv = {
+    ...env,
+    ...additions,
+    [PRIME_RELAUNCH_MARKER]: '1',
+    [PRIME_RELAUNCH_ADDED_ENV]: added.join(','),
+  };
 
   try {
     const spawnTarget = spawnDetachedSelf({
@@ -590,6 +601,7 @@ module.exports = {
   LINUX_PRIME_ENV,
   LINUX_OZONE_X11_ARG,
   PRIME_RELAUNCH_MARKER,
+  PRIME_RELAUNCH_ADDED_ENV,
   buildLinuxPrimeEnv,
   hasExplicitOzonePlatformArg,
   isLinuxHybridGpu,

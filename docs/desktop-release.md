@@ -106,7 +106,8 @@ the live Vite page and reloads with it. Env vars that matter on that command lin
 - `WOC_DISABLE_GPU_FORCE=1`: skip every GPU lever for this launch (the discrete-GPU
   force on all platforms, the Linux PRIME relaunch, and the Linux GPU backend switches).
 - `WOC_GPU_BACKEND=vulkan|opengl`: force the Linux GL backend for this launch, never
-  judged into the memory (see "GPU backend on Linux" below).
+  judged into the memory (see "GPU backend on Linux" below); `vulkan` is also how to try
+  Vulkan on a GPU the policy keeps Auto off (AMD, at the time of writing).
 
 Where the shell writes: `main.log` (the rotating shell log, `electron/logging.cjs`)
 and `desktop-prefs.json` (the shell's own prefs store, `electron/desktop_prefs.cjs`)
@@ -147,6 +148,37 @@ value reads without a decoder:
 | `vulkan-parallel-compile` | Vulkan with the ANGLE parallel-compile feature |
 | `vulkan-plain` | Vulkan without it (the feature is still opt-in upstream, and one rare late GPU-process crash was seen with it on Intel/Mesa) |
 | `opengl` | Chromium's default backend, no switches |
+
+### The policy: which machines Auto tries Vulkan on
+
+Above the memory and the rescue below sits a third, simpler thing: the exclusion list in
+`electron/gpu_backend_policy.cjs` (`AUTO_VULKAN_EXCLUSIONS`). The ladder's verdict only
+knows the failures it can observe (a GPU process that dies, a software rasterizer, a
+backend that did not bind); a driver that renders WRONG without dying is invisible to it,
+and a Steam Deck (AMD APU, Mesa RADV) reported exactly that: the game came up on ANGLE
+Vulkan and every texture was noise. Vulkan was only ever measured on NVIDIA and Intel, so
+on hardware where it was not, Auto is CAPPED at OpenGL and Vulkan is one explicit choice
+away (the `vulkan` setting, or `WOC_GPU_BACKEND=vulkan`).
+
+- The evidence is `/sys/class/drm` (`linuxGpuAdapters`), read at the top of `main.cjs`
+  before the switches are appended, the same source as the PRIME hybrid check. The
+  adapters judged are the ones that will render: under the PRIME offload the card that
+  does NOT drive the screen (what `DRI_PRIME=1` and the NVIDIA offload variables select,
+  whichever vendor it is), else the card that drives the screen (`boot_vga`), else all of
+  them (`renderingAdapters`); an unreadable `/sys` is no evidence and no cap.
+- An entry names a PCI vendor, optionally one device id, and its reason and what would
+  lift it. It is a decision with its evidence: add one when a machine renders wrong or
+  dies on Vulkan in a way the ladder cannot catch, remove it once Vulkan is measured
+  healthy there. The list ships with AMD (`0x1002`) on it.
+- A capped launch (`decideGpuBackendLaunch` with `autoCeiling`, `capAutoLaunch`) is NOT the
+  memory's: nothing is remembered and the counter does not move, so the policy leaves no
+  trace of its own and the day an entry is lifted Auto resumes from whatever it remembered
+  before (the top rung when nothing was). Auto is capped at the ceiling as well as above
+  it, so a machine whose memory already said OpenGL still reads as held by the policy in
+  the options row. The rescue still applies. `main.log` says `[gpu] backend launch: opengl (auto, capped at opengl:
+  0x1002:0x163f excluded: ...)`, and the options row reads "Auto does not try Vulkan on
+  this graphics card yet; pick Vulkan to try it" (`autoCapped` on
+  `desktop-get-gpu-backend`).
 
 ### Two mechanisms, kept apart
 
@@ -256,6 +288,34 @@ rescue moved off the player's choice also raises the boot GPU notice
 opens the options still learns their choice did not take. Both read the same shell
 answer: `active` and `requestedUnavailable` on `desktop-get-gpu-backend`, pushed again
 on `desktop-gpu-backend-state` when the launch is judged.
+
+### Settings that take effect at the next launch
+
+The backend setting and the discrete-GPU opt-out are read before Electron's own startup,
+so a setter persists them for the next launch and the running session keeps the old
+value. Two things make that usable (`electron/launch_settings.cjs`):
+
+- `desktop-get-launch-settings` answers what THIS process started with
+  (`launchSettingsSnapshot`, taken right after the prefs load and frozen). The getters
+  serve the STORED values, which a setter moves live, so the snapshot is the only way the
+  game can tell "changed, restart to apply" from "already running". The game's registry
+  of such settings is `NEXT_LAUNCH_SETTINGS` in `src/game/desktop_next_launch_settings.ts`;
+  a new next-launch setting is one entry there.
+- `desktop-restart-app` restarts the shell at the player's request (`restartApp`): the
+  options window's restart strip (`src/ui/restart_strip.ts`, at the foot of the Graphics
+  panel and of Interface > General) offers "Restart Game" whenever a stored value has
+  moved off the snapshot, in place of an Apply that could not help. The child is spawned
+  through `spawnDetachedSelf` from an environment stripped of what the shell's own
+  relaunch levers planted (the rescue marker, and exactly the PRIME offload variables and
+  X11 ozone argument the PRIME relaunch recorded adding in `WOC_PRIME_RELAUNCH_ADDED`; a
+  `DRI_PRIME` or `--ozone-platform` the player set themselves stays), the single-instance
+  lock is handed over on the child's `spawn` event, and this process quits through
+  `app.quit` so the close-time bounds save runs. One restart is in flight at a time; a
+  child that never starts answers false and the strip says so, this process keeps
+  running, with its lock. The snapshot is what the PREFS said at launch: under
+  `WOC_GPU_BACKEND` or `WOC_DISABLE_GPU_FORCE=1` the session runs the override, the
+  snapshot still names the stored value, and a restart offered against it re-launches
+  under the same override (those variables are the player's and are never stripped).
 
 ### Reading the log, and rescuing a stuck machine
 

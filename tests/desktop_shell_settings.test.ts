@@ -33,6 +33,10 @@ function bridgeRecorder() {
       calls.push('get:displayMode');
       return Promise.resolve('windowed');
     },
+    getLaunchSettings: () => {
+      calls.push('get:launchSettings');
+      return Promise.resolve({ gpuForceOptOut: false, gpuBackend: 'auto' });
+    },
     setDisplayMode: () => Promise.resolve(true),
     setDiscordPresenceEnabled: (enabled: boolean) => {
       calls.push(`set:discordPresence=${enabled}`);
@@ -70,6 +74,7 @@ describe('syncDesktopShellSettings', () => {
       'get:gpuForceOptOut',
       'get:gpuBackend',
       'get:displayMode',
+      'get:launchSettings',
     ]);
     await new Promise((r) => setTimeout(r, 0));
     expect(constructed.length).toBeGreaterThan(0);

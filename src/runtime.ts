@@ -137,6 +137,17 @@ export interface DesktopGpuBackendState {
   active?: string;
   /** The launch bound something lower than the setting asked for. */
   requestedUnavailable?: boolean;
+  /** Auto wanted Vulkan and the shell's policy held this launch at OpenGL (an
+   *  excluded GPU); Vulkan stays the player's to pick. */
+  autoCapped?: boolean;
+}
+
+/** The next-launch settings as the running shell process read them at startup
+ *  (electron/launch_settings.cjs): the values THIS launch runs on, where the
+ *  getters serve the stored ones a setter moves live. */
+export interface DesktopLaunchSettings {
+  gpuForceOptOut: boolean;
+  gpuBackend: DesktopGpuBackendSetting;
 }
 
 export interface DesktopBridge {
@@ -214,6 +225,13 @@ export interface DesktopBridge {
    *  the options row would otherwise show the pre-judgement reading all session. */
   onGpuBackendState?(callback: (state: DesktopGpuBackendState) => void): () => void;
   hasGpuBackendChoice?: boolean;
+  // The next-launch settings this process started with, and the restart that
+  // applies a changed one (src/game/desktop_next_launch_settings.ts). The
+  // restart answers false when the new process never started; on success this
+  // process quits and the promise never settles. Absent on older shells:
+  // feature-check before use.
+  getLaunchSettings?(): Promise<DesktopLaunchSettings>;
+  restartApp?(): Promise<boolean>;
   // The page's WebGL renderer string, the evidence the shell judges its Linux
   // Vulkan trial on (getGPUInfo carries no renderer string there). A send, no
   // answer. Absent on older shells: feature-check before use.

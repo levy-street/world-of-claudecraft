@@ -8,6 +8,8 @@ export const HIGH_PERF_GPU_SWITCHES: readonly string[];
 export const LINUX_PRIME_ENV: Readonly<Record<string, string>>;
 export const LINUX_OZONE_X11_ARG: string;
 export const PRIME_RELAUNCH_MARKER: string;
+/** Beside the marker: the env names and the argv addition the PRIME relaunch planted. */
+export const PRIME_RELAUNCH_ADDED_ENV: string;
 
 export function buildLinuxPrimeEnv(
   existingEnv?: Record<string, string | undefined>,

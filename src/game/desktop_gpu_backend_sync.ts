@@ -94,6 +94,8 @@ export async function syncDesktopGpuBackendSetting(
 export interface DesktopGpuBackendActive {
   active: string;
   requestedUnavailable: boolean;
+  /** Auto was held at OpenGL by the shell's GPU policy (an excluded card). */
+  autoCapped: boolean;
 }
 
 /** The latched reading, refreshed by the shell's push. Latched rather than
@@ -125,7 +127,8 @@ function latchActive(state: unknown): void {
   if (
     previous &&
     previous.active === next.active &&
-    previous.requestedUnavailable === next.requestedUnavailable
+    previous.requestedUnavailable === next.requestedUnavailable &&
+    previous.autoCapped === next.autoCapped
   )
     return;
   for (const listener of activeListeners) listener();
@@ -133,16 +136,19 @@ function latchActive(state: unknown): void {
 
 function readActive(state: unknown): DesktopGpuBackendActive | null {
   if (!state || typeof state !== 'object') return null;
-  const { active, requestedUnavailable } = state as {
+  const { active, requestedUnavailable, autoCapped } = state as {
     active?: unknown;
     requestedUnavailable?: unknown;
+    autoCapped?: unknown;
   };
   // A rung the shell has not judged yet is absent, not a guess: showing the
   // asked-for backend as the active one is exactly the lie the row exists to
   // stop. Same for the flag, which is a strict boolean or nothing.
   if (typeof active !== 'string' || active === '') return null;
   if (typeof requestedUnavailable !== 'boolean') return null;
-  return { active, requestedUnavailable };
+  // The cap flag is newer than the verdict: an older shell omits it, which reads
+  // as "not capped" rather than as no verdict at all.
+  return { active, requestedUnavailable, autoCapped: autoCapped === true };
 }
 
 /** Subscribe to the shell's push. The FIRST reading comes from the boot sync

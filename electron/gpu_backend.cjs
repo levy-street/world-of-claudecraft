@@ -29,6 +29,11 @@
 // GPU-process death used to demote a healthy machine for good, and an explicit choice
 // had no rescue at all.
 //
+// Above both sits THE POLICY (electron/gpu_backend_policy.cjs): which machines Auto may
+// try Vulkan on at all. The ladder only sees the failures it can observe, and a driver
+// that renders wrong without dying is not one of them, so on hardware where Vulkan has
+// not been measured Auto is capped at OpenGL and Vulkan is the player's explicit choice.
+//
 // Pure functions with injected deps, exercised by tests/electron_gpu_backend.test.ts;
 // main.cjs is the only caller and wires process.platform, process.env, the prefs and app.
 // The self-relaunch spawn lives in electron/gpu_preference.cjs (spawnDetachedSelf), the
@@ -151,6 +156,9 @@ function isHigherRung(rung, other) {
  *   the counter).
  * - `reprobed`: an Auto CLIMB (a rung above the remembered one, tried on the cadence);
  *   what the launch counter resets on, so it measures launches since the last attempt.
+ * - `capped`: Auto wanted a higher rung and the policy's ceiling held it here
+ *   (capAutoLaunch). Not `auto`: nothing is remembered from a capped launch. The
+ *   options row reads it, to tell a player on Auto why they are not on Vulkan.
  */
 function launchForRung(rung, reason, flags = {}) {
   return {
@@ -158,6 +166,7 @@ function launchForRung(rung, reason, flags = {}) {
     parallel: rung === 'vulkan-parallel-compile',
     rung,
     reprobed: flags.reprobed === true,
+    capped: flags.capped === true,
     reason,
     ladder: flags.ladder !== false,
     auto: flags.auto === true,
@@ -186,9 +195,11 @@ function validProof(prefs, appVersion) {
  * - setting 'opengl' | 'vulkan': that rung, explicit; the memory is not read and not
  *   written, but the RESCUE still applies to this launch;
  * - setting 'auto': `gpuBackendToAttempt`, or the top rung when nothing is stored, with
- *   a periodic climb back up (see reprobe below).
+ *   a periodic climb back up (see reprobe below), CAPPED by the policy's ceiling
+ *   (`autoCeiling`, from electron/gpu_backend_policy.cjs: an excluded GPU keeps Auto on
+ *   OpenGL, and Vulkan stays one explicit choice away).
  */
-function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
+function decideGpuBackendLaunch({ platform, env, prefs, appVersion, autoCeiling }) {
   if (platform !== 'linux') return launchForRung('opengl', 'platform default', { ladder: false });
   const environment = env ?? {};
   const explicit = explicitGpuBackendLaunch(environment, prefs);
@@ -202,6 +213,30 @@ function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
     });
   }
   if (explicit) return explicit;
+  return capAutoLaunch(autoLaunch(prefs, appVersion), autoCeiling);
+}
+
+/**
+ * The policy's cap on an Auto launch (electron/gpu_backend_policy.cjs): a launch at or
+ * above `ceiling.rung` runs the ceiling instead, capped. At, not only above: a machine
+ * whose memory already says OpenGL (a demotion from before the policy) is still a machine
+ * the policy holds there, and the options row must say so rather than read as an
+ * ordinary OpenGL memory. A capped launch is NOT the memory's: nothing is remembered from
+ * it and the counter does not move, so the policy leaves no trace of its own; the day the
+ * exclusion is lifted, Auto resumes from whatever it remembered before (the top rung when
+ * nothing was). The rescue still applies to it (`ladder` stays on). No ceiling, or a
+ * memory BELOW the ceiling: unchanged, the memory's own verdict stands.
+ */
+function capAutoLaunch(launch, ceiling) {
+  if (!ceiling || rungIndex(ceiling.rung) < 0) return launch;
+  if (isHigherRung(ceiling.rung, launch.rung)) return launch;
+  return launchForRung(ceiling.rung, `auto, capped at ${ceiling.rung}: ${ceiling.why}`, {
+    capped: true,
+  });
+}
+
+/** The Auto memory's own decision: the remembered rung, or the climb back on its cadence. */
+function autoLaunch(prefs, appVersion) {
   const auto = { auto: true };
 
   const stored = prefs?.gpuBackendToAttempt;
@@ -542,6 +577,7 @@ module.exports = {
   activeGpuAdapterKey,
   applyGpuBackendSwitches,
   backendDidNotBind,
+  capAutoLaunch,
   decideGpuBackendLaunch,
   demoteAfterRepeatedCrashes,
   gpuBackendMemoryAfterHealthySession,

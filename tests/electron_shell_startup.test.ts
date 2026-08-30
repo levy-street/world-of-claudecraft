@@ -368,6 +368,51 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     );
   });
 
+  it('caps the Auto backend by the GPU policy, read before the decision', () => {
+    // The ceiling is the policy's answer (electron/gpu_backend_policy.cjs) and
+    // it must be in hand before decideGpuBackendLaunch runs; feeding it is what
+    // keeps an excluded GPU off Auto Vulkan at all.
+    const ceilingAt = code.indexOf(
+      'const gpuAutoCeiling = autoBackendCeiling({ platform: process.platform, env: process.env });',
+    );
+    const decideAt = code.indexOf('const gpuBackendLaunch = decideGpuBackendLaunch({');
+    expect(ceilingAt, 'the policy ceiling is gone').toBeGreaterThan(-1);
+    expect(ceilingAt).toBeLessThan(decideAt);
+    const decision = code.slice(decideAt, code.indexOf('});', decideAt)).replace(/\s+/g, ' ');
+    expect(decision).toContain('autoCeiling: gpuAutoCeiling,');
+    expect(count(code, 'autoBackendCeiling(')).toBe(1);
+    // The options row learns it from the same state payload as the verdict.
+    expect(code).toContain('autoCapped: gpuBackendLaunch.capped === true,');
+  });
+
+  it('snapshots the next-launch settings right after the prefs load, before any lever or setter', () => {
+    // The getters serve the STORED values, which a setter moves live; the
+    // frozen snapshot taken here is the only way the game can tell "changed,
+    // restart to apply" from "already running" (electron/launch_settings.cjs).
+    const loadAt = code.indexOf('const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);');
+    const snapshotAt = code.indexOf('const launchSettings = launchSettingsSnapshot(desktopPrefs);');
+    const firstLeverAt = code.indexOf('if (gpuForceDisabledByEnv) {');
+    const firstSetterAt = code.indexOf("ipcMain.handle('desktop-set-");
+    expect(snapshotAt, 'the launch snapshot is gone').toBeGreaterThan(loadAt);
+    expect(snapshotAt).toBeLessThan(firstLeverAt);
+    expect(snapshotAt).toBeLessThan(firstSetterAt);
+    expect(count(code, 'launchSettingsSnapshot(')).toBe(1);
+    // Served as-is, and the restart hands the lock over on the child's spawn
+    // event through app.quit (never app.exit: the window is healthy, its
+    // close-time bounds save runs).
+    const getter = code.indexOf("ipcMain.handle('desktop-get-launch-settings'");
+    expect(code.slice(getter, getter + 200)).toContain('return launchSettings;');
+    const restart = code.indexOf("ipcMain.handle('desktop-restart-app'");
+    const restartBody = code.slice(restart, code.indexOf('});', restart) + 3).replace(/\s+/g, ' ');
+    expect(restartBody).toContain('if (restartInFlight) return restartInFlight;');
+    expect(restartBody).toContain('restartInFlight = restartApp({');
+    expect(restartBody).toContain('if (!started) restartInFlight = null;');
+    expect(restartBody).toContain(
+      'onSpawned: () => { app.releaseSingleInstanceLock(); app.quit(); }',
+    );
+    expect(restartBody).not.toContain('app.exit(');
+  });
+
   it('judges this launch once, through one function fed by every evidence source', () => {
     // The judgement has ONE shape (judgeThisLaunch): it runs once per process (a
     // crash-recovery reload lands on the post-crash fallback, not this launch's
@@ -560,7 +605,10 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // return to act on it.
     expect(count(code, 'app.exit(0)')).toBe(1);
     expect(flat).not.toMatch(/=\s*relaunchOnLowerBackend\(/);
-    expect(count(code, 'releaseSingleInstanceLock()')).toBe(1);
+    // Two handovers of the single-instance lock in the whole shell: this rescue
+    // and the player-requested restart (pinned by its own case above), each on
+    // its child's 'spawn' event.
+    expect(count(code, 'releaseSingleInstanceLock()')).toBe(2);
     // The spawn lives there and nowhere else, so no trigger can bypass the latch.
     expect(count(code, 'relaunchOnLowerBackend(')).toBe(1);
     expect(count(code, 'rescueOntoLowerBackend(')).toBe(4);

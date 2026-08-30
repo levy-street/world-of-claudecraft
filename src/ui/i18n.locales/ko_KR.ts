@@ -1516,7 +1516,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendActiveUnavailable':
     '현재 {backend}을(를) 사용 중입니다(Vulkan을 활성화할 수 없음).',
   'hudChrome.options.gpuBackendNote':
-    '자동은 가장 알맞은 옵션을 대신 선택합니다. Vulkan이 더 빠르며 대부분의 플레이어에게 권장됩니다. OpenGL은 더 느리지만 Vulkan이 제대로 작동하지 않을 때 도움이 될 수 있습니다.',
+    '자동은 가장 알맞은 옵션을 대신 선택합니다. Vulkan이 더 빠르며 대부분의 플레이어에게 권장됩니다. OpenGL은 더 느리지만 Vulkan이 제대로 작동하지 않을 때 도움이 될 수 있습니다. 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    '현재 {backend}을(를) 사용 중입니다. 이 그래픽 카드에서는 자동이 아직 Vulkan을 시도하지 않습니다. 시도하려면 Vulkan을 선택하세요.',
+  'hudChrome.options.restartPending': '일부 변경 사항은 재시작 후에 적용됩니다.',
+  'hudChrome.options.restartGame': '게임 재시작',
+  'hudChrome.options.restartInProgress': '게임을 재시작하는 중...',
+  'hudChrome.options.restartFailed': '게임을 자동으로 재시작할 수 없습니다. 종료한 뒤 다시 실행하세요.',
   'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',
   'hudChrome.options.discordPresenceNote':
     '플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',

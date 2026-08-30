@@ -381,6 +381,22 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       backend: 'hudChrome.options.gpuBackendActiveNameOpenGL',
     });
 
+    // Auto held at OpenGL by the shell's GPU policy: its own sentence (why the
+    // player is not on Vulkan, and that it is theirs to pick), the OpenGL name.
+    const capped = backendRow({ active: 'opengl', requestedUnavailable: false, autoCapped: true });
+    expect(capped?.control === 'choice' && capped.statusKey).toBe(
+      'hudChrome.options.gpuBackendActiveAutoCapped',
+    );
+    expect(capped?.control === 'choice' && capped.statusValueKeys).toEqual({
+      backend: 'hudChrome.options.gpuBackendActiveNameOpenGL',
+    });
+    // A choice that fell short wins over the cap (the two never both hold; the
+    // order is pinned so a future shell cannot make the row say the wrong thing).
+    const both = backendRow({ active: 'opengl', requestedUnavailable: true, autoCapped: true });
+    expect(both?.control === 'choice' && both.statusKey).toBe(
+      'hudChrome.options.gpuBackendActiveUnavailable',
+    );
+
     // Nothing to say yet: no reading at all rather than a guessed one, and the
     // row keeps its description and its single note.
     for (const active of [null, undefined]) {

@@ -1539,7 +1539,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gpuBackendActiveUnavailable':
     'Сейчас используется {backend} (не удалось включить Vulkan).',
   'hudChrome.options.gpuBackendNote':
-    'Авто выбирает лучший вариант за вас. Vulkan быстрее и рекомендуется большинству игроков. OpenGL медленнее, но может помочь, если Vulkan работает неправильно.',
+    'Авто выбирает лучший вариант за вас. Vulkan быстрее и рекомендуется большинству игроков. OpenGL медленнее, но может помочь, если Vulkan работает неправильно. Вступает в силу при следующем запуске игры.',
+  'hudChrome.options.gpuBackendActiveAutoCapped':
+    'Сейчас используется {backend}. На этой видеокарте режим Авто пока не пробует Vulkan; чтобы попробовать, выберите Vulkan.',
+  'hudChrome.options.restartPending': 'Некоторые изменения вступят в силу после перезапуска.',
+  'hudChrome.options.restartGame': 'Перезапустить игру',
+  'hudChrome.options.restartInProgress': 'Перезапуск игры...',
+  'hudChrome.options.restartFailed': 'Игра не смогла перезапуститься сама. Выйдите и запустите её снова.',
   'hudChrome.options.discordPresence': 'Статус в Discord',
   'hudChrome.options.discordPresenceNote':
     'Показывает зону, в которой вы находитесь, и время этой игровой сессии как вашу активность в Discord, и это видит любой, кому доступен ваш профиль Discord. Передаются только название зоны, время сессии и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.',

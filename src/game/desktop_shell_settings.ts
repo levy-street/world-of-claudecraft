@@ -21,6 +21,7 @@ import {
   syncDesktopGpuPrefSetting,
 } from './desktop_gpu_pref_sync';
 import { reportDesktopGpuRenderer } from './desktop_gpu_report';
+import { syncDesktopLaunchSettings } from './desktop_next_launch_settings';
 import { pushDiscordPresenceEnabled } from './discord_presence';
 
 export type DesktopShellSettings = DesktopGpuPrefSettings &
@@ -43,6 +44,9 @@ export function syncDesktopShellSettings(
   // whenever the player opens it.
   initDesktopGpuBackendActive(bridge);
   void syncDesktopDisplayModeSetting(bridge, createSettings);
+  // What this launch started with, for the two next-launch settings above: the
+  // options window offers a restart when a stored value has moved off it.
+  void syncDesktopLaunchSettings(bridge);
 }
 
 export interface DesktopApplySettings {

@@ -2,6 +2,7 @@
 // which electron/main.cjs invokes at runtime and tests/electron_gpu_backend.test.ts exercises
 // directly. main.cjs itself runs outside tsc; these types serve the test.
 
+import type { AutoBackendCeiling } from './gpu_backend_policy.cjs';
 import type { SelfSpawn } from './gpu_preference.cjs';
 
 export type GpuBackendSetting = 'auto' | 'vulkan' | 'opengl';
@@ -57,6 +58,8 @@ export interface GpuBackendLaunch {
   auto: boolean;
   /** A rescue spawned this process; it inherits `auto` from its chain. */
   rescued: boolean;
+  /** Auto wanted a higher rung and the policy's ceiling held it here; not `auto`. */
+  capped: boolean;
 }
 
 export interface DecideGpuBackendLaunchInput {
@@ -65,8 +68,16 @@ export interface DecideGpuBackendLaunchInput {
   prefs?: GpuBackendMemory | null;
   /** This build's version; a proof from another version does not aim the climb. */
   appVersion?: string;
+  /** The policy's ceiling; an Auto launch at or above it runs the ceiling, capped. */
+  autoCeiling?: AutoBackendCeiling | null;
 }
 export function decideGpuBackendLaunch(input: DecideGpuBackendLaunchInput): GpuBackendLaunch;
+
+/** A launch above `ceiling.rung` becomes a capped launch of that rung; else unchanged. */
+export function capAutoLaunch(
+  launch: GpuBackendLaunch,
+  ceiling: AutoBackendCeiling | null | undefined,
+): GpuBackendLaunch;
 
 export function applyGpuBackendSwitches(
   app: { commandLine: { appendSwitch(name: string, value: string): void } },

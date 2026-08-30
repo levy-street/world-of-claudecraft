@@ -190,6 +190,7 @@ describe('the latched reading and its subscribers', () => {
     expect(desktopGpuBackendActive()).toEqual({
       active: 'vulkan-parallel-compile',
       requestedUnavailable: false,
+      autoCapped: false,
     });
 
     // The shell resends its state on its own schedule; a rebuild per resend
@@ -210,13 +211,21 @@ describe('the latched reading and its subscribers', () => {
     expect(wakes).toBe(2);
     shell.send({ setting: 'vulkan', active: 'opengl', requestedUnavailable: true });
     expect(wakes).toBe(3);
-    expect(desktopGpuBackendActive()).toEqual({ active: 'opengl', requestedUnavailable: true });
+    expect(desktopGpuBackendActive()).toEqual({
+      active: 'opengl',
+      requestedUnavailable: true,
+      autoCapped: false,
+    });
 
     // A payload with nothing to say keeps the reading AND stays silent: an
     // unjudged rung is absent, never a guess.
     shell.send({ setting: 'vulkan' });
     expect(wakes).toBe(3);
-    expect(desktopGpuBackendActive()).toEqual({ active: 'opengl', requestedUnavailable: true });
+    expect(desktopGpuBackendActive()).toEqual({
+      active: 'opengl',
+      requestedUnavailable: true,
+      autoCapped: false,
+    });
 
     unsubscribe();
     shell.send({ setting: 'auto', active: 'vulkan-plain', requestedUnavailable: false });
@@ -224,6 +233,7 @@ describe('the latched reading and its subscribers', () => {
     expect(desktopGpuBackendActive()).toEqual({
       active: 'vulkan-plain',
       requestedUnavailable: false,
+      autoCapped: false,
     });
     off();
     expect(shell.liveSubscriptions()).toBe(0);
@@ -244,7 +254,43 @@ describe('the latched reading and its subscribers', () => {
     expect(desktopGpuBackendActive()).toEqual({
       active: 'vulkan-plain',
       requestedUnavailable: true,
+      autoCapped: false,
     });
+  });
+
+  it('carries the policy cap as its own field, absent on an older shell meaning not capped', () => {
+    const shell = pushingBridge();
+    const off = initDesktopGpuBackendActive(shell.bridge);
+    let wakes = 0;
+    onDesktopGpuBackendActiveChange(() => {
+      wakes += 1;
+    });
+    shell.send({
+      setting: 'auto',
+      active: 'opengl',
+      requestedUnavailable: false,
+      autoCapped: true,
+    });
+    expect(desktopGpuBackendActive()).toEqual({
+      active: 'opengl',
+      requestedUnavailable: false,
+      autoCapped: true,
+    });
+    expect(wakes).toBe(1);
+    // The cap moving alone is a different reading (the row's sentence changes).
+    shell.send({ setting: 'auto', active: 'opengl', requestedUnavailable: false });
+    expect(desktopGpuBackendActive()?.autoCapped).toBe(false);
+    expect(wakes).toBe(2);
+    // Only a strict true caps.
+    shell.send({
+      setting: 'auto',
+      active: 'opengl',
+      requestedUnavailable: false,
+      autoCapped: 'yes' as never,
+    });
+    expect(desktopGpuBackendActive()?.autoCapped).toBe(false);
+    expect(wakes).toBe(2);
+    off();
   });
 
   it('subscribes to nothing on a shell without the push channel', () => {

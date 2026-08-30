@@ -90,6 +90,8 @@ const {
   SESSION_HEALTHY_AFTER_MS,
   shouldRescueMissingGpu,
 } = require('./gpu_backend.cjs');
+const { autoBackendCeiling } = require('./gpu_backend_policy.cjs');
+const { launchSettingsSnapshot, restartApp } = require('./launch_settings.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
 const {
@@ -113,6 +115,12 @@ const {
 // close-time bounds save still to come).
 const desktopPrefsPath = path.join(app.getPath('userData'), DESKTOP_PREFS_FILENAME);
 const desktopPrefs = loadDesktopPrefs(desktopPrefsPath);
+// What THIS process started with, for the settings that only apply at the next launch
+// (electron/launch_settings.cjs). Taken here, before any lever reads the prefs and before
+// any setter can move them, and frozen: the getters below serve the STORED values, which
+// a setter moves live, so this snapshot is the only way the game can tell "changed,
+// restart to apply" from "already running".
+const launchSettings = launchSettingsSnapshot(desktopPrefs);
 
 // No-boot escape hatch (documented in docs/desktop-release.md): setting
 // WOC_DISABLE_GPU_FORCE=1 in the environment skips BOTH discrete-GPU levers
@@ -276,11 +284,17 @@ function mergeDesktopPrefs(partial) {
 // 'ready' (the switches are read there), after the discrete-GPU force. The decision table
 // (the rescue marker, WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto
 // memory and its climb) lives in electron/gpu_backend.cjs.
+// The policy's ceiling first (electron/gpu_backend_policy.cjs): a machine whose rendering
+// GPU is on the exclusion list keeps Auto on OpenGL, whatever the memory says, and only
+// an explicit choice reaches Vulkan there. Read from /sys/class/drm, so it is in hand
+// before the switches are appended.
+const gpuAutoCeiling = autoBackendCeiling({ platform: process.platform, env: process.env });
 const gpuBackendLaunch = decideGpuBackendLaunch({
   platform: process.platform,
   env: process.env,
   prefs: desktopPrefs,
   appVersion: app.getVersion(),
+  autoCeiling: gpuAutoCeiling,
 });
 applyGpuBackendSwitches(app, gpuBackendLaunch);
 log.info(`[gpu] backend launch: ${gpuBackendLaunch.rung} (${gpuBackendLaunch.reason})`);
@@ -1177,9 +1191,44 @@ function gpuBackendState() {
       judged: gpuBackendJudged,
       boundRung,
     }),
+    // Auto asked for more and the policy held it at OpenGL (an excluded GPU): the row
+    // tells the player so, and that Vulkan is still theirs to pick.
+    autoCapped: gpuBackendLaunch.capped === true,
     supported: process.platform === 'linux',
   };
 }
+
+// The next-launch settings as THIS process read them (see launchSettings above): what
+// the options window compares the stored values against to offer a restart.
+ipcMain.handle('desktop-get-launch-settings', (event) => {
+  if (!trustedSender(event)) return null;
+  return launchSettings;
+});
+
+// Restart at the player's request (the options window's restart strip). Same handover as
+// the backend rescue: the single-instance lock is released and this process quits on the
+// child's 'spawn' event, never before (electron/launch_settings.cjs). app.quit, not
+// app.exit: the window is healthy, so its close-time bounds save and the will-quit
+// teardown get their normal turn. The answer is the child's fate: false when it never
+// started, with this process still running and holding its lock, so the strip can say so.
+let restartInFlight = null;
+ipcMain.handle('desktop-restart-app', (event) => {
+  if (!trustedSender(event)) return false;
+  // One child at a time: a second ask while the first is still coming up joins its
+  // answer rather than spawning a second detached child beside it.
+  if (restartInFlight) return restartInFlight;
+  restartInFlight = restartApp({
+    log,
+    onSpawned: () => {
+      app.releaseSingleInstanceLock();
+      app.quit();
+    },
+  }).then((started) => {
+    if (!started) restartInFlight = null;
+    return started;
+  });
+  return restartInFlight;
+});
 
 ipcMain.handle('desktop-get-gpu-backend', (event) => {
   if (!trustedSender(event)) return null;

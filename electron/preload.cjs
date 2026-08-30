@@ -216,6 +216,14 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   // Whether this platform has a backend choice at all (Linux only), answered
   // synchronously so the options row can be gated the moment the window opens.
   hasGpuBackendChoice: process.platform === 'linux',
+  // The next-launch settings (the GPU force opt-out, the backend) as THIS process read
+  // them at startup, frozen: the getters above serve the STORED values, which a setter
+  // moves live, so this is how the game tells "changed, restart to apply" from "already
+  // running" (src/game/desktop_next_launch_settings.ts).
+  getLaunchSettings: () => ipcRenderer.invoke('desktop-get-launch-settings'),
+  // Restart the shell at the player's request. Answers false when the new process never
+  // started (this one keeps running); on success this process quits and no answer lands.
+  restartApp: () => ipcRenderer.invoke('desktop-restart-app'),
   // How the shell presents its window: 'borderless' (full screen) or 'windowed'.
   // The setter applies live AND stores for the next launch, and answers whether
   // the choice actually reached disk. An unknown mode is refused here rather
