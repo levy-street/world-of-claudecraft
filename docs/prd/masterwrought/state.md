@@ -22057,3 +22057,38 @@ a6cac2e226).
       same commit.
 - [x] All listed suites green; ci:changed exit 0 after the last code
       commit; both regens zero-diff at the final tip.
+
+### THE FROZEN STAMP: EXIT=0 at 7f3ae4938f, the gate's bounded form
+Taken 2026-08-30 (started 06:36:26 local), one run, at the repaired tip
+7f3ae4938f (porcelain clean before and after; DATABASE_URL confirmed
+unset; npm test -- --maxWorkers=8; zero vitest processes before launch).
+Log kept at the session scratchpad's fullsuite_p16_run2.log.
+  Test Files  3342 passed | 29 skipped (3371)
+       Tests  50403 passed | 2 expected fail | 452 skipped (50857)
+    Duration  595.04 s
+   SUITE_EXIT 0, zero failing files
+Follow-ons, all clean at this span: npx tsc --noEmit zero diagnostics;
+npm run ci:changed exit 0 after the last commit; wiki:content and
+i18n:gen both byte-clean before the final repair commit and unchanged by
+it (the repair's pending.ts move IS the regen's own output).
+THE FIRST ATTEMPT WAS RED AND IS PART OF THE RECORD: at the docs tip
+9d92857168 the full suite failed 5 files, all the phase's own ripples
+the selective verification could not see (the new screenshot dir owed
+the five CI sparse-checkout cones; the four reworded guide keys owed
+RETIRED_KEYS rows and the pending regen; the Eastbrook polish
+provenance's renderer leaf followed the extracted file, re-minted by its
+own one-step sweep with no capture retaken; and two source pins scanning
+renderer.ts for the moved builder family followed the code). The
+source-text-pin-breaks-on-upstream-extraction class from the trap
+catalog, caught by exactly the layer built to catch it; repaired as
+7f3ae4938f and the second run above is EXIT=0 first try at that tip.
+DRIFT vs the Phase 15 QA stamp at da7b164b36 (3337/29 files (3366),
+50317/2/452 (50771)): +5 files, +86 tests, skipped 452 and expected-fail
+2 unchanged. The +5 files are exactly the phase's five new suites
+(zone_prewarm_groups, crafting_wire, legendary_regalia,
+server/admin_market_metrics, admin/market_metrics_page), whose combined
+count is 66 (measured by running the five in isolation at this tip); the
+remaining +20 are in-file additions across the phase-edited suites
+(discord_activity_professions, discord_bot, guide, pr_shot_targets,
+masterwrought_cap, originality_renames, and the QA-round arms), owed a
+per-file decomposition by the Phase 16 QA twin if it wants one.
