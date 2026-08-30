@@ -98,6 +98,20 @@ discharges its citations in the same change, never after.
 - `power-verification.md`, Phase 15's deliverable and the R5 measurement the closing
   checklist names as the packet's defining gate.
 
+TEARDOWN BLAST-RADIUS ADDENDUM (2026-08-30, the Phase 17 qa gate): beyond the
+eleven screenshot cone rows, the teardown chore must also discharge (a) the
+roughly fourteen permanent test files whose prose comments cite
+`docs/prd/masterwrought/*` paths (`recipe_index_memo`, `farming_anti_chore`,
+`mob_portrait_source_manifest`, `flask_consumables`, `gathering_supply_coverage`,
+`item_art_consistency`, `harvest_geography`, `recipe_reachability`, and peers;
+re-derive the live list by grep at execution time, never from this note), and
+(b) the two files a test READS from disk: `merge-deletion-list.md` (consumed by
+the census AND parsed whole by `tests/merge_audit_symbol_census.test.ts`'s
+committed-doc pin) must be re-homed on the naming-audit precedent or its pin
+retired in the same change, and `farming/qa-checklist.md` cited from
+`tests/farming_anti_chore.test.ts`. The chore's one-decision shape stands; this
+note only states its true blast radius.
+
 EXECUTED 2026-08-30 by Phase 17 (NEW WORK N13): both files moved to
 `docs/design/naming-audit.md` and `docs/design/power-verification.md` with their
 basenames kept, so every bare-name citation stays literally correct; all thirteen

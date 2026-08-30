@@ -1275,7 +1275,7 @@ shipped collisions get display-name-only renames in the dedicated naming phase).
 web-verified audit of all 2605 shipped player-visible proper nouns (workflow: 20 sweep
 agents, adversarial verify, 4 hunters) confirmed the collisions below; every replacement
 name was itself web-verified before adoption. Per-name verdicts and evidence:
-docs/prd/masterwrought/naming-audit.md. Two of these (Gloomshade, Winterbite) were
+docs/design/naming-audit.md. Two of these (Gloomshade, Winterbite) were
 SEO-pass adoptions at the 2026-07-02 lock whose screening missed the collision; the
 "Factions: ... Wyrmcult" context note above predates this amendment (that faction is now
 the Broodsworn). Ids stay frozen as always; new literals pin in

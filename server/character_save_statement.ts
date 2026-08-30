@@ -91,7 +91,19 @@ export function characterUpdateStatement(
   // stdout is a blocking sink (a file, a full pipe), which would lengthen the
   // lock hold at exactly the moment the signal fires. setImmediate keeps the
   // line, off the critical section.
-  if (sizeWarning !== null) setImmediate(() => console.warn(sizeWarning));
+  // The callback swallows its own throw (EPIPE on a stdout closed at
+  // shutdown): an unhandled async rejection from a dev-channel line would be
+  // worse than a lost line, and a shutdown-path save losing its queued warn
+  // is an accepted cost of keeping the write off the lock hold.
+  if (sizeWarning !== null) {
+    setImmediate(() => {
+      try {
+        console.warn(sizeWarning);
+      } catch {
+        /* a lost dev-channel line, never a crash */
+      }
+    });
+  }
   switch (fence.kind) {
     case 'none':
       return {

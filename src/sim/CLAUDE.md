@@ -279,7 +279,10 @@ remove the declaration AND its binding in the same change, then re-run the parit
   `evaluateCraftAdmission`, so a oncePerDay refusal skips the resolve's one to two
   output draws exactly like the vault refusal above. Any harness replaying a command
   stream against a seed must capture `resetDay` beside the seed (recorded at the
-  Phase 12 QA ledger's replay note).
+  Phase 12 QA ledger's replay note). This carve-out is PINNED too:
+  `tests/quickening_catalyst_gate.test.ts` covers both gate crossings and
+  `tests/delves.test.ts` the `''` default; change this paragraph and those pins
+  together, in the same change, like the vault paragraph above.
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase
