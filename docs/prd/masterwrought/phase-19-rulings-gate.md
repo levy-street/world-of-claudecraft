@@ -1,0 +1,83 @@
+# Phase 19: The rulings gate (every open maintainer decision, answered and executed)
+
+Appended 2026-08-30 under ruling qr-18-REOPEN. The packet's residual list is two kinds of
+item: work a session can do (Phase 18) and decisions only the maintainer can make (this
+phase). Phase 19 opens on ONE complete decision table, takes the maintainer's answers
+in-session, executes every ruling, and records each where it stands. No decision is
+guessed; no row closes without a ruling id.
+
+## The decision table (FINALIZED by the Phase 18 QA; the seed rows below are the known set)
+
+Every row: the question, the options, a price per option, a recommendation, the
+authority row it closes. The Phase 18 QA replaces this seed with the derived, complete
+table before this phase runs.
+
+| # | Decision | Where it stands today | Options (priced by the 18 QA) |
+|---|---|---|---|
+| 1 | The commission minimum-fee floor: (a) mechanics (escrow at open / transfer at delivery / display-only), (b) basis (UNBIND_FEE ladder / buyValue fraction / flat) | PARKED, Phase 14 ledger + handoff row 128 | to be priced |
+| 2 | Ruling 135 p13-OPEN-RELIQUARY: does a player-named legendary INSTANCE warrant an instance-keyed Reliquary page | RECORDED undecided, farming/state.md rulings block | to be priced |
+| 3 | The THIRTEEN standing items (state.md): scroll/elixir 15c parity; RULE 2's value-half reading; the inherited stale-client window; 11h's two deviations (ratify or revert); 11i's session cap 15 s to 16 s; prog_first_harvest's 13 catches; the apex hoe channel (the Decision-A contradiction); the shipped-id golden policy; Decision D's band scope; the reworded wiki keys' stale fills (folded into the Phase 20 fill unless ruled re-keyed); col_junk_drawer's three of margin; zone 1 carries no poor mob drop | OPEN, each with its ledger derivation | to be priced, one row each |
+| 4 | Every farming handoff-table row still in the open-family and handed-to-maintainer classes (re-derive the live set from the table's text; 44 non-fill rows at the Phase 17 close), including the tuning reads ((bs) waiver cadence, feast tuning, seed-back rates, watch and compost fees, tonic, dish curve points, crop durations, name lore passes, hoe names) and the standing deviations ((a), (w), (al), (ap), (bb), (be), (bg), (bh)) | OPEN in farming/state.md | to be priced, one row each |
+| 5 | The feast per-area placement cap (a value and a scope: per cell or per zone) | Phase 17 hot-path read | to be priced |
+| 6 | The nonce fence's missing expiry term (keep suspend-first, or add the term) | Phase 13 QA recorded read | to be priced |
+| 7 | Alchemy has no repeatable band-3 recipe (author one, or accept the gap) | Phase 15 recorded read | to be priced |
+| 8 | The apex weapon rung sits +1 over Greater (a demand risk under R21: tune, or accept) | power-verification.md section 14 | to be priced |
+| 9 | qr-GRAY's row wording is measurably false as written (reword the row, or rule the measurement) | Phase 15 recorded read | to be priced |
+| 10 | The two consistency reads: fine farm produce reads Material while ore/log/herb fine grades read Fine Material; the nameplate_canvas ratchet row on an upstream-owned line | recorded, unnumbered | to be priced |
+| 11 | The zone-celebration fan-out shape, IF Phase 18's measurement recorded a refusal | Phase 18 ledger | to be priced |
+
+### Starter Prompt
+```
+STANDING DELIVERY RULE (unchanged): NO push, NO PR, NO teardown. LOCAL ONLY.
+This is Phase 19 of the Masterwrought feature: the rulings gate. Model: xhigh effort.
+ULTRACODE: yes for the execution and review halves; the decision half is a
+conversation with the maintainer and runs in the main loop.
+
+WORKTREE GUARD (FIRST): run pwd. If not in /Users/fernando/Documents/wocc-masterwrought,
+switch NOW with EnterWorktree (path: /Users/fernando/Documents/wocc-masterwrought). If it
+refuses, STOP.
+
+STEP 0 - PRE-FLIGHT: git status clean at the Phase 18 QA close; the newest
+origin/release/** re-resolved by version sort and merged with the release-merge-audit if
+it moved (riders as in Phase 18). Memory scan as in Phase 18.
+
+STEP 1 - THE TABLE: load the FINALIZED decision table from this file (the Phase 18 QA
+wrote it). Verify it is complete against the live ledgers with one Explore sweep (any
+open decision missing from the table is added before STEP 2, priced the same way). Then
+STOP and present the whole table to the maintainer in ONE message, every row with its
+options, prices, and the recommendation. Do not proceed until every row has an answer
+in the maintainer's own words (a row may be answered "defer past the PR": that is a
+ruling too, recorded as such with the maintainer's reason).
+
+STEP 2 - EXECUTE EVERY RULING, one commit per ruling cluster: content tunes carry their
+same-change obligations (wiki regen, deed and reliquary pins, art parks, non-Latin fills,
+census rows, the R5 surface untouched unless the ruling names it, in which case the
+harness re-cut and the record amendment ride the same commit); mechanics rulings carry
+their tests (sim and server always) and their reviewers per the Review Dispatch Matrix;
+every ruling is RECORDED where the open row stands (a dated RULED line with the ruling
+id qr-19-<slug>, the maintainer's answer quoted in substance, the executing commit), the
+handoff table row's status flipped, the decisions index updated if a namespace moved.
+
+STEP 3 - REVIEW: every execution unit gets its domain reviewer and a fresh reader; all
+findings applied; the fix round re-read fresh; qa-checklist LAST. The QA twin is folded
+INTO this phase by decision (the 11b-qa-GATE-9 precedent): the executions are small,
+each is reviewed twice here, and Phase 20's re-close is the independent backstop.
+
+STEP 4 - VALIDATION: tsc, the affected suites, architecture and monolith guards, the
+census (RESULT PASS, exit captured without a pipe), ci:changed after the last commit,
+then node scripts/gate_select.mjs on the committed tree, then the full npm run gate in
+the background (pg armed) judged by exit code AND markers.
+
+STEP 5 - DOCS: progress.md Phase 19 row; the Phase 19 ledger in state.md (the table as
+answered, every ruling id, every executing commit, the JUDGED list); the handoff table's
+open classes should now hold ONLY the fill rows and ip-17-PUSH; if anything else remains
+open, it carries a ruling id that says why.
+
+STOPPING RULES: no ruling is inferred from silence; a ruling that contradicts a ratified
+R5 row is an escalation, not an execution; a ruling that needs a value the maintainer did
+not give goes back to the maintainer in the same session; any red gate step; NO push, NO
+PR, NO teardown.
+
+REPORT: the answered table, every ruling's id and commit, the review record, the gate
+results, and NEXT = Phase 20 (phase-20-release-fill-and-reclose.md, FRESH session).
+```

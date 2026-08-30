@@ -22457,3 +22457,22 @@ teardown offer prepared. NO push, NO PR, NO teardown, NO fill: each waits on
 the maintainer's explicit word (ip-17-PUSH the one structural hand-back). The
 close-out list of genuinely open maintainer decisions is in the Phase 17
 report and mirrors the handoff table's open classes.
+
+## Maintainer ruling qr-18-REOPEN (2026-08-30, relayed in-session; RECORDED)
+
+The maintainer directs a perfection close: "I want this feature to be perfect
+... close out EVERY single item on this list." This SUPERSEDES, for the
+residual inventory only, the do-not-re-raise standing of the judged refusals
+and the code-shaped recorded-not-acted maintainer reads across ALL packet
+ledgers (Phase 17's included): they RE-OPEN as actionable work for Phase 18.
+What does NOT re-open: the four ratified R5 rulings and the whole R5 surface
+(frozen); the accepted-by-design handoff rows (ip-GATE-17 stands); refusals
+that are mutually exclusive with shipped work (the byteLength pre-filter,
+superseded by the shipped gauge); and pure records of measured facts that name
+no action. Items that require a maintainer DECISION (a value, a basis, a
+design call) do not become guessable: they assemble into the Phase 19 decision
+table instead. Three phases append on the bare axis per the never-renumber
+rule: 18 (the perfection sweep, with its QA twin), 19 (the rulings gate:
+every open decision priced, answered in-session, executed), 20 (the
+release-tier fill and the packet re-close). The delivery contract's one
+branch, one PR shape stands; the PR opens after Phase 20.
