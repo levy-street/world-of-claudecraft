@@ -163,6 +163,23 @@ describe('Market Metrics page', () => {
     expect(screen.getByText(t('marketMetrics.autoRefresh', { seconds: 30 }))).toBeInTheDocument();
   });
 
+  it('names every bucket table by its own heading (aria-labelledby resolves)', async () => {
+    // The accessible-name wiring is markup only, so it can regress silently
+    // without this pin: each table must point at the id of the h3 carrying
+    // its bucket title.
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    const tables = document.querySelectorAll('table');
+    expect(tables.length).toBeGreaterThanOrEqual(1);
+    for (const table of tables) {
+      const labelId = table.getAttribute('aria-labelledby');
+      expect(labelId, 'a metrics table has no aria-labelledby').toMatch(/^market-bucket-/);
+      const heading = document.getElementById(labelId as string);
+      expect(heading?.tagName, `no heading element for ${labelId}`).toBe('H3');
+      expect(heading?.textContent?.trim()).not.toBe('');
+    }
+  });
+
   it('auto-refresh refetches on the 30 s interval and the toggle-off cancels it', async () => {
     // The interval itself, driven (the Phase 16 QA): the label-only case
     // above stays green with the setInterval or the toggle wiring deleted.

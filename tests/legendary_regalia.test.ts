@@ -16,6 +16,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 import { CHARACTER_LOD_RANGE_SQ } from '../src/render/crowd_lod';
 import {
   LEGENDARY_REGALIA_COLOR,
@@ -30,10 +31,10 @@ import { QUALITY_COLOR } from '../src/ui/icons';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant must never satisfy or trip the scan that enforces it.
+// Through the shared order-safe helper (the block-first two-pass shape this
+// used to hand-roll opens a false block on a bare /* inside a line comment).
 const read = (rel: string): string =>
-  readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  stripComments(readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8'));
 
 describe('legendaryRegaliaActive: the four-field wire predicate', () => {
   const worn = (inst: ItemInstancePayload): Partial<Record<string, ItemInstancePayload>> => ({
@@ -252,11 +253,13 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(4);
     expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(4);
     expect(pubBlock).not.toContain('...');
-    // ... and no non-dotted write shape either (the Phase 16 QA): an
-    // Object.assign(pub, {...}) or a computed-key loop (pub[k] = inst[k])
-    // matches neither the 4-count nor the spread ban above, so ban the shapes
-    // outright; every projected write must be the counted dotted assignment.
-    expect(pubBlock).not.toMatch(/Object\.assign|\bpub\[/);
+    // ... and none of the KNOWN non-dotted write shapes either (the Phase 16
+    // QA): Object.assign, Reflect writes, defineProperty, a cast that opens
+    // computed keys ('pub as'), or a direct pub[...] index all evade the
+    // 4-count and spread bans above. A blocklist, not completeness: a wholly
+    // novel write shape is the reviewer's to catch, and the dotted 4-count
+    // stays the positive arm.
+    expect(pubBlock).not.toMatch(/Object\.assign|Reflect\.|defineProperty|\bpub\s+as\b|pub\[/);
     const core = read(CORE);
     expect(core).toContain(".rolled?.quality === 'legendary'");
     for (const field of ['signer', 'enchant', 'craftedRecipeId', 'bindOnTrade', 'locked']) {
@@ -330,6 +333,13 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
       recomputeAt > guardOpenAt && recomputeAt < guardCloseAt,
       'the predicate recompute must sit INSIDE the ref-diff guard braces',
     ).toBe(true);
+    // ... and exactly ONCE: indexOf finds only the first occurrence, so a
+    // second unconditional recompute duplicated below the guard would pass a
+    // first-occurrence check while defeating the one-pointer-compare claim.
+    expect(
+      slice.split('v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);'),
+      'the recompute must appear exactly once in the wiring slice',
+    ).toHaveLength(2);
     // the emit is suppressed for a reduced-motion viewer (the lich-aura
     // precedent; an accessibility choice by the viewer, never a graphics shed;
     // the fairness doc's regalia bullet names this arm)
@@ -342,18 +352,24 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // condition inserted here gating the glow on hp, target, casting, aura,
     // or Perfecting state, or re-tying it to the live governor, must red this
     // scan. reducedMotion is the one sanctioned extra read (above).
+    // Prefix forms, not whole-word, wherever the live identifiers are
+    // camelCase compounds: \btarget\b never matches targetId (the entity's
+    // real field), \bcasting\b never matches castingAbility (the spelling
+    // three lines above the gate), and \bgovernor\b matches none of
+    // renderBudgetGovernor/autoGovernor.
     for (const banned of [
       /\bperfected\b/,
       /\bperfecting\b/,
       /\bhpFrac\b/,
       /\bhp\b/,
       /\bmaxHp\b/,
-      /\btarget\b/,
+      /\btarget\w*/,
       /\bauras\b/,
-      /\bcasting\b/,
+      /\bcasting\w*/,
       /\bappliedBudgetLevels\b/,
-      /\bgovernor\b/i,
-      /\brenderBudget\b/i,
+      /governor/i,
+      /renderBudget/i,
+      /graphicsBucket/i,
     ]) {
       expect(banned.test(slice), `wiring slice must not read ${banned}`).toBe(false);
     }
@@ -380,6 +396,15 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect(closeAt, 'the dead-guard block never closes').toBeGreaterThan(openAt);
     const deadBlock = renderer.slice(openAt, closeAt);
     expect(deadBlock).toContain('formAura');
+    // No condition may be WRAPPED around the regalia gate either: the span
+    // from the dead-guard open to the gate carries exactly the form-aura
+    // chain's four ifs, so an inserted gating wrapper (one line above the
+    // pinned gate, outside the banned-token slice) raises this count and is
+    // re-judged by hand.
+    expect(
+      renderer.slice(openAt, gateAt).match(/if \(/g) ?? [],
+      'an unexpected condition sits between the dead guard and the regalia gate',
+    ).toHaveLength(4);
     expect(gateAt, 'the regalia gate must open inside the dead guard').toBeGreaterThan(openAt);
     expect(emitAt, 'the regalia emit must land inside the dead guard').toBeLessThan(closeAt);
     // the cached pair lives on the view

@@ -750,7 +750,6 @@ export const pt_BR: AdminTranslations = {
   "topHolders.colPurse": "Bolsa",
   "topHolders.colMail": "Correspondência",
   "topHolders.colMarket": "Mercado",
-  "marketMetrics.title": "Market Metrics",
   "marketMetrics.hint": "Live World Market listings for the tracked supply buckets: what is on the book right now, not sold volume. The server caches this readout for about 15 seconds.",
   "marketMetrics.autoRefresh": "Auto-refresh ({seconds}s)",
   "marketMetrics.loading": "loading…",

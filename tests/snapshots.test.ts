@@ -44,8 +44,8 @@ import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
 import { ClientWorld } from '../src/net/online';
-import { legendaryRegaliaActive } from '../src/render/legendary_regalia_core';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { legendaryRegaliaActive } from '../src/render/legendary_regalia_core';
 import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
@@ -4120,14 +4120,19 @@ describe('equipped instance wire (eqi)', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [wired] });
     const mirror = client.entities.get(pid)!;
     expect(legendaryRegaliaActive(mirror.equippedInstances)).toBe(true);
-    // Negative control on the same rig: a plain masterwork roll glows on
-    // NEITHER host (the predicate keys on rolled.quality alone).
-    sim.unequipItem('chest', pid);
-    sim.addItemInstance('eastbrook_ritual_vestments', structuredClone(inst), pid);
-    sim.equipItem('eastbrook_ritual_vestments', pid);
-    expect(legendaryRegaliaActive(e.equippedInstances)).toBe(false);
-    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
-    expect(legendaryRegaliaActive(client.entities.get(pid)!.equippedInstances)).toBe(false);
+    // Negative control on a FRESH rig (aimed, not order-dependent: on the
+    // shared rig the unequipped legendary copy would sit in bags beside the
+    // masterwork one and the un-aimed equip's pick order would decide the
+    // arm): a plain masterwork roll glows on NEITHER host (the predicate
+    // keys on rolled.quality alone).
+    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Plainwrought');
+    const e2 = sim2.entities.get(pid2)!;
+    sim2.addItemInstance('eastbrook_ritual_vestments', structuredClone(inst), pid2);
+    sim2.equipItem('eastbrook_ritual_vestments', pid2);
+    expect(legendaryRegaliaActive(e2.equippedInstances)).toBe(false);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e2)] });
+    expect(legendaryRegaliaActive(client.entities.get(pid2)!.equippedInstances)).toBe(false);
   });
 
   it('restores equippedInstances from a full record, deep-cloned; an eqi-less full record resets', () => {

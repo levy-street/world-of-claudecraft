@@ -750,7 +750,6 @@ export const vi_VN: AdminTranslations = {
   "topHolders.colPurse": "Cái ví",
   "topHolders.colMail": "Thư",
   "topHolders.colMarket": "Chợ",
-  "marketMetrics.title": "Market Metrics",
   "marketMetrics.hint": "Live World Market listings for the tracked supply buckets: what is on the book right now, not sold volume. The server caches this readout for about 15 seconds.",
   "marketMetrics.autoRefresh": "Auto-refresh ({seconds}s)",
   "marketMetrics.loading": "loading…",

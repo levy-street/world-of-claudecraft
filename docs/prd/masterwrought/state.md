@@ -21989,8 +21989,8 @@ a6cac2e226).
   in tests/monolith_budget.test.ts (renderer 13363 to 13116, online 5959
   to 5922, game 10462 to 10329) landed TOGETHER in c7493716b9, beside (not
   inside) the cdba54791c and 9bc2cb735b extraction commits; the renderer
-  row was then adjusted to 13133 in 2ed0748e53 and a8e3111c2f as dated in
-  the row itself. Every payback and every lowering is real and inside the
+  row was then adjusted 13116 to 13131 (2ed0748e53) and 13131 to 13133
+  (a8e3111c2f), as dated in the row itself. Every payback and every lowering is real and inside the
   phase; only the per-commit pairing claim is corrected. The acceptance
   rows below repeating "in the same commit(s)" carry this same amendment.
 - Discord cards (N10, exactly two per ip-16-SURFACES b): c7493716b9. The

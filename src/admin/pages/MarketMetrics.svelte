@@ -71,7 +71,7 @@
   });
 </script>
 
-<Panel title={t('marketMetrics.title')}>
+<Panel>
   <div class="page-controls">
     <p class="hint">{t('marketMetrics.hint')}</p>
     <AutoRefreshToggle

@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 import type { PooledObjectView } from '../src/render/ground_object_pool';
 import {
   buildEntityPrewarmGroup,
@@ -274,12 +275,13 @@ describe('the untyped host seam stays welded to the renderer', () => {
   // prepare.
   // Comments stripped before scanning (the architecture-test rule): a comment
   // spelling an anchor must never satisfy the weld after the member is gone.
-  const renderer = readFileSync(
-    fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
-    'utf8',
-  )
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  // Through the shared order-safe helper: the hand-rolled block-first two-pass
+  // shape opens a false block on a bare /* inside a line comment (the
+  // strip_comments.ts header documents the ~1,950-line src/main.ts exemption
+  // that shipped from exactly this).
+  const renderer = stripComments(
+    readFileSync(fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)), 'utf8'),
+  );
 
   it('renderer.ts still declares every member the host cast consumes, full signature', () => {
     // FULL signatures, not name prefixes (the Phase 16 QA): the cast is

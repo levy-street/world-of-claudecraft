@@ -750,7 +750,6 @@ export const en_XA: AdminTranslations = {
   "topHolders.colPurse": "[Þúŕšé]",
   "topHolders.colMail": "[Ɱáíļ]",
   "topHolders.colMarket": "[Ɱáŕķéţ]",
-  "marketMetrics.title": "[Ɱáŕķéţ Ɱéţŕíçš]",
   "marketMetrics.hint": "[Ļíʋé Ŵóŕļð Ɱáŕķéţ ļíšţíñĝš ƒóŕ ţĥé ţŕáçķéð šúþþļý ƀúçķéţš: ŵĥáţ íš óñ ţĥé ƀóóķ ŕíĝĥţ ñóŵ, ñóţ šóļð ʋóļúɱé. Ţĥé šéŕʋéŕ çáçĥéš ţĥíš ŕéáðóúţ ƒóŕ áƀóúţ 15 šéçóñðš.]",
   "marketMetrics.autoRefresh": "[Áúţó-ŕéƒŕéšĥ ({seconds}š)]",
   "marketMetrics.loading": "[ļóáðíñĝ…]",
