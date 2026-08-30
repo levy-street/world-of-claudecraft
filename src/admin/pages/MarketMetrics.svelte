@@ -71,7 +71,7 @@
   });
 </script>
 
-<Panel>
+<Panel title={t('marketMetrics.title')}>
   <div class="page-controls">
     <p class="hint">{t('marketMetrics.hint')}</p>
     <AutoRefreshToggle
@@ -91,7 +91,7 @@
     {/if}
     {#each metrics.buckets as bucket (bucket.bucket)}
       <section class="bucket">
-        <h3>{t(BUCKET_TITLE_KEYS[bucket.bucket])}</h3>
+        <h3 id={`market-bucket-${bucket.bucket}`}>{t(BUCKET_TITLE_KEYS[bucket.bucket])}</h3>
         <p class="bucket-summary">
           {t('marketMetrics.bucketSummary', {
             listings: fmtNumber(bucket.listingCount),
@@ -107,7 +107,7 @@
           <div class="empty">{t('marketMetrics.bucketEmpty')}</div>
         {:else}
           <div class="table-scroll">
-            <table>
+            <table aria-labelledby={`market-bucket-${bucket.bucket}`}>
               <thead>
                 <tr>
                   <th>{t('marketMetrics.colItem')}</th>
