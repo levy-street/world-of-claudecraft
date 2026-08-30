@@ -1398,7 +1398,29 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // holds zero player-facing literals (cards and daily-reward observers), but
   // it drains per-event at the tick tail, exactly where an emit is plausible,
   // and the corpus is hand-curated, so it rides along from day one.
-  const serverSrc = ['server/game.ts', 'server/social.ts', 'server/activity_detect.ts']
+  // The remaining masterwrought-branch server modules joined at Phase 17 (the
+  // closing parity review): each holds zero player-facing emits today, but the
+  // corpus is hand-curated and the sim side got whole-directory sweeps, so the
+  // server half now follows the same rule (a new module joins in the change
+  // that adds it). Command handlers (farming_commands, perfect_item_ref,
+  // clear_item_name) and the wire/read extractions ride along so the NEXT
+  // literal added in any of them fails here instead of shipping English.
+  const serverSrc = [
+    'server/game.ts',
+    'server/social.ts',
+    'server/activity_detect.ts',
+    'server/farming_commands.ts',
+    'server/perfect_item_ref.ts',
+    'server/clear_item_name.ts',
+    'server/craft_activity.ts',
+    'server/self_social_wire.ts',
+    'server/sim_calendar_feed.ts',
+    'server/heavy_self.ts',
+    'server/interest_policy.ts',
+    'server/character_blob_size.ts',
+    'server/character_save_statement.ts',
+    'server/admin_market_metrics.ts',
+  ]
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
 

@@ -1513,6 +1513,29 @@ const MONOLITHS: MonolithRow[] = [
     ceiling: 1941,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
+  {
+    // ADDED by Masterwrought Phase 17 (the closing QA), on the frontend
+    // reviewer's note and the daily_rewards_window precedent: the two largest
+    // painters of the src/ui/hud/professions/ domain each grew about ten
+    // percent across the packet's phases and neither had a row, and a file
+    // with no row is exactly where unwatched growth accumulates. The domain's
+    // logic went to siblings correctly (professions_view.ts and the family
+    // view-cores carry the models); what stays is the flow and the DOM state
+    // it owns. Pinned at the exact count, zero slack: the next professions
+    // feature lands as a sibling module behind the domain barrel, never as
+    // another method cluster here.
+    file: 'src/ui/hud/professions/professions_window.ts',
+    ceiling: 845,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
+  },
+  {
+    // ADDED with the row above, same phase, same reasoning, same seam. The
+    // crafting window composes the family view-cores; growth belongs in a
+    // sibling module behind src/ui/hud/professions/index.ts.
+    file: 'src/ui/hud/professions/crafting_window.ts',
+    ceiling: 774,
+    seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
+  },
 ];
 
 function countLines(absPath: string): number {

@@ -438,9 +438,10 @@ export interface SimContextCallbacks {
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
   // awardWyrmfallCores is owned by professions/masterwrought_materials: the C1
-  // death hub calls it right after awardHeroicMarks with the same death-time
-  // participation snapshot (one rng draw per credited eligible kill, appended
-  // after rollLoot returns).
+  // death hub calls it AFTER the whole loot-roll block (awardHeroicMarks, then
+  // rollLoot/rollWorldBossLoot and the world-boss deed hook) with the same
+  // death-time participation snapshot (one rng draw per credited eligible
+  // kill; combat/damage.ts explains why that position is draw-order safe).
   awardWyrmfallCores(mob: Entity, recipients: PlayerMeta[]): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it

@@ -274,6 +274,12 @@ remove the declaration AND its binding in the same change, then re-run the parit
   ticks; the enchant-apply refusal skips ZERO draws (the streams never diverge) and
   forks persisted state only. If that pin fails, the divergence widened or narrowed:
   change this paragraph and the pin together, in the same change.
+  A SECOND host input of the same shape exists since the masterwrought daily gates:
+  `resetDay` (fed by the host calendar seam) gates `craftDailyLimitReached` FIRST in
+  `evaluateCraftAdmission`, so a oncePerDay refusal skips the resolve's one to two
+  output draws exactly like the vault refusal above. Any harness replaying a command
+  stream against a seed must capture `resetDay` beside the seed (recorded at the
+  Phase 12 QA ledger's replay note).
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase
