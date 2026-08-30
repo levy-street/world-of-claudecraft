@@ -36,7 +36,25 @@ const METRICS: AdminMarketMetrics = {
       ],
     },
     emptyBucket('essence', 2),
-    emptyBucket('patterns', 40),
+    {
+      // a SECOND listed bucket, so the aria-labelledby identity and
+      // id-uniqueness arms exercise more than one table
+      bucket: 'patterns',
+      listingCount: 1,
+      totalQuantity: 1,
+      trackedItemCount: 40,
+      listedItemCount: 1,
+      items: [
+        {
+          itemId: 'pattern_sunspun_vestments',
+          name: 'Pattern: Sunspun Vestments',
+          listingCount: 1,
+          totalQuantity: 1,
+          lowestPerUnit: 12,
+          medianPerUnit: 15,
+        },
+      ],
+    },
     emptyBucket('produce', 24),
     emptyBucket('seeds', 12),
     emptyBucket('compost', 2),

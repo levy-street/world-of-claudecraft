@@ -43,5 +43,21 @@
       "frames": 1443,
       "fps": 108.28
     }
+  },
+  "base-f90b3f5812-mobile-run1": {
+    "mobile": {
+      "hudHotDomWrites": 573,
+      "frameLong50": 1,
+      "frames": 1565,
+      "fps": 118.2
+    }
+  },
+  "base-f90b3f5812-mobile-run2-warm": {
+    "mobile": {
+      "hudHotDomWrites": 573,
+      "frameLong50": 0,
+      "frames": 1570,
+      "fps": 118.65
+    }
   }
 }
