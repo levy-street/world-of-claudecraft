@@ -739,6 +739,27 @@ script's `SIM_EVENT_UNION_ONLY`.
 | simevent emit | `attunedZone` | | 13 | branch commit 5bbfcb0450 (fix(sim): apply the review round's sim findings on the promotion); the Phase 13 ledger | lost by the extractor, not by the game: the emit moved behind the shared `announceZoneCelebration` prologue, its literal now in the caller's builder arrow one indirection past the named `emitToZonePlayers` fanout (src/sim/professions/attunement_events.ts); still declared, still handled, pinned firing over the live wire by tests/professions_attunement_online.test.ts; the blind spot is pinned by name in `SIM_EVENT_UNION_ONLY` |
 | simevent emit | `masterworkZone` | | 13 | branch commit 5bbfcb0450 (fix(sim): apply the review round's sim findings on the promotion); the Phase 13 ledger | the same helper indirection (`announceMasterworkZone` in src/sim/professions/gather_events.ts routes through `announceZoneCelebration`); still fires, pinned by tests/masterwork_zone_broadcast.test.ts (sim fanout, live GameServer wire routing, and the hud arm); pinned by name in `SIM_EVENT_UNION_ONLY` |
 
+## Phase 18 STEP 0 deletions (2026-08-30, the eighth v0.41.0 sync)
+
+Rows written at the census re-run on the merge commit 4f72218ed4 (release tip
+3e801dc925 into feature/masterwrought 4f9b785794), discharging the MISSING set it
+found (exports 2). Both names are the SAME class the Phase 17 reconciliation's
+second cluster records: born upstream after base and retired upstream too, so the
+base-gated release-attribution annotation cannot fire and the run misfiles them as
+packet-attributable. The release's raid consolidation absorbed the arena-wall
+camera-occluder fade module `src/render/arena_wall_fade.ts` (the gated sightline fade
+of release commit 67eceab7d1, itself synced at the seventh sync e19d832b47) into
+`src/render/dungeon_wall_occlusion.ts`, which now drives both occlusion modes; the
+deleted module's pins moved with it to `tests/occluder_fade_gate.test.ts`, and the
+merged `tests/monolith_budget.test.ts` dungeon.ts row records the same absorption in
+the release's own words. Found by `git log -S` over the release span and verified in
+the deleting commit's diff.
+
+| Class | Old name | New name | Phase | Ruling | Reason |
+|---|---|---|---|---|---|
+| export | `ArenaHideable` | | release/v0.41.0, the e19d832b47..3e801dc925 sync window (found at the Phase 18 STEP 0 census) | release span e19d832b47..3e801dc925 (the Ignivar raid consolidation absorbing arena_wall_fade.ts into dungeon_wall_occlusion.ts), carried by origin/release/v0.41.0 3e801dc925 | retired upstream: the hideable-wall interface of the camera-occluder fade moved into `src/render/dungeon_wall_occlusion.ts` with the module; born upstream after base, so the base-gated release annotation cannot fire (base:no, ours:no, theirs:no; the older synced tip e19d832b47 still carries it in src/render/arena_wall_fade.ts, which is why the union holds it) |
+| export | `advanceArenaWallFades` | | release/v0.41.0, the e19d832b47..3e801dc925 sync window (found at the Phase 18 STEP 0 census) | release span e19d832b47..3e801dc925 (the Ignivar raid consolidation absorbing arena_wall_fade.ts into dungeon_wall_occlusion.ts), carried by origin/release/v0.41.0 3e801dc925 | retired upstream: the per-frame gated fade step of the same module moved into `src/render/dungeon_wall_occlusion.ts`'s hideable-wall update loop; born upstream after base, so the base-gated release annotation cannot fire (base:no, ours:no, theirs:no; the older synced tip e19d832b47 still carries it in src/render/arena_wall_fade.ts) |
+
 ## Explained extras (2026-08-30, the Phase 17 reconciliation: phases 11e to 16)
 
 The explained-extras discipline stopped after 11e: phases 11f through 16 kept
