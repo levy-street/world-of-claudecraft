@@ -496,8 +496,11 @@ interface AttributionTargetFixture {
 // NEITHER parent. Parent values for the record: ours 01fcf59e, the release
 // fd58a923. The value below is the re-mint over the resolved tree, committed
 // with exactly the bytes it read. No capture was retaken.
+// Re-minted at Phase 16 (2026-08-30): the zone prewarm-group extraction moved
+// the builder family out of renderer.ts and the composite's renderer leaf
+// followed the file. REMINT_COMMAND on the committed tree; no capture retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '92e85131521216db23a9315995919559f20da23e68522774beca72534e5a8e56';
+  'b623d52b0439d5a2a1f6c949591e2c756a05f05a1a6f4c76560c3ad68752aa64';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

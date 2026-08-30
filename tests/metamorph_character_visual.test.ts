@@ -132,7 +132,16 @@ describe('Metamorphosis character integration', () => {
     );
     expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
-    expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
+    // The player prewarm builder (metamorph-first, then per-class rigs) moved
+    // to src/render/zone_prewarm_groups.ts at the Phase 16 extraction; the
+    // form claim follows the code.
+    const prewarmGroups = readFileSync(
+      new URL('../src/render/zone_prewarm_groups.ts', import.meta.url),
+      'utf8',
+    );
+    expect(prewarmGroups).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
+    // The prewarm-instance lifecycle (dispose on zone teardown) stayed on the
+    // renderer with the manifest entries.
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
     // The per-rig setActive fan-out lives in entity_gate_stand_in_core.ts
     // (applyCharacterFormVisibility), where a pending form's token keeps the

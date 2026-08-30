@@ -136,6 +136,14 @@ export const RETIRED_KEYS = [
   'guide.abilityHook.stormsurge',
   'guide.abilityHook.tidecall',
   'guide.abilityHook.veilbound_march',
+  // Phase 16 (2026-08-30) rewords, the reword-is-a-new-key convention: each
+  // retired body's replacement renders in its place (masterwroughtBodyLegendary,
+  // identityBodyOneMeal, enchantsNoteInfusionLive, tableBodyOneMeal); the old
+  // keys keep their reviewed overlay fills until the release fill retires them.
+  'guide.gear.masterwroughtBody',
+  'guide.profPages.craftProse.cooking.identityBody',
+  'guide.profPages.ench.enchantsNoteOffhand',
+  'guide.profPages.farm.tableBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);
