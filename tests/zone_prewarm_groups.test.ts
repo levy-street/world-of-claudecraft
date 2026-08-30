@@ -10,7 +10,6 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { stripComments } from './helpers/strip_comments';
 import type { PooledObjectView } from '../src/render/ground_object_pool';
 import {
   buildEntityPrewarmGroup,
@@ -23,6 +22,7 @@ import {
   type ZonePrewarmGroupHost,
 } from '../src/render/zone_prewarm_groups';
 import { ALL_CLASSES, type Entity, type ZoneDef } from '../src/sim/types';
+import { stripComments } from './helpers/strip_comments';
 
 const state = vi.hoisted(() => ({
   createCalls: [] as string[],

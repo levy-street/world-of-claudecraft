@@ -16,7 +16,6 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { stripComments } from './helpers/strip_comments';
 import { CHARACTER_LOD_RANGE_SQ } from '../src/render/crowd_lod';
 import {
   LEGENDARY_REGALIA_COLOR,
@@ -28,6 +27,7 @@ import {
 import { TIERS } from '../src/render/weapon_vfx';
 import type { ItemInstancePayload } from '../src/sim/types';
 import { QUALITY_COLOR } from '../src/ui/icons';
+import { stripComments } from './helpers/strip_comments';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant must never satisfy or trip the scan that enforces it.
