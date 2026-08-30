@@ -37,12 +37,17 @@ export const EMBER_DENS = [
   { x: 302, z: 2258 },
 ] as const;
 const WYRMWATCH = { x: 404, z: 1900, r: 32 } as const;
+// The owner's rebuilt churchyard on the west gate lawn (church, chapel
+// roof, and the gravestone garden sit past the hub disc's reach).
+const WYRMWATCH_CHURCHYARD = { x: 384, z: 1877, r: 20 } as const;
 
 /** Shared scatter clearance: roads, the hub, dens, and the whole modeled
  *  lava network (pools, basins, river banks along the real meander). */
 export function emberScatterClear(x: number, z: number): boolean {
   if (roadDistance(x, z) < 6) return false;
   if (Math.hypot(x - WYRMWATCH.x, z - WYRMWATCH.z) < WYRMWATCH.r) return false;
+  if (Math.hypot(x - WYRMWATCH_CHURCHYARD.x, z - WYRMWATCH_CHURCHYARD.z) < WYRMWATCH_CHURCHYARD.r)
+    return false;
   if (!keepSiteClear(x, z)) return false; // the Last Keep's build site
   if (!bulwarkClear(x, z)) return false; // the Ashen Bulwark's headland pad
   for (const pool of EMBER_LAVA_POOLS) {

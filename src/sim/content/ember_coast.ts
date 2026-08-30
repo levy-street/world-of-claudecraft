@@ -192,6 +192,18 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 464.95, a1: 471.95, h0: 2.3, h1: 5.76 },
   { axis: 'x', b0: 2165.4, b1: 2171.89, a0: 471.95, a1: 472.95, h0: 5.76, h1: 5.76 },
   { link: true, axis: 'x', b0: 2165.4, b1: 2171.89, a0: 472.95, a1: 476.5, h0: 5.76, h1: 5.1 },
+  // the rampart climb (the third pass): plaza plates (2.3) up the west
+  // flight to the mid landing (its plate top 5.5), then the north flight
+  // onto the rampart walk decks (7.75) over the training yard wall
+  { link: true, axis: 'x', b0: 2161.3, b1: 2165.9, a0: 458.9, a1: 457.5, h0: 2.0, h1: 2.3 },
+  { axis: 'x', b0: 2161.3, b1: 2165.9, a0: 457.5, a1: 453.13, h0: 2.3, h1: 5.5 },
+  { axis: 'x', b0: 2161.3, b1: 2165.9, a0: 453.13, a1: 452.5, h0: 5.5, h1: 5.5 },
+  { axis: 'z', b0: 448.43, b1: 452.07, a0: 2162.35, a1: 2158.85, h0: 5.5, h1: 7.75 },
+  { axis: 'z', b0: 448.43, b1: 452.07, a0: 2158.85, a1: 2158.35, h0: 7.75, h1: 7.75 },
+  // the north strand stair: the strait-bridge decks (-1.13) up to the
+  // gate-mouth ground behind the fence line
+  { axis: 'z', b0: 440.11, b1: 447.59, a0: 2189.9, a1: 2182.9, h0: -1.13, h1: 2.0 },
+  { axis: 'z', b0: 440.11, b1: 447.59, a0: 2182.9, a1: 2181.9, h0: 2.0, h1: 2.0 },
 ];
 
 /** No wild scatter on the fortress's graded grounds (the Last Keep rule):
