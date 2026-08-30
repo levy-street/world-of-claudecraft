@@ -22275,9 +22275,9 @@ after the stamp.
 
 ## Phase 17 ledger (2026-08-30, the packet-closing QA and PR preparation; IN PROGRESS)
 
-STATUS: RUNNING. Opened by the market-chip evidence commit; the full record
-(union matrix results, review rounds, census reconciliation, validation
-stamps, the close-out list) lands with the closing docs commit.
+STATUS: see "STATUS: COMPLETE except the maintainer's word" at the end of
+this ledger (opened by the market-chip evidence commit; closed by the
+closing docs commit the same day).
 
 ### The market-chip screenshots (the Phase 11 recorded deferral, DISCHARGED)
 
@@ -22304,3 +22304,156 @@ breakpoint with the menu partially scrolled (the desktop pair carries the
 category comparison). The new screenshot directory joins the five CI
 sparse-checkout cones and the SPARSE_CONE literal in the same commit, per
 the referenced-set rule.
+### The union matrix (STEP 2), executed as a 14-lane workflow with per-finding adversarial verification
+
+75 rows across 14 lanes (three-host parity, determinism, R5 closure-state, economy,
+persistence, i18n, naming, UX, deeds, anti-chore, server authority, well-fed
+unification, monolith ceilings, copy review): 74 PASS with per-row evidence (a named
+test the lane RAN with its result line, or a file:line read), 1 OPEN-MAINTAINER (the
+instance-keyed Reliquary question, ruling 135 p13-OPEN-RELIQUARY, honored as recorded),
+ZERO findings. The full per-row evidence table is archived in the session record; the
+load-bearing verdicts: the farming draw-count contract pinned clause by clause; the
+farming_session and perfecting_walk parity scenarios green in their shard; the
+well-fed exclusivity PINNED (wellfed_<kind> absent from the tree, the one mint at
+src/sim/wellfed.ts); all 19 monolith rows exact at tip with the hud.ts 18731
+release-attribution intact; GATE 1's discharge verified by test (the three formerly
+reagent-dormant rows obtainable); the R5 record verified as the ratified Verdict with
+both caveats, not re-audited.
+
+### The eleven domain reviewers (STEP 3), the fix rounds, and the gate
+
+All eleven typed reviewers delivered (architecture, cross-platform-sync,
+privacy-security, migration-safety, database-performance, server-hot-path,
+frontend-seam, render-performance, content-obligations, test-coverage,
+gate-integrity; the workflow agentType+schema dispatch died the recorded way and the
+Agent-tool re-dispatch was the working form). Verdicts: zero blocking anywhere; every
+finding applied or refused with the reason recorded below. The fix round (nine
+commits) got its own fresh reader (one blocking caught and already fixed in-range,
+two nits closed), and the qa-checklist gate ran LAST: READY, zero blocking, its three
+should-fix items closed in 1c265abfa6.
+
+### Applied findings (the fix-round commits)
+
+- 67573755b8: the coverage auditor's round (epoch-12 rationale fixture on the
+  epoch-10/11 pattern; the auth-world-11 reject arm; ip_scrub teeth for the two
+  Etching-era verbatim rows; originality vacuity floors; the two missed CLAUDE.md
+  naming-audit re-points, count corrected eleven to thirteen).
+- 80760030c3: the db/security round (woc_character_state_bytes_max high-water gauge;
+  the setImmediate warn deferral off the lock-hold window; the unleased realm fence
+  with its real-Postgres cross-realm refusal arm).
+- 556163fd9a: the render round (farmPatchVisuals joins the lifecycle dispose seam,
+  zero renderer.ts bytes; the prewarm-guard pin brace-scoped).
+- ea90890b71: monolith rows for the two professions painters at exact counts; the S3
+  server corpus grown 3 to 14 modules; the awardWyrmfallCores registry comment and
+  the resetDay determinism carve-out documented.
+- a0fdc679f6: the db.ts ratchet line reclaimed after biome wrapped the fence object
+  (the format-pass-is-not-a-check-pass trap fired and was caught by the gate).
+- 5e0dc336e5: the fresh reader's nits (committed-doc census parse pin; the warn
+  comment's call-site arithmetic corrected).
+- 1c265abfa6: the qa gate's should-fixes (ip-refactor/NAME-MAP.md re-point, the one
+  confirmed orphan; the warn callback swallows its own throw; the resetDay paragraph
+  names its pins; the teardown blast-radius addendum in decisions-index.md).
+
+### JUDGED REFUSALS this phase (binding, do not re-raise)
+
+1. Hot-path F1 (admin metrics per-request stringify / no limiter): the serialize-once
+   half is the Phase 16 QA's judged refusal (the overview/activity family chore); the
+   limiter half follows the same recorded family rationale (zero DB cost, the
+   overview precedent stated in-code at the route).
+2. Hot-path F2 (the mst party-walk closure): the trade is recorded at the module
+   header (mobile_station.ts, one bounded closure per partied viewer); the reviewer's
+   own withdrawal condition applies.
+3. Hot-path F3 (feast per-area cap): the per-placer bound is the recorded anti-abuse
+   answer; the interest-cost exposure is the same class every placed ground object
+   carries (pre-existing shape, recorded as a read below).
+4. Frontend N2 (the two bare-named modal painters outside the painter gate sweep):
+   the documented src/ui/CLAUDE.md blind-spot limit, deliberately kept; a rename or a
+   gate widening is a maintainer chore, not a phase-17 churn.
+5. Test-coverage NIT (the vendor_floor tercile arm protecting only test-local
+   literals): the arm's own comment discloses it; the live pin at the craftedValue
+   column reds first.
+6. DB-perf F5 (the unconditional byteLength pre-filter): consciously superseded by
+   F3's gauge, which consumes the measurement; the trade is stated at the chokepoint.
+
+### RECORDED, NOT ACTED (new maintainer reads)
+
+1. The farm_patches unprepared-GPU-producer recorded read (Phase 14, state.md) is
+   AMENDED with the Phase 17 render review's wider scope: the dispose-then-create
+   rebuild path can release and cold-relink a stage's program REPEATEDLY (stage
+   cycling and the wetBand flips, not a once-per-session cost), the feast
+   shadow-budget flip adds a depth-twin cold-link arm, and against THIS release base
+   the branch is the diff that introduces the producer (the "pre-existing" framing
+   held only against the absorbed farming branch). The recorded correction (a
+   retained prewarm-manifest twin or a compile gate with the static bed as stand-in)
+   must be the retained shape; a one-shot warm does not close the repeated-relink
+   class. Still the maintainer's render work item.
+2. Hot-path F4 (two new tenants on the per-recipient zone-celebration fan-out):
+   recorded so the NEXT tenant is a conscious decision; the seam if the list grows is
+   the realm-readout memo plus sendRaw.
+3. The render review's feast click-proxy compile-unit note (one gate unit per feast
+   view for an invisible material): VERIFY-gated against gpuPrepEventsSnapshot before
+   acting; a shared module-level proxy material is the candidate shape.
+4. Gate-integrity's three INFO notes (the cone rows red loudly at a doc-deleting
+   teardown, by design; the block extractor's blank-line truncation residual; the
+   vacuity floor now 9 under the measured subtree count, so a routine evidence purge
+   reds and re-measures it).
+5. The setImmediate warn deferral's shutdown trade (a lost dev-channel line on a
+   shutdown-path save), stated at the call site.
+6. The architecture review's composed-net note: nythraxis_full_pull's whole-branch
+   draw delta is 6087 to 6080 (the per-phase rows record each re-mint; this line is
+   the composed accounting a merge reviewer would want, with 65 of 67 pre-existing
+   goldens byte-identical in draws AND drawDigest as the append-only proof).
+
+### VALIDATION at the frozen tip 1c265abfa6 (all four legs, 2026-08-30)
+
+- node scripts/gate_select.mjs: PASS, all 12 steps green, EXIT=0, zero printed
+  FAIL markers, committed tree, pg suites armed via TEST_DATABASE_URL (the
+  first attempt one commit earlier caught the db.ts ratchet break and paid for
+  itself).
+- npm run gate (the full merge bar, pg armed): PASS, all 12 steps green,
+  EXIT=0, zero FAIL markers; the full-suite step read 3369 passed / 2 skipped
+  files (3371), 50840 passed / 2 xfail / 27 skipped (50869); the real-browser
+  suite 315/315 (the armory standing exception did not fire).
+- THE FROZEN STAMP, the gate's bounded form (npm test -- --maxWorkers=8,
+  DATABASE_URL and TEST_DATABASE_URL unset, porcelain clean before and after,
+  zero vitest processes before launch): EXIT=0 FIRST TRY at 1c265abfa6,
+  3342 passed / 29 skipped files (3371), 50414 passed / 2 expected fail / 453
+  skipped (50869), 590.09 s. DRIFT vs the Phase 16 QA stamp at 3960a06439
+  (3342/29, 50406/2/452 (50860)): +0 files, +8 passed, +1 skipped, MATCHING
+  THE PRE-RUN PREDICTION EXACTLY and attributed one-to-one: +1 the ws_auth
+  reject matrix's auth-world-11 entry, -1 the bank_wire_epoch fold, +2 the two
+  monolith roster rows, +1 the blob high-water arm, +4 the census suite's
+  reconciliation arms, +1 the committed-doc parse pin, +1 skipped the pg
+  cross-realm arm registering in the skipped integration file.
+- The census delivery gate: RESULT: PASS, EXIT=0 at the tip (MISSING zero in
+  every class, every extra explained; the six-class mutation guard each killed
+  exactly its one seeded symbol; full record in merge-deletion-list.md and the
+  census commits dd27ac5336 / 256809bb07 / d06710f3e3).
+- The release-tier six suites (I18N_RELEASE_TIER=1, run explicitly since the
+  tier never auto-fires off a feature branch): 159 passed, 8 failed, and all
+  eight failures are the known fill-lane arms (the empty-pending pins, the
+  deed manifest rows, the admin copied-English arm, the 21-locale matcher
+  arm). The fill is the maintainer's sequenced workflow; the derived set is
+  11,997 pending rows across 826 keys (main 11,367, admin 630; the five
+  non-Latin locales M16-clean at 37 rows each) PLUS the reword-staleness
+  package the ledgers flag by key (about 78 translated-but-stale rows of which
+  about 24 are invisible to every gate, 11 deed-channel rows, two whole-block
+  regens, four machine-anchored sets owed re-judgement), assembled for the
+  fill session from the RELEASE-FILL OBLIGATIONS blocks.
+
+### THE FINAL SYNC WAS A RECORDED NO-OP
+
+origin/release/v0.41.0 unmoved at e19d832b47, already the merge-base: no
+merge, no release-merge-audit, and the Eastbrook re-mint and ARM 3
+release-tip-capture riders did not fire (the ARM 3 clean-capture read still
+stands for the next real sync).
+
+### STATUS: COMPLETE except the maintainer's word
+
+Everything the phase can do without the maintainer is done: matrix executed,
+reviews applied, census green, gates green, the frozen stamp taken, the PR
+body drafted with both screenshot subtrees, the fill package assembled, the
+teardown offer prepared. NO push, NO PR, NO teardown, NO fill: each waits on
+the maintainer's explicit word (ip-17-PUSH the one structural hand-back). The
+close-out list of genuinely open maintainer decisions is in the Phase 17
+report and mirrors the handoff table's open classes.
