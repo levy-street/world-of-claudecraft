@@ -22570,3 +22570,192 @@ rule: 18 (the perfection sweep, with its QA twin), 19 (the rulings gate:
 every open decision priced, answered in-session, executed), 20 (the
 release-tier fill and the packet re-close). The delivery contract's one
 branch, one PR shape stands; the PR opens after Phase 20.
+
+## Phase 18 STEP 0 ledger: the eighth v0.41.0 sync (2026-08-30; the sweep itself re-runs FRESH)
+
+STATUS: the sync is LANDED, AUDITED, the audit's confirmed round APPLIED, and
+the gate's full-suite fallback healed;
+the Phase 18 perfection sweep did NOT run in this session. The maintainer
+stopped the session at the sync's size ("so many merge conflicts: handle all
+of that first including the merge audit, then re-run the prompt with fresh
+context"), so this ledger is STEP 0 only: the derived inventory, the units,
+and the Phase 19 table pricing are the fresh session's. LOCAL only: NO push,
+NO PR, NO teardown. Commits: the merge 4f72218ed4 (parents 4f9b785794 ours,
+3e801dc925 theirs, base e19d832b47), the closeout dd0545e460 (census rows +
+the ARM 3 evidence), the escalation record 717a342696, the audit round
+58acaf4bda, the full-suite heal dc0f371705, the fresh reader's round
+7c7b25597b.
+
+### THE MOVE AND THE MERGE
+origin/release/v0.41.0 moved e19d832b47 to 3e801dc925 (PR 3655, the complete
+Ignivar raid, and its train): 294 commits, 1388 files, 161k insertions; 189
+true conflicts against a branch side of 1229 commits over 1704 files. Six
+disjoint-file Workflow lanes resolved the 85 hand files (about 300 hunks) as
+semantic unions with both parents' comment history; the bulk classes were
+regenerated on the merged tree (72 parity goldens via UPDATE_PARITY, the
+resolved i18n bundles and translation keys, the guide content, the SFX
+manifest and runtime pack twice, the media manifest, the map plates including
+a re-baked drakelands and world strip, the terrain height fixture, the
+append-only shipped-item-ids golden, the shard weights by the KEY UNION tool:
+3349 keys, coverage 0.9533 over 3513 walked files). ONLINE_WORLD_LAYOUT_VERSION
+lands at 26 (the release ran raid epochs 13 to 25 and reserved 12; the
+branch's 12 renumbered past the ladder in every mirror and pin).
+Cross-file resolutions worth the record: interest_policy.ts derives
+INTEREST_RADIUS from the release's PLAYER_INTEREST_RADIUS; the release's
+compareStatLabelKey edit mirrored onto the branch's extracted
+item_compare_view.ts (the legacy-arm class); the release's new prose takes
+the branch's IP-scrub names (three Frostglobe comments; Fleetmend in the
+grovespring set-bonus copy, whose five non-Latin fills already carried each
+locale's shipped ability name); the art-pending plumbing both sides added
+folded onto the branch's superset shape with the item-art verdict re-minted
+by the audit tool (1124 art files / 1139 live defs / 25 groups / 30 pages);
+the Eastbrook polish provenance re-minted over the final renderer.ts bytes
+(composite 02f05f25, metadata cc2ee10f, second-order d4b1c0ef; town-source
+fingerprint untouched); all 19 monolith rows measured and re-pinned to exact
+merged counts with both parent pins recorded (six coordinator rows fell BELOW
+both parents where the two arms' extractions compose; sim.ts later followed
+its file down again, 12043 to 12040, when the audit's dead-import nit
+landed). The `generate` vs `emit` media-manifest trap is recorded in the
+merge battery notes: `node scripts/build_media_manifest.mjs` (no argument)
+writes the TS; `emit` only copies hashed files into dist.
+
+### THE R5 ESCALATION
+The full record is the eighth-sync AMENDED block in the Phase 15 ledger
+(above, at "THE VERDICT IS SUSPENDED"): the release moved the R5 fixture
+surface (all four baseline kits re-rated, the hit ramp itself lowered, the
+twins duplicated, the chest lead negative, the dev-bis and boost pickers
+re-geared). NINE pins ride it.fails with escalation notes (seven Phase 15,
+two phase 08), the rogue balance identity pins are re-anchored (JUDGED
+PENDING confirmation), the heroic-floors max-kit literals re-pinned with the
+named cause, and the decisions are Phase 19 rows 12 to 16. Nothing on the
+ratified surface was rewritten.
+
+### THE AUDIT (release-merge-audit, nine lanes + per-finding adversarial verification)
+Run twice: the first attempt lost eight of nine lanes to a usage-limit
+outage (the ninth, content obligations, delivered a fully green sweep plus
+the one confirmed finding); the resumed run completed all nine lanes and
+verified every non-nit finding with two adversarial votes, none refuted (39
+agents, about 4.7M tokens across both runs). Lane verdicts: the three
+overlap lanes proved every parent-added line present and every parent-deleted
+line absent across the both-sides-changed sets (31 sim/world_api files, 56
+ui/render/game files, the server/net/tests set), with the epoch-26
+resolution, the frost_mage Frostquench-plus-rename union, and the hud/renderer
+release wirings each verified at their call sites; the legacy-arms lane
+confirmed every branch extraction still points at live modules and every
+release signature change re-bound; the inventories lane verified the command,
+delta-key, facet, metric, and S3 surfaces with their pins; the premises,
+r5-surface, double-extraction, and content-obligation lanes produced the
+findings below. CONFIRMED and APPLIED (58acaf4bda unless noted): the
+escalation record the seven pins cited had not been written (717a342696
+wrote it; the verify round then corrected its hit-need arithmetic and added
+the rogue and caster kit movements); the two phase-08 pbe_boost equip-cap
+pins were red and unrecorded (now the eighth and ninth expected-fails); the
+corpse-harvest untagged census re-pinned 181 to 188 naming the seven
+Ignivar-span templates; sundering's eligibility tightened to the explicit
+gear allowlist its own doctrine states (the release's raid-sourced epic
+sigils, kind tool, and the staged lastflame core, kind junk, would otherwise
+have fed essence; premise-pinned arms plus a whole-catalog sweep in
+tests/masterwrought_materials.test.ts; the Crucible GEAR tier's admission is
+row 16); entity_display_labels.ts trimmed to its two live members (the
+double-extraction class: the branch homes won every consumer; 18 dead
+duplicate exports deleted, two of which had already drifted stale; census
+still PASS, every name lives on in its branch home); the Power placement
+section gained its staleness pointer; power-verification.md its second
+HISTORY entry; the Phase 18 seed anchors re-pointed at the merged catalog
+(the pbe_boost scorer offender and the druid drift figure must be re-derived
+there first); the stale fill-count paragraph stamped; the farming epoch row
+dated. RECORDED, NOT ACTED (maintainer reads): the release stages a Crucible
+crafted tier (docs/prd/ignivar-raid-professions.md, PR 3704) that
+prospectively contradicts the crafted-ceiling premises (folded into row 13);
+R5's protected-asset set does not name the new raid (folded into row 12's
+re-measure option); the release's encounterOwned aura marker never rides the
+wire (a one-byte design call if an encounter ever applies one to players);
+frozenOrbFx and necromancyArmyPortalFx carry no explicit renderer-teardown
+dispose (release-side tidy, not owed by the merge); the overlap parity suites
+sit near their 20 s budgets under parallel workers (validate through the
+gate's bounded form, treat a lone red as contention until reproduced
+standalone).
+
+### THE RIDERS
+- Eastbrook re-mint: in the merge commit.
+- ARM 3 clean release-tip capture (the Phase 16 QA's owed read, DISCHARGED):
+  the release tip served from a scratch worktree on :5177 and the merged
+  branch on :5173, PERF_GPU=1 headed, both viewports, two runs per side.
+  Release: desktop 1054 then 1074 (the warm outlier under six-lane vitest
+  load), mobile 573/589; branch: desktop 1054/1054, mobile 573/564. The 1062
+  anchor is KEPT and RE-GROUNDED on the clean release capture (1054 + 8), the
+  branch adds zero writes on either viewport, ARM 3 runs green on the branch
+  artifact for both viewports, the four-way evidence is committed at
+  docs/screenshots/masterwrought-phase-16/perf-tour-ab-2026-08-30-eighth-sync.json,
+  and the baseline's canonical row records the re-grounding. Both sides carry
+  the same two release-span console errors (character asset not preloaded:
+  training_dummy.glb, brasscrown_walking_staff.glb), the tour's exit-1 cause
+  and not a HUD signal; a release-side read, not the branch's.
+
+### VALIDATION
+- npx tsc --noEmit: clean after every round.
+- The merge battery (95 files, about 3350 tests) green at the merge with the
+  expected-fails only; the audit re-ran 70-plus suites green.
+- The census delivery gate: RESULT PASS, EXIT=0, MISSING zero in every class,
+  zero unexplained extras, after the two Phase 18 STEP 0 deletion rows (the
+  arena_wall_fade retirements, the recorded misattribution class).
+- npm run ci:changed after the last commit: EXIT=0 (warnings only).
+- node scripts/gate_select.mjs on the committed tree, TEST_DATABASE_URL
+  armed, first run at 58acaf4bda: the planner fell back to the full suite
+  (the change set is the whole release span) and FAILED with exactly five
+  suites red out of 3530 files (52392 passed, 11 expected fail), every one a
+  suite the targeted batteries had not reached: (1)
+  tests/paladin_support_abilities.test.ts, four arms, the EVIL-MERGE FIXTURE
+  class: both parents pass 25/25 and a three-way probe showed the primary
+  player's entity id is 997 on ours, 995 on the release, and exactly 999 on
+  the merged world, the literal the suite used as its foreign-paladin
+  sourceId, so every foreign-aura fixture silently became a self-aura;
+  fixed by moving the fixture to the un-allocatable -999 with the collision
+  recorded at the constant. (2, 3) two release-authored hud source pins whose
+  construct the branch had extracted or unioned
+  (tests/item_affix_tooltip.test.ts follows compareStatLabelKey into
+  item_compare_view.ts; tests/ignivar_encounter_render.test.ts pins the
+  merged farming-first cast-label resolver). (4, 5) two derived literals the
+  release catalog moved, re-pinned with the named cause their own comments
+  demand: the level-20 shelf census 266 to 454 (all 188 Ignivar-span
+  additions gate at 20; the per-item sweep stays green) and the friendly
+  practice dummy's reference body 1712 hp / 2941 armor to 1232 / 3265 (the
+  bestEpicGearFor re-gear; Phase 19 rows 12 and 13 may move it again). All
+  five healed in dc0f371705; the re-run at the final tip 7c7b25597b: PASS,
+  all 12 steps green, EXIT=0, committed tree, pg suites armed via
+  TEST_DATABASE_URL; the full-suite fallback read 3528 passed / 2 skipped
+  files (3530), 52400 passed / 11 expected fail / 27 skipped (52438), the
+  build step 36/36, ci:changed EXIT=0 after the last commit. The 11 expected
+  fails are exactly the nine escalation pins plus the two pre-existing
+  terrain-seam xfails.
+- The fresh reader over the audit fix round (a general-purpose agent, the
+  full-report contract): three should-fix and three nits, ALL APPLIED in
+  7c7b25597b, everything else verified clean including every it.fails body
+  byte-identical to the pre-merge branch, every R5 numeric claim re-measured,
+  the sundering premises, the trim's 18 deleted exports each alive in a
+  branch home with both stale-divergence claims confirmed, and a zero-hit
+  dash/emoji scan over the whole range. The two substantive corrections, now
+  in every home: the baseline rating swaps belong to the incumbent set-stack
+  retune d404eab938 (c920f39c85 owns only the lowered hit ramp), and the tank
+  baseline's +200 decomposes as +60 heart_of_the_rift plus about +100 from
+  the replaced crownforged 2pc bonus (ap 40 to str 10 / sta 10, a set-bonus
+  mover the first record missed) plus the retune's lineage lines. Nits: the
+  ARM 3 prose names the warm 1074 outlier and the mobile band; the guide's
+  sundering sentence writes the live gear-only mechanic (RELEASE-FILL
+  OBLIGATION: that key's 18 translated fills join the reword-staleness set
+  for Phase 20); the hud monolith row points at the post-trim live homes.
+  JUDGED, recorded: the refusal line "Only raid-won epics can be sundered."
+  is kept as written, a necessary-condition statement that remains true under
+  the gear allowlist (changing it would stale three matcher homes and 18
+  fills for no falsehood corrected).
+- The frozen bounded stamp is deliberately NOT taken here: it is the Phase 18
+  QA twin's job, and the sweep session's drift will attribute against the
+  Phase 17 stamp at 1c265abfa6 PLUS this ledger's suite deltas.
+
+### NEXT
+Phase 18 (phase-18-perfection-sweep.md) in a FRESH session; its STEP 0 finds
+the release already merged at 4f72218ed4 (audited, fix rounds applied,
+validation above) and records the no-op the Phase 17 way unless the release
+moves again. The inventory derivation starts from the seed list as amended
+this session (the two re-derive-first anchors) and the Phase 19 table now
+carries rows 12 to 16.
