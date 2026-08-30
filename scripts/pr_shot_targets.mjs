@@ -12283,8 +12283,7 @@ export const TARGETS = [
       );
       // The worn mirror must carry the legendary roll before anything can emit.
       await page.waitForFunction(
-        () =>
-          window.__game?.sim?.player?.equippedInstances?.legs?.rolled?.quality === 'legendary',
+        () => window.__game?.sim?.player?.equippedInstances?.legs?.rolled?.quality === 'legendary',
         { timeout: 10000, polling: 200 },
       );
       // And the renderer must have recomputed its per-view flag off the new
@@ -12292,8 +12291,8 @@ export const TARGETS = [
       // predicate path ran, not just the sim state.
       await page.waitForFunction(
         () =>
-          window.__game?.renderer?.views?.get?.(window.__game?.sim?.playerId)
-            ?.legendaryRegalia === true,
+          window.__game?.renderer?.views?.get?.(window.__game?.sim?.playerId)?.legendaryRegalia ===
+          true,
         { timeout: 15000, polling: 250 },
       );
       // The zone change re-pops the tutorial quest banner (Seek the Marshal)
