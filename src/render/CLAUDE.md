@@ -644,10 +644,13 @@ GPU work signs. Each rule names its seam and its guard.
   before its first link). The client (`shader_warm_client.ts`, pure policy in
   `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
   backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
-  is `all` where the compile runs off the presenting thread (D3D11, Vulkan, Metal)
-  and `off` on every OpenGL and GLES class, where the worker only relocates the
-  stall into the GPU process (measured 2026-08-28 on Linux NVIDIA, Linux Intel and
-  Android Mali); iOS is `off` whatever the setting (a second context is a
+  is `all` where the compile runs off the presenting thread AND there is something to
+  warm (D3D11, Metal: `WORKER_WORTH_BACKENDS`), `off` on every OpenGL and GLES class,
+  where the worker only relocates the stall into the GPU process (measured 2026-08-28
+  on Linux NVIDIA, Linux Intel and Android Mali), and `off` on Vulkan, where a cold
+  link is already as cheap as a hit and the first draw is free while the worker's own
+  links cost three to six times more (measured 2026-08-30 on an RTX 3060, an RTX 3090
+  and an Intel iGPU); iOS is `off` whatever the setting (a second context is a
   per-process ceiling risk there); `?shaderwarm=off|reveal|all` overrides.
   The worker is a client of the EXISTING gates: `shader_warm_gate.ts` assembles a
   root's program sources through the three patch's dry-compile hook

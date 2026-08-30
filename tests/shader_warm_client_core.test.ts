@@ -146,14 +146,17 @@ describe('readShaderWarmSetting', () => {
 });
 
 describe('shaderWarmModeFor', () => {
-  it('resolves auto by the backend: the full policy where the compile runs off the presenting thread', () => {
-    // Measured 2026-08-28: D3D11 passed, Vulkan had nothing left to warm,
-    // every OpenGL cell (Linux NVIDIA, Linux Intel, Android Mali) only
-    // relocated the stall into the GPU process. The full policy holds the
+  it('resolves auto by the backend: the full policy where the worker is worth its cost', () => {
+    // Measured 2026-08-28: D3D11 passed, every OpenGL cell (Linux NVIDIA,
+    // Linux Intel, Android Mali) only relocated the stall into the GPU
+    // process. Measured 2026-08-30 on Vulkan (RTX 3060, RTX 3090, Intel
+    // iGPU): a cold link costs 8 to 25 ms and the first draw 0 ms, while the
+    // worker's own links cost three to six times more, so there is nothing
+    // to warm and the worker is a net cost: off. The full policy holds the
     // live view too: its stand-in already shows what is there, so a longer
     // stand-in beats a frozen frame (settled 2026-08-28).
     expect(shaderWarmModeFor('auto', 'd3d11')).toBe('all');
-    expect(shaderWarmModeFor('auto', 'vulkan')).toBe('all');
+    expect(shaderWarmModeFor('auto', 'vulkan')).toBe('off');
     expect(shaderWarmModeFor('auto', 'metal')).toBe('all');
     expect(shaderWarmModeFor('auto', 'opengl')).toBe('off');
     expect(shaderWarmModeFor('auto', 'software')).toBe('off');
@@ -163,6 +166,8 @@ describe('shaderWarmModeFor', () => {
 
   it('keeps an explicit setting whatever the backend', () => {
     expect(shaderWarmModeFor('off', 'd3d11')).toBe('off');
+    // The explicit arm is how Vulkan stays measurable.
+    expect(shaderWarmModeFor('all', 'vulkan')).toBe('all');
     expect(shaderWarmModeFor('reveal', 'opengl')).toBe('reveal');
     expect(shaderWarmModeFor('all', null)).toBe('all');
     expect(shaderWarmModeFor('all', 'opengl', 'android')).toBe('all');

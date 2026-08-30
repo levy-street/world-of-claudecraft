@@ -26,7 +26,7 @@
 // view (the arm the step-3 cells ran, kept so a probe can price the
 // live-view hold on its own); `?shaderwarm=` pins any of them.
 
-import { compilesOffThread, type GpuBackendClass } from './gpu_backend_class_core';
+import { type GpuBackendClass, workerWorthWarming } from './gpu_backend_class_core';
 import { programSourceHash } from './shader_warm_audit_core';
 import type { ShaderWarmSource } from './shader_warm_protocol';
 
@@ -136,11 +136,12 @@ export type ShaderWarmPlatform = 'ios' | 'android' | 'other';
 
 /** `auto` resolves once the backend is known: the worker holds links (the
  *  live view included) only where the backend compiles off the presenting
- *  thread (D3D11, Vulkan, Metal; measured 2026-08-28,
- *  tmp/REPORT_worker-step3_2026-08-28.md). On ANGLE's OpenGL backends (Linux
- *  and Android Chrome) the worker only relocates the stall into the GPU
- *  process, so `auto` is OFF there, and OFF while the backend is still
- *  unknown. iOS is OFF whatever the setting: the explicit arm exists to
+ *  thread AND has something to warm (D3D11, Metal; measured 2026-08-28 and
+ *  2026-08-30). On ANGLE's OpenGL backends (Linux and Android Chrome) the
+ *  worker only relocates the stall into the GPU process, and on Vulkan a
+ *  cold link is already as cheap as a hit while the worker's own links cost
+ *  three to six times more, so `auto` is OFF on both, and OFF while the
+ *  backend is still unknown. iOS is OFF whatever the setting: the explicit arm exists to
  *  measure a backend, never to mint a second context on a phone-class
  *  WebKit; Android keeps the explicit arm (its GLES class already reads
  *  OFF under auto). */
@@ -151,7 +152,7 @@ export function shaderWarmModeFor(
 ): ShaderWarmMode {
   if (platform === 'ios') return 'off';
   if (setting !== 'auto') return setting;
-  return backend !== null && compilesOffThread(backend) ? 'all' : 'off';
+  return backend !== null && workerWorthWarming(backend) ? 'all' : 'off';
 }
 
 export interface ShaderWarmRequestSource {

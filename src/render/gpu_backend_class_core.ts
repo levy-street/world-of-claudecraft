@@ -34,6 +34,19 @@ export function compilesOffThread(backend: GpuBackendClass): boolean {
   return OFF_THREAD_COMPILE_BACKENDS.includes(backend);
 }
 
+/** Backends where the warm worker is worth its cost: it must compile off the
+ *  presenting thread AND have something to warm. Vulkan compiles off-thread
+ *  but a cold link there costs 8 to 25 ms (ANGLE only emits SPIR-V, the
+ *  pipeline is built at link and the first draw is free: 0 ms on an RTX
+ *  3060, an RTX 3090 and an Intel iGPU, 2026-08-30) while the worker's own
+ *  context pays 70 to 160 ms per link until warm, and in game its links ran
+ *  42 to 89 ms against 14 on the main context: it costs more than it saves. */
+export const WORKER_WORTH_BACKENDS: readonly GpuBackendClass[] = ['d3d11', 'metal'];
+
+export function workerWorthWarming(backend: GpuBackendClass): boolean {
+  return WORKER_WORTH_BACKENDS.includes(backend);
+}
+
 export interface GpuBackendReadout {
   renderer: string;
   backend: GpuBackendClass;
