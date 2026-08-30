@@ -24,6 +24,7 @@ import { createHttpMetrics, HTTP_REQUESTS_TOTAL } from '../../../server/http/met
 function stubSource(): GameStateSource {
   return {
     usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 0,
     playersOnline: () => 0,
     accountsOnline: () => 0,
     wsConnections: () => 0,

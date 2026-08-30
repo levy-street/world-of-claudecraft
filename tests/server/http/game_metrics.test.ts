@@ -35,6 +35,7 @@ import {
   WOC_CHARACTER_DELETE_BUSY_TOTAL,
   WOC_CHARACTER_DELETE_GATE,
   WOC_CHARACTER_DELETE_VERIFY_TOTAL,
+  WOC_CHARACTER_STATE_BYTES_MAX,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
@@ -92,6 +93,7 @@ import {
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
   return {
     usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 17408,
     playersOnline: () => 3,
     accountsOnline: () => 2,
     wsConnections: () => 5,
@@ -226,12 +228,14 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
     expect(WOC_ESCROW_GATE_IN_FLIGHT).toBe('woc_escrow_gate_in_flight');
     expect(WOC_USERNAME_BANLIST_FILE_LOADED).toBe('woc_username_banlist_file_loaded');
+    expect(WOC_CHARACTER_STATE_BYTES_MAX).toBe('woc_character_state_bytes_max');
     expect(WOC_BACKGROUND_DB_GATE).toBe('woc_background_db_gate');
     expect(WOC_STORAGE_RECOVERY).toBe('woc_storage_recovery');
     expect(WOC_BANK_LEDGER_GROWTH_BUDGET).toBe('woc_bank_ledger_growth_budget');
 
     for (const name of [
       WOC_USERNAME_BANLIST_FILE_LOADED,
+      WOC_CHARACTER_STATE_BYTES_MAX,
       WOC_PLAYERS_ONLINE,
       WOC_ACCOUNTS_ONLINE,
       WOC_WS_CONNECTIONS,
@@ -258,6 +262,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     // The realm escrow gate's occupancy (the fix round: an alert rule needs
     // it in /metrics, not only behind the dashboard secret).
     expect(sampleValue(text, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('2');
+    // The blob high-water gauge (the Phase 17 database review): the stub
+    // returns the professions-block ceiling figure.
+    expect(sampleValue(text, /^woc_character_state_bytes_max (\d+)$/m)).toBe('17408');
   });
 
   it('exports the fixed durable ledger limit and last database observation', async () => {

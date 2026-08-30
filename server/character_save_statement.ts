@@ -29,12 +29,17 @@
 // Pure apart from the size signal: no pool, no clock of its own, the holder
 // injected, so the statement text is unit-testable
 // (tests/server/character_save_statement.test.ts).
-import { reportCharacterBlobSize } from './character_blob_size';
+import { recordCharacterBlobBytes, reportCharacterBlobSize } from './character_blob_size';
 
 export type CharacterSaveFence =
   | { kind: 'none' }
   | { kind: 'nonce'; holder: string; nonce: string }
-  | { kind: 'unleased' };
+  // The offline fence also pins the row's realm (the Phase 17 security
+  // review's defense-in-depth note): the live fences address a row a session
+  // of THIS realm process loaded, while the offline writer takes a bare
+  // character id from an admin route, so the statement itself refuses a
+  // cross-realm id rather than relying on every caller's pre-checks.
+  | { kind: 'unleased'; realm: string };
 
 /** The offline writer's refusal, surfaced to the operator by the endpoint
  *  that took the 0-row result (server/clear_item_name.ts). */
@@ -71,12 +76,20 @@ export function characterUpdateStatement(
   // guild bank book gets a hard bound. Nothing about the size can refuse,
   // truncate, or skip the write. The reporter also dampens to one line per
   // window, so a fleet-wide crossing cannot drown the log.
-  const sizeWarning = reportCharacterBlobSize(
-    characterId,
-    Buffer.byteLength(stateJson, 'utf8'),
-    Date.now(),
-  );
-  if (sizeWarning !== null) console.warn(sizeWarning);
+  // The byte measure feeds BOTH signals: the dampened warn line and the
+  // scrape-visible high-water gauge (woc_character_state_bytes_max), which is
+  // why it stays unconditional (a cheap can-this-exceed pre-filter would blind
+  // the gauge to exactly the 10 to 50 KB band it exists to watch; the scan is
+  // microseconds at the measured worst case).
+  const blobBytes = Buffer.byteLength(stateJson, 'utf8');
+  recordCharacterBlobBytes(blobBytes);
+  const sizeWarning = reportCharacterBlobSize(characterId, blobBytes, Date.now());
+  // Deferred off the builder call: two of the four call sites build this
+  // statement inside an open transaction holding row locks, and console.warn
+  // is a SYNCHRONOUS write when stdout is a blocking sink (a file, a full
+  // pipe), which would lengthen the lock hold at exactly the moment the
+  // signal fires. setImmediate keeps the line, off the critical section.
+  if (sizeWarning !== null) setImmediate(() => console.warn(sizeWarning));
   switch (fence.kind) {
     case 'none':
       return {
@@ -96,12 +109,12 @@ export function characterUpdateStatement(
     case 'unleased':
       return {
         text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
+            WHERE id = $1 AND realm = $4
               AND NOT EXISTS (
                 SELECT 1 FROM character_leases
                  WHERE character_id = $1 AND expires_at > now()
               )`,
-        values: [characterId, level, stateJson],
+        values: [characterId, level, stateJson, fence.realm],
       };
   }
 }

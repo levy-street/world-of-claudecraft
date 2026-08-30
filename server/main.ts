@@ -112,6 +112,7 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { characterBlobBytesHighWater } from './character_blob_size';
 import {
   characterDeleteGateStats,
   configureCharacterDeleteBackgroundGate,
@@ -3755,6 +3756,7 @@ export async function startServer(): Promise<http.Server> {
   // count (joined or not), distinct from players_online (joined sessions).
   const gameStateSource: GameStateSource = {
     usernameBanlistLoaded: usernameBanlistFileLoaded,
+    characterBlobBytesHighWater,
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
     wsConnections: () => wss.clients.size,

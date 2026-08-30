@@ -3545,6 +3545,7 @@ export async function saveOfflineCharacterState(
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), {
     kind: 'unleased',
+    realm: REALM,
   });
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(stmt.text, stmt.values),

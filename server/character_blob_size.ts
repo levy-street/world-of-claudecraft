@@ -136,3 +136,20 @@ export function createCharacterBlobSizeReporter(): CharacterBlobSizeReporter {
 // which is the point (a fleet-wide crossing hitting every path at once still
 // prints one line a minute, not three).
 export const reportCharacterBlobSize = createCharacterBlobSizeReporter();
+
+// The scrape-visible twin of the warn line (the Phase 17 database review): the
+// warn threshold sits about 3.2x above the modelled worst case, so the whole
+// band where real growth lives (10 to 50 KB) emits nothing at all in logs. The
+// high-water mark makes the measurement the chokepoint already pays visible to
+// a scrape (server/http/game_metrics.ts, woc_character_state_bytes_max), so a
+// per-character blob regression shows as a climbing gauge long before it is 3x
+// worse than any modelled character. Process-lifetime monotonic max, reset only
+// by restart: the question it answers is "did a bigger blob than we modelled
+// ever save here", which decays with the process, not with a window.
+let blobBytesHighWater = 0;
+export function recordCharacterBlobBytes(bytes: number): void {
+  if (bytes > blobBytesHighWater) blobBytesHighWater = bytes;
+}
+export function characterBlobBytesHighWater(): number {
+  return blobBytesHighWater;
+}

@@ -92,6 +92,7 @@ import {
 /** Live characters online (joined sessions). */
 export const WOC_PLAYERS_ONLINE = 'woc_players_online';
 export const WOC_USERNAME_BANLIST_FILE_LOADED = 'woc_username_banlist_file_loaded';
+export const WOC_CHARACTER_STATE_BYTES_MAX = 'woc_character_state_bytes_max';
 
 /** Distinct accounts online (a single account may hold several sessions). */
 export const WOC_ACCOUNTS_ONLINE = 'woc_accounts_online';
@@ -348,6 +349,14 @@ export interface GameStateSource {
    * next screen, not at the next scrape.
    */
   usernameBanlistLoaded(): boolean;
+  /**
+   * Largest serialized character blob (bytes) this process has measured at the
+   * save chokepoint (server/character_blob_size.ts high-water mark). The warn
+   * line only fires 3.2x above the modelled worst case; this gauge makes the
+   * band below it scrape-visible, so a per-player field growing without a
+   * bound shows as a climbing max long before the log says anything.
+   */
+  characterBlobBytesHighWater(): number;
   /** Live characters online. */
   playersOnline(): number;
   /** Distinct accounts online. */
@@ -478,6 +487,15 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.usernameBanlistLoaded() ? 1 : 0);
+    },
+  });
+
+  new Gauge({
+    name: WOC_CHARACTER_STATE_BYTES_MAX,
+    help: 'Largest serialized character blob in bytes measured at the save chokepoint since process start (monotonic high-water mark; the dampened warn line only fires far above the modelled worst case, this gauge watches the band below it).',
+    registers: [registry],
+    collect() {
+      this.set(source.characterBlobBytesHighWater());
     },
   });
 

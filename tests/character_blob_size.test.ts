@@ -38,8 +38,10 @@ vi.mock('pg', () => ({
 import {
   CHARACTER_BLOB_WARN_BYTES,
   CHARACTER_BLOB_WARN_WINDOW_MS,
+  characterBlobBytesHighWater,
   characterBlobSizeWarning,
   createCharacterBlobSizeReporter,
+  recordCharacterBlobBytes,
 } from '../server/character_blob_size';
 import {
   openMarketWriteGate,
@@ -148,7 +150,10 @@ describe('saveCharacterState: the size signal never gates the write', () => {
   // Restore between cases: spying an ALREADY-spied console.warn hands back the
   // same mock, so without this the call log accumulates across tests and a
   // toHaveBeenCalledTimes(1) silently starts counting a previous case's line.
-  afterEach(() => {
+  afterEach(async () => {
+    // Drain this test's deferred warn immediates into ITS spy before the
+    // restore, so no oversized save leaks a warn into the next case.
+    await new Promise((resolve) => setImmediate(resolve));
     vi.restoreAllMocks();
   });
 
@@ -160,6 +165,8 @@ describe('saveCharacterState: the size signal never gates the write', () => {
 
     expect(ok).toBe(true);
     expect(characterUpdateCall(client)).toBeDefined();
+    // Flush the deferral so this negative cannot pass on an unflushed warn.
+    await new Promise((resolve) => setImmediate(resolve));
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
@@ -170,7 +177,9 @@ describe('saveCharacterState: the size signal never gates the write', () => {
 
     const ok = await saveCharacterState(102, 60, state);
 
-    // The signal fired...
+    // The signal fired (deferred off the builder call via setImmediate so a
+    // blocking stdout cannot lengthen a lock hold; flush it before asserting).
+    await new Promise((resolve) => setImmediate(resolve));
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(String(warnSpy.mock.calls[0][0])).toContain('102');
     // ...and the write still happened and still reported success. This is the
@@ -235,7 +244,10 @@ describe('every character write path inherits the signal (the shared chokepoint)
     openMarketWriteGate();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Drain this test's deferred warn immediates into ITS spy before the
+    // restore, so no oversized save leaks a warn into the next case.
+    await new Promise((resolve) => setImmediate(resolve));
     vi.restoreAllMocks();
   });
 
@@ -246,6 +258,8 @@ describe('every character write path inherits the signal (the shared chokepoint)
     const ok = await saveCharacterAndMarketState(201, 60, oversizedCharacterState(), MARKET, MAIL);
 
     expect(ok).toBe(true);
+    // The warn is setImmediate-deferred; flush before asserting.
+    await new Promise((resolve) => setImmediate(resolve));
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(String(warnSpy.mock.calls[0][0])).toContain('201');
     expect(characterUpdateCall(client)).toBeDefined();
@@ -263,6 +277,8 @@ describe('every character write path inherits the signal (the shared chokepoint)
     const ok = await saveCharacterAndGuildBankState(202, 60, oversizedCharacterState(), []);
 
     expect(ok).toBe(true);
+    // The warn is setImmediate-deferred; flush before asserting.
+    await new Promise((resolve) => setImmediate(resolve));
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(String(warnSpy.mock.calls[0][0])).toContain('202');
     expect(characterUpdateCall(client)).toBeDefined();
@@ -284,6 +300,8 @@ describe('every character write path inherits the signal (the shared chokepoint)
     dbMock.connect.mockResolvedValue(transactionClient() as never);
     await saveCharacterAndGuildBankState(205, 12, ordinary, []);
 
+    // Flush the deferral so this negative cannot pass on an unflushed warn.
+    await new Promise((resolve) => setImmediate(resolve));
     expect(warnSpy).not.toHaveBeenCalled();
   });
 });
@@ -352,5 +370,21 @@ describe('createCharacterBlobSizeReporter: one line per window, nothing lost sil
     expect(a(1, OVER, 0)).not.toBeNull();
     // b has its own memory, so a's line does not silence it at the same instant.
     expect(b(1, OVER, 0)).not.toBeNull();
+  });
+
+  it('tracks a monotonic high-water mark for the scrape gauge', () => {
+    // The gauge half (the Phase 17 database review): process-lifetime max,
+    // never decaying, so a climbing gauge means a bigger blob than any before
+    // it saved here. Monotonic within this process: assert relative movement
+    // rather than absolute values so suite order cannot matter.
+    const before = characterBlobBytesHighWater();
+    recordCharacterBlobBytes(before + 100);
+    expect(characterBlobBytesHighWater()).toBe(before + 100);
+    // A smaller measurement never lowers it.
+    recordCharacterBlobBytes(1);
+    expect(characterBlobBytesHighWater()).toBe(before + 100);
+    // A larger one raises it.
+    recordCharacterBlobBytes(before + 250);
+    expect(characterBlobBytesHighWater()).toBe(before + 250);
   });
 });

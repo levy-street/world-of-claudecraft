@@ -146,6 +146,24 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     it('answers false, never a throw, for a character row that does not exist', async () => {
       expect(await db.saveOfflineCharacterState(999_999, 7, STATE('ghost'))).toBe(false);
     });
+
+    it('REFUSES a cross-realm character id, touching nothing (the realm qualifier)', async () => {
+      // The Phase 17 security review's defense-in-depth arm: the offline
+      // writer takes a bare id from an admin route, so the statement itself
+      // pins the row's realm instead of trusting every caller's pre-checks.
+      const acc = await pool.query(
+        `INSERT INTO accounts (username, password_hash) VALUES ($1, 'x') RETURNING id`,
+        [`csvrealm_${seq()}`],
+      );
+      const other = await pool.query(
+        `INSERT INTO characters (account_id, name, class, realm, level, state)
+           VALUES ($1, $2, 'warrior', $3, 1, '{}'::jsonb) RETURNING id`,
+        [Number(acc.rows[0].id), `CSVerifyX${seq()}`, `${realm}-other`],
+      );
+      const id = Number(other.rows[0].id);
+      expect(await db.saveOfflineCharacterState(id, 7, STATE('cross-realm'))).toBe(false);
+      expect(await markerOf(id)).toBeUndefined();
+    });
   });
 
   describe('the nonce fence (saveCharacterState, the live-session save)', () => {

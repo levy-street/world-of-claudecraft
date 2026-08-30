@@ -52,15 +52,18 @@ describe('characterUpdateStatement: the three fence shapes', () => {
     // qualifier: a crashed process's orphan lease blocks the write until it
     // lapses, and a holder or nonce match must NOT let a same-process write
     // through (the offline writer has no session of its own).
-    const stmt = characterUpdateStatement(7, 3, STATE_JSON, { kind: 'unleased' });
+    // The realm qualifier (the Phase 17 security review): the offline writer
+    // takes a bare character id from an admin route, so the statement itself
+    // refuses a cross-realm id rather than relying on caller pre-checks.
+    const stmt = characterUpdateStatement(7, 3, STATE_JSON, { kind: 'unleased', realm: 'main' });
     expect(stmt.text).toContain('UPDATE characters SET level = $2, state = $3, updated_at = now()');
-    expect(stmt.text).toContain('WHERE id = $1');
+    expect(stmt.text).toContain('WHERE id = $1 AND realm = $4');
     expect(stmt.text).toContain('AND NOT EXISTS (');
     expect(stmt.text).toContain('SELECT 1 FROM character_leases');
     expect(stmt.text).toContain('WHERE character_id = $1 AND expires_at > now()');
     expect(stmt.text).not.toContain('holder');
     expect(stmt.text).not.toContain('nonce');
-    expect(stmt.values).toEqual([7, 3, STATE_JSON]);
+    expect(stmt.values).toEqual([7, 3, STATE_JSON, 'main']);
   });
 
   it('every shape routes through the size signal chokepoint with the real byte length', () => {
@@ -69,7 +72,7 @@ describe('characterUpdateStatement: the three fence shapes', () => {
     for (const fence of [
       { kind: 'none' },
       { kind: 'nonce', holder: 'h', nonce: 'n' },
-      { kind: 'unleased' },
+      { kind: 'unleased', realm: 'main' },
     ] as const) {
       report.mockClear();
       characterUpdateStatement(9, 1, wide, fence);

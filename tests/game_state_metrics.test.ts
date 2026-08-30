@@ -101,6 +101,7 @@ function join(
 function sourceOver(server: GameServer): GameStateSource {
   return {
     usernameBanlistLoaded: () => true,
+    characterBlobBytesHighWater: () => 0,
     playersOnline: () => server.clients.size,
     accountsOnline: () => server.liveAccountIds().size,
     wsConnections: () => server.clients.size,
