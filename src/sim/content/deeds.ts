@@ -681,15 +681,23 @@ export const DEEDS: Record<string, DeedDef> = {
       questIds: ['q_wolves', 'q_boars', 'q_spiders', 'q_greyjaw'],
     },
   },
+  // chr_vale_cup_debut dropped from this meta trigger (deeds.md rule 5,
+  // reviewed and deliberate): the Vale Cup minigame retired in commit
+  // 1c74387b4c ("demolish the Sowfield and retire the Vale Cup"), so that
+  // prerequisite became permanently unearnable and Chapter II would
+  // otherwise dead-end for every player who had not already finished it.
+  // deedsEarned is append-only, so an earned Chapter II is untouched; this
+  // only reopens the earn path for everyone else. The desc drops the matching
+  // clause so it never promises a task that no longer exists.
   chr_vale_chapter_ii: {
     id: 'chr_vale_chapter_ii',
     name: 'Vale Chronicle, Chapter II',
-    desc: "Finish the second chapter of Saul's chronicle: bandits, murlocs, and mine vermin put down, the Sowfield played, and the Reliquary braved.",
+    desc: "Finish the second chapter of Saul's chronicle: bandits, murlocs, and mine vermin put down, and the Reliquary braved.",
     category: 'chronicle',
     renown: 10,
     trigger: {
       kind: 'meta',
-      deedIds: ['chr_vale_packbreaker', 'chr_vale_cup_debut', 'dlv_reliquary'],
+      deedIds: ['chr_vale_packbreaker', 'dlv_reliquary'],
       questIds: ['q_murlocs', 'q_supplies', 'q_bandits', 'q_ringleader', 'q_mine', 'q_bones'],
     },
   },
@@ -746,13 +754,16 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'manual' },
   },
+  // Feat of Strength (deeds.md rule 5): joins the ten pvp_vcup_* Feats below
+  // (see their block comment) now that the Vale Cup minigame is gone.
   chr_vale_cup_debut: {
     id: 'chr_vale_cup_debut',
     name: 'Copper Pail Contender',
-    desc: 'Take the field and touch the ball in a Vale Cup match at the Sowfield.',
+    desc: 'Take the field and touch the ball in a Vale Cup match at the Sowfield. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'chronicle',
-    renown: 5,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   chr_vale_rares: {
     id: 'chr_vale_rares',
@@ -1379,86 +1390,113 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'stat', stat: 'duelsLost', count: 1 },
   },
+  // Feats of Strength, the feat_brightwood_relic class (deeds.md rule 5): the
+  // New Eastbrook program (commit 1c74387b4c, "feat(world)!: demolish the
+  // Sowfield and retire the Vale Cup") pulled the whole boarball minigame out
+  // of the game, so a Vale Cup match can no longer be entered by any real
+  // player and none of these ten (plus chr_vale_cup_debut above) can be newly
+  // earned. Off the pvp_ prefix on purpose, the col_reliquary_complete
+  // exception class (renaming would silently strip the deed from every
+  // veteran's earned set, since PlayerMeta.deedsEarned keys on the id
+  // verbatim): see OFF_PREFIX_FEATS in tests/deeds_content.test.ts. Renown
+  // drops to 0 and they exit Book completion (deedDisplayCategory routes on
+  // category, not feat, so they stay on the PvP and Sport shelf), resolving
+  // docs/design/eastbrook-revamp/master-plan.md section 6 decision 1 (RETIRE,
+  // don't delete: earned copies, including pvp_vcup_wins_25's Boarball Legend
+  // title, stay exactly as earned). Each desc states the retirement directly,
+  // the feat_brightwood_relic precedent, since a stuck-looking Vale Cup deed
+  // with no explanation reads as a broken achievement rather than a removed
+  // game mode.
   pvp_vcup_first_match: {
     id: 'pvp_vcup_first_match',
     name: 'Boots on the Pitch',
-    desc: 'See out a full Vale Cup match at the Sowfield, win or lose.',
+    desc: 'See out a full Vale Cup match at the Sowfield, win or lose. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 5,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_first_win: {
     id: 'pvp_vcup_first_win',
     name: 'First Silverware',
-    desc: 'Win a rated Vale Cup match.',
+    desc: 'Win a rated Vale Cup match. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'meter', meter: 'vcupWins', amount: 1 },
+    feat: true,
   },
   pvp_vcup_wins_10: {
     id: 'pvp_vcup_wins_10',
     name: 'Seasoned Boarballer',
-    desc: 'Win 10 rated Vale Cup matches.',
+    desc: 'Win 10 rated Vale Cup matches. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'meter', meter: 'vcupWins', amount: 10 },
+    feat: true,
   },
   pvp_vcup_wins_25: {
     id: 'pvp_vcup_wins_25',
     name: 'Boarball Legend',
-    desc: 'Win 25 rated Vale Cup matches.',
+    desc: 'Win 25 rated Vale Cup matches. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 25,
+    renown: 0,
     trigger: { kind: 'meter', meter: 'vcupWins', amount: 25 },
     reward: { kind: 'title', text: 'Boarball Legend' },
+    feat: true,
   },
   pvp_vcup_first_goal: {
     id: 'pvp_vcup_first_goal',
     name: 'Off the Mark',
-    desc: 'Score a goal in a rated Vale Cup match.',
+    desc: 'Score a goal in a rated Vale Cup match. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 5,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_hat_trick: {
     id: 'pvp_vcup_hat_trick',
     name: 'Hat Trick Hero',
-    desc: 'Score three goals in a single rated Vale Cup match, in the 3v3 bracket or larger.',
+    desc: 'Score three goals in a single rated Vale Cup match, in the 3v3 bracket or larger. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 25,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_golden_goal: {
     id: 'pvp_vcup_golden_goal',
     name: 'Golden Moment',
-    desc: 'Score the golden goal that decides a rated Vale Cup match.',
+    desc: 'Score the golden goal that decides a rated Vale Cup match. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 25,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_first_save: {
     id: 'pvp_vcup_first_save',
     name: 'Safe Hands',
-    desc: 'Make a save as keeper in a rated Vale Cup match, in the 3v3 bracket or larger. Only a shot moving fast enough to test your grip counts: a soft catch does not.',
+    desc: 'Make a save as keeper in a rated Vale Cup match, in the 3v3 bracket or larger. Only a shot moving fast enough to test your grip counts: a soft catch does not. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 5,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_clean_sheet: {
     id: 'pvp_vcup_clean_sheet',
     name: 'Nothing Gets Past Me',
-    desc: 'Win a rated Vale Cup match as keeper without conceding a goal, in the 3v3 bracket or larger.',
+    desc: 'Win a rated Vale Cup match as keeper without conceding a goal, in the 3v3 bracket or larger. Vale Cup matches are no longer playable, so this can no longer be newly earned.',
     category: 'pvp',
-    renown: 25,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_vcup_guild_win: {
     id: 'pvp_vcup_guild_win',
     name: 'For the Banner',
-    desc: "Win a rated Vale Cup match entered under your guild's banner.",
+    desc: "Win a rated Vale Cup match entered under your guild's banner. Vale Cup matches are no longer playable, so this can no longer be newly earned.",
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'meter', meter: 'vcupGuildWins', amount: 1 },
+    feat: true,
   },
   pvp_fiesta_first_bout: {
     id: 'pvp_fiesta_first_bout',

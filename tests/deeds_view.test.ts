@@ -849,12 +849,17 @@ describe('real catalog integration', () => {
     // Reliquary completion-ladder deeds, the walk-in castle visit pair, and
     // the bank socket ladder pair (Bank Storage phase 06) and the Proving
     // Shore graduation deed, all non-feat non-hidden, so all three join the
-    // denominator; col_reliquary_complete is the catalog's one off-prefix
-    // feat, so it sits outside the completion denominator like the three
-    // feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(263);
+    // denominator; col_reliquary_complete was the catalog's one off-prefix
+    // feat, sitting outside the completion denominator like the three feat_
+    // deeds), then chr_vale_cup_debut and the ten pvp_vcup_* deeds joined the
+    // off-prefix feat set when the Vale Cup minigame retired, dropping 263 to
+    // 252 (263 - 11).
+    expect(view.summary.visibleTotal).toBe(252);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
-    // shelf plus the off-prefix capstone on Collection).
+    // shelf, the off-prefix capstone on Collection, and the eleven off-prefix
+    // Vale Cup feats on Chronicle and PvP and Sport): unchanged by the Vale
+    // Cup conversion, since feat status never moves a deed off its home
+    // category shelf.
     expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(267);
   });
 
