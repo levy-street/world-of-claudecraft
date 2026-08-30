@@ -6,6 +6,8 @@
 // untyped host seam removed the compiler's reach). createCharacterVisual and
 // buildGroundQuestObject are mocked so the asset-unavailable arm and the build
 // counts are controllable from the test.
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PooledObjectView } from '../src/render/ground_object_pool';
@@ -259,5 +261,52 @@ describe('buildObjectPrewarmGroup pooled copies and the point-light hide', () =>
       });
     }
     expect(lights).toBe(stored.length);
+  });
+});
+
+describe('the untyped host seam stays welded to the renderer', () => {
+  // The builders take host: object and cast to ZonePrewarmGroupHost because
+  // the consumed Renderer members are PRIVATE (structural typing cannot see
+  // them), so tsc proves nothing about the renderer's conformance and the
+  // fake-host suite above cannot either. These source pins are the weld: a
+  // rename of a consumed member, or logic growing inside the wrapper the
+  // builders bypass, reds here instead of throwing at runtime during zone
+  // prepare.
+  const renderer = readFileSync(
+    fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
+    'utf8',
+  );
+
+  it('renderer.ts still declares every member the host cast consumes', () => {
+    for (const anchor of [
+      'private prewarmEntity(',
+      'private storePooledObject(',
+      'private templateIdsInZone(',
+      'private prewarmedMobTemplates',
+      'private prewarmedNpcModels',
+    ]) {
+      expect(
+        renderer,
+        `${anchor} renamed or removed: update ZonePrewarmGroupHost and the builders`,
+      ).toContain(anchor);
+    }
+  });
+
+  it('the bypassed visualPoolKeyFor wrapper stays a pure delegation', () => {
+    // The extracted builders call characterVisualPoolKey DIRECTLY; the
+    // renderer keeps this wrapper for its remaining call site. If logic ever
+    // grows inside it, the builders silently diverge, so pin the body to the
+    // bare delegation (comments stripped by slicing to the return statement).
+    const at = renderer.indexOf('private visualPoolKeyFor(');
+    expect(at, 'visualPoolKeyFor removed: re-point the builders or this pin').toBeGreaterThan(-1);
+    const body = renderer.slice(at, renderer.indexOf('}', at) + 1);
+    const statements = body
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith('//') && !l.startsWith('private') && l !== '}');
+    expect(
+      statements,
+      'logic grew inside the wrapper: mirror it in zone_prewarm_groups.ts',
+    ).toEqual(['return characterVisualPoolKey(e);']);
   });
 });
