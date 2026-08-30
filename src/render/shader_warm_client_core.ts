@@ -116,6 +116,18 @@ function asShaderWarmSetting(value: string | null | undefined): ShaderWarmSettin
     : null;
 }
 
+/** `?shaderwarmready=<ms>` pins how long a spawned worker has to answer ready,
+ *  for a probe on a backend where the GPU process is busy at boot (Windows
+ *  OpenGL: the worker's context queues behind the boot lane's links and the
+ *  3 s default expires before it ever links). Ignored unless a positive
+ *  finite number; the shipped default stays. */
+export function readShaderWarmReadyDeadline(search: string, fallbackMs: number): number {
+  const match = /[?&]shaderwarmready=([^&]*)/.exec(search);
+  if (!match) return fallbackMs;
+  const value = Number(decodeURIComponent(match[1] ?? ''));
+  return Number.isFinite(value) && value > 0 ? value : fallbackMs;
+}
+
 /** `?shaderwarm=auto|off|reveal|all` pins an arm for a probe and wins over
  *  the stored graphics option. No stored option at all (an entry that never
  *  registered the store: the editor, the guide viewer, a test) is OFF, never

@@ -653,7 +653,9 @@ GPU work signs. Each rule names its seam and its guard.
   link is already as cheap as a hit and the first draw is free while the worker's own
   links cost three to six times more (measured 2026-08-30 on an RTX 3060, an RTX 3090
   and an Intel iGPU); iOS is `off` whatever the setting (a second context is a
-  per-process ceiling risk there); `?shaderwarm=off|reveal|all` overrides.
+  per-process ceiling risk there); `?shaderwarm=off|reveal|all` overrides, and
+  `?shaderwarmready=<ms>` lengthens the worker's ready deadline for a probe on a
+  backend whose GPU process is busy at boot (Windows OpenGL).
   The worker is a client of the EXISTING gates: `shader_warm_gate.ts` assembles a
   root's program sources through the three patch's dry-compile hook
   (`program_sources.ts`; the hook calls each live material's `onBeforeCompile`

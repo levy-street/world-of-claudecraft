@@ -28,6 +28,7 @@ import {
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
+  readShaderWarmReadyDeadline,
   readShaderWarmSetting,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
@@ -141,6 +142,7 @@ const state = {
   spawn: null as (() => WorkerLike | null) | null,
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
   now: null as (() => number) | null,
+  readyDeadlineMs: SHADER_WARM_READY_DEADLINE_MS,
   mobile: false,
   platform: 'other' as ShaderWarmPlatform,
   /** Sources handed in before the worker answered ready, sent on ready. */
@@ -199,10 +201,12 @@ export function setShaderWarmStoredSettingSource(source: () => string | null): v
  *  stays OFF until the first policy call brings a context whose backend
  *  decides it. */
 export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
+  const search = deps.search ?? currentSearch();
   state.setting = readShaderWarmSetting(
-    deps.search ?? currentSearch(),
+    search,
     deps.stored !== undefined ? deps.stored : storedSettingSource(),
   );
+  state.readyDeadlineMs = readShaderWarmReadyDeadline(search, SHADER_WARM_READY_DEADLINE_MS);
   state.backend = null;
   state.platform = deps.platform ?? defaultPlatform();
   state.mode = shaderWarmModeFor(state.setting, null, state.platform);
@@ -340,7 +344,7 @@ function startWorker(context: ShaderWarmContextSource): void {
     state.workerState = 'refused';
     state.refusal = 'ready-timeout';
     retireWorker();
-  }, SHADER_WARM_READY_DEADLINE_MS);
+  }, state.readyDeadlineMs);
 }
 
 export function shaderWarmAvailable(): boolean {

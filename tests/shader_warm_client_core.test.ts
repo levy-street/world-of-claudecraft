@@ -11,6 +11,7 @@ import {
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
+  readShaderWarmReadyDeadline,
   readShaderWarmSetting,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_FRAME_PERIOD_MS,
@@ -512,5 +513,19 @@ describe('abandoning a request', () => {
     requests.settle(1, 'failed');
     expect(await old).toEqual(['failed']);
     expect(requests.stats()).toMatchObject({ sent: 2, deduped: 0, failed: 1 });
+  });
+});
+
+describe('readShaderWarmReadyDeadline', () => {
+  it('pins the ready deadline off the query for a probe, and keeps the default otherwise', () => {
+    expect(readShaderWarmReadyDeadline('?perf&shaderwarmready=15000', 3_000)).toBe(15_000);
+    expect(readShaderWarmReadyDeadline('?shaderwarmready=2500.5', 3_000)).toBe(2_500.5);
+    expect(readShaderWarmReadyDeadline('?perf', 3_000)).toBe(3_000);
+    expect(readShaderWarmReadyDeadline('', 3_000)).toBe(3_000);
+    // Not a positive finite number: the default, never a disabled deadline.
+    expect(readShaderWarmReadyDeadline('?shaderwarmready=0', 3_000)).toBe(3_000);
+    expect(readShaderWarmReadyDeadline('?shaderwarmready=-5', 3_000)).toBe(3_000);
+    expect(readShaderWarmReadyDeadline('?shaderwarmready=abc', 3_000)).toBe(3_000);
+    expect(readShaderWarmReadyDeadline('?shaderwarmready=Infinity', 3_000)).toBe(3_000);
   });
 });

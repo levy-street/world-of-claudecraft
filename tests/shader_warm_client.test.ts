@@ -179,6 +179,17 @@ const SOURCE = {
 const OTHER = { vertex: 'void main() {}', fragment: 'float f;', index0Attribute: 'position' };
 
 describe('starting the shader warm worker', () => {
+  it('arms the ready deadline the query pins, for a probe on a busy backend', () => {
+    // Windows OpenGL: the worker's context queues behind the boot lane's
+    // links on the GPU process and the 3 s default expired before it ever
+    // linked; the probe knob is how that backend gets measured at all.
+    const { timers } = start({ search: '?shaderwarm=all&shaderwarmready=15000' });
+    expect(timers.map((timer) => timer.ms)).toEqual([15_000]);
+    resetShaderWarmForTest();
+    const plain = start({ search: '?shaderwarm=all' });
+    expect(plain.timers.map((timer) => timer.ms)).toEqual([SHADER_WARM_READY_DEADLINE_MS]);
+  });
+
   it('hands the worker the game context own attributes, extensions and caps', () => {
     // The worker's context must be created the same way and enable exactly
     // the same set, in the same order: the browser's program cache key
