@@ -24,7 +24,12 @@ export function shouldRelaunchForLinuxPrime(
   fileExists?: (path: string) => boolean,
 ): boolean;
 
-export type SelfSpawn = (command: string, args: string[], options?: unknown) => { unref?(): void };
+export interface SelfSpawnedChild {
+  unref?(): void;
+  /** Node's ChildProcess events: 'spawn' once the child exists, 'error' when it never will. */
+  once?(event: 'spawn' | 'error', listener: (...args: unknown[]) => void): unknown;
+}
+export type SelfSpawn = (command: string, args: string[], options?: unknown) => SelfSpawnedChild;
 
 export function resolveSelfSpawnTarget(
   env: Record<string, string | undefined> | undefined,
@@ -36,6 +41,10 @@ export interface SpawnDetachedSelfDeps {
   argv: string[];
   execPath?: string;
   spawn?: SelfSpawn;
+  /** The child's 'spawn' event: it exists. */
+  onSpawned?: (spawnTarget: string) => void;
+  /** The child's 'error' event: it never started; this process is still running. */
+  onSpawnFailed?: (err: unknown, spawnTarget: string) => void;
 }
 export function spawnDetachedSelf(deps: SpawnDetachedSelfDeps): string;
 

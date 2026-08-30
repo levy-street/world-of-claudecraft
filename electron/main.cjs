@@ -1506,22 +1506,31 @@ function refineParallelCompile(parallelCompile) {
  * Latched, so the first one wins and the rest are no-ops. Off the ladder (not Linux)
  * there is nothing to rescue onto, so nothing is logged as a rescue either.
  *
- * The single-instance lock is handed over once the child is spawned (and only then):
- * this process is about to exit, and a child that requested its own lock while the
- * parent still held it would see itself as a second instance and quit. Not before the
- * spawn: a spawn that throws keeps this process running, and it must keep its lock.
+ * The single-instance lock is handed over, and this process exits, on the child's
+ * 'spawn' event (and only then): a child that requested its own lock while the parent
+ * still held it would see itself as a second instance and quit, and a parent that had
+ * exited on spawn() returning would leave nothing running when the child never starts
+ * (an async ENOENT). A refused or failed rescue keeps this process running, with its
+ * lock.
  */
 function rescueOntoLowerBackend(why) {
   if (!gpuBackendLaunch.ladder || gpuRescueSpawned || sessionHealthy) return;
   gpuRescueSpawned = true;
   log.warn(`[gpu] rescuing off ${gpuBackendLaunch.rung}: ${why}`);
-  const spawned = relaunchOnLowerBackend(
-    { log, onSpawned: () => app.releaseSingleInstanceLock() },
+  relaunchOnLowerBackend(
+    {
+      log,
+      // On the child's 'spawn' event, never on spawn() returning: a child that
+      // never starts (an async ENOENT) leaves this process running, with its lock.
+      onSpawned: () => {
+        app.releaseSingleInstanceLock();
+        app.exit(0);
+      },
+    },
     gpuBackendLaunch.rung,
   );
-  if (spawned) app.exit(0);
-  // No lower rung, a spent chain or a failed spawn: run on whatever we have rather than
-  // leave the player with nothing.
+  // No lower rung, a spent chain or a child that never started: run on whatever we have
+  // rather than leave the player with nothing.
 }
 
 // A session is HEALTHY once it has survived SESSION_HEALTHY_AFTER_MS without a

@@ -7,6 +7,7 @@ import {
   enableRendererExtensions,
   RENDERER_CONTEXT_EXTENSIONS,
 } from '../src/render/renderer_extensions';
+import { stripComments } from './helpers/strip_comments';
 
 function host(available: readonly string[], throwing: readonly string[] = []) {
   const calls: string[] = [];
@@ -89,8 +90,9 @@ describe('enableRendererExtensions', () => {
 });
 
 describe('the renderer sweeps its context before its first GPU work', () => {
+  // Comments stripped, so a commented-out call cannot satisfy a pin.
   const rendererSource = (): string =>
-    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    stripComments(readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'));
 
   it('replaces the lone parallel-compile probe and precedes the grass ground bake', () => {
     const source = rendererSource();

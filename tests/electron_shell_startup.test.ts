@@ -546,13 +546,20 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
       'if (!gpuBackendLaunch.ladder || gpuRescueSpawned || sessionHealthy) return;',
     );
     expect(flat).toContain('gpuRescueSpawned = true;');
-    // The single-instance lock is handed over once the child has spawned, through
-    // the module's onSpawned hook (never on a refused or failed spawn, which keep
-    // this process running): a child that requested its own lock while the parent
-    // still held it would see itself as a second instance and quit.
+    // The single-instance lock is handed over, and this process exits, on the
+    // child's 'spawn' event through the module's onSpawned hook: never on
+    // spawn() returning (a child that never starts is an async 'error', and a
+    // parent that had exited on the return would leave nothing running), never
+    // on a refused spawn (a child that requested its own lock while the parent
+    // still held it would see itself as a second instance and quit).
     expect(flat).toContain(
-      'const spawned = relaunchOnLowerBackend( { log, onSpawned: () => app.releaseSingleInstanceLock() }, gpuBackendLaunch.rung, ); if (spawned) app.exit(0);',
+      'relaunchOnLowerBackend( { log, onSpawned: () => { app.releaseSingleInstanceLock(); app.exit(0); }, }, gpuBackendLaunch.rung, );',
     );
+    expect(flat).not.toContain('if (spawned)');
+    // The exit lives in the hook and nowhere else, and nothing reads the
+    // return to act on it.
+    expect(count(code, 'app.exit(0)')).toBe(1);
+    expect(flat).not.toMatch(/=\s*relaunchOnLowerBackend\(/);
     expect(count(code, 'releaseSingleInstanceLock()')).toBe(1);
     // The spawn lives there and nowhere else, so no trigger can bypass the latch.
     expect(count(code, 'relaunchOnLowerBackend(')).toBe(1);
@@ -886,5 +893,19 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // elsewhere cannot satisfy it.
     const banner = block("log.info('[shell] starting'", '});', 'startup banner');
     expect(banner).toContain('wocExchangeEnabled: desktopConfig.wocExchangeEnabled,');
+  });
+});
+
+describe('the log lines the Linux runbook quotes', () => {
+  // docs/desktop-release.md ("Linux CI verification") tells a maintainer what
+  // to grep for in main.log; a reworded line would send them after text
+  // that never appears. The lines named there and pinned nowhere else.
+  it('exist in the shell, in the shape the runbook prints them', () => {
+    expect(code).toContain(
+      '`[gpu] backend bound: ${boundRung} (asked for ${gpuBackendLaunch.rung})`',
+    );
+    expect(code).toContain('`[gpu] GPU process gone at launch on ${gpuBackendLaunch.rung}`');
+    expect(code).toContain('`[gpu] rescuing off ${gpuBackendLaunch.rung}: ${why}`');
+    expect(code).toContain("rescueOntoLowerBackend('the GPU process died at launch')");
   });
 });

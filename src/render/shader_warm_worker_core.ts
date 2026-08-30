@@ -112,6 +112,56 @@ export const SHADER_WARM_MAX_WINDOW_MOBILE = 2;
 export const SHADER_WARM_RETAINED_DESKTOP = 0;
 export const SHADER_WARM_RETAINED_MOBILE = 0;
 
+/** The retained-program cap an init message asked for: a whole count at or
+ *  above zero, and ZERO for anything else (absent, NaN, negative). A NaN cap
+ *  compares false against every length, so the eviction loop would never
+ *  run and every warmed program would live for the worker's life: the
+ *  opposite of the delete-right-after-resolve the worker promises. */
+export function shaderWarmRetainCapOf(retain: unknown): number {
+  return typeof retain === 'number' && Number.isFinite(retain)
+    ? Math.max(0, Math.floor(retain))
+    : 0;
+}
+
+/** The programs the worker keeps after they resolved, newest last, under a
+ *  cap; the oldest past the cap is released at once, and `clear` releases
+ *  them all (dispose, context loss). A cap of zero, the shipped value, is
+ *  delete right after resolve. */
+export interface WarmRetention<T> {
+  setCap(retain: unknown): void;
+  retain(handle: T): void;
+  clear(): void;
+  readonly size: number;
+}
+
+export function createWarmRetention<T>(release: (handle: T) => void): WarmRetention<T> {
+  const kept: T[] = [];
+  let cap = 0;
+  const evict = (): void => {
+    while (kept.length > cap) {
+      const oldest = kept.shift();
+      if (oldest !== undefined) release(oldest);
+    }
+  };
+  return {
+    setCap(retain) {
+      cap = shaderWarmRetainCapOf(retain);
+      evict();
+    },
+    retain(handle) {
+      kept.push(handle);
+      evict();
+    },
+    clear() {
+      for (const handle of kept) release(handle);
+      kept.length = 0;
+    },
+    get size() {
+      return kept.length;
+    },
+  };
+}
+
 /** A link in flight past this is failed and dropped: the driver never
  *  flipped its completion, or a throttled worker timer stopped polling it.
  *  The AIMD's own no-progress bound, so one wedged link cannot close

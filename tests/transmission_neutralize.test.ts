@@ -13,6 +13,7 @@ import {
   neutralizeTransmission,
   TRANSMISSION_OPACITY_LOSS,
 } from '../src/render/assets/transmission_neutralize';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 describe('neutralizeTransmission', () => {
@@ -53,7 +54,10 @@ describe('neutralizeTransmission', () => {
 
 describe('the loader applies the rule to every parsed GLB', () => {
   it('runs the walk in the parse resolve chain, before any consumer sees the scene', () => {
-    const loader = readFileSync(new URL('../src/render/assets/loader.ts', import.meta.url), 'utf8');
+    // Comments stripped, so a commented-out call cannot satisfy the pin.
+    const loader = stripComments(
+      readFileSync(new URL('../src/render/assets/loader.ts', import.meta.url), 'utf8'),
+    );
     const polish = loader.indexOf('polishGltfTextures(gltf);');
     const neutralize = loader.indexOf('neutralizeGltfTransmission(gltf);');
     expect(polish).toBeGreaterThan(-1);

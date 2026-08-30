@@ -270,47 +270,6 @@ describe('reveal compile host soft deadline', () => {
   });
 });
 
-describe('reveal compile host announcement arm', () => {
-  it('tells the announcement arm each piece representative when the compile is created, before the gate runs', async () => {
-    const announced: string[] = [];
-    let gateSeenAt = -1;
-    let gatePieces = 0;
-    const two = new THREE.Group();
-    two.name = 'kit';
-    const stone = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial());
-    stone.name = 'stone';
-    const glass = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
-    glass.name = 'glass';
-    two.add(stone, glass);
-    const announcing = createRevealCompileHost({
-      gate(pieces) {
-        gateSeenAt = announced.length;
-        gatePieces = pieces.length;
-        return pieces
-          .reduce<Promise<unknown>>(
-            (chain, piece) => chain.then(() => piece({ fired: false })),
-            Promise.resolve(),
-          )
-          .then(() => SETTLED);
-      },
-      compileColor: () => Promise.resolve(),
-      compileShadow: () => Promise.resolve(),
-      settle: () => Promise.resolve(),
-      expect: (node) => {
-        announced.push(node.name);
-      },
-      upload: () => Promise.resolve(),
-      touch: () => Promise.resolve(),
-      predictRevealMs: () => 0,
-    });
-    await announcing.compile(two, false);
-    expect(announced).toEqual(['stone', 'glass']);
-    // Both announcements landed before the gate was even handed its pieces.
-    expect(gateSeenAt).toBe(2);
-    expect(gatePieces).toBe(2);
-  });
-});
-
 describe('reveal compile host shader warm arm', () => {
   // The host routes its pieces through the warm worker when it is given the
   // compile arms (src/render/shader_warm_gate.ts). Both ends of that are

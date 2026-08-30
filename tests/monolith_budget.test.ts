@@ -336,7 +336,9 @@ const MONOLITHS: MonolithRow[] = [
     // battleground compile-gate wiring and then some, and the field
     // construction PR 3706 added inline left the file with the view module.
     // Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13238,
+    // Lowered by the unused import the cast_vfx_prewarm.ts extraction left
+    // behind (its removal collapsed the import block). Exact count.
+    ceiling: 13233,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

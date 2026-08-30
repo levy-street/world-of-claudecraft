@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -646,6 +647,21 @@ describe('relaunchForLinuxPrime', () => {
     const result = relaunchForLinuxPrime(deps({ spawn, env: {}, log: { warn } }));
     expect(result).toBe(false);
     expect(warn).toHaveBeenCalled();
+  });
+
+  it('hears a child that never started, as a warning rather than an uncaught error event', () => {
+    // The async failure (ENOENT on a swapped AppImage) arrives as an 'error'
+    // event; Node throws it as an uncaught exception when nothing listens.
+    const child = Object.assign(new EventEmitter(), { unref: vi.fn() });
+    const warn = vi.fn();
+    expect(relaunchForLinuxPrime(deps({ spawn: () => child, env: {}, log: { warn } }))).toBe(true);
+    expect(warn).not.toHaveBeenCalled();
+    const failure = new Error('spawn ENOENT');
+    expect(() => child.emit('error', failure)).not.toThrow();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('never started'),
+      expect.objectContaining({ err: failure }),
+    );
   });
 });
 

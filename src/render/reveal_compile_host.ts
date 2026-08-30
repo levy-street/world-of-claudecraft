@@ -24,12 +24,7 @@ import type * as THREE from 'three';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileArmHost } from './compile_arms';
 import type { CompileGatePiece, CompileGateResult } from './compile_gate';
-import {
-  linkPiecesOf,
-  linkPieceWork,
-  type PieceExpect,
-  type PieceSettle,
-} from './compile_gate_pieces';
+import { linkPiecesOf, linkPieceWork, type PieceSettle } from './compile_gate_pieces';
 import { type RevealCompileHost, revealSoftDeadlineMs } from './reveal_gate';
 import { runPiecesWarmed } from './shader_warm_gate';
 
@@ -57,9 +52,6 @@ export interface RevealCompileHostDeps {
    *  (program_variant_settle.ts): what makes a settled gate mean "every
    *  variant ready", not "the one slot compileAsync polled". */
   settle: PieceSettle;
-  /** The announcement arm (compile_gate_pieces.ts), when the host has one:
-   *  told each piece's representative at gate creation. */
-  expect?: PieceExpect;
   /** The compile arms, when the host has them: each piece asks the shader
    *  warm worker before it links (shader_warm_gate.ts); without them the
    *  pieces go to the gate at once, as before. */
@@ -102,13 +94,7 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
       const priority =
         namedPriority ??
         (imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM);
-      const pieces = linkPieceWork(
-        target,
-        deps.compileColor,
-        deps.compileShadow,
-        deps.settle,
-        deps.expect,
-      );
+      const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);
       submittedPieces.set(target, pieces.length);
       const options = { priority, label: `${REVEAL_GATE_PREP_KIND}:${target.name || target.type}` };
       const arms = deps.arms;

@@ -8,6 +8,7 @@ import {
   SHARD_LOG_FILE_FLOOR,
   shardHarvestVerdict,
 } from '../scripts/lib/ci_shard_weight_harvest_guard.mjs';
+import { stripComments } from './helpers/strip_comments';
 
 describe('shardHarvestVerdict', () => {
   it('refuses a PR tests shard under the floor, accepts one at or above it', () => {
@@ -39,9 +40,9 @@ describe('shardHarvestVerdict', () => {
   });
 
   it('is what the harvest consults, per job, before it merges that log', () => {
-    const harvest = readFileSync(
-      new URL('../scripts/ci_shard_weights_harvest.mjs', import.meta.url),
-      'utf8',
+    // Comments stripped, so a commented-out call cannot satisfy the pin.
+    const harvest = stripComments(
+      readFileSync(new URL('../scripts/ci_shard_weights_harvest.mjs', import.meta.url), 'utf8'),
     );
     expect(harvest).toContain("from './lib/ci_shard_weight_harvest_guard.mjs'");
     const verdictAt = harvest.indexOf('shardHarvestVerdict(job.name, Object.keys(own).length)');

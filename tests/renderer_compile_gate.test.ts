@@ -317,8 +317,8 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(gateMethod).toContain('this.liveCompileGates.runPieces(');
     expect(gateMethod).toContain('compileMayStartBeforeInitialPaint(priority, requiredForEntry)');
     expect(gateMethod).toContain('this.initialGpuWorkStart');
-    // The announcement arm rides the same piece cut, at gate creation
-    // (shader_warm_audit.ts dry-assembles each piece's programs there).
+    // The piece cut, handed to the warm arm: the shader warm audit is told
+    // in that arm's assembly unit, so no announcement arm rides here.
     expect(gateMethod).toContain('linkPieceWork(target, color, shadow, settle), {');
     expect(gateMethod).toContain('runPiecesWarmed(this.compileArms, target,');
     expect(gateMethod).toContain('firstIndex,');

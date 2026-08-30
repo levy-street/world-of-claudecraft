@@ -392,13 +392,28 @@ function resolveSelfSpawnTarget(env, execPath) {
  * the caller's log line; throws when the spawn itself fails (the caller decides what a
  * failed relaunch means).
  */
-function spawnDetachedSelf({ env, argv, execPath = process.execPath, spawn = nodeSpawn }) {
+function spawnDetachedSelf({
+  env,
+  argv,
+  execPath = process.execPath,
+  spawn = nodeSpawn,
+  onSpawned,
+  onSpawnFailed,
+}) {
   const spawnTarget = resolveSelfSpawnTarget(env, execPath);
   const child = spawn(spawnTarget, argv, {
     env,
     stdio: 'inherit',
     detached: true,
   });
+  // spawn() returning is not a child: a target that cannot start (ENOENT on
+  // an AppImage swapped under a running session, EACCES) is reported LATER,
+  // as an 'error' event, which without a listener is an uncaught exception
+  // in this process. The 'spawn' event is the only proof the child exists.
+  if (typeof child.once === 'function') {
+    child.once('spawn', () => onSpawned?.(spawnTarget));
+    child.once('error', (err) => onSpawnFailed?.(err, spawnTarget));
+  }
   child.unref?.();
   return spawnTarget;
 }
@@ -443,6 +458,11 @@ function relaunchForLinuxPrime(deps = {}) {
       argv,
       execPath: deps.execPath ?? process.execPath,
       spawn: deps.spawn ?? nodeSpawn,
+      // The caller exits on the true return, before this can fire in practice
+      // (see the header: stopping the main script there is the point); heard
+      // rather than swallowed for the process that is still around to log it.
+      onSpawnFailed: (err, target) =>
+        log?.warn?.('[gpu] the Linux PRIME relaunch never started', { spawnTarget: target, err }),
     });
     log?.info?.('[gpu] relaunching for Linux PRIME render offload', {
       spawnTarget,

@@ -832,13 +832,17 @@ product exist. Coding and merge stay dark-safe without those credentials.
    name) showing the relaunched PID's parent already exited, and `[gpu] running as
    PRIME-relaunched child` in `main.log` (the child writes it; the parent exits
    before file logging exists).
-   Then the GL backend: `[gpu] backend launch: vulkan (auto, Vulkan trial)` on a
-   first launch followed by `[gpu] vulkan trial verdict: ok`, and on every later
-   launch `[gpu] backend launch: vulkan (auto, Vulkan trial passed)` with the
+   Then the GL backend: `[gpu] backend launch: vulkan-parallel-compile (auto, best
+   rung)` on a first launch, `[gpu] backend bound: vulkan-parallel-compile (asked for
+   vulkan-parallel-compile)` once the page reports its renderer, and a minute later
+   `[gpu] session healthy on vulkan-parallel-compile; memory updated`, with the
    active renderer line naming Vulkan and the real adapter (see "GPU backend on
-   Linux"). On a machine without a Vulkan driver, `verdict: failed` followed by a
-   relaunch whose banner says `backend launch: default`, and never a second
-   relaunch.
+   Linux"). On a machine without a Vulkan driver, `[gpu] GPU process gone at launch
+   on vulkan-parallel-compile`, then `[gpu] rescuing off vulkan-parallel-compile: the
+   GPU process died at launch` and `[gpu] the GPU process died on
+   vulkan-parallel-compile; starting a relaunch on vulkan-plain`; the child's `main.log`
+   opens with `backend launch: vulkan-plain (rescued to vulkan-plain)`, a second
+   rescue lands on `opengl (rescued to opengl)`, and there is never a third.
    Known follow-ups, not yet addressed: the relaunch's interaction with the
    second-instance deep-link path (`worldofclaudecraft://` login handoff) has not
    been verified against a login link that arrives during the brief relaunch

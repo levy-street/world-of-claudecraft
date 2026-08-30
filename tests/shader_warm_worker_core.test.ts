@@ -8,8 +8,10 @@
 // driven by an injected clock, so a settlement duration is a number this
 // file chooses, never a wall reading.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  createWarmRetention,
   createWarmScheduler,
   SHADER_WARM_LINK_DEADLINE_MS,
   SHADER_WARM_MAX_WINDOW_DESKTOP,
@@ -18,7 +20,9 @@ import {
   SHADER_WARM_RETAINED_MOBILE,
   SHADER_WARM_WEIGHT_CHARS,
   SHADER_WARM_WINDOW_CONFIG,
+  shaderWarmRetainCapOf,
   shaderWarmWeightOf,
+  type WarmRetention,
   type WarmScheduler,
   warmRequestOf,
   warmStatsOf,
@@ -99,6 +103,86 @@ describe('the window the worker paces itself with', () => {
   it('clamps a caller window into the config bounds, never past the maximum', () => {
     expect(rig(99).scheduler.snapshot().budget.maxWindowLinks).toBe(4);
     expect(rig(0).scheduler.snapshot().budget.maxWindowLinks).toBe(1);
+  });
+});
+
+describe('the retained-program cap the worker reads off its init message', () => {
+  it('keeps a whole count, and reads anything else as zero', () => {
+    expect(shaderWarmRetainCapOf(0)).toBe(0);
+    expect(shaderWarmRetainCapOf(3)).toBe(3);
+    expect(shaderWarmRetainCapOf(2.9)).toBe(2);
+    expect(shaderWarmRetainCapOf(-1)).toBe(0);
+    // An init message that omits the field (the browser suite's does): the
+    // former Math.floor(undefined) was NaN, which no length ever exceeds, so
+    // nothing was ever evicted.
+    expect(shaderWarmRetainCapOf(undefined)).toBe(0);
+    expect(shaderWarmRetainCapOf(Number.NaN)).toBe(0);
+    expect(shaderWarmRetainCapOf(Number.POSITIVE_INFINITY)).toBe(0);
+    expect(shaderWarmRetainCapOf('2')).toBe(0);
+    expect(shaderWarmRetainCapOf(SHADER_WARM_RETAINED_DESKTOP)).toBe(SHADER_WARM_RETAINED_DESKTOP);
+  });
+});
+
+describe('the programs the worker keeps after they resolved', () => {
+  function rig(): { retention: WarmRetention<string>; released: string[] } {
+    const released: string[] = [];
+    return { retention: createWarmRetention<string>((handle) => released.push(handle)), released };
+  }
+
+  it('deletes right after resolve under the shipped cap of zero, and under no cap at all', () => {
+    const { retention, released } = rig();
+    retention.setCap(SHADER_WARM_RETAINED_DESKTOP);
+    retention.retain('a');
+    expect(released).toEqual(['a']);
+    expect(retention.size).toBe(0);
+    const absent = rig();
+    absent.retention.retain('b');
+    expect(absent.released).toEqual(['b']);
+    const nan = rig();
+    nan.retention.setCap(undefined);
+    nan.retention.retain('c');
+    expect(nan.released).toEqual(['c']);
+  });
+
+  it('keeps the newest under the cap and releases the oldest first', () => {
+    const { retention, released } = rig();
+    retention.setCap(2);
+    retention.retain('a');
+    retention.retain('b');
+    expect(released).toEqual([]);
+    retention.retain('c');
+    expect(released).toEqual(['a']);
+    expect(retention.size).toBe(2);
+    // A cap lowered later evicts at once, oldest first.
+    retention.setCap(1);
+    expect(released).toEqual(['a', 'b']);
+    expect(retention.size).toBe(1);
+  });
+
+  it('releases everything on clear', () => {
+    const { retention, released } = rig();
+    retention.setCap(3);
+    retention.retain('a');
+    retention.retain('b');
+    retention.clear();
+    expect(released).toEqual(['a', 'b']);
+    expect(retention.size).toBe(0);
+  });
+
+  it('is what the worker host keeps its programs in', () => {
+    // A source pin on the host (a worker script no node test can import):
+    // the cap comes from the init message through this unit, never through
+    // an inline clamp of its own.
+    const worker = readFileSync(
+      new URL('../src/render/shader_warm_worker.ts', import.meta.url),
+      'utf8',
+    );
+    expect(worker).toContain('createWarmRetention<WarmProgramHandle>(');
+    expect(worker).toContain('retention.setCap(retain);');
+    expect(worker).toContain('retention.retain(handle);');
+    expect(worker).toContain('retention.clear();');
+    expect(worker).toContain('retained: retention.size,');
+    expect(worker).not.toContain('Math.floor(retain)');
   });
 });
 

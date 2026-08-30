@@ -474,21 +474,24 @@ function launchCounterAfterAutoLaunch({ prefs, launch }) {
  * Same binary (the outer AppImage when running from one), same argv, detached, with the
  * rescue marker naming the child's rung.
  *
- * Returns true when a child was spawned, in which case the caller exits this process
- * (app.exit(0)). False when there is no lower rung, when the chain has already spent its
- * budget (the marker on this process names a rung at or below the target, so the child
- * would repeat a rung this chain has already run), or when the spawn itself fails, in
- * which case this process keeps running on whatever Chromium recovered rather than
- * leaving the player with nothing.
+ * Returns true when spawn() returned a handle (whether the child then starts is reported
+ * later, through the callbacks below). False when there is no lower rung, when the
+ * chain has already spent its budget (the marker on this process names a rung at or
+ * below the target, so the child would repeat a rung this chain has already run), or
+ * when spawn() itself throws, in which case this process keeps running on whatever
+ * Chromium recovered rather than leaving the player with nothing.
  *
- * `deps.onSpawned` runs once the child HAS been spawned, before this returns true: the
- * shell hands over the single-instance lock there, so the child cannot reach its own
- * requestSingleInstanceLock while this process still holds it, see itself as a second
- * instance and quit, which is the one outcome the rescue exists to prevent. After the
- * spawn and not before it, because a spawn that throws leaves this process running,
- * and a running process without its lock would let the next launch open a second
- * game beside it. The child needs far longer to boot to its own lock request than
- * this process needs to release and exit.
+ * `deps.onSpawned` runs on the child's 'spawn' event, the only proof the child exists:
+ * the shell hands over the single-instance lock there and exits, so the child cannot
+ * reach its own requestSingleInstanceLock while this process still holds it, see itself
+ * as a second instance and quit, which is the one outcome the rescue exists to prevent.
+ * On the event and not on spawn() returning, because a target that cannot start (an
+ * AppImage swapped under a running session) is reported later, as an 'error' event; a
+ * process that had already released its lock and exited on the return would have left
+ * the player with nothing, and one that only released it would let the next launch open
+ * a second game beside it. `deps.onSpawnFailed` runs instead on that event, this process
+ * still running, with its lock. The child needs far longer to boot to its own lock
+ * request than this process needs to release and exit.
  */
 function relaunchOnLowerBackend(deps = {}, rung) {
   const env = deps.env ?? process.env;
@@ -508,9 +511,13 @@ function relaunchOnLowerBackend(deps = {}, rung) {
       argv,
       execPath: deps.execPath ?? process.execPath,
       spawn: deps.spawn,
+      onSpawned: () => deps.onSpawned?.(),
+      onSpawnFailed: (err) => {
+        log?.warn?.(`[gpu] the relaunch on ${target} never started; staying on ${rung}`, err);
+        deps.onSpawnFailed?.(err);
+      },
     });
-    deps.onSpawned?.();
-    log?.info?.(`[gpu] the GPU process died on ${rung}; relaunching on ${target}`, {
+    log?.info?.(`[gpu] the GPU process died on ${rung}; starting a relaunch on ${target}`, {
       spawnTarget,
     });
     return true;

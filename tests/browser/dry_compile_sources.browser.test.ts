@@ -84,6 +84,40 @@ describe('the dry compile against the real link', () => {
     expect(renderer.collectProgramSources(root, camera, world)).toEqual([]);
   });
 
+  it('reads the shadow-casting lights the link will see, and the link agrees byte for byte', async () => {
+    // The light and shadow gathering in collectProgramSources mirrors three's
+    // compile() rather than sharing it (compile() inlines the walk), so the
+    // shadow branch of the mirror is exercised here: a casting light changes
+    // the keys, and the link then mints exactly the sources collected.
+    renderer.shadowMap.enabled = true;
+    const { scene: world, camera, root } = scene();
+    const sun = world.children[0] as THREE.DirectionalLight;
+    for (const child of root.children) child.receiveShadow = true;
+    sun.castShadow = false;
+    const unshadowedKeys = renderer
+      .collectProgramSources(root, camera, world)
+      .map((entry) => entry.cacheKey);
+    sun.castShadow = true;
+    const shadowed = renderer.collectProgramSources(root, camera, world);
+    expect(shadowed.length).toBe(unshadowedKeys.length);
+    const shadowedKeys = shadowed.map((entry) => entry.cacheKey);
+    // The lit programs read the shadow: at least one key moved.
+    expect(shadowedKeys.some((key) => !unshadowedKeys.includes(key))).toBe(true);
+    const before = new Set(minted().map((program) => program.cacheKey));
+    await renderer.compileAsync(root, camera, world);
+    const gl = renderer.getContext();
+    const linked = minted().filter((program) => !before.has(program.cacheKey));
+    expect(linked.map((program) => program.cacheKey).sort()).toEqual(shadowedKeys.slice().sort());
+    const byKey = new Map(shadowed.map((entry) => [entry.cacheKey, entry]));
+    for (const program of linked) {
+      const entry = byKey.get(program.cacheKey);
+      expect(entry).toBeDefined();
+      if (!entry) continue;
+      expect(gl.getShaderSource(program.vertexShader)).toBe(entry.vertexGlsl);
+      expect(gl.getShaderSource(program.fragmentShader)).toBe(entry.fragmentGlsl);
+    }
+  });
+
   it('carries the renderer state the link will see: a bound target changes the keys', () => {
     const { scene: world, camera, root } = scene();
     const canvasKeys = renderer

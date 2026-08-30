@@ -27,7 +27,8 @@ export interface ShaderWarmInitMessage {
   /** The worker's admission window bounds for this platform class. */
   maxWindow: number;
   /** Programs kept linked after their resolve, for this platform class. */
-  retain: number;
+  /** Programs kept after they resolved; absent or not a count reads as zero. */
+  retain?: number;
 }
 
 export interface ShaderWarmRequestMessage {

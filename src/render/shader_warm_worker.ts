@@ -25,9 +25,9 @@ import type {
   ShaderWarmWorkerMessage,
 } from './shader_warm_protocol';
 import {
+  createWarmRetention,
   createWarmScheduler,
   SHADER_WARM_LINK_DEADLINE_MS,
-  SHADER_WARM_RETAINED_DESKTOP,
   type WarmScheduler,
   warmRequestOf,
   warmStatsOf,
@@ -64,10 +64,12 @@ let gl: (WarmupGl & { isContextLost?: () => boolean }) | null = null;
 let scheduler: WarmScheduler | null = null;
 /** KHR_parallel_shader_compile on the worker's context: poll, else block. */
 let parallel = true;
-let retainCap = SHADER_WARM_RETAINED_DESKTOP;
 const sources = new Map<number, ShaderWarmSource>();
 const inFlight = new Map<number, InFlight>();
-const retained: WarmProgramHandle[] = [];
+/** Resolved programs kept under the init message's cap (shader_warm_worker_core.ts). */
+const retention = createWarmRetention<WarmProgramHandle>((handle) => {
+  if (gl) deleteWarmProgram(gl, handle);
+});
 let warmed = 0;
 let failed = 0;
 let ticking = false;
@@ -97,9 +99,9 @@ function init(
   attributes: Record<string, unknown> | null,
   wanted: readonly string[],
   maxWindow: number,
-  retain: number,
+  retain: number | undefined,
 ): void {
-  retainCap = Math.max(0, Math.floor(retain));
+  retention.setCap(retain);
   const Offscreen = (
     globalThis as { OffscreenCanvas?: new (w: number, h: number) => OffscreenCanvas }
   ).OffscreenCanvas;
@@ -144,11 +146,7 @@ function init(
 
 function retain(handle: WarmProgramHandle): void {
   if (!gl) return;
-  retained.push(handle);
-  while (retained.length > retainCap) {
-    const oldest = retained.shift();
-    if (oldest) deleteWarmProgram(gl, oldest);
-  }
+  retention.retain(handle);
 }
 
 function contextLost(): boolean {
@@ -241,7 +239,7 @@ function postStats(): void {
       inFlight: inFlight.size,
       warmed,
       failed,
-      retained: retained.length,
+      retained: retention.size,
     }),
   );
 }
@@ -285,11 +283,10 @@ scope.onmessage = (event: MessageEvent<ShaderWarmClientMessage>) => {
           releaseWarmShaders(gl, flight.handle);
           deleteWarmProgram(gl, flight.handle);
         }
-        for (const handle of retained) deleteWarmProgram(gl, handle);
+        retention.clear();
         (gl.getExtension('WEBGL_lose_context') as { loseContext(): void } | null)?.loseContext();
       }
       inFlight.clear();
-      retained.length = 0;
       sources.clear();
       gl = null;
       break;

@@ -336,8 +336,10 @@ interface AttributionTargetFixture {
 // merged renderer.ts carries the entry-fade arm's scenery cull beside this
 // branch's aim blocked pass-through, so the composite matches neither parent.
 // No capture was retaken.
+// Re-minted for the review fixes on the shader warm PR (renderer.ts lost one
+// unused import; the runtimeRender.renderer leaf moved).
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '373218a143bcfcc723227774f118894306b62cec652f477f7a53fb4e4dbe2fd0';
+  '2b3a5e3455c4dc12d4178c78615dc91562dca3c161168c1c287a44e6af2e55f8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

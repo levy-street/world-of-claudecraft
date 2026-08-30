@@ -143,10 +143,13 @@ export interface RelaunchOnLowerBackendDeps {
     info?(...args: unknown[]): void;
     warn?(...args: unknown[]): void;
   };
-  /** Runs once the child HAS spawned, before the true return (the shell releases its lock). */
+  /** The child's 'spawn' event: it exists (the shell releases its lock and exits there). */
   onSpawned?: () => void;
+  /** The child's 'error' event: it never started; this process keeps running. */
+  onSpawnFailed?: (err: unknown) => void;
 }
-/** Rescue: spawn a child on the rung BELOW `rung`; true when one was spawned. */
+/** Rescue: spawn a child on the rung BELOW `rung`; true when spawn() returned a handle
+ *  (the child's start, or its failure to start, is reported through the callbacks). */
 export function relaunchOnLowerBackend(
   deps: RelaunchOnLowerBackendDeps | undefined,
   rung: unknown,

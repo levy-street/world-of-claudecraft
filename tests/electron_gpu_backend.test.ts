@@ -1,3 +1,4 @@
+import { EventEmitter } from 'node:events';
 import { describe, expect, it, vi } from 'vitest';
 import {
   activeGpuAdapterKey,
@@ -997,14 +998,19 @@ describe('the memory across one launch-time death and its rescue chain', () => {
 });
 
 describe('relaunchOnLowerBackend', () => {
+  /** A child handle with Node's event surface: the test decides whether and
+   *  when it reports 'spawn' or 'error', as a real ChildProcess does, later. */
   function fakeSpawn() {
     const calls: Array<{ command: string; args: string[]; options: Record<string, unknown> }> = [];
+    const children: EventEmitter[] = [];
     const unref = vi.fn();
     const spawn = vi.fn((command: string, args: string[], options?: unknown) => {
       calls.push({ command, args, options: options as Record<string, unknown> });
-      return { unref };
+      const child = Object.assign(new EventEmitter(), { unref });
+      children.push(child);
+      return child;
     });
-    return { spawn, calls, unref };
+    return { spawn, calls, children, unref };
   }
 
   it('re-execs the same binary and argv, detached, with the target rung on the child', () => {
@@ -1038,9 +1044,10 @@ describe('relaunchOnLowerBackend', () => {
       detached: true,
     });
     expect(unref).toHaveBeenCalled();
-    expect(info).toHaveBeenCalledWith(expect.stringContaining('vulkan-plain'), {
-      spawnTarget: '/usr/bin/world-of-claudecraft',
-    });
+    expect(info).toHaveBeenCalledWith(
+      '[gpu] the GPU process died on vulkan-parallel-compile; starting a relaunch on vulkan-plain',
+      { spawnTarget: '/usr/bin/world-of-claudecraft' },
+    );
   });
 
   it('spawns the outer AppImage (env.APPIMAGE), never execPath, inside an AppImage', () => {
@@ -1109,14 +1116,18 @@ describe('relaunchOnLowerBackend', () => {
   });
 
   it('runs onSpawned only once a child HAS spawned, and never on a refused or failed spawn', () => {
-    // The shell hands the single-instance lock over there; releasing it while
-    // this process keeps running (a refused rescue, a spawn that threw) would
-    // let the next launch open a second game beside it.
-    const { spawn, calls } = fakeSpawn();
+    // The shell hands the single-instance lock over there and exits; doing
+    // either while this process keeps running (a refused rescue, a spawn that
+    // threw) would let the next launch open a second game beside it, and
+    // doing it before the child exists would leave the player with nothing.
+    const { spawn, calls, children } = fakeSpawn();
     const order: string[] = [];
     const onSpawned = vi.fn(() => order.push(`spawned:${calls.length}`));
     const base = { env: {}, argv: [], execPath: '/bin/app', spawn, onSpawned };
     expect(relaunchOnLowerBackend(base, 'vulkan-plain')).toBe(true);
+    // spawn() returning is not the child: nothing until its 'spawn' event.
+    expect(order).toEqual([]);
+    children[0]?.emit('spawn');
     expect(order).toEqual(['spawned:1']);
     // No lower rung, a spent chain: not called.
     expect(relaunchOnLowerBackend(base, 'opengl')).toBe(false);
@@ -1134,6 +1145,27 @@ describe('relaunchOnLowerBackend', () => {
       relaunchOnLowerBackend({ ...base, spawn: throwing as never, log: {} }, 'vulkan-plain'),
     ).toBe(false);
     expect(onSpawned).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports a child that never started through onSpawnFailed, and never through onSpawned', () => {
+    // The async failure: spawn() returned a handle, then the target could not
+    // be started (ENOENT on an AppImage swapped under the running session).
+    // Node reports it as an 'error' event; unheard, it is an uncaught
+    // exception in the one process still running the game.
+    const { spawn, children } = fakeSpawn();
+    const onSpawned = vi.fn();
+    const onSpawnFailed = vi.fn();
+    const warn = vi.fn();
+    const result = relaunchOnLowerBackend(
+      { env: {}, argv: [], execPath: '/bin/app', spawn, onSpawned, onSpawnFailed, log: { warn } },
+      'vulkan-plain',
+    );
+    expect(result).toBe(true);
+    const failure = new Error('spawn ENOENT');
+    expect(() => children[0]?.emit('error', failure)).not.toThrow();
+    expect(onSpawned).not.toHaveBeenCalled();
+    expect(onSpawnFailed).toHaveBeenCalledWith(failure);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('never started'), failure);
   });
 
   it('refuses a rung that is not on the ladder', () => {
@@ -1184,10 +1216,52 @@ describe('spawnDetachedSelf (the shared self-relaunch spawn)', () => {
     expect(unref).toHaveBeenCalled();
   });
 
+  it('wires the child events to the callers: spawn to onSpawned, error to onSpawnFailed', () => {
+    const child = Object.assign(new EventEmitter(), { unref: vi.fn() });
+    const onSpawned = vi.fn();
+    const onSpawnFailed = vi.fn();
+    spawnDetachedSelf({
+      env: {},
+      argv: [],
+      execPath: '/bin/woc',
+      spawn: () => child,
+      onSpawned,
+      onSpawnFailed,
+    });
+    expect(onSpawned).not.toHaveBeenCalled();
+    child.emit('spawn');
+    expect(onSpawned).toHaveBeenCalledWith('/bin/woc');
+    const failure = new Error('spawn EACCES');
+    child.emit('error', failure);
+    expect(onSpawnFailed).toHaveBeenCalledWith(failure, '/bin/woc');
+    // Both are once: a second event is not a second rescue.
+    child.emit('spawn');
+    expect(onSpawned).toHaveBeenCalledTimes(1);
+  });
+
+  it('hears an error event with no callback given, rather than letting it throw', () => {
+    const child = Object.assign(new EventEmitter(), { unref: vi.fn() });
+    spawnDetachedSelf({ env: {}, argv: [], execPath: '/bin/woc', spawn: () => child });
+    expect(() => child.emit('error', new Error('spawn ENOENT'))).not.toThrow();
+  });
+
   it('tolerates a child handle without unref and propagates a spawn failure', () => {
-    expect(spawnDetachedSelf({ env: {}, argv: [], execPath: '/bin/woc', spawn: () => ({}) })).toBe(
-      '/bin/woc',
-    );
+    // A handle with no event surface fires neither callback: nothing is
+    // known about that child, and nothing is claimed.
+    const onSpawned = vi.fn();
+    const onSpawnFailed = vi.fn();
+    expect(
+      spawnDetachedSelf({
+        env: {},
+        argv: [],
+        execPath: '/bin/woc',
+        spawn: () => ({}),
+        onSpawned,
+        onSpawnFailed,
+      }),
+    ).toBe('/bin/woc');
+    expect(onSpawned).not.toHaveBeenCalled();
+    expect(onSpawnFailed).not.toHaveBeenCalled();
     expect(() =>
       spawnDetachedSelf({
         env: {},
