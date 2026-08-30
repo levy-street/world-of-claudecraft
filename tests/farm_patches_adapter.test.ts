@@ -788,6 +788,41 @@ describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
     expect(prewarmStart).toBeGreaterThan(-1);
     const guardedAt = src.indexOf(guarded);
     expect(guardedAt).toBeGreaterThan(prewarmStart);
+    // BRACE-SCOPED, not merely index-ordered (the Phase 17 render review):
+    // "after the declaration" admits any later position in the file, so walk
+    // the method's braces (the legendary_regalia idiom) and require the
+    // guarded call INSIDE prewarmWorldFrame's actual body span. Anchor on the
+    // DECLARATION, never a `.prewarmWorldFrame(` call reference.
+    let declAt = -1;
+    for (
+      let at = src.indexOf('prewarmWorldFrame(');
+      at !== -1;
+      at = src.indexOf('prewarmWorldFrame(', at + 1)
+    ) {
+      if (src[at - 1] !== '.') {
+        declAt = at;
+        break;
+      }
+    }
+    expect(declAt, 'prewarmWorldFrame declaration not found').toBeGreaterThan(-1);
+    const prewarmOpenAt = src.indexOf('{', declAt);
+    let prewarmDepth = 0;
+    let prewarmCloseAt = -1;
+    for (let i = prewarmOpenAt; i < src.length; i++) {
+      if (src[i] === '{') prewarmDepth++;
+      else if (src[i] === '}') {
+        prewarmDepth--;
+        if (prewarmDepth === 0) {
+          prewarmCloseAt = i;
+          break;
+        }
+      }
+    }
+    expect(prewarmCloseAt, 'prewarmWorldFrame body never closes').toBeGreaterThan(prewarmOpenAt);
+    expect(
+      guardedAt > prewarmOpenAt && guardedAt < prewarmCloseAt,
+      'the guarded farm sync must sit inside prewarmWorldFrame body',
+    ).toBe(true);
     // The live-frame call site stays UNGUARDED by design (it runs only after
     // entry completes; the rationale paragraph lives in farm_patches.ts
     // applyFeasts, renderer.ts deliberately carries no comment at its exact

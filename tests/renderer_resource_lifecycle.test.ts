@@ -16,6 +16,9 @@ describe('renderer resource lifecycle', () => {
     const warlockMeteorFx = { dispose: vi.fn() };
     const abilityVfxFx = { dispose: vi.fn() };
     const vfx = { dispose: vi.fn() };
+    // The farm patch visuals joined the seam at the Phase 17 render review:
+    // their dispose() had no production caller before this arm existed.
+    const farmPatchVisuals = { dispose: vi.fn() };
     const prewarmDepthMaterials = new Map([['depth', depthMaterial]]);
     const errors: unknown[] = [];
     const bestEffort = (cleanup: () => void): void => {
@@ -27,7 +30,7 @@ describe('renderer resource lifecycle', () => {
     };
 
     disposeRendererPrewarmAndGroundFx(
-      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, abilityVfxFx, vfx },
+      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, abilityVfxFx, vfx, farmPatchVisuals },
       bestEffort,
     );
 
@@ -36,6 +39,7 @@ describe('renderer resource lifecycle', () => {
     expect(warlockMeteorFx.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
     expect(vfx.dispose).toHaveBeenCalledOnce();
+    expect(farmPatchVisuals.dispose).toHaveBeenCalledOnce();
     expect(prewarmDepthMaterials.size).toBe(0);
     expect(errors).toHaveLength(2);
   });
