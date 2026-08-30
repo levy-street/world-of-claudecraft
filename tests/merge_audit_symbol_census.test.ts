@@ -238,13 +238,18 @@ describe('simEventVerdict: the declared-but-unseen pin and the resolver backstop
     expect(v.failed).toBe(true);
   });
 
-  it('pins the shipped list as the server-side set, non-empty and sorted', () => {
+  it('pins the shipped list, non-empty and sorted', () => {
     expect(SIM_EVENT_UNION_ONLY).toEqual([
+      // The three announceZoneCelebration events (Phase 13 helper indirection,
+      // pinned at the Phase 17 reconciliation; see the script's note).
+      'attunedZone',
       'calendarResult',
       'deedBroadcast',
       'guildInvite',
       'guildInviteCancelled',
       'guildRenamed',
+      'legendaryForgedZone',
+      'masterworkZone',
       'motdResult',
       'reliquaryIlluminationBroadcast',
       // The release's never-emitted declaration (see the script's note).

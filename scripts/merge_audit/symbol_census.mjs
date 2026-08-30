@@ -128,9 +128,13 @@ export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers']);
  * SimEvent types the union DECLARES that the emits extractor does not see, pinned
  * so the set cannot drift silently.
  *
- * What is left here is ONLY the server-side set: events emitted from `server/`
- * (the social and calendar surfaces), legitimately outside SIM_ROOT, which the sim
- * scan was never going to see and which no sim-side merge hunk can drop.
+ * Two kinds live here. The server-side set: events emitted from `server/` (the
+ * social and calendar surfaces), legitimately outside SIM_ROOT, which the sim scan
+ * was never going to see and which no sim-side merge hunk can drop. And, since the
+ * Phase 17 reconciliation, the announceZoneCelebration set: three zone
+ * celebrations whose emit literal Phase 13 moved one indirection PAST the named
+ * fanout helper (see the dated entries below), each with a matching `simevent
+ * emit` deletion-list row.
  *
  * Four names that used to sit here were a REAL hole, and the Phase 11d QA closed
  * it rather than only reporting it: attunedZone, farmReady, gatherRareEvent and
@@ -148,11 +152,26 @@ export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers']);
  * the regression this list exists to surface.
  */
 export const SIM_EVENT_UNION_ONLY = Object.freeze([
+  // Phase 13 (branch commit 5bbfcb0450; pinned 2026-08-30 at the Phase 17
+  // reconciliation): attunedZone, legendaryForgedZone and masterworkZone moved
+  // behind the shared announceZoneCelebration prologue
+  // (src/sim/professions/gather_events.ts), so each event literal sits in the
+  // CALLER's builder arrow one indirection past the named emitToZonePlayers
+  // fanout, where this extractor cannot follow it; the actual emit happens
+  // inside emitToZonePlayers on the builder's return. All three still fire:
+  // declared in src/sim/types.ts, handled by hud.ts, pinned live by
+  // tests/professions_attunement_online.test.ts,
+  // tests/masterwork_zone_broadcast.test.ts and tests/orange_promotion.test.ts,
+  // with matching `simevent emit` deletion-list rows for the two on parents.
+  'attunedZone',
   'calendarResult',
   'deedBroadcast',
   'guildInvite',
   'guildInviteCancelled',
   'guildRenamed',
+  // Phase 13 helper indirection: see the attunedZone note above.
+  'legendaryForgedZone',
+  'masterworkZone',
   'motdResult',
   'reliquaryIlluminationBroadcast',
   // release/v0.41.0 (the seventeenth sync): declared in the union and handled by
