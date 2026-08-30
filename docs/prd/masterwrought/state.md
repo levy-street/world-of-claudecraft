@@ -22272,3 +22272,35 @@ regalia weld, the admin metrics auto-refresh interval case, and the admin
 metrics aria-labelledby case. Skipped 452 and expected-fail 2 unchanged.
 This ledger's docs commits sit on top of the frozen tip; no code moved
 after the stamp.
+
+## Phase 17 ledger (2026-08-30, the packet-closing QA and PR preparation; IN PROGRESS)
+
+STATUS: RUNNING. Opened by the market-chip evidence commit; the full record
+(union matrix results, review rounds, census reconciliation, validation
+stamps, the close-out list) lands with the closing docs commit.
+
+### The market-chip screenshots (the Phase 11 recorded deferral, DISCHARGED)
+
+The Phase 11 QA recorded that the eventual packet PR owes before/after
+screenshots for the market chip (the Browse type-category work of commit
+3181dbf7bd: pattern leaves the Other catch-all for its own browse category
+on the itemType axis, beside the materials category). Taken 2026-08-30 at
+the live merchant (the teleport finds the_merchant from the sim's own
+entities, so the Eastbrook re-site cannot strand it), lowest graphics
+preset per the standing capture rule, desktop 1600x900 and mobile
+landscape 844x390, with the TYPE menu expanded so the category set itself
+is the visible delta (the before menu ends at Other; the after menu
+carries Patterns):
+
+- docs/screenshots/masterwrought-phase-17/before-market-type-menu-desktop.png
+- docs/screenshots/masterwrought-phase-17/after-market-type-menu-desktop.png
+- docs/screenshots/masterwrought-phase-17/before-market-type-menu-mobile.png
+- docs/screenshots/masterwrought-phase-17/after-market-type-menu-mobile.png
+
+The before pair was captured from a detached scratch worktree at the
+release base e19d832b47 with a cloned node_modules, the same script and
+framing both sides. The mobile pair shows the window at the phone
+breakpoint with the menu partially scrolled (the desktop pair carries the
+category comparison). The new screenshot directory joins the five CI
+sparse-checkout cones and the SPARSE_CONE literal in the same commit, per
+the referenced-set rule.

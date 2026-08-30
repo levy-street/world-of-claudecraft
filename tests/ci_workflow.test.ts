@@ -325,6 +325,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-phase-14/',
       '            /docs/screenshots/masterwrought-phase-16/',
+      '            /docs/screenshots/masterwrought-phase-17/',
       '            /docs/screenshots/masterwrought-phase06-tomes/',
       '            /docs/screenshots/masterwrought-phase07/',
       '            /docs/screenshots/masterwrought-phase08-qa/',
