@@ -26,8 +26,12 @@
 // probe's size arm), so a sample is compared only against solo samples of
 // COMPARABLE weight (within a factor of two); with none, the verdict is
 // mid. The etalon is a median over the last few comparable solo samples,
-// and a solo sample far under it (a cache hit: the main thread linked the
-// program first, then asked again) teaches nothing.
+// and a sample far under it, solo or in company (a cache hit: the main
+// thread linked the program first, then asked again), teaches nothing and
+// votes nothing: in company it would read as an extremely fast link and
+// grow the window on the very abandon that cost the main thread the link.
+// The same goes for a unit the lane flags cheap (its prologue linked no
+// program): its settle is the queue's time, not a link's.
 //
 // What a solo sample may decide. It says nothing about queueing, so it
 // lifts the window to two, the first step that can produce a concurrent
@@ -57,8 +61,8 @@ export interface RelativeSettleJudgeConfig {
   /** A solo sample counts as comparable to a sample whose weight is within
    *  this factor of its own, either way. */
   comparableWeightFactor: number;
-  /** A solo sample under this fraction of the comparable etalon is a cache
-   *  hit, not a link: it teaches nothing. */
+  /** A sample under this fraction of the comparable etalon, solo or in
+   *  company, is a cache hit, not a link: it teaches nothing. */
   hitBelowRatio: number;
   /** Samples after a confirmed slow during which no verdict grows the window. */
   cooldownSamples: number;
@@ -85,7 +89,8 @@ export interface RelativeSettleJudgeSnapshot {
    *  over every solo sample kept; null until the first. */
   etalonMsPerWeight: number | null;
   soloSamples: number;
-  /** Solo samples set aside as cache hits. */
+  /** Samples set aside as cache hits: under the ratio, solo or in company,
+   *  or flagged cheap by the lane. */
   hits: number;
   /** The last concurrent settle's ratio to its expectation; null if none
    *  was comparable yet. */
@@ -159,17 +164,25 @@ export function createRelativeSettleJudge(
   };
 
   const judge: SettlementJudge = (sample: SettlementSample): SettlementVerdict => {
-    cooling = cooldown > 0;
-    if (cooling) cooldown--;
     const weight = Math.max(MIN_WEIGHT, Number.isFinite(sample.weight) ? sample.weight : 1);
     const perWeight = Math.max(0, sample.settlementMs) / weight;
+    if (sample.cheap) {
+      // The lane saw no program come out of it: nothing about a link in it.
+      hits++;
+      return 'mid';
+    }
+    const etalon = comparableEtalon(weight);
+    if (etalon !== null && etalon > 0 && perWeight < etalon * config.hitBelowRatio) {
+      // A program the driver already had: nothing about a link in it, and
+      // no vote, in company least of all.
+      hits++;
+      return 'mid';
+    }
+    // Only a sample that is read spends the cooldown: a flood of set-asides
+    // (the boot sweep's already-linked views) must not drain it.
+    cooling = cooldown > 0;
+    if (cooling) cooldown--;
     if (sample.concurrency <= 1) {
-      const etalon = comparableEtalon(weight);
-      if (etalon !== null && etalon > 0 && perWeight < etalon * config.hitBelowRatio) {
-        // A program the driver already had: nothing about a link in it.
-        hits++;
-        return 'mid';
-      }
       solo.push({ weight, perWeight });
       if (solo.length > keep) solo.splice(0, solo.length - keep);
       soloSamples++;
@@ -177,7 +190,6 @@ export function createRelativeSettleJudge(
       // concurrent reading, and no further.
       return answer(sample.windowLinks < soloCap ? 'fast' : 'mid');
     }
-    const etalon = comparableEtalon(weight);
     if (etalon === null || etalon <= 0) {
       // Nothing comparable to read it against: neither grow nor shrink.
       streak = null;

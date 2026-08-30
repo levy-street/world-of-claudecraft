@@ -675,7 +675,9 @@ GPU work signs. Each rule names its seam and its guard.
   overlaps links, 2026-08-30); solo evidence opens the window to two and no further,
   a cache hit teaches nothing, and a halving is followed by a cooldown. The boot lane
   (`link_rate_budget.ts`) still runs the absolute bounds; the seam
-  (`AdaptiveLinkBudgetConfig.judgeSettlement`) is how it adopts the same rule later.
+  (`AdaptiveLinkBudgetConfig.judgeSettlement`) is how it adopts the same rule later,
+  and a unit that linked nothing reaches the judge flagged `cheap` and teaches it
+  nothing (the boot sweep's already-linked views would otherwise set the etalon).
   No new queue, no new lane: the hold is one more piece on
   the caller's queue at the caller's priority, and the actionable floor and
   imminent consults bypass it (`shaderWarmDecision`). The worker never draws, so it

@@ -16,16 +16,17 @@ import {
   type RelativeSettleJudgeConfig,
 } from '../src/render/shader_warm_settle_judge_core';
 
-/** A settle of `settlementMs` at `concurrency`; weight 1 and a window equal
- *  to the concurrency unless given. */
+/** A settle of `settlementMs` at `concurrency`; weight 1, a window equal
+ *  to the concurrency and a unit that linked something unless given. */
 function settle(
   judge: RelativeSettleJudge,
   settlementMs: number,
   concurrency: number,
   weight = 1,
   windowLinks = concurrency,
+  cheap = false,
 ): SettlementVerdict {
-  return judge.judge({ settlementMs, weight, concurrency, windowLinks });
+  return judge.judge({ settlementMs, weight, concurrency, windowLinks, cheap });
 }
 
 /** Two solo links at `ms` each, with the window at one: the etalon, and the
@@ -114,6 +115,55 @@ describe('what a solo link teaches', () => {
     // Exactly a quarter is a link, not a hit.
     settle(judge, 10, 1, 1, 2);
     expect(judge.snapshot()).toMatchObject({ hits: 4, soloSamples: 3 });
+  });
+
+  it('sets a cache hit aside in company too: it is not a fast link, and it votes nothing', () => {
+    // The shape the abandon path produces: a hold expired, the main thread
+    // linked the program cold, the worker's copy was already in flight and
+    // resolves from the driver cache in 2 ms beside a real link. Read as a
+    // link that would be a ratio of 0.05, two of them the grow condition,
+    // and the window would widen because a link was SKIPPED.
+    const judge = createRelativeSettleJudge();
+    settle(judge, 40, 1, 4);
+    settle(judge, 40, 1, 4);
+    expect(settle(judge, 2, 2, 4)).toBe('mid');
+    expect(settle(judge, 2, 2, 4)).toBe('mid');
+    expect(judge.snapshot()).toMatchObject({
+      hits: 2,
+      lastRatio: null,
+      etalonMsPerWeight: 10,
+      // The hits left the solo streak where it was: no verdict was cast.
+      streak: { verdict: 'fast', count: 2 },
+    });
+    // A real link beside them is still read, and extends the streak the
+    // hits left untouched.
+    expect(settle(judge, 40, 2, 4)).toBe('fast');
+    expect(judge.snapshot()).toMatchObject({ hits: 2, lastRatio: 1 });
+  });
+
+  it('sets a unit the lane flagged cheap aside, solo or in company', () => {
+    // The boot sweep's already-linked views: a zero program delta settles in
+    // no time whatever the driver does. Fed to the etalon it would price a
+    // link at nothing and read every real one as slow.
+    const judge = taught(40);
+    // Ten times the etalon, solo: as a link it would have joined the etalon.
+    expect(settle(judge, 400, 1, 1, 2, true)).toBe('mid');
+    // The same in company: as a link it would have voted slow. A cheap unit
+    // that came back slow is not congestion evidence for a judge that reads
+    // links: a queue's time says nothing about overlap.
+    expect(settle(judge, 400, 2, 1, 2, true)).toBe('mid');
+    expect(settle(judge, 0, 2, 1, 2, true)).toBe('mid');
+    expect(judge.snapshot()).toMatchObject({
+      etalonMsPerWeight: 40,
+      soloSamples: 2,
+      hits: 3,
+      lastRatio: null,
+      streak: { verdict: 'fast', count: 2 },
+    });
+    // The first cheap unit of a session, before any etalon, is set aside the same way.
+    const fresh = createRelativeSettleJudge();
+    expect(settle(fresh, 0, 1, 1, 1, true)).toBe('mid');
+    expect(fresh.snapshot()).toMatchObject({ etalonMsPerWeight: null, soloSamples: 0, hits: 1 });
   });
 
   it('forgets solo samples past the window, so a driver that warmed up is re-read', () => {
@@ -284,6 +334,19 @@ describe('the cooldown after a halving', () => {
     }
     expect(judge.snapshot().cooldown).toBe(0);
     expect(settle(judge, 40, 1, 1, 1)).toBe('fast');
+  });
+
+  it('spends the cooldown only on samples it reads: a set-aside does not drain it', () => {
+    // The boot sweep's already-linked views settle by the dozen; were each a
+    // cooldown sample, the seven would be gone before the next real link.
+    const judge = taught(40);
+    settle(judge, 100, 2);
+    expect(settle(judge, 100, 2)).toBe('slow');
+    for (let i = 0; i < 4; i++) settle(judge, 0, 1, 1, 1, true);
+    for (let i = 0; i < 3; i++) settle(judge, 5, 1, 1, 1);
+    expect(judge.snapshot()).toMatchObject({ cooldown: 7, hits: 7 });
+    for (let i = 0; i < 7; i++) expect(settle(judge, 40, 1, 1, 1)).toBe('mid');
+    expect(judge.snapshot().cooldown).toBe(0);
   });
 
   it('still halves during the cooldown: only growth waits', () => {

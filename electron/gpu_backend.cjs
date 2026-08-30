@@ -224,7 +224,10 @@ function decideGpuBackendLaunch({ platform, env, prefs, appVersion }) {
     ? prefs.launchesSinceBackendReprobe
     : 0;
   // An app version the proof does not know is a changed environment: re-probe now
-  // rather than waiting out a counter that describes the old one.
+  // rather than waiting out a counter that describes the old one. The proof stays
+  // stale until a session runs SESSION_HEALTHY_AFTER_MS, so a machine whose higher
+  // rung dies re-probes (and takes the rescue) on every launch a player quits inside
+  // that minute; one full minute on any rung writes a fresh proof and ends it.
   if (!staleProof && since < every) return launchForRung(attempt, 'auto, remembered rung', auto);
   const target = provenAbove ? proof.backend : rungAbove(attempt);
   if (!target) return launchForRung(attempt, 'auto, remembered rung', auto);
@@ -406,7 +409,14 @@ function demoteAfterRepeatedCrashes({ prefs, rung }) {
     return { consecutiveGpuLaunchCrashes: crashes };
   }
   const lower = rungBelow(attempt);
-  if (!lower) return { consecutiveGpuLaunchCrashes: crashes };
+  // Nothing below the bottom rung: the streak holds at the threshold rather than
+  // counting every death for the life of the profile.
+  if (!lower) {
+    const held = Math.min(crashes, MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES);
+    return held === prefs?.consecutiveGpuLaunchCrashes
+      ? null
+      : { consecutiveGpuLaunchCrashes: held };
+  }
   return { gpuBackendToAttempt: lower, consecutiveGpuLaunchCrashes: 0 };
 }
 

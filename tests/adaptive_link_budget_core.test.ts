@@ -443,14 +443,22 @@ describe('a settlement judge in place of the absolute bounds', () => {
     budget.markSyncEnd('c', 8);
     clock.advance(300);
     budget.markSettled('a');
-    expect(samples).toEqual([{ settlementMs: 300, weight: 2.5, concurrency: 3, windowLinks: 16 }]);
+    expect(samples).toEqual([
+      { settlementMs: 300, weight: 2.5, concurrency: 3, windowLinks: 16, cheap: false },
+    ]);
     // 300 ms would have read slow against the 1_200/2_000 bounds; the judge
     // said fast, and fast is what moved the window.
     expect(budget.snapshot()).toMatchObject({ windowLinks: 20, state: 'ramp' });
 
     // A unit submitted alone after the others settled is alone at its peak.
     budget.markSettled('b');
-    expect(samples[1]).toEqual({ settlementMs: 300, weight: 1, concurrency: 3, windowLinks: 20 });
+    expect(samples[1]).toEqual({
+      settlementMs: 300,
+      weight: 1,
+      concurrency: 3,
+      windowLinks: 20,
+      cheap: false,
+    });
     expect(budget.snapshot()).toMatchObject({ windowLinks: 10, state: 'backoff' });
     budget.markSettled('c');
     expect(budget.snapshot()).toMatchObject({ windowLinks: 10, state: 'steady' });
@@ -458,7 +466,13 @@ describe('a settlement judge in place of the absolute bounds', () => {
     budget.markSubmitted('d');
     budget.markSyncEnd('d', 8);
     budget.markSettled('d');
-    expect(samples[3]).toEqual({ settlementMs: 0, weight: 1, concurrency: 1, windowLinks: 10 });
+    expect(samples[3]).toEqual({
+      settlementMs: 0,
+      weight: 1,
+      concurrency: 1,
+      windowLinks: 10,
+      cheap: false,
+    });
 
     // A weight that is not a positive number is one.
     budget.markSubmitted('e', Number.NaN);
@@ -479,6 +493,38 @@ describe('a settlement judge in place of the absolute bounds', () => {
     expect(budget.snapshot()).toMatchObject({
       windowLinks: CONFIG.initialWindowLinks,
       settledUnits: 1,
+    });
+  });
+
+  it('tells the judge which units linked nothing, so a judge that keeps state can set them aside', () => {
+    // The discount is applied AFTER the judge has seen the sample: a judge
+    // with an etalon would otherwise learn a zero-link settle as the price of
+    // a link. The flag rides the sample; the discount itself still holds.
+    const clock = virtualClock();
+    const samples: SettlementSample[] = [];
+    const budget = createAdaptiveLinkBudget(
+      {
+        ...CONFIG,
+        judgeSettlement: (sample) => {
+          samples.push(sample);
+          return 'fast';
+        },
+      },
+      clock,
+    );
+    budget.markSubmitted('hidden:0');
+    budget.markSyncEnd('hidden:0', 0);
+    budget.markSettled('hidden:0');
+    budget.markSubmitted('real:0');
+    budget.markSyncEnd('real:0', 3);
+    budget.markSettled('real:0');
+    // A unit whose prologue never reported keeps the provisional estimate: not cheap.
+    budget.markSubmitted('silent:0');
+    budget.markSettled('silent:0');
+    expect(samples.map((sample) => sample.cheap)).toEqual([true, false, false]);
+    expect(budget.snapshot()).toMatchObject({
+      windowLinks: CONFIG.initialWindowLinks + 2 * CONFIG.increaseLinks,
+      settledUnits: 3,
     });
   });
 

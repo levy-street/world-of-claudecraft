@@ -552,6 +552,24 @@ describe('demoteAfterRepeatedCrashes', () => {
     expect(next).toEqual({ consecutiveGpuLaunchCrashes: MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES });
     expect(next).not.toHaveProperty('gpuBackendToAttempt');
   });
+
+  it('holds the streak at the threshold at the bottom rung, never counting past it', () => {
+    // A machine that keeps dying on OpenGL has nowhere to go; the stored value
+    // stays readable rather than growing for the life of the profile, and a
+    // death that changes nothing writes nothing.
+    const memory = {
+      gpuBackend: 'auto',
+      gpuBackendToAttempt: 'opengl',
+      consecutiveGpuLaunchCrashes: MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES,
+    };
+    expect(demoteAfterRepeatedCrashes({ prefs: memory, rung: 'opengl' })).toBeNull();
+    expect(
+      demoteAfterRepeatedCrashes({
+        prefs: { ...memory, consecutiveGpuLaunchCrashes: MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES + 5 },
+        rung: 'opengl',
+      }),
+    ).toEqual({ consecutiveGpuLaunchCrashes: MAX_CONSECUTIVE_GPU_LAUNCH_CRASHES });
+  });
 });
 
 describe('gpuBackendMemoryAfterHealthySession', () => {
@@ -864,6 +882,50 @@ describe('the memory across one launch-time death and its rescue chain', () => {
       gpuBackendToAttempt: 'vulkan-plain',
       consecutiveGpuLaunchCrashes: 0,
     });
+  });
+
+  it('re-probes a stale proof on every launch until one session runs the healthy minute', () => {
+    // The corner the stale-proof arm accepts: the app version changed, the
+    // higher rung still dies, and the player quits inside the minute, so no
+    // fresh proof is written and the next launch re-probes again, whatever
+    // the launch counter says. One healthy minute on ANY rung (the rescued
+    // child included) writes the proof for this version and ends it.
+    let memory: Record<string, unknown> = {
+      gpuBackend: 'auto',
+      gpuBackendToAttempt: 'opengl',
+      gpuBackendProof: proof('vulkan-parallel-compile', '0.40.0'),
+    };
+    for (let launchNo = 0; launchNo < 3; launchNo++) {
+      const parent = linux(memory);
+      expect(parent).toMatchObject({ rung: 'vulkan-plain', reprobed: true });
+      memory = merge(memory, launchCounterAfterAutoLaunch({ prefs: memory, launch: parent }));
+      // Dies above the remembered rung: counts nothing.
+      expect(demoteAfterRepeatedCrashes({ prefs: memory, rung: parent.rung })).toBeNull();
+      const child = linux(memory, { [GPU_BACKEND_RESCUE_ENV]: 'opengl' });
+      expect(child).toMatchObject({ rung: 'opengl', rescued: true });
+      // Quit inside the minute: nothing written.
+    }
+    // A re-probe zeroes the counter, and zero on a fresh memory is no write.
+    expect(memory.launchesSinceBackendReprobe ?? 0).toBe(0);
+    // The rescued child runs a full minute on OpenGL.
+    memory = merge(
+      memory,
+      gpuBackendMemoryAfterHealthySession({
+        prefs: memory,
+        rung: 'opengl',
+        appVersion: VERSION,
+        gpuAdapter: ADAPTER,
+        rescued: true,
+      }),
+    );
+    expect(memory.gpuBackendProof).toEqual(proof('opengl'));
+    // A proof this version knows, at the attempt: the rare cadence, no re-probe.
+    const settled = linux(memory);
+    expect(settled).toMatchObject({ rung: 'opengl', reprobed: false });
+    expect(
+      linux({ ...memory, launchesSinceBackendReprobe: REPROBE_HIGHER_BACKEND_EVERY_LAUNCHES })
+        .reprobed,
+    ).toBe(false);
   });
 
   it('counts a re-probe chain on the rung it lands back on: the remembered one', () => {

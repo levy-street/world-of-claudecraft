@@ -35,6 +35,11 @@ export interface SettlementSample {
   concurrency: number;
   /** The admission window when the unit settled. */
   windowLinks: number;
+  /** The unit's synchronous prologue reported a program delta of zero: it
+   *  linked nothing, so its settle is the queue's time, not a link's. The
+   *  window credit is withheld by the lane whatever the judge says (the
+   *  cheap-unit discount); a judge that keeps state must not learn from it. */
+  cheap: boolean;
 }
 
 /** `fast` grows the window, `slow` halves it, `mid` leaves it. */
@@ -260,6 +265,7 @@ export function createAdaptiveLinkBudget(
       weight: unit.weight,
       concurrency: unit.peakConcurrency,
       windowLinks,
+      cheap: unit.cheap,
     });
     if (verdict === 'fast') {
       // The cheap-unit discount. A unit that linked no program settles

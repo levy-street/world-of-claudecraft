@@ -30,6 +30,10 @@ export function classifyGpuBackend(renderer: string): GpuBackendClass {
   return 'unknown';
 }
 
+/** The precondition of `WORKER_WORTH_BACKENDS`, not a mode switch: the
+ *  scheduler reads `workerWorthWarming`, and this stays exported so
+ *  `tests/gpu_backend_class_core.test.ts` can pin that every worth-it
+ *  backend compiles off-thread. */
 export function compilesOffThread(backend: GpuBackendClass): boolean {
   return OFF_THREAD_COMPILE_BACKENDS.includes(backend);
 }
