@@ -1,5 +1,5 @@
 // The R5 measurement harness, pinned. `scripts/r5_envelope_probe.ts` is the
-// artifact docs/prd/masterwrought/power-verification.md sends a reader to when
+// artifact docs/design/power-verification.md sends a reader to when
 // it says every figure in sections 9.2 and 9.5 is reproducible, so it is the
 // packet's only reproducibility artifact and nothing was checking it.
 //

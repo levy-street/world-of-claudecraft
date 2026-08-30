@@ -1282,7 +1282,7 @@ describe('masterwrought Phase 11h: the arithmetic above every row', () => {
     // rather than deleted. The 11h premise was "flask 15 plus food 6 equals
     // 21"; the R5 measured pass found the full kit outside the envelope and
     // used its own named tune-down knob, so the shipped kit is flask 13 plus
-    // plate 6 for 19 (docs/prd/masterwrought/power-verification.md section
+    // plate 6 for 19 (docs/design/power-verification.md section
     // 10.4). The pin's JOB is unchanged: 11h is an input-cost phase and may
     // never move these six numbers, so a magnitude change still reds HERE and
     // not only in the budget suite.

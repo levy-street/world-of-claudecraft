@@ -3085,7 +3085,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // The six farming patterns (Phase 11f, content/farm_patterns.ts). NO NEW
   // COINAGE: every name is the registered cooking prefix "Recipe:" plus a dish
   // name already shipped above, so masterwrought R15 and D17 are satisfied by construction
-  // and the verdict is recorded in docs/prd/masterwrought/naming-audit.md.
+  // and the verdict is recorded in docs/design/naming-audit.md.
   // Several are wordy in English, so M16 non-Latin fills land with them.
   pattern_highwatch_gourd_soup: 'Recipe: Highwatch Gourd Soup',
   pattern_highwatch_barley_porridge: 'Recipe: Highwatch Barley Porridge',
@@ -3095,7 +3095,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   pattern_harvest_feast: 'Recipe: Harvest Feast',
   // masterwrought Phase 11i (the angler's endgame). Every proper noun here was
   // web-verified at authoring with an adversarial second pass and recorded in
-  // docs/prd/masterwrought/naming-audit.md; the four patterns coin nothing at
+  // docs/design/naming-audit.md; the four patterns coin nothing at
   // all, being a registered per-craft prefix plus a name verified in the same
   // block. All eleven are wordy in English, so M16 non-Latin fills land with
   // them.

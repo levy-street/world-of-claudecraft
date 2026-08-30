@@ -109,7 +109,7 @@ const HARDCODED_VERBATIM: string[] = [
   // Masterwrought Phase 03 naming audit (R15, 2026-08-07): confirmed collisions
   // renamed display-only; the old names arm here so a content edit or merge
   // cannot quietly reintroduce them. Verdicts + evidence:
-  // docs/prd/masterwrought/naming-audit.md; map rows in ip-refactor/NAME-MAP.md.
+  // docs/design/naming-audit.md; map rows in ip-refactor/NAME-MAP.md.
   'Crusader Strike',
   'Heroic Leap',
   'Holy Nova',

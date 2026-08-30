@@ -1,6 +1,6 @@
 // THE R5 ENVELOPE PROBE (masterwrought Phase 15).
 //
-// Produces docs/prd/masterwrought/power-verification.md sections 9.2 and 9.5
+// Produces docs/design/power-verification.md sections 9.2 and 9.5
 // exactly: the rogue rows and the tank table from the start, and the fury and
 // caster rows since the 2026-08-29 re-cut (the R5 closure re-measured them
 // from this committed harness at the documented invocations, retiring the

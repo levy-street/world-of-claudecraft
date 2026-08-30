@@ -1,5 +1,12 @@
 # Phase 03 naming audit (R15): every shipped player-visible proper noun
 
+PROMOTED 2026-08-30 from `docs/prd/masterwrought/` into `docs/design/` (Phase 17,
+NEW WORK N13, on the farming-asset-manifest precedent) so the live test citations
+(`tests/originality_renames.test.ts`, `tests/ip_scrub.test.ts`) outlive the
+eventual packet-doc teardown. The body below is the unedited record: a bare
+`state.md` or `farming/state.md` in it means `docs/prd/masterwrought/state.md`
+and `docs/prd/masterwrought/farming/state.md`, its former siblings.
+
 Audited 2026-08-07 on `feature/masterwrought` (base a2f0082a32). Ruling R15
 (`state.md`): never reuse a coined term or full item name distinctive to another
 game; pre-existing shipped collisions get display-name-only renames (ids are

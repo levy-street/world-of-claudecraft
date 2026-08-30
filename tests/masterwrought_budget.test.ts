@@ -1860,7 +1860,7 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // THE VALUE IS ENVELOPE-DERIVED, NOT LADDER-DERIVED, AND PHASE 15 MADE IT
     // SO (15 to 13). The ladder's own step would put the flask at 15, and that
     // is where it shipped. The measured R5 pass
-    // (docs/prd/masterwrought/power-verification.md) read the full kit at 5.86
+    // (docs/design/power-verification.md) read the full kit at 5.86
     // and 6.08 percent at 15; at 13 the central estimates straddle the line,
     // and the R5 verdict, SUSPENDED on 2026-08-28 pending the gear-term
     // ruling, is CLOSED BY RULING since 2026-08-29 (its Verdict and section

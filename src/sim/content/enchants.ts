@@ -543,7 +543,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // warrior-fury and shaman-enhancement, equipment_rules.ts), so the int rung
   // lands once on every class the caster lanes model.
   //
-  // KNOWN COST, recorded in docs/prd/masterwrought/power-verification.md
+  // KNOWN COST, recorded in docs/design/power-verification.md
   // section 14: this file's own Greater-tier law asks for at least +3 over the
   // best base option so the arcane_shard sink stays alive, and a +1 apex rung
   // behind a lucent_reagent gate is that same shape one tier up. It is a demand

@@ -40,7 +40,7 @@
 // follow the shipped per-craft prefix table, and cooking's prefix is "Recipe:",
 // so every name here is "Recipe: " plus an ALREADY SHIPPED dish name and this
 // table mints NO new proper noun. The naming sweep ran anyway and its verdict
-// is written in docs/prd/masterwrought/naming-audit.md.
+// is written in docs/design/naming-audit.md.
 //
 // Def shape copies types.ts RecipeItemDef exactly: kind 'recipe' with
 // teachesRecipeId and nothing else. No use, no stackSize, no soulbound, no

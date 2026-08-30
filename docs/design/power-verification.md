@@ -1,5 +1,13 @@
 # Masterwrought power verification (R5)
 
+PROMOTED 2026-08-30 from `docs/prd/masterwrought/` into `docs/design/` (Phase 17,
+NEW WORK N13, on the farming-asset-manifest precedent) so the live citations
+(`tests/r5_envelope_probe.test.ts`, `tests/masterwrought_budget.test.ts`,
+`tests/provisioning_supply_line_apex.test.ts`, `scripts/r5_envelope_probe.ts`,
+and the two `src/sim/content` KNOWN COST comments) outlive the eventual
+packet-doc teardown. The body below is the unedited record: a bare `state.md`
+in it means `docs/prd/masterwrought/state.md`, its former sibling.
+
 The measured pass for masterwrought R5, the packet's defining gate:
 
 > R5 Power envelope: full kit (2 Perfected pieces + apex enchants + flask + food)

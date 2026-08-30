@@ -1177,7 +1177,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // one always-on consumable, it is the first offensive consumable the game
   // has ever had (every pre-packet elixir and scroll is stamina), and its
   // whole magnitude lands as new throughput with nothing to net it off. The
-  // measured pass (docs/prd/masterwrought/power-verification.md) read the
+  // measured pass (docs/design/power-verification.md) read the
   // full kit at 5.86 / 6.08 percent with every value up; with the other three
   // tunes applied and the flask still at 15 it read 5.1 to 5.3 on fury, the
   // number this 15-to-13 trim was sized against (a 2-stat trim buys 0.26 to

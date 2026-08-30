@@ -97,3 +97,13 @@ discharges its citations in the same change, never after.
   exists.
 - `power-verification.md`, Phase 15's deliverable and the R5 measurement the closing
   checklist names as the packet's defining gate.
+
+EXECUTED 2026-08-30 by Phase 17 (NEW WORK N13): both files moved to
+`docs/design/naming-audit.md` and `docs/design/power-verification.md` with their
+basenames kept, so every bare-name citation stays literally correct; all eleven
+full-path citations re-pointed in the same change (the two naming tests, the three
+R5 test suites, `scripts/r5_envelope_probe.ts`, the two `src/sim/content` KNOWN COST
+comments, `src/sim/content/farm_patterns.ts`, `src/sim/content/rift/infernal_citadel.ts`,
+and `src/ui/i18n.catalog/items.ts`); each promoted file carries a dated banner resolving
+its bare `state.md` sibling references. Packet-history docs keep their old-path prose as
+history; this note is the pointer.

@@ -110,7 +110,7 @@ describe('originality-sweep display literals stay renamed', () => {
 
 // Masterwrought Phase 03 naming audit (R15, 2026-08-07): every confirmed
 // collision renamed display-only. Old names additionally arm the ip_scrub
-// denylist; verdicts + evidence live in docs/prd/masterwrought/naming-audit.md.
+// denylist; verdicts + evidence live in docs/design/naming-audit.md.
 describe('phase 03 naming-audit display literals stay renamed', () => {
   it('pins the renamed ability display names', () => {
     expect(ABILITIES.crusader_strike.name).toBe('Oathstrike');
