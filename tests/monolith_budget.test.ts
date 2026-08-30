@@ -875,7 +875,14 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 12128, the release 12465. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 12043,
+    // LOWERED 12043 -> 12040 at the eighth-sync audit round: the merge had
+    // kept three import tokens whose only uses the two arms' refactors had
+    // moved elsewhere (computeTalentModifiers superseded by the release's
+    // computeCharacterModifiers seam, NYTHRAXIS_SPIRIT_MENDING_CAST_ID's
+    // consumer extracted by the branch to mob/combat_profile.ts, and the
+    // already-dead PersistedFarmPlot type import); the ceiling follows the
+    // file down. Exact count, zero slack.
+    ceiling: 12040,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

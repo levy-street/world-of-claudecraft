@@ -177,7 +177,6 @@ import {
 } from './content/skins';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
   FIRST_TALENT_LEVEL,
@@ -343,7 +342,6 @@ import {
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
-import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import {
@@ -468,7 +466,6 @@ import {
 import {
   countDroppedHiddenSlots,
   normalizeFarmPlots,
-  type PersistedFarmPlot,
   serializeFarmPlots,
 } from './professions/farm_persist';
 import {

@@ -21470,6 +21470,49 @@ lifted, and the verdict is CLOSED BY RULING. The verbatim ruling rows and
 the closure record sit at the end of this file; power-verification.md's
 Verdict section carries the flip.
 
+AMENDED 2026-08-30 (the eighth v0.41.0 sync, release tip 3e801dc925, the
+Ignivar raid span, merge 4f72218ed4): THE R5 FIXTURE SURFACE MOVED, the first
+sync where it did (the seventh's audit found it clean; this one measured the
+kits item by item on both parents). The release's Crucible hit rebalance
+(release commit c920f39c85) swapped hit for crit on five of the fury
+baseline's pieces (heroic_crownforged_dreadhelm and _warspaulders 55 hit / 20
+crit to 20 / 55; gravescale_girdle, bloodmane_war_legguards and
+tideworn_warboots 40 hit to 40 crit), taking WAR_BIS from 355 hit to 165,
+UNDER the 190 heroic need, so the dead-rating mechanism section 9.6 measured
+does not exist on the merged catalog; the legendary band retune (4ed7a279b4)
+moved heart_of_the_rift (sta 14 to 18, str/agi/int 6 to 8), taking the tank
+baseline of section 9.5 from 3332 to 3532 health; the retuned references make
+the apex twins forgefold_legguards and spiritweld_girdle DUPLICATE their
+reference drop's rating (crit 40 both sides) instead of complementing it; and
+the raid catalog puts a stronger incumbent in the chest slot (the R5 lead
+tables measure -1 against the ratified cap of 2) while out-scoring every apex
+piece on bestEpicGearFor's raw-stat score (all nine classes' dev-bis loadouts
+carry ZERO flagged pieces; the flagged family is still 17). TREATMENT, per the
+packet rule that a finding contradicting a ratified row is an escalation and
+never a re-tune: SEVEN Phase 15 pins were kept byte-identical and marked
+it.fails with a MERGE-INHERITED escalation note at each
+(tests/r5_envelope_probe.test.ts: the section 9.6 mechanism arm and the
+section 9.5 tank table; tests/masterwrought_budget.test.ts: the two twin rows
+and the R5 lead-cap arm; tests/dev_bis_gear.test.ts: the cap sweep and the
+by-id pin), each carrying the flip-back rule (return to it() in the SAME
+commit that executes the ruling). Two adjacent re-derives that are NOT the R5
+surface: the rogue balance identity pins (tests/rogue_dps_balance.test.ts)
+were re-anchored to the merged tree's Crucible pair (neck heartspring_amulet,
+ring2 circle_of_cinders; bands to the release's 204..220 / 167..183 /
+182..198), the mirror image of the Phase 10 QA ruling 1 and recorded as
+JUDGED PENDING the same authority's confirmation; and the max-mitigation kit
+literal in tests/heroic_difficulty_floors.test.ts was re-pinned to the
+release's catalog (2969 to 4085 armor, 1672 to 1582 pool; named cause the
+Crucible plate; REF_ARMOR 2861 untouched, the calibration gap now over a
+thousand points, which sharpens the section 14 REF_ARMOR read). The open
+decisions are rows 12 to 15 of the Phase 19 decision table
+(phase-19-rulings-gate.md): re-measure R5 on the merged world or ratify the
+record as a measurement of the pre-raid catalog; the apex tier's placement
+against the Crucible tier; the twin complement rule against the retuned
+references; REF_ARMOR against the raid-era live kit. The four ratified
+rulings and the closure record above stand untouched; what moved is the
+CATALOG under the measurement, not any packet def or record row.
+
 ### THE FROZEN STAMP: EXIT=0 at e611b0639d, the gate's bounded form
 Taken 2026-08-29T12:38:33Z to 12:48:32Z, one run, first try, at the phase
 tip e611b0639d (porcelain clean before and after; HEAD unchanged across the
