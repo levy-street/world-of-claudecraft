@@ -359,6 +359,30 @@ describe('applyGpuBackendSwitches', () => {
     ]);
   });
 
+  it("appends the policy's per-card switches on every Vulkan launch, never on OpenGL", () => {
+    const workaround = [['disable-angle-features', 'supportsImageDrmFormatModifier']] as const;
+    const vulkan = fakeApp();
+    applyGpuBackendSwitches(
+      vulkan.app,
+      { backend: 'vulkan', parallel: true, rung: 'vulkan-parallel-compile' } as never,
+      workaround,
+    );
+    expect(vulkan.switches).toEqual([
+      ['use-gl', 'angle'],
+      ['use-angle', 'vulkan'],
+      ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
+      ['enable-angle-features', 'enableParallelCompileAndLink'],
+      ['disable-angle-features', 'supportsImageDrmFormatModifier'],
+    ]);
+    const opengl = fakeApp();
+    applyGpuBackendSwitches(
+      opengl.app,
+      { backend: 'default', rung: 'opengl' } as never,
+      workaround,
+    );
+    expect(opengl.switches).toEqual([]);
+  });
+
   it('appends nothing for a default launch, or for no launch at all', () => {
     const { app, switches } = fakeApp();
     applyGpuBackendSwitches(app, {

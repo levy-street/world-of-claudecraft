@@ -90,7 +90,7 @@ const {
   SESSION_HEALTHY_AFTER_MS,
   shouldRescueMissingGpu,
 } = require('./gpu_backend.cjs');
-const { autoBackendCeiling } = require('./gpu_backend_policy.cjs');
+const { gpuBackendPolicy } = require('./gpu_backend_policy.cjs');
 const { launchSettingsSnapshot, restartApp } = require('./launch_settings.cjs');
 const { gpuStatusPayload } = require('./gpu_status_events.cjs');
 const { presentationStatePayload } = require('./presentation_events.cjs');
@@ -284,20 +284,26 @@ function mergeDesktopPrefs(partial) {
 // 'ready' (the switches are read there), after the discrete-GPU force. The decision table
 // (the rescue marker, WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto
 // memory and its climb) lives in electron/gpu_backend.cjs.
-// The policy's ceiling first (electron/gpu_backend_policy.cjs): a machine whose rendering
-// GPU is on the exclusion list keeps Auto on OpenGL, whatever the memory says, and only
-// an explicit choice reaches Vulkan there. Read from /sys/class/drm, so it is in hand
-// before the switches are appended.
-const gpuAutoCeiling = autoBackendCeiling({ platform: process.platform, env: process.env });
+// The policy first (electron/gpu_backend_policy.cjs): what this machine's rendering GPU
+// needs on Vulkan (switches every Vulkan launch carries, whatever the mode) and whether
+// Auto is held at a rung there. Read from /sys/class/drm, so it is in hand before the
+// switches are appended.
+const gpuPolicy = gpuBackendPolicy({ platform: process.platform, env: process.env });
 const gpuBackendLaunch = decideGpuBackendLaunch({
   platform: process.platform,
   env: process.env,
   prefs: desktopPrefs,
   appVersion: app.getVersion(),
-  autoCeiling: gpuAutoCeiling,
+  autoCeiling: gpuPolicy.autoCeiling,
 });
-applyGpuBackendSwitches(app, gpuBackendLaunch);
+applyGpuBackendSwitches(app, gpuBackendLaunch, gpuPolicy.vulkanSwitches);
 log.info(`[gpu] backend launch: ${gpuBackendLaunch.rung} (${gpuBackendLaunch.reason})`);
+if (gpuPolicy.why !== '') {
+  log.info(`[gpu] backend policy: ${gpuPolicy.why}`, {
+    vulkanSwitches: gpuPolicy.vulkanSwitches,
+    autoCeiling: gpuPolicy.autoCeiling?.rung ?? null,
+  });
+}
 // The climb counter moves on every Auto launch (never a rescued child, never an explicit
 // one), whether or not this launch climbed, so the cadence measures launches since the
 // last ATTEMPT rather than since anything at all.

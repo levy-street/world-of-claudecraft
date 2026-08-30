@@ -82,6 +82,8 @@ export function capAutoLaunch(
 export function applyGpuBackendSwitches(
   app: { commandLine: { appendSwitch(name: string, value: string): void } },
   launch: GpuBackendLaunch | null | undefined,
+  /** The policy's per-card Vulkan switches, appended on every Vulkan launch. */
+  cardSwitches?: ReadonlyArray<readonly [string, string]>,
 ): void;
 
 export function hasGetGpuInfoEvidence(

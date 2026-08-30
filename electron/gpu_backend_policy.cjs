@@ -1,16 +1,31 @@
 'use strict';
 
-// Which machines Auto may TRY Vulkan on. The ladder in electron/gpu_backend.cjs answers
-// "what happens when Vulkan dies"; this module answers the question before it, "should
-// Auto even attempt Vulkan here", from evidence the shell has before Electron starts.
+// What a given GPU needs from the Vulkan backend, and whether Auto may try it there. The
+// ladder in electron/gpu_backend.cjs answers "what happens when Vulkan dies"; this module
+// answers the questions before it, from evidence the shell has before Electron starts:
+// "does this card need a workaround to run Vulkan at all" and "should Auto even attempt
+// Vulkan here".
 //
 // Why it exists: the ladder's verdict only knows the failures it can observe (the GPU
 // process dying, a software rasterizer, a backend that did not bind). A driver that
 // renders WRONG without dying is invisible to it: the session runs, counts as healthy,
-// and Auto remembers the rung. That is what a Steam Deck reported (AMD APU, Mesa RADV,
-// ANGLE Vulkan): the game came up and every texture was noise. Vulkan was only ever
-// measured on NVIDIA and Intel, so on the vendors it was not measured on, Auto stays on
-// OpenGL and Vulkan is the player's explicit choice (the setting, or WOC_GPU_BACKEND).
+// and Auto remembers the rung. That is what a Steam Deck reported (AMD APU, Mesa RADV):
+// the game came up on Vulkan and every texture was noise. The cause, found on the Deck:
+// ANGLE could not import Chromium's tiled AMD buffer through a DRM format modifier
+// (VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT), so the compositor read the
+// buffer with the wrong layout. Disabling that ANGLE import path
+// (`--disable-angle-features=supportsImageDrmFormatModifier`) fixed the picture and kept
+// the fast path: on the Deck, Vulkan with the workaround beat OpenGL (51.7 against 49.7
+// fps, a recent p95 of 22 against 33 ms, no frame over 50 ms against three).
+//
+// So an entry names a card (a PCI vendor, optionally one device) and what Vulkan needs
+// there: `vulkanSwitches`, appended to EVERY Vulkan launch on that card (Auto, the
+// setting, WOC_GPU_BACKEND: the switches follow the hardware, never the mode, so a player
+// who picks Vulkan on an AMD card gets the workaround too), and optionally `autoCeiling`,
+// the rung Auto is held at while the card is unmeasured. AMD ships with the workaround
+// and NO ceiling (the maintainer's call: the import bug is the RADV path, not one APU,
+// and a Vulkan choice without the workaround would have no fix at all). The most specific
+// entry wins, so one device can carry its own answer beside its vendor's.
 //
 // The evidence is /sys/class/drm, read synchronously at the top of main (the same source
 // and the same reason as the PRIME hybrid check in electron/gpu_preference.cjs:
@@ -25,20 +40,34 @@ const PCI_VENDOR_AMD = '0x1002';
 const PCI_VENDOR_NVIDIA = '0x10de';
 
 /**
- * The exclusion list: adapters Auto never tries Vulkan on. Each entry names a vendor,
- * optionally one device id (to exclude a single card rather than a vendor), and the
- * reason, which is what the launch log line prints. The `until` line says what would
- * lift it, so the list is a set of open questions rather than a graveyard.
+ * ANGLE's DRM-format-modifier image import, which fails on Chromium's tiled AMD buffers
+ * under RADV and leaves the compositor reading them with the wrong layout. Off, ANGLE
+ * imports the buffer the plain way; the Vulkan compositor and its zero-copy handoff stay.
+ */
+const DISABLE_DRM_FORMAT_MODIFIER_SWITCH = [
+  'disable-angle-features',
+  'supportsImageDrmFormatModifier',
+];
+
+/**
+ * The policy entries. Each names a vendor, optionally one device id (the most specific
+ * entry wins), what Vulkan needs on that card (`vulkanSwitches`, [name, value] pairs),
+ * optionally the rung Auto is held at (`autoCeiling`, a ladder rung; absent means Auto
+ * climbs as anywhere else), the reason, and what would lift the entry, so the list reads
+ * as open questions rather than a graveyard.
  *
  * An entry is a decision with its evidence, never a guess: add one when a machine has
- * been seen to render wrong or die on Vulkan in a way the ladder cannot catch; remove it
- * when the backend has been measured healthy on that hardware.
+ * been seen to render wrong or die on Vulkan in a way the ladder cannot catch; narrow or
+ * remove it when the backend has been measured healthy without it on that hardware.
  */
-const AUTO_VULKAN_EXCLUSIONS = Object.freeze([
+const GPU_BACKEND_POLICY = Object.freeze([
   Object.freeze({
     vendor: PCI_VENDOR_AMD,
-    reason: 'AMD (Mesa RADV) renders corrupted textures on ANGLE Vulkan (Steam Deck, 2026-08-30)',
-    until: 'Vulkan is measured healthy on AMD hardware; until then it is opt-in there',
+    vulkanSwitches: Object.freeze([DISABLE_DRM_FORMAT_MODIFIER_SWITCH]),
+    reason:
+      'AMD (Mesa RADV): ANGLE cannot import the tiled AMD buffer through a DRM format modifier, the compositor then draws it as noise (Steam Deck, 2026-08-30); with the import path off, Vulkan measured ahead of OpenGL there',
+    until:
+      'ANGLE or RADV imports the tiled buffer correctly, measured on AMD hardware without the switch',
   }),
 ]);
 
@@ -93,11 +122,11 @@ function linuxGpuAdapters(readdir = nodeReaddirSync, readFile = nodeReadFileSync
  * NVIDIA offload variables select, whichever vendor it is (an NVIDIA card beside an AMD
  * APU, or an AMD card beside an Intel iGPU). Without the offload the card that drives the
  * screen renders, when sysfs names one. When neither can be told, every adapter is
- * judged, so an excluded card anywhere on the machine keeps Auto off Vulkan: the cost of
- * being wrong that way is a slower backend, the cost of being wrong the other way is a
- * game that renders noise. Known limit: an offload the driver silently ignored (the
- * NVIDIA variables on a machine without the NVIDIA driver) leaves the display card
- * rendering while the offload card is judged.
+ * judged, so an entry matching any card on the machine applies: the cost of being wrong
+ * that way is a switch the driver ignores or a slower backend, the cost of being wrong
+ * the other way is a game that renders noise. Known limit: an offload the driver silently
+ * ignored (the NVIDIA variables on a machine without the NVIDIA driver) leaves the display
+ * card rendering while the offload card is judged.
  */
 function renderingAdapters(adapters, env = {}) {
   const list = Array.isArray(adapters) ? adapters : [];
@@ -109,44 +138,60 @@ function renderingAdapters(adapters, env = {}) {
   return display.length > 0 ? display : list;
 }
 
-/** The first exclusion one of `adapters` matches, as `{ adapter, exclusion }`, or null. */
-function autoVulkanExclusion(adapters, exclusions = AUTO_VULKAN_EXCLUSIONS) {
+/**
+ * The entry that applies to `adapters`, as `{ adapter, entry }`, or null. The most
+ * specific match wins: a device-scoped entry over its vendor's, whatever the list order;
+ * across adapters, the first adapter with a match.
+ */
+function gpuPolicyEntry(adapters, entries = GPU_BACKEND_POLICY) {
   for (const adapter of Array.isArray(adapters) ? adapters : []) {
-    for (const exclusion of exclusions) {
-      if (adapter?.vendor !== exclusion.vendor) continue;
-      if (typeof exclusion.device === 'string' && adapter.device !== exclusion.device) continue;
-      return { adapter, exclusion };
+    let best = null;
+    for (const entry of entries) {
+      if (adapter?.vendor !== entry.vendor) continue;
+      if (typeof entry.device === 'string') {
+        if (adapter.device !== entry.device) continue;
+        return { adapter, entry };
+      }
+      best = best ?? { adapter, entry };
     }
+    if (best) return best;
   }
   return null;
 }
 
 /**
- * What Auto may attempt on this machine: `{ rung: 'opengl', why }` when one of the
- * rendering adapters is excluded, `null` when Auto is free to climb. Only Auto reads
- * this: an explicit setting or WOC_GPU_BACKEND=vulkan is the player's decision, and the
- * whole point of the exclusion list is that Vulkan stays reachable by choice.
- *
- * Off Linux there is no backend choice, so no ceiling. `env` is where the PRIME marker
- * is read from; `readdir` / `readFile` are the sysfs readers, injectable for tests.
+ * What this machine's GPU asks of the backend lever:
+ * - `vulkanSwitches`: appended to every Vulkan launch here (empty when nothing is);
+ * - `autoCeiling`: `{ rung, why }` when Auto is held at a rung, else null;
+ * - `why`: the applied entry's card and reason, for the launch log; '' when none.
+ * Off Linux there is no backend choice, so nothing applies. `env` is where the PRIME
+ * marker is read from; `readdir` / `readFile` are the sysfs readers, injectable.
  */
-function autoBackendCeiling({ platform, env, readdir, readFile, adapters, exclusions } = {}) {
-  if (platform !== 'linux') return null;
+function gpuBackendPolicy({ platform, env, readdir, readFile, adapters, entries } = {}) {
+  const none = { vulkanSwitches: [], autoCeiling: null, why: '' };
+  if (platform !== 'linux') return none;
   const list = adapters ?? linuxGpuAdapters(readdir, readFile);
-  const hit = autoVulkanExclusion(renderingAdapters(list, env ?? {}), exclusions);
-  if (!hit) return null;
+  const hit = gpuPolicyEntry(renderingAdapters(list, env ?? {}), entries);
+  if (!hit) return none;
   const id = hit.adapter.device
     ? `${hit.adapter.vendor}:${hit.adapter.device}`
     : hit.adapter.vendor;
-  return { rung: 'opengl', why: `${id} excluded: ${hit.exclusion.reason}` };
+  const why = `${id}: ${hit.entry.reason}`;
+  const ceilingRung = hit.entry.autoCeiling;
+  return {
+    vulkanSwitches: [...(hit.entry.vulkanSwitches ?? [])],
+    autoCeiling: typeof ceilingRung === 'string' ? { rung: ceilingRung, why } : null,
+    why,
+  };
 }
 
 module.exports = {
-  AUTO_VULKAN_EXCLUSIONS,
+  DISABLE_DRM_FORMAT_MODIFIER_SWITCH,
+  GPU_BACKEND_POLICY,
   PCI_VENDOR_AMD,
   PCI_VENDOR_NVIDIA,
-  autoBackendCeiling,
-  autoVulkanExclusion,
+  gpuBackendPolicy,
+  gpuPolicyEntry,
   linuxGpuAdapters,
   renderingAdapters,
 };

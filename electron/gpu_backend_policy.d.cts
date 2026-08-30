@@ -1,20 +1,25 @@
-// Type declarations for the GPU backend policy (electron/gpu_backend_policy.cjs): which
-// machines Auto may try Vulkan on. main.cjs runs outside tsc; these types serve
-// tests/electron_gpu_backend_policy.test.ts.
+// Type declarations for the GPU backend policy (electron/gpu_backend_policy.cjs): what a
+// given GPU needs from the Vulkan backend, and whether Auto may try it there. main.cjs
+// runs outside tsc; these types serve tests/electron_gpu_backend_policy.test.ts.
 
 import type { GpuBackendRung } from './gpu_backend.cjs';
 
 export const PCI_VENDOR_AMD: string;
 export const PCI_VENDOR_NVIDIA: string;
+/** `--disable-angle-features=supportsImageDrmFormatModifier`, as a [name, value] pair. */
+export const DISABLE_DRM_FORMAT_MODIFIER_SWITCH: readonly [string, string];
 
-/** An adapter Auto never tries Vulkan on: a vendor, optionally one device, and why. */
-export interface AutoVulkanExclusion {
+/** What a card asks of the lever: a vendor, optionally one device, the switches every
+ *  Vulkan launch there carries, optionally the rung Auto is held at, and why. */
+export interface GpuBackendPolicyEntry {
   vendor: string;
   device?: string;
+  vulkanSwitches?: ReadonlyArray<readonly [string, string]>;
+  autoCeiling?: GpuBackendRung;
   reason: string;
   until: string;
 }
-export const AUTO_VULKAN_EXCLUSIONS: readonly AutoVulkanExclusion[];
+export const GPU_BACKEND_POLICY: readonly GpuBackendPolicyEntry[];
 
 /** A GPU as /sys/class/drm lists it: lowercase `0x` ids, '' for a missing device id. */
 export interface LinuxGpuAdapter {
@@ -37,22 +42,29 @@ export function renderingAdapters(
   env?: Record<string, string | undefined>,
 ): LinuxGpuAdapter[];
 
-export function autoVulkanExclusion(
+export function gpuPolicyEntry(
   adapters: readonly LinuxGpuAdapter[],
-  exclusions?: readonly AutoVulkanExclusion[],
-): { adapter: LinuxGpuAdapter; exclusion: AutoVulkanExclusion } | null;
+  entries?: readonly GpuBackendPolicyEntry[],
+): { adapter: LinuxGpuAdapter; entry: GpuBackendPolicyEntry } | null;
 
-/** The policy's cap on an Auto launch, or null when Auto is free to climb. */
+/** The policy's cap on an Auto launch. */
 export interface AutoBackendCeiling {
   rung: GpuBackendRung;
   why: string;
 }
 
-export function autoBackendCeiling(input?: {
+/** What this machine's GPU asks of the lever. */
+export interface GpuBackendPolicyVerdict {
+  vulkanSwitches: Array<readonly [string, string]>;
+  autoCeiling: AutoBackendCeiling | null;
+  why: string;
+}
+
+export function gpuBackendPolicy(input?: {
   platform?: string;
   env?: Record<string, string | undefined>;
   readdir?: SysfsReaddir;
   readFile?: SysfsReadFile;
   adapters?: readonly LinuxGpuAdapter[];
-  exclusions?: readonly AutoVulkanExclusion[];
-}): AutoBackendCeiling | null;
+  entries?: readonly GpuBackendPolicyEntry[];
+}): GpuBackendPolicyVerdict;

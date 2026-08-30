@@ -29,10 +29,11 @@
 // GPU-process death used to demote a healthy machine for good, and an explicit choice
 // had no rescue at all.
 //
-// Above both sits THE POLICY (electron/gpu_backend_policy.cjs): which machines Auto may
-// try Vulkan on at all. The ladder only sees the failures it can observe, and a driver
-// that renders wrong without dying is not one of them, so on hardware where Vulkan has
-// not been measured Auto is capped at OpenGL and Vulkan is the player's explicit choice.
+// Above both sits THE POLICY (electron/gpu_backend_policy.cjs): what a given GPU needs
+// from Vulkan (switches every Vulkan launch on that card carries, whatever the mode) and
+// whether Auto may try Vulkan there at all (an optional ceiling). The ladder only sees the
+// failures it can observe, and a driver that renders wrong without dying is not one of
+// them: that is the policy's business.
 //
 // Pure functions with injected deps, exercised by tests/electron_gpu_backend.test.ts;
 // main.cjs is the only caller and wires process.platform, process.env, the prefs and app.
@@ -294,17 +295,23 @@ function explicitGpuBackendLaunch(environment, prefs) {
 
 /**
  * Append the Vulkan switches for a 'vulkan' launch, plus the parallel-compile feature
- * for a `parallel` one; nothing for 'default'. Must run before app 'ready' (Chromium
- * reads its command line there), which is why main.cjs calls it at module scope right
- * after the discrete-GPU force.
+ * for a `parallel` one, plus what the policy says this card needs on Vulkan
+ * (`cardSwitches`, the policy's `vulkanSwitches`: the AMD DRM-format-modifier
+ * workaround); nothing for 'default'. The card's switches ride EVERY Vulkan launch,
+ * Auto or explicit: they follow the hardware, never the mode. Must run before app
+ * 'ready' (Chromium reads its command line there), which is why main.cjs calls it at
+ * module scope right after the discrete-GPU force.
  */
-function applyGpuBackendSwitches(app, launch) {
+function applyGpuBackendSwitches(app, launch, cardSwitches = []) {
   if (launch?.backend !== 'vulkan') return;
   for (const [name, value] of VULKAN_BACKEND_SWITCHES) {
     app.commandLine.appendSwitch(name, value);
   }
   if (launch.parallel === true) {
     app.commandLine.appendSwitch(...VULKAN_PARALLEL_COMPILE_SWITCH);
+  }
+  for (const [name, value] of cardSwitches) {
+    app.commandLine.appendSwitch(name, value);
   }
 }
 

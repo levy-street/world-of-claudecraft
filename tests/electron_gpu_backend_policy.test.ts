@@ -1,15 +1,17 @@
-// The GPU backend policy (electron/gpu_backend_policy.cjs): which machines Auto
-// may try Vulkan on at all, from /sys/class/drm, and how the ladder's launch
-// decision honors the cap. The ladder only sees the failures it can observe; a
-// driver that renders wrong without dying (the Steam Deck report) is caught here
-// or nowhere.
+// The GPU backend policy (electron/gpu_backend_policy.cjs): what a given GPU
+// needs from Vulkan (switches every Vulkan launch on that card carries) and
+// whether Auto may try Vulkan there, from /sys/class/drm, and how the ladder's
+// launch decision honors the cap. The ladder only sees the failures it can
+// observe; a driver that renders wrong without dying (the Steam Deck report)
+// is caught here or nowhere.
 
 import { describe, expect, it } from 'vitest';
 import { decideGpuBackendLaunch, TOP_GPU_BACKEND_RUNG } from '../electron/gpu_backend.cjs';
 import {
-  AUTO_VULKAN_EXCLUSIONS,
-  autoBackendCeiling,
-  autoVulkanExclusion,
+  DISABLE_DRM_FORMAT_MODIFIER_SWITCH,
+  GPU_BACKEND_POLICY,
+  gpuBackendPolicy,
+  gpuPolicyEntry,
   linuxGpuAdapters,
   PCI_VENDOR_AMD,
   PCI_VENDOR_NVIDIA,
@@ -53,25 +55,37 @@ const HYBRID_AMD_DGPU = {
   card1: { vendor: '0x1002', device: '0x7480', bootVga: '0' },
 };
 
+const WORKAROUND = [['disable-angle-features', 'supportsImageDrmFormatModifier']];
+const linux = (cards: Record<string, Card>, env: Record<string, string> = {}) =>
+  gpuBackendPolicy({ platform: 'linux', env, ...sysfs(cards) });
+
 const VERSION = '0.41.0';
 const linuxLaunch = (
   prefs: Parameters<typeof decideGpuBackendLaunch>[0]['prefs'],
-  autoCeiling: ReturnType<typeof autoBackendCeiling>,
+  autoCeiling: ReturnType<typeof gpuBackendPolicy>['autoCeiling'],
   env: Record<string, string | undefined> = {},
 ) => decideGpuBackendLaunch({ platform: 'linux', env, prefs, appVersion: VERSION, autoCeiling });
 
-describe('the exclusion list (load-bearing literals)', () => {
-  it('keeps AMD off Auto Vulkan, vendor-wide, with its reason and what lifts it', () => {
+describe('the policy entries (load-bearing literals)', () => {
+  it('gives every AMD card the DRM-format-modifier workaround on Vulkan, with no Auto ceiling', () => {
     expect(PCI_VENDOR_AMD).toBe('0x1002');
     expect(PCI_VENDOR_NVIDIA).toBe('0x10de');
-    const amd = AUTO_VULKAN_EXCLUSIONS.find((entry) => entry.vendor === PCI_VENDOR_AMD);
+    expect(DISABLE_DRM_FORMAT_MODIFIER_SWITCH).toEqual([
+      'disable-angle-features',
+      'supportsImageDrmFormatModifier',
+    ]);
+    const amd = GPU_BACKEND_POLICY.find((entry) => entry.vendor === PCI_VENDOR_AMD);
     expect(amd).toBeDefined();
-    // Vendor-wide: no device id, so every AMD card is opt-in, not just the Deck.
+    // Vendor-wide: the import bug is the RADV path, not one APU (the maintainer's call).
     expect(amd?.device).toBeUndefined();
+    expect(amd?.vulkanSwitches).toEqual(WORKAROUND);
+    // Auto climbs on AMD like anywhere else: with the workaround, Vulkan measured
+    // ahead of OpenGL on the Deck.
+    expect(amd?.autoCeiling).toBeUndefined();
     expect(amd?.reason).toMatch(/Steam Deck/);
     expect(amd?.until).toMatch(/measured/);
     // Every entry is a decision with its evidence, never a bare vendor.
-    for (const entry of AUTO_VULKAN_EXCLUSIONS) {
+    for (const entry of GPU_BACKEND_POLICY) {
       expect(entry.vendor).toMatch(/^0x[0-9a-f]{4}$/);
       expect(entry.reason.length).toBeGreaterThan(0);
       expect(entry.until.length).toBeGreaterThan(0);
@@ -133,86 +147,90 @@ describe('renderingAdapters', () => {
   });
 });
 
-describe('autoVulkanExclusion', () => {
+describe('gpuPolicyEntry', () => {
   const amd = { card: 'card0', vendor: '0x1002', device: '0x163f', bootVga: true };
   const nvidia = { card: 'card0', vendor: '0x10de', device: '0x2204', bootVga: true };
 
   it('matches a vendor-wide entry on any device of that vendor', () => {
-    const hit = autoVulkanExclusion([nvidia, amd]);
+    const hit = gpuPolicyEntry([nvidia, amd]);
     expect(hit?.adapter).toBe(amd);
-    expect(hit?.exclusion.vendor).toBe(PCI_VENDOR_AMD);
-    expect(autoVulkanExclusion([nvidia])).toBeNull();
+    expect(hit?.entry.vendor).toBe(PCI_VENDOR_AMD);
+    expect(gpuPolicyEntry([nvidia])).toBeNull();
   });
 
-  it('matches a device-scoped entry on that device only', () => {
-    const deckOnly = [{ vendor: '0x1002', device: '0x163f', reason: 'deck', until: 'later' }];
-    expect(autoVulkanExclusion([amd], deckOnly)?.adapter).toBe(amd);
-    expect(autoVulkanExclusion([{ ...amd, device: '0x1681' }], deckOnly)).toBeNull();
+  it('lets a device-scoped entry win over its vendor, whatever the list order', () => {
+    const vendorWide = { vendor: '0x1002', reason: 'vendor', until: 'later' };
+    const deckOnly = { vendor: '0x1002', device: '0x163f', reason: 'deck', until: 'later' };
+    expect(gpuPolicyEntry([amd], [vendorWide, deckOnly])?.entry).toBe(deckOnly);
+    expect(gpuPolicyEntry([amd], [deckOnly, vendorWide])?.entry).toBe(deckOnly);
+    // Another AMD card: the vendor entry, never the Deck's.
+    expect(gpuPolicyEntry([{ ...amd, device: '0x1681' }], [deckOnly, vendorWide])?.entry).toBe(
+      vendorWide,
+    );
+    expect(gpuPolicyEntry([{ ...amd, device: '0x1681' }], [deckOnly])).toBeNull();
   });
 });
 
-describe('autoBackendCeiling', () => {
-  it('caps Auto at OpenGL on the Steam Deck, naming the card and the reason', () => {
-    const ceiling = autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(DECK) });
-    expect(ceiling?.rung).toBe('opengl');
-    expect(ceiling?.why).toContain('0x1002:0x163f excluded');
-    expect(ceiling?.why).toContain('Steam Deck');
+describe('gpuBackendPolicy', () => {
+  it('gives the Steam Deck the workaround, Auto free to climb, and names the card', () => {
+    const policy = linux(DECK);
+    expect(policy.vulkanSwitches).toEqual(WORKAROUND);
+    expect(policy.autoCeiling).toBeNull();
+    expect(policy.why).toMatch(/^0x1002:0x163f: /);
+    expect(policy.why).toContain('Steam Deck');
   });
 
-  it('leaves an NVIDIA machine free to climb', () => {
-    expect(autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(RTX_3090) })).toBeNull();
+  it('asks nothing of an NVIDIA machine', () => {
+    expect(linux(RTX_3090)).toEqual({ vulkanSwitches: [], autoCeiling: null, why: '' });
   });
 
-  it('on a hybrid machine, caps exactly when the AMD card is the one rendering', () => {
+  it('on a hybrid machine, follows the card that is rendering', () => {
     const prime = { [PRIME_RELAUNCH_MARKER]: '1' };
-    // AMD APU on the screen, NVIDIA offload: capped without the offload, free under it.
-    expect(autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(HYBRID) })?.rung).toBe(
-      'opengl',
-    );
-    expect(autoBackendCeiling({ platform: 'linux', env: prime, ...sysfs(HYBRID) })).toBeNull();
+    // AMD APU on the screen, NVIDIA offload: the workaround without the offload only.
+    expect(linux(HYBRID).vulkanSwitches).toEqual(WORKAROUND);
+    expect(linux(HYBRID, prime).vulkanSwitches).toEqual([]);
     // Intel on the screen, AMD offload: the other way round.
-    expect(
-      autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(HYBRID_AMD_DGPU) }),
-    ).toBeNull();
-    expect(
-      autoBackendCeiling({ platform: 'linux', env: prime, ...sysfs(HYBRID_AMD_DGPU) })?.why,
-    ).toContain('0x1002:0x7480 excluded');
+    expect(linux(HYBRID_AMD_DGPU).vulkanSwitches).toEqual([]);
+    expect(linux(HYBRID_AMD_DGPU, prime).why).toMatch(/^0x1002:0x7480: /);
   });
 
-  it('names the vendor alone when the card has no readable device id, and takes an injected list', () => {
-    const noDevice = { card0: { vendor: '0x1002', bootVga: '1' } };
-    expect(autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(noDevice) })?.why).toMatch(
-      /^0x1002 excluded: /,
-    );
-    const intelOnly = [{ vendor: '0x8086', reason: 'test', until: 'test' }];
-    expect(
-      autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(DECK), exclusions: intelOnly }),
-    ).toBeNull();
-    expect(
-      autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(RTX_3090), exclusions: intelOnly }),
-    ).toBeNull();
-    expect(
-      autoBackendCeiling({
-        platform: 'linux',
-        env: {},
-        adapters: [{ card: 'card0', vendor: '0x8086', device: '0x7d55', bootVga: true }],
-        exclusions: intelOnly,
-      })?.why,
-    ).toBe('0x8086:0x7d55 excluded: test');
+  it("reads an entry's ceiling as the Auto cap, with the same why", () => {
+    const held = [
+      {
+        vendor: '0x8086',
+        autoCeiling: 'opengl' as const,
+        vulkanSwitches: [],
+        reason: 'test',
+        until: 'test',
+      },
+    ];
+    const intel = { card0: { vendor: '0x8086', bootVga: '1' } };
+    const policy = gpuBackendPolicy({ platform: 'linux', env: {}, ...sysfs(intel), entries: held });
+    // No readable device id: the vendor alone names the card.
+    expect(policy.autoCeiling).toEqual({ rung: 'opengl', why: '0x8086: test' });
+    expect(policy.why).toBe('0x8086: test');
+    expect(policy.vulkanSwitches).toEqual([]);
   });
 
-  it('is no ceiling off Linux, and none on an unreadable /sys', () => {
-    expect(autoBackendCeiling({ platform: 'win32', env: {}, ...sysfs(DECK) })).toBeNull();
-    expect(autoBackendCeiling({ platform: 'darwin', env: {}, ...sysfs(DECK) })).toBeNull();
+  it('copies the switches, so a caller cannot edit the entry through them', () => {
+    const policy = linux(DECK);
+    policy.vulkanSwitches.push(['x', 'y']);
+    expect(linux(DECK).vulkanSwitches).toEqual(WORKAROUND);
+  });
+
+  it('asks nothing off Linux, and nothing on an unreadable /sys', () => {
+    const none = { vulkanSwitches: [], autoCeiling: null, why: '' };
+    expect(gpuBackendPolicy({ platform: 'win32', env: {}, ...sysfs(DECK) })).toEqual(none);
+    expect(gpuBackendPolicy({ platform: 'darwin', env: {}, ...sysfs(DECK) })).toEqual(none);
     const readdir = () => {
       throw new Error('EACCES');
     };
-    expect(autoBackendCeiling({ platform: 'linux', env: {}, readdir })).toBeNull();
+    expect(gpuBackendPolicy({ platform: 'linux', env: {}, readdir })).toEqual(none);
   });
 });
 
 describe('decideGpuBackendLaunch under a ceiling', () => {
-  const capped = autoBackendCeiling({ platform: 'linux', env: {}, ...sysfs(DECK) });
+  const capped = { rung: 'opengl' as const, why: '0x1002:0x163f: held for the test' };
 
   it('runs a fresh Auto launch on OpenGL, capped, outside the memory', () => {
     const launch = linuxLaunch({ gpuBackend: 'auto' }, capped);
@@ -223,7 +241,7 @@ describe('decideGpuBackendLaunch under a ceiling', () => {
     expect(launch.auto).toBe(false);
     // The rescue still applies.
     expect(launch.ladder).toBe(true);
-    expect(launch.reason).toBe(`auto, capped at opengl: ${capped?.why}`);
+    expect(launch.reason).toBe(`auto, capped at opengl: ${capped.why}`);
   });
 
   it('caps a remembered or proven Vulkan rung the same way', () => {

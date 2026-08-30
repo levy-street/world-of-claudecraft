@@ -342,7 +342,9 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     // the escape-hatch derivation must precede it. One call site each, so a
     // second decision cannot silently override this one.
     const decideAt = code.indexOf('const gpuBackendLaunch = decideGpuBackendLaunch({');
-    const applyAt = code.indexOf('applyGpuBackendSwitches(app, gpuBackendLaunch);');
+    const applyAt = code.indexOf(
+      'applyGpuBackendSwitches(app, gpuBackendLaunch, gpuPolicy.vulkanSwitches);',
+    );
     const forceAt = code.indexOf('forceHighPerformanceGpu({ app, log });');
     const loadAt = code.indexOf('loadDesktopPrefs(desktopPrefsPath)');
     const ready = code.indexOf('app.whenReady()');
@@ -368,19 +370,22 @@ describe('shell startup polish pins (electron/main.cjs)', () => {
     );
   });
 
-  it('caps the Auto backend by the GPU policy, read before the decision', () => {
-    // The ceiling is the policy's answer (electron/gpu_backend_policy.cjs) and
-    // it must be in hand before decideGpuBackendLaunch runs; feeding it is what
-    // keeps an excluded GPU off Auto Vulkan at all.
-    const ceilingAt = code.indexOf(
-      'const gpuAutoCeiling = autoBackendCeiling({ platform: process.platform, env: process.env });',
+  it('reads the GPU policy before the decision, and feeds both its halves', () => {
+    // The policy (electron/gpu_backend_policy.cjs) must be in hand before
+    // decideGpuBackendLaunch runs: its ceiling shapes the Auto decision, and
+    // its per-card switches ride the Vulkan switches, whatever the mode.
+    const policyAt = code.indexOf(
+      'const gpuPolicy = gpuBackendPolicy({ platform: process.platform, env: process.env });',
     );
     const decideAt = code.indexOf('const gpuBackendLaunch = decideGpuBackendLaunch({');
-    expect(ceilingAt, 'the policy ceiling is gone').toBeGreaterThan(-1);
-    expect(ceilingAt).toBeLessThan(decideAt);
+    expect(policyAt, 'the policy read is gone').toBeGreaterThan(-1);
+    expect(policyAt).toBeLessThan(decideAt);
     const decision = code.slice(decideAt, code.indexOf('});', decideAt)).replace(/\s+/g, ' ');
-    expect(decision).toContain('autoCeiling: gpuAutoCeiling,');
-    expect(count(code, 'autoBackendCeiling(')).toBe(1);
+    expect(decision).toContain('autoCeiling: gpuPolicy.autoCeiling,');
+    expect(code).toContain(
+      'applyGpuBackendSwitches(app, gpuBackendLaunch, gpuPolicy.vulkanSwitches);',
+    );
+    expect(count(code, 'gpuBackendPolicy(')).toBe(1);
     // The options row learns it from the same state payload as the verdict.
     expect(code).toContain('autoCapped: gpuBackendLaunch.capped === true,');
   });

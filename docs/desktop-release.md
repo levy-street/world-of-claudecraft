@@ -149,36 +149,44 @@ value reads without a decoder:
 | `vulkan-plain` | Vulkan without it (the feature is still opt-in upstream, and one rare late GPU-process crash was seen with it on Intel/Mesa) |
 | `opengl` | Chromium's default backend, no switches |
 
-### The policy: which machines Auto tries Vulkan on
+### The policy: what a card needs from Vulkan, and whether Auto tries it
 
-Above the memory and the rescue below sits a third, simpler thing: the exclusion list in
-`electron/gpu_backend_policy.cjs` (`AUTO_VULKAN_EXCLUSIONS`). The ladder's verdict only
-knows the failures it can observe (a GPU process that dies, a software rasterizer, a
-backend that did not bind); a driver that renders WRONG without dying is invisible to it,
-and a Steam Deck (AMD APU, Mesa RADV) reported exactly that: the game came up on ANGLE
-Vulkan and every texture was noise. Vulkan was only ever measured on NVIDIA and Intel, so
-on hardware where it was not, Auto is CAPPED at OpenGL and Vulkan is one explicit choice
-away (the `vulkan` setting, or `WOC_GPU_BACKEND=vulkan`).
+Above the memory and the rescue below sits a third, simpler thing: the policy in
+`electron/gpu_backend_policy.cjs` (`GPU_BACKEND_POLICY`). The ladder's verdict only knows
+the failures it can observe (a GPU process that dies, a software rasterizer, a backend
+that did not bind); a driver that renders WRONG without dying is invisible to it, and a
+Steam Deck (AMD APU, Mesa RADV) reported exactly that: the game came up on Vulkan, was
+judged healthy, and every texture was noise. The cause, found on the Deck: ANGLE could
+not import Chromium's tiled AMD buffer through a DRM format modifier
+(`VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT`), so the compositor read the
+buffer with the wrong layout. With that ANGLE import path off
+(`--disable-angle-features=supportsImageDrmFormatModifier`) the picture is clean and the
+fast path stays: Vulkan measured ahead of OpenGL there (51.7 against 49.7 fps, a recent
+p95 of 22 against 33 ms, no frame over 50 ms against three).
 
+- An entry names a PCI vendor, optionally one device id (the most specific entry wins),
+  the switches every Vulkan launch on that card carries (`vulkanSwitches`), optionally
+  the rung Auto is held at (`autoCeiling`; absent means Auto climbs as anywhere else),
+  its reason and what would lift it. The switches follow the HARDWARE, never the mode: a
+  player who picks Vulkan on an AMD card, or forces it with `WOC_GPU_BACKEND=vulkan`, gets
+  the workaround too. AMD (`0x1002`) ships with the workaround and no ceiling.
 - The evidence is `/sys/class/drm` (`linuxGpuAdapters`), read at the top of `main.cjs`
   before the switches are appended, the same source as the PRIME hybrid check. The
   adapters judged are the ones that will render: under the PRIME offload the card that
   does NOT drive the screen (what `DRI_PRIME=1` and the NVIDIA offload variables select,
   whichever vendor it is), else the card that drives the screen (`boot_vga`), else all of
-  them (`renderingAdapters`); an unreadable `/sys` is no evidence and no cap.
-- An entry names a PCI vendor, optionally one device id, and its reason and what would
-  lift it. It is a decision with its evidence: add one when a machine renders wrong or
-  dies on Vulkan in a way the ladder cannot catch, remove it once Vulkan is measured
-  healthy there. The list ships with AMD (`0x1002`) on it.
+  them (`renderingAdapters`); an unreadable `/sys` is no evidence and nothing applies.
 - A capped launch (`decideGpuBackendLaunch` with `autoCeiling`, `capAutoLaunch`) is NOT the
   memory's: nothing is remembered and the counter does not move, so the policy leaves no
   trace of its own and the day an entry is lifted Auto resumes from whatever it remembered
   before (the top rung when nothing was). Auto is capped at the ceiling as well as above
   it, so a machine whose memory already said OpenGL still reads as held by the policy in
-  the options row. The rescue still applies. `main.log` says `[gpu] backend launch: opengl (auto, capped at opengl:
-  0x1002:0x163f excluded: ...)`, and the options row reads "Auto does not try Vulkan on
-  this graphics card yet; pick Vulkan to try it" (`autoCapped` on
-  `desktop-get-gpu-backend`).
+  the options row. The rescue still applies. `main.log` says
+  `[gpu] backend policy: 0x1002:0x163f: ...` with the switches and the ceiling, and a
+  capped launch reads `[gpu] backend launch: opengl (auto, capped at opengl: ...)`; the
+  options row then says "Auto does not try Vulkan on this graphics card yet; pick Vulkan
+  to try it" (`autoCapped` on `desktop-get-gpu-backend`). No entry carries a ceiling
+  today; the mechanism stays for the next unmeasured card.
 
 ### Two mechanisms, kept apart
 
