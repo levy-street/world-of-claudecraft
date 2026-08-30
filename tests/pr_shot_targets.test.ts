@@ -691,6 +691,13 @@ describe('classifyDiff', () => {
     expect(
       target?.variants.map((v: { beforeLoad?: { name?: string } }) => v.beforeLoad?.name),
     ).toEqual(['seedMediumGraphicsPreset', 'seedMediumGraphicsPreset']);
+    // ... and WHAT that helper seeds: the name pin alone would stay green if
+    // the helper's body were edited down to the lowest preset, silently
+    // costing the capture its medium-gated subject.
+    const seedSource = String((target?.variants[0] as { beforeLoad?: unknown })?.beforeLoad);
+    expect(seedSource, 'seedMediumGraphicsPreset must seed preset 2').toContain(
+      'graphicsPreset = 2',
+    );
     // The mobile arm must keep its Android UA override: the runner's default
     // iPhone UA lands the iOS memory profile, whose Lambert material tier
     // never applies the day/night grade, and the evening staging is

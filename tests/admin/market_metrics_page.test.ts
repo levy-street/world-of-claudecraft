@@ -171,13 +171,20 @@ describe('Market Metrics page', () => {
     await screen.findByText('Wyrmfall Core');
     const tables = document.querySelectorAll('table');
     expect(tables.length).toBeGreaterThanOrEqual(1);
+    const seenIds: string[] = [];
     for (const table of tables) {
       const labelId = table.getAttribute('aria-labelledby');
       expect(labelId, 'a metrics table has no aria-labelledby').toMatch(/^market-bucket-/);
+      seenIds.push(labelId as string);
       const heading = document.getElementById(labelId as string);
       expect(heading?.tagName, `no heading element for ${labelId}`).toBe('H3');
-      expect(heading?.textContent?.trim()).not.toBe('');
+      // the heading carries ITS OWN bucket's title, not just any text
+      const bucket = (labelId as string).replace('market-bucket-', '');
+      const titleKey = `marketMetrics.bucket${bucket.charAt(0).toUpperCase()}${bucket.slice(1)}`;
+      expect(heading?.textContent?.trim()).toBe(t(titleKey));
     }
+    // one heading per table: duplicated ids would all resolve to the first
+    expect(new Set(seenIds).size).toBe(seenIds.length);
   });
 
   it('auto-refresh refetches on the 30 s interval and the toggle-off cancels it', async () => {
@@ -195,6 +202,12 @@ describe('Market Metrics page', () => {
       toggle.click();
       await vi.advanceTimersByTimeAsync(90_000); // three would-be intervals
       expect(apiGetMock, 'the cancelled interval refetched').toHaveBeenCalledTimes(2);
+      // toggling back ON refetches immediately AND re-arms the interval
+      toggle.click();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(apiGetMock, 'toggle-on must refetch immediately').toHaveBeenCalledTimes(3);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(apiGetMock, 'toggle-on must re-arm the interval').toHaveBeenCalledTimes(4);
     } finally {
       vi.useRealTimers();
     }

@@ -69,7 +69,7 @@ describe('originality-sweep display literals stay renamed', () => {
         // refill in one of these dresses reds here; a wholly new dress is
         // the release fill reviewer's to catch.
         expect(row[1] ?? row[2], `${file}: ${row[0]}`).not.toMatch(
-          /^(Enchant|Encantar|Enchanter|Enchantement|Verzauber|Verzaubern|Verzauberung|Incanta|Betover|Zakl|Ocarov|Očarov|Fortroll|Förtroll|Fortryl|Buyule|Büyüle|Sihir|Phu phep|Phu phép|Phù phép)\s?/i,
+          /^(Enchant|Encantar|Enchanter|Enchantement|Verzauber|Verzaubern|Verzauberung|Incanta|Betover|Zakl|Ocarov|Očarov|Fortroll|Förtroll|Fortryl|Buyule|Büyüle|Sihir|Phu phep|Phu phép|Phù phep|Phù phép)\s?/i,
         );
       }
     }

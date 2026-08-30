@@ -259,7 +259,18 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // 4-count and spread bans above. A blocklist, not completeness: a wholly
     // novel write shape is the reviewer's to catch, and the dotted 4-count
     // stays the positive arm.
-    expect(pubBlock).not.toMatch(/Object\.assign|Reflect\.|defineProperty|\bpub\s+as\b|pub\[/);
+    const eqiWriteShapes = /Object\.assign|Reflect\.|defineProperty|\bpub\s+as\b|pub\[/;
+    expect(pubBlock).not.toMatch(eqiWriteShapes);
+    // positive control: the blocklist fires on each shape it names
+    for (const leak of [
+      'Object.assign(pub, extra)',
+      'Reflect.set(pub, k, v)',
+      "Object.defineProperty(pub, 'x', d)",
+      '(pub as any)[k] = inst[k]',
+      'pub[k] = inst[k]',
+    ]) {
+      expect(eqiWriteShapes.test(leak), `blocklist misses: ${leak}`).toBe(true);
+    }
     const core = read(CORE);
     expect(core).toContain(".rolled?.quality === 'legendary'");
     for (const field of ['signer', 'enchant', 'craftedRecipeId', 'bindOnTrade', 'locked']) {
@@ -340,6 +351,13 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
       slice.split('v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);'),
       'the recompute must appear exactly once in the wiring slice',
     ).toHaveLength(2);
+    // ... and exactly once in the WHOLE file: a duplicate just past the
+    // slice window (below the emit, same presentation block) would evade the
+    // slice-scoped count.
+    expect(
+      renderer.split('v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);'),
+      'a second recompute exists outside the wiring slice',
+    ).toHaveLength(2);
     // the emit is suppressed for a reduced-motion viewer (the lich-aura
     // precedent; an accessibility choice by the viewer, never a graphics shed;
     // the fairness doc's regalia bullet names this arm)
@@ -357,7 +375,7 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // real field), \bcasting\b never matches castingAbility (the spelling
     // a few dozen lines above the gate), and \bgovernor\b matches none of
     // renderBudgetGovernor/autoGovernor.
-    for (const banned of [
+    const bannedWiringReads = [
       /\bperfected\b/,
       /\bperfecting\b/,
       /\bhpFrac\b/,
@@ -370,8 +388,30 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
       /governor/i,
       /renderBudget/i,
       /graphicsBucket/i,
-    ]) {
+    ];
+    for (const banned of bannedWiringReads) {
       expect(banned.test(slice), `wiring slice must not read ${banned}`).toBe(false);
+    }
+    // Positive control: every banned regex fires on a synthetic leak in the
+    // repo's own spellings, so a dead pattern cannot read as clean forever.
+    const leakSamples = [
+      'e.perfected',
+      'x.perfecting',
+      'e.hpFrac',
+      'e.hp > 0',
+      'e.maxHp',
+      'e.targetId',
+      'e.auras',
+      'e.castingAbility',
+      'this.appliedBudgetLevels',
+      'this.renderBudgetGovernor',
+      'graphicsBucketLevels',
+    ];
+    for (const banned of bannedWiringReads) {
+      expect(
+        leakSamples.some((s) => banned.test(s)),
+        `positive control: ${banned} fires on no leak sample`,
+      ).toBe(true);
     }
     // the emit rides the same ambient !e.dead block as the form auras (a
     // corpse must not smolder), under runCharacterPresentation. NESTING, not

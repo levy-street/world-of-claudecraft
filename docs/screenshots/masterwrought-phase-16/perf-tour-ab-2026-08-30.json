@@ -1,0 +1,47 @@
+{
+  "_purpose": "Committed evidence for the 2026-08-30 hudHotDomWrites anchor re-capture (1014 to 1062): the same-machine A/B behind tests/hud_perf_budget.baseline.md. Branch = feature/masterwrought tip after the Phase 16 QA fix round; base = f90b3f5812 (pre-phase, ALREADY containing the seventh v0.41.0 sync e19d832b47), served from a throwaway worktree on :5177. PERF_GPU=1 headed Chrome, two runs per side; the full tour JSONs these rows are extracted from are session artifacts, not committed (about 3MB each).",
+  "branch-run1": {
+    "desktop": {
+      "hudHotDomWrites": 1045,
+      "frameLong50": 10,
+      "frames": 1289,
+      "fps": 96.88
+    },
+    "mobile": {
+      "hudHotDomWrites": 589,
+      "frameLong50": 3,
+      "frames": 1467,
+      "fps": 110.65
+    }
+  },
+  "branch-run2-warm": {
+    "desktop": {
+      "hudHotDomWrites": 1054,
+      "frameLong50": 3,
+      "frames": 1439,
+      "fps": 108.1
+    },
+    "mobile": {
+      "hudHotDomWrites": 573,
+      "frameLong50": 0,
+      "frames": 1566,
+      "fps": 118.18
+    }
+  },
+  "base-f90b3f5812-run1": {
+    "desktop": {
+      "hudHotDomWrites": 1054,
+      "frameLong50": 1,
+      "frames": 1449,
+      "fps": 108.97
+    }
+  },
+  "base-f90b3f5812-run2-warm": {
+    "desktop": {
+      "hudHotDomWrites": 1054,
+      "frameLong50": 1,
+      "frames": 1443,
+      "fps": 108.28
+    }
+  }
+}
