@@ -1190,3 +1190,36 @@ game.ts 10329), each ceiling lowered in its own commit (AMENDED
 in c7493716b9, beside the extraction commits; see state.md's dated
 amendment in the Phase 16 ARMS section). LOCAL only, no push, no PR.
 NEXT = Phase 16 QA (phase-16-qa.md, FRESH session).
+
+## Phase 16 QA (2026-08-30): PASS; the R5 closure's execution verified FAITHFUL
+
+The twin verified the polish sweep AND the closure that opened the phase,
+under the maintainer's four premise corrections. The closure re-cut
+reproduces BYTE-EXACT from the committed harness at the phase tip: all
+seven documented invocations, every recorded cell (the fury sample
++4.60/+5.76, the 300-seed pair +5.06/+5.24 at +/-0.40, the 9.6 pair
+4.97/5.27 vs 10.42/10.21, caster, coupling, rogue and tank controls),
+all EXIT=0. Every flip home verified, with three edge repairs (a missed
+def-file comment twin, the unmarked Phase 15 build-section tail, the
+equipped aside recorded only in state.md) and the honest-verdict framing
+intact everywhere. The audit: an 8-lane 54-agent workflow with
+per-finding adversarial verification, both typed reviewers DELIVERING in
+full (the empty-result pattern did not recur), the coverage auditor, and
+the qa-checklist gate; twelve fix commits over four fresh-reader rounds
+to convergence, incl. the reduced-motion gate on the regalia drift (the
+lich-aura precedent, line-neutral on the zero-slack ratchet), the
+cross-host regalia weld, the payback-record dated amendments, the
+Eastbrook provenance re-mint the renderer edit owed, and the ARM 3
+bypass-anchor re-capture (1014 to 1062), release-attributed by a
+same-machine A/B with the evidence committed. The stamp drift's owed
+decomposition is measured and exact: 86 = 66 (five new suites) + 18
+(edited suites) + 2 (ownership_coverage's data-driven growth). VERIFY
+set all run: mobile E2E signatures byte-identical to the recorded
+pre-existing set, perf tour + ARM 3 green warm, gpuPrep programs
+byte-identical across the A/B (the emitter adds zero), screenshot
+recipes reproduce incl. the live Etching scheme. Full record: state.md
+"Phase 16 QA ledger" (judged + recorded lists BINDING). LOCAL only, no
+push, no PR. NEXT = Phase 17, the packet-closing phase
+(phase-17-final-qa.md, FRESH session): final QA and PR, the
+ONLINE_WORLD_LAYOUT_VERSION bump at ship time, and the teardown decision
+taken WITH the maintainer.

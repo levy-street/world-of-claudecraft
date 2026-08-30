@@ -22101,3 +22101,153 @@ remaining +20 are in-file additions across the phase-edited suites
 (discord_activity_professions, discord_bot, guide, pr_shot_targets,
 masterwrought_cap, originality_renames, and the QA-round arms), owed a
 per-file decomposition by the Phase 16 QA twin if it wants one.
+AMENDED 2026-08-30 (the Phase 16 QA twin took the decomposition, measured
+by two full-suite JSON-reporter runs, one at da7b164b36 in a throwaway
+worktree and one at the QA tip, both EXIT=0 with the baseline reproducing
+this stamp's parent exactly): the +20 is 18 in the phase-edited suites
+(discord_activity_professions +11, discord_bot +2, guide +2,
+originality_renames +2, pr_shot_targets +1; masterwrought_cap gained
+ZERO and the QA-round arms were already inside the five new suites' 66)
+plus 2 in tests/server/http/ownership_coverage.test.ts, a suite the
+phase never edited, whose data-driven registration grew from the two
+surface_inventory rows the admin metrics route added. 66 + 18 + 2 = 86
+exactly.
+
+## Phase 16 QA ledger (2026-08-30, the twin: the polish sweep AND the R5 closure)
+
+STATUS: **COMPLETE, verdict PASS** (the frozen stamp at the end of this
+ledger). LOCAL only, no push, no PR. Ran under the corrected premises the
+maintainer supplied with the starter prompt: the scaffold predates the R5
+closure (this QA audits the closure's EXECUTION, never the four ratified
+rulings), the icon doctrine is the 84/81/0 PARK partition, the admin
+metrics ship ZERO SQL, and the screenshot form-factor expectations are
+the corrected ones. STEP 0 was a recorded NO-OP sync
+(origin/release/v0.41.0 unmoved at e19d832b47, already an ancestor; no
+merge, no audit; ratchet targets stand).
+
+### CLOSURE-FIDELITY VERDICT: FAITHFUL
+The R5 closure's execution is verified faithful in substance and, after
+three edge repairs, in every home. (1) THE RE-CUT REPRODUCES: all seven
+documented invocations were re-run from the committed harness at
+98277dc7c7 (the fury 60x600 recorded sample, the default full table, the
+9.4 caster-300s coupling, the 9.6 escalation pair, both 180 s twins, and
+the 300-seed precision pair; about 63 minutes wall), and EVERY recorded
+cell reproduced byte-exact: fury FULL +4.60 +/-0.91 / +5.76 +/-0.90 with
+gear +0.53/+1.14, gear+ench +0.64/+2.00, equipped +9.33/+10.39, bases
+168.35/151.18; the 180 s twins +4.82/+5.36 and the 25-seed pair
++4.17/+5.25; caster +4.90/+4.93/+4.74/+4.63 with apex chest
++2.53/+2.53/+2.41/+2.36; the coupling +7.67 with base 81.34; every rogue
+cell, the whole 9.5 tank table (3.00/4.20/4.28 and 4.27 at L23), the 9.6
+pair modelled 4.97/5.27 vs equipped 10.42/10.21, and the 300-seed pair
++5.06/+5.24 at +/-0.40 each. All legs EXIT=0; log kept at the session
+scratchpad's p16qa_probe_recut.log. (2) THE FLIP: every home the closure
+record names was verified flipped; the audit found three edge gaps, all
+repaired as 700e61e400 with the record amended where execution and record
+disagreed: the profession_items.ts flask comment still asserted SUSPENDED
+as current (trued to its test twin's wording), the progress.md Phase 15
+BUILD section tail had no resolution marker though the record claims both
+tails (dated marker added), and the 600 s equipped aside lived only in
+this file (now in section 9.2, framed per ruling 2b with the 9.6 pair
+named as the ruling's own). (3) THE FROZEN SURFACE: zero drift over the
+whole span; the four tunes stand at their live lines; the probes are
+header-comment-only; the apex-bag rescoped pin intact; the honest-verdict
+sentence with both ratified caveats survives in every characterization
+found by a tree-wide sweep. The rulings themselves were not audited: they
+are ratified and bind.
+
+### THE AUDIT
+An eight-lane workflow (closure-docs, closure-untouched, fairness,
+completeness, i18n-admin, test-decisiveness, cleanup, ledger-accuracy; 54
+agents, two adversarial verifiers per finding) plus both typed domain
+reviewers, which DELIVERED FULL REPORTS on typed dispatch: the packet's
+four-occurrence empty-result pattern did not recur this round (nor for
+qa-checklist or the typed test-coverage-auditor later). Findings: 23 from
+the workflow (0 blocking), privacy-security-review CLEAN (3 INFO),
+frontend-seam-reviewer 0 blocking / 2 should-fix / 5 notes. Premise 3
+verified: server/admin_market_metrics.ts contains zero SQL (the live
+book through the boot-injected cached read), so
+database-performance-reviewer was NOT dispatched, by measurement rather
+than assumption. Premise 2 re-derived from the tree: the 165 = 84 + 81 +
+0 partition reproduces exactly (84 art-landed with one mapping.json owner
+each, 81 parked ownerless with distinct recipes, the allowlist entirely
+packet-owned, DEED_ART_PENDING at 15). Premise 4 verified against the
+manifest: 13 keepers, regalia and enchant picker in both form factors,
+guide legs desktop-only by design, the admin capture skip recorded.
+
+### THE FIX ROUNDS (twelve commits, four fresh-reader rounds to convergence)
+700e61e400 (docs truing), de42a28196 (the reduced-motion gate on the
+regalia drift, line-neutral, the lich-aura precedent, with the fairness
+doc's new cosmetic bullet + enforcing-guards row and the cross-host weld
+in snapshots.test.ts), ac4b75572e (decisive-pin repairs across six
+suites), 3cba76fc53 (admin aria wiring), 7ee7660fd9 (the Eastbrook
+provenance re-mint the renderer edit owed, the round's one BLOCKING
+find), be4b60fe82 (the readers' round: the snapshots import order and
+aimed negative control, prefix-form banned tokens, the exactly-once and
+if-count-4 pins, both stripComments swaps, the admin Panel-title DROP
+after the reader proved it duplicated AdminShell's h1, and the doc
+rewords), dd159fe36f (the ARM 3 bypass-anchor re-capture), 3b4e764d5f +
+bdc6249b92 (prose + import order; the gate's one blocker), f30156c2c9
+(the coverage auditor's round: the seed-body scan, the shared
+scan_guard_self_audit stripper swap with all 31 importers re-run green,
+positive controls for both banned lists, the file-wide recompute arm,
+per-bucket aria identity, the toggle-back-ON arm, the committed A/B
+evidence), ada4afb0de (the fourth reader's two minors: base-side mobile
+tour runs added to the evidence, the two-bucket fixture).
+
+### JUDGED REFUSALS (this round's, binding)
+1. The adapter-object weld arm and the biome-ignore trio on the three
+   prewarm members: both would grow the zero-slack renderer.ts ratchet,
+   and the strengthened full-signature weld already pins the members.
+2. Serialize-once on the admin metrics response: the overview/activity
+   siblings share the per-request stringify shape; a retrofit belongs to
+   the family as one maintainer chore (the 403-refusal's own logic).
+3. Collapsing the admin auto-refresh glue: the extractable parts
+   (storage helpers, the toggle component) are ALREADY shared; the
+   residual per-page reactive wiring is a Svelte-idiom refactor chore.
+4. The M16 commit-granularity nit (guide keys one commit before their
+   fills): repairing it means rewriting history the ledgers cite by SHA.
+5. The wrapper-count pin's two contrived evasions and the corpus list's
+   self-pin: recorded limits, both declared at the assertion.
+6. Accepted limits recorded, not defects: the reduced-motion suppression
+   is covered by a comment-stripped source pin, not a behavioral test
+   (the established seam for this renderer wiring); the fairness doc's
+   regalia bullet is unpinned prose per the doc's own norm.
+
+### RECORDED, NOT ACTED (new maintainer reads)
+1. The ARM 3 bypass anchor has moved 706 to 1014 to 1062 in three weeks,
+   each raise release-attributed by a same-machine A/B but never
+   re-derived from a clean release-tip capture; worth a clean capture at
+   the next sync (the qa-checklist gate's flag, seconded; the 08-30 A/B
+   numbers are committed at
+   docs/screenshots/masterwrought-phase-16/perf-tour-ab-2026-08-30.json).
+2. The mobile E2E tooling staleness persists unchanged: both scripts
+   reproduce their recorded pre-existing failure signatures exactly
+   (mobile_visual at the retired #mobile-more click; the overlap audit's
+   13 strict violations in the recorded classes) on this tip.
+3. The serialize-once and auto-refresh-glue family chores above.
+
+### THE VERIFY SET (the runs the build could not make, all made)
+- Mobile E2E over npm run dev: failure signatures byte-identical to the
+  recorded pre-existing set; the window matrix incl. crafting passed;
+  no Phase 16 regression.
+- The perf tour (PERF_GPU=1, headed, both viewports, twice) + ARM 3:
+  first red on the desktop bypass count (1054 vs anchor 1014); a
+  same-machine A/B attributed ALL growth to the seventh-sync release
+  span (the pre-phase base f90b3f5812 reads an identical 1054 both
+  runs; the branch adds zero), the anchor re-captured to 1062 by its own
+  discipline with the evidence committed; ARM 3 then green 144/144 on
+  the warm artifact; warm frames healthy (fps 108/118, long50 0 to 3).
+- The gpuPrep live-program count on the offline tour: desktop steady
+  252/255 on BOTH sides of the A/B, byte-identical; the regalia emitter
+  adds zero live programs, dynamically confirming the pooled-cloud
+  structure.
+- The screenshot recipes re-run at the committed tip: the enchant picker
+  renders the live Etching scheme (16 frames); the regalia target
+  reproduces both form factors with evening grade and visible motes (the
+  first desktop attempt caught a transient game-menu overlay under a
+  contended box; the quiet re-shoot is clean; headless software-GL shows
+  the GPU notice the committed headed captures lack, environmental).
+- One incidental confirmation: a full bounded suite run at the INHERITED
+  baseline da7b164b36 reproduced the Phase 15 QA stamp exactly
+  (3337/29, 50317/2/452, EXIT=0), independently re-validating the
+  inherited stamp on this box.
