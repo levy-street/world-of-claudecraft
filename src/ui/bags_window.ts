@@ -1864,7 +1864,7 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    const instant = vendorSellIsInstant(item, slot.instance);
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -1890,13 +1890,15 @@ export class BagsWindow {
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else if (!instant) {
-      // Anything short of true junk (common+ quality, ANY instance payload:
-      // an enchant, masterwork bake, signer, bound-to, or lock, or a crafted
-      // marker) confirms before it sells. A plain click on gray junk keeps
-      // the existing one-step sale; everything else gets the same safety net
-      // destroy already has (showDiscardItemPrompt), so selling junk one
-      // item at a time can no longer vendor an adjacent, unrelated valuable
-      // item on a single stray click (the enchanted-offhand-vanishes report).
+      // A rare+ item or a copy carrying ANY instance payload (an enchant,
+      // masterwork bake, signer, bound-to, or lock) confirms before it sells,
+      // the same safety net destroy already has (showDiscardItemPrompt), so
+      // selling trash one item at a time cannot vendor an adjacent, unrelated
+      // valuable item on a single stray click (the enchanted-offhand-vanishes
+      // report). A plain click on any PLAIN sub-rare stack keeps the classic
+      // one-step sale: those copies are interchangeable and buyback restores
+      // them exactly, and per-item approval on ordinary vendor-trash runs was
+      // itself reported as a defect (vendorSellIsInstant, bags_view.ts).
       this.showSellConfirmPrompt(item, slot);
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));

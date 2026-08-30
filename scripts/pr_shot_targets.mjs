@@ -2110,12 +2110,15 @@ export const TARGETS = [
   {
     key: 'vendor-sell-confirm',
     label:
-      'Vendor: a plain click on a valuable item confirms before selling; junk still sells instantly',
+      'Vendor: plain sub-rare items sell in one step again; a rare item still confirms before selling',
     when: ['ui/bags_view', 'ui/bags_window'],
-    // On a base checkout the click sells the sword outright (no dialog exists yet),
-    // so the SAME recipe shoots the honest BEFORE state (the bag empties on the
-    // spot). On the fix, the same click opens the confirm prompt instead and the
-    // sword stays put until the player actually confirms.
+    // The SAME recipe shoots both states honestly. On a base checkout (poor
+    // quality only is instant) the common sword click opens the confirm prompt,
+    // #bags goes inert behind it, and the follow-up rare click is swallowed: the
+    // BEFORE frame shows the per-item approval on an ordinary white item. On the
+    // fix the sword sells on the spot (chat line, bag cell empties) and the rare
+    // cudgel click opens the prompt instead: the AFTER frame shows the one-step
+    // sale back for plain sub-rare items with the confirm intact for rare+.
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
@@ -2138,10 +2141,14 @@ export const TARGETS = [
         p.pos.x = vendor.pos.x + 2;
         p.pos.z = vendor.pos.z;
         p.prevPos = { ...p.pos };
-        // A common-quality sword (needs confirm) beside a poor-quality junk stack
-        // (still sells on the spot): the same click, two different outcomes.
+        // A common-quality sword (sells on the spot) beside a rare cudgel
+        // (needs confirm) and a poor-quality junk stack: the same two clicks,
+        // two different outcomes on either side of the gate.
         try {
           sim.addItem('eastbrook_arming_sword', 1);
+        } catch {}
+        try {
+          sim.addItem('moggers_copper_cudgel', 1);
         } catch {}
         try {
           sim.addItem('tangled_weed', 1);
@@ -2157,6 +2164,27 @@ export const TARGETS = [
         return { ok: true };
       });
       if (!setup.ok) throw new Error(`vendor-sell-confirm setup failed: ${setup.reason}`);
+      // Teleporting beside the vendor can re-raise the zone streaming curtain,
+      // and on a slow machine the initial world reveal itself can still be up
+      // here; either way a shot under #loading-screen captures the curtain.
+      // Let the transition start, then wait for the world to be visible again
+      // (the target-auras target's precedent, with more headroom: this target
+      // runs late in the sweep and asset streaming under capture contention
+      // has outlasted 90s on the desktop variant).
+      await wait(1000);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 180000, polling: 200 },
+      );
+      // Decline the once-ever ferry greeting, then close its follow-up note,
+      // so neither photobombs the frame (the sim never re-offers it).
+      await page.evaluate(() => {
+        document.querySelector('#tutorial-greeting [data-skip]')?.click();
+      });
+      await wait(200);
+      await page.evaluate(() => {
+        document.querySelector('#tutorial-greeting [data-close]')?.click();
+      });
       if (!(await pollForSize(page, '#vendor-window'))) {
         throw new Error('vendor window did not open');
       }
@@ -2165,6 +2193,13 @@ export const TARGETS = [
       await page.evaluate(() => {
         const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
           b.getAttribute('aria-label')?.includes('Eastbrook Arming Sword'),
+        );
+        cell?.click();
+      });
+      await wait(400);
+      await page.evaluate(() => {
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes("Mogger's Copper Cudgel"),
         );
         cell?.click();
       });
