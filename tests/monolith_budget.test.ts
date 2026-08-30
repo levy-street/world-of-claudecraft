@@ -358,6 +358,10 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm carries the bank-storage +3 above. Measured on the
     // merged tree, never reconciled by arithmetic. Exact count, zero slack.
     // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
+    // (Since the eighth-sync trim that module keeps only combatAbilityName and
+    // parseSimMoney; the family's live homes are the branch's
+    // entity_display_core.ts, entity_display_name.ts and
+    // ability_tooltip_lines.ts, which won every consumer at the merge.)
     // Re-pinned to the exact count of the ignivar-raid-complete base merge
     // into the Phase B branch: the base's fork landed its own extractions
     // while this branch's healPower seam, sigil-shop progression views, and

@@ -79,13 +79,18 @@ describe('the R5 envelope harness', () => {
   });
 
   // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
-  // tip 3e801dc925). The release's Crucible hit rebalance (c920f39c85) swapped
-  // hit for crit on five of the fury baseline's pieces (heroic_crownforged
-  // dreadhelm and warspaulders 55 hit / 20 crit -> 20 / 55; gravescale_girdle,
-  // bloodmane_war_legguards and tideworn_warboots 40 hit -> 40 crit), taking
-  // WAR_BIS from 355 hit to 165: UNDER the 190 heroic need, so the dead-rating
-  // mechanism section 9.6 measured no longer exists on the merged catalog, and
-  // the twin arm (bloodmane hit / forgefold crit) now reads two crit pieces.
+  // tip 3e801dc925). The release's incumbent set-stack retune (d404eab938)
+  // swapped hit for crit on five of the fury baseline's pieces
+  // (heroic_crownforged dreadhelm and warspaulders 55 hit / 20 crit -> 20 /
+  // 55; gravescale_girdle, bloodmane_war_legguards and tideworn_warboots 40
+  // hit -> 40 crit), taking WAR_BIS from 355 hit to 165, and the span's
+  // Crucible hit rebalance (c920f39c85) lowered the hit ramp itself
+  // (ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] -> [0, 2.5, 8, 14]), so the merged
+  // needs read 130 heroic / 190 S-rift: 165 hit is 35 OVER the merged heroic
+  // need (dead rating persists there, smaller) and 25 UNDER the merged S-rift
+  // need, the record's 355-against-190 arithmetic belongs to the pre-raid
+  // catalog, and the twin arm (bloodmane hit / forgefold crit) now reads two
+  // crit pieces.
   // Every literal here is an input of the RATIFIED R5 record (sections 3, 8.1
   // and 9.6; the four maintainer rulings of 2026-08-29), which the packet may
   // not rewrite: the test is kept exactly as authored and marked expected-fail
@@ -139,8 +144,11 @@ describe('the R5 envelope harness', () => {
 
   // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
   // tip 3e801dc925): the release's legendary band retune (4ed7a279b4) moved
-  // heart_of_the_rift (sta 14 -> 18, str/agi/int 6 -> 8), so the tank baseline
-  // reads 3532 health against the record's 3332. Section 9.5 is part of the
+  // heart_of_the_rift (sta 14 -> 18, str/agi/int 6 -> 8; measured +60 of the
+  // move) and the incumbent set-stack retune (d404eab938) replaced the
+  // crownforged 2pc bonus (ap 40 -> str 10 / sta 10, about +100 more, the
+  // remainder its other lineage lines), so the tank baseline reads 3532
+  // health against the record's 3332. Section 9.5 is part of the
   // ratified R5 record; same treatment, same escalation, same flip rule as the
   // arm above.
   it.fails('reproduces the section 9.5 tank effective-health table exactly', () => {

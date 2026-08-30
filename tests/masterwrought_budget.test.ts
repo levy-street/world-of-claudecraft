@@ -828,10 +828,10 @@ describe('masterwrought apex budget sweep', () => {
   });
 
   // MERGE-INHERITED, EXPECTED-FAIL rows (2026-08-30, the eighth v0.41.0 sync,
-  // release tip 3e801dc925). The release's Crucible hit rebalance (c920f39c85)
-  // swapped hit for crit on the same-slot reference drops these two apex twins
-  // COMPLEMENT (bloodmane_war_legguards and gravescale_girdle: 40 hit -> 40
-  // crit), so on the merged tree the twins DUPLICATE their reference's rating
+  // release tip 3e801dc925). The release's incumbent set-stack retune
+  // (d404eab938) swapped hit for crit on the same-slot reference drops these
+  // two apex twins COMPLEMENT (bloodmane_war_legguards and gravescale_girdle:
+  // 40 hit -> 40 crit), so on the merged tree the twins DUPLICATE their reference's rating
   // and the complement arm below reds exactly as authored. forgefold_legguards
   // is the very piece the ratified R5 record measures (section 9.6: dead hit on
   // the reference, live crit on the twin), so re-cutting either rating is a

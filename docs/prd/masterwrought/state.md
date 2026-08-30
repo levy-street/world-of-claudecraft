@@ -21484,19 +21484,21 @@ Verdict section carries the flip.
 AMENDED 2026-08-30 (the eighth v0.41.0 sync, release tip 3e801dc925, the
 Ignivar raid span, merge 4f72218ed4): THE R5 FIXTURE SURFACE MOVED, the first
 sync where it did (the seventh's audit found it clean; this one measured the
-kits item by item on both parents). The release's Crucible hit rebalance
-(release commit c920f39c85) swapped hit for crit on five of the fury
-baseline's pieces (heroic_crownforged_dreadhelm and _warspaulders 55 hit / 20
-crit to 20 / 55; gravescale_girdle, bloodmane_war_legguards and
+kits item by item on both parents). The release's incumbent set-stack retune
+(release commit d404eab938, "feat(sim): retune the incumbent set stack into
+2/4/6 lineages"; the fresh reader corrected the first record's c920f39c85
+attribution, which owns only the ramp below) swapped hit for crit on five of
+the fury baseline's pieces (heroic_crownforged_dreadhelm and _warspaulders 55
+hit / 20 crit to 20 / 55; gravescale_girdle, bloodmane_war_legguards and
 tideworn_warboots 40 hit to 40 crit), taking WAR_BIS from 355 hit to 165.
-CORRECTED at the audit's verify round (2026-08-30): the SAME release commit
-also lowered the hit ramp itself, ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] to
+CORRECTED at the audit's verify round (2026-08-30): the span's Crucible hit
+rebalance (c920f39c85) lowered the hit ramp itself, ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] to
 [0, 2.5, 8, 14], so the merged melee needs read 130 heroic / 190 S-rift
 against the record's 190 / 260; 165 hit is therefore 35 OVER the merged
 heroic need (dead rating persists at heroic, smaller) and 25 UNDER the merged
 S-rift need (the baseline is no longer capped there), and the record's
 355-against-190 arithmetic belongs to the pre-raid catalog it was measured
-on. The same rebalance also moved the OTHER two measured baselines, so the
+on. The same retune also moved the OTHER two measured baselines, so the
 item-by-item measurement covers all four kits: the rogue pair
 (heroic_nighttalon_crown and _shoulderguards 55 hit / 20 crit to 20 / 55;
 ROGUE_BIS 190 to 120 hit, 165 to 235 crit, now under both caps) and the
@@ -21505,8 +21507,11 @@ to 50 hit, 130 to 200 haste), and the caster's legendary mainhand
 heroic_deathless_heartwood was buffed (+25 Spell Power and larger primaries),
 so the caster rows' non-reproducibility has a direction on the record. The
 legendary band retune (4ed7a279b4) moved heart_of_the_rift (sta 14 to 18,
-str/agi/int 6 to 8), taking the tank baseline of section 9.5 from 3332 to
-3532 health; the retuned references make
+str/agi/int 6 to 8; measured +60 of the move) and the same set-stack retune
+replaced the crownforged 2pc bonus (ap 40 becomes str 10 / sta 10, about
++100 more, the remainder its other lineage lines; the set-bonus mover also
+shifts the fury and rogue baselines' attack-power lines), taking the tank
+baseline of section 9.5 from 3332 to 3532 health; the retuned references make
 the apex twins forgefold_legguards and spiritweld_girdle DUPLICATE their
 reference drop's rating (crit 40 both sides) instead of complementing it; and
 the raid catalog puts a stronger incumbent in the chest slot (the R5 lead

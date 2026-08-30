@@ -107,16 +107,19 @@ state.md's "WHAT THE MAINTAINER OWNS" mirror and this file's git history.
 
 HISTORY, second entry (2026-08-30, the eighth v0.41.0 sync, release tip
 3e801dc925, merge 4f72218ed4): THE CATALOG MOVED UNDER THIS RECORD, the first
-sync where it did. The release's Crucible hit rebalance (c920f39c85) swapped
-hit for crit or haste on pieces of every measured baseline kit (fury: the
-crownforged pair plus gravescale_girdle, bloodmane_war_legguards and
-tideworn_warboots, WAR_BIS 355 to 165 hit; rogue: the nighttalon pair,
+sync where it did. The release's incumbent set-stack retune (d404eab938)
+swapped hit for crit or haste on pieces of every measured baseline kit
+(fury: the crownforged pair plus gravescale_girdle, bloodmane_war_legguards
+and tideworn_warboots, WAR_BIS 355 to 165 hit; rogue: the nighttalon pair,
 ROGUE_BIS 190 to 120 hit; caster: the soulflame pair, CASTER_BIS 160 to 50
-hit) AND lowered the hit ramp itself (ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21]
-to [0, 2.5, 8, 14], so the merged melee needs read 130 heroic / 190 S-rift
-against this record's 190 / 260); the legendary band retune (4ed7a279b4)
-moved heart_of_the_rift and the section 9.5 tank baseline from 3332 to 3532
-health and buffed the caster's legendary mainhand; and the raid catalog's
+hit) and replaced the crownforged 2pc bonus (ap 40 becomes str 10 / sta 10);
+the span's Crucible hit rebalance (c920f39c85) lowered the hit ramp itself
+(ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] to [0, 2.5, 8, 14], so the merged
+melee needs read 130 heroic / 190 S-rift against this record's 190 / 260);
+the legendary band retune (4ed7a279b4) moved heart_of_the_rift (measured +60
+of the tank move; the 2pc replacement above is about +100 more) and, with
+the lineage lines, took the section 9.5 tank baseline from 3332 to 3532
+health while buffing the caster's legendary mainhand; and the raid catalog's
 incumbents put the section 8 apex chest lead at -1 against the ratified cap
 of 2 while displacing every apex piece from bestEpicGearFor's picks. NOTHING
 IN THIS RECORD WAS REWRITTEN: its figures are the measurement of the
