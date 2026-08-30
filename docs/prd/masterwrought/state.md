@@ -21984,6 +21984,15 @@ a6cac2e226).
   third payback rode the Discord lane: server/game.ts 10462 to 10329 via
   server/activity_detect.ts (c7493716b9), paying for the golden_harvest
   arm inside a net -133.
+  AMENDED 2026-08-30 (Phase 16 QA re-derivation): "ceilings lowered in the
+  same commits" was wrong for two of the three. All three ratchet re-pins
+  in tests/monolith_budget.test.ts (renderer 13363 to 13116, online 5959
+  to 5922, game 10462 to 10329) landed TOGETHER in c7493716b9, beside (not
+  inside) the cdba54791c and 9bc2cb735b extraction commits; the renderer
+  row was then adjusted to 13133 in 2ed0748e53 and a8e3111c2f as dated in
+  the row itself. Every payback and every lowering is real and inside the
+  phase; only the per-commit pairing claim is corrected. The acceptance
+  rows below repeating "in the same commit(s)" carry this same amendment.
 - Discord cards (N10, exactly two per ip-16-SURFACES b): c7493716b9. The
   Harvestmaster card is a bespoke render INSIDE the existing deed kind
   (the FIRST_KOI precedent), so no double-announce is possible; the

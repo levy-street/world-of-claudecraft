@@ -672,7 +672,7 @@ const MONOLITHS: MonolithRow[] = [
     // cached predicate, plus the visualPoolKeyFor cross-pointer comment from
     // the review round (2026-08-29, +2), add the lines between 13116 and this
     // count. Exact count, zero slack: any further growth reds again; the paid
-    // target 13333 stays cleared by more than 200 lines.
+    // target 13333 stays cleared by exactly 200 lines.
     ceiling: 13133,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

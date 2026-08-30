@@ -39,6 +39,7 @@
     "Mobile regalia emulates an Android phone UA (variant.userAgent, honored by scripts/pr_screenshots.mjs): the runner's default iPhone UA lands gfx.ts's iOS memory profile, whose Lambert material tier never applies the day/night grade outdoors, so the evening the shot depends on cannot render there; Android-profile phones show the graded evening, and that arm is pinned by tests/pr_shot_targets.test.ts.",
     "Regalia frames: verified evening light plus visible orange forge motes near the wearer in all four frames (full desktop, full mobile, both closeups).",
     "Enchant picker: before frames show the retired 'Enchant <Slot> - <Stat>' rows, after frames the '<Slot> Etching: ...' scheme from the phase 16 display-name re-cut.",
+    "Guide cooking/farming legs are after-only by design: both are prose-reword targets whose pre-phase state is evidenced by the before-guide-professions-endgame hub shot from the f90b3f5812 worktree (:5177); per-anchor before frames were not captured (note added by the Phase 16 QA, 2026-08-30).",
     "Admin leg SKIPPED: a sanctioned local admin session needs db:up + .env + npm run server + account registration + scripts/grant_admin.mjs (all documented), but the phase 16 admin surface is the new market-metrics panel (server/admin_market_metrics.ts), which renders empty without staged market activity; staging real listings and sales through the game exceeds the 15-minute box and SQL-faking them was ruled out."
   ]
 }

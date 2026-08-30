@@ -1078,6 +1078,12 @@ NEXT = Phase 15 QA (phase-15-qa.md, FRESH session), which must verify the
 ESCALATION rather than confirm a verdict, and whose own starter prompt is
 stale on exactly that point.
 
+(Resolved 2026-08-29: the two owed definitions above were ratified as
+rulings 1a and 2b at the Phase 16 gate and executed at its STEP 0.5; the
+verdict is CLOSED BY RULING. See the R5 closure entry below. This marker
+was added 2026-08-30 by the Phase 16 QA: the closure record named both
+Phase 15 section tails as flipped homes, and this one had been missed.)
+
 ## Phase 15 QA (2026-08-29): PASS on the phase's work; THE ESCALATION HOLDS
 
 The QA verified the escalation rather than a verdict (its own starter prompt

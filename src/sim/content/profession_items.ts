@@ -1181,9 +1181,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // full kit at 5.86 / 6.08 percent with every value up; with the other three
   // tunes applied and the flask still at 15 it read 5.1 to 5.3 on fury, the
   // number this 15-to-13 trim was sized against (a 2-stat trim buys 0.26 to
-  // 0.36 points by 8.3's own sensitivity); at 13 the central estimate is
-  // inside the 5 percent envelope with an interval that straddles the line,
-  // and the R5 verdict is SUSPENDED pending the section 3 and 8.1 rulings
+  // 0.36 points by 8.3's own sensitivity); at 13 the central estimates
+  // straddle the line, and the R5 verdict, SUSPENDED on 2026-08-28 pending
+  // the section 3 and 8.1 rulings, is CLOSED BY RULING since 2026-08-29
   // (that file's Verdict and section 9.6), so 13 is a conservative margin
   // rather than a proven crossing. The
   // value is ENVELOPE-DERIVED rather than ladder-derived: R5 is the contract

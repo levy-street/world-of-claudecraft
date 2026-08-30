@@ -630,6 +630,10 @@ either target.
 
 The fury FULL figures are the 600 s, 60-seed runs (base 168.35 at heroic,
 base 151.18 at S-rift; all re-cut 2026-08-29 from the committed harness).
+The same run prints the equipped aside at +9.33% / +10.39%: the accepted
+equipped evidence at this sample, the 600 s companion of 9.6's 300 s pair,
+never the ratified quantity (the modelled term is the R5 quantity per
+ruling 2b, the published percentages floors).
 Its 180 s, 60-seed twins read +4.82% and +5.36%, and its 25-seed 180 s runs
 read +4.17% and +5.25%: the same lane, three sample sizes, every draw within
 a point of the recorded row. The 600 s row is the recorded sample because
