@@ -500,7 +500,7 @@ interface AttributionTargetFixture {
 // the builder family out of renderer.ts and the composite's renderer leaf
 // followed the file. REMINT_COMMAND on the committed tree; no capture retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b623d52b0439d5a2a1f6c949591e2c756a05f05a1a6f4c76560c3ad68752aa64';
+  'f2e6c8c3c17ff95b672fc36a6e4d4fa4880e8945e55d8c2197cff48aae226eb1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
