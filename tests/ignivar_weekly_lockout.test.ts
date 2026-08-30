@@ -4,9 +4,18 @@
 // through a real Sim's ctx settle hub and the real enterDungeon door, the
 // deeds_sites_pin harness idiom.
 import { describe, expect, it } from 'vitest';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { enterDungeon, heroicLockoutId } from '../src/sim/instances/dungeons';
+import {
+  DAILY_LOCKOUT_RAID_ROOMS,
+  enterDungeon,
+  heroicLockoutId,
+  instanceKeyFor,
+  leaveDungeon,
+  RAID_REQUIRED_DUNGEON_IDS,
+  WEEKLY_LOCKOUT_RAID_ROOMS,
+} from '../src/sim/instances/dungeons';
 import { type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import type { DungeonDifficulty, Entity, Vec3 } from '../src/sim/types';
 
@@ -190,5 +199,93 @@ describe('the door: a locked player cannot mint a fresh raid claim', () => {
     lead.raidLockouts.set('ignivar_raid_arena', Math.floor(sim.time * 1000) - 1);
     expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
     expect(lead.raidLockouts.has('ignivar_raid_arena')).toBe(false);
+  });
+});
+
+// A real claimed run through the real door: enter, find the claim and its own
+// final boss, kill it via the real stamping path, then exercise re-entry.
+function clearedClaimRun(sim: Sim, lead: PlayerMeta): { inst: InstanceSlot; boss: Entity } {
+  expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
+  const key = instanceKeyFor(sim.ctx, lead.entityId);
+  const inst = sim.ctx.instances.find(
+    (i) => i.dungeonId === 'ignivar_raid_arena' && i.partyKey === key,
+  )!;
+  expect(inst).toBeDefined();
+  const finalBossId = HEROIC_DUNGEON_TUNING.ignivar_raid_arena.finalBossId;
+  const boss = inst.mobIds
+    .map((id) => sim.entities.get(id))
+    .find((e): e is Entity => e !== undefined && e.templateId === finalBossId)!;
+  expect(boss).toBeDefined();
+  boss.hp = 0;
+  boss.dead = true;
+  sim.ctx.awardHeroicMarks(boss, [lead]);
+  expect(lead.raidLockouts.has('ignivar_raid_arena')).toBe(true);
+  expect(inst.clearedBy.has(lead.entityId)).toBe(true);
+  return { inst, boss };
+}
+
+describe('the cleared-run door exception on the weekly rooms', () => {
+  it('a participant who steps out after the kill re-enters the cleared claim for loot', () => {
+    const sim = makeSim();
+    const lead = raidLeader(sim);
+    clearedClaimRun(sim, lead);
+    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
+  });
+
+  it('a released ghost locked by its own kill walks back in to resurrect', () => {
+    const sim = makeSim();
+    const lead = raidLeader(sim);
+    const { inst } = clearedClaimRun(sim, lead);
+    const e = entityOf(sim, lead);
+    const corpsePos = { ...e.pos };
+    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    e.dead = true;
+    e.ghost = true;
+    e.corpsePos = corpsePos;
+    e.corpseInstanceId = inst.exitId;
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
+  });
+
+  it('a player locked by an earlier run is still barred from someone else cleared claim', () => {
+    const sim = makeSim();
+    const lead = raidLeader(sim);
+    clearedClaimRun(sim, lead);
+    // Late joins the raid AFTER the kill, carrying a lock from an earlier run:
+    // not in this claim's clearedBy, so the door must still refuse the ferry.
+    const latePid = sim.addPlayer('mage', 'Late');
+    sim.partyInvite(latePid, lead.entityId);
+    sim.partyAccept(latePid);
+    const late = sim.players.get(latePid)!;
+    late.raidLockouts.set('ignivar_raid_arena', Math.floor(sim.time * 1000) + WEEK_MS);
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', latePid, true)).toBe(false);
+  });
+});
+
+describe('every raid boss room declares its lockout boundary explicitly', () => {
+  it('raid rooms with a final boss sit in exactly one of the weekly/daily sets', () => {
+    for (const dungeonId of RAID_REQUIRED_DUNGEON_IDS) {
+      const hasFinalBoss = HEROIC_DUNGEON_TUNING[dungeonId]?.finalBossId !== undefined;
+      const weekly = WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId);
+      const daily = DAILY_LOCKOUT_RAID_ROOMS.has(dungeonId);
+      if (!hasFinalBoss) {
+        expect(weekly || daily, `${dungeonId} has no final boss, so no lockout set`).toBe(false);
+        continue;
+      }
+      expect(
+        weekly !== daily,
+        `${dungeonId} must declare weekly or daily lockout, exactly one`,
+      ).toBe(true);
+    }
+  });
+
+  it('the two sets never overlap and name only raid-tier rooms', () => {
+    for (const dungeonId of WEEKLY_LOCKOUT_RAID_ROOMS) {
+      expect(DAILY_LOCKOUT_RAID_ROOMS.has(dungeonId), dungeonId).toBe(false);
+      expect(RAID_REQUIRED_DUNGEON_IDS.has(dungeonId), dungeonId).toBe(true);
+    }
+    for (const dungeonId of DAILY_LOCKOUT_RAID_ROOMS) {
+      expect(RAID_REQUIRED_DUNGEON_IDS.has(dungeonId), dungeonId).toBe(true);
+    }
   });
 });

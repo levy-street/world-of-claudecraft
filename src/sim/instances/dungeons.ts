@@ -74,7 +74,10 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
 ]);
-const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena', ...IGNIVAR_RAID_ROOM_IDS]);
+export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
+  'nythraxis_boss_arena',
+  ...IGNIVAR_RAID_ROOM_IDS,
+]);
 // A claim whose final boss is already dead (inst.clearedBy is non-empty) idles
 // this much longer than INSTANCE_EMPTY_TIMEOUT before the reaper frees it: a
 // clean kill that wipes the whole party, with nobody left to resurrect, must
@@ -299,6 +302,14 @@ export const WEEKLY_LOCKOUT_RAID_ROOMS: ReadonlySet<string> = new Set([
   'ignivar_inner_crucible',
 ]);
 
+// The raid boss rooms that keep the realm-DAILY boundary, by the same explicit
+// maintainer ruling. Every raid-tier room with a final boss must appear in
+// exactly one of these two sets: the at-the-door lock check below reads their
+// union, and the guard in tests/ignivar_weekly_lockout.test.ts fails any new
+// raid boss room that names neither, so a future room cannot silently ship on
+// an undeclared boundary.
+export const DAILY_LOCKOUT_RAID_ROOMS: ReadonlySet<string> = new Set(['nythraxis_boss_arena']);
+
 // The reset boundary a final-boss kill in this dungeon locks until: the weekly
 // boundary for the raid rooms above, the realm-daily boundary everywhere else.
 function finalBossLockedUntil(ctx: SimContext, dungeonId: string): number {
@@ -518,14 +529,26 @@ export function enterDungeon(
   }
   const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
   const returningForLoot = inst !== undefined && corpseRunClaim === inst;
-  // Nythraxis keeps its at-the-door lockout, scoped to the difficulty actually
-  // being entered: the live claim's when one exists, else the current selection.
-  // A loot-eligible ghost may return to its party's defeated live claim for the
-  // normal corpse-run resurrection, but the lockout still bars every fresh claim.
-  if (dungeonId === 'nythraxis_boss_arena' || WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)) {
+  // The raid rooms keep their at-the-door lockout, scoped to the difficulty
+  // actually being entered: the live claim's when one exists, else the current
+  // selection. A loot-eligible ghost may return to its party's defeated live
+  // claim for the normal corpse-run resurrection, but the lockout still bars
+  // every fresh claim.
+  if (DAILY_LOCKOUT_RAID_ROOMS.has(dungeonId) || WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)) {
     const doorDifficulty = inst?.difficulty ?? difficulty;
     const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
-    if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot) {
+    // The cleared-run door exception, the heroic idiom extended to the weekly
+    // rooms: the live claim this kill's own lock came from stays re-enterable
+    // for loot and corpse runs once its final boss is down. clearedBy holds
+    // exactly that kill's participants, so a player locked by an EARLIER run
+    // still cannot walk into someone else's cleared claim, and a claim whose
+    // boss is up is a fresh farm no locked player may join.
+    const returningToClearedClaim =
+      WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) &&
+      inst !== undefined &&
+      !finalBossAlive(ctx, inst) &&
+      inst.clearedBy.has(r.meta.entityId);
+    if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot && !returningToClearedClaim) {
       ctx.error(
         r.meta.entityId,
         doorDifficulty === 'heroic'
@@ -549,7 +572,7 @@ export function enterDungeon(
     inst.difficulty === 'heroic' &&
     !returningForLoot &&
     isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId)) &&
-    (heroicFinalBossAlive(ctx, inst) || !inst.clearedBy.has(r.meta.entityId))
+    (finalBossAlive(ctx, inst) || !inst.clearedBy.has(r.meta.entityId))
   ) {
     ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
     return false;
@@ -698,11 +721,12 @@ function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boo
   return true;
 }
 
-// Is the claimed heroic instance's final boss still up? Gates the locked-player
-// door rule in enterDungeon: a cleared run (boss down, or its corpse already
-// swept) stays re-enterable for loot and corpse-runs; a run with the boss alive
-// is a fresh farm a locked player must not join.
-function heroicFinalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
+// Is the claimed instance's final boss still up? Difficulty-agnostic (the
+// tuning table names the final boss for both difficulties). Gates the
+// locked-player door rules in enterDungeon: a cleared run (boss down, or its
+// corpse already swept) stays re-enterable for loot and corpse-runs; a run
+// with the boss alive is a fresh farm a locked player must not join.
+function finalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning) return false;
   for (const id of inst.mobIds) {
