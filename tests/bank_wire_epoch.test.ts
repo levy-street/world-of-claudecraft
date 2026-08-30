@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { ItemInstancePayload } from '../src/sim/types';
 import {
   type BankInfo,
   ONLINE_WORLD_AUTH_TYPE,
@@ -39,6 +40,32 @@ const AUTH_WORLD_10_VAULT_INFO = {
 
 const VAULT_SPECIAL_REQUIRED_KEYS = ['special'] as const satisfies readonly (keyof VaultInfo)[];
 
+// Exact auth-world-11 ItemInstancePayload key set from origin/release/v0.41.0
+// (e19d832b47). The masterwrought epoch (12) exists because equipped-instance
+// snapshots now carry the Perfecting rank, the Perfected quality marker, and
+// an orange piece's chosen name, none of which an epoch-11 binary can render
+// or select. The other half of the epoch-12 rationale, the `fplot` farm-plot
+// self delta, has no compile-time wire interface to fixture here; its
+// presence in today's delta registry is pinned by tests/snapshots.test.ts
+// (the ALL_DELTA_KEYS / TERSE_TO_IWORLD fplot rows).
+const AUTH_WORLD_11_ITEM_INSTANCE_PAYLOAD = {
+  signer: 'Maker',
+  charges: {},
+  rolled: {},
+  enchant: 'ench',
+  craftedRecipeId: 'recipe',
+  boundTo: 1,
+  bindOnTrade: true,
+  locked: true,
+  rift: {},
+} as const;
+
+const PERFECTING_REQUIRED_KEYS = [
+  'perfecting',
+  'perfected',
+  'name',
+] as const satisfies readonly (keyof ItemInstancePayload)[];
+
 // The load-bearing check on both historical fixtures is COMPILE-TIME and tsc
 // is its gate: the `satisfies` arms above prove every required key is a real
 // field of today's interfaces, and the AssertNever arms below prove neither
@@ -52,19 +79,23 @@ type _BankStorageKeysAreNew = AssertNever<
 type _VaultSpecialKeysAreNew = AssertNever<
   Extract<(typeof VAULT_SPECIAL_REQUIRED_KEYS)[number], keyof typeof AUTH_WORLD_10_VAULT_INFO>
 >;
+type _PerfectingKeysAreNew = AssertNever<
+  Extract<
+    (typeof PERFECTING_REQUIRED_KEYS)[number],
+    keyof typeof AUTH_WORLD_11_ITEM_INSTANCE_PAYLOAD
+  >
+>;
 
-describe('BankInfo wire compatibility epoch', () => {
-  it('separates the bank-storage snapshot from release/v0.41.0 before admission', () => {
-    // The runtime epoch pin: the world handshake version that fences the
-    // pre-bank-storage shape out before any snapshot is admitted. The
-    // masterwrought/farming epoch (12) supersedes the vault epoch (11) and
-    // keeps every earlier shape fenced with it.
+describe('wire compatibility epoch', () => {
+  it('fences every pre-masterwrought epoch out at the epoch-12 handshake', () => {
+    // The runtime epoch pin: the world handshake version that fences older
+    // snapshot shapes out before any snapshot is admitted. The three frozen
+    // fixtures above carry the per-epoch rationale: bank storage (10) added
+    // the socket and two-pool BankInfo fields, the Materials Vault (11) the
+    // identity-preserving `special` collection, and masterwrought (12) the
+    // Perfecting instance fields plus the fplot self delta.
     expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
-  });
-
-  it('separates identity-preserving vault snapshots from auth-world-10 before admission', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');

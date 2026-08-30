@@ -582,8 +582,9 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
   it('teeth: every Phase 03 hardcoded arm fires on its old name (no inert entry)', () => {
     // A typo'd or whitespace-damaged denylist entry is silently inert; this
     // fixture replays every old display name of the Phase 03 rename wave and
-    // requires each of the 36 entries added for it (35 at phase close, plus
-    // the QA round's Hellfire Citadel) to produce a violation.
+    // requires each of the 38 entries added for it (35 at phase close, the
+    // QA round's Hellfire Citadel, and the Phase 16 Etching re-cut's two
+    // verified-verbatim WoW enchant rows) to produce a violation.
     const PHASE03_OLD_NAMES = [
       'Crusader Strike',
       'Heroic Leap',
@@ -621,6 +622,8 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
       'The Moonwell',
       'Spiritmend',
       'The Hellfire Citadel',
+      'Enchant Gloves - Agility',
+      'Enchant Chest - Greater Stamina',
     ];
     const PHASE03_ENTRIES = [
       'Crusader Strike',
@@ -659,6 +662,8 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
       'Moonwell',
       'Spiritmend',
       'Hellfire Citadel',
+      'Enchant Gloves - Agility',
+      'Enchant Chest - Greater Stamina',
     ];
     const out: Violation[] = [];
     PHASE03_OLD_NAMES.forEach((name, i) => {

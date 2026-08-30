@@ -261,7 +261,7 @@ Use the seams this repo already has, do not invent new ones:
   searches against the major game wikis) and never reuse a coined term or a full
   name distinctive to another game; shared generic fantasy English is fine. Protocol
   and worked verdicts: `src/sim/content/CLAUDE.md` "Naming originality" and
-  `docs/prd/masterwrought/naming-audit.md`. A collision found after shipping is
+  `docs/design/naming-audit.md`. A collision found after shipping is
   fixed display-only (ids are frozen) and pinned in `tests/originality_renames.test.ts`.
 - New server REST endpoint: a `RouteDef` module (`server/<domain>.ts` `export const routes`)
   registered in `server/http/registry.ts`, never an inline handler in `main.ts`. Scaffold with

@@ -133,8 +133,9 @@ export type {
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
 // 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
-// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
-// rejected before the new client can consume the old six-field snapshot.
+// The pre-bank-storage release/v0.41.0 payload (then auth-world-9) lacks them,
+// so mixed binaries must be rejected before the new client can consume the old
+// six-field snapshot.
 // 11 = Materials Vault snapshots require the identity-preserving `special`
 // collection. An epoch-10 client can neither render nor select those rows, and
 // an epoch-10 server would omit them, stranding deposited special materials.

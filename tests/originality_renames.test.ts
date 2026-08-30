@@ -35,6 +35,9 @@ describe('originality-sweep display literals stay renamed', () => {
   // formula again, in either synchronized English layer (Lucent Infusion, the
   // registered standalone noun, passes by construction).
   it('no enchant display name wears the WoW verb-formula dress', () => {
+    // Vacuity floor: an emptied catalog would leave both loops green.
+    expect(Object.keys(ENCHANTS).length).toBeGreaterThanOrEqual(40);
+    expect(Object.keys(en.hudChrome.enchantName).length).toBeGreaterThanOrEqual(40);
     for (const def of Object.values(ENCHANTS)) {
       expect(def.name).not.toMatch(/^Enchant\s/);
     }

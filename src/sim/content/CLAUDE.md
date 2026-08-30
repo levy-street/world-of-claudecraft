@@ -247,7 +247,7 @@ collisions with other games in the SAME change that adds it, never retroactively
   non-Latin overlays get real fills of the new name (M16), stale Latin overlay rows
   strip to pending for the release fill, guide content is regenerated, and the new
   literal gets a pin in `tests/originality_renames.test.ts`. The audited catalog of
-  every shipped name and the worked protocol: `docs/prd/masterwrought/naming-audit.md`.
+  every shipped name and the worked protocol: `docs/design/naming-audit.md`.
 
 ## This data also feeds the public Guide/wiki
 The Guide at `/wiki` (`src/guide/`) is generated from THIS directory, so player-facing
