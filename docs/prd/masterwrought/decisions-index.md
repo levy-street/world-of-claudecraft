@@ -62,6 +62,28 @@ remain the correct record of how F01 to F14 were executed.
    Review Dispatch Matrix. Farming's copy at `farming/implementation-plan.md` is historical
    and does not govern this packet.
 
+## The closing-matrix ruling, recorded before the matrix ran (2026-08-30)
+
+Executed by Phase 17, per ip-GATE-17's own instruction ("recorded in decisions-index.md and
+the packet record before the closing matrix runs"). The ruling itself was settled 2026-08-20
+and is not re-litigated here; the authority texts are 11b-D-3 second half (state.md, "The
+four decisions, ANSWERED") and ip-GATE-17 (implementation-plan.md, ruling 104 in
+farming/state.md's rulings block).
+
+- An "accepted-by-design" handoff row ALREADY constitutes the explicit record the delivery
+  contract's CUT requirement asks for. Phase 17 therefore closes the maintainer-gated rows
+  of the handoff table and does NOT re-close the accepted-by-design ones.
+- "Closes" means closes AS RECORDS: each maintainer-gated row is verified explicitly
+  recorded and the genuinely open ones are handed to the maintainer in ONE close-out list
+  in the Phase 17 report, never as per-item stops. Judged refusals and recorded-not-acted
+  maintainer reads BIND and are never re-raised; parked rulings stay parked.
+- The counts are re-derived from the table's TEXT at execution time, never pasted from the
+  2026-08-19 sweep: at this recording the maintainer-gated class is 54 in-table rows (38
+  open-family plus the fee-floor park appended in this same change per state-COLLECT, 6
+  handed-to-maintainer, 9 deferred-to-release-fill; five of the sweep's 51 closed since,
+  rows appended since) and the accepted-by-design class is 40 in-table rows (the sweep's
+  44 counted four QA findings that were never table rows).
+
 ## Promoted out of the packet before Phase 17
 
 Farming parked `docs/design/farming-asset-manifest.json` outside its packet deliberately so
