@@ -4697,7 +4697,13 @@ export const ko_KR: EnTranslations = {
       "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
     "wallet": {
-      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.",
+      "reauth_required": "이 지갑 변경을 확인하려면 계정 비밀번호를 입력하세요.",
+      "reauth_two_factor": "이 계정은 2단계 인증이 활성화되어 있습니다. 확인하려면 인증 코드를 입력하세요.",
+      "reauth_no_password": "먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+      "reauth_bad_signature": "지갑 서명을 확인할 수 없습니다. 다시 시도하세요.",
+      "reauth_bad_password": "비밀번호가 올바르지 않습니다.",
+      "reauth_bad_two_factor": "코드가 올바르지 않습니다. 다시 시도하세요."
     },
     "ota_updates": {
       "invalid_input": "입력이 올바르지 않습니다."
@@ -7623,6 +7629,13 @@ export const ko_KR: EnTranslations = {
     "unlink": "연결 해제",
     "unlinkTitle": "이 계정에서 지갑 인증 제거",
     "unlinkAria": "이 계정에서 지갑 인증 제거",
+    "reauthTitle": "지갑 변경 확인",
+    "reauthUnlinkTitle": "지갑 제거 확인",
+    "reauthHelp": "보안을 위해 이 변경을 승인하려면 계정 비밀번호를 입력하세요.",
+    "reauthNoPassword": "이 계정은 비밀번호 없이 로그인합니다. 먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+    "reauthConfirm": "확인",
+    "reauthCancel": "취소",
+    "reauthClose": "닫기",
     "signOut": "연결 끊기",
     "signOutTitle": "이 브라우저에서 지갑 앱 연결 끊기",
     "signOutAria": "이 브라우저에서 지갑 앱 연결 끊기",

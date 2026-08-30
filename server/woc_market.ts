@@ -47,6 +47,11 @@ import type * as WocOps from './woc_market_ops';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
+  resolveReviewSettlement,
+  type WocReviewResolution,
+  type WocReviewVerdict,
+} from './woc_market_review_resolution';
+import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
   bondCents,
@@ -813,6 +818,16 @@ export interface WocMarketDb {
     to: WocSettlementState,
     failReason?: string,
   ): Promise<boolean>;
+  /** The parked-review operator arm's realm-scoped pair (the arm must not
+   *  rule another realm's row; see woc_market_review_resolution.ts). */
+  transitionSettlementInRealm(
+    realm: string,
+    id: number,
+    from: WocSettlementState[],
+    to: WocSettlementState,
+    failReason?: string,
+  ): Promise<boolean>;
+  settlementStateInRealm(realm: string, id: number): Promise<{ state: WocSettlementState } | null>;
   confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]>;
   /** confirmed -> delivering (SKIP LOCKED claim). */
   claimDeliverableSettlements(realm: string, limit: number): Promise<WocSettlementRow[]>;
@@ -3028,6 +3043,18 @@ export class WocMarketService {
     return { ok: true };
   }
 
+  async adminResolveReviewSettlement(
+    id: number,
+    verdict: WocReviewVerdict,
+  ): Promise<WocReviewResolution | Refused> {
+    // Kill-switch gated like its three write siblings; semantics live in
+    // woc_market_review_resolution.ts. The buyer's cached myActivity readout
+    // deliberately rides the TTL here (the sweep-transition ruling in
+    // woc_market_read_cache.ts): do not import the routes runtime to bust it.
+    if (!this.cfg.enabled) return refuse('disabled');
+    return resolveReviewSettlement(this.deps.db, this.cfg.realm, id, verdict);
+  }
+
   // -------------------------------------------------------------------------
   // The sweep pass (called by woc_market_sweep.ts on its own clock)
   // -------------------------------------------------------------------------
@@ -3602,9 +3629,9 @@ export class WocMarketService {
    *  set, still OPEN (the listing cannot re-auction), surfaced by the stuck
    *  readout. The operator resolution arms are review -> confirmed (payment
    *  verified on chain: delivery resumes) and review -> failed (verified
-   *  unpaid: the ordinary overdue default pass takes it from there); NO
-   *  in-repo route drives them yet, the arms arrive with the service-side
-   *  release tooling. Runs BEFORE the poll arm in the pass, so a row
+   *  unpaid: the ordinary overdue default pass takes it from there), driven
+   *  by POST /internal/woc-market/settlements/:id/resolve through the
+   *  realm-scoped CAS. Runs BEFORE the poll arm in the pass, so a row
    *  whose economy recovered exactly at the bound parks rather than
    *  resolves: deliberate (six hours of polls already failed) and
    *  operator-recoverable. */

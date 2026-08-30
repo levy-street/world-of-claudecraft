@@ -198,6 +198,8 @@ export const fr_CA: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Défis de portefeuille limités",
   "usage.metric.walletLinkRequest": "Requêtes de liaison de portefeuille",
   "usage.metric.walletLinkFailure": "Échecs de liaison de portefeuille",
+  "usage.metric.walletUnlinkFailure": "Refus de dissociation de portefeuille",
+  "usage.metric.walletUnlinkSuccess": "Dissociations de portefeuille effectuées",
   "usage.metric.walletLinkRateLimited": "Liaisons de portefeuille limitées",
   "usage.metric.cardPublishRequest": "Requêtes de publication de carte joueur",
   "usage.metric.cardPublishRejected": "Publications de carte rejetées",

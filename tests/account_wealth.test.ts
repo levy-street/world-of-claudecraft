@@ -125,31 +125,33 @@ describe('escrowTotalsFromStateRows', () => {
 });
 
 describe('refreshAccountWealth', () => {
-  it('runs the SQL purse pass, then folds the escrow blobs into the apply call', async () => {
+  it('runs the SQL purse pass, then feeds the SQL-aggregated totals to the apply call', async () => {
     const calls: string[] = [];
     const deps = {
       refreshAccountPurseTotals: vi.fn(async () => {
         calls.push('purses');
         return { rowsChanged: 7, orphansZeroed: 2 };
       }),
-      listEscrowStateRows: vi.fn(async () => {
-        calls.push('list');
-        return [{ key: 'mail:eastbrook', data: { mail: [{ recipientKey: '12', copper: 750 }] } }];
+      aggregateEscrowTotals: vi.fn(async () => {
+        calls.push('aggregate');
+        return [
+          { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
+        ];
       }),
       applyEscrowTotals: vi.fn(async () => {
         calls.push('apply');
         return 3;
       }),
     };
-    // The summary carries every db count plus the folded entry count, so the
-    // sweep's log line can name what the pass touched.
+    // The summary carries every db count plus the aggregated entry count, so
+    // the sweep's log line can name what the pass touched.
     await expect(refreshAccountWealth(deps)).resolves.toEqual({
       purseRowsChanged: 7,
       orphanPursesZeroed: 2,
       escrowEntries: 1,
       staleEscrowZeroed: 3,
     });
-    expect(calls).toEqual(['purses', 'list', 'apply']);
+    expect(calls).toEqual(['purses', 'aggregate', 'apply']);
     expect(deps.applyEscrowTotals).toHaveBeenCalledWith([
       { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
     ]);
@@ -186,8 +188,8 @@ describe('startAccountWealthSweep', () => {
       refreshAccountPurseTotals: vi
         .fn(async () => ({ rowsChanged: 5, orphansZeroed: 1 }))
         .mockRejectedValueOnce(new Error('transient')),
-      listEscrowStateRows: vi.fn(async () => [
-        { key: 'mail:eastbrook', data: { mail: [{ recipientKey: '12', copper: 750 }] } },
+      aggregateEscrowTotals: vi.fn(async () => [
+        { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
       ]),
       applyEscrowTotals: vi.fn(async () => 2),
       withSweepLock: vi.fn(async (run: () => Promise<void>) => {
@@ -231,7 +233,7 @@ describe('startAccountWealthSweep', () => {
     const onInfo = vi.fn();
     const deps = {
       refreshAccountPurseTotals: vi.fn(async () => ({ rowsChanged: 0, orphansZeroed: 0 })),
-      listEscrowStateRows: vi.fn(async () => []),
+      aggregateEscrowTotals: vi.fn(async () => []),
       applyEscrowTotals: vi.fn(async () => 0),
       // A losing try-lock never runs the pass and is not an error.
       withSweepLock: vi.fn(async () => false),
@@ -254,7 +256,7 @@ describe('startAccountWealthSweep', () => {
       refreshAccountPurseTotals: vi.fn(async () => {
         throw new Error('statement timeout');
       }),
-      listEscrowStateRows: vi.fn(async () => []),
+      aggregateEscrowTotals: vi.fn(async () => []),
       applyEscrowTotals: vi.fn(async () => 0),
       withSweepLock: vi.fn(async (run: () => Promise<void>) => {
         vi.advanceTimersByTime(2_000);
@@ -279,7 +281,7 @@ describe('startAccountWealthSweep', () => {
     const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => {});
     const deps = {
       refreshAccountPurseTotals: vi.fn(async () => ({ rowsChanged: 0, orphansZeroed: 0 })),
-      listEscrowStateRows: vi.fn(async () => []),
+      aggregateEscrowTotals: vi.fn(async () => []),
       applyEscrowTotals: vi.fn(async () => 0),
       withSweepLock: vi.fn(async (run: () => Promise<void>) => {
         await run();

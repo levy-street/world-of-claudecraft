@@ -2285,7 +2285,9 @@ describe('autosaves', () => {
     });
 
     await server.flushDirtyGuildBooks(session.characterId);
-    await server.persistMailBlob();
+    // saveMail() is the surviving gated writer: the custody-overlay migration
+    // deleted persistMailBlob, which had an identical body.
+    await server.saveMail();
 
     expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
     expect(saveMailState).toHaveBeenCalledTimes(1);

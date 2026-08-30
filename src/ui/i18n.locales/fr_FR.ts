@@ -2622,6 +2622,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parade',
   'apiError.wallet.handoff_invalid':
     "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+  'apiError.wallet.reauth_required':
+    'Confirmez ce changement de portefeuille avec le mot de passe de votre compte.',
+  'apiError.wallet.reauth_two_factor':
+    "L'authentification à deux facteurs est activée sur votre compte. Saisissez votre code pour confirmer.",
+  'apiError.wallet.reauth_no_password':
+    "Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+  'apiError.wallet.reauth_bad_signature':
+    "La signature du portefeuille n'a pas pu être vérifiée. Réessayez.",
+  'apiError.wallet.reauth_bad_password': 'Votre mot de passe est incorrect.',
+  'apiError.wallet.reauth_bad_two_factor': "Ce code n'est pas valide, réessayez.",
   'cardDuel.close': 'Fermer',
   'cardDuel.counts': 'Deck : {deck} · Défausse : {discard}',
   'cardDuel.forfeit': 'Abandonner',
@@ -5323,6 +5333,15 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Dissocier',
   'wallet.unlinkTitle': 'Retirer la vérification du portefeuille de ce compte',
   'wallet.unlinkAria': 'Retirer la vérification du portefeuille de ce compte',
+  'wallet.reauthTitle': 'Confirmer le changement de portefeuille',
+  'wallet.reauthUnlinkTitle': 'Confirmer le retrait du portefeuille',
+  'wallet.reauthHelp':
+    'Pour votre sécurité, saisissez le mot de passe de votre compte pour autoriser ce changement.',
+  'wallet.reauthNoPassword':
+    "Ce compte se connecte sans mot de passe. Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+  'wallet.reauthConfirm': 'Confirmer',
+  'wallet.reauthCancel': 'Annuler',
+  'wallet.reauthClose': 'Fermer',
   'wallet.signOut': 'Déconnecter',
   'wallet.signOutTitle': "Déconnecter l'appli de portefeuille sur ce navigateur",
   'wallet.signOutAria': "Déconnecter l'appli de portefeuille sur ce navigateur",

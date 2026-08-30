@@ -81,7 +81,11 @@ const MONOLITHS: MonolithRow[] = [
     // Down 2487 -> 2475 at the desktop-signing round: the WocMarketHooks
     // contract moved to src/ui/woc_market_hooks.ts (wiring, window, and the
     // trade arm all consume it), paying for the signer-reference plumbing.
-    ceiling: 2475,
+    // RAISED 2475 -> 2478 at the main base-merge into release/v0.41.0: both
+    // parents grew the wallet card (release the balance line and its signature
+    // gate, main the card itself) and each already paid its own ratchet, so the
+    // merged composite is the honest bound. Exact count, zero slack.
+    ceiling: 2478,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -678,7 +682,11 @@ const MONOLITHS: MonolithRow[] = [
     // boot clients now attach the shared forwarder) and the connection-budget
     // arithmetic to db_connection_budget.ts, paying for the VALIDATE's
     // post-unlock restructure in place. Exact count, zero slack.
-    ceiling: 4959,
+    // RAISED 4959 -> 5016 at the main base-merge into release/v0.41.0: release's
+    // fenced beginSaveTx transaction wrapper and main's custody overlay bake
+    // (snapshot, delete, watermark advance) are both live in production and had
+    // to compose rather than pick a side. Exact merged count, zero slack.
+    ceiling: 5016,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -733,7 +741,11 @@ const MONOLITHS: MonolithRow[] = [
     // the operator-listing batch above): the merged file again lands below
     // both parent pins and the ratchet follows it down. Measured on the
     // merged tree. Exact count.
-    ceiling: 3918,
+    // RAISED 3918 -> 3945 at the main base-merge into release/v0.41.0: unlike the
+    // previous syncs, this one does NOT land below both parent pins. Main's
+    // custody-parcel work (persistCustodyParcelRow and the CUSTODY_PARCEL_LETTERS
+    // seam) is new surface release never had. Exact merged count, zero slack.
+    ceiling: 3945,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

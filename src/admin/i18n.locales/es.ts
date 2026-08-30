@@ -316,6 +316,8 @@ export const es: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Desafíos de cartera limitados',
   'usage.metric.walletLinkRequest': 'Solicitudes de vinculación de cartera',
   'usage.metric.walletLinkFailure': 'Errores al vincular cartera',
+  'usage.metric.walletUnlinkFailure': 'Rechazos al desvincular cartera',
+  'usage.metric.walletUnlinkSuccess': 'Desvinculaciones de cartera completadas',
   'usage.metric.walletLinkRateLimited': 'Vinculaciones de cartera limitadas',
   'usage.metric.cardPublishRequest': 'Solicitudes de publicación de tarjeta de jugador',
   'usage.metric.cardPublishRejected': 'Publicaciones de tarjeta rechazadas',

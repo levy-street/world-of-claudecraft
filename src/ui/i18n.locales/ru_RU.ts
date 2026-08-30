@@ -1805,6 +1805,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Отвязать',
   'wallet.unlinkTitle': 'Удалить подтверждение кошелька из этой учетной записи',
   'wallet.unlinkAria': 'Удалить подтверждение кошелька из этой учетной записи',
+  'wallet.reauthTitle': 'Подтверждение изменения кошелька',
+  'wallet.reauthUnlinkTitle': 'Подтверждение удаления кошелька',
+  'wallet.reauthHelp':
+    'В целях безопасности введите пароль учетной записи, чтобы разрешить это изменение.',
+  'wallet.reauthNoPassword':
+    'Эта учетная запись входит без пароля. Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'wallet.reauthConfirm': 'Подтвердить',
+  'wallet.reauthCancel': 'Отмена',
+  'wallet.reauthClose': 'Закрыть',
   'wallet.signOut': 'Отключить',
   'wallet.signOutTitle': 'Отключить приложение кошелька в этом браузере',
   'wallet.signOutAria': 'Отключить приложение кошелька в этом браузере',
@@ -9225,6 +9234,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.wallet.reauth_required': 'Подтвердите это изменение кошелька паролем учетной записи.',
+  'apiError.wallet.reauth_two_factor':
+    'В вашей учетной записи включена двухфакторная аутентификация. Введите код для подтверждения.',
+  'apiError.wallet.reauth_no_password':
+    'Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'apiError.wallet.reauth_bad_signature':
+    'Не удалось проверить подпись кошелька. Попробуйте ещё раз.',
+  'apiError.wallet.reauth_bad_password': 'Неверный пароль.',
+  'apiError.wallet.reauth_bad_two_factor': 'Этот код недействителен, попробуйте ещё раз.',
   'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
   'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
   'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',

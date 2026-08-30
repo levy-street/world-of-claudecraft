@@ -568,7 +568,10 @@ export class WocMarketWindow {
     this.render();
   }
 
-  /** Wallet fan-out arm: the card is module state the view digest never sees. */
+  /** Wallet fan-out arm (Hud's onWalletUiChange, the Claudium panel's twin): the
+   *  card is module state the view digest never sees, so a connect repaints here.
+   *  Gated on the card's own signature, which includes the VERIFIED balance:
+   *  this card renders that balance, so a balance tick must repaint it. */
   onWalletChanged(): void {
     if (wocWalletCardSig(walletConnectionView()) === this.paintedWalletSig) return;
     this.relocalize();

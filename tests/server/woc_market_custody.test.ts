@@ -19,6 +19,7 @@ import {
   BankLedgerOutboxBudget,
   type BankLedgerOutboxSnapshot,
 } from '../../server/bank_ledger_outbox';
+import type { CustodyParcelRow } from '../../server/mail_custody_overlay';
 import type { CharacterSaveArgs } from '../../server/woc_market';
 import { createWocMarketCustody, type WocCustodyGameHost } from '../../server/woc_market_custody';
 import { isCataloguedRelicItem } from '../../src/sim/content/reliquary';
@@ -28,20 +29,21 @@ import type { InvSlot } from '../../src/sim/types';
 const RECIPIENT = { key: '4242', name: 'Buyer' };
 const REF = 'settlement:9';
 
-/** A host over a real Sim: no live session (deliveries never need one) and a
- *  persist hook whose calls are counted so "did it try to persist" is decidable. */
+/** A host over a real Sim: no live session (deliveries never need one). The
+ *  per-parcel durable write is injected as a recorder, so "did it persist,
+ *  and what row" is decidable, and a spy on serializeMail pins that the
+ *  parcel path never serializes the whole book. */
 function makeHost(over: Partial<WocCustodyGameHost> = {}): {
   host: WocCustodyGameHost;
   persists: () => number;
+  parcelRows: CustodyParcelRow[];
+  persistParcelRow: (row: CustodyParcelRow) => Promise<void>;
 } {
-  let persists = 0;
+  const parcelRows: CustodyParcelRow[] = [];
   const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
   const host: WocCustodyGameHost = {
     sim,
     wocCustodySession: () => null,
-    persistMailBlob: async () => {
-      persists++;
-    },
     // Pass-through FIFO and a fixup-free persist snapshot: these tests have
     // no GameServer, so the session fixups and queue ordering are exercised
     // by tests/server/woc_market_escrow_queue.test.ts instead.
@@ -59,7 +61,14 @@ function makeHost(over: Partial<WocCustodyGameHost> = {}): {
     escrowSessionLost: () => {},
     ...over,
   };
-  return { host, persists: () => persists };
+  return {
+    host,
+    persists: () => parcelRows.length,
+    parcelRows,
+    persistParcelRow: async (row) => {
+      parcelRows.push(row);
+    },
+  };
 }
 
 function ledgerSnapshot(
@@ -80,8 +89,8 @@ const UNKNOWN: InvSlot = { itemId: 'no_such_item_id', count: 1 };
 
 describe('persistMailParcel propagates a refused parcel', () => {
   it('throws, and does NOT persist, when no offered slot survives validation', async () => {
-    const { host, persists } = makeHost();
-    const custody = createWocMarketCustody(host);
+    const { host, persists, persistParcelRow } = makeHost();
+    const custody = createWocMarketCustody(host, { persistParcelRow });
     await expect(custody.persistMailParcel(RECIPIENT, 'delivery', [UNKNOWN], REF)).rejects.toThrow(
       /refused/,
     );
@@ -92,18 +101,32 @@ describe('persistMailParcel propagates a refused parcel', () => {
   });
 
   it('names the custody ref in the error so the stuck row is findable in a log', async () => {
-    const { host } = makeHost();
-    const custody = createWocMarketCustody(host);
+    const { host, persistParcelRow } = makeHost();
+    const custody = createWocMarketCustody(host, { persistParcelRow });
     await expect(
       custody.persistMailParcel(RECIPIENT, 'delivery', [UNKNOWN], 'settlement:777'),
     ).rejects.toThrow(/settlement:777/);
   });
 
-  it('books and persists exactly once on the happy path', async () => {
-    const { host, persists } = makeHost();
-    const custody = createWocMarketCustody(host);
+  it('books and persists exactly once on the happy path, never serializing the book', async () => {
+    const { host, persists, parcelRows, persistParcelRow } = makeHost();
+    const custody = createWocMarketCustody(host, { persistParcelRow });
+    // The acceptance pin of the rewrite: booking one parcel must cost the
+    // parcel, not the book. No full serializeMail may run on this path (the
+    // old persistMailBlob stringified the whole 89 MB production book per
+    // parcel).
+    const serializeSpy = vi.spyOn(host.sim, 'serializeMail');
     await custody.persistMailParcel(RECIPIENT, 'delivery', [GOOD], REF);
+    expect(serializeSpy).not.toHaveBeenCalled();
     expect(persists()).toBe(1);
+    // The durable row carries exactly what a boot replay needs to re-book
+    // this letter through the book-once dedupe.
+    expect(parcelRows[0]).toEqual({
+      custodyRef: REF,
+      recipient: RECIPIENT,
+      letter: 'delivery',
+      items: [GOOD],
+    });
     expect(host.sim.postOffice.mail).toHaveLength(1);
     expect(host.sim.postOffice.mail[0].items.map((s) => s.itemId)).toEqual(['rusty_hatchet']);
     expect(host.sim.postOffice.mail[0].custodyRef).toBe(REF);
@@ -113,21 +136,21 @@ describe('persistMailParcel propagates a refused parcel', () => {
     // The book-once dedupe answers "already booked" as success, which must not
     // be confused with the refusal above: a retry after a crash has to be able
     // to complete rather than throwing forever.
-    const { host, persists } = makeHost();
-    const custody = createWocMarketCustody(host);
+    const { host, persists, persistParcelRow } = makeHost();
+    const custody = createWocMarketCustody(host, { persistParcelRow });
     await custody.persistMailParcel(RECIPIENT, 'delivery', [GOOD], REF);
     await custody.persistMailParcel(RECIPIENT, 'delivery', [GOOD], REF);
     expect(host.sim.postOffice.mail).toHaveLength(1);
     expect(persists()).toBe(2);
   });
 
-  it('propagates a persist failure too, so nothing advances on a dead blob write', async () => {
-    const { host } = makeHost({
-      persistMailBlob: async () => {
+  it('propagates a persist failure too, so nothing advances on a dead row write', async () => {
+    const { host } = makeHost();
+    const custody = createWocMarketCustody(host, {
+      persistParcelRow: async () => {
         throw new Error('db down');
       },
     });
-    const custody = createWocMarketCustody(host);
     await expect(custody.persistMailParcel(RECIPIENT, 'delivery', [GOOD], REF)).rejects.toThrow(
       'db down',
     );
@@ -136,8 +159,8 @@ describe('persistMailParcel propagates a refused parcel', () => {
   it('carries a goods-free notice through, which legitimately attaches nothing', async () => {
     // The sold_notice arm passes no items on purpose. "Nothing booked" must not
     // read as a refusal when nothing was offered, or every sale notice throws.
-    const { host, persists } = makeHost();
-    const custody = createWocMarketCustody(host);
+    const { host, persists, persistParcelRow } = makeHost();
+    const custody = createWocMarketCustody(host, { persistParcelRow });
     await custody.persistMailParcel(RECIPIENT, 'sold_notice', [], 'sold:9');
     expect(persists()).toBe(1);
     expect(host.sim.postOffice.mail).toHaveLength(1);

@@ -198,6 +198,8 @@ export const ko_KR: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "지갑 챌린지 제한",
   "usage.metric.walletLinkRequest": "지갑 연결 요청",
   "usage.metric.walletLinkFailure": "지갑 연결 실패",
+  "usage.metric.walletUnlinkFailure": "지갑 연결 해제 거부",
+  "usage.metric.walletUnlinkSuccess": "지갑 연결 해제 완료",
   "usage.metric.walletLinkRateLimited": "지갑 연결 제한",
   "usage.metric.cardPublishRequest": "플레이어 카드 게시 요청",
   "usage.metric.cardPublishRejected": "거부된 카드 게시",

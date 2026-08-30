@@ -354,6 +354,8 @@ export const ja_JP: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': '制限されたウォレットチャレンジ',
   'usage.metric.walletLinkRequest': 'ウォレットリンクリクエスト',
   'usage.metric.walletLinkFailure': 'ウォレットリンク失敗',
+  'usage.metric.walletUnlinkFailure': 'ウォレットリンク解除の拒否',
+  'usage.metric.walletUnlinkSuccess': 'ウォレットリンク解除の完了',
   'usage.metric.walletLinkRateLimited': '制限されたウォレットリンク',
   'usage.metric.cardPublishRequest': 'プレイヤーカード公開リクエスト',
   'usage.metric.cardPublishRejected': '拒否されたカード公開',

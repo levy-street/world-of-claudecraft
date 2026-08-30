@@ -2454,6 +2454,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Đỡ Đòn',
   'apiError.wallet.handoff_invalid':
     'Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.',
+  'apiError.wallet.reauth_required': 'Xác nhận thay đổi ví này bằng mật khẩu tài khoản của bạn.',
+  'apiError.wallet.reauth_two_factor':
+    'Tài khoản của bạn đã bật xác thực hai lớp. Nhập mã của bạn để xác nhận.',
+  'apiError.wallet.reauth_no_password':
+    'Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.',
+  'apiError.wallet.reauth_bad_signature': 'Không thể xác minh chữ ký ví. Hãy thử lại.',
+  'apiError.wallet.reauth_bad_password': 'Mật khẩu của bạn không đúng.',
+  'apiError.wallet.reauth_bad_two_factor': 'Mã đó không hợp lệ, hãy thử lại.',
   'cardDuel.close': 'Đóng',
   'cardDuel.counts': 'Bộ bài: {deck} · Thải bài: {discard}',
   'cardDuel.forfeit': 'Bỏ Cuộc',
@@ -9942,6 +9950,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Xác minh một ví khác',
   'wallet.unlink': 'Hủy liên kết',
   'wallet.unlinkAria': 'Gỡ xác minh ví khỏi tài khoản này',
+  'wallet.reauthTitle': 'Xác nhận thay đổi ví',
+  'wallet.reauthUnlinkTitle': 'Xác nhận gỡ ví',
+  'wallet.reauthHelp': 'Vì an toàn của bạn, hãy nhập mật khẩu tài khoản để cho phép thay đổi này.',
+  'wallet.reauthNoPassword':
+    'Tài khoản này đăng nhập không dùng mật khẩu. Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.',
+  'wallet.reauthConfirm': 'Xác nhận',
+  'wallet.reauthCancel': 'Hủy',
+  'wallet.reauthClose': 'Đóng',
   'wallet.unlinkFailed': 'Không thể hủy liên kết ví.',
   'wallet.unlinkTitle': 'Gỡ xác minh ví khỏi tài khoản này',
   'wallet.verify': 'Xác minh ví',

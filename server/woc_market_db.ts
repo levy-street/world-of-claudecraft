@@ -4197,6 +4197,42 @@ export class PgWocMarketDb implements WocMarketDb {
     }
   }
 
+  /** The parked-review operator arm's realm-scoped CAS. Realms share one
+   *  database, so the arm must not let realm A's process rule realm B's row
+   *  (whose own kill switch may be off); the plain transitionSettlement above
+   *  is only ever driven by this process's own realm-scoped reads. No 23505
+   *  arm: the review pair never moves a row INTO the one-open-settlement
+   *  predicate (that is the failed -> offered revival above). */
+  async transitionSettlementInRealm(
+    realm: string,
+    id: number,
+    from: WocSettlementState[],
+    to: WocSettlementState,
+    failReason?: string,
+  ): Promise<boolean> {
+    const res = await this.boundedWrite(
+      `UPDATE woc_market_settlements
+          SET state = $4, fail_reason = COALESCE($5, fail_reason), updated_at = now()
+        WHERE id = $1 AND realm = $2 AND state = ANY($3::text[])`,
+      [id, realm, from, to, failReason ?? null],
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
+  /** The arm's CAS-miss diagnosis read, realm-scoped for the same reason: a
+   *  wrong-realm id must answer not_found, never leak another realm's state. */
+  async settlementStateInRealm(
+    realm: string,
+    id: number,
+  ): Promise<{ state: WocSettlementState } | null> {
+    const res = await this.pool.query(
+      `SELECT state FROM woc_market_settlements WHERE id = $1 AND realm = $2`,
+      [id, realm],
+    );
+    const state = res.rows[0]?.state as WocSettlementState | undefined;
+    return state === undefined ? null : { state };
+  }
+
   async confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
     const res = await this.pool.query(
       `SELECT ${SETTLEMENT_COLS} FROM woc_market_settlements

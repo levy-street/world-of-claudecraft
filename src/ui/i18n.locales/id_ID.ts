@@ -2584,6 +2584,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Tangkis',
   'apiError.wallet.handoff_invalid':
     'Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi.',
+  'apiError.wallet.reauth_required': 'Konfirmasi perubahan dompet ini dengan kata sandi akun Anda.',
+  'apiError.wallet.reauth_two_factor':
+    'Akun Anda mengaktifkan autentikasi dua-faktor. Masukkan kode Anda untuk konfirmasi.',
+  'apiError.wallet.reauth_no_password':
+    'Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.',
+  'apiError.wallet.reauth_bad_signature':
+    'Tanda tangan dompet tidak dapat diverifikasi. Coba lagi.',
+  'apiError.wallet.reauth_bad_password': 'Kata sandi Anda salah.',
+  'apiError.wallet.reauth_bad_two_factor': 'Kode itu tidak valid, coba lagi.',
   'cardDuel.close': 'Tutup',
   'cardDuel.counts': 'Dek: {deck} · Buang: {discard}',
   'cardDuel.forfeit': 'Menyerah',
@@ -10037,6 +10046,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifikasi dompet yang berbeda',
   'wallet.unlink': 'Lepas Tautan',
   'wallet.unlinkAria': 'Hapus verifikasi dompet dari akun ini',
+  'wallet.reauthTitle': 'Konfirmasi perubahan dompet',
+  'wallet.reauthUnlinkTitle': 'Konfirmasi penghapusan dompet',
+  'wallet.reauthHelp':
+    'Demi keamanan Anda, masukkan kata sandi akun untuk mengizinkan perubahan ini.',
+  'wallet.reauthNoPassword':
+    'Akun ini masuk tanpa kata sandi. Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.',
+  'wallet.reauthConfirm': 'Konfirmasi',
+  'wallet.reauthCancel': 'Batal',
+  'wallet.reauthClose': 'Tutup',
   'wallet.unlinkFailed': 'Tidak dapat melepas tautan dompet.',
   'wallet.unlinkTitle': 'Hapus verifikasi dompet dari akun ini',
   'wallet.verify': 'Verifikasi Dompet',

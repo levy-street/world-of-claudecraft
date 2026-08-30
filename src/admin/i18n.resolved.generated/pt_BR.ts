@@ -198,6 +198,8 @@ export const pt_BR: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Desafios de carteira limitados",
   "usage.metric.walletLinkRequest": "Solicitações de vinculação de carteira",
   "usage.metric.walletLinkFailure": "Falhas ao vincular carteira",
+  "usage.metric.walletUnlinkFailure": "Recusas ao desvincular carteira",
+  "usage.metric.walletUnlinkSuccess": "Desvinculações de carteira concluídas",
   "usage.metric.walletLinkRateLimited": "Vinculações de carteira limitadas",
   "usage.metric.cardPublishRequest": "Solicitações de publicação de cartão do jogador",
   "usage.metric.cardPublishRejected": "Publicações de cartão rejeitadas",

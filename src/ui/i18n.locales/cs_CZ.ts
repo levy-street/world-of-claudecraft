@@ -2586,6 +2586,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Odražení',
   'apiError.wallet.handoff_invalid':
     'Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.',
+  'apiError.wallet.reauth_required': 'Potvrď tuto změnu peněženky heslem k účtu.',
+  'apiError.wallet.reauth_two_factor':
+    'Tvůj účet má zapnuté dvoufaktorové ověření. Pro potvrzení zadej svůj kód.',
+  'apiError.wallet.reauth_no_password':
+    'Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.',
+  'apiError.wallet.reauth_bad_signature': 'Podpis peněženky se nepodařilo ověřit. Zkus to znovu.',
+  'apiError.wallet.reauth_bad_password': 'Tvoje heslo není správné.',
+  'apiError.wallet.reauth_bad_two_factor': 'Tento kód není platný, zkus to znovu.',
   'cardDuel.close': 'Zavřít',
   'cardDuel.counts': 'Balíček: {deck} · Odložiště: {discard}',
   'cardDuel.forfeit': 'Vzdát se',
@@ -4313,6 +4321,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Ověřit jinou peněženku',
   'wallet.unlink': 'Odpojit od účtu',
   'wallet.unlinkAria': 'Odebrat ověření peněženky z tohoto účtu',
+  'wallet.reauthTitle': 'Potvrzení změny peněženky',
+  'wallet.reauthUnlinkTitle': 'Potvrzení odebrání peněženky',
+  'wallet.reauthHelp': 'Z bezpečnostních důvodů zadej heslo k účtu pro povolení této změny.',
+  'wallet.reauthNoPassword':
+    'Tento účet se přihlašuje bez hesla. Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.',
+  'wallet.reauthConfirm': 'Potvrdit',
+  'wallet.reauthCancel': 'Zrušit',
+  'wallet.reauthClose': 'Zavřít',
   'wallet.unlinkFailed': 'Peněženku se nepodařilo odpojit od účtu.',
   'wallet.unlinkTitle': 'Odebrat ověření peněženky z tohoto účtu',
   'wallet.verify': 'Ověřit peněženku',

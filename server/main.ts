@@ -54,8 +54,8 @@ import {
   TOP_WEALTH_HOLDERS_LIMIT,
 } from './account_wealth';
 import {
+  aggregateEscrowTotals,
   applyEscrowTotals,
-  listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
   withAccountWealthSweepLock,
@@ -296,7 +296,7 @@ import {
 } from './http_util';
 import {
   configureInternalRuntime,
-  configureInternalWocMarketReads,
+  configureInternalWocMarketOps,
   configureInternalWocMarketStuckRead,
   handleInternalApi,
 } from './internal';
@@ -311,6 +311,7 @@ import {
   readProjectStats,
 } from './leaderboard';
 import { findLiveSessionForCharacter, resolveLiveCharacterFrom } from './live_character_resolver';
+import { custodyOverlayStats, pruneMailCustodyParcelsBatch } from './mail_custody_overlay';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -2569,6 +2570,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'DELETE' && url === '/api/wallet/link') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      // R11: the unlink was the one wallet mutation with no limiter.
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleWalletUnlink(req, res, accountId);
     }
     if (req.method === 'GET' && url === '/api/wallet') {
@@ -2967,7 +2972,6 @@ const wocMarketService = new WocMarketService({
         return liveGame().sim;
       },
       wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
-      persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
         liveGame().enqueueCharacterWrite(characterId, async () => {
           // BOUNDED gate wait, and the job NEVER runs without a permit. This
@@ -3053,9 +3057,10 @@ configureWocMarketRuntime({
   readCache: wocMarketReadCache,
   authGuardDb: wocAuthGuardCache,
 });
-// The dashboard's read-only ops views. Injected here so internal.ts never
-// imports the market route module (and admin/account behind it).
-configureInternalWocMarketReads(wocMarketService);
+// The dashboard's ops surface (the Exchange reads plus the parked-review
+// resolve arm). Injected here so internal.ts never imports the market route
+// module (and admin/account behind it).
+configureInternalWocMarketOps(wocMarketService);
 // The sweep duration watchdog: mid-flight visibility for a camping pass
 // (constructed here so the ops readout below can serve it; the sweep shell
 // stamps it once constructed after listen).
@@ -3113,6 +3118,10 @@ configureInternalWocMarketStuckRead(async () => ({
   // The extract-side per-listing serialize cost (event-loop CPU): the number
   // the SAVE_IDLE bound's sizing argument rests on.
   escrowSerialize: wocEscrowSerializeStats(),
+  // The custody mail overlay: a growing pendingBake or a lastMerge with
+  // refused rows is the stuck-parcel signal an operator needs without a
+  // log grep (mail_custody_overlay.ts).
+  custodyOverlay: custodyOverlayStats(),
   // Stamp-ledger high-water crossings (the counted half of the intent-map
   // bound: the maps never shed entries, so crossings are the incident count).
   stampHighWater: wocStampHighWaterCount(),
@@ -4002,6 +4011,14 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) => pruneExpiredWocStepUpChallengesBatch(pool, n),
       },
       {
+        // $WOC custody mail overlay residue: the bake and the boot merge's
+        // stale cutoff clean every healthy row, so this entry drains only
+        // refused rows an operator never resolved and rows for realms no
+        // process serves (constant window; deliberately no env knob).
+        name: 'mail_custody_parcels',
+        pruneBatch: (n) => pruneMailCustodyParcelsBatch(n),
+      },
+      {
         // Closed, fully-disposed $WOC Exchange listings (bids + settlements
         // cascade; sales are provenance and never prune). LAST in the array on
         // purpose: a rebase auto-merge has twice spliced this entry into the
@@ -4071,7 +4088,7 @@ export async function startServer(): Promise<http.Server> {
   configureSuspicionFlagDataset(listSuspicionFlagDataset);
   const accountWealthSweep = startAccountWealthSweep({
     refreshAccountPurseTotals,
-    listEscrowStateRows,
+    aggregateEscrowTotals,
     applyEscrowTotals,
     // The sweep's queries are global, so exactly one process across all realms
     // runs a pass; losers of the advisory lock stand down until their next tick.

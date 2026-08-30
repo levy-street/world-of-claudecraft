@@ -2590,6 +2590,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parowanie',
   'apiError.wallet.handoff_invalid':
     'Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.',
+  'apiError.wallet.reauth_required': 'Potwierdź tę zmianę portfela hasłem do konta.',
+  'apiError.wallet.reauth_two_factor':
+    'Twoje konto ma włączone uwierzytelnianie dwuskładnikowe. Wpisz swój kod, aby potwierdzić.',
+  'apiError.wallet.reauth_no_password':
+    'Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.',
+  'apiError.wallet.reauth_bad_signature':
+    'Nie udało się zweryfikować podpisu portfela. Spróbuj ponownie.',
+  'apiError.wallet.reauth_bad_password': 'Twoje hasło jest nieprawidłowe.',
+  'apiError.wallet.reauth_bad_two_factor': 'Ten kod jest nieprawidłowy, spróbuj ponownie.',
   'cardDuel.close': 'Zamknij',
   'cardDuel.counts': 'Talia: {deck} · Odrzucone: {discard}',
   'cardDuel.forfeit': 'Poddaj się',
@@ -9496,6 +9505,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Zweryfikuj inny portfel',
   'wallet.unlink': 'Odepnij',
   'wallet.unlinkAria': 'Usuń weryfikację portfela z tego konta',
+  'wallet.reauthTitle': 'Potwierdź zmianę portfela',
+  'wallet.reauthUnlinkTitle': 'Potwierdź usunięcie portfela',
+  'wallet.reauthHelp':
+    'Dla Twojego bezpieczeństwa wpisz hasło do konta, aby zatwierdzić tę zmianę.',
+  'wallet.reauthNoPassword':
+    'To konto loguje się bez hasła. Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.',
+  'wallet.reauthConfirm': 'Potwierdź',
+  'wallet.reauthCancel': 'Anuluj',
+  'wallet.reauthClose': 'Zamknij',
   'wallet.unlinkFailed': 'Nie udało się odpiąć portfela.',
   'wallet.unlinkTitle': 'Usuń weryfikację portfela z tego konta',
   'wallet.verify': 'Zweryfikuj portfel',
