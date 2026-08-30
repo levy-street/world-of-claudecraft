@@ -10,7 +10,15 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import {
+  DELVE_X_MIN,
+  GATHER_NODES,
+  ITEMS,
+  QUESTS,
+  RIFT_X_MIN,
+  STATIONS,
+  YUMI_MAZE_X,
+} from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -975,6 +983,66 @@ describe('minimap corpse marker (ghost run)', () => {
       z: PZ,
     };
     expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(true);
+  });
+
+  // A corpse left in the rift band while the ghost stands in the overworld: raw
+  // corpsePos points at the displaced instance coordinate space (isRiftPos), a
+  // misleading heading for the run back. The marker redirects at the rift
+  // entrance portal ('rift_portal', still standing through the recovery grace)
+  // when one is mirrored, and draws nothing at all otherwise.
+  it('redirects the rim marker at the rift entrance portal for a rift corpse and an overworld ghost', () => {
+    const world = makeWorld('client');
+    const p = world.player as unknown as {
+      pos: { x: number; z: number };
+      ghost: boolean;
+      corpsePos: { x: number; y: number; z: number };
+    };
+    p.ghost = true;
+    p.corpsePos = { x: RIFT_X_MIN, y: 0, z: -1000 }; // far east: raw dx would be hugely negative
+    (world.entities as unknown as Map<number, unknown>).set(30, {
+      id: 30,
+      kind: 'object',
+      templateId: 'rift_portal',
+      dead: false,
+      hostile: false,
+      lootable: true,
+      aggroTargetId: null,
+      questIds: [],
+      pos: { x: p.pos.x - 100, z: p.pos.z }, // west of the ghost, past the rim
+    });
+    const corpse = buildMarkers(world).find((m) => m.kind === 'corpse');
+    expect(corpse, 'the run-back marker still draws').toBeTruthy();
+    // +X is map-left, so a portal WEST of the ghost clamps to the map-right rim
+    // (mx > centre); the raw rift corpse would have clamped to the opposite rim.
+    expect(corpse!.mx).toBeGreaterThan(S / 2);
+    expect(corpse!.my).toBeCloseTo(S / 2, 5);
+  });
+
+  it('suppresses the corpse marker for a rift corpse when no portal entity is mirrored', () => {
+    const world = makeWorld('client');
+    const p = world.player as unknown as {
+      ghost: boolean;
+      corpsePos: { x: number; y: number; z: number };
+    };
+    p.ghost = true;
+    p.corpsePos = { x: RIFT_X_MIN, y: 0, z: -1000 };
+    expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(false);
+  });
+
+  it('keeps the plain corpse marker while the ghost itself still stands in the rift band', () => {
+    const world = makeWorld('client');
+    const p = world.player as unknown as {
+      pos: { x: number; z: number };
+      ghost: boolean;
+      corpsePos: { x: number; y: number; z: number };
+    };
+    p.ghost = true;
+    p.pos = { x: RIFT_X_MIN, z: -1000 };
+    p.corpsePos = { x: RIFT_X_MIN + 3, y: 0, z: -1000 };
+    const corpse = buildMarkers(world).find((m) => m.kind === 'corpse');
+    expect(corpse, 'an in-band ghost keeps the direct body marker').toBeTruthy();
+    // The body sits 3 yd east: on-map, no rim clamp, drawn map-left of centre.
+    expect(corpse!.mx).toBeCloseTo(S / 2 - 3 * PPY, 5);
   });
 });
 

@@ -3452,6 +3452,37 @@ export const TARGETS = [
     },
   },
   {
+    key: 'rift-corpse-run-minimap',
+    label: 'Minimap: run-back marker for a ghost whose corpse lies in a rift',
+    when: ['minimap_markers'],
+    // Die inside a rift, release, and shoot the overworld minimap at the
+    // graveyard: the rim skull is the run-back marker under test (it aims at
+    // the rift entrance portal, not at the corpse's displaced band coordinate).
+    // Offline dev builds carry devCommands, so /dev portal works here.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.setPlayerLevel(20);
+        sim.chat('/dev portal 555 20', sim.player.id);
+        const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal');
+        if (!portal) return;
+        sim.enterRift(portal.riftSeed, portal.riftBaseLevel, sim.playerId, undefined, portal);
+      });
+      await wait(600);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.player.hp = 0;
+        sim.player.dead = true;
+        sim.releaseSpirit();
+      });
+      // Give the ghost teleport a tick and the ~10Hz minimap a few redraws.
+      await wait(1500);
+      return { clip: '#minimap-wrap' };
+    },
+  },
+  {
     key: 'continent-map',
     label: 'World map: continent overview (land-masked zone highlight)',
     when: ['ui/continent_', 'map_pinch_zoom_core'],

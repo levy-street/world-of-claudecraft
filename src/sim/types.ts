@@ -4744,6 +4744,15 @@ export interface Entity extends ClientMirroredEntityFields {
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).
   riftReentryGraceUntil?: number;
+  // Whether the LAST riftState event emitted for this player said active: true.
+  // Stamped only by rift/runs.ts emitRiftState (the single emit site) and read
+  // by the per-tick reconciliation sweep there (reconcileRiftStateMirrors),
+  // which emits the closing active: false once a flagged player is no longer
+  // inside any floor region of a run they are a member of. That is what keeps
+  // the online ClientWorld.riftFloor mirror in step with the offline Sim's
+  // position-derived riftFloor on every teleport out of the band (spirit
+  // release, dead Unstuck, run teardown). Session-only; never serialized.
+  riftStateActive?: boolean;
   // Locked glide heading while ice-sliding on a rift frost sheet (unit vector);
   // both 0/undefined means not sliding. The slide advances a fixed step along this
   // each tick, ignoring steering input, until a wall or the sheet edge stops it.
