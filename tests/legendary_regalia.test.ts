@@ -355,7 +355,7 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     // Prefix forms, not whole-word, wherever the live identifiers are
     // camelCase compounds: \btarget\b never matches targetId (the entity's
     // real field), \bcasting\b never matches castingAbility (the spelling
-    // three lines above the gate), and \bgovernor\b matches none of
+    // a few dozen lines above the gate), and \bgovernor\b matches none of
     // renderBudgetGovernor/autoGovernor.
     for (const banned of [
       /\bperfected\b/,
