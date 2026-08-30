@@ -22759,3 +22759,33 @@ validation above) and records the no-op the Phase 17 way unless the release
 moves again. The inventory derivation starts from the seed list as amended
 this session (the two re-derive-first anchors) and the Phase 19 table now
 carries rows 12 to 16.
+
+### The ninth v0.41.0 sync (2026-08-30, the Phase 18 sweep session's STEP 0)
+The release moved again after the eighth sync: origin/release/v0.41.0
+3e801dc925 to e6b8edb375 (2 commits, PR #3765: the shaman mass resurrection
+ancestor_return gains cooldown 300, the Chronomancy collective_reversal twin
+equality, plus its refusal-arm suite growth in
+tests/owned_class_approved_followups.test.ts). Merged clean as 8d5796808c,
+zero conflicts. Release-merge audit, all seven steps on the two-file delta:
+- Overlaps (step 2): both files are branch-owned, but the branch's own edits
+  never touched the ancestor_return or collective_reversal regions (empty
+  region grep against the merge base); the merged block carries the release's
+  cooldown 300 and the branch's surrounding text intact.
+- Legacy arms, endpoints, injected helpers (steps 3 to 5): none in the span
+  (a content-record value, a comment, a test; no routes, no signatures, no
+  vi.mock sites in the new test span).
+- Premises (step 6): state.md's only ancestor_return mention is a past sync
+  record (line ~5215), not a live premise. The R5 surface is untouched: a
+  restoration utility cooldown moves no bestEpicGearFor input, rating
+  constant, enchant, flask, Perfecting arm, or probe input; the nine
+  escalation pins stay as written.
+- Riders: src/render/renderer.ts has zero bytes in the span, so no Eastbrook
+  re-mint. The ARM 3 clean release-tip capture was discharged at the eighth
+  sync (dd0545e460) and this span touches no render, desktop, or perf
+  surface, so the anchor stays grounded; no re-capture owed.
+- Validation at 8d5796808c: tests/owned_class_approved_followups.test.ts
+  9/9 PASS; npx tsc --noEmit EXIT=0; npm run wiki:content and i18n:gen both
+  zero-diff; symbol census CENSUS_EXIT=0, RESULT: PASS (no new exported
+  name, content id, i18n key, or SimEvent in the span, so no census row
+  owed). gate_select rides the first Phase 18 unit batch on this committed
+  tree.
