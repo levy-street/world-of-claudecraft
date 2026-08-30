@@ -250,6 +250,17 @@ and Phase 11j writes masterwrought R17 to R20 into it. Reviewers: a bare packet 
 source, test, or `docs/design/` comment is a finding, not a nit.
 
 ## Power placement (the numbers every content phase authors against)
+
+AMENDED 2026-08-30 (the eighth v0.41.0 sync, release tip 3e801dc925): three
+lines below are STALE against the merged catalog and are kept as the record
+of what the phases authored against, never as live numbers: the release's
+Ignivar raid tier sits above the "below raid 33/23" line, the Perfected
+"one to two points over the raid chest per slot" lead measures -1 against
+the Crucible chest, and the legendary ceiling moved with the Thronebane
+band retune. The live placement is the maintainer's Phase 19 ruling (rows
+12 to 16, phase-19-rulings-gate.md; the eighth-sync AMENDED block in the
+Phase 15 ledger carries the measured deltas). Values below unchanged by the
+packet rule: the R5 surface is frozen until ruled.
 - Budget formula: `src/sim/item_budget.ts` `primaryStatBudget`; crafted source level =
   `recipe.level` (`src/sim/item_level.ts` bumps at the ALL_RECIPES loop).
 - Base apex: `recipe.level: 25`, quality `epic` -> ilvl 31 -> chest budget 22
@@ -21477,11 +21488,25 @@ kits item by item on both parents). The release's Crucible hit rebalance
 (release commit c920f39c85) swapped hit for crit on five of the fury
 baseline's pieces (heroic_crownforged_dreadhelm and _warspaulders 55 hit / 20
 crit to 20 / 55; gravescale_girdle, bloodmane_war_legguards and
-tideworn_warboots 40 hit to 40 crit), taking WAR_BIS from 355 hit to 165,
-UNDER the 190 heroic need, so the dead-rating mechanism section 9.6 measured
-does not exist on the merged catalog; the legendary band retune (4ed7a279b4)
-moved heart_of_the_rift (sta 14 to 18, str/agi/int 6 to 8), taking the tank
-baseline of section 9.5 from 3332 to 3532 health; the retuned references make
+tideworn_warboots 40 hit to 40 crit), taking WAR_BIS from 355 hit to 165.
+CORRECTED at the audit's verify round (2026-08-30): the SAME release commit
+also lowered the hit ramp itself, ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21] to
+[0, 2.5, 8, 14], so the merged melee needs read 130 heroic / 190 S-rift
+against the record's 190 / 260; 165 hit is therefore 35 OVER the merged
+heroic need (dead rating persists at heroic, smaller) and 25 UNDER the merged
+S-rift need (the baseline is no longer capped there), and the record's
+355-against-190 arithmetic belongs to the pre-raid catalog it was measured
+on. The same rebalance also moved the OTHER two measured baselines, so the
+item-by-item measurement covers all four kits: the rogue pair
+(heroic_nighttalon_crown and _shoulderguards 55 hit / 20 crit to 20 / 55;
+ROGUE_BIS 190 to 120 hit, 165 to 235 crit, now under both caps) and the
+caster pair (the soulflame cowl and mantle swap hit for haste; CASTER_BIS 160
+to 50 hit, 130 to 200 haste), and the caster's legendary mainhand
+heroic_deathless_heartwood was buffed (+25 Spell Power and larger primaries),
+so the caster rows' non-reproducibility has a direction on the record. The
+legendary band retune (4ed7a279b4) moved heart_of_the_rift (sta 14 to 18,
+str/agi/int 6 to 8), taking the tank baseline of section 9.5 from 3332 to
+3532 health; the retuned references make
 the apex twins forgefold_legguards and spiritweld_girdle DUPLICATE their
 reference drop's rating (crit 40 both sides) instead of complementing it; and
 the raid catalog puts a stronger incumbent in the chest slot (the R5 lead
@@ -21489,13 +21514,16 @@ tables measure -1 against the ratified cap of 2) while out-scoring every apex
 piece on bestEpicGearFor's raw-stat score (all nine classes' dev-bis loadouts
 carry ZERO flagged pieces; the flagged family is still 17). TREATMENT, per the
 packet rule that a finding contradicting a ratified row is an escalation and
-never a re-tune: SEVEN Phase 15 pins were kept byte-identical and marked
-it.fails with a MERGE-INHERITED escalation note at each
+never a re-tune: NINE pins were kept byte-identical and marked it.fails with
+a MERGE-INHERITED escalation note at each, seven from Phase 15
 (tests/r5_envelope_probe.test.ts: the section 9.6 mechanism arm and the
 section 9.5 tank table; tests/masterwrought_budget.test.ts: the two twin rows
 and the R5 lead-cap arm; tests/dev_bis_gear.test.ts: the cap sweep and the
-by-id pin), each carrying the flip-back rule (return to it() in the SAME
-commit that executes the ruling). Two adjacent re-derives that are NOT the R5
+by-id pin) and two from phase 08 the audit's re-run surfaced
+(tests/server/pbe_boost.test.ts: the flagged-cap role-kit sweep and the
+demotion-fallback arm, the boost scorer re-geared by the same catalog), each
+carrying the flip-back rule (return to it() in the SAME commit that executes
+the ruling). Two adjacent re-derives that are NOT the R5
 surface: the rogue balance identity pins (tests/rogue_dps_balance.test.ts)
 were re-anchored to the merged tree's Crucible pair (neck heartspring_amulet,
 ring2 circle_of_cinders; bands to the release's 204..220 / 167..183 /
@@ -21504,14 +21532,30 @@ JUDGED PENDING the same authority's confirmation; and the max-mitigation kit
 literal in tests/heroic_difficulty_floors.test.ts was re-pinned to the
 release's catalog (2969 to 4085 armor, 1672 to 1582 pool; named cause the
 Crucible plate; REF_ARMOR 2861 untouched, the calibration gap now over a
-thousand points, which sharpens the section 14 REF_ARMOR read). The open
-decisions are rows 12 to 15 of the Phase 19 decision table
-(phase-19-rulings-gate.md): re-measure R5 on the merged world or ratify the
-record as a measurement of the pre-raid catalog; the apex tier's placement
-against the Crucible tier; the twin complement rule against the retuned
-references; REF_ARMOR against the raid-era live kit. The four ratified
-rulings and the closure record above stand untouched; what moved is the
-CATALOG under the measurement, not any packet def or record row.
+thousand points, which sharpens the section 14 REF_ARMOR read). Three more
+records from the audit round: the release span STAGES a Crucible crafted
+tier (docs/prd/ignivar-raid-professions.md and
+src/sim/content/crucible_professions.ts, the PR 3704 fast-follow: crafted
+epics at ilvl 37 with skill-100 floors and a crafted non-masterwrought
+legendary), which contradicts the packet's crafted-ceiling premises
+prospectively (nothing red today) and is folded into row 13; the same span's
+raid-sourced epic NON-gear (the fifteen soulbound sigils, kind tool, and the
+lastflame core, kind junk) silently widened the sundering feedstock, closed
+in-repo under the code's own gear-only doctrine (isSunderable is now an
+explicit gear allowlist, pinned) with the Crucible GEAR tier's essence
+question carried as row 16; and the release's new encounterOwned aura marker
+never rides the wire (a client cannot see the removability refusal it
+implies), recorded as a maintainer read, a one-byte design call if an
+encounter ever applies one to players. The open decisions are rows 12 to 16
+of the Phase 19 decision table (phase-19-rulings-gate.md): re-measure R5 on
+the merged world (which also decides whether the Ignivar raid joins the
+protected-asset set beside heroic Nythraxis and S-rift) or ratify the record
+as a measurement of the pre-raid catalog; the apex tier's placement against
+the Crucible tier, crafted fast-follow included; the twin complement rule
+against the retuned references; REF_ARMOR against the raid-era live kit; the
+Crucible gear tier's sundering admission. The four ratified rulings and the
+closure record above stand untouched; what moved is the CATALOG under the
+measurement, not any packet def or record row.
 
 ### THE FROZEN STAMP: EXIT=0 at e611b0639d, the gate's bounded form
 Taken 2026-08-29T12:38:33Z to 12:48:32Z, one run, first try, at the phase
@@ -22477,7 +22521,9 @@ should-fix items closed in 1c265abfa6.
   eight failures are the known fill-lane arms (the empty-pending pins, the
   deed manifest rows, the admin copied-English arm, the 21-locale matcher
   arm). The fill is the maintainer's sequenced workflow; the derived set is
-  11,997 pending rows across 826 keys (main 11,367, admin 630; the five
+  11,997 pending rows across 826 keys (counts predate the eighth v0.41.0
+  sync, whose release span adds its own keys and fills; Phase 20 re-derives
+  the set from the registry at fill time) (main 11,367, admin 630; the five
   non-Latin locales M16-clean at 37 rows each) PLUS the reword-staleness
   package the ledgers flag by key (about 78 translated-but-stale rows of which
   about 24 are invisible to every gate, 11 deed-channel rows, two whole-block

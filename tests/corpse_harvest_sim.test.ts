@@ -3181,12 +3181,18 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
         id,
       ).toEqual([]);
     }
-    // The census the sweep sits in: 54 tagged templates, 181 untagged, 0
+    // The census the sweep sits in: 54 tagged templates, 188 untagged, 0
     // mixed after the 11m spread (six templates tagged for the first time)
-    // and mapping.
+    // and mapping. Re-derived 181 -> 188 at the eighth v0.41.0 sync
+    // (2026-08-30): the Ignivar raid span adds seven untagged templates
+    // (derelict_mech, ignivar_cinder_artificer, ignivar_crucible_warden,
+    // ignivar_ember_sentinel, ignivar_heart_of_the_end,
+    // ignivar_herald_of_the_last_flame,
+    // varkhul_forgefather_of_the_last_flame), measured by a MOBS-key diff of
+    // the two merge parents; no tagged template moved.
     const tagged = Object.values(MOBS).filter((m) => (m.componentTags?.length ?? 0) > 0);
     expect(tagged).toHaveLength(54);
-    expect(Object.keys(MOBS).length - tagged.length).toBe(181);
+    expect(Object.keys(MOBS).length - tagged.length).toBe(188);
     // The sweep itself, over the two mixed widths retagged onto real
     // templates: the three-tag sethrael shape (one trap among three boxes)
     // and the two-tag murloc shape (one box is the whole refusal).

@@ -206,9 +206,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   loot roll; the rift arm is draw-free.
 - `sundering.ts`: the Sundered Essence extraction (`extractEssence` /
   `completeSunderCast`): a SUNDER_CAST_ID cast on the enchant-family session
-  seam, raid-sourced epics only (`isSunderable` over the item_level source
-  index), deterministic 1:1 yield, the disenchant-style pinned-slot re-check
-  at completion; draws NO rng.
+  seam, raid-sourced GEAR epics only (`isSunderable` over the item_level
+  source index PLUS the explicit gear-kind allowlist added at the eighth
+  v0.41.0 sync, when the Ignivar span's raid-sourced epic non-gear, sigils
+  and the staged core, would otherwise have widened the feedstock),
+  deterministic 1:1 yield, the disenchant-style pinned-slot re-check at
+  completion; draws NO rng.
 - `tools.ts` / `stations.ts` / `focus.ts`: pure-leaf gates and bonuses
   (gather-tool tier, per-type crafting stations (superseding the retired
   level-20 hub), town focus allocation). Tool effects in `tools.ts` are LIVE

@@ -105,6 +105,32 @@ the item-swap arm's piece-choice rule and its unmeasured class-free mail
 alternates, `spiritweld_girdle` and `wardspeaker_sabatons`) is preserved in
 state.md's "WHAT THE MAINTAINER OWNS" mirror and this file's git history.
 
+HISTORY, second entry (2026-08-30, the eighth v0.41.0 sync, release tip
+3e801dc925, merge 4f72218ed4): THE CATALOG MOVED UNDER THIS RECORD, the first
+sync where it did. The release's Crucible hit rebalance (c920f39c85) swapped
+hit for crit or haste on pieces of every measured baseline kit (fury: the
+crownforged pair plus gravescale_girdle, bloodmane_war_legguards and
+tideworn_warboots, WAR_BIS 355 to 165 hit; rogue: the nighttalon pair,
+ROGUE_BIS 190 to 120 hit; caster: the soulflame pair, CASTER_BIS 160 to 50
+hit) AND lowered the hit ramp itself (ABOVE_LEVEL_MISS_PCT [0, 2.5, 14, 21]
+to [0, 2.5, 8, 14], so the merged melee needs read 130 heroic / 190 S-rift
+against this record's 190 / 260); the legendary band retune (4ed7a279b4)
+moved heart_of_the_rift and the section 9.5 tank baseline from 3332 to 3532
+health and buffed the caster's legendary mainhand; and the raid catalog's
+incumbents put the section 8 apex chest lead at -1 against the ratified cap
+of 2 while displacing every apex piece from bestEpicGearFor's picks. NOTHING
+IN THIS RECORD WAS REWRITTEN: its figures are the measurement of the
+pre-raid catalog they were taken on, the nine contradicted pins across
+tests/r5_envelope_probe.test.ts, tests/masterwrought_budget.test.ts,
+tests/dev_bis_gear.test.ts and tests/server/pbe_boost.test.ts are kept
+byte-identical under it.fails with escalation notes, and the maintainer's
+ruling is Phase 19 decision table rows 12 to 16
+(docs/prd/masterwrought/phase-19-rulings-gate.md): re-measure R5 on the
+merged world (which would also decide whether the new raid joins the
+protected-asset set beside heroic Nythraxis and S-rift) or ratify this
+record as the pre-raid measurement; the eighth-sync AMENDED block in
+state.md's Phase 15 ledger carries the item-by-item deltas.
+
 ## 1. What R5 measures, and what it does not
 
 **The geared INDIVIDUAL at full food uptime, never the raid aggregate**

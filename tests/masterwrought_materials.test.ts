@@ -837,6 +837,43 @@ describe('sundered essence: the extraction', () => {
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
   });
 
+  it('the eighth-sync gear allowlist: raid-sourced epic non-gear never sunders', () => {
+    // AMENDED at the eighth v0.41.0 sync (2026-08-30): the Ignivar span added
+    // raid-sourced epic NON-gear the old recipe-kind denylist could not see
+    // (the soulbound sigils, kind 'tool', and the lastflame core, kind
+    // 'junk'), so isSunderable is now an explicit GEAR allowlist. Premises
+    // pinned per id so no arm can go vacuous: each is epic AND raid-sourced,
+    // so only the allowlist clause refuses it.
+    for (const id of ['sigil_anvil_helmet', 'lastflame_core'] as const) {
+      expect(ITEMS[id].quality, id).toBe('epic');
+      expect(itemFromRaid(id), `premise: ${id} is raid-sourced`).toBe(true);
+      expect(isSunderable(ITEMS[id]), id).toBe(false);
+    }
+    expect(ITEMS.sigil_anvil_helmet.kind).toBe('tool');
+    expect(ITEMS.lastflame_core.kind).toBe('junk');
+    // A Crucible GEAR epic stays admitted: the allowlist changes nothing for
+    // gear, and whether the Crucible gear tier should feed essence at all is
+    // the maintainer's (Phase 19 decision table row 16).
+    expect(ITEMS.grovespring_helmet.kind).toBe('armor');
+    expect(isSunderable(ITEMS.grovespring_helmet)).toBe(true);
+    // The whole-catalog sweep: every sunderable id is gear, no exceptions,
+    // and the sweep really measured a populated set (non-vacuity floor).
+    const gearKinds = new Set(['weapon', 'armor', 'held_offhand']);
+    const sunderable = Object.values(ITEMS).filter((d) => isSunderable(d));
+    expect(sunderable.filter((d) => !gearKinds.has(d.kind)).map((d) => d.id)).toEqual([]);
+    expect(sunderable.length).toBeGreaterThan(20);
+    // The real cast path refuses a held sigil with the one refusal line.
+    const sim = makeSunderSim();
+    const { pid } = playerOf(sim);
+    sim.addItem('sigil_anvil_helmet', 1, pid);
+    sim.drainEvents();
+    runSunder(sim, 'sigil_anvil_helmet');
+    const errors = (sim.drainEvents() as any[]).filter((e) => e.type === 'error');
+    expect(errors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
+    expect(sim.countItem('sigil_anvil_helmet', pid)).toBe(1);
+    expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
+  });
+
   it('refuses while busy and while dead', () => {
     const sim = makeSunderSim();
     const { p, pid } = playerOf(sim);

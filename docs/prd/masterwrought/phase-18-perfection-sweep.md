@@ -82,7 +82,9 @@ without a citation):
   and server/pbe_boost.ts) join the unleased fence with real-Postgres arms; the nonce
   fence's missing expiry term is a DECISION (Phase 19), not this phase's.
 - The pbe_boost scorer hands a protection tank a caster belt (spiritweld_girdle): fix the
-  scorer, pin it. The trade-layer substitution class (Phase 12 QA read: fix home = the
+  scorer, pin it. (AMENDED 2026-08-30, the eighth v0.41.0 sync: re-derive the offender on
+  the MERGED catalog first; the Crucible items re-geared every bestEpicGearFor consumer,
+  so the belt pick, and possibly the whole defect, moved under the merge.) The trade-layer substitution class (Phase 12 QA read: fix home = the
   trade layer): implement and pin.
 - Frontend: the two bare-named modal painters (legendary_naming_dialog.ts,
   input_dialog.ts) join the painter gate (the *_controller suffix the gate already sweeps,
@@ -94,7 +96,9 @@ without a citation):
 - Tests and tooling: the mobile E2E tooling repair (mobile_visual.mjs's retired
   #mobile-more click; the overlap audit's 13 strict violations, judged against the live
   layout rather than tolerated); the druid balance harness re-pin (drifted 12 percent,
-  never re-pinned); the vendor_floor tercile arm made honest (a live-derived endpoint or a
+  never re-pinned; AMENDED 2026-08-30: re-measure the drift on the MERGED catalog first,
+  the eighth sync re-geared its fixture the same way it did every bestEpicGearFor
+  consumer); the vendor_floor tercile arm made honest (a live-derived endpoint or a
   relabel); the census adopts the fanout-helper alternative (announceZoneCelebration
   named in SIM_EVENT_FANOUT_HELPERS, restoring extractor visibility, the three union-only
   pins and the two simevent-emit deletion rows retired in the same change, mutation guard

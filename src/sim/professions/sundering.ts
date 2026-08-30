@@ -40,15 +40,30 @@ import { SUNDERED_ESSENCE_ITEM_ID } from './masterwrought_materials';
 // RS3 trimmed-masterwork model this stage follows is a 1:1 sink).
 export const SUNDERED_ESSENCE_YIELD = 1;
 
-/** The one eligibility rule: an epic whose source index says a raid encounter
- *  drops it. Rift legendaries and heroic five-man epics are excluded by the
- *  index itself (itemFromRaid), vendor and crafted epics never enter it.
- *  Pattern items are excluded by KIND (phase 11): the raid pattern drops are
- *  epic and raid-sourced, so without this guard a player could grind a
- *  chase pattern into one essence, a pure foot-gun; classic-era disenchanting
- *  never took recipes, only gear, and sundering follows that line. */
+/** The one eligibility rule: a GEAR epic whose source index says a raid
+ *  encounter drops it. Rift legendaries and heroic five-man epics are excluded
+ *  by the index itself (itemFromRaid), vendor and crafted epics never enter it.
+ *  Pattern items were excluded by a recipe-kind denylist at phase 11 (the raid
+ *  pattern drops are epic and raid-sourced, so without a kind guard a player
+ *  could grind a chase pattern into one essence, a pure foot-gun); AMENDED at
+ *  the eighth v0.41.0 sync (2026-08-30): the Ignivar span added raid-sourced
+ *  epic NON-gear the denylist could not see (the fifteen soulbound sigils,
+ *  kind 'tool', and the lastflame core, kind 'junk'), so the guard is now the
+ *  explicit GEAR allowlist the doctrine always meant: classic-era
+ *  disenchanting never took recipes, tokens, or materials, only gear, and
+ *  sundering follows that line. Whether the Crucible GEAR epics should feed
+ *  essence at all (the tier scope of R1's "of the tier") is the maintainer's
+ *  call, Phase 19 decision table row 16; until ruled they remain admitted the
+ *  way every raid gear epic is. */
+const SUNDERABLE_GEAR_KINDS: ReadonlySet<ItemDef['kind']> = new Set([
+  'weapon',
+  'armor',
+  'held_offhand',
+]);
 export function isSunderable(def: ItemDef | undefined): boolean {
-  return !!def && def.quality === 'epic' && def.kind !== 'recipe' && itemFromRaid(def.id);
+  return (
+    !!def && def.quality === 'epic' && SUNDERABLE_GEAR_KINDS.has(def.kind) && itemFromRaid(def.id)
+  );
 }
 
 /** Shared admission for the start AND the completion re-validation: emits the
