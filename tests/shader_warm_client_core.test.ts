@@ -157,7 +157,9 @@ describe('shaderWarmModeFor', () => {
     // stand-in beats a frozen frame (settled 2026-08-28).
     expect(shaderWarmModeFor('auto', 'd3d11')).toBe('all');
     expect(shaderWarmModeFor('auto', 'vulkan')).toBe('off');
-    expect(shaderWarmModeFor('auto', 'metal')).toBe('all');
+    // Metal: the Vulkan profile on its one datapoint (11 ms cold) and no
+    // in-game measurement; the explicit arm is how it gets one.
+    expect(shaderWarmModeFor('auto', 'metal')).toBe('off');
     expect(shaderWarmModeFor('auto', 'opengl')).toBe('off');
     expect(shaderWarmModeFor('auto', 'software')).toBe('off');
     expect(shaderWarmModeFor('auto', 'unknown')).toBe('off');
@@ -177,7 +179,8 @@ describe('shaderWarmModeFor', () => {
     expect(shaderWarmModeFor('all', 'metal', 'ios')).toBe('off');
     expect(shaderWarmModeFor('reveal', 'metal', 'ios')).toBe('off');
     expect(shaderWarmModeFor('auto', 'metal', 'ios')).toBe('off');
-    expect(shaderWarmModeFor('auto', 'metal', 'other')).toBe('all');
+    expect(shaderWarmModeFor('all', 'metal', 'other')).toBe('all');
+    expect(shaderWarmModeFor('auto', 'd3d11', 'other')).toBe('all');
   });
 });
 

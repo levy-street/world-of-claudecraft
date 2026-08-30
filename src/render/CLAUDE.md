@@ -645,7 +645,9 @@ GPU work signs. Each rule names its seam and its guard.
   `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
   backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
   is `all` where the compile runs off the presenting thread AND there is something to
-  warm (D3D11, Metal: `WORKER_WORTH_BACKENDS`), `off` on every OpenGL and GLES class,
+  warm AND that was measured (D3D11 only: `WORKER_WORTH_BACKENDS`; Metal reads like
+  Vulkan on its one datapoint and has no in-game measurement, so it stays out until the
+  explicit setting produces one), `off` on every OpenGL and GLES class,
   where the worker only relocates the stall into the GPU process (measured 2026-08-28
   on Linux NVIDIA, Linux Intel and Android Mali), and `off` on Vulkan, where a cold
   link is already as cheap as a hit and the first draw is free while the worker's own

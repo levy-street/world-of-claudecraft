@@ -136,12 +136,13 @@ export type ShaderWarmPlatform = 'ios' | 'android' | 'other';
 
 /** `auto` resolves once the backend is known: the worker holds links (the
  *  live view included) only where the backend compiles off the presenting
- *  thread AND has something to warm (D3D11, Metal; measured 2026-08-28 and
- *  2026-08-30). On ANGLE's OpenGL backends (Linux and Android Chrome) the
- *  worker only relocates the stall into the GPU process, and on Vulkan a
- *  cold link is already as cheap as a hit while the worker's own links cost
- *  three to six times more, so `auto` is OFF on both, and OFF while the
- *  backend is still unknown. iOS is OFF whatever the setting: the explicit arm exists to
+ *  thread AND has something to warm AND that was measured (D3D11; measured
+ *  2026-08-28 and 2026-08-30). On ANGLE's OpenGL backends (Linux and
+ *  Android Chrome) the worker only relocates the stall into the GPU process,
+ *  on Vulkan a cold link is already as cheap as a hit while the worker's own
+ *  links cost three to six times more, and Metal reads like Vulkan on its
+ *  one datapoint (11 ms cold) with no in-game measurement, so `auto` is OFF
+ *  on all three, and OFF while the backend is still unknown. iOS is OFF whatever the setting: the explicit arm exists to
  *  measure a backend, never to mint a second context on a phone-class
  *  WebKit; Android keeps the explicit arm (its GLES class already reads
  *  OFF under auto). */
