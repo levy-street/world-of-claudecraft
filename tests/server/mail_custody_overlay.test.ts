@@ -453,11 +453,16 @@ describe('bake and merge wiring order', () => {
     const firstAwaitAt = body.indexOf('await ');
     const deleteAt = body.indexOf('deleteBakedCustodyRefsIn(');
     const advanceAt = body.indexOf('advanceCustodyWatermarkIn(');
-    const commitAt = body.indexOf("await client.query('COMMIT')");
+    // The FENCED wrapper's commit, not a bare client.query('COMMIT'): beginSaveTx
+    // installs the statement/lock timeouts and the abort-driven pg_cancel_backend
+    // that a raw client bypasses, so this leave path must commit through it.
+    const commitAt = body.indexOf('await transaction.commit()');
     const confirmAt = body.indexOf('confirmBakedCustodyRefs(');
     for (const at of [snapshotAt, firstAwaitAt, deleteAt, advanceAt, commitAt, confirmAt]) {
       expect(at).toBeGreaterThan(-1);
     }
+    // The bare form must not come back here: it would silently drop the fence.
+    expect(body).not.toContain("client.query('COMMIT')");
     // Snapshot at entry, before the first await; the DELETE and the advance
     // inside the transaction; the confirm on the committed arm only, so
     // neither the fence-refused false arm nor a rollback can forget a
