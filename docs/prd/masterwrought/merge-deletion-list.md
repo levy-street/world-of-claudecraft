@@ -1217,6 +1217,18 @@ extras check exists to catch) and is reported to the operator instead.
 | simEventUnion | `legendaryForgedZone` | 13 | branch commit ffd5b5843b (feat(sim): orange promotion consuming the Deed of Making), the Phase 13 ledger | The final Perfecting act: a Perfected apex copy plus one Deed of Making plus a valid player-chosen name promotes to legendary presentation only (R3): rolled.quality override, payload.name, signer retained, stats byte-... (src/sim/types.ts) |
 | simEventEmits | `legendaryForged` | 13 | branch commit ffd5b5843b (feat(sim): orange promotion consuming the Deed of Making), the Phase 13 ledger | The final Perfecting act: a Perfected apex copy plus one Deed of Making plus a valid player-chosen name promotes to legendary presentation only (R3): rolled.quality override, payload.name, signer retained, stats byte-... (src/sim/professions/perfecting.ts) |
 
+## Explained extras (2026-08-30, the Phase 17 delivery-gate fix round)
+
+Names authored AFTER the reconciliation section above, by the Phase 17 fix commits
+themselves; from here on every fix round that authors a new name appends its rows in
+the same change (the doc tables are consumed, so the census fails until it does).
+
+| Class | Name | Phase | Ruling | Reason |
+|---|---|---|---|---|
+| exports | `recordCharacterBlobBytes` | 17 | branch commit 80760030c3 (fix(server): blob high-water gauge, deferred size warn, offline realm fence); the Phase 17 database and security review closes | the save chokepoint's byte-measure recorder feeding the new monotonic gauge (server/character_blob_size.ts) |
+| exports | `characterBlobBytesHighWater` | 17 | branch commit 80760030c3 (fix(server): blob high-water gauge, deferred size warn, offline realm fence); the Phase 17 database and security review closes | the high-water read the metrics endpoint scrapes (server/character_blob_size.ts) |
+| exports | `WOC_CHARACTER_STATE_BYTES_MAX` | 17 | branch commit 80760030c3 (fix(server): blob high-water gauge, deferred size warn, offline realm fence); the Phase 17 database and security review closes | the gauge's metric-name constant, woc_character_state_bytes_max (server/http/game_metrics.ts) |
+
 ## Literal-only records (not symbols in any census class; kept for the reader)
 
 | Class | Old name | New name | Phase | Ruling | Reason |
