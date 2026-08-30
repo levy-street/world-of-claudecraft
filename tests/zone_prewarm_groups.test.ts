@@ -272,18 +272,32 @@ describe('the untyped host seam stays welded to the renderer', () => {
   // rename of a consumed member, or logic growing inside the wrapper the
   // builders bypass, reds here instead of throwing at runtime during zone
   // prepare.
+  // Comments stripped before scanning (the architecture-test rule): a comment
+  // spelling an anchor must never satisfy the weld after the member is gone.
   const renderer = readFileSync(
     fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
     'utf8',
-  );
+  )
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  it('renderer.ts still declares every member the host cast consumes', () => {
+  it('renderer.ts still declares every member the host cast consumes, full signature', () => {
+    // FULL signatures, not name prefixes (the Phase 16 QA): the cast is
+    // untyped, so a parameter inserted, reordered, retyped, or a Set field
+    // renamed by suffix (prewarmedMobTemplatesByZone) would keep a bare-name
+    // anchor green and break at runtime during zone prepare. Anchoring the
+    // whole declaration makes any signature drift red here first; on a red,
+    // update ZonePrewarmGroupHost + the builders + these anchors together.
     for (const anchor of [
-      'private prewarmEntity(',
-      'private storePooledObject(',
-      'private templateIdsInZone(',
-      'private prewarmedMobTemplates',
-      'private prewarmedNpcModels',
+      "private prewarmEntity(\n    kind: 'player' | 'mob' | 'npc',\n" +
+        '    templateId: string,\n    color: number,\n    scale: number,\n' +
+        '    skin = 0,\n    id = -10_000,\n  ): Entity {',
+      'private storePooledObject(key: string, object: PooledObjectView): void {',
+      "private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {",
+      'private prewarmedMobTemplates = new Set<string>();',
+      'private prewarmedNpcModels = new Set<string>();',
+      // the host's `sim.player.pos` read: the renderer's sim field must stand
+      'private sim: IWorld,',
     ]) {
       expect(
         renderer,
@@ -299,11 +313,16 @@ describe('the untyped host seam stays welded to the renderer', () => {
     // bare delegation (comments stripped by slicing to the return statement).
     const at = renderer.indexOf('private visualPoolKeyFor(');
     expect(at, 'visualPoolKeyFor removed: re-point the builders or this pin').toBeGreaterThan(-1);
-    const body = renderer.slice(at, renderer.indexOf('}', at) + 1);
+    // Slice from the OPEN BRACE, not by filtering 'private'-prefixed lines
+    // (the Phase 16 QA): a statement written ON the signature line would be
+    // dropped by a prefix filter and the wrapper could diverge invisibly.
+    const openAt = renderer.indexOf('{', at);
+    expect(openAt, 'visualPoolKeyFor has no body').toBeGreaterThan(at);
+    const body = renderer.slice(openAt + 1, renderer.indexOf('}', openAt));
     const statements = body
       .split('\n')
       .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith('//') && !l.startsWith('private') && l !== '}');
+      .filter((l) => l && !l.startsWith('//'));
     expect(
       statements,
       'logic grew inside the wrapper: mirror it in zone_prewarm_groups.ts',

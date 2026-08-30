@@ -162,4 +162,24 @@ describe('Market Metrics page', () => {
     await screen.findByText('Wyrmfall Core');
     expect(screen.getByText(t('marketMetrics.autoRefresh', { seconds: 30 }))).toBeInTheDocument();
   });
+
+  it('auto-refresh refetches on the 30 s interval and the toggle-off cancels it', async () => {
+    // The interval itself, driven (the Phase 16 QA): the label-only case
+    // above stays green with the setInterval or the toggle wiring deleted.
+    vi.useFakeTimers();
+    try {
+      render(MarketMetrics);
+      await vi.advanceTimersByTimeAsync(0); // flush the mount fetch
+      expect(apiGetMock).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(apiGetMock).toHaveBeenCalledTimes(2);
+      const toggle = screen.getByRole('checkbox') as HTMLInputElement;
+      expect(toggle.checked).toBe(true);
+      toggle.click();
+      await vi.advanceTimersByTimeAsync(90_000); // three would-be intervals
+      expect(apiGetMock, 'the cancelled interval refetched').toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

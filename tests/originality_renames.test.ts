@@ -52,8 +52,10 @@ describe('originality-sweep display literals stay renamed', () => {
     // values that wrap onto the next line included).
     const overlaysRoot = fileURLToPath(new URL('../src/ui/i18n.locales', import.meta.url));
     let scanned = 0;
+    let present = 0;
     for (const { file, full } of tsFilesUnder(overlaysRoot)) {
       const source = readFileSync(full, 'utf8');
+      present += (source.match(/["']hudChrome\.enchantName\./g) ?? []).length;
       const rows = source.matchAll(
         /'hudChrome\.enchantName\.[^']+':\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/g,
       );
@@ -67,13 +69,17 @@ describe('originality-sweep display literals stay renamed', () => {
         // refill in one of these dresses reds here; a wholly new dress is
         // the release fill reviewer's to catch.
         expect(row[1] ?? row[2], `${file}: ${row[0]}`).not.toMatch(
-          /^(Enchant|Encantar|Enchanter|Enchantement|Verzauber|Verzaubern|Verzauberung|Incanta|Betover|Zakl|Ocarov|Očarov|Fortroll|Förtroll|Fortryl|Buyule|Büyüle|Sihir|Phu phép|Phù phép)\s?/i,
+          /^(Enchant|Encantar|Enchanter|Enchantement|Verzauber|Verzaubern|Verzauberung|Incanta|Betover|Zakl|Ocarov|Očarov|Fortroll|Förtroll|Fortryl|Buyule|Büyüle|Sihir|Phu phep|Phu phép|Phù phép)\s?/i,
         );
       }
     }
-    // Vacuity floor: the five shipped non-Latin fills alone carry 46 scheme
-    // rows plus the infusion row each, so an emptied scrape cannot pass.
-    expect(scanned).toBeGreaterThanOrEqual(5 * 46);
+    // Every present row must be CONSUMED by the row regex (the Phase 16 QA):
+    // a row rewritten with a double-quoted key or a template-literal value
+    // would leave the scan silently, so scanned is held equal to the looser
+    // occurrence count, and the floor sits at the real total (five shipped
+    // non-Latin fills at 46 scheme rows plus the infusion row each, 235).
+    expect(scanned, 'a hudChrome.enchantName row escaped the row regex').toBe(present);
+    expect(scanned).toBeGreaterThanOrEqual(5 * 47);
   });
 
   it('pins the renamed quest, deed, and tool-effect names', () => {

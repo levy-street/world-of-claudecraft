@@ -1394,7 +1394,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // literal harvested today is a server_i18n matcher row, so with those shapes
   // scanned the NEXT literal added to that file in its own idiom fails here
   // instead of shipping English to every locale.
-  const serverSrc = ['server/game.ts', 'server/social.ts']
+  // activity_detect.ts joined the corpus with Phase 16's extraction: today it
+  // holds zero player-facing literals (cards and daily-reward observers), but
+  // it drains per-event at the tick tail, exactly where an emit is plausible,
+  // and the corpus is hand-curated, so it rides along from day one.
+  const serverSrc = ['server/game.ts', 'server/social.ts', 'server/activity_detect.ts']
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
 

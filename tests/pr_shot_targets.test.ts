@@ -684,7 +684,13 @@ describe('classifyDiff', () => {
     // comparison exception to the standing lowest-preset rule; the rationale
     // lives on the target and the seedMediumGraphicsPreset helper).
     expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
-    expect(target?.variants.every((v: { beforeLoad?: unknown }) => !!v.beforeLoad)).toBe(true);
+    // Pin the seed IDENTITY, not just presence (the Phase 16 QA): the
+    // load-bearing property is WHICH seed. A truthy-only check would stay
+    // green if a variant swapped to the lowest-preset seed, and the capture
+    // would silently lose the medium-gated treatment (an empty frame).
+    expect(
+      target?.variants.map((v: { beforeLoad?: { name?: string } }) => v.beforeLoad?.name),
+    ).toEqual(['seedMediumGraphicsPreset', 'seedMediumGraphicsPreset']);
     // The mobile arm must keep its Android UA override: the runner's default
     // iPhone UA lands the iOS memory profile, whose Lambert material tier
     // never applies the day/night grade, and the evening staging is

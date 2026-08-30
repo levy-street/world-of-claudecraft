@@ -776,6 +776,9 @@ describe('significant-activity cards', () => {
     expect(msg.embeds[0].description).toContain('golden harvest of Vale Wheat');
     expect(msg.embeds[0].description).toContain('<@111>');
     expect(msg.embeds[0].color).toBe(0xf5c242);
+    // The kind-to-author mapping, fully asserted (the Phase 16 QA): a reworded
+    // author line would otherwise pass with only title/description sampled.
+    expect(msg.embeds[0].author?.name).toBe(':ear_of_rice: Golden Harvest');
   });
 
   // Same empty-embed class, one layer in: an item name the server sends as an
