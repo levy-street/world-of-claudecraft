@@ -217,8 +217,14 @@ describe('the Highwatch practice row', () => {
     // bestEpicGearFor, so any new epic entering a slot moves them. Pinned here
     // so the move reds with a named cause and a reviewer decides whether the
     // reference player body should have changed.
-    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1712);
-    expect(vitals.armor, 'and its armor').toBe(2941);
+    // Re-pinned at the eighth v0.41.0 sync (2026-08-30), the named cause the
+    // comment above demands: the release's Crucible raid catalog re-geared
+    // bestEpicGearFor (every slot's raw-stat winner is now a raid piece), so
+    // the SHIPPED friendly dummy's body moved with the live catalog. The
+    // maintainer's Phase 19 rows 12 and 13 (apex versus the Crucible tier)
+    // may re-gear it again; re-pin with that ruling's commit if so.
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1232);
+    expect(vitals.armor, 'and its armor').toBe(3265);
     // A player-sized pool, not the practice targets near-immortal one: heals
     // have to read as a real fraction of the bar.
     expect(d.maxHp).toBeGreaterThan(1000);

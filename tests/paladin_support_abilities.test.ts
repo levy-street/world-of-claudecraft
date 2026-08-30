@@ -78,6 +78,15 @@ function aura(
   };
 }
 
+// The foreign-Paladin fixture id, NEGATIVE by design (2026-08-30, the eighth
+// v0.41.0 sync): the entity allocator hands out ascending positive ids seeded
+// by how many world entities spawn before the player, and the merged world's
+// Ignivar span moved the primary player's own entity id to exactly 999, the
+// literal this suite had used as its "foreign paladin" source, silently
+// turning every foreign-aura fixture into a self-aura (four arms inverted at
+// once). No allocator can mint a negative id, so this can never collide again.
+const FOREIGN_PALADIN_SOURCE_ID = -999;
+
 describe('Paladin support abilities', () => {
   it('applies Guardian Covenant to both a targeted ally and the Retribution paladin', () => {
     const sim = new Sim({ seed: 159, playerClass: 'paladin', autoEquip: true });
@@ -442,12 +451,12 @@ describe('Paladin support abilities', () => {
     run(sim, null, resolve(sim, 'dawn_devotion'));
     run(sim, null, resolve(sim, 'grace_devotion'));
     run(sim, null, resolve(sim, 'devotion_ward'));
-    sim.player.auras.push(aura('dawn_devotion', 'buff_ap', 999, 40));
+    sim.player.auras.push(aura('dawn_devotion', 'buff_ap', FOREIGN_PALADIN_SOURCE_ID, 40));
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
         expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
-        expect.objectContaining({ id: 'dawn_devotion', sourceId: 999 }),
+        expect.objectContaining({ id: 'dawn_devotion', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
       ]),
     );
     expect(sim.player.auras).not.toContainEqual(
@@ -463,7 +472,7 @@ describe('Paladin support abilities', () => {
       expect.objectContaining({ id: 'grace_devotion', sourceId: sim.player.id }),
     );
     expect(sim.player.auras).toContainEqual(
-      expect.objectContaining({ id: 'dawn_devotion', sourceId: 999 }),
+      expect.objectContaining({ id: 'dawn_devotion', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
     );
   });
 
@@ -575,15 +584,15 @@ describe('Paladin support abilities', () => {
     expect(ally.auras).toContainEqual(
       expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
     );
-    ally.auras.push(aura('devotion_ward', 'buff_dr', 999, 0.05));
-    sim.player.auras.push(aura('devotion_ward', 'buff_dr', 999, 0.05));
+    ally.auras.push(aura('devotion_ward', 'buff_dr', FOREIGN_PALADIN_SOURCE_ID, 0.05));
+    sim.player.auras.push(aura('devotion_ward', 'buff_dr', FOREIGN_PALADIN_SOURCE_ID, 0.05));
 
     run(sim, null, resolve(sim, 'retribution_aura'));
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ id: 'retribution_aura', sourceId: sim.player.id }),
     );
     expect(sim.player.auras).toContainEqual(
-      expect.objectContaining({ id: 'devotion_ward', sourceId: 999 }),
+      expect.objectContaining({ id: 'devotion_ward', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
     );
     expect(ally.auras).not.toContainEqual(
       expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
@@ -592,7 +601,7 @@ describe('Paladin support abilities', () => {
       expect.objectContaining({ id: 'retribution_aura', sourceId: sim.player.id }),
     );
     expect(ally.auras).toContainEqual(
-      expect.objectContaining({ id: 'devotion_ward', sourceId: 999 }),
+      expect.objectContaining({ id: 'devotion_ward', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
     );
 
     run(sim, null, resolve(sim, 'devotion_ward'));
@@ -612,7 +621,7 @@ describe('Paladin support abilities', () => {
     if (!ally) throw new Error('missing aura survivor');
 
     run(sim, null, resolve(sim, 'devotion_ward'));
-    ally.auras.push(aura('devotion_ward', 'buff_dr', 999, 0.05));
+    ally.auras.push(aura('devotion_ward', 'buff_dr', FOREIGN_PALADIN_SOURCE_ID, 0.05));
     expect(ally.auras).toContainEqual(
       expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id, permanent: true }),
     );
@@ -636,7 +645,7 @@ describe('Paladin support abilities', () => {
       expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
     );
     expect(ally.auras).toContainEqual(
-      expect.objectContaining({ id: 'devotion_ward', sourceId: 999 }),
+      expect.objectContaining({ id: 'devotion_ward', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
     );
   });
 
@@ -669,8 +678,8 @@ describe('Paladin support abilities', () => {
     if (!ally) throw new Error('missing aura cancel ally');
 
     run(sim, null, resolve(sim, 'devotion_ward'));
-    sim.player.auras.unshift(aura('devotion_ward', 'buff_dr', 999, 0.05));
-    ally.auras.push(aura('devotion_ward', 'buff_dr', 999, 0.05));
+    sim.player.auras.unshift(aura('devotion_ward', 'buff_dr', FOREIGN_PALADIN_SOURCE_ID, 0.05));
+    ally.auras.push(aura('devotion_ward', 'buff_dr', FOREIGN_PALADIN_SOURCE_ID, 0.05));
 
     sim.cancelAura('devotion_ward');
 
@@ -679,7 +688,7 @@ describe('Paladin support abilities', () => {
         expect.objectContaining({ id: 'devotion_ward', sourceId: sim.player.id }),
       );
       expect(entity.auras).toContainEqual(
-        expect.objectContaining({ id: 'devotion_ward', sourceId: 999 }),
+        expect.objectContaining({ id: 'devotion_ward', sourceId: FOREIGN_PALADIN_SOURCE_ID }),
       );
     }
   });

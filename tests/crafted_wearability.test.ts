@@ -163,7 +163,12 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
         gated.has(d.quality ?? 'common') &&
         (itemSourceLevel(d.id) ?? 0) >= 20,
     );
-    expect(shelf.length).toBe(266);
+    // Re-pinned 266 -> 454 at the eighth v0.41.0 sync (2026-08-30): the
+    // release's Ignivar span ships 188 new gated equippables sourced at or
+    // past the cap (the Crucible set roster, the raid drop tables, the
+    // Thronebane-band legendaries), every one deriving the same level-20
+    // gate the sweep below asserts; no packet row moved.
+    expect(shelf.length).toBe(454);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

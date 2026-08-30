@@ -129,6 +129,15 @@ describe('hud.itemTooltip composition (source pins)', () => {
   });
 
   it('the compare rows resolve their labels through compareStatLabelKey', () => {
-    expect(hud).toContain('t(compareStatLabelKey(d.stat) as TranslationKey)');
+    // The compare block lives in the branch's extracted
+    // src/ui/item_compare_view.ts since the eighth v0.41.0 sync (2026-08-30):
+    // the release re-pointed the inline hud block at compareStatLabelKey and
+    // the branch had already extracted that block, so the edit was mirrored
+    // onto the extracted home and this pin follows the code there.
+    const compareView = readFileSync(
+      new URL('../src/ui/item_compare_view.ts', import.meta.url),
+      'utf8',
+    );
+    expect(compareView).toContain('t(compareStatLabelKey(d.stat) as TranslationKey)');
   });
 });
