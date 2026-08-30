@@ -614,7 +614,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-11',
+          t: 'auth-world-12',
           token: 't',
           character: 1,
         }),

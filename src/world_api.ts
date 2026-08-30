@@ -138,7 +138,12 @@ export type {
 // 11 = Materials Vault snapshots require the identity-preserving `special`
 // collection. An epoch-10 client can neither render nor select those rows, and
 // an epoch-10 server would omit them, stranding deposited special materials.
-export const ONLINE_WORLD_LAYOUT_VERSION = 11 as const;
+// 12 = Masterwrought and farming ship together: equipped-instance snapshots
+// carry required Perfecting fields (rank progress, the Perfected quality, an
+// orange piece's chosen name) and the self wire carries the `fplot` farm-plot
+// delta. An epoch-11 client can neither render Perfected copies nor a farm,
+// and an epoch-11 server omits both, stranding Perfecting progress and plots.
+export const ONLINE_WORLD_LAYOUT_VERSION = 12 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

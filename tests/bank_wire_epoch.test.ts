@@ -56,14 +56,17 @@ type _VaultSpecialKeysAreNew = AssertNever<
 describe('BankInfo wire compatibility epoch', () => {
   it('separates the bank-storage snapshot from release/v0.41.0 before admission', () => {
     // The runtime epoch pin: the world handshake version that fences the
-    // pre-bank-storage shape out before any snapshot is admitted.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(11);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-11');
+    // pre-bank-storage shape out before any snapshot is admitted. The
+    // masterwrought/farming epoch (12) supersedes the vault epoch (11) and
+    // keeps every earlier shape fenced with it.
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
   });
 
   it('separates identity-preserving vault snapshots from auth-world-10 before admission', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(11);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-11');
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-9');
   });
