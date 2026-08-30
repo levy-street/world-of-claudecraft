@@ -22251,3 +22251,24 @@ tour runs added to the evidence, the two-bucket fixture).
   baseline da7b164b36 reproduced the Phase 15 QA stamp exactly
   (3337/29, 50317/2/452, EXIT=0), independently re-validating the
   inherited stamp on this box.
+
+### THE FROZEN STAMP: EXIT=0 FIRST TRY at 3960a06439, the gate's bounded form
+Taken 2026-08-30, one run, at the ledger tip 3960a06439 (porcelain clean
+before and after; DATABASE_URL unset; npm test -- --maxWorkers=8; zero
+vitest processes before launch). Log at the session scratchpad's
+fullsuite_p16qa.log.
+  Test Files  3342 passed | 29 skipped (3371)
+       Tests  50406 passed | 2 expected fail | 452 skipped (50860)
+    Duration  587.04 s
+   SUITE_EXIT 0, zero failing files
+Follow-ons, all clean at this span: npx tsc --noEmit zero diagnostics;
+npm run ci:changed exit 0 after the last code commit (zero errors,
+warnings-only pre-existing debt); wiki:content and i18n:gen both
+byte-zero-diff; npm run i18n:admin regen committed with its source.
+DRIFT vs the Phase 16 stamp at 7f3ae4938f (3342/29 (3371),
+50403/2/452 (50857)): +0 files, +3 tests, MATCHING THE PRE-RUN PREDICTION
+EXACTLY and attributed one-to-one: the snapshots.test.ts cross-host
+regalia weld, the admin metrics auto-refresh interval case, and the admin
+metrics aria-labelledby case. Skipped 452 and expected-fail 2 unchanged.
+This ledger's docs commits sit on top of the frozen tip; no code moved
+after the stamp.
