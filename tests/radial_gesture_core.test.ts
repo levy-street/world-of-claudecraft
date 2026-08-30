@@ -12,9 +12,20 @@ import {
 } from '../src/ui/hud/action_bar/radial_action_core';
 import {
   radialCancelIsLive,
+  resolveRadialPress,
   resolveRadialRelease,
   shouldRevealOnDrag,
 } from '../src/ui/hud/action_bar/radial_gesture_core';
+
+describe('resolveRadialPress', () => {
+  it('claims a press when the active aim belongs to its physical button', () => {
+    expect(resolveRadialPress({ aimOwnedByButton: true })).toEqual({ kind: 'cancel-aim' });
+  });
+
+  it('leaves a button that does not own the active aim on its normal path', () => {
+    expect(resolveRadialPress({ aimOwnedByButton: false })).toEqual({ kind: 'continue' });
+  });
+});
 
 function release(over: Partial<Parameters<typeof resolveRadialRelease>[0]> = {}) {
   return resolveRadialRelease({

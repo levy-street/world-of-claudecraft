@@ -746,11 +746,9 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
-    // Moved by the Passing Stone icon (the death lesson's rite marker,
-    // rendered from its own shipped world model). `verdict: null` below is
-    // unchanged and is the point: the committed reviewed verdict covers the
-    // art as of its own review, and a newly added icon is deliberately NOT
-    // folded into it. It awaits an owner visual review of its own.
+    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
+    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
+    // rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -760,11 +758,11 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'f1dff0a9362b94020fa4946b93e56dc6f5b22db5217e44742ceafa9b74e41605',
-      catalogBytes: 455338,
+      catalogSha256: '030be381ff6cd91e85a0c1043d33c4b3e97999be6a150ed52ff2b677b63f4ad9',
+      catalogBytes: 458_987,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 830,
-      liveItemCount: 845,
+      catalogCount: 837,
+      liveItemCount: 852,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -773,7 +771,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '74e2e261cf3b2e62b21856c9f3ec9e5f42fa848cc3b8a8f14ce3005f0f968d5c',
+      shippingCatalogSha256: '55d3e58447d82bd72cb09a7327c3681ad111bbcb1da4ffd27046bc2e9ef65102',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -507,8 +507,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Ver os termos do Mercado (abre em uma nova aba)',
   'hudChrome.wocMarket.title': 'Bolsa $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Você está se comprometendo a pagar um valor em USD, em $WOC. A quantidade exata de tokens é definida por uma nova cotação quando o pagamento é solicitado e pode ser diferente da estimativa.',
-  'hudChrome.wocMarket.walletBanner': 'Vincule e verifique uma carteira para dar lances, comprar ou vender na Bolsa.',
-  'hudChrome.wocMarket.walletBannerCta': 'Conectar carteira',
   'hudChrome.wocMarket.yourListing': 'Sua listagem',
   'hudChrome.wocMarket.yourListingTip': 'Você listou este item. Não é possível dar lances na sua própria listagem; enquanto ela não tiver lances, você pode cancelá-la aqui ou em Atividades.',
   'apiError.guilds.invalid_roster_name': 'Nome de guilda inválido.',
@@ -4171,6 +4169,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
   'itemUi.kind.bag': 'Bolsa',
   'itemUi.tooltip.bagSlots': 'Bolsa de {slots} espaços',
+  'itemUi.tooltip.bagSlotsMaterials': 'Bolsa de materiais de {slots} espaços',
   'sim.delve.baptistryEggs':
     'O batistério fica em silêncio. Sacos de ovos de aranha se agarram, úmidos, à borda.',
   'sim.delve.baptistrySpidersSealed': 'Você deveria tentar destruir os sacos de aranha.',

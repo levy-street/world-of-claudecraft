@@ -496,8 +496,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Se Markedspladsens vilkår (åbner i en ny fane)',
   'hudChrome.wocMarket.title': '$WOC-Børsen',
   'hudChrome.wocMarket.variableTokenWarning': 'Du forpligter dig til at betale en USD-værdi i $WOC. Det præcise antal tokens fastsættes af et nyt tilbud, når betalingen anmodes, og kan afvige fra estimatet.',
-  'hudChrome.wocMarket.walletBanner': 'Tilknyt og verificer en pung for at byde, købe eller sælge på Børsen.',
-  'hudChrome.wocMarket.walletBannerCta': 'Tilslut pung',
   'hudChrome.wocMarket.yourListing': 'Din notering',
   'hudChrome.wocMarket.yourListingTip': 'Du har noteret denne vare. Du kan ikke byde på din egen notering; så længe den ikke har nogen bud, kan du annullere den her eller fra Aktiviteter.',
   'apiError.guilds.invalid_roster_name': 'Ugyldigt laugsnavn.',
@@ -4092,6 +4090,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '{name} rejser sig over Tornetop Højder!',
   'itemUi.kind.bag': 'Taske',
   'itemUi.tooltip.bagSlots': 'Taske med {slots} pladser',
+  'itemUi.tooltip.bagSlotsMaterials': 'Materialetaske med {slots} pladser',
   'questUi.tracker.hideFromMap': 'Skjul {name} på kortet',
   'questUi.tracker.showOnMap': 'Vis {name} på kortet',
   'sim.delve.baptistryEggs':

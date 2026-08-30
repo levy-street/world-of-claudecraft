@@ -207,6 +207,10 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       // the druid line.
       { itemId: 'peaksong_helm', chance: 0.002 },
       { itemId: 'moonbark_vestments', chance: 0.002 },
+      // The rare world-drop bag, the lowest of its three ordinary-mob rows: the
+      // tunnelers are the densest pull of the three, so the per-kill rate is
+      // trimmed to keep the effective farm rate in line with the troll's.
+      { itemId: 'wayfarers_backpack', chance: 0.001 },
     ],
     scale: 0.85,
     color: 0x9c7a3c,
@@ -298,6 +302,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 75, chance: 1 },
       { itemId: 'ogre_toe_ring', chance: 0.35 },
       { itemId: 'cragprowl_belt', chance: 0.02 },
+      // The rare world-drop bag, the highest-level of its three ordinary-mob
+      // rows and so the slightly better one to farm.
+      { itemId: 'wayfarers_backpack', chance: 0.002 },
     ],
     scale: 1.3,
     color: 0x9e7b53,
@@ -450,6 +457,12 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'crag_warden_cudgel', chance: 0.25, rollGroup: 'brutok_chase' },
       { itemId: 'skullsplitter_dirk', chance: 0.25, rollGroup: 'brutok_chase' },
       { itemId: 'stormroot_cowl', chance: 0.2 },
+      // The rare mob's elevated row for the world-drop bag, the same shape Old
+      // Greyjaw carries for the Wolfhide Satchel (0.35). Held a notch under it:
+      // the Wayfarer's Backpack is two quality tiers better, and the ogre's
+      // three-hour cadence is already most of the gate. Ungrouped, like
+      // Greyjaw's, so it never competes with the brutok_chase weapon slot.
+      { itemId: 'wayfarers_backpack', chance: 0.25 },
     ],
     scale: 1.45,
     color: 0x6e5235,

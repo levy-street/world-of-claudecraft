@@ -507,8 +507,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Ver las condiciones de la Bolsa (se abre en una pestaña nueva)',
   'hudChrome.wocMarket.title': 'Bolsa de $WOC',
   'hudChrome.wocMarket.variableTokenWarning': 'Te comprometes a pagar un valor en USD mediante $WOC. La cantidad exacta de tokens la fija una cotización nueva cuando se solicita el pago, y puede diferir de la estimación.',
-  'hudChrome.wocMarket.walletBanner': 'Vincula y verifica una cartera para pujar, comprar o vender en la Bolsa.',
-  'hudChrome.wocMarket.walletBannerCta': 'Conectar cartera',
   'hudChrome.wocMarket.yourListing': 'Tu anuncio',
   'hudChrome.wocMarket.yourListingTip': 'Tú publicaste este objeto. No puedes pujar en tu propio anuncio; mientras no tenga pujas, puedes cancelarlo aquí o desde Actividad.',
   'apiError.guilds.invalid_roster_name': 'Nombre de hermandad no válido.',
@@ -4247,6 +4245,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.unlock': 'Mover el marco del objetivo',
   'itemUi.kind.bag': 'Bolsa',
   'itemUi.tooltip.bagSlots': 'Bolsa de {slots} espacios',
+  'itemUi.tooltip.bagSlotsMaterials': 'Bolsa de materiales de {slots} espacios',
   'sim.delve.baptistryEggs':
     'El baptisterio queda en silencio. Sacos de huevos de araña se aferran, húmedos, al borde.',
   'sim.delve.baptistrySpidersSealed': 'Deberías intentar destruir los sacos de araña.',

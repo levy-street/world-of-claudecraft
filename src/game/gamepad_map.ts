@@ -24,6 +24,10 @@ export interface LookDelta {
   active: boolean;
 }
 
+export type PadCastHold =
+  | { kind: 'slot'; slot: number }
+  | { kind: 'xhb'; action: { type: 'ability' | 'item'; id: string } };
+
 // --- W3C "Standard Gamepad" indices --------------------------------------
 // https://w3c.github.io/gamepad/#remapping, fixed across Xbox/DualShock/Switch
 // pads that report mapping === 'standard'.
@@ -330,6 +334,14 @@ export function risingEdges(prev: readonly boolean[], cur: readonly boolean[]): 
   const out: number[] = [];
   for (let i = 0; i < cur.length; i++) {
     if (cur[i] && !prev[i]) out.push(i);
+  }
+  return out;
+}
+
+export function fallingEdges(prev: readonly boolean[], cur: readonly boolean[]): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < prev.length; i++) {
+    if (prev[i] && !cur[i]) out.push(i);
   }
   return out;
 }

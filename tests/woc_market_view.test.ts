@@ -20,6 +20,7 @@ import {
   type WocSaleView,
   type WocSettlementView,
   wocMarketViewSig,
+  wocQuoteCountdownSig,
 } from '../src/ui/woc_market_view';
 
 // Pure core: DOM/i18n-free, deterministic, the caller passes nowMs. Inputs are
@@ -857,5 +858,24 @@ describe('the Browse filters resolve in the view core', () => {
     // Past the cap the query is too broad to narrow: null (no filter), never
     // a truncated arbitrary subset that would silently hide listings.
     expect(browseItemFilterIds('sword', name, ids, 1)).toBeNull();
+  });
+});
+
+describe('wocQuoteCountdownSig: the pending quote repaint key', () => {
+  it('keys on SECONDS, matching the resolution the countdown is displayed at', () => {
+    // A finer key would rebuild the window many times per second for a string
+    // that did not change; the ceiling keeps 0.2s remaining reading as 1, the
+    // way the countdown itself is shown.
+    const now = 1_000_000;
+    expect(wocQuoteCountdownSig(now + 90_000, now)).toBe('90');
+    expect(wocQuoteCountdownSig(now + 90_400, now)).toBe('91');
+    expect(wocQuoteCountdownSig(now + 200, now)).toBe('1');
+  });
+
+  it('floors at zero once the quote has run out, and is empty with no deadline', () => {
+    // No pending quote means no key at all, so an idle window still rests.
+    expect(wocQuoteCountdownSig(500, 1_000)).toBe('0');
+    expect(wocQuoteCountdownSig(null, 1_000)).toBe('');
+    expect(wocQuoteCountdownSig(undefined, 1_000)).toBe('');
   });
 });

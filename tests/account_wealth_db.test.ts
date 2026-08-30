@@ -292,11 +292,17 @@ describe('largeGoldMovementsForAccount', () => {
         },
       ]),
     );
-    const rows = await largeGoldMovementsForAccount(42, 100_000, 25);
-    expect(query.mock.calls[0][0]).toMatch(/abs\(l\.copper_delta\) >= \$2/);
-    expect(query.mock.calls[0][1]).toEqual([42, 100_000, 25]);
-    // The read depends on the CONCURRENTLY-built bank_ledger_account_recent
-    // index, which a realm can serve before it exists (server/db.ts, the
+    const rows = await largeGoldMovementsForAccount(42, 25);
+    const sql = query.mock.calls[0][0];
+    // The threshold is a production-fixed literal, not a bind parameter. That
+    // lets PostgreSQL prove the query implies the matching partial-index
+    // predicate even when the driver/server selects a generic prepared plan.
+    expect(sql).toMatch(/abs\(copper_delta\) >= 100000/);
+    expect(sql).not.toMatch(/abs\(copper_delta\) >= \$\d/);
+    expect(sql).toMatch(/LIMIT \$2/);
+    expect(query.mock.calls[0][1]).toEqual([42, 25]);
+    // The read depends on the CONCURRENTLY-built partial account index, which
+    // a realm can serve before it exists (server/db.ts, the
     // runConcurrentIndexMigrations rule): it carries its own bound, far below
     // the 15 s pool default, so a full ledger scan fails this one read instead
     // of pinning pooled clients.

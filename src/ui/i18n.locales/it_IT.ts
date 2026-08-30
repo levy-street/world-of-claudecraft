@@ -507,8 +507,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Visualizza i termini della Borsa (si apre in una nuova scheda)',
   'hudChrome.wocMarket.title': 'Borsa $WOC',
   'hudChrome.wocMarket.variableTokenWarning': "Ti stai impegnando a pagare un valore in USD tramite $WOC. L'importo esatto in token viene fissato da una nuova quotazione al momento della richiesta di pagamento e potrebbe differire dalla stima.",
-  'hudChrome.wocMarket.walletBanner': 'Collega e verifica un portafoglio per fare offerte, acquistare o vendere sulla Borsa.',
-  'hudChrome.wocMarket.walletBannerCta': 'Collega portafoglio',
   'hudChrome.wocMarket.yourListing': 'La tua inserzione',
   'hudChrome.wocMarket.yourListingTip': 'Hai messo in vendita tu questo oggetto. Non puoi fare offerte sulla tua stessa inserzione; finché non ha offerte puoi annullarla qui o dalla scheda Attività.',
   'apiError.guilds.invalid_roster_name': 'Nome di gilda non valido.',
@@ -4209,6 +4207,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
   'itemUi.kind.bag': 'Borsa',
   'itemUi.tooltip.bagSlots': 'Borsa da {slots} spazi',
+  'itemUi.tooltip.bagSlotsMaterials': 'Borsa per materiali da {slots} spazi',
   'sim.delve.baptistryEggs':
     'Il battistero si acquieta. Sacche di uova di ragno aderiscono viscide al bordo.',
   'sim.delve.baptistrySpidersSealed': 'Dovresti provare a distruggere le sacche dei ragni.',

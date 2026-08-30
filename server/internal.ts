@@ -97,7 +97,15 @@ export async function handleInternalApi(
  * exists on the role-gated /admin/api surface with its own audit trail, and
  * moving one here would move it out from under that.
  */
-const LISTING_STATUSES = ['active', 'ending', 'settling', 'closed', 'all'] as const;
+const LISTING_STATUSES = [
+  'active',
+  'ending',
+  'settling',
+  'closed',
+  'sold',
+  'cancelled',
+  'all',
+] as const;
 const OFFER_STATUSES = ['pending', 'accepted', 'declined', 'withdrawn', 'expired', 'all'] as const;
 
 const OPS_DAY_MS = 24 * 60 * 60 * 1000;

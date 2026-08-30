@@ -484,6 +484,15 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'deathlord_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
       { itemId: 'necromancers_soulsteps', chance: 0.05, rollGroup: 'velkhar_bonus' },
       { itemId: 'wyrmshadow_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
+      // The dungeon rung of the materials-satchel ladder, same shape and rate
+      // as the Gravewoven Bag on Morthen. Velkhar is the one Sanctum boss with
+      // room for it: velkhar_bonus sums to 0.75, so a 0.2 row lands fully
+      // inside the partition and still leaves slack for a no-bonus kill, the
+      // way morthen_bonus does at 0.81. korgath_bonus already sums to exactly
+      // 1.0 (an appended row could never be rolled) and korzul_bonus to 0.87
+      // (0.2 would overflow and clip its own tail), so neither could carry it
+      // without re-pricing the pieces already there.
+      { itemId: 'necromancers_reagent_satchel', chance: 0.2, rollGroup: 'velkhar_bonus' },
     ],
     scale: 1.25,
     color: 0x512e5f,

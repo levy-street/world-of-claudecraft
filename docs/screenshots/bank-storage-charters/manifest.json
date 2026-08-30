@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-26T05:06:07.679Z",
+  "sourceRevision": "e760e0c73a033e3a7b032a67b5d9cb63a11db251",
+  "sourceTreeState": "dirty",
+  "browser": "Google Chrome for Testing 149.0.7827.55",
+  "graphicsPreset": "low",
+  "note": "sourceRevision is the pre-commit HEAD. sourceTreeState records whether the accepted frames came from working-tree changes; the evidence commit and per-frame hashes bind the final files.",
+  "harness": "scripts/charter_store_shot.mjs",
+  "command": "BROWSER_PATH=<chromium> GAME_URL=http://127.0.0.1:5173 SHOTS_DIR=docs/screenshots/bank-storage-charters CHARTER_SHOT_SET=prompts node scripts/charter_store_shot.mjs",
+  "assertions": "The harness verifies prompt focus/modal semantics and stale nonmodal status semantics before each capture.",
+  "frames": [
+    {
+      "file": "after-store-confirm-desktop.png",
+      "sha256": "5a880c8c3597803afe7178e118c56c80948d056f35a3d7496e0861f10d71f812",
+      "viewport": "desktop",
+      "theme": "classic",
+      "surface": "confirmation"
+    },
+    {
+      "file": "after-store-result-desktop.png",
+      "sha256": "2a7c647b384d33d6f7b5fcd43097463dd43faf5268e196f572a8a63633cc3ba5",
+      "viewport": "desktop",
+      "theme": "classic",
+      "surface": "stale result"
+    },
+    {
+      "file": "after-store-confirm-mobile-landscape.png",
+      "sha256": "a473b4358e53df330d8d26f9644d5a94dd837d285d53737b201e7385c8cc63f5",
+      "viewport": "844x390 touch",
+      "theme": "classic",
+      "surface": "confirmation"
+    },
+    {
+      "file": "after-store-result-mobile-landscape.png",
+      "sha256": "8379cb46c4918e742afe8be56afbadac7d3b1c3961ab2d478c86bda0d84c0e89",
+      "viewport": "844x390 touch",
+      "theme": "classic",
+      "surface": "stale result"
+    },
+    {
+      "file": "after-store-confirm-forced-colors.png",
+      "sha256": "d2dbbadff1e6209264daf6dc2acc9c3923cb1429c24a2e223f19ccf82216937e",
+      "viewport": "desktop",
+      "theme": "forced colors",
+      "surface": "confirmation"
+    },
+    {
+      "file": "after-store-result-forced-colors.png",
+      "sha256": "e09fde7803abb4843abbc6bd9d30a133e9ec49d9d92ab570bcf466a2f78b4d13",
+      "viewport": "desktop",
+      "theme": "forced colors",
+      "surface": "stale result"
+    }
+  ]
+}

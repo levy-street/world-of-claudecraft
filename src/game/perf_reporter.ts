@@ -3,6 +3,7 @@ import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
+import { entryRevealSummary } from './perf_entry_reveal_core';
 import {
   createPrewarmHeavyListGate,
   PREWARM_REPORT_BUDGET_VARIANTS,
@@ -623,6 +624,7 @@ function payloadFromSnapshot(
       // fixed key set. Add a field to the summary rather than sending the twin.
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
       rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
+      entryReveal: entryRevealSummary(renderer.gpuPrep),
       assets: {
         preload: snapshot.assets.preload,
         byType: snapshot.assets.byType,

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-26T05:06:07.679Z",
+  "sourceRevision": "e760e0c73a033e3a7b032a67b5d9cb63a11db251",
+  "sourceTreeState": "dirty",
+  "browser": "Google Chrome for Testing 149.0.7827.55",
+  "graphicsPreset": "low",
+  "note": "sourceRevision is the pre-commit HEAD. sourceTreeState records whether the accepted frames came from working-tree changes; the evidence commit and per-frame hashes bind the final files.",
+  "harness": "scripts/pr_screenshots.mjs target bank-vault",
+  "captureManifest": "../bank-vault-tab/capture-manifest.json",
+  "purpose": "base-versus-fine Vault comparison evidence",
+  "frames": [
+    {
+      "file": "before-desktop.png",
+      "source": "03-bank-vault-desktop.png",
+      "sha256": "37d87e58100af4698ae6fe4c3d6d1d48ee46f1dd66b30f234eb8d648682339d1",
+      "theme": "classic",
+      "content": "base and signed desktop"
+    },
+    {
+      "file": "before-mobile.png",
+      "source": "04-bank-vault-mobile.png",
+      "sha256": "e45817aa1a10a042d37346de692d0c3d9a5e5246b091bb4473171c854a923350",
+      "theme": "classic",
+      "content": "base and signed 844x390 touch"
+    },
+    {
+      "file": "after-desktop.png",
+      "source": "07-bank-vault-fine.png",
+      "sha256": "14e0fd90db7fa0dcb7b4f605fcb6e40801a84438ac576bcc3aa5d2cd8c82c3ae",
+      "theme": "classic",
+      "content": "fine and signed desktop"
+    },
+    {
+      "file": "after-mobile.png",
+      "source": "08-bank-vault-fine-mobile.png",
+      "sha256": "6bd02415391e18b3deb639e0e95242e3d7b9868f91bf5b9123d95643c74abf4b",
+      "theme": "classic",
+      "content": "fine 844x390 touch"
+    }
+  ]
+}

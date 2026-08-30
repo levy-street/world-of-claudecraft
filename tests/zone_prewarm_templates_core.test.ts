@@ -75,3 +75,14 @@ describe('zonePrewarmTemplateIds', () => {
     expect([...ids].sort()).toEqual(ids);
   });
 });
+
+describe('summon-only quest mobs', () => {
+  it('takes the kill targets of the zone quests, so a summoned mob without a camp is prewarmed', () => {
+    const ids = zonePrewarmTemplateIds('proving_shore', 'mob', []);
+    // Mister Crabs is called by a quest item and has no camp.
+    expect(CAMPS.some((camp) => camp.mobId === 'mister_crabs')).toBe(false);
+    expect(ids).toContain('mister_crabs');
+    // ... and only in the zone whose NPC gives that quest.
+    expect(zonePrewarmTemplateIds(EASTBROOK, 'mob', [])).not.toContain('mister_crabs');
+  });
+});

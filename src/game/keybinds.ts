@@ -17,6 +17,14 @@ import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
 
 export type BindKind = 'held' | 'edge';
 
+/** The binding a rebind would evict: the action holding the key, which of its
+ *  two slots holds it, and the stored code as bind() would compare it. */
+export interface BindConflict {
+  id: string;
+  index: number;
+  code: string;
+}
+
 export interface BindAction {
   id: string;
   label: string;
@@ -734,6 +742,33 @@ export class Keybinds {
     codes[index] = value;
     this.save();
     return true;
+  }
+
+  /**
+   * Which OTHER binding `combo` would be stolen from if it were bound to
+   * (id, index) right now, or null when the key is free. A pure LOOK-AHEAD for
+   * the rebind UI's are-you-sure prompt: it mirrors bind()'s eviction rules
+   * exactly (held actions compare the modifier-stripped code, a shared action
+   * on either side never evicts, the same slot is not its own conflict, a
+   * reserved code is refused before any eviction), so what it reports is
+   * precisely what bind() would unbind. It mutates nothing.
+   */
+  findBindConflict(id: string, index: number, combo: string): BindConflict | null {
+    const codes = this.map.get(id);
+    if (!codes || index < 0 || index >= SLOTS_PER_ACTION) return null;
+    const value = actionKind(id) === 'held' ? comboCode(combo) : combo;
+    // A reserved code never binds at all, so it can never steal anything; the
+    // caller reports that refusal on its own.
+    if (isReservedCode(value) || actionAllowsShared(id)) return null;
+    for (const [otherId, otherCodes] of this.map) {
+      if (actionAllowsShared(otherId)) continue;
+      for (let i = 0; i < otherCodes.length; i++) {
+        if (otherCodes[i] === value && !(otherId === id && i === index)) {
+          return { id: otherId, index: i, code: value };
+        }
+      }
+    }
+    return null;
   }
 
   clear(id: string, index: number): void {

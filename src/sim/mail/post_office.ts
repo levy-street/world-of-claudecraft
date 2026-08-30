@@ -16,7 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
-import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
+import { bagPools, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
@@ -605,7 +605,7 @@ export class PostOffice {
       if (
         canGrantCopies(
           meta.inventory,
-          bagCapacity(meta.bags),
+          bagPools(meta.bags),
           s.itemId,
           s.count,
           s.instance,

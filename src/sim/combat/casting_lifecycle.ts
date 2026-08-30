@@ -1487,6 +1487,13 @@ export function castAbility(
         d > maxRange
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: aim.x, y: p.pos.y, z: aim.z };
+      // Only a PROPOSED point can be too close; the no-aim arm below fixes its
+      // own point up to the minimum, so re-measuring it there would invite a
+      // refusal whenever the sin/cos round trip lands one ulp short.
+      if (ability.minRange && dist2d(p.pos, aimPoint) < ability.minRange) {
+        ctx.error(p.id, 'Too close!');
+        return;
+      }
     } else {
       // Faultwake's keybind default is the selected hostile; other position
       // spells retain the canonical at-feet fallback. Clamp the selected point
@@ -1505,6 +1512,17 @@ export function castAbility(
         d > maxRange
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: fallback.x, y: p.pos.y, z: fallback.z };
+      // A minRange ability with no aim would refuse forever at the at-feet
+      // fallback (distance 0), so a caller that cannot aim (a bare keybind
+      // cast, the RL env) lands at the minimum along facing instead. This arm
+      // never refuses: the push is the compliance move.
+      if (ability.minRange && dist2d(p.pos, aimPoint) < ability.minRange) {
+        aimPoint = {
+          x: p.pos.x + Math.sin(p.facing) * ability.minRange,
+          y: p.pos.y,
+          z: p.pos.z + Math.cos(p.facing) * ability.minRange,
+        };
+      }
     }
   }
 

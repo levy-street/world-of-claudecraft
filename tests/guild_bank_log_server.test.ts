@@ -15,6 +15,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const dbMock = vi.hoisted(() => ({
   // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
   loadGuildBankLogRows: vi.fn(async (..._args: any[]): Promise<unknown[]> => []),
+  saveCharacterAndGuildBankState: vi.fn(async () => true),
 }));
 
 vi.mock('../server/db', () => ({
@@ -22,11 +23,14 @@ vi.mock('../server/db', () => ({
   GUILD_BANK_ROW_MAX_BYTES: 262144,
   loadGuildBankLogRows: dbMock.loadGuildBankLogRows,
   saveCharacterState: vi.fn(async () => true),
-  saveCharacterAndGuildBankState: vi.fn(async () => true),
+  saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: vi.fn(async () => true),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
   openPlaySession: vi.fn(async () => 1),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
@@ -35,9 +39,13 @@ vi.mock('../server/db', () => ({
   releaseCharacterLease: vi.fn(async () => {}),
 }));
 
-import { bankLedgerIdle } from '../server/bank_ledger';
 import { type ClientSession, GameServer } from '../server/game';
 import { resetGuildBankLogCacheForTests } from '../server/guild_bank_log';
+import {
+  type GuildBankIncident,
+  noopGameMetricsCounters,
+  setGameMetricsCounters,
+} from '../server/http/game_signals';
 import type { Entity } from '../src/sim/types';
 
 const GUILD_ID = 913;
@@ -127,6 +135,8 @@ const logFrames = (sent: Record<string, unknown>[]) => sent.filter((m) => m.t ==
 
 beforeEach(() => {
   dbMock.loadGuildBankLogRows.mockClear();
+  dbMock.saveCharacterAndGuildBankState.mockReset();
+  dbMock.saveCharacterAndGuildBankState.mockResolvedValue(true);
   dbMock.loadGuildBankLogRows.mockResolvedValue([
     {
       id: 5,
@@ -273,16 +283,37 @@ describe('guild_bank_log: the read gate is the BANK gate', () => {
     expect(logFrames(sent)[0]?.ok).toBe(true);
   });
 
-  it('answers a failed read with a refusal rather than leaving the pane loading forever', async () => {
+  it('answers one failed read with a refusal and records exactly one read incident', async () => {
     const server = new GameServer();
     const { session, sent } = joinServer(server, 1, 'Offi');
     stand(server, session, 'officer');
+    const incidents: GuildBankIncident[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      guildBankIncident: (kind) => incidents.push(kind),
+    });
     const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
-    dbMock.loadGuildBankLogRows.mockRejectedValue(new Error('database is down'));
-    dispatch(server, session);
-    await settle();
-    expect(logFrames(sent)[0]).toEqual({ t: 'gbanklog', ok: false });
-    errs.mockRestore();
+    try {
+      dbMock.loadGuildBankLogRows.mockRejectedValue(new Error('database is down'));
+      dispatch(server, session);
+      await settle();
+
+      expect(logFrames(sent)[0]).toEqual({ t: 'gbanklog', ok: false });
+      expect(incidents).toEqual(['log_read_failed']);
+
+      // A failed refresh installs no cache entry. The next successful read
+      // therefore exercises the same real delivery wiring and proves ordinary
+      // success does not inflate the incident counter.
+      dbMock.loadGuildBankLogRows.mockResolvedValue([]);
+      restand(server, session);
+      dispatch(server, session);
+      await settle();
+      expect(logFrames(sent)[1]).toEqual({ t: 'gbanklog', ok: true, entries: [] });
+      expect(incidents).toEqual(['log_read_failed']);
+    } finally {
+      errs.mockRestore();
+      setGameMetricsCounters(noopGameMetricsCounters);
+    }
   });
 
   it('withholds the anomaly ops even when the statement layer hands them over', async () => {
@@ -351,11 +382,11 @@ describe('guild_bank_log: the read gate is the BANK gate', () => {
     expect(JSON.stringify(logFrames(sent)[0])).not.toContain('Carrier');
   });
 
-  it('a REAL guild bank op busts the cache: the next read sees the new history', async () => {
-    // The end-to-end freshness contract. Without the bust wired into the one
-    // ledger writer, an officer watching the log would be shown a pre-op
-    // history for a whole TTL precisely while somebody was watching for the op,
-    // which is the exact failure the log exists to prevent.
+  it('a REAL guild bank op refreshes history only after its atomic save commits', async () => {
+    // The end-to-end freshness and truth contract. Staging an op must not
+    // expose history that can still be lease-fenced away; once the exact
+    // outbox prefix commits with the character and book, the warm cache must
+    // refresh rather than hiding that durable action for a whole TTL.
     const server = new GameServer();
     const { session, sent } = joinServer(server, 1, 'Offi');
     stand(server, session, 'officer');
@@ -374,7 +405,7 @@ describe('guild_bank_log: the read gate is the BANK gate', () => {
     await settle();
     expect(dbMock.loadGuildBankLogRows).toHaveBeenCalledTimes(1);
 
-    // A real op through the real dispatch path: its ledger write busts the log.
+    // A real op through the real dispatch path stages one exact outbox prefix.
     restand(server, session);
     const meta2 = server.sim.players.get(session.pid);
     if (meta2) meta2.copper = 500_000;
@@ -385,13 +416,117 @@ describe('guild_bank_log: the read gate is the BANK gate', () => {
       0,
     );
     expect(server.sim.guildBankInfoFor(session.pid)?.treasury).toBe(105_000);
-    await bankLedgerIdle();
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBeGreaterThan(0);
+
+    // It is not history yet: another cached read remains warm before commit.
+    restand(server, session);
+    dispatch(server, session);
+    await settle();
+    expect(dbMock.loadGuildBankLogRows).toHaveBeenCalledTimes(1);
+
+    // Model what the durable reader returns after the atomic save lands.
+    dbMock.loadGuildBankLogRows.mockResolvedValue([
+      {
+        id: 6,
+        at: AT + 1,
+        characterName: 'Offi',
+        op: 'deposit_gold',
+        itemId: null,
+        count: null,
+        copperDelta: 5_000,
+      },
+      {
+        id: 5,
+        at: AT,
+        characterName: 'Kara',
+        op: 'withdraw',
+        itemId: 'iron_ore',
+        count: 3,
+        copperDelta: 0,
+      },
+    ]);
+    expect(await priv(server).saveCharacter(session)).toBe(true);
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+
     await settle();
     restand(server, session);
     dispatch(server, session);
     await settle();
     expect(dbMock.loadGuildBankLogRows).toHaveBeenCalledTimes(2);
-    expect(logFrames(sent).length).toBe(3);
+    expect(logFrames(sent).length).toBe(4);
+    expect(logFrames(sent).at(-1)?.entries).toEqual([
+      {
+        id: 6,
+        at: AT + 1,
+        actor: 'Offi',
+        op: 'deposit_gold',
+        itemId: null,
+        count: null,
+        copper: 5_000,
+      },
+      {
+        id: 5,
+        at: AT,
+        actor: 'Kara',
+        op: 'withdraw',
+        itemId: 'iron_ore',
+        count: 3,
+        copper: null,
+      },
+    ]);
+  });
+
+  it('a lease-fenced guild save keeps staged history out of the activity log', async () => {
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 1, 'Fenced');
+    stand(server, session, 'officer');
+    const meta = server.sim.players.get(session.pid);
+    if (!meta) throw new Error('missing meta');
+    meta.copper = 500_000;
+
+    dispatch(server, session);
+    await settle();
+    expect(dbMock.loadGuildBankLogRows).toHaveBeenCalledTimes(1);
+
+    restand(server, session);
+    priv(server).dispatchMessage(
+      session,
+      { t: 'cmd', cmd: 'guild_bank_deposit_gold', amount: 5_000 },
+      '{}',
+      0,
+    );
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBeGreaterThan(0);
+
+    // A false save result is the lease-fence contract: the transaction
+    // committed neither state nor evidence. Suppress the asynchronous kick so
+    // this harness can issue the decisive post-fence read itself.
+    dbMock.saveCharacterAndGuildBankState.mockResolvedValueOnce(false);
+    session.left = true;
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(await priv(server).saveCharacter(session)).toBe(false);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('save fenced out'));
+    warn.mockRestore();
+    session.left = false;
+
+    dbMock.loadGuildBankLogRows.mockResolvedValue([
+      {
+        id: 6,
+        at: AT + 1,
+        characterName: 'Fenced',
+        op: 'deposit_gold',
+        itemId: null,
+        count: null,
+        copperDelta: 5_000,
+      },
+    ]);
+    restand(server, session);
+    dispatch(server, session);
+    await settle();
+
+    expect(dbMock.loadGuildBankLogRows).toHaveBeenCalledTimes(1);
+    expect(logFrames(sent).at(-1)?.entries).toEqual([
+      { id: 5, at: AT, actor: 'Kara', op: 'withdraw', itemId: 'iron_ore', count: 3, copper: null },
+    ]);
   });
 
   it('two officers of the same guild share ONE query', async () => {

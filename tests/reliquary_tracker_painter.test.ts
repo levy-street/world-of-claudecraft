@@ -39,7 +39,8 @@ function liveWriters(): PainterHostWriters {
       el.classList.toggle(cls, on);
     },
     setAttr: (el, name, value) => {
-      el.setAttribute(name, value);
+      if (value === null) el.removeAttribute(name);
+      else el.setAttribute(name, value);
     },
   };
 }

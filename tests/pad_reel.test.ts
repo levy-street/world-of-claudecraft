@@ -128,7 +128,7 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     // load-bearing, not decorative).
     const body = dispatchBody();
     expect(body).toContain("if (id.startsWith('slot')) {");
-    expect(body).toContain('hud.castSlot(Number(id.slice(4)));');
+    expect(body).toContain('hud.pressSlot(Number(id.slice(4)));');
     expect(BIND_ACTIONS.some((a) => a.kind === 'edge' && a.id.startsWith('slot'))).toBe(true);
     // escape: a PANEL-extra row (not in BIND_ACTIONS), so the loop above
     // never checks it; pin the offer and the dispatch arm directly.

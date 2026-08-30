@@ -29,6 +29,11 @@ export interface ActiveConsecration {
   remaining: number;
 }
 
+export interface GroundAimPointXZ {
+  x: number;
+  z: number;
+}
+
 export interface IWorldCombat {
   known: ResolvedAbility[];
   /** Server-authored persistent traps currently visible to this world view. */
@@ -37,6 +42,9 @@ export interface IWorldCombat {
   activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
+  /** Best-effort adjusted landing preview for a ground-aimed placement
+   *  ability (seed-derived terrain arms only; the cast stays the arbiter). */
+  groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ;
   castAbility(abilityId: string): void;
   castAbilityBySlot(slot: number): void;
   // Ground-targeted cast: the ability is aimed at a world point (x, z) the player

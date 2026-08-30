@@ -178,6 +178,8 @@ export const ru_RU: AdminTranslations = {
   "usage.cacheColEvictions": "Удаления",
   "usage.cacheEntriesOfMax": "{entries} / {max}",
   "usage.notAvailable": "н/д",
+  "usage.metric.walletHandoffAuthorizationEvicted": "Desktop wallet handoff evictions",
+  "usage.metric.walletHandoffCreateRejected": "Desktop wallet handoff rejections",
   "usage.metric.wocBalanceApi": "API-запросы баланса $WOC",
   "usage.metric.wocBalanceRateLimited": "Ограниченные запросы баланса $WOC",
   "usage.metric.wocBalanceRpc": "RPC-чтения баланса Solana",

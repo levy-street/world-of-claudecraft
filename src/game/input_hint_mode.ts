@@ -40,6 +40,14 @@ function clearPadActivity(): void {
   if (hasDom()) document.body.classList.remove(PAD_ACTIVE_CLASS);
 }
 
+function clearPadActivityOnMouseMove(event: MouseEvent): void {
+  // A 1000 Hz mouse fires this per event forever once a pad was seen; skip the
+  // classList write unless there is actually a mark to clear.
+  if (!event.isTrusted) return;
+  if (!hasDom() || !document.body.classList.contains(PAD_ACTIVE_CLASS)) return;
+  clearPadActivity();
+}
+
 /** Called by GamepadManager.poll whenever the pad produced real input this
  *  frame. Cheap when already marked (a classList.add no-op). */
 export function markPadActivity(): void {
@@ -48,6 +56,7 @@ export function markPadActivity(): void {
     clearsInstalled = true;
     window.addEventListener('keydown', clearPadActivity);
     window.addEventListener('mousedown', clearPadActivity);
+    window.addEventListener('mousemove', clearPadActivityOnMouseMove, { passive: true });
   }
   document.body.classList.add(PAD_ACTIVE_CLASS);
 }

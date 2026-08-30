@@ -434,15 +434,24 @@ describe('Eastbrook authored gameplay data integration', () => {
     // dropped) and tinker_gizzel (four axes and sickles dropped). Nothing else
     // in any def, and no placement field, changed. The three row assertions
     // that follow re-check that those are still the rows this case owns.
-    // The three moved rows, asserted BEFORE the digest below so they actually
+    //
+    // Re-minted a third time by phase 05 of the bank-storage packet, which put
+    // the Burlap Reagent Pouch (the one vendor-sold materials-only bag) on the
+    // two counters that already stock bags: trader_wilkes and weaver_ottilie,
+    // appended at the END of both lists. Exactly two of the payloads moved and
+    // both moves are vendorItems rows. Nothing else in any def, and no
+    // placement field, changed.
+    //
+    // The moved rows, asserted BEFORE the digest below so they actually
     // run: a failing expect throws, so stating them after the hash meant they
     // never evaluated in the one case they exist to describe. Ordered this way
     // a drift in some OTHER field of some other NPC moves the hash while these
-    // three stay green, which is the diagnostic the digest alone cannot give.
+    // stay green, which is the diagnostic the digest alone cannot give.
     //
-    // Re-minted a third time when the Sowfield demolition retired Groundskeeper
-    // Bram with the Vale Cup module: his whole record (the one dynamic payload)
-    // left the table, and no other def or placement field moved.
+    // Re-minted again at the release/v0.41.0 sync, where the Sowfield
+    // demolition retired Groundskeeper Bram with the Vale Cup module: his
+    // whole record (the one dynamic payload) left the table, and no other def
+    // or placement field moved. MEASURED on the merged tree.
     expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
       'baked_bread',
       'spring_water',
@@ -457,6 +466,14 @@ describe('Eastbrook authored gameplay data integration', () => {
       'gathering_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
+      'burlap_reagent_pouch',
+    ]);
+    expect(ZONE1_NPCS.weaver_ottilie.vendorItems).toEqual([
+      'linen_pouch',
+      'travelers_knapsack',
+      'gathering_sickle',
+      'spool_of_thread',
+      'burlap_reagent_pouch',
     ]);
     expect(ZONE1_NPCS.forgemistress_darva.vendorItems).toEqual([
       'copper_mining_pick',
@@ -479,7 +496,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'Careful where you step in the northeastern woods, friend.',
     );
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '2f6072ad2baa2341ce32484144915a0d6cbc9836d0ed4c9d70112e3dbeb87146',
+      '3943f298cc9eff07d9dc040c8ff68d401da70e4a1ba9c17efc681aebc0fede44',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

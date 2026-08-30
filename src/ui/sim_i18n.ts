@@ -43,10 +43,49 @@ const baseEnTable = {
   // refusal toasts; log.bankSlotsPurchased is the purchase notice.
   'error.bankQuestItem': 'You cannot store quest items in the bank.',
   'error.bankFull': 'Your bank is full.',
+  // The pool-honest no_fit refusal (src/sim/bank.ts bankDeposit): a
+  // non-material deposit refused while only materials-only satchel capacity
+  // remains, so "full" would contradict the two-pool meter on screen.
+  'error.bankOnlyMaterialsSpace': 'Only materials fit in the space left in your bank.',
+  // The granularity no_fit refusal (src/sim/bank.ts, MoveResult.noFitCause
+  // 'instanced_units'): free slots exist but the indivisible payload cannot
+  // land whole, so both pool lines would lie.
+  'error.bankStackIndivisible': 'That stack cannot be split to fit the space left in your bank.',
+  // Its bags-direction twin (bankWithdraw AND guildBankWithdraw, one shared
+  // literal): free bag slots exist but the indivisible payload cannot land
+  // whole, so "Your bags are full." would lie.
+  'error.bagsStackIndivisible': 'That stack cannot be split to fit the space left in your bags.',
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
+  // The purchase-mutex refusal ('Your bank has a purchase in progress.') is a
+  // SERVER emit (server/bank_wire.ts) and lives in server_i18n.ts beside its
+  // origin; the client's error chain runs that matcher first.
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Bank bag sockets (src/sim/bank_sockets.ts, Bank Storage phase 06). The
+  // too-far, no-such-item, and bags-full refusals deliberately REUSE the rows
+  // above and below, same banker, same bags. The two {item} lines are matched
+  // by RULES entries; the rest register in the EXACT matcher.
+  'error.bankSocketMax': 'Your bank has no more bag sockets to unlock.',
+  'error.bankSocketCannotAfford': 'You cannot afford that bag socket.',
+  'error.bankSocketNoneOpen': 'You have no open bank bag socket.',
+  'error.bankSocketSpecialProperty':
+    'That bag cannot be socketed while it carries a special property.',
+  'log.bankSocketUnlocked': 'You unlock a bank bag socket.',
+  'log.bankBagSocketed': 'Socketed {item} into your bank.',
+  'log.bankBagUnsocketed': 'Unsocketed {item} from your bank.',
+  // Materials Vault (src/sim/materials_vault.ts): the per-material stockpile
+  // beside the bank. The error.* lines are the refusal toasts; the log.* lines
+  // are the unlock/upgrade notices. The too-far refusal and the bags-full
+  // refusal deliberately REUSE the bank/bags rows above, since the vault is
+  // gated by the same banker and fills the same bags.
+  'error.vaultOnlyMaterials': 'Only materials can be stored in the Materials Vault.',
+  'error.vaultLocked': 'You have not unlocked the Materials Vault.',
+  'error.vaultMaterialFull': 'Your vault cannot hold any more of that material.',
+  'error.vaultCannotAfford': 'You cannot afford that vault upgrade.',
+  'error.vaultMaxUpgrades': 'Your vault cannot be upgraded further.',
+  'log.vaultUnlocked': 'You unlock the Materials Vault.',
+  'log.vaultUpgraded': 'You upgrade the Materials Vault.',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the
@@ -62,6 +101,11 @@ const baseEnTable = {
   'error.guildBankNoGuild': 'You must be in a guild to use the guild bank.',
   'error.guildBankRank': 'Only guild officers may use the guild bank.',
   'error.guildBankFull': 'The guild bank is full.',
+  // The granularity no_fit refusal (guildBankDeposit, MoveResult.noFitCause
+  // 'instanced_units'): free slots exist but the indivisible payload cannot
+  // land whole, so "full" would lie.
+  'error.guildBankStackIndivisible':
+    'That stack cannot be split to fit the space left in the guild bank.',
   // The anonymous-pipe item policy refusals (guildBankPipeRefusal). DEPOSIT names
   // the dimension: quest and soulbound get their own lines; noMarketList and
   // transfer-locked copies share the generic one (the mail noMailQuestItems
@@ -78,6 +122,11 @@ const baseEnTable = {
   'error.guildBankCarryCap': 'You cannot carry that much money.',
   'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
   'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  // Paid guild creation can be bounded by the process-wide transaction gate
+  // or the founder's exact ledger reservation. The server emits this through
+  // the social error seam, so it belongs in the same exact matcher as the sim
+  // refusals even though the originating authority lives in server/game.ts.
+  'error.guildCreateBusy': 'You are busy. Try again in a moment.',
   'log.guildBankOpened': 'You open the guild bank.',
   'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
   'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
@@ -1001,6 +1050,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
     'error.guildBankFull': 'El banco de la hermandad está lleno.',
+    'error.guildBankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en el banco de la hermandad.',
     'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
     'error.guildBankSoulbound':
       'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
@@ -1348,6 +1399,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Poder de la Serpiente',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
+    'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
+    'error.bagsStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tus bolsas.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -1460,6 +1516,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank':
       'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
     'error.guildBankFull': 'El banco de la hermandad está lleno.',
+    'error.guildBankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en el banco de la hermandad.',
     'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
     'error.guildBankSoulbound':
       'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
@@ -1804,6 +1862,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Poder de la Serpiente',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
+    'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
+    'error.bagsStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tus bolsas.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -1919,6 +1982,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
+    'error.guildBankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de la banque de guilde.",
     'error.guildBankQuestItem':
       "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
     'error.guildBankSoulbound':
@@ -2273,6 +2338,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Puissance du Serpent',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
+    'error.bankOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
+    'error.bagsStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de vos sacs.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -2388,6 +2459,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
     'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
     'error.guildBankFull': 'La banque de guilde est pleine.',
+    'error.guildBankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de la banque de guilde.",
     'error.guildBankQuestItem':
       "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
     'error.guildBankSoulbound':
@@ -2742,6 +2815,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Puissance du Serpent',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
+    'error.bankOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
+    'error.bagsStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de vos sacs.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -3057,6 +3136,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Devi essere in una gilda per usare la banca della gilda.',
     'error.guildBankRank': 'Solo gli ufficiali della gilda possono usare la banca della gilda.',
     'error.guildBankFull': 'La banca della gilda è piena.',
+    'error.guildBankStackIndivisible':
+      'Quella pila non può essere divisa per entrare nello spazio rimasto nella banca della gilda.',
     'error.guildBankQuestItem': 'Non puoi depositare oggetti missione nella banca della gilda.',
     'error.guildBankSoulbound':
       "Non puoi depositare oggetti vincolati all'anima nella banca della gilda.",
@@ -3404,6 +3485,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Potenza del Serpente',
     'error.bankQuestItem': 'Non puoi depositare oggetti missione in banca.',
     'error.bankFull': 'La tua banca è piena.',
+    'error.bankOnlyMaterialsSpace':
+      "Nello spazio rimasto nella tua banca c'è posto solo per i materiali.",
+    'error.bankStackIndivisible':
+      'Quella pila non può essere divisa per entrare nello spazio rimasto nella tua banca.',
+    'error.bagsStackIndivisible':
+      'Quella pila non può essere divisa per entrare nello spazio rimasto nelle tue borse.',
     'error.bankCannotAfford': "Non puoi permetterti quell'ampliamento della banca.",
     'error.bankMaxSlots': 'La tua banca non può essere ampliata oltre.',
     'error.bankTooFar': 'Sei troppo lontano dal banchiere.',
@@ -3519,6 +3606,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
     'error.guildBankRank': 'Nur Gildenoffiziere dürfen die Gildenbank benutzen.',
     'error.guildBankFull': 'Die Gildenbank ist voll.',
+    'error.guildBankStackIndivisible':
+      'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz der Gildenbank zu passen.',
     'error.guildBankQuestItem': 'Ihr könnt keine Questgegenstände in der Gildenbank lagern.',
     'error.guildBankSoulbound':
       'Ihr könnt keine seelengebundenen Gegenstände in der Gildenbank lagern.',
@@ -3869,6 +3958,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Macht der Schlange',
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
+    'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
+    'error.bankStackIndivisible':
+      'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz Eurer Bank zu passen.',
+    'error.bagsStackIndivisible':
+      'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz Eurer Taschen zu passen.',
     'error.bankCannotAfford': 'Ihr könnt Euch diese Bankerweiterung nicht leisten.',
     'error.bankMaxSlots': 'Eure Bank kann nicht weiter erweitert werden.',
     'error.bankTooFar': 'Ihr seid zu weit vom Bankier entfernt.',
@@ -3980,6 +4074,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': '你必须加入公会才能使用公会银行。',
     'error.guildBankRank': '只有公会官员才能使用公会银行。',
     'error.guildBankFull': '公会银行已满。',
+    'error.guildBankStackIndivisible': '该物品堆无法拆分，放不进公会银行的剩余空间。',
     'error.guildBankSoulbound': '你无法将灵魂绑定的物品存入公会银行。',
     'error.guildBankNoTransfer': '该物品无法存入公会银行。',
     'error.guildBankTreasuryCap': '公会金库无法容纳这么多金钱。',
@@ -4272,6 +4367,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '你无法将任务物品存入公会银行。',
     'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
+    'error.bankOnlyMaterialsSpace': '你的银行剩余空间只能存放材料。',
+    'error.bankStackIndivisible': '该物品堆无法拆分，放不进你银行的剩余空间。',
+    'error.bagsStackIndivisible': '该物品堆无法拆分，放不进你背包的剩余空间。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
     'error.bankTooFar': '你距离银行家太远。',
@@ -4426,6 +4524,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': '你必須加入公會才能使用公會銀行。',
     'error.guildBankRank': '只有公會幹部才能使用公會銀行。',
     'error.guildBankFull': '公會銀行已滿。',
+    'error.guildBankStackIndivisible': '該物品堆無法拆分，放不進公會銀行的剩餘空間。',
     'error.guildBankSoulbound': '你無法將靈魂綁定物品存入公會銀行。',
     'error.guildBankNoTransfer': '該物品無法存入公會銀行。',
     'error.guildBankTreasuryCap': '公會金庫容納不下這麼多金錢。',
@@ -4718,6 +4817,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '你無法將任務物品存入公會銀行。',
     'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
+    'error.bankOnlyMaterialsSpace': '你的銀行剩餘空間只能存放材料。',
+    'error.bankStackIndivisible': '該物品堆無法拆分，放不進你銀行的剩餘空間。',
+    'error.bagsStackIndivisible': '該物品堆無法拆分，放不進你背包的剩餘空間。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
     'error.bankTooFar': '你距離銀行家太遠。',
@@ -4873,6 +4975,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': '길드 은행을 사용하려면 길드에 소속되어 있어야 합니다.',
     'error.guildBankRank': '길드 임원만 길드 은행을 사용할 수 있습니다.',
     'error.guildBankFull': '길드 은행이 가득 찼습니다.',
+    'error.guildBankStackIndivisible':
+      '해당 묶음은 나눌 수 없어 길드 은행에 남은 공간에 넣을 수 없습니다.',
     'error.guildBankSoulbound': '귀속된 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankNoTransfer': '그 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankTreasuryCap': '길드 금고는 그만큼 많은 돈을 담을 수 없습니다.',
@@ -5171,6 +5275,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '퀘스트 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
+    'error.bankOnlyMaterialsSpace': '은행에 남은 공간에는 재료만 보관할 수 있습니다.',
+    'error.bankStackIndivisible': '해당 묶음은 나눌 수 없어 은행에 남은 공간에 넣을 수 없습니다.',
+    'error.bagsStackIndivisible': '해당 묶음은 나눌 수 없어 가방에 남은 공간에 넣을 수 없습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
     'error.bankTooFar': '은행원과 너무 멀리 떨어져 있습니다.',
@@ -5329,6 +5436,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'ギルド銀行を利用するにはギルドに加入している必要があります。',
     'error.guildBankRank': 'ギルド銀行を利用できるのはギルド幹部のみです。',
     'error.guildBankFull': 'ギルド銀行がいっぱいです。',
+    'error.guildBankStackIndivisible':
+      'そのスタックは分割できないため、ギルド銀行の残りのスペースに収まりません。',
     'error.guildBankSoulbound': '魂縛のアイテムはギルド銀行に預けられません。',
     'error.guildBankNoTransfer': 'そのアイテムはギルド銀行に預けられません。',
     'error.guildBankTreasuryCap': 'ギルド金庫にはそれだけの額を入れられません。',
@@ -5635,6 +5744,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': 'クエストアイテムはギルド銀行に預けられません。',
     'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
+    'error.bankOnlyMaterialsSpace': '銀行の残りのスペースには素材しか入りません。',
+    'error.bankStackIndivisible':
+      'そのスタックは分割できないため、銀行の残りのスペースに収まりません。',
+    'error.bagsStackIndivisible':
+      'そのスタックは分割できないため、バッグの残りのスペースに収まりません。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
     'error.bankTooFar': '銀行員から遠すぎます。',
@@ -5796,6 +5910,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
     'error.guildBankRank': 'Somente oficiais da guilda podem usar o banco da guilda.',
     'error.guildBankFull': 'O banco da guilda está cheio.',
+    'error.guildBankStackIndivisible':
+      'Essa pilha não pode ser dividida para caber no espaço restante do banco da guilda.',
     'error.guildBankQuestItem': 'Você não pode guardar itens de missão no banco da guilda.',
     'error.guildBankSoulbound': 'Você não pode guardar itens vinculados à alma no banco da guilda.',
     'error.guildBankNoTransfer': 'Esse item não pode ser guardado no banco da guilda.',
@@ -6139,6 +6255,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Força da Serpente',
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
+    'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
+    'error.bankStackIndivisible':
+      'Essa pilha não pode ser dividida para caber no espaço restante do seu banco.',
+    'error.bagsStackIndivisible':
+      'Essa pilha não pode ser dividida para caber no espaço restante das suas bolsas.',
     'error.bankCannotAfford': 'Você não pode pagar por essa expansão do banco.',
     'error.bankMaxSlots': 'Seu banco não pode ser expandido além disso.',
     'error.bankTooFar': 'Você está longe demais do banqueiro.',
@@ -6252,6 +6373,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
     'error.guildBankRank': 'Пользоваться банком гильдии могут только офицеры гильдии.',
     'error.guildBankFull': 'Банк гильдии полон.',
+    'error.guildBankStackIndivisible':
+      'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место банка гильдии.',
     'error.guildBankSoulbound': 'Персональные предметы нельзя хранить в банке гильдии.',
     'error.guildBankNoTransfer': 'Этот предмет нельзя хранить в банке гильдии.',
     'error.guildBankTreasuryCap': 'Казна гильдии не может вместить такую сумму.',
@@ -6557,6 +6680,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': 'Предметы заданий нельзя хранить в банке гильдии.',
     'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
+    'error.bankOnlyMaterialsSpace': 'В вашем банке осталось место только для материалов.',
+    'error.bankStackIndivisible':
+      'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место вашего банка.',
+    'error.bagsStackIndivisible':
+      'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место ваших сумок.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
     'error.bankTooFar': 'Вы слишком далеко от банкира.',
@@ -11307,6 +11435,16 @@ const RULES: Rule[] = [
   { re: /^You have already recovered this relic\.$/, build: () => tItemExtra('relicRecovered') },
   { re: /^Equipped (?!\()(.+)\.$/, build: (m) => tSim('log.equipped', { item: locItem(m[1]) }) },
   { re: /^Unequipped (.+)\.$/, build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }) },
+  // Bank bag sockets (src/sim/bank_sockets.ts). Anchored on the full phrase so
+  // neither rule can swallow a future bare Socketed/Unsocketed line.
+  {
+    re: /^Socketed (.+) into your bank\.$/,
+    build: (m) => tSim('log.bankBagSocketed', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^Unsocketed (.+) from your bank\.$/,
+    build: (m) => tSim('log.bankBagUnsocketed', { item: locItem(m[1]) }),
+  },
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
   {
     re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,

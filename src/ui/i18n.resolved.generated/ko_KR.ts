@@ -789,7 +789,37 @@ export const ko_KR: EnTranslations = {
       "applied": "적용됨",
       "apply": "스킨 적용",
       "detach": "스킨 해제",
-      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요."
+      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요.",
+      "charter": {
+        "eyebrow": "금고",
+        "title": "금고 특허장",
+        "scope": "특허장은 이 캐릭터의 은행만 확장합니다. 출납관도 같은 칸을 골드로 판매합니다.",
+        "grant": "은행 칸 {slots}칸 추가",
+        "buy": "특허장 구매",
+        "buyAria": "{item} 구매",
+        "confirmTitle": "특허장 구매 확인",
+        "confirmBody": "{item}을(를) {cost} Claudium에 구매할까요?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "특허장이 적용되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+        "alreadyGranted": "이 특허장은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+        "applyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+        "grantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+        "inProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+        "doesNotFit": "이 캐릭터의 은행에는 이 특허장의 칸을 모두 담을 수 없습니다.",
+        "notPurchasable": "이 특허장은 지금 구매할 수 없습니다.",
+        "noRoom": "이 캐릭터의 은행에는 더 이상 특허장을 넣을 자리가 없습니다.",
+        "noCharterFits": "이 캐릭터의 은행에 남은 자리에 들어갈 수 있는 특허장이 없습니다.",
+        "someHiddenByFit": "이 캐릭터의 은행에 남은 자리보다 큰 특허장은 표시되지 않습니다.",
+        "outage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "outageStale": "상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "failed": "구매를 완료하지 못했습니다.",
+        "names": {
+          "strongbox_charter_1": "하급 금고 특허장",
+          "strongbox_charter_2": "상급 금고 특허장",
+          "strongbox_charter_3": "대금고 특허장",
+          "strongbox_charter_complete": "완전 금고 특허장"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "presets": {
         "classic": "클래식 골드",
+        "fancyGold": "화려한 골드",
         "midnight": "미드나이트",
         "parchment": "양피지",
         "highContrast": "고대비"
@@ -1321,6 +1352,11 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "done": "완료",
       "cancel": "취소",
+      "showExtraBar": "액션 바 하나 더 표시",
+      "hideExtraBar": "액션 바 하나 숨기기",
+      "conflictTitle": "이미 지정된 키",
+      "conflictBody": "{key} 키는 이미 {other}에 지정되어 있습니다. {action}에 지정하면 {other}의 지정이 해제됩니다.",
+      "conflictAccept": "그래도 재지정",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
     },
@@ -1543,6 +1579,7 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "combineActionBars": "액션 바 합치기",
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
@@ -1552,6 +1589,8 @@ export const ko_KR: EnTranslations = {
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
       "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchPreciseAim": "정밀 지면 지정",
+      "touchPreciseAimNote": "지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.",
       "touchTapMenus": "탭 메뉴",
       "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
@@ -1587,6 +1626,7 @@ export const ko_KR: EnTranslations = {
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
       "cameraSpeed": "카메라 속도",
+      "reticleSpeed": "조준점 속도",
       "vibration": "진동",
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
@@ -2435,7 +2475,10 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "poolGeneral": "일반: {total}칸 중 {used}칸",
+      "poolMaterials": "재료: {total}칸 중 {used}칸",
+      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸."
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -2691,6 +2734,7 @@ export const ko_KR: EnTranslations = {
     },
     "partyFrames": {
       "section": "파티 및 공격대 프레임",
+      "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
       "lock": "파티 및 공격대 프레임 고정",
       "style": "프레임 스타일",
@@ -2720,6 +2764,62 @@ export const ko_KR: EnTranslations = {
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
+    },
+    "interfaceUnlock": {
+      "label": "프레임 편집",
+      "unlock": "인터페이스 잠금 해제",
+      "lock": "인터페이스 잠금",
+      "lockAll": "인터페이스 잠금",
+      "barsNote": "편집 중에는 켜 둔 액션 바만 표시됩니다. 더 많은 바를 배치하려면 먼저 기본 액션 바의 더하기/빼기 버튼으로 추가하세요.",
+      "frozenNote": "편집 중에는 인터페이스와 카메라가 고정됩니다. 버튼과 프레임은 배치용 정지 화면이 되며, 클릭은 게임 세계에 전달되지 않습니다.",
+      "unlockFrame": "이 프레임 잠금 해제",
+      "lockFrame": "이 프레임 잠금",
+      "resizeFrame": "이 프레임 크기 조절",
+      "frameNames": {
+        "actionBar1": "행동 단축바",
+        "actionBar2": "행동 단축바 2",
+        "actionBar3": "행동 단축바 3",
+        "steamWishlist": "찜 목록 알림",
+        "menu": "Menu",
+        "minimap": "미니맵",
+        "stanceBar": "태세 바",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "액션 바",
+        "playerFrame": "플레이어",
+        "targetFrame": "대상",
+        "partyFrames": "파티",
+        "swingBar": "자동 공격"
+      },
+      "framesMenu": "프레임 설정",
+      "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",
+      "showHideFrames": "프레임 표시 및 숨기기",
+      "buffsLeftToRight": "버프 왼쪽에서 오른쪽으로",
+      "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
+      "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
+      "actionBarsVertical": "액션 바 세로 배치",
+      "actionBar1Vertical": "액션 바 세로 배치",
+      "actionBar2Vertical": "액션 바 2 세로 배치",
+      "actionBar3Vertical": "액션 바 3 세로 배치",
+      "menuRailHorizontal": "메뉴 가로 배치",
+      "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "크기 초기화",
+      "resetFrameSizeFor": "{name} 크기 초기화",
+      "previewSpell": "예시 주문"
+    },
+    "transfer": {
+      "frameLayout": "프레임 배치",
+      "allSettings": "모든 설정",
+      "exportAction": "내보내기",
+      "importAction": "가져오기",
+      "copy": "복사",
+      "copied": "클립보드에 복사했습니다.",
+      "copyFailed": "복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.",
+      "applyReload": "적용 후 다시 불러오기",
+      "pastePlaceholder": "내보낸 코드를 여기에 붙여넣으세요.",
+      "invalid": "유효한 내보내기 코드가 아닙니다.",
+      "wrongKind": "이 코드는 다른 종류의 내보내기입니다."
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
@@ -2928,7 +3028,10 @@ export const ko_KR: EnTranslations = {
       "unlink": "Steam 연동 해제",
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
-      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.",
+      "wishlist": "Steam에서 위시리스트에 추가",
+      "wishlistAria": "Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기",
+      "wishlistShort": "위시리스트"
     },
     "epic": {
       "title": "Epic",
@@ -3014,6 +3117,26 @@ export const ko_KR: EnTranslations = {
       "buySlotsMaxed": "완전히 확장됨",
       "buyConfirm": "{price}에 은행 칸 {count}개를 추가로 구매하시겠습니까?",
       "buyConfirmAccept": "구매",
+      "meterLabel": "{total}칸 중 {used}칸 사용",
+      "meterPoolGeneral": "일반: {total}칸 중 {used}칸",
+      "meterPoolMaterials": "재료: {total}칸 중 {used}칸",
+      "meterPoolsAria": "사용 중인 은행 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.",
+      "meterMaterialsNote": "장착한 재료 가방이 제공하는 재료 전용 공간입니다. 다른 아이템은 사용할 수 없습니다.",
+      "priceDisclaimer": "가격은 게임 경제에 따라 변동될 수 있습니다.",
+      "rungItemName": "은행 칸 {count}개",
+      "buySlotsDualAria": "{price} 또는 {cost} Claudium으로 {count}칸 구매",
+      "buyConfirmDual": "은행 칸 {count}개를 추가로 구매하시겠습니까?",
+      "buyConfirmGold": "{price}에 구매",
+      "buyConfirmClaudium": "{cost} Claudium으로 구매",
+      "rungGranted": "은행 칸이 추가되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+      "rungAlreadyGranted": "이 칸은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+      "rungApplyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+      "rungGrantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+      "rungInProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+      "rungDoesNotFit": "이 캐릭터의 은행에는 더 이상 확장을 담을 수 없습니다.",
+      "rungNotPurchasable": "이 은행 칸은 지금 구매할 수 없습니다.",
+      "rungFailed": "구매를 완료하지 못했습니다.",
+      "rungOutage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
       "withdrawHint": "클릭하여 꺼내기",
       "withdrawPartialHint": "Shift+클릭하여 일부만 꺼내기",
       "depositHint": "클릭하여 넣기",
@@ -3026,6 +3149,9 @@ export const ko_KR: EnTranslations = {
       "withdrawQuantityTitle": "{item} 꺼내기",
       "withdrawQuantityInput": "꺼낼 수량",
       "withdrawQuantityConfirm": "꺼내기",
+      "vaultRowWithdrawName": "{item} 꺼내기",
+      "priceChanged": "구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.",
+      "withdrawQuantityAction": "{item} 꺼낼 수량 선택",
       "filterGroupAria": "은행을 분류별로 필터링",
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",
@@ -3047,6 +3173,34 @@ export const ko_KR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.",
       "bonusSectionAria": "보너스 은행 칸과 획득 방법",
+      "socketRowAria": "은행 가방 칸",
+      "socketEmpty": "빈 은행 가방 칸",
+      "socketEmptyHint": "가방에 있는 가방을 클릭하면 은행에 보관됩니다",
+      "socketLocked": "잠긴 가방 칸",
+      "socketLockedLater": "가방 칸은 저렴한 것부터 순서대로 해금됩니다",
+      "socketUnlockAria": "{price}(으)로 은행 가방 칸 해금",
+      "socketUnlockHint": "클릭하여 이 가방 칸을 해금",
+      "socketUnlockConfirm": "{price}(으)로 은행 가방 칸을 해금하시겠습니까?",
+      "socketUnlockAccept": "해금",
+      "unsocketHint": "클릭하여 이 가방을 가방으로 되돌리기",
+      "socketHint": "클릭하여 이 가방을 은행에 장착",
+      "vaultTab": "보관소",
+      "vaultCapacityNote": "각 재료는 최대 {cap}개까지 보관할 수 있습니다.",
+      "vaultEmpty": "재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.",
+      "vaultRowAria": "{item}: {count}/{cap}개 보관 중",
+      "vaultLockedIntro": "재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.",
+      "vaultUnlockButton": "재료 보관소 개방",
+      "vaultUnlockConfirm": "{price}(으)로 재료 보관소를 개방하시겠습니까?",
+      "vaultUpgrade": "보관 한도를 {cap}개로 확장",
+      "vaultUpgradeConfirm": "{price}(으)로 각 재료의 보관 한도를 {cap}개로 확장하시겠습니까?",
+      "vaultDepositAll": "재료 모두 보관",
+      "vaultDepositAllTooltip": "가방의 모든 재료를 한 번에 보관소로 옮깁니다. 각 재료는 한도까지 채워집니다. 장비, 도구, 퀘스트 아이템, 소모품은 옮겨지지 않습니다.",
+      "vaultDepositAllDone": "보관한 재료: {count}개.",
+      "vaultDepositAllFull": "보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.",
+      "vaultDepositAllNone": "보관 한도가 가득 차서 아무것도 보관하지 못했습니다.",
+      "vaultWithdrawShort": "가방에는 {count}개 중 {fit}개만 들어갑니다.",
+      "vaultDepositHint": "클릭하여 보관소에 보관",
+      "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
       "tabsAria": "은행 탭",
       "personalTab": "개인",
       "guildTab": "길드",
@@ -3446,6 +3600,8 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
+      "reagentVaultDraw": "(재료 보관소에서 {count}개 사용)",
+      "vaultUnreachable": "여기에서는 재료 보관소를 사용할 수 없습니다.",
       "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
@@ -4047,8 +4203,10 @@ export const ko_KR: EnTranslations = {
       "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
       "disabledRealm": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
       "pausedBanner": "거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.",
-      "walletBanner": "지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.",
-      "walletBannerCta": "지갑 연결",
+      "walletLinkedDisconnected": "공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.",
+      "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "알 수 없음",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
@@ -4302,6 +4460,8 @@ export const ko_KR: EnTranslations = {
       "online": "캐릭터가 현재 접속 중입니다.",
       "rename_not_permitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
+      "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
+      "delete_busy": "서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
@@ -6306,6 +6466,7 @@ export const ko_KR: EnTranslations = {
       "bankBody": "모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.",
       "bankHow": "금고가 열린 상태에서 가방의 물건을 클릭하면 맡겨지고, 금고의 물건을 클릭하면 되찾습니다. 금고에는 물건만 보관할 수 있고 동전은 맡길 수 없으며, 퀘스트 아이템은 늘 몸에 지니게 됩니다. 여행 중에 가방이 가득 차면 제작 재료를 한 번에 맡기는 버튼도 있습니다.",
       "bankSlots": "갓 연 금고는 작지만 당신과 함께 자랍니다. 출납관은 추가 칸을 동전에 판매하며 가격은 단계마다 높아집니다. 온라인으로 플레이하면 이메일 인증, 계정 연동, 친구 초대 등으로 보너스 공간도 얻을 수 있습니다.",
+      "bankSockets": "칸 사다리 너머로, 출납관은 최대 네 개의 가방 칸도 판매합니다. 저렴한 것부터 순서대로 해금되며 가격은 단계마다 높아집니다. 들고 다니던 여분의 가방을 칸에 끼우면 그 가방의 칸이 금고 공간에 더해집니다. 일반 가방은 금고 전체를 넓히고, 재료 주머니는 제작 재료만 쓸 수 있는 공간을 더합니다. 가방에 있는 가방을 클릭하면 끼워지고, 칸을 클릭하면 되찾습니다. 되찾아도 보관한 물건을 잃는 일은 없습니다. 금고가 줄어든 공간을 넘어서더라도 모든 물건은 그대로 남고, 새 보관만 자리가 나기를 기다립니다.",
       "buyingTitle": "사고팔기",
       "buyingBody": "상인에게 말을 걸어 물건을 둘러보기로 하면, 그들의 상점이 세 개의 탭과 함께 열립니다. 구매, 판매, 되사기입니다. 구매 탭에는 그들이 갖춘 모든 물건이 있어, 형편이 닿는 한 무엇이든 살 수 있습니다. 판매 탭에는 가방 속에서 그들이 값을 치를 물건이 나열되며, 저마다 굴려 정해진 품질을 지닌 물건을 팔 때에는 먼저 확인을 묻기에, 아끼는 물건이 실수로 빠져나가는 일이 없습니다. 후회할 물건을 넘겼다면, 되사기 탭에 최근 판매 내역이 남아 있어 받았던 동전으로 다시 사들일 수 있습니다.",
       "junkTitle": "잡동사니 정리",
@@ -7342,6 +7503,7 @@ export const ko_KR: EnTranslations = {
       "title": "Solana 지갑 연결",
       "linkBody": "이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.",
       "paymentBody": "계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.",
+      "stepUpBody": "계정에 연결된 지갑을 선택하고 $WOC 거래소 승인 메시지에 서명하세요. 서명은 무료이며 자금이 이동하지 않습니다.",
       "extensionHelp": "호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.",
       "safety": "World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.",
       "continueWith": "{wallet}(으)로 계속",
@@ -9427,7 +9589,8 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots}칸 가방"
+      "bagSlots": "{slots}칸 가방",
+      "bagSlotsMaterials": "{slots}칸 재료 가방"
     },
     "bags": {
       "title": "가방",
@@ -12863,6 +13026,27 @@ export const ko_KR: EnTranslations = {
       },
       "dawnhold_posy": {
         "name": "던홀드 정원 꽃다발"
+      },
+      "wayfarers_backpack": {
+        "name": "나그네의 배낭"
+      },
+      "burlap_reagent_pouch": {
+        "name": "삼베 재료 주머니"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "강령술사의 재료 가방"
+      },
+      "duskweave_bag": {
+        "name": "황혼결 가방"
+      },
+      "resonant_weave_bag": {
+        "name": "공명결 가방"
+      },
+      "foragers_haversack": {
+        "name": "채집가의 잡낭"
+      },
+      "loombound_reagent_satchel": {
+        "name": "베틀결 재료 가방"
       },
       "ps_briny_lure": {
         "name": "짠물 미끼"

@@ -51,6 +51,7 @@ interface SlotOpts {
   // (an assigned slot whose ability/item does not resolve); defaults to "bound iff
   // an ability or item resolves".
   hasAction?: boolean;
+  ownsAimSlot?: (activeAimSlot: number) => boolean;
 }
 
 function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
@@ -61,6 +62,7 @@ function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
     ability: () => opts.ability ?? null,
     item: () => opts.item ?? null,
     keybindLabel: () => opts.keybind ?? `K${slotIndex}`,
+    ownsAimSlot: opts.ownsAimSlot,
   };
 }
 
@@ -118,6 +120,7 @@ interface WorldOpts {
     ascensionRemaining: number;
   };
   paladinSpec?: string | null;
+  activeAimSlot?: number | null;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -153,8 +156,71 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
     stealthed: opts.stealthed ?? false,
     fateThreads: opts.fateThreads ?? 0,
     entities: opts.entities ?? [],
+    activeAimSlot: opts.activeAimSlot ?? null,
   };
 }
+
+describe('actionBarView: active ground aim ownership', () => {
+  it('supports exact source-slot ownership', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(4, { ability: ability('fireball') }),
+        slot(27, {
+          ability: ability('blizzard'),
+          ownsAimSlot: (activeAimSlot) => activeAimSlot === 27,
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ activeAimSlot: 27 })).slots.map((state) => state.aiming)).toEqual([
+      false,
+      true,
+    ]);
+  });
+
+  it('marks exactly the descriptor that owns the active source slot', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(4, { ability: ability('fireball') }),
+        slot(9, {
+          ability: ability('meteor'),
+          ownsAimSlot: (activeAimSlot) => activeAimSlot === 27,
+        }),
+        slot(27, { ability: ability('blizzard') }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ activeAimSlot: 27 })).slots.map((state) => state.aiming)).toEqual([
+      false,
+      true,
+      false,
+    ]);
+  });
+
+  it('clears every slot when an active ground aim ends', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(2, { ability: ability('fireball') }),
+        slot(3, {
+          ability: ability('meteor'),
+          ownsAimSlot: (activeAimSlot) => activeAimSlot === 3,
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ activeAimSlot: 3 })).slots.map((state) => state.aiming)).toEqual([
+      false,
+      true,
+    ]);
+    expect(view.tick(world({ activeAimSlot: null })).slots.map((state) => state.aiming)).toEqual([
+      false,
+      false,
+    ]);
+  });
+});
 
 describe('actionBarView: the four slot kinds classify correctly', () => {
   it('dims a Devotion spender until the secondary resource cost is met', () => {

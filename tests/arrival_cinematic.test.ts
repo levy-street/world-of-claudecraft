@@ -3,6 +3,7 @@
 // framing over a few seconds, monotonic in both knobs, cancellable, and
 // exact at both ends.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   ARRIVAL_CINEMATIC_SECONDS,
@@ -57,5 +58,15 @@ describe('arrival cinematic', () => {
     let frames = 0;
     while (stepArrivalCinematic(state, 0.1)) frames++;
     expect(frames).toBe(Math.ceil(ARRIVAL_CINEMATIC_SECONDS / 0.1));
+  });
+});
+
+describe('the landing fall yields to the spawn intro (source pin)', () => {
+  it('main.ts never starts the fall while the first-spawn intro owns the camera', () => {
+    const src = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const hook = src.indexOf('hud.onIslandFirstArrival = () => {');
+    expect(hook).toBeGreaterThan(-1);
+    const body = src.slice(hook, src.indexOf('startArrivalCinematic(arrivalCinematic', hook));
+    expect(body).toContain('if (intro !== null ||');
   });
 });

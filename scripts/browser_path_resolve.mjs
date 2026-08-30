@@ -33,6 +33,9 @@ export function playwrightBrowserCandidates(options = {}) {
       if (!entry.isDirectory() || !entry.name.startsWith('chromium-')) continue;
       const dir = path.join(root, entry.name);
       out.push(
+        // Current Playwright Linux archives use chrome-linux64; retain the
+        // older chrome-linux layout for existing caches.
+        path.join(dir, 'chrome-linux64', 'chrome'),
         path.join(dir, 'chrome-linux', 'chrome'),
         path.join(dir, 'chrome-mac', 'Chromium.app', 'Contents', 'MacOS', 'Chromium'),
         path.join(dir, 'chrome-win', 'chrome.exe'),

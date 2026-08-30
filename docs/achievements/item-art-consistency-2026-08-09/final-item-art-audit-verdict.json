@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-10T04:33:00.640Z",
+  "generatedAt": "2026-08-26T05:07:29.368Z",
   "auditScope": {
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 830,
-    "liveItemDefinitions": 845,
+    "itemArtFilesReviewed": 837,
+    "liveItemDefinitions": 852,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -298,7 +298,7 @@
       "armor-ring": 18,
       "armor-shoulder": 49,
       "armor-waist": 27,
-      "bag": 6,
+      "bag": 13,
       "drink": 9,
       "elixir": 4,
       "food": 21,
@@ -342,6 +342,25 @@
           "docs/achievements/icon-brief.md"
         ],
         "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-26",
+        "branch": "feature/bank-storage-pr",
+        "reviewer": "implementation agent",
+        "replacedIds": [
+          "burlap_reagent_pouch",
+          "duskweave_bag",
+          "foragers_haversack",
+          "loombound_reagent_satchel",
+          "necromancers_reagent_satchel",
+          "resonant_weave_bag",
+          "wayfarers_backpack"
+        ],
+        "provenance": [
+          "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json",
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -384,7 +403,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 830,
+    "passCount": 837,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -461,6 +480,7 @@
       "broodmother_silk_robe",
       "brutoks_maul",
       "bulwark_rusted_pauldrons",
+      "burlap_reagent_pouch",
       "canopy_silk_hank",
       "cantors_drowned_sash",
       "captains_crest",
@@ -557,6 +577,7 @@
       "duskfang_dirk",
       "duskhide_wraps",
       "duskthorn_mantle",
+      "duskweave_bag",
       "duskwhisper",
       "duskwisp_essence",
       "eastbrook_arming_sword",
@@ -622,6 +643,7 @@
       "first_blood_razor",
       "fleetblood_band",
       "footpad_jerkin",
+      "foragers_haversack",
       "forest_pink_armor_plate",
       "fountain_court_mantle",
       "frayed_prayer_beads",
@@ -804,6 +826,7 @@
       "litany_legs",
       "litany_plate_chest",
       "litany_shoulder",
+      "loombound_reagent_satchel",
       "lost_caravan_goods",
       "lunar_choir_leggings",
       "lunar_tide_greatstaff",
@@ -877,6 +900,7 @@
       "mudfin_scale",
       "murloc_hut",
       "necromancers_legwraps",
+      "necromancers_reagent_satchel",
       "necromancers_soulspire_mantle",
       "necromancers_soulsteps",
       "necromancers_starshroud",
@@ -965,6 +989,7 @@
       "resonant_steel",
       "resonant_thread",
       "resonant_timber",
+      "resonant_weave_bag",
       "restless_skull",
       "revenant_silk_robe",
       "revenantstep_treads",
@@ -1174,6 +1199,7 @@
       "wardplate_cuirass",
       "wardweave_cowl",
       "waterlogged_idol",
+      "wayfarers_backpack",
       "wayfarers_hood",
       "weathered_ledger_page",
       "webwood_silk",
@@ -1221,7 +1247,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21."
+    "summary": "All 837 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21."
   },
   "nonVisualContentWatch": [
     {
@@ -1378,8 +1404,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "f1dff0a9362b94020fa4946b93e56dc6f5b22db5217e44742ceafa9b74e41605",
-      "bytes": 455338
+      "sha256": "030be381ff6cd91e85a0c1043d33c4b3e97999be6a150ed52ff2b677b63f4ad9",
+      "bytes": 458987
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1393,7 +1419,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "15521fa698a0238779c2dab9d257ba7c8036cf37edaf12e98b3e1efc5ad247a4",
+    "sheetSetSha256": "4a36d29fb1003cff82192617a08036bb840ed8e37f30d782d83964664dbb5db0",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2101,66 +2127,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--128-color.png",
-        "sha256": "767520a971ef975009c461ef7eabbdf528fdf9239ba17f06f070d9714d5b0749",
-        "bytes": 205495,
+        "sha256": "9dc1f42b24861f08ef7e490a4729dd544a31c347e1e554f6dc017dfb2d1d5f8a",
+        "bytes": 414632,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--40-color.png",
-        "sha256": "04245faad8f6d6130cef27127b29c34c620ef61beec03a4e4329fd5fd462c37b",
-        "bytes": 38235,
+        "sha256": "22912fcf62c7d7f65d3d4bc8e29b396c07ccbb5b5eedc4253725e739b67ce419",
+        "bytes": 78985,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-color.png",
-        "sha256": "d8567a94950e28e0db5161f578a68b3b63651216bd227ea18814f7a1ede1ac28",
-        "bytes": 27575,
+        "sha256": "6eac7554711e37c601ea708d8a83be2f5931533764cbc1b3c4afb74109e14df8",
+        "bytes": 56117,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--22-color.png",
-        "sha256": "62032d68b9b5ff766dde5ffeec1d1bb5da47dfc0f25fc17c8767062a8541da5e",
-        "bytes": 22114,
+        "sha256": "fbd4efa3ca67d1187fffb6d9ac55c28e78715b0efd3b805794434393b35f552e",
+        "bytes": 44574,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-grayscale.png",
-        "sha256": "de2cb54b8c782f6be54df65f8e1c6819f4d4d216aecfb8eac5fa032e536f240d",
-        "bytes": 22465,
+        "sha256": "683c1f076191d6cb982d14aa9c664d907976ed415d0df0983a014e847b0670b7",
+        "bytes": 42438,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "961963568833224c3399445d0102a853a950122cd451655dfa2b2a4572f14fa2",
-        "bytes": 67978,
+        "sha256": "39eaeaac0afba4a9679b5b8e73461d6961da4b99dd30daf832db394a8fff9fc0",
+        "bytes": 137853,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "1c0f71a63220e4d02fa45ff90bd372d3337eaa519ac078dd6395d2efd4ba3a4c",
-        "bytes": 121261,
+        "sha256": "71e5d5474a416238942554830cdb5dd860ca99e07a1fce6925437dd2ae817261",
+        "bytes": 247595,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--identity.png",
-        "sha256": "b803738066d28908b7f51f6772b4eeed9d0bce340781ab2e1ab29315fe77ab96",
-        "bytes": 214503,
+        "sha256": "5352ee0940df7aa86a7e39fb209613f68f2be127ba86c53095970f59a4644c3e",
+        "bytes": 432542,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -3060,6 +3086,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "74e2e261cf3b2e62b21856c9f3ec9e5f42fa848cc3b8a8f14ce3005f0f968d5c"
+    "shippingCatalogSha256": "55d3e58447d82bd72cb09a7327c3681ad111bbcb1da4ffd27046bc2e9ef65102"
   }
 }

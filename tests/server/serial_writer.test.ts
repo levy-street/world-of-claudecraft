@@ -10,7 +10,11 @@
 // settled or rejected write would either warn forever or (once the throttle
 // swallows it) go silent on a real pile-up.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createDepthWarnedSerialWriter, createKeyedSerialWriter } from '../../server/serial_writer';
+import {
+  createDepthWarnedSerialWriter,
+  createKeyedSerialWriter,
+  KeyedSerialWriteAborted,
+} from '../../server/serial_writer';
 
 function gate(): { open: () => void; held: Promise<void> } {
   let open!: () => void;
@@ -99,6 +103,153 @@ describe('createKeyedSerialWriter', () => {
     // keep it, so b still runs and the entry clears only after b settles.
     expect(writer.pendingKeys()).toBe(1);
     expect(await b).toBe('tail');
+    expect(writer.pendingKeys()).toBe(0);
+  });
+
+  it('settles and unlinks an aborted queued write while the running head stays blocked', async () => {
+    const writer = createKeyedSerialWriter<number>();
+    const parked = gate();
+    const order: string[] = [];
+    const head = writer.enqueue(7, async () => {
+      order.push('head-start');
+      await parked.held;
+      order.push('head-end');
+    });
+    const controller = new AbortController();
+    const cancelledWrite = vi.fn(async () => {
+      order.push('cancelled');
+    });
+    const cancelled = writer.enqueueCancellable(7, controller.signal, cancelledWrite);
+    const survivor = writer.enqueue(7, async () => {
+      order.push('survivor');
+      return 'survived';
+    });
+
+    await Promise.resolve();
+    expect(order).toEqual(['head-start']);
+    controller.abort(new Error('caller-owned shutdown reason'));
+
+    const cancellation = await cancelled.catch((error: unknown) => error);
+    expect(cancellation).toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(cancellation).toMatchObject({
+      code: 'KEYED_SERIAL_WRITE_ABORTED',
+      message: 'keyed serial write aborted before starting',
+      name: 'KeyedSerialWriteAborted',
+    });
+    expect(cancelledWrite).not.toHaveBeenCalled();
+    expect(order).toEqual(['head-start']);
+    expect(writer.pendingKeys()).toBe(1);
+
+    parked.open();
+    await head;
+    expect(await survivor).toBe('survived');
+    expect(order).toEqual(['head-start', 'head-end', 'survivor']);
+    expect(writer.pendingKeys()).toBe(0);
+  });
+
+  it('preserves FIFO order among survivors when queued cancellations unlink from the middle', async () => {
+    const writer = createKeyedSerialWriter<string>();
+    const parked = gate();
+    const order: string[] = [];
+    const head = writer.enqueue('character', async () => {
+      await parked.held;
+      order.push('head');
+    });
+    const firstController = new AbortController();
+    const secondController = new AbortController();
+    const firstCancelled = writer.enqueueCancellable(
+      'character',
+      firstController.signal,
+      async () => {
+        order.push('cancelled-1');
+      },
+    );
+    const survivorA = writer.enqueue('character', async () => {
+      order.push('survivor-a');
+    });
+    const secondCancelled = writer.enqueueCancellable(
+      'character',
+      secondController.signal,
+      async () => {
+        order.push('cancelled-2');
+      },
+    );
+    const survivorB = writer.enqueue('character', async () => {
+      order.push('survivor-b');
+    });
+
+    secondController.abort();
+    firstController.abort();
+    await expect(firstCancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    await expect(secondCancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    parked.open();
+    await Promise.all([head, survivorA, survivorB]);
+
+    expect(order).toEqual(['head', 'survivor-a', 'survivor-b']);
+    expect(writer.pendingKeys()).toBe(0);
+  });
+
+  it('makes the abort-start boundary explicit and never cancels work after it starts', async () => {
+    const writer = createKeyedSerialWriter<number>();
+    const beforeStart = new AbortController();
+    const neverStarted = vi.fn(async () => 'too late');
+    const queued = writer.enqueueCancellable(1, beforeStart.signal, neverStarted);
+
+    // Starting is deferred to a microtask, so a same-turn abort owns the race.
+    beforeStart.abort();
+    await expect(queued).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(neverStarted).not.toHaveBeenCalled();
+
+    const duringStart = new AbortController();
+    const running = writer.enqueueCancellable(2, duringStart.signal, async () => {
+      // The entry is already running before user code is invoked. An abort
+      // from inside the thunk therefore cannot retroactively cancel it.
+      duringStart.abort();
+      return 'completed';
+    });
+    await expect(running).resolves.toBe('completed');
+    expect(writer.pendingKeys()).toBe(0);
+  });
+
+  it('does not interrupt a running cancellable write', async () => {
+    const writer = createKeyedSerialWriter<number>();
+    const controller = new AbortController();
+    const started = gate();
+    const finish = gate();
+    const running = writer.enqueueCancellable(3, controller.signal, async () => {
+      started.open();
+      await finish.held;
+      return 42;
+    });
+
+    await started.held;
+    controller.abort();
+    let settled = false;
+    void running.then(
+      () => {
+        settled = true;
+      },
+      () => {
+        settled = true;
+      },
+    );
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(writer.pendingKeys()).toBe(1);
+
+    finish.open();
+    await expect(running).resolves.toBe(42);
+    expect(writer.pendingKeys()).toBe(0);
+  });
+
+  it('does not retain a key for an already-aborted entry', async () => {
+    const writer = createKeyedSerialWriter<number>();
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(
+      writer.enqueueCancellable(9, controller.signal, async () => 'never'),
+    ).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
     expect(writer.pendingKeys()).toBe(0);
   });
 });
@@ -243,5 +394,34 @@ describe('createDepthWarnedSerialWriter', () => {
     expect(await write(async () => 'after')).toBe('after');
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(message).toHaveBeenCalledTimes(1);
+  });
+
+  it('unlinks an aborted queued write while preserving the shared FIFO', async () => {
+    const write = createDepthWarnedSerialWriter(3, (depth) => `market writer depth ${depth}`);
+    const parked = gate();
+    const order: string[] = [];
+    const first = write(async () => {
+      order.push('first:start');
+      await parked.held;
+      order.push('first:end');
+      return 'first';
+    });
+    const controller = new AbortController();
+    const cancelled = write.enqueueCancellable(controller.signal, async () => {
+      order.push('cancelled');
+      return 'cancelled';
+    });
+    const last = write(async () => {
+      order.push('last');
+      return 'last';
+    });
+
+    await Promise.resolve();
+    controller.abort();
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    parked.open();
+    await expect(first).resolves.toBe('first');
+    await expect(last).resolves.toBe('last');
+    expect(order).toEqual(['first:start', 'first:end', 'last']);
   });
 });

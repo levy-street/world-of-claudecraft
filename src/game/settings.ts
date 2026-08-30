@@ -127,6 +127,8 @@ export const SETTING_RANGES = {
   gamepadStickDeadzone: { min: 0.05, max: 0.4, def: 0.18 },
   // Right-stick camera turn/pitch rate, in radians/sec at full deflection.
   gamepadCameraSpeed: { min: 0.5, max: 5, def: 2.4 },
+  // Left-stick ground-reticle movement multiplier while placing an ability.
+  gamepadReticleSpeed: { min: 0.5, max: 2, def: 1 },
   // Rumble intensity (0 silences haptics without disabling the pad entirely).
   gamepadVibration: { min: 0, max: 1, def: 1 },
   // Printed controller glyph family: 0 Auto, 1 Xbox, 2 PlayStation, 3 Nintendo.
@@ -167,6 +169,18 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // Real-dimension sizing for the player/target unit frames, the raid-frame
+  // model: the interface editor's edge drags write these settings, so the
+  // bars RE-LAY-OUT at their crisp text size instead of transform-stretching.
+  // playerFrameWidth is the frame's full row width (--player-frame-width;
+  // stock 612 = the 520px bars panel plus 92px of portrait chrome), while
+  // targetFrameWidth is that frame's bars-panel width (--target-frame-width,
+  // stock 190). The two heights are the hp/resource BAR thickness in px
+  // (--player-frame-height / --target-frame-height, stock 15).
+  playerFrameWidth: { min: 300, max: 900, def: 612 },
+  playerFrameHeight: { min: 8, max: 30, def: 15 },
+  targetFrameWidth: { min: 100, max: 320, def: 190 },
+  targetFrameHeight: { min: 8, max: 30, def: 15 },
   // WoW-style party/raid frame profile. Width/height are CSS pixels before the
   // independent scale; columns and spacing let raids grow across rather than
   // covering the whole left edge. style: 0 automatic, 1 classic, 2 raid frames.
@@ -174,8 +188,8 @@ export const SETTING_RANGES = {
   // partyFrameSort: 0 group, 1 role, 2 name.
   partyFrameStyle: { min: 0, max: 2, def: 0 },
   partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
-  partyFrameWidth: { min: 120, max: 260, def: 170 },
-  partyFrameHeight: { min: 30, max: 72, def: 42 },
+  partyFrameWidth: { min: 80, max: 260, def: 170 },
+  partyFrameHeight: { min: 20, max: 72, def: 42 },
   partyFrameSpacing: { min: 0, max: 12, def: 4 },
   partyFrameColumns: { min: 1, max: 5, def: 1 },
   partyFrameHealthText: { min: 0, max: 3, def: 1 },
@@ -183,6 +197,34 @@ export const SETTING_RANGES = {
 } as const;
 
 export const BOOL_SETTINGS = {
+  // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
+  // edit mode). Off = the stock right-to-left growth (the rows anchor beside
+  // the minimap and fill toward the screen centre); on = left to right, via
+  // --buff-bar-direction / --debuff-bar-direction in main.ts.
+  buffsLeftToRight: { def: false },
+  debuffsLeftToRight: { def: false },
+  // Orientation flips (the Frames Settings menu): lay a desktop action bar
+  // out as a COLUMN instead of a row, PER BAR so split bars mix freely
+  // (owner request); the combined block follows bar 1's orientation and the
+  // menu shows one toggle that drives all three while combined. The corner
+  // menu rail flips to a ROW instead of its stock two stacked columns. Pure
+  // CSS via element/body classes in main.ts.
+  actionBar1Vertical: { def: false },
+  actionBar2Vertical: { def: false },
+  actionBar3Vertical: { def: false },
+  menuRailHorizontal: { def: false },
+  // Arrange-mode drag snapping (the editor's Snap to Grid toggle): dragged
+  // frames land on the shared FRAME_SNAP_GRID so layouts align without
+  // pixel hunting. Off by default: snapping surprises a player who wants
+  // pixel placement, and the toggle lives beside the gesture it changes.
+  frameSnapToGrid: { def: false },
+  // Glue the player frame to the TOP of the action bars (the Frames Settings
+  // menu): the frame gives up its own dragged spot (kept in storage for
+  // switching back) and re-docks over the bars, riding along when the
+  // combined block is moved and when bar 2 or 3 is added or removed. While
+  // on, the frame itself is not individually movable. Hud.
+  // setLockPlayerFrameToActionBar owns the mechanics.
+  lockPlayerFrameToActionBar: { def: false },
   mouseCamera: { def: false },
   // on by default: while a camera drag is active, pointer-lock the canvas so the
   // OS cursor cannot leave the window during rotation (otherwise it hits the
@@ -210,6 +252,9 @@ export const BOOL_SETTINGS = {
   // gameplay space is the primary camera path; this is an opt-in alternative for
   // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
   mobileCameraJoystick: { def: false },
+  // on by default: touch position abilities enter ground aim before casting.
+  // Turning it off casts immediately at the smart seed point instead.
+  touchPreciseGroundAim: { def: true },
   // off by default: replaces every touch gesture menu (the action radial, the
   // consumables row, the menu control) with a tap-only flow. Opening a menu casts
   // nothing, a second tap on the control runs its default action, and a tap
@@ -397,6 +442,11 @@ export const BOOL_SETTINGS = {
   // 23..33). main.ts enforces that this row can only remain enabled while the
   // secondary row is visible. Mobile exposes the same slots through ring pages.
   showThirdActionBar: { def: false },
+  // off by default: merges the three desktop action bar rows into ONE movable
+  // frame (#actionbar-group) instead of three independent ones, so the whole
+  // block is placed as a single piece under the "Unlock interface" option.
+  // Purely a layout preference; every slot keeps its keybind either way.
+  combineActionBars: { def: false },
   // off by default (the classic look, unchanged out of the box): strips the black
   // background, border, and keybind label from desktop action-bar slots that hold
   // no ability or item, via a body class main.ts toggles (issue 2429). The fixed

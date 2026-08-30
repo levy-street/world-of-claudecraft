@@ -78,6 +78,10 @@ export interface MobileActionRingDeps {
   sourceSlot(buttonIndex: number, direction: RadialDirection): number;
   /** Whether that button plus direction maps to a real slot right now. */
   hasSourceSlot(buttonIndex: number, direction: RadialDirection): boolean;
+  /** Whether the active ground aim belongs to this physical ring button. */
+  aimOwnsButton(buttonIndex: number): boolean;
+  /** Cancel the active ground aim owned by a ring button. */
+  cancelAim(): void;
   actionForSlot(slot: number): unknown;
   abilityForSlot(slot: number): ActionBarAbility | null;
   itemForSlot(slot: number): ItemDef | null;
@@ -175,6 +179,8 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
     // still casts and only the reveal has nothing to show.
     metricsHost: overlay ?? container,
     hasSlot: (buttonIndex, direction) => deps.hasSourceSlot(buttonIndex, direction),
+    aimOwnsButton: (buttonIndex) => deps.aimOwnsButton(buttonIndex),
+    cancelAim: () => deps.cancelAim(),
     cast: (buttonIndex, direction) => {
       deps.consumePeekGuard();
       deps.hideTooltip();
@@ -197,7 +203,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
   });
 
   slotBtns.forEach((btn, i) => {
-    deps.bindEmpoweredHold(btn, () => deps.sourceSlot(i, 'center'));
+    deps.bindEmpoweredHold(btn, () => (deps.aimOwnsButton(i) ? -1 : deps.sourceSlot(i, 'center')));
   });
   gesture.attach();
 
@@ -232,6 +238,7 @@ export function buildMobileActionRing(deps: MobileActionRingDeps): MobileActionR
           ability: () => deps.abilityForSlot(deps.sourceSlot(i, 'center')),
           item: () => deps.itemForSlot(deps.sourceSlot(i, 'center')),
           keybindLabel: () => '',
+          ownsAimSlot: () => deps.aimOwnsButton(i),
         })),
       ],
     },

@@ -168,8 +168,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands
-    // (311 -> 312 for the Bonebound Rickshaw's new horizons_mounts slot).
-    expect(catalogTotal).toBe(312);
+    // (313 since the v0.37.0 merge paged the two bank-storage bag drops; 314
+    // with the Bonebound Rickshaw's horizons_mounts slot on this branch).
+    expect(catalogTotal).toBe(314);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  desktopWalletHandoffAvailable,
+  parseDesktopWalletHandoffStatus,
   performDesktopWalletHandoff,
   waitForDesktopWalletResult,
   walletHandoffCodeFromHash,
@@ -79,5 +81,93 @@ describe('desktop wallet handoff client', () => {
       signature: 'signature',
     });
     expect(bridge.openWalletBrowser).toHaveBeenCalledWith('D'.repeat(43));
+  });
+
+  it('carries the step-up action verbatim and resolves its result kind', async () => {
+    const api = {
+      createDesktopWalletHandoff: vi.fn().mockResolvedValue({
+        code: 'E'.repeat(43),
+        expiresInMs: 10_000,
+      }),
+      desktopWalletHandoffResult: vi.fn().mockResolvedValue({
+        status: 'complete',
+        result: { kind: 'stepup', address: 'wallet', signature: 'msg-signature' },
+      }),
+    };
+    const bridge = {
+      openWalletBrowser: vi.fn().mockResolvedValue(true),
+      takeWalletHandoffCode: vi.fn().mockResolvedValue(null),
+      onWalletHandoffCode: vi.fn().mockReturnValue(() => {}),
+    };
+    const action = { kind: 'stepup' as const, nonce: 'ab'.repeat(16), expectedAddress: 'wallet' };
+    await expect(performDesktopWalletHandoff(action, api, bridge)).resolves.toEqual({
+      kind: 'stepup',
+      address: 'wallet',
+      signature: 'msg-signature',
+    });
+    // The action reaches the create call untouched: only the NONCE travels,
+    // never any message text the renderer could have supplied.
+    expect(api.createDesktopWalletHandoff).toHaveBeenCalledWith(action);
+  });
+
+  it('validates result payloads: known kinds pass, anything else reads as missing', () => {
+    expect(
+      parseDesktopWalletHandoffStatus({
+        status: 'complete',
+        result: { kind: 'stepup', address: 'wallet', signature: 'sig' },
+      }),
+    ).toEqual({
+      status: 'complete',
+      result: { kind: 'stepup', address: 'wallet', signature: 'sig' },
+    });
+    expect(parseDesktopWalletHandoffStatus({ status: 'pending' })).toEqual({ status: 'pending' });
+    // The two pre-existing kinds, moved out of online.ts by this change:
+    // breaking either arm silently turns a completed link or payment into
+    // "expired", so both happy paths are pinned here.
+    expect(
+      parseDesktopWalletHandoffStatus({
+        status: 'complete',
+        result: { kind: 'link', address: 'wallet', nonce: 'n1', signature: 'sig' },
+      }),
+    ).toEqual({
+      status: 'complete',
+      result: { kind: 'link', address: 'wallet', nonce: 'n1', signature: 'sig' },
+    });
+    expect(
+      parseDesktopWalletHandoffStatus({
+        status: 'complete',
+        result: { kind: 'transaction', address: 'wallet', signature: 'sig' },
+      }),
+    ).toEqual({
+      status: 'complete',
+      result: { kind: 'transaction', address: 'wallet', signature: 'sig' },
+    });
+    // Fail-closed arms: an unknown kind, a missing field, and junk all read
+    // as 'missing' (the poller surfaces that as an expired authorization).
+    expect(
+      parseDesktopWalletHandoffStatus({
+        status: 'complete',
+        result: { kind: 'mystery', address: 'wallet', signature: 'sig' },
+      }),
+    ).toEqual({ status: 'missing' });
+    expect(
+      parseDesktopWalletHandoffStatus({
+        status: 'complete',
+        result: { kind: 'link', address: 'wallet', signature: 'sig' },
+      }),
+    ).toEqual({ status: 'missing' });
+    expect(parseDesktopWalletHandoffStatus({})).toEqual({ status: 'missing' });
+  });
+});
+
+describe('desktopWalletHandoffAvailable', () => {
+  it('requires BOTH the desktop shell and the openWalletBrowser bridge method', () => {
+    const openWalletBrowser = async () => true;
+    expect(desktopWalletHandoffAvailable(true, { openWalletBrowser })).toBe(true);
+    // An older shell without the method: the Exchange signers must fall back
+    // to the in-renderer wallet, never throw unavailable.
+    expect(desktopWalletHandoffAvailable(true, {})).toBe(false);
+    expect(desktopWalletHandoffAvailable(true, null)).toBe(false);
+    expect(desktopWalletHandoffAvailable(false, { openWalletBrowser })).toBe(false);
   });
 });

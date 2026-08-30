@@ -55,6 +55,30 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('scopes the bank one-row toolbar contract to the short-phone footer regime, with its yield', () => {
+    // The nowrap lives HERE, on the footer regime, never on a bare
+    // #bank-window in components.css: a desktop window resized toward its
+    // 220px floor must wrap rather than clip controls off the edge. The
+    // browser arm (tests/browser/bank_mobile_chrome.browser.test.ts) proves
+    // the geometry; this pin keeps the RULE from being deleted, unscoped, or
+    // quietly moved back where the default vitest run would never notice.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #bank-window:has\(\.bank-footer\) \.bag-tools,\s*body\.mobile-touch\.bank-open #bank-window:has\(\.bank-footer\) \.bag-tools \{[^}]*flex-wrap: nowrap;/,
+    );
+    // The yield that makes nowrap safe under a wordy locale: the deposit
+    // button shrinks with an ellipsis instead of clipping off the
+    // overflow-hidden window edge (es/es_ES measured 52px past the row at
+    // 740x360 without it).
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #bank-window:has\(\.bank-footer\) \.bank-deposit-all,\s*body\.mobile-touch\.bank-open #bank-window:has\(\.bank-footer\) \.bank-deposit-all \{[^}]*text-overflow: ellipsis;/,
+    );
+    const componentsCss = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    );
+    expect(componentsCss).not.toMatch(/#bank-window \.bag-tools \{[^}]*flex-wrap: nowrap/);
+  });
+
   it('keeps mobile Daily Rewards in one vertical scroller above the open-window layer', () => {
     const rewardsWindow = mobileCss.match(
       /body\.mobile-touch #daily-rewards-window:not\(\.store-active\) \{([^}]*)\}/,

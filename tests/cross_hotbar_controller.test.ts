@@ -22,6 +22,7 @@ const CELL_COUNT = 16;
 const resolvers: CrossHotbarResolvers = {
   abilityById: () => null,
   itemById: () => null,
+  activeAimAbilityId: () => null,
   abilityName: (def) => def.id,
   itemName: (item) => item.id,
 };

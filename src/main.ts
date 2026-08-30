@@ -149,6 +149,8 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padCastPress, padCastRelease } from './game/pad_cast_routing';
+import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -174,6 +176,7 @@ import {
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
+import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { isIslandFerryTeleport, islandTeleportCameraYaw } from './game/teleport_camera';
@@ -191,7 +194,11 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
-import { performDesktopWalletHandoff } from './net/desktop_wallet_handoff';
+import {
+  authorizeDesktopWalletHandoff,
+  type DesktopWalletBrowserAction,
+  desktopWalletHandoffAvailable,
+} from './net/desktop_wallet_handoff';
 import {
   desktopWalletManagerAction,
   desktopWalletManagerView,
@@ -248,6 +255,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import { setArrivalEstablishingShot } from './render/arrival_cover';
 import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
@@ -469,7 +477,7 @@ import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
 import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
-import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
+import { applyPerfOrnamentVars, applyWindowOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
@@ -496,6 +504,7 @@ import {
   setWalletUiEnabled,
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
+  WocBalanceRefreshOrder,
 } from './ui/wallet_balance';
 import { claudiumCheckoutErrorText } from './ui/wallet_bridge_reason_text';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
@@ -1439,6 +1448,15 @@ async function startGame(
     const vars = themeStore.cssVars();
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
+    // The gilded window frame (components.css "performance overlay gilded
+    // ornament" section) belongs to the Fancy Gold preset, not the default
+    // chrome (owner walked back an always-on rollout): this class is the CSS
+    // gate, toggled live with the rest of the theme so switching presets in
+    // the options window re-frames open windows immediately.
+    document.documentElement.classList.toggle(
+      'fancy-gold-ui',
+      themeStore.get().preset === 'fancyGold',
+    );
     mapMarkerPaletteLifecycle?.notify();
   }
   applyTheme();
@@ -1560,6 +1578,7 @@ async function startGame(
     loadPhaseStart('icon-plan');
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
+    applyWindowOrnamentVars(); // the Fancy Gold theme's tinted window frame layers
     applyMinimapOrnamentVars(); // minimap disc's gilded ring
     hud.prewarmStaticUiAssets();
 
@@ -2017,6 +2036,8 @@ async function startGame(
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
       canUseGameKeys: () => !gameplayInputBlocked(),
+      // The "Unlock interface" arrange mode claims the mouse for frame drags.
+      isCameraLocked: () => hud.isInterfaceUnlocked(),
     },
     keybinds,
   );
@@ -2044,12 +2065,12 @@ async function startGame(
   hud.onIslandFirstArrival = () => {
     // Reduce motion is the EFFECTIVE flag (OS query OR in-game switch, the
     // spawn intro's contract below): a 4.5 s sweeping camera fall is exactly
-    // what that contract exists for, so it never starts and the arrival lands
-    // at the ordinary chase framing.
+    // what that contract exists for. A newborn's landing under the spawn intro
+    // yields too: introCameraTick overwrites this fall every frame.
     const osReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (settings.get('reduceMotion') || osReduced) return;
+    if (intro !== null || settings.get('reduceMotion') || osReduced) return;
     startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
   };
 
@@ -2217,7 +2238,7 @@ async function startGame(
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
+      hud.pressSlot(Number(id.slice(4)));
       return;
     }
     hud.cancelGroundAim();
@@ -2383,13 +2404,17 @@ async function startGame(
         cameraPromptOpen(),
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
+    ...padGroundAimCallbacks({
+      hud,
+      world: () => world,
+      camYaw: () => input.camYaw,
+      reticleSpeed: () => settings.get('gamepadReticleSpeed'),
+    }),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbarCast: (action) => {
-      padTargetPick.autoTarget(action);
-      hud.castCrossHotbarAction(action);
-    },
+    onCrossHotbarCast: (action) => padCastPress(hud, padTargetPick.autoTarget, action),
+    onCastRelease: (hold) => padCastRelease(hud, hold),
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
@@ -2515,10 +2540,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
+    if (key === 'startAttackOnAbilityUse' || key === 'touchPreciseGroundAim') {
+      // No live subsystem to update: the HUD reads these settings at ability-cast
       // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
+      settings.set(key, !!value);
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -2614,6 +2639,11 @@ async function startGame(
       settings.set('showThirdActionBar', visibility.third);
       document.body.classList.toggle('show-actionbar2', visibility.secondary);
       document.body.classList.toggle('show-actionbar3', visibility.third);
+      hud.setActionBarVisibility(visibility);
+      return;
+    }
+    if (key === 'combineActionBars') {
+      hud.setCombineActionBars(settings.set('combineActionBars', !!value));
       return;
     }
     if (key === 'showTargetOfTarget') {
@@ -2800,6 +2830,18 @@ async function startGame(
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
         break;
+      case 'playerFrameWidth':
+        document.documentElement.style.setProperty('--player-frame-width', `${v}px`);
+        break;
+      case 'playerFrameHeight':
+        document.documentElement.style.setProperty('--player-frame-height', `${v}px`);
+        break;
+      case 'targetFrameWidth':
+        document.documentElement.style.setProperty('--target-frame-width', `${v}px`);
+        break;
+      case 'targetFrameHeight':
+        document.documentElement.style.setProperty('--target-frame-height', `${v}px`);
+        break;
       case 'partyFrameScale':
         document.documentElement.style.setProperty('--party-frame-scale', String(v));
         break;
@@ -2823,6 +2865,43 @@ async function startGame(
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
+        break;
+      // Icon flow of the standalone buff/debuff rows (Frames Settings menu):
+      // the stock layout grows right-to-left from its anchor beside the
+      // minimap; 'row' flips a row to read left to right. Vars rather than
+      // classes so the stylesheet's aurasOnPlayerFrame override (a docked
+      // buff row always reads left to right) keeps winning by specificity.
+      case 'buffsLeftToRight':
+        document.documentElement.style.setProperty(
+          '--buff-bar-direction',
+          v ? 'row' : 'row-reverse',
+        );
+        break;
+      case 'debuffsLeftToRight':
+        document.documentElement.style.setProperty(
+          '--debuff-bar-direction',
+          v ? 'row' : 'row-reverse',
+        );
+        break;
+      case 'lockPlayerFrameToActionBar':
+        hud.setLockPlayerFrameToActionBar(!!v);
+        break;
+      // Orientation flips (Frames Settings menu): pure CSS off element and
+      // body classes. Per-bar vertical stamps the bar's own element; bar 1
+      // additionally stamps the body class the COMBINED block's direction
+      // keys off (the block follows the primary bar's orientation).
+      case 'actionBar1Vertical':
+        document.getElementById('actionbar')?.classList.toggle('bar-vertical', !!v);
+        document.body.classList.toggle('combined-bars-vertical', !!v);
+        break;
+      case 'actionBar2Vertical':
+        document.getElementById('actionbar2')?.classList.toggle('bar-vertical', !!v);
+        break;
+      case 'actionBar3Vertical':
+        document.getElementById('actionbar3')?.classList.toggle('bar-vertical', !!v);
+        break;
+      case 'menuRailHorizontal':
+        document.body.classList.toggle('menu-rail-horizontal', !!v);
         break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer
@@ -3054,6 +3133,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    groundAimTargetAttackable: (targetId) =>
+      isAttackableEntity(world.entities.get(targetId), world.playerId, activePvpOpponentIds(world)),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3092,7 +3173,7 @@ async function startGame(
       },
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
-    refreshWocBalance: () => refreshWocBalanceOnDemand(),
+    refreshWocBalance: (force) => refreshWocBalanceOnDemand(force),
     // Deed-broadcast opt-out: online only (an offline character has no account
     // row); the options row hides itself when this seam is absent.
     ...(online
@@ -3147,6 +3228,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
+      // A ground aim armed before the drop is anchored to a stale world; the
+      // rebuilt mirror may place the player elsewhere entirely.
+      hud.cancelGroundAim();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3396,12 +3480,12 @@ async function startGame(
           throw new Error(claudiumCheckoutErrorText(err));
         });
       },
-      spend: async (itemId, kind, expectedCostClaudium) => {
+      spend: async (itemId, kind, expectedCostClaudium, idempotencyKey) => {
         const result = await economy.spend({
           itemId,
           kind,
           expectedCostClaudium,
-          idempotencyKey: newIdempotencyKey(),
+          idempotencyKey: idempotencyKey ?? newIdempotencyKey(),
         });
         return {
           granted: result.granted,
@@ -3415,8 +3499,12 @@ async function startGame(
       hud,
       api,
       online,
-      wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
-    });
+      wallet: {
+        linkedPubkey: () => linkedWalletPubkey,
+        load: loadWallet,
+        desktopAuthorize: desktopWalletBrowserHandoffAvailable() ? wocDesktopAuthorize : null,
+      },
+    }).catch((err) => console.warn('[woc] exchange attach failed', err));
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (
@@ -3520,32 +3608,15 @@ async function startGame(
   }
 
   function syncGroundAimReticle(): void {
-    if (!hud.isGroundAimActive()) {
-      renderer.setGroundAimReticle(null);
-      return;
-    }
-    // Touch placement is updated directly by MobileControls. Some mobile
-    // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
-    // reading it here would erase the finger-owned point every render frame.
-    if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
-      hud.updateGroundAimPoint(
-        cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
-      );
-    }
-    const reticle = hud.groundAimReticle();
-    renderer.setGroundAimReticle(
-      reticle
-        ? {
-            x: reticle.point.x,
-            z: reticle.point.z,
-            radius: reticle.radius,
-            school: reticle.school,
-            dimmed: reticle.clamped,
-          }
-        : null,
-    );
+    groundAimReticleSync();
   }
+  const groundAimReticleSync = createGroundAimReticleSync({
+    hud,
+    isMobileTouch: () => document.body.classList.contains('mobile-touch'),
+    cursorPoint: () => input.cursorPoint(),
+    groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
+    setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
+  });
 
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
@@ -4094,7 +4165,9 @@ async function startGame(
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it
-    // walks the player straight back into the trigger.
+    // walks the player straight back into the trigger. An armed ground aim is
+    // anchored to the prior position the same way, so it drops with it.
+    if (clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) hud.cancelGroundAim();
     if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
       input.clearClickMove();
     }
@@ -4447,6 +4520,7 @@ async function startGame(
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
+      hud.cancelGroundAim();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }
@@ -4918,14 +4992,7 @@ async function startGame(
   // has no Escape key) skips straight to the end; other input is swallowed
   // while it runs. Seen-state persists per character so it plays exactly once;
   // reduce-motion players go straight to gameplay.
-  const INTRO_SEEN_KEY = `woc_spawn_intro_seen:${keybindScope}`;
-  let introSeen = true;
-  try {
-    introSeen = localStorage.getItem(INTRO_SEEN_KEY) === '1';
-  } catch {
-    // storage unavailable: the seen marker can't persist, so treat the intro as
-    // seen rather than replaying it on every boot
-  }
+  const introSeen = readSpawnIntroSeen(keybindScope);
   let intro: { cinematic: SpawnCinematic; startedAt: number | null } | null = null;
   // Wordmark overlay: fades in/hold/out over the opening of the intro cinematic
   // (see logo_fade.ts for the pure timing curve), well clear of the landing.
@@ -4946,6 +5013,9 @@ async function startGame(
     if (!intro) return;
     const end = intro.cinematic.end;
     intro = null;
+    // A skip under the curtain: the establishing shot is off, so the entry
+    // cover's remaining consults go back to the ordinary priority.
+    setArrivalEstablishingShot(false);
     if (skipToEnd) {
       input.camYaw = end.yaw;
       input.camPitch = end.pitch;
@@ -4955,11 +5025,7 @@ async function startGame(
     setIntroUiHidden(false);
     window.removeEventListener('keydown', skipIntro, true);
     window.removeEventListener('pointerdown', skipIntro, true);
-    try {
-      localStorage.setItem(INTRO_SEEN_KEY, '1');
-    } catch {
-      // storage unavailable: worst case the intro replays next session
-    }
+    markSpawnIntroSeen(keybindScope);
   };
   const introTaps: number[] = [];
   const skipIntro = (e: Event): void => {
@@ -5269,6 +5335,9 @@ async function startGame(
         adaptiveBudget: GFX.autoGovernor,
         constrainedMemory: GFX.constrainedMemory,
         online: online !== null,
+        // The intro opens on a wide establishing shot of the village: hold the
+        // curtain, bounded, until what that shot sees has linked.
+        establishingShot: intro !== null,
         revealWorld,
       });
     }),
@@ -7954,6 +8023,7 @@ function wireHomepageMusicToggle(): void {
 let linkedWalletPubkey: string | null = null;
 let linkedWocBalance: number | null = null;
 let connectedWocBalance: number | null = null;
+const wocBalanceRefreshOrder = new WocBalanceRefreshOrder();
 let walletVerifyPending = false;
 let walletVerifyInProgress = false;
 // True from when a logged-in session starts loading its linked-wallet status until
@@ -7968,25 +8038,16 @@ let walletHiddenNoticeTimeout: number | null = null;
 let desktopWalletBrowserSessionActive = false;
 
 function desktopWalletBrowserHandoffAvailable(): boolean {
-  const bridge = DESKTOP_APP ? desktopBridge() : null;
-  return !!bridge?.openWalletBrowser;
+  return desktopWalletHandoffAvailable(DESKTOP_APP, DESKTOP_APP ? desktopBridge() : null);
 }
-
-async function authorizeDesktopWalletInBrowser(
-  action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
-) {
-  const bridge = desktopBridge();
-  const openWalletBrowser = bridge?.openWalletBrowser;
-  if (!openWalletBrowser) throw new Error('desktop wallet browser is unavailable');
-  const takeWalletHandoffCode = bridge.takeWalletHandoffCode;
-  const onWalletHandoffCode = bridge.onWalletHandoffCode;
-  const result = await performDesktopWalletHandoff(action, api, {
-    openWalletBrowser: (code) => openWalletBrowser(code),
-    takeWalletHandoffCode: takeWalletHandoffCode ? () => takeWalletHandoffCode() : undefined,
-    onWalletHandoffCode: onWalletHandoffCode
-      ? (callback) => onWalletHandoffCode(callback)
-      : undefined,
-  });
+function authorizeDesktopWalletInBrowser(action: DesktopWalletBrowserAction) {
+  return authorizeDesktopWalletHandoff(action, api, desktopBridge());
+}
+// Exchange signers' desktop arm (woc_market_wiring.ts): handoff + session flag.
+async function wocDesktopAuthorize(action: DesktopWalletBrowserAction) {
+  const result = await authorizeDesktopWalletInBrowser(action);
+  desktopWalletBrowserSessionActive = true;
+  updateWalletButton();
   return result;
 }
 
@@ -8517,12 +8578,10 @@ async function disconnectUnverifiedWalletIfIdle(): Promise<void> {
   await disconnectUnverifiedWallet();
 }
 
-// Read the connected wallet's $WOC balance and re-render. Ignores a stale
-// response if the connected wallet changed while the RPC call was in flight.
-// `fresh` bypasses the server's per-wallet cache (used when the player opens a
-// surface that shows the balance, so an on-chain token change shows up); an
-// initial (non-fresh) read clears the prior value first to show a loading state.
+// Read and repaint the connected wallet's $WOC balance. `fresh` bypasses the
+// server cache; an initial non-fresh read first shows a loading state.
 async function refreshWocBalance(address: string, fresh = false): Promise<void> {
+  const request = wocBalanceRefreshOrder.start();
   if (!fresh) {
     connectedWocBalance = null;
     updateWalletButton();
@@ -8538,27 +8597,25 @@ async function refreshWocBalance(address: string, fresh = false): Promise<void> 
     currentAddress: wallet.currentWallet().address,
     linkedAddress: linkedWalletPubkey,
   });
-  if (!apply) return;
+  if (!apply || !wocBalanceRefreshOrder.claim(request)) return;
   connectedWocBalance = balance;
   if (setLinked) linkedWocBalance = balance;
   updateWalletButton();
 }
 
-// Re-fetch the connected/linked wallet's balance on demand (server cache
-// bypassed) so surfaces that display it, the bag footer and the player card,
-// reflect on-chain changes. No-op when the wallet feature is off or nothing is
-// connected/linked. Prefers the account-LINKED wallet (whose balance the badge
-// shows) over a merely-connected one, and a short throttle coalesces rapid
-// bag/card toggles so they don't burn the per-IP fresh-read budget.
+// Re-fetch the linked/connected wallet for visible balance surfaces. Prefer
+// the linked wallet and throttle ordinary toggles to protect the fresh-read
+// budget; a confirmed payment forces the post-spend read through.
 let lastOnDemandRefreshAddress: string | null = null;
 let lastOnDemandRefreshAt = 0;
 const ON_DEMAND_REFRESH_THROTTLE_MS = 5000;
-function refreshWocBalanceOnDemand(): void {
+function refreshWocBalanceOnDemand(force = false): void {
   if (!WALLET_ENABLED) return;
   const address = linkedWalletPubkey ?? walletMod?.currentWallet().address ?? null;
   if (!address) return;
   const now = Date.now();
   if (
+    !force &&
     address === lastOnDemandRefreshAddress &&
     now - lastOnDemandRefreshAt < ON_DEMAND_REFRESH_THROTTLE_MS
   )

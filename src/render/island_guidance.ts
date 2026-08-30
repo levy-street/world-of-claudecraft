@@ -13,7 +13,7 @@ import type * as THREE from 'three';
 import { isOnProvingShore } from '../sim/content/proving_shore';
 import { CRAB_MOB_ID } from '../sim/interactions/crab_summon';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
-import { CoachTrail } from './coach_trail';
+import { CoachTrail, type CoachTrailCompileGate } from './coach_trail';
 import { type CoachGuideReader, type CoachGuides, coachGuides } from './coach_trail_core';
 import { beaconNpcIds } from './quest_beacon_core';
 
@@ -61,8 +61,12 @@ export class IslandGuidance {
   private timeKey = -1;
   private readonly trail: CoachTrail;
 
-  constructor(scene: THREE.Object3D, groundAt: (x: number, z: number) => number) {
-    this.trail = new CoachTrail(scene, groundAt);
+  constructor(
+    scene: THREE.Object3D,
+    groundAt: (x: number, z: number) => number,
+    compileGate?: CoachTrailCompileGate,
+  ) {
+    this.trail = new CoachTrail(scene, groundAt, compileGate);
   }
 
   /** The per-frame island memo, resolvable from either call site. */

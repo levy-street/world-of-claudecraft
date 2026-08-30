@@ -113,11 +113,16 @@ export class StanceBarController {
     return known === undefined ? abilityId : this.deps.abilityName(known);
   }
 
+  // Both teardown paths replace only the .stancebar-group, never the whole
+  // subtree: the bar is a movable HUD frame (interface_unlock), so it also
+  // hosts the MovableFrame chrome (corner button, resize grip, name chip),
+  // which an innerHTML wipe would silently destroy the first time the known
+  // stance set changed.
   private clearRow(): void {
     const { bar } = this.deps;
     bar.style.display = 'none';
     if (this.lastRowSig !== '') {
-      bar.innerHTML = '';
+      bar.querySelector(`.${GROUP_CLASS}`)?.remove();
       this.lastRowSig = '';
     }
   }
@@ -131,7 +136,7 @@ export class StanceBarController {
     bar.style.display = 'flex';
     if (model.sig === this.lastRowSig) return;
     this.lastRowSig = model.sig;
-    bar.innerHTML = '';
+    bar.querySelector(`.${GROUP_CLASS}`)?.remove();
     const group = document.createElement('div');
     group.className = GROUP_CLASS;
     bar.appendChild(group);
