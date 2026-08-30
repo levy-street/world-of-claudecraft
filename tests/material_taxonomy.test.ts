@@ -233,6 +233,11 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'harvest_feast',
   'last_keep_signet',
+  // Staged AHEAD of its recipes (the professions fast-follow, PR 3704): the
+  // Core of the Last Flame drops now so crafters bank it, and the moment a
+  // recipe consumes it the derivation classifies it IN and this row must
+  // move to the classified list (3704 carries exactly that move).
+  'lastflame_core',
   // masterwrought Phase 11k's three apex role feasts: kind 'junk' by the same
   // tonic precedent harvest_feast set, and nothing crafts FROM any of them, so
   // all three are deliberate non-materials on the harvest_feast footing above.

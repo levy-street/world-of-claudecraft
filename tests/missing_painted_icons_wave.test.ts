@@ -661,7 +661,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // committed crest. 293 at the v0.41.0 release-batch sync: the release's
     // bank socket pair (Bank Storage phase 06, 274 to 276 on its own arm)
     // joins the same pending side.
-    expect(DEED_ORDER).toHaveLength(293);
+    // 298 at the release/v0.41.0 merge (2026-08-30): the release's five
+    // Crucible raid deeds (276 to 281 on its own arm) join the same pending
+    // side on the deed_cat_dungeon crest.
+    expect(DEED_ORDER).toHaveLength(298);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

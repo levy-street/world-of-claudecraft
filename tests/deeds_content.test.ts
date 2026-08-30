@@ -92,7 +92,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 293 deeds worth 3375 total Renown', () => {
+  it('ships exactly 298 deeds worth 3525 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -139,11 +139,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 293 / 3375, recomputed against the merged catalog rather than either
     // parent's prose.
     //
+    // Then the 2026-08-30 release/v0.41.0 sync merge appends the five
+    // Crucible raid deeds (four clears at 25 plus the flawless 50: +150; the
+    // release's own chain reads 281 / 3340, its 276 / 3190 base plus exactly
+    // these five) and removes none: 293 / 3375 plus five deeds at 150 gives
+    // 298 / 3525, written BEFORE the merged tree was measured and matched by
+    // it.
+    //
     // The NAME carries the numbers too, deliberately: vitest prints it in the
     // failure header, and a stale name there is the one part of this pin a
     // reader can act on without seeing the diff. It went stale once already.
-    expect(DEED_ORDER.length).toBe(293);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3375);
+    expect(DEED_ORDER.length).toBe(298);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3525);
   });
 
   it('ships the audited per-category counts', () => {
@@ -162,8 +169,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Phase 13 promotion capstone prog_legendmaker.
       progression: 68,
       combat: 10,
-      // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
-      dungeon: 31,
+      // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
+      // deeds (per-boss clear pairs plus the Varkhul flawless task).
+      dungeon: 36,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -350,9 +358,20 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The Proving Shore graduation closed the earlier merged tail (appended
       // at the previous release/v0.41.0 merge behind the branch's rows).
       'prog_ready_for_an_adventure',
-      // The Phase 13 promotion capstone closes the tail (append-only:
+      // The Phase 13 promotion capstone closed the branch's tail (append-only:
       // DEED_ORDER cannot seat it beside its progression siblings).
       'prog_legendmaker',
+      // The Crucible of the Last Spring raid block (per-boss clear pairs on
+      // the new FINAL_BOSS_DUNGEONS rows plus the Varkhul flawless task, the
+      // dgn_nythraxis_deathless shape; docs/prd/ignivar-raid-loot.md
+      // "Obligations closeout"), seated behind the branch's rows at the
+      // 2026-08-30 release/v0.41.0 sync merge, keeping both sides' tails in
+      // their own authored order.
+      'dgn_ignivar',
+      'dgn_ignivar_heroic',
+      'dgn_varkhul',
+      'dgn_varkhul_heroic',
+      'dgn_varkhul_flawless',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -463,6 +482,55 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       markId: 'dungeon:dawnhold_castle',
     });
     expect(DEEDS.exp_dawnhold_castle.reward).toBeUndefined();
+  });
+
+  it('pins the Crucible raid deeds: renown, trigger, and reward literals', () => {
+    // Per-boss clear pairs (each raid room is its own dungeon id; the
+    // FINAL_BOSS_DUNGEONS rows in src/sim/deeds.ts land in the same change)
+    // plus the raid finale's flawless task on the generic FLAWLESS_TASKS
+    // window, the dgn_nythraxis_deathless shape.
+    expect(DEEDS.dgn_ignivar.renown).toBe(25);
+    expect(DEEDS.dgn_ignivar.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_raid_arena',
+      count: 1,
+    });
+    expect(DEEDS.dgn_ignivar.reward).toBeUndefined();
+    expect(DEEDS.dgn_ignivar_heroic.renown).toBe(25);
+    expect(DEEDS.dgn_ignivar_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_raid_arena',
+      difficulty: 'heroic',
+      count: 1,
+    });
+    expect(DEEDS.dgn_varkhul.renown).toBe(25);
+    expect(DEEDS.dgn_varkhul.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_inner_crucible',
+      count: 1,
+    });
+    expect(DEEDS.dgn_varkhul.reward).toBeUndefined();
+    expect(DEEDS.dgn_varkhul_heroic.renown).toBe(25);
+    expect(DEEDS.dgn_varkhul_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_inner_crucible',
+      difficulty: 'heroic',
+      count: 1,
+    });
+    expect(DEEDS.dgn_varkhul_flawless.renown).toBe(50);
+    expect(DEEDS.dgn_varkhul_flawless.trigger).toEqual({ kind: 'manual' });
+    expect(DEEDS.dgn_varkhul_flawless.reward).toEqual({ kind: 'title', text: 'the Unscorched' });
+    for (const id of [
+      'dgn_ignivar',
+      'dgn_ignivar_heroic',
+      'dgn_varkhul',
+      'dgn_varkhul_heroic',
+      'dgn_varkhul_flawless',
+    ]) {
+      expect(DEEDS[id].category, id).toBe('dungeon');
+      expect(DEEDS[id].hidden ?? false, id).toBe(false);
+      expect(DEEDS[id].feat ?? false, id).toBe(false);
+    }
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -687,21 +755,22 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 45 titles and 4 borders', () => {
+  it('ships exactly 46 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
     // on top of the release base (31 + 3), Grandmaster Jewelcrafting (phase
     // 05 QA) the ninth per-craft grandmaster, Grandmaster Inscription
-    // (phase 06) the tenth, closing the family across the whole ring, and
+    // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
-    // mandate).
-    expect(titles.length).toBe(45);
+    // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
+    // the 2026-08-30 release/v0.41.0 sync merge) one more.
+    expect(titles.length).toBe(46);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(45);
+    expect(new Set(titleTexts).size).toBe(46);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -872,7 +941,26 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // this branch's seventeen appended rows reproduce the release's
   // 9d39a371... EXACTLY, so the merged catalog is a pure append on BOTH
   // sides. No shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = 'd1c102c3eebce38a337164d7164d3954108393b9f9b93a5f2d14242c0c403530';
+  // The release side's own ledger for the same span: re-baselined at its
+  // release/v0.39.0 sync merge, which interleaves the walk-in castle visit
+  // pair (exp_the_last_keep, exp_dawnhold_castle) and the Proving Shore
+  // graduation deed (prog_ready_for_an_adventure, on the new
+  // tutorialGraduations stat) at the tail; no shipped trigger or renown
+  // changed on either side. Then re-baselined for the Crucible of the Last
+  // Spring raid deeds (the obligations closeout,
+  // docs/prd/ignivar-raid-loot.md): five appended deeds, the per-boss clear
+  // pairs (dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul, dgn_varkhul_heroic)
+  // and the Varkhul flawless task (dgn_varkhul_flawless); its own literal
+  // was bd95099f... No shipped trigger or renown changed.
+  // Re-baselined at the 2026-08-30 release/v0.41.0 sync merge for those five
+  // Crucible raid deeds, seated behind this branch's prog_legendmaker. The
+  // merged canonical rows minus the five raid rows (feat_book_complete's
+  // live deedIds filtered back) reproduce this branch's d1c102c3... EXACTLY
+  // when checked the auditable way, and minus this branch's seventeen
+  // appended rows reproduce the release's bd95099f..., so the merged catalog
+  // is a pure append on BOTH sides. No shipped trigger or renown changed on
+  // either side.
+  const FROZEN_CATALOG_SHA256 = '77b670a2b8eefdfb6768290dbbee7146828636c3b7327d0cb88cb5683c072a4b';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -897,29 +985,41 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // digest too, which the comment-only proof above could not show. Re-minting:
   // move FROZEN_CATALOG_SHA256 down into PRE_APPEND_CATALOG_SHA256, list the
   // new ids in APPENDED_SINCE, then mint the new frozen literal.
-  // At the merge of release/v0.41.0 (tip e19d832b47) the append set is the
-  // release's two bank-socket deeds, and the previous mint is this branch's
-  // own pre-merge frozen literal (which had already absorbed
-  // prog_legendmaker); the proof below reproduces it exactly, so no older
-  // row was retro-edited by the merge.
+  // At the merge of release/v0.41.0 (tip e19d832b47) the append set was the
+  // release's two bank-socket deeds, and the previous mint was this branch's
+  // own pre-merge frozen literal d69e3def... (which had already absorbed
+  // prog_legendmaker); that proof reproduced it exactly. At the 2026-08-30
+  // release/v0.41.0 sync merge (tip 3e801dc925) the append set is the
+  // release's five Crucible raid deeds, and the previous mint is the
+  // d1c102c3... literal that merge rotated down here; the proof below
+  // reproduces it exactly, so no older row was retro-edited by the merge.
   const PRE_APPEND_CATALOG_SHA256 =
-    'd69e3def57ec7bfb8d6dd71d674af29f76930718c57b7b960d7a620c680fc33e';
-  const APPENDED_SINCE: readonly string[] = ['soc_strongbox_outfitter', 'soc_four_bags_deep'];
+    'd1c102c3eebce38a337164d7164d3954108393b9f9b93a5f2d14242c0c403530';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_ignivar',
+    'dgn_ignivar_heroic',
+    'dgn_varkhul',
+    'dgn_varkhul_heroic',
+    'dgn_varkhul_flawless',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The appended rows sit as one contiguous run at a PINNED position: this
-    // merge seats the release's soc pair ahead of the shared graduation tail
-    // (the release's own authored order), so the pin is the exact final four
-    // rather than a bare tail slice. Still an append into a known seat, never
-    // a scattered insert, and never a retro-edit (the digest below proves it).
+    // The appended rows sit as one contiguous run at a PINNED position: the
+    // 2026-08-29 merge seated the release's soc pair ahead of the shared
+    // graduation tail (the release's own authored order), so that pin was the
+    // exact final four; this merge seats the release's Crucible raid block
+    // behind the branch's prog_legendmaker, so the run IS the tail, pinned
+    // together with the two rows it follows. Still an append into a known
+    // seat, never a scattered insert, and never a retro-edit (the digest
+    // below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      ...APPENDED_SINCE,
       'prog_ready_for_an_adventure',
       'prog_legendmaker',
+      ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
       const trigger = DEEDS[id].trigger;
@@ -1113,10 +1213,10 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and Phase 13's
-    // prog_legendmaker closes the tail (behind the release's
-    // prog_ready_for_an_adventure since the promotion capstone appended), and
-    // either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the newest appended
+    // deed closes the tail (the release's Crucible raid block, behind Phase
+    // 13's prog_legendmaker since the 2026-08-30 sync merge), and either
+    // moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
@@ -1129,9 +1229,12 @@ describe('table shape', () => {
     // the branch's tail until the release/v0.41.0 merge, where the Proving
     // Shore graduation deed closed the merged tail (appended at the release
     // merge behind the walk-in castle visit pair and the branch's rows; the
-    // 2026-08-29 sync merge seats the bank socket pair ahead of it), and
-    // Phase 13's promotion capstone prog_legendmaker now closes it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_legendmaker');
+    // 2026-08-29 sync merge seats the bank socket pair ahead of it), then
+    // Phase 13's promotion capstone prog_legendmaker closed it, and the
+    // 2026-08-30 sync merge seats the release's Crucible raid block behind
+    // that (appended behind the branch's rows; the flawless task is its
+    // final entry).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_varkhul_flawless');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

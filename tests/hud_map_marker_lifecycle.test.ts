@@ -148,6 +148,9 @@ interface MapHudHarness {
   bgMapPainter: { paint(): void };
   delvePainter: { paintWorldMapDelve(): DelveDrawModel | null };
   riftPainter: { paintWorldMap(): RiftMapModel | null };
+  interiorMaps: {
+    paintCastleWorldMap(): string | null;
+  };
   continentPainter: {
     paintContinent(): { regions: ContinentZoneRegion[] };
   };
@@ -161,6 +164,8 @@ function semanticCore(): MapSemanticAccessibilityCore {
     station: (type) => type,
     poi: (zoneId, index) => `${zoneId}/${index}`,
     rift: (name, rank) => `${name}${rank ? ` (${rank})` : ''}`,
+    npc: (id) => id,
+    mob: (id) => id,
   });
 }
 
@@ -173,6 +178,8 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
       station: (type) => type,
       poi: (zoneId, index) => `${zoneId}/${index}`,
       rift: (name, rank) => `${name}${rank ? ` (${rank})` : ''}`,
+      npc: (id) => id,
+      mob: (id) => id,
     },
     npc: (marker) => hud.questGiverTooltipHtml(marker),
     navigation: (marker) => hud.navigationMapTooltipHtml(marker),
@@ -443,6 +450,7 @@ function lifecycleHarness(): {
     bgMapPainter: { paint: vi.fn() },
     delvePainter: { paintWorldMapDelve: vi.fn(() => null) },
     riftPainter: { paintWorldMap: vi.fn(() => null) },
+    interiorMaps: { paintCastleWorldMap: vi.fn(() => null) },
     continentPainter: {
       paintContinent: () => ({
         regions: [

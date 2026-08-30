@@ -81,8 +81,11 @@ describe('deed_i18n English resolution', () => {
     // socket ladder pair (Bank Storage phase 06: soc_strongbox_outfitter and
     // soc_four_bags_deep, both reward-free), so the title count stays at 45.
     // MEASURED on the merged tree (274 base + 17 packet + 2 release).
-    expect(manifest.length).toBe(293 * 2 + 45);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(45);
+    // 298 since the release/v0.41.0 merge (2026-08-30) brought in the five
+    // Crucible raid deeds; the Varkhul flawless task carries a title (the
+    // release's own chain read 281 * 2 + 43), so the title count moves to 46.
+    expect(manifest.length).toBe(298 * 2 + 46);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

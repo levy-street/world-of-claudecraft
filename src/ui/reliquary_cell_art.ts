@@ -220,21 +220,24 @@ export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
   // measured dark and stay legible under the silhouette darken.
   //
   // MASTERWROUGHT PHASE 11i BROKE THAT PREMISE, and it did so in the way the
-  // guard in tests/reliquary_cell_art.ts predicted rather than by accident: it
-  // catalogued the apex fishing rod while that rod's painting is still PARKED
-  // in ITEM_ART_PENDING with the rest of the packet's art. An item whose art is
-  // parked falls through to the procedural compositor, which paints an OPAQUE
-  // radial tile, and darkening an opaque tile as though it were a transparent
-  // cutout is what the crest arm one line up already refuses to do.
+  // guard in tests/reliquary_cell_art.test.ts predicted rather than by
+  // accident: it catalogued the apex fishing rod while that rod's painting is
+  // still PARKED in ITEM_ART_PENDING with the rest of the packet's art. An item
+  // whose art is parked falls through to the procedural compositor, which
+  // paints an OPAQUE radial tile, and darkening an opaque tile as though it
+  // were a transparent cutout is what the crest arm one line up already
+  // refuses to do.
   //
-  // So the item arm now asks the same question the crest arm does: is there
-  // committed painted art behind this id. It reads exactly the two pipelines
-  // the premise named, which keeps the predicate honest as each parked id's
-  // painting lands (a committed webp flips it back to false with no edit here).
-  if (art.kind === 'item') {
-    return itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null;
-  }
-  return false;
+  // So the item arm asks the same question the crest arm does: is there
+  // committed painted art behind this id. An item with neither committed
+  // pipeline (no /ui/items webp, no /ui/weapons variant render) takes the
+  // crest-style answer: opaque exactly while its painted art is pending (the
+  // ITEM_ART_PENDING ledger in icons.ts; the release's Crucible arm emptied
+  // when its wave landed, this packet's parked ids are the live case). Reading
+  // exactly the two pipelines the premise named keeps the predicate honest as
+  // each parked id's painting lands: a committed webp flips it back to false
+  // with no edit here.
+  return itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null;
 }
 
 /** Profession-sheet art for one lifetime mark. The masterwork family keys off

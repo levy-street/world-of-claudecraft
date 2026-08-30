@@ -224,27 +224,31 @@ describe('i18n whole-catalog completeness', () => {
   });
 
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
+    // Re-derived 2026-08-30 at the merge of release/v0.41.0 (tip 3e801dc925) into
+    // feature/masterwrought: both parents added marker keys, so the merged rows
+    // digest to a value matching neither parent (recomputed the test's own way
+    // over the regenerated resolved tables, 101 rows per locale).
     const expected = {
-      es: '01cd5dee022842b9d286e89fca1fd3f20ac8f6ec48a1f09e42888895cc5ea60c',
-      es_ES: '01cd5dee022842b9d286e89fca1fd3f20ac8f6ec48a1f09e42888895cc5ea60c',
-      fr_FR: '891bb2da8f4026aff7916c34b13c9011c7a488d9d6724443aea98bcdb41f0534',
-      fr_CA: '891bb2da8f4026aff7916c34b13c9011c7a488d9d6724443aea98bcdb41f0534',
-      it_IT: '18dfff684d704c0504382945efc2dca2e869ceb5c3257e0a909e6127f8204421',
-      de_DE: '95f9df75941ea1588aff45b5b796278417235f9b16f56819900bebb5ef5f86e2',
-      zh_CN: '898d2f0e16199483469025ffe5185c6c7dbb0335bb905cd1d094cc8d9adfc4fa',
-      zh_TW: '46106f5851cebb14f2a41e9d858524d5caa3de8c7d0066569e6daca0337373f1',
-      ko_KR: '7bbf13b1d94957b346841148e64470969dbbe546ac82dc9b6518ab5e02c1fded',
-      ja_JP: '8d90be2a0af5e6c3749af5b1ea717cf98d2e8121339fad2882b0a8909a8879f5',
-      pt_BR: '67d8f18b93a760f1782834c034cd54548de724361fc7dbf1911bd0fb480ab866',
-      ru_RU: '102b64819422b0e9df1026ecc2f5085aa83afc77f038ee3ce6892161be466b62',
-      cs_CZ: 'b273624bb9355319828e1313f3bbf5119c73fe1e73a9b4326a2a28ee1b6a0398',
-      nl_NL: '23c491ec0da1f37f113423bab5f6a2ebe4a98c308f562bc9f23d7361fc63cfc0',
-      pl_PL: '192e32c3aa2ccec254def1bcae71c17e3171f7d4eb78af8e892fb807f728f732',
-      id_ID: 'c686f65e39887c12c316e3449df048d9cbeb2ef141ea970befb3de1f8da99a51',
-      tr_TR: '1271fbf15b6df3cfd5f376f2117e17095ef335b0bc8148a1f4eff2aff869b132',
-      sv_SE: '68f28ef51249c154d24478aba3066418e8bf8a6ae167f6dd1374a4d1c2489f12',
-      vi_VN: '5359299551e7aeadfb157950fee749a04ffecd9d21cdd993188da00fbffc1114',
-      da_DK: '649ebaa06a0e7c2551846c6f148c6be41ab9d0da081083fde88801d98993a492',
+      es: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
+      es_ES: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
+      fr_FR: '78c4622c008dacdd7999a63663f9db6dd0129909d1c1aec7fe3b3c8cf8f23c66',
+      fr_CA: '78c4622c008dacdd7999a63663f9db6dd0129909d1c1aec7fe3b3c8cf8f23c66',
+      it_IT: 'd4871933ecda60f31eef89695499c14143b814a830bb27cb9bb2ef81e99db965',
+      de_DE: '561b0bdde46111288a41393d99a0f86e34541262d6687ddefefb1b8195923ca2',
+      zh_CN: '88655d9dcd570ef3031925e758bd28f9480d378e6e074b7c30bc4e1e4fad73bc',
+      zh_TW: 'd013561d91c7bd77ee5f7c309bd39e147e4e67a45b4982faf4f9975396ba0865',
+      ko_KR: 'd35b9d6cb07a9394455c31e2cf465c74888e2bf86463098d6ce09fbe64d63bb6',
+      ja_JP: 'aaad77f83c6acd5bd443c654cf4930f565e31deca0f1e0f8eba460c9686fe065',
+      pt_BR: 'ef3e911c94e6b22e12893f1bd53af45e73100770e64ec288755c88fa7cffd77f',
+      ru_RU: '869bb35098d22e182aa7c693786f69148769fc6c93228a2b959a9b2b719d6794',
+      cs_CZ: '50b349eecfa38cec90036bda3dd01c816db8832fce3fe05da1a791734361cc57',
+      nl_NL: '67004a2f3890e86ebeb2be6dc0a37b1e9eb29466d40ed4108d5f31a411b8e7ad',
+      pl_PL: '8d48b62fb85ebf10a900c4e559618a3e08be1aee66799f85154a2a93d2376c74',
+      id_ID: '2e0bb93cfd572e37a63179c6981e96ffd5dd7794e441c4ac46592fa2d155bf80',
+      tr_TR: '26cc32a76bced8f7d1e2d383f9bf61338643f6b87b72876df29244fee75b4200',
+      sv_SE: 'e3bfd8e3b602a798dce2a476487b3a7c5d0fd200e7688a2d1de8d4b93ac283a8',
+      vi_VN: 'ea499bad62046a4d95d2e63de0f695507595bc733c615c4b90b47bacdc61db0c',
+      da_DK: 'fd9baf6493eafbc7e7ce3b60c900ad33d561797cbeda584fb2454aafd7cf7092',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<
@@ -253,7 +257,8 @@ describe('i18n whole-catalog completeness', () => {
       const markerRows = Object.entries(flatten(TABLES[lang])).filter(([key]) =>
         key.startsWith('hud.core.mapMarker'),
       );
-      expect(markerRows).toHaveLength(99);
+      // 98 at the shared base + this branch's marker key + the release's two.
+      expect(markerRows).toHaveLength(101);
       expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
         digest,
       );

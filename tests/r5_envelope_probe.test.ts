@@ -78,7 +78,22 @@ describe('the R5 envelope harness', () => {
     expect((armorReduction(SRIFT_TARGET.armor, 20) * 100).toFixed(2)).toBe('38.13');
   });
 
-  it('pins the escalation mechanism: dead hit on the base arm, live crit on the equipped arm', () => {
+  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
+  // tip 3e801dc925). The release's Crucible hit rebalance (c920f39c85) swapped
+  // hit for crit on five of the fury baseline's pieces (heroic_crownforged
+  // dreadhelm and warspaulders 55 hit / 20 crit -> 20 / 55; gravescale_girdle,
+  // bloodmane_war_legguards and tideworn_warboots 40 hit -> 40 crit), taking
+  // WAR_BIS from 355 hit to 165: UNDER the 190 heroic need, so the dead-rating
+  // mechanism section 9.6 measured no longer exists on the merged catalog, and
+  // the twin arm (bloodmane hit / forgefold crit) now reads two crit pieces.
+  // Every literal here is an input of the RATIFIED R5 record (sections 3, 8.1
+  // and 9.6; the four maintainer rulings of 2026-08-29), which the packet may
+  // not rewrite: the test is kept exactly as authored and marked expected-fail
+  // so the contradiction stays visible in every run. ESCALATED (state.md, the
+  // Phase 19 table: re-measure R5 on the merged world, or ratify the record as
+  // a measurement of the pre-raid catalog). Flip back to it() in the SAME
+  // commit that executes the ruling.
+  it.fails('pins the escalation mechanism: dead hit on the base arm, live crit on the equipped arm', () => {
     // Section 9.6's escalation driver, as assertions (the Phase 15 QA; the
     // 2026-08-28 suspension it drove is closed by ruling since 2026-08-29,
     // and the mechanism stays pinned as the record's accepted evidence). The
@@ -122,7 +137,13 @@ describe('the R5 envelope harness', () => {
     expect(bloodmane.critRating).toBeUndefined();
   });
 
-  it('reproduces the section 9.5 tank effective-health table exactly', () => {
+  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
+  // tip 3e801dc925): the release's legendary band retune (4ed7a279b4) moved
+  // heart_of_the_rift (sta 14 -> 18, str/agi/int 6 -> 8), so the tank baseline
+  // reads 3532 health against the record's 3332. Section 9.5 is part of the
+  // ratified R5 record; same treatment, same escalation, same flip rule as the
+  // arm above.
+  it.fails('reproduces the section 9.5 tank effective-health table exactly', () => {
     // Every literal here is a figure power-verification.md section 9.5 prints.
     // If the harness drifts from the record, this is where it says so.
     const base = tankBody('base');

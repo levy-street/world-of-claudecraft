@@ -60,6 +60,14 @@ describe('mob combat profiles', () => {
     expect(NYTHRAXIS_ADD_COMBAT_PROFILE.immediateSwingOnEnterRange).toBe(true);
   });
 
+  it('makes Varkhul close inside player melee range despite his oversized model', () => {
+    const profile = combatProfileForMob('varkhul_forgefather_of_the_last_flame', 3.2);
+
+    expect(profile.meleeRange).toBeCloseTo(11.6, 8);
+    expect(profile.desiredRange).toBe(4.5);
+    expect(profile.desiredRange).toBeLessThan(MELEE_RANGE);
+  });
+
   it('keeps the closing-distance grace small so reach is not wildly inflated', () => {
     // One tick of relative closing at 20 Hz is well under a yard; a flat 3 yd grace
     // let an ordinary scale-1 mob swing from 8 yd. Keep the grace tick-justified.

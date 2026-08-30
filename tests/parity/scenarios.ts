@@ -34,8 +34,19 @@ import {
   STATIONS,
 } from '../../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../../src/sim/eastbrook_layout';
+import {
+  IGNIVAR_BRAND_AURA_ID,
+  IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED,
+} from '../../src/sim/encounters/ignivar';
+import { VARKHUL_FORGESTORM_CAST_ID } from '../../src/sim/encounters/varkhul';
 import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
+import {
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+  VARKHUL_BOSS_ID,
+} from '../../src/sim/ignivar_raid_ids';
+import { enterDungeon } from '../../src/sim/instances/dungeons';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
@@ -66,6 +77,7 @@ import {
   dist2d,
   type Entity,
   FISHING_CAST_ID,
+  IGNIVAR_BOSS_ID,
   MAX_LEVEL,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
@@ -7040,6 +7052,216 @@ function perfectingWalk(seed = 1): Scenario {
     },
   };
 }
+function ignivarRaidTuning(): Scenario {
+  return {
+    name: 'ignivar_raid_tuning',
+    coverage: [
+      'Heroic Ignivar rotating-ray live damage and per-player pulse cooldown',
+      'Last Inferno Brand target RNG and final-phase cadence',
+      'automatic wipe reset for cooldowns of two minutes or longer',
+      'class:warrior',
+    ],
+    sampleEvery: 1,
+    build: () => new Sim({ seed: 1171, playerClass: 'warrior', devCommands: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(MAX_LEVEL, sim.player.id);
+      sim.setDungeonDifficulty('heroic', sim.player.id);
+      if (!enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id, true)) {
+        throw new Error('Ignivar parity raid entry failed');
+      }
+      const boss = [...sim.entities.values()].find(
+        (entity) => entity.templateId === IGNIVAR_BOSS_ID && !entity.dead,
+      );
+      if (!boss) throw new Error('Ignivar parity boss did not spawn');
+      const placeInRoom = (entity: Entity, x: number, z: number) => {
+        entity.pos = { x, y: boss.pos.y, z };
+        entity.prevPos = { ...entity.pos };
+        entity.fallStartY = boss.pos.y;
+        entity.vy = 0;
+        entity.onGround = true;
+        sim.rebucket(entity);
+      };
+      const roomPlayers = [sim.player];
+      for (let index = 0; index < 3; index++) {
+        const playerId = sim.addPlayer('mage', `IgnivarParity${index}`);
+        sim.setPlayerLevel(MAX_LEVEL, playerId);
+        const player = requireEntity(sim, playerId, `Ignivar parity player ${index}`);
+        roomPlayers.push(player);
+      }
+      roomPlayers.forEach((player, index) => {
+        player.maxHp = 1_000;
+        player.hp = 1_000;
+        placeInRoom(player, boss.pos.x + index * 2, boss.pos.z + 10);
+      });
+      boss.inCombat = true;
+      boss.aiState = 'attack';
+      boss.aggroTargetId = sim.player.id;
+      boss.swingTimer = Number.POSITIVE_INFINITY;
+      rec.track(boss.id);
+      rec.tick(1);
+      if (!boss.ignivar) throw new Error('Ignivar parity state did not initialize');
+      const state = boss.ignivar;
+      state.brandTimer = 999;
+      state.forgeStrikeTimer = 999;
+      state.frontalTimer = 999;
+      state.skyfireTimer = 999;
+      state.meteorTimer = 999;
+      state.forgeWaveTimer = 999;
+      state.soakTimer = 999;
+      state.overlapTimer = 999;
+      state.rotatingRaysTimer = 0;
+      rec.tick(1);
+      state.rotatingRaysWindupRemaining = 0;
+      const firstFacing =
+        state.rotatingRaysFacing +
+        state.rotatingRaysDirection * IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED * DT;
+      placeInRoom(
+        sim.player,
+        boss.pos.x + Math.sin(firstFacing) * 15,
+        boss.pos.z + Math.cos(firstFacing) * 15,
+      );
+      rec.tick(1);
+      rec.notes.rayHpAfterHit = sim.player.hp;
+      const adjacentFacing =
+        state.rotatingRaysFacing +
+        state.rotatingRaysDirection * IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED * DT;
+      placeInRoom(
+        sim.player,
+        boss.pos.x + Math.sin(adjacentFacing) * 15,
+        boss.pos.z + Math.cos(adjacentFacing) * 15,
+      );
+      rec.tick(1);
+      rec.notes.rayHpAfterAdjacentTick = sim.player.hp;
+      rec.snapshot('rotating-rays');
+
+      state.rotatingRaysWindupRemaining = 0;
+      state.rotatingRaysActiveRemaining = 0;
+      state.rotatingRaysTimer = 999;
+      state.lastInfernoTriggered = true;
+      state.lastInfernoRemaining = 999;
+      state.brandTimer = DT;
+      boss.castingAbility = null;
+      boss.castRemaining = 0;
+      boss.castTotal = 0;
+      roomPlayers.forEach((player) => {
+        player.auras = player.auras.filter((aura) => aura.id !== IGNIVAR_BRAND_AURA_ID);
+      });
+      rec.tick(1);
+      rec.notes.brandedPlayerIds = roomPlayers
+        .filter((player) => player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID))
+        .map((player) => player.id);
+      rec.notes.attemptParticipantIds = [...(state.attemptParticipantIds ?? [])];
+      rec.snapshot('final-brands');
+
+      const meta = requireValue(sim.meta(sim.player.id), 'Ignivar parity player metadata');
+      const longAbility = requireValue(
+        meta.known.find((ability) => ability.cooldown >= 120),
+        'Ignivar parity long cooldown',
+      );
+      sim.player.cooldowns.set(longAbility.def.id, longAbility.cooldown);
+      roomPlayers.forEach((player) => {
+        player.dead = true;
+        player.hp = 0;
+      });
+      rec.tick(1);
+      rec.notes.longCooldownReset = !sim.player.cooldowns.has(longAbility.def.id);
+      rec.notes.encounterReset = boss.ignivar === undefined;
+      rec.snapshot('wipe-reset');
+    },
+  };
+}
+
+function varkhulRaidTuning(): Scenario {
+  return {
+    name: 'varkhul_raid_tuning',
+    coverage: [
+      'Varkhul pre-pull roster exclusion and real pull participant tracking',
+      'Heroic Forgestorm live encounter damage',
+      'automatic wipe cooldown reset limited to pull participants',
+      'class:warrior',
+    ],
+    sampleEvery: 1,
+    build: () => new Sim({ seed: 1172, playerClass: 'warrior', devCommands: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(MAX_LEVEL, sim.player.id);
+      sim.setDungeonDifficulty('heroic', sim.player.id);
+      const visitorMeta = requireValue(sim.meta(sim.player.id), 'Varkhul visitor metadata');
+      const visitorLongAbility = requireValue(
+        visitorMeta.known.find((ability) => ability.cooldown >= 120),
+        'Varkhul visitor long cooldown',
+      );
+      sim.player.cooldowns.set(visitorLongAbility.def.id, visitorLongAbility.cooldown);
+      if (!enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id, true)) {
+        throw new Error('Varkhul parity raid entry failed');
+      }
+      const boss = [...sim.entities.values()].find(
+        (entity) => entity.templateId === VARKHUL_BOSS_ID && !entity.dead,
+      );
+      if (!boss) throw new Error('Varkhul parity boss did not spawn');
+      rec.track(boss.id);
+      rec.tick(1);
+      if (!boss.varkhul) throw new Error('Varkhul parity state did not initialize');
+      rec.notes.prePullParticipantIds = [...(boss.varkhul.attemptParticipantIds ?? [])];
+      rec.snapshot('pre-pull');
+
+      const raiderId = sim.addPlayer('warrior', 'VarkhulParityRaider');
+      sim.setPlayerLevel(MAX_LEVEL, raiderId);
+      const raider = requireEntity(sim, raiderId, 'Varkhul parity raider');
+      const raiderMeta = requireValue(sim.meta(raiderId), 'Varkhul raider metadata');
+      const raiderLongAbility = requireValue(
+        raiderMeta.known.find((ability) => ability.cooldown >= 120),
+        'Varkhul raider long cooldown',
+      );
+      raider.cooldowns.set(raiderLongAbility.def.id, raiderLongAbility.cooldown);
+      sim.player.pos = sim.ctx.groundPos(0, 0);
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.rebucket(sim.player);
+      raider.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 2 };
+      raider.prevPos = { ...raider.pos };
+      raider.fallStartY = boss.pos.y;
+      raider.onGround = true;
+      sim.rebucket(raider);
+      rec.tick(1);
+      const state = requireValue(boss.varkhul, 'Varkhul parity pulled state');
+      rec.notes.pullParticipantIds = [...(state.attemptParticipantIds ?? [])];
+
+      state.engage.phase = 'done';
+      state.makersBrandTimer = 999;
+      state.frontalTimer = 999;
+      state.cinderOrbsTimer = 999;
+      state.sharedPyreTimer = 999;
+      state.anvilTimer = 999;
+      state.interceptBeamTimer = 999;
+      state.forgestormTimer = DT;
+      boss.swingTimer = Number.POSITIVE_INFINITY;
+      raider.maxHp = 1_000;
+      raider.hp = 1_000;
+      rec.tick(1);
+      raider.pos = { ...state.forgestormPoints[0] };
+      raider.prevPos = { ...raider.pos };
+      raider.fallStartY = raider.pos.y;
+      raider.onGround = true;
+      sim.rebucket(raider);
+      state.forgestormWarningRemaining = DT;
+      rec.tick(1);
+      rec.notes.forgestormHpAfterImpact = raider.hp;
+      rec.notes.forgestormDamageSeen = rec.allEvents.some(
+        (event) => event.type === 'damage' && event.ability === VARKHUL_FORGESTORM_CAST_ID,
+      );
+      rec.snapshot('heroic-forgestorm');
+
+      raider.dead = true;
+      raider.hp = 0;
+      rec.tick(1);
+      rec.notes.visitorCooldownRetained = sim.player.cooldowns.has(visitorLongAbility.def.id);
+      rec.notes.raiderCooldownReset = !raider.cooldowns.has(raiderLongAbility.def.id);
+      rec.notes.encounterReset = boss.varkhul === undefined;
+      rec.snapshot('wipe-reset');
+    },
+  };
+}
 
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
@@ -7139,4 +7361,6 @@ export const SCENARIOS: Scenario[] = [
   // The Perfecting stage (masterwrought Phase 12). Appended last, so it lands
   // in the final shard automatically; SHARD_BOUNDS needs no edit.
   perfectingWalk(),
+  ignivarRaidTuning(),
+  varkhulRaidTuning(),
 ];

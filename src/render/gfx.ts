@@ -14,7 +14,14 @@ import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
+  RIM_GLOW_DEFAULT_COLOR,
 } from './pbr_fragment_shader';
+import {
+  patchRoofDarknessFragmentShader,
+  patchRoofDarknessVertexShader,
+  ROOF_DARK_END_Y,
+  ROOF_DARK_START_Y,
+} from './roof_darkness_core';
 import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
@@ -1920,10 +1927,18 @@ export const gfxInternalsForTest = {
 // One clock uniform shared by every onBeforeCompile shader (wind, water,
 // grade grain). The renderer ticks it once per frame in sync(). uRimBoost
 // scales the character rim glow (raised inside dungeons so silhouettes
-// separate from the murk).
+// separate from the murk); uRimColor is its tint, cool by default and
+// re-graded by the interior light rig (warm ember in the Ignivar forge).
 export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
+  uRimColor: { value: new THREE.Color(RIM_GLOW_DEFAULT_COLOR) },
+  /** The raid rooms' world-height black ramp (roof_darkness_core.ts):
+   *  strength 0 everywhere except the ignivar states, which the interior
+   *  light rig raises to 1 on settle. */
+  uRoofDarkStrength: { value: 0 },
+  uRoofDarkStart: { value: ROOF_DARK_START_Y },
+  uRoofDarkEnd: { value: ROOF_DARK_END_Y },
   /** (player x, player z, dense blade-carpet radius): the paint-free ring the
    *  terrain splat reads so painted blades never show under the real carpet.
    *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
@@ -1998,6 +2013,7 @@ export function addRimGlow(mat: THREE.Material): void {
     const patched = patchPbrRimGlowFragmentShader(sh.fragmentShader);
     if (patched === sh.fragmentShader) return;
     sh.uniforms.uRimBoost = sharedUniforms.uRimBoost;
+    sh.uniforms.uRimColor = sharedUniforms.uRimColor;
     sh.fragmentShader = patched;
   };
   mat.customProgramCacheKey = () =>
@@ -2010,6 +2026,30 @@ export function addRimGlow(mat: THREE.Material): void {
  *  material_clone_hooks.ts re-attaches. */
 export function hasRimGlow(mat: THREE.Material): boolean {
   return rimGlowMaterials.has(mat);
+}
+
+// The raid rooms' roof darkness (roof_darkness_core.ts): a post-fog world
+// height black ramp. Hooked onto the ignivar tile packs and the env prop
+// templates; inert (strength 0) in every other scene state.
+const roofDarknessMaterials = new WeakSet<THREE.Material>();
+
+export function addRoofDarkness(mat: THREE.Material): void {
+  if (roofDarknessMaterials.has(mat)) return;
+  roofDarknessMaterials.add(mat);
+  const previousCompile = mat.onBeforeCompile;
+  const previousCompileSource = previousCompile.toString();
+  const previousProgramKey = mat.customProgramCacheKey.bind(mat);
+  mat.onBeforeCompile = (sh, renderer) => {
+    previousCompile.call(mat, sh, renderer);
+    const fragment = patchRoofDarknessFragmentShader(sh.fragmentShader);
+    if (fragment === sh.fragmentShader) return;
+    sh.vertexShader = patchRoofDarknessVertexShader(sh.vertexShader);
+    sh.uniforms.uRoofDarkStrength = sharedUniforms.uRoofDarkStrength;
+    sh.uniforms.uRoofDarkStart = sharedUniforms.uRoofDarkStart;
+    sh.uniforms.uRoofDarkEnd = sharedUniforms.uRoofDarkEnd;
+    sh.fragmentShader = fragment;
+  };
+  mat.customProgramCacheKey = () => `roof-dark|${previousCompileSource}|${previousProgramKey()}`;
 }
 
 // Material factory: dedupes by (color|maps|flags) so hundreds of small box

@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Anillos de Brecha',
     desc: 'Los anillos de Brecha personales, acuñados para cada campeón del grupo que logra la primera conquista de una Brecha clasificada. Cada personaje solo puede tener el suyo.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Botines épicos de Ignivar, Heraldo de la Última Llama.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroico: Crucible of the Last Spring',
+    desc: 'Armas exclusivas del modo heroico de Ignivar, Heraldo de la Última Llama.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Botines épicos de Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroico: The Inner Crucible',
+    desc: 'Escudos y armas exclusivos del modo heroico de Varkhul, Forgefather of the Last Flame.',
+  },
 };

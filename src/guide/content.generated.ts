@@ -7030,6 +7030,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Harvestmaster"
+      },
+      {
+        "kind": "title",
+        "name": "the Unscorched"
       }
     ]
   },

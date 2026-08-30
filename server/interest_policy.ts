@@ -6,12 +6,16 @@
 // a thin consumer.
 
 import { bgOriginAt, isBgPos } from '../src/sim/data';
-import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
+import { type Entity, PLAYER_INTEREST_DROP_RADIUS, PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
-// Interest management: the client renders entities out to 80yd, so new
-// entities enter interest just past that, and known entities persist a
-// little farther so the boundary doesn't churn create/destroy cycles.
-export const INTEREST_RADIUS = 90;
+// Interest management: new entities enter interest at the shared sim edge
+// (PLAYER_INTEREST_RADIUS; the rationale lives on the sim constant: the client
+// renders entities out to 80yd, so entry sits just past that), and known
+// entities persist a little farther so the boundary doesn't churn
+// create/destroy cycles. Derived, never a second literal: the v0.41.0 Ignivar
+// span lifted the number into src/sim/types.ts and this leaf follows it (the
+// merge of 3e801dc925, 2026-08-30).
+export const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS;
 // Exported so the idle-mob-tick radius (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
 export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;

@@ -59,6 +59,10 @@ function parseArguments(arguments_) {
 async function loadItems(repoRoot) {
   const build = await esbuild.build({
     stdin: {
+      // ITEM_ART_PENDING is the one art-pending ledger: it spreads its
+      // content-side source list (IGNIVAR_ART_PENDING_ITEM_IDS in
+      // src/sim/content/ignivar_loot.ts) on top of the enumerated debt, so the
+      // audit reads the union through the UI seam and never a partial list.
       contents:
         "export { ITEMS } from './src/sim/data.ts';\n" +
         "export { ITEM_ART_PENDING } from './src/ui/icons.ts';",
@@ -74,8 +78,8 @@ async function loadItems(repoRoot) {
   });
   const bundled = build.outputFiles[0].text;
   const dataUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
-  const module = await import(dataUrl);
-  return { items: module.ITEMS, pendingArtIds: module.ITEM_ART_PENDING };
+  const module_ = await import(dataUrl);
+  return { items: module_.ITEMS, pendingArtIds: module_.ITEM_ART_PENDING };
 }
 
 const arguments_ = parseArguments(process.argv.slice(2));
@@ -106,7 +110,14 @@ const build = await buildItemArtAudit({
     // briny lure and lustrous pearl), measured as the committed .webp count
     // under public/ui/items. 920 at the v0.41.0 release-batch sync: the
     // release's seven painted bank-storage bags join the count.
-    catalogCount: 920,
+    // 1124 at the v0.41.0 Crucible sync: the release's own arm went 829 to
+    // 1040 (the crucible-raid-weapons-2026-08-28 batch's 9 painted weapons,
+    // the ignivar-varkhul-drop-renders-2026-08-28 batch's 2 rendered
+    // legendaries, the crucible-set-icons-2026-08-29 wave's 192 non-weapon
+    // Crucible pieces, and the Core of the Last Flame reagent), so its 204
+    // post-base ids join the 920 (836 shared base plus this branch's 84 plus
+    // the release's 204), again measured as the committed .webp count.
+    catalogCount: 1124,
     // The ART-SUBJECT count: live defs minus the declared procedural-art
     // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
     // 922 was the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
@@ -116,7 +127,14 @@ const build = await buildItemArtAudit({
     // release-batch sync's seven painted bank-bag defs. It stays a
     // hard literal: a new item ships art (joining this count) or
     // joins the pending pin, and either move is a visible, deliberate edit.
-    liveItemCount: 935,
+    // 1139 at the v0.41.0 Crucible sync: the release's arm went 844 to 1055
+    // (the 201 Crucible raid loot definitions, once 192 of them art-pending
+    // and now all painted, plus the 2 Varkhul legendary definitions, plus
+    // the release-sync's 7 bank-storage painted bags, already counted here),
+    // so its 204 post-base art-shipping defs join the 935; the release's
+    // content-side ledger (IGNIVAR_ART_PENDING_ITEM_IDS) is empty, so the
+    // debt term below is this branch's 81 alone.
+    liveItemCount: 1139,
     // The other half of the art-subject split: the declared procedural-art
     // debt, pinned as its own literal so the audit reds on new debt even
     // when it runs standalone (the vitest exact-set pin in
@@ -154,7 +172,13 @@ const build = await buildItemArtAudit({
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    sheetPageCount: 29,
+    // 29 pages over 25 groups on this branch (the flask, recipe and scroll
+    // kinds each formed a group of their own), 27 pages over the release's 22
+    // groups (its 204 ids landed in existing kinds and split one more page);
+    // at the v0.41.0 Crucible sync the merged census keeps the 25 groups and
+    // the release's 204 ids split one more page, 30, measured by the merged
+    // build.
+    sheetPageCount: 30,
     groupCount: 25,
   },
 });

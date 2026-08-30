@@ -97,6 +97,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
   ridgebreaker: 'mace',
+  varkhul_forgebreaker: 'mace',
   // Axes
   rusty_hatchet: 'axe',
   copper_bearded_axe: 'axe',
@@ -148,6 +149,16 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   ironbark_boar_spear: 'polearm',
   fen_reaver_glaive: 'polearm',
   fanglords_beastspear: 'polearm',
+  // Crucible of the Last Spring raid weapons (content/ignivar_loot.ts).
+  forgefathers_warhammer: 'mace',
+  springtouched_crozier: 'mace',
+  cinderfang_kris: 'dagger',
+  slagrender_cleaver: 'axe',
+  anvilguard_blade: 'sword',
+  heart_of_the_end_greatblade: 'sword',
+  staff_of_the_last_spring: 'staff',
+  forgefire_spire: 'staff',
+  wand_of_quenched_sparks: 'wand',
 };
 
 /**

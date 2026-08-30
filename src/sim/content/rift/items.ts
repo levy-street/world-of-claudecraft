@@ -379,8 +379,11 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'neck',
     quality: 'legendary',
+    // Buffed to the legendary band of the 2026-08-30 ilvl-honesty round
+    // (maintainer direction: every legendary lives at the Thronebane tier,
+    // budget-true at its labeled level; sources in item_level.ts).
     requiredLevel: 20,
-    stats: { sta: 14, str: 6, agi: 6, int: 6 },
+    stats: { sta: 18, str: 8, agi: 8, int: 8 },
     sellValue: 50000,
   },
   // The caster half of the S-rank chase. Deliberately a DAGGER: the only other
@@ -411,13 +414,21 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'legendary',
+    // Buffed to the legendary band of the 2026-08-30 ilvl-honesty round
+    // (maintainer direction: every legendary lives at the Thronebane tier,
+    // budget-true at its labeled level; sources in item_level.ts).
     requiredLevel: 20,
     // dagger: true keeps the skin and the gameplay notion of "dagger" in step
     // (tests/weapon_skins.test.ts). With no class lock a rogue MAY equip this and
     // it does count for Craven Thrust / Ambush (weaponStrike + requiresBehind);
     // the weak damage line is what makes that a downgrade rather than a lure.
+    // The swing stays deliberately WEAK (a caster's white line is dead
+    // weight, and rift_loot_pools pins it under the epic melee dagger floor
+    // so no rogue is tempted); the ilvl-49 band power lives in the caster
+    // axes: the 65-point stat line and the lane-share Spell Power.
     weapon: { min: 15, max: 25, speed: 1.8, dagger: true },
-    stats: { int: 19, spi: 17, sta: 13 },
+    stats: { int: 25, spi: 23, sta: 17 },
+    spellPower: 25,
     // NO requiredClass, deliberately: a class lock is a nerf, and the stat line
     // already decides who wants this (19 int / 17 spi / 0 agi / 0 str). A paladin
     // or shaman healer has a real case for it, which the cloth-armor CASTER group

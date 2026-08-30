@@ -332,13 +332,16 @@ describe('isHarvestableCorpse', () => {
     // spider_egg and mirefen_broodmother their silk, aurelhorn its horn);
     // the twelve other templates the spread touched were already tagged, and
     // mapping horn and gills in the same phase moved nothing here, since
-    // every carrier of either already carried a mapped family beside it.
+    // every carrier of either already carried a mapped family beside it. The
+    // release's seven Ignivar raid templates (the v0.41.0 sync merge) are all
+    // untagged forge constructs, so they move the `untagged` count below and
+    // this one not at all.
     expect(included).toHaveLength(54);
-    // ...and the untagged templates are counted rather than assumed: 181 of
+    // ...and the untagged templates are counted rather than assumed: 188 of
     // them ship, every one excluded, and none of them ever passed through
     // `excluded` (fen_troll was already tagged with claw and tusk when #2905
     // mapped both, so it moved from `excluded` into `included` above, never
-    // through `untagged`). The chain to 181: 184 before the v0.32.0 base
+    // through `untagged`). The chain to 188: 184 before the v0.32.0 base
     // merge, plus the untagged dragonkin egg from the brood and the four
     // untagged camp mobs the quest-dedupe pass added, minus shoal_scuttler
     // once it gained a mapped tag. Plus the three practice dummies the
@@ -349,9 +352,13 @@ describe('isHarvestableCorpse', () => {
     // Shore tutorial island's training_effigy, a straw target that yields
     // nothing either: 187. Minus the six templates the Phase 11m spread
     // tagged for the first time, the same six the `included` count above
-    // picked up: 181.
+    // picked up: 181. Plus the seven Ignivar raid templates (the derelict
+    // mech, Varkhul, the three crucible automatons, the herald and the Heart
+    // of the End): all elemental-family forge constructs, and a construct
+    // corpse carries no skinnable or butcherable components (the release's
+    // own chain read 194 = 187 + 7): 188.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(181);
+    expect(untagged).toHaveLength(188);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

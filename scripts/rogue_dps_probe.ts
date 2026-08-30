@@ -7,10 +7,10 @@
 
 import type { TalentRowLevel } from '../src/sim/content/talents';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
-import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import { equipReferenceEpicKitForDev } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import type { Entity, EquipSlot, WorldContent } from '../src/sim/types';
 import { anchorProbeInOpenField } from './probe_anchor';
 
 export type RogueProbeSpec = 'assassination' | 'combat' | 'subtlety';
@@ -33,6 +33,10 @@ export interface RogueDpsResult {
   dps: number;
   seeds: readonly number[];
   build: RogueProbeBuild;
+  // The kit the probe actually equipped, so tests assert the band's gear
+  // properties (epic-only, no legendary) on reality instead of on a function
+  // the probe might silently stop calling.
+  equipment: Readonly<Partial<Record<EquipSlot, string>>>;
 }
 
 type ProbeSim = Sim & {
@@ -186,11 +190,13 @@ export function runRogueDpsProbe(
     throw new Error(`failed to apply ${spec} probe build`);
   }
 
-  // /dev bis chooses only epic items, so the representative current loadout
-  // cannot include the legendary this band intentionally excludes.
-  if (equipBestInSlotForDev(sim.ctx, sim.playerId) === 0) {
+  // The reference kit's epic-only scorer keeps the legendary this band
+  // intentionally excludes out of the loadout. /dev bis no longer guarantees
+  // that: it equips top-parse loadouts, legendaries included.
+  if (equipReferenceEpicKitForDev(sim.ctx, sim.playerId) === 0) {
     throw new Error(`failed to equip ${spec} probe loadout`);
   }
+  const equipment = { ...(sim.ctx.players.get(sim.playerId)?.equipment ?? {}) };
 
   const player = sim.player;
   player.resource = player.maxResource;
@@ -219,6 +225,7 @@ export function runRogueDpsProbe(
     dps: damage / seconds,
     seeds: [seed],
     build,
+    equipment,
   };
 }
 
@@ -240,6 +247,7 @@ export function averageRogueDps(
     dps: damage / seconds,
     seeds: [...seeds],
     build,
+    equipment: runs[0].equipment,
   };
 }
 

@@ -8,7 +8,7 @@ import {
   instanceMusicDecision,
 } from '../src/game/instance_music';
 import { ZONE_STREAM_URLS } from '../src/game/music_tracks';
-import { DELVE_X_MIN, ZONES } from '../src/sim/data';
+import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
 if (!eastbrookFixture) throw new Error('eastbrook_vale fixture is missing');
@@ -102,5 +102,49 @@ describe('the Proving Shore cue, resolved from the shipped zone record', () => {
     expect(existsSync(path.join(__dirname, '..', 'public', ...url!.split('?')[0].split('/')))).toBe(
       true,
     );
+  });
+
+  it('selects the authored ambient cue for each Ignivar raid room', () => {
+    const rooms = [
+      { id: 'ignivar_forge_approach', zone: 'ignivar_forge_approach' },
+      { id: 'ignivar_raid_arena', zone: 'ignivar_raid_arena' },
+      { id: 'ignivar_molten_assembly', zone: 'ignivar_forge_approach' },
+      { id: 'ignivar_inner_crucible', zone: 'ignivar_inner_crucible' },
+    ] as const;
+
+    for (const room of rooms) {
+      const origin = instanceOrigin(DUNGEONS[room.id].index, 0);
+      const decision = instanceMusicDecision(
+        input({
+          playerPos: origin,
+          inDungeon: true,
+        }),
+      );
+      expect(decision.instanceId, room.id).toBe(room.id);
+      expect(decision.zone, room.id).toBe(room.zone);
+      expect(decision.musicCombat, room.id).toBe(false);
+    }
+  });
+
+  it('keeps the room cue selected while ordinary raid combat uses the global combat layer', () => {
+    const room = 'ignivar_inner_crucible';
+    const origin = instanceOrigin(DUNGEONS[room].index, 0);
+    const decision = instanceMusicDecision(
+      input({
+        playerPos: origin,
+        inDungeon: true,
+        entities: [
+          {
+            kind: 'mob',
+            dead: false,
+            templateId: 'varkhul_forgefather',
+            aggroTargetId: 7,
+          },
+        ],
+      }),
+    );
+
+    expect(decision.zone).toBe(room);
+    expect(decision.musicCombat).toBe(true);
   });
 });

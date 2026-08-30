@@ -5,6 +5,7 @@ import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { TAUNT_FORCE_SECONDS, topThreatValue } from '../threat';
 import type { Entity } from '../types';
+import { stonehearthCadenceHeal } from './shaman_stonehearth';
 import {
   galeheartEchoMultiplier,
   primalExaltationActive,
@@ -264,15 +265,17 @@ function tryProcStormsurge(ctx: SimContext, player: Entity): void {
 
 /**
  * Advances one shared cadence for either hand. `steps` is two for Ancestral
- * Strike and one for a landed base swing. Echoes copy resolved damage and draw
- * no RNG, so they cannot recursively advance the cadence.
+ * Strike (three for a Warspirit Emberscale 2pc wearer, the call-site
+ * selection in combat/auto_attack.ts) and one for a landed base swing.
+ * Echoes copy resolved damage and draw no RNG, so they cannot recursively
+ * advance the cadence.
  */
 export function advanceWarspiritCadence(
   ctx: SimContext,
   player: Entity,
   target: Entity,
   resolvedWeaponDamage: number,
-  steps: 1 | 2 = 1,
+  steps: 1 | 2 | 3 = 1,
 ): boolean {
   if (!isWarspirit(ctx, player) || warspiritPosture(player) === null) return false;
   const cadenceTarget = primalExaltationActive(player) ? 2 : WARSPIRIT_CADENCE_STEPS;
@@ -283,6 +286,11 @@ export function advanceWarspiritCadence(
   }
   setCadence(ctx, player, Math.min(cadenceTarget - 1, total - cadenceTarget));
   armStormcast(ctx, player);
+  // Stonehearth 4pc: completing a cadence while Stonebound heals 3 percent of
+  // max health (a HEAL at the completion point, distinct from Living Weapon's
+  // absorb which arms on the Stormcast CONSUME in onStormcastConsumed below).
+  // The module no-ops for non-wearers and draws no rng for anyone.
+  stonehearthCadenceHeal(ctx, player, warspiritPosture(player));
   if (warspiritPosture(player) !== 'galeheart' || target.dead) return true;
   const echoDamage = Math.max(
     1,

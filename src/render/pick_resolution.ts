@@ -40,10 +40,19 @@ export function resolveDirectPickEntityId(
   // still-fighting mob is the "hard to target the last living mob" bug: the
   // nearest live hit wins over a leading corpse before the loot/cycle logic
   // below ever runs.
-  if (lootableCorpse(ordered[0])) {
-    const live = ordered.find(isLiveTargetable);
-    if (live) return live.id;
+  // Large raid-boss click proxies can overlap smaller adds. Once the nearest
+  // live hit is already selected, another click on the same stack advances to
+  // the next live target instead of selecting the boss again forever.
+  const liveTargets = ordered.filter(isLiveTargetable);
+  if (
+    (isLiveTargetable(ordered[0]) || lootableCorpse(ordered[0])) &&
+    liveTargets.length > 1 &&
+    currentTargetId !== null
+  ) {
+    const idx = liveTargets.findIndex((e) => e.id === currentTargetId);
+    if (idx >= 0) return liveTargets[(idx + 1) % liveTargets.length].id;
   }
+  if (lootableCorpse(ordered[0]) && liveTargets.length > 0) return liveTargets[0].id;
 
   const corpses = ordered.filter(lootableCorpse);
   if (lootableCorpse(ordered[0]) && corpses.length > 1 && currentTargetId !== null) {

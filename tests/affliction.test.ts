@@ -206,7 +206,10 @@ describe('Affliction Warlock', () => {
   it('pins the level-20 Needle and Maledict Gaze damage floor', () => {
     expect(ABILITIES.needle_of_fate.ranks?.find((rank) => rank.rank === 3)).toMatchObject({
       level: 20,
-      effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
+      effects: [
+        { type: 'afflictionNeedle', doom: 7 },
+        { type: 'directDamage', min: 41, max: 49 },
+      ],
     });
     expect(maledictGazeDamage(19)).toBe(9);
     expect(maledictGazeDamage(20)).toBe(10);
@@ -217,9 +220,18 @@ describe('Affliction Warlock', () => {
     expect(en.entities.abilities.needle_of_fate.description).toContain(
       'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
     );
-    expect(en.entities.abilities.needle_of_fate.description).toContain(
-      'generates 7 Condemnation on impact',
+    // The Condemnation figure is a live {needleDoom} splice in the CATALOG
+    // since the Hexthread 2pc (the Crucible set doc); the sim-source
+    // description keeps the base literal 7 (the $-form contract in
+    // tests/ability_tooltip_consistency.test.ts). The number pin moved from
+    // the resolved artifact to the two SOURCES, so the probe holds both
+    // before and after the next i18n:gen rebuilds the resolved bundles.
+    expect(ABILITIES.needle_of_fate.description).toContain('generates 7 Condemnation on impact');
+    const abilitiesCatalogSource = readFileSync(
+      new URL('../src/ui/i18n.catalog/abilities.ts', import.meta.url),
+      'utf8',
     );
+    expect(abilitiesCatalogSource).toContain('generates {needleDoom} Condemnation on impact');
     expect(en.entities.abilities.needle_of_fate.description).toContain(
       'Fate Threads stay with you when the Eye moves or its target dies',
     );

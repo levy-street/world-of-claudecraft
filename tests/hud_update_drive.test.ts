@@ -1065,6 +1065,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the heroic vendor window out of range',
   },
   {
+    call: 'this.closeCrucibleVendor',
+    band: 'medium',
+    gate: 'this.openCrucibleVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'closes the crucible vendor window out of range',
+  },
+  {
     call: 'this.closeWarfareVendor',
     band: 'medium',
     gate: 'this.openWarfareVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
@@ -1648,19 +1656,22 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
       // Both sides of every v0.36.0 sync move this bucket split independently
-      // (the branch's reliquary window row, its char-sheet latch and its WOC
-      // Store slow-band row against the release's own window/chrome churn and
-      // its woc_market row), so it cannot be reconciled by arithmetic across a
-      // merge. The numbers below were set from a suite run ON THE MERGED TREE,
-      // not from either side's narrative. At the fifth v0.40.0 sync the
-      // release's tracker-stack anchor apply (seats the stack below the minimap
-      // column; tracker_stack_anchor.ts) had already taken chrome to 84 on both
-      // arms, and the release's woc_market window row lands on top of the
-      // branch's own window rows.
-      // At the release/v0.41.0 sync the Vale Cup retirement removes the cup
-      // window and chrome rows from the branch arm while the release's tutorial
-      // coach strip and gamepad hint applies land on top. MEASURED, not derived.
-    ).toEqual({ window: 45, chrome: 83, none: 17 });
+      // (each side's window and chrome churn lands against the other's), so it
+      // cannot be reconciled by arithmetic across a merge. The numbers below
+      // were set from a suite run on the merged tree, not from either side's
+      // narrative.
+      // chrome 83 -> 84: the tracker-stack anchor apply (seats the stack below
+      // the minimap column; tracker_stack_anchor.ts).
+      // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
+      // Eastbrook program) removed the cup rows on this branch.
+      // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
+      // window 43 -> 44: the release arm's woc_market window row rides the
+      // v0.40.0 sync merge back in.
+      // chrome 82 -> 83: the controller-tutorial merge's gamepad control
+      // hint apply.
+      // window 44 -> 45: the crucible vendor's out-of-range close (the third
+      // #vendor-window tenant, on the heroic vendor's exact row shape).
+    ).toEqual({ window: 46, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1685,7 +1696,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // holds no signature of its own to diff. The release's trade row left this
       // bucket when its lastTradeSig latch moved into the woc_trade module.
       hud: 6,
-      callsite: 11,
+      // Up to 12 with the crucible vendor's out-of-range close: the same
+      // callsite-guarded shape as the copper and heroic vendor closes.
+      callsite: 12,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never

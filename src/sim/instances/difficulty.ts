@@ -1,8 +1,20 @@
-import { HEROIC_DUNGEON_TUNING, NORMAL_DUNGEON_TUNING } from '../content/dungeon_difficulty';
+import {
+  HEROIC_DUNGEON_TUNING,
+  HEROIC_MOB_TUNING,
+  type HeroicMobTuning,
+  NORMAL_DUNGEON_TUNING,
+} from '../content/dungeon_difficulty';
 import { MOBS } from '../data';
 import type { DungeonDifficulty, Entity, MobTemplate } from '../types';
 
-export const HEROIC_DUNGEON_IDS = new Set(Object.keys(HEROIC_DUNGEON_TUNING));
+export const HEROIC_DUNGEON_IDS = new Set([
+  ...Object.keys(HEROIC_DUNGEON_TUNING),
+  ...Object.keys(HEROIC_MOB_TUNING),
+]);
+
+function heroicMobTuningFor(dungeonId: string): HeroicMobTuning | undefined {
+  return HEROIC_MOB_TUNING[dungeonId] ?? HEROIC_DUNGEON_TUNING[dungeonId];
+}
 
 // Every heroic-instance mob moves at least this fast (player RUN_SPEED is 7),
 // so heroic pulls cannot be kited on foot; escapes need a sprint cooldown.
@@ -50,7 +62,7 @@ export function mobTemplateForDungeonDifficulty(
       dmgPerLevel: template.dmgPerLevel * dmgMult,
     };
   }
-  const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
+  const tuning = heroicMobTuningFor(dungeonId);
   if (!tuning) return template;
   const dmgMult =
     tuning.damageMultiplierByMob?.[template.id] ??
@@ -75,7 +87,7 @@ export function mobLevelForDungeonDifficulty(
   rolledLevel: number,
 ): number {
   if (difficulty !== 'heroic') return rolledLevel;
-  return HEROIC_DUNGEON_TUNING[dungeonId]?.level ?? rolledLevel;
+  return heroicMobTuningFor(dungeonId)?.level ?? rolledLevel;
 }
 
 // Boss/support mechanic numbers (aoePulse, bigCast, stomp damage; mendAlly,
@@ -114,12 +126,14 @@ export function applyDungeonMobTuning(
     }
     return;
   }
-  const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
+  const tuning = heroicMobTuningFor(dungeonId);
   if (!tuning) return;
   mob.mechanicDamageMult =
+    tuning.mechanicDamageMultiplierByMob?.[mob.templateId] ??
     tuning.damageMultiplierByMob?.[mob.templateId] ??
     (role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier);
   mob.mechanicHealMult = tuning.healthMultiplier;
+  mob.mechanicBurnDamageMult = tuning.burnDamageMultiplierByMob?.[mob.templateId];
   if (MOBS[mob.templateId]?.boss) {
     mob.ccImmune = true;
     mob.slowImmune = true;

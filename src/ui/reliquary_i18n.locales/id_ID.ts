@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Cincin Rift',
     desc: 'Cincin Rift pribadi, ditempa untuk setiap jawara dalam kelompok yang meraih penyelesaian pertama sebuah Rift berperingkat. Setiap karakter hanya bisa memiliki miliknya sendiri.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Rampasan epik dari Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroik: Crucible of the Last Spring',
+    desc: 'Senjata khusus mode heroik dari Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Rampasan epik dari Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroik: The Inner Crucible',
+    desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Forgefather of the Last Flame.',
+  },
 };

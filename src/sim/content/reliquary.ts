@@ -434,6 +434,10 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The farming capstone (the celebrations phase): Harvestmaster pages here
   // per the locked titles-page rule like every non-hidden title deed.
   'prog_farming_100',
+  // The Crucible raid's flawless title (the obligations closeout,
+  // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
+  // per the locked titles-page rule.
+  'dgn_varkhul_flawless',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -738,6 +742,23 @@ export const RELIQUARY_HEROIC_GEAR = {
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
+  ],
+  // Crucible of the Last Spring: the heroic-only weapon and shield appends.
+  // The sigil redemption tokens that share both bosses' heroic tables are
+  // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
+  // Crucible Quartermaster consumes, not unique spoils, the same carve-out
+  // the delve pages apply to Marks-counter tools and heroic_mark itself.
+  ignivar_herald_of_the_last_flame: [
+    'forgefathers_warhammer',
+    'anvilguard_blade',
+    'springtouched_crozier',
+  ],
+  varkhul_forgefather_of_the_last_flame: [
+    'bulwark_of_the_inner_crucible',
+    'ember_wardens_barrier',
+    'heart_of_the_end_greatblade',
+    'forgefire_spire',
+    'staff_of_the_last_spring',
   ],
 } as const;
 
@@ -1614,6 +1635,104 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       ...RIFT_GEAR_ITEM_IDS.map((id) => [id, fromActivity('rift_first_clear')] as const),
     ),
+  },
+
+  // ---- Crucible of the Last Spring (the Ignivar raid, per boss room) ----
+  // Each raid room is its own dungeon id with its own clear record, so the
+  // raid pages come per boss, the conquerors_nythraxis shape. The sigil
+  // redemption tokens on both bosses' tables are deliberately NOT catalogued
+  // (kind 'tool', redemption currency, see RELIQUARY_HEROIC_GEAR above); the
+  // vendor-redeemed tier pieces are not catalogued either: beyond being a
+  // chosen purchase, paging all 145 would grow the relic catalog by roughly
+  // half against the design doc's deliberate-authoring bound on catalog
+  // growth and the measured autosave cost per catalogued id; if the sets
+  // earn a prestige surface it should be an authored per-lineage page shape
+  // (the honor-stock precedent), a curator decision recorded for the
+  // maintainer. The two Varkhul legendaries
+  // (varkhul_forgebreaker, varkhul_emberward) are deliberately ABSENT: no
+  // live table awards either yet (IGNIVAR_DROP_PLACEHOLDER_IDS,
+  // content/ignivar_drops.ts), and an unearnable slot must never sit on a
+  // conquerors page (it would dead-end col_reliquary_conquerors, the pin in
+  // tests/reliquary_content.test.ts); their page rows land with the drop
+  // wiring, as the ignivar_drops.ts contract records.
+  {
+    id: 'conquerors_ignivar',
+    shelf: 'conquerors',
+    name: 'Crucible of the Last Spring',
+    desc: 'Epic spoils claimed from Ignivar, Herald of the Last Flame.',
+    clearSource: { kind: 'dungeon', dungeonId: 'ignivar_raid_arena', difficulty: 'normal' },
+    // The arena's one boss drops every relic on the page.
+    sourceDefault: fromBoss('ignivar_herald_of_the_last_flame'),
+    relics: items(
+      'cinderfang_kris',
+      'slagrender_cleaver',
+      'wand_of_quenched_sparks',
+      'pendant_of_the_first_tempering',
+      'ignivars_ember_choker',
+      'locket_of_the_last_flame',
+      'heartspring_amulet',
+      'cord_of_the_last_flame',
+      'springbinder_sash',
+      'cinderbark_cinch',
+      'slagstalker_belt',
+      'moonscorch_waistwrap',
+      'grovetender_belt',
+      'forgewall_girdle',
+      'warforged_waistguard',
+      'stormkindled_chain',
+      'tidebinder_links',
+    ),
+  },
+  {
+    id: 'conquerors_ignivar_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Crucible of the Last Spring',
+    desc: 'Heroic-only weapons from Ignivar, Herald of the Last Flame.',
+    clearSource: { kind: 'dungeon', dungeonId: 'ignivar_raid_arena', difficulty: 'heroic' },
+    sourceDefault: fromBoss('ignivar_herald_of_the_last_flame'),
+    relics: items(...RELIQUARY_HEROIC_GEAR.ignivar_herald_of_the_last_flame),
+  },
+  {
+    id: 'conquerors_varkhul',
+    shelf: 'conquerors',
+    name: 'The Inner Crucible',
+    desc: 'Epic spoils claimed from Varkhul, Forgefather of the Last Flame.',
+    clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'normal' },
+    // The wing's one boss drops every relic on the page, including the
+    // legendary shield (the kingsbane 3 percent precedent; see
+    // content/ignivar_drops.ts). Forgebreaker is deliberately NOT paged:
+    // the maintainer pulled it from the loot table to route it through the
+    // crafting professions (2026-08-30), and a relic page row requires a
+    // conquerable source; it re-pages with its recipe chain.
+    sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
+    relics: items(
+      'varkhul_emberward',
+      'orb_of_the_last_spring',
+      'cinder_of_the_first_design',
+      'seal_of_the_forgewall',
+      'band_of_marked_strikes',
+      'circle_of_cinders',
+      'loop_of_quiet_springs',
+      'cindersoaked_slippers',
+      'steps_of_quiet_water',
+      'ashenbark_treads',
+      'ashrunner_boots',
+      'scorchgrove_striders',
+      'dewfall_moccasins',
+      'anvilstance_sabatons',
+      'furnace_march_greaves',
+      'thundershock_treads',
+      'springwarden_sabatons',
+    ),
+  },
+  {
+    id: 'conquerors_varkhul_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Inner Crucible',
+    desc: 'Heroic-only shields and weapons from Varkhul, Forgefather of the Last Flame.',
+    clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'heroic' },
+    sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
+    relics: items(...RELIQUARY_HEROIC_GEAR.varkhul_forgefather_of_the_last_flame),
   },
 ]);
 

@@ -17,6 +17,7 @@ import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
 import {
   type BankBonusSource,
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   PET_SPECIAL_WIRE_VERSION,
@@ -283,6 +284,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
       msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const dungeonEntryFacingWireVersion: 0 | typeof DUNGEON_ENTRY_FACING_WIRE_VERSION =
+      msg.dungeonEntryFacingWire === DUNGEON_ENTRY_FACING_WIRE_VERSION
+        ? DUNGEON_ENTRY_FACING_WIRE_VERSION
+        : 0;
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -354,6 +359,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         isAdmin,
         adminPermissions,
         clientSeed,
+        dungeonEntryFacingWireVersion,
         timerWireVersion,
         petSpecialWireVersion,
         // The character's stored action-bar layout, sent once to the owning client

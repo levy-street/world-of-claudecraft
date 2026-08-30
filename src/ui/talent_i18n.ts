@@ -77,6 +77,9 @@ type DisplayGlobalKey = Exclude<
   | 'barrierDrPct'
   | 'manaDefCdrPer10'
   | 'blinkCast'
+  // Set-bonus rider only (the Crucible caster/healer 2pc pushback immunity);
+  // never a talent-row stat line, so it needs no per-locale label.
+  | 'castPushbackReduction'
   | 'convergence'
   | 'ignitionPct'
   | 'manaPct'

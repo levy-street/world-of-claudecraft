@@ -47,6 +47,7 @@ import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
 import { aurasSurvivingCleanSlate } from '../resurrection';
 import { Rng } from '../rng';
+import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
@@ -235,7 +236,7 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   // A standardized default build (spec + first-option rows) so every fighter
   // enters equal; the player's real allocation returns with fiestaRestoreChar.
   meta.talents = defaultBuild(meta.cls, FIESTA_STANDARD_LEVEL);
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
+  meta.talentMods = computeCharacterModifiers(meta.cls, meta.talents, e.level, meta.equipment);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
@@ -248,7 +249,7 @@ export function fiestaRestoreChar(meta: PlayerMeta, e: Entity): void {
   e.level = snap.level;
   meta.xp = snap.xp;
   meta.talents = snap.talents;
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
+  meta.talentMods = computeCharacterModifiers(meta.cls, meta.talents, e.level, meta.equipment);
   meta.fiestaRestore = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
   meta.wireRev++; // real talents restored, refresh the wire promptly

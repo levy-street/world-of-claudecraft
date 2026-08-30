@@ -108,7 +108,11 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // window, not just the reins_ slice: a fifth mount, a rift id, a packet
     // id, or ANY new id entering HEROIC_BOSS_LOOT while stale bundles live
     // is a new deployed-bundle throw arm and must be a deliberate decision
-    // recorded here, the way the Wildheart six were. Release-scoped like
+    // recorded here, the way the Wildheart six were. The Crucible raid loot
+    // branch admits the Ignivar and Varkhul heroic-only append ids (sigils,
+    // shields, weapons) the same recorded way: the raid is development-only
+    // (no player can claim a heroic Crucible kill on a deployed realm), so
+    // no stale bundle can be handed one of these ids during a window. Release-scoped like
     // the file: delete with it once clients roll. The snapshot is
     // `vitest -u`-updatable, so the literal reins array below is the real
     // teeth: never blanket-update this snapshot while the deploy window is

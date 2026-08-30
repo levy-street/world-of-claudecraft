@@ -210,6 +210,8 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
       wildheart_basin: [4.0, 17.25, 8.625],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
+      ignivar_raid_arena: [1.75, 2, 2],
+      ignivar_inner_crucible: [5 / 3, 1.2459633027522936, 1],
     });
   });
 
@@ -324,7 +326,19 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // derivation folds in; REF_ARMOR above stays the pinned calibration
     // constant it has always been and is deliberately not asserted equal to
     // this, because it is not a live property of the catalog.
-    expect(a.stats.armor, 'the live max-armor kit').toBe(2969);
-    expect(a.maxHp, 'and its pool').toBe(1672);
+    // Re-pinned 2969 -> 4085 at the merge of release/v0.41.0 (tip 3e801dc925,
+    // 2026-08-30): the named cause is the release's Crucible raid plate (the
+    // Phase B set pieces and the Varkhul legendaries), which a prot warrior
+    // can wear and which out-armours the pre-raid kit slot for slot; no
+    // flagged def moved (the sweep above still holds). The calibration gap
+    // between REF_ARMOR (2861) and the live kit therefore widened from about a
+    // hundred points to over a thousand: a maintainer decision on the
+    // constant (the packet's Phase 19 table), never a re-tune here.
+    expect(a.stats.armor, 'the live max-armor kit').toBe(4085);
+    // The pool moved DOWN with the same cause (1672 -> 1582): the max-ARMOR
+    // picks are not the max-stamina picks, and the Crucible plate that wins
+    // each slot on armour carries less stamina than the pre-raid kit it
+    // displaces. Same re-pin, same date, same named cause.
+    expect(a.maxHp, 'and its pool').toBe(1582);
   });
 });

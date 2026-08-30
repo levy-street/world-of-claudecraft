@@ -35,6 +35,7 @@ import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
+import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
@@ -692,6 +693,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.wildheartGateAssetUrl);
+  });
+
+  it('ignivar raid dressing prop assets', () => {
+    for (const url of Object.values(ignivarEnvPropsInternalsForTest.urls)) {
+      expectAssetExistsAndManifested(url);
+    }
   });
 
   it('quest object assets', () => {

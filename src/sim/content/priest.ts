@@ -52,8 +52,14 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'heal_echo', value: 180, duration: 30 }],
+    // The rescue heal is dynamic (base 180; the Benison Dawnweave 2pc's
+    // buffPct row raises it to 270 for wearers). The sim source uses the
+    // $-form ($b resolves the buffTarget heal_echo value, the same number)
+    // per the contract in tests/ability_tooltip_consistency.test.ts: brace
+    // tokens are reserved for the translated catalog, whose row splices it
+    // as {buff}.
     description:
-      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for $b. (Benison signature)',
   },
   summon_tithefiend: {
     id: 'summon_tithefiend',

@@ -4,7 +4,11 @@
 // a real Sim so the spatial grid, MOBS table, and threat seeding are the live ones; the
 // module is also exercised directly for its return count.
 import { describe, expect, it } from 'vitest';
-import { FLEE_HELP_RADIUS, rallyFleeingAllies } from '../src/sim/mob/social_aggro';
+import {
+  FLEE_HELP_RADIUS,
+  rallyFleeingAllies,
+  socialPullSameTemplate,
+} from '../src/sim/mob/social_aggro';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -192,5 +196,50 @@ describe('rallyFleeingAllies', () => {
       return rallyFleeingAllies((sim as any).ctx, fleer, sim.player);
     };
     expect(run()).toEqual(run());
+  });
+});
+
+describe('socialPullSameTemplate', () => {
+  it('pulls only idle same-template neighbours inside the default radius', () => {
+    const sim = makeSim();
+    const [pulled, near, far, otherTemplate, busy] = wildMobs(sim);
+    pulled.templateId = 'gravecaller_cultist';
+    pulled.pos = { x: sim.player.pos.x + 3, z: sim.player.pos.z, y: sim.player.pos.y };
+    placeAlly(near, pulled, 3);
+    placeAlly(far, pulled, 9);
+    placeAlly(otherTemplate, pulled, 2, 'gravecaller_mender');
+    placeAlly(busy, pulled, -2);
+    busy.aiState = 'chase';
+    (sim as any).grid.refresh(sim.entities.values());
+
+    socialPullSameTemplate((sim as any).ctx, pulled, sim.player);
+
+    expect(near.aiState).toBe('chase');
+    expect(near.aggroTargetId).toBe(sim.player.id);
+    expect(near.inCombat).toBe(true);
+    expect(near.threat.get(sim.player.id)).toBe(1);
+    expect(far.aiState).toBe('idle');
+    expect(otherTemplate.aiState).toBe('idle');
+    expect(busy.aggroTargetId).toBeNull();
+  });
+
+  it('applies the per-family radius override (mudfin pulls to 8 yards)', () => {
+    const sim = makeSim();
+    const [pulled, insideOverride, defaultPulled, defaultSevenYards] = wildMobs(sim);
+    pulled.templateId = 'deepfen_murloc';
+    pulled.pos = { x: sim.player.pos.x + 3, z: sim.player.pos.z, y: sim.player.pos.y };
+    placeAlly(insideOverride, pulled, 7, 'deepfen_murloc');
+    // Negative control: the same 7 yard gap stays OUTSIDE the default radius,
+    // so the mudfin pull below proves the override rather than a raised default.
+    defaultPulled.templateId = 'gravecaller_cultist';
+    defaultPulled.pos = { x: pulled.pos.x + 40, z: pulled.pos.z, y: pulled.pos.y };
+    placeAlly(defaultSevenYards, defaultPulled, 7);
+    (sim as any).grid.refresh(sim.entities.values());
+
+    socialPullSameTemplate((sim as any).ctx, pulled, sim.player);
+    socialPullSameTemplate((sim as any).ctx, defaultPulled, sim.player);
+
+    expect(insideOverride.aiState).toBe('chase');
+    expect(defaultSevenYards.aiState).toBe('idle');
   });
 });

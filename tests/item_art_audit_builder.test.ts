@@ -873,8 +873,12 @@ describe('item-art audit builder', () => {
     // the same delta as on its own arm; measured by the merged build: 504725
     // with the five promotions in); the promotion arithmetic on top of it is
     // unchanged.
+    // v0.41.0 Crucible sync: the base moves 504715 to 613412, the 204 Crucible
+    // records the release's catalog carries (108697 bytes; measured by the
+    // merged build: 613422 with the five promotions in); the promotion
+    // arithmetic on top of it is unchanged.
     expect(verified.catalogBytes).toBe(
-      504715 + promoted.length * ('common'.length - 'poor'.length),
+      613412 + promoted.length * ('common'.length - 'poor'.length),
     );
     // Re-minted a third time at the 11l QA, which excluded the cracked fetish
     // and the bogiron nugget under the tusk standard and put both defs back
@@ -890,22 +894,32 @@ describe('item-art audit builder', () => {
       // merged build's own measurement. The renderer fingerprint is this
       // branch's lib self-hash (the release left scripts/lib/item_art_audit.mjs
       // at the base bytes, so the merge keeps the pendingArtCount-aware lib).
-      catalogSha256: '76eb2929f401f7a91422face6e0bc360348c2a3d22cd88dcbda0b11ac67c6755',
-      catalogBytes: 504725,
-      rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
-      catalogCount: 920,
-      liveItemCount: 935,
+      // v0.41.0 Crucible sync: 1040 / 1055 on the release's own arm (its 204
+      // post-base ids: 9 painted Crucible weapons, 2 rendered Varkhul
+      // legendaries, the 192-piece Crucible set wave and the Core of the Last
+      // Flame reagent), 1124 / 1139 merged (both arms' additions join both
+      // terms, the debt term stays this branch's 81). The release ALSO grew
+      // the audit lib (its own art-pending sweep, folded into the
+      // pendingArtIds option here), so the lib self-hash, the catalog bytes
+      // and sha, and the shipping catalog sha are all the merged build's own
+      // measurement; the release's 22 groups over 27 pages fold into this
+      // branch's 25 groups.
+      catalogSha256: 'e0c30df50810b7cc28eb4f13d0c9f2510ff205eebec6c549245f7ebfe1593fdb',
+      catalogBytes: 613422,
+      rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
+      catalogCount: 1124,
+      liveItemCount: 1139,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
       groupCount: 25,
-      sheetPageCount: 29,
-      sheetCount: 232,
-      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 29])),
+      sheetPageCount: 30,
+      sheetCount: 240,
+      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 30])),
       sheetSetSha256: null,
-      // Measured by the merged build at the v0.41.0 release-batch sync (the
-      // 920-id shipping set, both arms' art in).
-      shippingCatalogSha256: '54ed87722fd4f1c6f6cd81d4982a4a7f7124f4f8e60d6984460579f8ff6fb608',
+      // Measured by the merged build at the v0.41.0 Crucible sync (the
+      // 1124-id shipping set, both arms' art in).
+      shippingCatalogSha256: '6f7ec6e61f2cd3343a7c352b69d3b04cfa0a27026fa1e3c5248bab1ef194dadd',
       machineChecksPassed: true,
       verdict: null,
     });

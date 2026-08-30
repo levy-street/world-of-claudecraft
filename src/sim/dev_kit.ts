@@ -188,7 +188,12 @@ export function roleItemScore(role: DevKitRole, item: ItemDef): number {
     const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
     score += dps * (role.melee ? MELEE_WEAPON_DPS_WEIGHT : CASTER_WEAPON_DPS_WEIGHT);
   }
-  if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  // Healing Power only scores for healer roles: Spell Power heals too, but
+  // Healing Power never damages (the directionality contract), so a damage
+  // caster kit must never pick a healer piece over its own affix.
+  if (!role.melee)
+    score +=
+      ((item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0)) * SPELL_POWER_WEIGHT;
   // blockValue lives on shields specifically. kind === 'armor' is not enough to
   // narrow: jewelry declares the same kind and carries no blockValue.
   if (role.tank && isShieldItem(item)) score += (item.blockValue ?? 0) * TANK_BLOCK_WEIGHT;

@@ -17,9 +17,14 @@
 import type { EquipSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
+// compareStatLabelKey (not statNameKey): the v0.41.0 Ignivar span added the
+// healPower delta, which has no StatId cell, so the release re-pointed the
+// inline compare block at this resolver; the branch had already extracted the
+// block here, so the edit is mirrored onto the extracted home (merge of
+// 3e801dc925, 2026-08-30).
+import { compareStatLabelKey } from './item_affix_tooltip';
 import { itemStatDeltas } from './item_compare';
 import { wornTooltipInstance } from './item_instance_tooltip';
-import { statNameKey } from './stat_tooltip_view';
 
 /** The worn source the comparison reads: the equipment map plus the worn
  *  per-copy payloads (the IWorld `equipment` / `equipmentInstances` shapes). */
@@ -77,7 +82,7 @@ function compareBlockForSlot(
         maximumFractionDigits: d.decimals,
       });
       return `<div class="${cls}">${sign}${magnitude} ${esc(
-        t(statNameKey(d.stat) as TranslationKey),
+        t(compareStatLabelKey(d.stat) as TranslationKey),
       )}</div>`;
     })
     .join('');

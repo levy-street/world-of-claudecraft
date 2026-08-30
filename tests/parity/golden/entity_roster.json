@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1002,
-      "state": "abeae35a",
+      "nextId": 1004,
+      "state": "8d8e5b18",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -106,7 +106,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 997
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -118,8 +118,9 @@
           "dodgeChance": 0.06,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 5,
           "hp": 100,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -163,9 +164,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1004,
-      "state": "31619ff1",
-      "events": "74fccf8e",
+      "nextId": 1006,
+      "state": "bdcff1cf",
+      "events": "5214f0ca",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -174,8 +175,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1004,
-      "state": "66faae58",
+      "nextId": 1006,
+      "state": "f1ed4a86",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -185,8 +186,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1004,
-      "state": "1f238b5c",
+      "nextId": 1006,
+      "state": "624b96aa",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -246,7 +247,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -292,7 +293,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 997
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -304,8 +305,9 @@
           "dodgeChance": 0.0645,
           "fallStartY": -2,
           "fiveSecondRule": 99.25,
+          "healPower": 5,
           "hp": 50000,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -349,8 +351,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1004,
-      "state": "9f59e074",
+      "nextId": 1006,
+      "state": "4377fdf8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -410,7 +412,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -464,8 +466,9 @@
           "fallStartY": -2,
           "fiveSecondRule": 99.25,
           "ghost": true,
+          "healPower": 5,
           "hp": 442,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -509,9 +512,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1004,
-      "state": "09d70794",
-      "events": "f86060c7",
+      "nextId": 1006,
+      "state": "1d1119bd",
+      "events": "af135899",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -570,7 +573,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -616,7 +619,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 997,
+              "sourceId": 999,
               "undispellable": true,
               "value": -0.75
             }
@@ -630,8 +633,9 @@
           "dodgeChance": 0.0535,
           "fallStartY": -2,
           "fiveSecondRule": 99.25,
+          "healPower": 2,
           "hp": 44,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -675,9 +679,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1004,
-      "state": "faeba7ec",
-      "events": "8d79efc7",
+      "nextId": 1006,
+      "state": "b0cb7fc3",
+      "events": "0268853b",
       "rng": {
         "draws": 4,
         "digest": "0d8664bb"
@@ -686,8 +690,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 1004,
-      "state": "e8aa1407",
+      "nextId": 1006,
+      "state": "9151f35c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -747,7 +751,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -793,7 +797,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 997,
+              "sourceId": 999,
               "undispellable": true,
               "value": -0.75
             },
@@ -804,7 +808,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 997
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -816,8 +820,9 @@
           "dodgeChance": 0.0535,
           "fallStartY": -0.850337,
           "fiveSecondRule": 99.35,
+          "healPower": 2,
           "hp": 44,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

@@ -499,8 +499,36 @@ interface AttributionTargetFixture {
 // Re-minted at Phase 16 (2026-08-30): the zone prewarm-group extraction moved
 // the builder family out of renderer.ts and the composite's renderer leaf
 // followed the file. REMINT_COMMAND on the committed tree; no capture retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the later release/v0.41.0 span (tip
+// 3e801dc925), kept rather than dropped (the block that follows is the
+// release's record verbatim).
+// Re-minted after the Forgefather strike-route call-site swap in renderer.ts
+// (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
+// runtimeRender.renderer leaf. No capture was retaken.
+// Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+// integration in renderer.ts: the runtimeRender.renderer leaf moved. No
+// capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip 3e801dc925) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts again
+// (the release's Ignivar/Varkhul wiring, backface twin staging and the
+// Ignivar mechanic-visual prewarm beside this branch's farmPatchVisuals
+// dispose seam, zone_prewarm extraction and reduced-motion regalia gate), so
+// the merged tree mints a value matching NEITHER parent. Parent values for
+// the record: ours f2e6c8c3, the release 23415789. The literal below is the
+// re-mint (node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs)
+// run over the fully resolved merged tree on 2026-08-30, after every
+// renderer.ts byte was final, and committed with exactly the bytes it read.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f2e6c8c3c17ff95b672fc36a6e4d4fa4880e8945e55d8c2197cff48aae226eb1';
+  '02f05f2543c81fd6a1d8aa255f72b1a2ce85d8a8a988e4756eef7b94b1904706';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

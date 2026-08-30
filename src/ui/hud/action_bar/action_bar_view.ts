@@ -48,6 +48,7 @@ import {
   solarReprisalMakesAbilityFree,
 } from '../../../sim/combat/paladin_solar_reprisal';
 import { sunVerdictAbilityGlowActive } from '../../../sim/combat/paladin_sun_verdict';
+import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
 import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
@@ -60,7 +61,6 @@ import {
   dist2d,
   GCD,
   type ItemDef,
-  MELEE_RANGE,
   POTION_COOLDOWN,
   type ResourceType,
   type Vec3,
@@ -235,6 +235,8 @@ export interface ActionBarPlayerInput {
 /** The target fields the bar reads; null when there is no current target. */
 export interface ActionBarTargetInput {
   dead: boolean;
+  kind: string;
+  templateId: string;
   pos: Vec3;
   maxHp?: number;
   auras: readonly ActionBarAuraInput[];
@@ -469,7 +471,8 @@ export function createActionBarView(
           slot.isCharges = false;
           slot.rechargePercent = 0;
           slot.usable = true;
-          slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
+          slot.outOfRange =
+            tgtDist !== null && target !== null && tgtDist > effectivePlayerAttackRange(target, 0);
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
@@ -699,7 +702,8 @@ export function createActionBarView(
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
-          (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
+          target !== null &&
+          (tgtDist > effectivePlayerAttackRange(target, def.range) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         // Spec resources/procs share pure sim predicates so the bar and combat

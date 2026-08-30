@@ -81,4 +81,8 @@ export interface IWorldDungeons {
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
   // paying its Heroic Marks price from the buyer's bags. Server-validated.
   buyHeroicVendorItem(itemId: string): void;
+  // Redeem one Crucible Quartermaster set piece (src/sim/content/ignivar_loot.ts),
+  // paying its matching-slot sigil from the buyer's bags. Server-validated,
+  // class-gated sim-side.
+  buyCrucibleVendorItem(itemId: string): void;
 }

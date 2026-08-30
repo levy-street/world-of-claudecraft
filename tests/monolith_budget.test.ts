@@ -353,6 +353,25 @@ const MONOLITHS: MonolithRow[] = [
     // on this file over the span (its adds land against equal sheds), so the
     // merged file measures exactly ours' pin (wc -l < src/ui/hud.ts). Exact
     // merged count, zero slack: any further growth reds again.
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // and the release arm carries the bank-storage +3 above. Measured on the
+    // merged tree, never reconciled by arithmetic. Exact count, zero slack.
+    // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
+    // Re-pinned to the exact count of the ignivar-raid-complete base merge
+    // into the Phase B branch: the base's fork landed its own extractions
+    // while this branch's healPower seam, sigil-shop progression views, and
+    // biome import strip lowered the file; the merge lands both arms and the
+    // ratchet pins the merged reality. Exact count, zero slack.
+    // Plus 2 for the item-affix tooltip wiring: the import and one composed
+    // call into item_affix_tooltip.ts (the Spell Power / Healing Power lines
+    // themselves live in that sibling, gather_tool_tooltip pattern). Exact
+    // count, zero slack; maintainer-review item.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 18731, the release 18863. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
     ceiling: 18731,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -673,7 +692,25 @@ const MONOLITHS: MonolithRow[] = [
     // the review round (2026-08-29, +2), add the lines between 13116 and this
     // count. Exact count, zero slack: any further growth reds again; the paid
     // target 13333 stays cleared by exactly 200 lines.
-    ceiling: 13133,
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // that arm's entry-horizon cull and this branch's ground-aim reticle
+    // pass-through both land in the merged file. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero headroom.
+    // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
+    // Lowered 13265 -> 13243: the set-proc swirl table and both resolution
+    // walks moved to src/render/set_proc_fx.ts (the Crucible engine-proc arm
+    // landed there, not here); the ratchet follows the file down. Exact
+    // count, zero slack.
+    // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
+    // branch): both arms edited the renderer and the union lands at the count
+    // below. Measured on the merged tree. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 13133, the release 13249. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 13049,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -812,7 +849,33 @@ const MONOLITHS: MonolithRow[] = [
     // measured 12128 (wc -l < src/sim/sim.ts), never reconciled by
     // arithmetic. Exact merged count, zero slack: any further growth reds
     // again.
-    ceiling: 12128,
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // Re-pinned at the sixth release/v0.41.0 sync: the release arm's own row
+    // moved down across the bank-storage and entry-fade merges while this
+    // branch keeps its +4 above. Measured on the merged tree, never
+    // reconciled by arithmetic. Exact count, zero slack.
+    // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
+    // Re-pinned 12473 -> 12451 for the PR 3684 raid restoration: the authored
+    // pack-aggro call paid for itself by moving the legacy same-template
+    // social pull (and its per-family radius table) to mob/social_aggro.ts.
+    // Plus 7 on top for the Crucible sigil shop: the import plus the thin
+    // buyCrucibleVendorItem delegation to instances/crucible_vendor.ts (the
+    // buyHeroicVendorItem shape exactly); the logic itself lives in the
+    // instances module. Exact merged count, zero slack.
+    // Plus 5 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown): a one-line clock read against
+    // lockoutNowMs; the window logic itself lives in loot/bop_trade_window.ts.
+    // Thin facet wiring with no clean extraction. Exact count, zero slack.
+    // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
+    // the setPlayerLevel writer routing through computeCharacterModifiers
+    // (the resolver itself is the extracted module). Exact count, zero slack.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 12128, the release 12465. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 12043,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -974,7 +1037,36 @@ const MONOLITHS: MonolithRow[] = [
     // file falls BELOW both parent pins and the ratchet follows it down:
     // measured 11587 (wc -l < src/main.ts). Exact merged count, zero slack:
     // any further growth reds again.
-    ceiling: 11587,
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
+    // availability probe and browser authorizer moved to
+    // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
+    // paying for the Exchange desktop-signer wiring at the attach site.
+    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
+    // the interface-editor settings (frame dimensions, aura direction vars,
+    // the player-frame bar lock) predate this ratchet; folding them behind a
+    // src/game/ settings-application seam is flagged follow-up work.
+    // The branch's spawn_intro_seen extraction still pays for its own line at
+    // the entry wait (3 under the release row), and the empower-hold sync
+    // merge lowered the release row by 1 (the pad cast routing lives in
+    // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
+    // Exact merged count, zero headroom.
+    // Re-pinned at the PR 3676 sync: this branch's reticle-sync closure
+    // extraction pays 2 more under the entry-fade row above. Measured on the
+    // merged tree, never reconciled by arithmetic. Exact merged count, zero
+    // headroom.
+    // Re-pinned after the /daynight dev-command extraction to
+    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
+    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
+    // raid branch: both arms extracted and added independently, so neither
+    // parent pin fits the combined file; the merged count is the honest bound.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 11587, the release 11551. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 11515,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1100,7 +1192,20 @@ const MONOLITHS: MonolithRow[] = [
     // Discord card added there. The file measures 10329
     // (wc -l < server/game.ts). Exact count, zero slack: any further growth
     // reds again.
-    ceiling: 10329,
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // the raid consolidation moved the ground-telegraph snapshot unit, the forge-portal replay lifecycle, eventAnchor, and the door gate out; exact count.
+    // Plus 1 for the Healing Power wire field: the ONE line is maybe('hpw')
+    // beside maybe('sp') in the delta-guarded self record; no clean extraction
+    // exists for a single serializer line. Exact count.
+    // Plus 7 for the crucible_buy command arm: the dispatch case is the
+    // heroic_buy shape exactly; validation lives sim-side. Exact count.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 10329, the release 10612. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 10298,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1187,7 +1292,36 @@ const MONOLITHS: MonolithRow[] = [
     // bank_snapshot_wire/mount_race_wire fold shape the row's own history
     // records). The file measures 5922 (wc -l < src/net/online.ts). Exact
     // count, zero slack: any further growth reds again.
-    ceiling: 5922,
+    // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
+    // kept so the merge drops neither parent's record:
+    // Re-pinned at the PR 3676 sixth v0.41.0 sync: the bank-storage arm's +66
+    // and this branch's +5 above compose. Measured on the merged tree, never
+    // reconciled by arithmetic. Exact count, zero slack.
+    // the raid consolidation moved the ground-telegraph wire decoders (ground_telegraph_wire.ts) out; exact count.
+    // Plus 2 for the Healing Power mirror: the blankEntity default and the
+    // s.hpw ?? fallback beside the existing sp lines; thin wire wiring with no
+    // clean extraction. Exact count.
+    // Plus 3 for the buyCrucibleVendorItem command mirror (the
+    // buyHeroicVendorItem shape exactly). Exact count, zero slack.
+    // Plus 4 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown vs Date.now(), riftEventMsRemaining's
+    // clock). Thin facet wiring with no clean extraction. Exact count.
+    // Plus 5 for the Phase B set-bonus mirror: the snapshot decode resolves
+    // talent mods through computeCharacterModifiers with the equipment
+    // mirror, so worn Crucible tiers read identically in both hosts. Thin
+    // wiring to the extracted set_bonus_mods seam. Exact count.
+    // Re-pinned to the exact merged count of the ignivar-raid-complete base
+    // merge: the base's raid consolidation extracted decoders while this
+    // branch added its mirrors; the merge lands both arms. Exact count.
+    // Re-pinned again at the PR 3685 base sync: the release arm's Bank
+    // Storage wiring and this branch's mirrors both grew the file; the
+    // union lands at the count below. Exact merged count, zero headroom.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
+    // BOTH parent pins for the record: ours 5922, the release 5856. Measured on
+    // the merged tree, never reconciled by arithmetic. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 5890,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1195,7 +1329,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the Proving Shore dawn-cue merge, then again when the
     // final render replaced the composed themes with a supplied stream-only
     // track; exact merged count.
-    ceiling: 5064,
+    // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
+    // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
+    // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
+    ceiling: 4935,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1205,7 +1342,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned again for the v0.40.0 sync merge (the release arm's
     // gardenwalk pass rides in beside the tutorial island). Exact count,
     // zero slack.
-    ceiling: 5347,
+    // the ember coast tables extracted to content/ember_coast.ts (the
+    // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room.
+    // The walkable-lift sum extracted to walk_lifts.ts (the Forgefather
+    // stair ramps fold in there), then EMBER_LAVA_POOLS moved home to
+    // ember_lava_layout.ts beside its flat-pool sibling (paying for the
+    // fortress scatter screen); exact count.
+    ceiling: 5275,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -1348,14 +1491,25 @@ const MONOLITHS: MonolithRow[] = [
     // merged working tree (wc -l < src/render/nameplate_canvas.ts), neither
     // parent's literal. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 864,
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span) into feature/masterwrought (base e19d832b47): this row did not
+    // conflict, and that is exactly why it is measured (a conflict marks
+    // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
+    // the record: ours 864, the release 864. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero slack.
+    ceiling: 863,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
     file: 'src/sim/colliders.ts',
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 2621,
+    // Re-pinned after the interior-collider-set assembly extraction to
+    // interior_collider_sets.ts (which appends the Ignivar authored prop
+    // colliders). Exact count, zero slack.
+    // the dungeon-door jamb block extracted to dungeon_door_jambs.ts; the
+    // fortress collider hook rode the freed room
+    ceiling: 2587,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -1368,7 +1522,32 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/render/dungeon.ts',
     // Lowered after extracting the arena-wall camera-occluder fade (footprint
     // hit test plus the per-frame gated step) into src/render/arena_wall_fade.ts.
-    ceiling: 2804,
+    // the raid consolidation moved the arena-wall occlusion core, the pending-wall builder, and the ignivar tile loaders out; exact count.
+    // Re-pinned after the addTorchGlow extraction to torch_glow_decal.ts
+    // (shared with the Ignivar dressing glow pools), net of the ignivar
+    // pillar-swap gate; then again after the banner picking moved to
+    // dungeon_banner_core.ts (paying for the ignivar banner suppression
+    // gates and the torch-tuck fix). Exact count, zero slack.
+    // Re-pinned 2715 -> 2463 for the lava-moat wiring: the floor/quad/wall kind
+    // pickers moved to dungeon_tile_kind_core.ts (the banner-core pattern).
+    // Re-pinned 2463 -> 2433 for the raid wall backface cull: the hideable-wall
+    // update loop moved to dungeon_wall_occlusion.ts and the torch palette
+    // table to dungeon_torch_colors.ts (re-counted after the raid-complete
+    // floor-coverage merge). Exact count, zero slack.
+    // The v0.41.0 sync absorbed release's arena_wall_fade.ts (the gated
+    // sightline fade) into dungeon_wall_occlusion.ts, which now drives both
+    // occlusion modes; the deleted module's pins moved with it
+    // (tests/occluder_fade_gate.test.ts).
+    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
+    // raid branch: both arms extracted and added independently, so neither
+    // parent pin fits the combined file; the merged count is the honest bound.
+    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
+    // raid span) into feature/masterwrought (base e19d832b47): this row did not
+    // conflict, and that is exactly why it is measured (a conflict marks
+    // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
+    // the record: ours 2804, the release 2433. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero slack.
+    ceiling: 2432,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

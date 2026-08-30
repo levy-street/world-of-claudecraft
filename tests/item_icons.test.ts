@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
+import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import {
@@ -313,8 +314,10 @@ describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
     // 123 -> 125 at Masterwrought phase 09: duskforged_warblade + ridgebreaker joined
-    // ITEM_WEAPON_VARIANTS (set from a suite run, not arithmetic).
-    expect(WEAPON_IMAGE_IDS.size).toBe(125);
+    // ITEM_WEAPON_VARIANTS (set from a suite run, not arithmetic); 125 -> 135 at the
+    // release/v0.41.0 merge (2026-08-30), which brought the ten Ignivar raid weapons
+    // (the release's own arm read 133 = 123 + 10). Re-derived on the merged tree.
+    expect(WEAPON_IMAGE_IDS.size).toBe(135);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -387,6 +390,11 @@ describe('item webp icons', () => {
     // the garden hoe since the growth engine shipped) and is doubly false now
     // that GATE 1 stocks the tier-3 and tier-4 seeds. Live players can hold
     // art-pending items; the park is the reason, dormancy never was.
+    // The release's Crucible arm (IGNIVAR_ART_PENDING_ITEM_IDS, spread into the
+    // set first) is EMPTY since its wave painted (crucible-set-icons-2026-08-29),
+    // so it adds no member here; the next commissioned wave re-pins its exact
+    // membership in this list when it stages. Re-pinned on the merged tree at
+    // the release/v0.41.0 merge (2026-08-30): the packet ids alone, 81.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',

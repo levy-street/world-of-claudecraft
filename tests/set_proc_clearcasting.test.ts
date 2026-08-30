@@ -92,7 +92,7 @@ describe('Clearcasting set proc', () => {
       id: 'set_clearcasting',
       name: 'Clearcasting',
       trigger: 'spellCast',
-      chance: 0.1,
+      chance: 0.06,
       aura: 'next_cast_free',
       duration: 12,
       icd: 4,

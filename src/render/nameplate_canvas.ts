@@ -10,6 +10,7 @@ import {
   nameplateHeraldryLift,
 } from './nameplate_heraldry_core';
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
+import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
 export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
@@ -112,8 +113,6 @@ export function createNameplateCanvasState(): NameplateCanvasState {
   };
 }
 
-export const NAMEPLATE_BASE_WIDTH = 80;
-export const NAMEPLATE_BOSS_WIDTH = 100;
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 // Nameplate labels scale their backing stores with DPR. The count remains a
@@ -719,7 +718,7 @@ export class NameplateCanvasSurface {
   private drawHealth(state: NameplateCanvasState, centerX: number, y: number): void {
     const ctx = this.ctx;
     const forcedColors = this.forcedColorsActive();
-    const width = state.frame === 'boss' ? NAMEPLATE_BOSS_WIDTH : NAMEPLATE_BASE_WIDTH;
+    const width = nameplateHealthBarWidth(state.frame === 'boss');
     const x = centerX - width / 2;
     if (state.threat) {
       ctx.save();

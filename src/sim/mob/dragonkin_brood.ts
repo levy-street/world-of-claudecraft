@@ -110,7 +110,7 @@ export function applyBroodBurn(
     kind: 'dot',
     remaining: spec.duration,
     duration: spec.duration,
-    value: Math.max(1, Math.round(spec.perTick)),
+    value: Math.max(1, Math.round(spec.perTick * (source.mechanicBurnDamageMult ?? 1))),
     tickInterval: spec.interval,
     tickTimer: spec.interval,
     sourceId: source.id,

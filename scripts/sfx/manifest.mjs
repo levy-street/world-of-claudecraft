@@ -152,17 +152,11 @@ export function sfxTrackDescriptors(source) {
 }
 
 function playbackProfileForKey(key, playbackProfile) {
-  if (CATALOG_KEYS.has(key)) return resolveSfxPlaybackProfile(key, playbackProfile);
-  // Mob subfamily extensions are intentionally absent from the fixed catalog.
-  // They inherit their family category baseline and remain neutral for key trim
-  // and playback rate until explicitly promoted into the catalog.
-  const category = categoryForSfx(key);
-  const gainDb = playbackProfile.gainMap.categoryBaselineDb[category] ?? 0;
-  return {
-    gainDb,
-    gain: Number((10 ** (gainDb / 20)).toFixed(6)),
-    playbackRate: 1,
-  };
+  // One resolution path for catalog and mob subfamily extension keys alike:
+  // extension keys are addressable by the playback maps (their trims validate
+  // against the computed custom-master ceilings), so a second neutral branch
+  // here would silently drop an authored trim or rate.
+  return resolveSfxPlaybackProfile(key, playbackProfile);
 }
 
 export function catalogHashForEntries() {

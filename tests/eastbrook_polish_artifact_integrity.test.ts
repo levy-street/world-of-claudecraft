@@ -1186,10 +1186,36 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // moved the builder family out of renderer.ts (the composite's renderer leaf
 // follows the file); REMINT_COMMAND run on the committed tree, no capture
 // retaken.
+//
+// UPSTREAM'S OWN RE-MINT HISTORY over the later release/v0.41.0 span (tip
+// 3e801dc925), kept rather than dropped (the block that follows is the
+// release's record verbatim).
+// Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
+// the renderer extraction round moved the renderer integration leaf). No
+// capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
+//
+// Re-minted at the merge of release/v0.41.0 (tip 3e801dc925) into
+// feature/masterwrought: BOTH parents edited src/render/renderer.ts again
+// (the release's Ignivar/Varkhul wiring, backface twin staging and the
+// Ignivar mechanic-visual prewarm beside this branch's farmPatchVisuals
+// dispose seam, zone_prewarm extraction and reduced-motion regalia gate), so
+// the merged tree mints values matching NEITHER parent. Parent values for
+// the record: metadata sha256 ours baf8721e / theirs 359a5b4c, composite
+// ours f2e6c8c3 / theirs 23415789. The literals below are the re-mint (node
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs) run
+// over the fully resolved merged tree on 2026-08-30, after every renderer.ts
+// byte was final, and committed with exactly the bytes it read. No capture
+// was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'baf8721e89af069d6d75f1853a2b7041131c46872798cf26ebbde274c634cea9';
+  'cc2ee10f5e3ad00ea7e4ffa830fc4d7b8aef3d611623ecf75fe5e456b1d8b62d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f2e6c8c3c17ff95b672fc36a6e4d4fa4880e8945e55d8c2197cff48aae226eb1';
+  '02f05f2543c81fd6a1d8aa255f72b1a2ce85d8a8a988e4756eef7b94b1904706';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2376,15 +2402,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
-    // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the battleground field-stream compile gate (renderer.ts
-    // provenance input moved): same order, the composite first, then this
-    // seal. No capture was retaken.
-    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
-    // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
-    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for PR #3740's forge-lift room: the first-order composite
+    // follows the lift room's renderer.ts hookup, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -2436,7 +2457,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // moved renderer.ts's builder family to zone_prewarm_groups.ts, the
       // composite followed the renderer leaf, and this second-order seal
       // follows the swept evidence bytes. No capture was retaken.
-    ).toBe('96212117cc4ee3160bfdf3e154a15c4f4b2e244f1da1589e4ec0923a5548b086');
+      // The release's own half over the later v0.41.0 span (tip 3e801dc925),
+      // kept rather than dropped: re-minted for the Drakelands entrance merge
+      // into the raid branch: the composite first, then this seal. No capture
+      // was retaken.
+      // Re-minted at the merge of release/v0.41.0 (tip 3e801dc925) into
+      // feature/masterwrought: both parents edited renderer.ts again (the
+      // release's Ignivar/Varkhul wiring, backface twin staging and mechanic
+      // prewarm beside this branch's farmPatchVisuals dispose seam, prewarm
+      // extraction and reduced-motion regalia gate), so the merged tree is a
+      // third content once more. Parent values for the record: ours 96212117,
+      // the release b01743e8. The literal below is the re-mint of 2026-08-30,
+      // recomputed LAST per REMINT_COMMAND from the swept files over the fully
+      // resolved merged tree, after every renderer.ts byte was final. No
+      // capture was retaken.
+    ).toBe('d4b1c0effddb2cf190608ae56afae23b2f3161848e6fe658ecf6cdd7d744318d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

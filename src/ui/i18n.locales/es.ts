@@ -2275,7 +2275,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque.',
   'entities.abilities.needle_of_fate.name': 'Aguja del destino',
   'entities.abilities.needle_of_fate.description':
-    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
+    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera {needleDoom} de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
   'entities.abilities.sentence.name': 'Sentencia',
   'entities.abilities.sentence.description':
     'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
@@ -3163,7 +3163,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Un grito aterrador que hace huir de miedo a hasta 5 enemigos en 8 m durante 4 s. El daño puede romper el efecto.',
   'entities.abilities.intimidating_shout.name': 'Grito Intimidante',
   'entities.abilities.iron_resolve.description':
-    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber 4 de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
+    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
   'entities.abilities.iron_resolve.name': 'Temple de Hierro',
   'entities.abilities.measured_fury.description':
     'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
@@ -4323,6 +4323,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'Entrada a la brecha: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': 'Enemigo hostil',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'Enemigo que te está atacando',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Jefe: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Jefe que te está atacando: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': 'Enemigo con botín',
   'hud.core.mapMarkerLabels.corpse': 'Tu cadáver',
   'hud.core.mapMarkerLabels.deathZone': 'Zona peligrosa',
@@ -6434,7 +6436,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
-  'entities.abilities.conflagrate.description': 'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda 2 cargas. (Distintivo de Destrucción)',
+  'entities.abilities.conflagrate.description': 'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda {charges} cargas. (Distintivo de Destrucción)',
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
     'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
@@ -9570,39 +9572,27 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.crownforged.name': 'Equipo de batalla Bonewrought',
   'entities.itemSets.crownforged.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Aumenta la fuerza en 15, el aguante en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.deathlord.name': 'Equipo de batalla de Barrowlord',
   'entities.itemSets.deathlord.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.deathlord.bonus3': 'Aumenta la fuerza en 15 y el aguante en 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Equipo del Acechador de Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.necromancers.name': 'Vestiduras de Mournweave',
   'entities.itemSets.necromancers.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.necromancers.bonus3': 'Aumenta el intelecto en 10 y el aguante en 10.',
   'entities.itemSets.nighttalon.name': 'Atuendo de cuero Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.soulflame.name': 'Vestiduras de Wraithfire',
   'entities.itemSets.soulflame.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.soulflame.bonus3':
-    'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.stormcallers.name': 'Vestiduras de Galecall',
   'entities.itemSets.stormcallers.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestiduras del Arcanista del Valle',
   'entities.itemSets.vale_arcanist.bonus3':
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.wyrmshadow.name': 'Atuendo de Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Aumenta la agilidad en 15 y la probabilidad de crítico en 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistido',
@@ -10125,6 +10115,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hedge_knight.name': 'Caballero de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fuego Fatuo del Hielo',
   'entities.mobs.idol_guardian.name': 'El Guardián del Ídolo',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Ignivar Ashcaller',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Ignivar, Heraldo de la Última Llama',
   'entities.mobs.lily_wisp.name': 'Fuego Fatuo del Lirio',
   'entities.mobs.mere_lurker.name': 'Acechador del Mere',
   'entities.mobs.moonfleece_grazer.name': 'Ramoneador Moonfleece',
@@ -13034,7 +13026,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra en un estado sagrado hasta la muerte, aumentando la sanación un 10% y la probabilidad de crítico con hechizos un 5%, y reduciendo la amenaza generada un 50%. Solo para Sanadores del Sol.',
   'entities.abilities.seraphic_vigil.description':
-    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por 180. (Distintivo de Bendición)',
+    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por {buff}. (Distintivo de Bendición)',
   'entities.abilities.scouring_mercy.description':
     'Inflige de 72 a 84 de daño Sagrado a un enemigo o sana a un objetivo amistoso de 130 a 155. Ambas cantidades aumentan con el poder con hechizos. El daño también sana un 30% a cada aliado vinculado por Doctrina, o un 15% al miembro del grupo con menos salud si no hay ninguno vinculado. (Distintivo de Doctrina)',
   'entities.abilities.solar_invocation.description':
@@ -13200,10 +13192,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume tus 3 de Marea Lunar para un golpe pesado de {damage} de daño Arcano: la opción de daño. Estela Solar consume los mismos 3 de Marea Lunar, así que elige una.',
   'entities.abilities.moonseed.name': 'Semilla Lunar',
   'entities.abilities.moonseed.description':
-    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta 6 s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
+    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta {duration} s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
   'entities.abilities.overbloom.name': 'Sobrefloración',
   'entities.abilities.overbloom.description':
-    'Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un 60% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo.',
+    'Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo.',
   'entities.abilities.redharvest.name': 'Cosecha Roja',
   'entities.abilities.redharvest.description':
     'Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo.',
@@ -13715,6 +13707,70 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Rugido Funesto',
   'entities.abilities.cheap_shot.descriptionNoStealth':
     'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    '¡El pilar izquierdo de la forja está cargándose! Se encenderá en 3 s.',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    '¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    '¡Los pilares de la forja están cargándose! Se encenderán en 3 s.',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    '¡Un Artífice de ceniza se acerca a la forja!',
+  'hudChrome.varkhulCallout.leftPillar': '¡El pilar izquierdo de la forja se enciende!',
+  'hudChrome.varkhulCallout.rightPillar': '¡El pilar derecho de la forja se enciende!',
+  'hudChrome.varkhulCallout.bothPillars': '¡Los pilares de la forja se encienden!',
+  'hudChrome.varkhulCallout.portalsOpening': '¡Los portales de la forja se están abriendo!',
+  'hudChrome.varkhulCallout.heat75': '¡La forja ha alcanzado un 75% de calor!',
+  'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
+  'hudChrome.varkhulCallout.addsDefeated':
+    '¡La legión de la forja ha caído: Varkhul está expuesto!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.',
+  'hudChrome.varkhulCallout.worldfireClosing':
+    '¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!',
+  'hudChrome.varkhulCallout.worldfireConsumed': '¡Todo el crisol está en llamas!',
+  'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Guía de jefes',
+  'hudChrome.raidBossGuide.button': 'Guía: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
+  'hudChrome.raidBossGuide.close': 'Cerrar la guía de jefes',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Movimiento: evita los conos y meteoros de Lluvia de cenizas, muévete con Infierno giratorio y usa los dos huecos de Ola de la Forja.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Heroico: las parejas permanecen juntas durante Cadenas de la Forja, Marca sigue activa dentro de Juicio y Ola de la Forja empuja más lejos.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro jugadores dentro del círculo móvil en cualquier dificultad. Cada plaza ausente inflige un 15% de la salud máxima a toda la banda.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Decreto del Yunque: Varkhul se desplaza hasta la gran forja y la golpea tres veces, dañando a la banda. En heroico también caen meteoros marcados.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Rayo de temple: otro jugador, normalmente un tanque, intercepta la línea móvil antes de que termine el largo aviso. Quien recibe el golpe sufre Herida templada.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Pilares de la forja: bloquea los rayos antes de que lleguen a la forja y rota a los bloqueadores cuando aumente Exposición del Crisol. El calor completo provoca Colapso de la Forja.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'La Asamblea del Maestro: bloquea ambos rayos, mata todas las oleadas de portales, interrumpe Terremoto del Crisol e impide que los Artífices de ceniza curen a Varkhul.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Fuego del Mundo: en heroico, el borde en llamas avanza hacia el centro durante la fase final. Derrota a Varkhul antes de que arda todo el crisol.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Heroico: el calor de la forja nunca baja, Decreto del Yunque añade meteoros y la fase final elimina casi todas las mecánicas para centrarse en Fuego del Mundo.',
   'gpuNotice.bodyDiscreteInactive':
     'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
   'guide.profPages.faq.q3': '¿Cuál es la diferencia entre saquear y recolectar un cadáver?',

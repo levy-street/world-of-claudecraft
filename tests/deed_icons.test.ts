@@ -402,7 +402,14 @@ describe('Book of Deeds webp icons', () => {
     // commissioned art lands: LIVE 291 + 2 = 293, PAINTED unmoved at 278,
     // PENDING 13 + 2 = 15, which is also the 293 - 278 cross-check. Measured
     // on the merged tree rather than nudged from either parent's prose.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(293);
+    // Then the release/v0.41.0 merge (2026-08-30) appends the five Crucible
+    // raid deeds (dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul,
+    // dgn_varkhul_heroic, dgn_varkhul_flawless), all riding DEED_ART_PENDING
+    // until their commissioned art lands (the release's own chain read
+    // 281 / 271, its painted count unmoved): LIVE 293 + 5 = 298, PAINTED
+    // unmoved at 278, PENDING 15 + 5 = 20, which is also the 298 - 278
+    // cross-check. Measured on the merged tree rather than nudged.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(298);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {

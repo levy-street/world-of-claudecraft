@@ -288,6 +288,8 @@ describe('installWindowDrag', () => {
         station: (type) => type,
         poi: (zoneId, index) => `${zoneId}/${index}`,
         rift: (name) => name,
+        npc: (id) => id,
+        mob: (id) => id,
       },
       npc: () => '',
       navigation: () => '',

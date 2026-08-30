@@ -27,14 +27,14 @@
 // animations, meshes, nodes, extras-bearing nodes) match the source and aborts
 // the file on any mismatch.
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Mode, toktx } from '@gltf-transform/cli';
 import { NodeIO } from '@gltf-transform/core';
-import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extensions';
 import { meshopt, textureCompress } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
-import sharp from 'sharp';
 import {
   classifyGlb,
   glbJsonChunk,
@@ -42,6 +42,19 @@ import {
   structuralSnapshot,
   weaponVfxModelKeys,
 } from './lib/glb_texture_compression_core.mjs';
+
+// Use the exact Sharp runtime owned by gltf-transform CLI. Loading a second
+// Sharp major/minor in the same Windows process loads a second libvips DLL and
+// fails with ERR_DLOPEN_FAILED 127 before conversion starts.
+const rootRequire = createRequire(import.meta.url);
+const cliRequire = createRequire(rootRequire.resolve('@gltf-transform/cli'));
+const sharp = (await import(pathToFileURL(cliRequire.resolve('sharp')).href)).default;
+// On Windows, adding KTX's DLL directory before Sharp initializes can make the
+// loader pick incompatible DLL names. Allow callers to expose the executable
+// only after libvips is resident; ordinary PATH-based installs need no override.
+if (process.env.KTX_BIN) {
+  process.env.PATH = `${process.env.PATH ?? ''}${path.delimiter}${process.env.KTX_BIN}`;
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DEFAULT_DIR = path.join(ROOT, 'public', 'models');
@@ -82,6 +95,8 @@ async function convertFile(io, file, { dryRun }) {
   const srcBuf = fs.readFileSync(file);
   const srcJson = glbJsonChunk(srcBuf);
   const cls = classifyGlb(srcJson);
+  const losslessMeshopt =
+    cls.hadMeshopt && !(srcJson.extensionsUsed ?? []).includes('KHR_mesh_quantization');
   if (cls.skip) return { file, status: 'skipped', before: srcBuf.length, after: srcBuf.length };
   if (dryRun) return { file, status: 'would-convert', before: srcBuf.length, after: srcBuf.length };
 
@@ -93,8 +108,16 @@ async function convertFile(io, file, { dryRun }) {
     toktx({ mode: Mode.UASTC, slots: UASTC_SLOTS, jobs: 2, encoder: sharp }),
     toktx({ mode: Mode.ETC1S, jobs: 2, encoder: sharp }),
   ];
-  if (cls.hadMeshopt) transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
+  if (cls.hadMeshopt && !losslessMeshopt) {
+    transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
+  }
   await doc.transform(...transforms);
+  if (losslessMeshopt) {
+    doc
+      .createExtension(EXTMeshoptCompression)
+      .setRequired(true)
+      .setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.FILTER });
+  }
   const outBuf = Buffer.from(await io.writeBinary(doc));
 
   const outJson = glbJsonChunk(outBuf);

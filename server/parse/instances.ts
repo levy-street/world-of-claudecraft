@@ -3,6 +3,7 @@
 // (boss-flagged template) or a trash segment; per-tick observation only closes
 // them (boss death, boss reset/wipe, trash quiet, slot vacancy). One active
 // fight per slot at a time; a boss pull during trash closes the trash segment.
+import { IGNIVAR_RAID_ROOM_IDS } from '../../src/sim/ignivar_raid_ids';
 import type { FightParticipant, Surface } from './contract';
 import { OpenFight, type PendingClose } from './fights';
 import type { InstanceSlotView, SegmenterHost } from './types';
@@ -11,7 +12,10 @@ import type { InstanceSlotView, SegmenterHost } from './types';
  * in-game damage meter's ENCOUNTER_END_SECONDS in src/ui/meters.ts). */
 const TRASH_QUIET_TICKS = 100;
 /** Instance ids whose fights are raids, not dungeons. */
-const RAID_DUNGEON_IDS: ReadonlySet<string> = new Set(['nythraxis_boss_arena']);
+const RAID_DUNGEON_IDS: ReadonlySet<string> = new Set([
+  'nythraxis_boss_arena',
+  ...IGNIVAR_RAID_ROOM_IDS,
+]);
 
 interface SlotState {
   slotKey: string;

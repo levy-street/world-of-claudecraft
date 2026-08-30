@@ -40,8 +40,14 @@ describe('painted weapon inventory icons', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
     // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
     // 125 with the Masterwrought phase 09 pair (duskforged_warblade,
-    // ridgebreaker), painted in masterwrought-phase09-art.
-    expect(baseWeapons).toHaveLength(125);
+    // ridgebreaker), painted in masterwrought-phase09-art;
+    // 132 with the nine Crucible raid weapons (crucible-raid-weapons-2026-08-28;
+    // the Emberflight Longbow was pulled: bows wait for the hunter rework);
+    // 133 with the Ignivar legendary maul (varkhul_forgebreaker, rendered in
+    // ignivar-varkhul-drop-renders-2026-08-28), landed by the base merge;
+    // 135 on the masterwrought branch, which carries both the phase 09 pair
+    // and the release's Crucible plus Ignivar additions.
+    expect(baseWeapons).toHaveLength(135);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -70,7 +76,7 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(4);
+    expect(weaponBatches).toHaveLength(6);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -140,12 +146,44 @@ describe('painted weapon inventory icons', () => {
     expect(masterwroughtBatch?.provenanceRecord).toBe(
       'docs/achievements/masterwrought-phase09-art/',
     );
+    // The Crucible raid weapons land in their own batch
+    // (crucible-raid-weapons-2026-08-28), like the integration daggers.
+    const crucibleBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'crucible-raid-weapons-2026-08-28',
+    );
+    expect(crucibleBatch).toBeDefined();
+    const crucibleWeaponIds = (crucibleBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(crucibleWeaponIds).toEqual([
+      'anvilguard_blade',
+      'cinderfang_kris',
+      'forgefathers_warhammer',
+      'forgefire_spire',
+      'heart_of_the_end_greatblade',
+      'slagrender_cleaver',
+      'springtouched_crozier',
+      'staff_of_the_last_spring',
+      'wand_of_quenched_sparks',
+    ]);
+    // The Ignivar legendaries ship in-engine renders of their own held models
+    // in a dedicated batch (ignivar-varkhul-drop-renders-2026-08-28).
+    const varkhulBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'ignivar-varkhul-drop-renders-2026-08-28',
+    );
+    expect(varkhulBatch).toBeDefined();
+    const varkhulWeaponIds = (varkhulBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(varkhulWeaponIds).toEqual(['varkhul_forgebreaker']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
           !replacementWeaponIds.includes(id) &&
           !integrationWeaponIds.includes(id) &&
-          !masterwroughtWeaponIds.includes(id),
+          !masterwroughtWeaponIds.includes(id) &&
+          !crucibleWeaponIds.includes(id) &&
+          !varkhulWeaponIds.includes(id),
       ),
     );
     expect(
@@ -186,10 +224,15 @@ describe('painted weapon inventory icons', () => {
     };
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
-    // integration daggers or the two Masterwrought phase 09 weapons, both of
-    // which postdate the campaign.
+    // integration daggers, the two Masterwrought phase 09 weapons, the nine
+    // Crucible raid weapons, or the Ignivar legendary, all of which postdate
+    // the campaign.
     const campaignExpected = expected.filter(
-      (id) => !integrationWeaponIds.includes(id) && !masterwroughtWeaponIds.includes(id),
+      (id) =>
+        !integrationWeaponIds.includes(id) &&
+        !masterwroughtWeaponIds.includes(id) &&
+        !crucibleWeaponIds.includes(id) &&
+        !varkhulWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

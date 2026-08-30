@@ -70,6 +70,7 @@ const GM_TEST_WORLD: WorldContent = {
 };
 
 import {
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_LAYOUT_VERSION,
   PET_SPECIAL_WIRE_VERSION,
@@ -109,11 +110,14 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
-    // The prior release/v0.41.0 server accepts only `auth-world-11`, so the new
-    // client discriminator must remain necessarily unrecognizable to it.
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
+    // The release/v0.41.0 server this branch merged accepts only `auth-world-25`
+    // (the Ignivar raid ladder's tip), and the previous layout-gated servers
+    // before it only `auth-world-11` and `auth-world-10`, so the new client
+    // discriminator must remain necessarily unrecognizable to every one of them.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-25');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
   });
@@ -132,6 +136,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
+      dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
@@ -143,6 +148,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
+      dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });

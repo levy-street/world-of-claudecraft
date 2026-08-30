@@ -20,6 +20,8 @@ const VOICE_BASE_GAIN = 0.9;
 // INTERACT_RANGE (5), so FULL sits just past it and never dips the line on open.
 export const VOICE_FULL_DIST = 6;
 export const VOICE_SILENT_DIST = 22;
+export const IGNIVAR_ROOM_WELCOME_VOICE_KEY =
+  'yell__the_seal_hears_you_little_embers_step_closer_and_feed_the_la';
 
 export function voiceDistanceGain(
   dist: number,
@@ -31,12 +33,19 @@ export function voiceDistanceGain(
   return (silent - dist) / (silent - full);
 }
 
-class GameVoice {
+interface QueuedVoiceLine {
+  lineKey: string;
+  opts?: { gain?: number };
+}
+
+export class GameVoice {
   private el: HTMLAudioElement | null = null;
   private vol = 0.9; // 0..1, from the settings slider
   private enabled = true;
   private playGain = 1; // per-line gain passed to play()
   private distanceGain = 1; // live distance attenuation (1 = at the NPC)
+  private currentKey: string | null = null;
+  private queued: QueuedVoiceLine | null = null;
 
   private applyVolume(): void {
     if (this.el)
@@ -66,12 +75,32 @@ class GameVoice {
     if (!on) this.stop();
   }
 
+  /** Whether semantic VO can currently sound, used to coordinate SFX vocals. */
+  isAudible(): boolean {
+    return this.enabled && this.vol > 0;
+  }
+
   /** Stop and reset the current line (so a new NPC interrupts the last one). */
   stop(): void {
+    this.queued = null;
+    this.stopCurrent();
+  }
+
+  private stopCurrent(): void {
     if (this.el) {
+      this.el.onended = null;
       this.el.pause();
       this.el.currentTime = 0;
     }
+    this.currentKey = null;
+  }
+
+  private advanceQueue(finishedKey: string): void {
+    if (this.currentKey !== finishedKey) return;
+    this.currentKey = null;
+    const next = this.queued;
+    this.queued = null;
+    if (next) this.play(next.lineKey, next.opts);
   }
 
   /** Play the clip for a line key, if one exists and voice-over is enabled. */
@@ -79,17 +108,25 @@ class GameVoice {
     if (!this.enabled) return;
     const src = VOICE_LINES[lineKey];
     if (!src) return;
-    this.stop();
+    // The one-time room introduction is longer than the walk to Ignivar's
+    // aggro edge. Preserve it for this player and queue the latest encounter
+    // line locally instead of delaying simulation or the rest of the raid.
+    if (this.currentKey === IGNIVAR_ROOM_WELCOME_VOICE_KEY && this.isPlaying()) {
+      this.queued = { lineKey, opts };
+      return;
+    }
+    this.queued = null;
+    this.stopCurrent();
     if (!this.el) this.el = new Audio();
     this.el.src = src;
+    this.currentKey = lineKey;
+    this.el.onended = () => this.advanceQueue(lineKey);
     this.playGain = opts?.gain ?? 1;
     this.distanceGain = 1; // a fresh line starts at full: you just clicked the NPC, you are close
     this.applyVolume();
     // Autoplay restrictions / a missing file reject the promise — ignore, the
     // dialogue text is the source of truth and audio is an enhancement.
-    void this.el.play().catch(() => {
-      /* no-op */
-    });
+    void this.el.play().catch(() => this.advanceQueue(lineKey));
   }
 }
 

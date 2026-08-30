@@ -165,3 +165,19 @@ Collection (the rare-find family):
 Progression (the profession milestone):
 
 - [v1] `prog_farming_100`, Harvestmaster: a crossed hoe and sickle over a ribbon-tied wheat crown, proud guild-seal framing in bronze and gold. NOTE: an interim tied-wheat-sheaf medallion crest is COMMITTED with the phase (the Reliquary title shelf forbids fallback art for title deeds, so this one could not ride the pending ledger); the commissioned piece replaces it through the normal converter run.
+
+## The Crucible of the Last Spring raid crests (2026-08-29)
+
+Five new ids from the Ignivar raid deeds pass (the loot PRD's obligations
+closeout), same delivery contract as above: one 512x512 RGBA PNG per deed,
+named exactly by deed id, ingested with `npm run assets:deeds <source-dir>`.
+All five ride the procedural dungeon category crest until the paintings land
+(enumerated in `DEED_ART_PENDING`, `src/ui/icons.ts`).
+
+Dungeon (the Crucible of the Last Spring raid):
+
+- [v1] `dgn_ignivar`, The Herald Falls: Ignivar's molten herald mask cracked through and going dark, sparks dying above sealed spring waters, forge orange on iron black.
+- [v1] `dgn_ignivar_heroic`, Heroic: The Herald Falls: the same cracked herald mask ringed by a gold heroic laurel, its last ember caught inside the wreath.
+- [v1] `dgn_varkhul`, The Forge Goes Cold: Varkhul's great anvil under a raised silent hammer, the forge glow fading to blue-grey ash, one thin line of spring water cutting through the coals.
+- [v1] `dgn_varkhul_heroic`, Heroic: The Forge Goes Cold: the cold anvil and hammer ringed by a gold heroic laurel, frost creeping over the anvil face.
+- [v1] `dgn_varkhul_flawless`, Not One Ember Lost: ten unbroken candle flames in a ring above the forge floor, none guttering, warm gold on deep bronze.

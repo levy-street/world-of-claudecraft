@@ -476,12 +476,16 @@ export async function buildItemArtAudit(options) {
     heroicWeaponArtAliases.every(([, item]) => fileIds.has(item.heroicOf)),
     'Every heroic weapon art alias must reference a shipping base-art file',
   );
-  // Declared procedural-art debt (src/ui/icons.ts ITEM_ART_PENDING): ids that
-  // deliberately ship a procedural icon while their committed art is owed.
-  // The set is exact-pinned in tests/item_icons.test.ts, so growing it is a
-  // visible test edit, never a silent audit bypass. Both directions are held
-  // here: a pending id must be a live def with NO shipping webp (art landing
-  // forces the id OFF the pending set, which keeps the debt ledger honest).
+  // Declared procedural-art debt, the enumerated art-pending ledger
+  // (src/ui/icons.ts ITEM_ART_PENDING, which also spreads its content-side
+  // source list, IGNIVAR_ART_PENDING_ITEM_IDS): ids whose painted wave has not
+  // landed yet deliberately ship a procedural icon while their committed art
+  // is owed, and are excluded from the every-live-item sweep below. The set is
+  // exact-pinned in tests/item_icons.test.ts (A2/A3 force each entry out as
+  // its art lands), so growing it is a visible test edit, never a silent audit
+  // bypass. Both directions are held here: a pending id must be a live def
+  // with NO shipping webp (art landing forces the id OFF the pending set,
+  // which keeps the debt ledger honest).
   const pendingArtIds = new Set(options.pendingArtIds ?? []);
   for (const id of pendingArtIds) {
     assert(options.items[id], `pending-art id ${id} is not a live item definition`);

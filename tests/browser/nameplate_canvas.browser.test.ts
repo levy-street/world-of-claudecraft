@@ -3,6 +3,11 @@ import {
   createNameplateCanvasState,
   NameplateCanvasSurface,
 } from '../../src/render/nameplate_canvas';
+import {
+  nameplateHealthBarTop,
+  nameplateHealthBarWidth,
+  pickNameplateHealthBarAt,
+} from '../../src/render/nameplate_pick_core';
 
 interface InkBounds {
   minX: number;
@@ -206,4 +211,57 @@ describe('nameplate canvas in a real browser', () => {
       else Reflect.deleteProperty(window, 'matchMedia');
     }
   });
+
+  it.each([
+    ['normal add', false, false],
+    ['casting boss', true, true],
+  ] as const)(
+    'maps the visible %s health bar back to its exact entity',
+    (_label, boss, casting) => {
+      const parent = document.createElement('div');
+      document.body.appendChild(parent);
+      const surface = new NameplateCanvasSurface(parent);
+      try {
+        const state = createNameplateCanvasState();
+        Object.assign(state, {
+          name: boss ? 'Ignivar' : 'Cinder Artificer',
+          hpVisible: true,
+          hpFill: 0.75,
+          hostile: true,
+          frame: boss ? 'boss' : '',
+          castVisible: casting,
+          castFill: casting ? 0.5 : 0,
+          castLabel: casting ? 'Revolving Inferno' : '',
+        });
+        surface.beginFrame(WIDTH, HEIGHT, 1);
+        surface.drawBase(state, NAME_X, NAME_BOTTOM_Y);
+
+        const healthTop = nameplateHealthBarTop(NAME_BOTTOM_Y, casting);
+        const healthWidth = nameplateHealthBarWidth(boss);
+        const clickX = NAME_X + healthWidth / 2 - 2;
+        const clickY = healthTop + 2;
+        expect(pixelColor(surface.canvas, clickX, clickY)).not.toBe('0,0,0,0');
+        expect(
+          pickNameplateHealthBarAt(
+            [
+              {
+                id: 42,
+                sx: NAME_X,
+                sy: NAME_BOTTOM_Y,
+                hpVisible: true,
+                castVisible: casting,
+                boss,
+                pickable: true,
+              },
+            ],
+            1,
+            clickX,
+            clickY,
+          ),
+        ).toBe(42);
+      } finally {
+        surface.dispose();
+      }
+    },
+  );
 });

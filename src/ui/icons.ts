@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
@@ -2555,6 +2556,36 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   earthquake: r('earth', 'earthBrown', ['sunburst'], ['crack']),
   attack: r('steel', 'steel', ['sword'], ['motion']),
+  // Ignivar and Varkhul encounter-journal icons. These ids are UI-owned rather
+  // than cast ids so related fire mechanics remain visually distinct at a glance.
+  raid_ignivar_forge_strike: r('fire', 'ember', ['mace', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_brand: r('fire', 'blood', ['sigil_rune', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_searing_torrent: r('fire', 'ember', ['flame', { p: 'droplet', ...BR, pal: 'ice' }]),
+  raid_ignivar_rain_of_cinders: r('fire', 'ember', [
+    { p: 'meteor', x: -10, y: -8, s: 0.72 },
+    { p: 'meteor', x: 11, y: 10, s: 0.62 },
+  ]),
+  raid_ignivar_revolving_inferno: r('fire', 'ember', ['sunburst', 'flame'], ['arcs']),
+  raid_ignivar_forge_wave: r('fire', 'ember', ['droplet', { p: 'sunburst', ...BIG }], ['arcs']),
+  raid_ignivar_apocalypse: r('shadow', 'blood', ['skull', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_judgment: r('fire', 'holyGold', ['mace', { p: 'sunburst', ...BIG }], ['glow']),
+  raid_ignivar_chains: r('steel', 'ember', ['tendrils', { p: 'flame', ...BR }], ['arcs']),
+  raid_ignivar_last_inferno: r('blood', 'ember', ['skull', 'flame'], ['glow', 'drips']),
+  raid_varkhul_makers_brand: r('steel', 'ember', ['sigil_rune', { p: 'mace', ...BR }], ['glow']),
+  raid_varkhul_frontal: r('fury', 'ember', ['mace', { p: 'flame', ...BR }], ['motion']),
+  raid_varkhul_cinder_orbs: r('fire', 'ember', [
+    { p: 'sunburst', x: -10, y: -8, s: 0.68 },
+    { p: 'sunburst', x: 11, y: 10, s: 0.58 },
+  ]),
+  raid_varkhul_shared_pyre: r('fire', 'holyGold', ['heart', { p: 'flame', ...BR }], ['glow']),
+  raid_varkhul_forgestorm: r('storm', 'ember', ['meteor', { p: 'flame', ...BR }], ['arcs']),
+  raid_varkhul_tempering_ray: r('fire', 'holyGold', ['bolt', { p: 'shield', ...BR }], ['glow']),
+  raid_varkhul_anvils_decree: r('steel', 'ember', ['mace', { p: 'sunburst', ...BIG }], ['crack']),
+  raid_varkhul_masters_assembly: r('steel', 'gold', ['sigil_rune', { p: 'mace', ...BR }], ['arcs']),
+  raid_varkhul_crucible_beam: r('fire', 'ember', ['bolt', { p: 'shield', ...BR }], ['arcs']),
+  raid_varkhul_forge_legion: r('steel', 'ember', ['helm', { p: 'mace', ...BR }]),
+  raid_varkhul_masterpiece_unbound: r('fury', 'blood', ['mace', 'flame'], ['glow']),
+  raid_varkhul_worldfire: r('fire', 'blood', ['sunburst', 'flame'], ['glow', 'drips']),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
@@ -5750,7 +5781,7 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // and it stayed empty upstream when the Proving Shore pair landed: the island's castaway
 // crate and ferry bell icons are rendered from their own world models
 // (scripts/render_island_item_icons.mjs), so they ship with committed art like
-// every other item. (History; the paragraph below is why the set is not empty here.)
+// every other item. (History; the paragraphs below are why the set is not empty here.)
 //
 // Re-opened by the farming growth-engine phase for its four items. This is the
 // "development-only item" case the paragraph above reserves the mechanism for, not a way to
@@ -5768,7 +5799,17 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // items today. The honest reason is the one that survives: this is a deliberate, scheduled
 // ART PARK covering Phases 11e to 11k, exactly like the DEED_ART_PENDING sibling below, which
 // already words its own rationale that way. The park is the decision; dormancy never was.
+//
+// The Ignivar raid loot table (content/ignivar_loot.ts) carries its own arm of
+// this ledger, IGNIVAR_ART_PENDING_ITEM_IDS, spread in first: the release
+// enumerated its 192 non-weapon items there behind the development-only
+// Crucible raid until their painted wave landed (crucible-set-icons-2026-08-29
+// emptied that arm; the spread stays so a future Crucible re-park flows through
+// the same ledger). The 10 raid weapons are excluded: weapons never enter this
+// set (guard A2); they ship painted art through WEAPON_IMAGE_IDS like every
+// other weapon. The ids below are this packet's own scheduled art park.
 export const ITEM_ART_PENDING = new Set<string>([
+  ...IGNIVAR_ART_PENDING_ITEM_IDS,
   'bog_beet',
   'bog_beet_seed',
   'bronze_hoe',
@@ -5961,10 +6002,20 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'prog_ready_for_an_adventure',
   // Phase 13's promotion capstone, falling back to deed_cat_progression until
   // its commissioned art lands (docs/achievements/icon-brief.md), appended at
-  // the TAIL to match its DEED_ORDER position (the load-bearing note above).
+  // the TAIL to match its DEED_ORDER position (the load-bearing note above);
+  // the release/v0.41.0 merge then appended the Crucible block BEHIND it in
+  // the deeds table, so the raid deeds follow it here too.
   // It carries NO title, so the Reliquary title-shelf rule that forced
   // prog_farming_100's crest to ship committed does not apply here.
   'prog_legendmaker',
+  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
+  // each rides the deed_cat_dungeon crest until its commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'dgn_ignivar',
+  'dgn_ignivar_heroic',
+  'dgn_varkhul',
+  'dgn_varkhul_heroic',
+  'dgn_varkhul_flawless',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

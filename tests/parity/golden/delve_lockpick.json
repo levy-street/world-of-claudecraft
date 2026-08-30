@@ -9,14 +9,14 @@
     "lockpick minigame (flawless solve)",
     "reward chest + delve marks"
   ],
-  "draws": 8,
-  "drawDigest": "b2debc02",
+  "draws": 11,
+  "drawDigest": "6ae3afff",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1002,
-      "state": "0069a3cc",
+      "nextId": 1004,
+      "state": "e4139851",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -105,8 +105,9 @@
           "dualWielding": true,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 6,
           "hp": 62,
-          "id": 997,
+          "id": 999,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -158,45 +159,45 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1012,
-      "state": "f479e714",
-      "events": "7fdb89a7",
-      "rng": {
-        "draws": 4,
-        "digest": "ade9332b"
-      }
-    },
-    {
-      "tick": 20,
-      "time": 1,
-      "nextId": 1012,
-      "state": "685700ce",
-      "events": "3e70d59e",
-      "rng": {
-        "draws": 4,
-        "digest": "ade9332b"
-      }
-    },
-    {
-      "tick": 30,
-      "time": 1.5,
-      "nextId": 1012,
-      "state": "ca0c9429",
-      "events": "b5790f00",
+      "nextId": 1014,
+      "state": "33ec3685",
+      "events": "e8d9a1da",
       "rng": {
         "draws": 5,
         "digest": "110f9090"
       }
     },
     {
-      "tick": 38,
-      "time": 1.9,
+      "tick": 20,
+      "time": 1,
       "nextId": 1014,
-      "state": "c92f3e74",
-      "events": "9c883af3",
+      "state": "0d113532",
+      "events": "82b32424",
+      "rng": {
+        "draws": 5,
+        "digest": "110f9090"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 1014,
+      "state": "93e3e8f7",
+      "events": "d2bc8ef0",
       "rng": {
         "draws": 8,
         "digest": "b2debc02"
+      }
+    },
+    {
+      "tick": 38,
+      "time": 1.9,
+      "nextId": 1016,
+      "state": "744fbf51",
+      "events": "2f65f6d1",
+      "rng": {
+        "draws": 11,
+        "digest": "6ae3afff"
       },
       "label": "delve-end",
       "players": [
@@ -223,7 +224,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 25,
+          "copper": 19,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -282,7 +283,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 3,
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -328,8 +329,9 @@
           "dodgeChance": 0.0715,
           "dualWielding": true,
           "fiveSecondRule": 100.9,
+          "healPower": 6,
           "hp": 50000,
-          "id": 997,
+          "id": 999,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -368,7 +370,7 @@
             "sta": 23,
             "str": 23
           },
-          "targetId": 1008,
+          "targetId": 1010,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -379,15 +381,15 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 100.9,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.434496,
+          "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 103,
-          "id": 1007,
+          "id": 1009,
           "kind": "mob",
           "level": 4,
           "lootFfaTimer": "Infinity",
@@ -395,7 +397,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 997,
+          "ownerId": 999,
           "petMode": "defensive",
           "pos": {
             "x": 104200,
@@ -426,23 +428,23 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.692692,
+          "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1008,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 104202.346895,
-            "z": -1167.171978
+            "x": 104200,
+            "z": -1170
           },
           "level": 9,
           "loot": {
-            "copper": 388
+            "copper": 208
           },
           "lootFfaTimer": 59.6,
           "lootRecipientIds": [
-            997
+            999
           ],
           "lootable": true,
           "maxHp": 635,
@@ -451,8 +453,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104202.346895,
-            "z": -1167.171978
+            "x": 104200,
+            "z": -1170
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.6,
@@ -463,14 +465,10 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 12,
-          "tappedById": 997,
+          "stompTimer": 10.5,
+          "swingTimer": 0.75,
+          "tappedById": 999,
           "templateId": "deacon_varric",
-          "wanderTarget": {
-            "x": 104205.680222,
-            "z": -1163.155298
-          },
-          "wanderTimer": 28.55,
           "weapon": {
             "max": 51,
             "min": 33,
@@ -487,7 +485,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1014,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -520,23 +518,23 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1014,
-      "state": "334ecabb",
+      "nextId": 1016,
+      "state": "ab5d2b71",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "b2debc02"
+        "draws": 11,
+        "digest": "6ae3afff"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1014,
-      "state": "334ecabb",
+      "nextId": 1016,
+      "state": "ab5d2b71",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "b2debc02"
+        "draws": 11,
+        "digest": "6ae3afff"
       },
       "label": "final",
       "players": [
@@ -563,7 +561,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 25,
+          "copper": 19,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -622,7 +620,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 3,
-          "entityId": 997,
+          "entityId": 999,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -668,8 +666,9 @@
           "dodgeChance": 0.0715,
           "dualWielding": true,
           "fiveSecondRule": 101,
+          "healPower": 6,
           "hp": 50000,
-          "id": 997,
+          "id": 999,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -708,7 +707,7 @@
             "sta": 23,
             "str": 23
           },
-          "targetId": 1008,
+          "targetId": 1010,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -719,15 +718,15 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 101,
+          "combatTimer": 0.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.434496,
+          "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 103,
-          "id": 1007,
+          "id": 1009,
           "kind": "mob",
           "level": 4,
           "lootFfaTimer": "Infinity",
@@ -735,7 +734,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 997,
+          "ownerId": 999,
           "petMode": "defensive",
           "pos": {
             "x": 104200,
@@ -766,23 +765,23 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 0.692692,
+          "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1008,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 104202.346895,
-            "z": -1167.171978
+            "x": 104200,
+            "z": -1170
           },
           "level": 9,
           "loot": {
-            "copper": 388
+            "copper": 208
           },
           "lootFfaTimer": 59.5,
           "lootRecipientIds": [
-            997
+            999
           ],
           "lootable": true,
           "maxHp": 635,
@@ -791,8 +790,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104202.346895,
-            "z": -1167.171978
+            "x": 104200,
+            "z": -1170
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.5,
@@ -803,14 +802,10 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 12,
-          "tappedById": 997,
+          "stompTimer": 10.5,
+          "swingTimer": 0.75,
+          "tappedById": 999,
           "templateId": "deacon_varric",
-          "wanderTarget": {
-            "x": 104205.680222,
-            "z": -1163.155298
-          },
-          "wanderTimer": 28.55,
           "weapon": {
             "max": 51,
             "min": 33,
@@ -827,7 +822,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1014,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

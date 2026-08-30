@@ -11,9 +11,8 @@
 // quest-NPC surface) and are reached through two append-only SimContext callbacks.
 // The corpse-loot helpers (distributeLootCopper / awardSharedLootItem /
 // lootSlotVisibleTo / pruneCorpseLoot) are imported from loot/loot_roll.ts (L1/W6)
-// and the Nythraxis interaction hooks (tryStartNythraxisWardChannel /
-// activateNythraxisRelic / interactObjectForQuests) from encounters/nythraxis.ts
-// (N1); they are imported, never edited.
+// and the encounter interaction hooks from encounters/nythraxis.ts and
+// ignivar_raid_lore.ts; they are imported, never edited.
 //
 // Move-not-rewrite: statements, branches, short-circuit and iteration order are
 // verbatim. The immutability waiver applies: the in-place loot-slot (s.count /
@@ -36,6 +35,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
+import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
@@ -44,7 +44,9 @@ import {
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
+  grantAwardedLootItem,
   hasPendingLootRollForMob,
+  killSnapshotEligibility,
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
@@ -160,7 +162,13 @@ export function lootCorpse(
         if (s.instance) {
           ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
         } else {
-          ctx.addItem(s.itemId, 1, meta.entityId);
+          // Through the shared award grant, NOT a bare addItem: an openToAll
+          // slot is how an everyone-passed (or winner-offline) roll returns a
+          // drop to the corpse, and a soulbound item picked up from it must
+          // carry the same bind-on-pickup party trade window a roll win
+          // would; a bare add minted a permanently untradeable copy from the
+          // most common raid outcome (everyone passes to sort it out later).
+          grantAwardedLootItem(ctx, s.itemId, meta.entityId, killSnapshotEligibility(ctx, mob));
         }
         s.count--;
         didLoot = true;
@@ -831,11 +839,18 @@ export function pickUpObject(
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
     return tryRingFerryBell(ctx, obj, p, meta);
   }
+  const ignivarLore = interactIgnivarRaidLore(ctx, obj, meta);
+  if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;
   if (interactObjectForQuests(ctx, obj, meta)) {
-    return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
+    return (
+      ignivarLore.handled ||
+      meta.counters.questProgress !== beforeQuestProgress ||
+      ctx.nextId !== beforeQuestNextId
+    );
   }
+  if (ignivarLore.handled) return true;
   const def = ITEMS[objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);

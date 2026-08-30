@@ -127,6 +127,7 @@ describe('approved Packlord follow-up', () => {
     if (!stampede) throw new Error('missing Stampede');
     const displayed = abilityEffectText(stampede, {
       spellPower: 0,
+      healPower: 0,
       rangedPower: sim.player.rangedPower,
       attackPower: 0,
     });
@@ -241,12 +242,12 @@ describe('approved Thundercall Chain Lightning follow-up', () => {
     if (!chain) throw new Error('missing Skybranch');
     // v0.36 composition re-pin: Earthen Fury mastery now applies whole-hit per
     // the composed talent scaling, raising the zero-power band.
-    expect(abilityEffectText(chain, { spellPower: 0, rangedPower: 0, attackPower: 0 })).toBe(
-      '60 to 69',
-    );
-    expect(abilityEffectText(chain, { spellPower: 100, rangedPower: 0, attackPower: 0 })).not.toBe(
-      '60 to 69',
-    );
+    expect(
+      abilityEffectText(chain, { spellPower: 0, healPower: 0, rangedPower: 0, attackPower: 0 }),
+    ).toBe('60 to 69');
+    expect(
+      abilityEffectText(chain, { spellPower: 100, healPower: 100, rangedPower: 0, attackPower: 0 }),
+    ).not.toBe('60 to 69');
 
     const sim = new Sim({ seed: 2920, playerClass: 'shaman' });
     sim.setPlayerLevel(20);

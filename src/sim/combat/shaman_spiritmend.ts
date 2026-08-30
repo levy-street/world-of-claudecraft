@@ -1,11 +1,13 @@
 // Spiritmend's owner-scoped Mending Current pool. The remaining healing is the
 // aura value itself, so ticking and Chain Heal consumption share one authority.
 
+import { SPRINGMENDER_4PC_CHAIN_HARVEST_MULT } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 
 export { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from '../content/shaman_tuning';
 
+import { wearsSetBonus } from './set_bonus_wearer';
 import {
   lifespringMasteryDepositBonus,
   SHAMAN_TALENT_IDS,
@@ -212,7 +214,14 @@ export function consumeMendingCurrent(ctx: SimContext, source: Entity, target: E
   const index = currentIndex(target, source.id);
   if (index < 0) return 0;
   const current = removeAuraAt(ctx, target, index);
-  const proposed = Math.max(0, Math.round((current?.value ?? 0) * CURRENT_CONSUME_MULTIPLIER));
+  // Springmender 4pc (the Crucible set doc): the CHAIN-path harvest rises to
+  // 150 percent, scoped to this consume alone: unleashMendingCurrent's
+  // collapse below deliberately keeps the base 1.25 for everyone. Draws no
+  // rng; the payoff heal below already passes canCrit false.
+  const consumeMultiplier = wearsSetBonus(ctx, source, 'springmender', 4)
+    ? SPRINGMENDER_4PC_CHAIN_HARVEST_MULT
+    : CURRENT_CONSUME_MULTIPLIER;
+  const proposed = Math.max(0, Math.round((current?.value ?? 0) * consumeMultiplier));
   if (proposed > 0 && !target.dead) {
     ctx.applyHeal(source, target, proposed, 'Mending Current', MENDING_CURRENT_ID, false, false);
     ctx.emit({

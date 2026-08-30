@@ -61,12 +61,13 @@ export const castDisplayName = (id: string): string => {
   return ability ? abilityDisplayName(ability) : id;
 };
 
-/** The TARGET cast bar's label resolver (#tf-castbar). The target bar has
- *  historically shown the raw cast id, byte-faithful to its old inline block,
- *  so a targeted player mid-trade-cast reads "farming" / "crafting" instead
- *  of a localized name. Phase 14 fixes exactly the FARMING cast (the handoff
- *  row it discharges); the other trades' raw ids are the same pre-existing
- *  class and stay deliberately untouched here (a class-wide fix localizes
- *  every id and is a maintainer call, not polish). */
+/** The TARGET cast bar's label resolver (#tf-castbar) for the FARMING cast
+ *  only. The target bar historically showed the raw cast id, byte-faithful to
+ *  its old inline block, so a targeted player mid-trade-cast read "farming";
+ *  Phase 14 localized exactly the FARMING cast here (the handoff row it
+ *  discharges). Since the v0.41.0 Ignivar span (merged 2026-08-30) the hud
+ *  routes every OTHER id through abilityDisplayNameFromSource, which passes
+ *  an unknown id through unchanged, so this resolver's raw-id fallthrough is
+ *  reached only for non-farming ids the hud has already handed elsewhere. */
 export const targetCastDisplayLabel = (id: string): string =>
   id === FARMING_CAST_ID ? castDisplayName(id) : id;

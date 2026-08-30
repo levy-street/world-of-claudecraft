@@ -130,8 +130,18 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // dispatch-only unchanged at 13. The numbers below were re-derived by
 // replaying this suite's own scans over the three-way union of both sides'
 // sources, never by trusting either side's constant.
-const EXPECTED_SEND_COUNT = 213;
-const EXPECTED_DISPATCH_COUNT = 226;
+// The release side (v0.41.0, the Crucible raid loot landing): the raid's
+// Quartermaster sigil-redemption vendor adds its one crucible_buy send +
+// dispatch pair, so the release read 207/220 on its own (its own narrative
+// still spoke of the Vale Cup retirement and the start_tutorial pair).
+// The 2026-08-30 v0.41.0 sync composes a NINTH time and CONFLICTED (ours
+// 213/226 against the release's 207/220): the merged tree carries both arms,
+// ours' seven plus the release's one new pair, so the send and dispatch
+// counts each move by one over the eighth composition; dispatch-only stays
+// 13. Set from a suite run on the merged tree, never by arithmetic in the
+// diff.
+const EXPECTED_SEND_COUNT = 214;
+const EXPECTED_DISPATCH_COUNT = 227;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

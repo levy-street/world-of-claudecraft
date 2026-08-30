@@ -68,6 +68,11 @@ import {
 vi.mock('../src/ui/icons', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => `data:,${kind}:${id}`,
+  // reliquaryCellArtOpaque's item arm consults both committed pipelines; the
+  // window tests only care that the answer is stable, so mock everything as
+  // committed (non-opaque), matching the pre-art-pending behavior.
+  itemImageUrl: (id: string) => `/ui/items/${id}.webp`,
+  weaponIconUrl: () => null,
 }));
 
 // The page every grid test drives: five item relics, a dungeon clear source, and

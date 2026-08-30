@@ -41,13 +41,15 @@ const AUTH_WORLD_10_VAULT_INFO = {
 const VAULT_SPECIAL_REQUIRED_KEYS = ['special'] as const satisfies readonly (keyof VaultInfo)[];
 
 // Exact auth-world-11 ItemInstancePayload key set from origin/release/v0.41.0
-// (e19d832b47). The masterwrought epoch (12) exists because equipped-instance
-// snapshots now carry the Perfecting rank, the Perfected quality marker, and
-// an orange piece's chosen name, none of which an epoch-11 binary can render
-// or select. The other half of the epoch-12 rationale, the `fplot` farm-plot
-// self delta, has no compile-time wire interface to fixture here; its
-// presence in today's delta registry is pinned by tests/snapshots.test.ts
-// (the ALL_DELTA_KEYS / TERSE_TO_IWORLD fplot rows).
+// (e19d832b47). The masterwrought epoch (26: one past the release's Ignivar
+// ladder tip 25; it was 12 on the pre-merge branch) exists because
+// equipped-instance snapshots now carry the Perfecting rank, the Perfected
+// quality marker, and an orange piece's chosen name, none of which a
+// pre-masterwrought binary (epoch 11 through 25) can render or select. The
+// other half of the epoch-26 rationale, the `fplot` farm-plot self delta, has
+// no compile-time wire interface to fixture here; its presence in today's
+// delta registry is pinned by tests/snapshots.test.ts (the ALL_DELTA_KEYS /
+// TERSE_TO_IWORLD fplot rows).
 const AUTH_WORLD_11_ITEM_INSTANCE_PAYLOAD = {
   signer: 'Maker',
   charges: {},
@@ -87,16 +89,20 @@ type _PerfectingKeysAreNew = AssertNever<
 >;
 
 describe('wire compatibility epoch', () => {
-  it('fences every pre-masterwrought epoch out at the epoch-12 handshake', () => {
+  it('fences every pre-masterwrought epoch out at the epoch-26 handshake', () => {
     // The runtime epoch pin: the world handshake version that fences older
     // snapshot shapes out before any snapshot is admitted. The three frozen
     // fixtures above carry the per-epoch rationale: bank storage (10) added
     // the socket and two-pool BankInfo fields, the Materials Vault (11) the
-    // identity-preserving `special` collection, and masterwrought (12) the
-    // Perfecting instance fields plus the fplot self delta.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(12);
+    // identity-preserving `special` collection, and masterwrought (26) the
+    // Perfecting instance fields plus the fplot self delta. The Ignivar raid
+    // ladder moved release/v0.41.0 from 11 to 25 (src/world_api.ts) before
+    // this branch merged it, so masterwrought sits one past that tip; any
+    // epoch at or above 11 keeps the bank and vault fences.
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-12');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-25');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-9');

@@ -28,7 +28,7 @@ export const SFX_MAX_TRACKS_PER_KEY = 8;
 export const SFX_MAX_TRACK_BYTES = 4194304;
 export const SFX_MAX_TOTAL_AUDIO_BYTES = 134217728;
 export const SFX_MAX_RUNTIME_PACK_BYTES = 524288;
-export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"battle_shout":2.041738,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"defiant_bellow":1.819701,"demoralizing_shout":1.819701,"emboldening_roar":2.041738,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"intimidating_shout":2.041738,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"meteor":2.041738,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1,"mob_beast_wolf_attack":1,"mob_beast_wolf_death":1,"mob_beast_wolf_hurt":1,"mob_beast_wolf_idle":1,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1,"mob_undead_skeleton_attack":1,"mob_undead_skeleton_death":1,"mob_undead_skeleton_hurt":1,"mob_undead_skeleton_idle":1,"mount_run_aether_hover_cycle":1.819701,"mount_run_drakemaw_raptor":1.819701,"mount_run_grag_bear":1.840772,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":2.041738,"mount_run_terrorspark_groundshaker_start":1.840772,"mount_run_terrorspark_groundshaker_stop":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"player_death":2.06538,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"rallying_cry":1.840772,"rift_boulder_impact":1.778279,"rift_boulder_roll":1.698244,"rift_gate_grind":2.041738,"rift_ice_glide":2.041738,"rift_ice_start":1.819701,"rift_ice_stop":1.840772,"rift_lava_tick":2.42661,"rift_portal_drone":8.317638,"rift_portal_enter":2.660725,"rift_portal_spawn":3.935501,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_farm_feast":1,"ui_farm_golden":1,"ui_farm_harvest":1,"ui_farm_plant":1,"ui_farm_ready":1,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_legendary_forged":1,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_perfecting_attempt":1,"ui_perfecting_success":1,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_sunder_complete":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
+export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"battle_shout":2.041738,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"defiant_bellow":1.819701,"demoralizing_shout":1.819701,"emboldening_roar":2.041738,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"intimidating_shout":2.041738,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"meteor":2.041738,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1.840772,"mob_beast_wolf_attack":1.840772,"mob_beast_wolf_death":1.840772,"mob_beast_wolf_hurt":1.840772,"mob_beast_wolf_idle":1.819701,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_elemental_ignivar_aggro":2.041738,"mob_elemental_ignivar_attack":1.995262,"mob_elemental_ignivar_death":2.041738,"mob_elemental_ignivar_hurt":1.798871,"mob_elemental_ignivar_idle":1.678804,"mob_elemental_varkhul_aggro":2.722701,"mob_elemental_varkhul_attack":2.290868,"mob_elemental_varkhul_death":2.540973,"mob_elemental_varkhul_hurt":1.905461,"mob_elemental_varkhul_idle":2.041738,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1.819701,"mob_undead_skeleton_attack":1.840772,"mob_undead_skeleton_death":1.840772,"mob_undead_skeleton_hurt":1.840772,"mob_undead_skeleton_idle":1.883649,"mount_run_aether_hover_cycle":1.819701,"mount_run_drakemaw_raptor":1.819701,"mount_run_grag_bear":1.840772,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":2.041738,"mount_run_terrorspark_groundshaker_start":1.840772,"mount_run_terrorspark_groundshaker_stop":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"player_death":2.06538,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"rallying_cry":1.840772,"rift_boulder_impact":1.778279,"rift_boulder_roll":1.698244,"rift_gate_grind":2.041738,"rift_ice_glide":2.041738,"rift_ice_start":1.819701,"rift_ice_stop":1.840772,"rift_lava_tick":2.42661,"rift_portal_drone":8.317638,"rift_portal_enter":2.660725,"rift_portal_spawn":3.935501,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_farm_feast":1,"ui_farm_golden":1,"ui_farm_harvest":1,"ui_farm_plant":1,"ui_farm_ready":1,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_legendary_forged":1,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_perfecting_attempt":1,"ui_perfecting_success":1,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_sunder_complete":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
 export const SFX_CLIPS =
 {
   "amb_birds": {
@@ -2974,6 +2974,292 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mob_elemental_idle_2.mp3?v=1f18591393f9",
         "bytes": 23866,
         "sha256": "1f18591393f9b5b64eb6b2335a88b1bb9e436fec481d9aa86d70c5e0e9f041f1"
+      }
+    ]
+  },
+  "mob_elemental_ignivar_aggro": {
+    "url": "/audio/sfx/mob_elemental_ignivar_aggro_1.mp3?v=d9c35f4a7b2c",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 90322,
+    "hash": "d9c35f4a7b2c",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_ignivar_aggro_1.mp3?v=d9c35f4a7b2c",
+        "bytes": 90322,
+        "sha256": "d9c35f4a7b2c4d8279ac2194fa3810aa00cce26233251e133cd034696c03e045"
+      }
+    ]
+  },
+  "mob_elemental_ignivar_attack": {
+    "url": "/audio/sfx/mob_elemental_ignivar_attack_1.mp3?v=7092bb488cde",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.995262,
+    "playbackRate": 1,
+    "bytes": 45138,
+    "hash": "7092bb488cde",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_ignivar_attack_1.mp3?v=7092bb488cde",
+        "bytes": 45138,
+        "sha256": "7092bb488cde68442a06a55486b1ba9c969ab99146f3c83ab5345d1377f0bdb8"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_ignivar_attack_2.mp3?v=ddcf75358d9f",
+        "bytes": 43257,
+        "sha256": "ddcf75358d9f9fe0dda27a4a86b327360cc52962a78b4ea2a1ebe4361884be70"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mob_elemental_ignivar_attack_3.mp3?v=e342ef94b701",
+        "bytes": 45182,
+        "sha256": "e342ef94b70170c5bdc0103ed3b046124da9ef2262535e9c0d04f32e16d2a293"
+      },
+      {
+        "id": "4",
+        "url": "/audio/sfx/mob_elemental_ignivar_attack_4.mp3?v=441fd90565e1",
+        "bytes": 52661,
+        "sha256": "441fd90565e1e79f5751d1a904aa73ac7759f9329be2f8e2c5c4387512c83c1f"
+      }
+    ]
+  },
+  "mob_elemental_ignivar_death": {
+    "url": "/audio/sfx/mob_elemental_ignivar_death_1.mp3?v=d3fc81b369d9",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 79664,
+    "hash": "d3fc81b369d9",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_ignivar_death_1.mp3?v=d3fc81b369d9",
+        "bytes": 79664,
+        "sha256": "d3fc81b369d92e91dbf8f4dfca3465c7e20ac9f18d15b93f9963caae42da05fa"
+      }
+    ]
+  },
+  "mob_elemental_ignivar_hurt": {
+    "url": "/audio/sfx/mob_elemental_ignivar_hurt_1.mp3?v=b84156be8c44",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.798871,
+    "playbackRate": 1,
+    "bytes": 40750,
+    "hash": "b84156be8c44",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_ignivar_hurt_1.mp3?v=b84156be8c44",
+        "bytes": 40750,
+        "sha256": "b84156be8c44e8052d22d63409e6fd437178def73ec1db63815b287cbddddc9e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_ignivar_hurt_2.mp3?v=764f2f8d0f50",
+        "bytes": 43257,
+        "sha256": "764f2f8d0f504339463622017d2abf4ce7c72603990ad0f471ab2083a47c284e"
+      }
+    ]
+  },
+  "mob_elemental_ignivar_idle": {
+    "url": "/audio/sfx/mob_elemental_ignivar_idle_1.mp3?v=9cc22896d5b6",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.678804,
+    "playbackRate": 1,
+    "bytes": 61439,
+    "hash": "9cc22896d5b6",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_ignivar_idle_1.mp3?v=9cc22896d5b6",
+        "bytes": 61439,
+        "sha256": "9cc22896d5b6e3779546f65d1f59fa69e3a7b417378137f727be9f656e05027d"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_ignivar_idle_2.mp3?v=8fe0d9d17e01",
+        "bytes": 91532,
+        "sha256": "8fe0d9d17e016532caf2e6a2f38eea2a246b2658b2ad1a503ddc0d7bf4ae1180"
+      }
+    ]
+  },
+  "mob_elemental_varkhul_aggro": {
+    "url": "/audio/sfx/mob_elemental_varkhul_aggro_1.mp3?v=59465693b82b",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.722701,
+    "playbackRate": 1,
+    "bytes": 88397,
+    "hash": "59465693b82b",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_varkhul_aggro_1.mp3?v=59465693b82b",
+        "bytes": 88397,
+        "sha256": "59465693b82b15facf31e8e03790ade6c1693aa6f22614a7e68b6bac5ae6a2d5"
+      }
+    ]
+  },
+  "mob_elemental_varkhul_attack": {
+    "url": "/audio/sfx/mob_elemental_varkhul_attack_1.mp3?v=303714db2dcc",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.290868,
+    "playbackRate": 1,
+    "bytes": 43257,
+    "hash": "303714db2dcc",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_1.mp3?v=303714db2dcc",
+        "bytes": 43257,
+        "sha256": "303714db2dcca162f13e4ed3299f19ec9d4350f5b5bc3b5eec8f446977835a29"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_2.mp3?v=b9c9b41177a1",
+        "bytes": 45138,
+        "sha256": "b9c9b41177a1052dac10af5fefad85462f48ee6b77a11b4746f1ff81604737c2"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_3.mp3?v=d4718db037f7",
+        "bytes": 42004,
+        "sha256": "d4718db037f791d11184cfed6ab56384c5eb589693d035e0ed982146ae9a3c61"
+      },
+      {
+        "id": "4",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_4.mp3?v=736dc8578664",
+        "bytes": 37615,
+        "sha256": "736dc857866428c369906daa88b2a618a855915b4248833c7f375257e6acf067"
+      },
+      {
+        "id": "5",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_5.mp3?v=6c4f7b345397",
+        "bytes": 48273,
+        "sha256": "6c4f7b3453972642ac13af16c67d080e1b17f7ecac58e27e95d4e1a509b87778"
+      },
+      {
+        "id": "6",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_6.mp3?v=26b5491ddc09",
+        "bytes": 40750,
+        "sha256": "26b5491ddc0979de32c5d9023ba10d9508649a546bdc14efc1d5719e25c80ab5"
+      },
+      {
+        "id": "7",
+        "url": "/audio/sfx/mob_elemental_varkhul_attack_7.mp3?v=871dadc004f2",
+        "bytes": 37615,
+        "sha256": "871dadc004f24163debbbd7e936baf91151f7e25a0894242d855de9beb886252"
+      }
+    ]
+  },
+  "mob_elemental_varkhul_death": {
+    "url": "/audio/sfx/mob_elemental_varkhul_death_1.mp3?v=71a2255aa1be",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.540973,
+    "playbackRate": 1,
+    "bytes": 85262,
+    "hash": "71a2255aa1be",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_varkhul_death_1.mp3?v=71a2255aa1be",
+        "bytes": 85262,
+        "sha256": "71a2255aa1be3c2c6260855fe20a4e456da13a61ee396f9f8a2d5336fcdc2dc4"
+      }
+    ]
+  },
+  "mob_elemental_varkhul_hurt": {
+    "url": "/audio/sfx/mob_elemental_varkhul_hurt_1.mp3?v=16d9188b6451",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.905461,
+    "playbackRate": 1,
+    "bytes": 37615,
+    "hash": "16d9188b6451",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_varkhul_hurt_1.mp3?v=16d9188b6451",
+        "bytes": 37615,
+        "sha256": "16d9188b6451e8700f339145e7cd36171958044799a14b1562674099194a1449"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_varkhul_hurt_2.mp3?v=9196bc3dff0d",
+        "bytes": 37615,
+        "sha256": "9196bc3dff0d2162cdb9b44f028f7bfbfc73e9ee728f802bc1f97a62024fb07a"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mob_elemental_varkhul_hurt_3.mp3?v=1290c23ca84c",
+        "bytes": 34480,
+        "sha256": "1290c23ca84c126ab247245ed6c7de473c77d61c3e60241639a641b679e0a8a9"
+      },
+      {
+        "id": "4",
+        "url": "/audio/sfx/mob_elemental_varkhul_hurt_4.mp3?v=54df0d020466",
+        "bytes": 40750,
+        "sha256": "54df0d0204664d39a8f200391e8749a8448f7d4301ac36c78eff7453472468f6"
+      }
+    ]
+  },
+  "mob_elemental_varkhul_idle": {
+    "url": "/audio/sfx/mob_elemental_varkhul_idle_1.mp3?v=499d40034536",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.041738,
+    "playbackRate": 1,
+    "bytes": 64617,
+    "hash": "499d40034536",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_elemental_varkhul_idle_1.mp3?v=499d40034536",
+        "bytes": 64617,
+        "sha256": "499d4003453657cb0d2cd52099be2805e2f3e4398737a2a2276f20ff6cd89c90"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_elemental_varkhul_idle_2.mp3?v=fa18d23fbd0d",
+        "bytes": 58304,
+        "sha256": "fa18d23fbd0dbea3a477211cafc1ee1f1225d21bef287d812687626028bdcbf6"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mob_elemental_varkhul_idle_3.mp3?v=ebd550571127",
+        "bytes": 52661,
+        "sha256": "ebd5505711272f745dc1cec04765e618900219be7d35f4df803545cb896d270b"
       }
     ]
   },

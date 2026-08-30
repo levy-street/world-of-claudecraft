@@ -22,7 +22,11 @@ function makeSim(cls: PlayerClass, level: number, spellPower: number) {
   // A large HP pool with a deep deficit so nothing overheals and caps the delta.
   p.maxHp = 100000;
   p.hp = 1;
+  // Heal riders read the derived healPower (spellPower + flat Healing Power);
+  // a direct spellPower poke bypasses recalcPlayerStats, so mirror the
+  // derivation by hand.
   p.spellPower = spellPower;
+  p.healPower = spellPower;
   return { sim, p, meta };
 }
 

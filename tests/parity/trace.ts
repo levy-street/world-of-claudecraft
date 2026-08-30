@@ -160,6 +160,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
   'prevFacing',
+  'dungeonEntrySeq', // transient online acknowledgement generation; never read by gameplay
   'netUpdatedAt', // online wire cadence
   'netInterval',
   'vx', // air velocity (locomotion interpolation)

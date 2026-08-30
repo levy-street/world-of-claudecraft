@@ -35,7 +35,9 @@ import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { ITEMS } from '../src/sim/data';
 import { mountItemId } from '../src/sim/mounts';
 import {
+  DEED_ART_PENDING,
   deedImageUrl,
+  ITEM_ART_PENDING,
   iconDataUrl,
   isUnknownIconRecipe,
   itemIconRecipe,
@@ -181,14 +183,19 @@ describe('title relics resolve the deed crest', () => {
     expect(art).toEqual({ kind: 'crest', crestId: 'deed_col_reliquary_rank_2' });
   });
 
-  it('routes every title on the shelf to a committed per-deed crest', () => {
+  it('routes every title on the shelf to its per-deed crest, category fallback only while pinned art-pending', () => {
+    // A shelf title without committed art must be an enumerated DEED_ART_PENDING
+    // member (the docs/design/deeds.md "art can trail the deed" contract), never
+    // an unreviewed fallback; those route to their category crest until the
+    // commissioned painting lands. Exactly the Crucible flawless title today.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pending, 'the title shelf must not use category fallback art').toEqual([]);
+    expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
+      'dgn_varkhul_flawless',
+    ]);
+    for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
-      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
-        kind: 'crest',
-        crestId: `deed_${id}`,
-      });
+      const crestId = pending.includes(id) ? `deed_cat_${DEEDS[id].category}` : `deed_${id}`;
+      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({ kind: 'crest', crestId });
     }
   });
 });
@@ -460,6 +467,13 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(skin !== null && reliquaryCellArtOpaque(skin)).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
       const painted = reliquaryCellArt({ kind: 'title', id });
+      // Art-pending shelf titles ride their category crest and are opaque
+      // (procedural radial); every painted title is bespoke and dark-card.
+      if (DEED_ART_PENDING.has(id)) {
+        expect(painted).toEqual({ kind: 'crest', crestId: `deed_cat_${DEEDS[id].category}` });
+        expect(painted !== null && reliquaryCellArtOpaque(painted), id).toBe(true);
+        continue;
+      }
       expect(painted).toEqual({ kind: 'crest', crestId: `deed_${id}` });
       expect(painted !== null && reliquaryCellArtOpaque(painted), id).toBe(false);
     }
@@ -483,7 +497,7 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(crests, 'anti-vacuity: the titles shelf really contributed crests').toBeGreaterThan(30);
   });
 
-  it('every catalogued item relic resolves to a COMMITTED dark-card pipeline', () => {
+  it('every catalogued item relic is dark-card committed art or an enumerated art-pending opaque', () => {
     // Nearly every item the catalog can show ships one of two committed
     // dark-card pipelines: a /ui/items webp (non-weapons, alpha-less but
     // dark-card) or a /ui/weapons rendered-model jpg (weapons via
@@ -502,6 +516,12 @@ describe('unknown ids fall through to the caller fallback', () => {
     // property: whichever pipeline an item lands in, reliquaryCellArtOpaque
     // agrees with it. An empty procedural list would have gone back to being a
     // weaker claim than the one now available.
+    //
+    // The release/v0.41.0 merge (2026-08-30) brought the same item arm upstream
+    // in a second shape: the iff is swept both ways, and every procedural
+    // relic must additionally be an ITEM_ART_PENDING member (the enumerated
+    // icon debt), so an unenumerated procedural relic still reds rather than
+    // landing silently on either filter. Both arms are kept below.
     const procedural: string[] = [];
     let itemsWebp = 0;
     let weaponsJpg = 0;
@@ -524,14 +544,26 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
       10,
     );
+    // Every procedural relic must be an enumerated ITEM_ART_PENDING member (the
+    // release's arm): an unenumerated one reds here by name.
+    for (const itemId of procedural) {
+      expect(
+        ITEM_ART_PENDING.has(itemId),
+        `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
+      ).toBe(true);
+    }
     // The parked set is EXACTLY the phase's own catalogued id, spelled out
     // rather than counted: a second parked relic arriving unnoticed is the
     // thing this list is here to surface, and it stays a one-line edit when
     // that art lands (the id leaves ITEM_ART_PENDING and leaves this list).
+    // The release's Crucible relics left this set when their wave painted
+    // (crucible-set-icons-2026-08-29), so its snug ceiling now reads the same
+    // one member; growth is a deliberate catalog decision that re-raises both.
     expect(
       procedural,
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
     ).toEqual(['clockreel_fishing_rod']);
+    expect(procedural.length).toBeLessThanOrEqual(1);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

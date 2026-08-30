@@ -262,6 +262,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
+  'src/ui/raid_boss_guide_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -326,6 +327,7 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/crucible_vendor_view.ts',
   'src/ui/hud/vendor/warfare_vendor_view.ts',
   'src/ui/hud/vendor/train_view.ts',
   'src/ui/hud/vendor/train_learn_core.ts',
@@ -448,6 +450,7 @@ const UI_PURE_CORES = [
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/dungeon_map_view.ts',
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
@@ -484,6 +487,7 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_cell_art.ts',
   'src/ui/reliquary_view.ts',
   'src/ui/reliquary_sheet_view.ts',
+  'src/ui/character_progression_view.ts',
   'src/ui/reliquary_tracker_view.ts',
   'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
@@ -582,6 +586,13 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/arena_wall_occlusion_core.ts',
+  'src/render/wall_backface_cull_core.ts',
+  'src/render/dungeon_banner_core.ts',
+  'src/render/dungeon_tile_kind_core.ts',
+  'src/render/ignivar_dressing_plan_core.ts',
+  'src/render/roof_darkness_core.ts',
+  'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',
   'src/render/entity_gate_stand_in_core.ts',
   'src/render/entity_view_policy_core.ts',
@@ -593,6 +604,8 @@ const RENDER_PURE_CORES = [
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
+  'src/render/characters/anim_state_entity_core.ts',
+  'src/render/characters/death_grounding_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
@@ -672,6 +685,9 @@ const RENDER_PURE_CORES = [
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',
   'src/render/ground_aim_reticle_core.ts',
+  'src/render/ignivar_encounter_core.ts',
+  'src/render/varkhul_encounter_core.ts',
+  'src/render/ignivar_judgment_fire_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/drain_channel_visual_core.ts',
@@ -689,6 +705,7 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
@@ -2334,6 +2351,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/questlog_window.ts',
   'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
+  'src/ui/hud/vendor/crucible_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
@@ -2397,6 +2415,8 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/hud/professions/professions_window.ts',
+  'src/ui/raid_boss_guide_window.ts',
+  'src/ui/raid_boss_guide_model_controller.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches
   // localStorage (through the safe_local_storage seam, the one sanctioned door)
   // and the clock, which is precisely why it is not in the pure record core it

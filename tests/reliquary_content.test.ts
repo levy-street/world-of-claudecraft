@@ -17,6 +17,7 @@ import {
   RETIRED_HEROIC_ITEMS,
 } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
 import {
   SET_WARFARE_ASHSTALKER,
   SET_WARFARE_CINDERWEAVE,
@@ -127,6 +128,14 @@ function isHeroicVariantId(itemId: string): boolean {
   return itemId.startsWith('heroic_');
 }
 
+/** Redemption tokens (kind 'tool') are per-slot currency a quartermaster
+ *  consumes (the Crucible sigils, the heroic_mark pattern), not unique spoils,
+ *  so the museum never catalogs them. Same carve-out the delve derivation
+ *  already applies to rare+ tools on the Marks counters (delveRarePlusIds). */
+function isRedemptionTokenId(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'tool';
+}
+
 // Classifies EVERY live quality (`satisfies` pins the union): a new ItemDef
 // quality tier fails tsc here until the curator sorts it museum-in or out.
 const RARE_PLUS_BY_QUALITY = {
@@ -203,6 +212,15 @@ function isReliquaryCarvedOut(itemId: string): boolean {
   return ITEMS[itemId]?.kind === 'recipe';
 }
 
+// Crafting materials fall out by kind too: 'junk' is the material
+// convention (crucible_professions.ts), and a reagent like the Core of the
+// Last Flame is banked and consumed, not a conquerable relic (the
+// professions doctrine: the crafted OUTPUTS are the uniques). The liveness
+// arm in the raid-page describe proves this filter excludes a real epic row.
+function isMaterialId(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'junk';
+}
+
 function dungeonRarePlusLootIds(
   dungeonId: string,
   opts?: { includeCarvedOut?: boolean },
@@ -210,10 +228,17 @@ function dungeonRarePlusLootIds(
   // The includeCarvedOut arm exists ONLY for the vacuity guard below, which
   // diffs this ONE walk against itself instead of second-modeling it (the
   // recorded second-model-of-a-walk trap): a future third loot source added
-  // here is automatically covered by the guard with no twin to update.
+  // here is automatically covered by the guard with no twin to update. The
+  // flag lifts the recipe carve-out alone: redemption tokens (the Crucible
+  // sigils are epic 'tool' rows on both raid bosses' tables) and materials
+  // fall out by kind on both arms, and the liveness pins in the raid-page
+  // describe prove each of those two filters really excludes something.
   const include = opts?.includeCarvedOut === true;
   const admits = (itemId: string): boolean =>
-    isRarePlus(itemId) && (include || !isReliquaryCarvedOut(itemId));
+    isRarePlus(itemId) &&
+    !isRedemptionTokenId(itemId) &&
+    !isMaterialId(itemId) &&
+    (include || !isReliquaryCarvedOut(itemId));
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
     for (const entry of MOBS[mobId]?.loot ?? []) {
@@ -337,11 +362,13 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(27);
+    // 27 + the four Crucible raid pages (per-boss N+H, the obligations
+    // closeout of docs/prd/ignivar-raid-loot.md).
+    expect(CONQUEROR_PAGES.length).toBe(31);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(35);
+    expect(RELIQUARY_PAGES.length).toBe(39);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -400,8 +427,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // two live bag drops (wayfarers_backpack on Spoils,
     // necromancers_reagent_satchel on Gravewyrm Sanctum), the
     // derivation-equality pins' own demand: 348 on the merged tree
-    // (346 + 2; the release's own chain read 342 = 340 + 2).
-    expect(full).toEqual({ owned: 348, total: 348 });
+    // (346 + 2; the release's own chain read 342 = 340 + 2). The four
+    // Crucible raid pages (the 2026-08-30 sync merge) add the release's 43
+    // distinct new item ids (its own chain read 385 = 342 + 43): 391.
+    expect(full).toEqual({ owned: 391, total: 391 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -410,12 +439,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     });
     // Literal: update when catalog content lands (same deltas as the overview
     // pair above, including the three release-merged daggers, both craft
-    // masterwork marks, the two Grandmaster title-shelf slots, and the two
-    // bank-storage bag drops; marks are character-scoped, so this trails the
-    // overview by the 29 account-scoped weapon skins). The phase 11i apex rod
-    // is an ITEM, so it moves this pair by the same one as the overview:
-    // 319 on the merged tree (317 + 2).
-    expect(character).toEqual({ owned: 319, total: 319 });
+    // masterwork marks, the two Grandmaster title-shelf slots, the two
+    // bank-storage bag drops, and the 43 Crucible raid relics; marks are
+    // character-scoped, so this trails the overview by the 29 account-scoped
+    // weapon skins). The phase 11i apex rod is an ITEM, so it moves this pair
+    // by the same one as the overview: 319 on the merged tree before the raid
+    // pages (317 + 2), 362 with them.
+    expect(character).toEqual({ owned: 362, total: 362 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -443,11 +473,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     // overview total above by 35.
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
-    // moved instead of only that the sum did.
+    // moved instead of only that the sum did. The four Crucible raid pages
+    // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
+    // and the raid's flawless title joins the titles page, plus the two
+    // Varkhul legendaries at the launch wiring: 419; then 418 when the
+    // maintainer pulled Forgebreaker to route it through crafting.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(383);
+    ).toBe(426);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, and the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription).
@@ -662,10 +696,13 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
     // ids, plus the three daggers the v0.36.0 release merge added (240), plus
     // the Masterwrought phase 11i apex fishing rod (241), plus the two
-    // bank-storage bag drops the release/v0.41.0 merge paged: 243 (the sixth
-    // figure of the ledger row's "all pinned" claim; the other five are the
-    // page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(243);
+    // bank-storage bag drops the release/v0.41.0 merge paged (243), plus the
+    // Crucible raid relics incl. the Varkhul shield the 2026-08-30 sync merge
+    // paged (Forgebreaker left the pages with its loot row, pending its
+    // crafting chain; the release's own chain read 284 = 242 + 42): 285, the
+    // sixth figure of the ledger row's "all pinned" claim; the other five are
+    // the page/overview/character/slot/mark literals nearby.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(285);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -786,10 +823,12 @@ describe('Reliquary clear sources map to live content', () => {
 
   it('covers every live five-man / raid final boss dungeon with N+H pages', () => {
     // Hand copy of the module-private FINAL_BOSS_DUNGEONS list in
-    // src/sim/deeds.ts (documented there as PINNED as of v1: it never grows).
-    // Not derived: a new rare+ dungeon is caught by the growth sweep below,
-    // not by this list.
+    // src/sim/deeds.ts (grown deliberately with new content, the wildheart
+    // and Crucible raid entries). Not derived: a new rare+ dungeon is caught
+    // by the growth sweep below, not by this list.
     const required = [
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
       'hollow_crypt',
       'sunken_bastion',
       'drowned_temple',
@@ -839,9 +878,13 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
+    ignivar_herald_of_the_last_flame: 'conquerors_ignivar_heroic',
+    varkhul_forgefather_of_the_last_flame: 'conquerors_varkhul_heroic',
   };
 
-  /** The live ids a heroic page is expected to catalog, all carve-outs applied.
+  /** The live ids a heroic page is expected to catalog, all carve-outs applied
+   *  (mount reins, auto-generated heroic variants, redemption tokens, and the
+   *  kind 'recipe' patterns).
    *
    *  THE CONDITION THIS JSDOC USED TO DEFER ON HAS ARRIVED. It said the raid
    *  carve-out was "deliberately NOT threaded here" because patterns rode the
@@ -868,6 +911,7 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     for (const e of entries) {
       if (typeof e.itemId !== 'string') continue;
       if (isMountReinsId(e.itemId) || isHeroicVariantId(e.itemId)) continue;
+      if (isRedemptionTokenId(e.itemId)) continue;
       if (!include && isReliquaryCarvedOut(e.itemId)) continue;
       liveIds.push(e.itemId);
     }
@@ -903,14 +947,36 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     .filter((bossId) => catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).length > 0)
     .sort();
 
-  it('carves out only auto-generated heroic variants, never a bespoke heroic unique', () => {
-    // Positive control: the carve-out predicate really fires on the live variant id.
+  /** The SOURCE_PENDING_RULING pattern for whole bosses: a visible maintainer
+   *  decision that a boss's heroic page is deliberately deferred, never an
+   *  accident. Both pins below stay bidirectional: a pended boss must still be
+   *  a live GEAR_BOSSES member (the row cannot rot after a retune) and must
+   *  have NO page yet (authoring the page forces the row out of this ledger).
+   *  Empty since the Crucible raid pages landed (the PRD obligations closeout);
+   *  the mechanism stays for the next deferred boss. */
+  const HEROIC_PAGE_PENDING: Record<string, string> = {};
+
+  it('carves out variants, reins, and tokens, never a bespoke heroic unique', () => {
+    // Positive controls: each carve-out predicate really fires on a live id.
     expect(isHeroicVariantId('heroic_duskwhisper')).toBe(true);
-    // Negative control: a bespoke heroic unique the catalog DOES list stays catalogue-able.
+    expect(isRedemptionTokenId('sigil_anvil_chest')).toBe(true);
+    // Negative controls: bespoke heroic uniques the catalog DOES list stay
+    // catalogue-able under both predicates.
     expect(isHeroicVariantId('morthens_cryptforged_hauberk')).toBe(false);
-    // The catalog itself has never listed a variant id, on any page.
+    expect(isRedemptionTokenId('forgefathers_warhammer')).toBe(false);
+    // The token carve-out is live in the heroic derivation: both raid bosses
+    // carry sigil tokens their heroic pages must not list.
+    expect(
+      HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame.some(
+        (e) => typeof e.itemId === 'string' && isRedemptionTokenId(e.itemId),
+      ),
+    ).toBe(true);
+    // The catalog itself has never listed a variant or token id, on any page.
     for (const page of CONQUEROR_PAGES) {
-      for (const id of itemRelicIds(page)) expect(isHeroicVariantId(id)).toBe(false);
+      for (const id of itemRelicIds(page)) {
+        expect(isHeroicVariantId(id), id).toBe(false);
+        expect(isRedemptionTokenId(id), id).toBe(false);
+      }
     }
     // Anti-vacuity: something is actually excluded, and every id of every excluded boss is
     // a carve-out, so GEAR_BOSSES cannot silently shed a boss that still owes the catalog.
@@ -920,7 +986,9 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
         expect(
           typeof entry.itemId === 'string' &&
-            (isMountReinsId(entry.itemId) || isHeroicVariantId(entry.itemId)),
+            (isMountReinsId(entry.itemId) ||
+              isHeroicVariantId(entry.itemId) ||
+              isRedemptionTokenId(entry.itemId)),
           `${bossId} drops ${String(entry.itemId)}, which is not a carve-out`,
         ).toBe(true);
       }
@@ -928,11 +996,16 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   });
 
   it('RELIQUARY_HEROIC_GEAR lists every catalogue-able HEROIC_BOSS_LOOT id', () => {
+    // The pending ledger only defers live gear bosses; a stale row reds here.
+    for (const bossId of Object.keys(HEROIC_PAGE_PENDING)) {
+      expect(GEAR_BOSSES, `${bossId} pended but not a live gear boss`).toContain(bossId);
+    }
+    const AUTHORED_BOSSES = GEAR_BOSSES.filter((b) => HEROIC_PAGE_PENDING[b] === undefined);
     // Bidirectional first: the loop below walks live bosses, so a stale
     // RELIQUARY_HEROIC_GEAR key for a removed boss would sit unnoticed as
     // dead data without this pin.
-    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(GEAR_BOSSES);
-    for (const bossId of GEAR_BOSSES) {
+    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(AUTHORED_BOSSES);
+    for (const bossId of AUTHORED_BOSSES) {
       const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
@@ -957,6 +1030,12 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   it('every HEROIC_BOSS_LOOT boss with catalogue-able gear has a mapped heroic page', () => {
     expect(GEAR_BOSSES.length).toBeGreaterThan(0);
     for (const bossId of GEAR_BOSSES) {
+      if (HEROIC_PAGE_PENDING[bossId] !== undefined) {
+        // The other bidirectional arm: a pended boss that gains its page must
+        // leave the ledger in the same change.
+        expect(HEROIC_PAGE_BY_BOSS[bossId], `${bossId} paged AND pended`).toBeUndefined();
+        continue;
+      }
       expect(HEROIC_PAGE_BY_BOSS[bossId], `page map for ${bossId}`).toBeDefined();
     }
   });
@@ -1607,6 +1686,11 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 32 },
   wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
   nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
+  // The Crucible raid rooms (per-boss pages). The derivation excludes the
+  // sigil redemption tokens by kind; the token-liveness arm below proves the
+  // filter excludes something real.
+  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 16 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -1654,6 +1738,56 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // The predicate itself stays kind-keyed: a real relic never carves.
     expect(isReliquaryCarvedOut('duskforged_warblade')).toBe(false);
     expect(isReliquaryCarvedOut('pattern_duskforged_warblade')).toBe(true);
+  });
+
+  it('the redemption-token filter really excludes live rare+ tool rows', () => {
+    // Liveness for the isRedemptionTokenId arm of dungeonRarePlusLootIds:
+    // both Crucible bosses carry epic sigil tokens on their NORMAL tables, so
+    // without the filter the equality pins above would force currency onto
+    // the museum grid. Positive premise (the raw walk really sees rare+
+    // tools) plus the filtered result staying token-free.
+    const rawRarePlusTools = dungeonMobIds('ignivar_raid_arena')
+      .flatMap((mobId) => (MOBS[mobId]?.loot ?? []).map((e) => e.itemId))
+      .filter((id): id is string => typeof id === 'string')
+      .filter((id) => isRarePlus(id) && isRedemptionTokenId(id));
+    expect(rawRarePlusTools.length).toBeGreaterThanOrEqual(6);
+    for (const dungeonId of ['ignivar_raid_arena', 'ignivar_inner_crucible']) {
+      for (const id of dungeonRarePlusLootIds(dungeonId)) {
+        expect(isRedemptionTokenId(id), `${dungeonId} derived ${id}`).toBe(false);
+      }
+    }
+    // The material carve-out is live, not vacuous: the staged core reagent
+    // is an EPIC junk-kind row on both bosses and must fall out here.
+    expect(ITEMS.lastflame_core?.quality).toBe('epic');
+    const raidFinaleBosses: Record<string, string> = {
+      ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
+      ignivar_inner_crucible: 'varkhul_forgefather_of_the_last_flame',
+    };
+    for (const [dungeonId, bossId] of Object.entries(raidFinaleBosses)) {
+      const raw = (MOBS[bossId]?.loot ?? []).map((e) => e.itemId);
+      expect(raw, `${dungeonId} raw table carries the core`).toContain('lastflame_core');
+      expect(dungeonRarePlusLootIds(dungeonId)).not.toContain('lastflame_core');
+    }
+  });
+
+  it('the Varkhul legendaries: the shield drops and pages, Forgebreaker is craft-pending', () => {
+    // The 2026-08-30 landed state: Emberward drops from Varkhul's normal
+    // table (3 percent, the kingsbane precedent) and sits on the
+    // conquerors_varkhul page. Forgebreaker is deliberately OFF the table
+    // and OFF the pages: the maintainer is routing it through the crafting
+    // professions, and a relic page row requires a conquerable source. This
+    // pin holds drop and page membership as one unit in BOTH directions:
+    // re-wiring the drop without re-paging (or vice versa) reds here, and
+    // so does the recipe chain landing without flipping this pin.
+    expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
+    expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_emberward')).toBe(
+      true,
+    );
+    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_forgebreaker')).toBe(
+      false,
+    );
   });
 
   it('the mob walk really reaches boss-summoned adds', () => {
@@ -1717,6 +1851,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
       conquerors_hollow_crypt_heroic: ['morthen'],
       conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
+      conquerors_ignivar: ['ignivar_herald_of_the_last_flame'],
+      conquerors_ignivar_heroic: ['ignivar_herald_of_the_last_flame'],
+      conquerors_varkhul: ['varkhul_forgefather_of_the_last_flame'],
+      conquerors_varkhul_heroic: ['varkhul_forgefather_of_the_last_flame'],
     };
     for (const [pageId, mobIds] of Object.entries(DESC_BOSSES)) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
@@ -1773,8 +1911,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
 
 describe('Reliquary growth sweeps (new content must page or opt out)', () => {
   it('every dungeon whose mobs carry rare+ loot maps to a normal-difficulty page', () => {
-    // No exclusions today: add a `dungeonId: 'rationale'` row here only when a
-    // dungeon's rare+ drops deliberately stay out of the museum.
+    // Add a `dungeonId: 'rationale'` row here only when a dungeon's rare+
+    // drops deliberately stay out of the museum. Empty since the Crucible
+    // raid pages landed (the PRD obligations closeout); the mechanism stays
+    // for the next deliberate opt-out.
     const EXCLUDED_DUNGEONS: Record<string, string> = {};
     const pageByDungeon = new Map<string, string>();
     for (const page of RELIQUARY_PAGES) {
@@ -2746,6 +2886,12 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_wildheart_basin_heroic: 1,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
+  // The Crucible raid pages: each room's one boss drops every relic, so all
+  // four ride a page default, the conquerors_nythraxis shape.
+  conquerors_ignivar: 1,
+  conquerors_ignivar_heroic: 1,
+  conquerors_varkhul: 1,
+  conquerors_varkhul_heroic: 1,
   conquerors_thunzharr: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
@@ -2770,8 +2916,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
-  // Jewelcrafting and Inscription titles + the farming Harvestmaster.
-  horizons_titles: 43,
+  // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
+  // Crucible raid's flawless title.
+  horizons_titles: 44,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -4232,9 +4379,10 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All ten defaults are live today (nine boss pages plus the storefront on
-    // the skins page); update deliberately with the authoring.
-    expect(defaults).toBe(10);
+    // All fourteen defaults are live today (nine boss pages, the storefront
+    // on the skins page, and the four Crucible raid pages); update
+    // deliberately with the authoring.
+    expect(defaults).toBe(14);
   });
 });
 

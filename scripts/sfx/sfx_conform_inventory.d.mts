@@ -1,6 +1,9 @@
 export interface SfxConformCatalogEntry {
   key: string;
   stereo?: boolean;
+  /** Hand-recorded, already-mastered content: conform guards its true peak but
+   *  never re-targets its loudness. */
+  custom?: boolean;
 }
 
 export interface DiscoveredSfxConformEntry {
@@ -12,6 +15,7 @@ export interface SfxConformPolicy {
   violations: string[];
   recognizes(filename: string): boolean;
   expectedChannels(filename: string): number | undefined;
+  isCustomMaster(filename: string): boolean;
 }
 
 export function buildSfxConformPolicy(

@@ -3201,6 +3201,147 @@
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
     display: none;
   }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-boss-guide-button {
+    display: none;
+  }
+  body.mobile-touch .party-boss-guide-button {
+    width: min(344px, calc(100dvw - 30px));
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #raid-boss-guide-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
+    width: auto;
+    max-width: 620px;
+    max-height: calc(
+      var(--app-vh, 100dvh) /
+      var(--window-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
+    );
+    margin-inline: auto;
+    transform: none;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: calc(
+      var(--app-vh, 100dvh) /
+      var(--window-scale, 1) -
+      82px -
+      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
+    );
+    min-height: 0;
+    max-height: calc(
+      var(--app-vh, 100dvh) /
+      var(--window-scale, 1) -
+      82px -
+      (max(10px, env(safe-area-inset-top)) / var(--window-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1))
+    );
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 7px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-rbg-divider);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-tab {
+    grid-template-columns: 38px minmax(0, 1fr);
+    min-height: 48px;
+    font-size: 9px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-tab img {
+    width: 38px;
+    height: 38px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-journal {
+    padding: 10px 10px 16px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-hero {
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 11px;
+    min-height: 146px;
+    padding: 6px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-model-slot,
+  body.mobile-touch #raid-boss-guide-window .rbg-model-viewer {
+    min-height: 146px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-model-stage {
+    min-height: 118px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-model-load {
+    min-width: 106px;
+    min-height: 40px;
+    bottom: 8px;
+    font-size: 10px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-model-hint {
+    min-height: 28px;
+    font-size: 8px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-overview {
+    padding: 4px 4px 4px 0;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-overview h2 {
+    margin-bottom: 7px;
+    font-size: 15px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-overview p {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-difficulty {
+    justify-content: space-between;
+    margin: 9px 0 11px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-segmented button {
+    min-width: 66px;
+    min-height: 40px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-phase {
+    margin-top: 11px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-phase header p {
+    font-size: 10px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-toggle {
+    min-height: 54px;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 6px;
+    padding-right: 5px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-toggle > img {
+    width: 42px;
+    height: 42px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-name {
+    font-size: 10px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-badges {
+    gap: 3px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-badge {
+    width: 20px;
+    height: 20px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-badge .ui-icon {
+    width: 11px;
+    height: 11px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-detail {
+    margin-left: 51px;
+    padding: 7px 8px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
+    font-size: 10px;
+  }
   body.mobile-touch #buff-bar {
     right: max(10px, env(safe-area-inset-right));
     top: max(140px, env(safe-area-inset-top));

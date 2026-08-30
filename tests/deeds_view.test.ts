@@ -877,10 +877,14 @@ describe('real catalog integration', () => {
     // soc_four_bags_deep), both visible non-feat SOCIAL deeds, so they join
     // both counts; 293 - 4 - 9 = 280, and the bucket sum adds the 4 feat
     // rows back = 284, recomputed against the merged catalog.
-    expect(view.summary.visibleTotal).toBe(280);
+    // 285 since the release/v0.41.0 merge (2026-08-30) brought in the five
+    // Crucible raid deeds, all visible non-feat DUNGEON deeds (the release's
+    // own identity read 281 - 4 - 9 = 268 and 272), so they join both counts;
+    // 298 - 4 - 9 = 285, and the bucket sum adds the 4 feat rows back = 289.
+    expect(view.summary.visibleTotal).toBe(285);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(284);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(289);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

@@ -42,7 +42,13 @@ import {
   zh_TW,
 } from '../src/ui/i18n';
 import { localizeServerText, DICT as serverDICT, tServer } from '../src/ui/server_i18n';
-import { localizeSimAuraName, localizeSimText, DICT as simDICT } from '../src/ui/sim_i18n';
+import {
+  localizeAuthoredYellSpeakerName,
+  localizeAuthoredYellText,
+  localizeSimAuraName,
+  localizeSimText,
+  DICT as simDICT,
+} from '../src/ui/sim_i18n';
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
@@ -611,6 +617,35 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('localizes authored encounter yells but preserves player-authored yells', () => {
+    setLanguage('es_ES');
+    const authored = 'Ignivar Ashcaller awakens. Let the world burn!';
+    expect(localizeAuthoredYellText(authored, 'mob')).toBe(
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, 'npc')).toBe(
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, 'player')).toBe(authored);
+    expect(localizeAuthoredYellText(authored, undefined)).toBe(
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, undefined, 'mage')).toBe(authored);
+    expect(localizeAuthoredYellText('Player message', 'mob')).toBe('Player message');
+    expect(
+      localizeAuthoredYellSpeakerName(
+        'Ignivar, Herald of the Last Flame',
+        'mob',
+        'ignivar_herald_of_the_last_flame',
+      ),
+    ).not.toBe('Ignivar, Herald of the Last Flame');
+    expect(
+      localizeAuthoredYellSpeakerName('Ignivar, Herald of the Last Flame', undefined, undefined),
+    ).not.toBe('Ignivar, Herald of the Last Flame');
+    expect(localizeAuthoredYellSpeakerName('Player', undefined, undefined, 'mage')).toBe('Player');
+    setLanguage('en');
+  });
+
   it('matches every tide-pool summon emit (crab_summon + the Mister Crabs yell)', () => {
     // The four emits added with the island miniboss: the three REASON_MESSAGE
     // toasts (src/sim/interactions/crab_summon.ts) and the summon yell
@@ -640,6 +675,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
     expect(localizeSimAuraName('Tamed')).not.toBe('Tamed');
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
+    setLanguage('en');
+  });
+
+  it('localizes Varkhul Forge Convergence in the visible cast bar', () => {
+    setLanguage('es');
+    expect(localizeSimAuraName('Forge Convergence')).toBe('Convergencia de la Forja');
     setLanguage('en');
   });
 

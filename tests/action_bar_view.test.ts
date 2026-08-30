@@ -6,10 +6,18 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
+import { RAID_BOSS_PLAYER_MELEE_RANGE } from '../src/sim/combat/player_attack_reach';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { ABILITIES } from '../src/sim/data';
-import { type AbilityDef, type AuraKind, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+import {
+  type AbilityDef,
+  type AuraKind,
+  IGNIVAR_BOSS_ID,
+  type ItemDef,
+  MELEE_RANGE,
+} from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
@@ -97,6 +105,7 @@ interface WorldOpts {
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
+  targetTemplateId?: string;
   targetMaxHp?: number;
   targetAuras?: ActionBarAuraInput[];
   entities?: Iterable<{
@@ -148,6 +157,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
         ? null
         : {
             dead: opts.targetDead ?? false,
+            kind: 'mob',
+            templateId: opts.targetTemplateId ?? 'training_dummy',
             pos: targetPos,
             maxHp: opts.targetMaxHp,
             auras: opts.targetAuras ?? [],
@@ -803,6 +814,32 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
       .outOfRange;
     expect(far).toBe(true);
     expect(near).toBe(false);
+  });
+
+  it('keeps melee actions in range across the enlarged raid-boss footprint', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(0, { attack: true }),
+        slot(1, { ability: ability('mortal_strike', { requiresTarget: true, range: 0 }) }),
+      ),
+      fakeDeps(),
+    );
+    expect(RAID_BOSS_PLAYER_MELEE_RANGE).toBe(8);
+    const targetPos = { x: 8, y: 0, z: 0 };
+
+    const ignivar = view.tick(world({ targetPos, targetTemplateId: IGNIVAR_BOSS_ID }));
+    expect(ignivar.slots.map((slotState) => slotState.outOfRange)).toEqual([false, false]);
+
+    const varkhul = view.tick(world({ targetPos, targetTemplateId: VARKHUL_BOSS_ID }));
+    expect(varkhul.slots.map((slotState) => slotState.outOfRange)).toEqual([false, false]);
+
+    const ordinaryMob = view.tick(world({ targetPos, targetTemplateId: 'training_dummy' }));
+    expect(ordinaryMob.slots.map((slotState) => slotState.outOfRange)).toEqual([true, true]);
+
+    const justOutside = view.tick({
+      ...world({ targetPos: { x: 8.01, y: 0, z: 0 }, targetTemplateId: IGNIVAR_BOSS_ID }),
+    });
+    expect(justOutside.slots.map((slotState) => slotState.outOfRange)).toEqual([true, true]);
   });
 
   it('a dead target yields no distance, so a ranged ability never reads out of range', () => {

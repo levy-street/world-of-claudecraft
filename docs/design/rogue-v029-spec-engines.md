@@ -108,7 +108,8 @@ that bank Gloam. No row grants a second engine (class-design stacking rule).
 ## Balance target (the rogue buff): MEASURED 2026-07-23
 
 With the engines, feel pass, two-beat pass, and combo-chain pass landed and
-`/dev bis` gear, the 123 sec eight-seed probes (`scripts/rogue_dps_probe.ts`)
+the epic reference kit (`equipReferenceEpicKitForDev`, then also what
+`/dev bis` equipped), the 123 sec eight-seed probes (`scripts/rogue_dps_probe.ts`)
 land at Knifework 210.6 (Venom Dividend + Second Shadow), Thuggery 213.5
 (Ceaseless Cuts + Second Shadow), and Skulduggery 222.8 (Dusk Economy +
 Grave Brand) sustained DPS (measured on the merged integration branch:

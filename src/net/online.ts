@@ -17,7 +17,6 @@ import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
-  computeTalentModifiers,
   emptyAllocation,
   type Role,
   repairAllocation,
@@ -33,6 +32,7 @@ import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
+  dungeonAt,
   getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
@@ -62,6 +62,7 @@ import {
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -96,7 +97,13 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveVarkhulAnvilMeteorWarning,
+  type ActiveVarkhulAssembly,
+  type ActiveVarkhulCinderFire,
+  type ActiveVarkhulCinderOrbProjectile,
+  type ActiveVarkhulForgestormWarning,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -117,6 +124,7 @@ import {
   type DelveRunInfo,
   type DelveShopOfferView,
   type DevLeaderboardPage,
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
   type FarmPatchDef,
   type FarmPlantKnobs,
@@ -187,6 +195,14 @@ import {
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
+import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
+import {
+  decodeConsecrations,
+  decodeFrostRings,
+  decodeIgnivarMeteors,
+  decodeTemporalHourglasses,
+  decodeVarkhulForgestormWarnings,
+} from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import {
@@ -207,6 +223,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
+import {
+  decodeVarkhulCinderFires,
+  decodeVarkhulCinderOrbProjectiles,
+} from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
@@ -214,7 +235,7 @@ import { vaultWithdrawPayload } from './vault_snapshot_wire';
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
 
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral';
+type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
 
 interface PendingTransientInput {
   jump: boolean;
@@ -319,6 +340,7 @@ export function buildWebSocketAuthMessage(
   token: string;
   character: number;
   clientSeed: string;
+  dungeonEntryFacingWire: typeof DUNGEON_ENTRY_FACING_WIRE_VERSION;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
   petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
 } {
@@ -327,6 +349,7 @@ export function buildWebSocketAuthMessage(
     token,
     character: characterId,
     clientSeed,
+    dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
     timerWire: STABLE_TIMER_WIRE_VERSION,
     petSpecialWire: PET_SPECIAL_WIRE_VERSION,
   };
@@ -1339,6 +1362,7 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    healPower: 0,
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
@@ -1955,6 +1979,12 @@ export class ClientWorld implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
+  activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
+  activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
+  activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
+  activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[] = [];
+  activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -1999,14 +2029,14 @@ export class ClientWorld implements IWorld {
   private lastInputSig = '';
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
-  // No initializer on purpose: bare ClientWorld test fixtures skip field
-  // initializers, and the lazy accessor below keeps that construction idiom
-  // equivalent to a real instance.
+  // Lazy because bare ClientWorld fixtures skip field initializers.
   private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  private dungeonEntrySeq: number | null = null;
+  private pendingDungeonEntryFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
@@ -2280,9 +2310,11 @@ export class ClientWorld implements IWorld {
     return facing;
   }
 
-  // -----------------------------------------------------------------------
-  // Socket
-  // -----------------------------------------------------------------------
+  consumeDungeonEntryFacing(): number | null {
+    const facing = this.pendingDungeonEntryFacing ?? null;
+    this.pendingDungeonEntryFacing = null;
+    return facing;
+  }
 
   private inputSignature(): string {
     const mi = this.moveInput;
@@ -2327,19 +2359,20 @@ export class ClientWorld implements IWorld {
   }
 
   private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
+    // The forced-facing arm reaches here from applyWire, which snapshot-driven
+    // harnesses (and the reconnect teardown window) run with no socket at all,
+    // so the socket existence check must come before its readyState.
     if (
       typeof this.spectating === 'string' ||
       !this.connected ||
+      !this.ws ||
       this.ws.readyState !== WebSocket.OPEN
     ) {
       return false;
     }
-    // Shed ordinary input while the browser-owned queue is backed up. Preserve
-    // the three engagement edges that are not idempotent-latest: jump can be
-    // pressed and released inside one shed interval, and keyboard-turn flags
-    // are intentionally present for only their engagement frame. Pause
-    // neutralization is the sole bounded force path and admits one frame.
-    if (mode !== 'forced-neutral' && isInputSendBackpressured(this.ws.bufferedAmount)) {
+    // Shed ordinary input under backpressure, retaining one-shot jump and turn
+    // edges. The two bounded forced modes each admit one required frame.
+    if (!mode.startsWith('forced-') && isInputSendBackpressured(this.ws.bufferedAmount)) {
       this.retainTransientInput();
       this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
       return false;
@@ -2378,19 +2411,14 @@ export class ClientWorld implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // The camera steer rides along only when it actually GRADES something.
-    // Absent means full rate on the far side (swimSteerRate), which is both the
-    // old behaviour and what every land frame wants — so walking around sends
-    // exactly the bytes it always did, and the field appears only while a
-    // swimmer is easing the view into a dive or a climb.
+    // Swim camera steer is sparse: absent means full rate and preserves the
+    // legacy land-frame wire shape.
     if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
       (msg.mi as Record<string, number>).ss = mi.swimSteer;
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
+    if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));
-    // WebSocket.send accepted the real frame. Pending edges are transport-local
-    // and are consumed exactly once, including when the forced-neutral mode
-    // intentionally cancels them rather than replaying them into the pause.
     this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
@@ -2510,8 +2538,7 @@ export class ClientWorld implements IWorld {
       }
       if (this.reconnectAttempts > 0) {
         // fresh transport after an auto-reconnect: the server restarts input
-        // acking at 0 and resends the world from an empty interest set, and
-        // any stale mirrored entities fall out via the snapshot prune
+        // acking at 0 and resends the world from an empty interest set.
         this.reconnectAttempts = 0;
         this.conflictRejections = 0;
         this.timeoutRejections = 0;
@@ -2522,6 +2549,8 @@ export class ClientWorld implements IWorld {
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
+        this.dungeonEntrySeq = null;
+        this.pendingDungeonEntryFacing = null;
         this.missingSince.clear();
         this.lastSnapAt = 0;
         // any in-flight target echo died with the old transport; the resent
@@ -2889,91 +2918,17 @@ export class ClientWorld implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = Array.isArray(snap.rings)
-      ? snap.rings.flatMap((value: unknown): ActiveFrostRing[] => {
-          if (!value || typeof value !== 'object') return [];
-          const ring = value as Record<string, unknown>;
-          if (
-            typeof ring.id !== 'string' ||
-            ![ring.x, ring.z, ring.r, ring.i, ring.dur, ring.rem].every(
-              (value) => typeof value === 'number' && Number.isFinite(value),
-            ) ||
-            (ring.r as number) <= 0 ||
-            (ring.i as number) < 0 ||
-            (ring.i as number) >= (ring.r as number) ||
-            (ring.dur as number) <= 0 ||
-            (ring.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: ring.id,
-              x: ring.x as number,
-              z: ring.z as number,
-              radius: ring.r as number,
-              innerRadius: ring.i as number,
-              duration: ring.dur as number,
-              remaining: Math.min(ring.rem as number, ring.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
-      ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
-          if (!value || typeof value !== 'object') return [];
-          const hourglass = value as Record<string, unknown>;
-          if (
-            typeof hourglass.id !== 'string' ||
-            ![hourglass.x, hourglass.z, hourglass.r, hourglass.dur, hourglass.rem].every(
-              (entry) => typeof entry === 'number' && Number.isFinite(entry),
-            ) ||
-            (hourglass.r as number) <= 0 ||
-            (hourglass.dur as number) <= 0 ||
-            (hourglass.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: hourglass.id,
-              x: hourglass.x as number,
-              z: hourglass.z as number,
-              radius: hourglass.r as number,
-              duration: hourglass.dur as number,
-              remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeConsecrations = Array.isArray(snap.consecrations)
-      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
-          if (!value || typeof value !== 'object') return [];
-          const consecration = value as Record<string, unknown>;
-          if (
-            typeof consecration.id !== 'string' ||
-            ![
-              consecration.x,
-              consecration.z,
-              consecration.r,
-              consecration.dur,
-              consecration.rem,
-            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-            (consecration.r as number) <= 0 ||
-            (consecration.dur as number) <= 0 ||
-            (consecration.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: consecration.id,
-              x: consecration.x as number,
-              z: consecration.z as number,
-              radius: consecration.r as number,
-              duration: consecration.dur as number,
-              remaining: Math.min(consecration.rem as number, consecration.dur as number),
-            },
-          ];
-        })
-      : [];
+    this.activeFrostRings = decodeFrostRings(snap.rings);
+    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
+    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
+    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
+    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
+      snap.varkhulCinderOrbs,
+    );
+    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
+    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
+    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
+    this.activeConsecrations = decodeConsecrations(snap.consecrations);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -3103,19 +3058,11 @@ export class ClientWorld implements IWorld {
           e.vendorItems = def?.vendorItems ? [...def.vendorItems] : [];
         }
       }
-      // interpolation bases: re-anchor at the pose the renderer last drew,
-      // not at the previous server pose — when a frame extrapolated past the
-      // last update, restarting from the server pose snapped entities
-      // backwards every snapshot (visible rubber-banding while running).
-      // Non-self entities are drawn on their per-entity clock (renderer.sync),
-      // so the continuation alpha comes from that same clock; self stays on
-      // the global snapshot clock the camera follow uses.
+      // Re-anchor remote and self interpolation on their respective clocks.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
-      // LOCKSTEP with remoteEntityAlpha (src/render/net_interp_core.ts, which
-      // net/ cannot import): unknown-cadence entities interpolate on a fixed
-      // 120 ms fallback interval capped at 1, so the re-anchor lands exactly
-      // on the pose the renderer drew instead of the global snapshot clock.
+      // LOCKSTEP with remoteEntityAlpha: unknown cadence uses a fixed 120 ms
+      // interval capped at 1.
       const entAlpha =
         w.id !== this.playerId && prevUpdatedAt !== undefined
           ? Math.min(
@@ -3124,11 +3071,8 @@ export class ClientWorld implements IWorld {
             )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
-      // per-entity update clock: distant entities are sent below snapshot
-      // rate, so each one interpolates over its own measured cadence. Only
-      // gaps within the slowest legitimate cadence count — records also
-      // pause while an entity's state is unchanged, and folding an idle
-      // period into the estimate would smear its next steps in slow motion
+      // Distant entities interpolate on measured cadence. Ignore idle gaps,
+      // which would smear their next movement into slow motion.
       if (prevUpdatedAt !== undefined) {
         const gap = now - prevUpdatedAt;
         if (gap > 5 && gap < 450) {
@@ -3136,15 +3080,26 @@ export class ClientWorld implements IWorld {
         }
       }
       e.netUpdatedAt = now;
-      // A teleport (arena pit, dungeon portal, graveyard release) jumps an
-      // entity far further than any single walking update could. Interpolating
-      // across that gap streaks it across the map — and when its per-entity
-      // interpolation clock isn't established yet, the renderer falls back to
-      // the global alpha and the entity sticks at its old pose until its next
-      // real update (e.g. taking damage). Snap both poses to the destination so
-      // it appears exactly where the server placed it.
       const teleDx = w.x - e.pos.x,
         teleDz = w.z - e.pos.z;
+      if (selfDelta) {
+        const entryFacing = dungeonEntrySnapshotFacing(
+          this.dungeonEntrySeq ?? null,
+          w.de,
+          e.pos.x,
+          w.x,
+          w.f,
+          this.mouselookFacing,
+        );
+        this.dungeonEntrySeq = entryFacing.entrySeq;
+        this.mouselookFacing = entryFacing.inputFacing;
+        if (entryFacing.forceFacing) {
+          this.moveInput.turnLeft = false;
+          this.moveInput.turnRight = false;
+          this.pendingDungeonEntryFacing = w.f;
+          this.sendInput(now, 'forced-facing');
+        } else if (dungeonAt(w.x) === null) this.pendingDungeonEntryFacing = null;
+      }
       const wasDead = e.dead;
       const nowDead = !!w.dead;
       if ((wasDead && !nowDead) || teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {
@@ -3558,6 +3513,7 @@ export class ClientWorld implements IWorld {
       e.attackPower = s.ap ?? e.attackPower;
       e.rangedPower = s.rp ?? 0;
       e.spellPower = s.sp ?? e.spellPower;
+      e.healPower = s.hpw ?? e.healPower;
       // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
       // no wiring (the swing timers already ride the snapshot).
       e.spellHaste = s.sh ?? e.spellHaste;
@@ -3686,7 +3642,12 @@ export class ClientWorld implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
+      const talentMods = computeCharacterModifiers(
+        this.cfg.playerClass,
+        talents,
+        e.level,
+        this.equipment,
+      );
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
@@ -4218,6 +4179,10 @@ export class ClientWorld implements IWorld {
   socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void {
     if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
     else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
+  }
+  // IWorldInventory: server-stamped untilMs vs Date.now(), riftEventMsRemaining's clock.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - Date.now());
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -5413,6 +5378,9 @@ export class ClientWorld implements IWorld {
   }
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
+  }
+  buyCrucibleVendorItem(itemId: string): void {
+    this.cmd({ cmd: 'crucible_buy', itemId });
   }
   // Live lethal death zones on the current rift boss floor. Mirrored from
   // riftDeathZoneSpawn events emitted at zone-placement time; the client counts

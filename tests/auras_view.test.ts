@@ -116,6 +116,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'sun_verdict',
         'sunder',
         'tongues',
+        'vuln_source',
         'vulnerability',
       ].sort(),
     );

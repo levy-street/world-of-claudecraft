@@ -37,7 +37,25 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
+import {
+  announceIgnivarDeath,
+  IGNIVAR_APOCALYPSE_ADD_ID,
+  resetIgnivarEncounter,
+  updateIgnivarApocalypseAdd,
+  updateIgnivarEncounter,
+} from '../encounters/ignivar';
+import {
+  announceVarkhulDeath,
+  resetVarkhulEncounter,
+  updateVarkhulAssemblyAutomaton,
+  updateVarkhulEncounter,
+  VARKHUL_BOSS_ID,
+  VARKHUL_CINDER_ARTIFICER_ID,
+  VARKHUL_CRUCIBLE_WARDEN_ID,
+  VARKHUL_EMBER_SENTINEL_ID,
+} from '../encounters/varkhul';
 import { isEscortNpcTemplate } from '../escort';
+import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
@@ -63,6 +81,7 @@ import {
   DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
+  IGNIVAR_BOSS_ID,
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
@@ -74,6 +93,7 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
+import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
@@ -85,7 +105,9 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
+import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -184,6 +206,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.despawnTimer = undefined;
   }
   if (mob.dead) {
+    if (mob.templateId === IGNIVAR_BOSS_ID) {
+      if (mob.ignivar) {
+        announceIgnivarDeath(ctx, mob);
+        resetIgnivarEncounter(ctx, mob);
+      }
+      unlockIgnivarRaidGate(ctx, mob);
+    }
+    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) {
+      announceVarkhulDeath(ctx, mob);
+      resetVarkhulEncounter(ctx, mob);
+    }
     ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&
@@ -309,6 +342,20 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  if (mob.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
+    updateIgnivarApocalypseAdd(mob);
+    return;
+  }
+
+  if (
+    (mob.templateId === VARKHUL_CINDER_ARTIFICER_ID ||
+      mob.templateId === VARKHUL_CRUCIBLE_WARDEN_ID ||
+      mob.templateId === VARKHUL_EMBER_SENTINEL_ID) &&
+    updateVarkhulAssemblyAutomaton(ctx, mob)
+  ) {
+    return;
+  }
+
   // Tolling Bell projectiles (The Drowned Litany finale) are moved exclusively
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
@@ -387,7 +434,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   if (!mob.hostile) mob.hostile = true;
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
-  if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
+  const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
+  const isVarkhul = mob.templateId === VARKHUL_BOSS_ID;
+  // Varkhul stages his own pre-pull (anvil work + the proximity pull gate),
+  // so his encounter module owns him even out of combat.
+  if (
+    mob.inCombat ||
+    isVarkhul ||
+    (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')
+  ) {
     const nythraxisScriptLocked =
       isNythraxis &&
       mob.nythraxis &&
@@ -406,6 +461,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
+    } else if (isIgnivar) {
+      updateIgnivarEncounter(ctx, mob, true);
+      return;
+    } else if (isVarkhul) {
+      updateVarkhulEncounter(ctx, mob, true);
+      return;
     } else {
       ctx.updateBossMechanics(mob);
     }
@@ -437,13 +498,14 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   switch (mob.aiState) {
     case 'idle': {
-      if (mob.templateId === NYTHRAXIS_BOSS_ID && !mob.inCombat) {
+      if ((isNythraxis || isIgnivar || isVarkhul) && !mob.inCombat) {
         mob.wanderTarget = null;
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };
         mob.prevPos = { ...mob.pos };
-        mob.facing = Math.PI;
-        mob.prevFacing = Math.PI;
+        const homeFacing = isVarkhul ? VARKHUL_WORK_FACING : Math.PI;
+        mob.facing = homeFacing;
+        mob.prevFacing = homeFacing;
         const template = MOBS[mob.templateId];
         let detected: Entity | null = null;
         let detectedD = Infinity;
@@ -504,6 +566,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         ctx.aggroMob(mob, detected, true);
         break;
       }
+      // Dormant-until-pulled mobs (the downed forge mechs, and any hand-placed
+      // pack marked per-spawn) never idle-wander, so the formation holds. Drawn
+      // AFTER the aggro scan so proximity still wakes them; skips the wander draw.
+      // A synthetic mob whose templateId does not resolve (perf-capture rigs)
+      // has no template flag; tolerate that like the hardLeashRadius read does.
+      if (template?.idleStationary || mob.idleStationary) break;
       mob.wanderTimer -= DT;
       // ONE idle sub-stream for the whole wander step, threaded through all three
       // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
@@ -562,6 +630,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      if (updateDungeonMinibossStomp(ctx, mob)) break;
+      if (updateIgnivarTrashAutomaton(ctx, mob)) break;
       // A heroic charge dash in flight owns the mob's movement for the tick
       // (mirrors the player's updateChargeMovement early return); it also ticks
       // the charge cooldown, so this runs before the combat-profile runner on
@@ -1435,6 +1505,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.enraged = false;
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
+  resetDungeonMinibossStomp(mob);
+  resetIgnivarTrashAutomaton(mob);
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.
   resetMechanicSpacing(mob);
@@ -1524,6 +1596,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
+  if (mob.templateId === VARKHUL_BOSS_ID) resetVarkhulEncounter(ctx, mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every
   // mob other than the one that actually started the channel, so it is safe to

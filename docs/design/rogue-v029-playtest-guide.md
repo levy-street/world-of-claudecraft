@@ -2,8 +2,11 @@
 
 Companion to `docs/design/rogue-v029-spec-engines.md` (the engine contracts)
 and `docs/design/rogue-v029-class-design.md` (the talent rows). Numbers come
-from `scripts/rogue_dps_probe.ts` (123 sec training dummy, level 20, /dev bis
-gear, eight-seed average); the fury probe peer reference is 147.2.
+from `scripts/rogue_dps_probe.ts` (123 sec training dummy, level 20, the epic
+reference kit, eight-seed average); the fury probe peer reference is 147.2.
+The probe equips that kit via `equipReferenceEpicKitForDev`; `/dev bis`
+equipped the same kit at the time but now applies top-parse loadouts
+(legendaries included), so `/dev bis` gear no longer reproduces these bands.
 
 Feel pass (owner playtest, 2026-07-23): engine stages now build at the cadence
 of the button you press constantly, per the class-directions contract. Venom
@@ -39,8 +42,10 @@ the wound itself now runs 20 sec.
 
 1. `npm run dev`, open the client, Play Offline, create a rogue.
 2. `/dev level 20`, pick a spec in `N`, pick the talents below.
-3. `/dev bis` outfits best-in-slot epics (dagger mainhand for everyone except
-   committed Thuggery). Re-run after switching spec.
+3. `/dev bis` outfits the spec's top-parse loadout (spec-less it falls back to
+   best-in-slot epics: dagger mainhand for everyone except committed
+   Thuggery). Re-run after switching spec. Note this no longer matches the
+   probe's epic reference kit, so in-game numbers can read above the bands.
 4. `/dev spawn forest_wolf 5 20` for targets, `/dev god` while comparing.
 
 ## Probe results (best build per spec)

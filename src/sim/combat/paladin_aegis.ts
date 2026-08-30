@@ -77,7 +77,7 @@ export function tickPaladinAegis(ctx: SimContext, caster: Entity, res: ResolvedA
   const effect = effectOf(res);
   if (!effect) return false;
 
-  const spellPowerBonus = channelTickBonus(caster.spellPower, res.def);
+  const spellPowerBonus = channelTickBonus(caster.healPower, res.def);
   for (const ally of eligibleAllies(ctx, caster, effect.radius)) {
     const amount = ctx.rng.range(effect.tickMin, effect.tickMax) + spellPowerBonus;
     ctx.applyHeal(caster, ally, amount, res.def.name, res.def.id);
@@ -105,7 +105,7 @@ export function completePaladinAegis(
   const effect = effectOf(res);
   if (!effect) return false;
 
-  const finalBonus = directHealBonus(caster.spellPower, 0, true);
+  const finalBonus = directHealBonus(caster.healPower, 0, true);
   for (const ally of eligibleAllies(ctx, caster, effect.radius)) {
     const amount = ctx.rng.range(effect.finalMin, effect.finalMax) + finalBonus;
     ctx.applyHeal(caster, ally, amount, res.def.name, res.def.id);

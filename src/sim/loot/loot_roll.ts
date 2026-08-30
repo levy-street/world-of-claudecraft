@@ -53,6 +53,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
+import { bopPartyTradeInstance } from './bop_trade_window';
 import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
@@ -96,6 +97,12 @@ export interface PendingLootRoll {
   // When set, this is a master-loot assignment (not a need/greed vote): only the
   // master looter pid decides, and a timeout returns the item to the corpse.
   masterLooter?: number;
+  // The bind-on-pickup window's eligibility snapshot, captured when the roll
+  // OPENED from the mob's kill-time recipient set (killSnapshotEligibility
+  // below). Kept on the roll because the corpse can be gone by resolution
+  // time; empty names mean the mob carried no death-time snapshot and the
+  // award grants windowless rather than stamping a loot-time roster.
+  windowEligible: { names: string[]; characterIds: number[] };
 }
 
 function partyLootStrategiesForMob(ctx: SimContext, mob: Entity): LootStrategies | null {
@@ -394,6 +401,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
     partyMembers,
     choices: new Map(),
     expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
+    windowEligible: killSnapshotEligibility(ctx, mob),
   };
   ctx.pendingLootRolls.set(roll.id, roll);
   mob.corpseTimer = Math.max(mob.corpseTimer, LOOT_ROLL_TIMEOUT + 2);
@@ -441,6 +449,7 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     choices: new Map(),
     expiresAt: ctx.time + MASTER_LOOT_TIMEOUT,
     masterLooter: looterPid,
+    windowEligible: killSnapshotEligibility(ctx, mob),
   };
   ctx.pendingLootRolls.set(roll.id, roll);
   mob.corpseTimer = Math.max(mob.corpseTimer, MASTER_LOOT_TIMEOUT + 2);
@@ -458,6 +467,53 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
   return true;
 }
 
+// The drop-moment eligibility snapshot for a bind-on-pickup window stamp:
+// names plus the stable character ids behind them (the trade gate prefers
+// ids, because a display name can be freed by a rename and re-taken inside
+// the 2 hour window). Deliberately EMPTY when the mob carries no kill-time
+// recipient snapshot: partyLootCandidatesForMob would then read the CURRENT
+// roster, which must never become a window's eligible set, so the award
+// falls back to a windowless grant instead (the safe direction).
+export function killSnapshotEligibility(
+  ctx: SimContext,
+  mob: Entity,
+): { names: string[]; characterIds: number[] } {
+  if (!mob.lootRecipientIds || mob.lootRecipientIds.length === 0) {
+    return { names: [], characterIds: [] };
+  }
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  return {
+    names: candidates.map((c) => c.name),
+    characterIds: candidates.flatMap((c) => (c.characterId === undefined ? [] : [c.characterId])),
+  };
+}
+
+// The one grant every award arm routes through (including the corpse-return
+// openToAll pickup in interaction.ts). A SOULBOUND drop with anyone else in
+// the drop-moment snapshot is granted as an instanced copy carrying the
+// bind-on-pickup party trade window (bop_trade_window.ts): tradeable only
+// with the players who were loot-eligible at the exact kill moment, until
+// the window expires or the copy is equipped. Everything else stays the
+// plain force-add grant these sites always used.
+//
+// A windowed grant deliberately does NOT auto-equip: addItemInstance has no
+// auto-equip arm, and that is load-bearing here, because equipping strips
+// the window (items.ts equipmentPayloadFor), so an auto-equip on the win
+// would silently destroy the tradability the window exists to grant. The
+// player equips by hand, accepting the bind.
+export function grantAwardedLootItem(
+  ctx: SimContext,
+  itemId: string,
+  pid: number,
+  eligibility: { names: readonly string[]; characterIds: readonly number[] },
+): void {
+  const instance = ITEMS[itemId]?.soulbound
+    ? bopPartyTradeInstance(ctx.lockoutNowMs(), eligibility.names, eligibility.characterIds)
+    : undefined;
+  if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
+  else ctx.addItem(itemId, 1, pid);
+}
+
 // Rotates a common/junk drop over the kill-time eligible party members
 // (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
 // loot-time in-range set: that is the fairness point. Mirrors
@@ -471,7 +527,7 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
   if (!party) return false;
   const winner = candidates[party.lootTurn % candidates.length];
   party.lootTurn++;
-  ctx.addItem(itemId, 1, winner.entityId);
+  grantAwardedLootItem(ctx, itemId, winner.entityId, killSnapshotEligibility(ctx, mob));
   return true;
 }
 
@@ -491,7 +547,7 @@ export function awardSharedLootItem(
   if (startNeedGreedRoll(ctx, itemId, mob)) return true;
   if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
   if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
-  ctx.addItem(itemId, 1, looter.entityId);
+  grantAwardedLootItem(ctx, itemId, looter.entityId, killSnapshotEligibility(ctx, mob));
   return true;
 }
 
@@ -736,7 +792,7 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
-    ctx.addItem(roll.itemId, 1, targets[0]);
+    grantAwardedLootItem(ctx, roll.itemId, targets[0], roll.windowEligible);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -882,7 +938,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
-  ctx.addItem(roll.itemId, 1, winner.pid);
+  grantAwardedLootItem(ctx, roll.itemId, winner.pid, roll.windowEligible);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve

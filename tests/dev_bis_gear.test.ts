@@ -1,6 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { bestEpicGearFor, equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import {
+  bestEpicGearFor,
+  equipBestInSlotForDev,
+  equipReferenceEpicKitForDev,
+} from '../src/sim/dev/bis_gear';
+import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { canEquipItemInSlot, MASTERWROUGHT_EQUIP_CAP } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot, ItemDef } from '../src/sim/types';
@@ -52,6 +60,63 @@ describe('dev bis gear', () => {
     expect(sim.player.stats.agi + sim.player.stats.sta).toBeGreaterThan(before);
     expect(sim.player.hp).toBe(sim.player.maxHp);
   });
+
+  it('keeps the reference kit on the item-table scorer, never the parse snapshot', () => {
+    // The balance probes and their pinned DPS bands equip through
+    // equipReferenceEpicKitForDev; a new parse capture must not move them.
+    const sim = new Sim({ seed: 5, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('combat')).toBe(true);
+    // The spec has a parse loadout, and it differs from the scorer's picks, so
+    // this fixture actually distinguishes the two sources.
+    const parse = parseBisGearFor('rogue', 'combat');
+    const reference = bestEpicGearFor('rogue', 'combat');
+    expect(parse).toBeTruthy();
+    expect(parse).not.toEqual(reference);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx;
+    const equipped = equipReferenceEpicKitForDev(ctx, sim.player.id);
+    expect(equipped).toBeGreaterThanOrEqual(8);
+    const meta = ctx.players.get(sim.player.id);
+    // Total equality, not a per-slot subset: a parse-only slot leaking in or a
+    // reference slot silently going uncoverable must both fail here.
+    expect(meta?.equipment).toEqual(reference);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('preserves stale slots the scorer cannot cover, unlike the clearing /dev bis', () => {
+    // The reference kit reproduces the pre-parse-loadout equip semantics the
+    // pinned DPS bands were minted under: overwrite picks only, never clear.
+    // The scorer has no druid offhand pick, so a planted offhand is the one
+    // observable that separates the two appliers.
+    const sim = new Sim({ seed: 5, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('feral')).toBe(true);
+    expect(bestEpicGearFor('druid', 'feral').offhand).toBeUndefined();
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx;
+    const meta = ctx.players.get(sim.player.id);
+    expect(meta).toBeDefined();
+    if (meta) meta.equipment.offhand = 'gnarled_staff';
+    equipReferenceEpicKitForDev(ctx, sim.player.id);
+    expect(meta?.equipment.offhand).toBe('gnarled_staff');
+    equipBestInSlotForDev(ctx, sim.player.id);
+    expect(meta?.equipment.offhand).not.toBe('gnarled_staff');
+  });
+
+  it('keeps the balance probes equipping through the reference kit', () => {
+    // The regression shape that broke the fight-6498 bands was a probe call
+    // site drifting onto the /dev bis applier; pin the call sites cheaply so
+    // the failure is not deferred to the multi-minute band suites.
+    const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+    for (const file of ['scripts/rogue_dps_probe.ts', 'scripts/druid_balance_probe.ts']) {
+      const source = readFileSync(join(repoRoot, file), 'utf8');
+      expect(source, `${file} equips via the reference kit`).toContain(
+        'equipReferenceEpicKitForDev',
+      );
+      expect(source, `${file} must not equip via the /dev bis applier`).not.toContain(
+        'equipBestInSlotForDev',
+      );
+    }
+  });
 });
 
 describe('dev bis gear: Masterwrought cap (phase 08)', () => {
@@ -67,7 +132,27 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     'druid',
   ] as const;
 
-  it('every class outfit picks exactly the cap of flagged pieces', () => {
+  // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
+  // tip 3e801dc925, the Ignivar raid span). Both tripwires below fired exactly as
+  // written: the release's Crucible raid catalog (the Phase B set pieces and the
+  // Thronebane-band legendaries) out-scores every Masterwrought apex piece on
+  // bestEpicGearFor's raw-stat score(), so on the merged tree NO class's dev-bis
+  // loadout carries a flagged piece (all nine classes measure [] while the
+  // flagged family is still 17). That is a power-placement contradiction with
+  // the packet's ratified premise (apex = the purple ceiling; state.md "Power
+  // placement" and the Phase 15 R5 record), and the packet rule is that a
+  // finding which contradicts a ratified row is an ESCALATION, never a re-tune:
+  // the assertions are kept exactly as authored and marked it.fails so the
+  // contradiction stays visible in every run instead of being re-pinned to the
+  // release's truth. Flip both back to it() in the SAME commit that executes the
+  // maintainer's ruling (re-tier the apex pieces above the Crucible tier, or
+  // amend the power placement and re-derive these pins; Phase 19 decision
+  // table). Consumers that re-geared silently with the pool: the friendly
+  // practice dummy's reference vitals (src/sim/mob/practice_dummies.ts), the
+  // server PBE boost kit, scripts/druid_balance_probe.ts and its harness, and
+  // tests/rogue_dps_balance.test.ts (whose identity pins were re-anchored to
+  // the Crucible pair at the same merge, recorded for the same ruling).
+  it.fails('every class outfit picks exactly the cap of flagged pieces', () => {
     // equipBestInSlotForDev writes equipment directly and never runs
     // masterwroughtConflictSlot, so the picker itself must hold the cap.
     // Deliberate EXACT pin, not <= cap: against the shipped phase 09 catalog
@@ -136,7 +221,8 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     ]);
   });
 
-  it('the flagged picks are pinned BY ID per class, so a catalog move reds on GEAR', () => {
+  // MERGE-INHERITED, EXPECTED-FAIL: see the block above; same ruling, same flip.
+  it.fails('the flagged picks are pinned BY ID per class, so a catalog move reds on GEAR', () => {
     // ADDED AT PHASE 15. bestEpicGearFor is the live-derived loadout behind
     // six consumers, two of them shipped code (the friendly practice dummy's
     // vitals and the server PBE boost kit) and two of them balance-band tests

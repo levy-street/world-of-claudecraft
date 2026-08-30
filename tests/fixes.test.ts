@@ -16,6 +16,9 @@ import {
 } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
+import { IGNIVAR_LIFT_RIDE_SECONDS } from '../src/sim/ignivar_forge_lift';
+import { IGNIVAR_LIFT_ROOM_ID, isIgnivarRaidRoom } from '../src/sim/ignivar_raid_ids';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
@@ -683,12 +686,27 @@ describe('the Hollow Crypt doors', () => {
 describe('dungeon instance placement and targetability', () => {
   it('places every dungeon entry and mob spawn on unblocked instance ground', () => {
     for (const dungeon of DUNGEON_LIST) {
-      const sim = makeSim();
+      const ignivarRaidRoom = isIgnivarRaidRoom(dungeon.id);
+      const sim = ignivarRaidRoom
+        ? new Sim({ seed: SEED, playerClass: 'warrior', devCommands: true })
+        : makeSim();
       if (dungeon.id === 'nythraxis_boss_arena') {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
-      sim.enterDungeon(dungeon.id);
+      if (ignivarRaidRoom) {
+        formRaid(sim);
+        expect(enterDungeon(sim.ctx, dungeon.id, sim.playerId, true)).toBe(true);
+      } else {
+        sim.enterDungeon(dungeon.id);
+      }
+      if (dungeon.id === IGNIVAR_LIFT_ROOM_ID) {
+        // The lift's only encounter is its exit gate, sealed under the
+        // locked template for the descent; ride it out so the placement
+        // sweep samples the room settled, with the gate swapped to the
+        // open dungeon_door portal every rider walks out through.
+        for (let tick = 0; tick < 20 * (IGNIVAR_LIFT_RIDE_SECONDS + 2); tick++) sim.tick();
+      }
       const p = sim.player;
       expect(p.pos.x, `${dungeon.id} entry is not inside an instance`).toBeGreaterThan(
         DUNGEON_X_THRESHOLD,

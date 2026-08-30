@@ -47,6 +47,7 @@ import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/c
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
+import { tryDayNightDevCommand } from './game/daynight_dev_command';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
@@ -102,6 +103,7 @@ import {
   stampGraphicsRebuildProbe,
   updateGraphicsRebuildProbePhase,
 } from './game/graphics_rebuild_crash_guard';
+import { tryIgnivarPlacerCommand } from './game/ignivar_placer';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -179,7 +181,12 @@ import {
 import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { isIslandFerryTeleport, islandTeleportCameraYaw } from './game/teleport_camera';
+import {
+  type TeleportCameraArrival,
+  teleportCameraArrivalAfterTick,
+  teleportCameraArrivalKind,
+  teleportCameraFacingState,
+} from './game/teleport_camera';
 import {
   ensureTurnstile,
   resetTurnstile,
@@ -310,7 +317,6 @@ import {
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
-import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -1720,91 +1726,6 @@ async function startGame(
       autosizeChat();
     }
   });
-  // Dev-only chat command to scrub the world day/night cycle for testing:
-  //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
-  //   /daynight moon new|crescent|half|full|<0..1>|auto   (the lunar phase)
-  // Render-only: it just overrides the shared clock phase (day_night_clock), so
-  // the sky lighting and the minimap dial both jump to the chosen time of day.
-  // Returns true when it handled the input (so it is not also sent to chat).
-  const MOON_PRESETS: Record<string, number> = {
-    new: 0,
-    crescent: 0.125,
-    half: 0.25,
-    quarter: 0.25,
-    gibbous: 0.375,
-    full: 0.5,
-  };
-  const DAY_NIGHT_PRESETS: Record<string, number> = {
-    midnight: 0,
-    night: 0,
-    dawn: 0.25,
-    sunrise: 0.25,
-    morning: 0.375,
-    day: 0.5,
-    noon: 0.5,
-    midday: 0.5,
-    afternoon: 0.625,
-    dusk: 0.75,
-    sunset: 0.75,
-    evening: 0.8,
-  };
-  const tryDayNightDevCommand = (raw: string): boolean => {
-    const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
-    if (!m) return false;
-    // Dev builds only: a per-client phase override is brighter-night-for-me,
-    // exactly the actionable-visibility class the graphics-fairness rule bans.
-    // Harmless while DAY_ONLY pins day, but gate it before that ever flips.
-    if (!import.meta.env.DEV) return false;
-    const arg = m[1].trim().toLowerCase();
-    if (!arg) {
-      hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
-      hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
-      return true;
-    }
-    const moonArg = arg.match(/^moon\s*(.*)$/);
-    if (moonArg) {
-      const moonWord = moonArg[1].trim();
-      if (!moonWord || ['auto', 'off', 'real', 'resume', 'clear'].includes(moonWord)) {
-        setLunarPhaseOverride(null);
-        hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
-        return true;
-      }
-      let moonPhase: number | null = moonWord in MOON_PRESETS ? MOON_PRESETS[moonWord] : null;
-      if (moonPhase === null) {
-        const n = Number.parseFloat(moonWord);
-        if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
-      }
-      if (moonPhase === null) {
-        hud.log(
-          `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
-          '#ffcf6a',
-        );
-        return true;
-      }
-      setLunarPhaseOverride(moonPhase);
-      hud.log(`[dev] moon set to ${moonWord} (lunar phase ${moonPhase.toFixed(2)})`, '#8fd0ff');
-      return true;
-    }
-    if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
-      setDayNightPhaseOverride(null);
-      hud.log('[dev] day/night resumed (real UTC clock)', '#8fd0ff');
-      hud.refreshDayNightDial();
-      return true;
-    }
-    let phase: number | null = arg in DAY_NIGHT_PRESETS ? DAY_NIGHT_PRESETS[arg] : null;
-    if (phase === null) {
-      const n = Number.parseFloat(arg);
-      if (Number.isFinite(n)) phase = ((n % 1) + 1) % 1;
-    }
-    if (phase === null) {
-      hud.log(`[dev] unknown time "${arg}" - try night|dawn|day|dusk|<0..1>|auto`, '#ffcf6a');
-      return true;
-    }
-    setDayNightPhaseOverride(phase);
-    hud.log(`[dev] time of day set to ${arg} (phase ${phase.toFixed(2)})`, '#8fd0ff');
-    hud.refreshDayNightDial();
-    return true;
-  };
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
     // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
@@ -1820,7 +1741,20 @@ async function startGame(
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
       // dev-only day/night scrub command, intercepted before the chat send path
-      if (import.meta.env.DEV && tryDayNightDevCommand(raw)) {
+      if (import.meta.env.DEV && tryDayNightDevCommand(raw, hud)) {
+        chatInput.value = '';
+        closeChat();
+        return;
+      }
+      // dev-only Ignivar prop placement rig (local branch tooling)
+      if (
+        import.meta.env.DEV &&
+        tryIgnivarPlacerCommand(raw, {
+          scene: renderer.scene,
+          getPlayer: () => world.player,
+          log: (text, color) => hud.log(text, color),
+        })
+      ) {
         chatInput.value = '';
         closeChat();
         return;
@@ -3868,38 +3802,38 @@ async function startGame(
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
-  // perf overlay's Jitter row.
+  // Smoothed input-echo jitter for the perf overlay.
   let onlineJitterMs = 0;
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
-  // Displacement and rift-band-exit tracking (src/game/zone_warm_tracker.ts
-  // owns the state and the hidden-freeze semantics). Rift-exit background: the
-  // instance band teleports back into an overworld zone that is usually still
-  // RESIDENT, so the ready-bail below would skip the loading screen entirely
-  // and drop the player inside the residency fog clamp while the surrounding
-  // zones stream back in: a tight teal fog wall easing open over seconds that
-  // reads as "standing in water". A rift exit therefore always takes the
-  // blocking path, and it streams a WIDER arrival neighbourhood than an
-  // ordinary teleport: the rift band sits outside the overworld entirely, so
-  // the whole ring around the exit point may have been evicted rather than
-  // just the border the player lands next to (ARRIVAL_NEIGHBOR_STREAM_RADIUS
-  // covers that ordinary case).
+  // Rift exits block and stream widely because their arrival ring may be evicted.
   const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
-  // Last-evaluated position for the ferry camera-snap scoping: the snap needs
-  // the displacement's ORIGIN (the town bell ride lands off-island, so the
-  // landed point alone cannot tell a ferry ride from a hearthstone). Updated
-  // only when the tracker evaluates, so a hidden desktop span keeps its
-  // pre-hidden origin exactly like the tracker's own displacement.
+  // The evaluated origin distinguishes authored arrivals from other movement.
   let camSnapPrevX = world.player.pos.x;
   let camSnapPrevZ = world.player.pos.z;
-  // Ferry crossings are a CLICK, not a walk, so the far shore has to be
-  // resident BEFORE the bell is rung or the arrival takes the blocking loading
-  // screen. Warm it while the player is still walking up to the bell; the
-  // latch keeps it to one stream per destination per session, and a failure
-  // simply leaves the classic screen in place.
+  let observedDungeonEntrySeq = world.player.dungeonEntrySeq ?? 0;
+  const alignTeleportCameraFacing = (
+    arrival: Exclude<TeleportCameraArrival, null>,
+    landedFacing: number,
+  ): number => {
+    const next = teleportCameraFacingState(arrival, landedFacing, {
+      camYaw: input.camYaw,
+      lastInterpFacing,
+      pendingReleaseFacing,
+      prevCameraDrivenFacing,
+      keyboardTurn: kbTurn,
+    });
+    input.camYaw = next.camYaw;
+    lastInterpFacing = next.lastInterpFacing;
+    pendingReleaseFacing = next.pendingReleaseFacing;
+    prevCameraDrivenFacing = next.prevCameraDrivenFacing;
+    Object.assign(kbTurn, next.keyboardTurn);
+    return next.movementFacing;
+  };
+  // Prewarm the clicked ferry's far shore while the player approaches its bell.
+  // The latch streams once per destination; failure keeps the loading screen.
   const ferryPrewarmed = new Set<string>();
   const maybeWarmFerryDestination = (): void => {
     // The hidden desktop shell rule (maybeWarmCurrentZone below) applies to
@@ -3922,43 +3856,27 @@ async function startGame(
   };
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
-    // A hidden desktop shell must not pay zone-warm GPU work for a view
-    // nobody sees (the presentation gate stops render, not this lane, and
-    // this is its heaviest recurring producer). The tracker freezes whole
-    // while hidden, so the reveal frame computes the accumulated displacement
-    // as if the transition just happened; a rift crossing keeps its exit edge
-    // unless it entered AND left the band inside the hidden span (no rift
-    // session was rendered then, so no eviction happened, and the
-    // displacement arms cover that reveal; see zone_warm_tracker.ts).
+    const dungeonEntryChanged = (player.dungeonEntrySeq ?? 0) !== observedDungeonEntrySeq;
+    observedDungeonEntrySeq = player.dungeonEntrySeq ?? 0;
+    // The tracker freezes while the desktop shell is hidden, then reports the
+    // accumulated reveal displacement and any visible rift-exit edge.
     const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
-    if (!warm) return;
-    const { displacement, riftExit } = warm;
-    // A teleport-scale jump snaps the chase camera behind the landed facing,
-    // so the player sees what the landing authored, SCOPED to the island's
-    // ferry crossings: a snap on every portal, dungeon door and hearthstone
-    // would be a global feel change riding in a tutorial change
-    // (game/teleport_camera.ts owns the pure decision and the scoping).
-    // The same predicate forces the blocking loading screen below: the town
-    // side of the crossing is the whole harbor kit, and even a prewarmed
-    // arrival links its building programs across the first live frames, so
-    // the crossing always rides the curtain and lets the reveal settle behind
-    // it instead of hitching in front of the player.
-    const ferryRide = isIslandFerryTeleport(
-      camSnapPrevX,
-      camSnapPrevZ,
-      player.pos.x,
-      player.pos.z,
-      displacement,
-    );
-    input.camYaw = islandTeleportCameraYaw(
-      camSnapPrevX,
-      camSnapPrevZ,
-      player.pos.x,
-      player.pos.z,
-      displacement,
-      player.facing,
-      input.camYaw,
-    );
+    if (!warm && !dungeonEntryChanged) return;
+    const { displacement, riftExit } = warm ?? { displacement: 0, riftExit: false };
+    // Authored ferry and dungeon arrivals align the camera to the landed
+    // facing. Dungeon entry also clears stale client heading owners before
+    // held movement can stream the approach yaw back over the sim reset.
+    const cameraArrival = dungeonEntryChanged
+      ? 'dungeon'
+      : teleportCameraArrivalKind(
+          camSnapPrevX,
+          camSnapPrevZ,
+          player.pos.x,
+          player.pos.z,
+          displacement,
+        );
+    const ferryRide = cameraArrival === 'ferry';
+    if (cameraArrival !== null) alignTeleportCameraFacing(cameraArrival, player.facing);
     camSnapPrevX = player.pos.x;
     camSnapPrevZ = player.pos.z;
     if (zoneWarmup) return;
@@ -4539,7 +4457,7 @@ async function startGame(
     }
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
-    const movementFacing = !movementFrozen()
+    let movementFacing = !movementFrozen()
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
@@ -4549,6 +4467,9 @@ async function startGame(
       // itself, to stay deterministic).
       feedSimCalendar(offlineSim);
       while (acc >= DT) {
+        const tickFromX = offlineSim.player.pos.x;
+        const tickFromZ = offlineSim.player.pos.z;
+        const tickFromDungeonEntrySeq = offlineSim.player.dungeonEntrySeq ?? 0;
         const { mi, facing } = resolveMove(
           mouselook,
           offlineSim.player.pos,
@@ -4574,6 +4495,18 @@ async function startGame(
           perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
           perf.finishTime('sim', simStart);
         }
+        const tickPlayer = offlineSim.player;
+        const tickArrival = teleportCameraArrivalAfterTick(
+          tickFromX,
+          tickFromZ,
+          tickPlayer.pos.x,
+          tickPlayer.pos.z,
+          tickFromDungeonEntrySeq,
+          tickPlayer.dungeonEntrySeq ?? 0,
+        );
+        if (tickArrival !== null) {
+          movementFacing = alignTeleportCameraFacing(tickArrival, tickPlayer.facing);
+        }
         const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
         desktopPresenceOnFrame(offlineSim);
@@ -4597,18 +4530,9 @@ async function startGame(
         pendingReleaseFacing = null;
         acc -= DT;
       }
-      // Re-check immediately after the tick loop, before renderer.sync() below reads
-      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
-      // the position as of the START of the frame; a tick above can itself teleport the
-      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
-      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
-      // Left unchecked, this frame would still render the just-teleported position with
-      // no loading curtain and an unprepared destination zone (a one-frame flash of an
-      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
-      // once a warmup is already in flight or the zone is ready), so calling it twice in
-      // one frame is safe; it does not remove the top-of-frame call, which still owns the
-      // input-suspend handling and catches a teleport triggered from outside the tick
-      // (e.g. a UI action) before this frame's tick even runs.
+      // A tick can teleport after the top-of-frame warm check. Re-check before
+      // renderer.sync reads the new position; this call is idempotent while a
+      // warmup is already active or the destination is ready.
       maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
@@ -4689,6 +4613,10 @@ async function startGame(
     if (gate.paint) spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
+    const dungeonEntryFacing = net.consumeDungeonEntryFacing();
+    if (dungeonEntryFacing !== null) {
+      movementFacing = alignTeleportCameraFacing('dungeon', dungeonEntryFacing);
+    }
     const resolved = resolveMove(
       mouselook,
       world.player.pos,

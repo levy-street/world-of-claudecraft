@@ -540,6 +540,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'harvest_feast',
     'inert_storm_shard',
     'last_keep_signet',
+    // Staged ahead of its recipes (PR 3704): the core matches the materials
+    // chip the moment a recipe consumes it, and this row moves out then.
+    'lastflame_core',
     'linen_pouch',
     'loombound_reagent_satchel',
     'mistcallers_duffel',

@@ -6,10 +6,18 @@
 // dynamically), so three.js never lands in the main Guide bundle.
 
 import * as THREE from 'three';
+import { GPU_WORK_PRIORITY } from '../../render/background_gpu_queue';
 import { trackWebGLContext } from '../../render/context_release';
+import {
+  type LinkedProgramTouchQueue,
+  PREVIEW_LINKED_PROGRAM_TOUCH_LABEL,
+  runLinkedProgramTouchLane,
+} from '../../render/linked_program_touch_lane';
+import { shaderDebugRequested } from '../../render/shader_debug_flag';
 import type { GuideModelSpec } from '../content.generated';
 import { type Bounds3, frameTurntable } from './framing';
 import { buildModel, skinAwareBounds } from './model';
+import { prewarmModelViewer } from './model_prewarm';
 
 const AUTO_SPIN = 0.3; // rad/sec, paused while dragging or for reduced-motion readers
 // Advance the idle clip to this representative pose before measuring, so we frame the POSED
@@ -37,6 +45,7 @@ export class ModelViewer {
   private dragging = false;
   private lastX = 0;
   private onscreen = true;
+  private renderReady = false;
   private contextLost = false;
   /** Set once in destroy(); makes destroy() idempotent and lets an in-flight load() that
    *  resolved after teardown discard its freshly-built model instead of restarting the loop. */
@@ -45,16 +54,22 @@ export class ModelViewer {
   /** Drops this renderer from the page-teardown release set; called once in destroy(). */
   private readonly untrackContext: () => void;
 
-  constructor(container: HTMLElement, canvasLabel: string) {
+  constructor(
+    container: HTMLElement,
+    canvasLabel: string,
+    private readonly touchQueue: () => LinkedProgramTouchQueue | null = () => null,
+  ) {
     this.container = container;
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'guide-viewer-canvas';
-    this.canvas.tabIndex = 0;
+    this.canvas.tabIndex = -1;
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', canvasLabel);
-    container.appendChild(this.canvas);
+    this.canvas.setAttribute('aria-hidden', 'true');
 
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, alpha: true, antialias: true });
+    container.appendChild(this.canvas);
+    this.renderer.debug.checkShaderErrors = shaderDebugRequested();
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     // Each viewer is its own GL context and browsers cap live contexts at ~16, so register for
@@ -103,6 +118,8 @@ export class ModelViewer {
     const onLost = (e: Event): void => {
       e.preventDefault();
       this.contextLost = true;
+      this.renderReady = false;
+      this.setCanvasReady(false);
       if (this.raf !== null) {
         cancelAnimationFrame(this.raf);
         this.raf = null;
@@ -125,6 +142,8 @@ export class ModelViewer {
 
   /** Load (or replace) the displayed model. Awaits the GLB fetch + assembly. */
   async load(spec: GuideModelSpec, tint: number | null): Promise<void> {
+    this.renderReady = false;
+    this.setCanvasReady(false);
     if (this.built) {
       this.turntable.remove(this.built.root);
       this.built.dispose();
@@ -144,6 +163,23 @@ export class ModelViewer {
     this.built = built;
     this.turntable.add(this.built.root);
     this.frameToPosedBounds();
+    await prewarmModelViewer(this.renderer, this.scene, this.camera, {
+      isCancelled: () => this.destroyed || this.contextLost,
+      touchPrograms: async () => {
+        const queue = this.touchQueue();
+        if (!queue) return;
+        await runLinkedProgramTouchLane(
+          queue,
+          this.renderer.properties,
+          this.scene,
+          GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+          { label: PREVIEW_LINKED_PROGRAM_TOUCH_LABEL, settled: true },
+        );
+      },
+    });
+    if (this.destroyed || this.contextLost) return;
+    this.renderReady = true;
+    this.setCanvasReady(true);
     if (this.raf === null) this.animate();
   }
 
@@ -155,6 +191,12 @@ export class ModelViewer {
   /** Update the canvas accessible name (the gallery swaps models in one viewer). */
   setLabel(canvasLabel: string): void {
     this.canvas.setAttribute('aria-label', canvasLabel);
+  }
+
+  private setCanvasReady(ready: boolean): void {
+    this.canvas.tabIndex = ready ? 0 : -1;
+    if (ready) this.canvas.removeAttribute('aria-hidden');
+    else this.canvas.setAttribute('aria-hidden', 'true');
   }
 
   /** Frame the camera to the model's POSED, skin-aware bounds (not the bind pose) and
@@ -299,7 +341,7 @@ export class ModelViewer {
     const dt = Math.min(this.timer.getDelta(), 0.1);
     if (!this.reduceMotion.matches && !this.dragging) this.rotateBy(AUTO_SPIN * dt);
     this.built?.mixer?.update(dt);
-    if (this.onscreen) this.renderer.render(this.scene, this.camera);
+    if (this.onscreen && this.renderReady) this.renderer.render(this.scene, this.camera);
   };
 
   destroy(): void {
@@ -307,6 +349,8 @@ export class ModelViewer {
     // a double forceContextLoss/dispose on three internals is fragile, so bail on re-entry.
     if (this.destroyed) return;
     this.destroyed = true;
+    this.renderReady = false;
+    this.setCanvasReady(false);
     this.onLostCb = null;
     if (this.raf !== null) {
       cancelAnimationFrame(this.raf);

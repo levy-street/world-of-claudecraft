@@ -25,8 +25,10 @@
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../content/heroic_loot';
 import { RIFT_EPIC_ITEM_IDS } from '../content/rift/items';
 import { DUNGEONS, ITEMS, MOBS } from '../data';
+import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 import { itemSourceLevel, RAID_MIN_PLAYERS } from '../item_level';
 import type { ItemDef } from '../types';
+import { IGNIVAR_BOSS_ID } from '../types';
 
 /** The source level a C rift reads as: the rank's own base level, which is also
  *  the level of the normal five-man tier it pays from. */
@@ -75,8 +77,13 @@ export function riftNormalClearPool(): readonly string[] {
 export function riftHeroicClearPool(): readonly string[] {
   if (heroicPool) return heroicPool;
   const ids = new Set<string>(RIFT_EPIC_ITEM_IDS);
+  // RAID bosses are excluded: this pool is the five-man heroic epics, and a
+  // raid's heroic-only appends must never pay out of a rift clear (the
+  // Crucible ilvl-35 appends leaking here was caught by
+  // tests/rift_loot_pools.test.ts when the Ignivar tables landed).
+  const RAID_BOSS_IDS = new Set([NYTHRAXIS_RAID_BOSS_ID, IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]);
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
-    if (bossId === NYTHRAXIS_RAID_BOSS_ID) continue;
+    if (RAID_BOSS_IDS.has(bossId)) continue;
     for (const entry of entries) {
       const itemId = entry.itemId;
       if (!itemId) continue;

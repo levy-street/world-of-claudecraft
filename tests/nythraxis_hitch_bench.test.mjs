@@ -30,6 +30,7 @@ import {
   summarizeHitchPhase,
   withinMobInterest,
 } from '../scripts/lib/nythraxis_hitch_bench.mjs';
+import { PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const SCRIPT = codeWithoutLineComments(
@@ -226,8 +227,13 @@ describe('nythraxis hitch bench helpers', () => {
     );
     // The radius lives in the interest-policy leaf the broadcast pass consumes
     // (server/interest_policy.ts), so the bench script's copy is pinned there.
+    // Since the v0.41.0 sync the leaf no longer spells the number itself: it
+    // derives from the shared PLAYER_INTEREST_RADIUS in src/sim/types.ts, so
+    // the pin checks the derivation AND that the shared constant still equals
+    // the bench copy.
     const policy = readFileSync(new URL('../server/interest_policy.ts', import.meta.url), 'utf8');
-    expect(policy).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
+    expect(policy).toContain('export const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS');
+    expect(PLAYER_INTEREST_RADIUS).toBe(MOB_INTEREST_RADIUS);
   });
 
   it('stands the observer on the live Aldric spawn and keeps that distance pinned to the encounter', () => {

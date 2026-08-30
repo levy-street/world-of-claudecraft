@@ -220,6 +220,9 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // The two Crucible held offhands follow the wraithfire_orb precedent
+      // (a held orb/censer with no dedicated GLB yet).
+      'cinder_of_the_first_design',
       // copperlens_ocular: masterwrought Phase 11o's on-ramp gadget parks
       // with its register sibling gyrelens_array below (the same lens-array
       // class of gap; no shared model exists) until the art wave.
@@ -237,6 +240,7 @@ describe('held weapon models', () => {
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
       'moggers_hide_quiver',
+      'orb_of_the_last_spring',
       'valefire_lantern',
       'voidbound_grimoire',
       'wraithfire_orb',

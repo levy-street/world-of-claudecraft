@@ -12,6 +12,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
@@ -94,7 +95,7 @@ export function updateMobCombatProfile(
     // and ignores the flee-recovery grace: past it the mob goes home, however
     // the fight has been dragged. Checked before the soft leash so a tethered
     // mob can never be walked out one anchor-refresh at a time.
-    const hardLeash = MOBS[mob.templateId]?.hardLeashRadius;
+    const hardLeash = mob.ignoreHardLeash ? undefined : MOBS[mob.templateId]?.hardLeashRadius;
     if (hardLeash !== undefined && dist2d(mob.pos, mob.spawnPos) > hardLeash) {
       startEvadeHome(mob);
       return 'done';
@@ -118,6 +119,13 @@ export function updateMobCombatProfile(
       startEvadeHome(mob);
       return 'done';
     }
+  }
+
+  // Suicide-bomber mechs own their whole engaged tick (face-before-move approach,
+  // arming windup, detonation) in place of the normal pursuit + melee swing.
+  if (MOBS[mob.templateId]?.meleeBomb) {
+    updateDerelictBomber(ctx, mob, target, profile);
+    return 'done';
   }
 
   onEngagedTick?.();

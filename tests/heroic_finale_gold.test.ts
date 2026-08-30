@@ -11,8 +11,8 @@ import type { LootEntry, MobTemplate } from '../src/sim/types';
 // src/sim/content/dungeon_difficulty.ts, ladder doc in
 // docs/design/dungeon-gold.md): a heroic-claim kill of a dungeon's final
 // boss substitutes a raised money base on the SAME single rng draw.
-// Five-man finales pay 10g nominal (100000c, rolls 60000c to 140000c); the
-// Nythraxis raid finale pays 20g (200000c, rolls 120000c to 280000c).
+// Five-man finales pay 10g nominal (100000c, rolls 60000c to 140000c); a
+// raid finale pays 20g (200000c, rolls 120000c to 280000c).
 // Normal-mode kills keep the modest per-dungeon bases: heroic sits behind
 // the per-dungeon daily lockout, so the raise rewards the legitimate clear
 // without re-opening the repeat farms the normal-mode nerfs closed
@@ -25,6 +25,13 @@ const RAID_ROLL_MIN = 120000; // ceil(200000 * 0.6)
 const RAID_ROLL_MAX = 280000; // ceil(200000 * 1.4)
 const NORMAL_ROLL_MIN = 9000; // ceil(15000 * 0.6)
 const NORMAL_ROLL_MAX = 21000; // ceil(15000 * 1.4)
+// The raid-tier finales: both pay the shared 20g heroic base and the 15g
+// normal base (the Ignivar development raid mirrors the Nythraxis wiring).
+const RAID_FINALE_DUNGEON_IDS = new Set([
+  'nythraxis_boss_arena',
+  'ignivar_raid_arena',
+  'ignivar_inner_crucible',
+]);
 // The full normal-mode finale money ladder, pinned so a single-boss retune
 // (up or down) is a deliberate edit here, not a drive-by.
 const NORMAL_FINALE_COPPER: Record<string, number> = {
@@ -34,6 +41,8 @@ const NORMAL_FINALE_COPPER: Record<string, number> = {
   gravewyrm_sanctum: 15000,
   wildheart_basin: 15000,
   nythraxis_boss_arena: 150000,
+  ignivar_raid_arena: 150000,
+  ignivar_inner_crucible: 200000,
 };
 
 function copperEntries(loot: LootEntry[] | undefined) {
@@ -41,7 +50,7 @@ function copperEntries(loot: LootEntry[] | undefined) {
 }
 
 function heroicBandFor(dungeonId: string): { min: number; max: number } {
-  return dungeonId === 'nythraxis_boss_arena'
+  return RAID_FINALE_DUNGEON_IDS.has(dungeonId)
     ? { min: RAID_ROLL_MIN, max: RAID_ROLL_MAX }
     : { min: HEROIC_ROLL_MIN, max: HEROIC_ROLL_MAX };
 }
@@ -113,8 +122,9 @@ describe('heroic finale gold policy', () => {
       // The roller's money arm gates on a truthy copper, so a heroicCopper
       // riding a zero base would silently pay nothing on heroic.
       expect(money[0].copper, tuning.id).toBeGreaterThan(0);
-      const expectedHeroic =
-        tuning.id === 'nythraxis_boss_arena' ? RAID_HEROIC_COPPER : FIVE_MAN_HEROIC_COPPER;
+      const expectedHeroic = RAID_FINALE_DUNGEON_IDS.has(tuning.id)
+        ? RAID_HEROIC_COPPER
+        : FIVE_MAN_HEROIC_COPPER;
       expect(money[0].heroicCopper, tuning.id).toBe(expectedHeroic);
     }
     // The ladder table covers exactly the live registry (a new heroic

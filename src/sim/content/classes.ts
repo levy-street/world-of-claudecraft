@@ -16,6 +16,14 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import {
+  GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
+  GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
+  HEXTHREAD_2PC_NEEDLE_DOOM_BONUS,
+  MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC,
+  setBonusFlag,
+  WILDFANG_2PC_REDHARVEST_ENERGY_MULT,
+} from './ignivar_set_bonuses';
 import { PALADIN_CORE_ABILITIES } from './paladin_core_abilities';
 import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
@@ -5089,21 +5097,34 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 22, max: 27 }],
+    effects: [
+      { type: 'afflictionNeedle', doom: 7 },
+      { type: 'directDamage', min: 22, max: 27 },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 30,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 36, max: 43 }],
+        effects: [
+          { type: 'afflictionNeedle', doom: 7 },
+          { type: 'directDamage', min: 36, max: 43 },
+        ],
       },
       {
         rank: 3,
         level: 20,
         cost: 35,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
+        effects: [
+          { type: 'afflictionNeedle', doom: 7 },
+          { type: 'directDamage', min: 41, max: 49 },
+        ],
       },
     ],
+    // The sim-source description keeps the BASE literal 7 (the $-form
+    // contract in tests/ability_tooltip_consistency.test.ts: brace tokens are
+    // reserved for the translated catalog). The catalog row splices the
+    // RESOLVED payload as {needleDoom}, so Hexthread 2pc wearers read 9 there.
     description:
       'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
   },
@@ -6202,8 +6223,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 20, max: 26 },
       { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
     ],
+    // The per-application extension cap is the $t splice (the resolved
+    // extendDot maxBonus, see abilityDurationValue): Moonscorch 2pc wearers
+    // read 12 there, everyone else the base 6.
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to $t sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -7378,7 +7402,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_cold_focus', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+      'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
   },
   bloodhook: {
     id: 'bloodhook',
@@ -7674,6 +7698,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 118, max: 140 }],
     description:
+      // The sim-source description keeps the BASE literal 2 (the $-form
+      // contract in tests/ability_tooltip_consistency.test.ts); the catalog
+      // row splices the RESOLVED count as {charges}, so Ruincaller 2pc
+      // wearers read 3 there.
       'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },
   moonkin_form: {
@@ -7866,8 +7894,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'verdance',
     requiresAuraStacks: 5,
     effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
+    // The harvest fraction is the $b splice (the resolved druidOverbloom
+    // harvestPct, see abilityBuffValue): Grovespring 4pc wearers read 75
+    // there, everyone else the base 60.
     description:
-      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
   },
 
   // Baseline class interrupts: every caster-pressuring class trains a short-cooldown
@@ -8727,7 +8758,12 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
           effect.type === 'selfBuff' ||
           effect.type === 'buffTarget' ||
           effect.type === 'absorb' ||
-          effect.type === 'hot'
+          effect.type === 'hot' ||
+          // Emberfury 2pc (the Crucible set doc's rewrite-list extension):
+          // the Enrage an enrageChance effect grants reads its RESOLVED
+          // duration, so a durationFlat row lengthens the buff for engine
+          // and tooltip alike.
+          effect.type === 'enrageChance'
         ) {
           return { ...effect, duration: Math.max(0, effect.duration + (am.durationFlat ?? 0)) };
         }
@@ -8760,9 +8796,83 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
               // damage; a re-coat picks up the new value).
               e.type === 'imbue'
               ? { ...e, bonus: Math.round(e.bonus * mul) }
-              : e,
+              : // Forgewall 2pc (the Crucible set doc's scaleEffect
+                // extension): Iron Resolve's rage-to-absorb rate is the
+                // buff-shaped value on absorbSpentResource, so the generic
+                // per-ability knob reaches it and the tooltip splice reads
+                // the same resolved rate the dispatch consumes.
+                e.type === 'absorbSpentResource'
+                ? { ...e, mult: Math.round(e.mult * mul) }
+                : e,
       );
     }
+  }
+  // Hexthread 2pc (the Crucible set doc): Needle of Fate grants 2 additional
+  // Condemnation. The bonus is baked into the RESOLVED afflictionNeedle
+  // payload, the ONE number the dispatch (resolveNeedleOfFate) and the
+  // {needleDoom} description splice both read, so the engine and the printed
+  // figure can never diverge. eyeGeneration still multiplies the total after
+  // (x0.5-with-rounding secondary Eyes, x2 under Hour of Judgment), the set
+  // doc's disclosures.
+  if (entry.def.id === 'needle_of_fate' && mods.selected[setBonusFlag('hexthread', 2)] === true) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'afflictionNeedle' ? { ...e, doom: e.doom + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS } : e,
+    );
+  }
+  // Moonscorch 2pc (the Crucible set doc): Moonseed may extend Lunar Tempest
+  // twice per application. The per-application cap is baked into the RESOLVED
+  // extendDot effect (6 -> 12), the ONE number the extendOwnedDot dispatch
+  // and the {duration} description splice both read; the per-press extension
+  // (seconds 6) stays untouched, so each press still adds 6 sec and the
+  // third press stays dead. Deterministic, no rng involved.
+  if (entry.def.id === 'moonseed' && mods.selected[setBonusFlag('moonscorch', 2)] === true) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'extendDot' ? { ...e, maxBonus: MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC } : e,
+    );
+  }
+  // Wildfang 2pc (the Crucible set doc): Redharvest restores 45 energy, up
+  // from 30 (rank-3 truth). The multiplier is baked into the RESOLVED
+  // gainResource amount, the one number the dispatch's resource grant reads;
+  // Math.floor keeps the rank ladder at 22/33/45. gainResource is exempt from
+  // the generic damage scaling above (economy, not damage), so this is the
+  // one write. Deterministic, no rng involved.
+  if (
+    entry.def.id === 'redharvest' &&
+    mods.selected[setBonusFlag('wildfang_emberhide', 2)] === true
+  ) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'gainResource'
+        ? { ...e, amount: Math.floor(e.amount * WILDFANG_2PC_REDHARVEST_ENERGY_MULT) }
+        : e,
+    );
+  }
+  // Grovespring 2pc (the Crucible set doc): Swiftmend heals 25 percent more.
+  // A bespoke rewrite of the RESOLVED consumeAura heal (the set doc's named
+  // eff.heal hook: no generic knob reaches it without folding into the
+  // additive baseline), applied AFTER the generic scaling so the bend is an
+  // exact 1.25x on the resolved base; the $d tooltip splice reads the same
+  // range. The healPower rider keeps its base scaling (disclosed).
+  if (entry.def.id === 'swiftmend' && mods.selected[setBonusFlag('grovespring', 2)] === true) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'consumeAura' && e.heal
+        ? {
+            ...e,
+            heal: {
+              min: Math.round(e.heal.min * GROVESPRING_2PC_SWIFTMEND_HEAL_MULT),
+              max: Math.round(e.heal.max * GROVESPRING_2PC_SWIFTMEND_HEAL_MULT),
+            },
+          }
+        : e,
+    );
+  }
+  // Grovespring 4pc (the Crucible set doc): Overbloom harvests 75 percent.
+  // The fraction is baked into the RESOLVED druidOverbloom effect, the ONE
+  // number resolveDruidOverbloom and the {buff} description splice both
+  // read. Deterministic, no rng involved.
+  if (entry.def.id === 'overbloom' && mods.selected[setBonusFlag('grovespring', 4)] === true) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'druidOverbloom' ? { ...e, harvestPct: GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT } : e,
+    );
   }
 }
 

@@ -17,7 +17,7 @@ import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
-import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
+import { DUNGEON_ENTRY_FACING_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
@@ -249,13 +249,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-10 client before all admission work', async () => {
+  it('2c. rejects an auth-world-25 client on the auth-world-26 server before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-10', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-25', token: 'tok', character: 7 }),
       req,
     );
 
@@ -268,8 +268,8 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
 
   it.each([
     'auth-world',
-    'auth-world-11',
-    'auth-world-13',
+    'auth-world-24',
+    'auth-world-27',
     'auth-world-next',
     'auth-world-01',
     'auth-world-1.0',
@@ -546,6 +546,28 @@ describe('createWsAuth: Warlock pet-special capability negotiation', () => {
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(joinedMeta(resume.game)).toMatchObject({ petSpecialWireVersion: 1 });
+  });
+});
+
+describe('createWsAuth: dungeon-entry facing capability negotiation', () => {
+  it('accepts only the exact optional capability and otherwise keeps the legacy path', async () => {
+    const capable = setup();
+    await createWsAuth(capable.deps).authenticateWebSocket(
+      asWs(capable.ws),
+      authRaw({ dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION }),
+      capable.req,
+    );
+    expect(joinedMeta(capable.game)).toMatchObject({ dungeonEntryFacingWireVersion: 1 });
+
+    for (const advertised of [undefined, 2, '1', true]) {
+      const legacy = setup();
+      await createWsAuth(legacy.deps).authenticateWebSocket(
+        asWs(legacy.ws),
+        authRaw(advertised === undefined ? {} : { dungeonEntryFacingWire: advertised }),
+        legacy.req,
+      );
+      expect(joinedMeta(legacy.game)).toMatchObject({ dungeonEntryFacingWireVersion: 0 });
+    }
   });
 });
 

@@ -4,10 +4,17 @@
 // Wildfang shares Old Blood across Wolf and Bruin forms, and Groveheart
 // grows Verdance toward Overbloom.
 
+import {
+  CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE,
+  GROVESPRING_4PC_VERDANCE_BANK,
+} from '../content/ignivar_set_bonuses';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { hotTickBonus } from '../spell_scaling';
+import { duelJustEndedBetween } from '../social/duel';
+import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 export const MOONTIDE_ID = 'moontide';
 export const OLD_BLOOD_ID = 'old_blood';
@@ -169,7 +176,7 @@ export function druidEngineOnCast(
   ctx: SimContext,
   player: Entity,
   abilityId: string,
-  _target?: Entity | null,
+  target?: Entity | null,
 ): void {
   if (player.kind !== 'player') return;
   const meta = ctx.players.get(player.id);
@@ -228,6 +235,20 @@ export function druidEngineOnCast(
     if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
       setBank(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', 1);
     }
+    // Wildfang 4pc: Redharvest plants a fresh Flense on the target. This
+    // funnel runs AFTER runEffects (onCastCompleted), so the consumeDot
+    // cash-out already paid and removed the old bleed: no double billing.
+    // The replant is aura-only: no combo point, and the landed-strike hook
+    // never fires, so it banks no Old Blood. Draws no rng.
+    if (
+      abilityId === 'redharvest' &&
+      target &&
+      !target.dead &&
+      ctx.isHostileTo(player, target) &&
+      wearsSetBonus(ctx, player, 'wildfang_emberhide', 4)
+    ) {
+      replantFlense(ctx, player, target);
+    }
     return;
   }
 }
@@ -252,6 +273,18 @@ export function druidEngineOnLandedStrike(
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
   if (meta?.cls !== 'druid' || specOf(ctx, player) !== 'feral') return;
   addStage(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  // Cinderbark 2pc: a landed Sweeping Claws has a 30 percent chance to bank
+  // an ADDITIONAL Old Blood (one roll per landed cast: the aoe arm reports
+  // here once per cast that struck anything). WEARER-ONLY rng draw, disclosed
+  // by the set doc: the roll is flag-gated, so a non-wearer's stream stays
+  // byte-identical. The 3-stack cap holds through addStage.
+  if (
+    abilityId === 'swipe' &&
+    wearsSetBonus(ctx, player, 'cinderbark', 2) &&
+    ctx.rng.chance(CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE)
+  ) {
+    addStage(ctx, player, OLD_BLOOD_ID, 'Old Blood', 'old_blood', OLD_BLOOD_STAGES);
+  }
 }
 
 export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, aura: Aura): void {
@@ -297,7 +330,7 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
   if (!resolved || !hot || hot.type !== 'hot') return;
   const tickValue =
     Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))) +
-    hotTickBonus(player.spellPower, hot.duration, hot.interval);
+    hotTickBonus(player.healPower, hot.duration, hot.interval);
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,
@@ -310,6 +343,49 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
     sourceId: player.id,
     school: resolved.def.school,
   });
+}
+
+// Wildfang 4pc: the aura-only Flense replant. Mirrors the dot arm's value
+// arithmetic (effect_dispatch.ts 'dot' case) for the resolved Flense bleed:
+// the authored total is already talent-baked, and the Attack Power rider is
+// the same dotTickBonus the real application pays (Flense's weaponStrike is
+// not a hybrid-suppressing nuke, so its bleed carries the rider). The
+// equivalence is pinned by the wave's test against a REAL Flense cast on the
+// same actor, so the two computations cannot drift silently. No combo award,
+// no landed-strike bank, no rng.
+function replantFlense(ctx: SimContext, player: Entity, target: Entity): void {
+  // Mirror the dot arm's duel-end clamp (effect_dispatch 'dot'): this replant
+  // runs at onCastCompleted, strictly AFTER a same-tick duel end has stripped
+  // everything the caster inflicted, so without the guard it would stamp a
+  // fresh hostile bleed the clear can no longer catch.
+  if (duelJustEndedBetween(ctx, target, player)) return;
+  const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
+  if (!meta) return;
+  const resolved = ctx.resolvedAbility('rake', player.id);
+  const dot = resolved?.effects.find((effect) => effect.type === 'dot');
+  if (!resolved || !dot || dot.type !== 'dot') return;
+  const mods = ctx.playerMods(meta);
+  const dotBase = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
+  const dotSp = dotTickBonus(
+    abilityScalingPower(player, resolved.def),
+    resolved.def,
+    dot.duration,
+    dot.interval,
+    resolveTalentHitMult(resolved.def, mods).dmgMult * (1 + mods.global.dotDmgPct),
+  );
+  ctx.applyAura(target, {
+    id: 'rake',
+    name: resolved.def.name,
+    kind: 'dot',
+    remaining: dot.duration,
+    duration: dot.duration,
+    value: dotBase + dotSp,
+    tickInterval: dot.interval,
+    tickTimer: dot.interval,
+    sourceId: player.id,
+    school: dot.school ?? resolved.def.school,
+  });
+  ctx.enterCombat(player, target);
 }
 
 export function resolveDruidOverbloom(
@@ -351,6 +427,23 @@ export function resolveDruidOverbloom(
   }
   if (selectedRow(ctx, player, DRUID_TALENT_IDS.naturesFury)) {
     setBank(ctx, player, VERDANCE_ID, 'Verdance', 'verdance', 1);
+  }
+  // Grovespring 4pc: bank 1 Verdance after the harvest resolves, placed
+  // AFTER the Nature's Fury seed so the two are additive beside each other.
+  // setBank(current + 1) DIRECTLY, never addStage: addStage would silently
+  // pay Quickening's per-stage reward on top of the promised bank. The
+  // replants above go through ctx.applyAura, never the hot-planted hook, so
+  // neither Seedspread nor this bank can self-arm. Draws no rng.
+  if (wearsSetBonus(ctx, player, 'grovespring', 4)) {
+    const current = ownedAura(player, VERDANCE_ID)?.stacks ?? 0;
+    setBank(
+      ctx,
+      player,
+      VERDANCE_ID,
+      'Verdance',
+      'verdance',
+      Math.min(VERDANCE_STAGES, current + GROVESPRING_4PC_VERDANCE_BANK),
+    );
   }
 }
 

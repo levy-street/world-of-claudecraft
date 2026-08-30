@@ -269,7 +269,12 @@ describe('the HUD latch that converges the open character sheet', () => {
     expect(win.slice(at, at + 160)).toContain('this.render()');
     // And every signed row is painted from the same progression block the HUD
     // builds, which is what makes ONE signature the right shape for all of them.
-    const progression = hud.slice(hud.indexOf('private progressionHtml(level: number): string {'));
+    // The progression block moved out of the hud.ts coordinator into the pure
+    // view module (the monolith-ratchet payment); the pin follows the code.
+    const view = read('src/ui/character_progression_view.ts');
+    const progression = view.slice(
+      view.indexOf('export function progressionHtml(sim: IWorld, level: number): string {'),
+    );
     const body = progression.slice(0, 2600);
     expect(body).toContain('sim.activeBorder');
     expect(body).toContain('sim.activeTitle');

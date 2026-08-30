@@ -97,6 +97,7 @@ import {
   type SimEvent,
   type UnstuckBlockedReason,
 } from '../src/sim/types';
+import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
 import {
   type BankBonusSource,
   type BgLadderEntry,
@@ -224,6 +225,8 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
+import { findDungeonDoorNear } from './dungeon_door';
+import * as entryFacing from './dungeon_entry_facing';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -237,7 +240,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { shouldDeliverCombatEventToViewer } from './event_delivery';
+import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
@@ -252,6 +255,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
@@ -379,6 +383,7 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
+import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
@@ -919,13 +924,16 @@ export interface ClientSession {
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
   rememberedChat: RememberedChat;
-  // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
+  dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
+  // A resumed socket missed one-shot forge portal events while linkdead. Replay
+  // the current authoritative warnings once, after its first full snapshot.
+  needsVarkhulPortalReplay: boolean;
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
@@ -3467,6 +3475,7 @@ export class GameServer {
         fbc?: string | null;
         sourceUrl?: string | null;
         leaseNonce?: string;
+        dungeonEntryFacingWireVersion?: entryFacing.WireVersion;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
         generalChatRateLimit?: GeneralChatRateLimit | null;
@@ -3659,8 +3668,10 @@ export class GameServer {
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
+      dungeonEntryFacing: entryFacing.forEntity(player, meta.dungeonEntryFacingWireVersion),
       lastInputAt: this.sim.time,
       lastSent: {},
+      needsVarkhulPortalReplay: false,
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
       petSpecialWireVersion:
@@ -3914,12 +3925,18 @@ export class GameServer {
     // trackers need no reset. Preserving lastSent here would require resetting
     // those trackers instead. Focused reconnect tests pin the force-reship arm.
     session.lastSent = {};
+    session.needsVarkhulPortalReplay = true;
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     session.petSpecialWireVersion =
       meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const player = this.sim.entities.get(session.pid);
     if (player) {
+      session.dungeonEntryFacing = entryFacing.forResume(
+        session.dungeonEntryFacing,
+        player,
+        meta.dungeonEntryFacingWireVersion,
+      );
       player.petSpecialCommandsSupported =
         session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }
@@ -6335,26 +6352,23 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
-      // The movement lane verdicts at the top of the arm, before the sim
-      // moveInput assignment and before observeInput (R5): a dropped movement
-      // frame reaches neither the sim nor the detector, which is FP-safe
-      // because input_absence only counts input frames toward ACTIVE time.
       if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
+      const facingDecision = entryFacing.decideDungeonEntryInput(
+        session.dungeonEntryFacing,
+        e,
+        frame,
+        msg.de,
+      );
+      session.dungeonEntryFacing = facingDecision.state;
+      Object.assign(meta.moveInput, facingDecision.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
-        // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past lastInputSeq + 1 proves the missing seqs were
-        // sent and never processed (the input-frame-attributed share of the
-        // server's own drops). Guarded to a positive high-water because resume
-        // zeroes it while the client restarts its counter on reconnect, and
-        // capped so a reset mismatch never books a giant gap.
         if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
           gameMetricsCounters().wsInputSeqGap(
             Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
@@ -6362,15 +6376,8 @@ export class GameServer {
         }
         session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
-      // A released spirit turns with the camera like the living; only a corpse that
-      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
-      // this the server drops the ghost's mouselook facing and its run feels inverted.
-      // A stun locks facing too (issue #2426): the offline kernel already blocks its
-      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
-      // this out-of-band channel and must be rejected here, the authoritative side,
-      // not trusted to a client that could simply keep sending it.
-      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
-        e.facing = frame.facing;
+      if (facingDecision.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
+        e.facing = facingDecision.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
@@ -8076,14 +8083,8 @@ export class GameServer {
           break;
         }
         const e = sim.entities.get(pid);
-        const door = [...sim.entities.values()].find(
-          (x) => x.templateId === 'dungeon_door' && x.dungeonId === dungeonId,
-        );
-        const succeeded =
-          !!e &&
-          !!door &&
-          Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
-          sim.enterDungeon(dungeonId, pid);
+        const door = e ? findDungeonDoorNear(sim.entities.values(), dungeonId, e.pos) : undefined;
+        const succeeded = !!door && sim.enterDungeon(dungeonId, pid);
         this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
@@ -8108,6 +8109,13 @@ export class GameServer {
         // Range, stock, balance, and bag space all re-validate in the sim
         // handler (instances/heroic_vendor.ts); the client only sends intent.
         if (typeof msg.itemId === 'string') sim.buyHeroicVendorItem(msg.itemId, pid);
+        break;
+      }
+      case 'crucible_buy': {
+        // Range, stock, class, sigil balance, and bag space all re-validate in
+        // the sim handler (instances/crucible_vendor.ts); the client only
+        // sends intent.
+        if (typeof msg.itemId === 'string') sim.buyCrucibleVendorItem(msg.itemId, pid);
         break;
       }
       case 'enter_delve': {
@@ -8236,9 +8244,12 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
-    const activeFrostRings = this.sim.activeFrostRings;
-    const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
-    const activeConsecrations = this.sim.activeConsecrations;
+    const telegraphWorld = groundTelegraphWorld(this.sim, INTEREST_QUERY_RADIUS, EVENT_RADIUS);
+    const varkhulPortalReplay = buildVarkhulPortalReplayBatch(
+      this.clients.values(),
+      () => this.sim.activeVarkhulForgePortalTelegraphs,
+      EVENT_RADIUS,
+    );
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8407,51 +8418,8 @@ export class GameServer {
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
-        // ground effects, not entities: they carry a position, radius and timer
-        // and no caster identity or team, and a player must be able to react to
-        // one wherever it lands. They therefore keep the widened match horizon
-        // inside the band, unlike the enemy PLAYERS above, whose records the
-        // narrowed rule holds to the open-world radii.
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
-        const frostRings = activeFrostRings
-          .filter((ring) => {
-            const dx = ring.x - anchorEntity.pos.x;
-            const dz = ring.z - anchorEntity.pos.z;
-            const limit = aoeBase + ring.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (ring) =>
-              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
-          );
-        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
-        const temporalHourglasses = activeTemporalHourglasses
-          .filter((hourglass) => {
-            const dx = hourglass.x - anchorEntity.pos.x;
-            const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = aoeBase + hourglass.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (hourglass) =>
-              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
-          );
-        const temporalHourglassesJson =
-          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
-        const consecrations = activeConsecrations
-          .filter((consecration) => {
-            const dx = consecration.x - anchorEntity.pos.x;
-            const dz = consecration.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (consecration) =>
-              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
-          );
-        const consecrationsJson =
-          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
+        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase);
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         const petSpecialWireJson =
           session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
@@ -8459,8 +8427,17 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}}`,
         );
+        if (session.needsVarkhulPortalReplay) {
+          session.needsVarkhulPortalReplay = false;
+          const replayFrame = varkhulPortalReplayFrame(
+            varkhulPortalReplay,
+            anchorEntity.pos,
+            this.sim.entities,
+          );
+          if (replayFrame !== null) this.sendRaw(session, replayFrame);
+        }
       },
       (err, resolved) =>
         console.error(
@@ -8717,6 +8694,8 @@ export class GameServer {
     const maybe = (key: string, value: unknown): void => {
       maybeSerialized(key, JSON.stringify(value ?? null));
     };
+    if (session.dungeonEntryFacing.enabled)
+      maybeSerialized('de', `${this.sim.entities.get(session.pid)?.dungeonEntrySeq ?? 0}`);
     // Static combat-rating/progression scalars: rarely change (gear/talent swap,
     // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
     // other field on this record which was still being rebuilt and stringified
@@ -8730,6 +8709,7 @@ export class GameServer {
     maybe('copper', meta.copper);
     maybe('ap', p.attackPower);
     maybe('sp', p.spellPower);
+    maybe('hpw', p.healPower);
     maybe('sh', p.spellHaste);
     maybe('crit', p.critChance);
     maybe('dodge', p.dodgeChance);
@@ -9660,9 +9640,12 @@ export class GameServer {
             continue;
           }
           // world events: only those near this player
-          const anchor = this.eventAnchor(ev);
+          const anchor = eventAnchor(ev, this.sim.entities);
           if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
             mine.push(fragments[i]);
+            if (ev.type === 'spellfxAt' && ev.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID) {
+              session.needsVarkhulPortalReplay = false;
+            }
           }
         }
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;
@@ -9763,20 +9746,6 @@ export class GameServer {
       else this.sim.tradeInvites.delete(ev.pid);
     }
     return suppressed;
-  }
-
-  private eventAnchor(ev: SimEvent): { x: number; y: number; z: number } | null {
-    let id: number | undefined;
-    if ('targetId' in ev && typeof ev.targetId === 'number') id = ev.targetId;
-    else if ('entityId' in ev && typeof ev.entityId === 'number') id = ev.entityId;
-    if (id !== undefined) return this.sim.entities.get(id)?.pos ?? null;
-    // world-coordinate events (spellfxAt: a ground-targeted impact) anchor at
-    // their own point so they interest-scope like entity-anchored fx instead
-    // of fanning out server-wide (dist2d ignores y)
-    if ('x' in ev && 'z' in ev && typeof ev.x === 'number' && typeof ev.z === 'number') {
-      return { x: ev.x, y: 0, z: ev.z };
-    }
-    return null; // chat/log etc: broadcast
   }
 
   private isSpectateLocalChat(session: ClientSession, text: string): boolean {

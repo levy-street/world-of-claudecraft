@@ -173,6 +173,20 @@ export function prefetchOccluderFade(mats: readonly OccluderFadeMat[]): void {
 }
 
 /**
+ * Stage a structure's fade programs once, unconditionally. This is the warm
+ * path for hideables whose flip is DISTANCE-INDEPENDENT (the raid shells'
+ * backface cull re-shows whenever the camera returns inside the plane,
+ * however far the wall is), where the within-reach latch below would be the
+ * wrong gate. It shares the per-structure latch with
+ * prefetchOccluderFadeWithin, so whichever asks first covers both.
+ */
+export function stageOccluderFadeOnce(mats: readonly OccluderFadeMat[]): void {
+  if (mats.length === 0 || mats[0].prefetched) return;
+  mats[0].prefetched = true;
+  prefetchOccluderFade(mats);
+}
+
+/**
  * The painters' per-frame prefetch: once, the first frame the structure
  * anchored at (x, z) is within OCCLUDER_FADE_PREFETCH_YD of the camera. The
  * latch lives on the structure's first record, so a painter adds one call and
@@ -187,8 +201,7 @@ export function prefetchOccluderFadeWithin(
 ): void {
   if (mats.length === 0 || mats[0].prefetched) return;
   if (!withinOccluderFadePrefetch(x, z, camX, camZ)) return;
-  mats[0].prefetched = true;
-  prefetchOccluderFade(mats);
+  stageOccluderFadeOnce(mats);
 }
 
 /** Whether the records have `alpha` written to their materials. The writes
