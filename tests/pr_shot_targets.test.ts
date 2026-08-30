@@ -667,6 +667,33 @@ describe('classifyDiff', () => {
     expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
     expect(target?.variants.every((v: { beforeLoad?: unknown }) => !!v.beforeLoad)).toBe(true);
   });
+
+  it('routes the legendary regalia core to the phase 16 regalia target', () => {
+    // The forge-mote drift is computed in legendary_regalia_core.ts and drawn
+    // by the renderer entity loop; a change to the core is a change to the
+    // marquee orange identity and must reshoot it.
+    const plan = classifyDiff(['src/render/legendary_regalia_core.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('p16-legendary-regalia');
+    const target = resolveTargets(['src/render/legendary_regalia_core.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'p16-legendary-regalia',
+    );
+    // Desktop and mobile landscape both. Every variant carries a preset seed,
+    // and deliberately NOT the lowest one: the treatment is gated at the
+    // medium effects tier, so the target seeds preset 2 (the graphics
+    // comparison exception to the standing lowest-preset rule; the rationale
+    // lives on the target and the seedMediumGraphicsPreset helper).
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
+    expect(target?.variants.every((v: { beforeLoad?: unknown }) => !!v.beforeLoad)).toBe(true);
+    // The mobile arm must keep its Android UA override: the runner's default
+    // iPhone UA lands the iOS memory profile, whose Lambert material tier
+    // never applies the day/night grade, and the evening staging is
+    // load-bearing for the shot (daylight washes the additive motes out).
+    const mobileVariant = target?.variants.find((v: { key: string }) => v.key === 'mobile') as
+      | { userAgent?: string }
+      | undefined;
+    expect(mobileVariant?.userAgent).toContain('Android');
+  });
 });
 
 describe('diffChangedPaths', () => {

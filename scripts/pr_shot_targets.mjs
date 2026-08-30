@@ -535,6 +535,18 @@ async function dismissTutorialGreeting(page) {
   await wait(200);
 }
 
+/** Deliberate MEDIUM leg for treatments hidden below the medium effects tier
+ *  (renderer gates like gfxTierAtLeast(GFX.effectsTier, 'medium')). Preset 2 is
+ *  the LOWEST numeric preset whose tier passes such a gate (gfx.ts
+ *  tierFromHints maps 2 to 'medium', and an explicit stored preset is honored
+ *  even on software GL), so this stays as close to the standing lowest-preset
+ *  rule as the subject allows. */
+async function seedMediumGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 2; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
 /** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
 async function seedHighGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
@@ -12169,6 +12181,217 @@ export const TARGETS = [
       if (!expanded) return { skip: 'the consumable strip never revealed from the seat hold' };
       await wait(300);
       return { clip: '#ui' };
+    },
+  },
+  {
+    // Masterwrought phase 16: the orange legendary regalia identity, the
+    // world-space forge-mote drift over a wearer whose worn slot carries a
+    // legendary-rolled payload (the renderer entity loop over
+    // legendary_regalia_core.ts). PRESET NOTE: the treatment is hidden below
+    // the medium effects tier by design (gfxTierAtLeast(GFX.effectsTier,
+    // 'medium')), so the standing lowest-preset rule yields to the
+    // graphics-comparison exception here: both variants seed preset 2 via
+    // seedMediumGraphicsPreset, the lowest numeric preset that passes the
+    // gate (see that helper's header for the mapping).
+    key: 'p16-legendary-regalia',
+    label: 'Legendary regalia forge-mote drift on a worn legendary-rolled piece (phase 16)',
+    when: ['legendary_regalia_core'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedMediumGraphicsPreset },
+      {
+        key: 'mobile',
+        mobile: true,
+        beforeLoad: seedMediumGraphicsPreset,
+        // The runner's default iPhone UA lands gfx.ts's iOS memory profile,
+        // which pins Lambert materials at EVERY preset, and the Lambert
+        // outdoor branch never applies the day/night grade (updateAmbience),
+        // so the evening staging cannot darken the frame there and full
+        // daylight washes the additive motes out (verified: the override
+        // reached the renderer, sunDir moved, the frame stayed noon). An
+        // Android phone profile keeps standard materials at the medium
+        // preset and shows the graded evening the way a real Android phone
+        // does; iOS-profile devices genuinely never see the grade.
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+      },
+    ],
+    async capture(page, variant) {
+      await dismissTutorialGreeting(page);
+      // Stage through the real item path: a legendary-rolled instance lands in
+      // the bags and is equipped to its own slot, so the equip arm consumes the
+      // bagged instance into PlayerMeta.equipmentInstance and recalcPlayerStats
+      // mirrors it onto entity.equippedInstances, the exact read the renderer
+      // predicate keys on. Never a hand-poked entity field.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.addItemInstance('quilted_trousers', { rolled: { quality: 'legendary' } });
+        sim.equipItemToSlot('quilted_trousers', 'legs');
+        // The entry camp is thick with ambient fireflies and torch glow that
+        // read exactly like sparse orange motes; relocate to the flat clear
+        // stretch the weapon-vfx-shed target probed (open ground, clean dark
+        // backdrop; a seaward nudge was tried and puts a fully opaque tree
+        // right behind the wearer, worse than the faint high occluder ghost
+        // this spot carries), and drop the entry self-target so the target
+        // frame and overhead highlight stay out of the closeup.
+        player.pos.x = 100;
+        player.pos.z = -80;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        sim.rebucket?.(player);
+        player.targetId = null;
+        // Camera aim happens AFTER the arrival settles (below): the arrival
+        // director re-seats the orbit, so a yaw set here does not survive the
+        // curtain. Only re-home nearby mobs now so nothing aggros through the
+        // frame (the weapon-vfx-shed idiom).
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.hp = player.maxHp;
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // The relocation is a teleport-class arrival: it raises the loading
+      // curtain while the destination streams and its programs link. Give the
+      // curtain a beat to RAISE first (a check that runs before it mounts
+      // passes vacuously), then hold until it is down or the shot is a
+      // loading screen.
+      await wait(1200);
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          return !loading || !loading.classList.contains('visible');
+        },
+        { timeout: 180000, polling: 300 },
+      );
+      // The worn mirror must carry the legendary roll before anything can emit.
+      await page.waitForFunction(
+        () =>
+          window.__game?.sim?.player?.equippedInstances?.legs?.rolled?.quality === 'legendary',
+        { timeout: 10000, polling: 200 },
+      );
+      // And the renderer must have recomputed its per-view flag off the new
+      // equippedInstances identity: that flag turning true is the proof the
+      // predicate path ran, not just the sim state.
+      await page.waitForFunction(
+        () =>
+          window.__game?.renderer?.views?.get?.(window.__game?.sim?.playerId)
+            ?.legendaryRegalia === true,
+        { timeout: 15000, polling: 250 },
+      );
+      // The zone change re-pops the tutorial quest banner (Seek the Marshal)
+      // over the top of the frame, and the software-GL notice can outlast the
+      // pre-goto suppression; clear both through their own controls before
+      // the shot, then let sparks accumulate: at 1.8 motes a second with a
+      // 1.1s to 1.6s life, a few are airborne in any shutter once the
+      // emitter has run a while.
+      await page.evaluate(() => {
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // Now that the arrival director is done re-seating the orbit: pull
+        // the chase camera in so the sparse drift reads at PR-screenshot
+        // size, aim it at the sea (probed: every landward yaw here backs the
+        // frame with trees and their own fireflies, which read exactly like
+        // motes), and face the wearer at the camera so the worn piece and
+        // the drift share the frame.
+        const game = window.__game;
+        const player = game?.sim?.player;
+        if (game && player) {
+          game.input.camDist = 5;
+          game.input.camYaw = Math.PI;
+          player.facing = 0;
+        }
+      });
+      // Evening light through the same render-only override the /daynight dev
+      // command drives. The command itself is a main.ts closure over the
+      // desktop chat composer's keydown, and the mobile HUD routes chat entry
+      // through its own controls, so a synthetic composer Enter never lands
+      // there; call the underlying module directly instead. Vite dev serves
+      // the live module registry, so this import IS the instance the renderer
+      // reads currentDayNightPhase() from every frame (the reliquary targets'
+      // idiom). 0.8 is the 'evening' preset in main.ts DAY_NIGHT_PRESETS.
+      const evening = await page.evaluate(async () => {
+        const clock = await import('/src/render/day_night_clock.ts');
+        clock.setDayNightPhaseOverride(0.8);
+        // The direct call skips the command's dial refresh; nudge the minimap
+        // dial the same way so the chrome agrees with the sky.
+        window.__game?.hud?.refreshDayNightDial?.();
+        return clock.currentDayNightPhase();
+      });
+      // The override is load-bearing for this shot (in daylight the additive
+      // embers disappear against the dune): a direct call does not log, so
+      // verify through the clock's own state rather than a chatlog line.
+      if (Math.abs(evening - 0.8) > 1e-9) {
+        throw new Error(`evening staging did not land (day/night phase ${evening})`);
+      }
+      // The light transition eases over several seconds (the classic-theme
+      // target waits 8s for the same command); the spark accumulation rides
+      // the same window.
+      await wait(8000);
+      // Ferryman Odo's greeting can pop mid-wait (it arrives a few beats
+      // after entry, later than the entry helper's dismissal), and the
+      // software-GL notice re-raises itself after slow frames; clear both
+      // again so neither covers the frame.
+      await dismissTutorialGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Companion close crop around the wearer so the motes read at review
+      // size (the weapon-vfx-shed idiom); the runner's own shot keeps the full
+      // frame for context.
+      const spot = await page.evaluate(() => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(window.__game?.sim?.playerId);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        // Center the crop on the torso: the drift anchors at the hips and
+        // spreads most of a body height upward.
+        p.y += (v.height ?? 1.8) * 0.55;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      });
+      if (spot) {
+        const box = { w: 560, h: 520 };
+        const width = Math.min(box.w, spot.w);
+        const height = Math.min(box.h, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        // Keep the crop above the self unit frame at the bottom of the HUD:
+        // the closeup is about the world-space motes, not the chrome.
+        const yMax = Math.max(0, spot.h - height - 190);
+        const y = Math.max(0, Math.min(yMax, spot.y - height / 2));
+        await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/p16-legendary-regalia-${variant?.key ?? 'desktop'}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
     },
   },
   {
