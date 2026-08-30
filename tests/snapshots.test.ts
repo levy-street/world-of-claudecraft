@@ -44,6 +44,7 @@ import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
 import { ClientWorld } from '../src/net/online';
+import { legendaryRegaliaActive } from '../src/render/legendary_regalia_core';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import {
   emptyPriestMarkerState,
@@ -4096,6 +4097,37 @@ describe('equipped instance wire (eqi)', () => {
     expect(wired.chest.perfected).toBeUndefined();
     expect(wired.chest.perfecting).toBeUndefined();
     expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
+  });
+
+  it('welds the regalia predicate across hosts: one legendary roll through the real wire', () => {
+    // The one assertion joining the eqi allowlist scrape and the mirror pin
+    // (Phase 16 QA): a real legendary-rolled worn piece drives
+    // legendaryRegaliaActive TRUE on the Sim entity's own mirror, then TRUE
+    // again on the ClientWorld mirror decoded from the same wireEntity
+    // record, so the both-hosts claim is measured, not argued.
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Sunwrought');
+    const e = sim.entities.get(pid)!;
+    sim.addItemInstance(
+      'eastbrook_ritual_vestments',
+      { signer: 'Aldric', rolled: { quality: 'legendary', stats: { int: 3 } } },
+      pid,
+    );
+    sim.equipItem('eastbrook_ritual_vestments', pid);
+    expect(legendaryRegaliaActive(e.equippedInstances)).toBe(true);
+    const wired = wireEntity(e);
+    const client = bareClient(99);
+    (client as any).applySnapshot({ t: 'snap', ents: [wired] });
+    const mirror = client.entities.get(pid)!;
+    expect(legendaryRegaliaActive(mirror.equippedInstances)).toBe(true);
+    // Negative control on the same rig: a plain masterwork roll glows on
+    // NEITHER host (the predicate keys on rolled.quality alone).
+    sim.unequipItem('chest', pid);
+    sim.addItemInstance('eastbrook_ritual_vestments', structuredClone(inst), pid);
+    sim.equipItem('eastbrook_ritual_vestments', pid);
+    expect(legendaryRegaliaActive(e.equippedInstances)).toBe(false);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(legendaryRegaliaActive(client.entities.get(pid)!.equippedInstances)).toBe(false);
   });
 
   it('restores equippedInstances from a full record, deep-cloned; an eqi-less full record resets', () => {

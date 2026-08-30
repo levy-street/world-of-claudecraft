@@ -11559,7 +11559,7 @@ export class Renderer {
               v.legendaryRegaliaRef = e.equippedInstances;
               v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);
             }
-            if (v.legendaryRegalia) {
+            if (v.legendaryRegalia && !this.reducedMotion()) {
               this.vfx.legendaryRegalia(e.id, dt * legendaryRegaliaEmitScale(d2));
             }
           }

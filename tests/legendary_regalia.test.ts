@@ -138,8 +138,12 @@ describe('legendaryRegaliaEmitScale: the distance shed', () => {
 
   it('keeps a visible emission under the pool quality floor at the shed floor', () => {
     // emitCount scales rates by floor + span * quality; the floor is SCRAPED
-    // from vfx.ts rather than hand-copied, and the shed floor is read from the
-    // live scale at the anchor, so a retune of either re-prices this bound.
+    // from vfx.ts and then PINNED to 0.35 below, so the scrape's job is
+    // anchoring (proving the pinned value really is emitCount's own floor,
+    // not a sibling's): a legitimate retune of the emitCount floor is
+    // EXPECTED to red this line and be re-judged by hand, not silently
+    // re-priced (the Phase 16 QA trued this comment; the pin itself is the
+    // fix round's deliberate anchored-scrape shape).
     // Worst case must stay a spark every few seconds, never a silent removal.
     // Anchor the scrape INSIDE emitCount's body: scaledCount above it carries
     // its own floor + span * quality expression with a DIFFERENT floor, and an
@@ -248,6 +252,11 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(4);
     expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(4);
     expect(pubBlock).not.toContain('...');
+    // ... and no non-dotted write shape either (the Phase 16 QA): an
+    // Object.assign(pub, {...}) or a computed-key loop (pub[k] = inst[k])
+    // matches neither the 4-count nor the spread ban above, so ban the shapes
+    // outright; every projected write must be the counted dotted assignment.
+    expect(pubBlock).not.toMatch(/Object\.assign|\bpub\[/);
     const core = read(CORE);
     expect(core).toContain(".rolled?.quality === 'legendary'");
     for (const field of ['signer', 'enchant', 'craftedRecipeId', 'bindOnTrade', 'locked']) {
@@ -293,16 +302,61 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect(emitAt, 'the shed emit call is missing').toBeGreaterThan(gateAt);
     const slice = renderer.slice(gateAt, emitAt + 80);
     // recomputed ONLY on reference identity change: the predicate call sits
-    // inside the ref-diff guard, so the per-frame cost is one pointer compare
+    // inside the ref-diff guard, so the per-frame cost is one pointer compare.
+    // NESTING, not source order (the Phase 16 QA): an unconditional recompute
+    // moved BELOW the guard would still satisfy an index comparison, so walk
+    // the guard's braces and require the recompute inside its span.
     const refGuardAt = slice.indexOf('if (v.legendaryRegaliaRef !== e.equippedInstances)');
     const recomputeAt = slice.indexOf(
       'v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);',
     );
     expect(refGuardAt).toBeGreaterThan(-1);
     expect(recomputeAt).toBeGreaterThan(refGuardAt);
+    const guardOpenAt = slice.indexOf('{', refGuardAt);
+    let guardDepth = 0;
+    let guardCloseAt = -1;
+    for (let i = guardOpenAt; i < slice.length; i++) {
+      if (slice[i] === '{') guardDepth++;
+      else if (slice[i] === '}') {
+        guardDepth--;
+        if (guardDepth === 0) {
+          guardCloseAt = i;
+          break;
+        }
+      }
+    }
+    expect(guardCloseAt, 'the ref-diff guard block never closes').toBeGreaterThan(guardOpenAt);
+    expect(
+      recomputeAt > guardOpenAt && recomputeAt < guardCloseAt,
+      'the predicate recompute must sit INSIDE the ref-diff guard braces',
+    ).toBe(true);
+    // the emit is suppressed for a reduced-motion viewer (the lich-aura
+    // precedent; an accessibility choice by the viewer, never a graphics shed;
+    // the fairness doc's regalia bullet names this arm)
+    expect(slice).toContain('if (v.legendaryRegalia && !this.reducedMotion())');
     expect(slice).not.toMatch(/Object\.(entries|values|keys)/);
     expect(slice).not.toMatch(/\.visible\s*=/);
     expect(slice).not.toMatch(/new THREE\.PointLight/);
+    // no actionable or host-forking read may enter the wiring slice either
+    // (the core's own token ban only covers legendary_regalia_core.ts): a
+    // condition inserted here gating the glow on hp, target, casting, aura,
+    // or Perfecting state, or re-tying it to the live governor, must red this
+    // scan. reducedMotion is the one sanctioned extra read (above).
+    for (const banned of [
+      /\bperfected\b/,
+      /\bperfecting\b/,
+      /\bhpFrac\b/,
+      /\bhp\b/,
+      /\bmaxHp\b/,
+      /\btarget\b/,
+      /\bauras\b/,
+      /\bcasting\b/,
+      /\bappliedBudgetLevels\b/,
+      /\bgovernor\b/i,
+      /\brenderBudget\b/i,
+    ]) {
+      expect(banned.test(slice), `wiring slice must not read ${banned}`).toBe(false);
+    }
     // the emit rides the same ambient !e.dead block as the form auras (a
     // corpse must not smolder), under runCharacterPresentation. NESTING, not
     // source order: walk brace depth from the dead guard's open brace to its

@@ -64,6 +64,18 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
+- The legendary-regalia forge motes (`src/render/legendary_regalia_core.ts` plus the
+  `Vfx.legendaryRegalia` pooled emitter): the sparse orange drift rising off a wearer whose
+  worn set includes a legendary-rolled copy. Worn-gear PRESTIGE display, not actionable
+  state: the predicate reads only the eqi wire allowlist (never `perfected`, hp, auras, or
+  target state), so shedding it hides nothing a player acts on (the classification is a
+  recorded maintainer read in the masterwrought Phase 16 ledger). The shed's shape: gated
+  at the medium effects tier by the STATIC preset stamp (`gfxTierAtLeast(GFX.effectsTier)`,
+  never the FPS governor), distance-faded against the fixed `CHARACTER_LOD_RANGE_SQ` anchor
+  exactly like the weapon-VFX fade above, floored above zero, and dimmed only through the
+  pooled cloud's own governor quality floor. Suppressed under the viewer's
+  prefers-reduced-motion setting, the lich-aura precedent (an accessibility choice by the
+  viewer, not a graphics shed).
 - Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
   surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
   forged seal, motif, material, and structural edge may never be hidden. The world seal and
@@ -311,6 +323,12 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   literal-pinned, the shed is strictly every-other-frame (never a removal: the application
   writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
   renderer call sites.
+- `tests/legendary_regalia.test.ts`: the legendary-regalia motes. The predicate core is
+  scanned free of preset, tier, profile, and governor inputs and of every actionable token
+  (`perfected` included, the host-forking read), the eqi wire allowlist is scrape-pinned in
+  `server/game.ts`, the distance shed is anchored to the fixed `CHARACTER_LOD_RANGE_SQ` with
+  a floored scale, the pooled emitter is proven light-, material-, and visibility-write-free,
+  and the renderer wiring is pinned cached, players-only, and static-preset-gated.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
