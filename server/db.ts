@@ -3533,10 +3533,9 @@ export async function saveCharacterState(
 // (the handshake acquires it before it re-reads the blob, server/ws_auth.ts)
 // makes this write touch nothing and return false, which the caller surfaces
 // as a refusal instead of landing a write the session's next autosave would
-// clobber. The offline pre-checks in the caller answer the common case; this
-// fence answers the reconnect window a per-process session map cannot see
-// (including a session on a peer process). Same chokepoints as the live save
-// (the zone-1 sanitize, the heavy allowance, the size signal).
+// clobber. The caller's pre-checks answer the common case; the fence answers
+// the reconnect window a per-process session map cannot see (a peer process
+// too), and pins the row's realm. Same chokepoints as the live save.
 export async function saveOfflineCharacterState(
   characterId: number,
   level: number,
