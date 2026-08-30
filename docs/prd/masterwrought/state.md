@@ -1,20 +1,20 @@
 # Masterwrought: cross-phase state
 
-Current phase: 16 IN PROGRESS (2026-08-29). **THE R5 GATE IS CLOSED BY
-RULING**: the maintainer delivered all four priced rulings at the Phase 16
-gate (1a keep the baseline pool with the denominator caveat recorded, 2b
-ratify the modelled term as the R5 quantity with the floors stated, 3a
-close on the four measured lanes with enhancement bounded by argument,
-4-amend the rescoped apex-bag pin is final; the verbatim dated rows sit in
-"Maintainer rulings (2026-08-29)" at the END of this file, followed by the
-R5 closure record). Phase 16's STEP 0.5 executed the closure: the section
-9.2 fury and caster rows re-cut from the COMMITTED harness at the closure
-tip, the Verdict flipped from SUSPENDED to CLOSED BY RULING in every home
-(power-verification.md, both Phase 15 ledgers here, progress.md), and the
-probe suite green. The four content tunes stand. The record is
-docs/prd/masterwrought/power-verification.md. Next: Phase 16's arms
-(polish and content surfaces, the phase file as amended 2026-08-29), then
-Phase 16 QA.
+Current phase: 16 COMPLETE (2026-08-29 to 2026-08-30). **THE R5 GATE IS
+CLOSED BY RULING** (the maintainer's four rulings 1a/2b/3a/4-amend,
+verbatim in "Maintainer rulings (2026-08-29)" at the END of this file,
+executed as STEP 0.5: the 9.2 fury and caster rows re-cut from the
+COMMITTED harness, the Verdict flipped from SUSPENDED to CLOSED BY RULING
+in every home, the four content tunes standing), and every polish arm
+landed: the orange regalia identity, the enumerated icon park, the guide
+coverage and well-fed coherence, the Etching enchant-scheme re-cut, the
+two Discord cards, the widened admin Market Metrics page, the four
+explicit records, three monolith paybacks (renderer 13133, online 5922,
+game.ts 10329), and the committed screenshot set. Six-charter review plus
+a fix round, a fresh reader, and the qa-checklist gate (READY, zero
+blocking); the Phase 16 ledger at the end of this file carries the
+records, refusals, acceptance, and the frozen stamp. Next: Phase 16 QA
+(phase-16-qa.md, FRESH session).
 
 Previously: 15 QA COMPLETE (2026-08-29): PASS on the phase's work and THE
 ESCALATION HOLDS, verified four independent ways; the ruling packet priced
@@ -21814,15 +21814,82 @@ EXECUTED the same day the rulings landed. The inventory:
    stand. Validation: tests/r5_envelope_probe.test.ts and
    tests/masterwrought_budget.test.ts green at the closure tip, tsc clean.
 
-## Phase 16 ledger (2026-08-29, polish and content surfaces)
+## Phase 16 ledger (2026-08-29 to 2026-08-30, polish and content surfaces)
 
-STATUS: BUILD COMPLETE, review round in flight; the STATUS line, reviewer
-verdicts and the frozen stamp are appended below when the round settles.
+STATUS: **COMPLETE.** Every arm landed, every reviewer finding applied or
+judged with the refusal recorded below, the qa-checklist gate returned
+READY with zero blocking, and the frozen stamp sits at the end of this
+ledger. LOCAL only, no push, no PR.
 STEP 0: recorded NO-OP sync (origin/release/v0.41.0 unmoved at e19d832b47,
 already an ancestor; no merge, no audit; payback targets stand as the
 seventh-sync arithmetic moved them). STEP 0.5: the R5 closure, executed
 first (the rulings section and closure record above; commits 536e8cb846,
 a6cac2e226).
+
+### THE REVIEW ROUNDS
+- SIX DOMAIN CHARTERS over f90b3f5812..HEAD (frontend-seam, render-perf,
+  privacy-security, server-hot-path, content-obligations,
+  test-decisiveness). The TYPED reviewer dispatch returned SIX EMPTY
+  results (the FOURTH occurrence of the pattern this packet; 168-agent
+  precedent noted in the Phase 15 QA ledger) and was re-run
+  general-purpose with the charters inlined per protocol; the re-run
+  delivered all six full reports. Verdicts: ZERO blocking; 1 should-fix
+  (the ja/ru locale trade-dress collision) and roughly twenty nits, every
+  one applied, adapted, or refused-with-reason below. Cross-checks the
+  round proved independently: both extractions move-not-rewrite by
+  normalized diff, the no-double-announce property, the cached-predicate
+  identity safety in BOTH hosts, and the ratchet arithmetic.
+- FIX ROUND (a8e3111c2f) applied 6 should-fix and 12 nits; a FRESH READER
+  over that commit found 5 more (a genuinely mis-anchored source scrape
+  among them), applied as 80ec14020d.
+- qa-checklist LAST (general-purpose fan of the evergreen gate): READY,
+  zero blocking, five should-fix, all five closed (the bot/CLAUDE.md N10
+  entry and the untyped-host weld pins in 178080a690; the judged-refusals
+  record and the admin-capture judgment in this ledger; the format slip in
+  43178d23cf). 39 guard suites re-run green by the gate itself.
+
+### JUDGED REFUSALS (the a8e3111c2f body's "three", recorded here)
+1. The per-frame emit-scale micro-cost (three Math.sqrt per glowing
+   on-screen player): a cached quantized scale would add a staleness
+   surface for a trivial gain; refused, the cost is bounded and the
+   reviewer rated it trivial.
+2. The admin page's 403-as-generic-failure line: matches the
+   Overview/TopHolders sibling convention exactly; changing one page
+   against its family is worse than the nit.
+3. The 25 admin marketMetrics keys shipping as pending in 24 locales:
+   the admin catalog's fills are the maintainer's release-time workflow
+   by design (the release-tier gate hard-fails pending rows); not a
+   phase debt.
+
+### RECORDED, NOT ACTED (maintainer reads)
+1. The admin market-metrics page ships WITHOUT a screenshot: the panel
+   renders empty without staged market activity, faking listings was
+   ruled out, and the capture stack needs the SHARED :5433 dev database
+   a concurrent session may own, so bouncing it for an empty-state shot
+   is a real hazard. The happy-dom page suite pins the chrome and every
+   string; the manifest records the skip.
+2. The regalia glow is hidden below the medium effects tier by the
+   static preset: classified sheddable prestige (the fairness suite pins
+   the classification); the presumption that worn-gear prestige display
+   is cosmetic, not actionable, is load-bearing and recorded.
+3. The self entity's predicate cache online re-evaluates at snapshot
+   rate (the self record is always identity-bearing): one ~19-slot loop
+   per snapshot for one entity, informational.
+4. The :ear_of_rice: embed-author shortcode follows the shipped
+   :scroll:/:fish: family; if Discord ever renders these literally it
+   was already true of every card.
+5. The single-flight cache's concurrency arm rests on the primitive's
+   own suite (tests/server/board_read_single_flight.test.ts), stated in
+   the metrics test.
+6. VERIFY items handed to the Phase 16 QA twin: the mobile E2E scripts,
+   npm run perf:tour (desktop and mobile), the gpuPrep live-program
+   count on an offline tour, and a re-run of the screenshot recipes.
+7. The i18n.locales departure: this phase EDITS 18 overlay files against
+   the contributor letter-of-the-rule (the five non-Latin M16 re-fills
+   plus stripping 13 Latin overlays' stale WoW-scheme rows to pending);
+   judged correct because leaving them would keep rendering the exact
+   trade dress the re-cut removes, and the naming registry records it.
+   Flagged for the maintainer's eye by the QA gate, seconded here.
 
 ### THE FOUR EXPLICIT RECORDS (in-or-CUT; each is the deliverable)
 
@@ -21944,3 +22011,49 @@ a6cac2e226).
   46 x 5 non-Latin re-fills avoiding each locale's own trade-dress
   nouns; 42 x 13 Latin rows stripped to pending for the release fill;
   the originality pin gains the scheme-shape guard.
+- Screenshots (Arm 5): f5c401bac4 plus the 43178d23cf format slip.
+  Thirteen keepers under docs/screenshots/masterwrought-phase-16 with the
+  enriched manifest; the p16-legendary-regalia change-aware target and
+  its routing pin; the runner's per-variant mobile userAgent override
+  (the iPhone UA lands the iOS material tier that never applies the
+  evening grade, discovered and documented by the capture round).
+- QA fixes: a8e3111c2f (the six-reviewer round), 80ec14020d (the fresh
+  reader's five), 178080a690 (the gate round's two).
+
+### ACCEPTANCE (the phase file's STEP 5 plus additions, all met)
+- [x] Orange treatment cosmetic-only, fairness tests green, render
+      module-first (registered pure core, pooled emitter, no new GPU
+      producer).
+- [x] Every ledger item enumerated against the icon table and the merged
+      pending allowlist (165 = 84 + 81 + 0), the PARK statement written,
+      the retirement recorded; no icon code change was owed and that
+      finding is the record.
+- [x] Guide regenerated, freshness gate green, prose keys added,
+      spoiler-safe; ONE wiki regen on the merged tree stands (zero-diff
+      re-verified at the final tip).
+- [x] One well-fed explanation (byte-identical canonical sentence, both
+      pages, pinned guide-to-tooltip) and the one-professions framing
+      judged satisfied by whatBody, dated.
+- [x] Admin metrics localized, hot-path and retention seams respected
+      (cached read, TTL-only with the rationale; nothing stored).
+- [x] M16 fills done (guide keys, cap reword, 46 enchant rows, five
+      locales); screenshots committed (desktop + mobile) and manifest
+      referenced.
+- [x] Gate-model paragraph in docs/design/professions.md, no bare
+      R-number (qr-GATE-DOC).
+- [x] Naming registry Well Fed row amended dated; no rename anywhere.
+- [x] Storefront mapping NONE per decision 8; packet-level record
+      written; both tables untouched; 84 pin unmoved.
+- [x] Discord: the kind-union member and EXACTLY TWO cards, the bot's
+      tests, the bot/CLAUDE.md entry; no third card, no per-placement
+      noise.
+- [x] headless/CLAUDE.md carries the RL CUT with lockoutNowMs as cause
+      and a virtual clock as re-admission.
+- [x] Admin metrics WIDENED to produce/seeds/compost, every string
+      through the catalog, moved surfaces recorded (N12).
+- [x] renderer.ts extracted to 13131 then 13133 (target 13333, cleared
+      by 200), ceiling lowered then adjusted dated in the same commits.
+- [x] online.ts extracted to 5922 (target 5942), ceiling lowered in the
+      same commit.
+- [x] All listed suites green; ci:changed exit 0 after the last code
+      commit; both regens zero-diff at the final tip.
