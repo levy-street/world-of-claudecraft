@@ -1460,52 +1460,84 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 10,
     trigger: { kind: 'meter', meter: 'vcupGuildWins', amount: 1 },
   },
+  // Feats of Strength, the feat_brightwood_relic class (deeds.md rule 5): the
+  // Ravenrift PvP-window merge (commit 9583d36103, "the Fiesta and Protect
+  // Yumi brackets retire from the strip along with the offline practice
+  // hook") pulled Fiesta out of the queueable bracket list, so none of these
+  // seven can be newly earned through the shipped client. Off the pvp_
+  // prefix on purpose, the col_reliquary_complete exception class (renaming
+  // would silently strip the deed from every veteran's earned set, since
+  // PlayerMeta.deedsEarned keys on the id verbatim): see OFF_PREFIX_FEATS in
+  // tests/deeds_content.test.ts. They stay on the PvP and Sport shelf, not
+  // the Feats shelf: deedDisplayCategory keys on `category` alone (still
+  // 'pvp' here), and only hidden-category deeds plus the true feat_* ids
+  // land on Feats; the feat ribbon marks them in place instead. Renown drops
+  // to 0 and they exit Book completion, which also un-strands
+  // feat_book_complete for anyone who had not earned all seven
+  // pre-retirement (see "un-strands the capstone" below) and is what stops a
+  // new player's maximum from sitting behind a bracket nobody can enter.
+  // This is a DELIBERATE exception to deeds.md rule 2 ("the account score
+  // must never decrease"): recomputeRenown (src/sim/deeds.ts) and the
+  // account Renown board (server/deeds_board.ts) both re-derive from the
+  // LIVE catalog, so an existing earner's Renown total and board score drop
+  // by up to 65 on their next load. The earned RECORD never changes (that is
+  // what keeping the pvp_ id protects); only the score moves, which rule 5's
+  // retirement path forces by construction, since a Feat is zero-Renown
+  // under rule 2's own scale. Flagged for maintainer review; see the PR
+  // description. Each desc states the retirement directly, the
+  // feat_brightwood_relic precedent, since a stuck-looking Fiesta deed in
+  // the PvP and Sport tab is what got reported as "the mode was removed."
   pvp_fiesta_first_bout: {
     id: 'pvp_fiesta_first_bout',
     name: 'Party Crasher',
-    desc: 'Fight a full 2v2 Fiesta bout, win or lose.',
+    desc: 'Fight a full 2v2 Fiesta bout, win or lose. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 5,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_fiesta_first_win: {
     id: 'pvp_fiesta_first_win',
     name: 'Life of the Fiesta',
-    desc: 'Win a 2v2 Fiesta bout.',
+    desc: 'Win a 2v2 Fiesta bout. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_fiesta_double: {
     id: 'pvp_fiesta_double',
     name: 'Double Trouble',
-    desc: 'Score two Fiesta takedowns within four seconds.',
+    desc: 'Score two Fiesta takedowns within four seconds. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_fiesta_shutdown: {
     id: 'pvp_fiesta_shutdown',
     name: 'Party Pooper',
-    desc: 'Take down a Fiesta foe who is on a streak of three or more.',
+    desc: 'Take down a Fiesta foe who is on a streak of three or more. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_fiesta_full_build: {
     id: 'pvp_fiesta_full_build',
     name: 'Dressed for the Occasion',
-    desc: 'Win a Fiesta bout with an augment locked in from all three waves.',
+    desc: 'Win a Fiesta bout with an augment locked in from all three waves. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
   pvp_fiesta_powerups: {
     id: 'pvp_fiesta_powerups',
     name: 'One of Everything',
-    desc: 'Grab each of the four ring power-ups at least once: Speed Demon, Colossus, Moon Boots, and Berserker.',
+    desc: 'Grab each of the four ring power-ups at least once: Speed Demon, Colossus, Moon Boots, and Berserker. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: {
       kind: 'visits',
       markIds: [
@@ -1515,14 +1547,16 @@ export const DEEDS: Record<string, DeedDef> = {
         'fiesta:pow_berserker',
       ],
     },
+    feat: true,
   },
   pvp_fiesta_five_kills: {
     id: 'pvp_fiesta_five_kills',
     name: 'Carrying the Party',
-    desc: 'Score five takedowns in a single Fiesta bout.',
+    desc: 'Score five takedowns in a single Fiesta bout. Fiesta bouts are no longer offered in the Arena queue; this cannot be newly earned.',
     category: 'pvp',
-    renown: 10,
+    renown: 0,
     trigger: { kind: 'manual' },
+    feat: true,
   },
 
   soc_first_party: {

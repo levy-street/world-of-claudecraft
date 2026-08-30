@@ -4623,56 +4623,56 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "pvp_fiesta_first_bout",
     "name": "Party Crasher",
     "category": "pvp",
-    "renown": 5,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_first_bout.webp"
   },
   {
     "id": "pvp_fiesta_first_win",
     "name": "Life of the Fiesta",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_first_win.webp"
   },
   {
     "id": "pvp_fiesta_double",
     "name": "Double Trouble",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_double.webp"
   },
   {
     "id": "pvp_fiesta_shutdown",
     "name": "Party Pooper",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_shutdown.webp"
   },
   {
     "id": "pvp_fiesta_full_build",
     "name": "Dressed for the Occasion",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_full_build.webp"
   },
   {
     "id": "pvp_fiesta_powerups",
     "name": "One of Everything",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_powerups.webp"
   },
   {
     "id": "pvp_fiesta_five_kills",
     "name": "Carrying the Party",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_fiesta_five_kills.webp"
   },
   {
