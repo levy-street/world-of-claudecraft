@@ -84,11 +84,13 @@ export function characterUpdateStatement(
   const blobBytes = Buffer.byteLength(stateJson, 'utf8');
   recordCharacterBlobBytes(blobBytes);
   const sizeWarning = reportCharacterBlobSize(characterId, blobBytes, Date.now());
-  // Deferred off the builder call: two of the four call sites build this
-  // statement inside an open transaction holding row locks, and console.warn
-  // is a SYNCHRONOUS write when stdout is a blocking sink (a file, a full
-  // pipe), which would lengthen the lock hold at exactly the moment the
-  // signal fires. setImmediate keeps the line, off the critical section.
+  // Deferred off the builder call: of the five db.ts call sites, at least
+  // three build this statement inside an open transaction holding row locks
+  // (the two beginSaveTx escrow flushes plus saveCharacterStateOnClient after
+  // lockSaveEffectAccounts), and console.warn is a SYNCHRONOUS write when
+  // stdout is a blocking sink (a file, a full pipe), which would lengthen the
+  // lock hold at exactly the moment the signal fires. setImmediate keeps the
+  // line, off the critical section.
   if (sizeWarning !== null) setImmediate(() => console.warn(sizeWarning));
   switch (fence.kind) {
     case 'none':

@@ -1,8 +1,12 @@
 // Fast pins for the symbol census extractors (scripts/merge_audit/symbol_census.mjs,
-// Phase 11d unit 5). Inline fixtures only: no git, no repo walk, so the suite stays
-// cheap enough for the selective gate while pinning the exact lexing rules the census
-// leans on (comment and string stripping, `as` renames, dotted i18n paths, literal
-// content ids, SimEvent discriminant literals, and the positive floor guard).
+// Phase 11d unit 5). Inline fixtures only (one deliberate exception: the committed
+// deletion-list doc parse pin, which reads a single tracked markdown file, still no
+// git and no repo walk), so the suite stays cheap enough for the selective gate while
+// pinning the exact lexing rules the census leans on (comment and string stripping,
+// `as` renames, dotted i18n paths, literal content ids, SimEvent discriminant
+// literals, and the positive floor guard).
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CLASSES,
@@ -490,6 +494,22 @@ describe('parseExplainedExtras: the doc-sourced explained-extras tables (Phase 1
       'beta',
     ]);
     expect(res.failed).toBe(false);
+  });
+
+  it('parses the COMMITTED deletion list doc: hundreds of rows, zero defects', () => {
+    // The fix-round review's wiring pin: everything above drives the parser on
+    // fixtures, so a parser that quietly stopped matching the real doc's table
+    // shape would only surface as ~460 unexplained extras at the delivery-gate
+    // run. Parsing the committed doc here makes that drift a unit failure. The
+    // floor sits under the 512 rows the Phase 17 reconciliation authored, near
+    // enough that a lost SECTION reds while an appended row does not.
+    const md = readFileSync(
+      join(__dirname, '..', 'docs', 'prd', 'masterwrought', 'merge-deletion-list.md'),
+      'utf8',
+    );
+    const { rows, defects } = parseExplainedExtras(md);
+    expect(defects).toEqual([]);
+    expect(rows.length).toBeGreaterThan(400);
   });
 });
 
