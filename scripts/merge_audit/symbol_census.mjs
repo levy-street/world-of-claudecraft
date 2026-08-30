@@ -10,8 +10,11 @@
 //
 //   MISSING = (ours UNION theirs) minus merged minus deletionList   -> must be EMPTY
 //   EXTRA   = merged minus (ours UNION theirs)                     -> must be EXACTLY
-//             the set the 11b and 11c ledgers authored (EXPLAINED_EXTRAS below, every
-//             entry with the phase and ruling that authored it)
+//             the explained set: EXPLAINED_EXTRAS below UNION every row of the
+//             deletion list's "## Explained extras" tables (parseExplainedExtras;
+//             consumed since Phase 17, no longer a mere mirror). Every entry carries
+//             the phase and ruling that authored it, and a defective doc row fails
+//             the census exactly like a defective deletion row.
 //
 // Either assertion failing exits nonzero. Most classes are keyed BY NAME (never by
 // file): the merge's top risk is a dropped hunk, and a name defined in a different
@@ -1686,6 +1689,110 @@ export function parseDeletionList(markdown) {
 }
 
 // ---------------------------------------------------------------------------------
+// The explained-extras tables of the same doc, CONSUMED since Phase 17 (before that
+// the doc tables merely mirrored EXPLAINED_EXTRAS; the constant stays untouched for
+// the 11b/11c/11e set and the doc carries every later phase's rows). Only tables
+// under a `## Explained extras` heading are read, with columns (any order, matched
+// by header text): Class | Name | Phase | Ruling | Reason. Class accepts both the
+// deletion-table labels (`export`, `content id`, ...) and the census class keys the
+// existing doc tables already use (`exports`, `contentIds`, `contentIdRows`,
+// `i18nKeys`, `simEventUnion`, `simEventEmits`). The defective-row rule is the
+// deletion table's own: a row missing its name, phase, or ruling, or whose reason
+// says only 'deleted' (or nothing), fails the census.
+// ---------------------------------------------------------------------------------
+
+const EXTRAS_HEADING_RE = /^##\s+Explained extras\b/;
+
+const EXTRA_CLASS_BY_LABEL = Object.freeze({
+  export: 'exports',
+  exports: 'exports',
+  'content id': 'contentIds',
+  'content ids': 'contentIds',
+  contentids: 'contentIds',
+  'content row': 'contentIdRows',
+  'content rows': 'contentIdRows',
+  contentidrows: 'contentIdRows',
+  'i18n key': 'i18nKeys',
+  'i18n keys': 'i18nKeys',
+  i18nkeys: 'i18nKeys',
+  'simevent union': 'simEventUnion',
+  simeventunion: 'simEventUnion',
+  'simevent emit': 'simEventEmits',
+  'simevent emits': 'simEventEmits',
+  simeventemits: 'simEventEmits',
+});
+
+/**
+ * @param {string} markdown
+ * @returns {{ rows: Array<{cls: string, classLabel: string, name: string, phase: string,
+ *            ruling: string, reason: string, line: number}>, defects: string[] }}
+ */
+export function parseExplainedExtras(markdown) {
+  const rows = [];
+  const defects = [];
+  const lines = markdown.split('\n');
+  let inExtrasSection = false;
+  let columns = null;
+  for (let ln = 0; ln < lines.length; ln++) {
+    const raw = lines[ln];
+    const line = raw.trim();
+    if (line.startsWith('#')) {
+      inExtrasSection = EXTRAS_HEADING_RE.test(line);
+      columns = null;
+      continue;
+    }
+    if (!inExtrasSection) continue;
+    if (!line.startsWith('|')) {
+      columns = null;
+      continue;
+    }
+    const cells = line
+      .slice(1, line.endsWith('|') ? -1 : undefined)
+      .split('|')
+      .map((c) => c.trim());
+    if (!columns) {
+      const lower = cells.map((c) => c.toLowerCase());
+      // A deletions-format table (with an Old name column) is never an extras
+      // table, even under this heading; parseDeletionList owns that shape.
+      if (lower.includes('class') && lower.includes('name') && !lower.includes('old name')) {
+        columns = lower;
+        continue;
+      }
+      continue;
+    }
+    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) continue;
+    const get = (name) => {
+      const idx = columns.indexOf(name);
+      return idx >= 0 ? cleanCell(cells[idx]) : '';
+    };
+    const classLabel = get('class').toLowerCase();
+    const cls = EXTRA_CLASS_BY_LABEL[classLabel];
+    if (cls === undefined) {
+      defects.push(`extras line ${ln + 1}: unknown class '${classLabel}'`);
+      continue;
+    }
+    const row = {
+      cls,
+      classLabel,
+      name: get('name'),
+      phase: get('phase'),
+      ruling: get('ruling'),
+      reason: get('reason'),
+      line: ln + 1,
+    };
+    if (!row.name) defects.push(`extras line ${ln + 1}: an explained-extra row needs a name`);
+    if (!row.phase || !row.ruling)
+      defects.push(`extras line ${ln + 1}: phase and ruling are required`);
+    if (!row.reason || /^deleted\.?$/i.test(row.reason))
+      defects.push(
+        `extras line ${ln + 1}: a reason saying only 'deleted' (or nothing) is a defect`,
+      );
+    rows.push(row);
+  }
+  return { rows, defects };
+}
+
+// ---------------------------------------------------------------------------------
 // Tree readers: the merged side from disk, the parents through git plumbing.
 // ---------------------------------------------------------------------------------
 
@@ -2137,9 +2244,16 @@ export function formatReport(r, limit = 60) {
   L.push(
     `  files scanned: ours ${r.fileCounts.ours.exports}, theirs ${r.fileCounts.theirs.exports}, merged ${r.fileCounts.merged.exports} (content ${r.fileCounts.merged.contentIds}, catalog ${r.fileCounts.merged.i18nKeys}, sim ${r.fileCounts.merged.simEventEmits} on merged)`,
   );
+  L.push(
+    `  explained extras: ${r.extrasConstantRows ?? EXPLAINED_EXTRAS.length} constant + ${r.extrasDocRows ?? 0} doc rows (the doc's "Explained extras" tables are consumed, not a mirror)`,
+  );
   if (r.deletionDefects.length) {
     L.push('  DELETION LIST DEFECTS (fail):');
     for (const d of r.deletionDefects) L.push(`    ${d}`);
+  }
+  if (r.extrasDefects?.length) {
+    L.push('  EXPLAINED-EXTRAS DEFECTS (fail):');
+    for (const d of r.extrasDefects) L.push(`    ${d}`);
   }
   L.push('');
   for (const cls of CLASSES) {
@@ -2340,7 +2454,10 @@ export function runCensus(opts = {}) {
 
   const releaseRef = opts.releaseRef ?? RELEASE_REF;
 
-  const deletion = parseDeletionList(fs.readFileSync(deletionListPath, 'utf8'));
+  const deletionMarkdown = fs.readFileSync(deletionListPath, 'utf8');
+  const deletion = parseDeletionList(deletionMarkdown);
+  const docExtras = parseExplainedExtras(deletionMarkdown);
+  const explainedExtras = [...EXPLAINED_EXTRAS, ...docExtras.rows];
   const ours = censusTree(readRefTree(repo, oursRef));
   const theirs = censusTree(readRefTree(repo, theirsRef));
   const merged = censusTree(readMergedTree(mergedRoot));
@@ -2380,14 +2497,23 @@ export function runCensus(opts = {}) {
   }
   const releases = releaseRefs.map((re) => censusTree(readRefTree(repo, re.ref)));
   const base = opts.readBase === false ? null : censusTree(readRefTree(repo, BASE_REF));
-  const cmp = compareCensus({ ours, theirs, merged, deletionRows: deletion.rows, releases, base });
+  const cmp = compareCensus({
+    ours,
+    theirs,
+    merged,
+    deletionRows: deletion.rows,
+    explainedExtras,
+    releases,
+    base,
+  });
   const simEvent = simEventVerdict(merged.sets.simEventUnion, merged.sets.simEventEmits);
   const {
     unionOnly: simEventUnionOnly,
     drift: simEventUnionOnlyDrift,
     emitsOutsideUnion,
   } = simEvent;
-  const failed = cmp.failed || deletion.defects.length > 0 || simEvent.failed;
+  const failed =
+    cmp.failed || deletion.defects.length > 0 || docExtras.defects.length > 0 || simEvent.failed;
   return {
     refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
     releaseRefs,
@@ -2397,6 +2523,9 @@ export function runCensus(opts = {}) {
     deletionRows: deletion.rows,
     deletionConsumed: deletion.rows.filter((r) => r.cls).length,
     deletionDefects: deletion.defects,
+    extrasConstantRows: EXPLAINED_EXTRAS.length,
+    extrasDocRows: docExtras.rows.length,
+    extrasDefects: docExtras.defects,
     fileCounts: { ours: ours.fileCounts, theirs: theirs.fileCounts, merged: merged.fileCounts },
     /** SimEvent types the union declares that the emits extractor never sees. */
     simEventUnionOnly,

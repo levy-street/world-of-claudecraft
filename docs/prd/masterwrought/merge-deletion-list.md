@@ -6,11 +6,16 @@ The written, rename-aware record of every name that was present on a parent of t
 farming absorb merge and is deliberately absent from the merged tree, plus the names the
 absorb phases authored that exist on no parent. It is the human half of the export
 and symbol census; `scripts/merge_audit/symbol_census.mjs` is the machine half and reads
-the first table below. The census asserts, for every exported symbol, content-table row
-id, i18n catalog key, and SimEvent name present on ANY parent (ours UNION theirs UNION
-the synced release tips), that the name is present in the merged tree unless a row here
-says otherwise, and that every name present on NO parent is explained (the script's
-`EXPLAINED_EXTRAS` constant, mirrored in the second table).
+BOTH kinds of table below. The census asserts, for every exported symbol, content-table
+row id, i18n catalog key, and SimEvent name present on ANY parent (ours UNION theirs
+UNION the synced release tips), that the name is present in the merged tree unless a
+deletion row here says otherwise, and that every name present on NO parent is explained.
+The explained set is the script's `EXPLAINED_EXTRAS` constant UNION every row of every
+table under an `## Explained extras` heading in this file (`parseExplainedExtras`;
+CONSUMED since Phase 17, no longer a mere mirror, so a new phase's extras are appended
+here as a dated section rather than grown into the constant). A defective extras row
+(missing name, phase, or ruling, or a reason saying only "deleted") fails the census
+exactly like a defective deletion row.
 
 The refs (immutable; the census reads every parent with `git ls-tree` plus
 `git cat-file --batch`, never a checkout):
@@ -68,6 +73,12 @@ has seen fail is not a census. The 11d pre-run's four outcomes are recorded in t
   extraction-beats-in-place rule is in one place.
 - Remove a row only when the name comes back on purpose; the census prints
   `WARN deletion-list rows not matching a missing name` when a row goes stale.
+- Explained-extras rows (the `## Explained extras` tables, columns Class | Name |
+  Phase | Ruling | Reason) follow the same discipline: every row names the PHASE, the
+  RULING (a ruling id, a commit, or a ledger section), and a real REASON, and the
+  Class is always a census class (there is no `literal-only` extra: a name the census
+  cannot match does not need explaining). The census consumes them in union with the
+  script's `EXPLAINED_EXTRAS` constant; an EXTRA with no row in either place fails.
 
 ## Deletions and renames (consumed by the census)
 

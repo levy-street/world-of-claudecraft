@@ -15,6 +15,7 @@ import {
   extractSimEventUnion,
   FLOORS,
   parseDeletionList,
+  parseExplainedExtras,
   SIM_EVENT_UNION_ONLY,
   simEventVerdict,
 } from '../scripts/merge_audit/symbol_census.mjs';
@@ -399,6 +400,91 @@ describe('parseDeletionList', () => {
     expect(rows[0]).toMatchObject({ cls: 'exports', oldName: 'oldName', newName: 'newName' });
     expect(defects).toHaveLength(1);
     expect(defects[0]).toContain('deleted');
+  });
+});
+
+describe('parseExplainedExtras: the doc-sourced explained-extras tables (Phase 17)', () => {
+  const table = (rows: string[]) =>
+    ['| Class | Name | Phase | Ruling | Reason |', '|---|---|---|---|---|', ...rows].join('\n');
+
+  it('parses rows under an Explained extras heading, mapping both label spellings', () => {
+    const md = [
+      '## Explained extras (2026-08-30, the Phase 17 reconciliation)',
+      '',
+      table([
+        '| exports | `newHelper` | 12 | branch commit abc123 (feat: x) | the Perfecting helper |',
+        '| content id | `new_item` | 11f | masterwrought DECISION Q | the drop-economy item |',
+        '| contentIdRows | `src/sim/content/items.ts:new_item` | 11f | masterwrought DECISION Q | the same row, file-scoped |',
+      ]),
+    ].join('\n');
+    const { rows, defects } = parseExplainedExtras(md);
+    expect(defects).toEqual([]);
+    expect(rows.map((r) => [r.cls, r.name])).toEqual([
+      ['exports', 'newHelper'],
+      ['contentIds', 'new_item'],
+      ['contentIdRows', 'src/sim/content/items.ts:new_item'],
+    ]);
+    expect(rows[0]).toMatchObject({ phase: '12', ruling: 'branch commit abc123 (feat: x)' });
+  });
+
+  it('refuses a defective row: missing ruling, empty reason, unknown class', () => {
+    const md = [
+      '## Explained extras (defect fixture)',
+      table([
+        '| exports | `noRuling` | 12 | | has a reason |',
+        '| exports | `noReason` | 12 | ruling-id | |',
+        '| bogus | `wrongClass` | 12 | ruling-id | a reason |',
+      ]),
+    ].join('\n');
+    const { rows, defects } = parseExplainedExtras(md);
+    expect(defects).toHaveLength(3);
+    expect(defects[0]).toContain('phase and ruling are required');
+    expect(defects[1]).toContain('deleted');
+    expect(defects[2]).toContain("unknown class 'bogus'");
+    // The unknown-class row is refused outright, never half-parsed into a class.
+    expect(rows.map((r) => r.name)).toEqual(['noRuling', 'noReason']);
+  });
+
+  it('reads ONLY tables under an Explained extras heading, never another section', () => {
+    const md = [
+      '## Deletions and renames (consumed by the census)',
+      table(['| exports | `notAnExtra` | 11c | ruling-id | a deletion, not an extra |']),
+      '## Explained extras (scoped fixture)',
+      table(['| exports | `theExtra` | 12 | ruling-id | the one consumed row |']),
+      '## Literal-only records',
+      table(['| exports | `afterwards` | 12 | ruling-id | outside the section again |']),
+    ].join('\n');
+    const { rows } = parseExplainedExtras(md);
+    expect(rows.map((r) => r.name)).toEqual(['theExtra']);
+  });
+
+  it('a doc-sourced row explains an EXTRA end to end (compareCensus consumes it)', () => {
+    const parent = censusTree([['src/sim/thing.ts', 'export const alpha = 1;']]);
+    const merged = censusTree([
+      ['src/sim/thing.ts', 'export const alpha = 1;\nexport const beta = 2;'],
+    ]);
+    const { rows, defects } = parseExplainedExtras(
+      [
+        '## Explained extras (end-to-end fixture)',
+        table(['| exports | `beta` | 12 | branch commit abc123 | authored by the phase |']),
+      ].join('\n'),
+    );
+    expect(defects).toEqual([]);
+    const res = compareCensus({
+      ours: parent,
+      theirs: parent,
+      merged,
+      deletionRows: [],
+      explainedExtras: rows,
+      floors: NO_FLOORS,
+      releases: [],
+      base: null,
+    });
+    expect(res.perClass.exports.extraUnexplained).toEqual([]);
+    expect(res.perClass.exports.extraExplained.map((e: { name: string }) => e.name)).toEqual([
+      'beta',
+    ]);
+    expect(res.failed).toBe(false);
   });
 });
 

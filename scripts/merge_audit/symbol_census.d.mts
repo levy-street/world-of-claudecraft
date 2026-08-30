@@ -94,6 +94,20 @@ export interface DeletionRow {
 }
 export function parseDeletionList(markdown: string): { rows: DeletionRow[]; defects: string[] };
 
+export interface ExplainedExtraRow {
+  cls: CensusClass;
+  classLabel: string;
+  name: string;
+  phase: string;
+  ruling: string;
+  reason: string;
+  line: number;
+}
+export function parseExplainedExtras(markdown: string): {
+  rows: ExplainedExtraRow[];
+  defects: string[];
+};
+
 export function isCensusPath(relPath: string): boolean;
 export function readMergedTree(
   mergedRoot: string,
