@@ -85,13 +85,16 @@ describe('GPU backend constants (load-bearing literals)', () => {
     expect(VULKAN_BACKEND_SWITCHES).toEqual([
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
-      ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
     ]);
+    // WebGL only: the `Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set would move
+    // Chromium's compositor onto Vulkan as well, the handoff a Steam Deck (AMD, RADV)
+    // rendered as noise, for no link the game needed.
     expect(VULKAN_PARALLEL_COMPILE_SWITCH).toEqual([
       'enable-angle-features',
       'enableParallelCompileAndLink',
     ]);
     const names = VULKAN_BACKEND_SWITCHES.map(([name]) => name);
+    expect(names).not.toContain('enable-features');
     expect(names).not.toContain('ignore-gpu-blocklist');
     expect(names).not.toContain('disable-gpu-driver-bug-workarounds');
     expect(names).not.toContain('disable-vulkan-surface');
@@ -337,7 +340,6 @@ describe('applyGpuBackendSwitches', () => {
     expect(switches).toEqual([
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
-      ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
       ['enable-angle-features', 'enableParallelCompileAndLink'],
     ]);
     const plain = fakeApp();
@@ -355,7 +357,6 @@ describe('applyGpuBackendSwitches', () => {
     expect(plain.switches).toEqual([
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
-      ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
     ]);
   });
 

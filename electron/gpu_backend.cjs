@@ -8,10 +8,17 @@
 // 320 ms hitches per program, which the game cannot schedule around. On ANGLE's Vulkan
 // backend a cold link is about 10 ms and the problem disappears (measured on an RTX 3090
 // and on an Intel iGPU). Windows already runs D3D11 and macOS Metal, so only Linux needs
-// the change. Vulkan is forced with the three Chromium switches below and nothing else:
+// the change. Vulkan is forced with the two Chromium switches below and nothing else:
 // no --ignore-gpu-blocklist, no --disable-gpu-driver-bug-workarounds (both widen the
-// blast radius on drivers the blocklist exists for), and never --disable-vulkan-surface
-// (a headless-only switch that breaks presentation in a windowed shell).
+// blast radius on drivers the blocklist exists for), never --disable-vulkan-surface (a
+// headless-only switch that breaks presentation in a windowed shell), and NOT the
+// `Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set: those move Chromium's own
+// compositor and rasterizer onto Vulkan as well, which the game never needed (the links
+// are WebGL's, and --use-angle=vulkan alone selects ANGLE's Vulkan backend for WebGL) and
+// which is the component a Steam Deck (AMD, Mesa RADV) rendered as noise: the ANGLE image
+// to Viz Vulkan handoff, not the WebGL backend itself. The compositor stays on its
+// default; the judge below still reads the WebGL renderer string, so a launch where the
+// switch did not take is rescued as before.
 //
 // The risk: a forced Vulkan backend has NO OpenGL fallback of its own. On a machine
 // without a working Vulkan driver Chromium lands on SwiftShader and the game crawls, or
@@ -53,11 +60,12 @@ const GPU_BACKEND_SETTINGS = ['auto', 'vulkan', 'opengl'];
 const GPU_BACKEND_RUNGS = ['vulkan-parallel-compile', 'vulkan-plain', 'opengl'];
 const TOP_GPU_BACKEND_RUNG = GPU_BACKEND_RUNGS[0];
 
-/** The Chromium switches that force ANGLE's Vulkan backend, as [name, value] pairs. */
+/** The Chromium switches that select ANGLE's Vulkan backend for WebGL, as [name, value]
+ *  pairs. WebGL only: no `--enable-features=Vulkan...`, which would move the compositor
+ *  too (see the header). */
 const VULKAN_BACKEND_SWITCHES = [
   ['use-gl', 'angle'],
   ['use-angle', 'vulkan'],
-  ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
 ];
 
 /**

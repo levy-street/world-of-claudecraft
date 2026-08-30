@@ -37,8 +37,10 @@ const PCI_VENDOR_NVIDIA = '0x10de';
 const AUTO_VULKAN_EXCLUSIONS = Object.freeze([
   Object.freeze({
     vendor: PCI_VENDOR_AMD,
-    reason: 'AMD (Mesa RADV) renders corrupted textures on ANGLE Vulkan (Steam Deck, 2026-08-30)',
-    until: 'Vulkan is measured healthy on AMD hardware; until then it is opt-in there',
+    reason:
+      'AMD (Mesa RADV) rendered corrupted textures under the Vulkan switches (Steam Deck, 2026-08-30)',
+    until:
+      'Vulkan is measured healthy on AMD hardware with the WebGL-only switches (the compositor feature set, the suspected cause, was dropped the same day); until then it is opt-in there',
   }),
 ]);
 

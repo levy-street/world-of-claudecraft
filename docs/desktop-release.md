@@ -125,13 +125,16 @@ is a 100 to 320 ms hitch the game cannot schedule around. ANGLE's Vulkan backend
 in about 10 ms and the hitches disappear (measured on an RTX 3090 and an Intel iGPU).
 Windows already runs D3D11 and macOS Metal, so only Linux needs the lever.
 
-The shell forces Vulkan with the Chromium switches (`VULKAN_BACKEND_SWITCHES` in
-`electron/gpu_backend.cjs`: `--use-gl=angle`, `--use-angle=vulkan`, and the
-`Vulkan,DefaultANGLEVulkan,VulkanFromANGLE` feature set) plus, on the top rung, the
-ANGLE feature switch `--enable-angle-features=enableParallelCompileAndLink`
+The shell selects Vulkan for WebGL with the Chromium switches (`VULKAN_BACKEND_SWITCHES`
+in `electron/gpu_backend.cjs`: `--use-gl=angle` and `--use-angle=vulkan`) plus, on the top
+rung, the ANGLE feature switch `--enable-angle-features=enableParallelCompileAndLink`
 (`VULKAN_PARALLEL_COMPILE_SWITCH`), and nothing wider: no `--ignore-gpu-blocklist`, no
-`--disable-gpu-driver-bug-workarounds`, and never `--disable-vulkan-surface` (headless
-only). The ANGLE feature matters: ANGLE's Vulkan backend exposes
+`--disable-gpu-driver-bug-workarounds`, never `--disable-vulkan-surface` (headless only),
+and NOT `--enable-features=Vulkan,DefaultANGLEVulkan,VulkanFromANGLE`. That feature set
+moves Chromium's own compositor and rasterizer onto Vulkan as well, which the game never
+needed (the links are WebGL's), and it is the component a Steam Deck (AMD, Mesa RADV)
+rendered as noise: the ANGLE image to Viz Vulkan handoff, not the WebGL backend. The
+compositor stays on its default, and the judge still reads the WebGL renderer string. The ANGLE feature matters: ANGLE's Vulkan backend exposes
 `KHR_parallel_shader_compile` only when it is on (an opt-in feature since 2023, never
 defaulted), and without that extension the renderer runs its no-async-compile policy
 (every program links synchronously on the GPU-process thread, every compile gate is
