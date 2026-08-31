@@ -150,6 +150,17 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
  * refusal, bags.ts, #2837): peeking through this function rather than a
  * bespoke walk is what keeps it locked to the real selection `ctx.removeItem`
  * (`Sim.removeItem`) makes, instead of drifting into its own guess.
+ *
+ * THE ONE PRECONDITION, stated because a caller that misses it destroys items.
+ * This agrees with `Sim.removeItem` only when the newest matching slot holds
+ * `count >= 1`. `removeItem` takes `Math.min(s.count, count)` per slot, so a
+ * non-positive count yields nothing, splices the slot and CONTINUES to the next
+ * match, while this walk stops at it; a caller that peeks here and consumes
+ * through `removeItem` would then inspect one copy and destroy another. The
+ * consuming twin above has no such gap (it decrements the first match
+ * unconditionally), and `selectedInventorySlot` below refuses `count < 1`
+ * outright. A caller pairing this peek with `removeItem` must apply that same
+ * `count >= 1` refusal itself; `bank_sockets.ts` bankSocketBag does.
  */
 export function newestMatchingSlot(inventory: InvSlot[], itemId: string): InvSlot | undefined {
   for (let i = inventory.length - 1; i >= 0; i--) {
@@ -179,4 +190,28 @@ export function selectedInventorySlot(
   const slot = inventory[slotIndex];
   if (slot.itemId !== itemId || slot.count < 1) return null;
   return slot;
+}
+
+/**
+ * Fold the shared entry points' overloaded trailing pair into (pid, named
+ * slot). Sim's public item commands accept `pidOrTarget` as EITHER a host pid
+ * (server/RL callers) OR the IWorld `{ slotIndex }` target (the UI naming the
+ * exact copy, this module's whole subject), with a trailing `slotIndex` for
+ * the pid arity. Extracted from the fifteen per-delegate copies in sim.ts
+ * (rule of three, several times over), so the fold has ONE definition.
+ *
+ * Null-guarded (the bankSocketBag precedent): these delegates sit on the
+ * shared entry point both hosts call, and `typeof null === 'object'` would
+ * throw on `.slotIndex` if any caller ever passed a null target. No shipped
+ * wire path can (dispatch parses `msg.slot` into the trailing arm), so the
+ * guard is defense in depth, now uniform instead of per-site.
+ */
+export function foldNamedSlotTarget(
+  pidOrTarget: number | { slotIndex: number } | undefined,
+  slotIndex: number | undefined,
+): { pid: number | undefined; named: number | undefined } {
+  const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+  const named =
+    pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+  return { pid, named };
 }

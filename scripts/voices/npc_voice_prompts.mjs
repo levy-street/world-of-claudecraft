@@ -196,6 +196,35 @@ export const VOICE_PROMPTS = [
       'I built a kingdom that should have outlived the stars. Kneel before your king. Another kingdom comes to challenge me — and you too will join the rest.',
   },
 
+  {
+    npcId: 'ignivar',
+    name: 'Ignivar Ashcaller',
+    voiceDescription:
+      'A natural, actor-led core voiced through an enormous ancient war automaton. Very deep male ' +
+      'bass with dense iron weight, a furnace-like chest resonance, and a dry scorched texture. ' +
+      'Words arrive like heavy mechanisms locking into place: slow attacks, hard consonants, brief ' +
+      "measured gaps, and controlled bursts of heat. Ignivar is Varkhul's disciplined herald, " +
+      'proud and devoted rather than bestial, with fear buried beneath the metal.',
+    sampleText:
+      'Ignivar Ashcaller awakens. Let the world burn! The sky itself will burn! The last flame ' +
+      'consumes all! Varkhul... the seal is broken.',
+  },
+
+  {
+    npcId: 'varkhul',
+    name: 'Varkhul, Forgefather of the Last Flame',
+    voiceDescription:
+      'Native English with archaic dwarven word shapes and broad Highland vowels. Male-presenting, ' +
+      'older than human. An awakened obsidian forge idol with a non-human mineral voice, very low ' +
+      'pitch, immense cavity resonance, sparse breath, and a dry fractured surface. Speech feels ' +
+      'carved rather than spoken: long silences, heavy vowels, chiseled consonants, and occasional ' +
+      'tectonic strain. No human narrator, beast, demon, or machine.',
+    sampleText:
+      'I am Varkhul, Forgefather of the Last Flame. Raise your weapons, little sparks. The spring ' +
+      'did not die. I bound its last memory into iron. Every blow will feed the furnace in my ' +
+      'chest. By ember, stone, and anvil, I will unmake you. Master... I have failed you.',
+  },
+
   // -- Eldergleam, the Veiled Hollow (src/sim/content/realm.ts) -------------
   {
     npcId: 'keeper_saelwyn',
@@ -1049,6 +1078,10 @@ export const VOICE_ALIAS = {
   brother_aldric_raid: 'brother_aldric',
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
+  // Maelin is a development-only raid archivist and reuses the established
+  // measured scholar register until the hidden raid receives bespoke voice art.
+  archivist_maelin_emberward: 'archivist_tullo',
+  archivist_maelin_ember_projection: 'archivist_tullo',
   // Warmarshal Draven Kole, the Highwatch Master of the Warfare Stores, sells the
   // identical WARFARE stock FURY sells in Eastbrook and speaks in the same
   // parade-ground register, so he borrows FURY's designed voice for now. This is
@@ -1057,6 +1090,12 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // Quartermaster Bronn Emberward, the Crucible sigil broker: a quartermaster
+  // at a counter selling proof of hard content, the same register Vex's
+  // designed voice carries, so he borrows it as a ROLE match (the Draven Kole
+  // precedent above). Promote him to his own VOICE_PROMPTS entry, with the
+  // forge-warden weight his greeting carries, when a key is available.
+  crucible_quartermaster: 'heroic_quartermaster',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

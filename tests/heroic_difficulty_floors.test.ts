@@ -207,6 +207,8 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
       wildheart_basin: [4.0, 17.25, 8.625],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
+      ignivar_raid_arena: [1.75, 2, 2],
+      ignivar_inner_crucible: [5 / 3, 1.2459633027522936, 1],
     });
   });
 

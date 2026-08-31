@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { PROVING_SHORE_NPCS } from '../src/sim/content/proving_shore';
 import { MOBS, QUESTS } from '../src/sim/data';
 import { summonQuestMob } from '../src/sim/encounters/quest_summon';
+import { runDespawnDecay } from '../src/sim/entity_roster';
 import {
   CRAB_MOB_ID,
   CRAB_QUEST_ID,
@@ -15,11 +16,14 @@ import {
   crabSummonCheck,
   LURE_ITEM_ID,
 } from '../src/sim/interactions/crab_summon';
+import { completeTame, petOf, tameError } from '../src/sim/pet/pet_commands';
+import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../src/sim/types';
+import { ALL_CLASSES, type Entity, type SimEvent, TICK_RATE } from '../src/sim/types';
 
 const PEARL_ITEM_ID = 'ps_lustrous_pearl';
 const RING_ITEM_ID = 'mother_of_pearl';
+const FIVE_MINUTES_SECONDS = 5 * 60;
 
 function makeSim(seed = 4120): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -37,6 +41,12 @@ function liveBoss(sim: Sim): Entity | null {
   return null;
 }
 
+function requireLiveBoss(sim: Sim): Entity {
+  const boss = liveBoss(sim);
+  if (!boss) throw new Error('Expected a live Mister Crabs');
+  return boss;
+}
+
 function errorTexts(events: SimEvent[]): string[] {
   return events
     .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
@@ -46,7 +56,9 @@ function errorTexts(events: SimEvent[]): string[] {
 /** Clear the prerequisite and take the quest at Nel's watch (the real accept
  *  path, so the requiredItems grant runs). */
 function startQuest(sim: Sim): void {
-  sim.players.get(sim.playerId)!.questsDone.add('q_ps_shell_and_claw');
+  const meta = sim.players.get(sim.playerId);
+  if (!meta) throw new Error('Expected the primary player metadata');
+  meta.questsDone.add('q_ps_shell_and_claw');
   const nel = PROVING_SHORE_NPCS.tidewarden_nel.pos;
   teleportTo(sim, nel.x + 1, nel.z);
   sim.drainEvents();
@@ -105,11 +117,12 @@ describe('the Mother of Pearl chain in a real sim', () => {
     sim.drainEvents();
     sim.useItem(LURE_ITEM_ID);
 
-    const boss = liveBoss(sim);
-    expect(boss).toBeTruthy();
-    expect(boss!.hostile).toBe(true);
+    const boss = requireLiveBoss(sim);
+    expect(boss.hostile).toBe(true);
+    expect(boss.maxHp).toBe(42);
+    expect(boss.hp).toBe(42);
     // Tapped to the summoner, so nobody else can steal the credit.
-    expect(boss!.tappedById).toBe(sim.playerId);
+    expect(boss.tappedById).toBe(sim.playerId);
     // The lure is reusable: never consumed, so a wipe can always retry.
     expect(sim.countItem(LURE_ITEM_ID)).toBe(1);
     // A second use while he prowls warns instead of double-summoning.
@@ -117,10 +130,10 @@ describe('the Mother of Pearl chain in a real sim', () => {
     sim.useItem(LURE_ITEM_ID);
     expect(errorTexts(sim.drainEvents())).toContain('Mister Crabs already prowls the pool!');
 
-    sim.ctx.dealDamage(sim.player, boss!, 9_999, false, 'physical', null, 'hit');
-    expect(boss!.dead).toBe(true);
-    teleportTo(sim, boss!.pos.x, boss!.pos.z);
-    sim.lootCorpse(boss!.id);
+    sim.ctx.dealDamage(sim.player, boss, 9_999, false, 'physical', null, 'hit');
+    expect(boss.dead).toBe(true);
+    teleportTo(sim, boss.pos.x, boss.pos.z);
+    sim.lootCorpse(boss.id);
     expect(sim.countItem(PEARL_ITEM_ID)).toBe(1);
     expect(sim.questState(CRAB_QUEST_ID)).toBe('ready');
 
@@ -142,26 +155,139 @@ describe('the Mother of Pearl chain in a real sim', () => {
     expect(sim.equipment.ring1).toBe(RING_ITEM_ID);
   });
 
+  it('lets a non-questing player target and kill the summoner-owned crab', () => {
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.useItem(LURE_ITEM_ID);
+    const boss = requireLiveBoss(sim);
+    const helperPid = sim.addPlayer('mage', 'Helpful Stranger');
+    const helper = sim.entities.get(helperPid);
+    const helperMeta = sim.players.get(helperPid);
+    if (!helper || !helperMeta) throw new Error('Expected the helper player to join');
+    helper.pos.x = boss.pos.x;
+    helper.pos.z = boss.pos.z + 1;
+
+    expect(helperMeta.questLog.has(CRAB_QUEST_ID)).toBe(false);
+    expect(isQuestGatedEntityHidden(boss, helperMeta.questLog)).toBe(false);
+    expect(sim.ctx.isHostileTo(helper, boss)).toBe(true);
+    sim.targetEntity(boss.id, helperPid);
+    expect(helper.targetId).toBe(boss.id);
+
+    const hpBefore = boss.hp;
+    const dealt = sim.ctx.dealDamage(helper, boss, 1, false, 'physical', null, 'hit');
+    expect(dealt).toBeGreaterThan(0);
+    expect(boss.hp).toBeLessThan(hpBefore);
+    expect(boss.tappedById).toBe(sim.playerId);
+
+    sim.ctx.dealDamage(helper, boss, 9_999, false, 'physical', null, 'hit');
+    expect(boss.dead).toBe(true);
+    const progress = sim.questLog.get(CRAB_QUEST_ID);
+    if (!progress) throw new Error('Expected the summoner quest to stay active');
+    expect(progress.counts[0]).toBe(1);
+    teleportTo(sim, boss.pos.x, boss.pos.z);
+    sim.lootCorpse(boss.id);
+    expect(sim.countItem(PEARL_ITEM_ID)).toBe(1);
+    expect(sim.questState(CRAB_QUEST_ID)).toBe('ready');
+
+    // A scripted summon has no wild respawn scheduled. Advance its shortened
+    // corpse window through the real mob tick and prove it is dropped instead.
+    expect(boss.respawnTimer).toBe(Number.POSITIVE_INFINITY);
+    boss.corpseTimer = 1 / TICK_RATE;
+    sim.tick();
+    expect(sim.entities.has(boss.id)).toBe(false);
+  });
+
+  it('cannot be tamed into a permanent hunter pet that bypasses its lifetime', () => {
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.useItem(LURE_ITEM_ID);
+    const boss = requireLiveBoss(sim);
+    const hunterPid = sim.addPlayer('hunter', 'Crab Collector');
+    sim.setPlayerLevel(10, hunterPid);
+    const hunter = sim.entities.get(hunterPid);
+    if (!hunter) throw new Error('Expected the hunter player to join');
+
+    expect(tameError(sim.ctx, hunter, boss)).toBe('That beast is too strong to tame.');
+    completeTame(sim.ctx, hunter, boss);
+    expect(sim.entities.has(boss.id)).toBe(true);
+    expect(petOf(sim.ctx, hunterPid, true)).toBeNull();
+  });
+
+  it('despawns five minutes after the lure summons it', () => {
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.useItem(LURE_ITEM_ID);
+    const boss = requireLiveBoss(sim);
+
+    expect(boss.hardDespawnTimer).toBe(FIVE_MINUTES_SECONDS);
+    for (let i = 0; i < FIVE_MINUTES_SECONDS * TICK_RATE - 1; i++) {
+      runDespawnDecay(sim.ctx);
+    }
+    expect(sim.entities.has(boss.id)).toBe(true);
+    runDespawnDecay(sim.ctx);
+    expect(sim.entities.has(boss.id)).toBe(false);
+
+    sim.useItem(LURE_ITEM_ID);
+    const replacement = requireLiveBoss(sim);
+    expect(replacement.id).not.toBe(boss.id);
+  });
+
+  it('keeps the five-minute lifetime after the summoner dies and a helper takes aggro', () => {
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.useItem(LURE_ITEM_ID);
+    const boss = requireLiveBoss(sim);
+    const helperPid = sim.addPlayer('mage', 'Helpful Survivor');
+    const helper = sim.entities.get(helperPid);
+    if (!helper) throw new Error('Expected the helper player to join');
+    helper.pos.x = boss.pos.x;
+    helper.pos.z = boss.pos.z + 1;
+    sim.ctx.dealDamage(helper, boss, 1, false, 'physical', null, 'hit');
+
+    sim.ctx.dealDamage(boss, sim.player, 9_999, false, 'physical', null, 'hit');
+    expect(sim.player.dead).toBe(true);
+    expect(boss.aggroTargetId).toBe(helperPid);
+
+    for (let i = 0; i < FIVE_MINUTES_SECONDS * TICK_RATE; i++) {
+      runDespawnDecay(sim.ctx);
+    }
+    expect(sim.entities.has(boss.id)).toBe(false);
+  });
+
   it('lets an unlooted kill summon again, so the pearl can never strand', () => {
     const sim = makeSim();
     startQuest(sim);
     teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
     sim.useItem(LURE_ITEM_ID);
-    const first = liveBoss(sim);
-    expect(first).toBeTruthy();
-    sim.ctx.dealDamage(sim.player, first!, 9_999, false, 'physical', null, 'hit');
-    expect(first!.dead).toBe(true);
+    const first = requireLiveBoss(sim);
+    sim.ctx.dealDamage(sim.player, first, 9_999, false, 'physical', null, 'hit');
+    expect(first.dead).toBe(true);
     // Kill credited but the pearl never looted (say the corpse faded): the
     // quest stays active, so the lure works again.
     expect(sim.questState(CRAB_QUEST_ID)).toBe('active');
     sim.useItem(LURE_ITEM_ID);
-    const second = liveBoss(sim);
-    expect(second).toBeTruthy();
-    expect(second!.id).not.toBe(first!.id);
+    const second = requireLiveBoss(sim);
+    expect(second.id).not.toBe(first.id);
     // The kill objective stays capped at its requirement across the rekill.
-    sim.ctx.dealDamage(sim.player, second!, 9_999, false, 'physical', null, 'hit');
-    const qp = sim.questLog.get(CRAB_QUEST_ID)!;
+    sim.ctx.dealDamage(sim.player, second, 9_999, false, 'physical', null, 'hit');
+    const qp = sim.questLog.get(CRAB_QUEST_ID);
+    if (!qp) throw new Error('Expected the summon quest progress');
     expect(qp.counts[0]).toBe(1);
+
+    // Summon-only corpses must have no ordinary one-minute wild-mob respawn
+    // scheduled. Move both decay windows to their last production tick: the
+    // summoned-add branch must drop them instead of reviving either copy.
+    expect(first.respawnTimer).toBe(Number.POSITIVE_INFINITY);
+    expect(second.respawnTimer).toBe(Number.POSITIVE_INFINITY);
+    first.corpseTimer = 1 / TICK_RATE;
+    second.corpseTimer = 1 / TICK_RATE;
+    sim.tick();
+    expect(sim.entities.has(first.id)).toBe(false);
+    expect(sim.entities.has(second.id)).toBe(false);
   });
 
   it('stays silent for a player who never took the quest', () => {
@@ -190,9 +316,11 @@ describe('the Mother of Pearl chain in a real sim', () => {
       -1,
       { perOwner: true },
     );
-    const strangers = liveBoss(sim);
-    expect(strangers).toBeTruthy();
-    expect(strangers!.tappedById).toBe(-1);
+    const strangers = requireLiveBoss(sim);
+    expect(strangers.tappedById).toBe(-1);
+    expect(strangers.hardDespawnTimer).toBeUndefined();
+    expect(strangers.runScoped).toBeUndefined();
+    expect(strangers.summonedAdd).toBe(false);
     // The player's own lure still works beside it.
     sim.drainEvents();
     sim.useItem(LURE_ITEM_ID);
@@ -207,13 +335,15 @@ describe('the Mother of Pearl chain in a real sim', () => {
     expect(errorTexts(sim.drainEvents())).toContain('Mister Crabs already prowls the pool!');
   });
 
-  it('pins the anti-grief and reward wiring on the content records', () => {
-    // Only quest holders can damage him (nobody can grief a summon), the
-    // pearl drops for quest holders only, and EVERY class is paid the same
-    // ring. Not three archetypes: the ring is the island's keepsake and the
-    // vehicle for its equip lesson, so a paladin or a druid used to finish
+  it('pins the public fight and reward wiring on the content records', () => {
+    // Anyone can help damage the summoner-owned crab, while the pearl remains
+    // quest-gated and EVERY class is paid the same ring. Not three archetypes:
+    // the ring is the island's keepsake and the vehicle for its equip lesson,
+    // so a paladin or a druid used to finish
     // the detour, be told to slide it on, and have no ring to slide.
-    expect(MOBS[CRAB_MOB_ID].requiresQuestId).toBe(CRAB_QUEST_ID);
+    expect(MOBS[CRAB_MOB_ID].hpBase).toBe(42);
+    expect(MOBS[CRAB_MOB_ID].requiresQuestId).toBeUndefined();
+    expect(MOBS[CRAB_MOB_ID].untameable).toBe(true);
     const pearlEntry = (MOBS[CRAB_MOB_ID].loot ?? []).find((l) => l.itemId === PEARL_ITEM_ID);
     expect(pearlEntry).toMatchObject({ chance: 1, questId: CRAB_QUEST_ID });
     expect(QUESTS[CRAB_QUEST_ID].itemRewards).toEqual(

@@ -21,6 +21,13 @@ function bankInfo(slots: InvSlot[], capacity = 12): BankInfo {
     bonusSlots: 0,
     nextExpansionCost: 1000,
     bonusSources: [],
+    socketsUnlocked: 0,
+    socketBags: [null, null, null, null],
+    nextSocketCost: 1000000,
+    generalCapacity: capacity,
+    materialsCapacity: 0,
+    generalUsed: slots.length,
+    materialsUsed: 0,
   };
 }
 

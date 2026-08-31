@@ -17,10 +17,346 @@ vi.mock('../src/render/vfx', () => ({
   },
 }));
 
-import { capRingLightness, MageGroundFx } from '../src/render/mage_ground_fx';
+import {
+  capRingLightness,
+  MageGroundFx,
+  METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS,
+} from '../src/render/mage_ground_fx';
 
 describe('Mage meteor visual', () => {
-  it('builds an irregular molten rock with a terrain-draped flame telegraph', () => {
+  it('keeps an ambient falling meteor but hides its ground danger telegraph', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 3, showTelegraph: false });
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(true);
+    expect(root.getObjectByName('mage-meteor-telegraph')?.visible).toBe(false);
+    expect(scene.getObjectByName('ground_fire_aoe')).toBeUndefined();
+  });
+
+  it('shows the danger circle before revealing a delayed falling meteor', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+
+    fx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 2.5, warningLead: 0.75 });
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const body = root.getObjectByName('mage-meteor-body') as THREE.Group;
+    const trail = root.getObjectByName('mage-meteor-trail') as THREE.Group;
+    expect(root.getObjectByName('mage-meteor-telegraph')?.visible).toBe(true);
+    expect(body.visible).toBe(false);
+    expect(trail.visible).toBe(false);
+
+    fx.update(0.74);
+    expect(body.visible).toBe(false);
+    expect(landed).not.toHaveBeenCalled();
+
+    fx.update(0.02);
+    expect(body.visible).toBe(true);
+    expect(trail.visible).toBe(true);
+    expect(body.position.y).toBeGreaterThan(44);
+
+    fx.update(1.74);
+    expect(landed).toHaveBeenCalledWith(
+      4,
+      7,
+      expect.objectContaining({ x: 4, z: 7, radius: 2.4, warningLead: 0.75 }),
+    );
+  });
+
+  it('reconstructs a meteor mid-warning once and keeps its authoritative fall timing', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+    const warning = {
+      id: '77:912:0',
+      x: 4,
+      z: 7,
+      radius: 2.4,
+      duration: 2.5,
+      remaining: 2,
+      warningLead: 0.75,
+    };
+
+    fx.syncMeteorWarnings([warning]);
+    fx.syncMeteorWarnings([warning]);
+
+    const roots = scene.children.filter((child) => child.name === 'mage-meteor-fx');
+    expect(roots).toHaveLength(1);
+    const root = roots[0] as THREE.Group;
+    expect(root.userData.persistentMeteorId).toBe(warning.id);
+    expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(false);
+
+    fx.update(0.26);
+    expect(root.getObjectByName('mage-meteor-body')?.visible).toBe(true);
+    fx.update(1.74);
+    expect(landed).toHaveBeenCalledOnce();
+  });
+
+  it('reconciles three encounter meteor streams without pruning any owner', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+    const first = {
+      id: 'ignivar:1',
+      x: 1,
+      z: 2,
+      radius: 2.4,
+      duration: 2.5,
+      remaining: 2,
+      warningLead: 0.75,
+    };
+    const second = {
+      id: 'varkhul:1',
+      x: 4,
+      z: 5,
+      radius: 3.5,
+      duration: 1.8,
+      remaining: 1.2,
+      warningLead: 0,
+    };
+    const third = {
+      id: 'varkhul-forgestorm:90:2:1:0',
+      sourceId: 90,
+      x: 7,
+      z: 8,
+      radius: 4,
+      duration: 2.5,
+      remaining: 1.5,
+      warningLead: 0,
+    };
+
+    fx.syncWorldMeteorWarnings({
+      activeIgnivarMeteors: [first],
+      activeVarkhulAnvilMeteors: [second],
+      activeVarkhulForgestormWarnings: [third],
+    });
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(3);
+    fx.syncMeteorWarnings([], [second], [third]);
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === first.id),
+    ).toBeUndefined();
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === second.id),
+    ).toBeDefined();
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === third.id),
+    ).toBeDefined();
+    const forgestormMeteor = scene.children.find(
+      (child) => child.userData.persistentMeteorId === third.id,
+    ) as THREE.Group;
+    expect(forgestormMeteor.getObjectByName('mage-meteor-body')?.visible).toBe(true);
+    expect(forgestormMeteor.getObjectByName('mage-meteor-trail')?.visible).toBe(true);
+  });
+
+  it('lets the contributor fire disc own Ignivar ground detail without hiding countdown', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.syncMeteorWarnings([
+      {
+        id: '77:912:0',
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2,
+        warningLead: 0.75,
+      },
+    ]);
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const contributorAoe = scene.getObjectByName('ground_fire_aoe') as THREE.Group;
+    const contributorDisc = contributorAoe.getObjectByName('ground_fire_aoe__disc') as THREE.Mesh<
+      THREE.CircleGeometry,
+      THREE.ShaderMaterial
+    >;
+    expect(contributorAoe.visible).toBe(true);
+    expect(contributorDisc.material.uniforms.uHeat.value).toBeCloseTo(1 - 0.89 ** 10, 6);
+    expect(root.getObjectByName('mage-meteor-telegraph-footprint')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-veins')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-flames')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-beacon-embers')?.visible).toBe(false);
+    expect(root.getObjectByName('mage-meteor-telegraph-boundary')?.visible).toBe(true);
+    expect(root.getObjectByName('mage-meteor-telegraph-countdown-ring')?.visible).toBe(true);
+
+    const boundary = root.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop<
+      THREE.BufferGeometry,
+      THREE.LineBasicMaterial
+    >;
+    const countdown = root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.MeshBasicMaterial
+    >;
+    const countdownPositions = countdown.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const countdownXBefore = countdownPositions.getX(0);
+    const boundaryOpacityBefore = boundary.material.opacity;
+    const countdownOpacityBefore = countdown.material.opacity;
+    fx.update(METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS);
+    expect(countdownPositions.getX(0)).not.toBe(countdownXBefore);
+    expect(boundary.material.opacity).not.toBe(boundaryOpacityBefore);
+    expect(countdown.material.opacity).not.toBe(countdownOpacityBefore);
+    for (const name of [
+      'mage-meteor-telegraph-footprint',
+      'mage-meteor-telegraph-veins',
+      'mage-meteor-telegraph-flames',
+      'mage-meteor-telegraph-beacon-embers',
+    ]) {
+      expect(root.getObjectByName(name)?.visible).toBe(false);
+    }
+
+    fx.syncMeteorWarnings([
+      {
+        id: '77:912:0',
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 1,
+        warningLead: 0.75,
+      },
+    ]);
+    expect(contributorDisc.material.uniforms.uHeat.value).toBeCloseTo(1 - 0.89 ** 30, 6);
+
+    const genericScene = new THREE.Scene();
+    const genericFx = new MageGroundFx(genericScene, () => 0, vi.fn());
+    genericFx.spawnMeteor({ x: 4, z: 7, radius: 2.4, duration: 2.5 });
+    const genericRoot = genericScene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    expect(genericScene.getObjectByName('ground_fire_aoe')).toBeUndefined();
+    for (const name of [
+      'mage-meteor-telegraph-footprint',
+      'mage-meteor-telegraph-veins',
+      'mage-meteor-telegraph-flames',
+      'mage-meteor-telegraph-beacon-embers',
+    ]) {
+      expect(genericRoot.getObjectByName(name)?.visible).toBe(true);
+    }
+  });
+
+  it('hides the contributor fire disc with an explicitly hidden warning', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+
+    fx.spawnMeteor({
+      x: 4,
+      z: 7,
+      radius: 2.4,
+      duration: 2.5,
+      persistentId: '77:912:0',
+      showTelegraph: false,
+    });
+
+    expect(scene.getObjectByName('ground_fire_aoe')?.visible).toBe(false);
+  });
+
+  it('deduplicates the live meteor event against its snapshot warning', () => {
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+    const warning = {
+      id: '77:912:0',
+      x: 4,
+      z: 7,
+      radius: 2.4,
+      duration: 2.5,
+      remaining: 2.5,
+      warningLead: 0.75,
+    };
+
+    fx.spawnMeteor({
+      ...warning,
+      persistentId: warning.id,
+    });
+    fx.syncMeteorWarnings([warning]);
+
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(1);
+  });
+
+  it('advances an existing meteor to the latest authoritative remaining time', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+    const warning = {
+      id: '77:912:0',
+      x: 4,
+      z: 7,
+      radius: 2.4,
+      duration: 2.5,
+      remaining: 2.5,
+      warningLead: 0.75,
+    };
+
+    fx.syncMeteorWarnings([warning]);
+    fx.update(0.25);
+    fx.syncMeteorWarnings([{ ...warning, remaining: 1 }]);
+    fx.update(0.99);
+    expect(landed).not.toHaveBeenCalled();
+    fx.update(0.01);
+    expect(landed).toHaveBeenCalledOnce();
+  });
+
+  it('removes a persistent warning cancelled by authoritative state without landing it', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+
+    fx.syncMeteorWarnings([
+      {
+        id: '77:912:0',
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2,
+        warningLead: 0.75,
+      },
+    ]);
+    fx.syncMeteorWarnings([]);
+    fx.update(3);
+
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(0);
+    expect(landed).not.toHaveBeenCalled();
+  });
+
+  it('resolves an authoritative impact once and removes its pending warning', () => {
+    const scene = new THREE.Scene();
+    const landed = vi.fn();
+    const fx = new MageGroundFx(scene, () => 0, landed);
+    const id = '77:912:0';
+
+    fx.syncMeteorWarnings([
+      {
+        id,
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 0.1,
+        warningLead: 0.75,
+      },
+    ]);
+    fx.impactMeteor(id, 4, 7);
+    fx.syncMeteorWarnings([
+      {
+        id,
+        x: 4,
+        z: 7,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 0.1,
+        warningLead: 0.75,
+      },
+    ]);
+    fx.update(1);
+    fx.syncMeteorWarnings([]);
+
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(0);
+    expect(landed).toHaveBeenCalledOnce();
+    expect(landed).toHaveBeenCalledWith(4, 7);
+  });
+
+  it('builds an exact terrain-draped danger mark beneath the irregular molten rock', () => {
     const scene = new THREE.Scene();
     const heightAt = (x: number, z: number): number =>
       Math.sin(x * 0.31) * 0.8 + Math.cos(z * 0.27) * 0.55;
@@ -33,16 +369,47 @@ describe('Mage meteor visual', () => {
     const cracks = root.getObjectByName('mage-meteor-cracks') as THREE.Group;
     const trail = root.getObjectByName('mage-meteor-trail') as THREE.Group;
     const telegraph = root.getObjectByName('mage-meteor-telegraph') as THREE.Group;
+    const footprint = root.getObjectByName('mage-meteor-telegraph-footprint') as THREE.Mesh;
     const boundary = root.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop;
-    const innerRing = root.getObjectByName('mage-meteor-telegraph-inner-ring') as THREE.LineLoop;
+    const countdown = root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh;
     const veins = root.getObjectByName('mage-meteor-telegraph-veins') as THREE.LineSegments;
     const flames = root.getObjectByName('mage-meteor-telegraph-flames') as THREE.InstancedMesh;
+    const beaconEmbers = root.getObjectByName(
+      'mage-meteor-telegraph-beacon-embers',
+    ) as THREE.Points;
 
     expect(rock).toBeInstanceOf(THREE.Mesh);
     expect(rock.geometry).toBeInstanceOf(THREE.IcosahedronGeometry);
     expect(cracks.children.length).toBeGreaterThanOrEqual(3);
     expect(trail.children.length).toBeGreaterThanOrEqual(2);
     expect(flames.count).toBeGreaterThanOrEqual(12);
+    expect(footprint).toBeInstanceOf(THREE.Mesh);
+    expect(countdown).toBeInstanceOf(THREE.Mesh);
+    expect(beaconEmbers).toBeInstanceOf(THREE.Points);
+    expect((footprint.material as THREE.MeshBasicMaterial).blending).toBe(THREE.NormalBlending);
+    expect((footprint.material as THREE.MeshBasicMaterial).opacity).toBeLessThanOrEqual(0.22);
+    for (const material of [
+      boundary.material as THREE.LineBasicMaterial,
+      countdown.material as THREE.MeshBasicMaterial,
+      veins.material as THREE.LineBasicMaterial,
+      flames.material as THREE.MeshBasicMaterial,
+    ]) {
+      expect(material.color.r).toBeGreaterThan(material.color.g * 2.5);
+      expect(material.color.r).toBeGreaterThan(material.color.b * 1.5);
+    }
+
+    const footprintPositions = footprint.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let footprintOuterRadius = 0;
+    for (let i = 0; i < footprintPositions.count; i++) {
+      const x = footprintPositions.getX(i);
+      const y = footprintPositions.getY(i);
+      const z = footprintPositions.getZ(i);
+      const radius = Math.hypot(x - 10, z - 20);
+      footprintOuterRadius = Math.max(footprintOuterRadius, radius);
+      expect(radius).toBeLessThanOrEqual(8.0001);
+      expect(y).toBeCloseTo(heightAt(x, z) + 0.045, 4);
+    }
+    expect(footprintOuterRadius).toBeCloseTo(8, 4);
 
     const positions = boundary.geometry.getAttribute('position') as THREE.BufferAttribute;
     for (let i = 0; i < positions.count; i++) {
@@ -50,23 +417,39 @@ describe('Mage meteor visual', () => {
       const y = positions.getY(i);
       const z = positions.getZ(i);
       expect(Math.hypot(x - 10, z - 20)).toBeCloseTo(8, 4);
-      expect(y).toBeCloseTo(heightAt(x, z) + 0.08, 4);
+      expect(y).toBeCloseTo(heightAt(x, z) + 0.09, 4);
     }
-    const innerPositions = innerRing.geometry.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < innerPositions.count; i++) {
-      const x = innerPositions.getX(i);
-      const y = innerPositions.getY(i);
-      const z = innerPositions.getZ(i);
-      expect(Math.hypot(x - 10, z - 20)).toBeCloseTo(8 * 0.62, 4);
-      expect(y).toBeCloseTo(heightAt(x, z) + 0.075, 4);
+
+    const countdownPositions = countdown.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let countdownOuterRadius = 0;
+    for (let i = 0; i < countdownPositions.count; i++) {
+      const x = countdownPositions.getX(i);
+      const y = countdownPositions.getY(i);
+      const z = countdownPositions.getZ(i);
+      countdownOuterRadius = Math.max(countdownOuterRadius, Math.hypot(x - 10, z - 20));
+      expect(y).toBeCloseTo(heightAt(x, z) + 0.085, 4);
     }
+    expect(countdownOuterRadius).toBeCloseTo(8 * 0.84, 4);
+
     const veinPositions = veins.geometry.getAttribute('position') as THREE.BufferAttribute;
-    expect(veinPositions.count).toBeGreaterThan(20);
+    expect(veinPositions.count).toBeGreaterThan(200);
+    expect((veins.material as THREE.LineBasicMaterial).opacity).toBeGreaterThanOrEqual(0.3);
     for (let i = 0; i < veinPositions.count; i++) {
       const x = veinPositions.getX(i);
       const y = veinPositions.getY(i);
       const z = veinPositions.getZ(i);
-      expect(y).toBeCloseTo(heightAt(x, z) + 0.07, 4);
+      expect(y).toBeCloseTo(heightAt(x, z) + 0.075, 4);
+    }
+
+    const beaconPositions = beaconEmbers.geometry.getAttribute('position') as THREE.BufferAttribute;
+    expect(beaconPositions.count).toBeGreaterThanOrEqual(12);
+    expect(beaconEmbers.position.x).toBe(10);
+    expect(beaconEmbers.position.y).toBeCloseTo(heightAt(10, 20) + 0.1, 4);
+    expect(beaconEmbers.position.z).toBe(20);
+    expect((beaconEmbers.material as THREE.PointsMaterial).opacity).toBeLessThanOrEqual(0.22);
+    for (let i = 0; i < beaconPositions.count; i++) {
+      expect(beaconPositions.getY(i)).toBeGreaterThan(0);
+      expect(beaconPositions.getY(i)).toBeLessThanOrEqual(4.8);
     }
     const flameMatrix = new THREE.Matrix4();
     const flamePosition = new THREE.Vector3();
@@ -89,6 +472,57 @@ describe('Mage meteor visual', () => {
     }
     expect(maxRadius - minRadius).toBeGreaterThan(0.12);
     expect(telegraph.parent).toBe(root);
+  });
+
+  it('collapses and intensifies the countdown ring without moving the exact boundary', () => {
+    const scene = new THREE.Scene();
+    const heightAt = (x: number, z: number): number => x * 0.035 - z * 0.018;
+    const fx = new MageGroundFx(scene, heightAt, vi.fn());
+    fx.spawnMeteor({ x: -6, z: 11, radius: 9, duration: 4 });
+
+    const root = scene.getObjectByName('mage-meteor-fx') as THREE.Group;
+    const boundary = root.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop;
+    const countdown = root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.MeshBasicMaterial
+    >;
+    const veins = root.getObjectByName('mage-meteor-telegraph-veins') as THREE.LineSegments<
+      THREE.BufferGeometry,
+      THREE.LineBasicMaterial
+    >;
+    const initialCountdownOpacity = countdown.material.opacity;
+    const initialVeinOpacity = veins.material.opacity;
+    const initialPositions = countdown.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let initialRadius = 0;
+    for (let i = 0; i < initialPositions.count; i++) {
+      initialRadius = Math.max(
+        initialRadius,
+        Math.hypot(initialPositions.getX(i) + 6, initialPositions.getZ(i) - 11),
+      );
+    }
+
+    fx.update(3.2);
+
+    const latePositions = countdown.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let lateRadius = 0;
+    for (let i = 0; i < latePositions.count; i++) {
+      const x = latePositions.getX(i);
+      const y = latePositions.getY(i);
+      const z = latePositions.getZ(i);
+      lateRadius = Math.max(lateRadius, Math.hypot(x + 6, z - 11));
+      expect(y).toBeCloseTo(heightAt(x, z) + 0.085, 4);
+    }
+    expect(lateRadius).toBeLessThan(initialRadius * 0.45);
+    expect(countdown.material.opacity).toBeGreaterThan(initialCountdownOpacity);
+    expect(veins.material.opacity).toBeGreaterThan(initialVeinOpacity);
+
+    const boundaryPositions = boundary.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < boundaryPositions.count; i++) {
+      expect(Math.hypot(boundaryPositions.getX(i) + 6, boundaryPositions.getZ(i) - 11)).toBeCloseTo(
+        9,
+        4,
+      );
+    }
   });
 
   it('lands on schedule, leaves a fading central fire, then removes every transient mesh', () => {
@@ -121,9 +555,11 @@ describe('Mage meteor visual', () => {
         }
       }
       if (
+        object.name === 'mage-meteor-telegraph-footprint' ||
         object.name === 'mage-meteor-telegraph-boundary' ||
-        object.name === 'mage-meteor-telegraph-inner-ring' ||
+        object.name === 'mage-meteor-telegraph-countdown-ring' ||
         object.name === 'mage-meteor-telegraph-veins' ||
+        object.name === 'mage-meteor-telegraph-beacon-embers' ||
         object.name === 'mage-meteor-trail-embers'
       ) {
         const ownedGeometry = renderable.geometry;
@@ -151,9 +587,9 @@ describe('Mage meteor visual', () => {
     expect(scene.getObjectByName('mage-meteor-fx')).toBe(root);
     expect(material.opacity).toBe(0);
     const impactFireOpacity = (
-      root.getObjectByName('mage-meteor-telegraph-inner-ring') as THREE.LineLoop<
+      root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh<
         THREE.BufferGeometry,
-        THREE.LineBasicMaterial
+        THREE.MeshBasicMaterial
       >
     ).material.opacity;
     expect(impactFireOpacity).toBeGreaterThan(0);
@@ -162,9 +598,9 @@ describe('Mage meteor visual', () => {
     expect(scene.getObjectByName('mage-meteor-fx')).toBe(root);
     expect(
       (
-        root.getObjectByName('mage-meteor-telegraph-inner-ring') as THREE.LineLoop<
+        root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh<
           THREE.BufferGeometry,
-          THREE.LineBasicMaterial
+          THREE.MeshBasicMaterial
         >
       ).material.opacity,
     ).toBeLessThan(impactFireOpacity);
@@ -177,7 +613,7 @@ describe('Mage meteor visual', () => {
     // (baked from the spawn's own position) still can't be shared, so it
     // still disposes as before.
     expect(disposedMaterials.size).toBe(0);
-    expect(disposedGeometries.size).toBe(4);
+    expect(disposedGeometries.size).toBe(6);
   });
 
   it('recycles retired meteor materials into a later cast instead of allocating fresh ones', () => {
@@ -190,8 +626,20 @@ describe('Mage meteor visual', () => {
     const firstBoundary = firstRoot.getObjectByName(
       'mage-meteor-telegraph-boundary',
     ) as THREE.LineLoop;
+    const firstFootprint = firstRoot.getObjectByName(
+      'mage-meteor-telegraph-footprint',
+    ) as THREE.Mesh;
+    const firstCountdown = firstRoot.getObjectByName(
+      'mage-meteor-telegraph-countdown-ring',
+    ) as THREE.Mesh;
+    const firstBeacon = firstRoot.getObjectByName(
+      'mage-meteor-telegraph-beacon-embers',
+    ) as THREE.Points;
     const firstRockMat = firstRock.material as THREE.MeshStandardMaterial;
     const firstBoundaryMat = firstBoundary.material as THREE.LineBasicMaterial;
+    const firstFootprintMat = firstFootprint.material as THREE.MeshBasicMaterial;
+    const firstCountdownMat = firstCountdown.material as THREE.MeshBasicMaterial;
+    const firstBeaconMat = firstBeacon.material as THREE.PointsMaterial;
 
     // Run the first meteor all the way through fall, scorch, and cleanup.
     fx.update(2); // fall completes, lands
@@ -204,13 +652,28 @@ describe('Mage meteor visual', () => {
     const secondBoundary = secondRoot.getObjectByName(
       'mage-meteor-telegraph-boundary',
     ) as THREE.LineLoop;
+    const secondFootprint = secondRoot.getObjectByName(
+      'mage-meteor-telegraph-footprint',
+    ) as THREE.Mesh;
+    const secondCountdown = secondRoot.getObjectByName(
+      'mage-meteor-telegraph-countdown-ring',
+    ) as THREE.Mesh;
+    const secondBeacon = secondRoot.getObjectByName(
+      'mage-meteor-telegraph-beacon-embers',
+    ) as THREE.Points;
 
     // Same Material instances come back out of the free list...
     expect(secondRock.material).toBe(firstRockMat);
     expect(secondBoundary.material).toBe(firstBoundaryMat);
+    expect(secondFootprint.material).toBe(firstFootprintMat);
+    expect(secondCountdown.material).toBe(firstCountdownMat);
+    expect(secondBeacon.material).toBe(firstBeaconMat);
     // ...reset to their config baseline opacity, not whatever the retired
     // instance last animated to (boundary opacity was driven to 0 at landing).
-    expect((secondBoundary.material as THREE.LineBasicMaterial).opacity).toBeCloseTo(0.42, 5);
+    expect((secondFootprint.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.2, 5);
+    expect((secondBoundary.material as THREE.LineBasicMaterial).opacity).toBeCloseTo(0.58, 5);
+    expect((secondCountdown.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.34, 5);
+    expect((secondBeacon.material as THREE.PointsMaterial).opacity).toBeCloseTo(0.18, 5);
   });
 
   it('returns repeated cast and expiry cycles to a stable scene and pool baseline', () => {
@@ -251,6 +714,37 @@ describe('Mage meteor visual', () => {
     const secondRock = (secondRoot.getObjectByName('mage-meteor-rock') as THREE.Mesh)
       .material as THREE.Material;
     expect(secondRock).not.toBe(firstRock);
+  });
+
+  it('bounds terrain sampling and countdown uploads for five concurrent raid warnings', () => {
+    const scene = new THREE.Scene();
+    const groundY = vi.fn(() => 0);
+    const fx = new MageGroundFx(scene, groundY, vi.fn());
+    for (let i = 0; i < 5; i++) {
+      fx.spawnMeteor({ x: i * 3, z: i * -2, radius: 8, duration: 5 });
+    }
+    const countdowns = scene.children.map(
+      (root) => root.getObjectByName('mage-meteor-telegraph-countdown-ring') as THREE.Mesh,
+    );
+    const countdownPositions = countdowns.map(
+      (countdown) => countdown.geometry.attributes.position as THREE.BufferAttribute,
+    );
+    const initialUploadVersions = countdownPositions.map((positions) => positions.version);
+    groundY.mockClear();
+
+    fx.update(METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS * 0.4);
+
+    expect(groundY).not.toHaveBeenCalled();
+    expect(countdownPositions.map((positions) => positions.version)).toEqual(initialUploadVersions);
+
+    fx.update(METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS * 0.6);
+
+    expect(groundY).toHaveBeenCalledTimes(5 * 72 * 2);
+    expect(
+      countdownPositions.every(
+        (positions, index) => positions.version > initialUploadVersions[index],
+      ),
+    ).toBe(true);
   });
 
   it('keeps the Blizzard boundary visible until the zone expires', () => {

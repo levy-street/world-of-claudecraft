@@ -2,26 +2,37 @@
 // live Sim (docs/prd/woc/marketplace.md "Item custody"). Escrow extraction
 // runs against the online seller's live bags; deliveries and returns book
 // Ravenpost system parcels (instance payloads intact, book-once by
-// custodyRef) and persist the realm mail blob before the caller advances its
-// settlement row, so a crash anywhere in between reconciles to exactly one
-// parcel. The sim stays currency-blind: nothing here mentions prices, tokens,
+// custodyRef) and persist a durable per-parcel overlay row
+// (mail_custody_overlay.ts) before the caller advances its settlement row,
+// so a crash anywhere in between reconciles to exactly one parcel and a
+// parcel never costs a whole-book write. The sim stays currency-blind: nothing here mentions prices, tokens,
 // or wallets, only item copies and letters.
 
-import {
-  WOC_MARKET_DELIVERY_LETTER,
-  WOC_MARKET_RETURN_LETTER,
-  WOC_MARKET_SOLD_LETTER,
-} from '../src/sim/content/letters';
+import { randomUUID } from 'node:crypto';
+import { WOC_MARKET_RETURN_LETTER } from '../src/sim/content/letters';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { CharacterState, Sim } from '../src/sim/sim';
 import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
+import type { BankLedgerOutboxSnapshot } from './bank_ledger_outbox';
 import { gameMetricsCounters } from './http/game_signals';
-import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
+import {
+  CUSTODY_PARCEL_LETTERS,
+  type CustodyParcelRow,
+  persistCustodyParcelRow,
+} from './mail_custody_overlay';
+import type { StorageAppliedEffect } from './storage_purchase_db';
+import type {
+  CharacterSaveArgs,
+  WocCustodyExtract,
+  WocCustodyGrant,
+  WocMarketCustody,
+} from './woc_market';
 import { createWocEscrowGate, type WocEscrowGate } from './woc_market_escrow_gate';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
- *  wocCustodySession / persistMailBlob plus the public sim, and the
- *  per-character save FIFO seam the escrow persist rides). */
+ *  wocCustodySession plus the public sim, and the per-character save FIFO
+ *  seam the escrow persist rides). Parcel durability rides the per-parcel
+ *  overlay row (mail_custody_overlay.ts), never a whole-book write. */
 export interface WocCustodyGameHost {
   sim: Sim;
   wocCustodySession(characterId: number): {
@@ -30,7 +41,6 @@ export interface WocCustodyGameHost {
     name: string;
     leaseNonce: string | undefined;
   } | null;
-  persistMailBlob(): Promise<void>;
   /** The per-character save FIFO (game.ts characterSaveQueues): a job runs
    *  only after every earlier save or job for that character settled, so
    *  commit order is enqueue order. A job must never await another enqueue
@@ -41,10 +51,26 @@ export interface WocCustodyGameHost {
    *  this module hands to a durable write comes from here; a raw
    *  sim.serializeCharacter is a jail escape. Null when the session is
    *  gone, torn down, or escrow-quarantined. */
-  serializeCharacterForPersist(
-    characterId: number,
-  ): { level: number; state: CharacterState } | null;
-  hasDirtyGuildBooks(characterId: number): boolean;
+  serializeCharacterForPersist(characterId: number): {
+    level: number;
+    state: CharacterState;
+    storageEffects?: StorageAppliedEffect[];
+    bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
+  } | null;
+  /** Acknowledge every exact save effect as one host decision after COMMIT.
+   *  The host must exact-match character and lease identity, consume neither
+   *  queue on any mismatch, and return false rather than throw. This bridge
+   *  still catches a broken host so a known database commit can never enter
+   *  marketplace compensation. */
+  acknowledgeCharacterSaveEffects?(save: CharacterSaveArgs): boolean;
+  /** True when a character-only market transaction would split any dirty
+   *  guild book from its character state OR any queued guild-scoped ledger
+   *  row from that book. A mixed personal+guild prefix is still a conflict:
+   *  callers refuse the whole exact prefix and never filter it. */
+  hasCharacterOnlySaveConflict(characterId: number): boolean;
+  /** Retained during the host migration only; all custody decisions use the
+   *  wider hasCharacterOnlySaveConflict guard above. */
+  hasDirtyGuildBooks?(characterId: number): boolean;
   flushDirtyGuildBooks(characterId: number): Promise<void>;
   /** Terminal escrow-job signals (game.ts owns the semantics: 'fenced' kicks
    *  the displaced zombie, 'ambiguous' quarantines so the durable row
@@ -60,9 +86,9 @@ export interface WocCustodyGameHost {
  *  request open only invites a retry pile-up. NOTE this bounds only the
  *  wait: a job that STARTED holds the request for the transaction's own
  *  ceiling (pool checkout + BEGIN and the installing SET LOCAL under the
- *  15s session default + the five workload statements + their five
- *  inter-statement idle windows under the 10s save bound + the lock wait +
- *  COMMIT under the 65s driver backstop: 157s worst case, derived and
+ *  15s session default + the twelve-statement ledger-plus-storage maximum +
+ *  its twelve inter-statement idle windows under the 10s save bound + the
+ *  lock wait + COMMIT under the 65s driver backstop: 255s worst case, derived and
  *  pinned in the tunables ladder, under the HTTP layer's 300s), so client
  *  fetch timeouts must be sized off THAT, not off this deadline. The FIFO
  *  occupancy story is wider still: the pre-job guild flush rides the 60s
@@ -79,11 +105,7 @@ export const ESCROW_QUEUE_WARN_MS = 2_000;
  *  tunables-ladder pin beside its siblings. */
 export const ESCROW_QUEUE_WARN_THROTTLE_MS = 30_000;
 
-const LETTERS = {
-  delivery: WOC_MARKET_DELIVERY_LETTER,
-  return: WOC_MARKET_RETURN_LETTER,
-  sold_notice: WOC_MARKET_SOLD_LETTER,
-} as const;
+const LETTERS = CUSTODY_PARCEL_LETTERS;
 
 /** Process-lifetime per-listing serialize cost (the escrow write-path rider):
  *  the extract-side serializeCharacterForPersist is synchronous CPU on the
@@ -104,6 +126,28 @@ export function wocEscrowSerializeStats(): { count: number; totalMs: number; max
   };
 }
 
+function characterSaveArgs(
+  characterId: number,
+  leaseNonce: string | undefined,
+  snapshot: {
+    level: number;
+    state: CharacterState;
+    storageEffects?: StorageAppliedEffect[];
+    bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
+  },
+): CharacterSaveArgs {
+  return {
+    characterId,
+    level: snapshot.level,
+    state: snapshot.state,
+    leaseNonce,
+    storageEffects: snapshot.storageEffects ?? [],
+    // Object identity is load-bearing: BankLedgerOutbox.acknowledge uses the
+    // exact captured object to remove only this prefix, leaving later appends.
+    bankLedgerSnapshot: snapshot.bankLedgerSnapshot,
+  };
+}
+
 export function createWocMarketCustody(
   host: WocCustodyGameHost,
   opts: {
@@ -114,12 +158,16 @@ export function createWocMarketCustody(
      *  gate per realm process; injectable so main.ts can put its stats on
      *  the ops readout and tests can saturate it. */
     escrowGate?: WocEscrowGate;
+    /** The per-parcel durable write (mail_custody_overlay.ts by default);
+     *  injectable so the custody tests run without a pool. */
+    persistParcelRow?: (row: CustodyParcelRow) => Promise<void>;
   } = {},
 ): WocMarketCustody {
   const escrowWaitMs = opts.escrowWaitMs ?? ESCROW_QUEUE_WAIT_MS;
   const escrowWarnMs = opts.escrowWarnMs ?? ESCROW_QUEUE_WARN_MS;
   const escrowWarnThrottleMs = opts.escrowWarnThrottleMs ?? ESCROW_QUEUE_WARN_THROTTLE_MS;
   const escrowGate = opts.escrowGate ?? createWocEscrowGate();
+  const persistParcelRow = opts.persistParcelRow ?? persistCustodyParcelRow;
   /** Depth cap 1 per character: the ids with an escrow job queued or
    *  running. Released when the WORK settles; a FIFO that never settles
    *  (a non-query hang past every db bound) would pin its character's slot
@@ -160,12 +208,7 @@ export function createWocMarketCustody(
         pid: session.pid,
         extracted: out.extracted,
         characterName: session.name,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
     },
 
@@ -229,7 +272,7 @@ export function createWocMarketCustody(
                 `[woc_market] escrow queue wait ${waited}ms for character ${characterId}`,
               );
             }
-            if (host.hasDirtyGuildBooks(characterId)) {
+            if (host.hasCharacterOnlySaveConflict(characterId)) {
               gameMetricsCounters().wocEscrowQueue('books_dirty_refused');
               return 'contended';
             }
@@ -274,12 +317,7 @@ export function createWocMarketCustody(
       accountId: number,
       characterId: number,
       expectedNonce: string | undefined,
-      persist: (save: {
-        characterId: number;
-        level: number;
-        state: CharacterState;
-        leaseNonce: string | undefined;
-      }) => Promise<T>,
+      persist: (save: CharacterSaveArgs) => Promise<T>,
     ): Promise<T | 'busy' | 'session_lost'> {
       // The delivered-save FIFO entry (the escrow write-path rider closes
       // the commitGrant carve-out). The blob is serialized INSIDE the
@@ -304,6 +342,15 @@ export function createWocMarketCustody(
           async () => {
             if (cancelled) return 'busy';
             started = true;
+            // This transaction persists the character row without a guild
+            // book. Check in the FIFO slot immediately before the fresh
+            // snapshot so neither a dirty book nor a guild-bearing outbox
+            // prefix can be split by the WOC save. The whole prefix parks;
+            // filtering its guild rows would destroy command-batch identity.
+            if (host.hasCharacterOnlySaveConflict(characterId)) {
+              gameMetricsCounters().wocEscrowQueue('books_dirty_refused');
+              return 'busy';
+            }
             // Validated UNDER the slot: a session that left or rotated its
             // lease during the wait must park (only the operator can
             // attribute the earlier grant), and the fresh serialize below is
@@ -314,12 +361,7 @@ export function createWocMarketCustody(
             if (session.leaseNonce !== expectedNonce) return 'session_lost';
             const snap = host.serializeCharacterForPersist(characterId);
             if (!snap) return 'session_lost';
-            return persist({
-              characterId,
-              level: snap.level,
-              state: snap.state,
-              leaseNonce: session.leaseNonce,
-            });
+            return persist(characterSaveArgs(characterId, session.leaseNonce, snap));
           },
         );
         const timeout = new Promise<'timeout'>((resolve) => {
@@ -365,12 +407,7 @@ export function createWocMarketCustody(
       }
       return {
         ok: true,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
     },
 
@@ -387,13 +424,27 @@ export function createWocMarketCustody(
       if (!snap) return { ok: false, reason: 'offline' };
       return {
         ok: true,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
+    },
+
+    acknowledgeCharacterSave(save: CharacterSaveArgs): void {
+      const acknowledge = host.acknowledgeCharacterSaveEffects;
+      if (!acknowledge) return;
+      try {
+        if (!acknowledge(save)) {
+          console.error(
+            `[woc_market] committed character save effects were retained for character ${save.characterId}: acknowledgement identity mismatch`,
+          );
+        }
+      } catch (err) {
+        // COMMIT is already known. A bookkeeping failure must retain effects
+        // for their idempotent retry, never throw into copy compensation.
+        console.error(
+          `[woc_market] committed character save effects were retained for character ${save.characterId}: acknowledgement failed`,
+          err,
+        );
+      }
     },
 
     restoreCopy(pid: number, characterId: number, slot: InvSlot): void {
@@ -418,12 +469,18 @@ export function createWocMarketCustody(
         restoreInto(host, pid, slot);
         return;
       }
-      host.sim.mailSystemParcel(
-        { key: String(characterId), name: String(characterId) },
-        WOC_MARKET_RETURN_LETTER,
-        [slot],
+      // A generated ref makes even this compensation parcel replay-safe: the
+      // overlay row re-books it after a crash and the book-once dedupe keeps
+      // it single. Fire-and-forget like the old whole-book write (the durable
+      // listing row still holds the item until the next flush lands), but a
+      // failed row write is at least visible now.
+      const custodyRef = `woc-return:${randomUUID()}`;
+      const recipient = { key: String(characterId), name: String(characterId) };
+      host.sim.mailSystemParcel(recipient, WOC_MARKET_RETURN_LETTER, [slot], custodyRef);
+      void persistParcelRow({ custodyRef, recipient, letter: 'return', items: [slot] }).catch(
+        (err) =>
+          console.error(`[woc_market] return parcel row write failed for ${custodyRef}`, err),
       );
-      void host.persistMailBlob().catch(() => {});
     },
 
     ownsLiveCharacter(accountId: number, characterId: number): boolean {
@@ -475,10 +532,14 @@ export function createWocMarketCustody(
         throw new Error(`woc_market: mail parcel refused for custodyRef ${custodyRef}`);
       }
       // Failure here PROPAGATES too: the caller must not advance its settlement
-      // or dispose flag until the blob holding the parcel is durable. The
-      // in-memory letter stays booked; the custodyRef dedupe makes the retry
-      // (this process) or the re-book (after a restart) exactly-once.
-      await host.persistMailBlob();
+      // or dispose flag until the parcel is durable. Durability is the
+      // PER-PARCEL overlay row (mail_custody_overlay.ts), never a whole-book
+      // write: the in-memory letter stays booked and reaches the blob on the
+      // next full book write, and a crash before that replays the row through
+      // the book-once dedupe at boot, so the retry (this process) or the
+      // re-book (after a restart) stays exactly-once. Booking a parcel now
+      // costs the loop the parcel, not the book.
+      await persistParcelRow({ custodyRef, recipient, letter, items });
     },
 
     hasParcel(custodyRef: string): boolean {

@@ -12,14 +12,16 @@
 // by this painter-mount harness; their pixels get no faked per-marker aria.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { normalizeGraphicsSettingsSnapshot } from '../../src/game/graphics_rebuild_core';
+import { storageRungSkuForLadderIndex } from '../../src/sim/content/storage_charters';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
+import { BankWindow } from '../../src/ui/bank_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
-import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
@@ -351,10 +353,15 @@ describe('axe: options menu', () => {
     await expectClean(root);
   });
 
-  it('enables the third action row through the secondary row and preserves keyboard focus', () => {
+  it('keeps keyboard focus on a combat toggle across its settings rebuild', () => {
+    // The optional-bar rows (showSecondaryActionBar / showThirdActionBar)
+    // deliberately have no options rows any more: the primary bar's plus and
+    // minus buttons are the one control for adding and removing them, and
+    // the edit mode's Frames Settings menu owns the other bar toggles. This
+    // pins the removal and keeps the focus-preservation coverage on a
+    // toggle the Combat tab still renders.
     const values: Record<string, number | boolean> = {
-      showSecondaryActionBar: false,
-      showThirdActionBar: false,
+      startAttackOnAbilityUse: false,
     };
     const settings = {
       get: (key: string) => values[key] ?? false,
@@ -365,19 +372,7 @@ describe('axe: options menu', () => {
     };
     const hooks = {
       settings,
-      onSettingChange: (key: string, value: number | boolean) => {
-        if (key !== 'showSecondaryActionBar' && key !== 'showThirdActionBar') return;
-        const visibility = resolveActionBarVisibility(
-          {
-            secondary: Boolean(values.showSecondaryActionBar),
-            third: Boolean(values.showThirdActionBar),
-          },
-          key,
-          Boolean(value),
-        );
-        values.showSecondaryActionBar = visibility.secondary;
-        values.showThirdActionBar = visibility.third;
-      },
+      onSettingChange: () => {},
       theme: {
         get: () => ({ preset: 'classic', custom: {} }),
         setPreset: () => {},
@@ -411,24 +406,109 @@ describe('axe: options menu', () => {
       (button) => button.textContent === t('hud.options.interface'),
     );
     interfaceButton?.click();
-    // The Interface panel is tabbed; both action-bar toggles live under Combat.
+    // The Interface panel is tabbed; the surviving auto-attack toggles live
+    // under Combat.
     root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
 
-    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
-    const secondary = toggle('showSecondaryActionBar');
-    secondary?.focus();
-    secondary?.click();
-    expect(values.showSecondaryActionBar).toBe(true);
-    expect(toggle('showThirdActionBar')?.disabled).toBe(false);
-    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+    // The optional-bar rows are gone from the options window by design.
+    expect(toggle('showSecondaryActionBar')).toBeNull();
+    expect(toggle('showThirdActionBar')).toBeNull();
 
-    toggle('showThirdActionBar')?.click();
-    expect(values.showThirdActionBar).toBe(true);
-    toggle('showSecondaryActionBar')?.click();
-    expect(values.showSecondaryActionBar).toBe(false);
-    expect(values.showThirdActionBar).toBe(false);
-    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
-    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+    const attack = toggle('startAttackOnAbilityUse');
+    expect(attack, 'combat tab renders the auto-attack toggle').toBeTruthy();
+    attack?.focus();
+    attack?.click();
+    expect(values.startAttackOnAbilityUse).toBe(true);
+    expect(document.activeElement).toBe(toggle('startAttackOnAbilityUse'));
+
+    toggle('startAttackOnAbilityUse')?.click();
+    expect(values.startAttackOnAbilityUse).toBe(false);
+    expect(document.activeElement).toBe(toggle('startAttackOnAbilityUse'));
+  });
+
+  it('keeps keyboard focus on a graphics dial across its dependency-driven rebuild', () => {
+    // The test above covers an independent toggle (no rebuild); this one covers
+    // the DEPENDENCY-driven rebuild, where a control is re-rendered with a
+    // different disabled state. The interface no longer carries a boolToggle
+    // pair with a disabled: predicate (the gamepad cross-hotbar pair was
+    // checked: both toggles render independent), so the surviving dependent
+    // pair is the Graphics panel: every dial carries rerender, staging a value
+    // re-renders the WHOLE panel (destroying the clicked button), and the
+    // rebuilt footer's Apply button flips from disabled (draft clean) to
+    // enabled (draft dirty). Focus must ride the rebuild back onto the
+    // clicked dial's rebuilt equivalent (focus_restore.ts, data-focus-key).
+    const values: Record<string, number | boolean> = {};
+    const settings = {
+      get: (key: string) => values[key] ?? 0,
+      set: (key: string, value: number | boolean) => {
+        values[key] = value;
+        return value;
+      },
+    };
+    const hooks = {
+      settings,
+      onSettingChange: () => {},
+      graphicsApplied: () => normalizeGraphicsSettingsSnapshot({}),
+      theme: {
+        get: () => ({ preset: 'classic', custom: {} }),
+        setPreset: () => {},
+        setCustom: () => {},
+        resetCustom: () => {},
+      },
+      perfOverlay: { setPlacement: () => {} },
+    };
+    const root = host('options-menu');
+    root.style.display = 'none';
+    const win = new OptionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            realm: 'Claudemoon',
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+          }) as never,
+        options: () => hooks as never,
+        auraOverlays: () => ({ setPlacement: vi.fn() }) as never,
+        bugReport: () => null,
+        buildDropdown: () => document.createElement('div'),
+        captureFocus: () => null,
+      }),
+    );
+
+    win.toggle();
+    const graphicsButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
+      (button) => button.textContent === t('hud.options.graphics'),
+    );
+    expect(graphicsButton, 'main menu renders the Graphics entry').toBeTruthy();
+    graphicsButton?.click();
+
+    // The dependent control starts DISABLED: the draft matches the applied
+    // snapshot, so there is nothing to apply yet.
+    const apply = () => root.querySelector<HTMLButtonElement>('[data-graphics-apply]');
+    expect(apply(), 'graphics panel renders the Apply action').toBeTruthy();
+    expect(apply()?.disabled).toBe(true);
+
+    // The controlling control: a shadow-quality dial value that is NOT the
+    // one currently displayed, so the click genuinely stages a change.
+    const dial = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-focus-key^="shadowQuality:"]'),
+    ).find((button) => button.getAttribute('aria-pressed') === 'false');
+    expect(dial, 'an unselected shadow-quality dial value exists').toBeTruthy();
+    const focusKey = dial?.dataset.focusKey ?? '';
+    dial?.focus();
+    dial?.click(); // stages the draft and re-renders the whole panel
+
+    // The dependent control was re-rendered ENABLED (re-queried: the old
+    // footer node was destroyed by the rebuild).
+    expect(apply()?.disabled).toBe(false);
+    // And keyboard focus survived the rebuild: the active element is the
+    // clicked dial's rebuilt equivalent (a NEW node with the same focus key),
+    // now showing the staged value as selected.
+    const rebuilt = root.querySelector<HTMLButtonElement>(`[data-focus-key="${focusKey}"]`);
+    expect(rebuilt, 'the dial was rebuilt with the same focus key').toBeTruthy();
+    expect(rebuilt).not.toBe(dial);
+    expect(rebuilt?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.activeElement).toBe(rebuilt);
   });
 });
 
@@ -1269,6 +1349,168 @@ describe('axe: reliquary window search, filters, and relic grid', () => {
     for (const chip of chips) {
       expect(chip.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     }
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bank (#bank-window) - the phase 08 footer meter joined in QA 08: the split
+// aria (meterPoolsAria), the focusable meter group, the socket row, and the
+// buy button are all live in this staged near-full, socketed, stocked state,
+// so the whole personal pane meets axe rather than only the bags half of the
+// new aria pair.
+// ---------------------------------------------------------------------------
+
+describe('axe: bank window personal pane (footer meter)', () => {
+  it('a split, near-full, socketed bank axes clean', async () => {
+    const root = host('bank-window');
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    const world = {
+      bankInfo: {
+        slots: Array.from({ length: 23 }, () => ({ itemId: 'iron_ore', count: 1 })),
+        capacity: 32,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: 500,
+        bonusSources: [],
+        socketsUnlocked: 1,
+        socketBags: ['burlap_reagent_pouch', null, null, null],
+        nextSocketCost: 2000000,
+        generalCapacity: 24,
+        materialsCapacity: 8,
+        generalUsed: 21,
+        materialsUsed: 2,
+      },
+      guildBankInfo: null,
+      vaultInfo: null,
+      inventory: [],
+      bags: [null, null, null, null],
+      copper: 1000,
+    };
+    const win = new BankWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        itemIcon: () => '<span class="item-icon"></span>',
+        moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
+        itemTooltip: () => '',
+        captureFocus: () => null,
+        consumePeek: () => false,
+      }),
+    );
+    win.open();
+    // The staged state is the fullest one: gilded near-full footer, both meter
+    // segments, the split aria, and the focusable group all up before axe runs.
+    expect(root.querySelector('.bank-footer.near-full')).not.toBeNull();
+    expect(root.querySelector('.bank-meter[role="group"][tabindex="0"]')).not.toBeNull();
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bank (#bank-window) - the phase 13 Claudium rung purchase, which puts four
+// nodes in the SAME personal-pane footer that the meter arm above can never
+// reach: the second price tag inside the one expand button, that button's
+// aria-busy + disabled in-flight state, the purchase-result band, and the
+// visually hidden region that announces it. They are staged together because
+// that is the one moment all four coexist: a spend still on the wire with the
+// previous result's band still on screen.
+// ---------------------------------------------------------------------------
+
+describe('axe: bank window personal pane (Claudium rung purchase)', () => {
+  it('a dual-tag buy button, busy mid-spend, over a result band axes clean', async () => {
+    const root = host('bank-window');
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    // The SKU the staged wire is selling, resolved the way the view core does
+    // (ladder index = purchasedSlots / block), so the busy state below is
+    // latched against the id the painter will actually compare rather than a
+    // `strongbox_rung_NN` literal that drifts when the ladder is re-cut.
+    const sku = storageRungSkuForLadderIndex(0);
+    expect(sku).toBeDefined();
+    const world = {
+      bankInfo: {
+        slots: Array.from({ length: 23 }, () => ({ itemId: 'iron_ore', count: 1 })),
+        capacity: 32,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: 500,
+        // The wire's own Claudium price for that same next rung. Absent, this
+        // is the normal service-outage shape and the footer stays gold-only.
+        nextRungClaudiumPrice: 1200,
+        bonusSources: [],
+        socketsUnlocked: 1,
+        socketBags: ['burlap_reagent_pouch', null, null, null],
+        nextSocketCost: 2000000,
+        generalCapacity: 24,
+        materialsCapacity: 8,
+        generalUsed: 21,
+        materialsUsed: 2,
+      },
+      guildBankInfo: null,
+      vaultInfo: null,
+      inventory: [],
+      bags: [null, null, null, null],
+      copper: 1000,
+    };
+    const win = new BankWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        itemIcon: () => '<span class="item-icon"></span>',
+        moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
+        itemTooltip: () => '',
+        captureFocus: () => null,
+        consumePeek: () => false,
+        // The host-side gate: with no Claudium hooks attached the view core
+        // suppresses the second tag outright and this arm would silently be a
+        // duplicate of the gold-only footer above.
+        storeEnabled: () => true,
+      }),
+    );
+    // Both are read at MARKUP-BUILD time (a repaint may not hand back an
+    // enabled button mid-spend), so they have to be latched before the first
+    // paint, and neither the window nor the controller exposes a public setter.
+    //
+    // RE-POINTED at Bank Storage phase 17, which moved the rung money state
+    // machine out of the window into src/ui/bank_rung_purchase_core.ts. This rig
+    // stages state by NAME, so the move silently turned two writes into
+    // properties nobody reads: the button came back enabled with no band, and
+    // this file is the ONLY guard in the tree that could say so. The full gate
+    // caught it; no unit suite, source pin or review lane did. If these names
+    // move again, they move here in the same change.
+    const state = win as unknown as {
+      rungPurchase: {
+        inFlight: string | null;
+        band: { granted: boolean; reason: string | null } | null;
+      };
+    };
+    state.rungPurchase.inFlight = sku?.id ?? null;
+    state.rungPurchase.band = { granted: false, reason: 'purchase_in_progress' };
+    win.open();
+    // WHY THE PRE-CHECKS: axe over a scope that lost these nodes passes just as
+    // cleanly as one that audits them, so every claim this arm makes rests on
+    // the nodes really being on the page. A gate flipping the tag off, a
+    // renamed wire field, or a busy state that stops reaching the button would
+    // otherwise leave a green arm auditing markup that is not there.
+    const tag = root.querySelector('.bank-buy-tag.bank-buy-tag-claudium');
+    expect(tag).not.toBeNull();
+    expect(tag?.querySelector('img[alt=""]')).not.toBeNull();
+    expect(tag?.querySelector('strong')).not.toBeNull();
+    const btn = root.querySelector<HTMLButtonElement>('.bank-buy-btn[data-focus-key="bank:buy"]');
+    expect(btn).not.toBeNull();
+    expect(btn?.getAttribute('aria-busy')).toBe('true');
+    expect(btn?.disabled).toBe(true);
+    // The accessible name has to be the dual one, not the two prices read back
+    // to back: it is the whole reason the aria-label exists on this button.
+    expect((btn?.getAttribute('aria-label') ?? '').length).toBeGreaterThan(0);
+    expect(root.querySelector('.bank-rung-notice.failure')).not.toBeNull();
+    expect(
+      root.querySelector('span.visually-hidden[data-rung-live][role="status"][aria-live="polite"]'),
+    ).not.toBeNull();
     await expectClean(root);
   });
 });

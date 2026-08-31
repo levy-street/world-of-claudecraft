@@ -64,6 +64,10 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/audit_conservation_property.test.ts', 2_700_000],
   ['tests/battleground_band.test.ts', 480_000],
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
+  // The real-suite shard collection case walks the complete test corpus and
+  // needs a 60s allowance on low-worker hosts; the other timeout pins in this
+  // file keep the exact aggregate just above the default.
+  ['tests/ci_shard_plan.test.ts', 310_000],
   ['tests/discord_db_integration.test.ts', 420_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
   ['tests/druid_balance_probe.test.ts', 540_000],
@@ -71,6 +75,10 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
   ['tests/nythraxis_matrix.test.ts', 1_200_000],
   ['tests/owned_class_balance_dps_probes.test.ts', 360_000],
+  // The shared PostgreSQL escrow fixture carries a 30s setup hook plus ten
+  // independently bounded 30s cases. The exact row records that existing
+  // parallelizable shape without promoting the suite into the measured lane.
+  ['tests/woc_market_delivery_pg_integration.test.ts', 330_000],
   // The 2026-08-23 warlock viability round doubled each anchor file's scope
   // (the heroic Nythraxis contract plus the historical level-20 tripwire,
   // four probe runs each); same suite family as the druid/owned probes above.

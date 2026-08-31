@@ -47,8 +47,8 @@ export const WOC_ESCROW_GATE_MAX_IN_FLIGHT = 4;
  *  deadline-cancelled job still settles only when the FIFO reaches it).
  *  The tunables ladder therefore prices the honest started-request ceiling
  *  PLUS the guild-flush heavy allowance PLUS a bounded head-of-line term
- *  (ONE heavy save queued ahead on the same character: 157s + 60s + 60s
- *  leaves this 300s ceiling 23s of slack). Inside that bound
+ *  (ONE heavy save queued ahead on the same character: 255s + 60s + 60s
+ *  leaves this 400s ceiling 25s of slack). Inside that bound
  *  a reclaim is an incident signal rather than ordinary churn; PAST it (a
  *  character whose queue holds two or more saves each taking the full
  *  heavy allowance) the reclaim can also fire on a still-legitimate hold,
@@ -56,7 +56,7 @@ export const WOC_ESCROW_GATE_MAX_IN_FLIGHT = 4;
  *  correctness. Identity tokens keep it exact (only the oldest hold past
  *  the ceiling is reclaimed), and the pg pool's own bounds remain the
  *  backstop for whatever the wedged sequence still holds. */
-export const WOC_ESCROW_GATE_HOLD_CEILING_MS = 300_000;
+export const WOC_ESCROW_GATE_HOLD_CEILING_MS = 400_000;
 
 /** One acquired slot. release() retires exactly this hold's stamp; calling
  *  it twice, or after the reclaim already retired the hold, is a no-op. */

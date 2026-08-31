@@ -114,10 +114,11 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
-// Online world-layout compatibility is encoded in the first WebSocket frame's
-// discriminator. Changing the authoritative town layout requires a new epoch:
-// the strict discriminator makes both rolling-deploy directions fail closed
-// before either binary loads a character into a differently shaped world.
+// Online world and required-snapshot compatibility is encoded in the first
+// WebSocket frame's discriminator. Changing the authoritative town layout or
+// a required snapshot shape requires a new epoch: the strict discriminator
+// makes both rolling-deploy directions fail closed before either binary loads
+// a character into an incompatible world.
 // 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
 // disagree about the authoritative resource carrier, so they must fail closed.
 // 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
@@ -128,7 +129,54 @@ export type {
 // ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
+// 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
+// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
+// rejected before the new client can consume the old six-field snapshot.
+// 11 = Materials Vault snapshots require the identity-preserving `special`
+// collection. An epoch-10 client can neither render nor select those rows, and
+// an epoch-10 server would omit them, stranding deposited special materials.
+// 13 = Varkhul's Forge Links became ten individual room runes with concentric
+// movement controls. Mixed binaries disagree about actionable raid instructions,
+// so they must fail closed before entering the world.
+// 14 = Heroic Forge Links added orphaned-rune rescue state and neighbor signals.
+// Older clients cannot render who is authorized to rescue an orphan.
+// 15 = Forge Links became one five-track rune loom with moving controls, two
+// waves on both difficulties, and explicit Normal/Heroic wire identity. Older
+// clients would render ten overlapping stations and give unsafe instructions.
+// 16 = Forge Links returned to ten separate room stations while retaining the
+// moving controls and two-wave flow. Epoch 15 clients would stack every rune at
+// one shared center and present the wrong interaction geometry.
+// 17 = Forge Links added two authoritative crucible beams, blocker endpoints,
+// forge overheat, and Forge Meltdown. Epoch 16 clients cannot show or react to
+// those lethal signals, so mixed binaries must fail closed.
+// 18 = Forge Links removed the rune interface and became persistent crucible
+// pillars plus timed beam windows, forge heat and portal add waves. Epoch 17
+// clients would still render obsolete runes and hide inactive pillar hardware.
+// 19 = Varkhul added an authoritative moving Tempering Ray with a first-body
+// interceptor. Epoch 18 clients cannot render its lethal line or safe blocker.
+// 20 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
+// fire radius is authoritative, but the four-second player warning is compiled
+// into the client, so epoch 19 clients would preview a dangerously smaller area.
+// 21 = Heroic Varkhul added Worldfire, a compiled six-stage room-filling fire
+// wall. Epoch 20 clients would take lethal damage from bands they cannot see.
+// 22 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
+// 120 degrees to 42 yards and 140 degrees. Epoch 21 clients would display a
+// dangerously smaller warning than the authoritative server damage.
+// 23 = The Ignivar raid gained Molten Assembly as a compiled fourth room and
+// Varkhul's Assembly gained authoritative wave/enemy counters. Epoch 22 clients
+// do not know the new route or enough state to present its add phase safely.
+// 24 = Ignivar's compiled arena floor gained a lowered lethal lava perimeter
+// whose exact 4x4 stone-tile union and bridge footprint are shared by movement,
+// damage and rendering. Epoch 23 clients would render and stand on the old full
+// floor while the server burns and lowers the new perimeter.
+// 25 = Ignivar's compiled Rain of Cinders cone length grew from 24 to 30 yards.
+// Epoch 24 clients would display a dangerously shorter warning than the
+// authoritative server damage.
+// (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
+// the pre-merge raid branch, which forked before the Bank Storage and Materials
+// Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
+// before the Eastbrook program bumps.)
+export const ONLINE_WORLD_LAYOUT_VERSION = 25 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -147,6 +195,11 @@ export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
 export const PET_SPECIAL_WIRE_VERSION = 1 as const;
 export type PetSpecialWireVersion = typeof PET_SPECIAL_WIRE_VERSION;
 
+// Dungeon-entry facing acknowledgement capability. The exact entry generation
+// proves the client observed the authoritative landing snapshot.
+export const DUNGEON_ENTRY_FACING_WIRE_VERSION = 1 as const;
+export type DungeonEntryFacingWireVersion = typeof DUNGEON_ENTRY_FACING_WIRE_VERSION;
+
 // Absolute cooldown schedule in server simulation seconds. A number is the
 // expiry for 1x recovery. The tuple adds a temporary recovery-rate segment;
 // after acceleratedUntil, recovery continues at 1x until expiresAt.
@@ -162,7 +215,7 @@ export type {
   ActionBarLayoutRestore,
   ActionBarSlotAction,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo } from './world_api/bank';
+export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
@@ -176,7 +229,13 @@ export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveIgnivarMeteorWarning,
   ActiveTemporalHourglass,
+  ActiveVarkhulAnvilMeteorWarning,
+  ActiveVarkhulAssembly,
+  ActiveVarkhulCinderFire,
+  ActiveVarkhulCinderOrbProjectile,
+  ActiveVarkhulForgestormWarning,
 } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
@@ -487,6 +546,7 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
+  'crucible_buy',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',
@@ -614,6 +674,34 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // The Materials Vault: the per-material, gold-upgraded material store beside the
+  // personal slot bank (src/sim/materials_vault.ts). Appended at the END because
+  // wire tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. `slot` is a carried-inventory index
+  // and `count` optional (the bank_* wire idiom); withdraw is keyed by `itemId`
+  // instead, because the vault has no slots to index. The Sim owns every gameplay
+  // rule (banker proximity, material scope, per-material cap, exact copper).
+  'vault_deposit',
+  'vault_withdraw',
+  'vault_buy_upgrade',
+  // The vault's batched deposit-all sweep (Bank Storage Phase 03): ONE
+  // server-side command, argument-free, so even a full carried sweep (112
+  // slots at the phase 05 bag ceiling) costs one
+  // command-lane token and one batched ledger write instead of a send per
+  // slot. Appended at the END because wire tokens are never reordered.
+  'vault_deposit_all',
+  // Bank bag sockets (Bank Storage phase 07): the three socket commands the
+  // phase 06 sim bodies gate (unlock in order for exact copper; socket a
+  // CARRIED payload-free bag, `item` + optional integer `socket` + optional
+  // integer `slot` naming the exact carried copy, the equip_bag wire shape
+  // verbatim; unsocket by integer `socket`). Appended at the END because wire
+  // tokens are never reordered, so these deliberately do NOT sit beside the
+  // bank_* cluster they belong to by domain. The Sim owns every gameplay rule
+  // (banker proximity, unlock order and price, the payload peek, the
+  // carried-side unsocket fit); dispatch is shape-only in server/bank_wire.ts.
+  'bank_unlock_socket',
+  'bank_socket_bag',
+  'bank_unsocket_bag',
   // The tutorial greeting's accept: the ferry ride to the Proving Shore
   // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
   // life, and band server-side). Appended because wire tokens are never
@@ -852,6 +940,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  lock_item: 'IWorldInventory',
   market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
@@ -892,6 +981,19 @@ export const COMMAND_FACETS = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // The Materials Vault rides the SAME facet as the personal bank (same bursars,
+  // same proximity gate); vaultInfo is a proximity-gated snapshot read (no send,
+  // untagged), exactly like bankInfo above.
+  vault_deposit: 'IWorldBank',
+  vault_withdraw: 'IWorldBank',
+  vault_buy_upgrade: 'IWorldBank',
+  vault_deposit_all: 'IWorldBank',
+  // The bank bag sockets ride the SAME facet again (same bursars, same
+  // proximity gate; Bank Storage phase 07); the socket readouts ride the
+  // bankInfo snapshot read above (no send, untagged).
+  bank_unlock_socket: 'IWorldBank',
+  bank_socket_bag: 'IWorldBank',
+  bank_unsocket_bag: 'IWorldBank',
   // IWorldGuildBank: the officer-plus shared guild treasury + item store
   // (snake_case wire strings, by design; its OWN tokens, never a bank_* reuse).
   // guildBankInfo is a proximity + rank gated snapshot read (no send, untagged).

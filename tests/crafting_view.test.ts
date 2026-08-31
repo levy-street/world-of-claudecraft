@@ -3,6 +3,7 @@ import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET, STATIONS } from '../src/sim/content/
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
 import { requiredReagentCount } from '../src/sim/professions/crafting';
+import { materialGradeIds } from '../src/sim/professions/material_grades';
 import type { StationType } from '../src/sim/professions/stations';
 import { stationTypeForCraft } from '../src/sim/professions/stations';
 import {
@@ -973,5 +974,260 @@ describe('craftingReagentSig tracks every grade', () => {
     const before = craftingReagentSig([], null);
     const after = craftingReagentSig([{ itemId: 'greyjaw_fang', count: 5 }], null);
     expect(after).toBe(before);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Craft-from-vault availability fold (Bank Storage Phase 04): the view folds
+// IWorld.craftVaultStock into `have` through the SAME planReagentSourceDraw
+// the sim's admission gate uses, so the Craft button and the server's answer
+// cannot diverge in either host.
+// ---------------------------------------------------------------------------
+describe('buildCraftingView craft-from-vault fold (Phase 04)', () => {
+  const IDENTITY: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+  };
+  const build = (
+    reagents: { itemId: string; count: number }[],
+    inventory: InvSlot[],
+    vaultStock: Readonly<Record<string, number>> | null,
+  ) =>
+    buildCraftingView(
+      [recipe('recipe_v', reagents)],
+      inventory,
+      table(item('copper_ore'), item('fine_copper_ore'), item('recipe_v_result')),
+      {},
+      IDENTITY,
+      new Set(),
+      null,
+      vaultStock,
+    );
+
+  it('folds drawable vault stock into have and reports the vault draw', () => {
+    const view = build([{ itemId: 'copper_ore', count: 4 }], [{ itemId: 'copper_ore', count: 1 }], {
+      copper_ore: 5,
+    });
+    const row = view.recipes[0].reagents[0];
+    expect(row.have).toBe(6);
+    expect(row.satisfied).toBe(true);
+    // Carried drains FIRST (1 of 4), the vault covers the remainder.
+    expect(row.vaultDrawn).toBe(3);
+    expect(row.fineSubstituted).toBe(0);
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('a null vaultStock renders the exact pre-vault row (literal values, not a self-compare)', () => {
+    // The default parameter IS null, so comparing the two calls would prove
+    // nothing (the coverage audit's F4): pin the literal pre-vault row
+    // instead, which the vault fold could only corrupt by changing one of
+    // these values.
+    const reagents = [{ itemId: 'copper_ore', count: 4 }];
+    const inventory: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
+    const row = build(reagents, inventory, null).recipes[0];
+    expect(row.reagents).toEqual([
+      {
+        itemId: 'copper_ore',
+        item: item('copper_ore'),
+        required: 4,
+        have: 1,
+        satisfied: false,
+        fineSubstituted: 0,
+        vaultDrawn: 0,
+      },
+    ]);
+    expect(row.craftable).toBe(false);
+  });
+
+  it('the vault tier walks the SAME grade order, and a vault fine take warns on both axes', () => {
+    // Carried holds only the fine grade (2), the vault only the base (3);
+    // required 4. Carried tier drains base 0 then fine 2; vault tier covers
+    // the remaining 2 from its base rows.
+    const view = build(
+      [{ itemId: 'copper_ore', count: 4 }],
+      [{ itemId: 'fine_copper_ore', count: 2 }],
+      { copper_ore: 3 },
+    );
+    const row = view.recipes[0].reagents[0];
+    expect(row.have).toBe(5);
+    expect(row.satisfied).toBe(true);
+    expect(row.vaultDrawn).toBe(2);
+    expect(row.fineSubstituted).toBe(2);
+  });
+
+  it('corrupt vault rows are invisible to the fold', () => {
+    const view = build([{ itemId: 'copper_ore', count: 1 }], [], { copper_ore: 2.5 });
+    const row = view.recipes[0].reagents[0];
+    expect(row.have).toBe(0);
+    expect(row.satisfied).toBe(false);
+    expect(row.vaultDrawn).toBe(0);
+  });
+
+  it('an unsatisfied row reports no vault draw (an uncraftable recipe warns about nothing)', () => {
+    const view = build([{ itemId: 'copper_ore', count: 4 }], [], { copper_ore: 1 });
+    const row = view.recipes[0].reagents[0];
+    expect(row.have).toBe(1);
+    expect(row.satisfied).toBe(false);
+    expect(row.vaultDrawn).toBe(0);
+  });
+});
+
+describe('craftingReagentSig vault term (Phase 04)', () => {
+  it('a drawable vault reagent row changes the signature; {} and null are DISTINCT', () => {
+    // PIN MOVED (Phase 04 QA): the original arm pinned {} === null encoding,
+    // correct while the view treated the two identically. The QA round's
+    // vault-unreachable note renders from blocked-ness (null), so a gate flip
+    // with no drawable rows must now repaint: null carries the V!| blocked
+    // sentinel, {} does not.
+    expect(craftingReagentSig([], null, { fine_copper_ore: 5 })).not.toBe(
+      craftingReagentSig([], null, null),
+    );
+    expect(craftingReagentSig([], null, {})).not.toBe(craftingReagentSig([], null, null));
+    expect(craftingReagentSig([], null, null)).toContain('V!|');
+    expect(craftingReagentSig([], null, {})).not.toContain('V!|');
+  });
+
+  it('corrupt and non-reagent vault rows contribute nothing beyond unblocked-ness', () => {
+    // Same pin move as above: the corrupt/non-reagent arms compare against
+    // the UNBLOCKED empty stock now, since null carries the blocked sentinel.
+    expect(craftingReagentSig([], null, { fine_copper_ore: 2.5 })).toBe(
+      craftingReagentSig([], null, {}),
+    );
+    expect(craftingReagentSig([], null, { greyjaw_fang: 5 })).toBe(
+      craftingReagentSig([], null, {}),
+    );
+  });
+
+  it('the V-prefixed vault term can never collide with a bag term', () => {
+    expect(craftingReagentSig([{ itemId: 'fine_copper_ore', count: 5 }], null, null)).not.toBe(
+      craftingReagentSig([], null, { fine_copper_ore: 5 }),
+    );
+  });
+});
+
+describe('the vault-unreachable note (Phase 04 QA)', () => {
+  const oreRecipe = recipe('recipe_note_probe', [{ itemId: 'copper_ore', count: 3 }]);
+  const NOTE_ITEMS = table(item('copper_ore'), item('recipe_note_probe_result'));
+
+  it('derives vaultNote ONLY from blocked-plus-short, each arm decisive', () => {
+    const short: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
+    const enough: InvSlot[] = [{ itemId: 'copper_ore', count: 3 }];
+    const base = [
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<never>(),
+      null,
+    ] as const;
+    // Blocked AND short: the one true arm.
+    expect(
+      buildCraftingView([oreRecipe], short, NOTE_ITEMS, {}, ...base, null, true).vaultNote,
+    ).toBe(true);
+    // Blocked but everything satisfied: no note (nothing to explain).
+    expect(
+      buildCraftingView([oreRecipe], enough, NOTE_ITEMS, {}, ...base, null, true).vaultNote,
+    ).toBe(false);
+    // Short but NOT blocked (open world, empty vault {}): no note.
+    expect(
+      buildCraftingView([oreRecipe], short, NOTE_ITEMS, {}, ...base, {}, false).vaultNote,
+    ).toBe(false);
+    // The pre-vault default caller (neither vaultStock nor the flag): never a
+    // note, the byte-identity arm's guarantee.
+    expect(buildCraftingView([oreRecipe], short, NOTE_ITEMS).vaultNote).toBe(false);
+  });
+});
+
+describe('cross-reagent tally agreement with the sim gate (Phase 04 review)', () => {
+  const IDENTITY: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+  };
+
+  it('a recipe naming ONE material twice cannot promise the same units to both rows', () => {
+    // The sim's planCraftReagentDraw denies this construction (its own suite
+    // pins it); an untallied projection would show both rows satisfied off
+    // the same five units and enable a Craft the server refuses.
+    const view = buildCraftingView(
+      [
+        recipe('recipe_overlap', [
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'copper_ore', count: 5 },
+        ]),
+      ],
+      [],
+      table(item('copper_ore'), item('recipe_overlap_result')),
+      {},
+      IDENTITY,
+      new Set(),
+      null,
+      { copper_ore: 5 },
+    );
+    const rows = view.recipes[0].reagents;
+    expect(rows[0].satisfied).toBe(true);
+    expect(rows[1].satisfied).toBe(false);
+    expect(view.recipes[0].craftable).toBe(false);
+    // The positive control: stock for BOTH lines admits both rows.
+    const full = buildCraftingView(
+      [
+        recipe('recipe_overlap', [
+          { itemId: 'copper_ore', count: 5 },
+          { itemId: 'copper_ore', count: 5 },
+        ]),
+      ],
+      [],
+      table(item('copper_ore'), item('recipe_overlap_result')),
+      {},
+      IDENTITY,
+      new Set(),
+      null,
+      { copper_ore: 10 },
+    );
+    expect(full.recipes[0].reagents.map((r) => r.satisfied)).toEqual([true, true]);
+    expect(full.recipes[0].craftable).toBe(true);
+  });
+
+  it('CONTENT GUARD: no shipped recipe names one material twice or overlaps grade ladders', () => {
+    // The tally above (and the sim's) only CHANGES an answer for overlapping
+    // reagents. This guard is the tripwire that makes the first overlapping
+    // recipe a reviewed act rather than a silent behavior shift: the day it
+    // reds, re-read the Phase 04 tally rationale in buildCraftingView and
+    // planCraftReagentDraw before widening it, AND fix the display divergence
+    // the tally creates on overlap: `have` is the raw per-item fold while
+    // `satisfied` is the tallied plan, so the second overlapping row renders
+    // a satisfied-looking "x5/5" count in the .unsat error tint. Expose the
+    // tallied remaining on the row (or an explicit shortfall figure) in the
+    // same change that ships the first overlapping recipe.
+    for (const r of ALL_RECIPES) {
+      const seen = new Set<string>();
+      for (const reagent of r.reagents) {
+        for (const gradeId of materialGradeIds(reagent.itemId)) {
+          expect(
+            seen.has(gradeId),
+            `recipe ${r.id}: grade ${gradeId} reachable from two reagents`,
+          ).toBe(false);
+          seen.add(gradeId);
+        }
+      }
+    }
+  });
+
+  it('CONTENT GUARD: reagent ids keep the grammar the V-prefixed sig term is injective under', () => {
+    // craftingReagentSig's vault term prefixes 'V' onto `id:count` pieces; the
+    // encoding is collision-proof only because no real id is a bare 'V' or a
+    // bare digit (a hypothetical item id 'V' with a bag term could collide
+    // with an id '5' vault term). Authored ids are lowercase snake_case, which
+    // this pin turns from an assumption into a fact: the day an id breaks the
+    // grammar, revisit the sig encoding before shipping it.
+    for (const r of ALL_RECIPES) {
+      for (const reagent of r.reagents) {
+        for (const gradeId of materialGradeIds(reagent.itemId)) {
+          expect(gradeId, `id ${gradeId} breaks the lowercase snake_case grammar`).toMatch(
+            /^[a-z][a-z0-9_]*$/,
+          );
+        }
+      }
+    }
   });
 });

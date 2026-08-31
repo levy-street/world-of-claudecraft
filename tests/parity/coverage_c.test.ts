@@ -600,6 +600,154 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.durability).toBe(29);
   });
 
+  it('bank_round_trip: both banker-counter stores actually move (the re-mint guard)', () => {
+    // The golden is what UPDATE_PARITY regenerates wholesale, so a silently
+    // broken recipe (a moved banker failing the proximity gate, every vault op
+    // refusing) would mint a no-op arm with nothing red. Pin the final state
+    // both stores must reach; the numbers are the scenario's own arithmetic
+    // (71000 - 20000 - 50000 = 1000 copper; 10 ore deposited 6 then 2 back,
+    // then the step-12 sweep re-stocks the carried 6; the whole 4-stack of
+    // logs; the bank ladder's first 500-copper rung; and the sweep takes the
+    // 5 wolf_fang the bank arm returned to the bags, wolf_fang being a recipe
+    // reagent the honest material set admits).
+    const rec = run('bank_round_trip');
+    const pid = rec.notes.pid as number;
+    // biome-ignore lint/suspicious/noExplicitAny: the recorder exposes the raw Sim
+    const meta = (rec.sim as any).players.get(pid);
+    expect(meta.vault.upgrades).toBe(2);
+    expect(meta.vault.stock).toEqual({ ashwood_log: 4, copper_ore: 10, wolf_fang: 5 });
+    expect(meta.copper).toBe(1000);
+    expect(meta.bank.purchasedSlots).toBe(6);
+    // The bank's ITEM arm nets to zero in the counters above (5 wolf_fang in,
+    // 5 back out), so pin it directly: the bank ends empty, and the fangs the
+    // withdraw returned to the bags are the SAME five the step-12 sweep then
+    // stocked (the vault literal above), or a silently no-op'd
+    // deposit/withdraw pair could still mint a green golden.
+    expect(meta.bank.inventory).toEqual([]);
+    // The sweep's OWN no-op arms: the dagger added beside it survives in the
+    // bags (gear is not a material), the starting bread stays (a consumable is
+    // not a material), and no carried material remains at all. NOTE: this pin
+    // does NOT discriminate the sweep's iteration direction (every eligible
+    // slot is fully consumed here, so ascending and descending end alike);
+    // the direction guard is the slot-identity assertion in
+    // tests/materials_vault.test.ts ('fills each material only to its
+    // headroom, descending by slot index').
+    // biome-ignore lint/suspicious/noExplicitAny: raw Sim inventory slots
+    const carried = meta.inventory.map((s: any) => [s.itemId, s.count]);
+    expect(carried).toEqual([
+      ['baked_bread', 5],
+      ['rusty_dagger', 1],
+    ]);
+  });
+
+  it('bank_materials_satchel: a socketed satchel splits the pools, one gate answers twice', () => {
+    // The re-mint guard for the ONE scenario in this suite that carries a
+    // materials-only bag. Every other scenario runs with empty sockets, where
+    // general = 16 / materials = 0 and the pool math is arithmetically the old
+    // flat scalar, so a silently broken recipe here (the equip refusing, both
+    // withdrawals refusing, both succeeding) would mint a golden that still
+    // proves nothing about the two-pool mechanic and nothing would be red.
+    //
+    // The two discriminating instants are the SAME withdrawal of the SAME bank
+    // slot, answered differently: refused while the general pool is full, then
+    // allowed once materials-first packing parks the carried materials in the
+    // materials pool. Everything below is the scenario's own arithmetic against
+    // absolute literals, never a value read back out of bag_pools.ts.
+    const scenario = SCENARIOS.find((s) => s.name === 'bank_materials_satchel');
+    expect(scenario, 'no bank_materials_satchel scenario').toBeTruthy();
+    const { trace, rec } = record(scenario!);
+    const pid = rec.notes.pid as number;
+    // biome-ignore lint/suspicious/noExplicitAny: the recorder exposes the raw Sim
+    const meta = (rec.sim as any).players.get(pid);
+
+    // The socket took, through the real equipBag path: without it there is no
+    // materials pool at all and every assertion below degenerates.
+    expect(meta.bags).toEqual(['foragers_haversack', null, null, null]);
+
+    // biome-ignore lint/suspicious/noExplicitAny: sampled frames are plain JSON
+    const at = (label: string): any => {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
+      return frame?.players?.[0];
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: sampled inventory slots
+    const rows = (sample: any): [string, number][] =>
+      // biome-ignore lint/suspicious/noExplicitAny: sampled inventory slots
+      (sample.inventory ?? []).map((s: any) => [s.itemId, s.count]);
+
+    // The two setup instants checkpoint 1 stands on, pinned directly rather than
+    // inferred from the refusal: the general pool really is packed to its 16-slot
+    // budget before the material crosses back, and that withdrawal really did land
+    // the whole 20-unit stack in satchel-only headroom (a partial move or a split
+    // stack would still leave the bank empty and the refusal intact).
+    expect(at('general-pool-full').inventory).toHaveLength(16);
+    const withdrawn = at('material-withdrawn-into-satchel-headroom');
+    expect(rows(withdrawn)).toContainEqual(['copper_ore', 20]);
+
+    // Checkpoint 1, the flat-scalar discriminator. The general pool is full at
+    // 16 non-material slots (5 loaves in one, 15 daggers in fifteen) and the
+    // material withdrawal already landed in satchel headroom for a 17th slot.
+    // 17 carried against a summed budget of 28 (16 base + 12 satchel) leaves 11
+    // slots of FLAT headroom, so a flat scalar moves the dagger here. It must
+    // still be in the bank.
+    const refused = at('non-material-refused-with-flat-headroom');
+    expect(refused.inventory).toHaveLength(17);
+    expect(rows(refused).filter(([id]) => id === 'rusty_dagger')).toHaveLength(15);
+    expect(refused.bank.inventory).toEqual([{ itemId: 'rusty_dagger', count: 1 }]);
+    // Exactly one refusal in the whole run: the step-5 withdrawal. A second one
+    // would mean an arm meant to succeed did not.
+    const ev = rec.allEvents as Ev[];
+    const full = ev.filter((e) => e.type === 'error' && e.text === 'Your bags are full.');
+    expect(full).toHaveLength(1);
+
+    // Checkpoint 2, the allocation-order discriminator. 3 non-material slots
+    // and 13 material slots is 16 carried, exactly the general budget, so a
+    // general-first packing leaves zero general headroom and refuses again.
+    // Materials-first puts 12 material slots in the materials pool and spills
+    // one, so the general pool holds 4 of 16 and the same withdrawal now moves.
+    const overfilled = at('materials-pool-overfilled');
+    expect(overfilled.inventory).toHaveLength(16);
+    expect(rows(overfilled).filter(([id]) => id === 'copper_ore')).toHaveLength(13);
+    expect(rows(overfilled).filter(([id]) => id !== 'copper_ore')).toEqual([
+      ['baked_bread', 5],
+      ['rusty_dagger', 1],
+      ['rusty_dagger', 1],
+    ]);
+    // The bank emptied, so the retry moved the very slot the refusal left.
+    expect(meta.bank.inventory).toEqual([]);
+    // biome-ignore lint/suspicious/noExplicitAny: raw Sim inventory slots
+    const carried = meta.inventory.map((s: any) => [s.itemId, s.count]);
+    expect(carried).toHaveLength(17);
+    expect(carried.filter(([id]: [string, number]) => id === 'rusty_dagger')).toHaveLength(3);
+    expect(carried.filter(([id]: [string, number]) => id === 'copper_ore')).toEqual(
+      Array.from({ length: 13 }, () => ['copper_ore', 20]),
+    );
+
+    // Draw-free end to end, and that is the whole trace, not just these
+    // checkpoints: equipBag, both deposits, all three withdrawals, the discard
+    // and the grants are pure slot arithmetic, the bank is the same, and the
+    // two-tick world tail draws nothing either, so the trace draws NOTHING
+    // anywhere. The loop's one tooth: a pool change that starts drawing rng
+    // moves a checkpoint off zero and goes red.
+    for (const label of [
+      'satchel-socketed',
+      'deposited-material-and-gear',
+      'general-pool-full',
+      'material-withdrawn-into-satchel-headroom',
+      'non-material-refused-with-flat-headroom',
+      'materials-pool-overfilled',
+      'gear-withdrawn-after-materials-first-packing',
+    ]) {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame?.rng.draws, `${label} drew rng`).toBe(0);
+    }
+    // The whole-trace totals once, so no draw can hide between the checkpoints
+    // or in the tail: zero draws, and the digest still sitting at the untouched
+    // FNV-1a offset basis with nothing folded into it.
+    expect(trace.draws).toBe(0);
+    expect(trace.drawDigest).toBe('811c9dc5');
+  });
+
   it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {
     const rec = run('rift_boss_floor');
     const ev = rec.allEvents as Ev[];
@@ -690,5 +838,37 @@ describe('coverage: each scenario fires its subsystem', () => {
       (event) => event.type === 'error' && event.text === 'Line of sight.',
     );
     expect(lineOfSightErrors).toHaveLength(1);
+  });
+
+  it('ignivar_raid_tuning: pins live Heroic rays, final Brands, and wipe cooldown recovery', () => {
+    const rec = run('ignivar_raid_tuning');
+    const notes = rec.notes as Record<string, unknown>;
+    const events = rec.allEvents as Ev[];
+
+    expect(notes.rayHpAfterHit).toBe(500);
+    expect(notes.rayHpAfterAdjacentTick).toBe(500);
+    expect(notes.brandedPlayerIds as number[]).toHaveLength(3);
+    expect(notes.attemptParticipantIds as number[]).toHaveLength(4);
+    expect(notes.longCooldownReset).toBe(true);
+    expect(notes.encounterReset).toBe(true);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'damage' && event.ability === 'Revolving Inferno' && event.amount === 500,
+      ),
+    ).toBe(true);
+  });
+
+  it('varkhul_raid_tuning: excludes visitors, pins Heroic Forgestorm, and scopes wipe recovery', () => {
+    const rec = run('varkhul_raid_tuning');
+    const notes = rec.notes as Record<string, unknown>;
+
+    expect(notes.prePullParticipantIds).toEqual([]);
+    expect(notes.pullParticipantIds as number[]).toHaveLength(1);
+    expect(notes.forgestormHpAfterImpact).toBe(200);
+    expect(notes.forgestormDamageSeen).toBe(true);
+    expect(notes.visitorCooldownRetained).toBe(true);
+    expect(notes.raiderCooldownReset).toBe(true);
+    expect(notes.encounterReset).toBe(true);
   });
 });

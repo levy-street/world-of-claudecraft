@@ -53,6 +53,9 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   dungeon_hollow_crypt: '/audio/music/dungeon_hollow_crypt.mp3?v=4bb48c2d90fc',
   dungeon_sunken_bastion: '/audio/music/dungeon_sunken_bastion.mp3?v=db67d7df0f4b',
   dungeon_gravewyrm_sanctum: '/audio/music/dungeon_gravewyrm_sanctum.mp3?v=19f49e28f3af',
+  ignivar_forge_approach: '/audio/music/ignivar_forge_approach.mp3?v=b0699abaf914',
+  ignivar_raid_arena: '/audio/music/ignivar_raid_arena.mp3?v=797023a0d280',
+  ignivar_inner_crucible: '/audio/music/ignivar_inner_crucible.mp3?v=f20a68a10819',
   // Rift crawl stand-ins borrow the nearest-mood dungeon crawl render.
   rift_frost: '/audio/music/dungeon_gravewyrm_sanctum.mp3?v=19f49e28f3af',
   rift_ember: '/audio/music/dungeon_hollow_crypt.mp3?v=4bb48c2d90fc',

@@ -37,7 +37,7 @@ function required<T>(value: T | undefined): T {
   return value;
 }
 
-const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
+const SC: AbilityScaling = { spellPower: 80, healPower: 80, rangedPower: 200, attackPower: 140 };
 const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
 const FROST_MODS = { ...emptyModifiers(), spec: 'frost' as const };
 const SURVIVAL_MODS = computeTalentModifiers('hunter', {
@@ -81,6 +81,7 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
       expect(effect.damage).toBe(expectedDamage);
       const damageText = abilityEffectText(litany, {
         spellPower: 500,
+        healPower: 500,
         rangedPower: 700,
         attackPower: 900,
       });
@@ -214,12 +215,14 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   it('Cascading Mend shows the same Spell Power bonus as its first combat heal', () => {
     const chain = known('shaman', 'chain_heal', SPIRITMEND_MODS);
     const effect = required(chain.effects.find((candidate) => candidate.type === 'chainHeal'));
-    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 0 })).toBe(0);
-    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 100 })).toBe(
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 0, healPower: 0 })).toBe(0);
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 100, healPower: 100 })).toBe(
       directHealBonus(100, chain.castTime),
     );
-    expect(abilityEffectText(chain, { ...SC, spellPower: 0 })).toBe('120 to 145');
-    expect(abilityEffectText(chain, { ...SC, spellPower: 100 })).toMatch(/^120 to 145 \(\+\d+\)$/);
+    expect(abilityEffectText(chain, { ...SC, spellPower: 0, healPower: 0 })).toBe('120 to 145');
+    expect(abilityEffectText(chain, { ...SC, spellPower: 100, healPower: 100 })).toMatch(
+      /^120 to 145 \(\+\d+\)$/,
+    );
   });
 
   it('a personal mage barrier shows the same Spell Power bonus combat applies', () => {

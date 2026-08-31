@@ -19,6 +19,7 @@
 import {
   BG_BASES,
   BG_GRAVEYARDS,
+  BG_PICKUP_RADIUS,
   BG_POWER_RUNES,
   BG_SPEED_RUNES,
   BG_TEAM_COLORS,
@@ -44,6 +45,7 @@ import {
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
@@ -115,9 +117,13 @@ export const BG_CARRIER_VULN_DELAY = 75;
 export const BG_CARRIER_VULN_INTERVAL = 15;
 export const BG_CARRIER_VULN_PER_STACK = 0.1;
 const BG_FLAG_RETURN_TIME = 20; // a dropped flag auto-returns home after this
-// Reach for the flag action. The stand is paved ground, not a plinth: a runner
-// walks right up to the pole, so the reach stays tight.
-export const BG_PICKUP_RADIUS = 2.5;
+
+// Re-exported: BG_PICKUP_RADIUS now lives in battleground_layout.ts (a pure
+// leaf, alongside BG_TEAM_COLORS) so the client can share the same reach the
+// server checks; kept exported here too, so existing importers of this
+// module are unaffected.
+export { BG_PICKUP_RADIUS };
+
 const BG_CAPTURE_RADIUS = 4; // carry the enemy flag this close to your stand
 const BG_RUNE_RADIUS = 2.5; // step this close to a speed rune to claim it
 const BG_RUNE_COOLDOWN = 30; // a claimed rune recharges over this (owner: 22 felt too fast)
@@ -329,6 +335,17 @@ export function bgActiveMatchForFighter(ctx: SimContext, pid: number): BgMatch |
     if (match.state === 'active' && bgAllPids(match).includes(pid)) return match;
   }
   return null;
+}
+
+/** Allocation-free seated fast path of `bgActiveMatchForFighter`: true only
+ *  while the per-pid index seats `pid` in an ACTIVE match. Callers on per-tick
+ *  paths (the pet corpse hold) use this instead of the general helper, which
+ *  spreads both teams into a fresh array per call and walks every match on
+ *  its miss path; a stale index entry simply answers false. */
+export function bgActiveSeatedFighter(ctx: SimContext, pid: number): boolean {
+  const match = ctx.bgMatches.get(pid);
+  if (match?.state !== 'active') return false;
+  return match.teams[0].includes(pid) || match.teams[1].includes(pid);
 }
 
 export function bgActiveFighterPids(ctx: SimContext, match: BgMatch): number[] {
@@ -685,7 +702,10 @@ function backfillBgMatches(ctx: SimContext): void {
       eligible.push({ index: i, size: g.pids.length, waited: g.waited });
     });
     const pickedAt = pickBgBackfillGroup(eligible.map((c) => ({ size: c.size, waited: c.waited })));
-    if (pickedAt < 0) return; // no eligible solo waiting: no later match can do better
+    // backfillDeclined is scoped to THIS match, so an empty list here only rules
+    // out this match: a later one that never made this offer can still want the
+    // same solo.
+    if (pickedAt < 0) continue;
     const index = eligible[pickedAt].index;
     const [group] = ctx.bgQueue.splice(index, 1);
     // ASK, never seat. The seat is a teleport into a live rated 5v5 that also
@@ -1143,6 +1163,7 @@ function placeInBg(
   e.facing = team === 0 ? 0 : Math.PI; // face the field
   e.prevFacing = e.facing;
   ctx.rebucket(e);
+  settleTeleportArrival(e);
   ctx.readyArenaFighter(e, { clearPrep: true });
   // readyArenaFighter revives but does NOT clear the spirit arm: a fighter
   // seated (or re-seated by the form-up hold) must never stay a ghost.
@@ -1202,6 +1223,14 @@ function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
   e.templateId = 'bg_flag';
   e.objectItemId = null;
   e.lootable = false;
+  // The generic per-tick object sweep (sim.ts) counts any non-lootable object
+  // down to respawnTimer<=0 and flips lootable back true; the entity default
+  // is 0, so left unset this fires the very next tick. The flag is driven
+  // entirely by its own pickup-radius mechanic (bgFlagAction), never the
+  // generic respawn system, so it must never re-enter that pool (an
+  // Infinity respawnTimer for a never-generic-respawns object is the
+  // established pattern; see Entity.respawnTimer's runScoped doc).
+  e.respawnTimer = Infinity;
   e.color = BG_TEAM_COLORS[flag.team];
   ctx.addEntity(e);
   flag.entityId = e.id;
@@ -1219,6 +1248,9 @@ function spawnRuneEntity(ctx: SimContext, rune: BgRuneState): void {
   e.templateId = 'bg_rune';
   e.objectItemId = null;
   e.lootable = false;
+  // Same reasoning as spawnFlagEntity above: never let the generic per-tick
+  // object sweep re-lootable this, its own proximity claim owns the pickup.
+  e.respawnTimer = Infinity;
   e.color = visual.color;
   ctx.addEntity(e);
   rune.entityId = e.id;
@@ -1227,8 +1259,9 @@ function spawnRuneEntity(ctx: SimContext, rune: BgRuneState): void {
 // One team-wide respawn clock per side, period BG_WAVE_PERIOD, the two clocks
 // offset by BG_WAVE_OFFSET (staggered half-cycles, never synchronized). The
 // wave raises every RELEASED spirit waiting in the team graveyard, together,
-// in place; a corpse that never released waits for a later wave (release is
-// the classic rite, and auto-release makes sure nobody waits forever).
+// in place; a corpse that never released waits for a later wave. Release is
+// the player's own press: there is no in-match auto-release (only relog
+// releases for you, sim.ts), and the match cap bounds the longest wait.
 function tickWaveRespawns(ctx: SimContext, match: BgMatch): void {
   for (const team of [0, 1] as BgTeam[]) {
     match.waveIn[team] -= DT;

@@ -310,6 +310,18 @@ const BANK_TAGS: Readonly<Record<string, string>> = {
   bank_deposit: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
+  // The Materials Vault: the per-material material store beside the slot bank.
+  // Same facet, same bursars, its OWN vault_* wire strings (never a bank_* reuse).
+  vault_deposit: 'IWorldBank',
+  vault_withdraw: 'IWorldBank',
+  vault_buy_upgrade: 'IWorldBank',
+  // The Phase 03 batched deposit-all sweep: one server-side command, same facet.
+  vault_deposit_all: 'IWorldBank',
+  // The bank bag-socket trio (Bank Storage phase 07): same facet, same
+  // bursars, its own bank_* socket wire strings.
+  bank_unlock_socket: 'IWorldBank',
+  bank_socket_bag: 'IWorldBank',
+  bank_unsocket_bag: 'IWorldBank',
 };
 
 describe('command facet tags (bank)', () => {
@@ -327,10 +339,31 @@ describe('command facet tags (bank)', () => {
     expect('bank_buy_slots' in tags).toBe(true);
     expect('bankDeposit' in tags).toBe(false);
     expect('bankBuySlots' in tags).toBe(false);
+    // The Materials Vault trio follows the same rule: the WIRE string is the key,
+    // and the camelCase IWorld method names are never tags.
+    expect('vault_deposit' in tags).toBe(true);
+    expect('vault_withdraw' in tags).toBe(true);
+    expect('vault_buy_upgrade' in tags).toBe(true);
+    expect('vault_deposit_all' in tags).toBe(true);
+    expect('vaultDeposit' in tags).toBe(false);
+    expect('vaultWithdraw' in tags).toBe(false);
+    expect('vaultBuyUpgrade' in tags).toBe(false);
+    expect('vaultDepositAll' in tags).toBe(false);
+    // The socket trio follows the same rule.
+    expect('bank_unlock_socket' in tags).toBe(true);
+    expect('bank_socket_bag' in tags).toBe(true);
+    expect('bank_unsocket_bag' in tags).toBe(true);
+    expect('bankUnlockSocket' in tags).toBe(false);
+    expect('bankSocketBag' in tags).toBe(false);
+    expect('bankUnsocketBag' in tags).toBe(false);
   });
 
   it('does not tag bankInfo (proximity-gated snapshot read, no wire command)', () => {
     expect('bankInfo' in tags).toBe(false);
+  });
+
+  it('does not tag vaultInfo (proximity-gated snapshot read, no wire command)', () => {
+    expect('vaultInfo' in tags).toBe(false);
   });
 });
 

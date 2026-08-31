@@ -15,6 +15,8 @@
 // lines, depth-graded water with shallow foam, wet and dry sand shorelines,
 // hypsometric tinting, fbm vegetation mottling, rock exposure on steep
 // slopes, and worn dirt tracks with wobbling width and inked edges.
+
+import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
   COLUMN_ZONES,
   columnBlendAt,
@@ -214,6 +216,14 @@ function biomeBaseColor(biome: BiomeId, x: number, z: number, out: [number, numb
       r = r * (1 - scorch * 0.35) - 60 * valley * (sandT > 0 ? 1 : 0);
       g = g * (1 - scorch * 0.45);
       bb = bb * (1 - scorch * 0.4) - 25 * valley;
+      // the Forgefather's Isle: dark volcanic rock, mirroring the world tiers
+      // (the shared sim weight; the high-ground override below matches at h>20)
+      const isle = forgefatherIsleRockWeight(x, z);
+      if (isle > 0) {
+        r += (84 - r) * isle * 0.85;
+        g += (58 - g) * isle * 0.85;
+        bb += (52 - bb) * isle * 0.85;
+      }
       out[0] = r;
       out[1] = g;
       out[2] = bb;
@@ -402,7 +412,13 @@ export function paintTerrainRows(
         r = 78;
         g = 68;
         b = 88;
-      } else if (biome === 'ember' && h > 20) {
+      } else if (
+        biome === 'ember' &&
+        (h > 20 || (h > 4 && forgefatherIsleRockWeight(x, z) > 0.5))
+      ) {
+        // volcanic high ground; the isle's terraces are the same dark rock
+        // at every height (the generic green and grey mid bands below would
+        // otherwise paint over the isle override in biomeBaseColor)
         r = 84;
         g = 58;
         b = 52;
@@ -505,10 +521,13 @@ export function paintTerrainRows(
       }
 
       // -- the shoreline: a wet dark line at the waterline, dry pale sand above --
+      // (the Forgefather's Isle keeps its dark wet-gravel strand: the pale
+      // sand blend fades out with the same rock weight the world tiers use)
       if (shore < 1.6) {
-        const t = 1 - shore / 1.6;
+        const sandy = biome === 'ember' ? 1 - forgefatherIsleRockWeight(x, z) : 1;
+        const t = (1 - shore / 1.6) * sandy;
         if (shore < 0.5) {
-          const wet = 1 - shore / 0.5;
+          const wet = (1 - shore / 0.5) * (0.4 + 0.6 * sandy);
           r += (128 - r) * wet * 0.8;
           g += (114 - g) * wet * 0.8;
           b += (88 - b) * wet * 0.8;

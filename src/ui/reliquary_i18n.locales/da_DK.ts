@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Riftringe',
     desc: 'De personlige riftringe, præget til hver mester i gruppen, der vinder den første gennemførsel af en rangeret Rift. En figur kan kun eje sin egen.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Episk bytte fra Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroisk: Crucible of the Last Spring',
+    desc: 'Våben kun fra heroisk tilstand, fra Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Episk bytte fra Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroisk: The Inner Crucible',
+    desc: 'Skjolde og våben kun fra heroisk tilstand, fra Varkhul, Forgefather of the Last Flame.',
+  },
 };

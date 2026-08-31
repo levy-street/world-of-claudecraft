@@ -19,11 +19,11 @@ export type AuraGainLogKey = 'hud.combat.auraAfflicted' | 'hud.combat.auraGainOt
  * moment the event is handled). When no live aura can be found (e.g. it already
  * expired before the event drained), `fallbackKind` -- the SimEvent's own optional
  * `auraKind` -- still resolves every kind except a negative-value `buff_*` reuse,
- * since only that case needs the real value to break the tie; absent both, the
- * gain reads as neutral rather than assumed harmful.
+ * since only a live match carries the real value to break that tie; absent both,
+ * the gain reads as neutral rather than assumed harmful.
  */
 export function auraGainLogKeyFor(
-  matchedAura: Pick<Aura, 'kind' | 'value'> | undefined,
+  matchedAura: Pick<Aura, 'kind' | 'value' | 'id'> | undefined,
   fallbackKind?: AuraKind,
 ): AuraGainLogKey {
   const kind = matchedAura?.kind ?? fallbackKind;

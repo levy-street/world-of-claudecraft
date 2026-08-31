@@ -29,6 +29,9 @@ export interface LootWindowControllerDeps {
   itemIcon(item: ItemDef): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
+  /** The shared HUD confirm dialog (Hud.confirmDialog: focus-trapped,
+   *  aria-named), for the bind-on-pickup warning before Take Loot. */
+  confirm(title: string, body: string, okText: string, cancelText: string, onOk: () => void): void;
   centerPopup(element: HTMLElement): void;
   placePopup(
     element: HTMLElement,
@@ -74,13 +77,33 @@ export class LootWindowController {
     this.attachItemTooltips();
 
     if (hasLoot) {
+      const takeLoot = (): void => {
+        this.deps.world().lootCorpse(mobId);
+        this.close();
+      };
+      // Bind-on-pickup warning: when the visible loot holds a soulbound item,
+      // taking it binds it, so the player confirms once first (the classic
+      // BoP dialog). An unknown stale-client def cannot claim soulbound, so
+      // it takes the plain path rather than warning on a guess.
+      const bindsOnPickup = visibleItems.some(
+        (stack) => knownItemDef(ITEMS, stack.itemId)?.soulbound === true,
+      );
       // "Take Loot", not "Take All": the old label promised the harvest too.
       // The delve-chest arm keeps Take All.
       this.appendTakeButton(
         t('hudChrome.loot.takeLootButton'),
         () => {
-          this.deps.world().lootCorpse(mobId);
-          this.close();
+          if (bindsOnPickup) {
+            this.deps.confirm(
+              t('hudChrome.loot.bindConfirmTitle'),
+              t('hudChrome.loot.bindConfirmBody'),
+              t('hudChrome.loot.takeLootButton'),
+              t('hud.chat.context.cancel'),
+              takeLoot,
+            );
+            return;
+          }
+          takeLoot();
         },
         () => esc(t('hudChrome.loot.takeLootTooltip')),
       );

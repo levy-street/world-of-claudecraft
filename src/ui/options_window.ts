@@ -21,7 +21,7 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { CROSS_HOTBAR_TRIGGERS, isCrossHotbarButton } from '../game/cross_hotbar';
+import { isCrossHotbarModifier } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
@@ -80,6 +80,7 @@ import {
   t,
 } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
+import { interfaceUnlockLabelKey } from './interface_unlock_core';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -111,7 +112,9 @@ import {
   withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
-import { settingsCard } from './settings_controls';
+import { settingsCard, subhead } from './settings_controls';
+import { exportTransferCode, importTransferCode } from './settings_transfer';
+import type { TransferKind } from './settings_transfer_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import {
@@ -303,6 +306,20 @@ export interface OptionsWindowDeps {
   resetChatWindow(): void;
   /** Reset the movable player + target unit frames to their stock spots. */
   resetUnitFrames(): void;
+  /** True while every movable HUD frame accepts a move / resize gesture. */
+  isInterfaceUnlocked(): boolean;
+  /** Flip every movable HUD frame at once; returns the new unlocked state. */
+  toggleInterfaceUnlock(): boolean;
+  /** The shared HUD confirm dialog, used by the rebind flow's key-conflict
+   *  prompt (a key lives on one action at a time, so a rebind can silently
+   *  unbind another action; the player is asked first). */
+  confirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void;
   /** Chat-timestamp state (Hud owns it; the chat renderer reads the same fields). */
   getChatTimestamps(): boolean;
   setChatTimestamps(on: boolean): void;
@@ -1229,7 +1246,9 @@ export class OptionsWindow {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.audio'));
     const controls = hooks ? buildAudioControls(this.settingsSource(hooks)) : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderAudio());
+    // Through render(), not renderAudio(): the dispatcher re-wires the
+    // title-bar [data-back] control the rebuild just destroyed.
+    if (hooks) this.applyControls(body, controls, hooks, () => this.render());
     this.settingsViewFooter(controls);
   }
 
@@ -1322,23 +1341,26 @@ export class OptionsWindow {
     const presetName = document.createElement('span');
     presetName.className = 'set-name';
     presetName.textContent = t('hudChrome.theme.preset');
-    const seg = document.createElement('div');
-    seg.className = 'set-seg theme-presets';
     const presetLabel = (id: PresetId): string =>
       t(`hudChrome.theme.presets.${id}` as TranslationKey);
-    for (const id of PRESET_ORDER) {
-      const btn = document.createElement('button');
-      btn.className = 'btn set-seg-btn';
-      btn.textContent = presetLabel(id);
-      btn.classList.toggle('active', theme.get().preset === id);
-      btn.addEventListener('click', () => {
+    // The themed dropdown the language picker uses (owner request: a dropdown
+    // rather than a row of segment buttons). Through render(), not
+    // renderInterface(): the dispatcher re-wires the title-bar [data-back]
+    // control the rebuild just destroyed.
+    const presetDropdown = this.deps.buildDropdown(
+      PRESET_ORDER.map((id) => ({ value: id, label: presetLabel(id) })),
+      theme.get().preset,
+      (selected) => {
+        const preset = PRESET_ORDER.find((id) => id === selected);
+        if (!preset || preset === theme.get().preset) return;
         audio.click();
-        theme.setPreset(id);
-        this.renderInterface(); // refresh active state + custom pickers
-      });
-      seg.appendChild(btn);
-    }
-    presetRow.append(presetName, seg);
+        theme.setPreset(preset);
+        this.render(); // refresh custom pickers + re-wire the back control
+      },
+      undefined,
+      { ariaLabel: t('hudChrome.theme.preset') },
+    );
+    presetRow.append(presetName, presetDropdown);
     body.appendChild(presetRow);
 
     // Custom palette: one colour input per knob, seeded with the effective value.
@@ -1356,7 +1378,9 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       theme.resetCustom();
-      this.renderInterface();
+      // Through render(), not renderInterface(): the dispatcher re-wires the
+      // title-bar [data-back] control the rebuild just destroyed.
+      this.render();
     });
     customRow.append(customName, reset);
     body.appendChild(customRow);
@@ -1398,10 +1422,9 @@ export class OptionsWindow {
     const el = this.deps.root();
     const hooks = this.deps.options();
     const tab = this.interfaceTab;
-    // The full, untagged control list across all four tabs (~40 settings): the
-    // footer's Reset to Defaults must restore every Interface setting the panel
-    // governs, not just whichever tab happens to be open when the player clicks
-    // it, so switching tabs never changes what the shared button resets.
+    // The full, untagged control list across all four tabs; the footer scopes
+    // itself to the ACTIVE tab's slice below (owner request: Reset to Defaults
+    // resets only the settings the open menu shows).
     // The desktop GPU preference row is gated on the shell BRIDGE CAPABILITY,
     // never on nativeShell: that flag is true in the mobile shells too, and a
     // desktop shell installed before the preference shipped cannot serve it.
@@ -1429,9 +1452,12 @@ export class OptionsWindow {
     el.insertBefore(strip, body);
     body.id = 'interface-tabpanel';
     body.setAttribute('role', 'tabpanel');
+    // Through render(), not renderInterface(): the dispatcher re-wires the
+    // title-bar [data-back] control this rebuild just destroyed (a tab switch
+    // used to leave Back dead for the rest of the visit).
     wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
       this.interfaceTab = id as InterfaceTab;
-      this.renderInterface();
+      this.render();
       if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
     });
 
@@ -1441,15 +1467,36 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
+    // Frames leads with the Edit Frames action (the unlock mode): arranging
+    // and sizing frames is what this tab is about, so its entry row sits at
+    // the top, with the layout export/import right under it (owner request:
+    // above the party section). The declarative rows below the subhead all
+    // tune the party frames (owner request: one labelled subsection), since
+    // every non-party knob moved into the editor's Frames Settings menu.
+    if (tab === 'frames') {
+      // Frame editing is desktop-only (every gesture refuses touch layouts),
+      // so the touch HUD never offers the entry row; Hud.toggleInterfaceUnlock
+      // refuses on mobile as the backstop.
+      if (!env.touch) this.interfaceUnlockRow(body);
+      this.transferRows(body, 'frames');
+      subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
+    }
+
     if (hooks)
       this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
-        this.renderInterface();
+        // Through render(), not renderInterface(): the dispatcher re-wires the
+        // title-bar [data-back] control the rebuild just destroyed.
+        this.render();
         if (focusKey)
           this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
       });
 
-    // Frames closes with the unit-frames reset row.
-    if (tab === 'frames') this.unitFramesResetRow(body);
+    // (The frames tab's Reset Frame Positions row was retired, owner
+    // request: the per-frame size resets live in the editor's Frames
+    // Settings menu and the tab's own Reset to Defaults footer still
+    // restores the settings.)
+    // General closes with the all-settings export/import.
+    if (tab === 'general') this.transferRows(body, 'settings');
 
     // Chat closes with the timestamp toggle + clock pair, the chat-window reset
     // row, the online deed-broadcast row, then the explanatory notes.
@@ -1473,7 +1520,153 @@ export class OptionsWindow {
       }
     }
 
-    this.settingsViewFooter(controls);
+    // Reset to Defaults scopes to the ACTIVE TAB: the keys its rows render
+    // plus the tab's off-menu keys, the settings whose UI moved elsewhere (or
+    // was retired) but whose SAVED value still belongs to this tab's domain
+    // and must stay resettable, or a player who set one before the rows moved
+    // would be stranded on it. General owns the retired UI Scale slider;
+    // Frames owns the retired frame-scale sliders and the Frames Settings
+    // dropdown's toggles, and its reset also restores the whole stock LAYOUT
+    // (every movable frame, the chat box, the meter panels, the target-aura
+    // panel): arranging frames is what that tab is about, and a reset that
+    // left them strewn about read as a broken button.
+    const offMenuTabKeys: Record<InterfaceTab, readonly (keyof GameSettings)[]> = {
+      general: ['uiScale'],
+      frames: [
+        'playerFrameScale',
+        'targetFrameScale',
+        'partyFrameScale',
+        // The interface editor's dimension drags (movable_frame.ts,
+        // resizeMode 'dimensions') write these; no slider shows them, so the
+        // Frames reset must name them explicitly.
+        'playerFrameWidth',
+        'playerFrameHeight',
+        'targetFrameWidth',
+        'targetFrameHeight',
+        'partyFrameWidth',
+        'partyFrameHeight',
+        'partyFrameColumns',
+        'partyFrameSpacing',
+        'buffsLeftToRight',
+        'debuffsLeftToRight',
+        'lockPlayerFrameToActionBar',
+        'actionBar1Vertical',
+        'actionBar2Vertical',
+        'actionBar3Vertical',
+        'menuRailHorizontal',
+        'frameSnapToGrid',
+        'combineActionBars',
+        'hideUnusedActionSlots',
+        'mouseoverCast',
+        'lockActionBars',
+      ],
+      chat: [],
+      combat: [],
+    };
+    this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {
+      const allKeys = [...keys, ...offMenuTabKeys[tab]];
+      hooks.settings.reset(allKeys);
+      for (const k of allKeys) hooks.onSettingChange(k, hooks.settings.get(k));
+      if (tab === 'frames') this.deps.resetUnitFrames();
+      this.render();
+    });
+  }
+
+  // Export/import rows: the frame layout (Frames tab) and the whole settings
+  // family (General tab). The code is a JSON envelope validated against a key
+  // ALLOWLIST (settings_transfer_core.ts), so a pasted blob can never plant
+  // arbitrary storage keys; a successful import reloads the page, since every
+  // family it writes is read at boot (the settings apply-all loop, the frame
+  // movers' constructors).
+  private transferRows(body: HTMLElement, kind: TransferKind): void {
+    const label = t(
+      kind === 'frames' ? 'hudChrome.transfer.frameLayout' : 'hudChrome.transfer.allSettings',
+    );
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = label;
+    const actions = document.createElement('div');
+    actions.className = 'set-seg';
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn set-toggle';
+    exportBtn.textContent = t('hudChrome.transfer.exportAction');
+    const importBtn = document.createElement('button');
+    importBtn.className = 'btn set-toggle';
+    importBtn.textContent = t('hudChrome.transfer.importAction');
+    actions.append(exportBtn, importBtn);
+    row.append(name, actions);
+    body.appendChild(row);
+
+    // The expando under the row: one mode visible at a time, rebuilt per open.
+    const pane = document.createElement('div');
+    pane.className = 'transfer-pane';
+    pane.hidden = true;
+    body.appendChild(pane);
+    const openPane = (mode: 'export' | 'import') => {
+      audio.click();
+      pane.hidden = false;
+      pane.replaceChildren();
+      const box = document.createElement('textarea');
+      box.className = 'transfer-code';
+      box.rows = 4;
+      box.setAttribute('aria-label', label);
+      pane.appendChild(box);
+      const status = document.createElement('div');
+      status.className = 'set-note';
+      status.setAttribute('role', 'status');
+      if (mode === 'export') {
+        box.readOnly = true;
+        box.value = exportTransferCode(kind);
+        const copy = document.createElement('button');
+        copy.className = 'btn';
+        copy.textContent = t('hudChrome.transfer.copy');
+        copy.addEventListener('click', () => {
+          audio.click();
+          box.select();
+          const write = navigator.clipboard?.writeText(box.value);
+          if (write) {
+            write.then(
+              () => {
+                status.textContent = t('hudChrome.transfer.copied');
+              },
+              () => {
+                status.textContent = t('hudChrome.transfer.copyFailed');
+              },
+            );
+          } else {
+            status.textContent = t('hudChrome.transfer.copyFailed');
+          }
+        });
+        pane.appendChild(copy);
+        box.focus();
+        box.select();
+      } else {
+        box.placeholder = t('hudChrome.transfer.pastePlaceholder');
+        const apply = document.createElement('button');
+        apply.className = 'btn';
+        apply.textContent = t('hudChrome.transfer.applyReload');
+        apply.addEventListener('click', () => {
+          audio.click();
+          const result = importTransferCode(kind, box.value);
+          if (result.ok) {
+            window.location.reload();
+            return;
+          }
+          status.textContent = t(
+            result.reason === 'kind'
+              ? 'hudChrome.transfer.wrongKind'
+              : 'hudChrome.transfer.invalid',
+          );
+        });
+        pane.appendChild(apply);
+        box.focus();
+      }
+      pane.appendChild(status);
+    };
+    exportBtn.addEventListener('click', () => openPane('export'));
+    importBtn.addEventListener('click', () => openPane('import'));
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1554,21 +1747,43 @@ export class OptionsWindow {
 
   // Reset the movable player + target unit frames back to their stock spots
   // (forgets the saved drag positions and re-docks the player frame). Frames tab.
-  private unitFramesResetRow(body: HTMLElement): void {
-    const framesRow = document.createElement('div');
-    framesRow.className = 'set-row';
-    const framesName = document.createElement('span');
-    framesName.className = 'set-name';
-    framesName.textContent = t('hudChrome.frameReset.label');
-    const framesBtn = document.createElement('button');
-    framesBtn.className = 'btn set-toggle';
-    framesBtn.textContent = t('hudChrome.chatWindow.resetAction');
-    framesBtn.addEventListener('click', () => {
+
+  // "Unlock interface": one press loosens every movable HUD frame (the three
+  // action bars, the cast bar, the menu rail, the minimap and the player / pet
+  // frames) so they can be dragged and scaled, and the button relabels itself to
+  // "Lock interface" while they are loose. An action rather than a stored
+  // setting, so it is a bespoke row rather than a boolToggle: the unlocked state
+  // deliberately does not survive a reload (a frame always loads locked, the
+  // same rule the per-frame corner buttons have always followed). Combat tab,
+  // rendered directly above Auto-Attack on Ability Use.
+  private interfaceUnlockRow(body: HTMLElement): void {
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = t('hudChrome.interfaceUnlock.label');
+    const btn = document.createElement('button');
+    btn.className = 'btn set-toggle';
+    const sync = (unlocked: boolean) => {
+      btn.textContent = t(interfaceUnlockLabelKey(unlocked));
+      btn.setAttribute('aria-pressed', String(unlocked));
+      btn.classList.toggle('active', unlocked);
+    };
+    sync(this.deps.isInterfaceUnlocked());
+    btn.addEventListener('click', () => {
       audio.click();
-      this.deps.resetUnitFrames();
+      sync(this.deps.toggleInterfaceUnlock());
     });
-    framesRow.append(framesName, framesBtn);
-    body.append(framesRow);
+    row.append(name, btn);
+    body.append(row);
+    // One guidance note going in: the freeze while editing is deliberate
+    // rather than a hang. (The action-bars note was retired, owner request:
+    // the Frames Settings menu now lists bar 2/3 in both shapes, so the
+    // plus/minus preamble no longer needs explaining here.)
+    const note = document.createElement('div');
+    note.className = 'set-note';
+    note.textContent = t('hudChrome.interfaceUnlock.frozenNote');
+    body.appendChild(note);
   }
 
   // -------------------------------------------------------------------------
@@ -1803,7 +2018,7 @@ export class OptionsWindow {
   // and Jump. Movement-axis actions (forward/strafe/turn) are excluded, they live
   // on the analog stick. Zoom ships unbound by default (no free default slot
   // remains among the 13 bindable buttons), so it is opt-in only from here.
-  private gamepadActionOptions(): { value: string; label: string }[] {
+  private gamepadActionOptions(crossHotbarOwned = false): { value: string; label: string }[] {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
@@ -1817,6 +2032,9 @@ export class OptionsWindow {
     ];
     for (const a of BIND_ACTIONS) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
+      // Runtime suppresses flat action-bar slots while the cross hotbar is on,
+      // so do not offer a binding that would be accepted here but never fire.
+      if (crossHotbarOwned && a.id.startsWith('slot')) continue;
       if (a.kind !== 'edge' && a.id !== 'jump') continue;
       opts.push({ value: a.id, label: this.actionDisplayName(a.id, a.label) });
     }
@@ -1827,7 +2045,9 @@ export class OptionsWindow {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hudChrome.controller.title'));
     const controls = hooks ? buildControllerControls(this.settingsSource(hooks)) : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderController());
+    // Through render(), not renderController(): the dispatcher re-wires the
+    // title-bar [data-back] control the rebuild just destroyed.
+    if (hooks) this.applyControls(body, controls, hooks, () => this.render());
 
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -1840,18 +2060,12 @@ export class OptionsWindow {
     body.appendChild(head);
 
     if (hooks) {
-      const opts = this.gamepadActionOptions();
       const kind = hooks.gamepad.kind();
-      // While the cross hotbar is on it OWNS the d-pad and both triggers: the
-      // triggers are its modifiers and the d-pad is four of its cells (plus HUD
-      // navigation on a bare press). Listing them here as freely rebindable is a
-      // lie the panel used to tell, so they are dropped from the flat list and
-      // the cross-hotbar section below is where those buttons are configured.
       const crossHotbarOwned = hooks.settings.get('gamepadCrossHotbar');
+      const opts = this.gamepadActionOptions(crossHotbarOwned);
       for (const { button, action } of hooks.gamepad.entries()) {
-        const isModifier =
-          button === CROSS_HOTBAR_TRIGGERS.left || button === CROSS_HOTBAR_TRIGGERS.right;
-        if (crossHotbarOwned && (isCrossHotbarButton(button) || isModifier)) continue;
+        if (crossHotbarOwned && isCrossHotbarModifier(button)) continue;
+        const current = crossHotbarOwned && action.startsWith('slot') ? GAMEPAD_NONE : action;
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
@@ -1865,7 +2079,7 @@ export class OptionsWindow {
         // language picker's ariaLabel above.
         const dd = this.deps.buildDropdown(
           opts,
-          action,
+          current,
           (v) => hooks.gamepad.bind(button, v),
           undefined,
           {
@@ -1874,12 +2088,6 @@ export class OptionsWindow {
         );
         row.append(name, dd);
         body.appendChild(row);
-      }
-      if (crossHotbarOwned) {
-        const owned = document.createElement('div');
-        owned.className = 'set-note';
-        owned.textContent = t('hudChrome.controller.crossHotbarOwnsButtons');
-        body.appendChild(owned);
       }
       const reset = document.createElement('button');
       reset.type = 'button';
@@ -2214,20 +2422,54 @@ export class OptionsWindow {
       this.capturingKey = null;
       if (code === null) {
         this.keybindNote = t('hud.options.keybindCancelled');
-      } else if (this.deps.keybinds().bind(actionId, index, code)) {
-        // Label what was actually stored: bind() strips modifiers from held
-        // (movement) actions, so a captured "Shift+KeyW" is saved bare as "KeyW".
-        // Reading it back keeps the confirmation in sync with the action-bar keycap.
-        this.keybindNote = t('hud.options.keybindBound', {
-          action: name,
-          key: keyLabel(this.deps.keybinds().codeAt(actionId, index)),
-        });
-        this.deps.refreshKeybindLabels();
-      } else if (isReservedCode(code)) {
-        this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+        if (this.isOpen) this.renderKeybinds();
+        return;
       }
+      // A key lives on ONE action at a time, so binding a key another action
+      // already holds silently unbinds that other action. Ask first: the
+      // look-ahead reports exactly what bind() would evict, so the prompt can
+      // name it, and cancelling leaves both bindings untouched.
+      const conflict = this.deps.keybinds().findBindConflict(actionId, index, code);
+      if (conflict) {
+        const other = this.actionDisplayName(conflict.id, conflict.id);
+        this.keybindNote = t('hudChrome.actionBar.conflictTitle');
+        if (this.isOpen) this.renderKeybinds();
+        this.deps.confirmDialog(
+          t('hudChrome.actionBar.conflictTitle'),
+          t('hudChrome.actionBar.conflictBody', {
+            key: keyLabel(conflict.code),
+            other,
+            action: name,
+          }),
+          t('hudChrome.actionBar.conflictAccept'),
+          t('hud.chat.context.cancel'),
+          () => {
+            this.commitCapturedBind(actionId, index, code, name);
+            if (this.isOpen) this.renderKeybinds();
+          },
+        );
+        return;
+      }
+      this.commitCapturedBind(actionId, index, code, name);
       // re-render only if the menu is still open (player may have closed it)
       if (this.isOpen) this.renderKeybinds();
     });
+  }
+
+  // The commit half of a capture, shared by the free-key path and the
+  // conflict prompt's accept. Never called for a cancelled capture.
+  private commitCapturedBind(actionId: string, index: number, code: string, name: string): void {
+    if (this.deps.keybinds().bind(actionId, index, code)) {
+      // Label what was actually stored: bind() strips modifiers from held
+      // (movement) actions, so a captured "Shift+KeyW" is saved bare as "KeyW".
+      // Reading it back keeps the confirmation in sync with the action-bar keycap.
+      this.keybindNote = t('hud.options.keybindBound', {
+        action: name,
+        key: keyLabel(this.deps.keybinds().codeAt(actionId, index)),
+      });
+      this.deps.refreshKeybindLabels();
+    } else if (isReservedCode(code)) {
+      this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+    }
   }
 }

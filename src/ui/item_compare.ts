@@ -15,7 +15,9 @@ export type CompareStat =
   | 'warfare'
   | 'hitRating'
   | 'critRating'
-  | 'hasteRating';
+  | 'hasteRating'
+  | 'spellPower'
+  | 'healPower';
 
 export interface StatDelta {
   stat: CompareStat;
@@ -48,8 +50,14 @@ export function itemStatDeltas(item: ItemDef, equipped: ItemDef): StatDelta[] {
     out.push({ stat: 'warfare', delta: warfareDelta, decimals: 0 });
   }
 
-  // Combat ratings, in the base item tooltip's affix order. spellPower is
-  // deliberately absent: no content item carries it, so a row could never fire.
+  // Affixes and combat ratings, in the base item tooltip's order. The Crucible
+  // tier authored Spell Power and Healing Power onto items, so both now earn
+  // compare rows (the old "no content item carries it" carve-out is retired).
+  const affixes = ['spellPower', 'healPower'] as const;
+  for (const k of affixes) {
+    const delta = (item[k] ?? 0) - (equipped[k] ?? 0);
+    if (Math.abs(delta) >= 0.5) out.push({ stat: k, delta, decimals: 0 });
+  }
   const ratings = ['hitRating', 'critRating', 'hasteRating'] as const;
   for (const k of ratings) {
     const delta = (item[k] ?? 0) - (equipped[k] ?? 0);

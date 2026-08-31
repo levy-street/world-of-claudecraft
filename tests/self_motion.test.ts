@@ -10,6 +10,8 @@ import {
   updateSelfRenderFallback,
   type Vec3Like,
 } from '../src/render/self_motion';
+import { DUNGEON_FLOOR_Y } from '../src/sim/data';
+import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -65,7 +67,7 @@ interface FrameResult {
 class Lab {
   readonly srv: Sim;
   readonly self: Entity;
-  readonly predictor = new SelfMotionPredictor(SEED);
+  readonly predictor: SelfMotionPredictor;
   private nowMs = 0;
   private lastSnapMs = 0;
   private sinceTickMs = 0;
@@ -115,6 +117,9 @@ class Lab {
       autoEquip: true,
       world: EMPTY_TEST_WORLD,
     });
+    // Same fixed-per-world token the live Sim closes over for its own movement
+    // (Sim.riftCollisionToken); real only once a scenario calls srv.enterRift.
+    this.predictor = new SelfMotionPredictor(SEED, this.srv.riftCollisionToken);
     this.srv.setPlayerLevel(60);
     // Default start re-pinned 2026-08 for the Eastbrook harbor move
     // (d19aa33f76, docs/design/eastbrook-revamp/site-plan.md): (0,-80) now
@@ -197,6 +202,10 @@ class Lab {
       frameDt: frameMs / 1000,
       snapAgeMs: this.lastSnapMs > 0 ? this.nowMs - this.lastSnapMs : 0,
       snapIntervalMs: this.deliveryMs,
+      // Read fresh every frame, exactly like main.ts reads net.riftFloor: null
+      // outside a rift, the live descriptor once a rift scenario calls
+      // srv.enterRift (see the "rift prediction" describe block below).
+      riftFloor: this.srv.riftFloor,
     };
     const out = this.predictor.step(this.self, frame);
     const a = {
@@ -290,6 +299,7 @@ describe('SelfMotionPredictor', () => {
       frameDt: 0.05,
       snapAgeMs: 0,
       snapIntervalMs: SNAP_MS,
+      riftFloor: null,
     };
     const predictive = new SelfMotionPredictor(SEED);
     const ordinary = new SelfMotionPredictor(SEED);
@@ -1188,6 +1198,7 @@ describe('SelfMotionPredictor', () => {
           frameDt,
           snapAgeMs,
           snapIntervalMs,
+          riftFloor: null,
         });
         if (!out) throw new Error('predictor disabled unexpectedly');
         expect(Number.isFinite(out.x) && Number.isFinite(out.y) && Number.isFinite(out.z)).toBe(
@@ -1254,5 +1265,304 @@ describe('SelfMotionPredictor', () => {
       if (r.pose) maxRise = Math.max(maxRise, r.pose.y - groundY);
     }
     expect(maxRise).toBeGreaterThan(0.3);
+  });
+});
+
+// Issue #3479: prediction used to be switched off entirely inside a rift
+// (src/main.ts's old `!isRiftPos(pe.pos.x)` gate), so every key press showed
+// the full echo latency there while the overworld and regular dungeons stayed
+// predicted. These scenarios drive Lab through a REAL procedural rift floor
+// (Sim.enterRift, the same entry point the server uses) so the predictor's
+// strip/reapply lift pair and its rift-token wall resolution are proven
+// against the actual generated geometry, not a hand-built stand-in.
+describe('rift prediction (issue #3479)', () => {
+  // Procedural (no authored rooms), so riftLiftAt falls through to the z-band
+  // platform ramp: flat below local z=84, height ~2.2206 from z=94 on, verified
+  // directly against riftLiftAt below rather than hardcoded.
+  const PLATFORM_SEED = 6;
+  const PLATFORM_BASE_LEVEL = 20;
+  // Same "chamber-waist" wall fixture tests/rift_wall_swept_collision.test.ts
+  // pins: a real side wall at local x=35 inside the origin(slot, 0) room band.
+  const WALL_SEED = 2;
+  const WALL_BASE_LEVEL = 20;
+
+  // Real ClientWorld teleport handling (online.ts TELEPORT_SNAP_DIST_SQ): a jump
+  // this large re-anchors prevPos AT the new pos, no interpolation sweep. Lab's
+  // own snapshot mirroring has no such collapse (nothing before this needed
+  // one), so every scenario below applies it manually right after repositioning
+  // the server player, instead of letting Lab glide across roughly 100000 yd
+  // from the overworld start to the rift band.
+  //
+  // Deliberately NOT authoritativeDiscontinuity: that flag is reserved for a
+  // completed /unstuck recovery (hasAuthoritativeSelfPositionDiscontinuity),
+  // a narrower signal than "any large teleport". A rift entry is an ordinary
+  // large jump, caught the same way any other one is: step()'s own anchor
+  // check (the module header's "any gap over the renderer's 6 yd snap rule
+  // resets outright") sees the collapsed mirror disagree with the predictor's
+  // pre-jump history and resets from there, with no discontinuity flag
+  // needed. This helper exists only to fast-forward past the ~100000 yd trip
+  // from the overworld start Lab's constructor uses to the rift band, so the
+  // scenarios below can start their assertions already on the rift floor.
+  function collapseMirrorToServerPos(lab: Lab): void {
+    lab.self.pos = { ...lab.srv.player.pos };
+    lab.self.prevPos = { ...lab.srv.player.pos };
+  }
+
+  it('the predicted Y matches the server-lifted Y at rest on a raised tier, with no per-frame oscillation', () => {
+    const platformFloor = generateRiftFloor(PLATFORM_SEED, PLATFORM_BASE_LEVEL, 0);
+    const expectedLift = riftLiftAt(platformFloor, 0, 100);
+    expect(expectedLift).toBeGreaterThan(1); // sanity: this local point is really raised
+
+    const lab = new Lab(50);
+    lab.srv.enterRift(PLATFORM_SEED, PLATFORM_BASE_LEVEL, lab.srv.player.id);
+    const origin = lab.srv.riftFloor?.origin;
+    if (!origin) throw new Error('rift floor did not spawn');
+    const p = lab.srv.player;
+    p.pos.x = origin.x;
+    p.pos.z = origin.z + 100;
+    p.pos.y = DUNGEON_FLOOR_Y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    lab.srv.tick(); // settle server-side: updateRiftTriggers lifts p.pos.y once
+    expect(p.pos.y).toBeCloseTo(expectedLift, 6);
+    collapseMirrorToServerPos(lab);
+
+    // The reposition above is a real teleport (a rift entry always is): the
+    // predictor's actor is already rooted correctly. What this test actually
+    // proves is what happens AFTER, across many further frames with no input:
+    // the strip/reapply pair around the kernel must keep re-deriving the SAME
+    // lift every tick, or the display would drift or judder on the platform.
+    // Vertical is never leash-clamped (a jump apex must not be), so this is
+    // decisive: nothing else would mask a wrong or drifting lift here.
+    const ys: number[] = [];
+    for (let i = 0; i < 40; i++) {
+      const r = lab.frame();
+      if (r.pose) ys.push(r.pose.y);
+    }
+    expect(ys.length).toBeGreaterThan(30);
+    for (const y of ys) {
+      expect(y).toBeCloseTo(expectedLift, 2);
+    }
+    // No per-frame oscillation: consecutive settled samples barely move at all
+    // (this is a STANDING player; any visible bobbing would show up here).
+    for (let i = 1; i < ys.length; i++) {
+      expect(Math.abs(ys[i] - ys[i - 1])).toBeLessThan(0.01);
+    }
+  });
+
+  it('a jump from the raised tier arcs above the lift and settles back onto it, never sinking through', () => {
+    const platformFloor = generateRiftFloor(PLATFORM_SEED, PLATFORM_BASE_LEVEL, 0);
+    const expectedLift = riftLiftAt(platformFloor, 0, 100);
+
+    const lab = new Lab(50);
+    lab.srv.enterRift(PLATFORM_SEED, PLATFORM_BASE_LEVEL, lab.srv.player.id);
+    const origin = lab.srv.riftFloor?.origin;
+    if (!origin) throw new Error('rift floor did not spawn');
+    const p = lab.srv.player;
+    p.pos.x = origin.x;
+    p.pos.z = origin.z + 100;
+    p.pos.y = DUNGEON_FLOOR_Y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    lab.srv.tick();
+    collapseMirrorToServerPos(lab);
+    for (let i = 0; i < 10; i++) lab.frame(); // settle the mirror onto the lift
+
+    lab.setInput(mi({ jump: true }));
+    for (let i = 0; i < 4; i++) lab.frame(); // hold across a full 50ms server step
+    lab.setInput(mi());
+    let maxY = 0;
+    for (let i = 0; i < 30; i++) {
+      const r = lab.frame();
+      if (r.pose) maxY = Math.max(maxY, r.pose.y);
+    }
+    // The arc goes measurably above the resting lift...
+    expect(maxY).toBeGreaterThan(expectedLift + 0.3);
+    // ...and once landed and fully settled (a further 1s, well past a normal
+    // jump arc's flight time) it is back to EXACTLY the platform's lift (same
+    // decisive tolerance as the at-rest test), not sunk into a tier the
+    // flat-floor kernel would otherwise not know exists. Only the TAIL of the
+    // window is asserted: the arc itself is still descending through part of
+    // this window, and asserting on that part would just re-measure the jump.
+    const ys: number[] = [];
+    for (let i = 0; i < 60; i++) {
+      const r = lab.frame();
+      if (r.pose) ys.push(r.pose.y);
+    }
+    for (const y of ys.slice(-15)) {
+      expect(y).toBeCloseTo(expectedLift, 2);
+    }
+  });
+
+  // Regression pin for a bug the first version of this fix shipped: the lift
+  // was stripped/reapplied per kernel step INSIDE the DT loop, so it was
+  // correct at the moment each step ran, but the divergence servo and the
+  // horizontal leash clamp both run AFTER the loop and can still move x/z
+  // (that is their whole job under lag) without ever recomputing the lift for
+  // where they moved it to. On a flat plateau that is invisible (the lift is
+  // constant either side of any such shift); it only shows up walking the
+  // ramp itself, where the lift is a function of z. lagMs 300 keeps the servo
+  // and the leash both continuously active for the whole traverse (the same
+  // budget reasoning as the wall test below), so this is decisive, not just
+  // theoretically exercising the path.
+  it('the predicted Y matches the lift at wherever x/z actually ends up while walking up a ramp under lag', () => {
+    const platformFloor = generateRiftFloor(PLATFORM_SEED, PLATFORM_BASE_LEVEL, 0);
+    // Sanity: the ramp is really a ramp over this span (not flat, not already
+    // fully raised), so the assertion below is actually exercising a
+    // position-varying lift, not a constant.
+    expect(riftLiftAt(platformFloor, 0, 80)).toBe(0);
+    expect(riftLiftAt(platformFloor, 0, 89)).toBeGreaterThan(0);
+    expect(riftLiftAt(platformFloor, 0, 89)).toBeLessThan(riftLiftAt(platformFloor, 0, 100));
+
+    const lab = new Lab(300, FRAME_MS, { facing: 0 }); // facing 0: +z, straight up the ramp
+    lab.srv.enterRift(PLATFORM_SEED, PLATFORM_BASE_LEVEL, lab.srv.player.id);
+    const origin = lab.srv.riftFloor?.origin;
+    if (!origin) throw new Error('rift floor did not spawn');
+    const p = lab.srv.player;
+    p.pos.x = origin.x;
+    p.pos.z = origin.z + 70; // flat, well short of the ramp's rampZ0=84
+    p.pos.y = DUNGEON_FLOOR_Y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    p.facing = 0;
+    lab.srv.tick();
+    collapseMirrorToServerPos(lab);
+    for (let i = 0; i < 10; i++) lab.frame(); // settle the mirror
+
+    lab.setInput(mi({ forward: true }));
+    // 4s comfortably crosses the flat lead-in (z 70-84) and carries well into
+    // the ramp itself (84-94), leash-bounded well under full run speed; it
+    // does not reach the plateau (94+) at this lag budget, which the
+    // maxLocalZ/liftedSamples assertions below pin directly rather than
+    // leaving to a comment a future speed or leash change could silently
+    // outdate.
+    let sampled = 0;
+    let maxLocalZ = Number.NEGATIVE_INFINITY;
+    let liftedSamples = 0;
+    for (let i = 0; i < 240; i++) {
+      const r = lab.frame();
+      if (!r.pose) continue;
+      const localX = r.pose.x - origin.x;
+      const localZ = r.pose.z - origin.z;
+      const expected = riftLiftAt(platformFloor, localX, localZ);
+      // 0.02 yd (under a centimeter), not the tighter 0.005 the at-rest tests
+      // use: right at the ramp's kink (rampZ0) the OUTPUT itself linearly
+      // interpolates x/z and y separately across one sub-frame step, and the
+      // lift function is not linear across that exact point, so a one- or
+      // two-frame sub-visual residual there is real and expected, not a
+      // regression. The bug this test exists to catch (the servo/leash not
+      // recomputing the lift after moving x/z) was an order of magnitude
+      // larger: ~0.22 yd of Y error per yard of x/z correction on this same
+      // ramp slope.
+      expect(
+        Math.abs(r.pose.y - expected),
+        `frame ${i} at local z=${localZ.toFixed(2)}: expected ~${expected.toFixed(4)}, got ${r.pose.y.toFixed(4)}`,
+      ).toBeLessThan(0.02);
+      sampled++;
+      maxLocalZ = Math.max(maxLocalZ, localZ);
+      if (expected > 0) liftedSamples++;
+    }
+    expect(sampled).toBeGreaterThan(200);
+    // Decisive traversal pins: the run must actually carry well onto the
+    // ramp's rising slope (not just brush its start) while staying short of
+    // the plateau, and a solid share of the 4s window must land on the
+    // lifted (z > 84) part. A future speed or leash change that quietly
+    // shrank the ramp portion toward zero would still pass `sampled > 200`
+    // (a pose is produced on flat ground too), so these two are what
+    // actually hold the traversal this test claims to exercise.
+    expect(maxLocalZ).toBeGreaterThan(85);
+    expect(maxLocalZ).toBeLessThan(94);
+    expect(liftedSamples).toBeGreaterThan(80);
+  });
+
+  it('the predicted pose stops at a rift wall, never crossing it while running into it', () => {
+    // facing: PI/2 (+x, toward the wall) as a constructor opt, not just on
+    // the entity: the predictor's displayFacing reads Lab's OWN readonly
+    // facing field, set once here, never the live entity's p.facing.
+    // lagMs 300 gives a generous leash budget (~2 yd), so only the
+    // predictor's OWN local wall resolution can hold it short of the wall:
+    // a small budget would pass this test vacuously (the leash alone already
+    // keeps the display within a fraction of a yard of the (also correctly
+    // blocked) server anchor, whether or not local collision resolves at all).
+    const lab = new Lab(300, FRAME_MS, { facing: Math.PI / 2 });
+    lab.srv.enterRift(WALL_SEED, WALL_BASE_LEVEL, lab.srv.player.id);
+    const origin = lab.srv.riftFloor?.origin;
+    if (!origin) throw new Error('rift floor did not spawn');
+    const p = lab.srv.player;
+    // The same "chamber-waist" wall the swept-collision fixture pins (local
+    // x=35), approached along z=70 (verified clear) rather than that
+    // fixture's own single-shot teleport start point (z=61): stepped
+    // movement there is a pre-existing dead spot unrelated to this fix
+    // (resolveMovement's ejection guard rejects every iterative step from
+    // that exact point, in every direction), so it cannot host a WALKED
+    // approach. Server-verified along z=70 to run freely and stop at local
+    // x=33.5.
+    p.pos.x = origin.x + 33;
+    p.pos.z = origin.z + 70;
+    p.pos.y = DUNGEON_FLOOR_Y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    p.facing = Math.PI / 2; // face +x, straight at the wall
+    lab.srv.tick();
+    collapseMirrorToServerPos(lab);
+    for (let i = 0; i < 10; i++) lab.frame(); // settle the mirror
+
+    lab.setInput(mi({ forward: true }));
+    let maxLocalX = Number.NEGATIVE_INFINITY;
+    let sampled = 0;
+    const localXs: number[] = [];
+    // The wall must hold the predicted pose at its real block face
+    // (server-verified 33.5) the whole way, not just at the end.
+    for (let i = 0; i < 120; i++) {
+      const r = lab.frame();
+      if (!r.pose) continue;
+      const localX = r.pose.x - origin.x;
+      maxLocalX = Math.max(maxLocalX, localX);
+      localXs.push(localX);
+      sampled++;
+    }
+    // A pose must actually be produced across most of the run, or the bound
+    // below is satisfied vacuously by prediction being off the whole time
+    // (exactly the failure mode: a rift floor riftFloor never populated for,
+    // e.g. a resumed session, suspends prediction entirely and this loop
+    // would otherwise pass on zero samples).
+    expect(sampled).toBeGreaterThan(100);
+    expect(maxLocalX).toBeLessThan(34.5);
+    // A full yard of slack against the real block face (33.5) would also let
+    // the local wall resolution silently do nothing (leaving the leash alone
+    // to hold the pose near the server anchor) and still pass; pin the lower
+    // bound too, so a regression that stops resolving the wall locally shows
+    // up here even while the leash still masks it from the naive test.
+    expect(maxLocalX).toBeGreaterThan(33.4);
+    // No backward step once the run reaches the wall: the issue's own
+    // acceptance criterion ("no backward step when the authoritative anchor
+    // catches up"), which nothing above asserts on its own.
+    for (let i = 1; i < localXs.length; i++) {
+      expect(localXs[i]).toBeGreaterThanOrEqual(localXs[i - 1] - 1e-6);
+    }
+  });
+
+  it('suspends prediction while riftSliding is true and resumes once it clears', () => {
+    // The ice slide is server-driven and unmirrored (self_motion.ts module
+    // header): step()'s early-return gate on self.riftSliding is what hands
+    // control back to the authoritative fallback for its duration, the same
+    // way the Valkyr's Calling flight aura suspends grounded prediction
+    // (tests/paladin_valkyrs_calling.test.ts). Nothing else in this suite
+    // exercises that gate directly.
+    const lab = new Lab(50);
+    lab.srv.enterRift(PLATFORM_SEED, PLATFORM_BASE_LEVEL, lab.srv.player.id);
+    lab.srv.tick();
+    collapseMirrorToServerPos(lab);
+    expect(lab.frame().pose).not.toBeNull();
+
+    lab.self.riftSliding = true;
+    expect(lab.frame().pose).toBeNull();
+
+    lab.self.riftSliding = false;
+    expect(lab.frame().pose).not.toBeNull();
   });
 });

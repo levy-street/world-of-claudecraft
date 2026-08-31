@@ -19,6 +19,7 @@
 // Deterministic: a pure argmax over the static content tables. No rng, no clock, so
 // the same spec always yields byte-identical gear and a balance run is repeatable.
 
+import { isMaterialsOnlyBag } from './bag_pools';
 import { BAG_SOCKETS } from './bags';
 import { type DevKitRole, devKitRole } from './content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
@@ -187,7 +188,12 @@ export function roleItemScore(role: DevKitRole, item: ItemDef): number {
     const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
     score += dps * (role.melee ? MELEE_WEAPON_DPS_WEIGHT : CASTER_WEAPON_DPS_WEIGHT);
   }
-  if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  // Healing Power only scores for healer roles: Spell Power heals too, but
+  // Healing Power never damages (the directionality contract), so a damage
+  // caster kit must never pick a healer piece over its own affix.
+  if (!role.melee)
+    score +=
+      ((item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0)) * SPELL_POWER_WEIGHT;
   // blockValue lives on shields specifically. kind === 'armor' is not enough to
   // narrow: jewelry declares the same kind and carries no blockValue.
   if (role.tank && isShieldItem(item)) score += (item.blockValue ?? 0) * TANK_BLOCK_WEIGHT;
@@ -215,9 +221,18 @@ function bestBy(items: readonly ItemDef[], score: (item: ItemDef) => number): It
   return best;
 }
 
-/** The largest-capacity bag in the fresh-20 pool, or null if there is none. */
+/** The largest-capacity bag in the fresh-20 pool, or null if there is none.
+ *  Materials-only bags are excluded on purpose: the kit fills EVERY socket with
+ *  this one bag, and a materials-only bag feeds the materials pool instead of
+ *  the general one, so picking the biggest one outright would leave the tester
+ *  with a bare backpack for everything that is not a raw material. The kit
+ *  wants general capacity; specialty satchels are equipped deliberately. */
 export function bestKitBag(): ItemDef | null {
-  const bags = Object.values(ITEMS).filter((item) => (item.bagSlots ?? 0) > 0);
+  // Deliberately the same kind-based filter server/pbe_boost.ts bestBoostBag
+  // uses, so a mis-authored bag def cannot make the two pickers disagree.
+  const bags = Object.values(ITEMS).filter(
+    (item) => item.kind === 'bag' && !isMaterialsOnlyBag(item),
+  );
   return bestBy(bags, (item) => item.bagSlots ?? 0);
 }
 

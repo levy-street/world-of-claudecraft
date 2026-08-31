@@ -19,17 +19,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => ({
-  // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
-  saveCharacterState: vi.fn(async (..._args: any[]) => true),
-  // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
-  saveCharacterAndGuildBankState: vi.fn(async (..._args: any[]) => true),
-  // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
-  saveCharacterAndMarketState: vi.fn(async (..._args: any[]) => true),
   // Records every row the observer wrote, in the shape Postgres hands back to
   // the audit script (snake_case), so the audit under test is the real one
   // reading the real rows rather than a fixture of what they might look like.
   rows: [] as Record<string, unknown>[],
-  insertBankLedgerRow: vi.fn(async (row: Record<string, unknown>) => {
+  appendLedgerRow: vi.fn((row: Record<string, unknown>) => {
+    const instanceJson = row.instanceJson;
     dbMock.rows.push({
       id: dbMock.rows.length + 1,
       realm: row.realm,
@@ -38,7 +33,10 @@ const dbMock = vi.hoisted(() => ({
       op: row.op,
       item_id: row.itemId,
       count: row.count,
-      instance: row.instance ?? null,
+      instance:
+        instanceJson === null || instanceJson === undefined
+          ? (row.instance ?? null)
+          : JSON.parse(String(instanceJson)),
       copper_delta: row.copperDelta,
       purchased_slots_after: row.purchasedSlotsAfter,
       container: row.container,
@@ -46,6 +44,38 @@ const dbMock = vi.hoisted(() => ({
       counterparty_copper_delta: row.counterpartyCopperDelta,
       counterparty_count: row.counterpartyCount,
     });
+  }),
+  // Live operations no longer call an insert spy. Materialize only the exact
+  // ledger prefix carried by the mocked character transaction, so audit rows
+  // cannot appear before the matching character and guild-book snapshot saves.
+  // biome-ignore lint/suspicious/noExplicitAny: hoisted DB argument capture
+  commitLedgerEffects: vi.fn((effects: any) => {
+    for (const batch of effects?.batches ?? []) {
+      for (const row of batch.rows) dbMock.appendLedgerRow(row);
+    }
+  }),
+  // biome-ignore lint/suspicious/noExplicitAny: hoisted DB argument capture
+  saveCharacterState: vi.fn(async (...args: any[]) => {
+    dbMock.commitLedgerEffects(args[5]);
+    return true;
+  }),
+  // biome-ignore lint/suspicious/noExplicitAny: hoisted DB argument capture
+  saveCharacterAndGuildBankState: vi.fn(async (...args: any[]) => {
+    dbMock.commitLedgerEffects(args[7]);
+    return true;
+  }),
+  // biome-ignore lint/suspicious/noExplicitAny: hoisted DB argument capture
+  saveCharacterAndMarketState: vi.fn(async (...args: any[]) => {
+    dbMock.commitLedgerEffects(args[9]);
+    return true;
+  }),
+  insertBankLedgerRow: vi.fn(async (row: Record<string, unknown>) => {
+    dbMock.appendLedgerRow(row);
+  }),
+  // The batched sibling records through the same recorder so vault deposit-all
+  // rows land in dbMock.rows with the same id sequence and snake_case shape.
+  insertBankLedgerRows: vi.fn(async (rows: Record<string, unknown>[]) => {
+    for (const row of rows) await dbMock.insertBankLedgerRow(row);
   }),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
 }));
@@ -69,11 +99,14 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
   loadGuildBankRows: dbMock.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   releaseCharacterLease: vi.fn(async () => {}),
@@ -341,10 +374,31 @@ function audit(server: GameServer) {
   });
 }
 
+/** Join the real character FIFO and prove the exact staged prefix travels in
+ *  the same mocked DB call as the final character state and guild delta payload. */
+async function commitQueuedGuildLedger(server: GameServer, session: ClientSession): Promise<void> {
+  const staged = session.bankLedgerJournal.outbox.snapshot();
+  expect(staged.rowCount).toBeGreaterThan(0);
+  const callCount = dbMock.saveCharacterAndGuildBankState.mock.calls.length;
+  await expect(server.saveCharacter(session)).resolves.toBe(true);
+  expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalledTimes(callCount + 1);
+  const call = dbMock.saveCharacterAndGuildBankState.mock.calls.at(-1);
+  expect(call?.[2]).toEqual(server.sim.serializeCharacter(session.pid));
+  expect(call?.[3]).toHaveLength(1);
+  expect(call?.[7]).toEqual({ owner: staged.owner, batches: staged.batches });
+  expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+}
+
 beforeEach(() => {
   guildMemberRows.length = 0;
   dbMock.rows.length = 0;
+  dbMock.appendLedgerRow.mockClear();
+  dbMock.commitLedgerEffects.mockClear();
   dbMock.insertBankLedgerRow.mockClear();
+  dbMock.insertBankLedgerRows.mockClear();
+  dbMock.saveCharacterState.mockClear();
+  dbMock.saveCharacterAndGuildBankState.mockClear();
+  dbMock.saveCharacterAndMarketState.mockClear();
   dbMock.loadGuildBankRows.mockResolvedValue([]);
   setGameMetricsCounters(noopGameMetricsCounters);
 });
@@ -368,7 +422,9 @@ describe('the counterparty side, end to end through the dispatch observer', () =
     );
     dispatch(server, session, { cmd: 'guild_bank_withdraw', slot: bookSlot, count: 1 });
     dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
-    await bankLedgerIdle();
+    expect(ledgerRows()).toEqual([]);
+    expect(session.bankLedgerJournal.outbox.snapshot().batches).toHaveLength(5);
+    await commitQueuedGuildLedger(server, session);
 
     // Every guild row carries BOTH halves, and each one balances.
     const ops = ledgerRows().map((r) => r.op);
@@ -425,7 +481,7 @@ describe('the counterparty side, end to end through the dispatch observer', () =
       meta.copper += 12_345; // the mint: purse up, book untouched
     });
     errSpy.mockRestore();
-    await bankLedgerIdle();
+    await commitQueuedGuildLedger(server, session);
 
     // The op wrote its own anomaly row instead of nothing at all.
     const orphans = ledgerRows().filter((r) => r.op === COUNTERPARTY_ORPHAN_OP);
@@ -495,7 +551,7 @@ describe('the counterparty side, end to end through the dispatch observer', () =
       book.treasury -= 1_000; // the book gave up 1_000 ...
       meta.copper += 4_000; // ... and the purse received 4_000
     });
-    await bankLedgerIdle();
+    await commitQueuedGuildLedger(server, session);
 
     const row = ledgerRows().find((r) => r.op === 'withdraw_gold');
     expect(row).toMatchObject({ copper_delta: -1_000, counterparty_copper_delta: 4_000 });
@@ -538,7 +594,7 @@ describe('the counterparty side, end to end through the dispatch observer', () =
       book.inventory[0].count -= 1; // the book lost one ...
       server.sim.addItem('wolf_fang', 3, session.pid, { silent: true }); // ... bags gained three
     });
-    await bankLedgerIdle();
+    await commitQueuedGuildLedger(server, session);
 
     const row = ledgerRows().find((r) => r.op === 'withdraw');
     expect(row).toMatchObject({ count: 1, counterparty_count: 3 });
@@ -570,7 +626,8 @@ describe('the counterparty side, end to end through the dispatch observer', () =
     const result = await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', 4242);
     warnSpy.mockRestore();
     expect(result.ok).toBe(true);
-    await bankLedgerIdle();
+    expect(dbMock.commitLedgerEffects).toHaveBeenCalledTimes(1);
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
 
     const row = ledgerRows().find((r) => r.op === 'admin_purge');
     expect(row).toMatchObject({ count: 2, counterparty_count: 0, counterparty_copper_delta: 0 });
@@ -606,7 +663,7 @@ describe('the counterparty side, end to end through the dispatch observer', () =
       server.sim.addItem('copper_ore', 8, session.pid, { silent: true }); // the mint
     });
     errSpy.mockRestore();
-    await bankLedgerIdle();
+    await commitQueuedGuildLedger(server, session);
 
     // The withdraw row itself balances: 1 out of the book, 1 into the bags.
     const withdrawRow = ledgerRows().find((r) => r.op === 'withdraw');

@@ -36,11 +36,14 @@ export function isEnchantReagentItem(itemId: string): boolean {
 }
 
 export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant' | 'lock' | 'unlock';
-export type BagItemContextActionId = 'default' | BagItemNewActionId;
+export type BagItemContextActionId = 'default' | 'sellAll' | BagItemNewActionId;
 
 export interface BagItemContextAction {
   id: BagItemContextActionId;
   labelKey: TranslationKey;
+  /** The row's interpolation count (Sell all's {count}), so the DOM consumer
+   *  knows to pass params to t() instead of rendering the bare template. */
+  count?: number;
 }
 
 const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
@@ -106,6 +109,21 @@ export function bagItemContextActions(
   const rows: BagItemContextAction[] = [{ id: 'default', labelKey: defaultActionLabelKey(def) }];
   for (const id of bagItemNewActions(def, itemId, instance)) {
     rows.push({ id, labelKey: NEW_ACTION_LABEL_KEY[id] });
+  }
+  return rows;
+}
+
+/** The right-click / tap menu at a vendor: the classic default row (relabeled
+ *  Sell, since that is what it runs there, not Use/Equip), plus Sell all (N)
+ *  when more than one copy is held across the bags (one copy is exactly what
+ *  the default row already sells, so the extra row would be redundant).
+ *  Deliberately distinct from bagItemContextActions: a vendor never offers the
+ *  enchanting-profession rows (mirrors itemMenuAvailable's default-mode-only
+ *  gate in bags_window.ts, which already excludes every other special mode). */
+export function vendorSellContextActions(heldCount: number): BagItemContextAction[] {
+  const rows: BagItemContextAction[] = [{ id: 'default', labelKey: 'hudChrome.itemMenu.sell' }];
+  if (heldCount > 1) {
+    rows.push({ id: 'sellAll', labelKey: 'hudChrome.itemMenu.sellAll', count: heldCount });
   }
   return rows;
 }

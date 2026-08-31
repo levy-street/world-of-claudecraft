@@ -161,9 +161,9 @@ function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
 
 describe('standalone world WebSocket auth', () => {
   it('keeps the Node discriminator fresh with the authoritative world layout epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(9);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(25);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-9');
+    expect(SCRIPT_WORLD_AUTH_TYPE).toBe('auth-world-25');
     expect(SCRIPT_WORLD_AUTH_TYPE).toBe(ONLINE_WORLD_AUTH_TYPE);
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_AUTH_TYPE: '${ONLINE_WORLD_AUTH_TYPE}';`,

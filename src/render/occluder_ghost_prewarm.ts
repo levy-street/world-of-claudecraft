@@ -18,7 +18,12 @@
 // is BUILT at boot (the props kits and both rebuilt towns, all created in the
 // Renderer constructor). Hideables built later, notably the dungeon arena walls
 // emitted when an instance interior is built, are not in the scene when the
-// prewarm runs and still pay their first fade on sight.
+// prewarm runs; their first fade goes through the fade gate instead
+// (occluder_fade_gate.ts), which links the twin before the flip, and the raid
+// shells' backface walls stage their twins through the same gate on their
+// first advanced frame (stageOccluderFadeOnce in dungeon_wall_occlusion.ts)
+// and hold their re-show out of the fully hidden state until every twin is
+// ready, so the flip never draws a program the stage has not linked.
 //
 // One twin per distinct PROGRAM, not per ghost material: see
 // occluderGhostVariantKey for why a town of thousands of per-structure clones
@@ -33,117 +38,18 @@
 // linked program this group exists to keep.
 
 import * as THREE from 'three';
-import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { clearOccluderGhostMarker, isOccluderGhostMaterial } from './occluder_fade';
-import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
+import { buildOccluderFadeTwin } from './occluder_fade_gate';
+import {
+  isOccluderGhostMaterial,
+  isOccluderGhostTwin,
+  type OccluderGhostTarget,
+  occluderGhostVariantKey,
+} from './occluder_ghost_variant_key';
 
-/** userData marker on a twin, so a later scan never shadows a shadow. */
-const PREWARM_MARKER = 'wocOccluderGhostPrewarm';
-
-/** One ghost material plus the program-key context of the mesh wearing it. */
-export interface OccluderGhostTarget {
-  material: THREE.Material;
-  geometry: THREE.BufferGeometry;
-  instanced: boolean;
-  instanceColor: boolean;
-}
-
-function isPrewarmTwin(material: THREE.Material): boolean {
-  return (material.userData as { [PREWARM_MARKER]?: boolean })[PREWARM_MARKER] === true;
-}
-
-/**
- * Texture slots three folds into the program cache key. Only PRESENCE and the
- * uv channel matter (`<slot>Uv` in WebGLPrograms.getParameters); which image is
- * bound never does, which is why a whole town of recoloured, re-atlased kit
- * sheets collapses onto a handful of programs.
- */
-const MAP_SLOTS = [
-  'map',
-  'aoMap',
-  'lightMap',
-  'bumpMap',
-  'normalMap',
-  'displacementMap',
-  'emissiveMap',
-  'metalnessMap',
-  'roughnessMap',
-  'anisotropyMap',
-  'clearcoatMap',
-  'clearcoatNormalMap',
-  'clearcoatRoughnessMap',
-  'iridescenceMap',
-  'iridescenceThicknessMap',
-  'sheenColorMap',
-  'sheenRoughnessMap',
-  'specularMap',
-  'specularColorMap',
-  'specularIntensityMap',
-  'transmissionMap',
-  'thicknessMap',
-  'alphaMap',
-  'gradientMap',
-  'matcap',
-  'envMap',
-] as const;
-
-/**
- * The identity of the program a faded twin of `target` would link.
- *
- * The hideable registries clone their materials PER STRUCTURE (a fade must not
- * bleed across buildings), so a town is thousands of ghost materials over a few
- * dozen programs; staging a twin each cost a measured 2.4s of extra boot
- * compile to link 38 of them. This models the inputs three keys on so the group
- * carries one twin per program instead.
- *
- * It errs toward SPLITTING: raw values go in rather than the derived booleans,
- * because an extra twin is one redundant cache hit while a wrong merge silently
- * drops a variant back onto the first live fade.
- */
-export function occluderGhostVariantKey(target: OccluderGhostTarget): string {
-  const material = target.material as THREE.MeshPhysicalMaterial & Record<string, unknown>;
-  const geometry = target.geometry;
-  const parts: unknown[] = [
-    material.type,
-    material.customProgramCacheKey(),
-    JSON.stringify(material.defines ?? null),
-    material.side,
-    material.blending,
-    material.premultipliedAlpha,
-    material.forceSinglePass,
-    material.alphaTest,
-    material.alphaHash,
-    material.alphaToCoverage,
-    material.vertexColors,
-    material.flatShading,
-    material.fog,
-    material.dithering,
-    material.depthPacking,
-    material.combine,
-    material.normalMapType,
-    material.clearcoat,
-    material.iridescence,
-    material.anisotropy,
-    material.transmission,
-    material.sheen,
-    material.dispersion,
-  ];
-  for (const slot of MAP_SLOTS) {
-    const texture = material[slot] as THREE.Texture | null | undefined;
-    parts.push(texture ? `${slot}:${texture.channel ?? 0}:${texture.mapping ?? 0}` : '');
-  }
-  const color = geometry.getAttribute('color');
-  parts.push(
-    geometry.getAttribute('tangent') ? 'tangent' : '',
-    color ? `color${color.itemSize}` : '',
-    geometry.morphAttributes.position?.length ?? 0,
-    geometry.morphAttributes.normal?.length ?? 0,
-    geometry.morphAttributes.color?.length ?? 0,
-    target.instanced ? 'instanced' : '',
-    target.instanceColor ? 'instanceColor' : '',
-  );
-  return parts.join('|');
-}
+// The key model and the twin recipe live in occluder_ghost_variant_key.ts and
+// occluder_fade_gate.ts (the live fade gate mints twins from the same recipe);
+// re-exported here for the callers that learned them under this name.
+export { type OccluderGhostTarget, occluderGhostVariantKey };
 
 /** Every distinct ghost material under `root`, with a representative mesh. */
 export function collectOccluderGhostTargets(root: THREE.Object3D): OccluderGhostTarget[] {
@@ -155,7 +61,7 @@ export function collectOccluderGhostTargets(root: THREE.Object3D): OccluderGhost
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of materials) {
       if (!material || seen.has(material)) continue;
-      if (isPrewarmTwin(material) || !isOccluderGhostMaterial(material)) continue;
+      if (isOccluderGhostTwin(material) || !isOccluderGhostMaterial(material)) continue;
       seen.add(material);
       targets.push({
         material,
@@ -169,28 +75,7 @@ export function collectOccluderGhostTargets(root: THREE.Object3D): OccluderGhost
 }
 
 function buildTwin(target: OccluderGhostTarget): THREE.Mesh {
-  const material = cloneMaterialWithHooks(target.material);
-  material.name = `${target.material.name || target.material.type}:ghost-fade-prewarm`;
-  // Exactly the state applyOccluderFade writes below alpha 1.
-  material.transparent = true;
-  material.depthWrite = true;
-  material.opacity = target.material.opacity * OCCLUDER_FADE_ALPHA;
-  clearOccluderGhostMarker(material);
-  (material.userData as { [PREWARM_MARKER]?: boolean })[PREWARM_MARKER] = true;
-
-  let mesh: THREE.Mesh;
-  if (target.instanced) {
-    const instanced = new THREE.InstancedMesh(target.geometry, material, 1);
-    instanced.setMatrixAt(0, new THREE.Matrix4());
-    if (target.instanceColor) instanced.setColorAt(0, new THREE.Color(1, 1, 1));
-    mesh = instanced;
-  } else {
-    mesh = new THREE.Mesh(target.geometry, material);
-  }
-  mesh.name = material.name;
-  mesh.visible = false;
-  mesh.frustumCulled = false;
-  return mesh;
+  return buildOccluderFadeTwin(target, 'ghost-fade-prewarm');
 }
 
 /**

@@ -16,6 +16,7 @@ vi.mock('../server/db', () => ({
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),

@@ -6,7 +6,10 @@
 // the page (no network), rendered, and the canvas saved as a downscaled JPG.
 //
 // Prereq: bundle the entry first —
-//   npx esbuild scripts/weapon_render_entry.js --bundle --format=iife --outfile=tmp/weapon_render_bundle.js
+//   npx esbuild scripts/weapon_render_entry.js --bundle --format=iife \
+//     --define:import.meta.url='"http://127.0.0.1/"' --outfile=tmp/weapon_render_bundle.js
+// (the define matters: three's KTX2Loader builds URLs from import.meta.url at module
+// load, and the bare iife stub leaves it undefined, which throws before __ready)
 // Run:
 //   node scripts/render_weapon_icons.mjs [srcDir=tmp/weapon_src] [outDir] [px=128]
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';

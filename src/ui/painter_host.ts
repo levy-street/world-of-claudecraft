@@ -102,7 +102,8 @@ export interface PainterHostWriters {
    * written every frame per slot (Top risk 4); the rendered string still comes from
    * the core's `t()` call each frame, this only elides the DOM write.
    */
-  setAttr(el: HTMLElement, name: string, value: string): void;
+  /** null removes the attribute (elided like any other value). */
+  setAttr(el: HTMLElement, name: string, value: string | null): void;
 }
 
 /**
@@ -169,6 +170,9 @@ export function shouldWriteSingleSlot(
  * direct writes and the painter writes. No writer composes a key string on any
  * path: an elided frame allocates nothing.
  */
+// Cache sentinel for a removed attribute; no real attribute value can be it.
+const ATTR_REMOVED = '\u0000';
+
 export function makeWriterFacet(
   cache: SingleSlotCache,
   stylePropCache: WeakMap<HTMLElement, Map<string, string>>,
@@ -227,7 +231,10 @@ export function makeWriterFacet(
       if (shouldWriteSlot(classCache, el, cls, on ? 'on' : 'off')) el.classList.toggle(cls, on);
     },
     setAttr: (el, name, value) => {
-      if (shouldWriteSlot(attrCache, el, name, value)) el.setAttribute(name, value);
+      if (shouldWriteSlot(attrCache, el, name, value === null ? ATTR_REMOVED : value)) {
+        if (value === null) el.removeAttribute(name);
+        else el.setAttribute(name, value);
+      }
     },
   };
 }

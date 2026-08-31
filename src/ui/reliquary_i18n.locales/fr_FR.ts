@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Anneaux de Faille',
     desc: "Les anneaux de Faille personnels, frappés pour chaque champion du groupe qui remporte la première conquête d'une Faille classée. Un personnage ne peut jamais détenir que le sien.",
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Butins épiques de Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Héroïque : Crucible of the Last Spring',
+    desc: 'Armes exclusives au mode héroïque de Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Butins épiques de Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Héroïque : The Inner Crucible',
+    desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Forgefather of the Last Flame.',
+  },
 };

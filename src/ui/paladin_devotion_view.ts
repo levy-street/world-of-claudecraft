@@ -1,3 +1,4 @@
+import { MAX_ASCENSION_CHARGES } from '../sim/paladin_devotion';
 import type { Entity } from '../sim/types';
 
 export interface PaladinDevotionState {
@@ -46,7 +47,7 @@ export function createPaladinDevotionView(
         (devotion?.ascensionCharges ?? 0) > 0 && (devotion?.ascensionRemaining ?? 0) > 0;
       state.ready = state.value >= 20 && !state.ascended;
       state.charges = state.ascended
-        ? Math.max(0, Math.min(5, devotion?.ascensionCharges ?? 0))
+        ? Math.max(0, Math.min(MAX_ASCENSION_CHARGES, devotion?.ascensionCharges ?? 0))
         : 0;
       state.lastCharge = state.ascended && state.charges === 1;
       const valueLabel = formatCount(state.value);

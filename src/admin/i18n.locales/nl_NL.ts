@@ -311,6 +311,8 @@ export const nl_NL: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Beperkte verzoeken portemonnee-uitdaging',
   'usage.metric.walletLinkRequest': 'Verzoeken portemonnee-koppeling',
   'usage.metric.walletLinkFailure': 'Mislukte portemonnee-koppelingen',
+  'usage.metric.walletUnlinkFailure': 'Geweigerde portemonnee-ontkoppelingen',
+  'usage.metric.walletUnlinkSuccess': 'Voltooide portemonnee-ontkoppelingen',
   'usage.metric.walletLinkRateLimited': 'Beperkte verzoeken portemonnee-koppeling',
   'usage.metric.cardPublishRequest': 'Publicatieverzoeken spelerskaart',
   'usage.metric.cardPublishRejected': 'Geweigerde publicaties spelerskaart',
@@ -1175,4 +1177,8 @@ export const nl_NL: Record<string, string> = {
   'wealth.purse': 'Over karakters:',
   'wealth.total': 'Totaal:',
   'wealth.updatedAt': 'bijgewerkt {when}',
+  // nl_NL release i18n fill (autoFillable batch).
+  'usage.metric.walletHandoffAuthorizationEvicted':
+    'Verwijderde autorisaties voor desktop-portemonnee-overdracht',
+  'usage.metric.walletHandoffCreateRejected': 'Geweigerde desktop-portemonnee-overdrachten',
 };

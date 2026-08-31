@@ -30,6 +30,9 @@ interface DoomMeterMover {
 export interface DoomMeterMovement {
   detachedParent: HTMLElement;
   isMobileLayout(): boolean;
+  /** The arrange-mode Snap to Grid read, threaded into the mover's config
+   *  like every other MovableFrame's. Absent means never snap. */
+  snapToGrid?(): boolean;
   createMover?(config: MovableFrameConfig): DoomMeterMover;
 }
 
@@ -95,6 +98,7 @@ export function createDoomMeter(
         draggingBodyClass: 'warlock-doom-frame-dragging',
         fallbackSize: { w: 300, h: 48 },
         isMobileLayout: movement.isMobileLayout,
+        snapToGrid: movement.snapToGrid,
         onPositioned(active): void {
           frame.classList.toggle('doom-detached', active);
           if (active) {

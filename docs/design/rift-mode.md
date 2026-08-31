@@ -105,6 +105,15 @@ save/load and wire round-trips, and are rebuilt from bounded inputs at load rath
 than trusted from JSONB. Gear can be upgraded, enchanted, socketed, unequipped
 without losing its payload, or salvaged back into power-scaled Rift Essence.
 
+Rift Essence and the rank-dependent gems are plain, freely tradeable forge
+currency: tradeable in person, mailable, and listable on the World Market and the
+guild bank, like any other crafting material. This is deliberate, not an
+oversight: unlike the three first-clear Riftbound rings (owner-bound personal
+reward gear, `RIFT_GEAR_ITEM_IDS`), the currency is boss loot bound by the
+ranked portal spawn cadence, never a re-grantable faucet, so closing its market
+and mail routes (the way a re-grantable faucet or a store SKU is closed
+elsewhere in the item catalog) has no exploit to guard against.
+
 The forge (upgrade, enchant, socket) has no shipped client UI yet, so the
 authoritative server refuses its three wire commands unless the realm opts in
 with RIFT_FORGE_ENABLED=1 (server/rift_forge_gate.ts, pinned by

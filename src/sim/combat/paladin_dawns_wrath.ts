@@ -1,3 +1,4 @@
+import { setBonusFlag, ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT } from '../content/ignivar_set_bonuses';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
@@ -37,6 +38,18 @@ function emitFade(ctx: SimContext, p: Entity, aura: Aura): void {
   });
 }
 
+// Zealfire 4pc: the wearer's Hammer strikes 40 percent harder (base 20). The
+// mult is baked into the aura VALUE at grant, the ONE source both the consume
+// in applyDawnsWrathOverride and the HUD's dynamic {pct} print read, so the
+// displayed number is honest for every wearer. Snapshot at grant: a gear swap
+// mid-aura keeps the granted value until the next proc.
+function dawnsWrathDamageMultFor(ctx: SimContext, p: Entity): number {
+  const meta: PlayerMeta | undefined = p.kind === 'player' ? ctx.players.get(p.id) : undefined;
+  return meta !== undefined && ctx.playerMods(meta).selected[setBonusFlag('zealfire', 4)] === true
+    ? ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT
+    : DAWNS_WRATH_DAMAGE_MULT;
+}
+
 export function grantDawnsWrath(ctx: SimContext, p: Entity): void {
   ctx.applyAura(p, {
     id: DAWNS_WRATH_ID,
@@ -44,7 +57,7 @@ export function grantDawnsWrath(ctx: SimContext, p: Entity): void {
     kind: DAWNS_WRATH_KIND,
     remaining: DAWNS_WRATH_DURATION,
     duration: DAWNS_WRATH_DURATION,
-    value: DAWNS_WRATH_DAMAGE_MULT - 1,
+    value: dawnsWrathDamageMultFor(ctx, p) - 1,
     sourceId: p.id,
     school: 'holy',
   });
@@ -83,7 +96,12 @@ export function applyDawnsWrathOverride(
       effect.type === 'directDamage'
         ? {
             ...effect,
-            damageMult: (effect.damageMult ?? 1) * DAWNS_WRATH_DAMAGE_MULT,
+            // Read the mult back from the CONSUMED aura (baked at grant),
+            // never the constant, so the engine applies exactly the number
+            // the aura tooltip promised (Zealfire 4pc wearers carry 0.4).
+            // Multiplicative with Ascension's 1.3 empower (1.82 total for
+            // wearers), disclosed by the set doc.
+            damageMult: (effect.damageMult ?? 1) * (1 + aura.value),
           }
         : effect,
     ),

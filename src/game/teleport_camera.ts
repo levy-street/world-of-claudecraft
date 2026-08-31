@@ -1,5 +1,6 @@
-// Snap the chase camera behind a teleported player, SCOPED to the Proving
-// Shore's ferry crossings.
+// Snap the chase camera behind a teleported player for authored arrivals that
+// also set the character's heading: Proving Shore ferry crossings and dungeon
+// entries.
 //
 // A walked frame moves the player a fraction of a yard and the camera yaw is
 // the player's own business. The ferry TELEPORT sets the player down facing
@@ -9,13 +10,11 @@
 // player staring at open sea. Snapping the yaw to the landed facing shows
 // them exactly what the landing meant them to see.
 //
-// The scoping is deliberate (PR #3467 review, finding 6): every OTHER
-// teleport in the game (portals, dungeon doors, hearthstone, graveyard
-// release) has always kept the player's camera where they left it, and
-// re-aiming all of them is a global feel change, not a tutorial one. So the
-// snap fires only when the displacement touches the island rectangle on
-// either end, which is exactly the two ferry rides. Widening it is its own
-// change with its own tests.
+// The dungeon entry arm is deliberate: enterDungeon resets facing to 0, but a
+// stale camera yaw in Mouse Camera mode is streamed back as authoritative
+// facing on the next input frame. Snapping before input is sampled keeps the
+// client aligned with the shared sim entry heading. Dungeon exits, portals,
+// hearthstones, and graveyard releases still preserve camera yaw.
 //
 // The teleport test reuses zone_transition.ts's displacement classifier: the
 // same per-frame threshold that decides a blocking loading screen decides a
@@ -25,11 +24,13 @@
 // measures per-frame displacement for zone warmup) applies the returned yaw.
 
 import { isOnProvingShore } from '../sim/content/proving_shore';
+import { isDungeonEntryTransition } from '../sim/data';
+import { type KeyboardTurnState, newKeyboardTurnState } from './keyboard_turn_facing';
 import { TELEPORT_DISPLACEMENT_YD } from './zone_transition';
 
 /** The camera yaw to use this frame: the player's landed facing after a
  *  teleport-scale displacement, the current yaw otherwise. Unscoped core,
- *  exported for tests; live callers go through islandTeleportCameraYaw. */
+ *  exported for focused policy tests. */
 export function teleportCameraYaw(
   displacementYd: number,
   landedFacing: number,
@@ -53,7 +54,7 @@ export function isIslandFerryTeleport(
   return isOnProvingShore(fromX, fromZ) || isOnProvingShore(toX, toZ);
 }
 
-/** The live entry point: the snap decision plus the ferry scoping. A
+/** Ferry-only snap policy retained for focused ferry tests. A
  *  displacement that neither starts nor ends on the Proving Shore keeps the
  *  current yaw no matter its size. */
 export function islandTeleportCameraYaw(
@@ -67,4 +68,91 @@ export function islandTeleportCameraYaw(
 ): number {
   if (!isIslandFerryTeleport(fromX, fromZ, toX, toZ, displacementYd)) return currentYaw;
   return landedFacing;
+}
+
+/** True when a teleport-scale displacement crosses into a different dungeon
+ *  definition. This covers overworld doors and internal raid-room gates while
+ *  leaving dungeon exits and unrelated teleports alone. */
+export function isDungeonEntryTeleport(
+  fromX: number,
+  toX: number,
+  displacementYd: number,
+): boolean {
+  if (displacementYd <= TELEPORT_DISPLACEMENT_YD) return false;
+  return isDungeonEntryTransition(fromX, toX);
+}
+
+export type TeleportCameraArrival = 'ferry' | 'dungeon' | null;
+
+export interface TeleportCameraFacingState {
+  camYaw: number;
+  lastInterpFacing: number | null;
+  pendingReleaseFacing: number | null;
+  prevCameraDrivenFacing: boolean;
+  keyboardTurn: KeyboardTurnState;
+}
+
+export interface TeleportCameraFacingUpdate extends TeleportCameraFacingState {
+  movementFacing: number;
+}
+
+/** Aligns every client-side heading owner before held movement is sampled. */
+export function teleportCameraFacingState(
+  arrival: Exclude<TeleportCameraArrival, null>,
+  landedFacing: number,
+  current: TeleportCameraFacingState,
+): TeleportCameraFacingUpdate {
+  if (arrival === 'ferry') {
+    return {
+      ...current,
+      camYaw: landedFacing,
+      keyboardTurn: { ...current.keyboardTurn },
+      movementFacing: landedFacing,
+    };
+  }
+  return {
+    camYaw: landedFacing,
+    lastInterpFacing: landedFacing,
+    pendingReleaseFacing: null,
+    prevCameraDrivenFacing: false,
+    keyboardTurn: newKeyboardTurnState(),
+    movementFacing: landedFacing,
+  };
+}
+
+/** Allocation-free arrival classification for the per-frame main loop. */
+export function teleportCameraArrivalKind(
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+  displacementYd: number,
+): TeleportCameraArrival {
+  if (isDungeonEntryTeleport(fromX, toX, displacementYd)) return 'dungeon';
+  if (isIslandFerryTeleport(fromX, fromZ, toX, toZ, displacementYd)) return 'ferry';
+  return null;
+}
+
+/** Classifies one completed simulation tick from its before and after poses. */
+export function teleportCameraArrivalBetween(
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+): TeleportCameraArrival {
+  return teleportCameraArrivalKind(fromX, fromZ, toX, toZ, Math.hypot(toX - fromX, toZ - fromZ));
+}
+
+/** Uses the sim entry generation so same-position and same-room entries count. */
+export function teleportCameraArrivalAfterTick(
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+  beforeEntrySeq: number,
+  afterEntrySeq: number,
+): TeleportCameraArrival {
+  return afterEntrySeq !== beforeEntrySeq
+    ? 'dungeon'
+    : teleportCameraArrivalBetween(fromX, fromZ, toX, toZ);
 }

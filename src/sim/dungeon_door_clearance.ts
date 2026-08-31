@@ -23,6 +23,11 @@ export const DUNGEON_DOORS: ReadonlyArray<{ x: number; z: number }> = (() => {
   const seen = new Set<string>();
   const doors: { x: number; z: number }[] = [];
   for (const d of Object.values(DUNGEONS)) {
+    // A room reached only through internal instance doors (overworldDoor:
+    // false, e.g. the Ignivar raid wings) has no surface door to keep clear;
+    // its placeholder doorPos must not carve a ring into the open world.
+    // Same skip as the ctor's entrance loop and colliders.ts.
+    if (d.overworldDoor === false) continue;
     const door = d.doorPos;
     if (!door) continue;
     const key = `${door.x},${door.z}`;

@@ -6,6 +6,7 @@ import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { replaceResolvedAbility } from './action_replacement';
 import { livingGroupRaidInRadius } from './group_targeting';
+import { coldsightLongDrawCritExtensionSec } from './hunter_coldsight';
 
 const APEX_ID = 'hunter_apex_instinct';
 const EFFICIENT_PROGRESS_ID = 'hunter_efficient_rhythm_progress';
@@ -371,8 +372,21 @@ export function onHunterPrimaryDamage(
   target: Entity,
   res: ResolvedAbility,
   dealt: number,
+  crit = false,
 ): void {
   if (dealt <= 0 || !isFocusSpender(res.def.id)) return;
+  // Coldsight 4pc: observe the shared block's already-rolled crit (the one
+  // plumbed argument) and extend the Cold Focus window; Apex Instinct
+  // re-derives alongside, preserving the window + 4 relationship
+  // activateHunterMajorWindow established. No rng is drawn here.
+  const coldsightExtension = coldsightLongDrawCritExtensionSec(ctx, hunter, res.def.id, crit);
+  if (coldsightExtension > 0) {
+    const apex = hunter.auras.find((aura) => aura.id === APEX_ID);
+    if (apex) {
+      apex.remaining += coldsightExtension;
+      apex.duration += coldsightExtension;
+    }
+  }
   const multiplier = (res.hunterApex ? 1.2 : 1) * (res.hunterOverdraw ? 1.35 : 1);
   const bonus = Math.max(0, Math.round(dealt * (multiplier - 1)));
   if (bonus > 0) {

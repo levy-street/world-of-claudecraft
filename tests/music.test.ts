@@ -614,6 +614,22 @@ describe('world music zone selection', () => {
       'dungeon_hollow_crypt',
     );
   });
+
+  it('maps every Ignivar raid room to its authored ambient composition', () => {
+    const rooms = [
+      { id: 'ignivar_forge_approach', zone: 'ignivar_forge_approach' },
+      { id: 'ignivar_raid_arena', zone: 'ignivar_raid_arena' },
+      { id: 'ignivar_molten_assembly', zone: 'ignivar_forge_approach' },
+      { id: 'ignivar_inner_crucible', zone: 'ignivar_inner_crucible' },
+    ] as const;
+    const themes = buildMusicThemes();
+
+    for (const room of rooms) {
+      expect(dungeonMusicZoneForDungeon(room.id)).toBe(room.zone);
+      expect(musicZoneForLocation('custom', 'ember', false, true, room.id)).toBe(room.zone);
+      expect(themes[room.zone]).toBeDefined();
+    }
+  });
 });
 
 describe('rift crawl selection', () => {

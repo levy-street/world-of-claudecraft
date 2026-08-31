@@ -381,16 +381,18 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keys).toContain('touchInvertLook');
     expect(keys).toContain('mobileCameraJoystick');
     expect(keys).toContain('leftHandedTouch');
+    expect(keys).toContain('touchPreciseGroundAim');
     // touchLookSpeed sits right after cameraSpeed
     expect(keys[keys.indexOf('cameraSpeed') + 1]).toBe('touchLookSpeed');
-    // mobileCameraJoystick and leftHandedTouch are the last two touch-only rows,
-    // right after touchInvertLook, in that order.
+    // The boolean touch rows follow touchInvertLook in their rendered order.
     const touchInvertIdx = keys.indexOf('touchInvertLook');
     expect(keys[touchInvertIdx + 1]).toBe('mobileCameraJoystick');
     expect(keys[touchInvertIdx + 2]).toBe('leftHandedTouch');
+    expect(keys[touchInvertIdx + 3]).toBe('touchPreciseGroundAim');
+    expect(keys[touchInvertIdx + 4]).toBe('note:hudChrome.options.touchPreciseAimNote');
   });
 
-  it('hides mobileCameraJoystick and leftHandedTouch on a desktop interface', () => {
+  it('hides mobile touch toggles on a desktop interface', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
       touch: false,
       nativeShell: false,
@@ -398,13 +400,18 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     const keys = keysOf(controls);
     expect(keys).not.toContain('mobileCameraJoystick');
     expect(keys).not.toContain('leftHandedTouch');
+    expect(keys).not.toContain('touchPreciseGroundAim');
+    expect(keys).not.toContain('note:hudChrome.options.touchPreciseAimNote');
   });
 
-  it('gives mobileCameraJoystick and leftHandedTouch their correct i18n keys', () => {
-    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
-      touch: true,
-      nativeShell: false,
-    });
+  it('gives mobile touch toggles their correct i18n keys', () => {
+    const controls = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4 }, { touchPreciseGroundAim: true }),
+      {
+        touch: true,
+        nativeShell: false,
+      },
+    );
     expect(find(controls, 'mobileCameraJoystick')).toMatchObject({
       control: 'boolToggle',
       labelKey: 'hudChrome.options.mobileCameraJoystick',
@@ -412,6 +419,11 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(find(controls, 'leftHandedTouch')).toMatchObject({
       control: 'boolToggle',
       labelKey: 'hudChrome.options.mobileLeftHanded',
+    });
+    expect(find(controls, 'touchPreciseGroundAim')).toMatchObject({
+      control: 'boolToggle',
+      labelKey: 'hudChrome.options.touchPreciseAim',
+      on: true,
     });
   });
 });
@@ -451,6 +463,7 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
     expect(find(controls, 'gamepadGlyphStyle')).toMatchObject({
@@ -467,6 +480,10 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
     expect(find(controls, 'gamepadEnabled')).toMatchObject({ control: 'boolToggle' });
     // camera speed renders with a one-decimal readout, not a percent
     expect(find(controls, 'gamepadCameraSpeed')).toMatchObject({
+      control: 'slider',
+      fmt: 'oneDecimal',
+    });
+    expect(find(controls, 'gamepadReticleSpeed')).toMatchObject({
       control: 'slider',
       fmt: 'oneDecimal',
     });
@@ -489,6 +506,7 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
   });
@@ -523,7 +541,6 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
 // interfaceControlsForTab(all, tab) must return exactly these, in order; the
 // concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
 const GENERAL_KEYS = [
-  'uiScale',
   'hudOpacity',
   'tooltipScale',
   'frostedPanels',
@@ -540,16 +557,14 @@ const GENERAL_KEYS = [
   'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
+  'confirmVendorSell',
+  'note:hudChrome.options.confirmVendorSellNote',
 ];
 const FRAMES_KEYS = [
-  'playerFrameScale',
-  'targetFrameScale',
   'partyFrameStyle',
-  'partyFrameScale',
-  'partyFrameWidth',
-  'partyFrameHeight',
-  'partyFrameSpacing',
-  'partyFrameColumns',
+  // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
+  // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
+  // Settings dropdown.
   'partyFrameHealthText',
   'partyFrameSort',
   'partyFrameShowResource',
@@ -558,7 +573,9 @@ const FRAMES_KEYS = [
   'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
+  'alwaysShowAllBuffs',
   'showTargetOfTarget',
+  'showTargetSwingTimer',
   'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
@@ -568,13 +585,8 @@ const COMBAT_KEYS = [
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',
-  'mouseoverCast',
   'stickyTarget',
   'fctScale',
-  'showSecondaryActionBar',
-  'showThirdActionBar',
-  'hideUnusedActionSlots',
-  'lockActionBars',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,
@@ -630,6 +642,15 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     });
   });
 
+  it('renders NO menu rows for the optional action bars (the on-bar toggle owns them)', () => {
+    // The plus/minus buttons on the primary action bar are the one control for
+    // the secondary/third rows; duplicate checkboxes here would fight them.
+    // The settings and the main.ts dependency resolver are unchanged.
+    const all = buildInterfaceControls(makeSource());
+    expect(find(all, 'showSecondaryActionBar')).toBeUndefined();
+    expect(find(all, 'showThirdActionBar')).toBeUndefined();
+  });
+
   it('appends the desktop GPU row + note ONLY with the bridge capability', () => {
     // With the capability: the row and its next-launch note close the General
     // tab, leaving every other row exactly where it was.
@@ -646,11 +667,14 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       labelKey: 'hudChrome.options.forceHighPerfGpu',
     });
     expect(desktop.filter((c) => c.control === 'note')).toEqual([
+      { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
     ]);
 
-    // Without it: the exact pre-existing list, with no row and no note at all.
-    // A plain browser and a mobile Capacitor shell both land here.
+    // Without it: the exact pre-existing list, with no GPU-preference row or
+    // note (the keysOf equality below already pins the whole set exactly,
+    // confirmVendorSellNote included since it is unconditional). A plain
+    // browser and a mobile Capacitor shell both land here.
     for (const env of [undefined, WEB_ENV, { touch: true, nativeShell: true }]) {
       const withoutCapability = buildInterfaceControls(makeSource(), env);
       expect(keysOf(withoutCapability)).toEqual([
@@ -661,7 +685,6 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       ]);
       expect(find(withoutCapability, 'forceHighPerfGpu')).toBeUndefined();
       expect(find(withoutCapability, 'discordPresence')).toBeUndefined();
-      expect(withoutCapability.some((c) => c.control === 'note')).toBe(false);
     }
 
     // nativeShell alone never reveals it, and the capability alone always does:
@@ -770,27 +793,14 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
-  it('enables the third action-bar toggle only while the secondary row is visible', () => {
-    const hidden = buildInterfaceControls(makeSource());
-    expect(find(hidden, 'showSecondaryActionBar')).toMatchObject({
-      control: 'boolToggle',
-      rerender: true,
-    });
-    expect(find(hidden, 'showThirdActionBar')).toMatchObject({
-      control: 'boolToggle',
-      disabled: true,
-    });
-
-    const visible = buildInterfaceControls(makeSource({}, { showSecondaryActionBar: true }));
-    expect(find(visible, 'showThirdActionBar')).toMatchObject({ disabled: false });
-  });
-
-  it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
+  it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
     const controls = buildInterfaceControls(makeSource());
-    // uiScale rescales the whole UI (window included), so it must apply on release.
-    expect(find(controls, 'uiScale')).toMatchObject({ control: 'slider', commitOnChange: true });
+    // The UI Scale slider is retired from the menu: the stored setting still
+    // applies at boot and the General tab's Reset to Defaults still clears it
+    // (renderInterface's off-menu key list).
+    expect(find(controls, 'uiScale')).toBeUndefined();
     // Sibling sliders keep their live preview (no commitOnChange flag).
-    expect(find(controls, 'playerFrameScale')).not.toHaveProperty('commitOnChange');
+    expect(find(controls, 'chatFontScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'fctScale')).not.toHaveProperty('commitOnChange');
   });
@@ -883,28 +893,24 @@ describe('options_view: interface tab taxonomy', () => {
     });
   });
 
-  it('keeps the dependent action-bar toggles together in the combat tab', () => {
-    // showThirdActionBar's disabled state depends on showSecondaryActionBar, so
-    // both must sit in the same tab or the dependency would span a tab boundary.
+  it('renders NO menu rows for the settings the Frames Settings dropdown owns', () => {
+    // combineActionBars / hideUnusedActionSlots / mouseoverCast /
+    // lockActionBars moved into the edit mode's Frames Settings dropdown
+    // (interface_unlock.ts settingToggles); a duplicate row here would drift
+    // out of sync with it. The frame-scale sliders are likewise gone: Edit
+    // Frames resizes each frame directly. The settings keys all remain.
     const all = buildInterfaceControls(makeSource());
-    expect(find(all, 'showSecondaryActionBar')?.category).toBe('combat');
-    expect(find(all, 'showThirdActionBar')?.category).toBe('combat');
-  });
-
-  // Issue 2429: the "Hide Unused Action Slots" toggle sits in the combat tab
-  // alongside the other action-bar controls, unconditionally enabled (unlike
-  // showThirdActionBar it has no dependency on another toggle).
-  it('renders the hide-unused-action-slots toggle in the combat tab, reflecting the stored value', () => {
-    const off = buildInterfaceControls(makeSource());
-    expect(find(off, 'hideUnusedActionSlots')).toMatchObject({
-      control: 'boolToggle',
-      category: 'combat',
-      labelKey: 'hudChrome.options.hideUnusedActionSlots',
-      on: false,
-    });
-
-    const on = buildInterfaceControls(makeSource({}, { hideUnusedActionSlots: true }));
-    expect(find(on, 'hideUnusedActionSlots')).toMatchObject({ on: true });
+    for (const key of [
+      'combineActionBars',
+      'hideUnusedActionSlots',
+      'mouseoverCast',
+      'lockActionBars',
+      'playerFrameScale',
+      'targetFrameScale',
+      'partyFrameScale',
+    ]) {
+      expect(find(all, key), `${key} should have no options row`).toBeUndefined();
+    }
   });
 });
 

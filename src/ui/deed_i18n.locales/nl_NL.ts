@@ -1049,4 +1049,33 @@ export const table: DeedLocaleTable = {
     desc: 'Verlucht de bladzijde Heroïsch: Grafwurm-Heiligdom van Het Reliquarium.',
     title: 'Licht van het Heiligdom',
   },
+  soc_strongbox_outfitter: {
+    name: 'Het Eerste Vak',
+    desc: 'Ontgrendel je eerste banktasvak.',
+  },
+  soc_four_bags_deep: {
+    name: 'Alle Vier de Vakken',
+    desc: 'Ontgrendel alle vier de banktasvakken.',
+  },
+  dgn_ignivar: {
+    name: 'De Heraut Valt',
+    desc: 'Versla Ignivar, Herald of the Last Flame, in de Crucible of the Last Spring.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroïsch: De Heraut Valt',
+    desc: 'Versla Ignivar, Herald of the Last Flame, op Heroïsche moeilijkheidsgraad.',
+  },
+  dgn_varkhul: {
+    name: 'De Smidse Koelt Af',
+    desc: 'Versla Varkhul, Forgefather of the Last Flame, in de Inner Crucible.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroïsch: De Smidse Koelt Af',
+    desc: 'Versla Varkhul, Forgefather of the Last Flame, op Heroïsche moeilijkheidsgraad.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Geen Sintel Verloren',
+    desc: 'Versla Varkhul, Forgefather of the Last Flame, op Heroïsche moeilijkheidsgraad zonder dat één raider sterft.',
+    title: 'de Ongeschondene',
+  },
 };

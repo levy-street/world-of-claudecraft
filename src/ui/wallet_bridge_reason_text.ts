@@ -81,6 +81,9 @@ export const WALLET_BRIDGE_MESSAGE_REASONS: Readonly<Record<string, WalletBridge
   'native wallet returned no signature': 'bad_response',
   'native wallet returned no transaction signature': 'bad_response',
   'wallet returned an invalid transaction authorization': 'bad_response',
+  // The Exchange signers' desktop arm (src/game/woc_market_wiring.ts): the
+  // handoff answered a result of the wrong kind for the step-up signer.
+  'wallet returned an invalid step-up authorization': 'bad_response',
 };
 
 const REASON_KEYS: Readonly<Record<Exclude<WalletBridgeReason, 'unknown'>, TranslationKey>> = {

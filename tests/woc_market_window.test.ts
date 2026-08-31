@@ -986,8 +986,12 @@ describe('woc_market_window: listing requires the wallet step-up (B6/R1)', () =>
       'private async payBond(',
     );
     const iChallenge = submit.indexOf('client.stepUpChallenge({');
-    const iSign = submit.indexOf('hooks.signMessageBase58(issued.challenge.message)');
+    const iSign = submit.indexOf('hooks.signMessageBase58(');
     const iCreate = submit.indexOf('client.createListing({');
+    // The signer receives the SERVER message and the challenge nonce (the
+    // desktop arm resolves the server-stored message by that nonce).
+    expect(submit).toContain('issued.challenge.message,');
+    expect(submit).toContain('issued.challenge.nonce,');
     expect(iChallenge, 'the challenge mint').toBeGreaterThanOrEqual(0);
     expect(iSign, 'the wallet signs the server message, never client text').toBeGreaterThan(
       iChallenge,
@@ -1366,12 +1370,12 @@ describe('woc_market_window: the quote countdown actually moves', () => {
     expect(render).toContain('this.quoteCountdownSig()');
   });
 
-  it('keys on SECONDS, matching the resolution the countdown is displayed at', () => {
-    // A finer key would rebuild many times per second for an unchanged string.
+  it('keys through the view core on the WINDOW clock, from the pending quote alone', () => {
+    // The arithmetic (seconds, empty with no deadline) lives in the pure core and
+    // is pinned behaviorally in tests/woc_market_view.test.ts; the window's part
+    // is to feed it its own pending quote and the wall clock it owns.
     const sig = between('private quoteCountdownSig()', '/** Language fan-out arm');
-    expect(sig).toContain('/ 1000');
-    // And no pending quote means no key at all, so an idle window still rests.
-    expect(sig).toContain("return ''");
+    expect(sig).toContain('wocQuoteCountdownSig(this.pendingQuote?.quote.expiresAtMs, Date.now())');
   });
 });
 

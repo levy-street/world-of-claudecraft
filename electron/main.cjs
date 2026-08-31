@@ -65,6 +65,8 @@ const {
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
+const { registerLinuxUrlHandler } = require('./linux_url_handler.cjs');
+const { allowGpuUnderSteamOverlay } = require('./steam_overlay_guard.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
 const {
@@ -229,6 +231,14 @@ if (gpuForceDisabledByEnv) {
 } else {
   forceHighPerformanceGpu({ app, log });
 }
+
+// Steam preloads its overlay into every native Linux game, and with that library mapped
+// Chromium's GPU process cannot start: the browser process gives up with a CHECK and the app
+// dies on SIGTRAP with no window and no log, which is the launching spinner that never ends.
+// Relaxing the GPU sandbox is enough and is the narrowest fix; the renderer stays sandboxed.
+// Applies ONLY when Steam actually injected, so an ordinary launch keeps the full sandbox.
+// Must be before app 'ready', like the switches above, or Chromium never reads it.
+allowGpuUnderSteamOverlay({ app, log });
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'
@@ -949,6 +959,16 @@ ipcMain.handle('desktop-wallet-capability', (event) => {
   return walletConnectionSupported(desktopConfig);
 });
 
+// The $WOC Exchange may attach only in the website-distributed shell. Steam
+// and Epic builds, and any build without an explicit website stamp, answer
+// false so no Exchange UI exists there at all (desktop_config.cjs owns the
+// decision; the renderer gate in src/game/woc_market_wiring.ts fails closed
+// on a false, missing, or failing answer).
+ipcMain.handle('desktop-exchange-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return desktopConfig.wocExchangeEnabled === true;
+});
+
 ipcMain.handle('desktop-login-open-browser', (event) => {
   if (!trustedSender(event)) return null;
   openDesktopLogin();
@@ -1183,12 +1203,34 @@ ipcMain.on('desktop-renderer-error', (event, payload) => {
   log.error('[renderer]', entry);
 });
 
-if (process.defaultApp) {
-  app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
-    path.resolve(process.argv[1]),
-  ]);
-} else {
-  app.setAsDefaultProtocolClient(deepLinkProtocol);
+// Linux has no OS-level protocol registry to write: the scheme is owned by a .desktop
+// entry, which an AppImage never installs and which Electron's own registration misnames.
+// electron/linux_url_handler.cjs fixes both, and MUST run first so the file and the
+// CHROME_DESKTOP name are in place before setAsDefaultProtocolClient shells out to
+// xdg-settings. No-op on win32/darwin and on every non-AppImage Linux channel.
+const linuxUrlHandler = registerLinuxUrlHandler({ scheme: deepLinkProtocol, log });
+
+// CHROME_DESKTOP is process-wide and inherited by every child, including the browser we open
+// for the Discord login itself. It exists only for the registration below, so the restore runs
+// in a finally: a throw from setAsDefaultProtocolClient would otherwise leave our app identity
+// set for every child, which is the exact outcome the module documents as the reason to
+// restore it. No-op on win32/darwin, and when nothing was set.
+try {
+  if (process.defaultApp) {
+    app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  } else {
+    app.setAsDefaultProtocolClient(deepLinkProtocol);
+  }
+} finally {
+  linuxUrlHandler.restore();
+  // AFTER setAsDefaultProtocolClient, never alongside it. Electron's Linux path shells out to
+  // xdg-settings, which runs `xdg-mime default` itself against the same unlocked file, and a
+  // torn read there makes it restore the ORIGINAL association and fail: exactly the broken
+  // state this is meant to fix. Ours stays as the fallback for when Electron's registration
+  // does not take.
+  linuxUrlHandler.associate();
 }
 
 const singleInstance = app.requestSingleInstanceLock();
@@ -1291,6 +1333,10 @@ app.whenReady().then(() => {
     distribution: desktopConfig.distribution,
     updaterEnabled: desktopConfig.updaterEnabled,
     updateChannel: desktopConfig.updateChannel,
+    // Logged so the per-channel release smoke (docs/desktop-release.md step 6)
+    // has a field to read; on an unstamped packaged build `distribution` says
+    // website (the channel collapse) while this correctly says false.
+    wocExchangeEnabled: desktopConfig.wocExchangeEnabled,
     crashUpload: desktopConfig.crashSubmitUrl !== '',
     crashDumpDir: app.getPath('crashDumps'),
     logFile: logFilePath,

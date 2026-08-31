@@ -25,19 +25,20 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
-import { classifyDiff, diffChangedPaths } from './pr_shot_targets.mjs';
+import { resolveEntryTimeouts } from './lib/pr_shot_entry_opts.mjs';
+import { classifyDiff, diffChangedPaths, resolveMobileViewport } from './pr_shot_targets.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 // Dev-entry load can outlast 60s on a contended machine (SwiftShader plus a
-// cold Vite module graph); NAV_TIMEOUT_MS raises the ceiling without touching
-// the default CI behavior.
-const NAV_TIMEOUT = Number(process.env.NAV_TIMEOUT_MS ?? 60000);
-// The class cards only get their box once the procedural icons have rendered,
-// which on the same contended host outlasts enterOfflineGame's 15s default and
-// fails every target at once with "Waiting for selector ... mini-class" (the
-// helper documents this exact case). Same escape hatch as NAV_TIMEOUT_MS: the
-// default is unchanged, so CI behavior does not move.
-const ENTRY_SELECTOR_TIMEOUT = Number(process.env.ENTRY_SELECTOR_TIMEOUT_MS ?? 15000);
+// cold Vite module graph), and the class cards only get their box once the
+// procedural icons have rendered, which outlasts enterOfflineGame's 15s
+// default and fails every target at once with "Waiting for selector ...
+// mini-class". The two escape hatches, their raise-only interaction, and the
+// fixed 60s selector floor (a LOW NAV_TIMEOUT_MS shortens page loads, never
+// the selector wait) live in lib/pr_shot_entry_opts.mjs (unit-pinned);
+// defaults leave CI untouched.
+const { navTimeoutMs: NAV_TIMEOUT, selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT } =
+  resolveEntryTimeouts(process.env);
 const ENTRY_PROBE_KEY = 'woc_entry_probe';
 const OUT = process.env.SHOTS_DIR ?? 'pr-shots';
 const DIFF_FILE = process.env.DIFF_FILE;
@@ -91,8 +92,14 @@ const browser = await puppeteer.launch({
 // Under swiftshader the class cards get their box only after the procedural
 // icons software-render, and the world boot takes correspondingly longer; the
 // entry helper's defaults are tuned for a GPU host and time out here (its own
-// header says so). One shared override for every entry below.
-const ENTRY_OPTS = { settleMs: 3000, selectorTimeoutMs: 60000, gameBootTimeoutMs: 60000 };
+// header says so). One shared override for every entry below; the resolved
+// selector deadline already honors both escape hatches (see
+// lib/pr_shot_entry_opts.mjs).
+const ENTRY_OPTS = {
+  settleMs: 3000,
+  selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT,
+  gameBootTimeoutMs: 60000,
+};
 
 // Standalone screenshot variants intentionally close a live world page and open
 // another in the same browser profile. v0.40's crash guard correctly treats an
@@ -174,10 +181,11 @@ async function shootSpecific(targets) {
           watch(page, `${t.key}-${variant.key}`);
           await suppressGpuNotice(page);
           if (variant.mobile) {
+            const { width, height } = resolveMobileViewport(variant);
             await page.emulate({
               viewport: {
-                width: 844,
-                height: 390,
+                width,
+                height,
                 isMobile: true,
                 hasTouch: true,
                 deviceScaleFactor: 2,
@@ -189,7 +197,15 @@ async function shootSpecific(targets) {
           // Anything that has to be in place BEFORE the document loads (a request
           // stub via evaluateOnNewDocument, a storage seed).
           await variant.beforeLoad?.(page);
-          await page.goto(URL, { waitUntil: 'networkidle0', timeout: NAV_TIMEOUT });
+          await page.goto(URL, {
+            // Landing-shell captures need the deferred module graph complete,
+            // which DOMContentLoaded guarantees. They intentionally do not
+            // wait for network idleness: the marketing shell polls presence
+            // and project-stat endpoints, so an absent local API otherwise
+            // burns the full navigation timeout before every static UI frame.
+            waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0',
+            timeout: NAV_TIMEOUT,
+          });
           if (variant.mobile)
             await page.evaluate(() => document.body.classList.add('mobile-touch'));
           // A `landing: true` variant shoots the pre-game marketing shell (the home

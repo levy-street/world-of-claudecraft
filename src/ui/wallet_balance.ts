@@ -18,6 +18,23 @@ let connectedAddress: string | null = null;
 let externalSignerAvailable = false;
 let listener: (() => void) | null = null;
 
+/** Orders successful async balance refreshes without letting a failed newer
+ * read suppress an older usable result. */
+export class WocBalanceRefreshOrder {
+  private nextRequest = 0;
+  private latestApplied = 0;
+
+  start(): number {
+    return ++this.nextRequest;
+  }
+
+  claim(request: number): boolean {
+    if (request < this.latestApplied) return false;
+    this.latestApplied = request;
+    return true;
+  }
+}
+
 /** Whether the wallet feature is enabled in this client build. */
 export function walletUiEnabled(): boolean {
   return enabled;

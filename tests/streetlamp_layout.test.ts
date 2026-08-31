@@ -375,6 +375,10 @@ describe('the real world lamp network is deterministic and finite', () => {
   // re-planning here against a warm grid would hand the layout its own posts as
   // obstacles and quietly thin the network under every assertion below.
   const realSites = () => streetlampPlacements(SEED);
+  // The road-relative invariants below cover the planned NETWORK only: the
+  // authored venue lamps (the Forgefather fortress pass) stand off-road by
+  // design and are pinned by their own block further down.
+  const networkSites = () => realSites().filter((site) => !site.authored);
 
   it('lights the whole network, sparsely (waymarkers, not a boulevard)', () => {
     const sites = realSites();
@@ -387,7 +391,7 @@ describe('the real world lamp network is deterministic and finite', () => {
   });
 
   it('stands every post beside the painted road, never on it', () => {
-    for (const site of realSites()) {
+    for (const site of networkSites()) {
       const clear = roadDistance(site.x, site.z);
       expect(clear).toBeGreaterThanOrEqual(3.0);
       expect(clear).toBeLessThanOrEqual(5.6);
@@ -421,17 +425,35 @@ describe('the real world lamp network is deterministic and finite', () => {
     // Junctions, hairpins and roads running in parallel are where a pair of
     // posts used to end up almost touching. The floor holds across the whole
     // network, not just the crossing the unit case builds.
-    expect(closestPair(realSites())).toBeGreaterThanOrEqual(18);
+    expect(closestPair(networkSites())).toBeGreaterThanOrEqual(18);
   });
 
   it('turns every lamp on the network toward the road it lights', () => {
     // The facing yaw is only useful if stepping along it actually approaches
     // the PAINTED track, on meandering real roads rather than a test chord.
-    for (const site of realSites()) {
+    for (const site of networkSites()) {
       const here = roadDistance(site.x, site.z);
       const ahead = stepTowardRoad(site, 1);
       expect(roadDistance(ahead.x, ahead.z)).toBeLessThan(here);
     }
+  });
+
+  it('carries the authored fortress lamps as their own off-road class', () => {
+    const authored = realSites().filter((site) => site.authored);
+    // The Forgefather fortress pass: every authored site is the owner's
+    // verbatim placement (drakelands brazier fixtures on the isle), and
+    // the shipped list is the network PLUS exactly this set, so a lamp can
+    // never slip its class and dodge the road invariants above.
+    expect(authored.length).toBe(13);
+    for (const site of authored) {
+      expect(site.style).toBe('drakelands_brazier');
+      expect(site.areaId).toBe('drakelands');
+      expect(site.x).toBeGreaterThan(476);
+      expect(site.x).toBeLessThan(544);
+      expect(site.z).toBeGreaterThan(2168);
+      expect(site.z).toBeLessThan(2280);
+    }
+    expect(networkSites().length + authored.length).toBe(realSites().length);
   });
 
   it('produces the identical layout twice (no hidden global state)', () => {

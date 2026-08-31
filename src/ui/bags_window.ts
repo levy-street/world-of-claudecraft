@@ -22,6 +22,7 @@ import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { isItemLocked } from '../sim/item_lock';
+import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
@@ -51,6 +52,7 @@ import {
   bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
+  bagSlotsLineKey,
   bagSortSignature,
   bagStackIndex,
   bagsMoneyRowStale,
@@ -60,10 +62,12 @@ import {
   buildBagBar,
   buildBagGrid,
   buildBagListRows,
+  carriedPools,
   resolveDepositSubmit,
   vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { hasOpenBankSocket } from './bank_view';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { isPaperdollDraggable } from './equip_drop_core';
@@ -198,6 +202,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  bank instead (officer-plus only; the tab exists only while guildBankInfo
    *  is non-null, so this can never be true for a member or offline). */
   isGuildBankTab(): boolean;
+  /** The bank window is open ON ITS VAULT TAB with the Materials Vault
+   *  unlocked: a click deposits the material into the vault. The locked
+   *  offer pane arms nothing (a purchase surface, the guild Log rule). */
+  isVaultBankTab(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
@@ -237,6 +245,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
+  /** The confirmVendorSell setting (on by default): whether a vendor sale of
+   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
+   *  False restores the classic one-click instant sale for every item. */
+  confirmVendorSell(): boolean;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown. */
   markEquipDropTargets(itemId: string | null): void;
@@ -253,10 +265,12 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  RING position; the HUD resolves the underlying bar slot from the live
    *  page at drop time (the paged-ring mapping is HUD state). */
   dropOnActionRingSlot(itemId: string, ringIndex: number): void;
-  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
-   *  for a stack at a viewport point. `runDefault` runs the exact classic
-   *  left-click action for the clicked slot, so the menu's first row stays
-   *  byte-identical to a plain click. */
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant, or
+   *  at an open vendor, Sell / Sell all) for a stack at a viewport point.
+   *  `runDefault` runs the exact classic left-click action for the clicked
+   *  slot, so the menu's first row stays byte-identical to a plain click.
+   *  `vendorSellCount` is every copy of this item held across the bags,
+   *  supplied only when it should show the vendor row set instead. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -265,6 +279,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     y: number,
     runDefault: () => void,
     instance?: ItemInstancePayload,
+    vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void;
 }
 
@@ -579,7 +595,7 @@ export class BagsWindow {
           'aria-label',
           t('hudChrome.bags.bagSocketAria', {
             name: itemDisplayName(item),
-            slots: t('itemUi.tooltip.bagSlots', {
+            slots: t(bagSlotsLineKey(item) ?? 'itemUi.tooltip.bagSlots', {
               slots: formatNumber(socket.slots, { maximumFractionDigits: 0 }),
             }),
           }),
@@ -611,15 +627,56 @@ export class BagsWindow {
     }
     const counter = document.createElement('span');
     counter.className = `bag-capacity${model.used > model.capacity ? ' over' : ''}`;
+    // Focusable: the per-pool split lives only in the tooltip, whose host
+    // serves hover, long-press, AND focusin; a keyboard-only user needs the
+    // tab stop to reach it (the bank meter's twin, QA 08). The focus key
+    // keeps a parked reader here across the whole-window inventory rebuild
+    // (the restore ladder resolves by dataset equality).
+    counter.tabIndex = 0;
+    counter.dataset.focusKey = 'bag-capacity';
     const fmt = (n: number): string => formatNumber(n, { maximumFractionDigits: 0 });
     counter.textContent = t('hudChrome.bags.capacity', {
       used: fmt(model.used),
       total: fmt(model.capacity),
     });
+    // The per-pool truth behind the summed counter (Bank Storage phase 08):
+    // with a materials-only bag equipped the summed pair can look roomy while
+    // one pool refuses pickups, so the aria splits when the materials pool has
+    // anything to say and the tooltip always names the pools. The split comes
+    // from the shared carriedPools core (the sim's own helpers), never a
+    // painter re-derivation. Non-actionable span: no click, no peek guard.
+    const split = carriedPools(world.bags, world.inventory);
     counter.setAttribute(
       'aria-label',
-      t('hudChrome.bags.capacityAria', { used: fmt(model.used), total: fmt(model.capacity) }),
+      split.showMaterials
+        ? t('hudChrome.bags.capacityPoolsAria', {
+            used: fmt(model.used),
+            total: fmt(model.capacity),
+            generalUsed: fmt(split.general.used),
+            generalTotal: fmt(split.general.capacity),
+            materialsUsed: fmt(split.materials.used),
+            materialsTotal: fmt(split.materials.capacity),
+          })
+        : t('hudChrome.bags.capacityAria', { used: fmt(model.used), total: fmt(model.capacity) }),
     );
+    this.deps.attachTooltip(counter, () => {
+      const generalLine = `<div class="tt-sub">${esc(
+        t('hudChrome.bags.poolGeneral', {
+          used: fmt(split.general.used),
+          total: fmt(split.general.capacity),
+        }),
+      )}</div>`;
+      if (!split.showMaterials) return generalLine;
+      return (
+        generalLine +
+        `<div class="tt-sub">${esc(
+          t('hudChrome.bags.poolMaterials', {
+            used: fmt(split.materials.used),
+            total: fmt(split.materials.capacity),
+          }),
+        )}</div>`
+      );
+    });
     bar.appendChild(counter);
     return bar;
   }
@@ -1004,10 +1061,21 @@ export class BagsWindow {
         // (issue 3042) added Lock/Unlock to every item's menu, this is now
         // ALWAYS available (previously only for Disenchant / Salvage / Apply
         // Enchant items; a plain item tapped straight through). Long-press
-        // still peeks (handled above).
-        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId, s.instance)) {
-          this.openItemMenuFor(item, s, ev);
-          return;
+        // still peeks (handled above). At an open vendor the profession menu
+        // is unavailable (itemMenuAvailable excludes it, same as every other
+        // special mode), so a sellable item falls into the vendor row set
+        // instead: touch has no shift-click either, so this is its only way
+        // to reach Sell all.
+        if (this.deps.isTouchHud()) {
+          if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
+            this.openItemMenuFor(item, s, ev);
+            return;
+          }
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+            return;
+          }
         }
         // runBagAction's use/feed/equip/deposit arms call this.render()
         // SYNCHRONOUSLY: the rebuild's focus-restore ladder re-seats focus
@@ -1044,13 +1112,24 @@ export class BagsWindow {
           ev.preventDefault();
           return;
         }
-        // At a vendor, Ctrl/Meta right-click owns the bulk-sell shortcut
-        // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
-        // split-stack quantity prompt).
         if (this.deps.vendorOpen()) {
-          if (!ev.ctrlKey && !ev.metaKey) return;
-          ev.preventDefault();
-          this.sellBagItem(item, s, ev);
+          // Ctrl/Meta right-click keeps its direct bulk-sell shortcut
+          // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
+          // split-stack quantity prompt), unchanged.
+          if (ev.ctrlKey || ev.metaKey) {
+            ev.preventDefault();
+            this.sellBagItem(item, s, ev);
+            return;
+          }
+          // Plain right-click opens the vendor row set (Sell, plus Sell all
+          // when more than one copy is held) for a sellable item; a blocked
+          // or soulbound item falls through to the native browser menu, same
+          // as before this row existed.
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            ev.preventDefault();
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+          }
           return;
         }
         ev.preventDefault();
@@ -1460,7 +1539,14 @@ export class BagsWindow {
   // pure bagItemAction decided. Both buttons run it (right-click is the classic
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
-    const action = bagItemAction(item, this.bagMode(), s.instance);
+    const action = bagItemAction(
+      // The vault arm needs the honest-set membership the info shape cannot
+      // carry (it has no id); every other arm ignores the extra field.
+      { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
+      this.bagMode(),
+      s.instance,
+      s.craftedRecipeId,
+    );
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -1520,6 +1606,16 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
+      case 'bankSocketBag':
+        // The bank-aimed twin of equipBag below: the clicked payload-free bag
+        // sockets into the bank's first empty unlocked socket (the sim owns
+        // the scan; no socket index is named), consuming the EXACT clicked
+        // copy via the named-slot selector. The bank pane repaints through its
+        // own signature (socketBags moves); the bags side repaints here.
+        this.deps.world().bankSocketBag(s.itemId, undefined, this.copyRefFor(s));
+        this.deps.hideTooltip();
+        this.render();
+        break;
       case 'bankDepositBlockedNoTarget':
         // The bank is open with no grid on screen to drop into (its guild pane's
         // Log view). SPEAK, do not go quiet: this is a deliberate click on an
@@ -1543,6 +1639,27 @@ export class BagsWindow {
         }
         break;
       }
+      case 'vaultDeposit': {
+        // The vault twin of bankDeposit: same reference-resolved index, same
+        // shift split prompt, sent through the IWorldBank vault facet (the
+        // sim clamps a partial fill to the material's headroom silently).
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)), 'vault');
+        } else {
+          this.deps.world().vaultDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+        break;
+      }
+      // The vault's one pre-empt deny voices the exact materials-only line the
+      // sim would refuse with, sending nothing. Identity-bearing materials
+      // reach the normal deposit arm and retain their payload in the vault.
+      case 'vaultDepositBlockedNotMaterial':
+        this.deps.showError(tSim('error.vaultOnlyMaterials'));
+        return;
       // The guild pipe's pre-empt denies, each voicing the exact line the sim
       // would refuse with (its established sim_i18n keys), sending nothing.
       case 'guildBankDepositBlockedQuest':
@@ -1593,16 +1710,23 @@ export class BagsWindow {
   private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
     this.deps.attachTooltip(row, () => {
       const mode = this.bagMode();
-      const key = bagTooltipHintKey(item, mode, s.instance);
+      const key = bagTooltipHintKey(
+        { ...item, vaultMaterial: vaultMaterialIds().has(s.itemId) },
+        mode,
+        s.instance,
+        s.craftedRecipeId,
+      );
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a
       // blocked quest item never shows it).
-      // Both bank modes advertise the shift split on their deposit-hint arm
-      // (a blocked item never shows it): the guild target reuses the partial
-      // wording, only the primary hint key differs.
+      // All three bank modes advertise the shift split on their deposit-hint
+      // arm (a blocked item never shows it): the guild and vault targets reuse
+      // the partial wording, only the primary hint key differs.
       const partial =
-        (key === 'hudChrome.bank.depositHint' || key === 'hudChrome.bank.guildDepositHint') &&
+        (key === 'hudChrome.bank.depositHint' ||
+          key === 'hudChrome.bank.guildDepositHint' ||
+          key === 'hudChrome.bank.vaultDepositHint') &&
         bankDepositOpensPrompt(s)
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
           : '';
@@ -1697,7 +1821,15 @@ export class BagsWindow {
       // the item action menu over a reading surface.
       bankOpen: this.deps.isBankOpen(),
       bankDeposit: this.deps.isPersonalBankTab(),
+      // Meaningful only beside bankDeposit, so the read is gated on it: a
+      // clicked payload-free bag SOCKETS while an unlocked bank socket is
+      // empty, and deposits otherwise. hasOpenBankSocket tolerates a thin
+      // world fake with no bankInfo member (unit and a11y rigs), reading it
+      // as false exactly like the away state.
+      bankSocketable:
+        this.deps.isPersonalBankTab() && hasOpenBankSocket(this.deps.world().bankInfo),
       guildBankDeposit: this.deps.isGuildBankTab(),
+      vaultDeposit: this.deps.isVaultBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
   }
@@ -1723,6 +1855,7 @@ export class BagsWindow {
       !mode.bankOpen &&
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
+      !mode.vaultDeposit &&
       !mode.petFeed;
     return inDefaultMode && bagItemHasContextActions(item, itemId, instance);
   }
@@ -1730,7 +1863,12 @@ export class BagsWindow {
   // Open the action menu at the event's viewport point (falling back to the row
   // box for a keyboard-activated click), passing the exact classic action for
   // this slot as the menu's first row.
-  private openItemMenuFor(item: ItemDef, s: InvSlot, ev: MouseEvent): void {
+  private openItemMenuFor(
+    item: ItemDef,
+    s: InvSlot,
+    ev: MouseEvent,
+    vendorSellCount?: number,
+  ): void {
     this.deps.hideTooltip();
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
@@ -1744,7 +1882,22 @@ export class BagsWindow {
       y,
       () => this.runBagAction(item, s, ev),
       s.instance,
+      vendorSellCount,
+      vendorSellCount === undefined
+        ? undefined
+        : () => this.sellAllBagItem(item, s, vendorSellCount),
     );
+  }
+
+  /** N for the vendor right-click/tap menu's Sell all (N) row: every copy of
+   *  this item held across the bags, or undefined when it cannot be
+   *  vendor-sold at all (mirrors bagItemAction's own vendorSell split, so a
+   *  blocked or soulbound item never grows a sell affordance the sim would
+   *  refuse). bagItemAction itself already gates on mode.vendorOpen, so this
+   *  is a no-op outside an open vendor. */
+  private vendorSellMenuCount(item: ItemDef, s: InvSlot): number | undefined {
+    if (bagItemAction(item, this.bagMode(), s.instance) !== 'vendorSell') return undefined;
+    return totalHeldCount(this.deps.world().inventory, s.itemId);
   }
 
   /** The copy selection for a clicked stack, or undefined when the stack is no
@@ -1761,7 +1914,15 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The confirmVendorSell setting folds into the same instant gate
+    // vendorSellIsInstant already uses: turning it off (a player accepting the
+    // risk in exchange for speed) treats every item as instant for
+    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
+    // sells is still decided below exactly as it already is for true junk
+    // (one unit on a plain click, the whole stack on ctrl/meta).
+    const instant =
+      !this.deps.confirmVendorSell() ||
+      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -1786,6 +1947,15 @@ export class BagsWindow {
       // its stackSize (commonly 20), so a player holding more sits in other slots.
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
+    } else if (!instant && count > 1) {
+      // Mirrors the ctrl-click arm above: a plain click on a STACK (not true
+      // junk) used to confirm exactly ONE unit per click (showSellConfirmPrompt
+      // never took a quantity), so clearing a whole stack demanded one prompt
+      // PER UNIT. Route through the same bulk quantity prompt instead, so a
+      // single confirmation covers the whole stack (or whatever amount the
+      // player edits it down to).
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else if (!instant) {
       // Anything short of true junk (common+ quality, ANY instance payload:
       // an enchant, masterwork bake, signer, bound-to, or lock, or a crafted
@@ -1798,6 +1968,25 @@ export class BagsWindow {
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
+  }
+
+  private sellAllBagItem(item: ItemDef, slot: InvSlot, count: number): void {
+    const heldTotal = Math.max(1, Math.floor(count));
+    if (this.everyHeldCopyVendorSellIsInstant(item, slot.itemId)) {
+      this.deps.world().sellItem(slot.itemId, heldTotal);
+      return;
+    }
+    this.showSellQuantityPrompt(slot.itemId, heldTotal);
+  }
+
+  private everyHeldCopyVendorSellIsInstant(item: ItemDef, itemId: string): boolean {
+    let matched = false;
+    for (const slot of this.deps.world().inventory) {
+      if (slot.itemId !== itemId) continue;
+      matched = true;
+      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+    }
+    return matched;
   }
 
   // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
@@ -1836,7 +2025,9 @@ export class BagsWindow {
       input.min = '1';
       input.max = String(maxCount);
       input.step = '1';
-      input.value = '1';
+      // Defaults to the FULL stack (a new player's expectation of "destroy
+      // this"), pre-filled and still editable for anyone who wants fewer.
+      input.value = String(maxCount);
       prompt.appendChild(input);
     }
     const confirm = document.createElement('button');
@@ -1902,7 +2093,10 @@ export class BagsWindow {
     input.min = '1';
     input.max = String(maxCount);
     input.step = '1';
-    input.value = '1';
+    // Defaults to the FULL held amount (a stray click on the confirm button
+    // sells the whole stack, the obvious intent of clearing it out), still
+    // editable down for anyone who wants to keep some.
+    input.value = String(maxCount);
     const confirm = document.createElement('button');
     confirm.className = 'btn';
     confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');
@@ -1999,13 +2193,14 @@ export class BagsWindow {
   // owns the bags closures: the stale-slot re-resolve (resolveDepositSubmit
   // refuses on an itemId mismatch, else clamps to the live stack) and the send.
   // `target` picks which facet command the submit sends: the personal pane's
-  // bankDeposit (default) or the Guild tab's guildBankDeposit; everything else
-  // is identical between the two.
+  // bankDeposit (default), the Guild tab's guildBankDeposit, or the Vault
+  // tab's vaultDeposit (the sim clamps a partial fill to the material's
+  // headroom silently); everything else is identical across the three.
   private showDepositQuantityPrompt(
     index: number,
     captured: InvSlot,
     maxCount: number,
-    target: 'bank' | 'guild' = 'bank',
+    target: 'bank' | 'guild' | 'vault' = 'bank',
   ): void {
     // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
     // made every bags item read tolerate an id this client does not know.
@@ -2033,6 +2228,7 @@ export class BagsWindow {
         },
         send: (count) => {
           if (target === 'guild') this.deps.world().guildBankDeposit(index, count);
+          else if (target === 'vault') this.deps.world().vaultDeposit(index, count);
           else this.deps.world().bankDeposit(index, count);
         },
         afterClose: (sent) => {

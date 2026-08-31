@@ -15,17 +15,23 @@ vi.mock('pg', () => ({
   },
 }));
 
+import { serializeBankLedgerCommandBatch } from '../server/bank_ledger_outbox';
 import {
+  type BankLedgerSaveEffects,
   GUILD_BANK_BOOT_BATCH,
   GUILD_BANK_ROW_MAX_BYTES,
   type GuildBankWriteResult,
+  loadGuildBankRow,
   loadGuildBankRows,
+  openMailPartitionWriteGate,
   openMarketWriteGate,
-  saveCharacterAndGuildBankState,
-  saveCharacterAndMarketState,
+  saveCharacterAndGuildBankState as saveGuildDb,
+  saveCharacterAndMarketState as saveMarketDb,
 } from '../server/db';
+import type { GuildBankSave } from '../server/guild_bank_state';
 import { REALM } from '../server/realm';
 import { SOCIAL_SCHEMA } from '../server/social_db';
+import type { StorageAppliedEffect } from '../server/storage_purchase_db';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
@@ -33,14 +39,39 @@ beforeEach(() => {
   dbMock.connect.mockReset();
   dbMock.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
   openMarketWriteGate();
+  openMailPartitionWriteGate();
+  batchSeq = 0;
 });
 
 function clientStub(rowCounts?: (sql: string) => number) {
-  const query = vi.fn().mockImplementation((sql: string) => {
+  const query = vi.fn().mockImplementation((sql: string, values?: unknown[]) => {
+    if (/SELECT id FROM accounts/i.test(sql)) {
+      return Promise.resolve({ rows: [{ id: Number(values?.[0]) }], rowCount: 1 });
+    }
+    if (/WITH receipt_input AS/i.test(sql)) {
+      const params = values as unknown[];
+      const ordinals = params[0] as number[];
+      const rowCounts = params[5] as number[];
+      return Promise.resolve({
+        rows: ordinals.map((ordinal, index) => ({
+          batch_ordinal: ordinal,
+          batch_key: (params[1] as string[])[index],
+          newly_claimed: true,
+          stored_batch_key: (params[1] as string[])[index],
+          stored_realm: (params[2] as string[])[index],
+          stored_character_id: (params[3] as number[])[index],
+          stored_account_id: (params[4] as number[])[index],
+          stored_row_count: rowCounts[index],
+          stored_payload_sha256: (params[6] as string[])[index],
+          inserted_row_count: rowCounts.reduce((sum, count) => sum + count, 0),
+        })),
+        rowCount: ordinals.length,
+      });
+    }
     return Promise.resolve({ rows: [], rowCount: rowCounts ? rowCounts(String(sql)) : 0 });
   });
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
 }
 
 const STATE = {
@@ -50,7 +81,10 @@ const STATE = {
   inventory: [],
 } as unknown as CharacterState;
 const MARKET = { listings: [] } as unknown as MarketSave;
-const MAIL = { mail: [] } as unknown as MailSave;
+// These tests exercise the guild-bank-carrying transaction shape, not mail
+// content, so an empty partitions array (no dirty mailbox this session) is
+// the right fixture: it issues no mail SQL, matching every assertion below.
+const MAIL_PARTITIONS: { recipientKey: string; letters: MailSave['mail'] }[] = [];
 const BOOK = {
   treasury: 1500,
   inventory: [{ itemId: 'wolf_fang', count: 2 }],
@@ -82,6 +116,144 @@ const DEPOSIT_FANGS = {
 };
 const SAVE_7 = { guildId: 7, deltas: [DEPOSIT_GOLD, DEPOSIT_FANGS] };
 const SAVE_9 = { guildId: 9, deltas: [DEPOSIT_GOLD] };
+let batchSeq = 0;
+
+function effectsFor(characterId: number, saves: readonly GuildBankSave[]): BankLedgerSaveEffects {
+  return {
+    owner: { realm: REALM, characterId, accountId: 7 },
+    batches: saves.flatMap((save) =>
+      save.deltas.map((delta) =>
+        serializeBankLedgerCommandBatch(
+          `test.guild.${++batchSeq}`,
+          [
+            {
+              realm: REALM,
+              characterId,
+              accountId: 7,
+              op: delta.op,
+              itemId: delta.itemId,
+              count: delta.count,
+              instance: delta.instance,
+              copperDelta: delta.copperDelta,
+              purchasedSlotsAfter: delta.purchasedSlotsAfter,
+              container: 'guild',
+              containerId: save.guildId,
+              counterpartyCopperDelta: null,
+              counterpartyCount: null,
+            },
+          ],
+          { guildId: save.guildId, deltas: [delta] },
+        ),
+      ),
+    ),
+  };
+}
+
+function saveCharacterAndGuildBankState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  saves: readonly GuildBankSave[],
+  leaseNonce?: string,
+  results?: GuildBankWriteResult[],
+  storageEffects: readonly StorageAppliedEffect[] = [],
+) {
+  return saveGuildDb(
+    characterId,
+    level,
+    state,
+    saves,
+    leaseNonce,
+    results,
+    storageEffects,
+    effectsFor(characterId, saves),
+  );
+}
+
+function saveCharacterAndMarketState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  market: MarketSave,
+  mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
+  leaseNonce?: string,
+  saves?: readonly GuildBankSave[],
+) {
+  return saveMarketDb(
+    characterId,
+    level,
+    state,
+    market,
+    mailPartitions,
+    leaseNonce,
+    saves,
+    undefined,
+    [],
+    saves ? effectsFor(characterId, saves) : undefined,
+  );
+}
+const STORAGE_EFFECT: StorageAppliedEffect = {
+  realm: REALM,
+  accountId: 7,
+  characterId: 42,
+  itemId: 'strongbox_rung_01',
+  expectedCostClaudium: 100,
+  idempotencyKey: 'guild-storage-effect',
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 6,
+};
+
+function storageEffectClient() {
+  const query = vi.fn(async (sql: string, values?: unknown[]) => {
+    if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: 1 };
+    if (/WITH receipt_input AS/i.test(sql)) {
+      const params = values as unknown[];
+      const rowCounts = params[5] as number[];
+      return {
+        rows: (params[0] as number[]).map((ordinal, index) => ({
+          batch_ordinal: ordinal,
+          batch_key: (params[1] as string[])[index],
+          newly_claimed: true,
+          stored_batch_key: (params[1] as string[])[index],
+          stored_realm: (params[2] as string[])[index],
+          stored_character_id: (params[3] as number[])[index],
+          stored_account_id: (params[4] as number[])[index],
+          stored_row_count: rowCounts[index],
+          stored_payload_sha256: (params[6] as string[])[index],
+          inserted_row_count: rowCounts.reduce((sum, count) => sum + count, 0),
+        })),
+        rowCount: rowCounts.length,
+      };
+    }
+    if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
+    if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {
+      return {
+        rows: [
+          {
+            id: 82,
+            realm: REALM,
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'guild-storage-effect',
+            spend_claim_token: STORAGE_EFFECT.spendClaimToken,
+            status: 'pending',
+          },
+        ],
+        rowCount: 1,
+      };
+    }
+    if (/INSERT INTO storage_purchase_applied_receipts/i.test(sql)) {
+      return { rows: [{ source_purchase_id: 82 }], rowCount: 1 };
+    }
+    if (/DELETE FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 1 };
+    return { rows: [], rowCount: 1 };
+  });
+  return { query, release: vi.fn(), on: vi.fn(), removeListener: vi.fn() };
+}
 
 describe('the guild_banks DDL (SOCIAL_SCHEMA, the family that owns guilds)', () => {
   it('is additive and idempotent with the state.md column set and the disband cascade', () => {
@@ -110,7 +282,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
       42,
       5,
       STATE,
-      [SAVE_7, SAVE_9],
+      [SAVE_9, SAVE_7],
       'nonce-1',
       results,
     );
@@ -190,11 +362,35 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     expect(client.release).toHaveBeenCalled();
   });
 
+  it('writes storage effects after guild books and before COMMIT', async () => {
+    const client = storageEffectClient();
+    dbMock.connect.mockResolvedValueOnce(client as never);
+
+    await expect(
+      saveCharacterAndGuildBankState(42, 5, STATE, [SAVE_7], 'nonce-1', undefined, [
+        STORAGE_EFFECT,
+      ]),
+    ).resolves.toBe(true);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    const at = (pattern: RegExp) => sqls.findIndex((sql) => pattern.test(sql));
+    const book = sqls.reduce(
+      (last, sql, index) => (/INSERT INTO guild_banks/.test(sql) ? index : last),
+      -1,
+    );
+    expect(at(/SELECT id FROM accounts/)).toBeLessThan(at(/UPDATE characters/));
+    expect(book).toBeGreaterThan(at(/UPDATE characters/));
+    expect(book).toBeLessThan(at(/INSERT INTO storage_purchase_applied_receipts/));
+    expect(at(/INSERT INTO storage_purchase_applied_receipts/)).toBeLessThan(at(/^COMMIT/));
+  });
+
   it('a failing book write rolls the character half back too and rethrows', async () => {
     const client = clientStub(() => 1);
-    client.query.mockImplementation((sql: string) => {
-      if (/INSERT INTO guild_banks/i.test(String(sql))) throw new Error('book boom');
-      return Promise.resolve({ rows: [], rowCount: 1 });
+    const ordinaryQuery = client.query.getMockImplementation();
+    client.query.mockImplementation((sql: string, values?: unknown[]) => {
+      if (/INSERT INTO guild_banks/i.test(String(sql))) {
+        throw Object.assign(new Error('book boom'), { code: 'XX000' });
+      }
+      return ordinaryQuery?.(sql, values);
     });
     dbMock.connect.mockResolvedValueOnce(client as never);
 
@@ -218,11 +414,11 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
 });
 
 describe('saveCharacterAndMarketState carrying guild books (the leave flush)', () => {
-  it('the books land inside the SAME transaction as character + market + mail', async () => {
+  it('the books land inside the SAME transaction as character + market (no dirty mail this session)', async () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
 
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, undefined, [SAVE_7]);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, undefined, [SAVE_7]);
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls[0]).toMatch(/^BEGIN/);
@@ -234,7 +430,7 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   it('omitting the parameter keeps the pre-guild-bank write set (back-compat)', async () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS);
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
   });
@@ -242,7 +438,9 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   it('a fence miss on the leave flush writes no book row either', async () => {
     const client = clientStub((sql) => (/UPDATE characters/i.test(sql) ? 0 : 1));
     dbMock.connect.mockResolvedValueOnce(client as never);
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale', [SAVE_7]);
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, 'stale', [
+      SAVE_7,
+    ]);
     expect(ok).toBe(false);
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
@@ -251,6 +449,28 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
 });
 
 describe('loadGuildBankRows (the bounded, batched boot read)', () => {
+  it('loads one post-boot guild without synthesizing a missing row', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ guild_id: 77, has_row: true, data_bytes: 120, data: BOOK }],
+      rowCount: 1,
+    } as never);
+
+    await expect(loadGuildBankRow(77)).resolves.toEqual({
+      guildId: 77,
+      data: BOOK,
+      oversized: false,
+      dataBytes: 120,
+    });
+    const [sql, params] = dbMock.query.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('g.realm = $1 AND g.id = $3');
+    expect(sql).toContain('octet_length(gb.data::text)');
+    expect(params).toEqual([REALM, GUILD_BANK_ROW_MAX_BYTES, 77]);
+
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
+    await expect(loadGuildBankRow(78)).resolves.toBeNull();
+    await expect(loadGuildBankRow(0)).rejects.toThrow(/positive safe integer/);
+  });
+
   // The boot read now rides runWithStatementTimeout (a client transaction
   // carrying SET LOCAL statement_timeout on the HEAVY allowance): a slow boot
   // must load the books, not fail into the all-banks-inert arm. The client

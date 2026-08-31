@@ -17,6 +17,7 @@ import {
   DB_STATEMENT_TIMEOUT_MS,
   GUILD_BANK_LOG_TIMEOUT_MS,
   insertBankLedgerRow,
+  insertBankLedgerRows,
   loadGuildBankLogRows,
 } from '../server/db';
 import { REALM } from '../server/realm';
@@ -67,6 +68,156 @@ describe('insertBankLedgerRow', () => {
       'personal',
       null,
       null,
+      null,
+    ]);
+  });
+
+  it('binds a Materials Vault row as container vault with a null container_id', async () => {
+    // The vault is a per-character container like 'personal', so it names no
+    // container_id and stamps no counterparty side. The container column is a
+    // plain TEXT with no CHECK constraint, so this is the whole DDL story for
+    // the third value: nothing to migrate, the writer just binds a new literal.
+    await insertBankLedgerRow({
+      realm: REALM,
+      characterId: 42,
+      accountId: 7,
+      op: 'deposit',
+      itemId: 'copper_ore',
+      count: 6,
+      instance: null,
+      copperDelta: 0,
+      // The vault's monotonic ladder analogue: the upgrade RUNG, not a slot count.
+      purchasedSlotsAfter: 2,
+      container: 'vault',
+      containerId: null,
+    });
+    const [, params] = dbMock.query.mock.calls[0];
+    expect(params).toEqual([
+      REALM,
+      42,
+      7,
+      'deposit',
+      'copper_ore',
+      6,
+      null,
+      0,
+      2,
+      'vault',
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it('the batched sibling issues ONE UNNEST insert with thirteen parallel arrays', async () => {
+    // insertBankLedgerRows is the vault observer's write path (Bank Storage
+    // Phase 03): a deposit-all's N material rows must land as one statement,
+    // atomically, in array order. The insertChatLogs UNNEST idiom.
+    await insertBankLedgerRows([
+      {
+        realm: REALM,
+        characterId: 42,
+        accountId: 7,
+        op: 'deposit',
+        itemId: 'copper_ore',
+        count: 6,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+        container: 'vault',
+        containerId: null,
+      },
+      {
+        realm: REALM,
+        characterId: 42,
+        accountId: 7,
+        op: 'deposit',
+        itemId: 'iron_ore',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+        container: 'vault',
+        containerId: null,
+      },
+    ]);
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toContain('INSERT INTO bank_ledger');
+    expect(sql).toContain('realm, character_id, account_id, op, item_id, count, instance');
+    expect(sql).toContain('copper_delta, purchased_slots_after, container, container_id');
+    expect(sql).toContain('counterparty_copper_delta, counterparty_count');
+    expect(sql).toContain('SELECT * FROM unnest(');
+    // Thirteen ARRAY bind params, one per column, rows preserved in order.
+    expect(sql).toContain('$13');
+    expect(sql).not.toContain('$14');
+    // ALL thirteen arrays in one literal (the single-row sibling's discipline):
+    // spot checks left character_id and account_id unasserted, and both are
+    // int[] into overlapping id spaces, so a swapped map at the call site
+    // would misattribute every batched audit row with no constraint to catch
+    // it. The fixture keeps 42 and 7 distinct so the swap cannot hide.
+    expect(params).toEqual([
+      [REALM, REALM],
+      [42, 42],
+      [7, 7],
+      ['deposit', 'deposit'],
+      ['copper_ore', 'iron_ore'],
+      [6, 2],
+      [null, null],
+      [0, 0],
+      [1, 1],
+      ['vault', 'vault'],
+      [null, null],
+      // The unsupplied counterparty side binds null per row, never zero.
+      [null, null],
+      [null, null],
+    ]);
+  });
+
+  it('the batched sibling short-circuits an empty batch without touching the pool', async () => {
+    await insertBankLedgerRows([]);
+    expect(dbMock.query).not.toHaveBeenCalled();
+  });
+
+  it('the batched sibling serializes a non-null instance payload per row', async () => {
+    // Every VAULT row binds instance null (count-only storage), so this arm
+    // exists for the general-purpose contract: a future batched bank/guild
+    // caller hands a real payload and it must land as a JSON string the
+    // jsonb[] cast parses, riding beside a null in the same array.
+    const instance = { signer: 'Ana "quoted" \\ name', rolled: { quality: 'rare' } };
+    await insertBankLedgerRows([
+      {
+        realm: REALM,
+        characterId: 42,
+        accountId: 7,
+        op: 'deposit',
+        itemId: 'signed_blade',
+        count: 1,
+        instance,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+        container: 'personal',
+        containerId: null,
+      },
+      {
+        realm: REALM,
+        characterId: 42,
+        accountId: 7,
+        op: 'deposit',
+        itemId: 'copper_ore',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+        container: 'vault',
+        containerId: null,
+      },
+    ]);
+    const [, params] = dbMock.query.mock.calls[0];
+    // A LITERAL expected string, not a recomputed JSON.stringify: the escaping
+    // of the embedded quote and backslash is the thing under test.
+    expect(params[6]).toEqual([
+      '{"signer":"Ana \\"quoted\\" \\\\ name","rolled":{"quality":"rare"}}',
       null,
     ]);
   });

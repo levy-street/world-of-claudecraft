@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-26T15:05:56.777Z",
+  "sourceRevision": "f119c32db051c69a4a46dd298f16b5c8af5c897f",
+  "sourceTreeState": "dirty",
+  "comparison": {
+    "beforeRevision": "445588a63f00e2ff8595fef6a36d8dd1ac9e787c",
+    "paintedArtRevision": "94efe922aa0c4ce6286833e1a8bcf383a59f0351"
+  },
+  "browser": "Google Chrome for Testing 149.0.7827.55",
+  "graphicsPreset": "low",
+  "harness": "scripts/bag_icons_shot.mjs",
+  "purpose": "Before/after evidence for the seven painted bank-storage bag icons in the inventory bag bar and grid.",
+  "note": "The after capture used the current dirty review tree at sourceRevision; the compared icon bytes are pinned by paintedArtRevision. Each report asserts that the rendered bag bar and grid resolved to /ui/items/*.webp assets rather than procedural data URLs.",
+  "paintedItems": [
+    "duskweave_bag",
+    "wayfarers_backpack",
+    "necromancers_reagent_satchel",
+    "loombound_reagent_satchel",
+    "resonant_weave_bag",
+    "burlap_reagent_pouch",
+    "foragers_haversack"
+  ],
+  "frames": [
+    {
+      "file": "bag-icons-before-desktop.png",
+      "sha256": "761d02e26a3a46ec87623ded78b6f37c73df04e9ac36d97c230f449a54b7ddf3",
+      "revision": "beforeRevision",
+      "viewport": "1600x900 at 2x DPR",
+      "surface": "full inventory"
+    },
+    {
+      "file": "bag-icons-before-desktop-bar.png",
+      "sha256": "0e917e6fddc5fa9896ec6ee3a850f3d2ee2317b20c7d959e5255da670039ca6b",
+      "revision": "beforeRevision",
+      "viewport": "1600x900 at 2x DPR",
+      "surface": "bag bar crop"
+    },
+    {
+      "file": "bag-icons-after-desktop.png",
+      "sha256": "9c35fc9aecb3f6d9878c7d4780c5f73c911e1b29457d306f9cfef03d227875f2",
+      "revision": "paintedArtRevision",
+      "viewport": "1600x900 at 2x DPR",
+      "surface": "full inventory"
+    },
+    {
+      "file": "bag-icons-after-desktop-bar.png",
+      "sha256": "c7fd3b7afcf206975b4cb14d3059d8904e623c4afd4832e1fc60c585b9ec02da",
+      "revision": "paintedArtRevision",
+      "viewport": "1600x900 at 2x DPR",
+      "surface": "bag bar crop"
+    },
+    {
+      "file": "bag-icons-before-mobile.png",
+      "sha256": "c524d275f8b9fcadb3dee58be64756158db7b9914c1b21c52a0f552f228faf29",
+      "revision": "beforeRevision",
+      "viewport": "844x390 touch at 3x DPR",
+      "surface": "full inventory"
+    },
+    {
+      "file": "bag-icons-before-mobile-bar.png",
+      "sha256": "b0dbfc8ab0576d368ce95fefbb59d46e7f4c6035058bbad520ff2a93d87987b3",
+      "revision": "beforeRevision",
+      "viewport": "844x390 touch at 3x DPR",
+      "surface": "bag bar crop"
+    },
+    {
+      "file": "bag-icons-after-mobile.png",
+      "sha256": "7be4468a5eb3c7188387d6e5c026866340b2cb605a83dfb19ce57a68f49d9770",
+      "revision": "paintedArtRevision",
+      "viewport": "844x390 touch at 3x DPR",
+      "surface": "full inventory"
+    },
+    {
+      "file": "bag-icons-after-mobile-bar.png",
+      "sha256": "6b5b39042a73f085668a8aa9c6d119c6e90c38f635a9844f55d0fa5780baad09",
+      "revision": "paintedArtRevision",
+      "viewport": "844x390 touch at 3x DPR",
+      "surface": "bag bar crop"
+    }
+  ],
+  "reports": [
+    {
+      "files": [
+        "bag-icons-before-desktop-report.json",
+        "bag-icons-before-mobile-report.json"
+      ],
+      "sha256": "f4117d84cc7ef27d7f9d67b48a87ceba43c5d373bdb244591365e2ca35d58608"
+    },
+    {
+      "files": [
+        "bag-icons-after-desktop-report.json",
+        "bag-icons-after-mobile-report.json"
+      ],
+      "sha256": "38a83a155c0f10cc895b613fd5b7bf9c950c68d11a4d23f88fa93ba042ce6303"
+    }
+  ]
+}

@@ -717,4 +717,33 @@ export const table: DeedLocaleTable = {
     name: '整装待发',
     desc: '从试炼之滨毕业：完成岛上的每一堂课，然后敲响渡船铃回到东溪镇。',
   },
+  soc_strongbox_outfitter: {
+    name: '保险箱装备师',
+    desc: '解锁你的第一个银行背包栏位。',
+  },
+  soc_four_bags_deep: {
+    name: '四袋俱全',
+    desc: '解锁银行的全部四个背包栏位。',
+  },
+  dgn_ignivar: {
+    name: '使者陨落',
+    desc: '在最后泉源熔炉击败"伊格尼瓦，末焰使者"。',
+  },
+  dgn_ignivar_heroic: {
+    name: '英雄：使者陨落',
+    desc: '在英雄难度下击败"伊格尼瓦，末焰使者"。',
+  },
+  dgn_varkhul: {
+    name: '熔炉渐冷',
+    desc: '在内环熔炉击败"末焰锻父瓦尔库尔"。',
+  },
+  dgn_varkhul_heroic: {
+    name: '英雄：熔炉渐冷',
+    desc: '在英雄难度下击败"末焰锻父瓦尔库尔"。',
+  },
+  dgn_varkhul_flawless: {
+    name: '余烬不灭',
+    desc: '在英雄难度下击败"末焰锻父瓦尔库尔"，全程无一名团队成员死亡。',
+    title: '未焚者',
+  },
 };

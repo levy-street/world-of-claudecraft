@@ -1,0 +1,197 @@
+{
+  "targetName": "Bonebound Rickshaw (Stage 1 v2: throne-cart shape, no rig)",
+  "targetId": "rickshaw-mount",
+  "schemaVersion": "2.0-handauthored",
+  "authoringNote": "img2threejs is installed (~/.claude/skills/img2threejs) but its own generator emits a TypeScript class-based factory under a different runtime contract than this repo's scripts/assets/<asset>/model.js + export_<asset>.mjs pipeline, so this spec is hand-authored following the tool's OWN structural intent instead: its pre-spec assessment scaffold's featureGroups/antiShallowSpecRules were used as the authoring checklist below. This v2 throne-cart rebuild's own reference is a user-supplied AI-generated concept sheet, cropped into 7 single-subject views (front three-quarter, profile, front, plus 4 detail crops: lantern, wheel & frame, cushion, banner; see complexity.reasoning below and the detail-crop citations in detailInventory). No check_reference_admission.py run and no admission-record file were produced for this concept sheet: this stays a hand-authored spec per the sentence above, not an img2threejs-driven one. The three real-world rickshaw photographs in reference-metadata.json are a SEPARATE, earlier reference set: they informed the v1 open-frame-cart shape's silhouette and proportion only, and only a few v1 measurements (RICKSHAW_SCALE, the wheel hub/spoke fix, the shaft cross-brace position) carry forward into this v2 spec unchanged; none of v2's throne/cushion/lantern/banner detail comes from those photos.",
+  "sourceImage": "user-supplied AI-generated concept sheet, cropped into 7 single-subject reference views (front three-quarter, profile, front, plus lantern/wheel-frame/cushion/banner detail crops); no admission-gate record was produced (hand-authored spec, see authoringNote). The three real-world photographs in docs/design/rickshaw_mount/reference-metadata.json are the earlier, separate v1 silhouette reference, not this pass's source.",
+  "revisionNote": "Full replacement of the v1 open-frame-cart shape (docs history: v1 shipped an unadorned wood bench + iron running gear, no canopy, after the canopy was cut for crown-clearance and unsupported-spoke problems). The user supplied a new AI-generated concept sheet and asked for a from-scratch rebuild: a throne-style seat (not a wheelchair read), heavy riveted bronze-on-wood banding, a tufted cushion, a hanging glowing lantern, and a banner on the seat-back. Explicitly excluded by the user: a chain harness (complexity vs payoff) and the concept art's own invented skeleton pose/geometry (the mount composes a dedicated skel_rickshaw_puller visual at runtime, backed by skeleton_minion_free.glb, per src/render/rickshaw_mount.ts; the grip position is derived from that rig's own measured hand bones, not from the concept art's hands). Kept from v1 unchanged: RICKSHAW_SCALE=2.0, the wheel hub/spoke fix, and the measured shaft cross-brace position (SHAFT_TIP_Y/Z/SIDE_X), since the puller attach geometry did not change.",
+  "stageScope": {
+    "thisPass": "Riveted wood-and-bronze throne-cart GLB, now shipping with real PBR surface maps (wood/bronze/leather/fabric albedo/normal/orm, KTX2-compressed) rather than the vertex-color-only convention this spec was originally authored under: tufted cushion, banded spoked wheels with procedural runtime spin, forward shafts with the same measured cross-brace grip point, a hanging emissive lantern, a banner panel. Ships as a mount_visuals.ts entry with rigged:false and a small idle bob. skel_rickshaw_puller (skeleton_minion_free.glb, with its own Walk/Run gait clips synced to mount speed) and the player rider are composed at runtime onto this cart's sockets, not part of this mesh.",
+    "deferred": [
+      "chain harness detail (explicitly cut by the user: real chain-link geometry is a meaningful triangle/complexity cost for a detail that reads at mount scale mostly as background texture, not an identity feature)",
+      "banner emblem/icon: the reference shows a tower/castle icon on the banner; the banner ships as a two-tone flat field + trim panel (the shape and color, not the emblem graphic), still true even after the move to real surface maps since no emblem texture was authored"
+    ]
+  },
+  "objectClass": {
+    "primaryType": "stylized throne-style hand-pulled cart mount",
+    "formLanguage": [
+      "stylized hard-surface",
+      "Halloween/spooky fantasy",
+      "low-poly wheeled vehicle",
+      "riveted iron-bound woodwork",
+      "high-backed throne seat"
+    ],
+    "structureKind": [
+      "compound vehicle",
+      "two-wheel cart",
+      "no engine, no cannon, no turret",
+      "no canopy",
+      "no chain harness"
+    ],
+    "materialFamilies": [
+      "dark riveted wood",
+      "warm bronze/brass hardware",
+      "tufted burgundy leather cushion",
+      "emissive lantern glass"
+    ],
+    "notes": "Rebuilt from a user-supplied AI-generated concept sheet (Bonebound Rickshaw mount). The puller is skel_rickshaw_puller, a dedicated visual on skeleton_minion_free.glb, composed at runtime and not authored here; the concept art's own invented chained-skeleton pose is reference for silhouette/material language only, never copied as geometry or pose."
+  },
+  "complexity": {
+    "tier": "moderate",
+    "estimatedCounts": {
+      "macroComponents": 5,
+      "mesoComponents": 11,
+      "materialBuckets": 3,
+      "repetitionSystems": 3
+    },
+    "reasoning": [
+      "Two identical wheels (12-spoke repetition) and two shaft poles remain the largest repetition systems; rivet studs along panel edges are a third, smaller repetition system (banker_chest precedent: OctahedronGeometry(0.027) domed studs).",
+      "New meso-level systems versus v1: throne wings, crest cap, armrests, tufted seat + seat-back cushions with button-stud relief, banner (field+trim two-layer extrude), lantern (bracket arm + cage + glass core).",
+      "Front three-quarter, profile, and front-view renders plus 4 detail crops (lantern, wheel & frame, cushion, banner) cover every macro system; only the true underside and rear are extrapolated, same as v1."
+    ]
+  },
+  "budgets": {
+    "triangleSoftTarget": 6000,
+    "triangleHardCeiling": 9000,
+    "byteCeiling": 260000,
+    "byteCeilingNote": "260 KiB target: v1 shipped at ~28 KiB against a 225 KiB ceiling with wide headroom; v2 adds real meso-detail (cushion tufting, banner, lantern, rivets) but stays well inside sibling-mount norms (stormfeather_griffin 261 KiB).",
+    "materialBucketTarget": 3,
+    "materialBucketNote": "CartWood (wood + cushion + banner, distinguished by vertex color only, since fabric/leather/wood share a similar diffuse PBR response) + BronzeFrame (running gear, shafts, rivets, lantern housing) + LanternGlow (the one bucket that needs a genuinely different material: emissive, lower roughness). Bumped from v1's 2 buckets for the lantern's distinct response."
+  },
+  "detailInventory": {
+    "identityCritical": [
+      {
+        "id": "spoked-wheel-pair",
+        "note": "two large wire-spoke wheels flanking the seat, now with a visibly thicker banded rim and rivet studs around the rim face (reference: detail_wheel crop), not just a plain torus rim"
+      },
+      {
+        "id": "throne-seat-back",
+        "note": "a tall seat-back with a domed/crested top and two outward-angled wing panels, the single feature that reads as throne rather than bench or wheelchair; a flat single-plane back (v1's shape) reads as neither"
+      },
+      {
+        "id": "tufted-cushion",
+        "note": "a distinct maroon cushion (seat pad + seat-back pad) proud of the wood/bronze frame, with a button-stud grid suggesting diamond tufting (reference: detail_cushion crop). RoundedBoxGeometry for the pillowy silhouette, not a hard BoxGeometry"
+      },
+      {
+        "id": "hanging-lantern",
+        "note": "a bent bronze bracket arm rising from the seat-back top and curving forward/out, ending in a small hex/box lantern cage with an emissive glass core (reference: detail_lantern crop). Emissive-only, no dynamic point light (perf: this mount can be ridden by many players at once, see src/render/CLAUDE.md performance discipline), calibrated to clear the post composer's bloom threshold the way src/render/streetlamp_emissive.ts's authored LAMP_GLASS/LAMP_SOURCE materials do"
+      },
+      {
+        "id": "banner-panel",
+        "note": "a flat pennant-shaped banner (rectangular top tapering to a point) mounted flush on one side of the seat body, two-tone (dark green field + light trim border), opposite the lantern for an asymmetric silhouette (reference: detail_banner crop)"
+      },
+      {
+        "id": "forward-shaft-pair",
+        "note": "two long, roughly parallel poles reaching forward from the cart body to the puller's measured hand position; unchanged from v1 (SHAFT_TIP_Y/Z/SIDE_X), since the puller rig did not change"
+      }
+    ],
+    "supporting": [
+      {
+        "id": "riveted-panel-edges",
+        "note": "small domed bronze rivet studs along the wood seat box and seat-back panel edges (banker_chest precedent technique), the same visual language as the reference's bronze corner brackets"
+      },
+      {
+        "id": "armrests",
+        "note": "beefed-up bronze armrest bar + vertical support per side, replacing v1's thin flat rub-rail; reads as a seat arm at rider hand height, not a structural rail"
+      },
+      { "id": "wheel-hub-cap", "note": "small domed cap at the wheel hub center, kept from v1" },
+      {
+        "id": "shaft-cross-brace",
+        "note": "cross-bar joining the two shafts at the handle end; unchanged position from v1, still the literal grip point the puller's measured hand bones pin to"
+      }
+    ],
+    "omitOrSimplify": [
+      "chain harness / chain-wrapped puller limbs (explicitly cut by the user: complexity vs payoff)",
+      "the concept art's own skeleton geometry, helmet, and hunched pose (skel_rickshaw_puller on skeleton_minion_free.glb is composed at runtime instead, in its own idle pose)",
+      "banner emblem/icon graphic (vertex-color-only convention: shape and two-tone color carry the read, not the icon)",
+      "any manufacturer decal, lettering, or watermark",
+      "exact diamond-quilting stitch lines on the cushion (represented via a button-stud grid instead, not a UV pattern)",
+      "wood grain / leather grain as a texture (vertex color only, per project convention)",
+      "a canopy of any kind (cut in v1 for real crown-clearance and unconnected-geometry problems; not revisited here)"
+    ]
+  },
+  "components": [
+    {
+      "id": "throne-body",
+      "system": "macro",
+      "parts": [
+        "seat box",
+        "seat-back panel",
+        "crest cap",
+        "throne wings (2)",
+        "armrests (2)",
+        "footboard",
+        "rivet studs"
+      ],
+      "material": "CartWood + BronzeFrame (rivets/armrests/crest trim)"
+    },
+    {
+      "id": "cushions",
+      "system": "meso",
+      "parts": [
+        "seat cushion (rounded box)",
+        "seat-back cushion (rounded box)",
+        "button studs (grid)"
+      ],
+      "material": "CartWood (distinct vertex-color tint, same PBR family as wood/fabric)"
+    },
+    {
+      "id": "running-gear",
+      "system": "macro",
+      "repetition": "2 (left/right)",
+      "parts": ["hub", "spokes", "banded rim", "rim rivets", "hub cap"],
+      "material": "BronzeFrame"
+    },
+    {
+      "id": "shafts",
+      "system": "macro",
+      "repetition": "2 (left/right) + 1 cross-brace",
+      "parts": ["forward pole", "handle grip end", "cross-brace"],
+      "material": "BronzeFrame"
+    },
+    {
+      "id": "lantern",
+      "system": "meso",
+      "parts": ["bracket arm (2-segment bent)", "hanging ring", "cage housing", "glass core"],
+      "material": "BronzeFrame (arm + cage) + LanternGlow (glass core)"
+    },
+    {
+      "id": "banner",
+      "system": "meso",
+      "parts": ["field panel", "trim backing panel"],
+      "material": "CartWood (distinct vertex-color tint)"
+    }
+  ],
+  "materialBuckets": [
+    {
+      "name": "CartWood",
+      "colorFamily": "dark riveted wood, burgundy tufted leather, banner fabric",
+      "parts": ["throne-body wood elements", "cushions", "banner"]
+    },
+    {
+      "name": "BronzeFrame",
+      "colorFamily": "warm aged bronze/brass hardware",
+      "parts": [
+        "running-gear",
+        "shafts",
+        "throne-body hardware/rivets/armrests",
+        "lantern arm + cage"
+      ]
+    },
+    {
+      "name": "LanternGlow",
+      "colorFamily": "warm yellow-green emissive glass",
+      "parts": ["lantern glass core"]
+    }
+  ],
+  "sockets": [
+    {
+      "name": "Socket_Rider",
+      "purpose": "player rider seat anchor, raised from v1 to sit on top of the new seat cushion rather than the bare wood box top"
+    },
+    {
+      "name": "Socket_Puller",
+      "purpose": "authoring-time reference for the puller attach offset hardcoded in src/render/rickshaw_mount.ts; unchanged from v1"
+    }
+  ]
+}

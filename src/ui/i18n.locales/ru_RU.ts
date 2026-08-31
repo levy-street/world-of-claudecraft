@@ -217,7 +217,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Устрашающий клич, обращающий в бегство до 5 врагов в пределах 8 м на 4 сек. Урон может разрушить эффект.',
   'entities.abilities.intimidating_shout.name': 'Устрашающий крик',
   'entities.abilities.iron_resolve.description':
-    'Стисните зубы и игнорируйте боль: расходует до 40 ед. ярости (минимум 20), поглощая 4 ед. урона за каждую потраченную единицу ярости в течение не более 10 сек. (ветка «Защита»)',
+    'Стисните зубы и игнорируйте боль: расходует до 40 ед. ярости (минимум 20), поглощая {absorbPerRage} ед. урона за каждую потраченную единицу ярости в течение не более 10 сек. (ветка «Защита»)',
   'entities.abilities.iron_resolve.name': 'Железная решимость',
   'entities.abilities.measured_fury.description':
     'Ваша размеренная ярость оттачивает расход: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)',
@@ -546,6 +546,33 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': 'Применить облик',
   'hudChrome.wocStore.detach': 'Снять облик',
   'hudChrome.wocStore.equipHint': 'Чтобы применить этот облик, возьмите в руки {type}.',
+  'hudChrome.wocStore.charter.eyebrow': 'Сундук',
+  'hudChrome.wocStore.charter.title': 'Грамоты на сундук',
+  'hudChrome.wocStore.charter.scope': 'Грамота расширяет банк только этого персонажа. Казначей продаёт те же ячейки за золото.',
+  'hudChrome.wocStore.charter.grant': 'Добавляет ячеек банка: {slots}',
+  'hudChrome.wocStore.charter.buy': 'Купить грамоту',
+  'hudChrome.wocStore.charter.buyAria': 'Купить: {item}',
+  'hudChrome.wocStore.charter.confirmTitle': 'Подтвердите покупку грамоты',
+  'hudChrome.wocStore.charter.confirmBody': 'Купить {item} за {cost} Claudium?',
+  'hudChrome.wocStore.charter.granted': 'Грамота применена. Банк этого персонажа стал больше.',
+  'hudChrome.wocStore.charter.alreadyGranted': 'Эта грамота уже есть у персонажа. Повторно средства не списаны.',
+  'hudChrome.wocStore.charter.applyDeferred': 'Оплата прошла. Ячейки появятся автоматически при следующем входе этим персонажем.',
+  'hudChrome.wocStore.charter.grantUnresolved': 'Оплата прошла, но ячейки пока не выданы. Покупка записана, и поддержка сможет её завершить.',
+  'hudChrome.wocStore.charter.inProgress': 'Покупка для этого персонажа еще завершается. Повторите попытку через мгновение.',
+  'hudChrome.wocStore.charter.doesNotFit': 'В банке этого персонажа не поместятся все ячейки этой грамоты.',
+  'hudChrome.wocStore.charter.notPurchasable': 'Эту грамоту сейчас нельзя купить.',
+  'hudChrome.wocStore.charter.noCharterFits': 'Ни одна грамота не помещается в оставшееся место в банке этого персонажа.',
+  'hudChrome.wocStore.charter.someHiddenByFit':
+    'Грамоты, слишком большие для оставшегося места в банке этого персонажа, не показываются.',
+  'hudChrome.wocStore.charter.noRoom': 'В банке этого персонажа больше нет места ни для одной грамоты.',
+  'hudChrome.wocStore.charter.outage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
+  'hudChrome.wocStore.charter.outageStale': 'Вернитесь в магазин и снова используйте то же действие «Купить грамоту». Средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
+  'hudChrome.wocStore.charter.failed': 'Не удалось завершить покупку.',
+  'hudChrome.wocStore.charter.resultContext': '{item} ({sku}): {message}',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Малая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Большая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': 'Великая грамота на сундук',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': 'Полная грамота на сундук',
   'hudChrome.claudium.title': 'Claudium',
   'hudChrome.claudium.open': 'Открыть Claudium',
   'hudChrome.claudium.close': 'Закрыть Claudium',
@@ -630,6 +657,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': 'Кому',
   'itemUi.kind.bag': 'Сумка',
   'itemUi.tooltip.bagSlots': 'Сумка на {slots} ячеек',
+  'itemUi.tooltip.bagSlotsMaterials': 'Сумка для материалов на {slots} ячеек',
   'hudChrome.auth.forgotPrompt': 'Забыли пароль?',
   'hudChrome.auth.forgotTitle': 'Сброс пароля',
   'hudChrome.auth.forgotHint':
@@ -719,6 +747,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Забирает монеты и выпавшие предметы. Возможность сбора не расходуется.',
   'hudChrome.loot.unifiedPressHint':
     'Клавиша взаимодействия одним нажатием забирает добычу и собирает компоненты, следуя фокусу города.',
+  'hudChrome.loot.bindConfirmTitle': 'Персональный при получении',
+  'hudChrome.loot.bindConfirmBody':
+    'Среди этой добычи есть предмет, который станет персональным, когда вы его возьмёте. Персональный предмет можно передать только игрокам, разделившим эту добычу, и только в течение ограниченного времени.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -756,9 +787,68 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.petHealth': 'Питомец {name}, здоровье {pct}',
   'hudChrome.partyFrames.showSelf': 'Показывать вашу рамку',
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
+  'hudChrome.interfaceUnlock.label': 'Редактирование фреймов',
+  'hudChrome.interfaceUnlock.unlock': 'Разблокировать интерфейс',
+  'hudChrome.interfaceUnlock.lock': 'Заблокировать интерфейс',
+  'hudChrome.interfaceUnlock.lockAll': 'Заблокировать интерфейс',
+  'hudChrome.interfaceUnlock.barsNote': 'Во время редактирования видны только включённые панели действий. Чтобы разместить больше панелей, сначала добавьте их кнопками плюс и минус на основной панели.',
+  'hudChrome.interfaceUnlock.frozenNote': 'Во время редактирования интерфейс и камера заморожены: кнопки и рамки становятся неподвижными картинками для расстановки, а щелчки не попадают в игровой мир.',
+  'hudChrome.interfaceUnlock.unlockFrame': 'Разблокировать эту рамку',
+  'hudChrome.interfaceUnlock.lockFrame': 'Заблокировать эту рамку',
+  'hudChrome.interfaceUnlock.resizeFrame': 'Изменить размер этой рамки',
+  'hudChrome.interfaceUnlock.frameNames.actionBar1': 'Панель команд',
+  'hudChrome.interfaceUnlock.frameNames.actionBar2': 'Панель команд 2',
+  'hudChrome.interfaceUnlock.frameNames.actionBar3': 'Панель команд 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Напоминание о списке желаемого',
+  'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
+  'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
+  'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
+  'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
+  'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
+  'hudChrome.interfaceUnlock.frameNames.chat': 'Чат',
+  'hudChrome.interfaceUnlock.frameNames.menu': 'Меню',
+  'hudChrome.interfaceUnlock.frameNames.xpBar': 'Полоса опыта',
+  'hudChrome.options.combineActionBars': 'Объединить панели действий',
+  'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'Панели действий',
+  'hudChrome.interfaceUnlock.frameNames.swingBar': 'Автоатака',
+  'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
+  'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
+  'hudChrome.interfaceUnlock.snapToGrid': 'Привязка к сетке',
+  'hudChrome.interfaceUnlock.buffsLeftToRight': 'Усиления слева направо',
+  'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Ослабления слева направо',
+  'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Закрепить фрейм игрока над панелью действий',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'Вертикальные панели действий',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'Вертикальная панель команд',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'Вертикальная панель команд 2',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'Вертикальная панель команд 3',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'Горизонтальное меню',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'Сбросить размер',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': 'Сбросить размер: {name}',
+  'hudChrome.partyFrames.optionsSection': 'Настройки фреймов группы',
+  'hudChrome.interfaceUnlock.framesMenuTitle':
+    'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',
+  'hudChrome.interfaceUnlock.previewSpell': 'Пример заклинания',
+  'hudChrome.interfaceUnlock.previewMemberName': '{className} {number}',
+  'hudChrome.transfer.frameLayout': 'Расположение фреймов',
+  'hudChrome.transfer.allSettings': 'Все настройки',
+  'hudChrome.transfer.exportAction': 'Экспорт',
+  'hudChrome.transfer.importAction': 'Импорт',
+  'hudChrome.transfer.copy': 'Копировать',
+  'hudChrome.transfer.copied': 'Скопировано в буфер обмена.',
+  'hudChrome.transfer.copyFailed': 'Не удалось скопировать. Выделите код и скопируйте его вручную.',
+  'hudChrome.transfer.applyReload': 'Применить и перезагрузить',
+  'hudChrome.transfer.pastePlaceholder': 'Вставьте сюда экспортированный код.',
+  'hudChrome.transfer.invalid': 'Это не действительный код экспорта.',
+  'hudChrome.transfer.wrongKind': 'Этот код относится к другому типу экспорта.',
+  'hudChrome.actionBar.conflictTitle': 'Клавиша уже занята',
+  'hudChrome.actionBar.conflictBody': '{key} уже назначена на «{other}». Назначение на «{action}» снимет привязку с «{other}».',
+  'hudChrome.actionBar.conflictAccept': 'Всё равно переназначить',
+  'hudChrome.actionBar.showExtraBar': 'Показать ещё одну панель действий',
+  'hudChrome.actionBar.hideExtraBar': 'Скрыть панель действий',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
+  'hudChrome.options.alwaysShowAllBuffs': 'Всегда показывать все баффы',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -820,6 +910,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'Вход в разлом: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': 'Враждебный противник',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'Атакующий вас противник',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Босс: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Босс атакует вас: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': 'Противник с добычей',
   'hud.core.mapMarkerLabels.corpse': 'Ваше тело',
   'hud.core.mapMarkerLabels.deathZone': 'Опасная зона',
@@ -877,6 +969,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'м',
   'hudChrome.unitFrame.durationUnitHours': 'ч',
   'hudChrome.unitFrame.durationUnitDays': 'д',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
   'hudChrome.unitFrame.partyChip': 'Группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
@@ -1076,6 +1169,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.customColors': 'Настраиваемые цвета',
   'hudChrome.theme.reset': 'Сброс',
   'hudChrome.theme.presets.classic': 'Классическое золото',
+  'hudChrome.theme.presets.fancyGold': 'Роскошное золото',
   'hudChrome.theme.presets.midnight': 'Полночь',
   'hudChrome.theme.presets.parchment': 'Пергамент',
   'hudChrome.theme.presets.highContrast': 'Высокий контраст',
@@ -1239,6 +1333,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.hidePlaytimeAria': 'Скрыть время в игре',
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
+  'hudChrome.statInfo.names.healPower': 'Сила исцеления',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
   'hudChrome.statInfo.names.parry': 'Парирование',
@@ -1455,6 +1550,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': 'Фон высокой контрастности',
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showReliquaryTracker': 'Показывать список Реликвария',
+  'hudChrome.options.confirmVendorSell': 'Подтверждать продажу',
+  'hudChrome.options.confirmVendorSellNote':
+    'Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
   'hudChrome.options.hideUnusedActionSlots': 'Скрыть неиспользуемые ячейки действий',
@@ -1462,6 +1560,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
+  'hudChrome.options.touchPreciseAim': 'Точное наведение по земле',
+  'hudChrome.options.touchPreciseAimNote': 'Наземные заклинания сначала требуют наведения. Если отключить этот параметр, они мгновенно применяются в предложенной точке.',
   'hudChrome.options.touchTapMenus': 'Меню по нажатию',
   'hudChrome.options.touchTapMenusNote': 'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
@@ -1716,6 +1816,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Отвязать',
   'wallet.unlinkTitle': 'Удалить подтверждение кошелька из этой учетной записи',
   'wallet.unlinkAria': 'Удалить подтверждение кошелька из этой учетной записи',
+  'wallet.reauthTitle': 'Подтверждение изменения кошелька',
+  'wallet.reauthUnlinkTitle': 'Подтверждение удаления кошелька',
+  'wallet.reauthHelp':
+    'В целях безопасности введите пароль учетной записи, чтобы разрешить это изменение.',
+  'wallet.reauthNoPassword':
+    'Эта учетная запись входит без пароля. Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'wallet.reauthConfirm': 'Подтвердить',
+  'wallet.reauthCancel': 'Отмена',
+  'wallet.reauthClose': 'Закрыть',
   'wallet.signOut': 'Отключить',
   'wallet.signOutTitle': 'Отключить приложение кошелька в этом браузере',
   'wallet.signOutAria': 'Отключить приложение кошелька в этом браузере',
@@ -1792,6 +1901,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выберите расширение кошелька в этом браузере. Подпишите сообщение проверки, затем вернитесь в приложение.',
   'wallet.browser.paymentBody':
     'Выберите кошелек, привязанный к аккаунту, и подтвердите транзакцию в этом браузере.',
+  'wallet.browser.stepUpBody':
+    'Выберите кошелек, привязанный к аккаунту, и подпишите сообщение авторизации Биржи $WOC. Подпись бесплатна и не переводит средства.',
   'wallet.browser.extensionHelp':
     'Совместимое расширение кошелька не найдено. Установите или разблокируйте Phantom, Solflare либо другой браузерный кошелек Solana и повторите попытку.',
   'wallet.browser.safety':
@@ -2814,6 +2925,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Купить {item} за {marks} героических знаков? Покупки за знаки не подлежат возврату.',
   'heroicShop.buyConfirmAccept': 'Купить',
   'heroicShop.buyConfirmCancel': 'Отмена',
+  'crucibleShop.browse': 'Обменять печати',
+  'crucibleShop.browseAria': 'Обменять печати Горнила у {name}',
+  'crucibleShop.empty': 'Для вашего класса нет доступных частей комплекта.',
+  'crucibleShop.balance': 'Ваши печати: {list}',
+  'crucibleShop.noSigils': 'У вас нет печатей Горнила.',
+  'crucibleShop.price': '1 x {sigil}',
+  'crucibleShop.buyAria': 'Обменять {sigil} на {item}',
+  'crucibleShop.buyConfirmTitle': 'Подтверждение обмена',
+  'crucibleShop.buyConfirmBody': 'Обменять {sigil} на {item}? Потраченную печать нельзя вернуть.',
+  'crucibleShop.buyConfirmAccept': 'Обменять',
+  'crucibleShop.buyConfirmCancel': 'Отмена',
   'itemUi.quality.poor': 'Низкое',
   'itemUi.quality.common': 'Обычное',
   'itemUi.quality.uncommon': 'Необычное',
@@ -3043,6 +3165,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': 'Пас: {item}',
   'itemUi.lootRoll.everyonePassed': 'Все отказались от {item}.',
   'itemUi.lootRoll.rolled': '{answered}/{total} бросили',
+  'itemUi.lootRoll.bindsOnPickup': 'Персональный при получении',
   'entities.abilities.heroic_strike.name': 'Удар разорителя',
   'entities.abilities.heroic_strike.description':
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
@@ -3498,7 +3621,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)',
   'entities.abilities.conflagrate.name': 'Поджигание',
-  'entities.abilities.conflagrate.description': 'Приближает будущий тик вашего Пылающего договора, затем поджигает цель на {damage} урона от огня. Даёт 1 Опустошение и 1 Крах. Держит 2 заряда. (знаковое умение Разрушения)',
+  'entities.abilities.conflagrate.description': 'Приближает будущий тик вашего Пылающего договора, затем поджигает цель на {damage} урона от огня. Даёт 1 Опустошение и 1 Крах. Держит {charges} заряда. (знаковое умение Разрушения)',
   'entities.abilities.moonkin_form.name': 'Облик лунного совуха',
   'entities.abilities.moonkin_form.description':
     'Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)',
@@ -4937,6 +5060,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите через запечатанную королевскую дверь.',
   'entities.dungeons.nythraxis_boss_arena.leaveText':
     'Вы возвращаетесь в холодный воздух Терновых высот.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Игнивар, Вестник Последнего Пламени',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Игнивар Эшколлер',
+  'entities.mobs.derelict_mech.name': 'Заброшенный механизм',
+  'entities.dungeons.ignivar_raid_arena.name': 'Горнило Последнего Источника',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'Жар дрожит над запечатанными водами Горнила.',
+  'entities.dungeons.ignivar_raid_arena.leaveText':
+    'Вы покидаете Горнило и снова дышите свободно.',
   'entities.quests.q_nythraxis_restless_dead.title': 'Беспокойство на костяных полях',
   'entities.quests.q_nythraxis_restless_dead.text':
     'Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.',
@@ -5939,6 +6070,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.many': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.other': 'Осталось {count} сек.',
+  'hudChrome.plurals.buffsHidden.one': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.few': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.many': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.other': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
   'hudChrome.plurals.playtimeDays.one': '{count} день',
   'hudChrome.plurals.playtimeDays.few': '{count} дня',
   'hudChrome.plurals.playtimeDays.many': '{count} дней',
@@ -5973,6 +6108,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': 'Инверсия камеры (Y)',
   'hudChrome.controller.deadzone': 'Мёртвая зона стика',
   'hudChrome.controller.cameraSpeed': 'Скорость камеры',
+  'hudChrome.controller.reticleSpeed': 'Скорость прицела',
   'hudChrome.controller.vibration': 'Вибрация',
   'hudChrome.controller.buttons': 'Раскладка кнопок',
   'hudChrome.controller.resetButtons': 'Сбросить раскладку кнопок',
@@ -6010,6 +6146,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': 'Легендарное',
   'entities.items.deathless_heartwood.name': 'Сердцевина бессмертной короны',
   'entities.items.kingsbane_last_oath.name': 'Погибель Трона, последняя клятва Торнпика',
+  'entities.items.varkhul_forgebreaker.name': 'Горнолом, машина Варкула',
+  'entities.items.varkhul_emberward.name': 'Углестраж, бастион Варкула',
   'entities.items.crownforged_dreadhelm.name': 'Костокованый шлем ужаса',
   'entities.items.crownforged_warspaulders.name': 'Костокованые боевые наплечники',
   'entities.items.nighttalon_crown.name': 'Корона Лютого Клыка',
@@ -6175,6 +6313,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': 'Рюкзак',
   'hudChrome.bags.socketEmpty': 'Пустая ячейка для сумки',
   'hudChrome.bags.unequipHint': 'Нажмите, чтобы снять эту сумку',
+  'hudChrome.bags.poolGeneral': 'Общие: {used} из {total}',
+  'hudChrome.bags.poolMaterials': 'Материалы: {used} из {total}',
+  'hudChrome.bags.capacityPoolsAria': 'Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'Классическая MMO, в которую можно играть бесплатно прямо в браузере.',
@@ -7704,6 +7845,262 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.sharedPyre':
+    'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках). За каждого недостающего игрока весь рейд, включая игроков в круге, дополнительно получает урон в размере {missingPenalty}% от максимального здоровья.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Перехватите луч активной колонны до того, как он достигнет кузни. Свободный луч добавляет 6% жара в секунду. В обычном режиме заблокированные лучи и выключенные колонны охлаждают кузню; в героическом жар не снижается. При 100% происходит смертоносное расплавление кузни.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Перехват луча горнила каждую секунду наносит всё больший урон от максимального здоровья. Эффект сбрасывается через 10 секунд вне луча в обычном режиме и через 60 секунд в героическом.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    'Левая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    'Правая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    'Колонны кузни заряжаются. Они зажгутся через 3 секунды!',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    'Искровой механик приближается к горнилу!',
+  'hudChrome.varkhulCallout.leftPillar': 'Левая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.rightPillar': 'Правая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.bothPillars': 'Колонны кузни зажигаются!',
+  'hudChrome.varkhulCallout.portalsOpening': 'Порталы кузни открываются!',
+  'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
+  'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
+  'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    'Мировое пламя вспыхивает по краю зала. Через 42 сек горнило будет поглощено!',
+  'hudChrome.varkhulCallout.worldfireClosing': 'Мировое пламя сжимается. Двигайтесь к центру!',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'Всё горнило охвачено огнём!',
+  'hudChrome.varkhulWaveStatus': 'Волна {wave}/{waves} | Враги: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Тактика на босса',
+  'hudChrome.raidBossGuide.button': 'Тактика: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
+  'hudChrome.raidBossGuide.close': 'Закрыть тактику',
+  'hudChrome.raidBossGuide.bossesLabel': 'Рейдовые боссы',
+  'hudChrome.raidBossGuide.difficultyLabel': 'Сложность',
+  'hudChrome.raidBossGuide.normal': 'Обычный',
+  'hudChrome.raidBossGuide.heroic': 'Героический',
+  'hudChrome.raidBossGuide.portraitAlt': 'Портрет босса {boss}',
+  'hudChrome.raidBossGuide.overviewHeading': 'Обзор',
+  'hudChrome.raidBossGuide.abilitiesHeading': 'Способности',
+  'hudChrome.raidBossGuide.whatToDo': 'Что делать',
+  'hudChrome.raidBossGuide.whatToDoResponse': 'Что делать: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': 'Обязанности ролей',
+  'hudChrome.raidBossGuide.flagsLabel': 'Предупреждения механик',
+  'hudChrome.raidBossGuide.roleTank': 'Танк',
+  'hudChrome.raidBossGuide.roleHealer': 'Лекарь',
+  'hudChrome.raidBossGuide.roleDamage': 'Боец',
+  'hudChrome.raidBossGuide.roleAll': 'Все роли',
+  'hudChrome.raidBossGuide.flagDeadly': 'Смертельно',
+  'hudChrome.raidBossGuide.flagInterruptible': 'Можно прервать',
+  'hudChrome.raidBossGuide.flagImportant': 'Важно',
+  'hudChrome.raidBossGuide.flagCleansable': 'Можно рассеять',
+  'hudChrome.raidBossGuide.browseBoss': 'Показать: {boss}',
+  'hudChrome.raidBossGuide.chooseDifficulty': 'Показать механики сложности «{difficulty}»',
+  'hudChrome.raidBossGuide.expandAbility': 'Развернуть: {ability}',
+  'hudChrome.raidBossGuide.collapseAbility': 'Свернуть: {ability}',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'Варкхул выковал Игнивара как вестника, живую печать и ключ к Внутреннему горнилу. В этом бою проверяются управление водоводами, точное перемещение и быстрая атака приоритетных целей.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': 'Пробуждение вестника',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    'Управляйте Клеймом костра с помощью водоводов, избегая повторяющихся фронтальных атак, небесного огня, вращающихся лучей и расширяющейся Волны кузни.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': 'Переход: Апокалипсис',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    'На {health} здоровья Игнивар призывает Эшколлера, который пытается завершить бой.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': 'Суд кузни',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    'На {health} здоровья Игнивар поджигает арену и открывает одно безопасное место среди трёх убежищ.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    'На {health} здоровья Игнивар поджигает арену, а действующие Клейма продолжают угрожать игрокам рядом даже внутри убежища.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': 'Финал: Последний инферно',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    'На {health} здоровья Игнивар начинает финальную фазу с жёстким ограничением времени и ускоренными повторяющимися механиками.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': 'Удар кузни',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'Игнивар бьёт текущего танка и накладывает Расплавленную броню, увеличивая получаемый от Игнивара урон.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'Танки меняются на{stacks} зарядах. Лекари готовятся к удару и первым атакам ближнего боя по новому танку.',
+  'hudChrome.raidBossGuide.ignivar.brandName': 'Клеймо костра',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'Игнивар отмечает игроков, кроме танков, постоянным уроном от огня. Отмеченные игроки также обжигают ближайших союзников.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    'Рассредоточьтесь. Направьте Жгучий поток в готовый водовод, затем каждый отмеченный игрок должен в одиночку пройти через активированную воду и очиститься.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    'Рассредоточьтесь. Откройте водовод Жгучим потоком и очищайте по одному отмеченному игроку. Каждое очищение вызывает рейдовую Обратную волну очищения.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': 'Жгучий поток',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'Игнивар отслеживает игрока, а затем выпускает широкий фронтальный поток. Готовый водовод, задетый атакой, ненадолго активируется.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'Игнивар отслеживает игрока, а затем выпускает почти смертельный широкий фронтальный поток. Готовый водовод, задетый атакой, ненадолго активируется.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    'Проведите предупреждение ровно через один готовый водовод. Все остальные покидают фронтальную область до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.rainName': 'Дождь углей',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    'Три огненных сектора и отмеченные места падения метеоров наносят урон игрокам, оставшимся в предупреждающих областях.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    'Три огненных сектора и отмеченные места падения метеоров наносят огромный урон игрокам, оставшимся в предупреждающих областях.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse':
+    'Перейдите в неотмеченный разрыв и покиньте каждый круг метеора до падения.',
+  'hudChrome.raidBossGuide.ignivar.raysName': 'Вращающийся инферно',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    'Вращающиеся огненные лучи проходят вокруг Игнивара и многократно наносят урон коснувшимся их игрокам.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    'Вращающиеся огненные лучи проходят вокруг Игнивара и при касании многократно наносят тяжёлый урон.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    'Двигайтесь вместе со свободным пространством между лучами. Не пересекайте луч даже с помощью быстрого перемещения.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': 'Волна кузни',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    'Расширяющаяся стена огня пересекает арену, оставляя два противоположных разрыва и отбрасывая задетых игроков.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    'Расширяющаяся стена огня пересекает арену, оставляя два противоположных разрыва и отбрасывая задетых игроков намного дальше.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    'Во время подготовки найдите любой разрыв, выровняйтесь с ним и не позволяйте отбросить себя к краю арены.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': 'Апокалипсис',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'Игнивар призывает Эшколлера. Если прислужник завершит Апокалипсис, рейд немедленно потерпит поражение.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    'Все доступные бойцы переключаются на Игнивара Эшколлера и уничтожают его до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': 'Суд кузни',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'Игнивар отмечает три убежища, указывает одно безопасное место, а затем многократно поджигает остальную арену.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    'Пока арена горит, Игнивар отмечает одно безопасное убежище. Клеймо костра остаётся активным и продолжает наносить урон ближайшим союзникам.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    'Во время предупреждения найдите уникально отмеченное убежище и полностью соберитесь внутри его границы до воспламенения пола.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': 'Цепи кузни',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'Игнивар связывает ближайшие пары. Слишком большое расстояние или пересечение цепи другой пары наносит смертельный урон.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'Держитесь рядом со связанным напарником, двигайтесь вместе и не позволяйте другим игрокам проходить через вашу цепь.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': 'Последний инферно',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'Игнивар впадает в ярость и готовит полное уничтожение, пока Дождь углей, Жгучий поток и Вращающийся инферно ускоряются.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    'Используйте оставшиеся атакующие и лечебные способности, продолжайте выполнять механики движения и победите Игнивара до конца отсчёта.',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Клеймо костра: рассредоточьтесь. Направьте Жгучий поток в готовый водовод и пройдите через воду в одиночку, чтобы очиститься.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Движение: избегайте конусов и метеоров Дождя углей, двигайтесь с Вращающимся инферно и используйте два разрыва Волны кузни.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Апокалипсис: уничтожьте Игнивара Эшколлера до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Суд кузни: определите особое убежище во время предупреждения и соберитесь внутри отмеченной границы, когда загорится пол.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Последний инферно: убейте Игнивара до полного уничтожения, справляясь с ускоренными метеорами, фронтальными атаками и Вращающимся инферно.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Героический: связанные игроки держатся рядом во время Цепей кузни, Клеймо сохраняется внутри Суда, а Волна кузни отбрасывает игроков дальше.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'Варкхул заточил умирающий Последний источник, чтобы ковать живой металл, а затем создал Игнивара для охраны своего преступления. Бой сочетает личное позиционирование и управление великой кузней силами всего рейда.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': 'Отец кузни',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'Варкхул чередует давление на танков, широкие фронтальные атаки, движущиеся снаряды, совместное принятие урона, волны метеоров и атаки великой наковальни.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': 'Переход: Сборка мастера',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    'На {health} здоровья Варкхул получает защиту, легион кузни входит через порталы, а лучи столпов угрожают вызвать Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': 'Финал: Освобождённый шедевр',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    'На {health} здоровья Варкхул атакует быстрее, наносит больше урона и обжигает рейд огненными импульсами до последнего срока.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    'На {health} здоровья Варкхул отказывается от большинства прежних механик, пока Мировой огонь сжимается внутрь и поглощает горнило.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': 'Клеймо создателя',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'Варкхул бьёт текущего танка и накладывает суммирующийся эффект, увеличивающий весь получаемый от него урон.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'Танки меняются на{stacks} зарядах. Лекари защищают входящего танка до смены цели Варкхула.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': 'Размах отца кузни',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'Варкхул совершает очень широкий фронтальный размах, наносящий большой урон от огня всем перед ним.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'Варкхул совершает очень широкий фронтальный размах, наносящий почти смертельный урон от огня всем перед ним.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'Держите Варкхула лицом от группы и сразу перемещайтесь ему за спину при появлении предупреждения.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': 'Угольные сферы',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    'Отмеченные игроки, кроме танков, оставляют постоянные угольные лужи и выпускают огненные сферы во всех направлениях. Раскалённый металл также поглощает входящее исцеление.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    'Отмеченные игроки, кроме танков, оставляют очень опасные угольные лужи и выпускают огненные сферы во всех направлениях. Раскалённый металл также поглощает входящее исцеление.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    'Отнесите каждую метку к краю комнаты, разделите лужи, а затем уклоняйтесь от пересекающих арену сфер. Лекари быстро снимают поглощение исцеления.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': 'Общий костёр',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    'Движущийся круг следует за игроком без Раскалённого металла. Урон делится между игроками внутри, а за каждого недостающего игрока весь рейд получает {missingPenalty} максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    'Движущийся круг следует за игроком без Раскалённого металла и делит более сильный удар. За каждого недостающего игрока весь рейд также получает {missingPenalty} максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    'Соберите не менее {players} игроков внутри круга и двигайтесь вместе с целью до срабатывания заклинания.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': 'Кузнечная буря',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'Варкхул вызывает на арене {waves} последовательных волн отмеченных падений метеоров.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'Варкхул вызывает {waves} последовательных волн отмеченных падений метеоров, наносящих огромный урон.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    'Следите за каждым новым набором предупреждений на земле и уходите до падения волны. Не возвращайтесь на прежнее место, не проверив следующую волну.',
+  'hudChrome.raidBossGuide.varkhul.rayName': 'Закалочный луч',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    'Луч долго отслеживает отмеченного игрока. Первый другой игрок между Варкхулом и целью перехватывает удар и получает Закалённую рану.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    'Назначьте здорового игрока, обычно второго танка, который встанет на линию. Остальные отходят, а перехватчики меняются, пока действует Закалённая рана.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': 'Указ наковальни',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'Варкхул идёт к великой кузне и бьёт по ней{strikes} раз, нанося всё больший урон всему рейду.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'Варкхул бьёт по великой кузне{strikes} раз, нанося всё больший урон рейду, пока отмеченные метеоры падают на игроков.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse':
+    'Соберитесь для рейдового исцеления и используйте защитные способности на последнем ударе.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    'Разнесите отмеченные метеоры от группы, пока лекари и защитные способности прикрывают все{strikes} ударов.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': 'Сборка мастера',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'Варкхул получает защиту и начинает сборку с ограничением времени. Рейд должен победить все волны порталов до завершения шедевра кузней.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    'Разделите внимание между управлением лучами и приоритетными прислужниками. Победите весь легион кузни до окончания таймера сборки.',
+  'hudChrome.raidBossGuide.varkhul.beamName': 'Луч горнила',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    'Активные лучи столпов нагревают кузню, если игроки их не перекрывают. Перекрывающие игроки получают растущий урон от Воздействия горнила, а перекрытые и неактивные лучи позволяют жару спадать.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    'Активные лучи столпов нагревают кузню, если игроки их не перекрывают. Перекрывающие игроки получают растущий урон от Воздействия горнила, а жар кузни никогда не спадает.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    'Встаньте между каждым активным столпом и кузней, затем меняйте игроков до опасного уровня воздействия. Полный жар вызывает смертельное Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.legionName': 'Легион кузни',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'Стражи горнила применяют Землетрясение тигля, повышающее жар кузни, а Угольные мастера используют Протокол ремонта для лечения Варкхула.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'Прерывайте Землетрясение тигля и Протокол ремонта, сосредоточьтесь на каждом опасном заклинателе, а затем добейте остальных прислужников.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': 'Освобождённый шедевр',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'Варкхул атакует быстрее, наносит больше урона и многократно обжигает рейд до финального уничтожения.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'Варкхул атакует быстрее и наносит больше урона, а Мировой огонь заменяет большинство прежних механик в финальном натиске.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    'Используйте оставшиеся атакующие и защитные способности и победите Варкхула до конца финального отсчёта.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': 'Мировой огонь',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    'В героическом режиме огонь поэтапно движется от края арены к центру, пока всё горнило не загорится.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    'Двигайтесь внутрь раньше каждой наступающей полосы огня, сохраняйте сужающееся безопасное место и победите Варкхула до воспламенения центра.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Танки: меняйтесь на двух зарядах Клейма создателя и держите Вархала в радиусе ближнего боя.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Угольные сферы: отмеченные игроки расходятся к краю комнаты. Огненные лужи остаются, а выпущенные сферы пересекают комнату.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Общий костёр: выбирается только игрок без Раскалённого металла. В круге нужны четыре игрока в любом режиме. За каждого недостающего игрока весь рейд получает урон в размере 15% от максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Кузнечная буря: следите за падающими метеорами и покидайте каждую отмеченную область до падения трёх волн.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Указ наковальни: Вархал идёт к великой кузне и трижды бьёт по ней, нанося урон рейду. В героическом режиме также падают отмеченные метеоры.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Закалочный луч: другой игрок, обычно танк, перехватывает движущуюся линию до конца долгого предупреждения. Получивший удар получает Закалённую рану.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Столпы кузни: перекрывайте лучи до их попадания в кузню и меняйте игроков по мере роста Воздействия горнила. Полная шкала жара вызывает Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'Сборка мастера: перекрывайте оба луча, убивайте все волны порталов, прерывайте Землетрясение тигля и не давайте Угольным мастерам лечить Вархала.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Мировой огонь: в героической финальной фазе горящий край сжимается к центру. Победите Вархала до того, как загорится всё горнило.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Героический: жар кузни не спадает, Указ наковальни добавляет метеоры, а финальная фаза сосредоточена на Мировом огне.',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
@@ -7789,45 +8186,155 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.crownforged.name': 'Костокованые регалии',
-  'entities.itemSets.crownforged.bonus2': 'Сила атаки повышается на 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Сила повышается на 15, выносливость на 15, а скорость атаки и произнесения заклинаний на 15%.',
-  'entities.itemSets.crownforged.bonus4':
-    'Критические удары оружием оставляют в цели «Костяной осколок»: 8 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
+  'entities.itemSets.crownforged.bonus2': 'Сила повышается на 10, выносливость повышается на 10.',
+  'entities.itemSets.crownforged.bonus4': 'Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 40 на 10 сек.',
+  'entities.itemSets.crownforged.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием оставляют в цели «Костяной осколок»: 5 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
+  'entities.itemSets.packlord_emberhide.name': 'Угольная шкура повелителя стаи',
+  'entities.itemSets.packlord_emberhide.bonus2': 'Время восстановления Команды стае сокращается до 3 сек.',
+  'entities.itemSets.packlord_emberhide.bonus4': 'Шанс Команды стае сбросить восстановление Звериного натиска возрастает до 30%.',
+  'entities.itemSets.coldsight_trackers.name': 'Снаряжение следопыта холодного взора',
+  'entities.itemSets.coldsight_trackers.bonus2': 'Выверенный выстрел восстанавливает на 5 Концентрации больше.',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    'Критические удары Долгого натяга продлевают Холодную сосредоточенность на 2 сек, но не более чем на 6 сек за одно действие эффекта.',
+  'entities.itemSets.slagsnare.name': 'Убранство шлаковых силков',
+  'entities.itemSets.slagsnare.bonus2': 'Потрошащий удар дает 20 Концентрации.',
+  'entities.itemSets.slagsnare.bonus4':
+    'Рваная рана, поглощающая 3 Охотничьих натиска, сохраняет их. Не чаще одного раза в 8 сек.',
+  'entities.itemSets.cinderfang.name': 'Покров угольного клыка',
+  'entities.itemSets.cinderfang.bonus2':
+    'Ядовитый ритуал возвращает 20 ед. энергии за удар вместо 15.',
+  'entities.itemSets.cinderfang.bonus4':
+    'Время восстановления Ядовитого дротика сокращается до 4 сек.',
+  'entities.itemSets.smolderstrike.name': 'Кожаные доспехи тлеющего удара',
+  'entities.itemSets.smolderstrike.bonus2': 'Удар с размаху наносит на 20% больше урона.',
+  'entities.itemSets.smolderstrike.bonus4':
+    'Каждое применение Отключки сокращает оставшееся время восстановления Шквала клинков на 6 сек.',
+  'entities.itemSets.ashveil.name': 'Одеяние пепельной завесы',
+  'entities.itemSets.ashveil.bonus2': 'Удар скрытня наносит на 25% больше урона.',
+  'entities.itemSets.ashveil.bonus4':
+    'Первый Удар скрытня под Ударом завесы наносит тройной урон вместо двойного.',
+  'entities.itemSets.emberscreed.name': 'Одеяние угольного кредо',
+  'entities.itemSets.emberscreed.bonus2':
+    'Ваша связь Послушания преобразует в исцеление на 10% больше вашего светлого урона. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.emberscreed.bonus4':
+    'Когда ваш Псалом ограждения полностью поглощен, следующий Очищающий гимн в течение 10 сек. применяется мгновенно. Не чаще одного раза в 15 сек.',
+  'entities.itemSets.benison_dawnweave.name': 'Рассветное плетение благословения',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    'Спасительное исцеление Серафического бдения возрастает до 270 вместо 180. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    'Когда срабатывает Серафическое бдение, его подопечный дополнительно исцеляется на 15% своего максимального запаса здоровья в течение 10 сек.',
+  'entities.itemSets.vesperash.name': 'Покров вечернего пепла',
+  'entities.itemSets.vesperash.bonus2':
+    'Время восстановления Призыва демона десятины сокращается на 6 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.vesperash.bonus4':
+    'Призыв демона десятины сбрасывает восстановление Раскола разума, а демон возвращает вдвое больше маны за каждый удар.',
+  'entities.itemSets.stormkindled.name': 'Регалии грозового розжига',
+  'entities.itemSets.stormkindled.bonus2':
+    'Высвобождение оружия с пламенным клеймом даёт 3 Грома. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.stormkindled.bonus4':
+    'Бонус Земного толчка за каждый Гром возрастает до 30%.',
+  'entities.itemSets.warspirit_emberscale.name': 'Угольная чешуя духа войны',
+  'entities.itemSets.warspirit_emberscale.bonus2': 'Удар предков продвигает ваш ритм на 3 шага.',
+  'entities.itemSets.warspirit_emberscale.bonus4': 'Удар предков наносит на 30% больше урона.',
+  'entities.itemSets.stonehearth.name': 'Бастион каменного очага',
+  'entities.itemSets.stonehearth.bonus2':
+    'Пока действуют каменные узы, Целебные воды под Бурезаклятием не тратят ману и исцеляют на 25% сильнее.',
+  'entities.itemSets.stonehearth.bonus4':
+    'Пока действуют каменные узы, завершение ритма исцеляет вас на 3% максимального здоровья.',
+  'entities.itemSets.springmender.name': 'Чешуя родникового целителя',
+  'entities.itemSets.springmender.bonus2':
+    'Время восстановления Зова прилива сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.springmender.bonus4':
+    'Каскадное исцеление достигает четвёртого союзника и собирает Поток исцеления со 150%.',
+  'entities.itemSets.chronoweave.name': 'Одеяние эфирного плетения',
+  'entities.itemSets.chronoweave.bonus2':
+    'Временное эхо преобразует в исцеление 50% вашего урона от тайной магии по одиночной цели. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Время восстановления Временного каскада сокращается на 5 сек.',
+  'entities.itemSets.pyroclast.name': 'Регалии пирокласта',
+  'entities.itemSets.pyroclast.bonus2':
+    'Ошпаривание всегда наносит критический удар по целям с 35% здоровья или ниже. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.pyroclast.bonus4':
+    'Критические удары ваших заклинаний огня вне Транса феникса сокращают его оставшееся время восстановления на 1,5 сек.',
+  'entities.itemSets.frostquench.name': 'Плетение морозной закалки',
+  'entities.itemSets.frostquench.bonus2':
+    'Критические удары Копья изморози откладывают дополнительную «Сосульку», но не более 5. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.frostquench.bonus4':
+    'Зимняя плеть накладывает 3 заряда «Зимней стужи» вместо 2.',
+  'entities.itemSets.hexthread.name': 'Покров колдовской нити',
+  'entities.itemSets.hexthread.bonus2':
+    'Игла судьбы создаёт дополнительно 2 ед. Осуждения. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.hexthread.bonus4': 'Вынесение Приговора возвращает 10 ед. Осуждения.',
+  'entities.itemSets.gravebrand.name': 'Регалии могильного клейма',
+  'entities.itemSets.gravebrand.bonus2':
+    'Время восстановления Приказа жатвы сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.gravebrand.bonus4': 'Слаженные удары Приказа жатвы наносят на 25% больше урона.',
+  'entities.itemSets.ruincaller.name': 'Одеяние зовущего погибель',
+  'entities.itemSets.ruincaller.bonus2':
+    'Поджигание держит 3 заряда. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.ruincaller.bonus4': 'Стрела погибели наносит на 20% больше урона.',
+  'entities.itemSets.moonscorch.name': 'Одеяние лунного ожога',
+  'entities.itemSets.moonscorch.bonus2':
+    'Лунное семя может продлевать Лунную бурю дважды за одно наложение, всего не более 12 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.moonscorch.bonus4':
+    'Лунный всплеск и Пробуждение солнца наносят на 25% больше урона.',
+  'entities.itemSets.wildfang_emberhide.name': 'Тлеющая шкура дикого клыка',
+  'entities.itemSets.wildfang_emberhide.bonus2':
+    'Кровавая жатва восстанавливает 45 ед. энергии вместо 30.',
+  'entities.itemSets.wildfang_emberhide.bonus4':
+    'Кровавая жатва накладывает на цель новое Свежевание.',
+  'entities.itemSets.cinderbark.name': 'Защита пепельной коры',
+  'entities.itemSets.cinderbark.bonus2':
+    'Разящие когти с вероятностью 30% добавляют дополнительную стадию Старой крови.',
+  'entities.itemSets.cinderbark.bonus4':
+    'Дробление костей наносит на 30% больше урона, а его аварийная защита больше не заменяет удар.',
+  'entities.itemSets.grovespring.name': 'Одеяние рощевого родника',
+  'entities.itemSets.grovespring.bonus2':
+    'Быстрое восстановление сначала поглощает ваш собственный Дикий расцвет или Второй расцвет и исцеляет на 25% больше. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.grovespring.bonus4':
+    'Сверхцветение собирает 75% оставшегося исцеления ваших эффектов, после чего добавляет 1 стадию Зелени.',
+  'entities.items.lastflame_core.name': 'Ядро Последнего Пламени',
+  'entities.itemSets.slagbreaker.name': 'Боевое облачение шлаколома',
+  'entities.itemSets.slagbreaker.bonus2': 'Кровавая рука усиливает ваш следующий Калечащий удар на 30% за заряд вместо 20%.',
+  'entities.itemSets.slagbreaker.bonus4': 'Каждое второе применение Кровавой руки сокращает оставшееся время восстановления Бреши на 3 сек.',
+  'entities.itemSets.emberfury.name': 'Упряжь угольной ярости',
+  'entities.itemSets.emberfury.bonus2': 'Ваше Бешенство длится 6 сек вместо 4.',
+  'entities.itemSets.emberfury.bonus4': 'Кровопускание всегда приводит вас в Бешенство, а его исцеление возрастает до 8% вашего максимального запаса здоровья.',
+  'entities.itemSets.forgewall.name': 'Эгида кузнечной стены',
+  'entities.itemSets.forgewall.bonus2': 'Железная решимость преобразует ярость в 5 единиц поглощения за каждую единицу вместо 4.',
+  'entities.itemSets.forgewall.bonus4': 'Каждое применение Раскола щита сокращает оставшееся время восстановления Железной решимости на 2 сек.',
+  'entities.itemSets.dawnforged.name': 'Облачение рассветной ковки',
+  'entities.itemSets.dawnforged.bonus2': 'Маяк Света копирует 55% вашего прямого исцеления. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.dawnforged.bonus4': 'Усиленные Сияющим резонансом Объятия рассвета применяются мгновенно.',
+  'entities.itemSets.oathpyre.name': 'Бастион клятвенного костра',
+  'entities.itemSets.oathpyre.bonus2': 'Вероятность того, что Удар хранителя обета даст Солнечное возмездие, возрастает до 30%, а успешный блок дает его с вероятностью 40%.',
+  'entities.itemSets.oathpyre.bonus4': 'Потратив Солнечное возмездие, вы получаете щит на 6% вашего максимального запаса здоровья на 10 сек.',
+  'entities.itemSets.zealfire.name': 'Боевой доспех пламенного рвения',
+  'entities.itemSets.zealfire.bonus2': 'Последний эдикт и Падение рассвета сокращают оставшееся время восстановления друг друга на 3 сек вместо 2.',
+  'entities.itemSets.zealfire.bonus4': 'Молот гнева, примененный под Гневом рассвета, наносит на 40% больше урона вместо 20%.',
   'entities.itemSets.deathlord.name': 'Боевой доспех Владыки Кургана',
-  'entities.itemSets.deathlord.bonus2': 'Сила атаки повышается на 40.',
-  'entities.itemSets.deathlord.bonus3': 'Сила повышается на 15, выносливость на 15.',
-  'entities.itemSets.deathlord.bonus4':
-    'Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 60 на 10 сек.',
+  'entities.itemSets.deathlord.bonus2': 'Сила повышается на 10, выносливость повышается на 10.',
+  'entities.itemSets.deathlord.bonus4': 'Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 40 на 10 сек.',
+  'entities.itemSets.deathlord.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием оставляют в цели «Костяной осколок»: 5 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'entities.itemSets.greyjaw_stalker.name': 'Снаряжение ловчего Серой Челюсти',
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.necromancers.name': 'Одеяние Скорбного плетения',
-  'entities.itemSets.necromancers.bonus2':
-    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
-  'entities.itemSets.necromancers.bonus3': 'Интеллект повышается на 10, выносливость на 10.',
-  'entities.itemSets.necromancers.bonus4':
-    'Ваши заклинания с вероятностью 10% даруют «Ясность», делая следующее заклинание бесплатным.',
+  'entities.itemSets.necromancers.bonus2': 'Интеллект повышается на 10, дух повышается на 10. Получаемый урон замедляет чтение ваших заклинаний вдвое меньше (50% сопротивление замедлению чтения).',
+  'entities.itemSets.necromancers.bonus4': 'Увеличивает силу заклинаний на 12. Ваши заклинания с вероятностью 6% даруют «Ясность», делая следующее заклинание бесплатным.',
+  'entities.itemSets.necromancers.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%. Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 25 на 10 сек.',
   'entities.itemSets.nighttalon.name': 'Кожаный доспех Лютого Клыка',
-  'entities.itemSets.nighttalon.bonus2': 'Сила атаки повышается на 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Ловкость повышается на 15, вероятность критического удара на 2%, а скорость атаки и произнесения заклинаний на 15%.',
-  'entities.itemSets.nighttalon.bonus4':
-    'Критические удары оружием наносят «Рваную рану»: цель теряет 6 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
+  'entities.itemSets.nighttalon.bonus2': 'Ловкость повышается на 10, вероятность критического удара на 1%.',
+  'entities.itemSets.nighttalon.bonus4': 'Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 15% на 8 сек.',
+  'entities.itemSets.nighttalon.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием наносят «Рваную рану»: цель теряет 4 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'entities.itemSets.soulflame.name': 'Одеяние Призрачного пламени',
-  'entities.itemSets.soulflame.bonus2':
-    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
-  'entities.itemSets.soulflame.bonus3':
-    'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
-  'entities.itemSets.soulflame.bonus4':
-    'Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 40 на 10 сек.',
+  'entities.itemSets.soulflame.bonus2': 'Интеллект повышается на 10, дух повышается на 10. Получаемый урон замедляет чтение ваших заклинаний вдвое меньше (50% сопротивление замедлению чтения).',
+  'entities.itemSets.soulflame.bonus4': 'Увеличивает силу заклинаний на 12. Ваши заклинания с вероятностью 6% даруют «Ясность», делая следующее заклинание бесплатным.',
+  'entities.itemSets.soulflame.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%. Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 25 на 10 сек.',
   'entities.itemSets.stormcallers.name': 'Одеяние Зова Бури',
-  'entities.itemSets.stormcallers.bonus2':
-    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
-  'entities.itemSets.stormcallers.bonus4':
-    'Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 40 на 10 сек.',
+  'entities.itemSets.stormcallers.bonus2': 'Интеллект повышается на 10, дух повышается на 10. Получаемый урон замедляет чтение ваших заклинаний вдвое меньше (50% сопротивление замедлению чтения).',
+  'entities.itemSets.stormcallers.bonus4': 'Увеличивает силу заклинаний на 12. Ваши заклинания с вероятностью 6% даруют «Ясность», делая следующее заклинание бесплатным.',
+  'entities.itemSets.stormcallers.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%. Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 25 на 10 сек.',
   'entities.itemSets.vale_arcanist.name': 'Регалии арканиста Долины',
   'entities.itemSets.vale_arcanist.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
@@ -7852,11 +8359,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_thornhide.bonus4': 'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_thornhide.bonus7': 'Повышает рейтинги атаки и защиты Боевой мощи на 80. Ваши заклинания с вероятностью 15% дают Терновую стражу, повышающую уклонение на 15% на 6 сек.',
   'entities.itemSets.wyrmshadow.name': 'Облачение Ночного Клыка',
-  'entities.itemSets.wyrmshadow.bonus2': 'Сила атаки повышается на 40.',
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Ловкость повышается на 15, вероятность критического удара на 2%.',
-  'entities.itemSets.wyrmshadow.bonus4':
-    'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
+  'entities.itemSets.wyrmshadow.bonus2': 'Ловкость повышается на 10, вероятность критического удара на 1%.',
+  'entities.itemSets.wyrmshadow.bonus4': 'Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 15% на 8 сек.',
+  'entities.itemSets.wyrmshadow.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием наносят «Рваную рану»: цель теряет 4 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemUniqueEquipped': 'Уникальный (экипируется)',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
@@ -8744,6 +9249,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.wallet.reauth_required': 'Подтвердите это изменение кошелька паролем учетной записи.',
+  'apiError.wallet.reauth_two_factor':
+    'В вашей учетной записи включена двухфакторная аутентификация. Введите код для подтверждения.',
+  'apiError.wallet.reauth_no_password':
+    'Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'apiError.wallet.reauth_bad_signature':
+    'Не удалось проверить подпись кошелька. Попробуйте ещё раз.',
+  'apiError.wallet.reauth_bad_password': 'Неверный пароль.',
+  'apiError.wallet.reauth_bad_two_factor': 'Этот код недействителен, попробуйте ещё раз.',
   'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
   'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
   'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
@@ -8804,6 +9318,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': 'Персонаж сейчас в сети.',
   'apiError.character.rename_not_permitted': 'Переименование этого персонажа не разрешено.',
   'apiError.character.delete_confirm': 'Введите имя персонажа, чтобы подтвердить удаление.',
+  'apiError.character.storage_purchase_open':
+    'Перед удалением этого персонажа покупка хранилища должна быть завершена или урегулирована.',
+  'apiError.character.delete_busy':
+    'Сервер перегружен. Повторите попытку удаления этого персонажа чуть позже.',
   'apiError.character.already_in_world': 'Персонаж уже находится в мире.',
   'apiError.character.taken_over': 'Вашего персонажа перехватила другая сессия.',
   'apiError.character.rename_required': 'Перед входом в мир этому персонажу нужно сменить имя.',
@@ -9056,11 +9574,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': 'Загрузка биржи...',
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Открыть Биржу $WOC в браузере?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Биржа $WOC доступна только в браузерной версии World of ClaudeCraft. В браузере откроется World of ClaudeCraft, где вы сможете войти и открыть биржу, игра продолжит работать здесь.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Открыть в браузере',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Отмена',
   'hudChrome.wocMarket.pausedBanner':
     'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
-  'hudChrome.wocMarket.walletBanner':
-    'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
-  'hudChrome.wocMarket.walletBannerCta': 'Подключить кошелёк',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    'Ваш публичный адрес привязан. Чтобы платить в $WOC, снова подключите это приложение-кошелёк.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
+  'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
+  'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
@@ -9458,6 +9984,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': 'Кожевничество',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '(потратит отборный сорт: {count})',
+  'hudChrome.crafting.reagentVaultDraw': '(возьмёт из хранилища материалов: {count})',
+  'hudChrome.crafting.vaultUnreachable': 'Хранилище материалов здесь недоступно.',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
@@ -9675,6 +10203,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пока хранилище открыто, щёлкните предмет в сумках, чтобы положить его, и щёлкните предмет в хранилище, чтобы забрать обратно. Хранилище принимает только вещи, но не монеты, а квестовые предметы всегда остаются при вас. Если сумки переполнились в дороге, отдельная кнопка разом убирает все ремесленные материалы.',
   'guide.economy.bankSlots':
     'Свежее хранилище невелико, но растёт вместе с вами. Казначей продаёт дополнительные ячейки за монеты, и каждая следующая ступень дороже прежней. Игра онлайн приносит и бонусное место: за подтверждённую почту, привязанные аккаунты и друзей, которых вы привели в игру.',
+  'guide.economy.bankSockets':
+    'Помимо лестницы ячеек казначей продаёт до четырёх ячеек для сумок: они открываются по порядку, и каждая следующая дороже прежней. Вложите запасную сумку из своего набора, и её ячейки прибавятся к месту в хранилище: обычная сумка расширяет всё хранилище, а сумка для реагентов добавляет место только под материалы для ремесла. Нажмите на сумку в сумках, чтобы вложить её, и на ячейку, чтобы забрать обратно. Забирая сумку, вы никогда не теряете сохранённое: если хранилище окажется полнее уменьшившегося места, всё остаётся на месте, а новые вклады просто ждут свободного места.',
   'guide.economy.bankTitle': 'Банк',
   'hudChrome.bank.title': 'Банк',
   'hudChrome.bank.subtitle': 'Золочёный сундук',
@@ -9687,18 +10217,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': 'Полностью расширен',
   'hudChrome.bank.buyConfirm': 'Купить {count} дополнительных ячеек банка за {price}?',
   'hudChrome.bank.buyConfirmAccept': 'Купить',
+  'hudChrome.bank.meterLabel': 'Занято {used} из {total} ячеек',
+  'hudChrome.bank.meterPoolGeneral': 'Общие: {used} из {total}',
+  'hudChrome.bank.meterPoolMaterials': 'Материалы: {used} из {total}',
+  'hudChrome.bank.meterPoolsAria': 'Занято ячеек банка: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.',
+  'hudChrome.bank.meterMaterialsNote': 'Место только для материалов из вставленных сумок для материалов. Другие предметы не могут его занимать.',
+  'hudChrome.bank.priceDisclaimer': 'Цены могут меняться вместе с игровой экономикой.',
+  'hudChrome.bank.rungItemName': '{count} ячеек банка',
+  'hudChrome.bank.buySlotsDualAria': 'Купить {count} ячеек за {price} или {cost} Claudium',
+  'hudChrome.bank.buyConfirmDual': 'Купить {count} дополнительных ячеек банка?',
+  'hudChrome.bank.buyConfirmGold': 'Купить за {price}',
+  'hudChrome.bank.buyConfirmClaudium': 'Купить за {cost} Claudium',
+  'hudChrome.bank.rungGranted': 'Ячейки банка добавлены. Банк этого персонажа стал больше.',
+  'hudChrome.bank.rungAlreadyGranted':
+    'Эти ячейки уже есть у персонажа. Повторно средства не списаны.',
+  'hudChrome.bank.rungApplyDeferred':
+    'Оплата прошла. Ячейки появятся автоматически при следующем входе этим персонажем.',
+  'hudChrome.bank.rungGrantUnresolved':
+    'Оплата прошла, но ячейки пока не выданы. Покупка записана, и поддержка сможет её завершить.',
+  'hudChrome.bank.rungInProgress':
+    'Покупка для этого персонажа еще завершается. Повторите попытку через мгновение.',
+  'hudChrome.bank.rungDoesNotFit':
+    'В банке этого персонажа больше не поместится ни одно расширение.',
+  'hudChrome.bank.rungNotPurchasable': 'Эти ячейки банка сейчас нельзя купить.',
+  'hudChrome.bank.rungFailed': 'Не удалось завершить покупку.',
+  'hudChrome.bank.rungOutage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.bank.withdrawHint': 'Нажмите, чтобы забрать',
   'hudChrome.bank.withdrawPartialHint': 'Shift+клик, чтобы забрать часть',
   'hudChrome.bank.depositHint': 'Нажмите, чтобы положить',
   'hudChrome.bank.depositPartialHint': 'Shift+клик, чтобы положить часть',
   'hudChrome.bank.cannotDeposit': 'Нельзя хранить в банке',
   'hudChrome.bank.cannotDepositNow': 'Сейчас положить нельзя',
+  'hudChrome.bank.socketRowAria': 'Ячейки для сумок в банке',
+  'hudChrome.bank.socketEmpty': 'Пустая банковская ячейка для сумки',
+  'hudChrome.bank.socketEmptyHint': 'Нажмите на сумку в сумках, чтобы поместить ее в банк',
+  'hudChrome.bank.socketLocked': 'Закрытая ячейка для сумки',
+  'hudChrome.bank.socketLockedLater':
+    'Ячейки для сумок открываются по порядку, начиная с самой дешевой',
+  'hudChrome.bank.socketUnlockAria': 'Открыть банковскую ячейку для сумки за {price}',
+  'hudChrome.bank.socketUnlockHint': 'Нажмите, чтобы открыть эту ячейку для сумки',
+  'hudChrome.bank.socketUnlockConfirm': 'Открыть банковскую ячейку для сумки за {price}?',
+  'hudChrome.bank.socketUnlockAccept': 'Открыть',
+  'hudChrome.bank.unsocketHint': 'Нажмите, чтобы вернуть эту сумку в сумки',
+  'hudChrome.bank.socketHint': 'Нажмите, чтобы вложить эту сумку в банк',
   'hudChrome.bank.depositQuantityTitle': 'Положить {item}',
   'hudChrome.bank.depositQuantityInput': 'Количество для внесения',
   'hudChrome.bank.depositQuantityConfirm': 'Положить',
   'hudChrome.bank.withdrawQuantityTitle': 'Забрать {item}',
+  'hudChrome.bank.vaultRowWithdrawName': 'Забрать {item}',
+  'hudChrome.bank.priceChanged':
+    'Цена изменилась до завершения покупки. Проверьте обновлённую цену и подтвердите покупку ещё раз.',
   'hudChrome.bank.withdrawQuantityInput': 'Количество для получения',
   'hudChrome.bank.withdrawQuantityConfirm': 'Забрать',
+  'hudChrome.bank.withdrawQuantityAction': 'Выбрать количество для получения: {item}',
   'hudChrome.bank.filterGroupAria': 'Фильтровать банк по категории',
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
@@ -9722,6 +10293,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
+  'hudChrome.bank.vaultTab': 'Хранилище',
+  'hudChrome.bank.vaultCapacityNote': 'Каждый материал можно хранить в количестве до {cap} шт.',
+  'hudChrome.bank.vaultEmpty':
+    'Ваше хранилище пусто. Щелкните по материалу в сумке, чтобы поместить его сюда.',
+  'hudChrome.bank.vaultRowAria': '{item}: хранится {count} из {cap}',
+  'hudChrome.bank.vaultLockedIntro':
+    'Откройте хранилище материалов, чтобы запасать ремесленные материалы рядом с банком. У каждого материала свое место, до {cap} шт.',
+  'hudChrome.bank.vaultUnlockButton': 'Открыть хранилище материалов',
+  'hudChrome.bank.vaultUnlockConfirm': 'Открыть хранилище материалов за {price}?',
+  'hudChrome.bank.vaultUpgrade': 'Расширить предел до {cap}',
+  'hudChrome.bank.vaultUpgradeConfirm':
+    'Расширить предел хранения каждого материала до {cap} за {price}?',
+  'hudChrome.bank.vaultDepositAll': 'Сложить все материалы',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'Отправляет все материалы из ваших сумок в хранилище за один раз, заполняя каждый материал до его предела. Экипировка, инструменты, предметы заданий и расходуемые предметы остаются на месте.',
+  'hudChrome.bank.vaultDepositAllDone': 'Сложено материалов: {count}.',
+  'hudChrome.bank.vaultDepositAllFull': 'Сложено материалов: {count}. Часть пределов заполнена.',
+  'hudChrome.bank.vaultDepositAllNone': 'Пределы хранилища заполнены: ничего не сложено.',
+  'hudChrome.bank.vaultWithdrawShort': 'В сумки помещается только {fit} из {count}.',
+  'hudChrome.bank.vaultDepositHint': 'Щелкните, чтобы поместить в хранилище',
+  'hudChrome.bank.vaultCannotDeposit': 'Нельзя поместить в хранилище',
   'hudChrome.bank.tabsAria': 'Вкладки банка',
   'hudChrome.bank.personalTab': 'Личный',
   'hudChrome.bank.guildTab': 'Гильдия',
@@ -9941,6 +10533,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.',
   'hudChrome.steam.noTicket':
     'Steam не выдал билет для привязки. Запустите Steam и повторите попытку.',
+  'hudChrome.steam.wishlist': 'Добавить в желаемое в Steam',
+  'hudChrome.steam.wishlistAria': 'Добавить в желаемое в Steam: открыть страницу World of ClaudeCraft в магазине',
+  'hudChrome.steam.wishlistShort': 'В желаемое',
   'hudChrome.epic.link': 'Привязать Epic',
   'hudChrome.epic.unlink': 'Отвязать Epic',
   'hudChrome.epic.linked': 'Привязан аккаунт Epic {id}',
@@ -10090,6 +10685,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
+  'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -10106,6 +10702,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
@@ -10567,6 +11165,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': 'Вы блокируете атаку {source}, получая {amount} урона.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
+  'hudChrome.options.showTargetSwingTimer': 'Показывать таймер замаха цели',
   'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
@@ -10840,6 +11439,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': 'Золочёное одеяние',
   'entities.items.goldweave_leggings.name': 'Золочёные поножи',
   'entities.items.silkspun_satchel.name': 'Шёлкопряденая сумка',
+  'entities.items.wayfarers_backpack.name': 'Ранец странника',
+  'entities.items.burlap_reagent_pouch.name': 'Холщовый мешочек для материалов',
+  'entities.items.necromancers_reagent_satchel.name': 'Сумка некроманта для материалов',
+  'entities.items.duskweave_bag.name': 'Сумеречнотканая сумка',
+  'entities.items.resonant_weave_bag.name': 'Резонанснотканая сумка',
+  'entities.items.foragers_haversack.name': 'Ранец собирателя',
+  'entities.items.loombound_reagent_satchel.name': 'Станкотканая сумка для материалов',
   'entities.items.silkbinders_raiment.name': 'Облачение шёлкоткача',
   'entities.items.sunweave_mantle.name': 'Солнцетканая мантия',
   'entities.items.sunweave_treads.name': 'Солнцетканая поступь',
@@ -10897,6 +11503,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
+  'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
   'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',
@@ -11238,6 +11845,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': 'Резонирующая сталь',
   'entities.items.resonant_timber.name': 'Резонирующая древесина',
   'hud.errors.tradeBound': 'Этот предмет привязан и не может быть обменян.',
+  'hud.errors.tradeWindowIneligible': 'Этот предмет можно передать только игрокам, разделившим эту добычу.',
   'hud.errors.marketListBound': 'Этот предмет привязан и не может быть выставлен на продажу.',
   'hudChrome.enchantName.enchant_weapon_might': 'Зачарование оружия - Мощь',
   'hudChrome.enchantName.enchant_weapon_intellect': 'Зачарование оружия - Сила заклинаний',
@@ -11978,6 +12586,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': 'Заблокировано',
   'hudChrome.bags.unlockItem': 'Разблокировать предмет',
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    'Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
@@ -12484,10 +13094,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Расходует ваши 3 стадии Лунного прилива на мощный удар, наносящий {damage} ед. урона от тайной магии: выбор в пользу урона. Пробуждение солнца тратит те же 3 стадии, так что выбирайте одно.',
   'entities.abilities.moonlash.name': 'Лунный всплеск',
   'entities.abilities.moonseed.description':
-    'Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более 6 сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии.',
+    'Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более {duration} сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии.',
   'entities.abilities.moonseed.name': 'Лунное семя',
   'entities.abilities.needle_of_fate.description':
-    'Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт 5 ед. Осуждения; если его нет, сначала отмечает цель.',
+    'Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт {needleDoom} ед. Осуждения; если его нет, сначала отмечает цель.',
   'entities.abilities.needle_of_fate.name': 'Игла судьбы',
   'entities.abilities.oath_chain.description':
     'Мгновенно связывает далекого врага священной цепью. Враг движется к вам со скоростью 18 м в секунду, пока не приблизится на 3 м, после чего его скорость снижается на 50% на 4 сек. Во время Вознесения связывает второго ближайшего врага.',
@@ -12496,7 +13106,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Отмечает противника на 15 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 ярдов и создаёт 1 осколок души.',
   'entities.abilities.ossuary_mark.name': 'Метка оссуария',
   'entities.abilities.overbloom.description':
-    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на 60% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
+    'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на {buff}% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
   'entities.abilities.overbloom.name': 'Сверхцветение',
   'entities.abilities.pack_command.description':
     'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
@@ -12567,7 +13177,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Расходует всё Осуждение и Нити судьбы, вынося врагу приговор. Каждая Нить увеличивает урон на 6%, а дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения. После 16-го уровня рост урона замедляется.',
   'entities.abilities.sentence.name': 'Приговор',
   'entities.abilities.seraphic_vigil.description':
-    'Накладывает на союзника оберегающее благословение, исцеляющее его при опасном падении здоровья. Особая способность Благословения.',
+    'Накладывает на союзника оберегающее благословение, исцеляющее его на {buff} ед. при опасном падении здоровья. Особая способность Благословения.',
   'entities.abilities.seraphic_vigil.name': 'Серафическое бдение',
   'entities.abilities.shellskin.description':
     'Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать.',
@@ -13161,6 +13771,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': 'Что такое разлом',
   'guide.settingsPage.advancedLadder': 'Сдвиньте любой из них, и пресет качества переключится на «Расширенное», взяв за основу ровно те уровни, что были у вас перед глазами, так что ваше сочетание начинается с уже увиденного, а не с чистого листа. Когда понравится, нажмите «Применить». Именно поэтому «Расширенное» стоит в конце списка пресетов: это профиль для знатоков, где живёт ваше собственное сочетание.',
   'guide.settingsPage.ifAurasOnPlayerFrame': 'Показывает ваши усиления и ослабления не только на панели аур, но и на вашей собственной рамке персонажа.',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    'Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.',
   'guide.settingsPage.ifChatFontScale': 'Размер текста в чате.',
   'guide.settingsPage.ifChatIntro': 'Как читается окно чата. Здесь же лежит сброс самих окон чата.',
   'guide.settingsPage.ifChatOpacity': 'Насколько плотный фон у чата.',
@@ -13921,6 +14533,60 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
+  'hudChrome.auraEffect.makersBrand':
+    'В течение {duration} сек. каждый эффект повышает урон от Варкхула на {pct}%. Суммируется до {max} раз. Танкам следует сменяться при {swap} эффектах.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Пепельный часовой преследует вас. Держите его вдали от рейда, пока он не будет уничтожен.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Отнесите ядро к горну. Бремя расплава каждые {interval} сек. наносит возрастающий урон от {min}% до {max}% максимального здоровья.',
+  'entities.mobs.ignivar_ember_sentinel.name': 'Пепельный часовой',
+  'entities.mobs.ignivar_crucible_warden.name': 'Страж горнила',
+  'entities.mobs.ignivar_cinder_artificer.name': 'Искровой механик',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': 'Варкхул, отец ковки Последнего Пламени',
+  'entities.npcs.archivist_maelin_emberward.name': 'Архивариус Мэйлин Углестраж',
+  'entities.npcs.archivist_maelin_emberward.title': 'Архивариус горнила',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'Каждый след молота здесь — это фраза. Помогите мне прочесть то, что Варкхул пытался скрыть.',
+  'entities.npcs.archivist_maelin_ember_projection.name': 'Углевая проекция Мэйлин',
+  'entities.npcs.archivist_maelin_ember_projection.title': 'Углевая проекция',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    'Угли несут голос Мэйлин всё дальше в глубины кузни.',
+  'entities.npcs.crucible_quartermaster.name': 'Интендант Бронн Уголёк',
+  'entities.npcs.crucible_quartermaster.title': 'Интендант Горнила',
+  'entities.npcs.crucible_quartermaster.greeting': 'Горн метит своих. Принеси мне печать из Горнила, и я снаряжу тебя для войны.',
+  'entities.quests.q_ignivar_echoes_in_iron.title': 'Эхо в железе',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'Эти автоматоны не солдаты, а черновики. Уничтожьте каждую сборочную линию и прислушайтесь, когда падёт последний корпус. Кузня помнит то, что Варкхул пытался стереть.',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    'Отголоски сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были неудачными закалками. Выдержал лишь Игнивар.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Уничтожить Пепельных часовых',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Уничтожить Стражей горнила',
+  'entities.quests.q_ignivar_heralds_heart.title': 'Сердце Предвестника',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'Каждый отголосок указывает на единственного выжившего, Игнивара. Варкхул называл его предвестником, печатью и ключом. Победите его. Если записи верны, его смерть откроет, что он был выкован охранять.',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'Игнивар никогда не был просто стражем. Его сердце было ключом, а последние пластины открыли запечатанное горнило внизу.',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Игнивар повержен',
+  'entities.quests.q_ignivar_the_forgefather.title': 'Отец ковки',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    'Путь вниз ведёт к Варкхулу, отцу ковки Последнего Пламени. Он заточил Последний Источник, чтобы оживить металл, а затем выковал Игнивара, чтобы сохранить преступление в тайне. Войдите во Внутреннее Горнило и положите конец его трудам.',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'Наконец горн замолчал. Возможно, источник уже никогда не восстановится, но Варкхул больше не скуёт жизни в цепи.',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Варкхул повержен',
+  'entities.dungeons.ignivar_forge_lift.name': 'Кузнечный подъёмник',
+  'entities.dungeons.ignivar_forge_lift.enterText': 'Кузнечный подъёмник вздрагивает и опускается; навстречу поднимается грохот молотов.',
+  'entities.dungeons.ignivar_forge_lift.leaveText': 'Подъёмник поднимает вас обратно на открытый воздух крепости.',
+  'entities.dungeons.ignivar_forge_approach.name': 'Чертоги Первой Закалки',
+  'entities.dungeons.ignivar_forge_approach.enterText': 'Грохот молотов эхом разносится по Чертогам Первой Закалки.',
+  'entities.dungeons.ignivar_forge_approach.leaveText': 'Вы отходите от первого горна и снова дышите свободно.',
+  'entities.dungeons.ignivar_molten_assembly.name': 'Литейный цех',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    'Открытые врата ведут в раскалённый сборочный зал.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    'Вы покидаете сборочную линию и возвращаетесь в Горнило.',
+  'entities.dungeons.ignivar_inner_crucible.name': 'Внутреннее Горнило',
+  'entities.dungeons.ignivar_inner_crucible.enterText': 'Открытые врата ведут глубже в горнило.',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': 'Вы покидаете безмолвные глубины горнила.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'Изменить раскладку панели действий',
   'hudChrome.barEditor.title': 'Редактор панели действий',
@@ -13957,4 +14623,211 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
   'entities.abilities.nightshade_coating.description':
     'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': 'Продать',
+  'hudChrome.itemMenu.sellAll': 'Продать все ({count})',
+  // Ignivar raid loot (Crucible of the Last Spring): the M16 same-change
+  // fills for the new wordy item names (src/sim/content/ignivar_loot.ts).
+  'entities.items.slagbreaker_helmet.name': 'Шлем шлаколома',
+  'entities.items.slagbreaker_shoulder.name': 'Наплечья шлаколома',
+  'entities.items.slagbreaker_chest.name': 'Кольчуга шлаколома',
+  'entities.items.slagbreaker_gloves.name': 'Рукавицы шлаколома',
+  'entities.items.slagbreaker_legs.name': 'Набедренники шлаколома',
+  'entities.items.emberfury_helmet.name': 'Шлем угольной ярости',
+  'entities.items.emberfury_shoulder.name': 'Наплечья угольной ярости',
+  'entities.items.emberfury_chest.name': 'Кольчуга угольной ярости',
+  'entities.items.emberfury_gloves.name': 'Рукавицы угольной ярости',
+  'entities.items.emberfury_legs.name': 'Набедренники угольной ярости',
+  'entities.items.forgewall_helmet.name': 'Шлем кузнечной стены',
+  'entities.items.forgewall_shoulder.name': 'Наплечья кузнечной стены',
+  'entities.items.forgewall_chest.name': 'Кольчуга кузнечной стены',
+  'entities.items.forgewall_gloves.name': 'Рукавицы кузнечной стены',
+  'entities.items.forgewall_legs.name': 'Набедренники кузнечной стены',
+  'entities.items.dawnforged_helmet.name': 'Шлем рассветной ковки',
+  'entities.items.dawnforged_shoulder.name': 'Наплечья рассветной ковки',
+  'entities.items.dawnforged_chest.name': 'Кольчуга рассветной ковки',
+  'entities.items.dawnforged_gloves.name': 'Рукавицы рассветной ковки',
+  'entities.items.dawnforged_legs.name': 'Набедренники рассветной ковки',
+  'entities.items.oathpyre_helmet.name': 'Шлем клятвенного костра',
+  'entities.items.oathpyre_shoulder.name': 'Наплечья клятвенного костра',
+  'entities.items.oathpyre_chest.name': 'Кольчуга клятвенного костра',
+  'entities.items.oathpyre_gloves.name': 'Рукавицы клятвенного костра',
+  'entities.items.oathpyre_legs.name': 'Набедренники клятвенного костра',
+  'entities.items.zealfire_helmet.name': 'Шлем пламенного рвения',
+  'entities.items.zealfire_shoulder.name': 'Наплечья пламенного рвения',
+  'entities.items.zealfire_chest.name': 'Кольчуга пламенного рвения',
+  'entities.items.zealfire_gloves.name': 'Рукавицы пламенного рвения',
+  'entities.items.zealfire_legs.name': 'Набедренники пламенного рвения',
+  'entities.items.packlord_emberhide_helmet.name': 'Клобук повелителя стаи',
+  'entities.items.packlord_emberhide_shoulder.name': 'Наплечники повелителя стаи',
+  'entities.items.packlord_emberhide_chest.name': 'Куртка повелителя стаи',
+  'entities.items.packlord_emberhide_gloves.name': 'Хваты повелителя стаи',
+  'entities.items.packlord_emberhide_legs.name': 'Бриджи повелителя стаи',
+  'entities.items.coldsight_trackers_helmet.name': 'Клобук холодного взора',
+  'entities.items.coldsight_trackers_shoulder.name': 'Наплечники холодного взора',
+  'entities.items.coldsight_trackers_chest.name': 'Куртка холодного взора',
+  'entities.items.coldsight_trackers_gloves.name': 'Хваты холодного взора',
+  'entities.items.coldsight_trackers_legs.name': 'Бриджи холодного взора',
+  'entities.items.slagsnare_helmet.name': 'Клобук шлаковых силков',
+  'entities.items.slagsnare_shoulder.name': 'Наплечники шлаковых силков',
+  'entities.items.slagsnare_chest.name': 'Куртка шлаковых силков',
+  'entities.items.slagsnare_gloves.name': 'Хваты шлаковых силков',
+  'entities.items.slagsnare_legs.name': 'Бриджи шлаковых силков',
+  'entities.items.cinderfang_helmet.name': 'Клобук пеплоклыка',
+  'entities.items.cinderfang_shoulder.name': 'Наплечники пеплоклыка',
+  'entities.items.cinderfang_chest.name': 'Куртка пеплоклыка',
+  'entities.items.cinderfang_gloves.name': 'Хваты пеплоклыка',
+  'entities.items.cinderfang_legs.name': 'Бриджи пеплоклыка',
+  'entities.items.smolderstrike_helmet.name': 'Клобук тлеющего удара',
+  'entities.items.smolderstrike_shoulder.name': 'Наплечники тлеющего удара',
+  'entities.items.smolderstrike_chest.name': 'Куртка тлеющего удара',
+  'entities.items.smolderstrike_gloves.name': 'Хваты тлеющего удара',
+  'entities.items.smolderstrike_legs.name': 'Бриджи тлеющего удара',
+  'entities.items.ashveil_helmet.name': 'Клобук пепельной завесы',
+  'entities.items.ashveil_shoulder.name': 'Наплечники пепельной завесы',
+  'entities.items.ashveil_chest.name': 'Куртка пепельной завесы',
+  'entities.items.ashveil_gloves.name': 'Хваты пепельной завесы',
+  'entities.items.ashveil_legs.name': 'Бриджи пепельной завесы',
+  'entities.items.emberscreed_helmet.name': 'Капюшон догмата углей',
+  'entities.items.emberscreed_shoulder.name': 'Оплечье догмата углей',
+  'entities.items.emberscreed_chest.name': 'Одеяние догмата углей',
+  'entities.items.emberscreed_gloves.name': 'Обмотки догмата углей',
+  'entities.items.emberscreed_legs.name': 'Штаны догмата углей',
+  'entities.items.benison_dawnweave_helmet.name': 'Капюшон рассветного плетения',
+  'entities.items.benison_dawnweave_shoulder.name': 'Оплечье рассветного плетения',
+  'entities.items.benison_dawnweave_chest.name': 'Одеяние рассветного плетения',
+  'entities.items.benison_dawnweave_gloves.name': 'Обмотки рассветного плетения',
+  'entities.items.benison_dawnweave_legs.name': 'Штаны рассветного плетения',
+  'entities.items.vesperash_helmet.name': 'Капюшон вечернего пепла',
+  'entities.items.vesperash_shoulder.name': 'Оплечье вечернего пепла',
+  'entities.items.vesperash_chest.name': 'Одеяние вечернего пепла',
+  'entities.items.vesperash_gloves.name': 'Обмотки вечернего пепла',
+  'entities.items.vesperash_legs.name': 'Штаны вечернего пепла',
+  'entities.items.stormkindled_helmet.name': 'Шлем грозового пламени',
+  'entities.items.stormkindled_shoulder.name': 'Наплечья грозового пламени',
+  'entities.items.stormkindled_chest.name': 'Кольчуга грозового пламени',
+  'entities.items.stormkindled_gloves.name': 'Рукавицы грозового пламени',
+  'entities.items.stormkindled_legs.name': 'Набедренники грозового пламени',
+  'entities.items.warspirit_emberscale_helmet.name': 'Шлем углечешуи',
+  'entities.items.warspirit_emberscale_shoulder.name': 'Наплечья углечешуи',
+  'entities.items.warspirit_emberscale_chest.name': 'Кольчуга углечешуи',
+  'entities.items.warspirit_emberscale_gloves.name': 'Рукавицы углечешуи',
+  'entities.items.warspirit_emberscale_legs.name': 'Набедренники углечешуи',
+  'entities.items.stonehearth_helmet.name': 'Шлем каменного очага',
+  'entities.items.stonehearth_shoulder.name': 'Наплечья каменного очага',
+  'entities.items.stonehearth_chest.name': 'Кольчуга каменного очага',
+  'entities.items.stonehearth_gloves.name': 'Рукавицы каменного очага',
+  'entities.items.stonehearth_legs.name': 'Набедренники каменного очага',
+  'entities.items.springmender_helmet.name': 'Шлем родникового целителя',
+  'entities.items.springmender_shoulder.name': 'Наплечья родникового целителя',
+  'entities.items.springmender_chest.name': 'Кольчуга родникового целителя',
+  'entities.items.springmender_gloves.name': 'Рукавицы родникового целителя',
+  'entities.items.springmender_legs.name': 'Набедренники родникового целителя',
+  'entities.items.chronoweave_helmet.name': 'Капюшон эфирного плетения',
+  'entities.items.chronoweave_shoulder.name': 'Оплечье эфирного плетения',
+  'entities.items.chronoweave_chest.name': 'Одеяние эфирного плетения',
+  'entities.items.chronoweave_gloves.name': 'Обмотки эфирного плетения',
+  'entities.items.chronoweave_legs.name': 'Штаны эфирного плетения',
+  'entities.items.pyroclast_helmet.name': 'Капюшон пирокласта',
+  'entities.items.pyroclast_shoulder.name': 'Оплечье пирокласта',
+  'entities.items.pyroclast_chest.name': 'Одеяние пирокласта',
+  'entities.items.pyroclast_gloves.name': 'Обмотки пирокласта',
+  'entities.items.pyroclast_legs.name': 'Штаны пирокласта',
+  'entities.items.frostquench_helmet.name': 'Капюшон морозной закалки',
+  'entities.items.frostquench_shoulder.name': 'Оплечье морозной закалки',
+  'entities.items.frostquench_chest.name': 'Одеяние морозной закалки',
+  'entities.items.frostquench_gloves.name': 'Обмотки морозной закалки',
+  'entities.items.frostquench_legs.name': 'Штаны морозной закалки',
+  'entities.items.hexthread_helmet.name': 'Капюшон проклятой нити',
+  'entities.items.hexthread_shoulder.name': 'Оплечье проклятой нити',
+  'entities.items.hexthread_chest.name': 'Одеяние проклятой нити',
+  'entities.items.hexthread_gloves.name': 'Обмотки проклятой нити',
+  'entities.items.hexthread_legs.name': 'Штаны проклятой нити',
+  'entities.items.gravebrand_helmet.name': 'Капюшон могильного клейма',
+  'entities.items.gravebrand_shoulder.name': 'Оплечье могильного клейма',
+  'entities.items.gravebrand_chest.name': 'Одеяние могильного клейма',
+  'entities.items.gravebrand_gloves.name': 'Обмотки могильного клейма',
+  'entities.items.gravebrand_legs.name': 'Штаны могильного клейма',
+  'entities.items.ruincaller_helmet.name': 'Капюшон зовущего руины',
+  'entities.items.ruincaller_shoulder.name': 'Оплечье зовущего руины',
+  'entities.items.ruincaller_chest.name': 'Одеяние зовущего руины',
+  'entities.items.ruincaller_gloves.name': 'Обмотки зовущего руины',
+  'entities.items.ruincaller_legs.name': 'Штаны зовущего руины',
+  'entities.items.moonscorch_helmet.name': 'Клобук лунного ожога',
+  'entities.items.moonscorch_shoulder.name': 'Наплечники лунного ожога',
+  'entities.items.moonscorch_chest.name': 'Куртка лунного ожога',
+  'entities.items.moonscorch_gloves.name': 'Хваты лунного ожога',
+  'entities.items.moonscorch_legs.name': 'Бриджи лунного ожога',
+  'entities.items.wildfang_emberhide_helmet.name': 'Клобук дикого клыка',
+  'entities.items.wildfang_emberhide_shoulder.name': 'Наплечники дикого клыка',
+  'entities.items.wildfang_emberhide_chest.name': 'Куртка дикого клыка',
+  'entities.items.wildfang_emberhide_gloves.name': 'Хваты дикого клыка',
+  'entities.items.wildfang_emberhide_legs.name': 'Бриджи дикого клыка',
+  'entities.items.cinderbark_helmet.name': 'Клобук пепельной коры',
+  'entities.items.cinderbark_shoulder.name': 'Наплечники пепельной коры',
+  'entities.items.cinderbark_chest.name': 'Куртка пепельной коры',
+  'entities.items.cinderbark_gloves.name': 'Хваты пепельной коры',
+  'entities.items.cinderbark_legs.name': 'Бриджи пепельной коры',
+  'entities.items.grovespring_helmet.name': 'Клобук рощевого родника',
+  'entities.items.grovespring_shoulder.name': 'Наплечники рощевого родника',
+  'entities.items.grovespring_chest.name': 'Куртка рощевого родника',
+  'entities.items.grovespring_gloves.name': 'Хваты рощевого родника',
+  'entities.items.grovespring_legs.name': 'Бриджи рощевого родника',
+  'entities.items.sigil_anvil_helmet.name': 'Печать наковальни: шлем',
+  'entities.items.sigil_ember_helmet.name': 'Печать углей: шлем',
+  'entities.items.sigil_tempest_helmet.name': 'Печать бури: шлем',
+  'entities.items.sigil_anvil_shoulder.name': 'Печать наковальни: оплечье',
+  'entities.items.sigil_ember_shoulder.name': 'Печать углей: оплечье',
+  'entities.items.sigil_tempest_shoulder.name': 'Печать бури: оплечье',
+  'entities.items.sigil_anvil_chest.name': 'Печать наковальни: одеяние',
+  'entities.items.sigil_ember_chest.name': 'Печать углей: одеяние',
+  'entities.items.sigil_tempest_chest.name': 'Печать бури: одеяние',
+  'entities.items.sigil_anvil_gloves.name': 'Печать наковальни: рукавицы',
+  'entities.items.sigil_ember_gloves.name': 'Печать углей: рукавицы',
+  'entities.items.sigil_tempest_gloves.name': 'Печать бури: рукавицы',
+  'entities.items.sigil_anvil_legs.name': 'Печать наковальни: поножи',
+  'entities.items.sigil_ember_legs.name': 'Печать углей: поножи',
+  'entities.items.sigil_tempest_legs.name': 'Печать бури: поножи',
+  'entities.items.cord_of_the_last_flame.name': 'Шнур последнего пламени',
+  'entities.items.cindersoaked_slippers.name': 'Прожжённые туфли',
+  'entities.items.springbinder_sash.name': 'Кушак родниковых уз',
+  'entities.items.steps_of_quiet_water.name': 'Поступь тихой воды',
+  'entities.items.cinderbark_cinch.name': 'Пояс пепельной коры',
+  'entities.items.ashenbark_treads.name': 'Ступни пепельного луба',
+  'entities.items.slagstalker_belt.name': 'Ремень шлакового ловчего',
+  'entities.items.ashrunner_boots.name': 'Сапоги бегущего по пеплу',
+  'entities.items.moonscorch_waistwrap.name': 'Повязка лунного ожога',
+  'entities.items.scorchgrove_striders.name': 'Скороходы палёной рощи',
+  'entities.items.grovetender_belt.name': 'Ремень хранителя рощи',
+  'entities.items.dewfall_moccasins.name': 'Мокасины росной пади',
+  'entities.items.forgewall_girdle.name': 'Пояс кузнечной стены',
+  'entities.items.anvilstance_sabatons.name': 'Ботфорты наковальни',
+  'entities.items.warforged_waistguard.name': 'Пояс боевой ковки',
+  'entities.items.furnace_march_greaves.name': 'Поножи горнового марша',
+  'entities.items.stormkindled_chain.name': 'Цепь грозового пламени',
+  'entities.items.thundershock_treads.name': 'Ступни громового удара',
+  'entities.items.tidebinder_links.name': 'Звенья владыки приливов',
+  'entities.items.springwarden_sabatons.name': 'Ботфорты стража родника',
+  'entities.items.pendant_of_the_first_tempering.name': 'Подвеска первой закалки',
+  'entities.items.ignivars_ember_choker.name': 'Ожерелье углей Игнивара',
+  'entities.items.locket_of_the_last_flame.name': 'Медальон последнего пламени',
+  'entities.items.heartspring_amulet.name': 'Амулет сердечного родника',
+  'entities.items.seal_of_the_forgewall.name': 'Печатка кузнечной стены',
+  'entities.items.band_of_marked_strikes.name': 'Кольцо метких ударов',
+  'entities.items.circle_of_cinders.name': 'Круг тлеющих углей',
+  'entities.items.loop_of_quiet_springs.name': 'Кольцо тихих родников',
+  'entities.items.bulwark_of_the_inner_crucible.name': 'Бастион внутреннего горнила',
+  'entities.items.ember_wardens_barrier.name': 'Заслон стража углей',
+  'entities.items.orb_of_the_last_spring.name': 'Сфера последнего родника',
+  'entities.items.cinder_of_the_first_design.name': 'Уголь первого замысла',
+  'entities.items.forgefathers_warhammer.name': 'Боевой молот Праотца-кузнеца',
+  'entities.items.cinderfang_kris.name': 'Крис пеплоклыка',
+  'entities.items.slagrender_cleaver.name': 'Секач шлакодёра',
+  'entities.items.anvilguard_blade.name': 'Клинок стража наковальни',
+  'entities.items.heart_of_the_end_greatblade.name': 'Великий клинок Сердца конца',
+  'entities.items.staff_of_the_last_spring.name': 'Посох последнего родника',
+  'entities.items.forgefire_spire.name': 'Шпиль горнового огня',
+  'entities.items.springtouched_crozier.name': 'Посох родникового касания',
+  'entities.items.wand_of_quenched_sparks.name': 'Жезл угасших искр',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

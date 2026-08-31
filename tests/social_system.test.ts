@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { resolveRealm } from '../server/realm';
 import {
   type CharInfo,
   type CharRef,
+  GUILD_MEMBER_LIMIT,
   type GuildEventRow,
   type GuildRank,
   PLEDGE_REPLEDGE_COOLDOWN_MS,
@@ -179,6 +180,9 @@ class FakeDb implements SocialDb {
     const id = this.nextGuildId++;
     this.guilds.set(id, name);
     this.members.set(leaderId, { guildId: id, rank: 'leader' });
+    // Mirrors the real transaction: founding a guild clears the founder's
+    // standing pledge.
+    this.pledges.delete(leaderId);
     return { guildId: id };
   }
   async deleteGuild(id: number): Promise<void> {
@@ -196,11 +200,19 @@ class FakeDb implements SocialDb {
     c: number,
     rank: GuildRank,
     limit: number,
-  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    requirePledge = false,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     if (!this.guilds.has(guildId)) return 'no_guild';
     if (this.members.has(c)) return 'already_member';
     const count = [...this.members.values()].filter((m) => m.guildId === guildId).length;
     if (count >= limit) return 'full';
+    // Mirrors the real transaction: the pledge is consumed with the seat, and
+    // a missing pledge to THIS guild refuses the whole seat.
+    if (requirePledge) {
+      const p = this.pledges.get(c);
+      if (!p || p.guildId !== guildId) return 'no_pledge';
+      this.pledges.delete(c);
+    }
     this.members.set(c, { guildId, rank });
     return 'ok';
   }
@@ -1002,6 +1014,58 @@ describe('guilds', () => {
     expect(site.slice(0, 700)).toContain('offensiveName(');
     // The 5th param must be the real chat filter's hard tier, same rationale.
     expect(site.slice(0, 700)).toContain('chatFilter.findHardHit(');
+  });
+
+  it('runs an injected guild creator only after validation and content screening', async () => {
+    const screened = setup({ isNameOffensive: (name) => name === 'Blocked Banner' });
+    screened.add(1, 'Aleph');
+    const calls: Array<[string, number]> = [];
+    const create = async (name: string, leaderId: number) => {
+      calls.push([name, leaderId]);
+      return { guildId: 41 } as const;
+    };
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'no', create)).toBe(false);
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Blocked Banner', create)).toBe(false);
+    expect(calls).toEqual([]);
+
+    expect(await screened.svc.guildCreate(screened.actor(1), 'Atomic Banner', create)).toBe(true);
+    expect(calls).toEqual([['Atomic Banner', 1]]);
+    expect(screened.tx.membershipStamps).toContainEqual({
+      id: 1,
+      membership: { guildId: 41, guildName: 'Atomic Banner', rank: 'leader' },
+    });
+    expect(screened.tx.created).toContainEqual({ id: 1, guildId: 41 });
+    expect(screened.tx.founded).toEqual([1]);
+  });
+
+  it('never turns a committed guild into a refusal when a live follow-up hook throws', async () => {
+    const isolated = setup();
+    isolated.add(1, 'Aleph');
+    isolated.tx.onGuildMembershipChanged = () => {
+      throw new Error('live stamp failed');
+    };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const created = await isolated.svc.guildCreate(
+        isolated.actor(1),
+        'Durable Banner',
+        async () => ({
+          guildId: 42,
+        }),
+      );
+
+      expect(created).toBe(true);
+      expect(isolated.tx.created).toEqual([{ id: 1, guildId: 42 }]);
+      expect(isolated.tx.founded).toEqual([1]);
+      expect(isolated.tx.textFor(1).join()).toContain('Durable Banner');
+      expect(logged).toHaveBeenCalledWith(
+        'guild create post-commit membership stamp failed:',
+        expect.any(Error),
+      );
+    } finally {
+      logged.mockRestore();
+    }
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
@@ -2237,9 +2301,9 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
   });
 
   it('onGuildCreated fires once, in the committed success arm only, AFTER the founder stamp', async () => {
-    // The boolean is the reserve-at-gate refund signal (Guild Bank Phase 3
-    // QA): FALSE on every refusal arm (the dispatch gate refunds the reserved
-    // fee), TRUE only on the committed success arm (the hook consumed it).
+    // The default creator still reports false for every refusal and true only
+    // after its guild/member transaction commits. GameServer injects the paid,
+    // fully atomic creator in production.
     await expect(h.svc.guildCreate(h.actor(1), 'no')).resolves.toBe(false); // invalid name
     expect(h.tx.created).toEqual([]);
     await expect(h.svc.guildCreate(h.actor(1), 'Iron Vanguard')).resolves.toBe(true);
@@ -2249,8 +2313,7 @@ describe('guild bank persistence hooks (Guild Bank Phase 3)', () => {
     expect(h.tx.membershipStamps).toEqual([
       { id: 1, membership: { guildId: 1, guildName: 'Iron Vanguard', rank: 'leader' } },
     ]);
-    // Refusals after: duplicate name, already guilded. No further hook calls,
-    // and both report false so the gate refunds.
+    // Refusals after: duplicate name, already guilded. No further hook calls.
     await expect(h.svc.guildCreate(h.actor(2), 'iron vanguard')).resolves.toBe(false);
     await expect(h.svc.guildCreate(h.actor(1), 'Second Banner')).resolves.toBe(false);
     expect(h.tx.created).toEqual([{ id: 1, guildId: 1 }]);
@@ -2511,17 +2574,232 @@ describe('guild pledges', () => {
     expect(await h.db.pledgeOf(4)).toBeNull();
   });
 
-  it('accept resolves the pledge into the standard invite', async () => {
+  it('accept with the pledger online resolves into the standard invite', async () => {
     const h = await seed();
     h.tx.setOnline(4);
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
-    expect(await h.db.pledgeOf(4)).toBeNull();
     const invites = (h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite');
     expect(invites).toHaveLength(1);
+    // The pledge is the standing request: it outlives the invite send, so a
+    // dropped or ignored invite can never make the request disappear.
+    expect(await h.db.pledgeOf(4)).not.toBeNull();
     // Accepting the invite seats them; joining clears any pledge state.
     await h.svc.guildAccept(h.actor(4));
     expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    // Joining restamps the live pledge tag from durable truth (now empty), so
+    // a later guild leave cannot resurface a stale pledged nameplate line.
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+  });
+
+  it('accepting an OFFLINE pledger seats them directly, wiping the ladder, no invite involved', async () => {
+    const h = await seed();
+    h.tx.setOnline(1);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // Seed a ladder rung so the wipe is observable: acceptance is the guild
+    // saying "we do want you", exactly like a real invite.
+    const account = await h.db.accountIdForCharacter(4);
+    await h.db.bumpPledgeLadder(h.guildId, account!);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.guildMembership(4)).toMatchObject({
+      guildName: 'Bookbinders',
+      rank: 'member',
+    });
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect(await h.db.pledgeLadder(h.guildId, account!)).toBeNull();
+    expect((h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite')).toHaveLength(0);
+    // Online members heard the join line.
+    expect(h.tx.textFor(1)).toContain('Aspirant has joined the guild.');
+  });
+
+  it('an offline accept against a full guild refuses and keeps the pledge on the board', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // Fill the roster to the real service cap (the seed already added 3).
+    for (let i = 0; i < GUILD_MEMBER_LIMIT - 3; i++) {
+      const id = 100 + i;
+      h.add(id, `Filler${i}`);
+      await h.db.addGuildMemberAtomic(h.guildId, id, 'member', GUILD_MEMBER_LIMIT);
+    }
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Your guild is full.');
+    expect(await h.db.guildMembership(4)).toBeNull();
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
+  it('an offline accept for a pledger who joined elsewhere drops the stale pledge', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    h.add(5, 'Scribe');
+    const other = await h.db.createGuildWithLeader('Inkwrights', 5);
+    if ('error' in other) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(other.guildId, 4, 'member', 50);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant is already in a guild.');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect((await h.db.guildMembership(4))?.guildName).toBe('Inkwrights');
+  });
+
+  it('a pledge survives logout: the dropped invite leaves the request standing, an offline re-accept seats them', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // Officer accepts while the pledger is online: the invite goes out.
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect((h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite')).toHaveLength(1);
+    // The pledger logs out before answering: the pending invite drops, but
+    // the pledge row persists.
+    h.svc.forget(4);
+    h.tx.setOffline(4);
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    // The dropped invite is truly gone.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toBeNull();
+    // The officer accepts the still-standing pledge while they are offline:
+    // seated directly, found in the guild on next login.
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.pledgeOf(4)).toBeNull();
+  });
+
+  it('accepting a pledger who blocks the officer stays silent and leaves the request standing', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    h.db.blocks.set(4, new Set([2]));
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    // The fake-success arm: the officer sees the ordinary confirmation and no
+    // invite reaches the blocker. The pledge stays standing, exactly like an
+    // invite the pledger never answered, so nothing the officer observes
+    // (including the board row surviving) can reveal the block.
+    expect(h.tx.textFor(2)).toContain('You have invited Aspirant to the guild.');
+    expect((h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite')).toHaveLength(0);
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.guildMembership(4)).toBeNull();
+  });
+
+  it('an online accept for a pledger who joined elsewhere drops the stale pledge', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    h.add(5, 'Scribe');
+    const other = await h.db.createGuildWithLeader('Inkwrights', 5);
+    if ('error' in other) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(other.guildId, 4, 'member', 50);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant is already in a guild.');
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect((await h.db.guildMembership(4))?.guildName).toBe('Inkwrights');
+  });
+
+  it('an online accept against a full guild refuses and keeps the pledge on the board', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    for (let i = 0; i < GUILD_MEMBER_LIMIT - 3; i++) {
+      const id = 100 + i;
+      h.add(id, `Filler${i}`);
+      await h.db.addGuildMemberAtomic(h.guildId, id, 'member', GUILD_MEMBER_LIMIT);
+    }
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Your guild is full.');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
+  it('a duplicate accept hits the pending-invite refusal and keeps the pledge', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant already has a pending guild invitation.');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    // The first accept's invite still stands and seats them normally.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
+    expect(await h.db.pledgeOf(4)).toBeNull();
+  });
+
+  it('declining the pledged guild invite withdraws the pledge: no offline force-seat', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    // The explicit "no" to the guild they pledged to ends the standing
+    // request, so a later accept cannot seat them while offline.
+    await h.svc.guildDecline(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.tx.setOffline(4);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant has no pledge to your guild.');
+    expect(await h.db.guildMembership(4)).toBeNull();
+  });
+
+  it('declining an unrelated guild invite leaves the pledge standing', async () => {
+    const h = await seed();
+    h.add(5, 'Scribe');
+    const other = await h.db.createGuildWithLeader('Inkwrights', 5);
+    if ('error' in other) throw new Error('guild seed failed');
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildInvite(h.actor(5), 'Aspirant');
+    await h.svc.guildDecline(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
+  it('founding a guild clears the founder standing pledge', async () => {
+    const h = await seed();
+    h.tx.setOnline(2);
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(await h.db.pledgeOf(4)).not.toBeNull();
+    const boardPushes = h.tx.snapshotCount.get(2) ?? 0;
+    const ok = await h.svc.guildCreate(h.actor(4), 'Aspirant Collective');
+    expect(ok).toBe(true);
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    // The live tag restamps from durable truth (now empty) and the pledged
+    // guild's officers hear the board row disappear.
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(boardPushes);
+  });
+
+  it('rejecting after an accept cancels the outstanding invite: the reject stops the join', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect((h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite')).toHaveLength(1);
+    // The officer changes their mind while the invite is still pending: the
+    // explicit no must cancel the invite, not just bump the ladder.
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect(
+      (h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInviteCancelled'),
+    ).toHaveLength(1);
+    // The inviting officer hears the cancel too (the guildRenamed shape).
+    expect(
+      (h.tx.delivered.get(2) ?? []).filter((e) => e.type === 'guildInviteCancelled'),
+    ).toHaveLength(1);
+    // The cancelled invite can no longer seat them.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toBeNull();
+    expect(h.tx.errorsFor(4).at(-1)).toBe('The guild invitation has expired.');
+  });
+
+  it('a withdraw racing the offline seat rolls the seat back', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // The pledger's withdraw lands after the officer's pledge read but before
+    // the seat transaction: the consent is gone, so the seat must refuse.
+    const realSeat = h.db.addGuildMemberAtomic.bind(h.db);
+    h.db.addGuildMemberAtomic = async (guildId, charId, rank, limit, requirePledge) => {
+      await h.db.deletePledge(4);
+      return realSeat(guildId, charId, rank, limit, requirePledge);
+    };
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.guildMembership(4)).toBeNull();
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant has no pledge to your guild.');
   });
 
   it('withdraw clears the pledge and restamps the badge', async () => {

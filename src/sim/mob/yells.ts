@@ -11,20 +11,24 @@
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, YELL_RANGE } from '../types';
 
-// `range` widens the broadcast for a "loud" boss (a booming voice heard across the
-// zone); it defaults to YELL_RANGE for every ordinary mob.
-export function emitMobYell(ctx: SimContext, mob: Entity, text: string, range = YELL_RANGE): void {
-  const event = {
-    type: 'chat' as const,
+export function emitMobYellToPlayer(ctx: SimContext, mob: Entity, text: string, pid: number): void {
+  ctx.emit({
+    type: 'chat',
     fromPid: mob.id,
     from: mob.name,
     text,
-    channel: 'yell' as const,
+    channel: 'yell',
     entityId: mob.id,
-  };
+    pid,
+  });
+}
+
+// `range` widens the broadcast for a "loud" boss (a booming voice heard across the
+// zone); it defaults to YELL_RANGE for every ordinary mob.
+export function emitMobYell(ctx: SimContext, mob: Entity, text: string, range = YELL_RANGE): void {
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
     if (!p || dist2d(p.pos, mob.pos) > range) continue;
-    ctx.emit({ ...event, pid: meta.entityId });
+    emitMobYellToPlayer(ctx, mob, text, meta.entityId);
   }
 }

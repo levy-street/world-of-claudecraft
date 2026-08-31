@@ -789,7 +789,37 @@ export const id_ID: EnTranslations = {
       "applied": "Diterapkan",
       "apply": "Terapkan Tampilan",
       "detach": "Lepaskan Tampilan",
-      "equipHint": "Kenakan {type} untuk menerapkan tampilan ini."
+      "equipHint": "Kenakan {type} untuk menerapkan tampilan ini.",
+      "charter": {
+        "eyebrow": "Peti Besi",
+        "title": "Piagam Peti Besi",
+        "scope": "Sebuah piagam hanya memperluas bank karakter ini. Bendahara menjual slot yang sama dengan gold.",
+        "grant": "Menambahkan {slots} slot bank",
+        "buy": "Beli Piagam",
+        "buyAria": "Beli {item}",
+        "confirmTitle": "Konfirmasi Pembelian Piagam",
+        "confirmBody": "Beli {item} seharga {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "Piagam telah diterapkan. Bank karakter ini kini lebih besar.",
+        "alreadyGranted": "Piagam ini sudah ada pada karakter ini. Kamu tidak dikenakan biaya lagi.",
+        "applyDeferred": "Pembayaran selesai. Slot akan diterapkan secara otomatis saat karakter ini masuk berikutnya.",
+        "grantUnresolved": "Pembayaran selesai, tetapi slot belum dapat diterapkan. Pembelian telah tercatat dan tim dukungan dapat menyelesaikannya untukmu.",
+        "inProgress": "Sebuah pembelian untuk karakter ini masih diproses. Coba lagi sesaat lagi.",
+        "doesNotFit": "Bank karakter ini tidak dapat menampung seluruh pemberian dari piagam ini.",
+        "notPurchasable": "Piagam ini tidak dapat dibeli saat ini.",
+        "noRoom": "Bank karakter ini tidak memiliki ruang tersisa untuk sebuah piagam.",
+        "noCharterFits": "Tidak ada piagam yang muat dengan ruang tersisa di bank karakter ini.",
+        "someHiddenByFit": "Piagam yang terlalu besar untuk ruang tersisa di bank karakter ini tidak ditampilkan.",
+        "outage": "Pembelian tidak dapat dikonfirmasi. Coba lagi dengan tombol ini dan kamu tidak akan dikenakan biaya dua kali. Memuat ulang permainan terlebih dahulu dapat menghilangkan perlindungan itu.",
+        "outageStale": "Kembali ke Toko dan gunakan lagi tindakan Beli Piagam yang sama. Kamu tidak akan dikenakan biaya dua kali. Memuat ulang permainan terlebih dahulu dapat menghilangkan perlindungan itu.",
+        "failed": "Pembelian tidak dapat diselesaikan.",
+        "names": {
+          "strongbox_charter_1": "Piagam Peti Besi Kecil",
+          "strongbox_charter_2": "Piagam Peti Besi Besar",
+          "strongbox_charter_3": "Piagam Peti Besi Agung",
+          "strongbox_charter_complete": "Piagam Peti Besi Lengkap"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const id_ID: EnTranslations = {
       "reset": "Atur Ulang",
       "presets": {
         "classic": "Emas Klasik",
+        "fancyGold": "Emas Mewah (WIP)",
         "midnight": "Tengah Malam",
         "parchment": "Perkamen",
         "highContrast": "Kontras Tinggi"
@@ -925,7 +956,8 @@ export const id_ID: EnTranslations = {
       "durationUnitSeconds": "d",
       "durationUnitMinutes": "m",
       "durationUnitHours": "j",
-      "durationUnitDays": "h"
+      "durationUnitDays": "h",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Pratinjau Model Karakter"
@@ -1321,6 +1353,11 @@ export const id_ID: EnTranslations = {
       "reset": "Atur Ulang",
       "done": "Selesai",
       "cancel": "Batal",
+      "showExtraBar": "Tampilkan Bilah Aksi Lain",
+      "hideExtraBar": "Sembunyikan Bilah Aksi",
+      "conflictTitle": "Tombol Sudah Terikat",
+      "conflictBody": "{key} sudah terikat pada {other}. Mengikatnya ke {action} akan melepas ikatan {other}.",
+      "conflictAccept": "Tetap Ikat Ulang",
       "resetConfirmTitle": "Atur ulang tombol bilah aksi?",
       "resetConfirmBody": "Bilah pertama kembali ke tombol bawaannya. Bilah kedua dan ketiga menjadi tak terikat. Ini tidak bisa dibatalkan."
     },
@@ -1350,6 +1387,7 @@ export const id_ID: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
+      "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -1358,7 +1396,8 @@ export const id_ID: EnTranslations = {
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
-      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu."
+      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1528,6 +1567,7 @@ export const id_ID: EnTranslations = {
       "playerFrameScale": "Skala Bingkai Pemain",
       "targetFrameScale": "Skala Bingkai Sasaran",
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
+      "alwaysShowAllBuffs": "Selalu Tampilkan Semua Buff",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "stopAutoAttackOnTargetSwitch": "Hentikan Serangan Otomatis Saat Ganti Target",
@@ -1537,19 +1577,25 @@ export const id_ID: EnTranslations = {
       "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
       "showItemLevel": "Tampilkan Level Item",
       "showReliquaryTracker": "Tampilkan Pelacak Relikui",
+      "confirmVendorSell": "Konfirmasi Sebelum Menjual",
+      "confirmVendorSellNote": "Menonaktifkan ini menjual barang dengan sekali klik tanpa konfirmasi, sehingga slot tas yang bergeser dapat menjual barang yang salah ke pedagang.",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
+      "combineActionBars": "Gabungkan Bilah Aksi",
       "hideUnusedActionSlots": "Sembunyikan Slot Aksi yang Tidak Terpakai",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
+      "showTargetSwingTimer": "Tampilkan pengatur waktu ayunan target",
       "showPetFrame": "Tampilkan Peliharaan Anda",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal",
+      "touchPreciseAim": "Pembidikan Tanah Presisi",
+      "touchPreciseAimNote": "Bidik dulu sebelum merapal mantra area tanah. Nonaktifkan untuk merapal seketika pada titik yang disarankan.",
       "touchTapMenus": "Ketuk untuk Menu",
       "touchTapMenusNote": "Buka kontrol aksi, barang habis pakai, dan menu dengan ketukan, bukan geseran. Ketuk sebuah item untuk memakainya, ketuk kontrolnya lagi untuk aksi biasanya, atau ketuk di luar untuk menutup."
     },
@@ -1585,6 +1631,7 @@ export const id_ID: EnTranslations = {
       "invertY": "Balikkan Kamera (Y)",
       "deadzone": "Zona Mati Tuas",
       "cameraSpeed": "Kecepatan Kamera",
+      "reticleSpeed": "Kecepatan Retikel",
       "vibration": "Getaran",
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
@@ -1965,6 +2012,7 @@ export const id_ID: EnTranslations = {
       "fromYour": "Dari {value} {stat} Anda:",
       "names": {
         "spellPower": "Kekuatan Mantra",
+        "healPower": "Kekuatan Penyembuhan",
         "critRating": "Rating Kritis",
         "hasteRating": "Rating Kecepatan",
         "parry": "Tangkis",
@@ -2099,6 +2147,12 @@ export const id_ID: EnTranslations = {
         "few": "{count} detik tersisa",
         "many": "{count} detik tersisa",
         "other": "{count} detik tersisa"
+      },
+      "buffsHidden": {
+        "one": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "few": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "many": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "other": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini"
       },
       "playtimeDays": {
         "one": "{count} hari",
@@ -2433,7 +2487,10 @@ export const id_ID: EnTranslations = {
       "backpack": "Ransel",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Slot tas kosong",
-      "unequipHint": "Klik untuk melepas tas ini"
+      "unequipHint": "Klik untuk melepas tas ini",
+      "poolGeneral": "Umum: {used} dari {total}",
+      "poolMaterials": "Material: {used} dari {total}",
+      "capacityPoolsAria": "Slot tas terpakai: {used} dari {total}. Barang umum: {generalUsed} dari {generalTotal}. Material: {materialsUsed} dari {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Raid Anda telah diubah kembali menjadi rombongan.",
@@ -2446,7 +2503,180 @@ export const id_ID: EnTranslations = {
       "leather": "Kulit",
       "mail": "Zirah rantai"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "Pilar tungku kiri sedang mengisi daya. Akan menyala dalam 3 dtk!",
+      "rightPillarCharging": "Pilar tungku kanan sedang mengisi daya. Akan menyala dalam 3 dtk!",
+      "bothPillarsCharging": "Pilar-pilar tungku sedang mengisi daya. Akan menyala dalam 3 dtk!",
+      "artificerApproaches": "Seorang Cinder Artificer mendekati tungku!",
+      "leftPillar": "Pilar tungku kiri menyala!",
+      "rightPillar": "Pilar tungku kanan menyala!",
+      "bothPillars": "Pilar-pilar tungku menyala!",
+      "portalsOpening": "Portal-portal tungku terbuka!",
+      "heat75": "Tungku berada pada panas 75%!",
+      "heat90": "Forge Meltdown akan segera terjadi!",
+      "addsDefeated": "Forge Legion telah dikalahkan: Varkhul kini terekspos!",
+      "worldfireBegins": "Worldfire menyala di tepi ruangan. Crucible akan terlahap habis dalam 42 dtk!",
+      "worldfireClosing": "Worldfire semakin mendekat. Bergeraklah menuju pusat!",
+      "worldfireConsumed": "Seluruh crucible terbakar!"
+    },
+    "varkhulWaveStatus": "Gelombang {wave}/{waves} | Musuh: {remaining}",
+    "raidBossGuide": {
+      "title": "Panduan Bos",
+      "button": "Panduan Bos: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "Tutup panduan bos",
+      "bossesLabel": "Bos raid",
+      "difficultyLabel": "Kesulitan",
+      "normal": "Normal",
+      "heroic": "Heroik",
+      "portraitAlt": "Potret pertarungan {boss}",
+      "overviewHeading": "Ikhtisar",
+      "abilitiesHeading": "Kemampuan",
+      "whatToDo": "Yang harus dilakukan",
+      "whatToDoResponse": "Yang harus dilakukan: {response}",
+      "rolesLabel": "Tanggung jawab peran",
+      "flagsLabel": "Peringatan mekanik",
+      "roleTank": "Tank",
+      "roleHealer": "Penyembuh",
+      "roleDamage": "Penyerang",
+      "roleAll": "Semua peran",
+      "flagDeadly": "Mematikan",
+      "flagInterruptible": "Dapat Diinterupsi",
+      "flagImportant": "Penting",
+      "flagCleansable": "Dapat Dibersihkan",
+      "browseBoss": "Lihat {boss}",
+      "chooseDifficulty": "Lihat mekanik {difficulty}",
+      "expandAbility": "Perluas {ability}",
+      "collapseAbility": "Ciutkan {ability}",
+      "abilityControlLabel": "{action}. {details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "Varkhul menempa Ignivar sebagai seorang utusan, sebuah segel hidup, dan kunci menuju Inner Crucible. Pertarungan ini menguji kendali saluran air, pergerakan presisi, dan kerusakan prioritas yang cepat.",
+        "phaseOpeningName": "The Herald Awakens",
+        "phaseOpeningSummary": "Kendalikan Brand of the Pyre dengan saluran air sambil menangani serangan depan berulang, hujan api langit, sinar berputar, dan Forge Wave yang meluas dari Ignivar.",
+        "phaseApocalypseName": "Jeda: Apocalypse",
+        "phaseApocalypseSummary": "Pada {health} kesehatan, Ignivar memanggil seorang Ashcaller yang berusaha mengakhiri pertarungan.",
+        "phaseJudgmentName": "Judgment of the Forge",
+        "phaseJudgmentSummary": "Pada {health} kesehatan, Ignivar menyalakan arena dan mengungkap satu tempat perlindungan aman di antara tiga tempat berlindung.",
+        "phaseJudgmentHeroicSummary": "Pada {health} kesehatan, Ignivar menyalakan arena sementara Brand yang aktif terus mengancam pemain di dekatnya di dalam tempat perlindungan.",
+        "phaseFinaleName": "Final: Last Inferno",
+        "phaseFinaleSummary": "Pada {health} kesehatan, Ignivar memulai fase pembakaran akhir dengan tenggat waktu ketat dan mekanik berulang yang lebih cepat.",
+        "forgeStrikeName": "Forge Strike",
+        "forgeStrikeSummary": "Ignivar menghantam tank yang sedang dipegangnya dan menerapkan Molten Armor, meningkatkan kerusakan yang diterima dari Ignivar.",
+        "forgeStrikeResponse": "Tank berganti pada {stacks} tumpukan. Penyembuh bersiap untuk hantaman itu dan ayunan jarak dekat pertama dari tank baru.",
+        "brandName": "Brand of the Pyre",
+        "brandSummary": "Ignivar menandai pemain non-tank dengan kerusakan api yang terus-menerus. Pemain yang ditandai juga membakar sekutu di dekatnya.",
+        "brandResponse": "Menyebarlah. Arahkan Searing Torrent ke saluran air yang siap, lalu setiap pemain yang ditandai menyeberangi air yang aktif itu sendirian untuk membersihkan diri.",
+        "brandHeroicResponse": "Menyebarlah. Buka sebuah saluran dengan Searing Torrent dan bersihkan satu pemain yang ditandai dalam satu waktu. Setiap pembersihan memicu Cleansing Backlash ke seluruh raid.",
+        "searingTorrentName": "Searing Torrent",
+        "searingTorrentSummary": "Ignivar mengunci seorang pemain, lalu melepaskan ledakan depan yang lebar. Saluran air yang siap dan terkena ledakan itu menjadi aktif untuk waktu singkat.",
+        "searingTorrentHeroicSummary": "Ignivar mengunci seorang pemain, lalu melepaskan ledakan depan yang hampir mematikan. Saluran air yang siap dan terkena ledakan itu menjadi aktif untuk waktu singkat.",
+        "searingTorrentResponse": "Arahkan peringatan itu tepat melalui satu saluran yang siap. Semua orang lainnya meninggalkan area depan sebelum rapalan selesai.",
+        "rainName": "Rain of Cinders",
+        "rainSummary": "Tiga sektor api dan titik jatuh meteor yang ditandai menghukum pemain yang tetap berada di dalam area peringatannya.",
+        "rainHeroicSummary": "Tiga sektor api dan titik jatuh meteor yang ditandai memberikan kerusakan ekstrem pada pemain yang tetap berada di dalam area peringatannya.",
+        "rainResponse": "Bergeraklah ke celah yang tidak ditandai dan tinggalkan setiap lingkaran meteor sebelum benturan.",
+        "raysName": "Revolving Inferno",
+        "raysSummary": "Sinar api yang berputar menyapu di sekeliling Ignivar dan berulang kali memberikan kerusakan pada pemain yang menyentuhnya.",
+        "raysHeroicSummary": "Sinar api yang berputar menyapu di sekeliling Ignivar dan memberikan kerusakan berulang yang parah saat tersentuh.",
+        "raysResponse": "Bergeraklah mengikuti ruang kosong di antara sinar. Jangan memotong melalui sinar, bahkan dengan kemampuan pergerakan cepat sekalipun.",
+        "forgeWaveName": "Forge Wave",
+        "forgeWaveSummary": "Dinding api yang meluas melintasi arena, menyisakan dua celah yang berhadapan dan mendorong mundur pemain yang terkena.",
+        "forgeWaveHeroicSummary": "Dinding api yang meluas melintasi arena, menyisakan dua celah yang berhadapan dan mendorong pemain yang terkena jauh lebih jauh.",
+        "forgeWaveResponse": "Temukan salah satu celah selama masa ancang-ancang, sejajarkan dirimu dengannya, dan hindari terdorong ke arah tepi arena.",
+        "apocalypseName": "Apocalypse",
+        "apocalypseSummary": "Ignivar memanggil seorang Ashcaller. Jika add ini menyelesaikan Apocalypse, raid langsung dikalahkan.",
+        "apocalypseResponse": "Alihkan semua kerusakan yang tersedia ke Ignivar Ashcaller dan kalahkan sebelum rapalannya selesai.",
+        "judgmentName": "Judgment of the Forge",
+        "judgmentSummary": "Ignivar menandai tiga tempat berlindung, menetapkan satu sebagai tempat perlindungan aman, lalu berulang kali membakar sisa arena.",
+        "judgmentHeroicSummary": "Ignivar menandai satu tempat perlindungan aman selagi arena terbakar. Brand of the Pyre tetap aktif dan masih memberikan kerusakan pada sekutu di dekatnya.",
+        "judgmentResponse": "Kenali tempat perlindungan yang ditandai secara unik selama peringatan dan berkumpul penuh di dalam batasnya sebelum lantai menyala.",
+        "chainsName": "Chains of the Forge",
+        "chainsSummary": "Ignivar menghubungkan pasangan pemain yang berdekatan. Terpisah terlalu jauh atau melintasi rantai pasangan lain menyebabkan kerusakan mematikan.",
+        "chainsResponse": "Tetap dekat dengan rekan yang terhubung denganmu, bergeraklah bersama, dan jangan biarkan pemain lain melintasi rantaimu.",
+        "lastInfernoName": "Last Inferno",
+        "lastInfernoSummary": "Ignivar mengamuk dan bersiap menyebabkan kekalahan total sementara Rain of Cinders, Searing Torrent, dan Revolving Inferno makin cepat.",
+        "lastInfernoResponse": "Gunakan jeda kerusakan dan penyembuhan yang tersisa, terus jalankan mekanik pergerakan, dan kalahkan Ignivar sebelum hitung mundur berakhir.",
+        "brand": "Brand of the Pyre: menyebarlah. Arahkan Searing Torrent ke saluran air yang siap, lalu seberangi air itu sendirian untuk membersihkan diri.",
+        "movement": "Pergerakan: hindari kerucut Rain of Cinders dan meteor, bergerak mengikuti Revolving Inferno, dan gunakan dua celah Forge Wave.",
+        "apocalypse": "Apocalypse: kalahkan Ignivar Ashcaller sebelum rapalannya selesai.",
+        "judgment": "Judgment of the Forge: kenali tempat perlindungan unik selama peringatan, lalu berkumpul di dalam batas yang ditandai saat lantai menyala.",
+        "finale": "Last Inferno: kalahkan Ignivar sebelum kekalahan total sambil meteor, serangan depan yang lebih cepat, dan Revolving Inferno terus berlanjut.",
+        "heroic": "Heroik: pemain yang berpasangan tetap dekat selama Chains of the Forge, Brand tetap aktif di dalam Judgment, dan Forge Wave mendorong lebih jauh."
+      },
+      "varkhul": {
+        "overview": "Varkhul memenjarakan Last Spring yang sekarat untuk menempa logam hidup, lalu menciptakan Ignivar untuk menjaga kejahatannya. Pertarungannya memadukan penempatan posisi pribadi dengan kendali tungku agung ke seluruh raid.",
+        "phaseOpeningName": "The Forgefather",
+        "phaseOpeningSummary": "Varkhul bergiliran memberikan tekanan pada tank, sabetan depan yang lebar, proyektil bergerak, serapan berkelompok, gelombang meteor, dan serangan dari paron agung.",
+        "phaseAssemblyName": "Jeda: The Master's Assembly",
+        "phaseAssemblySummary": "Pada {health} kesehatan, Varkhul menjadi terlindungi sementara Forge Legion miliknya memasuki arena lewat portal dan sinar pilar mengancam Forge Meltdown.",
+        "phaseFinaleName": "Final: Masterpiece Unbound",
+        "phaseFinaleSummary": "Pada {health} kesehatan, Varkhul menyerang lebih cepat, memberikan lebih banyak kerusakan, dan memancarkan api ke seluruh raid hingga tenggat akhir.",
+        "phaseFinaleHeroicSummary": "Pada {health} kesehatan, Varkhul meninggalkan sebagian besar mekanik sebelumnya saat Worldfire menutup ke arah dalam dan melahap crucible.",
+        "makersBrandName": "Maker's Brand",
+        "makersBrandSummary": "Varkhul menghantam tank yang sedang dipegangnya dan menerapkan efek bertumpuk yang meningkatkan semua kerusakan yang diterima darinya.",
+        "makersBrandResponse": "Tank berganti pada {stacks} tumpukan. Penyembuh bersiap untuk tank yang akan masuk sebelum Varkhul berganti target.",
+        "frontalName": "Forgefather's Sweep",
+        "frontalSummary": "Varkhul melepaskan sabetan depan yang sangat lebar dan memberikan kerusakan api yang berat pada semua orang di hadapannya.",
+        "frontalHeroicSummary": "Varkhul melepaskan sabetan depan yang sangat lebar dan memberikan kerusakan api yang hampir mematikan pada semua orang di hadapannya.",
+        "frontalResponse": "Jaga Varkhul agar tetap membelakangi grup dan bergeraklah ke belakangnya segera setelah peringatan muncul.",
+        "orbsName": "Cinder Orbs",
+        "orbsSummary": "Non-tank yang ditandai menjatuhkan genangan bara yang bertahan dan melepaskan orb api ke segala arah. Red-hot Metal juga menyerap penyembuhan yang masuk.",
+        "orbsHeroicSummary": "Non-tank yang ditandai menjatuhkan genangan bara yang bertahan dan sangat merusak serta melepaskan orb api berbahaya ke segala arah. Red-hot Metal juga menyerap penyembuhan yang masuk.",
+        "orbsResponse": "Bawa setiap tanda ke tepi ruangan, pisahkan genangannya, lalu hindari orb saat melintasi arena. Penyembuh membersihkan absorb itu dengan cepat.",
+        "pyreName": "Shared Pyre",
+        "pyreSummary": "Lingkaran yang bergerak mengikuti satu pemain tanpa Red-hot Metal. Kerusakannya dibagi di antara pemain di dalamnya, dan setiap pemain yang hilang memberikan kerusakan {missingPenalty} kesehatan maksimum ke seluruh raid.",
+        "pyreHeroicSummary": "Lingkaran yang bergerak mengikuti satu pemain tanpa Red-hot Metal dan membagi hantaman yang lebih besar. Setiap pemain yang hilang juga memberikan kerusakan {missingPenalty} kesehatan maksimum ke seluruh raid.",
+        "pyreResponse": "Kumpulkan setidaknya {players} pemain di dalam lingkaran dan bergerak mengikuti targetnya hingga rapalan selesai.",
+        "forgestormName": "Forgestorm",
+        "forgestormSummary": "Varkhul memanggil {waves} gelombang beruntun titik jatuh meteor yang ditandai di seluruh arena.",
+        "forgestormHeroicSummary": "Varkhul memanggil {waves} gelombang beruntun titik jatuh meteor yang ditandai dan memberikan kerusakan ekstrem.",
+        "forgestormResponse": "Perhatikan setiap set peringatan tanah yang baru dan menjauhlah sebelum gelombang itu mendarat. Jangan kembali ke posisi sebelumnya tanpa memeriksa gelombang berikutnya.",
+        "rayName": "Tempering Ray",
+        "raySummary": "Sebuah sinar mengunci pemain yang ditandai selama masa ancang-ancang yang panjang. Pemain lain pertama di antara Varkhul dan target itu mencegat hantamannya dan menerima Tempered Wound.",
+        "rayResponse": "Tugaskan seorang pemain yang sehat, biasanya off-tank, untuk melangkah ke dalam garis itu. Jaga pemain lain tetap di luar dan bergantian mencegat selama Tempered Wound aktif.",
+        "anvilName": "Anvil's Decree",
+        "anvilSummary": "Varkhul berjalan menuju tungku agung dan menghantamnya {strikes} kali, memberikan kerusakan ke seluruh raid yang terus meningkat.",
+        "anvilHeroicSummary": "Varkhul menghantam tungku agung {strikes} kali dengan kerusakan raid yang terus meningkat sementara meteor yang ditandai jatuh menimpa pemain.",
+        "anvilResponse": "Berkumpul untuk penyembuhan raid dan gunakan jeda pertahanan untuk hantaman terakhir.",
+        "anvilHeroicResponse": "Sebarkan meteor yang ditandai menjauh dari grup sementara penyembuh dan jeda pertahanan menutupi semua {strikes} hantaman.",
+        "assemblyName": "The Master's Assembly",
+        "assemblySummary": "Varkhul menjadi terlindungi dan memulai perakitan berwaktu. Raid harus mengalahkan setiap gelombang portal sebelum tungku menyelesaikan mahakaryanya.",
+        "assemblyResponse": "Bagi perhatian antara kendali sinar dan add prioritas. Kalahkan seluruh Forge Legion sebelum waktu perakitan habis.",
+        "beamName": "Crucible Beam",
+        "beamSummary": "Sinar pilar yang aktif memanaskan tungku kecuali seorang pemain memblokirnya. Pemblokir menerima kerusakan yang terus meningkat dari Crucible Exposure, sementara sinar yang diblokir dan tidak aktif membiarkan panas menurun.",
+        "beamHeroicSummary": "Sinar pilar yang aktif memanaskan tungku kecuali seorang pemain memblokirnya. Pemblokir menerima kerusakan yang terus meningkat dari Crucible Exposure, dan panas tungku tidak pernah menurun.",
+        "beamResponse": "Berdirilah di antara setiap pilar aktif dan tungku, lalu bergantian memblokir sebelum exposure menjadi berbahaya. Mencapai panas penuh menyebabkan Forge Meltdown yang mematikan.",
+        "legionName": "Forge Legion",
+        "legionSummary": "Crucible Warden merapal Crucible Quake untuk menambah panas tungku, sementara Cinder Artificer menggunakan Repair Protocol untuk menyembuhkan Varkhul.",
+        "legionResponse": "Interupsi Crucible Quake, hentikan Repair Protocol, dan fokuskan setiap perapal berbahaya sebelum membersihkan add yang tersisa.",
+        "masterpieceName": "Masterpiece Unbound",
+        "masterpieceSummary": "Varkhul menyerang lebih cepat, memberikan lebih banyak kerusakan, dan berulang kali membakar raid hingga kekalahan total terakhir.",
+        "masterpieceHeroicSummary": "Varkhul menyerang lebih cepat dan memberikan lebih banyak kerusakan sementara Worldfire menggantikan sebagian besar mekanik sebelumnya untuk pembakaran akhir.",
+        "masterpieceResponse": "Kerahkan jeda ofensif dan defensif yang tersisa dan kalahkan Varkhul sebelum hitung mundur terakhir berakhir.",
+        "worldfireName": "Worldfire",
+        "worldfireSummary": "Di Heroik, api maju dari tepi arena menuju pusat secara bertahap hingga seluruh crucible terbakar.",
+        "worldfireResponse": "Bergeraklah ke dalam mendahului setiap pita api yang maju, jaga ruang aman yang menyusut, dan selesaikan Varkhul sebelum pusatnya menyala.",
+        "tanks": "Tank: berganti pada dua tumpukan Maker's Brand dan jaga Varkhul tetap dalam jangkauan jarak dekat.",
+        "orbs": "Cinder Orbs: pemain yang ditandai menyebar ke tepi ruangan. Genangan api mereka bertahan dan orb yang dilepaskan melintasi ruangan.",
+        "pyre": "Shared Pyre: hanya pemain tanpa Red-hot Metal yang dipilih. Kumpulkan empat pemain di dalam lingkaran yang bergerak pada kedua tingkat kesulitan. Setiap pemain yang hilang memberikan kerusakan 15% kesehatan maksimum ke seluruh raid.",
+        "forgestorm": "Forgestorm: waspadai meteor yang jatuh dan tinggalkan setiap titik jatuh yang ditandai sebelum masing-masing dari tiga gelombang mendarat.",
+        "anvil": "Anvil's Decree: Varkhul bergerak menuju tungku agung dan menghantamnya tiga kali untuk kerusakan raid. Heroik juga menjatuhkan meteor yang ditandai.",
+        "ray": "Tempering Ray: pemain lain, biasanya seorang tank, mencegat garis yang bergerak sebelum masa ancang-ancang panjang berakhir. Pemain yang terkena menerima Tempered Wound.",
+        "forge": "Pilar tungku: blokir sinar aktif sebelum mencapai tungku dan bergantian memblokir seiring Crucible Exposure meningkat. Meteran panas penuh menyebabkan Forge Meltdown.",
+        "assembly": "The Master's Assembly: blokir kedua sinar tungku, kalahkan setiap gelombang portal, interupsi Crucible Quake, dan hentikan Cinder Artificer menyembuhkan Varkhul.",
+        "worldfire": "Worldfire: di Heroik, tepi yang terbakar menutup ke arah pusat selama fase akhir. Kalahkan Varkhul sebelum seluruh crucible terbakar.",
+        "heroic": "Heroik: panas tungku tidak pernah mendingin, Anvil's Decree menambahkan meteor, dan fase akhir menghilangkan sebagian besar mekanik untuk berfokus pada Worldfire."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Memberikan {total}% dari kesehatan maksimum setiap pemain, dibagi berdasarkan jumlah pemain di dalam lingkaran ({perPlayer}% masing-masing dengan {players} pemain).",
+      "varkhulSharedPyre": "Memberikan {total}% dari kesehatan maksimum setiap pemain, dibagi di antara pemain di dalam lingkaran ({perPlayer}% masing-masing dengan {players} pemain). Setiap pemain yang hilang juga memberikan kerusakan {missingPenalty}% kesehatan maksimum ke seluruh raid, termasuk pemain di dalam lingkaran.",
+      "makersBrand": "Selama {duration} dtk, setiap tumpukan meningkatkan kerusakan yang diterima dari Varkhul sebesar {pct}%. Menumpuk hingga {max} kali. Tank harus berganti pada {swap} tumpukan.",
+      "varkhulSentinelsGaze": "Ember Sentinel mengejarmu. Jauhkan dari raid hingga ia dihancurkan.",
+      "varkhulMoltenCore": "Bawa inti ini ke tungku. Molten Burden memberikan kerusakan yang terus meningkat setiap {interval} dtk, dari {min}% hingga {max}% kesehatan maksimum.",
+      "varkhulForgeLink": "Cegat sinar pilar yang aktif sebelum mencapai tungku. Sinar yang terbuka menambah 6% panas setiap detik. Di Normal, sinar yang diblokir dan pilar yang tidak aktif mendinginkan tungku; di Heroik, panas tidak pernah turun. Pada 100%, tungku mengalami Forge Meltdown yang mematikan.",
+      "varkhulCrucibleExposure": "Memblokir Crucible Beam memberikan kerusakan kesehatan maksimum yang terus meningkat setiap detik. Tumpukannya tereset 10 detik setelah meninggalkan sinar di Normal dan setelah 60 detik di Heroik.",
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
       "mendingCurrent": "Menyimpan {value} penyembuhan, dilepaskan seiring waktu atau dihabiskan oleh Tambalan Bertingkat",
@@ -2657,7 +2887,9 @@ export const id_ID: EnTranslations = {
       "chestTitle": "Peti",
       "takeLootButton": "Ambil Jarahan",
       "takeLootTooltip": "Mengambil koin dan barang yang jatuh. Tidak menggunakan kesempatan panen.",
-      "unifiedPressHint": "Tombol interaksi menjarah dan memanen dalam satu tekanan, menggunakan fokus kotamu."
+      "unifiedPressHint": "Tombol interaksi menjarah dan memanen dalam satu tekanan, menggunakan fokus kotamu.",
+      "bindConfirmTitle": "Terikat saat diambil",
+      "bindConfirmBody": "Jarahan ini berisi barang yang akan terikat padamu saat diambil. Barang yang terikat hanya dapat diperdagangkan kepada pemain yang berbagi jarahannya, dan hanya untuk waktu terbatas."
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
@@ -2689,6 +2921,7 @@ export const id_ID: EnTranslations = {
     },
     "partyFrames": {
       "section": "Bingkai Grup dan Raid",
+      "optionsSection": "Opsi Bingkai Party",
       "unlock": "Pindahkan bingkai grup dan raid",
       "lock": "Kunci bingkai grup dan raid",
       "style": "Gaya Bingkai",
@@ -2719,13 +2952,70 @@ export const id_ID: EnTranslations = {
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
     },
+    "interfaceUnlock": {
+      "label": "Edit Bingkai",
+      "unlock": "Buka kunci antarmuka",
+      "lock": "Kunci antarmuka",
+      "lockAll": "Kunci Antarmuka",
+      "barsNote": "Hanya bilah aksi yang telah kamu aktifkan yang muncul saat mengedit. Untuk menambahkan bilah lagi, tambahkan lebih dulu dengan tombol plus dan minus di bilah aksi utama.",
+      "frozenNote": "Saat mengedit, antarmuka dan kamera dibekukan: tombol dan bingkai hanyalah gambar diam untuk diatur, dan klik tidak akan mencapai dunia permainan.",
+      "unlockFrame": "Buka kunci bingkai ini",
+      "lockFrame": "Kunci bingkai ini",
+      "resizeFrame": "Ubah ukuran bingkai ini",
+      "frameNames": {
+        "actionBar1": "Bilah Aksi",
+        "actionBar2": "Bilah Aksi 2",
+        "actionBar3": "Bilah Aksi 3",
+        "steamWishlist": "Pengingat Wishlist",
+        "menu": "Menu",
+        "minimap": "Peta Mini",
+        "stanceBar": "Bilah Kuda-kuda",
+        "xpBar": "Bilah XP",
+        "chat": "Obrolan",
+        "actionBarGroup": "Bilah Aksi",
+        "playerFrame": "Pemain",
+        "targetFrame": "Target",
+        "partyFrames": "Party",
+        "swingBar": "Serangan Otomatis"
+      },
+      "framesMenu": "Pengaturan Bingkai",
+      "framesMenuTitle": "Tampilkan atau sembunyikan bingkai satu per satu. Bingkai yang tidak dicentang tetap tersembunyi sampai kamu mencentangnya lagi atau mengatur ulang ke bawaan.",
+      "showHideFrames": "Tampilkan atau Sembunyikan Bingkai",
+      "buffsLeftToRight": "Buff dari kiri ke kanan",
+      "debuffsLeftToRight": "Debuff dari kiri ke kanan",
+      "lockPlayerFrameToBar": "Kunci Bingkai Pemain ke Bilah Aksi",
+      "actionBarsVertical": "Bilah Aksi Vertikal",
+      "actionBar1Vertical": "Bilah Aksi Vertikal",
+      "actionBar2Vertical": "Bilah Aksi Vertikal 2",
+      "actionBar3Vertical": "Bilah Aksi Vertikal 3",
+      "menuRailHorizontal": "Menu Horizontal",
+      "snapToGrid": "Sesuaikan ke Grid",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Atur ulang ukuran",
+      "resetFrameSizeFor": "Atur ulang ukuran untuk {name}",
+      "previewSpell": "Mantra Contoh"
+    },
+    "transfer": {
+      "frameLayout": "Tata Letak Bingkai",
+      "allSettings": "Semua Pengaturan",
+      "exportAction": "Ekspor",
+      "importAction": "Impor",
+      "copy": "Salin",
+      "copied": "Disalin ke clipboard.",
+      "copyFailed": "Penyalinan gagal. Pilih kodenya dan salin sendiri.",
+      "applyReload": "Terapkan dan Muat Ulang",
+      "pastePlaceholder": "Tempel kode yang diekspor di sini.",
+      "invalid": "Itu bukan kode ekspor yang valid.",
+      "wrongKind": "Kode itu berjenis ekspor yang berbeda."
+    },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
       "riftTier": "Barang Rift peringkat {tier}",
       "riftUpgrade": "Peningkatan Rift {level}/{max}",
       "riftSockets": "Permata Rift {used}/{total}",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
-      "enchantedFallback": "Dimantrai"
+      "enchantedFallback": "Dimantrai",
+      "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan."
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
@@ -2926,7 +3216,10 @@ export const id_ID: EnTranslations = {
       "unlink": "Putuskan Tautan Steam",
       "linked": "Tertaut ke akun Steam {id}",
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
-      "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi."
+      "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi.",
+      "wishlist": "Masukkan ke wishlist di Steam",
+      "wishlistAria": "Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",
@@ -3012,6 +3305,26 @@ export const id_ID: EnTranslations = {
       "buySlotsMaxed": "Sudah diperluas penuh",
       "buyConfirm": "Beli {count} slot bank tambahan seharga {price}?",
       "buyConfirmAccept": "Beli",
+      "meterLabel": "{used} dari {total} slot",
+      "meterPoolGeneral": "Umum: {used} dari {total}",
+      "meterPoolMaterials": "Material: {used} dari {total}",
+      "meterPoolsAria": "Slot bank terpakai: {used} dari {total}. Barang umum: {generalUsed} dari {generalTotal}. Material: {materialsUsed} dari {materialsTotal}.",
+      "meterMaterialsNote": "Ruang khusus material dari kantong yang tersemat. Barang lain tidak dapat menggunakannya.",
+      "priceDisclaimer": "Harga dapat berubah mengikuti ekonomi permainan.",
+      "rungItemName": "{count} slot bank",
+      "buySlotsDualAria": "Beli {count} slot seharga {price} atau {cost} Claudium",
+      "buyConfirmDual": "Beli {count} slot bank tambahan?",
+      "buyConfirmGold": "Beli seharga {price}",
+      "buyConfirmClaudium": "Beli seharga {cost} Claudium",
+      "rungGranted": "Slot bank telah ditambahkan. Bank karakter ini kini lebih besar.",
+      "rungAlreadyGranted": "Slot ini sudah ada pada karakter ini. Kamu tidak dikenakan biaya lagi.",
+      "rungApplyDeferred": "Pembayaran selesai. Slot akan diterapkan secara otomatis saat karakter ini masuk berikutnya.",
+      "rungGrantUnresolved": "Pembayaran selesai, tetapi slot belum dapat diterapkan. Pembelian telah tercatat dan tim dukungan dapat menyelesaikannya untukmu.",
+      "rungInProgress": "Sebuah pembelian untuk karakter ini masih diproses. Coba lagi sesaat lagi.",
+      "rungDoesNotFit": "Bank karakter ini tidak dapat menampung perluasan lagi.",
+      "rungNotPurchasable": "Slot bank ini tidak dapat dibeli saat ini.",
+      "rungFailed": "Pembelian tidak dapat diselesaikan.",
+      "rungOutage": "Pembelian tidak dapat dikonfirmasi. Coba lagi dengan tombol ini dan kamu tidak akan dikenakan biaya dua kali. Memuat ulang permainan terlebih dahulu dapat menghilangkan perlindungan itu.",
       "withdrawHint": "Klik untuk menarik",
       "withdrawPartialHint": "Shift-klik untuk menarik sebagian",
       "depositHint": "Klik untuk menyetor",
@@ -3024,6 +3337,9 @@ export const id_ID: EnTranslations = {
       "withdrawQuantityTitle": "Tarik {item}",
       "withdrawQuantityInput": "Jumlah yang ditarik",
       "withdrawQuantityConfirm": "Tarik",
+      "vaultRowWithdrawName": "Tarik {item}",
+      "priceChanged": "Harga berubah sebelum pembelian selesai. Tinjau harga yang diperbarui dan konfirmasi lagi.",
+      "withdrawQuantityAction": "Jumlah yang ditarik: {item}",
       "filterGroupAria": "Saring bank menurut kategori",
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
@@ -3045,6 +3361,34 @@ export const id_ID: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Undang seorang teman: saat ia mencapai level 10, kalian masing-masing mendapat 2 slot, hingga 5 teman.",
       "bonusSectionAria": "Slot bank bonus dan cara mendapat lebih banyak",
+      "socketRowAria": "Slot tas bank",
+      "socketEmpty": "Slot tas bank kosong",
+      "socketEmptyHint": "Klik sebuah tas di tasmu untuk menyimpannya di bank",
+      "socketLocked": "Slot tas terkunci",
+      "socketLockedLater": "Slot tas terbuka secara berurutan, termurah lebih dulu",
+      "socketUnlockAria": "Buka kunci slot tas bank seharga {price}",
+      "socketUnlockHint": "Klik untuk membuka kunci slot tas ini",
+      "socketUnlockConfirm": "Buka kunci slot tas bank seharga {price}?",
+      "socketUnlockAccept": "Buka Kunci",
+      "unsocketHint": "Klik untuk mengembalikan tas ini ke tasmu",
+      "socketHint": "Klik untuk menyematkan tas ini ke bankmu",
+      "vaultTab": "Brankas",
+      "vaultCapacityNote": "Setiap material menampung hingga {cap}.",
+      "vaultEmpty": "Brankasmu kosong. Klik sebuah material di tasmu untuk menyetorkannya.",
+      "vaultRowAria": "{item}: {count} dari {cap} tersimpan",
+      "vaultLockedIntro": "Buka kunci Brankas Material untuk menimbun material kerajinan di samping bankmu. Setiap material mendapat ruangnya sendiri, hingga {cap} per jenis.",
+      "vaultUnlockButton": "Buka Kunci Brankas Material",
+      "vaultUnlockConfirm": "Buka kunci Brankas Material seharga {price}?",
+      "vaultUpgrade": "Perluas setiap batas maksimum menjadi {cap}",
+      "vaultUpgradeConfirm": "Perluas setiap batas maksimum material menjadi {cap} seharga {price}?",
+      "vaultDepositAll": "Setorkan semua material",
+      "vaultDepositAllTooltip": "Mengirim setiap material dari tasmu ke brankasmu dalam sekali jalan, mengisi setiap material hingga batas maksimumnya. Perlengkapan, alat, barang misi, dan barang habis pakai tidak pernah disentuh.",
+      "vaultDepositAllDone": "Material disetorkan: {count}.",
+      "vaultDepositAllFull": "Material disetorkan: {count}. Beberapa batas maksimum sudah penuh.",
+      "vaultDepositAllNone": "Batas maksimum brankas penuh: tidak ada yang disetorkan.",
+      "vaultWithdrawShort": "Hanya {fit} dari {count} yang muat di tasmu.",
+      "vaultDepositHint": "Klik untuk menyetor ke brankasmu",
+      "vaultCannotDeposit": "Tidak dapat masuk ke brankas",
       "tabsAria": "Tab bank",
       "personalTab": "Pribadi",
       "guildTab": "Guild",
@@ -3444,6 +3788,8 @@ export const id_ID: EnTranslations = {
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
+      "reagentVaultDraw": "(mengambil {count} dari brankasmu)",
+      "vaultUnreachable": "Brankas Material tidak terjangkau di sini.",
       "craftFeeLine": "Biaya kerajinan: {fee} per buah",
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
@@ -3542,7 +3888,9 @@ export const id_ID: EnTranslations = {
       "equip": "Pakai",
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
-      "applyEnchant": "Terapkan Mantrai"
+      "applyEnchant": "Terapkan Mantrai",
+      "sell": "Jual",
+      "sellAll": "Jual semua ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
@@ -4044,9 +4392,15 @@ export const id_ID: EnTranslations = {
       "loading": "Memuat Bursa...",
       "loadFailed": "Bursa tidak dapat dihubungi. Coba lagi sebentar lagi.",
       "disabledRealm": "Bursa $WOC tidak tersedia di realm ini.",
+      "browserOnlyConfirmTitle": "Buka Bursa $WOC di browser?",
+      "browserOnlyConfirmBody": "Bursa $WOC hanya berjalan di versi browser World of ClaudeCraft. Ini membuka World of ClaudeCraft di browser, tempat kamu dapat masuk dan membuka Bursa; game tetap berjalan di sini.",
+      "browserOnlyConfirmOpen": "Buka di Browser",
+      "browserOnlyConfirmCancel": "Batal",
       "pausedBanner": "Perdagangan sedang dijeda. Lelang tetap menghitung mundur; daftar baru, penawaran, tawaran, dan pembayaran menunggu sampai perdagangan berlanjut kembali, dan pembayaran yang sudah dikirim tetap dilunasi.",
-      "walletBanner": "Tautkan dan verifikasi dompet untuk menawar, membeli, atau menjual di Bursa.",
-      "walletBannerCta": "Hubungkan dompet",
+      "walletLinkedDisconnected": "Alamat publikmu sudah tertaut. Hubungkan kembali aplikasi dompet itu saat kamu ingin membayar dengan $WOC.",
+      "walletLinkedConnected": "Aplikasi dompet tertautmu sudah terhubung dan siap untuk pembelian $WOC.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Tidak diketahui",
       "rateNote": "Kurs: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "rateNotePaused": "Kurs terakhir yang diketahui: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "estimateNote": "Sekitar {tokens} $WOC untuk {usd} pada kurs saat ini.",
@@ -4300,6 +4654,8 @@ export const id_ID: EnTranslations = {
       "online": "Karakter sedang daring.",
       "rename_not_permitted": "Mengganti nama karakter ini tidak diperbolehkan.",
       "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
+      "storage_purchase_open": "Pembelian penyimpanan harus selesai atau diselesaikan sebelum karakter ini dapat dihapus.",
+      "delete_busy": "Realm sedang sibuk. Coba hapus karakter ini lagi sebentar nanti.",
       "already_in_world": "Karakter sudah berada di dalam dunia.",
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
       "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
@@ -4360,7 +4716,13 @@ export const id_ID: EnTranslations = {
       "upstream": "Epic tidak merespons. Coba lagi sebentar lagi."
     },
     "wallet": {
-      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
+      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi.",
+      "reauth_required": "Konfirmasi perubahan dompet ini dengan kata sandi akun Anda.",
+      "reauth_two_factor": "Akun Anda mengaktifkan autentikasi dua-faktor. Masukkan kode Anda untuk konfirmasi.",
+      "reauth_no_password": "Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.",
+      "reauth_bad_signature": "Tanda tangan dompet tidak dapat diverifikasi. Coba lagi.",
+      "reauth_bad_password": "Kata sandi Anda salah.",
+      "reauth_bad_two_factor": "Kode itu tidak valid, coba lagi."
     },
     "ota_updates": {
       "invalid_input": "Masukan tidak valid."
@@ -4818,6 +5180,7 @@ export const id_ID: EnTranslations = {
       "ifPartySort": "Urutan anggota party dicantumkan: urutan grup, peran, atau nama.",
       "ifPartyShowAuras": "Apakah buff dan debuff ditampilkan pada bingkai party. Sakelar serupa mencakup bilah sumber daya, penyerapan, peliharaan, dan apakah Anda muncul pada daftar party Anda sendiri.",
       "ifAurasOnPlayerFrame": "Menampilkan buff dan debuff Anda pada bingkai unit Anda sendiri selain di bilah aura.",
+      "ifAlwaysShowAllBuffs": "Menampilkan setiap buff aktif bahkan pada preset grafis Rendah, melewati batas ikon buff yang biasanya berlaku.",
       "ifTargetOfTarget": "Menampilkan siapa yang sedang disasar oleh sasaran Anda, cara klasik untuk mengetahui apakah tank masih memegangnya.",
       "ifPetFrame": "Menampilkan bingkai untuk peliharaan Anda.",
       "ifChatFontScale": "Ukuran teks obrolan.",
@@ -6304,6 +6667,7 @@ export const id_ID: EnTranslations = {
       "bankBody": "Setiap kota pusat memiliki cabang Brankas Bersepuh Emas, rumah perbankan realm ini. Bicaralah dengan bendahara di sana untuk membuka lemari besimu, ruang simpanan pribadi di luar tasmu yang dimiliki karaktermu seumur hidup. Apa pun yang kamu titipkan pada mereka menunggu dengan aman, di cabang mana pun yang kamu kunjungi berikutnya.",
       "bankHow": "Saat lemari besi terbuka, klik sebuah barang di tasmu untuk menyetorkannya dan klik barang itu di lemari besi untuk mengambilnya kembali. Lemari besi hanya menampung barang, tidak pernah koin, dan barang misi tetap bersamamu. Saat tasmu penuh di tengah perjalanan, satu tombol menyapu semua bahan kerajinanmu masuk sekaligus.",
       "bankSlots": "Lemari besi yang baru mulai dari ukuran kecil dan tumbuh bersamamu. Bendahara menjual slot tambahan dengan koin pada harga yang kian menanjak, dan bermain online memberi ruang bonus di atasnya, untuk hal-hal seperti email terverifikasi, akun tertaut, dan teman yang kamu ajak masuk ke dalam permainan.",
+      "bankSockets": "Setelah jenjang slot, bendahara juga menjual hingga empat soket tas, yang terbuka berurutan dengan harga yang makin mahal. Pasang tas cadangan dari perlengkapan bawaanmu di salah satunya dan slotnya akan menambah ruang penyimpananmu: tas biasa memperluas seluruh penyimpanan, sedangkan tas jinjing bahan hanya menambah ruang untuk material kerajinan. Klik tas di dalam tasmu untuk memasangnya, lalu klik soket untuk mengambilnya kembali. Mengambilnya kembali tidak pernah menghilangkan barang yang kamu simpan: jika ruang penyimpanan menjadi lebih penuh daripada kapasitasnya yang menyusut, semuanya tetap di tempat dan setoran baru cukup menunggu sampai ada ruang.",
       "buyingTitle": "Membeli dan menjual",
       "buyingBody": "Bicaralah dengan seorang pedagang dan pilih untuk menelusuri barangnya, maka tokonya terbuka dengan tiga tab: Telusuri, Jual, dan Beli Ulang. Telusuri memuat semua yang mereka stok, jadi milikmu jika kamu mampu membelinya. Jual mencantumkan apa saja di tasmu yang bersedia mereka bayar, dan menjual sebuah barang yang membawa mutu hasil undiannya sendiri meminta kamu mengonfirmasi lebih dulu, jadi salinan berharga tak pernah lepas karena keliru. Jika kamu melepas sesuatu yang kamu sesali, tab Beli Ulang menyimpan penjualan terakhirmu agar kamu bisa membelinya kembali seharga koin yang kamu terima.",
       "junkTitle": "Membereskan barang rongsokan",
@@ -7285,6 +7649,13 @@ export const id_ID: EnTranslations = {
     "unlink": "Lepas Tautan",
     "unlinkTitle": "Hapus verifikasi dompet dari akun ini",
     "unlinkAria": "Hapus verifikasi dompet dari akun ini",
+    "reauthTitle": "Konfirmasi perubahan dompet",
+    "reauthUnlinkTitle": "Konfirmasi penghapusan dompet",
+    "reauthHelp": "Demi keamanan Anda, masukkan kata sandi akun untuk mengizinkan perubahan ini.",
+    "reauthNoPassword": "Akun ini masuk tanpa kata sandi. Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.",
+    "reauthConfirm": "Konfirmasi",
+    "reauthCancel": "Batal",
+    "reauthClose": "Tutup",
     "signOut": "Putuskan Hubungan",
     "signOutTitle": "Putuskan hubungan aplikasi dompet di peramban ini",
     "signOutAria": "Putuskan hubungan aplikasi dompet di peramban ini",
@@ -7340,6 +7711,7 @@ export const id_ID: EnTranslations = {
       "title": "Hubungkan Dompet Solana",
       "linkBody": "Pilih ekstensi dompet di browser ini. Kamu akan menandatangani pesan verifikasi, lalu kembali ke aplikasi desktop.",
       "paymentBody": "Pilih dompet yang tertaut ke akunmu dan setujui transaksi di browser ini.",
+      "stepUpBody": "Pilih dompet yang tertaut ke akunmu dan tanda tangani pesan otorisasi $WOC Exchange. Penandatanganan ini gratis dan tidak memindahkan dana apa pun.",
       "extensionHelp": "Tidak ada ekstensi dompet yang kompatibel ditemukan. Instal atau buka Phantom, Solflare, atau dompet browser Solana lainnya, lalu coba lagi.",
       "safety": "World of ClaudeCraft tidak pernah meminta frasa pemulihan atau kunci privatmu.",
       "continueWith": "Lanjutkan dengan {wallet}",
@@ -7728,6 +8100,20 @@ export const id_ID: EnTranslations = {
     "buyConfirmBody": "Beli {item} untuk Tanda Heroik {marks}? Pembelian merek tidak dapat dikembalikan.",
     "buyConfirmAccept": "Membeli",
     "buyConfirmCancel": "Membatalkan"
+  },
+  "crucibleShop": {
+    "browse": "Tukar Sigil",
+    "browseAria": "Tukar sigil Crucible dengan {name}",
+    "empty": "Tidak ada bagian set yang dapat ditukar untuk kelas Anda.",
+    "balance": "Sigil Anda: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "Anda tidak memiliki sigil Crucible.",
+    "price": "1 {sigil}",
+    "buyAria": "Tukar {sigil} dengan {item}",
+    "buyConfirmTitle": "Konfirmasi Penukaran",
+    "buyConfirmBody": "Tukar {sigil} Anda dengan {item}? Sigil yang telah digunakan tidak dapat dikembalikan.",
+    "buyConfirmAccept": "Tukar",
+    "buyConfirmCancel": "Batal"
   },
   "cardDuel": {
     "title": "Duel Kartu",
@@ -8557,6 +8943,8 @@ export const id_ID: EnTranslations = {
         "riftEntrance": "Pintu masuk Rift: {name}",
         "hostileEnemy": "Musuh yang siap menyerang",
         "aggressiveEnemy": "Musuh yang menyerangmu",
+        "bossEnemy": "Bos: {name}",
+        "bossAggressiveEnemy": "Bos menyerangmu: {name}",
         "lootableEnemy": "Musuh yang dapat dijarah",
         "corpse": "Mayatmu",
         "deathZone": "Zona bahaya",
@@ -8945,6 +9333,7 @@ export const id_ID: EnTranslations = {
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
       "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
+      "tradeWindowIneligible": "Itu hanya dapat diperdagangkan kepada pemain yang berbagi jarahannya.",
       "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
     },
     "logs": {
@@ -9425,7 +9814,8 @@ export const id_ID: EnTranslations = {
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
       "clickBuyback": "Klik untuk membeli kembali",
-      "bagSlots": "Tas {slots} Slot"
+      "bagSlots": "Tas {slots} Slot",
+      "bagSlotsMaterials": "Tas Bahan {slots} Slot"
     },
     "bags": {
       "title": "Tas",
@@ -9607,7 +9997,8 @@ export const id_ID: EnTranslations = {
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
       "everyonePassed": "Semua orang melewatkan {item}.",
-      "rolled": "{answered}/{total} sudah melempar dadu"
+      "rolled": "{answered}/{total} sudah melempar dadu",
+      "bindsOnPickup": "Terikat saat diambil"
     }
   },
   "entities": {
@@ -10388,7 +10779,7 @@ export const id_ID: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya."
+        "description": "Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan {needleDoom} Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya."
       },
       "sentence": {
         "name": "Sentence",
@@ -10486,7 +10877,7 @@ export const id_ID: EnTranslations = {
       },
       "moonseed": {
         "name": "Benih Rembulan",
-        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga 6 dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
+        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
       },
       "rejuvenation": {
         "name": "Mekar Liar",
@@ -10790,7 +11181,7 @@ export const id_ID: EnTranslations = {
       },
       "conflagrate": {
         "name": "Kobaran Api",
-        "description": "Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung 2 muatan. (Ciri khas Penghancuran)"
+        "description": "Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung {charges} muatan. (Ciri khas Penghancuran)"
       },
       "moonkin_form": {
         "name": "Wujud Burung Bulan",
@@ -10822,7 +11213,7 @@ export const id_ID: EnTranslations = {
       },
       "overbloom": {
         "name": "Mekar Raya",
-        "description": "Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar 60% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran."
+        "description": "Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran."
       },
       "summon_imp": {
         "name": "Panggil Emberkin",
@@ -10894,7 +11285,7 @@ export const id_ID: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Tekad Besi",
-        "description": "Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap 4 kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)"
+        "description": "Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap {absorbPerRage} kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)"
       },
       "faultline": {
         "name": "Garis Patahan",
@@ -11271,7 +11662,7 @@ export const id_ID: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Jaga Serafik",
-        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar 180. (Ciri khas Berkat)"
+        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar {buff}. (Ciri khas Berkat)"
       },
       "summon_tithefiend": {
         "name": "Panggil Iblis Persepuluhan",
@@ -12814,6 +13205,9 @@ export const id_ID: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
       },
+      "reins_rickshaw_mount": {
+        "name": "Kendali Terikat: Becak Terikat Tulang"
+      },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
       },
@@ -12859,6 +13253,27 @@ export const id_ID: EnTranslations = {
       "dawnhold_posy": {
         "name": "Buket Taman Dawnhold"
       },
+      "wayfarers_backpack": {
+        "name": "Ransel Pengembara"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Kantung Reagen Goni"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Kantong Reagen Ahli Nekromansi"
+      },
+      "duskweave_bag": {
+        "name": "Tas Tenunan Senja"
+      },
+      "resonant_weave_bag": {
+        "name": "Tas Tenun Resonansi"
+      },
+      "foragers_haversack": {
+        "name": "Tas Punggung Pencari Makan"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Kantong Reagen Terikat Alat Tenun"
+      },
       "ps_briny_lure": {
         "name": "Umpan Asin"
       },
@@ -12870,6 +13285,612 @@ export const id_ID: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Batu Pelepasan"
+      },
+      "lastflame_core": {
+        "name": "Inti Api Terakhir"
+      },
+      "slagbreaker_helmet": {
+        "name": "Helm Pemecah Terak"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Pelindung Bahu Pemecah Terak"
+      },
+      "slagbreaker_chest": {
+        "name": "Hauberk Pemecah Terak"
+      },
+      "slagbreaker_gloves": {
+        "name": "Sarung Tangan Pemecah Terak"
+      },
+      "slagbreaker_legs": {
+        "name": "Pelindung Kaki Pemecah Terak"
+      },
+      "emberfury_helmet": {
+        "name": "Helm Amukan Bara"
+      },
+      "emberfury_shoulder": {
+        "name": "Pelindung Bahu Amukan Bara"
+      },
+      "emberfury_chest": {
+        "name": "Baju Zirah Amukan Bara"
+      },
+      "emberfury_gloves": {
+        "name": "Sarung Tangan Amukan Bara"
+      },
+      "emberfury_legs": {
+        "name": "Pelindung Kaki Amukan Bara"
+      },
+      "forgewall_helmet": {
+        "name": "Helm Tembok Tungku"
+      },
+      "forgewall_shoulder": {
+        "name": "Pelindung Bahu Tembok Tungku"
+      },
+      "forgewall_chest": {
+        "name": "Baju Zirah Tembok Tungku"
+      },
+      "forgewall_gloves": {
+        "name": "Sarung Tangan Tembok Tungku"
+      },
+      "forgewall_legs": {
+        "name": "Pelindung Kaki Tembok Tungku"
+      },
+      "dawnforged_helmet": {
+        "name": "Helm Tempa Fajar"
+      },
+      "dawnforged_shoulder": {
+        "name": "Pelindung Bahu Tempa Fajar"
+      },
+      "dawnforged_chest": {
+        "name": "Baju Zirah Tempa Fajar"
+      },
+      "dawnforged_gloves": {
+        "name": "Sarung Tangan Tempa Fajar"
+      },
+      "dawnforged_legs": {
+        "name": "Pelindung Kaki Tempa Fajar"
+      },
+      "oathpyre_helmet": {
+        "name": "Helm Api Sumpah"
+      },
+      "oathpyre_shoulder": {
+        "name": "Pelindung Bahu Api Sumpah"
+      },
+      "oathpyre_chest": {
+        "name": "Hauberk Api Sumpah"
+      },
+      "oathpyre_gloves": {
+        "name": "Sarung Tangan Api Sumpah"
+      },
+      "oathpyre_legs": {
+        "name": "Pelindung Kaki Api Sumpah"
+      },
+      "zealfire_helmet": {
+        "name": "Helm Api Semangat"
+      },
+      "zealfire_shoulder": {
+        "name": "Pelindung Bahu Api Semangat"
+      },
+      "zealfire_chest": {
+        "name": "Baju Zirah Api Semangat"
+      },
+      "zealfire_gloves": {
+        "name": "Sarung Tangan Zirah Api Semangat"
+      },
+      "zealfire_legs": {
+        "name": "Pelindung Kaki Api Semangat"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Kopiah Penguasa Kawanan"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Pelindung Bahu Penguasa Kawanan"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Tunik Kulit Bara Penguasa Kawanan"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Cengkeram Penguasa Kawanan"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Celana Penguasa Kawanan"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Kopiah Pelacak Pandangan Dingin"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Pelindung Bahu Pelacak Pandangan Dingin"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Tunik Pelacak Pandangan Dingin"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Sarung Tangan Pelacak Pandangan Dingin"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Celana Pelacak Pandangan Dingin"
+      },
+      "slagsnare_helmet": {
+        "name": "Tudung Penjerat Terak"
+      },
+      "slagsnare_shoulder": {
+        "name": "Pelindung Bahu Penjerat Terak"
+      },
+      "slagsnare_chest": {
+        "name": "Tunik Penjerat Terak"
+      },
+      "slagsnare_gloves": {
+        "name": "Cengkeram Penjerat Terak"
+      },
+      "slagsnare_legs": {
+        "name": "Celana Penjerat Terak"
+      },
+      "cinderfang_helmet": {
+        "name": "Kopiah Taring Bara"
+      },
+      "cinderfang_shoulder": {
+        "name": "Pelindung Bahu Taring Bara"
+      },
+      "cinderfang_chest": {
+        "name": "Tunik Taring Bara"
+      },
+      "cinderfang_gloves": {
+        "name": "Sarung Tangan Taring Bara"
+      },
+      "cinderfang_legs": {
+        "name": "Celana Taring Bara"
+      },
+      "smolderstrike_helmet": {
+        "name": "Tudung Serangan Bara"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Pelindung Bahu Serangan Bara"
+      },
+      "smolderstrike_chest": {
+        "name": "Tunik Serangan Bara"
+      },
+      "smolderstrike_gloves": {
+        "name": "Sarung Tangan Serangan Bara"
+      },
+      "smolderstrike_legs": {
+        "name": "Celana Serangan Bara"
+      },
+      "ashveil_helmet": {
+        "name": "Kopiah Selubung Abu"
+      },
+      "ashveil_shoulder": {
+        "name": "Pelindung Bahu Selubung Abu"
+      },
+      "ashveil_chest": {
+        "name": "Tunik Selubung Abu"
+      },
+      "ashveil_gloves": {
+        "name": "Sarung Tangan Selubung Abu"
+      },
+      "ashveil_legs": {
+        "name": "Celana Selubung Abu"
+      },
+      "emberscreed_helmet": {
+        "name": "Tudung Kredo Bara"
+      },
+      "emberscreed_shoulder": {
+        "name": "Mantel Kredo Bara"
+      },
+      "emberscreed_chest": {
+        "name": "Jubah Kredo Bara"
+      },
+      "emberscreed_gloves": {
+        "name": "Pembalut Tangan Kredo Bara"
+      },
+      "emberscreed_legs": {
+        "name": "Legging Kredo Bara"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Tudung Tenunan Fajar"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Mantel Tenunan Fajar"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Jubah Tenunan Fajar"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Pembalut Tangan Tenunan Fajar"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Legging Tenunan Fajar"
+      },
+      "vesperash_helmet": {
+        "name": "Tudung Abu Senja"
+      },
+      "vesperash_shoulder": {
+        "name": "Mantel Abu Senja"
+      },
+      "vesperash_chest": {
+        "name": "Jubah Abu Senja"
+      },
+      "vesperash_gloves": {
+        "name": "Pembalut Tangan Abu Senja"
+      },
+      "vesperash_legs": {
+        "name": "Legging Abu Senja"
+      },
+      "stormkindled_helmet": {
+        "name": "Helm Nyala Badai"
+      },
+      "stormkindled_shoulder": {
+        "name": "Pelindung Bahu Nyala Badai"
+      },
+      "stormkindled_chest": {
+        "name": "Baju Zirah Nyala Badai"
+      },
+      "stormkindled_gloves": {
+        "name": "Sarung Tangan Nyala Badai"
+      },
+      "stormkindled_legs": {
+        "name": "Pelindung Kaki Nyala Badai"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Helm Sisik Bara Roh Perang"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Pelindung Bahu Sisik Bara Roh Perang"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Baju Zirah Sisik Bara Roh Perang"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Sarung Tangan Sisik Bara Roh Perang"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Pelindung Kaki Sisik Bara Roh Perang"
+      },
+      "stonehearth_helmet": {
+        "name": "Helm Jantung Batu"
+      },
+      "stonehearth_shoulder": {
+        "name": "Pelindung Bahu Jantung Batu"
+      },
+      "stonehearth_chest": {
+        "name": "Baju Zirah Jantung Batu"
+      },
+      "stonehearth_gloves": {
+        "name": "Sarung Tangan Jantung Batu"
+      },
+      "stonehearth_legs": {
+        "name": "Pelindung Kaki Jantung Batu"
+      },
+      "springmender_helmet": {
+        "name": "Helm Pemulih Mata Air"
+      },
+      "springmender_shoulder": {
+        "name": "Pelindung Bahu Pemulih Mata Air"
+      },
+      "springmender_chest": {
+        "name": "Baju Zirah Pemulih Mata Air"
+      },
+      "springmender_gloves": {
+        "name": "Sarung Tangan Pemulih Mata Air"
+      },
+      "springmender_legs": {
+        "name": "Pelindung Kaki Pemulih Mata Air"
+      },
+      "chronoweave_helmet": {
+        "name": "Tudung Tenunan Aether"
+      },
+      "chronoweave_shoulder": {
+        "name": "Mantel Tenunan Aether"
+      },
+      "chronoweave_chest": {
+        "name": "Jubah Tenunan Aether"
+      },
+      "chronoweave_gloves": {
+        "name": "Pembalut Tangan Tenunan Aether"
+      },
+      "chronoweave_legs": {
+        "name": "Legging Tenunan Aether"
+      },
+      "pyroclast_helmet": {
+        "name": "Tudung Pyroclast"
+      },
+      "pyroclast_shoulder": {
+        "name": "Mantel Pyroclast"
+      },
+      "pyroclast_chest": {
+        "name": "Jubah Pyroclast"
+      },
+      "pyroclast_gloves": {
+        "name": "Pembalut Tangan Pyroclast"
+      },
+      "pyroclast_legs": {
+        "name": "Legging Pyroclast"
+      },
+      "frostquench_helmet": {
+        "name": "Tudung Penyejuk Beku"
+      },
+      "frostquench_shoulder": {
+        "name": "Mantel Penyejuk Beku"
+      },
+      "frostquench_chest": {
+        "name": "Jubah Penyejuk Beku"
+      },
+      "frostquench_gloves": {
+        "name": "Pembalut Tangan Penyejuk Beku"
+      },
+      "frostquench_legs": {
+        "name": "Legging Penyejuk Beku"
+      },
+      "hexthread_helmet": {
+        "name": "Tudung Benang Sihir"
+      },
+      "hexthread_shoulder": {
+        "name": "Mantel Benang Sihir"
+      },
+      "hexthread_chest": {
+        "name": "Jubah Benang Sihir"
+      },
+      "hexthread_gloves": {
+        "name": "Balutan Tangan Benang Sihir"
+      },
+      "hexthread_legs": {
+        "name": "Legging Benang Sihir"
+      },
+      "gravebrand_helmet": {
+        "name": "Tudung Tanda Kubur"
+      },
+      "gravebrand_shoulder": {
+        "name": "Mantel Tanda Kubur"
+      },
+      "gravebrand_chest": {
+        "name": "Jubah Tanda Kubur"
+      },
+      "gravebrand_gloves": {
+        "name": "Pembalut Tangan Tanda Kubur"
+      },
+      "gravebrand_legs": {
+        "name": "Legging Tanda Kubur"
+      },
+      "ruincaller_helmet": {
+        "name": "Tudung Pemanggil Kehancuran"
+      },
+      "ruincaller_shoulder": {
+        "name": "Mantel Pemanggil Kehancuran"
+      },
+      "ruincaller_chest": {
+        "name": "Jubah Pemanggil Kehancuran"
+      },
+      "ruincaller_gloves": {
+        "name": "Pembalut Tangan Pemanggil Kehancuran"
+      },
+      "ruincaller_legs": {
+        "name": "Legging Pemanggil Kehancuran"
+      },
+      "moonscorch_helmet": {
+        "name": "Kopiah Hangus Bulan"
+      },
+      "moonscorch_shoulder": {
+        "name": "Pelindung Bahu Hangus Bulan"
+      },
+      "moonscorch_chest": {
+        "name": "Tunik Hangus Bulan"
+      },
+      "moonscorch_gloves": {
+        "name": "Cengkeram Hangus Bulan"
+      },
+      "moonscorch_legs": {
+        "name": "Celana Hangus Bulan"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Tudung Kulit Bara Taring Liar"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Pelindung Bahu Kulit Bara Taring Liar"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Tunik Kulit Bara Taring Liar"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Cengkeram Kulit Bara Taring Liar"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Celana Kulit Bara Taring Liar"
+      },
+      "cinderbark_helmet": {
+        "name": "Kopiah Kulit Bara"
+      },
+      "cinderbark_shoulder": {
+        "name": "Pelindung Bahu Kulit Bara"
+      },
+      "cinderbark_chest": {
+        "name": "Tunik Kulit Bara"
+      },
+      "cinderbark_gloves": {
+        "name": "Sarung Tangan Kulit Bara"
+      },
+      "cinderbark_legs": {
+        "name": "Celana Kulit Bara"
+      },
+      "grovespring_helmet": {
+        "name": "Tudung Mata Air Rimba"
+      },
+      "grovespring_shoulder": {
+        "name": "Mantel Mata Air Rimba"
+      },
+      "grovespring_chest": {
+        "name": "Jubah Mata Air Rimba"
+      },
+      "grovespring_gloves": {
+        "name": "Pembalut Tangan Mata Air Rimba"
+      },
+      "grovespring_legs": {
+        "name": "Legging Mata Air Rimba"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Sigil Helm Landasan"
+      },
+      "sigil_ember_helmet": {
+        "name": "Sigil Helm Bara"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Sigil Helm Badai"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Sigil Mantel Landasan"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Sigil Mantel Bara"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Sigil Mantel Badai"
+      },
+      "sigil_anvil_chest": {
+        "name": "Sigil Jubah Landasan"
+      },
+      "sigil_ember_chest": {
+        "name": "Sigil Jubah Bara"
+      },
+      "sigil_tempest_chest": {
+        "name": "Sigil Jubah Badai"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Sigil Cengkeram Landasan"
+      },
+      "sigil_ember_gloves": {
+        "name": "Sigil Cengkeram Bara"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Sigil Cengkeram Badai"
+      },
+      "sigil_anvil_legs": {
+        "name": "Sigil Legging Landasan"
+      },
+      "sigil_ember_legs": {
+        "name": "Sigil Legging Bara"
+      },
+      "sigil_tempest_legs": {
+        "name": "Sigil Legging Badai"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Tali Api Terakhir"
+      },
+      "cindersoaked_slippers": {
+        "name": "Sandal Basah Bara"
+      },
+      "springbinder_sash": {
+        "name": "Selempang Pengikat Mata Air"
+      },
+      "steps_of_quiet_water": {
+        "name": "Langkah Air Tenang"
+      },
+      "cinderbark_cinch": {
+        "name": "Ikat Pinggang Kulit Bara"
+      },
+      "ashenbark_treads": {
+        "name": "Sepatu Kulit Abu"
+      },
+      "slagstalker_belt": {
+        "name": "Sabuk Penguntit Terak"
+      },
+      "ashrunner_boots": {
+        "name": "Sepatu Pelari Abu"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Balutan Pinggang Hangus Bulan"
+      },
+      "scorchgrove_striders": {
+        "name": "Sepatu Langkah Rimba Hangus"
+      },
+      "grovetender_belt": {
+        "name": "Sabuk Penjaga Rimba"
+      },
+      "dewfall_moccasins": {
+        "name": "Mokasin Jatuh Embun"
+      },
+      "forgewall_girdle": {
+        "name": "Ikat Pinggang Tembok Tungku"
+      },
+      "anvilstance_sabatons": {
+        "name": "Sabaton Sikap Landasan"
+      },
+      "warforged_waistguard": {
+        "name": "Pelindung Pinggang Tempaan Perang"
+      },
+      "furnace_march_greaves": {
+        "name": "Pelindung Tulang Kering Gerak Tungku"
+      },
+      "stormkindled_chain": {
+        "name": "Rantai Nyala Badai"
+      },
+      "thundershock_treads": {
+        "name": "Sepatu Jejak Kejutan Petir"
+      },
+      "tidebinder_links": {
+        "name": "Rantai Pengikat Pasang"
+      },
+      "springwarden_sabatons": {
+        "name": "Sabaton Penjaga Mata Air"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Liontin Penempaan Pertama"
+      },
+      "ignivars_ember_choker": {
+        "name": "Kalung Bara Ignivar"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Liontin Api Terakhir"
+      },
+      "heartspring_amulet": {
+        "name": "Jimat Mata Air Jantung"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Segel Tembok Tempa"
+      },
+      "band_of_marked_strikes": {
+        "name": "Cincin Serangan Bertanda"
+      },
+      "circle_of_cinders": {
+        "name": "Lingkaran Bara"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Cincin Mata Air Sunyi"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Benteng Crucible Dalam"
+      },
+      "ember_wardens_barrier": {
+        "name": "Penghalang Penjaga Bara"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Bola Mata Air Terakhir"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Bara Rancangan Pertama"
+      },
+      "forgefathers_warhammer": {
+        "name": "Palu Perang Bapak Tungku"
+      },
+      "cinderfang_kris": {
+        "name": "Kris Taring Bara"
+      },
+      "slagrender_cleaver": {
+        "name": "Kapak Tebas Pengoyak Terak"
+      },
+      "anvilguard_blade": {
+        "name": "Pedang Penjaga Landasan"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Pedang Agung Jantung Sang Akhir"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Tongkat Mata Air Terakhir"
+      },
+      "forgefire_spire": {
+        "name": "Menara Api Tungku"
+      },
+      "springtouched_crozier": {
+        "name": "Tongkat Kebesaran Sentuhan Mata Air"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Tongkat Percik Padam"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -13647,6 +14668,12 @@ export const id_ID: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Tali Kekang Kalkun Agung Penderap Guntur"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Mesin Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Benteng Varkhul"
       }
     },
     "mobs": {
@@ -13841,6 +14868,27 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Pewarta Api Terakhir"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Pemanggil Abu Ignivar"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Penjaga Bara"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Penjaga Wadah Peleburan"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Pengrajin Bara"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Bapak Tempa Api Terakhir"
+      },
+      "derelict_mech": {
+        "name": "Mek Terbengkalai"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
@@ -14501,6 +15549,21 @@ export const id_ID: EnTranslations = {
         "name": "Bruder Aldric",
         "title": "Pendeta Lembah",
         "greeting": "Dari halaman kapel di Lembah hingga atap dunia... jejak yang kita ikuti berakhir di sini. Aku bisa merasakan gunung ini menyimak."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Arsiparis Maelin Penjaga Bara",
+        "title": "Arsiparis Wadah Peleburan",
+        "greeting": "Setiap bekas palu di tempat ini adalah sebuah kalimat. Bantu aku membaca apa yang Varkhul coba sembunyikan."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Proyeksi Bara Maelin",
+        "title": "Proyeksi Bara",
+        "greeting": "Bara-bara itu membawa suara Maelin menembus tempaan."
+      },
+      "crucible_quartermaster": {
+        "name": "Perbekalan Bronn Penjaga Bara",
+        "title": "Perbekalan Wadah Peleburan",
+        "greeting": "Tempaan mengenali miliknya sendiri. Bawakan aku sigil dari Wadah Peleburan dan akan kupasangkan perlengkapan perang untukmu."
       },
       "brother_halven": {
         "name": "Bruder Halven",
@@ -15647,6 +16710,39 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis dibunuh"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Gema dalam Besi",
+        "text": "Automaton ini bukan prajurit. Mereka adalah rancangan. Hancurkan setiap jalur perakitan dan dengarkan saat cangkang terakhir jatuh. Tempaan mengingat apa yang Varkhul coba hapus.",
+        "completion": "Gema-gema itu sepakat. Varkhul mengikat air dari Mata Air Terakhir yang sekarat ke dalam logam hidup. Automaton ini adalah hasil tempaan yang gagal. Hanya Ignivar yang bertahan.",
+        "objectives": {
+          "0": {
+            "label": "Penjaga Bara dihancurkan"
+          },
+          "1": {
+            "label": "Penjaga Wadah Peleburan dihancurkan"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "Jantung Sang Pewarta",
+        "text": "Penyintas yang disebut dalam setiap gema adalah Ignivar. Varkhul menyebutnya pewarta, segel, dan kunci. Kalahkan dia. Jika catatan itu benar, kematiannya akan mengungkap apa yang ditempa untuk dijaganya.",
+        "completion": "Ignivar tidak pernah sekadar penjaga. Jantungnya adalah kunci, dan lempeng terakhirnya membuka wadah peleburan tersegel di bawah.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar dikalahkan"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "Bapak Tempa",
+        "text": "Jalan di bawah ini menuju Varkhul, Bapak Tempa Api Terakhir. Ia memenjarakan Mata Air Terakhir untuk membuat logam hidup, lalu menempa Ignivar agar kejahatan itu tetap tersegel. Masuklah ke Wadah Peleburan Dalam dan akhiri pekerjaannya.",
+        "completion": "Tempaan akhirnya sunyi. Mata air itu mungkin takkan pernah pulih, tetapi Varkhul takkan lagi membentuk kehidupan menjadi rantai.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul dikalahkan"
           }
         }
       },
@@ -17527,6 +18623,31 @@ export const id_ID: EnTranslations = {
         "enterText": "Kau melewati pintu kerajaan yang tersegel.",
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
       },
+      "ignivar_forge_lift": {
+        "name": "Lift Tungku",
+        "enterText": "Lift tungku bergetar dan turun; dentang palu naik menyambut Anda.",
+        "leaveText": "Lift membawa Anda kembali ke udara terbuka benteng."
+      },
+      "ignivar_forge_approach": {
+        "name": "Balairung Penempaan Pertama",
+        "enterText": "Gema dentang palu terdengar di seluruh Balairung Penempaan Pertama.",
+        "leaveText": "Anda menjauh dari tungku pertama dan kembali bernapas lega."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible Mata Air Terakhir",
+        "enterText": "Udara panas berkilauan di atas perairan Crucible yang tersegel.",
+        "leaveText": "Anda menjauh dari Crucible dan kembali bernapas lega."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Perakitan Lelehan",
+        "enterText": "Gerbang yang terbuka membawa Anda ke aula perakitan yang dipenuhi lelehan logam.",
+        "leaveText": "Anda meninggalkan jalur perakitan dan kembali ke Crucible."
+      },
+      "ignivar_inner_crucible": {
+        "name": "Crucible Dalam",
+        "enterText": "Gerbang yang terbuka membawa Anda semakin jauh ke dalam Crucible.",
+        "leaveText": "Anda meninggalkan kedalaman Crucible yang sunyi."
+      },
       "wildheart_basin": {
         "name": "Cekungan Hati Liar",
         "enterText": "Hujan hangat mendesis di atas batu tua. Wildheart Basin terbuka di hadapanmu.",
@@ -17758,53 +18879,183 @@ export const id_ID: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "Busana Selubung Abu",
+        "bonus2": "Serangan Penyergap menghasilkan kerusakan 25 persen lebih besar.",
+        "bonus4": "Serangan Ujung Terselubung Anda menghasilkan tiga kali lipat kerusakan, bukan dua kali lipat."
+      },
+      "benison_dawnweave": {
+        "name": "Tenunan Fajar Berkah",
+        "bonus2": "Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik."
+      },
       "boundstone_vanguard": {
         "name": "Garda Depan Batu Terikat",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
+      "chronoweave": {
+        "name": "Busana Tenunan Aether",
+        "bonus2": "Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Waktu Pulih Lenyap Temporal berkurang 5 detik."
+      },
+      "cinderbark": {
+        "name": "Pelindung Kulit Bara",
+        "bonus2": "Cakar Sapu memiliki peluang 30 persen untuk menyimpan Darah Tua tambahan.",
+        "bonus4": "Patah Sumsum menghasilkan kerusakan 30 persen lebih besar, dan perlindungan daruratnya tidak lagi menggantikan serangan."
+      },
+      "cinderfang": {
+        "name": "Selubung Taring Bara",
+        "bonus2": "Pengembalian energi Ritual Bisa meningkat menjadi 20 per pembangun.",
+        "bonus4": "Waktu pulih Panah Bisa berkurang menjadi 4 detik."
+      },
+      "coldsight_trackers": {
+        "name": "Pelacak Pandangan Dingin",
+        "bonus2": "Tembakan Terukur memulihkan 5 Fokus tambahan.",
+        "bonus4": "Serangan kritis Tarikan Panjang memperpanjang Fokus Dingin 2 detik, hingga 6 detik per aktivasi."
+      },
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda memecah target dengan Pecah Tulang, menyebabkan pendarahan 5 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+      },
+      "dawnforged": {
+        "name": "Busana Tempa Fajar",
+        "bonus2": "Mercusuar Cahaya menyalin 55 persen penyembuhan langsung Anda. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Pelukan Fajar yang diperkuat oleh Resonansi Cahaya bersifat instan."
       },
       "deathlord": {
         "name": "Perlengkapan Tempur Barrowlord",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.",
-        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Kuasa Kubur, meningkatkan daya serang sebesar 60 selama 10 detik."
+        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Kuasa Kubur, meningkatkan daya serang sebesar 60 selama 10 detik.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda memecah target dengan Pecah Tulang, menyebabkan pendarahan 5 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+      },
+      "emberfury": {
+        "name": "Baju Zirah Amukan Bara",
+        "bonus2": "Amukan Anda berlangsung 6 detik, bukan 4.",
+        "bonus4": "Pertumpahan Darah selalu memicu Amukan, dan penyembuhannya meningkat menjadi 8 persen kesehatan maksimum Anda."
+      },
+      "emberscreed": {
+        "name": "Busana Kredo Bara",
+        "bonus2": "Tautan Doktrin Anda mengubah 10 persen lebih banyak kerusakan Suci menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Saat Mazmur Penjagaan Anda habis sepenuhnya, Nyanyian Pengikisan berikutnya dalam 10 detik bersifat instan. Tidak dapat terjadi lebih dari sekali tiap 15 detik."
+      },
+      "forgewall": {
+        "name": "Aegis Tembok Tungku",
+        "bonus2": "Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.",
+        "bonus4": "Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik."
+      },
+      "frostquench": {
+        "name": "Tenunan Penyejuk Beku",
+        "bonus2": "Serangan kritis Tombak Embun menyimpan Es Runcing kedua, hingga maksimum 5. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Tebasan Musim Dingin menanamkan 3 muatan Dingin Musim Dingin, naik dari 2."
+      },
+      "gravebrand": {
+        "name": "Regalia Tanda Kubur",
+        "bonus2": "Waktu pulih Perintah Penuai berkurang 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Serangan serempak Perintah Penuai menghasilkan kerusakan 25 persen lebih besar."
       },
       "greyjaw_stalker": {
         "name": "Perlengkapan Penguntit Greyjaw",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
+      "grovespring": {
+        "name": "Busana Mata Air Rimba",
+        "bonus2": "Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi."
+      },
+      "hexthread": {
+        "name": "Selubung Benang Hex",
+        "bonus2": "Jarum Takdir memberikan 2 Penghukuman tambahan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Vonis Berlalu mengembalikan 10 Penghukuman."
+      },
+      "moonscorch": {
+        "name": "Busana Sangrai Bulan",
+        "bonus2": "Benih Bulan dapat memperpanjang Badai Purnama dua kali per penerapan, hingga maksimum 12 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Gelombang Bulan dan Bangun Surya menghasilkan kerusakan 25 persen lebih besar."
+      },
       "necromancers": {
         "name": "Jubah Mournweave",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
       },
       "nighttalon": {
         "name": "Perlengkapan Kulit Direfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+      },
+      "oathpyre": {
+        "name": "Benteng Api Sumpah",
+        "bonus2": "Peluang Serangan Penjaga Sumpah untuk menyiapkan Pembalasan Surya meningkat menjadi 30 persen, dan memblokir serangan menyiapkannya 40 persen dari waktu.",
+        "bonus4": "Mengonsumsi Pembalasan Surya memberi Anda perisai sebesar 6 persen kesehatan maksimum selama 10 detik."
+      },
+      "packlord_emberhide": {
+        "name": "Kulit Bara Penguasa Kawanan",
+        "bonus2": "Waktu pulih Perintah Kawanan berkurang menjadi 3 detik.",
+        "bonus4": "Peluang Perintah Kawanan mereset waktu pulih Amukan meningkat menjadi 30 persen."
+      },
+      "pyroclast": {
+        "name": "Regalia Piroklas",
+        "bonus2": "Luka Bakar selalu menyerang kritis target dengan kesehatan 35 persen atau kurang. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Serangan kritis mantra Api Anda di luar Trans Feniks mengurangi waktu pulihnya yang tersisa sebesar 1,5 detik."
+      },
+      "ruincaller": {
+        "name": "Busana Pemanggil Reruntuhan",
+        "bonus2": "Kobaran Api menyimpan 3 muatan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Baut Reruntuhan menghasilkan kerusakan 20 persen lebih besar."
+      },
+      "slagbreaker": {
+        "name": "Baju Tempur Pemecah Terak",
+        "bonus2": "Tangan Merah memperkuat Serangan Pelumpuh berikutnya sebesar 30 persen per tumpukan, bukan 20.",
+        "bonus4": "Setiap perapalan kedua Tangan Merah mengurangi waktu pulih Pembuka Celah yang tersisa sebesar 3 detik."
+      },
+      "slagsnare": {
+        "name": "Perlengkapan Jerat Terak",
+        "bonus2": "Serangan Pengoyak menghasilkan 20 Fokus.",
+        "bonus4": "Luka Sobek yang mengonsumsi 3 Momentum Berburu mempertahankan momentum tersebut. Tidak dapat terjadi lebih dari sekali tiap 8 detik."
+      },
+      "smolderstrike": {
+        "name": "Kulit Serangan Membara",
+        "bonus2": "Pukulan Tubuh menghasilkan kerusakan 20 persen lebih besar.",
+        "bonus4": "Padamkan Cahaya mengembalikan 6 detik waktu pulih Bilah Cermin yang tersisa."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
+      },
+      "springmender": {
+        "name": "Sisik Pemulih Mata Air",
+        "bonus2": "Waktu pulih Panggilan Pasang berkurang 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Sembuh Beruntun mencapai sekutu keempat dan memanen Arus Pemulihan sebesar 150 persen."
+      },
+      "stonehearth": {
+        "name": "Benteng Jantung Batu",
+        "bonus2": "Saat Terikat Batu, Air Pemulihan Pengguncang Badai tidak memerlukan mana dan menyembuhkan 25 persen lebih banyak.",
+        "bonus4": "Saat Terikat Batu, menyelesaikan irama memulihkan 3 persen kesehatan maksimum Anda."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
+      },
+      "stormkindled": {
+        "name": "Regalia Bara Badai",
+        "bonus2": "Lepaskan Senjata pada Tanda Api memberikan 3 Guntur. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Bonus Sentakan Bumi per Guntur meningkat menjadi 30 persen."
       },
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
+      },
+      "vesperash": {
+        "name": "Selubung Abu Senja",
+        "bonus2": "Waktu pulih Panggil Iblis Persepuluhan berkurang 6 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Memanggil Iblis Persepuluhan mereset waktu pulih Retak Pikiran, dan iblis itu mengembalikan mana dua kali lipat per serangan."
       },
       "warfare_ashstalker": {
         "name": "Perlengkapan Ashstalker",
@@ -17836,11 +19087,26 @@ export const id_ID: EnTranslations = {
         "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
         "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Duri, yang meningkatkan elakan sebesar 15% selama 6 dtk."
       },
+      "warspirit_emberscale": {
+        "name": "Sisik Bara Roh Perang",
+        "bonus2": "Serangan Leluhur memajukan irama Anda 3 langkah.",
+        "bonus4": "Serangan Leluhur menghasilkan kerusakan 30 persen lebih besar."
+      },
+      "wildfang_emberhide": {
+        "name": "Kulit Bara Taring Liar",
+        "bonus2": "Panen Merah memulihkan 45 energi, naik dari 30.",
+        "bonus4": "Panen Merah menanamkan Pengulitan baru pada target."
+      },
       "wyrmshadow": {
         "name": "Jubah Nightfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.",
-        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Sergap Taring, meningkatkan kecepatan serangan sebesar 25% selama 8 detik."
+        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Sergap Taring, meningkatkan kecepatan serangan sebesar 25% selama 8 detik.",
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+      },
+      "zealfire": {
+        "name": "Baju Zirah Api Zela",
+        "bonus2": "Maklumat Terakhir dan Runtuhnya Fajar saling mengurangi waktu pulih yang tersisa sebesar 3 detik, bukan 2.",
+        "bonus4": "Palu Murka yang dirapal di bawah Murka Fajar menghasilkan kerusakan 40 persen lebih besar, naik dari 20."
       }
     }
   },

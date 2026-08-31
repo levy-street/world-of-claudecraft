@@ -68,6 +68,17 @@ server store always canonical.
    (`src/sim/deeds_completion.ts`), it simply never scores. Do not "fix" the
    board by counting zero-Renown deeds into it, and do not "fix" the Book by
    hiding them from completion: the split is the design.
+   One recorded consequence of the meter kind (Bank Storage phase 11,
+   maintainer-vetoable): the `bankPurchasedSlots` meter reads the one shared
+   `purchasedSlots` counter, and that counter can now be moved by a Claudium
+   storage purchase as well as by gold, so `soc_room_for_more` (5) and
+   `soc_gilded_strongbox` (25) are the first deeds a real-money purchase can
+   credit. The ruling is to ALLOW the credit: full gold parity means both
+   deeds are reachable with gold alone, and suppressing the credit would
+   strand a paying player's meter forever on a counter the two rails share.
+   Pinned by `tests/storage_charters.test.ts` (the deed arm); revisit
+   deliberately before any deed meter that a paid grant could move joins the
+   registry.
 3. **Closed trigger vocabulary.** Every trigger is one of the `DeedTrigger`
    kinds in `src/sim/types.ts`: a predicate over persisted state (`level`,
    `lifetimeXp`, `quest`/`quests`, `arenaRating`, `craftSkill`, `gathering`,

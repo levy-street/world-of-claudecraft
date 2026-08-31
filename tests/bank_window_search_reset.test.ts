@@ -32,6 +32,13 @@ function bankInfo(overrides?: Partial<BankInfo>): BankInfo {
     bonusSlots: 0,
     nextExpansionCost: 1000,
     bonusSources: [],
+    socketsUnlocked: 0,
+    socketBags: [null, null, null, null],
+    nextSocketCost: 1000000,
+    generalCapacity: 12,
+    materialsCapacity: 0,
+    generalUsed: 2,
+    materialsUsed: 0,
     ...overrides,
   };
 }

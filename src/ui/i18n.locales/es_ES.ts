@@ -518,4 +518,15 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Ese código de diseño procede de una versión más reciente del juego.',
   'auth.designCodeErrMalformed':
     'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
+  // Bank slot and Strongbox Charter purchase retry hints (es_ES prefers "vuelve a
+  // intentarlo" over es-LatAm "inténtalo de nuevo", matching this file's existing
+  // retry phrasing, see hudChrome.chatQuota above).
+  'hudChrome.bank.rungInProgress':
+    'Todavía se está completando una compra para este personaje. Vuelve a intentarlo en un momento.',
+  'hudChrome.bank.rungOutage':
+    'No se pudo confirmar la compra. Vuelve a intentarlo con este botón y no se te cobrará dos veces. Si recargas el juego antes, puedes perder esa protección.',
+  'hudChrome.wocStore.charter.inProgress':
+    'Todavía se está completando una compra para este personaje. Vuelve a intentarlo en un momento.',
+  'hudChrome.wocStore.charter.outage':
+    'No se pudo confirmar la compra. Vuelve a intentarlo con este botón y no se te cobrará dos veces. Si recargas el juego antes, puedes perder esa protección.',
 };

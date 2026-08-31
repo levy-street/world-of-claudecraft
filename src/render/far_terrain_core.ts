@@ -18,6 +18,7 @@
 // terrainHeight tap per vertex (slope and normals come from the sampled
 // grid), which is what makes a whole-world pass affordable.
 
+import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
   COLUMN_ZONES,
   columnBlendAt,
@@ -596,6 +597,7 @@ export function farGroundColor(
   const pal = farPaletteAt(x, z);
   const biome = zoneBiomeAt(x, z);
   let grassW = 1;
+  let isleRock = 0;
 
   // base grass with the same patchy fbm variation the near tint uses
   const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
@@ -616,6 +618,13 @@ export function farGroundColor(
     grassW *= 1 - clamp01((z - 1925) / 145) * 0.75;
     grassW *= 1 - scorch * 0.5;
     grassW = grassW + (1 - grassW) * valley * 0.6;
+    // the Forgefather's Isle: bare volcanic rock, mirroring the near splat
+    isleRock = forgefatherIsleRockWeight(x, z);
+    if (isleRock > 0) {
+      lerp3(out, TONE.emberScorch, isleRock * 0.75);
+      lerp3(out, TONE.emberBasalt, isleRock * 0.45);
+      grassW *= 1 - isleRock * 0.85;
+    }
   }
 
   // marsh mud: pull the ground toward dark wet earth where the marsh blends in
@@ -653,7 +662,13 @@ export function farGroundColor(
   if (shore > 0) shore *= shoreWaterGate(x, z, h, WATER_LEVEL, shoreProbeFor(seed));
   if (shore > 0) {
     const wetStone = biome === 'peaks' || biome === 'volcano' || biome === 'cave';
-    lerp3(out, wetStone ? TONE.wetRock : biome === 'marsh' ? TONE.dirtDark : pal.sand, shore);
+    // the Forgefather's Isle strand is dark wet gravel at this tier too
+    // (the near splat splits its shore the same way, one feather)
+    const rockShore = shore * isleRock;
+    const sandShore = shore - rockShore;
+    if (sandShore > 0)
+      lerp3(out, wetStone ? TONE.wetRock : biome === 'marsh' ? TONE.dirtDark : pal.sand, sandShore);
+    if (rockShore > 0) lerp3(out, TONE.wetRock, rockShore);
     grassW *= 1 - shore;
   }
 

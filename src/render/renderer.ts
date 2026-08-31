@@ -21,9 +21,7 @@ import {
   delveModuleStackEndRelZ,
   delveOrigin,
   delveSlotAt,
-  dungeonAt,
   INSTANCE_SLOT_COUNT,
-  ITEM_SETS,
   instanceOrigin,
   isArenaPos,
   isBgPos,
@@ -40,7 +38,13 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
-import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
+import {
+  ALL_CLASSES,
+  type Entity,
+  IGNIVAR_BOSS_ID,
+  isMechWearer,
+  type SimEvent,
+} from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
@@ -97,9 +101,9 @@ import {
   stepCameraDirector,
 } from './camera_director_core';
 import {
-  cameraFovOffset,
   createCameraFeel,
   punchCameraFov,
+  resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
@@ -137,6 +141,7 @@ import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type AssembleOptions,
+  applyEntityAnimOverrides,
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
@@ -169,6 +174,7 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import { damageEventStartsAttackAnimation } from './characters/damage_attack_animation';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -181,10 +187,7 @@ import {
 import { skinCount, visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
-import {
-  playerRangedAttackAlreadyStarted,
-  playerRangedAttackStartsAtLaunch,
-} from './characters/skin_attack';
+import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
@@ -305,6 +308,7 @@ import {
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
+import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
   buildFoliageMaterialPrewarmGroup,
@@ -322,7 +326,7 @@ import {
   syncFrostNovaRootVisual,
 } from './frost_nova_root_visual';
 import { buildFrostSky, type FrostSkyView } from './frost_sky';
-import { FrozenOrbFx } from './frozen_orb_fx';
+import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
@@ -357,6 +361,15 @@ import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
+import {
+  buildIgnivarWaterConduit,
+  isIgnivarWaterConduitTemplate,
+  isStableIgnivarWaterConduitTransition,
+  syncIgnivarWaterConduitVisibility,
+} from './ignivar_conduit';
+import { ignivarBossFacingLocked } from './ignivar_encounter_core';
+import { attachIgnivarModelVfx } from './ignivar_model_vfx';
+import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits } from './initial_scene_compile_units';
@@ -398,24 +411,25 @@ import {
   mageBarrierStateForAura,
   syncMageBarrierVisual,
 } from './mage_barrier_visual';
-import { MageGroundFx } from './mage_ground_fx';
+import { handleMageGroundSpellfxEvent, MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
 import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { applyMountJumpAttitude } from './mount_jump_attitude';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { NecromancyArmyPortalFx } from './necromancy_army_portal_fx';
+import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_army_portal_fx';
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
@@ -436,6 +450,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
 import {
   type OpaqueSortPolicyInput,
@@ -552,6 +567,13 @@ import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from 
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
+import {
+  disposeRaidEncounterVisuals,
+  raidEncounterBypassesCharacterCulling,
+  raidEncounterViewVisibleDuringCompile,
+  syncRaidEncounterAnchorVisuals,
+  syncRaidEncounterRigVisuals,
+} from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
@@ -587,6 +609,16 @@ import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  attachPullerIfRickshaw,
+  preloadPullerIfRickshaw,
+  type RickshawMountViewState,
+  releaseRickshawMountState,
+  rickshawMountBuildReady,
+  spinMountWheels,
+  updateRickshawPuller,
+  updateRollingMountLoop,
+} from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -602,10 +634,16 @@ import {
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import {
+  createSelfRenderPositionState,
+  noteSelfIdentity,
+  type SelfRenderPrediction,
+  updateSelfRenderPosition,
+} from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -663,6 +701,8 @@ import {
   UnderwaterView,
 } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
+import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
+import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
@@ -898,37 +938,12 @@ const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 const SELECTION_RING_BOOST = 1.5;
 const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotation
 
-// Themed swirl colors for the 4-piece set-proc auras, by proc id; resolved to
-// the buff display NAME below (the aura SimEvent carries only the name) via
-// ITEM_SETS, so a re-coined proc name keeps its effect wired. The bleeds land
-// on the TARGET (a mob), so the aura case below must not gate these on the
-// player kind.
-const SET_PROC_FX_BY_ID: Record<string, number> = {
-  set_clearcasting: 0x8ed2ff, // icy arcane blue: a free cast
-  set_gravemight: 0xffb04d, // burnished gold: attack power
-  set_fangrush: 0xbfff5a, // feral green-yellow: attack speed
-  set_bonesplinter: 0xc22a2a, // blood red: the plate bleed landing
-  set_ragged_gash: 0xc22a2a, // blood red: the leather bleed landing
-  set_soulblaze: 0xff6a9e, // ember pink: spell power
-};
-const SET_PROC_FX_BY_NAME = new Map<string, number>();
-for (const set of Object.values(ITEM_SETS)) {
-  for (const tier of set.bonuses) {
-    const proc = tier.effect.proc;
-    if (proc && SET_PROC_FX_BY_ID[proc.id] !== undefined) {
-      SET_PROC_FX_BY_NAME.set(proc.name, SET_PROC_FX_BY_ID[proc.id]);
-    }
-  }
-}
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
 const CAMERA_BASE_FOV = 60;
-// Decay rate of the one-time offset captured when the self-motion predictor
-// takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
-const SELF_MOTION_HANDOFF_RATE = 15;
 // lighting rig (high/ultra): IBL supplies ambient, sun carries the key.
 // The key keeps its golden color (full-strength white read as harsh midday
 // glare against the sunless realm skies); key up / fill down buys the
@@ -1064,11 +1079,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-function selfSnapshotAlpha(alpha: number, lead: number): number {
-  return Math.min(1.25, alpha + Math.max(0, lead));
-}
-
-export interface EntityView {
+export interface EntityView extends RickshawMountViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1083,6 +1094,8 @@ export interface EntityView {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
+  /** Display-only jump attitude; see mount_jump_attitude. */
+  mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
@@ -1319,6 +1332,7 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
   private readonly camMirror = {
@@ -1489,22 +1503,20 @@ export class Renderer {
     sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
-  private selfRenderPositionReady = false;
-  // Online display-only self extrapolation (see src/render/self_motion.ts).
-  // Lazy: offline never passes a SelfMotionFrame, so it is never constructed.
-  private selfMotionPredictor: SelfMotionPredictor | null = null;
-  private selfMotionActive = false;
-  private selfMotionOffset = new THREE.Vector3();
+  // Display-pose state the pure core owns (predictor, handoff offset, ready /
+  // active / identity), writing straight into the Vector3 above. Online
+  // extrapolation itself lives in src/render/self_motion.ts, and its predictor
+  // is lazy: offline never passes a SelfMotionFrame, so it is never built.
+  private selfRender = createSelfRenderPositionState(this.selfRenderPosition);
 
   /** Perf-overlay telemetry: ms of latency the self-motion extrapolation is
    *  currently hiding, or null while the predictor is inactive. */
   get selfMotionLeadMs(): number | null {
-    return this.selfMotionActive && this.selfMotionPredictor
-      ? this.selfMotionPredictor.leadMs
+    return this.selfRender.active && this.selfRender.predictor
+      ? this.selfRender.predictor.leadMs
       : null;
   }
 
-  private lastSelfId: number | null = null;
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
   // engage re-seeds from the live interpolated facing instead of snapping. See
@@ -1819,6 +1831,7 @@ export class Renderer {
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
+  private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private warlockMeteorFx!: WarlockMeteorFx;
   private necromancyGroundFx!: NecromancyGroundFx;
   private necromancyArmyPortalFx!: NecromancyArmyPortalFx;
@@ -2544,6 +2557,7 @@ export class Renderer {
         createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
       );
       this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));
+      installOccluderFadeGate(revealHost);
     }
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
@@ -2839,7 +2853,7 @@ export class Renderer {
       (x, z) => groundHeight(x, z, this.sim.cfg.seed),
       (x, z, meteor) => {
         if (
-          meteor.ability &&
+          meteor?.ability &&
           this.abilityVfx.handleSpellfxAt({
             x,
             z,
@@ -2855,6 +2869,9 @@ export class Renderer {
         const gy = groundHeight(x, z, this.sim.cfg.seed);
         this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
       },
+    );
+    this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
     );
     this.warlockMeteorFx = new WarlockMeteorFx(
       this.scene,
@@ -3093,7 +3110,7 @@ export class Renderer {
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
     // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample);
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t));
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -3237,6 +3254,8 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    bestEffort(() => this.varkhulForgestormVisuals?.dispose());
+    this.varkhulForgestormVisuals = undefined;
     // Renderer-owned (not a module singleton): the graphics-rebuild teardown
     // comes through HERE (shutdown -> disposeRendererResources), so the blob
     // pool, texture and material release with the rest of the GPU state.
@@ -4207,7 +4226,7 @@ export class Renderer {
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
   setCameraFov(deg: number): void {
-    this.camera.fov = Math.min(100, Math.max(55, deg));
+    this.camera.fov = this.baseFov = Math.min(100, Math.max(55, deg));
     this.camera.updateProjectionMatrix();
   }
 
@@ -4875,7 +4894,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4886,7 +4905,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4897,7 +4916,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4911,7 +4930,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -4929,7 +4948,10 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
+    this.varkhulForgestormVisuals?.syncWorld(this.sim);
+    this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
     // landing frees the visible fall light), which would dip the pinned
@@ -7498,7 +7520,7 @@ export class Renderer {
           // position so the body snaps to the authoritative destination. A
           // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
-            this.selfRenderPositionReady = false;
+            this.selfRender.ready = false;
           }
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
@@ -7741,15 +7763,12 @@ export class Renderer {
         if (ev.ability === 'abyssal_rift' && ev.fx === 'nova') {
           this.abyssalRiftFx.spawn({ x: ev.x, z: ev.z, radius: ev.radius ?? 8, duration: 2.2 });
         }
-        if (ev.ability === 'army_of_the_dead' && ev.fx === 'burst') {
-          this.necromancyArmyPortalFx.spawn({
-            x: ev.x,
-            z: ev.z,
-            facing:
-              ev.sourceId === undefined ? 0 : (this.sim.entities.get(ev.sourceId)?.facing ?? 0),
-            duration: 2.8,
-          });
-        }
+        spawnArmyPortalBurstEvent(this.necromancyArmyPortalFx, ev, (id) =>
+          this.sim.entities.get(id),
+        );
+        routeVarkhulForgeHammer(ev, this.vfx, this.sim.cfg.seed, (entityId, abilityId) =>
+          this.triggerAttack(entityId, abilityId),
+        );
         // Spec-driven ground-cast visuals claim the point-anchored cues first
         // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
         // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
@@ -7772,22 +7791,8 @@ export class Renderer {
           }
           break;
         }
-        // The Frozen Orb flight, animated locally from its three moments:
-        // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
-        // the server's real coordinates when the orb latches onto an enemy.
-        // The pulse novas below stay the area telegraph, so no actionable
-        // information rides on this mesh.
-        if (ev.fx === 'meteorFall') {
-          this.mageGroundFx.spawnMeteor({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 2,
-            sourceId: ev.sourceId,
-            ability: ev.ability,
-          });
-          break;
-        }
+        if (handleMageGroundSpellfxEvent(this.mageGroundFx, ev)) break;
+        if (handleFrozenOrbSpellfxEvent(this.frozenOrbFx, ev)) break;
         if (ev.fx === 'snowZone') {
           const zoneDuration = ev.duration ?? 6;
           this.mageGroundFx.spawnSnow({
@@ -7811,32 +7816,6 @@ export class Renderer {
               zoneDuration,
             );
           }
-          break;
-        }
-        if (ev.fx === 'runeCircle') {
-          this.mageGroundFx.spawnRune({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 15,
-            school: ev.school,
-          });
-          break;
-        }
-        if (ev.fx === 'orb') {
-          const orbSource = ev.sourceId ?? -1;
-          if (ev.phase === 'halt') this.frozenOrbFx.halt(orbSource, ev.x, ev.z);
-          else if (ev.phase === 'resume') this.frozenOrbFx.resume(orbSource, ev.x, ev.z);
-          else
-            this.frozenOrbFx.spawn({
-              sourceId: orbSource,
-              x: ev.x,
-              z: ev.z,
-              dirX: ev.dirX ?? 0,
-              dirZ: ev.dirZ ?? 1,
-              speed: ev.speed ?? 2.5,
-              duration: ev.duration ?? 8,
-            });
           break;
         }
         // Ground-targeted impact: burst draped onto the terrain where the spell
@@ -7867,12 +7846,13 @@ export class Renderer {
         // Every melee/ranged hit animates the attacker. A ranged projectile
         // carrying the typed launch cue already began its cosmetic one-shot,
         // so do not restart that same shot when its damage lands.
-        const source = this.sim.entities.get(ev.sourceId);
-        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
-          source?.kind,
+        const sourceView = this.views.get(ev.sourceId);
+        const startsAttackAnimation = damageEventStartsAttackAnimation(
+          this.sim.entities.get(ev.sourceId),
+          sourceView ? this.activeVisual(sourceView) : null,
           ev.attackAnimationStarted,
         );
-        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
+        if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
@@ -8191,7 +8171,13 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    if (
+    const raidGatePlan =
+      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    if (raidGatePlan) {
+      body = buildIgnivarRaidGate(raidGatePlan);
+      height = raidGatePlan.height;
+      objectMesh = body;
+    } else if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
         e.templateId === 'dungeon_exit' ||
@@ -8258,6 +8244,11 @@ export class Renderer {
                 ? 2.2
                 : 2.4;
       objectMesh = body;
+    } else if (e.kind === 'object' && isIgnivarWaterConduitTemplate(e.templateId)) {
+      const built = buildIgnivarWaterConduit(e.templateId);
+      body = built.group;
+      height = built.height;
+      objectMesh = built.group;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -8415,6 +8406,7 @@ export class Renderer {
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
       group.add(visual.root);
+      if (e.templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(visual.root);
       height = visual.height;
     }
 
@@ -8484,7 +8476,9 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountPullerVisual: null,
       mountLift: 0,
+      mountJumpPitch: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
@@ -8569,7 +8563,15 @@ export class Renderer {
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
     if (view && e.id !== this.sim.player.id) {
-      view.compileReady = this.gateViewOnCompile(view, group, requiredForEntry);
+      // Ignivar's floor telegraphs are actionable during a cold/late-join load.
+      // Compile the complete view against the live light state, but gate only the
+      // cosmetic rig so the entity anchor remains visible for those overlays.
+      view.compileReady = this.gateViewOnCompile(
+        view,
+        group,
+        e.templateId === IGNIVAR_BOSS_ID && view.visual ? view.visual.root : group,
+        requiredForEntry,
+      );
     }
     // Warm an already-mounted entity's engine clips at view creation too: the
     // mountKey-edge preload below only fires on a CHANGE, but a remote rider
@@ -8674,13 +8676,16 @@ export class Renderer {
   private gateViewOnCompile(
     view: EntityView,
     group: THREE.Group,
+    visibilityTarget: THREE.Object3D = group,
     requiredForEntry = false,
   ): Promise<void> | null {
     if (!this.asyncCompileSupported) return null;
     const generation = this.lifecycleGeneration;
-    const priorVisibility = group.visible;
+    const priorVisibility = visibilityTarget.visible;
+    const gatesOnlyCharacterRig = visibilityTarget !== group;
     view.compilePending = true;
-    group.visible = false;
+    if (gatesOnlyCharacterRig) view.visualCompilePending = true;
+    visibilityTarget.visible = false;
     // The canvas nameplate (name, target marker, health, and cast bar) keeps
     // painting while the 3D group is gated, so actionable information has an
     // immediate placeholder without first-drawing a still-linking shader.
@@ -8688,12 +8693,15 @@ export class Renderer {
       () => {
         if (!this.shutdownStarted && generation === this.lifecycleGeneration) {
           view.compilePending = false;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         }
       },
       (error) => {
         this.recoverRejectedCompileGate(error, generation, () => {
           view.compilePending = false;
-          group.visible = priorVisibility;
+          if (gatesOnlyCharacterRig) view.visualCompilePending = false;
+          visibilityTarget.visible = priorVisibility;
         });
       },
     );
@@ -9241,6 +9249,7 @@ export class Renderer {
       hemi: this.hemi,
       scene: this.scene,
       rim: sharedUniforms.uRimBoost,
+      rimColor: sharedUniforms.uRimColor,
     };
     if (state === 'rift') {
       applyRiftLightRig(this.riftFogAuthored, targets);
@@ -9450,13 +9459,14 @@ export class Renderer {
           // callback marks the rank dirty whenever it does.
           const view = buildBattleground(o, this.sim.cfg.seed, {
             lowGfx: this.lowGfx,
-            // The raw registry on purpose: buildBgFieldLights already hides
-            // each light (battleground.ts) and its release path splices, which
-            // an append-only sink cannot express.
+            // The raw registry on purpose: buildBgFieldLights (battleground.ts) hides
+            // each light and its release path splices, which an append-only sink cannot express.
             fireLights: this.fireLights,
             onFireLightsChanged: () => {
               this.lightRankDirty = true;
             },
+            // Gate each streamed field piece's shader links (the dungeon interiors' seam).
+            compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,
           });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
@@ -9533,50 +9543,11 @@ export class Renderer {
         }
       }
     }
-    // the Drowned Temple reads as submerged: a teal murk instead of the
-    // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inDelve = inside && isDelvePos(px);
-    const inYumiMaze = inside && isYumiMazePos(px);
-    const inBattleground = inside && isBgPos(px);
-    const interior =
-      inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
-        ? dungeonAt(px)?.interior
-        : null;
-    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
-    const inTemple = interior === 'temple';
-    const inNythraxis = interior === 'nythraxis';
-    // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
-    // sky dome and the daylight rig and only swaps in its own field haze.
-    const inWildheartField = interior === 'wildheart';
-    const inLastKeep = interior === 'lastkeep';
-    const inDawnhold = interior === 'dawnhold';
-    const desired = inDelve
-      ? 'delve'
-      : inYumiMaze
-        ? 'yumiMaze'
-        : inBattleground
-          ? 'battleground'
-          : inTemple
-            ? 'temple'
-            : inNythraxis
-              ? 'nythraxis'
-              : inWildheartField
-                ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inDawnhold
-                    ? 'dawnhold'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+    // Which state this position means (and its preset below) is
+    // fog_scene_state.ts's to own, the fog twin of interior_light_rig.ts.
+    const fogScene = resolveFogScene(inside, px, camY, this.camera.position, this.sim.cfg.seed);
+    encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null);
+    const desired = fogScene.desired;
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9606,77 +9577,7 @@ export class Renderer {
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      if (desired === 'dungeon') {
-        fog.color.setHex(0x05060a);
-        fog.near = 18;
-        fog.far = 90;
-      } else if (desired === 'temple') {
-        fog.color.setHex(0x0a3a44);
-        fog.near = 12;
-        fog.far = 78;
-      } else if (desired === 'nythraxis') {
-        // the raid arena is huge (±230), push the murk back so ~50yd reads
-        // clear (linear-fog midpoint (near+far)/2 = 50), not the old ~30
-        fog.color.setHex(0x020106);
-        fog.near = 20;
-        fog.far = 80;
-      } else if (desired === 'wildheartField') {
-        // Sunlit humid depth keeps the full caldera readable while the rear
-        // shrine and limestone shell settle into a warm green atmospheric veil.
-        fog.color.setHex(0x8ca786);
-        fog.near = 105;
-        fog.far = 430;
-      } else if (desired === 'lastkeep') {
-        // The Last Keep: a warm hearth-lit haze pushed well back, so its
-        // grand three-story halls read golden and inhabited instead of
-        // dissolving into the crypt's cold near-black murk.
-        fog.color.setHex(0x241610);
-        fog.near = 30;
-        fog.far = 150;
-      } else if (desired === 'dawnhold') {
-        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
-        // murk: a pale sage-gold air pushed even further back, so the garden
-        // palace reads sunlit end to end.
-        fog.color.setHex(0x3d422a);
-        fog.near = 40;
-        fog.far = 190;
-      } else if (desired === 'delve') {
-        // the collapsed reliquary breathes a warm ember murk, dried-blood
-        // charcoal, tighter than the overworld crypt's cold near-black, so the
-        // delve reads as its own claustrophobic place under the red torches
-        fog.color.setHex(0x0e0705);
-        fog.near = 14;
-        fog.far = 74;
-      } else if (desired === 'yumiMaze') {
-        // the Protect Yumi maze is a COMPETITIVE arena: a lighter night-blue
-        // murk pushed well past the ~90yd footprint, so the torches + team
-        // beacons read across the maze instead of dissolving mid-corridor
-        fog.color.setHex(0x161d31);
-        fog.near = 30;
-        fog.far = 170;
-      } else if (desired === 'battleground') {
-        // Thornhollow Fields is OPEN-AIR at immersive scale (100x280): true
-        // view-distance fog, the open world's own rule. The fight around you
-        // (~a chamber) reads clearly; the far keep's detail still dissolves
-        // before the 236yd flag-to-flag line, so the far chambers stay places
-        // you travel to, not read from spawn. Pushed back from the original
-        // 55/130 after the playtest: the tighter wall of haze swallowed the
-        // sky and flattened the light; at 70/210 the dome and ramparts
-        // breathe while the tactical veil holds. Symmetric for both teams:
-        // distance, never information.
-        fog.color.setHex(0xaecbe0);
-        fog.near = 70;
-        fog.far = 210;
-      } else if (desired === 'underwater') {
-        fog.color.setHex(0x17506e);
-        fog.near = 2;
-        fog.far = 48;
-      } else {
-        const preset = this.outdoorFogPreset();
-        fog.color.setHex(preset.color);
-        fog.near = preset.near;
-        fog.far = preset.far;
-      }
+      applyFogScenePreset(desired, fog, () => this.outdoorFogPreset());
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
@@ -10060,6 +9961,7 @@ export class Renderer {
     this.healGlowAt.delete(id);
     const v = this.views.get(id);
     if (!v) return;
+    disposeRaidEncounterVisuals(v.group);
     // A pending weapon-skin application must never land on a dropped (or
     // pooled and reused) view.
     this.weaponSkinApplies.cancel(id);
@@ -10088,6 +9990,7 @@ export class Renderer {
       v.travelVisual?.dispose();
       v.mountVisual?.dispose();
       v.metamorphVisual?.dispose();
+      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -10113,6 +10016,10 @@ export class Renderer {
     if (disposeObjectResources)
       disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
     this.audioSink?.mountEngineReset(id);
+    // A mount loop is keyed by entity id and driven from the per-frame sync
+    // pass; once the view is gone nothing calls it again, so it would keep
+    // playing at the spot the entity vanished from. Stop it here.
+    this.audioSink?.stopMountLoop(id);
     this.views.delete(id);
   }
 
@@ -10220,7 +10127,7 @@ export class Renderer {
     dt: number,
     renderFacingOverride: number | null,
     selfAlphaLead = 0,
-    selfMotion: SelfMotionFrame | null = null,
+    selfMotion: SelfRenderPrediction | null = null,
     selfAuthoritativeDiscontinuity = false,
     // False while the window is hidden: everything below still runs (view
     // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
@@ -10292,24 +10199,24 @@ export class Renderer {
     }
     const sim = this.sim;
     const p = sim.player;
-    if (this.lastSelfId !== p.id) {
-      this.lastSelfId = p.id;
-      this.selfRenderPositionReady = false;
+    if (noteSelfIdentity(this.selfRender, p.id)) {
       this.selfFacingOverride = null;
       this.selfFacingLastTarget = null;
-      // A still-decaying predictor-handoff offset belongs to the previous
-      // character; leaking it would displace the new one for a few frames.
-      this.selfMotionOffset.set(0, 0, 0);
     }
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
-    const selfPos = this.updateSelfRenderPosition(
+    updateSelfRenderPosition(
+      this.selfRender,
+      p,
+      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
+      sim.riftCollisionToken,
     );
+    const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
 
     // Dynamic worlds create nearby views lazily and drop views for leavers or
@@ -10508,7 +10415,7 @@ export class Renderer {
         // Per-frame visibility follows the create/destroy hysteresis above so
         // rigs at the draw edge do not flicker. The object branch below may
         // still re-hide loot.
-        v.group.visible = !v.compilePending;
+        v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
         // server-side resurrect-range checks, and other ghosts still see it. The
@@ -10573,6 +10480,7 @@ export class Renderer {
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
+      if (ignivarBossFacingLocked(e)) facing = e.facing;
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
         // (up to 180deg when engaging after an orbit) under the rate limiter
@@ -10604,18 +10512,25 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          this.removeView(id);
-          this.createView(e);
-          continue;
+          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+            v.builtTemplateId = e.templateId;
+          } else {
+            this.removeView(id);
+            this.createView(e);
+            continue;
+          }
         }
         const isPortalObject = isPersistentPortalObject(e);
-        const vis = syncDelveInteractableVisibility(
-          v.group,
-          e,
-          this.sim.questLog,
-          v.compilePending,
-          !isPortalObject || d2 <= this.entityViewCreateRangeSq,
-        );
+        const withinRange = !isPortalObject || d2 <= this.entityViewCreateRangeSq;
+        const vis = isIgnivarWaterConduitTemplate(e.templateId)
+          ? syncIgnivarWaterConduitVisibility(v.group, e.templateId, v.compilePending, withinRange)
+          : syncDelveInteractableVisibility(
+              v.group,
+              e,
+              this.sim.questLog,
+              v.compilePending,
+              withinRange,
+            );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)
@@ -10720,23 +10635,45 @@ export class Renderer {
         dt,
         this.reducedMotion(),
       );
+      syncRaidEncounterAnchorVisuals(
+        v.group,
+        e,
+        this.views,
+        dt,
+        this.vfx,
+        this.sim.entities,
+        this.reducedMotion(),
+        v.visual !== null,
+      );
       if (!v.visual) continue;
       const veilboundState = characterVeilboundState(e);
       const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
-      let charOnScreen = true;
+      let characterBodyOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
         this.cullSphere.center.set(x, y + v.height * 0.5 * v.liveScale, z);
         const characterRadius = (v.height * 0.7 + 1.5) * v.liveScale;
         this.cullSphere.radius = paladinAegisActive
           ? Math.max(characterRadius, PALADIN_AEGIS_DOME_RADIUS + 1)
           : characterRadius;
-        charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
+        characterBodyOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
+      const charOnScreen = characterBodyOnScreen || raidEncounterBypassesCharacterCulling(e);
       const runCharacterPresentation = shouldRunCharacterPresentationWork(
         charOnScreen,
         actionablePose,
+      );
+      syncRaidEncounterRigVisuals(
+        v.group,
+        e,
+        dt,
+        this.vfx,
+        v.visual.root,
+        characterBodyOnScreen,
+        runCharacterPresentation,
+        this.sim.entities,
+        this.reducedMotion(),
       );
 
       let iceBlockActivated = false;
@@ -10979,13 +10916,15 @@ export class Renderer {
           v.mountVisual.dispose();
           v.mountVisual = null;
         }
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
-        if (mountAssetsReady(mountSpec.visualKey)) {
+        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
           const mountStarted = performance.now();
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -10997,11 +10936,13 @@ export class Renderer {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
           );
+          preloadPullerIfRickshaw(mountSpec.visualKey);
         }
       } else if (!mountSpec && v.mountVisual) {
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -11053,6 +10994,11 @@ export class Renderer {
       // model origin (the toad's is well back toward the tail).
       v.visual.root.position.y = v.mountLift;
       v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
+      if (!mountShown) {
+        v.mountJumpPitch = 0;
+        v.visual.root.rotation.x = 0;
+      }
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
       v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
@@ -11086,7 +11032,7 @@ export class Renderer {
       // fallback path the plain interpolated sim motion is still sampled
       // instead (that path's smoothed selfPos stutters within a snapshot
       // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && this.selfMotionActive;
+      const animFromDisplay = isSelf && this.selfRender.active;
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
@@ -11194,14 +11140,14 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfMotionPredictor && !inRift
-          ? !this.selfMotionPredictor.onGround
+        (animFromDisplay && this.selfRender.predictor && !inRift
+          ? !this.selfRender.predictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
-      // it while the soft camera boom trails behind. Applied for every body,
-      // and fed back into the self pose so the camera follows what is drawn.
+      // it. Applied for every body, and fed back into the self pose so the
+      // camera follows exactly what is drawn.
       const settled = !airborne && !swimming && !visuallyDead;
       // Display-derived fall speed: the wire carries no vy for remote bodies,
       // so the drawn trajectory is the only honest source of landing weight.
@@ -11322,14 +11268,9 @@ export class Renderer {
       st.sitting =
         e.kind === 'player' &&
         (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
-      // Ice slide: the sim glides the player at speed but they should read as
-      // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
-      // airborne so the state machine holds the static idle pose while they slide.
-      if (e.riftSliding && !visuallyDead) {
-        st.moving = false;
-        st.running = false;
-        st.airborne = false;
-      }
+      // Facts about the ENTITY that override what its displayed motion implies
+      // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
+      applyEntityAnimOverrides(st, e, visuallyDead);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -11425,6 +11366,17 @@ export class Renderer {
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
       }
+      updateRollingMountLoop(
+        sink,
+        v,
+        e.id,
+        e.mountKey,
+        ax,
+        ay,
+        az,
+        logicallyMounted && !visuallyDead,
+        moving && !airborne,
+      );
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
       const entryFallSpeed = v.fallSpeed;
@@ -11633,11 +11585,25 @@ export class Renderer {
         mst.swimming = st.swimming;
         if (runCharacterPresentation) {
           v.mountVisual.update(dt, mst, animate);
-          // the rider floats WITH the procedural bob (the hover cycle's idle
-          // float), not just the mount body
-          const bob = mountBobY(mountSpec, this.time, moving);
-          v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
+          // RAW per-frame travel, not st.speed. loco.speed is exponentially
+          // smoothed for footstep cadence and additionally latches its last
+          // value while "stalled", so it keeps reporting motion for a beat
+          // after the player actually stops -- which the wheels rode as a
+          // visible coast. The displayed position delta is the ground truth
+          // the wheels should agree with anyway: if the cart did not move this
+          // frame, the wheels must not turn this frame.
+          spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
+          applyMountJumpAttitude(
+            v,
+            v.mountVisual.root,
+            v.visual.root,
+            mountSpec,
+            this.time,
+            moving,
+            airborne,
+            dt > 1e-4 ? dyRaw / dt : 0,
+            dt,
+          );
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -11648,6 +11614,7 @@ export class Renderer {
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
+        updateRickshawPuller(v, dt, mst, animate, runCharacterPresentation);
       }
 
       const emoteId =
@@ -11691,6 +11658,14 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // The mount's own call, on the same edge as the glow but only when a
+          // mount actually APPEARED: e.mountKey === '' is a dismount, which
+          // keeps the glow and gets no call. A live swap is a genuine
+          // appearance and does play the new mount's call. lastMountKey is
+          // seeded from the entity's current state at view creation, so a rider
+          // already mounted when they enter interest range (or at login) never
+          // reaches this edge and stays silent.
+          if (e.mountKey !== '') this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf);
           // A mountKey change (dismount, a live mount swap, or a fresh summon
           // reusing this entity id) must drop any engine mount's windup/loop
           // state; otherwise the old loop node stays connected forever once
@@ -12054,7 +12029,10 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
+    this.varkhulForgestormVisuals?.syncWorld(this.sim);
+    this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or
     // expiry must not dip the pinned visible count for the frame it lands on.
@@ -12190,7 +12168,8 @@ export class Renderer {
     const eyeX = this.cameraLookAt.x;
     const eyeY = this.cameraLookAt.y;
     const eyeZ = this.cameraLookAt.z;
-    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, this.reducedMotion());
+    const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);
+    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
     this.eastbrookTownView.update(
       camX,
       camY,
@@ -12198,7 +12177,7 @@ export class Renderer {
       eyeX,
       eyeY,
       eyeZ,
-      fogFar,
+      sceneryFar,
       dt,
       this.reducedMotion(),
     );
@@ -12209,7 +12188,7 @@ export class Renderer {
       eyeX,
       eyeY,
       eyeZ,
-      fogFar,
+      sceneryFar,
       dt,
       this.reducedMotion(),
     );
@@ -12226,7 +12205,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      fogFar,
+      sceneryFar,
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -12574,68 +12553,6 @@ export class Renderer {
     }
   }
 
-  private updateSelfRenderPosition(
-    alpha: number,
-    dt: number,
-    selfAlphaLead: number,
-    selfMotion: SelfMotionFrame | null = null,
-    authoritativeDiscontinuity = false,
-  ): THREE.Vector3 {
-    const p = this.sim.player;
-    // Online intent-driven extrapolation: when active it owns the position and
-    // the lead-smoothing path below becomes the fallback (both write the same
-    // selfRenderPosition, so enable/disable hands off without a pop, absorbed
-    // by the snap/smooth rules on the next frame).
-    if (selfMotion) {
-      if (!this.selfMotionPredictor) {
-        this.selfMotionPredictor = new SelfMotionPredictor(this.sim.cfg.seed);
-      }
-      const predicted = this.selfMotionPredictor.step(p, selfMotion, authoritativeDiscontinuity);
-      if (predicted) {
-        // Follow the predictor output exactly (it is already continuous;
-        // smoothing it again would re-add the display lag this exists to
-        // remove). The only discontinuity is the handoff frame from the
-        // lead-smoothing path below: capture that gap once as an offset and
-        // decay it, so the camera glides instead of stepping.
-        if (authoritativeDiscontinuity) {
-          this.selfMotionOffset.set(0, 0, 0);
-        } else if (this.selfRenderPositionReady && !this.selfMotionActive) {
-          this.selfMotionOffset.set(
-            this.selfRenderPosition.x - predicted.x,
-            this.selfRenderPosition.y - predicted.y,
-            this.selfRenderPosition.z - predicted.z,
-          );
-        }
-        this.selfMotionOffset.multiplyScalar(Math.exp(-SELF_MOTION_HANDOFF_RATE * Math.max(0, dt)));
-        this.selfRenderPosition.set(
-          predicted.x + this.selfMotionOffset.x,
-          predicted.y + this.selfMotionOffset.y,
-          predicted.z + this.selfMotionOffset.z,
-        );
-        this.selfRenderPositionReady = true;
-        this.selfMotionActive = true;
-        return this.selfRenderPosition;
-      }
-    }
-    this.selfMotionActive = false;
-    const playerAlpha = selfSnapshotAlpha(alpha, selfAlphaLead);
-    const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
-    const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
-    const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-    updateSelfRenderFallback(
-      this.selfRenderPosition,
-      px,
-      py,
-      pz,
-      this.selfRenderPositionReady,
-      dt,
-      selfAlphaLead > 0,
-      authoritativeDiscontinuity,
-    );
-    this.selfRenderPositionReady = true;
-    return this.selfRenderPosition;
-  }
-
   // ---- Map-editor 3D seams (editor-only) --------------------------------
 
   /** The terrain chunk group, for the editor to raycast/rebuild. */
@@ -12664,6 +12581,7 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    this.varkhulForgestormVisuals?.dispose();
     this.blobShadows?.dispose();
   }
 
@@ -12954,8 +12872,7 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    // Base FOV plus the feel kicks; the latter are zero under reduced motion.
-    const fovTarget = Math.min(100, Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel)));
+    const fovTarget = resolveCameraFov(this.baseFov, this.camFeel);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
@@ -13113,11 +13030,11 @@ export class Renderer {
     return this.pickSloppy(clientX, clientY);
   }
 
-  // The direct-raycast half of pick(): only a hit that actually lands on an
-  // entity's mesh. Split out so callers that also raycast gather nodes (a
-  // click that lands on a node must not be stolen by the sloppy assist below)
-  // can slot the node raycast in between this and pickSloppy.
+  // The direct half of pick(): a visible nameplate health bar or an entity mesh.
+  // Split out so gather-node callers can slot their raycast before pickSloppy.
   pickDirect(clientX: number, clientY: number): number | null {
+    const nameplate = this.nameplatePainter.pickEntityAt(clientX, clientY);
+    if (nameplate !== null) return nameplate;
     this.raycastNdc.set(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
@@ -13283,6 +13200,7 @@ export class Renderer {
       radius: number;
       school: string;
       dimmed: boolean;
+      blocked?: boolean;
     } | null,
   ): void {
     this.groundAimReticle.setAim(
@@ -13293,6 +13211,7 @@ export class Renderer {
             radius: aim.radius,
             color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
             dimmed: aim.dimmed,
+            blocked: aim.blocked === true,
           }
         : null,
     );

@@ -56,6 +56,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
 import {
   DELVE_COMPANION_MAX_RANK,
   DELVE_PLATE_RADIUS,
@@ -164,6 +165,50 @@ export function delveOccupancyRadius(run: DelveRun): number {
  *  slot's rooms (they end 143u south). Pinned from both sides by the two
  *  south-margin tests in tests/delves.test.ts. */
 export const DELVE_OCCUPANCY_SOUTH_MARGIN = 40;
+
+/** True when a player entity stands inside a run's rooms. The band is asymmetric
+ *  on purpose (see DELVE_OCCUPANCY_SOUTH_MARGIN): a symmetric one reaches into the
+ *  south neighbor slot's rooms, so it could bind a player to the wrong slot's run. */
+function insideDelveRunBand(e: Entity, run: DelveRun): boolean {
+  const dz = e.pos.z - run.origin.z;
+  return (
+    Math.abs(e.pos.x - run.origin.x) < 120 &&
+    dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
+    dz < delveOccupancyRadius(run)
+  );
+}
+
+/** Move a live run onto `key` after its stamped key went stale. partyKey is stamped
+ *  once at claimDelveRun, so any membership change mid-run (an invite accepted, a duo
+ *  disbanding) flips instanceKeyFor and strands the run: no plates, no exit portal,
+ *  no respawn, no way out. Two guards keep the move safe: the run only leaves its old
+ *  key when NO member still holds it, so a splintering duo keeps the run with whoever
+ *  kept the party; and it never lands on a key another run already owns, so two solo
+ *  delvers who party up mid-run cannot end up sharing one member list. */
+function rebindDelveRun(ctx: SimContext, run: DelveRun, key: string): boolean {
+  if (run.partyKey === null || run.partyKey === key) return false;
+  if (ctx.partyMembersForKey(run.partyKey).length > 0) return false;
+  if (ctx.delveRuns.some((other) => other !== run && other.partyKey === key)) return false;
+  run.partyKey = key;
+  return true;
+}
+
+function rebindDelveRunToOccupant(ctx: SimContext, e: Entity, key: string): DelveRun | null {
+  for (const run of ctx.delveRuns) {
+    if (run.partyKey === null || run.partyKey === key) continue;
+    if (!insideDelveRunBand(e, run)) continue;
+    if (rebindDelveRun(ctx, run, key)) return run;
+  }
+  return null;
+}
+
+function ejectStaleDelveOccupants(ctx: SimContext, run: DelveRun, pids: readonly number[]): void {
+  const delve = DELVES[run.delveId];
+  pids.forEach((pid, i) => {
+    restorePetFromDelveStash(ctx, pid);
+    ejectToDelveDoor(ctx, pid, delve, i);
+  });
+}
 
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
@@ -284,23 +329,54 @@ export function delveMemberSpawnPos(ctx: SimContext, entry: Vec3, slotIndex: num
 }
 
 export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null {
+  // The vault craft gate's membership arm probes this EVERY snapshot per
+  // connected session (the cvault wire signature). With no live runs there is
+  // nothing either scan below could find (both are keyed into ctx.delveRuns),
+  // so return before touching the entity at all; and when runs DO exist, the
+  // party key (a minted template-literal string) is lazily built only once a
+  // run's cheap dx band admits the position or the player stands in the delve
+  // band, so the common open-world session allocates nothing here. Inside the
+  // loop the order is dx band, then key, then the occupancy-radius walk: the
+  // key reject stays ahead of the O(modules) radius walk (same-delve runs at
+  // different slots share origin.x, so an in-delve session would otherwise
+  // pay that walk per foreign run), and every continue keeps the ORIGINAL
+  // comparison sense via negation, so a non-finite coordinate still matches
+  // nothing (NaN > 120 is as false as NaN <= 120; a bare `> 120` continue
+  // would fall through and bind a corrupt position to its party's live run).
+  // The predicate is the same conjunction as before, so the first match over
+  // delveRuns order is unchanged and no draw or outcome can move.
+  if (ctx.delveRuns.length === 0) return null;
   const e = ctx.entities.get(pid);
   if (!e) return null;
-  const key = ctx.instanceKeyFor(pid);
+  let key: string | null = null;
+  const keyOf = (): string => {
+    if (key === null) key = ctx.instanceKeyFor(pid);
+    return key;
+  };
   for (const run of ctx.delveRuns) {
-    if (run.partyKey !== key) continue;
     const dx = Math.abs(e.pos.x - run.origin.x);
+    if (!(dx <= 120)) continue;
+    if (run.partyKey !== keyOf()) continue;
     // Symmetric band ON PURPOSE, unlike the updateDelveRuns empty sweep's
     // asymmetric one: this lookup is key-gated (one run per delveId+key, and
     // delves sit 600u apart in x), so it can never bind a player to a NEIGHBOR
     // slot's run; the generous band only ever re-finds the caller's own run.
     const dz = Math.abs(e.pos.z - run.origin.z);
-    if (dx <= 120 && dz <= delveOccupancyRadius(run)) return run;
+    if (!(dz <= delveOccupancyRadius(run))) continue;
+    return run;
   }
   if (!isDelvePos(e.pos.x)) return null;
   const delve = delveAt(e.pos.x);
   if (!delve) return null;
-  return ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === key) ?? null;
+  // keyOf(), not the bare `key`: the loop above only mints the key lazily, so a
+  // session whose dx band admitted no run still holds null here and would match
+  // a run whose partyKey is null. Resolving it first also gives the rebind a
+  // definite string.
+  const partyKey = keyOf();
+  return (
+    ctx.delveRuns.find((r) => r.delveId === delve.id && r.partyKey === partyKey) ??
+    rebindDelveRunToOccupant(ctx, e, partyKey)
+  );
 }
 
 export function delveRunForMob(ctx: SimContext, mobId: number): DelveRun | null {
@@ -410,6 +486,7 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.facing = 0;
   p.prevFacing = 0;
   p.targetId = null;
@@ -446,6 +523,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: delve.leaveText, color: '#b9f', pid: r.meta.entityId });
@@ -462,10 +540,25 @@ export function claimDelveRun(
   run.partyKey = key;
   run.seed = ctx.rng.int(1, 0x7fffffff);
   run.tierId = tierId;
-  // §7.6, roll Bountiful once at run start (Heroic 5% / Normal 2%). Derived from
-  // run.seed in its own stream (like affixes/modules) so it is deterministic
-  // without perturbing the global rng draw order that the chest loot depends on.
-  run.bountiful = new Rng((run.seed ^ 0x600dc0ff) >>> 0).chance(tierId === 'heroic' ? 0.05 : 0.02);
+  // §7.6, roll Bountiful once at run start (Heroic 20% / Normal 8%; raised 4x
+  // from the original 5%/2% launch tuning). This roll is DELVE-AGNOSTIC (keyed
+  // only on tierId, not delveId), so the bump applies to every delve sharing
+  // it, currently both the Collapsed Reliquary and The Drowned Litany, not
+  // Drowned Litany alone: deliberate, to keep one canonical roll rather than
+  // forking it per delve, and because Collapsed Reliquary's own Bountiful
+  // Coffer (higher item-level ceiling, docs/prd/DELVE_HANDOFF.md §7.7) was
+  // equally under-tuned. The motivating report was Drowned Litany's chase
+  // epics landing near 1-in-700 per heroic clear once compounded with the
+  // epic roll below (see drownedLitanyChestItemsForTier). Derived from
+  // run.seed in its own stream (like affixes/modules): the ROLL ITSELF never
+  // consumes a global ctx.rng draw. What happens downstream still depends on
+  // the delve's own chest-loot function: drownedLitanyChestItemsForTier below
+  // draws a fixed 2 global draws on every branch, so the Litany draw order is
+  // rng-stable across the bountiful flip; the sibling delveChestItemsForTier
+  // (lockpick_tiers.ts, Collapsed Reliquary) draws a variable count per
+  // branch instead, a pre-existing asymmetry this bump exercises 4x more
+  // often but does not introduce.
+  run.bountiful = new Rng((run.seed ^ 0x600dc0ff) >>> 0).chance(tierId === 'heroic' ? 0.2 : 0.08);
   run.affixes = rollDelveAffixes(delve, tierId, run.seed);
   run.modules = pickDelveModules(delve, run.seed, tierId);
   run.moduleIndex = 0;
@@ -625,25 +718,46 @@ export function updateDelveRuns(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return;
   for (const run of ctx.delveRuns) {
     if (run.partyKey === null) continue;
-    const origin = run.origin;
     let occupied = false;
+    let ownerOccupied = false;
+    const staleOccupants = new Map<string, number[]>();
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      if (!e) continue;
-      // Asymmetric band: rooms extend north up to ~536u but only ~11u south
-      // of the origin (see DELVE_OCCUPANCY_SOUTH_MARGIN for the geometry). The
-      // old symmetric +-radius check reached [-536, -143] into the SOUTH
-      // neighbor's rooms (slots sit 620u apart), letting busy neighbors pin an
-      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric
-      // band on purpose: it is key-gated, so cross-slot binding is unreachable.
-      const dz = e.pos.z - origin.z;
-      if (
-        Math.abs(e.pos.x - origin.x) < 120 &&
-        dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
-        dz < delveOccupancyRadius(run)
-      ) {
-        occupied = true;
-        break;
+      // insideDelveRunBand is the asymmetric band: the old symmetric +-radius check
+      // reached into the SOUTH neighbor's rooms, letting busy neighbors pin an
+      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric band on
+      // purpose: it is key-gated, so cross-slot binding is unreachable there.
+      if (!e || !insideDelveRunBand(e, run)) continue;
+      occupied = true;
+      const key = ctx.instanceKeyFor(meta.entityId);
+      if (key === run.partyKey) {
+        ownerOccupied = true;
+        continue;
+      }
+      const occupants = staleOccupants.get(key);
+      if (occupants) occupants.push(meta.entityId);
+      else staleOccupants.set(key, [meta.entityId]);
+    }
+    // Catches an occupant who changed party and then never moved or acted, so the
+    // on-demand re-bind in delveRunForPlayer never ran for them. If the stale
+    // occupant split from a still-owned run, or their new key already owns a
+    // different slot, send them back to the door instead of leaving a claimed run
+    // pinned under a key no current player can resolve.
+    if (staleOccupants.size > 0) {
+      const stalePids = [...staleOccupants.values()].flat();
+      if (ownerOccupied) {
+        ejectStaleDelveOccupants(ctx, run, stalePids);
+      } else if (staleOccupants.size === 1) {
+        const [[strandedKey, strandedPids]] = [...staleOccupants];
+        if (!rebindDelveRun(ctx, run, strandedKey)) {
+          ejectStaleDelveOccupants(ctx, run, strandedPids);
+          freeDelveRun(ctx, run);
+          continue;
+        }
+      } else {
+        ejectStaleDelveOccupants(ctx, run, stalePids);
+        freeDelveRun(ctx, run);
+        continue;
       }
     }
     if (occupied) run.emptyFor = 0;

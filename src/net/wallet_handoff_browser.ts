@@ -22,7 +22,9 @@ export interface BrowserWalletSession {
   signAndSendTransaction(transactionBase64: string): Promise<string>;
 }
 
-export type BrowserWalletRequirement = 'link' | 'transaction';
+// 'stepup' (the Exchange step-up challenge) is capability-identical to
+// 'link': both need only message signing, never SolanaSignAndSendTransaction.
+export type BrowserWalletRequirement = 'link' | 'transaction' | 'stepup';
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
 
@@ -36,7 +38,7 @@ function compatible(
     (wallet.chains.some(isSolanaChain) ||
       wallet.accounts.some((account) => account.chains.some(isSolanaChain)));
   if (!messageCompatible) return false;
-  if (requirement === 'link') return true;
+  if (requirement === 'link' || requirement === 'stepup') return true;
   if (!(SolanaSignAndSendTransaction in wallet.features)) return false;
   return (
     wallet.accounts.length === 0 || accountFor(wallet as CompatibleWallet, requirement) !== null
@@ -53,7 +55,7 @@ function accountFor(
       (account) =>
         account.chains.some(isSolanaChain) &&
         account.features.includes(SolanaSignMessage) &&
-        (requirement === 'link' || account.features.includes(SolanaSignAndSendTransaction)),
+        (requirement !== 'transaction' || account.features.includes(SolanaSignAndSendTransaction)),
     ) ?? null
   );
 }

@@ -18,11 +18,14 @@ describe('hollow_gates occluder-fade wiring (source pin)', () => {
     const src = readFileSync(`${ROOT}src/render/hollow_gates.ts`, 'utf8');
     expect(src).toContain("from './occluder_fade_core'");
     expect(src).toContain('occluderSegmentHitsObb(');
-    expect(src).toContain('occluderFadeSettled(');
-    expect(src).toContain('stepOccluderFade(');
     expect(src).toContain("from './occluder_fade'");
-    expect(src).toContain('applyOccluderFade(');
-    expect(src).toContain('occluderFadeMat(');
+    // The GATED per-frame stepper (occluder_fade.ts advanceOccluderFade wraps
+    // the core's step and settle checks behind the fade gate); a direct
+    // stepOccluderFade + applyOccluderFade pair here would flip ungated.
+    expect(src).toContain('advanceOccluderFade(');
+    expect(src).not.toContain('stepOccluderFade(');
+    expect(src).not.toContain('applyOccluderFade(');
+    expect(src).toContain('occluderFadeRecordFor(');
     // The hook-preserving clone, so a ghosted gate keeps its opaque program
     // and doesn't link a fresh one the first time a portal arrival crosses it.
     expect(src).toContain('cloneMaterialWithHooks(');

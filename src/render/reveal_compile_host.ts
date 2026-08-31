@@ -76,9 +76,15 @@ export function createRevealCompileHost(deps: RevealCompileHostDeps): RevealComp
   const submittedPieces = new WeakMap<object, number>();
   return {
     startAfterInitialPaint: deps.startAfterInitialPaint,
-    compile(root: object, imminent: boolean): Promise<unknown> {
+    compile(root: object, imminent: boolean, namedPriority?: number): Promise<unknown> {
       const target = root as THREE.Object3D;
-      const priority = imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM;
+      // One caller names its priority outright: the occluder-fade gate's
+      // edge-frame consult (the camera is INSIDE the structure now, and the
+      // player's own body is what the opaque hold hides) rides the actionable
+      // floor, like the character-effect swap it mirrors.
+      const priority =
+        namedPriority ??
+        (imminent ? GPU_WORK_PRIORITY.LIVE_VIEW : GPU_WORK_PRIORITY.VISIBLE_PREWARM);
       const pieces = linkPieceWork(target, deps.compileColor, deps.compileShadow, deps.settle);
       submittedPieces.set(target, pieces.length);
       const linked = deps.gate(pieces, {

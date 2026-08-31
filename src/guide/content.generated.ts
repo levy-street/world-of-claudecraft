@@ -5620,6 +5620,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false
   },
   {
+    "id": "soc_strongbox_outfitter",
+    "name": "Strongbox Outfitter",
+    "category": "social",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "soc_four_bags_deep",
+    "name": "Four Bags Deep",
+    "category": "social",
+    "renown": 25,
+    "feat": false
+  },
+  {
     "id": "prog_ready_for_an_adventure",
     "name": "Ready for an Adventure",
     "category": "progression",
@@ -5895,6 +5909,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Mournweave Soulsteps"
+      },
+      {
+        "kind": "item",
+        "name": "Necromancer's Reagent Satchel"
       },
       {
         "kind": "item",
@@ -6544,6 +6562,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Terrorspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Bonebound Rickshaw"
       }
     ]
   },
@@ -6834,6 +6856,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Light of the Sanctum"
+      },
+      {
+        "kind": "title",
+        "name": "the Unscorched"
       }
     ]
   },
@@ -7083,6 +7109,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormroot Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Wayfarer's Backpack"
       },
       {
         "kind": "item",
@@ -9415,6 +9445,158 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "name": "Sunweave Treads",
           "count": 1,
           "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_foragers_haversack",
+        "name": "Forager's Haversack",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Spider Silk",
+            "count": 8
+          },
+          {
+            "name": "Goldleaf Herb",
+            "count": 3
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Forager's Haversack",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_duskweave_bag",
+        "name": "Duskweave Bag",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Pristine Silk",
+            "count": 2
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 3
+          },
+          {
+            "name": "Spider Silk",
+            "count": 6
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Duskweave Bag",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_resonant_weave_bag",
+        "name": "Resonantweave Bag",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Resonant Thread",
+            "count": 8
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 4
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 4
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Resonantweave Bag",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_loombound_reagent_satchel",
+        "name": "Loombound Reagent Satchel",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "loom",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Resonant Thread",
+            "count": 12
+          },
+          {
+            "name": "Pristine Silk",
+            "count": 6
+          },
+          {
+            "name": "Sunpetal Herb",
+            "count": 5
+          },
+          {
+            "name": "Homespun Cloth",
+            "count": 8
+          },
+          {
+            "name": "Spool of Thread",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Loombound Reagent Satchel",
+          "count": 1,
+          "quality": "epic"
         },
         "combo": null,
         "gain": {

@@ -112,6 +112,22 @@ describe('reveal compile host priority', () => {
     ]);
   });
 
+  it('a caller that names its priority outright is submitted there, link, upload and touch alike', async () => {
+    // The occluder-fade gate's edge-frame consult (the camera is inside the
+    // structure now) rides the actionable floor; every other caller keeps the
+    // imminent/ordinary mapping.
+    const { calls, host } = recordingDeps();
+    await host.compile(root, true, GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+    const priorities = calls
+      .filter((call) => call.arm === 'gate' || call.arm === 'upload' || call.arm === 'touch')
+      .map((call) => call.priority);
+    expect(priorities).toEqual([
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+      GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
+    ]);
+  });
+
   it('keeps the imminent lane under the actionable gates and above every other reveal', () => {
     // Cosmetic scenery may go first among the reveals, never ahead of a mob or
     // a player the camera can act on.

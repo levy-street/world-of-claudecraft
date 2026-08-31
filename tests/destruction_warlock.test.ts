@@ -709,6 +709,9 @@ describe('Destruction finishers and target switching', () => {
     const primary = addDummy(sim, 9740);
     const branded = addDummy(sim, 9741, 3);
     p.facing = 0;
+    // Never-resist rig: Ruinous Brand is an instant hostile spell, so it takes a
+    // resist roll; a resisted brand leaves nothing for the second bolt to seek.
+    p.hitBonus = 1;
 
     sim.targetEntity(branded.id);
     castAndLand(sim, 'ruinous_brand', 1);

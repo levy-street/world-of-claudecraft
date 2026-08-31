@@ -353,6 +353,8 @@ export const tr_TR: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Kısıtlanan cüzdan doğrulama istekleri',
   'usage.metric.walletLinkRequest': 'Cüzdan bağlama istekleri',
   'usage.metric.walletLinkFailure': 'Cüzdan bağlama başarısızlıkları',
+  'usage.metric.walletUnlinkFailure': 'Reddedilen cüzdan bağlantısı kaldırmaları',
+  'usage.metric.walletUnlinkSuccess': 'Tamamlanan cüzdan bağlantısı kaldırmaları',
   'usage.metric.walletLinkRateLimited': 'Kısıtlanan cüzdan bağlama istekleri',
   'usage.metric.cardPublishRequest': 'Oyuncu kartı yayın istekleri',
   'usage.metric.cardPublishRejected': 'Reddedilen oyuncu kartı yayınları',
@@ -1173,4 +1175,6 @@ export const tr_TR: Record<string, string> = {
   'wealth.purse': 'Karakterler hakkında:',
   'wealth.total': 'Toplam:',
   'wealth.updatedAt': 'güncellendi {when}',
+  'usage.metric.walletHandoffAuthorizationEvicted': 'Masaüstü cüzdan devri tahliyeleri',
+  'usage.metric.walletHandoffCreateRejected': 'Reddedilen masaüstü cüzdan devirleri',
 };

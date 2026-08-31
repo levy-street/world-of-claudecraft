@@ -18,6 +18,12 @@ const RESTED_LEFT_PROP = 'left';
 const RESTED_WIDTH_PROP = 'width';
 const XP_OVERFLOW_CLASS = 'overflow';
 const XP_RESTED_CLASS = 'rested';
+// The always-visible percent (hud.css #xpbar::after / mobile's
+// #player-frame::after both read it via attr()), so showing it needs no new
+// DOM element or constructor param: it rides the already-cached bar and
+// player-frame refs through the existing multi-slot attr writer, the same
+// two-target shape --xp-fill already uses (desktop bar + the mobile ring).
+const PERCENT_ATTR = 'data-percent';
 // Width percent precision (e.g. "62.5%"); --xp-fill keeps four decimals.
 const PERCENT_FRACTION_DIGITS = 1;
 const XP_FILL_FRACTION_DIGITS = 4;
@@ -46,6 +52,8 @@ export class XpBarPainter {
       `${(view.restedFrac * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`,
     );
     this.writers.setText(this.label, view.label);
+    this.writers.setAttr(this.bar, PERCENT_ATTR, view.percentText);
+    this.writers.setAttr(this.playerFrame, PERCENT_ATTR, view.percentText);
     this.writers.toggleClass(this.bar, XP_OVERFLOW_CLASS, view.postCap);
     this.writers.toggleClass(this.bar, XP_RESTED_CLASS, view.restedFrac > 0);
   }

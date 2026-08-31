@@ -98,6 +98,7 @@ export function runRotation(
   const dummy = addDummy(sim);
   const ally = addAlly(sim);
   const mana0 = p.resource;
+  const gearHitBonus = p.hitBonus;
   let damage = 0;
   let echoHeal = 0;
   let oomTick = -1;
@@ -114,6 +115,11 @@ export function runRotation(
           oomTick = i;
           break;
         }
+        // The owner-derived bands in this family were measured before an INSTANT
+        // hostile spell took a resist roll. Hit-cap exactly those casts so the
+        // harness keeps measuring rotation throughput under the same avoidance
+        // profile; projectile spells keep the resist roll the bands were built on.
+        p.hitBonus = sim.resolvedAbility(next.id)?.def.projectile === false ? 1 : gearHitBonus;
         sim.targetEntity(next.targetId);
         sim.castAbility(next.id);
       }

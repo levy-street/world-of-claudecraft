@@ -39,6 +39,7 @@
 // runs and the gesture path above is untouched.
 
 import type { PainterHostWriters } from '../../painter_host';
+import { bindTouchTap } from '../../touch_tap';
 import { armTapMenuOutsideDismiss, registerTouchMenu } from '../tap_menu';
 import { resolveTapMenuPress, type TapMenuAnchorRole, type TapMenuPress } from '../tap_menu_core';
 import {
@@ -51,6 +52,7 @@ import {
 } from './radial_action_core';
 import {
   radialCancelIsLive,
+  resolveRadialPress,
   resolveRadialRelease,
   shouldRevealOnDrag,
 } from './radial_gesture_core';
@@ -116,6 +118,11 @@ export interface RadialGestureDeps {
   metricsHost: HTMLElement;
   /** Whether a button plus direction maps to a real hotbar slot right now. */
   hasSlot(buttonIndex: number, direction: RadialDirection): boolean;
+  /** Whether the active ground aim belongs to any direction on this physical
+   *  button. Omitted by radial controls that do not own action-bar slots. */
+  aimOwnsButton?(buttonIndex: number): boolean;
+  /** Cancel the active ground aim claimed by aimOwnsButton. */
+  cancelAim?(): void;
   /** Cast the action a button plus direction resolves to. Routes through the
    *  SAME castSlot path a plain ring tap uses; only the input differs. */
   cast(buttonIndex: number, direction: RadialDirection): void;
@@ -253,7 +260,7 @@ export class RadialGesture {
     this.petalCancel = cancel;
     this.setPetalsFocusable(false);
     petals.forEach(({ direction, el }, index) => {
-      el.addEventListener('click', () => {
+      bindTouchTap(el, () => {
         const press = resolveTapMenuPress({
           tapMenus: this.deps.tapMenus(),
           open: this.sticky !== null,
@@ -268,7 +275,7 @@ export class RadialGesture {
         }
       });
     });
-    cancel.addEventListener('click', () => {
+    bindTouchTap(cancel, () => {
       if (!this.sticky) return;
       this.closeSticky();
       this.deps.onCancel();
@@ -378,7 +385,8 @@ export class RadialGesture {
    *  assumed on: with tap mode off, Enter on a ring button casts its centre slot
    *  (what a click always did) instead of opening a menu the player never asked
    *  for. */
-  private resolveAnchorPress(buttonIndex: number): void {
+  private resolveAnchorPress(buttonIndex: number, allowAimCancel = false): void {
+    if (allowAimCancel && this.cancelOwnedAim(buttonIndex)) return;
     const press = resolveTapMenuPress({
       tapMenus: this.deps.tapMenus(),
       open: this.sticky?.buttonIndex === buttonIndex,
@@ -448,7 +456,12 @@ export class RadialGesture {
     if (this.press(this.sticky?.buttonIndex === buttonIndex, 'anchor').kind !== 'gesture') {
       this.suppressClick = true;
       if (e.pointerType === 'touch') e.preventDefault();
-      this.resolveAnchorPress(buttonIndex);
+      this.resolveAnchorPress(buttonIndex, true);
+      return;
+    }
+    if (this.cancelOwnedAim(buttonIndex)) {
+      this.suppressClick = true;
+      if (e.pointerType === 'touch') e.preventDefault();
       return;
     }
     // A sticky menu owns the ring while it is showing, exactly as it owns the row
@@ -484,6 +497,17 @@ export class RadialGesture {
     drag.revealTimer = setTimeout(() => this.reveal(drag), RADIAL_REVEAL_MS);
     this.drags.set(e.pointerId, drag);
     if (e.pointerType === 'touch') e.preventDefault();
+  }
+
+  /** The pure press table's cancel claim, shared by drag and tap-mode presses. */
+  private cancelOwnedAim(buttonIndex: number): boolean {
+    const outcome = resolveRadialPress({
+      aimOwnedByButton: this.deps.aimOwnsButton?.(buttonIndex) ?? false,
+    });
+    if (outcome.kind !== 'cancel-aim') return false;
+    this.closeSticky();
+    this.deps.cancelAim?.();
+    return true;
   }
 
   /** Measure the pressed button and seat the radial around it. The one place

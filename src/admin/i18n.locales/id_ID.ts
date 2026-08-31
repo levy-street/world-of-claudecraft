@@ -357,6 +357,8 @@ export const id_ID: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Permintaan tantangan dompet yang dibatasi',
   'usage.metric.walletLinkRequest': 'Permintaan tautan dompet',
   'usage.metric.walletLinkFailure': 'Kegagalan tautan dompet',
+  'usage.metric.walletUnlinkFailure': 'Penolakan pelepasan tautan dompet',
+  'usage.metric.walletUnlinkSuccess': 'Pelepasan tautan dompet selesai',
   'usage.metric.walletLinkRateLimited': 'Permintaan tautan dompet yang dibatasi',
   'usage.metric.cardPublishRequest': 'Permintaan penerbitan kartu pemain',
   'usage.metric.cardPublishRejected': 'Penerbitan kartu pemain yang ditolak',
@@ -1166,4 +1168,8 @@ export const id_ID: Record<string, string> = {
   'wealth.purse': 'Tentang karakter:',
   'wealth.total': 'Total:',
   'wealth.updatedAt': 'diperbarui {when}',
+
+  // Release-tier autoFillable fill (id_ID worklist).
+  'usage.metric.walletHandoffAuthorizationEvicted': 'Penggusuran serah terima dompet desktop',
+  'usage.metric.walletHandoffCreateRejected': 'Serah terima dompet desktop yang ditolak',
 };

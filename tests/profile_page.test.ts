@@ -167,8 +167,11 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
   it('pins the interpolated total to the live-catalog literal', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
-    // the literal anchors them. Literal: update when catalog content lands.
-    expect(catalogTotal).toBe(311);
+    // the literal anchors them. Literal: update when catalog content lands
+    // (311 base + the Bonebound Rickshaw's horizons_mounts slot + the 40
+    // Crucible raid relics and the raid's flawless title; Forgebreaker left
+    // the pages for its crafting chain).
+    expect(catalogTotal).toBe(357);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

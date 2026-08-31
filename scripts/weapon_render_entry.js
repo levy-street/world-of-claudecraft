@@ -41,6 +41,80 @@ function b64ToArrayBuffer(b64) {
   return arr.buffer;
 }
 
+// Transparent-background sibling renderer for icon composites (the item-icon
+// vignette pass wants an alpha subject). Lazy: the opaque preview path keeps
+// its original renderer and output untouched.
+let alphaRenderer = null;
+function getAlphaRenderer(size) {
+  if (!alphaRenderer) {
+    alphaRenderer = new THREE.WebGLRenderer({
+      antialias: true,
+      preserveDrawingBuffer: true,
+      alpha: true,
+    });
+    alphaRenderer.setPixelRatio(1);
+    alphaRenderer.outputColorSpace = THREE.SRGBColorSpace;
+  }
+  alphaRenderer.setSize(size, size);
+  return alphaRenderer;
+}
+
+function renderParsed(gltf, size, pose, target) {
+  const scene = new THREE.Scene();
+  scene.add(makeLights());
+
+  const obj = gltf.scene;
+  // Diagonal hero pose by default. Most KayKit weapons are authored upright (+Y).
+  obj.rotation.set(pose[0], pose[1], pose[2]);
+  scene.add(obj);
+
+  // center on bounding box, frame by bounding sphere (orientation-agnostic)
+  const box = new THREE.Box3().setFromObject(obj);
+  const center = box.getCenter(new THREE.Vector3());
+  obj.position.sub(center);
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const r = sphere.radius || 1;
+
+  const fov = 32;
+  const cam = new THREE.PerspectiveCamera(fov, 1, 0.01, 100);
+  const dist = (r / Math.sin((fov * Math.PI) / 360)) * 1.06;
+  cam.position.set(dist * 0.18, dist * 0.12, dist);
+  cam.lookAt(0, 0, 0);
+
+  target.setClearColor(0x000000, 0);
+  target.render(scene, cam);
+  const url = target.domElement.toDataURL('image/png');
+
+  obj.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material)
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => {
+        if (m.map) m.map.dispose();
+        m.dispose();
+      });
+  });
+  scene.clear();
+  return url;
+}
+
+// PNG-with-alpha still for the item-icon vignette composite. `pose` is an XYZ
+// euler; omit for the shared diagonal hero pose.
+window.renderWeaponAlpha = (b64, size = DEFAULT_SIZE, pose = [0.18, -0.5, -0.42]) =>
+  new Promise((resolve, reject) => {
+    loader.parse(
+      b64ToArrayBuffer(b64),
+      '',
+      (gltf) => {
+        try {
+          resolve(renderParsed(gltf, size, pose, getAlphaRenderer(size)));
+        } catch (e) {
+          reject(e);
+        }
+      },
+      reject,
+    );
+  });
+
 window.renderWeapon = (b64, size = DEFAULT_SIZE) =>
   new Promise((resolve, reject) => {
     loader.parse(

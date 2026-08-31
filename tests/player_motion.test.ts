@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_FLOOR_Y } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
@@ -59,13 +59,26 @@ function teleport(sim: Sim, x: number, z: number): void {
 }
 
 // The client dep shape: pure static collision, aura-only speed, no live-Sim
-// callbacks. Mirrors what src/render/self_motion.ts binds.
-function clientDeps(seed: number): PlayerMotionDeps {
+// callbacks. Mirrors what src/render/self_motion.ts binds. riftToken mirrors
+// self_motion.ts's own constructor parameter (default 0, the same "no rift
+// regions" inert value the live Sim itself falls back to outside a rift).
+function clientDeps(seed: number, riftToken = 0): PlayerMotionDeps {
   return {
     seed,
     moveSpeedMult: (e) => moveSpeedMult(e, 0),
     resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
-      resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
+      resolveMovement(
+        seed,
+        fromX,
+        fromZ,
+        nx,
+        nz,
+        r,
+        ignoreFences,
+        undefined,
+        moverHeight(e),
+        riftToken,
+      ),
     resolvedAbility: () => null,
     cancelCast: () => {},
     standUp: () => {},
@@ -115,8 +128,8 @@ function expectSamePose(sim: Sim, actor: Entity, label: string): void {
   expect(actor.onGround, `${label}: onGround`).toBe(p.onGround);
 }
 
-function runParity(sim: Sim, input: MoveInput, ticks: number, label: string): void {
-  const deps = clientDeps(SEED);
+function runParity(sim: Sim, input: MoveInput, ticks: number, label: string, riftToken = 0): void {
+  const deps = clientDeps(SEED, riftToken);
   const actor = mirrorActor(sim);
   for (let i = 0; i < ticks; i++) {
     tickBoth(sim, actor, deps, input);
@@ -206,6 +219,33 @@ describe('player motion kernel parity with the live Sim', () => {
     sim.player.facing = 0; // north, straight up the pass
     runParity(sim, mi({ forward: true }), 20 * 10, 'road pass');
     expect(sim.player.pos.z).toBeGreaterThan(200); // actually travelled
+  });
+
+  // Issue #3479 (enable self-motion prediction inside rifts): self_motion.ts's
+  // resolveMove now threads a real riftCollisionToken through to resolveMovement,
+  // the ONE codepath in this file the default clientDeps(SEED) (token 0, "no
+  // rift regions") never exercised before. Same "chamber-waist" wall the swept-
+  // collision fixture pins (local x=35), approached along z=70: local x=61 is a
+  // pre-existing dead spot for iterative movement unrelated to this fix
+  // (resolveMovement's ejection guard rejects every stepped move from that exact
+  // point), verified separately, not this test's concern.
+  it('resolves a rift wall identically through the client-shaped kernel deps with a real riftToken', () => {
+    const sim = makeSim();
+    sim.enterRift(2, 20, sim.player.id);
+    const origin = sim.riftFloor?.origin;
+    if (!origin) throw new Error('rift floor did not spawn');
+    const p = sim.player;
+    p.pos.x = origin.x + 20;
+    p.pos.z = origin.z + 70;
+    p.pos.y = DUNGEON_FLOOR_Y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    p.facing = Math.PI / 2; // face +x, straight at the wall
+    runParity(sim, mi({ forward: true }), 20 * 3, 'rift wall approach', sim.riftCollisionToken);
+    // Actually reached and was actually held by the wall, not just idle parity.
+    expect(sim.player.pos.x - origin.x).toBeGreaterThan(33);
+    expect(sim.player.pos.x - origin.x).toBeLessThan(34.5);
   });
 
   it('blocks uphill walls and slides off steep footing identically', () => {

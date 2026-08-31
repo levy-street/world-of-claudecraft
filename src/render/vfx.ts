@@ -7,6 +7,14 @@ import {
   DrainLifeVfx,
 } from './drain_life_vfx';
 import { GFX } from './gfx';
+import {
+  type IgnivarJudgmentFireSample,
+  ignivarJudgmentFireAllowsSmoke,
+  ignivarJudgmentFireInitialCount,
+  ignivarJudgmentFireNoise,
+  ignivarJudgmentFireRate,
+  writeIgnivarJudgmentFireSample,
+} from './ignivar_judgment_fire_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
@@ -257,6 +265,18 @@ export const SCHOOL_COLORS: Record<string, number> = {
   physical: 0xffd28a,
 };
 
+/** A burst waiting out the gap between its cue event and its visual moment. */
+interface PendingBurst {
+  remaining: number;
+  x: number;
+  y: number;
+  z: number;
+  school: string;
+  count: number;
+  power: number;
+  color?: number;
+}
+
 interface Projectile {
   pos: THREE.Vector3;
   targetId: number;
@@ -322,6 +342,8 @@ export class Vfx {
   private head = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
+  private pendingBursts: PendingBurst[] = [];
+  private readonly pendingBurstScratch = new THREE.Vector3();
   private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
   private tmpDirection = new THREE.Vector3();
@@ -342,6 +364,10 @@ export class Vfx {
   private quality = 1;
   private paladinSpellFx: PaladinSpellVfxController;
   private disposed = false;
+  private ignivarJudgmentFireSourceId = -1;
+  private ignivarJudgmentFireAccumulator = 0;
+  private ignivarJudgmentFireSerial = 0;
+  private readonly ignivarJudgmentFireSample: IgnivarJudgmentFireSample = { x: 0, z: 0 };
 
   constructor(
     private scene: THREE.Scene,
@@ -537,6 +563,114 @@ export class Vfx {
     this.drainLifeVfx.setQuality(this.quality);
   }
 
+  private emitIgnivarJudgmentGroundFire(
+    centerX: number,
+    groundY: number,
+    centerZ: number,
+    safeX: number,
+    safeZ: number,
+  ): void {
+    const serial = this.ignivarJudgmentFireSerial++;
+    if (
+      !writeIgnivarJudgmentFireSample(
+        serial,
+        safeX - centerX,
+        safeZ - centerZ,
+        this.ignivarJudgmentFireSample,
+      )
+    ) {
+      return;
+    }
+    const x = centerX + this.ignivarJudgmentFireSample.x;
+    const z = centerZ + this.ignivarJudgmentFireSample.z;
+    const sizeNoise = ignivarJudgmentFireNoise(serial, 2);
+    const driftAngle = ignivarJudgmentFireNoise(serial, 3) * Math.PI * 2;
+    const drift = 0.08 + ignivarJudgmentFireNoise(serial, 4) * 0.16;
+    const sprite = serial % 3 === 0 ? SPR.firePuff : SPR.flame;
+    this.spawn(
+      x,
+      groundY + 0.12 + sizeNoise * 0.18,
+      z,
+      Math.sin(driftAngle) * drift,
+      0.38 + sizeNoise * 0.62,
+      Math.cos(driftAngle) * drift,
+      serial % 5 === 0 ? 0xfff0a0 : serial % 2 === 0 ? 0xff9b32 : 0xff4b12,
+      0.92 + sizeNoise * 0.76,
+      0.85 + ignivarJudgmentFireNoise(serial, 5) * 0.55,
+      -0.18,
+      sprite,
+      (ignivarJudgmentFireNoise(serial, 6) - 0.5) * 0.42,
+    );
+
+    if (serial % 4 === 0) {
+      this.spawn(
+        x,
+        groundY + 0.28,
+        z,
+        Math.sin(driftAngle) * (0.25 + drift),
+        1.2 + sizeNoise * 1.4,
+        Math.cos(driftAngle) * (0.25 + drift),
+        serial % 8 === 0 ? 0xfff2a1 : 0xffa52f,
+        0.07 + sizeNoise * 0.08,
+        0.8 + ignivarJudgmentFireNoise(serial, 7) * 0.65,
+        0.45,
+        serial % 8 === 0 ? SPR.flash : SPR.glowSoft,
+        ignivarJudgmentFireNoise(serial, 8) * Math.PI * 2,
+      );
+    }
+
+    if (ignivarJudgmentFireAllowsSmoke(this.quality) && serial % 11 === 0) {
+      this.spawn(
+        x,
+        groundY + 0.75,
+        z,
+        Math.sin(driftAngle) * 0.18,
+        0.55 + sizeNoise * 0.45,
+        Math.cos(driftAngle) * 0.18,
+        0x4a2116,
+        0.45 + sizeNoise * 0.38,
+        1.45 + ignivarJudgmentFireNoise(serial, 9) * 0.75,
+        -0.08,
+        SPR.smoke,
+        ignivarJudgmentFireNoise(serial, 10) * Math.PI * 2,
+      );
+    }
+  }
+
+  syncIgnivarJudgmentGroundFire(
+    sourceId: number,
+    active: boolean,
+    centerX: number,
+    groundY: number,
+    centerZ: number,
+    safeX: number,
+    safeZ: number,
+    dt: number,
+  ): void {
+    if (!active) {
+      if (this.ignivarJudgmentFireSourceId === sourceId) {
+        this.ignivarJudgmentFireSourceId = -1;
+        this.ignivarJudgmentFireAccumulator = 0;
+      }
+      return;
+    }
+    if (this.ignivarJudgmentFireSourceId !== sourceId) {
+      this.ignivarJudgmentFireSourceId = sourceId;
+      this.ignivarJudgmentFireAccumulator = 0;
+      this.ignivarJudgmentFireSerial = Math.max(0, Math.trunc(sourceId)) * 4099;
+      const initialCount = ignivarJudgmentFireInitialCount(this.quality);
+      for (let index = 0; index < initialCount; index++) {
+        this.emitIgnivarJudgmentGroundFire(centerX, groundY, centerZ, safeX, safeZ);
+      }
+    }
+    this.ignivarJudgmentFireAccumulator += Math.max(0, dt) * ignivarJudgmentFireRate(this.quality);
+    const emitCount = Math.min(64, Math.floor(this.ignivarJudgmentFireAccumulator));
+    this.ignivarJudgmentFireAccumulator -= emitCount;
+    for (let index = 0; index < emitCount; index++) {
+      this.emitIgnivarJudgmentGroundFire(centerX, groundY, centerZ, safeX, safeZ);
+    }
+  }
+
   prewarm(at: THREE.Vector3): void {
     const sprites = Object.values(SPR);
     for (let i = 0; i < sprites.length; i++) {
@@ -562,6 +696,7 @@ export class Vfx {
   clear(): void {
     if (this.disposed) return;
     this.projectiles.length = 0;
+    this.pendingBursts.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
@@ -1404,6 +1539,26 @@ export class Vfx {
   }
 
   /**
+   * A burst scheduled `seconds` from now, for impacts whose visual moment sits
+   * inside an already-playing clip (the Forgefather's hammer reaching his
+   * anvil). Fixed world position by design: the emitter aims at a spot, not an
+   * entity, so a mover cannot drag the pending impact with it. Drained by
+   * update(); dispose() drops anything still pending.
+   */
+  burstLater(
+    seconds: number,
+    x: number,
+    y: number,
+    z: number,
+    school: string,
+    count = 18,
+    power = 1,
+    color?: number,
+  ): void {
+    this.pendingBursts.push({ remaining: seconds, x, y, z, school, count, power, color });
+  }
+
+  /**
    * Brief water-entry droplets. These reuse the single pooled point cloud, so
    * an impact adds no mesh, material, texture, or draw call. Continuous motion
    * belongs to the height-field wake; this only fires on discrete impacts.
@@ -2052,6 +2207,20 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
+
+    for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
+      const pending = this.pendingBursts[i];
+      pending.remaining -= dt;
+      if (pending.remaining > 0) continue;
+      this.pendingBursts.splice(i, 1);
+      this.burst(
+        this.pendingBurstScratch.set(pending.x, pending.y, pending.z),
+        pending.school,
+        pending.count,
+        pending.power,
+        pending.color,
+      );
+    }
 
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
       const stream = this.bubbleBeams[i];

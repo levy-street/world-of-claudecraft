@@ -834,11 +834,13 @@ describe('governorFromConfig', () => {
       paced.run({ method: 'POST', path: '/channels/2/messages' }, ok),
     ]);
 
-    // The real global was asked for the slot spacing the config implies.
+    // The real global was asked for the slot spacing the config implies. The
+    // production clock reads Date.now(), so elapsed test time can shave a
+    // millisecond off the nominal 500 ms slot without changing the contract.
     // `toContain` rather than an exact array: the stub is global for this window,
     // so an unrelated runtime timer would make an equality pin flake without
     // saying anything about the default clock.
-    expect(delays).toContain(500);
+    expect(delays.some((delay) => Math.abs(delay - 500) <= 1)).toBe(true);
     vi.unstubAllGlobals();
   });
 });

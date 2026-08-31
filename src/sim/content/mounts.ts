@@ -20,7 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'rickshaw_mount';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -106,6 +107,21 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Terrorspark Groundshaker',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // Developer-only, like the tank above: no player-facing acquisition path
+  // yet. A Halloween-flavored hand-pulled cart with a skeleton puller (its own
+  // rig, skel_rickshaw_puller in characters/manifest.ts, attached by a fixed
+  // offset, see src/render/rickshaw_mount.ts) built into the front, gripping
+  // the shafts. The puller runs a real gait, and the wheels roll from
+  // actual per-frame ground travel (rickshaw_mount.ts's spinMountWheels), so the
+  // moveSpeedPct below needs no matching animation constant anywhere: change it
+  // and the wheels simply roll faster. Stays LAST in the catalog
+  // alongside the tank; a new player-facing mount lands above both.
+  rickshaw_mount: {
+    key: 'rickshaw_mount',
+    name: 'Bonebound Rickshaw',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

@@ -21,8 +21,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
-import { EXTRA_LINES, yellKey } from './voices/extra_lines.mjs';
-import { voiceIdFor } from './voices/npc_voice_prompts.mjs';
+import { collectVoiceLines } from './voices/voice_line_catalog.mjs';
 import { buildVoiceManifestEntries } from './voices/voice_manifest.mjs';
 
 const API = 'https://api.elevenlabs.io';
@@ -63,7 +62,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function loadContent() {
   const build = await esbuild.build({
     stdin: {
-      contents: "export { NPCS, QUESTS, ESCORTS } from './src/sim/data.ts';",
+      contents:
+        "export { NPCS, QUESTS, ESCORTS } from './src/sim/data.ts'; " +
+        "export { IGNIVAR_DIALOGUE_LINES } from './src/sim/encounters/ignivar_dialogue.ts'; " +
+        "export { VARKHUL_DIALOGUE_LINES } from './src/sim/encounters/varkhul_dialogue.ts';",
       resolveDir: root,
       sourcefile: 'voice-lines-entry.ts',
       loader: 'ts',
@@ -123,37 +125,10 @@ async function tts(voiceId, text, { retries = 4 } = {}) {
   }
 }
 
-const { NPCS, QUESTS, ESCORTS } = await loadContent();
-
 // Build the full line list. Each line carries the speaking NPC's voice (giver
 // speaks quest offers, turn-in speaks completions); recurring Aldric/Maren records
 // resolve to their base voice via voiceIdFor.
-const lines = [];
-for (const npc of Object.values(NPCS)) {
-  if (npc.greeting)
-    lines.push({ key: `greeting__${npc.id}`, text: npc.greeting, voiceNpc: voiceIdFor(npc.id) });
-}
-for (const q of Object.values(QUESTS)) {
-  if (q.text)
-    lines.push({ key: `quest__${q.id}__offer`, text: q.text, voiceNpc: voiceIdFor(q.giverNpcId) });
-  if (q.completionText)
-    lines.push({
-      key: `quest__${q.id}__complete`,
-      text: q.completionText,
-      voiceNpc: voiceIdFor(q.turnInNpcId),
-    });
-}
-// Escort-quest barks: the escortee yells these through emitMobYell, so they key
-// off the spoken text exactly like encounter dialogue. Derived from the content
-// bundle (never copied) so a reworded bark cannot silently lose its clip; the
-// escortee's own voice is designed under its MobTemplate id.
-for (const e of Object.values(ESCORTS ?? {})) {
-  for (const text of [e.startText, e.successText, e.failText]) {
-    if (text) lines.push({ key: yellKey(text), text, voiceNpc: voiceIdFor(e.npcMobId) });
-  }
-}
-// Encounter dialogue (yells/bubbles) that isn't on any content record.
-for (const e of EXTRA_LINES) lines.push({ key: e.key, text: e.text, voiceNpc: e.voiceNpc });
+const lines = collectVoiceLines(await loadContent());
 
 const diskPathFor = (line) => path.join(voiceDir, line.voiceNpc, `${line.key}.mp3`);
 

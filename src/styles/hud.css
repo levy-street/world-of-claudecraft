@@ -859,7 +859,19 @@
     position: relative;
     top: auto;
     left: auto;
-    width: 612px;
+    /* The children zoom with the Player Frame Scale slider (the rule further
+       down), so the box carries the same factor: a fixed 612px box around
+       zoomed content leaves the unlock outline and the drag clamp working a
+       frame edge the player cannot see (90px of dead band per side at 0.75).
+       The content stays centred, so the locked HUD renders exactly as before
+       at every scale; only the invisible box edges move. The base width is
+       the playerFrameWidth setting (the interface editor's edge drags), a
+       real layout dimension so the bars reflow instead of stretching. */
+    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
+    /* Bar thickness for this frame's hp/resource bars (playerFrameHeight):
+       .bar and .bar-text read the var, so a height drag thickens the bars at
+       crisp text instead of distorting them through a transform. */
+    --uf-bar-height: var(--player-frame-height, 15px);
     margin: 0 auto 8px;
     display: flex;
     align-items: center;
@@ -1183,7 +1195,11 @@
     flex: 1;
     width: auto;
     min-width: 0;
-    max-width: 520px;
+    /* Rides the playerFrameWidth setting minus the frame's fixed chrome
+       (92px: portrait plus the centring margins), so the bar panel takes the
+       whole width change and the content inset below stays constant. Stock
+       612px - 92px = the historical 520px. */
+    max-width: calc(var(--player-frame-width, 612px) - 92px);
   }
   /* How far the player frame's centred content row sits from the left edge of its
      612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
@@ -1202,9 +1218,15 @@
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: 612px;
+    /* Same width and centring as the docked seat above: the class flips at the
+       first grab (MovableFrame applies the position before measuring the grab
+       offset), so any difference between the two seats renders as the visible
+       content jumping sideways under the cursor the moment a drag starts
+       (18px at the default scale, 85px at 0.75 back when this was
+       flex-start over a fixed 612px). */
+    width: calc(var(--player-frame-width, 612px) * var(--player-frame-scale, 1));
     margin: 0;
-    justify-content: flex-start;
+    justify-content: center;
     z-index: 6;
   }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
@@ -1271,6 +1293,9 @@
     top: 12px;
     display: none;
     z-index: 6;
+    /* Bar thickness for this frame's bars (targetFrameHeight): the nested
+       target-of-target frame inherits the var, so its strip thickens in step. */
+    --uf-bar-height: var(--target-frame-height, 15px);
   }
   /* Target Frame Scale (--target-frame-scale, targetFrameScale setting): the
      player frame's twin. Children only, never the drag-positioned frame itself
@@ -1385,7 +1410,8 @@
     pointer-events: auto;
   }
   .unitframe .tf-move-btn::before,
-  .warlock-doom-frame > .tf-move-btn::before {
+  .warlock-doom-frame > .tf-move-btn::before,
+  #chatlog-wrap .chat-move-btn::before {
     content: "";
     position: absolute;
     inset: 5px;
@@ -1428,9 +1454,9 @@
   /* The frame while unlocked: a dashed gold hint and a move cursor over the body. */
   .unitframe.tf-unlocked,
   .warlock-doom-frame.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
-    outline-offset: 2px;
+    outline-offset: -1px;
     touch-action: none;
   }
   .warlock-doom-frame.tf-unlocked {
@@ -1446,6 +1472,635 @@
   }
   body.mobile-touch .unitframe .tf-move-btn,
   body.mobile-touch .warlock-doom-frame > .tf-move-btn {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+     "Unlock interface" (interface_unlock.ts): the action bars, cast bar, menu
+     rail, minimap and pet frame become movable + scalable while body carries
+     .interface-unlocked. They share the unit frames' MovableFrame controller, so
+     the chrome is the same corner button plus the shared .panel-resize-grip; the
+     only difference is that neither is present until the interface is unlocked,
+     which keeps the stock HUD exactly as it was. Desktop only, like every other
+     frame gesture here.
+     --------------------------------------------------------------------------- */
+  #actionbar.tf-unlocked,
+  #actionbar2.tf-unlocked,
+  #actionbar3.tf-unlocked,
+  #castbar.tf-unlocked,
+  #swingbar.tf-unlocked,
+  #side-buttons.tf-unlocked,
+  #minimap-wrap.tf-unlocked,
+  #pet-frame.tf-unlocked,
+  #stancebar.tf-unlocked,
+  #xpbar.tf-unlocked,
+  #buff-bar.tf-unlocked,
+  #debuff-bar.tf-unlocked {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+    touch-action: none;
+  }
+  /* The corner button and grip need a positioned host to hang off. Only the
+     action bars lack one: the cast bar, the menu rail and the minimap wrap are
+     already absolute and the pet frame already relative. Re-stating the menu rail
+     here would ALSO shadow its real rule from the crafting-launcher rail budget,
+     which reads the FIRST wrapper block it finds by regex (and that regex scans
+     comments too, so do not spell the selector-plus-brace pattern in prose). */
+  #actionbar,
+  #actionbar2,
+  #actionbar3,
+  #stancebar {
+    position: relative;
+  }
+  /* A frame re-homed onto #ui (interface_unlock.ts makeUiRootDetacher: the action
+     bars and the pet frame, which otherwise resolve their left/top against
+     #bottom-bar's centering transform) must position off its own left/top. The
+     selectors are id-qualified because #pet-frame's own `position: relative` and
+     the action bars' rule above would otherwise win on specificity, leaving a
+     dragged frame stuck at its docked spot with the coordinates silently ignored.
+     Mirrors what pf-detached does for the player frame. */
+  #actionbar.hud-frame-detached,
+  #actionbar2.hud-frame-detached,
+  #actionbar3.hud-frame-detached,
+  #pet-frame.hud-frame-detached,
+  #stancebar.hud-frame-detached,
+  #xpbar.hud-frame-detached,
+  #buff-bar.hud-frame-detached,
+  #debuff-bar.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+  }
+  #actionbar .tf-move-btn,
+  #actionbar2 .tf-move-btn,
+  #actionbar3 .tf-move-btn,
+  #castbar .tf-move-btn,
+  #side-buttons .tf-move-btn,
+  #minimap-wrap .tf-move-btn,
+  #pet-frame .tf-move-btn,
+  #stancebar .tf-move-btn,
+  #xpbar .tf-move-btn,
+  #buff-bar .tf-move-btn,
+  #debuff-bar .tf-move-btn,
+  #chatlog-wrap .chat-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    cursor: var(--cursor-point);
+    z-index: 21;
+  }
+  #actionbar .tf-move-btn:focus-visible,
+  #actionbar2 .tf-move-btn:focus-visible,
+  #actionbar3 .tf-move-btn:focus-visible,
+  #castbar .tf-move-btn:focus-visible,
+  #side-buttons .tf-move-btn:focus-visible,
+  #minimap-wrap .tf-move-btn:focus-visible,
+  #pet-frame .tf-move-btn:focus-visible,
+  #stancebar .tf-move-btn:focus-visible,
+  #xpbar .tf-move-btn:focus-visible,
+  #buff-bar .tf-move-btn:focus-visible,
+  #debuff-bar .tf-move-btn:focus-visible,
+  #chatlog-wrap .chat-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The button is built once and hidden until unlocked (the controller also sets
+     the `hidden` attribute, which takes it out of the tab order). */
+  /* The chat box's arrange-mode keyboard move button: the same chrome as
+     every other frame's corner toggle, but the chat drags while LOCKED too
+     (its tab strip), so this extra affordance shows only in arrange mode
+     and the stock HUD gains no new tab stop. */
+  .chat-move-btn {
+    display: none;
+  }
+  body.interface-unlocked .chat-move-btn {
+    display: block;
+  }
+  .tf-move-btn-hidden {
+    display: none;
+  }
+  /* MovableFrame's own grip carries a second class so this gate cannot reach the
+     chat box or the meter panels, whose grips are always live. It only appears on
+     a frame that is actually loose, mirroring the target aura panel's
+     .ta-unlocked gate. Unlike those other grips this one is a real <button> (it
+     owns the arrow-key resize a keyboard player has no other route to), so the
+     button chrome is reset back to the shared hatch look. */
+  .mf-resize-grip {
+    display: none;
+    appearance: none;
+    padding: 0;
+    border: 0;
+  }
+  .tf-unlocked > .mf-resize-grip {
+    display: block;
+  }
+  /* While a frame is unlocked its grip is a primary affordance, not passive
+     chrome: the full 24px target at raised opacity and the game-styled
+     resize cursor (live play-testing found the dim hatch hard to discover
+     and grab). The chat grip joins in arrange mode; its LOCKED-mode base is
+     already 24px since it is an always-on focusable control. */
+  .tf-unlocked > .mf-resize-grip,
+  body.interface-unlocked .chat-resize-grip {
+    width: 24px;
+    height: 24px;
+    opacity: 0.85;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
+  }
+  /* The border bands advertise themselves on hover: the hovered side paints
+     an inset gold bar (data-resize-edge, written by the edge hover hit test),
+     so edge resizing is discoverable before the cursor change is noticed.
+     The bar is drawn by a dedicated overlay CHILD (.tf-edge-glow, minted by
+     MovableFrame and the chat controller) stacked over the frame's own
+     content: an inset shadow on the frame itself painted UNDER the bars and
+     buttons inside it, which mostly hid the highlight. */
+  .tf-edge-glow {
+    display: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 120;
+  }
+  .tf-unlocked > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap > .tf-edge-glow {
+    display: block;
+  }
+  .tf-unlocked[data-resize-edge="n"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="n"] > .tf-edge-glow {
+    box-shadow: inset 0 3px 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="s"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="s"] > .tf-edge-glow {
+    box-shadow: inset 0 -3px 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="e"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="e"] > .tf-edge-glow {
+    box-shadow: inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="w"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="w"] > .tf-edge-glow {
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="ne"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="ne"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 3px 0 var(--gold),
+      inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="nw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="nw"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 3px 0 var(--gold),
+      inset 3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="se"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="se"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 -3px 0 var(--gold),
+      inset -3px 0 0 var(--gold);
+  }
+  .tf-unlocked[data-resize-edge="sw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="sw"] > .tf-edge-glow {
+    box-shadow:
+      inset 0 -3px 0 var(--gold),
+      inset 3px 0 0 var(--gold);
+  }
+  .mf-resize-grip:focus-visible {
+    opacity: 0.9;
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The cast bar is hidden except while casting (and the auto-attack swing
+     timer except while swinging), so unlocking shows each as a dimmed
+     placeholder that can be positioned. !important is load-bearing: both
+     painters write `display` inline through the elided writers, and an
+     inline value beats an ordinary rule. A real cast repaints over the top of
+     this, so it never suppresses live cast information. */
+  body.interface-unlocked #castbar,
+  body.interface-unlocked #swingbar {
+    display: block !important;
+    opacity: 0.55;
+  }
+  /* Unlocking shows the frames the class could have that are merely EMPTY
+     right now (a target frame with nothing selected, a pet frame with no pet
+     out, the stance bar), so the layout is arrangeable in one session. Gated
+     on .tf-unlocked (not the body class alone) so a frame the coordinator
+     refused to loosen (the pet frame on a petless class) stays hidden;
+     !important beats the painters' inline display writes exactly as the
+     cast-bar rule above. The dim matches the cast-bar placeholder treatment:
+     while unlocked a frame is an inert arrangement proxy, not live combat
+     information. The optional action bars are deliberately NOT here: a bar the
+     player has switched OFF stays hidden while editing, and the options note
+     points at the plus/minus buttons for turning more on. */
+  body.interface-unlocked #target-frame.tf-unlocked,
+  body.interface-unlocked #pet-frame.tf-unlocked,
+  body.interface-unlocked #stancebar.tf-unlocked {
+    display: flex !important;
+    opacity: 0.55;
+  }
+  /* A resizable unit frame needs a positioned host for its grip; the three
+     already carry one (.unitframe and #party-frames are absolute, #player-frame
+     relative), so only the grip's own stacking is restated here, above the
+     frame's portrait and bars. */
+  #player-frame > .mf-resize-grip,
+  #target-frame > .mf-resize-grip,
+  #party-frames > .mf-resize-grip {
+    z-index: 21;
+  }
+  /* Containers that are invisible while EMPTY (no party, no auras) keep a
+     graspable placeholder box; the dashed .tf-unlocked outline draws its shape.
+     Unconditional minimums rather than :empty so a pooled-but-hidden child
+     cannot defeat the placeholder; a populated container already exceeds them. */
+  body.interface-unlocked #party-frames.tf-unlocked {
+    min-width: 220px;
+    min-height: 120px;
+  }
+  body.interface-unlocked #stancebar.tf-unlocked {
+    min-width: 160px;
+    min-height: 30px;
+  }
+  /* The arrange-mode name chip: which frame is which, sitting just ABOVE the
+     frame so it never covers the frame's own contents. A frame parked against
+     the viewport top has no room up there and its chip would clip away
+     entirely (that is how a frame ends up looking nameless), so the controller
+     stamps .tf-label-below on those and the chip hangs underneath instead.
+     Hidden until the frame is unlocked (the chat box gates on the body class
+     instead: its controller has no .tf-unlocked state). Inert text only, so it
+     never intercepts the drag it annotates. */
+  .tf-frame-label {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: -2px;
+    z-index: 22;
+    padding: 1px 7px;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+    color: var(--gold);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+  .tf-unlocked > .tf-frame-label,
+  body.interface-unlocked #chatlog-wrap > .tf-frame-label {
+    display: inline-block;
+  }
+  .tf-frame-label.tf-label-below {
+    bottom: auto;
+    top: calc(100% + 4px);
+  }
+  /* The XP bar and the cast bar both clip their overflow (a rounded fill, a
+     sliding cast fill), which silently swallowed their name chips: those were
+     the two frames that read as unnamed. While unlocked they are dimmed
+     placeholders, so letting them spill costs nothing. */
+  body.interface-unlocked #xpbar.tf-unlocked,
+  body.interface-unlocked #castbar.tf-unlocked,
+  body.interface-unlocked #swingbar.tf-unlocked {
+    overflow: visible;
+  }
+  /* While unlocked a frame's CONTENTS are a static picture: pointer-inert so a
+     grab anywhere on the frame starts the drag instead of pressing an action
+     button, selecting a unit, or scrubbing the minimap. Every descendant with
+     !important, because several controls inside governed frames re-enable
+     themselves with their own id-specific rules (the daily rewards chest's
+     pointer-events, the target debuff strip) and each would otherwise stay
+     clickable inside an "inert" frame. The frame's own chrome, the move button
+     and the resize grip, is carved back out. */
+  body.interface-unlocked .tf-unlocked :not(.tf-move-btn):not(.mf-resize-grip) {
+    pointer-events: none !important;
+  }
+  /* While unlocked each aura row keeps a graspable minimum box (the dashed
+     .tf-unlocked outline draws its shape), so an empty row is still there to
+     take hold of; a stretched row may also grow past its stylesheet width cap
+     while it carries a custom box. */
+  body.interface-unlocked #buff-bar.tf-unlocked,
+  body.interface-unlocked #debuff-bar.tf-unlocked {
+    min-width: 160px;
+    min-height: 30px;
+  }
+  #buff-bar.hud-frame-detached,
+  #debuff-bar.hud-frame-detached {
+    max-width: none;
+  }
+  /* The chat box rides the same arrange mode through its own geometry
+     controller: the whole box drags (its panes go pointer-inert so the wrap is
+     the event target) and wears the same dashed outline as every other frame. */
+  body.interface-unlocked #chatlog-wrap {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+  }
+  body.interface-unlocked #chatlog-wrap * {
+    pointer-events: none !important;
+  }
+  /* Edit-mode sample content (interface_unlock_preview.ts): example buffs,
+     party members, a mid-cast bar, laid over the otherwise-empty placeholder
+     frames so each can be sized against real proportions. Absolutely
+     positioned overlays, never children the frames' own painters manage;
+     inert like everything else inside an unlocked frame. */
+  .tf-preview {
+    position: absolute;
+    inset: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px;
+    pointer-events: none;
+    z-index: 4;
+  }
+  /* The aura sample rows mirror the LIVE bars' direction contract
+     (--buff-bar-direction / --debuff-bar-direction, the buffsLeftToRight /
+     debuffsLeftToRight toggles): row-reverse packs the samples against the
+     box's right end reading right to left, exactly like the live painter's
+     aura order in the row-reverse bar, and the menu toggle flips the sample
+     the same moment it flips the live rows. Without these the sample shell
+     was a plain LTR flex, so the editing box contradicted the live layout
+     (owner report). The on-frame twin below mirrors aurasOnPlayerFrame's
+     placement, whose live row is forced LTR regardless of the toggle. */
+  #buff-bar > .tf-preview-auras {
+    flex-direction: var(--buff-bar-direction, row-reverse);
+  }
+  #debuff-bar > .tf-preview-auras {
+    flex-direction: var(--debuff-bar-direction, row-reverse);
+  }
+  #player-frame > #buff-bar > .tf-preview-auras {
+    flex-direction: row;
+  }
+  .tf-preview-icon {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: #0c0a07;
+  }
+  /* The party sample host: REAL party-frame rows rendered inside by a second
+     PartyFramesPainter instance (interface_unlock_preview.ts), so the sample
+     is pixel-identical to a live party. IN FLOW (not the absolute overlay the
+     other samples use) so the force-shown #party-frames box grows to the
+     rows' true footprint; the column + spacing mirror #party-frames' own, so
+     the nested rows lay out exactly as direct members would. */
+  .tf-preview.tf-preview-party {
+    position: static;
+    inset: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--party-frame-spacing, 4px);
+  }
+  /* lockPlayerFrameToActionBar (Frames Settings menu): the bars own the
+     frame's spot, so its corner move button folds away entirely (display
+     none also drops it from the tab order); the interface-unlock
+     registration refuses to loosen the frame for the same reason (hud.ts,
+     setLockPlayerFrameToActionBar). */
+  body.pf-locked-to-bar #player-frame > .tf-move-btn {
+    display: none;
+  }
+  /* While that preview owns the party box, the LIVE rows fold away: the
+     preview re-renders the player's real members itself (padded with dummies
+     to the 10-slot sample roster), so leaving the live painter's rows visible
+     stacked N + 10 frames for a player in a party (owner report). DIRECT
+     child only, deliberately: the preview's own rows sit one level deeper
+     (.tf-preview-party > .party-rows, the throwaway painter mints its own
+     wrapper) and a descendant selector would hide those too, leaving the
+     editing box empty. Locking removes the body class, so the live rows
+     return the moment editing ends. */
+  body.interface-unlocked #party-frames > .party-rows {
+    display: none;
+  }
+  .tf-preview-unit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .tf-preview-portrait {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #3a3a4c, #15151f);
+  }
+  .tf-preview-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .tf-preview-name {
+    font-size: 10px;
+    line-height: 12px;
+    color: #fff0d0;
+    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .tf-preview-hp {
+    height: 8px;
+    width: 78%;
+    border-radius: 2px;
+    background: linear-gradient(#7ddb8a, #2e8f3e 60%, #1d5c28);
+  }
+  .tf-preview-mp {
+    height: 5px;
+    width: 62%;
+    border-radius: 2px;
+    background: linear-gradient(#8fb6e6, #3d6ea8 60%, #274a74);
+  }
+  /* The filled cast/swing samples: a fill under the frame's own label layer. */
+  .tf-preview-bar {
+    inset: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  .tf-preview-fill {
+    height: 100%;
+    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+    box-shadow: inset 0 1px 0 #fff4;
+  }
+  .tf-preview-bar-label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 11px;
+    line-height: 24px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--title-font);
+  }
+  /* The arrange mode's own controls: the floating Lock Interface exit (so
+     finishing an arrangement never means hunting for the options menu again)
+     plus the frames show/hide menu beside it. Centred at the top, clear of
+     every frame's default spot, and above the frame chrome. These are the ONLY
+     controls that stay live while the interface is unlocked, so they sit
+     outside the pointer-inert sweep by not being inside a frame. */
+  /* The Snap to Grid alignment grid (frameSnapToGrid): one faint gold line
+     every 16 VISUAL px, the exact FRAME_SNAP_GRID pitch snapped drags land
+     on (src/ui/target_frame_pos.ts). The overlay lives inside #ui, which
+     carries zoom: var(--ui-scale), so the author-space pitch divides by the
+     scale and the zoom multiplies it back to 16 visual px, the same
+     compensation #ui's own width uses; a plain 16px here drew the grid
+     offset from where snaps actually land at any other UI Scale (review
+     round four, blocker 1). First child of #ui at z-index 0, so it paints
+     over the world but under every frame being arranged; the coordinator
+     shows it only while the interface is unlocked AND the setting is on
+     (interface_unlock.ts refreshGridOverlay). */
+  #interface-grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      );
+  }
+  #interface-edit-controls {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    z-index: 40;
+    pointer-events: auto;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  #interface-edit-controls[hidden] {
+    display: none;
+  }
+  /* The dropdown beside the exit: a .panel anchored under the buttons, one
+     checkbox row per live frame. [hidden] must be restated because the flex
+     display above would otherwise defeat the attribute. */
+  #interface-frames-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #interface-frames-menu[hidden] {
+    display: none;
+  }
+  .frames-menu-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 6px;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .frames-menu-row:hover {
+    background: #ffffff14;
+  }
+  /* The discrete numeric rows (party columns): label left, a compact native
+     select pushed to the row's right edge, themed to the panel palette so it
+     never reads as default browser chrome. */
+  .frames-menu-select select {
+    margin-left: auto;
+    background: #0008;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font: inherit;
+    padding: 1px 4px;
+  }
+  /* A show/hide row: the checkbox label (grows) plus the per-frame
+     size-reset button, side by side. The button sits OUTSIDE the label so a
+     click can never double as the checkbox's activation. */
+  .frames-menu-row-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .frames-menu-row-wrap > .frames-menu-row {
+    flex: 1;
+    min-width: 0;
+  }
+  .frames-menu-reset {
+    flex: none;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #0008;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .frames-menu-reset:hover {
+    background: #ffffff14;
+  }
+  /* The show/hide sub-menu: a native details/summary fold, styled to read as
+     a menu heading, with the frame rows indented beneath it. */
+  .frames-menu-sub summary {
+    padding: 4px 6px;
+    cursor: var(--cursor-point);
+    font-size: 13px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .frames-menu-sub summary:hover {
+    background: #ffffff14;
+  }
+  .frames-menu-sub .frames-menu-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 12px;
+  }
+  /* The frame-behavior toggles below the fold (combine bars, hide unused
+     slots, ...), separated so the two groups read as distinct. */
+  .frames-menu-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 4px;
+  }
+  /* Frames the player hid via the frames menu. !important on purpose: it must
+     beat the painters' inline display writes while locked, and the force-shown
+     placeholder rules above while editing (those carry an id plus two classes,
+     so the second selector matches that strength and lands later in the
+     sheet). The menu row stays listed, which is the way back. */
+  #ui .tf-user-hidden {
+    display: none !important;
+  }
+  body.interface-unlocked #ui .tf-user-hidden {
+    display: none !important;
+  }
+  body.hud-frame-dragging,
+  body.hud-frame-dragging * {
+    user-select: none;
+  }
+  body.mobile-touch .tf-move-btn,
+  body.mobile-touch .tf-unlocked > .mf-resize-grip {
     display: none;
   }
   .portrait-wrap {
@@ -1620,6 +2275,9 @@
     margin-right: -18px;
     border-radius: 6px 11px 11px 6px;
     padding: 5px 26px 5px 8px;
+    /* The targetFrameWidth setting (the interface editor's edge drags): a real
+       layout width over the base .uf-bars 190px, so the bars reflow. */
+    width: var(--target-frame-width, 190px);
   }
   #target-frame .level-chip {
     left: auto;
@@ -1753,7 +2411,10 @@
   }
   .bar {
     position: relative;
-    height: 15px;
+    /* Var-driven thickness: #player-frame / #target-frame scope the var to
+       their height settings (the interface editor's vertical drags); every
+       other host (pet frame) keeps the stock 15px fallback. */
+    height: var(--uf-bar-height, 15px);
     background: #1a1a1a;
     border: 1px solid #000;
     margin-top: 3px;
@@ -1776,7 +2437,9 @@
     inset: 0;
     text-align: center;
     font-size: 11px;
-    line-height: 15px;
+    /* Tracks the var-driven bar thickness above so the text stays vertically
+       centred at any playerFrameHeight / targetFrameHeight. */
+    line-height: var(--uf-bar-height, 15px);
     color: #fff;
     text-shadow: 1px 1px 1px #000;
     font-weight: bold;
@@ -2095,7 +2758,7 @@
     left: 14px;
     z-index: 5;
     display: none;
-    width: 68px;
+    width: 94px;
     height: 14px;
     gap: 2px;
   }
@@ -2115,6 +2778,12 @@
     border-color: var(--color-text-light);
     background: var(--color-ascension);
     box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension);
+  }
+  /* The two Extended Dawn bonus charges (beyond the base 5) glow a distinct
+     color so the empowered bonus reads at a glance from peripheral vision. */
+  .paladin-ascension-charges span:nth-child(n + 6).on {
+    background: var(--color-ascension-bonus);
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension-bonus);
   }
   .paladin-devotion.last-charge .paladin-ascension-charges span.on,
   .paladin-devotion.last-charge .paladin-devotion-label {
@@ -2208,7 +2877,10 @@
     right: 196px;
     top: 14px;
     display: flex;
-    flex-direction: row-reverse;
+    /* Icon flow rides the buffsLeftToRight setting (Frames Settings menu):
+       stock row-reverse grows right-to-left from the minimap-side anchor;
+       main.ts flips the var to `row` for left-to-right reading. */
+    flex-direction: var(--buff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
     max-width: 320px;
@@ -2222,7 +2894,9 @@
     right: 196px;
     top: 172px;
     display: flex;
-    flex-direction: row-reverse;
+    /* The debuff row's twin of the #buff-bar direction var above
+       (debuffsLeftToRight). */
+    flex-direction: var(--debuff-bar-direction, row-reverse);
     flex-wrap: wrap;
     gap: 4px;
     max-width: 320px;
@@ -2352,6 +3026,24 @@
   .buff.own:not(.debuff) {
     border-color: var(--color-primary);
   }
+  /* The low-tier buff-cap overflow badge (auraVisibleCap, src/game/ui_tier_knobs.ts): a
+     dashed "+N" tile standing in for the buff icons the LOW preset sheds past the cap.
+     Hidden by default (the painter mints it via createElement, no class this rule does
+     not match), then reveals it (display:flex) only on a frame that actually sheds
+     something; the auras themselves stay active the whole time, only the icon is
+     cosmetic (docs/design/graphics-settings-fairness.md), so the full tiers never show
+     it. display:flex is set here to center the "+N" text; the painter's shown/hidden
+     writes use the explicit value pair, not the stacks badge's revert-to-default idiom
+     (auras_painter.ts OVERFLOW_SHOWN/OVERFLOW_HIDDEN), because the default here is
+     none, not shown. */
+  .buff.buff-overflow {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font: 700 12px var(--body-font);
+    color: var(--color-text-muted);
+    border-style: dashed;
+  }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
     cursor: context-menu;
@@ -2472,12 +3164,65 @@
     text-shadow: 1px 1px 2px #000;
     font-variant-numeric: tabular-nums;
   }
-  /* swing timer: sits just under the cast bar, steel-on-amber to read as melee */
-  #swingbar {
+  /* Target / target-of-target swing timers: sit in the SAME .uf-bars flex
+     flow as #tf-castbar (position: relative, NOT the absolute-positioned
+     #swingbar/#swingbar-offhand family), so they inherit the target frame's
+     existing responsive/mobile scaling for free with zero new breakpoint
+     rules. Violet (target) / rose (target-of-target) fills keep all four
+     possible swing bars (own main-hand amber, own off-hand teal, target
+     violet, target-of-target rose) visually distinct when several are up
+     at once. */
+  #swingbar-target,
+  #swingbar-tot {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    margin-top: 4px;
+    display: none;
+    border: 1px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 3px;
+    background: #0c0a07;
+    overflow: hidden;
+  }
+  #swingbar-target .fill,
+  #swingbar-tot .fill {
+    height: 100%;
+    width: 0%;
+    box-shadow: inset 0 1px 0 #fff4;
+    transition: width 60ms linear;
+  }
+  #swingbar-target .fill {
+    background: linear-gradient(#c9a3ff, #7c3fd9 60%, #481f8a);
+  }
+  #swingbar-tot .fill {
+    background: linear-gradient(#ffb3c6, #d9427c 60%, #8a1f4e);
+  }
+  #swingbar-target.ready .fill,
+  #swingbar-tot.ready .fill {
+    background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
+  }
+  #swingbar-target .label,
+  #swingbar-tot .label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 10px;
+    line-height: 12px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--title-font);
+  }
+  /* Swing timers: sit just under the cast bar, steel-on-amber (main-hand) /
+     steel-on-teal (off-hand, dual-wield only) to read as melee. The off-hand
+     bar is the same family stacked directly under the main-hand one, sharing
+     every rule except position and fill color, so the two read as one
+     melee-weaving cluster without drifting apart on the next edit. */
+  #swingbar,
+  #swingbar-offhand {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 234px;
     width: 220px;
     height: 12px;
     display: none;
@@ -2487,17 +3232,31 @@
     background: #0c0a07;
     overflow: hidden;
   }
-  #swingbar .fill {
+  #swingbar {
+    bottom: 234px;
+  }
+  #swingbar-offhand {
+    bottom: 220px;
+  }
+  #swingbar .fill,
+  #swingbar-offhand .fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
     box-shadow: inset 0 1px 0 #fff4;
     transition: width 60ms linear;
   }
-  #swingbar.ready .fill {
+  #swingbar .fill {
+    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+  }
+  #swingbar-offhand .fill {
+    background: linear-gradient(#8fe6d6, #1e9d97 60%, #0f5a58);
+  }
+  #swingbar.ready .fill,
+  #swingbar-offhand.ready .fill {
     background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
   }
-  #swingbar .label {
+  #swingbar .label,
+  #swingbar-offhand .label {
     position: absolute;
     inset: 0;
     text-align: center;
@@ -2570,6 +3329,28 @@
   }
   #xpbar:hover .label {
     opacity: 1;
+  }
+  /* Always-visible percent (new-player-first-hour: the number was hover-only
+     before, invisible on touch entirely since mobile has no hover). Reads the
+     xp_bar_painter data-percent attribute rather than a new DOM element, so it
+     needs no markup change; swaps out for the fuller .label on hover instead
+     of overlapping it. */
+  #xpbar::after {
+    content: attr(data-percent);
+    position: absolute;
+    inset: 0;
+    padding-right: 4px;
+    font-size: 10px;
+    color: #fff;
+    text-align: right;
+    line-height: 10px;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.15s;
+  }
+  #xpbar:hover::after {
+    opacity: 0;
   }
   /* Post-cap overflow bar (Max-Level XP Overflow): gold/prestige tint. */
   #xpbar.overflow {
@@ -2773,6 +3554,9 @@
   body.show-actionbar3 #swingbar {
     bottom: 292px;
   }
+  body.show-actionbar3 #swingbar-offhand {
+    bottom: 278px;
+  }
   #actionbar,
   #actionbar2,
   #actionbar3 {
@@ -2796,6 +3580,134 @@
   }
   body.show-actionbar3 #actionbar3 {
     display: flex;
+  }
+  /* Vertical action bars (actionBar1/2/3Vertical, the Frames Settings menu,
+     PER BAR): the flipped bar lays its slots out as a COLUMN. The width must
+     be its own (fit-content, centred): a bar docked in #actionbar-stack is a
+     stretched flex item, and a stretched column kept the full 612px stack
+     width, painting its panel background as a huge dark box with the edit
+     outline around it until the frame was moved (owner report). The
+     plus/minus toggle goes back to a ROW on a vertical bar, so the pair sits
+     side by side under the column instead of stacking it taller. */
+  #actionbar.bar-vertical,
+  #actionbar2.bar-vertical,
+  #actionbar3.bar-vertical {
+    flex-direction: column;
+    align-self: center;
+    width: fit-content;
+  }
+  #actionbar.bar-vertical .bar-toggle,
+  #actionbar2.bar-vertical .bar-toggle,
+  #actionbar3.bar-vertical .bar-toggle {
+    flex-direction: row;
+    justify-content: center;
+  }
+  /* The combined block follows bar 1's orientation (body class stamped by
+     main.ts): vertical bars sit side by side, bottom-aligned so bar 1 keeps
+     the ground line the plus/minus buttons live on. */
+  body.combined-bars-vertical.combined-action-bars #actionbar-group {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  /* The three action bars share a wrapper so the "Combine Action Bars" option
+     can move them as ONE frame. Off (the default) the wrapper has no box at
+     all, so the stack lays the three rows out exactly as it always did and each
+     row stays independently movable. On, it becomes a real column box: it is
+     the movable frame, and the rows inside it ride along. */
+  #actionbar-group {
+    display: contents;
+  }
+  body.combined-action-bars #actionbar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    /* Sized to the bars, not the stack: a block-level flex child stretches to
+       its parent's full width, which drew the arrange-mode outline across the
+       whole screen instead of around the combined block. */
+    width: fit-content;
+    margin: 0 auto;
+  }
+  /* A combined group re-homed onto #ui positions off its own left/top, exactly
+     as each bar does when moved on its own. The body-qualified selector is
+     load-bearing: the combined rule above carries `position: relative;
+     margin: 0 auto` at higher specificity than a bare
+     `#actionbar-group.hud-frame-detached`, and losing that tie left the
+     detached group IN FLOW, where the auto margins centered it and the inline
+     left offset applied relative on top, ratcheting the group to the right
+     screen edge on every grab. */
+  body.combined-action-bars #actionbar-group.hud-frame-detached,
+  #actionbar-group.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+  }
+  #actionbar-group.tf-unlocked {
+    cursor: var(--cursor-move, move);
+    outline: 1px dashed var(--gold);
+    outline-offset: -1px;
+    touch-action: none;
+  }
+  #actionbar-group .tf-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: var(--gold);
+    cursor: var(--cursor-point);
+    z-index: 21;
+  }
+  #actionbar-group .tf-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* While combined, only the rows the player has TURNED ON appear inside the
+     group, editing or not: the stock body.show-actionbar2/3 rules keep working
+     inside the wrapper, and a switched-off row never renders as a placeholder
+     (the options note points at the plus/minus buttons for turning more on). */
+  /* The plus/minus optional-row toggle at the end of the primary bar: a slim
+     vertical pair matching the slot chrome. 24x24 per button is the WCAG 2.2
+     SC 2.5.8 absolute target-size floor (src/ui/CLAUDE.md); do not shrink it. */
+  .bar-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .bar-toggle-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    line-height: 1;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: #d8c98f;
+    border: 1px solid #4a3d1d;
+    border-radius: 4px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    cursor: var(--cursor-point);
+    text-shadow: 1px 1px 2px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+  }
+  .bar-toggle-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  .bar-toggle-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .bar-toggle-btn:disabled {
+    opacity: 0.35;
+    cursor: var(--cursor-arrow);
   }
   .action-btn {
     width: 46px;
@@ -2948,6 +3860,13 @@
     box-shadow:
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
+  }
+  /* Armed ground aim: the queued/proc gold family, double so it can never be
+     read as the focus-visible ring (which stays the focus token, solid). */
+  .action-btn.aiming,
+  body.mobile-touch #mobile-action-ring button.aiming {
+    outline: 3px double var(--gold);
+    outline-offset: 1px;
   }
   /* Proc glow (Battle Trance and similar): the classic pulsing
      gold rim on the covered abilities. Actionable info: never gated by a graphics tier; the
@@ -3139,6 +4058,39 @@
   #side-buttons-col-b {
     position: relative;
     z-index: 1;
+  }
+  /* Horizontal menu rail (menuRailHorizontal, the Frames Settings menu): the
+     rail's two stacked columns become two side-by-side ROWS, reading as one
+     horizontal strip. The explicit 34px column width is dropped (a row sizes
+     to its buttons), and the rows bottom-align so the taller daily-rewards
+     chest never staggers the strip. */
+  body.menu-rail-horizontal #side-buttons {
+    flex-direction: column;
+    align-items: flex-end;
+    /* The stock 2px sat BETWEEN the two columns; between two stacked rows it
+       read as a stray horizontal seam, so the rows touch (owner request). */
+    gap: 0;
+  }
+  body.menu-rail-horizontal .side-buttons-col {
+    flex-direction: row;
+    align-items: flex-end;
+    width: auto;
+    /* The column's 4px button gap read as spacing BETWEEN items in a row;
+       the horizontal strip packs its buttons flush (owner request). */
+    gap: 0;
+  }
+  /* The daily-rewards chest's 46px box plus its 14px column spacing
+     inflated its row to 60px, floating the row's top edge 30px above the
+     30px buttons: exactly the seam the rows-touch rule above closes. In
+     the strip it takes a standard 30px slot and its art (overflow is
+     visible on the button) simply pokes past the box. */
+  body.menu-rail-horizontal #daily-rewards-button {
+    height: 30px;
+    margin-bottom: 0;
+  }
+  body.menu-rail-horizontal #daily-rewards-button .daily-rewards-icon {
+    width: 44px;
+    height: 44px;
   }
   .micro-btn {
     width: 34px;
@@ -3443,8 +4395,8 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     cursor: nwse-resize;
     z-index: 3;
     opacity: 0.45;
@@ -5486,13 +6438,98 @@
     display: none !important;
   }
 
+  /* ---------- Steam wishlist reminder ---------- */
+  /* One permanently visible ask, never a takeover. src/ui/steam_wishlist.ts owns
+     the store URL and the policy for who must never see it; the reminder repeats
+     on every surface that already carries Donate (homepage header and footer in
+     shell.css, this in-game rail, and the mobile More tray).
+     What keeps it quiet, and what to preserve if this is ever restyled:
+       - it wears the chrome of the rail it sits in, never Steam's blue as a fill,
+         and never the gold call-to-action fill this HUD reserves for rewards;
+       - it takes quiet silver ink, so the fixed dark plate stays AA-readable
+         even when the surrounding theme switches to light Parchment;
+       - its only motion is a single slow sheen that crosses the plate about once
+         every 14 seconds and spends the rest of the cycle parked off the left
+         edge, so it registers peripherally and never asks to be looked at.
+     Steam's own #66c0f4 arrives on hover and keyboard focus only, identifying the
+     destination the way each sibling link's brand colour already does. */
+  .community-link.steam-wishlist-chip {
+    position: relative;
+    width: auto;
+    gap: 7px;
+    padding: 0 11px;
+    overflow: hidden;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    /* The plate itself is fixed dark across themes, so the ink is fixed too.
+       Parchment's repaired themed token is dark brown for light panels and
+       fails here; this muted silver holds above 7:1 on both gradient stops. */
+    color: #b8bcc8;
+  }
+  .community-link.steam-wishlist-chip span {
+    display: inline;
+    line-height: 1;
+  }
+  .community-link.steam-wishlist-chip .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  /* The sheen: a narrow warm highlight swept across the plate once per cycle.
+     Ambient by definition, so it pauses at the low effects tier and under
+     reduced motion, and its duration rides --motion-scale like every other
+     ambient loop in this sheet. */
+  .community-link.steam-wishlist-chip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 36%,
+      rgb(255 238 190 / 22%) 50%,
+      transparent 64%
+    );
+    transform: translateX(-140%);
+    animation: steam-wishlist-sheen 14s linear infinite;
+    animation-duration: calc(14s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  @keyframes steam-wishlist-sheen {
+    0%,
+    88% {
+      transform: translateX(-140%);
+    }
+    100% {
+      transform: translateX(140%);
+    }
+  }
+  .community-link.steam-wishlist-chip:hover,
+  .community-link.steam-wishlist-chip:focus-visible {
+    color: #fff;
+    border-color: #66c0f4;
+  }
+  /* Two audiences never see the reminder: a player already inside the Steam
+     build of the desktop app (body.steam-build, stamped from the shell's own
+     answer by syncSteamWishlistVisibility), and the native store shells, which
+     drop outbound store links exactly as they already drop Donate above. This
+     lives in @layer components with !important so it also reaches the shell
+     surfaces in the later @layer shell (important declarations reverse layer
+     order), which is the same mechanism the body.native-app block above uses. */
+  body.steam-wishlist-pending .steam-wishlist,
+  body.native-app .steam-wishlist,
+  body.steam-build .steam-wishlist {
+    display: none !important;
+  }
+
   /* ---------- tooltip ---------- */
   #tooltip {
     position: absolute;
     display: none;
     z-index: 100;
     pointer-events: none;
-    max-width: 280px;
+    max-width: min(720px, calc(100vw - 16px));
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
@@ -7033,6 +8070,521 @@
     gap: var(--party-frame-spacing, 4px);
     zoom: var(--party-frame-scale, 1);
   }
+  .party-boss-guide-button {
+    width: 170px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 5px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.25px;
+    cursor: var(--cursor-point);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 7%, transparent);
+  }
+  .party-boss-guide-button:hover,
+  .party-boss-guide-button:focus-visible {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .party-boss-guide-button:focus-visible,
+  #raid-boss-guide-window .rbg-boss-tab:focus-visible,
+  #raid-boss-guide-window .rbg-segmented button:focus-visible,
+  #raid-boss-guide-window .rbg-model-load:focus-visible,
+  #raid-boss-guide-window .rbg-model-stage > canvas:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .party-boss-guide-button .ui-icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+  }
+  #raid-boss-guide-window {
+    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale, 1));
+    width: min(820px, calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 24px));
+    max-height: min(calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 24px), 760px);
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--gold) 54%, var(--color-rbg-frame-border-base));
+    background:
+      linear-gradient(135deg, var(--color-rbg-frame-flare), transparent 34%),
+      linear-gradient(180deg, var(--color-rbg-frame-start) 0%, var(--color-rbg-frame-end) 100%);
+  }
+  #raid-boss-guide-window .rbg-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  #raid-boss-guide-window .rbg-subtitle {
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-family: var(--body-font);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  #raid-boss-guide-window .rbg-shell {
+    display: grid;
+    grid-template-columns: 182px minmax(0, 1fr);
+    height: min(
+      calc(var(--app-vh, 100vh) * 0.7 / var(--window-scale, 1)),
+      calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 82px),
+      640px
+    );
+    min-height: 0;
+    max-height: min(
+      calc(var(--app-vh, 100vh) * 0.7 / var(--window-scale, 1)),
+      calc(var(--app-vh, 100vh) * 0.84 / var(--window-scale, 1) - 82px),
+      640px
+    );
+    margin: 10px -10px -10px;
+    border-top: 1px solid var(--color-rbg-divider);
+  }
+  #raid-boss-guide-window .rbg-boss-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 8px;
+    border-right: 1px solid var(--color-rbg-divider);
+    background:
+      linear-gradient(90deg, var(--color-rbg-nav-start), var(--color-rbg-nav-end)),
+      repeating-linear-gradient(0deg, transparent 0 19px, var(--color-rbg-nav-grid) 20px);
+  }
+  #raid-boss-guide-window .rbg-boss-tab {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-height: 58px;
+    padding: 5px;
+    border: 1px solid var(--color-rbg-tab-border);
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--color-rbg-tab-start), var(--color-rbg-tab-end));
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 10px;
+    line-height: 1.2;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #raid-boss-guide-window .rbg-boss-tab img {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-rbg-tab-border);
+    border-radius: 2px;
+    object-fit: contain;
+    padding: 2px;
+    background: radial-gradient(
+      circle,
+      var(--color-rbg-portrait-start),
+      var(--color-rbg-frame-end) 72%
+    );
+    filter: saturate(0.72) brightness(0.72);
+  }
+  #raid-boss-guide-window .rbg-boss-tab:hover,
+  #raid-boss-guide-window .rbg-boss-tab:focus-visible,
+  #raid-boss-guide-window .rbg-boss-tab.active {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  #raid-boss-guide-window .rbg-boss-tab.active {
+    background: linear-gradient(
+      90deg,
+      var(--color-rbg-tab-active-start),
+      var(--color-rbg-frame-start)
+    );
+    box-shadow:
+      inset 3px 0 0 var(--gold),
+      inset 0 0 18px var(--color-rbg-tab-active-glow);
+  }
+  #raid-boss-guide-window .rbg-boss-tab.active img {
+    border-color: var(--gold);
+    filter: none;
+  }
+  #raid-boss-guide-window .rbg-journal {
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    padding: 14px 16px 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  #raid-boss-guide-window .rbg-hero {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 18px;
+    align-items: stretch;
+    min-height: 190px;
+    padding: 8px;
+    border: 1px solid var(--color-rbg-hero-border);
+    background:
+      radial-gradient(circle at 13% 40%, var(--color-rbg-hero-flare), transparent 32%),
+      linear-gradient(100deg, var(--color-rbg-hero-start), var(--color-rbg-hero-end) 72%);
+    box-shadow: inset 0 0 24px var(--color-rbg-shadow-soft);
+  }
+  #raid-boss-guide-window .rbg-model-slot {
+    min-width: 0;
+    min-height: 190px;
+  }
+  #raid-boss-guide-window .rbg-model-viewer {
+    height: 100%;
+    min-height: 190px;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  #raid-boss-guide-window .rbg-model-stage {
+    position: relative;
+    min-height: 164px;
+    overflow: hidden;
+    border: 1px solid var(--color-rbg-model-border);
+    background: radial-gradient(
+      circle,
+      var(--color-rbg-model-start),
+      var(--color-rbg-model-end) 70%
+    );
+    box-shadow:
+      inset 0 0 22px var(--color-rbg-shadow),
+      0 0 12px var(--color-rbg-model-glow);
+  }
+  #raid-boss-guide-window .rbg-model-stage::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid var(--color-rbg-model-inset);
+    pointer-events: none;
+    z-index: 4;
+  }
+  #raid-boss-guide-window .rbg-model-poster {
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    object-fit: contain;
+    image-rendering: auto;
+    pointer-events: none;
+    z-index: 1;
+  }
+  #raid-boss-guide-window .rbg-model-stage > canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: grab;
+    touch-action: pan-y;
+    z-index: 2;
+  }
+  #raid-boss-guide-window .rbg-model-stage > canvas:active {
+    cursor: grabbing;
+  }
+  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-poster {
+    visibility: hidden;
+  }
+  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-stage > canvas {
+    opacity: 1;
+  }
+  #raid-boss-guide-window .rbg-model-load {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    min-width: 104px;
+    min-height: 34px;
+    display: none;
+    padding: 6px 10px;
+    border: 1px solid var(--color-rbg-button-border);
+    border-radius: 3px;
+    background: linear-gradient(var(--color-rbg-button-start), var(--color-rbg-button-end));
+    color: var(--color-rbg-button-text);
+    font-family: var(--title-font);
+    font-size: 10px;
+    cursor: var(--cursor-point);
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+  #raid-boss-guide-window
+    .rbg-model-viewer:is([data-state="idle"], [data-state="error"])
+    .rbg-model-load {
+    display: block;
+  }
+  #raid-boss-guide-window .rbg-model-load:hover,
+  #raid-boss-guide-window .rbg-model-load:focus-visible {
+    border-color: var(--gold);
+    color: var(--color-rbg-button-text-hover);
+  }
+  #raid-boss-guide-window .rbg-model-status {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 10px;
+    margin: 0;
+    color: var(--color-rbg-status-text);
+    font-size: 10px;
+    line-height: 1.35;
+    text-align: center;
+    text-shadow: 0 1px 3px var(--color-rbg-shadow);
+    z-index: 3;
+  }
+  #raid-boss-guide-window .rbg-model-hint {
+    min-height: 22px;
+    margin: 0;
+    padding: 5px 4px 0;
+    color: var(--color-text-muted);
+    font-size: 9px;
+    line-height: 1.25;
+    text-align: center;
+    visibility: hidden;
+  }
+  #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-hint {
+    visibility: visible;
+  }
+  #raid-boss-guide-window .rbg-overview {
+    padding: 8px 10px 6px 0;
+  }
+  #raid-boss-guide-window .rbg-overview h2 {
+    margin: 0 0 12px;
+    color: var(--color-rbg-heading);
+    font-family: var(--title-font);
+    font-size: 20px;
+    line-height: 1.15;
+    text-shadow: 0 2px 5px var(--color-rbg-shadow);
+  }
+  #raid-boss-guide-window .rbg-section-kicker,
+  #raid-boss-guide-window .rbg-section-title {
+    color: var(--color-rbg-kicker);
+    font-family: var(--title-font);
+    font-size: 10px;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+  }
+  #raid-boss-guide-window .rbg-overview p {
+    margin: 5px 0 0;
+    color: var(--color-text-light);
+    font-size: 12px;
+    line-height: 1.48;
+  }
+  #raid-boss-guide-window .rbg-difficulty {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    margin: 12px 0 14px;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 10px;
+  }
+  #raid-boss-guide-window .rbg-segmented {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid var(--color-rbg-segment-border);
+    border-radius: 4px;
+    background: var(--color-rbg-control-bg);
+  }
+  #raid-boss-guide-window .rbg-segmented button {
+    min-width: 72px;
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 10px;
+    cursor: var(--cursor-point);
+  }
+  #raid-boss-guide-window .rbg-segmented button:hover,
+  #raid-boss-guide-window .rbg-segmented button:focus-visible {
+    color: var(--color-text-light);
+  }
+  #raid-boss-guide-window .rbg-segmented button.active {
+    background: linear-gradient(
+      var(--color-rbg-segment-active-start),
+      var(--color-rbg-segment-active-end)
+    );
+    color: var(--color-rbg-segment-active-text);
+    box-shadow: inset 0 0 0 1px var(--color-rbg-segment-active-border);
+  }
+  #raid-boss-guide-window .rbg-section-title {
+    margin: 0 0 4px;
+    font-size: 12px;
+  }
+  #raid-boss-guide-window .rbg-phase {
+    margin-top: 14px;
+  }
+  #raid-boss-guide-window .rbg-phase > header {
+    display: grid;
+    grid-template-columns: 4px minmax(0, 1fr);
+    gap: 9px;
+    margin-bottom: 6px;
+    padding: 3px 1px;
+  }
+  #raid-boss-guide-window .rbg-phase-rule {
+    border-radius: 3px;
+    background: linear-gradient(var(--color-rbg-phase-start), var(--color-rbg-phase-end));
+    box-shadow: 0 0 8px var(--color-rbg-phase-glow);
+  }
+  #raid-boss-guide-window .rbg-phase h3 {
+    margin: 0;
+    color: var(--color-rbg-phase-title);
+    font-family: var(--title-font);
+    font-size: 13px;
+  }
+  #raid-boss-guide-window .rbg-phase header p {
+    margin: 3px 0 0;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  #raid-boss-guide-window .rbg-abilities {
+    display: grid;
+    gap: 4px;
+  }
+  #raid-boss-guide-window .rbg-ability {
+    border: 1px solid var(--color-rbg-ability-border);
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--color-rbg-ability-start), var(--color-rbg-tab-end));
+    box-shadow: inset 0 1px 0 var(--color-rbg-ability-inset);
+  }
+  #raid-boss-guide-window .rbg-ability.expanded {
+    border-color: var(--color-rbg-ability-expanded-border);
+    background: linear-gradient(
+      90deg,
+      var(--color-rbg-ability-expanded-start),
+      var(--color-rbg-tab-end)
+    );
+  }
+  #raid-boss-guide-window .rbg-ability-toggle {
+    width: 100%;
+    min-height: 56px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    padding: 4px 8px 4px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-light);
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #raid-boss-guide-window .rbg-ability-toggle > img {
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--color-rbg-icon-border);
+    border-radius: 3px;
+    background: var(--color-rbg-control-bg);
+    box-shadow: inset 0 0 5px var(--color-rbg-shadow);
+  }
+  #raid-boss-guide-window .rbg-ability-toggle:hover > img,
+  #raid-boss-guide-window .rbg-ability-toggle:focus-visible > img {
+    border-color: var(--gold);
+  }
+  #raid-boss-guide-window .rbg-ability-toggle:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  #raid-boss-guide-window .rbg-ability-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  #raid-boss-guide-window .rbg-expand-mark {
+    width: 13px;
+    color: var(--color-rbg-expand-mark);
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+  }
+  #raid-boss-guide-window .rbg-ability-name {
+    font-family: var(--title-font);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  #raid-boss-guide-window .rbg-badges,
+  #raid-boss-guide-window .rbg-role-badges,
+  #raid-boss-guide-window .rbg-flag-badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  #raid-boss-guide-window .rbg-badges {
+    gap: 7px;
+  }
+  #raid-boss-guide-window .rbg-badge {
+    width: 23px;
+    height: 23px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-rbg-badge-border);
+    border-radius: 50%;
+    background: var(--color-rbg-badge-bg);
+    color: var(--color-rbg-badge-text);
+  }
+  #raid-boss-guide-window .rbg-badge-role {
+    border: 0;
+    color: var(--color-rbg-role-icon);
+  }
+  #raid-boss-guide-window .rbg-badge-tank {
+    background: var(--color-rbg-role-tank-bg);
+  }
+  #raid-boss-guide-window .rbg-badge-healer {
+    background: var(--color-rbg-role-healer-bg);
+  }
+  #raid-boss-guide-window .rbg-badge-damage {
+    background: var(--color-rbg-role-damage-bg);
+  }
+  #raid-boss-guide-window .rbg-badge .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #raid-boss-guide-window .rbg-badge > span {
+    display: none;
+  }
+  #raid-boss-guide-window .rbg-badge-deadly {
+    border-color: var(--color-rbg-deadly-border);
+    color: var(--color-rbg-deadly-text);
+  }
+  #raid-boss-guide-window .rbg-badge-important,
+  #raid-boss-guide-window .rbg-badge-interruptible {
+    border-color: var(--color-rbg-important-border);
+    color: var(--color-rbg-important-text);
+  }
+  #raid-boss-guide-window .rbg-badge-cleansable {
+    border-color: var(--color-rbg-cleansable-border);
+    color: var(--color-rbg-cleansable-text);
+  }
+  #raid-boss-guide-window .rbg-ability-detail {
+    margin: 0 9px 9px 61px;
+    padding: 8px 10px;
+    border-left: 2px solid var(--color-rbg-detail-border);
+    background: var(--color-rbg-detail-bg);
+  }
+  #raid-boss-guide-window .rbg-ability-detail p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  #raid-boss-guide-window .rbg-ability-detail p + p {
+    margin-top: 7px;
+    color: var(--color-text-light);
+  }
+  @media (forced-colors: active) {
+    #raid-boss-guide-window .rbg-boss-tab.active,
+    #raid-boss-guide-window .rbg-ability.expanded,
+    #raid-boss-guide-window .rbg-segmented button.active {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
   #party-frames.below-target {
     /* Below the target frame's MEASURED bottom: party_below_target_painter.ts
        writes the author-space bottom of the target frame INCLUDING its
@@ -7288,7 +8840,13 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   .party-frame .bar {
-    height: 9px;
+    /* The hp/resource bars absorb a height drag the way the player and
+       target frames' --uf-bar-height does (partyFrameHeight is the ROW
+       height: the name line plus padding cost about 24px, the remainder
+       splits across the two bars, landing on the stock 9px at the stock
+       42px row). The raid presentation overrides this with its own
+       full-cell bar geometry. */
+    height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));
     margin-top: 2px;
   }
   .party-frame .bar.hp {
@@ -7416,7 +8974,7 @@
     border-color: var(--gold);
   }
   #party-frames.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: 4px;
     touch-action: none;
@@ -7752,6 +9310,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  /* Store decisions must clear the Armory inspector (z90), and async results
+     remain readable after the Store itself has closed. */
+  #prompt-stack.store-decision-active,
+  #prompt-stack.store-result-active {
+    z-index: 96;
   }
   .prompt {
     padding: 14px 18px;
@@ -8401,25 +9965,36 @@
    the twin proc arcs). Heating Up lights the LEFT half; Hot Streak completes
    the RIGHT, whitens the core and beats both wings once; the proc fading or
    being spent puts the fire out. Drag it (proc_overlay_drag) to park it. */
-#proc-overlay {
-  position: fixed;
-  left: 50%;
-  top: 42%;
-  translate: -50% -50%;
-  width: 300px;
-  height: 232px;
-  z-index: 30;
-  opacity: 0;
-  pointer-events: none;
-  /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);
+/* This whole tail of the file (through EOF) had fallen OUTSIDE @layer
+   components: nothing reopened the layer after the small #aura-overlays
+   block closed it below, so every rule from here on (proc-overlay, the
+   breath bar, and the full cross-hotbar/.xhb overlay family) was UNLAYERED
+   CSS. Per the Cascade Layers spec an unlayered rule always outranks a
+   layered one regardless of specificity or source order, so this silently
+   defeated hud.mobile.css's `body.mobile-touch .xhb { display: none; }`
+   guard (@layer hud-mobile is ordered after components, but that never
+   matters against unlayered CSS): a paired gamepad kept the cross-hotbar
+   overlay's face-diamond and arrange-chord hint drawn over the mobile
+   action ring's touch buttons instead of standing down. */
+@layer components {
+  #proc-overlay {
+    position: fixed;
+    left: 50%;
+    top: 42%;
+    translate: -50% -50%;
+    width: 300px;
+    height: 232px;
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);
      the lit rules below override it with a quick ON transition so the bird still
      lights crisply. Shared by the fire and the Chronomancy variants. */
-  transition: opacity 0.7s ease;
-}
+    transition: opacity 0.7s ease;
+  }
 
-/* Configurable Warrior proc frames. The cold controller owns placement and
+  /* Configurable Warrior proc frames. The cold controller owns placement and
    appearance vars; the hot painter only toggles .active. */
-@layer components {
   #aura-overlays {
     position: fixed;
     inset: 0 auto auto 0;
@@ -8674,1256 +10249,1261 @@
       transition: none;
     }
   }
-}
-/* The login preview: for a few seconds after entering the world the whole
+  /* The login preview: for a few seconds after entering the world the whole
    bird glows dimly, so the player can see where it lives and drag it BEFORE
    any proc lights it for real. Placed before the proc rules so a real proc
    arriving mid-preview wins the cascade. */
-#proc-overlay.preview {
-  opacity: 1;
-  pointer-events: auto;
-  cursor: grab;
-}
-#proc-overlay.preview .fire-embers {
-  opacity: 0.38;
-}
-#proc-overlay.heating,
-#proc-overlay.hot,
-#proc-overlay.combustion {
-  /* Lit but a touch translucent (owner: softer over the scene), shared with the
-     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak). */
-  opacity: 0.85;
-  /* Grabbable only while it burns; hidden it can never eat a click. */
-  pointer-events: auto;
-  cursor: grab;
-  /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
-  transition: opacity 0.2s ease;
-}
-#proc-overlay.dragging {
-  cursor: grabbing;
-}
-#proc-overlay .fire-bird {
-  position: absolute;
-  inset: 0;
-  user-select: none;
-}
-#proc-overlay .fire-bird::before,
-#proc-overlay .fire-bird::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 47%;
-  z-index: 2;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0;
-}
-#proc-overlay .fire-bird::before {
-  width: 76px;
-  border: 2px solid rgba(255, 190, 64, 0.92);
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(255, 238, 150, 0.92) 0deg 5deg,
-    transparent 5deg 22deg
-  );
-  mask: radial-gradient(circle, transparent 0 69%, #000 71% 100%);
-  filter: drop-shadow(0 0 6px rgba(255, 95, 24, 0.9));
-}
-#proc-overlay .fire-bird::after {
-  width: 100px;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.98) 0,
-    rgba(255, 225, 112, 0.78) 15%,
-    rgba(255, 83, 24, 0.3) 43%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-}
-#proc-overlay .fire-part {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity 0.7s ease;
-}
-#proc-overlay .fire-embers {
-  filter: saturate(0.72) brightness(0.42) contrast(1.14)
-    drop-shadow(0 0 8px rgba(180, 40, 16, 0.48));
-}
-#proc-overlay .fire-left {
-  clip-path: polygon(0 0, 50.5% 0, 50.5% 100%, 0 100%);
-}
-#proc-overlay .fire-right {
-  clip-path: polygon(49.5% 0, 100% 0, 100% 100%, 49.5% 100%);
-}
-#proc-overlay .fire-core {
-  clip-path: polygon(43% 0, 57% 0, 60% 100%, 40% 100%);
-}
-/* Heating Up shows the complete creature as a low ember silhouette. */
-#proc-overlay.heating .fire-embers {
-  opacity: 0.48;
-  transition: opacity 0.2s ease;
-}
-/* Combustion keeps a restrained flame silhouette alive between streaks. It must
-   not look identical to Hot Streak: full colour always means the free cast is
-   actually ready, while the dim state only communicates the cooldown window. */
-#proc-overlay.combustion .fire-embers {
-  opacity: 0.58;
-  filter: saturate(0.9) brightness(0.62) contrast(1.12)
-    drop-shadow(0 0 10px rgba(220, 58, 18, 0.58));
-}
-#proc-overlay.combustion .fire-left,
-#proc-overlay.combustion .fire-right {
-  opacity: 0.3;
-  transition: opacity 0.2s ease;
-}
-#proc-overlay.combustion .fire-core {
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
-}
-/* Hot Streak alone ignites the complete creature. During Combustion it overrides
-   the restrained baseline, then falls back to that baseline when spent. */
-#proc-overlay.hot .fire-left,
-#proc-overlay.hot .fire-right,
-#proc-overlay.hot .fire-core {
-  opacity: 1;
-  transition: opacity 0.2s ease;
-}
-#proc-overlay.hot .fire-embers {
-  opacity: 0.2;
-}
-#proc-overlay.hot:not(.combustion) .fire-left,
-#proc-overlay.combustion.combustion-enter .fire-left {
-  transform-origin: 52% 54%;
-  animation: fire-left-wing-beat 0.72s ease-out 1;
-}
-#proc-overlay.hot:not(.combustion) .fire-right,
-#proc-overlay.combustion.combustion-enter .fire-right {
-  transform-origin: 48% 54%;
-  animation: fire-right-wing-beat 0.72s ease-out 1;
-}
-#proc-overlay.hot:not(.combustion) .fire-bird::before,
-#proc-overlay.combustion.combustion-enter .fire-bird::before {
-  animation: fire-ring-burst 0.78s ease-out 1;
-}
-#proc-overlay.hot .fire-bird::after,
-#proc-overlay.combustion.combustion-enter .fire-bird::after {
-  animation: fire-core-flash 0.62s ease-out 1;
-}
-@keyframes fire-left-wing-beat {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  38% {
-    transform: rotate(-7deg) translateY(-2px);
-  }
-}
-@keyframes fire-right-wing-beat {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  38% {
-    transform: rotate(7deg) translateY(-2px);
-  }
-}
-@keyframes fire-ring-burst {
-  0% {
-    opacity: 0;
-    scale: 0.4;
-    rotate: -18deg;
-  }
-  24% {
-    opacity: 0.92;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.58;
-    rotate: 16deg;
-  }
-}
-@keyframes fire-core-flash {
-  0% {
-    opacity: 0;
-    scale: 0.28;
-  }
-  22% {
+  #proc-overlay.preview {
     opacity: 1;
-    scale: 0.72;
+    pointer-events: auto;
+    cursor: grab;
   }
-  100% {
-    opacity: 0;
-    scale: 1.25;
+  #proc-overlay.preview .fire-embers {
+    opacity: 0.38;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  #proc-overlay .fire-part,
+  #proc-overlay.heating,
+  #proc-overlay.hot,
+  #proc-overlay.combustion {
+    /* Lit but a touch translucent (owner: softer over the scene), shared with the
+     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak). */
+    opacity: 0.85;
+    /* Grabbable only while it burns; hidden it can never eat a click. */
+    pointer-events: auto;
+    cursor: grab;
+    /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
+    transition: opacity 0.2s ease;
+  }
+  #proc-overlay.dragging {
+    cursor: grabbing;
+  }
+  #proc-overlay .fire-bird {
+    position: absolute;
+    inset: 0;
+    user-select: none;
+  }
   #proc-overlay .fire-bird::before,
   #proc-overlay .fire-bird::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    z-index: 2;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  #proc-overlay .fire-bird::before {
+    width: 76px;
+    border: 2px solid rgba(255, 190, 64, 0.92);
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 238, 150, 0.92) 0deg 5deg,
+      transparent 5deg 22deg
+    );
+    mask: radial-gradient(circle, transparent 0 69%, #000 71% 100%);
+    filter: drop-shadow(0 0 6px rgba(255, 95, 24, 0.9));
+  }
+  #proc-overlay .fire-bird::after {
+    width: 100px;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.98) 0,
+      rgba(255, 225, 112, 0.78) 15%,
+      rgba(255, 83, 24, 0.3) 43%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+  }
+  #proc-overlay .fire-part {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  #proc-overlay .fire-embers {
+    filter: saturate(0.72) brightness(0.42) contrast(1.14)
+      drop-shadow(0 0 8px rgba(180, 40, 16, 0.48));
+  }
+  #proc-overlay .fire-left {
+    clip-path: polygon(0 0, 50.5% 0, 50.5% 100%, 0 100%);
+  }
+  #proc-overlay .fire-right {
+    clip-path: polygon(49.5% 0, 100% 0, 100% 100%, 49.5% 100%);
+  }
+  #proc-overlay .fire-core {
+    clip-path: polygon(43% 0, 57% 0, 60% 100%, 40% 100%);
+  }
+  /* Heating Up shows the complete creature as a low ember silhouette. */
+  #proc-overlay.heating .fire-embers {
+    opacity: 0.48;
+    transition: opacity 0.2s ease;
+  }
+  /* Combustion keeps a restrained flame silhouette alive between streaks. It must
+   not look identical to Hot Streak: full colour always means the free cast is
+   actually ready, while the dim state only communicates the cooldown window. */
+  #proc-overlay.combustion .fire-embers {
+    opacity: 0.58;
+    filter: saturate(0.9) brightness(0.62) contrast(1.12)
+      drop-shadow(0 0 10px rgba(220, 58, 18, 0.58));
+  }
+  #proc-overlay.combustion .fire-left,
+  #proc-overlay.combustion .fire-right {
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+  }
+  #proc-overlay.combustion .fire-core {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+  /* Hot Streak alone ignites the complete creature. During Combustion it overrides
+   the restrained baseline, then falls back to that baseline when spent. */
+  #proc-overlay.hot .fire-left,
+  #proc-overlay.hot .fire-right,
+  #proc-overlay.hot .fire-core {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+  #proc-overlay.hot .fire-embers {
+    opacity: 0.2;
+  }
+  #proc-overlay.hot:not(.combustion) .fire-left,
+  #proc-overlay.combustion.combustion-enter .fire-left {
+    transform-origin: 52% 54%;
+    animation: fire-left-wing-beat 0.72s ease-out 1;
+  }
+  #proc-overlay.hot:not(.combustion) .fire-right,
+  #proc-overlay.combustion.combustion-enter .fire-right {
+    transform-origin: 48% 54%;
+    animation: fire-right-wing-beat 0.72s ease-out 1;
+  }
+  #proc-overlay.hot:not(.combustion) .fire-bird::before,
+  #proc-overlay.combustion.combustion-enter .fire-bird::before {
+    animation: fire-ring-burst 0.78s ease-out 1;
+  }
+  #proc-overlay.hot .fire-bird::after,
+  #proc-overlay.combustion.combustion-enter .fire-bird::after {
+    animation: fire-core-flash 0.62s ease-out 1;
+  }
+  @keyframes fire-left-wing-beat {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    38% {
+      transform: rotate(-7deg) translateY(-2px);
+    }
+  }
+  @keyframes fire-right-wing-beat {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    38% {
+      transform: rotate(7deg) translateY(-2px);
+    }
+  }
+  @keyframes fire-ring-burst {
+    0% {
+      opacity: 0;
+      scale: 0.4;
+      rotate: -18deg;
+    }
+    24% {
+      opacity: 0.92;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.58;
+      rotate: 16deg;
+    }
+  }
+  @keyframes fire-core-flash {
+    0% {
+      opacity: 0;
+      scale: 0.28;
+    }
+    22% {
+      opacity: 1;
+      scale: 0.72;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.25;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #proc-overlay .fire-part,
+    #proc-overlay .fire-bird::before,
+    #proc-overlay .fire-bird::after {
+      animation: none !important;
+    }
+  }
+  body.reduce-motion #proc-overlay .fire-part,
+  body.reduce-motion #proc-overlay .fire-bird::before,
+  body.reduce-motion #proc-overlay .fire-bird::after {
     animation: none !important;
   }
-}
-body.reduce-motion #proc-overlay .fire-part,
-body.reduce-motion #proc-overlay .fire-bird::before,
-body.reduce-motion #proc-overlay .fire-bird::after {
-  animation: none !important;
-}
 
-/* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
-/* One painted transparent phoenix is layered four times and clipped into readable
+  /* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
+  /* One painted transparent phoenix is layered four times and clipped into readable
    charge stages: left wing/tail, right wing/tail, body, then the full temporal
    flare. Reusing one asset keeps the silhouette perfectly aligned at every stage. */
-#proc-overlay .chrono-bird {
-  display: none;
-  position: absolute;
-  inset: 0;
-  user-select: none;
-}
-#proc-overlay.chrono .fire-bird {
-  display: none;
-}
-#proc-overlay.chrono .chrono-bird {
-  display: block;
-}
-#proc-overlay.chrono .chrono-bird::before,
-#proc-overlay.chrono .chrono-bird::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0;
-}
-/* A compact clock face blooms from the phoenix's chest at 4/4. The segmented
-   conic edge reads as temporal runes without putting a large disc over combat. */
-#proc-overlay.chrono .chrono-bird::before {
-  left: 50%;
-  top: 47%;
-  width: 72px;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border: 2px solid rgba(216, 180, 254, 0.92);
-  border-radius: 50%;
-  background: repeating-conic-gradient(
-    from -3deg,
-    rgba(103, 232, 249, 0.9) 0deg 3deg,
-    transparent 3deg 18deg
-  );
-  mask: radial-gradient(circle, transparent 0 68%, #000 70% 100%);
-  filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9));
-}
-/* The white core flash stays local to the chest instead of washing the screen. */
-#proc-overlay.chrono .chrono-bird::after {
-  left: 50%;
-  top: 47%;
-  width: 96px;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.98) 0,
-    rgba(216, 180, 254, 0.72) 16%,
-    rgba(103, 232, 249, 0.24) 42%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-}
-#proc-overlay.chrono .chrono-part {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity 0.7s ease;
-}
-/* Keep each wing's long tail feather with it while reserving the chest and head
-   for charge three. The slight overlap avoids a visible seam during the fade. */
-#proc-overlay.chrono .chrono-left {
-  clip-path: polygon(0 0, 47% 0, 47% 32%, 43% 62%, 49% 100%, 0 100%);
-}
-#proc-overlay.chrono .chrono-right {
-  clip-path: polygon(53% 0, 100% 0, 100% 100%, 51% 100%, 57% 62%, 53% 32%);
-}
-#proc-overlay.chrono .chrono-core {
-  clip-path: polygon(43% 0, 57% 0, 59% 100%, 41% 100%);
-}
-#proc-overlay.chrono .chrono-final {
-  mix-blend-mode: screen;
-  filter: saturate(1.18) brightness(1.2) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8))
-    drop-shadow(0 0 24px rgba(103, 232, 249, 0.62));
-}
-/* Visible and grabbable once any charge is held (a touch translucent, matching
-   the fire bird's .heating/.hot opacity). */
-#proc-overlay.chrono.c1 {
-  opacity: 0.85;
-  pointer-events: auto;
-  cursor: grab;
-}
-/* Reveal order: left wing, right wing, central bird, final temporal flare. */
-#proc-overlay.chrono.c1 .chrono-left,
-#proc-overlay.chrono.c2 .chrono-right,
-#proc-overlay.chrono.c3 .chrono-core {
-  opacity: 1;
-  transition: opacity 0.22s ease;
-}
-#proc-overlay.chrono.c4 .chrono-final {
-  opacity: 0.28;
-  transition: opacity 0.16s ease;
-}
-#proc-overlay.chrono.c4 .chrono-left {
-  transform-origin: 52% 54%;
-  animation: chrono-left-wing-beat 0.72s ease-out 1;
-}
-#proc-overlay.chrono.c4 .chrono-right {
-  transform-origin: 48% 54%;
-  animation: chrono-right-wing-beat 0.72s ease-out 1;
-}
-#proc-overlay.chrono.c4 .chrono-bird::before {
-  animation: chrono-clock-burst 0.82s ease-out 1;
-}
-#proc-overlay.chrono.c4 .chrono-bird::after {
-  animation: chrono-core-flash 0.68s ease-out 1;
-}
-@keyframes chrono-left-wing-beat {
-  0%,
-  100% {
-    transform: rotate(0deg);
+  #proc-overlay .chrono-bird {
+    display: none;
+    position: absolute;
+    inset: 0;
+    user-select: none;
   }
-  38% {
-    transform: rotate(-7deg) translateY(-2px);
+  #proc-overlay.chrono .fire-bird {
+    display: none;
   }
-}
-@keyframes chrono-right-wing-beat {
-  0%,
-  100% {
-    transform: rotate(0deg);
+  #proc-overlay.chrono .chrono-bird {
+    display: block;
   }
-  38% {
-    transform: rotate(7deg) translateY(-2px);
-  }
-}
-@keyframes chrono-clock-burst {
-  0% {
-    opacity: 0;
-    scale: 0.45;
-    rotate: -25deg;
-  }
-  25% {
-    opacity: 0.95;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.55;
-    rotate: 18deg;
-  }
-}
-@keyframes chrono-core-flash {
-  0% {
-    opacity: 0;
-    scale: 0.25;
-  }
-  22% {
-    opacity: 1;
-    scale: 0.72;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.3;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  #proc-overlay.chrono .chrono-final,
-  #proc-overlay.chrono .chrono-left,
-  #proc-overlay.chrono .chrono-right,
   #proc-overlay.chrono .chrono-bird::before,
   #proc-overlay.chrono .chrono-bird::after {
-    animation: none !important;
+    content: "";
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
   }
-}
-body.reduce-motion #proc-overlay.chrono .chrono-final,
-body.reduce-motion #proc-overlay.chrono .chrono-left,
-body.reduce-motion #proc-overlay.chrono .chrono-right,
-body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
-body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
-  animation: none !important;
-}
-
-/* ---- Destruction variant: the Ruin ritual bank ------------------------- */
-/* Five forged seals rise in a shallow crown around a broken ritual ring. The
-   bank remains readable at zero and ignites one rune for each held Ruin. */
-#proc-overlay .ruin-ritual {
-  display: none;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 270px;
-  height: 112px;
-  translate: -50% -50%;
-  user-select: none;
-}
-#proc-overlay.destruction {
-  opacity: 0.76;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-#proc-overlay.destruction.r1 {
-  opacity: 0.94;
-}
-#proc-overlay.destruction.r5 {
-  opacity: 1;
-}
-#proc-overlay.destruction .fire-bird,
-#proc-overlay.destruction .chrono-bird,
-#proc-overlay.destruction .frost-bird,
-#proc-overlay.destruction .necromancy-bank {
-  display: none;
-}
-#proc-overlay.destruction .ruin-ritual {
-  display: block;
-}
-#proc-overlay.destruction .ruin-ritual,
-#proc-overlay.destruction .ruin-mark {
-  pointer-events: auto;
-  cursor: grab;
-}
-#proc-overlay.destruction.dragging .ruin-ritual,
-#proc-overlay.destruction.dragging .ruin-mark {
-  cursor: grabbing;
-}
-#proc-overlay.destruction .ruin-ritual::before,
-#proc-overlay.destruction .ruin-ritual::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-#proc-overlay.destruction .ruin-ritual::before {
-  inset: 22px -6px 0;
-  z-index: 0;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse,
-    var(--color-ruin-ritual-aura) 0,
-    var(--color-ruin-ritual-shadow) 36%,
-    transparent 72%
-  );
-  filter: blur(8px);
-}
-#proc-overlay.destruction .ruin-ritual::after {
-  inset: -20px -28px;
-  z-index: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 14% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
-    radial-gradient(circle at 32% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
-    radial-gradient(circle at 50% 5%, var(--color-ruin-full-flare) 0 3px, transparent 7px),
-    radial-gradient(circle at 68% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
-    radial-gradient(circle at 86% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
-    radial-gradient(ellipse, var(--color-ruin-ritual-aura) 0, transparent 68%);
-  mix-blend-mode: screen;
-  opacity: 0;
-}
-#proc-overlay.destruction.r5 .ruin-ritual::after {
-  opacity: 1;
-  animation: ruin-bank-full-flare 1.65s ease-in-out infinite;
-}
-#proc-overlay.destruction .ruin-ring {
-  position: absolute;
-  left: 15px;
-  right: 15px;
-  top: 33px;
-  z-index: 2;
-  height: 70px;
-  border-top: 3px solid var(--color-ruin-empty-border);
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 4%, var(--color-ruin-ring-highlight), transparent 68%);
-  box-shadow:
-    inset 0 3px var(--color-ruin-ritual-shadow),
-    0 -1px var(--color-ruin-inner-shine);
-  opacity: 0.76;
-  pointer-events: auto;
-  cursor: grab;
-}
-#proc-overlay.destruction.r5 .ruin-ring {
-  border-top-color: var(--color-ruin-lit-border);
-  filter: drop-shadow(0 0 8px var(--color-ruin-glow));
-}
-#proc-overlay.destruction .ruin-mark {
-  --ruin-mark-angle: 0deg;
-  position: absolute;
-  z-index: 3;
-  width: 43px;
-  height: 50px;
-  translate: -50% -50%;
-  rotate: var(--ruin-mark-angle);
-  scale: 0.86;
-  clip-path: polygon(50% 0, 91% 19%, 100% 67%, 72% 100%, 28% 100%, 0 67%, 9% 19%);
-  background: var(--color-ruin-empty-border);
-  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow));
-  opacity: 0.7;
-  transition:
-    opacity 0.18s ease,
-    scale 0.22s ease,
-    filter 0.22s ease;
-}
-#proc-overlay.destruction .ruin-mark::before,
-#proc-overlay.destruction .ruin-mark::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-#proc-overlay.destruction .ruin-mark::before {
-  inset: 3px;
-  clip-path: inherit;
-  background: linear-gradient(145deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
-  box-shadow: inset 4px 3px 6px var(--color-ruin-ritual-shadow);
-}
-#proc-overlay.destruction .ruin-mark::after {
-  inset: 10px 12px 9px;
-  clip-path: polygon(50% 0, 78% 30%, 62% 46%, 88% 100%, 50% 72%, 12% 100%, 38% 46%, 22% 30%);
-  background: var(--color-ruin-rune-dim);
-  filter: drop-shadow(0 0 2px var(--color-ruin-empty-border));
-}
-#proc-overlay.destruction .ruin-mark-1 {
-  --ruin-mark-angle: -11deg;
-  left: 10%;
-  top: 66%;
-}
-#proc-overlay.destruction .ruin-mark-2 {
-  --ruin-mark-angle: -5deg;
-  left: 30%;
-  top: 45%;
-}
-#proc-overlay.destruction .ruin-mark-3 {
-  left: 50%;
-  top: 35%;
-}
-#proc-overlay.destruction .ruin-mark-4 {
-  --ruin-mark-angle: 5deg;
-  left: 70%;
-  top: 45%;
-}
-#proc-overlay.destruction .ruin-mark-5 {
-  --ruin-mark-angle: 11deg;
-  left: 90%;
-  top: 66%;
-}
-#proc-overlay.destruction.r1 .ruin-mark-1,
-#proc-overlay.destruction.r2 .ruin-mark-2,
-#proc-overlay.destruction.r3 .ruin-mark-3,
-#proc-overlay.destruction.r4 .ruin-mark-4,
-#proc-overlay.destruction.r5 .ruin-mark-5 {
-  scale: 1;
-  opacity: 1;
-  background: var(--color-ruin-lit-border);
-  filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow))
-    drop-shadow(0 0 9px var(--color-ruin-glow));
-  animation: ruin-mark-ignite 0.28s ease-out;
-}
-#proc-overlay.destruction.r1 .ruin-mark-1::before,
-#proc-overlay.destruction.r2 .ruin-mark-2::before,
-#proc-overlay.destruction.r3 .ruin-mark-3::before,
-#proc-overlay.destruction.r4 .ruin-mark-4::before,
-#proc-overlay.destruction.r5 .ruin-mark-5::before {
-  background: radial-gradient(
-    circle at 42% 30%,
-    var(--color-ruin-lit-core),
-    var(--color-ruin-lit-mid) 42%,
-    var(--color-ruin-lit-edge) 82%
-  );
-  box-shadow: inset 0 0 7px var(--color-ruin-inner-shine);
-}
-#proc-overlay.destruction.r1 .ruin-mark-1::after,
-#proc-overlay.destruction.r2 .ruin-mark-2::after,
-#proc-overlay.destruction.r3 .ruin-mark-3::after,
-#proc-overlay.destruction.r4 .ruin-mark-4::after,
-#proc-overlay.destruction.r5 .ruin-mark-5::after {
-  background: var(--color-ruin-lit-core);
-  filter: drop-shadow(0 0 4px var(--color-ruin-lit-core));
-}
-@keyframes ruin-mark-ignite {
-  0% {
-    scale: 0.72;
-    filter: brightness(2.2) drop-shadow(0 0 18px var(--color-ruin-lit-core));
+  /* A compact clock face blooms from the phoenix's chest at 4/4. The segmented
+   conic edge reads as temporal runes without putting a large disc over combat. */
+  #proc-overlay.chrono .chrono-bird::before {
+    left: 50%;
+    top: 47%;
+    width: 72px;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border: 2px solid rgba(216, 180, 254, 0.92);
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      from -3deg,
+      rgba(103, 232, 249, 0.9) 0deg 3deg,
+      transparent 3deg 18deg
+    );
+    mask: radial-gradient(circle, transparent 0 68%, #000 70% 100%);
+    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9));
   }
-  100% {
-    scale: 1;
+  /* The white core flash stays local to the chest instead of washing the screen. */
+  #proc-overlay.chrono .chrono-bird::after {
+    left: 50%;
+    top: 47%;
+    width: 96px;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.98) 0,
+      rgba(216, 180, 254, 0.72) 16%,
+      rgba(103, 232, 249, 0.24) 42%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
   }
-}
-@keyframes ruin-bank-full-flare {
-  0%,
-  100% {
-    opacity: 0.5;
-    scale: 0.96;
+  #proc-overlay.chrono .chrono-part {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.7s ease;
   }
-  50% {
+  /* Keep each wing's long tail feather with it while reserving the chest and head
+   for charge three. The slight overlap avoids a visible seam during the fade. */
+  #proc-overlay.chrono .chrono-left {
+    clip-path: polygon(0 0, 47% 0, 47% 32%, 43% 62%, 49% 100%, 0 100%);
+  }
+  #proc-overlay.chrono .chrono-right {
+    clip-path: polygon(53% 0, 100% 0, 100% 100%, 51% 100%, 57% 62%, 53% 32%);
+  }
+  #proc-overlay.chrono .chrono-core {
+    clip-path: polygon(43% 0, 57% 0, 59% 100%, 41% 100%);
+  }
+  #proc-overlay.chrono .chrono-final {
+    mix-blend-mode: screen;
+    filter: saturate(1.18) brightness(1.2) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8))
+      drop-shadow(0 0 24px rgba(103, 232, 249, 0.62));
+  }
+  /* Visible and grabbable once any charge is held (a touch translucent, matching
+   the fire bird's .heating/.hot opacity). */
+  #proc-overlay.chrono.c1 {
+    opacity: 0.85;
+    pointer-events: auto;
+    cursor: grab;
+  }
+  /* Reveal order: left wing, right wing, central bird, final temporal flare. */
+  #proc-overlay.chrono.c1 .chrono-left,
+  #proc-overlay.chrono.c2 .chrono-right,
+  #proc-overlay.chrono.c3 .chrono-core {
     opacity: 1;
-    scale: 1.04;
+    transition: opacity 0.22s ease;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  #proc-overlay.destruction,
-  #proc-overlay.destruction .ruin-ring,
-  #proc-overlay.destruction .ruin-mark,
-  #proc-overlay.destruction.r5 .ruin-ritual::after {
+  #proc-overlay.chrono.c4 .chrono-final {
+    opacity: 0.28;
+    transition: opacity 0.16s ease;
+  }
+  #proc-overlay.chrono.c4 .chrono-left {
+    transform-origin: 52% 54%;
+    animation: chrono-left-wing-beat 0.72s ease-out 1;
+  }
+  #proc-overlay.chrono.c4 .chrono-right {
+    transform-origin: 48% 54%;
+    animation: chrono-right-wing-beat 0.72s ease-out 1;
+  }
+  #proc-overlay.chrono.c4 .chrono-bird::before {
+    animation: chrono-clock-burst 0.82s ease-out 1;
+  }
+  #proc-overlay.chrono.c4 .chrono-bird::after {
+    animation: chrono-core-flash 0.68s ease-out 1;
+  }
+  @keyframes chrono-left-wing-beat {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    38% {
+      transform: rotate(-7deg) translateY(-2px);
+    }
+  }
+  @keyframes chrono-right-wing-beat {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    38% {
+      transform: rotate(7deg) translateY(-2px);
+    }
+  }
+  @keyframes chrono-clock-burst {
+    0% {
+      opacity: 0;
+      scale: 0.45;
+      rotate: -25deg;
+    }
+    25% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.55;
+      rotate: 18deg;
+    }
+  }
+  @keyframes chrono-core-flash {
+    0% {
+      opacity: 0;
+      scale: 0.25;
+    }
+    22% {
+      opacity: 1;
+      scale: 0.72;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.3;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #proc-overlay.chrono .chrono-final,
+    #proc-overlay.chrono .chrono-left,
+    #proc-overlay.chrono .chrono-right,
+    #proc-overlay.chrono .chrono-bird::before,
+    #proc-overlay.chrono .chrono-bird::after {
+      animation: none !important;
+    }
+  }
+  body.reduce-motion #proc-overlay.chrono .chrono-final,
+  body.reduce-motion #proc-overlay.chrono .chrono-left,
+  body.reduce-motion #proc-overlay.chrono .chrono-right,
+  body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
+  body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
     animation: none !important;
-    transition: none !important;
   }
-}
-body.reduce-motion #proc-overlay.destruction,
-body.reduce-motion #proc-overlay.destruction .ruin-ring,
-body.reduce-motion #proc-overlay.destruction .ruin-mark,
-body.reduce-motion #proc-overlay.destruction.r5 .ruin-ritual::after {
-  animation: none !important;
-  transition: none !important;
-}
-@media (forced-colors: active) {
+
+  /* ---- Destruction variant: the Ruin ritual bank ------------------------- */
+  /* Five forged seals rise in a shallow crown around a broken ritual ring. The
+   bank remains readable at zero and ignites one rune for each held Ruin. */
+  #proc-overlay .ruin-ritual {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 270px;
+    height: 112px;
+    translate: -50% -50%;
+    user-select: none;
+  }
+  #proc-overlay.destruction {
+    opacity: 0.76;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  #proc-overlay.destruction.r1 {
+    opacity: 0.94;
+  }
+  #proc-overlay.destruction.r5 {
+    opacity: 1;
+  }
+  #proc-overlay.destruction .fire-bird,
+  #proc-overlay.destruction .chrono-bird,
+  #proc-overlay.destruction .frost-bird,
+  #proc-overlay.destruction .necromancy-bank {
+    display: none;
+  }
+  #proc-overlay.destruction .ruin-ritual {
+    display: block;
+  }
+  #proc-overlay.destruction .ruin-ritual,
+  #proc-overlay.destruction .ruin-mark {
+    pointer-events: auto;
+    cursor: grab;
+  }
+  #proc-overlay.destruction.dragging .ruin-ritual,
+  #proc-overlay.destruction.dragging .ruin-mark {
+    cursor: grabbing;
+  }
+  #proc-overlay.destruction .ruin-ritual::before,
+  #proc-overlay.destruction .ruin-ritual::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  #proc-overlay.destruction .ruin-ritual::before {
+    inset: 22px -6px 0;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      var(--color-ruin-ritual-aura) 0,
+      var(--color-ruin-ritual-shadow) 36%,
+      transparent 72%
+    );
+    filter: blur(8px);
+  }
+  #proc-overlay.destruction .ruin-ritual::after {
+    inset: -20px -28px;
+    z-index: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 14% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+      radial-gradient(circle at 32% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+      radial-gradient(circle at 50% 5%, var(--color-ruin-full-flare) 0 3px, transparent 7px),
+      radial-gradient(circle at 68% 18%, var(--color-ruin-glow) 0 2px, transparent 6px),
+      radial-gradient(circle at 86% 58%, var(--color-ruin-full-flare) 0 2px, transparent 5px),
+      radial-gradient(ellipse, var(--color-ruin-ritual-aura) 0, transparent 68%);
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+  #proc-overlay.destruction.r5 .ruin-ritual::after {
+    opacity: 1;
+    animation: ruin-bank-full-flare 1.65s ease-in-out infinite;
+  }
   #proc-overlay.destruction .ruin-ring {
-    border-top-color: CanvasText;
-    background: Canvas;
-    box-shadow: none;
-    filter: none;
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    top: 33px;
+    z-index: 2;
+    height: 70px;
+    border-top: 3px solid var(--color-ruin-empty-border);
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at 50% 4%,
+      var(--color-ruin-ring-highlight),
+      transparent 68%
+    );
+    box-shadow:
+      inset 0 3px var(--color-ruin-ritual-shadow),
+      0 -1px var(--color-ruin-inner-shine);
+    opacity: 0.76;
+    pointer-events: auto;
+    cursor: grab;
+  }
+  #proc-overlay.destruction.r5 .ruin-ring {
+    border-top-color: var(--color-ruin-lit-border);
+    filter: drop-shadow(0 0 8px var(--color-ruin-glow));
   }
   #proc-overlay.destruction .ruin-mark {
-    background: GrayText;
-    filter: none;
+    --ruin-mark-angle: 0deg;
+    position: absolute;
+    z-index: 3;
+    width: 43px;
+    height: 50px;
+    translate: -50% -50%;
+    rotate: var(--ruin-mark-angle);
+    scale: 0.86;
+    clip-path: polygon(50% 0, 91% 19%, 100% 67%, 72% 100%, 28% 100%, 0 67%, 9% 19%);
+    background: var(--color-ruin-empty-border);
+    filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow));
+    opacity: 0.7;
+    transition:
+      opacity 0.18s ease,
+      scale 0.22s ease,
+      filter 0.22s ease;
+  }
+  #proc-overlay.destruction .ruin-mark::before,
+  #proc-overlay.destruction .ruin-mark::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
   }
   #proc-overlay.destruction .ruin-mark::before {
-    background: Canvas;
-    box-shadow: none;
+    inset: 3px;
+    clip-path: inherit;
+    background: linear-gradient(145deg, var(--color-ruin-empty-start), var(--color-ruin-empty-end));
+    box-shadow: inset 4px 3px 6px var(--color-ruin-ritual-shadow);
+  }
+  #proc-overlay.destruction .ruin-mark::after {
+    inset: 10px 12px 9px;
+    clip-path: polygon(50% 0, 78% 30%, 62% 46%, 88% 100%, 50% 72%, 12% 100%, 38% 46%, 22% 30%);
+    background: var(--color-ruin-rune-dim);
+    filter: drop-shadow(0 0 2px var(--color-ruin-empty-border));
+  }
+  #proc-overlay.destruction .ruin-mark-1 {
+    --ruin-mark-angle: -11deg;
+    left: 10%;
+    top: 66%;
+  }
+  #proc-overlay.destruction .ruin-mark-2 {
+    --ruin-mark-angle: -5deg;
+    left: 30%;
+    top: 45%;
+  }
+  #proc-overlay.destruction .ruin-mark-3 {
+    left: 50%;
+    top: 35%;
+  }
+  #proc-overlay.destruction .ruin-mark-4 {
+    --ruin-mark-angle: 5deg;
+    left: 70%;
+    top: 45%;
+  }
+  #proc-overlay.destruction .ruin-mark-5 {
+    --ruin-mark-angle: 11deg;
+    left: 90%;
+    top: 66%;
   }
   #proc-overlay.destruction.r1 .ruin-mark-1,
   #proc-overlay.destruction.r2 .ruin-mark-2,
   #proc-overlay.destruction.r3 .ruin-mark-3,
   #proc-overlay.destruction.r4 .ruin-mark-4,
   #proc-overlay.destruction.r5 .ruin-mark-5 {
-    background: Highlight;
-    filter: none;
+    scale: 1;
+    opacity: 1;
+    background: var(--color-ruin-lit-border);
+    filter: drop-shadow(0 3px 3px var(--color-ruin-ritual-shadow))
+      drop-shadow(0 0 9px var(--color-ruin-glow));
+    animation: ruin-mark-ignite 0.28s ease-out;
   }
   #proc-overlay.destruction.r1 .ruin-mark-1::before,
   #proc-overlay.destruction.r2 .ruin-mark-2::before,
   #proc-overlay.destruction.r3 .ruin-mark-3::before,
   #proc-overlay.destruction.r4 .ruin-mark-4::before,
   #proc-overlay.destruction.r5 .ruin-mark-5::before {
-    background: Highlight;
+    background: radial-gradient(
+      circle at 42% 30%,
+      var(--color-ruin-lit-core),
+      var(--color-ruin-lit-mid) 42%,
+      var(--color-ruin-lit-edge) 82%
+    );
+    box-shadow: inset 0 0 7px var(--color-ruin-inner-shine);
   }
-}
+  #proc-overlay.destruction.r1 .ruin-mark-1::after,
+  #proc-overlay.destruction.r2 .ruin-mark-2::after,
+  #proc-overlay.destruction.r3 .ruin-mark-3::after,
+  #proc-overlay.destruction.r4 .ruin-mark-4::after,
+  #proc-overlay.destruction.r5 .ruin-mark-5::after {
+    background: var(--color-ruin-lit-core);
+    filter: drop-shadow(0 0 4px var(--color-ruin-lit-core));
+  }
+  @keyframes ruin-mark-ignite {
+    0% {
+      scale: 0.72;
+      filter: brightness(2.2) drop-shadow(0 0 18px var(--color-ruin-lit-core));
+    }
+    100% {
+      scale: 1;
+    }
+  }
+  @keyframes ruin-bank-full-flare {
+    0%,
+    100% {
+      opacity: 0.5;
+      scale: 0.96;
+    }
+    50% {
+      opacity: 1;
+      scale: 1.04;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #proc-overlay.destruction,
+    #proc-overlay.destruction .ruin-ring,
+    #proc-overlay.destruction .ruin-mark,
+    #proc-overlay.destruction.r5 .ruin-ritual::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  body.reduce-motion #proc-overlay.destruction,
+  body.reduce-motion #proc-overlay.destruction .ruin-ring,
+  body.reduce-motion #proc-overlay.destruction .ruin-mark,
+  body.reduce-motion #proc-overlay.destruction.r5 .ruin-ritual::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  @media (forced-colors: active) {
+    #proc-overlay.destruction .ruin-ring {
+      border-top-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      filter: none;
+    }
+    #proc-overlay.destruction .ruin-mark {
+      background: GrayText;
+      filter: none;
+    }
+    #proc-overlay.destruction .ruin-mark::before {
+      background: Canvas;
+      box-shadow: none;
+    }
+    #proc-overlay.destruction.r1 .ruin-mark-1,
+    #proc-overlay.destruction.r2 .ruin-mark-2,
+    #proc-overlay.destruction.r3 .ruin-mark-3,
+    #proc-overlay.destruction.r4 .ruin-mark-4,
+    #proc-overlay.destruction.r5 .ruin-mark-5 {
+      background: Highlight;
+      filter: none;
+    }
+    #proc-overlay.destruction.r1 .ruin-mark-1::before,
+    #proc-overlay.destruction.r2 .ruin-mark-2::before,
+    #proc-overlay.destruction.r3 .ruin-mark-3::before,
+    #proc-overlay.destruction.r4 .ruin-mark-4::before,
+    #proc-overlay.destruction.r5 .ruin-mark-5::before {
+      background: Highlight;
+    }
+  }
 
-/* ---- Necromancy variant: the Soul Fragment bank ------------------------ */
-/* Five jagged soul shards sit on a horizontal runed rail. The empty bank stays
+  /* ---- Necromancy variant: the Soul Fragment bank ------------------------ */
+  /* Five jagged soul shards sit on a horizontal runed rail. The empty bank stays
    visible so Necromancers always see and can place their primary resource. */
-#proc-overlay .necromancy-bank {
-  display: none;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 250px;
-  height: 86px;
-  translate: -50% -50%;
-  user-select: none;
-}
-#proc-overlay.necromancy {
-  opacity: 0.72;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-#proc-overlay.necromancy.n1 {
-  opacity: 0.96;
-}
-#proc-overlay.necromancy.n5 {
-  opacity: 1;
-}
-#proc-overlay.necromancy .fire-bird,
-#proc-overlay.necromancy .chrono-bird,
-#proc-overlay.necromancy .frost-bird {
-  display: none;
-}
-#proc-overlay.necromancy .necromancy-bank {
-  display: block;
-}
-#proc-overlay.necromancy .necromancy-bank::before,
-#proc-overlay.necromancy .necromancy-bank::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-#proc-overlay.necromancy .necromancy-bank::before {
-  inset: 13px -8px 8px;
-  z-index: 0;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse,
-    rgba(76, 29, 149, 0.3) 0,
-    rgba(46, 16, 101, 0.16) 38%,
-    transparent 72%
-  );
-  filter: blur(7px);
-}
-#proc-overlay.necromancy .necromancy-bank::after {
-  inset: -26px -20px;
-  z-index: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 10% 54%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
-    radial-gradient(circle at 28% 22%, rgba(168, 85, 247, 0.58) 0 2px, transparent 5px),
-    radial-gradient(circle at 50% 70%, rgba(233, 213, 255, 0.68) 0 2px, transparent 5px),
-    radial-gradient(circle at 72% 18%, rgba(168, 85, 247, 0.62) 0 2px, transparent 5px),
-    radial-gradient(circle at 90% 57%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
-    radial-gradient(ellipse, rgba(147, 51, 234, 0.45) 0, transparent 66%);
-  mix-blend-mode: screen;
-  filter: blur(1px);
-  opacity: 0;
-}
-#proc-overlay.necromancy.n5 .necromancy-bank::after {
-  opacity: 0.9;
-  animation: soul-bank-full-flare 1.8s ease-in-out infinite;
-}
-#proc-overlay.necromancy .soul-rail,
-#proc-overlay.necromancy .soul-crystal {
-  pointer-events: auto;
-  cursor: grab;
-}
-#proc-overlay.necromancy.dragging .soul-rail,
-#proc-overlay.necromancy.dragging .soul-crystal {
-  cursor: grabbing;
-}
-#proc-overlay.necromancy .soul-rail {
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  top: 50%;
-  z-index: 2;
-  height: 25px;
-  translate: 0 -50%;
-  border-top: 1px solid rgba(192, 132, 252, 0.54);
-  border-bottom: 1px solid rgba(46, 16, 101, 0.9);
-  clip-path: polygon(0 50%, 6% 4%, 94% 4%, 100% 50%, 94% 96%, 6% 96%);
-  background:
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 17px,
-      rgba(192, 132, 252, 0.22) 18px 20px,
-      transparent 21px 38px
-    ),
-    linear-gradient(rgba(46, 16, 101, 0.88), rgba(17, 7, 38, 0.96) 48%, rgba(3, 1, 9, 0.98));
-  box-shadow:
-    inset 0 1px rgba(233, 213, 255, 0.2),
-    inset 0 -5px 8px rgba(0, 0, 0, 0.72);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 5px rgba(88, 28, 135, 0.5));
-  opacity: 0.86;
-  transition:
-    opacity 0.2s ease,
-    filter 0.2s ease;
-}
-#proc-overlay.necromancy.n5 .soul-rail {
-  border-top-color: rgba(233, 213, 255, 0.9);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 12px rgba(147, 51, 234, 0.92));
-}
-#proc-overlay.necromancy .soul-crystal {
-  --soul-crystal-angle: 0deg;
-  position: absolute;
-  top: 50%;
-  z-index: 3;
-  width: 34px;
-  height: 58px;
-  translate: -50% -50%;
-  rotate: var(--soul-crystal-angle);
-  scale: 0.82;
-  opacity: 0.46;
-  clip-path: polygon(
-    48% 0,
-    82% 13%,
-    96% 39%,
-    76% 68%,
-    61% 100%,
-    43% 84%,
-    22% 98%,
-    28% 67%,
-    4% 41%,
-    19% 15%
-  );
-  background:
-    linear-gradient(146deg, rgba(216, 180, 254, 0.36) 0 16%, transparent 17% 100%),
-    linear-gradient(34deg, transparent 0 46%, rgba(192, 132, 252, 0.26) 48% 51%, transparent 53%),
-    linear-gradient(
-      112deg,
-      rgba(76, 29, 149, 0.96) 0 21%,
-      rgba(107, 33, 168, 0.9) 38%,
-      rgba(46, 16, 101, 0.96) 69%,
-      rgba(9, 3, 22, 0.98) 100%
-    );
-  box-shadow:
-    inset 5px 0 10px rgba(216, 180, 254, 0.18),
-    inset -5px -5px 10px rgba(9, 3, 22, 0.72);
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 4px rgba(88, 28, 135, 0.72));
-  transition:
-    opacity 0.18s ease,
-    scale 0.2s ease,
-    filter 0.2s ease;
-}
-#proc-overlay.necromancy .soul-crystal::before {
-  content: "";
-  position: absolute;
-  inset: 7px 8px 9px 10px;
-  clip-path: polygon(50% 0, 100% 30%, 64% 48%, 90% 100%, 42% 72%, 0 100%, 22% 43%, 0 25%);
-  background:
-    linear-gradient(64deg, transparent 0 45%, rgba(243, 232, 255, 0.72) 48% 52%, transparent 55%),
-    linear-gradient(rgba(216, 180, 254, 0.62), transparent 72%);
-  opacity: 0.28;
-}
-#proc-overlay.necromancy .soul-crystal::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  width: 22px;
-  height: 38px;
-  translate: -50% -50%;
-  border-radius: 52% 48% 44% 56%;
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 255, 255, 0.98) 0,
-    rgba(233, 213, 255, 0.9) 18%,
-    rgba(168, 85, 247, 0.5) 46%,
-    transparent 74%
-  );
-  mix-blend-mode: screen;
-  opacity: 0;
-  filter: blur(1px);
-}
-#proc-overlay.necromancy .soul-crystal-1 {
-  --soul-crystal-angle: -5deg;
-  left: 12%;
-  top: 50%;
-}
-#proc-overlay.necromancy .soul-crystal-2 {
-  --soul-crystal-angle: 3deg;
-  left: 31%;
-  top: 50%;
-}
-#proc-overlay.necromancy .soul-crystal-3 {
-  --soul-crystal-angle: -2deg;
-  left: 50%;
-  top: 50%;
-}
-#proc-overlay.necromancy .soul-crystal-4 {
-  --soul-crystal-angle: 4deg;
-  left: 69%;
-  top: 50%;
-}
-#proc-overlay.necromancy .soul-crystal-5 {
-  --soul-crystal-angle: -3deg;
-  left: 88%;
-  top: 50%;
-}
-#proc-overlay.necromancy.n1 .soul-crystal-1,
-#proc-overlay.necromancy.n2 .soul-crystal-2,
-#proc-overlay.necromancy.n3 .soul-crystal-3,
-#proc-overlay.necromancy.n4 .soul-crystal-4,
-#proc-overlay.necromancy.n5 .soul-crystal-5 {
-  opacity: 1;
-  scale: 1;
-  background:
-    linear-gradient(146deg, rgba(255, 255, 255, 0.92) 0 15%, transparent 17% 100%),
-    linear-gradient(34deg, transparent 0 46%, rgba(243, 232, 255, 0.82) 48% 51%, transparent 53%),
-    linear-gradient(
-      112deg,
-      rgba(243, 232, 255, 0.98) 0 14%,
-      rgba(192, 132, 252, 0.98) 32%,
-      rgba(126, 34, 206, 0.98) 66%,
-      rgba(46, 16, 101, 1) 100%
-    );
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 6px rgba(233, 213, 255, 0.94))
-    drop-shadow(0 0 15px rgba(147, 51, 234, 0.9));
-  animation: soul-crystal-ignite 0.34s ease-out 1;
-}
-#proc-overlay.necromancy.n1 .soul-crystal-1::after,
-#proc-overlay.necromancy.n2 .soul-crystal-2::after,
-#proc-overlay.necromancy.n3 .soul-crystal-3::after,
-#proc-overlay.necromancy.n4 .soul-crystal-4::after,
-#proc-overlay.necromancy.n5 .soul-crystal-5::after {
-  opacity: 0.9;
-}
-#proc-overlay.necromancy.n5 .soul-crystal {
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.98))
-    drop-shadow(0 0 22px rgba(168, 85, 247, 1));
-}
-@keyframes soul-crystal-ignite {
-  0% {
-    opacity: 0.28;
-    scale: 0.62;
+  #proc-overlay .necromancy-bank {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 250px;
+    height: 86px;
+    translate: -50% -50%;
+    user-select: none;
   }
-  62% {
+  #proc-overlay.necromancy {
+    opacity: 0.72;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  #proc-overlay.necromancy.n1 {
+    opacity: 0.96;
+  }
+  #proc-overlay.necromancy.n5 {
     opacity: 1;
-    scale: 1.14;
   }
-  100% {
+  #proc-overlay.necromancy .fire-bird,
+  #proc-overlay.necromancy .chrono-bird,
+  #proc-overlay.necromancy .frost-bird {
+    display: none;
+  }
+  #proc-overlay.necromancy .necromancy-bank {
+    display: block;
+  }
+  #proc-overlay.necromancy .necromancy-bank::before,
+  #proc-overlay.necromancy .necromancy-bank::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+  #proc-overlay.necromancy .necromancy-bank::before {
+    inset: 13px -8px 8px;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      rgba(76, 29, 149, 0.3) 0,
+      rgba(46, 16, 101, 0.16) 38%,
+      transparent 72%
+    );
+    filter: blur(7px);
+  }
+  #proc-overlay.necromancy .necromancy-bank::after {
+    inset: -26px -20px;
+    z-index: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 10% 54%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+      radial-gradient(circle at 28% 22%, rgba(168, 85, 247, 0.58) 0 2px, transparent 5px),
+      radial-gradient(circle at 50% 70%, rgba(233, 213, 255, 0.68) 0 2px, transparent 5px),
+      radial-gradient(circle at 72% 18%, rgba(168, 85, 247, 0.62) 0 2px, transparent 5px),
+      radial-gradient(circle at 90% 57%, rgba(216, 180, 254, 0.72) 0 2px, transparent 4px),
+      radial-gradient(ellipse, rgba(147, 51, 234, 0.45) 0, transparent 66%);
+    mix-blend-mode: screen;
+    filter: blur(1px);
+    opacity: 0;
+  }
+  #proc-overlay.necromancy.n5 .necromancy-bank::after {
+    opacity: 0.9;
+    animation: soul-bank-full-flare 1.8s ease-in-out infinite;
+  }
+  #proc-overlay.necromancy .soul-rail,
+  #proc-overlay.necromancy .soul-crystal {
+    pointer-events: auto;
+    cursor: grab;
+  }
+  #proc-overlay.necromancy.dragging .soul-rail,
+  #proc-overlay.necromancy.dragging .soul-crystal {
+    cursor: grabbing;
+  }
+  #proc-overlay.necromancy .soul-rail {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 50%;
+    z-index: 2;
+    height: 25px;
+    translate: 0 -50%;
+    border-top: 1px solid rgba(192, 132, 252, 0.54);
+    border-bottom: 1px solid rgba(46, 16, 101, 0.9);
+    clip-path: polygon(0 50%, 6% 4%, 94% 4%, 100% 50%, 94% 96%, 6% 96%);
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent 0 17px,
+        rgba(192, 132, 252, 0.22) 18px 20px,
+        transparent 21px 38px
+      ),
+      linear-gradient(rgba(46, 16, 101, 0.88), rgba(17, 7, 38, 0.96) 48%, rgba(3, 1, 9, 0.98));
+    box-shadow:
+      inset 0 1px rgba(233, 213, 255, 0.2),
+      inset 0 -5px 8px rgba(0, 0, 0, 0.72);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82)) drop-shadow(0 0 5px rgba(88, 28, 135, 0.5));
+    opacity: 0.86;
+    transition:
+      opacity 0.2s ease,
+      filter 0.2s ease;
+  }
+  #proc-overlay.necromancy.n5 .soul-rail {
+    border-top-color: rgba(233, 213, 255, 0.9);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.82))
+      drop-shadow(0 0 12px rgba(147, 51, 234, 0.92));
+  }
+  #proc-overlay.necromancy .soul-crystal {
+    --soul-crystal-angle: 0deg;
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    width: 34px;
+    height: 58px;
+    translate: -50% -50%;
+    rotate: var(--soul-crystal-angle);
+    scale: 0.82;
+    opacity: 0.46;
+    clip-path: polygon(
+      48% 0,
+      82% 13%,
+      96% 39%,
+      76% 68%,
+      61% 100%,
+      43% 84%,
+      22% 98%,
+      28% 67%,
+      4% 41%,
+      19% 15%
+    );
+    background:
+      linear-gradient(146deg, rgba(216, 180, 254, 0.36) 0 16%, transparent 17% 100%),
+      linear-gradient(34deg, transparent 0 46%, rgba(192, 132, 252, 0.26) 48% 51%, transparent 53%),
+      linear-gradient(
+        112deg,
+        rgba(76, 29, 149, 0.96) 0 21%,
+        rgba(107, 33, 168, 0.9) 38%,
+        rgba(46, 16, 101, 0.96) 69%,
+        rgba(9, 3, 22, 0.98) 100%
+      );
+    box-shadow:
+      inset 5px 0 10px rgba(216, 180, 254, 0.18),
+      inset -5px -5px 10px rgba(9, 3, 22, 0.72);
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84)) drop-shadow(0 0 4px rgba(88, 28, 135, 0.72));
+    transition:
+      opacity 0.18s ease,
+      scale 0.2s ease,
+      filter 0.2s ease;
+  }
+  #proc-overlay.necromancy .soul-crystal::before {
+    content: "";
+    position: absolute;
+    inset: 7px 8px 9px 10px;
+    clip-path: polygon(50% 0, 100% 30%, 64% 48%, 90% 100%, 42% 72%, 0 100%, 22% 43%, 0 25%);
+    background:
+      linear-gradient(64deg, transparent 0 45%, rgba(243, 232, 255, 0.72) 48% 52%, transparent 55%),
+      linear-gradient(rgba(216, 180, 254, 0.62), transparent 72%);
+    opacity: 0.28;
+  }
+  #proc-overlay.necromancy .soul-crystal::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    width: 22px;
+    height: 38px;
+    translate: -50% -50%;
+    border-radius: 52% 48% 44% 56%;
+    background: radial-gradient(
+      ellipse,
+      rgba(255, 255, 255, 0.98) 0,
+      rgba(233, 213, 255, 0.9) 18%,
+      rgba(168, 85, 247, 0.5) 46%,
+      transparent 74%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    filter: blur(1px);
+  }
+  #proc-overlay.necromancy .soul-crystal-1 {
+    --soul-crystal-angle: -5deg;
+    left: 12%;
+    top: 50%;
+  }
+  #proc-overlay.necromancy .soul-crystal-2 {
+    --soul-crystal-angle: 3deg;
+    left: 31%;
+    top: 50%;
+  }
+  #proc-overlay.necromancy .soul-crystal-3 {
+    --soul-crystal-angle: -2deg;
+    left: 50%;
+    top: 50%;
+  }
+  #proc-overlay.necromancy .soul-crystal-4 {
+    --soul-crystal-angle: 4deg;
+    left: 69%;
+    top: 50%;
+  }
+  #proc-overlay.necromancy .soul-crystal-5 {
+    --soul-crystal-angle: -3deg;
+    left: 88%;
+    top: 50%;
+  }
+  #proc-overlay.necromancy.n1 .soul-crystal-1,
+  #proc-overlay.necromancy.n2 .soul-crystal-2,
+  #proc-overlay.necromancy.n3 .soul-crystal-3,
+  #proc-overlay.necromancy.n4 .soul-crystal-4,
+  #proc-overlay.necromancy.n5 .soul-crystal-5 {
     opacity: 1;
     scale: 1;
+    background:
+      linear-gradient(146deg, rgba(255, 255, 255, 0.92) 0 15%, transparent 17% 100%),
+      linear-gradient(34deg, transparent 0 46%, rgba(243, 232, 255, 0.82) 48% 51%, transparent 53%),
+      linear-gradient(
+        112deg,
+        rgba(243, 232, 255, 0.98) 0 14%,
+        rgba(192, 132, 252, 0.98) 32%,
+        rgba(126, 34, 206, 0.98) 66%,
+        rgba(46, 16, 101, 1) 100%
+      );
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84))
+      drop-shadow(0 0 6px rgba(233, 213, 255, 0.94)) drop-shadow(0 0 15px rgba(147, 51, 234, 0.9));
+    animation: soul-crystal-ignite 0.34s ease-out 1;
   }
-}
-#proc-overlay.necromancy.n5 .soul-crystal::after {
-  opacity: 1;
-  filter: blur(0);
-}
-@keyframes soul-bank-full-flare {
-  0% {
-    opacity: 0.55;
-    scale: 0.94;
-  }
-  50% {
+  #proc-overlay.necromancy.n1 .soul-crystal-1::after,
+  #proc-overlay.necromancy.n2 .soul-crystal-2::after,
+  #proc-overlay.necromancy.n3 .soul-crystal-3::after,
+  #proc-overlay.necromancy.n4 .soul-crystal-4::after,
+  #proc-overlay.necromancy.n5 .soul-crystal-5::after {
     opacity: 0.9;
-    scale: 1.04;
   }
-  100% {
-    opacity: 0.55;
-    scale: 0.94;
+  #proc-overlay.necromancy.n5 .soul-crystal {
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.84))
+      drop-shadow(0 0 9px rgba(255, 255, 255, 0.98)) drop-shadow(0 0 22px rgba(168, 85, 247, 1));
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  #proc-overlay.necromancy .soul-crystal,
-  #proc-overlay.necromancy .necromancy-bank::after {
+  @keyframes soul-crystal-ignite {
+    0% {
+      opacity: 0.28;
+      scale: 0.62;
+    }
+    62% {
+      opacity: 1;
+      scale: 1.14;
+    }
+    100% {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  #proc-overlay.necromancy.n5 .soul-crystal::after {
+    opacity: 1;
+    filter: blur(0);
+  }
+  @keyframes soul-bank-full-flare {
+    0% {
+      opacity: 0.55;
+      scale: 0.94;
+    }
+    50% {
+      opacity: 0.9;
+      scale: 1.04;
+    }
+    100% {
+      opacity: 0.55;
+      scale: 0.94;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #proc-overlay.necromancy .soul-crystal,
+    #proc-overlay.necromancy .necromancy-bank::after {
+      animation: none !important;
+    }
+  }
+  body.reduce-motion #proc-overlay.necromancy .soul-crystal,
+  body.reduce-motion #proc-overlay.necromancy .necromancy-bank::after {
     animation: none !important;
   }
-}
-body.reduce-motion #proc-overlay.necromancy .soul-crystal,
-body.reduce-motion #proc-overlay.necromancy .necromancy-bank::after {
-  animation: none !important;
-}
 
-/* ---- Frost spec variant: the Glacial Spike Icicle bank ------------------ */
-/* The complete frozen phoenix is visible from the first Icicle. Additional
+  /* ---- Frost spec variant: the Glacial Spike Icicle bank ------------------ */
+  /* The complete frozen phoenix is visible from the first Icicle. Additional
    Icicles glaze the same silhouette with brighter layers, and the fifth locks
    it with a sharp crystal crown. */
-#proc-overlay .frost-bird {
-  display: none;
-  position: absolute;
-  inset: 0;
-  user-select: none;
-}
-#proc-overlay.frost {
-  transition: opacity 0.18s ease;
-}
-#proc-overlay.frost .fire-bird,
-#proc-overlay.frost .chrono-bird {
-  display: none;
-}
-#proc-overlay.frost .frost-bird {
-  display: block;
-}
-#proc-overlay.frost .frost-crystal {
-  --frost-crystal-angle: 0deg;
-  position: absolute;
-  z-index: 3;
-  width: 25px;
-  height: 50px;
-  translate: -50% -50%;
-  rotate: var(--frost-crystal-angle);
-  scale: 0.42;
-  opacity: 0;
-  pointer-events: none;
-  clip-path: polygon(50% 0, 100% 48%, 70% 100%, 30% 100%, 0 48%);
-  background: linear-gradient(
-    112deg,
-    rgba(240, 249, 255, 0.98) 0 18%,
-    rgba(125, 211, 252, 0.94) 38%,
-    rgba(14, 165, 233, 0.82) 72%,
-    rgba(30, 64, 175, 0.74) 100%
-  );
-  filter: drop-shadow(0 0 4px rgba(224, 247, 255, 0.98))
-    drop-shadow(0 0 11px rgba(14, 165, 233, 0.9));
-  transition:
-    opacity 0.12s ease,
-    scale 0.2s ease;
-}
-#proc-overlay.frost .frost-crystal-1 {
-  left: 50%;
-  top: 84%;
-}
-#proc-overlay.frost .frost-crystal-2 {
-  --frost-crystal-angle: -48deg;
-  left: 19%;
-  top: 65%;
-}
-#proc-overlay.frost .frost-crystal-3 {
-  --frost-crystal-angle: 48deg;
-  left: 81%;
-  top: 65%;
-}
-#proc-overlay.frost .frost-crystal-4 {
-  --frost-crystal-angle: -22deg;
-  left: 28%;
-  top: 27%;
-}
-#proc-overlay.frost .frost-crystal-5 {
-  --frost-crystal-angle: 22deg;
-  left: 72%;
-  top: 27%;
-}
-#proc-overlay.frost.f1 .frost-crystal-1,
-#proc-overlay.frost.f2 .frost-crystal-2,
-#proc-overlay.frost.f3 .frost-crystal-3,
-#proc-overlay.frost.f4 .frost-crystal-4,
-#proc-overlay.frost.f5 .frost-crystal-5 {
-  opacity: 0.94;
-  scale: 1;
-  animation: frost-crystal-ignite 0.3s ease-out 1;
-}
-#proc-overlay.frost.f5 .frost-crystal {
-  animation: frost-crown-lock 0.56s ease-out 1;
-}
-#proc-overlay.frost.f1 {
-  opacity: 0.88;
-  pointer-events: auto;
-  cursor: grab;
-}
-#proc-overlay.frost .frost-part {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  filter: saturate(1.08) brightness(0.96) drop-shadow(0 0 7px rgba(56, 189, 248, 0.5));
-  transition: opacity 0.2s ease;
-}
-/* Every layer keeps the complete silhouette. Their different intensity makes
+  #proc-overlay .frost-bird {
+    display: none;
+    position: absolute;
+    inset: 0;
+    user-select: none;
+  }
+  #proc-overlay.frost {
+    transition: opacity 0.18s ease;
+  }
+  #proc-overlay.frost .fire-bird,
+  #proc-overlay.frost .chrono-bird {
+    display: none;
+  }
+  #proc-overlay.frost .frost-bird {
+    display: block;
+  }
+  #proc-overlay.frost .frost-crystal {
+    --frost-crystal-angle: 0deg;
+    position: absolute;
+    z-index: 3;
+    width: 25px;
+    height: 50px;
+    translate: -50% -50%;
+    rotate: var(--frost-crystal-angle);
+    scale: 0.42;
+    opacity: 0;
+    pointer-events: none;
+    clip-path: polygon(50% 0, 100% 48%, 70% 100%, 30% 100%, 0 48%);
+    background: linear-gradient(
+      112deg,
+      rgba(240, 249, 255, 0.98) 0 18%,
+      rgba(125, 211, 252, 0.94) 38%,
+      rgba(14, 165, 233, 0.82) 72%,
+      rgba(30, 64, 175, 0.74) 100%
+    );
+    filter: drop-shadow(0 0 4px rgba(224, 247, 255, 0.98))
+      drop-shadow(0 0 11px rgba(14, 165, 233, 0.9));
+    transition:
+      opacity 0.12s ease,
+      scale 0.2s ease;
+  }
+  #proc-overlay.frost .frost-crystal-1 {
+    left: 50%;
+    top: 84%;
+  }
+  #proc-overlay.frost .frost-crystal-2 {
+    --frost-crystal-angle: -48deg;
+    left: 19%;
+    top: 65%;
+  }
+  #proc-overlay.frost .frost-crystal-3 {
+    --frost-crystal-angle: 48deg;
+    left: 81%;
+    top: 65%;
+  }
+  #proc-overlay.frost .frost-crystal-4 {
+    --frost-crystal-angle: -22deg;
+    left: 28%;
+    top: 27%;
+  }
+  #proc-overlay.frost .frost-crystal-5 {
+    --frost-crystal-angle: 22deg;
+    left: 72%;
+    top: 27%;
+  }
+  #proc-overlay.frost.f1 .frost-crystal-1,
+  #proc-overlay.frost.f2 .frost-crystal-2,
+  #proc-overlay.frost.f3 .frost-crystal-3,
+  #proc-overlay.frost.f4 .frost-crystal-4,
+  #proc-overlay.frost.f5 .frost-crystal-5 {
+    opacity: 0.94;
+    scale: 1;
+    animation: frost-crystal-ignite 0.3s ease-out 1;
+  }
+  #proc-overlay.frost.f5 .frost-crystal {
+    animation: frost-crown-lock 0.56s ease-out 1;
+  }
+  #proc-overlay.frost.f1 {
+    opacity: 0.88;
+    pointer-events: auto;
+    cursor: grab;
+  }
+  #proc-overlay.frost .frost-part {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    filter: saturate(1.08) brightness(0.96) drop-shadow(0 0 7px rgba(56, 189, 248, 0.5));
+    transition: opacity 0.2s ease;
+  }
+  /* Every layer keeps the complete silhouette. Their different intensity makes
    the bank grow without cutting the phoenix into separate body parts. */
-#proc-overlay.frost .frost-tail {
-  filter: saturate(0.9) brightness(0.82) drop-shadow(0 0 5px rgba(56, 189, 248, 0.42));
-}
-#proc-overlay.frost .frost-left {
-  mix-blend-mode: screen;
-  filter: saturate(1.02) brightness(1.02) drop-shadow(0 0 7px rgba(56, 189, 248, 0.46));
-}
-#proc-overlay.frost .frost-right {
-  mix-blend-mode: screen;
-  filter: saturate(0.94) brightness(1.08) drop-shadow(0 0 9px rgba(125, 211, 252, 0.5));
-}
-#proc-overlay.frost .frost-core {
-  mix-blend-mode: screen;
-  filter: saturate(0.86) brightness(1.16) drop-shadow(0 0 11px rgba(186, 230, 253, 0.58));
-}
-#proc-overlay.frost .frost-ready {
-  mix-blend-mode: screen;
-  filter: saturate(0.82) brightness(1.34) drop-shadow(0 0 10px rgba(224, 247, 255, 0.9))
-    drop-shadow(0 0 24px rgba(14, 165, 233, 0.72));
-}
-#proc-overlay.frost.f1 .frost-tail {
-  opacity: 0.52;
-}
-#proc-overlay.frost.f2 .frost-left {
-  opacity: 0.2;
-}
-#proc-overlay.frost.f3 .frost-right {
-  opacity: 0.18;
-}
-#proc-overlay.frost.f4 .frost-core {
-  opacity: 0.2;
-}
-#proc-overlay.frost.f5 .frost-ready {
-  opacity: 0.34;
-  transform-origin: 50% 49%;
-  animation: frost-ready-snap 0.58s ease-out 1;
-}
-/* The ready burst is deliberately angular, never a circular clock or arcane
-   rune. It reads as a crown of ice shards around the chest. */
-#proc-overlay.frost .frost-bird::before,
-#proc-overlay.frost .frost-bird::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 49%;
-  z-index: 2;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  pointer-events: none;
-  opacity: 0;
-}
-#proc-overlay.frost .frost-bird::before {
-  width: 112px;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.94),
-    rgba(125, 211, 252, 0.62) 24%,
-    transparent 64%
-  );
-  clip-path: polygon(
-    50% 0,
-    58% 34%,
-    96% 18%,
-    68% 47%,
-    100% 69%,
-    61% 61%,
-    50% 100%,
-    39% 61%,
-    0 73%,
-    32% 48%,
-    3% 20%,
-    42% 34%
-  );
-  filter: drop-shadow(0 0 7px rgba(186, 230, 253, 0.95));
-}
-#proc-overlay.frost .frost-bird::after {
-  width: 58px;
-  rotate: 45deg;
-  border: 2px solid rgba(240, 249, 255, 0.96);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(56, 189, 248, 0.2));
-  box-shadow: 0 0 18px rgba(125, 211, 252, 0.85);
-}
-#proc-overlay.frost.f5 .frost-bird::before {
-  animation: frost-shard-burst 0.72s ease-out 1;
-}
-#proc-overlay.frost.f5 .frost-bird::after {
-  animation: frost-core-lock 0.62s ease-out 1;
-}
-@keyframes frost-ready-snap {
-  0% {
-    opacity: 0;
-    scale: 0.96;
+  #proc-overlay.frost .frost-tail {
+    filter: saturate(0.9) brightness(0.82) drop-shadow(0 0 5px rgba(56, 189, 248, 0.42));
   }
-  40% {
+  #proc-overlay.frost .frost-left {
+    mix-blend-mode: screen;
+    filter: saturate(1.02) brightness(1.02) drop-shadow(0 0 7px rgba(56, 189, 248, 0.46));
+  }
+  #proc-overlay.frost .frost-right {
+    mix-blend-mode: screen;
+    filter: saturate(0.94) brightness(1.08) drop-shadow(0 0 9px rgba(125, 211, 252, 0.5));
+  }
+  #proc-overlay.frost .frost-core {
+    mix-blend-mode: screen;
+    filter: saturate(0.86) brightness(1.16) drop-shadow(0 0 11px rgba(186, 230, 253, 0.58));
+  }
+  #proc-overlay.frost .frost-ready {
+    mix-blend-mode: screen;
+    filter: saturate(0.82) brightness(1.34) drop-shadow(0 0 10px rgba(224, 247, 255, 0.9))
+      drop-shadow(0 0 24px rgba(14, 165, 233, 0.72));
+  }
+  #proc-overlay.frost.f1 .frost-tail {
     opacity: 0.52;
-    scale: 1.025;
   }
-  100% {
+  #proc-overlay.frost.f2 .frost-left {
+    opacity: 0.2;
+  }
+  #proc-overlay.frost.f3 .frost-right {
+    opacity: 0.18;
+  }
+  #proc-overlay.frost.f4 .frost-core {
+    opacity: 0.2;
+  }
+  #proc-overlay.frost.f5 .frost-ready {
     opacity: 0.34;
-    scale: 1;
+    transform-origin: 50% 49%;
+    animation: frost-ready-snap 0.58s ease-out 1;
   }
-}
-@keyframes frost-crystal-ignite {
-  0% {
-    opacity: 0;
-    scale: 0.3;
-  }
-  58% {
-    opacity: 1;
-    scale: 1.24;
-  }
-  100% {
-    opacity: 0.94;
-    scale: 1;
-  }
-}
-@keyframes frost-crown-lock {
-  0%,
-  100% {
-    opacity: 0.94;
-    scale: 1;
-  }
-  42% {
-    opacity: 1;
-    scale: 1.3;
-    filter: drop-shadow(0 0 7px rgba(255, 255, 255, 1)) drop-shadow(0 0 20px rgba(56, 189, 248, 1));
-  }
-}
-@keyframes frost-shard-burst {
-  0% {
-    opacity: 0;
-    scale: 0.3;
-    rotate: -12deg;
-  }
-  28% {
-    opacity: 0.95;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.65;
-    rotate: 10deg;
-  }
-}
-@keyframes frost-core-lock {
-  0% {
-    opacity: 0;
-    scale: 0.18;
-  }
-  34% {
-    opacity: 0.92;
-    scale: 0.72;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.28;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  #proc-overlay.frost .frost-crystal,
-  #proc-overlay.frost .frost-ready,
+  /* The ready burst is deliberately angular, never a circular clock or arcane
+   rune. It reads as a crown of ice shards around the chest. */
   #proc-overlay.frost .frost-bird::before,
   #proc-overlay.frost .frost-bird::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 49%;
+    z-index: 2;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  #proc-overlay.frost .frost-bird::before {
+    width: 112px;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.94),
+      rgba(125, 211, 252, 0.62) 24%,
+      transparent 64%
+    );
+    clip-path: polygon(
+      50% 0,
+      58% 34%,
+      96% 18%,
+      68% 47%,
+      100% 69%,
+      61% 61%,
+      50% 100%,
+      39% 61%,
+      0 73%,
+      32% 48%,
+      3% 20%,
+      42% 34%
+    );
+    filter: drop-shadow(0 0 7px rgba(186, 230, 253, 0.95));
+  }
+  #proc-overlay.frost .frost-bird::after {
+    width: 58px;
+    rotate: 45deg;
+    border: 2px solid rgba(240, 249, 255, 0.96);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(56, 189, 248, 0.2));
+    box-shadow: 0 0 18px rgba(125, 211, 252, 0.85);
+  }
+  #proc-overlay.frost.f5 .frost-bird::before {
+    animation: frost-shard-burst 0.72s ease-out 1;
+  }
+  #proc-overlay.frost.f5 .frost-bird::after {
+    animation: frost-core-lock 0.62s ease-out 1;
+  }
+  @keyframes frost-ready-snap {
+    0% {
+      opacity: 0;
+      scale: 0.96;
+    }
+    40% {
+      opacity: 0.52;
+      scale: 1.025;
+    }
+    100% {
+      opacity: 0.34;
+      scale: 1;
+    }
+  }
+  @keyframes frost-crystal-ignite {
+    0% {
+      opacity: 0;
+      scale: 0.3;
+    }
+    58% {
+      opacity: 1;
+      scale: 1.24;
+    }
+    100% {
+      opacity: 0.94;
+      scale: 1;
+    }
+  }
+  @keyframes frost-crown-lock {
+    0%,
+    100% {
+      opacity: 0.94;
+      scale: 1;
+    }
+    42% {
+      opacity: 1;
+      scale: 1.3;
+      filter: drop-shadow(0 0 7px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 20px rgba(56, 189, 248, 1));
+    }
+  }
+  @keyframes frost-shard-burst {
+    0% {
+      opacity: 0;
+      scale: 0.3;
+      rotate: -12deg;
+    }
+    28% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.65;
+      rotate: 10deg;
+    }
+  }
+  @keyframes frost-core-lock {
+    0% {
+      opacity: 0;
+      scale: 0.18;
+    }
+    34% {
+      opacity: 0.92;
+      scale: 0.72;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.28;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #proc-overlay.frost .frost-crystal,
+    #proc-overlay.frost .frost-ready,
+    #proc-overlay.frost .frost-bird::before,
+    #proc-overlay.frost .frost-bird::after {
+      animation: none !important;
+    }
+  }
+  body.reduce-motion #proc-overlay.frost .frost-ready,
+  body.reduce-motion #proc-overlay.frost .frost-crystal,
+  body.reduce-motion #proc-overlay.frost .frost-bird::before,
+  body.reduce-motion #proc-overlay.frost .frost-bird::after {
     animation: none !important;
   }
-}
-body.reduce-motion #proc-overlay.frost .frost-ready,
-body.reduce-motion #proc-overlay.frost .frost-crystal,
-body.reduce-motion #proc-overlay.frost .frost-bird::before,
-body.reduce-motion #proc-overlay.frost .frost-bird::after {
-  animation: none !important;
-}
 
-/* WoW-style breath mirror bar (src/ui/breath_bar.ts): top-center, blue,
+  /* WoW-style breath mirror bar (src/ui/breath_bar.ts): top-center, blue,
    only present while the lungful is spent or refilling. */
-.breath-bar {
-  position: absolute;
-  top: 78px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 240px;
-  height: 16px;
-  background: rgba(8, 14, 24, 0.72);
-  border: 1px solid rgba(150, 190, 230, 0.55);
-  border-radius: 4px;
-  overflow: hidden;
-  display: none;
-  pointer-events: none;
-  z-index: 30;
-}
-.breath-bar.breath-bar-show {
-  display: block;
-}
-.breath-bar-fill {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
-  transition: width 0.12s linear;
-}
-.breath-bar.breath-bar-drowning .breath-bar-fill {
-  background: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
-}
-.breath-bar.breath-bar-drowning {
-  animation: breath-drown-pulse 1s ease-in-out infinite;
-}
-@keyframes breath-drown-pulse {
-  0%,
-  100% {
-    border-color: rgba(255, 120, 100, 0.9);
+  .breath-bar {
+    position: absolute;
+    top: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 16px;
+    background: rgba(8, 14, 24, 0.72);
+    border: 1px solid rgba(150, 190, 230, 0.55);
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    pointer-events: none;
+    z-index: 30;
   }
-  50% {
-    border-color: rgba(255, 60, 40, 0.4);
+  .breath-bar.breath-bar-show {
+    display: block;
   }
-}
-.breath-bar-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: #eaf4ff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-body.reduce-motion .breath-bar.breath-bar-drowning {
-  animation: none;
-}
+  .breath-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
+    transition: width 0.12s linear;
+  }
+  .breath-bar.breath-bar-drowning .breath-bar-fill {
+    background: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
+  }
+  .breath-bar.breath-bar-drowning {
+    animation: breath-drown-pulse 1s ease-in-out infinite;
+  }
+  @keyframes breath-drown-pulse {
+    0%,
+    100% {
+      border-color: rgba(255, 120, 100, 0.9);
+    }
+    50% {
+      border-color: rgba(255, 60, 40, 0.4);
+    }
+  }
+  .breath-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: #eaf4ff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  body.reduce-motion .breath-bar.breath-bar-drowning {
+    animation: none;
+  }
 
-/* ---------- controller cross hotbar ----------
+  /* ---------- controller cross hotbar ----------
    The pad's held-trigger bar: a whole set at once, sixteen cells in two halves
    (the left trigger's eight and the right trigger's eight), each half a d-pad
    diamond plus a face diamond. Holding a trigger ARMS a half rather than swapping
@@ -9931,360 +11511,361 @@ body.reduce-motion .breath-bar.breath-bar-drowning {
    every icon, cooldown sweep, recharge veil and state class the action bar already
    styles applies unchanged; only the geometry and the arm treatment live here.
    The overlay is pointer-events-free: a readout for a controller, never a target. */
-.xhb {
-  --xhb-cell: 40px;
-  /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
+  .xhb {
+    --xhb-cell: 40px;
+    /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
      anything in flow here shoves the player frame and XP bar as it does. Out of
      flow it can never move another element. Its BOTTOM sits where the action-bar
      rows sit, so the pad bar takes over that band rather than floating elsewhere. */
-  position: fixed;
-  left: 50%;
-  bottom: var(--xhb-bottom, 18px);
-  transform: translateX(-50%);
-  z-index: 6;
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  width: max-content;
-  max-width: 100%;
-  pointer-events: none;
-  /* No panel behind it, ever. A filled slab is the single heaviest thing the bar
+    position: fixed;
+    left: 50%;
+    bottom: var(--xhb-bottom, 18px);
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    width: max-content;
+    max-width: 100%;
+    pointer-events: none;
+    /* No panel behind it, ever. A filled slab is the single heaviest thing the bar
      put on screen, and the cells already read as a bar on their own. The labels
      carry their own contrast instead (see the outlines below), which is what a
      slab was really buying. */
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 8px;
-}
-/* One trigger's eight: its d-pad diamond and its face diamond, side by side.
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+  }
+  /* One trigger's eight: its d-pad diamond and its face diamond, side by side.
    Dimmed until that trigger arms it, so the armed half reads at a glance. */
-.xhb-half {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 6px;
-  opacity: 0.5;
-  transition: opacity 120ms ease;
-}
-.xhb-half.xhb-armed {
-  opacity: 1;
-  background: rgba(255, 209, 0, 0.08);
-}
-/* The two halves read as one bar but must not run together. */
-.xhb-half-right {
-  border-left: 1px solid var(--border);
-}
-body.reduce-motion .xhb-half {
-  transition: none;
-}
-.xhb-diamond {
-  display: grid;
-  grid-template-columns: repeat(3, var(--xhb-cell));
-  grid-template-rows: repeat(3, var(--xhb-cell));
-  gap: 2px;
-}
-.xhb-slot {
-  width: var(--xhb-cell);
-  height: var(--xhb-cell);
-  position: relative;
-}
-.xhb-slot[data-xhb-point="top"] {
-  grid-area: 1 / 2;
-}
-.xhb-slot[data-xhb-point="left"] {
-  grid-area: 2 / 1;
-}
-.xhb-slot[data-xhb-point="right"] {
-  grid-area: 2 / 3;
-}
-.xhb-slot[data-xhb-point="bottom"] {
-  grid-area: 3 / 2;
-}
-/* The double set: the same bar showing the second sixteen, marked by the accent
+  .xhb-half {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    opacity: 0.5;
+    transition: opacity 120ms ease;
+  }
+  .xhb-half.xhb-armed {
+    opacity: 1;
+    background: rgba(255, 209, 0, 0.08);
+  }
+  /* The two halves read as one bar but must not run together. */
+  .xhb-half-right {
+    border-left: 1px solid var(--border);
+  }
+  body.reduce-motion .xhb-half {
+    transition: none;
+  }
+  .xhb-diamond {
+    display: grid;
+    grid-template-columns: repeat(3, var(--xhb-cell));
+    grid-template-rows: repeat(3, var(--xhb-cell));
+    gap: 2px;
+  }
+  .xhb-slot {
+    width: var(--xhb-cell);
+    height: var(--xhb-cell);
+    position: relative;
+  }
+  .xhb-slot[data-xhb-point="top"] {
+    grid-area: 1 / 2;
+  }
+  .xhb-slot[data-xhb-point="left"] {
+    grid-area: 2 / 1;
+  }
+  .xhb-slot[data-xhb-point="right"] {
+    grid-area: 2 / 3;
+  }
+  .xhb-slot[data-xhb-point="bottom"] {
+    grid-area: 3 / 2;
+  }
+  /* The double set: the same bar showing the second sixteen, marked by the accent
    frame so a player never has to guess which set a press will cast from. */
-.xhb.xhb-expanded {
-  border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
-}
-/* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down rather
+  .xhb.xhb-expanded {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+  }
+  /* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down rather
    than duplicating it under a bar the player has stopped reading.
    VISIBILITY, never display: the rows sit in the bottom HUD column, so collapsing
    their boxes drags the player frame and stance bar down the screen the moment a
    pad connects. Keeping the box hides the ink and holds the layout still. */
-body.xhb-mode #actionbar,
-body.xhb-mode #actionbar2,
-body.xhb-mode #actionbar3,
-/* The stance bar goes with them: the stance is seeded onto the cross hotbar for
+  body.xhb-mode #actionbar,
+  body.xhb-mode #actionbar2,
+  body.xhb-mode #actionbar3,
+  /* The stance bar goes with them: the stance is seeded onto the cross hotbar for
    exactly this reason, so leaving its own bar up duplicates a button the player
    now presses somewhere else. */
-body.xhb-mode #stancebar {
-  visibility: hidden;
-}
-/* The bar is taller than the rows it replaces, so lift the rest of the bottom
+  body.xhb-mode #stancebar {
+    visibility: hidden;
+  }
+  /* The bar is taller than the rows it replaces, so lift the rest of the bottom
    column clear of it. A transform, not a margin: it moves no other element's box
    and so cannot reflow anything.
    The distance is measured, not guessed, and it is a NARROW window: too little
    and the player frame sits on the bar, too much and it climbs into the cast bar
    (which is pinned 260px off the bottom). The old value was tuned when the bar
    still had a panel and overshot on both counts. */
-body.xhb-mode #player-frame {
-  transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
-}
-/* The cast bar rides up with it. It is pinned a fixed distance off the bottom, so
+  body.xhb-mode #player-frame {
+    transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
+  }
+  /* The cast bar rides up with it. It is pinned a fixed distance off the bottom, so
    left alone the frame climbs into it exactly when the bar is tallest (a handheld
    at a larger interface scale), which is the one case the lift has to handle. The
    two move as one column instead.
    Its own centring translate is repeated here on purpose: transform is a single
    property, so naming only the lift would drop the -50% and shove the bar right by
    half its width. */
-body.xhb-mode #castbar {
-  transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
-}
-/* The pad has no cursor, so the keycap column the action bar shows would be noise
+  body.xhb-mode #castbar {
+    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+  }
+  /* The pad has no cursor, so the keycap column the action bar shows would be noise
    here: the button under each cell is the d-pad or face button it sits on. */
-.xhb-slot .keybind {
-  display: none;
-}
-/* Each half names the trigger that opens it, so the two-trigger model is legible
+  .xhb-slot .keybind {
+    display: none;
+  }
+  /* Each half names the trigger that opens it, so the two-trigger model is legible
    without a trip to the options panel. Brand-resolved (LT/RT, L2/R2, ZL/ZR). */
-.xhb-trigger {
-  position: absolute;
-  top: -9px;
-  left: 10px;
-  padding: 1px 6px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  /* The trigger chips keep a fill of their own. They are two small labels rather
+  .xhb-trigger {
+    position: absolute;
+    top: -9px;
+    left: 10px;
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    /* The trigger chips keep a fill of their own. They are two small labels rather
      than a slab behind sixteen cells, and a chip is what makes LT/RT read as a
      button name instead of floating text. */
-  background: var(--panel-bg);
-  font-family: var(--ui-font);
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 1.3;
-  color: var(--gold);
-}
-.xhb-half {
-  position: relative;
-}
-.xhb-half.xhb-armed .xhb-trigger {
-  color: var(--gold);
-  border-color: var(--gold);
-}
-/* The route to the second set: hold one trigger, tap the other. Sits under the bar
+    background: var(--panel-bg);
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1.3;
+    color: var(--gold);
+  }
+  .xhb-half {
+    position: relative;
+  }
+  .xhb-half.xhb-armed .xhb-trigger {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  /* The route to the second set: hold one trigger, tap the other. Sits under the bar
    so it explains itself without competing with the icons. */
-.xhb-hint {
-  position: absolute;
-  /* A CHIP, matching the trigger labels, not a line of prose. The bar already has
+  .xhb-hint {
+    position: absolute;
+    /* A CHIP, matching the trigger labels, not a line of prose. The bar already has
      a language for naming buttons (the bordered LT/RT pills), and loose text beside
      them read as a debug string rather than part of the interface.
      Above the bar and pushed to its right shoulder: below, it covered the XP bar,
      and centred above it sat in the channel between the bar and the player frame. */
-  bottom: auto;
-  top: -11px;
-  left: auto;
-  right: 0;
-  transform: none;
-  padding: 1px 6px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--panel-bg);
-  font-family: var(--ui-font);
-  font-size: 10px;
-  font-weight: bold;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-  color: var(--gold-dim);
-  /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
+    bottom: auto;
+    top: -11px;
+    left: auto;
+    right: 0;
+    transform: none;
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    color: var(--gold-dim);
+    /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
      of the screen instead of growing the bar. */
-  white-space: nowrap;
-}
-/* The arrange line is a sentence rather than two glyphs, and there is no room
+    white-space: nowrap;
+  }
+  /* The arrange line is a sentence rather than two glyphs, and there is no room
    for it under the bar, so it sits above one. */
-.xhb.xhb-editing .xhb-hint {
-  display: block;
-  bottom: auto;
-  top: -16px;
-  /* Centred and un-chipped while arranging: this one is a sentence being read, not
+  .xhb.xhb-editing .xhb-hint {
+    display: block;
+    bottom: auto;
+    top: -16px;
+    /* Centred and un-chipped while arranging: this one is a sentence being read, not
      a button name the player is meant to stop noticing. */
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-  padding: 0;
-  border-color: transparent;
-  background: none;
-  color: var(--gold);
-  text-shadow:
-    0 0 3px #000,
-    0 1px 2px #000,
-    1px 0 2px #000,
-    -1px 0 2px #000,
-    0 -1px 2px #000;
-}
-.xhb.xhb-expanded .xhb-hint {
-  color: var(--gold);
-  opacity: 1;
-}
-/* The hardware glyph under each cell, so the mapping reads itself without a trip
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    padding: 0;
+    border-color: transparent;
+    background: none;
+    color: var(--gold);
+    text-shadow:
+      0 0 3px #000,
+      0 1px 2px #000,
+      1px 0 2px #000,
+      -1px 0 2px #000,
+      0 -1px 2px #000;
+  }
+  .xhb.xhb-expanded .xhb-hint {
+    color: var(--gold);
+    opacity: 1;
+  }
+  /* The hardware glyph under each cell, so the mapping reads itself without a trip
    to the options panel. Its own element: the shared action-bar painter owns
    `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
-.xhb-glyph {
-  position: absolute;
-  left: 50%;
-  bottom: -12px;
-  transform: translateX(-50%);
-  font-family: var(--ui-font);
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--gold);
-  /* A halo, not a drop shadow: the button hints sit over open world now, so they
+  .xhb-glyph {
+    position: absolute;
+    left: 50%;
+    bottom: -12px;
+    transform: translateX(-50%);
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--gold);
+    /* A halo, not a drop shadow: the button hints sit over open world now, so they
      need contrast from every side rather than only below. */
-  text-shadow:
-    0 0 3px #000,
-    0 1px 2px #000,
-    1px 0 2px #000,
-    -1px 0 2px #000,
-    0 -1px 2px #000;
-}
+    text-shadow:
+      0 0 3px #000,
+      0 1px 2px #000,
+      1px 0 2px #000,
+      -1px 0 2px #000,
+      0 -1px 2px #000;
+  }
 
-/* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
+  /* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
    focus set programmatically does not satisfy the browser's keyboard-like
    heuristic, so a pad player would see no ring and read the navigation as
    broken. Drawn from tokens and steady (never transitioned off), matching the
    focus-ring contract in src/ui/CLAUDE.md. */
-.pad-focus {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-  box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
-  border-radius: 4px;
-}
+  .pad-focus {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
+    border-radius: 4px;
+  }
 
-/* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has
+  /* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has
    selected. A console MMO still SHOWS a cursor under gamepad control, it just
    never makes you steer it, so this snaps to the selection and never free-moves.
    It is drawn by us because a page cannot move the OS pointer. */
-#pad-cursor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 28px;
-  height: 28px;
-  display: none;
-  pointer-events: none;
-  z-index: 100000;
-  /* The SAME ornate arrow the mouse uses (--cursor-arrow / CURSOR_HAND), so the
+  #pad-cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    display: none;
+    pointer-events: none;
+    z-index: 100000;
+    /* The SAME ornate arrow the mouse uses (--cursor-arrow / CURSOR_HAND), so the
      pad's pointer and the mouse's are one cursor rather than two designs. */
-  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
-}
+    background: url("/ui/cursors/arrow.png") no-repeat center / contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+  }
 
-/* Pad navigation hides the OS pointer, which would otherwise sit abandoned
+  /* Pad navigation hides the OS pointer, which would otherwise sit abandoned
    wherever it was last left. Any real mouse or trackpad movement clears this
    class immediately (gamepad/dpad_focus_nav.ts), so a keyboard-and-mouse player
    never loses their cursor.
    Gated on game-active, the in-world gate: a universal !important reaches the
    start screen and character select too, where the pad drives nothing and the
    player still needs a pointer to get into the world. */
-body.pad-nav.game-active,
-body.pad-nav.game-active * {
-  cursor: none !important;
-}
+  body.pad-nav.game-active,
+  body.pad-nav.game-active * {
+    cursor: none !important;
+  }
 
-/* The expanded bank (both triggers) is a THIRD set of eight, not a second page
+  /* The expanded bank (both triggers) is a THIRD set of eight, not a second page
    of sixteen: only the half those triggers reach exists, so the other half is
    dropped rather than drawn as an unreachable twin. Without this the bank looks
    identical to an ordinary trigger page and reads as the bar having swapped
    pages, which is not what happened. */
-.xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
-  display: none;
-}
+  .xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
+    display: none;
+  }
 
-/* The opt-in virtual mouse pointer. Same ornate arrow as everything else, so the
+  /* The opt-in virtual mouse pointer. Same ornate arrow as everything else, so the
    pad's two pointers and the mouse's are one cursor; only how it MOVES differs. */
-#pad-mouse-cursor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 28px;
-  height: 28px;
-  margin: -2px 0 0 -7px;
-  display: none;
-  pointer-events: none;
-  z-index: 100001;
-  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
-}
+  #pad-mouse-cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    margin: -2px 0 0 -7px;
+    display: none;
+    pointer-events: none;
+    z-index: 100001;
+    background: url("/ui/cursors/arrow.png") no-repeat center / contain;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+  }
 
-/* Edit mode: the bar is pinned open and arrangeable, so it says so rather than
+  /* Edit mode: the bar is pinned open and arrangeable, so it says so rather than
    looking like an ordinary resting bar the player's presses are bouncing off. */
-.xhb.xhb-editing {
-  opacity: 1;
-  border-color: var(--gold);
-  box-shadow: 0 0 14px rgba(255, 209, 0, 0.4);
-}
-.xhb.xhb-editing .xhb-half {
-  opacity: 1;
-}
-/* The cell an action was lifted from: it reads as a gap the carried thing came
+  .xhb.xhb-editing {
+    opacity: 1;
+    border-color: var(--gold);
+    box-shadow: 0 0 14px rgba(255, 209, 0, 0.4);
+  }
+  .xhb.xhb-editing .xhb-half {
+    opacity: 1;
+  }
+  /* The cell an action was lifted from: it reads as a gap the carried thing came
    out of, so the player can see where "put it back" would land. */
-.xhb-slot.xhb-carried {
-  opacity: 0.35;
-  outline: 2px dashed var(--gold);
-  outline-offset: 2px;
-}
+  .xhb-slot.xhb-carried {
+    opacity: 0.35;
+    outline: 2px dashed var(--gold);
+    outline-offset: 2px;
+  }
 
-/* The spellbook row whose action the pad is carrying. An action lifted off a CELL
+  /* The spellbook row whose action the pad is carrying. An action lifted off a CELL
    leaves a visible gap on the bar; one picked out of the book leaves none, so this
    is the only sign the pick-up worked. */
-.spell-row.spell-carried {
-  border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
-}
+  .spell-row.spell-carried {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+  }
 
-/* Cross hotbar display presets. The bar's structure never changes: each preset is
+  /* Cross hotbar display presets. The bar's structure never changes: each preset is
    a class on <body> and CSS owns the whole difference, so a player can flip
    between them mid-session without the bar rebuilding.
    Full is the default and needs no rules of its own. */
 
-/* Compact: no panel to remove any more, so this preset is purely about the
+  /* Compact: no panel to remove any more, so this preset is purely about the
    LABELS. They stay on the half a trigger has armed, where they are still saying
    something, and go everywhere else. */
-body.xhb-compact .xhb-hint,
-body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
-body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
-  display: none;
-}
+  body.xhb-compact .xhb-hint,
+  body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
+  body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
+    display: none;
+  }
 
-/* Minimal: nothing at all until a trigger is held, for a player who knows the
+  /* Minimal: nothing at all until a trigger is held, for a player who knows the
    layout and wants the screen back. The bar keeps its box (visibility, not
    display) so the HUD above it never moves. */
-body.xhb-minimal .xhb-hint {
-  display: none;
-}
-body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
-  visibility: hidden;
-}
-body.xhb-minimal .xhb.xhb-editing .xhb-half {
-  visibility: visible;
-}
+  body.xhb-minimal .xhb-hint {
+    display: none;
+  }
+  body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
+    visibility: hidden;
+  }
+  body.xhb-minimal .xhb.xhb-editing .xhb-half {
+    visibility: visible;
+  }
 
-/* The d-pad glyphs are one triangle turned four ways. Rotating a single glyph is
+  /* The d-pad glyphs are one triangle turned four ways. Rotating a single glyph is
    the only way the four read as the same size: measured, no font draws its four
    arrows (or its four triangles) to matching widths. */
-.xhb-glyph-top {
-  transform: translateX(-50%) rotate(0deg);
-}
-.xhb-glyph-left {
-  transform: translateX(-50%) rotate(-90deg);
-}
-.xhb-glyph-right {
-  transform: translateX(-50%) rotate(90deg);
-}
-.xhb-glyph-bottom {
-  transform: translateX(-50%) rotate(180deg);
+  .xhb-glyph-top {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  .xhb-glyph-left {
+    transform: translateX(-50%) rotate(-90deg);
+  }
+  .xhb-glyph-right {
+    transform: translateX(-50%) rotate(90deg);
+  }
+  .xhb-glyph-bottom {
+    transform: translateX(-50%) rotate(180deg);
+  }
 }

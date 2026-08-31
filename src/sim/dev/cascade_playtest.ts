@@ -68,7 +68,13 @@ export function logCascadeCast(
     const t = targets[i];
     const d = center ? dist2d(t.pos, center.pos) : 0;
     const echo = t.auras.find((a) => a.kind === 'temporal_echo' && a.sourceId === caster.id);
-    const kind = echo?.echoGroup === false ? 'individual 40%' : 'group 13%';
+    // Print the rate BAKED on the mark, not a literal: a Chronoweave 2pc
+    // wearer places 50% individual marks (content/ignivar_set_bonuses.ts),
+    // everyone else the base 40%, and this readout must report reality.
+    const kind =
+      echo?.echoGroup === false
+        ? `individual ${Math.round((echo.echoConvertRate ?? 0.4) * 100)}%`
+        : 'group 13%';
     line(`  - id ${t.id}: dist ${fmt(d)}y, ${kind}, initialHeal ${initialApplied[i] ?? 0}`);
   }
   const elapsed = Math.max(1e-3, ctx.time - s.startTime);

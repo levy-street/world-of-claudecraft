@@ -319,8 +319,12 @@ describe('post-entry mob-body streaming', () => {
     // A streamed body whose one-shot stream fetch failed must not stay
     // invisible for the session: resolvedGltf kicks the fetch again before its
     // fail-soft throw, and the view-create retry gate re-attempts the build.
-    // Gated to streamed urls so a non-streamed miss stays a loud preload bug.
-    expect(assetsSource).toContain('if (streamedUrlSet.has(url)) ensureCharacterUrl(url);');
+    // Gated to streamed urls plus the lazyPreload on-demand set (the raid GLBs
+    // load on first sight, the mount lazy-load pattern), so a plain preload
+    // miss stays a loud preload bug.
+    expect(assetsSource).toContain(
+      'if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);',
+    );
   });
 
   it('starts the stream at first paint, not inside the entry gate', () => {

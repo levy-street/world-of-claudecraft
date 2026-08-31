@@ -160,6 +160,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
   'prevFacing',
+  'dungeonEntrySeq', // transient online acknowledgement generation; never read by gameplay
   'netUpdatedAt', // online wire cadence
   'netInterval',
   'vx', // air velocity (locomotion interpolation)
@@ -250,6 +251,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments
   'fiestaSpecial', // derived from augments
+  'bankWireRev', // runtime-only bank snapshot dirty counter; never serialized/persisted
+  'vaultWireRev', // runtime-only vault snapshot dirty counter; never serialized/persisted
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
 ]);
 

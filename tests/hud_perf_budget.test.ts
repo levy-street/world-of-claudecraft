@@ -603,7 +603,9 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 14, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
+  // 3 one-time pooled-node builds (createNode's .buff/.dur/.stacks) + the overflow
+  // badge span built once in the constructor.
+  { file: 'auras_painter.ts', allow: { '.className': 4 }, reflowAllow: {} },
   {
     file: 'fct_painter.ts',
     allow: { '.className': 1, '.setAttribute': 1 },
@@ -692,6 +694,7 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: {},
     reflowAllow: { getComputedStyle: 1 },
   },
+  { file: 'dungeon_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -835,7 +838,22 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       },
     ],
   },
-  { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
+  // SIX, and the count is the shape of the fix rather than growth. WHICH element
+  // scrolls the personal pane depends on the viewport (Bank Storage phase 18: the
+  // .bank-scroll region normally, the window itself in the short-phone pinned-footer
+  // regime), so the pair became a pair of pairs: captureScroll reads both, and both
+  // restoreScroll and refreshGrid write both back. The window deliberately does not
+  // ask which regime is live, because asking would mean a second copy of the media
+  // query in TS; carrying both is a generalization of "a new pane starts at the
+  // top" rather than a free no-op (src/ui/bank_chrome_layout_core.ts states why).
+  // COST, and this is why it is a re-point rather than a regression: on each path
+  // the reads are ADJACENT inside captureScroll and the writes all follow them,
+  // so each added occurrence rides a flush its neighbour already paid for and the
+  // per-path flush count is exactly what it was before. (refreshGrid costs two:
+  // the read pair, then a DOM mutation, then the write pair, which is what it
+  // cost with one of each too. Interleaving a read BETWEEN the writes is what
+  // would make this thrash, and nothing here does.)
+  { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and
@@ -857,9 +875,27 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'commission_order_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
+  // A THIRD cadence reaches this same body and does NOT show up in the `drivers`
+  // list below, because the sweep scans in-file setInterval/setTimeout/rAF and
+  // this one is external: hud.update()'s 500 ms slowHud divider calls
+  // refreshIfChanged (Bank Storage phase 15, ruling 21). It is named here so a
+  // reader of this row still knows every cadence that can repaint the body. It
+  // is gated twice before it reaches the scroll pair: the HUD only calls it while
+  // the window is open, and the window returns unless the ladder count actually
+  // moved, so in steady state it costs a querySelector and a scalar compare and
+  // paints nothing. tests/daily_rewards_store_behavior.test.ts pins both arms
+  // against a real paint counter.
   {
     file: 'daily_rewards_window.ts',
-    reflowAllow: {},
+    // The same scroll pair the vendor family and commission_order_window hold:
+    // read the position before the body rebuild, write it back after. Granted
+    // here because the store's charter grid is the LAST section, below the whole
+    // armory, and EVERY purchase outcome forces a rebuild, so without the pair a
+    // buyer is thrown to the top of a long scroller on their own action. It runs
+    // on that rebuild only (replaceStoreBody, which elides whole on unchanged
+    // markup), never on a frame and never on either interval below. The count is
+    // what makes a THIRD read a conscious act.
+    reflowAllow: { '.scrollTop': 2 },
     driverAllow: { setInterval: 2 },
     drivers: [
       {
@@ -932,6 +968,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // clamp a drag or resize; chat_window fits the input and keeps the log pinned to the
   // bottom; fiesta forces one reflow to restart a CSS animation, the same documented trick
   // fct_painter uses.
+  // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
+  // from the applied placement (refilled by apply()/ensureGeometry, nulled on
+  // viewport resize), so hovering the unlocked chat box costs no layout read
+  // per pointermove; the five reads are the drag/resize measures.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 5 },
@@ -959,6 +999,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/vendor/crucible_vendor_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
@@ -1395,6 +1440,14 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
+    // Bank Storage phase 17's extraction, named here because its FILENAME is the
+    // whole reason it holds the cold contract. The spin overlay's code held it
+    // inside src/ui/daily_rewards_window.ts; the extraction would have shed it
+    // under a name outside this sweep, which is what the header above calls the
+    // point of the widening. Renaming the file back sheds the contract silently
+    // (the only other red is a missing-path row a contributor would simply edit),
+    // so the membership is pinned rather than the regex.
+    expect(COLD_PAINTERS).toContain('daily_rewards_spin_controller.ts');
   });
 
   // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
@@ -2486,6 +2539,7 @@ function fakeEl(): HTMLElement {
       toggle(): void {},
     },
     setAttribute(): void {},
+    removeAttribute(): void {},
   } as unknown as HTMLElement;
 }
 
@@ -2523,7 +2577,8 @@ interface PainterHarness {
 function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHarness[] {
   const harnesses: PainterHarness[] = [];
 
-  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText + toggleClass.
+  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText
+  // + setAttr (the always-visible percent, on both bar and frame) + toggleClass.
   {
     const bar = fakeEl();
     const fill = fakeEl();
@@ -2531,7 +2586,13 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
     const label = fakeEl();
     const playerFrame = fakeEl();
     const painter = new XpBarPainter(facet, bar, fill, rested, label, playerFrame);
-    const view: XpBarView = { fillFrac: 0.5, restedFrac: 0.1, label: 'XP 1 / 2', postCap: false };
+    const view: XpBarView = {
+      fillFrac: 0.5,
+      restedFrac: 0.1,
+      label: 'XP 1 / 2',
+      percentText: '50%',
+      postCap: false,
+    };
     harnesses.push({ name: 'xp_bar', drive: () => painter.paint(view) });
   }
 
@@ -2636,6 +2697,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           usable: true,
           outOfRange: false,
           queued: false,
+          aiming: false,
           procGlow: false,
           empowered: false,
           ascensionSpender: false,
@@ -2732,6 +2794,7 @@ function idleWorld(): ActionBarWorldInput {
     inventory: [],
     stealthed: false,
     entities: [],
+    activeAimSlot: null,
   };
 }
 

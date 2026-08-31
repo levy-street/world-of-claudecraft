@@ -1012,4 +1012,33 @@ export const table: DeedLocaleTable = {
     desc: 'Iluminuj v Relikviáři stránku Hrdinská: Svatyně Hrobodraka.',
     title: 'Světlo svatyně',
   },
+  soc_strongbox_outfitter: {
+    name: 'Správce truhlice',
+    desc: 'Odemkni svůj první slot na bankovní tašku.',
+  },
+  soc_four_bags_deep: {
+    name: 'Všechny čtyři tašky',
+    desc: 'Odemkni všechny čtyři sloty na bankovní tašky.',
+  },
+  dgn_ignivar: {
+    name: 'Posel padá',
+    desc: 'Poraz Ignivara, posla posledního plamene, v tavírně posledního pramene.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Hrdinská: Posel padá',
+    desc: 'Poraz Ignivara, posla posledního plamene, na hrdinské obtížnosti.',
+  },
+  dgn_varkhul: {
+    name: 'Výheň chladne',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, ve vnitřní tavírně.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Hrdinská: Výheň chladne',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, na hrdinské obtížnosti.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ani jiskřička nazmar',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, na hrdinské obtížnosti, aniž by jediný člen raidu zemřel.',
+    title: 'Nespálený',
+  },
 };

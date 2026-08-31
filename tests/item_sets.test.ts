@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SET_ENGINE_BONUSES } from '../src/sim/content/ignivar_set_bonuses';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
@@ -6,7 +7,10 @@ import {
   SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
+  SET_HASTE_3PC_RATING,
+  SET_HIT_4PC_RATING,
   SET_NECROMANCERS,
+  SET_NIGHTTALON,
   SET_SOULFLAME,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
@@ -16,7 +20,11 @@ import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
-import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import {
+  equippedSetTooltipPieces,
+  itemSetMemberCounts,
+  itemSetTooltipModel,
+} from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
@@ -41,7 +49,7 @@ describe('heroic set item identity', () => {
   });
 });
 
-describe('aggregateSetBonuses (pure resolver)', () => {
+describe('aggregateSetBonuses (the lineage ladder)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
     expect(eff).toEqual({
@@ -52,6 +60,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       spi: 0,
       ap: 0,
       sp: 0,
+      healPower: 0,
       crit: 0,
       critRating: 0,
       haste: 0,
@@ -66,56 +75,74 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     });
   });
 
-  it('strength set: 2pc grants AP, 3pc additionally grants str+sta (tiers stack)', () => {
+  it('one tier-1 piece plus one tier-2 piece reach the lineage 2-piece tier', () => {
+    // The load-bearing lineage behavior: deathlord and crownforged climb ONE
+    // ladder, so 1 + 1 pieces meet the 2-piece threshold together.
+    const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1, [SET_CROWNFORGED]: 1 }));
+    expect(eff.str).toBe(10);
+    expect(eff.sta).toBe(10);
+    expect(eff.ap).toBe(0); // the 4-piece tier is not met
+  });
+
+  it('the shared lineage table applies exactly once, never per member family', () => {
+    // 3 + 3 pieces = 6: all three tiers, with single-application magnitudes
+    // (str 10, not 10 per family).
+    const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 3, [SET_CROWNFORGED]: 3 }));
+    expect(eff.str).toBe(10);
+    expect(eff.sta).toBe(10);
+    expect(eff.ap).toBe(25);
+    expect(eff.hasteRating).toBe(SET_HASTE_3PC_RATING);
+    expect(eff.hitRating).toBe(SET_HIT_4PC_RATING);
+    expect(eff.procs.map((p) => p.id).sort()).toEqual(['set_bonesplinter', 'set_gravemight']);
+  });
+
+  it('strength lineage: stats at 2, attack power and Gravemight at 4', () => {
     const two = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 2 }));
-    expect(two.ap).toBe(40);
-    expect(two.str).toBe(0);
-    const three = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 3 }));
-    expect(three.ap).toBe(40); // 2pc bonus still active
-    expect(three.str).toBe(15);
-    expect(three.sta).toBe(15);
+    expect(two.str).toBe(10);
+    expect(two.sta).toBe(10);
+    expect(two.ap).toBe(0);
+    const four = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 4 }));
+    expect(four.str).toBe(10); // 2-piece tier still active (tiers stack)
+    expect(four.ap).toBe(25);
+    expect(four.procs.map((p) => p.id)).toEqual(['set_gravemight']);
   });
 
-  it('agility set: 2pc grants AP, 3pc additionally grants agi+crit', () => {
+  it('agility lineage: agi and crit at 2, attack power and Fangrush at 4', () => {
     const two = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 2 }));
-    expect(two.ap).toBe(40);
-    const three = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 3 }));
-    expect(three.ap).toBe(40);
-    expect(three.agi).toBe(15);
-    expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
+    expect(two.agi).toBe(10);
+    expect(two.critRating).toBe(SET_CRIT_3PC_RATING);
+    expect(two.ap).toBe(0);
+    const four = aggregateSetBonuses(counts({ [SET_NIGHTTALON]: 4 }));
+    expect(four.ap).toBe(25);
+    expect(four.procs.map((p) => p.id)).toEqual(['set_fangrush']);
   });
 
-  it('caster sets: 2pc grants full cast-pushback immunity, 3pc grants tier stats', () => {
-    // The caster 2-piece is SPELL pushback immunity (damage taken never delays
-    // a cast), never physical knockback resistance.
-    const necro = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3 }));
-    expect(necro.castPushbackReduction).toBe(1);
-    expect(necro.int).toBe(10);
-    expect(necro.sta).toBe(10);
-    expect(necro.spi).toBe(0);
-    expect(necro.knockbackResistance).toBe(0);
-
-    const soulflame = aggregateSetBonuses(counts({ [SET_SOULFLAME]: 3 }));
-    expect(soulflame.castPushbackReduction).toBe(1);
-    expect(soulflame.knockbackResistance).toBe(0);
-    expect(soulflame.int).toBe(15);
-    expect(soulflame.spi).toBe(15);
-    expect(soulflame.sta).toBe(0);
-
-    const stormcallers = aggregateSetBonuses(counts({ [SET_STORMCALLERS]: 3 }));
-    expect(stormcallers.castPushbackReduction).toBe(1);
-    expect(stormcallers.knockbackResistance).toBe(0);
-    expect(stormcallers.int).toBe(15);
-    expect(stormcallers.spi).toBe(15);
-    expect(stormcallers.sta).toBe(0);
+  it('caster lineage: int/spi and HALF pushback at 2, spell power and Clearcasting at 4', () => {
+    // Full pushback immunity moved to the new raid tier's caster and healer
+    // 2-piece bonuses in the retune; the incumbents keep 50%.
+    for (const setId of [SET_NECROMANCERS, SET_SOULFLAME, SET_STORMCALLERS]) {
+      const two = aggregateSetBonuses(counts({ [setId]: 2 }));
+      expect(two.int, setId).toBe(10);
+      expect(two.spi, setId).toBe(10);
+      expect(two.castPushbackReduction, setId).toBe(0.5);
+      expect(two.knockbackResistance, setId).toBe(0);
+      expect(two.sp, setId).toBe(0);
+    }
+    // 2 + 2 pieces across the tiers reach the lineage 4-piece tier together.
+    const four = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 2, [SET_SOULFLAME]: 2 }));
+    expect(four.sp).toBe(12);
+    expect(four.castPushbackReduction).toBe(0.5); // no higher pushback tier exists
+    expect(four.procs.map((p) => p.id)).toEqual(['set_clearcasting']);
   });
 
-  it('pushback reduction max-combines across met tiers and clamps to 0..1', () => {
-    const twoCasterSets = aggregateSetBonuses(
-      counts({ [SET_NECROMANCERS]: 2, [SET_SOULFLAME]: 2 }),
-    );
-    expect(twoCasterSets.castPushbackReduction).toBe(1);
+  it('caster lineage capstone: haste and Soulblaze at 6 pieces', () => {
+    const six = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3, [SET_STORMCALLERS]: 3 }));
+    expect(six.hasteRating).toBe(SET_HASTE_3PC_RATING);
+    expect(six.hitRating).toBe(0); // healer-facing lineage: no Hit in the capstone
+    expect(six.procs.map((p) => p.id).sort()).toEqual(['set_clearcasting', 'set_soulblaze']);
+  });
 
+  it('pushback and knockback clamp to 0..1 in the resolver', () => {
     const clampSetId = '__test_knockback_clamp';
     ITEM_SETS[clampSetId] = {
       id: clampSetId,
@@ -140,61 +167,73 @@ describe('aggregateSetBonuses (pure resolver)', () => {
   it('every set definition lists ascending tiers ending at its authored cap', () => {
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
-      // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
-      // 4-piece is a proc); the leveling haste kits deliberately carry the
-      // single 3-piece tier. The four WARFARE families are 2/4/7: seven because
-      // at six the seventh armor slot had one right answer (abandon the chest,
-      // the priciest piece with the best PvE replacement) and measured strictly
-      // better than the intended build (4,200 honor and 0.89x against the full
-      // kit's 5,400 and 1.03x). tests/warfare_balance_harness.test.ts guards it.
+      // The seven epic families share their lineage's 2/4/6 ladder; the
+      // leveling haste kits deliberately carry the single 3-piece tier; the
+      // WARFARE families are 2/4/7 (see tests/warfare_balance_harness.test.ts);
+      // the Crucible tier sets break at 2/4 (the engine-registered ids in
+      // content/ignivar_set_bonuses.ts; tests/ignivar_loot.test.ts owns the
+      // per-wave rollout ledger for them).
       const expected = set.id.startsWith('warfare_')
         ? '2,4,7'
-        : pieces.length === 1
-          ? '3'
-          : '2,3,4';
+        : set.lineage !== undefined
+          ? '2,4,6'
+          : SET_ENGINE_BONUSES[set.id] !== undefined
+            ? '2,4'
+            : '3';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
+
+  it('every lineage member shares the identical bonuses array', () => {
+    const byLineage = new Map<string, object>();
+    for (const set of Object.values(ITEM_SETS)) {
+      if (set.lineage === undefined) continue;
+      const shared = byLineage.get(set.lineage);
+      if (shared === undefined) byLineage.set(set.lineage, set.bonuses);
+      else expect(set.bonuses, set.id).toBe(shared); // same reference, not a copy
+    }
+    expect([...byLineage.keys()].sort()).toEqual([
+      'agility_lineage',
+      'caster_lineage',
+      'strength_lineage',
+    ]);
+  });
 });
 
-describe('item set tooltip model', () => {
-  it('counts each set as its distinct equip slots (base + all heroic versions are one piece)', () => {
-    const counts = itemSetMemberCounts();
-    // The t2 sets are 5 slots (soulflame cloth is 4). The normal piece, its
-    // auto-generated heroic variant, and any bespoke heroic raid piece for the
-    // same slot all collapse to one member, so the "X/N" denominator reflects the
-    // real number of collectible pieces (not the parallel heroic-variant ids).
-    expect(counts.crownforged).toBe(4);
-    expect(counts.nighttalon).toBe(4);
-    expect(counts.soulflame).toBe(4);
-    expect(counts.stormcallers).toBe(4);
-    // Leveling haste kits: 3 pieces each.
-    expect(counts.vale_arcanist).toBe(3);
-    expect(counts.boundstone_vanguard).toBe(3);
-    expect(counts.greyjaw_stalker).toBe(3);
-  });
-
-  it('keeps four-piece families at four and the Boundstone family at three', () => {
+describe('item set tooltip model (lineage-aware)', () => {
+  it('lineage families read the slot UNION across their lineage as the total', () => {
     const memberCounts = itemSetMemberCounts();
-    expect({
-      [SET_DEATHLORD]: memberCounts[SET_DEATHLORD],
-      [SET_BOUNDSTONE_VANGUARD]: memberCounts[SET_BOUNDSTONE_VANGUARD],
-    }).toEqual({
-      [SET_DEATHLORD]: 4,
-      [SET_BOUNDSTONE_VANGUARD]: 3,
-    });
+    // Each lineage unions to exactly seven wearable slots (four plus four
+    // with one overlapping slot), so every member family reads X/7.
+    expect(memberCounts.deathlord).toBe(7);
+    expect(memberCounts.crownforged).toBe(7);
+    expect(memberCounts.wyrmshadow).toBe(7);
+    expect(memberCounts.nighttalon).toBe(7);
+    expect(memberCounts.necromancers).toBe(7);
+    expect(memberCounts.soulflame).toBe(7);
+    expect(memberCounts.stormcallers).toBe(7);
+    // Leveling haste kits stay per-family: 3 pieces each.
+    expect(memberCounts.vale_arcanist).toBe(3);
+    expect(memberCounts.boundstone_vanguard).toBe(3);
+    expect(memberCounts.greyjaw_stalker).toBe(3);
   });
 
-  it('uses the authored member count, not the highest bonus threshold, as the header total', () => {
+  it('keeps non-lineage families at their own member count', () => {
+    const memberCounts = itemSetMemberCounts();
+    expect(memberCounts[SET_BOUNDSTONE_VANGUARD]).toBe(3);
+  });
+
+  it('uses the authored member count as the header total and shows the 2/4/6 tiers', () => {
     const model = itemSetTooltipModel({
       itemSetId: SET_DEATHLORD,
       equippedPieces: 2,
       itemSetMembers: {
-        [SET_DEATHLORD]: 4,
+        [SET_DEATHLORD]: 7,
       },
     });
-    expect(model?.totalPieces).toBe(4);
-    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3, 4]);
+    expect(model?.totalPieces).toBe(7);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 4, 6]);
+    expect(model?.bonusTiers.map((tier) => tier.active)).toEqual([true, false, false]);
   });
 
   it('hides bonus tiers that cannot be reached by the currently authored set pieces', () => {
@@ -208,66 +247,97 @@ describe('item set tooltip model', () => {
     expect(model?.totalPieces).toBe(2);
     expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2]);
   });
+
+  it('equippedSetTooltipPieces counts worn pieces across the whole lineage', () => {
+    const worn = [
+      'deathlord_warplate', // strength lineage
+      'crownforged_dreadhelm', // strength lineage, other family
+      'nighttalon_crown', // agility lineage: never counted for a strength set
+      null,
+      'oath_of_the_round_table', // no set tag
+    ];
+    expect(equippedSetTooltipPieces(SET_DEATHLORD, worn)).toBe(2);
+    expect(equippedSetTooltipPieces(SET_CROWNFORGED, worn)).toBe(2);
+    expect(equippedSetTooltipPieces(SET_NIGHTTALON, worn)).toBe(1);
+    expect(equippedSetTooltipPieces(SET_BOUNDSTONE_VANGUARD, worn)).toBe(0);
+  });
 });
 
 describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear)', () => {
-  it('Deathlord (t1 strength): flat AP at 2pc, str/sta added at 3pc', () => {
+  it('Deathlord (strength lineage): stats at 2 pieces, attack power at 4', () => {
     const base = statsFor('warrior', 20, {});
-    // 2 pieces: +40 AP, no set str yet. Warrior AP = str*2 + bonusAp.
+    // 2 pieces: the lineage 2-piece stat tier, no flat AP yet. Warrior AP =
+    // str*2 + bonusAp.
     const two = statsFor('warrior', 20, {
       chest: 'deathlord_warplate',
       legs: 'deathlord_legguards',
     });
-    expect(two.attackPower).toBe(two.stats.str * 2 + 40);
-    // 3 pieces: set adds +15 str / +15 sta on top of the item stats.
-    const three = statsFor('warrior', 20, {
+    const twoItemStr = 8 + 8; // warplate + legguards
+    expect(two.stats.str).toBe(base.stats.str + twoItemStr + 10);
+    expect(two.attackPower).toBe(two.stats.str * 2);
+    // 4 pieces: the flat +25 attack power joins.
+    const four = statsFor('warrior', 20, {
       chest: 'deathlord_warplate',
       legs: 'deathlord_legguards',
       feet: 'deathlord_sabatons',
+      helmet: 'deathlords_dread_visage',
     });
-    const itemStr = 8 + 8 + 7; // warplate + legguards + sabatons
-    expect(three.stats.str).toBe(base.stats.str + itemStr + 15);
-    expect(three.attackPower).toBe(three.stats.str * 2 + 40);
+    expect(four.attackPower).toBe(four.stats.str * 2 + 25);
   });
 
-  it('Wyrmshadow (t1 agility): crit gains 1% at 3pc on top of agi-derived crit', () => {
-    const three = statsFor('rogue', 20, {
+  it('Wyrmshadow (agility lineage): 1% crit at 2 pieces rides the rating conversion', () => {
+    const two = statsFor('rogue', 20, {
       chest: 'wyrmshadow_harness',
       feet: 'wyrmshadow_treads',
-      legs: 'wyrmshadow_legguards',
     });
-    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.01);
+    expect(two.critRating).toBe(SET_CRIT_3PC_RATING);
+    expect(two.critChance).toBeCloseTo(0.05 + two.stats.agi * 0.0005 + 0.01);
   });
 
-  it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {
-    // End-to-end (not just the pure set-bonus resolver): the +60 four-set Hit rides
-    // through recalcPlayerStats onto e.hitRating, on top of the 20 + 20 the helm and
-    // shoulder carry. Drop the `+ setEff.hitRating` term and this reds.
+  it('Crownforged pieces carry crit seeds now, and 4 lineage pieces pay no Hit', () => {
+    // The Hit program flip: the authored t2 seeds became critRating 20, so the
+    // heroic variants derive crit primaries too, and the only Hit the old
+    // stack provides is the 6-piece capstone.
     const four = statsFor('warrior', 20, {
       helmet: 'crownforged_dreadhelm',
       shoulder: 'crownforged_warspaulders',
       gloves: 'crownforged_gauntlets',
       waist: 'crownforged_girdle',
     });
-    expect(four.hitRating).toBe(20 + 20 + 60);
+    expect(four.critRating).toBe(20 + 20); // helm + shoulder seeds
+    expect(four.hitRating).toBe(0);
+    expect(four.attackPower).toBe(four.stats.str * 2 + 25); // lineage 4-piece
   });
 
-  it('Nighttalon (t2 agility, 2 pieces): reaches the 2-piece +40 AP bonus', () => {
-    const base = statsFor('rogue', 20, {});
+  it('six strength pieces across both families light the capstone', () => {
+    const six = statsFor('warrior', 20, {
+      helmet: 'crownforged_dreadhelm',
+      shoulder: 'crownforged_warspaulders',
+      gloves: 'crownforged_gauntlets',
+      waist: 'crownforged_girdle',
+      chest: 'deathlord_warplate',
+      legs: 'deathlord_legguards',
+    });
+    expect(six.hitRating).toBe(SET_HIT_4PC_RATING);
+    expect(six.hasteRating).toBe(SET_HASTE_3PC_RATING);
+  });
+
+  it('Nighttalon (agility lineage, 2 pieces): crit seeds plus the 2-piece tier, no AP', () => {
     const two = statsFor('rogue', 20, {
       helmet: 'nighttalon_crown',
       shoulder: 'nighttalon_shoulderguards',
     });
-    // Rogue AP = str + agi + bonusAp; the only set bonus at 2pc is +40 AP.
-    expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(40);
-    expect(two.attackPower).toBeGreaterThan(base.attackPower);
+    // Rogue AP = str + agi + bonusAp; no flat AP below the 4-piece tier.
+    expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(0);
+    // Two flipped 20-crit seeds plus the lineage 2-piece crit rating.
+    expect(two.critRating).toBe(20 + 20 + SET_CRIT_3PC_RATING);
   });
 
-  it('normal and heroic Nythraxis armor pieces mix for set thresholds', () => {
-    // A heroic helmet variant counts as the same set slot as its normal base, so
-    // mixing it with three normal pieces still reaches the 3-piece Wraithfire
-    // threshold (int +15, spi +15). Derive the expected primary totals from the
-    // live item defs so the heroic-variant stat rescale stays the source of truth.
+  it('normal and heroic pieces mix for lineage thresholds', () => {
+    // A heroic helmet variant counts as the same set slot as its normal base,
+    // so mixing it with three normal pieces still reaches the lineage 4-piece
+    // tier (spell power 12). Derive the expected primary totals from the live
+    // item defs so the heroic-variant stat rescale stays the source of truth.
     const worn = {
       helmet: 'heroic_soulflame_cowl', // heroic helmet mixed with normal pieces
       shoulder: 'soulflame_mantle',
@@ -278,52 +348,26 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     const mixed = statsFor('mage', 20, worn);
     const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
     const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
-    expect(mixed.castPushbackReduction).toBe(1);
-    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 15); // +15 = 3pc Wraithfire int
-    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 15); // +15 = 3pc Wraithfire spi
+    expect(mixed.castPushbackReduction).toBe(0.5);
+    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 10); // lineage 2-piece int
+    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 10); // lineage 2-piece spi
+    expect(mixed.spellPower).toBe(Math.round(mixed.stats.int * 0.5) + 12); // lineage 4-piece
   });
 
-  it("Necromancer's (t1 caster): cast-pushback immunity at 2pc, int/sta added at 3pc", () => {
+  it("Necromancer's (caster lineage): int/spi and half pushback at 2 pieces", () => {
     const base = statsFor('mage', 20, {});
     expect(statsFor('mage', 20, {}).castPushbackReduction).toBe(0);
-    const two = statsFor('mage', 20, {
+    const worn = {
       chest: 'necromancers_starshroud',
       feet: 'necromancers_soulsteps',
-    });
-    expect(two.castPushbackReduction).toBe(1);
+    };
+    const two = statsFor('mage', 20, worn);
+    const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
+    const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
+    expect(two.castPushbackReduction).toBe(0.5);
     expect(two.knockbackResistance).toBe(0);
-
-    const three = statsFor('mage', 20, {
-      chest: 'necromancers_starshroud',
-      feet: 'necromancers_soulsteps',
-      legs: 'necromancers_legwraps',
-    });
-    expect(three.castPushbackReduction).toBe(1);
-    expect(three.knockbackResistance).toBe(0);
-    expect(three.stats.int).toBe(base.stats.int + 11 + 8 + 13 + 10);
-    expect(three.stats.sta).toBe(base.stats.sta + 10);
-  });
-
-  it('Soulflame and Stormcaller (t2 caster): int/spi added at 3pc', () => {
-    const mageBase = statsFor('mage', 20, {});
-    const soulflame = statsFor('mage', 20, {
-      helmet: 'soulflame_cowl',
-      shoulder: 'soulflame_mantle',
-      gloves: 'soulflame_gloves',
-    });
-    expect(soulflame.castPushbackReduction).toBe(1);
-    expect(soulflame.stats.int).toBe(mageBase.stats.int + 11 + 9 + 8 + 15);
-    expect(soulflame.stats.spi).toBe(mageBase.stats.spi + 15);
-
-    const shamanBase = statsFor('shaman', 20, {});
-    const stormcallers = statsFor('shaman', 20, {
-      helmet: 'stormcallers_crown',
-      shoulder: 'stormcallers_spaulders',
-      gloves: 'stormcallers_handguards',
-    });
-    expect(stormcallers.castPushbackReduction).toBe(1);
-    expect(stormcallers.stats.int).toBe(shamanBase.stats.int + 10 + 8 + 8 + 15);
-    expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + 15);
+    expect(two.stats.int).toBe(base.stats.int + pieceInt + 10);
+    expect(two.stats.spi).toBe(base.stats.spi + pieceSpi + 10);
   });
 });
 
@@ -334,8 +378,8 @@ describe('pushbackCast honors castPushbackReduction', () => {
     p.channeling = channeling;
     p.castTotal = 3;
     p.castRemaining = 1.5;
-    // Set directly to cover the partial-reduction curve; the caster 2-piece
-    // grants the full 1 (see the end-to-end suite below).
+    // Set directly to cover the whole reduction curve; the caster lineage
+    // 2-piece grants 0.5 (see the end-to-end suite below).
     p.castPushbackReduction = reduction;
     (sim as any).pushbackCast(p);
     return p;
@@ -360,10 +404,11 @@ describe('pushbackCast honors castPushbackReduction', () => {
   });
 });
 
-describe('caster 2-piece: damage never delays a cast (end to end)', () => {
+describe('caster lineage 2-piece: damage delays a cast half as much (end to end)', () => {
   // Runs the REAL inbound path: dealDamage's spell-pushback block fires
   // ctx.pushbackCast on every landed hit against a casting target, and the
-  // 2-piece Mournweave castPushbackReduction of 1 makes it a no-op.
+  // lineage 2-piece castPushbackReduction of 0.5 halves the delay (full
+  // immunity moved to the new raid tier's caster sets in the retune).
   const castThenHit = (equipSet: boolean) => {
     const sim = new Sim({ seed: 77, playerClass: 'mage' });
     sim.setPlayerLevel(20);
@@ -374,7 +419,7 @@ describe('caster 2-piece: damage never delays a cast (end to end)', () => {
       }
     }
     const p = sim.player;
-    expect(p.castPushbackReduction).toBe(equipSet ? 1 : 0);
+    expect(p.castPushbackReduction).toBe(equipSet ? 0.5 : 0);
     const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
     mob.pos = { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z };
     mob.prevPos = { ...mob.pos };
@@ -388,13 +433,13 @@ describe('caster 2-piece: damage never delays a cast (end to end)', () => {
     return { p, rem0 };
   };
 
-  it('with 2 Mournweave pieces the cast timer is untouched by a landed hit', () => {
+  it('with 2 Mournweave pieces the delay is halved', () => {
     const { p, rem0 } = castThenHit(true);
     expect(p.castingAbility).toBe('fireball'); // still casting
-    expect(p.castRemaining).toBe(rem0); // and not delayed at all
+    expect(p.castRemaining).toBeCloseTo(rem0 + CAST_PUSHBACK_SEC * 0.5, 9);
   });
 
-  it('without the set the same hit delays the cast (control)', () => {
+  it('without the set the same hit delays the cast in full (control)', () => {
     const { p, rem0 } = castThenHit(false);
     expect(p.castRemaining).toBeCloseTo(rem0 + CAST_PUSHBACK_SEC, 9);
   });
@@ -402,8 +447,8 @@ describe('caster 2-piece: damage never delays a cast (end to end)', () => {
 
 describe('knockback resistance (the aggregate stat, set synthetically)', () => {
   it('prevents a forced mob knockback from displacing the player', () => {
-    // No shipped set grants knockbackResistance anymore (the caster 2-piece is
-    // cast-pushback immunity); this pins the engine mechanic behind the stat.
+    // No shipped set grants knockbackResistance; this pins the engine mechanic
+    // behind the stat.
     const sim = new Sim({ seed: 5150, playerClass: 'mage' });
     const p = sim.entities.get(sim.playerId)!;
     p.maxHp = 100000;

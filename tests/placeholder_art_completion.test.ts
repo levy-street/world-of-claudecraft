@@ -282,11 +282,29 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(targets.deeds.every((id) => DEED_IMAGE_IDS.has(id))).toBe(true);
     // The campaign's frozen weapon scope predates the class-overhaul
     // integration's four daggers (integration-dagger-icons-2026-08-10 owns
-    // their art), so the live registry minus that batch is the campaign set.
+    // their art) and the ten Crucible raid weapons
+    // (crucible-raid-weapons-2026-08-28), so the live registry minus both
+    // batches is the campaign set.
     const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    const CRUCIBLE_WEAPON_IDS = [
+      'anvilguard_blade',
+      'cinderfang_kris',
+      'forgefathers_warhammer',
+      'forgefire_spire',
+      'heart_of_the_end_greatblade',
+      'slagrender_cleaver',
+      'springtouched_crozier',
+      'staff_of_the_last_spring',
+      'wand_of_quenched_sparks',
+    ];
+    // The Ignivar legendary maul postdates the campaign the same way (its art
+    // batch is ignivar-varkhul-drop-renders-2026-08-28).
+    const POST_CAMPAIGN_WEAPON_IDS = [...INTEGRATION_WEAPON_IDS, 'varkhul_forgebreaker'];
     expect(targets.weaponItems).toEqual(
       sorted(
-        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !INTEGRATION_WEAPON_IDS.includes(id)),
+        Object.keys(ITEM_WEAPON_VARIANTS).filter(
+          (id) => !POST_CAMPAIGN_WEAPON_IDS.includes(id) && !CRUCIBLE_WEAPON_IDS.includes(id),
+        ),
       ),
     );
     expect(targets.itemCleanup).toEqual([...CLEANUP_ITEM_IDS]);

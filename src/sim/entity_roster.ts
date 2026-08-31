@@ -218,6 +218,10 @@ export function runDespawnDecay(ctx: SimContext): void {
       e.despawnTimer -= DT;
       if (e.despawnTimer <= 0) despawnIds.push(e.id);
     }
+    if (e.hardDespawnTimer !== undefined) {
+      e.hardDespawnTimer -= DT;
+      if (e.hardDespawnTimer <= 0 && despawnIds.at(-1) !== e.id) despawnIds.push(e.id);
+    }
     if (
       e.kind === 'mob' &&
       DAMAGE_IDLE_DESPAWN_MOB_IDS.has(e.templateId) &&
@@ -318,17 +322,19 @@ export function tickGroundAoEs(ctx: SimContext): void {
 // The outdoor/dungeon release-spirit flow MOVED to src/sim/spirit.ts (the WoW-style
 // ghost loop). The in-delve respawn stays here (delves keep their own bounded
 // death rules) and spirit.ts calls into it for delve positions.
-export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
+// Returns false when no run owns this corpse, so the caller can fall back to the
+// graveyard release instead of leaving the player dead with no way out.
+export function releaseSpiritInDelve(ctx: SimContext, pid: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r?.e.dead) return;
+  if (!r?.e.dead) return false;
   const run = ctx.delveRunForPlayer(pid);
-  if (!run) return;
+  if (!run) return false;
   const deaths = (run.deathsThisRun[pid] ?? 0) + 1;
   run.deathsThisRun[pid] = deaths;
   if (deaths >= 2) {
     r.e.dead = false;
     ctx.failDelveRun(run);
-    return;
+    return true;
   }
   const p = r.e;
   p.dead = false;
@@ -378,6 +384,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
     ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
   }
   ctx.emit({ type: 'respawn', pid });
+  return true;
 }
 
 // Readout for "/graveyard": names the graveyard this position falls back to. Pure

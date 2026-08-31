@@ -160,6 +160,11 @@ describe('owned-class raid-level balance harness (armor and avoidance)', () => {
         // fixes). This ceiling was already this loose at 29930/29932 before this
         // change; 1.12 covers the one seed the diet actually asserts, same as
         // every prior re-pin above.
+        // The ranged-haste single-bucket fix lands on the same ceiling from the
+        // same direction: the hunter is the best other spec here and its
+        // auto-shot cadence no longer double-counts gear haste, so bestOther
+        // drops again. Vespers itself is still unchanged; the 1.12 the pet fixes
+        // already needed also covers the frozen seeds under this fix.
         const bestOtherDps = Math.max(
           ...levelResults.filter((result) => result.spec !== 'vespers').map((result) => result.dps),
         );

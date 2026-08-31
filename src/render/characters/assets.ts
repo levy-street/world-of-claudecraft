@@ -27,6 +27,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
 import {
@@ -86,6 +87,7 @@ import {
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -206,6 +208,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
   // grip family follows the handling, like the attach bone below.
   encore_the_second_falling_star: 'VAR_CROSSBOW',
+  hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
   ...KAYKIT_SHIELD_ACCESSORIES,
 };
 
@@ -392,7 +395,9 @@ function attachProp(
   swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
 ): THREE.Object3D {
-  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  const gltf = resolvedGltf(att.url);
+  const payload = flattenWeaponScene(cloneSkinned(gltf.scene));
+  if (gltf.animations.length) registerHeldPropIdle(root, payload, gltf.animations);
   primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
@@ -564,6 +569,13 @@ function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
 }
 let streamedUrls = streamedCharacterUrlsFor(GFX);
 let streamedUrlSet = new Set(streamedUrls);
+const lazyOnDemandUrls = new Set(
+  Object.values(VISUALS).flatMap((def) =>
+    def.lazyPreload
+      ? [def.url, ...(def.animUrls ?? []), ...(def.attach ?? []).map((a) => a.url)]
+      : [],
+  ),
+);
 let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
@@ -915,7 +927,7 @@ function resolvedGltf(url: string): GLTF {
     // attempt re-kicks the fetch (the mount lazy-load pattern; loadGltf
     // evicts rejected promises so the re-call really re-fetches). A
     // non-streamed miss stays a loud preload-set bug: no masking fetch.
-    if (streamedUrlSet.has(url)) ensureCharacterUrl(url);
+    if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);
     throw new Error(`character asset not preloaded: ${resolvedUrl}`);
   }
   return g;
@@ -1734,6 +1746,7 @@ export function setHeldWeapon(
     if (o.userData[SWAP_WEAPON_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
   const payloads: THREE.Object3D[] = [];
   for (const i of targets) {
     const base = attachments[i];
@@ -1765,6 +1778,7 @@ export function setHeldOffhand(
     if (o.userData[SWAP_OFFHAND_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
 
   const base = def.attach?.[def.offhandSlot];
   if (!base) return [];
@@ -1820,6 +1834,7 @@ export function setWeaponsStowed(
     if (o.userData[HELD_PROP_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
   return attachAllProps(root, def, weaponItemId, weaponSkinId, stowed, offhandItemId);
 }
 
@@ -1932,6 +1947,9 @@ export function tintedMaterial(
   // shape, and an omitted key silently restores the over-sharing this
   // parameter exists to prevent. A single-shape caller passes '' on purpose.
   shapeKey: string,
+  selfIllumination = 0,
+  envMapIntensity?: number,
+  matte = false,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1942,9 +1960,24 @@ export function tintedMaterial(
   // shapeKey: a mounted clone is shared only among meshes of one program
   // shape (material_program_shape_core.ts); single-shape callers (the far
   // bake) pass nothing.
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}`;
+  // matte partitions the key even on the low tier, where the Lambert
+  // derivation ignores it: a matte and a non-matte def sharing one source
+  // material would mint two identical Lambert clones there. Accepted, since
+  // no GLB is shared across matte and non-matte defs today, and keying on
+  // the derivation INPUTS keeps the key honest if the derivation changes.
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}`;
   const build = () =>
-    buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
+    buildTintedClone(
+      src as THREE.MeshStandardMaterial,
+      tint,
+      strength,
+      skinTex,
+      emisTex,
+      role,
+      selfIllumination,
+      envMapIntensity,
+      matte,
+    );
   if (claims) {
     if (claims.has(key)) {
       // This lease already claimed the key (the same source material on an
@@ -1974,6 +2007,9 @@ function buildTintedClone(
   skinTex: THREE.Texture | null,
   emisTex: THREE.Texture | null,
   role: MaterialRole,
+  selfIllumination: number,
+  envMapIntensity?: number,
+  matte = false,
 ): THREE.Material {
   const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -2061,7 +2097,25 @@ function buildTintedClone(
     // key light) and others at 1.0 (dead flat); the band keeps every character
     // in one coherent painted-surface response without touching metalness.
     const std = mat as THREE.MeshStandardMaterial;
-    std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    if (matte) {
+      // VisualDef.matte: fully diffuse. Zero the metalness AND drop both PBR
+      // response maps: the scalars only multiply the sampled texels, so a
+      // metallic or low-roughness texel would re-gloss the body under the
+      // scalar-only form.
+      std.metalness = 0;
+      std.roughness = 1;
+      std.metalnessMap = null;
+      std.roughnessMap = null;
+    } else {
+      std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    }
+    if (selfIllumination > 0 && std.map && !std.emissiveMap) {
+      std.emissiveMap = std.map;
+      std.emissive.set(0xffffff);
+      std.emissiveIntensity = selfIllumination;
+      std.needsUpdate = true;
+    }
+    if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   return mat;
@@ -2113,7 +2167,20 @@ export function applyMaterials(
     const shapeKey = meshProgramShapeKey(mesh);
     if (Array.isArray(source)) {
       mesh.material = source.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role, claims, 'rig', shapeKey),
+        tintedMaterial(
+          m,
+          materialTint,
+          strength,
+          sk,
+          em,
+          role,
+          claims,
+          'rig',
+          shapeKey,
+          role === 'body' ? (def.selfIllumination ?? 0) : 0,
+          role === 'body' ? def.envMapIntensity : undefined,
+          role === 'body' && (def.matte ?? false),
+        ),
       );
     } else {
       mesh.material = tintedMaterial(
@@ -2126,6 +2193,9 @@ export function applyMaterials(
         claims,
         'rig',
         shapeKey,
+        role === 'body' ? (def.selfIllumination ?? 0) : 0,
+        role === 'body' ? def.envMapIntensity : undefined,
+        role === 'body' && (def.matte ?? false),
       );
     }
     attachSharedDepthMaterials(mesh, mesh.material);
@@ -2162,6 +2232,9 @@ export function tintedFarMaterials(
       // One baked mesh per far LOD, so there is exactly one shape here and
       // nothing to partition. Deliberate, not an omission.
       '',
+      isBody[i] ? (def.selfIllumination ?? 0) : 0,
+      isBody[i] ? def.envMapIntensity : undefined,
+      isBody[i] && (def.matte ?? false),
     ),
   );
 }
@@ -2181,6 +2254,8 @@ export interface PreparedVisual {
   clips: Map<string, THREE.AnimationClip>;
   /** static idle-pose geometry in normalized space (far LOD + shadow proxy) */
   idleGeo: THREE.BufferGeometry | null;
+  /** caster-only idle-pose geometry for the mid-distance shadow proxy */
+  shadowGeo: THREE.BufferGeometry | null;
   /** source materials aligned with idleGeo groups */
   idleSrcMats: THREE.Material[];
   /** parallel to idleSrcMats: whether that material belongs to the
@@ -2325,7 +2400,11 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const { geo, mats, isBody } = bakeStaticPose(norm, farBakeMeshes(temp));
+  const farMeshes = farBakeMeshes(temp);
+  const { geo, mats, isBody } = bakeStaticPose(norm, farMeshes);
+  const shadowMeshes = farMeshes.filter(characterMeshCastsShadow);
+  const shadowGeo =
+    shadowMeshes.length === farMeshes.length ? geo : bakeStaticPose(norm, shadowMeshes).geo;
   // The throwaway retained a variant when the def is modular (assembleModular
   // retains every clone it makes). It exists only to be measured and flattened,
   // so give it back rather than pinning one part set per modular key forever
@@ -2339,6 +2418,7 @@ export function prepareVisual(key: string): PreparedVisual {
     yOffset,
     clips,
     idleGeo: geo,
+    shadowGeo,
     idleSrcMats: mats,
     idleSrcIsBody: isBody,
     clickRadius,

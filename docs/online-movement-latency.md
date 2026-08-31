@@ -11,6 +11,19 @@ chosen should get its own spec under `docs/prd/`.
 File references were verified against the tree on the date above; per `docs/CLAUDE.md`,
 trust the intent and re-find exact lines if they have drifted.
 
+## Option 3 note (the later rework)
+
+Option 3, full client-side prediction with server reconciliation, later shipped
+as movement wire v2: per-tick input frames, a server-side input timeline, and
+exact-match replay reconciliation. Its design authority is
+`docs/design/movement-reconciliation.md`, and the mandatory simulated-latency
+harness this report calls for exists as
+`tests/movement_latency_baseline.test.ts` (strict mode is the feel bar). The
+client-authoritative option below remains rejected; the display-extrapolator
+constraints this report frames stay in force only for the retained legacy v1
+path. The note below describes the earlier Option 1/2 rollout this report
+originally shipped with.
+
 ## Implementation note (what actually shipped)
 
 Options 1 and 2 below, the movement-kernel extraction, and the rule amendment
@@ -50,6 +63,22 @@ here so the survey is not read as the as-built spec:
   hysteresis fixes for pre-existing animation flicker the smoother display made
   visible (`src/render/locomotion.ts`). Step 4 of the recommendation
   (re-measure before considering full reconciliation) still stands.
+
+### Follow-up: rifts joined the predicted band (2026-08-24, issue #3479)
+
+Option 2 originally shipped with rifts (and delves) excluded outright: every
+key press there showed the full round trip, which read as "rifts feel
+noticeably heavier than the overworld." Rifts are now predicted the same as
+regular dungeons. The gap was wiring, not data: the online client already
+receives the rift floor descriptor and regenerates identical geometry from it
+with the same pure generator the server runs, so the fix is registering that
+geometry under a real `riftCollisionToken` (`src/net/online.ts`) and having
+the predictor strip/reapply the raised-tier lift around its kernel step
+(`src/render/self_motion_rift_lift.ts`), instead of predicting a flat floor
+against a server pose that is not one. Delves remain excluded (a separate,
+still-open gap: their per-run door and prop state is not mirrored
+client-side). See `src/net/CLAUDE.md`'s locomotion-anticipation entry for the
+constraint-by-constraint detail.
 
 ## Executive Read
 

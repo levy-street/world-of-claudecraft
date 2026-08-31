@@ -4,6 +4,7 @@ import {
   eventLeadDayKey,
   isSupportedTimeZone,
   nextRaidResetMs,
+  nextWeeklyRaidResetMs,
   RAID_RESET_HOUR,
   resetDayKey,
 } from '../server/raid_reset';
@@ -256,5 +257,70 @@ describe('resolveRaidResetTimeZone', () => {
     expect(resolveRaidResetTimeZone('Bad/Zone')).toBe(DEFAULT_RAID_RESET_TIME_ZONE);
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
+  });
+});
+
+describe('nextWeeklyRaidResetMs', () => {
+  // The weekly raid lockout boundary: RAID_RESET_HOUR on WEEKLY_RESET_WEEKDAY
+  // (Tuesday) in the realm zone. Chosen from 28 days of prod concurrency: the
+  // population is EU-evening/US-afternoon shaped with its weekly peak Sunday
+  // evening UTC and its trough 00:00-06:00 UTC, so Tuesday 3 AM US Eastern
+  // lands in the dead band, gives every lockout week one full weekend, and
+  // reuses the classic Tuesday-reset convention on the realm's existing
+  // daily-reset hour.
+
+  it('walks a mid-week instant forward to next Tuesday 3 AM Eastern', () => {
+    // Wednesday 2026-08-26 12:00 EDT (16:00 UTC) resets Tuesday 2026-09-01
+    // 03:00 EDT (07:00 UTC).
+    expect(nextWeeklyRaidResetMs(Date.UTC(2026, 7, 26, 16, 0, 0))).toBe(
+      Date.UTC(2026, 8, 1, 7, 0, 0),
+    );
+  });
+
+  it('a kill in the small hours of Tuesday unlocks at that same morning reset', () => {
+    // Tuesday 2026-08-25 02:59 EDT (06:59 UTC) resets 03:00 EDT the same day.
+    expect(nextWeeklyRaidResetMs(Date.UTC(2026, 7, 25, 6, 59, 0))).toBe(
+      Date.UTC(2026, 7, 25, 7, 0, 0),
+    );
+  });
+
+  it('the boundary itself belongs to the NEXT week (strictly after)', () => {
+    // Exactly Tuesday 03:00:00.000 EDT rolls a full week forward, matching
+    // nextRaidResetMs's strictly-after contract.
+    expect(nextWeeklyRaidResetMs(Date.UTC(2026, 7, 25, 7, 0, 0))).toBe(
+      Date.UTC(2026, 8, 1, 7, 0, 0),
+    );
+  });
+
+  it('crosses the US fall-back transition onto standard time', () => {
+    // Monday 2026-11-02 12:00 EST (17:00 UTC): the next Tuesday reset is
+    // 2026-11-03 03:00 EST = 08:00 UTC (the zone fell back on 11-01).
+    expect(nextWeeklyRaidResetMs(Date.UTC(2026, 10, 2, 17, 0, 0))).toBe(
+      Date.UTC(2026, 10, 3, 8, 0, 0),
+    );
+  });
+
+  it('crosses the US spring-forward transition onto daylight time', () => {
+    // Monday 2027-03-15 12:00 EDT (16:00 UTC): next Tuesday 2027-03-16
+    // 03:00 EDT = 07:00 UTC (the zone sprang forward on 03-14).
+    expect(nextWeeklyRaidResetMs(Date.UTC(2027, 2, 15, 16, 0, 0))).toBe(
+      Date.UTC(2027, 2, 16, 7, 0, 0),
+    );
+  });
+
+  it('honors an explicit zone and weekday', () => {
+    // Wednesday convention in Europe/Paris (CEST, UTC+2 in August): from
+    // Monday 2026-08-24 12:00 CEST, the next Wednesday 03:00 CEST is
+    // 2026-08-26 01:00 UTC.
+    expect(nextWeeklyRaidResetMs(Date.UTC(2026, 7, 24, 10, 0, 0), 'Europe/Paris', 3)).toBe(
+      Date.UTC(2026, 7, 26, 1, 0, 0),
+    );
+  });
+
+  it('is always strictly in the future and exactly one week apart when chained', () => {
+    const first = nextWeeklyRaidResetMs(Date.UTC(2026, 7, 26, 16, 0, 0));
+    const second = nextWeeklyRaidResetMs(first);
+    expect(first).toBeGreaterThan(Date.UTC(2026, 7, 26, 16, 0, 0));
+    expect(second - first).toBe(7 * 24 * 60 * 60 * 1000);
   });
 });

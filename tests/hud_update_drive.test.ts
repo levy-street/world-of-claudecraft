@@ -291,11 +291,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap raid-lockout badge class, value-diffed',
   },
   {
-    call: 'this.refreshDailyRewardsLauncher',
+    call: 'this.dailyRewardsLauncher.refresh',
     band: 'slow',
     gate: '',
     surface: 'chrome',
-    why: 'the daily-rewards launcher button state (not the window)',
+    why: 'the daily-rewards launcher button state (not the window). Bank Storage phase 15 moved the poll state machine out of hud.ts into daily_rewards_launcher_core.ts, where its throttle is executed-tested; a chrome row carries no guard field, so the pin lives there rather than here',
   },
   {
     call: 'this.maybeRestoreActionBarLayout',
@@ -364,7 +364,10 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'hud',
       proof:
-        'if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
+        // Phase 04 (craft-from-vault) moved this pin: the guard gained the
+        // craftVaultStock term so a vault-only stock change repaints an open
+        // window (the signature's V-prefixed vault rows).
+        'if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
     },
     why: 'the other half of the Craft gate: rebuilds the crafting window when the bags move',
   },
@@ -640,11 +643,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the player cast bar plus the eat/drink overlay',
   },
   {
-    call: 'this.swingTimerPainter.paint',
+    call: 'this.swingTimerBars.update',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the auto-attack swing timer',
+    why: 'the main-hand and off-hand (dual-wield melee weaving) swing timers',
+  },
+  {
+    call: 'this.targetSwingTimerBars.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the target and target-of-target swing timers, gated internally by showTargetSwingTimer',
   },
   {
     call: 'this.procOverlayEl.classList.add',
@@ -722,11 +732,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'selects the active source page for the touch action ring; no DOM write',
   },
   {
-    call: 'this.mobileActionSourceSlotCount',
+    call: 'this.groundAim.activeSlot',
     band: 'frame',
-    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    gate: 'actionBarWorld',
     surface: 'none',
-    why: 'counts the source slots that determine the touch action ring pagination; no DOM write',
+    why: 'stamps the armed ground-aim slot into the bar world snapshot so the owning button paints its aiming accent; no DOM write of its own',
   },
   {
     call: 'this.mobileActionRingPainter.paint',
@@ -1062,6 +1072,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the heroic vendor window out of range',
   },
   {
+    call: 'this.closeCrucibleVendor',
+    band: 'medium',
+    gate: 'this.openCrucibleVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'closes the crucible vendor window out of range',
+  },
+  {
     call: 'this.closeWarfareVendor',
     band: 'medium',
     gate: 'this.openWarfareVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
@@ -1205,6 +1223,22 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'module', module: 'bank_window.ts', proof: SIG_RETURN },
     why: 'the bank window; it also closes itself when the bank mirror goes null',
+  },
+  {
+    call: 'this.dailyRewardsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.dailyRewardsWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'daily_rewards_window.ts',
+      // Phase 15 QA moved the signature into src/ui/charter_fit_memory.ts, beside
+      // the refusals it invalidates. The guard the row names is still the ONE
+      // line that decides whether the poll paints, which is what this registry
+      // is checking; the memory's own suite pins the comparison itself.
+      proof: 'if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
+    },
+    why: "the WOC Store's charter fit gate, which reads live ladder state no store event observes (Bank Storage phase 15, ruling 21): the reachable case is the store and the bank open together at a bursar while a copper rung is bought in the bank",
   },
   {
     call: 'this.bagsWindow.refreshIfChanged',
@@ -1640,7 +1674,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // v0.40.0 sync merge back in.
       // chrome 82 -> 83: the controller-tutorial merge's gamepad control
       // hint apply.
-    ).toEqual({ window: 44, chrome: 83, none: 17 });
+      // chrome 83 -> 84: the target / target-of-target swing-timer bars call
+      // (target_swing_timer_bars.ts), thin-consumer wiring beside the
+      // existing swingTimerBars.update row.
+      // window 44 -> 46: the crucible vendor's out-of-range close (the third
+      // #vendor-window tenant, on the heroic vendor's exact row shape).
+      // Both deltas apply on the merged tree.
+    ).toEqual({ window: 46, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1654,21 +1694,20 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       // Reliquary cold window (module) + craft-cast single-surface strip (hud)
       // both land on this pin; keep both counts, do not drop either side.
-      // 24 = both sides of the v0.36.0 sync counted 23 alone (the branch's
-      // reliquary module guard vs the release's new module-guarded row).
-      // Down to 21 with the Vale Cup retirement (the New Eastbrook program):
-      // the cup window/briefing/betting module guards left with their painters.
-      // Up to 23 with the v0.40.0 sync merge: the release arm's
-      // woc_market_window row plus the trade-window row (its guard moved from
-      // a hud latch to the woc_trade controller in the extraction).
-      module: 23,
-      // 6 = Phase 20's refreshCharSheetIfChanged and its siblings. Their
-      // latches are HUD fields (lastCharSheetSig et al) because the cold
-      // char_window painter holds no signature of its own to diff. Down one
-      // with the v0.40.0 sync: the trade row's lastTradeSig latch now lives
-      // in the woc_trade module.
+      // Both arms grow this bucket independently, so it is set from a suite run
+      // on the MERGED tree: the branch's reliquary module guard and its WOC
+      // Store ladder-signature row (phase 15) land beside the release's
+      // woc_market_window and trade-window rows, less the Vale Cup window,
+      // briefing and betting module guards the retirement takes with it.
+      module: 24,
+      // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
+      // HUD fields (lastCharSheetSig et al) because the cold char_window painter
+      // holds no signature of its own to diff. The release's trade row left this
+      // bucket when its lastTradeSig latch moved into the woc_trade module.
       hud: 6,
-      callsite: 11,
+      // Up to 12 with the crucible vendor's out-of-range close: the same
+      // callsite-guarded shape as the copper and heroic vendor closes.
+      callsite: 12,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
@@ -1704,12 +1743,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',
         'card_duel_window.ts: if (sig === this.lastSig) return;',
+        'daily_rewards_window.ts: if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;',
         'deeds_window.ts: if (sig === this.lastSig) return;',
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
-        'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
+        'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',
         // Phase 20: the progression-block latch for the open character sheet.
         'hud.ts: if (sig === this.lastCharSheetSig) return;',

@@ -5,6 +5,7 @@
 // the old hand-mirroring between renderer geometry and collider literals.
 // Sim layer: no three.js imports.
 import type { Collider } from './colliders';
+import { IGNIVAR_ARENA_SHELL_POLYGON } from './ignivar_arena';
 import {
   type AuthoredDecor,
   type AuthoredDoor,
@@ -271,6 +272,126 @@ export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
 // the moon-sanctum with Ysolei's great altar dais. Side walls at |x|=23 like
 // the crypt so the KayKit wall modules fit unchanged; wall-side slots carry
 // drowned reliquary altars instead of sarcophagi.
+// The Halls of the First Tempering: a long, clipped forge nave broken into
+// three readable workshops by pillar pairs. The open centre aisle keeps each
+// guardian pull and the final gate visible from the preceding chamber.
+export const IGNIVAR_FORGE_APPROACH_LAYOUT: DungeonLayout = {
+  zMin: -58,
+  zMax: 58,
+  sideWallZ: 0,
+  sideWallHd: 58,
+  wallX: 28,
+  endWallHw: 28,
+  floorHalfX: 28,
+  doorZ: -58,
+  pillars: [
+    { x: -18, z: -31 },
+    { x: 18, z: -31 },
+    { x: -18, z: -4 },
+    { x: 18, z: -4 },
+    { x: -18, z: 23 },
+    { x: 18, z: 23 },
+  ],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 49, r: 7 },
+  shellPolygon: [
+    { x: -16, z: -58 },
+    { x: 16, z: -58 },
+    { x: 28, z: -46 },
+    { x: 28, z: 46 },
+    { x: 16, z: 58 },
+    { x: -16, z: 58 },
+    { x: -28, z: 46 },
+    { x: -28, z: -46 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
+/** The Forge-Lift: the raid's first room, a sealed 20x16 car with its own
+ *  portal in (the keep facade's teleport) and portal out (the exit gate,
+ *  locked through the ride, then an ordinary dungeon_door to the Halls).
+ *  The two pillar points carry torch rigs so the car is lit. */
+export const IGNIVAR_LIFT_LAYOUT: DungeonLayout = {
+  zMin: -8,
+  zMax: 8,
+  sideWallZ: 0,
+  sideWallHd: 8,
+  wallX: 10,
+  endWallHw: 10,
+  floorHalfX: 10,
+  doorZ: 8,
+  pillars: [
+    { x: -7, z: -3 },
+    { x: 7, z: -3 },
+  ],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 0 },
+  shellPolygon: [
+    { x: -10, z: -8 },
+    { x: 10, z: -8 },
+    { x: 10, z: 8 },
+    { x: -10, z: 8 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
+// Ignivar's Crucible: a flat octagonal raid room centered on the sealed heart.
+// The clipped corners give the four diagonal water conduits their own readable
+// stations while the entire fighting floor stays free of line-of-sight blockers.
+// The polygon is the one source for both rendered walls and collision.
+export const IGNIVAR_LAYOUT: DungeonLayout = {
+  zMin: -33,
+  zMax: 33,
+  sideWallZ: 0,
+  sideWallHd: 33,
+  wallX: 33,
+  endWallHw: 33,
+  floorHalfX: 33,
+  doorZ: -33,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 8 },
+  shellPolygon: [...IGNIVAR_ARENA_SHELL_POLYGON],
+  shellPole: { x: 0, z: 0 },
+};
+
+// The raid's second encounter room. It stays mechanically neutral until its boss
+// is authored: a larger twelve-sided floor, no pillars, and no line-of-sight
+// blockers. The extra space leaves room for a future encounter without changing
+// Ignivar's carefully tuned arena geometry.
+export const IGNIVAR_SECOND_WING_LAYOUT: DungeonLayout = {
+  zMin: -40,
+  zMax: 40,
+  sideWallZ: 0,
+  sideWallHd: 40,
+  wallX: 40,
+  endWallHw: 40,
+  floorHalfX: 40,
+  doorZ: -40,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 10 },
+  shellPolygon: [
+    { x: -16, z: -40 },
+    { x: 16, z: -40 },
+    { x: 32, z: -32 },
+    { x: 40, z: -16 },
+    { x: 40, z: 16 },
+    { x: 32, z: 32 },
+    { x: 16, z: 40 },
+    { x: -16, z: 40 },
+    { x: -32, z: 32 },
+    { x: -40, z: 16 },
+    { x: -40, z: -16 },
+    { x: -32, z: -32 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
 export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   const pillars: GridPoint[] = [];
   for (const z of [10, 25, 40, 55, 80, 95, 110]) {

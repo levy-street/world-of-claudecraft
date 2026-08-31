@@ -13,6 +13,7 @@ import { ENCHANTS } from '../sim/content/enchants';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
+import { durationText } from './duration_text';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
@@ -86,6 +87,29 @@ export function instanceBindingLines(
     return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.crafting.commissionUnbound'))}</div>`;
   }
   return '';
+}
+
+/** The bind-on-pickup party trade window line (src/sim/loot/bop_trade_window.ts),
+ *  rendered right under the def's Soulbound line it qualifies: while the
+ *  copy's window is unexpired, the piece can still be traded to the players
+ *  who shared its drop, and equipping it ends that early. `msRemainingFor` is
+ *  IWorld.partyTradeMsRemaining, injected because only the world knows which
+ *  clock `untilMs` was stamped from (tick-derived offline, epoch online);
+ *  this builder stays a Node-testable pure string function. Renders nothing
+ *  for an absent, malformed, or expired window, and never on WORN gear
+ *  (equip strips the payload field, and wornTooltipInstance would trim it
+ *  anyway). */
+export function instancePartyTradeLine(
+  instance: ItemInstancePayload | undefined,
+  msRemainingFor: (untilMs: number) => number,
+): string {
+  const untilMs = instance?.partyTrade?.untilMs;
+  if (untilMs === undefined || !Number.isFinite(untilMs)) return '';
+  const remainingMs = msRemainingFor(untilMs);
+  if (remainingMs <= 0) return '';
+  return `<div class="tt-sub" style="color:var(--gold)">${esc(
+    t('hudChrome.itemTooltip.partyTradeWindow', { time: durationText(remainingMs / 1000) }),
+  )}</div>`;
 }
 
 /** The player item lock line (issue 3042, src/sim/item_lock.ts): unlike the

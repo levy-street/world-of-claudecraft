@@ -3,6 +3,7 @@
 // craft ring. A pure sim leaf; no DOM.
 
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
@@ -67,15 +68,26 @@ describe('craftIdsForMaterialItem', () => {
     }
   });
 
-  it('every honest material has at least one craft consumer (no orphan reagents)', () => {
+  it('every non-pending material has at least one craft consumer', () => {
     // The material taxonomy only admits junk-kind members of the source-or-
-    // reagent union; if a material has zero craft consumers the Used-by line
-    // cannot fire and the bag stack is unexplained. Pin completeness here.
+    // reagent union, plus an explicit recipe-pending list. If any other
+    // material has zero craft consumers, the Used-by line cannot fire and the
+    // bag stack is unexplained. Pin completeness here.
+    const pending = new Set<string>(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS);
     for (const itemId of MATERIAL_ITEM_IDS) {
+      if (pending.has(itemId)) continue;
       expect(
         craftIdsForMaterialItem(itemId).length,
         `${itemId} must have a craft consumer`,
       ).toBeGreaterThan(0);
+    }
+  });
+
+  it('recipe-pending materials have no consumer yet and remain explicitly classified', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const itemId of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(itemId), itemId).toBe(true);
+      expect(craftIdsForMaterialItem(itemId), itemId).toEqual([]);
     }
   });
 

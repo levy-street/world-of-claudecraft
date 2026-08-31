@@ -909,4 +909,33 @@ export const table: DeedLocaleTable = {
     name: '冒険の準備は万端',
     desc: '修練の浜を卒業する。島でのすべての課題を終え、渡しの鐘を鳴らしてイーストブルックへ帰る。',
   },
+  soc_strongbox_outfitter: {
+    name: '最初のスロット',
+    desc: '初めて銀行バッグスロットを解放する。',
+  },
+  soc_four_bags_deep: {
+    name: '四つのスロット',
+    desc: '銀行バッグスロットを4つすべて解放する。',
+  },
+  dgn_ignivar: {
+    name: '先触れ、ここに墜つ',
+    desc: '最後の泉のるつぼで「イグニヴァル、最後の炎の先触れ」を倒す。',
+  },
+  dgn_ignivar_heroic: {
+    name: '英雄: 先触れ、ここに墜つ',
+    desc: '英雄難易度で「イグニヴァル、最後の炎の先触れ」を倒す。',
+  },
+  dgn_varkhul: {
+    name: '鍛冶場、冷え果てる',
+    desc: '内部るつぼで「最後の炎の鍛造父、ヴァルクル」を倒す。',
+  },
+  dgn_varkhul_heroic: {
+    name: '英雄: 鍛冶場、冷え果てる',
+    desc: '英雄難易度で「最後の炎の鍛造父、ヴァルクル」を倒す。',
+  },
+  dgn_varkhul_flawless: {
+    name: '消えぬ熾火',
+    desc: 'レイドの誰ひとり死なせずに、英雄難易度で「最後の炎の鍛造父、ヴァルクル」を倒す。',
+    title: '無傷',
+  },
 };

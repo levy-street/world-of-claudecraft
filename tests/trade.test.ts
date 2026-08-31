@@ -539,9 +539,17 @@ describe('trade module (direct, no Sim)', () => {
     const body = src.slice(start, end);
     // Both sides of the swap resolve through the one walk definition: the
     // gives leave a scratch of the receiver's own bags, the receives are the
-    // giver's walk over the giver's scratch.
-    expect(body).toContain('shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn)');
-    expect(body).toContain('shippedOfferUnits(ctx, receives, giver.entityId, scratchGiver)');
+    // giver's walk over the giver's scratch. Each walk names its RECIPIENT
+    // and shares tradeConfirm's ONE memoized clock read (the BoP party-trade
+    // window resolves the soulbound skip against both). Whitespace-collapsed:
+    // the second call wraps across lines.
+    const flatBody = body.replace(/\s+/g, ' ');
+    expect(flatBody).toContain(
+      'shippedOfferUnits(ctx, gives, meta.entityId, giver.entityId, scratchOwn, nowMsFor)',
+    );
+    expect(flatBody).toContain(
+      'shippedOfferUnits( ctx, receives, giver.entityId, meta.entityId, scratchGiver, nowMsFor, )',
+    );
     // Exactly two walk calls, and the model must CONSUME the second one's
     // return: a fork that keeps both calls but iterates its own hand-rolled
     // walk (presence pins alone cannot see that) fails the count, the
@@ -558,7 +566,8 @@ describe('trade module (direct, no Sim)', () => {
     const removeStart = src.indexOf('function removeOffer(');
     expect(removeStart).toBeGreaterThan(-1);
     const removeBody = src.slice(removeStart, src.indexOf('function grantOffer(', removeStart));
-    expect(removeBody).toContain('shippedOfferUnits(ctx, items, fromPid,');
+    // Whitespace-insensitive: the call wraps across lines since gaining toPid.
+    expect(removeBody.replace(/\s+/g, ' ')).toContain('shippedOfferUnits( ctx, items, fromPid,');
   });
 
   it('sellerSignedCharmDeprioritize scopes to charms and a resolved seller name', () => {

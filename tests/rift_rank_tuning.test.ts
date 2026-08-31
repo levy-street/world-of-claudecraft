@@ -1413,7 +1413,8 @@ describe('rift ranks: budget escape and citadel exemption', () => {
     boss.deathZoneStrikeTimer = 999;
     sim.player.pos = { ...boss.pos, z: boss.pos.z - 3 };
     sim.player.prevPos = { ...sim.player.pos };
-    tickAlive(sim, 5); // warm-up: aoePulse fires on first contact and arms the lock
+    boss.pulseTimer = 0.01; // due now: the telegraphed pulse is what arms the lock
+    tickAlive(sim, 5); // warm-up: the due aoePulse fires and arms the lock
     expect(boss.mechanicLockTimer, 'warm-up armed the shared lock').toBeGreaterThan(0);
     boss.deathZoneCastTimer = 0.01; // due now, but the lock is live
     inst.bossDeathZones = [];

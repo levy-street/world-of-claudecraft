@@ -147,6 +147,7 @@ function slotState(iconKey: string): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    aiming: false,
     procGlow: false,
     empowered: false,
     ascensionSpender: false,
@@ -302,6 +303,9 @@ function recordingEl(tag: string, writes: string[]): HTMLElement {
     },
     setAttribute(name: string, value: string): void {
       writes.push(`${name}=${value}`);
+    },
+    removeAttribute(name: string): void {
+      writes.push(`${name}=REMOVED`);
     },
   } as unknown as HTMLElement;
 }

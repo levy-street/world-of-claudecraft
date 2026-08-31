@@ -90,9 +90,14 @@ describe('Chronomancy Phase 3 balance targets', () => {
     // fixes riding it): the seed-trio median reads 98.7 on the moved world
     // stream; same band width recentered. The v0.40.0 sync merge keeps the
     // union of both arms' bands (the release arm re-anchored to 92..104 for
-    // its own content adds on the shared rng stream).
+    // its own content adds on the shared rng stream). Ceiling raised 104 -> 108
+    // when the avoidance roll for instant hostile spells and physical direct
+    // damage forked the stream again: the harness hit-caps the instants it
+    // drives, so the rotation's own mana economy is untouched (net mana/s 15.9
+    // to 14.8, DPS 33.8 to 34.7, Piro and Cryo unmoved) and the trio median
+    // drifts 98.0 to 105.3 on reshuffled crit and Clearcasting draws alone.
     expect(ooms[1]).toBeGreaterThanOrEqual(92);
-    expect(ooms[1]).toBeLessThanOrEqual(104);
+    expect(ooms[1]).toBeLessThanOrEqual(108);
     // 60s budget: the seed-trio median runs three 200s-cap rotations in one
     // case, which outgrows the default 20s under full-suite worker
     // contention (the raised-timeout idiom the other long sims use).

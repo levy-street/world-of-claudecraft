@@ -579,6 +579,24 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rows()).toHaveLength(2);
   });
 
+  it('keeps one stable boss-guide control between member rows and leader controls', () => {
+    const guide = fakeEl('button');
+    const master = fakeEl('div');
+    painter.setMasterControl(master as unknown as HTMLElement);
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.sync([member({ pid: 2 })], 1, false);
+
+    expect(container.childNodes).toEqual([wrapperOf(), guide, master]);
+    const movesBefore = container._mutations;
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.sync([member({ pid: 2, hp: 40 })], 1, false);
+    expect(container._mutations).toBe(movesBefore);
+
+    painter.clear();
+    expect(container.childNodes).toEqual([]);
+    expect(guide.parentNode).toBeNull();
+  });
+
   it('repaints the crest with the recycled member class via the live slot (the portrait gate)', () => {
     iconDataUrlSpy.mockClear();
     // A mage joins: the gate fires once for class_mage on the first paint.
@@ -757,6 +775,17 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(kids[0].id).toBe(chipId);
     expect(rows()).toHaveLength(2); // the two member rows live inside the wrapper
     expect(kids[kids.length - 1]).toBe(wrapperOf());
+  });
+
+  it('keeps the complete mobile footer order with chip, rows, guide, and loot controls', () => {
+    const guide = fakeEl('button');
+    const master = fakeEl('div');
+    painter.setCollapse(true, true, false, false);
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.setMasterControl(master as unknown as HTMLElement);
+    painter.sync([member({ pid: 2 })], 1, false);
+
+    expect(container.childNodes).toEqual([findChip(), wrapperOf(), guide, master]);
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {

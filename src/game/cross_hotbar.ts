@@ -54,6 +54,13 @@ export const CROSS_HOTBAR_TRIGGERS: Record<CrossHotbarLayer, number> = {
   right: GP.RT,
 };
 
+/** True for a trigger reserved as a cross-hotbar modifier. Unlike the eight
+ * layer buttons, a modifier has no bare flat-binding behavior while the cross
+ * hotbar is enabled. */
+export function isCrossHotbarModifier(button: number): boolean {
+  return button === CROSS_HOTBAR_TRIGGERS.left || button === CROSS_HOTBAR_TRIGGERS.right;
+}
+
 // The eight buttons one held trigger reaches, in display order: the d-pad
 // diamond first, then the face diamond, each read top, left, right, bottom. The
 // order is the panel's and the overlay's; the indices are physical POSITIONS
@@ -174,7 +181,7 @@ export function crossHotbarPosition(layer: CrossHotbarLayer, button: number): nu
 }
 
 /** True for a button the cross hotbar claims while a trigger is held, so the
- *  consumer knows to suppress that button's own flat binding. */
+ *  consumer knows to suppress that button's own flat binding for that chord. */
 export function isCrossHotbarButton(button: number): boolean {
   return CROSS_HOTBAR_LAYER_BUTTONS.includes(button);
 }

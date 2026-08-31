@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Prsteny trhliny',
     desc: 'Osobní prsteny trhliny, ražené pro každého šampiona v družině, která zvládne první průchod hodnocenou trhlinou. Každá postava může vlastnit jen ten svůj.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Epická kořist získaná od Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Hrdinský: Crucible of the Last Spring',
+    desc: 'Zbraně dostupné jen hrdinsky od Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Epická kořist získaná od Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Hrdinský: The Inner Crucible',
+    desc: 'Štíty a zbraně dostupné jen hrdinsky od Varkhul, Forgefather of the Last Flame.',
+  },
 };

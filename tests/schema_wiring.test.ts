@@ -16,6 +16,8 @@ const h = vi.hoisted(() => {
     rateLimitsExists: true,
     invalidMetricsIndexExists: false,
     failOpenIndexCreate: false,
+    failLargeAccountIndexCreate: false,
+    failReceiptsValidate: false,
   };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
@@ -26,6 +28,51 @@ const h = vi.hoisted(() => {
       String(sql).includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character')
     ) {
       return Promise.reject(new Error('index build interrupted'));
+    }
+    if (
+      state.failLargeAccountIndexCreate &&
+      String(sql).includes(
+        'CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent',
+      )
+    ) {
+      return Promise.reject(new Error('large account index build interrupted'));
+    }
+    // A shape-violating survivor row: the real fragment raises 23514 from the
+    // VALIDATE inside the DO block.
+    if (
+      state.failReceiptsValidate &&
+      String(sql).includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape')
+    ) {
+      return Promise.reject(
+        Object.assign(
+          new Error(
+            'check constraint "bank_ledger_batch_receipts_key_shape" of relation "bank_ledger_batch_receipts" is violated by some row',
+          ),
+          { code: '23514' },
+        ),
+      );
+    }
+    // Mirror node-postgres: a simple query carrying several top-level
+    // statements resolves to an ARRAY of per-statement results (dollar-quoted
+    // bodies are not statement boundaries). ensureSchema once read `.rows[0]`
+    // off a multi-statement fragment; the flat-object fake kept that green
+    // while every real boot threw, so the distinction must materialize here.
+    const topLevel = String(sql).replace(/\$([A-Za-z_][A-Za-z0-9_]*)?\$[\s\S]*?\$\1\$/g, "''");
+    const statements = topLevel.split(';').filter((part) => part.trim().length > 0);
+    if (statements.length > 1) {
+      return Promise.resolve(statements.map(() => ({ rows: [], rowCount: 0 })));
+    }
+    // The growth-budget gauge readback (a single-statement SELECT): seed the
+    // counters so the wiring test can assert they reach the observer.
+    if (
+      String(sql).includes('.bank_ledger_growth_budget') &&
+      String(sql).includes('SELECT committed_rows') &&
+      String(sql).includes('singleton = TRUE')
+    ) {
+      return Promise.resolve({
+        rows: [{ committed_rows: '7', hard_limit_rows: '10000000' }],
+        rowCount: 1,
+      });
     }
     // The invalid-carcass check for the post-commit metrics index build; a test
     // flips the flag to exercise the repair arm. Checked before the to_regclass
@@ -50,6 +97,7 @@ const h = vi.hoisted(() => {
     query,
     connect: vi.fn(() => Promise.resolve({ query, release: vi.fn() })),
     clientConfigs: [] as unknown[],
+    noticeListeners: [] as Array<(notice: unknown) => void>,
   };
 });
 vi.mock('pg', () => ({
@@ -65,10 +113,35 @@ vi.mock('pg', () => ({
       connect: vi.fn(() => Promise.resolve()),
       query: h.query,
       end: vi.fn(() => Promise.resolve()),
+      on: vi.fn((event: string, listener: (notice: unknown) => void) => {
+        if (event === 'notice') h.noticeListeners.push(listener);
+      }),
     };
   }),
 }));
+// Spy on the growth-budget observer (real behavior preserved) so the wiring
+// test can assert the seeded readback counters actually reach the gauge.
+vi.mock('../server/bank_ledger_growth_budget', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../server/bank_ledger_growth_budget')>();
+  return {
+    ...actual,
+    observeBankLedgerGrowthBudget: vi.fn(actual.observeBankLedgerGrowthBudget),
+  };
+});
 
+import {
+  bankLedgerGrowthBudgetReadbackSql,
+  observeBankLedgerGrowthBudget,
+} from '../server/bank_ledger_growth_budget';
+import {
+  BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INDEX_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL,
+  BANK_LEDGER_ACCOUNT_INDEX_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL,
+} from '../server/bank_ledger_indexes';
 import { CONCURRENT_INDEX_MIGRATIONS } from '../server/concurrent_indexes';
 import {
   closeMarketWriteGateForTests,
@@ -87,6 +160,8 @@ describe('ensureSchema wires every schema module at boot', () => {
     h.state.rateLimitsExists = true;
     h.state.invalidMetricsIndexExists = false;
     h.state.failOpenIndexCreate = false;
+    h.state.failLargeAccountIndexCreate = false;
+    h.state.failReceiptsValidate = false;
     h.clientConfigs.length = 0;
   });
 
@@ -394,6 +469,145 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the storage pending-purchase schema under the advisory lock', async () => {
+    // STORAGE_PURCHASE_SCHEMA (server/storage_purchase_db.ts, Bank Storage
+    // phase 11): the whole Claudium storage purchase flow hard-depends on
+    // this table (the durable pending row IS the recovery story). Pin it by
+    // name so it can never regress to defined-but-unwired (the
+    // DISCORD_SCHEMA lesson).
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS storage_purchases');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_character');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_account');
+    expect(applied).toContain('DROP INDEX IF EXISTS storage_purchases_refused');
+
+    // The one new DDL fragment carrying destructive statements. Allowlist each
+    // permitted statement EXACTLY, then hold the remainder (SQL comments
+    // stripped: prose like "Drop only after..." is not a statement) to the
+    // same no-destructive-DDL bar its sibling fragments get above.
+    const storageDdl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS storage_purchases'),
+    );
+    expect(storageDdl).toBeDefined();
+    const allowedDestructive = [
+      "DELETE FROM storage_purchases WHERE status = 'refused';",
+      'DROP INDEX IF EXISTS storage_purchases_character_pending;',
+      'DROP INDEX IF EXISTS storage_purchases_refused;',
+      'DROP INDEX IF EXISTS storage_purchases_one_pending_per_character;',
+      'DROP INDEX storage_purchases_one_open_per_character;',
+      'ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_status_allowed;',
+      'ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_claim_pair;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_character_delete ON characters;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_account_delete ON accounts;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_consumed_key ON storage_purchases;',
+      'DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;',
+    ];
+    let remainder = (storageDdl as string).replace(/--[^\n]*/g, '');
+    for (const statement of allowedDestructive) {
+      // Exactly the allowed count (one each): split-join stripped EVERY copy,
+      // so a DUPLICATED destructive statement used to pass this bar. Count on
+      // the comment-stripped text and remove only the single allowance.
+      const occurrences = remainder.split(statement).length - 1;
+      expect(occurrences, `allowlisted destructive statement count: ${statement}`).toBe(1);
+      remainder = remainder.replace(statement, '');
+    }
+    expect(remainder).not.toMatch(/\b(?:DROP|TRUNCATE|DELETE\s+FROM|ALTER\s+COLUMN)\b/i);
+  });
+
+  it('reads the growth-budget counters back with a dedicated single-statement query', async () => {
+    // The fragment ends in a SELECT, but node-postgres answers the whole
+    // multi-statement fragment with an ARRAY of results, so ensureSchema must
+    // issue the gauge readback as its own query (inside the boot transaction,
+    // before COMMIT) and feed the observer from THAT result.
+    vi.mocked(observeBankLedgerGrowthBudget).mockClear();
+    await ensureSchema();
+    const fragmentIndex = h.calls.findIndex(
+      (sql) =>
+        sql.includes('bank_ledger_growth_budget') && sql.includes('CREATE TABLE IF NOT EXISTS'),
+    );
+    expect(fragmentIndex).toBeGreaterThanOrEqual(0);
+    // Matched through the SAME exported builder db.ts issues (exported beside
+    // the schema builder precisely so the two cannot drift).
+    const readbackIndex = h.calls.findIndex(
+      (sql, index) => index > fragmentIndex && sql === bankLedgerGrowthBudgetReadbackSql(),
+    );
+    expect(readbackIndex).toBeGreaterThan(fragmentIndex);
+    expect(readbackIndex).toBeLessThan(h.calls.indexOf('COMMIT'));
+    // The fake answers the single-statement readback with these seeded
+    // counters; the observer receiving them proves the wiring end to end.
+    expect(observeBankLedgerGrowthBudget).toHaveBeenCalledWith('7', '10000000');
+  });
+
+  it('warns when the growth readback cannot seed the gauge', async () => {
+    // The monitor refresh backstops the gauge inside a minute, but a missing
+    // or malformed singleton right after the fragment ran deserves a name in
+    // the boot log rather than silence.
+    vi.mocked(observeBankLedgerGrowthBudget).mockReturnValueOnce(false);
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await ensureSchema();
+      expect(
+        warns.mock.calls.some((call) =>
+          String(call[0]).includes('growth budget readback did not seed the gauge'),
+        ),
+      ).toBe(true);
+    } finally {
+      warns.mockRestore();
+    }
+  });
+
+  it('forwards fragment RAISE NOTICE reports to the boot log, filtering the no-op DDL wall', async () => {
+    // The schema fragments report through RAISE NOTICE (the storage-purchase
+    // refused-row sweep names what it removed); node-postgres discards
+    // unconsumed notices, so BOTH dedicated boot clients must register the
+    // shared forwarder: the ensureSchema transaction client AND the
+    // post-listen concurrent-index client the VALIDATE now rides (notices
+    // there were silently discarded before the forwarder moved to
+    // schema_notices.ts). The filter must drop the ~400 idempotent-DDL skip
+    // notices every steady-state boot emits or the one real report drowns.
+    h.noticeListeners.length = 0;
+    await ensureSchema();
+    const ensureSchemaListeners = h.noticeListeners.length;
+    expect(ensureSchemaListeners).toBeGreaterThan(0);
+    await runConcurrentIndexMigrations();
+    expect(h.noticeListeners.length).toBeGreaterThan(ensureSchemaListeners);
+    const listener = h.noticeListeners[h.noticeListeners.length - 1];
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // Real steady-state shapes (measured on PG 16). The drop-skips arrive
+      // as SQLSTATE 00000, the SAME code a RAISE report carries, so the
+      // filter keys them on the server routine; 42710 (duplicate_object)
+      // joins the already-exists family the first three codes do not cover.
+      listener({ code: '42P07', message: 'relation "accounts" already exists, skipping' });
+      listener({ code: '42701', message: 'column "locale" already exists, skipping' });
+      listener({ code: '42P06', message: 'schema already exists, skipping' });
+      listener({ code: '42710', message: 'extension "pgcrypto" already exists, skipping' });
+      listener({
+        code: '00000',
+        routine: 'DropErrorMsgNonExistent',
+        message: 'index "woc_market_settlements_open" does not exist, skipping',
+      });
+      listener({
+        code: '00000',
+        routine: 'does_not_exist_skipping',
+        message:
+          'trigger "storage_purchase_archive_applied" for relation "storage_purchases" does not exist, skipping',
+      });
+      expect(warns).not.toHaveBeenCalled();
+      listener({
+        code: '00000',
+        routine: 'exec_stmt_raise',
+        message:
+          'storage_purchases: removed 3 legacy refused row(s) before installing the closed status constraint',
+      });
+      expect(warns).toHaveBeenCalledTimes(1);
+      expect(String(warns.mock.calls[0][0])).toMatch(/^\[schema\] storage_purchases: removed 3/);
+    } finally {
+      warns.mockRestore();
+    }
+  });
+
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
     // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
     // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and
@@ -458,6 +672,40 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(postCommitTimeoutOff).toBeGreaterThan(commitIndex);
     expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
 
+    // The out-of-boot half of the receipts key-shape converge: db.ts must
+    // actually ISSUE the VALIDATE fragment here, never inside the boot
+    // transaction, or a NOT VALID constraint the boot converge re-added stays
+    // unvalidated forever, and it must run INSIDE the session advisory lock:
+    // after the unlock, a concurrently booting realm would already hold the
+    // lock and be running boot DDL, whose ADD COLUMN / CREATE INDEX IF NOT
+    // EXISTS take ACCESS EXCLUSIVE / SHARE locks even when skipping (SHARE
+    // conflicts with VALIDATE's SHARE UPDATE EXCLUSIVE), so it would block
+    // MID-DDL behind the scan while holding table locks at statement_timeout
+    // 0, freezing every login and save; a waiter at pg_advisory_lock holds
+    // NOTHING (the pg suite proves the fragment's behavior and the waiter's
+    // empty lock set; this pin proves the wiring).
+    const receiptsValidate = h.calls.findIndex((sql) =>
+      sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape'),
+    );
+    expect(receiptsValidate).toBeGreaterThan(commitIndex);
+    expect(receiptsValidate).toBeGreaterThan(sessionLock);
+    expect(receiptsValidate).toBeLessThan(sessionUnlock);
+    // And the scan is bounded TRANSACTION-LOCALLY: BEGIN, both SET LOCAL
+    // bounds, VALIDATE, COMMIT, all inside the lock, so the exported helper
+    // can never leave a 60s session setting on a future pooled caller.
+    const validateBegin = h.calls.findIndex((sql, i) => i > sessionLock && sql === 'BEGIN');
+    const validateTimeout = h.calls.findIndex(
+      (sql, i) =>
+        i > sessionLock &&
+        sql === 'SET LOCAL statement_timeout = 60000; SET LOCAL lock_timeout = 5000',
+    );
+    const validateCommit = h.calls.findIndex((sql, i) => i > receiptsValidate && sql === 'COMMIT');
+    expect(validateBegin).toBeGreaterThan(sessionLock);
+    expect(validateBegin).toBeLessThan(validateTimeout);
+    expect(validateTimeout).toBeLessThan(receiptsValidate);
+    expect(validateCommit).toBeGreaterThan(receiptsValidate);
+    expect(validateCommit).toBeLessThan(sessionUnlock);
+
     // The invalid-carcass check runs under the session lock, before the create
     // it protects; on a healthy boot (no carcass) nothing is dropped. Scoped
     // past the session lock because the boot-DDL schema strings legitimately
@@ -468,6 +716,8 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
+    // Healthy entries need no INVALID-carcass drops. In particular, this
+    // release keeps the broad account index for mixed-version readers.
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
     const rewardEventsIndex = h.calls.findIndex((sql) =>
       sql.includes(
@@ -495,6 +745,25 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(worst10sIdx).toBeGreaterThan(openIdx);
     expect(worst10sIdx).toBeLessThan(sessionUnlock);
     expect(h.calls[worst10sIdx]).toContain('worst_10s_frame_p95_ms DESC, created_at DESC');
+
+    const broadAccountIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_recent'),
+    );
+    const sellerSalesIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS woc_market_sales_seller'),
+    );
+    const largeMovementIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+    );
+    expect(broadAccountIdx).toBeGreaterThan(worst10sIdx);
+    expect(h.calls[broadAccountIdx]).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(h.calls[broadAccountIdx]).not.toContain('WHERE');
+    expect(sellerSalesIdx).toBeGreaterThan(broadAccountIdx);
+    expect(largeMovementIdx).toBeGreaterThan(sellerSalesIdx);
+    expect(h.calls[largeMovementIdx]).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(h.calls[largeMovementIdx]).toContain('WHERE abs(copper_delta) >= 100000');
+    expect(largeMovementIdx).toBeLessThan(sessionUnlock);
+    expect(h.calls).not.toContain(BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL);
   });
 
   it('keeps the CONCURRENTLY builds OUT of ensureSchema (they run after listen)', async () => {
@@ -595,6 +864,85 @@ describe('ensureSchema wires every schema module at boot', () => {
     const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
     expect(failedCreate).toBeGreaterThan(-1);
     expect(unlock).toBeGreaterThan(failedCreate);
+    // The VALIDATE rides the same try as the builds: an index-build failure
+    // skips it for the same next-boot retry, never runs it past the unlock.
+    expect(
+      h.calls.some((sql) => sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts')),
+    ).toBe(false);
+  });
+
+  it('a failed receipts VALIDATE reports loudly without failing the migration run', async () => {
+    // The VALIDATE has its own try/catch: a shape-violating survivor row (or a
+    // deadline expiry at production cardinality) must leave the constraint
+    // NOT VALID and the boot GREEN, not reject the whole post-listen phase.
+    // The pg suite proves the constraint really stays NOT VALID and enforcing
+    // for new writes; this pin proves the isolation wiring.
+    h.state.failReceiptsValidate = true;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(runConcurrentIndexMigrations()).resolves.toBeUndefined();
+      expect(
+        errors.mock.calls.some((call) => String(call[0]).includes('key-shape VALIDATE failed')),
+      ).toBe(true);
+    } finally {
+      errors.mockRestore();
+    }
+    // The failure was contained INSIDE the lock: the helper rolled its own
+    // transaction back, and the finally still released the session lock, so
+    // no realm stays wedged behind a failed VALIDATE and the next boot
+    // retries it.
+    const validateIdx = h.calls.findIndex((sql) =>
+      sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape'),
+    );
+    const rollback = h.calls.findIndex((sql, i) => i > validateIdx && sql === 'ROLLBACK');
+    const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(validateIdx).toBeGreaterThan(-1);
+    expect(rollback).toBeGreaterThan(validateIdx);
+    expect(unlock).toBeGreaterThan(rollback);
+  });
+
+  it('keeps the broad account index when its partial replacement build fails', async () => {
+    const migration = CONCURRENT_INDEX_MIGRATIONS.find(
+      (entry) => entry.name === 'bank_ledger_account_large_recent',
+    ) as { retireSql?: string };
+    const syntheticRetire = 'SELECT 1 /* synthetic concurrent-index retirement */';
+    migration.retireSql = syntheticRetire;
+    h.state.failLargeAccountIndexCreate = true;
+    try {
+      await expect(runConcurrentIndexMigrations()).rejects.toThrow(
+        'large account index build interrupted',
+      );
+      const failedCreate = h.calls.findIndex((sql) =>
+        sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+      );
+      expect(failedCreate).toBeGreaterThan(-1);
+      // The generic retirement arm is strictly post-create: an interrupted
+      // build must never reach it.
+      expect(h.calls).not.toContain(syntheticRetire);
+      const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+      expect(unlock).toBeGreaterThan(failedCreate);
+    } finally {
+      delete migration.retireSql;
+    }
+  });
+
+  it('runs a staged index retirement only after its replacement create succeeds', async () => {
+    const migration = CONCURRENT_INDEX_MIGRATIONS.find(
+      (entry) => entry.name === 'bank_ledger_account_large_recent',
+    ) as { retireSql?: string };
+    const syntheticRetire = 'SELECT 1 /* synthetic concurrent-index retirement */';
+    migration.retireSql = syntheticRetire;
+    try {
+      await runConcurrentIndexMigrations();
+      const create = h.calls.findIndex((sql) =>
+        sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+      );
+      const retire = h.calls.indexOf(syntheticRetire);
+      expect(create).toBeGreaterThan(-1);
+      expect(retire).toBeGreaterThan(create);
+    } finally {
+      delete migration.retireSql;
+    }
   });
 
   it('applies the play-session retention schema after the metrics schema and before the relocated exclusion view', async () => {
@@ -689,6 +1037,8 @@ describe('ensureSchema wires every schema module at boot', () => {
       'chat_violations_retention_created',
       'bank_ledger_account_recent',
       'woc_market_sales_seller',
+      'woc_market_ops_closed_created',
+      'bank_ledger_account_large_recent',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -723,19 +1073,67 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerContainer?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
     );
-    // The admin economy-oversight per-account bank_ledger reader
-    // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
-    // same bounded-backwards-scan shape as the guild reader. NOT partial: the
-    // threshold is a parameter here, applied as a trailing Filter.
-    const bankLedgerAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+    // The shipped broad account index remains in its original registry slot.
+    // Fresh databases need its unqualified key for the account FK, while old
+    // binaries need its ordered shape during the rolling-deploy window.
+    const bankLedgerBroadAccount = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'bank_ledger_account_recent',
     );
-    expect(bankLedgerAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
-    expect(bankLedgerAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
-    expect(bankLedgerAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
-    expect(bankLedgerAccount?.dropSql).toBe(
+    expect(bankLedgerBroadAccount?.createSql).toBe(BANK_LEDGER_ACCOUNT_INDEX_SQL);
+    expect(bankLedgerBroadAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerBroadAccount?.createSql).not.toContain('WHERE');
+    expect(bankLedgerBroadAccount?.checkSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL);
+    expect(bankLedgerBroadAccount?.dropSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL);
+    // The toBe pins above compare against the same constants production
+    // assigns, so both sides move together. Pin the load-bearing scraps as
+    // LITERALS: losing `AND NOT i.indisvalid` from the carcass check would
+    // let the repair path DROP a perfectly VALID index with this suite green.
+    expect(bankLedgerBroadAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
+    expect(bankLedgerBroadAccount?.checkSql).toContain('AND NOT i.indisvalid');
+    expect(bankLedgerBroadAccount?.dropSql).toContain('DROP INDEX CONCURRENTLY IF EXISTS');
+    expect(bankLedgerBroadAccount?.dropSql).toContain('bank_ledger_account_recent');
+    expect(bankLedgerBroadAccount?.retireSql).toBeUndefined();
+    // The admin economy-oversight per-account bank_ledger reader
+    // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
+    // same bounded-backwards-scan shape as the guild reader. It is partial on
+    // the fixed production threshold so small movements add no permanent
+    // write amplification to this keep-forever audit table.
+    const bankLedgerLargeAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_account_large_recent',
+    );
+    expect(bankLedgerLargeAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerLargeAccount?.createSql).toContain('WHERE abs(copper_delta) >= 100000');
+    expect(bankLedgerLargeAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerLargeAccount?.checkSql).toContain(
+      "to_regclass('bank_ledger_account_large_recent')",
+    );
+    expect(bankLedgerLargeAccount?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_large_recent',
+    );
+    // Phase two is explicit but deliberately not armed in this release: an
+    // old realm's parameterized generic plan still needs the broad ordering
+    // index during rolling deploys and the rollback window. That release
+    // appends the compact migration and attaches this retirement to IT, never
+    // by inserting ahead of today's already-shipped partial migration.
+    expect(BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent',
     );
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).toContain(
+      'CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_fk',
+    );
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).toContain('ON bank_ledger(account_id)');
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).not.toContain('WHERE');
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL).toContain(
+      "to_regclass('bank_ledger_account_fk')",
+    );
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL).toContain('AND NOT i.indisvalid');
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_fk',
+    );
+    expect(CONCURRENT_INDEX_MIGRATIONS.some((m) => m.name === 'bank_ledger_account_fk')).toBe(
+      false,
+    );
+    expect(bankLedgerLargeAccount?.retireSql).toBeUndefined();
     // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
     // age scan, so the index leads with created_at rather than either existing
     // account column, and is partial on the resolved-report predicate the
@@ -781,6 +1179,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(wocSalesSeller?.checkSql).toContain("to_regclass('woc_market_sales_seller')");
     expect(wocSalesSeller?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS woc_market_sales_seller',
+    );
+    const wocOpsClosed = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'woc_market_ops_closed_created',
+    );
+    expect(wocOpsClosed?.createSql).toContain(
+      'ON woc_market_listings(realm, resolution, created_at DESC, id DESC)',
+    );
+    expect(wocOpsClosed?.createSql).toContain(
+      "WHERE directed_buyer_account IS NULL AND status = 'closed'",
+    );
+    expect(wocOpsClosed?.checkSql).toContain("to_regclass('woc_market_ops_closed_created')");
+    expect(wocOpsClosed?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS woc_market_ops_closed_created',
     );
   });
 

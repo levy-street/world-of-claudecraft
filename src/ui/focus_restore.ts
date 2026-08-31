@@ -115,8 +115,37 @@ export interface FocusRestoreCandidate {
  * `if (focusKey !== null)`), so a caller that could mint one must decide which it means
  * rather than inherit whichever its guard happens to be.
  */
+/**
+ * The one place the `data-focus-key` ATTRIBUTE is built, so a markup emitter and
+ * {@link captureFocusKey} cannot disagree about the namespace's spelling. Returns
+ * a leading-space attribute fragment ready to concatenate into an element's
+ * opening tag, with the key escaped for a double-quoted attribute context.
+ *
+ * It exists because a pure markup module can legitimately EMIT a key without
+ * ever reading focus: pushing the emission through this seam keeps such a module
+ * inside the namespace's single-reader rule instead of hand-spelling the
+ * attribute beside it.
+ */
+export function focusKeyAttr(key: string): string {
+  return ` data-focus-key="${key.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"`;
+}
+
 export function captureFocusKey(root: HTMLElement): string | null {
   return focusedWithin(root)?.dataset.focusKey ?? null;
+}
+
+/**
+ * Resolve one focus key in a rebuilt subtree by exact dataset equality.
+ *
+ * Keys may include server-supplied item ids, so the value is deliberately never
+ * interpolated into a CSS attribute selector. The literal selector discovers the
+ * namespace members; the DOM's dataset value then performs the identity match.
+ */
+export function findFocusKey(root: ParentNode, key: string): HTMLElement | null {
+  for (const candidate of root.querySelectorAll(`[${FOCUS_KEY_ATTR}]`)) {
+    if (candidate instanceof HTMLElement && candidate.dataset.focusKey === key) return candidate;
+  }
+  return null;
 }
 
 /**
@@ -181,6 +210,17 @@ export function focusedWithin(root: ParentNode): HTMLElement | null {
  * player may not be looking at) win over that offset. Focus must be visible (WCAG
  * 2.4.11), and the common case cannot conflict: the control being refocused is the one
  * the player was already on, so it is in view and `focus()` scrolls nothing.
+ *
+ * THAT LAST PREMISE HAS ONE KNOWN EXCEPTION, and it is recorded here because this is
+ * the one place the decision is spelled. Bank Storage phase 18 made `#bank-window`
+ * itself a scroller on short phones, so the control a player was already on CAN be out
+ * of view: they scroll away from the search box while it still holds focus. A repaint
+ * then restores the offset and a bare `focus()` immediately spends 127px of it
+ * (measured). The bank window passes `preventScroll` on THAT path only, and the
+ * reasoning above is why it is not done here: this helper serves a DEGRADE ladder, and
+ * a degraded target is one the player may genuinely not be looking at, so scrolling it
+ * into view is the behaviour that keeps focus visible. A caller re-focusing the SAME
+ * control it captured is the case where the offset should win instead.
  *
  * SYNCHRONOUS on purpose, unlike FocusManager.restore, which defers a tick to win
  * against a browser's own post-close focus move. There is no competing move here: the
