@@ -196,6 +196,8 @@ export const de_DE: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Gedrosselte Wallet-Challenges",
   "usage.metric.walletLinkRequest": "Wallet-Verknüpfungsanfragen",
   "usage.metric.walletLinkFailure": "Wallet-Verknüpfungsfehler",
+  "usage.metric.walletUnlinkFailure": "Abgelehnte Wallet-Trennungen",
+  "usage.metric.walletUnlinkSuccess": "Abgeschlossene Wallet-Trennungen",
   "usage.metric.walletLinkRateLimited": "Gedrosselte Wallet-Verknüpfungen",
   "usage.metric.cardPublishRequest": "Veröffentlichungen von Spielerkarten",
   "usage.metric.cardPublishRejected": "Abgelehnte Spielerkarten-Veröffentlichungen",

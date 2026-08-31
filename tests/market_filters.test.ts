@@ -123,10 +123,7 @@ describe('World Market filters', () => {
       'amber_crimson_armor_plate',
       'alien_armor_plate',
     ]);
-    expect(filterIds(mixed, { itemType: 'material' })).toEqual([
-      'simple_fishing_pole',
-      'bone_fragments',
-    ]);
+    expect(filterIds(mixed, { itemType: 'material' })).toEqual(['bone_fragments']);
   });
 
   // Issue #2189: bags matched no item-type option at all (the 'material' arm is
@@ -135,11 +132,8 @@ describe('World Market filters', () => {
   it('browses bags as their own category, and never as materials, cosmetics or Other', () => {
     const mixed = ['linen_pouch', 'mistcallers_duffel', 'bone_fragments', 'simple_fishing_pole'];
     expect(filterIds(mixed, { itemType: 'bag' })).toEqual(['linen_pouch', 'mistcallers_duffel']);
-    expect(filterIds(mixed, { itemType: 'material' })).toEqual([
-      'bone_fragments',
-      'simple_fishing_pole',
-    ]);
-    expect(filterIds(mixed, { itemType: 'other' })).toEqual([]);
+    expect(filterIds(mixed, { itemType: 'material' })).toEqual(['bone_fragments']);
+    expect(filterIds(mixed, { itemType: 'other' })).toEqual(['simple_fishing_pole']);
     expect(filterIds(mixed, { itemType: 'cosmetic' })).toEqual([]);
     expect(filterIds(mixed, { itemType: 'armor' })).toEqual([]);
     // And exclusivity for EVERY catalog bag against EVERY bucket, not a hand-picked
@@ -153,6 +147,19 @@ describe('World Market filters', () => {
         `${id} must answer exactly one browse category`,
       ).toEqual(['bag']);
     }
+  });
+
+  // Issue #3757: a fishing rod (kind 'tool') was filed under the 'material'
+  // browse category, which is wrong — tools/gather-tools are not reagents.
+  // The material predicate now matches only junk (canonical isMaterialItem
+  // rule), and gathering tools route to the 'other' catch-all instead.
+  it('does not file fishing rods (kind tool) under materials (#3757)', () => {
+    const rods = ['stormreel_fishing_rod', 'simple_fishing_pole', 'tidewrought_fishing_rod'];
+    // None of the rods appear under materials.
+    expect(filterIds(rods, { itemType: 'material' })).toEqual([]);
+    // They are reachable through the 'other' catch-all (and 'All').
+    expect(filterIds(rods, { itemType: 'other' })).toEqual(rods);
+    expect(filterIds(rods, { itemType: 'all' })).toEqual(rods);
   });
 
   // The stat and armor-class filters are no-ops outside armor/weapon, which is the whole

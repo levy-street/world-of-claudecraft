@@ -1366,12 +1366,12 @@ describe('woc_market_window: the quote countdown actually moves', () => {
     expect(render).toContain('this.quoteCountdownSig()');
   });
 
-  it('keys on SECONDS, matching the resolution the countdown is displayed at', () => {
-    // A finer key would rebuild many times per second for an unchanged string.
+  it('keys through the view core on the WINDOW clock, from the pending quote alone', () => {
+    // The arithmetic (seconds, empty with no deadline) lives in the pure core and
+    // is pinned behaviorally in tests/woc_market_view.test.ts; the window's part
+    // is to feed it its own pending quote and the wall clock it owns.
     const sig = between('private quoteCountdownSig()', '/** Language fan-out arm');
-    expect(sig).toContain('/ 1000');
-    // And no pending quote means no key at all, so an idle window still rests.
-    expect(sig).toContain("return ''");
+    expect(sig).toContain('wocQuoteCountdownSig(this.pendingQuote?.quote.expiresAtMs, Date.now())');
   });
 });
 

@@ -2003,6 +2003,29 @@ export class FakeWocMarketDb implements WocMarketDb {
     return true;
   }
 
+  /** The parked-review arm's realm-scoped CAS twin: the rec carries realm
+   *  internally (see the type note above), so a wrong-realm caller misses,
+   *  matching the SQL's AND realm = $2. */
+  async transitionSettlementInRealm(
+    realm: string,
+    id: number,
+    from: WocSettlementState[],
+    to: WocSettlementState,
+    failReason?: string,
+  ): Promise<boolean> {
+    const rec = this.settlements.get(id);
+    if (!rec || rec.realm !== realm) return false;
+    return this.transitionSettlement(id, from, to, failReason);
+  }
+
+  async settlementStateInRealm(
+    realm: string,
+    id: number,
+  ): Promise<{ state: WocSettlementState } | null> {
+    const rec = this.settlements.get(id);
+    return rec && rec.realm === realm ? { state: rec.state } : null;
+  }
+
   async confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {
     return [...this.settlements.values()]
       .filter((s) => s.realm === realm && s.state === 'confirming')

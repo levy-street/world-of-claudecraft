@@ -2218,6 +2218,7 @@ const UI_DOM_MODULES = [
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/wallet_reauth_prompt.ts',
   'src/ui/wallet_verify_request.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',

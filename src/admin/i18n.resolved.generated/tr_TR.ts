@@ -196,6 +196,8 @@ export const tr_TR: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Kısıtlanan cüzdan doğrulama istekleri",
   "usage.metric.walletLinkRequest": "Cüzdan bağlama istekleri",
   "usage.metric.walletLinkFailure": "Cüzdan bağlama başarısızlıkları",
+  "usage.metric.walletUnlinkFailure": "Reddedilen cüzdan bağlantısı kaldırmaları",
+  "usage.metric.walletUnlinkSuccess": "Tamamlanan cüzdan bağlantısı kaldırmaları",
   "usage.metric.walletLinkRateLimited": "Kısıtlanan cüzdan bağlama istekleri",
   "usage.metric.cardPublishRequest": "Oyuncu kartı yayın istekleri",
   "usage.metric.cardPublishRejected": "Reddedilen oyuncu kartı yayınları",

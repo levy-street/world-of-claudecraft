@@ -540,6 +540,7 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
+import { blurIfPointerClick } from './pointer_blur';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
@@ -2360,6 +2361,7 @@ export class Hud {
       if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       this.playerCard.refresh();
       this.claudiumWindow.onWalletChanged();
+      this.wocMarketWindow.onWalletChanged();
     });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
@@ -9261,6 +9263,7 @@ export class Hud {
     el.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
+      blurIfPointerClick(ev, el);
       this.openMailbox();
     });
     el.addEventListener('keydown', (ev) => {
@@ -16958,6 +16961,10 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleTalents(): void {
+    const player = this.sim.entities.get(this.sim.primaryId);
+    if (player?.inCombat || player?.nythraxis) {
+      return; // prevent opening talents during combat or boss encounter
+    }
     const el = $('#talents-window');
     if (el.style.display === 'block') {
       this.talentsWindow.close();

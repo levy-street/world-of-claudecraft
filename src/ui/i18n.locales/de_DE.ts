@@ -2619,6 +2619,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parieren',
   'apiError.wallet.handoff_invalid':
     'Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.',
+  'apiError.wallet.reauth_required': 'Bestätige diese Wallet-Änderung mit deinem Konto-Passwort.',
+  'apiError.wallet.reauth_two_factor':
+    'Für dein Konto ist die Zwei-Faktor-Authentifizierung aktiviert. Gib zur Bestätigung deinen Code ein.',
+  'apiError.wallet.reauth_no_password':
+    'Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.',
+  'apiError.wallet.reauth_bad_signature':
+    'Die Wallet-Signatur konnte nicht verifiziert werden. Versuche es erneut.',
+  'apiError.wallet.reauth_bad_password': 'Dein Passwort ist falsch.',
+  'apiError.wallet.reauth_bad_two_factor': 'Dieser Code ist ungültig, versuche es erneut.',
   'cardDuel.close': 'Schließen',
   'cardDuel.counts': 'Deck: {deck} · Ablagestapel: {discard}',
   'cardDuel.forfeit': 'Aufgeben',
@@ -4910,6 +4919,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Trennen',
   'wallet.unlinkTitle': 'Wallet-Verifizierung von diesem Konto entfernen',
   'wallet.unlinkAria': 'Wallet-Verifizierung von diesem Konto entfernen',
+  'wallet.reauthTitle': 'Wallet-Änderung bestätigen',
+  'wallet.reauthUnlinkTitle': 'Wallet-Entfernung bestätigen',
+  'wallet.reauthHelp':
+    'Gib zu deiner Sicherheit dein Konto-Passwort ein, um diese Änderung zu erlauben.',
+  'wallet.reauthNoPassword':
+    'Dieses Konto meldet sich ohne Passwort an. Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.',
+  'wallet.reauthConfirm': 'Bestätigen',
+  'wallet.reauthCancel': 'Abbrechen',
+  'wallet.reauthClose': 'Schließen',
   'wallet.signOut': 'Abmelden',
   'wallet.signOutTitle': 'Wallet-App in diesem Browser trennen',
   'wallet.signOutAria': 'Wallet-App in diesem Browser trennen',

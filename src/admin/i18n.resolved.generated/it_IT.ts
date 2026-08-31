@@ -196,6 +196,8 @@ export const it_IT: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Challenge wallet limitate",
   "usage.metric.walletLinkRequest": "Richieste collegamento wallet",
   "usage.metric.walletLinkFailure": "Errori collegamento wallet",
+  "usage.metric.walletUnlinkFailure": "Rifiuti scollegamento wallet",
+  "usage.metric.walletUnlinkSuccess": "Scollegamenti wallet completati",
   "usage.metric.walletLinkRateLimited": "Collegamenti wallet limitati",
   "usage.metric.cardPublishRequest": "Richieste pubblicazione carta giocatore",
   "usage.metric.cardPublishRejected": "Pubblicazioni carta respinte",

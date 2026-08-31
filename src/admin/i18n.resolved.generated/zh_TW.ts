@@ -196,6 +196,8 @@ export const zh_TW: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "錢包挑戰限流",
   "usage.metric.walletLinkRequest": "錢包連結請求",
   "usage.metric.walletLinkFailure": "錢包連結失敗",
+  "usage.metric.walletUnlinkFailure": "錢包解除連結被拒",
+  "usage.metric.walletUnlinkSuccess": "錢包解除連結完成",
   "usage.metric.walletLinkRateLimited": "錢包連結限流",
   "usage.metric.cardPublishRequest": "玩家卡片發布請求",
   "usage.metric.cardPublishRejected": "玩家卡片發布遭拒",

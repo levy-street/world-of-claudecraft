@@ -97,6 +97,16 @@ const en: Record<EmailTemplateKey, EmailTemplate> = {
       'In effect until: {{until}}\n\n' +
       'Reply to this email if you believe this was a mistake.',
   },
+  wallet_changed: {
+    subject: `Your ${BRAND} account wallet was {{action}}`,
+    text:
+      'Hi {{username}},\n\n' +
+      'The Solana wallet linked to your account was just {{action}}.\n' +
+      'Wallet: {{wallet}}\n\n' +
+      'Marketplace sale proceeds pay to the linked wallet, so if you did not do ' +
+      'this, change your password immediately and contact support before ' +
+      'selling anything.',
+  },
   generic: {
     subject: '{{heading}}',
     text: 'Hi {{username}},\n\n{{body}}',

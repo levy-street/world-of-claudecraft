@@ -10726,7 +10726,7 @@
   }
   .df-cols {
     display: grid;
-    grid-template-columns: 236px 1fr;
+    grid-template-columns: minmax(180px, 236px) 1fr;
     gap: 10px;
     flex: 1 1 auto;
     min-height: 0;
@@ -15939,12 +15939,13 @@
     flex: none;
     align-items: stretch;
   }
-  /* The banner strip under the tabs holds only the two STANDING banners (a
-     paused realm, an unlinked wallet), which move on an operator action or a
-     wallet link, never on a click. The notice and busy line live in the
-     footer bar below the body instead, in a slot that keeps its height, so a
-     toast that comes and goes never shifts the rows or the form. All three
-     share one look: a themed well inside the panel, never a second panel. */
+  /* The banner strip under the tabs (above the Browse filters) holds only the
+     STANDING banners (a paused realm, the Solana wallet card), which move on an
+     operator action or a wallet event, never on a click. The notice and busy
+     line live in the footer bar below the body instead, in a slot that keeps
+     its height, so a toast that comes and goes never shifts the rows or the
+     form. All share one look: a themed well inside the panel, never a second
+     panel. */
   #woc-market-window .wm-strip {
     flex: none;
     display: flex;
@@ -15989,16 +15990,36 @@
   #woc-market-window .wm-notice-error {
     border-color: var(--color-border-invalid);
   }
+  /* The Solana wallet card: the Claudium panel's .cl-wallet-connect grid (title
+     over the state sentence, the action button spanning both rows on the far
+     edge) in this window's own tokens, so it reads as the same card without
+     borrowing the store's palette. */
   #woc-market-window .wm-banner-wallet {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+    grid-template-rows: auto auto;
+    gap: 4px var(--spacing-md);
+    align-items: start;
+    padding: var(--spacing-sm) 10px;
     border-color: var(--color-accent);
   }
-  /* The banner's connect shortcut rides the flex row's far edge: the label
-     soaks the remaining width, the button keeps its own. */
-  #woc-market-window .wm-banner-wallet span {
-    flex: 1;
+  #woc-market-window .wm-banner-wallet > strong {
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  #woc-market-window .wm-banner-wallet p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 16px;
   }
   #woc-market-window .wm-banner-wallet button {
-    flex: none;
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 100%;
     white-space: nowrap;
   }
   /* The shared ring (hud.css .woc-spinner) inside a flex line: the container's

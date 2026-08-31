@@ -2625,6 +2625,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parata',
   'apiError.wallet.handoff_invalid':
     "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova.",
+  'apiError.wallet.reauth_required':
+    'Conferma questa modifica del portafoglio con la password del tuo account.',
+  'apiError.wallet.reauth_two_factor':
+    "Il tuo account ha l'autenticazione a due fattori attiva. Inserisci il tuo codice per confermare.",
+  'apiError.wallet.reauth_no_password':
+    "Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+  'apiError.wallet.reauth_bad_signature':
+    'Impossibile verificare la firma del portafoglio. Riprova.',
+  'apiError.wallet.reauth_bad_password': 'La tua password non è corretta.',
+  'apiError.wallet.reauth_bad_two_factor': 'Questo codice non è valido, riprova.',
   'cardDuel.close': 'Chiudi',
   'cardDuel.counts': 'Mazzo: {deck} - Scarti: {discard}',
   'cardDuel.forfeit': 'Abbandona',
@@ -4888,6 +4898,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Scollega',
   'wallet.unlinkTitle': 'Rimuovi la verifica del portafoglio da questo account',
   'wallet.unlinkAria': 'Rimuovi la verifica del portafoglio da questo account',
+  'wallet.reauthTitle': 'Conferma modifica del portafoglio',
+  'wallet.reauthUnlinkTitle': 'Conferma rimozione del portafoglio',
+  'wallet.reauthHelp':
+    'Per la tua sicurezza, inserisci la password del tuo account per autorizzare questa modifica.',
+  'wallet.reauthNoPassword':
+    "Questo account accede senza password. Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+  'wallet.reauthConfirm': 'Conferma',
+  'wallet.reauthCancel': 'Annulla',
+  'wallet.reauthClose': 'Chiudi',
   'wallet.signOut': 'Disconnetti',
   'wallet.signOutTitle': "Disconnetti l'app del portafoglio su questo browser",
   'wallet.signOutAria': "Disconnetti l'app del portafoglio su questo browser",

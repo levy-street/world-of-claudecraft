@@ -2580,6 +2580,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Savuşturma',
   'apiError.wallet.handoff_invalid':
     'Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.',
+  'apiError.wallet.reauth_required': 'Bu cüzdan değişikliğini hesap parolanızla onaylayın.',
+  'apiError.wallet.reauth_two_factor':
+    'Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.',
+  'apiError.wallet.reauth_no_password':
+    'Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.',
+  'apiError.wallet.reauth_bad_signature': 'Cüzdan imzası doğrulanamadı. Tekrar deneyin.',
+  'apiError.wallet.reauth_bad_password': 'Parolanız yanlış.',
+  'apiError.wallet.reauth_bad_two_factor': 'Bu kod geçerli değil, tekrar deneyin.',
   'cardDuel.close': 'Kapat',
   'cardDuel.counts': 'Deste: {deck} · Atılan: {discard}',
   'cardDuel.forfeit': 'Teslim Ol',
@@ -10000,6 +10008,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Farklı bir cüzdan doğrula',
   'wallet.unlink': 'Bağlantıyı Kaldır',
   'wallet.unlinkAria': 'Bu hesaptan cüzdan doğrulamasını kaldır',
+  'wallet.reauthTitle': 'Cüzdan değişikliğini onayla',
+  'wallet.reauthUnlinkTitle': 'Cüzdan kaldırmayı onayla',
+  'wallet.reauthHelp': 'Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.',
+  'wallet.reauthNoPassword':
+    'Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.',
+  'wallet.reauthConfirm': 'Onayla',
+  'wallet.reauthCancel': 'İptal',
+  'wallet.reauthClose': 'Kapat',
   'wallet.unlinkFailed': 'Cüzdan bağlantısı kaldırılamadı.',
   'wallet.unlinkTitle': 'Bu hesaptan cüzdan doğrulamasını kaldır',
   'wallet.verify': 'Cüzdanı Doğrula',

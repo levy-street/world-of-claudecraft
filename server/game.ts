@@ -277,6 +277,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -4684,6 +4685,9 @@ export class GameServer {
   async loadMail(): Promise<void> {
     try {
       this.sim.loadMail(await loadMailState());
+      // Only after a SUCCESSFUL load: replay the durable custody parcel rows
+      // the last crash window left (book-once dedupes the ones the blob has).
+      await mergeCustodyParcelOverlay(this.sim);
     } catch (err) {
       console.error('failed to load mail:', err);
     }
@@ -6023,10 +6027,6 @@ export class GameServer {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.left || session.dirtyGuildBanks.size === 0) return;
     await this.saveCharacter(session);
-  }
-
-  async persistMailBlob(): Promise<void> {
-    await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
   }
 
   // Force-close every live session for the account. A bearer token is a reusable
@@ -7606,7 +7606,7 @@ export class GameServer {
             .catch(logSocialErr);
         break;
       case 'guild_decline':
-        this.social.guildDecline(this.actorFor(session));
+        void this.social.guildDecline(this.actorFor(session)).catch(logSocialErr);
         break;
       case 'guild_leave':
         void this.social.guildLeave(this.actorFor(session)).catch(logSocialErr);

@@ -4360,7 +4360,13 @@ export const it_IT: EnTranslations = {
       "upstream": "Epic non ha risposto. Riprova tra un momento."
     },
     "wallet": {
-      "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
+      "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova.",
+      "reauth_required": "Conferma questa modifica del portafoglio con la password del tuo account.",
+      "reauth_two_factor": "Il tuo account ha l'autenticazione a due fattori attiva. Inserisci il tuo codice per confermare.",
+      "reauth_no_password": "Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+      "reauth_bad_signature": "Impossibile verificare la firma del portafoglio. Riprova.",
+      "reauth_bad_password": "La tua password non è corretta.",
+      "reauth_bad_two_factor": "Questo codice non è valido, riprova."
     },
     "ota_updates": {
       "invalid_input": "Dati non validi."
@@ -7285,6 +7291,13 @@ export const it_IT: EnTranslations = {
     "unlink": "Scollega",
     "unlinkTitle": "Rimuovi la verifica del portafoglio da questo account",
     "unlinkAria": "Rimuovi la verifica del portafoglio da questo account",
+    "reauthTitle": "Conferma modifica del portafoglio",
+    "reauthUnlinkTitle": "Conferma rimozione del portafoglio",
+    "reauthHelp": "Per la tua sicurezza, inserisci la password del tuo account per autorizzare questa modifica.",
+    "reauthNoPassword": "Questo account accede senza password. Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+    "reauthConfirm": "Conferma",
+    "reauthCancel": "Annulla",
+    "reauthClose": "Chiudi",
     "signOut": "Disconnetti",
     "signOutTitle": "Disconnetti l'app del portafoglio su questo browser",
     "signOutAria": "Disconnetti l'app del portafoglio su questo browser",

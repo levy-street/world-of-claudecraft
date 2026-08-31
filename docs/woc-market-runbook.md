@@ -110,9 +110,10 @@ on a production realm:
    live (`WOC_MARKET_CONFIRMING_REVIEW_HOURS`; section 10). This shipped,
    and the knob is clamped at 720 hours with a loud boot warn
    (`server/woc_market_routes.ts`: the bound cannot be effectively disabled
-   by configuration); the enable check is that the OPERATOR arm for
-   resolving a parked review row exists by then (section 10: no sanctioned
-   surface drives that transition yet).
+   by configuration); the operator arm for resolving a parked review row is
+   `POST /internal/woc-market/settlements/:id/resolve` (section 10), so this
+   enable check is satisfied by verifying that route answers on the build
+   being enabled.
 
 ## 4. Wind-down (draining the market)
 
@@ -339,14 +340,24 @@ keep-forever, either of which disarms the prune coupling.
   `WOC_MARKET_CONFIRMING_REVIEW_HOURS`, default six hours, clamped at 720
   with a loud boot warn) needs a human: VERIFY ON CHAIN first, then resolve
   review to `confirmed` (the payment is real; delivery resumes) or review
-  to `failed` (unpaid; the overdue default pass takes over). KNOW THE GAP:
-  the transition machinery is `transitionSettlement`
-  (`server/woc_market_db.ts`) but NO route, admin command, or tool drives
-  it for review resolution yet (the stuck route's own comment records
-  this), and hand SQL is FORBIDDEN because it bypasses the compare-and-set
-  guards. Until the sanctioned operator surface lands (a pre-enable
-  follow-up with an owner in the hardening records), a review row has no
-  legitimate manual exit; escalate to the maintainer rather than improvise.
+  to `failed` (unpaid; the overdue default pass takes over). The sanctioned
+  surface is `POST /internal/woc-market/settlements/:id/resolve` with body
+  `{"verdict": "paid" | "unpaid"}` (dashboard-secret gated, beside the
+  stuck readout that lists the rows; `server/woc_market_review_resolution.ts`
+  documents the semantics). It rides the same `transitionSettlement`
+  compare-and-set every state move uses, refuses while the kill switch is
+  off like the other operator writes, and answers 409 on a lost operator
+  race. An unpaid ruling stamps `fail_reason = review_unpaid`; a paid ruling
+  keeps the `confirming_overdue` park fingerprint on the confirmed row.
+  Hand SQL remains FORBIDDEN because it bypasses those guards. KNOW WHAT
+  UNPAID DOES DOWNSTREAM: review_unpaid is not in the abandon-exempt list,
+  so the overdue default pass that picks up the failed row strikes the
+  buyer, exactly as any other settlement default does; a verified-unpaid
+  ruling IS a default, so only rule unpaid once the chain check is certain.
+  Under the retained API_DISPATCH=legacy rollback the resolve route
+  terminal-404s like its read siblings (the legacy ladder knows no
+  woc-market arm), which is why the enable-time check verifies the route
+  answers on the build being enabled.
 - The service expires a `confirming` quote five hours past its expiry
   (`service/src/market/quotes.ts`, MAX_CONFIRMING_AGE_MS, code-owned; sized
   under the game's review bound and under RPC signature-history depth so the

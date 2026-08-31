@@ -2600,6 +2600,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Pareren',
   'apiError.wallet.handoff_invalid':
     'Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.',
+  'apiError.wallet.reauth_required': 'Bevestig deze portemonneewijziging met je accountwachtwoord.',
+  'apiError.wallet.reauth_two_factor':
+    'Je account heeft tweestapsverificatie ingeschakeld. Voer je code in om te bevestigen.',
+  'apiError.wallet.reauth_no_password':
+    'Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.',
+  'apiError.wallet.reauth_bad_signature':
+    'De handtekening van de portemonnee kon niet worden geverifieerd. Probeer het opnieuw.',
+  'apiError.wallet.reauth_bad_password': 'Je wachtwoord is onjuist.',
+  'apiError.wallet.reauth_bad_two_factor': 'Die code is niet geldig, probeer het opnieuw.',
   'cardDuel.close': 'Sluiten',
   'cardDuel.counts': 'Deck: {deck} - Aflegstapel: {discard}',
   'cardDuel.forfeit': 'Opgeven',
@@ -9427,6 +9436,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifieer een andere portemonnee',
   'wallet.unlink': 'Ontkoppelen',
   'wallet.unlinkAria': 'Verwijder portemonneeverificatie van dit account',
+  'wallet.reauthTitle': 'Portemonneewijziging bevestigen',
+  'wallet.reauthUnlinkTitle': 'Portemonneeverwijdering bevestigen',
+  'wallet.reauthHelp':
+    'Voer voor je veiligheid je accountwachtwoord in om deze wijziging toe te staan.',
+  'wallet.reauthNoPassword':
+    'Dit account logt in zonder wachtwoord. Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.',
+  'wallet.reauthConfirm': 'Bevestigen',
+  'wallet.reauthCancel': 'Annuleren',
+  'wallet.reauthClose': 'Sluiten',
   'wallet.unlinkFailed': 'Kon portemonnee niet ontkoppelen.',
   'wallet.unlinkTitle': 'Verwijder portemonneeverificatie van dit account',
   'wallet.verify': 'Portemonnee verifiëren',

@@ -521,11 +521,12 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
     id: DEVIATION_ID.rateLimitedBodyToCode,
     routes: ['/api/wallet/link/challenge', '/api/wallet/link', '/api/woc/balance', '/api/card'],
     currentBehavior:
-      'On throttle, the wallet link-challenge, wallet link, woc balance, and card ' +
-      'routes answer 429 { error: "rate limited" } (application/json): the two ' +
-      'wallet routes self-limit inside handleWalletChallenge / handleWalletLink, and ' +
-      'the woc balance + card arms limit inline in server/main.ts, each returning the ' +
-      'same bare English prose body.',
+      'On throttle, the wallet link-challenge, wallet link, wallet unlink, woc balance, ' +
+      'and card routes answer 429 { error: "rate limited" } (application/json): the two ' +
+      'wallet link routes self-limit inside handleWalletChallenge / handleWalletLink, ' +
+      'the wallet unlink DELETE arm (the R11 rate-limit rider) plus the woc balance + ' +
+      'card arms limit inline in server/main.ts, each returning the same bare English ' +
+      'prose body.',
     intendedBehavior:
       'The new pipeline serves these routes: the throttle is a ' +
       'rateLimit(policy) middleware (WALLET_LINK_POLICY / WOC_BALANCE_POLICY / ' +

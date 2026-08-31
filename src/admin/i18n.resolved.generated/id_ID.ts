@@ -196,6 +196,8 @@ export const id_ID: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Permintaan tantangan dompet yang dibatasi",
   "usage.metric.walletLinkRequest": "Permintaan tautan dompet",
   "usage.metric.walletLinkFailure": "Kegagalan tautan dompet",
+  "usage.metric.walletUnlinkFailure": "Penolakan pelepasan tautan dompet",
+  "usage.metric.walletUnlinkSuccess": "Pelepasan tautan dompet selesai",
   "usage.metric.walletLinkRateLimited": "Permintaan tautan dompet yang dibatasi",
   "usage.metric.cardPublishRequest": "Permintaan penerbitan kartu pemain",
   "usage.metric.cardPublishRejected": "Penerbitan kartu pemain yang ditolak",
