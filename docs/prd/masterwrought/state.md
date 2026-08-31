@@ -23256,6 +23256,73 @@ record; the QA twin re-sweeps and diffs.
   untouched). The QA bar "RESULT PASS with the union-only pin list shrunk and
   the mutation guard re-run for the emits class" is met on this unit's
   classes; the tree-wide RESULT rides the batch validation.
+- U-SIM-FARM architecture review round 155a925cd2 (0 blocking, 4 should-fix,
+  7 notes, ALL applied): the battleground and honor arms the monotone
+  resetDay setter had silently no-opped rebuilt on fresh worlds; the sim
+  CLAUDE.md clamp paragraph; the reserved feast_range record; the ONE
+  claimedInstanceForMob predicate (four consumers); the honest farm_ready
+  header; feastOwnerKey null tolerance; the spatial cell-window helper (rule
+  of three, scratch copied to locals; a first name `window` tripped the sim
+  DOM-token scan and was renamed cellBounds); the dev-channel warn on the
+  load-side prompt drop; four professions module-map rows. Fresh reader in
+  flight.
+- U-SRV-HOT 8cc3248db6 (7 items + the admin memo review addendum, 27 census
+  rows): zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and
+  192 bytes per recipient today vs 8 to 11 ns shared; 0.4 us per second at
+  design cadence, 0.14 percent of a tick at the absolute ceiling; the splice
+  would buy a cross-module key-order invariant and a second serialization
+  path for nanoseconds), premises pinned in
+  tests/zone_celebration_fanout_shape.test.ts (so Phase 19 seed row 11 is
+  answered: no shape change owed); perfect-item-dirty-flag and
+  farming-command-refusal-selfheavydirty (the arm-marked subset; a SIM-side
+  denial still marks because the dispatch cannot see the sim's verdict,
+  documented); guild-name-screen-lane; p99-blob-size-gauge
+  (woc_character_state_bytes_p99, window 1024, heartbeat token blobP99=);
+  setimmediate-warn-shutdown-trade (queue + synchronous drain as the last
+  step before process.exit); release-hygiene-flags (all three arms; the third
+  identified the three release-authored db-mock suites by provenance
+  inference, flagged as such). game.ts LOWERED 10298 to 10294 via
+  tick_perf_log.ts. The admin addendum: tab-derived budgets (15 reads per tab
+  per minute from the SPA's own cadences; 8 tabs per operator = 120, 40 tabs
+  per NAT = 600), one memo per route, the key contract restated and pinned,
+  deep-frozen snapshots at install, a stats readout, memoized byte lengths,
+  an empty-parts refusal. Hot-path review in flight. The persist counter
+  scrape line is a marked TODO in game_metrics.ts until the counter module
+  lands.
+- U-FE-HUD + U-FE-WINDOWS da6443b616 (17 items, one commit because the
+  input_dialog to input_controller rename and hud.ts's import flip must land
+  in one tree; 23 census rows incl. two i18n keys): hud-inline-tone-hexes +
+  grant-green-hex-tokenization (125 literals on 121 lines onto the hud_tones
+  records HUD_LOG / MAP_TONE / CHROME_TONE, named by role; the professions
+  arms consume PROF_LOG_GRANT/DENY/MISS; grep-zero pinned through the shared
+  walker with the canvas fills and inline-CSS uses included, so the QA bar's
+  "grep count zero" holds literally), hud-tooleffectrecharge-extraction
+  (tool_effect_result_view, an exhaustive deny-key record), hud-tooltip-
+  bottom-clamp (tooltip_clamp_core; the bottom clamp is inert for on-screen
+  anchors, what bounds the bottom there is the top floor plus the new height
+  cap, stated in the tests), perfecting-rail-tile-keybind (Shift+T: bare T is
+  Crafting and Perfecting parks on its parent's shifted layer the way
+  Professions parks over the Spellbook; both main.ts dispatch sites; a hand-
+  authored glyph since no painted chrome art exists, a maintainer follow-up
+  if primary-destination art is wanted; col-a at exactly 12 tiles, pinned),
+  harvest-journal-rail-button (the tile half over the existing Shift+K),
+  commission-board-dialog-semantics (label form, flex-column open, opener
+  captured after paint and restored on close), modal-painters-gate-blindspot
+  (renames; red-proven with a planted offsetWidth: "input_controller.ts:
+  .offsetWidth appears 1x, expected 0"), status-region-itemid-fallback and
+  same-copy-refusal-uncued-edge (hudChrome.perfecting.unknownItem and
+  .namingSelectionUnconfirmed, five M16 overlay fills each, recorded verbatim
+  in the QA handoff for re-judgement at the release fill), roving-tabindex-
+  radiogroup (both windows; mutation-proven), enchant-target-row-copy-
+  identity (the Phase 14 ordinal+count anchor per family; the wire stays
+  id-only, the identity keys focus and shift detection), questlog-display-
+  name-unification, entity-display-module-consolidation (one module, two
+  re-export shims kept only for hud.ts's import surface), delve-map-painter-
+  dead-northlabel, crafting-reagent-nowrap, harvest-journal-padstart-seconds
+  (clock_seconds_core over three sites), farm-pin-palette-split (the station
+  token on both surfaces). hud.ts LOWERED 18731 to 18718, main.ts 11515 to
+  11509 (the sheathe cue rule extracted to src/game/sheathe_toggle.ts).
+  Frontend seam review in flight; the browser suite rides the batch gate.
 
 ### JUDGED THIS PHASE (refusals this phase itself makes; each cites the ground)
 
@@ -23303,6 +23370,16 @@ record; the QA twin re-sweeps and diffs.
   next login (the server feeds its own realm calendar, so online play is
   unaffected; the persisted gate date re-rolls on login). A wart the guard
   trades for closing the backwards-read double payout; recorded, not tuned.
+- The unleased save fence evaluates its lease check as an InitPlan BEFORE the
+  characters row lock is taken, so a lease acquired while the fence UPDATE waits
+  on a contended row is unseen for that wait; the Phase 18 lock_timeout bounds
+  the window to two seconds (the database review's measurement). A residual
+  concurrency shape, not a scaling defect; recorded.
+- The pg integration suites pin FIXED verify-database names by house
+  convention (two concurrent runs of ONE suite drop each other's database);
+  Phase 18 suffixes the character-save suite's name per worker/pid because the
+  phase lengthened its window, and records the convention divergence: a
+  repo-wide sweep of the other pg suites is out of this packet's scope.
 - (more appended at STEP 4)
 
 ### VALIDATION
