@@ -11,3 +11,20 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # Windows batch scripts keep their CRLF endings: exempt from text conversion so an
 # LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
 *.bat -text
+
+# Media assets are binary, always. Git's text heuristic samples only the first
+# block of a file, and a Radiance HDR (pure-ASCII header, no NUL in the sample)
+# passes as text: with core.autocrlf=true a fresh Windows checkout smudged the
+# evergarden env HDRs from LF to CRLF (+4 bytes each), build_media_manifest.mjs
+# hashed the smudged bytes, and the gate's manifest freshness step failed on
+# src/render/assets/manifest.generated.ts. Pin every extension in the manifest
+# script's MEDIA_EXTENSIONS set, not just the ones the heuristic misses today
+# (welded by tests/media_gitattributes.test.ts).
+*.glb binary
+*.fbx binary
+*.hdr binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.ktx2 binary
