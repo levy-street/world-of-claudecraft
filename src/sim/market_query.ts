@@ -201,15 +201,16 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
       item.kind === 'elixir'
     );
   if (filter === 'bag') return item.kind === 'bag';
-  if (filter === 'material')
-    return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
+  if (filter === 'material') return !isCosmeticItem(item) && item.kind === 'junk';
   if (filter === 'cosmetic') return isCosmeticItem(item);
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: quest items are never listable, and reins
   // (listable now that they are unbound) are too few to earn a filter chip.
-  // Neither may be left reachable through 'All' alone
-  // (tests/market_filters.test.ts).
-  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
+  // Gathering tools (kind 'tool': fishing rods, picks, sickles, axes) also land
+  // here — they are not reagents, so they must not show under 'material'
+  // (issue #3757), and 'other' is the catalog's catch-all browse bucket.
+  if (filter === 'other')
+    return item.kind === 'quest' || item.kind === 'mount' || item.kind === 'tool';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.
