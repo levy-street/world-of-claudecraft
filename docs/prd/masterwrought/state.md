@@ -23171,6 +23171,9 @@ recommendations, never rulings (no decision is guessed in this phase).
 | D120 | well-fed-last-eaten-wins | Keep the classic last-eaten-wins well-fed overwrite (eating a tier-1 dish after an apex plate downgrades the buff) or add a downgrade guard. | state.md, the 11c review record (lines 7032-7034 as read): 'Note RECORDED, not changed: eating a tier-1 dish after an apex plate downgrades the buff, the deliberate classic last-eaten-wins rule', a recorded-not-acted note qr-18-REOPEN reopens; the adjacent ruling 11c-D-2 (farming/state.md:479 as read) ratified the single well_fed id but never ruled on guarding the downgrade. | Keep last-eaten-wins, ratified [no-op (a dated RULED line); the legibility question stays with its own row]; Add a downgrade guard (refuse or confirm when the incoming buff is weaker) [wellfed.ts logic plus a sim test, identical behavior in both hosts, new confirm/refusal player copy with t() keys, and a deliberate departure from classic-era behavior] | Keep last-eaten-wins: classic fidelity is a project pillar, the ledger records the rule as deliberate, and the softer remedy (making the downgrade legible) is already priced separately as the row-4 legibility item rather than a mechanic change. | new (distinct from the row-4 legibility row: this is the mechanic policy, that is the UX surface) |
 | D121 | admin-preauth-ip-meter | Should /admin/api mount an IP-keyed rate meter ABOVE the require-admin frame, so the two awaited per-request auth reads (accountAndScopeForToken, adminRolesForAccount) are bounded per address, or stay on the deliberate direct-reads posture with the in-handler buckets only? | The Phase 18 hot-path review of 8cc3248db6 (this ledger): the analytics bucket sits below the auth frame, so a 429'd request has already paid both reads; server/CLAUDE.md rules the admin gate stays on direct reads (the auth-guard cache is marketplace-only); the sizing comment now names the pair as the deliberately unmetered real cost. | Stay on direct reads, comment-only (shipped) [no-op; the Phase 18 fix round already lands the honest sentence]; Mount a pre-auth IP meter for /admin/api [a middleware-onion change touching every admin route, its own limiter family and tests, and a review of the operator lockout failure mode] | Stay: the reads are two primary-key lookups on an operator-only surface, the buckets bound the handlers, and a pre-auth meter's lockout failure mode (an office NAT bricking the dashboard including moderation) costs more than the reads it saves. | new |
 | D122 | character-blob-warn-threshold | CHARACTER_BLOB_WARN_BYTES (131,072) now sits BELOW the legitimate worst case: the maximal legal character blob measures 151,495 bytes through the real serializer, so a character at every container ceiling prints the oversized-save warn on every autosave. Raise the threshold above the measured worst case, keep it as a deliberate early signal, or re-scope what the gauge watches? | The Phase 18 measurement unit (this ledger and tests/professions_blob_growth.test.ts): measured 151,495 (band 151,115 to 151,496), predicted 156,205 independently with the -4,710 drift accounted term by term; the standing carry said roughly 41.4 KB at about 3.2x headroom, so the recorded relation was inverted, not merely stale. The Phase 18 sweep recorded it and refused to tune it (a value decision). | Raise to a measured-worst-case-plus-headroom value [one constant plus its comment, the gauge and heartbeat pins re-read together; loses the early signal for the fleet-creep case the gauge exists to catch]; Keep 131,072 and accept the warn on maxed characters [no-op; the warn becomes routine for the very characters most worth watching, which is how a signal dies]; Re-scope the gauge to a growth RATE or a percentile band rather than an absolute ceiling [a small windowed core beside the p99 gauge already added this phase, plus its scrape and heartbeat rows] | Re-scope, or raise with the p99 gauge as the real watch: the absolute ceiling was calibrated against a blob a third the true size, and this phase already shipped the p99 windowed gauge that answers the fleet-creep question the warn was standing in for. | new |
+| D123 | jewelcrafting-exclusion-stale | The 11l rung exclusion record excludes gleamstag_charm, deepfen_pearl, pale_pearl and ogre_toe_ring from jewelcrafting on the ground that 'the uncrafted neck and ring pool is 25 items: 9 honor pieces at sellValue 0 and 16 above 600, nothing in (25, 460]'. The live tree answers 34 items, 9 at zero, 24 above 600, and mother_of_pearl (ring, uncommon, sellValue 50, src/sim/content/proving_shore.ts:756) sitting INSIDE the band the record calls empty. Is the record wrong, or is the content? | The Phase 18 tests unit (tests/trophy_domination_claims.test.ts): the live census is pinned with the contradiction named in place, and the header was deliberately NOT re-worded, because which side is wrong is a design call. The weapon band the same header flags as unpinned holds exactly, so this is a single stale clause, not a stale record. | Re-word the record at its live figures, keeping all four exclusions on the narrower ground that the one in-band row is a Proving Shore starter ring rather than a jewelcrafting-register output [a content edit to a balance record, plus an argument the record does not currently make; cheapest, leaves the exclusions standing]; Re-open the lane and author a jewelcrafting trophy row against one of the four [a new recipe plus its economy row, the reagent/output check in tests/recipe_economy.test.ts, and a re-derivation of whether a 50-value output clears each trophy's sellValue (pale_pearl 30 and ogre_toe_ring 25 would, deepfen_pearl 600 and gleamstag_charm 2500 would not); reopens a lane 11l QA closed twice]; Exclude the row by register, ruling a starter-zone item outside the crafted-output register [restores 'nothing in band' as a DERIVED fact rather than a re-worded claim, but needs a rule that holds for every future starter-zone item, and the derived test then pins the filter rather than the census] | Re-word at the live figures: the exclusions are sound on their merits, one clause of the census went stale, and inventing a register rule to make a sentence true again is a larger commitment than the sentence is worth. | new |
+| D124 | tooltip-line-doctrine | src/ui/tooltip_line.ts's header says 'Prefer this over new innerHTML builders'. The tree does the opposite: that module has ONE importer, while the HTML-string line family this phase collapsed is four modules and growing, and every one is a new innerHTML builder in that header's sense. Reaffirm the doctrine or soften the header to describe what the module actually is? | The Phase 18 sim-misc unit (this ledger, commits d2d678a4c7 and 97656679fe), which collapsed the four string builders and left the header's claim untouched because changing it either way IS the ruling. The two mechanisms are genuinely distinct and stay two: createTooltipLine returns an HTMLDivElement, the builders return strings Hud.itemTooltip composes into one innerHTML assignment, and neither can serve the other without serializing a node to re-parse it or assigning innerHTML. | Reaffirm the doctrine: new tooltip lines take the node path and the string builders become legacy to migrate [a migration of four modules and 27 call sites, plus a composition change in Hud.itemTooltip, which today builds one string]; Soften the header to describe it as the node-returning option for callers that need a node [a comment edit; the honest description of what shipped]; Leave the header as-is [no-op, but the tree keeps contradicting a stated preference, which is how a doctrine stops being read] | Soften the header: the preference lost on the merits over four modules and years, and a stated rule the tree ignores is worse than no rule. Worth noting for whoever rules: the string path is NOT the unsafe one, every line goes through esc(), so the header's implied safety argument does not by itself decide it. | new |
+| D125 | mobile-pet-frame-combo-overlap | On mobile, an energy user's pet frame overlaps the player frame: the frame renders 55.06px with the combo row visible against --mobile-pet-frame-drop: calc(53px * scale + 4px) (src/styles/hud.mobile.css:2843), so the 53px estimate is calibrated for the non-combo case. Re-derive the drop from the painted height, add a combo-aware term, or accept the overlap? | The Phase 18 tests unit, measured directly with a scratch probe rather than inferred: pre-heraldry 45.30px, heraldry-era 45.30px, heraldry-era WITH the combo row 55.06px. The combo row is display:flex only for an energy user and none otherwise (src/ui/hud.ts:9072). The structural heraldry modernization is height-neutral for a warrior, so this is shipped-CSS drift, not a regression this phase introduced, and it moves no existing assertion. | Re-derive the constant from the painted worst case [one CSS value plus the browser assertions that pin the pair's gap; costs vertical space for every class, including the majority who never show a combo row]; Add a combo-aware term so the drop follows the painted state [a class-conditional custom property and its mobile pins; correct in both states, one more conditional in the mobile layer]; Accept and document the overlap [no-op; an energy user on mobile keeps a pet frame that collides with the player frame] | Add the combo-aware term: the overlap is real and only for energy users, so paying it globally taxes every other class for a state they never enter. | new |
 
 ### THE BUCKET-C LIST
 
@@ -23403,6 +23406,84 @@ record; the QA twin re-sweeps and diffs.
   and its four margins moved into that core), so a resize can no longer leave
   the mobile card under a stale cap. hud.ts LOWERED 18718 to 18711, measured
   after the format pass rather than derived.
+
+- U-SIM-MISC d2d678a4c7 (4 of 5 items; item 3 routed, not carried). The item
+  text for the bedId deny race said to add bedId to the deny arms; the truth is
+  every plantCrop arm already carries bedId and cropId, and the id-free denies
+  come from convert_husks and feast, which have no bed to name. So the defect
+  was the plant sheet's PREDICATE accepting any id-free farmDenied as the answer
+  to its own in-flight send, and src/sim/professions/farming.ts is byte-unchanged
+  from HEAD. Preferring the truth over the item text is the right call and is
+  recorded as a deviation, not a shortfall. The unit then closed a gap the item
+  never named: the ONLINE wire. A server that dropped bedId would leave the Plant
+  control dead online with every offline pin green, so the delivered frame is now
+  pinned to carry bedId and cropId. The new sim suite runs one arm per deny reason
+  plus a coverage floor over all eleven, so a new arm cannot land id-free with
+  every arm green, and pins that the dead and busy gates emit NO farmDenied at
+  all, since the sheet's notifyErrorToast backstop is only correct while that
+  holds. Item 4 (the train fee over-reserve) is recorded for the option it
+  REJECTED: a tracker-provenance discriminator is more precise for pattern items
+  but reclassifies a trainer confirm landing after the 5s TTL as unsolicited and
+  fails OPEN, so a row could read affordable against a purse that is short; the
+  acquisition rule fails CLOSED everywhere, including the both-taught recipe it
+  deliberately does not narrow. Choosing the less precise rule because its
+  failure direction is safe is the standard this packet wants. Item 5's byte
+  identity corpus has 25 cases, and the 25th is the finding: nothing in the
+  original 24 routed an escapable character through the builder, so dropping
+  esc() would have passed all of them. Item 3 (name-screen-whole-frame-refusal)
+  STOPPED correctly rather than half-shipping: the narrowing needs the copy's
+  perfected state, reachable only at server/game.ts:6838, the sole production
+  caller, and an exported decision function with the parameter but no wiring is
+  dead code plus a census row for a name nothing calls.
+- U-SIM-MISC follow-up 97656679fe, and it exists because the census caught what
+  the unit missed. The collapse minted an exported type name that ALREADY
+  existed: for one commit src/ui/tooltip_line.ts and the new tooltip_line_core.ts
+  both exported TooltipLineClass with DIFFERENT members, so an author importing
+  it got whichever module the autoimport picked, which is worse than the four
+  differently-named private copies the collapse removed. Fixed by single
+  ownership plus DERIVATION rather than a rename: the core owns the union and the
+  DOM sibling takes Extract off it, so dropping a role from the owner narrows the
+  alias toward never and reds createTooltipLine's default parameter, where a
+  second hand-kept union would have gone quietly stale. A rename alone would have
+  dodged the collision and left two unions to sync. The writer named its own miss
+  precisely: it searched for private line() BODIES because the rule of three was
+  stated over the four copies, and never for the exported NAME. The habit that
+  follows is a phase rule now: an extraction that mints a name greps that name
+  across the tree BEFORE writing the module.
+- U-TOOLS 167b6ad82c (9 items, one carried). The coverage shortfall is 204 files,
+  not the thirty-odd first estimated, and about 184 predate this phase entirely:
+  they entered with the release sync after the 2026-08-23 harvest and have planned
+  at MEASURED_FALLBACK_MS ever since, so the LPT balance claim has been scored
+  partly on guesses since that sync rather than since these suites landed. The
+  carry mode enumerates the unmeasured set itself instead of taking a list,
+  because a hand-typed list goes stale the moment another unit lands a suite, and
+  it reads durations from the same reporter line the CI log parser consumes so a
+  carried weight and a harvested one mean the same thing. Two design points
+  carried the review: it REFUSES and exits non-zero if a run prints no parsable
+  duration rather than substituting a guess (a fabricated weight is the exact
+  failure the item exists to prevent, and a silent fallback reintroduces it
+  through the remedy), and the CLI refuses a valueless, blank or repeated
+  --reason rather than falling back to the default, which was the dangerous
+  shape because every row would then claim the pending-harvest reason while the
+  operator believed otherwise. A census collision was caught while writing the
+  rows: `median` is already exported twice in the scripts tree, so it became
+  medianMs, which also states the unit it rounds to.
+
+### A CENSUS APPEND TRAP THIS PHASE PAID FOR ONCE
+
+Recorded because the failure mode is a silent skip, not an error. The census
+parser resets its column detection on any non-table line, so a `|` row appended
+after a BLANK LINE has no header above it and is skipped WITHOUT raising a
+defect. One unit's first append of 26 rows landed that way: it parsed as 0 of 26
+while the tool reported zero problems, and the diff, the file and every read-by-
+eye check all looked correct. It was caught only because the unit verified with
+the census's own parser instead of by eye. The standing rule for the rest of the
+phase: append rows immediately under the header, then report the PARSED count
+against the count written ("26 of 26 parsed, all cls exports, all phase 18, zero
+defects"), because "I appended them" is not evidence. Second-order, this file is
+written by many units at once (1,443 to 1,930 lines during one unit's work): a
+git diff deletion count is not a loss count, since several apparent deletions
+were another unit re-sorting rows into a different section.
 
 ### JUDGED THIS PHASE (refusals this phase itself makes; each cites the ground)
 
