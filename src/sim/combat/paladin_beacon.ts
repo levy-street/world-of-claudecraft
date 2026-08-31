@@ -1,3 +1,4 @@
+import { DAWNFORGED_2PC_BEACON_HEAL_FRACTION, setBonusFlag } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -23,16 +24,35 @@ export function stripBeaconOfLight(ctx: SimContext, paladinId: number): void {
 
 export function placeBeaconOfLight(ctx: SimContext, paladin: Entity, target: Entity): void {
   stripBeaconOfLight(ctx, paladin.id);
+  // Dawnforged 2pc: the wearer's beacon copies 55 percent instead of 50. The
+  // fraction is baked into the aura VALUE at placement, the ONE source both
+  // the heal.ts transfer arithmetic (beaconTransferFraction below) and the
+  // aura mirror read, so the two readers can never diverge. A gear swap after
+  // placement keeps the placed fraction until the beacon is re-cast.
+  const meta = paladin.kind === 'player' ? ctx.players.get(paladin.id) : undefined;
+  const wornDawnforged2 =
+    meta !== undefined && ctx.playerMods(meta).selected[setBonusFlag('dawnforged', 2)] === true;
   ctx.applyAura(target, {
     id: BEACON_OF_LIGHT_ID,
     name: BEACON_OF_LIGHT_NAME,
     kind: 'beacon_of_light',
     remaining: BEACON_AURA_DURATION,
     duration: BEACON_AURA_DURATION,
-    value: BEACON_HEAL_FRACTION,
+    value: wornDawnforged2 ? DAWNFORGED_2PC_BEACON_HEAL_FRACTION : BEACON_HEAL_FRACTION,
     sourceId: paladin.id,
     school: 'holy',
   });
+}
+
+/** The transfer fraction heal.ts applies: read back from the PLACED aura on
+ *  the beacon holder (the Dawnforged 2pc bake above), so the arithmetic and
+ *  the aura value stay one number. Falls back to the base fraction for any
+ *  legacy aura without a value. */
+export function beaconTransferFraction(beacon: Entity, paladinId: number): number {
+  const aura = beacon.auras.find(
+    (candidate) => candidate.kind === 'beacon_of_light' && candidate.sourceId === paladinId,
+  );
+  return aura?.value ?? BEACON_HEAL_FRACTION;
 }
 
 export function beaconTransferTarget(

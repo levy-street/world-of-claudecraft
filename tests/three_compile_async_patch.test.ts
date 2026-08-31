@@ -330,6 +330,85 @@ describe('three degenerate normal guard patch', () => {
   });
 });
 
+describe('three low-tier NaN output scrub patch', () => {
+  // Sixth patch hunk (opaque_fragment): the degenerate-normal guard above
+  // closes the one KNOWN NaN source on this driver family, but it is only
+  // proven for the composer/gradePass path (medium tier and up), which also
+  // carries OutputGradePass's own sanitizeFinite scrub as defense in depth
+  // (src/render/post_output_grade.ts). Low tier (GfxTier 'low') builds no
+  // composer at all (renderer.ts: "low renders direct", a bare
+  // webgl.render(scene, camera) straight to the canvas backbuffer) and so has
+  // ZERO NaN defense of any kind: any other NaN source on an ANGLE-adjacent
+  // driver reaches gl_FragColor unscrubbed and paints black, with no
+  // composer stage downstream to catch it. opaque_fragment is the one
+  // fragment-shader chunk EVERY lit material includes right before writing
+  // gl_FragColor (MeshLambertMaterial and MeshStandardMaterial/Physical
+  // alike), so guarding it there closes the gap for every tier and every
+  // material kind in one place, the same per-component NaN-to-zero technique
+  // OutputGradePass already uses, applied one stage earlier and universally
+  // instead of tier-gated.
+  it('keeps the guard applied, scrubbing outgoingLight before gl_FragColor', () => {
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    // Anchored on the gl_FragColor assignment that immediately follows it, so
+    // the guard's POSITION is asserted, not just its presence: scrubbing
+    // after this point would be too late, and scrubbing earlier (before
+    // USE_TRANSMISSION's alpha multiply) would miss nothing here since alpha
+    // is a separate channel, but keeping it last is what makes it the final
+    // word on outgoingLight before the write.
+    expect(
+      source.includes(
+        'outgoingLight.x = ( outgoingLight.x < 0.0 || outgoingLight.x >= 0.0 ) ? outgoingLight.x : 0.0;\\n' +
+          'outgoingLight.y = ( outgoingLight.y < 0.0 || outgoingLight.y >= 0.0 ) ? outgoingLight.y : 0.0;\\n' +
+          'outgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 ) ? outgoingLight.z : 0.0;\\n' +
+          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+      ),
+      'the low-tier NaN output scrub is missing, or no longer immediately precedes gl_FragColor; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('leaves no unguarded opaque_fragment spelling behind', () => {
+    // The patch REPLACES the stock chunk string, it does not add a second
+    // one: the stock spelling must be gone, or a build is still compiling
+    // the unguarded chunk. Positive control: the deliberately unpatched
+    // three.cjs carries the stock spelling exactly once, so the GONE needle
+    // is proven matchable rather than vacuously absent.
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    const stock = '#endif\\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );';
+    expect(
+      source.includes(stock),
+      'the unguarded opaque_fragment spelling is back; the NaN scrub no longer replaces it',
+    ).toBe(false);
+    expect(
+      unpatchedSibling.split(stock).length - 1,
+      'the unpatched three.cjs control no longer matches the stock needle; the GONE pin above may be vacuous',
+    ).toBe(1);
+  });
+
+  it('records the hunk in the checked-in patch file', () => {
+    // node_modules is reinstalled from patches/three@0.185.1.patch, so the
+    // shipped artifact carries the hunk too, as an ADDED line rather than
+    // anywhere in its context.
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes(
+        '+var opaque_fragment = "#ifdef OPAQUE\\ndiffuseColor.a = 1.0;\\n#endif\\n#ifdef USE_TRANSMISSION\\n' +
+          'diffuseColor.a *= material.transmissionAlpha;\\n#endif\\noutgoingLight.x = ( outgoingLight.x < 0.0',
+      ),
+      'the low-tier NaN output scrub is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+  });
+});
+
 describe('three empty instanced draw skip patch', () => {
   // Fifth patch hunk (WebGLRenderer.projectObject): an InstancedMesh whose
   // count is 0 draws nothing, yet upstream still pushes it into the render

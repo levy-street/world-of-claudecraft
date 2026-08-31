@@ -9,7 +9,6 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
@@ -49,7 +48,6 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
-import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -70,7 +68,8 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
+import { riftStateEventFor } from '../src/sim/rift/runs';
+import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -94,10 +93,12 @@ import {
   MAX_LEVEL,
   type MobFamily,
   PLAYER_INTEREST_DROP_RADIUS,
+  PLAYER_INTEREST_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type UnstuckBlockedReason,
 } from '../src/sim/types';
+import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
 import {
   type BankBonusSource,
   type BgLadderEntry,
@@ -202,7 +203,6 @@ import {
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
-  saveMailState,
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
@@ -224,6 +224,8 @@ import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_act
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
+import { findDungeonDoorNear } from './dungeon_door';
+import * as entryFacing from './dungeon_entry_facing';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -237,7 +239,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { shouldDeliverCombatEventToViewer } from './event_delivery';
+import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
@@ -251,6 +253,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
@@ -283,6 +286,8 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
+import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -301,6 +306,15 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
+import {
+  applyMovementInputFrame,
+  consumeMovementFramesV2,
+  createMovementInputSessionState,
+  type MovementInputSessionState,
+  resetMovementInputSessionState,
+} from './movement_input_timeline_v2';
+import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import {
   classifyMsgLane,
   consumeLaneToken,
@@ -328,6 +342,10 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
+export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -360,20 +378,20 @@ import type { StorageAppliedEffect } from './storage_purchase_db';
 import { storageAppliedEffectsCommitted, storageRecovery } from './storage_purchases';
 import { StorageRecoverySessionSweep as RecoverySweep } from './storage_recovery_session_sweep';
 import { attachDetectorFlagHost } from './suspicion_flags';
-import { TickProfiler } from './tick_profiler';
+import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
+import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
-// Interest management: the client renders entities out to 80yd, so new
-// entities enter interest just past that, and known entities persist a
-// little farther so the boundary doesn't churn create/destroy cycles.
-const INTEREST_RADIUS = 90;
+// Interest management: enter at the shared sim edge (rationale on the sim
+// constant), persist a little farther so the boundary doesn't churn.
+const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
 export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
@@ -732,6 +750,8 @@ type ClientMessage = Record<string, unknown> & {
   marker?: number;
   mi?: unknown;
   mode?: string;
+  mt?: number;
+  mv?: number;
   n?: string;
   name?: string;
   mount?: string;
@@ -749,6 +769,7 @@ type ClientMessage = Record<string, unknown> & {
   roles?: unknown;
   rollId?: number;
   seq?: number;
+  stop?: unknown;
   sid?: string;
   sig?: string;
   skin?: number;
@@ -963,7 +984,7 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession {
+export interface ClientSession extends MovementInputSessionState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -1063,13 +1084,16 @@ export interface ClientSession {
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
   rememberedChat: RememberedChat;
-  // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
+  dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
+  // A resumed socket missed one-shot forge portal events while linkdead. Replay
+  // the current authoritative warnings once, after its first full snapshot.
+  needsVarkhulPortalReplay: boolean;
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
@@ -1499,6 +1523,16 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
+  // Target/target-of-target swing-timer bar: the general (non-self) mirror of
+  // the self-only `swing` field above selfWireJson, gated on autoAttack so an
+  // idle entity costs nothing extra on the broadcast (same style as the
+  // castingAbility gate above it). No weapon-speed field rides with it: the
+  // client's targetSwingTimerState degrades gracefully to the raw swingTimer
+  // as its first-frame period guess, self-correcting at the next swing-reset
+  // edge, trading one swing's worth of first-frame fill accuracy for not
+  // adding a second field to every broadcast tick for every auto-attacking
+  // entity in interest range.
+  if (e.autoAttack) out.swing = round2(e.swingTimer);
   // Mount summon/dismount transition, so every client can time the summon FX / call
   // pose and the self-extrapolator can root the local player in lockstep. Volatile
   // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck
@@ -1703,35 +1737,6 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// A frozen server tick-loop profile captured over one on-demand window, plus the
-// context needed to read it: when it was taken, how long the window was, and the
-// crowd it was taken under. The admin dashboard renders this.
-export interface PerfCaptureResult {
-  captureId: string; // server-generated correlation id returned when the window starts
-  capturedAt: number; // epoch ms the window closed
-  durationMs: number; // the (clamped) capture window length
-  loopCallbacks: number; // setInterval callbacks observed during the window
-  simTicks: number; // authoritative sim ticks run across those callbacks
-  catchUpCallbacks: number; // callbacks that ran more than one sim tick
-  maxTicksPerCallback: number;
-  online: number; // live sessions at capture close
-  simEntities: number; // sim entity count at capture close
-  aggroVisitsTotal: number; // aggro-scan player visits summed across the window
-  aggroVisitsMaxPerTick: number; // peak aggro-scan player visits in any one tick
-  threatVisitsTotal: number; // threat-table entry visits summed across the window
-  threatVisitsMaxPerTick: number; // peak threat-table entry visits in any one tick
-  profile: ReturnType<TickProfiler['profile']>;
-}
-
-// The /admin/api/perf/tick status envelope: whether a capture is currently running
-// (with when it ends, so the UI can show a countdown), plus the last frozen result.
-export interface PerfCaptureStatus {
-  captureId: string | null; // id of the in-flight capture, or null while idle
-  capturing: boolean;
-  endsAt: number | null; // epoch ms the in-flight capture closes, or null
-  last: PerfCaptureResult | null;
-}
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -1838,12 +1843,14 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
+  private readonly onSaveMs = createTickSaveObserver(() => this.tickProfiler);
   private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
     MARKET_WRITE_QUEUE_WARN_DEPTH,
     (depth) =>
       `market serial writer queue depth ${depth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+    this.onSaveMs,
   );
-  private readonly enqueueRiftWrite = createSerialWriter();
+  private readonly enqueueRiftWrite = createSerialWriter(this.onSaveMs);
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -1868,10 +1875,10 @@ export class GameServer {
   // sim.time (seconds) of the last head that carried tickHz; throttles the
   // scalar to TICK_HZ_HEAD_INTERVAL_S so it does not ride every 20 Hz head.
   private lastTickHzHeadTime: number | null = null;
-  // Rolling per-phase loop timing, localizes a stutter to a phase. Always-on
-  // (the hot path allocates nothing); read via perfProfile() for admin/ops.
+  // Always-on allocation-free per-phase timing, read via perfProfile() for admin/ops.
   private readonly tickProfiler = new TickProfiler([
     'stale',
+    'movementV2',
     'tick',
     'events',
     'antibot',
@@ -1879,13 +1886,10 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
-    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
-    // Populated only while the detailed capture is active (an on-demand admin
-    // capture or PERF_TICK_LOG=1); zero otherwise.
+    'saves',
+    'lateness',
     ...SIM_LAP_PHASES,
-    // Per-zone breakdown of the mob.update phase, with the same capture gating.
     ...SIM_MOB_ZONE_PHASES,
-    // Per-key-group breakdown of the bcastSelf phase, same capture gating.
     ...SELF_WIRE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
@@ -1934,6 +1938,7 @@ export class GameServer {
   // the latest tick's aggro/threat visit counts surfaced on the [perf] heartbeat, plus
   // the four capture-window accumulators frozen into a PerfCaptureResult.
   private readonly mobScanTickStats = createMobScanTickStats();
+  private readonly movementTimelineTickStats = new MovementInputTimelineTickStats();
   // Ops kill-switch: SELF_SNAPSHOT_FULL=1 re-diffs every heavy self field every
   // tick (pre-optimization behavior), for A/B benchmarking or rollback.
   private readonly heavySelfGate = process.env.SELF_SNAPSHOT_FULL !== '1';
@@ -2742,6 +2747,8 @@ export class GameServer {
           const now = process.hrtime.bigint();
           let dt = Number(now - last) / 1e9;
           last = now;
+          // Ahead of the clamp, which discards exactly what a stall reading must keep.
+          this.tickProfiler.add('lateness', Math.max(0, dt * 1000 - DT * 1000));
           if (dt > 0.5) dt = 0.5;
           acc += dt;
           // Feed the authoritative calendar to the sim so its daily windows work
@@ -2777,8 +2784,18 @@ export class GameServer {
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
+            lap('tick');
+            consumeMovementFramesV2(this.sim, this.clients.values());
+            this.movementTimelineTickStats.fold(
+              this.clients.values(),
+              this.perfCaptureDeadlineNs !== null,
+            );
+            lap('movementV2');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            lap('tick');
+            updateOverrideEpochs(this.sim, this.clients.values());
+            lap('movementV2');
             this.riftUpgrader.observe(this.sim.ctx);
             this.riftAssets.observe(this.sim.ctx);
             lap('tick');
@@ -2826,15 +2843,15 @@ export class GameServer {
             this.broadcastSocialPositions();
           }
           lap('social');
+          this.flushPeriodicSaves(dt);
           const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
-          this.tickProfiler.commit(tickMs);
+          this.tickProfiler.commit(tickMs, ticksRun);
           this.maybeLogTickPerf(tickMs);
           this.finalizePerfCaptureIfDue();
           this.tickMsAvg =
             this.tickMsAvg === 0
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-          this.flushPeriodicSaves(dt);
           // LAST statement of the guarded body, deliberately: this timestamp is the
           // liveness signal /livez reads, so only a pass that ran to completion may
           // refresh it (a body that throws every tick must go stale, not look alive).
@@ -2872,7 +2889,11 @@ export class GameServer {
     this.saveTimer += dt;
     if (this.saveTimer >= AUTOSAVE_SECONDS) {
       this.saveTimer = 0;
+      const sample = this.tickProfiler.currentSample();
       void this.saveAll('autosave');
+      void this.saveMarket(sample);
+      void this.saveMail(sample);
+      void this.saveRifts(sample);
       void this.saveMarket();
       void this.saveMail();
       void this.saveRifts();
@@ -3630,8 +3651,10 @@ export class GameServer {
         fbc?: string | null;
         sourceUrl?: string | null;
         leaseNonce?: string;
+        dungeonEntryFacingWireVersion?: entryFacing.WireVersion;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        movementWireVersion?: 1 | 2;
         generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
@@ -3822,8 +3845,11 @@ export class GameServer {
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
+      dungeonEntryFacing: entryFacing.forEntity(player, meta.dungeonEntryFacingWireVersion),
       lastInputAt: this.sim.time,
+      ...createMovementInputSessionState(meta.movementWireVersion),
       lastSent: {},
+      needsVarkhulPortalReplay: false,
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
       petSpecialWireVersion:
@@ -3954,6 +3980,7 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -4072,17 +4099,24 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
+    resetMovementInputSessionState(session, meta.movementWireVersion);
     // Load-bearing for every revision/cadence gate: sent.X === undefined forces
     // a rebuild on the next snapshot, so stale market/mail/corder/vault/cvault
     // trackers need no reset. Preserving lastSent here would require resetting
     // those trackers instead. Focused reconnect tests pin the force-reship arm.
     session.lastSent = {};
+    session.needsVarkhulPortalReplay = true;
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     session.petSpecialWireVersion =
       meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const player = this.sim.entities.get(session.pid);
     if (player) {
+      session.dungeonEntryFacing = entryFacing.forResume(
+        session.dungeonEntryFacing,
+        player,
+        meta.dungeonEntryFacingWireVersion,
+      );
       player.petSpecialCommandsSupported =
         session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }
@@ -4106,10 +4140,15 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
+    // A resumed session's fresh ClientWorld starts with riftFloor null (only
+    // enter/descend/exit emit riftState); re-send it so a resume is not blind.
+    const riftState = riftStateEventFor(this.sim.ctx, session.pid);
+    if (riftState) this.send(session, { t: 'events', list: [riftState] });
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
     return session;
@@ -4563,6 +4602,7 @@ export class GameServer {
         // attributable even though carriedGuildBankSeqs is filled only once
         // the queued closure actually runs.
         const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
+        let mailPartitionsForRearm: { recipientKey: string; letters: MailSave['mail'] }[] = []; // outer scope: catch arm re-arms on failure
         if (opts.withMarket || carriesGuildBooks) {
           // Market/mail/books and the character blob share one fenced queued
           // transaction. Capture their snapshots at write time.
@@ -4581,6 +4621,12 @@ export class GameServer {
               }
               persistedLevel = snap.level;
               const guildDeltas = collectDeltas();
+              // Drained here, at persist-BUILD time, not inside the closure:
+              // this is the same entry-snapshot moment as `snap`, and the outer
+              // mailPartitionsForRearm exists so the catch arm can re-arm them.
+              // A cancelled enqueue rejects into that same arm, so an abort
+              // while waiting on a background-db permit puts them back too.
+              if (opts.withMarket) mailPartitionsForRearm = this.sim.takeDirtyMailPartitions();
               const persist = () =>
                 opts.withMarket
                   ? saveCharacterAndMarketState(
@@ -4588,7 +4634,7 @@ export class GameServer {
                       snap.level,
                       snap,
                       this.sim.serializeMarket(),
-                      this.sim.serializeMail(),
+                      mailPartitionsForRearm,
                       session.leaseNonce,
                       guildDeltas,
                       guildBankResults,
@@ -4612,10 +4658,27 @@ export class GameServer {
                 : persist();
             });
           } catch (err) {
+            rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // mail half of the rollback
             this.acknowledgeDurableLedgerPrefixAfterError(session, carriedLedgerSnapshot, err);
-            // The whole escrow rolled back. Count foreign failures, but not an
-            // ordinary concurrent GuildBankEscrowRefused; its handler owns the
-            // retry/terminal metrics and all errors keep their existing route.
+            // The whole escrow rolled back: the character half AND every book
+            // half. The live sim is now ahead of durable truth for those books
+            // until a later save or a reconcile lands, which is exactly the
+            // window the dupe guards live in, so it must be visible in
+            // production, not only in a log line. The counter observes, it
+            // never swallows: the refusal arm still runs below and a foreign
+            // error is still rethrown.
+            //
+            // A REFUSAL is deliberately not counted here. Two officers of one
+            // guild contending is ordinary concurrency and the usual outcome is
+            // "refused, will retry, resolves in a round trip", which is not a
+            // failure and must not share a counter kind with one (an operator
+            // alerting on escrow_save_failed > 0 was getting that noise).
+            // handleGuildBankEscrowRefusal below owns the vocabulary instead:
+            // escrow_refused_retry per guild on the retry arm, and this
+            // escrow_save_failed once for the session on the TERMINAL arm,
+            // where the save really did fail for good. A durable-ledger growth
+            // refusal is excluded for the same reason: it is a capacity ceiling
+            // with its own handling, not a failed write.
             if (
               carriesGuildBooks &&
               !(err instanceof GuildBankEscrowRefused) &&
@@ -4664,6 +4727,7 @@ export class GameServer {
         // A false result is a lease fence miss: nothing persisted, so publish
         // no deeds, clear no staged work, and stamp no lastSave.
         if (saved === false) {
+          rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // false, not a throw: catch's rearm never ran
           // Same dupe-sensitive shape as the throw above, reached the other
           // way: the write matched no row, so nothing persisted. Counted only
           // when this save actually carried books (an ordinary fenced-out
@@ -4817,8 +4881,11 @@ export class GameServer {
    * producer permit. Keeping that order in one helper prevents the cap-one
    * market-FIFO/permit inversion that can otherwise deadlock a dirty-book
    * character save against a periodic market or mail save. */
-  private enqueueBackgroundMarketWrite<T>(write: () => Promise<T>): Promise<T> {
-    return this.enqueueMarketWrite(() => this.withBackgroundDbPermit(write));
+  private enqueueBackgroundMarketWrite<T>(
+    write: () => Promise<T>,
+    context?: TickProfilerSample,
+  ): Promise<T> {
+    return this.enqueueMarketWrite(() => this.withBackgroundDbPermit(write), context);
   }
 
   private saveCharacterWithBackgroundPermit(
@@ -4906,31 +4973,37 @@ export class GameServer {
     }
   }
 
-  async saveMarket(): Promise<void> {
+  async saveMarket(sample?: TickProfilerSample): Promise<void> {
     try {
-      await this.enqueueBackgroundMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
+      await this.enqueueBackgroundMarketWrite(
+        () => saveMarketState(this.sim.serializeMarket()),
+        sample,
+      );
     } catch (err) {
       console.error('failed to save world market:', err);
     }
   }
 
-  // The Ravenpost mail book: shared global state like the market, persisted as
-  // a single per-realm JSONB blob. Writes ride the market queue so a mail
-  // snapshot can never interleave with the atomic leave-path write.
   async loadMail(): Promise<void> {
     try {
       this.sim.loadMail(await loadMailState());
+      // Only after a SUCCESSFUL load: replay the durable custody parcel rows
+      // the last crash window left (book-once dedupes the ones the blob has).
+      await mergeCustodyParcelOverlay(this.sim);
     } catch (err) {
       console.error('failed to load mail:', err);
     }
   }
 
-  async saveMail(): Promise<void> {
-    try {
-      await this.enqueueBackgroundMarketWrite(() => saveMailState(this.sim.serializeMail()));
-    } catch (err) {
-      console.error('failed to save mail:', err);
-    }
+  async saveMail(sample?: TickProfilerSample): Promise<void> {
+    // Bound, not passed by reference: enqueueBackgroundMarketWrite is a
+    // prototype method that reads `this`, unlike the enqueueMarketWrite field.
+    await writeDirtyMailPartitions<TickProfilerSample>(
+      this.sim,
+      (write, context) => this.enqueueBackgroundMarketWrite(write, context),
+      false,
+      sample,
+    );
   }
 
   // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
@@ -5468,15 +5541,16 @@ export class GameServer {
     }
   }
 
-  private async persistRifts(): Promise<void> {
-    await this.enqueueRiftWrite(() =>
-      saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+  private async persistRifts(sample?: TickProfilerSample): Promise<void> {
+    await this.enqueueRiftWrite(
+      () => saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+      sample,
     );
   }
 
-  async saveRifts(): Promise<void> {
+  async saveRifts(sample?: TickProfilerSample): Promise<void> {
     try {
-      await this.persistRifts();
+      await this.persistRifts(sample);
     } catch (err) {
       console.error('failed to save shared Rift state:', err);
     }
@@ -5625,16 +5699,9 @@ export class GameServer {
     return this.loopStartedAtMs;
   }
 
-  // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
-  // keyed by phase name. The exporter converts to seconds and surfaces only its
-  // fixed WOC_TICK_PHASES subset, so the exported label set stays bounded.
-  tickPhaseMillis(): Record<string, { p95: number; max: number }> {
-    const { phases } = this.tickProfiler.profile();
-    const out: Record<string, { p95: number; max: number }> = {};
-    for (const [name, stats] of Object.entries(phases)) {
-      out[name] = { p95: stats.p95, max: stats.max };
-    }
-    return out;
+  // Per-phase loop timing (p95 + max, ms) for the narrowed /metrics export.
+  tickPhaseMillis(only?: readonly string[]): Record<string, { p95: number; max: number }> {
+    return this.tickProfiler.phaseMillis(only);
   }
 
   // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
@@ -5654,6 +5721,7 @@ export class GameServer {
     this.perfCaptureCatchUpCallbacks = 0;
     this.perfCaptureMaxTicksPerCallback = 0;
     resetMobScanCaptureAccumulators(this.mobScanTickStats);
+    this.movementTimelineTickStats.resetCapture();
     this.perfCaptureEndsAtMs = Date.now() + clamped;
     this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
@@ -5727,6 +5795,7 @@ export class GameServer {
       aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
       threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
       threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
+      ...this.movementTimelineTickStats.captureTotals(),
       profile: this.tickProfiler.profile(),
     };
     this.perfCaptureDeadlineNs = null;
@@ -5749,7 +5818,7 @@ export class GameServer {
     console.log(
       `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
-        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits}`,
+        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits} ${this.movementTimelineTickStats.heartbeatTokens()}`,
     );
     // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
     // the average (not just a spike) leads. Populated only while detailed timing is on.
@@ -6050,8 +6119,14 @@ export class GameServer {
     await this.saveCharacterWithBackgroundPermit(session);
   }
 
+  // The WocCustodyGameHost durability caller (server/woc_market_custody.ts):
+  // unlike saveMail(), a write failure must propagate.
   async persistMailBlob(): Promise<void> {
-    await this.enqueueBackgroundMarketWrite(() => saveMailState(this.sim.serializeMail()));
+    await writeDirtyMailPartitions<TickProfilerSample>(
+      this.sim,
+      (write, context) => this.enqueueBackgroundMarketWrite(write, context),
+      true,
+    );
   }
 
   // Force-close every live session for the account. A bearer token is a reusable
@@ -6498,22 +6573,16 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
-      // The movement lane verdicts at the top of the arm, before the sim
-      // moveInput assignment and before observeInput (R5): a dropped movement
-      // frame reaches neither the sim nor the detector, which is FP-safe
-      // because input_absence only counts input frames toward ACTIVE time.
       if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
-      const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
-      session.lastInputAt = sim.time;
+      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time, sim.ctx);
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past lastInputSeq + 1 proves the missing seqs were
+        // a forward jump past the receive high-water proves the missing seqs were
         // sent and never processed (the input-frame-attributed share of the
         // server's own drops). Guarded to a positive high-water because resume
         // zeroes it while the client restarts its counter on reconnect, and
@@ -6524,16 +6593,6 @@ export class GameServer {
           );
         }
         session.lastInputSeq = Math.max(session.lastInputSeq, seq);
-      }
-      // A released spirit turns with the camera like the living; only a corpse that
-      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
-      // this the server drops the ghost's mouselook facing and its run feels inverted.
-      // A stun locks facing too (issue #2426): the offline kernel already blocks its
-      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
-      // this out-of-band channel and must be rejected here, the authoritative side,
-      // not trusted to a client that could simply keep sending it.
-      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
-        e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
@@ -7570,7 +7629,7 @@ export class GameServer {
             .catch(logSocialErr);
         break;
       case 'guild_decline':
-        this.social.guildDecline(this.actorFor(session));
+        void this.social.guildDecline(this.actorFor(session)).catch(logSocialErr);
         break;
       case 'guild_leave':
         void this.social.guildLeave(this.actorFor(session)).catch(logSocialErr);
@@ -8199,14 +8258,8 @@ export class GameServer {
           break;
         }
         const e = sim.entities.get(pid);
-        const door = [...sim.entities.values()].find(
-          (x) => x.templateId === 'dungeon_door' && x.dungeonId === dungeonId,
-        );
-        const succeeded =
-          !!e &&
-          !!door &&
-          Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
-          sim.enterDungeon(dungeonId, pid);
+        const door = e ? findDungeonDoorNear(sim.entities.values(), dungeonId, e.pos) : undefined;
+        const succeeded = !!door && sim.enterDungeon(dungeonId, pid);
         this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
@@ -8231,6 +8284,13 @@ export class GameServer {
         // Range, stock, balance, and bag space all re-validate in the sim
         // handler (instances/heroic_vendor.ts); the client only sends intent.
         if (typeof msg.itemId === 'string') sim.buyHeroicVendorItem(msg.itemId, pid);
+        break;
+      }
+      case 'crucible_buy': {
+        // Range, stock, class, sigil balance, and bag space all re-validate in
+        // the sim handler (instances/crucible_vendor.ts); the client only
+        // sends intent.
+        if (typeof msg.itemId === 'string') sim.buyCrucibleVendorItem(msg.itemId, pid);
         break;
       }
       case 'enter_delve': {
@@ -8359,9 +8419,12 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
-    const activeFrostRings = this.sim.activeFrostRings;
-    const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
-    const activeConsecrations = this.sim.activeConsecrations;
+    const telegraphWorld = groundTelegraphWorld(this.sim, INTEREST_QUERY_RADIUS, EVENT_RADIUS);
+    const varkhulPortalReplay = buildVarkhulPortalReplayBatch(
+      this.clients.values(),
+      () => this.sim.activeVarkhulForgePortalTelegraphs,
+      EVENT_RADIUS,
+    );
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8530,51 +8593,8 @@ export class GameServer {
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
-        // ground effects, not entities: they carry a position, radius and timer
-        // and no caster identity or team, and a player must be able to react to
-        // one wherever it lands. They therefore keep the widened match horizon
-        // inside the band, unlike the enemy PLAYERS above, whose records the
-        // narrowed rule holds to the open-world radii.
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
-        const frostRings = activeFrostRings
-          .filter((ring) => {
-            const dx = ring.x - anchorEntity.pos.x;
-            const dz = ring.z - anchorEntity.pos.z;
-            const limit = aoeBase + ring.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (ring) =>
-              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
-          );
-        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
-        const temporalHourglasses = activeTemporalHourglasses
-          .filter((hourglass) => {
-            const dx = hourglass.x - anchorEntity.pos.x;
-            const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = aoeBase + hourglass.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (hourglass) =>
-              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
-          );
-        const temporalHourglassesJson =
-          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
-        const consecrations = activeConsecrations
-          .filter((consecration) => {
-            const dx = consecration.x - anchorEntity.pos.x;
-            const dz = consecration.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (consecration) =>
-              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
-          );
-        const consecrationsJson =
-          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
+        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase);
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         const petSpecialWireJson =
           session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
@@ -8582,8 +8602,17 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}}`,
         );
+        if (session.needsVarkhulPortalReplay) {
+          session.needsVarkhulPortalReplay = false;
+          const replayFrame = varkhulPortalReplayFrame(
+            varkhulPortalReplay,
+            anchorEntity.pos,
+            this.sim.entities,
+          );
+          if (replayFrame !== null) this.sendRaw(session, replayFrame);
+        }
       },
       (err, resolved) =>
         console.error(
@@ -8780,6 +8809,7 @@ export class GameServer {
       pcd: round2(p.potionCdRemaining),
       fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
+      swingOff: round2(p.offhandSwingTimer), // off-hand clock, unconditional like swing
       combo: p.comboPoints,
       pdev: p.paladinDevotion
         ? {
@@ -8807,6 +8837,7 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
+      ...(session.spectating ? {} : reconciliationSelfWire(session, p)),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default
@@ -8840,6 +8871,8 @@ export class GameServer {
     const maybe = (key: string, value: unknown): void => {
       maybeSerialized(key, JSON.stringify(value ?? null));
     };
+    if (session.dungeonEntryFacing.enabled)
+      maybeSerialized('de', `${this.sim.entities.get(session.pid)?.dungeonEntrySeq ?? 0}`);
     // Static combat-rating/progression scalars: rarely change (gear/talent swap,
     // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
     // other field on this record which was still being rebuilt and stringified
@@ -8853,6 +8886,7 @@ export class GameServer {
     maybe('copper', meta.copper);
     maybe('ap', p.attackPower);
     maybe('sp', p.spellPower);
+    maybe('hpw', p.healPower);
     maybe('sh', p.spellHaste);
     maybe('crit', p.critChance);
     maybe('dodge', p.dodgeChance);
@@ -8992,6 +9026,7 @@ export class GameServer {
     }
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
+    maybe('offhandWeapon', p.offhandWeapon); // client derives dualWielding as !== null
     selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));
@@ -9948,9 +9983,12 @@ export class GameServer {
             continue;
           }
           // world events: only those near this player
-          const anchor = this.eventAnchor(ev);
+          const anchor = eventAnchor(ev, this.sim.entities);
           if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
             mine.push(fragments[i]);
+            if (ev.type === 'spellfxAt' && ev.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID) {
+              session.needsVarkhulPortalReplay = false;
+            }
           }
         }
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;
@@ -10051,20 +10089,6 @@ export class GameServer {
       else this.sim.tradeInvites.delete(ev.pid);
     }
     return suppressed;
-  }
-
-  private eventAnchor(ev: SimEvent): { x: number; y: number; z: number } | null {
-    let id: number | undefined;
-    if ('targetId' in ev && typeof ev.targetId === 'number') id = ev.targetId;
-    else if ('entityId' in ev && typeof ev.entityId === 'number') id = ev.entityId;
-    if (id !== undefined) return this.sim.entities.get(id)?.pos ?? null;
-    // world-coordinate events (spellfxAt: a ground-targeted impact) anchor at
-    // their own point so they interest-scope like entity-anchored fx instead
-    // of fanning out server-wide (dist2d ignores y)
-    if ('x' in ev && 'z' in ev && typeof ev.x === 'number' && typeof ev.z === 'number') {
-      return { x: ev.x, y: 0, z: ev.z };
-    }
-    return null; // chat/log etc: broadcast
   }
 
   private isSpectateLocalChat(session: ClientSession, text: string): boolean {

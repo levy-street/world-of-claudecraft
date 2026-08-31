@@ -21,7 +21,9 @@ const {
   DEFAULT_SFX_SPEED_MAP,
   normalizeSfxGainMap,
   normalizeSfxSpeedMap,
+  readSfxGainMap,
   readSfxPlaybackProfile,
+  resolvedGainCeilingDb,
   resolveSfxPlaybackProfile,
   SFX_GAIN_MAP_PATH,
   SFX_SPEED_MAP_PATH,
@@ -192,6 +194,56 @@ describe('SFX runtime playback profile', () => {
     ).toThrow('between 0.25 and 4');
     expect(existsSync(join(root, SFX_GAIN_MAP_PATH))).toBe(false);
     expect(existsSync(join(root, SFX_SPEED_MAP_PATH))).toBe(false);
+  });
+
+  it('addresses mob subfamily extension keys, trims validated against their own ceilings', () => {
+    // The committed gain map claims each raid-boss subfamily key's full
+    // computed headroom (the voice-pack handoff rule: the trim matches
+    // ceilingDb exactly, putting the loudest take at -1dBFS). Pin trim ===
+    // ceiling for every claimed key, and that each ceiling is real: a
+    // regressed inheritance would mint no ceiling, zero both sides, and let
+    // the equality pass vacuously.
+    const committed = readSfxGainMap();
+    for (const boss of ['ignivar', 'varkhul']) {
+      for (const action of ['idle', 'aggro', 'attack', 'hurt', 'death']) {
+        const key = `mob_elemental_${boss}_${action}`;
+        const ceiling = resolvedGainCeilingDb(key);
+        expect(ceiling, key).toBeGreaterThan(0);
+        expect(committed.keyTrimDb[key], key).toBe(ceiling);
+      }
+    }
+    // Addressable does not mean anything mob_-shaped: an unknown family, or a
+    // key missing the _<action> tail, still throws instead of being accepted.
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { mob_notafamily_ignivar_attack: 1 },
+      }),
+    ).toThrow('unknown SFX gain key');
+    expect(() =>
+      normalizeSfxSpeedMap({ version: 1, rateByKey: { mob_elemental_ignivar: 1.1 } }),
+    ).toThrow('unknown SFX speed key');
+    // A trim past the computed ceiling fails validation through the extension
+    // sweep (these keys sit outside the catalog sweep, so this is the only
+    // check that can catch them).
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: {
+          mob_elemental_ignivar_attack: resolvedGainCeilingDb('mob_elemental_ignivar_attack') + 0.5,
+        },
+      }),
+    ).toThrow('resolved gain for mob_elemental_ignivar_attack');
+    // One resolution path: an extension key's trim AND rate are both honored.
+    const resolved = resolveSfxPlaybackProfile('mob_elemental_varkhul_attack', {
+      gainMap: readSfxGainMap(),
+      speedMap: { version: 1, rateByKey: { mob_elemental_varkhul_attack: 1.05 } },
+    });
+    expect(resolved.gainDb).toBe(resolvedGainCeilingDb('mob_elemental_varkhul_attack'));
+    expect(resolved.gain).toBeGreaterThan(1);
+    expect(resolved.playbackRate).toBe(1.05);
   });
 
   it('uses only the runtime maps for manifest gain and rate without changing audio identity', () => {

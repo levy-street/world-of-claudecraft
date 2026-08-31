@@ -82,12 +82,12 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 75, effects: 'heal 174-206' }, // revalued (was 120-142), learned at 20
   ],
   renew: [
-    { level: 8, cost: 30, effects: 'hot 45/15' },
+    { level: 6, cost: 30, effects: 'hot 45/15' },
     { level: 14, cost: 50, effects: 'hot 90/15' },
     { level: 20, cost: 75, effects: 'hot 205/15' }, // revalued cap (was 140)
   ],
   power_word_shield: [
-    { level: 6, cost: 45, effects: 'absorb 48/30' },
+    { level: 4, cost: 45, effects: 'absorb 48/30' },
     { level: 12, cost: 70, effects: 'absorb 90/30' },
     { level: 18, cost: 100, effects: 'absorb 145/30' },
     { level: 20, cost: 130, effects: 'absorb 210/30' }, // NEW cap rank
@@ -116,7 +116,7 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 110, effects: 'heal 254-302' }, // revalued cap (was 175-208)
   ],
   rejuvenation: [
-    { level: 4, cost: 25, effects: 'hot 32/12' },
+    { level: 3, cost: 25, effects: 'hot 32/12' },
     { level: 10, cost: 40, effects: 'hot 56/12' },
     { level: 16, cost: 60, effects: 'hot 88/12' },
     { level: 20, cost: 80, effects: 'hot 168/12' }, // revalued cap (was 116)

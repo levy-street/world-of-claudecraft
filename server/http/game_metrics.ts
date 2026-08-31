@@ -314,6 +314,26 @@ export const WOC_TICK_PHASES = [
   'bcastGrid',
   'bcastSelf',
   'social',
+  // Main-thread cost of the shared-blob persistence writes: the whole market book,
+  // the whole mail book, and the rift blob, each measured INSIDE its queued write
+  // thunk (server/serial_writer.ts) rather than where it is enqueued. That
+  // distinction is the whole value of the series: the writers defer the thunk to a
+  // microtask, so a timer at the enqueue site reads the bookkeeping and nothing
+  // else (0.02 ms measured around an enqueue whose write then blocked 250 ms).
+  //
+  // SCOPE, so a flat reading is not over-read: per-character blobs ride their own
+  // queue and are NOT counted here, and neither is any DB round trip. A stall this
+  // series does not explain still shows in `lateness`.
+  'saves',
+  // How late each callback fired, in seconds. Not a body phase: it is the gap
+  // BETWEEN callbacks, and it is the only series that can see the loop blocked by
+  // something the profiler never entered (a deferred write thunk, an off-loop
+  // timer, a GC pause, the host descheduling the process).
+  //
+  // Read `max`, not `p95`. The ring holds 1200 samples (about 60 s of callbacks),
+  // so a stall on a 30 s cadence is two samples per window and sits far below the
+  // 95th percentile: p95 stays flat through exactly the incident this exists for.
+  'lateness',
 ] as const;
 
 /** The two per-phase stats exposed for each phase. */

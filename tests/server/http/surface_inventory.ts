@@ -755,7 +755,10 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleApi arm: /api/wallet/link (DELETE)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    // The R11 rate-limit rider: the ladder arm gates with walletLinkRateLimited
+    // before handleWalletUnlink (the challenge/link POST rows keep limiter null
+    // because those two self-limit INSIDE their handlers, not in the ladder).
+    limiter: 'walletLinkRateLimited',
     requireOwnedExpected: null,
   },
   {
@@ -2763,6 +2766,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/internal/woc-market/stuck',
     handler: 'internal.ts RouteDef: /internal/woc-market/stuck',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDashboard,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    // The parked-review operator arm: the one WRITE on the dashboard-secret
+    // surface, ruling a review-parked settlement through the transition CAS.
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/woc-market/settlements/:id/resolve',
+    handler: 'internal.ts RouteDef: /internal/woc-market/settlements/:id/resolve',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.secretDashboard,
     limiter: null,

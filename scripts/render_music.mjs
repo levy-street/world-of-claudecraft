@@ -47,8 +47,14 @@ mkdirSync(OUT, { recursive: true });
 
 const BUNDLE = 'tmp/music_render_bundle.js';
 execFileSync(
-  'npx',
-  ['esbuild', 'scripts/music_render_entry.ts', '--bundle', '--format=iife', `--outfile=${BUNDLE}`],
+  process.execPath,
+  [
+    'node_modules/esbuild/bin/esbuild',
+    'scripts/music_render_entry.ts',
+    '--bundle',
+    '--format=iife',
+    `--outfile=${BUNDLE}`,
+  ],
   { stdio: 'inherit' },
 );
 if (!existsSync(BUNDLE)) {

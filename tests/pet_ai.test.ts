@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
-  PET_AGGRESSIVE_RANGE,
   petFollow,
   petPickTarget,
   petRangedAttack,
@@ -249,11 +248,13 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
       school: 'frost' as const,
       jet: { total: 30, duration: 4, interval: 1, slow: 0.6, cooldown: 8 },
     };
+    pet.autoAttack = true;
     startWaterJet(sim.ctx, pet, target, ranged.jet);
     const start = sim.drainEvents();
     expect(start.some((e) => e.type === 'spellfx' && e.fx === 'bubbleBeam')).toBe(true);
     expect(pet.castingAbility).toBe('water_jet');
     expect(pet.channeling).toBe(true);
+    expect(pet.autoAttack).toBe(false);
     expect(
       target.auras.some(
         (a) => a.id === 'water_jet_slow' && a.sourceId === pet.id && a.value === 0.6,
@@ -261,16 +262,20 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     ).toBe(true);
 
     const remaining = pet.castRemaining;
+    pet.autoAttack = true; // stale swing state from a previous tick must not survive the channel owner.
     updatePet(sim.ctx, pet);
     expect(pet.castRemaining).toBeLessThan(remaining);
+    expect(pet.autoAttack).toBe(false);
     expect(sim.drainEvents().some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(
       false,
     );
 
     place(target, 40, 0);
+    pet.autoAttack = true;
     updatePet(sim.ctx, pet);
     expect(pet.castingAbility).toBeNull();
     expect(pet.channeling).toBe(false);
+    expect(pet.autoAttack).toBe(false);
     expect(target.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
     expect(
       sim

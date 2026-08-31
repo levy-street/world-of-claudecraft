@@ -11,11 +11,9 @@
 //   reaching the game layer (never preventing the default, so native activation
 //   fires for keyboard users), and the pointer drop keeps a mouse click from leaving
 //   the button focused for the next Space that escapes the game layer to re-click.
-// - The always-on tracker overlays: their header (and quest row) controls are
-//   activated by delegated click + keydown arms in hud.ts, and the quest tracker's
-//   repaint re-focuses a focused header, so a mouse click would pin focus there and
-//   Space would keep toggling the tracker instead of jumping. Capture-phase drop, so
-//   the repaint's refocus check sees no focused header on the mouse path; keyboard
+// - The always-on tracker and minimap overlays: their controls may stop click
+//   propagation or repaint before Input's bubble-phase focus cleanup runs. The
+//   capture-phase drop clears pointer focus before either can happen, while keyboard
 //   activation keeps its focus.
 //
 // Host-agnostic: everything is reached through the injected query and the
@@ -43,16 +41,17 @@ export const CHROME_GUARDED_PANELS: readonly string[] = [
   '#side-buttons',
 ];
 
-/** Tracker overlays and the selector of the controls inside them that take the
- *  pointer-only focus drop (their delegated keydown arms carry keyboard activation). */
+/** Always-on overlays and the selector of the controls inside them that take the
+ *  pointer-only focus drop (their own keydown arms carry keyboard activation). */
 export const CHROME_TRACKER_BLURS: readonly (readonly [root: string, selector: string])[] = [
   ['#quest-tracker', '.qt-header, .qt-title'],
   ['#deed-tracker', '.dt-header'],
   ['#reliquary-tracker', '.dt-header'],
+  ['#minimap-disc', 'button'],
 ];
 
 /** Bind both halves over every guarded panel and the pointer drop over every
- *  tracker. `query` resolves a selector to its root (hud.ts passes `$`). */
+ *  always-on overlay. `query` resolves a selector to its root (hud.ts passes `$`). */
 export function wireChromeFocus(query: (selector: string) => ListenerHost): void {
   for (const [root, selector] of CHROME_TRACKER_BLURS) bindPointerBlur(query(root), selector);
   for (const panelId of CHROME_GUARDED_PANELS) {

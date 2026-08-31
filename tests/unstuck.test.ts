@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
+import {
+  BG_GRAVEYARDS,
+  battlegroundColliders,
+  bgFieldPlanWalls,
+} from '../src/sim/battleground_layout';
 import { resolvePosition } from '../src/sim/colliders';
 import {
   BUILTIN_WORLD,
@@ -161,6 +165,53 @@ function forceBattlegroundWallTrap(
   sim.ctx.rebucket(p);
   const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
   expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBeGreaterThan(0.01);
+  return p;
+}
+
+function forceBattlegroundWallContact(
+  sim: Sim,
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
+  pid: number,
+): Sim['player'] {
+  const origin = battlegroundOrigin(match.slot);
+  const p = required(sim.entities.get(pid), 'trapped battleground player');
+  let contact: { x: number; z: number; normalX: number; normalZ: number } | null = null;
+  for (const wall of battlegroundColliders()) {
+    if (wall.type !== 'obb' || wall.moveTopY !== undefined || wall.hw < 1 || wall.hd < 1) continue;
+    const axes = [
+      { x: Math.cos(wall.rot), z: -Math.sin(wall.rot), d: wall.hw },
+      { x: -Math.cos(wall.rot), z: Math.sin(wall.rot), d: wall.hw },
+      { x: Math.sin(wall.rot), z: Math.cos(wall.rot), d: wall.hd },
+      { x: -Math.sin(wall.rot), z: -Math.cos(wall.rot), d: wall.hd },
+    ];
+    for (const axis of axes) {
+      const x = origin.x + wall.x + axis.x * (axis.d + PLAYER_BODY_RADIUS + 0.005);
+      const z = origin.z + wall.z + axis.z * (axis.d + PLAYER_BODY_RADIUS + 0.005);
+      const resolved = resolvePosition(sim.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+      if (Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6) {
+        contact = { x, z, normalX: axis.x, normalZ: axis.z };
+        break;
+      }
+    }
+    if (contact) break;
+  }
+  contact = required(contact, 'clear battleground wall-contact point');
+  p.pos = sim.groundPos(contact.x, contact.z);
+  p.prevPos = { ...p.pos };
+  p.facing = Math.atan2(-contact.normalX, -contact.normalZ);
+  p.prevFacing = p.facing;
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  const meta = required(sim.meta(pid), 'battleground player metadata');
+  meta.moveInput.forward = true;
+  sim.ctx.rebucket(p);
+  const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBe(0);
   return p;
 }
 
@@ -806,6 +857,144 @@ describe('unstuck area identity', () => {
     const plot = BG_GRAVEYARDS[0];
     expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('completes a battleground wall-press ESC attempt while movement input is still held', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+
+    const start = required(
+      unstuckLocationAt(sim.ctx, pid, player.pos),
+      'battleground unstuck wall-contact start location',
+    );
+    expect(start.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+    expect(completed?.area).toMatchObject(start.area);
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    expect(
+      Math.hypot(
+        player.pos.x - (origin.x + BG_GRAVEYARDS[0].x),
+        player.pos.z - (origin.z + BG_GRAVEYARDS[0].z),
+      ),
+    ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
+    expect(required(sim.meta(pid), 'battleground player metadata').moveInput).toEqual(
+      expect.objectContaining({ forward: false }),
+    );
+  });
+
+  it('completes a recent battleground wall-press ESC attempt after the menu neutralizes input', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+    const origin = battlegroundOrigin(match.slot);
+
+    sim.tick();
+    meta.moveInput.forward = false;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    expect(
+      Math.hypot(
+        player.pos.x - (origin.x + BG_GRAVEYARDS[0].x),
+        player.pos.z - (origin.z + BG_GRAVEYARDS[0].z),
+      ),
+    ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('expires the battleground wall-press ESC grace instead of creating a delayed shortcut', () => {
+    const { sim, match, pid } = activeBattleground();
+    forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    sim.tick();
+    meta.moveInput.forward = false;
+    tickMany(sim, 20 * 4);
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('clears the battleground wall-press ESC grace after non-blocked movement', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    sim.tick();
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    sim.tick();
+    meta.moveInput.forward = false;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('rejects a battleground wall-adjacent ESC attempt while moving along the wall', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    sim.drainEvents();
+    sim.tick();
+
+    expect(
+      Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z),
+    ).toBeGreaterThan(0.05);
+    expect(meta.moveInput.forward).toBe(true);
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'moving' }),
+    );
+
+    expect(meta.pendingUnstuck).toBeNull();
   });
 
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {

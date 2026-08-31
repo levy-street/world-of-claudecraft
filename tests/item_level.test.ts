@@ -247,8 +247,17 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       ),
     );
     expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
-    const ids = Object.values(HEROIC_BOSS_LOOT)
-      .flat()
+    // The Ignivar raid bosses' heroic-only appends live in this table too but
+    // read the Crucible tier (source 26, ilvl 35, sigil tokens with no item
+    // level at all); their pins live in tests/ignivar_loot.test.ts, so this
+    // sweep stays scoped to the five-man + Nythraxis tables.
+    const IGNIVAR_RAID_BOSSES = new Set([
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
+    ]);
+    const ids = Object.entries(HEROIC_BOSS_LOOT)
+      .filter(([bossId]) => !IGNIVAR_RAID_BOSSES.has(bossId))
+      .flatMap(([, entries]) => entries)
       .flatMap((e) => (e.itemId && isGearEntry(e.itemId) ? [e.itemId] : []));
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
@@ -276,10 +285,21 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     for (const base of raidBases) {
       const variant = ITEMS[`heroic_${base}`];
       expect(variant, `heroic_${base} exists`).toBeTruthy();
-      expect(itemSourceLevel(variant.id), `${variant.id} source`).toBe(27);
+      // The three-tier legendary ladder (2026-08-30) prices the heroic
+      // legendaries at source 40 (ilvl 53); epic variants keep the raid 27.
+      expect(itemSourceLevel(variant.id), `${variant.id} source`).toBe(
+        variant.quality === 'legendary' ? 40 : 27,
+      );
       if (variant.quality === 'legendary') {
         legendaries++;
-        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(37);
+        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(53);
+        // The mint keeps its base's line (normalize-to-max): Heartwood's
+        // banded 65, Thronebane's owned 44 plus the heroic seed (49). The 53
+        // label prices the dominant axes, not a fresh stat roll.
+        expect(primaryStatSum(variant), `${variant.id} banded stats`).toBe(
+          variant.id === 'heroic_deathless_heartwood' ? 65 : 49,
+        );
+        continue;
       } else {
         epics++;
         expect(variant.quality, variant.id).toBe('epic');
@@ -337,10 +357,12 @@ describe('item level: every level-20 item is balanced to budget', () => {
     expect(split.map(([k]) => k)).toEqual([]);
   });
 
-  it('the two legendaries are normalized to the same top-tier budget', () => {
-    expect(primaryStatSum(ITEMS.deathless_heartwood)).toBe(
-      primaryStatSum(ITEMS.kingsbane_last_oath),
-    );
+  it('the Nythraxis legendaries carry their landed band budgets', () => {
+    // The 2026-08-30 legendary band: Heartwood is BUFFED budget-true to its
+    // ilvl-49 label (65 points); Thronebane keeps its owned 44-point line by
+    // maintainer direction, priced by its weapon axis instead.
+    expect(primaryStatSum(ITEMS.deathless_heartwood)).toBe(65);
+    expect(primaryStatSum(ITEMS.kingsbane_last_oath)).toBe(44);
   });
 });
 
@@ -387,22 +409,19 @@ describe('item level: rift gear is budget-exact (rares ilvl 26, epics ilvl 31, l
     }
   });
 
-  it('every rift legendary resolves at ilvl 37 with exact budget, and is NOT a raid drop', () => {
-    // The S legendaries sit a tier above the clear-time epics, at the raid SOURCE
-    // level (27), so legendary quality's +10 puts them at ilvl 37. Iterated over
-    // the whole pool, not just the first: the S chase is TWO independent rolls,
-    // and a second legendary added off the wrong source level would be the silent
-    // way to slip an over-budget chase item in.
+  it('every rift legendary resolves at the ilvl-49 band with exact budget, and is NOT a raid drop', () => {
+    // The 2026-08-30 legendary band: the S chase pair is BUFFED budget-true to
+    // source 39 (ilvl 49, the Thronebane tier; item_level.ts overrides).
+    // Iterated over the whole pool, not just the first: the S chase is TWO
+    // independent rolls, and a second legendary added off the wrong source
+    // would be the silent way to slip an over-budget chase item in.
     expect(RIFT_LEGENDARY_ITEM_IDS.length, 'the S chase is a pair').toBe(2);
-    expect(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL, 'one tier above the clear epics').toBe(
-      RIFT_CLEAR_LOOT_SOURCE_LEVEL + 2,
-    );
     for (const id of RIFT_LEGENDARY_ITEM_IDS) {
       const item = ITEMS[id];
       expect(item, `${id} is a real item`).toBeTruthy();
-      expect(itemSourceLevel(id), `${id} source`).toBe(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL);
+      expect(itemSourceLevel(id), `${id} source`).toBe(39);
       expect(item.quality, `${id} quality`).toBe('legendary');
-      expect(itemLevel(item), `${id} ilvl`).toBe(37);
+      expect(itemLevel(item), `${id} ilvl`).toBe(49);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
       // Sharing the raid SOURCE level must not make it read as raid loot: the two
       // are separate axes and only the level is borrowed.

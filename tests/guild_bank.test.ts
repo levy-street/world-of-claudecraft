@@ -18,6 +18,7 @@ import type { GuildRank as ServerGuildRank } from '../server/social';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
+import { RIFT_ESSENCE_ITEM_ID } from '../src/sim/content/rift/items';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
   applyGuildBankDeltasTo,
@@ -937,6 +938,37 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     );
     expect(fingerprint(sim)).toBe(before);
     expect(hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.')).toBe(true);
+  });
+
+  // Rift Essence (rift forge currency) deliberately does NOT carry noMarketList
+  // (content/rift/items.ts): unlike the personal riftbound rings, it is boss
+  // loot bound by the ranked portal spawn cadence, not a re-grantable faucet,
+  // so it rides every anonymous pipe, guild bank included.
+  it('permits Rift Essence: forge currency, not the personal rift gear the pipe policy blocks', () => {
+    const sim = makeOfficerSim();
+    expect(ITEMS[RIFT_ESSENCE_ITEM_ID]?.noMarketList).toBeUndefined(); // fixture guard
+    sim.addItem(RIFT_ESSENCE_ITEM_ID, 5);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === RIFT_ESSENCE_ITEM_ID),
+    );
+    expect(hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.')).toBe(false);
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, sim.playerId)).toBe(0);
+    expect(
+      book(sim).inventory.some((s) => s.itemId === RIFT_ESSENCE_ITEM_ID && s.count === 5),
+    ).toBe(true);
+
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(
+      sim.playerId,
+      book(sim).inventory.findIndex((s) => s.itemId === RIFT_ESSENCE_ITEM_ID),
+    );
+    expect(hasErr(sim.drainEvents(), 'That item cannot be withdrawn from the guild bank.')).toBe(
+      false,
+    );
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, sim.playerId)).toBe(5);
+    expect(book(sim).inventory.some((s) => s.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
   });
 
   it('refuses transfer-locked copies on deposit: bound (boundTo) and armed (bindOnTrade)', () => {

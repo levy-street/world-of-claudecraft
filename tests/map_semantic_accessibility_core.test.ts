@@ -1,4 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { DungeonMapModel } from '../src/ui/dungeon_map_view';
 import {
   BG_MAP_FIELD_PAD_PX,
   type BgMapModel,
@@ -25,6 +26,8 @@ function core() {
     station: (type) => `Station ${type}`,
     poi: (zoneId, index) => `POI ${zoneId}/${index}`,
     rift: (name, rank) => `${name} (${rank ?? '?'})`,
+    npc: (id) => `NPC ${id}`,
+    mob: (id) => `Mob ${id}`,
   });
 }
 
@@ -338,6 +341,8 @@ describe('map semantic accessibility core', () => {
       station: stationName,
       poi: (zoneId, index) => `${zoneId}/${index}`,
       rift: (name) => name,
+      npc: (id) => id,
+      mob: (id) => id,
     });
     const model = {
       view: {},
@@ -362,6 +367,38 @@ describe('map semantic accessibility core', () => {
     expect(stationName).toHaveBeenCalledTimes(1);
   });
 
+  it('semantically exposes the player, dungeon exits, bosses, NPCs, and party members', () => {
+    const description = core().updateDungeon(
+      {
+        markers: [
+          { kind: 'player', cx: 280, cy: 280, angle: 0 },
+          { kind: 'exit', cx: 280, cy: 500 },
+          { kind: 'gate', cx: 280, cy: 60 },
+          { kind: 'npc', cx: 180, cy: 180, templateId: 'maelin' },
+          {
+            kind: 'mob',
+            cx: 380,
+            cy: 180,
+            templateId: 'varkhul',
+            aggro: true,
+            boss: true,
+          },
+          { kind: 'party', cx: 180, cy: 380, cls: 'mage', dead: false },
+        ],
+      } as unknown as DungeonMapModel,
+      'Molten Assembly',
+      560,
+    );
+
+    expect(description).toContain('You');
+    expect(description).toContain('Dungeon exit');
+    expect(description).toContain('Sealed gate');
+    expect(description).toContain('Point of interest: NPC maelin');
+    expect(description).toContain('Boss attacking you: Mob varkhul');
+    expect(description).toContain('Party member');
+    expect(description).not.toContain('No meaningful markers are visible.');
+  });
+
   it('reserves crowded summaries for every resource, station, and service identity', () => {
     const stationName = vi.fn((type: string) => `Station ${type}`);
     const zoneName = vi.fn((id: string) => `Zone ${id}`);
@@ -372,6 +409,8 @@ describe('map semantic accessibility core', () => {
       station: stationName,
       poi: (zoneId, index) => `${zoneId}/${index}`,
       rift: (name) => name,
+      npc: (id) => id,
+      mob: (id) => id,
     });
     const model = crowdedOverworldModel();
 

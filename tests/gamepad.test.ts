@@ -1267,6 +1267,25 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onAction).toHaveBeenCalledWith('cancel');
   });
 
+  it('keeps a remapped Jump on a bare face button while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.A, 'jump');
+
+    h.press(GP.A);
+
+    expect(h.triggerGamepadJump).toHaveBeenCalledOnce();
+  });
+
+  it('keeps a remapped Jump on a bare d-pad button while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.DPAD_UP, 'jump');
+
+    h.press(GP.DPAD_UP);
+
+    expect(h.triggerGamepadJump).toHaveBeenCalledOnce();
+    expect(h.onAction).not.toHaveBeenCalledWith('targetNpcPrev');
+  });
+
   it('opens bags from View and keeps interface cycling on right-stick click', () => {
     const h = setupCrossHotbar(true);
     h.press(GP.BACK);

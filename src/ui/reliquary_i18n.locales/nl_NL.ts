@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Riftbanden',
     desc: 'De persoonlijke Riftbanden, geslagen voor elke kampioen in de groep die de eerste voltooiing van een gerangschikte Rift wint. Een personage kan alleen het zijne bezitten.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Epische buit van Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroïsch: Crucible of the Last Spring',
+    desc: 'Alleen heroïsch verkrijgbare wapens van Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Epische buit van Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroïsch: The Inner Crucible',
+    desc: 'Alleen heroïsch verkrijgbare schilden en wapens van Varkhul, Forgefather of the Last Flame.',
+  },
 };

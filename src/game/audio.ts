@@ -31,6 +31,11 @@ export const UI_CUES = {
   death: 'ui_death',
   arenaLoss: 'ui_arena_loss',
   playerDeath: 'player_death',
+  // The female take of the same cue. Registered here (rather than reached as
+  // a bare SfxId) so it lands in the UiCue union and play() keeps refusing
+  // anything that is not a real cue; hud.ts picks between the two via
+  // playerVoiceCue.
+  playerDeathFemale: 'player_death_female',
   readyCheck: 'ui_ready_check',
   weaponSheathe: 'ui_weapon_sheathe',
   weaponUnsheathe: 'ui_weapon_unsheathe',
@@ -216,14 +221,14 @@ export class GameAudio {
   // use death() below): plays the real custom death vocalization instead of
   // the generic UI stinger.
   //
-  // player_death_female_1..3 exist under public/audio/sfx but are unwired,
-  // same gap as the other player-voice trigger sites in src/ui/hud.ts (search
-  // player_hurt_female / player_death_female there): no gender field exists
-  // on PlayerMeta yet. This is the site to wire for your OWN character's
-  // death vocalization once that field lands, distinct from the OTHER
-  // players' death cue commented in hud.ts.
-  playerDeath(): void {
-    this.play(UI_CUES.playerDeath);
+  // The gendered cue is RESOLVED BY THE CALLER (hud.ts, via playerVoiceCue)
+  // rather than here: picking it needs the player's authored appearance, and
+  // this module is a host-agnostic cue facade with no entity access. Defaults
+  // to the male take so every existing caller keeps its current behavior.
+  playerDeath(
+    cue: typeof UI_CUES.playerDeath | typeof UI_CUES.playerDeathFemale = UI_CUES.playerDeath,
+  ): void {
+    this.play(cue);
   }
 
   lootItem(): void {

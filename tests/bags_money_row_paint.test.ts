@@ -100,6 +100,7 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => false,
+    confirmVendorSell: () => true,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,

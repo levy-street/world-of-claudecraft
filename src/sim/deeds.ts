@@ -135,7 +135,7 @@ export const DEEDS_RECENT_CAP = 8;
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
 // counter. PINNED as of v1: a future dungeon's boss gets a new deed; this
 // list never grows an earned requirement.
-const FINAL_BOSS_DUNGEONS: Record<string, string> = {
+export const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   morthen: 'hollow_crypt',
   vael_the_mistcaller: 'sunken_bastion',
   ysolei: 'drowned_temple',
@@ -144,16 +144,24 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   // Without this entry Zulgar kills write no dungeonClears record, so the
   // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
   wildheart_high_priest: 'wildheart_basin',
+  // The Crucible of the Last Spring raid credits per boss room: each raid
+  // room is its own dungeon id, and each boss dies through the generic
+  // kill-credit path (no bespoke lockout roster yet; the launch pass owns
+  // that), so the eligible snapshot (downed members included) is the
+  // recipient set, the wildheart precedent.
+  ignivar_herald_of_the_last_flame: 'ignivar_raid_arena',
+  varkhul_forgefather_of_the_last_flame: 'ignivar_inner_crucible',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
 // while the boss is engaged. Tainted by onPlayerDeathForDeeds; the window
 // re-arms on evade/reset/respawn (resetDeedEncounter).
-const FLAWLESS_TASKS: Record<string, string> = {
+export const FLAWLESS_TASKS: Record<string, string> = {
   morthen: 'dgn_morthen_flawless',
   ysolei: 'dgn_ysolei_flawless',
   korzul_the_gravewyrm: 'dgn_korzul_flawless',
   nythraxis_scourge_of_thornpeak: 'dgn_nythraxis_deathless',
+  varkhul_forgefather_of_the_last_flame: 'dgn_varkhul_flawless',
 };
 
 // Kill-order tasks: at boss death, every add it summoned this attempt is dead.

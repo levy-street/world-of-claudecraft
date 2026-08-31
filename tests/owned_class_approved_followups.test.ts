@@ -127,6 +127,7 @@ describe('approved Packlord follow-up', () => {
     if (!stampede) throw new Error('missing Stampede');
     const displayed = abilityEffectText(stampede, {
       spellPower: 0,
+      healPower: 0,
       rangedPower: sim.player.rangedPower,
       attackPower: 0,
     });
@@ -241,12 +242,12 @@ describe('approved Thundercall Chain Lightning follow-up', () => {
     if (!chain) throw new Error('missing Skybranch');
     // v0.36 composition re-pin: Earthen Fury mastery now applies whole-hit per
     // the composed talent scaling, raising the zero-power band.
-    expect(abilityEffectText(chain, { spellPower: 0, rangedPower: 0, attackPower: 0 })).toBe(
-      '60 to 69',
-    );
-    expect(abilityEffectText(chain, { spellPower: 100, rangedPower: 0, attackPower: 0 })).not.toBe(
-      '60 to 69',
-    );
+    expect(
+      abilityEffectText(chain, { spellPower: 0, healPower: 0, rangedPower: 0, attackPower: 0 }),
+    ).toBe('60 to 69');
+    expect(
+      abilityEffectText(chain, { spellPower: 100, healPower: 100, rangedPower: 0, attackPower: 0 }),
+    ).not.toBe('60 to 69');
 
     const sim = new Sim({ seed: 2920, playerClass: 'shaman' });
     sim.setPlayerLevel(20);
@@ -299,13 +300,64 @@ describe('approved Spiritmend group revive follow-up', () => {
       specs: ['restoration'],
       learnLevel: 20,
       castTime: 7,
+      cooldown: 300,
       requiresTarget: false,
       requiresOutOfCombat: true,
     });
+    // Same invariant the Chronomancy twin (collective_reversal) pins, for the same
+    // reason: requiresOutOfCombat is not a throttle on its own, because a healer who
+    // never draws aggro drops combat mid-fight once combatTimer passes the 5s linger.
+    // The cooldown is what stops a mass rez from being chained inside one encounter,
+    // so it must outlast a cast plus the linger the caster waits out to become
+    // eligible again.
+    const def = ABILITIES.ancestor_return;
+    expect(def.cooldown).toBeGreaterThan(def.castTime + 5);
+    expect(def.cooldown).toBe(ABILITIES.collective_reversal.cooldown);
     expect(ABILITIES.ancestor_return.effects).toContainEqual({
       type: 'massResurrectGroup',
       hpFrac: 0.3,
     });
+  });
+
+  it('refuses a second mass revive while the cooldown runs, even fully out of combat', () => {
+    const sim = new Sim({ seed: 4471, playerClass: 'shaman' });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('restoration')).toBe(true);
+    const fallenId = sim.addPlayer('warrior', 'Fallen Twice');
+    sim.partyInvite(fallenId, sim.playerId);
+    sim.partyAccept(fallenId);
+    const fallen = sim.entities.get(fallenId) as Entity;
+    killAt(fallen, sim.player.pos.x + 2, sim.player.pos.z);
+    sim.player.resource = sim.player.maxResource;
+
+    sim.castAbility('ancestor_return');
+    expect(sim.player.castingAbility).toBe('ancestor_return');
+    advance(sim, 7.05);
+    expect(sim.player.castingAbility).toBeNull();
+    sim.respondToResurrection(true, fallen.id);
+    expect(fallen.dead).toBe(false);
+
+    const remaining = sim.player.cooldowns.get('ancestor_return') ?? 0;
+    expect(remaining).toBeGreaterThan(290);
+    expect(remaining).toBeLessThanOrEqual(300);
+
+    // The same member dies again and the shaman is unambiguously out of combat with a
+    // full mana pool: only the cooldown may refuse this cast.
+    killAt(fallen, sim.player.pos.x + 2, sim.player.pos.z);
+    sim.player.inCombat = false;
+    sim.player.combatTimer = 99;
+    sim.player.resource = sim.player.maxResource;
+    const mana = sim.player.resource;
+    sim.castAbility('ancestor_return');
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.resource).toBe(mana);
+    expect(fallen.dead).toBe(true);
+
+    // Clearing only the cooldown lets the identical cast start, proving the refusal
+    // above was the cooldown and not the out-of-combat or dead-member gate.
+    sim.player.cooldowns.delete('ancestor_return');
+    sim.castAbility('ancestor_return');
+    expect(sim.player.castingAbility).toBe('ancestor_return');
   });
 
   it('offers every dead group member a resurrection and leaves strangers alone', () => {

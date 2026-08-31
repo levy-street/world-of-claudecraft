@@ -690,6 +690,8 @@ const GENERAL_KEYS = [
   'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
+  'confirmVendorSell',
+  'note:hudChrome.options.confirmVendorSellNote',
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
@@ -704,7 +706,9 @@ const FRAMES_KEYS = [
   'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
+  'alwaysShowAllBuffs',
   'showTargetOfTarget',
+  'showTargetSwingTimer',
   'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
@@ -796,11 +800,14 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       labelKey: 'hudChrome.options.forceHighPerfGpu',
     });
     expect(desktop.filter((c) => c.control === 'note')).toEqual([
+      { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
     ]);
 
-    // Without it: the exact pre-existing list, with no row and no note at all.
-    // A plain browser and a mobile Capacitor shell both land here.
+    // Without it: the exact pre-existing list, with no GPU-preference row or
+    // note (the keysOf equality below already pins the whole set exactly,
+    // confirmVendorSellNote included since it is unconditional). A plain
+    // browser and a mobile Capacitor shell both land here.
     for (const env of [undefined, WEB_ENV, { touch: true, nativeShell: true }]) {
       const withoutCapability = buildInterfaceControls(makeSource(), env);
       expect(keysOf(withoutCapability)).toEqual([
@@ -811,7 +818,6 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       ]);
       expect(find(withoutCapability, 'forceHighPerfGpu')).toBeUndefined();
       expect(find(withoutCapability, 'discordPresence')).toBeUndefined();
-      expect(withoutCapability.some((c) => c.control === 'note')).toBe(false);
     }
 
     // nativeShell alone never reveals it, and the capability alone always does:

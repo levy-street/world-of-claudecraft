@@ -75,7 +75,9 @@ handoff under the classic 110% rule after shifting out.
 
 1. Start offline play and create a Druid.
 2. Use `/dev level 20`, choose a specialization, and repick the redesigned rows.
-3. Use `/dev bis` after changing specialization.
+3. Use `/dev bis` after changing specialization. It now equips the spec's
+   top-parse loadout, not the epic reference kit the balance probes equip, so
+   in-game numbers can read above the probe bands.
 4. Compare both a high-health training target and an attacking live mob.
 5. Use `/dev god` when comparing tank or healing behavior.
 

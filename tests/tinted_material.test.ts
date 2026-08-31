@@ -59,6 +59,94 @@ describe('tinted character materials', () => {
     expect(viaFar).not.toBe(rig);
   });
 
+  it('derives a fully diffuse clone for a matte def without mutating the source', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      // A glossy authored source, the Ignivar shape: metallic factor 1 plus
+      // metallic-roughness response maps that would re-gloss a scalar-only fix.
+      const mrTex = new THREE.Texture();
+      const src = new THREE.MeshStandardMaterial({
+        color: 0x996644,
+        metalness: 1,
+        roughness: 0.3,
+        metalnessMap: mrTex,
+        roughnessMap: mrTex,
+      });
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      const root = new THREE.Group();
+      root.add(mesh);
+      const def = { matte: true } as VisualDef;
+      applyMaterials(root, def, 0xffffff);
+
+      const matte = mesh.material as THREE.MeshStandardMaterial;
+      expect(matte).not.toBe(src);
+      expect(matte.metalness).toBe(0);
+      expect(matte.roughness).toBe(1);
+      expect(matte.metalnessMap).toBeNull();
+      expect(matte.roughnessMap).toBeNull();
+      // the source stays authored: other defs sharing the GLB keep their look
+      expect(src.metalness).toBe(1);
+      expect(src.roughness).toBe(0.3);
+      expect(src.metalnessMap).toBe(mrTex);
+      expect(src.roughnessMap).toBe(mrTex);
+
+      // matte is part of the cache identity: the same source without the flag
+      // is a DIFFERENT clone that keeps the clamped glossy band.
+      const glossy = tintedMaterial(
+        src,
+        null,
+        0,
+        null,
+        null,
+        'body',
+        null,
+        'rig',
+        '',
+      ) as THREE.MeshStandardMaterial;
+      expect(glossy).not.toBe(matte);
+      expect(glossy.metalness).toBe(1);
+      expect(glossy.roughness).toBeCloseTo(0.55, 5);
+      expect(glossy.metalnessMap).toBe(mrTex);
+
+      // and the far mount derives the same matte response for its own clone
+      const [far] = tintedFarMaterials(def, 0xffffff, [src], [true]) as [
+        THREE.MeshStandardMaterial,
+      ];
+      expect(far).not.toBe(matte);
+      expect(far.metalness).toBe(0);
+      expect(far.roughness).toBe(1);
+      expect(far.metalnessMap).toBeNull();
+    } finally {
+      restoreGfx();
+    }
+
+    // Low tier: the Lambert rebuild has no metalness/roughness to zero, so
+    // matte must be a clean no-op that still carries the map across.
+    const restoreLow = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const map = new THREE.Texture();
+      const lowSrc = new THREE.MeshStandardMaterial({ color: 0x996644, map });
+      const low = tintedMaterial(
+        lowSrc,
+        null,
+        0,
+        null,
+        null,
+        'body',
+        null,
+        'rig',
+        '',
+        0,
+        undefined,
+        true,
+      );
+      expect((low as THREE.MeshLambertMaterial).isMeshLambertMaterial).toBe(true);
+      expect((low as THREE.MeshLambertMaterial).map).toBe(map);
+    } finally {
+      restoreLow();
+    }
+  });
+
   it('returns a colorless shader material as-is and continues the material traversal', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
     try {

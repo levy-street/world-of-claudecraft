@@ -163,6 +163,52 @@ describe('dungeons: door-trigger entry/exit', () => {
     expect(inst.exitId).not.toBeNull();
   });
 
+  it('sets the same forward facing on entry for every current and future dungeon definition', () => {
+    for (const dungeon of Object.values(DUNGEONS)) {
+      const sim = new Sim({
+        seed: 99,
+        playerClass: 'warrior',
+        noPlayer: true,
+        devCommands: true,
+        world: DUNGEON_TEST_WORLD,
+      }) as AnySim;
+      const pid = sim.addPlayer('warrior', `Facing-${dungeon.index}`);
+      const player = sim.entities.get(pid) as AnyEntity;
+      const moveInput = sim.meta(pid)?.moveInput;
+      if (!moveInput) throw new Error(`missing move input for ${dungeon.id}`);
+      player.facing = Math.PI;
+      player.prevFacing = Math.PI;
+      moveInput.forward = true;
+      moveInput.turnLeft = true;
+      moveInput.turnRight = true;
+
+      expect(enterDungeon(sim.ctx, dungeon.id, pid, true), dungeon.id).toBe(true);
+      expect(player.facing, dungeon.id).toBe(0);
+      expect(player.prevFacing, dungeon.id).toBe(0);
+      expect(player.dungeonEntrySeq, dungeon.id).toBe(1);
+      expect(moveInput, dungeon.id).toMatchObject({
+        forward: true,
+        turnLeft: false,
+        turnRight: false,
+      });
+      player.facing = Math.PI;
+      player.prevFacing = Math.PI;
+      moveInput.turnLeft = true;
+      moveInput.turnRight = true;
+      expect(enterDungeon(sim.ctx, dungeon.id, pid, true), dungeon.id).toBe(true);
+      expect(player.facing, dungeon.id).toBe(0);
+      expect(player.prevFacing, dungeon.id).toBe(0);
+      expect(moveInput, dungeon.id).toMatchObject({
+        forward: true,
+        turnLeft: false,
+        turnRight: false,
+      });
+      expect(player.dungeonEntrySeq, dungeon.id).toBe(2);
+      expect(enterDungeon(sim.ctx, 'missing_dungeon', pid, true), dungeon.id).toBe(false);
+      expect(player.dungeonEntrySeq, dungeon.id).toBe(2);
+    }
+  });
+
   // Bug repro: jumping into a dungeon door mid-air (the reported "jump into the
   // outer entrance" crypt repro) carries the overworld jump's airborne state
   // across the teleport. Every other sim teleport (portals.ts, sim.ts charge/
@@ -2737,7 +2783,7 @@ describe('dungeons: a cleared heroic claim outlives the ordinary empty-timeout',
     expect(inst.partyKey, 'freed once the extended grace elapses').toBeNull();
   });
 
-  it('a normal-difficulty run never earns the extended grace (clearedBy is heroic-only)', () => {
+  it('an ordinary normal-difficulty run never earns the extended grace (no clearedBy stamp)', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
     enterDungeon(sim.ctx, 'hollow_crypt', pid);

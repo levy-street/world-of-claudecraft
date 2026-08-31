@@ -16,8 +16,9 @@ export function summonQuestMob(
   // perOwner scopes the duplicate guard to THIS summoner's tap: on a shared
   // site (the island tide pool) every quest holder raises their own copy
   // instead of queueing behind a stranger's. Omitted, the guard stays
-  // site-wide, the original Nythraxis behavior.
-  opts?: { perOwner?: boolean },
+  // site-wide, the original Nythraxis behavior. hardDespawnSeconds gives a
+  // summon a fixed lifetime that combat and retargeting cannot clear.
+  opts?: { perOwner?: boolean; hardDespawnSeconds?: number },
 ): void {
   const existing = [...ctx.entities.values()].some(
     (e) =>
@@ -34,6 +35,14 @@ export function summonQuestMob(
   mob.facing = Math.PI;
   mob.prevFacing = mob.facing;
   mob.tappedById = ownerPid;
+  if (opts?.hardDespawnSeconds !== undefined) {
+    mob.hardDespawnTimer = opts.hardDespawnSeconds;
+    // A hard-lifetime summon was created by this script, not placed by a camp.
+    // Give it the established escort-wave lifecycle: death never schedules an
+    // ordinary wild respawn, and the corpse drops once its loot window decays.
+    mob.runScoped = true;
+    mob.summonedAdd = true;
+  }
   ctx.addEntity(mob);
   const owner = ctx.entities.get(ownerPid);
   if (owner && owner.kind === 'player' && !owner.dead) ctx.aggroMob(mob, owner, false);

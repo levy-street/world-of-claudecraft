@@ -93,6 +93,8 @@ export const es_ES: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Desafíos de monedero limitados',
   'usage.metric.walletLinkRequest': 'Solicitudes de vinculación de monedero',
   'usage.metric.walletLinkFailure': 'Errores al vincular monedero',
+  'usage.metric.walletUnlinkFailure': 'Rechazos al desvincular monedero',
+  'usage.metric.walletUnlinkSuccess': 'Desvinculaciones de monedero completadas',
   'usage.metric.walletLinkRateLimited': 'Vinculaciones de monedero limitadas',
   'usage.metric.cardPublishRequest': 'Solicitudes de publicación de tarjeta de jugador',
   'usage.metric.cardPublishRejected': 'Publicaciones de tarjeta rechazadas',

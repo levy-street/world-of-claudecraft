@@ -89,7 +89,10 @@ describe('Paladin core abilities', () => {
     sim.setSpec('holy');
     const enemy = hostileNear(sim);
     enemy.swingTimer = 999;
-    sim.rng.chance = () => false;
+    // Fail every roll EXCEPT the near-certain spell-hit one: Mercy Lance is an
+    // instant hostile spell, so a blanket false resists it and nothing lands.
+    sim.player.hitBonus = 1;
+    sim.rng.chance = (chance: number) => chance >= 1;
     sim.targetEntity(enemy.id);
     sim.castAbility('mercy_lance');
 
@@ -184,7 +187,10 @@ describe('Paladin core abilities', () => {
     sim.setSpec('holy');
     const enemy = hostileNear(sim);
     enemy.swingTimer = 999;
-    sim.rng.chance = () => false;
+    // Fail every roll EXCEPT the near-certain spell-hit one: Mercy Lance is an
+    // instant hostile spell, so a blanket false resists it and nothing lands.
+    sim.player.hitBonus = 1;
+    sim.rng.chance = (chance: number) => chance >= 1;
     grantDevotion(sim.player, 20);
     activateDivineAscension(sim.player);
 

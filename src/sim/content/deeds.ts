@@ -2880,6 +2880,64 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
   },
+  // The Crucible of the Last Spring raid (the deeds its content rule owes,
+  // docs/prd/ignivar-raid-loot.md "Obligations closeout"). Clear credit is
+  // per boss room: each raid room is its own dungeon id, so the clear deeds
+  // mirror the dgn_nythraxis pair per boss (FINAL_BOSS_DUNGEONS rows in
+  // src/sim/deeds.ts land in the same change). The flawless task rides the
+  // generic FLAWLESS_TASKS window on the raid finale, the
+  // dgn_nythraxis_deathless shape.
+  dgn_ignivar: {
+    id: 'dgn_ignivar',
+    name: 'The Herald Falls',
+    desc: 'Defeat Ignivar, Herald of the Last Flame, in the Crucible of the Last Spring.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'ignivar_raid_arena', count: 1 },
+  },
+  dgn_ignivar_heroic: {
+    id: 'dgn_ignivar_heroic',
+    name: 'Heroic: The Herald Falls',
+    desc: 'Defeat Ignivar, Herald of the Last Flame, on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_raid_arena',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_varkhul: {
+    id: 'dgn_varkhul',
+    name: 'The Forge Goes Cold',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, in the Inner Crucible.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'ignivar_inner_crucible', count: 1 },
+  },
+  dgn_varkhul_heroic: {
+    id: 'dgn_varkhul_heroic',
+    name: 'Heroic: The Forge Goes Cold',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_inner_crucible',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_varkhul_flawless: {
+    id: 'dgn_varkhul_flawless',
+    name: 'Not One Ember Lost',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, on Heroic difficulty without a single raider dying.',
+    category: 'dungeon',
+    renown: 50,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Unscorched' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

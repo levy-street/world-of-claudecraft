@@ -17,6 +17,7 @@ import {
   instanceBindingLines,
   instanceBonusStatLines,
   instanceMakersMarkLine,
+  instancePartyTradeLine,
   isGatheredProvenanceKind,
   itemNumber,
   itemStatName,
@@ -394,5 +395,41 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(hudCss).toMatch(
       /#tooltip \.tt-makers-mark-icon[\s\S]*?width: calc\(16px \* var\(--tooltip-scale, 1\)\)/,
     );
+  });
+});
+
+describe('instancePartyTradeLine (the BoP party trade window line)', () => {
+  const windowed = { partyTrade: { untilMs: 7_200_000, eligible: ['Alice', 'Bob'] } };
+
+  it('renders the gold window line with the remaining span while the window is live', () => {
+    const html = instancePartyTradeLine(windowed, (untilMs) => untilMs - 3_600_000);
+    expect(html).toContain('color:var(--gold)');
+    expect(html).toContain('1 hour');
+    expect(html).toContain('trade this item to players who shared its drop');
+    expect(html).toContain('Equipping it ends the trade window');
+  });
+
+  it('renders nothing for an expired window (the world clamps remaining to zero)', () => {
+    expect(instancePartyTradeLine(windowed, () => 0)).toBe('');
+  });
+
+  it('renders nothing for an absent or malformed window', () => {
+    expect(instancePartyTradeLine(undefined, () => 1)).toBe('');
+    expect(instancePartyTradeLine({}, () => 1)).toBe('');
+    expect(
+      instancePartyTradeLine({ partyTrade: { untilMs: Number.NaN, eligible: [] } }, () => 1),
+    ).toBe('');
+  });
+
+  it('composes in hud.itemTooltip right after the Soulbound line, before the bond lines', () => {
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
+    const partyTrade = hud.indexOf('instancePartyTradeLine(instance,');
+    const binding = hud.indexOf('instanceBindingLines(instance, item.kind)');
+    expect(partyTrade).toBeGreaterThan(soulbound);
+    expect(binding).toBeGreaterThan(partyTrade);
+    expect(hud.indexOf('instancePartyTradeLine(', partyTrade + 1)).toBe(-1);
+    // The remaining span resolves through the IWorld clock, never Date.now().
+    expect(hud).toContain('this.sim.partyTradeMsRemaining(untilMs)');
   });
 });

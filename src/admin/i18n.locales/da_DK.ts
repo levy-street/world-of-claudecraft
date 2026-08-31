@@ -295,6 +295,9 @@ export const da_DK: Record<string, string> = {
   'usage.cacheColEvictions': 'Udsmidninger',
   'usage.cacheEntriesOfMax': '{entries} / {max}',
   'usage.notAvailable': 'ikke tilgængelig',
+  'usage.metric.walletHandoffAuthorizationEvicted':
+    'Udsmidninger af skrivebords-wallet-overdragelser',
+  'usage.metric.walletHandoffCreateRejected': 'Afviste skrivebords-wallet-overdragelser',
   'usage.metric.wocBalanceApi': 'API-anmodninger om $WOC-saldo',
   'usage.metric.wocBalanceRateLimited': 'Strubede anmodninger om $WOC-saldo',
   'usage.metric.wocBalanceRpc': 'Solana RPC-saldolæsninger',
@@ -308,6 +311,8 @@ export const da_DK: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Strubede anmodninger om wallet-udfordring',
   'usage.metric.walletLinkRequest': 'Anmodninger om wallet-sammenkædning',
   'usage.metric.walletLinkFailure': 'Fejlede wallet-sammenkædninger',
+  'usage.metric.walletUnlinkFailure': 'Afviste wallet-frakoblinger',
+  'usage.metric.walletUnlinkSuccess': 'Gennemførte wallet-frakoblinger',
   'usage.metric.walletLinkRateLimited': 'Strubede anmodninger om wallet-sammenkædning',
   'usage.metric.cardPublishRequest': 'Udgivelsesanmodninger for spillerkort',
   'usage.metric.cardPublishRejected': 'Afviste udgivelser af spillerkort',

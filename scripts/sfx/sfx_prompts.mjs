@@ -143,6 +143,24 @@ export const SFX = [
     custom: true,
   },
   {
+    // Real recording (not ElevenLabs): the cart's rolling/creaking bed, held
+    // as a continuous loop while the mount moves rather than a per-stride
+    // one-shot like mount_run_* above. A wheeled cart has no stride to hang
+    // a one-shot on -- the sound is continuous by nature, so it runs through
+    // sfx.ts's loop()/unloop() the way the campfire and forge ambiences do.
+    key: 'mount_loop_rickshaw_mount',
+    custom: true,
+    loop: true,
+  },
+  {
+    // The Bonebound Rickshaw's summon call, fired once when the summon channel
+    // completes and the mount appears. Never on dismount, and never for a rider
+    // already mounted when they come into view. Silent for any mount without an
+    // authored take, so this key is the whole opt-in.
+    key: 'mount_summon_rickshaw_mount',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,
@@ -270,6 +288,20 @@ export const SFX = [
     duration: 1.3,
     prompt:
       "A human warrior's final pained death cry as he collapses to the ground. Single death cry fading out.",
+  },
+  {
+    key: 'player_hurt_female',
+    custom: true,
+    duration: 0.6,
+    prompt:
+      'A human warrior grunting in sudden sharp pain from taking a hit. Single short grunt. Female voice.',
+  },
+  {
+    key: 'player_death_female',
+    custom: true,
+    duration: 1.3,
+    prompt:
+      "A human warrior's final pained death cry as she collapses to the ground. Single death cry fading out. Female voice.",
   },
   {
     key: 'player_eat_food',

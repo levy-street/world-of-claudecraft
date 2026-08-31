@@ -206,6 +206,23 @@ export function emailSecurityIncident(
   );
 }
 
+/** The wallet link moved (the R11 alert): fire-and-forget like its siblings.
+ *  action reads inline in the subject and body: 'linked' | 'changed' | 'removed'.
+ *  The address is truncated for display: enough for the owner to recognize
+ *  their wallet without linking the mailbox to a full on-chain identity. */
+export function emailWalletChanged(t: Target, action: string, wallet: string): void {
+  const shown = wallet.length > 12 ? `${wallet.slice(0, 4)}...${wallet.slice(-4)}` : wallet;
+  fire(
+    getEmailService().send({
+      event: 'wallet_changed',
+      to: t.email,
+      locale: t.locale,
+      accountId: t.id,
+      data: { username: t.username, action, wallet: shown },
+    }),
+  );
+}
+
 export function emailGeneric(t: Target, heading: string, body: string, marketing = false): void {
   fire(
     getEmailService().send({

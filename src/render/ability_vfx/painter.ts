@@ -21,10 +21,11 @@ import {
   wornCcBand,
 } from '../ability_vfx_core';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
-import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
+import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
+import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
 
 interface VfxPoint {
@@ -306,7 +307,7 @@ const HOSTILE_AURA_SUFFIXES = new Set(['_slow', '_root']);
 const auraSpecIdMemo = new Map<string, string | null>();
 const auraHostileWornMemo = new Set<string>();
 function auraSpecId(auraId: string): string | null {
-  if (abilityVfxSpec(auraId) !== undefined) return auraId;
+  if (abilityVfxSpecFor(auraId) !== undefined) return auraId;
   let base = auraSpecIdMemo.get(auraId);
   if (base === undefined) {
     base = null;
@@ -314,7 +315,7 @@ function auraSpecId(auraId: string): string | null {
     for (const s of AURA_ID_SUFFIXES) {
       if (auraId.endsWith(s)) {
         const stripped = auraId.slice(0, -s.length);
-        if (abilityVfxSpec(stripped) !== undefined) {
+        if (abilityVfxSpecFor(stripped) !== undefined) {
           base = stripped;
           hostile = HOSTILE_AURA_SUFFIXES.has(s);
         }
@@ -360,6 +361,7 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
 // re-triggered trap) degrade to the cheap zone re-hit instead of replaying
 // the whole release + impact anatomy every second.
 const POINT_SEQ_REFRACTORY_SEC = 3;
+const POINT_SEQ_CELLS_PER_YARD = 4;
 
 // One cast-budget charge per (caster, ability) inside this window: a cast
 // event plus its own point-anchored landing (or a strike's contact hit) are
@@ -521,7 +523,7 @@ export class AbilityVfx {
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
-    const spec = abilityVfxSpec(ev.ability);
+    const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
     // Claimed and drawn as nothing: the generic arm would link cold too. Two
     // reads survive the refusal, for the same reason the point-anchored ring
@@ -530,7 +532,7 @@ export class AbilityVfx {
       this.refusedTelegraphs(ev, spec);
       return true;
     }
-    const full = abilityVfxFullSpec(ev.ability);
+    const full = abilityVfxFullSpecFor(ev.ability);
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
     // crescendoing cord and lands the full impact stack once, on the last tick.
@@ -905,7 +907,7 @@ export class AbilityVfx {
   handleSpellfxAt(ev: AbilityVfxSpellfxAtEvent): boolean {
     if (!ev.ability) return false;
     if (ev.fx !== 'nova' && ev.fx !== 'burst' && ev.fx !== 'tick') return false;
-    const spec = abilityVfxSpec(ev.ability);
+    const spec = abilityVfxSpecFor(ev.ability);
     if (!spec) return false;
     if (!this.admitted()) {
       // The terrain-draped area ring is an actionable telegraph (the blast
@@ -943,9 +945,11 @@ export class AbilityVfx {
       this.recordStat(ev.ability, true);
       return true;
     }
-    const full = abilityVfxFullSpec(ev.ability);
+    const full = abilityVfxFullSpecFor(ev.ability);
     // recurring emits of the same aimed nova replay only the cheap re-hit
-    const seqKey = `${casterId}:${ev.ability}`;
+    const pointCellX = Math.round(ev.x * POINT_SEQ_CELLS_PER_YARD);
+    const pointCellZ = Math.round(ev.z * POINT_SEQ_CELLS_PER_YARD);
+    const seqKey = `${casterId}:${ev.ability}:${pointCellX}:${pointCellZ}`;
     const lastSeq = this.pointSeqAt.get(seqKey);
     const repeat = lastSeq !== undefined && nowSec - lastSeq < POINT_SEQ_REFRACTORY_SEC;
     if (this.pointSeqAt.size > 64) {
@@ -1098,9 +1102,9 @@ export class AbilityVfx {
       return;
     }
     const abilityId = attackAbilityId(ev.ability);
-    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
+    const spec = abilityId ? abilityVfxSpecFor(abilityId) : undefined;
     if (!spec || !abilityId) return;
-    const full = abilityVfxFullSpec(abilityId);
+    const full = abilityVfxFullSpecFor(abilityId);
     const arch = full?.archetype ?? spec.a ?? 'strike';
     const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
@@ -1169,7 +1173,7 @@ export class AbilityVfx {
     if (!ev.gained) return;
     const abilityId = ev.ability ?? abilityIdGuess;
     if (!abilityId) return;
-    const spec = abilityVfxSpec(abilityId);
+    const spec = abilityVfxSpecFor(abilityId);
     if (!spec) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
@@ -1178,7 +1182,7 @@ export class AbilityVfx {
   // undefined to keep the generic school color. Cached parse, zero allocation:
   // safe to call every frame from the renderer's entity sync.
   sparkleColorFor(abilityId: string | null | undefined): number | undefined {
-    const spec = abilityId ? abilityVfxSpec(abilityId) : undefined;
+    const spec = abilityId ? abilityVfxSpecFor(abilityId) : undefined;
     return spec ? abilityVfxColor(spec) : undefined;
   }
 
@@ -1223,11 +1227,11 @@ export class AbilityVfx {
     let glowStrength = 0;
     let glowSlow = false;
     if (e.castingAbility) {
-      const spec = abilityVfxSpec(e.castingAbility);
+      const spec = abilityVfxSpecFor(e.castingAbility);
       if (spec) {
         const progress =
           e.castTotal > 0 ? Math.min(1, Math.max(0, 1 - e.castRemaining / e.castTotal)) : 0;
-        const full = abilityVfxFullSpec(e.castingAbility);
+        const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
         glowStrength = 1.2 * (full?.power ?? 1);
@@ -1285,11 +1289,11 @@ export class AbilityVfx {
         auraId = FEAR_BREAK_SPEC_ID;
         hostileWorn = true;
       }
-      const spec = abilityVfxSpec(auraId);
+      const spec = abilityVfxSpecFor(auraId);
       if (spec === undefined) continue;
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
-      const full = abilityVfxFullSpec(auraId);
+      const full = abilityVfxFullSpecFor(auraId);
       const wornDebuff = hostileWorn && full?.debuff !== undefined;
       // Long-worn buffs are SILENT while held (the long-buff policy,
       // ability_vfx_longbuff_core.ts): no orbit band, ground disc, shell, or
@@ -1435,8 +1439,8 @@ export class AbilityVfx {
     // shows the armed strike's color while queued and reverts on release. No
     // gain swirl: arming a level-1 filler is a tell, not a ceremony.
     if (e.queuedOnSwing && bands < 3) {
-      const qspec = abilityVfxSpec(e.queuedOnSwing);
-      const qfull = abilityVfxFullSpec(e.queuedOnSwing);
+      const qspec = abilityVfxSpecFor(e.queuedOnSwing);
+      const qfull = abilityVfxFullSpecFor(e.queuedOnSwing);
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
       if (qspec !== undefined && qstyle !== null) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
@@ -1449,7 +1453,9 @@ export class AbilityVfx {
         }
       }
     }
-    if (glowStrength > 0) fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+    if (glowStrength > 0 && ignivarAllowsBodyGlow(e.templateId, e.castingAbility)) {
+      fx.bodyGlow(e.id, glowColor, glowStrength, glowSlow);
+    }
     this.latchHeldState(held, e);
   }
 

@@ -49,6 +49,7 @@ import {
   setGameMetricsCounters,
   type WocEscrowQueueOutcome,
 } from '../../server/http/game_signals';
+import type { CustodyParcelRow } from '../../server/mail_custody_overlay';
 import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 import type { CharacterSaveArgs, WocMarketCustody } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
@@ -190,6 +191,9 @@ interface Rig {
   custody: WocMarketCustody;
   db: FakeWocMarketDb;
   service: WocMarketService;
+  /** Every durable custody parcel row the bridge wrote (the per-parcel
+   *  overlay seam that replaced the whole-book persistMailBlob). */
+  parcelRows: CustodyParcelRow[];
   /** Every character write across BOTH channels, in commit order, with
    *  whether that blob still holds the escrow item. */
   commits: Array<{ channel: string; holdsItem: boolean }>;
@@ -225,13 +229,13 @@ function makeRig(
   };
   const session = join(SELLER, SELLER_CHAR, 'Selara');
   server.sim.addItem(EPIC_ITEM, 1, session.pid, { silent: true });
+  const parcelRows: CustodyParcelRow[] = [];
   const custody = createWocMarketCustody(
     {
       get sim() {
         return server.sim;
       },
       wocCustodySession: (characterId) => server.wocCustodySession(characterId),
-      persistMailBlob: () => server.persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) => server.enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         server.serializeCharacterForPersist(characterId),
@@ -243,7 +247,12 @@ function makeRig(
       escrowSessionLost: (pid, characterId, kind) =>
         server.escrowSessionLost(pid, characterId, kind),
     },
-    opts,
+    {
+      ...opts,
+      persistParcelRow: async (row) => {
+        parcelRows.push(row);
+      },
+    },
   );
   const db = new FakeWocMarketDb({
     characters: [{ characterId: SELLER_CHAR, accountId: SELLER, name: 'Selara', realm: REALM }],
@@ -279,6 +288,7 @@ function makeRig(
     custody,
     db,
     service,
+    parcelRows,
     commits,
     itemIndex: () => inventory().findIndex((s) => s.itemId === EPIC_ITEM),
     bagsHold: (itemId) => inventory().some((s) => s.itemId === itemId),
@@ -522,7 +532,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // Positive control for that absence: the return-parcel arm is real and
     // fires when the extraction pid is genuinely gone from the sim.
     const idsBefore = new Set(rig.server.sim.postOffice.mail.map((m) => m.id));
-    const mailSpy = vi.spyOn(rig.server, 'persistMailBlob');
+    const rowsBefore = rig.parcelRows.length;
     rig.custody.restoreCopy(999_999, SELLER_CHAR, { itemId: EPIC_ITEM, count: 2 });
     expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore + 1);
     const booked = rig.server.sim.postOffice.mail.filter((m) => !idsBefore.has(m.id));
@@ -534,9 +544,16 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(booked[0]?.letterId).toBe('woc_market_return');
     expect(booked[0]?.letterId).toBe(WOC_MARKET_RETURN_LETTER.letterId);
     expect(booked[0]?.items).toEqual([{ itemId: EPIC_ITEM, count: 2 }]);
-    // The in-memory book alone is not the item: the blob write is what makes
-    // the parcel survive a restart.
-    expect(mailSpy).toHaveBeenCalledTimes(1);
+    // The in-memory book alone is not the item: the durable parcel row is
+    // what makes the parcel survive a restart (the boot merge replays it
+    // through the book-once dedupe). The row carries the SAME ref the letter
+    // was booked with, so the replay can never double-book.
+    expect(rig.parcelRows.length).toBe(rowsBefore + 1);
+    const row = rig.parcelRows.at(-1);
+    expect(row?.letter).toBe('return');
+    expect(row?.recipient.key).toBe(String(SELLER_CHAR));
+    expect(row?.items).toEqual([{ itemId: EPIC_ITEM, count: 2 }]);
+    expect(row?.custodyRef).toBe(booked[0]?.custodyRef);
   });
 
   it('a refusal mid-leave restores the LIVE bags, never a second rail', async () => {

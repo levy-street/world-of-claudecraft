@@ -732,4 +732,33 @@ export const table: DeedLocaleTable = {
     name: '整裝待發',
     desc: '從試煉之濱畢業：完成島上的每一堂課，然後敲響渡船鈴回到東溪鎮。',
   },
+  soc_strongbox_outfitter: {
+    name: '保險箱裝備師',
+    desc: '解鎖你的第一個銀行背包欄位。',
+  },
+  soc_four_bags_deep: {
+    name: '四袋俱全',
+    desc: '解鎖銀行的全部四個背包欄位。',
+  },
+  dgn_ignivar: {
+    name: '使者殞落',
+    desc: '在最後泉源熔爐擊敗「伊格尼瓦，末焰使者」。',
+  },
+  dgn_ignivar_heroic: {
+    name: '英雄：使者殞落',
+    desc: '以英雄難度擊敗「伊格尼瓦，末焰使者」。',
+  },
+  dgn_varkhul: {
+    name: '熔爐漸冷',
+    desc: '在內環熔爐擊敗「末焰鍛父瓦爾庫爾」。',
+  },
+  dgn_varkhul_heroic: {
+    name: '英雄：熔爐漸冷',
+    desc: '以英雄難度擊敗「末焰鍛父瓦爾庫爾」。',
+  },
+  dgn_varkhul_flawless: {
+    name: '餘燼不滅',
+    desc: '以英雄難度擊敗「末焰鍛父瓦爾庫爾」，且沒有任何團隊成員死亡。',
+    title: '未焚者',
+  },
 };

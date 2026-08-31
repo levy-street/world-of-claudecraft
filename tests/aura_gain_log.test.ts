@@ -37,6 +37,15 @@ describe('auraGainLogKeyFor', () => {
     expect(auraGainLogKeyFor(drain)).toBe('hud.combat.auraAfflicted');
   });
 
+  it('uses neutral gain wording for display-only Stormsurge Ready', () => {
+    // Stormsurge Ready is visually routed to the debuff surface, but combat-log
+    // polarity stays tied to harmful aura classification.
+    const stormsurge = aura({ id: 'shaman_stormsurge_ready', kind: 'internal_cd', value: 1 });
+    expect(auraGainLogKeyFor(stormsurge)).toBe('hud.combat.auraGainOther');
+    const heatingUp = aura({ id: 'heating_up', kind: 'internal_cd', value: 1 });
+    expect(auraGainLogKeyFor(heatingUp)).toBe('hud.combat.auraGainOther');
+  });
+
   it('falls back to the SimEvent auraKind when no live aura is found', () => {
     expect(auraGainLogKeyFor(undefined, 'stun')).toBe('hud.combat.auraAfflicted');
     expect(auraGainLogKeyFor(undefined, 'hot')).toBe('hud.combat.auraGainOther');

@@ -42,6 +42,23 @@ export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/
 const POINT_AMBIENCE_GAIN = 0.18;
 const COOLDOWN_ENTRY_TTL = 60;
 const COOLDOWN_PRUNE_INTERVAL = 30;
+// The target loop() multiplies by the clip's own manifest gain (1 for this
+// key, i.e. 0dB) to get the loop's actual gain. This is a tuning CHOICE, not a
+// ceiling-derived maximum: SFX_GAIN_LIMITS['mount_loop_rickshaw_mount'] is
+// 1.778279 (sfx_manifest.generated.ts, from this key's 5dB ceilingDb), and
+// nothing clamps the target a caller passes to loop() against that limit (it
+// only gates the runtime pack's own clip-gain override, sfx_runtime_pack.ts).
+// The conform pass put the file at -6dBFS, so 0dB of gain leaves 6dB of
+// headroom before clipping, well inside SFX_GAIN_LIMITS's own 5dB further on
+// top of that. If this ends up too loud against footsteps and ambience, this
+// comes DOWN; there is real ceiling left above it if it ever needs to come up.
+const MOUNT_LOOP_GAIN = 1;
+// Governs ONLY the dismount/view-removal fade (stopMountLoop -> unloop()).
+// The moving-to-stopped transition (the far more common case, letting go of
+// the movement key mid-ride) never touches this constant: loop() ramps that
+// gain with its own fixed setTargetAtTime(..., 0.25), so "letting go of the
+// key reads as the cart stopping" is governed by that 0.25, not by this value.
+const MOUNT_LOOP_FADE = 0.18;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
 // full sanctioned +5dB, the maximum true-peak headroom under the shared
@@ -89,6 +106,10 @@ const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   snow: 'foot_snow',
   water: 'foot_water',
 };
+
+function summonClipKey(mountKey: string): string {
+  return `mount_summon_${mountKey}`;
+}
 
 function assetCacheKey(key: string, variantIndex: number): string {
   return variantIndex === 0 ? key : `${key}:${variantIndex}`;
@@ -893,9 +914,42 @@ class Sfx {
   }
   private footTick = 0;
 
+  /** The one-shot that fires when a mount actually APPEARS: the completion
+   *  edge of the summon channel, never on dismount, and never for a rider who
+   *  was already mounted when they came into view.
+   *
+   *  Gain 1, not the ~0.85 the per-stride gait cues use: this is a
+   *  once-per-summon hero cue, and the level it actually plays at comes from
+   *  the key's authored trim in sfx_gain_map.json (bounded by its measured
+   *  peak headroom), which is the right place to shape it.
+   *
+   *  YOUR OWN summon is personal feedback and plays flat, like the UI cues it
+   *  sits next to in the mix. The positional path would dock it twice over for
+   *  something happening directly under you: the audio listener is the CAMERA,
+   *  which trails the player, so a source at the player is already past
+   *  refDistance and attenuating before the panner also spreads it off centre.
+   *  Somebody ELSE's mount is a world event and stays spatial, so it arrives
+   *  from where they are and falls off with distance.
+   *
+   *  A mount with no authored take is silent, so this is safe for every mount. */
+  mountSummon(x: number, y: number, z: number, mountKey: string, self: boolean): void {
+    const key = summonClipKey(mountKey);
+    if (!(key in SFX_CLIPS)) return;
+    if (self) this.playUi(key, { gain: 1, rate: 1, release: 0.6 });
+    else this.playAt(key, x, y, z, { gain: 1, rate: 1, release: 0.6 });
+  }
+
   /** One custom stride for a running mount. This is part of the world SFX mix,
    *  independent of the optional on-foot footstep toggle. */
   mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+    // A mount with a continuous loop does not also get per-stride one-shots.
+    // The rickshaw shipped both for a while and they stacked: a 0.6s stride cue
+    // retriggering every 5.8 units of travel is one hit every ~0.46s at mounted
+    // run speed, which layered over the rolling bed and read as the loop itself
+    // stuttering. Gated on the loop clip EXISTING rather than on a mount-key
+    // allowlist, so any mount that later gains a loop drops its strides for
+    // free, and every mount without one is untouched.
+    if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
     const key = `mount_run_${mountKey}`;
     if (!(key in SFX_CLIPS)) return;
     this.playAt(key, x, y, z, {
@@ -998,6 +1052,45 @@ class Sfx {
     this.preload(keys.startKey);
     this.preload(keys.loopKey);
     this.preload(keys.stopKey);
+  }
+
+  /** Continuous rolling loop for a mount that ships one. Every other mount has
+   *  only a stride one-shot and no `mount_loop_*` clip, so this is a no-op for
+   *  them and needs no per-mount allowlist.
+   *
+   *  Runs through the same loop()/unloop() path as the campfire and forge point
+   *  ambiences rather than mountRun()'s distance-accumulator strides, because a
+   *  cart wheel makes a CONTINUOUS sound: faking that with repeated one-shots
+   *  beats against its own tail at every speed except the one the stride
+   *  interval was tuned for. The id is per ENTITY, not per mount key, so two
+   *  players on carts get two independently positioned voices rather than
+   *  fighting over one slot. */
+  mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void {
+    const key = `mount_loop_${mountKey}`;
+    if (!(key in SFX_CLIPS)) {
+      // The renderer calls this every frame for every mounted entity in view,
+      // and most mounts have no mount_loop_* clip at all: skip the three
+      // unloop() Map ops (the key template string above is unavoidable, it is
+      // what the `in` check just used) unless a slot could actually be held
+      // (e.g. a mid-ride mount swap from a rolling mount to a walking one).
+      if (this.loops.has(`mountloop_${id}`) || this.pendingLoops.has(`mountloop_${id}`)) {
+        this.stopMountLoop(id);
+      }
+      return;
+    }
+    // GAIN-only, never stop/start on movement. Stopping the loop when `moving`
+    // goes false and restarting it when it comes back means any single-frame
+    // flicker in that flag re-creates the BufferSource, which restarts a 7.8s
+    // recording from zero -- audibly a fast stutter rather than a loop. Holding
+    // one source for as long as the rider is mounted and ramping its gain makes
+    // that failure impossible instead of merely unlikely, and it is the only
+    // way the recording is guaranteed to play through and loop at its own seam.
+    // Cost is one voice per mounted rider, alive only while actually mounted.
+    this.loop(`mountloop_${id}`, key, moving ? MOUNT_LOOP_GAIN : 0, x, y, z);
+  }
+
+  stopMountLoop(id: number): void {
+    this.unloop(`mountloop_${id}`, MOUNT_LOOP_FADE);
   }
 
   /** Jump / land / water-entry / swim-stroke. */

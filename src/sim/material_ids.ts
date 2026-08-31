@@ -1,8 +1,10 @@
 // The canonical honest-material registry shared by the sim and presentation.
-// Gathering and salvage tables live in type-light pure leaves, so this module
-// can derive eagerly without pulling their command modules back through bags.
-// The returned view has no runtime mutation surface; its Set is closure-private.
+// Gathering, salvage, and recipe-pending tables live in type-light leaves, so
+// this module can derive eagerly without pulling command modules back through
+// bags. The returned view has no runtime mutation surface; its Set is
+// closure-private.
 
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from './content/crucible_professions';
 import { ENCHANTS } from './content/enchants';
 import { HARVEST_COMPONENT_ITEMS, HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ALL_RECIPES, ITEMS } from './data';
@@ -19,6 +21,7 @@ export const MATERIAL_ITEM_IDS: ReadonlySet<string> = deriveMaterialItemIds({
   salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
   recipes: ALL_RECIPES,
   enchants: ENCHANTS,
+  recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
   items: ITEMS,
 });
 

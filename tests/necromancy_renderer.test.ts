@@ -1,5 +1,9 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import {
+  type NecromancyArmyPortalFx,
+  spawnArmyPortalBurstEvent,
+} from '../src/render/necromancy_army_portal_fx';
 import { Renderer } from '../src/render/renderer';
 import type { SimEvent } from '../src/sim/types';
 
@@ -179,6 +183,7 @@ describe('Necromancy renderer routing', () => {
       z: 12,
       facing: Math.PI / 4,
       duration: 2.8,
+      palette: 'necromancy',
     });
     expect(harness.abilityVfx.handleSpellfxAt).toHaveBeenCalledWith(event);
   });
@@ -211,6 +216,24 @@ describe('Necromancy renderer routing', () => {
     wrongFx.renderer.handleEvent(armyProjectile);
     expect(wrongFx.armyPortal).not.toHaveBeenCalled();
     expect(wrongFx.abilityVfx.handleSpellfxAt).toHaveBeenCalledWith(armyProjectile);
+  });
+
+  it('opens the Forge Legion Portal toward its summoner with the forge palette', () => {
+    const spawn = vi.fn();
+    spawnArmyPortalBurstEvent(
+      { spawn } as unknown as NecromancyArmyPortalFx,
+      { ability: 'Forge Legion Portal', fx: 'burst', x: 10, z: 20, sourceId: 5 },
+      (id) => (id === 5 ? { pos: { x: 13, z: 24 }, facing: 1.1 } : undefined),
+    );
+    // The portal opens FACING the summoner (atan2 of the offset), never the
+    // summoner's own facing, and swaps to the forge palette.
+    expect(spawn).toHaveBeenCalledWith({
+      x: 10,
+      z: 20,
+      facing: Math.atan2(3, 4),
+      duration: 2.8,
+      palette: 'forge',
+    });
   });
 
   it('routes Lich transformation feedback and suppresses the burst for reduced motion', () => {

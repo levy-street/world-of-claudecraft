@@ -1853,6 +1853,12 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
+    // The always-visible XP percent badge, captioned just under the ring
+    // (never over the portrait face): reads the SAME data-percent attribute
+    // xp_bar_painter.ts writes onto #player-frame alongside --xp-fill.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #player-frame::after {\n    content: attr(data-percent);',
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: max(8px, env(safe-area-inset-top));',
     );
@@ -2890,7 +2896,7 @@ describe('client HTML shell', () => {
     // The pet frame joins the same nudge: it shares the bottom-centre column with
     // the player frame and the two bars, so it has to travel with them.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar,\n  body.mobile-touch.hud-mobile-compact #pet-frame {\n    left: calc(50% - 15px);\n  }',
+      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar,\n  body.mobile-touch.hud-mobile-compact #swingbar-offhand,\n  body.mobile-touch.hud-mobile-compact #pet-frame {\n    left: calc(50% - 15px);\n  }',
     );
     // Left-handed mode mirrors the floating capture zone; the autorun target is
     // a child of the move joystick, so it follows that mirror without its own

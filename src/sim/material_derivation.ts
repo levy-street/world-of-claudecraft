@@ -28,6 +28,7 @@ export interface MaterialSourceTables {
   salvageMaterialByQuality: typeof SALVAGE_MATERIAL_BY_QUALITY;
   recipes: typeof ALL_RECIPES;
   enchants: typeof ENCHANTS;
+  recipePendingMaterialItemIds: readonly string[];
   items: typeof ITEMS;
 }
 
@@ -91,5 +92,9 @@ export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet
   for (const enchant of Object.values(tables.enchants)) {
     for (const reagent of enchant.reagents) sources.add(reagent.itemId);
   }
+  // Materials may arrive ahead of their consuming recipes. This explicit
+  // source is temporary by contract and disappears once reagent derivation
+  // can classify each id.
+  for (const id of tables.recipePendingMaterialItemIds) sources.add(id);
   return readonlySetView([...sources].filter((id) => tables.items[id]?.kind === 'junk'));
 }

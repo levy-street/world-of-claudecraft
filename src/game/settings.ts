@@ -323,6 +323,15 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // off by default: bypass the low graphics preset's buff-icon cap
+  // (AURA_VISIBLE_CAP_LOW, src/game/ui_tier_knobs.ts) so every active buff
+  // always renders in #buff-bar, at the cap's per-frame cost. The cap itself
+  // stays the sane default for the weak-device population Low targets; this is
+  // an explicit opt-in for a player who would rather pay that cost than ever
+  // lose a buff icon to it (player feedback on PR #3668). Read by
+  // AurasPainter's getFxTier closure (hud.ts), never by ui_tier_knobs.ts
+  // itself, so no OTHER low-tier knob is affected.
+  alwaysShowAllBuffs: { def: false },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read
@@ -475,6 +484,12 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // off by default: the target and target-of-target's own melee/ranged swing
+  // timer bars, under the target frame. Purely a display preference read by
+  // the HUD's per-frame update; the swingTimer/autoAttack data already rides
+  // the wire (server/game.ts dynamicFields), and both bars hide themselves
+  // when the target (or its own target) is unknown or not auto-attacking.
+  showTargetSwingTimer: { def: false },
   // on by default: the pet health strip under the player frame (hunter / warlock /
   // mage). It paints only while the player actually HAS a pet, so the six petless
   // classes never see it and the default costs them nothing. Purely a display
@@ -484,6 +499,13 @@ export const BOOL_SETTINGS = {
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // on by default (the safety net from the enchanted-offhand-vanishes report,
+  // #3547): a vendor sale of anything beyond true junk (see vendorSellIsInstant
+  // in bags_view.ts) opens a confirm prompt first, since an unhinted bag stack
+  // can shift position between clicks. Off restores the classic one-click
+  // instant sale for every item, for a player who would rather trade that
+  // safety net for speed.
+  confirmVendorSell: { def: true },
   // on by default (today's behavior, unchanged out of the box): mirrors the desktop
   // shell's GPU preference store, whose stored field is the INVERSE opt-out. The
   // shell asks the OS for the dedicated gaming GPU at launch; a MUXless laptop panel

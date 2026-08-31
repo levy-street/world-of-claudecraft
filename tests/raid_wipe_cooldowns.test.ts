@@ -7,11 +7,12 @@ import { ABILITIES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
 
 describe('raid wipe cooldown recovery', () => {
-  it('resets Army of the Dead at 120 sec and only other cooldowns above 120 sec', () => {
+  it('resets every cooldown of two minutes or longer', () => {
     expect(ABILITIES.army_of_the_dead.cooldown).toBe(120);
     expect(shouldResetRaidWipeCooldown('army_of_the_dead', 120)).toBe(true);
-    expect(shouldResetRaidWipeCooldown('another_two_minute_ability', 120)).toBe(false);
+    expect(shouldResetRaidWipeCooldown('another_two_minute_ability', 120)).toBe(true);
     expect(shouldResetRaidWipeCooldown('long_raid_cooldown', 120.01)).toBe(true);
+    expect(shouldResetRaidWipeCooldown('just_below_two_minutes', 119.99)).toBe(false);
     expect(shouldResetRaidWipeCooldown('short_cooldown', 45)).toBe(false);
   });
 

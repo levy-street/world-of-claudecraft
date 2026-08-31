@@ -1,5 +1,7 @@
+import { STORMKINDLED_2PC_UNLEASH_THUNDER } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { LIFESPRING_WEAPON_ID, mendingCurrent, unleashMendingCurrent } from './shaman_spiritmend';
 import { addThunderCharges } from './shaman_thundercall';
 import {
@@ -93,7 +95,15 @@ function applyPyrebrandUnleash(ctx: SimContext, player: Entity, target: Entity):
     false,
     'unleash_weapon',
   );
-  addThunderCharges(ctx, player, PYREBRAND_UNLEASH_THUNDER);
+  // Stormkindled 2pc (the Crucible set doc): the Pyrebrand Unleash grants 3
+  // Thunder instead of 2, a constant bend at this ONE grant site. With 3 or
+  // more already banked part of the grant overcaps at the 5-charge cap
+  // (disclosed). Deterministic: the damage and crit rolls above are shared,
+  // only the rng-free grant amount moves.
+  const thunder = wearsSetBonus(ctx, player, 'stormkindled', 2)
+    ? STORMKINDLED_2PC_UNLEASH_THUNDER
+    : PYREBRAND_UNLEASH_THUNDER;
+  addThunderCharges(ctx, player, thunder);
 }
 
 function applyGaleheartUnleash(ctx: SimContext, player: Entity, target: Entity): void {

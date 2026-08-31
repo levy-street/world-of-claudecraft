@@ -1,14 +1,8 @@
 import { bgFieldHeightLocal } from './battleground_field';
-import { beaconSpiralLift } from './beacon_spiral';
 import { BORDER_EDGES } from './border_edges';
-import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
-import {
-  castleLift,
-  castlePadTarget,
-  castlePadWeight,
-  castleSkirtWeight,
-  LAST_SPRING,
-} from './castle_layout';
+import { bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
+import { castlePadTarget, castlePadWeight, castleSkirtWeight, LAST_SPRING } from './castle_layout';
+import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
@@ -36,7 +30,7 @@ import {
   ZONES,
   zoneAt,
 } from './data';
-import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
+import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
@@ -44,6 +38,7 @@ import { eastbrookDeckSurface } from './eastbrook_harbor';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
+  EMBER_LAVA_POOLS,
   emberLinkDistanceNorm,
   emberNearestOnLink,
 } from './ember_lava_layout';
@@ -67,6 +62,7 @@ import {
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
+import { overworldWalkSurface } from './walk_lifts';
 import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -457,51 +453,12 @@ export function hollowLandness(x: number, z: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Drakelands' landmass: a gatewood shore fused to the causeway landing,
-// widening into the desert body, then a broad volcanic belt spanning the far
-// north (the Drakemaw range doubles as the sealed wall's footing where it
-// meets land; over the flanks the range simply runs into the sea).
+// The Drakelands' landmass tables live in content/ember_coast.ts (the
+// vale_coast.ts pattern): edit lobes and bays there, the field math stays
+// here.
 // ---------------------------------------------------------------------------
 const DRAKE_ZMIN = 1820; // keep in sync with DRAKELANDS_ZONE.zMin (east column)
 const DRAKE_ZMAX = 2420; // ...and zMax
-const EMBER_LAND_LOBES = [
-  { x: 404, z: 1825, r: 40 }, // the causeway landing, fused across the border
-  { x: 404, z: 1858, r: 52 }, // the Wyrmgate shore and Wyrmwatch
-  { x: 360, z: 1900, r: 70 }, // the Gatewood
-  { x: 450, z: 1920, r: 55 }, // eastern gatewood shore
-  { x: 455, z: 1995, r: 55 }, // the Last Spring headland
-  { x: 290, z: 1940, r: 60 }, // western gatewood shore
-  { x: 380, z: 2030, r: 90 }, // the drying midlands
-  { x: 280, z: 2080, r: 65 }, // Mirage Hollow's dune shelf
-  { x: 262, z: 2020, r: 46 }, // ...its southern shoulder under the dune road
-  { x: 274, z: 2170, r: 48 }, // ...and the shelf road's western shoulder
-  { x: 470, z: 2070, r: 70 }, // eastern dunes
-  { x: 465, z: 2150, r: 60 }, // Trollmoot's rise
-  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the Trollmoot fork
-  { x: 340, z: 2160, r: 85 }, // the Cinder Dunes' heart
-  { x: 420, z: 2260, r: 80 }, // approach to the Drakemaw
-  { x: 360, z: 2238, r: 45 }, // the saddle carrying the Snowline road
-  { x: 290, z: 2250, r: 75 }, // the Bloodglass shelf
-  { x: 360, z: 2355, r: 95 }, // the Drakemaw belt
-  { x: 490, z: 2330, r: 60 }, // eastern volcanic spur
-  { x: 220, z: 2340, r: 55 }, // western volcanic spur
-  { x: 450, z: 2400, r: 70 }, // the rim belt, wide under the sealed range
-  { x: 270, z: 2400, r: 70 },
-  { x: 360, z: 2410, r: 80 },
-  { x: 242, z: 2080, r: 42 }, // the Snowline crossing's waste-side shoulder
-  { x: 208, z: 2080, r: 40 }, // ...carried to the column border
-  { x: 216, z: 1930, r: 44 }, // the Snowline's waste-side shoulder
-  { x: 236, z: 1972, r: 46 }, // ...rising onto the dune shelf road
-  { x: 376, z: 1952, r: 42 }, // the town road's western shoulder
-  { x: 242, z: 1858, r: 46 }, // the cap's shore joining the Gatewood...
-  { x: 264, z: 1908, r: 44 }, // ...so no channel runs behind it to the sound
-  { x: 492, z: 2390, r: 48 }, // the Goldmelt Water's east cap, waste side
-] as const;
-const EMBER_BAYS = [
-  { x: 195, z: 1980, r: 50 }, // the west bight
-  { x: 535, z: 2180, r: 55 }, // the east reach
-  { x: 205, z: 2230, r: 40 }, // a western cove under the spur
-] as const;
 
 const EMBER_LAND_FIELD = boundedBlobs(EMBER_LAND_LOBES);
 const EMBER_BAY_FIELD = boundedBlobs(EMBER_BAYS);
@@ -2303,29 +2260,6 @@ export const EMBER_VOLCANOES = [
 // the Snowline crossing's drake-side footing (appended to the ember lobes
 // below via EMBER_GATE_LOBES; the fire road to the ice)
 
-// Open lava pools out in the wastes (shaped as shallow flat-floored basins;
-// the render lava surface sits just above each floor).
-// padK: where the flat melt floor ends, as a fraction of r. The default 0.95
-// keeps the whole model footprint on level ground; the Drakemaw vent keeps
-// the original tight eye (0.55) because its shore is the escape bench's
-// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
-export const EMBER_LAVA_POOLS = [
-  { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
-  { x: 446, z: 2220, r: 11, floor: -0.5 },
-  { x: 302, z: 2328, r: 11, floor: 0 },
-  // crater pools high in the two smaller cones (padK 0.55: the pit walls
-  // cradle the model's rocky ring, and the escape walkers need the legacy
-  // gentle floor-to-wall transition)
-  { x: 270, z: 2282, r: 7, floor: 11.5, padK: 0.55 },
-  { x: 487, z: 2356, r: 6, floor: 9.5, padK: 0.55 },
-  // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
-  // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
-  // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
-  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
-  { x: 423, z: 2347, r: 16, floor: -1.2 },
-  { x: 438, z: 2326, r: 10, floor: -1.2 },
-] as const;
-
 function emberShapingOffset(x: number, z: number, seed: number): number {
   if (z < DRAKE_ZMIN - 10 || z > DRAKE_ZMAX + 40) return 0;
   if (x < STRIP_MAX_X - 30) return 0; // the waste lives in the east column
@@ -4005,18 +3939,10 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  // The Old Beacon's stair rides the same idiom: beaconSpiralLift raises the
-  // walkable plank helix and gallery ring around the lighthouse (and its
-  // sheer core plug is what blocks walking through the tower). The Last
-  // Keep's curtain walls, bastions, and stair flights ride it too
-  // (castleLift): the wall mass is a sheer riser the climb gate refuses,
-  // and its flat top is the wall-walk.
-  const terrain =
-    terrainHeight(x, z, seed) +
-    beaconSpiralLift(x, z) +
-    castleLift(x, z) +
-    dawnholdLift(x, z) +
-    bulwarkLift(x, z);
+  // The Old Beacon's stair, the Last Keep's walls and flights, and the
+  // Forgefather stair ramps all ride the same idiom, summed by the
+  // walk_lifts leaf: raised walkable ground the render terrain never sees.
+  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed));
   return Math.max(
     terrain,
     dockSurfaceHeight(
@@ -5142,8 +5068,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     // beds, and the shaped basins stay clear (a rock there is also a stray
     // collider standing in the melt)
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
-    // the Last Keep's graded grounds carry no wild scatter
+    // the Last Keep's graded grounds carry no wild scatter, and neither
+    // do the Forgefather fortress's courts and stair flights
     if (castlePadWeight(gx, gz) > 0) return null;
+    if (forgefatherScatterExcluded(gx, gz)) return null;
     // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
     // is also a stray collider standing in the muster lane)
     if (bulwarkPadWeight(gx, gz) > 0) return null;

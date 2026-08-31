@@ -9,6 +9,13 @@ const RIM_PATCH_MARKER = 'WOC_PBR_RIM_REUSE';
 const COMMON_ANCHOR = '#include <common>';
 const LIGHTS_BEGIN_ANCHOR = '#include <lights_fragment_begin>';
 
+/** The character rim's neutral cool tint (the uRimColor uniform's boot value,
+ *  the vec3(0.5, 0.6, 0.8) the term used to hard-code). Interior light rigs
+ *  re-grade the shared uniform (the Ignivar forge rooms run a warm ember rim
+ *  so silhouettes read as firelit instead of frosted) and every other state
+ *  resets it here, so this constant and the uniform can never drift. */
+export const RIM_GLOW_DEFAULT_COLOR = 0x8099cc;
+
 /**
  * Move the character rim term after the stock light setup so it can reuse
  * geometryViewDir. Every character render path uses a PerspectiveCamera, where
@@ -25,12 +32,13 @@ export function patchPbrRimGlowFragmentShader(source: string): string {
       COMMON_ANCHOR,
       `${COMMON_ANCHOR}
       // ${RIM_PATCH_MARKER}
-      uniform float uRimBoost;`,
+      uniform float uRimBoost;
+      uniform vec3 uRimColor;`,
     )
     .replace(
       LIGHTS_BEGIN_ANCHOR,
       `${LIGHTS_BEGIN_ANCHOR}
-      totalEmissiveRadiance += vec3(0.5, 0.6, 0.8) * 0.12 * uRimBoost *
+      totalEmissiveRadiance += uRimColor * 0.12 * uRimBoost *
         pow(1.0 - saturate(dot(normal, geometryViewDir)), 3.0);`,
     );
 }

@@ -991,12 +991,14 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
-    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
-    // single 3-piece tier (name+bonus3 only).
-    // 7 epic families x (name + bonus2/3/4), 3 haste kits x (name + bonus3), and the
-    // 5 WARFARE families x (name + bonus2/4/7).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4);
+    // 7 raid/dungeon families with name+bonus2+bonus4+bonus6 (the lineage
+    // ladder: every family shares its archetype's 2/4/6 tiers), plus 3
+    // leveling haste kits carrying a single 3-piece tier (name+bonus3 only),
+    // the 5 WARFARE families x (name + bonus2/4/7), and the Crucible tier
+    // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
+    // rollout, so all 29 sets are registered (the ledger in
+    // tests/ignivar_loot.test.ts).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 29 * 3);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {

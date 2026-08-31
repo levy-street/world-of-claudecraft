@@ -44,6 +44,7 @@ import type {
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
+import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import type { MapMarkerProfile } from './map_marker_profile_core';
@@ -90,7 +91,7 @@ const CAMPFIRE_RADIUS_PPU = 0.5;
  *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
  *  markers self-suppress; the minimap owns the in-band field raster), or the
  *  overworld map (this core). */
-export type MapWindowMode = 'rift' | 'delve' | 'battleground' | 'overworld';
+export type MapWindowMode = 'rift' | 'delve' | 'battleground' | 'dungeon' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the current-zone square (its full spans). The
@@ -786,6 +787,7 @@ export interface OverworldMapInput {
 export function mapWindowMode(world: IWorld): MapWindowMode {
   if (world.riftFloor) return 'rift';
   if (isBgPos(world.player.pos.x)) return 'battleground';
+  if (dungeonMapActive(world)) return 'dungeon';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 

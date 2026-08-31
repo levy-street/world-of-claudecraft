@@ -75,4 +75,12 @@ export interface IWorldInventory {
   upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void;
   enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void;
   socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void;
+  /** Milliseconds left before the bind-on-pickup party trade deadline
+   *  `untilMs` (an ItemInstancePayload.partyTrade.untilMs value), clamped to
+   *  zero. Host-aware on purpose: `untilMs` is stamped from the sim's
+   *  lockout clock (real epoch ms on the live server, tick-derived ms
+   *  offline), so only the world knows which "now" it compares against; a
+   *  raw Date.now() subtraction would be wrong offline. Fresh per call, like
+   *  raidLockouts(), so the tooltip countdown ticks without a snapshot. */
+  partyTradeMsRemaining(untilMs: number): number;
 }

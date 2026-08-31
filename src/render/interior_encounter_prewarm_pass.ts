@@ -9,6 +9,9 @@ import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
+import { buildIgnivarEncounterPrewarmVisual } from './ignivar_encounter';
+import { buildIgnivarForgeJudgmentPrewarmVisual } from './ignivar_forge_judgment';
+import { buildIgnivarRotatingRaysPrewarmVisual } from './ignivar_rotating_rays';
 import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
@@ -21,12 +24,23 @@ import {
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
 import { collectObjectTextures } from './material_texture_slots';
+import {
+  buildVarkhulForgePortalPrewarmVisual,
+  type VarkhulForgePortalPrewarmVisual,
+} from './necromancy_army_portal_fx';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
+import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
+import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
+import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
+import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
+import { buildVarkhulWorldfirePrewarmVisual } from './varkhul_worldfire_visual';
 import { WEAPON_VFX } from './weapon_vfx';
 
 const startedByHost = new WeakMap<object, Set<string>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
+const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
+const varkhulPortalKeepAliveByHost = new WeakMap<object, VarkhulForgePortalPrewarmVisual[]>();
 const liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
 // One live body warms at a time, per host. Each pass waits for its own idle
 // slot, but a raid arrives together: six independent waits resolve in the SAME
@@ -142,15 +156,17 @@ async function runInteriorEncounterPrewarm(
   // prewarm_policy.ts). The catalog is 30-odd rigs held for the session; the
   // live arm below is bounded by the bodies actually in the room, so THAT is
   // the half a constrained device keeps.
-  if (GFX.constrainedMemory) return;
+  if (GFX.constrainedMemory && !spec.varkhulVisuals && !spec.ignivarVisuals) return;
   const plan = planInteriorEncounterPrewarm(spec, {
-    playerClasses: ALL_CLASSES,
-    weaponSkinIds: vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
+    playerClasses: GFX.constrainedMemory ? [] : ALL_CLASSES,
+    weaponSkinIds: GFX.constrainedMemory ? [] : vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
   });
   const group = new THREE.Group();
   group.name = 'interior-encounter-prewarm';
   placeHiddenPrewarmGroup(host, group);
   const keepAlive: CharacterVisual[] = [];
+  const varkhulKeepAlive: THREE.Group[] = [];
+  const varkhulPortalKeepAlive: VarkhulForgePortalPrewarmVisual[] = [];
   let idx = 0;
   const place = (visual: CharacterVisual): void => {
     visual.root.visible = true;
@@ -194,6 +210,68 @@ async function runInteriorEncounterPrewarm(
   const units: Array<() => void> = [
     ...plan.playerClasses.map((cls) => () => buildPlayerClass(cls)),
     ...plan.weaponSkinIds.map((skinId) => () => buildWeaponSkin(skinId)),
+    ...(spec.varkhulVisuals
+      ? [
+          () => {
+            const encounter = buildVarkhulEncounterPrewarmVisual();
+            const forgeBeams = buildVarkhulForgeBeamPrewarmVisual();
+            const interceptBeam = buildVarkhulInterceptBeamPrewarmVisual();
+            const forgePortals = buildVarkhulForgePortalPrewarmVisual();
+            const worldfire = buildVarkhulWorldfirePrewarmVisual();
+            encounter.position.set(-12, 0, 0);
+            forgeBeams.position.set(12, 0, 0);
+            interceptBeam.position.set(0, 0, 12);
+            forgePortals.root.position.set(0, 0, 12);
+            worldfire.position.set(0, 0, -12);
+            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root, worldfire);
+            varkhulKeepAlive.push(
+              encounter,
+              forgeBeams,
+              interceptBeam,
+              forgePortals.root,
+              worldfire,
+            );
+            varkhulPortalKeepAlive.push(forgePortals);
+          },
+          // Its own idle unit: the Assembly stages ten full rune stations, so
+          // sharing the unit above would concatenate both builds into one task.
+          () => {
+            const assembly = buildVarkhulAssemblyPrewarmVisual();
+            assembly.position.set(-36, 0, 0);
+            group.add(assembly);
+            varkhulKeepAlive.push(assembly);
+          },
+        ]
+      : []),
+    // Ignivar's own mechanic visuals share the interior with Varkhul's but are
+    // otherwise built lazily during per-frame encounter sync, after the view
+    // compile-gate enumeration: first onset would link their programs (the
+    // Judgment charred-ground and fire-beam shaders included) in a live frame.
+    ...(spec.ignivarVisuals
+      ? [
+          () => {
+            const encounter = buildIgnivarEncounterPrewarmVisual();
+            encounter.position.set(24, 0, 0);
+            group.add(encounter);
+            varkhulKeepAlive.push(encounter);
+          },
+          // Its own idle unit: four full fire-beam lanes plus flame blades.
+          () => {
+            const rays = buildIgnivarRotatingRaysPrewarmVisual();
+            rays.position.set(36, 0, 0);
+            group.add(rays);
+            varkhulKeepAlive.push(rays);
+          },
+          // Its own idle unit: the heaviest per-entity build in the encounter
+          // (three shelters, three warnings, three cue beams, the arena fire).
+          () => {
+            const judgment = buildIgnivarForgeJudgmentPrewarmVisual();
+            judgment.position.set(0, 0, 36);
+            group.add(judgment);
+            varkhulKeepAlive.push(judgment);
+          },
+        ]
+      : []),
   ];
   await runIdleQueue(units, (unit) => unit(), {
     batchSize: 1,
@@ -213,6 +291,16 @@ async function runInteriorEncounterPrewarm(
       visual.root.removeFromParent();
       visual.root.visible = false;
     }
+    const heldVarkhul = varkhulKeepAliveByHost.get(host) ?? [];
+    heldVarkhul.push(...varkhulKeepAlive);
+    varkhulKeepAliveByHost.set(host, heldVarkhul);
+    for (const visual of varkhulKeepAlive) {
+      visual.removeFromParent();
+      visual.visible = false;
+    }
+    const heldPortals = varkhulPortalKeepAliveByHost.get(host) ?? [];
+    heldPortals.push(...varkhulPortalKeepAlive);
+    varkhulPortalKeepAliveByHost.set(host, heldPortals);
   }
 }
 

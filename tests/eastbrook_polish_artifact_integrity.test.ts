@@ -1025,23 +1025,22 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
-// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
-// reveal-gated painters the horizon-capped cull far at both frame sites): the
-// renderer integration leaf moved. No capture was retaken.
-// Re-minted for the battleground field-stream compile gate (renderer.ts
-// injects the gate at the buildBattleground site; renderer.ts is a
-// provenance input). No capture was retaken.
-// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
-// compile-gate batch landed on the release arm; renderer inputs moved on
-// both sides). No capture was retaken.
-// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
-// first-order composite follows the merged renderer.ts (the entry-fade arm's
-// scenery cull beside this branch's aim blocked pass-through), then these
-// seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
+// the renderer extraction round moved the renderer integration leaf). No
+// capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
+// Re-minted for the 2026-08-31 v0.41.0 sync into the shader-warm branch: both
+// arms had re-minted, the merged renderer, lockfile, and re-stamped GLB inputs
+// land together. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'ddbd7d832f3153d284add41f2a3cb07cf034a65f853a7565b768d380381cc940';
+  '930fbf4d78043491ad420aaddc9c63f101bc29a7020922aceec1adc75a5425f7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '2b3a5e3455c4dc12d4178c78615dc91562dca3c161168c1c287a44e6af2e55f8';
+  '3ec3def5628b6937314babb7465a26303eff75b343275dcab776b385f575cfc1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2188,27 +2187,16 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
-    // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the battleground field-stream compile gate (renderer.ts
-    // provenance input moved): same order, the composite first, then this
-    // seal. No capture was retaken.
-    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
-    // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
-    // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the 2026-08-29 v0.41.0 sync merge into the shader-warm
-    // branch: both parents move renderer.ts (the branch's extractions, the
-    // release arm's battleground compile gate), so the composite follows the
-    // merged tree and this seal follows the swept evidence bytes. No capture
-    // was retaken.
-    // Re-minted again after the QA round's renderer edits (the extension sweep
-    // now installs the drift sentinel through one call). renderer.ts only; no
-    // capture was retaken.
+    // Re-minted for PR #3740's forge-lift room: the first-order composite
+    // follows the lift room's renderer.ts hookup, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('30e33ac9549d89133b3103f9aa53044928451c58091947c648d6633f55b2c40a');
+      // Re-minted for the Drakelands entrance merge into the raid branch: the
+      // composite first, then this seal. No capture was retaken.
+    ).toBe('7588cd62ecf7eba8c5f0c6082865758ac5d5dd84eb674eab213d9c9534b52f59');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

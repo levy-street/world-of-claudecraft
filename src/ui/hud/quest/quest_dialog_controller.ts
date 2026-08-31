@@ -67,6 +67,7 @@ export interface QuestDialogControllerDeps {
   // to <body> without an explicit, still-live element handed in.
   openVendor(npcId: number, opener?: HTMLElement | null): void;
   openHeroicVendor(npcId: number, opener?: HTMLElement | null): void;
+  openCrucibleVendor(npcId: number, opener?: HTMLElement | null): void;
   /** The WARFARE quartermaster's sectioned honor shop. Same opener handoff as
    *  openVendor above: the dialog is hidden before the route fires. */
   openWarfareVendor(npcId: number, opener?: HTMLElement | null): void;
@@ -374,6 +375,7 @@ export class QuestDialogController {
     const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
     const hasMarket = !!definition?.market;
     const hasHeroicVendor = !!definition?.heroicVendor;
+    const hasCrucibleVendor = !!definition?.crucibleVendor;
     const hasDelveBoard = Object.values(DELVES).some(
       (delve) => delve.boardNpcId === npc.templateId,
     );
@@ -386,6 +388,7 @@ export class QuestDialogController {
         hasVendor,
         hasMarket,
         hasHeroicVendor,
+        hasCrucibleVendor,
         hasWarfareVendor,
         hasDelveBoard,
         hasCardMaster,
@@ -478,6 +481,11 @@ export class QuestDialogController {
     if (hasHeroicVendor) {
       html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    if (hasCrucibleVendor) {
+      // Its OWN label and accessible name (the hasWarfareVendor rule): a sigil
+      // redemption counter never reads as generic "Browse Goods".
+      html += `<button type="button" class="qd-list-item" data-crucible-shop="1" aria-label="${esc(t('crucibleShop.browseAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('crucibleShop.browse'))}</button>`;
+    }
     if (hasWarfareVendor) {
       // Its OWN label and accessible name: this row sits beside the generic
       // goods row above at a flagged NPC, so it can never reuse "Browse Goods".
@@ -505,6 +513,9 @@ export class QuestDialogController {
     });
     this.bindRoute('[data-vendor]', (opener) => this.deps.openVendor(npc.id, opener));
     this.bindRoute('[data-heroic-shop]', (opener) => this.deps.openHeroicVendor(npc.id, opener));
+    this.bindRoute('[data-crucible-shop]', (opener) =>
+      this.deps.openCrucibleVendor(npc.id, opener),
+    );
     this.bindRoute('[data-warfare-shop]', (opener) => this.deps.openWarfareVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
     if (masterCraft !== null) {

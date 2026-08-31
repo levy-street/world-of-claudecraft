@@ -176,4 +176,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'リフトバウンド',
     desc: '個人専用のリフトバウンドの指輪。ランク付きリフトの初回クリアを勝ち取ったパーティの勇者一人ひとりのために打たれます。キャラクターは自分の分しか持てません。',
   },
+  conquerors_ignivar: {
+    name: '最後の泉のるつぼ',
+    desc: 'イグニヴァル、最後の炎の先触れから得られるエピックの戦利品。',
+  },
+  conquerors_ignivar_heroic: {
+    name: '英雄: 最後の泉のるつぼ',
+    desc: 'イグニヴァル、最後の炎の先触れからヒロイックでのみ得られる武器。',
+  },
+  conquerors_varkhul: {
+    name: '内部るつぼ',
+    desc: '最後の炎の鍛造父、ヴァルクルから得られるエピックの戦利品。',
+  },
+  conquerors_varkhul_heroic: {
+    name: '英雄: 内部るつぼ',
+    desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾と武器。',
+  },
 };

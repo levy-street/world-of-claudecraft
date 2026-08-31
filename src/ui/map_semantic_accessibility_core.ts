@@ -4,6 +4,7 @@
 
 import { BG_BASES } from '../sim/battleground_layout';
 import type { StationType } from '../sim/types';
+import type { DungeonMapModel } from './dungeon_map_view';
 import {
   type BgMapModel,
   bgMapCanvasX,
@@ -286,11 +287,14 @@ export type MapSemanticLabelId =
   | 'guildMember'
   | 'pointOfInterest'
   | 'dungeonEntrance'
+  | 'dungeonExit'
   | 'delveEntrance'
   | 'worldPassage'
   | 'riftEntrance'
   | 'hostileEnemy'
   | 'aggressiveEnemy'
+  | 'bossEnemy'
+  | 'bossAggressiveEnemy'
   | 'lootableEnemy'
   | 'corpse'
   | 'deathZone'
@@ -369,6 +373,7 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
   switch (label) {
     case 'pointOfInterest':
     case 'dungeonEntrance':
+    case 'dungeonExit':
     case 'delveEntrance':
     case 'worldPassage':
     case 'riftEntrance':
@@ -410,6 +415,8 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'guildMember':
     case 'hostileEnemy':
     case 'aggressiveEnemy':
+    case 'bossEnemy':
+    case 'bossAggressiveEnemy':
     case 'lootableEnemy':
     case 'corpse':
     case 'teammate':
@@ -528,7 +535,9 @@ type ArgumentKind =
   | 'station'
   | 'poi'
   | 'rift'
-  | 'service';
+  | 'service'
+  | 'npc'
+  | 'mob';
 
 interface SummaryGroup extends MapMarkerLocation {
   label: MapSemanticLabelId;
@@ -560,6 +569,8 @@ export interface MapSemanticNameResolvers {
   station(type: StationType): string;
   poi(zoneId: string, poiIndex: number): string;
   rift(name: string, rank: string | null): string;
+  npc(npcId: string): string;
+  mob(mobId: string): string;
 }
 
 export interface DelveSemanticMapModel {
@@ -734,6 +745,10 @@ export class MapSemanticAccessibilityCore {
         return t(
           argument === 'mailbox' ? 'worldContent.mailboxName' : 'worldContent.noticeboardName',
         );
+      case 'npc':
+        return this.names.npc(argument);
+      case 'mob':
+        return this.names.mob(argument);
     }
   }
 
@@ -755,6 +770,8 @@ export class MapSemanticAccessibilityCore {
       label === 'friend' ||
       label === 'guildMember' ||
       label === 'pointOfInterest' ||
+      label === 'bossEnemy' ||
+      label === 'bossAggressiveEnemy' ||
       label === 'dungeonEntrance' ||
       label === 'delveEntrance' ||
       label === 'riftEntrance'
@@ -956,6 +973,58 @@ export class MapSemanticAccessibilityCore {
       this.add(mob.cx, mob.cy, mob.aggro ? 'aggressiveEnemy' : 'hostileEnemy');
     for (const member of model.party)
       this.add(member.cx, member.cy, member.dead ? 'deadPartyMemberGeneric' : 'partyMemberGeneric');
+    return this.finish();
+  }
+
+  updateDungeon(model: DungeonMapModel | null, area: string, canvasSize: number): string {
+    const player = model?.markers.find((marker) => marker.kind === 'player');
+    this.begin(area, player?.cx ?? canvasSize / 2, player?.cy ?? canvasSize / 2, canvasSize);
+    if (!model) return this.finish();
+    for (const marker of model.markers) {
+      switch (marker.kind) {
+        case 'player':
+          this.add(marker.cx, marker.cy, 'you');
+          break;
+        case 'exit':
+          this.add(marker.cx, marker.cy, 'dungeonExit');
+          break;
+        case 'gate':
+          this.add(marker.cx, marker.cy, 'gateSealed');
+          break;
+        case 'loot':
+          this.add(
+            marker.cx,
+            marker.cy,
+            marker.source === 'enemy' ? 'lootableEnemy' : 'riftTreasureAvailable',
+          );
+          break;
+        case 'npc':
+          this.add(marker.cx, marker.cy, 'pointOfInterest', 'npc', marker.templateId);
+          break;
+        case 'mob':
+          this.add(
+            marker.cx,
+            marker.cy,
+            marker.boss
+              ? marker.aggro
+                ? 'bossAggressiveEnemy'
+                : 'bossEnemy'
+              : marker.aggro
+                ? 'aggressiveEnemy'
+                : 'hostileEnemy',
+            marker.boss ? 'mob' : 'none',
+            marker.boss ? marker.templateId : '',
+          );
+          break;
+        case 'party':
+          this.add(
+            marker.cx,
+            marker.cy,
+            marker.dead ? 'deadPartyMemberGeneric' : 'partyMemberGeneric',
+          );
+          break;
+      }
+    }
     return this.finish();
   }
 

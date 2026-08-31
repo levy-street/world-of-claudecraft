@@ -13,7 +13,7 @@ const GENERAL_LEVELS = {
   // nothing at 0 Devotion (src/sim/content/paladin_core_abilities.ts).
   hammer_of_grace: 1,
   devotion_ward: 4,
-  dawn_devotion: 5,
+  dawn_devotion: 3,
   solar_step: 5,
   divine_protection: 6,
   recall_the_fallen: 6,

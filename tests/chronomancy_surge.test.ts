@@ -73,6 +73,9 @@ function withCharges(n: number): Entity {
 // projectile:false spell resolves its damage and banks/consumes charges.
 function castResolve(sim: Sim, p: Entity, id: string, targetId: number, seconds = 2.3): SimEvent[] {
   p.resource = p.maxResource;
+  // Hit-cap the caster: these tests are about charge bookkeeping and scaling, not
+  // about whether the hostile spell's resist roll happens to land.
+  p.hitBonus = 1;
   (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
   sim.targetEntity(targetId);
   sim.castAbility(id);

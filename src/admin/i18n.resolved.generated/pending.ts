@@ -10,85 +10,25 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "es_ES": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "fr_FR": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "fr_CA": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "de_DE": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "zh_CN": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "zh_TW": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "ko_KR": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "ja_JP": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "pt_BR": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "ru_RU": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "cs_CZ": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "nl_NL": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "pl_PL": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "id_ID": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "tr_TR": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "sv_SE": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "vi_VN": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ],
-  "da_DK": [
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

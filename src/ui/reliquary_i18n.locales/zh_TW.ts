@@ -175,4 +175,20 @@ export const table: ReliquaryLocaleTable = {
     name: '裂隙之戒',
     desc: '個人專屬的裂隙之戒，為率先通關分級裂隙的隊伍中每位勇士鑄造。每個角色只能擁有自己的那一枚。',
   },
+  conquerors_ignivar: {
+    name: '最後泉源熔爐',
+    desc: '來自伊格尼瓦，末焰使者的史詩戰利品。',
+  },
+  conquerors_ignivar_heroic: {
+    name: '英雄：最後泉源熔爐',
+    desc: '伊格尼瓦，末焰使者身上僅限英雄難度掉落的武器。',
+  },
+  conquerors_varkhul: {
+    name: '內環熔爐',
+    desc: '來自末焰鍛父瓦爾庫爾的史詩戰利品。',
+  },
+  conquerors_varkhul_heroic: {
+    name: '英雄：內環熔爐',
+    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器。',
+  },
 };

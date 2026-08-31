@@ -85,6 +85,7 @@
     "SHOT_PREFIX",
     "SHOT_SLUG",
     "SHOT_SUFFIX",
+    "SHOT_TAG",
     "SHOT_TAGS",
     "SHOT_TEMPLATE",
     "SHOT_TEMPLATE_NAME",

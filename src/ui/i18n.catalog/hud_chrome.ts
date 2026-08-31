@@ -705,6 +705,14 @@ export const hudChromeStrings = {
     durationUnitMinutes: 'm',
     durationUnitHours: 'h',
     durationUnitDays: 'd',
+    // The badge label on the player's own buff row (#buff-bar) when the LOW graphics
+    // preset's aura cap (auraVisibleCap, src/game/ui_tier_knobs.ts) has shed {n} cosmetic
+    // buff icons past the cap (docs/design/graphics-settings-fairness.md: hiding a buff
+    // ICON removes no actionable information, the aura stays active either way). {n} is
+    // the shed count (formatNumber). Kept NON-WORDY (a bare "+" plus a number, no
+    // four-plus consecutive-lowercase run) so an English-filled non-Latin locale does not
+    // trip the M16 untranslated-leak guard.
+    buffOverflowLabel: '+{n}',
   },
   // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
   // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
@@ -1583,6 +1591,7 @@ export const hudChromeStrings = {
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_rickshaw_mount: 'Bonebound Rickshaw',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -1598,6 +1607,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_rickshaw_mount:
+      'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -1923,6 +1934,10 @@ export const hudChromeStrings = {
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
+    // every active buff always renders, at the cap's per-frame cost (wordy,
+    // M16: the five non-Latin fills land in this same change).
+    alwaysShowAllBuffs: 'Always Show All Buffs',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
@@ -1947,6 +1962,13 @@ export const hudChromeStrings = {
     // default); shares the persisted switch with the eye toggle inside The
     // Reliquary window.
     showReliquaryTracker: 'Show Reliquary Tracker',
+    // Interface panel toggle (on by default): confirm before a vendor sale of
+    // anything beyond true junk. Off restores the classic one-click instant
+    // sale for every item (wordy, M16: the five non-Latin fills land in the
+    // same change).
+    confirmVendorSell: 'Confirm Before Selling',
+    confirmVendorSellNote:
+      'Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -1971,6 +1993,10 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    // Interface panel toggle (off by default) for the current target's (and
+    // target-of-target's) own melee/ranged swing timer, under the target
+    // frame. Independent of showTargetOfTarget (the portrait mini-frame).
+    showTargetSwingTimer: 'Show Target Swing Timer',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
@@ -2517,6 +2543,7 @@ export const hudChromeStrings = {
     // item-stats catalog.
     names: {
       spellPower: 'Spell Power',
+      healPower: 'Healing Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
       parry: 'Parry',
@@ -2697,6 +2724,15 @@ export const hudChromeStrings = {
       few: '{count} seconds remaining',
       many: '{count} seconds remaining',
       other: '{count} seconds remaining',
+    },
+    // The native-tooltip text on the buff-bar overflow badge (hudChrome.unitFrame.
+    // buffOverflowLabel): {count} buffs are active but past the low-tier cap, so their
+    // icon is hidden. Read tPlural('hudChrome.plurals.buffsHidden', count).
+    buffsHidden: {
+      one: '{count} more buff is active but hidden on this graphics preset',
+      few: '{count} more buffs are active but hidden on this graphics preset',
+      many: '{count} more buffs are active but hidden on this graphics preset',
+      other: '{count} more buffs are active but hidden on this graphics preset',
     },
     // Unit fragments for the character sheet's Time Played line ({count} is
     // pre-formatted through formatNumber at the call site).
@@ -3234,7 +3270,270 @@ export const hudChromeStrings = {
   // formatNumber as {value}/{pct}/{interval}/{stacks}/{min}/{max}; {school} is the
   // localized damage-school name (see schools below). Keys are produced by the pure
   // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
+  varkhulCallout: {
+    leftPillarCharging: 'The left forge pillar is charging. It will ignite in 3 sec!',
+    rightPillarCharging: 'The right forge pillar is charging. It will ignite in 3 sec!',
+    bothPillarsCharging: 'The forge pillars are charging. They will ignite in 3 sec!',
+    artificerApproaches: 'A Cinder Artificer is approaching the forge!',
+    leftPillar: 'The left forge pillar ignites!',
+    rightPillar: 'The right forge pillar ignites!',
+    bothPillars: 'The forge pillars ignite!',
+    portalsOpening: 'The forge portals are opening!',
+    heat75: 'The forge is at 75% heat!',
+    heat90: 'Forge Meltdown is imminent!',
+    addsDefeated: 'The forge legion is defeated: Varkhul is exposed!',
+    worldfireBegins:
+      'Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!',
+    worldfireClosing: 'Worldfire closes in. Move toward the center!',
+    worldfireConsumed: 'The entire crucible is burning!',
+  },
+  varkhulWaveStatus: 'Wave {wave}/{waves} | Enemies: {remaining}',
+  raidBossGuide: {
+    title: 'Boss Guide',
+    button: 'Boss Guide: {boss}',
+    subtitle: '{boss} | {difficulty}',
+    close: 'Close boss guide',
+    bossesLabel: 'Raid bosses',
+    difficultyLabel: 'Difficulty',
+    normal: 'Normal',
+    heroic: 'Heroic',
+    portraitAlt: '{boss} encounter portrait',
+    overviewHeading: 'Overview',
+    abilitiesHeading: 'Abilities',
+    whatToDo: 'What to do',
+    whatToDoResponse: 'What to do: {response}',
+    rolesLabel: 'Role responsibilities',
+    flagsLabel: 'Mechanic warnings',
+    roleTank: 'Tank',
+    roleHealer: 'Healer',
+    roleDamage: 'Damage',
+    roleAll: 'All roles',
+    flagDeadly: 'Deadly',
+    flagInterruptible: 'Interruptible',
+    flagImportant: 'Important',
+    flagCleansable: 'Cleansable',
+    browseBoss: 'View {boss}',
+    chooseDifficulty: 'View {difficulty} mechanics',
+    expandAbility: 'Expand {ability}',
+    collapseAbility: 'Collapse {ability}',
+    abilityControlLabel: '{action}. {details}',
+    tooltipMeta: '{phase} | {difficulty}',
+    ignivar: {
+      overview:
+        'Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.',
+      phaseOpeningName: 'The Herald Awakens',
+      phaseOpeningSummary:
+        "Control Brand of the Pyre with the water conduits while handling Ignivar's repeating frontal, skyfire, rotating rays, and expanding Forge Wave.",
+      phaseApocalypseName: 'Intermission: Apocalypse',
+      phaseApocalypseSummary:
+        'At {health} health, Ignivar calls an Ashcaller that attempts to end the encounter.',
+      phaseJudgmentName: 'Judgment of the Forge',
+      phaseJudgmentSummary:
+        'At {health} health, Ignivar ignites the arena and reveals one safe refuge among three shelters.',
+      phaseJudgmentHeroicSummary:
+        'At {health} health, Ignivar ignites the arena while active Brands continue to threaten nearby players inside the refuge.',
+      phaseFinaleName: 'Finale: Last Inferno',
+      phaseFinaleSummary:
+        'At {health} health, Ignivar begins a final burn phase with a hard deadline and faster repeating mechanics.',
+      forgeStrikeName: 'Forge Strike',
+      forgeStrikeSummary:
+        'Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar.',
+      forgeStrikeResponse:
+        "Tanks swap at {stacks} stacks. Healers prepare for the strike and the new tank's first melee swings.",
+      brandName: 'Brand of the Pyre',
+      brandSummary:
+        'Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies.',
+      brandResponse:
+        'Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse.',
+      brandHeroicResponse:
+        'Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash.',
+      searingTorrentName: 'Searing Torrent',
+      searingTorrentSummary:
+        'Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time.',
+      searingTorrentHeroicSummary:
+        'Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time.',
+      searingTorrentResponse:
+        'Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes.',
+      rainName: 'Rain of Cinders',
+      rainSummary:
+        'Three fire sectors and marked meteor impacts punish players who remain inside their warnings.',
+      rainHeroicSummary:
+        'Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings.',
+      rainResponse: 'Move into an unmarked gap and leave every meteor circle before impact.',
+      raysName: 'Revolving Inferno',
+      raysSummary:
+        'Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them.',
+      raysHeroicSummary:
+        'Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact.',
+      raysResponse:
+        'Move with the open space between rays. Do not cut through a ray, even with a fast movement ability.',
+      forgeWaveName: 'Forge Wave',
+      forgeWaveSummary:
+        'An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits.',
+      forgeWaveHeroicSummary:
+        'An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther.',
+      forgeWaveResponse:
+        'Find either gap during the windup, align with it, and avoid being knocked toward the arena edge.',
+      apocalypseName: 'Apocalypse',
+      apocalypseSummary:
+        'Ignivar summons an Ashcaller. If the add finishes Apocalypse, the raid is defeated immediately.',
+      apocalypseResponse:
+        'Switch all available damage to the Ignivar Ashcaller and defeat it before the cast completes.',
+      judgmentName: 'Judgment of the Forge',
+      judgmentSummary:
+        'Ignivar marks three shelters, identifies one safe refuge, and then repeatedly burns the rest of the arena.',
+      judgmentHeroicSummary:
+        'Ignivar marks one safe refuge while the arena burns. Brand of the Pyre remains active and still damages nearby allies.',
+      judgmentResponse:
+        'Identify the uniquely marked refuge during the warning and stack fully inside its boundary before the floor ignites.',
+      chainsName: 'Chains of the Forge',
+      chainsSummary:
+        "Ignivar links nearby pairs. Separating too far or crossing another pair's chain causes lethal damage.",
+      chainsResponse:
+        'Stay close to your linked partner, move together, and keep every other player from passing through your chain.',
+      lastInfernoName: 'Last Inferno',
+      lastInfernoSummary:
+        'Ignivar enrages and prepares a hard wipe while Rain of Cinders, Searing Torrent, and Revolving Inferno accelerate.',
+      lastInfernoResponse:
+        'Use remaining damage and healing cooldowns, keep executing the movement mechanics, and defeat Ignivar before the countdown ends.',
+      // Kept as catalog aliases until the existing locale overlays migrate to
+      // the structured journal rows above. The runtime guide no longer reads them.
+      brand:
+        'Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.',
+      movement:
+        "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+      apocalypse: 'Apocalypse: kill Ignivar Ashcaller before its cast completes.',
+      judgment:
+        'Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.',
+      finale:
+        'Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.',
+      heroic:
+        'Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther.',
+    },
+    varkhul: {
+      overview:
+        'Varkhul imprisoned the dying Last Spring to forge living metal, then created Ignivar to guard the crime. His encounter combines personal positioning with raid-wide control of the grand forge.',
+      phaseOpeningName: 'The Forgefather',
+      phaseOpeningSummary:
+        'Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.',
+      phaseAssemblyName: "Intermission: The Master's Assembly",
+      phaseAssemblySummary:
+        'At {health} health, Varkhul becomes protected while his forge legion enters through portals and the pillar beams threaten a Forge Meltdown.',
+      phaseFinaleName: 'Finale: Masterpiece Unbound',
+      phaseFinaleSummary:
+        'At {health} health, Varkhul attacks faster, deals more damage, and pulses fire through the raid until the final deadline.',
+      phaseFinaleHeroicSummary:
+        'At {health} health, Varkhul abandons most earlier mechanics as Worldfire closes inward and consumes the crucible.',
+      makersBrandName: "Maker's Brand",
+      makersBrandSummary:
+        'Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him.',
+      makersBrandResponse:
+        'Tanks swap at {stacks} stacks. Healers prepare the incoming tank before Varkhul changes targets.',
+      frontalName: "Forgefather's Sweep",
+      frontalSummary:
+        'Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him.',
+      frontalHeroicSummary:
+        'Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him.',
+      frontalResponse:
+        'Keep Varkhul facing away from the group and move behind him as soon as the warning appears.',
+      orbsName: 'Cinder Orbs',
+      orbsSummary:
+        'Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing.',
+      orbsHeroicSummary:
+        'Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing.',
+      orbsResponse:
+        'Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly.',
+      pyreName: 'Shared Pyre',
+      pyreSummary:
+        'A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals {missingPenalty} maximum-health damage to the entire raid.',
+      pyreHeroicSummary:
+        'A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals {missingPenalty} maximum-health damage to the entire raid.',
+      pyreResponse:
+        'Stack at least {players} players inside the circle and move with its target until the cast resolves.',
+      forgestormName: 'Forgestorm',
+      forgestormSummary:
+        'Varkhul calls down {waves} consecutive waves of marked meteor impacts across the arena.',
+      forgestormHeroicSummary:
+        'Varkhul calls down {waves} consecutive waves of marked meteor impacts that deal extreme damage.',
+      forgestormResponse:
+        'Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave.',
+      rayName: 'Tempering Ray',
+      raySummary:
+        'A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound.',
+      rayResponse:
+        'Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active.',
+      anvilName: "Anvil's Decree",
+      anvilSummary:
+        'Varkhul walks to the grand forge and strikes it {strikes} times, dealing increasing raid-wide damage.',
+      anvilHeroicSummary:
+        'Varkhul strikes the grand forge {strikes} times for increasing raid damage while marked meteors fall on players.',
+      anvilResponse: 'Group for raid healing and use defensive cooldowns for the final strike.',
+      anvilHeroicResponse:
+        'Spread marked meteors away from the group while healers and defensive cooldowns cover all {strikes} strikes.',
+      assemblyName: "The Master's Assembly",
+      assemblySummary:
+        'Varkhul becomes protected and starts a timed assembly. The raid must defeat every portal wave before the forge completes his masterpiece.',
+      assemblyResponse:
+        'Split attention between beam control and priority adds. Defeat the full forge legion before the assembly timer expires.',
+      beamName: 'Crucible Beam',
+      beamSummary:
+        'Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, while blocked and inactive beams let heat fall.',
+      beamHeroicSummary:
+        'Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, and forge heat never decreases.',
+      beamResponse:
+        'Stand between each active pillar and the forge, then rotate blockers before exposure becomes dangerous. Reaching full heat causes a lethal Forge Meltdown.',
+      legionName: 'Forge Legion',
+      legionSummary:
+        'Crucible Wardens cast Crucible Quake to add forge heat, while Cinder Artificers use Repair Protocol to heal Varkhul.',
+      legionResponse:
+        'Interrupt Crucible Quake, stop Repair Protocol, and focus each dangerous caster before clearing the remaining adds.',
+      masterpieceName: 'Masterpiece Unbound',
+      masterpieceSummary:
+        'Varkhul attacks faster, deals more damage, and repeatedly burns the raid until the final wipe.',
+      masterpieceHeroicSummary:
+        'Varkhul attacks faster and deals more damage while Worldfire replaces most earlier mechanics for the final burn.',
+      masterpieceResponse:
+        'Commit remaining offensive and defensive cooldowns and defeat Varkhul before the final countdown ends.',
+      worldfireName: 'Worldfire',
+      worldfireSummary:
+        'On Heroic, fire advances from the arena edge toward the center in stages until the entire crucible burns.',
+      worldfireResponse:
+        'Move inward ahead of each advancing fire band, preserve the shrinking safe space, and finish Varkhul before the center ignites.',
+      // Locale-overlay compatibility aliases. The structured rows above own the
+      // rendered journal, but deleting these keys would orphan current translations.
+      tanks: "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+      orbs: 'Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.',
+      pyre: 'Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.',
+      forgestorm:
+        'Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.',
+      anvil:
+        "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
+      ray: 'Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.',
+      forge:
+        'Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.',
+      assembly:
+        "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
+      worldfire:
+        'Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.',
+      heroic:
+        "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire.",
+    },
+  },
   auraEffect: {
+    sharedPyre:
+      "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+    varkhulSharedPyre:
+      "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
+    makersBrand:
+      'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
+    varkhulSentinelsGaze:
+      'The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.',
+    varkhulMoltenCore:
+      'Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.',
+    varkhulForgeLink:
+      'Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.',
+    varkhulCrucibleExposure:
+      'Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',
@@ -3509,6 +3808,12 @@ export const hudChromeStrings = {
     takeLootTooltip: 'Takes the coins and dropped items. Does not use up the harvest.',
     // Footer hint on the corpse loot window, the town-focus hint-line idiom.
     unifiedPressHint: 'The interact key loots and harvests in one press, using your town focus.',
+    // The Take Loot confirm shown when the visible loot contains a soulbound
+    // item (loot_window_controller.ts): taking it binds it, so the player
+    // confirms once before the pickup, the classic bind-on-pickup warning.
+    bindConfirmTitle: 'Binds when picked up',
+    bindConfirmBody:
+      'This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare
@@ -3758,6 +4063,13 @@ export const hudChromeStrings = {
     // while its bag corner still paints the enchant glyph. Rendered ONLY in
     // that case, never beside an attributed line.
     enchantedFallback: 'Enchanted',
+    // The bind-on-pickup party trade window line, rendered under the
+    // Soulbound line it qualifies (item_instance_tooltip.ts
+    // instancePartyTradeLine). {time} is the already-localized remaining
+    // span from durationText. States the limit (equip ends it) per the
+    // tooltip-writing rule: it is the one trigger a player can regret.
+    partyTradeWindow:
+      'You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window.',
   },
   // Purpose hints for the eight enchanting materials
   // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the
@@ -5155,6 +5467,11 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    // The vendor right-click / tap menu's own default row (Sell, since that is
+    // what it runs there) and its Sell all (N) row (bag_item_context_menu.ts
+    // vendorSellContextActions), the total held across every bag.
+    sell: 'Sell',
+    sellAll: 'Sell all ({count})',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
@@ -5954,6 +6271,16 @@ export const hudChromeStrings = {
     loading: 'Loading the Exchange...',
     loadFailed: 'The Exchange could not be reached. Try again shortly.',
     disabledRealm: 'The $WOC Exchange is not available on this realm.',
+    // The wrapped DESKTOP shell's (Electron, Steam, packaged website build)
+    // launcher confirm dialog (src/ui/woc_market_link.ts): the Exchange
+    // itself stays fail-closed there (docs/prd/woc/marketplace.md), so this
+    // hands the player off to the browser build instead of leaving the
+    // launcher unexplained. Never shown on Capacitor native.
+    browserOnlyConfirmTitle: 'Open the $WOC Exchange in your browser?',
+    browserOnlyConfirmBody:
+      'The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.',
+    browserOnlyConfirmOpen: 'Open in Browser',
+    browserOnlyConfirmCancel: 'Cancel',
     // Names no cause (an operator pause and an unhealthy price print both
     // land here) and every action the pause refuses (guardEnabledHealthy
     // gates listing, bidding, offers and the payment quote); a payment

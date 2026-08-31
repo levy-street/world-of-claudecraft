@@ -799,7 +799,7 @@ export const zh_CN: EnTranslations = {
         "buyAria": "购买{item}",
         "confirmTitle": "确认购买特许状",
         "confirmBody": "花费 {cost} Claudium 购买{item}？",
-        "resultContext": "{item} ({sku}): {message}",
+        "resultContext": "{item}（{sku}）：{message}",
         "granted": "特许状已生效。当前角色的银行已经变大。",
         "alreadyGranted": "当前角色已拥有该特许状，不会重复扣费。",
         "applyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
@@ -956,7 +956,8 @@ export const zh_CN: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "时",
-      "durationUnitDays": "天"
+      "durationUnitDays": "天",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "角色模型预览"
@@ -1386,6 +1387,7 @@ export const zh_CN: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
       "name_terrorspark_groundshaker": "惊雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
+      "name_rickshaw_mount": "白骨人力车",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -1394,7 +1396,8 @@ export const zh_CN: EnTranslations = {
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
       "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
-      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。"
+      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -1583,6 +1586,7 @@ export const zh_CN: EnTranslations = {
       "playerFrameScale": "玩家框缩放",
       "targetFrameScale": "目标框缩放",
       "aurasOnPlayerFrame": "增益显示在玩家框",
+      "alwaysShowAllBuffs": "始终显示所有增益",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
       "stopAutoAttackOnTargetSwitch": "切换目标时停止自动攻击",
@@ -1592,6 +1596,8 @@ export const zh_CN: EnTranslations = {
       "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
+      "confirmVendorSell": "出售前确认",
+      "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -1600,6 +1606,7 @@ export const zh_CN: EnTranslations = {
       "hideUnusedActionSlots": "隐藏未使用的动作栏位",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
+      "showTargetSwingTimer": "显示目标的挥击计时器",
       "showPetFrame": "显示你的宠物",
       "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
@@ -2024,6 +2031,7 @@ export const zh_CN: EnTranslations = {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
+        "healPower": "治疗强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
         "parry": "招架",
@@ -2158,6 +2166,12 @@ export const zh_CN: EnTranslations = {
         "few": "剩余 {count} 秒",
         "many": "剩余 {count} 秒",
         "other": "剩余 {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "few": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "many": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "other": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标"
       },
       "playtimeDays": {
         "one": "{count} 天",
@@ -2508,7 +2522,180 @@ export const zh_CN: EnTranslations = {
       "leather": "皮甲",
       "mail": "锁甲"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左侧锻炉立柱正在充能，3秒后点燃！",
+      "rightPillarCharging": "右侧锻炉立柱正在充能，3秒后点燃！",
+      "bothPillarsCharging": "锻炉立柱正在充能，3秒后点燃！",
+      "artificerApproaches": "烬火工匠正在接近锻炉！",
+      "leftPillar": "左侧锻炉立柱点燃了！",
+      "rightPillar": "右侧锻炉立柱点燃了！",
+      "bothPillars": "锻炉立柱点燃了！",
+      "portalsOpening": "锻炉传送门正在开启！",
+      "heat75": "锻炉热量达到75%！",
+      "heat90": "锻炉熔毁迫在眉睫！",
+      "addsDefeated": "锻炉军团已被击败，瓦库尔暴露了！",
+      "worldfireBegins": "世界之火从房间边缘燃起，42秒后整个熔炉大厅将被吞没！",
+      "worldfireClosing": "世界之火正在逼近，向中央移动！",
+      "worldfireConsumed": "整个熔炉大厅都在燃烧！"
+    },
+    "varkhulWaveStatus": "波次 {wave}/{waves} | 敌人: {remaining}",
+    "raidBossGuide": {
+      "title": "首领指南",
+      "button": "指南: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "关闭首领指南",
+      "bossesLabel": "团队副本首领",
+      "difficultyLabel": "难度",
+      "normal": "普通",
+      "heroic": "英雄",
+      "portraitAlt": "{boss} 战斗肖像",
+      "overviewHeading": "概览",
+      "abilitiesHeading": "技能",
+      "whatToDo": "应对方法",
+      "whatToDoResponse": "应对方法：{response}",
+      "rolesLabel": "职责",
+      "flagsLabel": "机制警告",
+      "roleTank": "坦克",
+      "roleHealer": "治疗",
+      "roleDamage": "输出",
+      "roleAll": "所有职责",
+      "flagDeadly": "致命",
+      "flagInterruptible": "可打断",
+      "flagImportant": "重要",
+      "flagCleansable": "可净化",
+      "browseBoss": "查看 {boss}",
+      "chooseDifficulty": "查看{difficulty}机制",
+      "expandAbility": "展开{ability}",
+      "collapseAbility": "收起{ability}",
+      "abilityControlLabel": "{action}。{details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "瓦尔库尔将伊格尼瓦铸造成先驱、活体封印和通往内层坩埚的钥匙。这场战斗考验水渠控制、精确走位和快速集火优先目标。",
+        "phaseOpeningName": "先驱苏醒",
+        "phaseOpeningSummary": "利用水渠处理柴堆印记，同时应对伊格尼瓦反复施放的正面攻击、天火、旋转射线和扩张的熔炉波。",
+        "phaseApocalypseName": "过场阶段：末日",
+        "phaseApocalypseSummary": "生命值降至{health}时，伊格尼瓦召唤一名试图结束战斗的唤灰者。",
+        "phaseJudgmentName": "熔炉审判",
+        "phaseJudgmentSummary": "生命值降至{health}时，伊格尼瓦点燃竞技场，并在三个庇护所中显示一个安全区域。",
+        "phaseJudgmentHeroicSummary": "生命值降至{health}时，伊格尼瓦点燃竞技场，激活的印记仍会在安全区内威胁附近玩家。",
+        "phaseFinaleName": "最终阶段：最终炼狱",
+        "phaseFinaleSummary": "生命值降至{health}时，伊格尼瓦进入有严格时限的最终爆发阶段，重复机制也会加快。",
+        "forgeStrikeName": "熔炉打击",
+        "forgeStrikeSummary": "伊格尼瓦打击当前坦克并施加熔火护甲，使其受到伊格尼瓦的伤害提高。",
+        "forgeStrikeResponse": "坦克在{stacks}层时换坦。治疗为这次打击和新坦克承受的最初几次近战攻击做好准备。",
+        "brandName": "柴堆印记",
+        "brandSummary": "伊格尼瓦标记非坦克玩家，使其持续受到火焰伤害。被标记者还会灼烧附近的盟友。",
+        "brandResponse": "分散站位。将灼热洪流引向可用水渠，再让每名被标记者单独穿过激活的水流完成净化。",
+        "brandHeroicResponse": "分散站位。用灼热洪流开启水渠，每次只净化一名被标记者。每次净化都会触发全团净化反冲。",
+        "searingTorrentName": "灼热洪流",
+        "searingTorrentSummary": "伊格尼瓦追踪一名玩家，随后释放宽阔的正面冲击。被冲击命中的可用水渠会短暂激活。",
+        "searingTorrentHeroicSummary": "伊格尼瓦追踪一名玩家，随后释放几乎致命的宽阔正面冲击。被冲击命中的可用水渠会短暂激活。",
+        "searingTorrentResponse": "让预警区域恰好穿过一条可用水渠。其他所有人在施法完成前离开正面区域。",
+        "rainName": "烬雨",
+        "rainSummary": "三个火焰扇区和标记的陨石落点会惩罚仍留在预警区域内的玩家。",
+        "rainHeroicSummary": "三个火焰扇区和标记的陨石落点会对仍留在预警区域内的玩家造成极高伤害。",
+        "rainResponse": "移入未标记的缺口，并在陨石命中前离开所有圆形区域。",
+        "raysName": "旋转炼狱",
+        "raysSummary": "旋转的火焰射线环绕伊格尼瓦扫过，反复伤害接触它们的玩家。",
+        "raysHeroicSummary": "旋转的火焰射线环绕伊格尼瓦扫过，接触时会反复造成严重伤害。",
+        "raysResponse": "跟随射线之间的空隙移动。即使使用快速移动技能，也不要穿过射线。",
+        "forgeWaveName": "熔炉波",
+        "forgeWaveSummary": "一道扩张的火墙横穿竞技场，留下两个相对的缺口，并击退被命中的玩家。",
+        "forgeWaveHeroicSummary": "一道扩张的火墙横穿竞技场，留下两个相对的缺口，并将被命中的玩家击退得更远。",
+        "forgeWaveResponse": "在预备阶段找到任一缺口并与其对齐，避免被击退到竞技场边缘。",
+        "apocalypseName": "末日",
+        "apocalypseSummary": "伊格尼瓦召唤一名唤灰者。如果该小怪完成末日施法，团队会立即失败。",
+        "apocalypseResponse": "所有可用输出立即转火伊格尼瓦唤灰者，并在其完成施法前将其击杀。",
+        "judgmentName": "熔炉审判",
+        "judgmentSummary": "伊格尼瓦标记三个庇护所，指出其中一个安全区，然后反复灼烧竞技场其余区域。",
+        "judgmentHeroicSummary": "竞技场燃烧时，伊格尼瓦只标记一个安全区。柴堆印记仍会持续并伤害附近盟友。",
+        "judgmentResponse": "在预警期间认出标记独特的庇护所，并在地面燃烧前完全进入其边界内集合。",
+        "chainsName": "熔炉锁链",
+        "chainsSummary": "伊格尼瓦连接附近的玩家对。相距过远或穿过其他玩家对的锁链都会造成致命伤害。",
+        "chainsResponse": "靠近与你相连的玩家并一起移动，不要让其他任何玩家穿过你们的锁链。",
+        "lastInfernoName": "最终炼狱",
+        "lastInfernoSummary": "伊格尼瓦进入狂暴并准备强制团灭，同时烬雨、灼热洪流和旋转炼狱会加速。",
+        "lastInfernoResponse": "使用剩余的输出和治疗冷却，继续正确处理移动机制，并在倒计时结束前击败伊格尼瓦。",
+        "brand": "柴堆印记: 分散站位。将灼热洪流引向可用水渠，然后独自穿过水流完成净化。",
+        "movement": "移动: 躲避烬雨的锥形攻击和陨石，跟随旋转炼狱移动，并利用熔炉波的两个缺口。",
+        "apocalypse": "末日: 在伊格尼瓦·唤灰者完成施法前将其击杀。",
+        "judgment": "熔炉审判: 预警时找出独特的庇护点，地面燃烧后在标记边界内集合。",
+        "finale": "最终炼狱: 在团灭前击杀伊格尼瓦尔，同时应对加速的陨石、正面攻击和旋转炼狱。",
+        "heroic": "英雄: 熔炉锁链期间成对玩家必须保持靠近，熔炉审判期间印记仍会持续，且熔炉波会将玩家推得更远。"
+      },
+      "varkhul": {
+        "overview": "瓦尔库尔囚禁垂死的终末之泉来锻造活体金属，随后创造伊格尼瓦守护这一罪行。这场战斗结合个人走位与全团对巨型熔炉的控制。",
+        "phaseOpeningName": "锻炉之父",
+        "phaseOpeningSummary": "瓦尔库尔循环施放坦克压力、宽阔正面攻击、移动投射物、团队分摊、陨石波次和巨型铁砧攻击。",
+        "phaseAssemblyName": "过场阶段：大师组装",
+        "phaseAssemblySummary": "生命值降至{health}时，瓦尔库尔获得保护，锻炉军团通过传送门进入，柱状射线则会威胁触发熔炉熔毁。",
+        "phaseFinaleName": "最终阶段：杰作解放",
+        "phaseFinaleSummary": "生命值降至{health}时，瓦尔库尔攻击更快、造成更多伤害，并不断对全团释放火焰脉冲直到最终时限。",
+        "phaseFinaleHeroicSummary": "生命值降至{health}时，瓦尔库尔放弃大部分早期机制，世界之火向内收缩并吞噬整个坩埚。",
+        "makersBrandName": "制作者印记",
+        "makersBrandSummary": "瓦尔库尔打击当前坦克并施加可叠加效果，使其受到瓦尔库尔的所有伤害提高。",
+        "makersBrandResponse": "坦克在{stacks}层时换坦。治疗在瓦尔库尔更换目标前保护即将接怪的坦克。",
+        "frontalName": "锻炉之父横扫",
+        "frontalSummary": "瓦尔库尔释放范围极宽的正面横扫，对其前方所有玩家造成大量火焰伤害。",
+        "frontalHeroicSummary": "瓦尔库尔释放范围极宽的正面横扫，对其前方所有玩家造成几乎致命的火焰伤害。",
+        "frontalResponse": "让瓦尔库尔始终背对团队，预警出现后立刻移动到他身后。",
+        "orbsName": "烬火宝珠",
+        "orbsSummary": "被标记的非坦克玩家会留下持续的烬火池，并向各个方向释放火焰宝珠。炽热金属还会吸收受到的治疗。",
+        "orbsHeroicSummary": "被标记的非坦克玩家会留下高伤害烬火池，并向各个方向释放危险的火焰宝珠。炽热金属还会吸收受到的治疗。",
+        "orbsResponse": "将每个标记带到房间边缘，让火池彼此分开，再躲避横穿竞技场的宝珠。治疗迅速清除治疗吸收。",
+        "pyreName": "共享柴堆",
+        "pyreSummary": "一个移动圆圈会跟随没有炽热金属的玩家。伤害由圈内玩家分摊，每缺少一名玩家还会对全团造成相当于最大生命值{missingPenalty}的伤害。",
+        "pyreHeroicSummary": "一个移动圆圈会跟随没有炽热金属的玩家，并分摊更高的伤害。每缺少一名玩家还会对全团造成相当于最大生命值{missingPenalty}的伤害。",
+        "pyreResponse": "让至少{players}名玩家在圆圈内集合，并跟随目标移动直到施法结算。",
+        "forgestormName": "熔炉风暴",
+        "forgestormSummary": "瓦尔库尔在竞技场中连续召来{waves}波标记的陨石落点。",
+        "forgestormHeroicSummary": "瓦尔库尔连续召来{waves}波会造成极高伤害的标记陨石落点。",
+        "forgestormResponse": "观察每一组新的地面预警，并在该波落下前离开。确认下一波位置前不要返回刚才的区域。",
+        "rayName": "淬火射线",
+        "raySummary": "一道射线长时间追踪被标记的玩家。瓦尔库尔与目标之间的第一名其他玩家会拦截伤害并获得淬火创伤。",
+        "rayResponse": "安排一名健康玩家，通常是副坦克，站进射线。其他玩家远离，并在淬火创伤持续期间轮换拦截者。",
+        "anvilName": "铁砧敕令",
+        "anvilSummary": "瓦尔库尔走向巨型熔炉并敲击{strikes}次，对全团造成逐次提高的伤害。",
+        "anvilHeroicSummary": "瓦尔库尔敲击巨型熔炉{strikes}次，造成逐次提高的团队伤害，同时标记的陨石会落向玩家。",
+        "anvilResponse": "团队集合接受治疗，并为最后一次打击使用防御冷却。",
+        "anvilHeroicResponse": "将标记的陨石分散到团队之外，治疗和防御冷却则覆盖全部{strikes}次打击。",
+        "assemblyName": "大师组装",
+        "assemblySummary": "瓦尔库尔获得保护并开始限时组装。团队必须在熔炉完成他的杰作前击败所有传送门波次。",
+        "assemblyResponse": "同时关注射线控制和优先小怪。在组装计时结束前击败完整的锻炉军团。",
+        "beamName": "坩埚射线",
+        "beamSummary": "激活的柱状射线会加热熔炉，除非有玩家阻挡。阻挡者受到不断提高的坩埚暴露伤害，射线被阻挡或未激活时热量会下降。",
+        "beamHeroicSummary": "激活的柱状射线会加热熔炉，除非有玩家阻挡。阻挡者受到不断提高的坩埚暴露伤害，且熔炉热量永远不会下降。",
+        "beamResponse": "站在每根激活的柱子与熔炉之间，并在暴露变得危险前轮换阻挡者。热量满时会触发致命的熔炉熔毁。",
+        "legionName": "锻炉军团",
+        "legionSummary": "坩埚守卫施放坩埚震击来增加熔炉热量，烬火工匠则用修复协议治疗瓦尔库尔。",
+        "legionResponse": "打断坩埚震击和修复协议，优先集火每名危险施法者，再清理剩余小怪。",
+        "masterpieceName": "杰作解放",
+        "masterpieceSummary": "瓦尔库尔攻击更快、造成更多伤害，并反复灼烧全团直到最终团灭。",
+        "masterpieceHeroicSummary": "瓦尔库尔攻击更快、造成更多伤害，世界之火会取代大多数早期机制完成最终爆发。",
+        "masterpieceResponse": "使用剩余的进攻和防御冷却，并在最终倒计时结束前击败瓦尔库尔。",
+        "worldfireName": "世界之火",
+        "worldfireSummary": "英雄难度下，火焰会从竞技场边缘分阶段向中央推进，直到整个坩埚燃烧。",
+        "worldfireResponse": "在每条推进的火焰带到达前向内移动，保留不断缩小的安全空间，并在中央点燃前击败瓦尔库尔。",
+        "tanks": "坦克: 制作者印记达到2层时换坦，并让瓦尔库尔保持在近战范围内。",
+        "orbs": "烬火宝珠: 被标记者分散到房间边缘。火池会持续存在，释放的宝珠会穿过房间。",
+        "pyre": "共享柴堆: 只选择没有炽热金属的玩家。无论难度，移动圆圈内都需要4名玩家。每缺少一名玩家，整个团队都会受到相当于最大生命值15%的伤害。",
+        "forgestorm": "熔炉风暴: 观察坠落的陨石，在三波陨石落地前离开每个标记区域。",
+        "anvil": "铁砧敕令: 瓦尔库尔移动到巨型熔炉并敲击三次，造成团队伤害。英雄模式还会落下标记陨石。",
+        "ray": "淬火射线: 另一名玩家通常由坦克在长时间预警结束前拦截移动射线。承受伤害者会获得淬火创伤。",
+        "forge": "熔炉柱: 在射线抵达熔炉前阻挡，并在坩埚暴露叠加后轮换。热量满时会触发熔炉熔毁。",
+        "assembly": "大师组装: 阻挡两道熔炉射线，击杀所有传送门波次，打断坩埚震击，并阻止烬火工匠治疗瓦尔库尔。",
+        "worldfire": "世界之火: 英雄最终阶段的燃烧边缘会向中央收缩。在整个坩埚燃烧前击败瓦尔库尔。",
+        "heroic": "英雄: 熔炉热量不会下降，铁砧敕令会增加陨石，最终阶段会集中应对世界之火。"
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
+      "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
+      "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
+      "varkhulSentinelsGaze": "余烬哨兵正在追击你。将它带离团队，直到它被消灭。",
+      "varkhulMoltenCore": "将核心运到锻炉。熔融重压每 {interval} 秒造成不断提高的伤害，从最大生命值的 {min}% 增至 {max}%。",
+      "varkhulForgeLink": "在激活的立柱光束抵达锻炉前将其拦截。未拦截的光束每秒增加6%热量。普通难度下，已拦截的光束和关闭的立柱会让锻炉冷却；英雄难度下热量永不降低。达到100%时会触发致命的锻炉熔毁。",
+      "varkhulCrucibleExposure": "拦截坩埚光束时，每秒受到的最大生命值伤害都会提高。离开光束后，普通难度10秒、英雄难度60秒后重置层数。",
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
       "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",
@@ -2719,7 +2906,9 @@ export const zh_CN: EnTranslations = {
       "chestTitle": "宝箱",
       "takeLootButton": "拾取战利品",
       "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
-      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。"
+      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。",
+      "bindConfirmTitle": "拾取后绑定",
+      "bindConfirmBody": "这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
@@ -2797,11 +2986,11 @@ export const zh_CN: EnTranslations = {
         "actionBar2": "动作条 2",
         "actionBar3": "动作条 3",
         "steamWishlist": "愿望单提醒",
-        "menu": "Menu",
+        "menu": "菜单",
         "minimap": "小地图",
         "stanceBar": "姿态栏",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "经验条",
+        "chat": "聊天",
         "actionBarGroup": "动作条组",
         "playerFrame": "玩家",
         "targetFrame": "目标",
@@ -2819,7 +3008,7 @@ export const zh_CN: EnTranslations = {
       "actionBar2Vertical": "动作条 2 纵向",
       "actionBar3Vertical": "动作条 3 纵向",
       "menuRailHorizontal": "菜单横向排列",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "对齐网格",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "重置尺寸",
       "resetFrameSizeFor": "重置{name}的尺寸",
@@ -2844,7 +3033,8 @@ export const zh_CN: EnTranslations = {
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（附魔）",
-      "enchantedFallback": "已附魔"
+      "enchantedFallback": "已附魔",
+      "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。"
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
@@ -3717,7 +3907,9 @@ export const zh_CN: EnTranslations = {
       "equip": "装备",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "sell": "出售",
+      "sellAll": "全部出售（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",
@@ -4219,6 +4411,10 @@ export const zh_CN: EnTranslations = {
       "loading": "正在加载交易所...",
       "loadFailed": "无法连接交易所，请稍后再试。",
       "disabledRealm": "本服务器未开放 $WOC 交易所。",
+      "browserOnlyConfirmTitle": "在浏览器中打开 $WOC 交易所？",
+      "browserOnlyConfirmBody": "$WOC 交易所仅在 World of ClaudeCraft 的浏览器版本中提供。即将在浏览器中打开 World of ClaudeCraft，你可以在那里登录并打开交易所，游戏会继续在这里运行。",
+      "browserOnlyConfirmOpen": "在浏览器中打开",
+      "browserOnlyConfirmCancel": "取消",
       "pausedBanner": "交易已暂停。拍卖倒计时照常进行；新的挂单、出价、报价和付款需等交易恢复后再进行，已发出的付款仍会照常结算。",
       "walletLinkedDisconnected": "您的公开地址已关联。需要使用 $WOC 付款时，请重新连接该钱包应用。",
       "walletLinkedConnected": "已关联的钱包应用已连接，可用于 $WOC 付款。",
@@ -4539,7 +4735,13 @@ export const zh_CN: EnTranslations = {
       "upstream": "Epic 未响应。请稍后重试。"
     },
     "wallet": {
-      "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+      "handoff_invalid": "钱包授权已过期或无法验证。请重试。",
+      "reauth_required": "请输入账号密码以确认此钱包变更。",
+      "reauth_two_factor": "你的账号已启用两步验证。请输入验证码以确认。",
+      "reauth_no_password": "请先在账号设置中设置密码，然后重试。",
+      "reauth_bad_signature": "钱包签名验证失败。请重试。",
+      "reauth_bad_password": "密码不正确。",
+      "reauth_bad_two_factor": "验证码无效，请重试。"
     },
     "ota_updates": {
       "invalid_input": "输入无效。"
@@ -4997,6 +5199,7 @@ export const zh_CN: EnTranslations = {
       "ifPartySort": "队伍成员的排列顺序：入队顺序、职责或名字。",
       "ifPartyShowAuras": "队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。",
       "ifAurasOnPlayerFrame": "除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。",
+      "ifAlwaysShowAllBuffs": "即使在低画质预设下也显示所有生效中的增益，绕过该档位平时的增益图标上限。",
       "ifTargetOfTarget": "显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。",
       "ifPetFrame": "为你的宠物显示一个框体。",
       "ifChatFontScale": "聊天文字的大小。",
@@ -7465,6 +7668,13 @@ export const zh_CN: EnTranslations = {
     "unlink": "解除绑定",
     "unlinkTitle": "从此账号移除钱包验证",
     "unlinkAria": "从此账号移除钱包验证",
+    "reauthTitle": "确认钱包变更",
+    "reauthUnlinkTitle": "确认移除钱包",
+    "reauthHelp": "为了你的账号安全，请输入账号密码以授权此变更。",
+    "reauthNoPassword": "此账号未设置密码登录。请先在账号设置中设置密码，然后重试。",
+    "reauthConfirm": "确认",
+    "reauthCancel": "取消",
+    "reauthClose": "关闭",
     "signOut": "断开连接",
     "signOutTitle": "在此浏览器中断开钱包应用",
     "signOutAria": "在此浏览器中断开钱包应用",
@@ -7908,6 +8118,20 @@ export const zh_CN: EnTranslations = {
     "buyConfirmTitle": "确认购买",
     "buyConfirmBody": "用{marks}枚英雄徽记购买{item}？徽记购买后无法退款。",
     "buyConfirmAccept": "购买",
+    "buyConfirmCancel": "取消"
+  },
+  "crucibleShop": {
+    "browse": "兑换印记",
+    "browseAria": "与{name}兑换熔炉印记",
+    "empty": "你的职业没有可兑换的套装部件。",
+    "balance": "你持有的印记: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "你没有持有任何熔炉印记。",
+    "price": "1枚{sigil}",
+    "buyAria": "用{sigil}兑换{item}",
+    "buyConfirmTitle": "确认兑换",
+    "buyConfirmBody": "用{sigil}兑换{item}？印记消耗后无法退还。",
+    "buyConfirmAccept": "兑换",
     "buyConfirmCancel": "取消"
   },
   "cardDuel": {
@@ -8739,6 +8963,8 @@ export const zh_CN: EnTranslations = {
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敌对目标",
         "aggressiveEnemy": "正在攻击你的敌人",
+        "bossEnemy": "首领：{name}",
+        "bossAggressiveEnemy": "正在攻击你的首领：{name}",
         "lootableEnemy": "可拾取战利品的敌人",
         "corpse": "你的尸体",
         "deathZone": "危险区域",
@@ -9127,6 +9353,7 @@ export const zh_CN: EnTranslations = {
       "tradeExpired": "交易请求已过期。",
       "tradeFailed": "交易失败：物品或金钱已不可用。",
       "tradeBound": "该物品已绑定，无法交易。",
+      "tradeWindowIneligible": "该物品只能交易给共同获得该掉落的玩家。",
       "marketListBound": "该物品已绑定，无法上架。"
     },
     "logs": {
@@ -9790,7 +10017,8 @@ export const zh_CN: EnTranslations = {
       "greedAria": "贪婪 {item}",
       "passAria": "放弃 {item}",
       "everyonePassed": "所有人都放弃了 {item}。",
-      "rolled": "{answered}/{total} 已投骰"
+      "rolled": "{answered}/{total} 已投骰",
+      "bindsOnPickup": "拾取后绑定"
     }
   },
   "entities": {
@@ -10571,7 +10799,7 @@ export const zh_CN: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "命运之针",
-        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。"
+        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成{needleDoom}点谴罪；若不存在邪眼，则先标记目标。"
       },
       "sentence": {
         "name": "裁决",
@@ -10669,7 +10897,7 @@ export const zh_CN: EnTranslations = {
       },
       "moonseed": {
         "name": "月种",
-        "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
+        "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长{duration}秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
       },
       "rejuvenation": {
         "name": "野性绽放",
@@ -10973,7 +11201,7 @@ export const zh_CN: EnTranslations = {
       },
       "conflagrate": {
         "name": "燃尽",
-        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 2 层充能。（毁灭标志技能）"
+        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 {charges} 层充能。（毁灭标志技能）"
       },
       "moonkin_form": {
         "name": "枭兽形态",
@@ -11005,7 +11233,7 @@ export const zh_CN: EnTranslations = {
       },
       "overbloom": {
         "name": "盛放",
-        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。"
+        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
       },
       "summon_imp": {
         "name": "召唤烬裔",
@@ -11077,7 +11305,7 @@ export const zh_CN: EnTranslations = {
       },
       "iron_resolve": {
         "name": "钢铁意志",
-        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 4 点伤害，持续最多 10 秒。（防护）"
+        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 {absorbPerRage} 点伤害，持续最多 10 秒。（防护）"
       },
       "faultline": {
         "name": "地裂",
@@ -11454,7 +11682,7 @@ export const zh_CN: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "炽天使守望",
-        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。"
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复 {buff} 点生命值。赐福专属技能。"
       },
       "summon_tithefiend": {
         "name": "召唤什一魔",
@@ -12997,6 +13225,9 @@ export const zh_CN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "惊雷撼地者点火钥匙"
       },
+      "reins_rickshaw_mount": {
+        "name": "白骨人力车缚绳"
+      },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
       },
@@ -13074,6 +13305,612 @@ export const zh_CN: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "往生石"
+      },
+      "lastflame_core": {
+        "name": "末焰之核"
+      },
+      "slagbreaker_helmet": {
+        "name": "破渣头盔"
+      },
+      "slagbreaker_shoulder": {
+        "name": "破渣肩铠"
+      },
+      "slagbreaker_chest": {
+        "name": "破渣锁甲"
+      },
+      "slagbreaker_gloves": {
+        "name": "破渣护手"
+      },
+      "slagbreaker_legs": {
+        "name": "破渣腿甲"
+      },
+      "emberfury_helmet": {
+        "name": "烬怒头盔"
+      },
+      "emberfury_shoulder": {
+        "name": "烬怒肩铠"
+      },
+      "emberfury_chest": {
+        "name": "烬怒锁甲"
+      },
+      "emberfury_gloves": {
+        "name": "烬怒护手"
+      },
+      "emberfury_legs": {
+        "name": "烬怒腿甲"
+      },
+      "forgewall_helmet": {
+        "name": "炉墙头盔"
+      },
+      "forgewall_shoulder": {
+        "name": "炉墙肩铠"
+      },
+      "forgewall_chest": {
+        "name": "炉墙锁甲"
+      },
+      "forgewall_gloves": {
+        "name": "炉墙护手"
+      },
+      "forgewall_legs": {
+        "name": "炉墙腿甲"
+      },
+      "dawnforged_helmet": {
+        "name": "晓铸头盔"
+      },
+      "dawnforged_shoulder": {
+        "name": "晓铸肩铠"
+      },
+      "dawnforged_chest": {
+        "name": "晓铸锁甲"
+      },
+      "dawnforged_gloves": {
+        "name": "晓铸护手"
+      },
+      "dawnforged_legs": {
+        "name": "晓铸腿甲"
+      },
+      "oathpyre_helmet": {
+        "name": "誓火头盔"
+      },
+      "oathpyre_shoulder": {
+        "name": "誓火肩铠"
+      },
+      "oathpyre_chest": {
+        "name": "誓火锁甲"
+      },
+      "oathpyre_gloves": {
+        "name": "誓火护手"
+      },
+      "oathpyre_legs": {
+        "name": "誓火腿甲"
+      },
+      "zealfire_helmet": {
+        "name": "炽诚头盔"
+      },
+      "zealfire_shoulder": {
+        "name": "炽诚肩铠"
+      },
+      "zealfire_chest": {
+        "name": "炽诚锁甲"
+      },
+      "zealfire_gloves": {
+        "name": "炽诚护手"
+      },
+      "zealfire_legs": {
+        "name": "炽诚腿甲"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "兽群领主罩帽"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "兽群领主肩甲"
+      },
+      "packlord_emberhide_chest": {
+        "name": "兽群领主外衣"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "兽群领主手甲"
+      },
+      "packlord_emberhide_legs": {
+        "name": "兽群领主皮裤"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "冷目罩帽"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "冷目肩甲"
+      },
+      "coldsight_trackers_chest": {
+        "name": "冷目外衣"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "冷目手甲"
+      },
+      "coldsight_trackers_legs": {
+        "name": "冷目皮裤"
+      },
+      "slagsnare_helmet": {
+        "name": "渣网罩帽"
+      },
+      "slagsnare_shoulder": {
+        "name": "渣网肩甲"
+      },
+      "slagsnare_chest": {
+        "name": "渣网外衣"
+      },
+      "slagsnare_gloves": {
+        "name": "渣网手甲"
+      },
+      "slagsnare_legs": {
+        "name": "渣网皮裤"
+      },
+      "cinderfang_helmet": {
+        "name": "烬牙罩帽"
+      },
+      "cinderfang_shoulder": {
+        "name": "烬牙肩甲"
+      },
+      "cinderfang_chest": {
+        "name": "烬牙外衣"
+      },
+      "cinderfang_gloves": {
+        "name": "烬牙手甲"
+      },
+      "cinderfang_legs": {
+        "name": "烬牙皮裤"
+      },
+      "smolderstrike_helmet": {
+        "name": "燎击罩帽"
+      },
+      "smolderstrike_shoulder": {
+        "name": "燎击肩甲"
+      },
+      "smolderstrike_chest": {
+        "name": "燎击外衣"
+      },
+      "smolderstrike_gloves": {
+        "name": "燎击手甲"
+      },
+      "smolderstrike_legs": {
+        "name": "燎击皮裤"
+      },
+      "ashveil_helmet": {
+        "name": "灰幕罩帽"
+      },
+      "ashveil_shoulder": {
+        "name": "灰幕肩甲"
+      },
+      "ashveil_chest": {
+        "name": "灰幕外衣"
+      },
+      "ashveil_gloves": {
+        "name": "灰幕手甲"
+      },
+      "ashveil_legs": {
+        "name": "灰幕皮裤"
+      },
+      "emberscreed_helmet": {
+        "name": "余烬信条兜帽"
+      },
+      "emberscreed_shoulder": {
+        "name": "余烬信条衬肩"
+      },
+      "emberscreed_chest": {
+        "name": "余烬信条长袍"
+      },
+      "emberscreed_gloves": {
+        "name": "余烬信条裹手"
+      },
+      "emberscreed_legs": {
+        "name": "余烬信条护腿"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "晓织兜帽"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "晓织衬肩"
+      },
+      "benison_dawnweave_chest": {
+        "name": "晓织长袍"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "晓织裹手"
+      },
+      "benison_dawnweave_legs": {
+        "name": "晓织护腿"
+      },
+      "vesperash_helmet": {
+        "name": "暮灰兜帽"
+      },
+      "vesperash_shoulder": {
+        "name": "暮灰衬肩"
+      },
+      "vesperash_chest": {
+        "name": "暮灰长袍"
+      },
+      "vesperash_gloves": {
+        "name": "暮灰裹手"
+      },
+      "vesperash_legs": {
+        "name": "暮灰护腿"
+      },
+      "stormkindled_helmet": {
+        "name": "燃雷头盔"
+      },
+      "stormkindled_shoulder": {
+        "name": "燃雷肩铠"
+      },
+      "stormkindled_chest": {
+        "name": "燃雷锁甲"
+      },
+      "stormkindled_gloves": {
+        "name": "燃雷护手"
+      },
+      "stormkindled_legs": {
+        "name": "燃雷腿甲"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "烬鳞头盔"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "烬鳞肩铠"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "烬鳞锁甲"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "烬鳞护手"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "烬鳞腿甲"
+      },
+      "stonehearth_helmet": {
+        "name": "石炉头盔"
+      },
+      "stonehearth_shoulder": {
+        "name": "石炉肩铠"
+      },
+      "stonehearth_chest": {
+        "name": "石炉锁甲"
+      },
+      "stonehearth_gloves": {
+        "name": "石炉护手"
+      },
+      "stonehearth_legs": {
+        "name": "石炉腿甲"
+      },
+      "springmender_helmet": {
+        "name": "泉愈头盔"
+      },
+      "springmender_shoulder": {
+        "name": "泉愈肩铠"
+      },
+      "springmender_chest": {
+        "name": "泉愈锁甲"
+      },
+      "springmender_gloves": {
+        "name": "泉愈护手"
+      },
+      "springmender_legs": {
+        "name": "泉愈腿甲"
+      },
+      "chronoweave_helmet": {
+        "name": "以太织兜帽"
+      },
+      "chronoweave_shoulder": {
+        "name": "以太织衬肩"
+      },
+      "chronoweave_chest": {
+        "name": "以太织长袍"
+      },
+      "chronoweave_gloves": {
+        "name": "以太织裹手"
+      },
+      "chronoweave_legs": {
+        "name": "以太织护腿"
+      },
+      "pyroclast_helmet": {
+        "name": "火砾兜帽"
+      },
+      "pyroclast_shoulder": {
+        "name": "火砾衬肩"
+      },
+      "pyroclast_chest": {
+        "name": "火砾长袍"
+      },
+      "pyroclast_gloves": {
+        "name": "火砾裹手"
+      },
+      "pyroclast_legs": {
+        "name": "火砾护腿"
+      },
+      "frostquench_helmet": {
+        "name": "霜淬兜帽"
+      },
+      "frostquench_shoulder": {
+        "name": "霜淬衬肩"
+      },
+      "frostquench_chest": {
+        "name": "霜淬长袍"
+      },
+      "frostquench_gloves": {
+        "name": "霜淬裹手"
+      },
+      "frostquench_legs": {
+        "name": "霜淬护腿"
+      },
+      "hexthread_helmet": {
+        "name": "咒线兜帽"
+      },
+      "hexthread_shoulder": {
+        "name": "咒线衬肩"
+      },
+      "hexthread_chest": {
+        "name": "咒线长袍"
+      },
+      "hexthread_gloves": {
+        "name": "咒线裹手"
+      },
+      "hexthread_legs": {
+        "name": "咒线护腿"
+      },
+      "gravebrand_helmet": {
+        "name": "墓印兜帽"
+      },
+      "gravebrand_shoulder": {
+        "name": "墓印衬肩"
+      },
+      "gravebrand_chest": {
+        "name": "墓印长袍"
+      },
+      "gravebrand_gloves": {
+        "name": "墓印裹手"
+      },
+      "gravebrand_legs": {
+        "name": "墓印护腿"
+      },
+      "ruincaller_helmet": {
+        "name": "唤灭兜帽"
+      },
+      "ruincaller_shoulder": {
+        "name": "唤灭衬肩"
+      },
+      "ruincaller_chest": {
+        "name": "唤灭长袍"
+      },
+      "ruincaller_gloves": {
+        "name": "唤灭裹手"
+      },
+      "ruincaller_legs": {
+        "name": "唤灭护腿"
+      },
+      "moonscorch_helmet": {
+        "name": "月灼罩帽"
+      },
+      "moonscorch_shoulder": {
+        "name": "月灼肩甲"
+      },
+      "moonscorch_chest": {
+        "name": "月灼外衣"
+      },
+      "moonscorch_gloves": {
+        "name": "月灼手甲"
+      },
+      "moonscorch_legs": {
+        "name": "月灼皮裤"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "野牙罩帽"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "野牙肩甲"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "野牙外衣"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "野牙手甲"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "野牙皮裤"
+      },
+      "cinderbark_helmet": {
+        "name": "烬皮罩帽"
+      },
+      "cinderbark_shoulder": {
+        "name": "烬皮肩甲"
+      },
+      "cinderbark_chest": {
+        "name": "烬皮外衣"
+      },
+      "cinderbark_gloves": {
+        "name": "烬皮手甲"
+      },
+      "cinderbark_legs": {
+        "name": "烬皮皮裤"
+      },
+      "grovespring_helmet": {
+        "name": "林泉罩帽"
+      },
+      "grovespring_shoulder": {
+        "name": "林泉肩甲"
+      },
+      "grovespring_chest": {
+        "name": "林泉外衣"
+      },
+      "grovespring_gloves": {
+        "name": "林泉手甲"
+      },
+      "grovespring_legs": {
+        "name": "林泉皮裤"
+      },
+      "sigil_anvil_helmet": {
+        "name": "铁砧头盔印记"
+      },
+      "sigil_ember_helmet": {
+        "name": "余烬头盔印记"
+      },
+      "sigil_tempest_helmet": {
+        "name": "风暴头盔印记"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "铁砧肩甲印记"
+      },
+      "sigil_ember_shoulder": {
+        "name": "余烬肩甲印记"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "风暴肩甲印记"
+      },
+      "sigil_anvil_chest": {
+        "name": "铁砧长袍印记"
+      },
+      "sigil_ember_chest": {
+        "name": "余烬长袍印记"
+      },
+      "sigil_tempest_chest": {
+        "name": "风暴长袍印记"
+      },
+      "sigil_anvil_gloves": {
+        "name": "铁砧手套印记"
+      },
+      "sigil_ember_gloves": {
+        "name": "余烬手套印记"
+      },
+      "sigil_tempest_gloves": {
+        "name": "风暴手套印记"
+      },
+      "sigil_anvil_legs": {
+        "name": "铁砧护腿印记"
+      },
+      "sigil_ember_legs": {
+        "name": "余烬护腿印记"
+      },
+      "sigil_tempest_legs": {
+        "name": "风暴护腿印记"
+      },
+      "cord_of_the_last_flame": {
+        "name": "终焰束带"
+      },
+      "cindersoaked_slippers": {
+        "name": "浸烬便鞋"
+      },
+      "springbinder_sash": {
+        "name": "缚泉腰带"
+      },
+      "steps_of_quiet_water": {
+        "name": "静水之履"
+      },
+      "cinderbark_cinch": {
+        "name": "烬皮束腰"
+      },
+      "ashenbark_treads": {
+        "name": "灰皮之靴"
+      },
+      "slagstalker_belt": {
+        "name": "渣行者腰带"
+      },
+      "ashrunner_boots": {
+        "name": "灰行者之靴"
+      },
+      "moonscorch_waistwrap": {
+        "name": "月灼缠腰"
+      },
+      "scorchgrove_striders": {
+        "name": "灼林行者之靴"
+      },
+      "grovetender_belt": {
+        "name": "护林者腰带"
+      },
+      "dewfall_moccasins": {
+        "name": "落露软鞋"
+      },
+      "forgewall_girdle": {
+        "name": "炉墙束带"
+      },
+      "anvilstance_sabatons": {
+        "name": "砧姿铁靴"
+      },
+      "warforged_waistguard": {
+        "name": "战铸护腰"
+      },
+      "furnace_march_greaves": {
+        "name": "熔炉行军胫甲"
+      },
+      "stormkindled_chain": {
+        "name": "燃雷锁链腰带"
+      },
+      "thundershock_treads": {
+        "name": "雷击之靴"
+      },
+      "tidebinder_links": {
+        "name": "缚潮链环"
+      },
+      "springwarden_sabatons": {
+        "name": "泉守铁靴"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "初次淬火坠饰"
+      },
+      "ignivars_ember_choker": {
+        "name": "伊格尼瓦余烬项圈"
+      },
+      "locket_of_the_last_flame": {
+        "name": "终焰小盒坠链"
+      },
+      "heartspring_amulet": {
+        "name": "心泉护符"
+      },
+      "seal_of_the_forgewall": {
+        "name": "炉墙印戒"
+      },
+      "band_of_marked_strikes": {
+        "name": "刻痕之击指环"
+      },
+      "circle_of_cinders": {
+        "name": "烬環"
+      },
+      "loop_of_quiet_springs": {
+        "name": "静泉指环"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "内炉壁垒"
+      },
+      "ember_wardens_barrier": {
+        "name": "烬卫屏障"
+      },
+      "orb_of_the_last_spring": {
+        "name": "终泉宝珠"
+      },
+      "cinder_of_the_first_design": {
+        "name": "初构之烬"
+      },
+      "forgefathers_warhammer": {
+        "name": "铸父战锤"
+      },
+      "cinderfang_kris": {
+        "name": "烬牙波刃匕首"
+      },
+      "slagrender_cleaver": {
+        "name": "裂渣劈斧"
+      },
+      "anvilguard_blade": {
+        "name": "砧卫之刃"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "终末之心巨刃"
+      },
+      "staff_of_the_last_spring": {
+        "name": "终泉法杖"
+      },
+      "forgefire_spire": {
+        "name": "炉火尖塔杖"
+      },
+      "springtouched_crozier": {
+        "name": "泉息牧杖"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "熄火花魔杖"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -13851,6 +14688,12 @@ export const zh_CN: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "雷霆阔步大火鸡的缰绳"
+      },
+      "varkhul_forgebreaker": {
+        "name": "碎炉者，瓦库尔的引擎"
+      },
+      "varkhul_emberward": {
+        "name": "烬卫，瓦库尔的壁垒"
       }
     },
     "mobs": {
@@ -14045,6 +14888,27 @@ export const zh_CN: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "伊格尼瓦，末焰使者"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "伊格尼瓦·唤灰者"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "余烬哨兵"
+      },
+      "ignivar_crucible_warden": {
+        "name": "熔炉守卫"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "烬火工匠"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "末焰锻父瓦尔库尔"
+      },
+      "derelict_mech": {
+        "name": "废弃机甲"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
@@ -14705,6 +15569,21 @@ export const zh_CN: EnTranslations = {
         "name": "奥德里克修士",
         "title": "山谷牧师",
         "greeting": "从礼拜堂墓地到世界屋脊... 线索到这里结束。我感觉山正在聆听。"
+      },
+      "archivist_maelin_emberward": {
+        "name": "余烬守望者梅琳",
+        "title": "熔炉档案员",
+        "greeting": "这里的每一道锤印都是一句话。帮我读懂瓦尔库尔想隐藏的真相。"
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "梅琳的余烬投影",
+        "title": "余烬投影",
+        "greeting": "余烬将梅琳的声音传向锻炉深处。"
+      },
+      "crucible_quartermaster": {
+        "name": "军需官布隆恩·余烬守卫",
+        "title": "熔炉军需官",
+        "greeting": "熔炉会铭记自己人。把坩埚里的印记带给我，我就为你披挂上阵。"
       },
       "brother_halven": {
         "name": "哈尔文修士",
@@ -15851,6 +16730,39 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败尼思拉克西斯"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "铁中回响",
+        "text": "这些自动机械不是士兵，而是草稿。摧毁每条装配线，在最后一具躯壳倒下时仔细聆听。锻炉记得瓦尔库尔试图抹去的一切。",
+        "completion": "回响彼此吻合。瓦尔库尔将垂死末泉的水束缚进活体金属。这些自动机械都是失败的淬炼品，只有伊格尼瓦尔撑了下来。",
+        "objectives": {
+          "0": {
+            "label": "摧毁余烬哨兵"
+          },
+          "1": {
+            "label": "摧毁熔炉守卫"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "先驱之心",
+        "text": "每一道回响都指向唯一的幸存者：伊格尼瓦尔。瓦尔库尔称他为先驱、封印和钥匙。击败他。如果记录属实，他的死亡会揭示他被锻造来守护什么。",
+        "completion": "伊格尼瓦尔从来不只是守护者。他的心脏就是钥匙，最后的甲片打开了下方封闭的熔炉。",
+        "objectives": {
+          "0": {
+            "label": "击败伊格尼瓦尔"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "锻父",
+        "text": "下方的道路通向末焰锻父瓦尔库尔。他囚禁末泉以赋予金属生命，又锻造伊格尼瓦尔来封存这罪行。进入内环熔炉，结束他的工作。",
+        "completion": "锻炉终于寂静了。泉水也许永远无法复原，但瓦尔库尔再也不能将生命锻成锁链。",
+        "objectives": {
+          "0": {
+            "label": "击败瓦尔库尔"
           }
         }
       },
@@ -17731,6 +18643,31 @@ export const zh_CN: EnTranslations = {
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
       },
+      "ignivar_forge_lift": {
+        "name": "锻炉升降梯",
+        "enterText": "锻炉升降梯轰然震颤，缓缓下沉；锻锤的轰鸣迎面而来。",
+        "leaveText": "升降梯将你拉回要塞的露天高处。"
+      },
+      "ignivar_forge_approach": {
+        "name": "首锻大厅",
+        "enterText": "锻锤的轰鸣在首锻大厅中回荡。",
+        "leaveText": "你离开第一座锻炉，终于又能自由呼吸。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最后泉源熔炉",
+        "enterText": "热浪在熔炉封印的水源上方翻涌。",
+        "leaveText": "你离开熔炉，终于再次畅快呼吸。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "熔火装配间",
+        "enterText": "开启的大门通向熔火装配大厅。",
+        "leaveText": "你离开装配线，返回熔炉厅。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "内环熔炉",
+        "enterText": "已打开的大门通往熔炉更深处。",
+        "leaveText": "你离开熔炉寂静的深处。"
+      },
       "wildheart_basin": {
         "name": "荒野之心盆地",
         "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
@@ -17962,53 +18899,183 @@ export const zh_CN: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "灰帷装束",
+        "bonus2": "潜伏突袭造成的伤害提高 25%。",
+        "bonus4": "罩影突袭期间的第一次潜伏突袭造成三倍伤害（原为双倍）。"
+      },
+      "benison_dawnweave": {
+        "name": "赐福晨织法衣",
+        "bonus2": "炽天使守望的救援治疗量提高至 270（原为 180）。受到伤害不再延迟你的施法。",
+        "bonus4": "炽天使守望触发时，其守护的盟友还会在 10 秒内获得相当于其最大生命值 15% 的治疗。"
+      },
       "boundstone_vanguard": {
         "name": "缚石先锋",
         "bonus3": "攻击速度和施法速度提高 15%。"
       },
+      "chronoweave": {
+        "name": "以太织法衣",
+        "bonus2": "时光回响将你 50% 的单体奥术伤害转化为治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "时光奔流的冷却时间缩短 5 秒。"
+      },
+      "cinderbark": {
+        "name": "烬皮守御甲",
+        "bonus2": "横扫利爪有 30% 的几率额外积累 1 层古血。",
+        "bonus4": "碎髓造成的伤害提高 30%，且其紧急护盾不再取代这次打击。"
+      },
+      "cinderfang": {
+        "name": "烬牙罩袍",
+        "bonus2": "毒祭每次打击返还的能量提高至 20 点。",
+        "bonus4": "毒镖的冷却时间缩短至 4 秒。"
+      },
+      "coldsight_trackers": {
+        "name": "冷目追猎装束",
+        "bonus2": "审慎射击额外恢复 5 点集中。",
+        "bonus4": "引弓长射的致命一击使冷静专注延长 2 秒，每次持续期间最多延长 6 秒。"
+      },
       "crownforged": {
         "name": "骨铸战装",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus2": "力量提高 10 点，耐力提高 10 点。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 40 点，持续 10 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 5 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "dawnforged": {
+        "name": "晓铸圣装",
+        "bonus2": "圣光道标复制你 55% 的直接治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "辉光共鸣强化的黎明之拥变为瞬发。"
       },
       "deathlord": {
         "name": "冢主战甲",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点。",
-        "bonus4": "你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 60 点，持续 10 秒。"
+        "bonus2": "力量提高 10 点，耐力提高 10 点。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 40 点，持续 10 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 5 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "emberfury": {
+        "name": "烬怒挽具",
+        "bonus2": "你的激怒持续 6 秒（原为 4 秒）。",
+        "bonus4": "放血必定使你激怒，其治疗量提高至你最大生命值的 8%。"
+      },
+      "emberscreed": {
+        "name": "余烬信条圣装",
+        "bonus2": "你的戒律连结会额外将 10% 的神圣伤害转化为治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "你的守护圣咏被完全消耗后，你在 10 秒内的下一次涤净圣歌变为瞬发。该效果每 15 秒最多触发一次。"
+      },
+      "forgewall": {
+        "name": "锻墙圣盾",
+        "bonus2": "钢铁意志的怒气转化提高至每点 5 点吸收（原为 4 点）。",
+        "bonus4": "每次施放碎盾击，钢铁意志的剩余冷却时间缩短 2 秒。"
+      },
+      "frostquench": {
+        "name": "霜淬织衣",
+        "bonus2": "凛霜之矛的致命一击会额外积存一枚冰刺，上限仍为 5 枚。受到伤害不再延迟你的施法。",
+        "bonus4": "凛冬之鞭施加 3 层凛冬之寒（原为 2 层）。"
+      },
+      "gravebrand": {
+        "name": "墓印礼装",
+        "bonus2": "收割号令的冷却时间缩短 2 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "收割号令的齐击造成的伤害提高 25%。"
       },
       "greyjaw_stalker": {
         "name": "灰颚追猎者装备",
         "bonus3": "攻击速度和施法速度提高 15%。"
       },
+      "grovespring": {
+        "name": "林泉法衣",
+        "bonus2": "迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
+        "bonus4": "盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。"
+      },
+      "hexthread": {
+        "name": "咒线罩袍",
+        "bonus2": "命运之针额外生成 2 点谴罪。受到伤害不再延迟你的施法。",
+        "bonus4": "施放裁决后返还 10 点谴罪。"
+      },
+      "moonscorch": {
+        "name": "月灼法衣",
+        "bonus2": "月种可将月光风暴每次施加延长两次，最多共 12 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "月涌与日醒造成的伤害提高 25%。"
+      },
       "necromancers": {
         "name": "哀织法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 10 点，耐力提高 10 点。",
-        "bonus4": "你的法术有 10% 的几率触发“清晰施法”，使你的下一个法术免费施放。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
       },
       "nighttalon": {
         "name": "恐牙皮甲",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus2": "敏捷提高 10 点，致命一击几率提高 1%。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 15%，持续 8 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 4 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "oathpyre": {
+        "name": "誓火壁垒",
+        "bonus2": "守誓者打击触发烈阳反击的几率提高至 30%，每次成功格挡有 40% 几率触发。",
+        "bonus4": "消耗烈阳反击时，获得相当于你最大生命值 6% 的护盾，持续 10 秒。"
+      },
+      "packlord_emberhide": {
+        "name": "兽群领主烬皮甲",
+        "bonus2": "兽群号令的冷却时间缩短至 3 秒。",
+        "bonus4": "兽群号令重置兽群奔袭冷却时间的几率提高至 30%。"
+      },
+      "pyroclast": {
+        "name": "火砾礼装",
+        "bonus2": "灼烫对生命值不高于 35% 的目标必定造成致命一击。受到伤害不再延迟你的施法。",
+        "bonus4": "凤凰出神未激活时，你的火焰法术致命一击会使其剩余冷却时间缩短 1.5 秒。"
+      },
+      "ruincaller": {
+        "name": "唤灭法衣",
+        "bonus2": "燃尽可存 3 层充能。受到伤害不再延迟你的施法。",
+        "bonus4": "毁灭箭造成的伤害提高 20%。"
+      },
+      "slagbreaker": {
+        "name": "碎渣战甲",
+        "bonus2": "血手使你下一次致残打击的强化效果提高至每层 30%（原为 20%）。",
+        "bonus4": "每施放两次血手，破防者的剩余冷却时间缩短 3 秒。"
+      },
+      "slagsnare": {
+        "name": "渣网猎装",
+        "bonus2": "剖膛一击产生 20 点集中。",
+        "bonus4": "裂创消耗 3 层狩猎势能时将其保留。该效果每 8 秒最多触发一次。"
+      },
+      "smolderstrike": {
+        "name": "燎击皮甲",
+        "bonus2": "大摆拳造成的伤害提高 20%。",
+        "bonus4": "每次施放眼前一黑，剑刃乱舞的剩余冷却时间缩短 6 秒。"
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
+      },
+      "springmender": {
+        "name": "泉愈鳞甲",
+        "bonus2": "潮汐召唤的冷却时间缩短 4 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "层叠治愈可跳跃至第四名盟友，消耗的治愈湍流按 150% 治疗。"
+      },
+      "stonehearth": {
+        "name": "石炉壁垒",
+        "bonus2": "缚石状态下，风暴施法的治愈之水不消耗法力，且治疗量提高 25%。",
+        "bonus4": "缚石状态下，完成战魂节律时为你治疗最大生命值的 3%。"
       },
       "stormcallers": {
         "name": "唤风法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
+      },
+      "stormkindled": {
+        "name": "燃暴礼装",
+        "bonus2": "焰烙状态下的释放武器获得 3 层雷霆。受到伤害不再延迟你的施法。",
+        "bonus4": "大地震击的每层雷霆加成提高至 30%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "vesperash": {
+        "name": "晚祷烬灰罩袍",
+        "bonus2": "召唤什一魔的冷却时间缩短 6 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "召唤什一魔会重置碎心术的冷却时间，且什一魔每次攻击回复的法力值翻倍。"
       },
       "warfare_ashstalker": {
         "name": "灰烬追猎者装备",
@@ -18040,11 +19107,26 @@ export const zh_CN: EnTranslations = {
         "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予荆棘守护，使躲闪提高 15%，持续 6 秒。"
       },
+      "warspirit_emberscale": {
+        "name": "战魂烬鳞甲",
+        "bonus2": "先祖打击将战魂节律推进 3 段。",
+        "bonus4": "先祖打击造成的伤害提高 30%。"
+      },
+      "wildfang_emberhide": {
+        "name": "野牙烬皮甲",
+        "bonus2": "血收恢复的能量由 30 点提高至 45 点。",
+        "bonus4": "血收会在目标身上重新施加剐削。"
+      },
       "wyrmshadow": {
         "name": "夜牙法衣",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。",
-        "bonus4": "你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 25%，持续 8 秒。"
+        "bonus2": "敏捷提高 10 点，致命一击几率提高 1%。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 15%，持续 8 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 4 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "zealfire": {
+        "name": "炽诚战甲",
+        "bonus2": "终末敕令与黎明坠击互相缩短对方的剩余冷却时间 3 秒（原为 2 秒）。",
+        "bonus4": "在破晓之怒下施放的愤怒之锤伤害提高 40%（原为 20%）。"
       }
     }
   },

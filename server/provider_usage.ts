@@ -37,6 +37,8 @@ const USAGE_METRICS = [
   { key: 'wallet.link.request', labelKey: 'usage.metric.walletLinkRequest' },
   { key: 'wallet.link.failure', labelKey: 'usage.metric.walletLinkFailure' },
   { key: 'wallet.link.rate_limited', labelKey: 'usage.metric.walletLinkRateLimited' },
+  { key: 'wallet.unlink.failure', labelKey: 'usage.metric.walletUnlinkFailure' },
+  { key: 'wallet.unlink.success', labelKey: 'usage.metric.walletUnlinkSuccess' },
   { key: 'card.publish.request', labelKey: 'usage.metric.cardPublishRequest' },
   { key: 'card.publish.rejected', labelKey: 'usage.metric.cardPublishRejected' },
   { key: 'card.publish.rate_limited', labelKey: 'usage.metric.cardPublishRateLimited' },

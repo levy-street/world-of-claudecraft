@@ -211,6 +211,24 @@ export function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
+  // {absorbPerRage} splices the RESOLVED absorbSpentResource rate (Iron
+  // Resolve), so the Forgewall 2pc's 5-per-rage shows live for wearers the
+  // same way a talent-upgraded value would.
+  const absorbPerRage = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'absorbSpentResource' }> =>
+      eff.type === 'absorbSpentResource',
+  )?.mult;
+  // {needleDoom} splices the RESOLVED afflictionNeedle Condemnation payload
+  // (Needle of Fate), so the Hexthread 2pc's 9 shows live for wearers the
+  // same way a talent-upgraded value would.
+  const needleDoom = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'afflictionNeedle' }> =>
+      eff.type === 'afflictionNeedle',
+  )?.doom;
+  // {charges} splices the RESOLVED stored-use count (native maxCharges plus
+  // any bonusCharges rows), so Conflagrate's "Holds N charges" line reads 3
+  // for Ruincaller 2pc wearers and the base 2 for everyone else.
+  const charges = res.charges;
   const values: InterpolationValues = {
     damage: damageText,
     overTime: abilityOverTimeText(res, scaling),
@@ -225,6 +243,9 @@ export function abilityDisplayDescription(
     hostilePvpDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
     groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
     rage: rageText,
+    absorbPerRage: absorbPerRage === undefined ? '' : formatAbilityNumber(absorbPerRage),
+    needleDoom: needleDoom === undefined ? '' : formatAbilityNumber(needleDoom),
+    charges: charges === undefined ? '' : formatAbilityNumber(charges),
   };
   // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
   // has dropped it, prefer the stealth-free description variant so the prose stops

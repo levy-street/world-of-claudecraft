@@ -10,7 +10,7 @@ import {
   type VaultConsumptionAdmission,
 } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
-import { nextRaidResetMs } from './raid_reset';
+import { nextRaidResetMs, nextWeeklyRaidResetMs } from './raid_reset';
 import { REALM_RESET_TIME_ZONE } from './realm';
 import { STORAGE_PRICES } from './storage_prices';
 
@@ -59,6 +59,10 @@ export function buildRealmSimConfig(
     // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
     // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
     raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
+    // The Ignivar rooms run on a weekly lockout beside the daily one
+    // (server/raid_reset.ts): realm-local Tuesday, ported here when the boot
+    // config moved out of game.ts (the 3685 base sync).
+    weeklyRaidResetMs: (nowMs) => nextWeeklyRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     perfLap,
     vaultConsumptionAdmission,
     // Boot-time construction input: the optional STORAGE_PRICES env override

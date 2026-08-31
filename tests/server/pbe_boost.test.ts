@@ -33,9 +33,12 @@ import {
   NYTHRAXIS_ATTUNEMENT_QUESTS,
   pbeBoostEnabled,
   randomBoostName,
+  roleItemScore,
 } from '../../server/pbe_boost';
 import { bagCapacity, bagSlotsOf, stackSizeOf } from '../../src/sim/bags';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../../src/sim/content/ignivar_drops';
+import { ITEM_SETS } from '../../src/sim/content/item_sets';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
 import { bestKitBag } from '../../src/sim/dev_kit';
@@ -168,6 +171,30 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
     expect(heroicPicks, 'no heroic-pool item in any kit').toBeGreaterThan(0);
   });
 
+  it('the launched Varkhul legendaries join the kits; the placeholder set is empty', () => {
+    // The launch wiring made both legendaries real drops, so the old
+    // exclusion premise inverts: the emberward now legitimately argmaxes
+    // into the tank offhand it was once excluded from, and the empty
+    // placeholder set stays pinned so a future handover item must stage
+    // through it deliberately (eligibleForBoost keeps reading it).
+    expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
+    const prot = CLASS_ROLES.warrior.find((role) => role.tank);
+    expect(prot).toBeDefined();
+    const protKit = bisKitForRole('warrior', prot as BoostRole);
+    expect(protKit.offhand).toBe('varkhul_emberward');
+    // The forgebreaker stays out of the melee kits on score alone: the
+    // ilvl-35 Crucible two-handers out-budget the ilvl-33 legendary
+    // (the retired maul premise), proven live rather than assumed.
+    const ret = CLASS_ROLES.paladin.find((role) => role.melee && !role.tank);
+    expect(ret).toBeDefined();
+    const retKit = bisKitForRole('paladin', ret as BoostRole);
+    expect(retKit.mainhand).toBeTruthy();
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeGreaterThan(0);
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeLessThanOrEqual(
+      roleItemScore(ret as BoostRole, ITEMS[retKit.mainhand as string]),
+    );
+  });
+
   it('no role kit of any class contains a WARFARE piece', () => {
     for (const cls of BOOST_CLASSES) {
       for (const role of CLASS_ROLES[cls]) {
@@ -190,6 +217,10 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
           i.priceHonor === undefined &&
           canEquipItem(cls, i) &&
           (!i.requiredClass || i.requiredClass.includes(cls)) &&
+          // Mirrors eligibleForBoost's Phase A rule: a set piece whose set id
+          // is unregistered in ITEM_SETS has no bonuses yet and never counts
+          // as BiS (self-heals when the Crucible sets register).
+          (i.set === undefined || ITEM_SETS[i.set] !== undefined) &&
           meetsLevelRequirement(BOOST_LEVEL, i),
       );
       const best = Math.max(...candidates.map((i) => classItemScore(cls, i)));

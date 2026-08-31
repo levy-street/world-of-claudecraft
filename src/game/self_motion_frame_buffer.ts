@@ -1,4 +1,5 @@
 import type { MoveInput } from '../sim/types';
+import type { RiftFloorView } from '../world_api/dungeons';
 
 export interface BufferedSelfMotionFrame {
   enabled: boolean;
@@ -10,6 +11,7 @@ export interface BufferedSelfMotionFrame {
   frameDt: number;
   snapAgeMs: number;
   snapIntervalMs: number;
+  riftFloor: RiftFloorView | null;
 }
 
 export class SelfMotionFrameBuffer {
@@ -25,6 +27,7 @@ export class SelfMotionFrameBuffer {
     frameDt: number,
     snapAgeMs: number,
     snapIntervalMs: number,
+    riftFloor: RiftFloorView | null,
   ): BufferedSelfMotionFrame {
     if (this.frame === null) {
       this.frame = {
@@ -37,6 +40,7 @@ export class SelfMotionFrameBuffer {
         frameDt,
         snapAgeMs,
         snapIntervalMs,
+        riftFloor,
       };
     } else {
       this.frame.enabled = enabled;
@@ -48,6 +52,7 @@ export class SelfMotionFrameBuffer {
       this.frame.frameDt = frameDt;
       this.frame.snapAgeMs = snapAgeMs;
       this.frame.snapIntervalMs = snapIntervalMs;
+      this.frame.riftFloor = riftFloor;
     }
     return this.frame;
   }

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { advanceClimb, CLIMB_MIN_OVERHEAD, climbDuration, tryStartClimb } from '../src/sim/climb';
+import {
+  advanceClimb,
+  CLIMB_MAX_FALL_SPEED,
+  CLIMB_MIN_OVERHEAD,
+  climbDuration,
+  tryStartClimb,
+} from '../src/sim/climb';
 import {
   campCrateShape,
   DOCK_HUT_ROOF_TOP,
@@ -15,10 +21,10 @@ import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics';
 import { findLedgeGrab, LEDGE_GRAB_MAX, LEDGE_GRAB_MIN } from '../src/sim/physics/ledge';
-import { GRAVITY, JUMP_VELOCITY } from '../src/sim/player_motion';
+import { FALL_SAFE_DISTANCE, GRAVITY, JUMP_VELOCITY } from '../src/sim/player_motion';
 import { graveHeight, graveOffset } from '../src/sim/prop_layout';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import { DT, type Entity, type WorldContent } from '../src/sim/types';
 import { groundHeight, terrainHeight, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 
 // The ledge climb completes the traversal ladder: step over the low, vault the
@@ -602,5 +608,122 @@ describe('the climb onto the town roofs', () => {
     // Walked into the stall and stopped at its rim, never through or onto it.
     expect(p.pos.z).toBeLessThan(sz - 1.6);
     expect(p.pos.y).toBeLessThan(groundHeight(p.pos.x, p.pos.z, SEED) + 0.5);
+  });
+});
+
+describe('a ledge grab never refunds a fall', () => {
+  // The grab zeroes velocity and advanceClimb rebases fallStartY, so a lip
+  // crossed mid-plunge used to swallow every yard of fall behind it. The stall
+  // canopy is the worst case in town: a standable 2.54 top beside open ground.
+  const STALL_DZ = 2.6;
+  const BODY_DX = -2.0; // beside the gable end, clear of its own footprint
+
+  const JUMP_FORWARD = {
+    forward: true,
+    back: false,
+    turnLeft: false,
+    turnRight: false,
+    strafeLeft: false,
+    strafeRight: false,
+    jump: true,
+    dive: false,
+    surface: false,
+  };
+
+  interface Plunge {
+    hpLost: number;
+    grabbed: boolean;
+    landedY: number;
+  }
+
+  // A level 60 warrior, the fixture every Sim-level climb test here drives.
+  function makeWarrior(): Sim {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(60);
+    return sim;
+  }
+
+  function dropBesideStall(dropHeight: number, withStall: boolean): Plunge {
+    const sz = SPOT.z + STALL_DZ;
+    const stall = world({ stalls: [{ x: SPOT.x, z: sz, rot: 0, r: 1.7 }] });
+    setActiveWorldContent(withStall ? stall : world({}));
+    const sim = makeWarrior();
+    const p = sim.player;
+    const bx = SPOT.x + BODY_DX;
+    p.pos.x = bx;
+    p.pos.z = sz;
+    p.pos.y = groundHeight(bx, sz, SEED) + dropHeight;
+    p.prevPos = { ...p.pos };
+    p.facing = Math.PI / 2;
+    p.onGround = false;
+    p.jumping = false;
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+    p.climb = null;
+    p.fallStartY = p.pos.y;
+    const hp0 = p.hp;
+    let grabbed = false;
+    for (let i = 0; i < 200 && !p.onGround; i++) {
+      sim.tick();
+      if (p.climb) grabbed = true;
+    }
+    return { hpLost: hp0 - p.hp, grabbed, landedY: p.pos.y };
+  }
+
+  it('refuses a grab at a fall speed that would already deal damage', () => {
+    const drop = 20; // well past FALL_SAFE_DISTANCE
+    const bare = dropBesideStall(drop, false);
+    expect(bare.grabbed).toBe(false);
+    expect(bare.hpLost).toBeGreaterThan(0);
+    const beside = dropBesideStall(drop, true);
+    expect(beside.hpLost).toBe(bare.hpLost);
+    expect(beside.grabbed).toBe(false);
+    expect(beside.landedY).toBeCloseTo(bare.landedY, 6);
+  });
+
+  it('still catches a fall that is short enough to be harmless', () => {
+    const drop = 6; // half the safe distance: the grab is still free
+    const caught = dropBesideStall(drop, true);
+    expect(caught.grabbed).toBe(true);
+    expect(caught.hpLost).toBe(0);
+  });
+
+  it('caps the grab at exactly FALL_SAFE_DISTANCE of free fall', () => {
+    // Replay the sim's own vertical step. The cap has to land on the yard the
+    // damage starts at: lower and a harmless fall loses its grab, higher and a
+    // damaging one keeps buying a refund.
+    let vy = 0;
+    let fallen = 0;
+    for (let i = 0; i < 500 && -vy < CLIMB_MAX_FALL_SPEED - 1e-9; i++) {
+      vy -= GRAVITY * DT;
+      fallen -= vy * DT;
+    }
+    expect(-vy).toBeCloseTo(CLIMB_MAX_FALL_SPEED, 6);
+    expect(fallen).toBeCloseTo(FALL_SAFE_DISTANCE, 6);
+  });
+
+  it('leaves a ground jump at the same canopy climbing as before', () => {
+    const sz = SPOT.z + STALL_DZ;
+    setActiveWorldContent(world({ stalls: [{ x: SPOT.x, z: sz, rot: 0, r: 1.7 }] }));
+    const sim = makeWarrior();
+    const p = sim.player;
+    const meta = sim.players.get(p.id);
+    if (!meta) throw new Error('missing meta');
+    p.pos.x = SPOT.x - 1.55 - 1.4;
+    p.pos.z = sz;
+    p.pos.y = terrainHeight(p.pos.x, p.pos.z, SEED);
+    p.prevPos = { ...p.pos };
+    p.fallStartY = p.pos.y;
+    p.facing = Math.PI / 2;
+    p.onGround = true;
+    let climbed = false;
+    for (let i = 0; i < 120 && !climbed; i++) {
+      Object.assign(meta.moveInput, JUMP_FORWARD);
+      sim.tick();
+      if (p.climb) climbed = true;
+    }
+    expect(climbed).toBe(true);
+    expect(p.hp).toBe(p.maxHp);
   });
 });

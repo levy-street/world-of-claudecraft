@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
@@ -24,6 +24,24 @@ const readSource = (path: string): string =>
 const NYTHRAXIS_ALDRIC = 'brother_aldric_raid';
 
 describe('interior encounter prewarm spec', () => {
+  it('warms every Varkhul and Ignivar encounter material before entering the Inner Crucible', () => {
+    const spec = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
+    expect(spec).toEqual({
+      soulRendPlayerClasses: false,
+      soulRendVfxWeaponSkins: false,
+      soulRendLivePlayerVisuals: false,
+      varkhulVisuals: true,
+      ignivarVisuals: true,
+    });
+    expect(encounterPrewarmForInterior('ignivar_depths')).toEqual(spec);
+    expect(
+      planInteriorEncounterPrewarm(spec, {
+        playerClasses: ALL_CLASSES,
+        weaponSkinIds: ['ice_fang_sword'],
+      }),
+    ).toEqual({ playerClasses: [], weaponSkinIds: [] });
+  });
+
   it('warms Soul Rend overlays at arena entry, not boot, and warms no encounter NPC', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
     expect(spec).toBeDefined();
@@ -310,7 +328,7 @@ describe('live Soul Rend player-visual prewarm', () => {
     // the renderer only REPORTS every change, including leaving one.
     expect(renderer).not.toContain('activeInterior: string | null = null');
     expect(renderer).toContain(
-      'encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null)',
+      'encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null)',
     );
     const createStart = renderer.indexOf('private createView(');
     const createEnd = renderer.indexOf('\n  // Shared core for every compile gate', createStart);

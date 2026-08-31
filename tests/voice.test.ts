@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { VOICE_FULL_DIST, VOICE_SILENT_DIST, voiceDistanceGain } from '../src/game/voice';
+import { yellKey } from '../scripts/voices/extra_lines.mjs';
+import {
+  GameVoice,
+  IGNIVAR_ROOM_WELCOME_VOICE_KEY,
+  VOICE_FULL_DIST,
+  VOICE_SILENT_DIST,
+  voice,
+  voiceDistanceGain,
+} from '../src/game/voice';
+import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
 
 describe('voiceDistanceGain', () => {
   it('plays at full volume at or within the full distance', () => {
@@ -38,5 +47,76 @@ describe('voiceDistanceGain', () => {
     expect(voiceDistanceGain(10, 10, 20)).toBe(1);
     expect(voiceDistanceGain(20, 10, 20)).toBe(0);
     expect(voiceDistanceGain(15, 10, 20)).toBeCloseTo(0.5, 5);
+  });
+});
+
+describe('voice preference', () => {
+  it('exposes whether semantic voice-over can sound to the SFX routing layer', () => {
+    voice.setEnabled(false);
+    expect(voice.isAudible()).toBe(false);
+    voice.setEnabled(true);
+    voice.setVolume(0);
+    expect(voice.isAudible()).toBe(false);
+    voice.setVolume(0.9);
+    expect(voice.isAudible()).toBe(true);
+  });
+
+  it('finishes Ignivar room entry before playing the latest encounter line', () => {
+    class FakeAudio {
+      currentTime = 0;
+      ended = false;
+      onended: (() => void) | null = null;
+      paused = true;
+      src = '';
+      volume = 1;
+
+      pause(): void {
+        this.paused = true;
+      }
+
+      play(): Promise<void> {
+        this.ended = false;
+        this.paused = false;
+        return Promise.resolve();
+      }
+
+      finish(): void {
+        this.ended = true;
+        this.paused = true;
+        this.onended?.();
+      }
+    }
+
+    const previousAudio = globalThis.Audio;
+    const audioInstances: FakeAudio[] = [];
+    Object.defineProperty(globalThis, 'Audio', {
+      configurable: true,
+      value: class extends FakeAudio {
+        constructor() {
+          super();
+          audioInstances.push(this);
+        }
+      },
+    });
+
+    try {
+      const director = new GameVoice();
+      const engageKey = yellKey(IGNIVAR_DIALOGUE.engage);
+      expect(IGNIVAR_ROOM_WELCOME_VOICE_KEY).toBe(yellKey(IGNIVAR_DIALOGUE.roomEntry));
+
+      director.play(IGNIVAR_ROOM_WELCOME_VOICE_KEY);
+      director.play(engageKey);
+      const audio = audioInstances[0];
+      expect(audio.src).toContain(`/${IGNIVAR_ROOM_WELCOME_VOICE_KEY}.mp3`);
+
+      audio.finish();
+      expect(audio.src).toContain(`/${engageKey}.mp3`);
+      director.stop();
+    } finally {
+      Object.defineProperty(globalThis, 'Audio', {
+        configurable: true,
+        value: previousAudio,
+      });
+    }
   });
 });

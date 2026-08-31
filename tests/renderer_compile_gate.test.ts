@@ -10,6 +10,7 @@ interface CompileGateHarness {
   gateViewOnCompile(
     view: EntityView,
     group: THREE.Group,
+    visibilityTarget?: THREE.Object3D,
     requiredForEntry?: boolean,
   ): Promise<void> | null;
   gateSwapOnCompile(target: THREE.Object3D): void;
@@ -83,6 +84,33 @@ describe('Renderer live shader compile rejection recovery', () => {
 
     expect(view.compilePending).toBe(false);
     expect(group.visible).toBe(false);
+  });
+
+  it('keeps an actionable encounter anchor visible while only its rig compiles', async () => {
+    const renderer = harness();
+    let release!: () => void;
+    renderer.compileGate = () => new Promise<void>((resolve) => (release = resolve));
+    const group = new THREE.Group();
+    const rig = new THREE.Group();
+    const telegraph = new THREE.Group();
+    group.add(rig, telegraph);
+    const view = { compilePending: false, visualCompilePending: false } as EntityView;
+
+    const ready = renderer.gateViewOnCompile(view, group, rig);
+
+    expect(view.compilePending).toBe(true);
+    expect(view.visualCompilePending).toBe(true);
+    expect(group.visible).toBe(true);
+    expect(rig.visible).toBe(false);
+    expect(telegraph.visible).toBe(true);
+
+    release();
+    await ready;
+
+    expect(view.compilePending).toBe(false);
+    expect(view.visualCompilePending).toBe(false);
+    expect(group.visible).toBe(true);
+    expect(rig.visible).toBe(true);
   });
 
   it('reveals a live material-swap target after successful compilation', async () => {

@@ -55,8 +55,14 @@ function paint(view: XpBarView): Call[] {
 }
 
 describe('XpBarPainter: routes every write through the elided writers', () => {
-  it('drives fill width, --xp-fill on BOTH bar and player frame, rested geometry, label, classes', () => {
-    const calls = paint({ fillFrac: 0.5, restedFrac: 0.1, label: 'XP 1 / 2', postCap: false });
+  it('drives fill width, --xp-fill on BOTH bar and player frame, rested geometry, label, percent, classes', () => {
+    const calls = paint({
+      fillFrac: 0.5,
+      restedFrac: 0.1,
+      label: 'XP 1 / 2',
+      percentText: '50%',
+      postCap: false,
+    });
     expect(calls).toEqual([
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setStyleProp', args: [BAR, '--xp-fill', '0.5000'] },
@@ -64,13 +70,21 @@ describe('XpBarPainter: routes every write through the elided writers', () => {
       { m: 'setStyleProp', args: [RESTED, 'left', '50.0%'] },
       { m: 'setStyleProp', args: [RESTED, 'width', '10.0%'] },
       { m: 'setText', args: [LABEL, 'XP 1 / 2'] },
+      { m: 'setAttr', args: [BAR, 'data-percent', '50%'] },
+      { m: 'setAttr', args: [PF, 'data-percent', '50%'] },
       { m: 'toggleClass', args: [BAR, 'overflow', false] },
       { m: 'toggleClass', args: [BAR, 'rested', true] },
     ]);
   });
 
   it('post-cap overflow with no rested: overflow class on, rested class off, width 0.0%', () => {
-    const calls = paint({ fillFrac: 1, restedFrac: 0, label: 'Lv 20 (+7)', postCap: true });
+    const calls = paint({
+      fillFrac: 1,
+      restedFrac: 0,
+      label: 'Lv 20 (+7)',
+      percentText: '100%',
+      postCap: true,
+    });
     expect(calls).toEqual([
       { m: 'setWidth', args: [FILL, '100.0%'] },
       { m: 'setStyleProp', args: [BAR, '--xp-fill', '1.0000'] },
@@ -78,6 +92,8 @@ describe('XpBarPainter: routes every write through the elided writers', () => {
       { m: 'setStyleProp', args: [RESTED, 'left', '100.0%'] },
       { m: 'setStyleProp', args: [RESTED, 'width', '0.0%'] },
       { m: 'setText', args: [LABEL, 'Lv 20 (+7)'] },
+      { m: 'setAttr', args: [BAR, 'data-percent', '100%'] },
+      { m: 'setAttr', args: [PF, 'data-percent', '100%'] },
       { m: 'toggleClass', args: [BAR, 'overflow', true] },
       { m: 'toggleClass', args: [BAR, 'rested', false] },
     ]);

@@ -72,13 +72,13 @@ describe('reliquary_i18n English resolution', () => {
     // later contributes only its name row instead of an empty-string row.
     // This count is the FILL TRIPWIRE: adding a catalog page must be accompanied
     // by a name row in every shipped locale chunk (the per-locale row count is
-    // pinned to the same 35 below), so a new page cannot quietly render English
-    // to a CJK or Cyrillic reader.
-    expect(pageCount).toBe(35);
-    expect(descCount).toBe(35);
+    // pinned to the same 39 below), so a new page cannot quietly render English
+    // to a CJK or Cyrillic reader. 35 + the four Crucible raid pages.
+    expect(pageCount).toBe(39);
+    expect(descCount).toBe(39);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(35);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(35);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(39);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(39);
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
       field: 'name',
@@ -168,7 +168,7 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     for (const lang of tableLocales()) {
       // Vacuity floor: an emptied chunk would satisfy every for-loop in this
       // suite silently. One row per catalog page, in every shipped locale.
-      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(35);
+      expect(Object.keys(tables[lang]).length, `${lang} row count`).toBe(39);
       for (const [id, entry] of Object.entries(tables[lang])) {
         expect(RELIQUARY_PAGES_BY_ID[id], `${lang}.${id} is not a catalog page`).toBeDefined();
         for (const field of ['name', 'desc'] as const) {
@@ -277,8 +277,20 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     // tripwires. A drift here means the museum page and the content it
     // collects disagree inside the same client. The two Nythraxis raid pages
     // deliberately trim the arena noun off the entity name (state.md Phase 11
-    // anchors); the spot-check test pins both literally for ru_RU.
-    const NYTHRAXIS_DEVIATION = new Set(['conquerors_nythraxis', 'conquerors_nythraxis_heroic']);
+    // anchors); the spot-check test pins both literally for ru_RU. The four
+    // Crucible raid pages join the deviation for the heroic-anchor half of
+    // the sweep only in shape: their deed ids are dgn_ignivar / dgn_varkhul
+    // (the dgn_nythraxis shape), not dgn_<dungeonId>, so the derived heroic
+    // deed anchor cannot name them; their locale names still reuse the
+    // shipped dungeon entity strings verbatim (the chunk header rule).
+    const NYTHRAXIS_DEVIATION = new Set([
+      'conquerors_nythraxis',
+      'conquerors_nythraxis_heroic',
+      'conquerors_ignivar',
+      'conquerors_ignivar_heroic',
+      'conquerors_varkhul',
+      'conquerors_varkhul_heroic',
+    ]);
     const swept: string[] = [];
     for (const lang of tableLocales()) {
       const bundle = BUNDLES[lang as keyof typeof BUNDLES] as unknown as {

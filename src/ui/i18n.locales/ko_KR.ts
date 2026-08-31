@@ -219,7 +219,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': '8미터 안의 적 최대 5명을 4초 동안 공포에 질려 달아나게 하는 무시무시한 외침. 피해를 입으면 효과가 풀릴 수 있습니다.',
   'entities.abilities.intimidating_shout.name': '위협의 외침',
   'entities.abilities.iron_resolve.description':
-    '이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 4의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)',
+    '이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)',
   'entities.abilities.iron_resolve.name': '강철 의지',
   'entities.abilities.measured_fury.description':
     '절제된 분노가 자원 운용을 다듬어 기술의 분노 소모가 10% 감소합니다. (무기 특성)',
@@ -572,6 +572,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.outage': '구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
   'hudChrome.wocStore.charter.outageStale': '상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
   'hudChrome.wocStore.charter.failed': '구매를 완료하지 못했습니다.',
+  'hudChrome.wocStore.charter.resultContext': '{item} ({sku}): {message}',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': '하급 금고 특허장',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': '상급 금고 특허장',
   'hudChrome.wocStore.charter.names.strongbox_charter_3': '대금고 특허장',
@@ -749,6 +750,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.',
   'hudChrome.loot.unifiedPressHint':
     '상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.',
+  'hudChrome.loot.bindConfirmTitle': '획득 시 귀속',
+  'hudChrome.loot.bindConfirmBody':
+    '이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -807,6 +811,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.combineActionBars': '액션 바 합치기',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': '액션 바',
   'hudChrome.interfaceUnlock.frameNames.swingBar': '자동 공격',
+  'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
+  'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
+  'hudChrome.interfaceUnlock.frameNames.xpBar': '경험치 바',
   'hudChrome.interfaceUnlock.framesMenu': '프레임 설정',
   'hudChrome.interfaceUnlock.showHideFrames': '프레임 표시 및 숨기기',
   'hudChrome.interfaceUnlock.buffsLeftToRight': '버프 왼쪽에서 오른쪽으로',
@@ -817,12 +824,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar2Vertical': '액션 바 2 세로 배치',
   'hudChrome.interfaceUnlock.actionBar3Vertical': '액션 바 3 세로 배치',
   'hudChrome.interfaceUnlock.menuRailHorizontal': '메뉴 가로 배치',
+  'hudChrome.interfaceUnlock.snapToGrid': '격자에 맞추기',
   'hudChrome.interfaceUnlock.resetFrameSize': '크기 초기화',
   'hudChrome.interfaceUnlock.resetFrameSizeFor': '{name} 크기 초기화',
   'hudChrome.partyFrames.optionsSection': '파티 프레임 옵션',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.',
   'hudChrome.interfaceUnlock.previewSpell': '예시 주문',
+  'hudChrome.interfaceUnlock.previewMemberName': '{className} {number}',
   'hudChrome.transfer.frameLayout': '프레임 배치',
   'hudChrome.transfer.allSettings': '모든 설정',
   'hudChrome.transfer.exportAction': '내보내기',
@@ -842,6 +851,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
   'hudChrome.options.aurasOnPlayerFrame': '버프를 플레이어 프레임에 표시',
+  'hudChrome.options.alwaysShowAllBuffs': '모든 버프를 항상 표시',
   'hud.core.mapCanvasLabel': '지도',
   'hud.core.mapSummary': '{zone}의 지도.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -895,6 +905,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': '균열 입구: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': '적대 대상',
   'hud.core.mapMarkerLabels.aggressiveEnemy': '당신을 공격 중인 적',
+  'hud.core.mapMarkerLabels.bossEnemy': '우두머리: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': '당신을 공격 중인 우두머리: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': '전리품을 획득할 수 있는 적',
   'hud.core.mapMarkerLabels.corpse': '자신의 시체',
   'hud.core.mapMarkerLabels.deathZone': '위험 지역',
@@ -950,6 +962,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': '분',
   'hudChrome.unitFrame.durationUnitHours': '시',
   'hudChrome.unitFrame.durationUnitDays': '일',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': '내 파티',
   'hudChrome.unitFrame.partyChip': '파티',
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
@@ -1303,6 +1316,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.hidePlaytimeAria': '플레이 시간 숨기기',
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.statInfo.names.healPower': '치유력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
   'hudChrome.statInfo.names.parry': '무기 막기',
@@ -1534,6 +1548,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '고대비 배경',
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showReliquaryTracker': '성물고 추적기 표시',
+  'hudChrome.options.confirmVendorSell': '판매 전 확인',
+  'hudChrome.options.confirmVendorSellNote':
+    '이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
@@ -1794,6 +1811,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': '연결 해제',
   'wallet.unlinkTitle': '이 계정에서 지갑 인증 제거',
   'wallet.unlinkAria': '이 계정에서 지갑 인증 제거',
+  'wallet.reauthTitle': '지갑 변경 확인',
+  'wallet.reauthUnlinkTitle': '지갑 제거 확인',
+  'wallet.reauthHelp': '보안을 위해 이 변경을 승인하려면 계정 비밀번호를 입력하세요.',
+  'wallet.reauthNoPassword': '이 계정은 비밀번호 없이 로그인합니다. 먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.',
+  'wallet.reauthConfirm': '확인',
+  'wallet.reauthCancel': '취소',
+  'wallet.reauthClose': '닫기',
   'wallet.signOut': '연결 끊기',
   'wallet.signOutTitle': '이 브라우저에서 지갑 앱 연결 끊기',
   'wallet.signOutAria': '이 브라우저에서 지갑 앱 연결 끊기',
@@ -2867,6 +2891,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영웅의 징표 {marks}개로 {item}을(를) 구매하시겠습니까? 징표 구매는 환불되지 않습니다.',
   'heroicShop.buyConfirmAccept': '구매',
   'heroicShop.buyConfirmCancel': '취소',
+  'crucibleShop.browse': '인장 교환',
+  'crucibleShop.browseAria': '{name}에게 도가니 인장 교환',
+  'crucibleShop.empty': '내 직업으로 교환할 수 있는 세트 부위가 없습니다.',
+  'crucibleShop.balance': '보유한 인장: {list}',
+  'crucibleShop.noSigils': '도가니 인장을 갖고 있지 않습니다.',
+  'crucibleShop.price': '{sigil} 1개',
+  'crucibleShop.buyAria': '{sigil}(으)로 {item} 교환',
+  'crucibleShop.buyConfirmTitle': '교환 확인',
+  'crucibleShop.buyConfirmBody': '{sigil}(을)를 {item}(으)로 교환하시겠습니까? 소모된 인장은 환불되지 않습니다.',
+  'crucibleShop.buyConfirmAccept': '교환',
+  'crucibleShop.buyConfirmCancel': '취소',
   'itemUi.quality.poor': '하급',
   'itemUi.quality.common': '일반',
   'itemUi.quality.uncommon': '고급',
@@ -3099,6 +3134,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': '{item} 포기',
   'itemUi.lootRoll.everyonePassed': '모두 {item}을(를) 포기했습니다.',
   'itemUi.lootRoll.rolled': '{answered}/{total} 굴림 완료',
+  'itemUi.lootRoll.bindsOnPickup': '획득 시 귀속',
   'entities.abilities.heroic_strike.name': '약탈자의 일격',
   'entities.abilities.heroic_strike.description':
     '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
@@ -3551,7 +3587,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
   'entities.abilities.conflagrate.name': '점화',
-  'entities.abilities.conflagrate.description': '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 2회 담아 둡니다. (파괴 상징 기술)',
+  'entities.abilities.conflagrate.description': '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)',
   'entities.abilities.moonkin_form.name': '달빛야수 변신',
   'entities.abilities.moonkin_form.description':
     '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
@@ -4990,6 +5026,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '니트락시스 공격대 투기장',
   'entities.dungeons.nythraxis_boss_arena.enterText': '봉인된 왕실 문을 지나갑니다.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': '이그니바르, 마지막 불꽃의 전령',
+  'entities.mobs.ignivar_heart_of_the_end.name': '이그니바르 애쉬콜러',
+  'entities.mobs.derelict_mech.name': '버려진 기계병',
+  'entities.dungeons.ignivar_raid_arena.name': '마지막 샘의 도가니',
+  'entities.dungeons.ignivar_raid_arena.enterText': '도가니의 봉인된 물 위로 열기가 아른거립니다.',
+  'entities.dungeons.ignivar_raid_arena.leaveText': '도가니를 벗어나 다시 편히 숨을 쉽니다.',
   'entities.quests.q_nythraxis_restless_dead.title': '뼈 들판의 소요',
   'entities.quests.q_nythraxis_restless_dead.text':
     '쏜피크 고지에 변화가 생겼습니다, {playerName}. 죽은 자들이 더는 정처 없이 떠돌지 않습니다. 그들은 하이워치 너머 북쪽 뼈 들판, 옛 전장과 절벽길이 만나는 곳에서 모여 행군합니다. 그곳으로 가서 뼈갑옷 망령들의 소요를 조사하고, 무엇이 그들을 움직이는지 보여 줄 증거를 가져오십시오.',
@@ -5970,6 +6012,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.many': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.other': '{count}초 남음',
+  'hudChrome.plurals.buffsHidden.one': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.few': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.many': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.other': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
   'hudChrome.plurals.playtimeDays.one': '{count}일',
   'hudChrome.plurals.playtimeDays.few': '{count}일',
   'hudChrome.plurals.playtimeDays.many': '{count}일',
@@ -6046,6 +6092,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': '전설',
   'entities.items.deathless_heartwood.name': '죽지 않는 왕관의 심재',
   'entities.items.kingsbane_last_oath.name': '왕좌살해자, 손피크의 마지막 맹세',
+  'entities.items.varkhul_forgebreaker.name': '화로파괴자, 바르쿨의 기관',
+  'entities.items.varkhul_emberward.name': '잉걸수호자, 바르쿨의 방벽',
   'entities.items.crownforged_dreadhelm.name': '뼈벼림 공포투구',
   'entities.items.crownforged_warspaulders.name': '뼈벼림 전쟁 어깨갑옷',
   'entities.items.nighttalon_crown.name': '흉포송곳니 왕관',
@@ -7696,6 +7744,259 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '사슬',
   'hudChrome.auraEffect.dot': '{interval}초마다 {value}의 {school} 피해를 입힙니다',
   'hudChrome.auraEffect.hot': '{interval}초마다 생명력을 {value} 회복합니다',
+  'hudChrome.auraEffect.sharedPyre':
+    '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    '활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    '도가니 광선을 막으면 매초 최대 생명력 기반 피해가 증가합니다. 광선을 벗어난 뒤 일반에서는 10초, 영웅에서는 60초 후 중첩이 초기화됩니다.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    '왼쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    '오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    '용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!',
+  'hudChrome.varkhulCallout.artificerApproaches': '잿불 기계공이 용광로로 다가옵니다!',
+  'hudChrome.varkhulCallout.leftPillar': '왼쪽 용광로 기둥이 점화됩니다!',
+  'hudChrome.varkhulCallout.rightPillar': '오른쪽 용광로 기둥이 점화됩니다!',
+  'hudChrome.varkhulCallout.bothPillars': '용광로 기둥들이 점화됩니다!',
+  'hudChrome.varkhulCallout.portalsOpening': '용광로 차원문이 열리고 있습니다!',
+  'hudChrome.varkhulCallout.heat75': '용광로 열기가 75%에 도달했습니다!',
+  'hudChrome.varkhulCallout.heat90': '용광로 용융이 임박했습니다!',
+  'hudChrome.varkhulCallout.addsDefeated': '용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!',
+  'hudChrome.varkhulCallout.worldfireClosing': '세계불꽃이 다가옵니다. 중앙으로 이동하세요!',
+  'hudChrome.varkhulCallout.worldfireConsumed': '도가니 전체가 불타고 있습니다!',
+  'hudChrome.varkhulWaveStatus': '공세 {wave}/{waves} | 적: {remaining}',
+  'hudChrome.raidBossGuide.title': '우두머리 공략',
+  'hudChrome.raidBossGuide.button': '공략: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
+  'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
+  'hudChrome.raidBossGuide.bossesLabel': '공격대 우두머리',
+  'hudChrome.raidBossGuide.difficultyLabel': '난이도',
+  'hudChrome.raidBossGuide.normal': '일반',
+  'hudChrome.raidBossGuide.heroic': '영웅',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss} 전투 초상화',
+  'hudChrome.raidBossGuide.overviewHeading': '개요',
+  'hudChrome.raidBossGuide.abilitiesHeading': '능력',
+  'hudChrome.raidBossGuide.whatToDo': '대처 방법',
+  'hudChrome.raidBossGuide.whatToDoResponse': '대처 방법: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': '역할별 책임',
+  'hudChrome.raidBossGuide.flagsLabel': '메커니즘 경고',
+  'hudChrome.raidBossGuide.roleTank': '방어 담당',
+  'hudChrome.raidBossGuide.roleHealer': '치유 담당',
+  'hudChrome.raidBossGuide.roleDamage': '공격 담당',
+  'hudChrome.raidBossGuide.roleAll': '모든 역할',
+  'hudChrome.raidBossGuide.flagDeadly': '치명적',
+  'hudChrome.raidBossGuide.flagInterruptible': '차단 가능',
+  'hudChrome.raidBossGuide.flagImportant': '중요',
+  'hudChrome.raidBossGuide.flagCleansable': '해제 가능',
+  'hudChrome.raidBossGuide.browseBoss': '{boss} 보기',
+  'hudChrome.raidBossGuide.chooseDifficulty': '{difficulty} 메커니즘 보기',
+  'hudChrome.raidBossGuide.expandAbility': '{ability} 펼치기',
+  'hudChrome.raidBossGuide.collapseAbility': '{ability} 접기',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    '바르쿨은 이그니바르를 전령이자 살아 있는 봉인, 내부 도가니로 향하는 열쇠로 벼려냈습니다. 이 전투는 수로 제어, 정확한 이동, 우선 대상에 대한 빠른 집중 공격을 시험합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '전령의 각성',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '수로로 장작더미의 징표를 처리하면서 이그니바르의 반복되는 전방 공격, 하늘불꽃, 회전 광선, 확장되는 대장간 파도에 대응합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '사잇단계: 대재앙',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '생명력이{health}가 되면 이그니바르가 전투를 끝내려는 잿불소환사를 불러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우고 세 피난처 중 하나의 안전 지대를 드러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우며, 활성 징표는 피난처 안에서도 주변 플레이어를 계속 위협합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '마지막 단계: 마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '생명력이{health}가 되면 이그니바르가 엄격한 제한 시간이 있는 마지막 공격 단계에 들어가며 반복 메커니즘도 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '대장간 일격',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    '이그니바르가 현재 방어 담당을 공격하고 용융 갑옷을 부여하여 자신에게 받는 피해를 증가시킵니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 일격과 새 방어 담당이 받는 첫 근접 공격에 대비합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandName': '장작더미의 징표',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    '이그니바르가 방어 담당이 아닌 플레이어에게 지속 화염 피해를 주는 징표를 남깁니다. 대상자는 주변 아군도 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 징표 대상자가 한 명씩 활성화된 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '산개합니다. 불타는 급류로 수로를 열고 징표 대상자를 한 명씩 해제합니다. 해제할 때마다 공격대 전체에 정화의 반동이 발생합니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '불타는 급류',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 거의 치명적인 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '경고 범위가 준비된 수로 하나만 지나가게 유도합니다. 나머지는 시전이 끝나기 전에 전방 범위를 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.rainName': '잿불비',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 극심한 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '표시되지 않은 틈으로 이동하고 충돌 전에 모든 운석 원을 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.raysName': '회전하는 지옥불',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿은 플레이어에게 반복 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿을 때마다 반복해서 큰 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '광선 사이의 빈 공간을 따라 이동합니다. 빠른 이동 능력을 사용하더라도 광선을 가로지르지 않습니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '대장간 파도',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 훨씬 멀리 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '예고 중 어느 한 틈을 찾아 정렬하고 투기장 가장자리 쪽으로 밀려나지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '대재앙',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    '이그니바르가 잿불소환사를 불러냅니다. 추가 적이 대재앙 시전을 끝내면 공격대가 즉시 패배합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '모든 공격 담당이 이그니바르 잿불소환사로 전환하고 시전이 끝나기 전에 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    '이그니바르가 세 피난처를 표시하고 하나의 안전 지대를 확인한 뒤 투기장의 나머지 부분을 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '투기장이 불타는 동안 이그니바르가 하나의 안전 지대를 표시합니다. 장작더미의 징표는 남아 주변 아군에게 계속 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '경고 중 독특하게 표시된 피난처를 찾아 바닥이 타오르기 전에 경계 안으로 완전히 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '대장간의 사슬',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    '이그니바르가 가까운 플레이어를 둘씩 연결합니다. 너무 멀어지거나 다른 짝의 사슬을 가로지르면 치명적인 피해를 받습니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    '연결된 짝과 가까이 붙어 함께 움직이고 다른 플레이어가 사슬을 통과하지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    '이그니바르가 격노하여 전멸 공격을 준비하는 동안 잿불비, 불타는 급류, 회전하는 지옥불이 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '남은 공격 및 치유 재사용 대기시간을 사용하고 이동 메커니즘을 계속 수행하여 시간 안에 이그니바르를 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '대재앙: 시전이 끝나기 전에 이그니바르 애쉬콜러를 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '대장간의 심판: 경고 중 다른 피난처를 찾아내고 바닥이 타오르면 표시된 경계 안에 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    '바르쿨은 죽어 가는 마지막 샘을 가두어 살아 있는 금속을 벼린 뒤 그 죄를 지키도록 이그니바르를 만들었습니다. 이 전투는 개인 위치 선정과 공격대 전체의 거대 대장간 제어를 결합합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '대장간의 아버지',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    '바르쿨은 방어 담당 압박, 넓은 전방 공격, 이동 투사체, 단체 피해 분담, 운석 공세, 거대 모루의 공격을 반복합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '사잇단계: 거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '생명력이{health}가 되면 바르쿨이 보호받고 대장간 군단이 차원문으로 들어오며 기둥 광선이 대장간 붕괴를 위협합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '마지막 단계: 풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '생명력이{health}가 되면 바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 시간까지 공격대에 반복해서 화염을 내뿜습니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '생명력이{health}가 되면 바르쿨이 이전 메커니즘 대부분을 버리고 세계불꽃이 안쪽으로 좁혀져 도가니를 삼킵니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '제작자의 징표',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    '바르쿨이 현재 방어 담당을 공격하고 자신에게 받는 모든 피해를 증가시키는 중첩 효과를 부여합니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 바르쿨이 대상을 바꾸기 전에 다음 방어 담당을 보호합니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '대장간 아버지의 휩쓸기',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 큰 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 거의 치명적인 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    '바르쿨이 공격대 반대쪽을 보게 하고 경고가 나타나면 즉시 등 뒤로 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '잿불 구슬',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '표시된 비방어 담당이 지속되는 잿불 웅덩이를 남기고 모든 방향으로 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '표시된 비방어 담당이 큰 피해를 주는 지속 잿불 웅덩이를 남기고 모든 방향으로 위험한 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '각 징표를 방 가장자리로 옮겨 웅덩이를 떨어뜨려 놓고 투기장을 가로지르는 구슬을 피합니다. 치유 담당은 치유 흡수를 빠르게 제거합니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '공유 장작더미',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라갑니다. 피해는 원 안에서 나뉘며 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라가며 더 큰 일격을 분담합니다. 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '최소 {players}명이 원 안에 모이고 시전이 해결될 때까지 대상과 함께 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '대장간폭풍',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    '바르쿨이 투기장 전역에 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    '바르쿨이 극심한 피해를 주는 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '새로운 바닥 경고가 나타날 때마다 확인하고 해당 공세가 떨어지기 전에 벗어납니다. 다음 공세를 확인하지 않고 이전 위치로 돌아가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayName': '담금질 광선',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '광선이 표시된 플레이어를 오랫동안 추적합니다. 바르쿨과 대상 사이에 처음 들어간 다른 플레이어가 공격을 가로막고 담금질 상처를 얻습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '생명력이 충분한 플레이어, 보통 보조 방어 담당을 선에 세웁니다. 다른 플레이어는 벗어나고 담금질 상처가 남아 있는 동안 차단자를 교대합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '모루의 칙령',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    '바르쿨이 거대 대장간으로 걸어가{strikes}번 내리쳐 점점 증가하는 공격대 전체 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    '바르쿨이 거대 대장간을{strikes}번 내리쳐 점점 증가하는 공격대 피해를 주며 동시에 표시된 운석이 플레이어에게 떨어집니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '공격대 치유를 위해 모이고 마지막 일격에 방어 재사용 대기시간을 사용합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '표시된 운석을 공격대 밖으로 분산시키고 치유 및 방어 재사용 대기시간으로{strikes}번의 일격을 모두 버팁니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    '바르쿨이 보호받으며 제한 시간 조립을 시작합니다. 대장간이 그의 걸작을 완성하기 전에 공격대가 모든 차원문 공세를 물리쳐야 합니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '광선 제어와 우선 추가 적에 주의를 나눕니다. 조립 시간이 끝나기 전에 대장간 군단 전체를 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.beamName': '도가니 광선',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 광선이 막히거나 비활성이면 열기가 내려갑니다.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 대장간 열기는 절대 내려가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '각 활성 기둥과 대장간 사이에 서고 노출이 위험해지기 전에 차단자를 교대합니다. 열기가 가득 차면 치명적인 대장간 붕괴가 발생합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionName': '대장간 군단',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    '도가니 수호자는 대장간 열기를 높이는 도가니 지진을 시전하고 잿불 기술자는 수리 절차로 바르쿨을 치유합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    '도가니 지진과 수리 절차를 차단하고 위험한 시전자를 먼저 집중 공격한 뒤 남은 추가 적을 처리합니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 전멸까지 공격대를 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 세계불꽃이 이전 메커니즘 대부분을 대신해 마지막 공격을 이룹니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '남은 공격 및 방어 재사용 대기시간을 모두 사용하고 마지막 시간이 끝나기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '세계불꽃',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '영웅 난이도에서는 불길이 투기장 가장자리에서 중앙으로 단계적으로 전진하여 마침내 도가니 전체를 태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '전진하는 불길보다 먼저 안쪽으로 이동하고 줄어드는 안전 공간을 지키며 중앙이 타오르기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    '대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    '모루의 칙령: 바르쿨이 거대 대장간으로 이동해 세 번 내리쳐 공격대 피해를 줍니다. 영웅에서는 표시된 운석도 떨어집니다.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '담금질 광선: 긴 경고가 끝나기 전에 다른 플레이어, 보통 방어 담당이 움직이는 광선을 가로막습니다. 피격자는 담금질 상처를 얻습니다.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '대장간 기둥: 광선이 대장간에 닿기 전에 막고 도가니 노출이 쌓이면 교대합니다. 열기가 가득 차면 대장간이 붕괴합니다.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    '거장의 조립: 두 광선을 막고 모든 차원문 웨이브를 처치하며 도가니 지진을 차단하고 잿불 기술자의 치유를 막습니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    '세계불꽃: 영웅의 마지막 단계에서 불타는 가장자리가 중앙으로 좁혀집니다. 도가니 전체가 타기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다.',
   'hudChrome.auraEffect.absorb': '{value}의 피해를 흡수합니다',
   'hudChrome.auraEffect.healAbsorb': '들어오는 치유를 {value}만큼 흡수합니다',
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',
@@ -7778,44 +8079,147 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.name': '속박석 선봉대',
   'entities.itemSets.boundstone_vanguard.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.crownforged.name': '뼈벼림 전투장비',
-  'entities.itemSets.crownforged.bonus2': '전투력이 40만큼 증가합니다.',
-  'entities.itemSets.crownforged.bonus3':
-    '힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
-  'entities.itemSets.crownforged.bonus4':
-    '무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
+  'entities.itemSets.crownforged.bonus2': '힘이 10, 체력이 10만큼 증가합니다.',
+  'entities.itemSets.crownforged.bonus4': '전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 "무덤의 위력"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
+  'entities.itemSets.crownforged.bonus6': '공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
+  'entities.itemSets.packlord_emberhide.name': '무리군주 잉걸가죽',
+  'entities.itemSets.packlord_emberhide.bonus2': '무리 명령의 재사용 대기시간이 3초로 감소합니다.',
+  'entities.itemSets.packlord_emberhide.bonus4': '무리 명령이 야수 쇄도의 재사용 대기시간을 초기화할 확률이 30%로 증가합니다.',
+  'entities.itemSets.coldsight_trackers.name': '냉정한 시선 추적 장구',
+  'entities.itemSets.coldsight_trackers.bonus2': '정밀 사격이 집중을 5 추가로 회복합니다.',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    '긴 시위의 치명타가 냉정한 집중을 2초 연장합니다. 지속시간마다 최대 6초까지 연장됩니다.',
+  'entities.itemSets.slagsnare.name': '용재올가미 장구',
+  'entities.itemSets.slagsnare.bonus2': '내장 가르기가 집중을 20 생성합니다.',
+  'entities.itemSets.slagsnare.bonus4':
+    '사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다.',
+  'entities.itemSets.cinderfang.name': '잉걸송곳니 장막',
+  'entities.itemSets.cinderfang.bonus2': '맹독 의식이 타격마다 돌려주는 기력이 20으로 증가합니다.',
+  'entities.itemSets.cinderfang.bonus4': '맹독 다트의 재사용 대기시간이 4초로 감소합니다.',
+  'entities.itemSets.smolderstrike.name': '불씨타격 가죽 갑옷',
+  'entities.itemSets.smolderstrike.bonus2': '헤이메이커가 20% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.smolderstrike.bonus4':
+    '소등을 시전할 때마다 폭풍의 칼날의 남은 재사용 대기시간이 6초 감소합니다.',
+  'entities.itemSets.ashveil.name': '잿빛 장막 복장',
+  'entities.itemSets.ashveil.bonus2': '잠복자의 일격이 25% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.ashveil.bonus4':
+    '장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다.',
+  'entities.itemSets.emberscreed.name': '잉걸불 신조 예복',
+  'entities.itemSets.emberscreed.bonus2':
+    '수양의 연결이 신성 피해의 10%를 추가로 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.emberscreed.bonus4':
+    '수호의 성가가 완전히 소모되면 10초 이내의 다음 정화의 성가가 즉시 시전됩니다. 이 효과는 15초에 한 번만 발동합니다.',
+  'entities.itemSets.benison_dawnweave.name': '축복의 새벽직조 예복',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    '치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    '치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다.',
+  'entities.itemSets.vesperash.name': '만과의 잿가루 장막',
+  'entities.itemSets.vesperash.bonus2':
+    '십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.vesperash.bonus4':
+    '십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다.',
+  'entities.itemSets.stormkindled.name': '폭풍점화 예장',
+  'entities.itemSets.stormkindled.bonus2':
+    '화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.stormkindled.bonus4': '대지의 충격의 천둥당 보너스가 30%로 증가합니다.',
+  'entities.itemSets.warspirit_emberscale.name': '전령 잉걸비늘 갑주',
+  'entities.itemSets.warspirit_emberscale.bonus2': '선조의 일격이 전령의 박자를 3단계 진행시킵니다.',
+  'entities.itemSets.warspirit_emberscale.bonus4': '선조의 일격의 피해가 30% 증가합니다.',
+  'entities.itemSets.stonehearth.name': '돌화로 보루',
+  'entities.itemSets.stonehearth.bonus2':
+    '바위결속 상태에서는 폭풍시전 치유의 물결이 마나를 소모하지 않고 치유량이 25% 증가합니다.',
+  'entities.itemSets.stonehearth.bonus4':
+    '바위결속 상태에서 전령의 박자를 완성하면 최대 생명력의 3%만큼 치유됩니다.',
+  'entities.itemSets.springmender.name': '샘치유 비늘갑옷',
+  'entities.itemSets.springmender.bonus2':
+    '해일 부름의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.springmender.bonus4':
+    '물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다.',
+  'entities.itemSets.chronoweave.name': '에테르직조 예복',
+  'entities.itemSets.chronoweave.bonus2':
+    '시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소합니다.',
+  'entities.itemSets.pyroclast.name': '화쇄류 예장',
+  'entities.itemSets.pyroclast.bonus2':
+    '그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.pyroclast.bonus4':
+    '불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 1.5초 감소합니다.',
+  'entities.itemSets.frostquench.name': '서리담금질 직조복',
+  'entities.itemSets.frostquench.bonus2':
+    '서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.frostquench.bonus4':
+    '겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다.',
+  'entities.itemSets.hexthread.name': '주술실 장막',
+  'entities.itemSets.hexthread.bonus2':
+    '운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.hexthread.bonus4': '선고를 내리면 단죄 10을 돌려받습니다.',
+  'entities.itemSets.gravebrand.name': '무덤낙인 예장',
+  'entities.itemSets.gravebrand.bonus2':
+    '수확의 명령의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.gravebrand.bonus4': '수확의 명령의 일제 공격이 25% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.ruincaller.name': '파멸부름 예복',
+  'entities.itemSets.ruincaller.bonus2':
+    '점화가 충전을 3회 담아 둡니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.ruincaller.bonus4': '파멸 화살의 피해가 20% 증가합니다.',
+  'entities.itemSets.moonscorch.name': '달그을림 예복',
+  'entities.itemSets.moonscorch.bonus2':
+    '달씨앗이 달빛 폭풍을 적용 한 번당 두 번까지 연장할 수 있으며, 최대 12초까지 늘어납니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.moonscorch.bonus4': '달의 격동과 해돋움의 피해가 25% 증가합니다.',
+  'entities.itemSets.wildfang_emberhide.name': '야생송곳니 잉걸가죽',
+  'entities.itemSets.wildfang_emberhide.bonus2':
+    '피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.',
+  'entities.itemSets.wildfang_emberhide.bonus4': '피의 수확이 대상에게 새로운 저미기를 남깁니다.',
+  'entities.itemSets.cinderbark.name': '잿불나무껍질 수호구',
+  'entities.itemSets.cinderbark.bonus2': '휩쓰는 발톱이 30% 확률로 오랜 피를 1단계 더 쌓습니다.',
+  'entities.itemSets.cinderbark.bonus4':
+    '골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다.',
+  'entities.itemSets.grovespring.name': '숲샘 예복',
+  'entities.itemSets.grovespring.bonus2':
+    '신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.grovespring.bonus4':
+    '만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다.',
+  'entities.items.lastflame_core.name': '마지막 불꽃의 핵',
+  'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
+  'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
+  'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',
+  'entities.itemSets.emberfury.name': '잉걸불 분노 마구',
+  'entities.itemSets.emberfury.bonus2': '격노의 지속시간이 4초에서 6초로 늘어납니다.',
+  'entities.itemSets.emberfury.bonus4': '사혈이 항상 당신을 격노시키며, 회복량이 최대 생명력의 8%로 증가합니다.',
+  'entities.itemSets.forgewall.name': '벼림벽 아이기스',
+  'entities.itemSets.forgewall.bonus2': '강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.',
+  'entities.itemSets.forgewall.bonus4': '방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.dawnforged.name': '새벽벼림 예복',
+  'entities.itemSets.dawnforged.bonus2': '빛의 봉화가 직접 치유의 55%를 복제합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.dawnforged.bonus4': '광휘의 공명으로 강화된 여명의 포옹이 즉시 시전됩니다.',
+  'entities.itemSets.oathpyre.name': '맹세화염 보루',
+  'entities.itemSets.oathpyre.bonus2': '맹세수호자의 일격이 태양의 응보를 발동시킬 확률이 30%로 증가하고, 공격을 방패로 막으면 40% 확률로 발동합니다.',
+  'entities.itemSets.oathpyre.bonus4': '태양의 응보를 소모하면 최대 생명력의 6%를 흡수하는 보호막을 10초 동안 얻습니다.',
+  'entities.itemSets.zealfire.name': '열화신념 전쟁갑주',
+  'entities.itemSets.zealfire.bonus2': '최후의 칙령과 여명 강하가 서로의 남은 재사용 대기시간을 2초 대신 3초 감소시킵니다.',
+  'entities.itemSets.zealfire.bonus4': '여명의 격노 중에 시전한 분노의 망치가 20% 대신 40% 더 큰 피해를 입힙니다.',
   'entities.itemSets.deathlord.name': '고분군주의 전투장비',
-  'entities.itemSets.deathlord.bonus2': '전투력이 40만큼 증가합니다.',
-  'entities.itemSets.deathlord.bonus3': '힘이 15, 체력이 15만큼 증가합니다.',
-  'entities.itemSets.deathlord.bonus4':
-    '무기 치명타 적중 시 50% 확률로 "무덤의 위력"이 발동하여 전투력이 60만큼 증가합니다. 10초 동안 지속됩니다.',
+  'entities.itemSets.deathlord.bonus2': '힘이 10, 체력이 10만큼 증가합니다.',
+  'entities.itemSets.deathlord.bonus4': '전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 "무덤의 위력"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
+  'entities.itemSets.deathlord.bonus6': '공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.greyjaw_stalker.name': '그레이죠 추적자의 장비',
   'entities.itemSets.greyjaw_stalker.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.necromancers.name': '비탄직물 의복',
-  'entities.itemSets.necromancers.bonus2':
-    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
-  'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
-  'entities.itemSets.necromancers.bonus4':
-    '주문 사용 시 10% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
+  'entities.itemSets.necromancers.bonus2': '지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).',
+  'entities.itemSets.necromancers.bonus4': '주문력이 12 증가합니다. 주문 사용 시 6% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
+  'entities.itemSets.necromancers.bonus6': '공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.nighttalon.name': '흉포송곳니 가죽장비',
-  'entities.itemSets.nighttalon.bonus2': '전투력이 40만큼 증가합니다.',
-  'entities.itemSets.nighttalon.bonus3':
-    '민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
-  'entities.itemSets.nighttalon.bonus4':
-    '무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
+  'entities.itemSets.nighttalon.bonus2': '민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.',
+  'entities.itemSets.nighttalon.bonus4': '전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.',
+  'entities.itemSets.nighttalon.bonus6': '공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.soulflame.name': '망령불꽃 의복',
-  'entities.itemSets.soulflame.bonus2':
-    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
-  'entities.itemSets.soulflame.bonus3':
-    '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
-  'entities.itemSets.soulflame.bonus4':
-    '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
+  'entities.itemSets.soulflame.bonus2': '지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).',
+  'entities.itemSets.soulflame.bonus4': '주문력이 12 증가합니다. 주문 사용 시 6% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
+  'entities.itemSets.soulflame.bonus6': '공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.stormcallers.name': '강풍부름 의복',
-  'entities.itemSets.stormcallers.bonus2':
-    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
-  'entities.itemSets.stormcallers.bonus3':
-    '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
-  'entities.itemSets.stormcallers.bonus4':
-    '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
+  'entities.itemSets.stormcallers.bonus2': '지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).',
+  'entities.itemSets.stormcallers.bonus4': '주문력이 12 증가합니다. 주문 사용 시 6% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
+  'entities.itemSets.stormcallers.bonus6': '공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.vale_arcanist.name': '계곡 비전술사의 예복',
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.warfare_ashstalker.name': '잿빛추적자의 장비',
@@ -7839,10 +8243,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_thornhide.bonus4': '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_thornhide.bonus7': '워페어 공격 및 방어 등급이 80 증가합니다. 주문에 15% 확률로 가시 수호가 깃들어 회피가 6초 동안 15% 증가합니다.',
   'entities.itemSets.wyrmshadow.name': '밤송곳니 의복',
-  'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
-  'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
-  'entities.itemSets.wyrmshadow.bonus4':
-    '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
+  'entities.itemSets.wyrmshadow.bonus2': '민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.',
+  'entities.itemSets.wyrmshadow.bonus4': '전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.',
+  'entities.itemSets.wyrmshadow.bonus6': '공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'hudChrome.itemSoulbound': '귀속',
   'hudChrome.itemUniqueEquipped': '착용 시 고유',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
@@ -8706,6 +9109,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
+  'apiError.wallet.reauth_required': '이 지갑 변경을 확인하려면 계정 비밀번호를 입력하세요.',
+  'apiError.wallet.reauth_two_factor': '이 계정은 2단계 인증이 활성화되어 있습니다. 확인하려면 인증 코드를 입력하세요.',
+  'apiError.wallet.reauth_no_password': '먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.',
+  'apiError.wallet.reauth_bad_signature': '지갑 서명을 확인할 수 없습니다. 다시 시도하세요.',
+  'apiError.wallet.reauth_bad_password': '비밀번호가 올바르지 않습니다.',
+  'apiError.wallet.reauth_bad_two_factor': '코드가 올바르지 않습니다. 다시 시도하세요.',
   'apiError.seeker.native_only': 'Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.',
   'apiError.seeker.attestation_failed': '기기 인증에 실패했습니다. 다시 시도해 주세요.',
   'apiError.seeker.solana_artifact_required': 'Solana Store 앱을 사용하여 계속해 주세요.',
@@ -9012,6 +9421,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': '거래소를 불러오는 중...',
   'hudChrome.wocMarket.loadFailed': '거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.wocMarket.disabledRealm': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '브라우저에서 $WOC 거래소를 열까요?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC 거래소는 World of ClaudeCraft의 브라우저 버전에서만 이용할 수 있습니다. 브라우저에서 World of ClaudeCraft를 엽니다. 그곳에서 로그인하고 거래소를 열 수 있습니다. 게임은 계속 실행됩니다.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': '브라우저에서 열기',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': '취소',
   'hudChrome.wocMarket.pausedBanner':
     '거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.',
   'hudChrome.wocMarket.walletLinkedDisconnected':
@@ -9019,6 +9433,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     '연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.',
   'hudChrome.wocMarket.walletUsdUnknown': '알 수 없음',
+  'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',
@@ -10088,6 +10503,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
+  'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -10101,6 +10517,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    '덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
@@ -10548,6 +10966,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': '{source}의 공격을 방어하여 {amount}의 피해를 받았습니다.',
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
+  'hudChrome.options.showTargetSwingTimer': '대상의 공격 타이머 표시',
   'hudChrome.options.showPetFrame': '내 펫 표시',
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
@@ -10885,6 +11304,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
+  'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.dungeons.dawnhold_castle.name': '던홀드 성',
@@ -11217,6 +11637,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '공명의 강철',
   'entities.items.resonant_timber.name': '공명의 목재',
   'hud.errors.tradeBound': '그 아이템은 귀속되어 거래할 수 없습니다.',
+  'hud.errors.tradeWindowIneligible': '해당 아이템은 같은 전리품을 함께 획득한 플레이어와만 거래할 수 있습니다.',
   'hud.errors.marketListBound': '그 아이템은 귀속되어 등록할 수 없습니다.',
   'hudChrome.enchantName.enchant_weapon_might': '무기 마법부여 - 위력',
   'hudChrome.enchantName.enchant_weapon_intellect': '무기 마법부여 - 주문력',
@@ -11951,6 +12372,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': '잠김',
   'hudChrome.bags.unlockItem': '아이템 잠금 해제',
   'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    '앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
   'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',
@@ -12457,10 +12880,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '달물결 3단계를 소모해 {damage}의 비전 피해를 입히는 강력한 일격을 가합니다: 피해 특화 선택지입니다. 해돋움도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.moonlash.name': '달의 격동',
   'entities.abilities.moonseed.description':
-    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
+    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.needle_of_fate.description':
-    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
+    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
   'entities.abilities.needle_of_fate.name': '운명의 바늘',
   'entities.abilities.oath_chain.description':
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
@@ -12469,7 +12892,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
-    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
+    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.pack_command.description':
     '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
@@ -12538,7 +12961,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
-    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다.',
+    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다.',
   'entities.abilities.seraphic_vigil.name': '치천사의 수호',
   'entities.abilities.shellskin.description':
     '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',
@@ -13125,6 +13548,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': '균열이란',
   'guide.settingsPage.advancedLadder': '그중 하나라도 움직이면 품질 프리셋이 고급으로 바뀌고, 방금 보고 있던 단계 그대로를 씨앗 삼아 시작하므로 나만의 조합이 백지가 아니라 이미 본 화면에서 출발합니다. 마음에 들면 적용을 누르세요. 고급이 프리셋 목록 맨 끝에 놓인 이유도 그것입니다. 나만의 조합이 사는 전문가용 프로필이니까요.',
   'guide.settingsPage.ifAurasOnPlayerFrame': '내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    '낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.',
   'guide.settingsPage.ifChatFontScale': '채팅 글자 크기입니다.',
   'guide.settingsPage.ifChatIntro': '채팅 창이 어떻게 읽히는지를 다룹니다. 채팅 창 자체를 처음 상태로 되돌리는 초기화도 여기에 있습니다.',
   'guide.settingsPage.ifChatOpacity': '채팅 배경이 얼마나 불투명한지 정합니다.',
@@ -13928,6 +14353,60 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
   'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.otaUpdate.title': '게임 업데이트',
+  'hudChrome.auraEffect.makersBrand':
+    '{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    '잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    '이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.',
+  'entities.mobs.ignivar_ember_sentinel.name': '잔불 감시자',
+  'entities.mobs.ignivar_crucible_warden.name': '용광로 수호자',
+  'entities.mobs.ignivar_cinder_artificer.name': '불씨 기계공',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': '마지막 불꽃의 대장장이 발쿨',
+  'entities.npcs.archivist_maelin_emberward.name': '잔불지기 기록관 메일린',
+  'entities.npcs.archivist_maelin_emberward.title': '용광로 기록관',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    '이곳의 망치 자국 하나하나가 하나의 문장이야. 발쿨이 숨기려 한 내용을 읽어 내는 것을 도와줘.',
+  'entities.npcs.archivist_maelin_ember_projection.name': '마엘린의 잔불 투영체',
+  'entities.npcs.archivist_maelin_ember_projection.title': '잔불 투영체',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다.',
+  'entities.npcs.crucible_quartermaster.name': '군수담당관 브론 엠버워드',
+  'entities.npcs.crucible_quartermaster.title': '도가니 군수담당관',
+  'entities.npcs.crucible_quartermaster.greeting': '화로는 제 사람을 알아본다. 도가니의 인장을 가져오면 전장에 맞게 무장시켜 주지.',
+  'entities.quests.q_ignivar_echoes_in_iron.title': '철 속의 메아리',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    '이 자동 기계들은 병사가 아니라 시작품이야. 각 조립 라인을 부수고 마지막 껍질이 쓰러질 때 귀를 기울여. 대장간은 발쿨이 지우려 한 것을 기억하고 있어.',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    '메아리는 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 실패한 단련작이었지. 오직 이그니바르만 견뎌 냈어.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '잔불 감시자 파괴',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '용광로 수호자 파괴',
+  'entities.quests.q_ignivar_heralds_heart.title': '선구자의 심장',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    '모든 메아리가 유일한 생존자 이그니바르를 가리켜. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 그를 쓰러뜨려. 기록이 사실이라면 그의 죽음이 무엇을 지키도록 벼려졌는지 밝혀 줄 거야.',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    '이그니바르는 단순한 수호자가 아니었어. 그의 심장이 바로 열쇠였고, 마지막 갑주 판이 아래에 봉인된 용광로를 열었어.',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': '이그니바르 처치',
+  'entities.quests.q_ignivar_the_forgefather.title': '대장장이',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    '아래로 이어진 길은 마지막 불꽃의 대장장이 발쿨에게 이어져. 그는 금속에 생명을 불어넣으려 마지막 샘을 가두고, 그 죄를 봉인하려 이그니바르를 단조했어. 내부 용광로에 들어가 그의 일을 끝내.',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    '마침내 대장간이 조용해졌어. 샘은 다시 회복되지 못할지도 모르지만, 발쿨이 다시 생명을 사슬로 빚을 일은 없을 거야.',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '발쿨 처치',
+  'entities.dungeons.ignivar_forge_lift.name': '대장간 승강기',
+  'entities.dungeons.ignivar_forge_lift.enterText': '대장간 승강기가 요동치며 가라앉는다. 망치 소리가 마중 나오듯 울려 퍼진다.',
+  'entities.dungeons.ignivar_forge_lift.leaveText': '승강기가 너를 성채의 탁 트인 바람 속으로 다시 끌어올린다.',
+  'entities.dungeons.ignivar_forge_approach.name': '첫 단련의 회랑',
+  'entities.dungeons.ignivar_forge_approach.enterText': '첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.',
+  'entities.dungeons.ignivar_forge_approach.leaveText': '첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다.',
+  'entities.dungeons.ignivar_molten_assembly.name': '용융 조립장',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '열린 문 너머로 용융 조립 홀이 이어집니다.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    '조립 라인을 떠나 도가니로 돌아갑니다.',
+  'entities.dungeons.ignivar_inner_crucible.name': '내부 용광로',
+  'entities.dungeons.ignivar_inner_crucible.enterText': '열린 문이 용광로의 더 깊은 곳으로 이어집니다.',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': '용광로의 고요한 깊은 곳을 떠납니다.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': '행동 단축바 배치 편집',
   'hudChrome.barEditor.title': '행동 단축바 편집',
@@ -13964,4 +14443,211 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': '가지독 코팅',
   'entities.abilities.nightshade_coating.description':
     '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': '판매',
+  'hudChrome.itemMenu.sellAll': '모두 판매 ({count})',
+  // Ignivar raid loot (Crucible of the Last Spring): the M16 same-change
+  // fills for the new wordy item names (src/sim/content/ignivar_loot.ts).
+  'entities.items.slagbreaker_helmet.name': '슬래그브레이커 투구',
+  'entities.items.slagbreaker_shoulder.name': '슬래그브레이커 어깨갑옷',
+  'entities.items.slagbreaker_chest.name': '슬래그브레이커 사슬갑옷',
+  'entities.items.slagbreaker_gloves.name': '슬래그브레이커 건틀릿',
+  'entities.items.slagbreaker_legs.name': '슬래그브레이커 다리갑옷',
+  'entities.items.emberfury_helmet.name': '잿불격노 투구',
+  'entities.items.emberfury_shoulder.name': '잿불격노 어깨갑옷',
+  'entities.items.emberfury_chest.name': '잿불격노 사슬갑옷',
+  'entities.items.emberfury_gloves.name': '잿불격노 건틀릿',
+  'entities.items.emberfury_legs.name': '잿불격노 다리갑옷',
+  'entities.items.forgewall_helmet.name': '화로성벽 투구',
+  'entities.items.forgewall_shoulder.name': '화로성벽 어깨갑옷',
+  'entities.items.forgewall_chest.name': '화로성벽 사슬갑옷',
+  'entities.items.forgewall_gloves.name': '화로성벽 건틀릿',
+  'entities.items.forgewall_legs.name': '화로성벽 다리갑옷',
+  'entities.items.dawnforged_helmet.name': '새벽벼림 투구',
+  'entities.items.dawnforged_shoulder.name': '새벽벼림 어깨갑옷',
+  'entities.items.dawnforged_chest.name': '새벽벼림 사슬갑옷',
+  'entities.items.dawnforged_gloves.name': '새벽벼림 건틀릿',
+  'entities.items.dawnforged_legs.name': '새벽벼림 다리갑옷',
+  'entities.items.oathpyre_helmet.name': '맹세화염 투구',
+  'entities.items.oathpyre_shoulder.name': '맹세화염 어깨갑옷',
+  'entities.items.oathpyre_chest.name': '맹세화염 사슬갑옷',
+  'entities.items.oathpyre_gloves.name': '맹세화염 건틀릿',
+  'entities.items.oathpyre_legs.name': '맹세화염 다리갑옷',
+  'entities.items.zealfire_helmet.name': '열화신념 투구',
+  'entities.items.zealfire_shoulder.name': '열화신념 어깨갑옷',
+  'entities.items.zealfire_chest.name': '열화신념 사슬갑옷',
+  'entities.items.zealfire_gloves.name': '열화신념 건틀릿',
+  'entities.items.zealfire_legs.name': '열화신념 다리갑옷',
+  'entities.items.packlord_emberhide_helmet.name': '무리군주 가죽두건',
+  'entities.items.packlord_emberhide_shoulder.name': '무리군주 어깨보호구',
+  'entities.items.packlord_emberhide_chest.name': '무리군주 튜닉',
+  'entities.items.packlord_emberhide_gloves.name': '무리군주 손보호구',
+  'entities.items.packlord_emberhide_legs.name': '무리군주 가죽바지',
+  'entities.items.coldsight_trackers_helmet.name': '냉정한 시선 가죽두건',
+  'entities.items.coldsight_trackers_shoulder.name': '냉정한 시선 어깨보호구',
+  'entities.items.coldsight_trackers_chest.name': '냉정한 시선 튜닉',
+  'entities.items.coldsight_trackers_gloves.name': '냉정한 시선 손보호구',
+  'entities.items.coldsight_trackers_legs.name': '냉정한 시선 가죽바지',
+  'entities.items.slagsnare_helmet.name': '용재올가미 가죽두건',
+  'entities.items.slagsnare_shoulder.name': '용재올가미 어깨보호구',
+  'entities.items.slagsnare_chest.name': '용재올가미 튜닉',
+  'entities.items.slagsnare_gloves.name': '용재올가미 손보호구',
+  'entities.items.slagsnare_legs.name': '용재올가미 가죽바지',
+  'entities.items.cinderfang_helmet.name': '잿불송곳니 가죽두건',
+  'entities.items.cinderfang_shoulder.name': '잿불송곳니 어깨보호구',
+  'entities.items.cinderfang_chest.name': '잿불송곳니 튜닉',
+  'entities.items.cinderfang_gloves.name': '잿불송곳니 손보호구',
+  'entities.items.cinderfang_legs.name': '잿불송곳니 가죽바지',
+  'entities.items.smolderstrike_helmet.name': '그을음일격 가죽두건',
+  'entities.items.smolderstrike_shoulder.name': '그을음일격 어깨보호구',
+  'entities.items.smolderstrike_chest.name': '그을음일격 튜닉',
+  'entities.items.smolderstrike_gloves.name': '그을음일격 손보호구',
+  'entities.items.smolderstrike_legs.name': '그을음일격 가죽바지',
+  'entities.items.ashveil_helmet.name': '잿빛장막 가죽두건',
+  'entities.items.ashveil_shoulder.name': '잿빛장막 어깨보호구',
+  'entities.items.ashveil_chest.name': '잿빛장막 튜닉',
+  'entities.items.ashveil_gloves.name': '잿빛장막 손보호구',
+  'entities.items.ashveil_legs.name': '잿빛장막 가죽바지',
+  'entities.items.emberscreed_helmet.name': '잉걸불 신조 두건',
+  'entities.items.emberscreed_shoulder.name': '잉걸불 신조 어깨걸이',
+  'entities.items.emberscreed_chest.name': '잉걸불 신조 로브',
+  'entities.items.emberscreed_gloves.name': '잉걸불 신조 손싸개',
+  'entities.items.emberscreed_legs.name': '잉걸불 신조 다리싸개',
+  'entities.items.benison_dawnweave_helmet.name': '새벽직조 두건',
+  'entities.items.benison_dawnweave_shoulder.name': '새벽직조 어깨걸이',
+  'entities.items.benison_dawnweave_chest.name': '새벽직조 로브',
+  'entities.items.benison_dawnweave_gloves.name': '새벽직조 손싸개',
+  'entities.items.benison_dawnweave_legs.name': '새벽직조 다리싸개',
+  'entities.items.vesperash_helmet.name': '저녁잿빛 두건',
+  'entities.items.vesperash_shoulder.name': '저녁잿빛 어깨걸이',
+  'entities.items.vesperash_chest.name': '저녁잿빛 로브',
+  'entities.items.vesperash_gloves.name': '저녁잿빛 손싸개',
+  'entities.items.vesperash_legs.name': '저녁잿빛 다리싸개',
+  'entities.items.stormkindled_helmet.name': '폭풍점화 투구',
+  'entities.items.stormkindled_shoulder.name': '폭풍점화 어깨갑옷',
+  'entities.items.stormkindled_chest.name': '폭풍점화 사슬갑옷',
+  'entities.items.stormkindled_gloves.name': '폭풍점화 건틀릿',
+  'entities.items.stormkindled_legs.name': '폭풍점화 다리갑옷',
+  'entities.items.warspirit_emberscale_helmet.name': '잉걸비늘 투구',
+  'entities.items.warspirit_emberscale_shoulder.name': '잉걸비늘 어깨갑옷',
+  'entities.items.warspirit_emberscale_chest.name': '잉걸비늘 사슬갑옷',
+  'entities.items.warspirit_emberscale_gloves.name': '잉걸비늘 건틀릿',
+  'entities.items.warspirit_emberscale_legs.name': '잉걸비늘 다리갑옷',
+  'entities.items.stonehearth_helmet.name': '돌화로 투구',
+  'entities.items.stonehearth_shoulder.name': '돌화로 어깨갑옷',
+  'entities.items.stonehearth_chest.name': '돌화로 사슬갑옷',
+  'entities.items.stonehearth_gloves.name': '돌화로 건틀릿',
+  'entities.items.stonehearth_legs.name': '돌화로 다리갑옷',
+  'entities.items.springmender_helmet.name': '샘물치유사 투구',
+  'entities.items.springmender_shoulder.name': '샘물치유사 어깨갑옷',
+  'entities.items.springmender_chest.name': '샘물치유사 사슬갑옷',
+  'entities.items.springmender_gloves.name': '샘물치유사 건틀릿',
+  'entities.items.springmender_legs.name': '샘물치유사 다리갑옷',
+  'entities.items.chronoweave_helmet.name': '에테르직조 두건',
+  'entities.items.chronoweave_shoulder.name': '에테르직조 어깨걸이',
+  'entities.items.chronoweave_chest.name': '에테르직조 로브',
+  'entities.items.chronoweave_gloves.name': '에테르직조 손싸개',
+  'entities.items.chronoweave_legs.name': '에테르직조 다리싸개',
+  'entities.items.pyroclast_helmet.name': '화쇄류 두건',
+  'entities.items.pyroclast_shoulder.name': '화쇄류 어깨걸이',
+  'entities.items.pyroclast_chest.name': '화쇄류 로브',
+  'entities.items.pyroclast_gloves.name': '화쇄류 손싸개',
+  'entities.items.pyroclast_legs.name': '화쇄류 다리싸개',
+  'entities.items.frostquench_helmet.name': '서리담금질 두건',
+  'entities.items.frostquench_shoulder.name': '서리담금질 어깨걸이',
+  'entities.items.frostquench_chest.name': '서리담금질 로브',
+  'entities.items.frostquench_gloves.name': '서리담금질 손싸개',
+  'entities.items.frostquench_legs.name': '서리담금질 다리싸개',
+  'entities.items.hexthread_helmet.name': '저주실타래 두건',
+  'entities.items.hexthread_shoulder.name': '저주실타래 어깨걸이',
+  'entities.items.hexthread_chest.name': '저주실타래 로브',
+  'entities.items.hexthread_gloves.name': '저주실타래 손싸개',
+  'entities.items.hexthread_legs.name': '저주실타래 다리싸개',
+  'entities.items.gravebrand_helmet.name': '무덤낙인 두건',
+  'entities.items.gravebrand_shoulder.name': '무덤낙인 어깨걸이',
+  'entities.items.gravebrand_chest.name': '무덤낙인 로브',
+  'entities.items.gravebrand_gloves.name': '무덤낙인 손싸개',
+  'entities.items.gravebrand_legs.name': '무덤낙인 다리싸개',
+  'entities.items.ruincaller_helmet.name': '파멸의 부름 두건',
+  'entities.items.ruincaller_shoulder.name': '파멸의 부름 어깨걸이',
+  'entities.items.ruincaller_chest.name': '파멸의 부름 로브',
+  'entities.items.ruincaller_gloves.name': '파멸의 부름 손싸개',
+  'entities.items.ruincaller_legs.name': '파멸의 부름 다리싸개',
+  'entities.items.moonscorch_helmet.name': '달그을림 가죽두건',
+  'entities.items.moonscorch_shoulder.name': '달그을림 어깨보호구',
+  'entities.items.moonscorch_chest.name': '달그을림 튜닉',
+  'entities.items.moonscorch_gloves.name': '달그을림 손보호구',
+  'entities.items.moonscorch_legs.name': '달그을림 가죽바지',
+  'entities.items.wildfang_emberhide_helmet.name': '야생송곳니 가죽두건',
+  'entities.items.wildfang_emberhide_shoulder.name': '야생송곳니 어깨보호구',
+  'entities.items.wildfang_emberhide_chest.name': '야생송곳니 튜닉',
+  'entities.items.wildfang_emberhide_gloves.name': '야생송곳니 손보호구',
+  'entities.items.wildfang_emberhide_legs.name': '야생송곳니 가죽바지',
+  'entities.items.cinderbark_helmet.name': '잿불나무껍질 가죽두건',
+  'entities.items.cinderbark_shoulder.name': '잿불나무껍질 어깨보호구',
+  'entities.items.cinderbark_chest.name': '잿불나무껍질 튜닉',
+  'entities.items.cinderbark_gloves.name': '잿불나무껍질 손보호구',
+  'entities.items.cinderbark_legs.name': '잿불나무껍질 가죽바지',
+  'entities.items.grovespring_helmet.name': '숲의 샘 가죽두건',
+  'entities.items.grovespring_shoulder.name': '숲의 샘 어깨보호구',
+  'entities.items.grovespring_chest.name': '숲의 샘 튜닉',
+  'entities.items.grovespring_gloves.name': '숲의 샘 손보호구',
+  'entities.items.grovespring_legs.name': '숲의 샘 가죽바지',
+  'entities.items.sigil_anvil_helmet.name': '모루 투구 인장',
+  'entities.items.sigil_ember_helmet.name': '잉걸불 투구 인장',
+  'entities.items.sigil_tempest_helmet.name': '폭풍 투구 인장',
+  'entities.items.sigil_anvil_shoulder.name': '모루 어깨 인장',
+  'entities.items.sigil_ember_shoulder.name': '잉걸불 어깨 인장',
+  'entities.items.sigil_tempest_shoulder.name': '폭풍 어깨 인장',
+  'entities.items.sigil_anvil_chest.name': '모루 로브 인장',
+  'entities.items.sigil_ember_chest.name': '잉걸불 로브 인장',
+  'entities.items.sigil_tempest_chest.name': '폭풍 로브 인장',
+  'entities.items.sigil_anvil_gloves.name': '모루 장갑 인장',
+  'entities.items.sigil_ember_gloves.name': '잉걸불 장갑 인장',
+  'entities.items.sigil_tempest_gloves.name': '폭풍 장갑 인장',
+  'entities.items.sigil_anvil_legs.name': '모루 다리 인장',
+  'entities.items.sigil_ember_legs.name': '잉걸불 다리 인장',
+  'entities.items.sigil_tempest_legs.name': '폭풍 다리 인장',
+  'entities.items.cord_of_the_last_flame.name': '마지막 불꽃의 끈',
+  'entities.items.cindersoaked_slippers.name': '잿물배인 덧신',
+  'entities.items.springbinder_sash.name': '샘묶이 장식띠',
+  'entities.items.steps_of_quiet_water.name': '고요한 물의 발걸음',
+  'entities.items.cinderbark_cinch.name': '잿불나무껍질 허리끈',
+  'entities.items.ashenbark_treads.name': '잿빛나무껍질 신발',
+  'entities.items.slagstalker_belt.name': '용재추적자 허리띠',
+  'entities.items.ashrunner_boots.name': '재질주자 장화',
+  'entities.items.moonscorch_waistwrap.name': '달그을림 허리감개',
+  'entities.items.scorchgrove_striders.name': '그을린숲 활보자',
+  'entities.items.grovetender_belt.name': '숲지기 허리띠',
+  'entities.items.dewfall_moccasins.name': '이슬맺힌 신',
+  'entities.items.forgewall_girdle.name': '화로성벽 허리갑',
+  'entities.items.anvilstance_sabatons.name': '모루자세 강철신',
+  'entities.items.warforged_waistguard.name': '전쟁벼림 허리보호구',
+  'entities.items.furnace_march_greaves.name': '용광로 행군 다리보호구',
+  'entities.items.stormkindled_chain.name': '폭풍점화 사슬',
+  'entities.items.thundershock_treads.name': '천둥충격 신발',
+  'entities.items.tidebinder_links.name': '조수묶이 사슬고리',
+  'entities.items.springwarden_sabatons.name': '샘지기 강철신',
+  'entities.items.pendant_of_the_first_tempering.name': '첫 담금질의 목걸이',
+  'entities.items.ignivars_ember_choker.name': '이그니바르의 잉걸불 목걸이',
+  'entities.items.locket_of_the_last_flame.name': '마지막 불꽃의 로켓',
+  'entities.items.heartspring_amulet.name': '심장샘 부적',
+  'entities.items.seal_of_the_forgewall.name': '화로성벽 인장',
+  'entities.items.band_of_marked_strikes.name': '새겨진 일격의 반지',
+  'entities.items.circle_of_cinders.name': '잿불의 고리',
+  'entities.items.loop_of_quiet_springs.name': '고요한 샘의 고리',
+  'entities.items.bulwark_of_the_inner_crucible.name': '내부 도가니의 방벽',
+  'entities.items.ember_wardens_barrier.name': '잉걸불 수호자의 방벽',
+  'entities.items.orb_of_the_last_spring.name': '마지막 샘의 보주',
+  'entities.items.cinder_of_the_first_design.name': '최초 설계의 잿불',
+  'entities.items.forgefathers_warhammer.name': '벼림아버지의 전쟁망치',
+  'entities.items.cinderfang_kris.name': '잿불송곳니 크리스',
+  'entities.items.slagrender_cleaver.name': '용재절단 도끼',
+  'entities.items.anvilguard_blade.name': '모루수호 검',
+  'entities.items.heart_of_the_end_greatblade.name': '종말의 심장 대검',
+  'entities.items.staff_of_the_last_spring.name': '마지막 샘의 지팡이',
+  'entities.items.forgefire_spire.name': '화로불꽃 첨탑지팡이',
+  'entities.items.springtouched_crozier.name': '샘닿은 홀장',
+  'entities.items.wand_of_quenched_sparks.name': '꺼진 불꽃의 마법봉',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

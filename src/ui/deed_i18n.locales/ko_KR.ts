@@ -960,4 +960,33 @@ export const table: DeedLocaleTable = {
     name: '모험을 떠날 준비',
     desc: '수련의 해안을 졸업하십시오. 섬의 모든 수업을 마친 뒤, 나룻배 종을 울려 이스트브룩으로 돌아가십시오.',
   },
+  soc_strongbox_outfitter: {
+    name: '첫 번째 칸',
+    desc: '첫 은행 가방 칸을 해금하십시오.',
+  },
+  soc_four_bags_deep: {
+    name: '네 개의 칸',
+    desc: '네 개의 은행 가방 칸을 모두 해금하십시오.',
+  },
+  dgn_ignivar: {
+    name: '전령의 추락',
+    desc: '마지막 샘의 도가니에서 이그니바르, 마지막 불꽃의 전령을 처치하십시오.',
+  },
+  dgn_ignivar_heroic: {
+    name: '영웅: 전령의 추락',
+    desc: '영웅 난이도에서 이그니바르, 마지막 불꽃의 전령을 처치하십시오.',
+  },
+  dgn_varkhul: {
+    name: '대장간이 식다',
+    desc: '내부 용광로에서 마지막 불꽃의 대장장이 발쿨을 처치하십시오.',
+  },
+  dgn_varkhul_heroic: {
+    name: '영웅: 대장간이 식다',
+    desc: '영웅 난이도에서 마지막 불꽃의 대장장이 발쿨을 처치하십시오.',
+  },
+  dgn_varkhul_flawless: {
+    name: '꺼지지 않은 불씨',
+    desc: '공격대원이 단 한 명도 죽지 않고 영웅 난이도에서 마지막 불꽃의 대장장이 발쿨을 처치하십시오.',
+    title: '그을리지 않은 자',
+  },
 };

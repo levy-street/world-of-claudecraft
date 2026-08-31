@@ -20,13 +20,29 @@ import {
   dotTickBonus,
   hotTickBonus,
 } from '../sim/spell_scaling';
-import type { AbilityEffect } from '../sim/types';
+import type { AbilityEffect, Entity } from '../sim/types';
 
-/** The character's live scaling ratings (entity.spellPower / rangedPower / attackPower). */
+/** The character's live scaling ratings (entity.spellPower / healPower /
+ *  rangedPower / attackPower). healPower feeds the heal, HoT, and absorb
+ *  arms, mirroring the sim's heal riders; damage arms read spellPower. */
 export interface AbilityScaling {
   spellPower: number;
+  healPower: number;
   rangedPower: number;
   attackPower: number;
+}
+
+/** Build the scaling snapshot from a live entity: the ONE constructor, so a
+ *  consumer (the HUD tooltips) can never miss a scaling field. */
+export function abilityScalingOf(
+  e: Pick<Entity, 'spellPower' | 'healPower' | 'rangedPower' | 'attackPower'>,
+): AbilityScaling {
+  return {
+    spellPower: e.spellPower,
+    healPower: e.healPower,
+    rangedPower: e.rangedPower,
+    attackPower: e.attackPower,
+  };
 }
 
 /** Flat bonus this character adds to ONE displayed hit of `eff` (or, for a DoT, to
@@ -74,21 +90,21 @@ export function abilityDamageBonus(
       return 0;
     case 'aoeHeal':
       // AoE heals take the same per-target coefficient penalty as aoeDamage.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.healPower, res.castTime);
     case 'chainHeal':
       // Combat applies the full direct-heal coefficient to the first target,
       // then applies the authored falloff to each jump.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.healPower, res.castTime);
     case 'consumeAura':
       if (eff.deal) return directHitBonus(power, def, res.castTime, false);
-      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      if (eff.heal) return directHealBonus(scaling.healPower, res.castTime);
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.spellPower, res.castTime);
+      return directHealBonus(scaling.healPower, res.castTime);
     case 'absorb':
-      return absorbBonus(scaling.spellPower, eff.spellPowerCoeff ?? 0);
+      return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
       // direct part already took the coefficient); only pure HoTs (Rejuvenation)
@@ -97,7 +113,7 @@ export function abilityDamageBonus(
       const hybridHeal = res.effects.some((e) => e.type === 'heal');
       if (hybridHeal) return 0;
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
-      return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
+      return hotTickBonus(scaling.healPower, eff.duration, eff.interval) * ticks;
     }
     case 'drainTick':
       return channelTickBonus(power, def);
@@ -184,6 +200,10 @@ export function abilityOverTimeEffect(
  *  the player actually knows. Null when the ability has none. */
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
+    // Overbloom's harvest fraction is its $b: the RESOLVED druidOverbloom
+    // harvestPct as a whole percent, so the Grovespring 4pc's 75 shows live
+    // for wearers the same way a talent-upgraded value would (base 60).
+    if (eff.type === 'druidOverbloom') return Math.round(eff.harvestPct * 100);
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
       // form_fireball carries a 1+fraction speed multiplier; the tooltip's $b%
       // wants the whole-percent bonus (1.4 -> 40).
@@ -219,6 +239,10 @@ export function auraBuffDisplayValue(a: { kind: string; value: number }): number
  *  sleep read true). Null when no effect carries a duration. */
 export function abilityDurationValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
+    // An extendDot's timed magnitude is its per-application extension cap in
+    // seconds (Moonseed is the only extendDot user): $t prints the RESOLVED
+    // maxBonus, so the Moonscorch 2pc's 12 shows live for wearers (base 6).
+    if (eff.type === 'extendDot') return eff.maxBonus;
     if ('duration' in eff && typeof eff.duration === 'number') return eff.duration;
   }
   return null;

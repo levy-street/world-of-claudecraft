@@ -1,11 +1,6 @@
-// Real-browser regression suite for "Space reopens the last-used menu": a mouse
-// click on a micromenu button left it holding document focus (the canvas is not
-// focusable), and any state that skips the game layer's Space preventDefault (a
-// modal, a prompt, chat focus, a graphics rebuild pause) let the browser
-// natively re-activate that stale button on keyup. Runs in Browser Mode because
-// the bug IS native activation semantics: only trusted key events make a
-// focused button click on Space keyup, so a Node DOM fake cannot express either
-// the bug or the fix.
+// Real-browser regression suite for stale HUD focus hijacking Space or Enter.
+// Runs in Browser Mode because the bug is native focus and activation semantics:
+// only trusted pointer and key events reproduce the complete browser path.
 //
 // It drives the REAL modules end to end: the real Input (window-level keydown,
 // the blocked-state stale-focus guard, the jump latch), the real pointer_blur
@@ -16,6 +11,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { Input } from '../../src/game/input';
 import { Keybinds } from '../../src/game/keybinds';
+import { wireChromeFocus } from '../../src/ui/chrome_focus_wiring';
 import { markDialogRoot } from '../../src/ui/dialog_root';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { bindChromeButtonKeyGuard, bindPointerBlur } from '../../src/ui/pointer_blur';
@@ -26,6 +22,7 @@ import { installPromptDialog } from '../../src/ui/prompt_dialog';
 // main.ts's gameplayInputBlocked() (modal / prompt / camera prompt / rebuild).
 let input: Input;
 let blocked = false;
+let chatOpens = 0;
 // The last keydown as the window saw it AFTER Input's own listener ran (this
 // listener is registered after Input's, both bubble phase), so a test can assert
 // whether Input prevented the default: blur alone would already cancel the keyup
@@ -47,7 +44,9 @@ beforeAll(() => {
       onAbility: () => undefined,
       onAbilityDown: () => undefined,
       onAbilityUp: () => undefined,
-      onUiKey: () => undefined,
+      onUiKey: (key) => {
+        if (key === 'chat') chatOpens++;
+      },
       onEmoteWheel: () => undefined,
       onClickPick: () => undefined,
       canUseGameKeys: () => !blocked,
@@ -61,10 +60,12 @@ beforeAll(() => {
 });
 
 afterEach(async () => {
-  // Belt and braces: release Space if a failed assertion left it held, then
+  // Belt and braces: release keys if a failed assertion left one held, then
   // clear the fixtures and the blocked flag.
   await userEvent.keyboard('[/Space]').catch(() => undefined);
+  await userEvent.keyboard('[/Enter]').catch(() => undefined);
   blocked = false;
+  chatOpens = 0;
   lastKeydown = null;
   document.body.innerHTML = '';
 });
@@ -99,12 +100,71 @@ function makeRail(): {
   return { rail, btn, toggles: () => count, focusedAtClick: () => focusedAtClick };
 }
 
+/** The minimap mail fixture wired through the same one-call seam as Hud. Its
+ *  own handlers match Hud.initMailIndicator(), including stopPropagation(). */
+function makeMailIndicator(): {
+  mail: HTMLButtonElement;
+  opens: () => number;
+  focusedAtOpen: () => boolean | null;
+} {
+  const disc = document.createElement('div');
+  disc.id = 'minimap-disc';
+  const mail = document.createElement('button');
+  mail.type = 'button';
+  mail.id = 'mail-indicator';
+  mail.textContent = 'Mail';
+  let opens = 0;
+  let focusedAtOpen: boolean | null = null;
+  mail.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    opens++;
+    focusedAtOpen = document.activeElement === mail;
+  });
+  mail.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    event.stopPropagation();
+    opens++;
+    focusedAtOpen = document.activeElement === mail;
+  });
+  disc.appendChild(mail);
+  document.body.appendChild(disc);
+  wireChromeFocus(
+    (selector) => document.querySelector<HTMLElement>(selector) ?? document.createElement('div'),
+  );
+  return { mail, opens: () => opens, focusedAtOpen: () => focusedAtOpen };
+}
+
 async function pressSpace(): Promise<void> {
   await userEvent.keyboard('[Space>]');
   await userEvent.keyboard('[/Space]');
 }
 
-describe('stale focus vs Space (the reported bug and its fix)', () => {
+describe('stale focus vs gameplay keys (the reported bugs and their fixes)', () => {
+  it('mouse-click mail, then trusted Enter: opens chat without reopening mail', async () => {
+    const { mail, opens, focusedAtOpen } = makeMailIndicator();
+    await userEvent.click(mail);
+    expect(opens()).toBe(1);
+    expect(focusedAtOpen()).toBe(false);
+    expect(document.activeElement).not.toBe(mail);
+
+    await userEvent.keyboard('[Enter]');
+    expect(opens()).toBe(1);
+    expect(chatOpens).toBe(1);
+  });
+
+  it('keyboard-focused mail keeps Enter activation and an accessible return-focus opener', async () => {
+    const { mail, opens, focusedAtOpen } = makeMailIndicator();
+    mail.focus();
+
+    await userEvent.keyboard('[Enter]');
+    expect(opens()).toBe(1);
+    expect(focusedAtOpen()).toBe(true);
+    expect(document.activeElement).toBe(mail);
+    expect(chatOpens).toBe(0);
+  });
+
   it('(a) mouse-click a micromenu button, then Space: no re-toggle, jump requested', async () => {
     const { btn, toggles, focusedAtClick } = makeRail();
     await userEvent.click(btn);

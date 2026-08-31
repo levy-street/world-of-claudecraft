@@ -71,12 +71,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-// The New Eastbrook program retires the Vale Cup minigame (six vcup_* send +
-// dispatch pairs), the Proving Shore tutorial adds its start_tutorial pair, and
-// the Bank Storage branch adds its vault and bank-socket pairs. Both arms land
-// in the merged tree, so the counts below are MEASURED from a suite run on it.
-const EXPECTED_SEND_COUNT = 206;
-const EXPECTED_DISPATCH_COUNT = 219;
+// The New Eastbrook program then retires the Vale Cup minigame, removing its
+// six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
+// the Proving Shore tutorial adds its one start_tutorial pair back on top, and
+// the v0.40.0 sync merge brings the release side's one new pair with it.
+const EXPECTED_SEND_COUNT = 207;
+const EXPECTED_DISPATCH_COUNT = 220;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -2,43 +2,47 @@
 //
 // The sets are the epic armor families that drop from the Gravewyrm Sanctum
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
-// families assembled from existing world-drop items. Wearing enough pieces of
-// a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
-// `recalcPlayerStats` (primary stats, attack power, crit, haste, cast pushback
-// immunity). Every epic family's 4-piece tier is a proc (see SetProc):
-// weapon-crit-triggered for the plate and leather archetypes, spell-cast-
-// triggered for the caster archetypes, resolved by combat/set_procs.ts.
+// families assembled from existing world-drop items.
+//
+// THE LINEAGE LADDER (the incumbent retune, docs/prd/ignivar-raid-loot.md):
+// each archetype's tier-1 and tier-2 families count as ONE lineage with
+// breakpoints at 2, 4, and 6 pieces worn ACROSS the lineage: deathlord plus
+// crownforged (Strength), wyrmshadow plus nighttalon (Agility), and
+// necromancers plus soulflame plus stormcallers (caster; the two tier-2 caster
+// families share slots so they can never be worn together). Every lineage
+// unions to exactly seven wearable slots with one overlap, so six pieces is a
+// real commitment (the WARFARE 2/4/7 shape applied to the PvE incumbents).
+// Member families SHARE one bonuses array (the lineage table) and carry a
+// `lineage` tag; `aggregateSetBonuses` sums worn counts across the lineage and
+// applies the shared table exactly once. Tiers stack as before, and the tier-1
+// procs live at the 4-piece tier while the tier-2 procs are the 6-piece
+// capstones, so no named effect was deleted in the retune.
 //
 // The five WARFARE honor families the quartermasters sell (content/pvp_honor.ts)
-// are the one exception to every sentence around this one: they break at 2, 4
-// and 7 pieces rather than 2, 3 and 4, and they are paid entirely in WARFARE
-// rating and PvP-gated effects rather than in stats, so they contribute exactly
-// zero in PvE. See the WARFARE block below and docs/design/warfare.md.
-//
-// Bonuses are keyed by archetype: the plate (Strength) families get attack
-// power then Strength/Stamina; the leather (Agility) families get attack power
-// then Agility/crit; the cloth (caster) families get full spell-pushback
-// immunity (damage taken never delays a cast; NOT physical knockback) at 2
-// pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
-// tier 2, at 3 pieces. Every tier-2 3-piece bonus ALSO grants haste (ONE stat:
-// faster melee and ranged swings AND shorter casts/channels), and the three
-// leveling haste kits grant haste alone at 3 pieces. This file is
-// data-as-code: balance numbers live here, never inline in the engine.
-// `aggregateSetBonuses` is the pure resolver imported by `entity.ts`.
+// break at 2, 4 and 7 pieces of one seven-piece family, and are paid entirely
+// in WARFARE rating and PvP-gated effects rather than in stats, so they
+// contribute exactly zero in PvE. See the WARFARE block below and
+// docs/design/warfare.md. The leveling haste kits keep their single 3-piece
+// tier. This file is data-as-code: balance numbers live here, never inline in
+// the engine. `aggregateSetBonuses` is the pure resolver imported by
+// `entity.ts`.
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
-// Haste granted by a 3-piece bonus after the global combat-rating conversion:
-// what SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read
-// only by the tests, deliberately as a literal so it pins the conversion
+// Haste granted by a set tier after the global combat-rating conversion: what
+// SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read only
+// by the tests, deliberately as a literal so it pins the conversion
 // independently; it must be updated by hand whenever HASTE_RATING_PER_PCT moves.
-export const SET_HASTE_3PC = 0.075;
-export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
+// (The name keeps its historic 3PC suffix: the haste leveling kits still grant
+// it at 3 pieces, while the epic lineages now grant it at their 6-piece
+// capstone; see the retune in docs/prd/ignivar-raid-loot.md.)
+export const SET_HASTE_3PC = 0.04;
+export const SET_HASTE_3PC_RATING = 80; // -> 4% haste at 20 rating = 1%
 export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
-// The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
-// (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
-// the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
-export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
+// The lineage capstone bleeds (Bonesplinter, Ragged Gash) are modest on their
+// own; the capstone also grants Hit rating so finishing six pieces is worth
+// chasing for Heroic (+3 above-level) content. Halved in the same retune.
+export const SET_HIT_4PC_RATING = 30; // -> +3% hit at 10 rating = 1%
 
 // The WARFARE honor sets (content/pvp_honor.ts). Every tier is paid in WARFARE
 // rating or in a PvP-gated effect and never in flat stats, which is what makes
@@ -111,101 +115,49 @@ export const SET_WARFARE_ASHSTALKER = 'warfare_ashstalker'; // leather, Agility
 export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave'; // cloth, caster
 export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // leather, caster
 
-// Archetype bonus tiers. Tiers stack (a 3-piece set grants both the 2- and
-// 3-piece bonuses); cast pushback reduction and knockback resistance
-// max-combine (see the resolver).
-// Every family reaches its 3-piece tier: tier-1 pieces drop in the Gravewyrm
-// Sanctum; tier-2 helms/shoulders drop in the Nythraxis raid and the tier-2
-// gloves/belts from the Thunzharr world boss (content/zone3.ts).
-const STRENGTH_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  { pieces: 3, effect: { str: 15, sta: 15 }, text: 'Increases Strength by 15 and Stamina by 15.' },
+// Lineage ids: the cross-tier archetype ladders (see the header). The id is
+// carried on each member ItemSet's `lineage` field.
+export const LINEAGE_STRENGTH = 'strength_lineage';
+export const LINEAGE_AGILITY = 'agility_lineage';
+export const LINEAGE_CASTER = 'caster_lineage';
+
+// Lineage bonus tiers, at 2, 4, and 6 pieces worn across the lineage. Tiers
+// stack (six pieces grant all three tiers); cast pushback reduction and
+// knockback resistance max-combine (see the resolver). Values are the retuned
+// (roughly halved) magnitudes from docs/prd/ignivar-raid-loot.md: the summed
+// old double-stack paid two near-full packages, and the ladder replaces that
+// with one sized package whose top requires six pieces.
+const STRENGTH_LINEAGE_BONUSES: SetBonusTier[] = [
+  {
+    pieces: 2,
+    effect: { str: 10, sta: 10 },
+    text: 'Increases Strength by 10 and Stamina by 10.',
+  },
   {
     pieces: 4,
     effect: {
+      ap: 25,
       proc: {
         id: 'set_gravemight',
         name: 'Gravemight',
         trigger: 'weaponCrit',
         chance: 0.5,
         aura: 'buff_ap',
-        value: 60,
+        value: 40,
         duration: 10,
         icd: 15,
       },
     },
-    text: 'Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec.',
-  },
-];
-const AGILITY_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  {
-    pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
-    text: 'Increases Agility by 15 and critical strike chance by 1%.',
+    text: 'Increases attack power by 25. Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 40 for 10 sec.',
   },
   {
-    pieces: 4,
+    pieces: 6,
     effect: {
-      proc: {
-        id: 'set_fangrush',
-        name: 'Fangrush',
-        trigger: 'weaponCrit',
-        chance: 0.5,
-        // buff_haste value is a swing-interval divisor (1.25 = 25% faster swings)
-        aura: 'buff_haste',
-        value: 1.25,
-        duration: 8,
-        icd: 15,
-      },
-    },
-    text: 'Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec.',
-  },
-];
-const CASTER_T1_BONUSES: SetBonusTier[] = [
-  {
-    pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
-  },
-  {
-    pieces: 3,
-    effect: { int: 10, sta: 10 },
-    text: 'Increases Intellect by 10 and Stamina by 10.',
-  },
-  {
-    pieces: 4,
-    effect: {
-      proc: {
-        id: 'set_clearcasting',
-        name: 'Clearcasting',
-        trigger: 'spellCast',
-        chance: 0.1,
-        aura: 'next_cast_free',
-        duration: 12,
-        icd: 4,
-      },
-    },
-    text: 'Your spells have a 10% chance to grant Clearcasting, making your next spell free.',
-  },
-];
-// Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
-const STRENGTH_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  {
-    pieces: 3,
-    effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.',
-  },
-  {
-    pieces: 4,
-    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       hitRating: SET_HIT_4PC_RATING,
       // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
       // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
-      // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
-      // sustained damage while rewarding crit stacking. The added Hit rating is
-      // what makes the set worth completing for Heroic content.
+      // at 15 damage per 2s.
       proc: {
         id: 'set_bonesplinter',
         name: 'Bonesplinter',
@@ -213,31 +165,48 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
         chance: 1,
         applyTo: 'target',
         aura: 'dot',
-        value: 8, // per tick, per stack
+        value: 5, // per tick, per stack
         tickInterval: 2,
         duration: 12,
         maxStacks: 3,
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
-const AGILITY_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
+const AGILITY_LINEAGE_BONUSES: SetBonusTier[] = [
   {
-    pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.',
+    pieces: 2,
+    effect: { agi: 10, critRating: SET_CRIT_3PC_RATING },
+    text: 'Increases Agility by 10 and critical strike chance by 1%.',
   },
   {
     pieces: 4,
     effect: {
+      ap: 25,
+      proc: {
+        id: 'set_fangrush',
+        name: 'Fangrush',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        // buff_haste value is a swing-interval divisor (1.15 = 15% faster swings)
+        aura: 'buff_haste',
+        value: 1.15,
+        duration: 8,
+        icd: 15,
+      },
+    },
+    text: 'Increases attack power by 25. Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 15% for 8 sec.',
+  },
+  {
+    pieces: 6,
+    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       hitRating: SET_HIT_4PC_RATING,
-      // Leather crits land more often (the 3-piece adds crit AND haste), so
-      // its bleed ticks lighter than the plate one: more applications, same
-      // sustained value, peaking at 18 damage per 2s at 3 stacks. The added Hit
-      // rating is what makes the set worth completing for Heroic content.
+      // Agility crits land more often (the 2-piece adds crit), so its bleed
+      // ticks lighter than the Strength one: more applications, same sustained
+      // value, peaking at 12 damage per 2s at 3 stacks.
       proc: {
         id: 'set_ragged_gash',
         name: 'Ragged Gash',
@@ -245,42 +214,56 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
         chance: 1,
         applyTo: 'target',
         aura: 'dot',
-        value: 6, // per tick, per stack
+        value: 4, // per tick, per stack
         tickInterval: 2,
         duration: 12,
         maxStacks: 3,
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
-const CASTER_T2_BONUSES: SetBonusTier[] = [
+const CASTER_LINEAGE_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
-  },
-  {
-    pieces: 3,
-    effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.',
+    // Half pushback resistance: full immunity moved to the new raid tier's
+    // caster and healer 2-piece bonuses in the same retune.
+    effect: { int: 10, spi: 10, castPushbackReduction: 0.5 },
+    text: 'Increases Intellect by 10 and Spirit by 10. Damage taken delays your spellcasting half as much (50% pushback resistance).',
   },
   {
     pieces: 4,
     effect: {
+      sp: 12,
+      proc: {
+        id: 'set_clearcasting',
+        name: 'Clearcasting',
+        trigger: 'spellCast',
+        chance: 0.06,
+        aura: 'next_cast_free',
+        duration: 12,
+        icd: 4,
+      },
+    },
+    text: 'Increases spell power by 12. Your spells have a 6% chance to grant Clearcasting, making your next spell free.',
+  },
+  {
+    pieces: 6,
+    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       proc: {
         id: 'set_soulblaze',
         name: 'Soulblaze',
         trigger: 'spellCast',
         chance: 0.1,
         aura: 'buff_spellpower',
-        value: 40,
+        value: 25,
         duration: 10,
         icd: 20,
       },
     },
-    text: 'Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.',
+    text: 'Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec.',
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:
@@ -377,29 +360,44 @@ export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_DEATHLORD]: {
     id: SET_DEATHLORD,
     name: 'Barrowlord Battlegear',
-    bonuses: STRENGTH_T1_BONUSES,
+    lineage: LINEAGE_STRENGTH,
+    bonuses: STRENGTH_LINEAGE_BONUSES,
   },
   [SET_WYRMSHADOW]: {
     id: SET_WYRMSHADOW,
     name: 'Nightfang Vestments',
-    bonuses: AGILITY_T1_BONUSES,
+    lineage: LINEAGE_AGILITY,
+    bonuses: AGILITY_LINEAGE_BONUSES,
   },
   [SET_NECROMANCERS]: {
     id: SET_NECROMANCERS,
     name: 'Mournweave Raiment',
-    bonuses: CASTER_T1_BONUSES,
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
   },
   [SET_CROWNFORGED]: {
     id: SET_CROWNFORGED,
     name: 'Bonewrought Regalia',
-    bonuses: STRENGTH_T2_BONUSES,
+    lineage: LINEAGE_STRENGTH,
+    bonuses: STRENGTH_LINEAGE_BONUSES,
   },
-  [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Direfang Pelt', bonuses: AGILITY_T2_BONUSES },
-  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Wraithfire Regalia', bonuses: CASTER_T2_BONUSES },
+  [SET_NIGHTTALON]: {
+    id: SET_NIGHTTALON,
+    name: 'Direfang Pelt',
+    lineage: LINEAGE_AGILITY,
+    bonuses: AGILITY_LINEAGE_BONUSES,
+  },
+  [SET_SOULFLAME]: {
+    id: SET_SOULFLAME,
+    name: 'Wraithfire Regalia',
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
+  },
   [SET_STORMCALLERS]: {
     id: SET_STORMCALLERS,
     name: 'Galecall Vestments',
-    bonuses: CASTER_T2_BONUSES,
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
   },
   [SET_VALE_ARCANIST]: {
     id: SET_VALE_ARCANIST,
@@ -456,6 +454,507 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
     ),
   },
+
+  // ---- Crucible tier sets (Ignivar raid, Phase B) ----
+  // Five-piece class sets breaking at 2 and 4 pieces. The tiers here carry
+  // EMPTY stat effects ON PURPOSE: every Crucible bonus modifies the spec's
+  // engine, never raw stats (the maintainer ruling in
+  // docs/prd/ignivar-raid-loot.md, decision 7), so the payloads live in
+  // content/ignivar_set_bonuses.ts and apply through the talent-modifier
+  // seam (src/sim/set_bonus_mods.ts). The `text` below is the tooltip
+  // promise; tests pin it against the audited engine constants so copy and
+  // implementation cannot drift. Sets register one class wave at a time,
+  // text and engine TOGETHER (the rollout ledger in
+  // tests/ignivar_loot.test.ts), so a tooltip never promises an
+  // unimplemented bonus.
+  slagbreaker: {
+    id: 'slagbreaker',
+    name: 'Slagbreaker Battlegear',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        // "Every second cast", not "casting": the engine fires on castNth
+        // n:2 (the adversarial-round sizing), and the tooltip must not
+        // promise double the real rate. Deviation from the set doc's copy
+        // line, flagged for maintainer review in the PR.
+        text: "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec.",
+      },
+    ],
+  },
+  emberfury: {
+    id: 'emberfury',
+    name: 'Emberfury Harness',
+    bonuses: [
+      { pieces: 2, effect: {}, text: 'Your Enrage lasts 6 sec instead of 4.' },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health.',
+      },
+    ],
+  },
+  forgewall: {
+    id: 'forgewall',
+    name: 'Forgewall Aegis',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Iron Resolve converts rage at 5 absorb per point instead of 4.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.",
+      },
+    ],
+  },
+  dawnforged: {
+    id: 'dawnforged',
+    name: 'Dawnforged Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Radiant Resonance's empowered Dawn's Embrace is instant.",
+      },
+    ],
+  },
+  oathpyre: {
+    id: 'oathpyre',
+    name: 'Oathpyre Bastion',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec.',
+      },
+    ],
+  },
+  zealfire: {
+    id: 'zealfire',
+    name: 'Zealfire Warplate',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20.",
+      },
+    ],
+  },
+  packlord_emberhide: {
+    id: 'packlord_emberhide',
+    name: "Packlord's Emberhide",
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Pack Command's cooldown is reduced to 3 sec.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Pack Command's chance to reset Stampede's cooldown rises to 30 percent.",
+      },
+    ],
+  },
+  coldsight_trackers: {
+    id: 'coldsight_trackers',
+    name: 'Coldsight Trackers',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Measured Shot restores 5 additional Focus.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        // "per activation", not the set doc's "per window": the sim-purity
+        // scanner (tests/architecture.test.ts DOM_GLOBAL_RE) rejects the
+        // literal token "window." anywhere under src/sim, prose included.
+        // Same meaning, flagged as a copy deviation in the PR.
+        text: 'Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation.',
+      },
+    ],
+  },
+  slagsnare: {
+    id: 'slagsnare',
+    name: 'Slagsnare Trappings',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Gutting Strike generates 20 Focus.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec.',
+      },
+    ],
+  },
+  cinderfang: {
+    id: 'cinderfang',
+    name: 'Cinderfang Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Venom Ritual's energy refund rises to 20 per builder.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Venom Dart's cooldown is reduced to 4 sec.",
+      },
+    ],
+  },
+  smolderstrike: {
+    id: 'smolderstrike',
+    name: 'Smolderstrike Leathers',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Haymaker hits 20 percent harder.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown.",
+      },
+    ],
+  },
+  ashveil: {
+    id: 'ashveil',
+    name: 'Ashveil Garb',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Lurker's Strike hits 25 percent harder.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Your Veiled Edge strike hits for triple, up from double.',
+      },
+    ],
+  },
+  emberscreed: {
+    id: 'emberscreed',
+    name: 'Creed of Embers Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer/caster 2pc carries the pushback rider (full immunity,
+        // the raid tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec.',
+      },
+    ],
+  },
+  benison_dawnweave: {
+    id: 'benison_dawnweave',
+    name: 'Benison Dawnweave',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec.',
+      },
+    ],
+  },
+  vesperash: {
+    id: 'vesperash',
+    name: 'Vesperash Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit.",
+      },
+    ],
+  },
+  stormkindled: {
+    id: 'stormkindled',
+    name: 'Stormkindled Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Earthen Jolt's bonus per Thunder rises to 30 percent.",
+      },
+    ],
+  },
+  warspirit_emberscale: {
+    id: 'warspirit_emberscale',
+    name: 'Warspirit Emberscale',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Ancestral Strike advances your cadence 3 steps.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Ancestral Strike hits 30 percent harder.',
+      },
+    ],
+  },
+  stonehearth: {
+    id: 'stonehearth',
+    name: 'Stonehearth Bastion',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'While Stonebound, completing a cadence heals you for 3 percent of your maximum health.',
+      },
+    ],
+  },
+  springmender: {
+    id: 'springmender',
+    name: 'Springmender Scale',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent.',
+      },
+    ],
+  },
+  chronoweave: {
+    id: 'chronoweave',
+    // Renamed from the working title "Chronoweave" in the final adversarial
+    // round: the old name collided with the arcane mastery. The set ID stays
+    // `chronoweave` (the shipped Phase A item tags carry it).
+    name: 'Aetherweave Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Temporal Cascade's cooldown is reduced by 5 sec.",
+      },
+    ],
+  },
+  pyroclast: {
+    id: 'pyroclast',
+    name: 'Pyroclast Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec.",
+      },
+    ],
+  },
+  frostquench: {
+    id: 'frostquench',
+    name: 'Frostquench Weave',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Winterlash plants 3 Winter's Chill charges, up from 2.",
+      },
+    ],
+  },
+  hexthread: {
+    id: 'hexthread',
+    name: 'Hexthread Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Passing Sentence refunds 10 Condemnation.',
+      },
+    ],
+  },
+  gravebrand: {
+    id: 'gravebrand',
+    name: 'Gravebrand Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Reaping Command's unison strikes deal 25 percent more damage.",
+      },
+    ],
+  },
+  ruincaller: {
+    id: 'ruincaller',
+    name: 'Ruincaller Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Ruinbolt strikes 20 percent harder.',
+      },
+    ],
+  },
+  moonscorch: {
+    id: 'moonscorch',
+    name: 'Moonscorch Raiment',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Moonsurge and Sunwake strike 25 percent harder.',
+      },
+    ],
+  },
+  wildfang_emberhide: {
+    id: 'wildfang_emberhide',
+    name: 'Wildfang Emberhide',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Redharvest restores 45 energy, up from 30.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Redharvest plants a fresh Flense on the target.',
+      },
+    ],
+  },
+  cinderbark: {
+    id: 'cinderbark',
+    name: 'Cinderbark Ward',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Sweeping Claws has a 30 percent chance to bank an additional Old Blood.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike.',
+      },
+    ],
+  },
+  grovespring: {
+    id: 'grovespring',
+    name: 'Grovespring Raiment',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // "prefers your own ... first", not the set doc's "consumes only your
+        // own": the implemented (and doc-mandated) explicit fallback still
+        // consumes any HoT when the wearer has none of their own, so "only"
+        // would overclaim the narrowing. Recorded as a copy deviation in the
+        // wave's PR notes.
+        text: 'Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on
@@ -468,6 +967,7 @@ export interface AggregatedSetEffect {
   spi: number;
   ap: number;
   sp: number;
+  healPower: number;
   crit: number;
   critRating: number;
   haste: number;
@@ -490,6 +990,7 @@ function zeroEffect(): AggregatedSetEffect {
     spi: 0,
     ap: 0,
     sp: 0,
+    healPower: 0,
     crit: 0,
     critRating: 0,
     haste: 0,
@@ -510,11 +1011,29 @@ function zeroEffect(): AggregatedSetEffect {
 // than summing past 1. Pure and host-agnostic so a Vitest can drive it directly.
 export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetEffect {
   const out = zeroEffect();
+  // Fold family counts into lineage counts first, so tier thresholds read the
+  // COMBINED tier-1 plus tier-2 pieces (the 2/4/6 ladder). Each lineage's
+  // shared table applies exactly once, from whichever member set is seen
+  // first; non-lineage families (WARFARE, haste kits) resolve per set.
+  const lineageCounts = new Map<string, number>();
+  for (const [setId, count] of counts) {
+    const lineage = ITEM_SETS[setId]?.lineage;
+    if (lineage !== undefined) {
+      lineageCounts.set(lineage, (lineageCounts.get(lineage) ?? 0) + count);
+    }
+  }
+  const appliedLineages = new Set<string>();
   for (const [setId, count] of counts) {
     const set = ITEM_SETS[setId];
     if (!set) continue;
+    let effectiveCount = count;
+    if (set.lineage !== undefined) {
+      if (appliedLineages.has(set.lineage)) continue;
+      appliedLineages.add(set.lineage);
+      effectiveCount = lineageCounts.get(set.lineage) ?? count;
+    }
     for (const tier of set.bonuses) {
-      if (count < tier.pieces) continue;
+      if (effectiveCount < tier.pieces) continue;
       const e: SetBonusEffect = tier.effect;
       out.str += e.str ?? 0;
       out.agi += e.agi ?? 0;
@@ -523,6 +1042,7 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.spi += e.spi ?? 0;
       out.ap += e.ap ?? 0;
       out.sp += e.sp ?? 0;
+      out.healPower += e.healPower ?? 0;
       out.crit += e.crit ?? 0;
       out.critRating += e.critRating ?? 0;
       out.haste += e.haste ?? 0;

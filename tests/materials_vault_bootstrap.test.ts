@@ -18,7 +18,7 @@ import { vaultMaterialIds } from '../src/sim/materials_vault';
 describe('materials_vault as the first-evaluated sim module', () => {
   it('derives the full material set with no import of data.ts ahead of it', () => {
     const ids = vaultMaterialIds();
-    expect(ids.size).toBe(55);
+    expect(ids.size).toBe(56);
     expect(ids.has('iron_ore')).toBe(true);
     expect(ids.has('arcanite_bar')).toBe(true);
     expect(ids.has('guardian_core')).toBe(false);

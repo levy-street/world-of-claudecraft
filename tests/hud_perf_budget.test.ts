@@ -603,7 +603,9 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 14, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
+  // 3 one-time pooled-node builds (createNode's .buff/.dur/.stacks) + the overflow
+  // badge span built once in the constructor.
+  { file: 'auras_painter.ts', allow: { '.className': 4 }, reflowAllow: {} },
   {
     file: 'fct_painter.ts',
     allow: { '.className': 1, '.setAttribute': 1 },
@@ -692,6 +694,7 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: {},
     reflowAllow: { getComputedStyle: 1 },
   },
+  { file: 'dungeon_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -996,6 +999,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/vendor/crucible_vendor_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
@@ -2569,7 +2577,8 @@ interface PainterHarness {
 function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHarness[] {
   const harnesses: PainterHarness[] = [];
 
-  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText + toggleClass.
+  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText
+  // + setAttr (the always-visible percent, on both bar and frame) + toggleClass.
   {
     const bar = fakeEl();
     const fill = fakeEl();
@@ -2577,7 +2586,13 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
     const label = fakeEl();
     const playerFrame = fakeEl();
     const painter = new XpBarPainter(facet, bar, fill, rested, label, playerFrame);
-    const view: XpBarView = { fillFrac: 0.5, restedFrac: 0.1, label: 'XP 1 / 2', postCap: false };
+    const view: XpBarView = {
+      fillFrac: 0.5,
+      restedFrac: 0.1,
+      label: 'XP 1 / 2',
+      percentText: '50%',
+      postCap: false,
+    };
     harnesses.push({ name: 'xp_bar', drive: () => painter.paint(view) });
   }
 

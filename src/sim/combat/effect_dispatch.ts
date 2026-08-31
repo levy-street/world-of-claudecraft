@@ -16,6 +16,11 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
+import {
+  EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX,
+  SPRINGMENDER_4PC_BONUS_JUMPS,
+  setBonusFlag,
+} from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
@@ -175,7 +180,7 @@ import {
 import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
-import { triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
+import { dawnRhythmCutSec, triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { grantRadiantResonance } from './paladin_radiant_resonance';
 import { riteAnswersTheWholeGroup } from './paladin_rite_of_many';
@@ -215,6 +220,7 @@ import {
   rogueEngineOnFinisher,
   rogueGloamDetonation,
 } from './rogue_engines';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
 import {
   applyPrimalExaltation,
@@ -356,6 +362,21 @@ function consumeMatchingAura(
   eff: Extract<ResolvedAbility['effects'][number], { type: 'consumeAura' }>,
 ): number {
   if (!target) return -1;
+  // Grovespring 2pc: Swiftmend (the only hot-kind consumer) prefers the
+  // caster's OWN Wildbloom or Second Bloom, so a wearer stops eating another
+  // healer's HoT while their own is up. With none of their own present the
+  // base pick below still applies (the set doc's explicit fallback: a paid
+  // cast must never turn into a silent no-heal). Selection only; draws no
+  // rng and never changes which auras are eligible for anyone else.
+  if (eff.auraKind === 'hot' && wearsSetBonus(ctx, caster, 'grovespring', 2)) {
+    const own = target.auras.findIndex(
+      (a) =>
+        a.kind === 'hot' &&
+        a.sourceId === caster.id &&
+        (a.id === 'rejuvenation' || a.id === 'regrowth'),
+    );
+    if (own >= 0) return own;
+  }
   return target.auras.findIndex((a) => {
     // Only dot/hot auras are consumable, even by id: a raw splice skips the
     // stat-aura teardown expiry performs, so consuming a stat-carrying aura
@@ -419,6 +440,13 @@ export function runEffects(
   target: Entity | null,
   res: ResolvedAbility,
   attackAnimationStarted = false,
+  // Cast-scoped outgoing-heal multiplier for the direct 'heal' effect: 1 for
+  // every cast unless the caller marks this one (today only the Stonehearth
+  // 2pc's Stormcast-while-Stonebound Mending Waters, combat/
+  // shaman_stonehearth.ts). It multiplies the WHOLE resolved heal (authored
+  // roll plus the Spell Power rider) so a printed percent is delivered
+  // exactly; at 1 the arithmetic below is untouched.
+  castHealMult = 1,
   deferredBastionImpact = false,
   facingOverride?: number,
 ): void {
@@ -562,7 +590,7 @@ export function runEffects(
   // consuming its Doom pool after the cast is committed.
 
   let targetBuffIndex = 0;
-  for (const eff of res.effects) {
+  effects: for (const eff of res.effects) {
     switch (eff.type) {
       case 'destructionConflagrate': {
         if (target) advanceBurningPactTick(ctx, p, target);
@@ -700,7 +728,8 @@ export function runEffects(
             fx: 'paladinFinalEdict',
             ability: ability.id,
           });
-          triggerPaladinDawnRhythm(p, ability.id);
+          // Zealfire 2pc deepens the paired cut for wearers (dawnRhythmCutSec).
+          triggerPaladinDawnRhythm(p, ability.id, dawnRhythmCutSec(mods));
           tryGrantDawnsWrath(ctx, p);
         }
         if (hit && ability.id === 'vowkeeper_strike') {
@@ -726,9 +755,37 @@ export function runEffects(
         if (
           ability.id === 'marrowbreak' &&
           marrowbreakGuard?.type === 'druidMarrowbreakGuard' &&
-          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac)
+          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac) &&
+          // Cinderbark 4pc: the emergency guard no longer REPLACES the
+          // strike. This break is the one replacement site; skipping it for
+          // wearers lands the strike (with its authored flat-110 mult-2
+          // threat) while the druidMarrowbreakGuard arm below still applies
+          // the absorb and rage refund. Wearer-only rng note, disclosed by
+          // the set doc: the restored strike draws its damage and crit rolls
+          // below half health where the base path drew none.
+          !wearsSetBonus(ctx, p, 'cinderbark', 4)
         ) {
           break;
+        }
+        // A physical direct hit can miss like any melee attack (Hit rating reduces
+        // it, via swingMissChance), the same roll the sunder effect takes; a miss
+        // deals no damage and causes no threat. Rolled before this hit's damage and
+        // crit draws, and ONLY when it can actually fail: a hit-capped attacker
+        // cannot miss, so drawing there would fork the shared stream for nothing.
+        const directMissChance = isSpell ? 0 : swingMissChance(p, target);
+        if (directMissChance > 0 && ctx.rng.chance(directMissChance)) {
+          ctx.emit({
+            type: 'damage',
+            sourceId: p.id,
+            targetId: target.id,
+            amount: 0,
+            crit: false,
+            school: 'physical',
+            ability: ability.name,
+            kind: 'miss',
+          });
+          ctx.enterCombat(p, target);
+          break effects;
         }
         const rooted = isRootedOrChilled(target);
         const abilityMod = mods.abilities[ability.id];
@@ -816,7 +873,9 @@ export function runEffects(
         // Read before the hunter/shaman follow-up hooks below, which can deal their
         // own damage: this must stay the damage THIS ability landed.
         const effectiveDamage = Math.max(0, targetHpBefore - target.hp);
-        onHunterPrimaryDamage(ctx, p, target, res, finalDamage);
+        // The crit rolled above is plumbed through as one argument (Coldsight
+        // 4pc observes it; no extra roll happens anywhere downstream).
+        onHunterPrimaryDamage(ctx, p, target, res, finalDamage, crit);
         if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
@@ -1027,8 +1086,19 @@ export function runEffects(
       }
       case 'enrageChance': {
         // Guaranteed Enrage consumes no RNG; probabilistic Bloodletting draws
-        // exactly once at the authored chance.
-        if (eff.chance < 1 && !ctx.rng.chance(eff.chance)) break;
+        // exactly once at the authored chance. Emberfury 4pc makes
+        // Bloodletting's Enrage GUARANTEED for the wearer: the roll is
+        // SKIPPED at chance 1, never rolled-and-passed, so wearers
+        // legitimately shift the rng stream (disclosed in
+        // docs/prd/ignivar-set-bonus-final.md for seeded suites).
+        const guaranteed =
+          eff.chance >= 1 ||
+          (ability.id === 'bloodthirst' && mods.selected[setBonusFlag('emberfury', 4)] === true);
+        if (!guaranteed && !ctx.rng.chance(eff.chance)) break;
+        // Emberfury 2pc lives UPSTREAM: durationFlat rows rewrite the
+        // RESOLVED enrageChance durations (applyTalentMods), so eff.duration
+        // already carries the wearer's +2 and the tooltip reads the same
+        // number this site applies.
         ctx.applyAura(p, {
           id: 'fury_enrage',
           name: 'Enraged',
@@ -1135,7 +1205,7 @@ export function runEffects(
           // Temporal Cascade's initial heal the same way it does every other heal.
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
-            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+            directHealBonus(p.healPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, ally, healAmount, ability.name);
           if (devPlaytest) {
             const applied = ally.hp - before;
@@ -1228,10 +1298,16 @@ export function runEffects(
         // Power rider. Preserve the legacy direct-heal draw order, however:
         // Last Rite used to roll its fixed min/max and crit before this change.
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
-        const healAmount =
+        const baseHealAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.spellPower, res.castTime, false, talentHealMult)
+            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
+        // The cast-scoped multiplier (see the runEffects parameter note): the
+        // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
+        const healAmount =
+          castHealMult === 1
+            ? baseHealAmount
+            : Math.max(1, Math.round(baseHealAmount * castHealMult));
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
@@ -1317,9 +1393,17 @@ export function runEffects(
         if (first !== p && ctx.isHostileTo(p, first)) break;
         const baseAmount =
           ctx.rng.range(eff.min, eff.max) +
-          directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+          directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+        // Springmender 4pc (the Crucible set doc): Cascading Mend reaches a
+        // FOURTH ally, one extra hop past the authored jumps. Bespoke: no
+        // talent primitive reaches chainHeal's jump count, so the bend lives
+        // at this dispatch, gated on the wearer flag. Wearer-only rng note,
+        // disclosed: the extra hop draws its own heal-crit roll below;
+        // non-wearers build the exact chain and draws they always did.
+        const jumps =
+          eff.jumps + (wearsSetBonus(ctx, p, 'springmender', 4) ? SPRINGMENDER_4PC_BONUS_JUMPS : 0);
         const chain: Entity[] = [first];
-        while (chain.length <= eff.jumps) {
+        while (chain.length <= jumps) {
           const from = chain[chain.length - 1];
           let best: Entity | null = null;
           let bestFrac = Infinity;
@@ -1407,7 +1491,7 @@ export function runEffects(
         const hotSp = hybridHeal
           ? 0
           : hotTickBonus(
-              p.spellPower,
+              p.healPower,
               eff.duration,
               eff.interval,
               talentHealMult * (1 + mods.global.hotHealPct),
@@ -1442,7 +1526,7 @@ export function runEffects(
             eff.amount +
             Math.round(p.maxHp * (eff.casterMaxHpPct ?? 0)) +
             absorbBonus(
-              p.spellPower,
+              p.healPower,
               eff.spellPowerCoeff ?? 0,
               talentHealMult * (1 + mods.global.absorbPct),
             ),
@@ -2231,7 +2315,7 @@ export function runEffects(
               const source = ctx.entities.get(sourceId);
               const sourceMeta = ctx.players.get(sourceId);
               if (!source || source.dead || !sourceMeta) return;
-              runEffects(ctx, source, sourceMeta, null, res, true, true, castFacing);
+              runEffects(ctx, source, sourceMeta, null, res, true, 1, true, castFacing);
             },
           });
           break;
@@ -2427,7 +2511,8 @@ export function runEffects(
           advanceSunGodVerdictForHit(ctx, p, sunVerdictHit.target, ability.id, sunVerdictHit.mark);
         }
         if (ability.id === DAWNFALL_ID && aoeTargets.length > 0 && !dawnRhythmTriggered) {
-          triggerPaladinDawnRhythm(p, ability.id);
+          // Zealfire 2pc deepens the paired cut for wearers (dawnRhythmCutSec).
+          triggerPaladinDawnRhythm(p, ability.id, dawnRhythmCutSec(mods));
           dawnRhythmTriggered = true;
         }
         if (eff.rageOnHit && meta.cls === 'warrior' && p.resourceType === 'rage') {
@@ -2594,7 +2679,7 @@ export function runEffects(
           ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
-        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true, talentHealMult);
+        const aoeHealBonus = directHealBonus(p.healPower, res.castTime, true, talentHealMult);
         let effectiveHealingTargets = 0;
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
@@ -3380,7 +3465,7 @@ export function runEffects(
         if (eff.heal) {
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
-            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+            directHealBonus(p.healPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
         break;
@@ -3797,9 +3882,15 @@ export function runEffects(
         break;
       }
       case 'selfHealPctMax': {
-        const pct = p.auras.some((a) => a.id === 'furious_mending')
-          ? Math.max(eff.pct, 0.2)
-          : eff.pct;
+        // Emberfury 4pc: Bloodletting's self-heal rises to 8 percent of max
+        // health for the wearer. The furious_mending FLOOR (max with 0.2)
+        // stays on top, so the bonus is honestly inert inside that window
+        // (0.08 < 0.2; stated in the set doc).
+        const base =
+          ability.id === 'bloodthirst' && mods.selected[setBonusFlag('emberfury', 4)] === true
+            ? EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX
+            : eff.pct;
+        const pct = p.auras.some((a) => a.id === 'furious_mending') ? Math.max(base, 0.2) : base;
         ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
         if (ability.id === 'wildheart') runHunterWildheart(ctx, p);
         break;
@@ -3864,7 +3955,9 @@ export function runEffects(
         break;
       }
       case 'afflictionNeedle': {
-        if (target) resolveNeedleOfFate(ctx, p, target);
+        // eff.doom is the RESOLVED payload (the Hexthread 2pc rewrite raises
+        // it for wearers), so the dispatch and the tooltip splice agree.
+        if (target) resolveNeedleOfFate(ctx, p, target, eff.doom);
         break;
       }
       case 'afflictionSentence': {
@@ -4026,6 +4119,9 @@ export function runEffects(
         break;
       }
       case 'absorbSpentResource': {
+        // Forgewall 2pc lives UPSTREAM: a buffPct row rewrites the RESOLVED
+        // mult (applyTalentMods' scaleEffect extension), so eff.mult already
+        // carries the wearer's 5-per-rage and the tooltip reads the same.
         const amount = Math.round(res.cost * eff.mult);
         if (amount <= 0) break;
         ctx.applyAura(p, {

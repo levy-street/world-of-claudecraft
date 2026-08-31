@@ -977,4 +977,33 @@ export const table: DeedLocaleTable = {
     desc: 'Illuminera sidan Heroisk: Gravlindormens helgedom i Relikvariet.',
     title: 'Helgedomens ljus',
   },
+  soc_strongbox_outfitter: {
+    name: 'Kassakistans utrustare',
+    desc: 'Lås upp din första väskplats i valvet.',
+  },
+  soc_four_bags_deep: {
+    name: 'Full väskkapacitet',
+    desc: 'Lås upp alla fyra väskplatser i valvet.',
+  },
+  dgn_ignivar: {
+    name: 'Härolden faller',
+    desc: 'Besegra Ignivar, Herald of the Last Flame, i Crucible of the Last Spring.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroisk: Härolden faller',
+    desc: 'Besegra Ignivar, Herald of the Last Flame, på heroisk svårighetsgrad.',
+  },
+  dgn_varkhul: {
+    name: 'Smedjan kallnar',
+    desc: 'Besegra Varkhul, Forgefather of the Last Flame, i The Inner Crucible.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroisk: Smedjan kallnar',
+    desc: 'Besegra Varkhul, Forgefather of the Last Flame, på heroisk svårighetsgrad.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ingen enda glöd slocknad',
+    desc: 'Besegra Varkhul, Forgefather of the Last Flame, på heroisk svårighetsgrad utan att en enda raidmedlem dör.',
+    title: 'den Obrända',
+  },
 };

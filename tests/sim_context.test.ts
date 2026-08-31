@@ -147,6 +147,7 @@ const CALLBACK_KEYS = [
   // I1 dungeon instancing + the shared raid-lockout clock + the host reset boundary.
   'lockoutNowMs',
   'raidResetMs',
+  'weeklyRaidResetMs',
   'instanceKeyFor',
   'instanceOriginOf',
   'instanceClaimIdAt',
@@ -427,6 +428,7 @@ function makeFakeHost() {
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
+    weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),

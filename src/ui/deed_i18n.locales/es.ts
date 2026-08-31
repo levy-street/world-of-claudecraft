@@ -1049,6 +1049,35 @@ export const table: DeedLocaleTable = {
     desc: 'Ilumina la página Heroico: Santuario del Gravewyrm de El Relicario.',
     title: 'Luz del Santuario',
   },
+  soc_strongbox_outfitter: {
+    name: 'El Equipador del Arca',
+    desc: 'Desbloquea tu primer espacio de bolsa del banco.',
+  },
+  soc_four_bags_deep: {
+    name: 'Las cuatro bolsas',
+    desc: 'Desbloquea los cuatro espacios de bolsa del banco.',
+  },
+  dgn_ignivar: {
+    name: 'El Heraldo cae',
+    desc: 'Derrota a Ignivar, Heraldo de la Última Llama, en Crucible of the Last Spring.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroico: El Heraldo cae',
+    desc: 'Derrota a Ignivar, Heraldo de la Última Llama, en dificultad heroica.',
+  },
+  dgn_varkhul: {
+    name: 'La Forja se enfría',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en The Inner Crucible.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroico: La Forja se enfría',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en dificultad heroica.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ni una brasa perdida',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en dificultad heroica sin que muera un solo miembro de la banda.',
+    title: 'el Incólume',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

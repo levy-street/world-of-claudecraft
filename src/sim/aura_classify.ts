@@ -19,6 +19,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'polymorph',
   'attackspeed',
   'bleed_vuln',
+  'vuln_source',
   'debuff_ap',
   'sunder',
   'corrode',
@@ -57,18 +58,37 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
   return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }
 
+// Auras that ride a shared, mostly-buff kind ('internal_cd': Heating Up,
+// Convergence Mark, Warspirit Cadence, and a dozen other class-specific
+// cooldown/proc-window markers) but should be presented on the debuff surface.
+// This is VISUAL ONLY. It must not make the aura a player-removable harmful
+// effect for dispel, cleanseSelf, or right-click cancel classification.
+// Player feedback on PR #3668: Stormsurge's 6 sec "Ancestral Strike's cooldown
+// was just reset, and it cannot happen again until you use it and it goes back
+// on cooldown" marker (shaman_warspirit.ts STORMSURGE_READY_ID) read as a buff,
+// which hid it behind the buff bar's low-tier overflow cap alongside ordinary
+// stat buffs even though missing it costs the player a timing window, not just
+// a cosmetic icon.
+const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set(['shaman_stormsurge_ready']);
+
+export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {
+  return isDebuffAura(kind, value) || (id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(id));
+}
+
 // The one rule for "may a player counter take this aura off at all", ahead of any
-// question of school or polarity. Two aura classes answer no: encounter-authored
-// unbreakable control (the script owns its release) and `undispellable` penalties
+// question of school or polarity. Three aura classes answer no: encounter-owned
+// mechanics, unbreakable control (the script owns its release), and `undispellable` penalties
 // (the recovery sicknesses, which only their own timer clears). Every removal path a
 // player can drive routes through here so the answer cannot drift between them: the
 // dispel executor and its requiresDispellable cast gate (isDispellableAura below),
 // the cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
 // cancel (combat/aura_cancel.ts).
 export function isPlayerRemovableAura(
-  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'>,
+  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'encounterOwned' | 'undispellable'>,
 ): boolean {
-  return !isUnbreakableControlAura(aura) && aura.undispellable !== true;
+  return (
+    aura.encounterOwned !== true && !isUnbreakableControlAura(aura) && aura.undispellable !== true
+  );
 }
 
 // The dispel eligibility rule, shared by the dispel executor and the
@@ -77,13 +97,16 @@ export function isPlayerRemovableAura(
 // strips a benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
   aura: Pick<Aura, 'kind' | 'value' | 'school'> &
-    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'undispellable' | 'permanent'>>,
+    Partial<
+      Pick<Aura, 'id' | 'unbreakableControl' | 'encounterOwned' | 'undispellable' | 'permanent'>
+    >,
   offensive: boolean,
 ): boolean {
   // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,
   // not a transferable magic buff. Letting dispel/steal remove only the synthetic
   // icon would leave its charges active invisibly (or copy a mechanically inert icon).
   if (aura.id === 'divine_ascension' || aura.permanent) return false;
+  if (aura.id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(aura.id)) return false;
   if (!isPlayerRemovableAura(aura)) return false;
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
@@ -135,6 +158,11 @@ export function isPartyFrameRelevantAura(aura: {
 }): boolean {
   if (PARTY_FRAME_EXCLUDED_KINDS.has(aura.kind)) return false;
   const value = aura.neg ? -1 : (aura.value ?? 1);
+  // Deliberately the harmful classifier, not isDebuffDisplayAura: a display override is a
+  // personal proc/cooldown marker no healer acts on, exactly like 'sated' and
+  // 'cheater_mark' above, which PARTY_FRAME_EXCLUDED_KINDS already keeps off a
+  // raid frame despite being real debuffs. Passing the id here would newly spend
+  // a raid frame's limited aura slots on it.
   return (
     isDebuffAura(aura.kind, value) ||
     PARTY_FRAME_HELPFUL_KINDS.has(aura.kind) ||

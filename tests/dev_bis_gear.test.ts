@@ -1,6 +1,14 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { bestEpicGearFor, equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import {
+  bestEpicGearFor,
+  equipBestInSlotForDev,
+  equipReferenceEpicKitForDev,
+} from '../src/sim/dev/bis_gear';
+import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot } from '../src/sim/types';
@@ -51,5 +59,62 @@ describe('dev bis gear', () => {
     expect(equipped).toBeGreaterThanOrEqual(8);
     expect(sim.player.stats.agi + sim.player.stats.sta).toBeGreaterThan(before);
     expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('keeps the reference kit on the item-table scorer, never the parse snapshot', () => {
+    // The balance probes and their pinned DPS bands equip through
+    // equipReferenceEpicKitForDev; a new parse capture must not move them.
+    const sim = new Sim({ seed: 5, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('combat')).toBe(true);
+    // The spec has a parse loadout, and it differs from the scorer's picks, so
+    // this fixture actually distinguishes the two sources.
+    const parse = parseBisGearFor('rogue', 'combat');
+    const reference = bestEpicGearFor('rogue', 'combat');
+    expect(parse).toBeTruthy();
+    expect(parse).not.toEqual(reference);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx;
+    const equipped = equipReferenceEpicKitForDev(ctx, sim.player.id);
+    expect(equipped).toBeGreaterThanOrEqual(8);
+    const meta = ctx.players.get(sim.player.id);
+    // Total equality, not a per-slot subset: a parse-only slot leaking in or a
+    // reference slot silently going uncoverable must both fail here.
+    expect(meta?.equipment).toEqual(reference);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('preserves stale slots the scorer cannot cover, unlike the clearing /dev bis', () => {
+    // The reference kit reproduces the pre-parse-loadout equip semantics the
+    // pinned DPS bands were minted under: overwrite picks only, never clear.
+    // The scorer has no druid offhand pick, so a planted offhand is the one
+    // observable that separates the two appliers.
+    const sim = new Sim({ seed: 5, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('feral')).toBe(true);
+    expect(bestEpicGearFor('druid', 'feral').offhand).toBeUndefined();
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx;
+    const meta = ctx.players.get(sim.player.id);
+    expect(meta).toBeDefined();
+    if (meta) meta.equipment.offhand = 'gnarled_staff';
+    equipReferenceEpicKitForDev(ctx, sim.player.id);
+    expect(meta?.equipment.offhand).toBe('gnarled_staff');
+    equipBestInSlotForDev(ctx, sim.player.id);
+    expect(meta?.equipment.offhand).not.toBe('gnarled_staff');
+  });
+
+  it('keeps the balance probes equipping through the reference kit', () => {
+    // The regression shape that broke the fight-6498 bands was a probe call
+    // site drifting onto the /dev bis applier; pin the call sites cheaply so
+    // the failure is not deferred to the multi-minute band suites.
+    const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+    for (const file of ['scripts/rogue_dps_probe.ts', 'scripts/druid_balance_probe.ts']) {
+      const source = readFileSync(join(repoRoot, file), 'utf8');
+      expect(source, `${file} equips via the reference kit`).toContain(
+        'equipReferenceEpicKitForDev',
+      );
+      expect(source, `${file} must not equip via the /dev bis applier`).not.toContain(
+        'equipBestInSlotForDev',
+      );
+    }
   });
 });

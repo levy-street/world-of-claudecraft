@@ -106,7 +106,7 @@ describe('Essence Reap premium filler VFX', () => {
     expect(ability).toMatchObject({
       id: 'soul_harvest',
       name: 'Essence Reap',
-      learnLevel: 1,
+      learnLevel: 5,
       cost: 30,
       castTime: 1.8,
       cooldown: 0,

@@ -586,6 +586,16 @@ GPU work signs. Each rule names its seam and its guard.
   `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built,
   ahead of that renderer's first `render()`.** Guard: the secondary-context pins in
   `tests/shader_debug_flag.test.ts`.
+- **Every `THREE.ShaderChunk` patch installs at module scope, from its own module
+  (`final_color_nan_guard.ts` is the template), unless it is scoped to exactly one
+  renderer on purpose** (`installPbrPointLightShaderPruning`, `pbr_fragment_shader.ts`,
+  called only from `initGfxTier`, since only the world renderer needs it today). This
+  repo builds more than one `WebGLRenderer` outside `initGfxTier`
+  (`characters/preview.ts`, `characters/portrait.ts`, `armory_preview.ts`,
+  `src/editor/asset_thumbs.ts`, `src/guide/viewer/scene.ts`,
+  `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
+  world renderer, and a per-site call is easy to miss on one of the others. Guard:
+  `tests/final_color_nan_guard.test.ts`.
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
