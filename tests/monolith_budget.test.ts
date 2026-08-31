@@ -724,7 +724,12 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 13133, the release 13249. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 13049,
+    // Lowered 13049 -> 13023 at the Masterwrought phase 18 farm producer unit:
+    // the compile gate's shadow arm moved to src/render/shadow_depth_compile.ts
+    // (a thin wrapper stays), which paid for the farm gate closure, the gate
+    // label parameter, the zone-prewarm host weld and the single-sited farm
+    // drive. Exact count, zero slack.
+    ceiling: 13023,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

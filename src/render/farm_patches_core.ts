@@ -277,6 +277,17 @@ export function farmModelUrls(): string[] {
   return urls;
 }
 
+/**
+ * The `?farmPrep=0` kill switch (the `?encounterPrewarm=0` idiom): the farm
+ * visuals attach bare and stage no program anchors, exactly the pre-gate
+ * behaviour, so scripts/farm_gpu_tour.mjs runs its control leg on the same
+ * build as its prepared leg. Pure over the search string; the adapter hands it
+ * `location.search` (or '' headless).
+ */
+export function farmPrewarmDisabled(search: string): boolean {
+  return new URLSearchParams(search).get('farmPrep') === '0';
+}
+
 /** How far west of the grid's west edge the compost bin stands (yd). Short of
  *  the 5 yd bed pitch, so the bin never lands where a future bed row would. */
 export const FARM_COMPOST_BIN_OFFSET = 3;

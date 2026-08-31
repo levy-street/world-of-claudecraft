@@ -330,4 +330,42 @@ describe('the untyped host seam stays welded to the renderer', () => {
       'logic grew inside the wrapper: mirror it in zone_prewarm_groups.ts',
     ).toEqual(['return characterVisualPoolKey(e);']);
   });
+
+  it('every builder call goes through the typed adapter, never the bare untyped host', () => {
+    // The Phase 18 weld arm: renderer.ts binds its private members to
+    // ZonePrewarmGroupHost in one adapter object, so a signature drift on any
+    // consumed member is a tsc error at the binding (the source anchors above
+    // stay as the second arm, since the adapter's arrows carry no types of
+    // their own). The pin here is that the adapter is what the builders get:
+    // a call site handing `this` again would bypass the weld silently, since
+    // the builders still accept `host: object`.
+    const adapterAt = renderer.indexOf('private zonePrewarmHost(): ZonePrewarmGroupHost {');
+    expect(adapterAt, 'the typed adapter is missing from renderer.ts').toBeGreaterThan(-1);
+    const adapter = renderer.slice(adapterAt, renderer.indexOf('\n  }', adapterAt));
+    for (const binding of [
+      'sim: this.sim,',
+      'this.prewarmEntity(kind, templateId, color, scale, skin, id),',
+      'storePooledObject: (key, object) => this.storePooledObject(key, object),',
+      'templateIdsInZone: (zone, kind) => this.templateIdsInZone(zone, kind),',
+      'prewarmedMobTemplates: this.prewarmedMobTemplates,',
+      'prewarmedNpcModels: this.prewarmedNpcModels,',
+    ]) {
+      expect(adapter, `adapter binding missing: ${binding}`).toContain(binding);
+    }
+    // The first argument, up to its separating comma or the call's own `);`
+    // (lazy, so the adapter's `()` stays inside the capture).
+    const builderCalls = [
+      ...renderer.matchAll(
+        /\b(buildEntityPrewarmGroup|buildNpcPrewarmGroup|buildPlayerPrewarmGroup|buildObjectPrewarmGroup)\(([^\n]*?)(?:, |\);)/g,
+      ),
+    ];
+    // Four builders, every call site: the adapter, never `this`.
+    expect(builderCalls.length).toBeGreaterThanOrEqual(4);
+    for (const call of builderCalls) {
+      expect(call[2].trim(), `${call[1]} bypasses the weld: ${call[0]}`).toBe(
+        'this.zonePrewarmHost()',
+      );
+    }
+    expect(renderer).toContain('type ZonePrewarmGroupHost,');
+  });
 });

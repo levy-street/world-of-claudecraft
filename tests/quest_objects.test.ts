@@ -4,12 +4,16 @@
 // supply_crate fallback. No renderer/WebGL context is needed: THREE.Group/
 // Mesh/Geometry/Material construction runs fine under plain Node.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { linkPiecesOf } from '../src/render/compile_gate_pieces';
 import {
   buildGroundQuestObject,
+  noItemPickMaterialForTest,
   questObjectCacheInternalsForTest,
 } from '../src/render/quest_objects';
+import { disposeUnsharedMeshResources, isSharedMaterial } from '../src/render/shared_resource';
 
 describe('buildGroundQuestObject royal_seal', () => {
   it('returns a populated group, not the generic supply_crate fallback', () => {
@@ -121,5 +125,83 @@ describe('buildGroundQuestObject royal_seal', () => {
     expect(color.r).toBeGreaterThan(color.b);
     expect(color.r).toBeGreaterThan(0.5);
     expect(color.g).toBeGreaterThan(color.b);
+  });
+});
+
+describe('the no-item pick proxy (the placed feast entity view) and the compile gate', () => {
+  // The MEASUREMENT behind the shared material (Masterwrought phase 18, item
+  // feast-click-proxy-compile-unit): the entity view gate enumerates the proxy
+  // as one material group of its root (linkPiecesOf), so a feast view costs
+  // one compile-gate unit either way. What a fresh MeshBasicMaterial per view
+  // added was a LINK inside that unit: removeView disposed the only material
+  // holding the plain-MeshBasicMaterial program, so the next feast's unit
+  // linked it cold again. Shared and dispose-exempt, the unit is a
+  // program-cache hit after the first feast of a session.
+  const proxyOf = (group: THREE.Group): THREE.Mesh => {
+    const meshes: THREE.Mesh[] = [];
+    group.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
+    });
+    expect(meshes).toHaveLength(1);
+    return meshes[0];
+  };
+
+  it('every feast view wears the ONE shared proxy material, tagged dispose-exempt', () => {
+    const a = proxyOf(buildGroundQuestObject('', 501).group);
+    const b = proxyOf(buildGroundQuestObject('', 502).group);
+    expect(a.material).toBe(b.material);
+    expect(a.material).toBe(noItemPickMaterialForTest());
+    expect(isSharedMaterial(a.material as THREE.Material)).toBe(true);
+    expect((a.material as THREE.Material).type).toBe('MeshBasicMaterial');
+    // Still the invisible, non-casting click body at the feast contract bounds.
+    expect(a.visible).toBe(false);
+    expect(a.castShadow).toBe(false);
+    // Geometry stays per view: the raycast box is the view's own.
+    expect(a.geometry).not.toBe(b.geometry);
+  });
+
+  it("removeView's per-view teardown frees the box and leaves the shared material resident", () => {
+    const { group } = buildGroundQuestObject('', 503);
+    const proxy = proxyOf(group);
+    const materialDispose = vi.spyOn(proxy.material as THREE.Material, 'dispose');
+    const geometryDispose = vi.spyOn(proxy.geometry, 'dispose');
+    // The renderer's non-pooled object teardown (removeView).
+    const counts = disposeUnsharedMeshResources(group, { geometries: true, materials: true });
+    expect(counts).toEqual({ geometries: 1, materials: 0 });
+    expect(geometryDispose).toHaveBeenCalledOnce();
+    expect(materialDispose).not.toHaveBeenCalled();
+    materialDispose.mockRestore();
+    geometryDispose.mockRestore();
+  });
+
+  it('a feast view is exactly one compile-gate piece, keyed on the shared material', () => {
+    // One material group per gated root: the unit exists (the gate must still
+    // enumerate the proxy, since a root with no piece would settle nothing),
+    // and two views key their piece on the SAME material, which is what makes
+    // the second one a cache hit rather than a link.
+    const first = buildGroundQuestObject('', 504).group;
+    const second = buildGroundQuestObject('', 505).group;
+    const firstPieces = linkPiecesOf(first);
+    const secondPieces = linkPiecesOf(second);
+    expect(firstPieces).toHaveLength(1);
+    expect(secondPieces).toHaveLength(1);
+    expect((firstPieces[0][0] as THREE.Mesh).material).toBe(
+      (secondPieces[0][0] as THREE.Mesh).material,
+    );
+  });
+
+  it('is never cloned: a clone would inherit the shared tag and leak (source pin)', () => {
+    // shared_resource.ts: Material.copy deep-copies userData, so a clone of a
+    // tagged material is dispose-exempt forever. The proxy has one consumer
+    // and it hands the material straight to the mesh.
+    const src = readFileSync(new URL('../src/render/quest_objects.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(src).toContain(
+      'const NO_ITEM_PICK_MATERIAL = markSharedMaterial(new THREE.MeshBasicMaterial());',
+    );
+    expect(src).not.toContain('NO_ITEM_PICK_MATERIAL.clone(');
+    expect(src.split('NO_ITEM_PICK_MATERIAL').length - 1).toBe(3);
+    expect(src).not.toMatch(/new THREE\.MeshBasicMaterial\(\),\n\s*\);/);
   });
 });

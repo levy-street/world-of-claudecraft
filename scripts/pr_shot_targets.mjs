@@ -10984,11 +10984,15 @@ export const TARGETS = [
         const sim = window.__game?.sim;
         const player = sim?.player;
         if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
-        // Stand in the middle of the Eastbrook patch (beds at x 16/21, z 30/35,
-        // walkable by the no-collider ruling) so beds frame the player whichever
-        // way the camera faces.
-        player.pos.x = 18.5;
-        player.pos.z = 32.5;
+        // Stand in the middle of the Eastbrook patch (beds at x -24/-19, z
+        // -84/-79 since release/v0.41.0 moved the patch onto the town's own
+        // ground, src/sim/content/farm_patches.ts; walkable by the no-collider
+        // ruling) so beds frame the player whichever way the camera faces, and
+        // every bed sits 3.54 yd away, inside plantCrop's INTERACT_RANGE (a
+        // stand point out of range plants nothing: the sim refuses silently
+        // with a farmDenied range event).
+        player.pos.x = -21.5;
+        player.pos.z = -81.5;
         sim.addItem?.('garden_hoe', 1);
         sim.addItem?.('vale_wheat_seed', 4);
         sim.addItem?.('brook_carrot_seed', 4);
@@ -12583,8 +12587,10 @@ async function stageEastbrookBeds(page) {
     const sim = window.__game?.sim;
     const player = sim?.player;
     if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
-    player.pos.x = 18.5;
-    player.pos.z = 32.5;
+    // The patch centre (beds at x -24/-19, z -84/-79): inside plantCrop's
+    // INTERACT_RANGE of all four beds, see the farm-patches target above.
+    player.pos.x = -21.5;
+    player.pos.z = -81.5;
     sim.addItem?.('garden_hoe', 1);
     sim.addItem?.('vale_wheat_seed', 4);
     sim.addItem?.('brook_carrot_seed', 4);

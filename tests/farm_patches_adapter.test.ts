@@ -11,11 +11,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as THREE from 'three';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
 import {
   buildFarmPatchProps,
+  FARM_PROGRAM_ANCHORS_LABEL,
+  FARM_PROGRAM_ANCHORS_NAME,
   type FarmBedSeat,
+  type FarmCompileGate,
   FarmPatchVisuals,
   type FarmPlotSource,
   FEAST_SHADOW_CAP,
@@ -24,6 +27,7 @@ import {
 import {
   FARM_ACCENT_MESH_NAME,
   FARM_SOIL_SOCKET_NAME,
+  farmPrewarmDisabled,
   farmStageModelUrl,
   resolveFarmPlotVisual,
 } from '../src/render/farm_patches_core';
@@ -775,6 +779,12 @@ describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
     // consume the silent first pass and every standing feast would puff on
     // the first live read. Comments are stripped so the doc paragraph that
     // NAMES the guard cannot satisfy the pin.
+    //
+    // Since the phase 18 single-siting, both frames call ONE shared helper,
+    // FarmPatchVisuals.drive(world, dt, worldReady): the prewarm frame passes
+    // the readiness predicate as `worldReady`, the live frame passes nothing
+    // (always reads). The guard therefore lives in the ARGUMENT, and the pin
+    // below reads exactly that shape at both sites.
     const src = readFileSync(join(__dirname, '..', 'src/render/renderer.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -783,7 +793,8 @@ describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
     // renderer update path, after prewarmWorldFrame in the file) must stay
     // BARE, so a refactor that guards the live path and leaves the prewarm
     // one open cannot satisfy this by counts alone.
-    const guarded = 'if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(';
+    const guarded =
+      'this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));';
     const prewarmStart = src.indexOf('prewarmWorldFrame');
     expect(prewarmStart).toBeGreaterThan(-1);
     const guardedAt = src.indexOf(guarded);
@@ -826,12 +837,300 @@ describe('the feast-flourish prewarm guard (Masterwrought carry 16)', () => {
     // The live-frame call site stays UNGUARDED by design (it runs only after
     // entry completes; the rationale paragraph lives in farm_patches.ts
     // applyFeasts, renderer.ts deliberately carries no comment at its exact
-    // monolith ceiling). Exactly two call sites, and the one that is not the
-    // guarded one is bare.
-    const calls = src.match(/this\.farmPatchVisuals\.sync\(/g) ?? [];
+    // monolith ceiling). Exactly two drive sites, the one that is not the
+    // guarded one is the bare two-argument call, and the old sync/update pair
+    // is gone from the renderer (the helper owns it).
+    const calls = src.match(/this\.farmPatchVisuals\?\.drive\(/g) ?? [];
     expect(calls).toHaveLength(2);
-    const liveAt = src.indexOf('this.farmPatchVisuals.sync(', guardedAt + guarded.length);
+    const liveAt = src.indexOf('this.farmPatchVisuals?.drive(', guardedAt + guarded.length);
     expect(liveAt).toBeGreaterThan(guardedAt);
-    expect(src.slice(liveAt - guarded.length, liveAt)).not.toContain('entities.has');
+    expect(src.slice(liveAt, liveAt + 60)).toContain('this.farmPatchVisuals?.drive(this.sim, dt);');
+    expect(src).not.toContain('farmPatchVisuals.sync(');
+    expect(src).not.toContain('farmPatchVisuals.update(');
+    expect(src).not.toContain('farmPatchVisuals?.sync(');
+  });
+
+  it('drive(): the ready flag gates the read alone, the sway always runs', () => {
+    // The helper's own contract, since both renderer frames now ride it: a
+    // not-ready world skips the throttled read entirely (no myFarmPlots
+    // access, so the silent first feast pass cannot be consumed), while the
+    // per-frame sway still advances; a ready world reads exactly as sync did.
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink);
+    const { state, source } = fakeWorld([plot()], 0);
+    visuals.drive(source, READ_DT, false);
+    expect(state.reads).toBe(0);
+    expect(scene.children).toHaveLength(0);
+    visuals.drive(source, READ_DT);
+    expect(state.reads).toBe(1);
+    expect(scene.children).toHaveLength(1);
+    // The sway is the update() half: a grown crop's quaternion moves per drive.
+    state.rows = [plot({ status: 'ready' })];
+    visuals.drive(source, READ_DT);
+    const crop = scene.children[0];
+    const before = crop.quaternion.clone();
+    visuals.drive(source, 0.05, false);
+    expect(crop.quaternion.equals(before)).toBe(false);
+  });
+});
+
+describe('the prepared producer: the gated attach, the stand-ins and the program anchors', () => {
+  // The Masterwrought phase 18 close of the phase 14 render review's open
+  // item (the module header): every plot and feast group rides the host's
+  // compile gate, the outgoing stage mesh stands in for a rebuild, a group
+  // retired before its settle never shows or leaks, and the program anchors
+  // staged at construction retain every farm program across rebuilds.
+  function fakeGate() {
+    const calls: { target: THREE.Object3D; label: string; release: () => void }[] = [];
+    const gate: FarmCompileGate = (target, label) =>
+      new Promise<void>((resolve) => calls.push({ target, label, release: resolve }));
+    return { calls, gate };
+  }
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const plotsIn = (scene: THREE.Scene) =>
+    scene.children.filter((c) => c.name.startsWith('farmPlot:'));
+  const disposeSpies = (group: THREE.Object3D) => {
+    const spies: ReturnType<typeof vi.spyOn>[] = [];
+    group.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const mat of mats) spies.push(vi.spyOn(mat, 'dispose'));
+    });
+    return spies;
+  };
+
+  it('stages the program anchors once at construction, hidden, under the farm-prewarm label', () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { calls, gate } = fakeGate();
+    new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    const anchors = scene.children.filter((c) => c.name === FARM_PROGRAM_ANCHORS_NAME);
+    expect(anchors).toHaveLength(1);
+    expect(anchors[0].visible).toBe(false);
+    let meshes = 0;
+    anchors[0].traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) {
+        meshes++;
+        expect(o.visible, 'no anchor may ever draw').toBe(false);
+        expect((o as THREE.Mesh).castShadow).toBe(false);
+      }
+    });
+    // The fallback arm: fourteen GLB slots (twelve stage urls, the shared
+    // sprout, the feast) resolve to primitive boxes wearing surfaceMats of one
+    // program signature, so the anchors dedupe to exactly ONE mesh. The GLB
+    // arm is driven below with synthetic scenes.
+    expect(meshes).toBe(1);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].label).toBe(FARM_PROGRAM_ANCHORS_LABEL);
+    expect(calls[0].target).toBe(anchors[0]);
+    // A rejected anchor gate (renderer shutdown) is swallowed, never surfaced.
+    const rejecting: FarmCompileGate = () => Promise.reject(new Error('shut down'));
+    expect(() => new FarmPatchVisuals(scene, seats, recordingVfx().sink, rejecting)).not.toThrow();
+  });
+
+  it('anchors one mesh per distinct (material signature x attribute set) of the loaded GLBs', () => {
+    // Two synthetic stage scenes with distinct materials plus a feast: three
+    // signatures, three anchors, each wearing the SOURCE material (never a
+    // clone) on the real geometry, so the variant it links is the one a plot
+    // draws.
+    const wheatStage = new THREE.Group();
+    const wheatMat = new THREE.MeshStandardMaterial({ name: 'wheat', map: new THREE.Texture() });
+    const wheatGeo = new THREE.BoxGeometry(1, 1, 1);
+    wheatStage.add(new THREE.Mesh(wheatGeo, wheatMat));
+    const feastScene = new THREE.Group();
+    const feastMat = new THREE.MeshStandardMaterial({ name: 'table', vertexColors: true });
+    feastScene.add(new THREE.Mesh(new THREE.BoxGeometry(2, 1, 2), feastMat));
+    farmPatchesPreloadInternalsForTest.setLoaded(farmStageModelUrl('grain', 'stage2'), wheatStage);
+    farmPatchesPreloadInternalsForTest.setLoaded(farmStageModelUrl('grain', 'stage3'), wheatStage);
+    farmPatchesPreloadInternalsForTest.setLoaded('/models/props/farm_feast.glb', feastScene);
+    try {
+      const scene = new THREE.Scene();
+      const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+      new FarmPatchVisuals(scene, seats, recordingVfx().sink, fakeGate().gate);
+      const anchors = scene.children.find((c) => c.name === FARM_PROGRAM_ANCHORS_NAME);
+      const worn: THREE.Material[] = [];
+      anchors?.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh) worn.push(mesh.material as THREE.Material);
+      });
+      // the shared fallback box program, the wheat stage program (once for
+      // two urls sharing it), the vertex-coloured feast program
+      expect(worn).toHaveLength(3);
+      expect(worn).toContain(wheatMat);
+      expect(worn).toContain(feastMat);
+      const wheatAnchor = anchors?.children.find((c) => (c as THREE.Mesh).material === wheatMat);
+      expect((wheatAnchor as THREE.Mesh).geometry).toBe(wheatGeo);
+    } finally {
+      farmPatchesPreloadInternalsForTest.clearLoaded();
+    }
+  });
+
+  it('a first plant is held hidden under farm-plot:<bed> and shows when its gate settles', async () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { calls, gate } = fakeGate();
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    visuals.sync(fakeWorld([plot()], 0).source, READ_DT);
+    const [crop] = plotsIn(scene);
+    expect(crop).toBeDefined();
+    expect(crop.visible).toBe(false);
+    const call = calls.at(-1);
+    expect(call?.label).toBe('farm-plot:bed_eastbrook_1');
+    expect(call?.target).toBe(crop);
+    // The sway still drives the held group (harmless while hidden, and the
+    // record is live in the map from the first frame).
+    visuals.update(0.1);
+    call?.release();
+    await flush();
+    expect(crop.visible).toBe(true);
+  });
+
+  it('a rebuild keeps the outgoing stage drawing until the replacement links, then releases it', async () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { calls, gate } = fakeGate();
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    const { state, source } = fakeWorld([plot()], 0);
+    visuals.sync(source, READ_DT);
+    calls.at(-1)?.release();
+    await flush();
+    const [sprout] = plotsIn(scene);
+    expect(sprout.visible).toBe(true);
+    const sproutSpies = disposeSpies(sprout);
+    expect(sproutSpies.length).toBeGreaterThan(0);
+
+    // Half way to ready: the seedling mesh replaces the sprout.
+    state.nowMs = HOUR / 2;
+    visuals.sync(source, READ_DT);
+    const held = plotsIn(scene).filter((g) => g !== sprout);
+    expect(held).toHaveLength(1);
+    expect(held[0].visible).toBe(false);
+    expect(sprout.visible, 'the outgoing stage is the stand-in').toBe(true);
+    expect(sprout.parent).toBe(scene);
+    for (const spy of sproutSpies) expect(spy).not.toHaveBeenCalled();
+    expect(calls.at(-1)?.label).toBe('farm-plot:bed_eastbrook_1');
+
+    calls.at(-1)?.release();
+    await flush();
+    expect(held[0].visible).toBe(true);
+    expect(sprout.parent).toBeNull();
+    for (const spy of sproutSpies) expect(spy).toHaveBeenCalledOnce();
+    expect(plotsIn(scene)).toEqual([held[0]]);
+  });
+
+  it('a plot removed before its gate settles is never revealed and leaks neither itself nor the stage it replaced', async () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { calls, gate } = fakeGate();
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+    const { state, source } = fakeWorld([plot()], 0);
+    visuals.sync(source, READ_DT);
+    calls.at(-1)?.release();
+    await flush();
+    const [sprout] = plotsIn(scene);
+    state.nowMs = HOUR / 2;
+    visuals.sync(source, READ_DT);
+    const [held] = plotsIn(scene).filter((g) => g !== sprout);
+    const heldSpies = disposeSpies(held);
+    const sproutSpies = disposeSpies(sprout);
+    const heldGate = calls.at(-1);
+    expect(heldGate?.target).toBe(held);
+
+    // Harvested while the seedling is still linking: the bed goes bare on
+    // THIS read (the outgoing sprout too, not at the seedling's settle).
+    state.rows = [];
+    visuals.sync(source, READ_DT);
+    expect(plotsIn(scene)).toEqual([]);
+    expect(sprout.parent).toBeNull();
+    expect(held.parent).toBeNull();
+    for (const spy of [...heldSpies, ...sproutSpies]) expect(spy).toHaveBeenCalledOnce();
+
+    // The gate settles late: no reveal, no second dispose, no throw.
+    heldGate?.release();
+    await flush();
+    expect(held.visible).toBe(false);
+    expect(held.parent).toBeNull();
+    for (const spy of [...heldSpies, ...sproutSpies]) expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('a feast table is held under farm-feast:<id>, and a despawn before the settle retires it', async () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { calls, gate } = fakeGate();
+    const vfx = recordingVfx();
+    const visuals = new FarmPatchVisuals(scene, seats, vfx.sink, gate);
+    const { state, source } = fakeWorld([], 0);
+    visuals.sync(source, READ_DT); // the silent first pass
+    state.entities.set(501, feastEntity(501));
+    visuals.sync(source, READ_DT);
+    const table = scene.children.find((c) => c.name === 'farmFeast:501');
+    expect(table?.visible).toBe(false);
+    expect(calls.at(-1)?.label).toBe('farm-feast:501');
+    expect(calls.at(-1)?.target).toBe(table);
+    // The placement flourish still fires at once (cosmetic, not a stand-in).
+    expect(vfx.calls).toEqual(['puff', 'burst']);
+    const spies = disposeSpies(table as THREE.Object3D);
+    state.entities.delete(501);
+    visuals.sync(source, READ_DT);
+    expect(table?.parent).toBeNull();
+    for (const spy of spies) expect(spy).toHaveBeenCalledOnce();
+    calls.at(-1)?.release();
+    await flush();
+    expect(table?.visible).toBe(false);
+    expect(table?.parent).toBeNull();
+    for (const spy of spies) expect(spy).toHaveBeenCalledOnce();
+
+    // ...and a table whose gate settles normally shows.
+    state.entities.set(502, feastEntity(502, { pos: { x: -4, y: 0, z: 20 } } as Partial<Entity>));
+    visuals.sync(source, READ_DT);
+    const shown = scene.children.find((c) => c.name === 'farmFeast:502');
+    expect(shown?.visible).toBe(false);
+    calls.at(-1)?.release();
+    await flush();
+    expect(shown?.visible).toBe(true);
+  });
+
+  it('?farmPrep=0 restores the bare attach and stages no anchors (the tour control leg)', () => {
+    expect(farmPrewarmDisabled('?farmPrep=0')).toBe(true);
+    expect(farmPrewarmDisabled('?perf&farmPrep=0')).toBe(true);
+    expect(farmPrewarmDisabled('?perf')).toBe(false);
+    expect(farmPrewarmDisabled('?farmPrep=1')).toBe(false);
+    expect(farmPrewarmDisabled('')).toBe(false);
+    const globals = globalThis as { location?: { search: string } };
+    const previous = globals.location;
+    globals.location = { search: '?farmPrep=0' };
+    try {
+      const scene = new THREE.Scene();
+      const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+      const { calls, gate } = fakeGate();
+      const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
+      expect(scene.children.find((c) => c.name === FARM_PROGRAM_ANCHORS_NAME)).toBeUndefined();
+      visuals.sync(fakeWorld([plot()], 0).source, READ_DT);
+      const [crop] = plotsIn(scene);
+      expect(crop.visible).toBe(true);
+      expect(calls).toHaveLength(0);
+    } finally {
+      if (previous === undefined) delete globals.location;
+      else globals.location = previous;
+    }
+  });
+
+  it('the renderer hands the visuals its compile gate, guarded on async compile (source pin)', () => {
+    const src = readFileSync(join(__dirname, '..', 'src/render/renderer.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const at = src.indexOf('this.farmPatchVisuals = new FarmPatchVisuals(');
+    expect(at).toBeGreaterThan(-1);
+    const call = src.slice(at, src.indexOf(');', at));
+    expect(call).toContain(
+      'this.asyncCompileSupported ? (root, label) => this.compileGate(root, false, label) : null,',
+    );
+    // ...and the gate honours the label the visuals pass (the kind the budget
+    // learns), so a farm unit is priced as farm-plot / farm-feast, never as a
+    // generic live-gate.
+    expect(src).toContain('label = `live-gate:${target.name || target.type}`,');
+    expect(src).toContain('{ priority, label },');
   });
 });

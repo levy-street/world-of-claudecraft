@@ -22,7 +22,9 @@ import {
   LEGENDARY_REGALIA_GOLD,
   LEGENDARY_REGALIA_RATE_PER_SEC,
   legendaryRegaliaActive,
+  legendaryRegaliaEmitDt,
   legendaryRegaliaEmitScale,
+  legendaryRegaliaEmitScaleReference,
 } from '../src/render/legendary_regalia_core';
 import { TIERS } from '../src/render/weapon_vfx';
 import type { ItemInstancePayload } from '../src/sim/types';
@@ -164,6 +166,135 @@ describe('legendaryRegaliaEmitScale: the distance shed', () => {
   it('treats nonsense distance as in close, matching the copied shed arm', () => {
     expect(legendaryRegaliaEmitScale(Number.NaN)).toBe(1);
     expect(legendaryRegaliaEmitScale(-1)).toBe(1);
+  });
+
+  it('the cached step table answers exactly what the reference curve answers, everywhere', () => {
+    // The cache (STEP_DOWN_SQ, inverted once from the constants) replaces the
+    // three square roots per call; its whole contract is equality with the
+    // arithmetic form it was derived from. Swept densely across the ramp and
+    // past both ends, plus a deterministic scatter that lands off the
+    // quantization boundaries, where the inversion has to agree to the step.
+    const anchor = Math.sqrt(CHARACTER_LOD_RANGE_SQ);
+    for (let yd = 0; yd <= anchor * 1.5; yd += 0.05) {
+      const d2 = yd * yd;
+      expect(legendaryRegaliaEmitScale(d2), `at ${yd} yd`).toBe(
+        legendaryRegaliaEmitScaleReference(d2),
+      );
+    }
+    let seed = 0x9e3779b9;
+    for (let i = 0; i < 2000; i++) {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      const d2 = (seed / 0x100000000) * CHARACTER_LOD_RANGE_SQ * 1.2;
+      expect(legendaryRegaliaEmitScale(d2)).toBe(legendaryRegaliaEmitScaleReference(d2));
+    }
+    for (const d2 of [Number.NaN, -5, 0, Number.POSITIVE_INFINITY, CHARACTER_LOD_RANGE_SQ]) {
+      expect(legendaryRegaliaEmitScale(d2)).toBe(legendaryRegaliaEmitScaleReference(d2));
+    }
+    // ...and the reference itself is still the eased, quantized, floored form.
+    expect(legendaryRegaliaEmitScaleReference(0)).toBe(1);
+    expect(legendaryRegaliaEmitScaleReference(CHARACTER_LOD_RANGE_SQ)).toBeCloseTo(0.4, 5);
+  });
+
+  it('the cached form takes no square root per call (source pin on the hot path)', () => {
+    // The point of the cache: the per-frame per-wearer call walks the table.
+    // The reference form keeps its roots (that is what it is for); the live
+    // function must not.
+    const source = read('src/render/legendary_regalia_core.ts');
+    const liveAt = source.indexOf('export function legendaryRegaliaEmitScale(');
+    const referenceAt = source.indexOf('export function legendaryRegaliaEmitScaleReference(');
+    expect(liveAt).toBeGreaterThan(-1);
+    expect(referenceAt).toBeGreaterThan(liveAt);
+    const live = source.slice(liveAt, referenceAt);
+    expect(live).not.toContain('Math.sqrt');
+    expect(live).toContain('STEP_DOWN_SQ');
+    // The table is module-level state derived from constants only: no
+    // per-player cache, so nothing can go stale.
+    const tableAt = source.indexOf('const STEP_DOWN_SQ');
+    expect(tableAt).toBeGreaterThan(-1);
+    expect(tableAt).toBeLessThan(liveAt);
+    expect(source.slice(tableAt, liveAt)).not.toMatch(/\bMap\b|WeakMap|Set\(/);
+  });
+});
+
+describe('legendaryRegaliaEmitDt: the whole emit decision, reduced motion included', () => {
+  // The BEHAVIORAL arm of the reduced-motion suppression (the phase 16 accepted
+  // limit was a comment-stripped source pin alone): the renderer's presentation
+  // loop asks this one function for the dt the pooled emitter may advance by,
+  // so driving it with reducedMotion true and false IS driving the emit path.
+  const near = 0;
+  const mid = (Math.sqrt(CHARACTER_LOD_RANGE_SQ) * 0.7) ** 2;
+
+  it('emits at the shed-scaled dt for an active wearer when motion is not reduced', () => {
+    expect(legendaryRegaliaEmitDt(true, false, 1 / 60, near)).toBeCloseTo(1 / 60, 12);
+    expect(legendaryRegaliaEmitDt(true, false, 1 / 60, mid)).toBeCloseTo(
+      (1 / 60) * legendaryRegaliaEmitScale(mid),
+      12,
+    );
+    expect(legendaryRegaliaEmitDt(true, false, 1 / 60, mid)).toBeLessThan(1 / 60);
+    expect(legendaryRegaliaEmitDt(true, false, 1 / 60, mid)).toBeGreaterThan(0);
+  });
+
+  it('is suppressed outright under prefers-reduced-motion, at every distance', () => {
+    for (const d2 of [near, mid, CHARACTER_LOD_RANGE_SQ, CHARACTER_LOD_RANGE_SQ * 4]) {
+      expect(legendaryRegaliaEmitDt(true, true, 1 / 60, d2)).toBe(0);
+    }
+    // ...and flipping the setting back restores the emit on the same inputs.
+    expect(legendaryRegaliaEmitDt(true, false, 1 / 60, mid)).toBeGreaterThan(0);
+  });
+
+  it('emits nothing for a wearer without the identity, or for a dead frame', () => {
+    expect(legendaryRegaliaEmitDt(false, false, 1 / 60, near)).toBe(0);
+    expect(legendaryRegaliaEmitDt(undefined, false, 1 / 60, near)).toBe(0);
+    expect(legendaryRegaliaEmitDt(true, false, 0, near)).toBe(0);
+    expect(legendaryRegaliaEmitDt(true, false, Number.NaN, near)).toBe(0);
+  });
+
+  it('the renderer routes its emit through this decision and gates the call on a positive dt (wiring seam)', () => {
+    // The seam pin: renderer.ts asks legendaryRegaliaEmitDt with the view's
+    // cached predicate, ITS reducedMotion() read, the frame dt and the squared
+    // distance, and calls the emitter only for a positive answer. No other
+    // reducedMotion read or emit call may sit on this path (the fairness
+    // suite below owns the wider banned-token scan of the same slice).
+    const renderer = read('src/render/renderer.ts');
+    const decisionAt = renderer.indexOf(
+      'const emitDt = legendaryRegaliaEmitDt(v.legendaryRegalia, this.reducedMotion(), dt, d2);',
+    );
+    expect(decisionAt, 'the emit decision call is missing').toBeGreaterThan(-1);
+    const emitAt = renderer.indexOf(
+      'if (emitDt > 0) this.vfx.legendaryRegalia(e.id, emitDt);',
+      decisionAt,
+    );
+    expect(emitAt, 'the gated emit call is missing').toBeGreaterThan(decisionAt);
+    expect(renderer.split('this.vfx.legendaryRegalia(')).toHaveLength(2);
+    expect(renderer).not.toContain('legendaryRegaliaEmitScale(');
+  });
+
+  it("pins the fairness doc's regalia bullet to the shipped shape", () => {
+    // docs/design/graphics-settings-fairness.md carries the regalia bullet as
+    // prose; the accepted limit was that nothing pinned it. Each claim below is
+    // a claim the code above makes, so a retune that drops one reds here.
+    const doc = readFileSync(
+      new URL('../docs/design/graphics-settings-fairness.md', import.meta.url),
+      'utf8',
+    );
+    const bulletAt = doc.indexOf('- The legendary-regalia forge motes (');
+    expect(bulletAt, 'the regalia bullet is missing from the fairness doc').toBeGreaterThan(-1);
+    const bulletEnd = doc.indexOf('\n- ', bulletAt + 1);
+    const bullet = doc.slice(bulletAt, bulletEnd === -1 ? undefined : bulletEnd);
+    for (const claim of [
+      'src/render/legendary_regalia_core.ts',
+      'Vfx.legendaryRegalia',
+      'gfxTierAtLeast(GFX.effectsTier)',
+      'never the FPS governor',
+      'CHARACTER_LOD_RANGE_SQ',
+      'floored above zero',
+      'prefers-reduced-motion',
+      'never `perfected`',
+    ]) {
+      expect(bullet, `fairness bullet lost the claim: ${claim}`).toContain(claim);
+    }
+    // The bullet's reduced-motion claim is the behavior the cases above drive.
+    expect(legendaryRegaliaEmitDt(true, true, 1 / 60, 0)).toBe(0);
   });
 
   it('is sparse: an identity drift, far below the formAura ambients', () => {
@@ -310,9 +441,7 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
       "if (e.kind === 'player' && gfxTierAtLeast(GFX.effectsTier, 'medium'))",
     );
     expect(gateAt, 'the emit gate is missing from renderer.ts').toBeGreaterThan(-1);
-    const emitAt = renderer.indexOf(
-      'this.vfx.legendaryRegalia(e.id, dt * legendaryRegaliaEmitScale(d2));',
-    );
+    const emitAt = renderer.indexOf('if (emitDt > 0) this.vfx.legendaryRegalia(e.id, emitDt);');
     expect(emitAt, 'the shed emit call is missing').toBeGreaterThan(gateAt);
     const slice = renderer.slice(gateAt, emitAt + 80);
     // recomputed ONLY on reference identity change: the predicate call sits
@@ -360,8 +489,13 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     ).toHaveLength(2);
     // the emit is suppressed for a reduced-motion viewer (the lich-aura
     // precedent; an accessibility choice by the viewer, never a graphics shed;
-    // the fairness doc's regalia bullet names this arm)
-    expect(slice).toContain('if (v.legendaryRegalia && !this.reducedMotion())');
+    // the fairness doc's regalia bullet names this arm). The decision is the
+    // pure core's legendaryRegaliaEmitDt (driven behaviorally in the describe
+    // above); the wiring hands it the renderer's reducedMotion() read and the
+    // shed distance, and emits only on a positive dt.
+    expect(slice).toContain(
+      'const emitDt = legendaryRegaliaEmitDt(v.legendaryRegalia, this.reducedMotion(), dt, d2);',
+    );
     expect(slice).not.toMatch(/Object\.(entries|values|keys)/);
     expect(slice).not.toMatch(/\.visible\s*=/);
     expect(slice).not.toMatch(/new THREE\.PointLight/);

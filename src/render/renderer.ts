@@ -387,7 +387,7 @@ import {
 import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
-import { legendaryRegaliaActive, legendaryRegaliaEmitScale } from './legendary_regalia_core';
+import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_regalia_core';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import {
@@ -518,7 +518,6 @@ import {
   runPrewarmCompileSubmission,
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
-import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -633,6 +632,7 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
+import { compileShadowDepthPrograms } from './shadow_depth_compile';
 import {
   type ShadowAnchor,
   shadowTexelWorldSize,
@@ -754,6 +754,7 @@ import {
   PREWARM_OBJECT_ITEM_IDS,
   PREWARM_OBJECT_POOL_COPIES,
   prewarmPlayerSkinVariantCount,
+  type ZonePrewarmGroupHost,
 } from './zone_prewarm_groups';
 import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
@@ -2934,7 +2935,12 @@ export class Renderer {
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
-    this.farmPatchVisuals = new FarmPatchVisuals(this.scene, this.farmBedSeats, this.vfx);
+    this.farmPatchVisuals = new FarmPatchVisuals(
+      this.scene,
+      this.farmBedSeats,
+      this.vfx,
+      this.asyncCompileSupported ? (root, label) => this.compileGate(root, false, label) : null,
+    );
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
     this.abilityVfxFx = new AbilityVfxFx(
@@ -3714,8 +3720,8 @@ export class Renderer {
       const zone = zoneAt(x, z);
       const deadline = performance.now() + 5000;
       const t0 = performance.now();
-      const mobPrewarm = buildEntityPrewarmGroup(this, zone);
-      const npcPrewarm = buildNpcPrewarmGroup(this, zone, deadline);
+      const mobPrewarm = buildEntityPrewarmGroup(this.zonePrewarmHost(), zone);
+      const npcPrewarm = buildNpcPrewarmGroup(this.zonePrewarmHost(), zone, deadline);
       const mobGroup = mobPrewarm.group;
       const npcGroup = npcPrewarm.group;
       // Hide before scene attachment. The shared GPU queue may be occupied by
@@ -4940,10 +4946,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
-    if (this.farmPatchVisuals) {
-      if (this.sim.entities.has(this.sim.playerId)) this.farmPatchVisuals.sync(this.sim, dt);
-      this.farmPatchVisuals.update(dt);
-    }
+    this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);
@@ -5054,6 +5057,22 @@ export class Renderer {
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
     return zonePrewarmTemplateIds(zone.id, kind, this.sim.entities.values());
+  }
+
+  /** The typed weld for the zone_prewarm_groups builders. Their host parameter
+   *  is untyped because the members it names are private here, so binding each
+   *  one to the interface is what turns a signature drift into a tsc error
+   *  instead of a throw during zone prepare. */
+  private zonePrewarmHost(): ZonePrewarmGroupHost {
+    return {
+      sim: this.sim,
+      prewarmEntity: (kind, templateId, color, scale, skin, id) =>
+        this.prewarmEntity(kind, templateId, color, scale, skin, id),
+      storePooledObject: (key, object) => this.storePooledObject(key, object),
+      templateIdsInZone: (zone, kind) => this.templateIdsInZone(zone, kind),
+      prewarmedMobTemplates: this.prewarmedMobTemplates,
+      prewarmedNpcModels: this.prewarmedNpcModels,
+    };
   }
 
   private prewarmTexture(texture: THREE.Texture | null | undefined): void {
@@ -5172,66 +5191,21 @@ export class Renderer {
   }
 
   /**
-   * compileAsync(scene, camera) does not enumerate Three's renderer-owned
-   * shadow materials. Temporarily put equivalent MeshDepthMaterials on EVERY
-   * mesh under the root, skinned or not, so KHR_parallel_shader_compile links
-   * those variants before the shadow pass asks getUniforms for them: static
-   * and instanced casters (12 of the initial frame's 64 residual synchronous
-   * links), and meshes NOT casting at gate time, because castShadow is toggled
-   * at runtime by distance (entity shadow band, zone shadow volume, gather
-   * nodes) frames after this arm ran, so a rig created beyond the band linked
-   * cold at its first shadow draw (eleven depth programs of 20 to 41 ms in
-   * 0.3 s on the 3090 ride, ten through Eastbrook in production). Depth twins
-   * are few, cached per (material inputs x mesh shape): a cache hit, no link.
+   * The gate's shadow arm (shadow_depth_compile.ts): a depth twin on EVERY
+   * mesh under the root, caster or not, linked against the sun's shadow camera
+   * so the program WebGLShadowMap draws is warm before the first shadow draw.
    */
-  private async compileShadowPrograms(root: THREE.Object3D): Promise<void> {
-    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;
-    const swaps: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = [];
-    // Walked inside the try below so a throw mid-walk still restores every swap.
-    const swapMaterials = (): void => {
-      root.traverse((obj) => {
-        const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.material) return;
-        const material = mesh.material;
-        swaps.push({ mesh, material });
-        mesh.material = Array.isArray(material)
-          ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
-          : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
-      });
-    };
-    // Match the real shadow pass's program key exactly. A bare
-    // compileAsync(root, shadowCamera) uses the canvas output colour space
-    // and sees no scene lights, producing a skinned depth program that still
-    // misses both the render-target and shadow-map bits. Conversely, passing
-    // the world scene verbatim would add fog bits that WebGLShadowMap omits
-    // (its renderBufferDirect call uses a null scene). Keep the world only as
-    // the light source, briefly suppress its fog, and compile while any
-    // offscreen target is current so outputColorSpace is the linear working
-    // space. compileAsync runs its compile() prologue synchronously; restore
-    // the globals AND the swapped materials before awaiting the parallel
-    // linker: the boot-resume lane runs these units on VISIBLE post-reveal
-    // scene meshes, and a swap held across the awaited link (10 ms+ of real
-    // frames) would draw them as depth noise. The link tracks the depth
-    // material object, not the mesh, so restoring early is safe.
+  private compileShadowPrograms(root: THREE.Object3D): Promise<void> {
+    if (!GFX.dynamicShadows || !this.asyncCompileSupported) return Promise.resolve();
     this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
-    const previousTarget = this.webgl.getRenderTarget();
-    const previousFog = this.scene.fog;
-    let compilePromise: Promise<THREE.Object3D> | null = null;
-    try {
-      swapMaterials();
-      if (swaps.length > 0) {
-        this.scene.fog = null;
-        this.webgl.setRenderTarget(this.prewarmRenderTarget);
-        compilePromise = this.webgl.compileAsync(root, this.sun.shadow.camera, this.scene);
-      }
-    } finally {
-      this.webgl.setRenderTarget(previousTarget);
-      this.scene.fog = previousFog;
-      for (const swap of swaps) swap.mesh.material = swap.material;
-    }
-    // Do not race a timer here. The underlying linker cannot be cancelled,
-    // so a timeout only lets it overlap the next child and gameplay.
-    if (compilePromise) await compilePromise;
+    return compileShadowDepthPrograms(
+      this.webgl,
+      this.scene,
+      this.sun.shadow.camera,
+      this.prewarmDepthMaterials,
+      this.prewarmRenderTarget,
+      root,
+    );
   }
 
   // Link the local player's own body spirit (ghost) transparent variants
@@ -6126,7 +6100,7 @@ export class Renderer {
         priority: 34,
         required: true,
         run: () => {
-          const built = buildPlayerPrewarmGroup(this, buildDeadline);
+          const built = buildPlayerPrewarmGroup(this.zonePrewarmHost(), buildDeadline);
           playerPrewarmGroup = built.group;
           playerPrewarmVisuals = built.visualCount;
           playerPrewarmInstances = built.visuals;
@@ -6150,7 +6124,7 @@ export class Renderer {
         priority: 35,
         required: true,
         run: () => {
-          const built = buildEntityPrewarmGroup(this, activeZone);
+          const built = buildEntityPrewarmGroup(this.zonePrewarmHost(), activeZone);
           entityPrewarmGroup = built.group;
           entityPrewarmPool = built.pooled;
           this.scene.add(entityPrewarmGroup);
@@ -6164,7 +6138,7 @@ export class Renderer {
         priority: 36,
         required: true,
         run: () => {
-          const built = buildNpcPrewarmGroup(this, activeZone, buildDeadline);
+          const built = buildNpcPrewarmGroup(this.zonePrewarmHost(), activeZone, buildDeadline);
           npcPrewarmGroup = built.group;
           npcPrewarmPool = built.pooled;
           // Same derived rule as entities.player-archetypes above: done counts
@@ -6186,7 +6160,7 @@ export class Renderer {
         priority: 40,
         required: true,
         run: () => {
-          objectPrewarmGroup = buildObjectPrewarmGroup(this);
+          objectPrewarmGroup = buildObjectPrewarmGroup(this.zonePrewarmHost());
           this.scene.add(objectPrewarmGroup);
         },
         detail: () =>
@@ -8374,7 +8348,11 @@ export class Renderer {
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
-  private compileGate(target: THREE.Object3D, requiredForEntry = false): Promise<unknown> {
+  private compileGate(
+    target: THREE.Object3D,
+    requiredForEntry = false,
+    label = `live-gate:${target.name || target.type}`,
+  ): Promise<unknown> {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
@@ -8394,7 +8372,7 @@ export class Renderer {
       this.liveCompileGates.runPieces(
         linkPieceWork(target, color, shadow, settle),
         VIEW_COMPILE_GATE_MAX_MS,
-        { priority, label: `live-gate:${target.name || target.type}` },
+        { priority, label },
       );
     const startAfterInitialPaint = compileMayStartBeforeInitialPaint(priority, requiredForEntry)
       ? null
@@ -11471,9 +11449,8 @@ export class Renderer {
               v.legendaryRegaliaRef = e.equippedInstances;
               v.legendaryRegalia = legendaryRegaliaActive(e.equippedInstances);
             }
-            if (v.legendaryRegalia && !this.reducedMotion()) {
-              this.vfx.legendaryRegalia(e.id, dt * legendaryRegaliaEmitScale(d2));
-            }
+            const emitDt = legendaryRegaliaEmitDt(v.legendaryRegalia, this.reducedMotion(), dt, d2);
+            if (emitDt > 0) this.vfx.legendaryRegalia(e.id, emitDt);
           }
         }
         // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
@@ -11782,10 +11759,7 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
-    if (this.farmPatchVisuals) {
-      this.farmPatchVisuals.sync(this.sim, dt);
-      this.farmPatchVisuals.update(dt);
-    }
+    this.farmPatchVisuals?.drive(this.sim, dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
     this.paladinConsecrationVisuals.sync(this.sim.activeConsecrations);

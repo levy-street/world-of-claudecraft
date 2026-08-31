@@ -643,6 +643,27 @@ function prepareItem(itemId: string): THREE.Group | null {
 export const NO_ITEM_PICK_HEIGHT = 0.9;
 export const NO_ITEM_PICK_FOOTPRINT = 1.6;
 
+/**
+ * The ONE material every no-item pick proxy wears (the sparkleMat precedent):
+ * renderer-owned and dispose-exempt (markSharedMaterial), so removeView's
+ * per-view teardown skips it and the program it holds stays resident. A fresh
+ * MeshBasicMaterial per view was one compile-gate unit per feast that LINKED
+ * (the view's gate enumerates the proxy as its own material group, and each
+ * despawn disposed the only material holding that program, so the next feast's
+ * gate linked it cold again); shared, the unit remains (one piece per gated
+ * root) but is a program-cache hit after the first feast of a session. Never
+ * clone this: Material.copy carries the shared tag into the clone
+ * (shared_resource.ts markOwnedMaterial), so a tinted or per-view variant
+ * would be one more never-disposed material. The proxy is invisible, so the
+ * material's look is irrelevant; the program key is a plain MeshBasicMaterial.
+ */
+const NO_ITEM_PICK_MATERIAL = markSharedMaterial(new THREE.MeshBasicMaterial());
+
+/** Test-only: the shared proxy material, so a suite can pin identity. */
+export function noItemPickMaterialForTest(): THREE.Material {
+  return NO_ITEM_PICK_MATERIAL;
+}
+
 export function buildGroundQuestObject(
   itemId: string,
   entityId: number,
@@ -658,13 +679,14 @@ export function buildGroundQuestObject(
   // on top of it. What the view still owes the renderer is a raycastable
   // click body and an honest anchor height, so the proxy is an INVISIBLE box
   // at the feast contract's bounds (the character clickProxy precedent:
-  // three's raycaster ignores `visible`). Fresh geometry and material per
-  // view on purpose: removeView's non-pooled path disposes them, and a
-  // shared singleton would be torn down with the first despawned feast.
+  // three's raycaster ignores `visible`). Fresh geometry per view on purpose
+  // (removeView's non-pooled path disposes it); the material is the shared
+  // dispose-exempt NO_ITEM_PICK_MATERIAL above, so the teardown that frees the
+  // box leaves the material, and its program, resident for the next feast.
   if (!itemId) {
     const proxy = new THREE.Mesh(
       new THREE.BoxGeometry(NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_HEIGHT, NO_ITEM_PICK_FOOTPRINT),
-      new THREE.MeshBasicMaterial(),
+      NO_ITEM_PICK_MATERIAL,
     );
     proxy.position.y = NO_ITEM_PICK_HEIGHT / 2;
     proxy.visible = false;

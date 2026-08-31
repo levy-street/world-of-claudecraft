@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { farMeshShown } from '../src/render/characters/far_lod_reveal_core';
 import {
@@ -14,8 +15,18 @@ import {
   type EntityGateStandIn,
   entityHasNoBody,
 } from '../src/render/entity_gate_stand_in_core';
+import {
+  buildFarmPatchProps,
+  type FarmCompileGate,
+  FarmPatchVisuals,
+  type FarmPlotSource,
+} from '../src/render/farm_patches';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import type { Entity } from '../src/sim/types';
+import { INTERACT_RANGE } from '../src/sim/types';
+import type { FarmPlotView } from '../src/world_api/farming';
 
 // THE INVERSE INVARIANT of the live compile gates: never leave an entity with
 // no representation. A gate exists so a still-linking program is not drawn; it
@@ -62,6 +73,14 @@ const GATE_CALL_SITES: readonly {
     gate: 'spiritCompileGate',
     file: 'src/render/ability_vfx/spirits.ts',
     marker: 'this.compileGate && !puppet.compiled',
+  },
+  {
+    // The farm module's one gated attach (plots and feast tables both go
+    // through it); the marker is the helper's call, so a second attach site
+    // in the file reds until it is named.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/farm_patches.ts',
+    marker: 'attachSceneGroupGated(',
   },
 ];
 
@@ -360,5 +379,142 @@ describe('entity gate stand-ins actually stand in', () => {
     // An object view (door, loot) owns no rig at all: only the arrival gate,
     // which hides its group too, can leave it unrepresented.
     expect(entityHasNoBody(false, false, false)).toBe(false);
+  });
+
+  it('farm gate: the bed and the outgoing stage stand in for a plot, the feast entity for its table', async () => {
+    // The registry row for src/render/farm_patches.ts, driven for real: a
+    // controllable gate holds every farm attach, and what the player sees
+    // meanwhile is asserted, not described.
+    const row = ENTITY_GATE_STAND_INS.find((r) => r.file === 'src/render/farm_patches.ts');
+    expect(row?.gate).toBe('attachSceneGroupGated');
+    expect(row?.standIn).toContain('static bed');
+    expect(row?.standIn).toContain('OUTGOING stage mesh');
+    expect(row?.standIn).toContain('feastNear');
+
+    const pending: { target: THREE.Object3D; label: string; release: () => void }[] = [];
+    const gate: FarmCompileGate = (target, label) =>
+      new Promise<void>((resolve) => pending.push({ target, label, release: resolve }));
+    const scene = new THREE.Scene();
+    const beds = buildFarmPatchProps(1234, FARM_PATCHES);
+    // (1) The bed: static, drawn at boot, never gated. It is the plot's first
+    // stand-in, so it must be visible with nothing hidden under it.
+    scene.add(beds.group);
+    expect(beds.group.visible).toBe(true);
+    beds.group.traverse((o) => expect(o.visible).toBe(true));
+
+    const rows: FarmPlotView[] = [
+      {
+        bedId: 'bed_eastbrook_1',
+        cropId: 'vale_wheat',
+        plantedAtMs: 0,
+        readyAtMs: 3_600_000,
+        compost: false,
+        watch: false,
+        tonic: false,
+        notified: false,
+        status: 'growing',
+      },
+    ];
+    const entities = new Map<number, Entity>();
+    const world: FarmPlotSource = {
+      get myFarmPlots() {
+        return rows;
+      },
+      farmNowMs: () => now,
+      entities,
+      cfg: { seed: 1234 },
+    };
+    let now = 0;
+    const visuals = new FarmPatchVisuals(scene, beds.seats, { burst() {}, groundPuff() {} }, gate);
+    const plotGroups = () => scene.children.filter((c) => c.name === 'farmPlot:bed_eastbrook_1');
+
+    // (2) First plant: the crop is held hidden; the bed keeps drawing.
+    visuals.sync(world, 0.5);
+    expect(plotGroups()).toHaveLength(1);
+    expect(plotGroups()[0].visible).toBe(false);
+    expect(beds.group.visible).toBe(true);
+    const plotGate = pending.find((p) => p.label === 'farm-plot:bed_eastbrook_1');
+    expect(plotGate?.target).toBe(plotGroups()[0]);
+    plotGate?.release();
+    await new Promise((r) => setTimeout(r, 0));
+    const sprout = plotGroups()[0];
+    expect(sprout.visible).toBe(true);
+
+    // (3) A rebuild (the seedling stage): the OUTGOING sprout keeps drawing,
+    // the replacement is held, and nothing is disposed until the settle.
+    now = 1_800_000;
+    visuals.sync(world, 0.5);
+    const held = plotGroups().filter((g) => g !== sprout);
+    expect(held).toHaveLength(1);
+    expect(sprout.visible).toBe(true);
+    expect(sprout.parent).toBe(scene);
+    expect(held[0].visible).toBe(false);
+    const seedlingGate = pending.filter((p) => p.label === 'farm-plot:bed_eastbrook_1').at(-1);
+    expect(seedlingGate?.target).toBe(held[0]);
+    seedlingGate?.release();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(held[0].visible).toBe(true);
+    expect(sprout.parent).toBeNull();
+    expect(plotGroups()).toEqual([held[0]]);
+
+    // (4) The feast table is held too; what represents the feast meanwhile is
+    // the ENTITY's own plate (nameplate_view feastNear) inside INTERACT_RANGE
+    // + 1, the range where the feast is actionable. Beyond it the table is
+    // decoration, and the plate hides exactly as it does for a revealed feast.
+    const feast = {
+      id: 501,
+      kind: 'object',
+      templateId: 'farm_feast',
+      name: 'Mira',
+      pos: { x: 12, y: 0, z: -8 },
+      dead: false,
+      targetId: null,
+      lootable: false,
+      dungeonId: null,
+      scale: 1,
+      overheadEmoteId: null,
+      castingAbility: null,
+      aggroTargetId: null,
+      ownerId: null,
+    } as unknown as Entity;
+    entities.set(501, feast);
+    visuals.sync(world, 0.5);
+    const table = scene.children.find((c) => c.name === 'farmFeast:501');
+    expect(table?.visible).toBe(false);
+    expect(pending.at(-1)?.label).toBe('farm-feast:501');
+    const viewerAt = (dz: number) =>
+      ({
+        id: 1,
+        kind: 'player',
+        pos: { x: 12, y: 0, z: -8 + dz },
+        dead: false,
+        targetId: null,
+        comboPoints: 0,
+      }) as never;
+    const plan = (dz: number) =>
+      nameplatePlanInto(
+        newNameplatePlan(),
+        feast as never,
+        viewerAt(dz),
+        2,
+        false,
+        false,
+        false,
+        false,
+      );
+    expect(plan(INTERACT_RANGE).hidden, 'the plate stands in where the feast is actionable').toBe(
+      false,
+    );
+    expect(
+      plan(INTERACT_RANGE + 2).hidden,
+      'beyond eating range the plate is off, gate or not',
+    ).toBe(true);
+    pending.at(-1)?.release();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(table?.visible).toBe(true);
+    // The table's hold is bounded even if the gate never settles.
+    expect(
+      (await import('../src/render/gated_scene_attach')).GATED_ATTACH_WATCHDOG_MS,
+    ).toBeGreaterThan(0);
   });
 });

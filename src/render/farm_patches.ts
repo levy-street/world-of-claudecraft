@@ -25,6 +25,30 @@
 // and read no preset, tier knob or FPS governor. The plant, harvest and wither
 // flourishes are COSMETIC and go out through vfx.ts, whose scaledCount path IS
 // the tier shed; there is no bespoke knob here.
+//
+// A PREPARED GPU PRODUCER (src/render/CLAUDE.md, "GPU work: every new producer
+// is a client of the scheduler"): every plot and feast group attaches through
+// the renderer's compile gate (gated_scene_attach.ts), hidden until its
+// programs link, with the label kinds `farm-plot` and `farm-feast` the budget
+// learns per family. The static bed drawn at boot is the stand-in for a plot's
+// first appearance and the outgoing stage mesh stands in for a rebuild (it
+// keeps drawing until the replacement links); the feast ENTITY's own view and
+// nameplate stand in for its table (ENTITY_GATE_STAND_INS,
+// entity_gate_stand_in_core.ts). The gate alone does not close the REBUILD
+// class: a plot's materials are per-plot clones disposed with it, and three
+// releases a program with its last material. The repo's three patch parks a
+// released program linked in a bounded FIFO (RETAINED_PROGRAM_LIMIT, pinned by
+// tests/three_compile_async_patch.test.ts) instead of destroying it, so a
+// stage advance usually re-acquires warm, but the farm's rebuilds are minutes
+// apart and any interest churn past the bound in between (a streamed town, a
+// crowd) evicts the parked program and the next rebuild links it cold again.
+// The FARM PROGRAM ANCHORS close that class outright: one hidden mesh per
+// distinct (material signature x geometry attribute set) of the stage and
+// feast GLBs, wearing the source materials, staged at construction under the
+// same gate and retained for the visuals' life, so every farm program keeps a
+// live use, never enters the retention FIFO, and cannot be evicted by it.
+// `?farmPrep=0` (farm_patches_core.ts farmPrewarmDisabled) restores the bare
+// attach with no anchors, the control leg of scripts/farm_gpu_tour.mjs.
 import * as THREE from 'three';
 import { isFeastTemplateId } from '../sim/professions/feast';
 import type { Entity, SimEvent } from '../sim/types';
@@ -48,12 +72,15 @@ import {
   farmCompostBinPosition,
   farmModelUrls,
   farmPlotKeyMatches,
+  farmPrewarmDisabled,
   farmStageModelUrl,
   resolveFarmPlotVisual,
 } from './farm_patches_core';
+import { attachSceneGroupGated, GatedSceneAttachCancelledError } from './gated_scene_attach';
 import { surfaceMat } from './gfx';
 import { addInstancedParts, type GlbTemplatePart, glbTemplateParts } from './glb_instanced_props';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { materialProgramSignature } from './prewarm_policy';
 import { setRenderCategory } from './renderer_diagnostics';
 
 /**
@@ -95,6 +122,22 @@ const FEAST_HEIGHT = 0.9;
 const FEAST_VFX_LIFT = 0.45;
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
+
+/** The host's compile step for a farm group (the renderer's compile gate):
+ *  link `target`'s programs off the frame before it shows, queued under
+ *  `label` (a `kind:instance` the budget learns per kind, gpuPrepKindOfLabel). */
+export type FarmCompileGate = (target: THREE.Object3D, label: string) => Promise<unknown>;
+
+/** The hidden root of the farm program anchors (see the module header). */
+export const FARM_PROGRAM_ANCHORS_NAME = 'farmProgramAnchors';
+/** The anchors' gate label: one unit family, one instance. */
+export const FARM_PROGRAM_ANCHORS_LABEL = 'farm-prewarm:programs';
+
+/** A gated attach whose group was retired (its record replaced or removed)
+ *  before the gate settled resolves nothing further; anything else is a bug. */
+function ignoreRetiredAttach(error: unknown): void {
+  if (!(error instanceof GatedSceneAttachCancelledError)) throw error;
+}
 
 // RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 16 scenes are
 // retained for the whole session, never released. The templates serve every
@@ -277,6 +320,9 @@ interface FeastVisual {
   /** Whether this table currently casts shadows (the budget's memo, so the
    *  steady-state pass writes nothing when membership has not changed). */
   castsShadow: boolean;
+  /** Detached and its owned resources disposed (release is idempotent: a
+   *  retired gated attach and the despawn path can both reach it). */
+  released: boolean;
 }
 
 /** How many feast tables may CAST shadows at once (insertion order, oldest
@@ -304,6 +350,11 @@ interface PlotVisual extends FarmPlotVisualKey {
   phase: number;
   /** Sway amplitude, zero for a withered crop (dead stalks do not sway). */
   sway: number;
+  /** The stage mesh this one replaced, still drawing as the stand-in until
+   *  this one's gate settles; null once released or when nothing preceded it. */
+  outgoing: PlotVisual | null;
+  /** Detached and its owned resources disposed (idempotent, see FeastVisual). */
+  released: boolean;
 }
 
 // A grown crop leans in the wind; the sway is slow and small, a background
@@ -354,12 +405,44 @@ export class FarmPatchVisuals {
   // False until the first applyFeasts pass has run: standing feasts register
   // WITHOUT the placement flourish on that pass (see applyFeasts).
   private feastFlourishArmed = false;
+  // The host's compile gate, or null where programs cannot link off-thread (no
+  // KHR_parallel_shader_compile, a headless suite) and under ?farmPrep=0: then
+  // every attach is the bare, immediate one and no anchors are staged.
+  private readonly compileGate: FarmCompileGate | null;
+  // The hidden program anchors (module header), staged once at construction.
+  private readonly anchors: THREE.Group | null;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly seats: ReadonlyMap<string, FarmBedSeat>,
     private readonly vfx: FarmVfxSink,
-  ) {}
+    compileGate: FarmCompileGate | null = null,
+  ) {
+    const disabled = farmPrewarmDisabled(typeof location === 'undefined' ? '' : location.search);
+    this.compileGate = disabled ? null : compileGate;
+    this.anchors = this.compileGate ? buildFarmProgramAnchors() : null;
+    if (this.anchors && this.compileGate) {
+      // Added hidden and never revealed: the anchors exist to be compiled, so
+      // this is the one bare scene.add here, and the gate runs over it at
+      // once. Shutdown rejects queued GPU work on purpose; nothing to recover.
+      this.scene.add(this.anchors);
+      void this.compileGate(this.anchors, FARM_PROGRAM_ANCHORS_LABEL).catch(() => undefined);
+    }
+  }
+
+  /**
+   * The renderer's one per-frame entry, shared by the prewarm frame and the
+   * live frame: the throttled plot and feast read (when `worldReady`), then
+   * the per-frame sway. `worldReady` is the prewarm frame's guard, the entry
+   * watch's own readiness predicate (the world holds its player entity), so a
+   * prewarm over a snapshot-less online mirror cannot consume the silent first
+   * feast pass (the carry-16 rationale in applyFeasts); the live frame passes
+   * nothing and always reads.
+   */
+  drive(world: FarmPlotSource, dt: number, worldReady = true): void {
+    if (worldReady) this.sync(world, dt);
+    this.update(dt);
+  }
 
   /**
    * Mirror the viewer's plot rows, at most once per FARM_SYNC_INTERVAL_S.
@@ -415,8 +498,9 @@ export class FarmPatchVisuals {
       const existing = this.plots.get(plot.bedId);
       // The steady-state path: four field compares, no object and no string.
       if (existing && farmPlotKeyMatches(existing, plot, nowMs)) continue;
-      if (existing) this.disposePlot(plot.bedId, existing);
-      this.create(plot.bedId, seat, resolveFarmPlotVisual(plot, nowMs), plot);
+      // A rebuild hands the outgoing stage to the replacement, which keeps it
+      // drawing as the stand-in until its own gate settles (create).
+      this.create(plot.bedId, seat, resolveFarmPlotVisual(plot, nowMs), plot, existing ?? null);
       changed = true;
     }
     for (const [bedId, visual] of this.plots) {
@@ -458,17 +542,15 @@ export class FarmPatchVisuals {
    *  entry-sequence change. The fix stays at the RENDERER call site by
    *  design, never as a non-empty-map guard here, which would flip the
    *  pinned rebuild/login silence into a burst. Cosmetic either way: both
-   *  emitters ride vfx.ts's scaled budget. What that close does NOT cover
-   *  (recorded by the phase 14 render review, still OPEN): this module is
-   *  an unprepared GPU producer independent of the flourish. createFeast
-   *  and create scene-add cloned materials (and fallback BoxGeometry) from
-   *  the LIVE frame call site with no prewarm-manifest entry, compile gate,
-   *  or stand-in, so the first plot stage-advance or in-scope feast of a
-   *  session likely pays a cold program link mid-frame. The correction is a
-   *  prewarm manifest twin for the farm GLB set, or a compile gate on the
-   *  plot/feast attach with the static bed as the stand-in (a
-   *  render-scheduler change owned by a render diff, not the phase 14 UI
-   *  pass). */
+   *  emitters ride vfx.ts's scaled budget. What that close did NOT cover
+   *  (recorded by the phase 14 render review) was this module as an
+   *  unprepared GPU producer: createFeast and create scene-added cloned
+   *  materials from the LIVE frame call site with no prewarm home, compile
+   *  gate or stand-in, so the first plot stage-advance or in-scope feast of a
+   *  session paid a cold program link mid-frame, and every rebuild relinked.
+   *  CLOSED at Masterwrought phase 18 (2026-08-31) by the gated attach plus
+   *  the retained program anchors described in the module header, measured
+   *  by scripts/farm_gpu_tour.mjs. */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;
@@ -553,6 +635,37 @@ export class FarmPatchVisuals {
   dispose(): void {
     for (const [bedId, visual] of this.plots) this.disposePlot(bedId, visual);
     for (const [id, visual] of this.feasts) this.disposeFeast(id, visual);
+    // The anchors wear the GLB cache's own materials (shared with the
+    // instanced beds and every later template read) and the deduped gfx
+    // surface materials, so they are detached, never disposed.
+    if (this.anchors) this.scene.remove(this.anchors);
+  }
+
+  /**
+   * Attach a freshly built farm group through the host's compile gate
+   * (gated_scene_attach.ts): hidden until its programs link, then shown; a
+   * plot's outgoing stage mesh keeps drawing meanwhile and is released on the
+   * settle. A group retired before its gate settles (its record replaced or
+   * removed, `retired`) is never shown, and whatever it was replacing is
+   * released the same way. Without a gate the swap is immediate, exactly the
+   * pre-gate behaviour (and the pinned synchronous shape the adapter suite
+   * drives).
+   */
+  private attachGated(
+    group: THREE.Group,
+    label: string,
+    retired: () => boolean,
+    releaseOutgoing: (() => void) | null,
+  ): void {
+    const gate = this.compileGate;
+    if (!gate) {
+      releaseOutgoing?.();
+      this.scene.add(group);
+      return;
+    }
+    void attachSceneGroupGated(this.scene, group, (target) => gate(target, label), retired)
+      .catch(ignoreRetiredAttach)
+      .finally(() => releaseOutgoing?.());
   }
 
   /** Builds one feast table at the entity's ground seat (the bed idiom:
@@ -594,14 +707,18 @@ export class FarmPatchVisuals {
       group.add(mesh);
     }
     setRenderCategory(group, 'props');
-    this.scene.add(group);
-    this.feasts.set(e.id, {
+    const record: FeastVisual = {
       group,
       ownedMaterials,
       ownedGeometries,
       shadowMeshes,
       castsShadow: false,
-    });
+      released: false,
+    };
+    this.feasts.set(e.id, record);
+    // Hidden until its programs link; the feast entity's own view and plate
+    // stand in (module header). A despawn before the settle retires it.
+    this.attachGated(group, `farm-feast:${e.id}`, () => this.feasts.get(e.id) !== record, null);
 
     if (flourish) {
       // The placement flourish: turned earth under the table, then a warm
@@ -619,10 +736,16 @@ export class FarmPatchVisuals {
   }
 
   private disposeFeast(id: number, visual: FeastVisual): void {
+    this.feasts.delete(id);
+    this.releaseFeast(visual);
+  }
+
+  private releaseFeast(visual: FeastVisual): void {
+    if (visual.released) return;
+    visual.released = true;
     this.scene.remove(visual.group);
     for (const mat of visual.ownedMaterials) mat.dispose();
     for (const geo of visual.ownedGeometries) geo.dispose();
-    this.feasts.delete(id);
   }
 
   private create(
@@ -630,6 +753,7 @@ export class FarmPatchVisuals {
     seat: FarmBedSeat,
     visual: FarmPlotVisual,
     plot: FarmPlotView,
+    outgoing: PlotVisual | null,
   ): void {
     // Resolved on plot creates (never per frame) until a REAL bed GLB has
     // answered once: the socket offset needs the loaded bed, which may only
@@ -662,8 +786,7 @@ export class FarmPatchVisuals {
     // Same bucket as the beds they stand in, so the ?perf overlay counts them
     // with the rest of the world props rather than leaving them unattributed.
     setRenderCategory(group, 'props');
-    this.scene.add(group);
-    this.plots.set(bedId, {
+    const record: PlotVisual = {
       group,
       ownedMaterials,
       ownedGeometries,
@@ -677,7 +800,29 @@ export class FarmPatchVisuals {
       // of step, and the same bed sways the same way on every host.
       phase: (bedIdPhase(bedId) * Math.PI * 2) % (Math.PI * 2),
       sway: SWAY_AMPLITUDE[visual.stageMesh],
-    });
+      outgoing,
+      released: false,
+    };
+    this.plots.set(bedId, record);
+    // Hidden until its programs link. The bed (drawn at boot, never gated)
+    // stands in for a first plant; on a rebuild the outgoing stage mesh keeps
+    // drawing until this one settles, then goes. A plot removed before the
+    // settle (disposePlot) retires this attach and releases both itself.
+    this.attachGated(
+      group,
+      `farm-plot:${bedId}`,
+      () => this.plots.get(bedId) !== record,
+      () => this.releaseOutgoing(record),
+    );
+  }
+
+  /** Release the stage mesh `record` replaced, once (the settle, a retire and
+   *  a removal can each reach here). */
+  private releaseOutgoing(record: PlotVisual): void {
+    const outgoing = record.outgoing;
+    if (!outgoing) return;
+    record.outgoing = null;
+    this.releasePlot(outgoing);
   }
 
   /**
@@ -717,12 +862,81 @@ export class FarmPatchVisuals {
     return clone;
   }
 
+  /** The plot is gone (harvested, withered away, the viewer's rows changed):
+   *  drop the record and release it AND any stage mesh it was still replacing,
+   *  so a harvest during a pending rebuild still bares the bed at once. */
   private disposePlot(bedId: string, visual: PlotVisual): void {
+    this.plots.delete(bedId);
+    this.releaseOutgoing(visual);
+    this.releasePlot(visual);
+  }
+
+  private releasePlot(visual: PlotVisual): void {
+    if (visual.released) return;
+    visual.released = true;
     this.scene.remove(visual.group);
     for (const mat of visual.ownedMaterials) mat.dispose();
     for (const geo of visual.ownedGeometries) geo.dispose();
-    this.plots.delete(bedId);
   }
+}
+
+/**
+ * The farm program anchors: one hidden mesh per distinct program the stage and
+ * feast GLBs can ask for, wearing the SOURCE materials (never clones: a clone
+ * would be one more object to keep alive, and the source is what every plot
+ * clone shares its program key with through cloneMaterialWithHooks) on the
+ * real geometries, so the rigid variant three keys off the attribute set is
+ * the exact variant a plot or table draws. The bed and bin are left out: they
+ * draw instanced at boot, a different variant, and their rigid one is never
+ * drawn. Deduped by the prewarm signature plus the attribute set, so a set of
+ * GLBs that share one material recipe stages one anchor, not fourteen; an
+ * imperfect signature is fail-soft (the plot's own gate still covers a variant
+ * the anchors missed). Never visible: the root and every mesh are hidden, and
+ * compile traverses hidden objects (scene.traverse, not traverseVisible).
+ */
+function buildFarmProgramAnchors(): THREE.Group {
+  const root = new THREE.Group();
+  root.name = FARM_PROGRAM_ANCHORS_NAME;
+  root.visible = false;
+  setRenderCategory(root, 'prewarm');
+  const seen = new Set<string>();
+  const anchor = (url: string, height: number, fallbackColor: number): void => {
+    for (const part of templateParts(url, height, fallbackColor)) {
+      const materials = Array.isArray(part.mat) ? part.mat : [part.mat];
+      const key = `${materials.map((m) => materialProgramSignature(m)).join('+')}|${Object.keys(
+        part.geo.attributes,
+      )
+        .sort()
+        .join(',')}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const mesh = new THREE.Mesh(part.geo, part.mat);
+      mesh.name = `farmProgramAnchor:${url}`;
+      mesh.visible = false;
+      mesh.castShadow = false;
+      mesh.receiveShadow = true;
+      root.add(mesh);
+    }
+  };
+  const families: FarmCropFamily[] = ['grain', 'rootleaf', 'gourd'];
+  const stages: FarmStageMesh[] = ['sprout', 'stage2', 'stage3', 'stage4', 'withered'];
+  for (const family of families) {
+    for (const stage of stages) {
+      anchor(
+        farmStageModelUrl(family, stage),
+        STAGE_HEIGHT[stage],
+        stageAnchorColor(family, stage),
+      );
+    }
+  }
+  anchor(FARM_FEAST_MODEL_URL, FEAST_HEIGHT, 0x8a6a4a);
+  return root;
+}
+
+/** The fallback colour a stage anchor takes (the same surfaceMat a plot's
+ *  fallback box would clone from, so the anchor holds that program too). */
+function stageAnchorColor(family: FarmCropFamily, stage: FarmStageMesh): number {
+  return stage === 'withered' ? 0x8a8272 : STAGE_FALLBACK_COLORS[family];
 }
 
 /** The slice of IWorld this module reads. Taken as a WORLD rather than an

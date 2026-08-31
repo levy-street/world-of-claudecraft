@@ -359,6 +359,30 @@ export class FrozenOrbFx {
     orb.trail.geometry.dispose();
     this.orbs.splice(index, 1);
   }
+
+  /** Renderer teardown (renderer_resource_lifecycle.ts): every live orb is
+   *  removed (its materials return to the pools), then the pools and the
+   *  shared geometries are disposed. Idempotent, and a spawn afterwards
+   *  rebuilds the geometries lazily exactly like the first spawn did. */
+  dispose(): void {
+    while (this.orbs.length > 0) this.remove(this.orbs.length - 1);
+    const pools: THREE.Material[][] = [
+      this.shellPool,
+      this.corePool,
+      this.shardPool,
+      this.trailPool,
+    ];
+    for (const pool of pools) {
+      for (const mat of pool) mat.dispose();
+      pool.length = 0;
+    }
+    this.shellGeo?.dispose();
+    this.coreGeo?.dispose();
+    this.shardGeo?.dispose();
+    this.shellGeo = null;
+    this.coreGeo = null;
+    this.shardGeo = null;
+  }
 }
 
 /** The 'spellfxAt' fields the orb flight reads; the fx union keeps a typo in

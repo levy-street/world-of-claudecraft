@@ -112,8 +112,18 @@ export function entityHasNoBody(
 export interface EntityGateStandIn {
   /** the gate wrapper the call site invokes. `spiritCompileGate` is the one
    *  that is not a renderer wrapper: the puppet pool takes the host's gate
-   *  through `setSpiritCompileGate` and consults it inside its own spawn. */
-  gate: 'gateViewOnCompile' | 'gateSwapOnCompile' | 'gateSwapFlagOnCompile' | 'spiritCompileGate';
+   *  through `setSpiritCompileGate` and consults it inside its own spawn.
+   *  `attachSceneGroupGated` (gated_scene_attach.ts) is the world-group twin
+   *  of the view gate, registered where it hides something a player acts on:
+   *  the farm module, whose plots and feast tables ride the host's gate
+   *  through it (the renderer's own zone-feature attach and the coach trail
+   *  hide scenery and guidance built before any live frame, not entities). */
+  gate:
+    | 'gateViewOnCompile'
+    | 'gateSwapOnCompile'
+    | 'gateSwapFlagOnCompile'
+    | 'spiritCompileGate'
+    | 'attachSceneGroupGated';
   /** repo-relative source file the call site lives in */
   file: string;
   /** exact call-site text, so the pin fails when the wiring moves or is dropped */
@@ -184,5 +194,15 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
       'the spirit apparition of ONE cast, plus the entrance beat fx.ts spiritAt plays only on a successful spawn (its dust, its ring and its light pulse) and the creature call: the gate REFUSES the spawn rather than holding it, because a spirit that pops in late is worse than one that never came, and the puppet goes to the front of the warm-up queue for the next cast',
     standIn:
       "the rest of the ability's impact sequence, which sequencer.ts runs whatever spiritAt answers: the impact flash and shake, the archetype extras, the motifs and the authored linger. The apparition is one optional beat of a spectacle, never the entity a player acts on, and the refusals are counted as gpuPrep.gates.spiritSpawnsRefused",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/farm_patches.ts',
+    callSite:
+      'void attachSceneGroupGated(this.scene, group, (target) => gate(target, label), retired)',
+    hides:
+      "the viewer's own plot's growth-stage mesh on its create and on every rebuild (a stage advance, a wet-band flip), and a placed feast's table on its first appearance in interest scope; both link under the host gate as the label kinds farm-plot and farm-feast, and a group retired before its gate settles (its plot replaced again or removed, its feast despawned) is never shown",
+    standIn:
+      'for a plot: the static bed drawn at boot by buildFarmPatchProps (never gated, drawn at every tier) and, on a rebuild, the OUTGOING stage mesh, which keeps drawing until the replacement links and is released on that settle (or at once when the plot is removed meanwhile, so a harvest still bares the bed on the row frame); for a feast: the feast ENTITY itself, whose own view (the invisible click proxy, raycastable through the hold) and nameplate (nameplate_view.ts feastNear, shown within INTERACT_RANGE + 1, exactly where the feast is actionable) never ride this gate; beyond eating range the table is decoration that shows when its programs link, bounded by GATED_ATTACH_WATCHDOG_MS, and warm in practice because the farm program anchors staged at construction retain every farm program',
   },
 ];
