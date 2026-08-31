@@ -196,6 +196,8 @@ export const ru_RU: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Ограниченные испытания кошелька",
   "usage.metric.walletLinkRequest": "Запросы привязки кошелька",
   "usage.metric.walletLinkFailure": "Ошибки привязки кошелька",
+  "usage.metric.walletUnlinkFailure": "Отказы при отвязке кошелька",
+  "usage.metric.walletUnlinkSuccess": "Завершённые отвязки кошелька",
   "usage.metric.walletLinkRateLimited": "Ограниченные привязки кошелька",
   "usage.metric.cardPublishRequest": "Запросы публикации карты игрока",
   "usage.metric.cardPublishRejected": "Отклоненные публикации карты",

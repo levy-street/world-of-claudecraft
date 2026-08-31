@@ -43,12 +43,13 @@ import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { termsUrlFor } from './terms_link';
 import { svgIcon } from './ui_icons';
 import { usdText } from './usd_text';
-import { verifiedWocBalance } from './wallet_balance';
+import { verifiedWocBalance, walletConnectionView } from './wallet_balance';
 import {
   type WalletBridgeReason,
   walletBridgeReason,
   walletBridgeReasonText,
 } from './wallet_bridge_reason_text';
+import type { WalletConnectionKind } from './wallet_connection_view';
 import { overWalletBalance } from './woc_affordable_core';
 import { wocActivityHtml } from './woc_market_activity_html';
 import {
@@ -81,6 +82,7 @@ import {
   type WocMarketViewModel,
   type WocSellRowModel,
   wocMarketViewSig,
+  wocQuoteCountdownSig,
 } from './woc_market_view';
 import { wocTokensText } from './woc_tokens_text';
 
@@ -292,6 +294,7 @@ export class WocMarketWindow {
   private walletTokens(): number | null {
     return verifiedWocBalance();
   }
+  private paintedWalletKind: WalletConnectionKind | null = null;
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   /** Bumped every time a mutation starts AND every time the window closes. A
@@ -570,28 +573,25 @@ export class WocMarketWindow {
     });
   }
 
-  /**
-   * The pending quote's own repaint key.
-   *
-   * The quote panel is WINDOW state, so it never reaches the pure model and the
-   * model's digest cannot move for it. Without this the "expires in" countdown
-   * rendered once and then sat there, frozen, while the quote it described ran
-   * out underneath the player.
-   *
-   * Second resolution, matching every other countdown in that digest: the
-   * display has no finer grain, so a finer key would rebuild the window many
-   * times per second for a string that did not change.
-   */
+  /** The pending quote's own repaint key: the quote panel is WINDOW state, so it
+   *  never reaches the pure model and its digest cannot move for it. Without this
+   *  the "expires in" countdown sat frozen while the quote ran out under the player. */
   private quoteCountdownSig(): string {
-    const expiresAtMs = this.pendingQuote?.quote.expiresAtMs;
-    if (expiresAtMs === undefined || expiresAtMs === null) return '';
-    return String(Math.max(0, Math.ceil((expiresAtMs - Date.now()) / 1000)));
+    return wocQuoteCountdownSig(this.pendingQuote?.quote.expiresAtMs, Date.now());
   }
 
   /** Language fan-out arm: self-gated, one rebuild, signature re-latched. */
   relocalize(): void {
     if (!this.isOpen) return;
     this.render();
+  }
+
+  /** Wallet fan-out arm (Hud's onWalletUiChange, the Claudium panel's twin): the
+   *  card is module state the view digest never sees, so a connect repaints here.
+   *  Gated on the card's own state, so a balance tick alone rebuilds nothing. */
+  onWalletChanged(): void {
+    if (walletConnectionView().kind === this.paintedWalletKind) return;
+    this.relocalize();
   }
 
   // -------------------------------------------------------------------------
@@ -841,10 +841,10 @@ export class WocMarketWindow {
     // The standing banners and the footer are chrome builders (the pure-core
     // split); the window resolves its own state (notice sentence, busy label)
     // and the builders own the markup.
-    const bannerStrip = wocMarketBannersHtml({
-      paused: model.paused,
-      walletLinked: model.walletLinked,
-    });
+    // The wallet card is shared connection state, not model state: onWalletChanged() repaints it.
+    const wallet = walletConnectionView();
+    this.paintedWalletKind = wallet.kind;
+    const bannerStrip = wocMarketBannersHtml({ paused: model.paused, wallet });
     const foot = wocMarketFootHtml({
       paused: model.paused,
       tokensPerUsd: model.tokensPerUsd,

@@ -4360,7 +4360,13 @@ export const vi_VN: EnTranslations = {
       "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
     },
     "wallet": {
-      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
+      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.",
+      "reauth_required": "Xác nhận thay đổi ví này bằng mật khẩu tài khoản của bạn.",
+      "reauth_two_factor": "Tài khoản của bạn đã bật xác thực hai lớp. Nhập mã của bạn để xác nhận.",
+      "reauth_no_password": "Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.",
+      "reauth_bad_signature": "Không thể xác minh chữ ký ví. Hãy thử lại.",
+      "reauth_bad_password": "Mật khẩu của bạn không đúng.",
+      "reauth_bad_two_factor": "Mã đó không hợp lệ, hãy thử lại."
     },
     "ota_updates": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -7285,6 +7291,13 @@ export const vi_VN: EnTranslations = {
     "unlink": "Hủy liên kết",
     "unlinkTitle": "Gỡ xác minh ví khỏi tài khoản này",
     "unlinkAria": "Gỡ xác minh ví khỏi tài khoản này",
+    "reauthTitle": "Xác nhận thay đổi ví",
+    "reauthUnlinkTitle": "Xác nhận gỡ ví",
+    "reauthHelp": "Vì an toàn của bạn, hãy nhập mật khẩu tài khoản để cho phép thay đổi này.",
+    "reauthNoPassword": "Tài khoản này đăng nhập không dùng mật khẩu. Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.",
+    "reauthConfirm": "Xác nhận",
+    "reauthCancel": "Hủy",
+    "reauthClose": "Đóng",
     "signOut": "Ngắt kết nối",
     "signOutTitle": "Ngắt kết nối ứng dụng ví trên trình duyệt này",
     "signOutAria": "Ngắt kết nối ứng dụng ví trên trình duyệt này",
@@ -9235,6 +9248,8 @@ export const vi_VN: EnTranslations = {
       "tool_recharge": "Nạp Lại",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Nấm Mồ Băng Hà",
       "rift_frost_strike": "Độ Không Tuyệt Đối",
       "rift_ember_execution": "Giếng Dung Nham",

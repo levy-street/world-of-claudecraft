@@ -196,6 +196,8 @@ export const sv_SE: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Strypta begäranden om plånboksutmaning",
   "usage.metric.walletLinkRequest": "Begäranden om plånbokslänkning",
   "usage.metric.walletLinkFailure": "Misslyckade plånbokslänkningar",
+  "usage.metric.walletUnlinkFailure": "Avvisade plånboksfrånkopplingar",
+  "usage.metric.walletUnlinkSuccess": "Slutförda plånboksfrånkopplingar",
   "usage.metric.walletLinkRateLimited": "Strypta begäranden om plånbokslänkning",
   "usage.metric.cardPublishRequest": "Begäranden om publicering av spelarkort",
   "usage.metric.cardPublishRejected": "Avvisade publiceringar av spelarkort",

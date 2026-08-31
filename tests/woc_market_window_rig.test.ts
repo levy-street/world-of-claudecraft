@@ -24,6 +24,7 @@ import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { setWalletConnectionAddresses, setWalletUiEnabled } from '../src/ui/wallet_balance';
 import {
   type WocMarketHooks,
   WocMarketWindow,
@@ -318,6 +319,11 @@ beforeEach(() => {
   document.body.innerHTML = '';
   vi.useRealTimers();
   setLanguage('en');
+  // The Solana wallet card reads the shared connection state (wallet_balance),
+  // the same module the window's balance gate reads; each test starts from the
+  // feature-off default so only the wallet arms below paint the card.
+  setWalletUiEnabled(false);
+  setWalletConnectionAddresses(null, null);
 });
 
 describe('WocMarketWindow live rig: open, browse, select', () => {
@@ -402,20 +408,62 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     expect(q(r.root, '.wm-bid-form .wm-disclosures').hasAttribute('hidden')).toBe(true);
   });
 
-  it('the unlinked-wallet banner carries the connect shortcut into the shared flow', async () => {
+  it('the Solana wallet card stands above the Browse filters and carries the connect shortcut into the shared flow', async () => {
+    setWalletUiEnabled(true);
     const r = rig({ walletLinked: false });
     r.win.open();
     await flush();
-    const button = q<HTMLButtonElement>(
-      r.root,
-      '.wm-banner-wallet button[data-action="connect-wallet"]',
-    );
+    const card = q<HTMLElement>(r.root, '.wm-strip .wm-banner-wallet');
+    expect(card.getAttribute('data-wallet-kind')).toBe('unlinked');
+    expect(card.querySelector('strong')?.textContent).toBe(t('hudChrome.wocStore.wallet.title'));
+    expect(card.querySelector('p')?.textContent).toBe(t('hudChrome.wocStore.wallet.unlinked'));
+    // Above the filters: the strip precedes the tab panel that holds the sort
+    // and filter row, so the card is the first thing under the tabs.
+    const strip = q<HTMLElement>(r.root, '.wm-strip');
+    const panel = q<HTMLElement>(r.root, '#woc-market-panel');
+    expect(strip.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(panel.querySelector('.wm-browse select, .wm-browse input')).not.toBeNull();
+    const button = q<HTMLButtonElement>(card, 'button[data-action="connect-wallet"]');
+    expect(button.textContent).toBe(t('hudChrome.wocStore.wallet.connect'));
     button.click();
     expect(r.openWallet).toHaveBeenCalledTimes(1);
   });
 
-  it('a linked wallet paints no banner and no connect shortcut', async () => {
+  it("a linked wallet keeps the card with the Claudium panel's Manage / Reconnect button, and a wallet change repaints it", async () => {
+    setWalletUiEnabled(true);
+    setWalletConnectionAddresses('linked', 'linked');
     const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    const manage = q<HTMLButtonElement>(
+      r.root,
+      '.wm-banner-wallet button[data-action="connect-wallet"]',
+    );
+    expect(manage.textContent).toBe(t('hudChrome.wocStore.wallet.manage'));
+    expect(q(r.root, '.wm-banner-wallet p').textContent).toBe(
+      t('hudChrome.wocStore.wallet.linkedConnected'),
+    );
+    manage.focus();
+    // The wallet app disconnects: the Hud's onWalletUiChange fan-out reaches
+    // the window, which repaints the card (no digest moves for this) and keeps
+    // the player's focus on the button they were on.
+    setWalletConnectionAddresses('linked', null);
+    r.win.onWalletChanged();
+    const reconnect = q<HTMLButtonElement>(
+      r.root,
+      '.wm-banner-wallet button[data-action="connect-wallet"]',
+    );
+    expect(reconnect.textContent).toBe(t('hudChrome.wocStore.wallet.reconnect'));
+    expect(q(r.root, '.wm-banner-wallet').getAttribute('data-wallet-kind')).toBe(
+      'linked_disconnected',
+    );
+    expect(document.activeElement).toBe(reconnect);
+    reconnect.click();
+    expect(r.openWallet).toHaveBeenCalledTimes(1);
+  });
+
+  it('paints no wallet card when the wallet feature is off in this build', async () => {
+    const r = rig({ walletLinked: false });
     r.win.open();
     await flush();
     expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();

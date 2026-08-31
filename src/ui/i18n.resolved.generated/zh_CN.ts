@@ -4360,7 +4360,13 @@ export const zh_CN: EnTranslations = {
       "upstream": "Epic 未响应。请稍后重试。"
     },
     "wallet": {
-      "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+      "handoff_invalid": "钱包授权已过期或无法验证。请重试。",
+      "reauth_required": "请输入账号密码以确认此钱包变更。",
+      "reauth_two_factor": "你的账号已启用两步验证。请输入验证码以确认。",
+      "reauth_no_password": "请先在账号设置中设置密码，然后重试。",
+      "reauth_bad_signature": "钱包签名验证失败。请重试。",
+      "reauth_bad_password": "密码不正确。",
+      "reauth_bad_two_factor": "验证码无效，请重试。"
     },
     "ota_updates": {
       "invalid_input": "输入无效。"
@@ -7285,6 +7291,13 @@ export const zh_CN: EnTranslations = {
     "unlink": "解除绑定",
     "unlinkTitle": "从此账号移除钱包验证",
     "unlinkAria": "从此账号移除钱包验证",
+    "reauthTitle": "确认钱包变更",
+    "reauthUnlinkTitle": "确认移除钱包",
+    "reauthHelp": "为了你的账号安全，请输入账号密码以授权此变更。",
+    "reauthNoPassword": "此账号未设置密码登录。请先在账号设置中设置密码，然后重试。",
+    "reauthConfirm": "确认",
+    "reauthCancel": "取消",
+    "reauthClose": "关闭",
     "signOut": "断开连接",
     "signOutTitle": "在此浏览器中断开钱包应用",
     "signOutAria": "在此浏览器中断开钱包应用",
@@ -9235,6 +9248,8 @@ export const zh_CN: EnTranslations = {
       "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
+      "nythraxisWardChannel": "守护石信道",
+      "nythraxisDeathlessRage": "不灭之怒",
       "rift_frost_execution": "冰川之墓",
       "rift_frost_strike": "绝对零度",
       "rift_ember_execution": "岩浆泉",

@@ -4360,7 +4360,13 @@ export const de_DE: EnTranslations = {
       "upstream": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
     },
     "wallet": {
-      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
+      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.",
+      "reauth_required": "Bestätige diese Wallet-Änderung mit deinem Konto-Passwort.",
+      "reauth_two_factor": "Für dein Konto ist die Zwei-Faktor-Authentifizierung aktiviert. Gib zur Bestätigung deinen Code ein.",
+      "reauth_no_password": "Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.",
+      "reauth_bad_signature": "Die Wallet-Signatur konnte nicht verifiziert werden. Versuche es erneut.",
+      "reauth_bad_password": "Dein Passwort ist falsch.",
+      "reauth_bad_two_factor": "Dieser Code ist ungültig, versuche es erneut."
     },
     "ota_updates": {
       "invalid_input": "Ungültige Eingabe."
@@ -7285,6 +7291,13 @@ export const de_DE: EnTranslations = {
     "unlink": "Trennen",
     "unlinkTitle": "Wallet-Verifizierung von diesem Konto entfernen",
     "unlinkAria": "Wallet-Verifizierung von diesem Konto entfernen",
+    "reauthTitle": "Wallet-Änderung bestätigen",
+    "reauthUnlinkTitle": "Wallet-Entfernung bestätigen",
+    "reauthHelp": "Gib zu deiner Sicherheit dein Konto-Passwort ein, um diese Änderung zu erlauben.",
+    "reauthNoPassword": "Dieses Konto meldet sich ohne Passwort an. Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.",
+    "reauthConfirm": "Bestätigen",
+    "reauthCancel": "Abbrechen",
+    "reauthClose": "Schließen",
     "signOut": "Abmelden",
     "signOutTitle": "Wallet-App in diesem Browser trennen",
     "signOutAria": "Wallet-App in diesem Browser trennen",
@@ -9235,6 +9248,8 @@ export const de_DE: EnTranslations = {
       "tool_recharge": "Aufladen",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Gletschergrab",
       "rift_frost_strike": "Absoluter Nullpunkt",
       "rift_ember_execution": "Magmaquelle",

@@ -4360,7 +4360,13 @@ export const es_ES: EnTranslations = {
       "upstream": "Epic no respondió. Inténtalo de nuevo en un momento."
     },
     "wallet": {
-      "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
+      "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo.",
+      "reauth_required": "Confirma este cambio de cartera con la contraseña de tu cuenta.",
+      "reauth_two_factor": "Tu cuenta tiene activada la autenticación en dos pasos. Escribe tu código para confirmar.",
+      "reauth_no_password": "Primero establece una contraseña en los ajustes de la cuenta y vuelve a intentarlo.",
+      "reauth_bad_signature": "No se pudo verificar la firma de la cartera. Inténtalo de nuevo.",
+      "reauth_bad_password": "Tu contraseña es incorrecta.",
+      "reauth_bad_two_factor": "Ese código no es válido. Inténtalo de nuevo."
     },
     "ota_updates": {
       "invalid_input": "Entrada no válida."
@@ -7285,6 +7291,13 @@ export const es_ES: EnTranslations = {
     "unlink": "Desvincular",
     "unlinkTitle": "Eliminar la verificación de cartera de esta cuenta",
     "unlinkAria": "Eliminar la verificación de cartera de esta cuenta",
+    "reauthTitle": "Confirmar cambio de cartera",
+    "reauthUnlinkTitle": "Confirmar eliminación de cartera",
+    "reauthHelp": "Por tu seguridad, escribe la contraseña de tu cuenta para autorizar este cambio.",
+    "reauthNoPassword": "Esta cuenta inicia sesión sin contraseña. Primero establece una contraseña en los ajustes de la cuenta y vuelve a intentarlo.",
+    "reauthConfirm": "Confirmar",
+    "reauthCancel": "Cancelar",
+    "reauthClose": "Cerrar",
     "signOut": "Desconectar",
     "signOutTitle": "Desconectar la app de cartera en este navegador",
     "signOutAria": "Desconectar la app de cartera en este navegador",
@@ -9235,6 +9248,8 @@ export const es_ES: EnTranslations = {
       "tool_recharge": "Recargando",
       "demonHeal": "Sanación demoníaca",
       "thunzharrStormcall": "Llamada de la tormenta",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Tumba glacial",
       "rift_frost_strike": "Cero absoluto",
       "rift_ember_execution": "Pozo de magma",

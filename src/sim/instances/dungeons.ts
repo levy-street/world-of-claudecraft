@@ -334,7 +334,7 @@ export function enterDungeon(
         r.meta.entityId,
         doorDifficulty === 'heroic'
           ? `You are locked to Heroic ${dungeon.name}.`
-          : 'You are locked to Nythraxis Raid Arena.',
+          : 'You are locked to the Nythraxis Pillar.',
       );
       return false;
     }

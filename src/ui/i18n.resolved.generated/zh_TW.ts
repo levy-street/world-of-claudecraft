@@ -4360,7 +4360,13 @@ export const zh_TW: EnTranslations = {
       "upstream": "Epic 未回應。請稍後重試。"
     },
     "wallet": {
-      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
+      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。",
+      "reauth_required": "請輸入帳號密碼以確認此錢包變更。",
+      "reauth_two_factor": "你的帳號已啟用兩步驟驗證。請輸入驗證碼以確認。",
+      "reauth_no_password": "請先在帳號設定中設定密碼，然後再試一次。",
+      "reauth_bad_signature": "錢包簽章驗證失敗。請再試一次。",
+      "reauth_bad_password": "密碼不正確。",
+      "reauth_bad_two_factor": "這組代碼無效，請再試一次。"
     },
     "ota_updates": {
       "invalid_input": "輸入無效。"
@@ -7285,6 +7291,13 @@ export const zh_TW: EnTranslations = {
     "unlink": "解除綁定",
     "unlinkTitle": "從此帳號移除錢包驗證",
     "unlinkAria": "從此帳號移除錢包驗證",
+    "reauthTitle": "確認錢包變更",
+    "reauthUnlinkTitle": "確認移除錢包",
+    "reauthHelp": "為了你的帳號安全，請輸入帳號密碼以授權此變更。",
+    "reauthNoPassword": "此帳號未設定密碼登入。請先在帳號設定中設定密碼，然後再試一次。",
+    "reauthConfirm": "確認",
+    "reauthCancel": "取消",
+    "reauthClose": "關閉",
     "signOut": "斷開連線",
     "signOutTitle": "在此瀏覽器中斷開錢包應用程式",
     "signOutAria": "在此瀏覽器中斷開錢包應用程式",
@@ -9235,6 +9248,8 @@ export const zh_TW: EnTranslations = {
       "tool_recharge": "充能",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚",
+      "nythraxisWardChannel": "守護石信道",
+      "nythraxisDeathlessRage": "不滅之怒",
       "rift_frost_execution": "冰川之墓",
       "rift_frost_strike": "絕對零度",
       "rift_ember_execution": "岩漿泉",

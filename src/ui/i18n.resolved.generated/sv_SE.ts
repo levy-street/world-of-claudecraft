@@ -4360,7 +4360,13 @@ export const sv_SE: EnTranslations = {
       "upstream": "Epic svarade inte. Försök igen om en stund."
     },
     "wallet": {
-      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
+      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.",
+      "reauth_required": "Bekräfta den här plånboksändringen med ditt kontolösenord.",
+      "reauth_two_factor": "Ditt konto har tvåfaktorsautentisering aktiverad. Ange din kod för att bekräfta.",
+      "reauth_no_password": "Ange först ett lösenord i kontoinställningarna och försök igen.",
+      "reauth_bad_signature": "Plånbokens signatur kunde inte verifieras. Försök igen.",
+      "reauth_bad_password": "Ditt lösenord är felaktigt.",
+      "reauth_bad_two_factor": "Den koden är inte giltig, försök igen."
     },
     "ota_updates": {
       "invalid_input": "Ogiltig indata."
@@ -7285,6 +7291,13 @@ export const sv_SE: EnTranslations = {
     "unlink": "Avlänka",
     "unlinkTitle": "Ta bort plånboksverifieringen från det här kontot",
     "unlinkAria": "Ta bort plånboksverifieringen från det här kontot",
+    "reauthTitle": "Bekräfta plånboksändring",
+    "reauthUnlinkTitle": "Bekräfta borttagning av plånbok",
+    "reauthHelp": "För din säkerhet, ange ditt kontolösenord för att godkänna den här ändringen.",
+    "reauthNoPassword": "Det här kontot loggar in utan lösenord. Ange först ett lösenord i kontoinställningarna och försök igen.",
+    "reauthConfirm": "Bekräfta",
+    "reauthCancel": "Avbryt",
+    "reauthClose": "Stäng",
     "signOut": "Koppla från",
     "signOutTitle": "Koppla från plånboksappen i den här webbläsaren",
     "signOutAria": "Koppla från plånboksappen i den här webbläsaren",
@@ -9235,6 +9248,8 @@ export const sv_SE: EnTranslations = {
       "tool_recharge": "Omladdning",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Glaciärgraven",
       "rift_frost_strike": "Absoluta nollpunkten",
       "rift_ember_execution": "Magmakällan",

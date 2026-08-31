@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "es_ES": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "fr_FR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "fr_CA": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "de_DE": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "nl_NL": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "pl_PL": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "id_ID": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "tr_TR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "sv_SE": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "vi_VN": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ],
+  "da_DK": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel"
+  ]
 };

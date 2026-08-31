@@ -196,6 +196,8 @@ export const cs_CZ: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Požadavky na výzvu peněženky omezené limitem",
   "usage.metric.walletLinkRequest": "Požadavky na propojení peněženky",
   "usage.metric.walletLinkFailure": "Selhání propojení peněženky",
+  "usage.metric.walletUnlinkFailure": "Zamítnutá odpojení peněženky",
+  "usage.metric.walletUnlinkSuccess": "Dokončená odpojení peněženky",
   "usage.metric.walletLinkRateLimited": "Požadavky na propojení peněženky omezené limitem",
   "usage.metric.cardPublishRequest": "Požadavky na publikování karet hráčů",
   "usage.metric.cardPublishRejected": "Odmítnutá publikování karet hráčů",

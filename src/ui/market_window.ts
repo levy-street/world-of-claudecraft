@@ -30,7 +30,8 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
-import { itemDisplayName } from './entity_i18n';
+import { itemDisplayName, tEntity } from './entity_i18n';
+import { ITEMS } from '../sim/data';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
@@ -134,6 +135,12 @@ export class MarketWindow {
   // needs to land once the server's async echo catches up, via a narrow
   // DOM-only patch. See refreshSellPriceRef.
   private lastSellPriceRefSig = '';
+  // The Sell tab's slot-counter state (issue 3698): the listing cap is its own
+  // async echo axis, tracked separately from the price ref so the counter lands
+  // once the server echoes the new myListingCount without clobbering the form.
+  private lastMyListingCount = -1;
+  private lastMaxListings = -1;
+  private localizedNameEntries: Array<{ localized: string; itemID: string }>;
   private openerFocus: HTMLElement | null = null;
   // Armed by onReconnected() and cleared by the next refreshIfChanged() that
   // actually observes a post-reconnect MarketInfo. onReconnected() fires
@@ -146,7 +153,24 @@ export class MarketWindow {
   // next snapshot lets it see the real post-reconnect echo instead.
   private pendingReconnectResync = false;
 
-  constructor(private readonly deps: MarketWindowDeps) {}
+  constructor(private readonly deps: MarketWindowDeps) {
+    this.localizedNameEntries = Object.entries(ITEMS).map(([id, item]) => ({
+      localized: tEntity({ kind: 'item', id, field: 'name' }),
+      itemID: id,
+    }));
+  }
+
+  private convertSearchTerm(searchTerm: string): string {
+    if (!searchTerm) return searchTerm;
+    const lcSearch = searchTerm.trim().toLowerCase();
+    for (const entry of this.localizedNameEntries) {
+      if (entry.localized.toLowerCase().includes(lcSearch)) {
+        const item = ITEMS[entry.itemID];
+        return item.name ?? entry.itemID;
+      }
+    }
+    return searchTerm;
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -286,14 +310,15 @@ export class MarketWindow {
 
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so the general rebuild below never
-  // touches it; its one async surface, the price reference (issue 3043), gets
-  // its own narrow patch instead (refreshSellPriceRef).
+  // touches it; its async surfaces (the price reference, the slot counter) get
+  // their own narrow patches instead (refreshSellPriceRef, refreshSellNote).
   refreshIfChanged(): void {
     if (!this.opened) return;
     const info = this.deps.world().marketInfo;
     this.resolvePendingReconnectResync(info);
     if (this.tab === 'sell') {
       this.refreshSellPriceRef(info);
+      this.refreshSellNote(info);
       return;
     }
     const sig = JSON.stringify([
@@ -340,6 +365,28 @@ export class MarketWindow {
           : t('itemUi.market.collect');
     }
     this.renderContent();
+  }
+
+  // The Sell tab's slot-counter echo (issue 3698), patched independently of
+  // the general per-frame rebuild above: the rest of the Sell tab holds typed
+  // quantity/price inputs a rebuild would clobber, but the server-round-tripped
+  // listing count still needs to land without the player taking another action.
+  // Touches only the .mkt-note node renderSell mints, never the form itself.
+  private refreshSellNote(info: MarketInfo | null): void {
+    if (!info) return;
+    if (info.myListingCount === this.lastMyListingCount && info.maxListings === this.lastMaxListings) return;
+    this.lastMyListingCount = info.myListingCount;
+    this.lastMaxListings = info.maxListings;
+    const body = this.deps.root().querySelector<HTMLElement>('#market-body');
+    const note = body?.querySelector<HTMLElement>('.mkt-note');
+    if (!note) return;
+    note.innerHTML = esc(
+      t('itemUi.market.sellNote', {
+        cut: formatNumber(info.cutPct, { maximumFractionDigits: 0 }),
+        used: formatNumber(info.myListingCount, { maximumFractionDigits: 0 }),
+        max: formatNumber(info.maxListings, { maximumFractionDigits: 0 }),
+      }),
+    );
   }
 
   // The Sell tab's price-reference echo (issue 3043), patched independently of
@@ -434,7 +481,7 @@ export class MarketWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     const searchInput = el.querySelector<HTMLInputElement>('.mkt-search');
     searchInput?.addEventListener('input', () => {
-      this.searchQuery = searchInput.value;
+      this.searchQuery = this.convertSearchTerm(searchInput.value);
       this.browsePage = 0;
       this.pushQuery();
     });

@@ -4360,7 +4360,13 @@ export const nl_NL: EnTranslations = {
       "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
-      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_required": "Bevestig deze portemonneewijziging met je accountwachtwoord.",
+      "reauth_two_factor": "Je account heeft tweestapsverificatie ingeschakeld. Voer je code in om te bevestigen.",
+      "reauth_no_password": "Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+      "reauth_bad_signature": "De handtekening van de portemonnee kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_bad_password": "Je wachtwoord is onjuist.",
+      "reauth_bad_two_factor": "Die code is niet geldig, probeer het opnieuw."
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
@@ -7285,6 +7291,13 @@ export const nl_NL: EnTranslations = {
     "unlink": "Ontkoppelen",
     "unlinkTitle": "Verwijder portemonneeverificatie van dit account",
     "unlinkAria": "Verwijder portemonneeverificatie van dit account",
+    "reauthTitle": "Portemonneewijziging bevestigen",
+    "reauthUnlinkTitle": "Portemonneeverwijdering bevestigen",
+    "reauthHelp": "Voer voor je veiligheid je accountwachtwoord in om deze wijziging toe te staan.",
+    "reauthNoPassword": "Dit account logt in zonder wachtwoord. Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+    "reauthConfirm": "Bevestigen",
+    "reauthCancel": "Annuleren",
+    "reauthClose": "Sluiten",
     "signOut": "Verbinding verbreken",
     "signOutTitle": "Verbreek de verbinding met de portemonnee-app in deze browser",
     "signOutAria": "Verbreek de verbinding met de portemonnee-app in deze browser",
@@ -9235,6 +9248,8 @@ export const nl_NL: EnTranslations = {
       "tool_recharge": "Opladen",
       "demonHeal": "Demonengenezing",
       "thunzharrStormcall": "Stormroep",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "IJzig Graf",
       "rift_frost_strike": "Absoluut Nulpunt",
       "rift_ember_execution": "Magmabron",

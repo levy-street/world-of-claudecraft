@@ -48,10 +48,41 @@ high-score board) with the recruitment column:
 - GM and officers (the `GUILD_BANK_EDIT_RANKS` officer-plus family) get a
   Pledges tab in the guild UI: every open pledge (name, class, level, when),
   with Accept and Reject.
-- Accept sends the standard guild invite (the existing invite flow; the
-  invite, not the accept, is what creates membership) and removes the pledge.
-- Reject removes the pledge and advances that player's cooldown ladder for
-  THIS guild (below).
+- Accept, REVISED 2026-08-26 (owner decision): the pledge is the player's
+  standing request to join, so it persists across logout and only resolves on
+  a definite outcome.
+  - Pledger ONLINE: accept sends the standard guild invite (the existing
+    invite flow; the invite, not the accept, is what creates membership). The
+    pledge stays on the board until the player actually joins (joining any
+    guild clears it), so an invite that expires or drops at logout never
+    destroys the request.
+  - Pledger OFFLINE: accept seats them directly as a member (the pledge is
+    their standing consent; there is no one online to hand an invite to).
+    They find themselves in the guild on their next login. Acceptance wipes
+    the rejection ladder either way, exactly like a real invite. The seat
+    consumes the pledge in the same transaction, so a withdraw or decline
+    racing the accept rolls the seat back instead of seating a player who
+    just said no.
+  - A refused accept (guild full, pledger already guilded elsewhere) leaves
+    or resolves the pledge accordingly: full keeps it on the board; already
+    guilded drops the stale pledge. Founding a guild also counts as joining
+    one and clears the founder's standing pledge.
+  - Block policy: a pledge is guild-scoped consent. A per-officer block still
+    suppresses the ONLINE invite delivery (the silent fake-success arm of the
+    invite flow), and that arm leaves the request standing, exactly like an
+    invite the pledger never answered, so the board row itself never reveals
+    a block. (The invite flow's own refusal messages are a separate,
+    pre-existing observation surface, not changed here.) The OFFLINE seat is
+    not gated on any single officer's block relationship: the player asked
+    the guild, and the guild said yes.
+  - Declining the guild's invite withdraws the pledge: an explicit "no" to
+    the guild you pledged to ends the standing request, so a declined player
+    can never be seated offline afterwards. Letting an invite expire or
+    logging out with it pending is NOT a withdrawal; the request stands.
+- Reject removes the pledge, advances that player's cooldown ladder for THIS
+  guild (below), and cancels any still-pending invite an earlier accept sent
+  (both sides hear the cancel), so an officer's explicit no always stops the
+  join.
 - Per-guild settings, officer-plus editable: pledges on/off, minimum pledge
   level, and the pledge note (shown on the board).
 - Every new pledge notifies online GM/officers with an in-game chat line.

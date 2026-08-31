@@ -4360,7 +4360,13 @@ export const tr_TR: EnTranslations = {
       "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
-      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.",
+      "reauth_required": "Bu cüzdan değişikliğini hesap parolanızla onaylayın.",
+      "reauth_two_factor": "Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.",
+      "reauth_no_password": "Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+      "reauth_bad_signature": "Cüzdan imzası doğrulanamadı. Tekrar deneyin.",
+      "reauth_bad_password": "Parolanız yanlış.",
+      "reauth_bad_two_factor": "Bu kod geçerli değil, tekrar deneyin."
     },
     "ota_updates": {
       "invalid_input": "Geçersiz girdi."
@@ -7285,6 +7291,13 @@ export const tr_TR: EnTranslations = {
     "unlink": "Bağlantıyı Kaldır",
     "unlinkTitle": "Bu hesaptan cüzdan doğrulamasını kaldır",
     "unlinkAria": "Bu hesaptan cüzdan doğrulamasını kaldır",
+    "reauthTitle": "Cüzdan değişikliğini onayla",
+    "reauthUnlinkTitle": "Cüzdan kaldırmayı onayla",
+    "reauthHelp": "Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.",
+    "reauthNoPassword": "Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+    "reauthConfirm": "Onayla",
+    "reauthCancel": "İptal",
+    "reauthClose": "Kapat",
     "signOut": "Bağlantıyı Kes",
     "signOutTitle": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
     "signOutAria": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
@@ -9235,6 +9248,8 @@ export const tr_TR: EnTranslations = {
       "tool_recharge": "Şarj Etme",
       "demonHeal": "Şeytan İyileştirmesi",
       "thunzharrStormcall": "Fırtına Çağrısı",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Buzul Mezarı",
       "rift_frost_strike": "Mutlak Sıfır",
       "rift_ember_execution": "Magma Kuyusu",
