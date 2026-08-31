@@ -23568,6 +23568,21 @@ a question here:
 3. A start-of-unit `git status` snapshot, a scoped brief listing assigned files,
    and a landed commit whose diffstat matches the agent's own report.
 
+What actually TRIGGERED the check is worth stating honestly, because the
+flattering version is not the transferable one. The reader did not stop because
+it suspected a live writer; it stopped because the brief's FILE SET DID NOT
+COHERE, an ItemCopyAnchor and a BagMenuTarget having nothing to do with flask
+auras. The liveness finding came out of that check rather than causing it. So
+the usable rule is the weaker one: when a brief's file set contains something
+you cannot explain, verify the boundary before working through it. A brief is
+evidence about the lead's model of the tree, not about the tree.
+
+The same reader also flagged that its own soundness verdict had been formed
+against bytes that moved during the read, re-checked the three things it had
+actually asserted against the current file, and asked that the verdict be
+treated as of its read rather than as of now. Findings survive churn; verdicts
+have a timestamp.
+
 Two traps this phase paid for. COHERENT SHAPE DOES NOT ESTABLISH AN OWNER: a
 cluster dirty at one agent's session start reads as that agent's unit extending
 outward, and two agents independently reasoned exactly that; it was wrong,
