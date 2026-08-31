@@ -1714,17 +1714,40 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // minus 380, so any growth reds the day it lands and a wholesale shrink
     // cannot hide.
     //
-    // MEASURED at Phase 18 (U-MEASURE): 151,495 bytes, band 151,115..151,496.
-    // Measured against the COMMITTED tip 021d6c32ad, in a throwaway worktree at
-    // that SHA, deliberately: this branch's working tree was carrying several
-    // other Phase 18 agents' uncommitted content edits while this ran (the
-    // Reliquary and zone tables among them), and it already measures 151,525,
-    // thirty bytes over the edge. A band anchored on a working tree is
-    // anchored on nothing, so the figure here belongs to a SHA. The commit
-    // that lands those content edits therefore reds HERE, which is the
-    // re-mint obligation working exactly as the professions bound's does:
-    // re-measure and re-base the edge at the new measurement plus one, never
-    // widen it to absorb the difference.
+    // MEASURED at Phase 18 (U-MEASURE): 151,495 bytes against the committed tip
+    // 021d6c32ad, taken in a throwaway worktree at that SHA because the branch's
+    // working tree was carrying other Phase 18 units' in-flight content at the
+    // time and a band anchored on a moving tree is anchored on nothing.
+    //
+    // RE-BASED, same phase, to 151,525 bytes, band 151,145..151,526. The delta
+    // is +30 and it is MEASURED, not inferred: the per-key split before and
+    // after moves in exactly one key, `reliquary` 16,907 to 16,937, and no
+    // other key moves at all. The whole of it is ONE new mark id joining
+    // reliquary.marks, `gather_event:golden_harvest` (27 characters, 30 bytes
+    // as `"<id>",` in the sorted array), which the phase's farm-bed rare-event
+    // unit added to RELIQUARY_MARK_IDS (31 members to 32). Predicted from that
+    // id's own literal BEFORE the confirming run and measured EXACTLY, drift
+    // zero. The professions block did not move (17,596 both sides).
+    // Two corrections to the first cut of this paragraph, both of which a
+    // measurement settles and a guess would not: the zone and temple content
+    // edits in flight beside it move NOTHING here (they re-tune existing rows
+    // rather than add ids), and the item and deed tables did not grow either
+    // (profession_items.ts added a noDiscard flag to an existing item and
+    // deeds.ts only comments), so `deedStats.itemsDiscovered`, `deeds` and
+    // `questsDone` are byte-identical across the re-base. "Some content rows
+    // landed" is the shape of claim this file exists to refuse: the honest
+    // statement names the ONE row and its byte count.
+    //
+    // THE PHASE-CLOSE OBLIGATION, and it is not discharged by this re-base.
+    // This band is measured against a tree whose content is STILL MOVING, so
+    // every figure here is provisional until the phase's last content unit
+    // lands. A red here mid-phase is not a regression and is never widened
+    // away: re-measure, attribute the delta to the rows that caused it the way
+    // the +30 is attributed above, and re-base at measurement minus 380 and
+    // plus one. The band is then re-measured ONCE MORE AT THE PHASE CLOSE,
+    // after the last content unit, and THAT measurement is the one the QA twin
+    // freezes. Carrying this instruction forward is the point: a successor who
+    // finds this arm red and only moves the numbers has done half the work.
     //
     // TWO predictions were on record and they disagreed, so both are stated.
     // The STANDING carry was the Phase 11d arithmetic one, "roughly 41.4 KB"
@@ -1773,38 +1796,29 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
-    {
-      const perKey: Record<string, number> = {};
-      for (const k of Object.keys(s2)) {
-        perKey[k] = 1 + k.length + 3 + JSON.stringify((s2 as Record<string, unknown>)[k]).length;
-      }
-      require('node:fs').writeFileSync(
-        '/private/tmp/claude-501/-Users-fernando-Documents-world-of-claudecraft/e0a24801-a196-41bc-bbbb-004c24f4c950/scratchpad/fr_whole_dump2.json',
-        JSON.stringify({ bytes, professions: professionsBytes(s2), perKey }, null, 1),
-      );
-    }
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
       'the floor at measurement minus 380 and the edge at measurement plus one. ' +
-      'Never widen the edge to absorb a difference.';
-    // RE-BASED at integration from 151,495 to 151,525 (+30): the measurement
-    // was taken against the clean tip while the phase's own content units were
-    // still landing, and the two work-order Reliquary and zone content rows
-    // that landed after it widen the maximal containers by exactly that much.
-    // Structural shape unmoved; only content grew. This band is re-measured
-    // ONCE MORE at the phase close, after the last content unit lands, and the
-    // QA twin's frozen stamp is what settles it.
+      'Never widen the edge to absorb a difference. THE PHASE IS STILL LANDING ' +
+      'CONTENT: this band is measured against a moving tree, so a red here mid-phase ' +
+      'means re-measure and re-base, and the band is re-measured ONCE MORE at the ' +
+      'phase close after the LAST content unit lands. The close measurement is the ' +
+      'one the QA twin freezes.';
     expect(bytes, reMint).toBeGreaterThan(151144);
     expect(bytes, reMint).toBeLessThan(151526);
 
     // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, recorded rather
     // than tuned. The signal's own derivation (server/character_blob_size.ts)
     // states that 131,072 is "about 3.2x the legitimate worst case". Measured,
-    // the relation is the other way round: the legitimate worst case is 151,495
-    // and the threshold sits BELOW it, at about 0.87x, so a character who
-    // really reached every ceiling would print the oversized-save line on every
-    // autosave. The pin below records that direction as measured TODAY; it is
+    // the relation is the other way round: the legitimate worst case is 151,525
+    // and the threshold sits BELOW it, at about 0.87x, exceeded by 20,453
+    // bytes, so a character who really reached every ceiling would print the
+    // oversized-save line on every autosave. The direction is what matters and
+    // it does not depend on the re-base: the gap is over 20 KB while the
+    // content rows moving under it are tens of bytes, so no plausible
+    // phase-close measurement changes the finding, only its digits. The pin below
+    // records that direction as measured TODAY; it is
     // not an endorsement. Re-minting CHARACTER_BLOB_WARN_BYTES is a maintainer
     // decision and a re-mint reds here BY DESIGN, which is the point: the
     // threshold and this measurement must be re-read together, the same

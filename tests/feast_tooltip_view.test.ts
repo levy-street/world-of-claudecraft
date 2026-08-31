@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { FoodItemDef, ItemDef, OtherItemDef } from '../src/sim/types';
+import type { AuraKind, FoodItemDef, ItemDef, OtherItemDef } from '../src/sim/types';
 import { feastTooltipLines } from '../src/ui/hud/professions/feast_tooltip_view';
 import {
   ensureLocaleLoaded,
@@ -38,8 +38,22 @@ function feastDef(
     feast: { templateId: 'probe_feast', ...record },
   };
 }
-function dishDef(wellFed: NonNullable<FoodItemDef['wellFed']> | undefined): ItemDef {
-  return { ...(ITEMS.evergarden_braised_greens as FoodItemDef), id: 'probe_dish', wellFed };
+// The wellFed record arrives as the WIDE shape and is cast at this one
+// boundary, deliberately. TimedStatBuffPayload.kind narrowed to
+// TimedStatBuffAuraKind (the three flat-stat kinds the live carriers use), so an
+// unmapped kind is no longer constructible through the def type at all. That
+// narrowing is what the fallback below defends against ever being needed for,
+// but the fallback is still the safety net for the day the union widens without
+// the stat map gaining the row, so the probe reaches past the type to keep
+// exercising it.
+type ProbeWellFed = { aura: string; kind: AuraKind; value: number; duration: number };
+
+function dishDef(wellFed: ProbeWellFed | undefined): ItemDef {
+  return {
+    ...(ITEMS.evergarden_braised_greens as FoodItemDef),
+    id: 'probe_dish',
+    wellFed: wellFed as FoodItemDef['wellFed'],
+  };
 }
 
 describe('feastTooltipLines', () => {

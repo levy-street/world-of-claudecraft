@@ -125,7 +125,7 @@ describe('BagsWindow.render defers a rebuild that would tear out a live drag', (
     expect(h.itemKeys()).toEqual(['bag:worn_sword:0']);
 
     // The player has the sword picked up (dragstart already ran dragState.begin()).
-    h.dragState.begin({ itemId: 'worn_sword', count: 1, index: 0 });
+    h.dragState.begin({ itemId: 'worn_sword', count: 1, index: 0, copyPin: '' });
 
     // Loot lands mid-drag: the common case (a kill, a gather tick, a vendor
     // transaction, mob regen). Un-guarded, this would innerHTML-wipe the window
@@ -141,7 +141,7 @@ describe('BagsWindow.render defers a rebuild that would tear out a live drag', (
   it("flushes the deferred rebuild once the dragged row's own dragend fires", () => {
     const h = harness();
     h.window.render();
-    h.dragState.begin({ itemId: 'worn_sword', count: 1, index: 0 });
+    h.dragState.begin({ itemId: 'worn_sword', count: 1, index: 0, copyPin: '' });
     h.setInventory([SWORD, POTION]);
     h.window.render(); // deferred; the sword row survives
 

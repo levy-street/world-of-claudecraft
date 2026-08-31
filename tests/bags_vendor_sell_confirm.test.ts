@@ -9,6 +9,7 @@
 //   - focus after a confirmed sale lands on the close button, not a detached cell.
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -33,12 +34,18 @@ interface Harness {
   calls: string[];
   errors: string[];
   window: BagsWindow;
+  /** The live array the fake world reads, so a case can shift the bags under an
+   *  open prompt or a drag the way a snapshot does. */
+  inventory: InvSlot[];
+  /** Item ids the window asked to open the action menu for. */
+  menuOpens: string[];
 }
 
-function harness(inventory: InvSlot[]): Harness {
+function harness(inventory: InvSlot[], opts?: { touch?: boolean; vendor?: boolean }): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const calls: string[] = [];
   const errors: string[] = [];
+  const menuOpens: string[] = [];
   const sink =
     (name: string) =>
     (...a: unknown[]) =>
@@ -83,7 +90,7 @@ function harness(inventory: InvSlot[]): Harness {
     captureFocus: () => null,
     restoreFocus: noop,
     renderCharIfOpen: noop,
-    vendorOpen: () => true,
+    vendorOpen: () => opts?.vendor !== false,
     tradeOpen: () => false,
     isMarketSell: () => false,
     isMailAttach: () => false,
@@ -107,16 +114,18 @@ function harness(inventory: InvSlot[]): Harness {
     setDragAction: noop,
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
-    isTouchHud: () => false,
+    isTouchHud: () => opts?.touch === true,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
-    openItemActionMenu: noop,
+    openItemActionMenu: (_def, itemId) => {
+      menuOpens.push(itemId);
+    },
   };
   const window_ = new BagsWindow(deps);
   window_.render();
-  return { root, calls, errors, window: window_ };
+  return { root, calls, errors, window: window_, inventory, menuOpens };
 }
 
 function clickCellFor(root: HTMLElement, itemId: string, opts?: { ctrl?: boolean }): void {
@@ -143,7 +152,9 @@ describe('vendor plain click: true junk still sells in one step', () => {
     const h = harness([{ itemId: junkId, count: 1 }]);
     clickCellFor(h.root, junkId);
     expect(confirmPrompt()).toBeNull();
-    expect(h.calls).toEqual([`sellItem:${junkId},{"slotIndex":0}`]);
+    expect(h.calls).toEqual([
+      `sellItem:${junkId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
   });
 });
 
@@ -231,16 +242,17 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     expect(text?.querySelector('b')).toBeNull();
   });
 
-  it('the world-drop destroy prompt names the copy at the dragged index, never a shifted cell', () => {
-    // The prompt reads the copy at the pick-up index only while that cell
-    // still holds the dragged item id (the bags can shift under a snapshot
-    // mid-drag); otherwise the def name, never another copy's chosen name.
+  it('the world-drop destroy prompt names the DRAGGED copy, never whatever sits at its old index', () => {
+    // The prompt resolves the dragged copy by its PIN against the live bags,
+    // so a mid-drag shift moves the prompt with the copy instead of pointing it
+    // at the cell the copy used to occupy.
     const named = { rolled: { quality: 'legendary' as const }, name: 'Dawn Oath' };
     const h = harness([
       { itemId: valuableId, count: 1, instance: named },
       { itemId: junkId, count: 1 },
     ]);
-    h.window.promptDestroy(valuableId, 1, 0);
+    const ref = { index: 0, copyPin: itemCopyPin(h.inventory[0]) };
+    h.window.promptDestroy(valuableId, 1, ref);
     const first = document.querySelector('.discard-item-prompt .prompt-text');
     expect(first?.textContent).toContain('Dawn Oath');
     // Confirming destroys the copy the prompt NAMED, by target (the round-4
@@ -253,10 +265,60 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
       el.remove();
     });
     // The dragged cell now holds a different id: the def name, not the copy's.
-    h.window.promptDestroy(junkId, 1, 0);
+    h.window.promptDestroy(junkId, 1, { index: 0, copyPin: itemCopyPin(h.inventory[1]) });
     const shifted = document.querySelector('.discard-item-prompt .prompt-text');
     expect(shifted?.textContent).not.toContain('Dawn Oath');
     expect(shifted?.textContent).toContain(ITEMS[junkId].name);
+  });
+
+  it('a mid-drag shift cannot redirect the destroy to a DIFFERENT copy of the same id', () => {
+    // THE regression the drag pin closes. Index 0 holds the named copy at
+    // pick-up; a snapshot then swaps the two copies of that same id. An
+    // index-plus-id check is satisfied by the cell (still that id), so the
+    // prompt would title and destroy the WRONG copy. The pin follows the one
+    // the player dragged to index 1.
+    const inventory: InvSlot[] = [
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Veltara' },
+      },
+    ];
+    const h = harness(inventory);
+    const ref = { index: 0, copyPin: itemCopyPin(inventory[0]) };
+    inventory.reverse();
+    expect(inventory[ref.index].itemId).toBe(valuableId); // an id check would pass
+    h.window.promptDestroy(valuableId, 1, ref);
+    const text = document.querySelector('.discard-item-prompt .prompt-text');
+    expect(text?.textContent).toContain('Dawn Oath');
+    expect(text?.textContent).not.toContain('Veltara');
+    (document.querySelector('.discard-item-prompt button.btn') as HTMLElement).click();
+    expect(h.calls).toEqual([`discardItem:${valuableId},1,{"slotIndex":1}`]);
+  });
+
+  it('a dragged copy that left the bags falls back to the def, never an id-mate', () => {
+    const inventory: InvSlot[] = [
+      {
+        itemId: valuableId,
+        count: 1,
+        instance: { rolled: { quality: 'legendary' }, name: 'Dawn Oath' },
+      },
+      { itemId: valuableId, count: 1 },
+    ];
+    const h = harness(inventory);
+    const ref = { index: 0, copyPin: itemCopyPin(inventory[0]) };
+    inventory.splice(0, 1); // the dragged copy is spent mid-drag
+    h.window.promptDestroy(valuableId, 1, ref);
+    const text = document.querySelector('.discard-item-prompt .prompt-text');
+    // The plain id-mate is still held, so a fallback COULD have named it. The
+    // prompt names the def instead and leaves the untargeted walk to answer.
+    expect(text?.textContent).not.toContain('Dawn Oath');
+    expect(text?.textContent).toContain(ITEMS[valuableId].name);
   });
 
   it('the destroy confirm follows its named copy to its live index and refuses when it is gone', () => {
@@ -276,7 +338,7 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
       },
     ];
     const h = harness(inventory);
-    h.window.promptDestroy(valuableId, 1, 0);
+    h.window.promptDestroy(valuableId, 1, { index: 0, copyPin: itemCopyPin(inventory[0]) });
     expect(document.querySelector('.discard-item-prompt .prompt-text')?.textContent).toContain(
       'Dawn Oath',
     );
@@ -285,7 +347,7 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     expect(h.calls).toEqual([`discardItem:${valuableId},1,{"slotIndex":1}`]);
     expect(h.errors).toEqual([]);
     h.calls.length = 0;
-    h.window.promptDestroy(valuableId, 1, 1);
+    h.window.promptDestroy(valuableId, 1, { index: 1, copyPin: itemCopyPin(inventory[1]) });
     expect(document.querySelector('.discard-item-prompt .prompt-text')?.textContent).toContain(
       'Dawn Oath',
     );
@@ -328,5 +390,41 @@ describe('vendor plain click on an adopted 11l trophy confirms like any common i
       expect(h.calls, trophyId).toEqual([`sellItem:${trophyId},1,{"slotIndex":0}`]);
       expect(confirmPrompt(), trophyId).toBeNull();
     }
+  });
+
+  it('the MOBILE sell route raises exactly ONE dialog, never a back-to-back pair', () => {
+    // The de-duplication this pins is structural rather than a new branch: a
+    // touch tap normally opens the item-action menu first (touch has no
+    // right-click), which on top of the sell confirm would be two dialogs for
+    // one sale. itemMenuAvailable's transactional-mode gate refuses the menu at
+    // a vendor, so the tap runs the classic action directly and the ONE dialog
+    // the player sees is the sell confirm, which names the copy.
+    //
+    // The pin is here rather than as a source read because the two halves sit
+    // in different modules (the gate and the sell route) and only the flow
+    // shows whether they compose: this counts what a tap actually raises.
+    const trophyId = adoptedTrophyIds(ITEMS)[0];
+    const h = harness([{ itemId: trophyId, count: 1 }], { touch: true });
+    clickCellFor(h.root, trophyId);
+    // No menu hop...
+    expect(h.menuOpens).toEqual([]);
+    // ...and exactly one modal, carrying the copy's own name.
+    expect(document.querySelectorAll('.prompt.panel')).toHaveLength(1);
+    expect(confirmPrompt()?.textContent).toContain(ITEMS[trophyId].name);
+    expect(h.calls).toEqual([]);
+    clickPromptConfirmButton();
+    expect(h.calls).toEqual([`sellItem:${trophyId},1,{"slotIndex":0}`]);
+    expect(document.querySelectorAll('.prompt.panel')).toHaveLength(0);
+  });
+
+  it('the same tap OUTSIDE a vendor DOES open the menu (the gate is what de-duplicates)', () => {
+    // The control arm: without it the case above would pass on a window that
+    // never opens the action menu on touch at all, which would be a different
+    // bug and would make the de-duplication claim vacuous.
+    const trophyId = adoptedTrophyIds(ITEMS)[0];
+    const h = harness([{ itemId: trophyId, count: 1 }], { touch: true, vendor: false });
+    clickCellFor(h.root, trophyId);
+    expect(h.menuOpens).toEqual([trophyId]);
+    expect(document.querySelectorAll('.prompt.panel')).toHaveLength(0);
   });
 });

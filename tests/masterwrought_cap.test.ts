@@ -345,6 +345,32 @@ describe('equip unit selection (pure equipment_rules)', () => {
       expect(equipCandidateQuality(inventory, 'pure_selection_ring', def, bad)).toBe('epic');
     }
   });
+
+  it('an emptied cell (count 0) is not a candidate on either arm', () => {
+    // The named-cell arm has always required count >= 1; the highest-index
+    // fallback walk matched on itemId alone, so a stale count-0 cell above a
+    // real copy answered as the unit an id-only equip would take. Both arms now
+    // read the same rule: a cell holding nothing holds nothing.
+    const inventory = [
+      { itemId: 'pure_selection_ring', count: 1, instance: { rolled: { quality: 'legendary' } } },
+      { itemId: 'other', count: 1 },
+      { itemId: 'pure_selection_ring', count: 0 },
+    ];
+    // The fallback walk skips the emptied top cell for the real copy below it,
+    // and reads THAT copy's rolled quality rather than the def's.
+    expect(equipCandidateIndex(inventory, 'pure_selection_ring')).toBe(0);
+    expect(equipCandidateQuality(inventory, 'pure_selection_ring', def)).toBe('legendary');
+    // Naming the emptied cell explicitly falls back to the same answer, never
+    // to the emptied cell itself.
+    expect(equipCandidateIndex(inventory, 'pure_selection_ring', 2)).toBe(0);
+    // With no other copy carried, an emptied cell means the item is not held.
+    const onlyEmpty = [{ itemId: 'pure_selection_ring', count: 0 }];
+    expect(equipCandidateIndex(onlyEmpty, 'pure_selection_ring')).toBe(-1);
+    expect(equipCandidateIndex(onlyEmpty, 'pure_selection_ring', 0)).toBe(-1);
+    // A negative count is the same non-holding: the check is >= 1, not != 0.
+    const negative = [{ itemId: 'pure_selection_ring', count: -1 }];
+    expect(equipCandidateIndex(negative, 'pure_selection_ring')).toBe(-1);
+  });
 });
 
 describe('masterwrought counted family (pure equipment_rules)', () => {

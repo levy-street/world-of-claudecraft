@@ -31,7 +31,14 @@ function elixirDef(record: BuffRecord): ItemDef {
     kind: 'elixir',
     quality: 'common',
     sellValue: 1,
-    elixir: record,
+    // Cast at this ONE boundary, deliberately. TimedStatBuffPayload.kind is
+    // narrowed to TimedStatBuffAuraKind (the three flat-stat kinds the live
+    // carriers use), so an unmapped kind is no longer constructible through the
+    // def type at all. That narrowing is what the fallback below defends
+    // against being needed for, but the fallback is still the safety net for
+    // the day the union widens without ELIXIR_STAT_KEYS gaining the row, so the
+    // probe reaches past the type to keep exercising it.
+    elixir: record as ItemDef['elixir'],
   };
 }
 
@@ -96,7 +103,11 @@ describe('elixirTooltipLines', () => {
   });
 
   it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[NonNullable<ItemDef['elixir']>['kind'], string]> = [
+    // BuffRecord's own wide kind, not the def's narrowed one: two of these
+    // four rows (buff_agi, buff_armor) are stat labels the map still carries
+    // for a kind no shipped carrier uses, and the narrowing means they can
+    // only be reached through the probe boundary in elixirDef above.
+    const cases: Array<[BuffRecord['kind'], string]> = [
       ['buff_int', 'Intellect'],
       ['buff_agi', 'Agility'],
       ['buff_armor', 'Armor'],
