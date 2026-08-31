@@ -23356,6 +23356,54 @@ record; the QA twin re-sweeps and diffs.
   auth reads run before any limiter, deliberately, per the direct-reads
   rule), appended to the table draft as D121.
 
+- U-ADMIN-SVELTE e986eb3b73 (the permission-denied load class, the shared
+  refresh machine, the sold-volume store). The item named three load-failure
+  surfaces; the unit converted all 28, because converting a subset recreates
+  the exact inconsistency the original refusal cited. One pure classifier keyed
+  on the ApiError CLASS (never a duck-typed status) plus one shared panel;
+  every surface keeps its own generic copy, so all pre-existing admin suites
+  stayed green untouched. Overview carries TWO independent verdicts so an
+  operator holding live stats but not analytics sees one panel, not two. Five
+  polling pages collapsed onto one imperative auto-refresh composition
+  (testable outside a component); the cadence pin's own coverage arm then
+  surfaced two more polling pages the brief never named, both now pinned, which
+  is the arm that makes the collapse complete rather than partial. Sold volume
+  was NOT a missing read: the sim's sales ledger is cleared the moment a seller
+  collects, so nothing durable ever recorded it. The new store is a daily
+  roll-up keyed by realm, UTC day and item id, stamped from the DATABASE clock
+  so overlapping deploys cannot split a day, bounded by tracked ids so it
+  cannot be grown by trading harder, retention window typed against the sweep's
+  own contract, and it refuses house rows outright rather than pretending to
+  judge them (house stock is never spliced). DDL idempotence proven against
+  real Postgres, 9 of 9, schema applied twice more over a populated table.
+  Twenty-seven census rows. Its four arming call sites live in game.ts, db.ts
+  and main.ts and were routed to those holders; until they land the feature is
+  inert AND SAYS SO on the page, which is the honest shape for a split unit.
+- U-FE-HUD fix round 56d4a29120 (12 files plus only the hud.ts ratchet hunk).
+  Two findings worth keeping. FIRST, the guild-create footer had no submit hold
+  of any kind: now that guild_create rides the metered name_screen lane, five
+  rapid presses sent five frames and any the lane dropped returned nothing, a
+  dead button with no feedback. It takes the naming dialog's one-shot re-arm at
+  600ms as the house disabled plus aria-busy form, no new key or CSS. The
+  panel-specific twist is that social repaints STRUCTURALLY on the slow band
+  and hands back a live button, so the hold lives on the instance and the
+  render re-stamps it; that is the arm mutation testing fails without. SECOND,
+  the ui-scale cache needed TWO invalidations, not the one the item specified:
+  main.ts persists the setting (broadcasting the event) BEFORE it writes the
+  --ui-scale property, so an event-only cache resolved against a property that
+  did not exist yet and misplaced every movable frame by a frame. The writer
+  diagnosed the ordering instead of widening the test, cached against both
+  sources (the inline custom property per call, a style-attribute read with no
+  recalc, since that write IS the change event; the persisted blob lazily off
+  the settings event), and gave the movable-frame suite's hand-rolled fake DOM
+  the documentElement read it never had, making the fake MORE faithful to the
+  browser, not less. Also: both entity_display shims deleted and the last path
+  importer re-pointed, so the family is one module again; the mob tooltip now
+  writes its height cap from the same core as the cursor path (corner placement
+  and its four margins moved into that core), so a resize can no longer leave
+  the mobile card under a stale cap. hud.ts LOWERED 18718 to 18711, measured
+  after the format pass rather than derived.
+
 ### JUDGED THIS PHASE (refusals this phase itself makes; each cites the ground)
 
 - The admin OVERVIEW response is exempt from the serialize-once byte memo:
@@ -23427,10 +23475,28 @@ sound, and only measurement could tell them apart.
    the band belongs to a SHA, and the phase's own content moved it twice
    already; the assertion's own message carries the rule (re-measure, never
    widen).
-3. Run the shard-weight local carry (the new --carry-local mode) once, so the
-   thirty-odd new suites this phase added are attributed and the 0.95 coverage
-   floor is met; the CI harvest that would do it properly needs a pushed
-   branch, which this packet deliberately does not have.
+3. Run the shard-weight local carry once, on an otherwise idle tree, AFTER the
+   last unit has landed its suites:
+     node scripts/ci_shard_weights_harvest.mjs --carry-local-missing --runs 3
+     npx vitest run tests/ci_shard_partition.test.ts tests/ci_shard_weight_carry.test.ts
+     git diff --stat scripts/ci_shard_weights.generated.json
+   Acceptance, all four: the run reports the same file count it enumerated and
+   prints the reason recorded on each row; ci_shard_partition is FULLY green
+   (the coverage arm clears 0.95 AND the committed-table arms still pass);
+   ci_shard_weight_carry green; and the diff shows only ADDED rows plus the
+   provenance block, never a changed existing row, since a local carry must
+   never move a CI-harvested weight. The same acceptance is now written into
+   docs/qa-gate.md's shard-weight section, so it does not live only here.
+   CORRECTION to the earlier estimate, and it matters: the unmeasured set is
+   204 files, not the thirty-odd this checklist first said. About 184 of them
+   arrived with the release sync AFTER the 2026-08-23 harvest and were already
+   unattributed before this phase started; only the remainder are this phase's
+   own suites. So the 0.9434 reading was never evidence that this packet added
+   thirty unattributed suites, and the carry is repairing a pre-existing sync
+   gap as much as its own work. The mode enumerates the unmeasured files itself
+   rather than taking a list, because a hand-typed list goes stale the moment
+   another unit lands a suite. The CI harvest that would attribute these
+   properly needs a pushed branch, which this packet deliberately does not have.
 4. Re-run the census, gate_select on the committed tree, and the frozen stamp
    (the QA twin's job) LAST, after 1 to 3.
 
