@@ -23394,6 +23394,26 @@ record; the QA twin re-sweeps and diffs.
   cost is one missing "N beds ready" line in a narrow one-time case, accepted
   over a new persisted field.
 
+### THE PHASE-CLOSE CHECKLIST (obligations this phase deliberately defers to its own close, each with the reason it cannot be paid earlier)
+
+1. Regenerate the derived artifacts ONCE, after the last content unit lands:
+   npm run wiki:content, npm run i18n:gen, npm run wiki:seed. They are
+   derived, and a dozen concurrent units were moving their inputs all phase, so
+   regenerating per unit would have thrashed and merged badly. Two gates are
+   RED BY DESIGN until this runs: the mediawiki seed's release-tier
+   byte-equality arm, and any guide freshness arm downstream of a late content
+   row.
+2. Re-measure the whole-character blob band (tests/professions_blob_growth.test.ts):
+   the band belongs to a SHA, and the phase's own content moved it twice
+   already; the assertion's own message carries the rule (re-measure, never
+   widen).
+3. Run the shard-weight local carry (the new --carry-local mode) once, so the
+   thirty-odd new suites this phase added are attributed and the 0.95 coverage
+   floor is met; the CI harvest that would do it properly needs a pushed
+   branch, which this packet deliberately does not have.
+4. Re-run the census, gate_select on the committed tree, and the frozen stamp
+   (the QA twin's job) LAST, after 1 to 3.
+
 ### TWO DEFECTS THE REVIEW ROUNDS FOUND IN CODE THE PACKET DID NOT WRITE
 
 Recorded because they are the phase's most valuable finds and neither was on
