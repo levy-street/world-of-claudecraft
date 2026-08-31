@@ -269,24 +269,25 @@ import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
 import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
+  combatAbilityName,
   delveDisplayName,
   delveText,
   dungeonDisplayNameFromSource,
   dungeonText,
+  entityDisplayName,
   itemDisplayNameFromSource,
   itemStackDisplayName,
   mobDisplayName,
   npcDisplayName,
   npcDisplayTitle,
   npcGreeting,
+  parseSimMoney,
   questNarrative,
   questObjectiveLabel,
   questTitle,
   questTitleFromSource,
   zoneWelcome,
 } from './entity_display_core';
-import { combatAbilityName, parseSimMoney } from './entity_display_labels';
-import { entityDisplayName } from './entity_display_name';
 import {
   classDisplayName,
   dungeonDisplayName,
@@ -822,7 +823,12 @@ import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
-import { type TooltipViewport, tooltipMaxHeight, tooltipPlacementAt } from './tooltip_clamp_core';
+import {
+  mobTooltipCornerPlacement,
+  type TooltipViewport,
+  tooltipMaxHeight,
+  tooltipPlacementAt,
+} from './tooltip_clamp_core';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -1007,15 +1013,6 @@ const SCOPED_POPUP_IDS: ReadonlySet<string> = new Set([
 // The number of combo pips, named so the per-frame player paint carries no bare
 // literal at the call site.
 const COMBO_PIP_COUNT = 5;
-// The mob-hover tooltip's fixed desktop bottom-right slot (the WoW default
-// GameTooltip corner), in author-space px: the right margin clears the sidebar
-// icon rail, the bottom margin the community-links row, both fixed right-edge
-// chrome. Touch uses the slot immediately left of the minimap instead so it does
-// not cover the bottom action controls.
-const MOB_TOOLTIP_MARGIN_RIGHT = 56;
-const MOB_TOOLTIP_MARGIN_BOTTOM = 60;
-const MOB_TOOLTIP_MOBILE_MINIMAP_GAP = 8;
-const MOB_TOOLTIP_MOBILE_EDGE_GAP = 8;
 // The descriptor for a hidden target frame (no target, or a targeted world object).
 // unitFrameView reads only `present` when hiding, so the rest are no-op defaults; a
 // shared const avoids allocating a fresh descriptor for every hidden frame.
@@ -6289,26 +6286,19 @@ export class Hud {
     this.tooltipEl.classList.add('mob-tooltip');
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
-    const z = getUiScale();
-    const tw = this.tooltipEl.offsetWidth,
-      th = this.tooltipEl.offsetHeight;
-    const isMobileTouch = document.body.classList.contains('mobile-touch');
-    const minimapRect = isMobileTouch
+    // The cap goes on BEFORE the one measure here too. Both paint paths share
+    // the ONE #tooltip box, so a path that never writes maxHeight paints under
+    // whatever cap the last cursor tooltip computed, which goes stale the
+    // moment the viewport resizes.
+    const viewport = this.tooltipViewport();
+    this.tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;
+    const box = { w: this.tooltipEl.offsetWidth, h: this.tooltipEl.offsetHeight };
+    const minimapRect = document.body.classList.contains('mobile-touch')
       ? (document.getElementById('minimap-wrap')?.getBoundingClientRect() ?? null)
       : null;
-    const left =
-      minimapRect !== null
-        ? Math.max(
-            MOB_TOOLTIP_MOBILE_EDGE_GAP,
-            minimapRect.left / z - tw - MOB_TOOLTIP_MOBILE_MINIMAP_GAP,
-          )
-        : Math.max(8, window.innerWidth / z - tw - MOB_TOOLTIP_MARGIN_RIGHT);
-    const top =
-      minimapRect !== null
-        ? Math.max(MOB_TOOLTIP_MOBILE_EDGE_GAP, minimapRect.top / z)
-        : Math.max(8, window.innerHeight / z - th - MOB_TOOLTIP_MARGIN_BOTTOM);
-    this.tooltipEl.style.left = `${left}px`;
-    this.tooltipEl.style.top = `${top}px`;
+    const at = mobTooltipCornerPlacement(box, viewport, minimapRect);
+    this.tooltipEl.style.left = `${at.left}px`;
+    this.tooltipEl.style.top = `${at.top}px`;
   }
 
   // Shows the WoW-style mouseover tooltip (name / level / creature type) for a
@@ -6466,7 +6456,11 @@ export class Hud {
       // so the number can never drift from the rule. It always takes its own
       // gold line, never the type seat, because a piece can carry both tags.
       if (item.masterwrought) {
-        for (const line of masterwroughtTooltipLines(this.sim.equipment, ITEMS))
+        for (const line of masterwroughtTooltipLines(
+          this.sim.equipment,
+          ITEMS,
+          tooltipEffectiveQuality(item, instance),
+        ))
           html += `<div class="tt-sub" style="color:var(--gold)">${esc(t(line.key, line.values))}</div>`;
       }
     }
@@ -16329,8 +16323,8 @@ export class Hud {
 
   // The Perfecting window entry points (the crafting window's title-bar
   // button and its apex-row links open; Esc closes via the managed-window
-  // case; the toggle is the reliquary-shaped public surface for a future
-  // keybind or rail tile).
+  // case; the reliquary-shaped toggle is what the side-rail tile and the
+  // keybind both call, both shipped in this unit).
   openPerfecting(): void {
     this.perfectingWindow.open();
   }
@@ -18690,10 +18684,9 @@ export class Hud {
   }
 }
 
-// combatAbilityName and parseSimMoney moved WHOLE to ./entity_display_labels
-// (the release's v0.41.0 extraction, imported above). The other display-name
-// resolvers this file once defined inline live in ./entity_display_core and
-// ./entity_display_name (this branch's extraction), also imported above.
+// combatAbilityName, parseSimMoney, entityDisplayName and the other display-name
+// resolvers this file once defined inline all live in ./entity_display_core
+// (imported above), the one pure leaf the entity_display family folded into.
 
 // itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
 // its old name here), so the pure view cores can read the same shared-label facts

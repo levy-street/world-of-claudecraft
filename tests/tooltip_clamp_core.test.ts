@@ -8,6 +8,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  MOB_TOOLTIP_MARGIN_BOTTOM,
+  MOB_TOOLTIP_MARGIN_RIGHT,
+  MOB_TOOLTIP_MOBILE_EDGE_GAP,
+  MOB_TOOLTIP_MOBILE_MINIMAP_GAP,
+  mobTooltipCornerPlacement,
   TOOLTIP_EDGE_GAP,
   TOOLTIP_POINTER_DX,
   TOOLTIP_POINTER_DY,
@@ -101,6 +106,82 @@ describe('tooltipMaxHeight', () => {
   it('never goes negative on a degenerate viewport', () => {
     expect(tooltipMaxHeight({ w: 10, h: 10, scale: 1 })).toBe(0);
   });
+
+  it('MOVES with the viewport, which is what makes an unwritten cap stale', () => {
+    // The staleness bug in one measurement. The cap is a property of the
+    // VIEWPORT, so a window resize invalidates it; the shared #tooltip box
+    // keeps whatever max-height was last written to it. A path that never
+    // writes one therefore paints under the previous viewport's cap: here a
+    // card capped for a 1024px-tall window, repainted in a 600px one, may
+    // stand 1008px, which is 408px past the bottom edge gap.
+    const tall = { w: 1366, h: 1024, scale: 1 };
+    const short = { w: 1366, h: 600, scale: 1 };
+    expect(tooltipMaxHeight(tall)).toBe(1008);
+    expect(tooltipMaxHeight(short)).toBe(584);
+    expect(tooltipMaxHeight(tall) - tooltipMaxHeight(short)).toBe(424);
+    expect(tooltipMaxHeight(tall)).toBeGreaterThan(short.h - TOOLTIP_EDGE_GAP);
+  });
+});
+
+describe('mobTooltipCornerPlacement', () => {
+  // The mob-hover card is anchored to a fixed viewport CORNER, not the cursor,
+  // so it has its own placement rather than reusing tooltipPlacementAt. Both
+  // now live in this core, which is what lets the mob paint path write the same
+  // height cap the cursor path does (see the source pin at the end).
+  const BOX = { w: 260, h: 120 };
+
+  it('parks in the desktop bottom-right slot, clear of the rail and links row', () => {
+    expect(MOB_TOOLTIP_MARGIN_RIGHT).toBe(56);
+    expect(MOB_TOOLTIP_MARGIN_BOTTOM).toBe(60);
+    // 1366 - 260 - 56 = 1050, 768 - 120 - 60 = 588.
+    expect(mobTooltipCornerPlacement(BOX, VIEW, null)).toEqual({ left: 1050, top: 588 });
+  });
+
+  it('floors the desktop slot at the edge gap when the card is too wide or tall', () => {
+    // A card wider than the slot would otherwise get a negative left edge.
+    expect(mobTooltipCornerPlacement({ w: 1400, h: 120 }, VIEW, null).left).toBe(TOOLTIP_EDGE_GAP);
+    expect(mobTooltipCornerPlacement({ w: 260, h: 900 }, VIEW, null).top).toBe(TOOLTIP_EDGE_GAP);
+  });
+
+  it('moves to the slot left of the minimap on touch', () => {
+    expect(MOB_TOOLTIP_MOBILE_MINIMAP_GAP).toBe(8);
+    expect(MOB_TOOLTIP_MOBILE_EDGE_GAP).toBe(8);
+    // A minimap whose visual-space corner is (1100, 24): 1100 - 260 - 8 = 832,
+    // and the card's top lines up with the minimap's own.
+    expect(mobTooltipCornerPlacement(BOX, VIEW, { left: 1100, top: 24 })).toEqual({
+      left: 832,
+      top: 24,
+    });
+  });
+
+  it('floors the touch slot too, so a wide card never leaves the screen', () => {
+    // A narrow phone where the minimap sits near the left edge: the subtraction
+    // goes negative and the edge gap wins.
+    expect(
+      mobTooltipCornerPlacement(BOX, { w: 640, h: 360, scale: 1 }, { left: 120, top: 10 }).left,
+    ).toBe(MOB_TOOLTIP_MOBILE_EDGE_GAP);
+  });
+
+  it('maps both slots into author space under a UI scale', () => {
+    // At scale 2 the author-space viewport is 683 x 384: 683 - 260 - 56 = 367,
+    // 384 - 120 - 60 = 204. The box is measured in author space already
+    // (offsetWidth is zoom-immune), so only the viewport and the anchor divide.
+    const scaled = { w: 1366, h: 768, scale: 2 };
+    expect(mobTooltipCornerPlacement(BOX, scaled, null)).toEqual({ left: 367, top: 204 });
+    // The minimap rect arrives in VISUAL space like every other rect read:
+    // 1100 / 2 - 260 - 8 = 282, 24 / 2 = 12.
+    expect(mobTooltipCornerPlacement(BOX, scaled, { left: 1100, top: 24 })).toEqual({
+      left: 282,
+      top: 12,
+    });
+  });
+
+  it('is pure: same inputs, same box, nothing shared', () => {
+    const a = mobTooltipCornerPlacement(BOX, VIEW, null);
+    const b = mobTooltipCornerPlacement(BOX, VIEW, null);
+    expect(a).toEqual(b);
+    expect(a).not.toBe(b);
+  });
 });
 
 describe('hud.ts consumes the core (source pins)', () => {
@@ -123,6 +204,30 @@ describe('hud.ts consumes the core (source pins)', () => {
     expect(body).toContain('this.tooltipEl.style.top = `${at.top}px`;');
     // The hand-rolled clamp is gone from the paint path.
     expect(body).not.toContain('Math.min(window.innerWidth');
+  });
+
+  it('the MOB path caps the height too, or it paints under the cursor path leftovers', () => {
+    // The finding this arm exists for: max-height was written ONLY in
+    // paintTooltipAt and never cleared, and both paths share the one #tooltip
+    // element, so a mob card painted after a cursor tooltip inherited that
+    // cap, which goes stale the moment the viewport resizes (see the
+    // tooltipMaxHeight staleness arm above for the magnitude). Same shape as
+    // the paintTooltipAt pin: the cap is written BEFORE the one measure, from
+    // the same core, off the same viewport.
+    const start = hud.indexOf('private paintMobTooltipBottomRight(');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  }', start));
+    expect(body).toContain('const viewport = this.tooltipViewport();');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
+    const cap = body.indexOf('this.tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;');
+    const measure = body.indexOf('this.tooltipEl.offsetWidth');
+    expect(cap).toBeGreaterThan(-1);
+    expect(measure).toBeGreaterThan(cap);
+    // And the corner math is the core's, not a second hand-rolled clamp.
+    expect(body).toContain('mobTooltipCornerPlacement(box, viewport, minimapRect)');
+    expect(body).not.toContain('Math.max(8,');
+    expect(body).not.toContain('window.innerWidth');
+    expect(body).not.toContain('window.innerHeight');
   });
 
   it('the mousemove reposition path reuses the cached box through the same core', () => {

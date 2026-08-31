@@ -386,7 +386,26 @@ const MONOLITHS: MonolithRow[] = [
     // Those pay for the unit's own wiring: the Perfecting and Harvest Journal
     // rail tiles (click + keycap rows), the commission board's focus pair, and
     // the three tone imports. Exact count, zero slack.
-    ceiling: 18718,
+    // LOWERED AGAIN 18718 -> 18711 at the same phase's frontend review round,
+    // which is a net -11 from the review unit plus a +4 that is not its own.
+    // THE REVIEW UNIT'S -11, both findings paying for themselves and then some:
+    // the entity_display re-point folded three import statements into one
+    // against entity_display_core.ts and deleted the two re-export shims
+    // (entity_display_name.ts, entity_display_labels.ts), which the row above
+    // still names as live homes: they are gone, and this file's import surface
+    // was the last thing keeping them. The mob-tooltip cap fix took the corner
+    // placement math and its four margin constants into
+    // src/ui/tooltip_clamp_core.ts as mobTooltipCornerPlacement, so the two
+    // paint paths now share one core and the mob path writes the same height
+    // cap the cursor path does (it never wrote one, so it painted under
+    // whatever cap the last cursor tooltip left on the shared box).
+    // THE +4 IS THE CONCURRENT masterwrought-quality wiring landing in the same
+    // phase: masterwroughtTooltipLines gained its tooltipEffectiveQuality
+    // argument, which wrapped one call onto five lines. Recorded rather than
+    // folded in, so the next measure knows which half moved. Measured on the
+    // working tree (wc -l < src/ui/hud.ts), never reconciled by arithmetic.
+    // Exact count, zero slack.
+    ceiling: 18711,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

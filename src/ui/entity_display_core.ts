@@ -11,9 +11,9 @@
 // and the two combat-log label helpers (combatAbilityName, parseSimMoney, once
 // src/ui/entity_display_labels.ts) were folded in here, so the three sibling
 // modules two packets extracted from hud.ts are one pure leaf again. The two
-// old paths survive as one-line re-export shims for the coordinator's import
-// surface (src/ui/hud.ts) and go the day it re-points; nothing new imports
-// them.
+// old paths were one-line re-export shims until src/ui/hud.ts re-pointed at
+// this module (the Phase 18 frontend review round), and were deleted with that
+// last import; every consumer names this path.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { DUNGEON_LIST, ITEMS, QUESTS } from '../sim/data';
 import type { Entity, PlayerClass } from '../sim/types';
