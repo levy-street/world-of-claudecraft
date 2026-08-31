@@ -12,6 +12,7 @@
 // them rather than being laundered into an apparent CI pedigree, and `files`
 // counts the merged table. Plus the wrong-parent-wins refusal the review found.
 import { describe, expect, it } from 'vitest';
+import { carriedDefects } from '../scripts/lib/ci_shard_weight_carry.mjs';
 import { unionTables } from '../scripts/merge_audit/shard_weight_union.mjs';
 
 // The harvest DATE is part of the same provenance-honesty contract as the run id
@@ -81,6 +82,80 @@ describe('unionTables: the carried rows', () => {
     const prov = merged.__provenance as { files: number };
     expect(prov.files).toBe(3);
     expect(Object.keys(merged).filter((k) => k !== '__provenance')).toHaveLength(3);
+  });
+});
+
+describe('unionTables: the machine-readable carried map (Phase 18)', () => {
+  it('attributes every older-only row to the older harvest and keeps the identity', () => {
+    const ours = table('100', { 'tests/only_ours.test.ts': 77, 'tests/shared.test.ts': 10 });
+    const theirs = table('200', { 'tests/shared.test.ts': 12 });
+    const { merged } = unionTables(ours, theirs);
+    const prov = merged.__provenance as {
+      files: number;
+      harvestedFiles: number;
+      carried: Record<string, { ms: number; method: string; run?: string; measured?: string }>;
+    };
+    expect(prov.harvestedFiles).toBe(1);
+    expect(prov.files).toBe(2);
+    expect(prov.carried).toEqual({
+      'tests/only_ours.test.ts': {
+        ms: 77,
+        method: 'union-older-harvest',
+        run: '100',
+        measured: '2026-08-10',
+      },
+    });
+  });
+
+  it("carries the older table's OWN attribution forward instead of re-attributing it", () => {
+    const ours = table(
+      '100',
+      { 'tests/local.test.ts': 9, 'tests/shared.test.ts': 10 },
+      {
+        harvestedFiles: 1,
+        carried: {
+          'tests/local.test.ts': {
+            ms: 9,
+            method: 'local-median',
+            measured: '2026-08-20',
+            runs: [9, 9, 11],
+          },
+        },
+      },
+    );
+    const theirs = table('200', { 'tests/shared.test.ts': 12 });
+    const { merged } = unionTables(ours, theirs);
+    const prov = merged.__provenance as {
+      harvestedFiles: number;
+      carried: Record<string, { method: string; runs?: number[] }>;
+    };
+    expect(prov.carried['tests/local.test.ts'].method).toBe('local-median');
+    expect(prov.carried['tests/local.test.ts'].runs).toEqual([9, 9, 11]);
+    expect(prov.harvestedFiles).toBe(1);
+  });
+
+  it("keeps the NEWER table's carried attributions on its own rows, and the backfill note travels", () => {
+    const ours = table('100', { 'tests/shared.test.ts': 10 });
+    const theirs = table(
+      '200',
+      { 'tests/bf.test.ts': 4, 'tests/shared.test.ts': 12 },
+      {
+        harvestedFiles: 1,
+        carried: { 'tests/bf.test.ts': { ms: 4, method: 'prose-backfill' } },
+        backfill: { date: '2026-08-31', note: 'attributed from the localMerge prose' },
+      },
+    );
+    const { merged } = unionTables(ours, theirs);
+    const prov = merged.__provenance as {
+      harvestedFiles: number;
+      carried: Record<string, { method: string }>;
+      backfill?: { date: string; note: string };
+    };
+    expect(prov.carried['tests/bf.test.ts'].method).toBe('prose-backfill');
+    expect(prov.harvestedFiles).toBe(1);
+    expect(prov.backfill?.note).toContain('localMerge prose');
+    // And the merged table passes the same defect check the committed-table pin runs.
+    expect(carriedDefects(merged, { requireMap: true })).toEqual([]);
   });
 });
 

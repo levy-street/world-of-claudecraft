@@ -2,11 +2,16 @@
 // (scripts/CLAUDE.md: a script module imported by a type-checked Vitest suite
 // carries a .d.mts beside it). Only the surface the fixture suite consumes.
 
+import type { CarriedEntry } from '../lib/ci_shard_weight_carry.mjs';
+
 export interface WeightProvenance {
   run: string;
   harvested?: string;
   files?: number;
+  harvestedFiles?: number;
   localMerge?: string;
+  carried?: Record<string, CarriedEntry>;
+  backfill?: { date: string; note: string };
 }
 
 /** A weight table: one measured millisecond cost per test path, plus the

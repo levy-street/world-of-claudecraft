@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   assertPartitionCompleteness,
@@ -10,29 +10,19 @@ import {
   partitionForCi,
   weightForTestFile,
 } from '../scripts/ci_shard_partition.mjs';
+// The walk is SHARED with the union tool (scripts/merge_audit/shard_weight_union.mjs)
+// on purpose: the population this pin grades the table against and the one the
+// tool certifies a table against must be the same predicate, by import rather
+// than by two copies (tests/ci_shard_walk.test.ts pins the predicate and the
+// import on both sides).
+import { walkShardTestFiles } from '../scripts/lib/ci_shard_walk.mjs';
+// The carried-weight contract (the machine-readable half of the table's
+// provenance); the fixture arms live in tests/ci_shard_weight_carry.test.ts,
+// this file applies it to the COMMITTED table.
+import { carriedDefects, carriedRows, tableRows } from '../scripts/lib/ci_shard_weight_carry.mjs';
 
 const SHARD_N = 8;
 const root = join(import.meta.dirname, '..');
-
-function walkTestFiles(dir: string, out: string[] = []): string[] {
-  for (const ent of readdirSync(dir, { withFileTypes: true })) {
-    if (
-      ent.name === 'node_modules' ||
-      ent.name === 'dist' ||
-      ent.name === 'browser' ||
-      ent.name.startsWith('.')
-    ) {
-      continue;
-    }
-    const p = join(dir, ent.name);
-    if (ent.isDirectory()) {
-      walkTestFiles(p, out);
-    } else if (ent.name.endsWith('.test.ts') && !ent.name.endsWith('.browser.test.ts')) {
-      out.push(p);
-    }
-  }
-  return out;
-}
 
 describe('ci_shard_partition (D11 path-matrix)', () => {
   it('LPT packs are a complete disjoint partition of the input keys', () => {
@@ -257,13 +247,14 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
   });
 
   it('partitions the real tests/ tree into N complete packs (suite completeness)', () => {
-    const absFiles = walkTestFiles(join(root, 'tests'));
-    expect(absFiles.length).toBeGreaterThan(1000);
-    const items = absFiles.map((abs) => {
-      const key = `/${relative(root, abs).split('\\').join('/')}`;
+    const relFiles = walkShardTestFiles(root);
+    expect(relFiles.length).toBeGreaterThan(1000);
+    const items = relFiles.map((rel) => {
+      const key = `/${rel}`;
+      const abs = join(root, rel);
       const body = readFileSync(abs, 'utf8');
       const size = statSync(abs).size;
-      return { id: key, key, weight: weightForTestFile(key.slice(1), body, size) };
+      return { id: key, key, weight: weightForTestFile(rel, body, size) };
     });
     // Active CI strategy (LPT over measured weights).
     const packs = partitionForCi(items, SHARD_N);
@@ -286,5 +277,88 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     // fallback churn, and below 95% the balance claim stops being measured.
     const covered = items.filter((i) => MEASURED_WEIGHTS[i.key.slice(1)] !== undefined).length;
     expect(covered / items.length).toBeGreaterThanOrEqual(0.95);
+  });
+});
+
+describe('the committed weight table attributes every row it did not harvest', () => {
+  // The gate reviewer's standing finding through Phases 11g, 11h and 11k:
+  // nothing machine-checked that a CARRIED weight was a real measurement. The
+  // coverage floor above only asks whether a row EXISTS, so N rows appended at
+  // MEASURED_FALLBACK_MS would raise coverage, leave the balance bar
+  // byte-identical (the bar already scores an unknown file at the fallback),
+  // and pass every other pin in this file. This arm reads the table's own
+  // __provenance and refuses anything the contract in
+  // scripts/lib/ci_shard_weight_carry.mjs calls a defect: a row with neither a
+  // harvest nor an attribution, an attribution whose ms disagrees with its row,
+  // a local-median whose ms is not the median of its runs, an undated one, and
+  // the fabrication shape itself (the fallback as a modal carried value).
+  const table = JSON.parse(
+    readFileSync(join(root, 'scripts/ci_shard_weights.generated.json'), 'utf8'),
+  ) as Record<string, unknown>;
+
+  it('passes carriedDefects with the map REQUIRED, not merely consistent when present', () => {
+    expect(carriedDefects(table, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true })).toEqual(
+      [],
+    );
+  });
+
+  it('the identity is non-vacuous: real rows on both sides, and every carried row is a row', () => {
+    const { harvestedFiles } = (table.__provenance ?? {}) as { harvestedFiles?: number };
+    const carried = carriedRows(table);
+    const rows = tableRows(table);
+    // Floors near the committed shape (2939 harvested + 410 carried = 3349 at
+    // Phase 18), so a table that emptied one side cannot satisfy the identity
+    // trivially and read as a pass.
+    expect(rows.length).toBeGreaterThan(3000);
+    expect(harvestedFiles).toBeGreaterThan(2000);
+    expect(Object.keys(carried).length).toBeGreaterThan(0);
+    // The `?? 0` can never fire: the line above already refused a missing count.
+    expect((harvestedFiles ?? 0) + Object.keys(carried).length).toBe(rows.length);
+    for (const [file, entry] of Object.entries(carried)) {
+      expect(table[file], `${file} is carried but is not a row`).toBe(entry.ms);
+    }
+  });
+
+  it('an undeclared row, a mis-stated ms, and a fabricated fallback block each RED it', () => {
+    // The positive control for the arm above: three mutations of the real
+    // committed table, one per way a fabricated weight could arrive, each of
+    // which the coverage floor and the balance bar would both wave through.
+    const undeclared = { ...table, 'tests/__fabricated_row.test.ts': MEASURED_FALLBACK_MS };
+    expect(
+      carriedDefects(undeclared, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true }).join(' '),
+    ).toMatch(/harvestedFiles .* != .* rows/);
+
+    const [someCarried] = Object.keys(carriedRows(table));
+    const prov = table.__provenance as Record<string, unknown>;
+    const carriedMap = prov.carried as Record<string, { ms: number }>;
+    const misStated = {
+      ...table,
+      __provenance: {
+        ...prov,
+        carried: { ...carriedMap, [someCarried]: { ...carriedMap[someCarried], ms: 1 } },
+      },
+    };
+    expect(
+      carriedDefects(misStated, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true }).join(' '),
+    ).toMatch(new RegExp(`${someCarried.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}: row`));
+
+    // Every carried row filled at the fallback: the identity still holds and
+    // each entry is well formed, so ONLY the modal check can catch it.
+    const fabricated: Record<string, unknown> = {
+      ...table,
+      __provenance: {
+        ...prov,
+        carried: Object.fromEntries(
+          Object.keys(carriedMap).map((k) => [
+            k,
+            { ms: MEASURED_FALLBACK_MS, method: 'prose-backfill' },
+          ]),
+        ),
+      },
+    };
+    for (const k of Object.keys(carriedMap)) fabricated[k] = MEASURED_FALLBACK_MS;
+    expect(
+      carriedDefects(fabricated, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true }).join(' '),
+    ).toMatch(/is a modal value among the \d+ carried rows/);
   });
 });

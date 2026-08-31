@@ -1,0 +1,598 @@
+// Fixture pins for scripts/lib/ci_shard_weight_carry.mjs, the machine-readable
+// attribution of every shard-weight row the newest CI harvest did not measure.
+// The gate reviewer's standing finding (masterwrought Phases 11g, 11h, 11k):
+// NOTHING MACHINE-CHECKED THAT A CARRIED WEIGHT WAS A REAL MEASUREMENT, so N
+// rows appended at MEASURED_FALLBACK_MS would pass every pin and leave the
+// balance bar byte-identical. Each arm here trips exactly one clause of the
+// contract the committed-table pin (tests/ci_shard_partition.test.ts) applies.
+import { describe, expect, it } from 'vitest';
+import type {
+  CarriedProvenance,
+  CarriedWeightTable,
+} from '../scripts/lib/ci_shard_weight_carry.mjs';
+import {
+  applyLocalCarry,
+  CARRY_METHODS,
+  carriedDefects,
+  carriedRows,
+  DEFAULT_LOCAL_CARRY_REASON,
+  medianMs,
+  missingWeightFiles,
+  modes,
+  parseCarryLocalArgs,
+  parseCarryLocalCli,
+  serializeWeightTable,
+  tableRows,
+  unionCarried,
+} from '../scripts/lib/ci_shard_weight_carry.mjs';
+
+// applyLocalCarry refuses a table with no provenance, so every table it returns
+// has one; read it through the declared type rather than casting the union away,
+// and throw (not silently yield undefined) if that ever stops holding.
+const provenanceOf = (t: CarriedWeightTable): CarriedProvenance => {
+  const prov = t.__provenance;
+  if (!prov) throw new Error('applyLocalCarry returned a table with no __provenance');
+  return prov;
+};
+
+const table = (
+  rows: Record<string, number>,
+  prov: Record<string, unknown> = {},
+): Record<string, unknown> => ({
+  __provenance: { run: '100', harvested: '2026-08-10', files: Object.keys(rows).length, ...prov },
+  ...rows,
+});
+
+describe('medianMs and modes', () => {
+  it('medianMs takes the middle of an odd list and the rounded mean of the two middles of an even one', () => {
+    expect(medianMs([9, 3, 5])).toBe(5);
+    expect(medianMs([7])).toBe(7);
+    expect(medianMs([1, 2, 3, 10])).toBe(3);
+    expect(() => medianMs([])).toThrow(/at least one/);
+  });
+  it('modes returns every value sharing the top count', () => {
+    expect(modes([4, 4, 5, 6])).toEqual([4]);
+    expect(modes([4, 4, 5, 5, 6]).sort()).toEqual([4, 5]);
+  });
+});
+
+describe('carriedDefects: the contract, one clause per arm', () => {
+  const clean = table(
+    { 'tests/a.test.ts': 10, 'tests/b.test.ts': 20, 'tests/c.test.ts': 7 },
+    {
+      harvestedFiles: 2,
+      carried: {
+        'tests/c.test.ts': {
+          ms: 7,
+          method: 'local-median',
+          measured: '2026-08-31',
+          reason: 'added after the last harvest',
+          runs: [9, 7, 6],
+        },
+      },
+    },
+  );
+
+  it('passes a clean table and pins the method list as literals', () => {
+    expect(carriedDefects(clean, { fallbackMs: 31, requireMap: true })).toEqual([]);
+    expect(CARRY_METHODS).toEqual(['local-median', 'union-older-harvest', 'prose-backfill']);
+    expect(tableRows(clean)).toEqual(['tests/a.test.ts', 'tests/b.test.ts', 'tests/c.test.ts']);
+    expect(Object.keys(carriedRows(clean))).toEqual(['tests/c.test.ts']);
+  });
+
+  it('a row appended WITHOUT an attribution breaks the harvested + carried identity', () => {
+    // The fabrication shape: a row at the fallback value, no entry, files bumped
+    // so the old shape pin stays green.
+    const t = { ...clean, 'tests/z.test.ts': 31 } as Record<string, unknown>;
+    (t.__provenance as Record<string, unknown>).files = 4;
+    const defects = carriedDefects(t, { fallbackMs: 31, requireMap: true });
+    expect(defects).toHaveLength(1);
+    expect(defects[0]).toMatch(/harvestedFiles 2 \+ 1 carried != 4 rows/);
+  });
+
+  it('a missing map or a missing harvested count is a defect when the map is required, and not otherwise', () => {
+    const legacy = table({ 'tests/a.test.ts': 10 });
+    expect(carriedDefects(legacy, { requireMap: true })).toEqual([
+      '__provenance.carried is missing',
+      '__provenance.harvestedFiles is missing',
+    ]);
+    expect(carriedDefects(legacy)).toEqual([]);
+    expect(carriedDefects({} as Record<string, unknown>)).toEqual(['__provenance is missing']);
+  });
+
+  it('files must count the rows', () => {
+    const t = table({ 'tests/a.test.ts': 10 }, { files: 3, harvestedFiles: 1, carried: {} });
+    expect(carriedDefects(t)).toEqual(['files 3 != 1 rows']);
+  });
+
+  it('a carried entry must name a row and match its value', () => {
+    const ghost = table(
+      { 'tests/a.test.ts': 10 },
+      { harvestedFiles: 1, carried: { 'tests/gone.test.ts': { ms: 5, method: 'local-median' } } },
+    );
+    expect(carriedDefects(ghost).some((d) => d.includes('carried but not a row'))).toBe(true);
+    const mismatch = table(
+      { 'tests/a.test.ts': 10 },
+      {
+        harvestedFiles: 0,
+        carried: {
+          'tests/a.test.ts': {
+            ms: 12,
+            method: 'local-median',
+            measured: '2026-08-31',
+            reason: 'added after the last harvest',
+            runs: [12],
+          },
+        },
+      },
+    );
+    expect(carriedDefects(mismatch)).toEqual(['tests/a.test.ts: row 10 != carried ms 12']);
+    const nonInt = table(
+      { 'tests/a.test.ts': 10 },
+      { harvestedFiles: 0, carried: { 'tests/a.test.ts': { ms: 0, method: 'prose-backfill' } } },
+    );
+    expect(carriedDefects(nonInt).some((d) => d.includes('not a positive integer'))).toBe(true);
+  });
+
+  it('an unknown method is refused', () => {
+    const t = table(
+      { 'tests/a.test.ts': 10 },
+      { harvestedFiles: 0, carried: { 'tests/a.test.ts': { ms: 10, method: 'guessed' } } },
+    );
+    expect(carriedDefects(t)).toEqual(['tests/a.test.ts: unknown carry method "guessed"']);
+  });
+
+  it('local-median needs runs whose median IS the row, positive integers, a date, and a reason', () => {
+    const entry = (over: Record<string, unknown>) =>
+      table(
+        { 'tests/a.test.ts': 10 },
+        {
+          harvestedFiles: 0,
+          carried: {
+            'tests/a.test.ts': {
+              ms: 10,
+              method: 'local-median',
+              measured: '2026-08-31',
+              reason: 'added after the last harvest',
+              runs: [8, 10, 12],
+              ...over,
+            },
+          },
+        },
+      );
+    expect(carriedDefects(entry({}))).toEqual([]);
+    // The reason is REQUIRED, and blank does not count: a local carry is always
+    // a stopgap for a harvest that could not run, and the row must say which.
+    expect(carriedDefects(entry({ reason: undefined }))).toEqual([
+      'tests/a.test.ts: local-median without a reason',
+    ]);
+    expect(carriedDefects(entry({ reason: '   ' }))).toEqual([
+      'tests/a.test.ts: local-median without a reason',
+    ]);
+    expect(carriedDefects(entry({ reason: 42 }))).toEqual([
+      'tests/a.test.ts: local-median without a reason',
+    ]);
+    expect(carriedDefects(entry({ runs: [1, 2, 3] }))).toEqual([
+      'tests/a.test.ts: ms 10 is not the median of runs 1,2,3',
+    ]);
+    expect(carriedDefects(entry({ runs: [] }))).toEqual([
+      'tests/a.test.ts: local-median without runs',
+    ]);
+    expect(carriedDefects(entry({ runs: [10, 0.5, 10] }))).toEqual([
+      'tests/a.test.ts: local-median runs must be positive integers',
+    ]);
+    expect(carriedDefects(entry({ measured: 'yesterday' }))).toEqual([
+      'tests/a.test.ts: local-median without a measured date',
+    ]);
+  });
+
+  it('union-older-harvest needs the older run id and its harvest date', () => {
+    const entry = (over: Record<string, unknown>) =>
+      table(
+        { 'tests/a.test.ts': 10 },
+        {
+          harvestedFiles: 0,
+          carried: {
+            'tests/a.test.ts': {
+              ms: 10,
+              method: 'union-older-harvest',
+              run: '99',
+              measured: '2026-08-01',
+              ...over,
+            },
+          },
+        },
+      );
+    expect(carriedDefects(entry({}))).toEqual([]);
+    expect(carriedDefects(entry({ run: undefined }))).toEqual([
+      'tests/a.test.ts: union-older-harvest without a numeric run',
+    ]);
+    expect(carriedDefects(entry({ measured: undefined }))).toEqual([
+      'tests/a.test.ts: union-older-harvest without a measured date',
+    ]);
+  });
+
+  it('prose-backfill rows need the ONE dated backfill note on the provenance', () => {
+    const rows = { 'tests/a.test.ts': 10, 'tests/b.test.ts': 4 };
+    const carried = {
+      'tests/a.test.ts': { ms: 10, method: 'prose-backfill' },
+      'tests/b.test.ts': { ms: 4, method: 'prose-backfill' },
+    };
+    expect(carriedDefects(table(rows, { harvestedFiles: 0, carried }))).toEqual([
+      '2 prose-backfill rows without a dated __provenance.backfill note',
+    ]);
+    expect(
+      carriedDefects(
+        table(rows, {
+          harvestedFiles: 0,
+          carried,
+          backfill: { date: '2026-08-31', note: 'attributed from the localMerge prose' },
+        }),
+      ),
+    ).toEqual([]);
+    expect(
+      carriedDefects(
+        table(rows, { harvestedFiles: 0, carried, backfill: { date: '2026-08-31', note: '  ' } }),
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('the fallback-not-modal clause trips when the fallback is the carried mode, ties included', () => {
+    const rows = { 'tests/a.test.ts': 31, 'tests/b.test.ts': 31, 'tests/c.test.ts': 4 };
+    const carried = Object.fromEntries(
+      Object.entries(rows).map(([k, ms]) => [k, { ms, method: 'prose-backfill' }]),
+    );
+    const prov = {
+      harvestedFiles: 0,
+      carried,
+      backfill: { date: '2026-08-31', note: 'n' },
+    };
+    const modal = carriedDefects(table(rows, prov), { fallbackMs: 31 });
+    expect(modal).toHaveLength(1);
+    expect(modal[0]).toMatch(/MEASURED_FALLBACK_MS 31 is a modal value among the 3 carried rows/);
+    // A different fallback: clean. A tie at the top: still a defect.
+    expect(carriedDefects(table(rows, prov), { fallbackMs: 7 })).toEqual([]);
+    const tied = { 'tests/a.test.ts': 31, 'tests/b.test.ts': 4 };
+    const tiedCarried = Object.fromEntries(
+      Object.entries(tied).map(([k, ms]) => [k, { ms, method: 'prose-backfill' }]),
+    );
+    expect(
+      carriedDefects(table(tied, { ...prov, carried: tiedCarried }), { fallbackMs: 31 }),
+    ).toHaveLength(1);
+    // No carried rows: nothing to be modal.
+    expect(
+      carriedDefects(table({ 'tests/a.test.ts': 31 }, { harvestedFiles: 1, carried: {} }), {
+        fallbackMs: 31,
+      }),
+    ).toEqual([]);
+  });
+});
+
+describe('applyLocalCarry', () => {
+  const base = table(
+    { 'tests/a.test.ts': 10, 'tests/old.test.ts': 5 },
+    {
+      harvestedFiles: 1,
+      carried: { 'tests/old.test.ts': { ms: 5, method: 'prose-backfill' } },
+      backfill: { date: '2026-08-31', note: 'attributed from the localMerge prose' },
+    },
+  );
+
+  it('adds a row at the median of the runs with a local-median entry, keeps the identity, sorts', () => {
+    const out = applyLocalCarry(
+      base,
+      [
+        { file: 'tests/new_b.test.ts', runs: [12, 9, 11] },
+        { file: 'tests/aa.test.ts', runs: [3] },
+      ],
+      { measured: '2026-08-31', reason: 'pending harvest' },
+    );
+    expect(tableRows(out)).toEqual([
+      'tests/a.test.ts',
+      'tests/aa.test.ts',
+      'tests/new_b.test.ts',
+      'tests/old.test.ts',
+    ]);
+    expect(out['tests/new_b.test.ts']).toBe(11);
+    const prov = provenanceOf(out);
+    expect(prov.files).toBe(4);
+    expect(prov.harvestedFiles).toBe(1);
+    expect(carriedRows(out)['tests/new_b.test.ts']).toEqual({
+      ms: 11,
+      method: 'local-median',
+      measured: '2026-08-31',
+      reason: 'pending harvest',
+      runs: [12, 9, 11],
+    });
+    expect(carriedDefects(out, { fallbackMs: 31, requireMap: true })).toEqual([]);
+    // The input is not mutated.
+    expect(tableRows(base)).toEqual(['tests/a.test.ts', 'tests/old.test.ts']);
+  });
+
+  it('re-carrying an already carried row replaces its attribution', () => {
+    const out = applyLocalCarry(base, [{ file: 'tests/old.test.ts', runs: [6, 7, 8] }], {
+      measured: '2026-08-31',
+      reason: 'pending harvest',
+    });
+    expect(out['tests/old.test.ts']).toBe(7);
+    expect(carriedRows(out)['tests/old.test.ts'].method).toBe('local-median');
+    expect(provenanceOf(out).harvestedFiles).toBe(1);
+  });
+
+  it('REFUSES to overwrite a harvested row, a non-tests path, or non-integer runs', () => {
+    expect(() =>
+      applyLocalCarry(base, [{ file: 'tests/a.test.ts', runs: [1] }], {
+        measured: '2026-08-31',
+        reason: 'r',
+      }),
+    ).toThrow(/harvested row; a local run never overwrites a CI weight/);
+    expect(() =>
+      applyLocalCarry(base, [{ file: 'src/x.test.ts', runs: [1] }], {
+        measured: '2026-08-31',
+        reason: 'r',
+      }),
+    ).toThrow(/not under tests\//);
+    expect(() =>
+      applyLocalCarry(base, [{ file: 'tests/n.test.ts', runs: [1.5] }], {
+        measured: '2026-08-31',
+        reason: 'r',
+      }),
+    ).toThrow(/positive integer/);
+    expect(() =>
+      applyLocalCarry(base, [{ file: 'tests/n.test.ts', runs: [1] }], {
+        measured: 'today',
+        reason: 'r',
+      }),
+    ).toThrow(/YYYY-MM-DD/);
+  });
+
+  it('derives harvestedFiles for a legacy table with no map (every existing row counts as harvested)', () => {
+    const legacy = table({ 'tests/a.test.ts': 10, 'tests/b.test.ts': 20 });
+    const out = applyLocalCarry(legacy, [{ file: 'tests/c.test.ts', runs: [4] }], {
+      measured: '2026-08-31',
+      reason: 'pending harvest',
+    });
+    expect(provenanceOf(out).harvestedFiles).toBe(2);
+    expect(carriedDefects(out, { requireMap: true })).toEqual([]);
+  });
+});
+
+describe('unionCarried', () => {
+  it("keeps the newer table's attributions, carries the older's, and attributes older-harvest rows to the older run", () => {
+    const newer = table(
+      { 'tests/a.test.ts': 10, 'tests/n.test.ts': 3 },
+      {
+        run: '200',
+        harvestedFiles: 1,
+        carried: {
+          'tests/n.test.ts': { ms: 3, method: 'local-median', measured: '2026-08-30', runs: [3] },
+        },
+      },
+    );
+    const older = table(
+      { 'tests/a.test.ts': 9, 'tests/o1.test.ts': 40, 'tests/o2.test.ts': 6 },
+      {
+        run: '100',
+        harvested: '2026-08-10',
+        harvestedFiles: 2,
+        carried: { 'tests/o2.test.ts': { ms: 6, method: 'prose-backfill' } },
+      },
+    );
+    const { carried, harvestedFiles } = unionCarried({
+      newer,
+      older,
+      carriedKeys: ['tests/o1.test.ts', 'tests/o2.test.ts'],
+    });
+    expect(harvestedFiles).toBe(1);
+    expect(Object.keys(carried)).toEqual([
+      'tests/n.test.ts',
+      'tests/o1.test.ts',
+      'tests/o2.test.ts',
+    ]);
+    expect(carried['tests/o1.test.ts']).toEqual({
+      ms: 40,
+      method: 'union-older-harvest',
+      run: '100',
+      measured: '2026-08-10',
+    });
+    expect(carried['tests/o2.test.ts']).toEqual({ ms: 6, method: 'prose-backfill' });
+    expect(carried['tests/n.test.ts'].method).toBe('local-median');
+  });
+
+  it('treats a legacy newer table (no map) as fully harvested', () => {
+    const newer = table({ 'tests/a.test.ts': 10, 'tests/b.test.ts': 1 }, { run: '200' });
+    const older = table({ 'tests/a.test.ts': 9, 'tests/z.test.ts': 2 }, { run: '100' });
+    const out = unionCarried({ newer, older, carriedKeys: ['tests/z.test.ts'] });
+    expect(out.harvestedFiles).toBe(2);
+    expect(out.carried['tests/z.test.ts'].method).toBe('union-older-harvest');
+  });
+});
+
+describe('missingWeightFiles', () => {
+  it('keeps walk order and treats anything not a number as unmeasured', () => {
+    const walked = ['tests/a.test.ts', 'tests/b.test.ts', 'tests/c.test.ts', 'tests/d.test.ts'];
+    const weights = {
+      'tests/a.test.ts': 10,
+      // A null, a string and an absent key are all "no measurement": the table
+      // is generated, but a hand-edit or a bad merge can leave any of them, and
+      // planning a shard off a non-number is worse than planning off the
+      // fallback, so they must be reported as missing rather than skipped.
+      'tests/b.test.ts': null,
+      'tests/c.test.ts': '12',
+    } as unknown as Record<string, unknown>;
+    expect(missingWeightFiles(walked, weights)).toEqual([
+      'tests/b.test.ts',
+      'tests/c.test.ts',
+      'tests/d.test.ts',
+    ]);
+    expect(missingWeightFiles(walked, { ...weights, 'tests/b.test.ts': 1 })).toEqual([
+      'tests/c.test.ts',
+      'tests/d.test.ts',
+    ]);
+    expect(missingWeightFiles([], weights)).toEqual([]);
+  });
+});
+
+describe('parseCarryLocalCli: the --reason flag', () => {
+  it('defaults the reason and passes every other token through untouched', () => {
+    const { reason, tokens } = parseCarryLocalCli(['tests/a.test.ts=1,2,3', 'tests/b.test.ts=4']);
+    expect(tokens).toEqual(['tests/a.test.ts=1,2,3', 'tests/b.test.ts=4']);
+    expect(reason).toBe(DEFAULT_LOCAL_CARRY_REASON);
+    // Pinned as a literal, not just as the constant: the phase-close step in
+    // docs/qa-gate.md quotes this exact sentence as what lands on every row.
+    expect(DEFAULT_LOCAL_CARRY_REASON).toBe('phase 18 local carry pending the post-push harvest');
+  });
+
+  it('takes an explicit reason from anywhere in the list, trimmed, and removes both tokens', () => {
+    const { reason, tokens } = parseCarryLocalCli([
+      'tests/a.test.ts=1',
+      '--reason',
+      '  release sync backfill  ',
+      'tests/b.test.ts=2',
+    ]);
+    expect(reason).toBe('release sync backfill');
+    expect(tokens).toEqual(['tests/a.test.ts=1', 'tests/b.test.ts=2']);
+  });
+
+  it('REFUSES a valueless, blank, or repeated --reason rather than silently defaulting', () => {
+    // Silently defaulting is the dangerous shape: every row would claim the
+    // pending-harvest reason while the operator believed they had set another.
+    expect(() => parseCarryLocalCli(['tests/a.test.ts=1', '--reason'])).toThrow(
+      /--reason needs a non-empty value/,
+    );
+    expect(() => parseCarryLocalCli(['--reason', '   ', 'tests/a.test.ts=1'])).toThrow(
+      /--reason needs a non-empty value/,
+    );
+    expect(() => parseCarryLocalCli(['--reason', '--reason', 'tests/a.test.ts=1'])).toThrow(
+      /--reason needs a non-empty value/,
+    );
+    expect(() => parseCarryLocalCli(['--reason', 'a', '--reason', 'b'])).toThrow(
+      /--reason given twice/,
+    );
+  });
+
+  it('the reason reaches every carried row, and a row without one is a defect', () => {
+    const t = table({ 'tests/a.test.ts': 10 }, { harvestedFiles: 1, carried: {} });
+    const cli = parseCarryLocalCli(['--reason', 'why this row exists', 'tests/new.test.ts=5,6,7']);
+    const out = applyLocalCarry(t, parseCarryLocalArgs(cli.tokens), {
+      measured: '2026-08-31',
+      reason: cli.reason,
+    });
+    expect(carriedRows(out)['tests/new.test.ts'].reason).toBe('why this row exists');
+    expect(carriedDefects(out, { fallbackMs: 31, requireMap: true })).toEqual([]);
+    // Strip the reason back off and the committed-table contract rejects it.
+    const stripped = JSON.parse(JSON.stringify(out)) as Record<string, unknown>;
+    const carried = (stripped.__provenance as { carried: Record<string, { reason?: string }> })
+      .carried;
+    carried['tests/new.test.ts'].reason = undefined;
+    expect(carriedDefects(stripped, { fallbackMs: 31, requireMap: true })).toEqual([
+      'tests/new.test.ts: local-median without a reason',
+    ]);
+  });
+
+  it('applyLocalCarry itself refuses a missing or blank reason', () => {
+    const t = table({ 'tests/a.test.ts': 10 }, { harvestedFiles: 1, carried: {} });
+    const m = [{ file: 'tests/new.test.ts', runs: [5] }];
+    expect(() =>
+      applyLocalCarry(t, m, { measured: '2026-08-31' } as { measured: string; reason: string }),
+    ).toThrow(/opts.reason must say why the rows are carried/);
+    expect(() => applyLocalCarry(t, m, { measured: '2026-08-31', reason: '  ' })).toThrow(
+      /opts.reason must say why the rows are carried/,
+    );
+  });
+});
+
+describe('parseCarryLocalArgs', () => {
+  it('parses one measurement per token, keeping the runs in measured order', () => {
+    expect(parseCarryLocalArgs(['tests/a.test.ts=120,131,127', 'tests/b/c.test.ts=90'])).toEqual([
+      { file: 'tests/a.test.ts', runs: [120, 131, 127] },
+      { file: 'tests/b/c.test.ts', runs: [90] },
+    ]);
+    // Surrounding whitespace inside the run list is tolerated (a shell-quoted
+    // token pasted from a spreadsheet), the path is taken verbatim.
+    expect(parseCarryLocalArgs(['tests/a.test.ts=5, 7'])).toEqual([
+      { file: 'tests/a.test.ts', runs: [5, 7] },
+    ]);
+  });
+
+  it('REFUSES every malformed token rather than measuring something else', () => {
+    expect(() => parseCarryLocalArgs([])).toThrow(/at least one/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts'])).toThrow(/is not <path>=/);
+    expect(() => parseCarryLocalArgs(['=12'])).toThrow(/is not <path>=/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts='])).toThrow(/is not an integer ms/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts=12.5'])).toThrow(/is not an integer ms/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts=-4'])).toThrow(/is not an integer ms/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts=0'])).toThrow(/at least one positive/);
+    expect(() => parseCarryLocalArgs(['tests/a.test.ts=1', 'tests/a.test.ts=2'])).toThrow(
+      /measured twice/,
+    );
+  });
+
+  it('feeds applyLocalCarry directly (the median of the parsed runs becomes the row)', () => {
+    const t = table({ 'tests/a.test.ts': 10 }, { harvestedFiles: 1, carried: {} });
+    const out = applyLocalCarry(t, parseCarryLocalArgs(['tests/new.test.ts=120,131,127']), {
+      measured: '2026-08-31',
+      reason: 'pending harvest',
+    });
+    expect(out['tests/new.test.ts']).toBe(127);
+    expect(carriedRows(out)['tests/new.test.ts']).toEqual({
+      ms: 127,
+      method: 'local-median',
+      measured: '2026-08-31',
+      reason: 'pending harvest',
+      runs: [120, 131, 127],
+    });
+    expect(carriedDefects(out, { fallbackMs: 31, requireMap: true })).toEqual([]);
+  });
+});
+
+describe('serializeWeightTable', () => {
+  it('round-trips, and emits byte for byte what the repo formatter would', () => {
+    const t = table(
+      { 'tests/a.test.ts': 10, 'tests/c.test.ts': 7 },
+      {
+        harvestedFiles: 1,
+        carried: {
+          'tests/c.test.ts': {
+            ms: 7,
+            method: 'local-median',
+            measured: '2026-08-31',
+            runs: [9, 7, 6],
+          },
+        },
+        backfill: { date: '2026-08-31', note: 'n' },
+      },
+    );
+    const text = serializeWeightTable(t);
+    expect(JSON.parse(text)).toEqual(t);
+    expect(text.endsWith('\n')).toBe(true);
+    expect(text).toMatch(/\n {2}"tests\/a\.test\.ts": 10,\n/);
+    expect(text).toMatch(/\n {2}"__provenance": \{\n {4}"run": "100",\n/);
+    // Each carried entry is expanded, one field per line, under its file key.
+    expect(text).toContain('\n      "tests/c.test.ts": {\n        "ms": 7,\n');
+  });
+
+  it('emits the exact bytes the repo formatter would, pinned as a literal', () => {
+    // Spelled out rather than compared against JSON.stringify: asserting
+    // toBe(JSON.stringify(t, null, 2)) would re-run the implementation's own
+    // expression on both sides and pass for any layout the function might
+    // later adopt. These are the bytes biome prints for a .json file, and the
+    // whole point of the function is that the writer and the formatter agree
+    // (a custom layout is reformatted straight back and fails
+    // `npm run ci:changed` on the format diff).
+    const tiny = {
+      __provenance: { run: '7', harvestedFiles: 1, carried: {} },
+      'tests/a.test.ts': 10,
+    };
+    expect(serializeWeightTable(tiny)).toBe(
+      '{\n' +
+        '  "__provenance": {\n' +
+        '    "run": "7",\n' +
+        '    "harvestedFiles": 1,\n' +
+        '    "carried": {}\n' +
+        '  },\n' +
+        '  "tests/a.test.ts": 10\n' +
+        '}\n',
+    );
+  });
+});

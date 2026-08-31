@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { PREGEN_STEPS } from '../scripts/build_bundle_pregen.mjs';
 import {
   buildFullGateSteps,
   I18N_ARTIFACTS,
@@ -148,6 +149,38 @@ describe('gate cache inventory vs turbo.json', () => {
     for (const f of familyFiles) {
       expect(matched.includes(f), `${f} is not matched by any i18n:gen input pattern`).toBe(true);
     }
+  });
+
+  it('declares every script the build:bundle command runs as a build:bundle input', () => {
+    // A warm turbo cache replays dist/** whenever no declared input moved, so a
+    // script the command line runs but the inputs omit can change what the
+    // bundle contains while the cache serves the old one. The pregen
+    // orchestrator was exactly that gap (Phase 18 of the masterwrought packet:
+    // package.json ran scripts/build_bundle_pregen.mjs first, neither mirror
+    // listed it). Derive the obligation from the command itself and from the
+    // orchestrator's step table, so a new `node scripts/<x>.mjs` in either
+    // place fails here until it is declared in BOTH mirrors (the sync pin above
+    // proves the mirrors agree with each other; this one proves they agree
+    // with the command).
+    const inputs = turboJson.tasks['build:bundle'].inputs ?? [];
+    const command = pkg.scripts['build:bundle'];
+    const commandScripts = [...command.matchAll(/node (scripts\/[\w./-]+\.mjs)/g)].map((m) => m[1]);
+    expect(commandScripts).toContain('scripts/build_bundle_pregen.mjs');
+    expect(commandScripts.length).toBeGreaterThanOrEqual(3);
+    for (const script of commandScripts) {
+      expect(inputs, `build:bundle runs ${script} but does not declare it`).toContain(script);
+    }
+    const pregenScripts = PREGEN_STEPS.map((step) => step[0]);
+    expect(pregenScripts.length).toBeGreaterThanOrEqual(3);
+    for (const script of pregenScripts) {
+      expect(inputs, `the pregen orchestrator runs ${script} but build:bundle omits it`).toContain(
+        script,
+      );
+    }
+    expect(inputs).toContain('scripts/build_bundle_pregen.mjs');
+    expect(GATE_CACHE_TASK_INVENTORY['build:bundle'].inputs).toContain(
+      'scripts/build_bundle_pregen.mjs',
+    );
   });
 
   it('invalidates the server bundle when either Rift rollback migration source changes', () => {

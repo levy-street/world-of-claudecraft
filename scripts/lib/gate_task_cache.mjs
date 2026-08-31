@@ -152,6 +152,13 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'editor.html',
       'vite.config.ts',
       'tsconfig.json',
+      // Every script the build:bundle command line runs is an input, the pregen
+      // orchestrator included: it decides WHICH generators run before vite
+      // build, so an edit to it must bust the warm dist cache exactly as an
+      // edit to one of the generators does. tests/gate_task_cache.test.ts
+      // derives this obligation from the package.json command and
+      // PREGEN_STEPS, so a new pregen step cannot land undeclared.
+      'scripts/build_bundle_pregen.mjs',
       'scripts/build_sitemap.mjs',
       'scripts/build_sfx_manifest.mjs',
       'scripts/build_media_manifest.mjs',

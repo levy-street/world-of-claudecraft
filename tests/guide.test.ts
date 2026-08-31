@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
@@ -387,16 +388,45 @@ describe('Guide generated class content', () => {
   });
 
   it('matches the sim (regenerating leaves the committed file unchanged)', () => {
-    execFileSync('node', ['scripts/wiki/build_content.mjs'], {
-      cwd: new URL('..', import.meta.url),
-    });
-    // No diff means the committed content is derived from the current sim data.
-    expect(() =>
-      execFileSync('git', ['diff', '--exit-code', '--', 'src/guide/content.generated.ts'], {
+    // The generator emits into a TEMP file (`--out`) and this arm compares
+    // bytes, so running the suite never writes into the tree: the old
+    // regenerate-in-place form dirtied src/guide/content.generated.ts on every
+    // stale run and three agents had to restore it by hand (Phase 11d record).
+    // Arm two keeps the on-disk file welded to the index without regenerating
+    // first; the two arms together are exactly the old (regenerated == index)
+    // coverage, minus the write.
+    const tmp = mkdtempSync(join(tmpdir(), 'wocc-guide-content-'));
+    try {
+      const out = join(tmp, 'content.generated.ts');
+      execFileSync('node', ['scripts/wiki/build_content.mjs', '--out', out], {
         cwd: new URL('..', import.meta.url),
-        encoding: 'utf8',
-      }),
-    ).not.toThrow();
+      });
+      const generated = readFileSync(out, 'utf8');
+      const committed = readFileSync(
+        new URL('../src/guide/content.generated.ts', import.meta.url),
+        'utf8',
+      );
+      if (generated !== committed) {
+        const gen = generated.split('\n');
+        const com = committed.split('\n');
+        let line = 0;
+        while (line < gen.length && line < com.length && gen[line] === com[line]) line += 1;
+        expect.fail(
+          'src/guide/content.generated.ts is stale (run `npm run wiki:content` and commit the ' +
+            `result); first difference at line ${line + 1}:\n  committed: ${JSON.stringify(com[line] ?? '<end of file>')}\n  regenerated: ${JSON.stringify(gen[line] ?? '<end of file>')}`,
+        );
+      }
+      // No diff means the on-disk file is the committed one, so the byte
+      // comparison above was against the index, not a stray local edit.
+      expect(() =>
+        execFileSync('git', ['diff', '--exit-code', '--', 'src/guide/content.generated.ts'], {
+          cwd: new URL('..', import.meta.url),
+          encoding: 'utf8',
+        }),
+      ).not.toThrow();
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
   });
 });
 

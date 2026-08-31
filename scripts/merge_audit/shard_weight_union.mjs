@@ -18,8 +18,10 @@
 // Optional: --ours <ref> --theirs <ref> (defaults below are the 11b merge parents).
 // The parents are read with `git show`; nothing is checked out.
 import { execFileSync } from 'node:child_process';
-import { readdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { walkShardTestFiles } from '../lib/ci_shard_walk.mjs';
+import { serializeWeightTable, unionCarried } from '../lib/ci_shard_weight_carry.mjs';
 
 const ROOT = process.cwd();
 const TABLE = 'scripts/ci_shard_weights.generated.json';
@@ -99,10 +101,22 @@ export function unionTables(ours, theirs) {
     ? `the newer table (run ${newerProv.run}, ${newerKeys.size} rows), whose own provenance ` +
       `reads: "${newerProv.localMerge}"`
     : `the newer CI harvest (run ${newerProv.run}, ${newerKeys.size} rows)`;
+  // The machine-readable half of the disclosure (Phase 18, the carried-weight
+  // machine check): the newer table's own attributions travel with its rows,
+  // every carried key gets the older table's attribution (or is attributed to
+  // the older harvest run), and harvestedFiles keeps the identity the pin in
+  // tests/ci_shard_partition.test.ts checks (rows == harvestedFiles + carried).
+  const machine = unionCarried({ newer, older, carriedKeys: carried });
+  const backfill =
+    Object.values(machine.carried).some((e) => e.method === 'prose-backfill') &&
+    (newerProv.backfill ?? olderProv.backfill);
   merged.__provenance = {
     run: newerProv.run,
     harvested: newerProv.harvested,
     files: sortedKeys.length,
+    harvestedFiles: machine.harvestedFiles,
+    carried: machine.carried,
+    ...(backfill ? { backfill } : {}),
     localMerge:
       '2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of ' +
       `the two parent harvests; ${newerPedigree} ` +
@@ -124,32 +138,12 @@ export function unionTables(ours, theirs) {
   };
 }
 
-// The SAME walk predicate the enforcing pin applies
-// (tests/ci_shard_partition.test.ts): skip browser/, node_modules, dist and
-// dot-directories, and never follow symlinks (withFileTypes, no statSync), so
-// this tool cannot certify a coverage number the gate's own walk would then
-// reject.
-export function walkTestFiles(root) {
-  const out = [];
-  const walk = (dir) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const name = entry.name;
-      if (entry.isDirectory()) {
-        if (name === 'browser' || name === 'node_modules' || name === 'dist') continue;
-        if (name.startsWith('.')) continue;
-        walk(join(dir, name));
-      } else if (
-        entry.isFile() &&
-        name.endsWith('.test.ts') &&
-        !name.endsWith('.browser.test.ts')
-      ) {
-        out.push(join(dir, name).slice(root.length + 1));
-      }
-    }
-  };
-  walk(join(root, 'tests'));
-  return out.sort();
-}
+// The walk is the enforcing pin's walk BY IMPORT (scripts/lib/ci_shard_walk.mjs,
+// the module tests/ci_shard_partition.test.ts reads too), not a copy of it: the
+// copy this file carried until Phase 18 had drifted in two places (dot-prefix
+// skip on directories only, an isFile() re-check the pin never makes), so the
+// tool could certify a coverage number the gate's own walk then rejected.
+export const walkTestFiles = walkShardTestFiles;
 
 function main() {
   const ours = showJson(oursRef);
@@ -187,7 +181,7 @@ function main() {
     return;
   }
   if (write) {
-    writeFileSync(join(ROOT, TABLE), `${JSON.stringify(merged, null, 2)}\n`);
+    writeFileSync(join(ROOT, TABLE), serializeWeightTable(merged));
     console.log('wrote', TABLE, 'keys', stats.union);
   } else {
     console.log('dry run (pass --write to write the merged table)');

@@ -15,6 +15,13 @@ export interface CompositionCtx {
   eventsMoves: number;
   unalignedArrays: number;
   idShifts: Map<number, number>;
+  /** Leaves whose merged value was byte-equal to a release parent's (counted,
+   *  never silent); the first eight paths are sampled. */
+  releaseComposed: number;
+  releaseComposedPaths: string[];
+  /** Both-moved numeric leaves where merged took one parent's value outright. */
+  sidePicks: number;
+  sidePickPaths: string[];
   theirsOnlyFrameDiffs?: string[];
 }
 
@@ -24,7 +31,33 @@ export interface AddDiffs {
   numeric: string[];
   other: string[];
   presence: string[];
+  releaseComposed: number;
+  releaseComposedPaths: string[];
 }
+
+export type Lineage =
+  | 'shared'
+  | 'ours-only add'
+  | 'theirs-only add'
+  | 'release-only add'
+  | 'orphan';
+export function classifyLineage(args: {
+  b: unknown;
+  o: unknown;
+  t: unknown;
+  releases?: unknown[];
+}): Lineage;
+export function releaseParentRefs(args?: {
+  releaseRef?: string;
+  derived?: ReadonlyArray<{ ref: string; via: string }>;
+  extra?: readonly string[];
+  resolve?: (ref: string) => string;
+}): Array<{ ref: string; via: string | null }>;
+export function newestReleaseRef(args?: {
+  releaseRef?: string;
+  derived?: ReadonlyArray<{ ref: string; via: string }>;
+}): string;
+export function isAnchorPath(path: string): boolean;
 
 /** One golden a parent carries that the merged tree does not, with the parents
  *  that carried it. */
@@ -63,6 +96,7 @@ export function composeLeaf(
   m: unknown,
   path: string,
   ctx: CompositionCtx,
+  rs?: readonly unknown[],
 ): void;
 export function checkShared(
   name: string,
@@ -70,12 +104,20 @@ export function checkShared(
   o: unknown,
   t: unknown,
   m: unknown,
-): { ctx: CompositionCtx; frames: number; fourWay: number };
+  releases?: readonly unknown[],
+): {
+  ctx: CompositionCtx;
+  frames: number;
+  fourWay: number;
+  oursOnlyFrames: number;
+  theirsOnlyFrames: number;
+};
 export function checkAdd(
   name: string,
   p: unknown,
   m: unknown,
-  side: 'ours' | 'theirs',
+  side: 'ours' | 'theirs' | 'release',
+  releases?: readonly unknown[],
 ): { ctx: CompositionCtx; diffs: AddDiffs; frames: number };
 export function diffAgainst(
   p: unknown,
@@ -83,4 +125,5 @@ export function diffAgainst(
   path: string,
   diffs: AddDiffs,
   ctx: CompositionCtx,
+  rs?: readonly unknown[],
 ): void;

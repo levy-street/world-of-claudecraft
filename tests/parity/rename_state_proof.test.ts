@@ -25,7 +25,19 @@
 //       (default baseline ref HEAD — i.e. worktree goldens vs last commit;
 //        after the rename slice is committed, re-run with
 //        RENAME_PROOF_BASE=HEAD~1 to verify the committed slice.)
-// Skipped entirely (env-gated) unless RENAME_PROOF=1.
+// The PROOF block is env-gated (RENAME_PROOF=1) and stays hand-run, by
+// construction: it needs a base ref whose goldens differ from the working tree
+// ONLY by a rename, and it reds on any other golden move. An unconditional CI
+// copy would red every legitimate UPDATE_PARITY re-record (a behavior change
+// moves rng digests, which this proof must reject), and its "at least one
+// re-minted golden" arm reds on every PR that touched no golden. What CI CAN
+// honestly run is the SELF-CHECK block at the bottom of this file, ungated: it
+// pins the NAME-MAP row filter, the reverse mapper, the re-digest identity and
+// the Recorder capture hooks against fixtures and one cheap live recording.
+// tests/parity/ is a CI_GUARD_PREFIXES floor prefix (scripts/lib/ci_shard_plan.mjs),
+// so that block runs on every selective shard plan and every full run, and a
+// rot in the harness (a renamed trace.ts export, a NAME-MAP format drift) reds
+// in CI instead of surfacing the next time someone runs the proof by hand.
 //
 // SLICE SCOPING (Masterwrought Phase 03): the default reverse map spans the
 // WHOLE locked NAME-MAP plus the C1/C2 coined-id pairs, which is correct only
@@ -107,13 +119,16 @@ const REVERSE_ID_PAIRS: ReadonlyArray<readonly [string, string]> = [
 // inspector), reversed new->old and applied longest-new-first, word-bounded.
 const PROOF_SECTION = process.env.RENAME_PROOF_SECTION || '';
 
-function loadReverseDisplayPairs(): Array<[string, string]> {
-  const mapPath = join(ROOT, 'ip-refactor', 'NAME-MAP.md');
+// The parser takes the map TEXT and the section filter as parameters so the
+// self-check block below can drive it over a synthetic map: the proof and the
+// self-check share this one function, so a filter change cannot pass one and
+// silently skip the other.
+function parseReverseDisplayPairs(mapText: string, section: string): Array<[string, string]> {
   const pairs: Array<[string, string]> = [];
-  let inSection = PROOF_SECTION === '';
-  for (const line of readFileSync(mapPath, 'utf8').split('\n')) {
-    if (PROOF_SECTION && line.startsWith('#')) {
-      inSection = line.includes(PROOF_SECTION);
+  let inSection = section === '';
+  for (const line of mapText.split('\n')) {
+    if (section && line.startsWith('#')) {
+      inSection = line.includes(section);
       continue;
     }
     if (!inSection) continue;
@@ -134,13 +149,28 @@ function loadReverseDisplayPairs(): Array<[string, string]> {
   return pairs;
 }
 
+function loadReverseDisplayPairs(): Array<[string, string]> {
+  const mapPath = join(ROOT, 'ip-refactor', 'NAME-MAP.md');
+  return parseReverseDisplayPairs(readFileSync(mapPath, 'utf8'), PROOF_SECTION);
+}
+
 const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-function makeReverseMapper(): (s: string) => string {
-  const displayPairs = loadReverseDisplayPairs();
+interface ReverseMapSource {
+  displayPairs: ReadonlyArray<readonly [string, string]>;
+  // Coined-id pairs are the original wave's; a scoped slice never maps ids.
+  idPairs: ReadonlyArray<readonly [string, string]>;
+}
+
+function makeReverseMapper(
+  source: ReverseMapSource = {
+    displayPairs: loadReverseDisplayPairs(),
+    idPairs: PROOF_SECTION ? [] : REVERSE_ID_PAIRS,
+  },
+): (s: string) => string {
+  const { displayPairs, idPairs } = source;
   return (s: string): string => {
-    // Coined-id pairs are the original wave's; a scoped slice never maps ids.
-    const idHit = PROOF_SECTION ? undefined : REVERSE_ID_PAIRS.find(([n]) => s === n);
+    const idHit = idPairs.find(([n]) => s === n);
     if (idHit) return idHit[1];
     let out = s;
     for (const [n, o] of displayPairs) {
@@ -269,4 +299,139 @@ d(`rename state proof (reverse-map re-digest vs ${BASE_REF})`, () => {
       }
     });
   }
+});
+
+// ---- the self-check floor arm (UNGATED: this is what CI runs) -------------------
+//
+// The proof above cannot run unconditionally in CI (header). These arms pin the
+// machinery it stands on, against fixtures and one cheap live recording, so the
+// harness cannot rot between two hand-run rename slices: the NAME-MAP row filter,
+// the reverse mapper's word-bounded longest-first replacement, the re-digest
+// identity, and the vi.mock capture of the Recorder's digest path.
+describe('rename state proof: self-check floor arm', () => {
+  it('parses the locked NAME-MAP into a non-empty, longest-new-first reverse map', () => {
+    const pairs = loadReverseDisplayPairs();
+    // Vacuity floor near the real row count (about 640 rename/pairing/coined-id
+    // rows when written), so a parser that silently matches nothing fails here
+    // instead of turning the proof into a no-op reverse map.
+    expect(pairs.length).toBeGreaterThan(500);
+    for (let i = 1; i < pairs.length; i++) {
+      expect(pairs[i - 1][0].length, `pair ${i} sorts longest-new-first`).toBeGreaterThanOrEqual(
+        pairs[i][0].length,
+      );
+    }
+    for (const [newName, oldName] of pairs) {
+      expect(newName.length).toBeGreaterThan(0);
+      expect(oldName.length).toBeGreaterThan(0);
+      expect(newName, `no-op pair ${newName}`).not.toBe(oldName);
+      expect(oldName.startsWith('`'), `code-id row leaked: ${oldName}`).toBe(false);
+      expect(oldName.includes('('), `annotated row leaked: ${oldName}`).toBe(false);
+    }
+  });
+
+  it('row filter positive control: a synthetic map admits exactly the display-rename rows', () => {
+    const map = [
+      '# NAME-MAP - the locked rename contract',
+      '',
+      '## Abilities (V1)',
+      '### Warrior',
+      '| id (frozen) | old | new (PROPOSED) | kind | flag |',
+      '|---|---|---|---|---|',
+      '| `heroic_strike` | Heroic Strike | Reaver Strike | ability | rename |',
+      '| `murloc` | `murloc` | `mudfin` | family | coined-id |',
+      '| `war_imp_heroic_strike` | Improved Heroic Strike | Improved Reaver Strike | talent | pairing |',
+      '| `frost_nova` | Frost (Ice) Nova | Icebind | ability | rename |',
+      '| `keep` | Same Name | Same Name | ability | rename |',
+      '| `maybe` | Old Thing | New Thing | ability | rename? |',
+      '| `generic` | Charge | Charge Kept | ability | generic-keep? |',
+      '| `short` | Only Five | Cells |',
+      '## MASTERWROUGHT PHASE 03 AMENDMENT (2026-08-07)',
+      '| id (frozen) | old | new (PROPOSED) | kind | flag |',
+      '|---|---|---|---|---|',
+      '| `late` | Late Old | Late New | item | rename |',
+    ].join('\n');
+    // Whole map: the rename, the pairing, and the amendment row, longest NEW
+    // name first; the backticked code-id row, the parenthesised old name, the
+    // no-op row, the pending `rename?` and `generic-keep?` flags, and the
+    // malformed short row are all filtered.
+    expect(parseReverseDisplayPairs(map, '')).toEqual([
+      ['Improved Reaver Strike', 'Improved Heroic Strike'],
+      ['Reaver Strike', 'Heroic Strike'],
+      ['Late New', 'Late Old'],
+    ]);
+    // Section scoping restricts to the rows after the matching heading.
+    expect(parseReverseDisplayPairs(map, 'MASTERWROUGHT PHASE 03')).toEqual([
+      ['Late New', 'Late Old'],
+    ]);
+    // A section typo matches nothing, which the gated block turns into its own
+    // loud failure rather than opaque hash mismatches.
+    expect(parseReverseDisplayPairs(map, 'NO SUCH SECTION')).toEqual([]);
+  });
+
+  it('the sanctioned coined-id pairs are unique on both sides', () => {
+    expect(REVERSE_ID_PAIRS.length).toBeGreaterThan(0);
+    expect(new Set(REVERSE_ID_PAIRS.map(([n]) => n)).size).toBe(REVERSE_ID_PAIRS.length);
+    expect(new Set(REVERSE_ID_PAIRS.map(([, o]) => o)).size).toBe(REVERSE_ID_PAIRS.length);
+    for (const [n, o] of REVERSE_ID_PAIRS) expect(n).not.toBe(o);
+  });
+
+  it('the reverse mapper round-trips a payload of NEW names to OLD and re-digests identically', () => {
+    const mapStr = makeReverseMapper({
+      displayPairs: [
+        ['Reaver Strike', 'Heroic Strike'],
+        ['Frostveil', 'Ice Barrier'],
+      ],
+      idPairs: REVERSE_ID_PAIRS,
+    });
+    const live = {
+      entities: [
+        {
+          name: 'Reaver Strike',
+          templateId: 'mudfin',
+          // The third string is NOT a whole-word hit and must stay untouched.
+          auras: ['Frostveil fades', 'Reaver Strike x2', 'Frostveiled'],
+          hp: 12.5,
+        },
+      ],
+      events: [{ text: 'You cast Reaver Strike.' }, { text: 'mudfin flees' }],
+    };
+    const expected = {
+      entities: [
+        {
+          name: 'Heroic Strike',
+          templateId: 'murloc',
+          auras: ['Ice Barrier fades', 'Heroic Strike x2', 'Frostveiled'],
+          hp: 12.5,
+        },
+      ],
+      // The id pair is exact-match only: an id inside prose is not a coined id.
+      events: [{ text: 'You cast Heroic Strike.' }, { text: 'mudfin flees' }],
+    };
+    const reversed = reverseMapValue(live, mapStr);
+    expect(reversed).toEqual(expected);
+    const digestOf = (v: unknown) => fnv1a(JSON.stringify(canonical(v, { omitDefaults: false })));
+    expect(digestOf(reversed)).toBe(digestOf(expected));
+    // And the digest MOVED, so the identity above is not vacuous.
+    expect(digestOf(live)).not.toBe(digestOf(expected));
+  });
+
+  it('the capture harness still intercepts the Recorder digest path frame by frame', () => {
+    // grix_respawn_window is the cheapest scenario in tests/parity/scenarios.ts:
+    // no tick loop (0 ticks, 4 frames: init, two snapshots, final), one Sim.
+    const scenario = SCENARIOS.find((s) => s.name === 'grix_respawn_window');
+    if (!scenario) throw new Error('grix_respawn_window scenario missing from SCENARIOS');
+    captures.state.length = 0;
+    captures.events.length = 0;
+    const live = JSON.parse(JSON.stringify(recordTrace(scenario))) as GoldenTrace;
+    expect(live.frames.length).toBeGreaterThan(0);
+    // One state + one events capture per frame, in frame order: the vi.mock
+    // of ./trace is what the proof stands on, and a renamed digest export or a
+    // Recorder that stops calling it would leave these buffers empty.
+    expect(captures.state.length).toBe(live.frames.length);
+    expect(captures.events.length).toBe(live.frames.length);
+    for (let i = 0; i < live.frames.length; i++) {
+      expect(fnv1a(captures.state[i]), `frame ${i} state recompute`).toBe(live.frames[i].state);
+      expect(fnv1a(captures.events[i]), `frame ${i} events recompute`).toBe(live.frames[i].events);
+    }
+  });
 });

@@ -244,6 +244,97 @@ predates the suites running in CI (the shared-database suites were harvested at 
 skipped cost and the branch-only suites are absent from it entirely), so the packing is
 approximate until the first post-wiring harvest lands.
 
+**The shard weight table and its carried rows.** `scripts/ci_shard_weights.generated.json`
+holds one measured millisecond cost per test file; the LPT partition packs the shards from
+it, and a file with no row is planned at `MEASURED_FALLBACK_MS` (the table's own median).
+`tests/ci_shard_partition.test.ts` grades it two ways: at least 95 percent of the walked
+test tree must carry a row (below that the balance claim stops being measured, since the
+rest is planned at one shared guess), and every row the newest harvest did NOT measure must
+carry a machine-readable attribution in `__provenance.carried`. That second check exists
+because the first one only asks whether a row EXISTS: rows appended at the fallback value
+would have raised coverage, left the balance bar byte-identical, and passed every other pin,
+so nothing machine-checked that a carried weight was a real measurement (the gate reviewer's
+standing finding through Phases 11g, 11h and 11k). The contract, the three sanctioned
+attribution methods, and the fabrication shape the modal check catches are stated once in
+`scripts/lib/ci_shard_weight_carry.mjs`; the population both the pin and the union tool
+(`scripts/merge_audit/shard_weight_union.mjs`) grade against is the one shared walk in
+`scripts/lib/ci_shard_walk.mjs`, so the tool can no longer certify a coverage number the pin
+then rejects.
+
+Two writers may touch the table, and neither hand-edits it. A green FULL-MODE CI run is
+harvested wholesale with `node scripts/ci_shard_weights_harvest.mjs <run-id>`, which
+declares every row it wrote as harvested. Between harvests, a test file CI has not measured
+yet (a release sync or a phase added it) is carried with
+`node scripts/ci_shard_weights_harvest.mjs --carry-local [--reason "<why>"] tests/<file>.test.ts=<ms>,<ms>,<ms>`,
+which takes the MEDIAN of the runs given and writes a `local-median` entry naming every run,
+the date, and the REASON the row is carried rather than harvested. All three fields are
+required: `carriedDefects` rejects a `local-median` row with a blank or missing reason, so a
+carried weight always says which harvest it is standing in for. The mode refuses to
+overwrite a harvested row and refuses to write a table failing its own contract. Measure the
+runs the way the harvest does, from the vitest reporter line
+`scripts/lib/ci_shard_weight_parse.mjs` parses, on an otherwise idle machine and on the
+merged tree: a duration measured while other work is mutating the tree is not a measurement
+of what CI will run.
+
+**The phase-close step: carrying the phase's own new suites.** A phase that adds test files
+puts the coverage floor under 0.95 the moment it lands, because no harvest has measured
+them. `--carry-local-missing` is that step in one command: it enumerates every walked test
+file the table does not measure (never a hand-kept list, so a file a late unit added cannot
+be missed), runs each `--runs` times, reads each duration from the SAME reporter line
+`scripts/lib/ci_shard_weight_parse.mjs` parses out of a CI log, and hands the medians to the
+ordinary carry path, contract check included. It refuses rather than guessing if any run
+prints no parsable duration.
+
+```
+node scripts/ci_shard_weights_harvest.mjs --carry-local-missing --runs 3
+npx vitest run tests/ci_shard_partition.test.ts tests/ci_shard_weight_carry.test.ts
+git diff --stat scripts/ci_shard_weights.generated.json
+```
+
+Run it ONCE, as the LAST integration step of the phase, after every unit has landed its
+suites and on an otherwise idle tree. Both conditions are load-bearing: a carry taken while
+units are still landing is stale as soon as the next file appears, and a duration measured
+while other work is mutating the tree is not a measurement of what CI will run. It also
+carries any uncommitted test file present in the tree, which is another reason to wait until
+the units have landed.
+
+Acceptance, all four: the run reports the same file count it enumerated and prints the
+reason it recorded on each row; `tests/ci_shard_partition.test.ts` is fully green, which
+means both the coverage arm clears 0.95 AND the committed-table arms still pass
+(`harvestedFiles` plus the carried count equals the row count, and every carried row is
+attributed with a method, a date and a reason); `tests/ci_shard_weight_carry.test.ts` is
+green; and the diff shows only added rows plus the provenance block, never a changed
+existing row, since a local carry must never move a CI-harvested weight. The carried rows
+are a stopgap, not a result: the post-push harvest below replaces every one of them.
+
+**CARRIED to Phase 20: the post-push harvest.** As of 2026-08-31 the table is under the
+coverage floor: the walked tree carries 3,533 committed test files, 184 of which have no
+row, so coverage is 0.9479 against a 0.95 bar. Every one of those 184 arrived with a release
+sync after the last harvest (run `32621561241`, 2026-08-23), and the deficit cannot be
+closed on this branch: a harvest needs a completed, all-green, FULL-MODE CI run of a branch
+whose commits are pushed, and `feature/masterwrought` is deliberately local until the packet
+lands. The step is therefore owed at Phase 20, immediately after the first push whose CI run
+goes green in full mode, and before the packet's PR is called mergeable:
+
+```
+gh run list --branch feature/masterwrought --workflow ci.yml --limit 10   # find the run id
+node scripts/ci_shard_weights_harvest.mjs <run-id>                        # wholesale re-harvest
+npx vitest run tests/ci_shard_partition.test.ts tests/ci_shard_weight_carry.test.ts
+npx @biomejs/biome check --write scripts/ci_shard_weights.generated.json
+```
+
+The run id must be a run whose shard jobs printed `changes-job decision: mode=full` (the
+harvester refuses anything else, because a selective run measures only its slice and would
+silently shrink the table). Acceptance, all four in one pass: the harvester reports at least
+3,533 files written; `__provenance.harvestedFiles` equals the row count with `carried` empty
+(a wholesale harvest measures everything it writes, so nothing is carried and the
+`prose-backfill` block from the Phase 18 attribution is gone); the coverage arm of
+`tests/ci_shard_partition.test.ts` clears 0.95 rather than merely improving; and the
+worst-shard-over-median ratio in that same arm stays at or under 1.15. If a green full-mode
+run is still not available when Phase 20 closes, the fallback is `--carry-local` over the
+184 files (three consecutive single-file runs each, on the merged tree), which restores the
+floor with honest per-row provenance but leaves the wholesale harvest owed.
+
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
 seconds inside a full-mode shard, the chronomancy balance sweep among them, plus the
@@ -549,6 +640,16 @@ post-boot lights, secondary GL contexts, the background queue and its admission 
 the stand-in registry (the contract in `src/render/CLAUDE.md` "GPU work: every new producer is
 a client of the scheduler"), where frontend review keeps the presentation seams and tier
 fairness. Dispatch every role whose set of risk applies.
+
+Decisive-tests review has one dispatch trap worth stating, because its failure mode is
+silent: it resolves the diff itself, so dispatching it where `git diff` comes back empty (a
+worktree it was not pointed at, an already-committed range, a tree whose changes are staged
+elsewhere) used to return an out-of-scope sentence that reads exactly like a clean audit.
+Give it the range or the file list explicitly whenever the change is not plain unstaged
+working-tree edits, and treat a report with an empty per-behavior verdict list as a failed
+dispatch to re-run, never as coverage. Its charter now refuses both shapes: an empty diff is
+reported as an unresolved diff naming the commands tried, and an in-scope audit must emit a
+non-empty claim list with a verdict per claim as its final message.
 
 ## Keep the gate current
 

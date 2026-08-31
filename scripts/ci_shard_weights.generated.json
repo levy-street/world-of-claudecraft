@@ -2,7 +2,1676 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3349,
+    "files": 3351,
+    "harvestedFiles": 2939,
+    "carried": {
+      "tests/ability_drill.test.ts": {
+        "ms": 3970,
+        "method": "prose-backfill"
+      },
+      "tests/ability_tooltip_lines.test.ts": {
+        "ms": 20,
+        "method": "prose-backfill"
+      },
+      "tests/account_wealth.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/account_wealth_db.pg.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/account_wealth_db.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/admin/account_wealth_panel.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/admin/flags_page.test.ts": {
+        "ms": 57,
+        "method": "prose-backfill"
+      },
+      "tests/admin/top_holders_page.test.ts": {
+        "ms": 42,
+        "method": "prose-backfill"
+      },
+      "tests/admin_rate_limit_buckets.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/anim_state_entity_core.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/apex_feast_craft.test.ts": {
+        "ms": 1351,
+        "method": "prose-backfill"
+      },
+      "tests/apex_pattern_channels.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/apex_pattern_items.test.ts": {
+        "ms": 103,
+        "method": "prose-backfill"
+      },
+      "tests/armory_card_view.test.ts": {
+        "ms": 16,
+        "method": "prose-backfill"
+      },
+      "tests/arrival_cinematic.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/audit_conservation_vault.test.ts": {
+        "ms": 1215,
+        "method": "prose-backfill"
+      },
+      "tests/bag_pools.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/bags_vendor_sell_confirm.test.ts": {
+        "ms": 67,
+        "method": "prose-backfill"
+      },
+      "tests/bags_window_drag_render_defer.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/bank_bonus_view.test.ts": {
+        "ms": 63,
+        "method": "prose-backfill"
+      },
+      "tests/bank_chrome_layout.test.ts": {
+        "ms": 57,
+        "method": "prose-backfill"
+      },
+      "tests/bank_ledger_admission.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/bank_meter_view.test.ts": {
+        "ms": 48,
+        "method": "prose-backfill"
+      },
+      "tests/bank_rung_purchase.test.ts": {
+        "ms": 234,
+        "method": "prose-backfill"
+      },
+      "tests/bank_rung_purchase_core.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/bank_snapshot_wire.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/bank_socket_purchase_core.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/bank_sockets.test.ts": {
+        "ms": 2297,
+        "method": "prose-backfill"
+      },
+      "tests/bank_status_line.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/bank_window_offline_shape.test.ts": {
+        "ms": 40,
+        "method": "prose-backfill"
+      },
+      "tests/bank_window_sockets.test.ts": {
+        "ms": 149,
+        "method": "prose-backfill"
+      },
+      "tests/bank_wire_epoch.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/bar_editor_core.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/bar_editor_window.test.ts": {
+        "ms": 147,
+        "method": "prose-backfill"
+      },
+      "tests/bootcamp_disengage.test.ts": {
+        "ms": 1415,
+        "method": "prose-backfill"
+      },
+      "tests/bootcamp_glow.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/bootcamp_view.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/broker_custody.test.ts": {
+        "ms": 1082,
+        "method": "prose-backfill"
+      },
+      "tests/cast_display_name.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/character_blob_size.test.ts": {
+        "ms": 1244,
+        "method": "prose-backfill"
+      },
+      "tests/character_save_fixups.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/character_shadow_policy.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/character_shadow_proxy.test.ts": {
+        "ms": 6823,
+        "method": "prose-backfill"
+      },
+      "tests/character_state_module.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/charter_fit_memory.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/charter_store_view.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/chat_mod_live.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/cheetah_daze.test.ts": {
+        "ms": 1695,
+        "method": "prose-backfill"
+      },
+      "tests/ci_pg_presence.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/ci_shard_walk.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          21,
+          25,
+          21
+        ]
+      },
+      "tests/ci_shard_weight_carry.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          40
+        ]
+      },
+      "tests/claudium_latency_proxy_target.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/claudium_purchase_bridge.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/client_perf_scene_parity.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/coach_prompt_view.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/coach_trail_core.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/consumable_seat_controller.test.ts": {
+        "ms": 43,
+        "method": "prose-backfill"
+      },
+      "tests/consumable_strip_core.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/consumable_strip_gesture_controller.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/consumable_strip_painter.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/consuming.test.ts": {
+        "ms": 87,
+        "method": "prose-backfill"
+      },
+      "tests/corpse_interaction.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/count_format.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/crab_summon.test.ts": {
+        "ms": 1218,
+        "method": "prose-backfill"
+      },
+      "tests/craft_denial_line_view.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/craft_from_vault.test.ts": {
+        "ms": 3109,
+        "method": "prose-backfill"
+      },
+      "tests/crafting_deny_core.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/crafting_window_craft_fee.test.ts": {
+        "ms": 22,
+        "method": "prose-backfill"
+      },
+      "tests/css_token_resolution.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/daily_gate_load.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/daily_rewards_chrome_view.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/daily_rewards_ranks_view.test.ts": {
+        "ms": 34,
+        "method": "prose-backfill"
+      },
+      "tests/daily_rewards_spin_view.test.ts": {
+        "ms": 42,
+        "method": "prose-backfill"
+      },
+      "tests/daily_rewards_stub.test.ts": {
+        "ms": 991,
+        "method": "prose-backfill"
+      },
+      "tests/death_controller_hint.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/death_lesson.test.ts": {
+        "ms": 1348,
+        "method": "prose-backfill"
+      },
+      "tests/deed_heraldry_plaque_core.test.ts": {
+        "ms": 275,
+        "method": "prose-backfill"
+      },
+      "tests/derelict_bomber.test.ts": {
+        "ms": 1467,
+        "method": "prose-backfill"
+      },
+      "tests/desktop_login_exit.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/dev_noaggro.test.ts": {
+        "ms": 294,
+        "method": "prose-backfill"
+      },
+      "tests/dungeon_door_online.test.ts": {
+        "ms": 2155,
+        "method": "prose-backfill"
+      },
+      "tests/duration_text.test.ts": {
+        "ms": 19,
+        "method": "prose-backfill"
+      },
+      "tests/entity_display_core.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/entity_display_name.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/entity_i18n.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/entity_labels_feast.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/entry_watch.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/equipment_instances_wire.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/error_text_i18n_core.test.ts": {
+        "ms": 18,
+        "method": "prose-backfill"
+      },
+      "tests/exchange_eligibility.test.ts": {
+        "ms": 948,
+        "method": "prose-backfill"
+      },
+      "tests/farm_bed_interact.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/farm_event_feedback.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/farm_golden_bonus.test.ts": {
+        "ms": 667,
+        "method": "prose-backfill"
+      },
+      "tests/farm_intro_quest_content.test.ts": {
+        "ms": 1178,
+        "method": "prose-backfill"
+      },
+      "tests/farm_intro_quest_journey.test.ts": {
+        "ms": 1302,
+        "method": "prose-backfill"
+      },
+      "tests/farm_patch_placement.test.ts": {
+        "ms": 227,
+        "method": "prose-backfill"
+      },
+      "tests/farm_patches_adapter.test.ts": {
+        "ms": 177,
+        "method": "prose-backfill"
+      },
+      "tests/farm_patches_core.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/farm_pattern_items.test.ts": {
+        "ms": 1510,
+        "method": "prose-backfill"
+      },
+      "tests/farm_props_asset.test.ts": {
+        "ms": 59,
+        "method": "prose-backfill"
+      },
+      "tests/farm_quest_objective.test.ts": {
+        "ms": 1511,
+        "method": "prose-backfill"
+      },
+      "tests/farm_ready.test.ts": {
+        "ms": 5828,
+        "method": "prose-backfill"
+      },
+      "tests/farm_recipes.test.ts": {
+        "ms": 2945,
+        "method": "prose-backfill"
+      },
+      "tests/farm_seed_channels.test.ts": {
+        "ms": 1430,
+        "method": "prose-backfill"
+      },
+      "tests/farm_verb_reachability.test.ts": {
+        "ms": 732,
+        "method": "prose-backfill"
+      },
+      "tests/farm_watch_fee.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/farmer_npc_placement.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/farmer_vendor_purchase.test.ts": {
+        "ms": 1738,
+        "method": "prose-backfill"
+      },
+      "tests/farming_anti_chore.test.ts": {
+        "ms": 5428,
+        "method": "prose-backfill"
+      },
+      "tests/farming_asset_manifest.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/farming_command_chain_online.test.ts": {
+        "ms": 1595,
+        "method": "prose-backfill"
+      },
+      "tests/farming_gate1_faucet.test.ts": {
+        "ms": 1223,
+        "method": "prose-backfill"
+      },
+      "tests/farming_plant_sheet_view.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/farming_plant_sheet_window.test.ts": {
+        "ms": 60,
+        "method": "prose-backfill"
+      },
+      "tests/farming_view.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/farming_windows_body_class.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/farming_zones.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/fear_wall_guard.test.ts": {
+        "ms": 1934,
+        "method": "prose-backfill"
+      },
+      "tests/feast_interact.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/feast_online.test.ts": {
+        "ms": 1325,
+        "method": "prose-backfill"
+      },
+      "tests/feast_tooltip_view.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/ferry_prewarm.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/flask_consumables.test.ts": {
+        "ms": 1261,
+        "method": "prose-backfill"
+      },
+      "tests/flower_meadows_core.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/fog_scene_state.test.ts": {
+        "ms": 34,
+        "method": "prose-backfill"
+      },
+      "tests/foliage_shore_gate_core.test.ts": {
+        "ms": 88,
+        "method": "prose-backfill"
+      },
+      "tests/gamepad_bindings.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/gamepad_control_hint.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/gamepad_settings.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/gardenwalk_pass.test.ts": {
+        "ms": 61,
+        "method": "prose-backfill"
+      },
+      "tests/gather_rare_event_feedback.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/gathering_supply_coverage.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/glb_instanced_props.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/gltf_decoder_csp.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/ground_telegraph_wire.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/guild_board_window.test.ts": {
+        "ms": 756,
+        "method": "prose-backfill"
+      },
+      "tests/guild_roster_view.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/harvest_journal_view.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/harvest_journal_window.test.ts": {
+        "ms": 56,
+        "method": "prose-backfill"
+      },
+      "tests/helpers/adopted_trophy_ids.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/hollow_gates.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/honor_event.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/idle_stationary.test.ts": {
+        "ms": 1468,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_arena.test.ts": {
+        "ms": 1856,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_arena_atmosphere.test.ts": {
+        "ms": 84,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_boss_model.test.ts": {
+        "ms": 1686,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_brand_telegraph.test.ts": {
+        "ms": 19,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_conduit.test.ts": {
+        "ms": 44,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_dev_raid.test.ts": {
+        "ms": 3013,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_encounter.test.ts": {
+        "ms": 100720,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_encounter_render.test.ts": {
+        "ms": 257,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_fire_beams.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_forge_chains.test.ts": {
+        "ms": 18,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_forge_chains_render.test.ts": {
+        "ms": 20,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_forge_judgment.test.ts": {
+        "ms": 55046,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_forge_wave.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_frontal_telegraph.test.ts": {
+        "ms": 20,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_judgment_fire_core.test.ts": {
+        "ms": 161,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_meteors.test.ts": {
+        "ms": 296,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_dressing.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_environment.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_expansion_asset_inputs.test.ts": {
+        "ms": 1379,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_flow.test.ts": {
+        "ms": 2066,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_gate.test.ts": {
+        "ms": 23,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_lore.test.ts": {
+        "ms": 10822,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_progression.test.ts": {
+        "ms": 9854,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_soak_telegraph.test.ts": {
+        "ms": 24,
+        "method": "prose-backfill"
+      },
+      "tests/ignivar_tile_kit.test.ts": {
+        "ms": 105,
+        "method": "prose-backfill"
+      },
+      "tests/inscription_catalog.test.ts": {
+        "ms": 25,
+        "method": "prose-backfill"
+      },
+      "tests/inscription_flow.test.ts": {
+        "ms": 1040,
+        "method": "prose-backfill"
+      },
+      "tests/inscription_scroll_exclusivity.test.ts": {
+        "ms": 1927,
+        "method": "prose-backfill"
+      },
+      "tests/inscription_tome_assets.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/interest_policy.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/inventory_extract.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/island_isolation_core.test.ts": {
+        "ms": 1547,
+        "method": "prose-backfill"
+      },
+      "tests/items_sell_units.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/jewelcrafting_catalog.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/jewelcrafting_flow.test.ts": {
+        "ms": 930,
+        "method": "prose-backfill"
+      },
+      "tests/kit_uv_surface_core.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/kit_window_panes_core.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/line_of_sight_elevation.test.ts": {
+        "ms": 2769,
+        "method": "prose-backfill"
+      },
+      "tests/lucent_infusion_guard.test.ts": {
+        "ms": 799,
+        "method": "prose-backfill"
+      },
+      "tests/mail_custody_parcels.test.ts": {
+        "ms": 1300,
+        "method": "prose-backfill"
+      },
+      "tests/masterwrought_budget.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/masterwrought_cap.test.ts": {
+        "ms": 9061,
+        "method": "prose-backfill"
+      },
+      "tests/masterwrought_materials.test.ts": {
+        "ms": 2020,
+        "method": "prose-backfill"
+      },
+      "tests/masterwrought_tooltip.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/material_ids_eval_order.test.ts": {
+        "ms": 2738,
+        "method": "prose-backfill"
+      },
+      "tests/material_ids_immutability.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/materials_vault.test.ts": {
+        "ms": 1917,
+        "method": "prose-backfill"
+      },
+      "tests/materials_vault_bootstrap.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/materials_vault_special.test.ts": {
+        "ms": 1113,
+        "method": "prose-backfill"
+      },
+      "tests/mech_chroma_ownership.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/menu_control_controller.test.ts": {
+        "ms": 25,
+        "method": "prose-backfill"
+      },
+      "tests/menu_strip_core.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/menu_strip_gesture_controller.test.ts": {
+        "ms": 30,
+        "method": "prose-backfill"
+      },
+      "tests/menu_strip_painter.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/merge_audit_golden_composition.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/merge_audit_shard_weight_union.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/merge_audit_symbol_census.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/mob_boss_mechanics.test.ts": {
+        "ms": 1141,
+        "method": "prose-backfill"
+      },
+      "tests/mobile_station_party.test.ts": {
+        "ms": 1002,
+        "method": "prose-backfill"
+      },
+      "tests/mobile_station_tooltip.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/nameplate_heraldry_core.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/nameplate_pledge.test.ts": {
+        "ms": 4564,
+        "method": "prose-backfill"
+      },
+      "tests/noticeboard_placements.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/noticeboard_popup.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/objective_glow_view.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/opened_object_view.test.ts": {
+        "ms": 1279,
+        "method": "prose-backfill"
+      },
+      "tests/overlay_ip_scrub.test.ts": {
+        "ms": 759,
+        "method": "prose-backfill"
+      },
+      "tests/pool_wiring_pins.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/pr_shot_entry_opts.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/preview_prewarm_wiring.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/professions_farming.test.ts": {
+        "ms": 17981,
+        "method": "prose-backfill"
+      },
+      "tests/professions_farming_state.test.ts": {
+        "ms": 2210,
+        "method": "prose-backfill"
+      },
+      "tests/professions_feast.test.ts": {
+        "ms": 39356,
+        "method": "prose-backfill"
+      },
+      "tests/professions_hoe_recipes.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/proving_shore_content.test.ts": {
+        "ms": 57,
+        "method": "prose-backfill"
+      },
+      "tests/provisioner_firewall.test.ts": {
+        "ms": 332,
+        "method": "prose-backfill"
+      },
+      "tests/provisioning_supply_line.test.ts": {
+        "ms": 2058,
+        "method": "prose-backfill"
+      },
+      "tests/provisioning_supply_line_apex.test.ts": {
+        "ms": 912,
+        "method": "prose-backfill"
+      },
+      "tests/purchase_intent_durability.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/quest_strip_controller.test.ts": {
+        "ms": 47,
+        "method": "prose-backfill"
+      },
+      "tests/quest_strip_core.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/quickening_catalyst_gate.test.ts": {
+        "ms": 2709,
+        "method": "prose-backfill"
+      },
+      "tests/radial_action_core.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/radial_gesture_controller.test.ts": {
+        "ms": 32,
+        "method": "prose-backfill"
+      },
+      "tests/radial_gesture_core.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/raid_music_themes.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/recipe_index_memo.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/recipe_pattern_items.test.ts": {
+        "ms": 1603,
+        "method": "prose-backfill"
+      },
+      "tests/recipe_pattern_tooltip_view.test.ts": {
+        "ms": 807,
+        "method": "prose-backfill"
+      },
+      "tests/recipe_reachability.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/report_window.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/reward_counters.test.ts": {
+        "ms": 765,
+        "method": "prose-backfill"
+      },
+      "tests/rogue_sap_control.test.ts": {
+        "ms": 3198,
+        "method": "prose-backfill"
+      },
+      "tests/rogue_shadeslip_friendly.test.ts": {
+        "ms": 1069,
+        "method": "prose-backfill"
+      },
+      "tests/rogue_stealth_targeting.test.ts": {
+        "ms": 1307,
+        "method": "prose-backfill"
+      },
+      "tests/rogue_utility_poisons.test.ts": {
+        "ms": 3949,
+        "method": "prose-backfill"
+      },
+      "tests/server/admin_flag_transition_legacy.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/server/admin_oversight.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/server/admin_oversight_legacy.test.ts": {
+        "ms": 33,
+        "method": "prose-backfill"
+      },
+      "tests/server/admin_oversight_redaction.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/server/auth_guard_bust_coverage.test.ts": {
+        "ms": 36,
+        "method": "prose-backfill"
+      },
+      "tests/server/auth_guard_core.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server/background_db_gate.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_batch_db.test.ts": {
+        "ms": 20,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_growth_budget.pg.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_growth_budget.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_growth_monitor.pg.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_growth_monitor.test.ts": {
+        "ms": 164,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_guild_prefix.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_outbox.test.ts": {
+        "ms": 19,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_save_effects_db.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_ledger_session.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/server/bank_vault_ledger_guard.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/server/character_delete_http.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server/character_save_transaction.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/server/claudium_spend_reachability.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/server/db_transaction_deadline.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/server/fake_woc_market_db.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/server/game_flag_host_boot.test.ts": {
+        "ms": 924,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_bank_lazy_loader.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_bank_op_coordinator.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_bank_receipt_db.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_create_db.pg.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_create_db.test.ts": {
+        "ms": 248,
+        "method": "prose-backfill"
+      },
+      "tests/server/guild_roster.test.ts": {
+        "ms": 13,
+        "method": "prose-backfill"
+      },
+      "tests/server/heavy_self.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/server/http/client_perf_metrics.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/server/live_character_resolver.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/server/newborn_island_spawn.test.ts": {
+        "ms": 955,
+        "method": "prose-backfill"
+      },
+      "tests/server/paid_guild_creation_bounds.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/server/pg_rollback_proof.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/server/serial_writer.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/server/service_reachability.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_applied_effect_queue.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_gates.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_ladder_hold.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_prices_boot.test.ts": {
+        "ms": 976,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_purchase_db.pg.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_purchase_db.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_purchase_db_abort.test.ts": {
+        "ms": 470,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_purchases.test.ts": {
+        "ms": 13791,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_recovery_coordinator.test.ts": {
+        "ms": 439,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_recovery_gate.test.ts": {
+        "ms": 613,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_recovery_session_sweep.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/server/storage_wire_ledger.test.ts": {
+        "ms": 57,
+        "method": "prose-backfill"
+      },
+      "tests/server/varkhul_wire.test.ts": {
+        "ms": 36,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_auth_guard_cache.test.ts": {
+        "ms": 1015,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_auth_guard_wiring.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_backfill.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_custody.test.ts": {
+        "ms": 1111,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_delivery.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_directed_sql.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_env_docs.test.ts": {
+        "ms": 192,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_escrow_gate.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_escrow_queue.test.ts": {
+        "ms": 2341,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_hot_reads.test.ts": {
+        "ms": 35,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_local_ledgers.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_monitor.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_price_cache.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_proxy.test.ts": {
+        "ms": 15,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_read_cache.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_routes.test.ts": {
+        "ms": 25,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_service.test.ts": {
+        "ms": 122,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_stepup.test.ts": {
+        "ms": 53,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_stepup_flow.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_sweep_watchdog.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server/woc_market_wire_pins.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/server/ws_auth_login_covenant.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/server_sim_facade.test.ts": {
+        "ms": 27,
+        "method": "prose-backfill"
+      },
+      "tests/signpost_read.test.ts": {
+        "ms": 1187,
+        "method": "prose-backfill"
+      },
+      "tests/stance_control_controller.test.ts": {
+        "ms": 24,
+        "method": "prose-backfill"
+      },
+      "tests/stance_radial_core.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/starting_attack.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/stealth_pet_vanish.test.ts": {
+        "ms": 2570,
+        "method": "prose-backfill"
+      },
+      "tests/storage_charters.test.ts": {
+        "ms": 1942,
+        "method": "prose-backfill"
+      },
+      "tests/storage_grant_monotonic.test.ts": {
+        "ms": 1,
+        "method": "prose-backfill"
+      },
+      "tests/storage_price_guard.test.ts": {
+        "ms": 818,
+        "method": "prose-backfill"
+      },
+      "tests/storage_prices.test.ts": {
+        "ms": 683,
+        "method": "prose-backfill"
+      },
+      "tests/storage_rung_echo_core.test.ts": {
+        "ms": 18,
+        "method": "prose-backfill"
+      },
+      "tests/storage_rung_echo_wiring.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/store_decision_prompt.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/store_focus_policy.test.ts": {
+        "ms": 18,
+        "method": "prose-backfill"
+      },
+      "tests/store_purchase_intent.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/suspicion_flag_list.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/suspicion_flag_workflow.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/suspicion_flags.test.ts": {
+        "ms": 11,
+        "method": "prose-backfill"
+      },
+      "tests/suspicion_flags_db.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/tap_menu.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/tap_menu_core.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/teleport_camera.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/terms_link.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/trade_woc_arm_painter.test.ts": {
+        "ms": 108,
+        "method": "prose-backfill"
+      },
+      "tests/trade_woc_view.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/transfer_lock.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/tutorial_graduation_deed.test.ts": {
+        "ms": 1276,
+        "method": "prose-backfill"
+      },
+      "tests/tutorial_greeting.test.ts": {
+        "ms": 3106,
+        "method": "prose-backfill"
+      },
+      "tests/tutorial_greeting_view.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/tutorial_start_dispatch.test.ts": {
+        "ms": 913,
+        "method": "prose-backfill"
+      },
+      "tests/usd_text.test.ts": {
+        "ms": 303,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_add_models.test.ts": {
+        "ms": 178,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_anvil_meteors.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_anvil_render.test.ts": {
+        "ms": 28,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_anvils_decree.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_assembly.test.ts": {
+        "ms": 1012,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_assembly_focus_core.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_assembly_render.test.ts": {
+        "ms": 318,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_assembly_wire.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_callout.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_cinder_artificer.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_cinder_orb_render.test.ts": {
+        "ms": 26,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_cinder_orb_wire.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_cinder_orbs.test.ts": {
+        "ms": 16,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_damage_attack_animation.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_dev_raid.test.ts": {
+        "ms": 2351,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_encounter.test.ts": {
+        "ms": 41551,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_encounter_render.test.ts": {
+        "ms": 30,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_engage.test.ts": {
+        "ms": 2155,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forge_beam_render.test.ts": {
+        "ms": 84,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forge_beams.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forge_encounter.test.ts": {
+        "ms": 119765,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forge_hammer_render.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forge_intermission.test.ts": {
+        "ms": 10,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_forgestorm_render.test.ts": {
+        "ms": 55,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_frontal.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_grand_forge.test.ts": {
+        "ms": 42,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_intercept_beam.test.ts": {
+        "ms": 9,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_intercept_beam_encounter.test.ts": {
+        "ms": 2494,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_intercept_beam_render.test.ts": {
+        "ms": 20,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_visual_manifest.test.ts": {
+        "ms": 12,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_worldfire.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/varkhul_worldfire_render.test.ts": {
+        "ms": 101,
+        "method": "prose-backfill"
+      },
+      "tests/vault_consumption_admission.test.ts": {
+        "ms": 155,
+        "method": "prose-backfill"
+      },
+      "tests/vault_craft_gate.test.ts": {
+        "ms": 642,
+        "method": "prose-backfill"
+      },
+      "tests/vault_snapshot_wire.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/vault_view.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/vault_window.test.ts": {
+        "ms": 192,
+        "method": "prose-backfill"
+      },
+      "tests/vault_wire.test.ts": {
+        "ms": 2187,
+        "method": "prose-backfill"
+      },
+      "tests/vendor_stock_gate_core.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/wallet_bridge_reason_text.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/wallet_card_keys.test.ts": {
+        "ms": 3,
+        "method": "prose-backfill"
+      },
+      "tests/wallet_verify_request.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/wellfed.test.ts": {
+        "ms": 41123,
+        "method": "prose-backfill"
+      },
+      "tests/wellfed_tooltip_composition.test.ts": {
+        "ms": 8,
+        "method": "prose-backfill"
+      },
+      "tests/wellfed_tooltip_view.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/woc_affordable_core.test.ts": {
+        "ms": 2,
+        "method": "prose-backfill"
+      },
+      "tests/woc_balance_chip.test.ts": {
+        "ms": 16,
+        "method": "prose-backfill"
+      },
+      "tests/woc_log_tones.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_authguard_pg_integration.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_bond_pg_integration.test.ts": {
+        "ms": 7733,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_chrome.test.ts": {
+        "ms": 18,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_copy_figures.test.ts": {
+        "ms": 23,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_delivery_pg_integration.test.ts": {
+        "ms": 9364,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_directed_pg_integration.test.ts": {
+        "ms": 4165,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_plan_pins_pg_integration.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_poll_core.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_realm_scope_pg_integration.test.ts": {
+        "ms": 100,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_reason_text.test.ts": {
+        "ms": 6,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_rules.test.ts": {
+        "ms": 17,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_sdk.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_settlement_pg_integration.test.ts": {
+        "ms": 5750,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_stepup_pg_integration.test.ts": {
+        "ms": 3273,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_sweep.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_view.test.ts": {
+        "ms": 7,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_window.test.ts": {
+        "ms": 21,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_window_rig.test.ts": {
+        "ms": 605,
+        "method": "prose-backfill"
+      },
+      "tests/woc_market_wiring.test.ts": {
+        "ms": 5,
+        "method": "prose-backfill"
+      },
+      "tests/woc_tokens_text.test.ts": {
+        "ms": 14,
+        "method": "prose-backfill"
+      },
+      "tests/woc_trade_controller.test.ts": {
+        "ms": 61,
+        "method": "prose-backfill"
+      },
+      "tests/woc_trade_offer_view.test.ts": {
+        "ms": 4,
+        "method": "prose-backfill"
+      }
+    },
+    "backfill": {
+      "date": "2026-08-31",
+      "note": "The 410 rows this table carried before the machine-readable map existed (masterwrought Phases 11d to 11m, disclosed in the localMerge prose below and nowhere else). Attributed in ONE pass on 2026-08-31 by differencing the committed table against the pure harvest of run 32621561241 (commit 402fe4a46a, 2960 rows, 2939 of which survive here at their harvested value): every row absent from that blob is carried, and the prose is its only surviving provenance, so none of them can claim a run id or a measurement date. New rows never take this method: ci_shard_weights_harvest.mjs --carry-local writes local-median entries naming every run, and the next full-mode harvest supersedes all of these."
+    },
     "localMerge": "2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer table (run 32621561241, 3281 rows), whose own provenance reads: \"2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer table (run 32621561241, 3191 rows), whose own provenance reads: \"2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer table (run 32621561241, 2991 rows), whose own provenance reads: \"2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer CI harvest (run 32190441549, 2851 rows) wins on every shared key and 28 rows only the other parent's table carried keep that table's measured weight, sourced from the older table (run 32103940330), whose own provenance reads: \"2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched; files counts the merged table (2830 CI-harvested + 49 carried)\"; no weight is hand-written; files counts the merged table (2851 harvested + 28 carried); 2026-08-22 masterwrought Phase 11f: FOUR branch-only rows carried from a local measurement (the median of three consecutive single-file runs each), for suites that do not exist on CI yet and so cannot be harvested: farm_golden_bonus 667, farm_pattern_items 1510, farm_seed_channels 1430, provisioner_firewall 332. Carried because without them the suite-completeness guard measured-coverage floor (95%) drops under the bar and the LPT balance claim stops being measured; no CI-harvested weight is touched; 2026-08-22 masterwrought Phase 11g QA release sync (release/v0.40.0 to 3e49dc11b3): EIGHT branch-only rows carried from a local measurement (the median of three consecutive runs each, read from the same per-file reporter line the harvester parses), for the suites that arrived WITH that merge and so are not in any harvest this table descends from: build_retry_gate 2, inert_instance_corpse 777, mail_bot_welcome 689, mail_bot_welcome_purge 6, rift_collider_cells 459, server/static_fd_leak 1057, sfx_rift_pending_sweep 2, view_resource_disposal 16. Carried for exactly the reason the Phase 11f carry above records: without them the suite-completeness guard's measured-coverage floor (95%) falls to 0.9483 and the LPT balance claim stops being measured. The merge is what moved it, since those eight files raise the denominator without raising the covered count. No CI-harvested weight is touched, and the next full-mode harvest supersedes all eight | 2026-08-22 apex supply line (masterwrought Phase 11h): SEVEN rows CARRIED, not harvested. The ninth release sync brought six new test files (the entry-admission and prewarm work) and this phase added one (tests/provisioning_supply_line_apex.test.ts), which took the coverage ratio under the 0.95 floor: 2887/3042 = 0.9490 as the red was first observed (measured before this phase's own test file existed) and 2887/3043 = 0.9487 with it counted, since the seventh uncovered file is this phase: the merge raised the denominator without raising the covered count, the shard-weight union hazard the packet's record already warns about. Each carried value is the MEDIAN of three consecutive local runs, read from the same reporter line scripts/lib/ci_shard_weight_parse.mjs parses in CI. NO CI-harvested weight was touched and no existing row moved; the next full-mode harvest supersedes all seven. LOWERING THE FLOOR WAS CONSIDERED AND REFUSED, for the reason the 11g QA recorded when it carried eight: the ratio is the only signal that says this table still describes the tree, and under it the LPT balance bar grades the planner against its own assumption instead of reality. | 2026-08-23 masterwrought Phase 11i QA release sync (release/v0.40.0 50462dda83 to 14ab2e8630): KEY UNION of the two parent harvests. The release's harvest (run 32621561241, 2960 rows, 2026-08-23) is the newer full-mode run and WINS ON EVERY SHARED KEY; 31 rows only this branch's table carried keep that table's measured weight, sourced from run 32190441549 and the local carries its own provenance above records. No weight is hand-written and no CI-harvested weight is touched; files counts the merged table (2960 harvested + 31 carried, after dropping 4 stale branch-only rows whose test file no longer exists in the merged tree: tests/hdr_resample.test.ts, tests/legacy_druid_hunter_skill_art.test.ts, tests/legacy_skill_art_replacements.test.ts, tests/legacy_skill_repaint_provenance.test.ts). THE JUSTIFICATION FIRST RECORDED HERE WAS MEASURED OVER THE WRONG POPULATION AND IS CORRECTED. It said the release's table alone left coverage at 0.9524, four rows of slack against the 0.95 floor. That walk counted tests/browser and *.test.mjs, which walkTestFiles (scripts/merge_audit/shard_weight_union.mjs) excludes, so it was not the population the guard grades. Re-measured the GUARD's way over its 3063 walked files: the release table alone is 2960/3063 = 0.9664, comfortably clear of the floor, and this union is 2991/3063 = 0.9765. So the union is NOT what keeps the guard green, and claiming it was would have been a false reason for a correct action. What it actually buys is that the 31 rows only this branch has measured keep their real durations instead of falling to the median fallback, which is what the LPT packing is graded on. A coverage figure is only evidence about the set it walked.\" wins on every shared key and 46 rows only the other parent's table carried keep that table's measured weight, sourced from the older table's CI harvest (run 32621561241); no weight is hand-written; files counts the merged table (2991 harvested + 46 carried) | 2026-08-24 masterwrought Phase 11k QA release sync (release/v0.40.0 b39b16022e to efb1220e85, the FOURTEENTH sync and the first real one since the twelfth): KEY UNION of the two parent harvests. Both parents carry the SAME harvest run (32621561241), so no shared key moved: the release side is itself a union (its own note records 46 branch-only rows carried from a local measurement into feature/woc-marketplace), and 46 rows only it carries are CARRIED here with that table's values. No weight is hand-written and no CI-harvested weight is touched. FIVE stale rows were dropped because their test file no longer exists in the merged tree: tests/hdr_resample.test.ts, tests/legacy_druid_hunter_skill_art.test.ts, tests/legacy_skill_art_replacements.test.ts, tests/legacy_skill_repaint_provenance.test.ts, tests/trade_woc_panel.test.ts. Measured the GUARD's way over its walked tree: 3032/3171 = 0.9562, clear of the 0.95 floor, so no fresh harvest is owed before this phase closes. | 2026-08-25 masterwrought Phase 11m release sync (release/v0.41.0 ff2837da1f, the seventeenth sync, 170 commits): 180 rows CARRIED from a local measurement (the median of three consecutive runs each, read from the same reporter line scripts/lib/ci_shard_weight_parse.mjs parses), for the test files the merged tree walks that no harvest this table descends from covers (the release's tutorial island, guild pledge board, Double Honor, marketplace and admin suites, plus this branch's farming and trophy suites); 21 stale rows DROPPED because their file no longer exists in the merged tree (the retired Vale Cup suites and the two camera-prompt suites). The merge is what moved the ratio: 3011/3191 = 0.9436 under the 0.95 floor as first observed. No CI-harvested weight is touched and no existing row moved; the next full-mode harvest supersedes every carried row; files counts the merged table (3191).\" wins on every shared key and 90 rows only the other parent's table carried keep that table's measured weight, sourced from the older table's CI harvest (run 32621561241); no weight is hand-written; files counts the merged table (3191 harvested + 90 carried)\" wins on every shared key and 68 rows only the other parent's table carried keep that table's measured weight, sourced from the older table's CI harvest (run 32621561241); no weight is hand-written; files counts the merged table (3281 harvested + 68 carried)"
   },
   "tests/abilities_command.test.ts": 2582,
@@ -531,6 +2200,8 @@
   "tests/ci_selection_pipeline.test.ts": 10,
   "tests/ci_shard_partition.test.ts": 169,
   "tests/ci_shard_plan.test.ts": 10878,
+  "tests/ci_shard_walk.test.ts": 21,
+  "tests/ci_shard_weight_carry.test.ts": 6,
   "tests/ci_shard_weight_parse.test.ts": 5,
   "tests/ci_stall_rerun.test.ts": 430,
   "tests/ci_test_select.test.ts": 29,

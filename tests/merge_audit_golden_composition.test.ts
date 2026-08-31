@@ -6,17 +6,22 @@
 // pin; these arms prove the two properties the phase leaned on: numeric
 // leaves must COMPOSE (merged - base == oursDelta + theirsDelta) and a moved
 // rng digest in a scenario neither side touched is a FINDING, not a delta.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   checkAdd,
   checkShared,
+  classifyLineage,
   composeLeaf,
   compositionVerdict,
   GOLDEN_FLOOR,
   isIdPath,
   missingFromMerged,
   newCtx,
+  newestReleaseRef,
+  releaseParentRefs,
 } from '../scripts/merge_audit/golden_composition.mjs';
+import { stripComments } from './helpers/strip_comments';
 
 const frame = (tick: number, over: Record<string, unknown> = {}) => ({
   tick,
@@ -47,8 +52,13 @@ describe('composeLeaf', () => {
     const ok = newCtx();
     composeLeaf(100, 110, 96, 106, 'hp', ok); // 100 + 10 - 4 = 106
     expect(ok.findings).toEqual([]);
+    expect(ok.sidePicks).toBe(0);
+    // Single mover (theirs kept base): the additive value IS the three-way
+    // value, so merged keeping base drops ours' move and reds. (The both-moved
+    // side-pick shape this arm used to reject is now the recorded rule's
+    // legitimate case; see the residual-holes block below.)
     const bad = newCtx();
-    composeLeaf(100, 110, 96, 110, 'hp', bad); // took ours, dropped theirs' delta
+    composeLeaf(100, 110, 100, 100, 'hp', bad);
     expect(bad.findings).toHaveLength(1);
     expect(bad.findings[0]).toContain('does not compose');
   });
@@ -301,6 +311,252 @@ describe('the dropped-golden class (Phase 11d QA)', () => {
     // RE-DERIVED at each re-record, not widened: 11f re-records these goldens.
     expect(GOLDEN_FLOOR).toBeGreaterThanOrEqual(60);
     expect(GOLDEN_FLOOR).toBeLessThanOrEqual(68);
+  });
+});
+
+describe('the release-parent model (the Phase 11e tool gap, closed at Phase 18)', () => {
+  // The census got its release-parent model at 11d QA; goldens never did, so a
+  // merged golden following a RELEASE parent on a leaf where both modelled
+  // parents agree on the other value read as "base 2, ours 2, theirs 2,
+  // merged 1": a correct verdict from an incomplete model (the milepost_boots
+  // loot.items rows, 16 findings, exit 1 for the rest of the branch's life).
+  const lootFrame = (items: string[]) =>
+    frame(0, { entities: [{ id: 963, hp: 100, loot: { items } }] });
+  const parents = () => ({
+    b: golden(undefined, [lootFrame(['a', 'b'])]),
+    o: golden(undefined, [lootFrame(['a', 'b'])]),
+    t: golden(undefined, [lootFrame(['a', 'b'])]),
+    m: golden(undefined, [lootFrame(['a'])]),
+  });
+
+  it('the milepost_boots shape composes when merged follows a release parent', () => {
+    const { b, o, t, m } = parents();
+    const release = golden(undefined, [lootFrame(['a'])]);
+    const { ctx } = checkShared('fx', b, o, t, m, [release]);
+    expect(ctx.findings).toEqual([]);
+    // The unaligned array is ONE release row covering both its .length and its
+    // whole-value check, COUNTED and sampled so the report shows what composed
+    // by release rather than by the additive rule.
+    expect(ctx.releaseComposed).toBe(1);
+    expect(ctx.releaseComposedPaths).toEqual(['frames[0:init#0].entities[0].loot.items']);
+    expect(ctx.unalignedArrays).toBe(1);
+  });
+
+  it('still reds when the release parent holds a THIRD value (no byte-equal release copy)', () => {
+    const { b, o, t, m } = parents();
+    // Same LENGTH as merged, different contents: a per-leaf escape on the
+    // .length row would have read this as one leaf composed by release. The
+    // unaligned arm is atomic, so nothing composes and both rows red.
+    const release = golden(undefined, [lootFrame(['z'])]);
+    const { ctx } = checkShared('fx', b, o, t, m, [release]);
+    expect(ctx.findings.some((f: string) => f.includes('loot.items.length'))).toBe(true);
+    expect(ctx.findings.some((f: string) => f.includes('whole-value'))).toBe(true);
+    expect(ctx.releaseComposed).toBe(0);
+  });
+
+  it('still reds with NO release parents (the pre-model behavior is unchanged)', () => {
+    const { b, o, t, m } = parents();
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings.length).toBeGreaterThan(0);
+    expect(ctx.releaseComposed).toBe(0);
+  });
+
+  it('an rng digest matching a release parent still reds (the determinism anchor never composes by release)', () => {
+    const b = golden();
+    const o = golden();
+    const t = golden();
+    const moved = { drawDigest: 'ffff' };
+    const m = golden(moved, [frame(0, { rng: { draws: 10, digest: 'ffff' } })]);
+    const release = golden(moved, [frame(0, { rng: { draws: 10, digest: 'ffff' } })]);
+    const { ctx } = checkShared('fx', b, o, t, m, [release]);
+    expect(ctx.findings.some((f: string) => f.includes('RNG MOVED'))).toBe(true);
+    expect(ctx.findings.some((f: string) => f.startsWith('drawDigest'))).toBe(true);
+    expect(ctx.releaseComposed).toBe(0);
+  });
+
+  it('a key ONLY merged and a release parent carry composes; without the release it is a finding, never a crash', () => {
+    // Pre-model, a merged-only key (exactly what a release parent adds) sent
+    // composeLeaf into unbounded recursion (RangeError) on the live tree, so
+    // the tool crashed before printing its header.
+    const byRelease = newCtx();
+    composeLeaf(undefined, undefined, undefined, 5, 'craftDaily', byRelease, [5]);
+    expect(byRelease.findings).toEqual([]);
+    expect(byRelease.releaseComposed).toBe(1);
+    const noRelease = newCtx();
+    composeLeaf(undefined, undefined, undefined, 5, 'craftDaily', noRelease);
+    expect(noRelease.findings).toHaveLength(1);
+    expect(noRelease.findings[0]).toContain('presence does not compose');
+    const otherRelease = newCtx();
+    composeLeaf(undefined, undefined, undefined, 5, 'craftDaily', otherRelease, [7, undefined]);
+    expect(otherRelease.findings).toHaveLength(1);
+  });
+
+  it('a REMOVED key never takes the escape (absence on a release parent is not a match)', () => {
+    const ctx = newCtx();
+    // base, ours, theirs all carry it; merged dropped it; the release parent
+    // never had the golden at all (undefined). Absence must not read as
+    // agreement: the finding stands.
+    composeLeaf(5, 5, 5, undefined, 'craftDaily', ctx, [undefined]);
+    expect(ctx.findings).toHaveLength(1);
+    expect(ctx.releaseComposed).toBe(0);
+  });
+
+  it('a two-way arm (parent-only frame) takes the same escape on a byte-equal release leaf', () => {
+    const b = golden(undefined, [frame(0)]);
+    const o = golden(undefined, [frame(0), frame(20, { entities: [{ id: 963, hp: 100 }] })]);
+    const t = golden(undefined, [frame(0)]);
+    const m = golden(undefined, [frame(0), frame(20, { entities: [{ id: 963, hp: 55 }] })]);
+    const release = golden(undefined, [frame(0), frame(20, { entities: [{ id: 963, hp: 55 }] })]);
+    const { ctx } = checkShared('fx', b, o, t, m, [release]);
+    expect(ctx.findings).toEqual([]);
+    expect(ctx.releaseComposed).toBe(1);
+    // And the same shape without the release copy is the finding it always was.
+    expect(
+      checkShared('fx', b, o, t, m).ctx.findings.some((f: string) => f.includes('non-id numeric')),
+    ).toBe(true);
+  });
+
+  it('classifies a golden on no modelled parent but on a release parent as a release-only add, not an orphan', () => {
+    const g = golden();
+    expect(classifyLineage({ b: g, o: g, t: g, releases: [] })).toBe('shared');
+    expect(classifyLineage({ b: null, o: g, t: null, releases: [] })).toBe('ours-only add');
+    expect(classifyLineage({ b: null, o: null, t: g, releases: [] })).toBe('theirs-only add');
+    expect(classifyLineage({ b: null, o: null, t: null, releases: [null, g] })).toBe(
+      'release-only add',
+    );
+    expect(classifyLineage({ b: null, o: null, t: null, releases: [null] })).toBe('orphan');
+    expect(classifyLineage({ b: null, o: null, t: null, releases: [] })).toBe('orphan');
+    // A partial lineage (base without a parent) stays an orphan even when a
+    // release parent carries the file: the four-way path needs all three.
+    expect(classifyLineage({ b: g, o: null, t: null, releases: [g] })).toBe('orphan');
+  });
+
+  it('composes the release-parent list in census order and dedupes on the resolved ref', () => {
+    const refs = releaseParentRefs({
+      releaseRef: 'R',
+      derived: [
+        { ref: 'S1', via: 'M1' },
+        { ref: 'R', via: 'M0' },
+      ],
+      extra: ['X', 'S1'],
+    });
+    expect(refs).toEqual([
+      { ref: 'R', via: null },
+      { ref: 'S1', via: 'M1' },
+      { ref: 'X', via: null },
+    ]);
+    // Resolution runs BEFORE dedupe, so two spellings of one commit collapse.
+    const resolved = releaseParentRefs({
+      releaseRef: 'main~0',
+      derived: [{ ref: 'MAIN', via: 'M' }],
+      extra: [],
+      resolve: (ref: string) => (ref === 'main~0' || ref === 'MAIN' ? 'abc' : ref),
+    });
+    expect(resolved).toEqual([{ ref: 'abc', via: null }]);
+    // The newest release tip (for the MISSING class) is the first derived sync
+    // when there is one, else the pinned release ref.
+    expect(newestReleaseRef({ releaseRef: 'R', derived: [{ ref: 'S1', via: 'M1' }] })).toBe('S1');
+    expect(newestReleaseRef({ releaseRef: 'R', derived: [] })).toBe('R');
+  });
+
+  it('REUSES the census release-parent derivation by import, never a copy', () => {
+    const src = stripComments(
+      readFileSync(
+        new URL('../scripts/merge_audit/golden_composition.mjs', import.meta.url),
+        'utf8',
+      ),
+    );
+    expect(src).toMatch(/import \{[^}]*\bderiveSyncRefs\b[^}]*\} from '\.\/symbol_census\.mjs'/);
+    expect(src).not.toMatch(/function deriveSyncRefs\b/);
+    expect(src).not.toContain('--first-parent');
+  });
+});
+
+describe('the two residual holes the 11d ledger recorded, patched', () => {
+  it('diffAgainst visits an APPENDED element past the overlap (MIN-LENGTH-ARRAY)', () => {
+    const p = golden(undefined, [frame(0, { entities: [{ id: 963, hp: 100 }] })]);
+    const m = golden(undefined, [
+      frame(0, {
+        entities: [
+          { id: 963, hp: 100 },
+          { id: 999, hp: 5 },
+        ],
+      }),
+    ]);
+    const { diffs } = checkAdd('fx', p, m, 'theirs');
+    // The length row stays, AND the appended element itself is now a row.
+    expect(diffs.other.some((x) => x.includes('entities.length 1 -> 2'))).toBe(true);
+    expect(diffs.presence.some((x) => x.includes('entities[1]') && x.includes('added'))).toBe(true);
+  });
+
+  it('a REMOVED element is visited too', () => {
+    const p = golden(undefined, [
+      frame(0, {
+        entities: [
+          { id: 963, hp: 100 },
+          { id: 999, hp: 5 },
+        ],
+      }),
+    ]);
+    const m = golden(undefined, [frame(0, { entities: [{ id: 963, hp: 100 }] })]);
+    const { diffs } = checkAdd('fx', p, m, 'theirs');
+    expect(diffs.presence.some((x) => x.includes('entities[1]') && x.includes('removed'))).toBe(
+      true,
+    );
+  });
+
+  it('an ours-only FRAME with an appended entity is a finding that names the element', () => {
+    const b = golden(undefined, [frame(0)]);
+    const o = golden(undefined, [frame(0), frame(20, { entities: [{ id: 963, hp: 100 }] })]);
+    const t = golden(undefined, [frame(0)]);
+    const m = golden(undefined, [
+      frame(0),
+      frame(20, {
+        entities: [
+          { id: 963, hp: 100 },
+          { id: 999, hp: 5 },
+        ],
+      }),
+    ]);
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(
+      ctx.findings.some(
+        (f: string) => f.includes('keys appeared or vanished') && f.includes('entities[1]'),
+      ),
+    ).toBe(true);
+  });
+
+  it('accepts a legitimate SIDE-PICK when BOTH parents moved a leaf, counted (ADDITIVE-COMPOSE)', () => {
+    const ours = newCtx();
+    composeLeaf(100, 110, 96, 110, 'hp', ours);
+    expect(ours.findings).toEqual([]);
+    expect(ours.sidePicks).toBe(1);
+    expect(ours.sidePickPaths).toEqual(['hp 100->110 (ours; theirs 96, additive 106)']);
+    const theirs = newCtx();
+    composeLeaf(100, 110, 96, 96, 'hp', theirs);
+    expect(theirs.findings).toEqual([]);
+    expect(theirs.sidePicks).toBe(1);
+    // The additive value is still accepted and is NOT a side-pick.
+    const additive = newCtx();
+    composeLeaf(100, 110, 96, 106, 'hp', additive);
+    expect(additive.findings).toEqual([]);
+    expect(additive.sidePicks).toBe(0);
+  });
+
+  it('reds a both-moved leaf whose merged value matches NEITHER parent NOR the additive rule', () => {
+    const ctx = newCtx();
+    composeLeaf(100, 110, 96, 105, 'hp', ctx);
+    expect(ctx.findings).toHaveLength(1);
+    expect(ctx.findings[0]).toContain('does not compose');
+    expect(ctx.findings[0]).toContain('expected 106, ours 110, or theirs 96');
+    expect(ctx.sidePicks).toBe(0);
+  });
+
+  it('keeps the single-mover rule strict: merged taking base on a leaf ours moved still reds', () => {
+    const ctx = newCtx();
+    composeLeaf(100, 110, 100, 100, 'hp', ctx);
+    expect(ctx.findings).toHaveLength(1);
+    expect(ctx.sidePicks).toBe(0);
   });
 });
 
