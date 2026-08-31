@@ -1,7 +1,8 @@
 // Mobile-station tool tooltip lines: what placing the Master's Field Forge
 // does, the party-share radius, the duration, that the tool is never
 // consumed, and the replace rule. Pure string-builder composed inside
-// Hud.itemTooltip (the tool_effect_tooltip.ts pattern): t() + esc here, no
+// Hud.itemTooltip (the tool_effect_tooltip.ts pattern): t() plus the shared
+// tooltip_line_core builder (which owns the esc) here, no
 // DOM, no Hud state, so tests/mobile_station_tooltip.test.ts drives it
 // directly.
 //
@@ -16,12 +17,8 @@ import {
 } from '../../../sim/content/professions';
 import { stationTypeForCraft } from '../../../sim/professions/stations';
 import { type ItemDef, type ItemUse, type StationType, TICK_RATE } from '../../../sim/types';
-import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
-
-function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {
-  return `<div class="${cls}">${esc(text)}</div>`;
-}
+import { tooltipLine } from '../../tooltip_line_core';
 
 type PlaceMobileStationUse = Extract<ItemUse, { type: 'placeMobileStation' }>;
 
@@ -54,11 +51,11 @@ export function mobileStationTooltipLines(
   const type = stationTypeForCraft(item.use.stationCraftId);
   const station = type ? stationName(type) : '';
   return (
-    line('tt-sub', t('hudChrome.professions.mobileStationTooltip.kind')) +
-    line('tt-green', t('hudChrome.professions.mobileStationTooltip.use', { station })) +
-    line('tt-desc', t('hudChrome.professions.mobileStationTooltip.radius', { radius })) +
-    line('tt-desc', t('hudChrome.professions.mobileStationTooltip.duration', { minutes })) +
-    line('tt-desc', t('hudChrome.professions.mobileStationTooltip.notConsumed')) +
-    line('tt-sub', t('hudChrome.professions.mobileStationTooltip.replace'))
+    tooltipLine('tt-sub', t('hudChrome.professions.mobileStationTooltip.kind')) +
+    tooltipLine('tt-green', t('hudChrome.professions.mobileStationTooltip.use', { station })) +
+    tooltipLine('tt-desc', t('hudChrome.professions.mobileStationTooltip.radius', { radius })) +
+    tooltipLine('tt-desc', t('hudChrome.professions.mobileStationTooltip.duration', { minutes })) +
+    tooltipLine('tt-desc', t('hudChrome.professions.mobileStationTooltip.notConsumed')) +
+    tooltipLine('tt-sub', t('hudChrome.professions.mobileStationTooltip.replace'))
   );
 }

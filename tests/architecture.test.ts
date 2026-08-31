@@ -524,6 +524,10 @@ const UI_PURE_CORES = [
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/hud/professions/mobile_station_tooltip.ts',
+  // The one line builder those three and recipe_pattern_tooltip_view share
+  // (the Phase 18 collapse of four private copies): emit-only, esc() and the
+  // class div, nothing else.
+  'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
   'src/ui/honor_float_view.ts',

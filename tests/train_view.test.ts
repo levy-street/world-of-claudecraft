@@ -7,8 +7,10 @@
 // same plain fields either way; sim-only junk must be ignored).
 import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
-import { COMBO_RECIPES, TROPHY_RECIPES } from '../src/sim/content/recipes';
+import { COMBO_RECIPES, recipeById, TROPHY_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { trainingFeeFor } from '../src/sim/professions/training';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import {
   availableTrainCopper,
   buildTrainView,
@@ -16,6 +18,11 @@ import {
   isStationMasterNpc,
   type TrainViewDeps,
 } from '../src/ui/hud/vendor/train_view';
+
+/** A drop-taught armorcrafting recipe: a PATTERN item teaches it, a trainer
+ *  never can (resolveTrain refuses it as train_not_taught_here), and it homes
+ *  to the forge, so it rides the same window as the trainer rows below. */
+const PATTERN_ONLY_RECIPE = 'recipe_spiritweld_girdle';
 
 // Base deps: nothing learned, no skill, comfortable purse.
 function deps(over: Partial<TrainViewDeps> & Record<string, unknown> = {}): TrainViewDeps {
@@ -387,6 +394,67 @@ describe('buildTrainView', () => {
     expect(
       settled.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable,
     ).toBe(true);
+  });
+
+  it('a fee-free pattern-item confirm reserves nothing (the unsolicited-learn over-reserve)', () => {
+    // TrainLearnTracker.resolve accepts an UNSOLICITED trainResult, so a
+    // pattern item (src/sim/professions/pattern_items.ts) read at a trainer
+    // joins the confirmed overlay exactly like a Learn click. It charges no
+    // fee at all: resolveTrain refuses a recipe with no 'trainer' acquisition
+    // before any charging arm, so the trainer path can never have debited the
+    // purse for one. Reserving its tier fee anyway (160 gold here) blanked the
+    // gold chip on every sibling row for the one broadcast until the cprof
+    // mirror landed.
+    const pattern = recipeById(PATTERN_ONLY_RECIPE);
+    expect(pattern?.acquisition, PATTERN_ONLY_RECIPE).toEqual(['drop']);
+    // Non-vacuity: the fee this must NOT reserve genuinely exceeds the purse,
+    // so a reserve of it would be visible on every arm below.
+    expect(trainingFeeFor(pattern as ProfessionRecipeRecord)).toBeGreaterThan(2500);
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        confirmedRecipes: new Set([PATTERN_ONLY_RECIPE]),
+      }),
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable).toBe(
+      true,
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_hauberk')?.affordable).toBe(
+      true,
+    );
+  });
+
+  it('a trainer learn confirmed alongside it still reserves ITS fee', () => {
+    // The narrowing must not become a blanket opt-out: a real trainer confirm
+    // riding the same overlay keeps reserving, so the sibling still disables.
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        confirmedRecipes: new Set([PATTERN_ONLY_RECIPE, 'recipe_ironlink_hauberk']),
+      }),
+    );
+    expect(view.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable).toBe(
+      false,
+    );
+  });
+
+  it('availableTrainCopper itself skips an un-chargeable id', () => {
+    // The rule lives in the pure reserve derivation, so it holds for any
+    // caller, not only through buildTrainView's own reserve construction.
+    expect(availableTrainCopper(2500, new Set([PATTERN_ONLY_RECIPE]))).toBe(2500);
+    expect(availableTrainCopper(2500, new Set(['recipe_ironlink_hauberk']))).toBe(0);
+    // And the row under pricing is still excluded from its own reserve.
+    expect(
+      availableTrainCopper(
+        2500,
+        new Set([PATTERN_ONLY_RECIPE, 'recipe_ironlink_hauberk']),
+        'recipe_ironlink_hauberk',
+      ),
+    ).toBe(2500);
   });
 
   it('the apothecary master lists BOTH apothecary crafts, with the alchemy combo teachable at tier 1', () => {

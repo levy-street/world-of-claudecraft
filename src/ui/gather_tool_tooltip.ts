@@ -1,7 +1,8 @@
 // Gathering-tool item tooltip lines (#2343): what a pick/axe/sickle/rod is,
 // what it is required for, how using it behaves, and its speed/fishing
 // bonuses. A pure string-builder composed inside Hud.itemTooltip (the
-// item_instance_tooltip.ts pattern): t() + esc here, no DOM, no Hud state,
+// item_instance_tooltip.ts pattern): t() plus the shared tooltip_line_core
+// builder (which owns the esc) here, no DOM, no Hud state,
 // so tests/gather_tool_tooltip.test.ts drives it directly. Numbers come
 // straight from the sim's own tuning constants, never re-invented copy:
 // the gather cast sheds GATHER_CAST_TOOL_TIER_REDUCTION_SEC per owned tier
@@ -37,9 +38,9 @@ import { isGatherToolUse } from '../sim/professions/tools';
 import { wieldRequirementForTier } from '../sim/professions/wield_gate';
 import type { ItemDef } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { esc } from './esc';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { tooltipLine } from './tooltip_line_core';
 
 const KIND_KEYS: Record<GatheringProfessionId, TranslationKey> = {
   mining: 'hudChrome.gathering.toolTooltip.kind.mining',
@@ -69,10 +70,6 @@ const USE_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
   farming: 'hudChrome.gathering.toolTooltip.use.farming',
 };
 
-function line(cls: 'tt-sub' | 'tt-desc', text: string): string {
-  return `<div class="${cls}">${esc(text)}</div>`;
-}
-
 /** The tooltip lines for one gathering implement, or '' for any other item.
  *  Handles both shapes: the tiered gatherTool items (picks, axes, sickles,
  *  rods) and the simple fishing pole (use.type 'fishing', which keeps its
@@ -82,25 +79,25 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   if (!use) return '';
   if (use.type === 'fishing') {
     return (
-      line('tt-desc', t('itemUi.tooltip.useFishing')) +
-      line('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'))
+      tooltipLine('tt-desc', t('itemUi.tooltip.useFishing')) +
+      tooltipLine('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'))
     );
   }
   if (!isGatherToolUse(use)) return '';
   const tier = formatNumber(use.tier, { maximumFractionDigits: 0 });
-  let html = line('tt-sub', t(KIND_KEYS[use.professionId], { tier }));
+  let html = tooltipLine('tt-sub', t(KIND_KEYS[use.professionId], { tier }));
   if (use.professionId === 'fishing') {
-    html += line('tt-desc', t('itemUi.tooltip.useFishing'));
-    html += line('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'));
+    html += tooltipLine('tt-desc', t('itemUi.tooltip.useFishing'));
+    html += tooltipLine('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'));
     // What the tier actually opens, said on the item that satisfies it, the
     // same way a pick names the vein tiers it can work.
     const unlocksFishing = UNLOCKS_KEYS.fishing;
-    if (unlocksFishing) html += line('tt-desc', t(unlocksFishing, { tier }));
+    if (unlocksFishing) html += tooltipLine('tt-desc', t(unlocksFishing, { tier }));
     if (use.tier > 1) {
       // Both numbers come from the sim's own functions rather than from a
       // second copy of its arithmetic. The copy is what shipped a tier-5 rod
       // advertising a second the bite clamp never gives.
-      html += line(
+      html += tooltipLine(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodBite', {
           seconds: formatNumber(fishBiteSavedSecFor(use.tier), { maximumFractionDigits: 2 }),
@@ -112,7 +109,7 @@ export function gatherToolTooltipLines(item: ItemDef): string {
       // rung. The line still states one number, the total the rod buys over
       // the base window, because a player holds one rod and cares what it is
       // worth, not how the sum was assembled.
-      html += line(
+      html += tooltipLine(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodReel', {
           seconds: formatNumber(
@@ -149,7 +146,7 @@ export function gatherToolTooltipLines(item: ItemDef): string {
         const fish = introduced
           ? tEntity({ kind: 'item', id: introduced, field: 'name' })
           : undefined;
-        html += line(
+        html += tooltipLine(
           'tt-desc',
           fish
             ? t('hudChrome.gathering.toolTooltip.rodBandCatch', { fish, skill })
@@ -161,8 +158,8 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   }
   const unlocksKey = UNLOCKS_KEYS[use.professionId];
   const useKey = USE_KEYS[use.professionId];
-  if (unlocksKey) html += line('tt-desc', t(unlocksKey, { tier }));
-  if (useKey) html += line('tt-desc', t(useKey));
+  if (unlocksKey) html += tooltipLine('tt-desc', t(unlocksKey, { tier }));
+  if (useKey) html += tooltipLine('tt-desc', t(useKey));
   // The R22 wield requirement, on the item that carries it: the same
   // "Requires {craft} {skill}" line the vendor's advisory sub-line renders,
   // with the number read from the one wield table the harvest gate enforces
@@ -174,7 +171,7 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   // the vendor painter: a fallback through the KIND keys would render
   // "Requires Mining tool 40", a wrong sentence rather than a missing one.
   if (wieldReq > 0 && professionNameKey !== undefined) {
-    html += line(
+    html += tooltipLine(
       'tt-desc',
       t('hudChrome.crafting.skillReqLine', {
         craft: t(professionNameKey),
@@ -183,7 +180,7 @@ export function gatherToolTooltipLines(item: ItemDef): string {
     );
   }
   if (use.tier > 1) {
-    html += line('tt-desc', t('hudChrome.gathering.toolTooltip.speed', { tier }));
+    html += tooltipLine('tt-desc', t('hudChrome.gathering.toolTooltip.speed', { tier }));
   }
   return html;
 }

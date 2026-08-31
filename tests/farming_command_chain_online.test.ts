@@ -776,6 +776,9 @@ describe('the four farm events reach the actor, and only the actor', () => {
   interface FarmEventFrame {
     pid?: number;
     reason?: string;
+    /** The bed the command named. On the wire because the online plant sheet
+     *  correlates its in-flight send with the deny that answers it by bed id. */
+    bedId?: string;
     cropId?: string;
     seedBackCount?: number;
   }
@@ -824,8 +827,16 @@ describe('the four farm events reach the actor, and only the actor', () => {
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: 'bed_eastbrook_2', crop: CROP }),
     );
     routeTick(server);
-    expect(farmEvents(fc.sent, 'farmDenied')).toHaveLength(1);
+    const denied = farmEvents(fc.sent, 'farmDenied');
+    expect(denied).toHaveLength(1);
     expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+    // The WIRE carries the bed the command named. The online plant sheet
+    // re-arms its Plant control only on a deny naming its own bed
+    // (src/ui/hud/professions/farming_plant_sheet_window.ts, the bedId-free
+    // deny race), so a serializer that dropped the field would leave the
+    // control dead online while every offline pin stayed green.
+    expect(denied[0].bedId).toBe('bed_eastbrook_2');
+    expect(denied[0].cropId).toBe(CROP);
   });
 
   it('delivers farmHusksConverted to the trader, never to a bystander', () => {

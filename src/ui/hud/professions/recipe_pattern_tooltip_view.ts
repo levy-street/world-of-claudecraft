@@ -8,7 +8,8 @@
 // crafting identity in (knownRecipes + craftSkills off IWorld's
 // craftingIdentity, identical offline and online), the core resolves the taught
 // recipe against static content and answers a small typed model, and the
-// string builder beside it renders that model with t() + esc, no DOM and no Hud
+// string builder beside it renders that model with t() plus the shared
+// tooltip_line_core builder (which owns the esc), no DOM and no Hud
 // state (the elixir_tooltip_view.ts / gather_tool_tooltip.ts pattern), so
 // tests/recipe_pattern_tooltip_view.test.ts drives both directly.
 //
@@ -45,8 +46,8 @@ import { ITEMS } from '../../../sim/data';
 import { tierForSkill } from '../../../sim/professions/wheel';
 import type { ItemDef } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
-import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { tooltipLine } from '../../tooltip_line_core';
 import { craftNameKey } from './craft_name_view';
 
 /** The viewer state the host projects in, satisfied structurally by IWorld's
@@ -128,10 +129,6 @@ export function recipePatternTooltipModel(
   };
 }
 
-function line(cls: 'tt-sub' | 'tt-desc' | 'tt-red', text: string): string {
-  return `<div class="${cls}">${esc(text)}</div>`;
-}
-
 /** The tooltip lines for one pattern item, or '' for any other item. */
 export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternViewerInput): string {
   const model = recipePatternTooltipModel(item, viewer);
@@ -142,7 +139,10 @@ export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternVi
   // FUNCTION and hand itemDisplayName a non-def.
   const result = Object.hasOwn(ITEMS, model.resultItemId) ? ITEMS[model.resultItemId] : undefined;
   if (result) {
-    html += line('tt-desc', t('hudChrome.pattern.teaches', { item: itemDisplayName(result) }));
+    html += tooltipLine(
+      'tt-desc',
+      t('hudChrome.pattern.teaches', { item: itemDisplayName(result) }),
+    );
   }
   // Everything below answers off the viewer's own progression, which an online
   // client does not have until its first cprof snapshot lands. Stop at the
@@ -156,7 +156,7 @@ export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternVi
   // skillReq of 0 states nothing, so it renders nothing either.
   const professionNameKey = craftNameKey(model.professionId);
   if (model.skillReq > 0 && professionNameKey !== undefined) {
-    html += line(
+    html += tooltipLine(
       model.skillMet ? 'tt-sub' : 'tt-red',
       t('hudChrome.crafting.skillReqLine', {
         craft: t(professionNameKey),
@@ -169,6 +169,6 @@ export function recipePatternTooltipLines(item: ItemDef, viewer: RecipePatternVi
   // the sim's own refusal (error.patternKnown in sim_i18n.ts), so a player who
   // reads the warning and clicks anyway gets no second, differently-worded
   // answer. Keep the two in step if either is ever reworded.
-  if (model.known) html += line('tt-red', t('hudChrome.training.alreadyKnown'));
+  if (model.known) html += tooltipLine('tt-red', t('hudChrome.training.alreadyKnown'));
   return html;
 }

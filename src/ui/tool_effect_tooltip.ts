@@ -32,6 +32,7 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { itemNameColor } from './item_name_color';
 import { toolEffectNameKey } from './tool_effect_name';
+import { tooltipLine } from './tooltip_line_core';
 
 /** Effect id -> bonus-description key. Mirrors TOOL_EFFECTS; an id absent here
  *  has no honest bonus line (a retired or unknown id renders no tooltip). */
@@ -41,10 +42,6 @@ const BONUS_KEYS: Record<ToolEffectId, TranslationKey> = {
   quickening_charm: 'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm',
   makers_charm: 'hudChrome.professions.toolEffectTooltip.bonus.makersCharm',
 };
-
-function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {
-  return `<div class="${cls}">${esc(text)}</div>`;
-}
 
 type ToolEffectUse = Extract<ItemUse, { type: 'toolEffect' }>;
 
@@ -104,17 +101,17 @@ function toolEffectBodyLines(effectId: string): string {
   const baseCharges = formatNumber(def.startingDurability, { maximumFractionDigits: 0 });
   const rarityBonus = formatNumber(RARITY_DURABILITY_BONUS, { maximumFractionDigits: 0 });
   return (
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
-    line('tt-green', t(bonusKey)) +
-    line('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
-    line(
+    tooltipLine('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
+    tooltipLine('tt-green', t(bonusKey)) +
+    tooltipLine('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
+    tooltipLine(
       'tt-desc',
       t('hudChrome.professions.toolEffectTooltip.charges', {
         base: baseCharges,
         bonus: rarityBonus,
       }),
     ) +
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.landOnly'))
+    tooltipLine('tt-sub', t('hudChrome.professions.toolEffectTooltip.landOnly'))
   );
 }
 

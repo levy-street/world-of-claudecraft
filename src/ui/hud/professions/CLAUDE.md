@@ -45,7 +45,12 @@ painter, a11y, i18n, and performance contracts.
 - In-flight sends mirror a `pendingSend` flag onto the root's `aria-busy`
   through ONE writer, cleared by the answering event AND by
   `notifyErrorToast` (the sim's dead/busy gates answer through `ctx.error`,
-  not a domain event).
+  not a domain event). THE ANSWER MUST NAME THE SUBJECT: the deny arms that
+  can answer a send all carry the id the command named (for farming, the
+  plant sheet's bed, pinned in `tests/farm_deny_bed_correlation.test.ts`), so
+  a deny that names another subject, or names none at all (the husk trade,
+  the shared feast), is somebody else's answer and never clears the flag. An
+  id-free deny racing an in-flight send is exactly how the arm re-arms early.
 - Flip-to-ready announcements are a persistent `role="status"` node beside
   the repaint target (never inside an `innerHTML`-rewritten subtree), fed a
   FRESH child span per announcement (harvest journal shape).

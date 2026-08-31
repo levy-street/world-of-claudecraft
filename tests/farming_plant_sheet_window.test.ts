@@ -443,13 +443,34 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     expect(world.plantCrop).toHaveBeenCalledTimes(1);
   });
 
-  it('a bedId-free deny (the husk-trade family) re-arms the control', () => {
+  it('a bedId-free deny (the husk-trade family) does NOT re-arm the control', () => {
+    // The race this closes: a husk trade or a feast refusal landing while a
+    // plant is in flight carries no bedId, so accepting it as the answer let
+    // a second click leave before the real deny arrived. Every deny that CAN
+    // answer a plant carries the bed it was asked about
+    // (tests/farm_deny_bed_correlation.test.ts pins that in the sim), so an
+    // unlabelled deny is provably somebody else's and is ignored here.
     const win = makeWindow();
     win.open(BED);
     root.querySelector<HTMLElement>('[data-plant]')?.click();
     win.notifyFarmEvent({ type: 'farmDenied', pid: 1, reason: 'no_husks' } as FarmEvent);
     root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    // The sheet is not stuck either: its own bed's deny still re-arms it.
+    win.notifyFarmEvent(denied(BED));
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
     expect(world.plantCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('a bedId-free deny does not repaint the sheet either', () => {
+    // The repaint half of the same rule: an unrelated deny changed nothing
+    // about this bed, so rebuilding the subtree (and with it the focus carry)
+    // is work the player never asked for.
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector('#plant-sheet-title')?.setAttribute('data-qa-sentinel', '1');
+    win.notifyFarmEvent({ type: 'farmDenied', pid: 1, reason: 'no_farmer' } as FarmEvent);
+    expect(root.querySelector('#plant-sheet-title')?.getAttribute('data-qa-sentinel')).toBe('1');
   });
 
   it('an error toast re-arms the Plant control without repainting (the dead/busy heal)', () => {

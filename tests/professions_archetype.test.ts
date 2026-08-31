@@ -13,8 +13,11 @@
 // These tests exercise the STATE MACHINE directly via its sim entry points
 // (acceptArchetypeQuest / advanceAmendsProgress / switchArchetype).
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING, oppositeCraft } from '../src/sim/content/professions';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import {
   ARCHETYPE_PAIR_TARGETS,
   type ArchetypeState,
@@ -24,14 +27,40 @@ import {
   canSwitchHobby,
   craftsForPairTarget,
   defaultHobbyForPair,
+  defaultHobbyForPairWithContentProbe,
   emptyArchetypeState,
   hobbyCandidatesForPair,
+  hobbyContentProbe,
   isAdjacentPairTarget,
   normalizeArchetypeState,
   requiredAmendsProgress,
   switchHobby,
 } from '../src/sim/professions/archetype';
+import type { CraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
+
+/** Repo root, from this file's location (the tests/ tree sits one below). */
+const repoRoot = path.join(__dirname, '..');
+
+/** The module that DECLARES the test-only hobby-content seam. */
+const OWNER = 'src/sim/professions/archetype.ts';
+
+/** Both test-only names, as one matcher the scan and its vacuity floor share. */
+const TEST_ONLY_NAMES = /hobbyContentProbe|defaultHobbyForPairWithContentProbe/;
+
+/** Every production `.ts` source, read once, with its repo-relative path
+ *  spelled with forward slashes at every depth (the walker's own form). */
+function productionSources(): { rel: string; source: string }[] {
+  const out: { rel: string; source: string }[] = [];
+  for (const root of ['src', 'server']) {
+    for (const { file, full } of tsFilesUnder(path.join(repoRoot, root))) {
+      out.push({ rel: `${root}/${file}`, source: readFileSync(full, 'utf8') });
+    }
+  }
+  return out;
+}
 
 function makeSim(seed = 42) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -377,18 +406,45 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
 
   it('the content-availability tiebreak still beats ring order (injected contentless set)', () => {
     // Since phase 06 every live ring craft carries content, so no live pair
-    // can reach the content arm; the injected set exists for exactly this
-    // pin (see the defaultHobbyForPair docblock). With inscription marked
+    // can reach the content arm; the injected probe exists for exactly this
+    // pin (see the HobbyContentProbe docblock). With inscription marked
     // contentless, the Bombardier default must fall PAST ring order (which
     // prefers inscription, the zero-skill case above) to enchanting, which
     // is precisely the soft-lock protection the arm encodes; deleting the
     // contentDelta lines reds this and nothing else.
-    const contentless = new Set(['enchanting']);
-    expect(defaultHobbyForPair('engineering', 'alchemy', {}, contentless)).toBe('enchanting');
-    // And a skill preference still outranks the injected content arm.
-    expect(defaultHobbyForPair('engineering', 'alchemy', { inscription: 5 }, contentless)).toBe(
-      'inscription',
+    const contentless = hobbyContentProbe(['enchanting']);
+    expect(defaultHobbyForPairWithContentProbe('engineering', 'alchemy', {}, contentless)).toBe(
+      'enchanting',
     );
+    // And a skill preference still outranks the injected content arm.
+    expect(
+      defaultHobbyForPairWithContentProbe(
+        'engineering',
+        'alchemy',
+        { inscription: 5 },
+        contentless,
+      ),
+    ).toBe('inscription');
+  });
+
+  it('the injected probe answers identically to production when it carries the live set', () => {
+    // Non-vacuity for the seam itself: the two entry points are one decision
+    // over two content sets, so handing the probe the live derived set must
+    // reproduce production exactly. Without this, the pin above could pass
+    // over a probe entry point that had quietly grown a second rule.
+    const live = hobbyContentProbe(ALL_RECIPES.map((recipe) => recipe.professionId));
+    for (const [a, b] of [
+      ['weaponcrafting', 'armorcrafting'],
+      ['engineering', 'alchemy'],
+      ['cooking', 'leatherworking'],
+    ] as const) {
+      const skillCases: CraftSkills[] = [{}, { tailoring: 10 }, { enchanting: 5 }];
+      for (const skills of skillCases) {
+        expect(defaultHobbyForPairWithContentProbe(a, b, skills, live), `${a}+${b}`).toBe(
+          defaultHobbyForPair(a, b, skills),
+        );
+      }
+    }
   });
 
   // Derived flip that landed with the jewelcrafting base catalog (Masterwrought
@@ -406,6 +462,59 @@ describe('defaultHobbyForPair skill preference (hobby default)', () => {
     expect(defaultHobbyForPair('cooking', 'leatherworking', { weaponcrafting: 5 })).toBe(
       'weaponcrafting',
     );
+  });
+});
+
+describe('the hobby content-set seam is type-enforced, not prose-guarded', () => {
+  // The refusal this replaces: `contentSet` was a DEFAULTED fourth parameter
+  // on defaultHobbyForPair, kept off production call sites by a docblock
+  // sentence alone. Both halves of the replacement are compile-time, so these
+  // pins are @ts-expect-error assertions (`npx tsc --noEmit` covers tests/,
+  // so a seam that stops enforcing turns the expectation into an unused
+  // directive and reds).
+  it('production callers cannot pass a content set at all', () => {
+    // @ts-expect-error defaultHobbyForPair takes exactly three parameters.
+    expect(defaultHobbyForPair('engineering', 'alchemy', {}, new Set(['enchanting']))).toBe(
+      'inscription',
+    );
+  });
+
+  it('the injecting entry point refuses a bare Set', () => {
+    expect(() =>
+      defaultHobbyForPairWithContentProbe(
+        'engineering',
+        'alchemy',
+        {},
+        // @ts-expect-error only hobbyContentProbe mints a HobbyContentProbe.
+        new Set(['enchanting']),
+      ),
+    ).toThrow();
+  });
+
+  it('no src/ or server/ module reaches the test-only names', () => {
+    // The type system cannot stop a production module from IMPORTING the
+    // probe entry point, so the last arm of the seam is this scan. The
+    // owning module is excluded (it declares them).
+    const offenders = productionSources()
+      .filter(({ rel }) => rel !== OWNER)
+      .filter(({ source }) => TEST_ONLY_NAMES.test(source))
+      .map(({ rel }) => rel);
+    expect(offenders).toEqual([]);
+  });
+
+  it('the scan reaches a real corpus, and would see the names if they were there', () => {
+    // Two vacuity floors, because a scan that reads nothing passes forever: a
+    // count over the real tree, and the owning module proving the regex
+    // actually matches the spellings the arm above hunts for.
+    const sources = productionSources();
+    expect(sources.length).toBeGreaterThan(500);
+    const owner = sources.find(({ rel }) => rel === OWNER);
+    expect(owner, 'archetype.ts must be inside the scanned corpus').toBeDefined();
+    expect(TEST_ONLY_NAMES.test(owner?.source ?? '')).toBe(true);
+  });
+
+  it('scans only through the shared walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });
 

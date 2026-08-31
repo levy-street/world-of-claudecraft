@@ -1,14 +1,16 @@
 // The plant sheet window painter (#plant-sheet-window): the window a press on
 // a free garden bed opens (Phase 9b, the bed verbs). The pure model lives in
 // farming_plant_sheet_view.ts; this module only paints it and sends the one
-// verb. Cold on purpose: paint on open, on a seed re-pick, and on a deny;
-// no clock, no signature memo, no layout read.
+// verb. Cold on purpose: paint on open, on a seed re-pick, and on a deny FOR
+// THIS BED; no clock, no signature memo, no layout read.
 //
 // THE SIM'S EVENTS ARE THE FEEDBACK (the husk-trade contract): the Plant
 // control sends IWorldFarming.plantCrop exactly once per activation and the
 // sheet STAYS OPEN. A farmPlanted for THIS bed closes it with the trap's own
-// focus restore (no successor window); a farmDenied leaves it open, re-arms
-// the control, and repaints affordability from the live bags. The sim's
+// focus restore (no successor window); a farmDenied FOR THIS BED leaves it
+// open, re-arms the control, and repaints affordability from the live bags
+// (a deny naming another bed, or naming none at all, is somebody else's
+// answer and is ignored: see notifyFarmEvent). The sim's
 // dead/busy gates answer through ctx.error rather than farmDenied (its
 // one-busy-sentence design), so the Hud also forwards every error toast via
 // notifyErrorToast, which re-arms without repainting: an answer arrived, the
@@ -163,7 +165,15 @@ export class PlantSheetWindow {
    *  clears the send arm (the answer arrived; a matched close clears it
    *  anyway, and an unmatched one must not leave the Plant control dead
    *  forever). A deny for this bed re-arms the Plant control and repaints
-   *  affordability; every other event is not this window's business. */
+   *  affordability; every other event is not this window's business.
+   *
+   *  THE DENY MUST NAME THIS BED. Every plantCrop deny arm carries the bedId
+   *  the command named (pinned in tests/farm_deny_bed_correlation.test.ts), so
+   *  a bedId-free farmDenied is provably NOT the answer to this send: it is
+   *  the husk trade or a feast refusal, which have no bed to carry. Accepting
+   *  one used to clear the send arm early, letting a second click leave before
+   *  the real deny landed. The dead and busy gates are the only plant refusals
+   *  with no farmDenied at all, and notifyErrorToast above is their backstop. */
   notifyFarmEvent(ev: FarmEvent): void {
     if (!this.isOpen || this.bedId === null) return;
     if (ev.type === 'farmPlanted') {
@@ -171,7 +181,7 @@ export class PlantSheetWindow {
       if (ev.bedId === this.bedId) this.close();
       return;
     }
-    if (ev.type === 'farmDenied' && (ev.bedId === undefined || ev.bedId === this.bedId)) {
+    if (ev.type === 'farmDenied' && ev.bedId === this.bedId) {
       this.setPendingSend(false);
       this.paint();
     }

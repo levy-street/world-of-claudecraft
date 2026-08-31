@@ -265,26 +265,48 @@ const CRAFTS_WITH_CONTENT: ReadonlySet<string> = new Set([
   'enchanting',
 ]);
 
-/** Choose the higher retained-skill hobby; among an equal-skill (typically
- * zero-skill) tie, prefer a candidate with real content (the derived
- * CRAFTS_WITH_CONTENT set) over one with none, and only then fall back to
- * ring order as the final stable tie break. This is used for first
- * attunement and old-save backfill.
- * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
- * hobby-switch quest still needs every ring-opposite candidate reachable by
- * player choice, content or not.
+/**
+ * The content-set injection seam for the hobby default, and the ONLY way to
+ * reach `chooseDefaultHobby`'s content arm with a set other than the live
+ * derived one.
  *
- * `contentSet` exists for TESTS ONLY and defaults to the live derived set:
- * since the phase 06 inscription catalog every ring craft has content, so no
- * live pair can exercise the content arm, and without an injection seam the
- * arm would be untestable dead-looking code (it stays because a future craft
- * seat with no recipes reopens the soft-lock it guards against). Production
- * call sites never pass it. */
-export function defaultHobbyForPair(
+ * WHY IT IS A BRANDED TYPE rather than a defaulted parameter. Since the phase
+ * 06 inscription catalog every ring craft has content, so no live pair can
+ * exercise the content arm; it stays because a future craft seat with no
+ * recipes reopens the soft-lock it guards against, and without an injection
+ * seam it would be untestable dead-looking code. The seam used to be a
+ * defaulted fourth parameter on `defaultHobbyForPair` kept off production call
+ * sites by PROSE alone. It is type-enforced now, two ways at once:
+ * `defaultHobbyForPair` takes exactly three parameters (a production caller
+ * that passes a content set is a compile error, not a review finding), and the
+ * injecting entry point below demands a value only `hobbyContentProbe` can
+ * mint (a bare `Set<string>` is a compile error too, so the entry point cannot
+ * be mistaken for an ordinary overload).
+ */
+declare const hobbyContentProbeBrand: unique symbol;
+export type HobbyContentProbe = {
+  readonly crafts: ReadonlySet<string>;
+} & { readonly [hobbyContentProbeBrand]: true };
+
+/** Mint a content-set probe for the hobby default's content arm. TEST-ONLY by
+ *  contract: no `src/` or `server/` module may import it, which
+ *  `tests/professions_archetype.test.ts` pins by scanning the tree. */
+export function hobbyContentProbe(crafts: Iterable<string>): HobbyContentProbe {
+  // The brand is a declared-only symbol with no runtime value, so the cast is
+  // how a probe is minted; nothing ever reads the brand.
+  return { crafts: new Set(crafts) } as unknown as HobbyContentProbe;
+}
+
+/** Choose the higher retained-skill hobby; among an equal-skill (typically
+ * zero-skill) tie, prefer a candidate with real content (`contentSet`) over
+ * one with none, and only then fall back to ring order as the final stable tie
+ * break. Shared body behind the two entry points below; the ONLY difference
+ * between them is which content set they hand it. */
+function chooseDefaultHobby(
   activeArchetype: string,
   pairedMajor: string,
-  skills: CraftSkills = {},
-  contentSet: ReadonlySet<string> = CRAFTS_WITH_CONTENT,
+  skills: CraftSkills,
+  contentSet: ReadonlySet<string>,
 ): string | null {
   const candidates = hobbyCandidatesForPair(activeArchetype, pairedMajor);
   if (candidates.length === 0) return null;
@@ -298,6 +320,33 @@ export function defaultHobbyForPair(
       CRAFT_RING.findIndex((craft) => craft.id === b)
     );
   })[0];
+}
+
+/** The production entry point: the hobby default over the LIVE derived content
+ * set. Used for first attunement and old-save backfill.
+ * Deliberately NOT applied in hobbyCandidatesForPair: the explicit
+ * hobby-switch quest still needs every ring-opposite candidate reachable by
+ * player choice, content or not.
+ *
+ * Three parameters, and that arity is the seam (see HobbyContentProbe above):
+ * a caller here can never choose the content set. */
+export function defaultHobbyForPair(
+  activeArchetype: string,
+  pairedMajor: string,
+  skills: CraftSkills = {},
+): string | null {
+  return chooseDefaultHobby(activeArchetype, pairedMajor, skills, CRAFTS_WITH_CONTENT);
+}
+
+/** The same decision over an INJECTED content set, for the arm live content
+ *  cannot reach. TEST-ONLY by contract, like the probe it demands. */
+export function defaultHobbyForPairWithContentProbe(
+  activeArchetype: string,
+  pairedMajor: string,
+  skills: CraftSkills,
+  content: HobbyContentProbe,
+): string | null {
+  return chooseDefaultHobby(activeArchetype, pairedMajor, skills, content.crafts);
 }
 
 // Escalation formula for the repeatable "make amends" quest: a modest linear
