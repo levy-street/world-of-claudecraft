@@ -71,7 +71,7 @@ export const PROVING_SHORE_ZONE: ZoneDef = {
     { x: -306, z: -22, label: 'The Gauntlet', id: 'the_gauntlet' },
   ],
   welcome:
-    'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.',
+    'The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line and, when you are ready, Ferryman Odo will see you across to the vale. You can also ring the bell to go to the vale directly.',
   welcomeQuestId: 'q_ps_the_gauntlet',
 };
 
