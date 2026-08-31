@@ -15,10 +15,27 @@
 // Pure leaf: no SimContext, no rng, no clock. The sim's move command and the HUD's grid
 // both call this, so what the player drags onto is what the server rearranges.
 
-import type { InvSlot } from './types';
+import type { InventoryPlacement, InvSlot } from './types';
 
 /** A laid-out bag: one entry per cell, null where the cell is empty. */
 export type BagCells = (InvSlot | null)[];
+
+/** Insert a swap replacement before the stack that followed its removed item,
+ *  so it inherits the vacated dense cell even when intervening removals shift the array. */
+export function insertInventoryEntryAtPlacement(
+  inventory: InvSlot[],
+  entry: InvSlot,
+  placement?: InventoryPlacement,
+): void {
+  if (!placement) {
+    inventory.push(entry);
+    return;
+  }
+  if (placement.slotHint !== undefined) entry.slot = placement.slotHint;
+  const anchorIndex = placement.anchor === null ? -1 : inventory.indexOf(placement.anchor);
+  if (anchorIndex < 0) inventory.push(entry);
+  else inventory.splice(anchorIndex, 0, entry);
+}
 
 /** Place every stack into a cell. A stack's `slot` is honored when it is a real, free
  *  cell of this bag; every other stack (and every stack whose hint was unusable) falls

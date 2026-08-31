@@ -19,11 +19,10 @@
 // that slot, and a pin re-checked mid-cast catches a bag that shifted underneath.
 //
 // This module is that mechanism, lifted out so every surface can share it. Both
-// halves are MOVES, byte-identical to the private originals they replace
+// halves preserve the selection and payload behavior of the private originals
 // (`consumeSelectedInventorySlot` and `disenchantVictimPin` from
-// professions/enchanting.ts, `consumeEquippedInventoryUnit` from items.ts), because
-// the golden-trace parity gate drives equip / discard / sell / use and an id-only
-// call must stay bit-for-bit what it was. The extraction is the rule of three:
+// professions/enchanting.ts, `consumeEquippedInventoryUnit` from items.ts). A removed
+// stack now also reports its additive placement. The extraction is the rule of three:
 // enchanting had it, items.ts had a near-copy of the fallback half, and the gear
 // loadout is the third caller.
 //
@@ -48,7 +47,21 @@
 // the refusal has to happen EARLIER than the consume, so the composed helper was
 // removed rather than left as documented-but-unused advice.
 
-import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './types';
+import {
+  cloneItemInstancePayload,
+  type InventoryPlacement,
+  type InventoryUnitWithPlacement,
+  type InvSlot,
+} from './types';
+
+export function inventoryPlacementForRemovedStack(
+  inventory: readonly InvSlot[],
+  index: number,
+  slot: Pick<InvSlot, 'slot'>,
+): InventoryPlacement {
+  const anchor = inventory[index] ?? null;
+  return slot.slot === undefined ? { anchor } : { anchor, slotHint: slot.slot };
+}
 
 /** Stable, order-independent JSON, so a pin does not depend on key insertion
  *  order. Moved verbatim from professions/enchanting.ts. */
@@ -101,8 +114,23 @@ export function itemCopyPin(slot: InvSlot | undefined): string {
 export function consumeSelectedInventorySlot(
   inventory: InvSlot[],
   itemId: string,
+  slotIndex: number,
+): InventoryUnitWithPlacement | null;
+export function consumeSelectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
+  slotIndex: undefined,
+): undefined;
+export function consumeSelectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
   slotIndex: number | undefined,
-): InventoryUnit | undefined | null {
+): InventoryUnitWithPlacement | undefined | null;
+export function consumeSelectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
+  slotIndex: number | undefined,
+): InventoryUnitWithPlacement | undefined | null {
   if (slotIndex === undefined) return undefined;
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
   const slot = inventory[slotIndex];
@@ -111,24 +139,30 @@ export function consumeSelectedInventorySlot(
     slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
   slot.count -= 1;
-  if (slot.count <= 0) inventory.splice(slotIndex, 1);
-  return { instance, craftedRecipeId };
+  let placement: InventoryPlacement | undefined;
+  if (slot.count <= 0) {
+    inventory.splice(slotIndex, 1);
+    placement = inventoryPlacementForRemovedStack(inventory, slotIndex, slot);
+  }
+  return { instance, craftedRecipeId, ...(placement ? { placement } : {}) };
 }
 
 /**
  * The legacy fallback: consume the NEWEST matching copy (highest bag index down).
  *
- * This is the historical guess, kept exactly as it was and deliberately NOT
- * improved. Every id-only caller still reaches it, including callers no UI can
+ * This keeps the historical selection order deliberately unchanged. Every id-only
+ * caller still reaches it, including callers no UI can
  * fix (`server/pbe_boost.ts` auto-gears by bare item id), and the parity goldens
  * drive equip / discard / sell / use through it, so any change here forks the
  * world. New surfaces should pass a selection instead of relying on this.
  *
- * Moved verbatim from `consumeEquippedInventoryUnit` (items.ts), parameterized on
- * the inventory array rather than PlayerMeta so it composes with the selected
- * walk above and needs no meta in a test.
+ * It takes the inventory array rather than PlayerMeta so it composes with the
+ * selected walk above and needs no meta in a test.
  */
-export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string): InventoryUnit {
+export function consumeNewestInventoryUnit(
+  inventory: InvSlot[],
+  itemId: string,
+): InventoryUnitWithPlacement {
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
     if (slot.itemId !== itemId) continue;
@@ -136,8 +170,12 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
       slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
     const craftedRecipeId = slot.craftedRecipeId;
     slot.count -= 1;
-    if (slot.count <= 0) inventory.splice(i, 1);
-    return { instance, craftedRecipeId };
+    let placement: InventoryPlacement | undefined;
+    if (slot.count <= 0) {
+      inventory.splice(i, 1);
+      placement = inventoryPlacementForRemovedStack(inventory, i, slot);
+    }
+    return { instance, craftedRecipeId, ...(placement ? { placement } : {}) };
   }
   return { instance: undefined, craftedRecipeId: undefined };
 }
@@ -147,9 +185,9 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
  * bag index down), SAME match predicate, but returns the live slot rather than
  * taking a unit from it. For a caller that must inspect the copy an id-only
  * command would consume BEFORE committing to consume it (equipBag's bag-payload
- * refusal, bags.ts, #2837): peeking through this function rather than a
- * bespoke walk is what keeps it locked to the real selection `ctx.removeItem`
- * (`Sim.removeItem`) makes, instead of drifting into its own guess.
+ * refusal, bags.ts, #2837), this preserves the historical newest-first selection.
+ * Empty-socket equipBag pairs the peek with `ctx.removeItem`; occupied swaps use
+ * `consumeNewestInventoryUnit` so the removed position is available.
  *
  * THE ONE PRECONDITION, stated because a caller that misses it destroys items.
  * This agrees with `Sim.removeItem` only when the newest matching slot holds

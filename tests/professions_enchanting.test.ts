@@ -1791,6 +1791,7 @@ describe('replaceVictimIndex / consumeEnchantedVictim (the shared victim walk)',
     const consumed = consumeEnchantedVictim(stacked, GEAR);
     expect(stacked).toHaveLength(1);
     expect(stacked[0].count).toBe(1);
+    expect(consumed?.placement).toBeUndefined();
     // Clone-on-survival: mutating the returned payload never reaches the
     // surviving stack's shared payload (the removeEnchantableItem contract).
     consumed!.instance!.rolled!.stats!.str = 99;

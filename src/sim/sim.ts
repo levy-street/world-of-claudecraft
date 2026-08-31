@@ -275,7 +275,7 @@ import * as guildBankMod from './guild_bank';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
-import { foldNamedSlotTarget } from './item_copy_ref';
+import { foldNamedSlotTarget, inventoryPlacementForRemovedStack } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -757,7 +757,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
-  type InventoryUnit,
+  type InventoryUnitWithPlacement,
   type InvSlot,
   type ItemInstancePayload,
   isConsuming,
@@ -8788,24 +8788,24 @@ export class Sim {
     return n;
   }
 
-  // Removal counterpart to countEnchantableItem above: prefers plain fungible
-  // stacks (matching removeFungibleItem's ordering within that subset) and only
-  // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
-  // Never removes an already-enchanted copy (isEnchantedInstance). Returns one
-  // InventoryUnit per unit actually consumed, from BOTH passes, so a caller
-  // applying an enchant can merge a crafted copy's signer/masterwork/legacy
-  // rolled.quality into the freshly-enchanted instance instead of silently
-  // dropping them (#1712 round-3 review) AND can re-stamp the plain-stack
-  // craftedRecipeId marker on the copy it mints. Pass 1 (plain stacks) used to
-  // report nothing at all, which is precisely how enchanting a common crafted
-  // item laundered its disenchant-gate provenance: a plain crafted stack keeps
-  // its marker on the SLOT, not in an `instance`, so a payload-only return had
-  // nowhere to put it.
-  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[] {
-    const consumed: InventoryUnit[] = [];
+  // Plain stacks remain preferred so a special copy is consumed only when needed.
+  // Returned units preserve both provenance channels and any vacated placement.
+  // Already-enchanted copies are never removed (isEnchantedInstance).
+  // #1712 plain crafted stacks keep their marker on the slot, so payload-only returns cannot carry it.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnitWithPlacement[] {
+    const consumed: InventoryUnitWithPlacement[] = [];
     const r = this.resolve(pid);
     if (!r) return consumed;
     const { meta } = r;
+    const recordPlacement = (index: number, slot: InvSlot, take: number): void => {
+      meta.inventory.splice(index, 1);
+      if (take <= 0) return;
+      consumed[consumed.length - 1].placement = inventoryPlacementForRemovedStack(
+        meta.inventory,
+        index,
+        slot,
+      );
+    };
     // Pass 1: plain fungible stacks only, same order removeFungibleItem uses.
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
@@ -8816,7 +8816,7 @@ export class Sim {
       }
       s.count -= take;
       count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
+      if (s.count <= 0) recordPlacement(i, s, take);
     }
     // Pass 2: instanced copies that are not already enchanted. Per-unit
     // returns with the same clone-on-survival rule removeItem follows: the
@@ -8835,7 +8835,7 @@ export class Sim {
       }
       s.count -= take;
       count -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
+      if (s.count <= 0) recordPlacement(i, s, take);
     }
     this.ctx.onInventoryChangedForQuests(meta);
     return consumed;

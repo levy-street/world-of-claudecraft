@@ -60,7 +60,12 @@ import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
+import { insertInventoryEntryAtPlacement } from '../inventory_order';
+import {
+  consumeSelectedInventorySlot,
+  inventoryPlacementForRemovedStack,
+  itemCopyPin,
+} from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
 import {
   consumePlayerVaultStock,
@@ -83,7 +88,9 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
+  type InventoryPlacement,
   type InventoryUnit,
+  type InventoryUnitWithPlacement,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
@@ -196,7 +203,7 @@ export function replaceVictimIndex(inventory: readonly InvSlot[], itemId: string
 export function consumeEnchantedVictim(
   inventory: InvSlot[],
   itemId: string,
-): InventoryUnit | undefined {
+): InventoryUnitWithPlacement | undefined {
   const i = replaceVictimIndex(inventory, itemId);
   if (i < 0) return undefined;
   const s = inventory[i];
@@ -204,8 +211,12 @@ export function consumeEnchantedVictim(
   const payload = survives && s.instance ? cloneItemInstancePayload(s.instance) : s.instance;
   const craftedRecipeId = s.craftedRecipeId;
   s.count -= 1;
-  if (s.count <= 0) inventory.splice(i, 1);
-  return { instance: payload, craftedRecipeId };
+  let placement: InventoryPlacement | undefined;
+  if (s.count <= 0) {
+    inventory.splice(i, 1);
+    placement = inventoryPlacementForRemovedStack(inventory, i, s);
+  }
+  return { instance: payload, craftedRecipeId, ...(placement ? { placement } : {}) };
 }
 
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
@@ -1031,6 +1042,26 @@ function resolveApplyEnchantWorn(
   return enchantSuccess(itemId, enchantId, vaultDraws);
 }
 
+function reinsertMintedInventoryReplacement(
+  meta: PlayerMeta,
+  itemId: string,
+  replacement: ItemInstancePayload,
+  placement: InventoryPlacement | undefined,
+  inventoryLengthBeforeMint: number,
+): void {
+  if (!placement) return;
+  const minted = meta.inventory[inventoryLengthBeforeMint];
+  // Sim.addItemInstance keeps the caller's payload object for the first minted unit.
+  if (
+    meta.inventory.length === inventoryLengthBeforeMint + 1 &&
+    minted?.itemId === itemId &&
+    minted.instance === replacement
+  ) {
+    meta.inventory.splice(inventoryLengthBeforeMint, 1);
+    insertInventoryEntryAtPlacement(meta.inventory, minted, placement);
+  }
+}
+
 /** The #2415 bagged replace arm: resolve one CONFIRMED apply onto the pinned
  *  already-enchanted victim copy of `itemId` (replaceVictimIndex: the
  *  highest-index enchanted copy, the same end-first order every remover in
@@ -1161,12 +1192,21 @@ function resolveReplaceEnchantBagged(
   // movement: this re-mints the player's OWN copy in place, the same reason
   // silent + callerLogs are set, so it is not a new acquisition for the
   // Reliquary tally either (re-enchanting a relic must not raise its count).
-  ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed.instance, enchant), pid, 1, {
+  const replacement = replacedEnchantPayloadFor(consumed.instance, enchant);
+  const inventoryLengthBeforeMint = meta.inventory.length;
+  ctx.addItemInstance(itemId, replacement, pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed.craftedRecipeId,
     movement: true,
   });
+  reinsertMintedInventoryReplacement(
+    meta,
+    itemId,
+    replacement,
+    consumed.placement,
+    inventoryLengthBeforeMint,
+  );
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
@@ -1315,7 +1355,7 @@ export function resolveApplyEnchant(
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
-  const merged = enchantedPayloadFor(consumed?.instance, enchant);
+  const merged = enchantedPayloadFor(consumed.instance, enchant);
   // silent + callerLogs: the enchantResult event fires its own dedicated cue
   // (audio.enchant in src/game/audio.ts) and logs the one enchant line. This
   // mint re-grants the player's OWN copy, so the hub's "You receive:" line
@@ -1329,12 +1369,22 @@ export function resolveApplyEnchant(
   // loop the player runs entirely on their own gear.
   // movement: the plain apply arm re-mints the player's own copy too (see the
   // replace arm above), so it is a relocation, not an acquisition.
+  const inventoryLengthBeforeMint = meta?.inventory.length;
   ctx.addItemInstance(itemId, merged, pid, 1, {
     silent: true,
     callerLogs: true,
-    craftedRecipeId: consumed?.craftedRecipeId,
+    craftedRecipeId: consumed.craftedRecipeId,
     movement: true,
   });
+  if (meta && inventoryLengthBeforeMint !== undefined) {
+    reinsertMintedInventoryReplacement(
+      meta,
+      itemId,
+      merged,
+      consumed.placement,
+      inventoryLengthBeforeMint,
+    );
+  }
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return enchantSuccess(itemId, enchantId, vaultDraws);
