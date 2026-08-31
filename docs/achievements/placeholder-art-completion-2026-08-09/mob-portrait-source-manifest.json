@@ -6,13 +6,24 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "6e34f2b4196edea7f0f1dc616683186e99c8f33e9bbef66b61867b3f767fc746",
+  "rendererFingerprint": "86a329a4dc072c581c4640fe104eb3d9dc673b321eedbc8a35010bc3029fcb26",
+  "renderEnv": {
+    "schemaVersion": 1,
+    "platform": "darwin",
+    "arch": "arm64",
+    "gpuVendor": "Google Inc. (Google)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "151",
+    "browserVersion": "Chrome/151.0.7922.175",
+    "requestedBackend": "swiftshader",
+    "fingerprint": "aae859fdabb9b3c929eac99e3f49e921ef7eb648e1e4ab42942654490a20fb96"
+  },
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 10988,
-        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
+        "bytes": 12980,
+        "sha256": "56c68ed052e18757b7ee489f9176081484b28a74ff70e66f0923ab7d0681269a"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
@@ -27,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4788289,
-      "sha256": "a82765897f6d2c11671d70ad77197367fa2470c0e54d4a7d31fa20003ea43d1b",
+      "bytes": 4793178,
+      "sha256": "8eaa8e9e23116321a481d617b558a09b48b97ed97eb2bc0117f0375d3bc9fdf4",
       "esbuildVersion": "0.28.1"
     },
     "output": {

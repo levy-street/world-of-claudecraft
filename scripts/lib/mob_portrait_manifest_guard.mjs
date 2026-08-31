@@ -1,4 +1,5 @@
 import { describeManifestDrift } from './mob_portrait_manifest_diff.mjs';
+import { describeRenderEnvDrift, formatRenderEnvDrift } from './mob_portrait_render_env.mjs';
 
 export function changedPortraitIds(previous, next) {
   if (!previous || previous.rendererFingerprint !== next.rendererFingerprint) {
@@ -25,7 +26,13 @@ export function rowChangedPortraitIds(previous, next) {
     .map((portrait) => portrait.id);
 }
 
-export function assertManifestWriteAuthorized({ previous, next, receipt, allowBootstrap = false }) {
+export function assertManifestWriteAuthorized({
+  previous,
+  next,
+  receipt,
+  allowBootstrap = false,
+  allowEnvironmentRemint = false,
+}) {
   if (!previous || previous.schemaVersion !== next.schemaVersion) {
     if (!allowBootstrap) {
       throw new Error(
@@ -67,6 +74,42 @@ export function assertManifestWriteAuthorized({ previous, next, receipt, allowBo
   }
   if (receipt.rendererFingerprint !== next.rendererFingerprint) {
     throw new Error('portrait renderer receipt does not match the current renderer fingerprint');
+  }
+  if (
+    receipt.renderEnv &&
+    next.renderEnv &&
+    receipt.renderEnv.fingerprint !== next.renderEnv.fingerprint
+  ) {
+    throw new Error('portrait renderer receipt does not match the recorded render environment');
+  }
+
+  // The receipt proves these bytes came out of a real render. It cannot tell
+  // whether they came out of the SAME MACHINE the committed bytes did, and that
+  // is the whole cross-environment ping-pong: two honest renders of identical
+  // inputs disagree byte for byte because portrait WebPs are deterministic per
+  // machine and not across GPU stacks. So when the render environment moved and
+  // every changed row's render input is byte-identical, refuse by default and
+  // say which fields moved. This is never a correctness claim about the pixels;
+  // it is a claim that nobody DECIDED to swap 242 rows to another environment.
+  // An unrecorded environment on either side stays silent by construction
+  // (describeRenderEnvDrift reports known:false), so a manifest minted before
+  // this field existed keeps working and simply records the environment on its
+  // next receipt-backed write.
+  const envDrift = describeRenderEnvDrift(previous.renderEnv, next.renderEnv);
+  if (envDrift.moved && !allowEnvironmentRemint) {
+    const before = new Map(previous.portraits.map((portrait) => [portrait.id, portrait]));
+    const contentHeld = changedIds.every(
+      (id) =>
+        before.get(id)?.sourceFingerprint ===
+        next.portraits.find((portrait) => portrait.id === id)?.sourceFingerprint,
+    );
+    if (contentHeld) {
+      throw new Error(
+        `portrait outputs for ${changedIds.length} row(s) were re-rendered in a DIFFERENT render ` +
+          `environment with every render input unchanged; pass --allow-environment-remint to ` +
+          `accept the swap deliberately\n${formatRenderEnvDrift(envDrift)}`,
+      );
+    }
   }
 
   const receiptRows = new Map(receipt.portraits.map((portrait) => [portrait.id, portrait]));
