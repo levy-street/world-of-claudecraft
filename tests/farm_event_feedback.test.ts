@@ -14,6 +14,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const audioMock = vi.hoisted(() => ({
   farmPlant: vi.fn(),
   farmHarvest: vi.fn(),
+  farmWithered: vi.fn(),
   farmReady: vi.fn(),
   farmFeast: vi.fn(),
 }));
@@ -221,10 +222,11 @@ describe('farm_event_feedback: the cue arms', () => {
     expect(audioMock.farmHarvest).not.toHaveBeenCalled();
   });
 
-  it('farmHarvested fires the harvest cue EXACTLY once and never the plant cue', () => {
+  it('farmHarvested fires the harvest cue EXACTLY once and never the plant or withered cue', () => {
     drive(HARVEST);
     expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
     expect(audioMock.farmPlant).not.toHaveBeenCalled();
+    expect(audioMock.farmWithered).not.toHaveBeenCalled();
   });
 
   it('the extra harvest LINES do not each earn their own cue', () => {
@@ -242,9 +244,14 @@ describe('farm_event_feedback: the cue arms', () => {
     expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
   });
 
-  it('farmWithered SHARES the harvest cue: the same action resolved, unluckily', () => {
+  it('farmWithered fires its OWN disappointment cue, never the harvest one', () => {
+    // The Phase 8/10 deferral closed: the withered outcome used to borrow
+    // farmHarvest, which told the player their action landed when it did not.
+    // Pinned in BOTH directions here and on the harvest arm above, because a
+    // shared cue is exactly what a one-line edit would restore.
     drive({ type: 'farmWithered', pid: 1, bedId: 'high_1', cropId: 'highland_barley', count: 2 });
-    expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmWithered).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmHarvest).not.toHaveBeenCalled();
     expect(audioMock.farmPlant).not.toHaveBeenCalled();
   });
 

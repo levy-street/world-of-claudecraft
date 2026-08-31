@@ -26,7 +26,7 @@ import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
-import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
+import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { craftNameText } from './hud/professions/craft_name_view';
@@ -661,8 +661,15 @@ export class CharWindow {
       if (!drag) return;
       const item = ITEMS[drag.itemId];
       const world = this.deps.world();
+      // Re-resolve the dragged COPY every dragover, not once at pick-up: the
+      // bags can shift mid-drag, after which the pick-up index either names
+      // nothing (the socket stays lit from dragstart while the drop is silently
+      // refused: the light-then-refuse) or names a different copy of the same id
+      // (worse, since that drop succeeds on the wrong piece).
+      const named = draggedCopySlotIndex(world.inventory, drag.itemId, drag);
       if (
         !item ||
+        named === null ||
         paperdollDropAction(
           item,
           slot,
@@ -672,7 +679,7 @@ export class CharWindow {
           world.equipment,
           world.equipmentInstances,
           world.inventory,
-          drag.index ?? undefined,
+          named,
         ) !== 'equip'
       )
         return;
@@ -685,14 +692,21 @@ export class CharWindow {
       e.preventDefault();
       this.deps.dragState.end();
       this.markDropTargets(null);
-      // The desktop drop carries the drag's bag index the same way the touch path
+      // The desktop drop carries the drag's bag copy the same way the touch path
       // does; without it the most ordinary equip gesture fell back to the guess.
-      // `drag.index` is already null for a sorted or filtered grid, which names no
-      // position, so that case correctly sends no selection.
+      // Resolved by PIN against the live bags (see the dragover above), so an
+      // untouched drag lands on its own cell and a shifted one follows its copy;
+      // null means the copy left the bags, which refuses with the sim's own
+      // wording rather than letting the id-only walk take an id-mate.
+      const named = draggedCopySlotIndex(this.deps.world().inventory, drag.itemId, drag);
+      if (named === null) {
+        this.deps.showError(tSim('error.noItem'));
+        return;
+      }
       this.dropOnEquipSlot(
         drag.itemId,
         slot,
-        drag.index !== null && drag.index >= 0 ? { slotIndex: drag.index } : undefined,
+        named === undefined ? undefined : { slotIndex: named },
       );
     });
   }

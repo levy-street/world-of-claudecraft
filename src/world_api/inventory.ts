@@ -1,4 +1,5 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
+import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 
@@ -39,13 +40,22 @@ export interface IWorldInventory {
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
   useItem(itemId: string, target?: { slotIndex: number }): void;
-  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
+  /** `target.anchor` is the OPTIONAL ordinal-plus-count description of the copy
+   *  the player clicked (src/sim/item_copy_anchor.ts). The slot index alone
+   *  proves only that the cell still holds this ITEM; the anchor proves it
+   *  still holds this COPY, which is the case a lagging mirror actually breaks
+   *  (a splice moves every slot down one and the index lands on the id-mate
+   *  beside the piece the player picked). Server-revalidated: the sim
+   *  re-derives the anchor against its OWN bags and refuses a mismatch with the
+   *  existing not-held answer. Omit it and the command behaves exactly as it
+   *  always has, which is what keeps an older client working. */
+  discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void;
   /** Lock or unlock the ONE bag copy at `target.slotIndex` (issue 3042): a
    *  locked copy refuses salvage, profession-craft reagent consumption, and
    *  vendor sell (single and bulk) until unlocked again. Always targets a
    *  specific slot (mutate-in-place, item_copy_ref.ts selectedInventorySlot),
    *  never an id-only bulk toggle. */
-  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void;
+  setItemLocked(itemId: string, locked: boolean, target: NamedSlotTarget): void;
   // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
   // requests as many units as the buyer can currently afford in one purchase,
   // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews
@@ -55,7 +65,7 @@ export interface IWorldInventory {
   // at most one of the two fields. An empty/omitted bag buys the ordinary
   // single unit (or the food/drink staple stack), byte-identical to today.
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void;
-  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
+  sellItem(itemId: string, count?: number, target?: NamedSlotTarget): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
