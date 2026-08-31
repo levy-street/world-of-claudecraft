@@ -3158,14 +3158,28 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['drop'],
     stationType: 'apothecary',
   },
-  // THE LONGEST BILL IN THE GAME after this phase: seven reagent entries, where
-  // the previous maximum across the merged table was six (Phase 11g's roast and
-  // seasoned stock) and five before that. The claim is not left to this comment:
-  // tests/provisioning_supply_line_apex.test.ts derives the maximum over
-  // ALL_RECIPES and pins this row as the only member at seven, so a later phase
-  // that ties or beats it visits that arm rather than this sentence.
-  // Nothing in src/ or server/ slices or
-  // caps a reagent list, so the seventh row renders by existing.
+  // THE LONGEST BILL IN THE GAME: eight reagent entries, and FOUR rows hold it,
+  // this one plus the three apex feasts (recipe_sageleaf_feast,
+  // recipe_stonepot_feast, recipe_warspice_feast). Below it the table steps down
+  // cleanly: seven on the three role plates, six on six rows.
+  //
+  // NO HISTORY IS RESTATED HERE, deliberately. This sentence used to carry its
+  // own chain of previous maxima and went stale the moment the record moved,
+  // which is how it came to claim seven and a single holder while the pin beside
+  // it already said otherwise. tests/provisioning_supply_line_apex.test.ts
+  // derives the maximum over ALL_RECIPES, pins all three tiers BY ID, and records
+  // the history in its own messages, so a later phase that ties or beats eight
+  // visits that arm rather than this sentence.
+  //
+  // The eighth row renders by existing, and that is a BEHAVIORAL pin now rather
+  // than an asserted absence: tests/longest_reagent_bill_render.test.ts sweeps
+  // every max-length row through the crafting view core (count and authored
+  // order), all three of renderCraftingWindow's join sites (the inline spans, the
+  // tooltip string, the button's accessible name) and the wiki's craftDetailHtml
+  // counted page-wide. The old wording asserted that nothing in src/ or server/
+  // slices or caps a reagent list, which a source scan cannot actually establish:
+  // it sees neither a cap introduced through a helper, nor a CSS line-clamp, nor
+  // a painter that stops early. The sweep sees all three.
   //
   // THE THREE SURFACES THAT ACTUALLY DRAW IT, traced rather than assumed,
   // because Phase 11g's own record named a fourth that structurally cannot:
