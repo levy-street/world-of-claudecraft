@@ -291,6 +291,47 @@ describe('plant sheet window: selection and knobs', () => {
     expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
   });
 
+  it('the seed radios are ONE roving tab stop: arrows move the pick and focus, Home/End jump', () => {
+    // APG roving tabindex over the radiogroup (the Phase 18 sweep closed the
+    // recorded farming/state.md follow-up): only the checked seed is in the
+    // Tab order, arrows move the pick and the focus together (the repaint
+    // carries focus by the seed's key), Home/End jump, the ends wrap, and a
+    // key the roving core does not own falls through untouched.
+    world.inventory.push({ itemId: CARROT.seedItemId, count: 2 });
+    makeWindow().open(BED);
+    const seeds = (): HTMLButtonElement[] => [
+      ...root.querySelectorAll<HTMLButtonElement>('[data-seed-crop]'),
+    ];
+    const key = (el: HTMLElement, k: string): boolean =>
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+    const picked = (): Array<string | null> => seeds().map((el) => el.getAttribute('aria-checked'));
+    const tabs = (): Array<string | null> => seeds().map((el) => el.getAttribute('tabindex'));
+    expect(seeds().length).toBe(2);
+    expect(picked()).toEqual(['true', 'false']);
+    expect(tabs()).toEqual(['0', '-1']);
+    seeds()[0].focus();
+    expect(key(seeds()[0], 'ArrowDown')).toBe(false);
+    expect(picked()).toEqual(['false', 'true']);
+    expect(tabs()).toEqual(['-1', '0']);
+    expect(document.activeElement).toBe(seeds()[1]);
+    // Wrap past the end, then Home / End.
+    key(seeds()[1], 'ArrowRight');
+    expect(picked()).toEqual(['true', 'false']);
+    expect(document.activeElement).toBe(seeds()[0]);
+    key(seeds()[0], 'End');
+    expect(picked()).toEqual(['false', 'true']);
+    expect(document.activeElement).toBe(seeds()[1]);
+    key(seeds()[1], 'Home');
+    expect(picked()).toEqual(['true', 'false']);
+    expect(document.activeElement).toBe(seeds()[0]);
+    // Unowned key: no preventDefault, no repaint, the pick stands.
+    const before = seeds()[0];
+    expect(key(before, 'Tab')).toBe(true);
+    expect(seeds()[0]).toBe(before);
+    // Nothing here sends: the pick is view state until Plant is activated.
+    expect(world.plantCrop).not.toHaveBeenCalled();
+  });
+
   it('flips a knob toggle in place through aria-pressed', () => {
     makeWindow().open(BED);
     const compost = root.querySelector<HTMLElement>('[data-knob="compost"]');

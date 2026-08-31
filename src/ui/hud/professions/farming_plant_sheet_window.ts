@@ -23,6 +23,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
+import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
 import type { FarmEvent } from './farm_event_feedback';
 import {
@@ -216,16 +217,36 @@ export class PlantSheetWindow {
     }
   }
 
+  /** Pick the seed row `row` (a click or a roving-key landing). `focus` is
+   *  true for a key landing: the row is focused BEFORE the repaint so
+   *  captureFocusKey carries it by the seed's key; a click leaves focus where
+   *  the pointer blur or the keyboard put it. */
+  private pickSeed(row: HTMLElement, focus: boolean): void {
+    if (focus) row.focus();
+    const cropId = row.dataset.seedCrop ?? null;
+    if (cropId === null || cropId === this.selectedCropId) return;
+    this.selectedCropId = cropId;
+    this.paint();
+  }
+
   private wire(root: HTMLElement): void {
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    for (const btn of root.querySelectorAll<HTMLElement>('[data-seed-crop]')) {
-      btn.addEventListener('click', () => {
-        const cropId = btn.dataset.seedCrop ?? null;
-        if (cropId === null || cropId === this.selectedCropId) return;
-        this.selectedCropId = cropId;
-        this.paint();
+    const seeds = [...root.querySelectorAll<HTMLElement>('[data-seed-crop]')];
+    seeds.forEach((btn, index) => {
+      btn.addEventListener('click', () => this.pickSeed(btn, false));
+      // The APG radiogroup keys through the shared roving core: arrows (both
+      // axes, the rows are a vertical stack), Home and End move the pick and
+      // the focus as one; every other key falls through to the window (the
+      // Tab trap, Escape, Enter/Space activation stay native).
+      btn.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        const next = rovingTarget(ke.key, index, seeds.length, 'both');
+        if (next === null) return;
+        ke.preventDefault();
+        const target = seeds[next];
+        if (target) this.pickSeed(target, true);
       });
-    }
+    });
     for (const btn of root.querySelectorAll<HTMLButtonElement>('[data-knob]')) {
       btn.addEventListener('click', () => {
         const id = btn.dataset.knob as PlantSheetKnobId;
@@ -260,12 +281,17 @@ export class PlantSheetWindow {
     // its name, the li wrappers are presentational so the radios are the
     // group's owned children, and the LOCKED rows live in their own plain
     // list: they are not options, so they never dilute the radio count AT
-    // reports. Every radio stays a natively tabbable button (Tab reaches
-    // each, Enter/Space picks); the roving-tabindex refinement is deliberate
-    // future polish, not a gap the axe suite flags.
+    // reports. The group is an APG roving-tabindex radiogroup (the Phase 18
+    // sweep): the picked seed is the ONE tab stop (the first row when nothing
+    // is picked, which the view never produces) and the rest are reached by
+    // arrow; Enter/Space on a real button still picks.
+    const tabStop = Math.max(
+      0,
+      view.seedRows.findIndex((row) => row.selected),
+    );
     const seeds =
       view.seedRows.length > 0
-        ? `<ul class="ps-list" role="radiogroup" aria-labelledby="plant-sheet-title">${view.seedRows.map((row) => this.seedRowHtml(row)).join('')}</ul>`
+        ? `<ul class="ps-list" role="radiogroup" aria-labelledby="plant-sheet-title">${view.seedRows.map((row, i) => this.seedRowHtml(row, i === tabStop)).join('')}</ul>`
         : '';
     const locked =
       view.lockedRows.length > 0
@@ -282,10 +308,10 @@ export class PlantSheetWindow {
     return `${seeds}${locked}${knobs}${plant}`;
   }
 
-  private seedRowHtml(row: PlantSheetSeedRow): string {
+  private seedRowHtml(row: PlantSheetSeedRow, tabStop: boolean): string {
     const name = itemName(row.seedItemId);
     return (
-      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
+      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" tabindex="${tabStop ? '0' : '-1'}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
       `<span class="ps-name">${esc(name)}</span>` +
       `<span class="ps-count">${esc(wholeNumber(row.seedCount))}</span>` +
       `</button></li>`

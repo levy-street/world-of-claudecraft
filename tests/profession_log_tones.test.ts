@@ -8,10 +8,10 @@
 //
 // The re-spell scan walks the WHOLE professions family directory (not a fixed
 // file list like the $WOC pin): a new module joining the family joins the
-// scan with it. src/ui/hud.ts still spells some of these values for its
-// pre-existing log calls; that is separate debt outside this family's
-// directory (its ratchet freezes it this phase), deliberately not scanned
-// here for the same reason the $WOC pin stays $WOC-scoped.
+// scan with it. src/ui/hud.ts is outside this family's directory and is held
+// hex-free by its own guard (tests/hud_tones.test.ts, the Phase 18 sweep),
+// deliberately not scanned here for the same reason the $WOC pin stays
+// $WOC-scoped.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {

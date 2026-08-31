@@ -4,6 +4,8 @@
 // the "open a new order" form wires the right callback args, and each
 // action button fires the matching deps callback with the row's order id.
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { buildCommissionOrderBoardModel } from '../src/ui/hud/professions/commission_order_view';
@@ -11,6 +13,7 @@ import {
   type CommissionOrderWindowDeps,
   renderCommissionOrderWindow,
 } from '../src/ui/hud/professions/commission_order_window';
+import { t } from '../src/ui/i18n';
 import type { CommissionOrderView } from '../src/world_api/professions';
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
@@ -136,6 +139,75 @@ describe('renderCommissionOrderWindow', () => {
     renderCommissionOrderWindow(el, buildCommissionOrderBoardModel([], [], ITEMS), d);
     (el.querySelector('[data-close]') as HTMLButtonElement).click();
     expect(d.onClose).toHaveBeenCalledOnce();
+  });
+});
+
+// The chrome dialog contract (src/ui/CLAUDE.md; the Masterwrought Phase 18
+// sweep): the board root is a dialog with exactly one accessible name, opens on
+// the family's flex-column shell, and Hud drives the shared focus trap and
+// opener restore around it the way it does for the crafting window.
+describe('commission board dialog semantics', () => {
+  it('marks the root role=dialog with ONE accessible name (the label form) and aria-modal false', () => {
+    const el = document.createElement('div');
+    renderCommissionOrderWindow(el, buildCommissionOrderBoardModel([], [], ITEMS), deps());
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-modal')).toBe('false');
+    expect(el.getAttribute('tabindex')).toBe('-1');
+    expect(el.getAttribute('aria-label')).toBe(t('hudChrome.commissionBoard.title'));
+    expect(el.getAttribute('aria-labelledby')).toBeNull();
+  });
+
+  it('opens on the family flex-column display value, not display:block', () => {
+    const el = document.createElement('div');
+    renderCommissionOrderWindow(el, buildCommissionOrderBoardModel([], [], ITEMS), deps());
+    expect(el.style.display).toBe('flex');
+    // The column rule that makes 'flex' a column lives on the id in the
+    // stylesheet (the #professions-window precedent).
+    // process.cwd(), not import.meta.url: jsdom's URL refuses the file scheme.
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    const rule = /#commission-board-window \{([^}]*)\}/.exec(css)?.[1] ?? '';
+    expect(rule).toMatch(/flex-direction:\s*column;/);
+  });
+
+  it('a repaint keeps the dialog attributes (markDialogRoot runs on every render)', () => {
+    const el = document.createElement('div');
+    const d = deps();
+    renderCommissionOrderWindow(el, buildCommissionOrderBoardModel([], [], ITEMS), d);
+    renderCommissionOrderWindow(
+      el,
+      buildCommissionOrderBoardModel([order({ mine: true })], [], ITEMS),
+      d,
+    );
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-label')).toBe(t('hudChrome.commissionBoard.title'));
+  });
+
+  it('Hud captures the opener AFTER the paint and restores it on close (source pins)', () => {
+    // The coordinator cannot be unit-driven; the crafting window's shape is
+    // pinned the same way. Slice each method to its own closing brace so the
+    // pins cannot be satisfied by another window's identical calls.
+    const hud = readFileSync(resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain(
+      "private readonly commissionBoardFocus = this.windowFocus('#commission-board-window');",
+    );
+    const openStart = hud.indexOf('openCommissionBoard(): void {');
+    expect(openStart).toBeGreaterThan(-1);
+    const open = hud.slice(openStart, hud.indexOf('\n  }', openStart));
+    expect(open.length).toBeLessThan(1200);
+    const paintAt = open.indexOf('this.renderCommissionBoard();');
+    const captureAt = open.indexOf(
+      'this.commissionBoardOpenerFocus = this.commissionBoardFocus.captureFocus();',
+    );
+    expect(paintAt).toBeGreaterThan(-1);
+    expect(captureAt).toBeGreaterThan(paintAt);
+    const closeStart = hud.indexOf('closeCommissionBoard(): void {');
+    expect(closeStart).toBeGreaterThan(-1);
+    const close = hud.slice(closeStart, hud.indexOf('\n  }', closeStart));
+    expect(close.length).toBeLessThan(800);
+    expect(close).toContain(
+      'this.commissionBoardFocus.restoreFocus(this.commissionBoardOpenerFocus);',
+    );
+    expect(close).toContain('this.commissionBoardOpenerFocus = null;');
   });
 });
 

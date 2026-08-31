@@ -15087,6 +15087,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.rankAnnounce': '{name}が完全化ランク{rank}/{ranks}に到達しました。',
   'hudChrome.perfecting.perfectedAnnounce': '{name}は完全化されました。',
   'hudChrome.perfecting.promotedAnnounce': '{name}は{chosen}として鍛え上げられました。',
+  'hudChrome.perfecting.unknownItem': '不明なアイテム',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    'バッグの中身が変わりました：命名中の品を確認できません。鍛える前に選択を確認してください。',
   'hudChrome.perfecting.rowPromoted': '伝説',
   'hudChrome.perfecting.attemptCost': '挑戦コスト',
   'hudChrome.perfecting.promoteCost': '昇格コスト',

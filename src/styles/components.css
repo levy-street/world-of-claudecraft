@@ -6243,6 +6243,20 @@
     display: block;
     margin-top: 2px;
   }
+  /* A reagent entry never breaks between its name and its have/required
+     count (the .guide-prof-mat wiki twin's rule): a wrapped count reads as a
+     stray number on the next line. */
+  .crafting-reagent {
+    white-space: nowrap;
+  }
+  /* One reagent entry never breaks between its name and its have/required
+     count: an inline-block with nowrap wraps the reagent LIST between entries
+     instead (the wiki twin, .guide-prof-mat in src/guide/styles.css, which
+     this mirrors so the two surfaces read a bill the same way). */
+  .crafting-reagent {
+    display: inline-block;
+    white-space: nowrap;
+  }
   /* Unsatisfied reagents tint toward the error red; the have/required counts
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {
@@ -6837,8 +6851,12 @@
       min-height: 40px;
     }
   }
+  /* The column-flex shell the professions windows share (#professions-window
+     below): the painter opens the board with display:flex, so the title,
+     intro, form and sections stack as a column. */
   #commission-board-window {
     width: 460px;
+    flex-direction: column;
   }
   .commission-board-intro {
     display: block;

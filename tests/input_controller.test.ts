@@ -1,7 +1,9 @@
 // @vitest-environment happy-dom
 //
-// The extracted input modal (src/ui/input_dialog.ts, the Masterwrought
-// phase 14 hud.ts ratchet payback). The move kept Hud.inputDialog's behavior
+// The extracted input modal (src/ui/input_controller.ts, the Masterwrought
+// phase 14 hud.ts ratchet payback; renamed from input_dialog.ts at the Phase
+// 18 sweep so the painter gate's *_controller filename sweep covers it). The
+// move kept Hud.inputDialog's behavior
 // (the shared #confirm-dialog slot, the trap lifecycle through the deps bag,
 // Enter-submits, the copy affordance) and fixed three recorded gaps IN the
 // new module: the field's accessible name, the maxLength cap, and the busy
@@ -16,7 +18,7 @@ vi.mock('../src/game/audio', () => ({
 }));
 
 import { audio } from '../src/game/audio';
-import { type InputDialogDeps, showInputDialog } from '../src/ui/input_dialog';
+import { type InputDialogDeps, showInputDialog } from '../src/ui/input_controller';
 
 function makeDeps(): InputDialogDeps & {
   calls: string[];

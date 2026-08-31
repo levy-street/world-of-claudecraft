@@ -414,7 +414,9 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     const caseStart = source.indexOf("case 'fishingEarlyReel'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    expect(block.includes("this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8')")).toBe(
+    // The got-away grey is the professions family's MISS tone by name (the
+    // Phase 18 sweep left hud.ts hex-free; tests/hud_tones.test.ts holds it).
+    expect(block.includes("this.log(t('hudChrome.gathering.earlyReelLine'), PROF_LOG_MISS)")).toBe(
       true,
     );
     expect([...block.matchAll(/audio\.(\w+)\(/g)]).toHaveLength(0);

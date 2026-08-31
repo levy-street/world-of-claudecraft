@@ -13,6 +13,7 @@
 // socket for icons.
 
 import { isCommissionEligibleKind } from '../../../sim/professions/commission';
+import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
 import { formatNumber, t, tPlural } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
@@ -159,6 +160,10 @@ export function renderCommissionOrderWindow(
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.commissionBoard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.commissionBoard.close'))}">${svgIcon('close')}</button></div>`;
+  // The chrome dialog contract (src/ui/CLAUDE.md): role=dialog, ONE accessible
+  // name (the label form; the title span carries no id), aria-modal false like
+  // the crafting window it opens from (Hud installs the shared focus trap).
+  markDialogRoot(el, { label: t('hudChrome.commissionBoard.title') });
 
   const intro = document.createElement('div');
   intro.className = 'vi-sub commission-board-intro';
@@ -227,7 +232,11 @@ export function renderCommissionOrderWindow(
   );
 
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
-  el.style.display = 'block';
+  // The family's flex-column shell (every professions window opens with
+  // display:flex over a flex-direction:column rule on its id; the board's rule
+  // lives beside #professions-window in components.css), replacing the
+  // display:block the board alone used to open with.
+  el.style.display = 'flex';
   el.scrollTop = scrollTop;
 }
 

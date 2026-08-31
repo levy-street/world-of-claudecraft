@@ -10,13 +10,15 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ENCHANTS } from '../src/sim/content/enchants';
+import { ENCHANTS, type EnchantDef } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
-import type { InvSlot, ItemDef, ItemSlot } from '../src/sim/types';
+import { baggedEnchantVictim, replaceVictimIndex } from '../src/sim/professions/enchanting';
+import type { InvSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import {
   ENCHANT_PRESERVED_TRAITS,
   ENCHANT_TIER_ORDER,
+  type EnchantTargetRow,
   type EnchantViewerInput,
   enchantNameKey,
   enchantSectionsForReagent,
@@ -45,6 +47,15 @@ function itemForSlot(slot: ItemSlot, skip = new Set<string>()): string {
   );
   if (!id) throw new Error(`no item found for slot ${slot}`);
   return id;
+}
+
+/** The bagged rows minus their per-copy identity (`copy`), for the pins whose
+ *  subject is the row FAMILY (grouping, the replace facts, the #2421 / #2466
+ *  flags), not WHICH copy the sim would consume: those stay exact over the
+ *  family shape, and the identity has its own describe below (the Phase 18
+ *  per-copy anchor), so neither pin dilutes the other. */
+function familyRows(rows: EnchantTargetRow[]): Array<Omit<EnchantTargetRow, 'copy'>> {
+  return rows.map(({ copy: _copy, ...family }) => family);
 }
 
 /** A SYNCED viewer at `enchantingSkill`: the ordinary case, and the only one
@@ -350,7 +361,7 @@ describe('enchant_apply_view: enchantTargets', () => {
       { itemId: helmetId, count: 1 }, // wrong slot for a chest enchant
     ];
     const targets = enchantTargets(inventory, 'enchant_chest_stamina');
-    expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 2 }]);
   });
 
   it('surfaces an already-enchanted copy as a flagged replace row, and keeps a masterwork copy plain', () => {
@@ -362,7 +373,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     // #2415: the enchanted chest is no longer hidden: it paints as a replace
     // row AFTER the plain family, carrying the doomed enchant's id, and since
     // the picked enchant IS the one it carries, it is a sameEnchant deny row.
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: otherChestId, count: 1 },
       {
         itemId: chestId,
@@ -381,7 +392,7 @@ describe('enchant_apply_view: enchantTargets', () => {
       { itemId: chestId, count: 2 }, // plain fungible copies of the SAME id
     ];
     const targets = enchantTargets(inventory, 'enchant_chest_stamina');
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       // The plain family first, counting only the enchantable copies...
       // ...both rows flagged mixedHolding, since this pair is the one case that
       // shares an item display name (#2421, pinned on its own below).
@@ -401,7 +412,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     const inventory: InvSlot[] = [
       { itemId: chestId, count: 1, instance: { enchant: 'enchant_chest_stamina' } },
     ];
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       {
         itemId: chestId,
         count: 1,
@@ -414,7 +425,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     const inventory: InvSlot[] = [
       { itemId: chestId, count: 1, instance: { rolled: { stats: { sta: 4 } } } },
     ];
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       { itemId: chestId, count: 1, replace: { stats: { sta: 4 }, sameEnchant: false } },
     ]);
   });
@@ -427,7 +438,7 @@ describe('enchant_apply_view: enchantTargets', () => {
     // One row for the id, count = every enchanted copy, described by the
     // highest-index copy: exactly the one the sim's replaceVictimIndex
     // consumes, so what the dialog names is what a confirm destroys.
-    expect(enchantTargets(inventory, 'enchant_chest_spirit')).toEqual([
+    expect(familyRows(enchantTargets(inventory, 'enchant_chest_spirit'))).toEqual([
       {
         itemId: chestId,
         count: 2,
@@ -446,11 +457,178 @@ describe('enchant_apply_view: enchantTargets', () => {
     // The unknown-marker copy ('x' resolves to no ENCHANTS row) is DROPPED,
     // never offered: the sim's replace arm refuses what it cannot subtract,
     // and the picker must not offer what the sim denies.
-    expect(targets).toEqual([{ itemId: chestId, count: 3 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 3 }]);
   });
 
   it('returns nothing for an unknown enchant id', () => {
     expect(enchantTargets([{ itemId: chestId, count: 1 }], 'not_a_real_enchant')).toEqual([]);
+  });
+});
+
+describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18 anchor)', () => {
+  // Every bagged row names WHICH copy its activation lands on, resolved
+  // through the sim's own walks, and anchors it the Phase 14 Perfecting way
+  // (ordinal among the family's same-id cells plus that count) so a consumer
+  // can follow the copy across the bag shifts the bags pins cover: a splice
+  // below it, the adjacent sibling sliding onto its old cell, and a same-id
+  // departure or arrival (where the anchor stands down on purpose).
+  const chestId = itemForSlot('chest');
+  const helmetId = itemForSlot('helmet'); // never a chest row: the filler stack
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const OTHER = 'enchant_chest_spirit';
+  const plainCopy = (inventory: InvSlot[]) =>
+    enchantTargets(inventory, CHEST_ENCHANT).find((row) => row.replace === undefined)?.copy;
+  const replaceCopy = (inventory: InvSlot[]) =>
+    enchantTargets(inventory, CHEST_ENCHANT).find((row) => row.replace !== undefined)?.copy;
+
+  it("a plain row names the sim's own victim: the highest-index plain cell before any instanced copy", () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: helmetId, count: 3 },
+      { itemId: chestId, count: 2 },
+      { itemId: chestId, count: 1, instance: { rolled: { masterwork: true } } },
+    ];
+    const rows = enchantTargets(inventory, CHEST_ENCHANT);
+    expect(rows).toHaveLength(1);
+    // Units in `count`, CELLS in the anchor: three chest cells, four copies.
+    expect(rows[0].count).toBe(4);
+    expect(rows[0].copy).toEqual({
+      slotIndex: 2,
+      ordinal: 1,
+      count: 3,
+      identity: `plain:${chestId}:1/3`,
+    });
+    // The sim's peek agrees: a plain fungible victim reads undefined there and
+    // the named cell holds no payload.
+    expect(baggedEnchantVictim(inventory, chestId, false)).toBeUndefined();
+    expect(inventory[2].instance).toBeUndefined();
+  });
+
+  it('with no plain cell the victim is the newest unenchanted INSTANCED copy, the very object the sim peeks', () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'Crafter' } },
+      { itemId: helmetId, count: 3 },
+      { itemId: chestId, count: 1, instance: { rolled: { masterwork: true } } },
+    ];
+    const copy = plainCopy(inventory);
+    expect(copy).toEqual({ slotIndex: 2, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
+    // One selection by construction: the cell the row names holds the payload
+    // baggedEnchantVictim returns by reference.
+    expect(inventory[copy?.slotIndex ?? -1].instance).toBe(
+      baggedEnchantVictim(inventory, chestId, false),
+    );
+  });
+
+  it('a replace row names the pinned victim (replaceVictimIndex) among the ENCHANTED cells alone', () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { enchant: OTHER } },
+      { itemId: helmetId, count: 1 },
+      { itemId: chestId, count: 1 },
+      { itemId: chestId, count: 1, instance: { enchant: OTHER } },
+    ];
+    expect(replaceCopy(inventory)).toEqual({
+      slotIndex: replaceVictimIndex(inventory, chestId),
+      ordinal: 1,
+      count: 2,
+      identity: `replace:${chestId}:1/2`,
+    });
+    expect(replaceVictimIndex(inventory, chestId)).toBe(3);
+    // The two families of ONE item id anchor apart, each over its own cells.
+    expect(plainCopy(inventory)).toEqual({
+      slotIndex: 2,
+      ordinal: 0,
+      count: 1,
+      identity: `plain:${chestId}:0/1`,
+    });
+  });
+
+  it('a splice below the victim shifts its cell but not its identity (the Phase 14 splice arm)', () => {
+    const A: ItemInstancePayload = { signer: 'A' };
+    const B: ItemInstancePayload = { signer: 'B' };
+    const inventory: InvSlot[] = [
+      { itemId: helmetId, count: 1 }, // the stack an apply exhausts
+      { itemId: chestId, count: 1, instance: A },
+      { itemId: chestId, count: 1, instance: B },
+    ];
+    const before = plainCopy(inventory);
+    expect(before).toEqual({
+      slotIndex: 2,
+      ordinal: 1,
+      count: 2,
+      identity: `plain:${chestId}:1/2`,
+    });
+    expect(inventory[1].instance).toBe(A);
+    inventory.splice(0, 1);
+    const after = plainCopy(inventory);
+    // The cell moved 2 -> 1 and the adjacent sibling's OLD cell (1) now holds
+    // the victim: a cell-keyed row would have named A before and B after,
+    // while the anchor names B both times.
+    expect(after?.slotIndex).toBe(1);
+    expect(inventory[1].instance).toBe(B);
+    expect(after?.identity).toBe(before?.identity);
+    expect(after).toEqual({ slotIndex: 1, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
+  });
+
+  it('a same-id DEPARTURE moves the count, so the identity moves on purpose (the anchor stands down)', () => {
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'A' } },
+      { itemId: chestId, count: 1, instance: { signer: 'B' } },
+    ];
+    const before = plainCopy(inventory);
+    expect(before?.identity).toBe(`plain:${chestId}:1/2`);
+    inventory.splice(0, 1); // A sold: B slides onto cell 0
+    const after = plainCopy(inventory);
+    expect(after).toEqual({ slotIndex: 0, ordinal: 0, count: 1, identity: `plain:${chestId}:0/1` });
+    expect(after?.identity).not.toBe(before?.identity);
+  });
+
+  it('a same-id ARRIVAL moves the count too, and the newest copy becomes the victim', () => {
+    const inventory: InvSlot[] = [{ itemId: chestId, count: 1, instance: { signer: 'A' } }];
+    const before = plainCopy(inventory);
+    expect(before).toEqual({
+      slotIndex: 0,
+      ordinal: 0,
+      count: 1,
+      identity: `plain:${chestId}:0/1`,
+    });
+    inventory.push({ itemId: chestId, count: 1, instance: { signer: 'C' } });
+    const after = plainCopy(inventory);
+    expect(after).toEqual({ slotIndex: 1, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
+    expect(after?.identity).not.toBe(before?.identity);
+  });
+
+  it('a fungible stack is ONE cell: the anchor counts cells while the row counts units', () => {
+    const rows = enchantTargets([{ itemId: chestId, count: 3 }], CHEST_ENCHANT);
+    expect(rows[0].count).toBe(3);
+    expect(rows[0].copy).toEqual({
+      slotIndex: 0,
+      ordinal: 0,
+      count: 1,
+      identity: `plain:${chestId}:0/1`,
+    });
+  });
+
+  it('the ordinal counts the GATED family: a Perfected-only enchant anchors the victim among Perfected cells', () => {
+    const infusion = Object.values(ENCHANTS).find(
+      (enchant) => enchant.requiresPerfected === true && enchant.itemSlot === 'chest',
+    );
+    expect(infusion, 'content carries a Perfected-gated chest enchant').toBeDefined();
+    const enchantId = (infusion as EnchantDef).id;
+    const viewer = viewerAt(infusion?.skillReq ?? 0);
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1, instance: { signer: 'plain' } }, // fails the per-copy gate
+      { itemId: chestId, count: 1, instance: { perfected: true } },
+    ];
+    const rows = enchantTargets(inventory, enchantId, [], viewer);
+    expect(rows).toHaveLength(1);
+    // The victim (the newest unenchanted instanced copy) IS the Perfected
+    // cell, and it is the family's only member: ordinal 0 of 1, not 1 of 2.
+    expect(rows[0].copy).toEqual({
+      slotIndex: 1,
+      ordinal: 0,
+      count: 1,
+      identity: `plain:${chestId}:0/1`,
+    });
   });
 });
 
@@ -778,7 +956,7 @@ describe('enchant_apply_view: preserved facts on the replace rows (#2421)', () =
       ],
       WEAPON_ENCHANT,
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       {
         itemId: SWORD,
         count: 1,
@@ -904,7 +1082,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: chestId, count: 2, mixedHolding: true },
       {
         itemId: chestId,
@@ -937,7 +1115,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
+    expect(familyRows(targets)).toEqual([{ itemId: chestId, count: 2 }]);
   });
 
   // The CROSS-FAMILY holding: the enchanted copy is WORN and its plain twin is
@@ -951,9 +1129,9 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       'enchant_chest_stamina',
     );
     expect(worn[0]?.replace, 'the worn copy is the enchanted twin').toBeDefined();
-    expect(enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina', worn)).toEqual([
-      { itemId: chestId, count: 2, mixedHolding: true },
-    ]);
+    expect(
+      familyRows(enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina', worn)),
+    ).toEqual([{ itemId: chestId, count: 2, mixedHolding: true }]);
     // Without the worn rows the same bags read as unambiguous, which is what
     // makes the argument load-bearing rather than incidental.
     expect(
@@ -1016,7 +1194,7 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       { itemId: base, count: 1 },
       { itemId: heroic, count: 1, heroic: true },
     ]);
@@ -1090,7 +1268,7 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
       ],
       CHEST_ENCHANT,
     );
-    expect(targets).toEqual([
+    expect(familyRows(targets)).toEqual([
       {
         itemId: base,
         count: 1,
@@ -1621,7 +1799,7 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
       },
     ];
     expect(rowFor(walked, viewerAt(CAP))?.perfectedMet).toBe(true);
-    expect(enchantTargets(walked, INFUSION, [], viewerAt(CAP))).toEqual([
+    expect(familyRows(enchantTargets(walked, INFUSION, [], viewerAt(CAP)))).toEqual([
       { itemId: CHEST, count: 1 },
     ]);
   });
@@ -1676,7 +1854,7 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
       { itemId: CHEST, count: 1, instance: { perfected: true } },
     ];
     expect(rowFor(agreeing, viewerAt(CAP))?.perfectedMet).toBe(true);
-    expect(enchantTargets(agreeing, INFUSION, [], viewerAt(CAP))).toEqual([
+    expect(familyRows(enchantTargets(agreeing, INFUSION, [], viewerAt(CAP)))).toEqual([
       { itemId: CHEST, count: 1 },
     ]);
     // An already-enchanted Perfected copy beside an ordinary unenchanted one:
@@ -1708,7 +1886,7 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
       { itemId: CHEST, count: 1, instance: { perfected: true } },
     ];
     expect(rowFor(splitArms, viewerAt(CAP))?.perfectedMet).toBe(true);
-    expect(enchantTargets(splitArms, INFUSION, [], viewerAt(CAP))).toEqual([
+    expect(familyRows(enchantTargets(splitArms, INFUSION, [], viewerAt(CAP)))).toEqual([
       { itemId: CHEST, count: 1 },
     ]);
     // And with the enchanted Perfected copy alone, the plain victim falls to
@@ -1721,7 +1899,7 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     // The rule is the CAPSTONE'S alone: an ordinary chest enchant lists both
     // copies of the same disagreeing holding.
     const plain = 'enchant_chest_stamina';
-    expect(enchantTargets(disagreeing, plain, [], viewerAt(CAP))).toEqual([
+    expect(familyRows(enchantTargets(disagreeing, plain, [], viewerAt(CAP)))).toEqual([
       { itemId: CHEST, count: 2 },
     ]);
   });

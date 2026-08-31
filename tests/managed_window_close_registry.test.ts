@@ -41,7 +41,7 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
  */
 const CODE_BUILT: Record<string, string> = {
   'confirm-dialog':
-    'src/ui/hud.ts (confirmDialog) + src/ui/input_dialog.ts (the extracted input modal); the two share the one id',
+    'src/ui/hud.ts (confirmDialog) + src/ui/input_controller.ts (the extracted input modal); the two share the one id',
   'profession-tutorial': 'src/ui/hud/professions/profession_tutorial_window.ts',
   'tutorial-greeting': 'src/ui/tutorial_greeting_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
@@ -342,7 +342,9 @@ describe('closeManagedWindow case registry', () => {
       'ui/hud.ts': 1, // confirmDialog's half of the shared #confirm-dialog id
       // The extracted input modal (Masterwrought phase 14): the other half of
       // the shared #confirm-dialog id, moved whole out of Hud.inputDialog.
-      'ui/input_dialog.ts': 1,
+      // Named *_controller since the Phase 18 sweep so the painter gate's
+      // filename sweep covers it (tests/hud_perf_budget.test.ts).
+      'ui/input_controller.ts': 1,
       'ui/hud/professions/profession_tutorial_window.ts': 1,
       // The Perfecting window mints its own root (no markup entry).
       'ui/hud/professions/perfecting_window.ts': 1,

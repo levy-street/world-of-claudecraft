@@ -170,6 +170,7 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { toggleSheatheWithCue } from './game/sheathe_toggle';
 import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   decideSpawnCinematic,
@@ -1906,17 +1907,14 @@ async function startGame(
           case 'harvestJournal':
             hud.toggleHarvestJournal();
             break;
-          case 'sheathe': {
-            // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
-            // combat auto-unsheathe); play the cue only when the state moved.
-            const wasStowed = world.player.weaponStowed;
-            world.toggleWeaponStow();
-            if (world.player.weaponStowed !== wasStowed) {
-              if (world.player.weaponStowed) audio.weaponSheathe();
-              else audio.weaponUnsheathe();
-            }
+          case 'perfecting':
+            hud.togglePerfecting();
             break;
-          }
+          case 'sheathe':
+            // Cosmetic sheathe toggle (Z): the cue-on-state-change rule lives
+            // in sheathe_toggle.ts, shared with the gamepad dispatch below.
+            toggleSheatheWithCue(world, audio);
+            break;
           case 'chat':
             openChat();
             break;
@@ -2247,6 +2245,9 @@ async function startGame(
       case 'harvestJournal':
         hud.toggleHarvestJournal();
         break;
+      case 'perfecting':
+        hud.togglePerfecting();
+        break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every
         // edge keybind action); the dispatch dropped it silently.
@@ -2277,17 +2278,10 @@ async function startGame(
       case 'dungeonFinder':
         hud.toggleDungeonFinder();
         break;
-      case 'sheathe': {
-        // The keyboard arm's exact rule: the world owns the gate, the cue
-        // plays only when the state moved.
-        const wasStowed = world.player.weaponStowed;
-        world.toggleWeaponStow();
-        if (world.player.weaponStowed !== wasStowed) {
-          if (world.player.weaponStowed) audio.weaponSheathe();
-          else audio.weaponUnsheathe();
-        }
+      case 'sheathe':
+        // The keyboard arm's exact rule, from the same module.
+        toggleSheatheWithCue(world, audio);
         break;
-      }
       case 'chat':
         openChat();
         break;

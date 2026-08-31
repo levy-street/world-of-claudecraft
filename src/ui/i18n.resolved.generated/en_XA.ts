@@ -4151,6 +4151,8 @@ export const en_XA: EnTranslations = {
       "rankAnnounce": "[{name} ŕéáçĥéš Þéŕƒéçţíñĝ ŕáñķ {rank} óƒ {ranks}.]",
       "perfectedAnnounce": "[{name} íš ñóŵ Þéŕƒéçţéð.]",
       "promotedAnnounce": "[{name} íš ƒóŕĝéð áš {chosen}.]",
+      "unknownItem": "[Úñķñóŵñ íţéɱ]",
+      "namingSelectionUnconfirmed": "[Ýóúŕ ƀáĝš šĥíƒţéð: ţĥé þíéçé ƀéíñĝ ñáɱéð çóúļð ñóţ ƀé çóñƒíŕɱéð. Çĥéçķ ţĥé šéļéçţíóñ ƀéƒóŕé ýóú ƒóŕĝé.]",
       "rowPromoted": "[Ļéĝéñðáŕý]",
       "attemptCost": "[Áţţéɱþţ çóšţ]",
       "promoteCost": "[Þŕóɱóţíóñ çóšţ]",

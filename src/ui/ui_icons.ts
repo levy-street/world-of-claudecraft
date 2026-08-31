@@ -87,7 +87,9 @@ export type UiIconName =
   | 'demote'
   | 'out-of-range'
   | 'wiki'
-  | 'alert';
+  | 'alert'
+  | 'perfecting'
+  | 'harvest-journal';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -264,6 +266,17 @@ const ICONS: Record<UiIconName, string> = {
   // hollowed with evenodd so the links stay legible at corner size.
   'bond-link':
     '<path fill-rule="evenodd" d="M186 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104zM326 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104z"/>',
+  // hand-authored faceted gem with a rising spark (the Perfecting launcher): a
+  // cut stone hollowed with evenodd so the facet reads at micro-button size,
+  // and a four-point spark above its shoulder for the rank climb. Distinct from
+  // the `crafting` anvil it sits under and from the `enchant-rune` spark alone.
+  perfecting:
+    '<path fill-rule="evenodd" d="M256 128 L388 240 L256 448 L124 240 Z M256 192 L336 244 L256 376 L176 244 Z"/><path d="M400 56 L416 108 L468 124 L416 140 L400 192 L384 140 L332 124 L384 108 Z"/>',
+  // hand-authored sprout over a soil line (the Harvest Journal launcher): a
+  // stem with two leaves, the growing-crop read the journal tracks. Distinct
+  // from the `professions` mortar it sits beside and from the deeds `book`.
+  'harvest-journal':
+    '<path d="M256 464V236" stroke="currentColor" stroke-width="36" fill="none" stroke-linecap="round"/><path d="M252 300C150 300 100 240 90 150C190 150 250 200 252 300Z"/><path d="M260 240C262 140 320 90 420 90C410 190 360 240 260 240Z"/><path d="M128 464H384" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

@@ -37,6 +37,7 @@ import { ITEMS } from '../../../sim/data';
 import type { FarmGrowthStage } from '../../../sim/professions/farm_projection';
 import { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID } from '../../../sim/professions/farming';
 import type { IWorld } from '../../../world_api';
+import { clockSeconds } from '../../clock_seconds_core';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -115,7 +116,7 @@ function clockText(clock: HarvestJournalClock): string {
     days: clockPart(clock.days),
     hours: clockPart(clock.hours),
     minutes: clockPart(clock.minutes),
-    seconds: clock.minutes > 0 ? String(clock.seconds).padStart(2, '0') : clockPart(clock.seconds),
+    seconds: clockSeconds(clock.seconds, clock.minutes > 0),
   });
 }
 

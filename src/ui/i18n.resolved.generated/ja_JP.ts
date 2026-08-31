@@ -4151,6 +4151,8 @@ export const ja_JP: EnTranslations = {
       "rankAnnounce": "{name}が完全化ランク{rank}/{ranks}に到達しました。",
       "perfectedAnnounce": "{name}は完全化されました。",
       "promotedAnnounce": "{name}は{chosen}として鍛え上げられました。",
+      "unknownItem": "不明なアイテム",
+      "namingSelectionUnconfirmed": "バッグの中身が変わりました：命名中の品を確認できません。鍛える前に選択を確認してください。",
       "rowPromoted": "伝説",
       "attemptCost": "挑戦コスト",
       "promoteCost": "昇格コスト",

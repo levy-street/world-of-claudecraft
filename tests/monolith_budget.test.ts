@@ -300,7 +300,7 @@ const MONOLITHS: MonolithRow[] = [
     // decides the color, the hud case cannot recolor a shared moment), and
     // the itemIcon dep widened in place. Exact count, zero slack.
     // LOWERED 18242 -> 18230 at Masterwrought phase 14 (2026-08-28): the
-    // whole Hud.inputDialog body moved out to src/ui/input_dialog.ts (Hud
+    // whole Hud.inputDialog body moved out to src/ui/input_controller.ts (Hud
     // keeps a thin delegator lending the confirm-trap slot and the pending
     // no-choice cancel through a deps bag), which pays for the phase's own
     // wiring (the PerfectingWindow construction, its closeAll case,
@@ -376,7 +376,17 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 18731, the release 18863. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 18731,
+    // LOWERED 18731 -> 18718 at Masterwrought Phase 18 (2026-08-31, the hud.ts
+    // frontend unit): the toolEffectResult reason ternary moved into
+    // src/ui/hud/professions/tool_effect_result_view.ts, the tooltip
+    // placement math into src/ui/tooltip_clamp_core.ts (gaining the bottom
+    // clamp, the height cap and the mousemove left floor), and the
+    // battleground finish-line colour record into src/ui/hud_tones.ts, which
+    // also names every former inline hex literal (125 of them) by role.
+    // Those pay for the unit's own wiring: the Perfecting and Harvest Journal
+    // rail tiles (click + keycap rows), the commission board's focus pair, and
+    // the three tone imports. Exact count, zero slack.
+    ceiling: 18718,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1086,7 +1096,12 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 11587, the release 11551. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 11515,
+    // LOWERED 11515 -> 11509 at Masterwrought Phase 18 (2026-08-31, the hud.ts
+    // frontend unit): the sheathe keybind's cue-on-state-change rule, carried
+    // verbatim at BOTH dispatch sites, moved to src/game/sheathe_toggle.ts,
+    // paying for the Perfecting keybind's two dispatch cases (keyboard and
+    // gamepad, the silent-drop bug class). Exact count, zero slack.
+    ceiling: 11509,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

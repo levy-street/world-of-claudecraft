@@ -143,6 +143,14 @@ describe('registry', () => {
     expect(journal?.category).toBe('Interface');
     expect(journal?.kind).toBe('edge');
     expect(journal?.defaults).toEqual(['Shift+KeyK']);
+    // Perfecting is a rebindable Interface toggle on the shifted layer of KeyT
+    // (Crafting's letter; its own initial is the Spellbook bare and Professions
+    // shifted), so the crafting family's endgame window sits over Crafting and
+    // the two share the physical key across layers without colliding.
+    const perfecting = BIND_ACTIONS.find((a) => a.id === 'perfecting');
+    expect(perfecting?.category).toBe('Interface');
+    expect(perfecting?.kind).toBe('edge');
+    expect(perfecting?.defaults).toEqual(['Shift+KeyT']);
   });
 
   it('gives every shipped default code to exactly one action per layer', () => {

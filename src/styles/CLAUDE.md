@@ -94,7 +94,10 @@ the throw (#2499, #2502).
   `src/ui/hud/professions/profession_log_tones.ts` is the same sanctioned idea for the
   professions family's five log tones (grant, news, miss, toast, deny), pinned by
   `tests/profession_log_tones.test.ts`, which also scans the whole professions directory
-  so no family module re-spells one. Guarded by the per-painter no-magic source scans (e.g.
+  so no family module re-spells one; `src/ui/hud_tones.ts` is the third such home, the HUD
+  coordinator's own vocabulary (`HUD_LOG` chat registers, `MAP_TONE` canvas fills,
+  `CHROME_TONE` inline style colours), pinned by `tests/hud_tones.test.ts`, which also
+  keeps `src/ui/hud.ts` itself free of any hex literal. Guarded by the per-painter no-magic source scans (e.g.
   `tests/auras_painter.test.ts`, `tests/minimap_painter.test.ts`,
   `tests/action_bar_painter.test.ts`) and `tests/focus_visible_guard.test.ts`; there is no
   single central no-magic guard, each migrated painter scans its own source.

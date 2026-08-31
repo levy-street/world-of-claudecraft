@@ -337,6 +337,18 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyK'],
   },
+  // Perfecting parks on the shifted layer of KeyT, Crafting's letter: bare
+  // KeyT is Crafting, its own initial is spoken for on both layers (bare P is
+  // the Spellbook, Shift+P is Professions), and Perfecting is the crafting
+  // family's endgame surface, so it sits over Crafting the way Professions
+  // sits over the Spellbook. Rebindable like any action.
+  {
+    id: 'perfecting',
+    label: 'Perfecting',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyT'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

@@ -4151,6 +4151,8 @@ export const ko_KR: EnTranslations = {
       "rankAnnounce": "{name}의 완전화가 {ranks}단계 중 {rank}단계에 도달했습니다.",
       "perfectedAnnounce": "{name}이(가) 완전해졌습니다.",
       "promotedAnnounce": "{name}이(가) {chosen}(으)로 벼려졌습니다.",
+      "unknownItem": "알 수 없는 아이템",
+      "namingSelectionUnconfirmed": "가방 내용이 바뀌었습니다: 이름을 붙이려던 장비를 확인할 수 없습니다. 벼려내기 전에 선택을 확인하세요.",
       "rowPromoted": "전설",
       "attemptCost": "시도 비용",
       "promoteCost": "승급 비용",

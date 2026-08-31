@@ -186,7 +186,6 @@ export function delveSchematicStatic(
   layout: DungeonLayout,
   canvasSize: number,
   pad: number,
-  _northLabel = 'N',
   fit: DelveMapFit = 'rect',
 ): SchematicPrimitive[] {
   const prims: SchematicPrimitive[] = [];

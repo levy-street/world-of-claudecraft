@@ -1506,11 +1506,14 @@ describe('map_window_painter: painted stable marker sprites', () => {
     // The pin has no MapMarkerArtId this phase: the painter must never ask the
     // art cache for one, and must never blit a sprite for it.
     expect(markerArt.calls.filter((call) => String(call.id).includes('farm'))).toEqual([]);
-    // Two leaves in ONE filled path (two closed triangles), in the oak green
-    // rather than any gather-node readiness color.
+    // Two leaves in ONE filled path (two closed triangles), in the STATION
+    // family's token on this surface (the stall fill the station diamond takes
+    // with no sprite; the minimap paints the same pin in its own station
+    // token), never the oak green it once borrowed and never any gather-node
+    // readiness color.
     const leaves = trace.fills.find(
       (fill) =>
-        fill.style === 'paint:--color-map-oak' &&
+        fill.style === 'paint:--color-map-stall' &&
         fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
     );
     expect(leaves, 'the farm pin must paint its two-leaf sprout').toBeDefined();

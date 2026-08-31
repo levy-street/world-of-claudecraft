@@ -89,7 +89,7 @@ afterEach(() => {
 });
 
 describe('radiogroup semantics (the plant sheet shape)', () => {
-  it('rows are natively tabbable radios in a title-labelled group', () => {
+  it('rows are radios in a title-labelled group with ONE tab stop, the checked row', () => {
     world.inventory.push({ itemId: 'wyrmfall_pendant', count: 1 });
     const win = makeWindow();
     win.open();
@@ -98,12 +98,65 @@ describe('radiogroup semantics (the plant sheet shape)', () => {
     const radios = [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
     expect(radios.length).toBe(2);
     expect(radios.map((r) => r.getAttribute('aria-checked'))).toEqual(['true', 'false']);
-    // Every radio is a real button (natively tabbable; no roving tabindex,
-    // the recorded OPEN follow-up).
+    // Every radio is a real button, and the group is an APG roving-tabindex
+    // radiogroup (the Phase 18 sweep closed the recorded follow-up): exactly
+    // one member is in the Tab order, the checked one, and the rest are
+    // reachable by arrow only.
     for (const radio of radios) expect(radio.tagName).toBe('BUTTON');
+    expect(radios.map((r) => r.getAttribute('tabindex'))).toEqual(['0', '-1']);
     radios[1].click();
     const after = [...root().querySelectorAll('[role="radio"]')];
     expect(after.map((r) => r.getAttribute('aria-checked'))).toEqual(['false', 'true']);
+    // The tab stop follows the selection across the repaint.
+    expect(after.map((r) => r.getAttribute('tabindex'))).toEqual(['-1', '0']);
+  });
+
+  it('arrow keys move the checked row and focus together, Home/End jump, the ends wrap', () => {
+    world.inventory.push({ itemId: 'wyrmfall_pendant', count: 1 });
+    world.inventory.push({ itemId: APEX, count: 1, instance: { boundTo: 1, perfecting: 2 } });
+    const win = makeWindow();
+    win.open();
+    const radios = (): HTMLButtonElement[] =>
+      [...root().querySelectorAll('[role="radio"]')] as HTMLButtonElement[];
+    const key = (el: HTMLElement, k: string): boolean =>
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+    const checked = (): string[] => radios().map((r) => r.getAttribute('aria-checked') as string);
+    expect(radios().length).toBe(3);
+    radios()[0].focus();
+    // ArrowDown: the next row is checked AND focused (the radiogroup pattern:
+    // arrow moves focus and selection as one), the repaint carrying focus by
+    // the copy's identity key.
+    expect(key(radios()[0], 'ArrowDown')).toBe(false);
+    expect(checked()).toEqual(['false', 'true', 'false']);
+    expect(document.activeElement).toBe(radios()[1]);
+    expect(radios()[1].getAttribute('tabindex')).toBe('0');
+    // ArrowRight is the horizontal twin of ArrowDown in a 'both' group.
+    key(radios()[1], 'ArrowRight');
+    expect(checked()).toEqual(['false', 'false', 'true']);
+    expect(document.activeElement).toBe(radios()[2]);
+    // The end wraps to the start.
+    key(radios()[2], 'ArrowDown');
+    expect(checked()).toEqual(['true', 'false', 'false']);
+    expect(document.activeElement).toBe(radios()[0]);
+    // ArrowUp from the first wraps to the last.
+    key(radios()[0], 'ArrowUp');
+    expect(checked()).toEqual(['false', 'false', 'true']);
+    expect(document.activeElement).toBe(radios()[2]);
+    // Home / End jump to the ends.
+    key(radios()[2], 'Home');
+    expect(checked()).toEqual(['true', 'false', 'false']);
+    expect(document.activeElement).toBe(radios()[0]);
+    key(radios()[0], 'End');
+    expect(checked()).toEqual(['false', 'false', 'true']);
+    expect(document.activeElement).toBe(radios()[2]);
+    // A key the roving core does not own falls through untouched (no
+    // preventDefault, no repaint): the Tab trap and Escape stay the window's.
+    const before = radios()[2];
+    expect(key(before, 'Tab')).toBe(true);
+    expect(radios()[2]).toBe(before);
+    expect(checked()).toEqual(['false', 'false', 'true']);
+    // No key ever sent a command: selection is local view state.
+    expect(world.perfectItem).not.toHaveBeenCalled();
   });
 
   it('the dialog root is marked and the empty state renders without candidates', () => {
@@ -227,6 +280,30 @@ describe('the aria-busy send-once lifecycle', () => {
     expect(live.textContent).not.toBe('');
     win.close();
     expect(live.textContent).toBe('');
+  });
+
+  it('an item the client catalog does not carry announces through the localized fallback, never the raw id', () => {
+    // The mirrors can name a copy whose item id this client's catalog lacks
+    // (a content drift between server and client): the status region is
+    // player copy, so it says the localized fallback, not the id token.
+    const GHOST = 'ghost_masterwork_id_not_in_items';
+    const real = world.perfectingInfo.bind(world);
+    world.perfectingInfo = (ref: PerfectItemRef) => {
+      const info = real(ref);
+      return info ? { ...info, itemId: GHOST } : null;
+    };
+    const win = makeWindow();
+    win.open();
+    const live = root().querySelector('.pf-live-status') as HTMLElement;
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfecting: 2 } };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).toContain('rank 2 of 4');
+    expect(live.textContent).toContain('Unknown item');
+    expect(live.textContent).not.toContain(GHOST);
+    // The Perfected flip takes the same fallback.
+    world.equipmentInstances = { mainhand: { boundTo: 1, perfected: true } };
+    vi.advanceTimersByTime(1000);
+    expect(live.textContent).toBe('Unknown item is now Perfected.');
   });
 
   it('an unchanged world ticks without repainting (the signature gate)', () => {
@@ -1011,6 +1088,64 @@ describe('the naming dialog (deliverable B)', () => {
     // promoted face has no action button, so the candidate row takes it).
     expect(document.activeElement).not.toBe(document.body);
     expect(root().contains(document.activeElement)).toBe(true);
+  });
+
+  it('a refused same-copy pair under the open dialog announces the unconfirmed selection, once', () => {
+    // Two BAGGED Perfected copies of one id, the first selected and the
+    // naming dialog opened for it; the first copy then leaves the bags while
+    // the dialog is up (a sale, a deposit). The same-id count moves 2 -> 1,
+    // so sameSelectedCopy refuses the pair: the dialog stays open and
+    // unlocked (the selected-signature move answered it) and NOTHING in the
+    // gated block plays. Before the Phase 18 sweep that edge had no cue at
+    // all; now the status region carries the one line the reader needs
+    // before re-submitting a name at a copy that may not be the one picked.
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: APEX, count: 1, instance: { perfected: true, boundTo: 1 } },
+      { itemId: APEX, count: 1, instance: { perfected: true, boundTo: 1 } },
+      { itemId: 'deed_of_making', count: 1 },
+    ];
+    const win = makeWindow();
+    const prompt = openDialog(win);
+    expect(prompt).not.toBeNull();
+    const live = root().querySelector('.pf-live-status') as HTMLElement;
+    expect(live.textContent).toBe('');
+    (prompt.querySelector('.pf-name-input') as HTMLInputElement).value = 'Oathkeeper';
+    prompt.querySelector('.pf-name-input')?.dispatchEvent(new Event('input'));
+    (prompt.querySelector('.pf-name-submit') as HTMLButtonElement).click();
+    expect(prompt.getAttribute('aria-busy')).toBe('true');
+    world.inventory.splice(0, 1);
+    vi.advanceTimersByTime(1000);
+    // The dialog is still open and unlocked (the pre-existing behavior)...
+    expect(document.querySelector('.pf-name-prompt')).toBe(prompt);
+    expect(prompt.getAttribute('aria-busy')).toBeNull();
+    expect(audio.perfectingSuccess).not.toHaveBeenCalled();
+    // ...and the region now says so, in words (a t() key, no id token).
+    expect(live.textContent).toBe(
+      'Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.',
+    );
+    expect(live.children.length).toBe(1);
+    // Once per edge: the next unchanged tick neither repaints nor re-lands
+    // the line (the prevSelected latch re-armed on the surviving copy).
+    const span = live.firstElementChild;
+    vi.advanceTimersByTime(1000);
+    expect(live.firstElementChild).toBe(span);
+  });
+
+  it("a refused pair with NO dialog open stays silent (the cue is the dialog's, not the edge's)", () => {
+    world.equipment = {};
+    world.equipmentInstances = {};
+    world.inventory = [
+      { itemId: APEX, count: 1, instance: { perfected: true, boundTo: 1 } },
+      { itemId: APEX, count: 1, instance: { perfected: true, boundTo: 1 } },
+      { itemId: 'deed_of_making', count: 1 },
+    ];
+    const win = makeWindow();
+    win.open();
+    world.inventory.splice(0, 1);
+    vi.advanceTimersByTime(1000);
+    expect((root().querySelector('.pf-live-status') as HTMLElement).textContent).toBe('');
   });
 
   it('cancelling after a mid-prompt repaint still returns focus into the window', () => {

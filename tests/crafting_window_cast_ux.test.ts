@@ -552,3 +552,31 @@ describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
     expect(noteBody).toContain('color: var(--color-text-muted)');
   });
 });
+
+describe('crafting reagent entries never break mid-entry (the wiki twin rule, Phase 18)', () => {
+  // One reagent entry (name plus its have/required count) is an inline-block
+  // with nowrap, so a long name wraps the reagent LIST between entries rather
+  // than splitting an entry across lines; the wiki's recipe cells carry the
+  // same rule (.guide-prof-mat), and the two surfaces read a bill alike.
+  it('.crafting-reagent is inline-block + nowrap in components.css, mirroring .guide-prof-mat', () => {
+    const css = readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(css).toMatch(
+      /\.crafting-reagent \{[^}]*display: inline-block;[^}]*white-space: nowrap;[^}]*\}/s,
+    );
+    const guide = readFileSync(path.resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guide).toMatch(
+      /\.guide-prof-mat \{[^}]*display: inline-block;[^}]*white-space: nowrap;/s,
+    );
+    // The unsat tint stays a SEPARATE rule beside it (the count in the text is
+    // the signal; the tint is the redundant hint), so neither rule swallows
+    // the other.
+    expect(css).toMatch(/\.crafting-reagent\.unsat \{[^}]*color: var\(--color-text-error\);/s);
+    // And the window emits the class on every reagent span, so the rule has a
+    // target (a renamed class would leave the CSS green and inert).
+    const src = readFileSync(
+      path.resolve(process.cwd(), 'src/ui/hud/professions/crafting_window.ts'),
+      'utf8',
+    );
+    expect(src).toContain('class="crafting-reagent${');
+  });
+});

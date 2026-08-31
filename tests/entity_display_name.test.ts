@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS, NPCS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
-import { entityDisplayName } from '../src/ui/entity_display_name';
+import { entityDisplayName } from '../src/ui/entity_display_core';
 import {
   feastTitleKeyedTemplateIds,
   feastTitleKeyFor,

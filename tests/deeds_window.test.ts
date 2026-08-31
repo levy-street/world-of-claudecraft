@@ -213,11 +213,11 @@ describe('hud wiring', () => {
     const end = hud.indexOf('\n  log(\n', start);
     const body = stripLineComments(hud.slice(start, end));
     expect(body).toMatch(
-      /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*'#ffd100',?\s*\);/,
+      /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*HUD_LOG\.NOTICE,?\s*\);/,
     );
     // Named by the DEED: a border reward carries a palette slug, never text.
     expect(body).toMatch(
-      /for \(const id of plan\.borderHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedBorderHint', \{ name: deedName\(id\) \}\),\s*'#ffd100',?\s*\);/,
+      /for \(const id of plan\.borderHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedBorderHint', \{ name: deedName\(id\) \}\),\s*HUD_LOG\.NOTICE,?\s*\);/,
     );
   });
 
@@ -243,7 +243,7 @@ describe('hud wiring', () => {
       expect(start, anchor).toBeGreaterThan(-1);
       const body = stripLineComments(hud.slice(start, hud.indexOf('break;', start)));
       expect(body, anchor).toContain(
-        "if (this.showBanner(text) !== 'show') this.log(text, '#fa6');",
+        "if (this.showBanner(text) !== 'show') this.log(text, HUD_LOG.CONTEST);",
       );
     }
   });
@@ -536,7 +536,7 @@ describe('hud wiring', () => {
     // The chat-pane delivery too, not just the announcer: deleting the log
     // call would compile and pass everything else while the visible catch-up
     // line vanishes (the reliquary sibling pins its log line the same way).
-    expect(body).toContain("this.log(retroText, '#ffd100');");
+    expect(body).toContain('this.log(retroText, HUD_LOG.NOTICE);');
   });
 
   it('marks the watch toggle state and names the recent-strip jump buttons', () => {

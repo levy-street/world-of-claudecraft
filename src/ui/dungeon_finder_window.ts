@@ -23,6 +23,7 @@ import type { Role } from '../sim/content/talents';
 import { ITEMS } from '../sim/data';
 import type { DungeonDifficulty } from '../sim/types';
 import type { DungeonFinderApplicantView, IWorld } from '../world_api';
+import { clockSeconds } from './clock_seconds_core';
 import { markDialogRoot } from './dialog_root';
 import {
   buildDungeonFinderView,
@@ -804,7 +805,7 @@ function mmss(totalSeconds: number): string {
   const seconds = totalSeconds % 60;
   return t('hudChrome.finder.clock', {
     minutes: num(minutes),
-    seconds: String(seconds).padStart(2, '0'),
+    seconds: clockSeconds(seconds, true),
   });
 }
 

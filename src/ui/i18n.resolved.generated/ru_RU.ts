@@ -4151,6 +4151,8 @@ export const ru_RU: EnTranslations = {
       "rankAnnounce": "{name}: достигнут ранг совершенствования {rank} из {ranks}.",
       "perfectedAnnounce": "{name}: предмет доведен до совершенства.",
       "promotedAnnounce": "{name} выкован как {chosen}.",
+      "unknownItem": "Неизвестный предмет",
+      "namingSelectionUnconfirmed": "Содержимое сумок изменилось: предмет, которому даётся имя, не удалось подтвердить. Проверьте выбор перед ковкой.",
       "rowPromoted": "Легендарный",
       "attemptCost": "Цена попытки",
       "promoteCost": "Цена возвышения",

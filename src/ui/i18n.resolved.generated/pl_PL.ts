@@ -4151,6 +4151,8 @@ export const pl_PL: EnTranslations = {
       "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
       "perfectedAnnounce": "{name} is now Perfected.",
       "promotedAnnounce": "{name} is forged as {chosen}.",
+      "unknownItem": "Unknown item",
+      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
       "rowPromoted": "Legendary",
       "attemptCost": "Attempt cost",
       "promoteCost": "Promotion cost",

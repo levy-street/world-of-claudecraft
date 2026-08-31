@@ -15312,6 +15312,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.rankAnnounce': '{name}: достигнут ранг совершенствования {rank} из {ranks}.',
   'hudChrome.perfecting.perfectedAnnounce': '{name}: предмет доведен до совершенства.',
   'hudChrome.perfecting.promotedAnnounce': '{name} выкован как {chosen}.',
+  'hudChrome.perfecting.unknownItem': 'Неизвестный предмет',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    'Содержимое сумок изменилось: предмет, которому даётся имя, не удалось подтвердить. Проверьте выбор перед ковкой.',
   'hudChrome.perfecting.rowPromoted': 'Легендарный',
   'hudChrome.perfecting.attemptCost': 'Цена попытки',
   'hudChrome.perfecting.promoteCost': 'Цена возвышения',

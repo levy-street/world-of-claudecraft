@@ -4151,6 +4151,8 @@ export const zh_TW: EnTranslations = {
       "rankAnnounce": "{name}的完美化達到第{rank}階，共{ranks}階。",
       "perfectedAnnounce": "{name}已臻至完美。",
       "promotedAnnounce": "{name}已鑄就為{chosen}。",
+      "unknownItem": "未知物品",
+      "namingSelectionUnconfirmed": "你的背包發生了變動：無法確認正在命名的物品。鍛造前請檢查所選項。",
       "rowPromoted": "傳說",
       "attemptCost": "嘗試費用",
       "promoteCost": "晉升費用",

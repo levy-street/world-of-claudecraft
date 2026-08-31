@@ -429,7 +429,6 @@ import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
   BattlegroundScoreboard,
-  type BgEndLogTone,
   buildBgEndBannerView,
   buildBgMapModel,
   buildBgScoreboardView,
@@ -541,7 +540,11 @@ import {
   buildProfessionIdentityView,
   professionSurfaceRefreshSig,
 } from './hud/professions/profession_identity_view';
-import { PROF_LOG_DENY, PROF_LOG_GRANT } from './hud/professions/profession_log_tones';
+import {
+  PROF_LOG_DENY,
+  PROF_LOG_GRANT,
+  PROF_LOG_MISS,
+} from './hud/professions/profession_log_tones';
 import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
 import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
 import { ProfessionsWindow } from './hud/professions/professions_window';
@@ -552,6 +555,7 @@ import {
   type SkillLevelUp,
   skillLevelArtId,
 } from './hud/professions/skill_level_toast_view';
+import { toolEffectResultLine } from './hud/professions/tool_effect_result_view';
 import { wellFedTooltipLines } from './hud/professions/wellfed_tooltip_view';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
 import { parseChatSegments } from './hud/quest/quest_link';
@@ -583,6 +587,7 @@ import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { unitFrameCurrentMaxText } from './hud_frames';
+import { BG_END_LOG_COLORS, CHROME_TONE, HUD_LOG, MAP_TONE } from './hud_tones';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -595,7 +600,7 @@ import {
   tPlural,
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
-import { type InputDialogOpts, showInputDialog } from './input_dialog';
+import { type InputDialogOpts, showInputDialog } from './input_controller';
 import { InspectWindow } from './inspect_window';
 import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
 import { HUD_FRAME_SPECS } from './interface_unlock_core';
@@ -817,6 +822,7 @@ import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
+import { type TooltipViewport, tooltipMaxHeight, tooltipPlacementAt } from './tooltip_clamp_core';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -1107,20 +1113,6 @@ const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   battleground_kill: 'hudChrome.warfare.reasons.battlegroundKill',
   battleground_assist: 'hudChrome.warfare.reasons.battlegroundAssist',
 };
-// The combat-log color for each Thornhollow Fields finish-line tone. WHICH lines
-// exist and what they say is the pure core's decision
-// (hud/battleground/bg_end_banner_view.ts); only the color stays here, because
-// that is the coordinator's own log palette. Total over BgEndLogTone, so a new
-// tone red-fails tsc rather than logging an undefined color.
-const BG_END_LOG_COLORS: Record<BgEndLogTone, string> = {
-  resultWin: '#7fdc4f',
-  resultNotWin: '#ff7a6a',
-  cause: '#cfc6a8',
-  bonus: '#ffd100',
-};
-/** The remaining-time call's own log colour, the same gold the capture line
- *  uses: it is a match-critical call, not a result. */
-const BG_TIME_WARNING_LOG_COLOR = '#ffd24a';
 // The wire-union fallbacks (R34's enum axis): every code above is a SERVER
 // value a newer deploy can widen, and t() throws on an undefined key, so an
 // off-vocabulary code degrades to the family's most generic line instead of
@@ -1856,11 +1848,13 @@ export class Hud {
     }
   })();
   // Commission order board (issue #1298): whether #commission-board-window
-  // is the viewer's own open window this session. No opener-focus tracking
-  // (the crafting window precedent: a non-modal reference window, not a
-  // trapping dialog), and no location gate (opening/cancelling an order
-  // carries no escrow).
+  // is the viewer's own open window this session, plus the family's focus
+  // pair (the crafting window shape: the shared windowFocus trap over the
+  // painted root, the opener restored on close; aria-modal stays false). No
+  // location gate (opening/cancelling an order carries no escrow).
   private commissionBoardOpen = false;
+  private readonly commissionBoardFocus = this.windowFocus('#commission-board-window');
+  private commissionBoardOpenerFocus: HTMLElement | null = null;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly riftTracker: RiftFloorTrackerController;
@@ -2587,7 +2581,7 @@ export class Hud {
       stripCanvas.width = 140;
       stripCanvas.height = mapCanvasHeight(140, worldStripRegion);
       const stripCtx = require2dContext(stripCanvas);
-      stripCtx.fillStyle = '#163058'; // the painter's deep-sea tone until the plate lands
+      stripCtx.fillStyle = MAP_TONE.STRIP_SEA; // the painter's deep-sea tone until the plate lands
       stripCtx.fillRect(0, 0, stripCanvas.width, stripCanvas.height);
       this.minimapBg = stripCanvas;
       loadBakedMapBg(
@@ -2808,6 +2802,8 @@ export class Hud {
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
+    $('#mm-harvest-journal')?.addEventListener('click', () => this.toggleHarvestJournal());
+    $('#mm-perfecting')?.addEventListener('click', () => this.togglePerfecting());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
     // delegate on the stable container (the header is rebuilt on each render).
@@ -3132,7 +3128,7 @@ export class Hud {
     const styleMusicBtn = () => {
       // keep the note clearly readable when off (a plain tan, not gold) — the
       // slash, not dimming, signals "muted"
-      musicBtn.style.color = music.enabled ? 'var(--gold)' : '#cdbd8e';
+      musicBtn.style.color = music.enabled ? 'var(--gold)' : CHROME_TONE.MUSIC_OFF;
       musicBtn.classList.toggle('mm-muted', !music.enabled);
     };
     styleMusicBtn();
@@ -3145,9 +3141,9 @@ export class Hud {
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
     this.showBanner(startZoneName);
-    this.log(t('hud.core.welcomeZone', { zone: startZoneName }), '#ffd100');
+    this.log(t('hud.core.welcomeZone', { zone: startZoneName }), HUD_LOG.NOTICE);
     this.logZoneWelcome(startZone);
-    this.log(t('hudChrome.tips.joinChannels'), '#7fd4ff');
+    this.log(t('hudChrome.tips.joinChannels'), HUD_LOG.TIP);
   }
 
   // The two Hud-direct single-slot writers. The elision DECISION is
@@ -5618,7 +5614,7 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#options-menu'),
     // The gold log tint stays Hud-side so the painter carries no color literal.
-    log: (message) => this.log(message, '#ffd100'),
+    log: (message) => this.log(message, HUD_LOG.NOTICE),
     resetChatWindow: () => this.resetChatWindow(),
     resetUnitFrames: () => this.resetUnitFrames(),
     isInterfaceUnlocked: () => this.isInterfaceUnlocked(),
@@ -6132,12 +6128,15 @@ export class Hud {
         showAt(e.clientX, e.clientY, 'mouse');
         return;
       }
-      const z = getUiScale();
       // reuse the box size measured in showAt: same content, no forced reflow
-      const tw = ttW,
-        th = ttH;
-      this.tooltipEl.style.left = `${Math.min(window.innerWidth / z - tw - 8, e.clientX / z + 14)}px`;
-      this.tooltipEl.style.top = `${Math.max(8, e.clientY / z - th - 10)}px`;
+      const at = tooltipPlacementAt(
+        e.clientX,
+        e.clientY,
+        { w: ttW, h: ttH },
+        this.tooltipViewport(),
+      );
+      this.tooltipEl.style.left = `${at.left}px`;
+      this.tooltipEl.style.top = `${at.top}px`;
     });
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
@@ -6264,15 +6263,20 @@ export class Hud {
       this.tooltipEl.replaceChildren(content);
     }
     this.tooltipEl.style.display = 'block';
-    // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
-    // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
-    // before clamping against the author-space tooltip box + viewport.
-    const z = getUiScale();
-    const tw = this.tooltipEl.offsetWidth,
-      th = this.tooltipEl.offsetHeight;
-    this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
-    this.tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
-    return { w: tw, h: th };
+    // The height cap goes on BEFORE the one measure so the measured box already
+    // reflects it; the clamp core (tooltip_clamp_core.ts) then maps the visual
+    // x/y into author space and keeps the box inside every viewport edge.
+    const viewport = this.tooltipViewport();
+    this.tooltipEl.style.maxHeight = `${tooltipMaxHeight(viewport)}px`;
+    const box = { w: this.tooltipEl.offsetWidth, h: this.tooltipEl.offsetHeight };
+    const at = tooltipPlacementAt(x, y, box, viewport);
+    this.tooltipEl.style.left = `${at.left}px`;
+    this.tooltipEl.style.top = `${at.top}px`;
+    return box;
+  }
+
+  private tooltipViewport(): TooltipViewport {
+    return { w: window.innerWidth, h: window.innerHeight, scale: getUiScale() };
   }
 
   // Anchors the mob-hover tooltip to a fixed viewport corner instead of the
@@ -6410,7 +6414,7 @@ export class Hud {
         }),
       );
       if (item.heroicOf || item.heroic) {
-        qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+        qualityKindHtml += ` <span style="color:${CHROME_TONE.HEROIC_TAG}">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
       }
       html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     }
@@ -8177,9 +8181,11 @@ export class Hud {
       ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
       ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
       ['#mm-professions', 'professions', 'hudChrome.professions.title'],
+      ['#mm-harvest-journal', 'harvestJournal', 'hudChrome.harvestJournal.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
       ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
+      ['#mm-perfecting', 'perfecting', 'hudChrome.perfecting.title'],
       ['#mm-arena', 'arena', 'hudChrome.pvp.launcherTitle'],
       ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
@@ -9607,7 +9613,7 @@ export class Hud {
         if (this.lastZoneId !== '') {
           const currentZoneName = zoneDisplayName(currentZone.id);
           this.showBanner(currentZoneName);
-          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
+          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), HUD_LOG.NOTICE);
           this.logZoneWelcome(currentZone);
           // Zone-entry vista: a slow up-and-out camera sweep over the new
           // zone alongside the banner. Display-only, cancelled by any
@@ -10131,7 +10137,7 @@ export class Hud {
         t('hudChrome.mountTraining.returnToMarla'),
         6000,
       );
-      this.log(summary, '#7fdc4f');
+      this.log(summary, HUD_LOG.GOOD);
     }
   }
 
@@ -10163,11 +10169,11 @@ export class Hud {
       const seconds = formatNumber(timeTicks / TICK_RATE, { maximumFractionDigits: 1 });
       const summary = t('hudChrome.mountRace.finished', { seconds });
       this.showBanner(summary);
-      this.log(summary, '#7fdc4f');
+      this.log(summary, HUD_LOG.GOOD);
     } else if (outcome === 'timeout') {
       const summary = t('hudChrome.mountRace.timeout');
       this.showBanner(summary);
-      this.log(summary, '#ff7a6a');
+      this.log(summary, HUD_LOG.BAD);
       audio.error();
     }
     $('#mount-race-strip').style.display = 'none';
@@ -10255,7 +10261,7 @@ export class Hud {
       placeholder.width = MAP_BG_RES;
       placeholder.height = mapCanvasHeight(MAP_BG_RES, region);
       const ctx = require2dContext(placeholder);
-      ctx.fillStyle = '#3c3a30';
+      ctx.fillStyle = MAP_TONE.PAPER;
       ctx.fillRect(0, 0, placeholder.width, placeholder.height);
       this.mapBgPending.set(zone.id, placeholder);
     }
@@ -10356,7 +10362,7 @@ export class Hud {
     // A neutral parchment underlay: a cache-miss open blits this canvas while
     // it fills top-down (see mapZoneBg), so the unpainted remainder reads as
     // blank map paper rather than black.
-    ctx.fillStyle = '#3c3a30';
+    ctx.fillStyle = MAP_TONE.PAPER;
     ctx.fillRect(0, 0, W, H);
     this.mapPrewarm = {
       zoneId,
@@ -10518,11 +10524,11 @@ export class Hud {
     ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
     ctx.fill();
     if (daynessNow >= 0.5) {
-      ctx.fillStyle = '#ffd45a';
+      ctx.fillStyle = MAP_TONE.CLOCK_SUN;
       ctx.beginPath();
       ctx.arc(cx, cy, 8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#ffd45a';
+      ctx.strokeStyle = MAP_TONE.CLOCK_SUN;
       ctx.lineWidth = 2;
       for (let i = 0; i < 8; i++) {
         const a = (i / 8) * Math.PI * 2;
@@ -10533,7 +10539,7 @@ export class Hud {
       }
     } else {
       // crescent: a pale disc minus an offset disc repainted in the sky color
-      ctx.fillStyle = '#e2e8f6';
+      ctx.fillStyle = MAP_TONE.CLOCK_MOON;
       ctx.beginPath();
       ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
       ctx.fill();
@@ -10547,17 +10553,17 @@ export class Hud {
     // sized and haloed so the cycle position reads at a glance
     const am = angleForPhase(phaseNow);
     ctx.save();
-    ctx.shadowColor = '#fff';
+    ctx.shadowColor = MAP_TONE.CLOCK_HAND;
     ctx.shadowBlur = 8;
     ctx.beginPath();
     ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = MAP_TONE.CLOCK_HAND;
     ctx.fill();
     ctx.restore();
     ctx.beginPath();
     ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = MAP_TONE.CLOCK_HAND_RING;
     ctx.stroke();
   }
 
@@ -10793,7 +10799,7 @@ export class Hud {
         `</div>`;
     } else {
       const cls = CLASSES[m.oppClass] ? classDisplayName(m.oppClass) : m.oppClass;
-      vsBlock = `<div class="as-vs">${svgIcon('arena')} ${esc(t('hud.arena.vsLine', { name: m.oppName }))} <span style="color:#b6ad8c;font-size:11px">${esc(
+      vsBlock = `<div class="as-vs">${svgIcon('arena')} ${esc(t('hud.arena.vsLine', { name: m.oppName }))} <span style="color:${CHROME_TONE.ARENA_META};font-size:11px">${esc(
         t('hud.arena.levelClass', {
           level: formatNumber(m.oppLevel, { maximumFractionDigits: 0 }),
           className: cls,
@@ -11525,7 +11531,7 @@ export class Hud {
             ev.kind === 'evade'
           ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
-            // token (#bbb vs #fff); the localized word stays at the call site. A resisted
+            // token (the grey vs the white FCT token); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
             // not miss).
             const shape = fctSpawnShape({
@@ -11557,7 +11563,7 @@ export class Hud {
               );
             // Fiesta: a dodge is a moment — pop a big exaggerated word for it.
             if (ev.kind === 'dodge' && (isPlayerSource || isPlayerTarget) && this.inFiesta()) {
-              this.fiestaWordPop(t('fiesta.word.dodge'), '#7fd4ff', 1);
+              this.fiestaWordPop(t('fiesta.word.dodge'), HUD_LOG.TIP, 1);
               this.renderer.addShake(0.15);
             }
             if (isPlayerSource || isPlayerOwnedSource) {
@@ -11576,7 +11582,7 @@ export class Hud {
                   ability: combatAbilityName(ev.ability),
                   target: entityDisplayName(tgt),
                 }),
-                '#ccc',
+                HUD_LOG.PLAIN,
               );
             }
             break;
@@ -11618,7 +11624,7 @@ export class Hud {
                 target: entityDisplayName(tgt),
                 amount: ev.amount,
               }),
-              ev.ability ? '#ffe97a' : '#eee',
+              ev.ability ? HUD_LOG.ABILITY_HIT : HUD_LOG.MELEE_HIT,
             );
             // combat SFX (swing + material/school impact + crit) is spatial now;
             // see playEventSfx, which runs for every damage event above.
@@ -11631,7 +11637,7 @@ export class Hud {
                 source: src ? entityDisplayName(src) : '?',
                 amount: ev.amount,
               }),
-              '#ff8877',
+              HUD_LOG.DAMAGE_TAKEN,
             );
             // player-hit SFX is spatial now (see playEventSfx). Keep the Fiesta kick;
             // in the open world only a HEAVY hit kicks the camera (a tenth of
@@ -11660,7 +11666,7 @@ export class Hud {
                   target: entityDisplayName(tgt),
                   amount: ev.amount,
                 }),
-                '#b8c4d9',
+                HUD_LOG.BLOCK_DEALT,
               );
             // Same Fiesta/heavy-hit shake feel as an unblocked hit dealt: the block only
             // changes how the number READS, not the impact.
@@ -11683,7 +11689,7 @@ export class Hud {
                   source: src ? entityDisplayName(src) : '?',
                   amount: ev.amount,
                 }),
-                '#7ec8e3',
+                HUD_LOG.BLOCK_TAKEN,
               );
             // Same Fiesta/heavy-hit shake feel as an unblocked hit taken: the block only
             // changes how the number READS, not the impact.
@@ -11711,7 +11717,7 @@ export class Hud {
         case 'death': {
           const e = sim.entities.get(ev.entityId);
           if (e && ev.entityId !== sim.playerId)
-            this.combatLog(t('hud.combat.death', { name: entityDisplayName(e) }), '#aaa');
+            this.combatLog(t('hud.combat.death', { name: entityDisplayName(e) }), HUD_LOG.DEATH);
           break;
         }
         case 'xp': {
@@ -11741,10 +11747,10 @@ export class Hud {
                 amount: ev.amount,
                 rested: ev.rested,
               }),
-              '#a980d8',
+              HUD_LOG.XP,
             );
           } else {
-            this.log(t('hud.core.xpGain', { amount: ev.amount }), '#a980d8');
+            this.log(t('hud.core.xpGain', { amount: ev.amount }), HUD_LOG.XP);
           }
           break;
         }
@@ -11777,13 +11783,13 @@ export class Hud {
               now,
             );
           }
-          this.log(honorMessage, '#ffd100');
+          this.log(honorMessage, HUD_LOG.NOTICE);
           // Mirror to the combat pane as a SILENT visual line (appendLog, not
           // combatLog): the log() line above already announces via #chat-live, so
           // routing it through the combat announcer too would make a screen reader hear
           // every Honor gain twice. This matches the xp-float precedent and the announce
           // contract (see appendLog / showSelfNote).
-          this.appendLog(this.combatLogEl, honorMessage, '#ffd100');
+          this.appendLog(this.combatLogEl, honorMessage, HUD_LOG.NOTICE);
           // Keep the character sheet's Honor balance live if the sheet is open (spending
           // already refreshes via the inventory path; an award landing did not).
           this.renderCharIfOpen();
@@ -11794,7 +11800,7 @@ export class Hud {
           // replaced (the deed collision this closes) and files ahead of
           // queued deeds.
           this.showCelebrationBanner(t('hud.core.levelBanner', { level: ev.level }), 'levelup');
-          this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
+          this.log(t('hud.core.levelLog', { level: ev.level }), HUD_LOG.NOTICE);
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
             // Same 'levelup' class as the level banner above: before the R38
@@ -11819,7 +11825,7 @@ export class Hud {
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showCelebrationBanner(t('game.talents.unlockBanner'), 'levelup');
-            this.log(t('game.talents.unlockHint'), '#ffd100');
+            this.log(t('game.talents.unlockHint'), HUD_LOG.NOTICE);
           }
           break;
         }
@@ -11830,7 +11836,7 @@ export class Hud {
           );
           this.log(
             `${t('game.progression.virtualLevelUp')} ${formatNumber(ev.level, { maximumFractionDigits: 0 })}!`,
-            '#ffd100',
+            HUD_LOG.NOTICE,
           );
           audio.levelUp();
           break;
@@ -11859,7 +11865,7 @@ export class Hud {
           // (#2430). Everything else in this arm still runs for those grants:
           // the loot-roll close below, the bag refresh, and the independent
           // audio guard.
-          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), '#7fdc4f');
+          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), HUD_LOG.GOOD);
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
@@ -12158,56 +12164,15 @@ export class Hud {
           const professionName = professionKey ? t(professionKey) : ev.professionId;
           const materialToken = ev.materialItemId ? grantItemToken(ev.materialItemId) : '';
           const countText = formatNumber(ev.count ?? 0, { maximumFractionDigits: 0 });
-          if (ev.ok) {
-            this.log(
-              ev.action === 'slot'
-                ? t('hudChrome.professions.toolEffectSlotted', {
-                    effect: effectName,
-                    profession: professionName,
-                  })
-                : t('hudChrome.professions.toolEffectRecharged', {
-                    effect: effectName,
-                    material: materialToken,
-                    count: countText,
-                  }),
-              '#7fdc4f',
-            );
-          } else {
-            this.log(
-              ev.reason === 'no_tool'
-                ? t('hudChrome.professions.toolEffectNoTool', { profession: professionName })
-                : ev.reason === 'no_charm'
-                  ? t('hudChrome.professions.toolEffectNoCharm', { effect: effectName })
-                  : ev.reason === 'no_gain'
-                    ? t('hudChrome.professions.toolEffectNoGain', { effect: effectName })
-                    : ev.reason === 'no_slot'
-                      ? t('hudChrome.professions.toolEffectRechargeNoSlot', {
-                          profession: professionName,
-                        })
-                      : ev.reason === 'already_full'
-                        ? t('hudChrome.professions.toolEffectRechargeFull', { effect: effectName })
-                        : ev.reason === 'tool_capped'
-                          ? t('hudChrome.professions.toolEffectRechargeToolCapped', {
-                              effect: effectName,
-                              profession: professionName,
-                            })
-                          : ev.reason === 'insufficient_materials'
-                            ? t('hudChrome.professions.toolEffectRechargeMaterials', {
-                                effect: effectName,
-                                material: materialToken,
-                                count: countText,
-                              })
-                            : ev.reason === 'busy' || ev.reason === 'throttled'
-                              ? // 'throttled' is the old-server wire reason
-                                // (retired emit): render the busy copy, never
-                                // the wrong slot-invalid line.
-                                t('hudChrome.crafting.busy')
-                              : t('hudChrome.professions.toolEffectSlotInvalid', {
-                                  effect: effectName,
-                                }),
-              '#ff6b6b',
-            );
-          }
+          // Which line, its values, and its tone: tool_effect_result_view's
+          // exhaustive table (the craft_denial_line_view shape).
+          const line = toolEffectResultLine(ev, {
+            effect: effectName,
+            profession: professionName,
+            material: materialToken,
+            count: countText,
+          });
+          this.log(t(line.key, line.params), line.tone);
           // The slot rows live in the professions window; repaint an open one
           // so charges/effects flip without a manual reopen (the trainResult
           // idiom above).
@@ -12383,7 +12348,7 @@ export class Hud {
                 material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
                 qty: grantQtyText(ev.count),
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
             const secondary = disenchantSecondaryLineKey(ev);
             if (secondary && ev.secondaryItemId)
@@ -12392,7 +12357,7 @@ export class Hud {
                   material: grantItemToken(ev.secondaryItemId),
                   qty: grantQtyText(ev.secondaryCount),
                 }),
-                '#7fdc4f',
+                PROF_LOG_GRANT,
               );
             audio.disenchant();
           } else this.showError(t(toast.key));
@@ -12406,7 +12371,7 @@ export class Hud {
           if (ev.equipped > 0) {
             this.log(
               t('hudChrome.talents.gearRestored', { n: formatNumber(ev.equipped) }),
-              '#ffd100',
+              HUD_LOG.NOTICE,
             );
           }
           // Three distinct reasons, three distinct lines. The event schema and the
@@ -12416,13 +12381,13 @@ export class Hud {
           if (ev.notHeld > 0) {
             this.log(
               t('hudChrome.talents.gearNotHeld', { n: formatNumber(ev.notHeld) }),
-              '#ff8a5c',
+              HUD_LOG.SHORTFALL,
             );
           }
           if (ev.copyGone > 0) {
             this.log(
               t('hudChrome.talents.gearCopyGone', { n: formatNumber(ev.copyGone) }),
-              '#ff8a5c',
+              HUD_LOG.SHORTFALL,
             );
           }
           if (ev.takenByOtherSlot > 0) {
@@ -12430,7 +12395,7 @@ export class Hud {
               t('hudChrome.talents.gearTakenByOtherSlot', {
                 n: formatNumber(ev.takenByOtherSlot),
               }),
-              '#ff8a5c',
+              HUD_LOG.SHORTFALL,
             );
           }
           break;
@@ -12448,7 +12413,7 @@ export class Hud {
                 material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
                 qty: grantQtyText(ev.count),
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
             audio.salvage();
           } else this.showError(t(toast.key));
@@ -12469,7 +12434,7 @@ export class Hud {
                 item: grantItemToken(ev.itemId),
                 enchant: t(`hudChrome.enchantName.${ev.enchantId}` as TranslationKey),
               }),
-              '#7fdc4f',
+              PROF_LOG_GRANT,
             );
             audio.enchant();
           } else {
@@ -12502,7 +12467,7 @@ export class Hud {
           // toggle), the bobber flips into its bite state via the renderer's
           // own handleEvent arm, and this localized line keeps the moment
           // visible in the log so it is never sound-only (accessibility).
-          this.log(t('hudChrome.gathering.biteLine'), '#9adcff');
+          this.log(t('hudChrome.gathering.biteLine'), HUD_LOG.CUE);
           audio.fishBite();
           break;
         }
@@ -12511,7 +12476,7 @@ export class Hud {
           // localized line only, NO cue (a miss costs nothing and a cue every
           // missed bite would spam an AFK-adjacent moment); the bobber sinks
           // out on its own as the cast ends.
-          this.log(t('hudChrome.gathering.gotAwayLine'), '#a8a8a8');
+          this.log(t('hudChrome.gathering.gotAwayLine'), PROF_LOG_MISS);
           break;
         }
         case 'fishingEarlyReel': {
@@ -12519,7 +12484,7 @@ export class Hud {
           // line teaches the mechanic (wait for the bite), in the gotAwayLine
           // register: grey, log only, NO cue (an early reel costs nothing,
           // and a spammer would turn a cue into noise).
-          this.log(t('hudChrome.gathering.earlyReelLine'), '#a8a8a8');
+          this.log(t('hudChrome.gathering.earlyReelLine'), PROF_LOG_MISS);
           break;
         }
         case 'fishingEmptyHook': {
@@ -12625,7 +12590,7 @@ export class Hud {
               : ev.senderName;
           audio.whisper();
           this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: sender }));
-          this.log(t('hudChrome.mailbox.arrivedLog', { name: sender }), '#c8f7c5');
+          this.log(t('hudChrome.mailbox.arrivedLog', { name: sender }), HUD_LOG.NEWS);
           this.lastMailUnread = -1; // force the envelope indicator to repaint
           break;
         }
@@ -12638,9 +12603,9 @@ export class Hud {
           };
           if (ev.code === 'sent') {
             audio.coin();
-            this.log(t('hudChrome.mailbox.result.sent', values), '#c8f7c5');
+            this.log(t('hudChrome.mailbox.result.sent', values), HUD_LOG.NEWS);
           } else if (ev.code === 'collected') {
-            this.log(t('hudChrome.mailbox.result.collected', values), '#c8f7c5');
+            this.log(t('hudChrome.mailbox.result.collected', values), HUD_LOG.NEWS);
           } else {
             // ?? the generic row: t() throws on an undefined key, and the code
             // is a WIRE union a newer server can widen (the R34 family's enum
@@ -12653,7 +12618,7 @@ export class Hud {
         }
         case 'calendarResult': {
           if (ev.code === 'created' || ev.code === 'removed') {
-            this.log(t(CALENDAR_RESULT_KEYS[ev.code]), '#c8f7c5');
+            this.log(t(CALENDAR_RESULT_KEYS[ev.code]), HUD_LOG.NEWS);
           } else {
             this.showError(t(CALENDAR_RESULT_KEYS[ev.code] ?? CALENDAR_RESULT_FALLBACK_KEY));
           }
@@ -12662,7 +12627,7 @@ export class Hud {
         }
         case 'motdResult': {
           if (ev.code === 'set') {
-            this.log(t(MOTD_RESULT_KEYS[ev.code]), '#c8f7c5');
+            this.log(t(MOTD_RESULT_KEYS[ev.code]), HUD_LOG.NEWS);
           } else {
             this.showError(t(MOTD_RESULT_KEYS[ev.code] ?? MOTD_RESULT_FALLBACK_KEY));
           }
@@ -12680,7 +12645,7 @@ export class Hud {
                 this.deedsWindow.openWithDeed(ev.deedId),
               ),
             ),
-            '#40d264',
+            HUD_LOG.BROADCAST,
           );
           break;
         }
@@ -12706,7 +12671,7 @@ export class Hud {
                   reliquaryIlluminationBroadcastLine(ev.characterName, pageId),
                 ),
               ],
-              '#40d264',
+              HUD_LOG.BROADCAST,
             );
           } else {
             this.logNodes(
@@ -12718,7 +12683,7 @@ export class Hud {
                     this.reliquaryWindow.openWithPage(pageId),
                   ),
               ),
-              '#40d264',
+              HUD_LOG.BROADCAST,
             );
           }
           break;
@@ -12740,7 +12705,7 @@ export class Hud {
           break;
         case 'questProgress': {
           const progressText = questProgressEventText(ev);
-          this.log(progressText, '#dcd29f');
+          this.log(progressText, HUD_LOG.PROGRESS);
           // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
           // log line above stays the durable, announced copy.
           this.questBanner.show(progressText);
@@ -13019,7 +12984,7 @@ export class Hud {
                     target: entityDisplayName(tgt),
                     amount: ev.amount,
                   }),
-                  '#7fdc4f',
+                  HUD_LOG.GOOD,
                 );
               }
             }
@@ -13119,13 +13084,13 @@ export class Hud {
           this.guildInvitePromptEl = null;
           const message = t('hud.prompts.guildInviteCancelled');
           this.showBanner(message);
-          this.log(message, '#dcd29f');
+          this.log(message, HUD_LOG.PROGRESS);
           break;
         }
         case 'guildRenamed': {
           const message = t('hud.prompts.guildRenamed', { name: ev.newName });
           this.showBanner(message);
-          this.log(message, '#dcd29f');
+          this.log(message, HUD_LOG.PROGRESS);
           break;
         }
         case 'tradeRequest':
@@ -13163,7 +13128,7 @@ export class Hud {
           const text = t('hud.system.duelCountdown', {
             seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
           });
-          if (this.showBanner(text) !== 'show') this.log(text, '#fa6');
+          if (this.showBanner(text) !== 'show') this.log(text, HUD_LOG.CONTEST);
           audio.duelCountdownTick();
           break;
         }
@@ -13182,7 +13147,7 @@ export class Hud {
               winner: ev.winnerName,
               loser: ev.loserName,
             }),
-            '#fa6',
+            HUD_LOG.CONTEST,
           );
           audio.duelEnd();
           break;
@@ -13191,11 +13156,11 @@ export class Hud {
             t('hud.system.arenaQueued', {
               position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
             }),
-            '#ffa040',
+            HUD_LOG.QUEUE,
           );
           break;
         case 'arenaUnqueued':
-          this.log(t('hud.system.arenaUnqueued'), '#ffa040');
+          this.log(t('hud.system.arenaUnqueued'), HUD_LOG.QUEUE);
           break;
         case 'bgQueued':
         case 'bgUnqueued':
@@ -13232,7 +13197,7 @@ export class Hud {
             this.showBanner(t('hudChrome.bg.capturedTeamBanner', { takers, team, ...scores }));
             this.combatLog(
               t('hudChrome.bg.capturedLog', { name: ev.byName, team, ...scores }),
-              '#ffd24a',
+              HUD_LOG.CALL,
             );
             audio.bgCapture();
           } else if (ev.action === 'taken') {
@@ -13241,13 +13206,16 @@ export class Hud {
             // log-only so a taken/captured banner is never clobbered by the
             // least urgent call of the three.
             this.showBanner(t('hudChrome.bg.flagTakenBanner', { takers, team }));
-            this.combatLog(t('hudChrome.bg.flagTakenLog', { name: ev.byName, team }), '#ff9a3c');
+            this.combatLog(
+              t('hudChrome.bg.flagTakenLog', { name: ev.byName, team }),
+              HUD_LOG.FLAG_TAKEN,
+            );
             audio.bgFlagTaken();
           } else if (ev.action === 'dropped') {
-            this.combatLog(t('hudChrome.bg.flagDroppedLog', { team }), '#cfc6a8');
+            this.combatLog(t('hudChrome.bg.flagDroppedLog', { team }), HUD_LOG.MUTED);
           } else {
             this.showBanner(t('hudChrome.bg.flagReturnedBanner', { team }));
-            this.combatLog(t('hudChrome.bg.flagReturnedLog', { team }), '#9fdc7f');
+            this.combatLog(t('hudChrome.bg.flagReturnedLog', { team }), HUD_LOG.FLAG_RETURNED);
             audio.readyCheck();
           }
           break;
@@ -13268,7 +13236,11 @@ export class Hud {
             ev.killerName === null
               ? t('hudChrome.bg.killFeedFallen', { victim: ev.victimName })
               : t('hudChrome.bg.killFeed', { killer: ev.killerName, victim: ev.victimName }),
-            ev.killerTeam === 0 ? '#ff8a7a' : ev.killerTeam === 1 ? '#7fb2ff' : '#cfc6a8',
+            ev.killerTeam === 0
+              ? HUD_LOG.KILL_FEED_TEAM_A
+              : ev.killerTeam === 1
+                ? HUD_LOG.KILL_FEED_TEAM_B
+                : HUD_LOG.MUTED,
           );
           break;
         }
@@ -13279,7 +13251,7 @@ export class Hud {
           // The copy decision is the pure core's, not this switch's.
           const call = buildBgTimeWarningView(ev.secondsLeft);
           this.showBanner(call.banner);
-          this.combatLog(call.log, BG_TIME_WARNING_LOG_COLOR);
+          this.combatLog(call.log, HUD_LOG.CALL);
           audio.duelCountdownTick();
           break;
         }
@@ -13326,7 +13298,7 @@ export class Hud {
               level: formatNumber(ev.oppLevel, { maximumFractionDigits: 0 }),
               className: cls,
             }),
-            '#ffa040',
+            HUD_LOG.QUEUE,
           );
           audio.duelChallenge();
           break;
@@ -13336,7 +13308,7 @@ export class Hud {
           const text = t('hud.system.arenaCountdown', {
             seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
           });
-          if (this.showBanner(text) !== 'show') this.log(text, '#fa6');
+          if (this.showBanner(text) !== 'show') this.log(text, HUD_LOG.CONTEST);
           audio.duelCountdownTick();
           break;
         }
@@ -13348,14 +13320,14 @@ export class Hud {
           if (ev.format === 'fiesta') {
             if (ev.draw) {
               this.showBanner(t('fiesta.end.draw'));
-              this.combatLog(t('fiesta.end.draw'), '#fa6');
+              this.combatLog(t('fiesta.end.draw'), HUD_LOG.CONTEST);
             } else if (ev.won) {
               this.showBanner(t('fiesta.end.win'));
-              this.combatLog(t('fiesta.end.win'), '#7fdc4f');
+              this.combatLog(t('fiesta.end.win'), HUD_LOG.GOOD);
               audio.fiestaWave();
             } else {
               this.showBanner(t('fiesta.end.loss'));
-              this.combatLog(t('fiesta.end.loss'), '#ff7a6a');
+              this.combatLog(t('fiesta.end.loss'), HUD_LOG.BAD);
               audio.death();
             }
             break;
@@ -13368,11 +13340,11 @@ export class Hud {
             this.yumiPainter.reset();
             if (ev.won) {
               this.showBanner(t('yumi.end.win'));
-              this.combatLog(t('yumi.end.win'), '#7fdc4f');
+              this.combatLog(t('yumi.end.win'), HUD_LOG.GOOD);
               audio.fiestaWave();
             } else {
               this.showBanner(t('yumi.end.loss'));
-              this.combatLog(t('yumi.end.loss'), '#ff7a6a');
+              this.combatLog(t('yumi.end.loss'), HUD_LOG.BAD);
               audio.death();
             }
             break;
@@ -13397,7 +13369,7 @@ export class Hud {
               rating: ratingAfter,
               delta: ratingDelta,
             });
-            arenaResultColor = '#fa6';
+            arenaResultColor = HUD_LOG.CONTEST;
           } else if (ev.won) {
             this.showBanner(
               t('hud.system.arenaVictoryBanner', {
@@ -13411,7 +13383,7 @@ export class Hud {
               rating: ratingAfter,
               delta: ratingDelta,
             });
-            arenaResultColor = '#7fdc4f';
+            arenaResultColor = HUD_LOG.GOOD;
             audio.duelEnd();
           } else {
             this.showBanner(
@@ -13426,7 +13398,7 @@ export class Hud {
               rating: ratingAfter,
               delta: ratingDelta,
             });
-            arenaResultColor = '#ff7a6a';
+            arenaResultColor = HUD_LOG.BAD;
             audio.arenaLoss();
           }
           this.log(arenaResultLine, arenaResultColor);
@@ -13450,7 +13422,7 @@ export class Hud {
         case 'yumiSuddenDeath':
           if (ev.pid === sim.playerId) {
             this.showBanner(t('yumi.banner.sudden'));
-            this.combatLog(t('yumi.banner.sudden'), '#ff7a6a');
+            this.combatLog(t('yumi.banner.sudden'), HUD_LOG.BAD);
             audio.fiestaWave();
           }
           break;
@@ -13461,7 +13433,7 @@ export class Hud {
           const myCat = y ? (y.team === 'A' ? y.yumiA.entityId : y.yumiB.entityId) : -1;
           if (ev.catId === myCat) {
             this.showBanner(t('yumi.banner.teleport'));
-            this.log(t('yumi.banner.teleport'), '#7fd7ff');
+            this.log(t('yumi.banner.teleport'), HUD_LOG.TELEPORT);
           }
           break;
         }
@@ -13499,7 +13471,7 @@ export class Hud {
               total: formatNumber(ev.totalWaves, { maximumFractionDigits: 0 }),
             }),
           );
-          this.fiestaWordPop(t('fiesta.word.wave'), '#ffd24a', 2);
+          this.fiestaWordPop(t('fiesta.word.wave'), HUD_LOG.CALL, 2);
           this.renderer.addShake(0.4);
           audio.fiestaWave();
           break;
@@ -13518,20 +13490,23 @@ export class Hud {
             this.renderer.fiestaAugmentBurst(this.sim.playerId);
             audio.fiestaAugment();
             this.showBanner(t('fiesta.banner.augmentGained', { name }));
-            this.log(t('fiesta.log.augmentGained', { name }), '#ff3df0');
+            this.log(t('fiesta.log.augmentGained', { name }), HUD_LOG.AUGMENT);
           } else {
-            this.log(t('fiesta.log.allyAugment', { player: ev.byName, name }), '#c98bff');
+            this.log(
+              t('fiesta.log.allyAugment', { player: ev.byName, name }),
+              HUD_LOG.ALLY_AUGMENT,
+            );
           }
           break;
         }
         case 'fiestaPowerup': {
           const name = tOptional(`fiesta.powerup.${ev.defId}.name`) ?? ev.defId;
           const who = sim.entities.get(ev.entityId)?.name ?? '?';
-          this.log(t('fiesta.log.powerup', { player: who, name }), '#ffd24a');
+          this.log(t('fiesta.log.powerup', { player: who, name }), HUD_LOG.CALL);
           if (ev.entityId === sim.playerId) {
             audio.fiestaAugment();
             this.showBanner(t('fiesta.banner.powerup', { name }));
-            this.fiestaWordPop(name.toUpperCase(), '#32e0ff', 2);
+            this.fiestaWordPop(name.toUpperCase(), HUD_LOG.POWERUP_POP, 2);
           }
           break;
         }
@@ -13587,7 +13562,7 @@ export class Hud {
               : ev.tier === 'medium'
                 ? t('sim.lockpick.tierMedium')
                 : t('sim.lockpick.tierLow');
-          this.combatLog(t('sim.lockpick.lockYields', { tier }), '#ffdd88');
+          this.combatLog(t('sim.lockpick.lockYields', { tier }), HUD_LOG.LOCK_YIELD);
           sfx.playUi('lockpick_bonus');
           break;
         }
@@ -13672,13 +13647,13 @@ export class Hud {
               name: t(`delveUi.board.companion.${companionKey}` as TranslationKey),
               line,
             }),
-            '#c9a6e0',
+            HUD_LOG.DELVE_COMPANION,
           );
           break;
         }
         case 'delveLoreUnlock': {
           const title = t(`delveUi.lore.${ev.loreId}` as TranslationKey);
-          this.combatLog(t('delveUi.summary.loreUnlock', { title }), '#cba6f0');
+          this.combatLog(t('delveUi.summary.loreUnlock', { title }), HUD_LOG.DELVE_LORE);
           break;
         }
         case 'log': {
@@ -13690,8 +13665,8 @@ export class Hud {
           // mob barks while a mechanic's only cue is never buried. A narrative line
           // still gets its floating world chat bubble below.
           if (isCombatFlavorLog(ev.entityId, ev.pid, ev.telegraph))
-            this.combatLog(text, ev.color ?? '#ccc');
-          else this.log(text, ev.color ?? '#ccc');
+            this.combatLog(text, ev.color ?? HUD_LOG.PLAIN);
+          else this.log(text, ev.color ?? HUD_LOG.PLAIN);
           if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
           // Sundering completion cue: raw-English match pre-localization (the
           // fiestaRevive precedent; weld: profession_event_lines_core.ts).
@@ -13708,12 +13683,12 @@ export class Hud {
             ? abilityDisplayNameFromSource(ev.killerAbility)
             : undefined;
           const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
-          this.log(t(feedback.key, feedback.values), '#ff4444');
+          this.log(t(feedback.key, feedback.values), HUD_LOG.DEATH_RECAP);
           audio.playerDeath();
           break;
         }
         case 'respawn':
-          this.log(t('hud.system.respawn'), '#7fdc4f');
+          this.log(t('hud.system.respawn'), HUD_LOG.GOOD);
           break;
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);
@@ -13735,7 +13710,8 @@ export class Hud {
               feedback.kind === 'progress' ? 'unstuck' : null,
             );
           }
-          if (feedback.log) this.log(text, feedback.kind === 'success' ? '#7fdc4f' : '#ffd100');
+          if (feedback.log)
+            this.log(text, feedback.kind === 'success' ? HUD_LOG.GOOD : HUD_LOG.NOTICE);
           break;
         }
         case 'castStart':
@@ -13798,7 +13774,7 @@ export class Hud {
               t(ev.gained ? 'hud.combat.auraGain' : 'hud.combat.auraFade', {
                 name: auraName,
               }),
-              '#d8a0d8',
+              HUD_LOG.AURA,
             );
           } else if (tgt && ev.gained) {
             const matched = findAuraForGainEvent(tgt.auras, ev.name, ev.auraKind);
@@ -13807,7 +13783,7 @@ export class Hud {
                 target: entityDisplayName(tgt),
                 name: auraName,
               }),
-              '#d8a0d8',
+              HUD_LOG.AURA,
             );
           }
           break;
@@ -13897,7 +13873,7 @@ export class Hud {
         skill: skillName(up.skillId),
         level: formatNumber(up.toLevel, { maximumFractionDigits: 0 }),
       });
-    for (const up of plan.skillUpLogs) this.log(toastText(up), '#ffd100');
+    for (const up of plan.skillUpLogs) this.log(toastText(up), HUD_LOG.NOTICE);
     if (plan.banner !== null) {
       const artUrl = professionImageUrl(skillLevelArtId(plan.banner.skillId));
       // Celebration class 'deed': queues behind level-ups, never ambient
@@ -13972,7 +13948,7 @@ export class Hud {
                 }),
               })
             : t('hudChrome.crafting.trendNudgeNoMaster', { archetype }),
-          '#c8b888',
+          HUD_LOG.HINT,
         );
         break;
       }
@@ -14131,7 +14107,7 @@ export class Hud {
         // A relic the catalog no longer places has nowhere to jump, so the line
         // stays plain rather than offering a link that opens nothing (the
         // recent strip's inert-chip policy).
-        this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
+        this.log(t('hudChrome.reliquary.unlockToast', { name }), HUD_LOG.NOTICE);
         continue;
       }
       // The durable gold line, with the relic name spliced in as a clickable
@@ -14142,7 +14118,7 @@ export class Hud {
           t('hudChrome.reliquary.unlockToast', { name: DEED_NAME_TOKEN }),
           () => deedChatLinkEl(document, name, () => this.reliquaryWindow.openWithPage(pageId)),
         ),
-        '#ffd100',
+        HUD_LOG.NOTICE,
       );
     }
     // Durable Illumination log survives even when rank-up claims the banner slot.
@@ -14159,7 +14135,7 @@ export class Hud {
         // would jump to a window that opens un-navigated, so the line stays
         // plain instead of carrying a dead link: the relic line's inert-link
         // policy above, applied to both Illumination emitters.
-        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), HUD_LOG.NOTICE);
       } else {
         this.logNodes(
           deedLineNodes(
@@ -14168,7 +14144,7 @@ export class Hud {
             () =>
               deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
           ),
-          '#ffd100',
+          HUD_LOG.NOTICE,
         );
       }
     }
@@ -14192,7 +14168,7 @@ export class Hud {
             }),
             () => deedChatLinkEl(document, rankName, () => this.reliquaryWindow.open('overview')),
           ),
-          '#ffd100',
+          HUD_LOG.NOTICE,
         );
         // The one rank whose deed bridge rewards a nameplate border earns a
         // second, durable line: the rank banner alone never says the border is
@@ -14202,7 +14178,7 @@ export class Hud {
             t('hudChrome.reliquary.borderWearableNote', {
               name: deedName(CURATOR_BORDER_REWARD.deedId),
             }),
-            '#ffd100',
+            HUD_LOG.NOTICE,
           );
         }
       } else if (banner.kind === 'illuminate') {
@@ -14218,7 +14194,7 @@ export class Hud {
           // banner prose above keeps the (fallback) name on purpose: it is
           // text, not a jump, and a drift drain is a dev/ops anomaly worth
           // seeing.
-          this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+          this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), HUD_LOG.NOTICE);
         } else {
           this.logNodes(
             deedLineNodes(
@@ -14227,7 +14203,7 @@ export class Hud {
               () =>
                 deedChatLinkEl(document, pageName, () => this.reliquaryWindow.openWithPage(jumpId)),
             ),
-            '#ffd100',
+            HUD_LOG.NOTICE,
           );
         }
       } else {
@@ -14271,7 +14247,7 @@ export class Hud {
       const retroText = tPlural('hudChrome.plurals.reliquaryRetroSummary', plan.retroCount, {
         count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
       });
-      this.log(retroText, '#ffd100');
+      this.log(retroText, HUD_LOG.NOTICE);
       this.combatAnnouncer.push(retroText, performance.now());
     }
   }
@@ -14296,17 +14272,20 @@ export class Hud {
           t('hudChrome.deeds.unlockedBanner', { name: DEED_NAME_TOKEN }),
           () => deedChatLinkEl(document, deedName(id), () => this.deedsWindow.openWithDeed(id)),
         ),
-        '#ffd100',
+        HUD_LOG.NOTICE,
       );
     }
     for (const id of plan.titleHintIds) {
-      this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
+      this.log(
+        t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }),
+        HUD_LOG.NOTICE,
+      );
     }
     // The border sibling of the title hint, same color and placement. A border
     // reward carries no display text of its own (only a palette slug), so the
     // line names the DEED, which is also what the picker lists it under.
     for (const id of plan.borderHintIds) {
-      this.log(t('hudChrome.deeds.unlockedBorderHint', { name: deedName(id) }), '#ffd100');
+      this.log(t('hudChrome.deeds.unlockedBorderHint', { name: deedName(id) }), HUD_LOG.NOTICE);
     }
     if (plan.bannerId !== null) {
       const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
@@ -14328,14 +14307,14 @@ export class Hud {
       const retroText = tPlural('hudChrome.plurals.deedsRetroSummary', plan.retroCount, {
         count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
       });
-      this.log(retroText, '#ffd100');
+      this.log(retroText, HUD_LOG.NOTICE);
       this.combatAnnouncer.push(retroText, performance.now());
     }
   }
 
   log(
     text: string,
-    color = '#ccc',
+    color: string = HUD_LOG.PLAIN,
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
@@ -14404,7 +14383,7 @@ export class Hud {
 
   private logZoneWelcome(zone: ZoneDef): void {
     if (zone.welcomeQuestId && this.sim.questState(zone.welcomeQuestId) !== 'available') return;
-    this.log(zoneWelcome(zone.id), '#ffd100');
+    this.log(zoneWelcome(zone.id), HUD_LOG.NOTICE);
   }
 
   private chatLogFrom(
@@ -14838,7 +14817,7 @@ export class Hud {
     return copper === null ? text : formatLocalizedMoney(copper);
   }
 
-  private combatLog(text: string, color = '#ccc'): void {
+  private combatLog(text: string, color: string = HUD_LOG.PLAIN): void {
     this.appendLog(this.combatLogEl, text, color);
     // Mirror the combat line to the off-screen polite live region, throttled so a
     // damage burst does not flood the screen reader (see ./combat_announcer). The
@@ -14922,7 +14901,7 @@ export class Hud {
 
   // A floating note over the local player (e.g. "Can't move!" when a movement command
   // lands while rooted/stunned). The 8th FCT spawn site: it rides the same pooled painter
-  // as the combat floaters via the self-note kind (the #ff8c66 colour token). Throttling
+  // as the combat floaters via the self-note kind (its own FCT colour token). Throttling
   // is the caller's job (main.ts gates it behind IMMOBILE_NOTE_THROTTLE_MS).
   showSelfNote(text: string): void {
     const shape = fctSpawnShape({ type: 'self-note' });
@@ -16143,13 +16122,19 @@ export class Hud {
   // -------------------------------------------------------------------------
   // Commission order board (issue #1298): a lightweight job board layered on
   // the Maker's Bond (unbind service above). Opened from the crafting
-  // window's header; non-modal like crafting itself, so no focus trap.
+  // window's header; non-modal like crafting itself (aria-modal false), and
+  // like crafting it takes the shared windowFocus trap + opener restore.
   // -------------------------------------------------------------------------
 
   openCommissionBoard(): void {
+    const wasOpen = this.commissionBoardOpen;
     this.closeOtherWindows('#commission-board-window');
     this.commissionBoardOpen = true;
     this.renderCommissionBoard();
+    // AFTER the paint (the openCrafting ordering): captureFocus records the
+    // opener and installs the trap over a root that is by then populated and
+    // displayed. A re-open while already open keeps the first opener.
+    if (!wasOpen) this.commissionBoardOpenerFocus = this.commissionBoardFocus.captureFocus();
   }
 
   private renderCommissionBoard(): void {
@@ -16182,6 +16167,8 @@ export class Hud {
     $('#commission-board-window').style.display = 'none';
     this.commissionBoardOpen = false;
     this.hideTooltip();
+    this.commissionBoardFocus.restoreFocus(this.commissionBoardOpenerFocus);
+    this.commissionBoardOpenerFocus = null;
   }
 
   // -------------------------------------------------------------------------
@@ -17195,7 +17182,7 @@ export class Hud {
   }
 
   // In-app text-input modal (reuses the confirm-dialog chrome); the whole
-  // body lives in src/ui/input_dialog.ts (the phase 14 ratchet payback), and
+  // body lives in src/ui/input_controller.ts (the phase 14 ratchet payback), and
   // this thin delegator only lends it the Hud-owned pieces: the shared
   // confirm-trap slot and the pending no-choice cancel.
   private inputDialog(opts: InputDialogOpts): void {
@@ -17970,7 +17957,7 @@ export class Hud {
     const roleLabel = discordRoleTagLabel(target.discordRole);
     if (roleLabel) {
       parts.push(
-        `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? '#888'}">${esc(roleLabel)}</span>`,
+        `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? CHROME_TONE.ROLE_FALLBACK}">${esc(roleLabel)}</span>`,
       );
     }
     if (tier > 0) {
@@ -18376,10 +18363,10 @@ export class Hud {
     if (!key) return;
     if (this.localIgnoredNames.has(key)) {
       this.localIgnoredNames.delete(key);
-      this.log(t('hud.system.noLongerIgnoring', { name }), '#aaf');
+      this.log(t('hud.system.noLongerIgnoring', { name }), HUD_LOG.FILTER);
     } else {
       this.localIgnoredNames.add(key);
-      this.log(t('hud.system.ignoringChat', { name }), '#aaf');
+      this.log(t('hud.system.ignoringChat', { name }), HUD_LOG.FILTER);
     }
     this.saveLocalIgnoredNames();
   }

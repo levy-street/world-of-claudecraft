@@ -15098,6 +15098,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.rankAnnounce': '{name}의 완전화가 {ranks}단계 중 {rank}단계에 도달했습니다.',
   'hudChrome.perfecting.perfectedAnnounce': '{name}이(가) 완전해졌습니다.',
   'hudChrome.perfecting.promotedAnnounce': '{name}이(가) {chosen}(으)로 벼려졌습니다.',
+  'hudChrome.perfecting.unknownItem': '알 수 없는 아이템',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    '가방 내용이 바뀌었습니다: 이름을 붙이려던 장비를 확인할 수 없습니다. 벼려내기 전에 선택을 확인하세요.',
   'hudChrome.perfecting.rowPromoted': '전설',
   'hudChrome.perfecting.attemptCost': '시도 비용',
   'hudChrome.perfecting.promoteCost': '승급 비용',

@@ -32,13 +32,16 @@ painter, a11y, i18n, and performance contracts.
   `syncAnyWindowOpenState` (pinned by `tests/farming_windows_body_class.test.ts`).
 
 ## House a11y patterns (farming's, reused, never reinvented)
-- Single-select rows are a `role="radiogroup"` of natively tabbable
-  `role="radio"` buttons with `aria-checked` (plant sheet shape; the
-  roving-tabindex refinement is a recorded OPEN follow-up in
-  `docs/prd/masterwrought/farming/state.md`, and both farming roots run
-  `bindPointerBlur`, so a mouse click parks focus on the window root:
-  verify against `tests/farming_plant_sheet_window.test.ts`'s pointer-drop
-  arm before changing the pattern).
+- Single-select rows are an APG roving-tabindex `role="radiogroup"` of
+  `role="radio"` buttons with `aria-checked` (the plant sheet and Perfecting
+  shape, closed at the Phase 18 sweep): the checked row is the ONE tab stop,
+  arrows on both axes plus Home/End move the pick and the focus together
+  through `src/ui/roving_index.ts` `rovingTarget` (the landing row is focused
+  BEFORE the repaint so the focus-key carry follows it), every other key
+  falls through. Both farming roots run `bindPointerBlur`, so a mouse click
+  still parks focus on the window root: verify against
+  `tests/farming_plant_sheet_window.test.ts`'s pointer-drop arm and its
+  roving arm before changing the pattern.
 - In-flight sends mirror a `pendingSend` flag onto the root's `aria-busy`
   through ONE writer, cleared by the answering event AND by
   `notifyErrorToast` (the sim's dead/busy gates answer through `ctx.error`,

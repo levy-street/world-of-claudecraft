@@ -1631,9 +1631,11 @@ export class MinimapPainter {
           // Station color, NOT gatherReady: that green means "harvestable right
           // now" on this surface and the pin carries no readiness or plot state
           // (the map window painter refuses the same green for the same
-          // reason). A patch is a static service site like a crafting station,
-          // so it takes the station family's color and the two-leaf silhouette
-          // is what tells it apart from the diamond beside it. Tier-identical
+          // reason, and since the Phase 18 sweep paints the same pin in ITS
+          // station family token, colors.stall, so the two surfaces agree). A
+          // patch is a static service site like a crafting station, so it
+          // takes the station family's color and the two-leaf silhouette is
+          // what tells it apart from the diamond beside it. Tier-identical
           // (fairness invariant): never preset- or governor-gated.
           const radius = geometry.farmSproutRadius;
           const crownY = m.my - radius * FARM_SPROUT_CROWN;

@@ -119,7 +119,9 @@ describe('deedBroadcastLine (the guild-chat news line)', () => {
     const arm = hudSrc.slice(hudSrc.indexOf("case 'deedBroadcast'"));
     expect(arm.length).toBeGreaterThan(0);
     expect(arm.slice(0, 900)).toContain('deedBroadcastRendered(ev.characterName, DEED_NAME_TOKEN)');
-    expect(arm.slice(0, 900)).toContain("'#40d264'");
+    // The broadcast register is named, never spelled (tests/hud_tones.test.ts
+    // keeps hud.ts hex-free).
+    expect(arm.slice(0, 900)).toContain('HUD_LOG.BROADCAST');
     expect(arm.slice(0, 900)).toContain('this.deedsWindow.openWithDeed(ev.deedId)');
   });
 });

@@ -733,16 +733,19 @@ export class MapWindowPainter {
     // services. The glyph is a two-leaf sprout over a short stem: procedural
     // only this phase (no marker art id, so nothing to blit), and its
     // silhouette is what separates a patch from the station diamond and the
-    // noticeboard rectangle beside it. The fill is the map palette's oak green
-    // rather than the herb-node green, so a growing site never reads as a
-    // gather node's readiness. Tier-identical (fairness): the pin is actionable
-    // information, never preset- or governor-gated.
+    // noticeboard rectangle beside it. The fill is the STATION family's token
+    // on this surface (colors.stall, the fill the station diamond takes here
+    // when it has no sprite; the minimap paints the same pin in ITS station
+    // token), because a patch is a static service site like a crafting
+    // station, and never the herb-node green, so a growing site never reads
+    // as a gather node's readiness. Tier-identical (fairness): the pin is
+    // actionable information, never preset- or governor-gated.
     for (const patch of model.farmPatches) {
       const radius = geometry.farmPatchRadius;
       const crownY = patch.my - radius * FARM_SPROUT_CROWN;
       const heelX = radius * FARM_SPROUT_HEEL_X;
       const heelY = patch.my + radius * FARM_SPROUT_HEEL_Y;
-      ctx.fillStyle = colors.oak;
+      ctx.fillStyle = colors.stall;
       ctx.strokeStyle = colors.outline;
       ctx.lineWidth = geometry.markerOutlineWidth;
       ctx.beginPath();

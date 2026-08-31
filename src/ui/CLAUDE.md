@@ -296,7 +296,13 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
   (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
-  by the module sweep in `tests/architecture.test.ts`.
+  by the module sweep in `tests/architecture.test.ts`. A bare name is the WHOLE of that
+  escape, which is why a modal painter takes an adapter name too: the two bare-named modal
+  modules the Masterwrought phase 14 shipped (`input_dialog.ts`, `legendary_naming_dialog.ts`)
+  sat outside the sweep until 2026-08-31, when they were renamed `input_controller.ts` and
+  `hud/professions/legendary_naming_controller.ts` and joined the cold contract at zero
+  allowances (keeping their `UI_DOM_MODULES` rows, the deliberate double coverage). Name a new
+  dialog `*_controller.ts` from the start.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`

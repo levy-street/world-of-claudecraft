@@ -12,9 +12,12 @@
 // The values deliberately match the HUD's own log registers: GRANT is the
 // loot-family green (--color-text-success), MISS the gathering got-away grey,
 // TOAST the house gold, DENY the HUD's refusal red. hud.ts's PROFESSIONS
-// event arms (craft/train/unbind/disenchant result) consume GRANT and DENY by
-// name; its non-professions arms still spell tone hexes inline (a ratcheted
-// file migrates as headroom allows, never wholesale).
+// event arms (craft/train/unbind/disenchant/salvage/enchant result, the
+// fishing got-away and early-reel lines, and the tool-effect line through
+// tool_effect_result_view.ts) consume GRANT, MISS and DENY by name; its
+// non-professions arms consume the coordinator's own vocabulary, hud_tones.ts
+// (the Phase 18 sweep), so hud.ts spells no tone hex at all
+// (tests/hud_tones.test.ts).
 //
 // DOM-free and deterministic (registered in tests/architecture.test.ts
 // UI_PURE_CORES): five constants, no behavior.

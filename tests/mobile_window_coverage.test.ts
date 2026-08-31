@@ -245,7 +245,7 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       'hud.ts',
       // The extracted input modal (the other half of the shared
       // #confirm-dialog id; the exception row below covers the id).
-      'input_dialog.ts',
+      'input_controller.ts',
       'tutorial_greeting_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([

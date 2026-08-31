@@ -12114,7 +12114,7 @@ export const TARGETS = [
     // debounce-armed submit, with a draft typed so the count reads real.
     key: 'perfecting-naming',
     label: 'The legendary naming dialog (phase 14)',
-    when: ['ui/hud/professions/legendary_naming_dialog'],
+    when: ['ui/hud/professions/legendary_naming_controller'],
     variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
     async capture(page) {
       await dismissTutorialGreeting(page);

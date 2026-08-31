@@ -14775,6 +14775,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.rankAnnounce': '{name}的完美化達到第{rank}階，共{ranks}階。',
   'hudChrome.perfecting.perfectedAnnounce': '{name}已臻至完美。',
   'hudChrome.perfecting.promotedAnnounce': '{name}已鑄就為{chosen}。',
+  'hudChrome.perfecting.unknownItem': '未知物品',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    '你的背包發生了變動：無法確認正在命名的物品。鍛造前請檢查所選項。',
   'hudChrome.perfecting.rowPromoted': '傳說',
   'hudChrome.perfecting.attemptCost': '嘗試費用',
   'hudChrome.perfecting.promoteCost': '晉升費用',

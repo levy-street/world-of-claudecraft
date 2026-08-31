@@ -6105,6 +6105,18 @@ export const hudChromeStrings = {
     rankAnnounce: '{name} reaches Perfecting rank {rank} of {ranks}.',
     perfectedAnnounce: '{name} is now Perfected.',
     promotedAnnounce: '{name} is forged as {chosen}.',
+    // The {name} the three lines above take when the mirrors name an item id
+    // this client's catalog does not carry (a server/client content drift):
+    // player copy never shows the raw id token. WORDY by M16, so the five
+    // non-Latin overlays carry real fills.
+    unknownItem: 'Unknown item',
+    // The one announcement the refused same-copy edge owes while the naming
+    // dialog is open (perfecting_window.ts, the sameSelectedCopy gate): the
+    // selected copy could not be confirmed after a bag shift, the dialog
+    // stays open and unlocked, and a re-submit sends the ref it was opened
+    // for, so the reader is told to check before forging. WORDY (M16).
+    namingSelectionUnconfirmed:
+      'Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.',
     rowPromoted: 'Legendary',
     attemptCost: 'Attempt cost',
     promoteCost: 'Promotion cost',

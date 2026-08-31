@@ -22,8 +22,9 @@ import { describe, expect, it } from 'vitest';
 const HUD_SRC = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
 // The input modal moved whole into its own module at the Masterwrought
 // phase 14 extraction (Hud keeps a thin delegator); its literal is pinned
-// where it now lives.
-const INPUT_DIALOG_SRC = readFileSync(join(process.cwd(), 'src/ui/input_dialog.ts'), 'utf8');
+// where it now lives (input_controller.ts since the Phase 18 rename that put
+// it under the painter gate's filename sweep).
+const INPUT_DIALOG_SRC = readFileSync(join(process.cwd(), 'src/ui/input_controller.ts'), 'utf8');
 
 interface CloseControl {
   tag: string;

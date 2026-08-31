@@ -156,14 +156,19 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       const arm = body.slice(at, body.indexOf('break;', at));
       expect(arm, `case '${id}' body`).toContain(call);
     }
-    // sheathe carries the keyboard arm's cue-on-state-change rule whole.
-    const at = body.indexOf("case 'sheathe': {");
+    // sheathe carries the keyboard arm's cue-on-state-change rule whole: both
+    // dispatches call the ONE extracted rule (src/game/sheathe_toggle.ts,
+    // behavior pinned in tests/sheathe_toggle.test.ts), so the pad arm cannot
+    // drift from the keyboard arm by carrying its own copy.
+    const at = body.indexOf("case 'sheathe':");
     expect(at).toBeGreaterThan(-1);
-    const sheathe = body.slice(at, body.indexOf('}', body.indexOf('break;', at)));
-    expect(sheathe).toContain('const wasStowed = world.player.weaponStowed;');
-    expect(sheathe).toContain('world.toggleWeaponStow();');
-    expect(sheathe).toContain('if (world.player.weaponStowed !== wasStowed) {');
-    expect(sheathe).toContain('audio.weaponSheathe();');
-    expect(sheathe).toContain('audio.weaponUnsheathe();');
+    const sheathe = body.slice(at, body.indexOf('break;', at));
+    expect(sheathe).toContain('toggleSheatheWithCue(world, audio);');
+    const keyboardAt = mainTs.indexOf("case 'sheathe':");
+    expect(keyboardAt).toBeGreaterThan(-1);
+    expect(keyboardAt).toBeLessThan(mainTs.indexOf('function dispatchGamepadAction'));
+    expect(mainTs.slice(keyboardAt, mainTs.indexOf('break;', keyboardAt))).toContain(
+      'toggleSheatheWithCue(world, audio);',
+    );
   });
 });
