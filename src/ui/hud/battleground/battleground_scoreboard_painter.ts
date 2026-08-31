@@ -35,6 +35,8 @@ const FLAG_STATE_KEYS = {
 // The strip's own accessible name, named once: mount and relocalize() must read
 // the SAME key or a language switch renames the toggle to something else.
 const BOARD_TOGGLE_KEY = 'hudChrome.bg.boardToggleLabel';
+// Visibility for the respawn line, which also carries text; see updateRespawn.
+const DISPLAY_PROP = 'display';
 
 export interface BattlegroundScoreboardDeps {
   /** The HUD layer the strip mounts into (the #ui element). */
@@ -199,11 +201,17 @@ export class BattlegroundScoreboard {
     const w = this.deps.writers;
     const el = this.ensureRespawnRoot();
     if (!el) return;
+    // The respawn line needs TWO INDEPENDENT FACETS on one node, its text and its
+    // visibility, and the single-slot cache holds one (kind, value) entry per
+    // element: two single-slot writers on it flip that entry every call and BOTH
+    // bypass elision. Visibility takes its own slot, keyed (element, 'display'),
+    // writing the same inline display as before. A second node would have served
+    // equally; a second cache slot is cheaper.
     if (view.respawnIn > 0) {
       w.setText(el, t('hudChrome.bg.respawnIn', { seconds: num(view.respawnIn) }));
-      w.setDisplay(el, 'block');
+      w.setStyleProp(el, DISPLAY_PROP, 'block');
     } else {
-      w.setDisplay(el, 'none');
+      w.setStyleProp(el, DISPLAY_PROP, 'none');
     }
   }
 

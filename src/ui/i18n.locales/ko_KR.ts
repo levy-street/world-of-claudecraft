@@ -9815,6 +9815,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': '또한 {name} x{qty}을(를) 수확했습니다.',
   'hudChrome.farming.witheredLine': '작물이 시들었습니다. 밭을 정리했습니다: {name}.',
   'hudChrome.farming.witheredLineQty': '작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    '잔치와 작물이 모두 범위 안에 있습니다. 상호작용은 밭보다 잔치를 먼저 사용합니다. 수확하려면 잔치에서 물러나십시오.',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    '잔치와 빈 밭이 모두 범위 안에 있습니다. 상호작용은 밭보다 잔치를 먼저 사용합니다. 심으려면 잔치에서 물러나십시오.',
   'hudChrome.farming.seedBackLine': '씨앗을 회수했습니다: {name}.',
   'hudChrome.farming.goldenBonusLine': '황금 수확이 덤을 내놓았습니다: {name}.',
   'hudChrome.farming.seedBackLineQty': '씨앗을 회수했습니다: {name} x{qty}.',

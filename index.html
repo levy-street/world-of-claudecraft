@@ -607,6 +607,12 @@
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
+    <!-- Interact affordance: a small non-blocking line, hidden until an interact press
+         is ambiguous between two farming targets in reach (a placed feast over a garden
+         bed). role=status so a screen reader hears the ambiguity the sighted line shows;
+         it carries no authored text because every sentence is localized at paint time by
+         src/ui/hud/professions/farm_press_affordance_controller.ts. -->
+    <div id="interact-affordance" role="status" aria-live="polite"></div>
   </div>
 
   <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>

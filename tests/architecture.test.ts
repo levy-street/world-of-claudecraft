@@ -268,6 +268,7 @@ const UI_PURE_CORES = [
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
+  'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
   'src/ui/interface_unlock_menu_core.ts',

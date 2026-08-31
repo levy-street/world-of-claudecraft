@@ -9835,6 +9835,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': 'さらに{name} x{qty}も収穫した。',
   'hudChrome.farming.witheredLine': '作物が枯れた。畑を片づけた：{name}。',
   'hudChrome.farming.witheredLineQty': '作物が枯れた。畑を片づけた：{name} x{qty}。',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    '宴と自分の作物が両方とも範囲内にある。インタラクトは畑より先に宴を取る。収穫するには宴から離れよう。',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    '宴と空の畑が両方とも範囲内にある。インタラクトは畑より先に宴を取る。植えるには宴から離れよう。',
   'hudChrome.farming.seedBackLine': '種を回収した：{name}。',
   'hudChrome.farming.goldenBonusLine': '黄金の収穫がもたらした：{name}。',
   'hudChrome.farming.seedBackLineQty': '種を回収した：{name} x{qty}。',

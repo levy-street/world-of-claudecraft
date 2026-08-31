@@ -5107,6 +5107,20 @@ export const hudChromeStrings = {
     // news and says plainly that the crop, not the bed, was lost.
     witheredLine: 'The crop withered. You clear the bed: {name}.',
     witheredLineQty: 'The crop withered. You clear the bed: {name} x{qty}.',
+    // The interact affordance for the one ambiguous farming press: a placed
+    // feast and a garden bed both in reach (ruling 11b-R3c-1 orders the pair,
+    // feast first). The claim is deliberately COMPARATIVE, "before the bed",
+    // never "your press does X": corpses, delve objects, lootable objects,
+    // npcs, escorts and gather nodes all rank ABOVE both farming arms in
+    // tryNearbyInteraction, so an absolute promise would be false whenever one
+    // of those is also in reach. The second sentence is the way out, because a
+    // notice that only describes a problem is not an affordance.
+    pressTarget: {
+      feastOverHarvest:
+        'A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.',
+      feastOverPlant:
+        'A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant.',
+    },
     // The seed-back sentence (the crop-ladder phase): a tier 3/4 harvest can
     // hand back seeds beside its payout, on EITHER outcome, so this renders
     // whenever farmHarvested / farmWithered carries a positive seedBackCount.

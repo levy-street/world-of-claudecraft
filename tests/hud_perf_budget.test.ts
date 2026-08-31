@@ -70,9 +70,26 @@
 // together exercise all seven elided writers. The keyed-pool painters (auras, party,
 // fct) build + reconcile real DOM nodes; their steady-state *_painter.test.ts
 // tests prove no per-frame node CHURN plus targeted expensive-write gates (icon-url, crest
-// class), while facet-level DOM write-elision is guaranteed by makeWriterFacet and proven
-// with write/skip counters in tests/painter_host.test.ts; their bypass count rides ARM 3.
+// class), while facet-level DOM write-elision is proven with write/skip counters in
+// tests/painter_host.test.ts; their bypass count rides ARM 3.
 // ARM 1 still scans all eight painters (incl. the pooled ones) for raw writes + forced reflow.
+//
+// STATE THE GUARANTEE EXACTLY, because this note used to overstate it and the
+// overstatement cost real frames. makeWriterFacet guarantees elision PER (element,
+// KIND), not per element: the four single-slot writers share ONE (kind, value) entry
+// per element (painter_host.ts shouldWriteSingleSlot), so an element written through
+// TWO DIFFERENT single-slot writers has that entry flipped by every call and BOTH
+// writes bypass elision forever. This exemption waved exactly that case through:
+// auras_painter wrote the stacks badge with setDisplay AND setText, so every stacking
+// aura paid two un-elided writes per frame, for the life of the aura, and nothing here
+// could see it (ARM 2 does not drive auras; ARM 1 scans only for raw writes and
+// reflows; the *_painter.test.ts suites drive a RECORDING stub, which has no cache to
+// collide in). Seven such sites shipped across five modules. What covers the case now
+// is tests/painter_single_slot_collision_guard.test.ts, an AST scan of src/ui, plus
+// tests/painter_slot_collision.test.ts, which drives the real painters over the REAL
+// facet across steady polls and asserts SKIPS. Extending ARM 2 to the pooled painters
+// would NOT have caught it either: this defect is invisible to a per-file scan and to
+// any driver that does not compare counts across two identical frames.
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

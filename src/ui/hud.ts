@@ -2,10 +2,12 @@ import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
+import { farmPressTarget } from '../game/farm_press_target_core';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
+import { trackMetaPixel } from '../game/meta_pixel';
 import { music } from '../game/music';
 import {
   type GameSettings,
@@ -188,6 +190,7 @@ import {
 import { blockLandingLogKey } from './block_landing_feedback_core';
 import { BootcampOverlay } from './bootcamp';
 import { CalendarWindow } from './calendar_window';
+import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
 import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
@@ -258,11 +261,8 @@ import {
 } from './deeds_view';
 import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
-import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { bindDialogKeyActivation } from './dialog_key_activation';
 import { markDialogRoot } from './dialog_root';
-import { discordRoleTagLabel } from './discord_role_tag';
-import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
@@ -516,6 +516,7 @@ import {
   salvageResultToast,
 } from './hud/professions/enchanting_view';
 import { handleFarmEvent } from './hud/professions/farm_event_feedback';
+import { FarmPressAffordanceController } from './hud/professions/farm_press_affordance_controller';
 import { PlantSheetWindow } from './hud/professions/farming_plant_sheet_window';
 import { feastTooltipLines } from './hud/professions/feast_tooltip_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
@@ -817,6 +818,12 @@ import { SwingTimerPainter } from './swing_timer_painter';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
+import {
+  type TargetFlairLineInput,
+  targetFlairLineHtml,
+  targetFlairLineVisible,
+  targetFlairSignature,
+} from './target_flair_line_view';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1030,16 +1037,6 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   absorb: null,
   dead: false,
   outOfRange: false,
-};
-const trackMetaPixel = (
-  eventName: string,
-  data?: Record<string, unknown>,
-  options?: Record<string, unknown>,
-): void => {
-  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
-  if (typeof fbq !== 'function') return;
-  if (options) fbq('trackCustom', eventName, data ?? {}, options);
-  else fbq('trackCustom', eventName, data ?? {});
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
@@ -2187,6 +2184,16 @@ export class Hud {
       talents: () => this.sim.talents,
       iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
       paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
+    });
+    this.farmPressAffordance = new FarmPressAffordanceController({
+      root: () => $('#interact-affordance'),
+      writers: this.writerFacet,
+      text: (target) =>
+        t(
+          target === 'feast_over_harvest'
+            ? 'hudChrome.farming.pressTarget.feastOverHarvest'
+            : 'hudChrome.farming.pressTarget.feastOverPlant',
+        ),
     });
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim, {
@@ -4613,6 +4620,7 @@ export class Hud {
   // spell icon plus two side crescents once; its painter only toggles active
   // state on the hot path. Options > Auras owns preview and placement mode.
   private readonly auraOverlayController: AuraOverlayController;
+  private readonly farmPressAffordance: FarmPressAffordanceController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
   private readonly playerFrameBuffer = newUnitFrameBuffer();
@@ -9719,6 +9727,10 @@ export class Hud {
       this.questDialog.updateProximity();
     }
 
+    // The farming press ambiguity (a placed feast over a garden bed), medium band: it moves
+    // only on foot travel, and the resolver checks the SHORT static bed list before any walk.
+    if (mediumHud) this.farmPressAffordance.paint(farmPressTarget(sim, p.pos, p.dead));
+
     // when a bout begins, get the queue panel out of the way for the fight. Route through
     // arenaWindow.close() (not a raw hide) so it returns focus to the opener (WCAG 2.4.3):
     // close() guards a not-displayed window and tolerates a stale opener.
@@ -10947,7 +10959,7 @@ export class Hud {
     const inDelve = mapMode === 'delve';
     const inDungeon = mapMode === 'dungeon';
     const schematic = inRift || inDelve || inBattleground || inDungeon;
-    this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
+    this.setStyleProp($('#map-level-toggle'), 'display', schematic ? 'none' : 'block');
     this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
     if (inRift) {
       this.clearMapHitState(canvas);
@@ -17917,17 +17929,23 @@ export class Hud {
   // and players with no linked flair at all.
   private updateTargetDiscordLine(target: Entity): void {
     const el = this.targetDiscordEl;
-    const tier = target.discordTier ?? 0;
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
-    const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
-    // The AI mark rides this line too, so it has to be in BOTH the early-out below
-    // and the signature: without it an AI account carrying no Discord/dev flair
-    // would never render the line at all, and a live flag flip would never repaint.
-    const isAi = target.aiAccount === true;
-    if (
-      target.kind !== 'player' ||
-      (!tier && !target.discordName && !target.discordRole && !devIdx && !isAi)
-    ) {
+    // getLanguage() is a real input here, not bookkeeping: four of this line's faces
+    // are localized while every other field is identity data a locale switch never
+    // moves, so keyed on identity alone the line sat in the PREVIOUS locale until that
+    // player's flair happened to change. targetFlairSignature owns that reasoning.
+    // The AI flag rides both the visibility test and the signature: without it an AI
+    // account carrying no Discord or dev flair would never render the line at all.
+    const flair: TargetFlairLineInput = {
+      language: getLanguage(),
+      tier: target.discordTier ?? 0,
+      name: target.discordName ?? '',
+      role: target.discordRole ?? '',
+      avatar: target.discordAvatar ?? '',
+      devIndex: showDevBadges ? (target.devTier ?? 0) : 0,
+      isAi: target.aiAccount === true,
+    };
+    if (target.kind !== 'player' || !targetFlairLineVisible(flair)) {
       if (this.targetDiscordSig !== '') {
         this.targetDiscordSig = '';
         el.classList.remove('show');
@@ -17935,47 +17953,13 @@ export class Hud {
       }
       return;
     }
-    // This runs every frame the target frame updates; only rebuild when the Discord
+    // This runs every frame the target frame updates; only rebuild when the line's
     // content actually changes (else a fresh <img> per frame would re-fetch the
     // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}|${isAi ? 1 : 0}`;
+    const sig = targetFlairSignature(flair);
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
-    const parts: string[] = [];
-    const nameInner = target.discordAvatar
-      ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
-      : esc(target.discordName ?? '');
-    if (target.discordName || target.discordAvatar) {
-      parts.push(`<span class="uf-dc-name">${nameInner}</span>`);
-    }
-    const roleLabel = discordRoleTagLabel(target.discordRole);
-    if (roleLabel) {
-      parts.push(
-        `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? CHROME_TONE.ROLE_FALLBACK}">${esc(roleLabel)}</span>`,
-      );
-    }
-    if (tier > 0) {
-      parts.push(`<span class="uf-dc-chip rank">${esc(discordStatusDisplayName(tier))}</span>`);
-    }
-    const devDef = devTierByIndex(devIdx);
-    if (devDef) {
-      parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
-    }
-    if (isAi) {
-      // The shared .ai-tag mark, and deliberately NOT a .uf-dc-chip: the chip rules
-      // live UNLAYERED in index.extra.css, and unlayered CSS beats every @layer rule,
-      // so the chip's own color/background would override the gradient in
-      // @layer components and paint straight over it. The flair line is a flex row,
-      // so a bare span sits inline beside the chips anyway.
-      parts.push(
-        // role=img + aria-label, not just title: this is a DISCLOSURE, and assistive
-        // tech announces `title` inconsistently on a non-focusable span. Screen-reader
-        // users must hear "AI-operated account", not the bare "[AI]" literal (or, if
-        // the title is skipped entirely, nothing at all). Mirrors chatAiTagEl.
-        `<span class="ai-tag" role="img" aria-label="${esc(t('hudChrome.playerMenu.aiTagTitle'))}" title="${esc(t('hudChrome.playerMenu.aiTagTitle'))}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`,
-      );
-    }
-    el.innerHTML = parts.join('');
+    el.innerHTML = targetFlairLineHtml(flair);
     // Hide the external Discord avatar if its CDN image fails to load, so the line
     // never shows the browser's broken-image placeholder (the nickname stays).
     const dcAvatar = el.querySelector<HTMLImageElement>('.uf-dc-name img');
@@ -18696,15 +18680,6 @@ export class Hud {
 // abilityRequirementLines, describeAbilitySummary and resourceDisplayName
 // moved WHOLE to ./ability_tooltip_lines (imported above) at the Phase 10
 // headroom extraction, so a Vitest can pin the tooltip lines directly.
-
-// A 2D canvas context is non-null for any attached canvas in this app; centralize
-// the assertion so the call sites do not each carry a non-null bang. Throws (a
-// dev-surfaced failure, never reached in practice) rather than asserting.
-function require2dContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('2D canvas context unavailable');
-  return ctx;
-}
 
 function raidMarkerDisplayName(index: number): string {
   return t(RAID_MARKER_LABEL_KEYS[index] ?? RAID_MARKER_LABEL_KEYS[0]);

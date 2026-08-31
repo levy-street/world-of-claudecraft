@@ -78,6 +78,24 @@ export interface PainterHostPresentation {
  * setStyleProp/toggleClass/setAttr are MULTI-SLOT (keyed per (element, prop) /
  * (element, class) / (element, attr)), since one element holds many custom
  * properties, toggled classes, and attributes.
+ *
+ * THE GUARANTEE IS PER (ELEMENT, KIND), NOT PER ELEMENT, and the difference is a
+ * defect that has shipped. Because the four single-slot writers share ONE entry
+ * per element, an element written through TWO DIFFERENT single-slot writers has
+ * that entry flipped by each call, the equality below is false every time, and
+ * BOTH writes bypass elision FOREVER. Nothing renders wrong, so no behavior test
+ * fails; the writes just never elide and count as real writes in hotDomWrites.
+ * It shipped at seven sites across five modules, the worst being the aura stacks
+ * badge (setDisplay + setText on one node, every frame, per stacking aura).
+ *
+ * SO: a node that needs two facets gives the second one its OWN slot. Use
+ * setStyleProp for a CSS property (its contract covers a standard property, not
+ * just a `--var`: `setStyleProp(el, 'display', v)` is byte-for-byte the write
+ * setDisplay performs, keyed per (element, 'display')), toggleClass when the
+ * state belongs in the stylesheet, or setAttr for an attribute. Two separate
+ * ELEMENTS work equally well and are sometimes the honest answer; a second cache
+ * slot is simply cheaper than a second node.
+ * Guarded by tests/painter_single_slot_collision_guard.test.ts.
  */
 export interface PainterHostWriters {
   /** Set `el.textContent`, eliding a repeat of the same text. */

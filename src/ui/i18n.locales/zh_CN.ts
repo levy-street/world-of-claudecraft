@@ -9374,6 +9374,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': '你还收获了：{name} x{qty}。',
   'hudChrome.farming.witheredLine': '作物枯萎了。你清理了田畦：{name}。',
   'hudChrome.farming.witheredLineQty': '作物枯萎了。你清理了田畦：{name} x{qty}。',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    '盛宴和你的作物都在范围内。互动会优先取用盛宴，而不是田畦；离开盛宴再去收获。',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    '盛宴和空田畦都在范围内。互动会优先取用盛宴，而不是田畦；离开盛宴再去播种。',
   'hudChrome.farming.seedBackLine': '你回收了种子：{name}。',
   'hudChrome.farming.goldenBonusLine': '金色收成额外产出：{name}。',
   'hudChrome.farming.seedBackLineQty': '你回收了种子：{name} x{qty}。',

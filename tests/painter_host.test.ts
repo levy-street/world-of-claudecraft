@@ -111,6 +111,72 @@ describe('makeWriterFacet: single-slot writers (setText/setDisplay/setTransform/
     expect(node.style.display).toBe('block');
     expect(node.style.width).toBe('block');
   });
+
+  // THE COLLISION. The arm above is the same mechanism seen from the safe side: two
+  // single-slot kinds on one element MUST NOT false-elide, and they do not. The
+  // cost of that correctness is what nothing pinned until now, and what shipped as
+  // a live per-frame defect in five painters: the cache holds ONE (kind, value)
+  // entry per element, so an element written through two different single-slot
+  // writers has its entry flipped by each call and BOTH bypass elision forever.
+  // Nothing renders wrong; the writes simply never elide, and they count as real
+  // writes in hotDomWrites.
+  it('DEFEAT: two different single-slot writers on one element never elide, at any cadence', () => {
+    const { facet, counts } = fakeFacet();
+    const { el } = fakeEl();
+    // The establishing paint, which is allowed to write both facets.
+    facet.setText(el, '2');
+    facet.setDisplay(el, '');
+    counts.writes = 0;
+    counts.skips = 0;
+    // Two more STEADY polls: nothing about the model moved, so a correctly elided
+    // painter does nothing at all here.
+    for (let poll = 0; poll < 2; poll++) {
+      facet.setText(el, '2');
+      facet.setDisplay(el, '');
+    }
+    expect(counts).toEqual({ writes: 4, skips: 0 });
+  });
+
+  it('FIX: the same two facets elide completely once each has its own cache slot', () => {
+    // The element needs TWO INDEPENDENT FACETS (its text and its visibility) and
+    // the single-slot cache can only hold one. Giving visibility a slot of its own
+    // is what fixes it; TWO SEPARATE ELEMENTS would have worked equally well, and a
+    // second cache slot is simply cheaper than a second element. `setStyleProp` is
+    // the multi-slot writer for a CSS property (its own contract covers "a custom
+    // --var or a standard property"), so the visibility write keeps writing the
+    // very same inline `display` it always did, now keyed per (element, 'display').
+    const { facet, counts } = fakeFacet();
+    const { el } = fakeEl();
+    facet.setText(el, '2');
+    facet.setStyleProp(el, 'display', '');
+    counts.writes = 0;
+    counts.skips = 0;
+    for (let poll = 0; poll < 2; poll++) {
+      facet.setText(el, '2');
+      facet.setStyleProp(el, 'display', '');
+    }
+    // Asserting SKIPS, not just writes: a test that only counted writes would pass
+    // on a painter that stopped writing because it stopped painting.
+    expect(counts).toEqual({ writes: 0, skips: 4 });
+  });
+
+  it('FIX, the class form: visibility keyed per (element, class) elides the same way', () => {
+    // toggleClass is the other multi-slot writer and fixes the collision identically
+    // when the hidden state belongs in the stylesheet. Pinned beside setStyleProp so
+    // the contract reads as "give the second facet its own slot", never as "use this
+    // one writer".
+    const { facet, counts } = fakeFacet();
+    const { el } = fakeEl();
+    facet.setText(el, '2');
+    facet.toggleClass(el, 'is-hidden', false);
+    counts.writes = 0;
+    counts.skips = 0;
+    for (let poll = 0; poll < 2; poll++) {
+      facet.setText(el, '2');
+      facet.toggleClass(el, 'is-hidden', false);
+    }
+    expect(counts).toEqual({ writes: 0, skips: 4 });
+  });
 });
 
 // --- setStyleProp: the multi-slot custom-property writer ------------------------

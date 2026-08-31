@@ -1108,6 +1108,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the gossip dialog when the player walks away from the NPC',
   },
   {
+    call: 'this.farmPressAffordance.paint',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the interact affordance for the ambiguous farming press (a placed feast over a garden bed); the resolver checks the short static bed list first, so the entity walk happens only while standing in a garden, and both writes elide through the shared facet',
+  },
+  {
     call: 'this.arenaWindow.close',
     band: 'frame',
     gate: "inArenaMatch && !this.arenaMatchSeen && $('#arena-window').style.display === 'block'",
@@ -1671,7 +1678,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // hint apply.
       // window 44 -> 45: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
-    ).toEqual({ window: 46, chrome: 83, none: 17 });
+      // chrome 83 -> 84: the farming press affordance (a placed feast in reach
+      // over a garden bed). Chrome, not a window: it paints one #interact-
+      // affordance notice through the shared writer facet, with no window root,
+      // no open check and therefore no invalidation guard to name.
+    ).toEqual({ window: 46, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

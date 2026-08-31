@@ -17,6 +17,7 @@ export * from './elixir_tooltip_view';
 export * from './enchant_apply_view';
 export * from './enchanting_view';
 export * from './farm_event_feedback';
+export * from './farm_press_affordance_controller';
 export * from './farming_plant_sheet_view';
 export * from './farming_plant_sheet_window';
 export * from './farming_view';

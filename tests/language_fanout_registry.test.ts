@@ -35,11 +35,18 @@
 //      instead of inheriting an answer that was given about a different field.
 //
 // WHERE ITS TEETH STOP, stated rather than implied:
-//   - The sweep recognizes the `x === this.lastFoo` comparison shape. A gate
-//     written as a predicate call over retained state is invisible to it: the
-//     tutorial overlay's `tutorialNeedsRerender(this.step, next, ...)` is the
-//     live example, and it is covered instead by half 1 pinning its arm and by
-//     the behavioral test in `language_fanout_relocalize.test.ts`.
+//   - The sweep recognizes the `x === this.lastFoo` comparison shape, including
+//     one taken through a MEMBER of the memo (`this.searchEcho?.typed === x`).
+//     A gate written as a predicate call over retained state is still invisible
+//     to it: the tutorial overlay's `tutorialNeedsRerender(this.step, next,
+//     ...)` is the live example, and it is covered instead by half 1 pinning its
+//     arm and by the behavioral test in `language_fanout_relocalize.test.ts`.
+//   - The memo is found by a NAME family (see MEMO_DECL), which is a spelling
+//     convention this file cannot enforce. A gated memo named after neither the
+//     prefix nor the suffix vocabulary escapes, and the measured alternative
+//     (matching every private field) is 308 discoveries against 106, a registry
+//     nobody could keep green. Name a new memo out of that vocabulary and it is
+//     invisible here; that limit is real and is the price of the sweep existing.
 //   - Half 1 sees `refreshLocalizedDynamicUi()`'s OWN body. An arm that calls a
 //     `Hud` method which then fails to repaint is invisible here; the delve
 //     tracker was exactly that, and what catches it is the behavioral arm, not
@@ -58,6 +65,7 @@
 //     `src/render/` would have to be caught in review.
 
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readMethodCallSites } from './helpers/method_call_sites';
@@ -188,8 +196,27 @@ const observedArms = scan.sites.map((s) => `${s.call}|${s.conditions.join(' && '
  * family rather than a type: what makes one of these a language hazard is that
  * it retains a digest of the previous paint's INPUTS, and this repo spells that
  * `lastX` / `prevX` / `knownX` / `paintedX` everywhere it does it.
+ *
+ * The vocabulary is matched as a PREFIX **or** a SUFFIX, which is the widening
+ * the Masterwrought localized-search unit paid for. The prefix-only form read as
+ * a shape rule and was really a spelling rule: `market_window.ts`'s
+ * `searchEcho` cached a search string resolved from LOCALIZED item names, was
+ * compared before an early return exactly like every row below, and was never
+ * asked the question, purely because its memo word sits at the end of the name.
+ * After a language switch it served the previous locale's substitution, which
+ * for that surface is worse than the empty result it exists to avoid.
+ *
+ * Measured over the whole `src/ui` tree, the suffix half adds exactly ONE
+ * discovery beyond the prefix family (`hud.ts`'s `targetDiscordSig`, a real
+ * signature this guard could not see before), so the false-positive cost of the
+ * widening is nil. What it cannot do is catch a memo named after neither: that
+ * is a naming convention this file cannot enforce, and the honest limit is
+ * written in the limits block at the top rather than papered over by matching
+ * every private field (measured: 308 gated private fields tree-wide against 106
+ * here, i.e. a registry nobody could keep green).
  */
-const MEMO_DECL = /\bprivate\s+(?:readonly\s+)?((?:last|prev|known|painted)[A-Z]\w*)\b/g;
+const MEMO_DECL =
+  /\bprivate\s+(?:readonly\s+)?((?:(?:last|prev|known|painted)[A-Z]\w*)|(?:\w*(?:Echo|Memo|Cache|Cached|Sig|Signature)))\b/g;
 
 /** Any call that puts player-visible text on screen. */
 const EMITS_TEXT = /\bt\(|\btPlural\(|\btEntity\(/;
@@ -209,10 +236,19 @@ function discoverGatedModules(): GatedModule[] {
     // A memo is only a REPAINT gate when the module compares it. A retained
     // value that is merely written and read back (a cached ref, a latch the
     // painter re-reads) suppresses nothing on its own.
+    // The comparison may go THROUGH a member of the memo, which is the other
+    // half of the hole the localized-search unit found: `searchEcho` is a
+    // record, and its gate reads `this.searchEcho?.typed === ...` plus
+    // `this.searchEcho.lang === lang`, so a matcher demanding the field be
+    // compared WHOLE missed it on shape even before the name family did. A
+    // multi-field memo is the normal way to key a cache on more than one thing,
+    // so this is the shape a widened name family most needs to see.
     const gating = [
       ...new Set(
         declared.filter((memo) =>
-          new RegExp(`[!=]==\\s*this\\.${memo}\\b|this\\.${memo}\\s*[!=]==`).test(source),
+          new RegExp(`[!=]==\\s*this\\.${memo}\\b[?.\\w]*|this\\.${memo}[?.\\w]*\\s*[!=]==`).test(
+            source,
+          ),
         ),
       ),
     ].sort();
@@ -252,9 +288,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'bootcamp.ts',
-    memos: ['lastCounts'],
+    memos: ['lastCounts', 'lastFocus'],
     answer: 'this.bootcamp.relocalize',
-    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders. lastFocus is the retained CoachFocus (quest and step IDS, no text), surfaced by the member-compared gate widening because it is read as `this.lastFocus?.questId === DEATH_LESSON_QUEST_ID`, which is an ordinary conditional on an id rather than a repaint signature; the localized prompt is gated by promptContentKey, which is exactly what relocalize() clears',
   },
   {
     file: 'arena_window.ts',
@@ -359,9 +395,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig', 'lastSellPriceRefSig'],
+    memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
   },
   {
     file: 'woc_market_window.ts',
@@ -474,9 +510,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'bags_window.ts',
-    memos: ['lastSortBaseline'],
+    memos: ['lastSortBaseline', 'ordinalCache'],
     reason:
-      'lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
+      'ordinalCache (surfaced by the member-compared gate widening: it is read as `this.ordinalCache?.inv !== inventory`, so the whole-field matcher never saw it) holds no text of any kind. It is `{ inv, map }`, keyed on the inventory ARRAY IDENTITY and mapping each slot object to its ordinal NUMBER, rebuilt whenever the array reference changes; a locale switch neither moves the key nor changes a value, and nothing localized is stored. lastSortBaseline gates nothing that is drawn: it decides only whether the one-shot sort settle ANIMATION plays on this paint (armed by the Sort button, compared against the press-time INVENTORY signature because online the tidied inventory arrives with the heavy self snapshot, not the press repaint). fillGrid rebuilds every cell unconditionally on every paint, and the bags fan-out arm (this.renderBags) already drives a wholesale repaint on a locale switch, so the window relocalizes by itself; the signature reads no text at all (item ids, counts, cell hints), so a locale switch cannot even move it.',
   },
   {
     file: 'deed_tracker_painter.ts',
@@ -503,6 +539,148 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'the coordinator itself. Its own signature-gated arms are individually answered inside refreshLocalizedDynamicUi, which half 1 above pins EXACTLY, so pinning its two dozen unrelated memos here as well would only mean every hud.ts edit had to be re-approved in two places.',
   },
 ];
+
+/**
+ * Memos whose answer to the language question is that they KEY THE LOCALE
+ * THEMSELVES, rather than being repainted by a fan-out arm. A repaint answers a
+ * memo whose staleness is on screen; it cannot answer one whose stale value has
+ * already left the client (a search string sent to the server), so that shape
+ * has to re-resolve instead, and the way it does that is by putting the active
+ * language in its own cache key.
+ *
+ * Listed here so the claim is CHECKED rather than asserted in prose: the arm
+ * below reads the real source and requires both halves (the module reads the
+ * active language, and the memo's own key or gate carries it). Without that, "it
+ * keys the language" is exactly the sort of sentence that stays in a row's `why`
+ * long after the key stopped including it.
+ *
+ * THE THIRD FORM, added by the Masterwrought target-flair unit. The two shapes
+ * above both put the language on the READ side (a member compared off the memo, or
+ * the memo BEING the latch). The commonest shape puts it on the WRITE side instead:
+ * a scalar signature string with the locale built INTO it, which no comparison-site
+ * matcher can see. `memoValueSources` below covers that by resolving what actually
+ * flows into the memo's value. It is what `hud.ts`'s `targetDiscordSig` needed, and
+ * that memo is the reason this list is no longer only about `src/ui` windows: it
+ * sits inside the coordinator, whose blanket 'coordinator' opt-out in
+ * NOT_A_LANGUAGE_GATE is skipped BY NAME, so the classification arms could not
+ * report it. A row here is checked whatever the file, which is the narrow way to
+ * hold one memo inside that file without pinning two dozen unrelated ones.
+ */
+const LANGUAGE_KEYED: ReadonlyArray<{
+  readonly file: string;
+  readonly memo: string;
+  readonly why: string;
+}> = [
+  {
+    file: 'hud.ts',
+    memo: 'targetDiscordSig',
+    why: "the target frame's flair line (the role tag, the Discord rank rung, the dev rung, and the [AI] mark plus its screen-reader label). Every other field in the signature is identity data a locale switch cannot move, so keyed on identity alone the line sat in the PREVIOUS locale until that player's flair happened to change; the rebuild itself was always correct, it just never ran, so the fix is the key rather than a fan-out arm. The value is built by targetFlairSignature (src/ui/target_flair_line_view.ts), whose paired suite drives the difference across two locales on byte-identical identity data",
+  },
+  {
+    file: 'market_window.ts',
+    memo: 'searchEcho',
+    why: 'the typed-to-sent Browse search translation: the resolution reads localized item names, so the same typed string resolves to a different search per locale. Keyed on the text alone it served the previous locale substitution after a switch, which for this surface is a WRONG result set rather than the empty one the untranslated path gives',
+  },
+  {
+    file: 'map_semantic_accessibility_core.ts',
+    memo: 'lastLanguage',
+    why: 'the marker summary is gated on a text-independent hash plus this explicit language latch, compared against getLanguage() in the same early-return guard, so a locale switch always moves the gate and the labels rebuild on the next map paint',
+  },
+];
+
+const require_ = createRequire(import.meta.url);
+// The TypeScript 6 JS API wrapper (CONTRIBUTING.md, "TypeScript toolchain"): the
+// `tsc` binary is the TS7 native one and exposes no createSourceFile.
+// biome-ignore lint/suspicious/noExplicitAny: the JS API ships no types at this entry.
+const ts = require_('typescript') as any;
+
+/**
+ * Everything that flows into a value assigned to `this.<memo>`: the assigned
+ * expression, plus the initializer of every same-method local it transitively
+ * names, as source text.
+ *
+ * AST, NOT A REGEX, and the reason is the real shape it has to see. `hud.ts`
+ * writes `this.targetDiscordSig = sig`, where `sig` is `targetFlairSignature(flair)`
+ * and `flair` is the object literal holding `language: getLanguage()`. That is TWO
+ * hops through locals, in a method 60 lines long, inside an 18k-line file: a text
+ * scan for "getLanguage near the memo" answers on proximity, which is not the
+ * question. Resolving the chain answers the question that matters, which is whether
+ * the locale can reach the stored value at all.
+ *
+ * WHAT IT DELIBERATELY DOES NOT DO: it does not follow the chain out of the method
+ * (a language read inside `targetFlairSignature` itself would be invisible here,
+ * and correctly so, since that is the callee's contract and its own suite's job),
+ * and it over-collects rather than under-collects inside the method (locals are
+ * gathered from the whole function body, nested closures included, so a shadowed
+ * name contributes both initializers). Over-collecting can only make a row PASS
+ * that a narrower read would fail; the fixture arms below pin the failing
+ * direction, which is the one a guard is for.
+ */
+function memoValueSources(file: string, source: string, memo: string): string[] {
+  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
+  const out: string[] = [];
+  // biome-ignore lint/suspicious/noExplicitAny: untyped TS AST nodes.
+  const enclosingFunction = (node: any): any => {
+    // biome-ignore lint/suspicious/noExplicitAny: untyped TS AST nodes.
+    let n: any = node.parent;
+    while (
+      n &&
+      !ts.isMethodDeclaration(n) &&
+      !ts.isConstructorDeclaration(n) &&
+      !ts.isFunctionDeclaration(n) &&
+      !ts.isFunctionExpression(n) &&
+      !ts.isArrowFunction(n)
+    ) {
+      n = n.parent;
+    }
+    return n ?? sf;
+  };
+  // biome-ignore lint/suspicious/noExplicitAny: untyped TS AST nodes.
+  const visit = (node: any): void => {
+    if (
+      ts.isBinaryExpression(node) &&
+      node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      ts.isPropertyAccessExpression(node.left) &&
+      node.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
+      node.left.name.text === memo
+    ) {
+      const fn = enclosingFunction(node);
+      const locals = new Map<string, string>();
+      // biome-ignore lint/suspicious/noExplicitAny: untyped TS AST nodes.
+      const collect = (n: any): void => {
+        if (ts.isVariableDeclaration(n) && n.initializer && ts.isIdentifier(n.name)) {
+          locals.set(n.name.text as string, n.initializer.getText(sf) as string);
+        }
+        ts.forEachChild(n, collect);
+      };
+      collect(fn);
+      let text = node.right.getText(sf) as string;
+      const pulled = new Set<string>();
+      // Bounded: each local is pulled in at most once, so the loop terminates
+      // even on a circular pair of declarations.
+      for (let hop = 0; hop < 8; hop++) {
+        let grew = false;
+        for (const [name, init] of locals) {
+          if (pulled.has(name)) continue;
+          if (!new RegExp(`\\b${name}\\b`).test(text)) continue;
+          pulled.add(name);
+          text += `\n${init}`;
+          grew = true;
+        }
+        if (!grew) break;
+      }
+      out.push(text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return out;
+}
+
+/** Whether the locale can reach the value stored in `this.<memo>`. */
+function memoValueReadsLanguage(file: string, source: string, memo: string): boolean {
+  return memoValueSources(file, source, memo).some((s) => /\bgetLanguage\(/.test(s));
+}
 
 // ---------------------------------------------------------------------------
 
@@ -615,10 +793,30 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       '  private knownIds = [];',
       '  private paintedMarkup = 1;',
       '  private readonly lastKey = 1;',
+      // The SUFFIX half. The first is the exact declaration that escaped this
+      // matcher and shipped the stale-locale search (its post-fix form is the
+      // second, which must still be DISCOVERED: what makes it safe is the
+      // language in its key, verified by LANGUAGE_KEYED, never a rename).
+      '  private searchEcho: { typed: string; sent: string } | null = null;',
+      '  private searchEcho: { typed: string; lang: string; sent: string } | null = null;',
+      '  private targetDiscordSig = 1;',
+      '  private walletMemo = 1;',
+      '  private rowCache = new Map();',
+      '  private readonly bodySignature = 1;',
     ]) {
       expect(new RegExp(MEMO_DECL.source).test(decl), `MEMO_DECL missed ${decl}`).toBe(true);
     }
-    for (const decl of ['  private lastsig = 1;', '  lastSig = 1;', '  private sig = 1;']) {
+    for (const decl of [
+      '  private lastsig = 1;',
+      '  lastSig = 1;',
+      '  private sig = 1;',
+      // The suffix half is capitalized on purpose: a bare lowercase word is an
+      // ordinary field name, not a memo spelling, and matching it would drag in
+      // most of the tree (measured: 308 gated private fields against 106 here).
+      '  private echo = 1;',
+      '  private cache = new Map();',
+      '  searchEcho = 1;',
+    ]) {
       expect(new RegExp(MEMO_DECL.source).test(decl), `MEMO_DECL over-matched ${decl}`).toBe(false);
     }
     for (const call of ["t('a.b')", "tPlural('a.b', 2)", "tEntity({ kind: 'x' })"]) {
@@ -739,6 +937,156 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       'a classified module gained or lost a repaint memo. A NEW memo is a NEW gate and needs the language question answered about it, not inherited from the answer given about a different field:\n' +
         drift.join('\n'),
     ).toEqual([]);
+  });
+
+  it('verifies every LANGUAGE_KEYED claim against the real source', () => {
+    // Two halves, because either alone is satisfiable by accident: the module
+    // must READ the active language, and the memo's own key or gate must CARRY
+    // it. A memo that reads getLanguage() somewhere else in the file and keys
+    // only its text is precisely the bug this list exists to say has been fixed,
+    // and the third form's fixture arms below pin that that reading is refused.
+    const failures: string[] = [];
+    for (const row of LANGUAGE_KEYED) {
+      const found = uiSources.find((s) => s.file === row.file);
+      if (!found) {
+        failures.push(`${row.file}: not in the src/ui walk`);
+        continue;
+      }
+      const discoveredMemos = discoveredByFile.get(row.file)?.memos ?? [];
+      if (!discoveredMemos.includes(row.memo)) {
+        failures.push(`${row.file}: ${row.memo} is no longer a discovered repaint memo`);
+      }
+      if (!/\bgetLanguage\(/.test(found.source)) {
+        failures.push(`${row.file}: never reads getLanguage()`);
+      }
+      // Three accepted forms, two on the READ side and one on the WRITE side.
+      // The gate compares a language-named member OFF the memo
+      // (`this.searchEcho.lang === lang`); or the memo IS the language latch
+      // (`=== this.lastLanguage`); or the locale is built INTO the value the memo
+      // stores, which is what a scalar signature string does and what no
+      // comparison-site matcher can see. Anything else is a text-only key.
+      const keyedOffMemo = new RegExp(
+        `this\\.${row.memo}[?.\\w]*\\.lang\\w*\\s*[!=]==|[!=]==\\s*this\\.${row.memo}[?.\\w]*\\.lang\\w*`,
+      ).test(found.source);
+      const memoIsTheLatch = /lang/i.test(row.memo);
+      const keyedInTheValue = memoValueReadsLanguage(row.file, found.source, row.memo);
+      if (!keyedOffMemo && !memoIsTheLatch && !keyedInTheValue) {
+        failures.push(`${row.file}: ${row.memo} neither compares a language value nor stores one`);
+      }
+      expect(row.why.length, `LANGUAGE_KEYED ${row.file} needs a written reason`).toBeGreaterThan(
+        80,
+      );
+    }
+    expect(
+      failures,
+      'a LANGUAGE_KEYED row no longer describes the source it names:\n' + failures.join('\n'),
+    ).toEqual([]);
+  });
+
+  // The third form's own proofs, driven over fixture SOURCE rather than the tree.
+  // Over the real tree every LANGUAGE_KEYED row passes today, so no assertion there
+  // can tell a working detector from one that returns true unconditionally. These
+  // four cases are the shapes it has to separate, and the first is the exact
+  // pre-fix and post-fix pair of the defect that motivated the form.
+  describe('memoValueSources: the WRITE-side language key', () => {
+    const wrap = (body: string): string =>
+      [
+        'class X {',
+        '  private targetDiscordSig = "";',
+        `  m(target: T): void {`,
+        body,
+        '  }',
+        '}',
+      ].join('\n');
+    const reads = (body: string): boolean =>
+      memoValueReadsLanguage('fixture.ts', wrap(body), 'targetDiscordSig');
+
+    it('CATCHES the shipped pre-fix signature: identity fields only', () => {
+      // Exactly what hud.ts stored before the fix. Nothing renders wrong from
+      // this, which is why no behavior test anywhere failed on it; the line just
+      // never re-ran after a language switch.
+      expect(
+        reads(
+          [
+            '    const tier = target.discordTier ?? 0;',
+            // biome-ignore lint/suspicious/noTemplateCurlyInString: fixture source quoting a real template literal, not a template.
+            '    const sig = `${tier}|${target.discordName ?? ""}|${target.aiAccount ? 1 : 0}`;',
+            '    if (sig === this.targetDiscordSig) return;',
+            '    this.targetDiscordSig = sig;',
+          ].join('\n'),
+        ),
+      ).toBe(false);
+    });
+
+    it('PASSES the post-fix shape, through TWO hops of same-method locals', () => {
+      // The real chain: memo <- sig <- targetFlairSignature(flair) <- flair's
+      // object literal <- getLanguage(). A one-hop resolver reports this as
+      // unkeyed, so the hop count is load-bearing, not incidental.
+      expect(
+        reads(
+          [
+            '    const flair = { language: getLanguage(), tier: target.discordTier ?? 0 };',
+            '    const sig = targetFlairSignature(flair);',
+            '    if (sig === this.targetDiscordSig) return;',
+            '    this.targetDiscordSig = sig;',
+          ].join('\n'),
+        ),
+      ).toBe(true);
+    });
+
+    it('CATCHES a method that reads the language for something else entirely', () => {
+      // The decisiveness arm, and the one that separates this form from the cheap
+      // version of itself. "The enclosing method mentions getLanguage()" is true
+      // here, and hud.ts is a file where it would be true almost anywhere; the
+      // question is whether the locale reaches the STORED VALUE. It does not: the
+      // banner is painted and dropped, and the signature never sees it.
+      expect(
+        reads(
+          [
+            '    const banner = t("x", { lang: getLanguage() });',
+            // biome-ignore lint/suspicious/noTemplateCurlyInString: fixture source quoting a real template literal, not a template.
+            '    const sig = `${target.discordTier ?? 0}`;',
+            '    this.bannerEl.textContent = banner;',
+            '    this.targetDiscordSig = sig;',
+          ].join('\n'),
+        ),
+      ).toBe(false);
+    });
+
+    it('CATCHES a rename: the field name carries no evidence at all', () => {
+      // A signature renamed `targetDiscordLangSig` would satisfy the memoIsTheLatch
+      // form on its NAME. This form reads only the value, so it stays false.
+      const renamed = [
+        'class X {',
+        '  private targetDiscordLangSig = "";',
+        '  m(target: T): void {',
+        // biome-ignore lint/suspicious/noTemplateCurlyInString: fixture source quoting a real template literal, not a template.
+        '    const sig = `${target.discordTier ?? 0}`;',
+        '    this.targetDiscordLangSig = sig;',
+        '  }',
+        '}',
+      ].join('\n');
+      expect(memoValueReadsLanguage('fixture.ts', renamed, 'targetDiscordLangSig')).toBe(false);
+    });
+
+    it('reports every assignment site, so a reset to "" cannot mask a keyed write', () => {
+      // hud.ts assigns the memo twice (the empty reset on the hidden branch, and
+      // the real signature). The check is a some(), so the reset contributes a
+      // site with no language and the keyed one still answers.
+      const sources = memoValueSources(
+        'fixture.ts',
+        wrap(
+          [
+            '    if (target.kind !== "player") { this.targetDiscordSig = ""; return; }',
+            '    const flair = { language: getLanguage() };',
+            '    this.targetDiscordSig = targetFlairSignature(flair);',
+          ].join('\n'),
+        ),
+        'targetDiscordSig',
+      );
+      expect(sources).toHaveLength(2);
+      expect(sources.filter((s) => /getLanguage\(/.test(s))).toHaveLength(1);
+    });
   });
 
   it('answers each surface with an arm the fan-out really drives', () => {

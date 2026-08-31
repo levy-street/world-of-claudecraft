@@ -405,7 +405,20 @@ const MONOLITHS: MonolithRow[] = [
     // folded in, so the next measure knows which half moved. Measured on the
     // working tree (wc -l < src/ui/hud.ts), never reconciled by arithmetic.
     // Exact count, zero slack.
-    ceiling: 18711,
+    // LOWERED 18711 -> 18686 at Phase 18 (U-FE-HUD, 2026-08-31), and it had to
+    // be: the row carried ZERO slack while the phase added two arms here, the
+    // farming press affordance (+13) and the flair line's language key. The
+    // extraction that paid for both is src/ui/target_flair_line_view.ts, which
+    // took the WHOLE of updateTargetDiscordLine's decision surface (is there
+    // anything to show, has anything changed, what markup) out of the
+    // coordinator and left it the element handling. That is the seam this row
+    // names, and it was also the fix's enabler: the stale-locale bug was in the
+    // signature, and a signature buried in a 60-line method inside an 18k-line
+    // file had no unit that could drive it across two locales. It has one now
+    // (tests/target_flair_line_view.test.ts). Net -25 after the two arms, with
+    // four import statements going with the move. Measured with
+    // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
+    ceiling: 18686,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

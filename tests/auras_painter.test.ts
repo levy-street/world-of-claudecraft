@@ -116,6 +116,18 @@ function fakeEl(tag: string): FakeEl {
 const fakeDoc = { createElement: (tag: string) => fakeEl(tag) } as unknown as Document;
 
 type Call = { m: keyof PainterHostWriters; el: unknown; args: unknown[] };
+/**
+ * A RECORDING STUB, and stating its blind spot plainly because it cost real frames.
+ * It records every call and elides NOTHING: it has no cache, so it cannot tell an
+ * elided write from a performed one, and no amount of thoroughness here could have
+ * caught the single-slot collision this painter shipped (setDisplay + setText on the
+ * stacks badge, one cache entry per element, so both writes bypassed elision on
+ * EVERY frame for EVERY stacking aura). What this file proves is WHICH writer is
+ * called with what. What actually elides is proved over the REAL makeWriterFacet:
+ * the mechanism in tests/painter_host.test.ts, this painter across steady frames in
+ * tests/painter_slot_collision.test.ts, and the tree-wide shape in
+ * tests/painter_single_slot_collision_guard.test.ts.
+ */
 function recordingFacet() {
   const calls: Call[] = [];
   const writers: PainterHostWriters = {
@@ -345,8 +357,16 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     // duration + stacks via setText.
     expect(has('setText', (c) => c.args[0] === '5s')).toBe(true);
     expect(has('setText', (c) => c.args[0] === '3')).toBe(true);
-    // stacks badge shown via setDisplay('').
-    expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
+    // The stacks badge is shown via setStyleProp('display', ''), NOT setDisplay:
+    // it is the one node here carrying its text AND its visibility, and the four
+    // single-slot writers share one cache entry per element, so routing both
+    // through them would defeat elision on every frame for every stacking aura.
+    // The DOM write is identical; only the cache slot differs. The mechanism is
+    // pinned in tests/painter_host.test.ts, the elision in
+    // tests/painter_slot_collision.test.ts over the REAL facet (this recording
+    // stub has no cache, so it cannot see the difference), and the whole tree in
+    // tests/painter_single_slot_collision_guard.test.ts.
+    expect(has('setStyleProp', (c) => c.args[0] === 'display' && c.args[1] === '')).toBe(true);
   });
 
   it('clears the expiring blink through the elided writer when an aura is refreshed', () => {
@@ -358,9 +378,14 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     ).toBe(true);
   });
 
-  it('hides the stacks badge (setDisplay none) when the aura does not stack', () => {
+  it('hides the stacks badge (setStyleProp display:none) when the aura does not stack', () => {
     painter.paint(state([slot({ key: 'a', stacksText: '' })]));
-    expect(calls.some((c) => c.m === 'setDisplay' && c.args[0] === 'none')).toBe(true);
+    expect(
+      calls.some((c) => c.m === 'setStyleProp' && c.args[0] === 'display' && c.args[1] === 'none'),
+    ).toBe(true);
+    // And never through setDisplay, which would share the badge's cache entry
+    // with its text and defeat elision on both.
+    expect(calls.some((c) => c.m === 'setDisplay')).toBe(false);
   });
 });
 

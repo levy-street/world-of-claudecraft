@@ -10062,6 +10062,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.harvestFineLineQty': 'Вы также собираете: {name} x{qty}.',
   'hudChrome.farming.witheredLine': 'Урожай засох. Вы расчищаете грядку: {name}.',
   'hudChrome.farming.witheredLineQty': 'Урожай засох. Вы расчищаете грядку: {name} x{qty}.',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    'Пир и ваш урожай оба в пределах досягаемости. Взаимодействие выберет пир, а не грядку; отойдите от пира, чтобы собрать урожай.',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    'Пир и пустая грядка оба в пределах досягаемости. Взаимодействие выберет пир, а не грядку; отойдите от пира, чтобы посадить.',
   'hudChrome.farming.seedBackLine': 'Вы сохраняете семена на посадку: {name}.',
   'hudChrome.farming.goldenBonusLine': 'Золотой урожай приносит вдобавок: {name}.',
   'hudChrome.farming.seedBackLineQty': 'Вы сохраняете семена на посадку: {name} x{qty}.',

@@ -66,6 +66,9 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+// The badge's visibility rides setStyleProp rather than setDisplay because the SAME
+// node also carries its text. See the write at the paint site for why.
+const DISPLAY_PROP = 'display';
 const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'divine_ascension',
   'shaman_thunder_charges',
@@ -248,7 +251,15 @@ export class AurasPainter {
       this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
-      this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
+      // The badge node needs TWO INDEPENDENT FACETS, its text and its visibility, and
+      // the single-slot cache holds ONE (kind, value) entry per element. Routing both
+      // through single-slot writers flips that entry on every call, so BOTH bypass
+      // elision forever: every frame, for every stacking aura, which in combat is most
+      // of them. Visibility therefore takes a slot of its own, keyed (element,
+      // 'display'); the DOM write is the same inline display it always was. TWO
+      // SEPARATE NODES would have worked equally well, and a second cache slot is
+      // simply cheaper than a second node.
+      this.writers.setStyleProp(rec.stacks, DISPLAY_PROP, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
       if (hasStacks) this.writers.setText(rec.stacks, s.stacksText);
       this.ordered.push(rec);
     }
