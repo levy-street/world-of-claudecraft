@@ -2087,6 +2087,7 @@ export const ja_JP: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "名匠鍛造",
       "tooltipWorn": "名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。",
+      "tooltipLegendaryLimit": "伝説の名匠鍛造の品は{cap}つまでしか装備できません。",
       "tooltipAtCap": "あなたの名匠鍛造スロット{cap}枠はすべて使用中です。"
     },
     "itemSet": {
@@ -3047,7 +3048,14 @@ export const ja_JP: EnTranslations = {
       "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
       "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。",
       "deedOfMaking": "銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。",
-      "wyrmfallCore": "名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のAまたはSランクのリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。"
+      "wyrmfallCore": "名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のAまたはSランクのリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。",
+      "mudfinScale": "生産の材料。泥ひれの潜伏者は約半数の確率で落とし、沼の深みの魚はやや低く、その水域の名を持つ強敵は必ず持っている。",
+      "crackedWyrmScale": "生産の材料。サンクタム・スケイルガードが約半数の確率で落とし、ほかのどこからも手に入らない。",
+      "crackedOgreTusk": "生産の材料。頭蓋砕きブルトークが倒れるたびに必ず一つ残し、入手先は彼だけ。",
+      "tallowCandle": "生産の材料。ディープロックの掘削者は半数を超える確率で落とし、グレイブコーラーの信徒はときおり落とす。どちらも名を持つ長は必ず持っている。",
+      "banditBandana": "生産の材料。山賊が約半数の確率で落とし、名を持つ頭目は必ず持っている。",
+      "oldCragmawsPelt": "生産の材料。老いたるクラッグモウが倒れるたびに必ず一枚残し、ほかの獣は落とさない。",
+      "emberwingCinderscale": "生産の材料。燃え翼のヴォスカルが倒れるたびに必ず一枚残し、ほかの獣は落とさない。"
     },
     "discord": {
       "title": "Discord",
@@ -3648,6 +3656,10 @@ export const ja_JP: EnTranslations = {
       "harvestFineLineQty": "さらに{name} x{qty}も収穫した。",
       "witheredLine": "作物が枯れた。畑を片づけた：{name}。",
       "witheredLineQty": "作物が枯れた。畑を片づけた：{name} x{qty}。",
+      "pressTarget": {
+        "feastOverHarvest": "宴と自分の作物が両方とも範囲内にある。インタラクトは畑より先に宴を取る。収穫するには宴から離れよう。",
+        "feastOverPlant": "宴と空の畑が両方とも範囲内にある。インタラクトは畑より先に宴を取る。植えるには宴から離れよう。"
+      },
       "seedBackLine": "種を回収した：{name}。",
       "seedBackLineQty": "種を回収した：{name} x{qty}。",
       "goldenBonusLine": "黄金の収穫がもたらした：{name}。",
@@ -4402,6 +4414,7 @@ export const ja_JP: EnTranslations = {
         "gather_event_pristine_vein": "無垢の鉱脈",
         "gather_event_ancient_heartwood": "古代の心材",
         "gather_event_moonlit_bloom": "月明かりの花",
+        "gather_event_golden_harvest": "黄金の実り",
         "gather_event_perfect_specimen": "完璧な標本",
         "slain_old_greyjaw": "討伐: 老グレイジョー",
         "slain_mogger": "討伐: モガー",
@@ -8185,10 +8198,7 @@ export const ja_JP: EnTranslations = {
       "detonateLightningRod": "避雷針が雷撃する！",
       "detonateStormcallersWrath": "嵐の使者の怒りが爆発する！",
       "detonateAbyssalMaw": "深淵の顎が閉じる！",
-      "detonateCrushingDepth": "粉砕の深淵が押しつぶす！",
-      "detonatePactSeal": "契約の封印が炸裂する！",
-      "detonateBloodRite": "血の儀式が落ちる！",
-      "detonatePitSentence": "奈落の判決が炸裂する！"
+      "detonateCrushingDepth": "粉砕の深淵が押しつぶす！"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

@@ -1472,7 +1472,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "meteor",
-        "name": "Meteor"
+        "name": "Skystone"
       },
       {
         "id": "combustion",
@@ -6626,6 +6626,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mark",
         "name": "Moonlit Bloom"
+      },
+      {
+        "kind": "mark",
+        "name": "Golden Harvest"
       },
       {
         "kind": "mark",

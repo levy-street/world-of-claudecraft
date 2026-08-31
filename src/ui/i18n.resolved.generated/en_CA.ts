@@ -2087,6 +2087,7 @@ export const en_CA: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "Masterwrought",
       "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
+      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
       "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
     },
     "itemSet": {
@@ -3047,7 +3048,14 @@ export const en_CA: EnTranslations = {
       "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
       "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
       "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
-      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks."
+      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
+      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
+      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
+      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
+      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
+      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
+      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
+      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
     },
     "discord": {
       "title": "Discord",
@@ -3648,6 +3656,10 @@ export const en_CA: EnTranslations = {
       "harvestFineLineQty": "You also bring in: {name} x{qty}.",
       "witheredLine": "The crop withered. You clear the bed: {name}.",
       "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to harvest.",
+        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+      },
       "seedBackLine": "You recover seed: {name}.",
       "seedBackLineQty": "You recover seed: {name} x{qty}.",
       "goldenBonusLine": "The golden harvest yields: {name}.",
@@ -4402,6 +4414,7 @@ export const en_CA: EnTranslations = {
         "gather_event_pristine_vein": "Pristine Vein",
         "gather_event_ancient_heartwood": "Ancient Heartwood",
         "gather_event_moonlit_bloom": "Moonlit Bloom",
+        "gather_event_golden_harvest": "Golden Harvest",
         "gather_event_perfect_specimen": "Perfect Specimen",
         "slain_old_greyjaw": "Slain: Old Greyjaw",
         "slain_mogger": "Slain: Mogger",
@@ -6536,7 +6549,7 @@ export const en_CA: EnTranslations = {
       "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
       "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
       "perfectingHeading": "Perfecting, and the orange promotion",
-      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.",
+      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
       "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
       "stationsHeading": "Stations and the three hubs",
       "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
@@ -6712,7 +6725,7 @@ export const en_CA: EnTranslations = {
       "masteryHeading": "Skill gain",
       "masteryBody": "Every recipe in the window wears its gain state in the classic colors: orange means full gain, yellow half, green a quarter, gray nothing. The boundaries are exact, every {step} skill is a tier, and a recipe fades one color for each tier it falls below yours.\n\nBecause gains are deterministic (a full-gain craft always moves you exactly one point), you can plan a whole climb from the list: work a rung while it is orange, train the next rung as it turns yellow, and never spend materials on a gray craft expecting progress. At the cap of {cap} the number stops, but the recipes, the masterwork chance, and the profits keep working.",
       "masterworkHeading": "Masterworks",
-      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
+      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe apex Masterwrought crafts are the one exception, and they pay the same proc a different way. An apex piece already sits at the top of its ladder, so there is no finer tier to finish it in; a masterwork there hands the piece over one rank into Perfecting instead, a free first rank on the four-rank walk the Professions page describes. Nothing is baked into the stats, and the chance and its gates are the ones below.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "Training",
       "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Specialization",
@@ -8185,10 +8198,7 @@ export const en_CA: EnTranslations = {
       "detonateLightningRod": "Lightning Rod strikes!",
       "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
       "detonateAbyssalMaw": "Abyssal Maw closes!",
-      "detonateCrushingDepth": "Crushing Depth crushes!",
-      "detonatePactSeal": "Pact Seal detonates!",
-      "detonateBloodRite": "Blood Rite falls!",
-      "detonatePitSentence": "Pit Sentence detonates!"
+      "detonateCrushingDepth": "Crushing Depth crushes!"
     },
     "delve": {
       "cannotEnterNow": "You cannot enter a delve right now.",
@@ -16165,7 +16175,7 @@ export const en_CA: EnTranslations = {
       "the_merchant": {
         "name": "The Merchant",
         "title": "Keeper of the World Market",
-        "greeting": "Welcome to the World Market, {className}. Buy from every adventurer in the realm - or set out your own wares and let coin find you."
+        "greeting": "Welcome to the World Market, {className}. Buy from every adventurer in the realm, or set out your own wares and let coin find you."
       },
       "marshal_redbrook": {
         "name": "Marshal Redbrook",
@@ -16195,7 +16205,7 @@ export const en_CA: EnTranslations = {
       "fisherman_brandt": {
         "name": "Fisherman Brandt",
         "title": "Old Salt",
-        "greeting": "Blrb-glub- sorry, been listening to those fish-men too long."
+        "greeting": "Blrb-glub... sorry, been listening to those fish-men too long."
       },
       "foreman_odell": {
         "name": "Foreman Odell",
@@ -16215,12 +16225,12 @@ export const en_CA: EnTranslations = {
       "brother_aldric_fen": {
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
-        "greeting": "The Light keep you above the water, {playerName}. The dead in this fen do not sleep - they wade."
+        "greeting": "The Light keep you above the water, {playerName}. The dead in this fen do not sleep: they wade."
       },
       "provisioner_hale": {
         "name": "Provisioner Hale",
         "title": "Provisioner",
-        "greeting": "Dry boots, dry bread, dry powder - at Fenbridge you get two of the three on a good day."
+        "greeting": "Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day."
       },
       "herbalist_yara": {
         "name": "Herbalist Yara",
@@ -16230,12 +16240,12 @@ export const en_CA: EnTranslations = {
       "scout_maren": {
         "name": "Scout Maren",
         "title": "Marshal's Scout",
-        "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick - I am due back in the reeds."
+        "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
       },
       "captain_thessaly": {
         "name": "Captain Thessaly",
         "title": "Highwatch Captain",
-        "greeting": "Two hundred years this wall has held, {className}. It will not break on my watch - but it groans."
+        "greeting": "Two hundred years this wall has held, {className}. It will not break on my watch, but it groans."
       },
       "brother_aldric_highwatch": {
         "name": "Brother Aldric",
@@ -16250,7 +16260,7 @@ export const en_CA: EnTranslations = {
       "quartermaster_bree": {
         "name": "Quartermaster Bree",
         "title": "Highwatch Quartermaster",
-        "greeting": "Wool, hardtack, and steel-shod boots - Highwatch runs on all three, and I am short of everything."
+        "greeting": "Wool, hardtack, and steel-shod boots: Highwatch runs on all three, and I am short of everything."
       },
       "armorer_hode": {
         "name": "Armorer Hode",
@@ -16730,7 +16740,7 @@ export const en_CA: EnTranslations = {
       "q_greyjaw": {
         "title": "The Old Wolf",
         "text": "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the deep woods north of the wolf runs. Bring me his fang.",
-        "completion": "So the old devil is dead at last. The stable boy will sleep easier - and so will I.",
+        "completion": "So the old devil is dead at last. The stable boy will sleep easier, and so will I.",
         "objectives": {
           "0": {
             "label": "Old Greyjaw's Fang"
@@ -16749,7 +16759,7 @@ export const en_CA: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sableweb Menace",
-        "text": "The lurkers in the northeastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
+        "text": "The lurkers in the northeastern woods spin a silk I need for my poultices, and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
         "completion": "Ugh, still twitching. Perfect. Here, you've earned this.",
         "objectives": {
           "0": {
@@ -16762,7 +16772,7 @@ export const en_CA: EnTranslations = {
       },
       "q_murlocs": {
         "title": "Trouble at the Lake",
-        "text": "Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back - slay 8 of them. And watch yourself: where there is one mudfin, there are five.",
+        "text": "Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back: slay 8 of them. And watch yourself: where there is one mudfin, there are five.",
         "completion": "Hah! That will teach them to mind their own mudholes.",
         "objectives": {
           "0": {
@@ -16773,7 +16783,7 @@ export const en_CA: EnTranslations = {
       "q_mine": {
         "title": "Rats in the Mine",
         "text": "We struck a fine copper vein and then those burrowing vermin came boiling out of the hillside. My crew will not set foot in the dig until it is cleared. Put down 10 Deeprock Diggers.",
-        "completion": "Ha! Back to work, lads! You have my thanks - and my coin.",
+        "completion": "Ha! Back to work, lads! You have my thanks, and my coin.",
         "objectives": {
           "0": {
             "label": "Deeprock Digger slain"
@@ -16802,7 +16812,7 @@ export const en_CA: EnTranslations = {
       },
       "q_whispers": {
         "title": "Whispers Below",
-        "text": "You have laid the dead to rest, but they will not stay resting - something calls them back. Search the chapel ruin for any trace of the one doing the calling. If you find a sigil or seal, bring it to me untouched.",
+        "text": "You have laid the dead to rest, but they will not stay resting: something calls them back. Search the chapel ruin for any trace of the one doing the calling. If you find a sigil or seal, bring it to me untouched.",
         "completion": "This sigil... it bears the mark of the Gravecallers, a sect I had prayed was extinct. This is worse than I feared, {playerName}.",
         "objectives": {
           "0": {
@@ -16812,8 +16822,8 @@ export const en_CA: EnTranslations = {
       },
       "q_names_of_the_dead": {
         "title": "The Names of the Dead",
-        "text": "If the Gravecallers raised our dead, I must know whose graves they robbed. The chapel sexton kept a burial ledger, and the wind has scattered its pages across the chapel yard. Gather 3 of them for me, {playerName} - the dead deserve to be called by their names.",
-        "completion": "These poor souls... and look here. Sexton Marrow - the chapel's own living caretaker - his grave the first disturbed. Morthen began with the very man who buried Eastbrook's dead.",
+        "text": "If the Gravecallers raised our dead, I must know whose graves they robbed. The chapel sexton kept a burial ledger, and the wind has scattered its pages across the chapel yard. Gather 3 of them for me, {playerName}. The dead deserve to be called by their names.",
+        "completion": "These poor souls... and look here. Sexton Marrow, the chapel's own living caretaker, his grave the first disturbed. Morthen began with the very man who buried Eastbrook's dead.",
         "objectives": {
           "0": {
             "label": "Weathered Ledger Page"
@@ -16823,7 +16833,7 @@ export const en_CA: EnTranslations = {
       "q_silence_the_call": {
         "title": "Silence the Call",
         "text": "Every name in that ledger is a soul Morthen means to drag from the earth, and the chapel yard already crawls with those he has called. Return 12 Restless Bones to their graves, {playerName}, before the Gravecaller's whisper swells into a chorus.",
-        "completion": "The yard grows quieter - but the calling has not stopped. It rises from below now, {playerName}. From the crypt itself.",
+        "completion": "The yard grows quieter, but the calling has not stopped. It rises from below now, {playerName}. From the crypt itself.",
         "objectives": {
           "0": {
             "label": "Restless Bones silenced"
@@ -16832,7 +16842,7 @@ export const en_CA: EnTranslations = {
       },
       "q_rite": {
         "title": "The Binding Rite",
-        "text": "The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller - but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow - the mine's burrowers hoard tallow by the crate - and 6 Ghostly Essences from the restless dead.",
+        "text": "The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller, but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow (the mine's burrowers hoard tallow by the crate) and 6 Ghostly Essences from the restless dead.",
         "completion": "It is done. The way below stands open... and may the Light forgive me for opening it. Gather your strongest companions before you descend, {playerName}. No one should face the Hollow alone.",
         "objectives": {
           "0": {
@@ -16845,8 +16855,8 @@ export const en_CA: EnTranslations = {
       },
       "q_hollow": {
         "title": "Into the Hollow",
-        "text": "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero - take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
-        "completion": "The whispering has stopped. You have done what the whole Vale could not, {playerName} - the dead sleep, and Eastbrook owes you everything it has.",
+        "text": "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero: take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
+        "completion": "The whispering has stopped. You have done what the whole Vale could not, {playerName}. The dead sleep, and Eastbrook owes you everything it has.",
         "objectives": {
           "0": {
             "label": "Morthen the Gravecaller slain"
@@ -16855,8 +16865,8 @@ export const en_CA: EnTranslations = {
       },
       "q_sexton": {
         "title": "The Sexton's Bell",
-        "text": "The ledger named him and the crypt holds him: Sexton Marrow, the chapel's caretaker, the first man Morthen raised - guarding his master's door in death as faithfully as he kept the chapel in life. Take four companions into the Hollow Crypt and grant the old sexton the rest he was robbed of, {playerName}.",
-        "completion": "So Marrow is free at last. Ring no bell for him - he heard enough of them in life.",
+        "text": "The ledger named him and the crypt holds him: Sexton Marrow, the chapel's caretaker, the first man Morthen raised, guarding his master's door in death as faithfully as he kept the chapel in life. Take four companions into the Hollow Crypt and grant the old sexton the rest he was robbed of, {playerName}.",
+        "completion": "So Marrow is free at last. Ring no bell for him: he heard enough of them in life.",
         "objectives": {
           "0": {
             "label": "Sexton Marrow laid to rest"
@@ -16865,8 +16875,8 @@ export const en_CA: EnTranslations = {
       },
       "q_gravecallers_trail": {
         "title": "The Gravecaller's Trail",
-        "text": "Morthen is dead, yet a question gnaws at me: a sect that hid for a century does not spend itself on one village chapel. He kept a grimoire - his rites, his correspondence. If anything of it survives, it lies in the vestry of the ruined chapel above the crypt. Search the ruin and bring me whatever remains of his writings, {playerName}.",
-        "completion": "Morthen wrote to a 'Fogbinder' in the northern fen. The sect is not dead, {playerName} - it has merely been patient.",
+        "text": "Morthen is dead, yet a question gnaws at me: a sect that hid for a century does not spend itself on one village chapel. He kept a grimoire: his rites, his correspondence. If anything of it survives, it lies in the vestry of the ruined chapel above the crypt. Search the ruin and bring me whatever remains of his writings, {playerName}.",
+        "completion": "Morthen wrote to a 'Fogbinder' in the northern fen. The sect is not dead, {playerName}. It has merely been patient.",
         "objectives": {
           "0": {
             "label": "Morthen's Grimoire"
@@ -16885,8 +16895,8 @@ export const en_CA: EnTranslations = {
       },
       "q_bandits": {
         "title": "Bandits of the Vale",
-        "text": "A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
-        "completion": "Ten fewer knives in the dark. Take this - you have earned it.",
+        "text": "A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out: slay 10 Vale Bandits.",
+        "completion": "Ten fewer knives in the dark. Take this: you have earned it.",
         "objectives": {
           "0": {
             "label": "Vale Bandit slain"
@@ -16905,7 +16915,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fenbridge_muster": {
         "title": "Muster at Fenbridge",
-        "text": "Morthen's writings named a master in the northern marsh - a 'Fogbinder.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, {playerName}. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.",
+        "text": "Morthen's writings named a master in the northern marsh, a 'Fogbinder.' Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, {playerName}. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.",
         "completion": "Aldric's seal, is it? Then you'll do. The fen has been swallowing my patrols whole, and I need every blade that floats.",
         "objectives": {
           "0": {
@@ -16915,7 +16925,7 @@ export const en_CA: EnTranslations = {
       },
       "q_prowlers": {
         "title": "Teeth of the Fen",
-        "text": "The mire prowlers have learned what a supply mule sounds like, and now they hunt the causeway itself. Last week they dragged a courier into the reeds not fifty paces from this gate. Thin them out, {playerName} - twelve dead prowlers ought to teach the rest fear.",
+        "text": "The mire prowlers have learned what a supply mule sounds like, and now they hunt the causeway itself. Last week they dragged a courier into the reeds not fifty paces from this gate. Thin them out, {playerName}: twelve dead prowlers ought to teach the rest fear.",
         "completion": "Twelve, and not a bite on you? The causeway breathes easier tonight.",
         "objectives": {
           "0": {
@@ -16925,7 +16935,7 @@ export const en_CA: EnTranslations = {
       },
       "q_prowler_pelts": {
         "title": "Pelts for the Causeway",
-        "text": "Every plank of that causeway rests on pilings wrapped in oiled prowler hide - the only thing the rot will not chew through. My stock is gone and the south spans are already sinking. Bring me 8 unspoiled pelts, {playerName}, before we are all wading to Eastbrook.",
+        "text": "Every plank of that causeway rests on pilings wrapped in oiled prowler hide, the only thing the rot will not chew through. My stock is gone and the south spans are already sinking. Bring me 8 unspoiled pelts, {playerName}, before we are all wading to Eastbrook.",
         "completion": "Good thick pelts, these. The causeway will outlast the both of us now.",
         "objectives": {
           "0": {
@@ -16935,7 +16945,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fen_supplies": {
         "title": "The Lost Caravan",
-        "text": "A caravan out of Eastbrook went into the mist three days back and never rang the gate bell. The wreck is strewn the whole length of the causeway - crates, casks, the lot, sinking slow. Salvage 5 loads of goods before the marsh finishes the job.",
+        "text": "A caravan out of Eastbrook went into the mist three days back and never rang the gate bell. The wreck is strewn the whole length of the causeway: crates, casks, the lot, sinking slow. Salvage 5 loads of goods before the marsh finishes the job.",
         "completion": "Waterlogged, but whole. Poor drivers... the fen keeps what it catches, {playerName}. Remember that.",
         "objectives": {
           "0": {
@@ -16945,7 +16955,7 @@ export const en_CA: EnTranslations = {
       },
       "q_deepfen": {
         "title": "The Deepfen Stirs",
-        "text": "The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass - and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.",
+        "text": "The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass, and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.",
         "completion": "That will push them back to the mud for a while. But something set them digging, and I mean to learn what.",
         "objectives": {
           "0": {
@@ -16955,8 +16965,8 @@ export const en_CA: EnTranslations = {
       },
       "q_idols": {
         "title": "Idols of the Deep",
-        "text": "Fenwick's wardens say the fish-men dredge idols from the lake bottom and clutch them like holy relics. If those idols are what I fear, I must see them with my own eyes. Take 5 from the Deepfen snappers - they will not part with them kindly.",
-        "completion": "Gravecaller work - older than Morthen, older than me. The sect did not begin in Eastbrook, {playerName}. It began here, and the lake has been keeping its secrets.",
+        "text": "Fenwick's wardens say the fish-men dredge idols from the lake bottom and clutch them like holy relics. If those idols are what I fear, I must see them with my own eyes. Take 5 from the Deepfen snappers: they will not part with them kindly.",
+        "completion": "Gravecaller work, older than Morthen, older than me. The sect did not begin in Eastbrook, {playerName}. It began here, and the lake has been keeping its secrets.",
         "objectives": {
           "0": {
             "label": "Waterlogged Idol"
@@ -16985,7 +16995,7 @@ export const en_CA: EnTranslations = {
       },
       "q_widows": {
         "title": "Silk and Venom",
-        "text": "Widow venom is the only thing that draws fen-rot from a wound - I bled a man of it just this morning. But the thicket west of the road has gone from nuisance to horror; the webs are taking deer whole now. Kill 10 widows and cut me 6 venom sacs, whole and unburst.",
+        "text": "Widow venom is the only thing that draws fen-rot from a wound: I bled a man of it just this morning. But the thicket west of the road has gone from nuisance to horror; the webs are taking deer whole now. Kill 10 widows and cut me 6 venom sacs, whole and unburst.",
         "completion": "Whole sacs, every one. You have steadier hands than half the surgeons in the south, {playerName}.",
         "objectives": {
           "0": {
@@ -17011,7 +17021,7 @@ export const en_CA: EnTranslations = {
       },
       "q_drowned": {
         "title": "The Drowned Dead",
-        "text": "Travelers drowned on the causeway are walking out of the lakes, {playerName} - still hung with the weeds they died in. This is no restless haunting. Drowning leaves no marks; it makes obedient corpses. Someone is filling this fen like a tithing box. Return 12 of the Drowned Dead to their rest.",
+        "text": "Travelers drowned on the causeway are walking out of the lakes, {playerName}, still hung with the weeds they died in. This is no restless haunting. Drowning leaves no marks; it makes obedient corpses. Someone is filling this fen like a tithing box. Return 12 of the Drowned Dead to their rest.",
         "completion": "Each one you fell is a stolen soul set free. But the one who drowned them is still pouring water.",
         "objectives": {
           "0": {
@@ -17021,8 +17031,8 @@ export const en_CA: EnTranslations = {
       },
       "q_drowned_censers": {
         "title": "Censers from the Deep",
-        "text": "North of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers - funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.",
-        "completion": "As I feared. These censers burned grave-ash, not incense. Someone consecrated that chapel to the drowning - and the rite is signed 'Voss.'",
+        "text": "North of the widow lake stands a chapel that drowned with its congregation when the marsh rose. The dead there carry rusted censers, funerary ones, the kind swung at a Gravecaller rite. Gather 4 from the chapel yard and I will read what rite was sung over that water.",
+        "completion": "As I feared. These censers burned grave-ash, not incense. Someone consecrated that chapel to the drowning, and the rite is signed 'Voss.'",
         "objectives": {
           "0": {
             "label": "Rusted Censer"
@@ -17051,8 +17061,8 @@ export const en_CA: EnTranslations = {
       },
       "q_trolls": {
         "title": "Mounds of the Mirefen",
-        "text": "The Mirefen trolls have torn open the old barrow-mounds east of the far lake - burial mounds, {playerName}, older than any kingdom of men. Whatever gold they think is down there, what they are letting OUT is worse. Drive them off the mounds: 12 trolls dead ought to do it.",
-        "completion": "Trolls don't dig without a reason. Someone told them where to dig - and I'd wager my gate it wears a grey robe.",
+        "text": "The Mirefen trolls have torn open the old barrow-mounds east of the far lake: burial mounds, {playerName}, older than any kingdom of men. Whatever gold they think is down there, what they are letting OUT is worse. Drive them off the mounds: 12 trolls dead ought to do it.",
+        "completion": "Trolls don't dig without a reason. Someone told them where to dig, and I'd wager my gate it wears a grey robe.",
         "objectives": {
           "0": {
             "label": "Mirefen Troll slain"
@@ -17061,7 +17071,7 @@ export const en_CA: EnTranslations = {
       },
       "q_troll_fetishes": {
         "title": "Fetish and Bone",
-        "text": "I crawled the troll mounds two nights past. Those fetishes they plant are not troll-craft - the knots are wrong, the bones are man-bones, and every one points at the open barrows like a signpost. Bring me 8 of them and I will prove to Fenwick who is really paying for this dig.",
+        "text": "I crawled the troll mounds two nights past. Those fetishes they plant are not troll-craft: the knots are wrong, the bones are man-bones, and every one points at the open barrows like a signpost. Bring me 8 of them and I will prove to Fenwick who is really paying for this dig.",
         "completion": "Same maker as the banners in the cult camp. The trolls are hired shovels, nothing more. Good work, {playerName}.",
         "objectives": {
           "0": {
@@ -17071,7 +17081,7 @@ export const en_CA: EnTranslations = {
       },
       "q_grubjaw": {
         "title": "The Glutton",
-        "text": "There's one troll the others won't dig beside - Grubjaw, the Glutton. He ate my last two pack-mules, harness and all, and my insurance man drowned years ago. He prowls the far eastern mounds, {playerName}. Bring me his tusk and I will outfit you proper.",
+        "text": "There's one troll the others won't dig beside: Grubjaw, the Glutton. He ate my last two pack-mules, harness and all, and my insurance man drowned years ago. He prowls the far eastern mounds, {playerName}. Bring me his tusk and I will outfit you proper.",
         "completion": "That tusk is long as my forearm! The mules are avenged, and Fenbridge owes you a round.",
         "objectives": {
           "0": {
@@ -17081,7 +17091,7 @@ export const en_CA: EnTranslations = {
       },
       "q_cult_camp": {
         "title": "Robes in the Reeds",
-        "text": "There - north past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, {playerName}, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.",
+        "text": "There, north past the third lake, where the mist never lifts. Grey robes, grey banners: Gravecallers, camped in the open like they already own the fen. They have stopped hiding, {playerName}, which means they think they have already won. Prove them wrong. Cut down 12 of their cultists.",
         "completion": "Twelve robes face-down in the mud. Now they know the fen watches back.",
         "objectives": {
           "0": {
@@ -17091,8 +17101,8 @@ export const en_CA: EnTranslations = {
       },
       "q_summoners": {
         "title": "Stopping the Summoning",
-        "text": "Maren's reports name summoners among the cultists - voices that call the drowned up out of the water like hounds to a whistle. Their ciphers will spell out the chain of command. Silence 8 summoners and bring me 4 of their ciphers.",
-        "completion": "Every cipher is countersigned 'Deacon Voss' - and addressed onward to a 'Fogbinder' in the Bastion. Morthen's master, {playerName}. We have found him.",
+        "text": "Maren's reports name summoners among the cultists, voices that call the drowned up out of the water like hounds to a whistle. Their ciphers will spell out the chain of command. Silence 8 summoners and bring me 4 of their ciphers.",
+        "completion": "Every cipher is countersigned 'Deacon Voss', and addressed onward to a 'Fogbinder' in the Bastion. Morthen's master, {playerName}. We have found him.",
         "objectives": {
           "0": {
             "label": "Gravecaller Summoner slain"
@@ -17104,8 +17114,8 @@ export const en_CA: EnTranslations = {
       },
       "q_deacon": {
         "title": "The Deacon of the Mire",
-        "text": "So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road north, {playerName}, and put Deacon Voss in the ground - deep enough that nobody sings HIM back up.",
-        "completion": "Voss is dead and the mist over the camp is already thinning. You have broken their voice in the fen - now only the Bastion remains.",
+        "text": "So a deacon of the Gravecallers stands at the heart of that camp, singing my drowned wardens up out of the lakes to serve him. His hymn ends today. Take the camp road north, {playerName}, and put Deacon Voss in the ground, deep enough that nobody sings HIM back up.",
+        "completion": "Voss is dead and the mist over the camp is already thinning. You have broken their voice in the fen. Now only the Bastion remains.",
         "objectives": {
           "0": {
             "label": "Deacon Voss slain"
@@ -17114,7 +17124,7 @@ export const en_CA: EnTranslations = {
       },
       "q_bastion_door": {
         "title": "The Sunken Bastion",
-        "text": "The Sunken Bastion - a knight's hold that drowned in the fen a century ago - is where Voss's letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, {playerName}, and I will unweave the seal.",
+        "text": "The Sunken Bastion, a knight's hold that drowned in the fen a century ago, is where Voss's letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, {playerName}, and I will unweave the seal.",
         "completion": "The ward parts like rotten rope. The door stands open... and the dark below it is listening.",
         "objectives": {
           "0": {
@@ -17124,7 +17134,7 @@ export const en_CA: EnTranslations = {
       },
       "q_olen": {
         "title": "The Knight-Commander's Shame",
-        "text": "Knight-Commander Olen held the Bastion when it sank - drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, {playerName}. Take four companions below and grant Olen the rest he earned.",
+        "text": "Knight-Commander Olen held the Bastion when it sank, drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, {playerName}. Take four companions below and grant Olen the rest he earned.",
         "completion": "Then his watch is finally over. I'll see his name cut into the gate myself. Thank you, {playerName}.",
         "objectives": {
           "0": {
@@ -17134,8 +17144,8 @@ export const en_CA: EnTranslations = {
       },
       "q_mistcaller": {
         "title": "The Fogbinder",
-        "text": "At the bottom of the Bastion waits Vael the Fogbinder - Morthen's master, Voss's master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, {playerName}, and the fen's dead may finally lie still.",
-        "completion": "Vael is dead, and the mist is lifting for the first time in years. But Maren heard his last words, and they freeze my blood: 'The Wyrm stirs beneath the peaks.' The sect serves something older than we ever guessed, {playerName}. Rest while you can - the mountains are next.",
+        "text": "At the bottom of the Bastion waits Vael the Fogbinder, Morthen's master, Voss's master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, {playerName}, and the fen's dead may finally lie still.",
+        "completion": "Vael is dead, and the mist is lifting for the first time in years. But Maren heard his last words, and they freeze my blood: 'The Wyrm stirs beneath the peaks.' The sect serves something older than we ever guessed, {playerName}. Rest while you can: the mountains are next.",
         "objectives": {
           "0": {
             "label": "Vael the Fogbinder slain"
@@ -17144,7 +17154,7 @@ export const en_CA: EnTranslations = {
       },
       "q_highwatch_summons": {
         "title": "The Watch on the Peaks",
-        "text": "Vael's last words have not left me, {playerName}: the Wyrm stirs beneath the peaks. Captain Thessaly commands the wall at Highwatch, at the head of the mountain road north. A summons stands posted at her gate - take it up, and tell her Brother Aldric is climbing the mountain behind you.",
+        "text": "Vael's last words have not left me, {playerName}: the Wyrm stirs beneath the peaks. Captain Thessaly commands the wall at Highwatch, at the head of the mountain road north. A summons stands posted at her gate: take it up, and tell her Brother Aldric is climbing the mountain behind you.",
         "completion": "Aldric's word reaches far. If the priest of the Vale is climbing the mountain himself, then it is as bad as I feared. Welcome to Highwatch, {playerName}.",
         "objectives": {
           "0": {
@@ -17154,7 +17164,7 @@ export const en_CA: EnTranslations = {
       },
       "q_stalkers": {
         "title": "Stalkers on the Ridge",
-        "text": "The ridge cats have come down from the high snows hungry, and my patrols bleed for it. Every stalker you put down is a soldier I keep on the wall. Thin them, {playerName} - twelve, to start.",
+        "text": "The ridge cats have come down from the high snows hungry, and my patrols bleed for it. Every stalker you put down is a soldier I keep on the wall. Thin them, {playerName}: twelve, to start.",
         "completion": "Twelve fewer shadows on the ridge. The patrols will breathe easier tonight.",
         "objectives": {
           "0": {
@@ -17164,8 +17174,8 @@ export const en_CA: EnTranslations = {
       },
       "q_stalker_pelts": {
         "title": "First Frost at Highwatch",
-        "text": "Winter on this mountain does not knock, {playerName} - it kicks the door in. Eight ridge stalker pelts will line enough cloaks to see the wall through the first snows. The beasts prowl the ridges flanking the road south.",
-        "completion": "Thick as my arm, these. The watch will not freeze this year - take these treads for your trouble.",
+        "text": "Winter on this mountain does not knock, {playerName}. It kicks the door in. Eight ridge stalker pelts will line enough cloaks to see the wall through the first snows. The beasts prowl the ridges flanking the road south.",
+        "completion": "Thick as my arm, these. The watch will not freeze this year: take these treads for your trouble.",
         "objectives": {
           "0": {
             "label": "Ridge Stalker Pelt"
@@ -17204,8 +17214,8 @@ export const en_CA: EnTranslations = {
       },
       "q_kobold_tunnels": {
         "title": "Deeprock Trouble",
-        "text": "The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging - straight down, as if something were calling them. Their tunnels run beneath our wall, {playerName}. Collapse the matter: kill twelve Deeprock Tunnelers.",
-        "completion": "Straight down, every shaft of it - burrowers do not dig like that on their own. I must consult my books.",
+        "text": "The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging: straight down, as if something were calling them. Their tunnels run beneath our wall, {playerName}. Collapse the matter: kill twelve Deeprock Tunnelers.",
+        "completion": "Straight down, every shaft of it: burrowers do not dig like that on their own. I must consult my books.",
         "objectives": {
           "0": {
             "label": "Deeprock Tunneler slain"
@@ -17214,7 +17224,7 @@ export const en_CA: EnTranslations = {
       },
       "q_glowing_wax": {
         "title": "Strange Wax",
-        "text": "Caddis showed me a lump of wax taken off one of those tunnelers - it glows, {playerName}, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.",
+        "text": "Caddis showed me a lump of wax taken off one of those tunnelers: it glows, {playerName}, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.",
         "completion": "Still warm. The Loremaster says the glow matches no flame he knows of. I say it is mountain trouble, and I say it kindly.",
         "objectives": {
           "0": {
@@ -17224,7 +17234,7 @@ export const en_CA: EnTranslations = {
       },
       "q_ogre_edges": {
         "title": "Ogres at the Foothills",
-        "text": "The Thornpeak clans never come this far east - yet here they are, camped in the eastern foothills with war paint on. Somebody is paying them, {playerName}, and ogres do not take promises. Cut twelve of them down while I find out who holds the purse.",
+        "text": "The Thornpeak clans never come this far east, yet here they are, camped in the eastern foothills with war paint on. Somebody is paying them, {playerName}, and ogres do not take promises. Cut twelve of them down while I find out who holds the purse.",
         "completion": "Twelve down, and still they are not pulling back. Whoever bought them paid in something heavier than gold.",
         "objectives": {
           "0": {
@@ -17234,8 +17244,8 @@ export const en_CA: EnTranslations = {
       },
       "q_ogre_totems": {
         "title": "Totems of War",
-        "text": "Around the war-camp the ogres have raised totems - crude things of hide and skull, but they mark a muster, not a raid. Tear down six of them and bring them to me. Mind the crushers on the perimeter, {playerName}.",
-        "completion": "Skull, hide... and look here - wyrm-scale bindings. These totems were gifts, {playerName}. The cult is arming the clans.",
+        "text": "Around the war-camp the ogres have raised totems, crude things of hide and skull, but they mark a muster, not a raid. Tear down six of them and bring them to me. Mind the crushers on the perimeter, {playerName}.",
+        "completion": "Skull, hide... and look here: wyrm-scale bindings. These totems were gifts, {playerName}. The cult is arming the clans.",
         "objectives": {
           "0": {
             "label": "Ogre War Totem"
@@ -17245,7 +17255,7 @@ export const en_CA: EnTranslations = {
       "q_ogre_bounty": {
         "title": "The Captain's Bounty",
         "text": "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, {playerName}, and Highwatch will pay a captain's bounty.",
-        "completion": "Bounty paid in full. The foothills are quieter - now we deal with the ones doing the buying.",
+        "completion": "Bounty paid in full. The foothills are quieter. Now we deal with the ones doing the buying.",
         "objectives": {
           "0": {
             "label": "Brakka the Wallbreaker slain"
@@ -17254,8 +17264,8 @@ export const en_CA: EnTranslations = {
       },
       "q_crushers": {
         "title": "Break the War-Camp",
-        "text": "Drogmar's war-camp squats in the eastern crags, and his crushers are the spine of it - each one worth three of my soldiers. Take companions; this is no errand for one blade. Break ten crushers and the warlord's muster breaks with them.",
-        "completion": "Ten crushers down. The war-camp is a body without a spine - time to take the head.",
+        "text": "Drogmar's war-camp squats in the eastern crags, and his crushers are the spine of it, each one worth three of my soldiers. Take companions; this is no errand for one blade. Break ten crushers and the warlord's muster breaks with them.",
+        "completion": "Ten crushers down. The war-camp is a body without a spine. Time to take the head.",
         "objectives": {
           "0": {
             "label": "Thornpeak Crusher slain"
@@ -17265,7 +17275,7 @@ export const en_CA: EnTranslations = {
       "q_drogmar": {
         "title": "Warlord Drogmar",
         "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
-        "completion": "Drogmar, dead in his own camp. The clans will scatter to the high passes - you have bought my wall a winter, {playerName}.",
+        "completion": "Drogmar, dead in his own camp. The clans will scatter to the high passes: you have bought my wall a winter, {playerName}.",
         "objectives": {
           "0": {
             "label": "Warlord Drogmar slain"
@@ -17274,7 +17284,7 @@ export const en_CA: EnTranslations = {
       },
       "q_elementals": {
         "title": "The Mountain Wakes",
-        "text": "Stormcrag has stood silent a thousand years, and now the very stones of it get up and walk. Elementals do not simply wake, {playerName} - something beneath this mountain is turning in its sleep. Put twelve of them down so I may study what remains.",
+        "text": "Stormcrag has stood silent a thousand years, and now the very stones of it get up and walk. Elementals do not simply wake, {playerName}. Something beneath this mountain is turning in its sleep. Put twelve of them down so I may study what remains.",
         "completion": "The fragments hum like struck bells. The mountain is not angry, {playerName}... it is being disturbed.",
         "objectives": {
           "0": {
@@ -17284,7 +17294,7 @@ export const en_CA: EnTranslations = {
       },
       "q_shard_cores": {
         "title": "Cores of the Storm",
-        "text": "At each elemental's heart sits a storm core - a knot of lightning bound in stone. Six of them, set side by side, will tell me where the disturbance is centered. I suspect I already know, {playerName}, and I dearly hope that I am wrong.",
+        "text": "At each elemental's heart sits a storm core, a knot of lightning bound in stone. Six of them, set side by side, will tell me where the disturbance is centered. I suspect I already know, {playerName}, and I dearly hope that I am wrong.",
         "completion": "Each core leans the same way, like iron filings to a lodestone. They point south, {playerName}. To the Sanctum.",
         "objectives": {
           "0": {
@@ -17294,8 +17304,8 @@ export const en_CA: EnTranslations = {
       },
       "q_kazzix": {
         "title": "The Shardlord",
-        "text": "Among the elementals one burns brighter than the rest: Shardlord Kazzix, a storm given shoulders. Its heartshard would anchor every reading I have taken - if you can wrench it from the thing. It walks the far crags west of Stormcrag, beyond the second camp.",
-        "completion": "The heartshard! Still crackling - magnificent. Take these leggings; I sized them off a guess and a prayer.",
+        "text": "Among the elementals one burns brighter than the rest: Shardlord Kazzix, a storm given shoulders. Its heartshard would anchor every reading I have taken, if you can wrench it from the thing. It walks the far crags west of Stormcrag, beyond the second camp.",
+        "completion": "The heartshard! Still crackling. Magnificent. Take these leggings; I sized them off a guess and a prayer.",
         "objectives": {
           "0": {
             "label": "Kazzix's Heartshard"
@@ -17305,7 +17315,7 @@ export const en_CA: EnTranslations = {
       "q_zealots": {
         "title": "Chants on the Wind",
         "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
-        "completion": "The wind is quieter. But what troubles me is not the chanting, {playerName} - it is that something may be chanting back.",
+        "completion": "The wind is quieter. But what troubles me is not the chanting, {playerName}. It is that something may be chanting back.",
         "objectives": {
           "0": {
             "label": "Broodsworn Zealot slain"
@@ -17325,7 +17335,7 @@ export const en_CA: EnTranslations = {
       "q_necromancers": {
         "title": "The Phylactery Ring",
         "text": "The orders speak of a \"ring of phylacteries\", soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.",
-        "completion": "Light forgive us. These hold the dead of the Vale and the fen - every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
+        "completion": "Light forgive us. These hold the dead of the Vale and the fen, every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
         "objectives": {
           "0": {
             "label": "Ritual Phylactery"
@@ -17334,8 +17344,8 @@ export const en_CA: EnTranslations = {
       },
       "q_revenants": {
         "title": "The Revenant Fields",
-        "text": "East of the Sanctum road lies an old battlefield - the vanguard of the last army that tried to take this mountain, two hundred years buried. The cult has called them up, bones in rusted plate. Put twelve revenants back in the ground, {playerName}.",
-        "completion": "They were soldiers once, like mine. Whatever called them up has no respect for the dead - or a use for them I do not care to learn.",
+        "text": "East of the Sanctum road lies an old battlefield, the vanguard of the last army that tried to take this mountain, two hundred years buried. The cult has called them up, bones in rusted plate. Put twelve revenants back in the ground, {playerName}.",
+        "completion": "They were soldiers once, like mine. Whatever called them up has no respect for the dead, or a use for them I do not care to learn.",
         "objectives": {
           "0": {
             "label": "Boneclad Revenant slain"
@@ -17345,7 +17355,7 @@ export const en_CA: EnTranslations = {
       "q_revenant_vanguard": {
         "title": "Bones of the Vanguard",
         "text": "The revenants are forming ranks, {playerName}, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.",
-        "completion": "The fields lie still again. Take this - it was made for the defenders of the wall, and no one has earned it more.",
+        "completion": "The fields lie still again. Take this: it was made for the defenders of the wall, and no one has earned it more.",
         "objectives": {
           "0": {
             "label": "Vanguard Bone recovered"
@@ -17354,7 +17364,7 @@ export const en_CA: EnTranslations = {
       },
       "q_wyrm_sigils": {
         "title": "Sigils of the Wyrm",
-        "text": "It is time you knew the whole of it, {playerName}. The Gravecallers serve Korzul the Gravewyrm - an ancient dragon sealed beneath this mountain - and every soul they have stolen since Eastbrook is a tithe poured into its waking. On the Sanctum Approach the cult has laid sigils to thin the seal. Bring me three; I would read the rite they are working.",
+        "text": "It is time you knew the whole of it, {playerName}. The Gravecallers serve Korzul the Gravewyrm (an ancient dragon sealed beneath this mountain), and every soul they have stolen since Eastbrook is a tithe poured into its waking. On the Sanctum Approach the cult has laid sigils to thin the seal. Bring me three; I would read the rite they are working.",
         "completion": "Yes... a waking-litany, generations in the writing. They are close, {playerName}. Closer than I dared fear.",
         "objectives": {
           "0": {
@@ -17364,8 +17374,8 @@ export const en_CA: EnTranslations = {
       },
       "q_breaking_the_seal": {
         "title": "Breaking the Seal",
-        "text": "The seal on the Sanctum was wrought with mountain-fire, and only mountain-fire will let us pass without tearing it wide open. The stormcrag elementals carry embers of that first forging in their cores. Bring me five Blessed Embers, {playerName} - for if the cult opens that gate first, they will not be careful, and the Wyrm will not wake gently.",
-        "completion": "They burn blue and clean - the mountain remembers its old oath. With these I can unbind the gate for us alone.",
+        "text": "The seal on the Sanctum was wrought with mountain-fire, and only mountain-fire will let us pass without tearing it wide open. The stormcrag elementals carry embers of that first forging in their cores. Bring me five Blessed Embers, {playerName}, for if the cult opens that gate first, they will not be careful, and the Wyrm will not wake gently.",
+        "completion": "They burn blue and clean: the mountain remembers its old oath. With these I can unbind the gate for us alone.",
         "objectives": {
           "0": {
             "label": "Blessed Embers"
@@ -17387,8 +17397,8 @@ export const en_CA: EnTranslations = {
       },
       "q_sanctum_gate": {
         "title": "The Sanctum Gate",
-        "text": "This is the last threshold, {playerName}. The gate of the Gravewyrm Sanctum was locked with a keystone, and the cult shattered it into shards rather than see it turned against them. The shards lie scattered in the gate plaza, under the eyes of the boneclad dead. Bring me three, and I will open the way the Light intended - quietly.",
-        "completion": "The shards sit true... and the gate knows its key. The way below stands open, {playerName}. Gather the strongest companions you can find - what comes next, no one should face alone.",
+        "text": "This is the last threshold, {playerName}. The gate of the Gravewyrm Sanctum was locked with a keystone, and the cult shattered it into shards rather than see it turned against them. The shards lie scattered in the gate plaza, under the eyes of the boneclad dead. Bring me three, and I will open the way the Light intended, quietly.",
+        "completion": "The shards sit true... and the gate knows its key. The way below stands open, {playerName}. Gather the strongest companions you can find: what comes next, no one should face alone.",
         "objectives": {
           "0": {
             "label": "Sanctum Key Shard"
@@ -17397,8 +17407,8 @@ export const en_CA: EnTranslations = {
       },
       "q_korgath": {
         "title": "The Bound Guardian",
-        "text": "My last sweep of the Sanctum's mouth found chains, {playerName} - chains thick as a ship's mast, and something ogre-shaped straining inside them. The cult bound a champion at the threshold: Korgath, fed on rage for longer than either of us has been alive. Take four companions and put him down - and when the chains come off, do not let him corner you.",
-        "completion": "Korgath, broken at last. Even his chains deserved a kinder end than that. The wraps are yours - wear them past the threshold he kept.",
+        "text": "My last sweep of the Sanctum's mouth found chains, {playerName}, chains thick as a ship's mast, and something ogre-shaped straining inside them. The cult bound a champion at the threshold: Korgath, fed on rage for longer than either of us has been alive. Take four companions and put him down, and when the chains come off, do not let him corner you.",
+        "completion": "Korgath, broken at last. Even his chains deserved a kinder end than that. The wraps are yours: wear them past the threshold he kept.",
         "objectives": {
           "0": {
             "label": "Korgath the Bound slain"
@@ -17407,8 +17417,8 @@ export const en_CA: EnTranslations = {
       },
       "q_velkhar": {
         "title": "The Grand Necromancer",
-        "text": "Every thread we have followed - Morthen, Vael, the phylacteries - was spun by one hand: Grand Necromancer Velkhar, first of the Gravecallers, keeper of the waking rite. He stands in the ritual vault below, pouring two lands' worth of stolen souls into the Wyrm. End him, {playerName}, and the tithe ends with him.",
-        "completion": "Velkhar is dead, and the rite is headless. But you felt it down there, did you not? The souls are already spent - the Wyrm is no longer asleep.",
+        "text": "Every thread we have followed (Morthen, Vael, the phylacteries) was spun by one hand: Grand Necromancer Velkhar, first of the Gravecallers, keeper of the waking rite. He stands in the ritual vault below, pouring two lands' worth of stolen souls into the Wyrm. End him, {playerName}, and the tithe ends with him.",
+        "completion": "Velkhar is dead, and the rite is headless. But you felt it down there, did you not? The souls are already spent: the Wyrm is no longer asleep.",
         "objectives": {
           "0": {
             "label": "Grand Necromancer Velkhar slain"
@@ -17417,8 +17427,8 @@ export const en_CA: EnTranslations = {
       },
       "q_gravewyrm": {
         "title": "Korzul the Gravewyrm",
-        "text": "There is no rite left to stop, {playerName} - only the Wyrm itself, half-woken in its hollow, gorged on the dead of the Vale and the fen. If it rises, the wall, the marsh, Eastbrook - everything we have defended falls in a single night. Take your companions into the Wyrm's Hollow and finish what we began in a chapel yard so long ago. The Light has carried you this far; carry it the rest of the way.",
-        "completion": "It is over. The dead of three lands may rest, the mountain sleeps unhaunted - and it is your name, {playerName}, that every bell from here to Eastbrook rings tonight.",
+        "text": "There is no rite left to stop, {playerName}: only the Wyrm itself, half-woken in its hollow, gorged on the dead of the Vale and the fen. If it rises, the wall, the marsh, Eastbrook, everything we have defended falls in a single night. Take your companions into the Wyrm's Hollow and finish what we began in a chapel yard so long ago. The Light has carried you this far; carry it the rest of the way.",
+        "completion": "It is over. The dead of three lands may rest, the mountain sleeps unhaunted, and it is your name, {playerName}, that every bell from here to Eastbrook rings tonight.",
         "objectives": {
           "0": {
             "label": "Korzul the Gravewyrm slain"

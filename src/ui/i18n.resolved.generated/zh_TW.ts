@@ -2087,6 +2087,7 @@ export const zh_TW: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "大師鍛造",
       "tooltipWorn": "佔用一個大師鍛造欄位（已用{used}/{cap}）。",
+      "tooltipLegendaryLimit": "最多只能穿戴{cap}件傳說品質的大師鍛造物品。",
       "tooltipAtCap": "你的全部{cap}個大師鍛造欄位均已佔用。"
     },
     "itemSet": {
@@ -3047,7 +3048,14 @@ export const zh_TW: EnTranslations = {
       "quickeningCatalyst": "製作催化劑。鍊金術士每天只能製作一個。",
       "growthTonic": "農用品。種植時消耗，有機會獲得略多的收成。若作物枯萎，滋補劑也會隨之失去。",
       "deedOfMaking": "銘文契據。消耗後將一件已臻至完美的大師鍛造作品提升為傳說，並為其命名。",
-      "wyrmfallCore": "大師鍛造製作催化劑。團隊副本最終首領每個難度每日一次，為每位玩家掉落1到3個。英雄地城最終首領各自每日一次，為每位玩家掉落1到3個。每日首次在A級或S級裂隙競速中獲勝時，A級可獲得1個，S級可獲得2個。英雄軍需官以英雄徽記出售。"
+      "wyrmfallCore": "大師鍛造製作催化劑。團隊副本最終首領每個難度每日一次，為每位玩家掉落1到3個。英雄地城最終首領各自每日一次，為每位玩家掉落1到3個。每日首次在A級或S級裂隙競速中獲勝時，A級可獲得1個，S級可獲得2個。英雄軍需官以英雄徽記出售。",
+      "mudfinScale": "製作材料。泥鰭潛伏者約有一半機率掉落，沼澤深處的魚類稍低一些，而水中的精英首領則必定攜帶。",
+      "crackedWyrmScale": "製作材料。聖所鱗甲衛約有一半機率掉落，世上再無他處可得。",
+      "crackedOgreTusk": "製作材料。碎顱者布魯托克每次倒下都會留下一枚，也只有他會掉落。",
+      "tallowCandle": "製作材料。深岩掘地者掉落的機率過半，喚墓者教徒偶爾掉落，而兩者中的精英首領必定攜帶。",
+      "banditBandana": "製作材料。強盜約有一半機率掉落，而他們的精英首領必定攜帶。",
+      "oldCragmawsPelt": "製作材料。老裂顎每次倒下都會留下一張，別的野獸都不會掉落。",
+      "emberwingCinderscale": "製作材料。熾翼沃斯卡每次倒下都會留下一片，別的野獸都不會掉落。"
     },
     "discord": {
       "title": "Discord",
@@ -3648,6 +3656,10 @@ export const zh_TW: EnTranslations = {
       "harvestFineLineQty": "你還收穫了：{name} x{qty}。",
       "witheredLine": "作物枯萎了。你清理了田畦：{name}。",
       "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
+      "pressTarget": {
+        "feastOverHarvest": "盛宴和你的作物都在範圍內。互動會優先取用盛宴，而不是田畦；離開盛宴再去收穫。",
+        "feastOverPlant": "盛宴和空田畦都在範圍內。互動會優先取用盛宴，而不是田畦；離開盛宴再去播種。"
+      },
       "seedBackLine": "你回收了種子：{name}。",
       "seedBackLineQty": "你回收了種子：{name} x{qty}。",
       "goldenBonusLine": "金色收成額外產出：{name}。",
@@ -4402,6 +4414,7 @@ export const zh_TW: EnTranslations = {
         "gather_event_pristine_vein": "完美礦脈",
         "gather_event_ancient_heartwood": "古木心材",
         "gather_event_moonlit_bloom": "月華花蕾",
+        "gather_event_golden_harvest": "金色豐收",
         "gather_event_perfect_specimen": "完美標本",
         "slain_old_greyjaw": "斬殺：老灰顎",
         "slain_mogger": "斬殺：莫格",
@@ -8185,10 +8198,7 @@ export const zh_TW: EnTranslations = {
       "detonateLightningRod": "避雷針雷擊！",
       "detonateStormcallersWrath": "風暴召喚者之怒爆發！",
       "detonateAbyssalMaw": "深淵之口合攏！",
-      "detonateCrushingDepth": "粉碎深淵碾壓！",
-      "detonatePactSeal": "契約封印引爆！",
-      "detonateBloodRite": "血液儀式降臨！",
-      "detonatePitSentence": "深坑判決引爆！"
+      "detonateCrushingDepth": "粉碎深淵碾壓！"
     },
     "delve": {
       "cannotEnterNow": "你現在無法進入秘探。",

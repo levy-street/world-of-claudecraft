@@ -2823,7 +2823,7 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="11294">== Articles ==
+      <text xml:space="preserve" bytes="11296">== Articles ==
 * [[Abyssal Gag (Ability)]]
 * [[Abyssal Rift (Ability)]]
 * [[Adder&apos;s Bite (Ability)]]
@@ -3028,7 +3028,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Mending Light (Ability)]]
 * [[Mending Waters (Ability)]]
 * [[Mercy Lance (Ability)]]
-* [[Meteor (Ability)]]
 * [[Mindfracture (Ability)]]
 * [[Mirrored Blades (Ability)]]
 * [[Moonseed (Ability)]]
@@ -3121,6 +3120,7 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Shrapnel Charge (Ability)]]
 * [[Skybranch (Ability)]]
 * [[Skyfall (Ability)]]
+* [[Skystone (Ability)]]
 * [[Slinkstrike (Ability)]]
 * [[Slumber (Ability)]]
 * [[Smoke Screen (Ability)]]
@@ -4573,7 +4573,7 @@ Warrior starts with Pitted Shortsword and uses rage.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2149">== Overview ==
+      <text xml:space="preserve" bytes="2153">== Overview ==
 Mage starts with Bogoak Staff and uses mana.
 
 == Stats ==
@@ -4609,7 +4609,7 @@ Mage starts with Bogoak Staff and uses mana.
 * [[Ignition (Ability)|Ignition]]
 * [[Hot Streak (Ability)|Hot Streak]]
 * [[Blazing Barrier (Ability)|Blazing Barrier]]
-* [[Meteor (Ability)|Meteor]]
+* [[Skystone (Ability)|Skystone]]
 * [[Phoenix Trance (Ability)|Phoenix Trance]]
 * [[Summon Water Elemental (Ability)|Summon Water Elemental]]
 * [[Ice Lance (Ability)|Ice Lance]]
@@ -107878,7 +107878,7 @@ Heals a friendly target for $d over 15 sec. (Hunter talent)
   </page>
 
   <page>
-    <title>Meteor (Ability)</title>
+    <title>Skystone (Ability)</title>
     <ns>0</ns>
     <id>2181</id>
     <revision>
@@ -110640,7 +110640,7 @@ Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Hea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="58940">== Complete index ==
+      <text xml:space="preserve" bytes="58942">== Complete index ==
 * [[A Cart for the Orchard]]
 * [[A Different Pastime]]
 * [[A Recipe Worth Keeping]]
@@ -111753,7 +111753,6 @@ Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Hea
 * [[Mending Waters (Ability)]]
 * [[Mercy Lance (Ability)]]
 * [[Mere Lurker (Mob)]]
-* [[Meteor (Ability)]]
 * [[Milepost Boots]]
 * [[Militia Chainvest]]
 * [[Mind the Moorings]]
@@ -112277,6 +112276,7 @@ Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Hea
 * [[Skyfall (Ability)]]
 * [[Skysilver Hoe]]
 * [[Skysilver Mining Pick]]
+* [[Skystone (Ability)]]
 * [[Slagbreaker Gauntlets]]
 * [[Slagbreaker Hauberk]]
 * [[Slagbreaker Helm]]

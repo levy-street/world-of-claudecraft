@@ -2087,6 +2087,7 @@ export const ko_KR: EnTranslations = {
       "slotsValue": "{used} / {cap}",
       "pieceMark": "명장 제작",
       "tooltipWorn": "명장 제작 슬롯 1개를 차지합니다 ({cap}개 중 {used}개 사용 중).",
+      "tooltipLegendaryLimit": "전설 등급 명장 제작 장비는 {cap}개까지만 착용할 수 있습니다.",
       "tooltipAtCap": "당신의 명장 제작 슬롯 {cap}개가 모두 사용 중입니다."
     },
     "itemSet": {
@@ -3047,7 +3048,14 @@ export const ko_KR: EnTranslations = {
       "quickeningCatalyst": "제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다.",
       "growthTonic": "농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.",
       "deedOfMaking": "명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다.",
-      "wyrmfallCore": "명장 제작용 촉매. 공격대 최종 우두머리는 난이도마다 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 영웅 던전 최종 우두머리는 각각 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 경주 승리 시 A 등급이면 1개, S 등급이면 2개를 얻습니다. 영웅 병참장교가 영웅의 징표를 받고 판매합니다."
+      "wyrmfallCore": "명장 제작용 촉매. 공격대 최종 우두머리는 난이도마다 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 영웅 던전 최종 우두머리는 각각 하루 한 번 각 플레이어에게 1~3개를 떨어뜨립니다. 그날 첫 A 또는 S 등급 균열 경주 승리 시 A 등급이면 1개, S 등급이면 2개를 얻습니다. 영웅 병참장교가 영웅의 징표를 받고 판매합니다.",
+      "mudfinScale": "제작 재료. 진흙지느러미 잠복자가 절반 정도의 확률로 떨어뜨리고, 더 깊은 늪의 물고기는 그보다 조금 덜하며, 그 물가의 이름 있는 강적은 반드시 지니고 있습니다.",
+      "crackedWyrmScale": "제작 재료. 성소 비늘수호병이 절반 정도의 확률로 떨어뜨리며, 세상 어디에서도 달리 구할 수 없습니다.",
+      "crackedOgreTusk": "제작 재료. 해골분쇄자 브루톡이 쓰러질 때마다 하나씩 남기며, 그가 유일한 출처입니다.",
+      "tallowCandle": "제작 재료. 깊은바위 채굴꾼이 절반이 넘는 확률로 떨어뜨리고 무덤부름 교단원이 이따금 떨어뜨리며, 양쪽의 이름 있는 우두머리는 반드시 지니고 있습니다.",
+      "banditBandana": "제작 재료. 산적이 절반 정도의 확률로 떨어뜨리며, 이름 있는 두목은 반드시 지니고 있습니다.",
+      "oldCragmawsPelt": "제작 재료. 늙은 크래그모가 쓰러질 때마다 한 장씩 남기며, 다른 야수는 떨어뜨리지 않습니다.",
+      "emberwingCinderscale": "제작 재료. 잿불날개 보스카르가 쓰러질 때마다 한 장씩 남기며, 다른 야수는 떨어뜨리지 않습니다."
     },
     "discord": {
       "title": "Discord",
@@ -3648,6 +3656,10 @@ export const ko_KR: EnTranslations = {
       "harvestFineLineQty": "또한 {name} x{qty}을(를) 수확했습니다.",
       "witheredLine": "작물이 시들었습니다. 밭을 정리했습니다: {name}.",
       "witheredLineQty": "작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.",
+      "pressTarget": {
+        "feastOverHarvest": "잔치와 작물이 모두 범위 안에 있습니다. 상호작용은 밭보다 잔치를 먼저 사용합니다. 수확하려면 잔치에서 물러나십시오.",
+        "feastOverPlant": "잔치와 빈 밭이 모두 범위 안에 있습니다. 상호작용은 밭보다 잔치를 먼저 사용합니다. 심으려면 잔치에서 물러나십시오."
+      },
       "seedBackLine": "씨앗을 회수했습니다: {name}.",
       "seedBackLineQty": "씨앗을 회수했습니다: {name} x{qty}.",
       "goldenBonusLine": "황금 수확이 덤을 내놓았습니다: {name}.",
@@ -4402,6 +4414,7 @@ export const ko_KR: EnTranslations = {
         "gather_event_pristine_vein": "완벽한 광맥",
         "gather_event_ancient_heartwood": "고대 심재",
         "gather_event_moonlit_bloom": "달빛 꽃",
+        "gather_event_golden_harvest": "황금빛 수확",
         "gather_event_perfect_specimen": "완벽한 표본",
         "slain_old_greyjaw": "처치: 늙은 그레이죠",
         "slain_mogger": "처치: 모거",
@@ -8185,10 +8198,7 @@ export const ko_KR: EnTranslations = {
       "detonateLightningRod": "피뢰침이 번개를 내리칩니다!",
       "detonateStormcallersWrath": "폭풍 소환사의 분노가 폭발합니다!",
       "detonateAbyssalMaw": "심연의 아가리가 닫힙니다!",
-      "detonateCrushingDepth": "분쇄의 심연이 짓누릅니다!",
-      "detonatePactSeal": "서약 봉인이 폭발합니다!",
-      "detonateBloodRite": "피의 의식이 내려집니다!",
-      "detonatePitSentence": "구렁텅이 판결이 폭발합니다!"
+      "detonateCrushingDepth": "분쇄의 심연이 짓누릅니다!"
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
