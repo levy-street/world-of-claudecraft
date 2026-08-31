@@ -140,9 +140,10 @@ export function nameplatePlanInto(
   // and like every object plate it carries no hp bar (the flag-family object
   // treatment). The pad is INTERACT_RANGE + 1, the delve-family hysteresis
   // band: the plate shows one yard PAST the bite's own INTERACT_RANGE gate
-  // (consumeFeastAction denies feast_range strictly beyond it), so the title
-  // is already up as a player walks into eating range and never flickers at
-  // the exact boundary.
+  // (consumeFeastAction denies strictly beyond it with the merged not-found
+  // frame, farmDenied 'feast_expired', since masterwrought Phase 18), so the
+  // title is already up as a player walks into eating range and never
+  // flickers at the exact boundary.
   const feastNear =
     isFeastTemplateId(e.templateId) && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 

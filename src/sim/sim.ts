@@ -2942,7 +2942,7 @@ export class Sim {
       // or effect id that no longer exists in content is dropped, and the
       // counters are clamped, so retiring an effect cannot resurrect it or
       // load a negative charge count.
-      const savedSlots = normalizeToolEffectSlots(s.toolEffectSlots);
+      const savedSlots = normalizeToolEffectSlots(s.toolEffectSlots, meta.name);
       if (savedSlots) meta.toolEffectSlots = savedSlots;
       // Node respawn timers resume from their saved remaining deltas (D6),
       // re-anchored to THIS sim's clock and filtered to live node ids

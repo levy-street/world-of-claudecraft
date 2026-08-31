@@ -318,6 +318,25 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   the `node_persist.ts` anti-tamper doctrine with ABSOLUTE deadlines (allowlists
   and the `FARM_MAX_GROW_MS` duration clamp on the load side; clamp before the
   future re-anchor; the zero-clock offline guard).
+- `farm_load_report.ts`: pure leaf for the dev-channel visibility of a farm-plot
+  load's silent-drop arms (`droppedFarmPlotCounts`, `warnDroppedFarmPlotRows`),
+  extracted from `Sim.addPlayer` at masterwrought Phase 18; the counting half
+  is pure and the warn stays dev-channel English, never player-visible.
+- `farm_ready.ts`: the ONE ready notice (`notifyFarmReady`, called from the
+  login check and the 1 Hz sweep): a personal, text-free `farmReady` event
+  gated by the persisted `notified` flag, plus the Phase 18 withered-then-ready
+  correction over the transient `PlayerMeta.farmWitheredAnnounced` memory
+  (rides the same event as a fresh ready count; no new wire surface). Draws
+  no rng.
+- `feast.ts`: the shared feast behind the `SimContext` seam (`placeFeastAction`,
+  `consumeFeastAction`, the 1 Hz `updateFarmFeasts` despawn sweep): the
+  catalog-derived placeable family, the one-active-per-placer rule and the
+  eatenBy ledger on the domain-tagged `feastOwnerKey`, and the existence-oracle
+  guard (out-of-range and nonexistent ids answer the same not-found frame).
+  Transient state on `SimContext.feasts`; draws no rng.
+- `farmer_npcs.ts`: the farmer-NPC range predicate (`nearFarmerNpc`,
+  `FARMER_TRADE_RANGE`) the husk trade gates on, resolved by the NpcDef
+  `farmer` flag through the grid's early-exit `someInRadius`; draws no rng.
 - `wield_gate.ts`: the R22 land-tool USE requirements, a pure leaf like
   `tools.ts` (items table as a parameter, no player-state import): the one
   frozen threshold table (40/70/85/100), the wield-filtered bag scans the

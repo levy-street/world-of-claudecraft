@@ -52,6 +52,16 @@
 // ledger and one-active identities. The set is bounded by the feast's own
 // charge count and dropped wholesale at despawn, so it inherits none of the
 // persistence machinery the credited-objects ledger needs.
+//
+// THE RESERVED 'feast_range' REASON (masterwrought Phase 18 decision, recorded
+// here): since the existence-oracle guard in consumeFeastAction folded the
+// out-of-range refusal into the not-found frame ('feast_expired'), NOTHING
+// EMITS farmDenied 'feast_range' today. The reason stays in the wire union and
+// its hudChrome.farming.denied.feast_range key stays in the catalog and every
+// overlay as a RESERVED, currently-unemitted reason: retiring it would delete
+// the maintainer's roughly twenty filled overlay rows, which is the release
+// fill lane's call, not this unit's. The QA twin re-judges it at the release
+// fill.
 
 import { buildConsuming } from '../consuming';
 import { CRAFT_RING } from '../content/professions';
@@ -174,11 +184,11 @@ export interface FeastState {
  *  Domain-tagged (see THE LEDGER KEY in the header): the server's stable
  *  character id when present, the session entity id for offline and
  *  sim-only hosts, each under its own prefix so the two numeric domains
- *  can never collide at the same number. */
+ *  can never collide at the same number. `== null` on purpose, the null
+ *  tolerance the untagged `??` form had: a typed host never writes null,
+ *  but an untyped one must not key 'character:null'. */
 export function feastOwnerKey(meta: PlayerMeta): string {
-  return meta.characterId === undefined
-    ? `entity:${meta.entityId}`
-    : `character:${meta.characterId}`;
+  return meta.characterId == null ? `entity:${meta.entityId}` : `character:${meta.characterId}`;
 }
 
 /** Set out a feast at the caller's feet, spending one feast item from bags.
@@ -363,10 +373,10 @@ export function consumeFeastAction(
   // sweeping ids learns nothing about which far-away feasts exist, are
   // drained, or were already eaten from. Every feast-specific reason below
   // (the tick-domain expiry, feast_finished, feast_eaten) therefore answers
-  // only INSIDE reach, where the feast is visible anyway. The dedicated
-  // 'feast_range' reason stays in the wire union for stale clients but no
-  // longer reaches it from here; the client's own proximity gate
-  // (src/game/feast_interact.ts) is what real players see instead. All
+  // only INSIDE reach, where the feast is visible anyway. Nothing emits the
+  // 'feast_range' reason any more (it stays RESERVED in the union and the
+  // catalog; the header's decision record says why); the client's own
+  // proximity gate (src/game/feast_interact.ts) is what real players see. All
   // three arms are draw-free and emit the identical frame shape (the extra
   // dist2d on the existing-feast arm is arithmetic, not an observable).
   const feast = ctx.feasts.get(feastId);

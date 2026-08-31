@@ -635,6 +635,10 @@ export function structuredCloneToolEffectSlots(
  */
 export function normalizeToolEffectSlots(
   saved: Partial<Record<string, ToolEffectSlot>> | undefined,
+  // For the dev-channel drop line only (the farm_load_report posture): the
+  // owner's name when the caller has one, so an operator reading server logs
+  // can tie the dropped row to a character. Never player-visible.
+  ownerName?: string,
 ): Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined {
   if (!saved) return undefined;
   let out: Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined;
@@ -647,10 +651,17 @@ export function normalizeToolEffectSlots(
     // mode through the SAME coercion the surviving row would take (garbled
     // fail-safes to 'prompt', see the confirmMode note below), then drop a
     // pair the mint could never have written. Judged on the RESOLVED mode so
-    // a garbled farming row cannot slip through as a dead prompt slot.
+    // a garbled farming row cannot slip through as a dead prompt slot. The
+    // drop is NOT silent: no legal writer produces this row, so an operator
+    // should see it happen (dev-channel English, the farm_load_report line).
     const confirmMode: ToolEffectConfirmMode =
       row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt';
-    if (promptSlotRefused(professionId) && confirmMode === 'prompt') continue;
+    if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
+      console.warn(
+        `[load] dropped ${professionId} tool-effect slot ${row.effectId} (stored mode ${String(row.confirmMode)}) for ${ownerName ?? 'an unnamed owner'}: the mint refuses prompt mode on this profession, so no legal writer produced this row`,
+      );
+      continue;
+    }
     // A stored maxDurability that is not a usable positive integer falls back
     // to the catalog's own starting value, because a recharge restores TO this
     // number and a dead one would make the slot permanently useless.

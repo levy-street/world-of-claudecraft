@@ -36,9 +36,19 @@
 // event type, no new wire field, and no client change exist anywhere in this
 // feature. The memory needs no persistence: a notified plot that currently
 // reads withered was announced withered (monotonicity again), so every sweep
-// reseeds it from plain state and a relog loses nothing. Corrections ride
-// the once-only seam too: the set entry is removed as the correction emits,
-// and re-withering cannot happen, so a bed corrects at most once per cycle.
+// reseeds it from plain state and a relog keeps every correction whose flip
+// happens IN a session. The one flip a relog does lose: a skill rise that
+// lands between sessions (the load-time proficiency_display_heal bump is the
+// live case) reconstructs the plot as notified-and-ready against an empty
+// memory, so that correction is skipped; the bed still shows the truth, and
+// the notice was never the durable surface. Corrections ride the once-only
+// seam too: the set entry is removed as the correction emits, so a bed
+// corrects at most once per cycle. Re-withering cannot happen in play
+// (proficiency never decrements), with one out-of-play exception: the
+// one-time mastery_reset zeroes skills at load, so a plot corrected in the
+// prior session can read withered again and re-seed the memory, and a later
+// skill rise would then correct it a second time, worst case one duplicate
+// farmReady frame for a character that lived through the reset.
 
 import { farmCropTier } from '../content/farm_crops';
 import type { PlayerMeta } from '../sim';

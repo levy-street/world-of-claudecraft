@@ -8,8 +8,12 @@ import { dist2d, type Entity, INTERACT_RANGE, type Vec3 } from '../sim/types';
  *  lootable and owns no pickup item, so no other funnel arm ever competes for
  *  it. The boundary is
  *  INCLUSIVE (`<= INTERACT_RANGE`) to mirror the sim's own deny,
- *  `dist2d(p.pos, entity.pos) > INTERACT_RANGE` (farmDenied 'feast_range'),
- *  so the client never refuses a press the sim would accept. Ties go to the
+ *  `dist2d(p.pos, entity.pos) > INTERACT_RANGE`, which since masterwrought
+ *  Phase 18 answers the merged not-found frame (farmDenied 'feast_expired',
+ *  the existence-oracle guard in consumeFeastAction; 'feast_range' is a
+ *  reserved reason nothing emits today), so the client never refuses a press
+ *  the sim would accept and never sends one the sim would fold into
+ *  not-found. Ties go to the
  *  first entity in iteration order (the strict `<` on best keeps the earlier
  *  one), the farm_bed_interact comparator exactly. Pure module: no DOM, no
  *  Three, no HUD. */

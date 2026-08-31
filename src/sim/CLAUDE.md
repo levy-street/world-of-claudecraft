@@ -282,10 +282,18 @@ remove the declaration AND its binding in the same change, then re-run the parit
   `evaluateCraftAdmission`, so a oncePerDay refusal skips the resolve's one to two
   output draws exactly like the vault refusal above. Any harness replaying a command
   stream against a seed must capture `resetDay` beside the seed (recorded at the
-  Phase 12 QA ledger's replay note). This carve-out is PINNED too:
-  `tests/quickening_catalyst_gate.test.ts` covers both gate crossings and
-  `tests/delves.test.ts` the `''` default; change this paragraph and those pins
-  together, in the same change, like the vault paragraph above.
+  Phase 12 QA ledger's replay note). The host input is CLAMPED at the seam since
+  masterwrought Phase 18: `Sim.resetDay` is a setter that keeps the highest key
+  ever fed (monotone non-decreasing; `''` never lowers it, closing the
+  `''`-bounce), so a backwards realm-calendar read cannot re-open a spent daily
+  gate and only a Sim that was NEVER fed a day observes `''`. A harness that
+  wants the no-calendar arm builds a fresh Sim rather than assigning `''`.
+  This carve-out is PINNED too:
+  `tests/quickening_catalyst_gate.test.ts` covers both gate crossings,
+  `tests/delves.test.ts` the `''` default, and `tests/reset_day_guard.test.ts`
+  the clamp (a backwards read held, a spent gate staying spent); change this
+  paragraph and those pins together, in the same change, like the vault
+  paragraph above.
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase

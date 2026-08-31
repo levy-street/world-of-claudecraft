@@ -71,16 +71,30 @@ export class SpatialGrid {
     for (const e of entities) this.update(e);
   }
 
-  // Visit every entity within `radius` of (x, z) in the ground plane,
-  // passing the squared 2D distance. The cell window is padded by one unit
-  // so entities that drifted since the last rebuild still fall inside it;
-  // the distance check itself uses current positions.
-  forEachInRadius(x: number, z: number, radius: number, fn: (e: Entity, d2: number) => void): void {
+  // The ONE cell-window computation the three radius queries share (the rule
+  // of three: forEachInRadius, hasInRadius, someInRadius each carried a
+  // verbatim copy). The window is padded by one unit so entities that
+  // drifted since the last rebuild still fall inside it; the distance check
+  // itself uses current positions. Written into a reusable scratch rather
+  // than a fresh object because two of the callers are per-tick hot paths
+  // that must not allocate; every caller copies the four bounds into locals
+  // BEFORE it iterates, so a nested query fired from a forEachInRadius
+  // callback can never clobber an in-flight walk.
+  private readonly cellBounds = { minCx: 0, maxCx: 0, minCz: 0, maxCz: 0 };
+
+  private cellWindow(x: number, z: number, radius: number): void {
     const cs = this.cellSize;
-    const minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
-    const maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
-    const minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
-    const maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+    this.cellBounds.minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
+    this.cellBounds.maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
+    this.cellBounds.minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
+    this.cellBounds.maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+  }
+
+  // Visit every entity within `radius` of (x, z) in the ground plane,
+  // passing the squared 2D distance.
+  forEachInRadius(x: number, z: number, radius: number, fn: (e: Entity, d2: number) => void): void {
+    this.cellWindow(x, z, radius);
+    const { minCx, maxCx, minCz, maxCz } = this.cellBounds;
     const r2 = radius * radius;
     for (let cx = minCx; cx <= maxCx; cx++) {
       for (let cz = minCz; cz <= maxCz; cz++) {
@@ -110,11 +124,8 @@ export class SpatialGrid {
     radius: number,
     match: (e: Entity, d2: number) => boolean,
   ): boolean {
-    const cs = this.cellSize;
-    const minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
-    const maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
-    const minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
-    const maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+    this.cellWindow(x, z, radius);
+    const { minCx, maxCx, minCz, maxCz } = this.cellBounds;
     const r2 = radius * radius;
     for (let cx = minCx; cx <= maxCx; cx++) {
       for (let cz = minCz; cz <= maxCz; cz++) {
@@ -135,11 +146,8 @@ export class SpatialGrid {
   // from forEachInRadius so hot-path existence checks do not allocate a closure
   // or keep walking occupied cells after the answer is known.
   hasInRadius(x: number, z: number, radius: number): boolean {
-    const cs = this.cellSize;
-    const minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
-    const maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
-    const minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
-    const maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+    this.cellWindow(x, z, radius);
+    const { minCx, maxCx, minCz, maxCz } = this.cellBounds;
     const r2 = radius * radius;
     const queryCellCount = (maxCx - minCx + 1) * (maxCz - minCz + 1);
 

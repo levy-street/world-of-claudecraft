@@ -3121,14 +3121,25 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
     sim.resetDay = '2026-08-10'; // Monday: the chip drops on the rollover
     expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
-    // The 12-hour early open: Friday, once the host's lead probe reads Saturday.
-    sim.resetDay = '2026-08-07';
-    sim.eventLeadDay = '2026-08-08';
-    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
-    // No host calendar, no event (headless and parity runs stay untouched).
-    sim.resetDay = '';
-    sim.eventLeadDay = '';
-    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+    // The 12-hour early open: Friday, once the host's lead probe reads
+    // Saturday. A FRESH world: Sim.resetDay is monotone non-decreasing
+    // (tests/reset_day_guard.test.ts), so walking the shared sim back from
+    // Monday to Friday would be a held no-op and the arm would pass through
+    // the lead probe alone.
+    const friday = makeWorld();
+    const fridayPid = friday.addPlayer('warrior', 'Early');
+    friday.resetDay = '2026-08-07';
+    expect(must(friday.bgInfoFor(fridayPid), 'bg info').doubleHonorActive).toBe(false);
+    friday.eventLeadDay = '2026-08-08';
+    expect(must(friday.bgInfoFor(fridayPid), 'bg info').doubleHonorActive).toBe(true);
+    // No host calendar, no event (headless and parity runs stay untouched): a
+    // world NEVER fed a day, because '' after a known day is held by the same
+    // monotone setter and would exercise nothing.
+    const headless = makeWorld();
+    const headlessPid = headless.addPlayer('warrior', 'Quiet');
+    expect(headless.resetDay).toBe('');
+    expect(headless.eventLeadDay).toBe('');
+    expect(must(headless.bgInfoFor(headlessPid), 'bg info').doubleHonorActive).toBe(false);
   });
 
   it('an UNRATED dev match never claims it', () => {

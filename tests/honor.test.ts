@@ -360,8 +360,17 @@ describe('ranked Arena honor', () => {
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
     expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(25);
-    sim.resetDay = '';
-    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(0);
+    // The persisted window is carried into a SECOND world that was never fed
+    // a day (the tests/delves.test.ts shape): Sim.resetDay is monotone
+    // non-decreasing, so '' on the first world would be held at 2026-07-08
+    // and exercise nothing; a never-fed sim is the one host that observes ''.
+    const saved = sim.serializeCharacter(pid)!;
+    const replay = world();
+    expect(replay.resetDay).toBe('');
+    const replayPid = replay.addPlayer('warrior', 'Replay', { state: saved });
+    const replayMeta = replay.meta(replayPid)!;
+    expect(replayMeta.honorArenaDaily?.date).toBe('2026-07-08');
+    expect(awardRankedArenaResultHonor(replay.ctx, replayMeta, '1v1', key, 'win')).toBe(0);
   });
 
   it('round-trips the loss counter and leaves an unused one out of the save', () => {

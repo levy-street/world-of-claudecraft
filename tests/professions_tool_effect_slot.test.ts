@@ -7,7 +7,7 @@
 // object still serializes into the parity state digest and initialising it
 // moved every golden in the suite for a feature no scenario uses. Several arms
 // below assert absence specifically, not emptiness.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   GATHERING_PROFESSION_IDS,
   TOOL_EFFECT_IDS,
@@ -834,15 +834,31 @@ describe('the id tables and the load normalizer, directly', () => {
     // twin the mint comment used to argue away: a persisted farming prompt
     // row has NO legal writer (hand-edited JSONB, or a rogue path), so it is
     // normalized away at load like a policy-refused pair instead of loading
-    // as a permanently dead slot.
-    const farmingPrompt = normalizeToolEffectSlots({
-      farming: {
-        effectId: 'gatherers_cache',
-        durability: 5,
-        maxDurability: 20,
-        confirmMode: 'prompt',
-      },
-    } as never);
+    // as a permanently dead slot. The drop is announced on the dev channel
+    // (the farm_load_report posture), naming the profession, the row, and
+    // the owner when the caller supplies one.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let farmingPrompt: ReturnType<typeof normalizeToolEffectSlots>;
+    try {
+      farmingPrompt = normalizeToolEffectSlots(
+        {
+          farming: {
+            effectId: 'gatherers_cache',
+            durability: 5,
+            maxDurability: 20,
+            confirmMode: 'prompt',
+          },
+        } as never,
+        'Hoewright',
+      );
+      expect(warn).toHaveBeenCalledTimes(1);
+      const line = String(warn.mock.calls[0][0]);
+      expect(line).toContain('farming');
+      expect(line).toContain('gatherers_cache');
+      expect(line).toContain('Hoewright');
+    } finally {
+      warn.mockRestore();
+    }
     expect(farmingPrompt).toBeUndefined();
     // A GARBLED mode fail-safes to 'prompt' (the coercion arm below), which
     // on farming is the refused pair: the garbled row rides the twin out too.

@@ -161,7 +161,7 @@ export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): 
  * claim. Draws no rng.
  */
 export function spawnBossExitPortal(ctx: SimContext, mob: Entity): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  const inst = claimedInstanceForMob(ctx, mob.id);
   if (!inst || inst.bossExitId !== null) return;
   const dungeon = DUNGEONS[inst.dungeonId];
   const portal = dungeon?.bossExitPortal;
@@ -1245,7 +1245,10 @@ function heroicRewardWindowToken(lockedUntil: number): string {
  *  per death and hands the result to awardHeroicMarks AND awardWyrmfallCores
  *  through their optional claimed parameter, so a final-boss kill no longer
  *  pays the mobIds scan twice; both callees fall back to this same predicate
- *  when a foreign caller omits the argument. */
+ *  when a foreign caller omits the argument, and the two other death-time
+ *  readers (spawnBossExitPortal above, the Nythraxis lockout sweep in
+ *  encounters/nythraxis.ts) resolve through it too, so no inline copy of the
+ *  predicate survives anywhere. */
 export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceSlot | null {
   return ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mobId)) ?? null;
 }
