@@ -7,7 +7,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { CrossHotbarAction } from '../src/game/cross_hotbar';
-import { GAMEPAD_CONFIRM, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
+import { GAMEPAD_CONFIRM, GAMEPAD_CYCLE_HUD, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
 import { Keybinds } from '../src/game/keybinds';
 import type { Renderer } from '../src/render/renderer';
 import { PROVING_SHORE_NPCS } from '../src/sim/content/proving_shore';
@@ -79,7 +79,7 @@ describe('BootcampOverlay.disengage', () => {
 describe('BootcampOverlay controller prompt wiring', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="ui"></div>';
-    document.body.classList.add('pad-active');
+    document.body.className = 'pad-active';
   });
 
   function paintControllerPrompt(
@@ -296,31 +296,86 @@ describe('BootcampOverlay controller prompt wiring', () => {
     );
   });
 
-  it('names the default inventory button at the Mister Crabs summon site', () => {
+  it('guides the Mister Crabs summon through HUD navigation, never the system button', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
     sim.player.pos.x = CRAB_SUMMON_SITE.x;
     sim.player.pos.z = CRAB_SUMMON_SITE.z;
 
     paintControllerPrompt(sim, { questId: 'q_ps_mother_of_pearl', state: 'active' }, [
       { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
     ]);
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
+    expect(document.querySelector('.tut-prompt')?.textContent).not.toContain('View');
     expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe('Summon');
   });
 
-  it('uses the same inventory button for centered bag lessons', () => {
+  it('uses the HUD-navigation route for centered ring lessons', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
 
     paintControllerPrompt(
       sim,
       { questId: 'q_ps_mother_of_pearl', state: 'ready' },
-      [{ button: GP.BACK, action: 'bags' }],
+      [
+        { button: GP.BACK, action: 'bags' },
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
       false,
       { ringPhase: 'equip' },
     );
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Open your bags',
+    );
+  });
+
+  it('keeps the centered ring lesson on keyboard guidance outside controller mode', () => {
+    document.body.className = '';
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(
+      sim,
+      { questId: 'q_ps_mother_of_pearl', state: 'ready' },
+      [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      false,
+      { ringPhase: 'equip' },
+    );
+
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['B']);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Open your bags',
+    );
+  });
+
+  it('does not leak controller caps into the centered touch lesson', () => {
+    document.body.className = 'mobile-touch';
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(
+      sim,
+      { questId: 'q_ps_mother_of_pearl', state: 'ready' },
+      [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      false,
+      { ringPhase: 'equip' },
+    );
+
+    expect(document.querySelectorAll('.tut-prompt .tut-keycap')).toHaveLength(0);
     expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
       'Open your bags',
     );
@@ -332,15 +387,33 @@ describe('BootcampOverlay controller prompt wiring', () => {
 
     paintControllerPrompt(sim, { questId: 'q_ps_pouch_and_purse', state: 'ready' }, [
       { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
       { button: GP.A, action: GAMEPAD_CONFIRM },
     ]);
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
     expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
       'Open your bags',
     );
     expect(document.querySelector('.tut-prompt')?.classList.contains('tut-prompt-center')).toBe(
       true,
     );
+  });
+
+  it('uses the HUD-navigation route for the Passing Stone lesson', () => {
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(sim, { questId: 'q_ps_the_long_walk', state: 'active' }, [
+      { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
+    ]);
+
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
+    expect(document.querySelector('.tut-prompt')?.textContent).not.toContain('View');
   });
 });

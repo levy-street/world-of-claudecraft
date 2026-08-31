@@ -677,14 +677,16 @@ export class BootcampOverlay {
     const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
     const control = (id: string): readonly string[] =>
       padSource ? gamepadControlHint(padSource, { type: 'action', action: id }) : key(id);
+    const bagItem = (): readonly string[] =>
+      padSource ? gamepadControlHint(padSource, { type: 'bagItem' }) : key('bags');
     if (this.ringPhase === 'equip') {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     if (this.ringPhase === 'admire') {
       return { caps: control('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
     }
     if (pouchLessonActive(this.lastFocus, world.bags)) {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     // The death lesson's first beat: the stone is in the bags.
     if (
@@ -692,7 +694,7 @@ export class BootcampOverlay {
       this.lastFocus?.questId === DEATH_LESSON_QUEST_ID &&
       this.lastFocus.state === 'active'
     ) {
-      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     // The Gauntlet's closing camera lesson teaches the VIEW itself, so it
     // has never had a world anchor and had only the card to carry it.
@@ -1008,7 +1010,7 @@ function coachGamepadIntent(
 ): GamepadControlHintIntent {
   if (kind === 'select') return { type: 'target' };
   if (kind === 'jump') return { type: 'action', action: 'jump' };
-  if (kind === 'use') return { type: 'action', action: 'bags' };
+  if (kind === 'use') return { type: 'bagItem' };
   if (kind !== 'kill') return { type: 'interact' };
   const usesAbility = abilityAsk || caster;
   return {

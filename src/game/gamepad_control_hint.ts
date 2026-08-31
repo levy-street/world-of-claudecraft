@@ -16,9 +16,12 @@ import {
 } from './gamepad_bindings';
 import {
   GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
   GAMEPAD_CYCLE_SET,
+  GAMEPAD_NONE,
   type GamepadActionId,
   type GamepadKind,
+  GP,
   gamepadButtonLabel,
 } from './gamepad_map';
 
@@ -33,6 +36,7 @@ export interface GamepadControlHintSource {
 export type GamepadControlHintIntent =
   | { readonly type: 'interact' }
   | { readonly type: 'target' }
+  | { readonly type: 'bagItem' }
   | { readonly type: 'action'; readonly action: GamepadActionId }
   | {
       readonly type: 'crossHotbar';
@@ -55,6 +59,13 @@ export function gamepadControlHint(
   if (intent.type === 'target') {
     const label = labelForGamepadTarget(source.entries, source.kind, source.crossHotbarEnabled);
     return label ? [label] : [];
+  }
+  if (intent.type === 'bagItem') {
+    const enterHud = safeTutorialActionLabel(source, GAMEPAD_CYCLE_HUD);
+    const confirm = safeTutorialActionLabel(source, GAMEPAD_CONFIRM);
+    return enterHud && confirm && dpadNavigatesHud(source)
+      ? [enterHud, 'D-pad', confirm, 'D-pad', confirm]
+      : [];
   }
   if (intent.type === 'action') {
     const label = labelForGamepadAction(source.entries, intent.action, source.kind);
@@ -83,6 +94,24 @@ export function gamepadControlHint(
     return cycle ? [cycle, chord] : [];
   }
   return [];
+}
+
+function safeTutorialActionLabel(
+  source: GamepadControlHintSource,
+  action: GamepadActionId,
+): string | null {
+  const entry = source.entries.find(
+    (candidate) => candidate.action === action && candidate.button !== GP.BACK,
+  );
+  return entry ? gamepadButtonLabel(entry.button, source.kind) : null;
+}
+
+function dpadNavigatesHud(source: GamepadControlHintSource): boolean {
+  return [GP.DPAD_UP, GP.DPAD_DOWN, GP.DPAD_LEFT, GP.DPAD_RIGHT].every((button) => {
+    const action =
+      source.entries.find((candidate) => candidate.button === button)?.action ?? GAMEPAD_NONE;
+    return action === GAMEPAD_NONE || (source.crossHotbarEnabled && action.startsWith('slot'));
+  });
 }
 
 function crossHotbarChord(position: number, kind: GamepadKind): string | null {

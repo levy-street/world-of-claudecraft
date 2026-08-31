@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { CrossHotbarAction } from '../src/game/cross_hotbar';
 import { gamepadControlHint } from '../src/game/gamepad_control_hint';
-import { GAMEPAD_CONFIRM, GAMEPAD_CYCLE_SET, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
+import {
+  GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
+  GAMEPAD_CYCLE_SET,
+  GAMEPAD_NONE,
+  GP,
+} from '../src/game/gamepad_map';
 
 const emptySet = (): CrossHotbarAction[] => Array.from({ length: 16 }, () => null);
 
@@ -10,6 +16,7 @@ describe('gamepadControlHint', () => {
     { button: GP.A, action: GAMEPAD_CONFIRM },
     { button: GP.Y, action: 'jump' },
     { button: GP.BACK, action: 'bags' },
+    { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
     { button: GP.RB, action: GAMEPAD_CYCLE_SET },
     { button: GP.DPAD_RIGHT, action: GAMEPAD_NONE },
   ];
@@ -30,6 +37,122 @@ describe('gamepadControlHint', () => {
     expect(gamepadControlHint({ ...source, kind: 'playstation' }, { type: 'interact' })).toEqual([
       'Cross',
     ]);
+  });
+
+  it('guides bag items through HUD navigation without depending on the system button', () => {
+    const source = {
+      entries,
+      kind: 'xbox' as const,
+      crossHotbarEnabled: false,
+      crossHotbarSets: [] as const,
+      crossHotbarSet: 0,
+    };
+
+    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([
+      'R3',
+      'D-pad',
+      'A',
+      'D-pad',
+      'A',
+    ]);
+    expect(gamepadControlHint(source, { type: 'bagItem' })).not.toContain('View');
+    expect(
+      gamepadControlHint(
+        {
+          ...source,
+          kind: 'playstation',
+          entries: [
+            { button: GP.BACK, action: 'bags' },
+            { button: GP.L3, action: GAMEPAD_CYCLE_HUD },
+            { button: GP.X, action: GAMEPAD_CONFIRM },
+          ],
+        },
+        { type: 'bagItem' },
+      ),
+    ).toEqual(['L3', 'D-pad', 'Square', 'D-pad', 'Square']);
+  });
+
+  it('ignores a duplicate system-button HUD binding in favor of a usable stick binding', () => {
+    const source = {
+      entries: [
+        { button: GP.BACK, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      kind: 'xbox' as const,
+      crossHotbarEnabled: false,
+      crossHotbarSets: [] as const,
+      crossHotbarSet: 0,
+    };
+
+    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([
+      'R3',
+      'D-pad',
+      'A',
+      'D-pad',
+      'A',
+    ]);
+  });
+
+  it('stays silent when the bag route requires a system button or lacks a required action', () => {
+    const source = {
+      entries: [
+        { button: GP.BACK, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      kind: 'xbox' as const,
+      crossHotbarEnabled: false,
+      crossHotbarSets: [] as const,
+      crossHotbarSet: 0,
+    };
+
+    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([]);
+    expect(
+      gamepadControlHint(
+        { ...source, entries: [{ button: GP.R3, action: GAMEPAD_CYCLE_HUD }] },
+        { type: 'bagItem' },
+      ),
+    ).toEqual([]);
+    expect(
+      gamepadControlHint(
+        {
+          ...source,
+          entries: [
+            { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+            { button: GP.BACK, action: GAMEPAD_CONFIRM },
+          ],
+        },
+        { type: 'bagItem' },
+      ),
+    ).toEqual([]);
+  });
+
+  it('only advertises d-pad HUD navigation when its live bindings allow it', () => {
+    const source = {
+      entries: [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+        { button: GP.DPAD_DOWN, action: 'jump' },
+      ],
+      kind: 'xbox' as const,
+      crossHotbarEnabled: false,
+      crossHotbarSets: [] as const,
+      crossHotbarSet: 0,
+    };
+
+    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([]);
+    expect(
+      gamepadControlHint(
+        {
+          ...source,
+          crossHotbarEnabled: true,
+          entries: source.entries.map((entry) =>
+            entry.button === GP.DPAD_DOWN ? { ...entry, action: 'slot3' } : entry,
+          ),
+        },
+        { type: 'bagItem' },
+      ),
+    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
   });
 
   it('names the exact primary cross-hotbar chord for Attack', () => {
