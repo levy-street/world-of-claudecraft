@@ -507,6 +507,64 @@ describe('questObjectiveAreas', () => {
     }
   });
 
+  describe('objective-type dispatch exhaustiveness (the fall-through guard)', () => {
+    // The dispatch switches exhaustively over QuestObjective['type'] (a
+    // compile-time never default), and its RUNTIME posture for a value
+    // outside the union (a future save, a foreign server) is pinned here:
+    // draw nothing for that objective, never throw, and keep resolving the
+    // rest of the log. Installed as a temporary test-only quest, the
+    // sibling describe's pattern.
+    const TEST_QUEST_ID = 'q_test_future_objective_type';
+    const originalQuest = QUESTS[TEST_QUEST_ID];
+    afterEach(() => {
+      if (originalQuest) QUESTS[TEST_QUEST_ID] = originalQuest;
+      else delete QUESTS[TEST_QUEST_ID];
+    });
+
+    function installObjectives(objectives: unknown[]): Map<string, QuestProgress> {
+      QUESTS[TEST_QUEST_ID] = {
+        id: TEST_QUEST_ID,
+        name: 'Future Shapes',
+        giverNpcId: 'npc_none',
+        turnInNpcId: 'npc_none',
+        text: '',
+        completionText: '',
+        objectives,
+      } as unknown as QuestDef;
+      const log = new Map<string, QuestProgress>();
+      log.set(TEST_QUEST_ID, {
+        questId: TEST_QUEST_ID,
+        counts: objectives.map(() => 0),
+        state: 'active',
+      });
+      return log;
+    }
+
+    it('a craft objective deliberately draws nothing: no world anchor to circle', () => {
+      const log = installObjectives([
+        { type: 'craft', recipeId: 'copper_bar', count: 1, label: 'craft' },
+      ]);
+      expect(questObjectiveAreas(log)).toEqual([]);
+    });
+
+    it('an out-of-union objective type draws nothing, never throws, and spares the rest of the log', () => {
+      const log = installObjectives([
+        { type: 'attune_ley_line', count: 1, label: 'a future patch objective' },
+      ]);
+      const kill = requireKillQuest();
+      log.set(kill.quest.id, {
+        questId: kill.quest.id,
+        counts: kill.quest.objectives.map(() => 0),
+        state: 'active',
+      });
+      const areas = questObjectiveAreas(log);
+      // The unknown shape contributed no circle...
+      expect(areas.some((a) => a.objectives.some((o) => o.questId === TEST_QUEST_ID))).toBe(false);
+      // ...while the real quest beside it still resolved its camps.
+      expect(areas.some((a) => a.objectives.some((o) => o.questId === kill.quest.id))).toBe(true);
+    });
+  });
+
   describe('gather objective with only an itemId (no nodeType)', () => {
     // No shipped quest uses this shape yet (every gather objective in content
     // pins a nodeType), so it is installed as a temporary test-only quest, the

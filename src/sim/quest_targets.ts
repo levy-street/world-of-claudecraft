@@ -376,37 +376,73 @@ export function questObjectiveAreas(
       );
     }
   };
+  // An EXHAUSTIVE switch over the objective-type union (the fall-through
+  // hardening): the never-typed default is a compile error the moment a new
+  // QuestObjective variant lands without deciding what the map draws for it,
+  // where the old if/else chain silently drew nothing. At RUNTIME an
+  // out-of-union value (a future save, a foreign server) still draws
+  // nothing and never throws, pinned in tests/quest_targets.test.ts.
   for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
     const ref: QuestObjectiveRef = { questId, objectiveIndex };
-    if (obj.type === 'kill' && obj.targetMobId) pushMobCamps(ref, obj.targetMobId);
-    else if (obj.type === 'collect' && obj.itemId) {
-      for (const mobId of mobsDroppingQuestItem(obj.itemId, questId)) pushMobCamps(ref, mobId);
-      pushObjectCluster(ref, obj.itemId);
-      pushYieldClusters(ref, obj.itemId);
-    } else if (obj.type === 'interact') {
-      if (obj.targetObjectItemId) pushObjectCluster(ref, obj.targetObjectItemId);
-      const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
-      // fresh {x,z}: never alias the shared NPCS content the sim places from
-      if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
-    } else if (obj.type === 'gather' && obj.nodeType) {
-      pushNodeCluster(ref, obj.nodeType);
-    } else if (obj.type === 'gather' && obj.itemId) {
-      // itemId-only gather objective (no nodeType): credit only flows through
-      // onNodeGatheredForQuests when a matching node is harvested, so the pin
-      // must be the nodes whose yield resolves to this itemId, the symmetric
-      // counterpart of the nodeType arm above (never mob camps or
-      // ground-object clusters, which never grant this objective's credit).
-      // The credit arm is grade-aware (quest_credit.ts, D8), so the guidance
-      // reuses the same grade-aware cluster resolution the collect arm draws
-      // from (nodeYieldClusters: base yield, or its fine grade where the
-      // node tier can actually mint it).
-      pushYieldClusters(ref, obj.itemId);
-    } else if (obj.type === 'escort') {
-      // The escort begins where the idle escortee stands (its def start point).
-      const escort = ESCORTS[obj.escortId];
-      if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
-    } else if (obj.type === 'farm') {
-      pushFarmPatches(ref, obj.patchId);
+    switch (obj.type) {
+      case 'kill':
+        if (obj.targetMobId) pushMobCamps(ref, obj.targetMobId);
+        break;
+      case 'collect':
+        if (obj.itemId) {
+          for (const mobId of mobsDroppingQuestItem(obj.itemId, questId)) pushMobCamps(ref, mobId);
+          pushObjectCluster(ref, obj.itemId);
+          pushYieldClusters(ref, obj.itemId);
+        }
+        break;
+      case 'interact': {
+        if (obj.targetObjectItemId) pushObjectCluster(ref, obj.targetObjectItemId);
+        const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
+        // fresh {x,z}: never alias the shared NPCS content the sim places from
+        if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
+        break;
+      }
+      case 'craft':
+        // Deliberately draws nothing: a craft objective has no world anchor
+        // the map could honestly circle (any matching station serves), and
+        // this has always been the shipped behavior; the explicit arm is
+        // what the exhaustiveness guard buys over the silent fall-through.
+        break;
+      case 'gather':
+        if (obj.nodeType) {
+          pushNodeCluster(ref, obj.nodeType);
+        } else if (obj.itemId) {
+          // itemId-only gather objective (no nodeType): credit only flows
+          // through onNodeGatheredForQuests when a matching node is
+          // harvested, so the pin must be the nodes whose yield resolves to
+          // this itemId, the symmetric counterpart of the nodeType arm above
+          // (never mob camps or ground-object clusters, which never grant
+          // this objective's credit). The credit arm is grade-aware
+          // (quest_credit.ts, D8), so the guidance reuses the same
+          // grade-aware cluster resolution the collect arm draws from
+          // (nodeYieldClusters: base yield, or its fine grade where the node
+          // tier can actually mint it).
+          pushYieldClusters(ref, obj.itemId);
+        }
+        break;
+      case 'escort': {
+        // The escort begins where the idle escortee stands (its def start point).
+        const escort = ESCORTS[obj.escortId];
+        if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
+        break;
+      }
+      case 'farm':
+        // The documented patchless every-patch behavior stays as-is: a farm
+        // objective naming no patchId is honestly earned at any bed, so
+        // pushFarmPatches circles every patch (its own comment above).
+        pushFarmPatches(ref, obj.patchId);
+        break;
+      default:
+        // Compile-time exhaustiveness: `obj` must be `never` here. Runtime
+        // tolerance: an out-of-union type draws nothing, matching what the
+        // old chain did silently.
+        ((_exhausted: never): void => {})(obj);
+        break;
     }
   }
   return out;

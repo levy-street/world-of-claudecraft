@@ -886,7 +886,16 @@ const MONOLITHS: MonolithRow[] = [
     // consumer extracted by the branch to mob/combat_profile.ts, and the
     // already-dead PersistedFarmPlot type import); the ceiling follows the
     // file down. Exact count, zero slack.
-    ceiling: 12040,
+    // LOWERED 12040 -> 12038 at masterwrought Phase 18 (the farming/feast
+    // hardening unit): the farm-plot load report (dropped-row counting plus
+    // its dev warn) moved to professions/farm_load_report.ts and the
+    // delve/heroic daily load clamps folded into the existing
+    // professions/daily_gate_load.ts leaf, which together pay for the
+    // phase's own coordinator wiring (the resetDay monotonic accessor, the
+    // transient farmWitheredAnnounced field, the onCropFarmedForQuests seam
+    // binding, and the claimed-instance pass-through on the two award
+    // delegates). Exact count, zero slack.
+    ceiling: 12038,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

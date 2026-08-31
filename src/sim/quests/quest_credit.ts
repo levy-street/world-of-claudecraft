@@ -7,9 +7,9 @@
 // inventory hub, finalizeQuestAccept, interactNpcForQuests, and the N1 crypt
 // interactObjectForQuests) invoke them via ctx.onMobKilledForQuests /
 // ctx.onInventoryChangedForQuests / ctx.checkQuestReady. The farming action arm
-// (onCropFarmedForQuests) is imported DIRECTLY by professions/farming.ts, the
-// module-to-module shape its queueGatheringGrant import already uses: the
-// coordinator has no headroom for another callback wiring site.
+// (onCropFarmedForQuests) rides the seam too since the masterwrought Phase 18
+// fold: professions/farming.ts calls ctx.onCropFarmedForQuests beside its
+// sibling crediters (bound in buildSimContext like the rest).
 //
 // src/sim-pure: imports only sibling sim types + the QUESTS data table (no render/ui/
 // game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in Node, the

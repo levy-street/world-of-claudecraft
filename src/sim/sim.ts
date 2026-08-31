@@ -463,11 +463,8 @@ import {
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
-import {
-  countDroppedHiddenSlots,
-  normalizeFarmPlots,
-  serializeFarmPlots,
-} from './professions/farm_persist';
+import { warnDroppedFarmPlotRows } from './professions/farm_load_report';
+import { normalizeFarmPlots, serializeFarmPlots } from './professions/farm_persist';
 import {
   EMPTY_FARM_PLOT_VIEWS,
   type FarmPlantKnobs,
@@ -678,6 +675,7 @@ import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
+  onCropFarmedForQuests,
   onInventoryChangedForQuests,
   onMobKilledForQuests,
   onNodeGatheredForQuests,
@@ -1673,6 +1671,13 @@ export interface PlayerMeta {
   // professions/farm_persist.ts; render/ui and the wire see only the
   // FarmPlotView projection, never this record.
   farmPlots: Map<string, PlotState>;
+  // Bed ids whose LAST ready notice said withered (professions/farm_ready.ts,
+  // the withered-then-ready correction). TRANSIENT: never serialized, and
+  // reconstructed by the sweep itself from farmPlots + notified + current
+  // proficiency (a notified plot that reads withered was announced withered:
+  // status is monotone in skill), so a relog loses nothing. Excluded from the
+  // parity sampler (tests/parity/trace.ts META_EXCLUDE: derived bookkeeping).
+  farmWitheredAnnounced: Set<string>;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -1971,7 +1976,19 @@ export class Sim {
   // (server/raid_reset.ts `resetDayKey`), the offline client from the player's
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
-  resetDay = '';
+  // MONOTONIC NON-DECREASING (tests/reset_day_guard.test.ts): every daily gate
+  // rolls the moment this key CHANGES, so a backwards realm-calendar read (an
+  // NTP step, a zone reconfiguration) would re-open every spent gate for a
+  // second payout. The setter holds the highest key ever fed ('' never lowers
+  // it, closing the ''-bounce too); ISO keys order lexicographically, and a
+  // held day self-heals when the calendar catches back up.
+  private resetDayHeld = '';
+  get resetDay(): string {
+    return this.resetDayHeld;
+  }
+  set resetDay(next: string) {
+    if (next > this.resetDayHeld) this.resetDayHeld = next;
+  }
   // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
   // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
   // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
@@ -2854,6 +2871,7 @@ export class Sim {
       tierMailSent: new Map(),
       questedHobbies: new Map(),
       farmPlots: new Map(),
+      farmWitheredAnnounced: new Set(),
       profTierTutorialSent: false,
       tutorialGreetingSent: opts?.tutorialGreetingSent === true,
       firstCharacter: opts?.firstCharacter ?? true,
@@ -3294,26 +3312,9 @@ export class Sim {
         nowMs: this.lockoutNowMs(),
       });
       // Dev-channel visibility for the silent-drop arms (the knownRecipes
-      // precedent): a retired bed id or a tampered row vanishes on load by
-      // design, and a corrupt hidden slot is REPLACED by a derived one while
-      // its row SURVIVES (so the row count alone cannot see it), but an
-      // operator reading server logs should see both happen.
-      {
-        // typeof-object gated like countDroppedHiddenSlots: Object.keys of a
-        // tampered scalar ("farmPlots": "junk") returns index keys, which
-        // would fabricate a row count in the very tamper signal this line
-        // exists to report.
-        const droppedRows =
-          s.farmPlots && typeof s.farmPlots === 'object'
-            ? Object.keys(s.farmPlots).length - meta.farmPlots.size
-            : 0;
-        const droppedSlots = countDroppedHiddenSlots(s.farmPlots, meta.farmPlots);
-        if (droppedRows > 0 || droppedSlots > 0) {
-          console.warn(
-            `[load] dropped ${droppedRows} farmPlots row(s) and re-derived ${droppedSlots} hidden slot(s) for ${meta.name} (unknown bed/crop id, invalid deadline, or non-finite slot)`,
-          );
-        }
-      }
+      // precedent); counting + warn extracted to the pure leaf
+      // professions/farm_load_report.ts per the monolith ratchet.
+      warnDroppedFarmPlotRows(s.farmPlots, meta.farmPlots, meta.name);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.tutorialGreetingSent = s.tutorialGreetingSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
@@ -3325,22 +3326,16 @@ export class Sim {
       // boundary now rejects.
       meta.townFocus = professionsFocus.normalizeTownFocusOnLoad(s.townFocus);
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
-      if (s.delveDaily) {
-        meta.delveDaily = {
-          date: s.delveDaily.date,
-          firstClearXp: new Set(s.delveDaily.firstClearXp),
-          markClears: s.delveDaily.markClears,
-        };
-      }
-      if (s.heroicDaily) {
-        meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
-      }
-      // Load hardening (migration review) for the daily/weekly gate state:
-      // the clamps and their rationale live in the extracted pure leaf
+      // Load hardening (migration review) for the daily/weekly gate state,
+      // the delve and heroic daily fragments included since Phase 18 (their
+      // raw new Set(...) inlines threw on a tampered non-iterable row): the
+      // clamps and their rationale live in the extracted pure leaf
       // professions/daily_gate_load.ts (monolith ratchet). The optional
       // fragments mirror the save's zero-default omission, so an absent
       // fragment keeps createPlayer's default.
       const dailyGate = sanitizeDailyGateLoad(s);
+      if (dailyGate.delveDaily) meta.delveDaily = dailyGate.delveDaily;
+      if (dailyGate.heroicDaily) meta.heroicDaily = dailyGate.heroicDaily;
       if (dailyGate.wyrmfallDaily) meta.wyrmfallDaily = dailyGate.wyrmfallDaily;
       if (dailyGate.craftDaily) meta.craftDaily = dailyGate.craftDaily;
       meta.emberWeekAnchor = dailyGate.emberWeekAnchor;
@@ -5391,6 +5386,8 @@ export class Sim {
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
+      onCropFarmedForQuests: (action, cropId, meta) =>
+        onCropFarmedForQuests(sim.ctx, action, cropId, meta),
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
@@ -5424,7 +5421,8 @@ export class Sim {
       // reads the live ctx at call time (the N1 grantNythraxisLockout idiom).
       // Deliberately NO Sim method delegate, unlike awardHeroicMarks above: no
       // foreign caller resolves this on the facade (tests reach it via ctx).
-      awardWyrmfallCores: (mob, recipients) => awardWyrmfallCoresImpl(sim.ctx, mob, recipients),
+      awardWyrmfallCores: (mob, recipients, claimed) =>
+        awardWyrmfallCoresImpl(sim.ctx, mob, recipients, claimed),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -11004,8 +11002,8 @@ export class Sim {
 
   // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);
   // the C1 death hub reaches it through the seam, this delegate keeps the facade.
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void {
-    awardHeroicMarksImpl(this.ctx, mob, recipients);
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], claimed?: InstanceSlot | null): void {
+    awardHeroicMarksImpl(this.ctx, mob, recipients, claimed);
   }
 
   // Heroic Quartermaster purchase (owned by instances/heroic_vendor.ts): the

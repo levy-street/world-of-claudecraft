@@ -461,10 +461,11 @@ export function resolveSlotToolEffect(
   // or spend and the charm would be consumed into a permanently dead slot.
   // Whether harvest_crop grows a confirm channel is the Phase 7/8 farming UI
   // work's decision (the windows/timers surface owns the interaction); lift
-  // this refusal in the same change that lands the channel. The LOAD side
-  // (normalizeToolEffectSlots below) needs no matching arm: farming slots
-  // became mintable only in the hoe phase and this gate ships with the
-  // ladder, so no persisted farming row in prompt mode can exist.
+  // this refusal in the same change that lands the channel, together with
+  // its LOAD-side twin in normalizeToolEffectSlots below (masterwrought
+  // Phase 18): no legal mint can write a farming prompt row, so a persisted
+  // one is a hand-edited or rogue-writer row and drops at load like any
+  // policy-refused pair, instead of loading as a permanently dead slot.
   if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
     return { ok: false, reason: 'invalid_request' };
   }
@@ -641,6 +642,15 @@ export function normalizeToolEffectSlots(
     const row = saved[professionId];
     if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
     if (slotToolEffectRefused(professionId, row.effectId)) continue;
+    // The mint-side farming+prompt gate's load twin (masterwrought Phase 18;
+    // the resolver arm above owns the full reasoning): resolve the stored
+    // mode through the SAME coercion the surviving row would take (garbled
+    // fail-safes to 'prompt', see the confirmMode note below), then drop a
+    // pair the mint could never have written. Judged on the RESOLVED mode so
+    // a garbled farming row cannot slip through as a dead prompt slot.
+    const confirmMode: ToolEffectConfirmMode =
+      row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt';
+    if (promptSlotRefused(professionId) && confirmMode === 'prompt') continue;
     // A stored maxDurability that is not a usable positive integer falls back
     // to the catalog's own starting value, because a recharge restores TO this
     // number and a dead one would make the slot permanently useless.
@@ -700,8 +710,9 @@ export function normalizeToolEffectSlots(
       // another charm (the no_gain conjunct is what lets a mode-only
       // re-slot land). Fail-safe stays the right direction: a burned
       // charge is unrecoverable, a charm is a known price, and the mode
-      // chip makes the coerced state visible.
-      confirmMode: row.confirmMode === 'always' || row.confirmMode == null ? 'always' : 'prompt',
+      // chip makes the coerced state visible. Resolved ONCE above the
+      // farming+prompt twin, which judges the same value this row stores.
+      confirmMode,
     };
   }
   return out;

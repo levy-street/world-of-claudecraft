@@ -3,6 +3,7 @@ import {
   type DailyGateSaveFragments,
   sanitizeDailyGateLoad,
 } from '../src/sim/professions/daily_gate_load';
+import { type CharacterState, Sim } from '../src/sim/sim';
 
 // Direct pins for the extracted load-hardening leaf (the clamps formerly
 // inlined in Sim.addPlayer; the Sim-level round-trip behavior stays pinned by
@@ -81,15 +82,134 @@ describe('sanitizeDailyGateLoad', () => {
     );
   });
 
+  it('keeps a real delveDaily row verbatim and clamps every dimension of a corrupt one', () => {
+    const ok = sanitizeDailyGateLoad({
+      delveDaily: { date: '2026-08-14', firstClearXp: ['delve_a', 'delve_b'], markClears: 3 },
+    });
+    expect(ok.delveDaily).toEqual({
+      date: '2026-08-14',
+      firstClearXp: new Set(['delve_a', 'delve_b']),
+      markClears: 3,
+    });
+    // The non-iterable throw exposure this arm exists for: `new Set(5)`
+    // throws inside addPlayer, the unloadable-character class. Here it
+    // degrades to an empty set instead.
+    const nonIterable = sanitizeDailyGateLoad({
+      delveDaily: {
+        date: '2026-08-14',
+        firstClearXp: 5 as unknown as string[],
+        markClears: 1,
+      },
+    });
+    expect(nonIterable.delveDaily).toEqual({
+      date: '2026-08-14',
+      firstClearXp: new Set(),
+      markClears: 1,
+    });
+    // The sibling arms' clamps: 64-char date and tokens, 32-entry cap, and
+    // markClears floored to a non-negative integer with junk reading 0.
+    const corrupt = sanitizeDailyGateLoad({
+      delveDaily: {
+        date: 'x'.repeat(65),
+        firstClearXp: ['ok', 'y'.repeat(65), 7 as unknown as string],
+        markClears: -4,
+      },
+    });
+    expect(corrupt.delveDaily).toEqual({ date: '', firstClearXp: new Set(['ok']), markClears: 0 });
+    expect(
+      sanitizeDailyGateLoad({
+        delveDaily: {
+          date: '2026-08-14',
+          firstClearXp: Array.from({ length: 40 }, (_, i) => `d${i}`),
+          markClears: 2.9,
+        },
+      }).delveDaily,
+    ).toEqual({
+      date: '2026-08-14',
+      firstClearXp: new Set(Array.from({ length: 32 }, (_, i) => `d${i}`)),
+      markClears: 2,
+    });
+    expect(
+      sanitizeDailyGateLoad({
+        delveDaily: {
+          date: '2026-08-14',
+          firstClearXp: [],
+          markClears: Number.NaN,
+        },
+      }).delveDaily?.markClears,
+    ).toBe(0);
+  });
+
+  it('keeps a real heroicDaily row verbatim and clamps a corrupt one', () => {
+    const ok = sanitizeDailyGateLoad({
+      heroicDaily: { date: 'reset:20721', marked: ['emberfall_depths'] },
+    });
+    expect(ok.heroicDaily).toEqual({
+      date: 'reset:20721',
+      marked: new Set(['emberfall_depths']),
+    });
+    // Same non-iterable degrade as the delve arm.
+    expect(
+      sanitizeDailyGateLoad({
+        heroicDaily: { date: 'reset:20721', marked: 'junk' as unknown as string[] },
+      }).heroicDaily,
+    ).toEqual({ date: 'reset:20721', marked: new Set() });
+    const corrupt = sanitizeDailyGateLoad({
+      heroicDaily: {
+        date: 'x'.repeat(65),
+        marked: ['ok', 'y'.repeat(65), 7 as unknown as string],
+      },
+    });
+    expect(corrupt.heroicDaily).toEqual({ date: '', marked: new Set(['ok']) });
+    expect(
+      sanitizeDailyGateLoad({
+        heroicDaily: { date: 'reset:20721', marked: Array.from({ length: 40 }, (_, i) => `m${i}`) },
+      }).heroicDaily?.marked.size,
+    ).toBe(32);
+  });
+
   it('treats the input as untrusted end to end', () => {
     const hostile = {
       wyrmfallDaily: { date: null, sources: 'not-an-array' },
       craftDaily: { date: 42, crafted: { length: 3 } },
+      delveDaily: { date: {}, firstClearXp: 9, markClears: 'many' },
+      heroicDaily: { date: [], marked: null },
       emberWeekAnchor: ['2026-08-11'],
     } as unknown as DailyGateSaveFragments;
     const out = sanitizeDailyGateLoad(hostile);
     expect(out.wyrmfallDaily).toEqual({ date: '', sources: new Set() });
     expect(out.craftDaily).toEqual({ date: '', crafted: new Set() });
+    expect(out.delveDaily).toEqual({ date: '', firstClearXp: new Set(), markClears: 0 });
+    expect(out.heroicDaily).toEqual({ date: '', marked: new Set() });
     expect(out.emberWeekAnchor).toBe('');
+  });
+});
+
+describe('the addPlayer consumer', () => {
+  it('loads a character whose delve/heroic daily rows are non-iterable instead of throwing', () => {
+    // The exposure this extension closes: the raw `new Set(s.delveDaily
+    // .firstClearXp)` / `new Set(s.heroicDaily.marked)` inlined in addPlayer
+    // THREW on a tampered non-iterable row, the unloadable-character class.
+    const seedSim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const saved = seedSim.serializeCharacter(seedSim.playerId) as CharacterState;
+    (saved as unknown as Record<string, unknown>).delveDaily = {
+      date: '2026-08-14',
+      firstClearXp: 5,
+      markClears: 'many',
+    };
+    (saved as unknown as Record<string, unknown>).heroicDaily = {
+      date: 'reset:20721',
+      marked: 9,
+    };
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Tampered', { state: saved });
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('the tampered character failed to load');
+    expect(meta.delveDaily).toEqual({
+      date: '2026-08-14',
+      firstClearXp: new Set(),
+      markClears: 0,
+    });
+    expect(meta.heroicDaily).toEqual({ date: 'reset:20721', marked: new Set() });
   });
 });

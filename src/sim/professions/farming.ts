@@ -97,7 +97,6 @@ import { ITEMS } from '../data';
 import { onCropHarvestedForDeeds } from '../deeds';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
-import { onCropFarmedForQuests } from '../quests/quest_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
@@ -784,16 +783,14 @@ export function plantCrop(
   // its grant site. Never reached from a deny arm; zero rng, so the two-draw
   // contract above is untouched.
   ctx.markVisited(meta, 'farm:planted');
-  // The farm ACTION objective credit (quests/quest_credit.ts), LAST: after
-  // the plot write and the farmPlanted event, so a credited plant is always
-  // a committed one, and after ctx.onInventoryChangedForQuests above (the
-  // seed spend), so the collect re-count lands before the action credit.
-  // Never reached from a deny arm. Draw-free, so the two-draw contract above
-  // is untouched. Direct import rather than a SimContext callback: the
-  // gathering-grant precedent (./gathering) is the same module-to-module
-  // shape, and the sim.ts coordinator has no headroom for a sixth wiring
-  // site (tests/monolith_budget.test.ts).
-  onCropFarmedForQuests(ctx, 'plant', crop.id, meta);
+  // The farm ACTION objective credit, LAST: after the plot write and the
+  // farmPlanted event, so a credited plant is always a committed one, and
+  // after ctx.onInventoryChangedForQuests above (the seed spend), so the
+  // collect re-count lands before the action credit. Never reached from a
+  // deny arm. Draw-free, so the two-draw contract above is untouched.
+  // Through the SimContext seam like its sibling crediters (the Phase 18
+  // fold; bound in buildSimContext beside onNodeGatheredForQuests).
+  ctx.onCropFarmedForQuests('plant', crop.id, meta);
 }
 
 /** Insert a plot PRESERVING sorted bed order.
@@ -973,8 +970,8 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // The farm ACTION objective credit fires on EVERY harvest outcome, the
     // withered one included (the visit is the deed; quests/quest_credit.ts),
     // after the husk grant and its event. Draw-free (the harvest contract
-    // above holds); direct import, see the plantCrop call site's comment.
-    onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
+    // above holds); through the seam, see the plantCrop call site's comment.
+    ctx.onCropFarmedForQuests('harvest', plot.cropId, meta);
     return;
   }
   // A crop whose catalog row retired between planting and harvesting: the
@@ -1001,7 +998,7 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     });
     // Every outcome credits, this defensive one included: the visit still
     // happened, whatever the catalog did to the crop id in between.
-    onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
+    ctx.onCropFarmedForQuests('harvest', plot.cropId, meta);
     return;
   }
   // An absent yieldSeed reads as 0 rather than refusing: the load side derives
@@ -1237,10 +1234,14 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // branch only: a withered plot never chronicles (the fish rule that weeds
   // and boots do not count), and no deny reaches here. The hook filters to
   // FARM_CHRONICLE_ZONES itself and writes the farm:<zone> mark. Marks only,
-  // zero rng, draw-order neutral. The guard is defense-in-depth like the
-  // golden one above: a bed that passed the bad_bed gate always resolves a
-  // zone (impossible-today, same belief).
-  if (zoneId !== undefined) onCropHarvestedForDeeds(ctx, meta, zoneId, plot.cropId);
+  // zero rng, draw-order neutral. The call is UNCONDITIONAL: the per-crop
+  // farm_crop mark needs no zone, so a zone-resolution failure (impossible
+  // today, pinned by tests/farm_crop_mark_zone_guard.test.ts's every-bed
+  // arm) may drop only the ZONE half, never the collection credit. The ''
+  // sentinel sits outside every chronicle zone, so the hook's own membership
+  // filter is what skips the zone mark, exactly as any non-chronicle zone
+  // already does.
+  onCropHarvestedForDeeds(ctx, meta, zoneId ?? '', plot.cropId);
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after
   // everything above (zero draws, zero draw reordering), and a 0 gain queues
@@ -1253,9 +1254,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   queueGatheringGrant(meta, 'farming', farmingHarvestGainAt(skill, cropTier));
   // The farm ACTION objective credit, the survived arm: after the produce
   // grants, the farmHarvested event, and the proficiency queue, so a credited
-  // harvest is always a committed one. Draw-free; direct import (see the
+  // harvest is always a committed one. Draw-free; through the seam (see the
   // plantCrop call site's comment). Never reached from a deny arm.
-  onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
+  ctx.onCropFarmedForQuests('harvest', plot.cropId, meta);
 }
 
 // ---------------------------------------------------------------------------

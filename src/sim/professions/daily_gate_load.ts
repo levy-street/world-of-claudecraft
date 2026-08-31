@@ -1,17 +1,20 @@
-// Load hardening for the Masterwrought daily/weekly gate state (phases 04 and
-// 07), extracted verbatim from Sim.addPlayer per the monolith ratchet: a
+// Load hardening for the daily/weekly gate state (Masterwrought phases 04 and
+// 07; the delve and heroic daily fragments joined at Phase 18), extracted
+// verbatim from Sim.addPlayer per the monolith ratchet: a
 // tampered or corrupt row must degrade to defaults, never throw inside
 // addPlayer (the unloadable-character class) and never poison the gate with
 // junk entries. A malformed emberWeekAnchor would otherwise stall the weekly
 // grant forever: emberWeeksBetween returns 0 for unparseable input, which is
 // indistinguishable from same-week. The clamps bound the blob too. That matters
-// unevenly across the three fields, so state it exactly rather than as one rule:
-// wyrmfallDaily and emberWeekAnchor sit OUTSIDE the professions byte ceiling, so
+// unevenly across the fields, so state it exactly rather than as one rule:
+// wyrmfallDaily, delveDaily, heroicDaily and emberWeekAnchor sit OUTSIDE the
+// professions byte ceiling, so
 // the load clamp is the only thing bounding them (the knownRecipes doctrine),
 // while craftDaily is INSIDE it (it is in both PROFESSIONS_BLOB_FIELDS lists and
 // is costed in the growth bound). Real source tokens are short
-// (dungeonId:difficulty, 'rift'), real recipe ids are short, and both live
-// sets are content-bounded near ten, so oversized junk simply drops here.
+// (dungeonId:difficulty, 'rift', delve and dungeon ids), real recipe ids are
+// short, and every live set is content-bounded near ten, so oversized junk
+// simply drops here.
 //
 // A pure leaf (src/sim/CLAUDE.md): no SimContext, no rng, no clock; a Vitest
 // imports it directly. Sim.addPlayer is the one runtime caller.
@@ -33,6 +36,8 @@ const ONCE_PER_DAY_RECIPE_IDS: ReadonlySet<string> = new Set(
 export interface DailyGateSaveFragments {
   wyrmfallDaily?: { date: string; sources: string[] };
   craftDaily?: { date: string; crafted: string[] };
+  delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
+  heroicDaily?: { date: string; marked: string[] };
   emberWeekAnchor?: string;
 }
 
@@ -42,7 +47,29 @@ export interface DailyGateSaveFragments {
 export interface DailyGateLoadResult {
   wyrmfallDaily?: { date: string; sources: Set<string> };
   craftDaily?: { date: string; crafted: Set<string> };
+  delveDaily?: { date: string; firstClearXp: Set<string>; markClears: number };
+  heroicDaily?: { date: string; marked: Set<string> };
   emberWeekAnchor: string;
+}
+
+/** The shared date clamp (the wyrmfallDaily arm's rule): a real window key is
+ *  short (10 chars for a day, `reset:<n>` for the heroic window), so an
+ *  uncapped or non-string date degrades to '' instead of riding the save
+ *  verbatim forever. */
+function clampGateDate(date: unknown): string {
+  return typeof date === 'string' && date.length <= 64 ? date : '';
+}
+
+/** The shared token-set clamp (the wyrmfallDaily arm's rule): type-checked
+ *  strings, 64-char cap per token, 32-entry cap. A NON-ITERABLE value is the
+ *  arm's whole reason to exist: `new Set(5)` throws, which inlined in
+ *  addPlayer made the character unloadable; here it degrades to empty. */
+function clampGateTokens(tokens: unknown): Set<string> {
+  return new Set(
+    Array.isArray(tokens)
+      ? tokens.filter((x) => typeof x === 'string' && x.length <= 64).slice(0, 32)
+      : [],
+  );
 }
 
 export function sanitizeDailyGateLoad(s: DailyGateSaveFragments): DailyGateLoadResult {
@@ -60,17 +87,29 @@ export function sanitizeDailyGateLoad(s: DailyGateSaveFragments): DailyGateLoadR
       // The date carries the same 64-char cap as the tokens: a real value
       // is always 10 chars, and an uncapped corrupt date would re-save
       // verbatim forever (the omission arm keeps any non-empty date).
-      date:
-        typeof s.wyrmfallDaily.date === 'string' && s.wyrmfallDaily.date.length <= 64
-          ? s.wyrmfallDaily.date
-          : '',
-      sources: new Set(
-        Array.isArray(s.wyrmfallDaily.sources)
-          ? s.wyrmfallDaily.sources
-              .filter((x) => typeof x === 'string' && x.length <= 64)
-              .slice(0, 32)
-          : [],
-      ),
+      date: clampGateDate(s.wyrmfallDaily.date),
+      sources: clampGateTokens(s.wyrmfallDaily.sources),
+    };
+  }
+  // The delve and heroic daily fragments (masterwrought Phase 18, the third
+  // and fourth copies the rule-of-three called for): the SAME type/cap clamps
+  // as the wyrmfall arm, keeping the date when the set empties like it does
+  // (no live-id filter, so the craftDaily date-reset divergence does not
+  // apply), plus delveDaily's numeric markClears floored to a non-negative
+  // integer with any non-finite junk reading 0.
+  if (s.delveDaily) {
+    out.delveDaily = {
+      date: clampGateDate(s.delveDaily.date),
+      firstClearXp: clampGateTokens(s.delveDaily.firstClearXp),
+      markClears: Number.isFinite(s.delveDaily.markClears)
+        ? Math.max(0, Math.floor(s.delveDaily.markClears))
+        : 0,
+    };
+  }
+  if (s.heroicDaily) {
+    out.heroicDaily = {
+      date: clampGateDate(s.heroicDaily.date),
+      marked: clampGateTokens(s.heroicDaily.marked),
     };
   }
   // The oncePerDay craft stamp (Masterwrought phase 07): the exact clamps

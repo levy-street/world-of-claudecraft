@@ -1240,6 +1240,16 @@ function heroicRewardWindowToken(lockedUntil: number): string {
   return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
+/** The ONE claimed-instance-for-a-mob predicate (masterwrought Phase 18): the
+ *  slot whose claim holds this mob, or null. The death hub resolves it once
+ *  per death and hands the result to awardHeroicMarks AND awardWyrmfallCores
+ *  through their optional claimed parameter, so a final-boss kill no longer
+ *  pays the mobIds scan twice; both callees fall back to this same predicate
+ *  when a foreign caller omits the argument. */
+export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceSlot | null {
+  return ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mobId)) ?? null;
+}
+
 // Settle a heroic final-boss kill in one synchronous mutation. Every player who
 // takes the realm-reset lockout for this kill (the whole group owning the claim,
 // plus anyone still inside) also earns the configured marks, provided they took
@@ -1254,9 +1264,17 @@ function heroicRewardWindowToken(lockedUntil: number): string {
 // in town) takes the lockout with no pay: roster membership alone is not income.
 // An uncredited death (no tap and no killer credit resolves, so the death-time
 // snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
-export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (inst === undefined) return;
+export function awardHeroicMarks(
+  ctx: SimContext,
+  mob: Entity,
+  recipients: PlayerMeta[],
+  // The death hub's pre-resolved claim (claimedInstanceForMob above): null
+  // means the hub scanned and found none; undefined (a foreign caller, the
+  // pre-widening shape) means resolve it here. Behavior-identical either way.
+  claimed?: InstanceSlot | null,
+): void {
+  const inst = claimed === undefined ? claimedInstanceForMob(ctx, mob.id) : claimed;
+  if (inst === null) return;
   // The raid rooms' NORMAL kills settle a weekly lockout of their own (no
   // marks: marks are heroic pay). One lock per difficulty, so a normal clear
   // never consumes the week's heroic run or vice versa.

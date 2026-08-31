@@ -225,6 +225,12 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only
   'craftThrottle', // inert since the Craft Cast System retired the shared throttle; session-only
+  // Session-only sweep bookkeeping for the withered-then-ready correction
+  // (farm_ready.ts): derived from sampled inputs (farmPlots' notified flags +
+  // farming proficiency, both pinned) and reconstructed by every sweep, so
+  // sampling it would only churn goldens; the correction's OBSERVABLE, the
+  // farmReady event, rides the pinned event digest.
+  'farmWitheredAnnounced',
   'away', // session-only presence
   'lastWhisperFrom', // session-only
   'marketQuery', // session-only browse query (search + filters + page)

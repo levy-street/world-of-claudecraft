@@ -250,7 +250,7 @@ describe('shared feast: placing', () => {
     expect(st.entityId).toBe(feastId);
     expect(st.charges).toBe(10);
     expect(st.expiresAtTick).toBe(placedAt + 3600);
-    expect(st.ownerKey).toBe(placer.pid); // no characterId: entityId is the key
+    expect(st.ownerKey).toBe(`entity:${placer.pid}`); // no characterId: the entity domain
     expect(st.eatenBy.size).toBe(0);
   });
 
@@ -429,7 +429,7 @@ describe('shared feast: placing', () => {
     sim.placeFeast(placer.pid);
     expect(eventsOf(sim, from0, 'farmFeastPlaced')).toHaveLength(1);
     const st = [...sim.ctx.feasts.values()][0];
-    expect(st.ownerKey, 'the stored owner key is the characterId').toBe(501);
+    expect(st.ownerKey, 'the stored owner key is the tagged characterId').toBe('character:501');
     const from = sim.events.length;
     sim.placeFeast(placer.pid);
     expect(denyReason(sim, from)).toBe('feast_active');
@@ -503,7 +503,7 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     // The bite START: serving spent, ledger written, the eating slot holds
     // one serving of the capstone dish, and NO buff yet.
     expect(st.charges).toBe(9);
-    expect(st.eatenBy.has(eater.pid)).toBe(true);
+    expect(st.eatenBy.has(`entity:${eater.pid}`)).toBe(true);
     expect(eater.p.sitting).toBe(true);
     expect(eater.p.eating?.itemId).toBe(DISH_ID);
     expect(eater.p.eating?.kind).toBe('food');
@@ -589,7 +589,7 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     sim.consumeFeast(feastId, second.pid);
     expect(eventsOf(sim, from2, 'farmDenied')).toHaveLength(0);
     expect(st.charges).toBe(8);
-    expect(st.eatenBy.has(second.pid)).toBe(true);
+    expect(st.eatenBy.has(`entity:${second.pid}`)).toBe(true);
   });
 
   it('the ledger key is characterId when present, never the session entity id', () => {
@@ -602,8 +602,48 @@ describe('shared feast: the bite and the Well Fed mint', () => {
 
     sim.consumeFeast(feastId, keyed.pid);
     expect(st.charges).toBe(9);
-    expect(st.eatenBy.has(9001)).toBe(true);
-    expect(st.eatenBy.has(keyed.pid)).toBe(false);
+    expect(st.eatenBy.has('character:9001')).toBe(true);
+    expect(st.eatenBy.has(`entity:${keyed.pid}`)).toBe(false);
+  });
+
+  it('a characterId colliding with another player entity id shares no key: both eat, both place', () => {
+    // The key-domain collision (the feastOwnerKey hardening): before the
+    // domain tag, meta.characterId ?? meta.entityId put a characterId-keyed
+    // player and an entityId-keyed player in ONE numeric namespace, so a
+    // characterId that happened to equal another session's entity id merged
+    // their ledger and one-active identities. The tagged key keeps the two
+    // domains disjoint even at the same number.
+    const { sim, placer, eaters } = world(1);
+    const plain = eaters[0]; // keyed by entity id (no characterId)
+    const collider = join(sim, 'Nadia', plain.pid); // characterId === plain's ENTITY id
+    sim.tick();
+    standBeside(collider, placer, 0, 1);
+    const feastId = placeOk(sim, placer);
+    const st = sim.ctx.feasts.get(feastId)!;
+
+    // The one-active rule binds per PLACER, not per colliding number: the
+    // collider's own live feast must never hold plain's placement hostage
+    // (under the numeric domain their keys were the same number).
+    giveFeast(sim, collider);
+    const fromCollider = sim.events.length;
+    sim.placeFeast(collider.pid);
+    expect(eventsOf(sim, fromCollider, 'farmFeastPlaced')).toHaveLength(1);
+    giveFeast(sim, plain);
+    const from2 = sim.events.length;
+    sim.placeFeast(plain.pid);
+    expect(eventsOf(sim, from2, 'farmDenied')).toHaveLength(0);
+    expect(eventsOf(sim, from2, 'farmFeastPlaced')).toHaveLength(1);
+
+    // Both players bite the HOST's feast: the second is a DIFFERENT diner,
+    // never feast_eaten, and each lands under its own domain's key.
+    sim.consumeFeast(feastId, plain.pid);
+    expect(st.charges).toBe(9);
+    const from = sim.events.length;
+    sim.consumeFeast(feastId, collider.pid);
+    expect(eventsOf(sim, from, 'farmDenied')).toHaveLength(0);
+    expect(st.charges).toBe(8);
+    expect(st.eatenBy.has(`entity:${plain.pid}`)).toBe(true);
+    expect(st.eatenBy.has(`character:${plain.pid}`)).toBe(true);
   });
 
   it('a running non-spell cast blocks the bite with the family busy sentence', () => {
@@ -669,24 +709,58 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     expect(st.charges).toBe(9);
   });
 
-  it('feast_range: out of reach denies untouched, a step closer the same press lands', () => {
+  it('out of reach is indistinguishable from nonexistent: the existence-oracle pin', () => {
+    // The consume_feast hardening: a probe naming a feast id the prober
+    // cannot legitimately see (anything beyond INTERACT_RANGE) must answer
+    // EXACTLY what a nonexistent id answers, same reason, same frame shape,
+    // zero draws, so sweeping ids over the wire learns nothing about which
+    // feasts exist, are drained, or were already eaten from. The dedicated
+    // 'feast_range' reason therefore no longer reaches the wire from this
+    // command; a legit client's own proximity gate (feast_interact.ts) is
+    // what keeps real players from ever seeing the merged reason.
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
     const feastId = placeOk(sim, placer);
     const st = sim.ctx.feasts.get(feastId)!;
 
-    standBeside(eater, placer, 10, 0); // beyond INTERACT_RANGE (5)
-    const from = sim.events.length;
-    sim.consumeFeast(feastId, eater.pid);
-    expect(denyReason(sim, from)).toBe('feast_range');
-    expect(st.charges).toBe(10);
-    expect(st.eatenBy.size).toBe(0);
-    expect(eater.p.eating).toBeNull();
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    try {
+      standBeside(eater, placer, 10, 0); // beyond INTERACT_RANGE (5)
+      const from = sim.events.length;
+      sim.consumeFeast(feastId, eater.pid);
+      const farDeny = eventsOf(sim, from, 'farmDenied');
+      expect(farDeny).toEqual([{ type: 'farmDenied', pid: eater.pid, reason: 'feast_expired' }]);
+      expect(st.charges).toBe(10);
+      expect(st.eatenBy.size).toBe(0);
+      expect(eater.p.eating).toBeNull();
 
+      // The nonexistent probe: byte-identical event shape.
+      const from2 = sim.events.length;
+      sim.consumeFeast(999_999, eater.pid);
+      expect(eventsOf(sim, from2, 'farmDenied')).toEqual(farDeny);
+
+      // A drained or already-eaten feast leaks nothing extra at range: the
+      // feast-specific reasons answer only inside INTERACT_RANGE.
+      st.charges = 0;
+      st.eatenBy.add(`entity:${eater.pid}`);
+      const from3 = sim.events.length;
+      sim.consumeFeast(feastId, eater.pid);
+      expect(eventsOf(sim, from3, 'farmDenied')).toEqual(farDeny);
+      st.charges = 10;
+      st.eatenBy.clear();
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws, 'every probe arm draws zero rng').toBe(0);
+
+    // Positive control: a step closer the same press lands.
     standBeside(eater, placer, 1, 0);
-    const from2 = sim.events.length;
+    const from4 = sim.events.length;
     sim.consumeFeast(feastId, eater.pid);
-    expect(eventsOf(sim, from2, 'farmDenied')).toHaveLength(0);
+    expect(eventsOf(sim, from4, 'farmDenied')).toHaveLength(0);
     expect(st.charges).toBe(9);
   });
 

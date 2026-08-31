@@ -42,11 +42,15 @@
 // the live entity count at one per player, and involves no clock at all.
 // The charge count and expiry below are maintainer-flagged tuning.
 //
-// THE LEDGER KEY: eatenBy holds the rename-proof owner key
-// (meta.characterId ?? meta.entityId, the PlayerMeta contract), never the
-// bare entity id, per the interact_object_credit stable-key lesson: entity
-// ids are session artifacts. The set is bounded by the feast's own charge
-// count and dropped wholesale at despawn, so it inherits none of the
+// THE LEDGER KEY: eatenBy holds the rename-proof, DOMAIN-TAGGED owner key
+// ('character:<id>' online, 'entity:<id>' offline; the durableMemberKey idiom
+// in instances/dungeons.ts), never the bare entity id, per the
+// interact_object_credit stable-key lesson: entity ids are session artifacts.
+// The tag is what keeps the two numeric domains disjoint: the untagged
+// characterId ?? entityId form put both in one namespace, so a characterId
+// that happened to equal another session's entity id merged two players'
+// ledger and one-active identities. The set is bounded by the feast's own
+// charge count and dropped wholesale at despawn, so it inherits none of the
 // persistence machinery the credited-objects ledger needs.
 
 import { buildConsuming } from '../consuming';
@@ -145,8 +149,8 @@ export function isApexFeastRecipe(recipe: {
 /** One live placed feast. Keyed in SimContext.feasts by its entity id. */
 export interface FeastState {
   entityId: number;
-  /** The placer's rename-proof owner key (characterId ?? entityId). */
-  ownerKey: number;
+  /** The placer's rename-proof, domain-tagged owner key (feastOwnerKey). */
+  ownerKey: string;
   /** Servings left. Decremented at bite START (the dish precedent: the
    *  spend lands at use; an interrupted meal forfeits the buff, never
    *  refunds the serving). Despawn on 0 rides the 1 Hz sweep below. */
@@ -163,12 +167,18 @@ export interface FeastState {
    *  wire field), so it is sim-local and adds no cross-platform surface. */
   dishItemId: string;
   /** The per-player consumed ledger: one bite per player per feast. */
-  eatenBy: Set<number>;
+  eatenBy: Set<string>;
 }
 
-/** The rename-proof player key the ledger and the anti-abuse rule share. */
-export function feastOwnerKey(meta: PlayerMeta): number {
-  return meta.characterId ?? meta.entityId;
+/** The rename-proof player key the ledger and the anti-abuse rule share.
+ *  Domain-tagged (see THE LEDGER KEY in the header): the server's stable
+ *  character id when present, the session entity id for offline and
+ *  sim-only hosts, each under its own prefix so the two numeric domains
+ *  can never collide at the same number. */
+export function feastOwnerKey(meta: PlayerMeta): string {
+  return meta.characterId === undefined
+    ? `entity:${meta.entityId}`
+    : `character:${meta.characterId}`;
 }
 
 /** Set out a feast at the caller's feet, spending one feast item from bags.
@@ -347,9 +357,21 @@ export function consumeFeastAction(
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
+  // THE EXISTENCE-ORACLE GUARD: a feast id the player cannot legitimately
+  // see (nonexistent, orphaned, OR simply beyond INTERACT_RANGE) answers ONE
+  // merged refusal, the not-found reason, from ONE emit site, so a prober
+  // sweeping ids learns nothing about which far-away feasts exist, are
+  // drained, or were already eaten from. Every feast-specific reason below
+  // (the tick-domain expiry, feast_finished, feast_eaten) therefore answers
+  // only INSIDE reach, where the feast is visible anyway. The dedicated
+  // 'feast_range' reason stays in the wire union for stale clients but no
+  // longer reaches it from here; the client's own proximity gate
+  // (src/game/feast_interact.ts) is what real players see instead. All
+  // three arms are draw-free and emit the identical frame shape (the extra
+  // dist2d on the existing-feast arm is arithmetic, not an observable).
   const feast = ctx.feasts.get(feastId);
   const entity = ctx.entities.get(feastId);
-  if (!feast || !entity) {
+  if (!feast || !entity || dist2d(p.pos, entity.pos) > INTERACT_RANGE) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'feast_expired' });
     return;
   }
@@ -359,10 +381,6 @@ export function consumeFeastAction(
   }
   if (feast.charges < 1) {
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'feast_finished' });
-    return;
-  }
-  if (dist2d(p.pos, entity.pos) > INTERACT_RANGE) {
-    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'feast_range' });
     return;
   }
   if (feast.eatenBy.has(feastOwnerKey(meta))) {

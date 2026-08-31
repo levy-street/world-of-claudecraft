@@ -38,11 +38,10 @@ export function isFarmerNpcEntity(e: Entity): boolean {
 }
 
 /** True when the entity stands within FARMER_TRADE_RANGE of any live farmer
- *  NPC. Inclusive at the boundary, like nearBanker. */
+ *  NPC. Inclusive at the boundary, like nearBanker. Rides the grid's
+ *  predicate early-exit (spatial.ts someInRadius) so the walk stops at the
+ *  first farmer instead of visiting the whole radius after the answer is
+ *  known; same boolean the full walk produced, still zero rng. */
 export function nearFarmerNpc(ctx: SimContext, e: Entity): boolean {
-  let near = false;
-  ctx.grid.forEachInRadius(e.pos.x, e.pos.z, FARMER_TRADE_RANGE, (other) => {
-    if (!near && isFarmerNpcEntity(other)) near = true;
-  });
-  return near;
+  return ctx.grid.someInRadius(e.pos.x, e.pos.z, FARMER_TRADE_RANGE, isFarmerNpcEntity);
 }

@@ -202,6 +202,9 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'bankWireRev',
       'characterId',
       'craftThrottle',
+      // Session-only withered-then-ready correction bookkeeping
+      // (farm_ready.ts): derived from sampled inputs, justified in trace.ts.
+      'farmWitheredAnnounced',
       'fiestaMods',
       'fiestaSpecial',
       'firstCharacter',

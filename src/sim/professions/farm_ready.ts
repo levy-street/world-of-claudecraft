@@ -23,6 +23,22 @@
 // a farmer has already been told about. The only thing that re-arms a bed is
 // planting in it again: plantCrop writes notified: false with the new plot.
 // Nothing here ever clears the flag.
+//
+// THE WITHERED-THEN-READY CORRECTION (masterwrought Phase 18). A plot
+// announced withered can later PROJECT ready: farmPlotStatus reads CURRENT
+// proficiency, and out-levelling a crop retires its risk retroactively
+// (monotonic, one direction only, never ready-to-withered). The bed itself
+// always showed the truth; the notice was the one stale surface. The sweep
+// therefore keeps a transient per-player memory of which beds' notice said
+// withered (PlayerMeta.farmWitheredAnnounced, session-only) and, when such a
+// plot re-projects ready, counts it into the SAME farmReady frame as a fresh
+// ready bed: "N beds ready" after "withered" IS the correction, so no new
+// event type, no new wire field, and no client change exist anywhere in this
+// feature. The memory needs no persistence: a notified plot that currently
+// reads withered was announced withered (monotonicity again), so every sweep
+// reseeds it from plain state and a relog loses nothing. Corrections ride
+// the once-only seam too: the set entry is removed as the correction emits,
+// and re-withering cannot happen, so a bed corrects at most once per cycle.
 
 import { farmCropTier } from '../content/farm_crops';
 import type { PlayerMeta } from '../sim';
@@ -43,11 +59,17 @@ import { farmPlotStatus } from './farm_projection';
  *
  *  Allocation-light on the sweep path: an empty plot map leaves immediately
  *  (a non-farmer costs one size read and allocates nothing), the counting
- *  walk uses plain locals over the map's values() iterator, and the one
+ *  walk uses plain locals over the map's entries iterator, and the one
  *  OBJECT this can allocate is allocated only when a plot actually
- *  transitioned. */
+ *  transitioned or corrected. */
 export function notifyFarmReady(ctx: SimContext, meta: PlayerMeta): void {
-  if (meta.farmPlots.size === 0) return;
+  const announced = meta.farmWitheredAnnounced;
+  if (meta.farmPlots.size === 0) {
+    // A harvested-out allotment leaves no bed to correct; drop any stale
+    // memory so a later replant can never inherit it.
+    if (announced.size > 0) announced.clear();
+    return;
+  }
   const nowMs = ctx.lockoutNowMs();
   // CURRENT proficiency, the projection's own rule: out-levelling a crop
   // retires its risk retroactively, so a plot that would have withered at a
@@ -55,8 +77,21 @@ export function notifyFarmReady(ctx: SimContext, meta: PlayerMeta): void {
   const skill = meta.gatheringProficiency.farming ?? 0;
   let ready = 0;
   let withered = 0;
-  for (const plot of meta.farmPlots.values()) {
-    if (plot.notified) continue;
+  for (const [bedId, plot] of meta.farmPlots) {
+    if (plot.notified) {
+      // The correction walk (see the header): a notified plot that reads
+      // withered seeds the memory (idempotent; this is also the relog
+      // reconstruction), and one that reads ready while the memory holds its
+      // bed emits the correction by joining the ready count, once.
+      const status = farmPlotStatus(plot, nowMs, skill, farmCropTier(plot.cropId));
+      if (status === 'withered') announced.add(bedId);
+      else if (status === 'ready' && announced.delete(bedId)) ready++;
+      continue;
+    }
+    // A fresh, unannounced plot in this bed: any memory entry is a stale
+    // leftover from a previous cycle (the harvest emptied the bed and a
+    // replant re-armed it), never this crop's.
+    announced.delete(bedId);
     const status = farmPlotStatus(plot, nowMs, skill, farmCropTier(plot.cropId));
     if (status === 'growing') continue;
     // Flipped BEFORE the counts are used to emit anything (the mailWelcomed
@@ -65,8 +100,17 @@ export function notifyFarmReady(ctx: SimContext, meta: PlayerMeta): void {
     // sweep, never a repeating one. (Practically unreachable: the only
     // callees inside this loop are a stored-roll comparison and a table read.)
     plot.notified = true;
-    if (status === 'withered') withered++;
-    else ready++;
+    if (status === 'withered') {
+      withered++;
+      announced.add(bedId);
+    } else ready++;
+  }
+  // Prune memory entries whose bed no longer holds a plot (harvested away):
+  // bounded by the authored bed count, and only paid while entries exist.
+  if (announced.size > 0) {
+    for (const bedId of announced) {
+      if (!meta.farmPlots.has(bedId)) announced.delete(bedId);
+    }
   }
   if (ready + withered === 0) return;
   // The notice is TRANSIENT by design (state.md deviation (bb)): a farmer

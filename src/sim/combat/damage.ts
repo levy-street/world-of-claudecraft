@@ -30,7 +30,11 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
-import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import {
+  claimedInstanceForMob,
+  lockNormalDungeonResetOnBossKill,
+  spawnBossExitPortal,
+} from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
@@ -1756,7 +1760,13 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
-    ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // THE ONE claimed-instance resolution for this death (Phase 18 dedupe):
+    // both award arms below take it instead of re-running the mobIds scan.
+    // Nothing between the two calls can free the slot or move the mob's claim
+    // (the settles above and below only mutate the found slot in place), so
+    // the shared resolution answers exactly what each arm's own scan did.
+    const claimedInst = claimedInstanceForMob(ctx, e.id);
+    ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);
@@ -1779,7 +1789,7 @@ export function handleDeath(
     // neutral to move here from above the world-boss block: an instance kill
     // has no worldBossContribs and a world boss is never hosted in an instance
     // slot, so no kill reaches both a wyrmfall draw and a world-boss roll.
-    ctx.awardWyrmfallCores(e, heroicRewardRecipients);
+    ctx.awardWyrmfallCores(e, heroicRewardRecipients, claimedInst);
   }
 }
 

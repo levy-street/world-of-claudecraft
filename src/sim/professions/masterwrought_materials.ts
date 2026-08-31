@@ -34,8 +34,8 @@
 // dev portals are not a material faucet.
 
 import { HEROIC_DUNGEON_TUNING } from '../content/dungeon_difficulty';
-import { instanceLockoutMetas } from '../instances/dungeons';
-import type { PlayerMeta } from '../sim';
+import { claimedInstanceForMob, instanceLockoutMetas } from '../instances/dungeons';
+import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, RiftTier } from '../types';
 import { NYTHRAXIS_BOSS_ID } from '../types';
@@ -223,13 +223,21 @@ export function tryGrantMakersEmber(ctx: SimContext, meta: PlayerMeta): void {
  *  Present participants also tick the weekly ember check: an eligible
  *  completion counts toward the keystone even when the core gate already
  *  closed today. */
-export function awardWyrmfallCores(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
-  // Template precheck before the instance scan: this runs on EVERY mob death
-  // (the death hub calls unconditionally), and the slot scan below walks every
-  // claimed instance's mobIds. Only a final-boss template can ever qualify, so
-  // open-world trash exits here without scanning anything.
+export function awardWyrmfallCores(
+  ctx: SimContext,
+  mob: Entity,
+  recipients: PlayerMeta[],
+  // The death hub's pre-resolved claim (instances/dungeons.ts
+  // claimedInstanceForMob, the Phase 18 scan dedupe): null means the hub
+  // scanned and found none; undefined (a foreign caller) means resolve here.
+  claimed?: InstanceSlot | null,
+): void {
+  // Template precheck before any instance resolution: this runs on EVERY mob
+  // death (the death hub calls unconditionally). Only a final-boss template
+  // can ever qualify, so open-world trash exits here first, exactly as it
+  // did when this arm owned its own scan.
   if (!FINAL_BOSS_TEMPLATE_IDS.has(mob.templateId)) return;
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  const inst = claimed === undefined ? claimedInstanceForMob(ctx, mob.id) : claimed;
   if (!inst) return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   const heroicFinal =

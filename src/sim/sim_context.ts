@@ -440,13 +440,18 @@ export interface SimContextCallbacks {
   riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
-  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
+  // Both award arms take the death hub's ONE pre-resolved claimed instance
+  // (instances/dungeons.ts claimedInstanceForMob; the Phase 18 scan dedupe):
+  // null = the hub scanned and found no claim, undefined = resolve yourself
+  // (the pre-widening shape foreign callers and tests keep using). An
+  // APPEND-ONLY widening: the two-argument call is unchanged in meaning.
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[], claimed?: InstanceSlot | null): void;
   // awardWyrmfallCores is owned by professions/masterwrought_materials: the C1
   // death hub calls it AFTER the whole loot-roll block (awardHeroicMarks, then
   // rollLoot/rollWorldBossLoot and the world-boss deed hook) with the same
   // death-time participation snapshot (one rng draw per credited eligible
   // kill; combat/damage.ts explains why that position is draw-order safe).
-  awardWyrmfallCores(mob: Entity, recipients: PlayerMeta[]): void;
+  awardWyrmfallCores(mob: Entity, recipients: PlayerMeta[], claimed?: InstanceSlot | null): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -642,11 +647,12 @@ export interface SimContextCallbacks {
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
-  // The farm action credit (quests/quest_credit.ts onCropFarmedForQuests) is
-  // NOT a seam callback: professions/farming.ts imports it module-to-module
-  // (the sim.ts host wiring sits at its monolith ceiling), so a reader
-  // enumerating credit routes here must add that one; every crediter still
-  // takes ctx and draws nothing.
+  // The farm action credit (quests/quest_credit.ts onCropFarmedForQuests),
+  // folded onto the seam at masterwrought Phase 18 beside its siblings:
+  // professions/farming.ts calls it after every committed plant and every
+  // harvest outcome (withered included; never from a deny arm). Like every
+  // crediter it takes ctx-bound state only and draws nothing.
+  onCropFarmedForQuests(action: 'plant' | 'harvest', cropId: string, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;
@@ -1573,6 +1579,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     onMobKilledForQuests: host.onMobKilledForQuests,
     onRecipeCraftedForQuests: host.onRecipeCraftedForQuests,
     onNodeGatheredForQuests: host.onNodeGatheredForQuests,
+    onCropFarmedForQuests: host.onCropFarmedForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
     countItem: host.countItem,

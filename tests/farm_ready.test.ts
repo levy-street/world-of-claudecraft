@@ -311,6 +311,98 @@ describe('the ready notice on the 1 Hz sweep', () => {
   });
 });
 
+describe('the withered-then-ready correction (Phase 18 re-projection notice)', () => {
+  // A plot announced WITHERED can later project READY: farmPlotStatus reads
+  // CURRENT proficiency, and out-levelling a crop retires its risk
+  // retroactively (monotonic, one direction only). The bed always showed the
+  // truth; the notice was the one surface left stale. The sweep now emits a
+  // correcting notice through the SAME once-only seam, riding the existing
+  // farmReady event as a fresh ready count (no new event type, no new wire
+  // field, no client change): "1 bed ready" after "1 bed withered" IS the
+  // correction.
+  const TIER1_SURVIVAL_GATE = 0.85; // FARM_SURVIVAL_AT_GATE, tier 1 at skill 0
+
+  function witheredAnnouncedHarness(): Harness {
+    const h = makeHarness();
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    plant(h);
+    // Withered at skill 0 (roll above the 0.85 gate), ready at skill 25+
+    // (the tier-1 band tops out at chance 1.0).
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.9;
+    h.advance(CROP.durationMs + 1);
+    const first = h.tick(20);
+    expect(first).toEqual([{ type: 'farmReady', pid: h.pid, ready: 0, withered: 1 }]);
+    return h;
+  }
+
+  it('announces the flip exactly once when proficiency retires the risk mid-session', () => {
+    const h = witheredAnnouncedHarness();
+    // Quiet while nothing changes.
+    expect(h.tick(40)).toEqual([]);
+    // The farmer skills past the band: the plot now projects ready.
+    h.meta.gatheringProficiency.farming = 25;
+    expect(h.sim.farmPlotsFor(h.pid)[0]?.status).toBe('ready');
+    const corrected = h.tick(20);
+    expect(corrected).toEqual([{ type: 'farmReady', pid: h.pid, ready: 1 }]);
+    // Once only: the correction never repeats on later sweeps.
+    expect(h.tick(60)).toEqual([]);
+  });
+
+  it('corrects across a relog: the announced-withered memory reseeds from state at login', () => {
+    const h = witheredAnnouncedHarness();
+    const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
+    // A fresh session: the login check sees a notified, still-withered plot
+    // and stays silent; the mid-session skill-up then corrects.
+    const { sim, meta, joinEvents } = joinWith(saved, h.now());
+    expect(joinEvents).toEqual([]);
+    meta.gatheringProficiency.farming = 25;
+    const corrected: FarmReadyEvent[] = [];
+    for (let i = 0; i < 40; i++) {
+      for (const ev of sim.tick()) if (ev.type === 'farmReady') corrected.push(ev);
+    }
+    expect(corrected).toEqual([{ type: 'farmReady', pid: meta.entityId, ready: 1 }]);
+  });
+
+  it('harvesting the withered plot and replanting never fabricates a correction', () => {
+    const h = witheredAnnouncedHarness();
+    harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED);
+    expect(h.meta.farmPlots.has(BED)).toBe(false);
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    plant(h);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.01; // survives
+    h.advance(CROP.durationMs + 1);
+    // Exactly ONE fresh ready announce for the new crop, no phantom
+    // correction stacked on top of it from the previous cycle's memory.
+    const notices = h.tick(20);
+    expect(notices).toEqual([{ type: 'farmReady', pid: h.pid, ready: 1 }]);
+    expect(h.tick(40)).toEqual([]);
+  });
+
+  it('folds a correction and a fresh finish into one notice, and draws zero rng', () => {
+    const h = witheredAnnouncedHarness();
+    // A second bed planted and finishing AFTER the withered announce.
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    plant(h, BED2);
+    (h.meta.farmPlots.get(BED2) as PlotState).survivalRoll = 0.01;
+    h.advance(CROP.durationMs + 1);
+    h.meta.gatheringProficiency.farming = 25;
+    let notices: FarmReadyEvent[] = [];
+    const draws = countDraws(h.sim, () => {
+      notices = h.tick(20);
+    });
+    expect(draws).toBe(0);
+    // One frame, two beds waiting: the corrected plot and the fresh one.
+    expect(notices).toEqual([{ type: 'farmReady', pid: h.pid, ready: 2 }]);
+    expect(h.tick(40)).toEqual([]);
+  });
+
+  it('the gate literal the fixture leans on is the shipped one', () => {
+    // Anti-drift: the harness picks 0.9 as "withers at skill 0, survives at
+    // 25" against the 0.85 gate; if the ramp moves, this red points here.
+    expect(TIER1_SURVIVAL_GATE).toBe(0.85);
+  });
+});
+
 describe('the ready notice across two farmers in one sim', () => {
   it('announces each farmer separately, first-joined first, on ONE sweep tick', () => {
     // Deviation (bc): the sweep walks ctx.players in insertion order and

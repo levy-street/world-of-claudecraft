@@ -3748,6 +3748,41 @@ describe('convertHusks: the farmer-NPC range gate (the go-live)', () => {
     expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
   });
 
+  it('stops the farmer scan at the first farmer found (the early-exit radius query)', () => {
+    // nearFarmerNpc rides the grid's predicate early-exit (spatial.ts
+    // someInRadius), so the walk ends the moment a farmer answers instead
+    // of visiting every occupied cell in the window. Proven the spatial
+    // suite's way: a second in-range farmer whose pos read THROWS is never
+    // reached once the first farmer answered. Behavior-identical (same
+    // boolean the full walk produced) and draw-free.
+    standByNpc(h.sim);
+    const jessica = npcEntity(h.sim, 'farmer_jessica');
+    const ghost = {
+      id: 999_777,
+      kind: 'npc',
+      templateId: jessica.templateId,
+      pos: { x: jessica.pos.x, y: jessica.pos.y, z: jessica.pos.z },
+    } as Entity;
+    h.sim.grid.insert(ghost);
+    try {
+      // Same cell as jessica, inserted AFTER her, so the walk meets her first.
+      Object.defineProperty(ghost, 'pos', {
+        configurable: true,
+        get() {
+          throw new Error('the farmer scan kept walking after the answer was known');
+        },
+      });
+      expect(countDraws(h.sim, () => convertHusks(h.sim.ctx, h.sim.player, h.meta))).toBe(0);
+      expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    } finally {
+      Object.defineProperty(ghost, 'pos', {
+        configurable: true,
+        value: { x: jessica.pos.x, y: jessica.pos.y, z: jessica.pos.z },
+      });
+      h.sim.grid.remove(ghost);
+    }
+  });
+
   it('answers the range gate BEFORE the batch arithmetic: far away with no husks is still no_farmer', () => {
     // The stated gate order: a far-away sender learns the real reason, never
     // a phantom shortage.

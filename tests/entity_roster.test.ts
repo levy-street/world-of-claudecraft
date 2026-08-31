@@ -226,6 +226,7 @@ function makeCtx() {
     onMobKilledForQuests: vi.fn(),
     onRecipeCraftedForQuests: vi.fn(),
     onNodeGatheredForQuests: vi.fn(),
+    onCropFarmedForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),

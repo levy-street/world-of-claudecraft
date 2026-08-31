@@ -176,6 +176,94 @@ describe('ember week math (pure)', () => {
   });
 });
 
+describe('the death hub resolves the claimed instance ONCE (Phase 18 scan dedupe)', () => {
+  // The claimed-instance scan (partyKey !== null && mobIds.includes(mob.id))
+  // used to run once inside awardHeroicMarks and AGAIN inside
+  // awardWyrmfallCores on every final-boss death. The hub (combat/damage.ts)
+  // now resolves it once and hands the SAME slot to both through the widened
+  // seam callbacks; a callee handed a resolution never re-scans, and an
+  // omitted argument keeps the old self-scan for foreign callers.
+
+  function spyFinds(sim: AnySim): { finds: () => number; restore: () => void } {
+    const instances = sim.instances as unknown[];
+    let count = 0;
+    const realFind = instances.find.bind(instances);
+    Object.defineProperty(instances, 'find', {
+      configurable: true,
+      value: (...args: unknown[]) => {
+        count++;
+        return realFind(...(args as [(i: unknown) => boolean]));
+      },
+    });
+    return {
+      finds: () => count,
+      restore: () => {
+        delete (instances as unknown as Record<string, unknown>).find;
+      },
+    };
+  }
+
+  it('the hub hands BOTH award arms the identical pre-resolved slot', () => {
+    const { sim, leader, inst, boss } = heroicMorthenRig();
+    const seen: unknown[] = [];
+    const ctx = sim.ctx as Record<string, any>;
+    for (const key of ['awardHeroicMarks', 'awardWyrmfallCores']) {
+      const orig = ctx[key].bind(ctx);
+      ctx[key] = (mob: unknown, recipients: unknown, claimed: unknown) => {
+        seen.push(claimed);
+        orig(mob, recipients, claimed);
+      };
+    }
+    killBoss(sim, leader, boss);
+    // Both calls carried the hub's resolution BY IDENTITY: one scan, one slot.
+    expect(seen).toEqual([inst, inst]);
+    // And the pass-through changed nothing observable: marks and cores paid.
+    expect(sim.countItem('heroic_mark', leader)).toBeGreaterThan(0);
+    expect(sim.countItem(WYRMFALL_CORE_ITEM_ID, leader)).toBeGreaterThanOrEqual(WYRMFALL_BOSS_MIN);
+  });
+
+  it('a callee handed the resolved slot never re-scans; omitted, it scans for itself', () => {
+    const { sim, leader, member, inst, boss } = heroicMorthenRig();
+    const leaderMeta = sim.players.get(leader) as PlayerMeta;
+    const memberMeta = sim.players.get(member) as PlayerMeta;
+    // Handed the slot: zero scans, full payout (behavior-identical).
+    let spy = spyFinds(sim);
+    try {
+      sim.ctx.awardHeroicMarks(boss, [leaderMeta, memberMeta], inst);
+      sim.ctx.awardWyrmfallCores(boss, [leaderMeta, memberMeta], inst);
+    } finally {
+      spy.restore();
+    }
+    expect(spy.finds()).toBe(0);
+    expect(sim.countItem('heroic_mark', leader)).toBeGreaterThan(0);
+    const cores = sim.countItem(WYRMFALL_CORE_ITEM_ID, leader);
+    expect(cores).toBeGreaterThanOrEqual(WYRMFALL_BOSS_MIN);
+    // Handed null (the hub scanned and found no claim): a no-op, still no scan.
+    const fresh = heroicMorthenRig(11);
+    const freshMeta = fresh.sim.players.get(fresh.leader) as PlayerMeta;
+    spy = spyFinds(fresh.sim);
+    try {
+      fresh.sim.ctx.awardWyrmfallCores(fresh.boss, [freshMeta], null);
+      fresh.sim.ctx.awardHeroicMarks(fresh.boss, [freshMeta], null);
+    } finally {
+      spy.restore();
+    }
+    expect(spy.finds()).toBe(0);
+    expect(fresh.sim.countItem(WYRMFALL_CORE_ITEM_ID, fresh.leader)).toBe(0);
+    expect(fresh.sim.countItem('heroic_mark', fresh.leader)).toBe(0);
+    // Omitted (a foreign caller, the pre-widening shape): the callee resolves
+    // the claim itself, one scan each, and pays exactly as before.
+    spy = spyFinds(fresh.sim);
+    try {
+      fresh.sim.ctx.awardHeroicMarks(fresh.boss, [freshMeta]);
+    } finally {
+      spy.restore();
+    }
+    expect(spy.finds()).toBe(1);
+    expect(fresh.sim.countItem('heroic_mark', fresh.leader)).toBeGreaterThan(0);
+  });
+});
+
 describe('wyrmfall cores: the boss faucet', () => {
   it('a heroic final-boss kill pays every present participant the same rolled count', () => {
     const { sim, leader, member, boss } = heroicMorthenRig();

@@ -1263,6 +1263,10 @@ authors a new name appends its rows in the same change.
 | exports | `ADMIN_ANALYTICS_READ_MAX_PER_MINUTE` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the analytics read bucket's per-minute budget, scoped apart from the oversight bucket (server/ratelimit.ts) |
 | exports | `adminAnalyticsReadRateLimited` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the fused IP-plus-account limiter the three analytics.read routes consult (server/ratelimit.ts) |
 | exports | `resetAdminAnalyticsRateLimits` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the test-only window reset, the sibling of the oversight family's (server/ratelimit.ts) |
+| exports | `droppedFarmPlotCounts` | 18 | qr-18-REOPEN, item quest-credit-seam-fold (the paired sim.ts extraction that keeps the coordinator under its ratchet) | the pure dropped-row / re-derived-slot count of a farm-plot load, moved out of Sim.addPlayer (src/sim/professions/farm_load_report.ts) |
+| exports | `DroppedFarmPlotCounts` | 18 | qr-18-REOPEN, item quest-credit-seam-fold | that count's result shape (src/sim/professions/farm_load_report.ts) |
+| exports | `warnDroppedFarmPlotRows` | 18 | qr-18-REOPEN, item quest-credit-seam-fold | the one addPlayer call: counts, then the dev-channel warn only when something dropped (src/sim/professions/farm_load_report.ts) |
+| exports | `claimedInstanceForMob` | 18 | qr-18-REOPEN, item wyrmfall-marks-scan-dedup | the ONE claimed-instance-for-a-mob predicate the death hub resolves once and hands to awardHeroicMarks and awardWyrmfallCores through their new optional `claimed` parameter (src/sim/instances/dungeons.ts) |
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 
