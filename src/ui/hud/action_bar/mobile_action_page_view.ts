@@ -17,6 +17,7 @@
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import type { ActionBarVisibility } from './action_bar_visibility_core';
 import {
+  RADIAL_DIRECTIONS,
   RADIAL_SLOTS_PER_BUTTON,
   type RadialDirection,
   type RadialSlotOrder,
@@ -111,6 +112,22 @@ export function mobileButtonHasSourceSlot(
       startSlot: MOBILE_ACTION_SOURCE_SLOT_START,
     },
     totalSlots,
+  );
+}
+
+/** Whether the current page maps any direction on a physical ring button to
+ *  the given source slot. */
+export function mobileButtonOwnsSourceSlot(
+  page: number,
+  buttonIndex: number,
+  sourceSlot: number | null,
+  totalSlots: number = MOBILE_ACTION_SOURCE_SLOT_COUNT,
+): boolean {
+  if (sourceSlot === null) return false;
+  return RADIAL_DIRECTIONS.some(
+    (direction) =>
+      mobileButtonHasSourceSlot(page, buttonIndex, totalSlots, direction) &&
+      sourceSlotForMobileButton(page, buttonIndex, direction) === sourceSlot,
   );
 }
 

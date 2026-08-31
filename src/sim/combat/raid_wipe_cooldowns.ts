@@ -2,10 +2,9 @@ import type { ResolvedAbility } from '../sim';
 import type { Entity } from '../types';
 
 const TWO_MINUTES = 120;
-const ARMY_OF_THE_DEAD_ABILITY_ID = 'army_of_the_dead';
 
-export function shouldResetRaidWipeCooldown(abilityId: string, cooldown: number): boolean {
-  return abilityId === ARMY_OF_THE_DEAD_ABILITY_ID || cooldown > TWO_MINUTES;
+export function shouldResetRaidWipeCooldown(_abilityId: string, cooldown: number): boolean {
+  return cooldown >= TWO_MINUTES;
 }
 
 export function resetLongCooldownsForRaidWipe(

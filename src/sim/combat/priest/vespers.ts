@@ -1,7 +1,9 @@
+import { VESPERASH_4PC_MANA_RETURN_MULT } from '../../content/ignivar_set_bonuses';
 import type { PlayerMeta, ResolvedAbility } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, dist2d, type Entity } from '../../types';
 import { dismissOwnedGuardians, guardianOf, summonGuardian } from '../guardians';
+import { wearsSetBonus } from '../set_bonus_wearer';
 import { EFFIGY_AURA_ID, GLOOMTITHE_AURA_ID, GLOOMTITHE_MAX_STACKS } from './presentation';
 import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
 
@@ -264,9 +266,15 @@ export function vespersEchoDamage(
   if (!eligibleTarget) return;
 
   if (abilityId === TITHEFIEND_STRIKE_ID && priest.resourceType === 'mana') {
+    // Vesperash 4pc: the fiend returns twice the mana per hit. The bend is
+    // this call-site multiplier only; the base rate constant (and its literal
+    // test pin) stays untouched for everyone else. Draws no rng.
+    const manaReturnRate =
+      TITHEFIEND_MANA_RETURN_RATE *
+      (wearsSetBonus(ctx, priest, 'vesperash', 4) ? VESPERASH_4PC_MANA_RETURN_MULT : 1);
     priest.resource = Math.min(
       priest.maxResource,
-      priest.resource + Math.max(1, Math.round(priest.maxResource * TITHEFIEND_MANA_RETURN_RATE)),
+      priest.resource + Math.max(1, Math.round(priest.maxResource * manaReturnRate)),
     );
   }
   const candidates: { entity: Entity; distance: number }[] = [];

@@ -8,19 +8,25 @@
 // primitive is exercised directly. Copper deltas and capacities are pinned to LITERAL
 // numbers so a table/formula regression flips an assertion.
 import { describe, expect, it } from 'vitest';
-import { bagCapacity } from '../src/sim/bags';
+import { generalOnlyPools } from '../src/sim/bag_pools';
+import { bagCapacity, bagPools, countFit } from '../src/sim/bags';
 import {
+  applyBankBonusStamp,
   BANK_BASE_SLOTS,
   BANK_EXPANSION_PRICES,
   BANK_EXPANSION_SLOTS,
   BANK_MAX_BONUS_SLOTS,
   type BankState,
   bankCapacity,
+  bankGrantStorageSlots,
+  bankPurchasedSlotsFor,
   clampBonusSlots,
   moveBetweenContainers,
   sanitizeBankState,
+  savedBankState,
 } from '../src/sim/bank';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { STORAGE_SKUS } from '../src/sim/content/storage_charters';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type {
@@ -153,11 +159,33 @@ describe('bank constants and capacity math', () => {
   });
 
   it('bankCapacity = base + purchasedSlots + bonusSlots', () => {
-    expect(bankCapacity({ inventory: [], purchasedSlots: 0, bonusSlots: 0 })).toBe(24);
-    expect(bankCapacity({ inventory: [], purchasedSlots: 6, bonusSlots: 0 })).toBe(30);
-    expect(bankCapacity({ inventory: [], purchasedSlots: 72, bonusSlots: 0 })).toBe(96);
-    expect(bankCapacity({ inventory: [], purchasedSlots: 0, bonusSlots: 4 })).toBe(28);
-    expect(bankCapacity({ inventory: [], purchasedSlots: 12, bonusSlots: 5 })).toBe(41);
+    // bankCapacity is the LADDER budget alone: socket fields are present (the
+    // BankState shape) but deliberately not part of this formula; socketed bag
+    // slots join through bankPools, pinned in tests/bank_sockets.test.ts.
+    const ladder = (purchasedSlots: number, bonusSlots: number): BankState => ({
+      inventory: [],
+      purchasedSlots,
+      bonusSlots,
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
+    });
+    expect(bankCapacity(ladder(0, 0))).toBe(24);
+    expect(bankCapacity(ladder(6, 0))).toBe(30);
+    expect(bankCapacity(ladder(72, 0))).toBe(96);
+    expect(bankCapacity(ladder(0, 4))).toBe(28);
+    expect(bankCapacity(ladder(12, 5))).toBe(41);
+    // A socketed 16-slot general bag does NOT move the ladder budget.
+    expect(
+      bankCapacity({
+        inventory: [],
+        purchasedSlots: 6,
+        bonusSlots: 0,
+        unlockedSockets: 1,
+        socketBags: ['wayfarers_backpack', null, null, null],
+        appliedStorageKeys: [],
+      }),
+    ).toBe(30);
   });
 });
 
@@ -302,6 +330,32 @@ describe('deposit rules', () => {
     expect(m.copper).toBe(copperBefore);
   });
 
+  it('a MERGEABLE over-cap instanced deposit short of slots gets the pool-honest full line', () => {
+    // The emit boundary of the moveBetweenContainers "reads space" pin: the
+    // hand-shaped over-stackSize MERGEABLE instanced stack (only the load
+    // clamp keeps sim-built stacks at or under cap) against a bank with free
+    // slots, but too few. The mergeable gate classifies the shortfall as
+    // pool exhaustion, so the deposit arm must emit the pool-honest full
+    // line and must NOT emit the indivisible line: a later re-widening of
+    // the granularity cause cannot silently restore the wrong literal here.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = gearSlots(22); // base 24: exactly two free slots
+    pushInstanced(sim, 'wolf_fang', { signer: 'Ana' });
+    m.inventory[m.inventory.length - 1].count = 45; // needs 20+20+5: three slots
+    const bagBefore = clone(m.inventory);
+    const bankBefore = clone(m.bank.inventory);
+    sim.drainEvents();
+    sim.bankDeposit(m.inventory.length - 1);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bank is full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bank.')).toBe(
+      false,
+    );
+    expect(m.inventory).toEqual(bagBefore);
+    expect(m.bank.inventory).toEqual(bankBefore);
+  });
+
   it('treats out-of-range / non-positive / over-count deposits as SILENT no-ops', () => {
     const sim = makeSim();
     const m = meta(sim);
@@ -382,6 +436,103 @@ describe('withdraw rules', () => {
     expect(m.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
     expect(m.inventory).toEqual(bagBefore); // nothing duplicated into the full bags
     expect(m.copper).toBe(copperBefore);
+  });
+
+  it('a granularity withdraw refusal gets the bags-direction line, never "bags are full"', () => {
+    // The deposit arm's discrimination, mirrored at the withdraw gate: a
+    // hand-shaped multi-unit charges stack (every sim-built charges slot is
+    // count 1) banked, against bags with ONE free slot. One unit would land;
+    // three cannot, so "Your bags are full." would lie about the same stack
+    // the deposit path names honestly.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = [{ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } }];
+    m.inventory = gearSlots(15); // backpack 16: exactly one free general slot
+    const bankBefore = clone(m.bank.inventory);
+    const bagBefore = clone(m.inventory);
+    sim.drainEvents();
+    sim.bankWithdraw(0);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'Your bags are full.')).toBe(false);
+    expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
+    expect(m.inventory).toEqual(bagBefore);
+  });
+
+  it('a MERGEABLE over-cap withdraw short of slots gets the bags-full line, never the split line', () => {
+    // The deposit arm's mergeable negative (above), mirrored at the withdraw
+    // emit boundary: a hand-shaped over-stackSize MERGEABLE instanced stack
+    // (signer payloads merge; only the load clamp keeps sim-built stacks at
+    // or under cap) banked, against bags with free slots, but too few
+    // (45 needs 20+20+5: three slots, two exist). The gate reads the
+    // shortfall as pool exhaustion, so the withdraw must emit the pool-honest
+    // full line and must NOT claim the stack cannot be split: a later
+    // re-widening of the granularity cause cannot silently restore the wrong
+    // literal on this arm.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = [{ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } }];
+    m.inventory = gearSlots(14); // backpack 16: exactly two free general slots
+    const bankBefore = clone(m.bank.inventory);
+    const bagBefore = clone(m.inventory);
+    sim.drainEvents();
+    sim.bankWithdraw(0);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bags are full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      false,
+    );
+    expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
+    expect(m.inventory).toEqual(bagBefore);
+  });
+
+  it('lands a MATERIAL in satchel headroom and refuses a non-material from the same state', () => {
+    // The two-pool split AT the bankWithdraw boundary, discriminated behaviorally.
+    // Phase 05 made the destination pools bagPools(meta.bags) instead of a flat
+    // bagCapacity total, and only a pair of arms run from ONE state can tell those
+    // apart: with a Forager's Haversack socketed the bags are 16 general slots (all
+    // full) plus 12 materials slots (all free), so the flat total would report 12
+    // free for BOTH items while the split reports 12 for the material and 0 for the
+    // non-material. The material arm alone proves nothing; the refusal is the half
+    // that reds on a revert to the flat total.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('foragers_haversack', 1);
+    sim.equipBag('foragers_haversack', 0);
+    // Fixture preconditions, pinned as literals so a backpack or satchel resize
+    // fails HERE rather than quietly turning either arm below vacuous.
+    expect(bagPools(m.bags)).toEqual({ general: 16, materials: 12 });
+    // General exactly full with distinct 1-per-slot gear: no free slot and no stack
+    // to top up, and not one gear id is in the derived material set, so every free
+    // slot the bags still hold is materials-only.
+    m.inventory = gearSlots(16);
+    m.bank.inventory = [
+      { itemId: 'linen_scrap', count: 4 }, // a real member of the derived material set
+      { itemId: 'roasted_boar', count: 4 }, // food: general pool only
+    ];
+    const bankBefore = clone(m.bank.inventory);
+    // The revert this arm exists to catch, made EXECUTABLE rather than asserted in
+    // prose: on this exact fixture the pre-phase-05 flat total would hand the food
+    // parcel four units of room, so the refusal below can only come from the split.
+    // If a backpack or satchel change ever made the two shapes agree here, this
+    // line reds instead of the arm quietly going vacuous.
+    expect(countFit(m.inventory, generalOnlyPools(bagCapacity(m.bags)), 'roasted_boar', 4)).toBe(4);
+    sim.drainEvents();
+
+    // The non-material first, so the material arm below runs on the IDENTICAL state.
+    sim.bankWithdraw(1);
+    expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
+    expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
+    expect(sim.countItem('roasted_boar')).toBe(0);
+    expect(m.inventory).toHaveLength(16); // nothing squeezed into the full general pool
+
+    // Same bags, same instant: the material takes the satchel's free headroom.
+    sim.bankWithdraw(0);
+    expect(sim.countItem('linen_scrap')).toBe(4);
+    expect(m.bank.inventory).toEqual([{ itemId: 'roasted_boar', count: 4 }]);
+    expect(m.inventory).toHaveLength(17); // one materials-pool slot now occupied
   });
 
   it('treats malformed withdraw inputs as SILENT no-ops', () => {
@@ -505,7 +656,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
   it('moves a whole stack into an empty destination and splices the source', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
     const dst: InvSlot[] = [];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 5 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 5,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
   });
@@ -513,7 +666,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
   it('merges into an existing destination stack', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3 }];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 8 }]);
   });
@@ -521,7 +676,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
   it('tops up an existing stack to its size then splits the remainder into a new slot', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 18 }]; // stackSize 20
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 18 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 18,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([
       { itemId: 'wolf_fang', count: 20 },
@@ -532,7 +689,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
   it('moves an instanced slot whole and never merges it with a plain stack', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
-    expect(moveBetweenContainers(src, 0, 1, dst, 10)).toEqual({ moved: 1 });
+    expect(moveBetweenContainers(src, 0, 1, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 1,
+    });
     expect(src).toEqual([]);
     expect(dst).toHaveLength(2);
     expect(dst[1]).toEqual({ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } });
@@ -545,7 +704,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } },
     ];
     // Destination is at capacity: only the byte-equal stack's room admits it.
-    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([
       { itemId: 'wolf_fang', count: 5 },
@@ -559,26 +720,83 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 19, instance: { signer: 'Ana' } }];
     const srcSnap = clone(src);
     const dstSnap = clone(dst);
-    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // Merge room for ONE unit remains, but ZERO free slots do: partial
+      // byte-equal top-up room is still pool exhaustion, so the pool-honest
+      // lines stay truthful for this shape ('space', never granularity).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
     // AT the boundary: exactly one unit of room admits exactly a one-unit move.
     const one: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
-    expect(moveBetweenContainers(one, 0, undefined, dst, 1)).toEqual({ moved: 1 });
+    expect(moveBetweenContainers(one, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
+      moved: 1,
+    });
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } }]);
+  });
+
+  it('labels granularity only when free slots exist and the payload is indivisible', () => {
+    // The one reachable 'instanced_units' shape: a multi-unit NON-mergeable
+    // payload (charges), which only a tolerated hand-shaped save can carry
+    // (every sim-built charges slot is count 1). Two free slots exist, each
+    // absorbs one unit, three units cannot land whole: granularity, not
+    // space, and the refusal line must not blame pool allocation.
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } }];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+      noFitCause: 'instanced_units',
+    });
+    expect(src).toHaveLength(1);
+    expect(dst).toEqual([]);
+  });
+
+  it('a MERGEABLE over-cap stack short of slots reads space, because a split would land it', () => {
+    // The hand-shaped save shape that used to misread as granularity: a
+    // mergeable instanced stack past its 20-cap (only the load clamp keeps
+    // sim-built stacks at or under cap) against two free slots. Free slots
+    // EXIST, but addStacked would split the stack across fresh slots if
+    // enough existed, so "cannot be split" is false; the honest cause is a
+    // slot shortage ('space').
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [];
+    const srcSnap = clone(src);
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+      noFitCause: 'space',
+    });
+    expect(src).toEqual(srcSnap);
+    expect(dst).toEqual([]);
+    // The positive control that makes 'space' the truthful label: one more
+    // free slot and the same stack lands whole, SPLIT across three slots.
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 3, materials: 0 })).toEqual({
+      moved: 45,
+    });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+      { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+    ]);
   });
 
   it('a differently-signed instanced move still demands its own free destination slot', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Bru' } }];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // Zero room anywhere (no byte-equal stack, no free slot): genuine space.
+      noFitCause: 'space',
     });
-    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 1 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 1,
+    });
     expect(dst).toHaveLength(2);
   });
 
@@ -587,9 +805,11 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     const dst: InvSlot[] = [{ itemId: 'linen_scrap', count: 1 }];
     const srcSnap = clone(src);
     const dstSnap = clone(dst);
-    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // A fungible shortfall is always pool space (the request is divisible).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -600,9 +820,11 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 18 }];
     const srcSnap = clone(src);
     const dstSnap = clone(dst);
-    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // A fungible shortfall is always pool space (the request is divisible).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -615,20 +837,26 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     // deny a disenchant skill-up (enchanting.ts).
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' }];
     const dst: InvSlot[] = [];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 5 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 5,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' }]);
 
     // A plain (no-recipe) move must not merge into the crafted-provenance stack.
     const src2: InvSlot[] = [{ itemId: 'wolf_fang', count: 2 }];
-    expect(moveBetweenContainers(src2, 0, undefined, dst, 10)).toEqual({ moved: 2 });
+    expect(moveBetweenContainers(src2, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 2,
+    });
     expect(dst).toHaveLength(2);
     expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' });
     expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 2 });
 
     // A same-recipe move DOES merge into the existing crafted stack.
     const src3: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'recipe_a' }];
-    expect(moveBetweenContainers(src3, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src3, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 8, craftedRecipeId: 'recipe_a' });
   });
 
@@ -643,7 +871,10 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     ] as const) {
       const src = clone(base);
       const dst: InvSlot[] = [];
-      expect(moveBetweenContainers(src, i, c, dst, 10)).toEqual({ moved: 0, refusal: 'invalid' });
+      expect(moveBetweenContainers(src, i, c, dst, { general: 10, materials: 0 })).toEqual({
+        moved: 0,
+        refusal: 'invalid',
+      });
       expect(src).toEqual(base);
       expect(dst).toEqual([]);
     }
@@ -658,19 +889,25 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
   it('carries the craftedRecipeId marker through a deposit/withdraw round trip', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
     const dst: InvSlot[] = [];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(src).toEqual([]);
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
     // And back the other way (withdraw is the same primitive, source/dest swapped).
     const back: InvSlot[] = [];
-    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(dst, 0, undefined, back, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(back).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
   });
 
   it('never merges a crafted stack into a plain stack of the same item id, or vice versa', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(dst).toEqual([
       { itemId: 'wolf_fang', count: 5 },
       { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' },
@@ -691,12 +928,16 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       { itemId: 'wolf_fang', count: 3, instance: { ...payload }, craftedRecipeId: 'r_wolf_fang' },
     ];
     const dst: InvSlot[] = [];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(dst).toEqual([
       { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
     ]);
     const back: InvSlot[] = [];
-    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(dst, 0, undefined, back, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(back).toEqual([
       { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
     ]);
@@ -715,7 +956,9 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       },
     ];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 10, materials: 0 })).toEqual({
+      moved: 3,
+    });
     expect(dst).toEqual([
       { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
       {
@@ -743,9 +986,10 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       },
     ];
     const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
-    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      noFitCause: 'space',
     });
     expect(dst).toHaveLength(1);
     expect(src).toHaveLength(1); // nothing moved, nothing lost
@@ -801,7 +1045,14 @@ describe('conservation seed sweeps', () => {
 
     for (let seed = 1; seed <= 50; seed++) {
       m.inventory = clone(initialInventory);
-      m.bank = { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
+      m.bank = {
+        inventory: [],
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        unlockedSockets: 0,
+        socketBags: [null, null, null, null],
+        appliedStorageKeys: [],
+      };
       m.copper = 0;
       sim.drainEvents();
       sim.addItem('wolf_fang', 12);
@@ -1091,8 +1342,18 @@ describe('persistence and back-compat', () => {
       pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy as never });
     }).not.toThrow();
     const m2 = meta(sim2, pid);
-    expect(m2.bank).toEqual({ inventory: [], purchasedSlots: 0, bonusSlots: 0 });
+    expect(m2.bank).toEqual({
+      inventory: [],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
+    });
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
+    // The zero-socket save deliberately OMITS the socket keys (the
+    // SavedBankState omission idiom), so a legacy character's save stays
+    // byte-equal to what it was before sockets existed.
     expect(sim2.serializeCharacter(pid)!.bank).toEqual({
       inventory: [],
       purchasedSlots: 0,
@@ -1164,13 +1425,23 @@ describe('persistence and back-compat', () => {
       ],
       purchasedSlots: 6,
       bonusSlots: 0,
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
     });
   });
 });
 
 // ---------------------------------------------------------------------------
 describe('sanitizeBankState', () => {
-  const EMPTY: BankState = { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
+  const EMPTY: BankState = {
+    inventory: [],
+    purchasedSlots: 0,
+    bonusSlots: 0,
+    unlockedSockets: 0,
+    socketBags: [null, null, null, null],
+    appliedStorageKeys: [],
+  };
 
   it('defaults a missing or non-object raw to an empty bank', () => {
     expect(sanitizeBankState(undefined)).toEqual(EMPTY);
@@ -1747,7 +2018,7 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
       },
     ];
     const dest: import('../src/sim/types').InvSlot[] = [];
-    const r = moveBetweenContainers(source, 0, undefined, dest, 24);
+    const r = moveBetweenContainers(source, 0, undefined, dest, { general: 24, materials: 0 });
     expect(r.moved).toBe(1);
     expect(dest[0]).toEqual({
       itemId: 'eastbrook_arming_sword',
@@ -1757,7 +2028,7 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
     });
     // And back out, still intact.
     const home: import('../src/sim/types').InvSlot[] = [];
-    const r2 = moveBetweenContainers(dest, 0, undefined, home, 24);
+    const r2 = moveBetweenContainers(dest, 0, undefined, home, { general: 24, materials: 0 });
     expect(r2.moved).toBe(1);
     expect(home[0]?.craftedRecipeId).toBe('recipe_eastbrook_arming_sword');
     // The merge predicate still separates marked from unmarked: an unmarked
@@ -1765,7 +2036,7 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
     const mixed: import('../src/sim/types').InvSlot[] = [
       { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
     ];
-    const r3 = moveBetweenContainers(home, 0, undefined, mixed, 24);
+    const r3 = moveBetweenContainers(home, 0, undefined, mixed, { general: 24, materials: 0 });
     expect(r3.moved).toBe(1);
     expect(mixed).toHaveLength(2);
     // Existence arm: the fixture pair is real shipped content, so a rename
@@ -1789,8 +2060,192 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
         craftedRecipeId: 'recipe_eastbrook_arming_sword',
       },
     ];
-    const r = moveBetweenContainers(source, 0, undefined, dest, 1); // capacity 1: full
-    expect(r).toEqual({ moved: 0, refusal: 'no_fit' });
+    // capacity 1: full
+    const r = moveBetweenContainers(source, 0, undefined, dest, { general: 1, materials: 0 });
+    expect(r).toEqual({ moved: 0, refusal: 'no_fit', noFitCause: 'space' });
     expect(source).toHaveLength(1); // all-or-nothing: nothing moved
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The always-available ladder read (Bank Storage phase 15, ruling 17). The
+// Strongbox store opens anywhere in the world and gates its charter list on the
+// character's ladder position, while bankInfo is null away from a bursar. These
+// arms pin the read that closes that gap AND the one property the store's fit
+// gate is only safe under: for as long as one character stays resident the count never goes down.
+// ---------------------------------------------------------------------------
+describe('bankPurchasedSlotsFor: the ladder read with no proximity gate', () => {
+  it('answers away from every banker, in the exact state where bankInfo is null', () => {
+    const sim = makeSim();
+    meta(sim).copper = 500; // the first rung, to a literal
+    sim.bankBuySlots();
+    expect(meta(sim).bank.purchasedSlots).toBe(6);
+    moveFarFromBankers(sim);
+    // The blindness ruling 17 records...
+    expect(sim.bankInfo).toBeNull();
+    // ...and the read that closes it, from the same position.
+    expect(sim.bankPurchasedSlots).toBe(6);
+    expect(bankPurchasedSlotsFor(sim.ctx, sim.playerId)).toBe(6);
+  });
+
+  it('reads null (never 0) for a pid that resolves to no player', () => {
+    const world = makeBankWorld();
+    expect(bankPurchasedSlotsFor(world.ctx, 999_999)).toBeNull();
+    // The offline IWorld getter takes the same null on a world with no primary
+    // player. Coercing either to 0 would advertise the whole ladder as free room.
+    expect(world.bankPurchasedSlots).toBeNull();
+  });
+
+  it('tracks a second character independently, never the first', () => {
+    const world = makeBankWorld();
+    const a = world.addPlayer('warrior', 'Ladderowner');
+    const b = world.addPlayer('warrior', 'Ladderpeer');
+    moveToBanker(world, a);
+    world.meta(a)!.copper = 1_500;
+    world.bankBuySlots(a);
+    world.bankBuySlots(a);
+    expect(bankPurchasedSlotsFor(world.ctx, a)).toBe(12);
+    expect(bankPurchasedSlotsFor(world.ctx, b)).toBe(0);
+  });
+
+  it('every storage grant stays on the 6-slot grid the LOAD CLAMP floors to', () => {
+    // The clamp in sanitizeBankState does
+    // `purchasedSlots -= purchasedSlots % BANK_EXPANSION_SLOTS`, and it "cannot
+    // lower a legitimate value" only while every legitimate value is a multiple
+    // of the block size. Today they all are (the gold rung adds exactly one
+    // block, and every charter grant is 6, 12, 24, 48 or 72), but NOTHING
+    // enforced it: a future charter granting, say, 10 slots would make the next
+    // join silently drop four of them, which is a capacity loss AND a break of
+    // the monotonicity the store's whole fit gate rests on. Found in Phase 15 QA
+    // by a parity reviewer reading the clamp rather than the comment.
+    const offGrid = Object.values(STORAGE_SKUS)
+      .filter((sku) => sku.grantSlots % BANK_EXPANSION_SLOTS !== 0)
+      .map((sku) => `${sku.id} grants ${sku.grantSlots}`);
+    expect(
+      offGrid,
+      `a storage grant is not a multiple of BANK_EXPANSION_SLOTS (${BANK_EXPANSION_SLOTS}). sanitizeBankState floors the loaded count onto that grid, so the remainder is lost at the next join:\n${offGrid.join('\n')}`,
+    ).toEqual([]);
+    // Non-vacuous: there really are grants to check, and the smallest is one block.
+    expect(Object.keys(STORAGE_SKUS).length).toBeGreaterThan(4);
+    expect(Math.min(...Object.values(STORAGE_SKUS).map((s) => s.grantSlots))).toBe(
+      BANK_EXPANSION_SLOTS,
+    );
+  });
+
+  it('only ever GROWS across the whole write surface, for as long as one character is resident', () => {
+    // Ruling 21's safety argument in executable form. A stale fit gate is only
+    // harmless while the count cannot go DOWN: a low reading offers a charter
+    // the server refuses (no money moves), a high reading would HIDE capacity
+    // the player really has. So drive every command that touches the bank, plus
+    // a grant, a refused grant and a save/load round trip, and watch the number.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const samples: number[] = [];
+    const sample = () => {
+      const v = bankPurchasedSlotsFor(sim.ctx, pid);
+      if (v === null) throw new Error('the ladder read went null mid-session');
+      samples.push(v);
+    };
+    meta(sim).copper = LADDER_TOTAL + 10_000_000;
+    sim.addItem('wolf_fang', 5, pid);
+    sim.addItem('linen_pouch', 1, pid);
+    sample();
+    // Item movement must not touch the ladder at all. Every bystander below is
+    // ASSERTED to have actually landed: all of them are proximity- and
+    // cost-gated, and a silently refused command cannot move the counter either,
+    // so without these the claim degrades to "a no-op did not touch it".
+    sim.bankDeposit(
+      meta(sim).inventory.findIndex((s) => s?.itemId === 'wolf_fang'),
+      2,
+      pid,
+    );
+    expect(sim.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    sample();
+    sim.bankWithdraw(0, 1, pid);
+    expect(sim.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
+    sample();
+    // The socket tier is a SEPARATE ladder; neither the unlock nor the bag may
+    // move this counter (it is stamped as the slot-ladder bystander in the
+    // ledger for exactly this reason).
+    sim.bankUnlockSocket(pid);
+    expect(sim.bankInfo?.socketsUnlocked).toBe(1);
+    sample();
+    sim.bankSocketBag('linen_pouch', undefined, pid);
+    expect(sim.bankInfo?.socketBags[0]).toBe('linen_pouch');
+    sample();
+    sim.bankUnsocketBag(0, pid);
+    expect(sim.bankInfo?.socketBags[0]).toBeNull();
+    sample();
+    // The two real writers.
+    for (let i = 0; i < 4; i++) {
+      sim.bankBuySlots(pid);
+      sample();
+    }
+    expect(bankGrantStorageSlots(sim.ctx, pid, 'strongbox_charter_1', 'grow-a').status).toBe(
+      'applied',
+    );
+    sample();
+    // A refused grant, a dry run, and a replayed key each leave it alone.
+    expect(bankGrantStorageSlots(sim.ctx, pid, 'strongbox_charter_1', 'grow-a').status).toBe(
+      'already_applied',
+    );
+    sample();
+    expect(bankGrantStorageSlots(sim.ctx, pid, 'strongbox_charter_complete', 'grow-b').status).toBe(
+      'does_not_fit',
+    );
+    sample();
+    expect(
+      bankGrantStorageSlots(sim.ctx, pid, 'strongbox_rung_01', 'grow-c', { dryRun: true }).status,
+    ).toBe('not_next_rung');
+    sample();
+    // The third writer is the LOAD path, which runs at join before any reader
+    // exists. Round-tripping the save must not lower the answer either, and the
+    // round trip is taken at the REAL ceiling as well as mid-ladder: the clamp
+    // that could lower a legitimate value only bites at the top, so a mid-ladder
+    // round trip alone would never reach it.
+    const roundTrip = (state: BankState) =>
+      sanitizeBankState(JSON.parse(JSON.stringify(savedBankState(state))), 'Ladderowner', [], pid);
+    meta(sim).bank = roundTrip(meta(sim).bank);
+    sample();
+    for (let i = 0; i < 6; i++) sim.bankBuySlots(pid);
+    expect(bankPurchasedSlotsFor(sim.ctx, pid)).toBe(72); // the ladder ceiling, REACHED
+    sample();
+    meta(sim).bank = roundTrip(meta(sim).bank);
+    sample();
+
+    // NON-DECREASING, and the sequence must actually have MOVED: a pin over a
+    // constant zero would pass whatever the writers did.
+    for (let i = 1; i < samples.length; i++) {
+      expect(samples[i], `sample ${i} went down: ${samples.join(',')}`).toBeGreaterThanOrEqual(
+        samples[i - 1],
+      );
+    }
+    expect(samples[0]).toBe(0);
+    // 4 copper rungs (24) + the 12-slot charter (36), then 6 more rungs to the
+    // ceiling, which a load round trip must NOT clamp away.
+    expect(samples.at(-1)).toBe(72);
+    expect(new Set(samples).size).toBeGreaterThan(1);
+  });
+});
+
+describe('applyBankBonusStamp: the one writer of the host-stamped bonus', () => {
+  it('clamps to the registry ceiling and CLONES the breakdown rows', () => {
+    const target = { bank: { bonusSlots: 0 } as BankState, bankBonusSources: [] as never[] };
+    const sources = [{ id: 'email', slots: 2, maxSlots: 2 }];
+    applyBankBonusStamp(target as never, { bonusSlots: 999, sources });
+    expect(target.bank.bonusSlots).toBe(BANK_MAX_BONUS_SLOTS);
+    // A clone, not the caller's array: mutating the source afterwards must not
+    // reach the character (the write-boundary rule that moved here with it).
+    sources[0].slots = 99;
+    expect((target.bankBonusSources as unknown as { slots: number }[])[0].slots).toBe(2);
+  });
+
+  it('is what addPlayer stamps with, so a joined character carries the clamp', () => {
+    const world = makeBankWorld();
+    const pid = world.addPlayer('warrior', 'Bonusrider', {
+      bankBonus: { bonusSlots: 40, sources: [{ id: 'discord', slots: 2, maxSlots: 2 }] },
+    });
+    expect(world.meta(pid)!.bank.bonusSlots).toBe(BANK_MAX_BONUS_SLOTS);
+    expect(world.meta(pid)!.bankBonusSources).toEqual([{ id: 'discord', slots: 2, maxSlots: 2 }]);
   });
 });

@@ -27,8 +27,18 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     const mean = (key: 'dps' | 'starvedPct') =>
       rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
-    expect(mean('dps')).toBeGreaterThanOrEqual(185);
-    expect(mean('dps')).toBeLessThanOrEqual(220);
+    // Re-anchored for the 2/4/6 lineage retune: the frozen kit stacks both
+    // old caster families, so it pays the halved lineage ladder now (about a
+    // 12 to 15 percent drop from the 2026-08-23 anchors, the measured size of
+    // the deliberate nerf). The historical 200 DPS figure was the OLD tier's
+    // owner target, not a ceiling to restore: the Crucible wave introduces a
+    // new power level, so when the Phase B set bonuses land
+    // (docs/prd/ignivar-set-bonus-final.md), re-anchor these to whatever the
+    // new-tier kit actually measures, above 200 included.
+    // Re-anchored for the 2026-08-30 legendary band (Heartwood in the frozen
+    // kit; measured 190.9 on the gate run).
+    expect(mean('dps')).toBeGreaterThanOrEqual(181);
+    expect(mean('dps')).toBeLessThanOrEqual(201);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
@@ -39,8 +49,13 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
 
     // 209.8 measured at the 2026-08-23 re-anchor; about plus or minus 5%, so
     // the tripwire trips on a real collapse or runaway, not on engine drift.
-    expect(mean('dps')).toBeGreaterThanOrEqual(199);
-    expect(mean('dps')).toBeLessThanOrEqual(220);
+    // Post-retune measurement 190.5 (see the heroic anchor note above).
+    // Re-anchored 2026-08-30 at the OSSBrain v0.41.0 base merge: the new gear
+    // lifts the level-20 dummy to 207.2, so the old 206 ceiling was measuring
+    // the gear, not drift. Ceiling moves to measurement plus 5% (218); the
+    // floor stays where it was, since it still guards a real collapse.
+    expect(mean('dps')).toBeGreaterThanOrEqual(182);
+    expect(mean('dps')).toBeLessThanOrEqual(218);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

@@ -158,8 +158,9 @@ describe('foliage ghost prewarm wiring (source pins)', () => {
     );
     expect(foliage).toContain('drawPaths.push(draw.path);');
     expect(foliage).toContain('drawSources.set(foliageProgramKey(draw.path), {');
-    expect(foliage).toContain(
-      'for (const t of trees) for (const part of t.parts) yield part.mesh;',
-    );
+    // The hideable registry itself lives beside the tree fade (tree_hide_fade.ts).
+    expect(
+      readFileSync(new URL('../src/render/tree_hide_fade.ts', import.meta.url), 'utf8'),
+    ).toContain('for (const t of trees) for (const part of t.parts) yield part.mesh;');
   });
 });

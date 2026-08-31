@@ -55,6 +55,12 @@ export function checkRouteCompleteness(routes: RouteDef[]): CompletenessIssue[] 
  * Enforce the :id requireOwned presence rule. For each route with a `:param`
  * segment:
  *  - surface 'admin' is operator territory: exempt (no requireOwned required).
+ *  - surface 'internal' is secret-gated operator territory too (no account
+ *    bearer exists to own anything): exempt for the same reason. Residual:
+ *    the ownership sweep proves every /internal route rides a secret gate,
+ *    not that an account-scoped :id under /internal is owner-checked, so a
+ *    future /internal/accounts/:id route would pass both guards; such a
+ *    route should not exist (account data belongs on the api surface).
  *  - meta.publicRead marks an intentional no-owner public read: exempt.
  *  - otherwise it is account territory: it MUST carry meta.requireOwned. An
  *    operator-scoped requireOwned exempts it from the missing-loader clause but
@@ -69,10 +75,15 @@ export function checkRequireOwnedCoverage(routes: RouteDef[]): CoverageIssue[] {
 
     const requireOwned = route?.meta?.requireOwned;
     const isAdminSurface = route?.surface === 'admin';
+    const isInternalSurface = route?.surface === 'internal';
     const isPublicRead = route?.meta?.publicRead === true;
-    // Operator-scoped and explicitly-public routes are exempt from the missing clause.
+    // Operator-scoped (admin session or internal secret) and explicitly-public
+    // routes are exempt from the missing clause.
     const exemptFromMissing =
-      isAdminSurface || isPublicRead || requireOwned?.ownerScope === 'operator';
+      isAdminSurface ||
+      isInternalSurface ||
+      isPublicRead ||
+      requireOwned?.ownerScope === 'operator';
 
     if (!exemptFromMissing && !requireOwned) {
       issues.push({ path, method, problem: 'missing-require-owned' });

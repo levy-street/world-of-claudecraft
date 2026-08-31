@@ -18,7 +18,7 @@ import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { abilityEffectText } from '../src/ui/ability_description';
 
-const NO_SCALING = { spellPower: 0, rangedPower: 0, attackPower: 0 };
+const NO_SCALING = { spellPower: 0, healPower: 0, rangedPower: 0, attackPower: 0 };
 
 describe('Bleed Out and Bloodrift tooltips: $d shows the full five-point spend', () => {
   it('Bleed Out renders its 5-combo total (96), not a bare 0-combo base', () => {

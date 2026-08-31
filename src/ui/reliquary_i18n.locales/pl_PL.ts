@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Pierścienie Szczeliny',
     desc: 'Osobiste pierścienie Szczeliny, bite dla każdego czempiona w drużynie, która zdobędzie pierwsze przejście rankingowej Szczeliny. Każda postać może mieć tylko własny.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Epickie łupy od Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroiczny: Crucible of the Last Spring',
+    desc: 'Bronie dostępne wyłącznie heroicznie od Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Epickie łupy od Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroiczny: The Inner Crucible',
+    desc: 'Tarcze i bronie dostępne wyłącznie heroicznie od Varkhul, Forgefather of the Last Flame.',
+  },
 };

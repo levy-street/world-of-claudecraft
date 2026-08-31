@@ -36,6 +36,7 @@ import { aurasSurvivingCleanSlate, SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../spirit';
+import { settleTeleportArrival } from '../teleport_arrival';
 import {
   type ArenaCombatant,
   type ArenaFormat,
@@ -1031,6 +1032,7 @@ export function placeInArena(
   e.facing = spawn.facing;
   e.prevFacing = spawn.facing;
   ctx.rebucket(e);
+  settleTeleportArrival(e);
 }
 
 export function placeTeamInArena(

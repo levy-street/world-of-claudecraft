@@ -30,7 +30,11 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
-import { BEACON_HEAL_FRACTION, BEACON_OF_LIGHT_NAME, beaconTransferTarget } from './paladin_beacon';
+import {
+  BEACON_OF_LIGHT_NAME,
+  beaconTransferFraction,
+  beaconTransferTarget,
+} from './paladin_beacon';
 import { paladinHealingDoneMultiplier } from './paladin_support';
 import { onSpellCrit } from './talent_procs';
 
@@ -179,7 +183,11 @@ function applyBeaconTransfer(
   const beacon = beaconTransferTarget(ctx, source, healedTarget);
   if (!beacon) return;
 
-  let healed = Math.round(effectiveHeal * BEACON_HEAL_FRACTION * healingTakenMult(ctx, beacon));
+  // The fraction reads from the PLACED beacon aura (Dawnforged 2pc bakes the
+  // wearer's 0.55 there at placement), so this arithmetic and the aura value
+  // are always the same number.
+  const fraction = beaconTransferFraction(beacon, source.id);
+  let healed = Math.round(effectiveHeal * fraction * healingTakenMult(ctx, beacon));
   healed = consumeHealAbsorb(ctx, beacon, healed);
   const intended = healed;
   healed = Math.min(healed, beacon.maxHp - beacon.hp);

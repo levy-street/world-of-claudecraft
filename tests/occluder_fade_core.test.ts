@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   OCCLUDER_FADE_ALPHA,
+  OCCLUDER_FADE_PREFETCH_YD,
   occluderFadeSettled,
+  occluderKeepsInstances,
   occluderSegmentHitsBox,
   occluderSegmentHitsObb,
   stepOccluderFade,
+  withinOccluderFadePrefetch,
 } from '../src/render/occluder_fade_core';
 
 const DT = 1 / 60;
@@ -155,5 +158,51 @@ describe('occluderSegmentHitsObb', () => {
     expect(hitsFrom(-1.05)).toBe(false);
     // Backed off a couple of units, the same approach hits normally.
     expect(hitsFrom(-3)).toBe(true);
+  });
+});
+
+describe('occluder fade prefetch reach', () => {
+  it('is the literal reach, inclusive at the boundary, on the XZ distance', () => {
+    expect(OCCLUDER_FADE_PREFETCH_YD).toBe(60);
+    expect(withinOccluderFadePrefetch(0, 0, 0, 59.9)).toBe(true);
+    expect(withinOccluderFadePrefetch(0, 0, 0, 60)).toBe(true);
+    expect(withinOccluderFadePrefetch(0, 0, 0, 60.1)).toBe(false);
+    expect(withinOccluderFadePrefetch(60.1, 0, 0, 0)).toBe(false);
+    // Both axes count: 50 on each is 70.7 apart.
+    expect(withinOccluderFadePrefetch(50, 50, 0, 0)).toBe(false);
+    expect(withinOccluderFadePrefetch(40, 40, 0, 0)).toBe(true);
+    // Camera-relative, not origin-relative.
+    expect(withinOccluderFadePrefetch(1000, 1000, 1010, 990)).toBe(true);
+  });
+});
+
+describe('occluderKeepsInstances', () => {
+  const pool = (ready: boolean, log: string[] = []) => ({
+    allReady(parts: string): boolean {
+      log.push(parts);
+      return ready;
+    },
+  });
+
+  it('keeps the instances unless the tree occludes AND its ghost programs are ready', () => {
+    expect(occluderKeepsInstances(false, false, pool(true), 'p')).toBe(true);
+    expect(occluderKeepsInstances(false, false, pool(false), 'p')).toBe(true);
+    expect(occluderKeepsInstances(true, false, pool(false), 'p')).toBe(true);
+    expect(occluderKeepsInstances(true, false, pool(true), 'p')).toBe(false);
+    // Already ghosted: the fade owns the swap back, never this predicate.
+    expect(occluderKeepsInstances(true, true, pool(true), 'p')).toBe(false);
+    expect(occluderKeepsInstances(false, true, pool(true), 'p')).toBe(false);
+    expect(occluderKeepsInstances(false, true, pool(false), 'p')).toBe(false);
+  });
+
+  it('consults the pool only for an occluding, not-yet-ghosted tree (a consult requests a compile)', () => {
+    const log: string[] = [];
+    const ghosts = pool(true, log);
+    occluderKeepsInstances(false, false, ghosts, 'idle');
+    occluderKeepsInstances(false, true, ghosts, 'ghosted-clear');
+    occluderKeepsInstances(true, true, ghosts, 'ghosted-occluding');
+    expect(log).toEqual([]);
+    occluderKeepsInstances(true, false, ghosts, 'edge');
+    expect(log).toEqual(['edge']);
   });
 });

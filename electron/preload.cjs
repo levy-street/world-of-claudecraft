@@ -118,6 +118,9 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   // a click whose ticket can never exist.
   steamLinkSupported: () => ipcRenderer.invoke('desktop-steam-capability'),
   walletConnectionSupported: () => ipcRenderer.invoke('desktop-wallet-capability'),
+  // Whether the $WOC Exchange may attach in this shell (website distribution
+  // only; Steam and Epic builds answer false and get no Exchange UI at all).
+  wocExchangeSupported: () => ipcRenderer.invoke('desktop-exchange-capability'),
   // Signal that a link attempt has settled (the server verify resolved or
   // rejected) so the shell can cancel the Steam auth ticket (Valve's
   // CancelAuthTicket contract). Fire-and-forget; the main handler is idempotent.

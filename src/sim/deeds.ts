@@ -135,7 +135,7 @@ export const DEEDS_RECENT_CAP = 8;
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
 // counter. PINNED as of v1: a future dungeon's boss gets a new deed; this
 // list never grows an earned requirement.
-const FINAL_BOSS_DUNGEONS: Record<string, string> = {
+export const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   morthen: 'hollow_crypt',
   vael_the_mistcaller: 'sunken_bastion',
   ysolei: 'drowned_temple',
@@ -144,16 +144,24 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   // Without this entry Zulgar kills write no dungeonClears record, so the
   // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
   wildheart_high_priest: 'wildheart_basin',
+  // The Crucible of the Last Spring raid credits per boss room: each raid
+  // room is its own dungeon id, and each boss dies through the generic
+  // kill-credit path (no bespoke lockout roster yet; the launch pass owns
+  // that), so the eligible snapshot (downed members included) is the
+  // recipient set, the wildheart precedent.
+  ignivar_herald_of_the_last_flame: 'ignivar_raid_arena',
+  varkhul_forgefather_of_the_last_flame: 'ignivar_inner_crucible',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
 // while the boss is engaged. Tainted by onPlayerDeathForDeeds; the window
 // re-arms on evade/reset/respawn (resetDeedEncounter).
-const FLAWLESS_TASKS: Record<string, string> = {
+export const FLAWLESS_TASKS: Record<string, string> = {
   morthen: 'dgn_morthen_flawless',
   ysolei: 'dgn_ysolei_flawless',
   korzul_the_gravewyrm: 'dgn_korzul_flawless',
   nythraxis_scourge_of_thornpeak: 'dgn_nythraxis_deathless',
+  varkhul_forgefather_of_the_last_flame: 'dgn_varkhul_flawless',
 };
 
 // Kill-order tasks: at boss death, every add it summoned this attempt is dead.
@@ -363,7 +371,10 @@ export function restoreDeedStats(saved: SavedDeedStats | undefined): DeedStats {
   // Bounded on load exactly like the write sites: only real item ids enter
   // itemsDiscovered, and only marks in an authored namespace enter visited,
   // so a hand-edited save cannot grow either set unboundedly.
-  for (const id of saved.itemsDiscovered ?? []) if (ITEMS[id]) stats.itemsDiscovered.add(id);
+  // hasOwn for the same reason as markItemDiscovered: a prototype-named id in
+  // a tampered save indexes an inherited value and must not restore as real.
+  for (const id of saved.itemsDiscovered ?? [])
+    if (Object.hasOwn(ITEMS, id)) stats.itemsDiscovered.add(id);
   for (const mark of saved.visited ?? []) {
     if (typeof mark !== 'string') continue;
     const ns = mark.slice(0, mark.indexOf(':'));
@@ -586,7 +597,10 @@ export function markItemDiscovered(
   for (let depth = 0; id !== undefined && depth < 3; depth++) {
     // Annotated: indexing by the reassigned `id` would otherwise circularly
     // infer through def.heroicOf (TS7022).
-    const def: ItemDef | undefined = ITEMS[id];
+    // hasOwn, not truthiness: ITEMS carries Object.prototype, so a tampered
+    // container key like '__proto__' or 'toString' indexes an inherited value
+    // and would otherwise enter the PERSISTED discovery ledger as a real id.
+    const def: ItemDef | undefined = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
     if (!def) return; // bounded by construction: only real item ids enter the set
     if (!meta.deedStats.itemsDiscovered.has(id)) {
       meta.deedStats.itemsDiscovered.add(id);
@@ -758,6 +772,7 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
+  bankSocketsUnlocked: [],
   townFocusPoints: [],
   delveLoreCount: [],
   companionRankBest: [],
@@ -868,6 +883,7 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
+  bankSocketsUnlocked: (m) => m.bank.unlockedSockets,
   townFocusPoints: (m) => {
     // Allocation-free sum (tick-tail predicate: no Object.values array).
     let n = 0;
@@ -1202,9 +1218,10 @@ export function recomputeRenown(meta: PlayerMeta): void {
 const RETRO_SEED = { retro: true } as const;
 
 /** Seed the discovery ledger from what the character already holds (bags,
- *  bank, equipment, and the vendor buyback list, whose entries were all once
- *  possessed), so veterans keep credit for what they still own. Runs on
- *  every join; the set only grows, so re-seeding is idempotent.
+ *  bank, the Materials Vault, equipment, and the vendor buyback list, whose
+ *  entries were all once possessed), so veterans keep credit for what they
+ *  still own. Runs on every join; the set only grows, so re-seeding is
+ *  idempotent.
  *
  *  Every call here is RETRO: the character already owned these before the
  *  join, so the Reliquary fills silently (no recent push, no invented clear
@@ -1226,10 +1243,30 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.bank.inventory) {
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
-  for (const [slot, itemId] of Object.entries(meta.equipment) as [
-    EquipSlot,
-    string | undefined,
-  ][]) {
+  // Ordinary vault stock carries no instance quality. Sorted: stock is
+  // persisted as an object keyed by item id and Postgres jsonb re-orders object
+  // keys, so the raw walk order differs between a server-loaded and an offline
+  // character. The PERSISTED itemsDiscovered array is already host-identical
+  // (serializeDeedStats sorts on the way out); this protects the LIVE Set order
+  // that rides the dstats self wire.
+  for (const itemId of Object.keys(meta.vault.stock).sort()) {
+    markItemDiscovered(ctx, meta, itemId, undefined, RETRO_SEED);
+  }
+  // Identity-preserving vault rows retain rolled quality. Sort on every field
+  // that can affect the discovery marks, rather than on JSON serialization
+  // whose nested key order differs after a Postgres jsonb round trip.
+  for (const slot of [...meta.vault.special].sort((a, b) => {
+    const ak = `${a.itemId}\u0000${a.instance?.rolled?.quality ?? ''}\u0000${a.craftedRecipeId ?? ''}`;
+    const bk = `${b.itemId}\u0000${b.instance?.rolled?.quality ?? ''}\u0000${b.craftedRecipeId ?? ''}`;
+    return ak < bk ? -1 : ak > bk ? 1 : 0;
+  })) {
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
+  }
+  // Sorted for the same reason: meta.equipment is rebuilt by spreading the save
+  // blob, so its key order is jsonb-hostage too.
+  for (const [slot, itemId] of (
+    Object.entries(meta.equipment) as [EquipSlot, string | undefined][]
+  ).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) {
     if (itemId)
       markItemDiscovered(
         ctx,
@@ -1240,6 +1277,11 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
       );
   }
   for (const bagId of meta.bags) {
+    if (bagId) markItemDiscovered(ctx, meta, bagId, undefined, RETRO_SEED);
+  }
+  // Bank socket bags (phase 06): a persisted container position like the
+  // carried sockets above, so a bag parked in the bank still seeds discovery.
+  for (const bagId of meta.bank.socketBags) {
     if (bagId) markItemDiscovered(ctx, meta, bagId, undefined, RETRO_SEED);
   }
   for (const slot of meta.vendorBuyback) {

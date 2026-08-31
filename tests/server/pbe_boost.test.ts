@@ -33,12 +33,18 @@ import {
   NYTHRAXIS_ATTUNEMENT_QUESTS,
   pbeBoostEnabled,
   randomBoostName,
+  roleItemScore,
 } from '../../server/pbe_boost';
+import { bagCapacity, bagSlotsOf, stackSizeOf } from '../../src/sim/bags';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../../src/sim/content/ignivar_drops';
+import { ITEM_SETS } from '../../src/sim/content/item_sets';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
+import { bestKitBag } from '../../src/sim/dev_kit';
 import { canEquipItem, canEquipItemInSlot, isShieldItem } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
+import { materialItemIds } from '../../src/sim/material_ids';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
 import {
@@ -72,6 +78,21 @@ function lcg(seed: number): (maxExclusive: number) => number {
     s = (s * 1664525 + 1013904223) >>> 0;
     return Math.floor((s / 2 ** 32) * maxExclusive);
   };
+}
+
+/** Load a player's inventory to exactly `slots` occupied slots, using a single
+ *  material stacked out into full stacks. Materials pack into a materials-only
+ *  satchel's pool first (src/sim/bag_pools.ts), so a fill that stays inside the
+ *  summed budget is a LEGAL carried state rather than a tolerated
+ *  over-capacity hoard; the bag shrink guard reads the summed budget either
+ *  way. Self-checking: it pins the resulting slot count. */
+function fillInventorySlots(sim: Sim, pid: number, slots: number): void {
+  const materialId = [...materialItemIds()].filter((id) => ITEMS[id]).sort()[0];
+  const meta = sim.meta(pid)!;
+  const need = slots - meta.inventory.length;
+  expect(need, 'the fill target is above the starting inventory').toBeGreaterThan(0);
+  sim.addItem(materialId, need * stackSizeOf(ITEMS[materialId]), pid);
+  expect(meta.inventory.length, 'inventory filled to the target slot count').toBe(slots);
 }
 
 const ARMOR_SLOTS: EquipSlot[] = [
@@ -150,6 +171,30 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
     expect(heroicPicks, 'no heroic-pool item in any kit').toBeGreaterThan(0);
   });
 
+  it('the launched Varkhul legendaries join the kits; the placeholder set is empty', () => {
+    // The launch wiring made both legendaries real drops, so the old
+    // exclusion premise inverts: the emberward now legitimately argmaxes
+    // into the tank offhand it was once excluded from, and the empty
+    // placeholder set stays pinned so a future handover item must stage
+    // through it deliberately (eligibleForBoost keeps reading it).
+    expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
+    const prot = CLASS_ROLES.warrior.find((role) => role.tank);
+    expect(prot).toBeDefined();
+    const protKit = bisKitForRole('warrior', prot as BoostRole);
+    expect(protKit.offhand).toBe('varkhul_emberward');
+    // The forgebreaker stays out of the melee kits on score alone: the
+    // ilvl-35 Crucible two-handers out-budget the ilvl-33 legendary
+    // (the retired maul premise), proven live rather than assumed.
+    const ret = CLASS_ROLES.paladin.find((role) => role.melee && !role.tank);
+    expect(ret).toBeDefined();
+    const retKit = bisKitForRole('paladin', ret as BoostRole);
+    expect(retKit.mainhand).toBeTruthy();
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeGreaterThan(0);
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeLessThanOrEqual(
+      roleItemScore(ret as BoostRole, ITEMS[retKit.mainhand as string]),
+    );
+  });
+
   it('no role kit of any class contains a WARFARE piece', () => {
     for (const cls of BOOST_CLASSES) {
       for (const role of CLASS_ROLES[cls]) {
@@ -172,6 +217,10 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
           i.priceHonor === undefined &&
           canEquipItem(cls, i) &&
           (!i.requiredClass || i.requiredClass.includes(cls)) &&
+          // Mirrors eligibleForBoost's Phase A rule: a set piece whose set id
+          // is unregistered in ITEM_SETS has no bonuses yet and never counts
+          // as BiS (self-heals when the Crucible sets register).
+          (i.set === undefined || ITEM_SETS[i.set] !== undefined) &&
           meetsLevelRequirement(BOOST_LEVEL, i),
       );
       const best = Math.max(...candidates.map((i) => classItemScore(cls, i)));
@@ -299,6 +348,205 @@ describe('applyBoostKitToPlayer (world-join top-up)', () => {
     expect(sim.countItem(smaller!.id, pid), 'small bag kept in the pool').toBeGreaterThan(0);
   });
 
+  it('skips a socket already carrying a BIGGER bag, and grants no loose bag for it', () => {
+    // Phase 05 shipped materials-only satchels LARGER than the best general
+    // bag, so the boost bag is no longer the biggest bag in the game. Swapping
+    // a loaded satchel out for it shrinks the summed budget, which is exactly
+    // what equipBag's shrink guard refuses (src/sim/bags.ts): before the skip,
+    // the refused socket kept its old bag AND the granted boost bag was left
+    // loose in the pool, with the kit stamp written so it never retried.
+    const sim = new Sim({
+      seed: 53,
+      playerClass: 'warrior',
+      playerName: 'Satcheltester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(BOOST_LEVEL, pid);
+    const bagId = bestBoostBag();
+    const boostSlots = bagSlotsOf(ITEMS[bagId]);
+    const bigger = Object.values(ITEMS).find((i) => i.kind === 'bag' && bagSlotsOf(i) > boostSlots);
+    expect(bigger, 'a bag bigger than the boost bag exists in content').toBeDefined();
+    sim.addItem(bigger!.id, 1, pid);
+    sim.equipBag(bigger!.id, 0, pid);
+    const meta = sim.meta(pid)!;
+    expect(meta.bags[0]).toBe(bigger!.id);
+
+    // Load the inventory to exactly the shrink guard's refusal threshold. At
+    // socket 0 the other sockets are still empty, so the post-swap budget is
+    // the backpack plus the boost bag alone; equipBag refuses once the
+    // inventory is that long (`after = length - 1 + 1 > bagCapacity`).
+    const postSwapCapacity = bagCapacity([bagId, null, null, null]);
+    fillInventorySlots(sim, pid, postSwapCapacity);
+    // The starting state is LEGAL, not a tolerated over-capacity hoard: every
+    // filler is a material, so the satchel's materials pool absorbs them first
+    // and the total sits inside the summed budget of the bags actually worn.
+    expect(meta.inventory.length).toBeLessThanOrEqual(bagCapacity(meta.bags));
+
+    sim.drainEvents();
+    expect(applyBoostKitToPlayer(sim, pid), 'the top-up still applies').toBe(true);
+    // The satchel keeps its socket; the three empty sockets take the boost bag.
+    expect(meta.bags).toEqual([bigger!.id, bagId, bagId, bagId]);
+    // Decisive: the pre-fix bug left exactly one granted boost bag loose in the
+    // pool for the refused socket. Nothing loose, and the satchel was never
+    // displaced into the pool either.
+    expect(sim.countItem(bagId, pid), 'no loose boost bag in the pool').toBe(0);
+    expect(sim.countItem(bigger!.id, pid), 'the satchel stays socketed').toBe(0);
+    // The socket is SKIPPED, not attempted-then-cleaned-up: a refused swap
+    // would flash the shrink guard's error at a player who just logged in.
+    const events = sim.drainEvents();
+    const errors = events.filter((ev) => ev.type === 'error');
+    expect(errors, 'no refusal error surfaced during the top-up').toEqual([]);
+    // The SKIP is the thing under test, and the shrink guard's refusal is its
+    // only discriminator, so name that refusal here as well as covering it
+    // through the broad assertion above. If some unrelated boost error ever
+    // starts firing on this path, the broad assertion is the one that will be
+    // under pressure to weaken, and this line keeps the skip pinned when it is.
+    expect(
+      events.some(
+        (ev) => ev.type === 'error' && ev.text === 'You have too many items to swap to that bag.',
+      ),
+      'the shrink guard never refused: the socket was skipped, not attempted',
+    ).toBe(false);
+    // The rest of the kit still landed.
+    expect(meta.equipment.mainhand, 'kit equipped').toBe(bisKit('warrior').mainhand);
+    expect(meta.pbeBoostKit).toBe(BOOST_KIT_VERSION);
+  });
+
+  it('still upgrades a socket carrying a SMALLER general bag', () => {
+    const sim = new Sim({
+      seed: 59,
+      playerClass: 'priest',
+      playerName: 'Pouchtester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(BOOST_LEVEL, pid);
+    const bagId = bestBoostBag();
+    const boostSlots = bagSlotsOf(ITEMS[bagId]);
+    const smaller = Object.values(ITEMS).find(
+      (i) =>
+        i.kind === 'bag' &&
+        i.materialsOnly !== true &&
+        bagSlotsOf(i) > 0 &&
+        bagSlotsOf(i) < boostSlots,
+    );
+    expect(smaller, 'a smaller general bag exists in content').toBeDefined();
+    sim.addItem(smaller!.id, 1, pid);
+    sim.equipBag(smaller!.id, 1, pid);
+    const meta = sim.meta(pid)!;
+    expect(meta.bags[1]).toBe(smaller!.id);
+
+    expect(applyBoostKitToPlayer(sim, pid)).toBe(true);
+    expect(meta.bags).toEqual(Array(BOOST_BAG_SOCKETS).fill(bagId));
+    // The displaced pouch lands in the pool exactly once, and the four granted
+    // boost bags all went into sockets rather than leaving a loose copy.
+    expect(sim.countItem(smaller!.id, pid), 'the pouch is kept, never deleted').toBe(1);
+    expect(sim.countItem(bagId, pid), 'no loose boost bag in the pool').toBe(0);
+  });
+
+  it('leaves no loose bag when even a GROWING swap is refused (over-capacity legacy save)', () => {
+    // The skip above cannot cover everything: a socket holding a SMALLER bag is
+    // still attempted, and its swap grows the budget, yet an inventory longer
+    // than even the grown total (a pre-bag save that loaded overflowing) is
+    // refused all the same. The granted bag must come back out, or the same
+    // stray-bag defect returns through the other door.
+    const sim = new Sim({
+      seed: 61,
+      playerClass: 'hunter',
+      playerName: 'Legacytester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(BOOST_LEVEL, pid);
+    const bagId = bestBoostBag();
+    const boostSlots = bagSlotsOf(ITEMS[bagId]);
+    const smaller = Object.values(ITEMS).find(
+      (i) =>
+        i.kind === 'bag' &&
+        i.materialsOnly !== true &&
+        bagSlotsOf(i) > 0 &&
+        bagSlotsOf(i) < boostSlots,
+    );
+    expect(smaller, 'a smaller general bag exists in content').toBeDefined();
+    sim.addItem(smaller!.id, 1, pid);
+    sim.equipBag(smaller!.id, 0, pid);
+    const meta = sim.meta(pid)!;
+    fillInventorySlots(sim, pid, bagCapacity([bagId, null, null, null]));
+    // Deliberately over budget for the bags actually worn: the legacy shape
+    // this arm exists for.
+    expect(meta.inventory.length).toBeGreaterThan(bagCapacity(meta.bags));
+
+    expect(applyBoostKitToPlayer(sim, pid), 'the top-up still applies').toBe(true);
+    // Socket 0's swap was refused (it would still end above the grown budget),
+    // so the pouch stays; the empty sockets grow the budget and take the bag.
+    expect(meta.bags).toEqual([smaller!.id, bagId, bagId, bagId]);
+    expect(sim.countItem(bagId, pid), 'the refused grant was taken back out').toBe(0);
+  });
+
+  it('recovers the GRANTED copy, never a boost bag the player already carried', () => {
+    // The recovery above is coupled to the sim's LIFO removal walk: bags never
+    // stack, so addStacked pushes the granted copy as a fresh TAIL slot, and
+    // Sim.removeItem scans from the tail, which makes the copy taken back
+    // always the one just granted. A character who ALREADY carries a loose
+    // boost bag is the only fixture where that coupling is observable, and the
+    // one it breaks in: with the walk flipped, the recovery would eat the
+    // player's own bag and leave the refused grant standing in its place. This
+    // arm pins the coupling.
+    const sim = new Sim({
+      seed: 67,
+      playerClass: 'warlock',
+      playerName: 'Loosetester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(BOOST_LEVEL, pid);
+    const bagId = bestBoostBag();
+    const boostSlots = bagSlotsOf(ITEMS[bagId]);
+    const smaller = Object.values(ITEMS).find(
+      (i) =>
+        i.kind === 'bag' &&
+        i.materialsOnly !== true &&
+        bagSlotsOf(i) > 0 &&
+        bagSlotsOf(i) < boostSlots,
+    );
+    expect(smaller, 'a smaller general bag exists in content').toBeDefined();
+    sim.addItem(smaller!.id, 1, pid);
+    sim.equipBag(smaller!.id, 0, pid);
+    const meta = sim.meta(pid)!;
+    // The player's OWN loose boost bag, carried before the top-up runs.
+    sim.addItem(bagId, 1, pid);
+    // Hold the exact slot OBJECT it lives in: identity is what tells the two
+    // copies apart afterwards, since both are plain single-count slots of the
+    // same item and the count alone cannot say which one survived.
+    const looseSlot = meta.inventory[meta.inventory.length - 1];
+    expect(looseSlot.itemId, "the player's copy is the tail slot").toBe(bagId);
+    // Same over-capacity legacy shape as the arm above, so socket 0's growing
+    // swap is attempted and then refused.
+    fillInventorySlots(sim, pid, bagCapacity([bagId, null, null, null]));
+    expect(meta.inventory.length).toBeGreaterThan(bagCapacity(meta.bags));
+
+    sim.drainEvents();
+    expect(applyBoostKitToPlayer(sim, pid), 'the top-up still applies').toBe(true);
+    // Non-vacuous: socket 0 really was attempted and really was refused, so a
+    // granted copy really did land in the pool and need taking back. Without
+    // this the arm would pass trivially if the fixture ever stopped refusing.
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (ev) => ev.type === 'error' && ev.text === 'You have too many items to swap to that bag.',
+        ),
+      "socket 0's growing swap was attempted and refused",
+    ).toBe(true);
+    expect(meta.bags).toEqual([smaller!.id, bagId, bagId, bagId]);
+    expect(sim.countItem(bagId, pid), 'exactly one loose boost bag is left').toBe(1);
+    expect(
+      meta.inventory.includes(looseSlot),
+      "the survivor is the player's own slot, not the refused grant",
+    ).toBe(true);
+  });
+
   it('levels a low-level character to the boost level', () => {
     const sim = new Sim({
       seed: 47,
@@ -314,16 +562,35 @@ describe('applyBoostKitToPlayer (world-join top-up)', () => {
 });
 
 describe('bags, gold, and alternate role kits', () => {
-  it('equips the largest bag in the game in every bag socket', () => {
+  it('equips the largest GENERAL bag in the game in every bag socket', () => {
     const bagId = bestBoostBag();
-    const maxSlots = Math.max(
-      ...Object.values(ITEMS)
-        .filter((i) => i.kind === 'bag')
-        .map((b) => b.bagSlots ?? 0),
+    const generalBags = Object.values(ITEMS).filter(
+      (i) => i.kind === 'bag' && i.materialsOnly !== true,
     );
+    const maxSlots = Math.max(...generalBags.map((b) => b.bagSlots ?? 0));
     expect(ITEMS[bagId].bagSlots).toBe(maxSlots);
+    // The qualifier is load-bearing, not cosmetic. This one bag fills EVERY socket, and
+    // a materialsOnly bag feeds the materials pool instead of the general one
+    // (src/sim/bag_pools.ts), so picking the biggest bag outright would leave a boosted
+    // character with a bare backpack for their gear and four sockets of capacity that
+    // only raw materials may use. Assert the exclusion directly: a materials-only bag
+    // that is BIGGER than the winner must exist, or this arm proves nothing.
+    expect(ITEMS[bagId].materialsOnly).toBeUndefined();
+    const materialsOnly = Object.values(ITEMS).filter(
+      (i) => i.kind === 'bag' && i.materialsOnly === true,
+    );
+    expect(materialsOnly.length).toBeGreaterThan(0);
+    expect(Math.max(...materialsOnly.map((b) => b.bagSlots ?? 0))).toBeGreaterThan(maxSlots);
     const state = buildBoostedCharacterState('warrior', 'Pbetestbags', 0);
     expect(state.bags).toEqual(Array(BOOST_BAG_SOCKETS).fill(bagId));
+    // The tie is REAL (two general bags at the max since phase 05) and the
+    // winner is decided by the explicit ascending-id tie-break, never by
+    // content-table insertion order: pin the tie's existence, the exact
+    // winner, and that the dev kit's bestBy answers the SAME bag, so the two
+    // pickers can never silently disagree again.
+    expect(generalBags.filter((b) => (b.bagSlots ?? 0) === maxSlots).length).toBeGreaterThan(1);
+    expect(bagId).toBe('resonant_weave_bag');
+    expect(bestKitBag()?.id).toBe(bagId);
   });
 
   it('grants exactly 10 gold of pocket money on top of the attunement quest rewards', () => {

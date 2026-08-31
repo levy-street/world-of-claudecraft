@@ -40,10 +40,17 @@ export interface AnimState {
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** Engaged with someone right now: a standing body holds its rig's braced
+   *  battle stance instead of the relaxed idle (see desiredBaseState). Derived
+   *  from the mob's live aggro target, which both hosts carry, so peers brace
+   *  identically with no new wire traffic. Display-only; never gates gameplay. */
+  combat?: boolean;
 }
 
 export type BaseState =
   | 'idle'
+  /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
+  | 'combatIdle'
   | 'walk'
   | 'walkBack'
   | 'run'
@@ -238,6 +245,47 @@ export function waterContactFrameMode(
 }
 
 // ---------------------------------------------------------------------------
+// Cast hold + cast-exit play-out
+//
+// A generic cast clip shorter than its cast used to REPLAY from the top on
+// loop. Instead the clip plays ONCE up to its hold point (the held gesture:
+// arm up, pointing) and FREEZES there for as long as the cast channels; when
+// the cast ends, the remainder of the clip (the recovery back to stance)
+// plays out as a one-shot instead of being cut by the base-pose crossfade.
+
+export interface CastHoldStep {
+  paused: boolean;
+  /** when set, pin the action's time here (the exact hold frame) */
+  time?: number;
+}
+
+/** One frame of the pointing hold, pure: forward until the hold point, then
+ *  FROZEN exactly on it for as long as the cast channels. A hold point at or
+ *  past the clip end disables the freeze (the cast-exit play-out still covers
+ *  the recovery). */
+export function castHoldStep(time: number, holdPoint: number, duration: number): CastHoldStep {
+  if (!(holdPoint > 0) || holdPoint >= duration - 1e-3) return { paused: false };
+  if (time < holdPoint) return { paused: false };
+  return { paused: true, time: holdPoint };
+}
+
+/** Whether the cast clip driving the rig when its cast ended should FINISH
+ *  playing as a one-shot (the crash recovery, the pointing arm coming back
+ *  down) instead of being cut mid-pose by the base crossfade. Opt-in per
+ *  clip name: a seamless cadence loop (the Forgefather's decree Forging)
+ *  keeps its instant handoff. */
+export function shouldPlayOutCastExit(
+  playOutClips: readonly string[] | undefined,
+  clipName: string | null,
+  time: number,
+  duration: number,
+): boolean {
+  if (!playOutClips || clipName === null) return false;
+  if (!playOutClips.includes(clipName)) return false;
+  return time < duration - 1e-3;
+}
+
+// ---------------------------------------------------------------------------
 // Zero-weight watchdog
 //
 // A three.js SkinnedMesh renders BIND POSE (arms out: the T-pose) whenever the
@@ -345,6 +393,7 @@ export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,
   hasWadeClip = true,
+  hasCombatIdleClip = false,
 ): BaseState {
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
@@ -365,6 +414,13 @@ export function desiredBaseState(
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
     return s.running ? 'run' : 'walk';
   }
+  // Standing still. A body that is currently fighting someone holds its braced
+  // guard instead of dropping to the relaxed idle: between swings a warlord
+  // stays set, weight low and weapon up, and only stands down once the fight
+  // ends. Gated on the rig actually HAVING the loop, the same rule walkBack and
+  // wade follow: baseAction() falls back to idle for a rig without one, and the
+  // machine must not sit in a state nothing is playing.
+  if (s.combat && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
 

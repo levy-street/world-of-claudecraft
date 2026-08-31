@@ -199,7 +199,7 @@
      inline block is intentionally empty. */
 </style>
 </head>
-<body data-start-panel="mode-select">
+<body class="steam-wishlist-pending" data-start-panel="mode-select">
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
@@ -256,6 +256,8 @@
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
+        <div id="swingbar-target" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+        <div id="swingbar-tot" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
       <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
@@ -288,6 +290,7 @@
 
     <div id="castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.playerAria" aria-label="Your Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
     <div id="swingbar" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+    <div id="swingbar-offhand" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
 
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
@@ -330,18 +333,13 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.5 11.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm9 0a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM1.7 19.6c.5-3.6 2.6-5.5 5.8-5.5s5.3 1.9 5.8 5.5c.1.6-.4 1.1-1 1.1H2.7c-.6 0-1.1-.5-1-1.1Zm9.7-4.6c1.1-.7 2.8-.9 5.1-.9 3.2 0 5.3 1.9 5.8 5.5.1.6-.4 1.1-1 1.1h-6.6c-.3-2.3-1.4-4.2-3.3-5.7Z"/></svg>
         </summary>
         <div class="community-tray">
+          <a class="community-link steam-wishlist steam-wishlist-chip" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
+            <span data-i18n="hudChrome.steam.wishlist">Wishlist on Steam</span>
+          </a>
           <!-- No Discord link here: the in-game HUD's single Discord entry point is
                the Discord (U) icon-rail button (#mm-discord), which opens the richer
                account-linking/rank panel and (for an unlinked player) still offers a
                plain "join the server" action, so this tray does not duplicate it. -->
-          <a class="community-link github" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.githubProject" data-i18n-aria="a11y.githubProject" title="Open the World of ClaudeCraft GitHub project" aria-label="Open the World of ClaudeCraft GitHub project">
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-            <span>GitHub</span>
-          </a>
-          <a class="community-link donate" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            <span data-i18n="nav.donate">Donate</span>
-          </a>
         </div>
       </details>
     </nav>
@@ -359,7 +357,7 @@
         <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
         <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
         <div class="paladin-ascension-charges" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
       </div>
       <span class="visually-hidden" id="paladin-ascension-status" role="status" aria-live="polite"></span>
@@ -406,10 +404,12 @@
             </div>
           </div>
           <div id="stancebar"></div>
-          <div id="actionbar3" class="panel"></div>
-          <div id="actionbar2" class="panel"></div>
-          <div id="cross-hotbar" class="xhb" style="display: none"></div>
-          <div id="actionbar" class="panel"></div>
+          <div id="actionbar-group">
+            <div id="actionbar3" class="panel"></div>
+            <div id="actionbar2" class="panel"></div>
+            <div id="cross-hotbar" class="xhb" style="display: none"></div>
+            <div id="actionbar" class="panel"></div>
+          </div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
         </div>
         <div id="target-auras-window" class="panel mt-panel ta-panel" role="region" aria-labelledby="target-auras-title" style="display: none">
@@ -539,6 +539,7 @@
     </div>
     <div id="arena-window" class="window panel"></div>
     <div id="dungeon-finder-window" class="window panel"></div>
+    <div id="raid-boss-guide-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
     <div id="bg-proposal-popup" class="panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
@@ -757,6 +758,14 @@
             title="Exit Game"
             hidden
           >Exit Game</button>
+          <!-- The wishlist reminder (src/ui/steam_wishlist.ts owns the URL and the
+               suppression policy). Quiet by construction: it takes the ink-and-bronze
+               chrome of the surface it sits on rather than Steam's own blue, and only
+               the mark identifies the store. The glyph is hydrated from the single
+               registry entry in src/ui/ui_icons.ts, never a second copy of the path. -->
+          <a class="steam-wishlist steam-wishlist-cta" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
+            <span data-i18n="hudChrome.steam.wishlist">Wishlist on Steam</span>
+          </a>
           <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span data-i18n="nav.donate">Donate</span>
@@ -1357,19 +1366,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1582,6 +1591,9 @@
       <div class="footer-bar">
       <div class="footer-left">
       <div class="footer-social-row">
+        <a class="social-link steam-wishlist steam-wishlist-social" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
+          <span data-i18n="hudChrome.steam.wishlist">Wishlist on Steam</span>
+        </a>
         <a class="social-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.githubProject" aria-label="Open the World of ClaudeCraft GitHub project">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           <span data-i18n="footer.githubLabel">Open Source Project</span>
@@ -1595,7 +1607,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.40.0</div>
+      <div id="game-version">v0.41.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
@@ -1786,6 +1798,11 @@
           <button type="button" class="mobile-btn" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
           <button type="button" class="mobile-btn" id="mobile-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="mobile-label" data-i18n="hudChrome.discord.title">Discord</span></button>
           <button type="button" class="mobile-btn" id="mobile-donate" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft" data-icon="donate"><span class="mobile-label" data-i18n="nav.donate">Donate</span></button>
+          <!-- The tray entry is a plain link, not a wired button: it needs no client
+               state, so it stays consistent with the three other wishlist surfaces and
+               costs src/main.ts nothing. The caption is the short label; the full one
+               is the accessible name, since a 4-column 40px pill cannot hold it. -->
+          <a class="mobile-btn steam-wishlist" id="mobile-steam-wishlist" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page"><span class="mobile-label" data-i18n="hudChrome.steam.wishlistShort">Wishlist</span></a>
           <button type="button" class="mobile-btn" id="mobile-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"><span class="mobile-label" data-i18n="nav.wiki">Wiki</span></button>
           <button type="button" class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
           <button type="button" class="mobile-btn" id="mobile-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="mobile-label" data-i18n="hudChrome.pvp.mobileLabel">PvP</span></button>

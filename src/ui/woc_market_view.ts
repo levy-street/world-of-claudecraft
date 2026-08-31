@@ -394,6 +394,20 @@ export function browseQualityOptions(
 }
 
 /**
+ * The pending quote's own repaint key, at SECOND resolution like every other
+ * countdown in the view digest: the display has no finer grain, so a finer
+ * key would rebuild the window many times per second for a string that did
+ * not change. Empty when there is no deadline to count.
+ */
+export function wocQuoteCountdownSig(
+  expiresAtMs: number | null | undefined,
+  nowMs: number,
+): string {
+  if (expiresAtMs === undefined || expiresAtMs === null) return '';
+  return String(Math.max(0, Math.ceil((expiresAtMs - nowMs) / 1000)));
+}
+
+/**
  * Resolve the Browse item filter's free-text query to catalog item ids, the
  * sell combobox's matching rule (case-insensitive substring over the
  * localized display name).

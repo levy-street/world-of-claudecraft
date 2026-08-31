@@ -17,6 +17,11 @@ function runeCircleHarness() {
   const renderer = Object.create(Renderer.prototype) as EventHarness & Record<string, unknown>;
   renderer.warlockMeteorFx = {};
   renderer.abilityVfx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
+  // the Forgefather strike route reads sim.cfg.seed (and hands vfx along) on
+  // every spellfxAt before the runeCircle arm; a rune event never matches its
+  // gate, so empty stubs are enough
+  renderer.sim = { cfg: { seed: 42 } };
+  renderer.vfx = {};
   renderer.mageGroundFx = { spawnRune };
   return { harness: renderer as EventHarness, spawnRune };
 }

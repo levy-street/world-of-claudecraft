@@ -91,6 +91,12 @@ function harness(
   const attachTooltip = vi.fn();
   const centerPopup = vi.fn();
   const placePopup = vi.fn();
+  // The bind-on-pickup confirm: accept immediately by default so the existing
+  // Take Loot flows stay one-click in tests; assertions on the warning itself
+  // inspect the mock's calls.
+  const confirm = vi.fn(
+    (_title: string, _body: string, _ok: string, _cancel: string, onOk: () => void) => onOk(),
+  );
   const controller = new LootWindowController({
     element,
     document,
@@ -104,6 +110,7 @@ function harness(
     itemIcon: (item) => `<span data-icon="${item.id}"></span>`,
     itemTooltip: (item) => `tooltip:${item.id}`,
     attachTooltip,
+    confirm,
     centerPopup,
     placePopup,
   });
@@ -118,6 +125,7 @@ function harness(
     closeTransient,
     hideTooltip,
     attachTooltip,
+    confirm,
     centerPopup,
     placePopup,
   };
@@ -176,8 +184,60 @@ describe('LootWindowController', () => {
     takeLoot?.click();
 
     expect(test.lootCorpse).toHaveBeenCalledWith(10);
+    // An ordinary drop never triggers the bind-on-pickup confirm.
+    expect(test.confirm).not.toHaveBeenCalled();
     expect(test.element.style.display).toBe('none');
     expect(test.hideTooltip).toHaveBeenCalledTimes(1);
+  });
+
+  it('warns once via the shared confirm before taking loot that contains a soulbound item', () => {
+    const mob = entity(10, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: {
+        copper: 0,
+        // heroic_mark is a live soulbound def; picking it up binds it.
+        items: [{ itemId: 'heroic_mark', count: 1, personalFor: [7] }],
+      },
+    });
+    const test = harness([mob]);
+    test.controller.openCorpse(10, 400, 300);
+
+    const takeLoot = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
+    takeLoot?.click();
+
+    expect(test.confirm).toHaveBeenCalledTimes(1);
+    const [title, body, okText, cancelText] = test.confirm.mock.calls[0];
+    expect(title).toBe('Binds when picked up');
+    expect(body).toContain('bind to you when taken');
+    expect(body).toContain('players who shared its drop');
+    expect(okText).toBe('Take Loot');
+    expect(cancelText).toBe('Cancel');
+    // The harness confirm auto-accepts, so the take still lands.
+    expect(test.lootCorpse).toHaveBeenCalledWith(10);
+    expect(test.element.style.display).toBe('none');
+  });
+
+  it('a declined bind confirm leaves the corpse unlooted and the window open', () => {
+    const mob = entity(10, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: {
+        copper: 0,
+        items: [{ itemId: 'heroic_mark', count: 1, personalFor: [7] }],
+      },
+    });
+    const test = harness([mob]);
+    // Decline: never invoke onOk.
+    test.confirm.mockImplementation(() => {});
+    test.controller.openCorpse(10, 400, 300);
+
+    const takeLoot = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
+    takeLoot?.click();
+
+    expect(test.confirm).toHaveBeenCalledTimes(1);
+    expect(test.lootCorpse).not.toHaveBeenCalled();
+    expect(test.element.style.display).toBe('block');
   });
 
   it('renders an unknown-id drop as an occupied row instead of throwing (R34)', () => {

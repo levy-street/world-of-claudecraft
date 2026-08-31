@@ -33,7 +33,7 @@ const FILL = { id: 'fill' } as unknown as HTMLElement;
 const LABEL = { id: 'label' } as unknown as HTMLElement;
 const STATUS = { id: 'status' } as unknown as HTMLElement;
 const CHARGES = Array.from(
-  { length: 5 },
+  { length: 7 },
   (_, index) => ({ id: `charge-${index}` }) as unknown as HTMLElement,
 ) as unknown as HTMLCollection;
 
@@ -96,7 +96,40 @@ describe('PaladinDevotionPainter', () => {
       args: [FILL, '--devotion-scale', '0.300'],
     });
     expect(calls).toContainEqual({ method: 'toggleClass', args: [ROOT, 'ascended', true] });
-    expect(calls.slice(9).map((call) => call.args[2])).toEqual([true, true, true, false, false]);
+    expect(calls.slice(9).map((call) => call.args[2])).toEqual([
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+    ]);
+  });
+
+  it('lights all 7 charges once Extended Dawn raises the cap past the base 5', () => {
+    const calls = paint({
+      visible: true,
+      value: 0,
+      fillFrac: 0,
+      ready: false,
+      ascended: true,
+      charges: 7,
+      lastCharge: false,
+      label: '0 / 20',
+      ariaValueText: 'Devotion 0 of 20. Ascension 7 charges.',
+      announcement: '',
+    });
+
+    expect(calls.slice(9).map((call) => call.args[2])).toEqual([
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+    ]);
   });
 
   it('marks the final Ascension charge as a visual warning', () => {
@@ -165,6 +198,30 @@ describe('PaladinDevotionPainter', () => {
     expect(hud).not.toContain('devotionFrameMover');
     expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*cursor:\s*grab/);
     expect(css).toMatch(/\.paladin-devotion-frame\.dragging\s*\{[\s\S]*cursor:\s*grabbing/);
+  });
+
+  it('renders 7 charge pips so Extended Dawn (5 base + 2) can fully light up', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+    const mobileCss = readFileSync(
+      new URL('../src/styles/hud.mobile.css', import.meta.url),
+      'utf8',
+    );
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8');
+
+    for (const entry of [html, playHtml]) {
+      const block = entry.match(/class="paladin-ascension-charges"[\s\S]*?<\/div>/)?.[0] ?? '';
+      expect(block.match(/<span><\/span>/g)).toHaveLength(7);
+    }
+    expect(css).toMatch(/\.paladin-ascension-charges\s*\{[\s\S]*width:\s*94px/);
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.paladin-ascension-charges\s*\{[\s\S]*width:\s*78px/,
+    );
+    expect(tokensCss).toContain('--color-ascension-bonus');
+    expect(css).toMatch(
+      /\.paladin-ascension-charges span:nth-child\(n \+ 6\)\.on\s*\{[\s\S]*var\(--color-ascension-bonus\)/,
+    );
   });
 });
 

@@ -20,12 +20,52 @@ export function itemSetMemberCounts(): Record<string, number> {
     // A set's piece count is its number of distinct SLOTS: the normal item, its
     // auto-generated heroic variant, and any bespoke heroic raid piece for the same
     // slot are all one collectible piece (you wear one helmet). Keying on slot keeps
-    // the "X/N" denominator honest (e.g. the 4-slot t2 sets read /4, not an inflated
-    // count from the parallel heroic-variant ids).
+    // the "X/N" denominator honest, not an inflated count from the parallel
+    // heroic-variant ids.
     members.add(item.slot ?? item.id);
     membersBySet.set(item.set, members);
   }
-  return Object.fromEntries([...membersBySet].map(([setId, members]) => [setId, members.size]));
+  // Lineage families climb ONE cross-tier ladder (content/item_sets.ts), so
+  // their denominator is the SLOT UNION across the whole lineage: every
+  // member family reads the same X/7-style total the ladder can actually
+  // reach, instead of its own four slots hiding the 6-piece capstone.
+  const slotsByLineage = new Map<string, Set<string>>();
+  for (const [setId, members] of membersBySet) {
+    const lineage = ITEM_SETS[setId]?.lineage;
+    if (lineage === undefined) continue;
+    const union = slotsByLineage.get(lineage) ?? new Set<string>();
+    for (const slot of members) union.add(slot);
+    slotsByLineage.set(lineage, union);
+  }
+  return Object.fromEntries(
+    [...membersBySet].map(([setId, members]) => {
+      const lineage = ITEM_SETS[setId]?.lineage;
+      const size =
+        lineage === undefined ? members.size : (slotsByLineage.get(lineage)?.size ?? members.size);
+      return [setId, size];
+    }),
+  );
+}
+
+/** Worn pieces for the tooltip's have-of-total header: the set's own worn
+ *  count, or the summed count across its lineage (tier-1 and tier-2 pieces
+ *  climb one ladder, so the header and the lit tiers must count them
+ *  together, exactly like aggregateSetBonuses). */
+export function equippedSetTooltipPieces(
+  setId: string,
+  equippedIds: Iterable<string | null | undefined>,
+): number {
+  const lineage = ITEM_SETS[setId]?.lineage;
+  let n = 0;
+  for (const id of equippedIds) {
+    if (!id) continue;
+    const wornSet = ITEMS[id]?.set;
+    if (wornSet === undefined) continue;
+    if (wornSet === setId || (lineage !== undefined && ITEM_SETS[wornSet]?.lineage === lineage)) {
+      n += 1;
+    }
+  }
+  return n;
 }
 
 export function itemSetTooltipModel(args: {

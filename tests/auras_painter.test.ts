@@ -38,11 +38,13 @@ describe('AurasPainter: no raw DOM writes, no magic values', () => {
     // No listener churn in the hot painter: the tooltip attaches once in createNode via
     // the injected helper, never addEventListener directly + never per frame.
     expect(code).not.toMatch(/addEventListener/);
-    // .className is set EXACTLY 3 times, all in createNode (the pooled node + its .dur /
-    // .stacks children, set once at build). Pinning the count gives the guard teeth: the
-    // debuff state must flow through toggleClass, so any per-frame raw `rec.el.className =`
-    // write (the shape the old inline code used) would push this above 3 and fail here.
-    expect(code.match(/\.className\b/g) ?? []).toHaveLength(3);
+    // .className is set EXACTLY 4 times: the pooled node + its .dur / .stacks children in
+    // createNode(), plus the overflow badge span built once in the constructor. All are
+    // one-time CONSTRUCTION writes, never per-frame. Pinning the count gives the guard
+    // teeth: the debuff state must flow through toggleClass, so any per-frame raw
+    // `rec.el.className =` write (the shape the old inline code used) would push this
+    // above 4 and fail here.
+    expect(code.match(/\.className\b/g) ?? []).toHaveLength(4);
   });
 
   it('carries no literal hex / rgb / px value', () => {
@@ -160,6 +162,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     effectHtml: '',
     toggle: false,
     alwaysRender: false,
+    shortDuration: false,
     ...over,
   };
 }
@@ -530,6 +533,35 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW);
   });
 
+  it('PRIORITY: low sheds a long-duration buff before a short-duration one applied earlier', () => {
+    // Player feedback on PR #3668: a tank's Raised Guard (2-charge, 6 sec active
+    // mitigation, 12 sec recharge) applied AFTER a wall of long-lived raid buffs
+    // used to lose its icon to the flat first-N cap, hiding exactly the timing
+    // information a tank needs to know whether a charge is still up. Build
+    // cap+1 leading long buffs (shortDuration false, the default), then one
+    // short buff last: without priority the short buff (last in application
+    // order) would be the one shed; with it, a long buff sheds in its place.
+    const longBuffs = Array.from({ length: AURA_VISIBLE_CAP_LOW + 1 }, (_, i) =>
+      slot({ key: `raidbuff${i}` }),
+    );
+    const slots = [
+      ...longBuffs,
+      slot({ key: 'raised_guard_dr', name: 'Raised Guard', shortDuration: true }),
+    ];
+    const painter = tierPainter('low');
+    painter.paint(state(slots));
+
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW);
+    // The short buff rendered; a trailing long buff (raidbuff8, the last of the
+    // long-duration set) is the one that shed instead.
+    expect(tooltips.attached.map((a) => a.html())).toContain('Raised Guard|0');
+    expect(
+      calls.some(
+        (c) => c.m === 'setStyleProp' && c.args[1] === `url(raidbuff${AURA_VISIBLE_CAP_LOW})`,
+      ),
+    ).toBe(false);
+  });
+
   it('the tiered painter is deterministic: identical painted output by value for the same state', () => {
     // The painter consumes AurasState (the already-normalized, parity-identical view
     // output), so cross-world SHAPE parity (Sim {stacks:1} vs ClientWorld {stacks:undefined},
@@ -561,6 +593,156 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes().length).toBe(simCount);
     expect(nodes().length).toBe(AURA_VISIBLE_CAP_LOW + 1); // cap buffs + the kept debuff
     expect(sig(calls)).toEqual(simSig); // identical painted output, value for value
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The overflow badge: makes the low-tier buff cap's shed count HONEST instead of silent.
+// A painter built with an `overflowEl` reveals it (setDisplay('')) and writes the shed
+// count's label/tooltip through deps ONLY when this frame actually sheds a buff; a
+// painter built without one (the debuff bar, the target strip) never touches an element
+// at all, so nothing here can regress their existing coverage above.
+// ---------------------------------------------------------------------------
+
+describe('AurasPainter: the low-tier overflow badge', () => {
+  let container: FakeEl;
+  let calls: Call[];
+  let labelCalls: number[];
+  let tooltipCalls: number[];
+
+  // The badge element is minted INSIDE the constructor (never through the pool), so it
+  // is findable by its class marker among the container's children at any time.
+  const overflowEl = () =>
+    container.childNodes.find((n) =>
+      (n.className as string | undefined)?.includes('buff-overflow'),
+    );
+
+  function tierPainterWithOverflow(tier: UiEffectsTier, showOverflowBadge = true): AurasPainter {
+    const facet = recordingFacet();
+    calls = facet.calls;
+    labelCalls = [];
+    tooltipCalls = [];
+    const deps: AurasPainterDeps = {
+      resolveIconUrl: (key) => `url(${key})`,
+      renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
+      attachTooltip: () => {},
+      attachCancel: () => {},
+    };
+    return new AurasPainter(
+      facet.writers,
+      container as unknown as HTMLElement,
+      deps,
+      fakeDoc,
+      () => tier,
+      showOverflowBadge,
+      {
+        label: (n) => {
+          labelCalls.push(n);
+          return `+${n}`;
+        },
+        tooltip: (n) => {
+          tooltipCalls.push(n);
+          return `${n} hidden`;
+        },
+      },
+    );
+  }
+  const manyBuffs = (count: number) =>
+    state(Array.from({ length: count }, (_, i) => slot({ key: `aura${i}` })));
+
+  beforeEach(() => {
+    container = fakeEl('div');
+  });
+
+  it('showOverflowBadge=false (the default) never mints or touches a badge element', () => {
+    const painter = tierPainterWithOverflow('low', false);
+    expect(overflowEl()).toBeUndefined(); // nothing minted at construction
+    expect(() => painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 5))).not.toThrow();
+    // Only the (capped) pool nodes exist -- no extra badge child anywhere.
+    expect(container.childNodes).toHaveLength(AURA_VISIBLE_CAP_LOW);
+    expect(overflowEl()).toBeUndefined();
+    expect(calls.every((c) => c.el !== undefined)).toBe(true); // no write targets a phantom el
+  });
+
+  it('stays hidden and blank when the cap sheds nothing (under the cap, or a full tier)', () => {
+    const under = tierPainterWithOverflow('low');
+    under.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 2));
+    const el = overflowEl();
+    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
+    expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', ''] });
+    expect(labelCalls).toEqual([]);
+    expect(tooltipCalls).toEqual([]);
+
+    container = fakeEl('div'); // fresh container: a 2nd painter would else mint a 2nd badge
+    const ultra = tierPainterWithOverflow('ultra');
+    ultra.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 20));
+    expect(calls).toContainEqual({ m: 'setDisplay', el: overflowEl(), args: ['none'] });
+    expect(labelCalls).toEqual([]);
+  });
+
+  it('reveals the badge with the exact shed count once the low-tier buff cap bites', () => {
+    const painter = tierPainterWithOverflow('low');
+    const over = AURA_VISIBLE_CAP_LOW + 5;
+    painter.paint(manyBuffs(over));
+    const shed = over - AURA_VISIBLE_CAP_LOW;
+    const el = overflowEl();
+    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['flex'] });
+    expect(calls).toContainEqual({ m: 'setText', el, args: [`+${shed}`] });
+    expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', `${shed} hidden`] });
+    expect(labelCalls).toEqual([shed]);
+    expect(tooltipCalls).toEqual([shed]);
+  });
+
+  it('FAIRNESS: shed counts only the dropped BUFFS, never a debuff that rendered past the cap', () => {
+    // cap+2 leading buffs, then one debuff last (the debuff-priority scenario from the
+    // cap-selection suite above): the debuff always renders, so only the 2 trailing
+    // buffs are the real shed -- not 3.
+    const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) =>
+      slot({ key: `buff${i}` }),
+    );
+    slots.push(slot({ key: 'boss_curse', isDebuff: true, name: 'Boss Curse', remaining: 9 }));
+    const painter = tierPainterWithOverflow('low');
+    painter.paint(state(slots));
+    expect(labelCalls).toEqual([2]);
+  });
+
+  it('clears the badge again once the buff count drops back under the cap', () => {
+    const painter = tierPainterWithOverflow('low');
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 3));
+    expect(labelCalls).toEqual([3]);
+    calls.length = 0;
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 1));
+    const el = overflowEl();
+    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
+  });
+
+  it('a repeat identical frame re-derives the SAME value (the real elision lives in the injected writer facet, not here)', () => {
+    // AurasPainter always calls the writer facet every frame (exactly like every other
+    // write in this painter: setText/setDisplay/setAttr elision is the FACET's job,
+    // proven separately in tests/painter_host.test.ts). What this painter owns is
+    // recomputing the SAME output for the SAME state, so a real elided facet would see
+    // no-op writes on a steady state.
+    const painter = tierPainterWithOverflow('low');
+    const over = manyBuffs(AURA_VISIBLE_CAP_LOW + 4);
+    painter.paint(over);
+    const el = overflowEl();
+    const firstOverflowCalls = calls.filter((c) => c.el === el);
+    calls.length = 0;
+    labelCalls.length = 0;
+    painter.paint(over);
+    const secondOverflowCalls = calls.filter((c) => c.el === el);
+    expect(secondOverflowCalls).toEqual(firstOverflowCalls);
+    expect(labelCalls).toEqual([4]);
+  });
+
+  it('mints the badge as a permanent child that reconciles to the LAST DOM position', () => {
+    const painter = tierPainterWithOverflow('low');
+    expect(container.childNodes).toHaveLength(1); // the badge alone, before any paint
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 2));
+    const nodes = container.childNodes;
+    expect(nodes[nodes.length - 1]).toBe(overflowEl());
   });
 });
 

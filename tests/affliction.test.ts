@@ -70,6 +70,9 @@ function ctx(sim: Sim): SimContext {
 function finishCast(sim: Sim, abilityId: string, target?: Entity): SimEvent[] {
   if (target) sim.targetEntity(target.id);
   sim.player.resource = sim.player.maxResource;
+  // An aura change between casts recalcs stats and drops the harness's never-resist
+  // hitBonus; restore it so no cast here is decided by an avoidance roll.
+  sim.player.hitBonus = 1;
   sim.castAbility(abilityId);
   const events: SimEvent[] = [];
   for (let i = 0; i < 20 * 10 && sim.player.castingAbility; i++) events.push(...sim.tick());
@@ -132,8 +135,8 @@ describe('Affliction Warlock', () => {
     );
     expect(ABILITIES.maledict_gaze.passive).toBe(true);
     expect(at(7)).toContain('cursed_accomplice');
-    expect(at(6)).not.toContain('drain_life');
-    expect(at(7)).toContain('drain_life');
+    expect(at(5)).not.toContain('drain_life');
+    expect(at(6)).toContain('drain_life');
     expect(at(7)).not.toContain('searing_pain');
     expect(at(7)).not.toContain('litany_of_guilt');
     expect(at(8)).toContain('litany_of_guilt');
@@ -206,7 +209,10 @@ describe('Affliction Warlock', () => {
   it('pins the level-20 Needle and Maledict Gaze damage floor', () => {
     expect(ABILITIES.needle_of_fate.ranks?.find((rank) => rank.rank === 3)).toMatchObject({
       level: 20,
-      effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
+      effects: [
+        { type: 'afflictionNeedle', doom: 7 },
+        { type: 'directDamage', min: 41, max: 49 },
+      ],
     });
     expect(maledictGazeDamage(19)).toBe(9);
     expect(maledictGazeDamage(20)).toBe(10);
@@ -217,9 +223,18 @@ describe('Affliction Warlock', () => {
     expect(en.entities.abilities.needle_of_fate.description).toContain(
       'Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread',
     );
-    expect(en.entities.abilities.needle_of_fate.description).toContain(
-      'generates 7 Condemnation on impact',
+    // The Condemnation figure is a live {needleDoom} splice in the CATALOG
+    // since the Hexthread 2pc (the Crucible set doc); the sim-source
+    // description keeps the base literal 7 (the $-form contract in
+    // tests/ability_tooltip_consistency.test.ts). The number pin moved from
+    // the resolved artifact to the two SOURCES, so the probe holds both
+    // before and after the next i18n:gen rebuilds the resolved bundles.
+    expect(ABILITIES.needle_of_fate.description).toContain('generates 7 Condemnation on impact');
+    const abilitiesCatalogSource = readFileSync(
+      new URL('../src/ui/i18n.catalog/abilities.ts', import.meta.url),
+      'utf8',
     );
+    expect(abilitiesCatalogSource).toContain('generates {needleDoom} Condemnation on impact');
     expect(en.entities.abilities.needle_of_fate.description).toContain(
       'Fate Threads stay with you when the Eye moves or its target dies',
     );
@@ -711,12 +726,12 @@ describe('Affliction Warlock', () => {
     expect(afterSecond).toBeLessThan(afterFirst ?? 0);
   });
 
-  it('applies Evil Eye immediately without a projectile or resist roll', () => {
+  it('applies Evil Eye immediately, with no projectile and no avoidance', () => {
     const sim = makeAffliction();
     const target = addTarget(sim);
     target.level = 60;
-    sim.player.hitBonus = 0;
-    const chance = vi.spyOn(ctx(sim).rng, 'chance').mockReturnValue(false);
+    // makeAffliction hit-caps the warlock, so the instant hostile spell's resist
+    // roll can never fail and the wildly higher-level target still takes the Eye.
 
     sim.targetEntity(target.id);
     sim.castAbility('evil_eye');
@@ -724,7 +739,6 @@ describe('Affliction Warlock', () => {
 
     expect(eye(target, sim.playerId)).toBe(true);
     expect(ctx(sim).pendingProjectiles).toHaveLength(0);
-    expect(chance).not.toHaveBeenCalled();
     expect(
       events.some(
         (event) =>
@@ -1765,6 +1779,10 @@ describe('Affliction Warlock', () => {
     const bossHp = boss.hp;
     const bossNearby = addTarget(bossSim, 12);
     const bossNearbyHp = bossNearby.hp;
+    // The pinned tier math is the subject here, not resist luck: hit-cap the
+    // cast so the impact draw (still taken, same stream position) cannot land
+    // in the resist band when unrelated mob changes reshuffle the seed.
+    bossSim.player.hitBonus = 1;
     const bossEvents = finishCast(bossSim, 'sentence', boss);
     expect(
       bossEvents
@@ -2006,16 +2024,16 @@ describe('Affliction Warlock', () => {
     expect(doomValue(sim.player)).toBe(3);
   });
 
-  it('applies Coven immediately without a projectile or resist roll', () => {
+  it('applies Coven immediately, with no projectile and no avoidance', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 8);
     const secondary = addTarget(sim, 10);
     finishCast(sim, 'evil_eye', primary);
     sim.player.gcdRemaining = 0;
     sim.player.resource = sim.player.maxResource;
-    sim.player.hitBonus = 0;
     primary.level = 60;
-    const chance = vi.spyOn(ctx(sim).rng, 'chance').mockReturnValue(false);
+    // makeAffliction hit-caps the warlock, so the instant hostile spell's resist
+    // roll can never fail against the wildly higher-level primary.
 
     sim.targetEntity(primary.id);
     sim.castAbility('coven');
@@ -2023,7 +2041,6 @@ describe('Affliction Warlock', () => {
 
     expect(eye(secondary, sim.playerId, true)).toBe(true);
     expect(ctx(sim).pendingProjectiles).toHaveLength(0);
-    expect(chance).not.toHaveBeenCalled();
     expect(
       events.some(
         (event) =>

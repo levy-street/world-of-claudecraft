@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { NecromancyArmyPortalFx } from '../src/render/necromancy_army_portal_fx';
+import {
+  buildVarkhulForgePortalPrewarmVisual,
+  NecromancyArmyPortalFx,
+} from '../src/render/necromancy_army_portal_fx';
 
 function portalParts(scene: THREE.Scene) {
   const group = scene.getObjectByName('necromancy-army-portal') as THREE.Group;
@@ -18,6 +21,51 @@ function portalParts(scene: THREE.Scene) {
 }
 
 describe('Necromancy Army portal VFX', () => {
+  it('prewarms the four-portal forge burst within its renderable budget', () => {
+    const prewarm = buildVarkhulForgePortalPrewarmVisual();
+    expect(prewarm.root.name).toBe('varkhul-forge-portal-prewarm');
+    expect(prewarm.root.userData.portalCount).toBe(4);
+    expect(
+      prewarm.root.children.filter((child) => child.name === 'varkhul-forge-legion-portal'),
+    ).toHaveLength(4);
+    let renderables = 0;
+    prewarm.root.traverse((child) => {
+      const candidate = child as THREE.Mesh | THREE.LineSegments | THREE.Points;
+      if (candidate.geometry && candidate.material) renderables++;
+    });
+    expect(renderables).toBeLessThanOrEqual(40);
+    prewarm.dispose();
+    expect(prewarm.root.children).toEqual([]);
+  });
+
+  it('reuses the portal silhouette with a forge-fire palette for Varkhul adds', () => {
+    const scene = new THREE.Scene();
+    const fx = new NecromancyArmyPortalFx(scene, () => 0);
+
+    fx.spawn({ x: -27, z: -22, facing: 0.4, duration: 2, palette: 'forge' });
+
+    const group = scene.getObjectByName('varkhul-forge-legion-portal') as THREE.Group;
+    expect(group).toBeInstanceOf(THREE.Group);
+    expect(group.userData.palette).toBe('forge');
+    expect(group.position.toArray()).toEqual([-27, 0.08, -22]);
+    expect(group.rotation.y).toBeCloseTo(0.4);
+    const colorOf = (name: string): number => {
+      const mesh = group.getObjectByName(name) as THREE.Mesh;
+      return (mesh.material as THREE.MeshBasicMaterial).color.getHex();
+    };
+    expect(colorOf('necromancy-army-portal-membrane')).toBe(0x210400);
+    expect(colorOf('necromancy-army-portal-outer-ring')).toBe(0xff4b0b);
+    expect(colorOf('necromancy-army-portal-inner-ring')).toBe(0xffd46a);
+    expect(
+      (
+        (group.getObjectByName('necromancy-army-portal-runes') as THREE.LineSegments)
+          .material as THREE.LineBasicMaterial
+      ).color.getHex(),
+    ).toBe(0xffe4a3);
+
+    fx.dispose();
+  });
+
   it('builds a towering portal with three distinct emergence lanes over the real terrain', () => {
     const scene = new THREE.Scene();
     const groundY = (x: number, z: number): number => x * 0.03 + z * 0.02;

@@ -34,29 +34,42 @@ describe('graphics-overhaul integration', () => {
     expect(renderer).toContain(
       'const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
     );
+    expect(renderer).toContain(
+      'const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);',
+    );
+    expect(renderer).toContain(
+      'const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
+    );
     expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
     const chaseCamera = renderer.slice(
-      renderer.indexOf('const cx = px - Math.sin(pose.yaw)'),
+      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX;'),
       renderer.indexOf('// Spatial-audio listener'),
     );
-    expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(1);
-    expect(renderer).toContain('Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel))');
+    expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
+    expect(chaseCamera.match(/\bconst cx =/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bconst cy =/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bconst cz =/g)).toHaveLength(1);
+    expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {
     const consumers = [
       'src/render/props.ts',
-      'src/render/foliage.ts',
-      'src/render/dungeon.ts',
+      'src/render/tree_hide_fade.ts',
+      // dungeon.ts's occluder loop moved to dungeon_wall_occlusion.ts (the
+      // raid backface cull); the pin follows the consumer.
+      'src/render/dungeon_wall_occlusion.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
       'src/render/battleground_placements.ts',
     ];
     for (const file of consumers) {
       const text = source(file);
-      expect(text, file).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+      // Either the core's step (the instanced-ghost consumers and the raid
+      // backface cull, whose trailing argument is the fade floor) or the
+      // gated stepper over it (occluder_fade.ts advanceOccluderFade, the
+      // fade painters); both take the flag after dt.
+      expect(text, file).toMatch(/(?:step|advance)OccluderFade\([^)]+,\s*reducedMotion\s*[,)]/s);
     }
   });
 

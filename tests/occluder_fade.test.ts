@@ -10,7 +10,10 @@ describe('occluder fade material application', () => {
       transparent: false,
       depthWrite: false,
     });
-    const fade = occluderFadeMat(material);
+    const fade = occluderFadeMat(
+      material,
+      new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material),
+    );
     const opaqueVersion = material.version;
 
     const alpha = stepOccluderFade(1, true, 1 / 60);

@@ -669,7 +669,10 @@ const classAbilityNamesEn = {
       [
         'cold_focus',
         'Cold Focus',
-        'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+        // Absolute, not "50% more": the Coldsight 2pc adds a flat 5 after the
+        // window rewrite (25 -> 35 for wearers is not 50 percent), so only the
+        // absolute base value composes honestly with the set tooltip.
+        'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
       ],
       [
         'bloodhook',
@@ -1287,7 +1290,7 @@ const classAbilityNamesEn = {
       [
         'oath_chain',
         'Oath Chain',
-        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.',
+        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy. Bosses cannot be pulled or slowed.',
       ],
       [
         'veilbound_march',
@@ -1523,7 +1526,7 @@ const classAbilityNamesEn = {
       [
         'needle_of_fate',
         'Needle of Fate',
-        'Pierces the enemy for {damage} Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
+        'Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
       ],
       [
         'sentence',
@@ -1640,7 +1643,7 @@ const classAbilityNamesEn = {
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
       ],
       [
         'rejuvenation',
@@ -2011,7 +2014,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
+        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds {charges} charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -2051,7 +2054,7 @@ const classAbilityNamesEn = {
       [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
       ],
       [
         'summon_imp',
@@ -2141,7 +2144,7 @@ const classAbilityNamesEn = {
       [
         'iron_resolve',
         'Iron Resolve',
-        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)',
       ],
       [
         'faultline',
@@ -2466,7 +2469,7 @@ const classAbilityNamesEn = {
       [
         'multi_shot',
         'Splitshot',
-        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
       ],
       [
         'prayer_of_healing',
@@ -2592,7 +2595,7 @@ const classAbilityNamesEn = {
       [
         'seraphic_vigil',
         'Seraphic Vigil',
-        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {buff}. (Benison signature)',
       ],
       [
         'summon_tithefiend',

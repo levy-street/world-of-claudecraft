@@ -4,6 +4,10 @@ import type { Aura, Entity } from './types';
 
 export const MAX_DEVOTION = 20;
 export const ASCENSION_CHARGES = 5;
+// Extended Dawn (pal_r17_extended_dawn) is the only talent that raises the charge
+// count today; keep this in lockstep with its ascensionChargeBonus effect value.
+export const EXTENDED_DAWN_ASCENSION_CHARGE_BONUS = 2;
+export const MAX_ASCENSION_CHARGES = ASCENSION_CHARGES + EXTENDED_DAWN_ASCENSION_CHARGE_BONUS;
 export const ASCENSION_DURATION = 45;
 export const DIVINE_ASCENSION_AURA_ID = 'divine_ascension';
 export const ASCENSION_DEVOTION_BANK_CAP = 0;

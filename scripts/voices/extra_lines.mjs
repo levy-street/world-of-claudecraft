@@ -13,8 +13,8 @@
 // scripts/voices/voice_ids.json). Brother Aldric reuses his existing voice.
 
 // Stable clip key for a spoken line. MUST stay identical to the runtime
-// derivation in src/ui/hud.ts (yellVoiceKey) so playback can look the clip up
-// from the live event text.
+// derivation in src/ui/hud_voice_cues.ts (yellVoiceKey) so playback can look the
+// clip up from the live event text.
 export function yellKey(text) {
   return (
     'yell__' +

@@ -11,9 +11,8 @@
 // quest-NPC surface) and are reached through two append-only SimContext callbacks.
 // The corpse-loot helpers (distributeLootCopper / awardSharedLootItem /
 // lootSlotVisibleTo / pruneCorpseLoot) are imported from loot/loot_roll.ts (L1/W6)
-// and the Nythraxis interaction hooks (tryStartNythraxisWardChannel /
-// activateNythraxisRelic / interactObjectForQuests) from encounters/nythraxis.ts
-// (N1); they are imported, never edited.
+// and the encounter interaction hooks from encounters/nythraxis.ts and
+// ignivar_raid_lore.ts; they are imported, never edited.
 //
 // Move-not-rewrite: statements, branches, short-circuit and iteration order are
 // verbatim. The immutability waiver applies: the in-place loot-slot (s.count /
@@ -23,7 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { bagPools, canGrantItemInstance, fitsAll } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
@@ -36,6 +35,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
+import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
@@ -44,7 +44,9 @@ import {
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
+  grantAwardedLootItem,
   hasPendingLootRollForMob,
+  killSnapshotEligibility,
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
@@ -133,7 +135,9 @@ export function lootCorpse(
   }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return false;
-  // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
+  // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may
+  // loot. The flag is threaded into distribution too, so an outside looter keeps what
+  // they take instead of it being split by the absent tapping party's strategies.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
   if (!rights.shared && !rights.personal && !rights.open) {
@@ -146,7 +150,7 @@ export function lootCorpse(
   }
   let didLoot = false;
   if (rights.shared && mob.loot.copper > 0) {
-    distributeLootCopper(ctx, mob, meta);
+    distributeLootCopper(ctx, mob, meta, ffaUnlocked);
     didLoot = true;
   }
   // Capacity gate: an item that doesn't fit the looter's bags STAYS on the
@@ -160,7 +164,13 @@ export function lootCorpse(
         if (s.instance) {
           ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
         } else {
-          ctx.addItem(s.itemId, 1, meta.entityId);
+          // Through the shared award grant, NOT a bare addItem: an openToAll
+          // slot is how an everyone-passed (or winner-offline) roll returns a
+          // drop to the corpse, and a soulbound item picked up from it must
+          // carry the same bind-on-pickup party trade window a roll win
+          // would; a bare add minted a permanently untradeable copy from the
+          // most common raid outcome (everyone passes to sort it out later).
+          grantAwardedLootItem(ctx, s.itemId, meta.entityId, killSnapshotEligibility(ctx, mob));
         }
         s.count--;
         didLoot = true;
@@ -189,7 +199,7 @@ export function lootCorpse(
         if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
         ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
         s.count--;
-      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked)) {
         s.count--;
       } else {
         break;
@@ -417,7 +427,7 @@ export function harvestCorpse(
   // both gates upstream guarantee yieldingFocusComponents is non-empty, so
   // `wanted` always holds at least one row and the short-circuit's false arm is
   // unreachable. Dead since #2513, kept for the same reason the others are.
-  if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
+  if (wanted.length > 0 && !fitsAll(meta.inventory, bagPools(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
@@ -606,7 +616,7 @@ export function harvestCorpse(
     if (
       canGrantItemInstance(
         meta.inventory,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         grant.itemId,
         payload,
         grant.plainQty,
@@ -661,7 +671,7 @@ export function harvestCorpse(
   for (const grant of signedGrants) {
     if (!grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
+    if (canGrantItemInstance(meta.inventory, bagPools(meta.bags), grant.itemId, payload)) {
       // Exactly one unit, deliberately: the specimen is a jackpot, not a
       // quantity, so it never carries the component's rolled count the way the
       // signed grant above does. The guard's count defaults to that same 1.
@@ -824,11 +834,18 @@ export function pickUpObject(
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
     return tryRingFerryBell(ctx, obj, p, meta);
   }
+  const ignivarLore = interactIgnivarRaidLore(ctx, obj, meta);
+  if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;
   if (interactObjectForQuests(ctx, obj, meta)) {
-    return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
+    return (
+      ignivarLore.handled ||
+      meta.counters.questProgress !== beforeQuestProgress ||
+      ctx.nextId !== beforeQuestNextId
+    );
   }
+  if (ignivarLore.handled) return true;
   const def = ITEMS[objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);

@@ -310,9 +310,21 @@ describe('crafting window bag-freshness wiring (source pins)', () => {
       'private renderCrafting(focusReturnRecipeId = ',
       'closeCrafting(): void {',
     );
-    expect(renderCrafting).toContain(
-      'this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);',
+    // Phase 04 (craft-from-vault) moved this pin: the latch now carries the
+    // craftVaultStock term, read ONCE into a local so the signature and the
+    // build cannot see different snapshots. Whitespace-tolerant on the call
+    // so the formatter's wrap choice cannot re-break it.
+    expect(renderCrafting).toContain('const craftVaultStock = this.sim.craftVaultStock;');
+    expect(renderCrafting).toMatch(
+      /this\.lastCraftingReagentSig = craftingReagentSig\(\s*this\.sim\.inventory,\s*this\.sim\.player\.name,\s*craftVaultStock,?\s*\)/,
     );
+    // The single-read rule pinned DIRECTLY: exactly one getter read in the
+    // whole method (comments stripped), so a regression that hands the BUILD
+    // a second `this.sim.craftVaultStock` read (the two-snapshots-per-paint
+    // shape the local exists to prevent) reds here even though the sig arm
+    // above would still match.
+    const code = renderCrafting.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(code.match(/this\.sim\.craftVaultStock/g)).toHaveLength(1);
   });
 
   it('the slow band converges an open window in BOTH hosts', () => {

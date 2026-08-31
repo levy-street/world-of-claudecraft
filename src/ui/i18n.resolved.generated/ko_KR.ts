@@ -789,7 +789,37 @@ export const ko_KR: EnTranslations = {
       "applied": "적용됨",
       "apply": "스킨 적용",
       "detach": "스킨 해제",
-      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요."
+      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요.",
+      "charter": {
+        "eyebrow": "금고",
+        "title": "금고 특허장",
+        "scope": "특허장은 이 캐릭터의 은행만 확장합니다. 출납관도 같은 칸을 골드로 판매합니다.",
+        "grant": "은행 칸 {slots}칸 추가",
+        "buy": "특허장 구매",
+        "buyAria": "{item} 구매",
+        "confirmTitle": "특허장 구매 확인",
+        "confirmBody": "{item}을(를) {cost} Claudium에 구매할까요?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "특허장이 적용되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+        "alreadyGranted": "이 특허장은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+        "applyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+        "grantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+        "inProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+        "doesNotFit": "이 캐릭터의 은행에는 이 특허장의 칸을 모두 담을 수 없습니다.",
+        "notPurchasable": "이 특허장은 지금 구매할 수 없습니다.",
+        "noRoom": "이 캐릭터의 은행에는 더 이상 특허장을 넣을 자리가 없습니다.",
+        "noCharterFits": "이 캐릭터의 은행에 남은 자리에 들어갈 수 있는 특허장이 없습니다.",
+        "someHiddenByFit": "이 캐릭터의 은행에 남은 자리보다 큰 특허장은 표시되지 않습니다.",
+        "outage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "outageStale": "상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
+        "failed": "구매를 완료하지 못했습니다.",
+        "names": {
+          "strongbox_charter_1": "하급 금고 특허장",
+          "strongbox_charter_2": "상급 금고 특허장",
+          "strongbox_charter_3": "대금고 특허장",
+          "strongbox_charter_complete": "완전 금고 특허장"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "presets": {
         "classic": "클래식 골드",
+        "fancyGold": "화려한 골드",
         "midnight": "미드나이트",
         "parchment": "양피지",
         "highContrast": "고대비"
@@ -925,7 +956,8 @@ export const ko_KR: EnTranslations = {
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
       "durationUnitHours": "시",
-      "durationUnitDays": "일"
+      "durationUnitDays": "일",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -1321,6 +1353,11 @@ export const ko_KR: EnTranslations = {
       "reset": "초기화",
       "done": "완료",
       "cancel": "취소",
+      "showExtraBar": "액션 바 하나 더 표시",
+      "hideExtraBar": "액션 바 하나 숨기기",
+      "conflictTitle": "이미 지정된 키",
+      "conflictBody": "{key} 키는 이미 {other}에 지정되어 있습니다. {action}에 지정하면 {other}의 지정이 해제됩니다.",
+      "conflictAccept": "그래도 재지정",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
     },
@@ -1350,6 +1387,7 @@ export const ko_KR: EnTranslations = {
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_rickshaw_mount": "뼈에 묶인 인력거",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -1358,7 +1396,8 @@ export const ko_KR: EnTranslations = {
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
-      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1528,6 +1567,7 @@ export const ko_KR: EnTranslations = {
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
+      "alwaysShowAllBuffs": "모든 버프를 항상 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
@@ -1537,19 +1577,25 @@ export const ko_KR: EnTranslations = {
       "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "showReliquaryTracker": "성물고 추적기 표시",
+      "confirmVendorSell": "판매 전 확인",
+      "confirmVendorSellNote": "이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "combineActionBars": "액션 바 합치기",
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showTargetSwingTimer": "대상의 공격 타이머 표시",
       "showPetFrame": "내 펫 표시",
       "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
       "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchPreciseAim": "정밀 지면 지정",
+      "touchPreciseAimNote": "지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.",
       "touchTapMenus": "탭 메뉴",
       "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
@@ -1585,6 +1631,7 @@ export const ko_KR: EnTranslations = {
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
       "cameraSpeed": "카메라 속도",
+      "reticleSpeed": "조준점 속도",
       "vibration": "진동",
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
@@ -1965,6 +2012,7 @@ export const ko_KR: EnTranslations = {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
+        "healPower": "치유력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
         "parry": "무기 막기",
@@ -2099,6 +2147,12 @@ export const ko_KR: EnTranslations = {
         "few": "{count}초 남음",
         "many": "{count}초 남음",
         "other": "{count}초 남음"
+      },
+      "buffsHidden": {
+        "one": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "few": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "many": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "other": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다"
       },
       "playtimeDays": {
         "one": "{count}일",
@@ -2433,7 +2487,10 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "poolGeneral": "일반: {total}칸 중 {used}칸",
+      "poolMaterials": "재료: {total}칸 중 {used}칸",
+      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸."
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -2446,7 +2503,180 @@ export const ko_KR: EnTranslations = {
       "leather": "가죽",
       "mail": "사슬"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "왼쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "rightPillarCharging": "오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "bothPillarsCharging": "용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!",
+      "artificerApproaches": "잿불 기계공이 용광로로 다가옵니다!",
+      "leftPillar": "왼쪽 용광로 기둥이 점화됩니다!",
+      "rightPillar": "오른쪽 용광로 기둥이 점화됩니다!",
+      "bothPillars": "용광로 기둥들이 점화됩니다!",
+      "portalsOpening": "용광로 차원문이 열리고 있습니다!",
+      "heat75": "용광로 열기가 75%에 도달했습니다!",
+      "heat90": "용광로 용융이 임박했습니다!",
+      "addsDefeated": "용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!",
+      "worldfireBegins": "세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!",
+      "worldfireClosing": "세계불꽃이 다가옵니다. 중앙으로 이동하세요!",
+      "worldfireConsumed": "도가니 전체가 불타고 있습니다!"
+    },
+    "varkhulWaveStatus": "공세 {wave}/{waves} | 적: {remaining}",
+    "raidBossGuide": {
+      "title": "우두머리 공략",
+      "button": "공략: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "우두머리 공략 닫기",
+      "bossesLabel": "공격대 우두머리",
+      "difficultyLabel": "난이도",
+      "normal": "일반",
+      "heroic": "영웅",
+      "portraitAlt": "{boss} 전투 초상화",
+      "overviewHeading": "개요",
+      "abilitiesHeading": "능력",
+      "whatToDo": "대처 방법",
+      "whatToDoResponse": "대처 방법: {response}",
+      "rolesLabel": "역할별 책임",
+      "flagsLabel": "메커니즘 경고",
+      "roleTank": "방어 담당",
+      "roleHealer": "치유 담당",
+      "roleDamage": "공격 담당",
+      "roleAll": "모든 역할",
+      "flagDeadly": "치명적",
+      "flagInterruptible": "차단 가능",
+      "flagImportant": "중요",
+      "flagCleansable": "해제 가능",
+      "browseBoss": "{boss} 보기",
+      "chooseDifficulty": "{difficulty} 메커니즘 보기",
+      "expandAbility": "{ability} 펼치기",
+      "collapseAbility": "{ability} 접기",
+      "abilityControlLabel": "{action}. {details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "바르쿨은 이그니바르를 전령이자 살아 있는 봉인, 내부 도가니로 향하는 열쇠로 벼려냈습니다. 이 전투는 수로 제어, 정확한 이동, 우선 대상에 대한 빠른 집중 공격을 시험합니다.",
+        "phaseOpeningName": "전령의 각성",
+        "phaseOpeningSummary": "수로로 장작더미의 징표를 처리하면서 이그니바르의 반복되는 전방 공격, 하늘불꽃, 회전 광선, 확장되는 대장간 파도에 대응합니다.",
+        "phaseApocalypseName": "사잇단계: 대재앙",
+        "phaseApocalypseSummary": "생명력이{health}가 되면 이그니바르가 전투를 끝내려는 잿불소환사를 불러냅니다.",
+        "phaseJudgmentName": "대장간의 심판",
+        "phaseJudgmentSummary": "생명력이{health}가 되면 이그니바르가 투기장을 불태우고 세 피난처 중 하나의 안전 지대를 드러냅니다.",
+        "phaseJudgmentHeroicSummary": "생명력이{health}가 되면 이그니바르가 투기장을 불태우며, 활성 징표는 피난처 안에서도 주변 플레이어를 계속 위협합니다.",
+        "phaseFinaleName": "마지막 단계: 마지막 지옥불",
+        "phaseFinaleSummary": "생명력이{health}가 되면 이그니바르가 엄격한 제한 시간이 있는 마지막 공격 단계에 들어가며 반복 메커니즘도 빨라집니다.",
+        "forgeStrikeName": "대장간 일격",
+        "forgeStrikeSummary": "이그니바르가 현재 방어 담당을 공격하고 용융 갑옷을 부여하여 자신에게 받는 피해를 증가시킵니다.",
+        "forgeStrikeResponse": "방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 일격과 새 방어 담당이 받는 첫 근접 공격에 대비합니다.",
+        "brandName": "장작더미의 징표",
+        "brandSummary": "이그니바르가 방어 담당이 아닌 플레이어에게 지속 화염 피해를 주는 징표를 남깁니다. 대상자는 주변 아군도 불태웁니다.",
+        "brandResponse": "산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 징표 대상자가 한 명씩 활성화된 물을 건너 해제합니다.",
+        "brandHeroicResponse": "산개합니다. 불타는 급류로 수로를 열고 징표 대상자를 한 명씩 해제합니다. 해제할 때마다 공격대 전체에 정화의 반동이 발생합니다.",
+        "searingTorrentName": "불타는 급류",
+        "searingTorrentSummary": "이그니바르가 플레이어 한 명을 추적한 뒤 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.",
+        "searingTorrentHeroicSummary": "이그니바르가 플레이어 한 명을 추적한 뒤 거의 치명적인 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.",
+        "searingTorrentResponse": "경고 범위가 준비된 수로 하나만 지나가게 유도합니다. 나머지는 시전이 끝나기 전에 전방 범위를 벗어납니다.",
+        "rainName": "잿불비",
+        "rainSummary": "세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 피해를 줍니다.",
+        "rainHeroicSummary": "세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 극심한 피해를 줍니다.",
+        "rainResponse": "표시되지 않은 틈으로 이동하고 충돌 전에 모든 운석 원을 벗어납니다.",
+        "raysName": "회전하는 지옥불",
+        "raysSummary": "회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿은 플레이어에게 반복 피해를 줍니다.",
+        "raysHeroicSummary": "회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿을 때마다 반복해서 큰 피해를 줍니다.",
+        "raysResponse": "광선 사이의 빈 공간을 따라 이동합니다. 빠른 이동 능력을 사용하더라도 광선을 가로지르지 않습니다.",
+        "forgeWaveName": "대장간 파도",
+        "forgeWaveSummary": "확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 밀쳐냅니다.",
+        "forgeWaveHeroicSummary": "확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 훨씬 멀리 밀쳐냅니다.",
+        "forgeWaveResponse": "예고 중 어느 한 틈을 찾아 정렬하고 투기장 가장자리 쪽으로 밀려나지 않게 합니다.",
+        "apocalypseName": "대재앙",
+        "apocalypseSummary": "이그니바르가 잿불소환사를 불러냅니다. 추가 적이 대재앙 시전을 끝내면 공격대가 즉시 패배합니다.",
+        "apocalypseResponse": "모든 공격 담당이 이그니바르 잿불소환사로 전환하고 시전이 끝나기 전에 처치합니다.",
+        "judgmentName": "대장간의 심판",
+        "judgmentSummary": "이그니바르가 세 피난처를 표시하고 하나의 안전 지대를 확인한 뒤 투기장의 나머지 부분을 반복해서 불태웁니다.",
+        "judgmentHeroicSummary": "투기장이 불타는 동안 이그니바르가 하나의 안전 지대를 표시합니다. 장작더미의 징표는 남아 주변 아군에게 계속 피해를 줍니다.",
+        "judgmentResponse": "경고 중 독특하게 표시된 피난처를 찾아 바닥이 타오르기 전에 경계 안으로 완전히 모입니다.",
+        "chainsName": "대장간의 사슬",
+        "chainsSummary": "이그니바르가 가까운 플레이어를 둘씩 연결합니다. 너무 멀어지거나 다른 짝의 사슬을 가로지르면 치명적인 피해를 받습니다.",
+        "chainsResponse": "연결된 짝과 가까이 붙어 함께 움직이고 다른 플레이어가 사슬을 통과하지 않게 합니다.",
+        "lastInfernoName": "마지막 지옥불",
+        "lastInfernoSummary": "이그니바르가 격노하여 전멸 공격을 준비하는 동안 잿불비, 불타는 급류, 회전하는 지옥불이 빨라집니다.",
+        "lastInfernoResponse": "남은 공격 및 치유 재사용 대기시간을 사용하고 이동 메커니즘을 계속 수행하여 시간 안에 이그니바르를 처치합니다.",
+        "brand": "장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.",
+        "movement": "이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.",
+        "apocalypse": "대재앙: 시전이 끝나기 전에 이그니바르 애쉬콜러를 처치합니다.",
+        "judgment": "대장간의 심판: 경고 중 다른 피난처를 찾아내고 바닥이 타오르면 표시된 경계 안에 모입니다.",
+        "finale": "마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.",
+        "heroic": "영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다."
+      },
+      "varkhul": {
+        "overview": "바르쿨은 죽어 가는 마지막 샘을 가두어 살아 있는 금속을 벼린 뒤 그 죄를 지키도록 이그니바르를 만들었습니다. 이 전투는 개인 위치 선정과 공격대 전체의 거대 대장간 제어를 결합합니다.",
+        "phaseOpeningName": "대장간의 아버지",
+        "phaseOpeningSummary": "바르쿨은 방어 담당 압박, 넓은 전방 공격, 이동 투사체, 단체 피해 분담, 운석 공세, 거대 모루의 공격을 반복합니다.",
+        "phaseAssemblyName": "사잇단계: 거장의 조립",
+        "phaseAssemblySummary": "생명력이{health}가 되면 바르쿨이 보호받고 대장간 군단이 차원문으로 들어오며 기둥 광선이 대장간 붕괴를 위협합니다.",
+        "phaseFinaleName": "마지막 단계: 풀려난 걸작",
+        "phaseFinaleSummary": "생명력이{health}가 되면 바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 시간까지 공격대에 반복해서 화염을 내뿜습니다.",
+        "phaseFinaleHeroicSummary": "생명력이{health}가 되면 바르쿨이 이전 메커니즘 대부분을 버리고 세계불꽃이 안쪽으로 좁혀져 도가니를 삼킵니다.",
+        "makersBrandName": "제작자의 징표",
+        "makersBrandSummary": "바르쿨이 현재 방어 담당을 공격하고 자신에게 받는 모든 피해를 증가시키는 중첩 효과를 부여합니다.",
+        "makersBrandResponse": "방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 바르쿨이 대상을 바꾸기 전에 다음 방어 담당을 보호합니다.",
+        "frontalName": "대장간 아버지의 휩쓸기",
+        "frontalSummary": "바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 큰 화염 피해를 줍니다.",
+        "frontalHeroicSummary": "바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 거의 치명적인 화염 피해를 줍니다.",
+        "frontalResponse": "바르쿨이 공격대 반대쪽을 보게 하고 경고가 나타나면 즉시 등 뒤로 이동합니다.",
+        "orbsName": "잿불 구슬",
+        "orbsSummary": "표시된 비방어 담당이 지속되는 잿불 웅덩이를 남기고 모든 방향으로 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.",
+        "orbsHeroicSummary": "표시된 비방어 담당이 큰 피해를 주는 지속 잿불 웅덩이를 남기고 모든 방향으로 위험한 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.",
+        "orbsResponse": "각 징표를 방 가장자리로 옮겨 웅덩이를 떨어뜨려 놓고 투기장을 가로지르는 구슬을 피합니다. 치유 담당은 치유 흡수를 빠르게 제거합니다.",
+        "pyreName": "공유 장작더미",
+        "pyreSummary": "움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라갑니다. 피해는 원 안에서 나뉘며 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.",
+        "pyreHeroicSummary": "움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라가며 더 큰 일격을 분담합니다. 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.",
+        "pyreResponse": "최소 {players}명이 원 안에 모이고 시전이 해결될 때까지 대상과 함께 이동합니다.",
+        "forgestormName": "대장간폭풍",
+        "forgestormSummary": "바르쿨이 투기장 전역에 표시된 운석 충돌을 연속{waves}회 불러냅니다.",
+        "forgestormHeroicSummary": "바르쿨이 극심한 피해를 주는 표시된 운석 충돌을 연속{waves}회 불러냅니다.",
+        "forgestormResponse": "새로운 바닥 경고가 나타날 때마다 확인하고 해당 공세가 떨어지기 전에 벗어납니다. 다음 공세를 확인하지 않고 이전 위치로 돌아가지 않습니다.",
+        "rayName": "담금질 광선",
+        "raySummary": "광선이 표시된 플레이어를 오랫동안 추적합니다. 바르쿨과 대상 사이에 처음 들어간 다른 플레이어가 공격을 가로막고 담금질 상처를 얻습니다.",
+        "rayResponse": "생명력이 충분한 플레이어, 보통 보조 방어 담당을 선에 세웁니다. 다른 플레이어는 벗어나고 담금질 상처가 남아 있는 동안 차단자를 교대합니다.",
+        "anvilName": "모루의 칙령",
+        "anvilSummary": "바르쿨이 거대 대장간으로 걸어가{strikes}번 내리쳐 점점 증가하는 공격대 전체 피해를 줍니다.",
+        "anvilHeroicSummary": "바르쿨이 거대 대장간을{strikes}번 내리쳐 점점 증가하는 공격대 피해를 주며 동시에 표시된 운석이 플레이어에게 떨어집니다.",
+        "anvilResponse": "공격대 치유를 위해 모이고 마지막 일격에 방어 재사용 대기시간을 사용합니다.",
+        "anvilHeroicResponse": "표시된 운석을 공격대 밖으로 분산시키고 치유 및 방어 재사용 대기시간으로{strikes}번의 일격을 모두 버팁니다.",
+        "assemblyName": "거장의 조립",
+        "assemblySummary": "바르쿨이 보호받으며 제한 시간 조립을 시작합니다. 대장간이 그의 걸작을 완성하기 전에 공격대가 모든 차원문 공세를 물리쳐야 합니다.",
+        "assemblyResponse": "광선 제어와 우선 추가 적에 주의를 나눕니다. 조립 시간이 끝나기 전에 대장간 군단 전체를 처치합니다.",
+        "beamName": "도가니 광선",
+        "beamSummary": "활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 광선이 막히거나 비활성이면 열기가 내려갑니다.",
+        "beamHeroicSummary": "활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 대장간 열기는 절대 내려가지 않습니다.",
+        "beamResponse": "각 활성 기둥과 대장간 사이에 서고 노출이 위험해지기 전에 차단자를 교대합니다. 열기가 가득 차면 치명적인 대장간 붕괴가 발생합니다.",
+        "legionName": "대장간 군단",
+        "legionSummary": "도가니 수호자는 대장간 열기를 높이는 도가니 지진을 시전하고 잿불 기술자는 수리 절차로 바르쿨을 치유합니다.",
+        "legionResponse": "도가니 지진과 수리 절차를 차단하고 위험한 시전자를 먼저 집중 공격한 뒤 남은 추가 적을 처리합니다.",
+        "masterpieceName": "풀려난 걸작",
+        "masterpieceSummary": "바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 전멸까지 공격대를 반복해서 불태웁니다.",
+        "masterpieceHeroicSummary": "바르쿨의 공격이 빨라지고 피해가 증가하며 세계불꽃이 이전 메커니즘 대부분을 대신해 마지막 공격을 이룹니다.",
+        "masterpieceResponse": "남은 공격 및 방어 재사용 대기시간을 모두 사용하고 마지막 시간이 끝나기 전에 바르쿨을 처치합니다.",
+        "worldfireName": "세계불꽃",
+        "worldfireSummary": "영웅 난이도에서는 불길이 투기장 가장자리에서 중앙으로 단계적으로 전진하여 마침내 도가니 전체를 태웁니다.",
+        "worldfireResponse": "전진하는 불길보다 먼저 안쪽으로 이동하고 줄어드는 안전 공간을 지키며 중앙이 타오르기 전에 바르쿨을 처치합니다.",
+        "tanks": "방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.",
+        "orbs": "잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.",
+        "pyre": "공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.",
+        "forgestorm": "대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.",
+        "anvil": "모루의 칙령: 바르쿨이 거대 대장간으로 이동해 세 번 내리쳐 공격대 피해를 줍니다. 영웅에서는 표시된 운석도 떨어집니다.",
+        "ray": "담금질 광선: 긴 경고가 끝나기 전에 다른 플레이어, 보통 방어 담당이 움직이는 광선을 가로막습니다. 피격자는 담금질 상처를 얻습니다.",
+        "forge": "대장간 기둥: 광선이 대장간에 닿기 전에 막고 도가니 노출이 쌓이면 교대합니다. 열기가 가득 차면 대장간이 붕괴합니다.",
+        "assembly": "거장의 조립: 두 광선을 막고 모든 차원문 웨이브를 처치하며 도가니 지진을 차단하고 잿불 기술자의 치유를 막습니다.",
+        "worldfire": "세계불꽃: 영웅의 마지막 단계에서 불타는 가장자리가 중앙으로 좁혀집니다. 도가니 전체가 타기 전에 바르쿨을 처치합니다.",
+        "heroic": "영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
+      "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
+      "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
+      "varkhulSentinelsGaze": "잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.",
+      "varkhulMoltenCore": "이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.",
+      "varkhulForgeLink": "활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.",
+      "varkhulCrucibleExposure": "도가니 광선을 막으면 매초 최대 생명력 기반 피해가 증가합니다. 광선을 벗어난 뒤 일반에서는 10초, 영웅에서는 60초 후 중첩이 초기화됩니다.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
@@ -2657,7 +2887,9 @@ export const ko_KR: EnTranslations = {
       "chestTitle": "상자",
       "takeLootButton": "전리품 가져가기",
       "takeLootTooltip": "돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.",
-      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다."
+      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.",
+      "bindConfirmTitle": "획득 시 귀속",
+      "bindConfirmBody": "이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다."
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
@@ -2689,6 +2921,7 @@ export const ko_KR: EnTranslations = {
     },
     "partyFrames": {
       "section": "파티 및 공격대 프레임",
+      "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
       "lock": "파티 및 공격대 프레임 고정",
       "style": "프레임 스타일",
@@ -2719,13 +2952,70 @@ export const ko_KR: EnTranslations = {
     "frameReset": {
       "label": "프레임 위치 초기화"
     },
+    "interfaceUnlock": {
+      "label": "프레임 편집",
+      "unlock": "인터페이스 잠금 해제",
+      "lock": "인터페이스 잠금",
+      "lockAll": "인터페이스 잠금",
+      "barsNote": "편집 중에는 켜 둔 액션 바만 표시됩니다. 더 많은 바를 배치하려면 먼저 기본 액션 바의 더하기/빼기 버튼으로 추가하세요.",
+      "frozenNote": "편집 중에는 인터페이스와 카메라가 고정됩니다. 버튼과 프레임은 배치용 정지 화면이 되며, 클릭은 게임 세계에 전달되지 않습니다.",
+      "unlockFrame": "이 프레임 잠금 해제",
+      "lockFrame": "이 프레임 잠금",
+      "resizeFrame": "이 프레임 크기 조절",
+      "frameNames": {
+        "actionBar1": "행동 단축바",
+        "actionBar2": "행동 단축바 2",
+        "actionBar3": "행동 단축바 3",
+        "steamWishlist": "찜 목록 알림",
+        "menu": "메뉴",
+        "minimap": "미니맵",
+        "stanceBar": "태세 바",
+        "xpBar": "경험치 바",
+        "chat": "채팅",
+        "actionBarGroup": "액션 바",
+        "playerFrame": "플레이어",
+        "targetFrame": "대상",
+        "partyFrames": "파티",
+        "swingBar": "자동 공격"
+      },
+      "framesMenu": "프레임 설정",
+      "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",
+      "showHideFrames": "프레임 표시 및 숨기기",
+      "buffsLeftToRight": "버프 왼쪽에서 오른쪽으로",
+      "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
+      "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
+      "actionBarsVertical": "액션 바 세로 배치",
+      "actionBar1Vertical": "액션 바 세로 배치",
+      "actionBar2Vertical": "액션 바 2 세로 배치",
+      "actionBar3Vertical": "액션 바 3 세로 배치",
+      "menuRailHorizontal": "메뉴 가로 배치",
+      "snapToGrid": "격자에 맞추기",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "크기 초기화",
+      "resetFrameSizeFor": "{name} 크기 초기화",
+      "previewSpell": "예시 주문"
+    },
+    "transfer": {
+      "frameLayout": "프레임 배치",
+      "allSettings": "모든 설정",
+      "exportAction": "내보내기",
+      "importAction": "가져오기",
+      "copy": "복사",
+      "copied": "클립보드에 복사했습니다.",
+      "copyFailed": "복사에 실패했습니다. 코드를 선택해 직접 복사해 주세요.",
+      "applyReload": "적용 후 다시 불러오기",
+      "pastePlaceholder": "내보낸 코드를 여기에 붙여넣으세요.",
+      "invalid": "유효한 내보내기 코드가 아닙니다.",
+      "wrongKind": "이 코드는 다른 종류의 내보내기입니다."
+    },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
       "riftTier": "{tier} 등급 균열 아이템",
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
       "statEnchanted": "+{value} {stat} (마법부여)",
-      "enchantedFallback": "마법부여됨"
+      "enchantedFallback": "마법부여됨",
+      "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다."
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
@@ -2926,7 +3216,10 @@ export const ko_KR: EnTranslations = {
       "unlink": "Steam 연동 해제",
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
-      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.",
+      "wishlist": "Steam에서 위시리스트에 추가",
+      "wishlistAria": "Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기",
+      "wishlistShort": "위시리스트"
     },
     "epic": {
       "title": "Epic",
@@ -3012,6 +3305,26 @@ export const ko_KR: EnTranslations = {
       "buySlotsMaxed": "완전히 확장됨",
       "buyConfirm": "{price}에 은행 칸 {count}개를 추가로 구매하시겠습니까?",
       "buyConfirmAccept": "구매",
+      "meterLabel": "{total}칸 중 {used}칸 사용",
+      "meterPoolGeneral": "일반: {total}칸 중 {used}칸",
+      "meterPoolMaterials": "재료: {total}칸 중 {used}칸",
+      "meterPoolsAria": "사용 중인 은행 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.",
+      "meterMaterialsNote": "장착한 재료 가방이 제공하는 재료 전용 공간입니다. 다른 아이템은 사용할 수 없습니다.",
+      "priceDisclaimer": "가격은 게임 경제에 따라 변동될 수 있습니다.",
+      "rungItemName": "은행 칸 {count}개",
+      "buySlotsDualAria": "{price} 또는 {cost} Claudium으로 {count}칸 구매",
+      "buyConfirmDual": "은행 칸 {count}개를 추가로 구매하시겠습니까?",
+      "buyConfirmGold": "{price}에 구매",
+      "buyConfirmClaudium": "{cost} Claudium으로 구매",
+      "rungGranted": "은행 칸이 추가되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
+      "rungAlreadyGranted": "이 칸은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
+      "rungApplyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",
+      "rungGrantUnresolved": "결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.",
+      "rungInProgress": "이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.",
+      "rungDoesNotFit": "이 캐릭터의 은행에는 더 이상 확장을 담을 수 없습니다.",
+      "rungNotPurchasable": "이 은행 칸은 지금 구매할 수 없습니다.",
+      "rungFailed": "구매를 완료하지 못했습니다.",
+      "rungOutage": "구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.",
       "withdrawHint": "클릭하여 꺼내기",
       "withdrawPartialHint": "Shift+클릭하여 일부만 꺼내기",
       "depositHint": "클릭하여 넣기",
@@ -3024,6 +3337,9 @@ export const ko_KR: EnTranslations = {
       "withdrawQuantityTitle": "{item} 꺼내기",
       "withdrawQuantityInput": "꺼낼 수량",
       "withdrawQuantityConfirm": "꺼내기",
+      "vaultRowWithdrawName": "{item} 꺼내기",
+      "priceChanged": "구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.",
+      "withdrawQuantityAction": "{item} 꺼낼 수량 선택",
       "filterGroupAria": "은행을 분류별로 필터링",
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",
@@ -3045,6 +3361,34 @@ export const ko_KR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.",
       "bonusSectionAria": "보너스 은행 칸과 획득 방법",
+      "socketRowAria": "은행 가방 칸",
+      "socketEmpty": "빈 은행 가방 칸",
+      "socketEmptyHint": "가방에 있는 가방을 클릭하면 은행에 보관됩니다",
+      "socketLocked": "잠긴 가방 칸",
+      "socketLockedLater": "가방 칸은 저렴한 것부터 순서대로 해금됩니다",
+      "socketUnlockAria": "{price}(으)로 은행 가방 칸 해금",
+      "socketUnlockHint": "클릭하여 이 가방 칸을 해금",
+      "socketUnlockConfirm": "{price}(으)로 은행 가방 칸을 해금하시겠습니까?",
+      "socketUnlockAccept": "해금",
+      "unsocketHint": "클릭하여 이 가방을 가방으로 되돌리기",
+      "socketHint": "클릭하여 이 가방을 은행에 장착",
+      "vaultTab": "보관소",
+      "vaultCapacityNote": "각 재료는 최대 {cap}개까지 보관할 수 있습니다.",
+      "vaultEmpty": "재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.",
+      "vaultRowAria": "{item}: {count}/{cap}개 보관 중",
+      "vaultLockedIntro": "재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.",
+      "vaultUnlockButton": "재료 보관소 개방",
+      "vaultUnlockConfirm": "{price}(으)로 재료 보관소를 개방하시겠습니까?",
+      "vaultUpgrade": "보관 한도를 {cap}개로 확장",
+      "vaultUpgradeConfirm": "{price}(으)로 각 재료의 보관 한도를 {cap}개로 확장하시겠습니까?",
+      "vaultDepositAll": "재료 모두 보관",
+      "vaultDepositAllTooltip": "가방의 모든 재료를 한 번에 보관소로 옮깁니다. 각 재료는 한도까지 채워집니다. 장비, 도구, 퀘스트 아이템, 소모품은 옮겨지지 않습니다.",
+      "vaultDepositAllDone": "보관한 재료: {count}개.",
+      "vaultDepositAllFull": "보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.",
+      "vaultDepositAllNone": "보관 한도가 가득 차서 아무것도 보관하지 못했습니다.",
+      "vaultWithdrawShort": "가방에는 {count}개 중 {fit}개만 들어갑니다.",
+      "vaultDepositHint": "클릭하여 보관소에 보관",
+      "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
       "tabsAria": "은행 탭",
       "personalTab": "개인",
       "guildTab": "길드",
@@ -3444,6 +3788,8 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
+      "reagentVaultDraw": "(재료 보관소에서 {count}개 사용)",
+      "vaultUnreachable": "여기에서는 재료 보관소를 사용할 수 없습니다.",
       "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
@@ -3542,7 +3888,9 @@ export const ko_KR: EnTranslations = {
       "equip": "장착",
       "disenchant": "마력 추출",
       "salvage": "분해",
-      "applyEnchant": "마법부여 적용"
+      "applyEnchant": "마법부여 적용",
+      "sell": "판매",
+      "sellAll": "모두 판매 ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
@@ -4044,9 +4392,15 @@ export const ko_KR: EnTranslations = {
       "loading": "거래소를 불러오는 중...",
       "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
       "disabledRealm": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
+      "browserOnlyConfirmTitle": "브라우저에서 $WOC 거래소를 열까요?",
+      "browserOnlyConfirmBody": "$WOC 거래소는 World of ClaudeCraft의 브라우저 버전에서만 이용할 수 있습니다. 브라우저에서 World of ClaudeCraft를 엽니다. 그곳에서 로그인하고 거래소를 열 수 있습니다. 게임은 계속 실행됩니다.",
+      "browserOnlyConfirmOpen": "브라우저에서 열기",
+      "browserOnlyConfirmCancel": "취소",
       "pausedBanner": "거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.",
-      "walletBanner": "지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.",
-      "walletBannerCta": "지갑 연결",
+      "walletLinkedDisconnected": "공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.",
+      "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "알 수 없음",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
@@ -4300,6 +4654,8 @@ export const ko_KR: EnTranslations = {
       "online": "캐릭터가 현재 접속 중입니다.",
       "rename_not_permitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
+      "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
+      "delete_busy": "서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
@@ -4360,7 +4716,13 @@ export const ko_KR: EnTranslations = {
       "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
     "wallet": {
-      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.",
+      "reauth_required": "이 지갑 변경을 확인하려면 계정 비밀번호를 입력하세요.",
+      "reauth_two_factor": "이 계정은 2단계 인증이 활성화되어 있습니다. 확인하려면 인증 코드를 입력하세요.",
+      "reauth_no_password": "먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+      "reauth_bad_signature": "지갑 서명을 확인할 수 없습니다. 다시 시도하세요.",
+      "reauth_bad_password": "비밀번호가 올바르지 않습니다.",
+      "reauth_bad_two_factor": "코드가 올바르지 않습니다. 다시 시도하세요."
     },
     "ota_updates": {
       "invalid_input": "입력이 올바르지 않습니다."
@@ -4818,6 +5180,7 @@ export const ko_KR: EnTranslations = {
       "ifPartySort": "파티원을 나열하는 순서입니다. 파티 순서, 역할, 또는 이름 중에서 고릅니다.",
       "ifPartyShowAuras": "파티 프레임에 강화 효과와 약화 효과를 표시할지 정합니다. 자원 막대, 보호막, 소환수, 그리고 내 파티 목록에 나 자신이 나타날지에 대해서도 같은 방식의 스위치가 마련되어 있습니다.",
       "ifAurasOnPlayerFrame": "내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.",
+      "ifAlwaysShowAllBuffs": "낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.",
       "ifTargetOfTarget": "내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.",
       "ifPetFrame": "소환수의 프레임을 표시합니다.",
       "ifChatFontScale": "채팅 글자 크기입니다.",
@@ -6304,6 +6667,7 @@ export const ko_KR: EnTranslations = {
       "bankBody": "모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.",
       "bankHow": "금고가 열린 상태에서 가방의 물건을 클릭하면 맡겨지고, 금고의 물건을 클릭하면 되찾습니다. 금고에는 물건만 보관할 수 있고 동전은 맡길 수 없으며, 퀘스트 아이템은 늘 몸에 지니게 됩니다. 여행 중에 가방이 가득 차면 제작 재료를 한 번에 맡기는 버튼도 있습니다.",
       "bankSlots": "갓 연 금고는 작지만 당신과 함께 자랍니다. 출납관은 추가 칸을 동전에 판매하며 가격은 단계마다 높아집니다. 온라인으로 플레이하면 이메일 인증, 계정 연동, 친구 초대 등으로 보너스 공간도 얻을 수 있습니다.",
+      "bankSockets": "칸 사다리 너머로, 출납관은 최대 네 개의 가방 칸도 판매합니다. 저렴한 것부터 순서대로 해금되며 가격은 단계마다 높아집니다. 들고 다니던 여분의 가방을 칸에 끼우면 그 가방의 칸이 금고 공간에 더해집니다. 일반 가방은 금고 전체를 넓히고, 재료 주머니는 제작 재료만 쓸 수 있는 공간을 더합니다. 가방에 있는 가방을 클릭하면 끼워지고, 칸을 클릭하면 되찾습니다. 되찾아도 보관한 물건을 잃는 일은 없습니다. 금고가 줄어든 공간을 넘어서더라도 모든 물건은 그대로 남고, 새 보관만 자리가 나기를 기다립니다.",
       "buyingTitle": "사고팔기",
       "buyingBody": "상인에게 말을 걸어 물건을 둘러보기로 하면, 그들의 상점이 세 개의 탭과 함께 열립니다. 구매, 판매, 되사기입니다. 구매 탭에는 그들이 갖춘 모든 물건이 있어, 형편이 닿는 한 무엇이든 살 수 있습니다. 판매 탭에는 가방 속에서 그들이 값을 치를 물건이 나열되며, 저마다 굴려 정해진 품질을 지닌 물건을 팔 때에는 먼저 확인을 묻기에, 아끼는 물건이 실수로 빠져나가는 일이 없습니다. 후회할 물건을 넘겼다면, 되사기 탭에 최근 판매 내역이 남아 있어 받았던 동전으로 다시 사들일 수 있습니다.",
       "junkTitle": "잡동사니 정리",
@@ -7285,6 +7649,13 @@ export const ko_KR: EnTranslations = {
     "unlink": "연결 해제",
     "unlinkTitle": "이 계정에서 지갑 인증 제거",
     "unlinkAria": "이 계정에서 지갑 인증 제거",
+    "reauthTitle": "지갑 변경 확인",
+    "reauthUnlinkTitle": "지갑 제거 확인",
+    "reauthHelp": "보안을 위해 이 변경을 승인하려면 계정 비밀번호를 입력하세요.",
+    "reauthNoPassword": "이 계정은 비밀번호 없이 로그인합니다. 먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+    "reauthConfirm": "확인",
+    "reauthCancel": "취소",
+    "reauthClose": "닫기",
     "signOut": "연결 끊기",
     "signOutTitle": "이 브라우저에서 지갑 앱 연결 끊기",
     "signOutAria": "이 브라우저에서 지갑 앱 연결 끊기",
@@ -7340,6 +7711,7 @@ export const ko_KR: EnTranslations = {
       "title": "Solana 지갑 연결",
       "linkBody": "이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.",
       "paymentBody": "계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.",
+      "stepUpBody": "계정에 연결된 지갑을 선택하고 $WOC 거래소 승인 메시지에 서명하세요. 서명은 무료이며 자금이 이동하지 않습니다.",
       "extensionHelp": "호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.",
       "safety": "World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.",
       "continueWith": "{wallet}(으)로 계속",
@@ -7727,6 +8099,20 @@ export const ko_KR: EnTranslations = {
     "buyConfirmTitle": "구매 확인",
     "buyConfirmBody": "영웅의 징표 {marks}개로 {item}을(를) 구매하시겠습니까? 징표 구매는 환불되지 않습니다.",
     "buyConfirmAccept": "구매",
+    "buyConfirmCancel": "취소"
+  },
+  "crucibleShop": {
+    "browse": "인장 교환",
+    "browseAria": "{name}에게 도가니 인장 교환",
+    "empty": "내 직업으로 교환할 수 있는 세트 부위가 없습니다.",
+    "balance": "보유한 인장: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "도가니 인장을 갖고 있지 않습니다.",
+    "price": "{sigil} 1개",
+    "buyAria": "{sigil}(으)로 {item} 교환",
+    "buyConfirmTitle": "교환 확인",
+    "buyConfirmBody": "{sigil}(을)를 {item}(으)로 교환하시겠습니까? 소모된 인장은 환불되지 않습니다.",
+    "buyConfirmAccept": "교환",
     "buyConfirmCancel": "취소"
   },
   "cardDuel": {
@@ -8557,6 +8943,8 @@ export const ko_KR: EnTranslations = {
         "riftEntrance": "균열 입구: {name}",
         "hostileEnemy": "적대 대상",
         "aggressiveEnemy": "당신을 공격 중인 적",
+        "bossEnemy": "우두머리: {name}",
+        "bossAggressiveEnemy": "당신을 공격 중인 우두머리: {name}",
         "lootableEnemy": "전리품을 획득할 수 있는 적",
         "corpse": "자신의 시체",
         "deathZone": "위험 지역",
@@ -8945,6 +9333,7 @@ export const ko_KR: EnTranslations = {
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
       "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "tradeWindowIneligible": "해당 아이템은 같은 전리품을 함께 획득한 플레이어와만 거래할 수 있습니다.",
       "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {
@@ -9425,7 +9814,8 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots}칸 가방"
+      "bagSlots": "{slots}칸 가방",
+      "bagSlotsMaterials": "{slots}칸 재료 가방"
     },
     "bags": {
       "title": "가방",
@@ -9607,7 +9997,8 @@ export const ko_KR: EnTranslations = {
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",
-      "rolled": "{answered}/{total} 굴림 완료"
+      "rolled": "{answered}/{total} 굴림 완료",
+      "bindsOnPickup": "획득 시 귀속"
     }
   },
   "entities": {
@@ -10388,7 +10779,7 @@ export const ko_KR: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "운명의 바늘",
-        "description": "적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다."
+        "description": "적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다."
       },
       "sentence": {
         "name": "선고",
@@ -10486,7 +10877,7 @@ export const ko_KR: EnTranslations = {
       },
       "moonseed": {
         "name": "달씨앗",
-        "description": "달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다."
+        "description": "달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다."
       },
       "rejuvenation": {
         "name": "야생 개화",
@@ -10790,7 +11181,7 @@ export const ko_KR: EnTranslations = {
       },
       "conflagrate": {
         "name": "점화",
-        "description": "불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 2회 담아 둡니다. (파괴 상징 기술)"
+        "description": "불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)"
       },
       "moonkin_form": {
         "name": "달빛야수 변신",
@@ -10822,7 +11213,7 @@ export const ko_KR: EnTranslations = {
       },
       "overbloom": {
         "name": "만개",
-        "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
+        "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
       },
       "summon_imp": {
         "name": "불씨족 소환",
@@ -10894,7 +11285,7 @@ export const ko_KR: EnTranslations = {
       },
       "iron_resolve": {
         "name": "강철 의지",
-        "description": "이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 4의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)"
+        "description": "이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)"
       },
       "faultline": {
         "name": "단층선",
@@ -11271,7 +11662,7 @@ export const ko_KR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "치천사의 수호",
-        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다."
+        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다."
       },
       "summon_tithefiend": {
         "name": "십일조 악마 소환",
@@ -12814,6 +13205,9 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
       },
+      "reins_rickshaw_mount": {
+        "name": "결속된 고삐: 뼈에 묶인 인력거"
+      },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
       },
@@ -12859,6 +13253,27 @@ export const ko_KR: EnTranslations = {
       "dawnhold_posy": {
         "name": "던홀드 정원 꽃다발"
       },
+      "wayfarers_backpack": {
+        "name": "나그네의 배낭"
+      },
+      "burlap_reagent_pouch": {
+        "name": "삼베 재료 주머니"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "강령술사의 재료 가방"
+      },
+      "duskweave_bag": {
+        "name": "황혼결 가방"
+      },
+      "resonant_weave_bag": {
+        "name": "공명결 가방"
+      },
+      "foragers_haversack": {
+        "name": "채집가의 잡낭"
+      },
+      "loombound_reagent_satchel": {
+        "name": "베틀결 재료 가방"
+      },
       "ps_briny_lure": {
         "name": "짠물 미끼"
       },
@@ -12870,6 +13285,612 @@ export const ko_KR: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "안식의 돌"
+      },
+      "lastflame_core": {
+        "name": "마지막 불꽃의 핵"
+      },
+      "slagbreaker_helmet": {
+        "name": "슬래그브레이커 투구"
+      },
+      "slagbreaker_shoulder": {
+        "name": "슬래그브레이커 어깨갑옷"
+      },
+      "slagbreaker_chest": {
+        "name": "슬래그브레이커 사슬갑옷"
+      },
+      "slagbreaker_gloves": {
+        "name": "슬래그브레이커 건틀릿"
+      },
+      "slagbreaker_legs": {
+        "name": "슬래그브레이커 다리갑옷"
+      },
+      "emberfury_helmet": {
+        "name": "잿불격노 투구"
+      },
+      "emberfury_shoulder": {
+        "name": "잿불격노 어깨갑옷"
+      },
+      "emberfury_chest": {
+        "name": "잿불격노 사슬갑옷"
+      },
+      "emberfury_gloves": {
+        "name": "잿불격노 건틀릿"
+      },
+      "emberfury_legs": {
+        "name": "잿불격노 다리갑옷"
+      },
+      "forgewall_helmet": {
+        "name": "화로성벽 투구"
+      },
+      "forgewall_shoulder": {
+        "name": "화로성벽 어깨갑옷"
+      },
+      "forgewall_chest": {
+        "name": "화로성벽 사슬갑옷"
+      },
+      "forgewall_gloves": {
+        "name": "화로성벽 건틀릿"
+      },
+      "forgewall_legs": {
+        "name": "화로성벽 다리갑옷"
+      },
+      "dawnforged_helmet": {
+        "name": "새벽벼림 투구"
+      },
+      "dawnforged_shoulder": {
+        "name": "새벽벼림 어깨갑옷"
+      },
+      "dawnforged_chest": {
+        "name": "새벽벼림 사슬갑옷"
+      },
+      "dawnforged_gloves": {
+        "name": "새벽벼림 건틀릿"
+      },
+      "dawnforged_legs": {
+        "name": "새벽벼림 다리갑옷"
+      },
+      "oathpyre_helmet": {
+        "name": "맹세화염 투구"
+      },
+      "oathpyre_shoulder": {
+        "name": "맹세화염 어깨갑옷"
+      },
+      "oathpyre_chest": {
+        "name": "맹세화염 사슬갑옷"
+      },
+      "oathpyre_gloves": {
+        "name": "맹세화염 건틀릿"
+      },
+      "oathpyre_legs": {
+        "name": "맹세화염 다리갑옷"
+      },
+      "zealfire_helmet": {
+        "name": "열화신념 투구"
+      },
+      "zealfire_shoulder": {
+        "name": "열화신념 어깨갑옷"
+      },
+      "zealfire_chest": {
+        "name": "열화신념 사슬갑옷"
+      },
+      "zealfire_gloves": {
+        "name": "열화신념 건틀릿"
+      },
+      "zealfire_legs": {
+        "name": "열화신념 다리갑옷"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "무리군주 가죽두건"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "무리군주 어깨보호구"
+      },
+      "packlord_emberhide_chest": {
+        "name": "무리군주 튜닉"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "무리군주 손보호구"
+      },
+      "packlord_emberhide_legs": {
+        "name": "무리군주 가죽바지"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "냉정한 시선 가죽두건"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "냉정한 시선 어깨보호구"
+      },
+      "coldsight_trackers_chest": {
+        "name": "냉정한 시선 튜닉"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "냉정한 시선 손보호구"
+      },
+      "coldsight_trackers_legs": {
+        "name": "냉정한 시선 가죽바지"
+      },
+      "slagsnare_helmet": {
+        "name": "용재올가미 가죽두건"
+      },
+      "slagsnare_shoulder": {
+        "name": "용재올가미 어깨보호구"
+      },
+      "slagsnare_chest": {
+        "name": "용재올가미 튜닉"
+      },
+      "slagsnare_gloves": {
+        "name": "용재올가미 손보호구"
+      },
+      "slagsnare_legs": {
+        "name": "용재올가미 가죽바지"
+      },
+      "cinderfang_helmet": {
+        "name": "잿불송곳니 가죽두건"
+      },
+      "cinderfang_shoulder": {
+        "name": "잿불송곳니 어깨보호구"
+      },
+      "cinderfang_chest": {
+        "name": "잿불송곳니 튜닉"
+      },
+      "cinderfang_gloves": {
+        "name": "잿불송곳니 손보호구"
+      },
+      "cinderfang_legs": {
+        "name": "잿불송곳니 가죽바지"
+      },
+      "smolderstrike_helmet": {
+        "name": "그을음일격 가죽두건"
+      },
+      "smolderstrike_shoulder": {
+        "name": "그을음일격 어깨보호구"
+      },
+      "smolderstrike_chest": {
+        "name": "그을음일격 튜닉"
+      },
+      "smolderstrike_gloves": {
+        "name": "그을음일격 손보호구"
+      },
+      "smolderstrike_legs": {
+        "name": "그을음일격 가죽바지"
+      },
+      "ashveil_helmet": {
+        "name": "잿빛장막 가죽두건"
+      },
+      "ashveil_shoulder": {
+        "name": "잿빛장막 어깨보호구"
+      },
+      "ashveil_chest": {
+        "name": "잿빛장막 튜닉"
+      },
+      "ashveil_gloves": {
+        "name": "잿빛장막 손보호구"
+      },
+      "ashveil_legs": {
+        "name": "잿빛장막 가죽바지"
+      },
+      "emberscreed_helmet": {
+        "name": "잉걸불 신조 두건"
+      },
+      "emberscreed_shoulder": {
+        "name": "잉걸불 신조 어깨걸이"
+      },
+      "emberscreed_chest": {
+        "name": "잉걸불 신조 로브"
+      },
+      "emberscreed_gloves": {
+        "name": "잉걸불 신조 손싸개"
+      },
+      "emberscreed_legs": {
+        "name": "잉걸불 신조 다리싸개"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "새벽직조 두건"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "새벽직조 어깨걸이"
+      },
+      "benison_dawnweave_chest": {
+        "name": "새벽직조 로브"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "새벽직조 손싸개"
+      },
+      "benison_dawnweave_legs": {
+        "name": "새벽직조 다리싸개"
+      },
+      "vesperash_helmet": {
+        "name": "저녁잿빛 두건"
+      },
+      "vesperash_shoulder": {
+        "name": "저녁잿빛 어깨걸이"
+      },
+      "vesperash_chest": {
+        "name": "저녁잿빛 로브"
+      },
+      "vesperash_gloves": {
+        "name": "저녁잿빛 손싸개"
+      },
+      "vesperash_legs": {
+        "name": "저녁잿빛 다리싸개"
+      },
+      "stormkindled_helmet": {
+        "name": "폭풍점화 투구"
+      },
+      "stormkindled_shoulder": {
+        "name": "폭풍점화 어깨갑옷"
+      },
+      "stormkindled_chest": {
+        "name": "폭풍점화 사슬갑옷"
+      },
+      "stormkindled_gloves": {
+        "name": "폭풍점화 건틀릿"
+      },
+      "stormkindled_legs": {
+        "name": "폭풍점화 다리갑옷"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "잉걸비늘 투구"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "잉걸비늘 어깨갑옷"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "잉걸비늘 사슬갑옷"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "잉걸비늘 건틀릿"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "잉걸비늘 다리갑옷"
+      },
+      "stonehearth_helmet": {
+        "name": "돌화로 투구"
+      },
+      "stonehearth_shoulder": {
+        "name": "돌화로 어깨갑옷"
+      },
+      "stonehearth_chest": {
+        "name": "돌화로 사슬갑옷"
+      },
+      "stonehearth_gloves": {
+        "name": "돌화로 건틀릿"
+      },
+      "stonehearth_legs": {
+        "name": "돌화로 다리갑옷"
+      },
+      "springmender_helmet": {
+        "name": "샘물치유사 투구"
+      },
+      "springmender_shoulder": {
+        "name": "샘물치유사 어깨갑옷"
+      },
+      "springmender_chest": {
+        "name": "샘물치유사 사슬갑옷"
+      },
+      "springmender_gloves": {
+        "name": "샘물치유사 건틀릿"
+      },
+      "springmender_legs": {
+        "name": "샘물치유사 다리갑옷"
+      },
+      "chronoweave_helmet": {
+        "name": "에테르직조 두건"
+      },
+      "chronoweave_shoulder": {
+        "name": "에테르직조 어깨걸이"
+      },
+      "chronoweave_chest": {
+        "name": "에테르직조 로브"
+      },
+      "chronoweave_gloves": {
+        "name": "에테르직조 손싸개"
+      },
+      "chronoweave_legs": {
+        "name": "에테르직조 다리싸개"
+      },
+      "pyroclast_helmet": {
+        "name": "화쇄류 두건"
+      },
+      "pyroclast_shoulder": {
+        "name": "화쇄류 어깨걸이"
+      },
+      "pyroclast_chest": {
+        "name": "화쇄류 로브"
+      },
+      "pyroclast_gloves": {
+        "name": "화쇄류 손싸개"
+      },
+      "pyroclast_legs": {
+        "name": "화쇄류 다리싸개"
+      },
+      "frostquench_helmet": {
+        "name": "서리담금질 두건"
+      },
+      "frostquench_shoulder": {
+        "name": "서리담금질 어깨걸이"
+      },
+      "frostquench_chest": {
+        "name": "서리담금질 로브"
+      },
+      "frostquench_gloves": {
+        "name": "서리담금질 손싸개"
+      },
+      "frostquench_legs": {
+        "name": "서리담금질 다리싸개"
+      },
+      "hexthread_helmet": {
+        "name": "저주실타래 두건"
+      },
+      "hexthread_shoulder": {
+        "name": "저주실타래 어깨걸이"
+      },
+      "hexthread_chest": {
+        "name": "저주실타래 로브"
+      },
+      "hexthread_gloves": {
+        "name": "저주실타래 손싸개"
+      },
+      "hexthread_legs": {
+        "name": "저주실타래 다리싸개"
+      },
+      "gravebrand_helmet": {
+        "name": "무덤낙인 두건"
+      },
+      "gravebrand_shoulder": {
+        "name": "무덤낙인 어깨걸이"
+      },
+      "gravebrand_chest": {
+        "name": "무덤낙인 로브"
+      },
+      "gravebrand_gloves": {
+        "name": "무덤낙인 손싸개"
+      },
+      "gravebrand_legs": {
+        "name": "무덤낙인 다리싸개"
+      },
+      "ruincaller_helmet": {
+        "name": "파멸의 부름 두건"
+      },
+      "ruincaller_shoulder": {
+        "name": "파멸의 부름 어깨걸이"
+      },
+      "ruincaller_chest": {
+        "name": "파멸의 부름 로브"
+      },
+      "ruincaller_gloves": {
+        "name": "파멸의 부름 손싸개"
+      },
+      "ruincaller_legs": {
+        "name": "파멸의 부름 다리싸개"
+      },
+      "moonscorch_helmet": {
+        "name": "달그을림 가죽두건"
+      },
+      "moonscorch_shoulder": {
+        "name": "달그을림 어깨보호구"
+      },
+      "moonscorch_chest": {
+        "name": "달그을림 튜닉"
+      },
+      "moonscorch_gloves": {
+        "name": "달그을림 손보호구"
+      },
+      "moonscorch_legs": {
+        "name": "달그을림 가죽바지"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "야생송곳니 가죽두건"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "야생송곳니 어깨보호구"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "야생송곳니 튜닉"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "야생송곳니 손보호구"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "야생송곳니 가죽바지"
+      },
+      "cinderbark_helmet": {
+        "name": "잿불나무껍질 가죽두건"
+      },
+      "cinderbark_shoulder": {
+        "name": "잿불나무껍질 어깨보호구"
+      },
+      "cinderbark_chest": {
+        "name": "잿불나무껍질 튜닉"
+      },
+      "cinderbark_gloves": {
+        "name": "잿불나무껍질 손보호구"
+      },
+      "cinderbark_legs": {
+        "name": "잿불나무껍질 가죽바지"
+      },
+      "grovespring_helmet": {
+        "name": "숲의 샘 가죽두건"
+      },
+      "grovespring_shoulder": {
+        "name": "숲의 샘 어깨보호구"
+      },
+      "grovespring_chest": {
+        "name": "숲의 샘 튜닉"
+      },
+      "grovespring_gloves": {
+        "name": "숲의 샘 손보호구"
+      },
+      "grovespring_legs": {
+        "name": "숲의 샘 가죽바지"
+      },
+      "sigil_anvil_helmet": {
+        "name": "모루 투구 인장"
+      },
+      "sigil_ember_helmet": {
+        "name": "잉걸불 투구 인장"
+      },
+      "sigil_tempest_helmet": {
+        "name": "폭풍 투구 인장"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "모루 어깨 인장"
+      },
+      "sigil_ember_shoulder": {
+        "name": "잉걸불 어깨 인장"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "폭풍 어깨 인장"
+      },
+      "sigil_anvil_chest": {
+        "name": "모루 로브 인장"
+      },
+      "sigil_ember_chest": {
+        "name": "잉걸불 로브 인장"
+      },
+      "sigil_tempest_chest": {
+        "name": "폭풍 로브 인장"
+      },
+      "sigil_anvil_gloves": {
+        "name": "모루 장갑 인장"
+      },
+      "sigil_ember_gloves": {
+        "name": "잉걸불 장갑 인장"
+      },
+      "sigil_tempest_gloves": {
+        "name": "폭풍 장갑 인장"
+      },
+      "sigil_anvil_legs": {
+        "name": "모루 다리 인장"
+      },
+      "sigil_ember_legs": {
+        "name": "잉걸불 다리 인장"
+      },
+      "sigil_tempest_legs": {
+        "name": "폭풍 다리 인장"
+      },
+      "cord_of_the_last_flame": {
+        "name": "마지막 불꽃의 끈"
+      },
+      "cindersoaked_slippers": {
+        "name": "잿물배인 덧신"
+      },
+      "springbinder_sash": {
+        "name": "샘묶이 장식띠"
+      },
+      "steps_of_quiet_water": {
+        "name": "고요한 물의 발걸음"
+      },
+      "cinderbark_cinch": {
+        "name": "잿불나무껍질 허리끈"
+      },
+      "ashenbark_treads": {
+        "name": "잿빛나무껍질 신발"
+      },
+      "slagstalker_belt": {
+        "name": "용재추적자 허리띠"
+      },
+      "ashrunner_boots": {
+        "name": "재질주자 장화"
+      },
+      "moonscorch_waistwrap": {
+        "name": "달그을림 허리감개"
+      },
+      "scorchgrove_striders": {
+        "name": "그을린숲 활보자"
+      },
+      "grovetender_belt": {
+        "name": "숲지기 허리띠"
+      },
+      "dewfall_moccasins": {
+        "name": "이슬맺힌 신"
+      },
+      "forgewall_girdle": {
+        "name": "화로성벽 허리갑"
+      },
+      "anvilstance_sabatons": {
+        "name": "모루자세 강철신"
+      },
+      "warforged_waistguard": {
+        "name": "전쟁벼림 허리보호구"
+      },
+      "furnace_march_greaves": {
+        "name": "용광로 행군 다리보호구"
+      },
+      "stormkindled_chain": {
+        "name": "폭풍점화 사슬"
+      },
+      "thundershock_treads": {
+        "name": "천둥충격 신발"
+      },
+      "tidebinder_links": {
+        "name": "조수묶이 사슬고리"
+      },
+      "springwarden_sabatons": {
+        "name": "샘지기 강철신"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "첫 담금질의 목걸이"
+      },
+      "ignivars_ember_choker": {
+        "name": "이그니바르의 잉걸불 목걸이"
+      },
+      "locket_of_the_last_flame": {
+        "name": "마지막 불꽃의 로켓"
+      },
+      "heartspring_amulet": {
+        "name": "심장샘 부적"
+      },
+      "seal_of_the_forgewall": {
+        "name": "화로성벽 인장"
+      },
+      "band_of_marked_strikes": {
+        "name": "새겨진 일격의 반지"
+      },
+      "circle_of_cinders": {
+        "name": "잿불의 고리"
+      },
+      "loop_of_quiet_springs": {
+        "name": "고요한 샘의 고리"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "내부 도가니의 방벽"
+      },
+      "ember_wardens_barrier": {
+        "name": "잉걸불 수호자의 방벽"
+      },
+      "orb_of_the_last_spring": {
+        "name": "마지막 샘의 보주"
+      },
+      "cinder_of_the_first_design": {
+        "name": "최초 설계의 잿불"
+      },
+      "forgefathers_warhammer": {
+        "name": "벼림아버지의 전쟁망치"
+      },
+      "cinderfang_kris": {
+        "name": "잿불송곳니 크리스"
+      },
+      "slagrender_cleaver": {
+        "name": "용재절단 도끼"
+      },
+      "anvilguard_blade": {
+        "name": "모루수호 검"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "종말의 심장 대검"
+      },
+      "staff_of_the_last_spring": {
+        "name": "마지막 샘의 지팡이"
+      },
+      "forgefire_spire": {
+        "name": "화로불꽃 첨탑지팡이"
+      },
+      "springtouched_crozier": {
+        "name": "샘닿은 홀장"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "꺼진 불꽃의 마법봉"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -13647,6 +14668,12 @@ export const ko_KR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "천둥활보 대왕 칠면조의 고삐"
+      },
+      "varkhul_forgebreaker": {
+        "name": "화로파괴자, 바르쿨의 기관"
+      },
+      "varkhul_emberward": {
+        "name": "잉걸수호자, 바르쿨의 방벽"
       }
     },
     "mobs": {
@@ -13841,6 +14868,27 @@ export const ko_KR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "이그니바르, 마지막 불꽃의 전령"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "이그니바르 애쉬콜러"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "잔불 감시자"
+      },
+      "ignivar_crucible_warden": {
+        "name": "용광로 수호자"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "불씨 기계공"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "마지막 불꽃의 대장장이 발쿨"
+      },
+      "derelict_mech": {
+        "name": "버려진 기계병"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
@@ -14501,6 +15549,21 @@ export const ko_KR: EnTranslations = {
         "name": "알드릭 수사",
         "title": "계곡의 사제",
         "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
+      },
+      "archivist_maelin_emberward": {
+        "name": "잔불지기 기록관 메일린",
+        "title": "용광로 기록관",
+        "greeting": "이곳의 망치 자국 하나하나가 하나의 문장이야. 발쿨이 숨기려 한 내용을 읽어 내는 것을 도와줘."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "마엘린의 잔불 투영체",
+        "title": "잔불 투영체",
+        "greeting": "잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다."
+      },
+      "crucible_quartermaster": {
+        "name": "군수담당관 브론 엠버워드",
+        "title": "도가니 군수담당관",
+        "greeting": "화로는 제 사람을 알아본다. 도가니의 인장을 가져오면 전장에 맞게 무장시켜 주지."
       },
       "brother_halven": {
         "name": "브라더 할벤",
@@ -15647,6 +16710,39 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "니트락시스 처치"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "철 속의 메아리",
+        "text": "이 자동 기계들은 병사가 아니라 시작품이야. 각 조립 라인을 부수고 마지막 껍질이 쓰러질 때 귀를 기울여. 대장간은 발쿨이 지우려 한 것을 기억하고 있어.",
+        "completion": "메아리는 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 실패한 단련작이었지. 오직 이그니바르만 견뎌 냈어.",
+        "objectives": {
+          "0": {
+            "label": "잔불 감시자 파괴"
+          },
+          "1": {
+            "label": "용광로 수호자 파괴"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "선구자의 심장",
+        "text": "모든 메아리가 유일한 생존자 이그니바르를 가리켜. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 그를 쓰러뜨려. 기록이 사실이라면 그의 죽음이 무엇을 지키도록 벼려졌는지 밝혀 줄 거야.",
+        "completion": "이그니바르는 단순한 수호자가 아니었어. 그의 심장이 바로 열쇠였고, 마지막 갑주 판이 아래에 봉인된 용광로를 열었어.",
+        "objectives": {
+          "0": {
+            "label": "이그니바르 처치"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "대장장이",
+        "text": "아래로 이어진 길은 마지막 불꽃의 대장장이 발쿨에게 이어져. 그는 금속에 생명을 불어넣으려 마지막 샘을 가두고, 그 죄를 봉인하려 이그니바르를 단조했어. 내부 용광로에 들어가 그의 일을 끝내.",
+        "completion": "마침내 대장간이 조용해졌어. 샘은 다시 회복되지 못할지도 모르지만, 발쿨이 다시 생명을 사슬로 빚을 일은 없을 거야.",
+        "objectives": {
+          "0": {
+            "label": "발쿨 처치"
           }
         }
       },
@@ -17527,6 +18623,31 @@ export const ko_KR: EnTranslations = {
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
+      "ignivar_forge_lift": {
+        "name": "대장간 승강기",
+        "enterText": "대장간 승강기가 요동치며 가라앉는다. 망치 소리가 마중 나오듯 울려 퍼진다.",
+        "leaveText": "승강기가 너를 성채의 탁 트인 바람 속으로 다시 끌어올린다."
+      },
+      "ignivar_forge_approach": {
+        "name": "첫 단련의 회랑",
+        "enterText": "첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.",
+        "leaveText": "첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다."
+      },
+      "ignivar_raid_arena": {
+        "name": "마지막 샘의 도가니",
+        "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
+        "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
+      },
+      "ignivar_molten_assembly": {
+        "name": "용융 조립장",
+        "enterText": "열린 문 너머로 용융 조립 홀이 이어집니다.",
+        "leaveText": "조립 라인을 떠나 도가니로 돌아갑니다."
+      },
+      "ignivar_inner_crucible": {
+        "name": "내부 용광로",
+        "enterText": "열린 문이 용광로의 더 깊은 곳으로 이어집니다.",
+        "leaveText": "용광로의 고요한 깊은 곳을 떠납니다."
+      },
       "wildheart_basin": {
         "name": "야생심장 분지",
         "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
@@ -17758,53 +18879,183 @@ export const ko_KR: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "잿빛 장막 복장",
+        "bonus2": "잠복자의 일격이 25% 더 큰 피해를 입힙니다.",
+        "bonus4": "장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다."
+      },
+      "benison_dawnweave": {
+        "name": "축복의 새벽직조 예복",
+        "bonus2": "치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다."
+      },
       "boundstone_vanguard": {
         "name": "속박석 선봉대",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
+      "chronoweave": {
+        "name": "에테르직조 예복",
+        "bonus2": "시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "시간의 연쇄의 재사용 대기시간이 5초 감소합니다."
+      },
+      "cinderbark": {
+        "name": "잿불나무껍질 수호구",
+        "bonus2": "휩쓰는 발톱이 30% 확률로 오랜 피를 1단계 더 쌓습니다.",
+        "bonus4": "골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다."
+      },
+      "cinderfang": {
+        "name": "잉걸송곳니 장막",
+        "bonus2": "맹독 의식이 타격마다 돌려주는 기력이 20으로 증가합니다.",
+        "bonus4": "맹독 다트의 재사용 대기시간이 4초로 감소합니다."
+      },
+      "coldsight_trackers": {
+        "name": "냉정한 시선 추적 장구",
+        "bonus2": "정밀 사격이 집중을 5 추가로 회복합니다.",
+        "bonus4": "긴 시위의 치명타가 냉정한 집중을 2초 연장합니다. 지속시간마다 최대 6초까지 연장됩니다."
+      },
       "crownforged": {
         "name": "뼈벼림 전투장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+        "bonus2": "힘이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+      },
+      "dawnforged": {
+        "name": "새벽벼림 예복",
+        "bonus2": "빛의 봉화가 직접 치유의 55%를 복제합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "광휘의 공명으로 강화된 여명의 포옹이 즉시 시전됩니다."
       },
       "deathlord": {
         "name": "고분군주의 전투장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "힘이 15, 체력이 15만큼 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 60만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "힘이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+      },
+      "emberfury": {
+        "name": "잉걸불 분노 마구",
+        "bonus2": "격노의 지속시간이 4초에서 6초로 늘어납니다.",
+        "bonus4": "사혈이 항상 당신을 격노시키며, 회복량이 최대 생명력의 8%로 증가합니다."
+      },
+      "emberscreed": {
+        "name": "잉걸불 신조 예복",
+        "bonus2": "수양의 연결이 신성 피해의 10%를 추가로 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "수호의 성가가 완전히 소모되면 10초 이내의 다음 정화의 성가가 즉시 시전됩니다. 이 효과는 15초에 한 번만 발동합니다."
+      },
+      "forgewall": {
+        "name": "벼림벽 아이기스",
+        "bonus2": "강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.",
+        "bonus4": "방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다."
+      },
+      "frostquench": {
+        "name": "서리담금질 직조복",
+        "bonus2": "서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다."
+      },
+      "gravebrand": {
+        "name": "무덤낙인 예장",
+        "bonus2": "수확의 명령의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "수확의 명령의 일제 공격이 25% 더 큰 피해를 입힙니다."
       },
       "greyjaw_stalker": {
         "name": "그레이죠 추적자의 장비",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
+      "grovespring": {
+        "name": "숲샘 예복",
+        "bonus2": "신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다."
+      },
+      "hexthread": {
+        "name": "주술실 장막",
+        "bonus2": "운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "선고를 내리면 단죄 10을 돌려받습니다."
+      },
+      "moonscorch": {
+        "name": "달그을림 예복",
+        "bonus2": "달씨앗이 달빛 폭풍을 적용 한 번당 두 번까지 연장할 수 있으며, 최대 12초까지 늘어납니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "달의 격동과 해돋움의 피해가 25% 증가합니다."
+      },
       "necromancers": {
         "name": "비탄직물 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 10, 체력이 10만큼 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
       },
       "nighttalon": {
         "name": "흉포송곳니 가죽장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+        "bonus2": "민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+      },
+      "oathpyre": {
+        "name": "맹세화염 보루",
+        "bonus2": "맹세수호자의 일격이 태양의 응보를 발동시킬 확률이 30%로 증가하고, 공격을 방패로 막으면 40% 확률로 발동합니다.",
+        "bonus4": "태양의 응보를 소모하면 최대 생명력의 6%를 흡수하는 보호막을 10초 동안 얻습니다."
+      },
+      "packlord_emberhide": {
+        "name": "무리군주 잉걸가죽",
+        "bonus2": "무리 명령의 재사용 대기시간이 3초로 감소합니다.",
+        "bonus4": "무리 명령이 야수 쇄도의 재사용 대기시간을 초기화할 확률이 30%로 증가합니다."
+      },
+      "pyroclast": {
+        "name": "화쇄류 예장",
+        "bonus2": "그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 1.5초 감소합니다."
+      },
+      "ruincaller": {
+        "name": "파멸부름 예복",
+        "bonus2": "점화가 충전을 3회 담아 둡니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "파멸 화살의 피해가 20% 증가합니다."
+      },
+      "slagbreaker": {
+        "name": "광재파쇄자 전투복",
+        "bonus2": "붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.",
+        "bonus4": "붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다."
+      },
+      "slagsnare": {
+        "name": "용재올가미 장구",
+        "bonus2": "내장 가르기가 집중을 20 생성합니다.",
+        "bonus4": "사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다."
+      },
+      "smolderstrike": {
+        "name": "불씨타격 가죽 갑옷",
+        "bonus2": "헤이메이커가 20% 더 큰 피해를 입힙니다.",
+        "bonus4": "소등을 시전할 때마다 폭풍의 칼날의 남은 재사용 대기시간이 6초 감소합니다."
       },
       "soulflame": {
         "name": "망령불꽃 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
+      },
+      "springmender": {
+        "name": "샘치유 비늘갑옷",
+        "bonus2": "해일 부름의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다."
+      },
+      "stonehearth": {
+        "name": "돌화로 보루",
+        "bonus2": "바위결속 상태에서는 폭풍시전 치유의 물결이 마나를 소모하지 않고 치유량이 25% 증가합니다.",
+        "bonus4": "바위결속 상태에서 전령의 박자를 완성하면 최대 생명력의 3%만큼 치유됩니다."
       },
       "stormcallers": {
         "name": "강풍부름 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
+      },
+      "stormkindled": {
+        "name": "폭풍점화 예장",
+        "bonus2": "화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가합니다."
       },
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "vesperash": {
+        "name": "만과의 잿가루 장막",
+        "bonus2": "십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다."
       },
       "warfare_ashstalker": {
         "name": "잿빛추적자의 장비",
@@ -17836,11 +19087,26 @@ export const ko_KR: EnTranslations = {
         "bonus4": "워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.",
         "bonus7": "워페어 공격 및 방어 등급이 80 증가합니다. 주문에 15% 확률로 가시 수호가 깃들어 회피가 6초 동안 15% 증가합니다."
       },
+      "warspirit_emberscale": {
+        "name": "전령 잉걸비늘 갑주",
+        "bonus2": "선조의 일격이 전령의 박자를 3단계 진행시킵니다.",
+        "bonus4": "선조의 일격의 피해가 30% 증가합니다."
+      },
+      "wildfang_emberhide": {
+        "name": "야생송곳니 잉걸가죽",
+        "bonus2": "피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.",
+        "bonus4": "피의 수확이 대상에게 새로운 저미기를 남깁니다."
+      },
       "wyrmshadow": {
         "name": "밤송곳니 의복",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다."
+        "bonus2": "민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+      },
+      "zealfire": {
+        "name": "열화신념 전쟁갑주",
+        "bonus2": "최후의 칙령과 여명 강하가 서로의 남은 재사용 대기시간을 2초 대신 3초 감소시킵니다.",
+        "bonus4": "여명의 격노 중에 시전한 분노의 망치가 20% 대신 40% 더 큰 피해를 입힙니다."
       }
     }
   },

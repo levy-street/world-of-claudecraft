@@ -76,6 +76,18 @@ describe('checkRequireOwnedCoverage', () => {
       problem: 'wrong-owner-scope',
     });
   });
+
+  it('exempts a secret-gated internal :id route: no account bearer exists to own it', () => {
+    const routes: RouteDef[] = [
+      {
+        method: 'POST',
+        path: '/internal/woc-market/settlements/:id/resolve',
+        surface: 'internal',
+        handler: noopHandler,
+      },
+    ];
+    expect(checkRequireOwnedCoverage(routes)).toEqual([]);
+  });
 });
 
 describe('checkRouteCompleteness', () => {

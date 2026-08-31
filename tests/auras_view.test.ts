@@ -21,6 +21,8 @@ import {
   EXPIRING_BLINK_SEC,
   isAuraDebuff,
   isAuraExpiring,
+  isShortDurationBuff,
+  SHORT_BUFF_PRIORITY_SEC,
 } from '../src/ui/auras_view';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -71,6 +73,21 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
     expect(isAuraDebuff(aura({ id: 'x', kind: 'buff_int', value: -20 }))).toBe(true);
   });
 
+  it('id-styled override: Stormsurge Ready reads as a debuff despite its shared internal_cd kind', () => {
+    // Player feedback on PR #3668: Stormsurge's "cannot proc again until
+    // Ancestral Strike is back on cooldown" marker should read as a debuff
+    // (red border, debuff bar), not a buff.
+    expect(
+      isAuraDebuff(aura({ id: 'shaman_stormsurge_ready', kind: 'internal_cd', value: 1 })),
+    ).toBe(true);
+    // The override is per-id, not per-kind: every OTHER internal_cd marker
+    // (Heating Up, Convergence Mark, Warspirit Cadence, ...) stays a buff.
+    expect(isAuraDebuff(aura({ id: 'heating_up', kind: 'internal_cd', value: 1 }))).toBe(false);
+    expect(
+      isAuraDebuff(aura({ id: 'shaman_warspirit_cadence', kind: 'internal_cd', value: 0 })),
+    ).toBe(false);
+  });
+
   // The view re-exports the shared sim classification set. Pin its exact contents
   // so an accidental removal changes every consumer loudly.
   it('matches the exact shared set of harmful kinds', () => {
@@ -114,6 +131,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'sun_verdict',
         'sunder',
         'tongues',
+        'vuln_source',
         'vulnerability',
       ].sort(),
     );
@@ -564,6 +582,29 @@ describe('isAuraExpiring + the expiring slot flag (the QoL blink threshold)', ()
       entity([aura({ id: 'rend', kind: 'dot', remaining: 12, duration: 12 })]),
     );
     expect(refreshed.slots[0].expiring).toBe(false);
+  });
+});
+
+describe('isShortDurationBuff + slot.shortDuration (the low-tier buff-cap priority rule)', () => {
+  it('is short at or under SHORT_BUFF_PRIORITY_SEC, and never on missing/zero/permanent duration', () => {
+    expect(isShortDurationBuff(6)).toBe(true); // Raised Guard's active-mitigation window
+    expect(isShortDurationBuff(SHORT_BUFF_PRIORITY_SEC)).toBe(true); // boundary: inclusive
+    expect(isShortDurationBuff(SHORT_BUFF_PRIORITY_SEC + 1)).toBe(false);
+    expect(isShortDurationBuff(1800)).toBe(false); // a raid buff
+    expect(isShortDurationBuff(undefined)).toBe(false); // an old server's mirror
+    expect(isShortDurationBuff(0)).toBe(false);
+  });
+
+  it('sets slot.shortDuration from the aura duration, for every mode', () => {
+    const view = createAurasView('all', deps());
+    const state = view.tick(
+      entity([
+        aura({ id: 'raised_guard_dr', kind: 'buff_dr_phys', remaining: 6, duration: 6 }),
+        aura({ id: 'might', kind: 'buff_ap', remaining: 1800, duration: 1800 }),
+        aura({ id: 'foreign_dot', kind: 'dot', remaining: 6, duration: 6 }),
+      ]),
+    );
+    expect(state.slots.map((s) => s.shortDuration)).toEqual([true, false, true]);
   });
 });
 

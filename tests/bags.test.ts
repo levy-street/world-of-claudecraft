@@ -2,23 +2,34 @@
 // budget (16-slot backpack + 4 equippable bag sockets), the capacity gates at
 // the command boundaries, equip/unequip/swap rules, and save back-compat.
 import { describe, expect, it } from 'vitest';
+import { isMaterialsOnlyBag, type PoolCapacity } from '../src/sim/bag_pools';
 import {
   addStacked,
   BACKPACK_SLOTS,
   BAG_SOCKETS,
   bagCapacity,
+  bagPools,
   canAddItem,
+  canGrantCopies,
   canGrantItemInstance,
   consumeOneScratch,
   countFit,
   fitsAll,
+  freeBagSlotsFor,
   instancedCountCap,
+  MIGRATION_BAGS,
   migrationBagsFor,
   stackSizeOf,
 } from '../src/sim/bags';
 import { ALL_RECIPES, ITEMS } from '../src/sim/data';
 import { removePreferFungible } from '../src/sim/items';
+import { materialItemIds } from '../src/sim/material_ids';
+// material_taxonomy.ts derives EAGERLY and is therefore banned INSIDE src/sim
+// (the module-evaluation cycle rule); a test may import it, and this one must,
+// to hold the sim-side lazy set and the UI-side eager set to one taxonomy.
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { isCommissionEligibleKind } from '../src/sim/professions/commission';
+import { mintsSignedCraftOutput } from '../src/sim/professions/crafting';
 import { isEnchantedInstance } from '../src/sim/professions/enchanting';
 import { isSignableMaterialRarity } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
@@ -79,15 +90,15 @@ describe('stack sizes and stacking math', () => {
   it('countFit accounts for stack top-up room plus free slots', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 15 }];
     // capacity 2: 5 fit into the existing stack + 20 into the one free slot
-    expect(countFit(inv, 2, 'baked_bread', 99)).toBe(25);
-    expect(canAddItem(inv, 2, 'baked_bread', 25)).toBe(true);
-    expect(canAddItem(inv, 2, 'baked_bread', 26)).toBe(false);
+    expect(countFit(inv, { general: 2, materials: 0 }, 'baked_bread', 99)).toBe(25);
+    expect(canAddItem(inv, { general: 2, materials: 0 }, 'baked_bread', 25)).toBe(true);
+    expect(canAddItem(inv, { general: 2, materials: 0 }, 'baked_bread', 26)).toBe(false);
   });
 
   it('never merges into an instanced slot and offers it no top-up room (#1165)', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } }];
     // capacity 1: the instanced slot occupies the only slot and cannot absorb more
-    expect(countFit(inv, 1, 'baked_bread', 1)).toBe(0);
+    expect(countFit(inv, { general: 1, materials: 0 }, 'baked_bread', 1)).toBe(0);
     addStacked(inv, 'baked_bread', 3);
     expect(inv).toEqual([
       { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
@@ -102,23 +113,31 @@ describe('stack sizes and stacking math', () => {
     ];
     // Both slots occupied (capacity 2): the byte-equal signed stack is the only
     // top-up room the signed add sees; the plain stack offers it none.
-    expect(countFit(inv, 2, 'baked_bread', 99, { signer: 'Ana' })).toBe(15);
+    expect(countFit(inv, { general: 2, materials: 0 }, 'baked_bread', 99, { signer: 'Ana' })).toBe(
+      15,
+    );
     addStacked(inv, 'baked_bread', 3, { signer: 'Ana' });
     expect(inv).toEqual([
       { itemId: 'baked_bread', count: 8, instance: { signer: 'Ana' } },
       { itemId: 'baked_bread', count: 5 },
     ]);
     // A differently-signed add gets no top-up room from either slot.
-    expect(countFit(inv, 2, 'baked_bread', 1, { signer: 'Bru' })).toBe(0);
+    expect(countFit(inv, { general: 2, materials: 0 }, 'baked_bread', 1, { signer: 'Bru' })).toBe(
+      0,
+    );
   });
 
   it('the merge stops AT the stack cap: room is exactly stackSize minus count', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
-    expect(countFit(inv, 1, 'baked_bread', 99, { signer: 'Ana' })).toBe(1);
+    expect(countFit(inv, { general: 1, materials: 0 }, 'baked_bread', 99, { signer: 'Ana' })).toBe(
+      1,
+    );
     addStacked(inv, 'baked_bread', 1, { signer: 'Ana' });
     expect(inv[0].count).toBe(20);
     // At the cap the full stack offers zero room and a fresh add needs a slot.
-    expect(countFit(inv, 1, 'baked_bread', 1, { signer: 'Ana' })).toBe(0);
+    expect(countFit(inv, { general: 1, materials: 0 }, 'baked_bread', 1, { signer: 'Ana' })).toBe(
+      0,
+    );
   });
 
   it('canGrantItemInstance is all-or-nothing across the whole requested count (#2473)', () => {
@@ -130,14 +149,26 @@ describe('stack sizes and stacking math', () => {
     const signer = { signer: 'Ana' };
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
     // Capacity 1: zero free slots, exactly one unit of merge room.
-    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer)).toBe(true);
-    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 1)).toBe(true);
-    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 2)).toBe(false);
-    expect(canGrantItemInstance(inv, 1, 'baked_bread', signer, 3)).toBe(false);
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer)).toBe(
+      true,
+    );
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 1)).toBe(
+      true,
+    );
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 2)).toBe(
+      false,
+    );
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 3)).toBe(
+      false,
+    );
     // One free slot absorbs a whole fresh stack, so the same counts now pass.
-    expect(canGrantItemInstance(inv, 2, 'baked_bread', signer, 3)).toBe(true);
+    expect(canGrantItemInstance(inv, { general: 2, materials: 0 }, 'baked_bread', signer, 3)).toBe(
+      true,
+    );
     // A differently-signed grant sees neither the merge room nor a shortcut.
-    expect(canGrantItemInstance(inv, 1, 'baked_bread', { signer: 'Bru' }, 1)).toBe(false);
+    expect(
+      canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', { signer: 'Bru' }, 1),
+    ).toBe(false);
   });
 
   it('a charge-bearing payload gets one unit per fresh slot and never tops up its twin', () => {
@@ -147,7 +178,7 @@ describe('stack sizes and stacking math', () => {
     ];
     // capacity 3: the byte-equal charged slot offers NO room (mergeability),
     // and each of the two free slots absorbs exactly one charged unit.
-    expect(countFit(inv, 3, 'baked_bread', 99, charged)).toBe(2);
+    expect(countFit(inv, { general: 3, materials: 0 }, 'baked_bread', 99, charged)).toBe(2);
     addStacked(inv, 'baked_bread', 2, charged);
     expect(inv).toHaveLength(3);
     for (const s of inv) expect(s.count).toBe(1);
@@ -178,13 +209,13 @@ describe('stack sizes and stacking math', () => {
   it('fitsAll simulates the batch cumulatively', () => {
     const inv: InvSlot[] = [];
     expect(
-      fitsAll(inv, 2, [
+      fitsAll(inv, { general: 2, materials: 0 }, [
         { itemId: 'worn_sword', count: 1 },
         { itemId: 'rusty_dagger', count: 1 },
       ]),
     ).toBe(true);
     expect(
-      fitsAll(inv, 2, [
+      fitsAll(inv, { general: 2, materials: 0 }, [
         { itemId: 'worn_sword', count: 1 },
         { itemId: 'rusty_dagger', count: 1 },
         { itemId: 'training_mace', count: 1 },
@@ -346,28 +377,40 @@ describe('bags are declared payload-free (#2837)', () => {
   // nowhere to park an instance payload or a craftedRecipeId while a bag is
   // worn. craftedRecipeId is already impossible for a bag (crafting.ts
   // isCraftedDisenchantTrackedOutput and the commission opt-in are both
-  // weapon/armor/held_offhand-only, checked below), but an `instance.signer`
-  // payload is NOT gated by kind: resolveCraftForRecipe's
-  // isSignableMaterialRarity arm mints one for ANY rare-or-better CRAFTED
-  // output, bag included (a loot-only bag never reaches it: two shipped bags
-  // already sit at rare/epic, gravewoven_bag and mistcallers_duffel, both
-  // recipe-free dungeon drops granted plain, which is why the pin below is
-  // scoped to bags a recipe can actually produce, not every bag-kind def).
-  // This pins the content-authoring half of the equip-time guard (bags.ts
-  // equipBag): the day a bag RECIPE crosses this line, this fails at test
-  // time instead of the first player equip.
-  it('no craftable bag-kind item def is authored at a signable material rarity', () => {
+  // weapon/armor/held_offhand-only, checked below), and the signer mint is
+  // bag-exempt at the source: mintsSignedCraftOutput (crafting.ts) refuses
+  // to sign a bag-kind output at ANY rarity, so the phase 05 tailoring
+  // ladder's rare/epic craftable bags grant plain and fungible (loot-only
+  // bags always did: gravewoven_bag and mistcallers_duffel, both recipe-free
+  // dungeon drops granted plain). This pins the mint-side half of the
+  // equip-time guard (bags.ts equipBag, which still refuses a
+  // payload-carrying copy as defense in depth): the day the exemption is
+  // dropped or bypassed, this fails at test time instead of the first
+  // player equip refusing a freshly crafted bag.
+  it('a craftable bag never mints a signed crafted copy, at any authored rarity', () => {
     const bagRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'bag');
     expect(bagRecipes.length, 'sanity: there is a bag recipe to check').toBeGreaterThan(0);
+    // The authored catalog really exercises the bag exemption: the phase 05
+    // tailoring ladder ships rare/epic craftable bags, so this pin is
+    // decisive, not vacuously green over an all-sub-rare catalog.
+    expect(
+      bagRecipes.some((r) => {
+        const def = ITEMS[r.resultItemId];
+        const q = def?.quality === undefined || def.quality === 'poor' ? 'common' : def.quality;
+        return isSignableMaterialRarity(q);
+      }),
+      'sanity: at least one bag recipe sits at a signable rarity',
+    ).toBe(true);
     for (const recipe of bagRecipes) {
-      const def = ITEMS[recipe.resultItemId];
-      const outputQuality =
-        def?.quality === undefined || def.quality === 'poor' ? 'common' : def.quality;
       expect(
-        isSignableMaterialRarity(outputQuality),
-        `${recipe.id} -> ${recipe.resultItemId}: a craftable bag must never be rare or better`,
+        mintsSignedCraftOutput(ITEMS[recipe.resultItemId]),
+        `${recipe.id} -> ${recipe.resultItemId}: a crafted bag must grant plain and payload-free`,
       ).toBe(false);
     }
+    // Bag-scoped, not a blanket off-switch: a rare non-bag def still mints.
+    const rareNonBag = Object.values(ITEMS).find((d) => d.kind !== 'bag' && d.quality === 'rare');
+    expect(rareNonBag, 'sanity: a rare non-bag def exists').toBeTruthy();
+    expect(mintsSignedCraftOutput(rareNonBag)).toBe(true);
   });
 
   it('bags are never a commission-eligible kind', () => {
@@ -504,6 +547,20 @@ describe('persistence and back-compat', () => {
 });
 
 describe('pre-bag save migration (equivalent bags for earned space)', () => {
+  it('the frozen ladder mirrors the LIVE slot counts of the bags it names', () => {
+    // The ladder is a frozen back-compat subset (new bags never join it), but
+    // its hard-coded slot numbers must track the content table: a re-tuned
+    // bagSlots with a stale ladder row would compute coverage from the wrong
+    // number and under-grant a pre-bag save with every other test green.
+    for (const b of MIGRATION_BAGS) {
+      expect(ITEMS[b.id]?.bagSlots, b.id).toBe(b.slots);
+      // The intent is "not a materials-only bag", not "the field is absent":
+      // an explicit `materialsOnly: false` on a ladder row is still a general
+      // bag and must not red this arm.
+      expect(isMaterialsOnlyBag(ITEMS[b.id]), b.id).toBe(false);
+    }
+  });
+
   it('grants nothing at or under the backpack budget', () => {
     expect(migrationBagsFor(0)).toEqual([]);
     expect(migrationBagsFor(BACKPACK_SLOTS)).toEqual([]);
@@ -772,5 +829,589 @@ describe('consumeOneScratch (#2350)', () => {
     consumeOneScratch(copy, GEAR, isEnchantedInstance);
 
     expect(shape(pmeta.inventory)).toEqual(shape(copy));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 05: the fit gates above take a two-pool PoolCapacity split, not a flat
+// capacity number. The pure pool arithmetic is pinned in tests/bag_pools.test.ts
+// with a synthetic predicate; this block drives the SAME rule through the real
+// exported gates with the REAL derived taxonomy, so a gate that forgot to wire
+// isMaterialItemId (or wired an item-kind approximation instead) fails here.
+describe('two-pool capacity through the real gates and the real taxonomy', () => {
+  // Real members of the derived material set, classified below rather than
+  // assumed, plus real non-materials. Both materials stack to 20 (junk kind).
+  const MATERIAL = 'linen_scrap';
+  const MATERIAL_2 = 'copper_ore';
+  const FOOD = 'baked_bread'; // kind 'food': a non-material that stacks to 20
+  const GEAR = 'worn_sword'; // kind 'weapon': a non-material that never stacks
+
+  it('the fixture ids really are (and are not) materials', () => {
+    // Without this the whole block could be exercising the non-material arm
+    // twice and still be green.
+    expect(MATERIAL_ITEM_IDS.has(MATERIAL)).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has(MATERIAL_2)).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has(FOOD)).toBe(false);
+    expect(MATERIAL_ITEM_IDS.has(GEAR)).toBe(false);
+    expect(stackSizeOf(ITEMS[MATERIAL])).toBe(20);
+    expect(stackSizeOf(ITEMS[GEAR])).toBe(1);
+  });
+
+  it('countFit refuses a NON-material once general is full, materials headroom or not', () => {
+    const pools: PoolCapacity = { general: 3, materials: 5 };
+    const inv: InvSlot[] = Array.from({ length: 3 }, () => ({ itemId: GEAR, count: 1 }));
+    // Five materials slots stand free and buy the food nothing: a non-material
+    // may only ever take general-pool headroom.
+    expect(countFit(inv, pools, FOOD, 10)).toBe(0);
+    // One slot back below the boundary and a whole fresh stack fits again.
+    expect(countFit(inv.slice(0, 2), pools, FOOD, 10)).toBe(10);
+  });
+
+  it('countFit lets a MATERIAL spend the materials pool while general is full', () => {
+    const pools: PoolCapacity = { general: 3, materials: 5 };
+    const inv: InvSlot[] = Array.from({ length: 3 }, () => ({ itemId: GEAR, count: 1 }));
+    // Five free materials slots at a 20 stack: 100 units, and not one more.
+    expect(countFit(inv, pools, MATERIAL, 999)).toBe(100);
+    expect(canAddItem(inv, pools, MATERIAL, 100)).toBe(true);
+    expect(canAddItem(inv, pools, MATERIAL, 101)).toBe(false);
+  });
+
+  it('topping up an existing material stack is POOL-BLIND, but a fresh stack is not', () => {
+    // Both pools exactly full, and the one material stack has room for 5 more.
+    // Top-up needs no slot, so 5 of the 8 requested units land; the other 3
+    // would need a fresh stack and there is no slot in either pool for it.
+    const pools: PoolCapacity = { general: 2, materials: 1 };
+    const inv: InvSlot[] = [
+      { itemId: MATERIAL, count: 15 },
+      { itemId: GEAR, count: 1 },
+      { itemId: GEAR, count: 1 },
+    ];
+    expect(countFit(inv, pools, MATERIAL, 8)).toBe(5);
+    // A DIFFERENT material has no stack to top up, so it gets nothing at all.
+    expect(countFit(inv, pools, MATERIAL_2, 1)).toBe(0);
+  });
+
+  it('canGrantCopies applies the split, all-or-nothing, exactly at the boundary', () => {
+    const pools: PoolCapacity = { general: 0, materials: 2 };
+    expect(canGrantCopies([], pools, MATERIAL, 40)).toBe(true);
+    expect(canGrantCopies([], pools, MATERIAL, 41)).toBe(false);
+    // The non-material twin gets nothing from a general pool of zero.
+    expect(canGrantCopies([], pools, FOOD, 1)).toBe(false);
+  });
+
+  it('canGrantItemInstance reads the two-pool split at any count', () => {
+    const pools: PoolCapacity = { general: 0, materials: 1 };
+    const signed = { signer: 'Ana' };
+    // One materials slot, a mergeable payload: exactly one 20-unit stack, so
+    // 20 fits and 21 does not (the exact-fit boundary the retired
+    // fitForItemInstance helper used to surface as a number).
+    expect(canGrantItemInstance([], pools, MATERIAL, signed, 20)).toBe(true);
+    expect(canGrantItemInstance([], pools, MATERIAL, signed, 21)).toBe(false);
+    // A signed NON-material cannot reach the materials pool for even one copy.
+    expect(canGrantItemInstance([], pools, FOOD, signed, 1)).toBe(false);
+  });
+
+  it('fitsAll admits a mixed batch the materials pool makes room for', () => {
+    // general 1 + materials 2: three slots of total headroom, but only ONE of
+    // them is reachable by a non-material.
+    const pools: PoolCapacity = { general: 1, materials: 2 };
+    const mixed: InvSlot[] = [
+      { itemId: MATERIAL, count: 1 },
+      { itemId: MATERIAL_2, count: 1 },
+      { itemId: GEAR, count: 1 },
+    ];
+    expect(fitsAll([], pools, mixed)).toBe(true);
+    // Packing is recomputed from the whole scratch list at every step, never
+    // sticky, so the reverse batch order answers the same.
+    expect(fitsAll([], pools, [...mixed].reverse())).toBe(true);
+    // The discriminating negative: the same three slots of total headroom
+    // refuse a batch of just TWO non-materials.
+    expect(
+      fitsAll([], pools, [
+        { itemId: GEAR, count: 1 },
+        { itemId: 'rusty_dagger', count: 1 },
+      ]),
+    ).toBe(false);
+  });
+
+  it('freeBagSlotsFor answers the fresh-slot count per kind', () => {
+    // The conservative one-slot-per-unit read (trade.ts fitsAfterSwap's unknown
+    // stock fallback) must see the same split the stacking gates do.
+    const pools: PoolCapacity = { general: 1, materials: 2 };
+    expect(freeBagSlotsFor([], pools, MATERIAL)).toBe(3);
+    expect(freeBagSlotsFor([], pools, FOOD)).toBe(1);
+    expect(freeBagSlotsFor([{ itemId: GEAR, count: 1 }], pools, FOOD)).toBe(0);
+  });
+
+  // The mail-take contract (src/sim/mail/post_office.ts mailTake), pinned here
+  // at the gate: mailTake asks canGrantCopies per attached stack with
+  // bagPools(meta.bags), and a stack that is refused stays ATTACHED to the
+  // letter (never destroyed, never force-added). tests/mail.test.ts drives the
+  // same pair end to end through a real Sim and a shipped materials satchel;
+  // these arms isolate the decision to the gate, so a mail-side harness change
+  // cannot quietly stop exercising it. The recipient state is the mail suite's
+  // own full-bags fixture (16 food stacks filling general) plus a materials pool.
+  const MAIL_FIXTURE: InvSlot[] = Array.from({ length: 16 }, () => ({
+    itemId: 'roasted_boar',
+    count: 20,
+  }));
+
+  it('mail-take: a NON-material parcel is refused (stays attached) when general is full', () => {
+    // Five free materials slots and the food parcel still cannot land: the
+    // letter keeps it and the recipient is told to make room.
+    const pools: PoolCapacity = { general: 16, materials: 5 };
+    expect(MATERIAL_ITEM_IDS.has('roasted_boar')).toBe(false);
+    expect(canGrantCopies(MAIL_FIXTURE, pools, 'roasted_boar', 2)).toBe(false);
+    // The same parcel against one freed general slot does land, so the refusal
+    // above is the pool boundary and not a broken fixture.
+    expect(canGrantCopies(MAIL_FIXTURE.slice(0, 15), pools, 'roasted_boar', 2)).toBe(true);
+  });
+
+  it('mail-take: a MATERIAL parcel IS delivered into materials headroom, same state', () => {
+    // The discriminating pair with the arm above: identical recipient, identical
+    // pools, and only the parcel's classification differs.
+    const pools: PoolCapacity = { general: 16, materials: 5 };
+    expect(canGrantCopies(MAIL_FIXTURE, pools, MATERIAL, 2)).toBe(true);
+    expect(canGrantCopies(MAIL_FIXTURE, pools, MATERIAL, 100)).toBe(true); // 5 slots x 20
+    expect(canGrantCopies(MAIL_FIXTURE, pools, MATERIAL, 101)).toBe(false); // and not one more
+    // A recipient with NO satchel equipped (a materials pool of 0) refuses the
+    // SAME material parcel exactly like the food one: the delivery above is
+    // the satchel's doing, not the taxonomy's. That is the arm
+    // tests/mail.test.ts drives end to end through a real Sim.
+    expect(canGrantCopies(MAIL_FIXTURE, { general: 16, materials: 0 }, MATERIAL, 2)).toBe(false);
+  });
+
+  it('an inventory LONGER than both pools answers 0 for both kinds and never throws', () => {
+    // The tolerated-overflow load (a pre-bag save, an unequipped materials bag):
+    // 10 slots against a 5-slot budget. Every material stack is at its 20 cap
+    // and gear never stacks, so no top-up room masks the refusal.
+    const pools: PoolCapacity = { general: 2, materials: 3 };
+    const inv: InvSlot[] = [
+      ...Array.from({ length: 6 }, () => ({ itemId: MATERIAL, count: 20 })),
+      ...Array.from({ length: 4 }, () => ({ itemId: GEAR, count: 1 })),
+    ];
+    expect(() => countFit(inv, pools, MATERIAL, 1)).not.toThrow();
+    expect(countFit(inv, pools, MATERIAL, 1)).toBe(0);
+    expect(countFit(inv, pools, GEAR, 1)).toBe(0);
+    expect(canAddItem(inv, pools, MATERIAL, 1)).toBe(false);
+    expect(canAddItem(inv, pools, GEAR, 1)).toBe(false);
+    // Nothing is repaired, migrated, or destroyed by asking.
+    expect(inv).toHaveLength(10);
+    expect(inv.every((s) => s.count === (s.itemId === MATERIAL ? 20 : 1))).toBe(true);
+  });
+
+  it('the sim-side lazy material set IS the UI-side eager set, and both are the ruled 56', () => {
+    // Equality alone proves nothing (both delegate to the one derivation in
+    // material_derivation.ts), so it is pinned alongside the literal count
+    // tests/material_taxonomy.test.ts pins by exact-set equality, plus known
+    // members and known NON-members on each side.
+    const lazy = materialItemIds();
+    expect(lazy.size).toBe(56);
+    expect(MATERIAL_ITEM_IDS.size).toBe(56);
+    expect(lazy.size).toBe(MATERIAL_ITEM_IDS.size);
+    for (const id of lazy) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    for (const id of MATERIAL_ITEM_IDS) expect(lazy.has(id), id).toBe(true);
+    // The exact members this block's gate arms depend on...
+    expect(lazy.has(MATERIAL)).toBe(true);
+    expect(lazy.has(MATERIAL_2)).toBe(true);
+    // ...and non-members from both exclusion classes: a weapon (excluded by
+    // kind) and a rare-mob charm (non-poor junk the taxonomy settlement ruled
+    // OUT by name). A set that had drifted to "every junk item" would fail here
+    // while the size and equality arms above still passed.
+    expect(lazy.has(GEAR)).toBe(false);
+    expect(lazy.has('gleamstag_charm')).toBe(false);
+    expect(ITEMS.gleamstag_charm?.kind).toBe('junk'); // the exclusion is real, not a typo
+  });
+
+  it('is deterministic: frozen inputs and same-seed Sims answer identically (no rng drawn)', () => {
+    // The pool math draws NO rng (bag_pools.ts states it), so the same inputs
+    // must answer the same every call and in every world on a seed.
+    const pools: PoolCapacity = Object.freeze({ general: 4, materials: 3 });
+    const inv: readonly InvSlot[] = Object.freeze([
+      Object.freeze({ itemId: MATERIAL, count: 20 }),
+      Object.freeze({ itemId: GEAR, count: 1 }),
+    ]) as readonly InvSlot[];
+    const first = countFit(inv, pools, MATERIAL, 999);
+    expect(countFit(inv, pools, MATERIAL, 999)).toBe(first);
+    expect(first).toBe(100); // 2 materials + 3 general free slots, 20 per stack
+
+    const answers = [0, 1].map(() => {
+      const sim = makeSim('warrior', 4242);
+      const m = meta(sim);
+      m.inventory.length = 0; // a known start, so the pins below are literals
+      sim.addItem('linen_pouch', 1);
+      sim.equipBag('linen_pouch', 0);
+      const p = bagPools(m.bags);
+      return { pools: p, used: m.inventory.length, fit: countFit(m.inventory, p, MATERIAL, 9999) };
+    });
+    expect(answers[0]).toEqual(answers[1]);
+    expect(answers[0]).toEqual({
+      pools: { general: BACKPACK_SLOTS + 6, materials: 0 },
+      used: 0,
+      fit: (BACKPACK_SLOTS + 6) * 20,
+    });
+  });
+
+  it('bagPools and bagCapacity: the sum and the split agree in general, DIVERGE on a satchel', () => {
+    // The equip/unequip shrink guards read the TOTAL while the fit gates read
+    // the SPLIT. For unrestricted bags the two agree; the shipped satchels are
+    // where they diverge, and this arm documents which of the two numbers
+    // each caller wanted.
+    expect(bagPools([null, null, null, null])).toEqual({
+      general: BACKPACK_SLOTS,
+      materials: 0,
+    });
+    expect(bagPools(['linen_pouch', 'travelers_knapsack', null, null])).toEqual({
+      general: BACKPACK_SLOTS + 14,
+      materials: 0,
+    });
+    expect(bagCapacity(['linen_pouch', 'travelers_knapsack', null, null])).toBe(
+      BACKPACK_SLOTS + 14,
+    );
+    // The divergence: a materials satchel raises the TOTAL without raising the
+    // general pool, which is the whole two-pool mechanic in two assertions.
+    expect(bagPools(['foragers_haversack', null, null, null])).toEqual({
+      general: BACKPACK_SLOTS,
+      materials: 12,
+    });
+    expect(bagCapacity(['foragers_haversack', null, null, null])).toBe(BACKPACK_SLOTS + 12);
+  });
+
+  it('end to end on shipped content: a real materials satchel opens the second pool', () => {
+    // The whole mechanic through the real Sim command path, no pools literals:
+    // equip a shipped materialsOnly bag, fill the general pool, and the two
+    // kinds diverge exactly as the rule says.
+    const sim = makeSim();
+    const m = meta(sim);
+    expect(ITEMS.foragers_haversack.materialsOnly).toBe(true);
+    expect(ITEMS.foragers_haversack.bagSlots).toBe(12);
+    sim.addItem('foragers_haversack', 1);
+    sim.equipBag('foragers_haversack', 0);
+    expect(m.bags[0]).toBe('foragers_haversack');
+    // The backpack alone is the general pool; the satchel's 12 slots are the
+    // materials pool, and the total readout is both summed.
+    expect(bagPools(m.bags)).toEqual({ general: BACKPACK_SLOTS, materials: 12 });
+    expect(bagCapacity(m.bags)).toBe(BACKPACK_SLOTS + 12);
+
+    m.inventory = Array.from({ length: BACKPACK_SLOTS }, () => ({ itemId: GEAR, count: 1 }));
+    // General is exactly full: a material pickup still fits, a non-material does not.
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(true);
+    expect(sim.canAddItem(FOOD, 1)).toBe(false);
+    expect(freeBagSlotsFor(m.inventory, bagPools(m.bags), MATERIAL)).toBe(12);
+    expect(freeBagSlotsFor(m.inventory, bagPools(m.bags), FOOD)).toBe(0);
+
+    // Fill the materials pool too and the material is refused in turn: the
+    // satchel is extra room, never unlimited room.
+    m.inventory.push(...Array.from({ length: 12 }, () => ({ itemId: MATERIAL, count: 20 })));
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(false);
+    expect(sim.canAddItem(FOOD, 1)).toBe(false);
+  });
+
+  it('unequipping a materials satchel is refused when the carried load would not fit', () => {
+    // The shrink guard on the arm where it is sound: dropping the satchel would
+    // leave 28 slots of goods against the bare 16-slot backpack, so it refuses
+    // and nothing is force-dropped.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('foragers_haversack', 1);
+    sim.equipBag('foragers_haversack', 0);
+    m.inventory = [
+      ...Array.from({ length: BACKPACK_SLOTS }, () => ({ itemId: GEAR, count: 1 })),
+      ...Array.from({ length: 12 }, () => ({ itemId: MATERIAL, count: 20 })),
+    ];
+    sim.drainEvents();
+    sim.unequipBag(0);
+    const ev = sim.drainEvents();
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'You have too many items to remove that bag.',
+      ),
+    ).toBe(true);
+    expect(m.bags[0]).toBe('foragers_haversack'); // still equipped
+    expect(m.inventory).toHaveLength(BACKPACK_SLOTS + 12); // nothing dropped
+  });
+
+  it('unequipping a materials satchel that fits in TOTAL may leave general over capacity, tolerated', () => {
+    // PHASE 05 RULING (recorded in state.md; the phase file's over-capacity
+    // list mandates this exact arm): the shrink guards compare the TOTAL, so
+    // an unequip whose load still fits the summed budget succeeds even when
+    // the general pool ends over its own budget. The overflow is tolerated
+    // exactly like a legacy over-capacity load: new adds of the crowded class
+    // are refused, nothing is destroyed, and re-equipping recovers the state.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('foragers_haversack', 1);
+    sim.equipBag('foragers_haversack', 0);
+    sim.addItem('burlap_reagent_pouch', 1);
+    sim.equipBag('burlap_reagent_pouch', 1);
+    expect(bagPools(m.bags)).toEqual({ general: BACKPACK_SLOTS, materials: 20 });
+    m.inventory = [
+      ...Array.from({ length: BACKPACK_SLOTS }, () => ({ itemId: GEAR, count: 1 })),
+      ...Array.from({ length: 6 }, () => ({ itemId: MATERIAL, count: 20 })),
+    ];
+    sim.drainEvents();
+    // 22 slots + the returned pouch = 23 against a new total of 28: allowed.
+    sim.unequipBag(1);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error')).toBe(false);
+    expect(m.bags[1]).toBe(null);
+    expect(m.inventory).toHaveLength(23); // the pouch came back; nothing lost
+    // General now holds 17 non-materials against 16: over capacity, tolerated.
+    expect(bagPools(m.bags)).toEqual({ general: BACKPACK_SLOTS, materials: 12 });
+    expect(sim.canAddItem(GEAR, 1)).toBe(false);
+    // The remaining satchel still has materials headroom (6 of 12 used).
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(true);
+  });
+
+  it('the tolerated-overflow state still grants materials headroom, so total occupancy may pass the summed budget', () => {
+    // One step past the ruling arms around this one (the architecture-review
+    // finding): with general over budget (17 non-materials against 16), the
+    // free materials pool is STILL handed to materials, so consuming it takes
+    // total occupancy past bagCapacity. That is the documented exception in
+    // the bag_pools.ts header, not a violation: nothing is lost, both kinds
+    // are refused once the headroom is spent, and the used/total readout may
+    // legitimately read past its denominator in this state.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('foragers_haversack', 1);
+    sim.equipBag('foragers_haversack', 0);
+    m.inventory = Array.from({ length: 17 }, () => ({ itemId: GEAR, count: 1 }));
+    expect(bagCapacity(m.bags)).toBe(28);
+    // All 12 materials slots are free even though general is over: 240 units.
+    expect(countFit(m.inventory, bagPools(m.bags), MATERIAL, 999)).toBe(240);
+    expect(sim.canAddItem(MATERIAL, 240)).toBe(true);
+    // Land the grant through the REAL packer, not a hand-built push: the
+    // length pin then proves the 240 units the fit gate promised pack into
+    // exactly 12 fresh stacks (fit-matches-grant, the #2139 property).
+    addStacked(m.inventory, MATERIAL, 240);
+    expect(m.inventory).toHaveLength(29); // 29 > the 28 summed budget, tolerated
+    expect(m.inventory.length).toBeGreaterThan(bagCapacity(m.bags));
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(false);
+    expect(sim.canAddItem(GEAR, 1)).toBe(false);
+    expect(sim.canAddItem(FOOD, 1)).toBe(false);
+  });
+
+  it('swapping a general bag for a materials satchel is allowed on the TOTAL and lands general over, reversibly', () => {
+    // The same ruling's equip arm: the swap grows the TOTAL (22 to 28), so the
+    // guard permits it even though the general pool shrinks below the 22
+    // non-material slots it holds. The player lands in the tolerated-overflow
+    // state (non-material pickups refused, materials pool open) and can always
+    // swap back, so nothing is ever stranded irrecoverably.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('linen_pouch', 1);
+    sim.equipBag('linen_pouch', 0);
+    m.inventory = [
+      ...Array.from({ length: 21 }, () => ({ itemId: GEAR, count: 1 })),
+      { itemId: 'foragers_haversack', count: 1 },
+    ];
+    sim.drainEvents();
+    sim.equipBag('foragers_haversack', 0);
+    expect(sim.drainEvents().some((e) => e.type === 'error')).toBe(false);
+    expect(m.bags[0]).toBe('foragers_haversack');
+    expect(m.inventory).toHaveLength(22); // the pouch swapped back into the bags
+    expect(bagPools(m.bags)).toEqual({ general: BACKPACK_SLOTS, materials: 12 });
+    // 22 non-materials against general 16: refused there, materials pool open.
+    expect(sim.canAddItem(GEAR, 1)).toBe(false);
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(true);
+    // Reversible: the swap back is equally legal on the total (22 vs 22) and
+    // restores a fully in-budget general pool.
+    sim.equipBag('linen_pouch', 0);
+    expect(sim.drainEvents().some((e) => e.type === 'error')).toBe(false);
+    expect(m.bags[0]).toBe('linen_pouch');
+    expect(bagPools(m.bags)).toEqual({ general: BACKPACK_SLOTS + 6, materials: 0 });
+    expect(m.inventory).toHaveLength(22);
+  });
+
+  it('the swap guard judges the POST-swap row: a shrink the new bag cannot hold is refused', () => {
+    // THE ONLY repo-wide pin that the guard reads the post-swap row. Regress
+    // equipBag's `bagCapacity(newBags)` to `bagCapacity(meta.bags)` and every
+    // other arm in the repo stays green while this shrink-swap succeeds: the
+    // load is judged against the row it is about to LEAVE, so a 32-slot load
+    // passes on the 16-slot pack's 32 and lands on the pouch's 22, six items
+    // past a budget the player never agreed to and cannot be warned about.
+    const sim = makeSim();
+    const m = meta(sim);
+    const PACK = 'wayfarers_backpack'; // 16 general slots, the joint-largest
+    expect(ITEMS[PACK].bagSlots).toBe(16);
+    expect(ITEMS.linen_pouch.bagSlots).toBe(6);
+    sim.addItem(PACK, 1);
+    sim.equipBag(PACK, 0);
+    expect(bagCapacity(m.bags)).toBe(BACKPACK_SLOTS + 16);
+    // Exactly full at 32: 31 gear plus the pouch waiting to be swapped in.
+    // Post-swap the row holds 22, so the correct guard refuses at 32 > 22.
+    m.inventory = [
+      ...Array.from({ length: 31 }, () => ({ itemId: GEAR, count: 1 })),
+      { itemId: 'linen_pouch', count: 1 },
+    ];
+    sim.drainEvents();
+    sim.equipBag('linen_pouch', 0);
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (e) => e.type === 'error' && e.text === 'You have too many items to swap to that bag.',
+        ),
+    ).toBe(true);
+    // Refused, and nothing moved: the pack is still socketed and the pouch is
+    // still carried, so the player can free room and retry.
+    expect(m.bags[0]).toBe(PACK);
+    expect(m.bags).toEqual([PACK, null, null, null]);
+    expect(sim.countItem('linen_pouch')).toBe(1);
+    expect(m.inventory).toHaveLength(32);
+  });
+
+  it('over-carry compounds across sockets: swap-first-then-fill reaches 176/112 and is escapable only by unloading materials', () => {
+    // THE CORRECTED CEILING RECORD. The over-carry excess a swap can open is
+    // NOT bounded at roughly one bag: it is the SUM of the displaced general
+    // bags' slots. Each swap is judged against the TOTAL, which the satchel
+    // GROWS (80, 88, 96, 104, 112), so a player who swaps every socket before
+    // spending any materials headroom passes all four guards and lands 80
+    // non-material slots against a 16-slot general pool: 64 over, four bags'
+    // worth. The one-bag intuition only holds when the materials headroom is
+    // consumed BETWEEN swaps, because the fuller total re-tightens the next
+    // guard. Filling that headroom afterwards is still legal, taking the load
+    // to 176 slots against a 112 summed budget, and the state is escapable
+    // only by unloading materials first: both bag commands refuse until then.
+    const sim = makeSim();
+    const m = meta(sim);
+    const PACK = 'wayfarers_backpack'; // 16 general slots, the joint-largest
+    const SATCHEL = 'loombound_reagent_satchel'; // 24 MATERIALS slots
+    expect(isMaterialsOnlyBag(ITEMS[PACK])).toBe(false);
+    expect(ITEMS[PACK].bagSlots).toBe(16);
+    expect(isMaterialsOnlyBag(ITEMS[SATCHEL])).toBe(true);
+    expect(ITEMS[SATCHEL].bagSlots).toBe(24);
+    // A bag ITEM is a non-material, so the satchels waiting in the inventory
+    // count against the general pool exactly like the gear does.
+    expect(MATERIAL_ITEM_IDS.has(PACK)).toBe(false);
+    expect(MATERIAL_ITEM_IDS.has(SATCHEL)).toBe(false);
+
+    // Start: four general packs equipped through the real command, a general
+    // pool of 80, no materials pool, and every one of those 80 slots carried.
+    m.inventory.length = 0;
+    for (let k = 0; k < BAG_SOCKETS; k++) {
+      sim.addItem(PACK, 1);
+      sim.equipBag(PACK, k);
+    }
+    expect(m.bags).toEqual([PACK, PACK, PACK, PACK]);
+    expect(bagPools(m.bags)).toEqual({ general: 80, materials: 0 });
+    m.inventory = [
+      ...Array.from({ length: 76 }, () => ({ itemId: GEAR, count: 1 })),
+      ...Array.from({ length: BAG_SOCKETS }, () => ({ itemId: SATCHEL, count: 1 })),
+    ];
+    expect(m.inventory).toHaveLength(80);
+    expect(sim.canAddItem(GEAR, 1)).toBe(false); // exactly full, nothing over yet
+
+    // Every swap is permitted, and each one moves 16 slots of budget out of
+    // the general pool and 24 into the materials pool while the carried load
+    // never changes: the compounding, one guard-passing step at a time.
+    sim.drainEvents();
+    for (let k = 1; k <= BAG_SOCKETS; k++) {
+      sim.equipBag(SATCHEL, k - 1);
+      expect(
+        sim.drainEvents().some((e) => e.type === 'error'),
+        `swap ${k}`,
+      ).toBe(false);
+      expect(bagPools(m.bags), `swap ${k}`).toEqual({
+        general: 80 - 16 * k,
+        materials: 24 * k,
+      });
+      expect(m.inventory, `swap ${k}`).toHaveLength(80); // the pack swapped back in
+    }
+
+    const pools = bagPools(m.bags);
+    expect(pools).toEqual({ general: BACKPACK_SLOTS, materials: 96 });
+    expect(bagCapacity(m.bags)).toBe(112);
+    // 80 non-material slots against a general budget of 16: 64 over, which is
+    // four displaced packs and not one.
+    expect(m.inventory.every((s) => !MATERIAL_ITEM_IDS.has(s.itemId))).toBe(true);
+    expect(m.inventory.length - pools.general).toBe(4 * 16);
+    expect(freeBagSlotsFor(m.inventory, pools, GEAR)).toBe(0);
+    expect(sim.canAddItem(GEAR, 1)).toBe(false);
+
+    // The materials headroom is REAL, not bookkeeping: all 96 materials slots
+    // are free and the fit gate hands over every one of them.
+    expect(freeBagSlotsFor(m.inventory, pools, MATERIAL)).toBe(96);
+    expect(countFit(m.inventory, pools, MATERIAL, 9999)).toBe(1920); // 96 slots x 20
+    expect(sim.canAddItem(MATERIAL, 1920)).toBe(true);
+    expect(sim.canAddItem(MATERIAL, 1921)).toBe(false);
+    // Land the grant through the REAL packer so the length pin proves the
+    // promised units pack into exactly the promised slots (fit-matches-grant).
+    addStacked(m.inventory, MATERIAL, 1920);
+    expect(m.inventory).toHaveLength(176);
+    expect(m.inventory.filter((s) => s.itemId === MATERIAL)).toHaveLength(96);
+    expect(m.inventory.length).toBeGreaterThan(bagCapacity(m.bags)); // 176 over 112
+    expect(sim.canAddItem(MATERIAL, 1)).toBe(false);
+    expect(sim.canAddItem(GEAR, 1)).toBe(false);
+
+    // Both escapes are now refused, and neither refusal costs an item.
+    sim.drainEvents();
+    sim.equipBag(PACK, 0);
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (e) => e.type === 'error' && e.text === 'You have too many items to swap to that bag.',
+        ),
+    ).toBe(true);
+    sim.unequipBag(0);
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (e) => e.type === 'error' && e.text === 'You have too many items to remove that bag.',
+        ),
+    ).toBe(true);
+    expect(m.bags).toEqual([SATCHEL, SATCHEL, SATCHEL, SATCHEL]);
+    expect(m.inventory).toHaveLength(176);
+    // Length alone survives a refusal path that swapped one id for another, so
+    // pin the carried NON-material multiset too: the 76 gear and the four packs
+    // the swaps displaced are exactly what both refusals had to leave untouched
+    // (the 96 material stacks are counted by the length pin above).
+    const carriedGoods: Record<string, number> = {};
+    for (const s of m.inventory) {
+      if (s.itemId !== MATERIAL) carriedGoods[s.itemId] = (carriedGoods[s.itemId] ?? 0) + s.count;
+    }
+    expect(carriedGoods).toEqual({ [GEAR]: 76, [PACK]: 4 });
+
+    // Escapable, never stranded: unload the materials (the only thing the
+    // satchels were holding) and the swap back is legal again.
+    m.inventory = m.inventory.filter((s) => s.itemId !== MATERIAL);
+    expect(m.inventory).toHaveLength(80);
+    sim.drainEvents();
+    sim.equipBag(PACK, 0);
+    expect(sim.drainEvents().some((e) => e.type === 'error')).toBe(false);
+    expect(m.bags).toEqual([PACK, SATCHEL, SATCHEL, SATCHEL]);
+    expect(bagPools(m.bags)).toEqual({ general: 32, materials: 72 });
+    expect(m.inventory).toHaveLength(80);
+
+    // Conserved throughout: the four packs and four satchels that started the
+    // arm are all still here, equipped or carried, none destroyed or duped.
+    // The materials are absent because this arm deleted them above.
+    const tally: Record<string, number> = {};
+    for (const s of m.inventory) tally[s.itemId] = (tally[s.itemId] ?? 0) + s.count;
+    for (const b of m.bags) if (b) tally[b] = (tally[b] ?? 0) + 1;
+    expect(tally).toEqual({ [GEAR]: 76, [PACK]: 4, [SATCHEL]: 4 });
+  });
+
+  it('an over-capacity carried load reports zero general headroom and is never repaired', () => {
+    // The Sim-level twin of the pure over-capacity arm above, on shipped
+    // content: a tampered 20-slot save against the bare 16-slot backpack keeps
+    // every slot and simply refuses new adds, materials included.
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId)!;
+    state.bags = [null, null, null, null];
+    state.inventory = Array.from({ length: 20 }, () => ({ itemId: GEAR, count: 1 }));
+    const sim2 = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim2.addPlayer('warrior', 'Overloaded', { state });
+    const m2 = (
+      sim2 as never as { players: Map<number, { inventory: InvSlot[]; bags: (string | null)[] }> }
+    ).players.get(pid)!;
+    const pools = bagPools(m2.bags);
+    expect(pools).toEqual({ general: BACKPACK_SLOTS, materials: 0 });
+    expect(m2.inventory).toHaveLength(20); // above budget, and left alone
+    expect(freeBagSlotsFor(m2.inventory, pools, MATERIAL)).toBe(0);
+    expect(freeBagSlotsFor(m2.inventory, pools, GEAR)).toBe(0);
+    expect(sim2.canAddItem(MATERIAL, 1, pid)).toBe(false);
   });
 });

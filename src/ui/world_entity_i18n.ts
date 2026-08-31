@@ -94,6 +94,14 @@ const MOB_IDS = [
   'nythraxis_heroic_priest_add',
   'nythraxis_heroic_rogue_add',
   'nythraxis_scourge_of_thornpeak',
+  'ignivar_herald_of_the_last_flame',
+  'ignivar_heart_of_the_end',
+  'ignivar_ember_sentinel',
+  'ignivar_crucible_warden',
+  'ignivar_cinder_artificer',
+  'varkhul_forgefather_of_the_last_flame',
+  // Ignivar raid approach: the downed forge automaton packs (DUNGEON_MOBS).
+  'derelict_mech',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',
@@ -271,6 +279,9 @@ const NPC_IDS = [
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
+  'archivist_maelin_emberward', // dev-only Ignivar raid historian
+  'archivist_maelin_ember_projection', // Maelin's instanced raid checkpoint projection
+  'crucible_quartermaster', // Ignivar raid sigil-redemption vendor (Halls of the First Tempering)
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
@@ -431,6 +442,9 @@ const QUEST_IDS = [
   'q_nythraxis_sealed_crypt',
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
+  'q_ignivar_echoes_in_iron',
+  'q_ignivar_heralds_heart',
+  'q_ignivar_the_forgefather',
   'q_mogger',
   'q_prof_attune_smith',
   'q_prof_attune_outfitter',
@@ -600,6 +614,11 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'ignivar_forge_lift',
+  'ignivar_forge_approach',
+  'ignivar_raid_arena',
+  'ignivar_molten_assembly',
+  'ignivar_inner_crucible',
   'wildheart_basin',
   'the_last_keep',
   'dawnhold_castle',

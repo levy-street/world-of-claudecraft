@@ -123,6 +123,7 @@ function world(inventory: readonly { itemId: string; count: number }[]): ActionB
     stealthed: false,
     fateThreads: 0,
     entities: [],
+    activeAimSlot: null,
   };
 }
 

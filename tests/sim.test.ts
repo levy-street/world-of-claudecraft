@@ -60,19 +60,21 @@ describe('classic formulas', () => {
     expect(mobXpValue(2, 8)).toBe(0);
   });
 
-  it('spell resist rises with the level gap but is capped (~25% max)', () => {
+  it('spell resist rises with the level gap but is capped (~18% max)', () => {
+    // The Crucible hit rebalance lowered the above-level ramp to [0, 2.5, 8, 14]
+    // so the heroic-raid caps sit within the tier's elective hit budget.
     expect(spellHitChance(5, 5)).toBeCloseTo(0.96); // equal level -> 4% resist
     expect(spellHitChance(4, 5)).toBeCloseTo(0.935); // +1 -> 6.5% resist (preserved)
-    expect(spellHitChance(3, 5)).toBeCloseTo(0.82); // +2 -> ~18% resist
-    expect(spellHitChance(3, 7)).toBeCloseTo(0.75); // +4 -> capped ~25% resist
+    expect(spellHitChance(3, 5)).toBeCloseTo(0.88); // +2 -> 12% resist
+    expect(spellHitChance(3, 7)).toBeCloseTo(0.82); // +4 -> capped 18% resist
   });
 
-  it('melee/ranged miss rises with the level gap but is capped (~26% max)', () => {
+  it('melee/ranged miss rises with the level gap but is capped (~19% max)', () => {
     expect(meleeMissChance(5, 5)).toBeCloseTo(0.05); // equal level -> 5% base
     expect(meleeMissChance(4, 5)).toBeCloseTo(0.075); // +1 -> 7.5% miss (preserved)
-    expect(meleeMissChance(3, 5)).toBeCloseTo(0.19); // +2 (L3 vs L5) -> ~19%
-    expect(meleeMissChance(3, 7)).toBeCloseTo(0.26); // +4 -> capped ~26%
-    expect(meleeMissChance(3, 9)).toBeCloseTo(0.26); // +6 -> still capped ~26%
+    expect(meleeMissChance(3, 5)).toBeCloseTo(0.13); // +2 (L3 vs L5) -> 13%
+    expect(meleeMissChance(3, 7)).toBeCloseTo(0.19); // +4 -> capped 19%
+    expect(meleeMissChance(3, 9)).toBeCloseTo(0.19); // +6 -> still capped 19%
     // hunter Auto Shot + wands resolve through meleeMissChance too, so this covers them
   });
 

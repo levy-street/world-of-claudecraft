@@ -670,7 +670,14 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     // the plan). The knights garrison the annex outside the northeast
     // corner; their wolves still prowl the gate lawn.
     ...DAWNHOLD_BUILDINGS,
-    { key: 'hexCannonballs', x: 276.5, z: 909, scale: 7 },
+    // measured from hex_cannonballs.glb (0.34 wide, 0.33 tall at scale 1,
+    // minus the 0.05 render sink props.ts gives every decorProp): a standable
+    // pyramid, not walk-through dressing, so a jump lands on top instead of
+    // falling through an uncollided pile (issue: cant jump on balls). h keeps
+    // spell line-of-sight at the pile's real height instead of the 4yd
+    // default. Boxed in on the east: only 0.12yd of clearance to the
+    // hexBarracks collider at (283, 908.5) r 5.2, so don't grow r here.
+    { key: 'hexCannonballs', x: 276.5, z: 909, scale: 7, r: 1.2, h: 2.25, standableTop: 2.25 },
     { key: 'hexWeaponRack', x: 250, z: 884, rot: 1.2, scale: 9 },
     // the leafy fox at the centre of the walled flower court: the maze
     // arches' topiary gatekeeper, a size larger as the court's
@@ -762,7 +769,9 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWatchtower', x: 402, z: 720, rot: -2.2, scale: 6.5, r: 3, h: 8 },
     { key: 'hexWatchtower', x: 412, z: 1110, rot: 2.6, scale: 6.5, r: 3, h: 8 },
     // the north watch camp: the knights' kit beside their wolf hounds
-    { key: 'hexCannonballs', x: 406, z: 1114, scale: 5 },
+    // same standable pile, scaled down (see the gate-lawn pile above for the
+    // measured footprint the r/h/standableTop values are derived from)
+    { key: 'hexCannonballs', x: 406, z: 1114, scale: 5, r: 0.86, h: 1.59, standableTop: 1.59 },
     { key: 'hexWeaponRack', x: 415, z: 1113, rot: -0.8, scale: 8 },
     { key: 'hexFlag', x: 410, z: 1107, scale: 3 },
     // the gnome camps read as the groundskeepers' work yards

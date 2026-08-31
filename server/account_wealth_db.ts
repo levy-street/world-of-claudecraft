@@ -19,7 +19,9 @@
 // doctrine), so any per-member share would be fiction. The account detail
 // endpoint surfaces each character's guild treasury as context instead.
 
+import { BANK_LEDGER_LARGE_MOVEMENT_PREDICATE_SQL } from './bank_ledger_indexes';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
+import { MAIL_PARTITION_MARKER_PREFIX, MAIL_RECIPIENT_KEY_INFIX } from './mail_partition_backfill';
 
 // account_wealth is bounded (one row per account, cascade-deleted with the
 // account), so it needs no retention registration: it can never grow past the
@@ -148,13 +150,166 @@ export interface EscrowStateRow {
 }
 
 /** Every realm's mail and market blob (the escrow inputs the sweep parses in
- *  Node). The retained bare legacy 'market' rollback row does not match the
- *  'market:%' pattern and is deliberately excluded. */
+ *  Node), plus mail partition markers so retained legacy blobs can be ignored.
+ *  The retained bare legacy 'market' rollback row does not match 'market:%'. */
 export async function listEscrowStateRows(): Promise<EscrowStateRow[]> {
   const res = await pool.query(
-    `SELECT key, data FROM world_state WHERE key LIKE 'mail:%' OR key LIKE 'market:%'`,
+    `SELECT key, data FROM world_state
+     WHERE key LIKE 'mail:%' OR key LIKE 'market:%' OR key LIKE '${MAIL_PARTITION_MARKER_PREFIX}%'`,
   );
   return res.rows.map((row) => ({ key: row.key, data: row.data }));
+}
+
+// Number.MAX_SAFE_INTEGER, the id-key bound the retired Node fold enforced via
+// Number.isSafeInteger; the SQL arm must draw the identical line so a key just
+// past it stays name-resolved on both sides.
+const MAX_SAFE_INTEGER_SQL = '9007199254740991';
+
+// The one-statement work_mem raise for the escrow aggregate. Measured on a
+// 134k-letter, 103 MB book (PostgreSQL 16): at the stock 4 MB the pass
+// spills ~145 MB of temp-file writes and re-reads every tick (690 ms); at
+// 128 MB the sort fits but the expansion tuplestore still spills ~107 MB
+// (565 ms); at 256 MB nothing spills (500 ms). A book grown past the bound
+// degrades back to a graceful spill, never a failure. Safe to hold: exactly
+// one statement runs under it per pass, and the sweep is globally serialized
+// across realm processes by the advisory lock, so the allocation can never
+// multiply.
+export const ESCROW_AGGREGATE_WORK_MEM = '256MB';
+
+/** Per-character escrow totals aggregated INSIDE Postgres. The jsonb
+ *  expansion of every realm's mail and market blob never leaves the database:
+ *  the result set is proportional to the number of distinct recipients with
+ *  escrowed copper, never to the size of the books (the production mail row
+ *  has been 89 MB; shipping and JSON.parse-ing it in Node blocked the world
+ *  loop for hundreds of ms every sweep tick).
+ *
+ *  Semantics mirror the Node fold `escrowTotalsFromStateRows` exactly (that
+ *  fold is retained in server/account_wealth.ts as the parity oracle, pinned
+ *  by tests/account_wealth_pg_integration.test.ts): realm is everything after
+ *  the key's first colon, partitioned `mail:<realm>:r:*` rows count as mail
+ *  for their realm, and a retained legacy `mail:<realm>` row is ignored once
+ *  that realm has either a partition marker or any partition row; the bare
+ *  legacy 'market' rollback row does not match 'market:%' and is excluded; a
+ *  letter or collection entry counts only when its recipient key is a string
+ *  and its copper is a number whose floor is at least 1; keys are trimmed and
+ *  the house-stock '' key is skipped; an all-digit key within
+ *  Number.MAX_SAFE_INTEGER resolves by character id (merged across realms),
+ *  anything else stays a realm-scoped legacy name.
+ *
+ *  Both expansions scan every realm's blobs, so the read rides the heavy
+ *  allowance like refreshAccountPurseTotals. The CASE around each
+ *  jsonb_array_elements input is load-bearing: the lateral evaluates before
+ *  any WHERE guard could, and a malformed blob whose 'mail'/'collections' is
+ *  not an array must yield zero rows, not fail the whole sweep. */
+export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    // SET LOCAL: scoped to this transaction only (see the constant's comment).
+    await query(`SET LOCAL work_mem = '${ESCROW_AGGREGATE_WORK_MEM}'`);
+    // Statement shape notes, all load-bearing:
+    // - The inner OFFSET 0 subqueries compute each blob's array datum ONCE;
+    //   without the barrier the planner inlines the expression into both the
+    //   jsonb_typeof guard and the value use and detoasts the 89 MB blob
+    //   twice per pass.
+    // - The CASE around each jsonb_array_elements input yields NULL (zero
+    //   rows) for a malformed non-array 'mail'/'collections' instead of
+    //   failing the whole sweep; the copper upper bound below serves the
+    //   same must-not-abort rule for absurd stored values that would
+    //   overflow the bigint pipeline (the retired Node fold would have
+    //   mis-summed those in doubles and then failed in applyEscrowTotals).
+    // - The id-key test and the copper guard are both CASE-armored, never
+    //   bare AND chains: PostgreSQL does not guarantee AND evaluation order,
+    //   so the digit-bounding regex must run before raw_key's ::numeric cast
+    //   (leading zeros aside, 16 significant digits), and copper's
+    //   jsonb_typeof check must run before its cast (a non-number copper
+    //   would otherwise abort the whole sweep if the planner ever reordered
+    //   the quals). CASE is the one construct whose evaluation order is
+    //   guaranteed.
+    return query(
+      `WITH mail_rows AS (
+          SELECT rest,
+                 strpos(rest, '${MAIL_RECIPIENT_KEY_INFIX}') AS partition_sep,
+                 data
+          FROM (
+            SELECT substr(w.key, strpos(w.key, ':') + 1) AS rest, w.data
+            FROM world_state w WHERE w.key LIKE 'mail:%' OFFSET 0
+          ) raw_mail
+        ),
+        mail_books AS (
+          SELECT CASE WHEN partition_sep > 0
+                      THEN substr(rest, 1, partition_sep - 1)
+                      ELSE rest
+                 END AS realm,
+                 partition_sep > 0 AS is_partition,
+                 data->'mail' AS arr
+          FROM mail_rows
+          WHERE rest <> ''
+        ),
+        migrated_mail_realms AS (
+          SELECT substr(w.key, ${MAIL_PARTITION_MARKER_PREFIX.length + 1}) AS realm
+          FROM world_state w
+          WHERE w.key LIKE '${MAIL_PARTITION_MARKER_PREFIX}%'
+            AND substr(w.key, ${MAIL_PARTITION_MARKER_PREFIX.length + 1}) <> ''
+          UNION
+          SELECT realm FROM mail_books WHERE is_partition
+        ),
+        books AS (
+          SELECT realm, true AS is_mail,
+                 CASE WHEN jsonb_typeof(arr) = 'array' THEN arr END AS arr
+          FROM mail_books mb
+          WHERE mb.is_partition
+             OR NOT EXISTS (SELECT 1 FROM migrated_mail_realms mmr WHERE mmr.realm = mb.realm)
+          UNION ALL
+          SELECT realm, false,
+                 CASE WHEN jsonb_typeof(arr) = 'array' THEN arr END
+         FROM (SELECT substr(w.key, strpos(w.key, ':') + 1) AS realm, w.data->'collections' AS arr
+               FROM world_state w WHERE w.key LIKE 'market:%' OFFSET 0) c
+       ),
+       entries AS (
+         SELECT b.realm, b.is_mail,
+                btrim(
+                  CASE WHEN b.is_mail THEN elem->>'recipientKey' ELSE elem->>'key' END,
+                  E' \\t\\n\\r\\f\\v'
+                ) AS raw_key,
+                floor(cn.copper_numeric)::bigint AS copper
+         FROM books b
+         CROSS JOIN LATERAL jsonb_array_elements(b.arr) AS elem
+         CROSS JOIN LATERAL (
+           SELECT CASE WHEN jsonb_typeof(elem->'copper') = 'number'
+                       THEN (elem->>'copper')::numeric END AS copper_numeric
+         ) cn
+         WHERE jsonb_typeof(
+                 CASE WHEN b.is_mail THEN elem->'recipientKey' ELSE elem->'key' END
+               ) = 'string'
+           AND cn.copper_numeric >= 1
+           AND cn.copper_numeric < 9007199254740992
+       ),
+       keyed AS (
+         SELECT CASE WHEN raw_key ~ '^0*[0-9]{1,16}$' THEN
+                  CASE WHEN raw_key::numeric <= ${MAX_SAFE_INTEGER_SQL}
+                       THEN (raw_key::numeric)::bigint END
+                END AS character_id,
+                realm, raw_key, copper, is_mail
+         FROM entries
+         WHERE raw_key <> ''
+       )
+       SELECT character_id,
+              CASE WHEN character_id IS NULL THEN raw_key END AS character_name,
+              CASE WHEN character_id IS NULL THEN realm END AS realm,
+              COALESCE(sum(copper) FILTER (WHERE is_mail), 0)::bigint AS mail_copper,
+              COALESCE(sum(copper) FILTER (WHERE NOT is_mail), 0)::bigint AS market_copper
+       FROM keyed
+       GROUP BY character_id,
+                CASE WHEN character_id IS NULL THEN raw_key END,
+                CASE WHEN character_id IS NULL THEN realm END`,
+    );
+  });
+  return res.rows.map((row) => ({
+    characterId: row.character_id === null ? null : Number(row.character_id),
+    characterName: row.character_name ?? null,
+    realm: row.realm ?? null,
+    mailCopper: Number(row.mail_copper),
+    marketCopper: Number(row.market_copper),
+  }));
 }
 
 /** Per-character escrow totals resolved by stable character id, or (for legacy
@@ -355,7 +510,7 @@ export interface LargeGoldMovementRow {
 
 // Far BELOW the pool default, same reasoning as GUILD_BANK_LOG_TIMEOUT_MS in
 // server/db.ts: the intended cost is a bounded backward scan of the
-// bank_ledger_account_recent index, but that index is built CONCURRENTLY after
+// bank_ledger_account_large_recent index, but that index is built CONCURRENTLY after
 // listen (server/bank_ledger_indexes.ts), so a realm can serve this read
 // before it exists, and a missing or INVALID index turns it into a sequential
 // scan of a keep-forever table. Two seconds fails this one admin read instead
@@ -367,7 +522,6 @@ export const LARGE_GOLD_MOVEMENTS_TIMEOUT_MS = 2_000;
  *  trade, and mail flows are not ledgered and cannot appear here). */
 export async function largeGoldMovementsForAccount(
   accountId: number,
-  thresholdCopper: number,
   limit: number,
 ): Promise<LargeGoldMovementRow[]> {
   const res = await runWithStatementTimeout(LARGE_GOLD_MOVEMENTS_TIMEOUT_MS, (query) =>
@@ -376,10 +530,10 @@ export async function largeGoldMovementsForAccount(
             l.copper_delta, l.created_at
      FROM bank_ledger l
      LEFT JOIN characters c ON c.id = l.character_id
-     WHERE l.account_id = $1 AND abs(l.copper_delta) >= $2
+     WHERE l.account_id = $1 AND ${BANK_LEDGER_LARGE_MOVEMENT_PREDICATE_SQL}
      ORDER BY l.id DESC
-     LIMIT $3`,
-      [accountId, thresholdCopper, limit],
+     LIMIT $2`,
+      [accountId, limit],
     ),
   );
   return res.rows.map((row) => ({

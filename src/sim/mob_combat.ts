@@ -1,3 +1,4 @@
+import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import { MELEE_RANGE } from './types';
 
 export type MobCombatProfile = {
@@ -93,6 +94,14 @@ export function combatProfileCacheSizeForTest(): number {
 function buildCombatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
+  if (templateId === VARKHUL_BOSS_ID)
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // Varkhul's scale-3.2 body needs long swing reach, but the active tank
+      // must still be able to hit him while holding a crucible-beam lane.
+      meleeRange: scaledDefaultMobMeleeRange(scale),
+      desiredRange: 4.5,
+    };
   if (templateId === 'wildheart_ravager')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

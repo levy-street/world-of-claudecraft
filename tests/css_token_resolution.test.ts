@@ -56,7 +56,6 @@ const KNOWN_UNDECLARED = [
   '--color-text-primary', // shell.css: the pre-game shell's alias
   '--cursor-pointer', // components.css: the cursor family spells --cursor-point
   '--dev-outline', // hud.css: a dev overlay outline never tokenized
-  '--focus-ring', // components.css: the focus ring token DESIGN.md 10.1 names
   '--shadow-panel', // hud.css: the spectate badge shadow
 ].sort();
 

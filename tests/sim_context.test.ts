@@ -13,6 +13,7 @@ import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
+import { DEFAULT_STORAGE_PRICES } from '../src/sim/storage_prices';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 // Every cross-system callback on the seam. The list IS the contract: each must be a
@@ -21,6 +22,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 const CALLBACK_KEYS = [
   'emit',
   'error',
+  'reserveVaultConsumption',
   'dealDamage',
   'handleDeath',
   'cancelCast',
@@ -145,6 +147,7 @@ const CALLBACK_KEYS = [
   // I1 dungeon instancing + the shared raid-lockout clock + the host reset boundary.
   'lockoutNowMs',
   'raidResetMs',
+  'weeklyRaidResetMs',
   'instanceKeyFor',
   'instanceOriginOf',
   'instanceClaimIdAt',
@@ -258,6 +261,7 @@ function makeFakeHost() {
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
     nextRiftInstanceId: 1,
@@ -356,6 +360,7 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
+    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
@@ -423,6 +428,7 @@ function makeFakeHost() {
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
+    weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),

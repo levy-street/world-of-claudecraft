@@ -199,16 +199,18 @@ describe('the hidden-shell zone-warm pause (phase 8 GPU lane audit, lane 1)', ()
   // consumption, rift edge preserved, accumulated reveal displacement) are
   // behavior-tested in tests/zone_warm_tracker.test.ts; these pins hold the
   // composition: the latch threaded as the tracker's hidden argument, and
-  // the no-answer early-out.
-  it('threads the presentation latch into the tracker and bails on a hidden frame', () => {
+  // the no-answer early-out except for a newly observed dungeon entry.
+  it('threads the presentation latch into the tracker and preserves dungeon entry alignment', () => {
     const body = flat(stripLineComments(declarationText('maybeWarmCurrentZone')));
     expect(body).toContain(
       'const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());',
     );
-    expect(body).toContain('if (!warm) return;');
+    expect(body).toContain('if (!warm && !dungeonEntryChanged) return;');
+    expect(body).toContain("const cameraArrival = dungeonEntryChanged ? 'dungeon' :");
     // Polarity: neither the latch nor the bail may pick up a stray negation.
     expect(body).not.toContain('!desktopPresentationHidden()');
     expect(body).not.toContain('if (warm) return;');
+    expect(body).not.toContain('if (!warm) return;');
     // The tracker call is the FIRST statement after the player read, so no
     // warm work precedes the hidden decision.
     expect(body.indexOf('const warm = warmTracker(')).toBeLessThan(body.indexOf('zoneWarmup'));

@@ -1046,4 +1046,33 @@ export const table: DeedLocaleTable = {
     desc: "Ilumine a página Heroico: Santuário do Gravewyrm d'O Relicário.",
     title: 'Luz do Santuário',
   },
+  soc_strongbox_outfitter: {
+    name: 'Primeiro Espaço',
+    desc: 'Desbloqueie seu primeiro espaço de bolsa do banco.',
+  },
+  soc_four_bags_deep: {
+    name: 'Todos os Espaços',
+    desc: 'Desbloqueie todos os quatro espaços de bolsa do banco.',
+  },
+  dgn_ignivar: {
+    name: 'O Arauto Cai',
+    desc: 'Derrote Ignivar, Herald of the Last Flame, na Crucible of the Last Spring.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroico: O Arauto Cai',
+    desc: 'Derrote Ignivar, Herald of the Last Flame, na dificuldade Heroica.',
+  },
+  dgn_varkhul: {
+    name: 'A Forja Esfria',
+    desc: 'Derrote Varkhul, Forgefather of the Last Flame, na Inner Crucible.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroico: A Forja Esfria',
+    desc: 'Derrote Varkhul, Forgefather of the Last Flame, na dificuldade Heroica.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Nenhuma Brasa Perdida',
+    desc: 'Derrote Varkhul, Forgefather of the Last Flame, na dificuldade Heroica sem que um único membro da raide morra.',
+    title: 'o Incólume',
+  },
 };

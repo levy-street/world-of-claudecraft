@@ -1529,7 +1529,9 @@ describe('mandatory interaction-landmark prewarm', () => {
     );
     expect(gate).toContain('void this.compileGate(target).then(');
     expect(gate.match(/this\.recoverRejectedCompileGate\(/g)).toHaveLength(3);
-    expect(gate).toContain('group.visible = priorVisibility;');
+    // The Ignivar boss gates only its cosmetic rig (visibilityTarget), so the
+    // restore writes go through that target; for every other view it IS the group.
+    expect(gate).toContain('visibilityTarget.visible = priorVisibility;');
     expect(gate).toContain('this.recoverRejectedCompileGate(error, generation, onSettled);');
     expect(gate).not.toContain('onTimeout');
 

@@ -105,6 +105,10 @@ export interface CrossHotbarResolvers {
   itemById(id: string): ItemDef | null;
   abilityName(def: AbilityDef): string;
   itemName(item: ItemDef): string;
+  /** The armed ground aim's ability id, so the owning cell shows the aiming
+   *  accent. Identity is by ABILITY here, never by bar slot: an XHB cell has
+   *  no desktop slot, and an XHB-only aim carries the sentinel slot. */
+  activeAimAbilityId(): string | null;
 }
 
 /** The resolver bag, built from the world the HUD already holds. Lives here rather
@@ -119,6 +123,7 @@ export function crossHotbarResolvers(
   items: Record<string, ItemDef>,
   abilityName: (def: AbilityDef) => string,
   itemName: (item: ItemDef) => string,
+  activeAimAbilityId: () => string | null,
 ): CrossHotbarResolvers {
   return {
     // Same resolution the action bar performs on its own slots: a saved binding
@@ -135,6 +140,7 @@ export function crossHotbarResolvers(
     itemById: (id) => items[id] ?? null,
     abilityName,
     itemName,
+    activeAimAbilityId,
   };
 }
 
@@ -218,6 +224,10 @@ export class CrossHotbarController {
             return a?.type === 'item' ? resolve.itemById(a.id) : null;
           },
           keybindLabel: () => '',
+          ownsAimSlot: () => {
+            const a = this.state.cellActions[cell.index];
+            return a?.type === 'ability' && a.id === resolve.activeAimAbilityId();
+          },
         })),
       },
       {

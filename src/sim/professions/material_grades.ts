@@ -91,9 +91,14 @@ export function fineMaterialFor(baseItemId: string): string | undefined {
 }
 
 /** The base grade a fine id upgrades, or undefined when the id is not a fine
- *  grade. The inverse of fineMaterialFor over the nine rows. */
+ *  grade. The inverse of fineMaterialFor over the nine rows. hasOwn-guarded:
+ *  the callers feed SERVER-SUPPLIED ids (vault stock keys, tolerated-save
+ *  slot ids), and a bare keyed read would answer Object.prototype for a
+ *  dormant '__proto__' key, handing every consumer (bagFineMark, the vault
+ *  pane's group sort) a truthy non-string for a row that is not a fine
+ *  grade. */
 export function baseMaterialFor(fineItemId: string): string | undefined {
-  return BASE_BY_FINE_ID[fineItemId];
+  return Object.hasOwn(BASE_BY_FINE_ID, fineItemId) ? BASE_BY_FINE_ID[fineItemId] : undefined;
 }
 
 /** The zone tier ladder position of a base material, or undefined for an id
@@ -193,28 +198,34 @@ export interface GradeRemoval {
 }
 
 /**
- * How to take `count` units of `itemId` across its grades, given how many of
- * each grade are available. Drains the base grade first, then the fine grade,
- * and emits no zero-count lines.
+ * The removal KERNEL: how to take `count` units by walking `ids` in order,
+ * draining each in turn from whatever `available` reports, and emitting no
+ * zero-count lines. Walk order comes from `ids` alone, never from object-key
+ * iteration, so the plan is deterministic for any caller.
  *
- * Deliberately a PURE PLAN rather than two parallel removal loops. The craft
- * path has to make the identical decision twice, once on a scratch copy of
- * the inventory for the capacity pre-gate and once for real, and the two must
+ * Deliberately a PURE PLAN rather than parallel removal loops. The craft path
+ * has to make the identical decision more than once, on a scratch copy of the
+ * inventory for the capacity pre-gate and again for real, and every copy must
  * agree exactly or the gate approves a craft the consumption then performs
- * differently. One planner, two appliers.
+ * differently. One planner, many appliers.
  *
  * A short holding returns the plan for everything that IS available: callers
  * gate on their own count check first (hasRecipeMaterials, the quest collect
  * count), so this never has to invent a denial of its own.
+ *
+ * Split out of `planGradeRemoval` below so the id list can come from somewhere
+ * OTHER than the grade ladder: professions/reagent_sources.ts runs this same
+ * kernel a second time, over the same ids, against the Materials Vault's
+ * counts, to plan the vault half of a carried-first draw.
  */
-export function planGradeRemoval(
-  itemId: string,
+export function planRemovalOver(
+  ids: readonly string[],
   count: number,
   available: (id: string) => number,
 ): readonly GradeRemoval[] {
   const plan: GradeRemoval[] = [];
   let remaining = count;
-  for (const gradeId of materialGradeIds(itemId)) {
+  for (const gradeId of ids) {
     if (remaining <= 0) break;
     const take = Math.min(remaining, Math.max(0, available(gradeId)));
     if (take <= 0) continue;
@@ -222,6 +233,19 @@ export function planGradeRemoval(
     remaining -= take;
   }
   return plan;
+}
+
+/**
+ * How to take `count` units of `itemId` across its grades, given how many of
+ * each grade are available. Drains the base grade first, then the fine grade
+ * (materialGradeIds' consumption order), via the shared kernel above.
+ */
+export function planGradeRemoval(
+  itemId: string,
+  count: number,
+  available: (id: string) => number,
+): readonly GradeRemoval[] {
+  return planRemovalOver(materialGradeIds(itemId), count, available);
 }
 
 /** Units of `itemId` a holder has once its fine grade counts toward it.

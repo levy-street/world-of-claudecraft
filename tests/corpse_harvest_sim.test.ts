@@ -867,32 +867,29 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
   });
 
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {
-    // Hunted seed, the dedupe-pin idiom: probe on roomy bags proves the fang
-    // roll clears the signable floor, then a FRESH same-seed world reproduces
-    // the same draws (they are inventory-independent, pinned by the
-    // grant-order contract above) against the issue's exact inventory shape.
-    for (let seed = 1; seed <= 200; seed++) {
-      const probe = setup(seed);
-      probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
-      const pm = expectDefined(probe.internals.players.get(probe.a));
-      if (!pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)) continue;
-      const { sim, internals, a, mob } = setup(seed);
-      fillBags(sim, internals, a);
-      const m = expectDefined(internals.players.get(a));
-      const cap = bagCapacity(m.bags);
-      m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
-      expect(m.inventory.length).toBe(cap);
-      sim.drainEvents();
-      sim.harvestCorpse(mob.id, ['fang'], a);
-      expect(mob.harvestClaimedBy).toBe(a);
-      // The issue's acceptance: never past capacity, and the yield arrived as
-      // the plain top-up (the signature truncated, the yield did not).
-      expect(m.inventory.length).toBeLessThanOrEqual(cap);
-      expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
-      expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
-      return;
-    }
-    throw new Error('no seed with a signable fang roll within 200');
+    // Seed 31 is the suite's pinned signable fang roll. A roomy-bag probe
+    // proves the premise, then a FRESH same-seed world reproduces the same
+    // inventory-independent draws against the issue's exact inventory shape.
+    const seed = 31;
+    const probe = setup(seed);
+    probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
+    const pm = expectDefined(probe.internals.players.get(probe.a));
+    expect(pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)).toBe(true);
+
+    const { sim, internals, a, mob } = setup(seed);
+    fillBags(sim, internals, a);
+    const m = expectDefined(internals.players.get(a));
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The issue's acceptance: never past capacity, and the yield arrived as
+    // the plain top-up (the signature truncated, the yield did not).
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
   });
 
   it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 31)', () => {

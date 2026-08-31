@@ -39,7 +39,11 @@ entirely (the stamp is final), so a local env var cannot steer an installed app 
 another API, login page, updater state, or crash endpoint. The updater runs only
 for a PACKAGED WEBSITE build; there is deliberately no way to force it on in a
 Steam or Epic build. To try a channel unpacked, set
-`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`.
+`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`. That env opt-in
+is also what makes the $WOC Exchange visible in the dev shell: the Exchange gate
+requires an explicit website verdict even on unpackaged checkouts
+(`wocExchangeSupported` in `electron/desktop_config.cjs`), so without
+`WOC_DISTRIBUTION=website` the dev shell shows no Exchange launcher.
 
 Update tracks (prod/dev split): the publish channel is derived from the baked
 `apiOrigin` by one rule shared between build and runtime
@@ -394,6 +398,62 @@ Linux AppImage caveat: the updater requires the `APPIMAGE` env (set automaticall
 when running a real AppImage); running the raw unpacked binary logs an updater error
 and skips, by design.
 
+Linux deep-link caveat: `worldofclaudecraft://` is owned by a `.desktop` entry, not by
+an OS registry, so `electron/linux_url_handler.cjs` runs before
+`app.setAsDefaultProtocolClient` on both Linux channels. On the AppImage it writes
+`~/.local/share/applications/world-of-claudecraft-appimage.desktop` (the entry electron-builder
+bakes into the squashfs is never installed unless the player has AppImageLauncher), runs
+`update-desktop-database` when those entry bytes change, and always re-runs
+`xdg-mime default`. It then repoints `CHROME_DESKTOP` at
+whichever entry belongs to the channel it is running as: ours on an AppImage run, the deb's
+(`world-of-claudecraft.desktop`, installed by dpkg) otherwise. That matters, because pointing
+it at ours unconditionally would make a deb launch register the AppImage's entry, which is the
+same shadowing the distinct filename exists to prevent, reached through `CHROME_DESKTOP`
+instead of the desktop-file ID.
+
+The repoint is needed at all because Electron resolves the name it hands `xdg-settings` from
+that variable, and with no `desktopName` in `package.json` the name it infers comes from
+`app.name` (`World of ClaudeCraft.desktop`), which matches no file on disk. The deb's basename
+MUST keep tracking `executableName`: `tests/electron_linux_url_handler.test.ts` derives it from
+`package.json` `name` AND pins that no `executableName` / `desktopName` override exists, so
+either kind of rename fails there rather than silently breaking Discord login.
+
+Deliberate narrowings worth knowing before changing any of it:
+- `CHROME_DESKTOP` is set only when the entry actually exists on disk (ours or the
+  deb's), and is restored immediately after the registration call. Setting it
+  unconditionally would make a Steam depot, an Epic package, or a dev run point
+  `xdg-settings` at a dangling name, which can REPLACE a working association; leaving it
+  set leaks our app identity to every child process, including the browser opened for
+  the Discord login itself.
+- The entry is written temp-then-`rename` (with `wx` on the temp), so a concurrent second
+  instance cannot leave a torn file and a symlink at either path is refused or replaced rather
+  than followed.
+- The AppImage entry is `world-of-claudecraft-appimage.desktop`, deliberately NOT the deb's
+  basename. Same basename means the same desktop-file ID, and a user-level file wins outright,
+  so reusing it would let one AppImage run replace the deb's entry everywhere; with `TryExec`
+  that becomes a silent removal once the AppImage is deleted, and `apt reinstall` cannot fix it
+  because the shadowing file is in `$HOME`. `CHROME_DESKTOP` is pointed at whichever entry
+  actually exists, ours first, the deb's second.
+- The association (`update-desktop-database` and `xdg-mime`) runs AFTER
+  `app.setAsDefaultProtocolClient`, never alongside it. Electron's Linux path shells out to
+  `xdg-settings`, which runs `xdg-mime default` itself against the same unlocked
+  read-modify-write file; on a torn read `xdg-settings` restores the ORIGINAL association and
+  fails, which is exactly the broken state this exists to remove.
+- An unchanged entry still re-runs `xdg-mime default`, while `update-desktop-database`
+  is reserved for changed desktop-entry bytes. The file being identical does not mean the
+  association survived: another app can claim the scheme and a desktop environment can reset
+  `mimeapps.list`, and without the re-assert that breaks Discord login permanently with no
+  relaunch that recovers it.
+- Not `app.setDesktopName()`, the public API for the same value: it also drives the
+  Wayland app id and X11 `WM_CLASS`, which electron-builder independently writes as
+  `StartupWMClass` from `productName`. Changing one without the other breaks the
+  window-to-launcher association that works today.
+
+An AppImageLauncher user ends up with two entries (theirs, `appimagekit_*.desktop`, plus
+ours); ours takes the scheme default, which is the working one. All of it is best-effort:
+a player with no `xdg-utils` or a read-only home still signs in with a username and
+password, which never leaves the shell.
+
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on
@@ -440,6 +500,51 @@ Rules that keep this working:
   updates flow through Steam; keep it that way.
 - `steam_appid.txt` is not needed (`electron/steam.cjs` passes the app id
   straight to `init`) and must not ship.
+
+Steam-on-Linux caveat: Steam preloads `gameoverlayrenderer.so` into every native Linux game
+it launches, and with that library mapped Chromium's GPU process cannot start. The browser
+process retries, gives up, and dies on a `CHECK`:
+
+```
+FATAL:content/browser/gpu/gpu_data_manager_impl_private.cc] GPU process isn't usable. Goodbye.
+```
+
+`SIGTRAP`, no window, no `main.log`. To a player that is Steam's launching spinner, forever.
+`electron/steam_overlay_guard.cjs` appends `--disable-gpu-sandbox` when, and only when, the
+overlay is actually preloaded. Measured on a Steam Deck with the overlay in place: no flags
+crashes; `--disable-gpu-sandbox`, `--no-sandbox` and `--in-process-gpu` all boot. The narrowest
+one ships, because the RENDERER sandbox is the boundary that contains page content and it stays
+on. It boots on real hardware rather than falling back to software (3 runs of 3 reported the
+Deck's AMD adapter `0x1002:0x1435` active, with `webgl`, `gpu_compositing` and `rasterization`
+all `enabled`), which is the thing to re-check if this is ever changed: a "fix" that silently
+swapped in SwiftShader would be worse than the crash.
+
+Two things that look like fixes and are not, both measured rather than assumed:
+- **Stripping the overlay from `LD_PRELOAD`.** It cannot be done from inside the app, since
+  `ld.so` reads the variable at exec time. Every shape of re-exec fails: a detached parent exits
+  at once and Steam reads that as the game closing; a parent blocked in `spawnSync` cannot run a
+  signal handler, and the child lands in its own `app-world-of-claudecraft-<pid>.scope` while the
+  parent stays in `app-steam@autostart.service`, so Steam's stop kills the parent and strands the
+  game; a supervising parent can forward signals but is itself an Electron process with the
+  overlay mapped, so it dies of the crash it exists to avoid.
+- **Turning the overlay off in Steam.** It does not stop the injection. With `AllowOverlay=0` on
+  the shortcut, Steam still handed the launch both `gameoverlayrenderer.so` paths. Do not ship a
+  Linux depot betting on the Steamworks per-app overlay setting.
+
+Verify a Steam launch by grepping `main.log` for `[steam] Steam overlay detected` (pinned by
+`tests/electron_steam_overlay_guard.test.ts`, so a reword cannot break the procedure quietly).
+Steam injects the overlay into depot builds as well as non-Steam shortcuts, and the crash
+reproduces on a non-AppImage binary, so this is very unlikely to be AppImage-specific. It has
+NOT been verified on a real depot launch though: running `linux-unpacked/` standalone is not a
+faithful stand-in (Steam launches it through `reaper`, potentially inside the Steam Linux
+Runtime container, and the layout expects env that the AppImage's AppRun sets). Confirm on an
+actual depot build before trusting this section for the Steam channel.
+
+Adjacent, and worth knowing before it is rediscovered the hard way: the PRIME relaunch above
+spawns `detached` and exits the parent, which is the thing Steam reads as the game closing. It
+fires whenever `/sys/class/drm` holds two or more `card*` entries, so a hybrid laptop launched
+through Steam takes that path and Steam stops tracking the process that survives. A Steam Deck
+reports one card, so it does not arise there.
 
 ## Epic Games Store
 
@@ -616,8 +721,12 @@ product exist. Coding and merge stay dark-safe without those credentials.
    never an `appendSwitch` call in the running process.
    `main.cjs` therefore calls `relaunchForLinuxPrime` as the very first thing it
    does (before crash reporting, logging, or any window): on a HYBRID Linux
-   machine (two or more GPUs under `/sys/class/drm`; single-GPU machines are left
-   completely untouched), it re-execs the app with the PRIME variables baked into
+   machine (two or more GPUs under `/sys/class/drm` whose display card, the one
+   sysfs marks `boot_vga`, is not the NVIDIA one; single-GPU machines, and desktops
+   where the NVIDIA card already drives the screen next to an enabled integrated
+   GPU, are left completely untouched: on the latter the offload env fails every
+   EGL display type and Chromium disables the GPU for the session), it re-execs
+   the app with the PRIME variables baked into
    the new process's environment from birth plus `--ozone-platform=x11` appended
    to argv, and the original process exits immediately. The spawn source is
    `$APPIMAGE` (the outer AppImage file, the same source electron-updater restarts
@@ -645,6 +754,17 @@ product exist. Coding and merge stay dark-safe without those credentials.
 3. Login both paths: email/password in-app, and Discord via the external browser +
    `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).
+   On Linux run this on a machine with NO prior install and no AppImageLauncher (a
+   stock SteamOS or Bazzite box is the realistic case): the AppImage must register its
+   own handler on first launch. Confirm with
+   `xdg-mime query default x-scheme-handler/worldofclaudecraft` returning
+   `world-of-claudecraft-appimage.desktop` (the AppImage entry is deliberately NOT the deb's
+   basename), then `gio open "worldofclaudecraft://desktop-login?code=x"` reaching the running
+   game. Use `gio open`, not `xdg-open`: on stock SteamOS, which is the box this step names,
+   `xdg-open` takes its KDE branch and calls a `kfmclient` that is not installed, so it fails
+   for reasons unrelated to the handler. `gio open` is also the path a GTK browser takes.
+   A regression here shows up as the OS "choose an application" dialog, which cannot select an
+   AppImage at all.
 4. Play 5 minutes: steady frame rate, alt-tab out/in does not hitch or freeze the
    world (backgroundThrottling stays off).
 5. Website channel only: with a higher-version build on the feed, the update toast
@@ -653,13 +773,31 @@ product exist. Coding and merge stay dark-safe without those credentials.
    `apiOrigin` channel (`updateChannel: latest`). Steam and Epic channels: confirm
    the log says the updater is disabled and no update network traffic occurs
    (SteamPipe / BPT own patches).
-6. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
+6. $WOC Exchange gating: on the website channel, an online character with a
+   linked wallet sees the Exchange launcher (server `WOC_MARKET_ENABLED=1`);
+   on the Steam and Epic channels no Exchange UI exists anywhere (no launcher,
+   no menu entry, no trade-window $WOC arm), even with a linked wallet, since
+   tradeable-token functionality violates both stores' terms. The gate is the
+   `desktop-exchange-capability` IPC over the distribution stamp
+   (`electron/desktop_config.cjs` `wocExchangeSupported`, consumed by
+   `src/game/woc_market_wiring.ts`); for this gate specifically, a build with
+   an absent or unknown stamp behaves like a store build (the wallet-connect
+   and updater gates read the collapsed channel and are unchanged). On the
+   website channel the launcher appears one IPC round trip after world entry,
+   so give it a beat before calling it missing. The shell startup banner logs
+   `wocExchangeEnabled` per channel, so the log alone answers this step (on an
+   unstamped build `distribution` collapses to website while
+   `wocExchangeEnabled` correctly says false). Also smoke one signature on the
+   website channel: starting a listing (or paying a bond) must hand off to the
+   default browser for the wallet signature and complete on return, the same
+   handoff the Claudium checkout uses.
+7. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded
    auto-reload; the third reaches the localized Reload/Quit dialog (the auto-
    reload budget is 2 per 60s, electron/diagnostics.cjs). Each SEGV lands a
    minidump in crashDumps.
-7. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
+8. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
    shell's pure logic.
 
 ## Version pinning

@@ -24,6 +24,7 @@ function state(): AurasState {
         expiring: false,
         toggle: false,
         alwaysRender: false,
+        shortDuration: false,
       },
       {
         key: 'own_hot',
@@ -42,6 +43,7 @@ function state(): AurasState {
         expiring: false,
         toggle: false,
         alwaysRender: false,
+        shortDuration: false,
       },
       {
         key: 'foreign_dot',
@@ -60,6 +62,7 @@ function state(): AurasState {
         expiring: true,
         toggle: false,
         alwaysRender: false,
+        shortDuration: false,
       },
       {
         key: 'foreign_buff',
@@ -78,6 +81,7 @@ function state(): AurasState {
         expiring: false,
         toggle: false,
         alwaysRender: false,
+        shortDuration: false,
       },
     ],
   };

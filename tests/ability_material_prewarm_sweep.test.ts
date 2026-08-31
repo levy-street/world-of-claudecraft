@@ -4,11 +4,12 @@
 //
 // The measured defect: the pooled ability-VFX engines build every material in
 // their constructor (that is why the boot entry only has to SPAWN them), but
-// four visuals next to them keep a module-level cache filled by the first
+// the visuals next to them keep a module-level cache filled by the first
 // construction, which happens when the aura or cast goes live in view. The
 // first Frost Nova root, Ice Block, Temporal Hourglass and fireball travel form
-// therefore linked their programs inside a combat frame. Naming those four by
-// hand would be the same trap one class down, so the corpus is walked instead.
+// therefore linked their programs inside a combat frame (and later the coach
+// guidance's first ribbon, on the tutorial island). Naming them by hand would
+// be the same trap one class down, so the corpus is walked instead.
 //
 // THE HEURISTICS, and they are deliberately two:
 //   A. The BUNDLE idiom, over the whole of src/render: a module-scope
@@ -83,6 +84,7 @@ const REGISTERED_MODULES = [
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
   'fireball_travel_visual.ts',
+  'coach_trail_materials.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -229,10 +231,11 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the four registered
-    // bundles, the two excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(7);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(6);
+    // Vacuity floor, kept just under the real count: the five registered
+    // bundles (the coach trail's guidance set among the four spell visuals),
+    // the two excluded scenery bakes, and the battleground caches.
+    expect(hits.length).toBeGreaterThanOrEqual(8);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(7);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

@@ -12,7 +12,7 @@
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
-import type { Entity } from '../types';
+import type { Entity, MobFamily } from '../types';
 import { questGateBlocksAggro } from './quest_gated_aggro';
 
 // A fleeing mob rallies same-family allies within this (small, local) radius. Kept tight
@@ -49,4 +49,41 @@ export function rallyFleeingAllies(ctx: SimContext, mob: Entity, target: Entity)
     }
   });
   return pulled;
+}
+
+// How far a mob pulls same-family neighbours into a fight ("social aggro").
+// Murlocs (the clustered water mobs players call "frogs") used to pull too much,
+// chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
+// per family here; everything else falls back to the default.
+const DEFAULT_SOCIAL_PULL_RADIUS = 5;
+const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
+  mudfin: 8,
+};
+
+/** The legacy same-template social propagation on a fresh aggro: the pulled mob
+ * radius-pulls idle same-template neighbours within its family's social radius.
+ * Gated by the caller's `social` flag (authored dungeon packs engage through
+ * mob/dungeon_pack_aggro.ts regardless). Like the rally above it draws NO rng,
+ * so the shared draw order and the parity goldens are unaffected. */
+export function socialPullSameTemplate(ctx: SimContext, mob: Entity, target: Entity): void {
+  const family = MOBS[mob.templateId]?.family;
+  const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
+  ctx.grid.forEachInRadius(mob.pos.x, mob.pos.z, pullRadius, (m, d2) => {
+    if (
+      m.kind === 'mob' &&
+      m.id !== mob.id &&
+      !m.dead &&
+      m.hostile &&
+      m.aiState === 'idle' &&
+      m.ownerId === null &&
+      m.templateId === mob.templateId &&
+      d2 < pullRadius * pullRadius
+    ) {
+      m.aiState = 'chase';
+      m.aggroTargetId = target.id;
+      m.inCombat = true;
+      m.leashAnchor = { ...m.pos };
+      addThreat(m, target.id, 1);
+    }
+  });
 }

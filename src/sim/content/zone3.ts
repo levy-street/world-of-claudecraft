@@ -207,6 +207,10 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       // the druid line.
       { itemId: 'peaksong_helm', chance: 0.002 },
       { itemId: 'moonbark_vestments', chance: 0.002 },
+      // The rare world-drop bag, the lowest of its three ordinary-mob rows: the
+      // tunnelers are the densest pull of the three, so the per-kill rate is
+      // trimmed to keep the effective farm rate in line with the troll's.
+      { itemId: 'wayfarers_backpack', chance: 0.001 },
     ],
     scale: 0.85,
     color: 0x9c7a3c,
@@ -298,6 +302,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 75, chance: 1 },
       { itemId: 'ogre_toe_ring', chance: 0.35 },
       { itemId: 'cragprowl_belt', chance: 0.02 },
+      // The rare world-drop bag, the highest-level of its three ordinary-mob
+      // rows and so the slightly better one to farm.
+      { itemId: 'wayfarers_backpack', chance: 0.002 },
     ],
     scale: 1.3,
     color: 0x9e7b53,
@@ -450,6 +457,12 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'crag_warden_cudgel', chance: 0.25, rollGroup: 'brutok_chase' },
       { itemId: 'skullsplitter_dirk', chance: 0.25, rollGroup: 'brutok_chase' },
       { itemId: 'stormroot_cowl', chance: 0.2 },
+      // The rare mob's elevated row for the world-drop bag, the same shape Old
+      // Greyjaw carries for the Wolfhide Satchel (0.35). Held a notch under it:
+      // the Wayfarer's Backpack is two quality tiers better, and the ogre's
+      // three-hour cadence is already most of the gate. Ungrouped, like
+      // Greyjaw's, so it never competes with the brutok_chase weapon slot.
+      { itemId: 'wayfarers_backpack', chance: 0.25 },
     ],
     scale: 1.45,
     color: 0x6e5235,
@@ -2324,6 +2337,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // proc so a leveling rogue gets a taste of an interesting dagger before cap.
   boneglass_shiv: {
     id: 'boneglass_shiv',
+    // Gate frozen at the pre-ilvl-honesty derived value: the 2026-08-30
+    // source bump (ilvl 17 to 21) must not raise a leveling item's equip bar.
+    requiredLevel: 14,
     name: 'Boneglass Shiv',
     kind: 'weapon',
     slot: 'mainhand',
@@ -3215,13 +3231,17 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'legendary',
-    weapon: { min: 42, max: 68, speed: 3.2 },
+    // Buffed to the legendary band of the 2026-08-30 ilvl-honesty round
+    // (maintainer direction: every legendary lives at the Thronebane tier,
+    // budget-true at its labeled level; sources in item_level.ts).
+    weapon: { min: 52, max: 85, speed: 3.2 },
     // A druid caster/healer staff by deliberate choice: its 17 points sit in
     // spirit (druid mana/healing) rather than agility, accepting that feral
     // wearers lose real value from the swap (bear-form AP scales on agility).
     // Hunters/rogues cannot equip it. Still exactly on the 44-pt legendary
     // mainhand budget.
-    stats: { spi: 17, sta: 13, int: 14 },
+    stats: { spi: 25, sta: 19, int: 21 },
+    spellPower: 25,
     sellValue: 25000,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     // Life and decay: a damaging spell may fester a nature DoT (Deathbloom); a heal
@@ -3258,6 +3278,11 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'legendary',
+    // The line ships exactly as players own it. The 2026-08-30 ilvl-honesty
+    // round moved the LABEL instead: 21.4 dps occupies the ilvl-49 point of
+    // the one-hand curve, so the source registration in item_level.ts prices
+    // it there (heroic mint 50). Future items budget against the honest
+    // number instead of inheriting the pre-budget chase line as a lie.
     weapon: { min: 46, max: 74, speed: 2.8 },
     // Rebalanced into a str/agi/sta hybrid within the fixed 44-pt legendary
     // mainhand budget: 15 agi makes it a viable hunter ranged weapon (ranged AP +
@@ -3328,7 +3353,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 310, str: 8, sta: 9 },
     // ilvl-29 raid seed rating (20 -> 2.0%); the Heroic raid variant scales this up
     // and adds a complementary secondary (heroic_variants.ts). Off the stat budget.
-    hitRating: 20,
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
@@ -3341,7 +3366,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 260, str: 7, sta: 8 },
-    hitRating: 20,
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
@@ -3354,7 +3379,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 190, agi: 10, sta: 7 },
-    hitRating: 20,
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['rogue', 'hunter', 'druid'],
   },
@@ -3367,7 +3392,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 165, agi: 9, sta: 6 },
-    hitRating: 20,
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['rogue', 'hunter', 'druid'],
   },
@@ -3380,7 +3405,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 105, int: 11, sta: 6 },
-    hitRating: 20,
+    hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -3393,7 +3418,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 92, int: 9, sta: 6 },
-    hitRating: 20,
+    hasteRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },

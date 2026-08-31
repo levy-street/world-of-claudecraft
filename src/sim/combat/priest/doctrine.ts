@@ -1,6 +1,8 @@
+import { EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS } from '../../content/ignivar_set_bonuses';
 import type { PlayerMeta } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
+import { wearsSetBonus } from '../set_bonus_wearer';
 import { DOCTRINE_AURA_ID } from './presentation';
 import { hasPriestTalent, PRIEST_TALENT_IDS } from './talents';
 
@@ -44,7 +46,15 @@ export function placeDoctrineLink(ctx: SimContext, priest: Entity, ally: Entity)
       }
     }
   }
-  const conversion = twin ? 0.7 : DOCTRINE_CONVERSION;
+  // Emberscreed (Creed of Embers) 2pc: +0.10 ADDITIVE on BOTH twin branches.
+  // Baked into the link aura VALUE here, so the conversion read at damage
+  // time (doctrineConvertDamage's link?.value) snapshots at placement: links
+  // placed before a gear change keep their placed rate for up to the 30 sec
+  // link duration. The 0.15 no-link fallback below stays deliberately
+  // untouched (the set doc discloses both).
+  const conversion =
+    (twin ? 0.7 : DOCTRINE_CONVERSION) +
+    (wearsSetBonus(ctx, priest, 'emberscreed', 2) ? EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS : 0);
   ctx.applyAura(ally, {
     id: DOCTRINE_AURA_ID,
     name: 'Doctrine',

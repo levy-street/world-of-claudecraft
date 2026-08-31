@@ -12,6 +12,7 @@
 
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { SimContext } from './sim_context';
+import { settleTeleportArrival } from './teleport_arrival';
 import type { Entity } from './types';
 
 export function displacePlayer(
@@ -30,12 +31,6 @@ export function displacePlayer(
   p.facing = landing.facing;
   p.targetId = null;
   p.autoAttack = false;
-  // Land settled: no carried-over jump arc or fall distance from the far
-  // side (a portal pair with an elevation delta would otherwise deal fall
-  // damage on arrival).
-  p.vy = 0;
-  p.jumping = false;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
+  settleTeleportArrival(p);
   ctx.emit({ type: 'log', text, color: '#b9f', pid: p.id });
 }

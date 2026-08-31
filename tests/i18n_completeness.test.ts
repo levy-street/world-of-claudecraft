@@ -225,26 +225,26 @@ describe('i18n whole-catalog completeness', () => {
 
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
     const expected = {
-      es: '94cff42334df0e523983e80cf3d73a8baa84c161d3f58ab8c5493a83af19bab1',
-      es_ES: '94cff42334df0e523983e80cf3d73a8baa84c161d3f58ab8c5493a83af19bab1',
-      fr_FR: '7a750e079a7d5091ffae2b5d150369061ae03062a51e96b0a84834430d30175d',
-      fr_CA: '7a750e079a7d5091ffae2b5d150369061ae03062a51e96b0a84834430d30175d',
-      it_IT: '62af35080c27a9bd33eecf87870af3208fbf558767cdfcb69ae9912642f4dbea',
-      de_DE: 'a0c8898a20fde7a2f3cf1fbb3f5abf877ada7e5e70fdef3544fe83742ef1ba30',
-      zh_CN: '74fdc330dffbd9214786d1940d19592ee07f353a0bb495406f8c94a8b4d31893',
-      zh_TW: 'a3fad41448b9ebe54d0034282dd11f420cbb45c8bdc5f6ff2688c3429d7c866e',
-      ko_KR: '9b43e2db038af5f3b9cb09e201784b81f5a5314cacd61bab5c49a3858df80592',
-      ja_JP: '8d5c10f97574c34657694162243d4766c2566ba455acc527a497ea17f15a4b9e',
-      pt_BR: 'a6ebd7b16e0c39af3790124b8e2ae1592bc775743016f156142c5692f5919b3e',
-      ru_RU: '6a6e917d4e2e438aefe24304dfd35cd8ee7ab9e581f38b0f53a7dfb7fb7e47be',
-      cs_CZ: 'ecb49e6fa02b879f936ea807837de4fb4afc729bf5b2337c5f025e193661ab78',
-      nl_NL: '505f571593c2b2e7ee0d571d0bbf1602e2c20ee84950485a237910530e7c4e67',
-      pl_PL: '9a52a4b0a05b0c922a8f5f9bff4bba4b001e323c00bb5aa029e9ed7b43fe3ec8',
-      id_ID: 'cc17c4300ef1aecd7878b68d2f35c1befea2f5137211e8655965d8323753f0cf',
-      tr_TR: 'a7f65ce87ac4bf1618ff493ee39cb017b74a0532558cbd4d00d348a290a1b873',
-      sv_SE: 'f822eff1fbba419e7d1f97bb372e1bca3d4ff1c5416302dd2009b7bf547f34ba',
-      vi_VN: 'd9e3daf33161da4138982bb04f1b97acfdfbcfc8089a0150fab12e59047245ed',
-      da_DK: 'aff26e915bd7f8d71cfbf4294a23a60ed1e2920d92292c9012e49fd4fc9d9ca7',
+      es: 'a3b0facc6f346cab9b568ef8a175c2f278b698e02844be886a309d83a3d59236',
+      es_ES: 'a3b0facc6f346cab9b568ef8a175c2f278b698e02844be886a309d83a3d59236',
+      fr_FR: '4700a092a995bd13ec245920b2f3603be7cfba3cddc4e88e52874b4e1dd4ea61',
+      fr_CA: '4700a092a995bd13ec245920b2f3603be7cfba3cddc4e88e52874b4e1dd4ea61',
+      it_IT: 'fbf913501dc3bf7b9a0cf88f3b654bccaea8f50560bd378c56f2a04ba6b38060',
+      de_DE: '7fcca29608ee68a74d329ba58f3a2d5e91a3b5face81fde6adf9eecc840902b9',
+      zh_CN: 'a738be36830aacb67e1748030518e575d26e978f72676c33fb217b16988a391d',
+      zh_TW: 'eef84a2f3ee01485844c6477edb2d77339a50b49e55e01844b9d08c7194759c3',
+      ko_KR: 'c8e0dc983facc2d5fffa1f47e152078ae77d1beedb1a95e0c0c2c68da62533f5',
+      ja_JP: 'c12ab80566cadcc1b110954f5e3d36e0445fc15d5fd8aa961823980322ae948b',
+      pt_BR: 'a6e32a7ef00440fcd2e9f7ce4565f83884cbe6a3c62acd243077402ebcc01ce3',
+      ru_RU: '545527d526ab3214d9b1a8d003fa4f82fe38d9881be76480d98ddeed4eab3a74',
+      cs_CZ: 'c8bb2280b76279da5b0cc5f350fd8ba6dd7859d382179c7ba7d4be5bec9426d5',
+      nl_NL: 'dc8b8d5b30862f6eae769b1fd6385d35a17f050621ac03d84544c566af28c3e4',
+      pl_PL: '57efef4238801ef24418327e7040a62386f9cc590502201743ec22953fd5fd55',
+      id_ID: 'b9f192f7fef84c5037646bd499aac24a49461ebf9643384ce1fc53d98ba78915',
+      tr_TR: '76380b19af860657c0c28b4e0819860a5c5be0e000d6c3a2fe3870b58f2b4efb',
+      sv_SE: '0c441e36aeb4e410fa33b22bd6b9d5e688cfa6ffed19969938d73e7719e62eec',
+      vi_VN: '74316c1ae2c6aed1bac93823c13666d525f5323524fb3a32779b6e3d1c0f6aca',
+      da_DK: '980fac6b6bd64a0566b3624da401131f59375ff7b7efb0d2e4a9c7afc91896f6',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<
@@ -253,7 +253,7 @@ describe('i18n whole-catalog completeness', () => {
       const markerRows = Object.entries(flatten(TABLES[lang])).filter(([key]) =>
         key.startsWith('hud.core.mapMarker'),
       );
-      expect(markerRows).toHaveLength(98);
+      expect(markerRows).toHaveLength(100);
       expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
         digest,
       );
@@ -423,6 +423,7 @@ describe('i18n CLDR pluralization', () => {
 
   it('declares the expected plural bases with all four CLDR categories in en', () => {
     expect(bases.sort()).toEqual([
+      'buffsHidden',
       'characterCount',
       'deedsRetroSummary',
       'finderPartySize',

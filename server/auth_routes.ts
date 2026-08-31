@@ -94,7 +94,9 @@ const WEB_LOGIN_ONLY = 'logins are only allowed from the game client';
 // legacy and migrated 429 bodies are now byte-identical. The client matcher keys on
 // the prefix, so the localized text is unchanged either way.
 const TOO_MANY_ATTEMPTS = 'too many attempts, wait a minute and try again';
-const TOO_MANY_FAILED_ATTEMPTS = 'too many failed attempts, wait a few minutes and try again';
+// Exported: server/wallet.ts answers the same lockout with the same prose.
+export const TOO_MANY_FAILED_ATTEMPTS =
+  'too many failed attempts, wait a few minutes and try again';
 const INVALID_CREDENTIALS = 'invalid username or password';
 const USERNAME_SHAPE = 'username must be 3-24 chars (letters, digits, _)';
 const USERNAME_NOT_ALLOWED = 'username is not allowed';

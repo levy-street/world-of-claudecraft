@@ -27,10 +27,22 @@ interface VfxProbe {
   rotAttr: Float32Array;
   activeSlots: Int32Array;
   activeCount: number;
+  ignivarJudgmentFireAccumulator: number;
+  ignivarJudgmentFireSerial: number;
   head: number;
   drawBuffer: THREE.InterleavedBuffer;
   spriteRadiusSq: Float32Array;
   onContextRestored(): void;
+  syncIgnivarJudgmentGroundFire(
+    sourceId: number,
+    active: boolean,
+    centerX: number,
+    groundY: number,
+    centerZ: number,
+    safeX: number,
+    safeZ: number,
+    dt: number,
+  ): void;
   spawn(
     x: number,
     y: number,
@@ -117,6 +129,74 @@ describe('pooled VFX cloud', () => {
 
     expect(() => vfx.update(0.1)).not.toThrow();
     expect(impact).toHaveBeenCalledOnce();
+  });
+
+  it('renders deterministic pooled flame, fire, spark and smoke sprites for Judgment', () => {
+    installCanvasStub();
+    const build = () => {
+      const vfx = new Vfx(new THREE.Scene(), () => null);
+      const probe = vfx as unknown as VfxProbe;
+      vfx.setQuality(1);
+      probe.syncIgnivarJudgmentGroundFire(77, true, 100, 3, -50, 113.25, -58.5, 0);
+      const samples = [...probe.activeSlots.subarray(0, probe.activeCount)].map((slot) => ({
+        x: probe.pos[slot * 3],
+        y: probe.pos[slot * 3 + 1],
+        z: probe.pos[slot * 3 + 2],
+        sprite: probe.spriteAttr[slot],
+        size: probe.size[slot],
+      }));
+      return { probe, samples };
+    };
+
+    const first = build();
+    const second = build();
+    expect(first.samples).toEqual(second.samples);
+    expect(first.samples.length).toBeGreaterThan(200);
+    expect(new Set(first.samples.map((sample) => sample.sprite))).toEqual(
+      new Set([0, 2, 9, 10, 11]),
+    );
+    expect(
+      first.samples
+        .filter((sample) => sample.sprite === 9 || sample.sprite === 10)
+        .every((sample) => sample.size >= 0.9),
+    ).toBe(true);
+    for (const sample of first.samples) {
+      expect(Math.hypot(sample.x - 100, sample.z + 50)).toBeLessThan(34);
+      expect(Math.hypot(sample.x - 113.25, sample.z + 58.5)).toBeGreaterThanOrEqual(6.85);
+      expect(sample.y).toBeGreaterThanOrEqual(3);
+    }
+
+    const steadyCount = first.probe.activeCount;
+    const steadySerial = first.probe.ignivarJudgmentFireSerial;
+    first.probe.syncIgnivarJudgmentGroundFire(77, true, 100, 3, -50, 113.25, -58.5, 0);
+    expect(first.probe.activeCount).toBe(steadyCount);
+    expect(first.probe.ignivarJudgmentFireSerial).toBe(steadySerial);
+    first.probe.syncIgnivarJudgmentGroundFire(77, true, 100, 3, -50, 113.25, -58.5, 1 / 460);
+    expect(first.probe.ignivarJudgmentFireSerial).toBe(steadySerial);
+    expect(first.probe.ignivarJudgmentFireAccumulator).toBeCloseTo(0.5, 8);
+    first.probe.syncIgnivarJudgmentGroundFire(77, true, 100, 3, -50, 113.25, -58.5, 1 / 460);
+    expect(first.probe.ignivarJudgmentFireSerial).toBe(steadySerial + 1);
+    expect(first.probe.ignivarJudgmentFireAccumulator).toBeCloseTo(0, 8);
+
+    const before = first.probe.activeCount;
+    first.probe.syncIgnivarJudgmentGroundFire(77, false, 100, 3, -50, 113.25, -58.5, 1 / 60);
+    first.probe.syncIgnivarJudgmentGroundFire(77, true, 100, 3, -50, 113.25, -58.5, 1 / 60);
+    expect(first.probe.activeCount).toBeGreaterThan(before);
+  });
+
+  it('keeps low-tier Judgment flames actionable while omitting smoke', () => {
+    installCanvasStub();
+    const vfx = new Vfx(new THREE.Scene(), () => null);
+    const probe = vfx as unknown as VfxProbe;
+    vfx.setQuality(0);
+    probe.syncIgnivarJudgmentGroundFire(91, true, 0, 0, 0, 12, -8, 0);
+
+    const sprites = new Set(
+      [...probe.activeSlots.subarray(0, probe.activeCount)].map((slot) => probe.spriteAttr[slot]),
+    );
+    expect(probe.ignivarJudgmentFireSerial).toBe(91 * 4099 + 136);
+    expect(sprites).toEqual(new Set([0, 2, 9, 10]));
+    expect(sprites.has(11)).toBe(false);
   });
 
   it('submits and uploads only the live ascending prefix with conservative culling', () => {

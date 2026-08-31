@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/rickshaw_mount/rickshaw_mount.glb",
+      "out": "models/mounts/rickshaw_mount.glb",
+      "type": "static"
+    }
+  ]
+}

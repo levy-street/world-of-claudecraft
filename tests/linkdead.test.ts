@@ -34,6 +34,7 @@ import {
   RECONNECT_CONFLICT_ERROR,
   RECONNECT_TIMEOUT_ERROR,
 } from '../src/net/reconnect_policy';
+import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
 
 function fakeWs() {
   const ws: any = {
@@ -263,6 +264,138 @@ describe('linkdead grace lifecycle', () => {
     const resumed = expectJoined(server.join(ws2, 11, 101, 'NeverMuted', 'warrior', null));
 
     expect(resumed.chatMutedUntil).toBeNull();
+  });
+
+  it('replays current forge portals once after the resumed socket receives its full snapshot', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Forgebck', 'warrior', null));
+    const player = server.sim.entities.get(session.pid);
+    if (!player) throw new Error('Player missing');
+    const nearPortal = {
+      type: 'spellfxAt' as const,
+      x: player.pos.x + 2,
+      z: player.pos.z,
+      school: 'fire' as const,
+      fx: 'burst' as const,
+      sourceId: 9001,
+      radius: 4,
+      duration: 1.35,
+      ability: VARKHUL_FORGE_PORTAL_ABILITY_ID,
+    };
+    vi.spyOn(server.sim, 'activeVarkhulForgePortalTelegraphs', 'get').mockReturnValue([
+      nearPortal,
+      { ...nearPortal, x: player.pos.x + 10_000 },
+    ]);
+    dropSocket(server, session, ws);
+    const ws2 = fakeWs();
+    expectJoined(server.join(ws2, 11, 101, 'Forgebck', 'warrior', null));
+
+    (server as any).broadcastSnapshots();
+    const firstFrames = ws2.send.mock.calls.map((call: any[]) => JSON.parse(call[0]));
+    const snapIndex = firstFrames.findIndex((frame: any) => frame.t === 'snap');
+    const portalIndex = firstFrames.findIndex(
+      (frame: any) =>
+        frame.t === 'events' &&
+        frame.list?.some((event: any) => event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID),
+    );
+    expect(snapIndex).toBeGreaterThanOrEqual(0);
+    expect(portalIndex).toBeGreaterThan(snapIndex);
+    expect(firstFrames[portalIndex].list).toEqual([nearPortal]);
+
+    (server as any).broadcastSnapshots();
+    const allFrames = ws2.send.mock.calls.map((call: any[]) => JSON.parse(call[0]));
+    expect(
+      allFrames.filter(
+        (frame: any) =>
+          frame.t === 'events' &&
+          frame.list?.some((event: any) => event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID),
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('does not duplicate a forge portal event already delivered after resume', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Forgeevt', 'warrior', null));
+    const player = server.sim.entities.get(session.pid);
+    if (!player) throw new Error('Player missing');
+    const portal = {
+      type: 'spellfxAt' as const,
+      x: player.pos.x + 2,
+      z: player.pos.z,
+      school: 'fire' as const,
+      fx: 'burst' as const,
+      sourceId: 9002,
+      radius: 4,
+      duration: 1.2,
+      ability: VARKHUL_FORGE_PORTAL_ABILITY_ID,
+    };
+    vi.spyOn(server.sim, 'activeVarkhulForgePortalTelegraphs', 'get').mockReturnValue([portal]);
+    dropSocket(server, session, ws);
+    const ws2 = fakeWs();
+    expectJoined(server.join(ws2, 11, 101, 'Forgeevt', 'warrior', null));
+    ws2.send.mockClear();
+
+    (server as any).routeEvents([portal]);
+    (server as any).broadcastSnapshots();
+
+    const frames = ws2.send.mock.calls.map((call: any[]) => JSON.parse(call[0]));
+    expect(frames[0]).toMatchObject({ t: 'events', list: [portal] });
+    expect(frames.some((frame: any) => frame.t === 'snap')).toBe(true);
+    expect(
+      frames.filter(
+        (frame: any) =>
+          frame.t === 'events' &&
+          frame.list?.some((event: any) => event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID),
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('keeps the replay armed for an out-of-range portal or an unrelated world effect', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Forgefar', 'warrior', null));
+    const player = server.sim.entities.get(session.pid);
+    if (!player) throw new Error('Player missing');
+    const portal = {
+      type: 'spellfxAt' as const,
+      x: player.pos.x + 2,
+      z: player.pos.z,
+      school: 'fire' as const,
+      fx: 'burst' as const,
+      sourceId: 9003,
+      radius: 4,
+      duration: 1.1,
+      ability: VARKHUL_FORGE_PORTAL_ABILITY_ID,
+    };
+    vi.spyOn(server.sim, 'activeVarkhulForgePortalTelegraphs', 'get').mockReturnValue([portal]);
+    dropSocket(server, session, ws);
+    const ws2 = fakeWs();
+    expectJoined(server.join(ws2, 11, 101, 'Forgefar', 'warrior', null));
+    ws2.send.mockClear();
+
+    (server as any).routeEvents([
+      { ...portal, x: player.pos.x + 10_000 },
+      { ...portal, ability: 'Unrelated World Effect' },
+    ]);
+    expect(session.needsVarkhulPortalReplay).toBe(true);
+    (server as any).broadcastSnapshots();
+
+    const frames = ws2.send.mock.calls.map((call: any[]) => JSON.parse(call[0]));
+    const snapIndex = frames.findIndex((frame: any) => frame.t === 'snap');
+    const replayIndex = frames.findIndex(
+      (frame: any) =>
+        frame.t === 'events' &&
+        frame.list?.some((event: any) => event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID),
+    );
+    expect(frames[0]).toMatchObject({
+      t: 'events',
+      list: [expect.objectContaining({ ability: 'Unrelated World Effect' })],
+    });
+    expect(snapIndex).toBeGreaterThan(0);
+    expect(replayIndex).toBeGreaterThan(snapIndex);
+    expect(frames[replayIndex].list).toEqual([portal]);
   });
 
   it('ignores a late close event from the pre-resume socket', () => {

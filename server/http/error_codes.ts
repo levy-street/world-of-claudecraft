@@ -103,6 +103,10 @@ export const ERROR_CODES = deepFreeze({
   'character.rename_not_permitted': { params: [] },
   // identity: "type the character name to confirm deletion"
   'character.delete_confirm': { params: [] },
+  // identity: an open paid storage purchase must settle before character deletion
+  'character.storage_purchase_open': { params: [] },
+  // identity: the realm background gate refused the delete; retry in a moment
+  'character.delete_busy': { params: [] },
   // identity: "character already in world"
   'character.already_in_world': { params: [] },
   // identity: "character taken over"
@@ -218,6 +222,16 @@ export const ERROR_CODES = deepFreeze({
   'epic.upstream': { params: [] },
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
+  // wallet: changing or removing a LINKED wallet needs re-authorization
+  // (server/wallet_reauth.ts, the R11 relink gate): the current wallet's
+  // signature over the challenge message, or the account password plus the
+  // second factor when one is enrolled.
+  'wallet.reauth_required': { params: [] },
+  'wallet.reauth_two_factor': { params: [] },
+  'wallet.reauth_no_password': { params: [] },
+  'wallet.reauth_bad_signature': { params: [] },
+  'wallet.reauth_bad_password': { params: [] },
+  'wallet.reauth_bad_two_factor': { params: [] },
   'ota_updates.invalid_input': { params: [] },
   // seeker: native distribution, attestation, wallet, token, and entitlement failures.
   'seeker.native_only': { params: [] },

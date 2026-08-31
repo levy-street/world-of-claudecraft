@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   applyPerfOrnamentVars,
+  applyWindowOrnamentVars,
   PERF_CORNER_SIZE,
   PERF_EDGE_TILE_LENGTH,
   PERF_EDGE_TILE_THICKNESS,
@@ -9,6 +10,8 @@ import {
   perfGiltGradientBackground,
   perfMidEdgeOrnamentMaskImage,
   perfNoisyEdgeMaskImage,
+  WINDOW_ORNAMENT_LAYERS,
+  windowOrnamentFrameImage,
 } from '../src/ui/perf_ornament_svg';
 
 // A mask-image data URI never bakes in color: the referencing CSS rule always
@@ -245,5 +248,81 @@ describe('perf_ornament_svg', () => {
     expect(written['--perf-ornament-corner']).toBeTruthy();
     expect(written['--perf-ornament-mid-edge']).toBeTruthy();
     expect(written['--perf-ornament-gilt']).toBeTruthy();
+  });
+});
+
+// The Fancy Gold window-frame composite: the same 12 tiles pre-tinted from
+// the gold ramp and consumed as BACKGROUND layers on every desktop
+// .window.panel while the fancyGold theme preset is active (components.css,
+// gated by the .fancy-gold-ui root class), because a window is its own
+// scroll container and a masked ::before would clip and scroll away there
+// while the container's own background stays pinned (the resize grip's
+// mechanism, layout.css).
+describe('windowOrnamentFrameImage (the tinted Fancy Gold composite)', () => {
+  const tones = [
+    '#0a1',
+    '#0a2',
+    '#0a3',
+    '#0a4',
+    '#0b1',
+    '#0b2',
+    '#0b3',
+    '#0b4',
+    '#0c1',
+    '#0c2',
+    '#0c3',
+    '#0c4',
+  ];
+
+  it('emits exactly WINDOW_ORNAMENT_LAYERS distinct url() layers in the fixed order', () => {
+    const layers = windowOrnamentFrameImage(tones).split(', ');
+    expect(layers).toHaveLength(WINDOW_ORNAMENT_LAYERS);
+    expect(new Set(layers).size).toBe(WINDOW_ORNAMENT_LAYERS);
+    for (const layer of layers) expect(layer).toMatch(/^url\("data:image\/svg\+xml,/);
+    // Order contract the components.css position/size/repeat lists rely on:
+    // 4 corner tiles, 4 mid-edge tiles, then 4 edge ribbons.
+    const boxes = layers.map((l) => decodeSvg(l).match(/viewBox='([^']*)'/)?.[1]);
+    for (const b of boxes.slice(0, 4))
+      expect(b).toBe(`0 0 ${PERF_CORNER_SIZE} ${PERF_CORNER_SIZE}`);
+    for (const b of boxes.slice(4, 8))
+      expect(b).toBe(`0 0 ${PERF_MID_EDGE_SIZE} ${PERF_MID_EDGE_SIZE}`);
+    expect(boxes[8]).toBe(`0 0 ${PERF_EDGE_TILE_LENGTH} ${PERF_EDGE_TILE_THICKNESS}`);
+    expect(boxes[10]).toBe(`0 0 ${PERF_EDGE_TILE_THICKNESS} ${PERF_EDGE_TILE_LENGTH}`);
+  });
+
+  it("bakes each layer's tone into strokes AND the wrapping fill group, leaving no #000 ink", () => {
+    const layers = windowOrnamentFrameImage(tones).split(', ');
+    layers.forEach((layer, i) => {
+      const svg = decodeSvg(layer);
+      expect(svg).toContain(`<g fill="${tones[i]}">`);
+      expect(svg).not.toContain('#000');
+      if (i < 8) expect(svg).toContain(`stroke="${tones[i]}"`);
+    });
+  });
+
+  it('applyWindowOrnamentVars resolves the gold ramp and writes the one frame var', () => {
+    const written: Record<string, string> = {};
+    const fakeRoot = {
+      style: {
+        setProperty: (prop: string, value: string) => {
+          written[prop] = value;
+        },
+      },
+    } as unknown as HTMLElement;
+    const prev = (globalThis as Record<string, unknown>).getComputedStyle;
+    (globalThis as Record<string, unknown>).getComputedStyle = () => ({
+      getPropertyValue: (p: string) => (p.startsWith('--color-gold-') ? ` ${p.slice(2)} ` : ''),
+    });
+    try {
+      applyWindowOrnamentVars(fakeRoot);
+    } finally {
+      if (prev === undefined) delete (globalThis as Record<string, unknown>).getComputedStyle;
+      else (globalThis as Record<string, unknown>).getComputedStyle = prev;
+    }
+    const value = written['--window-ornament-frame'];
+    expect(value).toBeTruthy();
+    expect(value.split(', ')).toHaveLength(WINDOW_ORNAMENT_LAYERS);
+    // The resolved (trimmed) token values are what get baked in.
+    expect(decodeSvg(value.split(', ')[0])).toContain('fill="color-gold-500"');
   });
 });

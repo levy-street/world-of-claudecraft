@@ -5,6 +5,7 @@ import {
   getCharacter,
   insertClientPerfReport,
 } from './db';
+import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
@@ -867,6 +868,9 @@ export async function handlePerfReport(
   };
 
   await insertClientPerfReport(row);
+  // AFTER the insert on purpose: the /metrics series stay 1:1 with stored rows
+  // (see server/http/client_perf_metrics.ts for the full emission contract).
+  clientPerfMetricsSink().perfReportStored(row);
   return json(res, 200, { ok: true });
 }
 

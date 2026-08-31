@@ -71,8 +71,35 @@ import type {
   SimEvent,
   SkinCatalog,
   StationDef,
+  StoragePrices,
+  VaultConsumptionAdmission,
+  VaultConsumptionReservation,
+  VaultConsumptionTake,
   Vec3,
 } from './types';
+
+/** Shared inert success handle for hosts with no durable audit sink. Reused by
+ *  reference so offline/headless vault actions allocate no reservation object. */
+export const INERT_VAULT_CONSUMPTION_RESERVATION: VaultConsumptionReservation = Object.freeze({
+  commit(): void {},
+  cancel(): void {},
+});
+
+export const inertVaultConsumptionAdmission: VaultConsumptionAdmission = () =>
+  INERT_VAULT_CONSUMPTION_RESERVATION;
+
+export type RuntimeSimConfig = Required<
+  Omit<
+    SimConfig,
+    | 'noPlayer'
+    | 'world'
+    | 'perfLap'
+    | 'respawnSeconds'
+    | 'storagePrices'
+    | 'vaultConsumptionAdmission'
+  >
+> &
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
 
 export interface DamageResolution {
   landedHpLoss: number;
@@ -181,8 +208,9 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe), and `respawnSeconds` stays
   // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
   // global base from "fall through to the zone tier"; the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  // `storagePrices` is consumed at construction like `noPlayer` (resolved once
+  // into the storagePrices view below), so it never rides cfg.
+  readonly cfg: RuntimeSimConfig;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -349,6 +377,13 @@ export interface SimContextCallbacks {
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
   error(pid: number, text: string, reason?: ErrorReason): void;
+  /** Reserve host audit capacity before a craft/enchant vault draw mutates
+   *  character state. Null is the retryable busy refusal. */
+  reserveVaultConsumption(
+    pid: number,
+    takes: readonly VaultConsumptionTake[],
+    vaultUpgrades: number,
+  ): VaultConsumptionReservation | null;
 
   // I1 dungeon instancing. `lockoutNowMs` is the shared raid-lockout clock (stays on
   // Sim; N1 also writes lockouts through it). instanceKeyFor/instanceOriginOf/
@@ -367,6 +402,10 @@ export interface SimContextCallbacks {
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
   // the sim core never reads a time zone; offline/headless fall back to a flat 24h day.
   raidResetMs(nowMs: number): number;
+  // The next WEEKLY raid-reset instant for a given lockout "now": the boundary the
+  // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
+  // offline/headless fall back to a flat 7-day week).
+  weeklyRaidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -704,7 +743,7 @@ export interface SimContextCallbacks {
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
-  swingIntervalMult(e: Entity): number;
+  swingIntervalMult(e: Entity, channel?: 'melee' | 'ranged'): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
   // Exact swept player movement resolver, exposed for the local unstuck search.
@@ -915,6 +954,10 @@ export interface SimContextCallbacks {
     target: Entity | null,
     res: ResolvedAbility,
     attackAnimationStarted?: boolean,
+    // Cast-scoped outgoing-heal multiplier for the direct 'heal' effect
+    // (default 1; see the parameter note on combat/effect_dispatch.ts's
+    // runEffects). Today only the Stonehearth 2pc bend passes it.
+    castHealMult?: number,
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
@@ -1077,12 +1120,33 @@ export interface SimContextCallbacks {
 }
 
 // The seam consumed by extracted modules.
-export interface SimContext extends SimContextPrimitives, SimContextCallbacks {}
+export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
+  // The resolved storage price table (storage_prices.ts): bank expansions,
+  // bank bag sockets, vault rungs. Frozen at Sim construction from the
+  // cfg.storagePrices override; the ONE price truth every bank/vault charge
+  // and quote reads.
+  readonly storagePrices: StoragePrices;
+}
 
 // What `Sim` supplies to build a SimContext. Structurally identical to SimContext
 // today, but kept as its own name to make the data flow explicit (Sim -> host ->
 // context) and to let the consumed seam narrow independently of the provider later.
-export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {}
+// `storagePrices` is REQUIRED here, deliberately: a host that forgot to wire its
+// resolved table would otherwise silently charge compiled defaults under a live
+// override, so the compiler enforces the wiring (host fakes import
+// DEFAULT_STORAGE_PRICES for it). `reserveVaultConsumption` is required on
+// this seam too, but note precisely which layer enforces what: THIS interface
+// only makes sim-internal context assembly name an admission, and Sim's ctor
+// satisfies it with inertVaultConsumptionAdmission whenever
+// SimConfig.vaultConsumptionAdmission is omitted (the field stays OPTIONAL so
+// offline/headless constructions stay clean). The server wiring is enforced
+// one level up instead: buildRealmSimConfig (server/sim_boot_config.ts) takes
+// the admission as a REQUIRED parameter, so a realm boot that dropped the
+// journal wiring fails to compile there, and a deliberately inert server
+// caller must pass the exported inert constant by name.
+export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+  readonly storagePrices: StoragePrices;
+}
 
 // Assemble the immutable SimContext from its host. The primitives stay LIVE (each
 // access reads through to the host, so `time`/`tickCount` reflect the current tick
@@ -1211,6 +1275,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get cfg() {
       return host.cfg;
+    },
+    get storagePrices() {
+      return host.storagePrices;
     },
     get riftCollisionToken() {
       return host.riftCollisionToken;
@@ -1385,8 +1452,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     emit: host.emit,
     error: host.error,
+    reserveVaultConsumption: host.reserveVaultConsumption,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
+    weeklyRaidResetMs: host.weeklyRaidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,
@@ -1627,4 +1696,45 @@ export function createSimContext(host: SimContextHost): SimContext {
     bgOnPlayerHealed: host.bgOnPlayerHealed,
     bgCancelFlagAura: host.bgCancelFlagAura,
   };
+}
+
+/** Canonicalize every vault half of a reagent plan and offer it to the host.
+ *
+ * Undefined means the action has no vault draw and the host was deliberately
+ * not called. Null is a host refusal. A handle is an accepted reservation.
+ * The cloned rows and array are frozen before crossing the host boundary, and
+ * sorting uses code-unit order so it is deterministic across runtimes. */
+export function reservePlannedVaultConsumption(
+  ctx: SimContext,
+  pid: number,
+  plans: readonly { readonly vault: readonly VaultConsumptionTake[] }[],
+  vaultUpgrades: number,
+): VaultConsumptionReservation | null | undefined {
+  const takes: VaultConsumptionTake[] = [];
+  for (const plan of plans) {
+    for (const take of plan.vault) {
+      takes.push(Object.freeze({ itemId: take.itemId, count: take.count }));
+    }
+  }
+  if (takes.length === 0) return undefined;
+  takes.sort((a, b) => (a.itemId < b.itemId ? -1 : a.itemId > b.itemId ? 1 : a.count - b.count));
+  return ctx.reserveVaultConsumption(pid, Object.freeze(takes), vaultUpgrades);
+}
+
+/** Settle a planned vault reservation against what the apply loop really moved.
+ *
+ * The reservation is the DURABLE AUDIT RECORD for the whole planned take list,
+ * so it may become durable only when every planned take committed. A shortfall
+ * (consumePlayerVaultStock refusing a take) is reachable only by a bug, but
+ * committing the full list anyway would overclaim rows for units that never
+ * moved; cancel loses rows for the units that DID move, and under-claiming is
+ * the safe direction for an audit record (recording only what committed). */
+export function settleVaultConsumptionReservation(
+  reservation: VaultConsumptionReservation | undefined,
+  plannedTakes: number,
+  movedTakes: number,
+): void {
+  if (!reservation) return;
+  if (movedTakes === plannedTakes) reservation.commit();
+  else reservation.cancel();
 }

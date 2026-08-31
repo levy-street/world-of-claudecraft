@@ -10,10 +10,29 @@
 // chevron texture scrolls toward the destination and the glow breathes.
 // MeshBasicMaterial + additive blending keeps this actionable guidance
 // identical on every graphics tier (the fairness rule): no lights, no tier
-// reads, no governor reads.
+// reads, no governor reads. The materials are the page-wide set in
+// coach_trail_materials.ts (staged by the boot manifest, never disposed), and
+// every guidance object is built up front under ONE root the constructor
+// attaches through the gated scene attach (gated_scene_attach.ts): the root
+// stays hidden until the host's compile gate links the three programs, and a
+// route or target change afterwards only ever swaps geometry, so nothing the
+// coach does can link a program inside a live frame, whatever the boot kept.
 
 import * as THREE from 'three';
 import type { CoachTrailPlan } from './coach_trail_core';
+import {
+  COACH_BEAM_HEIGHT,
+  COACH_STRIP_INDEX,
+  type CoachTrailMaterials,
+  coachAreaRingGeometry,
+  coachBeamGeometry,
+  coachRibbonGeometry,
+  coachRingGeometry,
+  coachStripPositions,
+  coachStripUvs,
+  coachTrailMaterials,
+} from './coach_trail_materials';
+import { attachSceneGroupGated } from './gated_scene_attach';
 
 const RIBBON_WIDTH = 0.7;
 const RIBBON_LIFT = 0.14;
@@ -22,103 +41,76 @@ const SCROLL_SPEED = 1.5; // repeats per second, toward the destination
 const SAMPLES_PER_UNIT = 0.6; // cross-sections per world unit of route
 const MIN_SAMPLES = 24;
 const MAX_SAMPLES = 320;
-const GOLD = 0xffc860;
-const RING_INNER = 0.95;
-const RING_OUTER = 1.35;
 const RING_LIFT = 0.12;
 // The target NPC's body aura: a soft radial billboard behind the model, the
 // "glowing character" read (playtest: an arrow over the head looked wrong).
 const AURA_WIDTH = 3.0;
 const AURA_HEIGHT = 3.6;
 const AURA_LIFT = 1.15;
-// The non-character objective's vertical light column, sized to read across
-// the whole shore ("a beam, say 25 yards").
-const BEAM_HEIGHT = 25;
-const BEAM_RADIUS = 0.55;
 
-/** The race_line chevron strip, narrower: one arrow per repeat, pointing +u. */
-function chevronTexture(): THREE.Texture {
-  const w = 64;
-  const h = 32;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(10, 4);
-  ctx.lineTo(34, 16);
-  ctx.lineTo(10, 28);
-  ctx.lineTo(22, 16);
-  ctx.closePath();
-  ctx.fill();
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.ClampToEdgeWrapping;
-  return tex;
-}
-
-/** A soft radial glow disc, drawn once (the aura sprite's face). */
-function radialGlowTexture(): THREE.Texture {
-  const size = 128;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  const g = ctx.createRadialGradient(size / 2, size / 2, 8, size / 2, size / 2, size / 2);
-  g.addColorStop(0, 'rgba(255,255,255,0.9)');
-  g.addColorStop(0.45, 'rgba(255,255,255,0.35)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, size, size);
-  return new THREE.CanvasTexture(canvas);
-}
-
-/** A vertical alpha falloff strip for the beam (bright at the ground, gone
- *  at the top). */
-function beamFadeTexture(): THREE.Texture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  const g = ctx.createLinearGradient(0, 64, 0, 0);
-  g.addColorStop(0, 'rgba(255,255,255,0.85)');
-  g.addColorStop(0.35, 'rgba(255,255,255,0.4)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 1, 64);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.ClampToEdgeWrapping;
-  tex.wrapT = THREE.ClampToEdgeWrapping;
-  return tex;
-}
+/** The host's compile step for the trail's root: link its programs off the
+ *  frame before it shows (the renderer's compile gate). */
+export type CoachTrailCompileGate = (target: THREE.Object3D) => Promise<unknown>;
 
 export class CoachTrail {
-  private ribbon: THREE.Mesh | null = null;
-  private mat: THREE.MeshBasicMaterial | null = null;
-  private tex: THREE.Texture | null = null;
+  private readonly mats: CoachTrailMaterials = coachTrailMaterials();
+  /** Every guidance object, under one root attached to the scene once. */
+  readonly group = new THREE.Group();
+  private readonly ribbon: THREE.Mesh;
   private builtKey: string | null = null;
-  private ring: THREE.Mesh | null = null;
-  private ringMat: THREE.MeshBasicMaterial | null = null;
+  private readonly ring: THREE.Mesh;
   private ringKey = '';
-  private aura: THREE.Sprite | null = null;
-  private auraMat: THREE.SpriteMaterial | null = null;
-  private beam: THREE.Mesh | null = null;
-  private beamMat: THREE.MeshBasicMaterial | null = null;
+  private readonly aura: THREE.Sprite;
+  private readonly beam: THREE.Mesh;
   private beamKey = '';
-  private areaRing: THREE.Mesh | null = null;
-  private areaRingMat: THREE.MeshBasicMaterial | null = null;
+  private readonly areaRing: THREE.Mesh;
   private areaRingKey = '';
 
   constructor(
-    private readonly scene: THREE.Object3D,
+    scene: THREE.Object3D,
     private readonly groundAt: (x: number, z: number) => number,
-  ) {}
+    compileGate?: CoachTrailCompileGate,
+  ) {
+    this.group.name = 'coach-trail';
+    this.ribbon = this.guidance(
+      new THREE.Mesh(
+        coachRibbonGeometry(coachStripPositions(), coachStripUvs(), COACH_STRIP_INDEX),
+        this.mats.ribbon,
+      ),
+    );
+    this.ring = this.guidance(new THREE.Mesh(coachRingGeometry(), this.mats.ring));
+    this.aura = this.guidance(new THREE.Sprite(this.mats.aura));
+    this.beam = this.guidance(new THREE.Mesh(coachBeamGeometry(), this.mats.beam));
+    this.areaRing = this.guidance(
+      new THREE.Mesh(
+        coachAreaRingGeometry(coachStripPositions(), COACH_STRIP_INDEX),
+        this.mats.areaRing,
+      ),
+    );
+    // Hidden until the gate links the programs, then revealed; the objects
+    // above keep their own visibility for the per-frame drive below. This
+    // runs at renderer construction, before any live frame: without async
+    // compile the gate links synchronously under the boot window (the
+    // sibling attach sites guard on it because they attach mid-session), and
+    // its unit runs ahead of the boot manifest, whose coach stand-in then
+    // finds the programs cached.
+    void attachSceneGroupGated(scene, this.group, compileGate);
+  }
+
+  /** One guidance object: drawn late (over the ground), in the diagnostics'
+   *  world-space UI census bucket (never a behavior or visibility gate),
+   *  hidden until its station needs it. */
+  private guidance<T extends THREE.Object3D>(object: T): T {
+    object.renderOrder = 3;
+    object.userData.renderCategory = 'ui3d';
+    object.visible = false;
+    this.group.add(object);
+    return object;
+  }
 
   /** Rebuild the draped ribbon for a new route key. */
   private buildRibbon(plan: CoachTrailPlan): void {
-    this.disposeRibbon();
+    this.hideRibbon();
     if (plan.points.length < 2) return;
     const pts = plan.points.map((p) => new THREE.Vector3(p.x, 0, p.z));
     const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
@@ -164,106 +156,20 @@ export class CoachTrail {
         index.push(a, b, vi, b, vi + 1, vi);
       }
     }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-    geo.setIndex(index);
-    if (!this.tex) this.tex = chevronTexture();
-    this.mat = new THREE.MeshBasicMaterial({
-      map: this.tex,
-      color: new THREE.Color(GOLD).multiplyScalar(1.7),
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.ribbon = new THREE.Mesh(geo, this.mat);
-    this.ribbon.renderOrder = 3;
-    // Diagnostics-only census bucket (world-space actionable UI, the
-    // race_line precedent); never a behavior or visibility gate.
-    this.ribbon.userData.renderCategory = 'ui3d';
-    this.scene.add(this.ribbon);
+    this.ribbon.geometry.dispose();
+    this.ribbon.geometry = coachRibbonGeometry(positions, uvs, index);
     this.builtKey = plan.key;
   }
 
-  private disposeRibbon(): void {
-    if (this.ribbon) {
-      this.scene.remove(this.ribbon);
-      this.ribbon.geometry.dispose();
-      this.ribbon = null;
-    }
-    this.mat?.dispose();
-    this.mat = null;
+  private hideRibbon(): void {
+    this.ribbon.visible = false;
     this.builtKey = null;
-  }
-
-  private ensureRing(): void {
-    if (this.ring) return;
-    const geo = new THREE.RingGeometry(RING_INNER, RING_OUTER, 40);
-    geo.rotateX(-Math.PI / 2);
-    this.ringMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(GOLD).multiplyScalar(1.9),
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.ring = new THREE.Mesh(geo, this.ringMat);
-    this.ring.renderOrder = 3;
-    this.ring.userData.renderCategory = 'ui3d';
-    this.ring.visible = false;
-    this.scene.add(this.ring);
-  }
-
-  private ensureAura(): void {
-    if (this.aura) return;
-    this.auraMat = new THREE.SpriteMaterial({
-      map: radialGlowTexture(),
-      color: new THREE.Color(GOLD).multiplyScalar(1.6),
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    this.aura = new THREE.Sprite(this.auraMat);
-    this.aura.renderOrder = 3;
-    this.aura.userData.renderCategory = 'ui3d';
-    this.aura.visible = false;
-    this.scene.add(this.aura);
-  }
-
-  private ensureBeam(): void {
-    if (this.beam) return;
-    const geo = new THREE.CylinderGeometry(
-      BEAM_RADIUS,
-      BEAM_RADIUS * 1.5,
-      BEAM_HEIGHT,
-      14,
-      1,
-      true,
-    );
-    this.beamMat = new THREE.MeshBasicMaterial({
-      map: beamFadeTexture(),
-      color: new THREE.Color(GOLD).multiplyScalar(1.8),
-      transparent: true,
-      opacity: 0.65,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.beam = new THREE.Mesh(geo, this.beamMat);
-    this.beam.renderOrder = 3;
-    this.beam.userData.renderCategory = 'ui3d';
-    this.beam.visible = false;
-    this.scene.add(this.beam);
   }
 
   /** The kill camps' wide draped ring: an annulus ribbon whose every vertex
    *  sits on the sampled terrain, rebuilt only when the camp changes. */
   private buildAreaRing(key: string, at: { x: number; z: number; radius: number }): void {
-    this.disposeAreaRing();
+    this.hideAreaRing();
     const SEGMENTS = 72;
     const HALF_WIDTH = 0.5;
     const LIFT = 0.16;
@@ -286,32 +192,13 @@ export class CoachTrail {
         index.push(p, q, vi, q, vi + 1, vi);
       }
     }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setIndex(index);
-    this.areaRingMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(GOLD).multiplyScalar(1.8),
-      transparent: true,
-      opacity: 0.6,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.areaRing = new THREE.Mesh(geo, this.areaRingMat);
-    this.areaRing.renderOrder = 3;
-    this.areaRing.userData.renderCategory = 'ui3d';
-    this.scene.add(this.areaRing);
+    this.areaRing.geometry.dispose();
+    this.areaRing.geometry = coachAreaRingGeometry(positions, index);
     this.areaRingKey = key;
   }
 
-  private disposeAreaRing(): void {
-    if (this.areaRing) {
-      this.scene.remove(this.areaRing);
-      this.areaRing.geometry.dispose();
-      this.areaRing = null;
-    }
-    this.areaRingMat?.dispose();
-    this.areaRingMat = null;
+  private hideAreaRing(): void {
+    this.areaRing.visible = false;
     this.areaRingKey = '';
   }
 
@@ -328,39 +215,36 @@ export class CoachTrail {
     dt: number,
   ): void {
     if (!plan) {
-      if (this.ribbon) this.disposeRibbon();
+      this.hideRibbon();
     } else {
       if (this.builtKey !== plan.key) this.buildRibbon(plan);
-      if (this.ribbon && this.mat && this.tex) {
+      if (this.builtKey !== null) {
         this.ribbon.visible = true;
-        this.tex.offset.x -= SCROLL_SPEED * dt;
-        this.mat.opacity = 0.65 + 0.2 * Math.sin(time * 2.4);
+        if (this.mats.ribbon.map) this.mats.ribbon.map.offset.x -= SCROLL_SPEED * dt;
+        this.mats.ribbon.opacity = 0.65 + 0.2 * Math.sin(time * 2.4);
       }
     }
     this.updateRingAndAura(ringAt, time);
     this.updateBeam(beamAt, time);
     if (!areaRing) {
-      if (this.areaRing) this.areaRing.visible = false;
+      this.areaRing.visible = false;
     } else {
       const key = `${areaRing.x},${areaRing.z},${areaRing.radius}`;
       if (this.areaRingKey !== key) this.buildAreaRing(key, areaRing);
-      if (this.areaRing && this.areaRingMat) {
+      if (this.areaRingKey === key) {
         this.areaRing.visible = true;
         // A LOUD pulse (the playtest ask): the whole camp boundary breathes.
-        this.areaRingMat.opacity = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 3.0));
+        this.mats.areaRing.opacity = 0.35 + 0.4 * (0.5 + 0.5 * Math.sin(time * 3.0));
       }
     }
   }
 
   private updateRingAndAura(ringAt: { x: number; z: number } | null, time: number): void {
     if (!ringAt) {
-      if (this.ring) this.ring.visible = false;
-      if (this.aura) this.aura.visible = false;
+      this.ring.visible = false;
+      this.aura.visible = false;
       return;
     }
-    this.ensureRing();
-    this.ensureAura();
-    if (!this.ring || !this.ringMat || !this.aura || !this.auraMat) return;
     this.ring.visible = true;
     this.aura.visible = true;
     const key = `${ringAt.x},${ringAt.z}`;
@@ -372,26 +256,24 @@ export class CoachTrail {
     }
     const pulse = 1 + 0.1 * Math.sin(time * 3.4);
     this.ring.scale.setScalar(pulse);
-    this.ringMat.opacity = 0.4 + 0.25 * (0.5 + 0.5 * Math.sin(time * 3.4));
+    this.mats.ring.opacity = 0.4 + 0.25 * (0.5 + 0.5 * Math.sin(time * 3.4));
     const breathe = 1 + 0.07 * Math.sin(time * 2.2);
     this.aura.scale.set(AURA_WIDTH * breathe, AURA_HEIGHT * breathe, 1);
-    this.auraMat.opacity = 0.45 + 0.2 * (0.5 + 0.5 * Math.sin(time * 2.2));
+    this.mats.aura.opacity = 0.45 + 0.2 * (0.5 + 0.5 * Math.sin(time * 2.2));
   }
 
   private updateBeam(beamAt: { x: number; z: number } | null, time: number): void {
     if (!beamAt) {
-      if (this.beam) this.beam.visible = false;
+      this.beam.visible = false;
       return;
     }
-    this.ensureBeam();
-    if (!this.beam || !this.beamMat) return;
     this.beam.visible = true;
     const key = `${beamAt.x},${beamAt.z}`;
     if (this.beamKey !== key) {
       this.beamKey = key;
       const ground = this.groundAt(beamAt.x, beamAt.z);
-      this.beam.position.set(beamAt.x, ground + BEAM_HEIGHT / 2, beamAt.z);
+      this.beam.position.set(beamAt.x, ground + COACH_BEAM_HEIGHT / 2, beamAt.z);
     }
-    this.beamMat.opacity = 0.5 + 0.2 * Math.sin(time * 2.8);
+    this.mats.beam.opacity = 0.5 + 0.2 * Math.sin(time * 2.8);
   }
 }

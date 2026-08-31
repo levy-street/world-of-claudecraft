@@ -49,6 +49,7 @@ import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
+import { consumeHealAbsorb } from './heal';
 import {
   detonateOssuaryMark,
   OSSUARY_MARK_ABILITY_ID,
@@ -357,11 +358,16 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = dotSource;
             if (src && !src.dead) {
-              const intended = Math.round(tickDamage * a.leechPct);
-              const healed = Math.min(intended, src.maxHp - src.hp);
-              if (healed > 0) {
-                src.hp += healed;
-                const overheal = intended - healed;
+              // A leech is healing the SOURCE receives, so it runs the same
+              // recipient-side pipeline as applyHeal: incoming-heal mult, then
+              // the absorb drain, then the missing-hp clamp.
+              const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
+              const landing = consumeHealAbsorb(ctx, src, intended);
+              const absorbed = intended - landing;
+              const healed = Math.min(landing, src.maxHp - src.hp);
+              if (healed > 0 || absorbed > 0) {
+                if (healed > 0) src.hp += healed;
+                const overheal = landing - healed;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -369,19 +375,31 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(absorbed > 0 ? { absorbed } : {}),
                   ...(overheal > 0 ? { overheal } : {}),
                 });
-                ctx.healingThreat(src, src, healed);
+                if (healed > 0) ctx.healingThreat(src, src, healed);
               }
             }
           }
           if (e.dead) return;
+          if (a.maxTickStacks !== undefined) {
+            const oldStacks = Math.max(1, a.stacks ?? 1);
+            const nextStacks = Math.min(a.maxTickStacks, oldStacks + 1);
+            if (nextStacks !== oldStacks) {
+              const valuePerStack = a.value / oldStacks;
+              a.stacks = nextStacks;
+              a.value = Math.max(1, Math.round(valuePerStack * nextStacks));
+            }
+          }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
           const intended = Math.round(a.value * ctx.healingTakenMult(e));
-          const healed = Math.min(intended, e.maxHp - e.hp);
-          if (healed > 0) {
-            e.hp += healed;
-            const overheal = intended - healed;
+          const landing = consumeHealAbsorb(ctx, e, intended);
+          const absorbed = intended - landing;
+          const healed = Math.min(landing, e.maxHp - e.hp);
+          if (healed > 0 || absorbed > 0) {
+            if (healed > 0) e.hp += healed;
+            const overheal = landing - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
@@ -391,10 +409,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               ability: a.name,
               hot: true,
               abilityId: a.id,
+              ...(absorbed > 0 ? { absorbed } : {}),
               ...(overheal > 0 ? { overheal } : {}),
             });
             const src = ctx.entities.get(a.sourceId);
-            if (src) ctx.healingThreat(src, e, healed);
+            if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));

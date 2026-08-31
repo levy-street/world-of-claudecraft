@@ -22,8 +22,13 @@ import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
-import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
+import {
+  createSimContext,
+  inertVaultConsumptionAdmission,
+  type SimContextHost,
+} from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
+import { DEFAULT_STORAGE_PRICES } from '../src/sim/storage_prices';
 import type { Entity } from '../src/sim/types';
 
 type AnyEntity = Entity & Record<string, unknown>;
@@ -58,6 +63,7 @@ function makeCtx() {
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
     nextRiftInstanceId: 1,
@@ -156,6 +162,10 @@ function makeCtx() {
     channelSubs: new Map(),
     emit,
     error: vi.fn(),
+    // This fake models no durable audit sink: the explicit inert admission is
+    // now REQUIRED on the host type (the storagePrices compiler-enforcement
+    // rule), so a host that forgot to decide cannot compile.
+    reserveVaultConsumption: inertVaultConsumptionAdmission,
     clearEntityMarker,
     pulseGroundAoE,
     dealDamage: vi.fn(),
@@ -224,6 +234,7 @@ function makeCtx() {
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
+    weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),

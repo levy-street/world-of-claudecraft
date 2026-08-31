@@ -124,6 +124,10 @@ describe('weapon type classification', () => {
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
+      // The Armory bow GLBs double as held-model variants for real bow items
+      // (the Crucible longbow is the first); crossbow names must match first.
+      if (/crossbow/.test(variant)) return 'crossbow';
+      if (/bow$/.test(variant)) return 'bow';
       return null;
     };
     for (const id of weaponIds) {
@@ -661,8 +665,16 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     );
     expect(renderer).not.toContain("from '../sim/combat/auto_attack'");
     expect(launch).toContain("ev.attackAnimation === 'ranged-shot'");
-    expect(damage).toContain('playerRangedAttackAlreadyStarted(');
+    // The damage-side gate moved behind damageEventStartsAttackAnimation
+    // (characters/damage_attack_animation.ts), which still consults the typed
+    // launch correlation first.
+    expect(damage).toContain('damageEventStartsAttackAnimation(');
     expect(damage).toContain('ev.attackAnimationStarted,');
+    const damageGate = readFileSync(
+      join(ROOT, 'src/render/characters/damage_attack_animation.ts'),
+      'utf8',
+    );
+    expect(damageGate).toContain('playerRangedAttackAlreadyStarted(');
     expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
     expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
   });
@@ -774,6 +786,30 @@ describe('grip override wiring (editor saves reach the game)', () => {
     expect(tuned.position[0]).toBeCloseTo(row?.pos?.[0] ?? 0, 5);
     expect(tuned.position[1]).toBeCloseTo(0.05 + (row?.pos?.[1] ?? 0), 5);
     expect(tuned.quaternion).not.toEqual(bare.quaternion);
+  });
+
+  it('rotOffhand replaces rot on the off-hand only, and absent falls back to rot', async () => {
+    // The Forgebreaker case: the owner-tuned 180 yaw reads right in the RIGHT
+    // hand but composes against the identity base on the left, so the row pins
+    // the off-hand to the bare mirrored fit with rotOffhand [0, 0, 0].
+    const { variantGripTransform } = await import('../src/render/characters/weapon_grip');
+    const bareLeft = variantGripTransform(1.2, true, 0.05, 1.6, undefined);
+    const pinned = variantGripTransform(1.2, true, 0.05, 1.6, {
+      rot: [0, 180, 0],
+      rotOffhand: [0, 0, 0],
+    });
+    // [0, 0, 0] means the bare mirrored family fit, byte-identical.
+    expect(pinned.quaternion).toEqual(bareLeft.quaternion);
+    // The right hand still takes the authored rot.
+    const right = variantGripTransform(1.2, false, 0.05, 1.6, {
+      rot: [0, 180, 0],
+      rotOffhand: [0, 0, 0],
+    });
+    const bareRight = variantGripTransform(1.2, false, 0.05, 1.6, undefined);
+    expect(right.quaternion).not.toEqual(bareRight.quaternion);
+    // Absent rotOffhand keeps the prior behavior: rot applies on the left too.
+    const fallback = variantGripTransform(1.2, true, 0.05, 1.6, { rot: [0, 180, 0] });
+    expect(fallback.quaternion).not.toEqual(bareLeft.quaternion);
   });
 
   it('mirrors a per-weapon offset onto the off-hand (X and Z flip, Y shared)', async () => {

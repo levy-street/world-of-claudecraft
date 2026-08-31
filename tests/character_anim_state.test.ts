@@ -5,6 +5,7 @@ import {
   type AnimState,
   advanceSwimPitch,
   advanceTreadBlend,
+  castHoldStep,
   desiredBaseState,
   drivesPose,
   isWadingAtDepth,
@@ -14,6 +15,7 @@ import {
   SWIM_PITCH_MAX,
   scanAnimRepair,
   shouldPlayLanding,
+  shouldPlayOutCastExit,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -190,6 +192,38 @@ describe('desiredBaseState', () => {
     expect(desiredBaseState(anim({ ...moving, casting: true }), true)).toBe('cast');
     expect(desiredBaseState(anim({ ...moving, sitting: true }), true)).toBe('sit');
     expect(desiredBaseState(anim(), true)).toBe('idle');
+  });
+
+  it('holds the battle stance instead of the idle while engaged and standing', () => {
+    expect(desiredBaseState(anim({ combat: true }), true, true, true)).toBe('combatIdle');
+    // Not engaged: the relaxed idle, exactly as before the stance existed.
+    expect(desiredBaseState(anim(), true, true, true)).toBe('idle');
+  });
+
+  it('never asks for the battle stance when the loaded rig has no stance clip', () => {
+    // Same rule as walkBack: baseAction() falls back to the plain idle action, so
+    // a machine believing it is in combatIdle would desync from what is playing.
+    expect(desiredBaseState(anim({ combat: true }), true, true, false)).toBe('idle');
+    // ...and the default is off, so every existing rig is untouched by the flag.
+    expect(desiredBaseState(anim({ combat: true }), true, true)).toBe('idle');
+  });
+
+  it('lets every other pose outrank the battle stance', () => {
+    // The stance is an IDLE variant: it must lose to anything that describes the
+    // body actually doing something. One arm per competing branch, since a single
+    // combined case would pass on any one of them working.
+    const fighting = { combat: true };
+    expect(desiredBaseState(anim({ ...fighting, moving: true }), true, true, true)).toBe('walk');
+    expect(
+      desiredBaseState(anim({ ...fighting, moving: true, running: true }), true, true, true),
+    ).toBe('run');
+    expect(desiredBaseState(anim({ ...fighting, swimming: true }), true, true, true)).toBe(
+      'swimIdle',
+    );
+    expect(desiredBaseState(anim({ ...fighting, airborne: true }), true, true, true)).toBe('jump');
+    expect(desiredBaseState(anim({ ...fighting, spinning: true }), true, true, true)).toBe('spin');
+    expect(desiredBaseState(anim({ ...fighting, casting: true }), true, true, true)).toBe('cast');
+    expect(desiredBaseState(anim({ ...fighting, sitting: true }), true, true, true)).toBe('sit');
   });
 });
 
@@ -388,5 +422,46 @@ describe('shouldPlayLanding', () => {
 
   it('yields to death: a body killed mid-air collapses, it does not stick a landing', () => {
     expect(shouldPlayLanding(true, false, true, true)).toBe(false);
+  });
+});
+
+describe('castHoldStep (freeze the pointing frame while the cast channels)', () => {
+  // The Forgefather's Casting clip: 1.033s, pointing gesture peak at 0.72s.
+  const DURATION = 1.033;
+  const HOLD = 0.72;
+
+  it('plays the raise forward untouched until the hold point', () => {
+    expect(castHoldStep(0, HOLD, DURATION)).toEqual({ paused: false });
+    expect(castHoldStep(HOLD - 0.01, HOLD, DURATION)).toEqual({ paused: false });
+  });
+
+  it('freezes exactly on the hold frame, pinning a coarse-frame overshoot onto it', () => {
+    expect(castHoldStep(HOLD, HOLD, DURATION)).toEqual({ paused: true, time: HOLD });
+    expect(castHoldStep(HOLD + 0.2, HOLD, DURATION)).toEqual({ paused: true, time: HOLD });
+  });
+
+  it('disables the freeze when the hold point is not inside the clip', () => {
+    expect(castHoldStep(0.5, 0, DURATION)).toEqual({ paused: false });
+    expect(castHoldStep(0.5, DURATION, DURATION)).toEqual({ paused: false });
+  });
+});
+
+describe('shouldPlayOutCastExit (finish the clip instead of snapping to base)', () => {
+  const PLAY_OUT = ['Casting', 'Slam'];
+
+  it('plays out a listed clip that was cut mid-way (the Slam recovery)', () => {
+    // frontal cast ends at clip-time 1.62 of 2.433: the stand-back-up must play
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Slam', 1.62, 2.433)).toBe(true);
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Casting', 0.72, 1.033)).toBe(true);
+  });
+
+  it('does nothing for a clip that already reached its end', () => {
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Slam', 2.433, 2.433)).toBe(false);
+  });
+
+  it('leaves unlisted clips on the instant handoff (the Forging cadence loop)', () => {
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Forging', 0.9, 1.633)).toBe(false);
+    expect(shouldPlayOutCastExit(undefined, 'Slam', 1.62, 2.433)).toBe(false);
+    expect(shouldPlayOutCastExit(PLAY_OUT, null, 1.62, 2.433)).toBe(false);
   });
 });

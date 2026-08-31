@@ -53,6 +53,11 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       expect(['ring', 'neck']).toContain(item.slot);
       expect(offer.marks).toBeGreaterThan(0);
       expect(itemLevel(item), offer.itemId).toBe(26);
+      // Deliberately tradeable (maintainer ruling 2026-08-28): the Crucible
+      // tier binds its vendor gear, but this jewelry shipped tradeable and
+      // the live economy is built around that; the pin keeps a future
+      // vendor-gear-binds sweep from silently rebinding it.
+      expect(item.soulbound, offer.itemId).toBeUndefined();
     }
   });
 

@@ -411,8 +411,8 @@ describe('heroic Wildheart Basin keeps its own shipped calibration', () => {
   });
 
   it('never stamps rangedDamageMult on a heroic spawn', () => {
-    // The ranged knob is normal-only by construction (HeroicDungeonTuning has no
-    // such field), so heroic Wildheart cannot be silently re-priced by it.
+    // Heroic Wildheart has no ranged override, so its shipped calibration
+    // cannot be silently re-priced by the Normal-only entries above.
     for (const id of Object.keys(basinTuning().damageMultiplierByMob)) {
       const mob = createMob(1, MOBS[id], 22, { x: 0, y: 0, z: 0 });
       applyDungeonMobTuning(mob, BASIN, 'heroic');

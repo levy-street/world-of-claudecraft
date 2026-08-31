@@ -28,12 +28,13 @@ import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import {
-  occluderFadeSettled,
-  occluderSegmentHitsObb,
-  stepOccluderFade,
-} from './occluder_fade_core';
+  advanceOccluderFade,
+  type OccluderFadeMat,
+  occluderFadeRecordFor,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
+import { occluderSegmentHitsObb } from './occluder_fade_core';
 import { flowerTuftTexture } from './textures';
 
 interface GateOccluder {
@@ -136,9 +137,10 @@ export function buildHollowGates(seed: number): HollowGatesView {
       const src = mesh.material as THREE.Material;
       let fade = seenMats.get(src);
       if (!fade) {
-        fade = occluderFadeMat(cloneMaterialWithHooks(src));
+        fade = occluderFadeRecordFor(mats, cloneMaterialWithHooks(src), mesh);
         seenMats.set(src, fade);
-        mats.push(fade);
+      } else {
+        occluderFadeRecordFor(mats, fade.mat, mesh);
       }
       mesh.material = fade.mat;
     });
@@ -215,6 +217,7 @@ export function buildHollowGates(seed: number): HollowGatesView {
       // Petals never move; only the gate rock fades when it stands between
       // the eye and the camera (see the header note on why this exists).
       for (const o of occluders) {
+        prefetchOccluderFadeWithin(o.mats, o.x, o.z, camX, camZ);
         const hide = occluderSegmentHitsObb(
           o.x,
           o.z,
@@ -229,9 +232,7 @@ export function buildHollowGates(seed: number): HollowGatesView {
           camY,
           camZ,
         );
-        if (occluderFadeSettled(o.alpha, hide)) continue;
-        o.alpha = stepOccluderFade(o.alpha, hide, dt, reducedMotion);
-        applyOccluderFade(o.mats, o.alpha);
+        o.alpha = advanceOccluderFade(o.mats, o.alpha, hide, dt, reducedMotion);
       }
     },
   };

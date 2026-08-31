@@ -12,6 +12,8 @@ function armor(
     hitRating: number;
     critRating: number;
     hasteRating: number;
+    spellPower: number;
+    healPower: number;
   }> = {},
 ): ItemDef {
   return {
@@ -108,6 +110,20 @@ describe('itemStatDeltas', () => {
     ]);
   });
 
+  it('reports Spell Power and Healing Power deltas ahead of the ratings', () => {
+    // The Crucible tier authored both affixes onto items; the exact toEqual
+    // pins the tooltip's Stats | Affix | Ratings order (affixes first) and
+    // that each affix earns its own row rather than riding a rating row.
+    const candidate = armor('vestment', { int: 10 }, { spellPower: 14, critRating: 60 });
+    const equipped = armor('oldrobe', { int: 8 }, { healPower: 12, critRating: 40 });
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'int', delta: 2, decimals: 0 },
+      { stat: 'spellPower', delta: 14, decimals: 0 },
+      { stat: 'healPower', delta: -12, decimals: 0 },
+      { stat: 'critRating', delta: 20, decimals: 0 },
+    ]);
+  });
+
   it('treats a missing rating as zero (full value counts as a gain)', () => {
     const candidate = armor('hasted', {}, { hasteRating: 25 });
     const equipped = armor('plain', {});
@@ -124,16 +140,19 @@ describe('itemStatDeltas', () => {
 
   it('surfaces the rating difference between two real epic helmets', () => {
     // The community report scenario: comparing gear that differs in ratings
-    // showed no rating rows at all. crownforged_dreadhelm carries hit rating,
-    // stormcallers_crown carries crit rating.
+    // showed no rating rows at all. The 2/4/6 lineage retune's Hit program
+    // flipped both original helmets to crit 20 (an identical pair surfaces
+    // nothing), so the pair is now crownforged versus soulflame:
+    // crownforged_dreadhelm carries crit rating, soulflame_cowl carries
+    // haste rating (its retuned seed).
     const dreadhelm = ITEMS.crownforged_dreadhelm;
-    const crown = ITEMS.stormcallers_crown;
-    expect(dreadhelm?.hitRating).toBe(20);
-    expect(crown?.critRating).toBe(20);
+    const cowl = ITEMS.soulflame_cowl;
+    expect(dreadhelm?.critRating).toBe(20);
+    expect(cowl?.hasteRating).toBe(20);
     const byStat = Object.fromEntries(
-      itemStatDeltas(dreadhelm, crown).map((d) => [d.stat, d.delta]),
+      itemStatDeltas(dreadhelm, cowl).map((d) => [d.stat, d.delta]),
     );
-    expect(byStat.hitRating).toBe(20);
-    expect(byStat.critRating).toBe(-20);
+    expect(byStat.critRating).toBe(20);
+    expect(byStat.hasteRating).toBe(-20);
   });
 });

@@ -77,17 +77,17 @@ describe('combat ratings', () => {
 
   it('hit rating reduces a player melee miss vs a higher-level (Heroic +3) mob', () => {
     const mob = ent({ kind: 'mob', hostile: true, level: 23 });
-    // The +3 above-level miss is capped at ~26%; 5% hit claws it to ~21%.
-    expect(meleeMissChance(20, 23)).toBeCloseTo(0.26);
-    expect(swingMissChance(ent({ hitBonus: 0.05 }), mob)).toBeCloseTo(0.21);
+    // The +3 above-level miss is capped at 19%; 5% hit claws it to 14%.
+    expect(meleeMissChance(20, 23)).toBeCloseTo(0.19);
+    expect(swingMissChance(ent({ hitBonus: 0.05 }), mob)).toBeCloseTo(0.14);
     // Enough hit floors the miss at 0 (hit-capped), never negative.
     expect(swingMissChance(ent({ hitBonus: 0.9 }), mob)).toBe(0);
   });
 
   it('hit rating reduces spell resist by the same amount', () => {
-    // The +3 above-level resist is capped at ~25%; 5% hit claws it to ~20%.
-    expect(spellResistChance(20, 23)).toBeCloseTo(0.25);
-    expect(spellResistChance(20, 23, 0.05)).toBeCloseTo(0.2);
+    // The +3 above-level resist is capped at 18%; 5% hit claws it to 13%.
+    expect(spellResistChance(20, 23)).toBeCloseTo(0.18);
+    expect(spellResistChance(20, 23, 0.05)).toBeCloseTo(0.13);
   });
 
   it('is a no-op with zero hit, preserving the ungeared draw (parity)', () => {
@@ -114,11 +114,25 @@ describe('combat ratings', () => {
     expect(swingMissChance(mob, player)).toBeLessThanOrEqual(0.2); // MOB_VS_PLAYER cap, unchanged
   });
 
-  it('the weak T2 bleed 4-set bonuses now also grant hit rating', () => {
-    const crownforged = aggregateSetBonuses(new Map([['crownforged', 4]]));
-    const nighttalon = aggregateSetBonuses(new Map([['nighttalon', 4]]));
-    expect(crownforged.hitRating).toBe(60);
-    expect(nighttalon.hitRating).toBe(60);
+  it('the lineage bleed capstones grant their halved Hit at 6 pieces, not 4', () => {
+    // The retune: Hit left the 4-piece tier entirely; the 6-piece capstone
+    // pays the halved 30 (3%), the only Hit the old stack still provides.
+    const crownforgedFour = aggregateSetBonuses(new Map([['crownforged', 4]]));
+    expect(crownforgedFour.hitRating).toBe(0);
+    const strengthSix = aggregateSetBonuses(
+      new Map([
+        ['deathlord', 2],
+        ['crownforged', 4],
+      ]),
+    );
+    expect(strengthSix.hitRating).toBe(30);
+    const agilitySix = aggregateSetBonuses(
+      new Map([
+        ['wyrmshadow', 2],
+        ['nighttalon', 4],
+      ]),
+    );
+    expect(agilitySix.hitRating).toBe(30);
   });
 
   it('the heroic marks jewelry carries one combat rating each', async () => {
@@ -173,9 +187,29 @@ describe('combat-rating tier ladder', () => {
   it('enforces the complete 0 -> 1 -> 2 rating ladder by live item level', async () => {
     const { HEROIC_VENDOR_ITEMS } = await import('../src/sim/content/heroic_vendor');
     const vendorIds = new Set(Object.keys(HEROIC_VENDOR_ITEMS));
+    // The 2026-08-30 ilvl-honesty relabels: these items keep their SHIPPED
+    // identity (zero ratings included) while their item level moved to the
+    // level their lines actually occupy, so they sit outside the authored
+    // rating ladder. Membership is pinned: the carve-out must never grow.
+    const ILVL_HONESTY_RELABELED = new Set([
+      'boneglass_shiv',
+      'duskwhisper',
+      'marrowpoint',
+      'deathless_heartwood',
+      'heroic_deathless_heartwood',
+      'kingsbane_last_oath',
+      'heroic_kingsbane_last_oath',
+      'voidsong_dirk',
+      'heart_of_the_rift',
+      'varkhul_forgebreaker',
+      'varkhul_emberward',
+    ]);
     const allGear = Object.values(ITEMS).filter(
-      (item) => item.slot && itemLevel(item) !== undefined,
+      (item) => item.slot && itemLevel(item) !== undefined && !ILVL_HONESTY_RELABELED.has(item.id),
     );
+    for (const id of ILVL_HONESTY_RELABELED) {
+      expect(ITEMS[id], `${id} still exists (carve-out is not stale)`).toBeDefined();
+    }
 
     const ilvl26 = allGear.filter((item) => itemLevel(item) === 26);
     for (const item of ilvl26) {
@@ -241,7 +275,9 @@ describe('combat-rating tier ladder', () => {
     // 13 pre-existing pieces plus the 6 generated heroic raid variants of the
     // normal-raid epics (greatsword, greatblade, bulwark, orb, the hunter's
     // direfang_quiver, and the feral ladder capstone maul_of_the_scourged_wilds).
-    expect(heroicRaidGear).toHaveLength(19);
+    // Minus the two heroic legendaries, which live in the ilvl-honesty
+    // carve-out above with their shipped rating identity.
+    expect(heroicRaidGear).toHaveLength(17);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;

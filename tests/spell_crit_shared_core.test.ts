@@ -126,27 +126,28 @@ describe('spell crit shared core', () => {
     expect(sim.ctx.spellCrit(p)).toBeCloseTo(before + 0.05, 10);
   });
 
-  it('the set 3-piece crit rating bonus reaches spell crit through the shared core', () => {
-    // Arrange: a rogue with 2 then 3 Nighttalon pieces (the 3pc grants
-    // SET_CRIT_3PC_RATING crit rating; the pieces themselves carry no ratings).
+  it('the set crit rating bonus reaches spell crit through the shared core', () => {
+    // Arrange: a rogue with 1 then 2 Nighttalon pieces. The 2/4/6 lineage
+    // retune moved the crit rating to the Agility lineage's 2-piece tier
+    // (agi 10 + SET_CRIT_3PC_RATING; the pieces themselves carry no ratings).
     const sim = new Sim({ seed: 11, playerClass: 'rogue' });
     sim.setPlayerLevel(20);
     const p = sim.player;
     const pieces = setMembers(SET_NIGHTTALON);
 
-    recalcPlayerStats(p, 'rogue', equipmentOf(pieces.slice(0, 2)), undefined, {});
+    recalcPlayerStats(p, 'rogue', equipmentOf(pieces.slice(0, 1)), undefined, {});
     expect(p.sharedCritBonus).toBe(0);
-    const twoPiece = sim.ctx.spellCrit(p);
+    const onePiece = sim.ctx.spellCrit(p);
 
     // Act
-    recalcPlayerStats(p, 'rogue', equipmentOf(pieces.slice(0, 3)), undefined, {});
+    recalcPlayerStats(p, 'rogue', equipmentOf(pieces.slice(0, 2)), undefined, {});
 
     // Assert: the set rating is the whole core (no mods, no auras), and spell
-    // crit moves by exactly the converted rating over the 2-piece baseline.
+    // crit moves by exactly the converted rating over the 1-piece baseline.
     expect(p.critRating).toBe(SET_CRIT_3PC_RATING);
     expect(p.sharedCritBonus).toBeCloseTo(critFractionFromRating(p.critRating), 10);
     expect(sim.ctx.spellCrit(p)).toBeCloseTo(
-      twoPiece + critFractionFromRating(SET_CRIT_3PC_RATING),
+      onePiece + critFractionFromRating(SET_CRIT_3PC_RATING),
       10,
     );
   });

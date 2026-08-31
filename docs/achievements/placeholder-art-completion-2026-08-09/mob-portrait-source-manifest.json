@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "ba62c437c4b38f3db2078d29498d9b3a170a5051df5dbf569a692835cfc86484",
+  "rendererFingerprint": "448a81d8c63a15b663c304ba52b285ed913382774a309dafb53c06b436f092ad",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4295455,
-      "sha256": "d3ab474c8a53b94e72d73058fac141df746d77414531c526f9d53a945755e87a",
+      "bytes": 4356414,
+      "sha256": "f443e52bdc3d91da3f8e1ce7ec06bcccae03c4efa350111e7e5b876aa4fc32ec",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 235,
+  "portraitCount": 242,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1211,6 +1211,40 @@
         "path": "public/ui/mobs/deeprock_kobold.webp",
         "bytes": 1698,
         "sha256": "0ed04dd9e12a8b468245ea090cd80d1e7afabff92ba26c8f675f10739e4e2794"
+      }
+    },
+    {
+      "id": "derelict_mech",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_mech",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mech.glb",
+          "path": "public/models/creatures/mech.glb",
+          "bytes": 367684,
+          "sha256": "9b80ce7abed43924569e851a08f1449feb747f3a1d3723cf5a7551b6aaabcc2b"
+        },
+        "idle": "Crawl",
+        "height": 2,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "dee6974093bc5666f48727f9af4621e56948bbb473ee72301e5b0f41ea5b1316",
+      "output": {
+        "path": "public/ui/mobs/derelict_mech.webp",
+        "bytes": 1606,
+        "sha256": "4d9505f0a98dd042031f1b44d7b7ad5454c46a926f392f1ea231efc1c0b0a7f9"
       }
     },
     {
@@ -3126,6 +3160,176 @@
         "path": "public/ui/mobs/idol_guardian.webp",
         "bytes": 2874,
         "sha256": "db4c3aeca2ee36664c26627cd6007e02a6aa5f9d6acbf19e263516d1713b0a88"
+      }
+    },
+    {
+      "id": "ignivar_cinder_artificer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar_cinder_artificer",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/cinder_artificer.glb",
+          "path": "public/models/creatures/cinder_artificer.glb",
+          "bytes": 1501648,
+          "sha256": "3bb3e1d1cc51bed6b5c8873e3c7f18b7ac213185d40c3364ef6a9226dde94366"
+        },
+        "idle": "Idle",
+        "height": 2.1,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "ac182348126ac080c3bca146f16e4af96aed4558fb71ba3879efa4870a222902",
+      "output": {
+        "path": "public/ui/mobs/ignivar_cinder_artificer.webp",
+        "bytes": 2216,
+        "sha256": "d8f1f822569411ee598a744fd764fff0de0d14dc6dffa14ac978dd262cf08d73"
+      }
+    },
+    {
+      "id": "ignivar_crucible_warden",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar_crucible_warden",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crucible_warden.glb",
+          "path": "public/models/creatures/crucible_warden.glb",
+          "bytes": 1560992,
+          "sha256": "03d02c97cde096423b49be95be0c74e6f448bc6de801e3abfff80004d3c306f6"
+        },
+        "idle": "Idle",
+        "height": 2.2,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "905cf139af1f401835f37e3015c319cc93452f5af9675b1160a66ff1145d5369",
+      "output": {
+        "path": "public/ui/mobs/ignivar_crucible_warden.webp",
+        "bytes": 2804,
+        "sha256": "d261c38cec9ac7ce580ff430b8fd7bf614a6df95b2a7516bad50c1c16ed16c1f"
+      }
+    },
+    {
+      "id": "ignivar_ember_sentinel",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar_ember_sentinel",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ember_sentinel.glb",
+          "path": "public/models/creatures/ember_sentinel.glb",
+          "bytes": 1505736,
+          "sha256": "dcdcf7e8bb77c6d8bc7cd6de8558793e9dbbfdcffc2e8a0d74316ebc38b6068e"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "deabc374783072a48e4836bc0b170dd50e49105b4112bec8814454e5a92fca50",
+      "output": {
+        "path": "public/ui/mobs/ignivar_ember_sentinel.webp",
+        "bytes": 2272,
+        "sha256": "95d8f6d2eddac93cb814d3a03c47bf9ce31fdb90ae2f513644f74859f4ecf412"
+      }
+    },
+    {
+      "id": "ignivar_heart_of_the_end",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar_heart_of_the_end",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ignivar_ashcaller.glb",
+          "path": "public/models/creatures/ignivar_ashcaller.glb",
+          "bytes": 1881768,
+          "sha256": "0f92aa55d5f031cc2ae1c9368102edde96a3345827592cb3c56351d1b4fd4396"
+        },
+        "idle": "Idle",
+        "height": 1.8,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "ea3ad642b5bf35c1aec8ce14bcbc25954097dbf13d6db7b5653dcddfa014ec94",
+      "output": {
+        "path": "public/ui/mobs/ignivar_heart_of_the_end.webp",
+        "bytes": 2678,
+        "sha256": "43b3f88802b2e22ec9fbcf4eeb7f44d98d52fb63aa032b3a0774d5cb1eed8cfc"
+      }
+    },
+    {
+      "id": "ignivar_herald_of_the_last_flame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_ignivar",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/ignivar_herald.glb",
+          "path": "public/models/creatures/ignivar_herald.glb",
+          "bytes": 1463912,
+          "sha256": "0d522fe4bb3346342c628d596197c4da8ec895c7d728e425ab6dfb9e4d0247bf"
+        },
+        "idle": "Idle",
+        "height": 2.65,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
+      "output": {
+        "path": "public/ui/mobs/ignivar_herald_of_the_last_flame.webp",
+        "bytes": 2396,
+        "sha256": "80ee4a4a99665cc3086c6aa510e158015c1d664428273a2ed457f28f5d92b289"
       }
     },
     {
@@ -7664,6 +7868,40 @@
       }
     },
     {
+      "id": "varkhul_forgefather_of_the_last_flame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_varkhul_forgefather",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/varkhul_forgefather.glb",
+          "path": "public/models/creatures/varkhul_forgefather.glb",
+          "bytes": 1266816,
+          "sha256": "cfaa7b2c5d25dbce37a5ccd078efb0b7a8743b3357bb9f3d3b5907765bce4c32"
+        },
+        "idle": "Idle",
+        "height": 3,
+        "yaw": 0,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a1b01f3bd947684ddc20c92d46e4c7c96b25b7422ec0690f4cccb5bdafd27d3e",
+      "output": {
+        "path": "public/ui/mobs/varkhul_forgefather_of_the_last_flame.webp",
+        "bytes": 3518,
+        "sha256": "dbb650626d73cd0baa886df465819b139a9e67940379ded07a700b77b79da0b0"
+      }
+    },
+    {
       "id": "veiled_doe",
       "family": "beast",
       "finderEncounter": false,
@@ -8082,13 +8320,13 @@
       "id": "warlord_drogmar",
       "family": "ogre",
       "finderEncounter": false,
-      "visualKey": "mob_ogre",
+      "visualKey": "mob_drogmar",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/drogmar.glb",
+          "path": "public/models/creatures/drogmar.glb",
+          "bytes": 623308,
+          "sha256": "4b4899941e1acfa7048920fbf661119f573282bdf98fa9a8dd0568322c57231e"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -8105,11 +8343,11 @@
         "resolved": "#8c3b2e",
         "strength": 0.12
       },
-      "sourceFingerprint": "7465be705f9f55ef649fd8238a7155a3872a2361642152caf515e55cece36934",
+      "sourceFingerprint": "b956face7162a619116a9e431a42b8c484bdde9173d071be2cb76d9d8978f20b",
       "output": {
         "path": "public/ui/mobs/warlord_drogmar.webp",
-        "bytes": 2398,
-        "sha256": "81f8995ecd5d7689366f1c7e8febdb0120600cc89004388eae977fc5fa3b061b"
+        "bytes": 2384,
+        "sha256": "bfb73e0e4e3af879e195b74f2eb3c6d080238e74e8969b4b070da07bdd320933"
       }
     },
     {

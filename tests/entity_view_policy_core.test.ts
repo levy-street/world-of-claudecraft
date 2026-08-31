@@ -71,6 +71,17 @@ describe('entity view candidate priority', () => {
     expect(isPersistentPortalObject(entity(3, 'object', { templateId: 'mailbox' }))).toBe(false);
   });
 
+  it('keeps the battleground flag and rune props in the interactive object tier, always non-lootable', () => {
+    // bg_flag/bg_rune are lootable:false for their whole lifetime
+    // (bg_flag_interact.ts), so without this arm they would fall to the
+    // ordinary object tier (7) and lose priority under a saturated view
+    // pool: a carried flag's position is actionable info that must not lag.
+    for (const templateId of ['bg_flag', 'bg_rune']) {
+      const prop = entity(3, 'object', { templateId, lootable: false });
+      expect(entityViewCandidatePriority(prop, player, 10_000)).toBe(2);
+    }
+  });
+
   it('is distance-cull exempt for a heroic Nythraxis wardstone, lootable or not', () => {
     // The live raid client marks these lootable:true (which already lands them in
     // the interactive tier above via the ordinary lootable branch), but the

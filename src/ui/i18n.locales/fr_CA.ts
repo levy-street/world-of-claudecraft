@@ -329,4 +329,20 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': "Ce code d'apparence vient d'une version plus récente du jeu.",
   'auth.designCodeErrMalformed':
     "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
+  // Release-fill batch (fr_CA divergences over fr_FR): the "increase X" stat/value
+  // phrasing consistently uses accroit/accroitre in this overlay (see the
+  // hudChrome.auraEffect.increase.*/reduce.*/vulnerability precedents above), and
+  // the Chat frame label follows the established Clavardage term (see
+  // hudChrome.interfaceTabs.chat). Every other autoFillable key in this batch
+  // resolves identically to its filled fr_FR value, so no override is added for it.
+  'hudChrome.auraEffect.makersBrand':
+    "Pendant {duration} s, chaque cumul accroît les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
+  'hudChrome.bank.vaultUpgrade': 'Accroître chaque plafond à {cap}',
+  'hudChrome.bank.vaultUpgradeConfirm':
+    'Accroître chaque plafond de matériau à {cap} pour {price}?',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'Les Gardiens du creuset incantent Séisme du creuset pour accroître la chaleur de la forge, tandis que les Artificiers des cendres utilisent Protocole de réparation pour soigner Varkhul.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'Varkhul frappe son tank actuel et applique un effet cumulable qui accroît tous les dégâts subis de sa part.',
+  'hudChrome.interfaceUnlock.frameNames.chat': 'Clavardage',
 };

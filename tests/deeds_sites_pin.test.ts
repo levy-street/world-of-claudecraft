@@ -78,6 +78,7 @@ function encounterInstance(
     slot: 0,
     partyKey: 'party:deeds-test',
     mobIds: [boss.id],
+    npcIds: [],
     objectIds: [],
     exitId: null,
     bossExitId: null,
@@ -85,6 +86,8 @@ function encounterInstance(
     resetAvailableAt: 0,
     clearedBy: new Set(),
     enteredBy: new Set(),
+    raidReturnKeys: new Set(),
+    raidBossWelcomeKeys: new Set(),
     combatExitMemory: new Map(),
   };
   sim.ctx.instances.push(inst);
@@ -165,6 +168,85 @@ describe('encounter mechanical arms (onMobKillCreditForDeeds)', () => {
     onPlayerDeathForDeeds(taint.ctx, entityOf(taint, t.recipients[0]));
     onMobKillCreditForDeeds(taint.ctx, t.boss, null, t.recipients[0], t.recipients);
     expect(t.recipients[0].deedsEarned.has('dgn_korzul_flawless')).toBe(false);
+  });
+
+  it('dgn_varkhul_flawless: a clean heroic kill grants; a death taint or normal tier blocks', () => {
+    const clean = makeSim();
+    const c = encounterInstance(
+      clean,
+      'varkhul_forgefather_of_the_last_flame',
+      'ignivar_inner_crucible',
+      'heroic',
+      ['Tank', 'Healer'],
+    );
+    onMobKillCreditForDeeds(clean.ctx, c.boss, null, c.recipients[0], c.recipients);
+    for (const m of c.recipients) expect(m.deedsEarned.has('dgn_varkhul_flawless')).toBe(true);
+
+    const taint = makeSim();
+    const t = encounterInstance(
+      taint,
+      'varkhul_forgefather_of_the_last_flame',
+      'ignivar_inner_crucible',
+      'heroic',
+      ['Tank'],
+    );
+    t.boss.threat.set(t.recipients[0].entityId, 100); // engaged: window open
+    onPlayerDeathForDeeds(taint.ctx, entityOf(taint, t.recipients[0]));
+    onMobKillCreditForDeeds(taint.ctx, t.boss, null, t.recipients[0], t.recipients);
+    expect(t.recipients[0].deedsEarned.has('dgn_varkhul_flawless')).toBe(false);
+
+    // Same clean pull on Normal difficulty never satisfies the heroic-only gate.
+    const normal = makeSim();
+    const n = encounterInstance(
+      normal,
+      'varkhul_forgefather_of_the_last_flame',
+      'ignivar_inner_crucible',
+      'normal',
+      ['Tank'],
+    );
+    onMobKillCreditForDeeds(normal.ctx, n.boss, null, n.recipients[0], n.recipients);
+    expect(n.recipients[0].deedsEarned.has('dgn_varkhul_flawless')).toBe(false);
+  });
+
+  it('the Crucible raid rooms write per-room clear credit and grant the clear deeds', () => {
+    // Both raid bosses ride the generic FINAL_BOSS_DUNGEONS path (per-room
+    // dungeon ids; no bespoke lockout roster yet), so a credited kill writes
+    // the room's clear key for every eligible member and the evaluator turns
+    // it into the clear deeds. Heroic clears also satisfy the no-difficulty
+    // triggers (readDungeonClears sums both keys).
+    const sim = makeSim();
+    const arena = encounterInstance(
+      sim,
+      'ignivar_herald_of_the_last_flame',
+      'ignivar_raid_arena',
+      'normal',
+      ['Tank', 'Healer'],
+    );
+    onMobKillCreditForDeeds(sim.ctx, arena.boss, null, arena.recipients[0], arena.recipients);
+    for (const m of arena.recipients) {
+      expect(m.deedStats.dungeonClears.ignivar_raid_arena).toBe(1);
+    }
+    updateDeeds(sim.ctx);
+    for (const m of arena.recipients) {
+      expect(m.deedsEarned.has('dgn_ignivar')).toBe(true);
+      expect(m.deedsEarned.has('dgn_ignivar_heroic')).toBe(false);
+      expect(m.deedsEarned.has('dgn_varkhul')).toBe(false);
+    }
+
+    const heroic = makeSim();
+    const wing = encounterInstance(
+      heroic,
+      'varkhul_forgefather_of_the_last_flame',
+      'ignivar_inner_crucible',
+      'heroic',
+      ['Tank'],
+    );
+    onMobKillCreditForDeeds(heroic.ctx, wing.boss, null, wing.recipients[0], wing.recipients);
+    expect(wing.recipients[0].deedStats.dungeonClears['ignivar_inner_crucible:heroic']).toBe(1);
+    updateDeeds(heroic.ctx);
+    expect(wing.recipients[0].deedsEarned.has('dgn_varkhul')).toBe(true);
+    expect(wing.recipients[0].deedsEarned.has('dgn_varkhul_heroic')).toBe(true);
+    expect(wing.recipients[0].deedsEarned.has('dgn_ignivar')).toBe(false);
   });
 
   it('dgn_nythraxis_deathless: a clean heroic kill grants; a death taint blocks', () => {

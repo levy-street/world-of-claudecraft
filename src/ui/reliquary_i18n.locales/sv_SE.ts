@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Revringar',
     desc: 'De personliga revringarna, präglade åt varje mästare i gruppen som vinner första klarningen av en rankad Reva. En rollperson kan bara äga sin egen.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Episkt byte från Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroisk: Crucible of the Last Spring',
+    desc: 'Vapen enbart från heroiskt läge, från Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Episkt byte från Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroisk: The Inner Crucible',
+    desc: 'Sköldar och vapen enbart från heroiskt läge, från Varkhul, Forgefather of the Last Flame.',
+  },
 };

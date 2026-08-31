@@ -219,7 +219,8 @@ export const nettedReplayRescueCount = (): number => guildBankNettedReplayRescue
 // returns null has NO loaded book, and its write is SKIPPED: an unloaded book
 // means the row is not this process's to touch (the load-once / serialize-null
 // contract in src/sim/guild_bank.ts, which also covers the oversized and
-// malformed boot skips).
+// malformed boot skips). A caller carrying accepted deltas must turn that skip
+// into a whole-escrow refusal; it may never save the character half alone.
 export function collectGuildBankDeltas(
   serialize: (guildId: number) => unknown,
   deltasFor: (guildId: number) => readonly GuildBankOpDelta[],

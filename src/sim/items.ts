@@ -19,6 +19,7 @@
 import {
   addStacked,
   bagCapacity,
+  bagPools,
   bagsFullError,
   countFit,
   equipBag as equipBagCmd,
@@ -54,10 +55,12 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { refreshModsForEquipmentChange } from './progression/talents';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
@@ -106,8 +109,18 @@ export type VendorRemovedUnit = InventoryUnit;
 
 function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
   if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
+  // Equipping ends the bind-on-pickup party trade window for good: the worn
+  // payload never carries it, so the copy returned to bags on unequip
+  // (returnEquippedItemToBags) is permanently window-free. Strip on a clone
+  // through the SHARED helper (the persisted-equipment load arm in
+  // Sim.addPlayer applies the same one); the consumed bag unit's own payload
+  // is never mutated.
+  const instance = unit.instance
+    ? withoutPartyTradeMarker(cloneItemInstancePayload(unit.instance))
+    : undefined;
+  if (!instance && unit.craftedRecipeId === undefined) return undefined;
   return {
-    ...(unit.instance ? cloneItemInstancePayload(unit.instance) : {}),
+    ...(instance ?? {}),
     ...(unit.craftedRecipeId === undefined ? {} : { craftedRecipeId: unit.craftedRecipeId }),
   };
 }
@@ -145,9 +158,7 @@ function canReturnEquippedItemToBags(
 ): boolean {
   const craftedRecipeId = payload?.craftedRecipeId;
   const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
-  return (
-    countFit(meta.inventory, bagCapacity(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1
-  );
+  return countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1;
 }
 
 function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
@@ -298,10 +309,16 @@ export function removeSellUnitsFromInventory(
   count: number,
   skip?: (instance: ItemInstancePayload) => boolean,
   deprioritize?: (instance: ItemInstancePayload) => boolean,
+  // `skip` above deliberately sees INSTANCED slots only (mail/market escrow
+  // pass `() => true` to mean "plain stock only", and the vendor predicate
+  // derefs its argument), so a walk that must exclude plain stacks opts in
+  // here instead. Sole consumer: the trade offer's soulbound arm, where only
+  // window-carrying instanced copies may ever ship.
+  skipPlainStacks = false,
 ): VendorRemovedUnit[] {
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
-  for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+  for (let i = inventory.length - 1; i >= 0 && left > 0 && !skipPlainStacks; i--) {
     const s = inventory[i];
     if (s.itemId !== itemId || s.instance) continue;
     const take = Math.min(s.count, left);
@@ -595,6 +612,7 @@ export function equipItem(
   }
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
     type: 'log',
@@ -622,6 +640,7 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
   returnEquippedItemToBags(meta, offhandId, instance);
   ctx.markDeedsDirty(meta.entityId);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
     type: 'log',
@@ -686,6 +705,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   // today keys on an unequip, so there is nothing to award here regardless. An
   // enchanted piece gets its own instanced slot instead, so its enchant survives.
   returnEquippedItemToBags(meta, itemId, instance);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({
@@ -1477,14 +1497,8 @@ export function buyBackItem(
   // regrant with the row's own instance instead of always checking room for
   // a generic plain copy.
   const fits =
-    countFit(
-      meta.inventory,
-      bagCapacity(meta.bags),
-      itemId,
-      1,
-      slot.instance,
-      slot.craftedRecipeId,
-    ) >= 1;
+    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, slot.instance, slot.craftedRecipeId) >=
+    1;
   if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;

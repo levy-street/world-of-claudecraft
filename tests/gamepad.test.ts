@@ -5,6 +5,7 @@ import {
   cancelPadFocus,
   clearPadFocus,
   hasPadFocus,
+  moveDpadFocus,
   setPadNavSpansWindows,
   syncStandalonePadFocus,
 } from '../src/game/dpad_focus_nav';
@@ -12,7 +13,9 @@ import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import {
   AXIS,
+  applyRadialDeadzone,
   GAMEPAD_CANCEL,
+  GAMEPAD_CONFIRM,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GAMEPAD_ZOOM_STEP,
@@ -32,6 +35,7 @@ vi.mock('../src/game/dpad_focus_nav', async (importOriginal) => {
   return {
     ...actual,
     cancelPadFocus: vi.fn(actual.cancelPadFocus),
+    moveDpadFocus: vi.fn(actual.moveDpadFocus),
     setPadNavSpansWindows: vi.fn(actual.setPadNavSpansWindows),
     clearPadFocus: vi.fn(actual.clearPadFocus),
     hasPadFocus: vi.fn(actual.hasPadFocus),
@@ -176,6 +180,7 @@ describe('GamepadManager window focus', () => {
     });
     const onInputEdge = vi.fn();
     const onAction = vi.fn();
+    const onCastRelease = vi.fn();
     const setGamepadMove = vi.fn();
     const clearGamepadMove = vi.fn();
     const input = {
@@ -187,15 +192,19 @@ describe('GamepadManager window focus', () => {
     } as unknown as Input;
     const callbacks = {
       onAction,
+      onCastRelease,
       onInputEdge,
       isPointerMode: () => false,
     } satisfies GamepadCallbacks;
-    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    const bindings = new GamepadBindings();
+    const manager = new GamepadManager(input, bindings, callbacks);
     (manager as unknown as { index: number | null }).index = 0;
     return {
       manager,
+      bindings,
       onInputEdge,
       onAction,
+      onCastRelease,
       setGamepadMove,
       clearGamepadMove,
       setPad: (p: Gamepad) => {
@@ -248,6 +257,21 @@ describe('GamepadManager window focus', () => {
 
     expect(onInputEdge).toHaveBeenCalledTimes(1);
     expect(setGamepadMove).toHaveBeenCalled();
+  });
+
+  it('releases a held cast when the window loses focus', () => {
+    const { manager, bindings, onCastRelease, setPad } = setup();
+    let focused = true;
+    vi.stubGlobal('document', { hasFocus: () => focused });
+    bindings.bind(GP.A, 'slot6');
+
+    manager.poll(1 / 60);
+    setPad(gamepadWithPressed(GP.A));
+    manager.poll(1 / 60);
+    focused = false;
+    manager.poll(1 / 60);
+
+    expect(onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'slot', slot: 6 });
   });
 });
 
@@ -880,12 +904,19 @@ describe('GamepadManager cross hotbar', () => {
     const onConnectionChange = vi.fn();
     const onCrossHotbar = vi.fn();
     const onCrossHotbarCast = vi.fn();
+    const onCastRelease = vi.fn();
     const onCrossHotbarEdit = vi.fn();
     const onOpenSpellbook = vi.fn();
+    const onInputEdge = vi.fn();
+    const onGroundAimStick = vi.fn();
+    const onGroundAimCommit = vi.fn();
+    const onGroundAimSnap = vi.fn();
+    const cancelGroundAim = vi.fn();
     // Which cell the bar reports as focused, driven per case; null is "focus is
     // somewhere else", which arranging must ignore.
     let focusedCell: number | null = null;
     const triggerGamepadJump = vi.fn();
+    let groundAimActive = false;
     const input = {
       applyGamepadLook: vi.fn(),
       setGamepadLookActive: vi.fn(),
@@ -893,17 +924,24 @@ describe('GamepadManager cross hotbar', () => {
       clearGamepadMove: vi.fn(),
       triggerGamepadJump,
       toggleAutorun: vi.fn(),
+      setAutorun: vi.fn(),
       zoomBy: vi.fn(),
     } as unknown as Input & Record<string, ReturnType<typeof vi.fn>>;
     let pointerMode = false;
     const bindings = new GamepadBindings();
     const manager = new GamepadManager(input, bindings, {
       onAction,
-      onInputEdge: vi.fn(),
+      onInputEdge,
       isPointerMode: () => pointerMode,
+      isGroundAimActive: () => groundAimActive,
+      onGroundAimStick,
+      onGroundAimCommit,
+      onGroundAimSnap,
+      cancelGroundAim,
       onConnectionChange,
       onCrossHotbar,
       onCrossHotbarCast,
+      onCastRelease,
       onCrossHotbarEdit,
       onOpenSpellbook,
       focusedCrossHotbarCell: () => focusedCell,
@@ -925,9 +963,15 @@ describe('GamepadManager cross hotbar', () => {
       onAction,
       onConnectionChange,
       onCrossHotbarCast,
+      onCastRelease,
       onCrossHotbar,
       onCrossHotbarEdit,
       onOpenSpellbook,
+      onInputEdge,
+      onGroundAimStick,
+      onGroundAimCommit,
+      onGroundAimSnap,
+      cancelGroundAim,
       triggerGamepadJump,
       focus: (cell: number | null) => {
         focusedCell = cell;
@@ -972,6 +1016,13 @@ describe('GamepadManager cross hotbar', () => {
       setPointerMode: (on: boolean) => {
         pointerMode = on;
       },
+      setGroundAimActive: (on: boolean) => {
+        groundAimActive = on;
+      },
+      setAxes: (axes: number[]) => {
+        pad = gamepadWithPressed();
+        (pad as unknown as { axes: number[] }).axes = axes;
+      },
       // Unplug a pad the way the browser reports it: through the listener start()
       // put on window, so a case cannot pass against a handler nothing wires up.
       // Throws if start() was never called, which is the honest failure.
@@ -993,6 +1044,87 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
     // The bar owns its actions, so nothing goes out as an action-bar slot.
     expect(h.onAction).not.toHaveBeenCalled();
+  });
+
+  it('releases a cross hotbar cast with the press-time action', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.RT);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+    expect(h.onCastRelease.mock.calls[0]?.[0].action).toBe(action);
+  });
+
+  it('keeps the press-time action after its trigger is released first', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.A);
+    expect(h.onCastRelease).not.toHaveBeenCalled();
+    h.press();
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+  });
+
+  it('ignores a falling edge without a recorded cast', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.Y);
+    h.press();
+
+    expect(h.onCastRelease).not.toHaveBeenCalled();
+  });
+
+  it('releases a flat slot binding when the cross hotbar is off', () => {
+    const h = setupCrossHotbar(false);
+    h.bindings.bind(GP.DPAD_UP, 'slot5');
+    h.press(GP.DPAD_UP);
+    h.press();
+
+    expect(h.onAction).toHaveBeenCalledWith('slot5');
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'slot', slot: 5 });
+  });
+
+  it('releases a held cast when pointer mode takes the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.setPointerMode(true);
+    h.press(GP.RT, GP.A);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
+  });
+
+  it('releases all held casts in press order when the active pad disappears', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.start();
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    h.press(GP.RT, GP.A, GP.X);
+    const actions = h.onCrossHotbarCast.mock.calls.map(([action]) => action);
+    h.disconnectPad(0);
+    h.press();
+    h.press();
+
+    expect(h.onCastRelease.mock.calls.map(([hold]) => hold)).toEqual([
+      { kind: 'xhb', action: actions[0] },
+      { kind: 'xhb', action: actions[1] },
+    ]);
+  });
+
+  it('releases a held cast when the virtual mouse takes the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    const action = h.onCrossHotbarCast.mock.calls[0]?.[0];
+    h.press(GP.RT, GP.A, GP.LB);
+    h.press(GP.RT, GP.A, GP.LB, GP.R3);
+    h.press(GP.RT, GP.A, GP.LB, GP.R3);
+
+    expect(h.onCastRelease).toHaveBeenCalledExactlyOnceWith({ kind: 'xhb', action });
   });
 
   it('reaches the second eight through the right trigger', () => {
@@ -1133,6 +1265,25 @@ describe('GamepadManager cross hotbar', () => {
     // B is 'cancel' by default, which is not a slot, so a bare press still works.
     h.press(GP.B);
     expect(h.onAction).toHaveBeenCalledWith('cancel');
+  });
+
+  it('keeps a remapped Jump on a bare face button while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.A, 'jump');
+
+    h.press(GP.A);
+
+    expect(h.triggerGamepadJump).toHaveBeenCalledOnce();
+  });
+
+  it('keeps a remapped Jump on a bare d-pad button while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.DPAD_UP, 'jump');
+
+    h.press(GP.DPAD_UP);
+
+    expect(h.triggerGamepadJump).toHaveBeenCalledOnce();
+    expect(h.onAction).not.toHaveBeenCalledWith('targetNpcPrev');
   });
 
   it('opens bags from View and keeps interface cycling on right-stick click', () => {
@@ -1422,6 +1573,213 @@ describe('GamepadManager cross hotbar', () => {
     h.press(GP.LT);
     h.press(GP.LT);
     expect(h.onCrossHotbar).toHaveBeenCalledTimes(closed);
+  });
+
+  describe('ground aim placement', () => {
+    it('blocks the virtual mouse and arrange chords while placement is active', () => {
+      const mouse = setupCrossHotbar(true);
+      mouse.setGroundAimActive(true);
+      mouse.press(GP.LB);
+      mouse.press(GP.LB, GP.R3);
+      expect((mouse.manager as unknown as { mouseMode: boolean }).mouseMode).toBe(false);
+
+      const edit = setupCrossHotbar(true);
+      edit.setGroundAimActive(true);
+      edit.press(GP.LB);
+      edit.press(GP.LB, GP.Y);
+      expect(edit.onCrossHotbarEdit).not.toHaveBeenCalled();
+    });
+
+    it('steers with the deadzoned left stick and stops autorun once on entry', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.setAxes([0.5, -1, 0, 0]);
+
+      h.manager.poll(0.25);
+      h.manager.poll(0.25);
+
+      expect(h.input.clearGamepadMove).toHaveBeenCalledTimes(2);
+      expect(h.input.setAutorun).toHaveBeenCalledExactlyOnceWith(false);
+      expect(h.onGroundAimStick).toHaveBeenCalledTimes(2);
+      const expected = applyRadialDeadzone(0.5, -1, 0.18);
+      expect(h.onGroundAimStick.mock.calls[0]?.[0]).toBeCloseTo(expected.x);
+      expect(h.onGroundAimStick.mock.calls[0]?.[1]).toBeCloseTo(expected.y);
+      expect(h.onGroundAimStick.mock.calls[0]?.[2]).toBe(0.25);
+    });
+
+    it('stops autorun again after placement exits and re-enters', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.press();
+      h.setGroundAimActive(false);
+      h.press();
+      h.setGroundAimActive(true);
+      h.press();
+
+      expect(h.input.setAutorun).toHaveBeenCalledTimes(2);
+      expect(h.input.setAutorun).toHaveBeenNthCalledWith(1, false);
+      expect(h.input.setAutorun).toHaveBeenNthCalledWith(2, false);
+    });
+
+    it('marks diagonal placement steering just outside the radial deadzone as pad input', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.setAxes([0.13, 0.13, 0, 0]);
+      vi.mocked(markPadActivity).mockClear();
+
+      h.manager.poll(0.25);
+
+      expect(h.onGroundAimStick.mock.calls[0]?.[0]).not.toBe(0);
+      expect(h.onGroundAimStick.mock.calls[0]?.[1]).not.toBe(0);
+      expect(markPadActivity).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps right-stick camera look active during placement', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.setAxes([0, 0, 1, -0.5]);
+
+      h.manager.poll(0.25);
+
+      expect(h.input.applyGamepadLook).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
+      expect(h.input.setGamepadLookActive).toHaveBeenCalledWith(true);
+    });
+
+    it('snaps on bare d-pad right without targeting', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.DPAD_RIGHT);
+
+      expect(h.onGroundAimSnap).toHaveBeenCalledExactlyOnceWith(1);
+      expect(h.onAction).not.toHaveBeenCalledWith('target');
+    });
+
+    it('snaps left and consumes vertical d-pad presses', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.DPAD_LEFT);
+      h.press();
+      h.press(GP.DPAD_UP);
+      h.press();
+      h.press(GP.DPAD_DOWN);
+
+      expect(h.onGroundAimSnap).toHaveBeenCalledExactlyOnceWith(-1);
+      expect(h.onAction).not.toHaveBeenCalled();
+    });
+
+    it('commits on bare confirm and cancels on bare cancel', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.A);
+      h.press();
+      h.press(GP.B);
+
+      expect(h.onGroundAimCommit).toHaveBeenCalledTimes(1);
+      expect(h.cancelGroundAim).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses remapped confirm and cancel bindings once per rising edge', () => {
+      const h = setupCrossHotbar(true);
+      h.bindings.bind(GP.X, GAMEPAD_CONFIRM);
+      h.bindings.bind(GP.Y, GAMEPAD_CANCEL);
+      h.setGroundAimActive(true);
+
+      h.press(GP.X);
+      h.press(GP.X);
+      h.press();
+      h.press(GP.Y);
+      h.press(GP.Y);
+
+      expect(h.onGroundAimCommit).toHaveBeenCalledTimes(1);
+      expect(h.cancelGroundAim).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps cross-hotbar casting live while a trigger is held', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.LT);
+      h.press(GP.LT, GP.A);
+
+      expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a7' });
+    });
+
+    it('resolves a trigger and diamond that rise in the same poll', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.LT, GP.A);
+
+      expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a7' });
+      expect(h.onGroundAimCommit).not.toHaveBeenCalled();
+    });
+
+    it('cancels placement before direct jump and autorun actions', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.press(GP.Y);
+      h.press();
+      h.press(GP.L3);
+
+      expect(h.cancelGroundAim).toHaveBeenCalledTimes(2);
+      expect(h.triggerGamepadJump).toHaveBeenCalledTimes(1);
+      expect(h.input.toggleAutorun).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels placement on window blur and active-pad disconnect', () => {
+      const blurred = setupCrossHotbar(true);
+      blurred.setGroundAimActive(true);
+      blurred.setWindowFocused(false);
+      blurred.press();
+      expect(blurred.cancelGroundAim).toHaveBeenCalledTimes(1);
+
+      const disconnected = setupCrossHotbar(true);
+      disconnected.setGroundAimActive(true);
+      disconnected.manager.start();
+      disconnected.disconnectPad(0);
+      expect(disconnected.cancelGroundAim).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels placement when the manager stops', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+
+      h.manager.stop();
+
+      expect(h.cancelGroundAim).toHaveBeenCalledTimes(1);
+    });
+
+    it('defers to pointer navigation while a HUD window is open', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.setPointerMode(true);
+      vi.mocked(moveDpadFocus).mockClear();
+
+      h.press(GP.DPAD_RIGHT);
+
+      expect(moveDpadFocus).toHaveBeenCalledWith('right');
+      expect(h.onGroundAimSnap).not.toHaveBeenCalled();
+      expect(h.input.clearGamepadMove).toHaveBeenCalled();
+    });
+
+    it('keeps placement chords blocked while pointer mode handles the poll', () => {
+      const h = setupCrossHotbar(true);
+      h.setGroundAimActive(true);
+      h.setPointerMode(true);
+
+      h.press(GP.LB);
+      h.press(GP.LB, GP.R3);
+      h.press();
+      h.press(GP.LB);
+      h.press(GP.LB, GP.Y);
+
+      expect((h.manager as unknown as { mouseMode: boolean }).mouseMode).toBe(false);
+      expect(h.onCrossHotbarEdit).not.toHaveBeenCalled();
+    });
   });
 
   it('retries the one-time seed on a timer, never once per poll', () => {

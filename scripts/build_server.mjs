@@ -50,4 +50,14 @@ await esbuild.build({
   alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
 });
 
+await esbuild.build({
+  entryPoints: ['scripts/migrate_mail_bot_welcome_purge.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_mail_bot_welcome_purge.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
+
 console.log(`[build:server] bot detector: ${usePrivate ? 'private' : 'stub (no-op)'}`);

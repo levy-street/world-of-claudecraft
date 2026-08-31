@@ -789,7 +789,37 @@ export const fr_FR: EnTranslations = {
       "applied": "Appliquée",
       "apply": "Appliquer l’apparence",
       "detach": "Retirer l’apparence",
-      "equipHint": "Équipez-vous d’un objet de type {type} pour appliquer cette apparence."
+      "equipHint": "Équipez-vous d’un objet de type {type} pour appliquer cette apparence.",
+      "charter": {
+        "eyebrow": "Coffre-fort",
+        "title": "Chartes du coffre-fort",
+        "scope": "Une charte n'étend que la banque de ce personnage. Le trésorier vend les mêmes emplacements contre de l'or.",
+        "grant": "Ajoute {slots} emplacements de banque",
+        "buy": "Acheter une charte",
+        "buyAria": "Acheter {item}",
+        "confirmTitle": "Confirmer l'achat de la charte",
+        "confirmBody": "Acheter {item} pour {cost} Claudium ?",
+        "resultContext": "{item} ({sku}) : {message}",
+        "granted": "La charte a été appliquée. La banque de ce personnage est maintenant plus grande.",
+        "alreadyGranted": "Cette charte est déjà sur ce personnage. Vous n'avez pas été débité une seconde fois.",
+        "applyDeferred": "Paiement effectué. Les emplacements s'appliqueront automatiquement à la prochaine connexion de ce personnage.",
+        "grantUnresolved": "Paiement effectué, mais les emplacements n'ont pas encore pu être appliqués. L'achat est enregistré et le support peut le finaliser pour vous.",
+        "inProgress": "Un achat pour ce personnage est encore en cours de finalisation. Réessayez dans un instant.",
+        "doesNotFit": "La banque de ce personnage ne peut pas accueillir la totalité des emplacements de cette charte.",
+        "notPurchasable": "Cette charte ne peut pas être achetée pour le moment.",
+        "noRoom": "La banque de ce personnage n'a plus de place pour une charte.",
+        "noCharterFits": "Aucune charte ne convient à la place restante dans la banque de ce personnage.",
+        "someHiddenByFit": "Les chartes trop grandes pour la place restante dans la banque de ce personnage ne sont pas affichées.",
+        "outage": "L'achat n'a pas pu être confirmé. Réessayez avec ce bouton, vous ne serez pas débité deux fois. Recharger le jeu avant cela peut faire perdre cette protection.",
+        "outageStale": "Retournez à la Boutique et relancez la même action Acheter une charte. Vous ne serez pas débité deux fois. Recharger le jeu avant cela peut faire perdre cette protection.",
+        "failed": "L'achat n'a pas pu être finalisé.",
+        "names": {
+          "strongbox_charter_1": "Charte mineure du coffre-fort",
+          "strongbox_charter_2": "Charte majeure du coffre-fort",
+          "strongbox_charter_3": "Grande charte du coffre-fort",
+          "strongbox_charter_complete": "Charte complète du coffre-fort"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const fr_FR: EnTranslations = {
       "reset": "Réinitialiser",
       "presets": {
         "classic": "Or classique",
+        "fancyGold": "Or chic (WIP)",
         "midnight": "Minuit",
         "parchment": "Parchemin",
         "highContrast": "Contraste élevé"
@@ -925,7 +956,8 @@ export const fr_FR: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "j"
+      "durationUnitDays": "j",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Aperçu du modèle du personnage"
@@ -1321,6 +1353,11 @@ export const fr_FR: EnTranslations = {
       "reset": "Réinitialiser",
       "done": "Terminé",
       "cancel": "Annuler",
+      "showExtraBar": "Afficher une autre barre d'action",
+      "hideExtraBar": "Masquer une barre d'action",
+      "conflictTitle": "Touche déjà assignée",
+      "conflictBody": "{key} est déjà assignée à {other}. L'assigner à {action} annulera l'assignation de {other}.",
+      "conflictAccept": "Réassigner quand même",
       "resetConfirmTitle": "Réinitialiser les touches de la barre d'action ?",
       "resetConfirmBody": "La première barre retrouve ses touches par défaut. Les deuxième et troisième barres deviennent non assignées. Cette action est irréversible."
     },
@@ -1350,6 +1387,7 @@ export const fr_FR: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_rickshaw_mount": "Rickshaw d'os liés",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -1358,7 +1396,8 @@ export const fr_FR: EnTranslations = {
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
-      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre."
+      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1528,6 +1567,7 @@ export const fr_FR: EnTranslations = {
       "playerFrameScale": "Échelle du cadre du joueur",
       "targetFrameScale": "Échelle du cadre de la cible",
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
+      "alwaysShowAllBuffs": "Toujours afficher toutes les améliorations",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "stopAutoAttackOnTargetSwitch": "Arrêter l'attaque auto au changement de cible",
@@ -1537,19 +1577,25 @@ export const fr_FR: EnTranslations = {
       "stickyTarget": "Conserver la cible au clic au sol",
       "showItemLevel": "Afficher le niveau d'objet",
       "showReliquaryTracker": "Afficher le suivi du reliquaire",
+      "confirmVendorSell": "Confirmer avant de vendre",
+      "confirmVendorSellNote": "Désactiver cette option vend les objets en un seul clic sans confirmation ; un emplacement de sac déplacé pourrait donc faire vendre le mauvais objet.",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showThirdActionBar": "Afficher la troisième barre d'action",
+      "combineActionBars": "Fusionner les barres d'action",
       "hideUnusedActionSlots": "Masquer les emplacements d'action inutilisés",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
+      "showTargetSwingTimer": "Afficher le minuteur d'attaque de la cible",
       "showPetFrame": "Afficher votre familier",
       "waterRipples": "Ondulations de l'eau (sillages)",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
       "mobileLeftHanded": "Disposition pour gaucher",
+      "touchPreciseAim": "Ciblage au sol précis",
+      "touchPreciseAimNote": "Visez avant de lancer les sorts au sol. Désactivez pour lancer instantanément au point suggéré.",
       "touchTapMenus": "Menus par appui",
       "touchTapMenusNote": "Ouvrez les contrôles d'action, de consommables et de menu d'une pression au lieu d'un glissement. Touchez un élément pour l'utiliser, touchez à nouveau le contrôle pour son action habituelle, ou touchez à l'extérieur pour fermer."
     },
@@ -1585,6 +1631,7 @@ export const fr_FR: EnTranslations = {
       "invertY": "Inverser la caméra (Y)",
       "deadzone": "Zone morte du stick",
       "cameraSpeed": "Vitesse de la caméra",
+      "reticleSpeed": "Vitesse du réticule",
       "vibration": "Vibrations",
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
@@ -1965,6 +2012,7 @@ export const fr_FR: EnTranslations = {
       "fromYour": "Grâce à vos {value} en {stat} :",
       "names": {
         "spellPower": "Puissance des sorts",
+        "healPower": "Puissance de soins",
         "critRating": "Score de critique",
         "hasteRating": "Score de hâte",
         "parry": "Parade",
@@ -2099,6 +2147,12 @@ export const fr_FR: EnTranslations = {
         "few": "{count} secondes restantes",
         "many": "{count} secondes restantes",
         "other": "{count} secondes restantes"
+      },
+      "buffsHidden": {
+        "one": "Il reste {count} amélioration active, mais son icône est masquée par ce préréglage graphique",
+        "few": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "many": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "other": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique"
       },
       "playtimeDays": {
         "one": "{count} jour",
@@ -2433,7 +2487,10 @@ export const fr_FR: EnTranslations = {
       "backpack": "Sac à dos",
       "bagSocketAria": "{name} : {slots}",
       "socketEmpty": "Emplacement de sac vide",
-      "unequipHint": "Cliquez pour retirer ce sac"
+      "unequipHint": "Cliquez pour retirer ce sac",
+      "poolGeneral": "Général : {used} sur {total}",
+      "poolMaterials": "Matériaux : {used} sur {total}",
+      "capacityPoolsAria": "Emplacements de sac utilisés : {used} sur {total}. Objets généraux : {generalUsed} sur {generalTotal}. Matériaux : {materialsUsed} sur {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -2446,7 +2503,180 @@ export const fr_FR: EnTranslations = {
       "leather": "Cuir",
       "mail": "Mailles"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "Le pilier gauche de la forge se charge. Il s'enflammera dans 3 sec !",
+      "rightPillarCharging": "Le pilier droit de la forge se charge. Il s'enflammera dans 3 sec !",
+      "bothPillarsCharging": "Les piliers de la forge se chargent. Ils s'enflammeront dans 3 sec !",
+      "artificerApproaches": "Un artificier des cendres approche de la forge !",
+      "leftPillar": "Le pilier gauche de la forge s'enflamme !",
+      "rightPillar": "Le pilier droit de la forge s'enflamme !",
+      "bothPillars": "Les piliers de la forge s'enflamment !",
+      "portalsOpening": "Les portails de la forge s'ouvrent !",
+      "heat75": "La forge est à 75 % de chaleur !",
+      "heat90": "La Fusion de la forge est imminente !",
+      "addsDefeated": "La légion de la forge est vaincue : Varkhul est exposé !",
+      "worldfireBegins": "L'Embrasement du monde s'enflamme au bord de la salle. Le creuset sera consumé dans 42 sec !",
+      "worldfireClosing": "L'Embrasement du monde se resserre. Dirigez-vous vers le centre !",
+      "worldfireConsumed": "Tout le creuset est en flammes !"
+    },
+    "varkhulWaveStatus": "Vague {wave}/{waves} | Ennemis : {remaining}",
+    "raidBossGuide": {
+      "title": "Guide de boss",
+      "button": "Guide de boss : {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "Fermer le guide de boss",
+      "bossesLabel": "Boss de raid",
+      "difficultyLabel": "Difficulté",
+      "normal": "Normal",
+      "heroic": "Héroïque",
+      "portraitAlt": "Portrait de la rencontre {boss}",
+      "overviewHeading": "Aperçu",
+      "abilitiesHeading": "Compétences",
+      "whatToDo": "Que faire",
+      "whatToDoResponse": "Que faire : {response}",
+      "rolesLabel": "Responsabilités par rôle",
+      "flagsLabel": "Avertissements de mécanique",
+      "roleTank": "Tank",
+      "roleHealer": "Soigneur",
+      "roleDamage": "Dégâts",
+      "roleAll": "Tous les rôles",
+      "flagDeadly": "Mortel",
+      "flagInterruptible": "Interruptible",
+      "flagImportant": "Important",
+      "flagCleansable": "Dissipable",
+      "browseBoss": "Voir {boss}",
+      "chooseDifficulty": "Voir les mécaniques en {difficulty}",
+      "expandAbility": "Développer {ability}",
+      "collapseAbility": "Réduire {ability}",
+      "abilityControlLabel": "{action}. {details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "Varkhul a forgé Ignivar comme un héraut, un sceau vivant, et la clé de l'Inner Crucible. Cette rencontre teste le contrôle des conduits d'eau, la précision des déplacements, et la rapidité des dégâts prioritaires.",
+        "phaseOpeningName": "Le Héraut s'éveille",
+        "phaseOpeningSummary": "Contrôlez Marque du bûcher avec les conduits d'eau tout en gérant le frontal répété d'Ignivar, le feu du ciel, les rayons tournants, et Vague de la forge grandissante.",
+        "phaseApocalypseName": "Intermède : Apocalypse",
+        "phaseApocalypseSummary": "À {health} de vie, Ignivar appelle un Invocateur de cendres qui tente de mettre fin au combat.",
+        "phaseJudgmentName": "Jugement de la forge",
+        "phaseJudgmentSummary": "À {health} de vie, Ignivar enflamme l'arène et révèle un refuge sûr parmi trois abris.",
+        "phaseJudgmentHeroicSummary": "À {health} de vie, Ignivar enflamme l'arène tandis que les Marques actives continuent de menacer les joueurs proches à l'intérieur du refuge.",
+        "phaseFinaleName": "Finale : Brasier final",
+        "phaseFinaleSummary": "À {health} de vie, Ignivar entame une phase de combustion finale avec un délai strict et des mécaniques répétées plus rapides.",
+        "forgeStrikeName": "Frappe de la forge",
+        "forgeStrikeSummary": "Ignivar frappe son tank actuel et applique Armure en fusion, augmentant les dégâts subis de la part d'Ignivar.",
+        "forgeStrikeResponse": "Les tanks échangent à {stacks} cumuls. Les soigneurs se préparent à la frappe et aux premiers coups au corps à corps subis par le nouveau tank.",
+        "brandName": "Marque du bûcher",
+        "brandSummary": "Ignivar marque les joueurs autres que les tanks de dégâts de feu persistants. Les joueurs marqués brûlent aussi les alliés proches.",
+        "brandResponse": "Dispersez-vous. Dirigez Torrent brûlant vers un conduit d'eau prêt, puis faites traverser l'eau activée seul à chaque joueur marqué pour se purifier.",
+        "brandHeroicResponse": "Dispersez-vous. Ouvrez un conduit avec Torrent brûlant et purifiez un joueur marqué à la fois. Chaque purification déclenche un Contrecoup purificateur affectant tout le raid.",
+        "searingTorrentName": "Torrent brûlant",
+        "searingTorrentSummary": "Ignivar suit un joueur, puis libère une large explosion frontale. Un conduit d'eau prêt touché par l'explosion devient actif pendant un court instant.",
+        "searingTorrentHeroicSummary": "Ignivar suit un joueur, puis libère une explosion frontale presque mortelle. Un conduit d'eau prêt touché par l'explosion devient actif pendant un court instant.",
+        "searingTorrentResponse": "Dirigez l'avertissement à travers exactement un conduit prêt. Tous les autres quittent le frontal avant la fin de l'incantation.",
+        "rainName": "Pluie de cendres",
+        "rainSummary": "Trois secteurs de feu et des impacts de météores marqués punissent les joueurs qui restent dans leurs avertissements.",
+        "rainHeroicSummary": "Trois secteurs de feu et des impacts de météores marqués infligent des dégâts extrêmes aux joueurs qui restent dans leurs avertissements.",
+        "rainResponse": "Déplacez-vous vers une ouverture non marquée et quittez chaque cercle de météore avant l'impact.",
+        "raysName": "Brasier tournant",
+        "raysSummary": "Des rayons de feu tournants balaient les environs d'Ignivar et endommagent à répétition les joueurs qui les touchent.",
+        "raysHeroicSummary": "Des rayons de feu tournants balaient les environs d'Ignivar et infligent de sévères dégâts répétés au contact.",
+        "raysResponse": "Déplacez-vous avec l'espace libre entre les rayons. Ne traversez jamais un rayon, même avec une compétence de déplacement rapide.",
+        "forgeWaveName": "Vague de la forge",
+        "forgeWaveSummary": "Un mur de feu grandissant traverse l'arène, laissant deux ouvertures opposées et repoussant les joueurs qu'il touche.",
+        "forgeWaveHeroicSummary": "Un mur de feu grandissant traverse l'arène, laissant deux ouvertures opposées et projetant beaucoup plus loin les joueurs touchés.",
+        "forgeWaveResponse": "Repérez l'une des deux ouvertures pendant la préparation, alignez-vous dessus, et évitez d'être projeté vers le bord de l'arène.",
+        "apocalypseName": "Apocalypse",
+        "apocalypseSummary": "Ignivar invoque un Invocateur de cendres. Si l'add termine Apocalypse, le raid est vaincu immédiatement.",
+        "apocalypseResponse": "Reportez tous les dégâts disponibles sur l'Invocateur de cendres d'Ignivar et vainquez-le avant la fin de l'incantation.",
+        "judgmentName": "Jugement de la forge",
+        "judgmentSummary": "Ignivar marque trois abris, désigne un refuge sûr, puis brûle à répétition le reste de l'arène.",
+        "judgmentHeroicSummary": "Ignivar marque un refuge sûr tandis que l'arène brûle. Marque du bûcher reste active et continue d'endommager les alliés proches.",
+        "judgmentResponse": "Repérez le refuge marqué de façon unique pendant l'avertissement et regroupez-vous entièrement dans sa zone avant que le sol ne s'enflamme.",
+        "chainsName": "Chaînes de la forge",
+        "chainsSummary": "Ignivar relie les joueurs proches par paires. Se séparer trop loin ou traverser la chaîne d'une autre paire inflige des dégâts mortels.",
+        "chainsResponse": "Restez proche de votre partenaire lié, déplacez-vous ensemble, et empêchez tout autre joueur de traverser votre chaîne.",
+        "lastInfernoName": "Brasier final",
+        "lastInfernoSummary": "Ignivar s'enrage et prépare un anéantissement total tandis que Pluie de cendres, Torrent brûlant et Brasier tournant s'accélèrent.",
+        "lastInfernoResponse": "Utilisez les temps de recharge de dégâts et de soins restants, continuez d'exécuter les mécaniques de déplacement, et vainquez Ignivar avant la fin du compte à rebours.",
+        "brand": "Marque du bûcher : dispersez-vous. Dirigez Torrent brûlant vers un conduit d'eau prêt, puis traversez l'eau seul pour vous purifier.",
+        "movement": "Déplacement : évitez les cônes de Pluie de cendres et les météores, déplacez-vous avec Brasier tournant, et utilisez les deux ouvertures de Vague de la forge.",
+        "apocalypse": "Apocalypse : tuez l'Invocateur de cendres d'Ignivar avant la fin de son incantation.",
+        "judgment": "Jugement de la forge : repérez le refuge unique pendant l'avertissement, puis regroupez-vous dans sa zone marquée quand le sol s'enflamme.",
+        "finale": "Brasier final : achevez Ignivar avant l'anéantissement total, tandis que météores, frontaux et Brasier tournant s'accélèrent.",
+        "heroic": "Héroïque : les joueurs appariés restent proches pendant Chaînes de la forge, Marque reste active pendant Jugement, et Vague de la forge repousse plus loin."
+      },
+      "varkhul": {
+        "overview": "Varkhul a emprisonné la Dernière Source mourante pour forger du métal vivant, puis a créé Ignivar pour garder ce crime. Son combat combine le positionnement individuel avec le contrôle collectif de la grande forge.",
+        "phaseOpeningName": "Le Père-forgeron",
+        "phaseOpeningSummary": "Varkhul alterne pression sur le tank, larges frontaux, projectiles mobiles, absorptions de groupe, vagues de météores, et attaques depuis la grande enclume.",
+        "phaseAssemblyName": "Intermède : l'Assemblée du maître",
+        "phaseAssemblySummary": "À {health} de vie, Varkhul devient protégé tandis que sa légion de la forge entre par les portails et que les rayons des piliers menacent de provoquer une Fusion de la forge.",
+        "phaseFinaleName": "Finale : Chef-d'œuvre déchaîné",
+        "phaseFinaleSummary": "À {health} de vie, Varkhul attaque plus vite, inflige plus de dégâts, et propage des pulsations de feu à travers le raid jusqu'à l'échéance finale.",
+        "phaseFinaleHeroicSummary": "À {health} de vie, Varkhul abandonne la plupart des mécaniques précédentes tandis qu'Embrasement du monde se resserre et consume le creuset.",
+        "makersBrandName": "Marque du Créateur",
+        "makersBrandSummary": "Varkhul frappe son tank actuel et applique un effet cumulable qui augmente tous les dégâts subis de sa part.",
+        "makersBrandResponse": "Les tanks échangent à {stacks} cumuls. Les soigneurs préparent le tank entrant avant que Varkhul ne change de cible.",
+        "frontalName": "Balayage du Père-forgeron",
+        "frontalSummary": "Varkhul libère un très large balayage frontal infligeant de lourds dégâts de feu à tous ceux qui se trouvent devant lui.",
+        "frontalHeroicSummary": "Varkhul libère un très large balayage frontal infligeant des dégâts de feu presque mortels à tous ceux qui se trouvent devant lui.",
+        "frontalResponse": "Gardez Varkhul tourné à l'opposé du groupe et déplacez-vous derrière lui dès que l'avertissement apparaît.",
+        "orbsName": "Orbes de cendres",
+        "orbsSummary": "Les non-tanks marqués déposent des zones de cendres persistantes et libèrent des orbes de feu dans toutes les directions. Métal chauffé à blanc absorbe aussi les soins reçus.",
+        "orbsHeroicSummary": "Les non-tanks marqués déposent des zones de cendres persistantes très dommageables et libèrent de dangereuses orbes de feu dans toutes les directions. Métal chauffé à blanc absorbe aussi les soins reçus.",
+        "orbsResponse": "Portez chaque marque vers le bord de la salle, séparez les zones, puis esquivez les orbes lorsqu'elles traversent l'arène. Les soigneurs dissipent rapidement l'absorption.",
+        "pyreName": "Bûcher partagé",
+        "pyreSummary": "Un cercle mobile suit un joueur sans Métal chauffé à blanc. Ses dégâts sont répartis entre les joueurs à l'intérieur, et chaque joueur manquant inflige {missingPenalty} de dégâts en pourcentage des points de vie maximum à tout le raid.",
+        "pyreHeroicSummary": "Un cercle mobile suit un joueur sans Métal chauffé à blanc et répartit un coup plus important. Chaque joueur manquant inflige aussi {missingPenalty} de dégâts en pourcentage des points de vie maximum à tout le raid.",
+        "pyreResponse": "Regroupez au moins {players} joueurs à l'intérieur du cercle et déplacez-vous avec sa cible jusqu'à la fin de l'incantation.",
+        "forgestormName": "Tempête de forge",
+        "forgestormSummary": "Varkhul appelle {waves} vagues consécutives d'impacts de météores marqués à travers l'arène.",
+        "forgestormHeroicSummary": "Varkhul appelle {waves} vagues consécutives d'impacts de météores marqués infligeant des dégâts extrêmes.",
+        "forgestormResponse": "Surveillez chaque nouvel ensemble d'avertissements au sol et déplacez-vous avant que cette vague ne s'abatte. Ne retournez pas à une position précédente sans vérifier la vague suivante.",
+        "rayName": "Rayon de trempe",
+        "raySummary": "Un rayon suit un joueur marqué pendant une longue préparation. Le premier autre joueur situé entre Varkhul et la cible intercepte le coup et reçoit Blessure trempée.",
+        "rayResponse": "Assignez un joueur en bonne santé, généralement le tank secondaire, pour se placer sur la ligne. Gardez les autres joueurs à l'écart et faites tourner les intercepteurs tant que Blessure trempée est active.",
+        "anvilName": "Décret de l'enclume",
+        "anvilSummary": "Varkhul se rend à la grande forge et la frappe {strikes} fois, infligeant des dégâts croissants à tout le raid.",
+        "anvilHeroicSummary": "Varkhul frappe la grande forge {strikes} fois, infligeant des dégâts croissants au raid tandis que des météores marqués tombent sur les joueurs.",
+        "anvilResponse": "Regroupez-vous pour les soins de raid et utilisez vos défenses pour la frappe finale.",
+        "anvilHeroicResponse": "Éloignez les météores marqués du groupe pendant que les soigneurs et les défenses couvrent les {strikes} frappes.",
+        "assemblyName": "L'Assemblée du maître",
+        "assemblySummary": "Varkhul devient protégé et lance une assemblée chronométrée. Le raid doit vaincre chaque vague de portails avant que la forge n'achève son chef-d'œuvre.",
+        "assemblyResponse": "Partagez votre attention entre le contrôle des rayons et les adds prioritaires. Vainquez toute la légion de la forge avant l'expiration du minuteur de l'assemblée.",
+        "beamName": "Rayon du creuset",
+        "beamSummary": "Les rayons de pilier actifs chauffent la forge à moins qu'un joueur ne les bloque. Les joueurs qui bloquent subissent des dégâts croissants d'Exposition au creuset, tandis que les rayons bloqués et inactifs laissent la chaleur redescendre.",
+        "beamHeroicSummary": "Les rayons de pilier actifs chauffent la forge à moins qu'un joueur ne les bloque. Les joueurs qui bloquent subissent des dégâts croissants d'Exposition au creuset, et la chaleur de la forge ne diminue jamais.",
+        "beamResponse": "Placez-vous entre chaque pilier actif et la forge, puis faites tourner les joueurs qui bloquent avant que l'exposition ne devienne dangereuse. Atteindre la chaleur maximale provoque une Fusion de la forge mortelle.",
+        "legionName": "Légion de la forge",
+        "legionSummary": "Les Gardiens du creuset incantent Séisme du creuset pour augmenter la chaleur de la forge, tandis que les Artificiers des cendres utilisent Protocole de réparation pour soigner Varkhul.",
+        "legionResponse": "Interrompez Séisme du creuset, arrêtez Protocole de réparation, et concentrez-vous sur chaque lanceur de sorts dangereux avant d'éliminer les adds restants.",
+        "masterpieceName": "Chef-d'œuvre déchaîné",
+        "masterpieceSummary": "Varkhul attaque plus vite, inflige plus de dégâts, et brûle le raid à répétition jusqu'à l'anéantissement final.",
+        "masterpieceHeroicSummary": "Varkhul attaque plus vite et inflige plus de dégâts tandis qu'Embrasement du monde remplace la plupart des mécaniques précédentes pour la combustion finale.",
+        "masterpieceResponse": "Engagez les temps de recharge offensifs et défensifs restants et vainquez Varkhul avant la fin du compte à rebours final.",
+        "worldfireName": "Embrasement du monde",
+        "worldfireSummary": "En Héroïque, le feu progresse du bord de l'arène vers le centre par étapes jusqu'à ce que tout le creuset brûle.",
+        "worldfireResponse": "Déplacez-vous vers l'intérieur avant chaque bande de feu qui avance, préservez l'espace sûr qui rétrécit, et achevez Varkhul avant que le centre ne s'enflamme.",
+        "tanks": "Tanks : échangez à deux cumuls de Marque du Créateur et gardez Varkhul à portée de mêlée.",
+        "orbs": "Orbes de cendres : les joueurs marqués se dispersent vers le bord de la salle. Leurs zones de feu persistent et les orbes libérées traversent la salle.",
+        "pyre": "Bûcher partagé : seul un joueur sans Métal chauffé à blanc est sélectionné. Regroupez quatre joueurs à l'intérieur du cercle mobile, dans les deux difficultés. Chaque joueur manquant inflige 15% des points de vie maximum à tout le raid.",
+        "forgestorm": "Tempête de forge : surveillez les météores qui tombent et quittez chaque impact marqué avant que chacune des trois vagues ne s'abatte.",
+        "anvil": "Décret de l'enclume : Varkhul se rend à la grande forge et la frappe trois fois, infligeant des dégâts à tout le raid. En Héroïque, des météores marqués tombent aussi.",
+        "ray": "Rayon de trempe : un autre joueur, généralement un tank, intercepte la ligne mobile avant la fin de la longue préparation. Le joueur touché reçoit Blessure trempée.",
+        "forge": "Piliers de la forge : bloquez les rayons actifs avant qu'ils n'atteignent la forge et faites tourner les joueurs qui bloquent à mesure qu'Exposition au creuset augmente. Une jauge de chaleur pleine provoque Fusion de la forge.",
+        "assembly": "L'Assemblée du maître : bloquez les deux rayons de la forge, éliminez chaque vague de portails, interrompez Séisme du creuset, et empêchez les Artificiers des cendres de soigner Varkhul.",
+        "worldfire": "Embrasement du monde : en Héroïque, le bord brûlant se resserre vers le centre pendant la phase finale. Vainquez Varkhul avant que tout le creuset ne brûle.",
+        "heroic": "Héroïque : la chaleur de la forge ne redescend jamais, Décret de l'enclume ajoute des météores, et la phase finale retire la plupart des mécaniques pour se concentrer sur Embrasement du monde."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, divisé par le nombre de joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs).",
+      "varkhulSharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, réparti entre les joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs). Chaque joueur manquant inflige aussi {missingPenalty}% des points de vie maximum à tout le raid, y compris les joueurs à l'intérieur du cercle.",
+      "makersBrand": "Pendant {duration} s, chaque cumul augmente les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
+      "varkhulSentinelsGaze": "La Sentinelle de braise vous poursuit. Éloignez-la du raid jusqu'à ce qu'elle soit détruite.",
+      "varkhulMoltenCore": "Portez ce noyau jusqu'à la forge. Le Fardeau en fusion inflige des dégâts croissants toutes les {interval} s, de {min}% à {max}% des points de vie maximum.",
+      "varkhulForgeLink": "Interceptez un rayon de pilier actif avant qu'il n'atteigne la forge. Les rayons ouverts ajoutent 6% de chaleur par seconde. En Normal, les rayons bloqués et les piliers inactifs refroidissent la forge ; en Héroïque, la chaleur ne diminue jamais. À 100%, la forge subit une Fusion de la forge mortelle.",
+      "varkhulCrucibleExposure": "Bloquer un Rayon du creuset inflige des dégâts croissants en pourcentage des points de vie maximum chaque seconde. Les cumuls se réinitialisent 10 secondes après avoir quitté un rayon en Normal, et après 60 secondes en Héroïque.",
       "dot": "Inflige {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Rend {value} points de vie toutes les {interval} s",
       "mendingCurrent": "Stocke {value} de soins, libérés avec le temps ou consommés par Reprise en cascade",
@@ -2657,7 +2887,9 @@ export const fr_FR: EnTranslations = {
       "chestTitle": "Coffre",
       "takeLootButton": "Prendre le butin",
       "takeLootTooltip": "Prend les pièces et les objets lâchés. N'utilise pas la récolte.",
-      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg."
+      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg.",
+      "bindConfirmTitle": "Se lie au ramassage",
+      "bindConfirmBody": "Ce butin contient un objet qui se liera à vous une fois pris. Un objet lié ne peut être échangé qu'aux joueurs ayant partagé son butin, et seulement pendant un temps limité."
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
@@ -2689,6 +2921,7 @@ export const fr_FR: EnTranslations = {
     },
     "partyFrames": {
       "section": "Cadres de groupe et de raid",
+      "optionsSection": "Options des cadres de groupe",
       "unlock": "Déplacer les cadres de groupe et de raid",
       "lock": "Verrouiller les cadres de groupe et de raid",
       "style": "Style des cadres",
@@ -2719,13 +2952,70 @@ export const fr_FR: EnTranslations = {
     "frameReset": {
       "label": "Réinitialiser la position des cadres"
     },
+    "interfaceUnlock": {
+      "label": "Modifier les cadres",
+      "unlock": "Déverrouiller l'interface",
+      "lock": "Verrouiller l'interface",
+      "lockAll": "Verrouiller l'interface",
+      "barsNote": "Seules les barres d'action que vous avez activées apparaissent pendant la modification. Pour ajouter d'autres barres, utilisez d'abord les boutons plus et moins de la barre d'action principale.",
+      "frozenNote": "Pendant la modification, l'interface et la caméra sont figées : les boutons et les cadres ne sont que des images à disposer, et les clics n'atteignent pas le monde du jeu.",
+      "unlockFrame": "Déverrouiller ce cadre",
+      "lockFrame": "Verrouiller ce cadre",
+      "resizeFrame": "Redimensionner ce cadre",
+      "frameNames": {
+        "actionBar1": "Barre d'action",
+        "actionBar2": "Barre d'action 2",
+        "actionBar3": "Barre d'action 3",
+        "steamWishlist": "Rappel de liste de souhaits",
+        "menu": "Menu",
+        "minimap": "Minicarte",
+        "stanceBar": "Barre de posture",
+        "xpBar": "Barre d'XP",
+        "chat": "Discussion",
+        "actionBarGroup": "Barres d'action",
+        "playerFrame": "Joueur",
+        "targetFrame": "Cible",
+        "partyFrames": "Groupe",
+        "swingBar": "Attaque automatique"
+      },
+      "framesMenu": "Paramètres des cadres",
+      "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",
+      "showHideFrames": "Afficher ou masquer les cadres",
+      "buffsLeftToRight": "Améliorations de gauche à droite",
+      "debuffsLeftToRight": "Affaiblissements de gauche à droite",
+      "lockPlayerFrameToBar": "Verrouiller le cadre du joueur à la barre d'action",
+      "actionBarsVertical": "Barres d'action verticales",
+      "actionBar1Vertical": "Barre d'action verticale",
+      "actionBar2Vertical": "Barre d'action verticale 2",
+      "actionBar3Vertical": "Barre d'action verticale 3",
+      "menuRailHorizontal": "Menu horizontal",
+      "snapToGrid": "Aligner sur la grille",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Réinitialiser la taille",
+      "resetFrameSizeFor": "Réinitialiser la taille de {name}",
+      "previewSpell": "Sort d'exemple"
+    },
+    "transfer": {
+      "frameLayout": "Disposition des cadres",
+      "allSettings": "Tous les paramètres",
+      "exportAction": "Exporter",
+      "importAction": "Importer",
+      "copy": "Copier",
+      "copied": "Copié dans le presse-papiers.",
+      "copyFailed": "Échec de la copie. Sélectionnez le code et copiez-le vous-même.",
+      "applyReload": "Appliquer et recharger",
+      "pastePlaceholder": "Collez ici un code exporté.",
+      "invalid": "Ce code d'exportation n'est pas valide.",
+      "wrongKind": "Ce code correspond à un autre type d'exportation."
+    },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}",
       "riftTier": "Objet de faille de rang {tier}",
       "riftUpgrade": "Amélioration de faille {level}/{max}",
       "riftSockets": "Gemmes de faille {used}/{total}",
       "statEnchanted": "+{value} {stat} (Enchanté)",
-      "enchantedFallback": "Enchanté"
+      "enchantedFallback": "Enchanté",
+      "partyTradeWindow": "Vous pouvez échanger cet objet aux joueurs qui ont partagé son butin pendant encore {time}. L'équiper met fin à la fenêtre d'échange."
     },
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
@@ -2926,7 +3216,10 @@ export const fr_FR: EnTranslations = {
       "unlink": "Délier Steam",
       "linked": "Lié au compte Steam {id}",
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
-      "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez."
+      "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez.",
+      "wishlist": "Ajouter à la liste de souhaits Steam",
+      "wishlistAria": "Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique",
+      "wishlistShort": "Liste de souhaits"
     },
     "epic": {
       "title": "Epic",
@@ -3012,6 +3305,26 @@ export const fr_FR: EnTranslations = {
       "buySlotsMaxed": "Capacité maximale",
       "buyConfirm": "Acheter {count} emplacements de banque supplémentaires pour {price} ?",
       "buyConfirmAccept": "Acheter",
+      "meterLabel": "{used} sur {total} emplacements",
+      "meterPoolGeneral": "Général : {used} sur {total}",
+      "meterPoolMaterials": "Matériaux : {used} sur {total}",
+      "meterPoolsAria": "Emplacements de banque utilisés : {used} sur {total}. Objets généraux : {generalUsed} sur {generalTotal}. Matériaux : {materialsUsed} sur {materialsTotal}.",
+      "meterMaterialsNote": "Espace réservé aux matériaux provenant des sacoches serties. Les autres objets ne peuvent pas l'utiliser.",
+      "priceDisclaimer": "Les prix peuvent varier avec l'économie du jeu.",
+      "rungItemName": "{count} emplacements de banque",
+      "buySlotsDualAria": "Acheter {count} emplacements pour {price} ou {cost} Claudium",
+      "buyConfirmDual": "Acheter {count} emplacements de banque supplémentaires ?",
+      "buyConfirmGold": "Acheter pour {price}",
+      "buyConfirmClaudium": "Acheter pour {cost} Claudium",
+      "rungGranted": "Les emplacements de banque ont été ajoutés. La banque de ce personnage est maintenant plus grande.",
+      "rungAlreadyGranted": "Ces emplacements sont déjà sur ce personnage. Vous n'avez pas été débité une seconde fois.",
+      "rungApplyDeferred": "Paiement effectué. Les emplacements s'appliqueront automatiquement à la prochaine connexion de ce personnage.",
+      "rungGrantUnresolved": "Paiement effectué, mais les emplacements n'ont pas encore pu être appliqués. L'achat est enregistré et le support peut le finaliser pour vous.",
+      "rungInProgress": "Un achat pour ce personnage est encore en cours de finalisation. Réessayez dans un instant.",
+      "rungDoesNotFit": "La banque de ce personnage ne peut pas accueillir une extension supplémentaire.",
+      "rungNotPurchasable": "Ces emplacements de banque ne peuvent pas être achetés pour le moment.",
+      "rungFailed": "L'achat n'a pas pu être finalisé.",
+      "rungOutage": "L'achat n'a pas pu être confirmé. Réessayez avec ce bouton, vous ne serez pas débité deux fois. Recharger le jeu avant cela peut faire perdre cette protection.",
       "withdrawHint": "Cliquez pour retirer",
       "withdrawPartialHint": "Maj-clic pour retirer une quantité partielle",
       "depositHint": "Cliquez pour déposer",
@@ -3024,6 +3337,9 @@ export const fr_FR: EnTranslations = {
       "withdrawQuantityTitle": "Retirer {item}",
       "withdrawQuantityInput": "Quantité à retirer",
       "withdrawQuantityConfirm": "Retirer",
+      "vaultRowWithdrawName": "Retirer {item}",
+      "priceChanged": "Le prix a changé avant la fin de l'achat. Vérifiez le nouveau prix et confirmez à nouveau.",
+      "withdrawQuantityAction": "Quantité à retirer : {item}",
       "filterGroupAria": "Filtrer la banque par catégorie",
       "sortAria": "Trier les objets de la banque",
       "searchAria": "Rechercher un objet de la banque par son nom",
@@ -3045,6 +3361,34 @@ export const fr_FR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invitez un ami : quand il atteint le niveau 10, vous gagnez chacun 2 emplacements, jusqu'à 5 amis.",
       "bonusSectionAria": "Emplacements de banque bonus et comment en gagner d'autres",
+      "socketRowAria": "Emplacements de sac de la banque",
+      "socketEmpty": "Emplacement de sac de banque vide",
+      "socketEmptyHint": "Cliquez sur un sac dans vos sacs pour le ranger dans la banque",
+      "socketLocked": "Emplacement de sac verrouillé",
+      "socketLockedLater": "Les emplacements de sac se déverrouillent dans l'ordre, du moins cher au plus cher",
+      "socketUnlockAria": "Déverrouiller un emplacement de sac de banque pour {price}",
+      "socketUnlockHint": "Cliquez pour déverrouiller cet emplacement de sac",
+      "socketUnlockConfirm": "Déverrouiller un emplacement de sac de banque pour {price} ?",
+      "socketUnlockAccept": "Déverrouiller",
+      "unsocketHint": "Cliquez pour remettre ce sac dans vos sacs",
+      "socketHint": "Cliquez pour insérer ce sac dans votre banque",
+      "vaultTab": "Réserve",
+      "vaultCapacityNote": "Chaque matériau peut contenir jusqu'à {cap}.",
+      "vaultEmpty": "Votre réserve est vide. Cliquez sur un matériau dans vos sacs pour le déposer.",
+      "vaultRowAria": "{item} : {count} sur {cap} stockés",
+      "vaultLockedIntro": "Déverrouillez la Réserve de matériaux pour stocker vos matériaux d'artisanat à côté de votre banque. Chaque matériau dispose de son propre espace, jusqu'à {cap} chacun.",
+      "vaultUnlockButton": "Déverrouiller la Réserve de matériaux",
+      "vaultUnlockConfirm": "Déverrouiller la Réserve de matériaux pour {price} ?",
+      "vaultUpgrade": "Augmenter chaque plafond à {cap}",
+      "vaultUpgradeConfirm": "Augmenter chaque plafond de matériau à {cap} pour {price} ?",
+      "vaultDepositAll": "Déposer tous les matériaux",
+      "vaultDepositAllTooltip": "Envoie tous les matériaux de vos sacs vers votre réserve en un seul geste, en remplissant chaque matériau jusqu'à son plafond. L'équipement, les outils, les objets de quête et les consommables ne sont jamais touchés.",
+      "vaultDepositAllDone": "Matériaux déposés : {count}.",
+      "vaultDepositAllFull": "Matériaux déposés : {count}. Certains plafonds sont pleins.",
+      "vaultDepositAllNone": "Plafonds de la réserve pleins : rien n'a été déposé.",
+      "vaultWithdrawShort": "Seuls {fit} sur {count} tiennent dans vos sacs.",
+      "vaultDepositHint": "Cliquez pour déposer dans votre réserve",
+      "vaultCannotDeposit": "Ne peut pas être placé dans la réserve",
       "tabsAria": "Onglets de la banque",
       "personalTab": "Personnel",
       "guildTab": "Guilde",
@@ -3444,6 +3788,8 @@ export const fr_FR: EnTranslations = {
       "reagentsNeeded": "Nécessite$1",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(dépense {count} de qualité fine)",
+      "reagentVaultDraw": "(puise {count} dans votre réserve)",
+      "vaultUnreachable": "La Réserve de matériaux est hors de portée ici.",
       "craftFeeLine": "Frais de fabrication : {fee} chacun",
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
@@ -3542,7 +3888,9 @@ export const fr_FR: EnTranslations = {
       "equip": "Équiper",
       "disenchant": "Désenchanter",
       "salvage": "Récupérer",
-      "applyEnchant": "Appliquer un enchantement"
+      "applyEnchant": "Appliquer un enchantement",
+      "sell": "Vendre",
+      "sellAll": "Tout vendre ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
@@ -4044,9 +4392,15 @@ export const fr_FR: EnTranslations = {
       "loading": "Chargement de la Bourse...",
       "loadFailed": "Impossible de contacter la Bourse. Réessayez dans un instant.",
       "disabledRealm": "La Bourse $WOC n'est pas disponible sur ce royaume.",
+      "browserOnlyConfirmTitle": "Ouvrir la Bourse $WOC dans votre navigateur ?",
+      "browserOnlyConfirmBody": "La Bourse $WOC fonctionne uniquement dans la version navigateur de World of ClaudeCraft. Cela ouvre World of ClaudeCraft dans votre navigateur, où vous pouvez vous connecter et ouvrir la Bourse ; le jeu continue ici.",
+      "browserOnlyConfirmOpen": "Ouvrir dans le navigateur",
+      "browserOnlyConfirmCancel": "Annuler",
       "pausedBanner": "Les échanges sont en pause. Les enchères continuent de décompter ; les nouvelles annonces, enchères, offres et paiements attendent la reprise des échanges, et un paiement déjà envoyé se règle quand même.",
-      "walletBanner": "Liez et vérifiez un portefeuille pour enchérir, acheter ou vendre sur la Bourse.",
-      "walletBannerCta": "Connecter un portefeuille",
+      "walletLinkedDisconnected": "Votre adresse publique est liée. Reconnectez cette application de portefeuille quand vous souhaitez payer en $WOC.",
+      "walletLinkedConnected": "Votre application de portefeuille liée est connectée et prête pour les achats en $WOC.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Inconnu",
       "rateNote": "Taux : environ {tokens} $WOC pour 1,00 $ US au {time}.",
       "rateNotePaused": "Dernier taux connu : environ {tokens} $WOC pour 1,00 $ US au {time}.",
       "estimateNote": "Environ {tokens} $WOC pour {usd} au taux actuel.",
@@ -4300,6 +4654,8 @@ export const fr_FR: EnTranslations = {
       "online": "Le personnage est actuellement en ligne.",
       "rename_not_permitted": "Le changement de nom de ce personnage n'est pas autorisé.",
       "delete_confirm": "Saisissez le nom du personnage pour confirmer la suppression.",
+      "storage_purchase_open": "Un achat de stockage doit être terminé ou résolu avant de pouvoir supprimer ce personnage.",
+      "delete_busy": "Le royaume est occupé. Réessayez de supprimer ce personnage dans un instant.",
       "already_in_world": "Le personnage est déjà dans le monde.",
       "taken_over": "Votre personnage a été pris en main par une autre session.",
       "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
@@ -4360,7 +4716,13 @@ export const fr_FR: EnTranslations = {
       "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
-      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+      "reauth_required": "Confirmez ce changement de portefeuille avec le mot de passe de votre compte.",
+      "reauth_two_factor": "L'authentification à deux facteurs est activée sur votre compte. Saisissez votre code pour confirmer.",
+      "reauth_no_password": "Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+      "reauth_bad_signature": "La signature du portefeuille n'a pas pu être vérifiée. Réessayez.",
+      "reauth_bad_password": "Votre mot de passe est incorrect.",
+      "reauth_bad_two_factor": "Ce code n'est pas valide, réessayez."
     },
     "ota_updates": {
       "invalid_input": "Saisie invalide."
@@ -4818,6 +5180,7 @@ export const fr_FR: EnTranslations = {
       "ifPartySort": "L'ordre d'affichage des membres du groupe : ordre du groupe, rôle, ou nom.",
       "ifPartyShowAuras": "Si les améliorations et les affaiblissements s'affichent sur les cadres de groupe. Des interrupteurs équivalents couvrent les barres de ressource, les absorptions, les familiers, et si vous apparaissez dans votre propre liste de groupe.",
       "ifAurasOnPlayerFrame": "Affiche vos améliorations et vos affaiblissements sur votre propre cadre, en plus de la barre d'auras.",
+      "ifAlwaysShowAllBuffs": "Affiche tous les buffs actifs, même avec le préréglage graphique Faible, en contournant sa limite habituelle d’icônes de buffs.",
       "ifTargetOfTarget": "Affiche qui votre cible cible elle-même, la méthode classique pour vérifier si le tank a toujours l'aggro.",
       "ifPetFrame": "Affiche un cadre pour votre familier.",
       "ifChatFontScale": "Taille du texte de discussion.",
@@ -6304,6 +6667,7 @@ export const fr_FR: EnTranslations = {
       "bankBody": "Chaque ville principale abrite une succursale du Coffre doré, la maison de banque du royaume. Adressez-vous au trésorier sur place pour ouvrir votre chambre forte, une réserve privée au-delà de vos sacs que votre personnage conserve à vie. Tout ce que vous leur confiez attend en lieu sûr, quelle que soit la succursale où vous passerez ensuite.",
       "bankHow": "Une fois la chambre forte ouverte, cliquez sur un objet dans vos sacs pour le déposer, et cliquez dessus dans la chambre forte pour le reprendre. La chambre forte n'accueille que des biens, jamais de pièces, et les objets de quête restent sur vous. Quand vos sacs débordent en pleine route, un seul bouton y range d'un coup tous vos matériaux d'artisanat.",
       "bankSlots": "Une chambre forte neuve commence petite et grandit avec vous. Le trésorier vend des emplacements supplémentaires contre pièces, à des prix toujours plus élevés, et jouer en ligne rapporte de la place bonus en plus, par exemple pour une adresse e-mail vérifiée, des comptes liés ou des amis que vous amenez dans le jeu.",
+      "bankSockets": "Au-delà de l’extension des emplacements, le trésorier vend aussi jusqu’à quatre emplacements de sac, déverrouillés dans l’ordre à des prix toujours plus élevés. Placez-y un sac de rechange de votre équipement de portage pour ajouter ses emplacements à votre coffre : un sac ordinaire agrandit tout le rangement, tandis qu’une sacoche de composants n’offre de la place qu’aux matériaux d’artisanat. Cliquez sur un sac dans vos sacs pour le placer, puis cliquez sur l’emplacement pour le reprendre. Le reprendre ne vous fait jamais perdre ce que vous y avez entreposé : si le coffre devient plus rempli que son espace réduit, tout reste en place et les nouveaux dépôts attendent simplement qu’une place se libère.",
       "buyingTitle": "Acheter et vendre",
       "buyingBody": "Adressez-vous à un marchand et choisissez de parcourir ses marchandises : sa boutique s'ouvre sur trois onglets, Acheter, Vendre et Rachat. Acheter contient tout ce qu'il tient en stock, à vous si vous en avez les moyens. Vendre liste ce que vos sacs contiennent et qu'il vous paiera, et vendre une pièce qui porte sa propre qualité tirée au sort vous demande d'abord confirmation, pour qu'un exemplaire précieux ne vous échappe jamais par mégarde. Si vous vous séparez d'un objet à regret, l'onglet Rachat conserve vos ventes récentes pour que vous puissiez les racheter au prix qu'on vous en a donné.",
       "junkTitle": "Faire le tri du superflu",
@@ -7285,6 +7649,13 @@ export const fr_FR: EnTranslations = {
     "unlink": "Dissocier",
     "unlinkTitle": "Retirer la vérification du portefeuille de ce compte",
     "unlinkAria": "Retirer la vérification du portefeuille de ce compte",
+    "reauthTitle": "Confirmer le changement de portefeuille",
+    "reauthUnlinkTitle": "Confirmer le retrait du portefeuille",
+    "reauthHelp": "Pour votre sécurité, saisissez le mot de passe de votre compte pour autoriser ce changement.",
+    "reauthNoPassword": "Ce compte se connecte sans mot de passe. Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+    "reauthConfirm": "Confirmer",
+    "reauthCancel": "Annuler",
+    "reauthClose": "Fermer",
     "signOut": "Déconnecter",
     "signOutTitle": "Déconnecter l'appli de portefeuille sur ce navigateur",
     "signOutAria": "Déconnecter l'appli de portefeuille sur ce navigateur",
@@ -7340,6 +7711,7 @@ export const fr_FR: EnTranslations = {
       "title": "Connecter un portefeuille Solana",
       "linkBody": "Choisissez une extension de portefeuille dans ce navigateur. Vous signerez un message de vérification, puis retournerez dans l'application de bureau.",
       "paymentBody": "Choisissez le portefeuille lié à votre compte et approuvez la transaction dans ce navigateur.",
+      "stepUpBody": "Choisissez le portefeuille lié à votre compte et signez le message d’autorisation de la Bourse $WOC. La signature est gratuite et ne déplace aucun fonds.",
       "extensionHelp": "Aucune extension de portefeuille compatible n'a été trouvée. Installez ou déverrouillez Phantom, Solflare ou un autre portefeuille Solana pour navigateur, puis réessayez.",
       "safety": "World of ClaudeCraft ne vous demande jamais votre phrase de récupération ni votre clé privée.",
       "continueWith": "Continuer avec {wallet}",
@@ -7727,6 +8099,20 @@ export const fr_FR: EnTranslations = {
     "buyConfirmTitle": "Confirmer l'achat",
     "buyConfirmBody": "Acheter {item} pour {marks} Marques héroïques ? Les achats de marques ne peuvent pas être remboursés.",
     "buyConfirmAccept": "Acheter",
+    "buyConfirmCancel": "Annuler"
+  },
+  "crucibleShop": {
+    "browse": "Échanger des sceaux",
+    "browseAria": "Échanger des sceaux du Creuset avec {name}",
+    "empty": "Aucune pièce d’ensemble n’est échangeable pour votre classe.",
+    "balance": "Vos sceaux : {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "Vous n’avez aucun sceau du Creuset.",
+    "price": "1 {sigil}",
+    "buyAria": "Échanger {sigil} contre {item}",
+    "buyConfirmTitle": "Confirmer l’échange",
+    "buyConfirmBody": "Échanger votre {sigil} contre {item} ? Un sceau consommé ne peut pas être remboursé.",
+    "buyConfirmAccept": "Échanger",
     "buyConfirmCancel": "Annuler"
   },
   "cardDuel": {
@@ -8557,6 +8943,8 @@ export const fr_FR: EnTranslations = {
         "riftEntrance": "Entrée de la faille : {name}",
         "hostileEnemy": "Ennemi hostile",
         "aggressiveEnemy": "Ennemi qui vous attaque",
+        "bossEnemy": "Boss : {name}",
+        "bossAggressiveEnemy": "Boss qui vous attaque : {name}",
         "lootableEnemy": "Ennemi avec du butin",
         "corpse": "Votre cadavre",
         "deathZone": "Zone dangereuse",
@@ -8945,6 +9333,7 @@ export const fr_FR: EnTranslations = {
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "tradeWindowIneligible": "Cela ne peut être échangé qu'aux joueurs ayant partagé son butin.",
       "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
     },
     "logs": {
@@ -9425,7 +9814,8 @@ export const fr_FR: EnTranslations = {
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
       "clickBuyback": "Cliquer pour racheter",
-      "bagSlots": "Sac de {slots} emplacements"
+      "bagSlots": "Sac de {slots} emplacements",
+      "bagSlotsMaterials": "Sac à matériaux de {slots} emplacements"
     },
     "bags": {
       "title": "Sacs",
@@ -9607,7 +9997,8 @@ export const fr_FR: EnTranslations = {
       "greedAria": "Cupidité pour {item}",
       "passAria": "Passer pour {item}",
       "everyonePassed": "Tout le monde a passé pour {item}.",
-      "rolled": "{answered}/{total} ont lancé"
+      "rolled": "{answered}/{total} ont lancé",
+      "bindsOnPickup": "Se lie au ramassage"
     }
   },
   "entities": {
@@ -10388,7 +10779,7 @@ export const fr_FR: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Aiguille du destin",
-        "description": "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère 5 Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible."
+        "description": "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère {needleDoom} Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible."
       },
       "sentence": {
         "name": "Sentence",
@@ -10486,7 +10877,7 @@ export const fr_FR: EnTranslations = {
       },
       "moonseed": {
         "name": "Graine lunaire",
-        "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à 6 s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
+        "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
         "name": "Floraison sauvage",
@@ -10790,7 +11181,7 @@ export const fr_FR: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagration",
-        "description": "Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient 2 charges. (Signature Destruction)"
+        "description": "Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)"
       },
       "moonkin_form": {
         "name": "Forme de sélénien",
@@ -10822,7 +11213,7 @@ export const fr_FR: EnTranslations = {
       },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
+        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -10894,7 +11285,7 @@ export const fr_FR: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Résolution de fer",
-        "description": "Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)"
+        "description": "Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)"
       },
       "faultline": {
         "name": "Ligne de faille",
@@ -11271,7 +11662,7 @@ export const fr_FR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Veille séraphique",
-        "description": "Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de 180. (Signature de Bénison)"
+        "description": "Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de {buff}. (Signature de Bénison)"
       },
       "summon_tithefiend": {
         "name": "Invoquer un Démon de dîme",
@@ -12814,6 +13205,9 @@ export const fr_FR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
+      "reins_rickshaw_mount": {
+        "name": "Rênes liées : Rickshaw d'os liés"
+      },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
       },
@@ -12859,6 +13253,27 @@ export const fr_FR: EnTranslations = {
       "dawnhold_posy": {
         "name": "Bouquet du jardin de Dawnhold"
       },
+      "wayfarers_backpack": {
+        "name": "Sac à dos du voyageur"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Bourse à réactifs en toile"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Sacoche de réactifs du nécromancien"
+      },
+      "duskweave_bag": {
+        "name": "Sac de Tissage crépusculaire"
+      },
+      "resonant_weave_bag": {
+        "name": "Sac de tissage résonant"
+      },
+      "foragers_haversack": {
+        "name": "Sacoche du Fourrageur"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Sacoche de réactifs liée au métier à tisser"
+      },
       "ps_briny_lure": {
         "name": "Leurre saumâtre"
       },
@@ -12870,6 +13285,612 @@ export const fr_FR: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Pierre de trépas"
+      },
+      "lastflame_core": {
+        "name": "Cœur de la Dernière Flamme"
+      },
+      "slagbreaker_helmet": {
+        "name": "Heaume du Brise-scorie"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Épaulières du Brise-scorie"
+      },
+      "slagbreaker_chest": {
+        "name": "Haubert du Brise-scorie"
+      },
+      "slagbreaker_gloves": {
+        "name": "Gantelets du Brise-scorie"
+      },
+      "slagbreaker_legs": {
+        "name": "Jambières du Brise-scorie"
+      },
+      "emberfury_helmet": {
+        "name": "Heaume de Fureur des braises"
+      },
+      "emberfury_shoulder": {
+        "name": "Épaulières de Fureur des braises"
+      },
+      "emberfury_chest": {
+        "name": "Haubert de Fureur des braises"
+      },
+      "emberfury_gloves": {
+        "name": "Gantelets de Fureur des braises"
+      },
+      "emberfury_legs": {
+        "name": "Jambières de Fureur des braises"
+      },
+      "forgewall_helmet": {
+        "name": "Heaume du Rempart de forge"
+      },
+      "forgewall_shoulder": {
+        "name": "Épaulières du Rempart de forge"
+      },
+      "forgewall_chest": {
+        "name": "Haubert du Rempart de forge"
+      },
+      "forgewall_gloves": {
+        "name": "Gantelets du Rempart de forge"
+      },
+      "forgewall_legs": {
+        "name": "Jambières du Rempart de forge"
+      },
+      "dawnforged_helmet": {
+        "name": "Heaume forgé par l’aube"
+      },
+      "dawnforged_shoulder": {
+        "name": "Épaulières forgées par l’aube"
+      },
+      "dawnforged_chest": {
+        "name": "Haubert forgé par l’aube"
+      },
+      "dawnforged_gloves": {
+        "name": "Gantelets forgés par l’aube"
+      },
+      "dawnforged_legs": {
+        "name": "Jambières forgées par l’aube"
+      },
+      "oathpyre_helmet": {
+        "name": "Heaume du Bûcher du serment"
+      },
+      "oathpyre_shoulder": {
+        "name": "Épaulières du Bûcher du serment"
+      },
+      "oathpyre_chest": {
+        "name": "Haubert du Bûcher du serment"
+      },
+      "oathpyre_gloves": {
+        "name": "Gantelets du Bûcher du serment"
+      },
+      "oathpyre_legs": {
+        "name": "Jambières du Bûcher du serment"
+      },
+      "zealfire_helmet": {
+        "name": "Heaume du Feu du zèle"
+      },
+      "zealfire_shoulder": {
+        "name": "Spallières du Feu du zèle"
+      },
+      "zealfire_chest": {
+        "name": "Haubert du Feu du zèle"
+      },
+      "zealfire_gloves": {
+        "name": "Gantelets du Feu du zèle"
+      },
+      "zealfire_legs": {
+        "name": "Jambières du Feu du zèle"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Capuche du Seigneur de meute"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Épaulières du Seigneur de meute"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Tunique du Seigneur de meute"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Poignes du Seigneur de meute"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Culotte du Seigneur de meute"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Capuchon de Vue froide"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Spallières de Vue froide"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Tunique de Vue froide"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Poignes de Vue froide"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Braies de Vue froide"
+      },
+      "slagsnare_helmet": {
+        "name": "Capuche du Piège-scorie"
+      },
+      "slagsnare_shoulder": {
+        "name": "Spallières du Piège-scorie"
+      },
+      "slagsnare_chest": {
+        "name": "Tunique du Piège-scorie"
+      },
+      "slagsnare_gloves": {
+        "name": "Poignes du Piège-scorie"
+      },
+      "slagsnare_legs": {
+        "name": "Culotte du Piège-scorie"
+      },
+      "cinderfang_helmet": {
+        "name": "Capuchon du Croc cendré"
+      },
+      "cinderfang_shoulder": {
+        "name": "Spallières du Croc cendré"
+      },
+      "cinderfang_chest": {
+        "name": "Tunique du Croc cendré"
+      },
+      "cinderfang_gloves": {
+        "name": "Gants du Croc cendré"
+      },
+      "cinderfang_legs": {
+        "name": "Braies du Croc cendré"
+      },
+      "smolderstrike_helmet": {
+        "name": "Capuche de Frappe-braise"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Spallières de Frappe-braise"
+      },
+      "smolderstrike_chest": {
+        "name": "Tunique de Frappe-braise"
+      },
+      "smolderstrike_gloves": {
+        "name": "Poignes de Frappe-braise"
+      },
+      "smolderstrike_legs": {
+        "name": "Culotte de Frappe-braise"
+      },
+      "ashveil_helmet": {
+        "name": "Capuchon du Voile cendré"
+      },
+      "ashveil_shoulder": {
+        "name": "Spallières du Voile cendré"
+      },
+      "ashveil_chest": {
+        "name": "Tunique du Voile cendré"
+      },
+      "ashveil_gloves": {
+        "name": "Gants du Voile cendré"
+      },
+      "ashveil_legs": {
+        "name": "Braies du Voile cendré"
+      },
+      "emberscreed_helmet": {
+        "name": "Capuche du Credo des braises"
+      },
+      "emberscreed_shoulder": {
+        "name": "Mantelet du Credo des braises"
+      },
+      "emberscreed_chest": {
+        "name": "Robe du Credo des braises"
+      },
+      "emberscreed_gloves": {
+        "name": "Brassards du Credo des braises"
+      },
+      "emberscreed_legs": {
+        "name": "Jambières du Credo des braises"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Capuche de tissage d’aurore"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Mantelet de tissage d’aurore"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Robe de tissage d’aurore"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Bandages de tissage d’aurore"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Jambières de tissage d’aurore"
+      },
+      "vesperash_helmet": {
+        "name": "Capuche de Cendre-du-soir"
+      },
+      "vesperash_shoulder": {
+        "name": "Mantelet de Cendre-du-soir"
+      },
+      "vesperash_chest": {
+        "name": "Robe de Cendre-du-soir"
+      },
+      "vesperash_gloves": {
+        "name": "Bandages de Cendre-du-soir"
+      },
+      "vesperash_legs": {
+        "name": "Jambières de Cendre-du-soir"
+      },
+      "stormkindled_helmet": {
+        "name": "Heaume de l’Embrasé-de-tempête"
+      },
+      "stormkindled_shoulder": {
+        "name": "Spallières de l’Embrasé-de-tempête"
+      },
+      "stormkindled_chest": {
+        "name": "Haubert de l’Embrasé-de-tempête"
+      },
+      "stormkindled_gloves": {
+        "name": "Gantelets de l’Embrasé-de-tempête"
+      },
+      "stormkindled_legs": {
+        "name": "Jambières de l’Embrasé-de-tempête"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Heaume d’Écailles-de-braise"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Spallières d’Écailles-de-braise"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Haubert d’Écailles-de-braise"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Gantelets d’Écailles-de-braise"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Jambières d’Écailles-de-braise"
+      },
+      "stonehearth_helmet": {
+        "name": "Heaume du Cœur-de-pierre"
+      },
+      "stonehearth_shoulder": {
+        "name": "Spallières du Cœur-de-pierre"
+      },
+      "stonehearth_chest": {
+        "name": "Haubert du Cœur-de-pierre"
+      },
+      "stonehearth_gloves": {
+        "name": "Gantelets du Cœur-de-pierre"
+      },
+      "stonehearth_legs": {
+        "name": "Jambières du Cœur-de-pierre"
+      },
+      "springmender_helmet": {
+        "name": "Heaume du Réparateur-de-source"
+      },
+      "springmender_shoulder": {
+        "name": "Spallières du Réparateur-de-source"
+      },
+      "springmender_chest": {
+        "name": "Haubert du Réparateur-de-source"
+      },
+      "springmender_gloves": {
+        "name": "Gantelets du Réparateur-de-source"
+      },
+      "springmender_legs": {
+        "name": "Jambières du Réparateur-de-source"
+      },
+      "chronoweave_helmet": {
+        "name": "Capuche de tissage d’éther"
+      },
+      "chronoweave_shoulder": {
+        "name": "Mantelet de tissage d’éther"
+      },
+      "chronoweave_chest": {
+        "name": "Robe de tissage d’éther"
+      },
+      "chronoweave_gloves": {
+        "name": "Bandages de tissage d’éther"
+      },
+      "chronoweave_legs": {
+        "name": "Jambières de tissage d’éther"
+      },
+      "pyroclast_helmet": {
+        "name": "Capuche du Pyroclaste"
+      },
+      "pyroclast_shoulder": {
+        "name": "Mantelet du Pyroclaste"
+      },
+      "pyroclast_chest": {
+        "name": "Robe du Pyroclaste"
+      },
+      "pyroclast_gloves": {
+        "name": "Poignes du Pyroclaste"
+      },
+      "pyroclast_legs": {
+        "name": "Jambières du Pyroclaste"
+      },
+      "frostquench_helmet": {
+        "name": "Capuche de l’Extinction glaciale"
+      },
+      "frostquench_shoulder": {
+        "name": "Mantelet de l’Extinction glaciale"
+      },
+      "frostquench_chest": {
+        "name": "Robe de l’Extinction glaciale"
+      },
+      "frostquench_gloves": {
+        "name": "Brassards de l’Extinction glaciale"
+      },
+      "frostquench_legs": {
+        "name": "Jambières de l’Extinction glaciale"
+      },
+      "hexthread_helmet": {
+        "name": "Capuche du Fil ensorcelé"
+      },
+      "hexthread_shoulder": {
+        "name": "Mantelet du Fil ensorcelé"
+      },
+      "hexthread_chest": {
+        "name": "Robe du Fil ensorcelé"
+      },
+      "hexthread_gloves": {
+        "name": "Brassards du Fil ensorcelé"
+      },
+      "hexthread_legs": {
+        "name": "Jambières du Fil ensorcelé"
+      },
+      "gravebrand_helmet": {
+        "name": "Capuche de la Marque funeste"
+      },
+      "gravebrand_shoulder": {
+        "name": "Mantelet de la Marque funeste"
+      },
+      "gravebrand_chest": {
+        "name": "Robe de la Marque funeste"
+      },
+      "gravebrand_gloves": {
+        "name": "Brassards de la Marque funeste"
+      },
+      "gravebrand_legs": {
+        "name": "Jambières de la Marque funeste"
+      },
+      "ruincaller_helmet": {
+        "name": "Capuche du Crieur de ruines"
+      },
+      "ruincaller_shoulder": {
+        "name": "Mantelet du Crieur de ruines"
+      },
+      "ruincaller_chest": {
+        "name": "Robe du Crieur de ruines"
+      },
+      "ruincaller_gloves": {
+        "name": "Poignes du Crieur de ruines"
+      },
+      "ruincaller_legs": {
+        "name": "Jambières du Crieur de ruines"
+      },
+      "moonscorch_helmet": {
+        "name": "Capuche de la Brûlure lunaire"
+      },
+      "moonscorch_shoulder": {
+        "name": "Épaulières de la Brûlure lunaire"
+      },
+      "moonscorch_chest": {
+        "name": "Tunique de la Brûlure lunaire"
+      },
+      "moonscorch_gloves": {
+        "name": "Poignes de la Brûlure lunaire"
+      },
+      "moonscorch_legs": {
+        "name": "Culotte de la Brûlure lunaire"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Capuche du Croc-sauvage"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Spallières du Croc-sauvage"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Tunique du Croc-sauvage"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Poignes du Croc-sauvage"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Culotte du Croc-sauvage"
+      },
+      "cinderbark_helmet": {
+        "name": "Capuchon d’écorce cendrée"
+      },
+      "cinderbark_shoulder": {
+        "name": "Spallières d’écorce cendrée"
+      },
+      "cinderbark_chest": {
+        "name": "Tunique d’écorce cendrée"
+      },
+      "cinderbark_gloves": {
+        "name": "Gants d’écorce cendrée"
+      },
+      "cinderbark_legs": {
+        "name": "Braies d’écorce cendrée"
+      },
+      "grovespring_helmet": {
+        "name": "Capuche de la Source des bosquets"
+      },
+      "grovespring_shoulder": {
+        "name": "Épaulières de la Source des bosquets"
+      },
+      "grovespring_chest": {
+        "name": "Tunique de la Source des bosquets"
+      },
+      "grovespring_gloves": {
+        "name": "Poignes de la Source des bosquets"
+      },
+      "grovespring_legs": {
+        "name": "Culotte de la Source des bosquets"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Sceau de heaume de l'Enclume"
+      },
+      "sigil_ember_helmet": {
+        "name": "Sceau de heaume des Braises"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Sceau de heaume de la Tempête"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Sceau de mantelet de l'Enclume"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Sceau de mantelet des Braises"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Sceau de mantelet de la Tempête"
+      },
+      "sigil_anvil_chest": {
+        "name": "Sceau de robe de l'Enclume"
+      },
+      "sigil_ember_chest": {
+        "name": "Sceau de robe des Braises"
+      },
+      "sigil_tempest_chest": {
+        "name": "Sceau de robe de la Tempête"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Sceau de poignes de l'Enclume"
+      },
+      "sigil_ember_gloves": {
+        "name": "Sceau de poignes des Braises"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Sceau de poignes de la Tempête"
+      },
+      "sigil_anvil_legs": {
+        "name": "Sceau de jambières de l'Enclume"
+      },
+      "sigil_ember_legs": {
+        "name": "Sceau de jambières des Braises"
+      },
+      "sigil_tempest_legs": {
+        "name": "Sceau de jambières de la Tempête"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Cordon de la Dernière Flamme"
+      },
+      "cindersoaked_slippers": {
+        "name": "Pantoufles imbibées de cendres"
+      },
+      "springbinder_sash": {
+        "name": "Ceinture du Lie-source"
+      },
+      "steps_of_quiet_water": {
+        "name": "Pas de l’Eau paisible"
+      },
+      "cinderbark_cinch": {
+        "name": "Sangle d’écorce cendrée"
+      },
+      "ashenbark_treads": {
+        "name": "Bottes d’écorce cendrée"
+      },
+      "slagstalker_belt": {
+        "name": "Ceinture du Traque-scorie"
+      },
+      "ashrunner_boots": {
+        "name": "Bottes du Coureur de cendres"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Bande de taille de la Brûlure lunaire"
+      },
+      "scorchgrove_striders": {
+        "name": "Bottes de Scorchgrove"
+      },
+      "grovetender_belt": {
+        "name": "Ceinture du Gardien des bosquets"
+      },
+      "dewfall_moccasins": {
+        "name": "Mocassins de Rosée tombante"
+      },
+      "forgewall_girdle": {
+        "name": "Ceinturon du Rempart de forge"
+      },
+      "anvilstance_sabatons": {
+        "name": "Sabatons de posture d’enclume"
+      },
+      "warforged_waistguard": {
+        "name": "Garde-taille forgé-de-guerre"
+      },
+      "furnace_march_greaves": {
+        "name": "Grèves de la Marche du fourneau"
+      },
+      "stormkindled_chain": {
+        "name": "Chaîne de l’Embrasé-de-tempête"
+      },
+      "thundershock_treads": {
+        "name": "Brodequins du Choc-tonnerre"
+      },
+      "tidebinder_links": {
+        "name": "Maillons du Lie-marée"
+      },
+      "springwarden_sabatons": {
+        "name": "Sabatons du Gardien-de-source"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Pendentif de la première trempe"
+      },
+      "ignivars_ember_choker": {
+        "name": "Torque de braises d’Ignivar"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Médaillon de la Dernière Flamme"
+      },
+      "heartspring_amulet": {
+        "name": "Amulette de la Source du cœur"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Sceau du Mur-forge"
+      },
+      "band_of_marked_strikes": {
+        "name": "Anneau des frappes marquées"
+      },
+      "circle_of_cinders": {
+        "name": "Cercle des cendres"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Anneau des Sources paisibles"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Rempart du Creuset intérieur"
+      },
+      "ember_wardens_barrier": {
+        "name": "Barrière du Gardien des Braises"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Orbe de la Dernière Source"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Suintement du Premier dessein"
+      },
+      "forgefathers_warhammer": {
+        "name": "Marteau de guerre du Père de la forge"
+      },
+      "cinderfang_kris": {
+        "name": "Kris du Croc cendré"
+      },
+      "slagrender_cleaver": {
+        "name": "Couperet Tranche-scorie"
+      },
+      "anvilguard_blade": {
+        "name": "Lame de garde-enclume"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Grande lame du Cœur de la Fin"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Bâton de la Dernière Source"
+      },
+      "forgefire_spire": {
+        "name": "Flèche du Feu de forge"
+      },
+      "springtouched_crozier": {
+        "name": "Crosse touchée par la source"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Baguette des Étincelles éteintes"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -13647,6 +14668,12 @@ export const fr_FR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Rênes de Pavane-Tonnerre, le Grand Dindon"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Brise-forge, engin de Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Garde-braise, rempart de Varkhul"
       }
     },
     "mobs": {
@@ -13841,6 +14868,27 @@ export const fr_FR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, héraut de la Dernière Flamme"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Ignivar, le Crieur de cendres"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Sentinelle de braise"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Gardien du Creuset"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Artificier de cendre"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, père de la forge de la Dernière Flamme"
+      },
+      "derelict_mech": {
+        "name": "Méca abandonné"
       },
       "reliquary_ledger_wraith": {
         "name": "Spectre du registre"
@@ -14501,6 +15549,21 @@ export const fr_FR: EnTranslations = {
         "name": "Frère Aldric",
         "title": "Prêtre du Val",
         "greeting": "D'un cimetière de chapelle au toit du monde... la piste s'achève ici. Je sens la montagne écouter."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archiviste Maelin Garde-braise",
+        "title": "Archiviste du Creuset",
+        "greeting": "Chaque marque de marteau en ce lieu est une phrase. Aidez-moi à lire ce que Varkhul a tenté de cacher."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Projection de braise de Maelin",
+        "title": "Projection de braise",
+        "greeting": "Les braises portent la voix de Maelin à travers la forge."
+      },
+      "crucible_quartermaster": {
+        "name": "Intendant Bronn Garde-braise",
+        "title": "Intendant du Creuset",
+        "greeting": "La forge reconnaît les siens. Apportez-moi un insigne du Creuset et je vous équiperai pour la guerre."
       },
       "brother_halven": {
         "name": "Frère Halven",
@@ -15647,6 +16710,39 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis vaincu"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Échos dans le fer",
+        "text": "Ces automates ne sont pas des soldats. Ce sont des ébauches. Brisez chaque chaîne d’assemblage et écoutez lorsque la dernière carapace tombe. La forge se souvient de ce que Varkhul a tenté d’effacer.",
+        "completion": "Les échos concordent. Varkhul a lié l’eau de la Dernière Source mourante au métal vivant. Ces automates étaient des trempes ratées. Seul Ignivar a résisté.",
+        "objectives": {
+          "0": {
+            "label": "Sentinelles de braise détruites"
+          },
+          "1": {
+            "label": "Gardiens du Creuset détruits"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "Le cœur du héraut",
+        "text": "Le survivant nommé dans chaque écho est Ignivar. Varkhul l’appelait héraut, sceau et clé. Vainquez-le. Si les archives disent vrai, sa mort révélera ce qu’il avait été forgé à garder.",
+        "completion": "Ignivar n’a jamais été un simple gardien. Son cœur était la clé, et ses dernières plaques ont ouvert le Creuset scellé en contrebas.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar vaincu"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "Le père de la forge",
+        "text": "Le chemin en contrebas mène à Varkhul, père de la forge de la Dernière Flamme. Il a emprisonné la Dernière Source pour donner vie au métal, puis a forgé Ignivar afin de garder son crime scellé. Entrez dans le Creuset intérieur et mettez fin à son œuvre.",
+        "completion": "La forge est enfin silencieuse. La source pourrait ne jamais se rétablir, mais Varkhul ne transformera plus de vies en chaînes.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul vaincu"
           }
         }
       },
@@ -17527,6 +18623,31 @@ export const fr_FR: EnTranslations = {
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
       },
+      "ignivar_forge_lift": {
+        "name": "Le monte-forge",
+        "enterText": "Le monte-forge tremble et descend ; le fracas des marteaux monte à votre rencontre.",
+        "leaveText": "Le monte-charge vous ramène à l’air libre du donjon."
+      },
+      "ignivar_forge_approach": {
+        "name": "Salles de la Première Trempe",
+        "enterText": "Le fracas des marteaux résonne dans les salles de la Première Trempe.",
+        "leaveText": "Vous vous éloignez de la première forge et respirez à nouveau librement."
+      },
+      "ignivar_raid_arena": {
+        "name": "Creuset de la Dernière Source",
+        "enterText": "La chaleur scintille au-dessus des eaux scellées du Creuset.",
+        "leaveText": "Vous vous éloignez du Creuset et respirez à nouveau librement."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Assemblage en fusion",
+        "enterText": "La porte ouverte mène à une salle d’assemblage en fusion.",
+        "leaveText": "Vous quittez la chaîne d’assemblage et retournez au Creuset."
+      },
+      "ignivar_inner_crucible": {
+        "name": "Le Creuset intérieur",
+        "enterText": "La porte ouverte mène plus profondément dans le Creuset.",
+        "leaveText": "Vous quittez les profondeurs silencieuses du Creuset."
+      },
       "wildheart_basin": {
         "name": "Le Bassin du Cœur Sauvage",
         "enterText": "Une pluie tiède crépite sur la pierre ancienne. The Wildheart Basin s'ouvre devant vous.",
@@ -17758,53 +18879,183 @@ export const fr_FR: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "Tenue du Voile cendré",
+        "bonus2": "La Frappe du rôdeur inflige 25 % de dégâts supplémentaires.",
+        "bonus4": "Votre coup de Lame voilée inflige trois fois plus de dégâts au lieu de deux fois."
+      },
+      "benison_dawnweave": {
+        "name": "Bénédiction tissée d’aurore",
+        "bonus2": "Le sauvetage de Vigilance séraphique rend 270 points de vie au lieu de 180. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s."
+      },
       "boundstone_vanguard": {
         "name": "Avant-garde de pierre-liée",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
       },
+      "chronoweave": {
+        "name": "Vêtements tissés d’éther",
+        "bonus2": "Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Le temps de recharge de Cascade temporelle est réduit de 5 s."
+      },
+      "cinderbark": {
+        "name": "Égide d’écorce cendrée",
+        "bonus2": "Griffes balayantes a 30 % de chances d’emmagasiner un Sang ancien supplémentaire.",
+        "bonus4": "Brise-moelle inflige 30 % de dégâts supplémentaires, et la garde d’urgence ne remplace plus l’attaque."
+      },
+      "cinderfang": {
+        "name": "Linceul du Croc cendré",
+        "bonus2": "Le remboursement d’énergie du Rituel venimeux passe à 20 par générateur.",
+        "bonus4": "Le temps de recharge de Fléchette venimeuse passe à 4 s."
+      },
+      "coldsight_trackers": {
+        "name": "Traqueurs de vision froide",
+        "bonus2": "Tir mesuré rend 5 points de Concentration supplémentaires.",
+        "bonus4": "Les coups critiques de Longue tension prolongent Concentration froide de 2 s, jusqu’à 6 s par activation."
+      },
       "crownforged": {
         "name": "Tenue d'apparat Bonewrought",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente la force de 15, l'endurance de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 % et le Toucher de 3 %. Vos coups critiques d’arme fendent la cible avec Fendos, lui infligeant 5 points de dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois."
+      },
+      "dawnforged": {
+        "name": "Vêtements forgés à l’aube",
+        "bonus2": "Le Phare de lumière copie 55 % de vos soins directs. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "L’Étreinte de l’aube renforcée par Résonance radieuse est instantanée."
       },
       "deathlord": {
         "name": "Tenue de guerre de Barrowlord",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente la force de 15 et l'endurance de 15.",
-        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Puissance sépulcrale, augmentant la puissance d'attaque de 60 pendant 10 s."
+        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Puissance sépulcrale, augmentant la puissance d'attaque de 60 pendant 10 s.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 % et le Toucher de 3 %. Vos coups critiques d’arme fendent la cible avec Fendos, lui infligeant 5 points de dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois."
+      },
+      "emberfury": {
+        "name": "Harnais de fureur des braises",
+        "bonus2": "Votre Enrager dure 6 s au lieu de 4.",
+        "bonus4": "Saignée vous met toujours en rage et ses soins passent à 8 % de votre santé maximale."
+      },
+      "emberscreed": {
+        "name": "Vêtements du Credo des braises",
+        "bonus2": "Votre lien de Doctrine convertit 10 % supplémentaires de vos dégâts du Sacré en soins. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Quand votre Psaume de protection est entièrement consommé, votre prochain Hymne de purification sous 10 s est instantané. Ne peut se produire plus d’une fois toutes les 15 s."
+      },
+      "forgewall": {
+        "name": "Égide du Mur de forge",
+        "bonus2": "Résolution de fer convertit la rage à raison de 5 points d’absorption par point au lieu de 4.",
+        "bonus4": "Lancer Brise-bouclier réduit le temps de recharge restant de Résolution de fer de 2 s."
+      },
+      "frostquench": {
+        "name": "Tissage de givre éteint",
+        "bonus2": "Les coups critiques de Lancegivre stockent un Glaçon supplémentaire, jusqu’à un maximum de 5. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Déferlante hivernale applique 3 charges de Froid de l’hiver, au lieu de 2."
+      },
+      "gravebrand": {
+        "name": "Régalia de la marque funèbre",
+        "bonus2": "Le temps de recharge de Commandement faucheur est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Les frappes à l’unisson de Commandement faucheur infligent 25 % de dégâts supplémentaires."
       },
       "greyjaw_stalker": {
         "name": "Équipement du traqueur de Greyjaw",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
       },
+      "grovespring": {
+        "name": "Habillement de la Source sylvestre",
+        "bonus2": "Rétablissement rapide consomme d’abord votre Floraison sauvage ou Seconde floraison et soigne 25 % davantage. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure."
+      },
+      "hexthread": {
+        "name": "Linceul de fil maudit",
+        "bonus2": "Aiguille du destin confère 2 Condamnations supplémentaires. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Sentence rend 10 points de Condamnation."
+      },
+      "moonscorch": {
+        "name": "Habillement de brûlure lunaire",
+        "bonus2": "Graine lunaire peut prolonger Tempête lunaire deux fois par application, jusqu’à un maximum de 12 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Raz-de-lune et Éveil solaire infligent 25 % de dégâts supplémentaires."
+      },
       "necromancers": {
         "name": "Parure de Mournweave",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 10 et l'endurance de 10.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 %. Vos sorts ont 10 % de chances de conférer Brasâme, augmentant la puissance des sorts de 25 pendant 10 s."
       },
       "nighttalon": {
         "name": "Peau de Direfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 % et le Toucher de 3 %. Vos coups critiques d’arme ouvrent une Entaille déchirée, faisant saigner la cible de 4 dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois."
+      },
+      "oathpyre": {
+        "name": "Bastion du bûcher des serments",
+        "bonus2": "Les chances que Frappe du Gardien du serment arme Représailles solaires passent à 30 %, et bloquer une attaque l’arme 40 % du temps.",
+        "bonus4": "Consommer Représailles solaires vous protège à hauteur de 6 % de votre santé maximale pendant 10 s."
+      },
+      "packlord_emberhide": {
+        "name": "Peau-de-braise du Seigneur de meute",
+        "bonus2": "Le temps de recharge de Commandement de meute passe à 3 s.",
+        "bonus4": "Les chances que Commandement de meute réinitialise le temps de recharge de Piétinement passent à 30 %."
+      },
+      "pyroclast": {
+        "name": "Régalia de la Pyroclaste",
+        "bonus2": "Brûlure inflige toujours un coup critique aux cibles à 35 % de santé ou moins. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Les coups critiques de vos sorts de Feu hors Transe du phénix réduisent son temps de recharge restant de 1,5 s."
+      },
+      "ruincaller": {
+        "name": "Vêtements de l’Appel-des-ruines",
+        "bonus2": "Conflagration possède 3 charges. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Trait de ruine inflige 20 % de dégâts supplémentaires."
+      },
+      "slagbreaker": {
+        "name": "Armure de Brise-scories",
+        "bonus2": "Rougebraise renforce votre prochaine Frappe mutilante de 30 % par charge au lieu de 20.",
+        "bonus4": "Une incantation sur deux de Main rouge réduit de 3 s le temps de recharge restant de Brise-faille."
+      },
+      "slagsnare": {
+        "name": "Atours du Piège de scories",
+        "bonus2": "Frappe éventreuse génère 20 points de Concentration.",
+        "bonus4": "Déchirure qui consomme 3 Élan de chasse les conserve. Ne peut se produire plus d’une fois toutes les 8 s."
+      },
+      "smolderstrike": {
+        "name": "Cuirasse de frappe fumante",
+        "bonus2": "Coup au corps inflige 20 % de dégâts supplémentaires.",
+        "bonus4": "Extinction rembourse 6 s du temps de recharge restant de Lames miroitantes."
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 %. Vos sorts ont 10 % de chances de conférer Brasâme, augmentant la puissance des sorts de 25 pendant 10 s."
+      },
+      "springmender": {
+        "name": "Écailles du Soigneur printanier",
+        "bonus2": "Le temps de recharge d’Appel des marées est réduit de 4 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Soin en cascade atteint un quatrième allié et récolte les Courants guérisseurs à 150 %."
+      },
+      "stonehearth": {
+        "name": "Bastion du Cœur de pierre",
+        "bonus2": "Sous Peau de pierre, Eaux guérisseuses foudroyantes ne coûte pas de mana et soigne 25 % davantage.",
+        "bonus4": "Sous Peau de pierre, terminer une cadence vous soigne de 3 % de votre santé maximale."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 %. Vos sorts ont 10 % de chances de conférer Brasâme, augmentant la puissance des sorts de 25 pendant 10 s."
+      },
+      "stormkindled": {
+        "name": "Régalia embrasée par la tempête",
+        "bonus2": "Arme déchaînée sur Brûle-bûcher confère 3 points de Tonnerre. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Le bonus de Secousse tellurique par point de Tonnerre passe à 30 %."
       },
       "vale_arcanist": {
         "name": "Tenue de l'arcaniste du Val",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
+      },
+      "vesperash": {
+        "name": "Linceul de cendre vespérale",
+        "bonus2": "Le temps de recharge d’Appel du Démoneur est réduit de 6 s. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Appeler votre Démoneur réinitialise le temps de recharge de Fracture mentale, et le démon rend deux fois plus de mana par coup."
       },
       "warfare_ashstalker": {
         "name": "Équipement du traque-cendres",
@@ -17836,11 +19087,26 @@ export const fr_FR: EnTranslations = {
         "bonus4": "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
         "bonus7": "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Vos sorts ont 15% de chances d'accorder Garde d'épines, augmentant l'esquive de 15% pendant 6 s."
       },
+      "warspirit_emberscale": {
+        "name": "Écailles de braise de l’Esprit guerrier",
+        "bonus2": "Frappe ancestrale fait avancer votre cadence de 3 étapes.",
+        "bonus4": "Frappe ancestrale inflige 30 % de dégâts supplémentaires."
+      },
+      "wildfang_emberhide": {
+        "name": "Peau de braise du Croc sauvage",
+        "bonus2": "Moisson rouge rend 45 points d’énergie, contre 30 auparavant.",
+        "bonus4": "Moisson rouge applique un nouveau Dépeçage à la cible."
+      },
       "wyrmshadow": {
         "name": "Vêtements de Nightfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%.",
-        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Ruée des crocs, augmentant la vitesse d'attaque de 25% pendant 8 s."
+        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Ruée des crocs, augmentant la vitesse d'attaque de 25% pendant 8 s.",
+        "bonus6": "Augmente la vitesse d’attaque et d’incantation de 4 % et les chances de toucher de 3 %. Vos coups critiques avec une arme infligent une Entaille irrégulière, faisant saigner la cible de 4 points de dégâts toutes les 2 s pendant 12 s. Cumulable jusqu’à 3 fois."
+      },
+      "zealfire": {
+        "name": "Cuirasse de feu zélé",
+        "bonus2": "Édit final et Chute de l’aube réduisent chacun le temps de recharge restant de l’autre de 3 s au lieu de 2.",
+        "bonus4": "Marteau du courroux lancé sous Courroux de l’aube inflige 40 % de dégâts supplémentaires, au lieu de 20."
       }
     }
   },

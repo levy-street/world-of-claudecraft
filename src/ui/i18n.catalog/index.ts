@@ -171,7 +171,8 @@ export const en = {
       },
       biskit: {
         label: 'Equip BIS-20 kit',
-        description: 'Wear the best-in-slot epic set for a spec across every slot. Gear only.',
+        description:
+          'Wear the strongest complete raid-parse loadout observed for a spec. Gear only.',
       },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
@@ -659,6 +660,16 @@ export const en = {
     unlink: 'Unlink',
     unlinkTitle: 'Remove wallet verification from this account',
     unlinkAria: 'Remove wallet verification from this account',
+    // The R11 re-auth prompt (src/ui/wallet_reauth_prompt.ts): changing or
+    // removing a linked wallet asks for the account password first.
+    reauthTitle: 'Confirm wallet change',
+    reauthUnlinkTitle: 'Confirm wallet removal',
+    reauthHelp: 'For your security, enter your account password to authorize this change.',
+    reauthNoPassword:
+      'This account signs in without a password. Set a password in account settings first, then try again.',
+    reauthConfirm: 'Confirm',
+    reauthCancel: 'Cancel',
+    reauthClose: 'Close',
     signOut: 'Disconnect',
     signOutTitle: 'Disconnect the wallet app on this browser',
     signOutAria: 'Disconnect the wallet app on this browser',
@@ -732,6 +743,8 @@ export const en = {
         'Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.',
       paymentBody:
         'Choose the wallet linked to your account and approve the transaction in this browser.',
+      stepUpBody:
+        'Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.',
       extensionHelp:
         'No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.',
       safety: 'World of ClaudeCraft never asks for your recovery phrase or private key.',
@@ -1115,6 +1128,34 @@ export const en = {
     buyConfirmTitle: 'Confirm Purchase',
     buyConfirmBody: 'Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.',
     buyConfirmAccept: 'Buy',
+    buyConfirmCancel: 'Cancel',
+  },
+  crucibleShop: {
+    // The Crucible Quartermaster window (Ignivar raid sigil redemption):
+    // title/close reuse the vendor keys; only the sigil-specific strings live
+    // here. {list} is the viewer's held sigils with counts; {sigil} is the
+    // one token a row costs.
+    // The gossip-dialog row label: its OWN copy (never "Browse Goods"), since
+    // a redemption counter is not a goods grid.
+    browse: 'Redeem Sigils',
+    browseAria: 'Redeem Crucible sigils with {name}',
+    // The zero-rows arm of the shop grid; unreachable while every class has
+    // sets, but a silently empty panel is the worse failure mode.
+    empty: 'No set pieces are redeemable for your class.',
+    balance: 'Your sigils: {list}',
+    // One held-sigil entry inside {list}: the window composes each through
+    // this key and joins them with formatList, so a locale can reorder the
+    // count and name and keep its own list punctuation (the
+    // hudChrome.enchanting.replaceConfirmCostItem pattern).
+    balanceEntry: '{name} x{count}',
+    noSigils: 'You hold no Crucible sigils.',
+    price: '1 {sigil}',
+    buyAria: 'Redeem {sigil} for {item}',
+    // Confirm dialog gating each redemption: a consumed sigil records no
+    // buyback, so a mis-tap would be unrefundable without it.
+    buyConfirmTitle: 'Confirm Redemption',
+    buyConfirmBody: 'Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.',
+    buyConfirmAccept: 'Redeem',
     buyConfirmCancel: 'Cancel',
   },
   // The Card Master window (Card Duel minigame): queue join/leave affordance
@@ -1691,6 +1732,10 @@ export const en = {
       reins_shadowjump_toad: { name: 'Reins of Kama-Kage the Shadow-Jump Toad' },
       reins_stormfeather_griffin: { name: 'Reins of the Sky-Reach Stormfeather' },
       reins_thunderstrut_gobbler: { name: 'Reins of Thunderstrut the Grand Gobbler' },
+      // Ignivar raid legendary drops (Varkhul the Forgefather); dev-give-only
+      // until the raid loot pass wires them.
+      varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },
+      varkhul_emberward: { name: 'Emberward, Bulwark of Varkhul' },
     },
     itemSets: itemSetEntityText,
     mobs: {

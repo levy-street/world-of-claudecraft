@@ -1145,6 +1145,13 @@
     overflow-wrap: anywhere;
     text-shadow: 1px 1px 1px #000;
   }
+  /* Bind-on-pickup note under the item name on a roll prompt: the soulbound
+     gold the item tooltip's bound lines use, small so the name stays primary. */
+  .loot-roll-bind {
+    color: var(--gold);
+    font-size: 11px;
+    text-shadow: 1px 1px 1px #000;
+  }
   .loot-roll-timer {
     height: 7px;
     margin: 7px 0;
@@ -2002,6 +2009,10 @@
     padding: 0 12px;
     border-bottom: 1px solid var(--color-border-showcase);
   }
+  .woc-store-tablist {
+    display: flex;
+    gap: 2px;
+  }
   .woc-store-tabs button {
     min-height: 42px;
     padding: 0 18px;
@@ -2019,7 +2030,7 @@
     border-bottom-color: #c8a34a;
   }
   .woc-store-tabs button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: -2px;
   }
   .woc-store-loading {
@@ -2242,7 +2253,7 @@
   }
   .woc-store-card button:focus-visible,
   .woc-store-balance button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .woc-store-card button img {
@@ -2685,6 +2696,149 @@
   .armory-equip-hint {
     color: var(--color-text-muted);
     font-size: 11.5px;
+  }
+  /* Strongbox Charters: the Claudium bank-slot category, painted under the
+     Armory sections. Four cards at most, so the grid is auto-fit rather than
+     the Armory's fixed column count. Every fact a buyer needs (name, slot
+     grant, price or unavailable) is always-visible text, never hover-only. */
+  .charter-section {
+    margin: 18px 0 4px;
+  }
+  .charter-section > header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-bottom: none;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-accent) 14%, transparent),
+      transparent
+    );
+  }
+  .charter-section > header span {
+    color: var(--color-accent);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .charter-section > header h3 {
+    margin: 2px 0 0;
+    font-size: 15px;
+  }
+  .charter-body {
+    padding: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-top: 1px solid color-mix(in srgb, var(--color-text-light) 10%, transparent);
+    background: var(--panel-base);
+  }
+  .charter-scope {
+    margin: 0 0 10px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .charter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+  }
+  .charter-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--color-primary-dim);
+    background: color-mix(in srgb, var(--panel-base) 86%, var(--panel-edge));
+  }
+  .charter-card h4 {
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 14px;
+    line-height: 1.25;
+  }
+  .charter-grant {
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+  }
+  .charter-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    color: var(--color-accent);
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .charter-cost img {
+    width: 18px;
+    height: 18px;
+  }
+  .charter-cost.unavailable {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .charter-buy {
+    /* 40px is the comfortable pointer floor; hud.mobile.css raises it to 44 for
+       thumbs. The 36px it replaced was below the floor on desktop too. */
+    min-height: 40px;
+    border: 1px solid var(--color-primary-dim);
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-primary) 38%, var(--panel-base)),
+      color-mix(in srgb, var(--color-primary-dim) 20%, var(--panel-edge))
+    );
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .charter-buy:hover:not(:disabled) {
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-primary) 48%, var(--panel-base)),
+      color-mix(in srgb, var(--color-primary-dim) 28%, var(--panel-edge))
+    );
+  }
+  .charter-buy:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .charter-buy:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .charter-disclaimer {
+    margin: 10px 0 0;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .charter-empty {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  /* The scope line rides the empty arm too (it carries the gold pointer, which
+     is most useful exactly where no charter fits), so it needs its bottom
+     margin dropped there or the body ends on dead space. */
+  .charter-empty + .charter-scope {
+    margin-bottom: 0;
+    margin-top: 6px;
+  }
+  .charter-notice.success {
+    border-color: color-mix(in srgb, var(--color-text-success) 55%, transparent);
+    color: var(--color-text-success);
+    background: color-mix(in srgb, var(--color-text-success) 10%, transparent);
+  }
+  /* The failure tone was emitted with no rule of its own, so it rendered as the
+     neutral notice and read identically to a success. */
+  .charter-notice.failure {
+    border-color: color-mix(in srgb, var(--color-text-error) 55%, transparent);
+    color: var(--color-text-error);
+    background: color-mix(in srgb, var(--color-text-error) 12%, transparent);
   }
   /* Title subtitle ("Lifetime XP, realm"): the muted-gold token + 11px the painter
      used to set with an inline style (keeps the literals out of TS). */
@@ -5006,6 +5160,103 @@
     }
   }
 
+  /* Store-owned decision prompt: mounted in #prompt-stack, above the Armory
+     inspector, while the Store root is inert. The generic #confirm-dialog
+     geometry assumes a body-level window, so this scoped rule resets it to a
+     normal stack child. */
+  #prompt-stack .woc-store-prompt {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(380px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 18px;
+    transform: none;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .woc-store-prompt .prompt-text {
+    padding-right: 38px;
+    margin-bottom: 8px;
+    color: var(--color-accent);
+    font-family: var(--title-font);
+    font-size: 15px;
+  }
+  .woc-store-prompt-body {
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .woc-store-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .woc-store-prompt-close,
+  .woc-store-global-result button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--panel-base) 85%, var(--panel-edge));
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+  }
+  .woc-store-prompt-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+  .woc-store-prompt-close .ui-icon,
+  .woc-store-global-result .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .woc-store-prompt-confirm {
+    border-color: var(--color-primary-dim);
+    color: var(--color-accent);
+  }
+  .woc-store-global-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(440px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    font: 13px / 1.45 var(--ui-font);
+  }
+  .woc-store-global-result > span {
+    flex: 1 1 auto;
+  }
+  /* The mobile HUD deliberately makes #prompt-stack click-through and restores
+     hits only on `.prompt`; this nonmodal status is not a dialog, so opt its
+     own dismiss action back into pointer input without misrepresenting it. */
+  body.mobile-touch #prompt-stack .woc-store-global-result {
+    pointer-events: auto;
+  }
+  .woc-store-global-result.success {
+    border-color: var(--color-text-success);
+  }
+  .woc-store-global-result.failure {
+    border-color: var(--color-text-error);
+  }
+  @media (pointer: coarse) {
+    .woc-store-prompt-close,
+    .woc-store-prompt-actions .btn,
+    .woc-store-global-result button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
   .native-update-backdrop {
     position: fixed;
     inset: 0;
@@ -5974,6 +6225,12 @@
   .crafting-fine-sub {
     color: var(--gold-dim);
   }
+  /* The craft-from-vault suffix (Bank Storage Phase 04): same rule as the
+     fine-substitution tint above, a tint over words that already carry the
+     signal, never the signal itself. */
+  .crafting-vault-draw {
+    color: var(--gold-dim);
+  }
   /* The Craft affordance chip: the gold-gradient primary the mailbox send
      button established. It is decoration inside the row-button (the whole row
      is the target); disabled rows desaturate it through the button opacity. */
@@ -6174,6 +6431,17 @@
     flex: 1 0 100%;
     margin: 0;
     padding: 4px 10px 7px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+  /* The place-blocked vault note (Phase 04 QA): the muted note voice of the
+     combo/station family, with its OWN rule because the family selector
+     above is direct-child scoped to the recipe item and the note is a
+     window-level sibling of the scroll body. */
+  .crafting-vault-note {
+    flex: none;
+    padding: 4px 10px 0;
     color: var(--color-text-muted);
     font-size: 10.5px;
     line-height: 1.35;
@@ -6721,7 +6989,7 @@
     background: #4ac9ef28;
   }
   .claudium-launcher:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .claudium-coin {
@@ -6868,6 +7136,7 @@
      the named kinds below. Always visible on the cell itself on desktop and
      touch (information-add, identical on every graphics preset, so no --fx-*
      gate). Top-left, clear of the bottom-right count badge. */
+  .vault-row .bi-instance,
   .bag-item .bi-instance,
   .bank-item .bi-instance {
     position: absolute;
@@ -6893,6 +7162,7 @@
      masterwork or fine stack keeps the mark bags gave it (marks are an
      all-surfaces family, see item_instance_glyph_mark.ts). Only the quest
      seal stays bag-only: quest items cannot enter either bank. */
+  .vault-row .bi-glyph,
   .bag-item .bi-glyph,
   .bank-item .bi-glyph,
   .bag-item .bi-quest-seal,
@@ -6907,7 +7177,9 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 1px #000);
   }
+  .vault-row .bi-glyph .ui-icon,
   .bag-item .bi-glyph .ui-icon,
+  .vault-row .bi-fine-seal .ui-icon,
   .bank-item .bi-glyph .ui-icon,
   .bag-item .bi-quest-seal .ui-icon,
   .bag-item .bi-fine-seal .ui-icon,
@@ -6916,18 +7188,22 @@
     width: 100%;
     height: 100%;
   }
+  .vault-row .bi-glyph-enchanted,
   .bag-item .bi-glyph-enchanted,
   .bank-item .bi-glyph-enchanted {
     color: var(--color-bag-glyph-enchanted);
   }
+  .vault-row .bi-glyph-signed,
   .bag-item .bi-glyph-signed,
   .bank-item .bi-glyph-signed {
     color: var(--color-bag-glyph-signed);
   }
+  .vault-row .bi-glyph-bound,
   .bag-item .bi-glyph-bound,
   .bank-item .bi-glyph-bound {
     color: var(--color-bag-glyph-bound);
   }
+  .vault-row .bi-masterwork-seal,
   .bag-item .bi-masterwork-seal,
   .bank-item .bi-masterwork-seal {
     position: absolute;
@@ -6951,6 +7227,7 @@
      item NAME carries the grade word, so the cell accessible name needs no
      dedicated sentence. Glyph priority: masterwork > quest > fine > instance
      marks (bag_corner_mark_view.ts). */
+  .vault-row .bi-fine-seal,
   .bag-item .bi-fine-seal,
   .bank-item .bi-fine-seal {
     color: var(--color-bag-fine-seal);
@@ -6992,6 +7269,7 @@
      desktop and touch, identical on every graphics preset (no --fx-* gate);
      aria-hidden, the cell accessible name carries the locked fact. All-surfaces
      family (item_instance_glyph_mark.ts): bags and both banks share this rule. */
+  .vault-row .bi-lock-seal,
   .bag-item .bi-lock-seal,
   .bank-item .bi-lock-seal {
     position: absolute;
@@ -7003,6 +7281,7 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 1px #000);
   }
+  .vault-row .bi-lock-seal .ui-icon,
   .bag-item .bi-lock-seal .ui-icon,
   .bank-item .bi-lock-seal .ui-icon {
     display: block;
@@ -7055,7 +7334,8 @@
     filter: brightness(1.25);
   }
   .bag-socket:focus-visible,
-  .bag-item:focus-visible {
+  .bag-item:focus-visible,
+  .bag-capacity:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
@@ -7310,6 +7590,9 @@
   #bank-window .panel-title {
     flex: none;
   }
+  /* Retained for the vault note (vault_window.ts .vault-cap-note) and the guild
+     pane's capacity line (guild_bank_window.ts): the PERSONAL pane's capacity
+     header moved into the .bank-footer meter below (Bank Storage phase 08). */
   .bank-capacity {
     flex: none;
     margin-bottom: 6px;
@@ -7318,6 +7601,247 @@
     font-size: 12px;
     text-align: right;
   }
+  /* ---------- bank footer (meter + buy) ---------- */
+  /* The personal pane's rigid footer (Bank Storage phase 08): ONE band below the
+     scroll region holding the capacity meter and then the buy row. The footer
+     owns the band separation the buy row used to carry (same margin/padding/
+     border values), so the buy row inside it drops its own; the vault and guild
+     panes keep using the bare .bank-buy-row band untouched. */
+  .bank-footer {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .bank-footer .bank-buy-row {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+  /* The two-pool capacity meter. The painter (bank_view/bank_window) sets four
+     unitless custom properties ON .bank-meter: --bank-meter-general-share /
+     --bank-meter-materials-share size the two segments, and
+     --bank-meter-general-fill / --bank-meter-materials-fill (pool occupancy
+     clamped 0..1) size the fill inside each. The painter emits shares as
+     capacity/total for readability, but they act as flex-GROW RATIOS: only
+     their ratio matters, the denominator cancels (x1000 so a 0 share
+     collapses the segment entirely); fills drive width. Purely informational
+     chrome: the numbers always ride .bank-meter-text beside it. */
+  .bank-meter {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  /* Focusable readout (its tooltip is the only surface carrying the materials
+     note): the family's tokenized focus ring. */
+  .bank-meter:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .bank-meter-track {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--color-border-showcase);
+    background: var(--color-bg-input);
+  }
+  .bank-meter-seg-general,
+  .bank-meter-seg-materials {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .bank-meter-seg-general {
+    flex: calc(var(--bank-meter-general-share, 1) * 1000) 1 0;
+  }
+  /* The hairline divider only exists while BOTH pools have width: each share
+     term collapses the border to 0 when its pool is absent, so a general-only
+     bank (no socketed satchel) or a hypothetical all-materials split never
+     shows a stray hairline against the track's own border. */
+  .bank-meter-seg-materials {
+    flex: calc(var(--bank-meter-materials-share, 0) * 1000) 1 0;
+    border-left-style: solid;
+    border-left-color: var(--color-border-showcase);
+    border-left-width: min(
+      calc(var(--bank-meter-general-share, 1) * 1000px),
+      calc(var(--bank-meter-materials-share, 0) * 1000px),
+      1px
+    );
+  }
+  .bank-meter-fill {
+    height: 100%;
+  }
+  .bank-meter-seg-general .bank-meter-fill {
+    width: calc(var(--bank-meter-general-fill, 0) * 100%);
+    background: var(--gold-dim);
+  }
+  /* Materials fill rides --color-bag-fine (tokens.css, the fine-grade material
+     teal the bag/bank grids already speak): visually distinct from the gold
+     general pool and calm at 6px tall. */
+  .bank-meter-seg-materials .bank-meter-fill {
+    width: calc(var(--bank-meter-materials-fill, 0) * 100%);
+    background: var(--color-bag-fine);
+  }
+  /* The numbers, keeping the old .bank-capacity header look. */
+  .bank-meter-text {
+    color: var(--gold-dim);
+    font-family: var(--title-font);
+    font-size: 12px;
+    text-align: right;
+  }
+  /* Gilded near-full treatment (general pool at or above 85 percent, the class
+     set by the painter): token-driven warmth from the DESIGN.md 4.3 gold ramp
+     (tokens.css --bank-meter-gilt*). Static flat color plus one static
+     box-shadow: no animation, no layout shift, no filter blur, and no
+     preset/tier hook (cosmetic EMPHASIS only; the numbers, price, and button
+     never change visibility or legibility with it). */
+  .bank-footer.near-full .bank-meter-track {
+    border-color: var(--bank-meter-gilt);
+    box-shadow: 0 0 4px var(--bank-meter-gilt-glow);
+  }
+  .bank-footer.near-full .bank-meter-seg-general .bank-meter-fill {
+    background: var(--bank-meter-gilt-fill);
+  }
+  .bank-footer.near-full .bank-meter-text {
+    color: var(--bank-meter-gilt-text);
+  }
+  /* Honest tolerated-overflow state (used past the total, e.g. after a socketed
+     bag leaves): the meter text speaks the same error red the bags counter's
+     .bag-capacity.over uses. Wins over the near-full warmth by order. */
+  .bank-footer.over .bank-meter-text {
+    color: var(--color-text-error);
+  }
+  /* The buy button's price tags (phase 08 shape, built for the phase 13 pair):
+     a row of small chips inside the button's existing flex layout. The FIRST
+     tag (gold, the moneyHtml chip) stays full-strength primary; any later
+     sibling (the coming Claudium tag) reads quieter by position. What stays
+     fixed when a second tag lands is the gold tag's treatment and the row's
+     grammar, with zero selector moves; the button itself widens by one chip,
+     which its flex layout absorbs. */
+  .bank-buy-tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bank-buy-tag {
+    display: inline-flex;
+    align-items: center;
+  }
+  .bank-buy-tag + .bank-buy-tag {
+    opacity: 0.75;
+    font-size: 11px;
+  }
+  /* The phase 13 Claudium tag: the coin glyph beside its amount, sized to the
+     charter card's own coin (.charter-cost img) so the two Claudium surfaces
+     read as one currency. Everything that makes it SECONDARY is the sibling
+     rule above, so this adds no weight, no color emphasis, and no size of its
+     own; the gold tag is untouched. No rate, no equivalence, no combined
+     total: two independent per-product prices sharing one button. */
+  .bank-buy-tag-claudium {
+    gap: 4px;
+  }
+  .bank-buy-tag-claudium img {
+    width: 14px;
+    height: 14px;
+  }
+  /* The confirm prompt's SECOND rail carries NO rule of its own, deliberately.
+     Which rail is primary is said by ORDER (gold first), never by demoting one
+     or promoting the other, and phase 13 shipped a `font-size: 12px` here that
+     did exactly the demoting its own comment disclaimed: .btn is 12.5px, so the
+     Claudium rail rendered a half pixel smaller than the gold one beside it.
+     Dropped in phase 13 QA. A rail that needs its own treatment needs a design
+     decision first. */
+  /* The Claudium purchase-result band and its announcing region. The wrapper is
+     always present so the region exists before any text is written into it (a
+     live region created in the same paint as its own text is commonly not
+     announced at all); the visible band appears only when there is a result. */
+  .bank-rung-result {
+    flex: none;
+  }
+  .bank-rung-notice {
+    margin: 6px 0 0;
+    padding: 4px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-showcase);
+    /* Byte-identical to .bank-status below on purpose: the two are the same
+       band treatment in the same footer, and the deposit-all summary would look
+       like a different surface if only one of them moved. They migrate to a
+       palette token together or not at all. */
+    background: #1c1812;
+    font-family: var(--ui-font);
+    font-size: 12px;
+  }
+  .bank-rung-notice.success {
+    color: var(--gold-dim);
+  }
+  .bank-rung-notice.failure {
+    color: var(--color-text-error);
+  }
+  /* Small-print treatments: the meter tooltip's materials note (a .tt-sub
+     line the painter tags for this quieter reading) and the purchase
+     confirm's second line (the economy disclaimer). */
+  .bank-meter-note {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .bank-buy-disclaimer {
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    text-align: center;
+  }
+  /* Meter fills are background layers, which forced-colors strips; the numbers
+     in .bank-meter-text still carry the capacity, but an always-empty track
+     beside them would read as broken, so pin the fills to Highlight (the
+     castbar .fill precedent in base.css). The !important is load-bearing like
+     the precedent's, but against SPECIFICITY here: the .near-full fill rule
+     above outranks this bare class, and its non-system gold would be forced
+     back to Canvas. The pool distinction is the segment split itself. */
+  @media (forced-colors: active) {
+    .bank-meter-fill {
+      background: Highlight !important;
+    }
+  }
+  /* ---------- bank sockets ---------- */
+  /* The bag-socket row (Bank Storage phase 07): one .bag-socket cell per bank
+     socket, reusing the bags' socket family for the cell size, border, icon
+     inset, hover, and focus ring (a family reuse, not a bespoke cell). Only
+     the row container and the locked cell are bank specific. The cells keep
+     the family's 40px square, a comfortable touch target on mobile; the row
+     is a single fixed-height strip, so the 360px-tall phone budget the
+     scroll-region relocation was measured against keeps its grid space. */
+  .bank-sockets {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 6px;
+  }
+  .bank-socket.locked {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+  }
+  /* Only the NEXT socket (the one carrying the wire price) is actionable;
+     later locked cells are informational like the empty ones. The family
+     hover rule cannot see aria-disabled (it excludes by .empty/.backpack),
+     so suppress the control-like brightening here too: an informational
+     cell must not light up while refusing the pointer. */
+  .bank-socket.locked[aria-disabled="true"] {
+    cursor: default;
+  }
+  .bank-socket.locked[aria-disabled="true"]:hover {
+    filter: none;
+  }
+  /* The unlock tooltip's price line, spaced like the buy row's money chip. */
+  .bank-socket-price {
+    margin: 3px 0 1px;
+  }
   /* Search/category/sort toolbar. It reuses the bags filter-bar classes
      (.bag-filter-bar/.bag-chips/.bag-chip/.bag-tools/.bag-search/.bag-sort), so most
      styling carries over; only the flex-none pin (so the toolbar never stretches in the
@@ -7325,6 +7849,21 @@
      specific. */
   #bank-window .bag-filter-bar {
     flex: none;
+  }
+  /* The 96px flex BASIS keeps line fitting off the search input's intrinsic
+     width, and grow returns the slack, so the box shrinks toward its
+     min-width floor exactly when the labels need the room. Whether the row
+     may WRAP stays the generic .bag-tools rule's call here: the wrap exists
+     for the half-width pairings, and a desktop bank window resized toward
+     its 220px floor (window_resize_core.ts WINDOW_MIN_WIDTH) in a wordy
+     locale must wrap rather than clip controls off the edge (the search's
+     96px min-width still binds, so the basis alone can never pay a 30-char
+     deposit label, the shipped es/es_ES value, at that width). The
+     short-phone ONE-ROW contract lives in
+     hud.mobile.css beside the footer regime it belongs to, pinned by
+     tests/browser/bank_mobile_chrome.browser.test.ts. */
+  #bank-window .bag-search {
+    flex: 1 1 96px;
   }
   .bank-deposit-all {
     flex: none;
@@ -7359,17 +7898,18 @@
     padding: 4px 7px;
     border-radius: 4px;
     border: 1px solid var(--color-border-showcase);
-    background: #1c1812;
+    background: color-mix(in srgb, var(--panel-base) 84%, var(--panel-edge));
     color: var(--gold-dim);
     font-family: var(--ui-font);
     font-size: 12px;
   }
   /* The shared scroll region: the cell grid plus the bonus breakdown as its tail.
-     At a 360px-tall phone the rigid chrome (title, capacity, toolbar, buy row)
-     leaves under one cell row of flex space, so a fixed footer below the buy row
-     either crushed the grid or clipped itself (found live in QA); scrolling
-     one region reaches both. The two-row floor (2 x 40px cells + gap + padding)
-     keeps the region usable before the window itself would overflow. */
+     At a 360px-tall phone the rigid chrome (title, toolbar, and since phase 08
+     the .bank-footer band, which absorbed the old capacity header AND the buy
+     row) leaves under one cell row of flex space, so a SECOND fixed band below
+     the footer either crushed the grid or clipped itself (found live in QA);
+     scrolling one region reaches both. The two-row floor (2 x 40px cells + gap
+     + padding) keeps the region usable before the window itself would overflow. */
   .bank-scroll {
     flex: 1 1 auto;
     min-height: 92px;
@@ -7441,6 +7981,7 @@
      (the commons resets kill that glow anyway); a future non-common fine
      grade must revisit this composition or lose its quality glow. Always-on,
      no --fx-* gate (fairness). */
+  .vault-row.bag-fine,
   .bag-item.bag-fine,
   .bank-item.bag-fine {
     border-color: var(--color-bag-fine-rim) !important;
@@ -7500,8 +8041,22 @@
     font-family: var(--title-font);
     font-size: 12px;
   }
-  .bank-buy-btn:hover {
+  .bank-buy-btn:hover:not(:disabled) {
     filter: brightness(1.12);
+  }
+  /* The mid-spend state, added in phase 13 QA. The button is set disabled and
+     aria-busy for the span of one Claudium spend, which a screen reader can
+     report and a sighted player previously could not see at all: the control
+     looked live and still brightened under the pointer while it was dead.
+     DELIBERATELY UNSCOPED: .bank-buy-btn is painted into this same root by the
+     guild pane (guild_bank_window.ts) and the vault (vault_window.ts) too, and
+     neither disables its copy today, but a disabled control SHOULD read as
+     disabled whichever pane paints it. This is the .btn:disabled family
+     treatment, so a future disabled sibling inheriting it is the right outcome,
+     not a leak. */
+  .bank-buy-btn:disabled {
+    filter: grayscale(1) brightness(0.7);
+    cursor: default;
   }
   /* Steady tokenized focus ring on both keyboard-focusable bank controls (the
      .bag-item precedent; also in base.css's shared ring list). */
@@ -7757,7 +8312,11 @@
     color: var(--color-text-muted);
     text-align: center;
   }
-  .gbank-buy-short-label {
+  /* The shortfall label is family-wide since the vault adopted it: the
+     bank-named class is canonical, the gbank-named one stays as the guild
+     pane's alias. */
+  .gbank-buy-short-label,
+  .bank-buy-short-label {
     font-size: 11px;
     color: var(--color-text-error);
   }
@@ -7868,6 +8427,249 @@
     transform: translateX(var(--bank-dock-gap));
   }
 
+  /* ---------- materials vault (bank tab) ---------- */
+  /* The Materials Vault tab (Bank Storage Phase 03): a per-material LIST, not
+     a slot grid (the vault pools one count per material, so a row with a name
+     and a count/cap readout says more than an icon cell could). The pane is
+     the guild wrapper's transparent flex passthrough; the ONE scroller inside
+     is the shared .bank-scroll (no second cap: a capped scroll child inside
+     the capped window column collapses to zero height on mobile). */
+  .vault-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .vault-cap-note {
+    text-align: left;
+  }
+  .vault-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .vault-row-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 0;
+  }
+  .vault-row {
+    position: relative; /* anchors the fine corner seal to the icon corner */
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px; /* SC 2.5.8 target size, the .bank-item floor */
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-showcase);
+    border-left: 3px solid var(--bank-slot-quality, var(--color-quality-default));
+    flex: 1 1 auto;
+    min-width: 0;
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--panel-edge));
+    color: var(--color-text);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  .vault-row:hover {
+    filter: brightness(1.12);
+  }
+  .vault-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .vault-row-special {
+    background: color-mix(in srgb, var(--panel-base) 82%, var(--color-accent));
+  }
+  /* Fine corner seal on a vault ROW (Phase 04 QA): color and drop shadow ride
+     the shared family groups above (the vault selectors are prepended there),
+     but the CELL group's 1px/1px coords assume the seal's box IS the item
+     cell, and a vault row is a wide flex button, so the placement is stated
+     here against the row's padding box, over the leading item icon's corner
+     (the row is position: relative for exactly this). */
+  .vault-row .bi-instance,
+  .vault-row .bi-glyph,
+  .vault-row .bi-fine-seal {
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px var(--panel-edge));
+  }
+  .vault-row .bi-masterwork-seal {
+    top: 3px;
+    left: 7px;
+  }
+  .vault-row .bi-lock-seal {
+    left: 8px;
+    bottom: 3px;
+  }
+  .vault-row-name {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .vault-row-count {
+    flex: none;
+    color: var(--gold-dim);
+    font-family: var(--title-font);
+  }
+  .vault-row-stack-count {
+    flex: none;
+    padding: 2px 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel-edge) 72%, transparent);
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1;
+  }
+  /* At the ceiling: the readout carries the fact in TEXT (count == cap); the
+     brighter tint is reinforcement, never the only signal. */
+  .vault-row.at-cap .vault-row-count {
+    color: var(--gold);
+  }
+  /* Past the ceiling (a tolerated legacy over-stock, never truncated): the
+     count text already shows 90/40; the weight marks it as an oddity worth a
+     withdraw, composing on top of the at-cap tint. */
+  .vault-row.over-cap .vault-row-count {
+    font-weight: 700;
+  }
+  .vault-row-partial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--panel-base) 78%, var(--panel-edge));
+    color: var(--color-accent);
+    font: 11px / 1.1 var(--ui-font);
+    cursor: var(--cursor-point);
+  }
+  .vault-row-partial:hover {
+    border-color: var(--color-primary-dim);
+    filter: brightness(1.12);
+  }
+  .vault-row-partial:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .vault-row-partial .ui-icon {
+    flex: none;
+    width: 14px;
+    height: 14px;
+  }
+  .vault-row-partial-label {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (pointer: coarse) {
+    .vault-row,
+    .vault-row-partial,
+    .vault-unlock-btn,
+    .vault-footer button {
+      min-height: 44px;
+    }
+    .vault-row-partial {
+      min-width: 44px;
+    }
+  }
+  /* Puppeteer touch emulation and a few hybrid devices expose touch input
+     without reporting `pointer: coarse`; the runtime class is the second
+     truthful arm, keeping the same targets usable in both environments. */
+  body.mobile-touch .vault-row,
+  body.mobile-touch .vault-row-partial,
+  body.mobile-touch .vault-unlock-btn,
+  body.mobile-touch .vault-footer button {
+    min-height: 44px;
+  }
+  body.mobile-touch .vault-row-partial {
+    min-width: 44px;
+  }
+  .vault-locked-intro {
+    flex: none;
+    margin: 4px 0 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-showcase);
+    background: color-mix(in srgb, var(--panel-base) 84%, var(--panel-edge));
+    color: var(--gold-dim);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  /* The vault footer reuses .bank-buy-row's pinned-below-the-scroll placement;
+     it holds TWO actions (deposit-all + the ceiling upgrade), so it spreads
+     them and lets the pair wrap on narrow phones instead of clipping. */
+  .vault-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  /* The upgrade button shares the footer row with deposit-all, so it drops the
+     buy row's full-width default and flexes beside it (wrapping on phones). */
+  .vault-footer .bank-buy-btn {
+    width: auto;
+    flex: 1 1 auto;
+  }
+  @media (forced-colors: active) {
+    .charter-section > header,
+    .charter-body,
+    .charter-card,
+    .charter-buy,
+    .charter-notice,
+    .vault-row,
+    .vault-row-partial,
+    .vault-locked-intro,
+    .woc-store-prompt,
+    .woc-store-global-result,
+    .woc-store-prompt-close,
+    .woc-store-global-result button {
+      forced-color-adjust: auto;
+      background: Canvas;
+      border-color: CanvasText;
+      color: CanvasText;
+      filter: none;
+    }
+    .charter-buy:focus-visible,
+    .vault-row:focus-visible,
+    .vault-row-partial:focus-visible,
+    .woc-store-prompt button:focus-visible,
+    .woc-store-global-result button:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .charter-notice.success,
+    .charter-notice.failure,
+    .woc-store-global-result.success,
+    .woc-store-global-result.failure {
+      border-color: Highlight;
+      color: CanvasText;
+    }
+    .vault-row .bi-instance {
+      background: CanvasText;
+    }
+    .vault-row .bi-glyph,
+    .vault-row .bi-fine-seal,
+    .vault-row .bi-lock-seal,
+    .vault-row .bi-masterwork-seal {
+      color: CanvasText;
+      filter: none;
+    }
+  }
   /* ---------- deeds ---------- */
   /* The Book of Deeds: a cold catalog browser (summary strip, category rail,
      entry-card list, title picker, filter bar) over the IWorldDeeds facet.
@@ -13113,8 +13915,44 @@
     margin: 6px 0 2px;
     line-height: 1.4;
   }
+  /* An options-tab subsection header (the Frames tab's Party Frame Options
+     group): the title-font gold treatment the panel titles use, scaled to a
+     row divider. */
+  .set-subhead {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 4px;
+    margin: 10px 0 6px;
+  }
   .graphics-controls-disabled {
     opacity: 0.55;
+  }
+  /* The export/import expando (Frames tab: frame layout; General tab: all
+     settings): a code textarea with its action button underneath. */
+  .transfer-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 4px 0 8px;
+  }
+  .transfer-pane[hidden] {
+    display: none;
+  }
+  .transfer-code {
+    width: 100%;
+    min-height: 72px;
+    resize: vertical;
+    padding: 6px 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #e8dcb8;
+    background: #0c0a07;
+    border: 1px solid var(--border);
+    border-radius: 4px;
   }
   /* The graphics panel's one inline action row: Back, the stretching status,
      then Reset (a quiet text button) beside the primary Apply at the end. */
@@ -14007,6 +14845,177 @@
   #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
     inset-inline-end: 64px;
   }
+  /* The Fancy Gold theme's window frame: every desktop feature window wears
+     the gilded frame WHILE the fancyGold preset is active (the
+     .fancy-gold-ui root class applyTheme stamps in main.ts). The default
+     presets keep the classic flat panels: an always-on rollout shipped
+     briefly and the owner walked it back to the theme opt-in. The pilot's
+     mask-over-gradient ::before cannot generalize here because every .window
+     is its OWN scroll container (the sticky .panel-title depends on it), and
+     a scroll container both clips and scrolls a pseudo-element away with the
+     content; the container's own BACKGROUND stays pinned to the border box,
+     the exact mechanism the resize grip already rides (layout.css). So these
+     are the same 12 tiles, ink pre-tinted from the gold ramp
+     (applyWindowOrnamentVars, perf_ornament_svg.ts), stacked as background
+     layers over the shared panel gradient. Position/size/repeat lists below
+     are written against windowOrnamentFrameImage's fixed layer order:
+     corners (tl, tr, bl, br), mid-edges (t, b, l, r), ribbons (t, b, l, r),
+     then the panel gradient. The perf-wide view keeps its richer masked
+     ornament and is excluded so the two never double-paint. Mobile keeps the
+     flat chrome: the compact sheets hand-tune every window's geometry and
+     the corner ink would sit under real touch targets.
+     The top ribbon and the upper half of the top corners sit BENEATH the
+     sticky title's opaque strip by design: the gilt title bar (gold text +
+     gold-700 underline, below) reads as the frame's top rail, with the
+     corner tendrils emerging from under it. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {
+    /* THE FRAME CONTRACT (owner request): the ornament reads as a frame
+       SURROUNDING the menu, the contents never spill past it, the items keep
+       breathing room from it, and the scrollbar sits INSIDE it. One thick
+       transparent border delivers all four at once: overflow on a scroll
+       container clips at the PADDING box, so scrolling content can never
+       paint into the border band, and browsers draw the scrollbar inside
+       the border too; the ornament layers anchor to the BORDER box
+       (background-origin below), so the frame owns exactly the band the
+       content cannot reach. --window-pad (the shared inset the sticky title
+       mirrors) then adds the interior breathing room between the menu items
+       and the frame. Not `border: 0` + padding instead: the clip boundary
+       is what guarantees containment, padding alone would let wide content
+       and the scrollbar sit on the frame. */
+    border-width: 14px;
+    border-color: transparent;
+    outline: none;
+    border-radius: 30px;
+    --window-pad: 22px;
+    box-shadow:
+      inset 0 0 24px #0006,
+      inset 0 1px 0 #ffffff14;
+    /* Anchor every layer (and the panel gradient) to the border box, so the
+       frame paints in the transparent border band at the window's true outer
+       edge instead of shifting inward to the padding box. */
+    background-origin: border-box;
+    background-clip: border-box;
+    background-image: var(--window-ornament-frame), var(--panel-bg);
+    background-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right,
+      0 0;
+    background-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px,
+      auto;
+    background-repeat:
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      repeat-x,
+      repeat-x,
+      repeat-y,
+      repeat-y,
+      no-repeat;
+  }
+  /* Resizable windows: restate the grip layer (layout.css draws it as the
+     first background layer for the same stays-pinned reason) ahead of the
+     ornament stack, or this rule's background-image would silently drop it. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel.window-resizable:not(.perf-wide) {
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px),
+      var(--window-ornament-frame), var(--panel-bg);
+    background-position:
+/* The grip moves in past the 14px frame border plus the bottom-right
+         corner motif's rounding, so it reads inside the frame beside the
+         (equally inset) scrollbar rather than on the ornament band. */
+      right 18px bottom 18px,
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right,
+      0 0;
+    background-size:
+      12px 12px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px,
+      auto;
+    background-repeat:
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      no-repeat,
+      repeat-x,
+      repeat-x,
+      repeat-y,
+      repeat-y,
+      no-repeat;
+  }
+  /* The gilt title bar: same treatment as the pilot's (warm gold text, gold
+     underline reading as the frame's top rail, both title paddings widened so
+     the text and the pinned close button clear the top corners' ink), with
+     the top radius matching the frame's INNER curve (the 30px outer radius
+     minus the 14px frame border), so the sticky strip's opaque background
+     hugs the rounded padding box it now lives inside without square-cutting
+     the corners or bleeding onto the frame band. */
+  .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) > .panel-title {
+    color: var(--color-gold-400);
+    border-bottom-color: var(--color-gold-700);
+    border-radius: 16px 16px 0 0;
+    padding-left: 64px;
+    padding-right: 118px;
+  }
+  .fancy-gold-ui
+    body:not(.mobile-touch)
+    .window.panel:not(.perf-wide)
+    > .panel-title
+    > .x-btn:not(.back-btn) {
+    inset-inline-end: 64px;
+  }
   /* forced-colors: active strips background/mask layers (WCAG contract, see
      src/ui/CLAUDE.md); restore a plain system-color border so the window frame
      stays visible in high-contrast mode instead of vanishing with the mask. */
@@ -14016,6 +15025,9 @@
     }
     #options-menu.perf-wide::before {
       display: none;
+    }
+    .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {
+      border-color: CanvasText;
     }
   }
 
@@ -15857,7 +16869,7 @@
   }
   .dev-command-run:focus-visible,
   .dev-command-tabs button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .dev-command-footer {
@@ -15882,7 +16894,7 @@
   }
   /* ---------- The $WOC Exchange ---------- */
   /* Cold window (src/ui/woc_market_window.ts): USD-denominated auctions settled
-     in $WOC, browser-web only. Store-surface grammar (DESIGN.md 8.2) on the
+     in $WOC, browser web + website desktop only. Store-surface grammar (DESIGN.md 8.2) on the
      THEMED tokens: every fill, edge and text colour below is a themeCssVars
      derivation (--panel-base / --color-bg-dark / --border / --color-accent /
      the text pair), so the parchment and midnight presets stay readable, and
@@ -15939,12 +16951,13 @@
     flex: none;
     align-items: stretch;
   }
-  /* The banner strip under the tabs holds only the two STANDING banners (a
-     paused realm, an unlinked wallet), which move on an operator action or a
-     wallet link, never on a click. The notice and busy line live in the
-     footer bar below the body instead, in a slot that keeps its height, so a
-     toast that comes and goes never shifts the rows or the form. All three
-     share one look: a themed well inside the panel, never a second panel. */
+  /* The banner strip under the tabs (above the Browse filters) holds only the
+     STANDING banners (a paused realm, the Solana wallet card), which move on an
+     operator action or a wallet event, never on a click. The notice and busy
+     line live in the footer bar below the body instead, in a slot that keeps
+     its height, so a toast that comes and goes never shifts the rows or the
+     form. All share one look: a themed well inside the panel, never a second
+     panel. */
   #woc-market-window .wm-strip {
     flex: none;
     display: flex;
@@ -15989,17 +17002,56 @@
   #woc-market-window .wm-notice-error {
     border-color: var(--color-border-invalid);
   }
+  /* The Solana wallet card: the Claudium panel's .cl-wallet-connect grid (title
+     over the state sentence, the action button spanning both rows on the far
+     edge) in this window's own tokens, so it reads as the same card without
+     borrowing the store's palette. */
   #woc-market-window .wm-banner-wallet {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(160px, 220px);
+    grid-template-rows: auto auto;
+    gap: 4px var(--spacing-md);
+    align-items: start;
+    padding: var(--spacing-sm) 10px;
     border-color: var(--color-accent);
   }
-  /* The banner's connect shortcut rides the flex row's far edge: the label
-     soaks the remaining width, the button keeps its own. */
-  #woc-market-window .wm-banner-wallet span {
-    flex: 1;
+  #woc-market-window .wm-banner-wallet > strong {
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+    line-height: 17px;
+  }
+  #woc-market-window .wm-banner-wallet p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 16px;
   }
   #woc-market-window .wm-banner-wallet button {
-    flex: none;
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 100%;
     white-space: nowrap;
+  }
+  #woc-market-window .wm-wallet-balance {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 16px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  #woc-market-window .wm-wallet-balance > strong {
+    color: var(--color-text-light);
+    font-family: var(--title-font);
+    font-size: 13px;
+    line-height: 17px;
   }
   /* The shared ring (hud.css .woc-spinner) inside a flex line: the container's
      gap owns the spacing. */

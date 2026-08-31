@@ -14,15 +14,18 @@ const SNAP = 0.01;
 /**
  * Advance one occluder's fade alpha. Occlusion snaps to the ghost target on
  * the first frame so information timing is tier-independent; restoration is
- * exponential unless reduced motion asks for a direct state change.
+ * exponential unless reduced motion asks for a direct state change. `floor`
+ * is the occluded resting alpha: the default 20% ghost, or 0 for the raid
+ * shells' backface cull, which hides the wall outright.
  */
 export function stepOccluderFade(
   alpha: number,
   occluded: boolean,
   dt: number,
   reducedMotion = false,
+  floor = OCCLUDER_FADE_ALPHA,
 ): number {
-  const target = occluded ? OCCLUDER_FADE_ALPHA : 1;
+  const target = occluded ? floor : 1;
   const start = Number.isFinite(alpha) ? Math.min(1, Math.max(0, alpha)) : 1;
   if (dt <= 0) return start;
   if (occluded || reducedMotion) return target;
@@ -31,8 +34,12 @@ export function stepOccluderFade(
 }
 
 /** Whether a fade is at rest for its current occlusion state (no work left). */
-export function occluderFadeSettled(alpha: number, occluded: boolean): boolean {
-  return alpha === (occluded ? OCCLUDER_FADE_ALPHA : 1);
+export function occluderFadeSettled(
+  alpha: number,
+  occluded: boolean,
+  floor = OCCLUDER_FADE_ALPHA,
+): boolean {
+  return alpha === (occluded ? floor : 1);
 }
 
 /**
@@ -174,4 +181,55 @@ export function occluderSegmentHitsObb(
   if (tmin < 0 || tmin > 1) return false;
   if (tmin * Math.hypot(camX - eyeX, camZ - eyeZ) < OCCLUDER_HIDE_EYE_CLEARANCE) return false;
   return eyeY + (camY - eyeY) * tmin < topY;
+}
+
+/**
+ * How far from the camera (yards, XZ) a structure's fade programs are asked
+ * for AHEAD of its first occlusion (occluder_fade_gate.ts). Geometry, not a
+ * timer: a structure can only start fading once it crosses the eye-to-camera
+ * segment, and the longest such segment the game ever draws is the spawn
+ * cinematic's opening pull-back (spawn_cinematic.ts startDist 55); the chase
+ * camera's wheel range is far shorter. Everything anchored inside this reach
+ * is what the camera can fade next. A wide structure anchored just beyond it
+ * can still cross the segment first: its edge-frame consult then holds it
+ * opaque until the link lands, which is a late fade, never a stall.
+ */
+export const OCCLUDER_FADE_PREFETCH_YD = 60;
+
+/** The slice of an instanced-ghost pool the hide decision consults. */
+export interface OccluderGhostReadiness<T> {
+  allReady(parts: T): boolean;
+}
+
+/**
+ * Whether a hideable structure keeps drawing its instances this frame instead
+ * of swapping to ghost stand-ins: it is not occluding, or its ghost programs
+ * are still linking behind the fade gate. A structure already ghosted never
+ * comes back through here (its fade owns the swap back). The pool is consulted
+ * ONLY for an occluding, not-yet-ghosted structure, because a consult requests
+ * the compile: asking for every tree in the field would prefetch the world.
+ * The pool and its parts come in as two arguments rather than a thunk so the
+ * per-tree per-frame call allocates nothing.
+ */
+export function occluderKeepsInstances<T>(
+  occluded: boolean,
+  hasGhosts: boolean,
+  ghosts: OccluderGhostReadiness<T>,
+  parts: T,
+): boolean {
+  if (hasGhosts) return false;
+  if (!occluded) return true;
+  return !ghosts.allReady(parts);
+}
+
+/** Whether an anchor at (x, z) is within the prefetch reach of the camera. */
+export function withinOccluderFadePrefetch(
+  x: number,
+  z: number,
+  camX: number,
+  camZ: number,
+): boolean {
+  const dx = x - camX;
+  const dz = z - camZ;
+  return dx * dx + dz * dz <= OCCLUDER_FADE_PREFETCH_YD * OCCLUDER_FADE_PREFETCH_YD;
 }

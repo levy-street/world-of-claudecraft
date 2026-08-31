@@ -39,15 +39,18 @@ vi.mock('../../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   releaseCharacterLease: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { BankLedgerGrowthLimitExceeded } from '../../server/bank_ledger_growth_budget';
 import { type ClientSession, GameServer } from '../../server/game';
 import {
   noopGameMetricsCounters,
   setGameMetricsCounters,
   type WocEscrowQueueOutcome,
 } from '../../server/http/game_signals';
+import type { CustodyParcelRow } from '../../server/mail_custody_overlay';
+import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 import type { CharacterSaveArgs, WocMarketCustody } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
 import { createWocMarketCustody, wocEscrowSerializeStats } from '../../server/woc_market_custody';
@@ -67,6 +70,23 @@ const SELLER = 21;
 const SELLER_CHAR = 21;
 const NONCE = 'nonce-live';
 const GUILD = 913;
+
+const storageEffect = (
+  idempotencyKey: string,
+  itemId = 'strongbox_rung_01',
+  purchasedSlotsBefore = 0,
+  purchasedSlotsAfter = 6,
+): StorageAppliedEffect => ({
+  realm: REALM,
+  accountId: SELLER,
+  characterId: SELLER_CHAR,
+  itemId,
+  expectedCostClaudium: 100,
+  idempotencyKey,
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
+  purchasedSlotsBefore,
+  purchasedSlotsAfter,
+});
 
 // A real eligible equipment def from the content tables (the service-test
 // fixture shape): tradable, non-quest, so only the custody edge is under test.
@@ -103,9 +123,11 @@ function fakeWs(): unknown {
 
 /** A socket that KEEPS what the server sent, for the kick wire pins (the plain
  *  fakeWs above drops every frame). */
-function recordingWs(): { sent: string[]; ws: unknown } {
+function recordingWs(): { close: ReturnType<typeof vi.fn>; sent: string[]; ws: unknown } {
   const sent: string[] = [];
+  const close = vi.fn();
   return {
+    close,
     sent,
     ws: {
       readyState: 1,
@@ -113,7 +135,7 @@ function recordingWs(): { sent: string[]; ws: unknown } {
       send: (payload: string) => {
         sent.push(payload);
       },
-      close: () => {},
+      close,
       terminate: () => {},
     },
   };
@@ -169,12 +191,21 @@ interface Rig {
   custody: WocMarketCustody;
   db: FakeWocMarketDb;
   service: WocMarketService;
+  /** Every durable custody parcel row the bridge wrote (the per-parcel
+   *  overlay seam that replaced the whole-book persistMailBlob). */
+  parcelRows: CustodyParcelRow[];
   /** Every character write across BOTH channels, in commit order, with
    *  whether that blob still holds the escrow item. */
   commits: Array<{ channel: string; holdsItem: boolean }>;
   itemIndex: () => number;
   bagsHold: (itemId: string) => boolean;
   join: (accountId: number, characterId: number, name: string) => ClientSession;
+}
+
+function requirePlayerMeta(rig: Pick<Rig, 'server' | 'session'>) {
+  const meta = rig.server.sim.meta(rig.session.pid);
+  if (!meta) throw new Error('missing test player meta');
+  return meta;
 }
 
 const blobHoldsItem = (state: CharacterState, itemId: string): boolean =>
@@ -198,22 +229,30 @@ function makeRig(
   };
   const session = join(SELLER, SELLER_CHAR, 'Selara');
   server.sim.addItem(EPIC_ITEM, 1, session.pid, { silent: true });
+  const parcelRows: CustodyParcelRow[] = [];
   const custody = createWocMarketCustody(
     {
       get sim() {
         return server.sim;
       },
       wocCustodySession: (characterId) => server.wocCustodySession(characterId),
-      persistMailBlob: () => server.persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) => server.enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         server.serializeCharacterForPersist(characterId),
+      acknowledgeCharacterSaveEffects: (save) => server.acknowledgeCharacterSaveEffects(save),
+      hasCharacterOnlySaveConflict: (characterId) =>
+        server.hasCharacterOnlySaveConflict(characterId),
       hasDirtyGuildBooks: (characterId) => server.hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => server.flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
         server.escrowSessionLost(pid, characterId, kind),
     },
-    opts,
+    {
+      ...opts,
+      persistParcelRow: async (row) => {
+        parcelRows.push(row);
+      },
+    },
   );
   const db = new FakeWocMarketDb({
     characters: [{ characterId: SELLER_CHAR, accountId: SELLER, name: 'Selara', realm: REALM }],
@@ -249,6 +288,7 @@ function makeRig(
     custody,
     db,
     service,
+    parcelRows,
     commits,
     itemIndex: () => inventory().findIndex((s) => s.itemId === EPIC_ITEM),
     bagsHold: (itemId) => inventory().some((s) => s.itemId === itemId),
@@ -308,6 +348,8 @@ beforeEach(() => {
   dbMock.saveCharacterState.mockImplementation(async () => true);
   dbMock.saveCharacterAndGuildBankState.mockClear();
   dbMock.saveCharacterAndGuildBankState.mockImplementation(async () => true);
+  dbMock.saveCharacterAndMarketState.mockClear();
+  dbMock.saveCharacterAndMarketState.mockImplementation(async () => true);
 });
 
 afterEach(() => {
@@ -316,6 +358,28 @@ afterEach(() => {
 });
 
 describe('the escrow critical section rides the per-character save queue (H5)', () => {
+  it('acknowledges listing storage effects only after the escrow transaction commits', async () => {
+    const committed = makeRig();
+    const effect = storageEffect('listing-storage-commit');
+    requirePlayerMeta(committed).bank.purchasedSlots = 6;
+    expect(committed.server.stageStorageAppliedEffect(effect)).toBe(true);
+
+    const listed = await createListing(committed);
+    expect(listed.ok).toBe(true);
+    expect(committed.db.escrowSaves[0]?.storageEffects).toEqual([effect]);
+    expect(committed.session.pendingStorageAppliedEffects).toEqual([]);
+
+    const refused = makeRig();
+    const retained = storageEffect('listing-storage-refused');
+    requirePlayerMeta(refused).bank.purchasedSlots = 6;
+    expect(refused.server.stageStorageAppliedEffect(retained)).toBe(true);
+    refused.db.failNextEscrow = 'cap_reached';
+
+    await expect(createListing(refused)).resolves.toEqual({ ok: false, reason: 'cap_reached' });
+    expect(refused.db.escrowSaves[0]?.storageEffects).toEqual([retained]);
+    expect(refused.session.pendingStorageAppliedEffects).toEqual([retained]);
+  });
+
   it('a stale autosave snapshot can never resurrect an escrowed item', async () => {
     const rig = makeRig();
     const kinds = recordEscrowKinds();
@@ -468,7 +532,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     // Positive control for that absence: the return-parcel arm is real and
     // fires when the extraction pid is genuinely gone from the sim.
     const idsBefore = new Set(rig.server.sim.postOffice.mail.map((m) => m.id));
-    const mailSpy = vi.spyOn(rig.server, 'persistMailBlob');
+    const rowsBefore = rig.parcelRows.length;
     rig.custody.restoreCopy(999_999, SELLER_CHAR, { itemId: EPIC_ITEM, count: 2 });
     expect(rig.server.sim.postOffice.mail).toHaveLength(mailBefore + 1);
     const booked = rig.server.sim.postOffice.mail.filter((m) => !idsBefore.has(m.id));
@@ -480,9 +544,16 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(booked[0]?.letterId).toBe('woc_market_return');
     expect(booked[0]?.letterId).toBe(WOC_MARKET_RETURN_LETTER.letterId);
     expect(booked[0]?.items).toEqual([{ itemId: EPIC_ITEM, count: 2 }]);
-    // The in-memory book alone is not the item: the blob write is what makes
-    // the parcel survive a restart.
-    expect(mailSpy).toHaveBeenCalledTimes(1);
+    // The in-memory book alone is not the item: the durable parcel row is
+    // what makes the parcel survive a restart (the boot merge replays it
+    // through the book-once dedupe). The row carries the SAME ref the letter
+    // was booked with, so the replay can never double-book.
+    expect(rig.parcelRows.length).toBe(rowsBefore + 1);
+    const row = rig.parcelRows.at(-1);
+    expect(row?.letter).toBe('return');
+    expect(row?.recipient.key).toBe(String(SELLER_CHAR));
+    expect(row?.items).toEqual([{ itemId: EPIC_ITEM, count: 2 }]);
+    expect(row?.custodyRef).toBe(booked[0]?.custodyRef);
   });
 
   it('a refusal mid-leave restores the LIVE bags, never a second rail', async () => {
@@ -506,13 +577,17 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
 
   it('a lease-fenced write restores the copy and kicks the displaced zombie', async () => {
     const rig = makeRig();
+    const restores = vi.fn(rig.custody.restoreCopy);
+    rig.custody.restoreCopy = restores;
     rig.db.failNextEscrow = 'lease_lost';
     const res = await createListing(rig);
     expect(res).toEqual({ ok: false, reason: 'lease_lost' });
-    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(restores).toHaveBeenCalledTimes(1);
     // The fence-out signal is the same one saveCharacter sends: the zombie is
     // torn down rather than left playing an unsaveable session.
     await vi.waitFor(() => expect(rig.session.left).toBe(true));
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(dbMock.saveCharacterAndMarketState).not.toHaveBeenCalled();
   });
 
   it('an ambiguous escrow throw quarantines instead of restoring', async () => {
@@ -615,16 +690,30 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.server.hasDirtyGuildBooks(SELLER_CHAR)).toBe(false);
   });
 
-  it('refuses contended instead of tearing when the dirty books cannot flush clear', async () => {
+  it('quarantines when a dirty guild book has lost its live shadow', async () => {
     const rig = makeRig();
-    // A dirty mark for a guild with NO loaded book: the flush save SKIPS it
-    // (nothing to serialize), so the mark survives and the in-job re-check
-    // must refuse rather than commit a character row alone.
-    rig.session.dirtyGuildBanks.set(999, 1);
-    const res = await createListing(rig);
-    expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    // A dirty mark for a guild with NO loaded book is an impossible terminal
+    // state: the character half cannot be proved against its book half. The
+    // flush must abandon this live session instead of advertising a retry that
+    // can never make the missing shadow reappear.
+    rig.session.dirtyGuildBanks.set(999, 1);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await createListing(rig);
+    const logged = errSpy.mock.calls.map((call) => String(call[0]));
+    errSpy.mockRestore();
+    expect(res).toEqual({ ok: false, reason: 'character_invalid' });
+    // The terminal kick may already have removed the live player by the time
+    // the request settles. Durability is the proof that matters: neither the
+    // character/book save nor the listing write touched the pre-request row,
+    // which still contains the item established above.
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
     expect(rig.db.escrowSaves).toHaveLength(0);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    expect(
+      logged.some((line) => line.includes('guild bank escrow rolled back for guild 999')),
+    ).toBe(true);
   });
 
   it('refuses contended when the guild-book flush THROWS, never a 500', async () => {
@@ -1284,6 +1373,44 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(order).toEqual(['save:22', 'job', 'save:21']);
   });
 
+  it('a cancelled queued save never starts or reaches the database', async () => {
+    const rig = makeRig();
+    const targetCharacterId = 31_337;
+    const target = rig.join(31_337, targetCharacterId, 'CancelledSave');
+    // Joining schedules unrelated account-flair/welcome work. Let that drain
+    // and establish a clean write baseline before exercising this save.
+    await settle();
+    dbMock.saveCharacterState.mockClear();
+    dbMock.saveCharacterAndGuildBankState.mockClear();
+    dbMock.saveCharacterAndMarketState.mockClear();
+    let releaseBlocker!: () => void;
+    const blocker = new Promise<void>((resolve) => {
+      releaseBlocker = resolve;
+    });
+    const blockingWrite = rig.server.enqueueCharacterWrite(targetCharacterId, async () => {
+      await blocker;
+    });
+    const shouldStart = vi.fn(() => false);
+
+    const cancelled = rig.server.saveCharacter(target, { shouldStart });
+    releaseBlocker();
+    await blockingWrite;
+
+    await expect(cancelled).resolves.toBe(false);
+    expect(shouldStart).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterState.mock.calls.some((call) => call[0] === targetCharacterId)).toBe(
+      false,
+    );
+    expect(
+      dbMock.saveCharacterAndGuildBankState.mock.calls.some(
+        (call) => call[0] === targetCharacterId,
+      ),
+    ).toBe(false);
+    expect(
+      dbMock.saveCharacterAndMarketState.mock.calls.some((call) => call[0] === targetCharacterId),
+    ).toBe(false);
+  });
+
   it('saveCharacter still propagates a db throw to its caller through the queue', async () => {
     const rig = makeRig();
     dbMock.saveCharacterState.mockImplementationOnce(async () => {
@@ -1292,5 +1419,187 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
     // The chain is not poisoned: the next save for the same character runs.
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+  });
+
+  it('quarantines and counts a durable bank-ledger ceiling refusal', async () => {
+    const rig = makeRig();
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+    let refusals = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+    });
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    dbMock.saveCharacterState.mockRejectedValueOnce(refusal);
+
+    await expect(rig.server.saveCharacter(rig.session)).rejects.toBe(refusal);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(refusals).toBe(1);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1);
+  });
+
+  it('quarantines a market-only growth refusal and completes the terminal wire teardown', async () => {
+    const rig = makeRig();
+    const rec = recordingWs();
+    rig.session.ws = rec.ws as never;
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+
+    let refusals = 0;
+    const guildIncidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+      guildBankIncident(kind) {
+        guildIncidents.push(kind);
+      },
+    });
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    dbMock.saveCharacterAndMarketState.mockRejectedValueOnce(refusal);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).rejects.toBe(refusal);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(refusals).toBe(1);
+    expect(guildIncidents).toEqual([]);
+
+    await vi.waitFor(() => expect(rig.session.left).toBe(true));
+    expect(errorFrames(rec.sent)).toEqual([
+      { t: 'error', error: 'character state could not be saved' },
+    ]);
+    expect(rec.close).toHaveBeenCalledTimes(1);
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).resolves.toBe(false);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+  });
+
+  it('propagates an ordinary market-only save error without quarantining the session', async () => {
+    const rig = makeRig();
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+
+    let refusals = 0;
+    const guildIncidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+      guildBankIncident(kind) {
+        guildIncidents.push(kind);
+      },
+    });
+    const dbError = new Error('market save unavailable');
+    dbMock.saveCharacterAndMarketState.mockRejectedValueOnce(dbError);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).rejects.toBe(dbError);
+    expect(rig.session.escrowQuarantined).toBe(false);
+    expect(refusals).toBe(0);
+    expect(guildIncidents).toEqual([]);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).resolves.toBe(true);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(2);
+  });
+
+  it('a save queue never admits a second storage purchase behind its captured effect', async () => {
+    const rig = makeRig();
+    const meta = requirePlayerMeta(rig);
+    const first = storageEffect('storage-a');
+    const second = storageEffect('storage-b', 'strongbox_rung_02', 6, 12);
+    meta.bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(first)).toBe(true);
+
+    let finish!: (saved: boolean) => void;
+    dbMock.saveCharacterState.mockImplementationOnce(
+      async () => new Promise<boolean>((resolve) => (finish = resolve)),
+    );
+    const saving = rig.server.saveCharacter(rig.session);
+    await vi.waitFor(() => expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1));
+    expect(dbMock.saveCharacterState.mock.calls[0]?.[4]).toEqual([first]);
+
+    meta.bank.purchasedSlots = 12;
+    expect(() => rig.server.stageStorageAppliedEffect(second)).toThrow(
+      /different pending purchase/,
+    );
+    finish(true);
+    await expect(saving).resolves.toBe(true);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+  });
+
+  it('a throwing save retains staged storage effects for a later commit', async () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-retry');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+
+    dbMock.saveCharacterState.mockRejectedValueOnce(new Error('db down'));
+    await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
+
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+  });
+
+  it('a lease-fenced save never retries staged effects from the displaced session', async () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-fenced');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+
+    // A real lease-fence miss stays false for the displaced lease. Mark this
+    // fixture as already departing so the wire teardown is outside this pin.
+    rig.session.left = true;
+    dbMock.saveCharacterState.mockResolvedValueOnce(false);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1);
+  });
+
+  it('a missing serializable character refuses while a storage effect is pending', async () => {
+    const rig = makeRig();
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(storageEffect('storage-no-state'))).toBe(true);
+    rig.server.sim.removePlayer(rig.session.pid);
+
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
+    expect(rig.session.pendingStorageAppliedEffects).toHaveLength(1);
+  });
+
+  it('a WOC acknowledgement from the pre-takeover lease cannot touch the new lease', () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-takeover');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+    const snap = rig.custody.snapshotCopy(SELLER, SELLER_CHAR);
+    if (!snap.ok) throw new Error(`snapshotCopy refused: ${snap.reason}`);
+    expect(snap.save.leaseNonce).toBe(NONCE);
+
+    rig.session.leaseNonce = 'nonce-after-takeover';
+    rig.custody.acknowledgeCharacterSave?.(snap.save);
+
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
   });
 });

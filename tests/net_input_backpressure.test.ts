@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { MovementInputTimeline } from '../server/movement_input_timeline_v2';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
+import { parseMoveInputFrame } from '../src/sim/move_input';
 
 function makeClient(bufferedAmount: number) {
   const sent: string[] = [];
@@ -8,7 +10,9 @@ function makeClient(bufferedAmount: number) {
   const ws = {
     readyState: 1,
     bufferedAmount,
-    send: (payload: string) => sent.push(payload),
+    send: (payload: string) => {
+      sent.push(payload);
+    },
   };
   Object.assign(client as unknown as Record<string, unknown>, {
     moveInput: {
@@ -36,6 +40,7 @@ function sentInput(sent: string[], index = 0) {
   return JSON.parse(sent[index]) as {
     t: 'input';
     seq: number;
+    ct?: number;
     mi: { f: number; b: number; tl: number; tr: number; j: number };
   };
 }
@@ -186,5 +191,74 @@ describe('ClientWorld input send backpressure gate', () => {
     expect(ws.bufferedAmount).toBe(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     expect(sent).toHaveLength(1);
     expect(JSON.parse(sent[0])).toEqual({ t: 'cmd', cmd: 'chat' });
+  });
+
+  it('queues a v2 jump edge and flushes it in client tick order on recovery', () => {
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    client.movementWireVersion = 2;
+    withWebSocketStub(() => {
+      expect(
+        client.sendMovementFrame(
+          { ct: 0, mi: { ...client.moveInput, jump: true }, facing: null },
+          1_000,
+        ),
+      ).toBe(true);
+      ws.bufferedAmount = 0;
+      expect(
+        client.sendMovementFrame(
+          { ct: 1, mi: { ...client.moveInput, jump: false }, facing: null },
+          1_050,
+        ),
+      ).toBe(true);
+    });
+
+    expect(sent.map((payload) => sentInput([payload]).ct)).toEqual([0, 1]);
+    expect(sentInput(sent).mi.j).toBe(1);
+    expect(sentInput(sent, 1).mi.j).toBe(0);
+  });
+
+  it('drops the oldest v2 queue frame and lets the server timeline resync', () => {
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    const timeline = new MovementInputTimeline();
+    client.movementWireVersion = 2;
+    ws.send = (payload: string) => {
+      sent.push(payload);
+      const raw = JSON.parse(payload) as { ct: number };
+      const parsed = parseMoveInputFrame(raw);
+      timeline.enqueue({ ct: raw.ct, mi: parsed.moveInput, facing: parsed.facing });
+      if (sent.length === 6) ws.bufferedAmount = INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1;
+    };
+
+    withWebSocketStub(() => {
+      for (let ct = 0; ct <= 8; ct++) {
+        expect(client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, ct)).toBe(true);
+      }
+      ws.bufferedAmount = 0;
+      expect(client.sendMovementFrame({ ct: 9, mi: client.moveInput, facing: null }, 9)).toBe(true);
+    });
+
+    expect(sent.map((payload) => sentInput([payload]).ct)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(timeline.consumeNext()).toBeNull();
+    expect(timeline.consumeNext()).toBeNull();
+    expect(timeline.consumeNext()).toBeNull();
+    expect(timeline.resyncs).toBe(1);
+    expect(timeline.consumeNext()?.ct).toBe(1);
+  });
+
+  it('uses the v2 timer only to flush queued frames, never to send legacy input', () => {
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    client.movementWireVersion = 2;
+    withWebSocketStub(() => {
+      expect(client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000)).toBe(
+        true,
+      );
+      ws.bufferedAmount = 0;
+      (client as unknown as { sendMovementTimerTick(now?: number): void }).sendMovementTimerTick(
+        1_050,
+      );
+    });
+
+    expect(sent).toHaveLength(1);
+    expect(sentInput(sent)).toMatchObject({ t: 'input', ct: 0 });
   });
 });

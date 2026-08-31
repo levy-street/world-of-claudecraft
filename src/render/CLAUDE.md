@@ -334,7 +334,9 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   escaping bands are consulted in distance order (`prop_cull_core.ts`
   `updatePropCullables` over a reused `PropCullPass`; the sort runs only on a
   frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
-  as `imminentHolds`.
+  as `imminentHolds` (under the entry cover's establishing shot, below, EVERY
+  consulted key is marked, so a first-spawn entry's count is the whole
+  opening view, not the keys the camera stood among).
   TWO REACH FLOORS, and they are the only reveals that may draw a root
   unlinked: colliders are never invisible at arm's length. Bands keep
   `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
@@ -347,11 +349,42 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   view): every town-spanning static batch anchors at the town centre, so a
   camera standing there is at arm's length of all of them at once, and reach is
   a collider argument a batch cannot make.
+  THE ENTRY HORIZON BOUNDS WHAT IS CONSULTED. The reveal-gated painters (the
+  props view, both town views, foliage) cull against
+  `EntryDetailHorizonAdmission.sceneryCullFar` (`entry_detail_horizon_core.ts`
+  `entrySceneryCullFar`): the frame's cull far capped at the horizon's open
+  ring while the entry horizon is active, at BOTH frame sites (the prewarm
+  frame and the live frame). Before the far-terrain stand-in is complete the
+  renderer culls at scene fog rather than the horizon, and one such frame
+  under the entry cover requested every scenery key out to that fog (measured
+  on the Proving Shore spawn: 81 keys at once, 46 of them beyond the first
+  ring, both mainland towns included), so the spawn's own decor waited behind
+  keys the horizon then hid, whose watchdogs later revealed them cold. A key
+  beyond the ring is not consulted, so nothing is requested for it until the
+  ring reaches it or the camera does (real-geometry keys: foliage SPRITE rows
+  cull against the atmospheric far, which the cap leaves alone, so an impostor
+  bucket beyond the ring still consults its gate). The cap holds on the frames
+  the horizon cannot tick (before `vistaLive()`, `advanceFromFrame` is not
+  fed): that window is the one it exists for, and nothing beyond the ring
+  could draw there anyway, since every such key is gate-held until its link.
+  `snapshot().sceneryCap` reports the ring scenery culled at, distinct from
+  `cap`, which reads the target on those frames. Terrain keeps the wide cull
+  far: nothing it draws rides the reveal lane.
   The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
   for the whole blocking teleport chain, and at world entry) does two things and
   neither of them reveals anything. It makes the curtain WAIT on the gates
-  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online)
-  so an arrival lifts with its decor linked the way boot does. Its first check
+  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online
+  with ONE exception: the world entry that opens on the first-spawn cinematic's
+  ESTABLISHING SHOT, `settleWorldEntryCover` `establishingShot`, waits the same
+  bound online, and while that cover is up EVERY reveal consult is imminent,
+  `arrival_cover.ts` `arrivalEstablishingShotActive` read by `reveal_gate.ts`,
+  because the wide opening view of the village is what a new player sees
+  first and the chase camera's imminence radius does not describe it)
+  so an arrival lifts with its decor linked the way boot does. The wait's outcome
+  is an `arrival` event keyed `entry-wait` or `entry-wait:establishing-shot`
+  (waited ms, the bound, the imminent keys still held at the lift), which the
+  perf beacon summarizes with the reveal counters as `rawSummary.entryReveal`
+  (`src/game/perf_entry_reveal_core.ts`): the fleet-side watch for the bound. Its first check
   happens after ONE poll interval, never synchronously: the wait starts before
   any cull has consulted a gate at the new position, so a synchronous check read
   "nothing held" because nothing had been asked yet. At world entry that wait
@@ -394,6 +427,67 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   presentation: `startAfterInitialPaint` starts the reveal compile and both
   clocks together after the first painted world frame. Later arrivals read the
   already-settled page boundary and retain the normal immediate clock.
+- **The camera-occluder fade is a GATED flip (`occluder_fade_gate.ts`).** A
+  structure that blocks the eye-to-camera segment fades by flipping
+  `transparent` on its per-structure clones (`occluder_fade.ts`) or by drawing
+  a pooled transparent stand-in (`instanced_occluder_ghosts.ts`), and three
+  keys a SECOND program on that flip. The boot manifest stages one hidden twin
+  per fade program (`props.ghost-fade-variants`, `foliage.materials`), but both
+  entries are droppable and resume in the lowest lane, while the player's
+  first camera turn after the curtain is exactly when a house or a tree
+  crosses the segment: on a boot that dropped them the flip linked inside that
+  live frame. So the flip consults a reveal gate whose key is the program
+  identity (`occluder_ghost_variant_key.ts`, or `instancedGhostKey`) and whose
+  root is a hidden twin on that program (`buildOccluderFadeTwin`, the ONE
+  recipe the prewarm and the gate share; `instancedGhostTwin` for the pools,
+  built with the live stand-in's own `createInstancedGhostMaterial`). A cold
+  key fires the twin's compile through the reveal compile host and holds: an
+  EDGE consult (the camera is inside the structure now) names the actionable
+  floor, `compile(root, imminent, namedPriority)`, and escalates a key a
+  prefetch already queued at the ordinary priority (one more compile of the
+  same twin, the key settling on either result); the painter's per-frame path is
+  `advanceOccluderFade`, which keeps the structure OPAQUE while its alpha keeps
+  stepping and writes the flip the frame the link settles; the tree hides ask
+  `InstancedOccluderGhosts.allReady` for every part before the first acquire.
+  Restoring to the authored state never consults, and a structure that
+  clears the camera while still held never flips at all. WHAT THE PLAYER SEES
+  during a hold is the structure itself, opaque, exactly as before it crossed
+  the segment: the hold delays a cosmetic see-through, never a representation
+  (every entity behind the wall keeps drawing; the camera cannot see through
+  the wall yet, as it could not before the fade existed), the same trade the
+  character-effect swap makes, and the hold ends on the twin's settle or the
+  reveal watchdog, never on a clock. Structures within
+  `OCCLUDER_FADE_PREFETCH_YD` of the camera (geometry: the cinematic's opening
+  pull-back, past the wheel range) ask ahead of their first occlusion,
+  `prefetchOccluderFadeWithin` / `prefetchAll`, at the ordinary reveal
+  priority, or imminent under an arrival cover so the covered wait links them
+  too. No installed gate (no async compile, tests, the editor) means the
+  historical immediate flip; `renderer_resource_lifecycle.ts` uninstalls it
+  with the renderer, and the twins (one per program, retained for the gate's
+  life, never disposed while installed) go with it. A new fade painter uses
+  `advanceOccluderFade` and mints its records with `occluderFadeRecordFor`
+  (one record per material AND mesh variant: a plain and an instanced mesh
+  of one material are two programs); every instanced-ghost consumer (trees,
+  the Yumi maze walls, the battleground placements) decides through
+  `occluderKeepsInstances` before `acquire`. Pinned by
+  `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
+- **The Proving Shore coach's guidance is prewarmed AND gated.** The golden
+  ribbon, target ring, body aura, objective beam and camp ring
+  (`coach_trail.ts`) used to mint their materials and canvas textures on the
+  frame the coach's route or target first changed, by bare `scene.add`, and
+  to dispose the ribbon material on every station change: the island's first
+  accepted quest linked three programs inside a live frame. The materials are
+  now the page-wide set in `coach_trail_materials.ts`, staged by the boot
+  manifest on the ability-material lane (`ABILITY_MATERIAL_SOURCES`, the
+  lazy-cache sweep enforces the registration), and every guidance object is
+  built at construction under one root the trail attaches through
+  `attachSceneGroupGated` with the renderer's compile gate, so the root stays
+  hidden until the programs link whatever the boot kept; rebuilds only swap
+  geometry. The zone archetype prewarm also takes the kill targets of the
+  zone's quests (`zone_prewarm_templates_core.ts`), so a summon-only quest
+  mob (the island's Mister Crabs) is staged with the camps. Pinned by
+  `tests/coach_trail_materials.test.ts` and
+  `tests/zone_prewarm_templates_core.test.ts`.
 - **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
   A gate hides a still-linking object so its reveal draw cannot stall the frame;
   the link is not cancellable and the gate timeout is diagnostic only, so the
@@ -483,6 +577,16 @@ GPU work signs. Each rule names its seam and its guard.
   `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built,
   ahead of that renderer's first `render()`.** Guard: the secondary-context pins in
   `tests/shader_debug_flag.test.ts`.
+- **Every `THREE.ShaderChunk` patch installs at module scope, from its own module
+  (`final_color_nan_guard.ts` is the template), unless it is scoped to exactly one
+  renderer on purpose** (`installPbrPointLightShaderPruning`, `pbr_fragment_shader.ts`,
+  called only from `initGfxTier`, since only the world renderer needs it today). This
+  repo builds more than one `WebGLRenderer` outside `initGfxTier`
+  (`characters/preview.ts`, `characters/portrait.ts`, `armory_preview.ts`,
+  `src/editor/asset_thumbs.ts`, `src/guide/viewer/scene.ts`,
+  `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
+  world renderer, and a per-site call is easy to miss on one of the others. Guard:
+  `tests/final_color_nan_guard.test.ts`.
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),

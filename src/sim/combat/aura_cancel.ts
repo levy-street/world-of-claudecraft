@@ -1,11 +1,10 @@
 // Player-initiated buff cancellation ("right-click a buff to remove it").
 //
 // Pure, host-agnostic decision logic shared by the offline Sim (which mutates the
-// authoritative aura array) and the HUD (which decides which icons render as a
-// debuff and which expose the right-click affordance). Keeping the classification
-// in one leaf means "rendered as a helpful buff" and "right-click cancelable" are
-// provably the same set and can never drift apart.
+// authoritative aura array) and the HUD (which decides which icons expose the
+// right-click affordance).
 import { isDebuffAura as classifyDebuffAura, isPlayerRemovableAura } from '../aura_classify';
+import { DIVINE_ASCENSION_AURA_ID } from '../paladin_devotion';
 import type { Aura } from '../types';
 
 type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
@@ -13,10 +12,24 @@ type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
-// the stat). Mirrors the HUD's buff-vs-debuff styling test.
+// the stat). Display-only debuff styling does not count here.
 export function isDebuffAura(a: CancelableAura): boolean {
   return classifyDebuffAura(a.kind, a.value);
 }
+
+// `internal_cd` almost always rides hidden engine bookkeeping (applyStateAura in
+// combat/hunter_shared.ts and its siblings across every class: an internal
+// cooldown gating a proc/burst re-trigger, a rotation counter, a ready state), not
+// a buff the player carries. It defaults to isDebuffAura false (it is in neither
+// DEBUFF_AURA_KINDS nor a negative buff_*), so a player could right-click one away
+// the instant it landed and re-trigger the burst/proc it protects on demand,
+// defeating the gate entirely (reported: Hunter Enduring Courser's 20s ICD
+// stripped to farm its 3s/60% movement-speed burst at 100% uptime in arena/BG).
+// A rare few `internal_cd` auras ARE a genuine player-facing resource window with
+// their own bespoke Sim.cancelAura teardown (Divine Ascension unwinds
+// paladinDevotion.ascensionCharges/Remaining alongside the aura): list those here
+// explicitly, opt-in, rather than reopening the kind to every silent gate.
+const CANCELABLE_INTERNAL_CD_IDS: ReadonlySet<string> = new Set([DIVINE_ASCENSION_AURA_ID]);
 
 // A player may voluntarily cancel any helpful aura they carry; debuffs never. The
 // classic right-click-cancel includes forms, stances, and stealth (canceling a
@@ -27,6 +40,7 @@ export function isCancelableAura(a: CancelableAura): boolean {
   return (
     a.id !== 'beacon_of_light' &&
     a.id !== 'veilbound_march' &&
+    (a.kind !== 'internal_cd' || CANCELABLE_INTERNAL_CD_IDS.has(a.id)) &&
     isPlayerRemovableAura(a) &&
     !isDebuffAura(a)
   );

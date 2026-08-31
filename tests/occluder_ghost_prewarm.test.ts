@@ -17,17 +17,14 @@ import { attachBiomeHaze } from '../src/render/biome_haze_field';
 import { fenbridgeTownInternalsForTest } from '../src/render/fenbridge_town';
 import { gfxInternalsForTest, surfaceMat } from '../src/render/gfx';
 import { cloneMaterialWithHooks } from '../src/render/material_clone_hooks';
-import {
-  applyOccluderFade,
-  isOccluderGhostMaterial,
-  occluderFadeMat,
-} from '../src/render/occluder_fade';
+import { applyOccluderFade, occluderFadeMat } from '../src/render/occluder_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   buildGhostVariantPrewarmGroup,
   collectOccluderGhostTargets,
   occluderGhostVariantKey,
 } from '../src/render/occluder_ghost_prewarm';
+import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_key';
 import {
   modulateEmissiveByVertexColor,
   vertexColorEmissiveInternalsForTest,
@@ -78,6 +75,12 @@ function programKeyInputs(material: THREE.Material): Record<string, unknown> {
   };
 }
 
+// A record over a plain box mesh: the tests here exercise the scan and the
+// twins, whose keys read the LIVE meshes, not the record's own context.
+function fadeMat(material: THREE.Material): ReturnType<typeof occluderFadeMat> {
+  return occluderFadeMat(material, new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material));
+}
+
 // A ghosted structure as the hideable registries build one: a group of meshes
 // whose per-structure materials went through occluderFadeMat.
 function ghostedStructure(materials: readonly THREE.Material[]): {
@@ -87,7 +90,7 @@ function ghostedStructure(materials: readonly THREE.Material[]): {
   const group = new THREE.Group();
   const mats = materials.map((material) => {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const record = occluderFadeMat(material);
+    const record = fadeMat(material);
     group.add(new THREE.Mesh(geometry, record.mat));
     return record;
   });
@@ -111,13 +114,13 @@ describe('occluderFadeMat marks its ghost materials', () => {
   it('marks every fade record it mints, whichever registry called it', () => {
     const material = kitMaterial('villageWall');
     expect(isOccluderGhostMaterial(material)).toBe(false);
-    occluderFadeMat(material);
+    fadeMat(material);
     expect(isOccluderGhostMaterial(material)).toBe(true);
   });
 
   it('records the authored state unchanged (the marker is not a state change)', () => {
     const material = kitMaterial('villageWall');
-    const record = occluderFadeMat(material);
+    const record = fadeMat(material);
     expect(record.transparent).toBe(false);
     expect(record.opacity).toBe(1);
     expect(record.depthWrite).toBe(true);
@@ -145,7 +148,7 @@ describe('collectOccluderGhostTargets', () => {
 
   it('deduplicates a ghost material shared by several meshes of one structure', () => {
     const shared = kitMaterial('shared');
-    occluderFadeMat(shared);
+    fadeMat(shared);
     const root = new THREE.Group();
     root.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), shared));
     root.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), shared));
@@ -155,8 +158,8 @@ describe('collectOccluderGhostTargets', () => {
   it('reads every slot of a multi-material mesh', () => {
     const front = kitMaterial('front');
     const back = kitMaterial('back');
-    occluderFadeMat(front);
-    occluderFadeMat(back);
+    fadeMat(front);
+    fadeMat(back);
     const root = new THREE.Group();
     root.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), [front, back]));
     expect(collectOccluderGhostTargets(root).map((t) => t.material)).toEqual([front, back]);
@@ -164,7 +167,7 @@ describe('collectOccluderGhostTargets', () => {
 
   it('keeps the instanced flag and instance-colour flag of the live mesh', () => {
     const material = kitMaterial('wallInstanced');
-    occluderFadeMat(material);
+    fadeMat(material);
     const root = new THREE.Group();
     const instanced = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, 4);
     instanced.setColorAt(0, new THREE.Color(1, 1, 1));
@@ -230,8 +233,8 @@ describe('buildGhostVariantPrewarmGroup', () => {
   it('shares the live geometry and mesh kind, which the cache key also reads', () => {
     const plain = kitMaterial('wall');
     const instancedMat = kitMaterial('wallInstanced');
-    occluderFadeMat(plain);
-    occluderFadeMat(instancedMat);
+    fadeMat(plain);
+    fadeMat(instancedMat);
     const root = new THREE.Group();
     const plainGeo = new THREE.BoxGeometry(1, 1, 1);
     const instancedGeo = new THREE.BoxGeometry(2, 2, 2);
@@ -265,7 +268,7 @@ describe('one twin per program identity, not per ghost material', () => {
   function ghostRoot(entries: readonly [THREE.Material, THREE.BufferGeometry][]): THREE.Group {
     const root = new THREE.Group();
     for (const [material, geometry] of entries) {
-      occluderFadeMat(material);
+      fadeMat(material);
       root.add(new THREE.Mesh(geometry, material));
     }
     return root;
@@ -336,7 +339,7 @@ describe('one twin per program identity, not per ghost material', () => {
     const tangentMat = kitMaterial('b');
     const morphMat = kitMaterial('c');
     const instancedMat = kitMaterial('d');
-    for (const m of [plainMat, tangentMat, morphMat, instancedMat]) occluderFadeMat(m);
+    for (const m of [plainMat, tangentMat, morphMat, instancedMat]) fadeMat(m);
     const root = new THREE.Group();
     root.add(new THREE.Mesh(box(), plainMat));
     root.add(new THREE.Mesh(tangents, tangentMat));

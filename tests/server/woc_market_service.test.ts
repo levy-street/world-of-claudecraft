@@ -21,6 +21,10 @@ import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
 import { describe, expect, it, vi } from 'vitest';
 import type {
+  DesktopWalletStepUpAuthorization,
+  DesktopWalletTransactionAuthorization,
+} from '../../server/desktop_wallet_handoff';
+import type {
   CharacterSaveArgs,
   Refused,
   WocBidRow,
@@ -9057,5 +9061,182 @@ describe('settlementQuote entry guards', () => {
       reason: 'quote_expired',
     });
     expect((await getSettlement(h, settlement.id)).state, 'never revived').toBe('failed');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Desktop browser-signing registration (issue #3692): the service registers
+// every signable step-up challenge and payable quote with the desktop wallet
+// handoff store, keyed for the /api/desktop-wallet/create lookups.
+// ---------------------------------------------------------------------------
+
+describe('desktop handoff registration', () => {
+  function recordingRegistrar() {
+    const stepUps: Array<[number, DesktopWalletStepUpAuthorization]> = [];
+    const transactions: Array<[number, DesktopWalletTransactionAuthorization]> = [];
+    return {
+      stepUps,
+      transactions,
+      registrar: {
+        authorizeStepUp: (accountId: number, auth: DesktopWalletStepUpAuthorization) => {
+          stepUps.push([accountId, auth]);
+        },
+        authorizeTransaction: (accountId: number, auth: DesktopWalletTransactionAuthorization) => {
+          transactions.push([accountId, auth]);
+        },
+      },
+    };
+  }
+
+  it('registers an issued step-up challenge under the seller wallet (real-signature arm)', async () => {
+    const h = makeHarness();
+    const rec = recordingRegistrar();
+    (h.deps as { stepUpDevSig: boolean }).stepUpDevSig = false;
+    h.deps.desktopHandoff = rec.registrar;
+    const out = await h.service.issueStepUpChallenge(
+      SELLER,
+      listBindingFor(EPIC_ITEM, listingParams()),
+    );
+    if (!out.ok) throw new Error(`issue refused: ${out.reason}`);
+    expect(rec.stepUps).toEqual([
+      [
+        SELLER,
+        {
+          nonce: out.challenge.nonce,
+          message: out.challenge.message,
+          expectedAddress: 'wallet-seller',
+          expiresAtMs: out.challenge.expiresAtMs,
+        },
+      ],
+    ]);
+    expect(rec.transactions).toEqual([]);
+  });
+
+  it('registers nothing for a devsig challenge (no wallet ever signs it)', async () => {
+    const h = makeHarness();
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    const out = await h.service.issueStepUpChallenge(
+      SELLER,
+      listBindingFor(EPIC_ITEM, listingParams()),
+    );
+    if (!out.ok) throw new Error(`issue refused: ${out.reason}`);
+    expect(out.challenge.signatureRequired).toBe(false);
+    expect(rec.stepUps).toEqual([]);
+  });
+
+  it('registers a signable bond quote under the bidder wallet at placeBid', async () => {
+    const h = twoEpics(makeHarness());
+    const listing = await listEpic(h);
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    // The dev economy answers signatureRequired false (nothing signable), so
+    // force the production posture on the quote alone; everything else rides
+    // the real dev-economy answer.
+    const economy = h.deps.economy;
+    h.deps.economy = {
+      ...economy,
+      bondQuote: async (args) => ({
+        ...(await economy.bondQuote(args)),
+        signatureRequired: true,
+      }),
+    };
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(rec.transactions).toEqual([
+      [
+        BUYER_A,
+        expect.objectContaining({
+          reference: placed.bid.bondReference,
+          expectedAddress: 'wallet-a',
+          rail: 'woc',
+          expiresAtMs: placed.bid.bondQuoteExpiresAtMs,
+        }),
+      ],
+    ]);
+    expect(rec.stepUps).toEqual([]);
+  });
+
+  it('registers the FINAL refreshed bond quote past the CAS, under the bidder wallet', async () => {
+    const h = twoEpics(makeHarness());
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    // Arm the recorder only for the refresh, and force the production
+    // signable posture on the re-quote alone.
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    const economy = h.deps.economy;
+    h.deps.economy = {
+      ...economy,
+      bondQuote: async (args) => ({
+        ...(await economy.bondQuote(args)),
+        signatureRequired: true,
+      }),
+    };
+    const refreshed = unwrap(
+      await h.service.refreshBondQuote(BUYER_A, placed.bid.id),
+      'refreshBondQuote',
+    );
+    expect(rec.transactions).toEqual([
+      [
+        BUYER_A,
+        expect.objectContaining({
+          reference: refreshed.bond.reference,
+          expectedAddress: 'wallet-a',
+          rail: 'woc',
+          expiresAtMs: refreshed.bond.expiresAtMs,
+        }),
+      ],
+    ]);
+  });
+
+  it('registers the buy-now settlement quote past the stamp (the quoteFor path)', async () => {
+    const h = twoEpics(makeHarness());
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    const economy = h.deps.economy;
+    h.deps.economy = {
+      ...economy,
+      settlementQuote: async (args) => ({
+        ...(await economy.settlementQuote(args)),
+        signatureRequired: true,
+      }),
+    };
+    const buy = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(rec.transactions).toEqual([
+      [
+        BUYER_A,
+        expect.objectContaining({
+          reference: buy.quote.reference,
+          expectedAddress: 'wallet-a',
+          rail: 'woc',
+        }),
+      ],
+    ]);
+    expect(buy.quote.reference).not.toBeNull();
   });
 });

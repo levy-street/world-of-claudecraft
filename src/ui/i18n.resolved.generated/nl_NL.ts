@@ -789,7 +789,37 @@ export const nl_NL: EnTranslations = {
       "applied": "In gebruik",
       "apply": "Skin toepassen",
       "detach": "Skin verwijderen",
-      "equipHint": "Rust een {type} uit om deze skin aan te brengen."
+      "equipHint": "Rust een {type} uit om deze skin aan te brengen.",
+      "charter": {
+        "eyebrow": "Geldkist",
+        "title": "Geldkistcharters",
+        "scope": "Een charter breidt alleen de bank van dit personage uit. De thesaurier verkoopt dezelfde vakken voor goud.",
+        "grant": "Voegt {slots} bankvakken toe",
+        "buy": "Charter Kopen",
+        "buyAria": "{item} kopen",
+        "confirmTitle": "Aankoop van Charter Bevestigen",
+        "confirmBody": "{item} kopen voor {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "Het charter is toegepast. De bank van dit personage is nu groter.",
+        "alreadyGranted": "Dit charter staat al op dit personage. Je bent niet opnieuw belast.",
+        "applyDeferred": "Betaling voltooid. De vakken worden automatisch toegepast de volgende keer dat dit personage inlogt.",
+        "grantUnresolved": "Betaling voltooid, maar de vakken konden nog niet worden toegepast. De aankoop is geregistreerd en support kan dit voor je afronden.",
+        "inProgress": "Een aankoop voor dit personage wordt nog voltooid. Probeer het straks opnieuw.",
+        "doesNotFit": "De bank van dit personage heeft geen ruimte voor de volledige toekenning van dit charter.",
+        "notPurchasable": "Dit charter kan nu niet worden gekocht.",
+        "noRoom": "De bank van dit personage heeft geen ruimte meer voor een charter.",
+        "noCharterFits": "Geen enkel charter past in de resterende ruimte van de bank van dit personage.",
+        "someHiddenByFit": "Charters die te groot zijn voor de resterende ruimte in de bank van dit personage worden niet getoond.",
+        "outage": "De aankoop kon niet worden bevestigd. Probeer het opnieuw met deze knop; je wordt niet dubbel belast. Als je het spel eerst herlaadt, kan die bescherming verloren gaan.",
+        "outageStale": "Ga terug naar de Winkel en gebruik dezelfde actie Charter Kopen opnieuw. Je wordt niet dubbel belast. Als je het spel eerst herlaadt, kan die bescherming verloren gaan.",
+        "failed": "De aankoop kon niet worden voltooid.",
+        "names": {
+          "strongbox_charter_1": "Mindere Geldkistcharter",
+          "strongbox_charter_2": "Grotere Geldkistcharter",
+          "strongbox_charter_3": "Grootse Geldkistcharter",
+          "strongbox_charter_complete": "Volledige Geldkistcharter"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -845,6 +875,7 @@ export const nl_NL: EnTranslations = {
       "reset": "Herstellen",
       "presets": {
         "classic": "Klassiek Goud",
+        "fancyGold": "Chique Goud (WIP)",
         "midnight": "Middernacht",
         "parchment": "Perkament",
         "highContrast": "Hoog Contrast"
@@ -925,7 +956,8 @@ export const nl_NL: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "u",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Voorbeeld van Personagemodel"
@@ -1321,6 +1353,11 @@ export const nl_NL: EnTranslations = {
       "reset": "Herstellen",
       "done": "Klaar",
       "cancel": "Annuleren",
+      "showExtraBar": "Nog een Actiebalk Tonen",
+      "hideExtraBar": "Een Actiebalk Verbergen",
+      "conflictTitle": "Toets Al Gebonden",
+      "conflictBody": "{key} is al gebonden aan {other}. Als je het bindt aan {action}, wordt {other} ontbonden.",
+      "conflictAccept": "Toch Herbinden",
       "resetConfirmTitle": "Actiebalktoetsen herstellen?",
       "resetConfirmBody": "De eerste balk keert terug naar zijn standaardtoetsen. De tweede en derde balk raken hun toewijzing kwijt. Dit kan niet ongedaan worden gemaakt."
     },
@@ -1350,6 +1387,7 @@ export const nl_NL: EnTranslations = {
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
+      "name_rickshaw_mount": "Beengebonden Riksja",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1358,7 +1396,8 @@ export const nl_NL: EnTranslations = {
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
-      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend."
+      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
+      "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1528,6 +1567,7 @@ export const nl_NL: EnTranslations = {
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
+      "alwaysShowAllBuffs": "Altijd Alle Buffs Tonen",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "stopAutoAttackOnTargetSwitch": "Auto-Aanval Stoppen bij Doelwitwissel",
@@ -1537,19 +1577,25 @@ export const nl_NL: EnTranslations = {
       "stickyTarget": "Doel behouden bij klikken op de grond",
       "showItemLevel": "Itemniveau tonen",
       "showReliquaryTracker": "Toon Relikwieëntracker",
+      "confirmVendorSell": "Bevestigen Voor Verkoop",
+      "confirmVendorSellNote": "Dit uitzetten verkoopt voorwerpen met één klik zonder bevestiging, dus een verschoven tasvak zou het verkeerde voorwerp aan de handelaar kunnen verkopen.",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
+      "combineActionBars": "Actiebalken Combineren",
       "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
+      "showTargetSwingTimer": "Aanvalstimer van doelwit tonen",
       "showPetFrame": "Je huisdier tonen",
       "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
       "mobileLeftHanded": "Linkshandige indeling",
+      "touchPreciseAim": "Nauwkeurig Grondmikken",
+      "touchPreciseAimNote": "Mik voordat je grondspreuken werpt. Zet dit uit om direct op het voorgestelde punt te werpen.",
       "touchTapMenus": "Tik voor menu's",
       "touchTapMenusNote": "Open de actie-, verbruiksartikelen- en menuknoppen met een tik in plaats van een veeg. Tik op een item om het te gebruiken, tik nogmaals op de knop voor de gebruikelijke actie, of tik buiten het venster om te sluiten."
     },
@@ -1585,6 +1631,7 @@ export const nl_NL: EnTranslations = {
       "invertY": "Camera omkeren (Y)",
       "deadzone": "Stickdode zone",
       "cameraSpeed": "Camerasnelheid",
+      "reticleSpeed": "Richtkruissnelheid",
       "vibration": "Trilling",
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
@@ -1965,6 +2012,7 @@ export const nl_NL: EnTranslations = {
       "fromYour": "Van je {value} {stat}:",
       "names": {
         "spellPower": "Spreukkracht",
+        "healPower": "Genezingskracht",
         "critRating": "Crit-waardering",
         "hasteRating": "Snelheidswaardering",
         "parry": "Parering",
@@ -2099,6 +2147,12 @@ export const nl_NL: EnTranslations = {
         "few": "{count} seconden resterend",
         "many": "{count} seconden resterend",
         "other": "{count} seconden resterend"
+      },
+      "buffsHidden": {
+        "one": "Er is nog {count} verbetering actief, maar die is verborgen in deze grafische preset",
+        "few": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "many": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "other": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -2433,7 +2487,10 @@ export const nl_NL: EnTranslations = {
       "backpack": "Rugzak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leeg tasvak",
-      "unequipHint": "Klik om deze tas af te doen"
+      "unequipHint": "Klik om deze tas af te doen",
+      "poolGeneral": "Algemeen: {used} van {total}",
+      "poolMaterials": "Materialen: {used} van {total}",
+      "capacityPoolsAria": "Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -2446,7 +2503,180 @@ export const nl_NL: EnTranslations = {
       "leather": "Leer",
       "mail": "Maliën"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "De linker smidspijler laadt op. Hij ontsteekt over 3 sec!",
+      "rightPillarCharging": "De rechter smidspijler laadt op. Hij ontsteekt over 3 sec!",
+      "bothPillarsCharging": "De smidspijlers laden op. Ze ontsteken over 3 sec!",
+      "artificerApproaches": "Een Cinder Artificer nadert de smidse!",
+      "leftPillar": "De linker smidspijler ontsteekt!",
+      "rightPillar": "De rechter smidspijler ontsteekt!",
+      "bothPillars": "De smidspijlers ontsteken!",
+      "portalsOpening": "De smidsportalen gaan open!",
+      "heat75": "De smidse staat op 75% hitte!",
+      "heat90": "Smidsinstorting is op handen!",
+      "addsDefeated": "Het Smidslegioen is verslagen: Varkhul ligt bloot!",
+      "worldfireBegins": "Wereldvuur ontsteekt aan de rand van de ruimte. De Smeltkroes wordt over 42 sec verteerd!",
+      "worldfireClosing": "Wereldvuur sluit zich. Beweeg naar het midden!",
+      "worldfireConsumed": "De hele Smeltkroes staat in brand!"
+    },
+    "varkhulWaveStatus": "Golf {wave}/{waves} | Vijanden: {remaining}",
+    "raidBossGuide": {
+      "title": "Baasgids",
+      "button": "Baasgids: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "Baasgids sluiten",
+      "bossesLabel": "Raidbazen",
+      "difficultyLabel": "Moeilijkheidsgraad",
+      "normal": "Normaal",
+      "heroic": "Heroïsch",
+      "portraitAlt": "Gevechtsportret van {boss}",
+      "overviewHeading": "Overzicht",
+      "abilitiesHeading": "Vaardigheden",
+      "whatToDo": "Wat te doen",
+      "whatToDoResponse": "Wat te doen: {response}",
+      "rolesLabel": "Rolverantwoordelijkheden",
+      "flagsLabel": "Mechaniekwaarschuwingen",
+      "roleTank": "Tank",
+      "roleHealer": "Genezer",
+      "roleDamage": "Schade",
+      "roleAll": "Alle rollen",
+      "flagDeadly": "Dodelijk",
+      "flagInterruptible": "Onderbreekbaar",
+      "flagImportant": "Belangrijk",
+      "flagCleansable": "Reinigbaar",
+      "browseBoss": "Bekijk {boss}",
+      "chooseDifficulty": "Bekijk {difficulty}-mechanieken",
+      "expandAbility": "{ability} uitklappen",
+      "collapseAbility": "{ability} inklappen",
+      "abilityControlLabel": "{action}. {details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "Varkhul smeedde Ignivar als heraut, een levend zegel, en de sleutel tot The Inner Crucible. Het gevecht test controle over waterkanalen, precieze beweging, en snelle prioriteitsschade.",
+        "phaseOpeningName": "De Heraut Ontwaakt",
+        "phaseOpeningSummary": "Beheers Brandmerk van de Brandstapel met de waterkanalen, terwijl je Ignivars herhalende frontale aanval, hemelvuur, roterende stralen en uitdijende Smidsgolf opvangt.",
+        "phaseApocalypseName": "Tussenspel: Apocalyps",
+        "phaseApocalypseSummary": "Bij {health} gezondheid roept Ignivar een Ashcaller op die probeert het gevecht te beëindigen.",
+        "phaseJudgmentName": "Oordeel van de Smidse",
+        "phaseJudgmentSummary": "Bij {health} gezondheid ontsteekt Ignivar de arena en onthult één veilige schuilplaats tussen drie schuilplaatsen.",
+        "phaseJudgmentHeroicSummary": "Bij {health} gezondheid ontsteekt Ignivar de arena, terwijl actieve Brandmerken nabije spelers binnen de schuilplaats blijven bedreigen.",
+        "phaseFinaleName": "Finale: Laatste Inferno",
+        "phaseFinaleSummary": "Bij {health} gezondheid begint Ignivar aan een laatste verbrandingsfase met een harde deadline en snellere herhalende mechanieken.",
+        "forgeStrikeName": "Smidsslag",
+        "forgeStrikeSummary": "Ignivar slaat zijn huidige tank en past Gesmolten Pantser toe, wat de schade die je van Ignivar oploopt verhoogt.",
+        "forgeStrikeResponse": "Tanks wisselen bij {stacks} stapels. Genezers bereiden zich voor op de slag en de eerste melee-klappen van de nieuwe tank.",
+        "brandName": "Brandmerk van de Brandstapel",
+        "brandSummary": "Ignivar markeert niet-tankspelers met aanhoudende vuurschade. Gebrandmerkte spelers verbranden ook nabije bondgenoten.",
+        "brandResponse": "Spreid je uit. Richt Verzengende Vuurstroom op een gereed waterkanaal, en laat elke gemarkeerde speler daarna alleen door het geactiveerde water steken om te reinigen.",
+        "brandHeroicResponse": "Spreid je uit. Open een kanaal met Verzengende Vuurstroom en reinig steeds één gemarkeerde speler tegelijk. Elke reiniging veroorzaakt raidbrede Reinigingsterugslag.",
+        "searingTorrentName": "Verzengende Vuurstroom",
+        "searingTorrentSummary": "Ignivar volgt een speler, en lost dan een brede frontale uitbarsting. Een gereed waterkanaal dat door de uitbarsting wordt geraakt, wordt korte tijd actief.",
+        "searingTorrentHeroicSummary": "Ignivar volgt een speler, en lost dan een bijna dodelijke frontale uitbarsting. Een gereed waterkanaal dat door de uitbarsting wordt geraakt, wordt korte tijd actief.",
+        "searingTorrentResponse": "Richt de waarschuwing door precies één gereed kanaal. Iedereen anders verlaat de frontale aanval voordat de spreuk voltooid is.",
+        "rainName": "Sintelregen",
+        "rainSummary": "Drie vuursectoren en gemarkeerde meteorinslagen bestraffen spelers die binnen hun waarschuwingen blijven staan.",
+        "rainHeroicSummary": "Drie vuursectoren en gemarkeerde meteorinslagen richten extreme schade aan bij spelers die binnen hun waarschuwingen blijven staan.",
+        "rainResponse": "Beweeg naar een ongemarkeerde opening en verlaat elke meteorcirkel voor de inslag.",
+        "raysName": "Ronddraaiend Inferno",
+        "raysSummary": "Roterende vuurstralen zwiepen rond Ignivar en beschadigen herhaaldelijk spelers die ze raken.",
+        "raysHeroicSummary": "Roterende vuurstralen zwiepen rond Ignivar en veroorzaken bij contact zware herhaalde schade.",
+        "raysResponse": "Beweeg mee met de open ruimte tussen de stralen. Snijd nooit door een straal, zelfs niet met een snelle bewegingsvaardigheid.",
+        "forgeWaveName": "Smidsgolf",
+        "forgeWaveSummary": "Een uitdijende muur van vuur trekt door de arena, met twee tegenoverliggende openingen, en stoot geraakte spelers achteruit.",
+        "forgeWaveHeroicSummary": "Een uitdijende muur van vuur trekt door de arena, met twee tegenoverliggende openingen, en stoot geraakte spelers veel verder weg.",
+        "forgeWaveResponse": "Vind een van de openingen tijdens de oplaadtijd, lijn je ermee uit, en vermijd weggestoten te worden richting de rand van de arena.",
+        "apocalypseName": "Apocalyps",
+        "apocalypseSummary": "Ignivar roept een Ashcaller op. Als deze versterking Apocalyps voltooit, wordt de raid onmiddellijk verslagen.",
+        "apocalypseResponse": "Schakel alle beschikbare schade over naar de Ignivar Ashcaller en versla hem voordat de spreuk voltooid is.",
+        "judgmentName": "Oordeel van de Smidse",
+        "judgmentSummary": "Ignivar markeert drie schuilplaatsen, wijst er één als veilige schuilplaats aan, en verbrandt daarna herhaaldelijk de rest van de arena.",
+        "judgmentHeroicSummary": "Ignivar markeert één veilige schuilplaats terwijl de arena brandt. Brandmerk van de Brandstapel blijft actief en beschadigt nog steeds nabije bondgenoten.",
+        "judgmentResponse": "Identificeer de uniek gemarkeerde schuilplaats tijdens de waarschuwing en stapel volledig binnen de grens voordat de vloer ontsteekt.",
+        "chainsName": "Ketenen van de Smidse",
+        "chainsSummary": "Ignivar koppelt nabije paren aan elkaar. Te ver uit elkaar gaan of de keten van een ander paar kruisen veroorzaakt dodelijke schade.",
+        "chainsResponse": "Blijf dicht bij je gekoppelde partner, beweeg samen, en houd elke andere speler weg van jullie keten.",
+        "lastInfernoName": "Laatste Inferno",
+        "lastInfernoSummary": "Ignivar raakt woedend en bereidt een totale nederlaag voor, terwijl Sintelregen, Verzengende Vuurstroom en Ronddraaiend Inferno versnellen.",
+        "lastInfernoResponse": "Gebruik je resterende schade- en genezingsafkoeltijden, blijf de bewegingsmechanieken uitvoeren, en versla Ignivar voordat het aftellen eindigt.",
+        "brand": "Brandmerk van de Brandstapel: spreid je uit. Richt Verzengende Vuurstroom op een gereed waterkanaal, en steek dan alleen door het water om te reinigen.",
+        "movement": "Beweging: vermijd de kegels en meteoren van Sintelregen, beweeg mee met Ronddraaiend Inferno, en gebruik de twee openingen van Smidsgolf.",
+        "apocalypse": "Apocalyps: dood Ignivar Ashcaller voordat zijn spreuk voltooid is.",
+        "judgment": "Oordeel van de Smidse: identificeer de unieke schuilplaats tijdens de waarschuwing, en stapel dan binnen de gemarkeerde grens zodra de vloer ontsteekt.",
+        "finale": "Laatste Inferno: maak Ignivar af voordat de totale nederlaag volgt, terwijl snellere meteoren, frontale aanvallen en Ronddraaiend Inferno doorgaan.",
+        "heroic": "Heroïsch: gekoppelde spelers blijven dicht bij elkaar tijdens Ketenen van de Smidse, Brandmerk blijft actief binnen Oordeel, en Smidsgolf stoot verder weg."
+      },
+      "varkhul": {
+        "overview": "Varkhul kluisterde de stervende Last Spring om levend metaal te smeden, en schiep daarna Ignivar om de misdaad te bewaken. Zijn gevecht combineert persoonlijke positionering met raidbrede controle over de grote smidse.",
+        "phaseOpeningName": "De Smidsvader",
+        "phaseOpeningSummary": "Varkhul wisselt tussen tankdruk, brede frontale aanvallen, bewegende projectielen, groepsklappen, meteorengolven, en aanvallen vanaf het grote aambeeld.",
+        "phaseAssemblyName": "Tussenspel: De Samenkomst van de Meester",
+        "phaseAssemblySummary": "Bij {health} gezondheid wordt Varkhul beschermd, terwijl zijn Smidslegioen door portalen binnenkomt en de pijlerstralen een Smidsinstorting dreigen te veroorzaken.",
+        "phaseFinaleName": "Finale: Ontketend Meesterwerk",
+        "phaseFinaleSummary": "Bij {health} gezondheid valt Varkhul sneller aan, richt meer schade aan, en stuurt golven vuur door de raid tot de laatste deadline.",
+        "phaseFinaleHeroicSummary": "Bij {health} gezondheid laat Varkhul de meeste eerdere mechanieken varen terwijl Wereldvuur naar binnen sluit en de Smeltkroes verteert.",
+        "makersBrandName": "Brandmerk van de Maker",
+        "makersBrandSummary": "Varkhul slaat zijn huidige tank en past een stapelend effect toe dat alle schade die je van hem oploopt verhoogt.",
+        "makersBrandResponse": "Tanks wisselen bij {stacks} stapels. Genezers bereiden de binnenkomende tank voor voordat Varkhul van doelwit wisselt.",
+        "frontalName": "Zwaai van de Smidsvader",
+        "frontalSummary": "Varkhul lost een zeer brede frontale zwaai die zware vuurschade aanricht bij iedereen voor hem.",
+        "frontalHeroicSummary": "Varkhul lost een zeer brede frontale zwaai die bijna dodelijke vuurschade aanricht bij iedereen voor hem.",
+        "frontalResponse": "Houd Varkhul van de groep af gericht en beweeg achter hem zodra de waarschuwing verschijnt.",
+        "orbsName": "Sintelbollen",
+        "orbsSummary": "Gemarkeerde niet-tanks laten blijvende sintelpoelen achter en zenden vuurbollen in alle richtingen uit. Roodgloeiend Metaal absorbeert bovendien inkomende genezing.",
+        "orbsHeroicSummary": "Gemarkeerde niet-tanks laten zwaar beschadigende, blijvende sintelpoelen achter en zenden gevaarlijke vuurbollen in alle richtingen uit. Roodgloeiend Metaal absorbeert bovendien inkomende genezing.",
+        "orbsResponse": "Draag elke markering naar de rand van de ruimte, houd de poelen gescheiden, en ontwijk dan de bollen terwijl ze de arena kruisen. Genezers verwijderen de absorptie snel.",
+        "pyreName": "Gedeelde Brandstapel",
+        "pyreSummary": "Een bewegende cirkel volgt één speler zonder Roodgloeiend Metaal. De schade wordt verdeeld onder de spelers erbinnen, en elke ontbrekende speler doet {missingPenalty} schade aan maximale gezondheid bij de hele raid.",
+        "pyreHeroicSummary": "Een bewegende cirkel volgt één speler zonder Roodgloeiend Metaal en verdeelt een grotere klap. Elke ontbrekende speler doet bovendien {missingPenalty} schade aan maximale gezondheid bij de hele raid.",
+        "pyreResponse": "Stapel minstens {players} spelers binnen de cirkel en beweeg mee met het doelwit ervan tot de spreuk voltooid is.",
+        "forgestormName": "Smidsstorm",
+        "forgestormSummary": "Varkhul roept {waves} opeenvolgende golven gemarkeerde meteorinslagen op door de hele arena.",
+        "forgestormHeroicSummary": "Varkhul roept {waves} opeenvolgende golven gemarkeerde meteorinslagen op die extreme schade aanrichten.",
+        "forgestormResponse": "Let op elke nieuwe set grondwaarschuwingen en beweeg weg voordat die golf landt. Keer niet terug naar een vorige positie zonder de volgende golf te controleren.",
+        "rayName": "Hardingsstraal",
+        "raySummary": "Een straal volgt een gemarkeerde speler tijdens een lange oplaadtijd. De eerste andere speler tussen Varkhul en het doelwit onderschept de klap en krijgt Geharde Wond.",
+        "rayResponse": "Wijs een gezonde speler aan, meestal de off-tank, om in de lijn te stappen. Houd andere spelers eruit en wissel de onderscheppers terwijl Geharde Wond actief is.",
+        "anvilName": "Decreet van het Aambeeld",
+        "anvilSummary": "Varkhul loopt naar de grote smidse en slaat er {strikes} keer op, wat oplopende raidbrede schade veroorzaakt.",
+        "anvilHeroicSummary": "Varkhul slaat {strikes} keer op de grote smidse voor oplopende raidschade, terwijl gemarkeerde meteoren op spelers vallen.",
+        "anvilResponse": "Groepeer voor raidgenezing en gebruik defensieve afkoeltijden bij de laatste klap.",
+        "anvilHeroicResponse": "Spreid gemarkeerde meteoren weg van de groep, terwijl genezers en defensieve afkoeltijden alle {strikes} klappen opvangen.",
+        "assemblyName": "De Samenkomst van de Meester",
+        "assemblySummary": "Varkhul wordt beschermd en start een getimede samenkomst. De raid moet elke portaalgolf verslaan voordat de smidse zijn meesterwerk voltooit.",
+        "assemblyResponse": "Verdeel je aandacht tussen straalcontrole en prioriteitsversterkingen. Versla het volledige Smidslegioen voordat de samenkomsttimer afloopt.",
+        "beamName": "Smeltkroesstraal",
+        "beamSummary": "Actieve pijlerstralen verhitten de smidse tenzij een speler ze blokkeert. Blokkeerders lopen oplopende schade op van Smeltkroesblootstelling, terwijl geblokkeerde en inactieve stralen de hitte laten dalen.",
+        "beamHeroicSummary": "Actieve pijlerstralen verhitten de smidse tenzij een speler ze blokkeert. Blokkeerders lopen oplopende schade op van Smeltkroesblootstelling, en de hitte van de smidse daalt nooit.",
+        "beamResponse": "Ga tussen elke actieve pijler en de smidse staan, en wissel dan de blokkeerders voordat de blootstelling gevaarlijk wordt. Volledige hitte bereiken veroorzaakt een dodelijke Smidsinstorting.",
+        "legionName": "Smidslegioen",
+        "legionSummary": "Crucible Wardens werpen Smeltkroesbeving om hitte aan de smidse toe te voegen, terwijl Cinder Artificers Reparatieprotocol gebruiken om Varkhul te genezen.",
+        "legionResponse": "Onderbreek Smeltkroesbeving, stop Reparatieprotocol, en focus elke gevaarlijke caster voordat je de overige versterkingen opruimt.",
+        "masterpieceName": "Ontketend Meesterwerk",
+        "masterpieceSummary": "Varkhul valt sneller aan, richt meer schade aan, en verbrandt de raid herhaaldelijk tot de totale nederlaag.",
+        "masterpieceHeroicSummary": "Varkhul valt sneller aan en richt meer schade aan, terwijl Wereldvuur de meeste eerdere mechanieken vervangt voor de laatste verbranding.",
+        "masterpieceResponse": "Zet je resterende offensieve en defensieve afkoeltijden in en versla Varkhul voordat het laatste aftellen eindigt.",
+        "worldfireName": "Wereldvuur",
+        "worldfireSummary": "Op Heroïsch rukt het vuur in fasen op van de rand van de arena naar het midden, tot de hele Smeltkroes brandt.",
+        "worldfireResponse": "Beweeg naar binnen, vóór elke oprukkende vuurband, behoud de krimpende veilige ruimte, en maak Varkhul af voordat het midden ontsteekt.",
+        "tanks": "Tanks: wissel bij twee stapels van Brandmerk van de Maker en houd Varkhul binnen meleebereik.",
+        "orbs": "Sintelbollen: gemarkeerde spelers spreiden zich naar de rand van de ruimte. Hun vuurpoelen blijven liggen en de vrijgekomen bollen kruisen de ruimte.",
+        "pyre": "Gedeelde Brandstapel: alleen een speler zonder Roodgloeiend Metaal wordt gekozen. Stapel vier spelers binnen de bewegende cirkel, in beide moeilijkheidsgraden. Elke ontbrekende speler doet 15% van de maximale gezondheid aan de hele raid.",
+        "forgestorm": "Smidsstorm: let op de vallende meteoren en verlaat elke gemarkeerde inslag voordat elk van de drie golven landt.",
+        "anvil": "Decreet van het Aambeeld: Varkhul beweegt naar de grote smidse en slaat er drie keer op voor raidschade. Op Heroïsch vallen er ook gemarkeerde meteoren.",
+        "ray": "Hardingsstraal: een andere speler, meestal een tank, onderschept de bewegende lijn voordat de lange oplaadtijd eindigt. De geraakte speler krijgt Geharde Wond.",
+        "forge": "Smidspijlers: blokkeer actieve stralen voordat ze de smidse bereiken en wissel de blokkeerders naarmate Smeltkroesblootstelling toeneemt. Een volle hittemeter veroorzaakt Smidsinstorting.",
+        "assembly": "De Samenkomst van de Meester: blokkeer beide smidsstralen, dood elke portaalgolf, onderbreek Smeltkroesbeving, en houd Cinder Artificers tegen die Varkhul genezen.",
+        "worldfire": "Wereldvuur: op Heroïsch sluit de brandende rand zich naar het midden tijdens de laatste fase. Versla Varkhul voordat de hele Smeltkroes brandt.",
+        "heroic": "Heroïsch: de hitte van de smidse koelt nooit af, Decreet van het Aambeeld voegt meteoren toe, en de laatste fase verwijdert de meeste mechanieken om zich te richten op Wereldvuur."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over het aantal spelers in de cirkel ({perPlayer}% elk bij {players} spelers).",
+      "varkhulSharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.",
+      "makersBrand": "Gedurende {duration} sec verhoogt elke stapeling de schade die je van Varkhul oploopt met {pct}%. Stapelt tot {max} keer. Tanks moeten wisselen bij {swap} stapelingen.",
+      "varkhulSentinelsGaze": "De Ember Sentinel achtervolgt je. Houd hem weg van de raid tot hij vernietigd is.",
+      "varkhulMoltenCore": "Draag deze kern naar de smidse. Gesmolten Last richt elke {interval} sec oplopende schade aan, van {min}% tot {max}% van de maximale gezondheid.",
+      "varkhulForgeLink": "Onderschep een actieve pijlerstraal voordat hij de smidse bereikt. Open stralen voegen elke seconde 6% hitte toe. Op Normaal koelen geblokkeerde stralen en inactieve pijlers de smidse af; op Heroïsch daalt de hitte nooit. Bij 100% ondergaat de smidse een dodelijke Smidsinstorting.",
+      "varkhulCrucibleExposure": "Het blokkeren van een Smeltkroesstraal richt elke seconde oplopende schade aan je maximale gezondheid aan. De stapelingen resetten 10 seconden na het verlaten van een straal op Normaal, en na 60 seconden op Heroïsch.",
       "dot": "Brengt elke {interval} s {value} {school}schade toe",
       "hot": "Herstelt elke {interval} s {value} gezondheid",
       "mendingCurrent": "Slaat {value} genezing op, na verloop van tijd vrijgegeven of verbruikt door Cascadeherstel",
@@ -2657,7 +2887,9 @@ export const nl_NL: EnTranslations = {
       "chestTitle": "Kist",
       "takeLootButton": "Buit Nemen",
       "takeLootTooltip": "Neemt de munten en gevallen voorwerpen. Verbruikt de oogst niet.",
-      "unifiedPressHint": "De interactietoets berooft en oogst in een keer, op basis van je stadsfocus."
+      "unifiedPressHint": "De interactietoets berooft en oogst in een keer, op basis van je stadsfocus.",
+      "bindConfirmTitle": "Bindt bij het oprapen",
+      "bindConfirmBody": "Deze buit bevat een voorwerp dat aan jou gebonden raakt zodra je het meeneemt. Een gebonden voorwerp kan alleen worden geruild met spelers die de buit deelden, en dat ook maar voor een beperkte tijd."
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
@@ -2689,6 +2921,7 @@ export const nl_NL: EnTranslations = {
     },
     "partyFrames": {
       "section": "Groeps- en raidframes",
+      "optionsSection": "Groepsframe-opties",
       "unlock": "Groeps- en raidframes verplaatsen",
       "lock": "Groeps- en raidframes vergrendelen",
       "style": "Framestijl",
@@ -2719,13 +2952,70 @@ export const nl_NL: EnTranslations = {
     "frameReset": {
       "label": "Frameposities herstellen"
     },
+    "interfaceUnlock": {
+      "label": "Frames Bewerken",
+      "unlock": "Interface ontgrendelen",
+      "lock": "Interface vergrendelen",
+      "lockAll": "Interface Vergrendelen",
+      "barsNote": "Alleen de actiebalken die je hebt ingeschakeld, verschijnen tijdens het bewerken. Voeg eerst meer balken toe met de plus- en minknoppen op de hoofdactiebalk om ze te kunnen plaatsen.",
+      "frozenNote": "Tijdens het bewerken staan de interface en de camera stil: knoppen en frames zijn stilstaande afbeeldingen om te rangschikken, en klikken bereiken de spelwereld niet.",
+      "unlockFrame": "Dit frame ontgrendelen",
+      "lockFrame": "Dit frame vergrendelen",
+      "resizeFrame": "Formaat van dit frame aanpassen",
+      "frameNames": {
+        "actionBar1": "Actiebalk",
+        "actionBar2": "Actiebalk 2",
+        "actionBar3": "Actiebalk 3",
+        "steamWishlist": "Verlanglijstherinnering",
+        "menu": "Menu",
+        "minimap": "Minimap",
+        "stanceBar": "Houdingsbalk",
+        "xpBar": "XP-balk",
+        "chat": "Chat",
+        "actionBarGroup": "Actiebalken",
+        "playerFrame": "Speler",
+        "targetFrame": "Doelwit",
+        "partyFrames": "Groep",
+        "swingBar": "Automatische Aanval"
+      },
+      "framesMenu": "Frame-instellingen",
+      "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",
+      "showHideFrames": "Frames Tonen of Verbergen",
+      "buffsLeftToRight": "Buffs van links naar rechts",
+      "debuffsLeftToRight": "Debuffs van links naar rechts",
+      "lockPlayerFrameToBar": "Spelerframe Vergrendelen aan Actiebalk",
+      "actionBarsVertical": "Verticale Actiebalken",
+      "actionBar1Vertical": "Verticale Actiebalk",
+      "actionBar2Vertical": "Verticale Actiebalk 2",
+      "actionBar3Vertical": "Verticale Actiebalk 3",
+      "menuRailHorizontal": "Horizontaal Menu",
+      "snapToGrid": "Uitlijnen op Raster",
+      "previewMemberName": "{className} {number}",
+      "resetFrameSize": "Grootte resetten",
+      "resetFrameSizeFor": "Grootte resetten voor {name}",
+      "previewSpell": "Voorbeeldspreuk"
+    },
+    "transfer": {
+      "frameLayout": "Frame-indeling",
+      "allSettings": "Alle Instellingen",
+      "exportAction": "Exporteren",
+      "importAction": "Importeren",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd naar klembord.",
+      "copyFailed": "Kopiëren mislukt. Selecteer de code en kopieer hem zelf.",
+      "applyReload": "Toepassen en Herladen",
+      "pastePlaceholder": "Plak hier een geëxporteerde code.",
+      "invalid": "Dat is geen geldige exportcode.",
+      "wrongKind": "Die code is een ander exporttype."
+    },
     "itemTooltip": {
       "requiresLevel": "Vereist niveau {level}",
       "riftTier": "{tier}-rangs Rift-voorwerp",
       "riftUpgrade": "Rift-verbetering {level}/{max}",
       "riftSockets": "Riftjuwelen {used}/{total}",
       "statEnchanted": "+{value} {stat} (Betoverd)",
-      "enchantedFallback": "Betoverd"
+      "enchantedFallback": "Betoverd",
+      "partyTradeWindow": "Je kunt dit voorwerp de komende {time} ruilen met spelers die deze buit deelden. Uitrusten beëindigt het ruilvenster."
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
@@ -2926,7 +3216,10 @@ export const nl_NL: EnTranslations = {
       "unlink": "Steam ontkoppelen",
       "linked": "Gekoppeld aan Steam-account {id}",
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
-      "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
+      "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw.",
+      "wishlist": "Op verlanglijst zetten op Steam",
+      "wishlistAria": "Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft",
+      "wishlistShort": "Verlanglijst"
     },
     "epic": {
       "title": "Epic",
@@ -3012,6 +3305,26 @@ export const nl_NL: EnTranslations = {
       "buySlotsMaxed": "Volledig uitgebreid",
       "buyConfirm": "{count} extra bankvakken kopen voor {price}?",
       "buyConfirmAccept": "Kopen",
+      "meterLabel": "{used} van {total} vakken",
+      "meterPoolGeneral": "Algemeen: {used} van {total}",
+      "meterPoolMaterials": "Materialen: {used} van {total}",
+      "meterPoolsAria": "Bankvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}.",
+      "meterMaterialsNote": "Alleen-materialenruimte van geplaatste buidels. Andere voorwerpen kunnen dit niet gebruiken.",
+      "priceDisclaimer": "Prijzen kunnen veranderen met de spel-economie.",
+      "rungItemName": "{count} bankvakken",
+      "buySlotsDualAria": "Koop {count} vakken voor {price} of {cost} Claudium",
+      "buyConfirmDual": "{count} extra bankvakken kopen?",
+      "buyConfirmGold": "Kopen voor {price}",
+      "buyConfirmClaudium": "Kopen voor {cost} Claudium",
+      "rungGranted": "De bankvakken zijn toegevoegd. De bank van dit personage is nu groter.",
+      "rungAlreadyGranted": "Deze vakken staan al op dit personage. Je bent niet opnieuw belast.",
+      "rungApplyDeferred": "Betaling voltooid. De vakken worden automatisch toegepast de volgende keer dat dit personage inlogt.",
+      "rungGrantUnresolved": "Betaling voltooid, maar de vakken konden nog niet worden toegepast. De aankoop is geregistreerd en support kan dit voor je afronden.",
+      "rungInProgress": "Een aankoop voor dit personage wordt nog voltooid. Probeer het straks opnieuw.",
+      "rungDoesNotFit": "De bank van dit personage heeft geen ruimte voor nog een uitbreiding.",
+      "rungNotPurchasable": "Deze bankvakken kunnen nu niet worden gekocht.",
+      "rungFailed": "De aankoop kon niet worden voltooid.",
+      "rungOutage": "De aankoop kon niet worden bevestigd. Probeer het opnieuw met deze knop; je wordt niet dubbel belast. Als je het spel eerst herlaadt, kan die bescherming verloren gaan.",
       "withdrawHint": "Klik om op te nemen",
       "withdrawPartialHint": "Shift-klik om een deel op te nemen",
       "depositHint": "Klik om te storten",
@@ -3024,6 +3337,9 @@ export const nl_NL: EnTranslations = {
       "withdrawQuantityTitle": "{item} opnemen",
       "withdrawQuantityInput": "Aantal om op te nemen",
       "withdrawQuantityConfirm": "Opnemen",
+      "vaultRowWithdrawName": "{item} opnemen",
+      "priceChanged": "De prijs is veranderd voordat de aankoop werd voltooid. Bekijk de vernieuwde prijs en bevestig opnieuw.",
+      "withdrawQuantityAction": "Aantal om op te nemen: {item}",
       "filterGroupAria": "Bank filteren op categorie",
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",
@@ -3045,6 +3361,34 @@ export const nl_NL: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Nodig een vriend uit: wanneer die niveau 10 bereikt, verdienen jullie allebei 2 vakken, tot 5 vrienden.",
       "bonusSectionAria": "Bonusbankvakken en hoe je er meer verdient",
+      "socketRowAria": "Banktasvakken",
+      "socketEmpty": "Leeg banktasvak",
+      "socketEmptyHint": "Klik op een tas in je tassen om hem in de bank op te bergen",
+      "socketLocked": "Vergrendeld tasvak",
+      "socketLockedLater": "Tasvakken ontgrendelen in volgorde, goedkoopste eerst",
+      "socketUnlockAria": "Ontgrendel een banktasvak voor {price}",
+      "socketUnlockHint": "Klik om dit tasvak te ontgrendelen",
+      "socketUnlockConfirm": "Een banktasvak ontgrendelen voor {price}?",
+      "socketUnlockAccept": "Ontgrendelen",
+      "unsocketHint": "Klik om deze tas terug naar je tassen te verplaatsen",
+      "socketHint": "Klik om deze tas in je bank te plaatsen",
+      "vaultTab": "Materialenkluis",
+      "vaultCapacityNote": "Elk materiaal heeft een plafond van {cap}.",
+      "vaultEmpty": "Je Materialenkluis is leeg. Klik op een materiaal in je tassen om het te storten.",
+      "vaultRowAria": "{item}: {count} van {cap} opgeslagen",
+      "vaultLockedIntro": "Ontgrendel de Materialenkluis om ambachtsmaterialen naast je bank op te slaan. Elk materiaal krijgt zijn eigen ruimte, tot {cap} per stuk.",
+      "vaultUnlockButton": "Ontgrendel de Materialenkluis",
+      "vaultUnlockConfirm": "De Materialenkluis ontgrendelen voor {price}?",
+      "vaultUpgrade": "Verhoog elk plafond naar {cap}",
+      "vaultUpgradeConfirm": "Elk materiaalplafond verhogen naar {cap} voor {price}?",
+      "vaultDepositAll": "Alle materialen storten",
+      "vaultDepositAllTooltip": "Stuurt alle materialen uit je tassen in één keer naar je Materialenkluis, tot elk materiaal zijn plafond bereikt. Uitrusting, gereedschap, questvoorwerpen en verbruiksartikelen worden nooit aangeraakt.",
+      "vaultDepositAllDone": "Materialen gestort: {count}.",
+      "vaultDepositAllFull": "Materialen gestort: {count}. Sommige plafonds zijn vol.",
+      "vaultDepositAllNone": "Plafonds van de Materialenkluis vol: niets gestort.",
+      "vaultWithdrawShort": "Slechts {fit} van {count} past in je tassen.",
+      "vaultDepositHint": "Klik om in je Materialenkluis te storten",
+      "vaultCannotDeposit": "Kan niet in de Materialenkluis",
       "tabsAria": "Banktabbladen",
       "personalTab": "Persoonlijk",
       "guildTab": "Gilde",
@@ -3444,6 +3788,8 @@ export const nl_NL: EnTranslations = {
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
+      "reagentVaultDraw": "(haalt {count} uit je Materialenkluis)",
+      "vaultUnreachable": "De Materialenkluis is hier niet bereikbaar.",
       "craftFeeLine": "Ambachtskosten: {fee} per stuk",
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
@@ -3542,7 +3888,9 @@ export const nl_NL: EnTranslations = {
       "equip": "Uitrusten",
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
-      "applyEnchant": "Betovering aanbrengen"
+      "applyEnchant": "Betovering aanbrengen",
+      "sell": "Verkopen",
+      "sellAll": "Alles verkopen ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
@@ -4044,9 +4392,15 @@ export const nl_NL: EnTranslations = {
       "loading": "De Beurs laden...",
       "loadFailed": "De Beurs kon niet worden bereikt. Probeer het straks opnieuw.",
       "disabledRealm": "De $WOC-beurs is niet beschikbaar op deze wereld.",
+      "browserOnlyConfirmTitle": "De $WOC-beurs in je browser openen?",
+      "browserOnlyConfirmBody": "De $WOC-beurs werkt alleen in de browserversie van World of ClaudeCraft. Hiermee wordt World of ClaudeCraft in je browser geopend, waar je kunt inloggen en de beurs kunt openen; het spel blijft hier doorgaan.",
+      "browserOnlyConfirmOpen": "Openen in browser",
+      "browserOnlyConfirmCancel": "Annuleren",
       "pausedBanner": "Handel is gepauzeerd. Veilingen blijven aftellen; nieuwe aanbiedingen, biedingen, offertes en betalingen wachten tot de handel wordt hervat, en een betaling die al is verzonden, wordt nog steeds afgewikkeld.",
-      "walletBanner": "Koppel en verifieer een portemonnee om te bieden, kopen of verkopen op de Beurs.",
-      "walletBannerCta": "Portemonnee koppelen",
+      "walletLinkedDisconnected": "Je openbare adres is gekoppeld. Verbind die portemonnee-app opnieuw wanneer je met $WOC wilt betalen.",
+      "walletLinkedConnected": "Je gekoppelde portemonnee-app is verbonden en klaar voor $WOC-aankopen.",
+      "walletUsdBalance": "{amount} USD",
+      "walletUsdUnknown": "Onbekend",
       "rateNote": "Koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "rateNotePaused": "Laatst bekende koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "estimateNote": "Ongeveer {tokens} $WOC voor {usd} tegen de huidige koers.",
@@ -4300,6 +4654,8 @@ export const nl_NL: EnTranslations = {
       "online": "Personage is momenteel online.",
       "rename_not_permitted": "Dit personage hernoemen is niet toegestaan.",
       "delete_confirm": "Typ de personagenaam om de verwijdering te bevestigen.",
+      "storage_purchase_open": "Een opslag-aankoop moet voltooid of opgelost zijn voordat dit personage kan worden verwijderd.",
+      "delete_busy": "De wereld is bezet. Probeer dit personage zo meteen opnieuw te verwijderen.",
       "already_in_world": "Personage is al in de wereld.",
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
@@ -4360,7 +4716,13 @@ export const nl_NL: EnTranslations = {
       "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
-      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_required": "Bevestig deze portemonneewijziging met je accountwachtwoord.",
+      "reauth_two_factor": "Je account heeft tweestapsverificatie ingeschakeld. Voer je code in om te bevestigen.",
+      "reauth_no_password": "Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+      "reauth_bad_signature": "De handtekening van de portemonnee kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_bad_password": "Je wachtwoord is onjuist.",
+      "reauth_bad_two_factor": "Die code is niet geldig, probeer het opnieuw."
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
@@ -4818,6 +5180,7 @@ export const nl_NL: EnTranslations = {
       "ifPartySort": "De volgorde waarin groepsleden worden weergegeven: groepsvolgorde, rol, of naam.",
       "ifPartyShowAuras": "Of buffs en debuffs op de groepsframes worden getoond. Bijbehorende schakelaars beslaan resourcebalken, absorpties, huisdieren, en of je in je eigen groepslijst verschijnt.",
       "ifAurasOnPlayerFrame": "Zet je buffs en debuffs ook op je eigen spelerframe, naast de aurabalk.",
+      "ifAlwaysShowAllBuffs": "Toont elke actieve buff, zelfs met de preset Lage graphics, en omzeilt de gebruikelijke limiet voor buffpictogrammen.",
       "ifTargetOfTarget": "Toont wie het doelwit van jouw doelwit is, de klassieke manier om te zien of de tank het nog vasthoudt.",
       "ifPetFrame": "Toont een frame voor je huisdier.",
       "ifChatFontScale": "Tekstgrootte van de chat.",
@@ -6304,6 +6667,7 @@ export const nl_NL: EnTranslations = {
       "bankBody": "Elke hoofdplaats heeft een filiaal van De Vergulde Geldkist, het bankhuis van het rijk. Spreek daar met de thesaurier om je kluis te openen: een eigen bergruimte naast je tassen die je personage levenslang behoudt. Wat je bij hen achterlaat, wacht veilig op je, welk filiaal je daarna ook bezoekt.",
       "bankHow": "Met de kluis open klik je op een voorwerp in je tassen om het te storten, en klik je erop in de kluis om het terug te nemen. De kluis bewaart alleen waren, nooit geld, en questvoorwerpen blijven bij je. Raken je tassen onderweg vol, dan veegt één knop al je ambachtsmaterialen in één keer naar binnen.",
       "bankSlots": "Een nieuwe kluis begint klein en groeit met je mee. De thesaurier verkoopt extra vakken voor geld tegen steeds hogere prijzen, en online spelen levert daarbovenop bonusruimte op, voor zaken als een geverifieerd e-mailadres, gekoppelde accounts en vrienden die je naar het spel brengt.",
+      "bankSockets": "Na de stapsgewijze kluisuitbreidingen verkoopt de thesaurier ook maximaal vier tassenleuven, die achtereenvolgens tegen steeds hogere prijzen worden ontgrendeld. Plaats een extra tas uit je draagset in een leuf en de sleuven ervan worden aan je kluisruimte toegevoegd: een gewone tas vergroot de hele opslag, terwijl een reagentia-tas alleen ruimte toevoegt voor knutselmaterialen. Klik op een tas in je tassen om hem te plaatsen en klik op de leuf om hem weer weg te nemen. Dat kost je nooit iets wat je had opgeslagen: als de kluis voller is dan de verkleinde ruimte, blijft alles liggen en wachten nieuwe stortingen gewoon tot er plaats is.",
       "buyingTitle": "Kopen en verkopen",
       "buyingBody": "Spreek een handelaar aan en kies om zijn waar te bekijken, en zijn winkel opent met drie tabbladen: Bekijken, Verkopen en Terugkopen. Bekijken bevat alles wat ze op voorraad hebben, van jou als je het kunt betalen. Verkopen toont welke spullen uit je tassen zij willen kopen, en een stuk verkopen dat zijn eigen gerolde kwaliteit draagt, vraagt je eerst te bevestigen, zodat een gewild exemplaar nooit per ongeluk wegglipt. Doe je afstand van iets waar je spijt van krijgt, dan houdt het tabblad Terugkopen je recente verkopen vast zodat je ze kunt terugkopen voor de munten die je kreeg.",
       "junkTitle": "Rommel opruimen",
@@ -7285,6 +7649,13 @@ export const nl_NL: EnTranslations = {
     "unlink": "Ontkoppelen",
     "unlinkTitle": "Verwijder portemonneeverificatie van dit account",
     "unlinkAria": "Verwijder portemonneeverificatie van dit account",
+    "reauthTitle": "Portemonneewijziging bevestigen",
+    "reauthUnlinkTitle": "Portemonneeverwijdering bevestigen",
+    "reauthHelp": "Voer voor je veiligheid je accountwachtwoord in om deze wijziging toe te staan.",
+    "reauthNoPassword": "Dit account logt in zonder wachtwoord. Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+    "reauthConfirm": "Bevestigen",
+    "reauthCancel": "Annuleren",
+    "reauthClose": "Sluiten",
     "signOut": "Verbinding verbreken",
     "signOutTitle": "Verbreek de verbinding met de portemonnee-app in deze browser",
     "signOutAria": "Verbreek de verbinding met de portemonnee-app in deze browser",
@@ -7340,6 +7711,7 @@ export const nl_NL: EnTranslations = {
       "title": "Een Solana-portemonnee verbinden",
       "linkBody": "Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.",
       "paymentBody": "Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.",
+      "stepUpBody": "Kies de portemonnee die aan je account is gekoppeld en onderteken het autorisatiebericht voor $WOC Exchange. Ondertekenen is gratis en verplaatst geen geld.",
       "extensionHelp": "Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.",
       "safety": "World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.",
       "continueWith": "Doorgaan met {wallet}",
@@ -7727,6 +8099,20 @@ export const nl_NL: EnTranslations = {
     "buyConfirmTitle": "Bevestig aankoop",
     "buyConfirmBody": "{item} kopen voor {marks} Heroïsche Merken? Aankopen met merken kunnen niet worden terugbetaald.",
     "buyConfirmAccept": "Kopen",
+    "buyConfirmCancel": "Annuleren"
+  },
+  "crucibleShop": {
+    "browse": "Zegels inwisselen",
+    "browseAria": "Smeltkroeszegels met {name} inwisselen",
+    "empty": "Er kunnen geen setstukken voor jouw klasse worden ingewisseld.",
+    "balance": "Je zegels: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "Je hebt geen Smeltkroeszegels.",
+    "price": "1 {sigil}",
+    "buyAria": "{sigil} inwisselen voor {item}",
+    "buyConfirmTitle": "Inwisseling bevestigen",
+    "buyConfirmBody": "Je {sigil} inwisselen voor {item}? Een gebruikt zegel kan niet worden terugbetaald.",
+    "buyConfirmAccept": "Inwisselen",
     "buyConfirmCancel": "Annuleren"
   },
   "cardDuel": {
@@ -8557,6 +8943,8 @@ export const nl_NL: EnTranslations = {
         "riftEntrance": "Rift-ingang: {name}",
         "hostileEnemy": "Vijandig doelwit",
         "aggressiveEnemy": "Vijand valt je aan",
+        "bossEnemy": "Baas: {name}",
+        "bossAggressiveEnemy": "Baas valt je aan: {name}",
         "lootableEnemy": "Plunderbare vijand",
         "corpse": "Je lichaam",
         "deathZone": "Gevarenzone",
@@ -8945,6 +9333,7 @@ export const nl_NL: EnTranslations = {
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
       "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
+      "tradeWindowIneligible": "Dat kan alleen worden geruild met spelers die deze buit deelden.",
       "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
     },
     "logs": {
@@ -9425,7 +9814,8 @@ export const nl_NL: EnTranslations = {
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
       "clickBuyback": "Klik om terug te kopen",
-      "bagSlots": "Tas met {slots} vakken"
+      "bagSlots": "Tas met {slots} vakken",
+      "bagSlotsMaterials": "Materialentas met {slots} vakken"
     },
     "bags": {
       "title": "Tassen",
@@ -9607,7 +9997,8 @@ export const nl_NL: EnTranslations = {
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",
-      "rolled": "{answered}/{total} geworpen"
+      "rolled": "{answered}/{total} geworpen",
+      "bindsOnPickup": "Bindt bij het oprapen"
     }
   },
   "entities": {
@@ -10388,7 +10779,7 @@ export const nl_NL: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Doorboort de vijand voor {damage} Schaduwschade en genereert 5 Verdoemenis als het je Evil Eye draagt. Elke treffer op je primaire Evil Eye voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Evil Eye bestaat, markeert de Needle eerst zijn doelwit."
+        "description": "Doorboort de vijand voor {damage} Schaduwschade en genereert {needleDoom} Verdoemenis als het je Evil Eye draagt. Elke treffer op je primaire Evil Eye voegt een Lotsdraad toe voor 12 sec, tot 3. Als er geen Evil Eye bestaat, markeert de Needle eerst zijn doelwit."
       },
       "sentence": {
         "name": "Sentence",
@@ -10486,7 +10877,7 @@ export const nl_NL: EnTranslations = {
       },
       "moonseed": {
         "name": "Maanzaad",
-        "description": "Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot 6 sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf."
+        "description": "Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf."
       },
       "rejuvenation": {
         "name": "Wildbloei",
@@ -10790,7 +11181,7 @@ export const nl_NL: EnTranslations = {
       },
       "conflagrate": {
         "name": "Ontvlamming",
-        "description": "Haalt een toekomstige tik van uw Brandpact naar voren en ontsteekt dan het doelwit voor {damage} Vuurschade. Wekt 1 Verwoesting en 1 Ondergang op. Houdt 2 ladingen. (Kenmerk van Vernietiging)"
+        "description": "Haalt een toekomstige tik van uw Brandpact naar voren en ontsteekt dan het doelwit voor {damage} Vuurschade. Wekt 1 Verwoesting en 1 Ondergang op. Houdt {charges} ladingen. (Kenmerk van Vernietiging)"
       },
       "moonkin_form": {
         "name": "Maanuilvorm",
@@ -10822,7 +11213,7 @@ export const nl_NL: EnTranslations = {
       },
       "overbloom": {
         "name": "Overbloei",
-        "description": "Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor 60% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit."
+        "description": "Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit."
       },
       "summon_imp": {
         "name": "Emberkin Oproepen",
@@ -10894,7 +11285,7 @@ export const nl_NL: EnTranslations = {
       },
       "iron_resolve": {
         "name": "IJzeren Vastberadenheid",
-        "description": "Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om 4 schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)"
+        "description": "Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om {absorbPerRage} schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)"
       },
       "faultline": {
         "name": "Breuklijn",
@@ -11271,7 +11662,7 @@ export const nl_NL: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Serafijnse Wake",
-        "description": "Beschermt een bondgenoot 30 sec. De eerste treffer die hem onder 35% gezondheid brengt verbruikt de Wake en geneest hem voor 180. (Zegen-kenmerk)"
+        "description": "Beschermt een bondgenoot 30 sec. De eerste treffer die hem onder 35% gezondheid brengt verbruikt de Wake en geneest hem voor {buff}. (Zegen-kenmerk)"
       },
       "summon_tithefiend": {
         "name": "Roep Tiendduivel op",
@@ -12814,6 +13205,9 @@ export const nl_NL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
+      "reins_rickshaw_mount": {
+        "name": "Gebonden teugels: Beengebonden Riksja"
+      },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
       },
@@ -12859,6 +13253,27 @@ export const nl_NL: EnTranslations = {
       "dawnhold_posy": {
         "name": "Boeketje uit de tuin van Dawnhold"
       },
+      "wayfarers_backpack": {
+        "name": "Rugzak van de Reiziger"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Jutezak voor Reagentia"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Reagentiazak van de Necromancer"
+      },
+      "duskweave_bag": {
+        "name": "Schemerweefsel-Tas"
+      },
+      "resonant_weave_bag": {
+        "name": "Tas van Resonant Weefsel"
+      },
+      "foragers_haversack": {
+        "name": "Foerageerders-Rugzak"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Weefgetouwgebonden Reagentiazak"
+      },
       "ps_briny_lure": {
         "name": "Ziltig Lokaas"
       },
@@ -12870,6 +13285,612 @@ export const nl_NL: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Doorgangssteen"
+      },
+      "lastflame_core": {
+        "name": "Kern van de Laatste Vlam"
+      },
+      "slagbreaker_helmet": {
+        "name": "Helm van de Slakkenbreker"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Schouderplaten van de Slakkenbreker"
+      },
+      "slagbreaker_chest": {
+        "name": "Pantser van de Slakkenbreker"
+      },
+      "slagbreaker_gloves": {
+        "name": "Handschoenen van de Slakkenbreker"
+      },
+      "slagbreaker_legs": {
+        "name": "Beenplaten van de Slakkenbreker"
+      },
+      "emberfury_helmet": {
+        "name": "Sintelwoede-Helm"
+      },
+      "emberfury_shoulder": {
+        "name": "Sintelwoede-Schouderplaten"
+      },
+      "emberfury_chest": {
+        "name": "Sintelwoede-Kolder"
+      },
+      "emberfury_gloves": {
+        "name": "Sintelwoede-Handplaten"
+      },
+      "emberfury_legs": {
+        "name": "Sintelwoede-Beenkappen"
+      },
+      "forgewall_helmet": {
+        "name": "Smederijmuur-Helm"
+      },
+      "forgewall_shoulder": {
+        "name": "Smederijmuur-Schouderplaten"
+      },
+      "forgewall_chest": {
+        "name": "Smederijmuur-Kolder"
+      },
+      "forgewall_gloves": {
+        "name": "Smederijmuur-Handplaten"
+      },
+      "forgewall_legs": {
+        "name": "Smederijmuur-Beenkappen"
+      },
+      "dawnforged_helmet": {
+        "name": "Dageraadgesmeed-Helm"
+      },
+      "dawnforged_shoulder": {
+        "name": "Dageraadgesmeed-Schouderplaten"
+      },
+      "dawnforged_chest": {
+        "name": "Dageraadgesmeed-Kolder"
+      },
+      "dawnforged_gloves": {
+        "name": "Dageraadgesmeed-Handplaten"
+      },
+      "dawnforged_legs": {
+        "name": "Dageraadgesmeed-Beenkappen"
+      },
+      "oathpyre_helmet": {
+        "name": "Eedbrand-Helm"
+      },
+      "oathpyre_shoulder": {
+        "name": "Eedbrand-Schouderplaten"
+      },
+      "oathpyre_chest": {
+        "name": "Eedbrand-Kolder"
+      },
+      "oathpyre_gloves": {
+        "name": "Eedbrand-Handplaten"
+      },
+      "oathpyre_legs": {
+        "name": "Eedbrand-Beenkappen"
+      },
+      "zealfire_helmet": {
+        "name": "Zealvuurhelm"
+      },
+      "zealfire_shoulder": {
+        "name": "Zealvuur-schouderplaten"
+      },
+      "zealfire_chest": {
+        "name": "Zealvuurgambeson"
+      },
+      "zealfire_gloves": {
+        "name": "Zealvuur-handschoenen"
+      },
+      "zealfire_legs": {
+        "name": "Zealvuur-beenbeschermers"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Kap van de Roedelleider"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Schouderplaten van de Roedelleider"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Kolder van de Roedelleider"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Handplaten van de Roedelleider"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Beenkappen van de Roedelleider"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Koudzicht-Kap"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Koudzicht-Schouderplaten"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Koudzicht-Tuniek"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Koudzicht-Handgrepen"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Koudzicht-Broek"
+      },
+      "slagsnare_helmet": {
+        "name": "Kap van de Slakkenvanger"
+      },
+      "slagsnare_shoulder": {
+        "name": "Schouderplaten van de Slakkenvanger"
+      },
+      "slagsnare_chest": {
+        "name": "Tuniek van de Slakkenvanger"
+      },
+      "slagsnare_gloves": {
+        "name": "Handgrepen van de Slakkenvanger"
+      },
+      "slagsnare_legs": {
+        "name": "Broek van de Slakkenvanger"
+      },
+      "cinderfang_helmet": {
+        "name": "Sinteltand-Kap"
+      },
+      "cinderfang_shoulder": {
+        "name": "Sinteltand-Schouderplaten"
+      },
+      "cinderfang_chest": {
+        "name": "Sinteltand-Tuniek"
+      },
+      "cinderfang_gloves": {
+        "name": "Sinteltand-Handgrepen"
+      },
+      "cinderfang_legs": {
+        "name": "Sinteltand-Broek"
+      },
+      "smolderstrike_helmet": {
+        "name": "Smeulslag-kap"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Smeulslag-schouderplaten"
+      },
+      "smolderstrike_chest": {
+        "name": "Smeulslag-tuniek"
+      },
+      "smolderstrike_gloves": {
+        "name": "Smeulslag-handgrepen"
+      },
+      "smolderstrike_legs": {
+        "name": "Smeulslag-broek"
+      },
+      "ashveil_helmet": {
+        "name": "Aswaas-Kap"
+      },
+      "ashveil_shoulder": {
+        "name": "Aswaas-Schouderplaten"
+      },
+      "ashveil_chest": {
+        "name": "Aswaas-Tuniek"
+      },
+      "ashveil_gloves": {
+        "name": "Aswaas-Handgrepen"
+      },
+      "ashveil_legs": {
+        "name": "Aswaas-Broek"
+      },
+      "emberscreed_helmet": {
+        "name": "Geloofsbelijdenis van de Sintels-Kap"
+      },
+      "emberscreed_shoulder": {
+        "name": "Geloofsbelijdenis van de Sintels-Mantel"
+      },
+      "emberscreed_chest": {
+        "name": "Geloofsbelijdenis van de Sintels-Kleed"
+      },
+      "emberscreed_gloves": {
+        "name": "Geloofsbelijdenis van de Sintels-Handwikkels"
+      },
+      "emberscreed_legs": {
+        "name": "Geloofsbelijdenis van de Sintels-Beenkappen"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Dageraadweefsel-Kap"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Dageraadweefsel-Mantel"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Dageraadweefsel-Kleed"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Dageraadweefsel-Handwikkels"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Dageraadweefsel-Beenkappen"
+      },
+      "vesperash_helmet": {
+        "name": "Vesperas-kap"
+      },
+      "vesperash_shoulder": {
+        "name": "Vesperas-mantel"
+      },
+      "vesperash_chest": {
+        "name": "Vesperas-robe"
+      },
+      "vesperash_gloves": {
+        "name": "Vesperas-handwindsels"
+      },
+      "vesperash_legs": {
+        "name": "Vesperas-beenbekleding"
+      },
+      "stormkindled_helmet": {
+        "name": "Helm van de Stormontsteking"
+      },
+      "stormkindled_shoulder": {
+        "name": "Schouderplaten van de Stormontsteking"
+      },
+      "stormkindled_chest": {
+        "name": "Harnas van de Stormontsteking"
+      },
+      "stormkindled_gloves": {
+        "name": "Wanten van de Stormontsteking"
+      },
+      "stormkindled_legs": {
+        "name": "Beenbeschermers van de Stormontsteking"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Sintelschubbenhelm van de Oorlogsgeest"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Sintelschubben-schouderplaten van de Oorlogsgeest"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Sintelschubben-harnas van de Oorlogsgeest"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Sintelschubben-wanten van de Oorlogsgeest"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Sintelschubben-beenbeschermers van de Oorlogsgeest"
+      },
+      "stonehearth_helmet": {
+        "name": "Helm van het Steenhart"
+      },
+      "stonehearth_shoulder": {
+        "name": "Schouderplaten van het Steenhart"
+      },
+      "stonehearth_chest": {
+        "name": "Harnas van het Steenhart"
+      },
+      "stonehearth_gloves": {
+        "name": "Wanten van het Steenhart"
+      },
+      "stonehearth_legs": {
+        "name": "Beenbeschermers van het Steenhart"
+      },
+      "springmender_helmet": {
+        "name": "Helm van de Lentegenezer"
+      },
+      "springmender_shoulder": {
+        "name": "Schouderplaten van de Lentegenezer"
+      },
+      "springmender_chest": {
+        "name": "Harnas van de Lentegenezer"
+      },
+      "springmender_gloves": {
+        "name": "Wanten van de Lentegenezer"
+      },
+      "springmender_legs": {
+        "name": "Beenbeschermers van de Lentegenezer"
+      },
+      "chronoweave_helmet": {
+        "name": "Aetherweefsel-Kap"
+      },
+      "chronoweave_shoulder": {
+        "name": "Aetherweefsel-Mantel"
+      },
+      "chronoweave_chest": {
+        "name": "Aetherweefsel-Kleed"
+      },
+      "chronoweave_gloves": {
+        "name": "Aetherweefsel-Handwikkels"
+      },
+      "chronoweave_legs": {
+        "name": "Aetherweefsel-Beenkappen"
+      },
+      "pyroclast_helmet": {
+        "name": "Pyroclastische Kap"
+      },
+      "pyroclast_shoulder": {
+        "name": "Pyroclastische Mantel"
+      },
+      "pyroclast_chest": {
+        "name": "Pyroclastisch Kleed"
+      },
+      "pyroclast_gloves": {
+        "name": "Pyroclastische Handwikkels"
+      },
+      "pyroclast_legs": {
+        "name": "Pyroclastische Beenbekleding"
+      },
+      "frostquench_helmet": {
+        "name": "Vorstblussing-Kap"
+      },
+      "frostquench_shoulder": {
+        "name": "Vorstblussing-Mantel"
+      },
+      "frostquench_chest": {
+        "name": "Vorstblussing-Kleed"
+      },
+      "frostquench_gloves": {
+        "name": "Vorstblussing-Handwikkels"
+      },
+      "frostquench_legs": {
+        "name": "Vorstblussing-Beenkappen"
+      },
+      "hexthread_helmet": {
+        "name": "Vloekdraad-Kap"
+      },
+      "hexthread_shoulder": {
+        "name": "Vloekdraad-Mantel"
+      },
+      "hexthread_chest": {
+        "name": "Vloekdraad-Kleed"
+      },
+      "hexthread_gloves": {
+        "name": "Vloekdraad-Handwikkels"
+      },
+      "hexthread_legs": {
+        "name": "Vloekdraad-Beenkappen"
+      },
+      "gravebrand_helmet": {
+        "name": "Grafmerk-Kap"
+      },
+      "gravebrand_shoulder": {
+        "name": "Grafmerk-Mantel"
+      },
+      "gravebrand_chest": {
+        "name": "Grafmerk-Kleed"
+      },
+      "gravebrand_gloves": {
+        "name": "Grafmerk-Handwikkels"
+      },
+      "gravebrand_legs": {
+        "name": "Grafmerk-Beenkappen"
+      },
+      "ruincaller_helmet": {
+        "name": "Kap van de Verderfroepster"
+      },
+      "ruincaller_shoulder": {
+        "name": "Mantel van de Verderfroepster"
+      },
+      "ruincaller_chest": {
+        "name": "Kleed van de Verderfroepster"
+      },
+      "ruincaller_gloves": {
+        "name": "Handwikkels van de Verderfroepster"
+      },
+      "ruincaller_legs": {
+        "name": "Beenbekleding van de Verderfroepster"
+      },
+      "moonscorch_helmet": {
+        "name": "Maanschroe-Kap"
+      },
+      "moonscorch_shoulder": {
+        "name": "Maanschroe-Schouderplaten"
+      },
+      "moonscorch_chest": {
+        "name": "Maanschroe-Kleed"
+      },
+      "moonscorch_gloves": {
+        "name": "Maanschroe-Handplaten"
+      },
+      "moonscorch_legs": {
+        "name": "Maanschroe-Beenkappen"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Wildtandkap"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Wildtand-schouderplaten"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Wildtandtuniek"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Wildtandwanten"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Wildtandbroek"
+      },
+      "cinderbark_helmet": {
+        "name": "Sintelschors-Kap"
+      },
+      "cinderbark_shoulder": {
+        "name": "Sintelschors-Schouderplaten"
+      },
+      "cinderbark_chest": {
+        "name": "Sintelschors-Tuniek"
+      },
+      "cinderbark_gloves": {
+        "name": "Sintelschors-Handgrepen"
+      },
+      "cinderbark_legs": {
+        "name": "Sintelschors-Broek"
+      },
+      "grovespring_helmet": {
+        "name": "Groevebron-Kap"
+      },
+      "grovespring_shoulder": {
+        "name": "Groevebron-Schouderplaten"
+      },
+      "grovespring_chest": {
+        "name": "Groevebron-Kleed"
+      },
+      "grovespring_gloves": {
+        "name": "Groevebron-Handwikkels"
+      },
+      "grovespring_legs": {
+        "name": "Groevebron-Beenkappen"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Helm van het Aambeeldsigil"
+      },
+      "sigil_ember_helmet": {
+        "name": "Helm van het Sintelsigil"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Helm van het Stormsigil"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Mantel van het Aambeeldsigil"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Mantel van het Sintelsigil"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Mantel van het Stormsigil"
+      },
+      "sigil_anvil_chest": {
+        "name": "Kleed van het Aambeeldsigil"
+      },
+      "sigil_ember_chest": {
+        "name": "Kleed van het Sintelsigil"
+      },
+      "sigil_tempest_chest": {
+        "name": "Kleed van het Stormsigil"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Handgrepen van het Aambeeldsigil"
+      },
+      "sigil_ember_gloves": {
+        "name": "Handgrepen van het Sintelsigil"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Handgrepen van het Stormsigil"
+      },
+      "sigil_anvil_legs": {
+        "name": "Beenbekleding van het Aambeeldsigil"
+      },
+      "sigil_ember_legs": {
+        "name": "Beenbekleding van het Sintelsigil"
+      },
+      "sigil_tempest_legs": {
+        "name": "Beenbekleding van het Stormsigil"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Koord van de Laatste Vlam"
+      },
+      "cindersoaked_slippers": {
+        "name": "Sinteldoordrenkte Pantoffels"
+      },
+      "springbinder_sash": {
+        "name": "Sjerp van de Lentebinder"
+      },
+      "steps_of_quiet_water": {
+        "name": "Stappen van Stil Water"
+      },
+      "cinderbark_cinch": {
+        "name": "Sintelschors-Riem"
+      },
+      "ashenbark_treads": {
+        "name": "Assebast-Laarzen"
+      },
+      "slagstalker_belt": {
+        "name": "Gordel van de Slakkenjager"
+      },
+      "ashrunner_boots": {
+        "name": "Asloper-Laarzen"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Maanschroe-Taillewikkel"
+      },
+      "scorchgrove_striders": {
+        "name": "Schroeibos-Laarzen"
+      },
+      "grovetender_belt": {
+        "name": "Woudhoeder-Riem"
+      },
+      "dewfall_moccasins": {
+        "name": "Dauwval-Mocassins"
+      },
+      "forgewall_girdle": {
+        "name": "Smederijmuur-Riem"
+      },
+      "anvilstance_sabatons": {
+        "name": "Aambeeldhouding-Voetplaten"
+      },
+      "warforged_waistguard": {
+        "name": "Oorlogsgesmede middelgordel"
+      },
+      "furnace_march_greaves": {
+        "name": "Ovenmars-Scheenplaten"
+      },
+      "stormkindled_chain": {
+        "name": "Stormontstoken keten"
+      },
+      "thundershock_treads": {
+        "name": "Donderschok-laarzen"
+      },
+      "tidebinder_links": {
+        "name": "Schakels van de Getijdenbinder"
+      },
+      "springwarden_sabatons": {
+        "name": "Sabatons van de Lentewachter"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Hanger van de Eerste Harding"
+      },
+      "ignivars_ember_choker": {
+        "name": "Sintelchoker van Ignivar"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Medaillon van de Laatste Vlam"
+      },
+      "heartspring_amulet": {
+        "name": "Amulet van de Hartbron"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Zegel van de Smederijmuur"
+      },
+      "band_of_marked_strikes": {
+        "name": "Ring van Gemarkeerde Slagen"
+      },
+      "circle_of_cinders": {
+        "name": "Cirkel van Sintels"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Ring van de Stille Bronnen"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Bolwerk van de Innerlijke Smeltkroes"
+      },
+      "ember_wardens_barrier": {
+        "name": "Barrière van de Sintelwachter"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Bol van de Laatste Bron"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Sintels van het Eerste Ontwerp"
+      },
+      "forgefathers_warhammer": {
+        "name": "Smederijvaders-Strijdhamer"
+      },
+      "cinderfang_kris": {
+        "name": "Sinteltand-Kris"
+      },
+      "slagrender_cleaver": {
+        "name": "Slakkenkliever"
+      },
+      "anvilguard_blade": {
+        "name": "Aambeeldwacht-Kling"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Grootzwaard van het Eindhart"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Staf van de Laatste Lente"
+      },
+      "forgefire_spire": {
+        "name": "Smederijvuur-Spits"
+      },
+      "springtouched_crozier": {
+        "name": "Lenteraakte kromstaf"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Toverstaf van Gedoofde Vonken"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -13647,6 +14668,12 @@ export const nl_NL: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Teugels van Donderpronker, de Grote Kalkoen"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Smederijbreker, Motor van Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Sintelschild, Bolwerk van Varkhul"
       }
     },
     "mobs": {
@@ -13841,6 +14868,27 @@ export const nl_NL: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Heraut van de Laatste Vlam"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Ignivar, Asroeper"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Sintelschildwacht"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Bewaker van de Smeltkroes"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Sintelambachtsman"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Smidvader van de Laatste Vlam"
+      },
+      "derelict_mech": {
+        "name": "Verlaten Mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
@@ -14501,6 +15549,21 @@ export const nl_NL: EnTranslations = {
         "name": "Broeder Aldric",
         "title": "Priester van het Dal",
         "greeting": "Van een kapelhof in het Dal tot het dak van de wereld... het spoor dat we hebben gevolgd eindigt hier. Ik voel de berg luisteren."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivaris Maelin Sintelwacht",
+        "title": "Archivaris van de Smeltkroes",
+        "greeting": "Elke hamerslag hier is een zin. Help me lezen wat Varkhul probeerde te verbergen."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Maelins Sintelprojectie",
+        "title": "Sintelprojectie",
+        "greeting": "De sintels dragen Maelins stem door de smidse naar voren."
+      },
+      "crucible_quartermaster": {
+        "name": "Kwartiermeester Bronn Sintelwacht",
+        "title": "Kwartiermeester van de Smeltkroes",
+        "greeting": "De smidse herkent haar eigen volk. Breng me een zegel uit de Smeltkroes en ik rust je uit voor de oorlog."
       },
       "brother_halven": {
         "name": "Broeder Halven",
@@ -15647,6 +16710,39 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis gedood"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echo’s in IJzer",
+        "text": "Deze automaten zijn geen soldaten. Het zijn ontwerpen. Breek elke productielijn en luister wanneer de laatste huls valt. De smidse onthoudt wat Varkhul probeerde uit te wissen.",
+        "completion": "De echo’s stemmen overeen. Varkhul bond water uit de stervende Laatste Bron aan levend metaal. Deze automaten waren mislukte hardingen. Alleen Ignivar hield stand.",
+        "objectives": {
+          "0": {
+            "label": "Sintelschildwachten vernietigd"
+          },
+          "1": {
+            "label": "Bewakers van de Smeltkroes vernietigd"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "Het Hart van de Heraut",
+        "text": "De overlevende die in elke echo wordt genoemd is Ignivar. Varkhul noemde hem heraut, zegel en sleutel. Versla hem. Als de archieven kloppen, zal zijn dood onthullen wat hij moest bewaken.",
+        "completion": "Ignivar was nooit slechts een bewaker. Zijn hart was de sleutel, en de laatste platen ervan openden de verzegelde smeltkroes beneden.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar verslagen"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "De Smidvader",
+        "text": "Het pad hieronder leidt naar Varkhul, Smidvader van de Laatste Vlam. Hij zette de Laatste Bron gevangen om metaal tot leven te wekken en smeedde daarna Ignivar om de misdaad verborgen te houden. Betreed de Binnenste Smeltkroes en maak een einde aan zijn werk.",
+        "completion": "De smidse is eindelijk stil. De Bron herstelt misschien nooit, maar Varkhul zal geen levens meer tot ketenen smeden.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul verslagen"
           }
         }
       },
@@ -17527,6 +18623,31 @@ export const nl_NL: EnTranslations = {
         "enterText": "Je gaat door de verzegelde koninklijke deur.",
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
       },
+      "ignivar_forge_lift": {
+        "name": "De Smederij-Lift",
+        "enterText": "De smidslift schudt en daalt; hamerklappen stijgen je tegemoet.",
+        "leaveText": "De lift brengt je terug naar de open lucht van de vesting."
+      },
+      "ignivar_forge_approach": {
+        "name": "Zalen van de Eerste Tempering",
+        "enterText": "Hamerklappen weerklinken door de Zalen van de Eerste Tempering.",
+        "leaveText": "Je stapt weg van de eerste smidse en ademt weer vrij."
+      },
+      "ignivar_raid_arena": {
+        "name": "Smeltkroes van de Laatste Bron",
+        "enterText": "Hitte trilt boven de verzegelde wateren van de Smeltkroes.",
+        "leaveText": "Je stapt weg van de Smeltkroes en ademt weer vrij."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Gloeiende Assemblage",
+        "enterText": "De geopende poort leidt naar een gloeiende assemblagehal.",
+        "leaveText": "Je verlaat de assemblagelijn en keert terug naar de Smeltkroes."
+      },
+      "ignivar_inner_crucible": {
+        "name": "De Binnenste Smeltkroes",
+        "enterText": "De geopende poort leidt dieper de Smeltkroes in.",
+        "leaveText": "Je verlaat de stille diepten van de Smeltkroes."
+      },
       "wildheart_basin": {
         "name": "Het Wildhartbekken",
         "enterText": "Warme regen sist op oude steen. Het Wildhartbekken opent zich voor je.",
@@ -17758,53 +18879,183 @@ export const nl_NL: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "Ashveil-kledij",
+        "bonus2": "Lurker’s Strike treft 25 procent harder.",
+        "bonus4": "Je Veiled Edge-aanval treft driemaal zo hard, in plaats van tweemaal."
+      },
+      "benison_dawnweave": {
+        "name": "Benison Dageraadweefsel",
+        "bonus2": "De redding van Seraphic Vigil geneest 270, in plaats van 180. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid."
+      },
       "boundstone_vanguard": {
         "name": "Bandsteen-voorhoede",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
       },
+      "chronoweave": {
+        "name": "Aetherweefsel-Gewaden",
+        "bonus2": "Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. verkort."
+      },
+      "cinderbark": {
+        "name": "Cinderbast-Bescherming",
+        "bonus2": "Sweeping Claws heeft 30 procent kans om een extra Old Blood op te slaan.",
+        "bonus4": "Marrowbreak treft 30 procent harder en zijn noodbescherming vervangt de aanval niet meer."
+      },
+      "cinderfang": {
+        "name": "Cinderfang-Sluier",
+        "bonus2": "De energieteruggave van Venom Ritual stijgt naar 20 per opbouwer.",
+        "bonus4": "De afkoeltijd van Venom Dart wordt verkort tot 4 sec."
+      },
+      "coldsight_trackers": {
+        "name": "Koudzicht-Verkenners",
+        "bonus2": "Measured Shot herstelt 5 extra Focus.",
+        "bonus4": "Kritieke treffers van Long Draw verlengen Cold Focus met 2 sec., tot maximaal 6 sec. per activering."
+      },
       "crownforged": {
         "name": "Bonewrought-Regalia",
         "bonus2": "Verhoogt aanvalskracht met 40.",
-        "bonus3": "Verhoogt kracht met 15, uithoudingsvermogen met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen splijten het doel met Bonesplinter, waardoor het 12 sec. lang elke 2 sec. 5 schade oploopt. Stapelt tot 3 keer."
+      },
+      "dawnforged": {
+        "name": "Dageraadgesmede Gewaden",
+        "bonus2": "Beacon of Light kopieert 55 procent van je directe genezingen. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De versterkte Dawn’s Embrace van Radiant Resonance is onmiddellijk."
       },
       "deathlord": {
         "name": "Barrowlord-Strijduitrusting",
         "bonus2": "Verhoogt aanvalskracht met 40.",
-        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15.",
-        "bonus4": "Je kritieke wapentreffers hebben 50% kans om Grafmacht te verlenen, waardoor je aanvalskracht met 60 toeneemt gedurende 10 sec."
+        "bonus4": "Je kritieke wapentreffers hebben 50% kans om Grafmacht te verlenen, waardoor je aanvalskracht met 60 toeneemt gedurende 10 sec.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen splijten het doel met Bonesplinter, waardoor het 12 sec. lang elke 2 sec. 5 schade oploopt. Stapelt tot 3 keer."
+      },
+      "emberfury": {
+        "name": "Sintelwoede-Harnas",
+        "bonus2": "Je Enrage duurt 6 sec. in plaats van 4.",
+        "bonus4": "Bloodletting activeert altijd Enrage bij jou en de genezing ervan stijgt naar 8 procent van je maximale gezondheid."
+      },
+      "emberscreed": {
+        "name": "Gewaden van de Beloofde Sintels",
+        "bonus2": "Je Doctrine-link zet 10 procent meer van je Holy-schade om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Wanneer je Psalm of Warding volledig is verbruikt, is je volgende Scouring Hymn binnen 10 sec. onmiddellijk. Kan niet vaker dan eens per 15 sec. optreden."
+      },
+      "forgewall": {
+        "name": "Smederijmuur-Aegis",
+        "bonus2": "Iron Resolve zet woede om in 5 absorptie per punt in plaats van 4.",
+        "bonus4": "Het uitspreken van Schildbreuk verkort de resterende afkoelperiode van IJzeren Vastberadenheid met 2 sec."
+      },
+      "frostquench": {
+        "name": "Vorstblus-Weefsel",
+        "bonus2": "Kritieke treffers van Rimelance slaan een tweede Icicle op, tot een maximum van 5. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Winterlash plaatst 3 Winter’s Chill-ladingen, in plaats van 2."
+      },
+      "gravebrand": {
+        "name": "Grafmerk-Regalia",
+        "bonus2": "De afkoeltijd van Reaping Command wordt met 2 sec. verkort. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De unisono-aanvallen van Reaping Command richten 25 procent meer schade aan."
       },
       "greyjaw_stalker": {
         "name": "Uitrusting van de Grijskaak-sluiper",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
       },
+      "grovespring": {
+        "name": "Bosbron-Kledij",
+        "bonus2": "Swiftmend verbruikt eerst je eigen Wildbloom of Second Bloom en geneest 25 procent meer. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op."
+      },
+      "hexthread": {
+        "name": "Hexdraad-Sluier",
+        "bonus2": "Needle of Fate verleent 2 extra Condemnation. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Passing Sentence geeft 10 Condemnation terug."
+      },
+      "moonscorch": {
+        "name": "Maanschroeisel-Kledij",
+        "bonus2": "Moonseed kan Lunar Tempest per toepassing tweemaal verlengen, tot maximaal 12 sec. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Moonsurge en Sunwake treffen 25 procent harder."
+      },
       "necromancers": {
         "name": "Mournweave-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
-        "bonus3": "Verhoogt intellect met 10 en uithoudingsvermogen met 10.",
-        "bonus4": "Je spreuken hebben 10% kans om Helder Bezweren te verlenen, waardoor je volgende spreuk gratis is."
+        "bonus4": "Je spreuken hebben 10% kans om Helder Bezweren te verlenen, waardoor je volgende spreuk gratis is.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze te verlenen, waardoor spreukkracht gedurende 10 sec. met 25 toeneemt."
       },
       "nighttalon": {
         "name": "Direfang-Pels",
         "bonus2": "Verhoogt aanvalskracht met 40.",
-        "bonus3": "Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen slaan een Ragged Gash, waardoor het doel 12 sec. lang elke 2 sec. 4 schade oploopt. Stapelt tot 3 keer."
+      },
+      "oathpyre": {
+        "name": "Eedvuur-Bastion",
+        "bonus2": "De kans van Vowkeeper Strike om Solar Reprisal te activeren stijgt naar 30 procent, en een aanval blokkeren activeert het 40 procent van de tijd.",
+        "bonus4": "Door Solar Reprisal te verbruiken krijg je 10 sec. lang een schild ter waarde van 6 procent van je maximale gezondheid."
+      },
+      "packlord_emberhide": {
+        "name": "Emberhuid van de Meester van de Roedel",
+        "bonus2": "De afkoeltijd van Pack Command wordt verkort tot 3 sec.",
+        "bonus4": "De kans van Pack Command om de afkoeltijd van Stampede te resetten stijgt naar 30%."
+      },
+      "pyroclast": {
+        "name": "Pyroclast-Regalia",
+        "bonus2": "Scald deelt altijd kritieke treffers uit aan doelen met 35% gezondheid of minder. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Kritieke treffers van je Vuurspreuken buiten Phoenix Trance verkorten de resterende afkoeltijd ervan met 1,5 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller-Gewaden",
+        "bonus2": "Conflagrate heeft 3 ladingen. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Ruinbolt treft 20% harder."
+      },
+      "slagbreaker": {
+        "name": "Slagbreaker-Strijduitrusting",
+        "bonus2": "Redhand versterkt je volgende Maiming Strike met 30% per stapel in plaats van 20%.",
+        "bonus4": "Elke tweede keer dat je Redhand gebruikt, wordt de resterende afkoeltijd van Breachmaker met 3 sec. verkort."
+      },
+      "slagsnare": {
+        "name": "Slagsnare-Uitrusting",
+        "bonus2": "Gutting Strike genereert 20 Focus.",
+        "bonus4": "Woundrend die 3 Hunting Momentum verbruikt, bewaart ze. Dit kan niet vaker dan eenmaal per 8 sec. gebeuren."
+      },
+      "smolderstrike": {
+        "name": "Smolderstrike-Leder",
+        "bonus2": "Haymaker treft 20% harder.",
+        "bonus4": "Lights Out geeft 6 sec. van de resterende afkoeltijd van Mirrored Blades terug."
       },
       "soulflame": {
         "name": "Wraithfire-Regalia",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
-        "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze toe te kennen, wat spreukkracht met 25 verhoogt gedurende 10 sec."
+      },
+      "springmender": {
+        "name": "Springmender-Schubben",
+        "bonus2": "De afkoeltijd van Tidecall wordt met 4 sec. verkort. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Cascading Mend bereikt een vierde bondgenoot en oogst Mending Currents op 150%."
+      },
+      "stonehearth": {
+        "name": "Stonehearth-Bastion",
+        "bonus2": "Terwijl je Stonebound bent, kost Stormcast Mending Waters geen mana en geneest het 25% meer.",
+        "bonus4": "Terwijl je Stonebound bent, geneest het voltooien van een cadans je voor 3% van je maximale gezondheid."
       },
       "stormcallers": {
         "name": "Galecall-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
-        "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze toe te kennen, wat spreukkracht met 25 verhoogt gedurende 10 sec."
+      },
+      "stormkindled": {
+        "name": "Stormkindled-Regalia",
+        "bonus2": "Unleash Weapon op Pyrebrand kent 3 Thunder toe. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "De bonus van Earthen Jolt per Thunder stijgt naar 30%."
       },
       "vale_arcanist": {
         "name": "Gewaden van de Dal-arcanist",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
+      },
+      "vesperash": {
+        "name": "Vesperash-Sluier",
+        "bonus2": "De afkoeltijd van Call Tithefiend wordt met 6 sec. verkort. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Het oproepen van je Tithefiend reset de afkoeltijd van Mindfracture, en de demon geeft per treffer tweemaal zoveel mana terug."
       },
       "warfare_ashstalker": {
         "name": "Uitrusting van de Asjager",
@@ -17836,11 +19087,26 @@ export const nl_NL: EnTranslations = {
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Doornwacht te verlenen, wat het ontwijken 6 sec lang met 15% verhoogt."
       },
+      "warspirit_emberscale": {
+        "name": "Warspirit-Emberscale",
+        "bonus2": "Ancestral Strike brengt je cadans 3 stappen vooruit.",
+        "bonus4": "Ancestral Strike treft 30% harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang-Emberhuid",
+        "bonus2": "Redharvest herstelt 45 energie, verhoogd van 30.",
+        "bonus4": "Redharvest brengt een nieuwe Flense aan op het doelwit."
+      },
       "wyrmshadow": {
         "name": "Nightfang-Gewaden",
         "bonus2": "Verhoogt aanvalskracht met 40.",
-        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%.",
-        "bonus4": "Je kritieke wapentreffers hebben 50% kans om Slagtandstorm te verlenen, waardoor je aanvalssnelheid met 25% toeneemt gedurende 8 sec."
+        "bonus4": "Je kritieke wapentreffers hebben 50% kans om Slagtandstorm te verlenen, waardoor je aanvalssnelheid met 25% toeneemt gedurende 8 sec.",
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Hit met 3%. Kritieke treffers met je wapen scheuren een Ragged Gash, waardoor het doelwit gedurende 12 sec. elke 2 sec. 4 schade oploopt. Stapelt tot 3 keer."
+      },
+      "zealfire": {
+        "name": "Zealfire-Strijduitrusting",
+        "bonus2": "Final Edict en Dawnfall verkorten elkaars resterende afkoeltijd met 3 sec. in plaats van 2.",
+        "bonus4": "Hammer of Wrath die onder Dawn's Wrath wordt uitgesproken, treft 40% harder in plaats van 20%."
       }
     }
   },

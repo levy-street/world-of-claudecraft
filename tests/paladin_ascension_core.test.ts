@@ -35,7 +35,17 @@ describe('paladin Ascension visual plan', () => {
         dead: false,
         paladinDevotion: { ascensionCharges: 99, ascensionRemaining: 2 },
       }).charges,
-    ).toBe(5);
+    ).toBe(7);
+  });
+
+  it('shows all 7 charges once Extended Dawn raises the cap past the base 5', () => {
+    expect(
+      plan({
+        templateId: 'paladin',
+        dead: false,
+        paladinDevotion: { ascensionCharges: 7, ascensionRemaining: 45 },
+      }),
+    ).toEqual({ active: true, charges: 7, lastCharge: false });
   });
 
   it('hides the transformation for dead, expired, or non-Paladin entities', () => {

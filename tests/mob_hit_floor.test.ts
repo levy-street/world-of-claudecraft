@@ -47,12 +47,15 @@ function ent(over: Partial<Entity>): Entity {
 }
 
 describe('enemy mobs always hit players at >= 80% (PR #443 penalty is player -> mob only)', () => {
-  it('a low-level wild mob vs a higher-level player has its miss capped at 20%', () => {
+  it('a low-level wild mob vs a higher-level player never misses past the 20% guard', () => {
     const mob = ent({ kind: 'mob', level: 1, hostile: true, ownerId: null });
     const player = ent({ kind: 'player', level: 10, ownerId: null });
-    // The raw above-level miss (capped at ~26%) still exceeds the mob-facing floor...
-    expect(meleeMissChance(mob.level, player.level)).toBeGreaterThan(MOB_VS_PLAYER_MAX_MISS);
-    // ...but the swing guard holds a mob's hit at >= 80% against a player.
+    // The Crucible hit rebalance lowered the above-level ramp so its cap (19%)
+    // now sits UNDER the mob-facing guard: the guard is a dormant safety bound
+    // that binds again only if the ramp ever steepens past it. Both directions
+    // of that relationship stay pinned so a table change re-decides this test.
+    expect(meleeMissChance(mob.level, player.level)).toBeCloseTo(0.19);
+    expect(meleeMissChance(mob.level, player.level)).toBeLessThanOrEqual(MOB_VS_PLAYER_MAX_MISS);
     expect(swingMissChance(mob, player)).toBeLessThanOrEqual(MOB_VS_PLAYER_MAX_MISS);
   });
 
@@ -60,9 +63,9 @@ describe('enemy mobs always hit players at >= 80% (PR #443 penalty is player -> 
     const player = ent({ kind: 'player', level: 6, ownerId: null });
     const mob = ent({ kind: 'mob', level: 10, hostile: true, ownerId: null });
     // Player -> mob keeps the full penalty (uncapped by the mob floor), now topping
-    // out at ~26% (down from near-futile).
+    // out at 19% (the Crucible hit rebalance's lowered ramp).
     expect(swingMissChance(player, mob)).toBe(meleeMissChance(player.level, mob.level));
-    expect(swingMissChance(player, mob)).toBeCloseTo(0.26);
+    expect(swingMissChance(player, mob)).toBeCloseTo(0.19);
   });
 
   it('a mob swinging at a player-owned pet is also capped (the pet is player-side)', () => {
@@ -214,12 +217,14 @@ describe('enemy mob-cast spells never resist more than MOB_VS_PLAYER_MAX_RESIST 
     const mob = ent({ kind: 'mob', level: 1, hostile: true, ownerId: null });
     const player = ent({ kind: 'player', level: 60, ownerId: null });
     const naturalHit = effectiveSpellHit(mob.level, player.level);
-    // The raw above-level resist (uncapped) still exceeds the mob-facing floor...
-    expect(1 - naturalHit).toBeGreaterThan(MOB_VS_PLAYER_MAX_RESIST);
+    // The lowered ramp caps raw resist at 18%, UNDER the mob-facing floor:
+    // dormant guard, same contract as the melee arm above. The roll therefore
+    // uses the raw hit chance today; the floor re-binds if the ramp steepens.
+    expect(1 - naturalHit).toBeCloseTo(0.18);
+    expect(1 - naturalHit).toBeLessThanOrEqual(MOB_VS_PLAYER_MAX_RESIST);
     const { rng, calls } = recordingRng(true);
     isMobSpellResisted(rng, mob, player);
-    // ...but the roll was made against the floored hit chance, not the raw one.
-    expect(calls[0]).toBeCloseTo(1 - MOB_VS_PLAYER_MAX_RESIST, 10);
+    expect(calls[0]).toBeCloseTo(naturalHit, 10);
   });
 
   it('a player casting at a higher-level mob keeps the full above-level resist scaling (untouched)', () => {

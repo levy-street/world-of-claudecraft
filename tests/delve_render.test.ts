@@ -218,6 +218,28 @@ describe('buildDelveInteractable', () => {
     }
   });
 
+  it('keeps the always-non-lootable battleground flag and rune props visible', () => {
+    // Regression: bg_flag/bg_rune are lootable:false for their whole lifetime
+    // (claimed by their own proximity mechanics, not the generic pickUpObject
+    // scan), and syncDelveInteractableVisibility runs for every 'object'-kind
+    // entity view, not just delves; without this arm a carried flag would go
+    // invisible mid-match, breaking the "actionable info visible on every
+    // tier" contract (battleground_props.ts).
+    for (const templateId of ['bg_flag', 'bg_rune']) {
+      expect(delveInteractableVisible(templateId, false), templateId).toBe(true);
+    }
+    const group = new THREE.Group();
+    expect(
+      syncDelveInteractableVisibility(
+        group,
+        { templateId: 'bg_flag', lootable: false, pos: { x: 0, z: 0 } },
+        new Map(),
+        false,
+      ),
+    ).toBe(true);
+    expect(group.visible).toBe(true);
+  });
+
   it('keeps an object view hidden until async shader compilation completes', () => {
     const compiling = buildDelveInteractable('delve_bell_rope_pulled', 44).group;
     const rope = { templateId: 'delve_bell_rope_pulled', lootable: false, pos: { x: 0, z: 0 } };

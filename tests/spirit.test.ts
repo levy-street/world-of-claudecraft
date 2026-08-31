@@ -18,6 +18,7 @@ import {
   RES_HEALER_HP_FRACTION,
   RES_HP_FRACTION,
   RESURRECTION_SICKNESS_ID,
+  releasePlayerSpirit,
   resurrectOnInstanceReentry,
   SPIRIT_HEALER_RANGE,
 } from '../src/sim/spirit';
@@ -432,6 +433,34 @@ describe('spirit: delve respawn (unchanged bounded rules)', () => {
     const events = sim.tick();
     expect(events.some((ev: any) => ev.type === 'delveFailed')).toBe(true);
     expect(sim.moveInput.back).toBe(false);
+  });
+
+  it('an unclaimed delve corpse releases to the graveyard nearest the delve door', () => {
+    const sim = makeSim('rogue', 99);
+    const reliquary = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(reliquary.minLevel);
+    const p = sim.player as AnyEntity;
+    p.pos = { x: reliquary.doorPos.x, y: 0, z: reliquary.doorPos.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId) as any;
+    const instanceTrap = { x: run.origin.x, z: run.origin.z };
+    const doorGraveyard = { x: reliquary.doorPos.x, z: reliquary.doorPos.z };
+
+    (sim as any).freeDelveRun(run);
+    p.dead = true;
+    p.hp = 0;
+    releasePlayerSpirit(
+      (sim as any).ctx,
+      sim.playerId,
+      [instanceTrap, doorGraveyard],
+      SPIRIT_TEST_WORLD.playerStart,
+    );
+
+    expect(p.ghost).toBe(true);
+    expect(p.corpsePos?.x).toBeGreaterThan(reliquary.doorPos.x + 1000);
+    expect({ x: p.pos.x, z: p.pos.z }).toEqual(doorGraveyard);
   });
 });
 

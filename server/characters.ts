@@ -52,6 +52,11 @@ import type { PlayerClass } from '../src/sim/types';
 // only guarantees the stored document is small and well shaped.
 import { sanitizeAppearance } from '../src/world_api/appearance';
 import { normalizeCharName, offensiveName } from './auth';
+import {
+  characterDeleteClientGone,
+  characterDeleteHttpRefusal,
+  characterDeleteRequestSignal,
+} from './character_delete_http';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
@@ -506,15 +511,23 @@ export async function rekeyRenamedCharacterOwnSigner(
  *
  * The purge mutates the LIVE sim through the injected runtime and only then persists:
  * the realm process serving this request is the one running the world, and it
- * re-persists the market and mail blobs from memory every autosave, so editing the
- * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
- * seconds. Each save is skipped when its purge reports no change. This assumes the
- * current one-process-per-realm topology: a second process serving the same realm
- * would re-persist its own un-purged copy. The two saves are deliberately NOT one
- * transaction (unlike the leave path, whose atomicity guards an item duplicating
- * between a bag and its escrow): a market listing and a mail parcel are independent
- * escrows and each half is idempotent. The autosave bounds a SAVE FAILURE (the
- * wrappers swallow write errors; memory re-persists within thirty seconds); a
+ * re-persists the market and mail blobs from memory, so editing the world_state
+ * rows alone (inside db.deleteCharacter, say) would be clobbered within seconds
+ * for market (still a whole-blob autosave every cycle) but NOT reliably for mail
+ * (#3561: incremental, only the recipients Sim.takeDirtyMailPartitions reports
+ * dirty; purgeMailOwner's own call correctly marks the purged recipient dirty, so
+ * THIS call site still self-heals, but a direct row edit to some OTHER mailbox no
+ * autosave subsequently dirties would no longer be clobbered within seconds the
+ * way it always was before). Each save is skipped when its purge reports no
+ * change. This assumes the current one-process-per-realm topology: a second
+ * process serving the same realm would re-persist its own un-purged copy. The two
+ * saves are deliberately NOT one transaction (unlike the leave path, whose
+ * atomicity guards an item duplicating between a bag and its escrow): a market
+ * listing and a mail parcel are independent escrows and each half is idempotent.
+ * The autosave bounds a SAVE FAILURE for market (the wrappers swallow write
+ * errors; memory re-persists within thirty seconds) and, for mail, ONLY for the
+ * dirty recipients an autosave actually carries (mail_partition_rearm.ts re-arms
+ * a failed write's own recipients, so THAT failure mode still self-heals); a
  * process CRASH between the two saves loses the un-saved half permanently, the
  * same unrecoverable window the delete handler's comment records, because the
  * committed row delete leaves nothing to re-trigger the purge.
@@ -858,7 +871,22 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 400, DELETE_CONFIRM);
     return;
   }
-  const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  let ok: boolean;
+  try {
+    ok = await charactersDb.deleteCharacter(
+      accountId,
+      character.id,
+      characterDeleteRequestSignal(ctx.res),
+    );
+  } catch (error) {
+    // The requester vanished mid-wait: the socket is closed, so write nothing
+    // (the delete never began; a booked 503 would misread as saturation).
+    if (characterDeleteClientGone(error)) return;
+    const refusal = characterDeleteHttpRefusal(error);
+    if (refusal === null) throw error;
+    json(ctx.res, refusal.status, refusal.body);
+    return;
+  }
   // The row is gone; take its shared world state with it (R43). Read freshness
   // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
   // sim in this process). The AWAITED saves NARROW the crash window before the

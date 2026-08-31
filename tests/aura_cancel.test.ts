@@ -76,6 +76,37 @@ describe('isDebuffAura', () => {
 
     expect(isCancelableAura(scriptedStasis)).toBe(false);
   });
+
+  // Regression: an internal-cooldown/engine-state aura (applyStateAura's
+  // kind: 'internal_cd', e.g. hunter Enduring Courser's ICD gate) is not a
+  // helpful buff a player carries, it is the timer that gates a burst's
+  // refresh rate. It rode isDebuffAura's default (false, since it neither
+  // matches DEBUFF_AURA_KINDS nor a negative buff_*), so isCancelableAura let
+  // a right-click strip the gate off and re-trigger the burst it protects on
+  // demand, well before its real duration, defeating the internal cooldown
+  // entirely (100% uptime on a 60% speed burst meant to hold 3s per 20s).
+  it('never exposes an internal-cooldown/engine-state aura as player-cancelable', () => {
+    expect(isDebuffAura(aura('hunter_enduring_courser_icd', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('hunter_enduring_courser_icd', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('hunter_guise_mastery_icd', 'internal_cd'))).toBe(false);
+  });
+
+  // The one deliberate exception: Divine Ascension rides internal_cd but is a
+  // genuine player-facing resource window (Sim.cancelAura has bespoke teardown
+  // for it), so the fix above must not silently swallow it too.
+  it('still allows the one player-facing internal_cd exception, Divine Ascension', () => {
+    expect(isCancelableAura(aura('divine_ascension', 'internal_cd'))).toBe(true);
+  });
+
+  it('keeps Stormsurge Ready non-cancelable without making it a harmful debuff', () => {
+    // Player feedback on PR #3668. Stormsurge is specifically styled on the UI
+    // debuff surface, but the cancel path keeps the generic engine-state answer:
+    // not a harmful debuff, still not player-cancelable unless allowlisted above.
+    expect(isDebuffAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(false);
+    expect(isDebuffAura(aura('heating_up', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('heating_up', 'internal_cd'))).toBe(false);
+  });
 });
 
 describe('auraAffectsStats', () => {

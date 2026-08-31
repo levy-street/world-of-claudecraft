@@ -351,3 +351,68 @@ describe('boundCraftedRecipeIdOnLoad: the slot-level sibling bound', () => {
     expect(dropped).toEqual(['bag.hide.craftedRecipeId', 'buyback.hide.craftedRecipeId']);
   });
 });
+
+describe('sanitizeItemInstancePayloadOnLoad: the partyTrade window subtree', () => {
+  it('keeps a legal bind-on-pickup window intact (the 2h grant must survive a relog)', () => {
+    const payload = {
+      partyTrade: {
+        untilMs: 7_200_000,
+        eligible: ['Alice', 'Bob', 'Cara'],
+        eligibleIds: [11, 22, 33],
+      },
+    };
+    const before = JSON.stringify(payload);
+    const out = sanitizeItemInstancePayloadOnLoad(payload);
+    expect(out.dropped).toEqual([]);
+    expect(JSON.stringify(out.payload)).toBe(before);
+  });
+
+  it('a worst-case legal window (RAID_MAX max-length names plus ids) stays under the ceiling', () => {
+    const payload = {
+      partyTrade: {
+        untilMs: 7_200_000,
+        eligible: Array.from({ length: 10 }, (_, i) => `Raider${i}`.padEnd(24, 'x')),
+        eligibleIds: Array.from({ length: 10 }, (_, i) => 100_000 + i),
+      },
+    };
+    const out = sanitizeItemInstancePayloadOnLoad(payload);
+    expect(out.dropped).toEqual([]);
+  });
+
+  it('drops a hand-edited unbounded eligible list WHOLE via the subtree JSON ceiling', () => {
+    const payload = {
+      partyTrade: {
+        untilMs: 7_200_000,
+        eligible: Array.from({ length: 200 }, (_, i) => `Bogus${i}`.padEnd(30, 'y')),
+      },
+    };
+    const out = sanitizeItemInstancePayloadOnLoad(payload);
+    // ATOMIC, deliberately unlike the key-at-a-time doctrine: the window is
+    // one snapshot, so no partial `{ untilMs }` residue may survive (the
+    // pre-fix behavior kept exactly that residue). The marker was the
+    // payload's only key, so the emptied payload drops whole too.
+    expect(out.dropped).toEqual(['partyTrade', 'payload']);
+    expect(out.payload).toBeUndefined();
+  });
+
+  it('drops the whole marker when eligibility data is invalid or missing (atomic, no residue)', () => {
+    const malformedMarkers: unknown[] = [
+      { untilMs: 7_200_000 }, // eligible missing
+      { untilMs: 7_200_000, eligible: 5 }, // eligible not iterable (the load-crash shape)
+      { untilMs: 7_200_000, eligible: ['Alice', 42] }, // non-string name
+      { untilMs: 7_200_000, eligible: ['Alice', 'x'.repeat(65)] }, // overlong name
+      { untilMs: Number.NaN, eligible: ['Alice', 'Bob'] }, // non-finite clock
+      { eligible: ['Alice', 'Bob'] }, // untilMs missing
+      { untilMs: 7_200_000, eligible: ['Alice', 'Bob'], eligibleIds: 'junk' }, // ids not an array
+      { untilMs: 7_200_000, eligible: ['Alice', 'Bob'], eligibleIds: [11, 'x'] }, // non-number id
+      'a short string marker', // survives the generic string arm, so the marker arm must catch it
+      [7_200_000], // an array wearing the marker key
+    ];
+    for (const marker of malformedMarkers) {
+      const out = sanitizeItemInstancePayloadOnLoad({ signer: 'Loggerholm', partyTrade: marker });
+      expect(out.dropped, JSON.stringify(marker)).toEqual(['partyTrade']);
+      // The sibling key survives: atomicity is marker-wide, never payload-wide.
+      expect(out.payload, JSON.stringify(marker)).toEqual({ signer: 'Loggerholm' });
+    }
+  });
+});

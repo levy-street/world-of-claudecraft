@@ -276,6 +276,12 @@ export function onShieldConsumed(
         ? PERSONAL_BARRIER_IDS.includes(shieldAbilityId)
         : trigger.ability === shieldAbilityId;
     if (!matches) continue;
+    // G2 guard (the Emberscreed 4pc extension): while a shieldConsumed
+    // internal cooldown runs, matching consumes are ignored entirely; the
+    // icd arms only when the proc fires (the castNth/spellCrit idiom on the
+    // same procState icds map). Draws no rng either way.
+    if (trigger.icd !== undefined && state(player).icds[def.id] !== undefined) continue;
+    if (trigger.icd !== undefined) state(player).icds[def.id] = trigger.icd;
     fire(ctx, player, def, owner);
   }
 }

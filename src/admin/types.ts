@@ -863,6 +863,14 @@ export interface PerfCaptureResult {
   aggroVisitsMaxPerTick: number;
   threatVisitsTotal: number;
   threatVisitsMaxPerTick: number;
+  movementConsumedTotal: number;
+  movementStarvedTotal: number;
+  movementExtrapolatedTotal: number;
+  movementDiscardedLateTotal: number;
+  movementDroppedOldestTotal: number;
+  movementRejectedAnchoredWindowTotal: number;
+  movementRejectedSanityBoundTotal: number;
+  movementResyncsTotal: number;
   profile: {
     samples: number;
     windowTicks: number;

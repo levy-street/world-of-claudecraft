@@ -5,6 +5,7 @@
 // (which runs at data-eval time, before item_level finishes initializing) can share
 // this math without an import cycle. item_level.ts re-exports these for back-compat.
 import type { CoreStats, ItemDef, ItemSlot } from './types';
+import { SPELL_COEFF_DIVISOR } from './types';
 
 // The five primary attributes an item can carry (armor is handled separately: it
 // is an armor-class/slot property, not part of the comparable stat budget).
@@ -185,4 +186,33 @@ export function normalizePrimaryStats(
   for (let i = 0; assigned < budget; i++, assigned++) order[i % order.length].base += 1;
   for (const p of parts) out[p.k] = p.base;
   return out;
+}
+
+// --- The throughput lane (the TBC lesson, adopted 2026-08-30) -----------------
+// Every archetype gets ONE throughput lane per kit on top of the primary-stat
+// budget. Melee draw it as weapon dps (weaponDpsBudget x TWOHAND_DPS_MULT, the
+// lane this file has always priced); casters draw the SAME lane as flat Spell
+// Power (1 SP = 1/SPELL_COEFF_DIVISOR dps when chain-casting, so lane dps
+// converts at x3.5), healers as Healing Power at half Spell Power's price
+// (never adds damage; the classic-era 0.455-vs-0.855 ratio). Spell Power and
+// Healing Power are therefore PRICED, never free: the kit-wide totals below
+// are the whole caster/healer allowance for a tier, and
+// tests/ignivar_affix_lane.test.ts pins the shipped kits to them exactly.
+// The caster multiplier prices the uptime tax (melee white damage flows while
+// positioning; casters pay full price for every idle GCD; measured 32-64%
+// realized uptime in the sim-vs-reality decomposition): it is the ONE
+// caster-vs-melee itemization dial. Raising it is a maintainer decision.
+export const CASTER_LANE_MULT = 1.25;
+export const HEAL_POWER_PRICE_OF_SP = 0.5;
+
+/** Kit-wide flat Spell Power a caster tier at `level` may carry (floored). */
+export function casterLaneSpTotal(level: number): number {
+  return Math.floor(
+    weaponDpsBudget(level) * TWOHAND_DPS_MULT * SPELL_COEFF_DIVISOR * CASTER_LANE_MULT,
+  );
+}
+
+/** Kit-wide flat Healing Power a healer tier at `level` may carry. */
+export function healerLaneHpTotal(level: number): number {
+  return Math.floor(casterLaneSpTotal(level) / HEAL_POWER_PRICE_OF_SP);
 }

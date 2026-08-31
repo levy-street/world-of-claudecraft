@@ -79,6 +79,21 @@ function enterReliquary(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   sim.enterDelve('collapsed_reliquary', tier);
 }
 
+function enterReliquaryAs(sim: Sim, pid: number, tier: 'normal' | 'heroic' = 'normal') {
+  const heroicTier = DELVES.collapsed_reliquary.tiers.find((t) => t.id === 'heroic');
+  const level =
+    tier === 'heroic'
+      ? (heroicTier?.minPlayerLevel ?? DELVES.collapsed_reliquary.minLevel)
+      : DELVES.collapsed_reliquary.minLevel;
+  sim.setPlayerLevel(level, pid);
+  const door = DELVES.collapsed_reliquary.doorPos;
+  const e = sim.entities.get(pid)!;
+  e.pos = { x: door.x, y: terrainHeight(door.x, door.z, sim.cfg.seed), z: door.z };
+  e.prevPos = { ...e.pos };
+  (sim as any).rebucket(e);
+  sim.enterDelve('collapsed_reliquary', tier, pid);
+}
+
 function enterLitany(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   const heroicTier = DELVES.drowned_litany.tiers.find((t) => t.id === 'heroic');
   const level =
@@ -927,6 +942,27 @@ describe('delve interactables and affixes', () => {
     run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
     for (let i = 0; i < 21; i++) sim.tick();
     expect(run.partyKey).toBe(null);
+  });
+
+  it('ejects and recycles a stale occupied run when rebind would collide with another run', () => {
+    const sim = makeSim();
+    const b = sim.addPlayer('warrior', 'SoloB');
+    enterReliquary(sim);
+    enterReliquaryAs(sim, b);
+    const primaryRun = sim.delveRunForPlayer(sim.playerId)!;
+    const staleRun = sim.delveRunForPlayer(b)!;
+    expect(staleRun).not.toBe(primaryRun);
+
+    sim.partyInvite(sim.playerId, b);
+    sim.partyAccept(sim.playerId);
+    for (let i = 0; i < 21; i++) sim.tick();
+
+    expect(staleRun.partyKey).toBeNull();
+    expect(sim.delveRunForPlayer(sim.playerId)).toBe(primaryRun);
+    expect(sim.delveRunForPlayer(b)).toBeNull();
+    const e = sim.entities.get(b)!;
+    expect(isDelvePos(e.pos.x)).toBe(false);
+    expect(e.pos.x).toBeCloseTo(DELVES.collapsed_reliquary.doorPos.x, 5);
   });
 
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {
@@ -3774,6 +3810,36 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     sim.player.prevPos = { ...reliquary.pos };
     (sim as Sim).delveRiteChoose(intensity);
   }
+
+  it('rolls Bountiful at the raised rate (Heroic 5%→20%, Normal 2%→8%)', () => {
+    // Read the real run.seed a live delve entry produces, then re-derive the
+    // Bountiful roll straight from claimDelveRun's own formula against BOTH
+    // the retired and the live odds. This is deliberately decoupled from the
+    // exact global rng draw count preceding claimDelveRun (unlike asserting
+    // run.bountiful after the full Sim/enterDelve pipeline, which would
+    // silently start failing for the wrong reason the day an unrelated
+    // earlier draw shifts run.seed): only claimDelveRun's own p values are
+    // under test here. The roll is delve-agnostic (keyed on tierId only), so
+    // this pins the one shared formula regardless of which delve calls it.
+    const runSeedFor = (seed: number, tier: 'normal' | 'heroic') => {
+      const s = makeSim('warrior', seed);
+      enterLitany(s, tier);
+      return s.delveRunForPlayer(s.playerId)!.seed;
+    };
+    const rolls = (runSeed: number, p: number) => new Rng((runSeed ^ 0x600dc0ff) >>> 0).chance(p);
+
+    // Both top-level seeds were found by brute-force search: each produces a
+    // run.seed that MISSES under the retired 5%/2% odds and HITS under the
+    // live 20%/8% ones (the chase epics were landing near 1-in-700 per
+    // heroic clear before this bump, see drowned_litany_loot.ts).
+    const heroicSeed = runSeedFor(1, 'heroic');
+    expect(rolls(heroicSeed, 0.05)).toBe(false);
+    expect(rolls(heroicSeed, 0.2)).toBe(true);
+
+    const normalSeed = runSeedFor(53, 'normal');
+    expect(rolls(normalSeed, 0.02)).toBe(false);
+    expect(rolls(normalSeed, 0.08)).toBe(true);
+  });
 
   it('rejects a rite difficulty commit from a player away from the reliquary', () => {
     const sim = makeSim();

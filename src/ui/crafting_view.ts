@@ -13,6 +13,7 @@
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../sim/content/professions';
 import { ALL_RECIPES } from '../sim/content/recipes';
 import { countUnlockedInSlots } from '../sim/item_lock';
+import { drawableCounterFor, drawableVaultCount } from '../sim/materials_vault';
 import { craftSkillGainMultiplier } from '../sim/professions/archetype';
 import {
   type ComboEligibilityReason,
@@ -20,11 +21,12 @@ import {
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
+import { countAcrossGrades, materialGradeIds } from '../sim/professions/material_grades';
 import {
-  countAcrossGrades,
-  materialGradeIds,
-  planGradeRemoval,
-} from '../sim/professions/material_grades';
+  countMinusPlanned,
+  planReagentSourceDraw,
+  tallyPlannedTakes,
+} from '../sim/professions/reagent_sources';
 import { type StationType, stationsOfType } from '../sim/professions/stations';
 import { trainingStationTypeFor } from '../sim/professions/training';
 import type { ProfessionRecipeRecord } from '../sim/professions/types';
@@ -76,11 +78,23 @@ export interface CraftingReagentRow {
   /** True when the player holds at least `required` of this reagent. */
   satisfied: boolean;
   /** Units of the FINE grade this craft would consume because base stock
-   *  runs short (the UX pass): resolved through the sim's own
-   *  planGradeRemoval (base drains first, D8), so the warning and the spend
-   *  can never disagree. 0 when the base covers the bill, and 0 while the
-   *  row is unsatisfied (an uncraftable recipe warns about nothing). */
+   *  runs short (the UX pass): resolved through the sim's own reagent plan
+   *  (base drains first, D8), so the warning and the spend can never
+   *  disagree. Counted across BOTH source tiers (a fine unit drawn from the
+   *  vault still spends 2x gather value, so it still warns). 0 when the base
+   *  covers the bill, and 0 while the row is unsatisfied (an uncraftable
+   *  recipe warns about nothing). */
   fineSubstituted: number;
+  /** Units this craft would draw from the Materials Vault because carried
+   *  stock runs short (Bank Storage Phase 04): resolved through the SAME
+   *  shared planReagentSourceDraw the sim's admission gate and consume use
+   *  (carried always drains first), so the stated vault spend and the real
+   *  one can never disagree. 0 when carried covers the bill, when the world
+   *  reports vault draw unavailable here (vaultStock null), and while the
+   *  row is unsatisfied. May overlap fineSubstituted (a fine unit drawn from
+   *  the vault counts in both: one warns about grade value, this one about
+   *  source). */
+  vaultDrawn: number;
 }
 
 export interface CraftingRecipeRow {
@@ -137,6 +151,15 @@ export interface CraftingRecipeRow {
 
 export interface CraftingView {
   recipes: CraftingRecipeRow[];
+  /** True when vault draw is BLOCKED at this location (a gated context, the
+   *  Phase 04 QA note) AND some reagent row across the KNOWN recipes is
+   *  unsatisfied: the situation where the invisible vault might have made
+   *  the difference, so the window states the place-based reason in words
+   *  (the stationOutOfRange precedent) instead of leaving rows silently
+   *  short. The painter additionally scopes the RENDER to the selected
+   *  section's rows, so an all-green visible tab stays quiet. Never true for
+   *  a merely EMPTY vault (vaultStock {} is not blocked). */
+  vaultNote: boolean;
 }
 
 export interface CraftingIdentityLike {
@@ -172,7 +195,18 @@ type ReagentFacts = { have: number; selfSigned: boolean };
  * range of everything, so station-free callers need not pass it), and the
  * local player's name (the #1145 self-signed reduction: defaults to null,
  * meaning the self-signed check never matches; the #1134 specialization
- * discount still applies from craftSkills either way). Read-only:
+ * discount still applies from craftSkills either way), and the drawable
+ * Materials Vault stock as visible to crafting HERE (IWorld craftVaultStock,
+ * Bank Storage Phase 04: null means vault draw is unavailable at this
+ * location; for every SHIPPED recipe the null view is byte-identical to the
+ * pre-vault one, and the one divergence is deliberate and content-guarded:
+ * the carried-tier cross-reagent tally applies on the null path too, so an
+ * OVERLAPPING recipe that the old per-item fold called satisfied on both
+ * rows is now correctly unsatisfied on the second; defaults to null so every
+ * existing caller is unchanged), and `vaultBlocked` (Phase 04 QA): true when
+ * the location itself refuses vault draw, which is a DISTINCT fact from a
+ * null vaultStock default (an old caller passing nothing must not render a
+ * blocked note), used only to derive `vaultNote`. Read-only:
  * never mutates any of its inputs.
  */
 export function buildCraftingView(
@@ -188,6 +222,8 @@ export function buildCraftingView(
   },
   inRangeStations: ReadonlySet<StationType> = new Set(),
   playerName: string | null = null,
+  vaultStock: Readonly<Record<string, number>> | null = null,
+  vaultBlocked = false,
 ): CraftingView {
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
@@ -201,6 +237,13 @@ export function buildCraftingView(
   // build, so a rebuild re-reads the live inventory through the same
   // single-surface helpers.
   const reagentFacts = new Map<string, ReagentFacts>();
+  // The vault tier's per-grade count callback, shared by the have fold and
+  // the per-row plan below: null when the world reports vault draw
+  // unavailable here, so the planner's vault tier is simply absent and every
+  // number degrades to the pre-vault value. drawableCounterFor re-applies the
+  // drawable rule per read, so a test double handing raw stock is still read
+  // safely (the shared null-or-counter adapter, materials_vault.ts).
+  const vaultCount = drawableCounterFor(vaultStock);
   const factsFor = (itemId: string): ReagentFacts => {
     let facts = reagentFacts.get(itemId);
     if (!facts) {
@@ -212,7 +255,13 @@ export function buildCraftingView(
         // perform: eastbrook_vale is all tier-1 veins, so any tier-2 tool stops
         // the plain grade dropping and every recipe naming it would go
         // unbuildable through the window while resolveCraft accepted it.
-        have: countAcrossGrades(itemId, (gradeId) => countInInventory(inventory, gradeId)),
+        // Vault-backed availability folds in the SAME way (Phase 04): the sim's
+        // admission gate admits carried plus drawable vault stock, so the
+        // displayed have and the Craft gate track the server's answer in both
+        // hosts (countAcrossGrades and the vault fold share the grade walk).
+        have:
+          countAcrossGrades(itemId, (gradeId) => countInInventory(inventory, gradeId)) +
+          (vaultCount === null ? 0 : countAcrossGrades(itemId, vaultCount)),
         selfSigned:
           playerName !== null &&
           materialGradeIds(itemId).some((gradeId) =>
@@ -224,6 +273,16 @@ export function buildCraftingView(
     return facts;
   };
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
+    // Cross-reagent tallies (the Phase 04 review round): the sim's
+    // planCraftReagentDraw refuses to promise the same units to two reagents,
+    // so this projection tallies BOTH pools across the recipe's reagents in
+    // the same order, or the Craft button would lie for a recipe whose
+    // reagents name one material (or overlap grade ladders). No shipped
+    // recipe does (the content guard in tests/crafting_view.test.ts pins
+    // that), so every shipped answer is byte-identical; the tally is what
+    // keeps the window honest the day content changes.
+    const carriedPlanned = new Map<string, number>();
+    const vaultPlanned = new Map<string, number>();
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
       const { have, selfSigned } = factsFor(reagent.itemId);
       // The requirement the sim actually charges: the SAME shared
@@ -238,18 +297,32 @@ export function buildCraftingView(
         skills,
         recipe.professionId,
       ).count;
-      // The substitution signal (the UX pass): what the craft would take
-      // from the FINE grade because base stock ran short, read off the SAME
-      // plan the sim spends (planGradeRemoval drains the base first), so a
-      // silent 2x-value substitution becomes a stated one.
-      const satisfied = have >= required;
+      // The satisfaction, substitution and vault-draw signals (the UX pass +
+      // Phase 04): all read off the SAME planReagentSourceDraw the sim's
+      // admission gate and consume use (carried drains first, base before
+      // fine inside each tier, both pools tallied across reagents), so
+      // neither the Craft gate nor a stated spend can disagree with the real
+      // one. `have` stays the raw per-item fold above (display: what the
+      // player holds in total), while `satisfied` is the tallied plan's
+      // answer, exactly the sim's split. A partial plan still tallies its
+      // takes: units are claimed in reagent order, the planner's own rule.
+      const plan = planReagentSourceDraw(
+        reagent.itemId,
+        required,
+        countMinusPlanned((gradeId) => countInInventory(inventory, gradeId), carriedPlanned),
+        countMinusPlanned(vaultCount, vaultPlanned),
+      );
+      tallyPlannedTakes(carriedPlanned, plan.carried);
+      tallyPlannedTakes(vaultPlanned, plan.vault);
+      const satisfied = plan.shortfall === 0;
+      // 0 while the row is unsatisfied: an uncraftable recipe warns about
+      // nothing (the pinned pre-vault rule).
       const fineSubstituted = satisfied
-        ? planGradeRemoval(reagent.itemId, required, (gradeId) =>
-            countInInventory(inventory, gradeId),
-          )
+        ? [...plan.carried, ...plan.vault]
             .filter((take) => take.itemId !== reagent.itemId)
             .reduce((sum, take) => sum + take.count, 0)
         : 0;
+      const vaultDrawn = satisfied ? plan.vault.reduce((sum, take) => sum + take.count, 0) : 0;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
@@ -257,6 +330,7 @@ export function buildCraftingView(
         have,
         satisfied,
         fineSubstituted,
+        vaultDrawn,
       };
     });
     const combo = recipe.comboRequirement;
@@ -320,7 +394,10 @@ export function buildCraftingView(
         (station === null || station.inRange),
     };
   });
-  return { recipes: rows };
+  return {
+    recipes: rows,
+    vaultNote: vaultBlocked && rows.some((row) => row.reagents.some((r) => !r.satisfied)),
+  };
 }
 
 // Every item id any recipe consumes, derived ONCE from static content. Both
@@ -356,10 +433,23 @@ const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
  *  - QUIET. Non-reagent items are skipped and ids are emitted sorted, so
  *    looting a grey, rearranging the bags, or a stranger-signed stack changing
  *    hands never repaints the window under the player.
+ *
+ * The vault term (Phase 04): the drawable vault rows the view folds into
+ * `have` join under a distinct `V:` prefix, restricted to reagent ids and
+ * emitted sorted like the bag rows, so a craft that consumed vault stock (or
+ * a deposit made at the banker with the window open) converges the open
+ * window exactly the way a bag change does. A null vaultStock encodes the
+ * DISTINCT `V!|` blocked sentinel ('!' can never open a `V:` row: item ids
+ * are lowercase snake_case, content-guarded): the Phase 04 QA vault note
+ * renders from blocked-ness, so a gate flip must repaint even when no
+ * drawable reagent row changed. (This deliberately supersedes the original
+ * {}-equals-null encoding, which was only correct while the view treated
+ * the two identically.)
  */
 export function craftingReagentSig(
   inventory: readonly InvSlot[],
   playerName: string | null,
+  vaultStock: Readonly<Record<string, number>> | null = null,
 ): string {
   const totals = new Map<string, number>();
   const selfSigned = new Set<string>();
@@ -371,6 +461,17 @@ export function craftingReagentSig(
   let sig = '';
   for (const itemId of [...totals.keys()].sort())
     sig += `${itemId}:${totals.get(itemId)}:${selfSigned.has(itemId) ? 1 : 0}|`;
+  if (vaultStock === null) sig += 'V!|';
+  if (vaultStock !== null) {
+    const vaultRows: [string, number][] = [];
+    for (const itemId of Object.keys(vaultStock)) {
+      if (!REAGENT_ITEM_IDS.has(itemId)) continue;
+      const count = drawableVaultCount(vaultStock, itemId);
+      if (count > 0) vaultRows.push([itemId, count]);
+    }
+    vaultRows.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    for (const [itemId, count] of vaultRows) sig += `V:${itemId}:${count}|`;
+  }
   return sig;
 }
 

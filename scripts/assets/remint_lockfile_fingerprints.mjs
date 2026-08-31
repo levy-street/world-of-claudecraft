@@ -54,6 +54,21 @@ const ASSETS = [
   ...FENBRIDGE_ASSETS,
 ];
 
+const requestedAssets = new Set(
+  (process.env.ONLY ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean),
+);
+const selectedAssets = requestedAssets.size
+  ? ASSETS.filter((asset) => requestedAssets.has(asset.rel))
+  : ASSETS;
+if (requestedAssets.size && selectedAssets.length !== requestedAssets.size) {
+  const known = new Set(ASSETS.map((asset) => asset.rel));
+  const unknown = [...requestedAssets].filter((asset) => !known.has(asset));
+  throw new Error(`unknown ONLY asset path(s): ${unknown.join(', ')}`);
+}
+
 function findSourceFingerprint(buf) {
   const text = buf.toString('utf8');
   const match = text.match(/"sourceFingerprint"\s*:\s*"([0-9a-f]{64})"/);
@@ -92,7 +107,7 @@ console.log('live source fingerprints:');
 for (const [k, v] of Object.entries(fps)) console.log(`  ${k.padEnd(8)} ${v}`);
 
 const results = [];
-for (const asset of ASSETS) {
+for (const asset of selectedAssets) {
   const abs = path.join(ROOT, asset.rel);
   const buf = Buffer.from(readFileSync(abs));
   const before = buf.byteLength;

@@ -205,6 +205,8 @@ function fakeHooks(): {
       stepUpChallenges: Record<string, unknown>[];
       signMessages: string[];
       signAndSends: string[];
+      signAndSendArgs: [string, string | null][];
+      signMessageArgs: [string, string][];
       createOffers: number;
       resolveOffers: [number, string][];
       statuses: number;
@@ -260,6 +262,8 @@ function fakeHooks(): {
       stepUpChallenges: [] as Record<string, unknown>[],
       signMessages: [] as string[],
       signAndSends: [] as string[],
+      signAndSendArgs: [] as [string, string | null][],
+      signMessageArgs: [] as [string, string][],
       createOffers: 0,
       resolveOffers: [] as [number, string][],
       statuses: 0,
@@ -336,12 +340,14 @@ function fakeHooks(): {
     },
     characterId: () => 1,
     walletLinked: () => true,
-    signAndSendTransactionBase64: (tx: string) => {
+    signAndSendTransactionBase64: (tx: string, reference: string | null) => {
       state.calls.signAndSends.push(tx);
+      state.calls.signAndSendArgs.push([tx, reference]);
       return state.signAndSendImpl(tx);
     },
-    signMessageBase58: (message: string) => {
+    signMessageBase58: (message: string, stepUpNonce: string) => {
       state.calls.signMessages.push(message);
+      state.calls.signMessageArgs.push([message, stepUpNonce]);
       return state.signMessageImpl(message);
     },
   } as unknown as WocMarketHooks;
@@ -884,8 +890,11 @@ describe('the accept request body (seller escrow)', () => {
     };
     c.wocTradeOffer = heldOffer({ role: 'seller' });
     await c.acceptWocTradeOffer();
-    // The wallet was asked to sign the exact server message.
+    // The wallet was asked to sign the exact server message, WITH the
+    // challenge nonce the desktop arm resolves the stored message by (both
+    // parameters are strings, so only this runtime pin catches a swap).
     expect(h.state.calls.signMessages).toEqual(['step-up message nonce-1']);
+    expect(h.state.calls.signMessageArgs).toEqual([['step-up message nonce-1', 'nonce-1']]);
     // The decline aborts BEFORE acceptOffer: no custody moves on a refused sign.
     expect(h.state.calls.acceptOffers).toEqual([]);
     // The player line is the CLASSIFIED cancel copy, never the wallet's raw
@@ -1513,6 +1522,9 @@ describe('the pay verdict ladder matches the Exchange window', () => {
     expect(h.state.calls.signAndSends, 'the wallet transaction signer WAS driven').toEqual([
       'dHg=',
     ]);
+    // The signer also receives the quote REFERENCE (the desktop arm resolves
+    // the registered quote by it; a dropped argument kills desktop payments).
+    expect(h.state.calls.signAndSendArgs).toEqual([['dHg=', 'ref_1']]);
     expect(confirmedWith, 'confirm got the real wallet signature, not a devsig').toBe(
       'walletTxSig',
     );

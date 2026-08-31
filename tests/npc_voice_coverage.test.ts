@@ -14,8 +14,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { EXTRA_LINES, yellKey } from '../scripts/voices/extra_lines.mjs';
-import { VOICE_ALIAS, VOICE_PROMPTS, voiceIdFor } from '../scripts/voices/npc_voice_prompts.mjs';
+import { VOICE_ALIAS, VOICE_PROMPTS } from '../scripts/voices/npc_voice_prompts.mjs';
+import { collectVoiceLines } from '../scripts/voices/voice_line_catalog.mjs';
 import { ESCORTS, NPCS, QUESTS } from '../src/sim/data';
+import { IGNIVAR_DIALOGUE_LINES } from '../src/sim/encounters/ignivar_dialogue';
+import { VARKHUL_DIALOGUE_LINES } from '../src/sim/encounters/varkhul_dialogue';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const voiceIds: Record<string, string> = JSON.parse(
@@ -23,54 +26,14 @@ const voiceIds: Record<string, string> = JSON.parse(
 );
 const promptIds = new Set<string>(VOICE_PROMPTS.map((p: { npcId: string }) => p.npcId));
 
-/** Every clip the pipeline would render: mirrors the derivation in gen_npc_lines.mjs. */
-function allLines(): { key: string; text: string; voiceNpc: string; source: string }[] {
-  const lines: { key: string; text: string; voiceNpc: string; source: string }[] = [];
-  for (const npc of Object.values(NPCS)) {
-    if (npc.greeting)
-      lines.push({
-        key: `greeting__${npc.id}`,
-        text: npc.greeting,
-        voiceNpc: voiceIdFor(npc.id),
-        source: `NPCS.${npc.id}.greeting`,
-      });
-  }
-  for (const q of Object.values(QUESTS)) {
-    if (q.text)
-      lines.push({
-        key: `quest__${q.id}__offer`,
-        text: q.text,
-        voiceNpc: voiceIdFor(q.giverNpcId),
-        source: `QUESTS.${q.id}.text (giver ${q.giverNpcId})`,
-      });
-    if (q.completionText)
-      lines.push({
-        key: `quest__${q.id}__complete`,
-        text: q.completionText,
-        voiceNpc: voiceIdFor(q.turnInNpcId),
-        source: `QUESTS.${q.id}.completionText (turn-in ${q.turnInNpcId})`,
-      });
-  }
-  for (const e of Object.values(ESCORTS)) {
-    for (const [field, text] of [
-      ['startText', e.startText],
-      ['successText', e.successText],
-      ['failText', e.failText],
-    ] as const) {
-      if (text)
-        lines.push({
-          key: yellKey(text),
-          text,
-          voiceNpc: voiceIdFor(e.npcMobId),
-          source: `ESCORTS.${e.id}.${field} (escortee ${e.npcMobId})`,
-        });
-    }
-  }
-  for (const e of EXTRA_LINES as { key: string; text: string; voiceNpc: string }[]) {
-    lines.push({ key: e.key, text: e.text, voiceNpc: e.voiceNpc, source: `EXTRA_LINES ${e.key}` });
-  }
-  return lines;
-}
+const allLines = () =>
+  collectVoiceLines({
+    NPCS,
+    QUESTS,
+    ESCORTS,
+    IGNIVAR_DIALOGUE_LINES,
+    VARKHUL_DIALOGUE_LINES,
+  });
 
 describe('NPC voice prompt catalog', () => {
   it('declares each voice exactly once', () => {
@@ -132,14 +95,16 @@ describe('NPC voice line coverage', () => {
 
 describe('yell clip keys', () => {
   // Escort barks and encounter yells are looked up at runtime from the LIVE chat text
-  // by yellVoiceKey in src/ui/hud.ts. If that derivation and the generator's yellKey
-  // ever drift, every yell goes silent with no other symptom, so pin them together.
-  const hudSrc = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
+  // by yellVoiceKey in src/ui/hud_voice_cues.ts (extracted out of src/ui/hud.ts with
+  // the HUD's other voice-clip key resolvers). If that derivation and the generator's
+  // yellKey ever drift, every yell goes silent with no other symptom, so pin them
+  // together.
+  const voiceCuesSrc = readFileSync(join(repoRoot, 'src/ui/hud_voice_cues.ts'), 'utf8');
 
-  it('keeps src/ui/hud.ts yellVoiceKey byte-identical in shape to the generator', () => {
-    const body = hudSrc.slice(
-      hudSrc.indexOf('function yellVoiceKey'),
-      hudSrc.indexOf('}', hudSrc.indexOf('function yellVoiceKey')),
+  it('keeps yellVoiceKey byte-identical in shape to the generator', () => {
+    const body = voiceCuesSrc.slice(
+      voiceCuesSrc.indexOf('function yellVoiceKey'),
+      voiceCuesSrc.indexOf('}', voiceCuesSrc.indexOf('function yellVoiceKey')),
     );
     expect(body).toContain('.toLowerCase()');
     expect(body).toContain("replace(/[^a-z0-9]+/g, '_')");
@@ -149,8 +114,8 @@ describe('yell clip keys', () => {
   });
 
   it('slugs real content barks the way the runtime will', () => {
-    // Reference implementation copied from hud.ts yellVoiceKey; if this ever needs a
-    // change, the generator and hud must change with it.
+    // Reference implementation copied from hud_voice_cues.ts yellVoiceKey; if this
+    // ever needs a change, the generator and the resolver must change with it.
     const reference = (text: string) =>
       `yell__${text
         .toLowerCase()
@@ -160,6 +125,8 @@ describe('yell clip keys', () => {
     const texts = [
       ...Object.values(ESCORTS).flatMap((e) => [e.startText, e.successText, e.failText]),
       ...(EXTRA_LINES as { text: string }[]).map((e) => e.text),
+      ...IGNIVAR_DIALOGUE_LINES,
+      ...VARKHUL_DIALOGUE_LINES,
     ];
     expect(texts.length).toBeGreaterThan(0);
     for (const text of texts) expect(yellKey(text), text).toBe(reference(text));

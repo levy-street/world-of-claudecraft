@@ -221,16 +221,15 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
   // The old king of the shallows: the island's summon-only miniboss
   // (interactions/crab_summon.ts calls him out of the tide pool at the
   // strand's west end; no camp spawns him, the aldren idiom). Sized for a
-  // level 2 recruit fighting alone: a long meaty fight, never a lethal one.
-  // requiresQuestId keeps passers-by from griefing a summon they cannot be
-  // credited for.
+  // level 2 recruit fighting alone, with an owner tap that preserves the
+  // summoner's credit while allowing passers-by to help with the fight.
   mister_crabs: {
     id: 'mister_crabs',
     name: 'Mister Crabs',
     minLevel: 2,
     maxLevel: 2,
     family: 'beast',
-    hpBase: 70,
+    hpBase: 42,
     hpPerLevel: 0,
     // Harder per pinch than a scuttler (4 per 2.0s): the quest copy promises
     // it, and 6 per 2.4s is still a safe long fight for a level 2 recruit.
@@ -243,16 +242,18 @@ export const PROVING_SHORE_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 6.2,
     aggroRadius: 10,
     canSwim: true,
-    requiresQuestId: 'q_ps_mother_of_pearl',
+    // Taming swaps a wild mob onto the ordinary pet respawn lifecycle, which
+    // would bypass this lure summon’s unconditional five-minute lifetime.
+    untameable: true,
     loot: [
       // Quest-gated like the pearl. The summon is repeatable while the quest
       // is active (the no-strand rule), which makes this a reviewed and
       // accepted micro-faucet: ~30 copper per full summon-kill cycle, well
       // under any economy ceiling, and it closes at the hand-in.
       { copper: 30, chance: 1, questId: 'q_ps_mother_of_pearl' },
-      // The prize, for quest holders only (LootEntry.questId): nobody else
-      // can even damage him (requiresQuestId above), so the pearl never
-      // rots on a corpse a stranger tapped.
+      // The prize remains for quest holders only (LootEntry.questId). Helpers
+      // may damage him, while the summon-time owner tap preserves the caller's
+      // corpse and kill credit.
       { itemId: 'ps_lustrous_pearl', chance: 1, questId: 'q_ps_mother_of_pearl' },
     ],
     scale: 1.7,

@@ -1,3 +1,4 @@
+import { EXTENDED_DAWN_ASCENSION_CHARGE_BONUS } from '../paladin_devotion';
 import type { ClassChoiceRows } from './talent_rows';
 
 const rogueBuilderAbilityIds = [
@@ -396,7 +397,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Extended Dawn',
           description: 'Divine Ascension empowers 2 additional abilities.',
           icon: 'pal_r17_extended_dawn',
-          effect: { global: { ascensionChargeBonus: 2 } },
+          effect: { global: { ascensionChargeBonus: EXTENDED_DAWN_ASCENSION_CHARGE_BONUS } },
         },
         {
           id: 'pal_r17_radiant_wrath',
@@ -1517,11 +1518,11 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_tidal_waves',
           name: 'Living Weapon',
           description:
-            "After Earthen Jolt or Faultwake consumes all Thunder, Pyrebrand makes the next Arc Bolt instant. Galeheart's final echo deals 50% damage to up to 2 enemies within 8 yards. A Stonebound spell that consumes Stormcast grants an absorb equal to 8% of your maximum health. With Lifespring active, Tidecall also adds 50% of its full heal to the most injured ally within 10 yards.",
+            "After Earthen Jolt or Faultwake consumes all Thunder, Pyrebrand makes the next Arc Bolt instant. Galeheart's echoes each deal 40% damage to up to 2 enemies within 8 yards. A Stonebound spell that consumes Stormcast grants an absorb equal to 8% of your maximum health. With Lifespring active, Tidecall also adds 50% of its full heal to the most injured ally within 10 yards.",
           icon: 'rockbiter_weapon',
           effect: {
             runtime: {
-              cleavePercent: 50,
+              cleavePercent: 40,
               cleaveTargets: 2,
               absorbPercent: 8,
               allyDepositPercent: 50,

@@ -1,4 +1,10 @@
+import {
+  SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS,
+  SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
+  setBonusFlag,
+} from '../content/ignivar_set_bonuses';
 import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
@@ -8,7 +14,11 @@ import { grantHunterFocus, onHunterTrailbreak } from './hunter_shared';
 export const BLOODHOOK_BLEED_ID = 'bloodhook_bleed';
 export const HUNTING_MOMENTUM_ID = 'hunting_momentum';
 export const FIELDCRAFT_REENTRY_ID = 'fieldcraft_reentry';
+/** Slagsnare 4pc: the once-per-8-sec Woundrend momentum-preserve lockout. */
+export const SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID = 'slagsnare_momentum_icd';
 const BLOODHOOK_PENDING_ID = 'bloodhook_pending';
+/** Base Focus a landed Gutting Strike grants (the Slagsnare 2pc bends it). */
+const GUTTING_STRIKE_BASE_FOCUS = 15;
 
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
@@ -162,6 +172,28 @@ export function finishBloodhook(
   }
 }
 
+function slagsnarePreservesMomentum(ctx: SimContext, hunter: Entity, meta: PlayerMeta): boolean {
+  if (ctx.playerMods(meta).selected[setBonusFlag('slagsnare', 4)] !== true) return false;
+  return !hunter.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID);
+}
+
+function armSlagsnarePreserveLockout(ctx: SimContext, hunter: Entity): void {
+  ctx.applyAura(hunter, {
+    id: SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID,
+    // The localized 'Hunting Momentum' string is deliberately reused (the
+    // Oathpyre bulwark precedent): the lockout is Momentum's own once-per-8s
+    // preserve, and a new aura name would need a dictionary row across every
+    // locale. The distinct id keeps it from ever replacing the stacks aura.
+    name: 'Hunting Momentum',
+    kind: 'internal_cd',
+    remaining: SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
+    duration: SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
+    value: 1,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
+}
+
 function setMomentum(ctx: SimContext, hunter: Entity, stacks: number): void {
   ctx.applyAura(hunter, {
     id: HUNTING_MOMENTUM_ID,
@@ -192,7 +224,14 @@ export function onFieldcraftWeaponStrike(
   const meta = ctx.players.get(hunter.id);
   if (meta?.cls !== 'hunter' || meta.talents.spec !== 'survival' || dealt <= 0) return;
   if (abilityId === 'raptor_strike') {
-    grantHunterFocus(ctx, hunter, 15, 'raptor_strike');
+    // Slagsnare 2pc: the module-constant grant rises 15 -> 20 for wearers.
+    // preResolved stays false, so the Harrier and Efficient Rhythm riders
+    // apply after, exactly as they do for the base grant.
+    const guttingFocus =
+      ctx.playerMods(meta).selected[setBonusFlag('slagsnare', 2)] === true
+        ? SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS
+        : GUTTING_STRIKE_BASE_FOCUS;
+    grantHunterFocus(ctx, hunter, guttingFocus, 'raptor_strike');
     const current = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks ?? 0;
     setMomentum(ctx, hunter, Math.min(3, current + 1));
     if (hunter.auras.some((aura) => aura.id === FIELDCRAFT_REENTRY_ID)) {
@@ -229,7 +268,17 @@ export function onFieldcraftWeaponStrike(
     if (stacks >= 3) {
       const bonus = Math.max(1, Math.round(dealt * 0.15 * stacks));
       ctx.dealDamage(hunter, target, bonus, false, 'physical', 'Hunting Momentum', 'hit', true);
-      removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+      // Slagsnare 4pc: the Woundrend consume (this site ONLY; the Re-entry
+      // consumers keep spending the stacks) preserves the 3 stacks, once per
+      // 8 sec. The lockout's 8 sec deliberately MATCHES the Momentum window,
+      // and the refresh above already restarted that window, so preserved
+      // stacks carry a full 8 sec. The payoff damage above stays at 3-stack
+      // value either way. Deterministic, no rng.
+      if (slagsnarePreservesMomentum(ctx, hunter, meta)) {
+        armSlagsnarePreserveLockout(ctx, hunter);
+      } else {
+        removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
+      }
     }
   }
   if (hunter.auras.some((aura) => aura.kind === 'hunter_bloodtrail'))
@@ -342,6 +391,7 @@ export function clearFieldcraftState(ctx: SimContext, hunter: Entity): void {
   removeAura(ctx, hunter, HUNTING_MOMENTUM_ID);
   removeAura(ctx, hunter, FIELDCRAFT_REENTRY_ID);
   removeAura(ctx, hunter, BLOODHOOK_PENDING_ID);
+  removeAura(ctx, hunter, SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID);
   for (const entity of ctx.entities.values()) {
     entity.auras = entity.auras.filter(
       (aura) =>

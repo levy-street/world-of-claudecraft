@@ -63,6 +63,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['avenging_wrath_buff_haste', 'avenging_wrath'],
   ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
   ['bastion_rite_buff_block', 'bastion_rite'],
+  // Benison Dawnweave 4pc mend (src/sim/combat/priest/benison.ts): same icon
+  // family as the Seraphic Vigil it pays off.
+  ['benison_dawnweave_mend', 'seraphic_vigil'],
   ['bladed_echo', 'whirlwind'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
@@ -111,6 +114,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['marrowbreak_guard', 'marrowbreak'],
   ['natures_fury', 'hurricane'],
   ['oath_chain_pull', 'oath_chain'],
+  // Oathpyre 4pc consume shield (src/sim/combat/paladin_solar_reprisal.ts):
+  // same icon family as the Solar Reprisal proc it pays off.
+  ['oathpyre_bulwark', 'vowkeeper_strike'],
   ['pack_ferocity', 'pack_command'],
   ['perpetual_sun_generation', 'divine_ascension'],
   ['pet_aspect_of_the_cheetah', 'aspect_of_the_cheetah'],
@@ -147,6 +153,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['redline', 'eviscerate'],
   ['rog_improved_evasion', 'evasion'],
   ['rog_slipstream', 'sinister_strike'],
+  // Slagsnare 4pc preserve lockout (src/sim/combat/hunter_fieldcraft.ts):
+  // same icon family as the Woundrend consume it gates.
+  ['slagsnare_momentum_icd', 'mongoose_bite'],
   ['shaman_ancestral_bulwark', 'lightning_shield'],
   ['shaman_ancestral_bulwark_icd', 'lightning_shield'],
   ['shaman_echoing_elements_damage', 'chain_lightning'],
@@ -175,6 +184,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['shaman_wayfarer_grace', 'ghost_wolf'],
   ['shaman_wayfarer_grace_icd', 'ghost_wolf'],
   ['shaman_warspirit_cadence', 'warspirit_cadence'],
+  // Emberscreed 4pc instant-hymn empower (content/ignivar_set_bonuses.ts):
+  // same icon family as the Scouring Hymn it makes instant.
+  ['set_emberscreed_4pc', 'smite'],
   ['shrapnel_wound', 'shrapnel_charge'],
   ['solar_reprisal', 'vowkeeper_strike'],
   ['solar_step_slow_immunity', 'solar_step'],

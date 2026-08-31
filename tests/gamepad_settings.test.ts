@@ -38,18 +38,20 @@ describe('createGamepadSettingApplier', () => {
     expect(disabled.syncPadMode).toHaveBeenCalledOnce();
   });
 
-  it('applies the camera, vibration, and glyph-family settings', () => {
-    const { apply, pad } = setup();
+  it('applies the camera, reticle, vibration, and glyph-family settings', () => {
+    const { apply, pad, settings } = setup();
 
     expect(apply('gamepadInvertY', true)).toBe(true);
     expect(apply('gamepadStickDeadzone', 0.2)).toBe(true);
     expect(apply('gamepadCameraSpeed', 2.8)).toBe(true);
+    expect(apply('gamepadReticleSpeed', 1.4)).toBe(true);
     expect(apply('gamepadVibration', 0.7)).toBe(true);
     expect(apply('gamepadGlyphStyle', 1)).toBe(true);
 
     expect(pad.setInvertY).toHaveBeenCalledWith(true);
     expect(pad.setDeadzone).toHaveBeenCalledWith(0.2);
     expect(pad.setCameraSpeed).toHaveBeenCalledWith(2.8);
+    expect(settings.set).toHaveBeenCalledWith('gamepadReticleSpeed', 1.4);
     expect(pad.setVibration).toHaveBeenCalledWith(0.7);
     expect(pad.setKindOverride).toHaveBeenCalledWith('xbox');
   });

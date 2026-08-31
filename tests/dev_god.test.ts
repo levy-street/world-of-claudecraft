@@ -53,6 +53,15 @@ describe('/dev god cheat', () => {
     expect(p.devGod).toBe(false);
   });
 
+  it('takes ownership of the invulnerability mode when immortal was enabled', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev immortal', pid);
+    sim.chat('/dev god', pid);
+
+    expect(sim.player.devGod).toBe(true);
+    expect(sim.player.profilerInvulnerable).toBe(false);
+  });
+
   it('makes a god-mode player hit for 100x so a solo tester can down a raid boss', () => {
     const { sim, pid } = godSim();
     const p = sim.player;
@@ -120,6 +129,53 @@ describe('/dev god cheat', () => {
     const before = boss.hp;
     deal(sim, sim.player, boss, 100);
     expect(before - boss.hp).toBe(100); // no amp: plain 100
+  });
+});
+
+describe('/dev immortal cheat', () => {
+  it('toggles invulnerability while preserving normal outgoing damage', () => {
+    const { sim, pid } = godSim();
+    const player = sim.player;
+    player.hp = Math.round(player.maxHp * 0.3);
+
+    sim.chat('/dev immortal', pid);
+
+    expect(player.profilerInvulnerable).toBe(true);
+    expect(player.devGod).toBe(false);
+    expect(player.hp).toBe(player.maxHp);
+
+    const attacker = spawnMob(sim);
+    deal(sim, attacker, player, player.maxHp * 2);
+    expect(player.dead).toBe(false);
+    expect(player.hp).toBe(player.maxHp);
+
+    const target = spawnMob(sim, 60000);
+    const before = target.hp;
+    deal(sim, player, target, 100);
+    expect(before - target.hp).toBe(100);
+
+    sim.chat('/dev immortal', pid);
+    expect(player.profilerInvulnerable).toBe(false);
+  });
+
+  it('takes ownership of the invulnerability mode without retaining god damage', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev god', pid);
+    sim.chat('/dev immortal', pid);
+
+    expect(sim.player.profilerInvulnerable).toBe(true);
+    expect(sim.player.devGod).toBe(false);
+
+    const target = spawnMob(sim, 60000);
+    const before = target.hp;
+    deal(sim, sim.player, target, 100);
+    expect(before - target.hp).toBe(100);
+  });
+
+  it('is gated when dev commands are disabled', () => {
+    const { sim, pid } = godSim(false);
+    sim.chat('/dev immortal', pid);
+    expect(sim.player.profilerInvulnerable).toBeFalsy();
   });
 });
 

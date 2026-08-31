@@ -1,3 +1,4 @@
+import { PACKLORD_4PC_STAMPEDE_RESET_CHANCE, setBonusFlag } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
@@ -113,7 +114,16 @@ function tryResetStampede(ctx: SimContext, hunter: Entity): void {
   if (hunter.auras.some((aura) => aura.id === STAMPEDE_READY_AURA_ID)) return;
 
   const failed = hunter.procState?.counters[STAMPEDE_FAILURE_COUNTER] ?? 0;
-  if (ctx.rng.chance(STAMPEDE_RESET_CHANCE) || failed + 1 >= STAMPEDE_BAD_LUCK_CAP) {
+  // Packlord 4pc: the wearer's reset threshold rises 0.2 -> 0.3 on the SAME
+  // single roll (only the threshold moves, so neither wearers nor non-wearers
+  // shift the rng stream). The 5-fail bad-luck cap below stays untouched.
+  const meta = ctx.players.get(hunter.id);
+  const resetChance =
+    meta !== undefined &&
+    ctx.playerMods(meta).selected[setBonusFlag('packlord_emberhide', 4)] === true
+      ? PACKLORD_4PC_STAMPEDE_RESET_CHANCE
+      : STAMPEDE_RESET_CHANCE;
+  if (ctx.rng.chance(resetChance) || failed + 1 >= STAMPEDE_BAD_LUCK_CAP) {
     armStampedeReady(ctx, hunter);
     return;
   }
