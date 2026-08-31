@@ -121,8 +121,13 @@ export const SIM_EVENT_DISCRIMINANT = 'type';
  * once per recipient, so the literal event kind lives in the CALLER's arrow body
  * and never in an `emit({...})`. Named explicitly rather than inferred, so the
  * indirection the census claims to resolve stays a short auditable list.
+ * announceZoneCelebration (src/sim/professions/gather_events.ts) is the zone
+ * celebration prologue over emitToZonePlayers with the same builder-callback
+ * shape (adopted at masterwrought Phase 18, item census-fanout-helper), so the
+ * three celebration emits it fronts resolve here instead of riding the
+ * union-only pin below.
  */
-export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers']);
+export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers', 'announceZoneCelebration']);
 
 /**
  * SimEvent types the union DECLARES that the emits extractor does not see, pinned
@@ -152,26 +157,17 @@ export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers']);
  * the regression this list exists to surface.
  */
 export const SIM_EVENT_UNION_ONLY = Object.freeze([
-  // Phase 13 (branch commit 5bbfcb0450; pinned 2026-08-30 at the Phase 17
-  // reconciliation): attunedZone, legendaryForgedZone and masterworkZone moved
-  // behind the shared announceZoneCelebration prologue
-  // (src/sim/professions/gather_events.ts), so each event literal sits in the
-  // CALLER's builder arrow one indirection past the named emitToZonePlayers
-  // fanout, where this extractor cannot follow it; the actual emit happens
-  // inside emitToZonePlayers on the builder's return. All three still fire:
-  // declared in src/sim/types.ts, handled by hud.ts, pinned live by
-  // tests/professions_attunement_online.test.ts,
-  // tests/masterwork_zone_broadcast.test.ts and tests/orange_promotion.test.ts,
-  // with matching `simevent emit` deletion-list rows for the two on parents.
-  'attunedZone',
+  // The three zone-celebration events (attunedZone, legendaryForgedZone,
+  // masterworkZone) LEFT this list at masterwrought Phase 18: their prologue
+  // announceZoneCelebration joined SIM_EVENT_FANOUT_HELPERS, so the extractor
+  // now follows the caller's builder arrow and sees all three emitted (the
+  // Phase 17 reconciliation had pinned them here as a blind spot, with two
+  // `simevent emit` deletion-list rows now retired in the same change).
   'calendarResult',
   'deedBroadcast',
   'guildInvite',
   'guildInviteCancelled',
   'guildRenamed',
-  // Phase 13 helper indirection: see the attunedZone note above.
-  'legendaryForgedZone',
-  'masterworkZone',
   'motdResult',
   'reliquaryIlluminationBroadcast',
   // release/v0.41.0 (the seventeenth sync): declared in the union and handled by
