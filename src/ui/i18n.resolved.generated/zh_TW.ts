@@ -1385,6 +1385,8 @@ export const zh_TW: EnTranslations = {
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "name_goblin_rocket_sled": "哥布林火箭雪橇",
+      "name_rallycart_rxt": "拉力卡丁車 RXT",
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
       "name_rickshaw_mount": "白骨人力車",
@@ -1395,6 +1397,8 @@ export const zh_TW: EnTranslations = {
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
+      "desc_goblin_rocket_sled": "一輛結構過剩到危險的哥布林雪橇，靠雙發火箭和極差的判斷力推進。",
+      "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
@@ -13204,6 +13208,12 @@ export const zh_TW: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "驚雷撼地者點火鑰匙"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "哥布林火箭雪橇點火鑰匙"
+      },
+      "reins_rallycart_rxt": {
+        "name": "拉力卡丁車 RXT 點火鑰匙"
       },
       "reins_rickshaw_mount": {
         "name": "白骨人力車縛繩"

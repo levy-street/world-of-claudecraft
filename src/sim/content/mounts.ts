@@ -20,6 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'goblin_rocket_sled'
+  | 'rallycart_rxt'
   | 'terrorspark_groundshaker'
   | 'rickshaw_mount';
 
@@ -101,6 +103,20 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // Developer-only while its in-world motion, exhaust, audio, and final asset
+  // contract are reviewed. Keep it above the pinned developer-tail tank.
+  goblin_rocket_sled: {
+    key: 'goblin_rocket_sled',
+    name: 'Goblin Rocket Sled',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  rallycart_rxt: {
+    key: 'rallycart_rxt',
+    name: 'Rallycart RXT',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

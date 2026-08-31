@@ -12,7 +12,10 @@ import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 interface FakeSource {
   buffer: { duration: number } | null;
-  playbackRate: { value: number };
+  playbackRate: {
+    value: number;
+    setTargetAtTime(value: number, time: number, constant: number): void;
+  };
   onended: (() => void) | null;
   started: boolean;
   stopAt: number | null;
@@ -25,6 +28,15 @@ interface FakeSource {
 const sources: FakeSource[] = [];
 let nowT = 0;
 let gainAutomationCalls: string[] = [];
+interface GainScheduleCall {
+  kind: 'setValueAtTime' | 'setTargetAtTime';
+  value: number;
+  time: number;
+  constant?: number;
+}
+let gainScheduleCalls: GainScheduleCall[] = [];
+let linearRampCalls: Array<{ value: number; time: number }> = [];
+let playbackRateCalls: Array<{ value: number; time: number; constant: number }> = [];
 const WOOD_BUFFER = { duration: 0.37 };
 
 function lastSource(): FakeSource {
@@ -36,17 +48,29 @@ function lastSource(): FakeSource {
 function installAudioStub(): void {
   sources.length = 0;
   gainAutomationCalls = [];
+  gainScheduleCalls = [];
+  linearRampCalls = [];
+  playbackRateCalls = [];
   nowT += 1000; // monotonic across tests so the singleton's cooldown map never blocks
   const param = () => ({
     value: 0,
-    setValueAtTime(v: number) {
+    setValueAtTime(v: number, time?: number) {
       this.value = v;
       gainAutomationCalls.push('setValueAtTime');
+      gainScheduleCalls.push({ kind: 'setValueAtTime', value: v, time: time ?? 0 });
     },
-    linearRampToValueAtTime() {},
-    setTargetAtTime(v: number) {
+    linearRampToValueAtTime(value: number, time: number) {
+      linearRampCalls.push({ value, time });
+    },
+    setTargetAtTime(v: number, time?: number, constant?: number) {
       this.value = v;
       gainAutomationCalls.push('setTargetAtTime');
+      gainScheduleCalls.push({
+        kind: 'setTargetAtTime',
+        value: v,
+        time: time ?? 0,
+        constant: constant ?? 0,
+      });
     },
   });
   class FakeCtx {
@@ -81,7 +105,13 @@ function installAudioStub(): void {
     createBufferSource(): FakeSource {
       const s: FakeSource = {
         buffer: null,
-        playbackRate: { value: 1 },
+        playbackRate: {
+          value: 1,
+          setTargetAtTime(value: number, time: number, constant: number) {
+            this.value = value;
+            playbackRateCalls.push({ value, time, constant });
+          },
+        },
         onended: null,
         started: false,
         stopAt: null,
@@ -132,6 +162,154 @@ beforeEach(() => {
   buffers.set('impact_shadow', { duration: 0.7 });
   buffers.set('impact_bone', { duration: 0.5 });
   buffers.set('proj_shadow', { duration: 0.65 });
+});
+
+// The summon-to-idle handoff. The bug these pin: `playUi` (the LOCAL player's
+// path) set a flat gain and ignored the envelope options entirely, so the
+// summon take never faded and simply stopped dead at its last sample, while the
+// parked idle had already been rising underneath it at full level. What the
+// player heard was two engines and then a step, not a crossfade.
+describe('mount summon to idle crossfade', () => {
+  const SUMMON_KEY = 'mount_summon_rallycart_rxt';
+  const SUMMON_DURATION = 2.3;
+  // Mirrors SUMMON_CROSSFADE_SEC in src/game/sfx.ts. Pinned as a literal so a
+  // change to that constant has to be a deliberate edit here too: both halves
+  // of the crossfade are derived from it, and they only line up while they
+  // share one value.
+  const CROSSFADE = 0.45;
+
+  const seedSummon = (duration = SUMMON_DURATION) => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(SUMMON_KEY, { duration });
+  };
+
+  it('fades the summon tail instead of truncating the take', () => {
+    seedSummon();
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 1);
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    expect(fade, 'the summon must schedule a fade to silence').toBeDefined();
+    // Starts one crossfade before the buffer ends, not at time zero: a
+    // `release` would have started decaying immediately and stopped the take
+    // 0.45s in, which is the percussive behaviour and wrong for a 2.3s cue.
+    expect(fade?.time).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+    expect(fade?.constant).toBeCloseTo(CROSSFADE / 3, 5);
+
+    // Nothing may shorten the take.
+    const summonSource = sources.at(-1);
+    expect(summonSource?.started).toBe(true);
+    expect(summonSource?.stopAt, 'a tail fade never stops the source early').toBeNull();
+  });
+
+  it('opens the idle gate exactly as the summon starts fading', () => {
+    seedSummon();
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 7);
+
+    const gate = (
+      sfx as unknown as { mountEngineIdleGate: Map<number, number> }
+    ).mountEngineIdleGate.get(7);
+    // The two halves of one crossfade: the idle begins rising at the same
+    // instant the summon begins falling, so the curves cross once.
+    expect(gate).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+  });
+
+  it('measures the take the same way for the fade and the gate', () => {
+    // The two halves used to disagree: the fade divided the buffer duration by
+    // the playback rate and the gate did not, so the idle could start rising
+    // before the summon had begun fading. They must land on the same instant.
+    seedSummon();
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 11);
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    const gate = (
+      sfx as unknown as { mountEngineIdleGate: Map<number, number> }
+    ).mountEngineIdleGate.get(11);
+    expect(fade?.time).toBeCloseTo(gate as number, 5);
+  });
+
+  it('plays the summon at its authored rate, with no jitter', () => {
+    // Jitter would move the crossfade point randomly on every cast, because
+    // the handoff is scheduled off the take's real (rate-scaled) length.
+    seedSummon();
+    vi.spyOn(Math, 'random').mockReturnValue(0.99); // a maximal jitter roll
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 12);
+    expect(sources.at(-1)?.playbackRate.value).toBeCloseTo(1, 6);
+  });
+
+  it('keeps the tail fade when an attack is also set', () => {
+    // playAt injects `attack: voiceCrossfade` when a cue replaces a live
+    // voiceKey voice. Honouring tailRelease only in the no-envelope branch
+    // would drop it exactly when a prior voice happened to be playing and keep
+    // it otherwise: the same silently-dropped-option bug tailRelease exists to
+    // fix. Only `release` is genuinely incompatible, since that truncates.
+    seedSummon();
+    gainScheduleCalls = [];
+    const sfxAny = sfx as unknown as {
+      applyEnvelope(
+        src: unknown,
+        g: unknown,
+        peak: number,
+        now: number,
+        opts?: Record<string, unknown>,
+      ): void;
+    };
+    const ctx = (
+      sfx as unknown as {
+        ctx: { createBufferSource(): FakeSource; createGain(): { gain: unknown } };
+      }
+    ).ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = { duration: SUMMON_DURATION } as never;
+    const gain = ctx.createGain();
+    sfxAny.applyEnvelope(src, gain, 0.9, nowT, { attack: 0.04, tailRelease: CROSSFADE });
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    expect(fade, 'an attack must not cancel the tail fade').toBeDefined();
+    expect(fade?.time).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+    expect(src.stopAt, 'a tail fade never truncates, attack or not').toBeNull();
+  });
+
+  it('drops the tail fade when it would collide with its own attack', () => {
+    // A clip short enough that the tail window starts before the fade-IN has
+    // finished would leave two ramps fighting over one gain param.
+    gainScheduleCalls = [];
+    const sfxAny = sfx as unknown as {
+      applyEnvelope(
+        src: unknown,
+        g: unknown,
+        peak: number,
+        now: number,
+        opts?: Record<string, unknown>,
+      ): void;
+    };
+    const ctx = (
+      sfx as unknown as {
+        ctx: { createBufferSource(): FakeSource; createGain(): { gain: unknown } };
+      }
+    ).ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = { duration: 0.5 } as never; // tail 0.45 starts at 0.05, inside a 0.3 attack
+    const gain = ctx.createGain();
+    sfxAny.applyEnvelope(src, gain, 0.9, nowT, { attack: 0.3, tailRelease: CROSSFADE });
+
+    expect(gainScheduleCalls.some((c) => c.kind === 'setTargetAtTime' && c.value < 0.01)).toBe(
+      false,
+    );
+  });
+
+  it('leaves a take shorter than the crossfade at flat gain', () => {
+    // Guard against scheduling a fade that would start before the sound does.
+    seedSummon(0.2);
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 2);
+
+    expect(gainScheduleCalls.some((c) => c.kind === 'setTargetAtTime' && c.value < 0.01)).toBe(
+      false,
+    );
+    expect(sources.at(-1)?.stopAt).toBeNull();
+  });
 });
 
 describe('footstep audio', () => {
@@ -258,16 +436,17 @@ describe('isBuffered/preload', () => {
 
 describe('mount running audio', () => {
   it('ships one generated manifest entry for every catalog mount', () => {
-    // terrorspark_groundshaker's mount_run_ entry is the sustain take of an
-    // engine mount's windup/loop/winddown set (see the "mount engine audio"
-    // suite below): it is genuinely driven through Sfx.loop() at runtime, so
-    // its manifest entry correctly carries loop: true, unlike every other
-    // mount's plain per-stride gait clip.
-    const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
-    // The rickshaw ships no mount_run_ entry at all: it has only its
-    // continuous mount_loop_ cue (mountRun no-ops for it, see the "does not
-    // play a per-stride one-shot" test below), so it is excluded from this
-    // per-stride-manifest-entry check entirely.
+    // Engine mounts use mount_run_ as the sustain take of an authored
+    // windup/loop/winddown set. Those entries genuinely run through
+    // Sfx.loop(); every other mount's entry is a per-stride one-shot.
+    const ENGINE_LOOP_MOUNTS = new Set([
+      'goblin_rocket_sled',
+      'rallycart_rxt',
+      'terrorspark_groundshaker',
+    ]);
+    // A mount that ships a continuous mount_loop_ cue (the rickshaw) has no
+    // mount_run_ entry at all, since mountRun no-ops for it, so it is excluded
+    // from this per-stride-manifest-entry check entirely.
     const clips: Record<string, SfxEntry> = SFX_CLIPS;
     for (const mountKey of MOUNT_KEYS.filter((k) => !(`mount_loop_${k}` in SFX_CLIPS))) {
       const entry = clips[`mount_run_${mountKey}`];
@@ -281,14 +460,17 @@ describe('mount running audio', () => {
     }
   });
 
-  // The tank mount (terrorspark_groundshaker) has a dedicated windup/loop/
-  // winddown take set (see mount_engine_state.ts), so it ships two extra
-  // clips beyond the base loop every other mount has.
+  // Engine mounts ship start and stop transitions beside their base loop.
   const ENGINE_MOUNT_EXTRA_SUFFIXES: Partial<Record<string, string[]>> = {
+    goblin_rocket_sled: ['_start', '_stop', '_reverse_start', '_reverse', '_reverse_stop'],
+    // The cart adds a parked IDLE take on top of the sled's set: its reverse is
+    // that idle pitched at runtime, so the printed reverse takes ship but are
+    // not resolved by the engine state machine.
+    rallycart_rxt: ['_start', '_stop', '_idle', '_reverse_start', '_reverse', '_reverse_stop'],
     terrorspark_groundshaker: ['_start', '_stop'],
   };
 
-  it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
+  it('ships one non-empty MP3 asset for every mount and no orphan clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
     // The rickshaw is excluded: it ships only mount_loop_rickshaw_mount.mp3,
     // no mount_run_ file at all (mountRun no-ops for any mount with a loop).
@@ -313,7 +495,7 @@ describe('mount running audio', () => {
     }
   });
 
-  it('plays a distinct custom clip for every catalog mount', () => {
+  it('plays a distinct custom clip for every mount', () => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     const played = new Set<unknown>();
     // A mount with a continuous loop (currently just the rickshaw) does not
@@ -645,6 +827,136 @@ describe('mount engine audio (windup/loop/winddown)', () => {
     expect(slot?.gain.gain.value).toBeCloseTo(0.85);
     expect(gainAutomationCalls).toContain('setValueAtTime');
     expect(gainAutomationCalls).not.toContain('setTargetAtTime');
+  });
+});
+
+describe('Goblin Rocket Sled bidirectional engine audio', () => {
+  const KEY = 'goblin_rocket_sled';
+  const START_KEY = `mount_run_${KEY}_start`;
+  const LOOP_KEY = `mount_run_${KEY}`;
+  const STOP_KEY = `mount_run_${KEY}_stop`;
+  const START_BUF = { duration: 1.41 };
+  const LOOP_BUF = { duration: 9.53 };
+  const STOP_BUF = { duration: 2.04 };
+  const REVERSE_START_KEY = `mount_run_${KEY}_reverse_start`;
+  const REVERSE_LOOP_KEY = `mount_run_${KEY}_reverse`;
+  const REVERSE_STOP_KEY = `mount_run_${KEY}_reverse_stop`;
+  const REVERSE_START_BUF = { duration: 1.28 };
+  const REVERSE_LOOP_BUF = { duration: 10.53 };
+  const REVERSE_STOP_BUF = { duration: 1.18 };
+
+  beforeEach(() => {
+    const probe = sfx as unknown as {
+      buffers: Map<string, unknown>;
+      mountEngines: Map<number, unknown>;
+      mountEngineDirections: Map<number, unknown>;
+      loops: Map<string, unknown>;
+      keyedOneShots: Map<string, unknown>;
+    };
+    probe.buffers.set(START_KEY, START_BUF);
+    probe.buffers.set(LOOP_KEY, LOOP_BUF);
+    probe.buffers.set(STOP_KEY, STOP_BUF);
+    probe.buffers.set(REVERSE_START_KEY, REVERSE_START_BUF);
+    probe.buffers.set(REVERSE_LOOP_KEY, REVERSE_LOOP_BUF);
+    probe.buffers.set(REVERSE_STOP_KEY, REVERSE_STOP_BUF);
+    probe.mountEngines.clear();
+    probe.mountEngineDirections.clear();
+    probe.loops.clear();
+    probe.keyedOneShots.clear();
+  });
+
+  afterEach(() => {
+    (sfx as unknown as { active: number }).active = 0;
+  });
+
+  it('interrupts start with stop, then stop with a fresh start', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    const firstStart = lastSource();
+    nowT += 0.1;
+    sfx.mountEngine(0, 0, 0, KEY, false, 41, false);
+    expect(firstStart.stopAt).toBeCloseTo(nowT + 0.04);
+    expect(linearRampCalls).toContainEqual({ value: 0.0001, time: nowT + 0.04 });
+    expect(linearRampCalls).toContainEqual({ value: 0.85, time: nowT + 0.04 });
+    expect(lastSource().buffer).toBe(STOP_BUF);
+    const stop = lastSource();
+    nowT += 0.1;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    expect(stop.stopAt).toBeCloseTo(nowT + 0.04);
+    expect(lastSource().buffer).toBe(START_BUF);
+  });
+
+  it('splices to the forward loop at full gain with no fade', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    nowT += 1.41;
+    gainAutomationCalls = [];
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    expect(lastSource().buffer).toBe(LOOP_BUF);
+    expect((lastSource() as unknown as { loop: boolean }).loop).toBe(true);
+    expect(gainAutomationCalls).toEqual(['setValueAtTime']);
+  });
+
+  it('hard-stops the forward loop and immediately starts reverse on a direction change', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    nowT += 1.41;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    const loop = lastSource();
+    nowT += 0.2;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, true);
+    expect(loop.stopAt).toBe(0);
+    expect(lastSource().buffer).toBe(REVERSE_START_BUF);
+  });
+
+  it('splices through the reverse take set and remembers reverse for the stop edge', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, true);
+    expect(lastSource().buffer).toBe(REVERSE_START_BUF);
+    nowT += 1.28;
+    gainAutomationCalls = [];
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, true);
+    expect(lastSource().buffer).toBe(REVERSE_LOOP_BUF);
+    expect((lastSource() as unknown as { loop: boolean }).loop).toBe(true);
+    expect(gainAutomationCalls).toEqual(['setValueAtTime']);
+    const reverseLoop = lastSource();
+    nowT += 0.2;
+    // Stopped frames carry backwards=false; the engine must retain the last
+    // driven direction so this still selects the reverse shutdown take.
+    sfx.mountEngine(0, 0, 0, KEY, false, 41, false);
+    expect(reverseLoop.stopAt).toBe(0);
+    expect(lastSource().buffer).toBe(REVERSE_STOP_BUF);
+  });
+
+  it('crossfades an interrupted reverse transition into forward start', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, true);
+    const reverseStart = lastSource();
+    nowT += 0.1;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false);
+    expect(reverseStart.stopAt).toBeCloseTo(nowT + 0.04);
+    expect(lastSource().buffer).toBe(START_BUF);
+  });
+
+  it('pitches only the sustain loop up in flight and smoothly returns it on landing', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, false);
+    nowT += 1.41;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, false);
+    const loop = lastSource();
+    playbackRateCalls = [];
+    nowT += 0.1;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, true);
+    expect(loop.playbackRate.value).toBeCloseTo(1.08);
+    expect(playbackRateCalls.at(-1)).toEqual({ value: 1.08, time: nowT, constant: 0.07 });
+    nowT += 0.3;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, false);
+    expect(loop.playbackRate.value).toBeCloseTo(1);
+    expect(playbackRateCalls.at(-1)).toEqual({ value: 1, time: nowT, constant: 0.055 });
+  });
+
+  it('does not pitch the authored startup while jumping before sustain begins', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, false);
+    const start = lastSource();
+    playbackRateCalls = [];
+    nowT += 0.2;
+    sfx.mountEngine(0, 0, 0, KEY, true, 41, false, true);
+    expect(start.playbackRate.value).toBe(1);
+    expect(playbackRateCalls).toEqual([]);
   });
 });
 

@@ -6342,6 +6342,45 @@
         "resonant_weave_bag",
         "wayfarers_backpack"
       ]
+    },
+    {
+      "batchId": "goblin-rocket-sled-icon-2026-08-12",
+      "source": "OpenAI image generation (user-supplied accepted result; exact generator surface and prompt not supplied)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "User-supplied and user-approved V2 vehicle portrait derived from the Goblin Rocket Sled concept and reviewed against the shipped mount plus woc-item-icon-v1. Source and shipping hashes, reference role, processing, and small-size review are retained in docs/design/goblin_rocket_sled/icon-provenance.json; the exact source-generation prompt was not supplied and is explicitly not reconstructed.",
+      "commonPrompt": "Exact source-generation prompt not supplied. Accepted-art constraints verified after generation: one complete three-quarter Goblin Rocket Sled vehicle portrait; opaque dark painted vignette; warm top-left key; tactile red metal, black iron, wood, and leather; safe margins; no rider, text, UI border, watermark, transparency, or crop.",
+      "provenanceRecord": "docs/design/goblin_rocket_sled/icon-provenance.json",
+      "provenanceRecords": [
+        "docs/design/goblin_rocket_sled/icon-provenance.json"
+      ],
+      "itemIds": [
+        "reins_goblin_rocket_sled"
+      ]
+    },
+    {
+      "batchId": "rallycart-rxt-icon-2026-08-20",
+      "source": "OpenAI image generation (user-supplied accepted result; generated in ChatGPT by the author from screenshots of the shipped mount)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "User-supplied and user-approved vehicle portrait derived from the shipped rallycart_rxt.glb and reviewed against woc-item-icon-v1 plus the approved sibling vehicle icon reins_goblin_rocket_sled.webp. Source and shipping hashes, reference role, processing, and small-size review are retained in docs/design/rallycart_rxt/icon-provenance.json.",
+      "commonPrompt": "Author-supplied brief: a three-quarter portrait of the Rallycart RXT itself rather than the literal ignition key, vehicle alone and centred with no rider, preserving the four-lamp headlight cluster, rally tyres, wheel arches and body livery of the shipped model; premium hand-painted classic fantasy MMO inventory art rather than a 3D screenshot; warm top-left key with cool lower-right shadow; opaque dark painted vignette with a grounded contact shadow; no text, rarity border, UI frame, watermark, transparency or crop; legible at 128, 40, 28 and 22 px plus a 64 px circular crop and 28 px grayscale.",
+      "acceptedWithKnownDeviation": "Two small clusters of glyph-like marks remain on the painted panel between the windscreen and the hood scoop of the 1254 px master, which woc-item-icon-v1 lists as a reject condition (no letters, numbers or pseudo-writing). Accepted deliberately by the author on 2026-08-20: the clusters are roughly 40 to 100 px on a 1254 px master, therefore under one pixel in the 128 px shipped WebP, and are not resolvable at any size the client renders. Recorded here rather than silently passed so a later repaint can clear them. The separate dark fitting on the windscreen header was reviewed and is a mirror mount, not writing.",
+      "provenanceRecord": "docs/design/rallycart_rxt/icon-provenance.json",
+      "provenanceRecords": [
+        "docs/design/rallycart_rxt/icon-provenance.json"
+      ],
+      "itemIds": [
+        "reins_rallycart_rxt"
+      ]
     }
   ]
 }

@@ -10502,6 +10502,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'ゴブリンロケットそり',
+  'hudChrome.mounts.name_rallycart_rxt': 'ラリーカートRXT',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
@@ -10516,6 +10518,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。',
+  'hudChrome.mounts.desc_goblin_rocket_sled': '危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。',
+  'hudChrome.mounts.desc_rallycart_rxt': '小型ながら本格的なラリーマシン。移動速度を高めてくれる。',
   'hudChrome.mounts.desc_rickshaw_mount':
     'がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
@@ -11299,6 +11303,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
+  'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
+  'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',

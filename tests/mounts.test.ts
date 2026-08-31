@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer rickshaw last', () => {
-    expect(MOUNT_KEYS).toHaveLength(10);
+  it('has exactly twelve mounts with the horse first and the developer rickshaw last', () => {
+    expect(MOUNT_KEYS).toHaveLength(12);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -122,6 +122,7 @@ describe('mount catalog', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('goblin_rocket_sled')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
@@ -171,16 +172,21 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+  it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
+    const developerMounts = new Set([
+      'goblin_rocket_sled',
+      'rallycart_rxt',
+      'terrorspark_groundshaker',
+      'rickshaw_mount',
+    ]);
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker' || key === 'rickshaw_mount') {
-        // The developer-only tank/rickshaw stay soulbound: neither has a
-        // player acquisition path, and tradability would turn a dev grant
-        // into a leak vector.
+      if (developerMounts.has(key)) {
+        // Developer-only mounts stay soulbound: they have no player acquisition
+        // path, and tradability would turn a dev grant into an economy leak.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -245,7 +251,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    const NO_SOURCE_YET: readonly string[] = [
+      'reins_drakemaw_raptor',
+      'reins_goblin_rocket_sled',
+      'reins_rallycart_rxt',
+    ];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],

@@ -120,6 +120,90 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_goblin_rocket_sled_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled',
+    custom: true,
+    loop: true,
+  },
+  {
+    // The sled's summon call, fired once when the summon channel completes and
+    // the mount appears. Never on dismount, never for a rider already mounted
+    // when they come into view.
+    key: 'mount_summon_goblin_rocket_sled',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_stop',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_goblin_rocket_sled_reverse_stop',
+    custom: true,
+  },
+  {
+    key: 'mount_summon_rallycart_rxt',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_idle',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_stop',
+    custom: true,
+  },
+  // Reverse, the same three-part shape the sled uses. The engine builds these
+  // key names generically (`mount_run_<mountKey>_reverse*`), so the takes were
+  // on disk and reachable by code but absent from this catalog, which meant
+  // they were never in SFX_CLIPS and reversing the cart was silent.
+  {
+    key: 'mount_run_rallycart_rxt_reverse_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_reverse',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_reverse_stop',
+    custom: true,
+  },
+  {
+    // Takeoff and touchdown for the cart, five and four takes respectively.
+    // A mount that carries no jump/land set falls back to the rider's own
+    // move_jump/move_land, so these two keys are the whole opt-in: no shipped
+    // mount changes behavior by their existing.
+    key: 'mount_jump_rallycart_rxt',
+    custom: true,
+  },
+  {
+    key: 'mount_land_rallycart_rxt',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
   },

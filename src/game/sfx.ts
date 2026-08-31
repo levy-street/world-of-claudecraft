@@ -15,8 +15,12 @@ import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import {
+  advanceInterruptibleMountEngine,
   advanceMountEngine,
   type MountEngineEntry,
+  type MountEngineState,
+  mountEngineBendRate,
+  mountEngineIdleAudible,
   mountEngineLoopActive,
 } from './mount_engine_state';
 import {
@@ -29,6 +33,15 @@ import { loadRuntimeSfxPack } from './sfx_runtime_pack';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
+/** Per-call level for the movement one-shots (jump / land / splash / swim). */
+const MOVE_GAIN = 0.7;
+const SWIM_GAIN = 0.5;
+/** A mount's own landing over the rider's. See `movement`.
+ *
+ *  Was 1.5, taken down 25% on a listening pass: the takeoff sat right but the
+ *  landing still read hot. Only the mount's LANDING is scaled, so the jump and
+ *  the rider's own landing are untouched. */
+const MOUNT_LAND_BOOST = 1.125;
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
 // Per-ability synth layer (abilityAudio): its own small voice pool, separate
 // from MAX_VOICES so ability spam can never starve footsteps/UI one-shots,
@@ -94,6 +107,25 @@ export const FORGE_MAX_DISTANCE = 38;
 // splices to the loop at roughly the right instant.
 const MOUNT_ENGINE_START_FALLBACK_SEC = 0.9;
 
+// How long to hold a mount's parked idle after a summon when the summon take's
+// own duration is not known yet (a cold cache the channel's 1.5s preload did
+// not finish covering). Deliberately LONGER than any current summon take: too
+// long costs a beat of silence before the engine settles, too short lets the
+// idle cut into the summon, which is the artefact this gate exists to stop.
+const MOUNT_SUMMON_FALLBACK_SEC = 2.5;
+/** The summon-to-idle crossfade, used for BOTH halves so they cannot drift:
+ *  the summon take fades out over its last `SUMMON_CROSSFADE_SEC`, and the
+ *  parked idle starts rising exactly that far before the take ends.
+ *
+ *  It has to be one constant. When these were two numbers the summon's fade was
+ *  not happening at all on the self path (see mountSummon), so the "overlap"
+ *  was the idle rising underneath a take still at full level, which is two
+ *  engines rather than a handoff, and shortening the lead only made the pile-up
+ *  briefer instead of removing it. Sized against the idle's own 0.25s ramp time
+ *  constant: at 0.45s the idle is ~84% up as the summon reaches ~5%, so the two
+ *  curves cross once, in the middle, with no dip and no doubling. */
+const SUMMON_CROSSFADE_SEC = 0.45;
+
 // Rift roller/portal loops (src/render/rift_ambience.ts): a moving hazard or
 // an open portal should read as a clear nearby presence, not a wallpaper bed
 // like campfire/forge, but must still sit under foreground one-shots.
@@ -106,10 +138,6 @@ const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   snow: 'foot_snow',
   water: 'foot_water',
 };
-
-function summonClipKey(mountKey: string): string {
-  return `mount_summon_${mountKey}`;
-}
 
 function assetCacheKey(key: string, variantIndex: number): string {
   return variantIndex === 0 ? key : `${key}:${variantIndex}`;
@@ -143,6 +171,17 @@ export interface PlayOpts {
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
   release?: number; // fade-out seconds; the clip is stopped once it ends
+  /** Fade the clip's OWN TAIL, keeping its full length. The opposite of
+   *  `release` above, which truncates: `release: 0.2` on a 2.3s take stops it
+   *  0.2s in, correct for a footstep and wrong for anything meant to play out.
+   *  Use this when a long take simply must not end on a step, and when it has
+   *  to hand over to a loop: the fade is the crossfade's outgoing half, so
+   *  whatever rises underneath should be given the same number of seconds. */
+  tailRelease?: number;
+  /** One live authored transition voice per key. */
+  voiceKey?: string;
+  /** Seconds to crossfade when replacing an existing `voiceKey` voice. */
+  voiceCrossfade?: number;
 }
 
 interface LoopSlot {
@@ -154,6 +193,7 @@ interface LoopSlot {
   x?: number;
   y?: number;
   z?: number;
+  playbackTarget: number;
 }
 
 interface PendingLoop {
@@ -204,19 +244,39 @@ class Sfx {
   private lastPlay = new Map<string, number>();
   private lastPlayPruneAt = 0;
   private loops = new Map<string, LoopSlot>();
+  // The panner is retained alongside the voice so a MOVING emitter can carry
+  // its one-shots with it (see moveKeyedVoice). Without it a windup fires at
+  // the position the throttle was pressed and stays there while the vehicle
+  // drives away from its own engine note.
+  private keyedOneShots = new Map<
+    string,
+    { src: AudioBufferSourceNode; gain: GainNode; panner: PannerNode | null }
+  >();
   // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
   // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
   private mountEngines = new Map<number, MountEngineEntry>();
+  // Interruptible bidirectional mounts must remember which authored take set
+  // owns the stop edge: once velocity reaches zero the renderer no longer has
+  // a meaningful backwards flag.
+  private mountEngineDirections = new Map<number, 'forward' | 'reverse'>();
   // Memoized per-mountKey engine clip key triple, or null once a mountKey is
   // known to have no engine take set. mountEngine() is called every frame for
   // every mounted entity in earshot, so this turns the per-frame cost for an
   // ordinary (non-engine) mount into a plain map lookup instead of 3 fresh
   // template-literal string allocations that are immediately thrown away.
+  private engineIdleKeysCache = new Map<string, string | null>();
+  // Consecutive frames of confirmed forward input per entity, for the
+  // standstill-to-forward commit below.
+  private mountEngineForwardHold = new Map<number, number>();
+  // Audio-clock time before which an entity's parked idle stays silent, so a
+  // summon take can finish first.
+  private mountEngineIdleGate = new Map<number, number>();
   private engineClipKeysCache = new Map<
     string,
     { startKey: string; loopKey: string; stopKey: string } | null
   >();
+  private mountMovementKeyCache = new Map<string, string | null>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
@@ -461,6 +521,22 @@ class Sfx {
     }
   }
 
+  /**
+   * Move an in-flight keyed one-shot to a new world position.
+   *
+   * Loops already track their emitter because `loop()` is re-called every frame
+   * with fresh coordinates. One-shots are fired once, so a transition take on a
+   * MOVING source (a vehicle's engine windup and winddown) stays pinned where
+   * it started and audibly falls behind the vehicle. Call this every frame for
+   * the voice key those one-shots share.
+   *
+   * A no-op when the voice has already ended or was never positional.
+   */
+  moveKeyedVoice(voiceKey: string, x: number, y: number, z: number): void {
+    const voice = this.keyedOneShots.get(voiceKey);
+    if (voice?.panner) this.setPannerPos(voice.panner, x, y, z);
+  }
+
   private setPannerPos(p: PannerNode, x: number, y: number, z: number): void {
     if (p.positionX) {
       p.positionX.value = x;
@@ -592,15 +668,82 @@ class Sfx {
       (this.entry(key)?.gain ?? 1) *
       (jitter ? 1 + (Math.random() * 2 - 1) * 0.1 : 1);
     const panner = this.makePanner(x, y, z);
+    const priorVoice = opts?.voiceKey ? this.keyedOneShots.get(opts.voiceKey) : undefined;
+    const voiceCrossfade = Math.max(0, opts?.voiceCrossfade ?? 0);
+    if (priorVoice) {
+      if (voiceCrossfade > 0) {
+        priorVoice.gain.gain.setValueAtTime(priorVoice.gain.gain.value, now);
+        priorVoice.gain.gain.linearRampToValueAtTime(0.0001, now + voiceCrossfade);
+        try {
+          priorVoice.src.stop(now + voiceCrossfade);
+        } catch {
+          /* already stopped */
+        }
+      } else {
+        try {
+          priorVoice.src.stop();
+        } catch {
+          /* already stopped */
+        }
+      }
+    }
+    if (opts?.voiceKey) {
+      this.keyedOneShots.set(opts.voiceKey, { src, gain: g, panner });
+    }
     src.connect(g).connect(panner).connect(master);
     this.active++;
     src.onended = () => {
       this.active--;
+      if (opts?.voiceKey && this.keyedOneShots.get(opts.voiceKey)?.src === src) {
+        this.keyedOneShots.delete(opts.voiceKey);
+      }
       src.disconnect();
       g.disconnect();
       panner.disconnect();
     };
-    this.applyEnvelope(src, g, peak, now, opts);
+    this.applyEnvelope(
+      src,
+      g,
+      peak,
+      now,
+      priorVoice && voiceCrossfade > 0 ? { ...opts, attack: voiceCrossfade } : opts,
+    );
+    return true;
+  }
+
+  /** Fade a one-shot's own tail without shortening it: hold `peak` until
+   *  `tail` seconds before the buffer runs out, then decay to silence across
+   *  exactly that window. Returns false when the clip is too short to carry the
+   *  fade (nothing is scheduled, the caller's flat gain stands).
+   *
+   *  Separate from applyEnvelope on purpose. That one shapes a clip INTO a
+   *  short transient and stops it early, which is what a retriggered footstep
+   *  wants; this one leaves the take's length alone and only softens its last
+   *  moments, which is what a long authored take handing over to a loop wants.
+   *  Both paths call this, so a cue asking for a tail fade gets the same curve
+   *  whether it is the local player's (playUi) or another player's (playAt). */
+  private scheduleTailFade(
+    src: AudioBufferSourceNode,
+    g: GainNode,
+    peak: number,
+    now: number,
+    tail: number,
+    /** Earliest the fade may begin, absolute. Used by the attack path: a clip
+     *  short enough that its tail window overlaps its own fade-IN would have
+     *  the two ramps fighting over the same gain param, so the fade is dropped
+     *  rather than allowed to cut the attack short. */
+    notBefore = now,
+  ): boolean {
+    if (!(tail > 0) || !src.buffer) return false;
+    const clip = src.buffer.duration / (src.playbackRate.value || 1);
+    if (clip <= tail) return false;
+    const from = now + clip - tail;
+    if (from < notBefore) return false;
+    g.gain.setValueAtTime(peak, from);
+    // Same curve shape the percussive release uses (time constant = span/3, so
+    // it is ~5% of peak by the end of the window), for one consistent house
+    // fade rather than a second one that sounds subtly different.
+    g.gain.setTargetAtTime(0.0001, from, tail / 3);
     return true;
   }
 
@@ -617,15 +760,29 @@ class Sfx {
   ): void {
     const attack = Math.max(0, opts?.attack ?? 0);
     const release = Math.max(0, opts?.release ?? 0);
+    const tailRelease = Math.max(0, opts?.tailRelease ?? 0);
     if (attack === 0 && release === 0) {
       g.gain.value = peak;
       src.start();
+      // Scheduled AFTER start so the buffer's duration is the one actually
+      // playing; a tail fade never truncates, so there is no stop() to arrange.
+      this.scheduleTailFade(src, g, peak, now, tailRelease);
       return;
     }
     const a = Math.max(0.001, attack);
     g.gain.setValueAtTime(0.0001, now);
     g.gain.linearRampToValueAtTime(peak, now + a);
     src.start();
+    // A tail fade survives an ATTACK. Only `release` is incompatible with it,
+    // because that truncates the clip and there is then no tail left to fade.
+    //
+    // This branch is reachable without the caller ever asking for an attack:
+    // playAt injects `attack: voiceCrossfade` when a cue replaces a live
+    // `voiceKey` voice. Handling tailRelease only in the no-envelope branch
+    // above would therefore drop it for such a cue exactly when a prior voice
+    // happened to be playing, and keep it otherwise, which is the same class of
+    // silently-dropped option this whole option was added to fix.
+    if (release === 0) this.scheduleTailFade(src, g, peak, now, tailRelease, now + a);
     if (release > 0) {
       // Effective clip length at this playback rate; never schedule past it.
       const clip = src.buffer ? src.buffer.duration / (src.playbackRate.value || 1) : a + release;
@@ -682,7 +839,8 @@ class Sfx {
       this.authoredPlaybackRate(key) *
       (jitter ? 1 + (Math.random() * 2 - 1) * 0.05 : 1);
     const g = ctx.createGain();
-    g.gain.value = (opts?.gain ?? 1) * (this.entry(key)?.gain ?? 1);
+    const peak = (opts?.gain ?? 1) * (this.entry(key)?.gain ?? 1);
+    g.gain.value = peak;
     src.connect(g).connect(master);
     this.active++;
     src.onended = () => {
@@ -691,6 +849,14 @@ class Sfx {
       g.disconnect();
     };
     src.start();
+    // playUi used to play every take at a flat gain and drop `attack`/`release`
+    // on the floor, so a long cue asking not to end on a step got no fade at
+    // all on the local player's own path (mountSummon's, and the reason its
+    // handoff to the parked idle sounded like two engines rather than one
+    // crossfade). Only the non-truncating tail fade is honored here: `release`
+    // shortens a clip, which is a percussive-retrigger behavior that the
+    // positional path owns and no UI cue has ever asked for.
+    this.scheduleTailFade(src, g, peak, now, Math.max(0, opts?.tailRelease ?? 0));
   }
 
   // --- Looping sources (ambience + sustained casts) ------------------------
@@ -785,7 +951,17 @@ class Sfx {
       src.start();
       this.commitVariant(key, variantIndex);
       this.pendingLoopVariants.delete(id);
-      slot = { key, src, gain: g, panner, target: -1, x, y, z };
+      slot = {
+        key,
+        src,
+        gain: g,
+        panner,
+        target: -1,
+        x,
+        y,
+        z,
+        playbackTarget: this.authoredPlaybackRate(key),
+      };
       this.loops.set(id, slot);
       justCreated = true;
     } else if (positional && slot.panner) {
@@ -932,13 +1108,6 @@ class Sfx {
    *  from where they are and falls off with distance.
    *
    *  A mount with no authored take is silent, so this is safe for every mount. */
-  mountSummon(x: number, y: number, z: number, mountKey: string, self: boolean): void {
-    const key = summonClipKey(mountKey);
-    if (!(key in SFX_CLIPS)) return;
-    if (self) this.playUi(key, { gain: 1, rate: 1, release: 0.6 });
-    else this.playAt(key, x, y, z, { gain: 1, rate: 1, release: 0.6 });
-  }
-
   /** One custom stride for a running mount. This is part of the world SFX mix,
    *  independent of the optional on-foot footstep toggle. */
   mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
@@ -960,14 +1129,87 @@ class Sfx {
     });
   }
 
-  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
-   *  (currently just the tank mount): call every frame a rider is mounted,
-   *  keyed per entity so multiple riders never share state. A mount with no
+  /** The one-shot that fires when a mount actually APPEARS: the completion edge
+   *  of the 1.5s summon channel, never on dismount and never for a rider who was
+   *  already mounted when they came into view (renderer.ts seeds lastMountKey at
+   *  view creation, so that first observation is not an edge).
+   *
+   *  The local player's own summon is deliberately NON-spatial: the audio
+   *  listener is the camera, which trails the player, so a positional source at
+   *  your own feet is already attenuating by the time you hear it. Other
+   *  players' summons stay positional. A mount with no summon take is silent. */
+  mountSummon(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    self: boolean,
+    entityId: number,
+  ): void {
+    const key = `mount_summon_${mountKey}`;
+    if (!(key in SFX_CLIPS)) return;
+    // A TAIL fade, because the take does NOT decay to silence: its last 120ms
+    // still peaks at about -15 dBFS, so simply reaching the end of the buffer
+    // is a discontinuity, and that is an audible click. It must be
+    // `tailRelease` and not `release`: the latter truncates, and on a 2.3s
+    // summon it stopped the take 0.2s in, which is what the positional path
+    // was doing to every other player's summon.
+    // `jitter: false` matters for more than pitch. playUi's default +/-5% rate
+    // jitter changes the take's REAL length by up to 0.12s either way, and the
+    // idle's handoff is scheduled off that length, so a jittered summon moved
+    // the crossfade point randomly on every cast: on a slow roll the idle began
+    // rising before the summon had started fading at all, which is the "idle
+    // comes in too early" this cue kept being reported for. Jitter exists to
+    // stop rapid retriggers of one sample comb-filtering (footsteps); a summon
+    // fires once, so it buys nothing here and costs the handoff its timing.
+    const opts = { cooldown: 0.1, jitter: false, tailRelease: SUMMON_CROSSFADE_SEC };
+    if (self) this.playUi(key, { ...opts, gain: 0.9 });
+    else this.playAt(key, x, y, z, { ...opts, gain: 0.85 });
+    // Hold the parked idle until the summon take has finished: the engine
+    // catching and settling IS the summon sound, so an idle loop underneath it
+    // reads as two engines. Preloaded on the channel's start edge, so the
+    // buffer is normally decoded by now and the fallback rarely applies.
+    const ctx = this.ctx;
+    if (!ctx) return;
+    const buf = this.buffers.get(assetCacheKey(key, 0));
+    this.mountEngineIdleGate.set(
+      entityId,
+      // Start the idle rising exactly as the summon begins its tail fade, so
+      // the two are the halves of one crossfade. Overlapping them without that
+      // fade is what made this read as two engines: the idle climbed while the
+      // summon was still at full level, and the summon then stopped on a step.
+      //
+      // Measured the way the FADE measures it: a buffer's duration is its
+      // length at rate 1, and what matters is how long the take will actually
+      // be audible, so both sides divide by the same playback rate. They used
+      // to disagree (the fade divided, this did not), which put the handoff in
+      // a different place than intended on any key with an authored rate.
+      // Floored at zero so a very short take cannot gate into the past.
+      ctx.currentTime +
+        Math.max(
+          0,
+          (buf ? buf.duration / this.authoredPlaybackRate(key) : MOUNT_SUMMON_FALLBACK_SEC) -
+            SUMMON_CROSSFADE_SEC,
+        ),
+    );
+  }
+
+  /** Warm a mount's summon take, called on the summon channel's START edge so
+   *  the 1.5s channel covers the fetch and decode. */
+  preloadMountSummon(mountKey: string): void {
+    const key = `mount_summon_${mountKey}`;
+    if (key in SFX_CLIPS) this.preload(key);
+  }
+
+  /** Windup/loop/winddown engine audio for mounts with dedicated take sets:
+   *  call every frame a rider is mounted, keyed per entity so multiple riders
+   *  never share state. A mount with no
    *  `_start` take falls through silently, so ordinary mounts keep using
    *  mountRun's per-stride gait beat instead. See mount_engine_state.ts for
-   *  the transition rules (a quick tap plays the windup and winddown back to
-   *  back, no loop; sustained movement crossfades into the loop and back
-   *  out). Returns whether this call drives an engine mount at all, so the
+   *  the transition rules. The tank retains its trailing transition policy;
+   *  the rocket sled hard-splices its tightly authored forward takes and
+   *  interrupts start/stop when input changes. Returns whether this call
+   *  drives an engine mount at all, so the
    *  caller (renderer.ts) knows whether to also skip the generic gait beat. */
   /** Resolve (and cache) the engine clip key triple for a mountKey, or null if
    *  this mount has no dedicated windup/loop/winddown take set. Memoized so
@@ -975,15 +1217,54 @@ class Sfx {
    *  costs one map lookup instead of building and discarding 3 strings. */
   private engineClipKeys(
     mountKey: string,
+    direction: 'forward' | 'reverse' = 'forward',
   ): { startKey: string; loopKey: string; stopKey: string } | null {
-    const cached = this.engineClipKeysCache.get(mountKey);
+    const cacheId = direction === 'forward' ? mountKey : `${mountKey}:reverse`;
+    const cached = this.engineClipKeysCache.get(cacheId);
     if (cached !== undefined) return cached;
-    const startKey = `mount_run_${mountKey}_start`;
+    const stem =
+      direction === 'forward' ? `mount_run_${mountKey}` : `mount_run_${mountKey}_reverse`;
+    const startKey = `${stem}_start`;
     const resolved =
-      startKey in SFX_CLIPS
-        ? { startKey, loopKey: `mount_run_${mountKey}`, stopKey: `mount_run_${mountKey}_stop` }
-        : null;
-    this.engineClipKeysCache.set(mountKey, resolved);
+      startKey in SFX_CLIPS ? { startKey, loopKey: stem, stopKey: `${stem}_stop` } : null;
+    this.engineClipKeysCache.set(cacheId, resolved);
+    return resolved;
+  }
+
+  /** Whether this mount's engine keeps running while it is off the ground.
+   *
+   *  True exactly when it has a parked idle take, because such a mount is never
+   *  silent while summoned: polling it mid-jump cannot be mistaken for a stop,
+   *  so its airborne pitch bend can actually be applied. A mount without one
+   *  has to hold its phase instead, or every little hop runs a full winddown
+   *  and windup. */
+  mountEngineIdles(mountKey: string): boolean {
+    return this.engineIdleKey(mountKey) !== null;
+  }
+
+  /** Where this entity's engine audio is, and how far into that phase, on the
+   *  AUDIO clock.
+   *
+   *  Exposed so a visual can be pinned to a known moment inside an authored
+   *  take rather than to a render frame. `phaseStartedAt` is `ctx.currentTime`,
+   *  so a caller comparing against `elapsed` stays locked to the sound through
+   *  a frame hitch instead of drifting away from the thing it punctuates. */
+  mountEnginePhase(entityId: number): { state: MountEngineState; elapsed: number } | null {
+    const entry = this.mountEngines.get(entityId);
+    if (!entry || !this.ctx) return null;
+    return { state: entry.state, elapsed: this.ctx.currentTime - entry.phaseStartedAt };
+  }
+
+  /** The parked engine-idle loop, for a mount authored with one. Its presence
+   *  changes the shape of the whole state machine: the mount is never silent
+   *  while summoned, and reverse becomes this same loop pitched up rather than
+   *  a separate take (see mountEngine). */
+  private engineIdleKey(mountKey: string): string | null {
+    const key = `mount_run_${mountKey}_idle`;
+    const cached = this.engineIdleKeysCache.get(mountKey);
+    if (cached !== undefined) return cached;
+    const resolved = key in SFX_CLIPS ? key : null;
+    this.engineIdleKeysCache.set(mountKey, resolved);
     return resolved;
   }
 
@@ -994,46 +1275,150 @@ class Sfx {
     mountKey: string,
     moving: boolean,
     entityId: number,
+    backwards = false,
+    airborne = false,
+    pivoting = false,
   ): boolean {
-    const keys = this.engineClipKeys(mountKey);
+    // Mounts whose engine take set has a reverse variant and bends with jump
+    // load. Was a single hardcoded key; the rallycart wants the same behaviour.
+    const interruptible = mountKey === 'goblin_rocket_sled' || mountKey === 'rallycart_rxt';
+    const idleKey = this.engineIdleKey(mountKey);
+    // With a parked-idle take, REVERSE is that loop pitched up, not a separate
+    // clip set, so the windup/loop/winddown machine only ever drives forward
+    // travel and the reverse takes are never resolved.
+    const reversing = interruptible && moving && backwards;
+    // locomotion.ts only flips `backwards` after 3 consecutive confirming
+    // frames, so pressing reverse from a standstill reads as FORWARD for about
+    // 50 ms. Committing to the windup on that reading fires a windup and then a
+    // winddown for every standstill-to-reverse. Require the same confirmation
+    // before starting from parked; once the drive loop is running, react
+    // immediately so a forward-to-reverse flip still winds down on the spot.
+    const wantForward = moving && !backwards;
+    const hold = wantForward ? (this.mountEngineForwardHold.get(entityId) ?? 0) + 1 : 0;
+    this.mountEngineForwardHold.set(entityId, hold);
+    const priorState = this.mountEngines.get(entityId)?.state ?? 'idle';
+    const parked = priorState === 'idle' || priorState === 'stopping';
+    const driveForward = idleKey ? (parked ? hold >= 3 : wantForward) : moving;
+    const priorDirection = this.mountEngineDirections.get(entityId);
+    const direction: 'forward' | 'reverse' = idleKey
+      ? 'forward'
+      : interruptible
+        ? moving
+          ? backwards
+            ? 'reverse'
+            : 'forward'
+          : (priorDirection ?? 'forward')
+        : 'forward';
+    const directionChanged =
+      interruptible && moving && priorDirection !== undefined && priorDirection !== direction;
+    if (interruptible && moving) this.mountEngineDirections.set(entityId, direction);
+    const keys = this.engineClipKeys(mountKey, direction);
     if (!keys) return false;
     const { startKey, loopKey, stopKey } = keys;
     const ctx = this.ctx;
     if (!ctx) return true;
     const now = ctx.currentTime;
-    const prior = this.mountEngines.get(entityId);
+    const prior = directionChanged ? undefined : this.mountEngines.get(entityId);
+    if (directionChanged) this.unloop(`mountEngine:${entityId}`, 0);
     // variant 0: the only take today (see mountRun/playAt's variant pool for
     // other cues). If a second windup variant ever lands, this needs to
     // resolve whichever variant playAt's round-robin actually picked for
     // THIS play, not always the first.
     const startBuf = this.buffers.get(assetCacheKey(startKey, 0));
     const startDuration = startBuf?.duration ?? MOUNT_ENGINE_START_FALLBACK_SEC;
-    const { next, action } = advanceMountEngine(prior, moving, now, startDuration);
+    const driven = driveForward;
+    const { next, action } = interruptible
+      ? advanceInterruptibleMountEngine(prior, driven, now, startDuration)
+      : advanceMountEngine(prior, driven, now, startDuration);
     this.mountEngines.set(entityId, next);
-    // jitter: false on the windup: advanceMountEngine schedules the loop
+    // jitter: false on both transitions: the state machine schedules the loop
     // splice off this clip's nominal buffer duration (startDuration above),
     // so the actual playback must match that duration exactly. playAt's
     // default rate jitter (+/-6%) would otherwise let the loop enter up to
     // ~54ms early or late, and cut the windup off before (or past) the
     // level it was authored to hand off to the loop at.
+    const transitionVoice = interruptible ? `mountEngineTransition:${entityId}` : undefined;
     if (action === 'playStart') {
-      this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0, jitter: false });
-    } else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
+      this.playAt(startKey, x, y, z, {
+        gain: 0.85,
+        cooldown: 0,
+        jitter: false,
+        voiceKey: transitionVoice,
+        voiceCrossfade: interruptible ? 0.04 : undefined,
+      });
+    } else if (action === 'playStop') {
+      this.playAt(stopKey, x, y, z, {
+        gain: 0.85,
+        cooldown: 0,
+        jitter: false,
+        voiceKey: transitionVoice,
+        voiceCrossfade: interruptible ? 0.04 : undefined,
+      });
+    }
+    // Carry any in-flight windup/winddown with the vehicle. These are one-shots,
+    // so unlike the loops below they are not re-positioned by being called
+    // again each frame, and a vehicle drives away from its own transition take.
+    if (transitionVoice) this.moveKeyedVoice(transitionVoice, x, y, z);
     const loopActive = mountEngineLoopActive(next.state);
     const loopId = `mountEngine:${entityId}`;
     // immediate: true, the windup take is authored to already end at the
     // loop's own level, so a fade-in here would read as a swell right where
     // the two takes are meant to splice as one continuous sound.
     if (loopActive) this.loop(loopId, loopKey, 0.85, x, y, z, undefined, true);
-    else if (prior && mountEngineLoopActive(prior.state)) this.unloop(loopId, 0.15);
+    else if (prior && mountEngineLoopActive(prior.state)) {
+      this.unloop(loopId, interruptible ? 0 : 0.15);
+    }
+    // The parked idle: audible from summon onward, and ducked out only while the
+    // forward loop owns the engine. Not `immediate`, so the handoff out of the
+    // winddown eases in rather than butting against it.
+    const idleLoopId = `mountEngineIdle:${entityId}`;
+    const idleGateUntil = this.mountEngineIdleGate.get(entityId) ?? 0;
+    if (idleGateUntil && now >= idleGateUntil) this.mountEngineIdleGate.delete(entityId);
+    const idleAudible = !!idleKey && mountEngineIdleAudible(next.state) && now >= idleGateUntil;
+    if (idleKey) {
+      if (idleAudible) this.loop(idleLoopId, idleKey, 0.85, x, y, z);
+      // Quick out under the windup, slower out under nothing: a direction flip
+      // has to clear the idle fast enough that the new take owns the moment.
+      else this.unloop(idleLoopId, next.state === 'starting' ? 0.06 : 0.12);
+    }
+    // Only the rocket sled's sustained turbine take bends with jump load. The
+    // authored start/stop voices remain at their exact recorded pitch, and an
+    // in-progress start simply receives this target once its loop begins.
+    if (interruptible) {
+      const activeLoopId = loopActive || !idleAudible ? loopId : idleLoopId;
+      const loop = this.loops.get(activeLoopId);
+      if (loop) {
+        const authored = this.authoredPlaybackRate(loop.key);
+        const pitchTarget =
+          authored * mountEngineBendRate(reversing, airborne, !!idleKey, pivoting);
+        if (loop.playbackTarget !== pitchTarget) {
+          const rising = pitchTarget > loop.playbackTarget;
+          loop.playbackTarget = pitchTarget;
+          loop.src.playbackRate.setTargetAtTime(pitchTarget, now, rising ? 0.07 : 0.055);
+        }
+      }
+    }
     return true;
   }
 
   /** Drop an entity's engine-mount state and silence its loop, e.g. on
    *  dismount or when its view is removed (interest culled, disconnect). */
   mountEngineReset(entityId: number): void {
-    if (!this.mountEngines.delete(entityId)) return;
+    this.mountEngines.delete(entityId);
+    this.mountEngineDirections.delete(entityId);
+    this.mountEngineForwardHold.delete(entityId);
+    this.mountEngineIdleGate.delete(entityId);
     this.unloop(`mountEngine:${entityId}`, 0.1);
+    this.unloop(`mountEngineIdle:${entityId}`, 0.1);
+    const transitionKey = `mountEngineTransition:${entityId}`;
+    const transition = this.keyedOneShots.get(transitionKey);
+    if (!transition) return;
+    this.keyedOneShots.delete(transitionKey);
+    try {
+      transition.src.stop();
+    } catch {
+      /* already stopped */
+    }
   }
 
   /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
@@ -1047,11 +1432,26 @@ class Sfx {
    *  makes that window much smaller in practice. A no-op for a mount with no
    *  engine take set.*/
   preloadMountEngine(mountKey: string): void {
+    // Takeoff and landing ride along on the same edge. They are one-shots on a
+    // rare event, so a cold first jump is exactly the case that would drop the
+    // clip, and warming them here costs nothing for a mount without them.
+    for (const kind of ['jump', 'land'] as const) {
+      const key = this.mountMovementKey(kind, mountKey, '');
+      if (key) this.preload(key);
+    }
     const keys = this.engineClipKeys(mountKey);
     if (!keys) return;
     this.preload(keys.startKey);
     this.preload(keys.loopKey);
     this.preload(keys.stopKey);
+    if (mountKey === 'goblin_rocket_sled') {
+      const reverse = this.engineClipKeys(mountKey, 'reverse');
+      if (reverse) {
+        this.preload(reverse.startKey);
+        this.preload(reverse.loopKey);
+        this.preload(reverse.stopKey);
+      }
+    }
   }
 
   /** Continuous rolling loop for a mount that ships one. Every other mount has
@@ -1093,23 +1493,59 @@ class Sfx {
     this.unloop(`mountloop_${id}`, MOUNT_LOOP_FADE);
   }
 
-  /** Jump / land / water-entry / swim-stroke. */
+  /** Jump / land / water-entry / swim-stroke.
+   *
+   *  `mountKey` swaps the rider's own takeoff and landing for the mount's, when
+   *  the mount ships a set. A vehicle leaving the ground should not sound like
+   *  boots and leather. Splash and swim stay the rider's either way: those are
+   *  a body meeting water, and no mount has takes for them. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
     _self: boolean,
+    mountKey = '',
   ): void {
     const key =
       kind === 'jump'
-        ? 'move_jump'
+        ? this.mountMovementKey('jump', mountKey, 'move_jump')
         : kind === 'land'
-          ? 'move_land'
+          ? this.mountMovementKey('land', mountKey, 'move_land')
           : kind === 'splash'
             ? 'move_splash'
             : 'move_swim';
-    this.playAt(key, x, y, z, { gain: kind === 'swim' ? 0.5 : 0.7, cooldown: 0.08 });
+    // A vehicle coming down is a heavier event than boots hitting dirt, so a
+    // mount's own landing takes play louder than the rider's.
+    //
+    // Applied HERE rather than in the gain map for a concrete reason: the gain
+    // map is per key and already sits at this key's measured ceiling, which is
+    // set by the loudest of its four takes. Pushing that number further fails
+    // the playback-profile validator. The per-call gain is a separate multiply
+    // downstream of it, and the output bus has room (SAMPLE_GAIN is 0.85), so
+    // this lifts the cue without touching how the four takes sit against each
+    // other, and without touching the rider's own landing or the takeoff.
+    const mountLanding = kind === 'land' && key !== 'move_land';
+    const gain =
+      kind === 'swim' ? SWIM_GAIN : mountLanding ? MOVE_GAIN * MOUNT_LAND_BOOST : MOVE_GAIN;
+    this.playAt(key, x, y, z, { gain, cooldown: 0.08 });
+  }
+
+  /** `mount_<kind>_<mountKey>` when that key exists, else the rider's own.
+   *
+   *  Resolved by key existence and cached, the same way `engineClipKeys` picks
+   *  up an engine take set: adding takes for another mount is a matter of
+   *  dropping in the files and registering the key, with nothing to wire here,
+   *  and every mount without them keeps the sound it has today. */
+  private mountMovementKey(kind: 'jump' | 'land', mountKey: string, fallback: string): string {
+    if (!mountKey) return fallback;
+    const cacheId = `${kind}:${mountKey}`;
+    const cached = this.mountMovementKeyCache.get(cacheId);
+    if (cached !== undefined) return cached ?? fallback;
+    const candidate = `mount_${kind}_${mountKey}`;
+    const resolved = candidate in SFX_CLIPS ? candidate : null;
+    this.mountMovementKeyCache.set(cacheId, resolved);
+    return resolved ?? fallback;
   }
 
   necromancy(
