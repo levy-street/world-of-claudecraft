@@ -588,6 +588,24 @@ closed-by-X.
 | Wiki farming page rendered the node-arm layout with empty tables | P1 | Phase 5 / Phase 9 | closed-by-Phase-9 (live beds prose; the length guards flipped to demand the sections) |
 | No real-browser E2E for the professions window rows | P1 QA | Phase 8 QA | closed-by-Phase-8-QA (the browser a11y professions arm runs the real window) |
 
+RE-OPENED (qr-18-REOPEN, 2026-08-31): twelve rows of the table above are actioned
+by Phase 18 (a markdown table row cannot carry an inserted annotation line, so
+this block stands in for the in-place lines; the rows themselves stay as
+written, never renumbered or deleted). The rows, by their Phase 18 item ids:
+bags-feast-clicked-copy (the bags feast clicked-copy slot row),
+p99-blob-size-gauge (the p99 blob-size gauge row; handed-to-maintainer but
+code-shaped with no value call, so built rather than tabled),
+grant-green-hex-tokenization, focuskey-css-escape-login-replay,
+bf-residuals-batch (the twin dead map-marker exports half only),
+keybinds-em-dashes, questobjectiveareas-fallthrough, release-hygiene-flags,
+renderer-farm-event-route-pin, stale-dev-comments. The accepted-no-action rows
+re-opened here were tolerated-debt acceptances; rows whose acceptance rests on
+design grounds (for example the farmDenied echo-bound row) stay closed under
+qr-18-REOPEN's accepted-by-design carve-out.
+Also actioned from the rows above (relocated here from a misplaced first insert):
+bedid-free-deny-race (the bedId-free deny racing row) and
+withered-then-ready-reprojection (the withered-then-ready monotone re-projection row).
+
 ### Appended at the 2026-08-20 absorb: masterwrought's items (the END of the handoff table; never interleaved with the rows above)
 
 Per the absorb (masterwrought ruling 11b-D-3 and the migration clause below),
@@ -1158,6 +1176,7 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     appears in the placed entity's title, so role legibility is functional rather than flavor,
     and this reduces three R15 verifications to one.
 80. 11k-CUT. CUT: the crafter's signature is NOT carried onto a feast placed by someone else, and
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as feast-crafter-signature-carry.
     deliverable 3's prestige claim narrows in the same change to what is true (the signature is
     on the item instance, the placer's name is on the entity, and they coincide when a cook
     places their own feast). WHY: it needs a new FeastState field and a new wire field, a
@@ -3225,6 +3244,7 @@ question does not arise (farming has no station).
   FarmFeedbackHost would add hud.ts members at 4 lines of ceiling headroom;
   farmWithered plays the farmHarvest ACTION cue (the same harvest resolving
   unluckily; the distinct disappointment sting and the farm_ready chime are
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as withered-sting-ready-chime.
   Phase 8/10 scope); farmDenied and farmHusksConverted stay silent. The
   placeholder rows ride sfx_prompts.mjs through its UI_SFX_CATALOG import
   (no hand row there), PLACEHOLDER-marked in ui_sfx.mjs, both at 0 dB so a
@@ -3263,6 +3283,7 @@ question does not arise (farming has no station).
     exists (the fairness suite now also scans the GFX surface with the
     surfaceMat allowance pinned as an exact single-name import). Editing
     renderer.ts to single-site the drive was rejected: it would re-stale
+    RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as renderer-farm-sync-single-site.
     all three renderer-edit evidence-seal families for zero player-visible
     gain.
   - ONLINE EVENT-ORDER RACE healed (commit 4d6ff0e21e): the farm event and
@@ -3335,6 +3356,7 @@ question does not arise (farming has no station).
   (az) Open surface: the journal opens from the professions window's
   Farming row plus the Shift+K keybind (harvestJournal, Interface category;
   Shift+H and Shift+J were taken). NO side-rail button: the rail guard has
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as harvest-journal-rail-button.
   room (col-a measured 414 of 660 px), but hud.ts ceiling headroom is the
   binding budget and the packet's "rail at capacity" premise was WRONG in
   direction (guard fine, monolith tight). hud.ts closed the phase at 19485
@@ -3430,6 +3452,7 @@ question does not arise (farming has no station).
   concern applies to a SWEEP notice arriving during the offline boot, not to
   a login notice; cosmetic, accepted. (2) farmPatchMarkerAt/stationMarkerAt
   are twin production-dead exports (real hit-testing goes through
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as map-marker-dead-exports.
   mapPointMarkerHitsInto's arms); family consistency, test-covered, delete
   both together if the family is ever cleaned up. (3) the sprout ratio
   constants are declared in both painters with reciprocal cross-references;
@@ -3662,6 +3685,7 @@ question does not arise (farming has no station).
     delve-shop farming skip gained the inverted no-Marks-row-today
     tripwire. Any future census exclusion ships WITH its set pin.
   - The mint-side farming+prompt gate deliberately has NO load-side twin,
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as prompt-slot-load-side-twin.
     the decision RECORDED here after three lanes converged: every
     confirmMode writer routes through resolveSlotToolEffect (the slot
     actions both call it; the admin restore body carries no confirmMode
@@ -3810,6 +3834,7 @@ question does not arise (farming has no station).
   (buyItem refuses past 7, the window closes at 8), accepted as
   family-consistent.
   (bj) THE CREDIT ARM IS A MODULE IMPORT: professions/farming.ts imports
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as quest-credit-seam-fold.
   onCropFarmedForQuests from quests/quest_credit.ts directly (the sibling
   crediters are SimContext callbacks wired in sim.ts, which sits one line
   under its ceiling); the registry comment in src/sim/sim_context.ts names
@@ -3967,6 +3992,7 @@ question does not arise (farming has no station).
   until go-live" for compost (a comment inside the art-audit fingerprint
   family, swept at the Phase 13 art batch when the set moves anyway);
   nearFarmerNpc walks the whole radius after the answer (cosmetic).
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as near-farmer-scan-early-exit.
   Phase 9b QA (2026-08-19, PASS-WITH-FOLLOWUPS; branch
   fix/farming-phase-09b-qa, merge hash in progress.md):
   (bq) THE ERROR-TOAST RE-ARM (a refinement of the husk-trade feedback
@@ -4038,6 +4064,7 @@ question does not arise (farming has no station).
   later phase). The zone announce names the all-fine collapsed item id, the
   farmHarvested rule.
   (bv) NO RELIQUARY FIELD-NOTE CELL for gather_event:golden_harvest (its
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as golden-harvest-reliquary-cell.
   three node siblings have one): noteReliquaryMark no-ops by allowlist,
   pinned as a negative arm so the deferral retires consciously; and
   correctly NO server/character_sheet.ts RELIQUARY_MARK_ENGLISH row (that
@@ -4075,6 +4102,7 @@ question does not arise (farming has no station).
   list derives from the crop catalog. Fresh mutations 14/14 killed
   named. perf:tour exit 0 and test:browser 133 green closed the phase's
   two VERIFY items. DECLINED: the types.ts gatherRareEvent comment
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as gather-rare-event-comment-reflow.
   reflow (cosmetic; a sim-content comment edit stales the
   portrait-manifest evidence family for zero behavioral value).
   (bw) GOLDEN-WIN PARITY COVERAGE DEFERRED TO PHASE 11, AND DISCHARGED

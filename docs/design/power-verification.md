@@ -1208,6 +1208,7 @@ mutations are named above so any of them can be re-applied by hand.
   `scripts/r5_envelope_probe.ts` is a fourth member of that family and the table
   should name them.
 - **Two tooltips change their text and no screenshot was captured.** The apex
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshots-judged-below-bar.
   cloth chest's rating line moves from Hit 40 to Haste 40 and the three flask
   tooltips move from 15 to 13, both rendered from the live def. The repo's
   default workflow asks a visual change for before/after screenshots; this

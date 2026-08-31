@@ -629,11 +629,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   shipped carries the flag), decide the capture approach at PR time; the S3
   scanner's blindness to WRAPPED emits is a repo-wide guard gap worth a durable
   hardening outside this packet (a single-line ternary is visible, see the API
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as s3-scanner-wrapped-emit-hardening.
   decisions entry); the sim_i18n BASE_NEW locale blocks re-declare themselves after the
   `...BASE_NEW` spread and each MUST begin with its own inner `...BASE_NEW.<lang>`
   spread or every BASE_NEW fill silently shadows to English with nothing red
   (QA-verified all 8 current blocks do; the per-locale coverage test in
   masterwrought_cap.test.ts guards only the two masterwrought keys; a durable
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-dict-passthrough-guard.
   whole-DICT passthrough guard is a hardening candidate beside the S3 one);
   `tests/anim_pipeline_hunter_ghost.test.ts` is red AT the
   v0.36.0 release tip (inherited, files byte-identical), fix belongs upstream.
@@ -674,6 +676,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   overlay flips the train row Known); NO lastTrainResult write (that stays the train-command
   probe, pinned by identity) and NO event on refusals (they are ctx.error-only, or the deny
   would double-print). Known consequence, fails closed: a pattern learn transiently
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pattern-learn-fee-overreserve.
   over-reserves that recipe's trainer fee in availableTrainCopper for one broadcast.
 - New i18n keys + matcher rows: error.patternKnown 'You already know that recipe.' (fills
   copied VERBATIM per locale from resolved hudChrome.training.alreadyKnown so hover and click
@@ -774,8 +777,10 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   after its first press; elixir precedent); discard of an unlearned pattern stays the
   generic confirm (patterns are ordinary tradable items, the escalated confirm keys on
   instance payloads, classic-correct); PatternLearnResult stays exported with zero external
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as patternlearnresult-export.
   consumers (it names the public resolver's return type, the training.ts TrainResult idiom);
   removeItem-by-dispatch-itemId vs def.id is unpinnable without an unshippable
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as removeitem-dispatch-id-pin.
   table-key-vs-def-id mismatch fixture (recorded, no change); the frozen-id golden
   (tests/shipped_item_ids.test.ts over shipped_item_ids.golden.json, a .json golden a
   .snap-only search misses) is a DELETION guard only, so "no shipped pattern ids" is
@@ -888,15 +893,20 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   into the release's new inventory_sort ladder, the eastbrook seals re-minted on the
   merged tree. Recorded UPSTREAM follow-ups (release-owned, out of this branch's scope,
   do not fix here): server/pbe_boost.ts fillHands still hardcodes the pre-quiver
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pbe-boost-fillhands-prequiver.
   displacement rule (and tests/server/pbe_boost.test.ts:196 pins the old behavior);
   tests/visual_manifest.test.ts wildheart re-cut reads donor GLBs twice with a stale
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as visual-manifest-wildheart-double-read.
   comment; tests/delves.test.ts:1226 + tests/honor.test.ts:210,234 titles still say UTC
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as utc-day-test-titles.
   day while bodies drive resetDay; the release's hudChrome.fct.absorbed reword left all
   18 translated overlays stale (the reword-staleness blind spot: rows are translated,
   not pending, so no gate or worklist lists them). PACKET follow-ups: the branch-added
   tests/recipe_pattern_items.test.ts db mock (like the release's wire-cadence siblings)
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pattern-items-db-mock-keys.
   carries fewer './db' keys than the canonical shape and stays green only while its
   paths avoid them; the masterwrought suites (masterwrought_cap, recipe_pattern_items,
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as empty-test-world-adoption.
   recipe_pattern_tooltip_view) predate the EMPTY_TEST_WORLD gate-perf trim and could
   adopt it with per-suite validation.
 - Phase 03 QA round 2 (the QA fan-out over the phase + merge, 4 auditors + the
@@ -915,10 +925,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   overlay/deed/matcher value + per-locale script-family checks, locale sets derived
   from the live registries; both blockers proven red under it by mutation probe, and
   the originality pin proven decisive the same way). Cleanup-phase notes: the three
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as dead-detonate-sibling-keys.
   dead detonate siblings (PactSeal/BloodRite/PitSentence, no coin); the pre-phase
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as shaman-kit-old-name-residue.
   shaman-kit old-name residue in comments and test fixtures (~20 files, earlier rename
   wave, none player-visible); talent_i18n Latin semantic staleness for
   Thunderhurl/Zealwing stays under obligation 3; the abilities.ts inert per-locale
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as abilities-inert-locale-arms.
   arms (dead code, the overlay layer wins assembly) still carry roughly 143 stale
   renderings per non-Latin locale from the EARLIER rename tracks; QA refreshed only
   the six phase 03 coins, so the block is a strip-or-refresh cleanup candidate.
@@ -956,22 +969,29 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   provenance records (25 token swaps; public/ is deployed verbatim, so old coins there
   were live IP surface); README.md + the 20 docs/i18n mirrors' 'Deacon Varric'
   (proper-noun swap only, no translation touched); the mediawiki seed regen was ATTEMPTED and REVERTED: npm run wiki:seed produces a
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mediawiki-prose-dash-chore.
   coin-free seed, but re-baking the zone prose re-adds 95 grandfathered em-dash lines
   as new lines and the pre-push/CI copy scan does not exclude mediawiki/, so the regen
   is blocked until a content-prose dash chore lands; the seed stays stale-on-record
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mediawiki-seed-freshness-gate.
   with the phase 11 build_seed.mjs obligation (and still has no freshness gate,
   hardening candidate); the naming-audit 2605-vs-2606 count reconciled (the +1 is
   shard 10's un-articled 'Wildheart Basin' duplicate row).
   RECORDED, pre-existing, not this phase's regressions (QA follow-ups for a cleanup or
   QA phase, do NOT re-raise as phase defects): last-write-wins reverse-map collisions
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-reverse-map-collisions.
   in sim_i18n (Raised Bonewalker, Rime Elemental, Aether Surge, Patch Up); ability
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as ability-def-catalog-divergence.
   def-vs-catalog English divergence (shadowform def 'Gloamveil' vs catalog 'Gloamveil
   Form'; meteor def 'Meteor' vs catalog 'Skystone': fixing shifts parity goldens, needs
   its own proof round); the family-wide rift mechanic-name matcher gap (Pitsteel Sweep,
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as rift-mechanic-name-matcher-gap.
   Pitfire Ring, Hoof of Ruin, Wing Buffet and siblings render raw English in all
   locales; closing it means new aura.* keys + 20-locale fills per name); the positional
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as positional-item-catalog-guard.
   item catalog (ITEM_ENTITY_IDS vs name array, length-checked only) wants a
   derived-or-pinned guard; the rename state proof is env-gated so CI never runs it
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as rename-proof-ci-gating.
   (hardening candidate); release-tier pending=0 stays red by design until the fill.
 - Phase 03 pin-audit round (test-coverage-auditor, applied in 6b90a3d908) + gate
   fallout (17e5934a8c): the auditor proved two ip_scrub arms DEAD (the scanner never
@@ -1150,6 +1170,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   arms (inherited shape, hardening belongs upstream); the rift rig pins the
   rank through its own baseLevel input (the intended consequence of the
   re-sourcing; RIFT_TIER_INFO derives both faces from one table); the sibling
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sanitize-daily-sources-helper.
   heroicDaily.marked load keeps its identical unclamped hole (pre-existing,
   the shared-sanitizer cleanup candidate from round 1 covers it). Also for the
   record: the fix-round reviewer confirmed the ORIGINAL phase commits were red
@@ -1186,6 +1207,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   (zero draws), the off-anchor load normalize, and the losing-race ember end
   to end (two racing instances, loser gets the ember and no cores). Recorded,
   accepted as-is: the instance scan still runs once in awardWyrmfallCores and
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wyrmfall-marks-scan-dedup.
   once in awardHeroicMarks on a final-boss death (deduping means changing the
   release-owned marks signature; the template precheck removed the cost that
   mattered, the per-trash-death scan); the Heroic Quartermaster signs the
@@ -1372,8 +1394,10 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   the SECOND never-expiring reward-parcel source (mailHeroicMarks shape,
   ~7 letters/day ceiling); dying mid-sunder is code-verified safe (damage
   teardown clears the session); the mid-cast pin protects cast-start to
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as midcast-pin-scope-hardening.
   completion, not menu-click to confirm-OK (family-wide, release-owned);
   bags_window forwards a raw -1 stale index where the destroy sibling
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as bags-window-stale-index-fallback.
   falls back to undefined (family-wide, wrong toast only); itemCopyPin
   does not cover count (unreachable: all 14 eligible ids are stack 1;
   becomes real if a stackable sunderable ships); the capped-backlog
@@ -1381,11 +1405,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   resetDay itself is year 9999 with a 21-plus-week-behind anchor
   (effectively unreachable, the range bail's own edge, on record); a
   leaving-but-entered character's mail-arm gate stamp lands after the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mail-arm-relog-repay.
   leave snapshot so that source can re-pay on relog (byte-identical to
   the release's mailHeroicMarks + lockToHeroicClaim exposure, inherited
   and accepted, not a phase regression).
 - Phase 04 QA open items and obligations MINTED (append to the working set):
   (1) RULING TAKEN at Phase 05 QA (2026-08-10): heroic-raid epics ARE
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as heroic-raid-epic-sunderability.
   sunderable, aligning with the settled any-raid-epic-of-the-tier model
   (the normal-only boundary was an accident of the item_level.ts
   raid: false registration, not a decision). IMPLEMENTATION LANDS WITH
@@ -1407,12 +1433,16 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   the def). (5) The core faucet is per-account-unbounded through alts
   (up to eight sources per character per day, tradable output): phase 15
   power-verification input, on record. (6) Release-owned upstream
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as addressing-guard-client-window.
   follow-ups, do not fix here: the addressing guard's client-half sender
   window is comment-bleed-prone (bound it at the next method like the
   server half); the orphaned sortedJson JSDoc above beginEnchantFamilyCast
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sortedjson-orphan-jsdoc.
   (the item_copy_ref extraction left it); the release-authored reliquary
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reliquary-db-mock-partial.
   db-mock factories are partial (8/12 keys of 26; a future phase making
   join/snapshot call a new db export surfaces there first); the zh locales
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as zh-transliteration-scrub-arming.
   have no armed transliteration patterns in overlay_ip_scrub (they
   translate semantically today, no live gap). (7) The masterwrought
   suites still predate the EMPTY_TEST_WORLD gate-perf trim (carried
@@ -1442,6 +1472,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   stays banked). Recorded, not fixed here (reviewer-verified pre-existing or
   accepted): the sibling heroicDaily/delveDaily loads carry the same non-iterable
   throw exposure (third copy now; a shared sanitizeDailySources helper is a
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as autosave-transactional-writes.
   cleanup-phase candidate); the 30s autosave saves characters, market, and mail
   as three independent writes, so a crash between them can duplicate or drop a
   mailed-cores letter relative to the gate (same shape as mailHeroicMarks,
@@ -1620,6 +1651,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   the essence note. (7) The Osmium display forms web-verified post-hoc (registry
   above). Adversarial leftovers recorded for QA: hubCraftsPerformed now counts a
   ninth craft's station work (correct, unremarked widening); catalog reachability
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as rung50-reachability-pin.
   (rung 50 at 125-cap pacing) is stated in guide prose but unpinned. Two dev-kit
   scorer facts pinned-with-notes rather than changed: druid/feral (the one TANK_AGI
   role, sta-led) picks the rung-50 INT ring for its stamina over the rung-25 str
@@ -1751,6 +1783,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   models/*) are pre-existing repo-wide debt untouched by this phase (the ten phase
   WebPs live under ui/, outside those groups). Pre-existing, not ours, left alone:
   the icons.ts:5278 console.warn em dash (repo no-dash debt) and the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as icons-console-warn-dash.
   cs_CZ.dgn_sanctum_speed.name release-tier deed_i18n red.
 - GATE CLOSE (2026-08-11): node scripts/gate_select.mjs PASS, all 8 steps green at
   93a2dd16b3 (the content-heavy diff made the planner fall back to the FULL suite,
@@ -1765,6 +1798,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   per-hunk resolution verified branch keys survived but never re-screened the
   release text against the rename registry.
 - DEED-AUTHORING OBLIGATION DISCOVERED (durable, for every future TITLE deed): the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deeds-md-title-reliquary-coupling.
   locked titles-page rule means a new non-hidden title deed ALSO owes a
   horizons_titles slot in src/sim/content/reliquary.ts in the same change (the
   Grandmaster Jewelcrafting title reddened the derivation pin in
@@ -1798,6 +1832,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   in deeds.ts + deeds.md. (9) Comment re-cuts: deed_i18n lead line, dev_kit tie
   notes (anchor bound, order caveat, NaN seed), "nothing about the picker changed".
   Recorded, no change: server/pbe_boost.ts bestBySlot keeps a first-wins tie policy
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pbe-boost-tie-policy.
   distinct from dev_kit's identity-then-id (untouched, out of scope, noted for the
   next reader); the state.md build-ledger EXECUTION RECORD keeps its historical
   272/3155/58 and manifest numbers as written (the QA re-cut lives in this ledger).
@@ -1921,10 +1956,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   additions-only review) now covers the nine jewelry ids PLUS the six inscription ids.
 - RELEASE-OWNED FOLLOW-UPS surfaced by this phase's merge audit (do NOT fix on this
   branch): (1) turbo.json build:bundle inputs omit scripts/build_bundle_pregen.mjs (and the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as turbo-bundle-pregen-inputs.
   gate_task_cache mirror), a warm-cache staleness hazard for pregen-step edits; (2)
   qa-gate.md/gate_steps/gate_task_cache prose says cacheable steps run through npx while
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as qa-gate-prose-turbo-spawn.
   the code spawns node_modules/.bin/turbo directly; (3) gate.mjs/gate_select.mjs lost
   cwd-independence (fails loud, likely intentional); (4) the mob-portrait render
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as portrait-render-env-convergence.
   environment ping-pong: the release's CI rerender re-encoded all 230 portraits with byte
   drift this Mac's renderer does not reproduce, so every sync re-mints; the two
   environments should converge or the acceptance should carry an env fingerprint.
@@ -1988,6 +2026,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   live q7 answer): the recorded old-generation whole-block regen covers q1-a8 and the
   release fill must treat it as such, not as the four wave 3 keys only. RECORDED, no
   change: defaultHobbyForPair's contentSet stays a prose-guarded test-only parameter (a
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as default-hobby-contentset-seam.
   type-system-enforced seam would be an API redesign out of fix-round scope).
 - PHASE 06 GATE CLOSE (2026-08-11): gate_select TURBO_FORCE=1 PASS, all 8 steps green at
   tip 3c732e20d6 via the full-suite fallback (2659 files / 36697 passed, browser suite,
@@ -2175,6 +2214,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   (mutation-proven red on a deleted row), the mech staff pin, the tome family in
   scripts/assets/remint_lockfile_fingerprints.mjs plus the audit-doc scope line,
   and usedExtensions/scene/camera diagnostic pins on the asset test. The remint
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as remint-registry-completeness-guard.
   registry still has no completeness guard (nothing pins that every fingerprinted
   family is enumerated); recorded as a tooling note, deliberately not built here.
 - PORTRAIT LEDGER: the tome wiring moved vision_malric_mage's source digest and
@@ -2354,6 +2394,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   flip them mechanically inside this same PR. Extracting the craftDaily load clamp
   out of sim.ts (QA nit) would split it from its wyrmfallDaily sibling arm;
   declined for symmetry. The daily-before-not_learned ladder corner needs a
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as daily-gate-ladder-corner.
   DB-tampered row to reach post-clamp; accepted and documented at the ladder.
 - ACCEPTED ASYMMETRIES (documented in code, pinned in tests): gate state is
   server-private (Phase 04 ruling; the affordance caps on the STATIC half only, so
@@ -2450,6 +2491,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   construction: localization_coverage's dungeonDisplayNameFromSource token now
   matches the import + call sites, and gather_event_i18n pins the CALL text at
   the localizeLootText arm, which stays in hud.ts. questlog_window's private
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as questlog-display-name-unification.
   questTitle/questNarrative/questObjectiveLabel/npcDisplayName copies are
   PRE-EXISTING duplication, recorded as a later unification candidate,
   deliberately not touched at a sync.
@@ -2545,6 +2587,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
     session's review STANDS.
 - RECORDED, NO CODE CHANGE (ops/deploy/design notes from the fan-out):
   - Ops: sim.resetDay is recomputed per tick from the realm clock with no
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as resetday-monotonic-guard.
     monotonic guard, so a backwards realm calendar (TZ or config regression)
     silently re-opens the day; recorded like the wyrmfall equivalent, not
     engineered around.
@@ -2570,6 +2613,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
     server-private stamp, the recorded Phase 04 ruling); a host difference by
     design, not a defect.
   - hud.ts toolEffectRecharge reason ternary (shipped 2026-07-29): the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as hud-tooleffectrecharge-extraction.
     pre-existing un-extracted sibling of the extracted denial family,
     recorded as an extraction candidate (the questlog_window precedent),
     deliberately not extracted at a QA.
@@ -3034,6 +3078,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   drained character_leases table, takes an advisory lock, compare-and-swaps
   every state blob, and makes --realm dry-run-only; do not re-surface as
   open. (c) the vendor partial-sell
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as vendor-partial-sell-locked-toast.
   toast says 'Kept {n} bound copies' even when the spared units were
   player-LOCKED, not bound (items.ts partial-sale summary; release-parent
   code). (d) the release extracted isUpdateDue out of server/game.ts without
@@ -3089,6 +3134,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   InventoryUnit return (correct to discard; noted as the future
   learned-from-a-signed-pattern plug point), and the sunder pins' accuracy.
   Reviewer note for the frontend gate (recorded, not actioned at the sync):
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as bags-window-stale-repaint-copyref.
   bags_window's copyRefFor returns undefined on a stale repaint index, so a
   stale bag click still reaches the sim id-only; pre-existing, shared with
   equip/discard/sell, bounded by patterns being excluded from the action bar.
@@ -3191,11 +3237,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
     (off-archetype wearers get off-stat primaries). Recorded as the standing
     shape for phases 09/10.
   - src/sim/content/rift/items.ts's rating-rule comment classes int/spi
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as rift-items-healer-facing-comment.
     wholesale as healer-facing, which surface-contradicts the operative
     catalog rule (authored Hit seed distinguishes caster-DPS from healer
     cloth, heroic_variants.ts); the rift comment is the stale one. Cosmetic;
     left for a rift-content pass.
   - APEX_ARMOR_RECIPES' per-row "Input N vs output M" comments bake today's
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as apex-recipe-price-comments-stale.
     prices; the invariant itself recomputes live in two suites, so staleness
     is cosmetic only.
   - The commission-order board lists the nine apex epics by name (full
@@ -3299,6 +3347,7 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   release-owned notes passed upstream: civicServicePlacements is a
   construction-time readonly Sim field, not a SimContext module (defensible
   as derived static data), and delve_map_painter carries a dead _northLabel
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as delve-map-painter-dead-northlabel.
   argument with a stale relocalize comment.
 - CATALOG (ids frozen, all epic, recipe level 25, skillReq 100, ilvl 31 on
   gear): duskforged_warblade (1H sword, 30/50/2.5 = 16.00 dps, str13+sta9,
@@ -3452,6 +3501,7 @@ Phase 09 close-out addendum (2026-08-13, after the qa-checklist gate):
   the weapon-batch ownership model extended with the batch excluded from
   the frozen campaign chunks); duskforged_bulwark maps to shield_square
   while gyrelens_array and voidbound_grimoire joined the conscious
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as voidbound-grimoire-tome-glb.
   no-model pin (a voidbound tome GLB on the phase 06 procedural-tome
   pattern is recorded as a PHASE 14 beauty-pass follow-up); the four
   consumed intermediates left the bag All-only set; taxonomy bootstrap 64;
@@ -3504,6 +3554,7 @@ followups fixed in-session, nothing carried as future work.
   anchors) first meet this branch's sim delta in CI's lane jobs after
   push; residual risk low, the branch's changes in those areas are
   display-name strings only. docs/local-gate-perf/baselines.md:596 cites
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as local-gate-perf-stale-citation.
   the deleted chronomancy_balance.test.ts: pre-existing release-side debt,
   not touched here.
 - Audit fan-out: four QA auditors (correctness, seam, flag, cleanup), the
@@ -3539,6 +3590,7 @@ followups fixed in-session, nothing carried as future work.
   memo stands per the phase 09 ruling (the fix-round reviewer's
   WeakMap+freeze prescription would break the pattern-suite pushers; the
   new guard suite pins the actual contract instead); the fourth
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-line-helper-copies.
   private line() tooltip helper copy stays (a shared helper is a
   triple-registered architectural entity for a one-line body whose real
   content is each module's tt-class union; revisit only if a tooltip
@@ -3834,6 +3886,7 @@ applied in the fix round or recorded below.
   8 steps at the final tip f577bad787 (GATE_MAX_WORKERS=5), after the
   portrait re-bless (230/230 byte-identical rerender, both seal layers
   advanced in one change). Parity goldens unmoved (the phase draws zero rng; a flask
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as flask-parity-golden-declined.
   parity golden was considered and DECLINED: golden moves cost every
   future sync for an ordering shared code already guarantees).
 - Catalog facts for future test authors: every shipped crafted elixir is
@@ -3914,6 +3967,7 @@ collapseLowest + Sell-tab price reference, repo-wide dead-code cleanup).
   (poi.thornpeak_heights.7 "Wyrmkult-Zelte" etc.), pre-existing on BOTH
   parents (not merge damage; the literal-coin guards are blind to
   localized derivatives); non-Latin locales likely carry equivalents.
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as scrub-guard-derivative-pass.
   QUEUED for the release locale fill / a scrub-guard derivative pass.
 - MONOLITH RATCHET: the merged union broke sim.ts (12676 over 12660) and
   server/game.ts (10922 over 10900), both parents individually green.
@@ -4871,10 +4925,12 @@ recorded, or refuted with the file open)
   raid-sourced premise pinned. (2) NO Reliquary pages and NO deeds for
   patterns: consumed-on-learn knowledge, not catalogued collectible gear
   (the ruling-10 crafted-tools precedent); content-obligations-reviewer
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as market-pattern-corner-mark.
   audits the call at the review wave. (3) NO market corner mark: both
   .mkt-ico corners are taken and a pattern mark is phase 14 restyle
   territory; the category chip plus the parchment art carry findability.
   (4) The guide masterwork prose apex clause is DEFERRED TO PHASE 12
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as guide-masterwork-apex-clause-deferral.
   (sanctioned by the phase 08 carry's "with phase 12"): the Perfecting
   head start recuts that prose once, capturing the suppression exception
   and the head start in one reword instead of staling the filled non-Latin
@@ -5113,6 +5169,7 @@ recorded, or refuted with the file open)
   rows; Vigor and Clarity generic stat vocabulary with no appendix row, as
   the registry rows themselves say).
   The live Naming registry block above gained the mirror line, and the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as elixir-aura-names-unregistered.
   shipped elixir aura names remain unregistered (the recorded pre-existing
   half of the gap, closed only for the packet's own rows).
 - (e) Phase-15 kit premise, OUTCOME 2026-08-16: the feast is dropped from the
@@ -5296,6 +5353,7 @@ recorded, or refuted with the file open)
   superseded: the types.ts comment now names four (recut in 33008fa7ac).
   Flag semantics unchanged; flask/Spellgnaw/spellsteal pins all green.
 - RELEASE-OWNED, recorded not fixed: the castle deed pair ships art-pending
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as castle-deed-art-pending.
   by upstream design (DEED_ART_PENDING, category-crest fallback,
   docs/design/deeds.md sanctions it; icon-brief flags the commission); the 13
   Latin-overlay reins_terrorspark rows the branch stripped at phase 03 now
@@ -5365,6 +5423,7 @@ recorded, or refuted with the file open)
   none of the phase's loot, rift, vendor, market, pattern, sundering, or
   reliquary files.
 - CARRY (fix-round item for this QA): the two sim_i18n.ts deploy-window
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-deploy-window-alias-horizon.
   alias rows (the Winterbite aura alias and the Deacon Varric delve-line
   regex) carry a stale "drop after v0.36.0 ships" horizon comment. The
   rows themselves stay LIVE: the window they protect is the deploy of the
@@ -5468,11 +5527,13 @@ recorded, or refuted with the file open)
   reachability semantics are archetype-major by settled design; the
   ALL_RECIPES content-vs-data.ts duality is inert for the learn path;
   market search matches English names and ids only (pre-existing,
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as market-search-localized.
   catalog-wide); the committed mediawiki seed carries zero pattern pages
   (the recorded stale-on-record deferral; kind wording landed at the
   generator); marketItemTypeLabel had no exhaustiveness guard, closed by
   the new distinctness sweep; sv_SE kvartersmastarens spelling is
   pre-existing fill debt for the locale owner; the guide vendor-mirror
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as guide-vendor-mirror-shared-expression.
   shared-expression note is filed at low weight (the four literal
   per-arm exemplars and the probe-proven freshness arm carry it).
 - VALIDATION RECORD (close): suite list at 3b52e51cd1: 47 files passed,
@@ -6240,11 +6301,14 @@ guard alignment).
 
 - SECURITY: CLEAN, zero blocking or should-fix. Four INFO observations,
   all explicitly no-change-requested, LEDGERED: (a) a refused farming
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farming-command-refusal-selfheavydirty.
   command still sets selfHeavyDirty (game.ts ~6537; bounded by the command
   lane bucket and once-per-tick collapse; the rift-forge refusal-above-flag
   idiom is the shape to copy if beds ever grow); (b) consume_feast is a weak
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as consume-feast-existence-oracle.
   feast-existence oracle (dedicated map, no mutation, leaks only "a feast
   exists"); (c) feastOwnerKey mixes characterId/entityId domains (cannot
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as feastownerkey-domain-mixing.
   fire online, fails safe); (d) characterUpdateStatement now logs via the
   blob-size reporter (id + byte count only, scalar closure state). PASSED:
   full server authority on all five farming commands, dev gating, SQL
@@ -6354,6 +6418,7 @@ guard alignment).
    renders masterwrought's; sweep every farming-authored locale surface for
    the retired term during the key-pair retirement.
 12. farming's gatheringProficiency serializer writes farming: 0 non-omitted,
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farming-zero-blob-serialization.
    rewriting every character blob (~14 bytes) on first post-deploy autosave;
    11c makes the omit-or-accept call consciously (migration reviewer,
    WARNING 1).
@@ -6580,6 +6645,7 @@ baseline back to exactly the 1 known 11C-owned red.
   Notes: the mech-chroma host seam (CLAUDE.md row added), the farming
   sweep tail comment (trued), ItemUseResult's home in
   mech_chroma_ownership.ts recorded as a relocation candidate for whoever
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as itemuseresult-relocation.
   touches that area next.
 - PARITY: no new drift; the world_api_parity FALSE GREEN confirmed still
   live with the measured numbers matching the ledgered prediction
@@ -6596,6 +6662,7 @@ baseline back to exactly the 1 known 11C-owned red.
   with no scroller, fixed to flex with the three display pins updated; the
   picked-seed/armed-knob forced-colors hue-only state, fixed with the
   base.css redundant-underline arm; the two dead imports in
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farm-pin-palette-split.
   wellfed_tooltip_view.ts). Notes recorded: the map-vs-minimap farm-pin
   palette split (oak vs station tokens; family-consistency backlog),
   farm_event_feedback.ts's five raw hex log colors beside the tokenized
@@ -6604,6 +6671,7 @@ baseline back to exactly the 1 known 11C-owned red.
   pinned in tests/managed_window_close_registry.test.ts; cheap to close at
   a maintainer's option), targetCastDisplayLabel returning raw ids for
   non-farming system casts (in-module documented scoped gap; the one-line
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as entity-display-module-consolidation.
   fix is a maintainer call), the entity_display two-module family
   (consolidation candidate), and the feast-flourish prewarm tension
   (carry item 16).
@@ -6624,6 +6692,7 @@ hardening: CSS-half pins, ps-knob markup binding, comment-stripped scans,
 symmetric needles). Review chain: fresh reviewer over the first four (PASS,
 3 low, applied), qa-checklist LAST (READY, 0 blocking, 5 should-fix + 3
 nits, ALL applied), test-coverage-auditor over the new pins (3 should-fix +
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as brace-walk-comment-skip-quest-marker.
 5 nits, ALL applied or recorded; its F6 brace-walk comment-skip remark is a
 shared-idiom note on the quest_marker precedent too, recorded not fixed).
 GATE_MAX_WORKERS=5 node scripts/gate_select.mjs at 44bb54541d: mode=full
@@ -7001,6 +7070,7 @@ Fed is transient across save by design).
   obligation arises (no item id added, removed or renamed). Its deeds (7)
   and reliquary (3) reds matched the 11b parked rows exactly.
   Two INFOs recorded rather than acted on: harvest_feast is an eighth,
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as harvest-feast-wiki-effect-cell.
   INDIRECT well-fed carrier whose wiki craft row ships no effect cell
   (pre-existing Phase 12 shape, and the in-game feast tooltip does state
   it live); and the re-tune drops the shared feast's party payout from
@@ -7072,6 +7142,7 @@ findings itself rather than taking them on trust.
   over, and the only-three-named-reds box carries the in-phase i18n regen
   deviation. The gate judged the count-free resolution the better one.
 - WORKTREE HYGIENE, noted by three separate agents: running
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as guide-test-regen-dirties-tree.
   tests/guide.test.ts REGENERATES src/guide/content.generated.ts in place
   and dirties the tree. Every agent restored it; the phase tip is clean and
   the committed artifact stays deliberately stale for 11d.
@@ -7203,15 +7274,18 @@ wellfed.ts ("copied off"), sim_i18n.ts, icons.ts, farm_recipes.test.ts, the
 builder header's src/sim scope, profession_items.ts's 17-stamina phrase, the
 flask-band test naming the bear's duplicate rung.
 DECLINED WITH REASON: a feast-dish-strictly-below arm on the dominance sweep
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as dominance-sweep-feast-dish-arm.
 (architecture note): the shared feast is a delivery VEHICLE whose dish is
 already in the sweep, and 11k's apex feasts will serve the apex plates by
 design (equal to the apex, never above), so the arm would red the day 11k
 ships; recorded in the sweep's own comment so nobody adds it.
 RECORDED, NO CHANGE: TimedStatBuffPayload.kind is the full AuraKind
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as timedstatbuffpayload-kind-width.
 (pre-existing, shared with the elixir family, carrier set pinned to seven);
 the wellFedAura fallback reads "Grants Well Fed" now that every record's aura
 is 'Well Fed' (the never-silent degradation path, no live kind off-map); no
 interact affordance says whether a press hits the feast or the bed
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as feast-bed-press-affordance.
 (gameplay ruling 11b-R3c-1, both directions pinned); the consumable ladder
 has no docs/design home, its derivation lives in this PRD, the def comments
 and the pins (maintainer call); the one unscoped commit subject
@@ -7626,6 +7700,7 @@ cannot self-vacuate).
   after). INFO applied: the tool's walk now matches the enforcing pin's
   predicate CLOSELY, not exactly (Phase 11d QA correction, two residual
   asymmetries, neither live in this tree and neither load-bearing for
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as shard-tool-walk-predicate-asymmetries.
   partition completeness: the tool applies the dot-prefix skip only in the
   directory branch, so a dot-prefixed .test.ts counts for the tool and not
   the pin, which is the pessimistic direction; and the tool requires
@@ -7683,6 +7758,7 @@ cannot self-vacuate).
   967/971, 33 at 968/972; the true invariant, ours == base and merged ==
   theirs == base + 4, held in all 67); the additive-compose and
   min-length-array residual holes recorded for the next re-record's
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as golden-composition-residual-holes.
   reader.
 - DB-PERFORMANCE: verdict "6 P2 bound-fidelity findings, none a production
   regression". ALL SIX APPLIED OR RECORDED: F1 the fourth tool-effect slot
@@ -7694,6 +7770,7 @@ cannot self-vacuate).
   term recorded in the bound note and carried to Phase 12 as bound-policy
   work (phase-12-perfecting.md, both numbers named); F4 the exponential
   survivalRoll width noted at the fixture; F5 logging joins the non-zero
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as survivalroll-width-bound.
   columns (0.25) with the zero-blindness argument stated once; F6
   craftDaily's structural-vs-content bound gap recorded in the note. Its
   TOAST/WAL assessment recorded: the 17 KiB pin is structurally sane, the
@@ -7858,6 +7935,7 @@ row also gains its THIRD parent pin (the release's 12660 against a 12518 file).
    the sfx row's warrant is now the arithmetic (265 + 0 + 5) rather than its own
    observation, the one PREDICTED cell justified by a green run.
 4. The blob +490 is now split honestly: 433 DERIVED, ~57 an unmeasured residual
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as blob-57-byte-residual.
    whose attribution cannot be falsified as phrased, carried to Phase 12.
    Separately, FARM_RECIPES is fourteen rows INCLUDING recipe_growth_tonic, not
    thirteen plus one.
@@ -7950,6 +8028,7 @@ hoisting it to a named boolean would have blinded the census to farmReady.
   identification, not just the value.
 - Phase 12 inherits three measurement debts, all bound-policy: the ~57-byte blob
   residual, the whole-character maximal measurement (38.9 KB was taken with the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as whole-character-blob-remeasure.
   professions block about 2.5 KB smaller, so the merged carry is roughly 41.4 KB
   and the headroom ratio about 3.2x, an arithmetic carry and labelled as one),
   and the rift-payload and craftDaily-clamp terms already carried.
@@ -8045,6 +8124,7 @@ model at 11d QA; goldens never did. The finding is baked into the committed
 goldens, so golden_composition now exits 1 for the rest of this branch's life,
 and every remaining phase (11f to 11k) takes its own release sync, so any sync
 touching a golden reproduces it. The deliverable is to give golden_composition
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as golden-composition-release-parent-model.
 the same auto-derived release-parent set symbol_census already builds
 (deriveSyncRefs off the first-parent merge chain) and to treat a leaf that
 matches a release parent as composing. PROPOSED to the maintainer, deliberately
@@ -8540,6 +8620,7 @@ the other way are written on the deed row for the maintainer.
 
 TWO FINDINGS DECLINED, with reasons:
 - The per-crop mark is written inside the `zoneId !== undefined` guard, so a
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farm-crop-mark-zoneid-guard.
   bed that failed to resolve a zone would drop the crop mark too. Left as is:
   the guard is documented impossible-today defense-in-depth, both marks come
   from the same hook, and splitting them would add a second belief for a case
@@ -8590,6 +8671,7 @@ bank, vendor buyback, market listings and mail parcels. So the exposure is those
 THREE arms, and the third is the smallest and the only self-healing one.
 
 THE NOTE: do not roll a realm back across this change with live farmers, and do
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as content-id-rollback-one-way-door.
 not run a mixed fleet during the deploy. This is inherent to the id-allowlist
 model rather than a defect introduced here, which is exactly why it is worth
 writing down: the model makes every content-id addition a one-way door for the
@@ -8940,7 +9022,9 @@ exception col_farm_roster takes.
 
 CUT, with reasons, not carried as future-PR items:
 - The three render-perf SHOULD-FIX items (a prewarm home for the farm crop and
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farm-patches-gpu-producer.
   feast variants, the shared depth material outside the settle census, the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farm-depth-material-settle-census.
   orphaned FarmPatchVisuals.dispose) are all on code OUTSIDE this phase's diff:
   two are pre-existing branch farm-render work and one is the release's own new
   module. Fixing them is a real render change needing its own measurement, and
@@ -9451,6 +9535,7 @@ distinguishable from a constant.
   tree. Predates this phase, farming's own fine-twin question, so the R18
   displacement arm scopes to the base herb line and says why.
 - No parity golden covers a heroic FIVE-MAN clear, before or after this phase.
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as heroic-five-man-parity-golden.
   The dungeon append is the lowest-risk possible position (a tail group after
   the ungrouped rows, shifting nothing), and it is covered instead by a table
   pin plus a drive over 120 real heroic clears. Recorded as a coverage boundary,
@@ -10233,6 +10318,7 @@ defect: the alternative is a rung-0 row where the crop is the body.
 ### One visual note owed at PR time
 
 recipe_marlows_grand_roast and recipe_seasoned_stock now carry SIX reagent
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as six-reagent-bill-pr-screenshots.
 entries each, and they are the first six-reagent bills in the game (the previous
 maximum across all 149 recipes was five). Every render path is dynamic and
 nothing caps the count, and the roast's tooltip was composed and read by hand,
@@ -10544,6 +10630,7 @@ something never ruled.
 
 ### FOUR OBSERVATIONS RECORDED, NOT ACTED ON
 
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-craft-table-baked-english.
 - The wiki craft table renders material NAMES in baked English in every locale
   (content.generated.ts carries English names, interpolated into a t() format
   string). Structural to that generator and pre-existing; 11g adds nine such
@@ -10810,6 +10897,7 @@ firing rather than being remembered.
 ### ONE FINDING CUT RATHER THAN FIXED, with the reason
 
 The gate reviewer raised that NOTHING MACHINE-CHECKS THAT A CARRIED WEIGHT IS A
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as carried-weight-machine-check.
 REAL MEASUREMENT: the provenance is prose, and the shape pin only checks that
 `files` matches the row count and that each value is a plausible duration. A
 future contributor hitting this same red after a sync could append rows valued
@@ -11367,8 +11455,10 @@ because this exact compression bug shipped once before; the wiki materials cell
 wraps between entries under the .guide-prof-mat rule the 11g QA added; and the
 bag action-menu cost line cannot be reached at all. Two exposures are recorded as
 owed rather than fixed here, both pre-existing and both outside a content phase's
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as hud-tooltip-bottom-clamp.
 scope: the HUD tooltip clamps horizontally and at the TOP but has no bottom
 clamp and no max-height, and the crafting reagent entry has no white-space:nowrap
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as crafting-reagent-nowrap.
 where its wiki twin does, so a long name can break mid-entry. The tooltip fix
 would land in src/ui/hud.ts, which sits at its ratchet ceiling with ZERO slack,
 so it costs an extraction or a maintainer ceiling decision. This phase is LOCAL
@@ -12082,6 +12172,7 @@ than settled.
 
 ### THE SCOPE BOUNDARY
 
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as professions-doc-apex-crafting-amendment.
 This phase amends `docs/design/professions.md` for the GATHERING half only.
 The apex CRAFTING tier's own amendment belongs to Phase 16's content surface
 sweep, which is inside this packet, so pointing there is a sequencing
@@ -12939,6 +13030,7 @@ questions above them.
 THE STRUCTURAL FIX IS THE ONE THAT MATTERS. `src/guide/pages/professions_faq.ts`
 now names its ten answer keys in a `FAQ_ANSWER_KEYS` list instead of building
 `faq.a${n}`, which is what made `a6` and `a7` re-keyable at all. The QUESTION
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as faq-question-keys-positional.
 keys are still indexed and that is a deliberate line: none of them states a
 mechanic, so none can go stale the way an answer can. What they CAN do is what
 just happened, which is why the re-authoring below is the maintainer's and not a
@@ -14182,6 +14274,7 @@ converted to the additive `...(await importOriginal())` form the repo already
 uses in 37 other files, and the immunity is DRIVEN (a third icons import leaves
 both green where it previously threw). SIXTY-FOUR other test files still carry
 the bare form; sweeping them is its own task, not this packet's, and it is
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as bare-vi-mock-factory-sweep.
 recorded here so it is found rather than rediscovered.
 
 ### THE HANDOFF TO PHASE 11i QA, AND THROUGH IT TO 11j
@@ -14443,6 +14536,7 @@ the tests ran.
   total is summed FROM THE LITERAL on purpose, to catch a careless edit to the
   map. The comment says exactly that. Working as designed.
 - "Two new test titles carry regex metacharacters, so a vitest -t selection over
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as test-title-regex-metacharacters.
   them silently matches nothing." True of the titles and true of roughly 4,967
   test titles in this repo. Pre-existing convention, not this phase's regression.
 - "The record leaves two false premises standing in phase-11h-qa.md." Already
@@ -14456,6 +14550,7 @@ the tests ran.
   claim is a copy decision beyond a QA fix round, and it would be a third
   reworded value to fill.
 - Pinning "nothing in src/ or server/ slices a reagent list" with a source scan.
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reagent-slice-source-scan-pin.
   That is the source-scan blind-spot class the packet's own gotcha catalog warns
   about, and all four render surfaces were verified by reading the real code.
 - src/ui/hud.ts:5601. The mousemove tooltip path clamps left with a bare
@@ -15520,6 +15615,7 @@ reading exactly as cheap to settle as it was.
 - The crop at the accent cap of 2. Legal, and refused because it would have
   grown an open maintainer item by three rows.
 - A distinct apex feast prop, a role-pick interaction at the table, raid-scale
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as apex-feast-distinct-prop.
   charges, a second oncePerDay row, any power on the deed, differentiated feast
   bills: all inherited from the phase file's own list and none re-proposed.
 - Minting six one-word line-label keys on the wiki page when the catalog
@@ -15812,6 +15908,7 @@ THREE RESIDUES, all applied:
   comment shrank and the ceiling is re-measured DOWN.
 - **THREE UNUSED IMPORTS THE MERGE ITSELF INTRODUCED**, each where one parent
   deleted the use and the other kept the import. The fourth flagged import is
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as inherited-unused-import.
   inherited debt (import-only at base, ours, theirs and merged alike) and was
   left, with the reason recorded rather than swept in.
 - **THE hud.ts CEILING CARRIED TWO LINES OF SLACK** against a row whose own
@@ -16273,6 +16370,7 @@ rather than decided:
   gorrak), a tie the QA counted; the tie-break is that galecrest is a level-20
   zone where a rung-0 tailoring row is the honest rung for a 6-copper drop.
 - A per-item `hudChrome.materialHint.*` lead for any of the nine.
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as per-item-material-hint-lead.
 - Editing `col_junk_drawer`'s trigger, or sourcing the wildlife pack, inside
   this phase: both are the maintainer's.
 - Pricing non-gathered reagents in the mastery model (the trophy rows win
@@ -16483,6 +16581,7 @@ row) is recorded above as a probe, and the frozen run is this one.
   through their recorded reasons; the `TROPHY_RECIPES` header carries the
   greppable record, and the pool the explorers computed is reproducible from
   `ALL_RECIPES` and `ITEMS` in one pass. The record's domination claims (the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as domination-claims-unpinned.
   tusk's above all) are selection results over catalog data stated as
   conclusions; nothing pins them because the outcome is the ABSENCE of a row,
   so they rot silently the day a stronger uncrafted weapon lands in the band.
@@ -16560,8 +16659,10 @@ evidence took it to 249, accumulation, not a miscount), and the Phase 11e
 CLOSED paragraph in docs/design/deeds.md sitting under the heading below the
 waiver it closes. All four applied (fab171092f). Two release-side notes stay
 upstream: two browser fixtures hand-build pre-heraldry player-frame markup
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pre-heraldry-browser-fixtures.
 (green, synthetic, not this branch's), and shard-weight coverage reads 0.9547
 (3032 of 3176; two release test files carry no row; the standing fix is the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as shard-weight-ci-harvest.
 CI harvest, ruling 11d-U1-SHARD). The 11l BUILT ledger's "fifteenth sync was
 a no-op, release still at efb1220e85" paragraph is superseded by this one.
 
@@ -16827,9 +16928,11 @@ tables, so it is two counters. Applied in the tenth and eleventh commits.
   quiver sit in the offhand band, out of register). Commit bodies are
   immutable history here; the record is the source.
 - The mobile item-action menu's Sell route now raises a second confirm for a
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mobile-sell-double-confirm.
   promoted trophy: the flow every common item already has, with no bypass;
   recorded, not changed.
 - The reword-staleness class is still ungated by design (srcHash always
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reword-staleness-gate.
   equals enHash); the two manual 18-overlay sweeps this QA performed were
   the only available answer.
 
@@ -17769,9 +17872,13 @@ row's reachable margin moved 88-vs-80 to 83-vs-80 because a gills
 harvest signs the scale (the gold-negative invariant is machine-checked
 and green either way; whether the intended margin should move is a
 formula-owner's call no test knows). Release-owned residue the audit found and this branch left
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as release-owned-residue-cleanup.
 (the Sowfield sentence in the guide catalog, the dead crowd-roar SFX, the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as dead-crowd-roar-sfx; sowfield-guide-catalog-sentence.
 'sport' layout-form token, the minimap forge-coordinate comment, the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as minimap-forge-coordinate-comment; sport-layout-form-token.
 never-emitted tutorialGreeting union member, the gathering.test.ts '188'
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tutorial-greeting-union-member.
 prose the migration corrected on this side). And for Phase 11n, at its own
 STEP 0: the both-sourced set re-derives to nine ids so its STOP rule fires,
 and elixir_of_the_bear's Mirefen drop is 0.8 percent (both written into its
@@ -17786,6 +17893,7 @@ file).
 - "Silk is only available in the starting area": the same fix; the two
   hollow members do not serve this report, mire_widow does.
 - "Homespun Cloth drops heavily from Mirefen mobs": measured at 7
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as homespun-cloth-abundance.
   templates / 4 zones / density 58, all reachable, the floor met before the
   phase; NOT changed, because the mechanism is tag membership, not a drop
   rate, and its abundance is relative to silk's scarcity, which the spread
@@ -17971,6 +18079,7 @@ silent-refusal arm). 16 of 16 mutants killed round-wide.
 
 ### RECORDED, NOT ACTED, each with its reason
 - The zone-membership half of the reachability predicate is vacuous by
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reachability-zone-arm-vacuous.
   construction (zoneAt clamps every overworld query to some zone); the
   plane arm's zoneContaining assertion is the working guard. Known fact
   recorded, no action.
@@ -18703,6 +18812,7 @@ passed inside the frozen run.
   summaries predating the reword (no false claim; pre-existing drift,
   deliberately untouched).
 - The bestBy near-tie-chain unreachability claim (dev_kit.ts) is one
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as dev-kit-bestby-tie-chain-claim.
   content addition older than its last verification; the architecture
   review's fresh 87-pair census found no reachable chain.
 - The wiki seed (mediawiki/) carries pre-11o tiers and levels for the
@@ -18920,6 +19030,7 @@ spoiler-altitude judgment call and nothing it says is false).
 The materialsBody omission; the trophy-trio band-vs-mover precision
 note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
 placement note; the amendment-dating shortfall (corrected by this
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as amendment-dating-shortfall; refusal-control-placement.
 record, the homes deliberately not churned); the liveKeys spellPower
 false-red trigger (deliberate, documented at the pin).
 
@@ -19036,6 +19147,7 @@ module.
   13/15, thoriumscale_leggings 13/15), the bound-has-teeth arm, and the
   reliquary gear-capable pins (7, exactly ['copperlens_ocular']) all
   stand unmoved. The Jack 'worse' term on the head start is dead code (a
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as jack-worse-headstart-dead-term.
   Jack's rare ceiling refuses first); kept for gate symmetry, recorded.
 - ItemInstancePayload gains `perfecting` (integer 1..3; deleted at the
   stamp) beside the phase-10 `perfected`; item_instance_load.ts gains
@@ -19146,6 +19258,7 @@ module.
   trade-offer and guild-bank head-start visibility (each pipe's standing
   doctrine); the enchanted-only unconfirmed deny reading
   already_enchanted; the golden's structural blindness to zero keys.
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as parity-golden-zero-keys.
 
 ### PINS (predicted before running, observed after)
 world_api_parity 332/87/245/33 -> 334/87/247/33 (both union arms 334);
@@ -19345,6 +19458,7 @@ the merge before the audit fan-out ran. DATABASE_URL unset throughout.
   measurement out of tree; both parity arms host-symmetric and
   one-host-drop-failing). 3 should-fix and 7 nits, all applied or
   judged (below); its no-change-needed list (the two unreachable
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as test-lane-no-change-needed-list.
   defense-in-depth head-start terms, the rolled-spread distinguisher no
   shipped content can produce, the shared-constant boundary pins with
   their literal mitigations) is JUDGED and binds.
@@ -19425,11 +19539,13 @@ the end.
 
 ### JUDGED THIS ROUND, do not re-raise
 - The trade-substitution class (mid-trade instant payload mutators
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as trade-substitution-class.
   shipping a marker-differing twin through the documented fallback):
   pre-existing posture, fix home is the trade layer, recorded below.
 - The skillMet view discriminator: stays prose-plus-ledger until the
   phase 14 consumer exists.
 - The parity walk staging three of six deny arms (its coverage sentence
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as perfecting-walk-deny-coverage.
   is honest; all seven arms carry direct draw counters; re-minting the
   golden for optional coverage is churn the re-mint discipline avoids).
 - item_instance_load.ts's heavier import graph (no cycle, call-time
@@ -19437,7 +19553,9 @@ the end.
 - perfecting+perfected coexistence surviving the per-field load bound
   (no legal writer, no corrupting consumer, cross-field arms would
   break the drop-only doctrine); boundTo digit-width floor; the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as boundto-digit-width-floor.
   apexRecipeFor linear find (behind the O(1) def gate and the command
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as apex-recipe-linear-find.
   lane).
 - The test lane's no-change-needed list and the five build-ledger
   judged rulings, all honored unbroken.
@@ -19569,6 +19687,7 @@ file's own acceptance overturns (retired dated, D13-4).
   regions (provably exhaustive: promoted copies are permanently
   soulbound), online refusal with KICK-THEN-CLEAR as the decided
   operator flow (a live-session sim action was considered and CUT),
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as live-session-name-strip-cut.
   and a pre-save online re-check closing the reconnect race. The
   banlist stays operator-tunable (USERNAME_BANLIST/_FILE; the cache
   key folds mtime+size so an edited file takes effect without a
@@ -19600,6 +19719,7 @@ file's own acceptance overturns (retired dated, D13-4).
   inscriptionist scribes it FOR the promoter), NOT oncePerDay (blob F6
   stays a no-op), no noDiscard (judged: matches its named arm), a
   deliberate non-material (the taxonomy and bag-census allowlists
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deed-of-making-nodiscard.
   carry the rationale).
 - D13-7 THE DEED: prog_legendmaker ("The Legendmaker",
   naming-audit-cleared), progression, renown 50 (top-band prestige:
@@ -19707,13 +19827,18 @@ fresh)
   precedent); the masterwork seal on the legendary lines (phase 16
   owns the orange art); the offline host running shape-only (an
   offline name never reaches another player); the market Collect-tab
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as market-ledger-rows-def-only.
   sale LEDGER rows staying def-only (a past transaction, not a held
   copy); the name screen refusing the whole frame on an unperfected
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as name-screen-whole-frame-refusal.
   copy (conservative-safe, commented); the itemName computed before
   the dedupe claim (pure lookup); the double deny-head run per
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as double-deny-head-run.
   promotion (pure, draw-free); the two markItemDiscovered routes (the
   established idiom); the equipCandidateIndex count-0 theoretical; the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as equipcandidateindex-count0.
   retired-id per-cell targeting consequence (commented at the
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as retired-id-per-cell-targeting.
   validator); the peer card showing no unique tag (the D13-3
   consequence); deed_of_making without noDiscard; the writ outside the
   inscription pair convention (the exact-roster pin owns the census).
@@ -19786,8 +19911,10 @@ exception.
   needs resetDay), so the deed is unearnable there (a pre-existing
   property; deeds are not an RL surface).
 - The invalid-index UI mirror can still light-then-refuse on a STALE
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as stale-drag-light-then-refuse.
   drag when bags shift mid-drag (the sim refuses authoritatively).
 - maybeAutoEquip stays def-only on the unique peek (no reachable state
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as maybeautoequip-def-only-peek.
   hits the gap: promoted copies are bound and never arrive via a
   granting channel).
 - Phase 16 owes the orange render visuals, the legendary card art, and
@@ -19986,6 +20113,7 @@ end to end (Phase 12, Phase 12 QA, Phase 13).
   every deny arm, the exact zone count, the 32/33 boundary, the literal
   realm); its two infos executed (the catalog sha's pre-append
   reconstruction made mechanical; server/craft_activity.ts's behavior is
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as craft-activity-dedicated-suite.
   covered end to end through the professions activity suite, the paired
   suite convention recorded rather than a thin twin minted).
 
@@ -20096,6 +20224,7 @@ The throwaway worktrees were removed after the tables closed.
   copies), so only the single-copy arm may name a copy, and that arm
   destroys exactly the copy it names, by target, at its live index.
 - The bagged enchant-target rows keep the def name: EnchantTargetRow
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as enchant-target-row-copy-identity.
   groups bagged copies by item id with no per-copy identity; giving them
   one is a view-core redesign, not a QA fix.
 - msg_lanes over-meters perfect_item frames whose name field is
@@ -20111,6 +20240,7 @@ The throwaway worktrees were removed after the tables closed.
   autosave over a landed strip; the operator answer stays suspend-first
   (DEPLOY.md).
 - characters.ts's rename signer sweep and pbe_boost.ts remain UNFENCED
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as unfenced-offline-writers.
   offline writers; saveOfflineCharacterState is a drop-in when wanted.
 - The banlist stat and read stay synchronous on the realm loop, held to
   one stat per second: the hold bounds FREQUENCY, never duration, so a
@@ -20120,25 +20250,32 @@ The throwaway worktrees were removed after the tables closed.
   through the cached_read seam) is a redesign the banlist suites'
   synchronous shape resists, left as a maintainer decision.
 - The heavy-self dirty flag is set at the top of the dispatch switch for
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as perfect-item-dirty-flag.
   every allowed perfect_item frame (pre-existing; the lane improved the
   named-frame rate 15x).
 - The clear-item-name refusal path re-loads the whole blob where a
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as clear-item-name-select1.
   SELECT 1 would do (admin-rare).
 - The guild-name screen rides the 30/s command lane (string-bounded,
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as guild-name-screen-lane.
   fee-gated, one-in-flight); its syscall half is closed by the stat hold.
 - The world-drop gesture resolves its copy at DROP time by index and id,
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as itemdragstate-invslot.
   not by reference at drag START (the pick-up-to-prompt window every drop
   action shares); carrying the InvSlot on ItemDragState is the airtight
   follow-up.
 - The wire's one-shot discard is index-addressed (the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as index-plus-id-wire-class.
   sell/deposit/lock class): under mirror divergence the server may
   consume a different COPY of the same id, never a different id.
 - The trade row's label keeps the def name (a promoted copy is bound and
   cannot reach the table; the looser persisted-load arm is the one
   theoretical divergence, stated in the comment).
 - Bank search and name-sort (itemNameOf) do not match a chosen name yet
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as bank-search-chosen-name.
   (a behavior extension, not a regression).
 - No E2E scripts the operator kick-clear-retry flow (the units plus the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as kick-clear-retry-e2e.
   pg fence suite cover the semantics; a live-server script is a follow-up
   decision).
 - The perf tour and the mobile E2E were not run this round (no layout or
@@ -20147,6 +20284,7 @@ The throwaway worktrees were removed after the tables closed.
 - The Discord activity-card residual stands (a stripped name survives in
   already-published embeds; manual takedown).
 - The resolveLegendaryPromotion dead gate is a comment, not code (the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as resolve-legendary-promotion-gate.
   two Sim wrappers own the gate; a direct headless caller would bypass
   it).
 - The database-performance, cross-platform-sync, and architecture
@@ -20422,6 +20560,7 @@ Wave-1 fan-out (five fresh reviewers over the committed range):
   or a compile gate with the static bed as stand-in, owned by a render
   diff (recorded at the module and here).
 - The commission board never calls markDialogRoot and opens
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as commission-board-dialog-semantics.
   display:block against the family's flex-column shape (pre-existing;
   completing its dialog semantics needs Hud-side focus wiring).
 - The index-plus-id pin cannot distinguish two copies of the SAME
@@ -20432,11 +20571,13 @@ Wave-1 fan-out (five fresh reviewers over the committed range):
   0.41.0 release fill (M16 non-Latin fills landed; Latin locales
   pending as usual).
 - hud.ts still spells ~48 tone hexes inline in non-professions arms;
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as hud-inline-tone-hexes.
   they migrate onto named tones as headroom allows.
 - The .mkt-ico pattern mark stays deferred (both corners occupied; a
   third mark is a real sub-feature, verified again this phase); the
   voidbound tome GLB (phase 09 follow-up) stays open, out of this
   phase's UI scope; the flask_<kind> buff glyph still needs the wire
+  RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as flask-buff-glyph-wire-marker.
   marker (cross-platform) and proceeds on its own merits.
 - The crafting tab underline #cc9a3c and the remaining wash/scrim
   literals await the DESIGN.md foundation-phase tokens (enumerated in
@@ -20445,6 +20586,7 @@ Wave-1 fan-out (five fresh reviewers over the committed range):
   contract change; hud_perf_budget green incl. the counted new driver);
   the QA twin should mark them VERIFY.
 - The Perfecting window has no rail tile or keybind (togglePerfecting
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as perfecting-rail-tile-keybind.
   is the surface for one; the crafting button is the entry today).
 
 ### DESIGN.MD COMPLIANCE (stated with evidence)
@@ -20837,12 +20979,15 @@ focus key.
   edit the overlays" contributor rule; the fills are machine-anchored on
   the maintainer's behalf (below).
 - The legendary sub-cap (one legendary Masterwrought worn) stays off the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as legendary-subcap-tooltip.
   hover tooltips: the built shape scoped cap visibility to the 2-slot
   readout, no decision names the sub-cap's tooltip silence, and the refusal
   line speaks it at act time. CUT with that rationale.
 - The Harvest Journal's String().padStart seconds: pre-existing, untouched
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as harvest-journal-padstart-seconds.
   by the phase, cited precedent; no action owed this phase.
 - The raw itemId fallback feeding the status region: the repo's existing
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as status-region-itemid-fallback.
   idiom, unreachable from well-formed content.
 - The professions barrel stays a whole-family re-export consumed by tests
   while production deep-imports (the action_bar/chat style); recorded in
@@ -20855,6 +21000,7 @@ focus key.
 - The 'ONE instant' loop pin cannot fail under frozen fake timers by
   itself; the Date.now-advancing arm beside it is the decisive one.
 - sameSelectedCopy refuses a same-cell pair whose same-id count moved (one
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as same-copy-refusal-uncued-edge.
   uncued edge; the naming dialog left open but unlocked): the safe
   direction, pinned, stated in the window's prevSelected doc.
 - A same-id ARRIVAL while an unselected row holds keyboard focus moves the
@@ -20882,6 +21028,7 @@ focus key.
   cannot be unbound) is the release fill's reword lane.
 - The commission fee-floor ruling (the Phase 14 fired stop rule) stands.
 - THE PERF ANCHOR: hudHotDomWrites moved 706 to 1014 on a release-side,
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as perf-anchor-hudhotdomwrites.
   branch-neutral three-way A/B; which release change between the
   2026-08-08 capture and cb10309ba6 established the extra desktop writes
   is unmeasured (a clean cb10309ba6 capture would say). The perf program
@@ -20889,6 +21036,7 @@ focus key.
 - origin/release/v0.41.0 moved to d3f8bae369 (PR #3728) during the QA:
   Phase 15's STEP 0 sync + release-merge-audit.
 - scripts/mobile_visual.mjs is stale since 06e2fdd978 (its
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mobile-e2e-scripts-stale.
   page.click('#mobile-more') targets a tabindex -1 gesture-menu item) and
   scripts/mobile_hud_overlap_audit.mjs's quest injection, keyboard var
   read, and asset-preload checks are stale against release-era changes:
@@ -20903,6 +21051,7 @@ focus key.
 - The .prof-track-step.filled 0.28 bevel joins the recorded literal set
   (reconciled in the professions section header against .prof-bar-fill).
 - The roving-tabindex deferral (farming/state.md row 511) now spans two
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as roving-tabindex-radiogroup.
   windows: the Perfecting radiogroup replicates the plant-sheet shape.
 - The two bare-named dialog modules (legendary_naming_dialog.ts,
   input_dialog.ts) sit outside the painter gate's PAINTER_FILE_RE sweep,
@@ -20920,6 +21069,7 @@ focus key.
   reconcile at the parchment retune; src/ui/CLAUDE.md's interface-unlock
   block changes no contract this QA audited against.
 - The window suite's ECONNREFUSED ::1:3000 startup noise (happy-dom
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as vitest-econnrefused-noise.
   resource fetch against its default origin) is a tooling pass for whoever
   owns the vitest startup.
 - The commit messages of 346af6abc9 and 4a03c6fdc6 carry claims later
@@ -21110,6 +21260,7 @@ by this phase.
 Method per docs/design/spell-balance-framework.md, with two notes the
 framework's own text forces: its "Existing tools" table is STALE (all
 three tools it names build their reference character from the class
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as spell-balance-framework-stale-tools.
 starter kit and cannot accept a gear kit at all; the repo's gear-aware
 probe family is what implements its profiles), and it names no target
 level while R5 names two protected assets, so both are fixed in the doc.
@@ -21160,8 +21311,10 @@ Perfecting puts at most +1 on the lead stat per piece.
 
 ### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
 - The phase file's "11e decision 6" is ruling 11g-D-C and landed in 11g.
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as 11e-decision-6-stale-label.
   The content is correct; the label is stale.
 - server/pbe_boost.ts gives a boosted prot tank a CASTER belt
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pbe-boost-caster-belt-tank.
   (spiritweld_girdle wins the tank waist: a tank role adds any armour to
   identity, so the rating term breaks the tie), costing 60 hp, 9 str and
   6 sta for 9 dead int. Server scorer logic, out of this phase's scope;
@@ -21177,6 +21330,7 @@ Perfecting puts at most +1 on the lead stat per piece.
   keeps everything, deliberately and pinned. Closing it needs a load-time
   bench, which is sim logic and out of scope.
 - The druid balance harness drifted when the packet's defs landed (its
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as druid-balance-harness-drift.
   bear arm takes 12 percent more damage) and was never re-pinned; its
   assertions are "> 0" so nothing reds. The per-class gear-identity pin
   added this phase reds on the CAUSE instead.
@@ -21185,6 +21339,7 @@ Perfecting puts at most +1 on the lead stat per piece.
   catalyst a day or a hundred grey-rate crafts. Cannot be closed by tuning
   down; new content is out of scope.
 - The public wiki prints craft gain boundaries above the reachable cap (63
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-craft-gain-clamp.
   of 166 rows, all 12 skill-125 rows print all three; 63 of 170 after the
   2026-08-29 v0.41.0 sync brought the release's four tailoring bag recipes,
   numerator re-verified unchanged). The fix is a clamp
@@ -21668,6 +21823,7 @@ coverage-auditor charter) plus per-finding adversarial verification under
 three lenses (two for nits): 168 agents, 104 findings, ONE dissenting vote
 in the entire set (the floors-cannot-close note, argued already-recorded;
 judged against the dissent and applied as one clarifying sentence). The
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as coverage-auditor-empty-dispatch.
 typed test-coverage-auditor returned EMPTY on first dispatch (the third
 occurrence of the pattern this packet) and was re-run general-purpose with
 the charter inlined, per protocol. Round-2 fresh readers (three, plus a
@@ -21749,15 +21905,18 @@ the two tautological self-comparisons found by reading and replaced.
    non-reproducible-throwaway caveat as the 7.69/6.44 figures, symmetric by
    design; re-derivable in about a day from the named committed parts.
 7. The smoke floors catch dead or gutted rotations, NOT a single renamed
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as smoke-floor-renamed-ability-gap.
    ability (castAbility no-ops silently); comments claim exactly that, and
    the rogue floor sits at 150 between dead 97 and live 198.
 
 ### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
 1. Frozen phase packets (11b/11c/11h/11i and the dated ledgers) still state
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as phase11c-pretune-premise-note.
    the pre-tune flask 15 and 21-stamina premises as their own era's facts:
    historical by the blanket declaration at the CONSEQUENCE paragraph;
    optionally a one-line dated outcome note at phase-11c-food-and-feast.md.
 2. PLAYER_DUMMY_REST_HP_FRACTION is only self-compared (pre-existing,
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as player-dummy-rest-hp-self-compare.
    outside this span).
 3. The guide flask prose is pinned in English only; the five non-Latin
    overlay fills ride the release fill lane.
@@ -21773,6 +21932,7 @@ the two tautological self-comparisons found by reading and replaced.
 8. The 897 s guard is one second stricter than its own arithmetic needs;
    fails safe.
 9. mediawiki/seed/pages.xml predates the packet entirely (re-verified; the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-seed-regen-obligation.
    11n QA's release-time wiki:seed regen obligation stands).
 
 ### SESSION RECORD
@@ -21942,10 +22102,12 @@ a6cac2e226).
 
 ### JUDGED REFUSALS (the a8e3111c2f body's "three", recorded here)
 1. The per-frame emit-scale micro-cost (three Math.sqrt per glowing
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as regalia-emit-scale-cache.
    on-screen player): a cached quantized scale would add a staleness
    surface for a trivial gain; refused, the cost is bounded and the
    reviewer rated it trivial.
 2. The admin page's 403-as-generic-failure line: matches the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-403-generic-failure.
    Overview/TopHolders sibling convention exactly; changing one page
    against its family is worse than the nit.
 3. The 25 admin marketMetrics keys shipping as pending in 24 locales:
@@ -21955,6 +22117,7 @@ a6cac2e226).
 
 ### RECORDED, NOT ACTED (maintainer reads)
 1. The admin market-metrics page ships WITHOUT a screenshot: the panel
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-screenshot.
    renders empty without staged market activity, faking listings was
    ruled out, and the capture stack needs the SHARED :5433 dev database
    a concurrent session may own, so bouncing it for an empty-state shot
@@ -22058,6 +22221,7 @@ a6cac2e226).
    cached read, no SQL, no new table), the registry-only RouteDef behind
    analytics.read, and the Market Metrics dashboard page with every
    operator string through the admin catalog. SOLD VOLUME IS A RECORDED
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-sold-volume-metric.
    CUT: the sale log is a per-seller pending ledger cleared on collect,
    so an honest volume metric needs a new accumulating store, and the
    phase's stopping rule answers by storing nothing. The essence bucket
@@ -22288,20 +22452,25 @@ tour runs added to the evidence, the two-bucket fixture).
 
 ### JUDGED REFUSALS (this round's, binding)
 1. The adapter-object weld arm and the biome-ignore trio on the three
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as prewarm-adapter-weld-arm.
    prewarm members: both would grow the zero-slack renderer.ts ratchet,
    and the strengthened full-signature weld already pins the members.
 2. Serialize-once on the admin metrics response: the overview/activity
    siblings share the per-request stringify shape; a retrofit belongs to
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-serialize-once.
    the family as one maintainer chore (the 403-refusal's own logic).
 3. Collapsing the admin auto-refresh glue: the extractable parts
    (storage helpers, the toggle component) are ALREADY shared; the
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-refresh-glue-collapse.
    residual per-page reactive wiring is a Svelte-idiom refactor chore.
 4. The M16 commit-granularity nit (guide keys one commit before their
    fills): repairing it means rewriting history the ledgers cite by SHA.
 5. The wrapper-count pin's two contrived evasions and the corpus list's
    self-pin: recorded limits, both declared at the assertion.
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wrapper-count-pin-evasions.
 6. Accepted limits recorded, not defects: the reduced-motion suppression
    is covered by a comment-stripped source pin, not a behavioral test
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reduced-motion-behavioral-test.
    (the established seam for this renderer wiring); the fairness doc's
    regalia bullet is unpinned prose per the doc's own norm.
 
@@ -22448,10 +22617,12 @@ should-fix items closed in 1c265abfa6.
 
 ### JUDGED REFUSALS this phase (binding, do not re-raise)
 
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-rate-limiter.
 1. Hot-path F1 (admin metrics per-request stringify / no limiter): the serialize-once
    half is the Phase 16 QA's judged refusal (the overview/activity family chore); the
    limiter half follows the same recorded family rationale (zero DB cost, the
    overview precedent stated in-code at the route).
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as mst-party-walk-closure.
 2. Hot-path F2 (the mst party-walk closure): the trade is recorded at the module
    header (mobile_station.ts, one bounded closure per partied viewer); the reviewer's
    own withdrawal condition applies.
@@ -22459,8 +22630,10 @@ should-fix items closed in 1c265abfa6.
    answer; the interest-cost exposure is the same class every placed ground object
    carries (pre-existing shape, recorded as a read below).
 4. Frontend N2 (the two bare-named modal painters outside the painter gate sweep):
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as modal-painters-gate-blindspot.
    the documented src/ui/CLAUDE.md blind-spot limit, deliberately kept; a rename or a
    gate widening is a maintainer chore, not a phase-17 churn.
+   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as vendor-floor-tercile-arm.
 5. Test-coverage NIT (the vendor_floor tercile arm protecting only test-local
    literals): the arm's own comment discloses it; the live pin at the craftedValue
    column reds first.
@@ -22480,16 +22653,20 @@ should-fix items closed in 1c265abfa6.
    must be the retained shape; a one-shot warm does not close the repeated-relink
    class. Still the maintainer's render work item.
 2. Hot-path F4 (two new tenants on the per-recipient zone-celebration fan-out):
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as zone-celebration-fanout-tenants.
    recorded so the NEXT tenant is a conscious decision; the seam if the list grows is
    the realm-readout memo plus sendRaw.
 3. The render review's feast click-proxy compile-unit note (one gate unit per feast
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as feast-click-proxy-compile-unit.
    view for an invisible material): VERIFY-gated against gpuPrepEventsSnapshot before
    acting; a shared module-level proxy material is the candidate shape.
 4. Gate-integrity's three INFO notes (the cone rows red loudly at a doc-deleting
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as block-extractor-blank-line-truncation.
    teardown, by design; the block extractor's blank-line truncation residual; the
    vacuity floor now 9 under the measured subtree count, so a routine evidence purge
    reds and re-measures it).
 5. The setImmediate warn deferral's shutdown trade (a lost dev-channel line on a
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as setimmediate-warn-shutdown-trade.
    shutdown-path save), stated at the call site.
 6. The architecture review's composed-net note: nythraxis_full_pull's whole-branch
    draw delta is 6087 to 6080 (the per-phase rows record each re-mint; this line is
@@ -22662,6 +22839,7 @@ duplicate exports deleted, two of which had already drifted stale; census
 still PASS, every name lives on in its branch home); the Power placement
 section gained its staleness pointer; power-verification.md its second
 HISTORY entry; the Phase 18 seed anchors re-pointed at the merged catalog
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as phase18-seed-anchor-rederive.
 (the pbe_boost scorer offender and the druid drift figure must be re-derived
 there first); the stale fill-count paragraph stamped; the farming epoch row
 dated. RECORDED, NOT ACTED (maintainer reads): the release stages a Crucible
@@ -22672,7 +22850,9 @@ re-measure option); the release's encounterOwned aura marker never rides the
 wire (a one-byte design call if an encounter ever applies one to players);
 frozenOrbFx and necromancyArmyPortalFx carry no explicit renderer-teardown
 dispose (release-side tidy, not owed by the merge); the overlap parity suites
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as release-fx-teardown-dispose.
 sit near their 20 s budgets under parallel workers (validate through the
+RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as parity-suite-time-budgets.
 gate's bounded form, treat a lone red as contention until reproduced
 standalone).
 
