@@ -57,11 +57,12 @@ Verify:
   self-clocked loop) and any event-driven durability write (a handler persisting a shared book
   for one mutation) cost O(what changed) or a bounded result set, never O(the stored book);
   a new realm collection never persists as one whole-book world_state blob rewritten on the
-  autosave cadence (the mail, market, and rift blobs are the legacy shape, not the template);
+  autosave cadence (the market and rift blobs are the legacy shape, not the template, and the
+  mail book was the third until PR #3613 partitioned it per dirty recipient);
   a quiet interval writes nothing or a trivially small row;
 - regressions are observable: a new selfWireJson key joins a SELF_WIRE_PHASES bucket, and a
   recurring main-thread job bills its cost to a profiler phase (the saves phase counts only
-  the market and rift shared-blob writers through the createSerialWriter observer; any other
+  the market and rift shared-blob writers through the serial writers' onWrite observer; any other
   job registers a phase of its own, or it shows up only as unattributed lateness);
 - the evidence is grown-collection evidence: fresh characters carry empty books, boards, and
   inboxes, so a fresh-bot load test or a dev-world timing proves nothing about this class; a

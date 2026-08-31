@@ -81,7 +81,7 @@ checklist).
    `SELF_WIRE_PHASES` bucket (`tests/self_wire_phase_breakdown.test.ts`); a recurring
    main-thread job (autosave, sweeps, self-clocked loops) bills its cost to a profiler
    phase: the `saves` phase counts ONLY the market (market + mail books) and rift
-   writers through the `createSerialWriter` observer, so a new shared-blob writer wires
+   writers through the serial writers' `onWrite` observer, so a new shared-blob writer wires
    that observer and any other job registers a phase of its own; a job that reports
    into no phase shows up as `lateness` with nothing to attribute it to, the blind spot
    PR #3576 closed for the autosave.
@@ -122,8 +122,9 @@ checklist).
    `saves` max 64 ms against a 134k-letter book in PR #3576's measurement; the v0.40.1
    hotfix pair PR #3661 and PR #3663 are the exemplars of the fix: aggregate inside
    Postgres, persist per row or overlay). A NEW realm collection persisted as one
-   whole-book `world_state` blob rewritten on the autosave cadence is blocking; the mail,
-   market, and rift blobs are the legacy shape, not the template. A quiet interval must
+   whole-book `world_state` blob rewritten on the autosave cadence is blocking; the
+   market and rift blobs are the legacy shape, not the template, and the mail book was
+   the third until PR #3613 partitioned it per dirty recipient. A quiet interval must
    write nothing or a trivially small row.
 10. **Grown-collection evidence, not fresh-world evidence.** Fresh characters carry empty
     books, boards, and inboxes, so a fresh-bot load test or a dev-world timing proves

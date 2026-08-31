@@ -247,7 +247,7 @@ headline rules here:
   for one mutation) cost O(what changed), never O(the stored book); no new realm collection
   persists as one whole-book `world_state` blob on the autosave cadence; the job bills its
   cost to a profiler phase (the `saves` phase counts only the market and rift shared-blob
-  writers through the `createSerialWriter` observer; anything else needs a phase of its own,
+  writers through the serial writers' `onWrite` observer; anything else needs a phase of its own,
   or it shows up only as unattributed `lateness`).
 - A "cheap" claim for a new snapshot read or recurring job rests on a grown-collection bench
   (1,000+ seeded rows) or a Tick Profiler capture on a long-lived realm, recorded in the PR.

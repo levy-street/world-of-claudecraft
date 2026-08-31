@@ -245,24 +245,24 @@ that shape.
   row) and the v0.40.1 hotfix pair (the escrow fold that JSON-parsed the same book in
   Node every 60 s, moved into Postgres by PR #3661 in `account_wealth_db.ts`; the
   custody parcel that rewrote the whole book per booking, now one overlay row via
-  PR #3663 `mail_custody_overlay.ts`; both reach a release branch with its v0.40.1
-  merge-down) stayed undiagnosed for weeks. PR #3576 closed
+  PR #3663 `mail_custody_overlay.ts`) stayed undiagnosed for weeks. PR #3576 closed
   the blind spot: the shared-blob writers (the market writer, which carries the market
   AND mail books, and the rift writer) bill their thunk's synchronous cost to the
-  `saves` phase through the `createSerialWriter` observer (`serial_writer.ts`), and the
-  gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
+  `saves` phase through the serial writers' `onWrite` observer (`serial_writer.ts`),
+  and the gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
   (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). `saves` counts
   ONLY those two writers: per-character blobs and DB round trips are not in it, and a
   job that reports into no phase shows up as `lateness` with nothing to attribute it
   to. Rules: a new realm collection never persists as one whole-book `world_state` blob
-  rewritten on the autosave cadence (the mail, market, and rift blobs are the legacy
-  shape, not the template): write per-row, overlay, or dirty-bucket, so a quiet
-  interval writes nothing; a recurring job's cost, or an event-driven durability
-  write's, must not scale with total book size, only with what changed or with the
-  bounded result it produces (aggregate inside Postgres when the input is a stored
-  blob; a handler that awaits a whole-book save "so the grant is durable", the
-  `persistMailBlob` per-parcel shape PR #3663 retired, is the same defect on a
-  different clock); and a new recurring job bills its cost to
+  rewritten on the autosave cadence (the market and rift blobs are the legacy shape,
+  not the template; the mail book was the third until PR #3613 partitioned it per
+  dirty recipient, which is what the fix looks like): write per-row, overlay, or
+  dirty-bucket, so a quiet interval writes nothing; a recurring job's cost, or an
+  event-driven durability write's, must not scale with total book size, only with what
+  changed or with the bounded result it produces (aggregate inside Postgres when the
+  input is a stored blob; a handler that awaits a whole-book save "so the grant is
+  durable", the `persistMailBlob` per-parcel shape PR #3663 retired, is the same
+  defect on a different clock); and a new recurring job bills its cost to
   a profiler phase in the same change (an observer into `saves` for a new shared-blob
   writer, a registered phase of its own otherwise), never silently.
 
