@@ -11539,6 +11539,13 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
+  /* Keep absolutely positioned accessibility text, including the hidden coin
+     unit labels, inside this scroll pane. Without a local containing block those
+     descendants anchor to the positioned window shell and make its long detail
+     content inflate the shell's own scroll area after a resize. */
+  .df-detail {
+    position: relative;
+  }
   .df-row {
     display: flex;
     align-items: center;
