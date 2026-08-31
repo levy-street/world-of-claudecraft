@@ -416,10 +416,10 @@ describe('createAurasView: derivation per mode', () => {
     expect(text(Number.POSITIVE_INFINITY)).toBe(''); // truly permanent: no label
   });
 
-  it('hides the countdown under toggle auras (stealth / forms / stance / Ghost Wolf)', () => {
+  it('hides the countdown under toggle auras (stealth / forms / stance / Shadewolf)', () => {
     const v = createAurasView('all', deps());
     // The sim backs each toggle with a long finite duration (3600s), but a mode
-    // shows no countdown (WoW parity): stealth by kind, Ghost Wolf by id (its
+    // shows no countdown (WoW parity): stealth by kind, Shadewolf by id (its
     // aura rides the generic buff_speed kind that Sprint also uses).
     expect(
       v.tick(entity([aura({ id: 'stealth', kind: 'stealth', remaining: 3600 })])).slots[0]

@@ -624,7 +624,7 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
 
 // ---------------------------------------------------------------------------
 // MODE auras print no seconds-remaining line in the tooltip either. The sim backs
-// a form / stance / stealth / Ghost Wolf / the carried flag with a long finite
+// a form / stance / stealth / Shadewolf / the carried flag with a long finite
 // duration (3600s, or a whole match) purely so nothing can expire it; surfacing
 // that number is the same lie the suppressed countdown label already avoids, and
 // on the carried flag it reads as "the flag leaves me in 12 minutes".
@@ -660,7 +660,7 @@ describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
           remaining: 720,
           toggle: true,
         }),
-        slot({ key: 'ghost_wolf', name: 'Ghost Wolf', remaining: 3600, toggle: true }),
+        slot({ key: 'ghost_wolf', name: 'Shadewolf', remaining: 3600, toggle: true }),
         slot({ key: 'bg_sprint_rune', name: 'Sprint', remaining: 15, toggle: false }),
       ]),
     );
@@ -669,7 +669,7 @@ describe('AurasPainter: a toggle aura suppresses the tooltip countdown', () => {
     expect(html[0]).toBe('Carrying the Flag');
     expect(html[0]).not.toMatch(/remaining/);
     expect(html[0]).not.toMatch(/720/);
-    expect(html[1]).toBe('Ghost Wolf');
+    expect(html[1]).toBe('Shadewolf');
     expect(html[1]).not.toMatch(/3600/);
     // ...while a genuinely timed buff still shows its countdown.
     expect(html[2]).toBe('Sprint|15s remaining');

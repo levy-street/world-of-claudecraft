@@ -19,7 +19,7 @@ vi.mock('../src/render/assets/loader', () => ({
 }));
 
 // warmForClass resolves its models from the authored spec table; the shaman's
-// Ghost Wolf is the stable single-model case. BEAR is the second entry of
+// Shadewolf is the stable single-model case. BEAR is the second entry of
 // SPIRIT_URLS, used where the queue needs more than one puppet in it.
 const WOLF = 'wolf';
 const BEAR = 'bear';

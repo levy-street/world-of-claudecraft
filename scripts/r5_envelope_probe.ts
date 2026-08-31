@@ -47,6 +47,7 @@
 // and nothing else. The tank arm is the one exception and says so at its
 // definition: it swaps the two apex pieces in as ITEMS, because its gear term
 // is armour rather than a primary stat.
+import { ABILITIES } from '../src/sim/content/classes';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
@@ -62,6 +63,62 @@ import { WARLOCK_FULL_BIS_GEAR } from './warlock_balance_probe';
 
 type Stats = Partial<Record<string, number>>;
 type SlotStats = Record<string, Stats>;
+
+// --- the rotation ability ids, and the guard that they still exist ----------
+// castAbility NO-OPS SILENTLY on an unknown id, so a renamed ability def turns
+// a lane's rotation into auto-attack and the probe keeps printing a number.
+// The smoke floors in tests/r5_envelope_probe.test.ts catch a DEAD rotation,
+// not a single renamed cast (renaming only bloodthirst measures 134, above the
+// fury floor), so this is the arm that closes that gap.
+//
+// It moves NO measurement: the list below is the ids the three throughput
+// lanes already cast, and the guard only reads the ability table. It is
+// decisive in BOTH directions on purpose. Downward: each lane types its
+// castAbility parameter as RotationAbilityId, so casting an id this list does
+// not name is a tsc error rather than a silent addition. Upward:
+// assertRotationAbilitiesResolve throws by NAME when a listed id no longer
+// resolves, which is exactly the rename case.
+export const ROTATION_ABILITY_IDS = [
+  // rogue lane
+  'deadly_poison',
+  'adrenaline_rush',
+  'flurry_of_knives',
+  'blade_flurry',
+  'eviscerate',
+  'sinister_strike',
+  'slice_and_dice',
+  // fury lane
+  'battle_shout',
+  'recklessness',
+  'red_harvest',
+  'bloodthirst',
+  'raging_gale',
+  'whirlwind',
+  // caster lane
+  'frostbolt',
+] as const;
+export type RotationAbilityId = (typeof ROTATION_ABILITY_IDS)[number];
+
+/** The rotation ids with no live ability def, in list order. `table` is a
+ *  parameter so a test can feed a renamed catalog without touching ABILITIES. */
+export function unresolvedRotationAbilityIds(
+  table: Readonly<Record<string, unknown>> = ABILITIES,
+): readonly RotationAbilityId[] {
+  return ROTATION_ABILITY_IDS.filter((id) => table[id] === undefined);
+}
+
+/** Throw, naming every rotation id whose ability def is gone. Called at the
+ *  head of each throughput lane, before any fixture or fight. */
+export function assertRotationAbilitiesResolve(
+  table: Readonly<Record<string, unknown>> = ABILITIES,
+): void {
+  const missing = unresolvedRotationAbilityIds(table);
+  if (missing.length > 0) {
+    throw new Error(
+      `r5 probe rotation ids resolve to no ability def (castAbility would no-op silently): ${missing.join(', ')}`,
+    );
+  }
+}
 
 // --- the targets, derived (power-verification.md section 5) ------------------
 // EVERY input is read from the live tuning tables, never baked: the boss-arena
@@ -396,6 +453,7 @@ export function rogueLane(
   seconds: number = SECONDS,
 ): number {
   laneArms('rogue', ['base', 'gear', 'ench', 'full'], arm);
+  assertRotationAbilitiesResolve();
   const sim = new Sim({
     seed,
     playerClass: 'rogue',
@@ -405,7 +463,7 @@ export function rogueLane(
   const s = sim as unknown as {
     setPlayerLevel(n: number): void;
     applyTalents(a: unknown): boolean;
-    castAbility(id: string): unknown;
+    castAbility(id: RotationAbilityId): unknown;
     startAutoAttack(): void;
     player: Entity;
   };
@@ -528,7 +586,7 @@ interface FurySim {
     setPlayerLevel(n: number): void;
     setSpec(id: string): boolean;
     selectTalentRow(level: number, row: string): boolean;
-    castAbility(id: string): unknown;
+    castAbility(id: RotationAbilityId): unknown;
     player: Entity;
   };
   p: Entity;
@@ -608,11 +666,18 @@ export function furyLane(
   armor: number,
   seconds: number = SECONDS,
 ): number {
+  assertRotationAbilitiesResolve();
   const { sim, s, p } = furyDress(seed, arm);
   const t = inertTarget(sim, level, armor);
   p.autoAttack = true;
   s.castAbility('battle_shout');
-  const rotation = ['recklessness', 'red_harvest', 'bloodthirst', 'raging_gale', 'whirlwind'];
+  const rotation: readonly RotationAbilityId[] = [
+    'recklessness',
+    'red_harvest',
+    'bloodthirst',
+    'raging_gale',
+    'whirlwind',
+  ];
   return (
     fight(sim, t, seconds, () => {
       for (const id of rotation) {
@@ -688,6 +753,7 @@ export function casterLane(
   seconds: number,
 ): number {
   laneArms('caster', ['base', 'gear', 'ench', 'full', 'apexChest'], arm);
+  assertRotationAbilitiesResolve();
   const sim = new Sim({
     seed,
     playerClass: 'mage',
@@ -698,7 +764,7 @@ export function casterLane(
     setPlayerLevel(n: number): void;
     addItem(id: string, n: number): unknown;
     useItem(id: string): unknown;
-    castAbility(id: string): unknown;
+    castAbility(id: RotationAbilityId): unknown;
     player: Entity;
   };
   s.setPlayerLevel(20);

@@ -1,6 +1,6 @@
 // Phase 1: every spec grants a REAL signature ability on selection. Ports the 22 built
-// signature spells from the flip branch onto the current spec defs, plus Chain Heal (new,
-// resto-exclusive) and the Stormstrike exclusivity fix. Proves each of the 27 signatures
+// signature spells from the flip branch onto the current spec defs, plus Cascading Mend
+// (new, resto-exclusive) and the Ancestral Strike exclusivity fix. Proves each of the 27 signatures
 // resolves and, when cast, produces an observable effect.
 import { describe, expect, it } from 'vitest';
 import { TALENTS } from '../src/sim/content/talents';
@@ -141,7 +141,9 @@ describe('Phase 1: spec signatures', () => {
     expect(duds, `signatures that failed:\n${duds.join('\n')}`).toEqual([]);
   });
 
-  it('Stormstrike is Enhancement-only and Chain Heal is Restoration-only', () => {
+  // The display names are the shipped ones (src/ui/i18n.catalog/abilities.ts):
+  // the ability IDS stay stormstrike / chain_heal, which is what the sim reads.
+  it('Ancestral Strike is Enhancement-only and Cascading Mend is Restoration-only', () => {
     const shaman = TALENTS.shaman!;
     for (const s of shaman.specs) {
       const sim = new Sim({ seed: 1, playerClass: 'shaman', autoEquip: true });

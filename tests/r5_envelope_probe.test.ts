@@ -25,6 +25,7 @@
 // comment carries the measured margins).
 import { describe, expect, it } from 'vitest';
 import {
+  assertRotationAbilitiesResolve,
   CASTER_APEX_CHEST_DELTA,
   CHEST_STA_STEP_PERFECTED,
   CHEST_STA_STEP_PLATE,
@@ -33,16 +34,19 @@ import {
   furyBody,
   furyLane,
   HEROIC_TARGET,
+  ROTATION_ABILITY_IDS,
   rogueLane,
   SRIFT_TARGET,
   TANK_KIT_DELTA,
   TANK_KIT_ITEMS,
   tankBody,
+  unresolvedRotationAbilityIds,
   WAR_EQUIPPED_DELTA,
   WAR_EQUIPPED_ITEMS,
   WEAPON_INT_STEP,
   WEAPON_STR_STEP,
 } from '../scripts/r5_envelope_probe';
+import { ABILITIES } from '../src/sim/content/classes';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
@@ -330,11 +334,74 @@ describe('the R5 envelope harness', () => {
     // and the live values (fury 183, rogue 198, caster 91 at these exact
     // inputs). A dead or gutted rotation reds; a SINGLE renamed ability among
     // several is not guaranteed to (castAbility no-ops silently on an unknown
-    // id, e.g. renaming only bloodthirst measures 134, above the fury floor),
-    // and ordinary sim tuning stays green. Durations are explicit so an
+    // id, e.g. renaming only bloodthirst measures 134, above the fury floor);
+    // that gap is the id-existence guard's, in the describe below. Ordinary sim
+    // tuning stays green. Durations are explicit so an
     // ambient WOC_R5_SECONDS cannot change what this arm measures.
     expect(furyLane(4242, 'full', 22, 1058, 180), 'fury').toBeGreaterThan(100);
     expect(rogueLane(4242, 'combat', 'full', 22, 1058, 180), 'rogue').toBeGreaterThan(150);
     expect(casterLane(4242, 'full', 22, 1058, 60), 'caster').toBeGreaterThan(40);
+  });
+});
+
+describe('the R5 harness rotation ids resolve to live ability defs', () => {
+  // The gap the smoke floors above cannot close: castAbility no-ops silently
+  // on an unknown id, so ONE renamed ability def leaves a lane measuring a
+  // thinner rotation at a number that still clears its floor. The guard is
+  // output-invariant by construction (it reads the ability table and throws;
+  // it touches no kit, floor, fixture or constant), so it moves nothing the R5
+  // freeze protects.
+
+  it('every id the three lanes cast is a live ability, against the shipped table', () => {
+    expect(unresolvedRotationAbilityIds(), 'rotation ids with no ability def').toEqual([]);
+    expect(() => assertRotationAbilitiesResolve()).not.toThrow();
+    // Non-vacuity, both halves: the list is really the lanes' rotation (not an
+    // empty array that trivially satisfies the sweep), and every entry really
+    // is looked up in ABILITIES rather than assumed.
+    expect(ROTATION_ABILITY_IDS.length, 'the rotation id list is populated').toBe(14);
+    expect(new Set(ROTATION_ABILITY_IDS).size, 'no id is listed twice').toBe(
+      ROTATION_ABILITY_IDS.length,
+    );
+    for (const id of ROTATION_ABILITY_IDS) expect(ABILITIES[id], id).toBeDefined();
+  });
+
+  it('a RENAMED ability def fails loudly, naming the id the harness would have dropped', () => {
+    // The rename case exactly: the def is gone from the table under its old
+    // key (renamed, not deleted), which is what a content rename does to a
+    // literal the harness holds. Fed as a catalog rather than by mutating
+    // ABILITIES, so the live table is never disturbed.
+    const renamed: Record<string, unknown> = { ...ABILITIES };
+    delete renamed.bloodthirst;
+    renamed.crimson_thirst = ABILITIES.bloodthirst;
+    expect(unresolvedRotationAbilityIds(renamed)).toEqual(['bloodthirst']);
+    expect(() => assertRotationAbilitiesResolve(renamed)).toThrow(/bloodthirst/);
+    // Two gone at once are BOTH named, so the message never hides a second
+    // rename behind the first.
+    const twoGone: Record<string, unknown> = { ...renamed };
+    delete twoGone.frostbolt;
+    expect(unresolvedRotationAbilityIds(twoGone)).toEqual(['bloodthirst', 'frostbolt']);
+    expect(() => assertRotationAbilitiesResolve(twoGone)).toThrow(/bloodthirst, frostbolt/);
+  });
+
+  it('each throughput lane runs the guard BEFORE it measures anything', () => {
+    // The WIRING, not just the guard. The lanes call the guard with the live
+    // table, so the only honest proof is to take a rotation ability out of that
+    // table and watch all three lanes refuse. Restored in a finally, and the
+    // durations are 1 second so a lane that FORGOT the call returns a dps
+    // number cheaply (and reds on the toThrow) instead of running a real fight.
+    const original = ABILITIES.bloodthirst;
+    try {
+      delete (ABILITIES as Record<string, unknown>).bloodthirst;
+      expect(() => furyLane(4242, 'full', 22, 1058, 1), 'fury').toThrow(/bloodthirst/);
+      expect(() => rogueLane(4242, 'combat', 'full', 22, 1058, 1), 'rogue').toThrow(/bloodthirst/);
+      expect(() => casterLane(4242, 'full', 22, 1058, 1), 'caster').toThrow(/bloodthirst/);
+    } finally {
+      ABILITIES.bloodthirst = original;
+    }
+    // The table really is whole again, so nothing after this file leaks: the
+    // same three lanes measure a number once more.
+    expect(ABILITIES.bloodthirst, 'the live ability table is restored').toBe(original);
+    expect(unresolvedRotationAbilityIds()).toEqual([]);
+    expect(furyLane(4242, 'full', 22, 1058, 1), 'fury measures again').toBeGreaterThan(0);
   });
 });

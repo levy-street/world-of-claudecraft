@@ -1833,6 +1833,26 @@ const statBonus = (enchantId: string, axis: 'str' | 'agi' | 'sta' | 'int'): numb
 
 const APEX_FOOD_IDS = ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder'] as const;
 
+/** The feast payload's shape (src/sim/types.ts). Spelled out here rather than
+ *  indexed off ItemDef, which is a union whose other members carry no `feast`. */
+interface FeastPayload {
+  charges: number;
+  durationTicks: number;
+  dishItemId: string;
+  templateId: string;
+}
+
+/** Every feast-bearing def in the live catalog with its payload. Read off
+ *  ITEMS rather than a hand list so a feast authored later joins the sweep. */
+function feastPayloads(): { id: string; feast: FeastPayload }[] {
+  const out: { id: string; feast: FeastPayload }[] = [];
+  for (const def of Object.values(ITEMS)) {
+    const feast = (def as { feast?: FeastPayload }).feast;
+    if (feast) out.push({ id: def.id, feast });
+  }
+  return out;
+}
+
 describe('the phase 10 apex rungs step exactly one rung off the shipped ladders', () => {
   it('the skill-125 capstones sit above the skill-100 apex rungs', () => {
     // The SKILL dimension of "one rung above", which nothing said out loud: the
@@ -1964,11 +1984,13 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // apex band reds here the day it ships: the power inversion the 11c
     // re-tune removed (a cooking-50 trainer dish at 12/900 beating the
     // cooking-100 apex plate) can never quietly return.
-    // The shared harvest_feast is a delivery VEHICLE, not a food of its own:
-    // its bite serves feast.dishItemId, which is itself inside this sweep, so
-    // the feast needs no arm here; and 11k's apex feasts will serve the apex
-    // plates by design (equal to the apex, never above it), which is why a
-    // feast-dish-strictly-below arm is deliberately NOT written.
+    // A feast is a delivery VEHICLE, not a food of its own: its bite serves
+    // feast.dishItemId, so what a feast grants is whatever that dish already
+    // carries. That indirection is the one path this sweep cannot see (a
+    // dishItemId pointing outside the food catalog escapes it entirely), and
+    // the arm below closes it at an AT-MOST-the-apex bound rather than a
+    // strictly-below one, because 11k's apex feasts serve the apex plates by
+    // design (equal to the apex, never above it).
     const nonApex = Object.values(ITEMS).filter(
       (d): d is Extract<typeof d, { kind: 'food' }> =>
         d.kind === 'food' &&
@@ -1998,6 +2020,59 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     const topRung = Math.max(...nonApex.map((d) => d.wellFed!.value));
     const apexValue = foodDef(APEX_FOOD_IDS[0]).wellFed!.value;
     expect(topRung, 'the farming ladder tops out one below the apex').toBe(apexValue - 1);
+  });
+
+  it('every feast serves a well-fed FOOD at or below the apex point, on both axes', () => {
+    // The dominance sweep's blind spot, closed. A feast grants nothing itself;
+    // it names a dish, and the eating slot points at that dish, so a
+    // dishItemId that stopped resolving to a well-fed food (re-kinded, renamed
+    // out from under the payload, or authored above the plates) would deliver
+    // a buff no arm above polices. Swept over the LIVE catalog, so a feast
+    // authored in a later phase joins on the day it ships.
+    const apex = foodDef(APEX_FOOD_IDS[0]).wellFed;
+    expect(apex, 'the apex plate carries a Well Fed payload').toBeDefined();
+    // "The apex point" is one value/duration pair, not the first plate's
+    // accident: all three plates sit on it (they differ only in buff KIND, one
+    // per role table), which is what makes the bound below meaningful.
+    for (const id of APEX_FOOD_IDS) {
+      const plate = foodDef(id).wellFed;
+      expect(plate?.value, `${id} sits on the apex value`).toBe(apex?.value);
+      expect(plate?.duration, `${id} sits on the apex duration`).toBe(apex?.duration);
+    }
+    const feasts = feastPayloads();
+    // Non-vacuity: the three apex feasts plus the farming harvest_feast.
+    expect(feasts.length, 'feasts in the live catalog').toBeGreaterThanOrEqual(4);
+    for (const { id, feast } of feasts) {
+      const dish = ITEMS[feast.dishItemId];
+      expect(dish, `${id} serves ${feast.dishItemId}, which must exist`).toBeDefined();
+      expect(dish.kind, `${id} must serve a food`).toBe('food');
+      const wellFed = dish.kind === 'food' ? dish.wellFed : undefined;
+      expect(wellFed, `${id}'s dish ${dish.id} must carry a Well Fed payload`).toBeDefined();
+      expect(
+        wellFed?.value,
+        `${id}'s dish ${dish.id} value must not exceed the apex`,
+      ).toBeLessThanOrEqual(apex?.value as number);
+      expect(
+        wellFed?.duration,
+        `${id}'s dish ${dish.id} duration must not exceed the apex`,
+      ).toBeLessThanOrEqual(apex?.duration as number);
+    }
+    // The bound is a real ceiling rather than an equality every row trivially
+    // meets: at least one shipped feast serves a dish STRICTLY under the apex
+    // on both axes (the farming rung), and at least one sits exactly on it.
+    const served = feasts.map(({ feast }) => foodDef(feast.dishItemId).wellFed);
+    expect(
+      served.some((w) => (w?.value ?? 0) < (apex?.value as number)),
+      'a feast serves a dish below the apex value',
+    ).toBe(true);
+    expect(
+      served.some((w) => (w?.duration ?? 0) < (apex?.duration as number)),
+      'a feast serves a dish below the apex duration',
+    ).toBe(true);
+    expect(
+      served.some((w) => w?.value === apex?.value && w?.duration === apex?.duration),
+      'a feast serves a dish exactly on the apex point',
+    ).toBe(true);
   });
 
   it('each apex enchant continues its OWN slot ladder, the weapon rung at HALF its step', () => {

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
-  PET_AGGRESSIVE_RANGE,
   petFollow,
   petPickTarget,
   petRangedAttack,

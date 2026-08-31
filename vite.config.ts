@@ -507,6 +507,40 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    // happy-dom resolves a relative resource URL against its window origin,
+    // which vitest defaults to http://localhost:3000, and then opens a REAL
+    // socket to that port. Nothing is listening, so several DOM-env window
+    // suites (professions, perfecting) printed one ECONNREFUSED AggregateError
+    // per request on top of otherwise green output. Traced with a
+    // net.Socket.prototype.connect probe, the requests are the character
+    // model preloads (`/models/weapons/sword_1handed.glb` and kin), reached
+    // through the painters those suites import.
+    //
+    // The virtual server is what a happy-dom origin is SUPPOSED to have: it
+    // resolves the origin against the filesystem instead of the network, and
+    // `public/` is exactly what Vite (and server/main.ts serveStatic) serves
+    // at that origin, so `/models/...` now resolves to the same bytes a real
+    // browser would get, and a path with no file answers 404 locally. Nothing
+    // opens a socket either way. Disabling resource loading was tried first
+    // and is NOT the fix here: the loaders these suites trip are neither the
+    // CSS nor the JS one, so `disableCSSFileLoading`/`disableJavaScriptFileLoading`
+    // left the noise exactly where it was. A fetch interceptor cannot be used
+    // at all: environmentOptions is structured-cloned to the worker, so a
+    // function value throws before any test runs.
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          fetch: {
+            virtualServers: [
+              {
+                url: 'http://localhost:3000',
+                directory: fileURLToPath(new URL('public', import.meta.url)),
+              },
+            ],
+          },
+        },
+      },
+    },
     // Sharding: BalancedSequencer (LPT over MEASURED per-file durations,
     // scripts/ci_shard_weights.generated.json, harvested from green CI runs
     // by scripts/ci_shard_weights_harvest.mjs). Re-wired 2026-08-14: the D11

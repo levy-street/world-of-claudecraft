@@ -15,11 +15,11 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
-  it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
+  it("an Elemental shaman's spell-damage mastery leaves Shadewolf's 1.4x speed intact", () => {
     const sim = new Sim({ seed: 1, playerClass: 'shaman', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('elemental')).toBe(true); // mastery = +15% spell damage
-    // Ghost Wolf is a nature-school selfBuff whose value (1.4) is a movement-speed
+    // Shadewolf (ability id ghost_wolf) is a nature-school selfBuff whose value (1.4) is a movement-speed
     // MULTIPLIER, not a magnitude. The old `value < 1` guard scaled it by the spell
     // mastery mult and rounded 1.4 -> 2; it must now pass through untouched.
     const gw = sim.resolvedAbility('ghost_wolf', sim.playerId);
