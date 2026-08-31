@@ -559,8 +559,25 @@ describe('Eastbrook authored gameplay data integration', () => {
     // release 3943f298cc9eff07d9dc040c8ff68d401da70e4a1ba9c17efc681aebc0fede44.
     // Measured on the merged working tree (zone1.ts conflict-free) and set to
     // exactly what it reported.
+    //
+    // Re-minted at the Phase 18 seed-feeding copy pass (commit 58e904a4b6),
+    // which cleared the grandfathered em dashes out of the prose the mediawiki
+    // seed publishes. Exactly two payload fields moved, both greetings, both
+    // rewordings of a dash: The Merchant's market line takes a comma and
+    // Brandt's takes an ellipsis. No other field, no placement field, and no
+    // key order changed (proved by replaying the pre-pass zone1.ts against the
+    // current siblings: the payload reproduces the previous digest above with
+    // only these two strings restored). Both are asserted BEFORE the digest,
+    // same as the vendor and greeting rows above, so each moved field is
+    // described where it can actually fail.
+    expect(ZONE1_NPCS.the_merchant.greeting).toBe(
+      'Welcome to the World Market, $C. Buy from every adventurer in the realm, or set out your own wares and let coin find you.',
+    );
+    expect(ZONE1_NPCS.fisherman_brandt.greeting).toBe(
+      'Blrb-glub... sorry, been listening to those fish-men too long.',
+    );
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '015e5f550a00d2df0989bc70b203eea985e709a0ba7869bc9779d88112fdf171',
+      'ef35b8640f9ed213e86dbac9b04ba7a8ec9cdde6179d3859e833519dcaabb6c2',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

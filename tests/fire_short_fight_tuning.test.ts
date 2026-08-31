@@ -182,6 +182,20 @@ const IGNITION_PCT = (() => {
   return pct;
 })();
 
+// The ground-impact ability whose non-crit hits also bank Ignite, read from the
+// live catalog for the same reason IGNITION_PCT is: damage events carry only the
+// English DISPLAY name (the groundAoE path passes no abilityId), so a literal
+// here goes silently wrong the day the name is re-authored. It already did:
+// 'Meteor' was re-authored to 'Skystone' in the phase-18 naming sweep (the id
+// stays 'meteor'), which dropped every impact out of the bank estimate while
+// leaving the payout counted, and reported the missing bank as a 1.029
+// conservation breach. Throwing on a missing id keeps a future id rename loud.
+const METEOR_NAME = (() => {
+  const name = ABILITIES.meteor?.name;
+  if (!name) throw new Error('meteor ability missing from the catalog');
+  return name;
+})();
+
 interface BurstResult {
   dps: number;
   damage: number;
@@ -277,7 +291,7 @@ function runShortFight(spec: Spec, seconds: number, seed = 41, rows?: Rows): Bur
         if (e.ability === 'Ignite') ignitePaid += e.amount;
         else if (e.school === 'fire' && e.sourceId === p.id) {
           if (e.crit) igniteBanked += Math.round(e.amount * IGNITION_PCT);
-          else if (e.ability === 'Meteor') igniteBanked += Math.round(e.amount * IGNITION_PCT);
+          else if (e.ability === METEOR_NAME) igniteBanked += Math.round(e.amount * IGNITION_PCT);
         }
       }
     }

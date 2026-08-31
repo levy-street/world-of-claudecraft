@@ -13,10 +13,18 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   ONLINE_WORLD_LAYOUT_VERSION,
 } from '../src/world_api';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCRIPTS_ROOT = join(ROOT, 'scripts');
 const AUTHENTICATED_NODE_CLIENTS = [
+  {
+    // The Market Metrics capture tool (Masterwrought phase 18): the panel reads
+    // the sim's live in-process listing book, so the only way to a populated
+    // shot is a real session listing real goods, which is why it joins here.
+    path: 'scripts/admin_market_metrics_shot.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)))',
+  },
   {
     // The R35 admin capture tool: joins one throwaway character over the
     // wire so the professions inspector reads a LIVE session.
@@ -65,6 +73,13 @@ const AUTHENTICATED_NODE_CLIENTS = [
     // world as the observer character itself, not as a bot.
     path: 'scripts/nythraxis_hitch_bench.mjs',
     authSend: 'socket.send(JSON.stringify(worldAuthMessage(fixture.token, fixture.characterId)))',
+  },
+  {
+    // The kick-then-clear-then-retry operator E2E (Masterwrought phase 18): the
+    // character has to be genuinely ONLINE for arm 1's refusal and arm 4's
+    // session lease to be real, so it joins the world as the remediation target.
+    path: 'scripts/kick_clear_retry_e2e.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(reg.body.token, characterId)))',
   },
   {
     path: 'scripts/lib/perf_hitch_scenarios.mjs',
@@ -230,8 +245,16 @@ describe('standalone world WebSocket auth', () => {
     // script keeps running and reports numbers for bots that were never
     // levelled, geared, god-moded or teleported. Five perf scripts shipped that
     // shape, which is why this is a scan and not a review note.
+    //
+    // Read over CODE, not prose: a script that documents the trap right above
+    // its chatCommandMessage call spells the forbidden frame out in a comment
+    // (admin_market_metrics_shot.mjs does exactly that), and a raw-text scan
+    // reads that sentence as an offense. Stripping full-line comments is the
+    // same discipline the loopback-guard call-site pins already run on, and it
+    // narrows the scan to what can actually be SENT: a comment sends nothing.
+    // Both directions are proven below, so the strip cannot blind the scan.
     const offenders = nodeWebSocketSources()
-      .filter(([, source]) => TOP_LEVEL_CHAT_FRAME.test(source))
+      .filter(([, source]) => TOP_LEVEL_CHAT_FRAME.test(codeWithoutLineComments(source)))
       .map(([path]) => path);
     expect(offenders).toEqual([]);
     expect(chatCommandMessage('/dev god')).toEqual({ t: 'cmd', cmd: 'chat', text: '/dev god' });
@@ -246,6 +269,19 @@ describe('standalone world WebSocket auth', () => {
     // catches the exact literal the five scripts carried.
     expect(TOP_LEVEL_CHAT_FRAME.test("send(JSON.stringify({ t: 'chat', text }))")).toBe(true);
     expect(TOP_LEVEL_CHAT_FRAME.test("if (message.t === 'chat') return;")).toBe(false);
+    // And the comment strip in front of it: prose describing the trap is not an
+    // offense, while the same literal on a real statement still is, INCLUDING
+    // one carrying a trailing comment (only whole comment lines are dropped).
+    expect(
+      TOP_LEVEL_CHAT_FRAME.test(
+        codeWithoutLineComments("  // a bare { t: 'chat' } frame matches nothing"),
+      ),
+    ).toBe(false);
+    expect(
+      TOP_LEVEL_CHAT_FRAME.test(
+        codeWithoutLineComments("send(JSON.stringify({ t: 'chat', text })); // the offense"),
+      ),
+    ).toBe(true);
   });
 
   it('leaves no legacy auth discriminator in any standalone Node script', () => {

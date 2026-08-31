@@ -46,20 +46,34 @@ describe('safeStartupGraphicsPreset', () => {
 describe('constrained renderer integration', () => {
   it('uses the resolved dynamic-shadow policy for both the WebGL map and sun pass', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // The arm's traversal now lives in its own module (shadow_depth_compile.ts),
+    // so the ordering this pins moved with it: renderer.ts keeps the POLICY, and
+    // the guard must still stand in front of everything the arm costs, which is
+    // now the prewarm render target plus the ONE delegation into that module.
+    const shadowArm = readFileSync(
+      new URL('../src/render/shadow_depth_compile.ts', import.meta.url),
+      'utf8',
+    );
     const prewarmMethod = source.indexOf(
-      'private async compileShadowPrograms(root: THREE.Object3D)',
+      'private compileShadowPrograms(root: THREE.Object3D): Promise<void> {',
     );
     const prewarmGuard = source.indexOf(
-      'if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;',
+      'if (!GFX.dynamicShadows || !this.asyncCompileSupported) return Promise.resolve();',
       prewarmMethod,
     );
-    const prewarmTraversal = source.indexOf('root.traverse((obj) => {', prewarmMethod);
+    const prewarmTarget = source.indexOf('this.prewarmRenderTarget ??=', prewarmMethod);
+    const prewarmDelegate = source.indexOf('return compileShadowDepthPrograms(', prewarmMethod);
 
     expect(source).toContain('this.webgl.shadowMap.enabled = GFX.dynamicShadows;');
     expect(source).toContain('sun.castShadow = GFX.dynamicShadows;');
     expect(prewarmMethod).toBeGreaterThanOrEqual(0);
     expect(prewarmGuard).toBeGreaterThan(prewarmMethod);
-    expect(prewarmGuard).toBeLessThan(prewarmTraversal);
+    expect(prewarmTarget).toBeGreaterThan(prewarmGuard);
+    expect(prewarmDelegate).toBeGreaterThan(prewarmTarget);
+    // ONE call site, so the guard cannot be walked around by a second entry into
+    // the arm, and the traversal it gates is really the one in that module.
+    expect(source.match(/compileShadowDepthPrograms\(/g)).toHaveLength(1);
+    expect(shadowArm).toContain('root.traverse((obj) => {');
   });
 
   it('gates shadow-only CPU work while retaining the crowd animation bands', () => {
@@ -95,7 +109,9 @@ describe('constrained renderer integration', () => {
     }
     // sun.castShadow is assigned GFX.dynamicShadows and never reassigned, so the
     // prewarm gate above pins the same policy through the static preset knob.
-    expect(source).toContain('if (!GFX.dynamicShadows || !this.asyncCompileSupported) return;');
+    expect(source).toContain(
+      'if (!GFX.dynamicShadows || !this.asyncCompileSupported) return Promise.resolve();',
+    );
     expect(source).toContain('if (this.lowGfx && !this.sun.castShadow) return;');
     expect(
       source.match(/if \(this\.sun\.castShadow\) \{\n\s+this\.shadowLightDirection\.subVectors/g),

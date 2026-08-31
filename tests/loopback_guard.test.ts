@@ -156,6 +156,13 @@ const GUARDED_SCRIPTS = [
   'scripts/bank_rung_claudium_probe.mjs',
   'scripts/admin_cheater_mark_shot.mjs',
   'scripts/admin_guild_bank_shot.mjs',
+  // The Market Metrics capture tool (Masterwrought phase 18): it registers
+  // accounts, grants a staff role by shelling out to grant_admin.mjs, and drives
+  // /dev cheats to stage real listings. It opens NO pool of its own, so the
+  // discovery arm below never sees it; it belongs HERE and not with the URL-only
+  // scripts because it guards a DATABASE_URL all the same, the one grant_admin
+  // dials, and that arm is the whole reason the staff grant cannot leave the box.
+  'scripts/admin_market_metrics_shot.mjs',
   // The guild-pane seed step (Bank Storage phase 18 QA): it mints accounts and
   // characters over REST and writes guild, membership and guild-book rows
   // straight into Postgres, so it guards its server URL and its connection
@@ -166,6 +173,14 @@ const GUARDED_SCRIPTS = [
   'scripts/chat_mute_resume_shot.mjs',
   'scripts/geared_arrival_bench.mjs',
   'scripts/guild_pledge_shot.mjs',
+  // The kick-then-clear-then-retry operator E2E (Masterwrought phase 18): it
+  // registers accounts, grants a STAFF role by shelling out to grant_admin.mjs,
+  // and seeds then reads back the persisted character blob through a pg.Pool of
+  // its own, so it guards its server URL and its connection string. Both, not
+  // one: the grant reaches Postgres through another script, and the seed reaches
+  // it directly, and each target is a place a non-loopback value would take a
+  // staff grant or a blob rewrite somewhere it must never go.
+  'scripts/kick_clear_retry_e2e.mjs',
   'scripts/nythraxis_hitch_bench.mjs',
   'scripts/lib/perf_hitch_scenarios.mjs',
   'scripts/load_players.mjs',

@@ -170,10 +170,13 @@ function harness(
   return { root, calls, errors };
 }
 
-function clickCellFor(root: HTMLElement, itemId: string, shift = false): void {
+/** `nth` picks among several cells of the SAME id (a fixture holding two copies),
+ *  in grid order; 0, every caller but the copy-anchor arm, is the first one. */
+function clickCellFor(root: HTMLElement, itemId: string, shift = false, nth = 0): void {
   const cells = Array.from(root.querySelectorAll<HTMLElement>('button.bag-item'));
-  const cell = cells.find((c) => c.getAttribute('aria-label')?.includes(ITEMS[itemId].name));
-  expect(cell, `no bag cell for ${itemId}`).toBeTruthy();
+  const matches = cells.filter((c) => c.getAttribute('aria-label')?.includes(ITEMS[itemId].name));
+  const cell = matches[nth];
+  expect(cell, `no bag cell ${nth} for ${itemId}`).toBeTruthy();
   cell?.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: shift }));
 }
 
@@ -243,12 +246,15 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     // click must still reach the use ladder, and each armed pane must deposit.
     const closed = harness([{ itemId: plainId, count: 1 }], false, false, false);
     clickCellFor(closed.root, plainId);
-    // useItem now also carries WHICH bag copy was clicked, so the sink records a
-    // second argument. Asserted as a prefix plus the selection rather than as one
-    // exact string: this test is about the click REACHING the use ladder, and
-    // pinning the stringified argument object here would make it fail on any
-    // future field the selection gains.
-    expect(closed.calls).toEqual([`useItem:${plainId},{"slotIndex":0}`]);
+    // useItem carries WHICH bag copy was clicked, so the sink records a second
+    // argument: the cell's inventory index plus the copy anchor beside it
+    // (src/sim/item_copy_anchor.ts), the ordinal among same-id cells and how many
+    // the sender saw. Pinned whole, because "reaches the use ladder" and "names
+    // the clicked copy" are one claim here: a rung that reached useItem with the
+    // selection dropped would be a different bug wearing this arm's green.
+    expect(closed.calls).toEqual([
+      `useItem:${plainId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
     expect(closed.errors).toEqual([]);
   });
 
@@ -383,11 +389,29 @@ describe('personal-tab BAG click routing (the phase 07 socket arm, real BagsWind
   };
 
   it('sockets a clicked payload-free bag into the bank, naming the exact carried copy', () => {
-    const h = harness([{ itemId: bagId, count: 1 }], false, true, true, false, socketable);
-    clickCellFor(h.root, bagId);
+    // TWO copies, and the SECOND is the one clicked. With a single copy the
+    // anchor below reads {ordinal:0,count:1} whatever the sender computed, so a
+    // one-copy fixture cannot decide "the exact carried copy" at all: only a
+    // sibling pair makes both halves of the selection (the index AND the
+    // ordinal) name something a wrong answer would get wrong.
+    const h = harness(
+      [
+        { itemId: bagId, count: 1 },
+        { itemId: bagId, count: 1 },
+      ],
+      false,
+      true,
+      true,
+      false,
+      socketable,
+    );
+    clickCellFor(h.root, bagId, false, 1);
     // The equipBag call shape aimed at the bank: id, no socket named (the sim
-    // scans first-empty), and the reference-resolved copy selector.
-    expect(h.calls).toEqual([`bankSocketBag:${bagId},{"slotIndex":0}`]);
+    // scans first-empty), and the reference-resolved copy selector: the clicked
+    // cell's index plus the copy anchor naming which same-id sibling it was.
+    expect(h.calls).toEqual([
+      `bankSocketBag:${bagId},{"slotIndex":1,"anchor":{"ordinal":1,"count":2}}`,
+    ]);
   });
 
   it('falls back to the plain deposit when no unlocked socket is empty', () => {

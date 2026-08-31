@@ -144,7 +144,20 @@ describe('heavy-self policy sets', () => {
     // The membership pins above stay green on an orphaned module; this arm
     // fails if the coordinator stops importing the policy. A rename of the
     // import path or names is a deliberate change that edits this line.
+    //
+    // Phase 18 moved the CMDS consumption behind two predicates: game.ts no
+    // longer reads HEAVY_SELF_CMDS itself, it asks heavySelfMarkOnReceipt /
+    // heavySelfMarkOnAccept which path a command marks on (server/heavy_self.ts,
+    // which is where the set is now read). So the import line alone would leave
+    // the CMDS set orphanable behind a dead import: both CALL SITES are pinned
+    // too, one per path, and tests/heavy_self_arm_marks.test.ts holds the other
+    // end (that the predicates are really answering out of HEAVY_SELF_CMDS).
     const game = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
-    expect(game).toContain("import { HEAVY_SELF_CMDS, HEAVY_SELF_EVENTS } from './heavy_self';");
+    expect(game).toContain(
+      "import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';",
+    );
+    expect(game).toContain('heavySelfMarkOnReceipt(msg.cmd)');
+    expect(game).toContain('heavySelfMarkOnAccept(command)');
+    expect(game).toContain('if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;');
   });
 });

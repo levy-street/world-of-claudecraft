@@ -175,8 +175,11 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 40 Crucible raid relics, the raid's flawless title, and the rest of its
     // own 313 -> 356 arm; Forgebreaker left the pages for its crafting chain).
     // The id sets are disjoint, so the merged catalog carries both sides'
-    // slots: 313 + 6 + 43.
-    expect(catalogTotal).toBe(362);
+    // slots: 313 + 6 + 43. Phase 18 then added the gather_event:golden_harvest
+    // field note to RELIQUARY_PROFESSION_MARKS, one more character-scoped mark
+    // slot, so 362 + 1 = 363; the character pair in
+    // tests/reliquary_content.test.ts moved by the same one.
+    expect(catalogTotal).toBe(363);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
