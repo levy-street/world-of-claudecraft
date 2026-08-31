@@ -23514,6 +23514,40 @@ of one id. The fixture now exists and reds on that mutation. Both were surfaced
 by an agent proving its OWN kept assertions decisive, which is the argument for
 the mutation discipline rather than a green suite.
 
+### A FAN-OUT BLIND SPOT THIS PHASE FOUND, AND THE SWEEP THAT CLOSES IT
+
+Worth recording because it is a property of the METHOD, not of any unit. Every
+writer validates its own suites and looks at its own dirty files. A type
+NARROWING in src therefore breaks existing pins in test files the author never
+touched, and those files are clean at HEAD, so they sit in nobody's dirty set
+and no per-unit selection picks them up. Every writer reports green and the
+tree is tsc-red.
+
+Measured here: one whole-tree `npx tsc --noEmit` returned 33 errors across 11
+test files, and the five files carrying the most errors were all committed-clean,
+that is, invisible to the author whose change caused them. Three independent
+narrowings account for them: TimedStatBuffPayload.kind narrowed from AuraKind to
+the three-kind TimedStatBuffAuraKind Extract, promptDestroy's third parameter
+changed from `number | null` to `DraggedCopyRef | null`, and a session lookup
+that began returning `ClientSession | {error}`.
+
+The sweep is now part of the integrator's loop rather than the batch gate:
+whole-tree tsc BETWEEN unit commits (about two seconds on this repo), errors
+grouped by file and then SPLIT, because the split is the whole trick. Files
+dirty in the tree belong to their editor and resolve on commit; files clean at
+HEAD are the finding, and get routed to whoever made the src change with the
+exact error text and the causing src line quoted, since that author cannot see
+them from their own diff. Routing also states the fix DIRECTION, because the
+tempting repair is the wrong one: make the test honest about the narrow type,
+never widen the type back or cast through it. The narrowing is usually the
+valuable half (here it stops a content author writing an aura kind whose removal
+owes more than a recalc into a food record), and a cast in the test discards
+exactly that. Where a fixture used a value the narrowed type now excludes, the
+question asked first is whether any shipped record still produces it: if none
+does the fixture was vacuous and re-basing it strengthens the pin; if one does,
+the Extract is too tight and the TYPE is what is wrong. That answer is demanded
+with evidence rather than left to whichever repair is less work.
+
 ### THE UNIT MAP (how the 207 bucket-A items were partitioned)
 
 Sixteen units, each owning a DISJOINT file set so parallel writers could not
