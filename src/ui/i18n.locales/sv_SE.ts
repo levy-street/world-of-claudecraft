@@ -14467,4 +14467,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Varkhul besegrad',
   'entities.quests.q_ignivar_the_forgefather.text': 'Stigen där nere leder till Varkhul, den Sista lågans smidesfader. Han fängslade den Sista källan för att ge metall liv och smidde sedan Ignivar för att hålla brottet förseglat. Gå in i den Inre degeln och sätt stopp för hans verk.',
   'entities.quests.q_ignivar_the_forgefather.title': 'Smidesfadern',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblinraketsläde',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'En farligt överbyggd goblinsläde, driven av två raketer och utsökt dåligt omdöme.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'En liten rallymaskin som ökar färdhastigheten.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Tändningsnyckel: Goblinraketsläde',
+  'entities.items.reins_rallycart_rxt.name': 'Tändningsnyckel: Rallycart RXT',
 };

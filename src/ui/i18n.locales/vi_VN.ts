@@ -14255,4 +14255,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Sau bậc thang mở rộng ngăn, quản ngân khố còn bán tối đa bốn ô gắn túi, được mở khóa lần lượt với mức giá ngày càng cao. Đặt một túi dự phòng trong bộ túi mang theo vào ô, các ngăn của túi sẽ nhập vào kho của bạn: túi thông thường mở rộng toàn bộ kho, còn túi vật liệu chỉ thêm chỗ cho nguyên liệu chế tạo. Nhấp vào một chiếc túi trong hành trang để đặt vào, rồi nhấp vào ô để lấy ra. Khi lấy túi ra, những vật bạn đã cất không bao giờ bị mất: nếu kho trở nên đầy hơn sức chứa mới bị thu hẹp, mọi thứ vẫn nguyên chỗ và đồ gửi mới chỉ chờ đến khi có chỗ trống.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Hiển thị mọi buff đang hoạt động ngay cả ở cấu hình đồ họa Thấp, bỏ qua giới hạn biểu tượng buff thông thường.',
   'wallet.browser.stepUpBody': 'Chọn ví đã liên kết với tài khoản của bạn và ký thông báo ủy quyền $WOC Exchange. Việc ký là miễn phí và không chuyển khoản tiền nào.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Xe trượt tên lửa goblin',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Khóa khởi động: Xe trượt tên lửa goblin',
+  'entities.items.reins_rallycart_rxt.name': 'Khóa khởi động: Rallycart RXT',
 };

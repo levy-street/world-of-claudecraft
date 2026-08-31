@@ -9,130 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "es_ES": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "fr_FR": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "fr_CA": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "de_DE": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "nl_NL": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "pl_PL": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "id_ID": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "tr_TR": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "sv_SE": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "vi_VN": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ],
-  "da_DK": [
-    "entities.items.reins_goblin_rocket_sled.name",
-    "entities.items.reins_rallycart_rxt.name",
-    "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.desc_rallycart_rxt",
-    "hudChrome.mounts.name_goblin_rocket_sled",
-    "hudChrome.mounts.name_rallycart_rxt"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

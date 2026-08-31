@@ -1385,7 +1385,7 @@ export const sv_SE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Skuggsprångspaddan",
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
-      "name_goblin_rocket_sled": "Goblin Rocket Sled",
+      "name_goblin_rocket_sled": "Goblinraketsläde",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
@@ -1397,8 +1397,8 @@ export const sv_SE: EnTranslations = {
       "desc_shadowjump_toad": "En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.",
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
-      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
-      "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
+      "desc_goblin_rocket_sled": "En farligt överbyggd goblinsläde, driven av två raketer och utsökt dåligt omdöme.",
+      "desc_rallycart_rxt": "En liten rallymaskin som ökar färdhastigheten.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch."
@@ -13210,10 +13210,10 @@ export const sv_SE: EnTranslations = {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
       },
       "reins_goblin_rocket_sled": {
-        "name": "Ignition Key: Goblin Rocket Sled"
+        "name": "Tändningsnyckel: Goblinraketsläde"
       },
       "reins_rallycart_rxt": {
-        "name": "Ignition Key: Rallycart RXT"
+        "name": "Tändningsnyckel: Rallycart RXT"
       },
       "reins_rickshaw_mount": {
         "name": "Bundna tyglar: Benbunden Rickshaw"

@@ -14512,4 +14512,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Za žebříčkem slotů prodává správce pokladny také až čtyři sloty na brašny, které se postupně odemykají za stále vyšší ceny. Vlož do jednoho náhradní brašnu ze své nosné sady a její sloty se přidají k prostoru trezoru: běžná brašna rozšíří celý sklad, zatímco brašna na reagencie přidá místo pouze pro řemeslné materiály. Kliknutím na brašnu ve svých brašnách ji vložíš, kliknutím na slot ji zase vyjmeš. Vyjmutí ti nikdy nevezme nic uloženého: pokud bude trezor po zmenšení prostoru plnější, než se do něj vejde, všechno zůstane na místě a nové vklady jednoduše počkají, až se uvolní místo.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.',
   'wallet.browser.stepUpBody': 'Vyber peněženku propojenou s účtem a podepiš autorizační zprávu burzy $WOC. Podpis je zdarma a nepřevádí žádné prostředky.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Gobliní raketové saně',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Nebezpečně překonstruované gobliní saně poháněné dvěma raketami a skvěle špatným úsudkem.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Malý rallye stroj, který zvyšuje rychlost cestování.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Klíček zapalování: Gobliní raketové saně',
+  'entities.items.reins_rallycart_rxt.name': 'Klíček zapalování: Rallycart RXT',
 };

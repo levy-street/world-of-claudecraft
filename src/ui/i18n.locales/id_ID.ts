@@ -14581,4 +14581,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.packlord_emberhide_helmet.name': 'Kopiah Penguasa Kawanan',
   'entities.items.packlord_emberhide_legs.name': 'Celana Penguasa Kawanan',
   'entities.items.packlord_emberhide_shoulder.name': 'Pelindung Bahu Penguasa Kawanan',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Kereta Luncur Roket Goblin',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Kereta luncur goblin yang sangat berlebihan dan berbahaya, didorong dua roket serta penilaian buruk yang luar biasa.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Mesin reli mungil yang meningkatkan kecepatan perjalanan.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Kunci kontak: Kereta Luncur Roket Goblin',
+  'entities.items.reins_rallycart_rxt.name': 'Kunci kontak: Rallycart RXT',
 };

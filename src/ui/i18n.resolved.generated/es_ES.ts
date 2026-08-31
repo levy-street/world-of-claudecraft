@@ -1385,7 +1385,7 @@ export const es_ES: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
       "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
-      "name_goblin_rocket_sled": "Goblin Rocket Sled",
+      "name_goblin_rocket_sled": "Trineo cohete goblin",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
@@ -1397,8 +1397,8 @@ export const es_ES: EnTranslations = {
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
       "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
-      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
-      "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
+      "desc_goblin_rocket_sled": "Un trineo goblin peligrosamente sobredimensionado, propulsado por dos cohetes y un excelente mal juicio.",
+      "desc_rallycart_rxt": "Una máquina de rally en miniatura que proporciona mayor velocidad de viaje.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
@@ -13210,10 +13210,10 @@ export const es_ES: EnTranslations = {
         "name": "Llave de encendido: Aterrachispa, Sacudetierras"
       },
       "reins_goblin_rocket_sled": {
-        "name": "Ignition Key: Goblin Rocket Sled"
+        "name": "Llave de encendido: Trineo cohete goblin"
       },
       "reins_rallycart_rxt": {
-        "name": "Ignition Key: Rallycart RXT"
+        "name": "Llave de encendido: Rallycart RXT"
       },
       "reins_rickshaw_mount": {
         "name": "Riendas vinculadas: Rickshaw Atahuesos"

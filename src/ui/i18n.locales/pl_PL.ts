@@ -14528,4 +14528,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.warforged_waistguard.name': 'Ochraniacz Pasa Wykuty na Wojnę',
   'entities.items.warspirit_emberscale_chest.name': 'Kolczuga Łuski Żaru Ducha Wojny',
   'entities.items.warspirit_emberscale_gloves.name': 'Rękawice Łuski Żaru Ducha Wojny',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblińskie sanie rakietowe',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Niebezpiecznie przekombinowane goblińskie sanie, napędzane dwiema rakietami i znakomicie złym osądem.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Mała maszyna rajdowa, która zwiększa prędkość podróży.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Kluczyk zapłonu: Goblińskie sanie rakietowe',
+  'entities.items.reins_rallycart_rxt.name': 'Kluczyk zapłonu: Rallycart RXT',
 };

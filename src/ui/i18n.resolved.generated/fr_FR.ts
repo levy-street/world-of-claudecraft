@@ -1385,7 +1385,7 @@ export const fr_FR: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, le Crapaud Saute-Ombre",
       "name_stormfeather_griffin": "Plume-d’Orage Toise-Ciel",
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
-      "name_goblin_rocket_sled": "Goblin Rocket Sled",
+      "name_goblin_rocket_sled": "Luge-fusée gobeline",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
@@ -1397,8 +1397,8 @@ export const fr_FR: EnTranslations = {
       "desc_shadowjump_toad": "Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.",
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
-      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
-      "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
+      "desc_goblin_rocket_sled": "Une luge gobeline dangereusement surconstruite, propulsée par deux fusées et un excellent mauvais jugement.",
+      "desc_rallycart_rxt": "Une petite machine de rallye qui augmente la vitesse de déplacement.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
       "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
@@ -13210,10 +13210,10 @@ export const fr_FR: EnTranslations = {
         "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
       "reins_goblin_rocket_sled": {
-        "name": "Ignition Key: Goblin Rocket Sled"
+        "name": "Clé de contact : luge-fusée gobeline"
       },
       "reins_rallycart_rxt": {
-        "name": "Ignition Key: Rallycart RXT"
+        "name": "Clé de contact : Rallycart RXT"
       },
       "reins_rickshaw_mount": {
         "name": "Rênes liées : Rickshaw d'os liés"

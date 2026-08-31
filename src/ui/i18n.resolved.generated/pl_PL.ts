@@ -1385,7 +1385,7 @@ export const pl_PL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cienioskacząca Ropucha",
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
-      "name_goblin_rocket_sled": "Goblin Rocket Sled",
+      "name_goblin_rocket_sled": "Goblińskie sanie rakietowe",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
@@ -1397,8 +1397,8 @@ export const pl_PL: EnTranslations = {
       "desc_shadowjump_toad": "Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.",
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
-      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
-      "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
+      "desc_goblin_rocket_sled": "Niebezpiecznie przekombinowane goblińskie sanie, napędzane dwiema rakietami i znakomicie złym osądem.",
+      "desc_rallycart_rxt": "Mała maszyna rajdowa, która zwiększa prędkość podróży.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
@@ -13210,10 +13210,10 @@ export const pl_PL: EnTranslations = {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
       "reins_goblin_rocket_sled": {
-        "name": "Ignition Key: Goblin Rocket Sled"
+        "name": "Kluczyk zapłonu: Goblińskie sanie rakietowe"
       },
       "reins_rallycart_rxt": {
-        "name": "Ignition Key: Rallycart RXT"
+        "name": "Kluczyk zapłonu: Rallycart RXT"
       },
       "reins_rickshaw_mount": {
         "name": "Spętane lejce: Spętana Kośćmi Riksza"

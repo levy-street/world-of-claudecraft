@@ -1385,7 +1385,7 @@ export const tr_TR: EnTranslations = {
       "name_shadowjump_toad": "Gölge Sıçrayan Kurbağa Kama-Kage",
       "name_stormfeather_griffin": "Gökyüzü Erişimli Fırtınatüy",
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
-      "name_goblin_rocket_sled": "Goblin Rocket Sled",
+      "name_goblin_rocket_sled": "Goblin Roket Kızağı",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
@@ -1397,8 +1397,8 @@ export const tr_TR: EnTranslations = {
       "desc_shadowjump_toad": "Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.",
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
-      "desc_goblin_rocket_sled": "A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.",
-      "desc_rallycart_rxt": "A pint-sized rally machine that provides enhanced travel speed.",
+      "desc_goblin_rocket_sled": "İki roket ve mükemmel derecede kötü muhakemeyle ilerleyen, tehlikeli biçimde aşırı tasarlanmış bir goblin kızağı.",
+      "desc_rallycart_rxt": "Yolculuk hızını artıran küçük bir ralli makinesi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
@@ -13210,10 +13210,10 @@ export const tr_TR: EnTranslations = {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
       },
       "reins_goblin_rocket_sled": {
-        "name": "Ignition Key: Goblin Rocket Sled"
+        "name": "Kontak anahtarı: Goblin Roket Kızağı"
       },
       "reins_rallycart_rxt": {
-        "name": "Ignition Key: Rallycart RXT"
+        "name": "Kontak anahtarı: Rallycart RXT"
       },
       "reins_rickshaw_mount": {
         "name": "Bağlı Dizginler: Kemikbağlı Çekçek"

@@ -14350,4 +14350,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Yuva basamaklarının ötesinde, veznedar gittikçe yükselen fiyatlarla sırayla açılan dört çanta yuvasına kadar satar. Taşıma takımındaki yedek bir çantayı yuvaya yerleştirince yuvaları kasa odana katılır: sıradan bir çanta tüm depoyu genişletirken, malzeme kesesi yalnızca zanaat malzemelerinin kullanabileceği yer ekler. Yerleştirmek için çantalarındaki bir çantaya, geri almak için yuvaya tıkla. Geri almak, depoladığın hiçbir şeyi kaybettirmez: kasa küçülen alanından daha dolu hale gelirse her şey yerinde kalır ve yeni yatırmalar yer açılmasını bekler.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Düşük grafik ön ayarında bile etkin olan tüm güçlendirmeleri gösterir ve güçlendirme simgeleri için uygulanan olağan sınırı kaldırır.',
   'wallet.browser.stepUpBody': 'Hesabına bağlı cüzdanı seç ve $WOC Borsası yetkilendirme mesajını imzala. İmzalamak ücretsizdir ve hiçbir para hareket ettirmez.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblin Roket Kızağı',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'İki roket ve mükemmel derecede kötü muhakemeyle ilerleyen, tehlikeli biçimde aşırı tasarlanmış bir goblin kızağı.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Yolculuk hızını artıran küçük bir ralli makinesi.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Kontak anahtarı: Goblin Roket Kızağı',
+  'entities.items.reins_rallycart_rxt.name': 'Kontak anahtarı: Rallycart RXT',
 };

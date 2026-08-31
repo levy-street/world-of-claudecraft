@@ -14595,4 +14595,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Depois da sequência de espaços, o tesoureiro também vende até quatro espaços para bolsas, desbloqueados em ordem e por preços cada vez maiores. Coloque uma bolsa reserva do seu conjunto de transporte em um deles e seus espaços passam a fazer parte do seu cofre: uma bolsa comum amplia todo o armazenamento, enquanto uma bolsa de reagentes adiciona espaço que apenas materiais de criação podem ocupar. Clique em uma bolsa no seu inventário para colocá-la e clique no espaço para retirá-la. Retirá-la nunca custa nada do que você guardou: se o cofre acabar mais cheio do que o espaço reduzido comporta, tudo permanece no lugar e novos depósitos simplesmente aguardam espaço.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Mostra todos os benefícios ativos mesmo na predefinição gráfica Baixa, ignorando o limite normal de ícones de benefícios.',
   'wallet.browser.stepUpBody': 'Escolha a carteira vinculada à sua conta e assine a mensagem de autorização da Exchange $WOC. Assinar é gratuito e não movimenta fundos.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Trenó-foguete goblin',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Um trenó goblin perigosamente superdimensionado, impulsionado por dois foguetes e por um péssimo julgamento excelente.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Uma máquina de rali em miniatura que aumenta a velocidade de viagem.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Chave de ignição: Trenó-foguete goblin',
+  'entities.items.reins_rallycart_rxt.name': 'Chave de ignição: Rallycart RXT',
 };

@@ -14592,4 +14592,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Ignivar verslagen',
   'entities.quests.q_ignivar_heralds_heart.text': 'De overlevende die in elke echo wordt genoemd is Ignivar. Varkhul noemde hem heraut, zegel en sleutel. Versla hem. Als de archieven kloppen, zal zijn dood onthullen wat hij moest bewaken.',
   'entities.quests.q_ignivar_heralds_heart.title': 'Het Hart van de Heraut',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblin-raketslee',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Een gevaarlijk overgebouwde goblinslee, voortgestuwd door twee raketten en uitstekend slecht beoordelingsvermogen.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Een compacte rallymachine die de reissnelheid verhoogt.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Contactsleutel: Goblin-raketslee',
+  'entities.items.reins_rallycart_rxt.name': 'Contactsleutel: Rallycart RXT',
 };

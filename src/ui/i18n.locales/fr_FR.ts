@@ -14626,4 +14626,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Au-delà de l’extension des emplacements, le trésorier vend aussi jusqu’à quatre emplacements de sac, déverrouillés dans l’ordre à des prix toujours plus élevés. Placez-y un sac de rechange de votre équipement de portage pour ajouter ses emplacements à votre coffre : un sac ordinaire agrandit tout le rangement, tandis qu’une sacoche de composants n’offre de la place qu’aux matériaux d’artisanat. Cliquez sur un sac dans vos sacs pour le placer, puis cliquez sur l’emplacement pour le reprendre. Le reprendre ne vous fait jamais perdre ce que vous y avez entreposé : si le coffre devient plus rempli que son espace réduit, tout reste en place et les nouveaux dépôts attendent simplement qu’une place se libère.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Affiche tous les buffs actifs, même avec le préréglage graphique Faible, en contournant sa limite habituelle d’icônes de buffs.',
   'wallet.browser.stepUpBody': 'Choisissez le portefeuille lié à votre compte et signez le message d’autorisation de la Bourse $WOC. La signature est gratuite et ne déplace aucun fonds.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Luge-fusée gobeline',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Une luge gobeline dangereusement surconstruite, propulsée par deux fusées et un excellent mauvais jugement.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Une petite machine de rallye qui augmente la vitesse de déplacement.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Clé de contact : luge-fusée gobeline',
+  'entities.items.reins_rallycart_rxt.name': 'Clé de contact : Rallycart RXT',
 };

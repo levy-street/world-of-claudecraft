@@ -14445,4 +14445,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.frostquench_shoulder.name': 'Frostslukkende skulderkappe',
   'entities.items.furnace_march_greaves.name': 'Digelmarchens benskinner',
   'entities.items.gravebrand_chest.name': 'Gravemærket kåbe',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblin-raketslæde',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'En farligt overbygget goblinslæde, drevet af to raketter og fremragende dårlig dømmekraft.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'En lille rallymaskine, der øger rejsehastigheden.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Tændingsnøgle: Goblin-raketslæde',
+  'entities.items.reins_rallycart_rxt.name': 'Tændingsnøgle: Rallycart RXT',
 };

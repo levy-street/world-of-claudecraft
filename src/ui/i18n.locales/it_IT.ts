@@ -14672,4 +14672,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Oltre alla scala degli scomparti, il tesoriere vende anche fino a quattro scomparti per borse, che si sbloccano in ordine a prezzi sempre più alti. Inserisci in uno di essi una borsa di quelle che porti con te e i suoi spazi si aggiungeranno alla tua stanza del caveau: una borsa comune amplia tutto il deposito, mentre una borsa per reagenti aggiunge spazio solo per i materiali da creazione. Fai clic su una borsa nell’inventario per inserirla, oppure sullo scomparto per riprenderla. Riprenderla non ti fa mai perdere nulla di ciò che avevi depositato: se il caveau finisce per essere più pieno della stanza ridotta, tutto resta al suo posto e i nuovi depositi dovranno semplicemente attendere spazio.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Mostra ogni potenziamento attivo anche con il profilo grafico Basso, ignorando il normale limite di icone dei potenziamenti.',
   'wallet.browser.stepUpBody': 'Scegli il portafoglio collegato al tuo account e firma il messaggio di autorizzazione di Exchange $WOC. La firma è gratuita e non trasferisce alcun fondo.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Slitta a razzo goblin',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Una slitta goblin pericolosamente sovradimensionata, spinta da due razzi e da un eccellente pessimo giudizio.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Una piccola macchina da rally che aumenta la velocità di viaggio.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Chiave di accensione: Slitta a razzo goblin',
+  'entities.items.reins_rallycart_rxt.name': 'Chiave di accensione: Rallycart RXT',
 };

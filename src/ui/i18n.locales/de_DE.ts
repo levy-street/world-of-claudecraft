@@ -14674,4 +14674,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Nach den gestaffelten Lagerplatzerweiterungen verkauft der Kämmerer außerdem bis zu vier Taschenplätze, die der Reihe nach zu immer höheren Preisen freigeschaltet werden. Setze eine Ersatztasche aus deinem Trageset in einen Platz, und ihre Fächer werden Teil deines Tresorraums: Eine gewöhnliche Tasche erweitert das gesamte Lager, während eine Reagenzientasche nur Platz für Handwerksmaterialien schafft. Klicke auf eine Tasche in deinen Taschen, um sie einzusetzen, und auf den Platz, um sie wieder herauszunehmen. Beim Herausnehmen geht nichts verloren, was du eingelagert hast: Ist der Tresor danach voller als sein verkleinerter Raum, bleibt alles an seinem Platz, und neue Einlagerungen warten einfach auf freien Raum.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Zeigt jeden aktiven Stärkungseffekt auch bei der Grafikeinstellung Niedrig an und umgeht das übliche Limit für Stärkungssymbole.',
   'wallet.browser.stepUpBody': 'Wähle das mit deinem Konto verknüpfte Wallet und signiere die Autorisierungsnachricht für die $WOC-Börse. Das Signieren ist kostenlos und bewegt keine Guthaben.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Goblin-Raketenschlitten',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Ein gefährlich überkonstruierter Goblinschlitten, angetrieben von zwei Raketen und hervorragend schlechtem Urteilsvermögen.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Eine handliche Rallyemaschine, die die Reisegeschwindigkeit erhöht.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Zündschlüssel: Goblin-Raketenschlitten',
+  'entities.items.reins_rallycart_rxt.name': 'Zündschlüssel: Rallycart RXT',
 };

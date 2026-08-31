@@ -14689,4 +14689,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.economy.bankSockets': 'Más allá de la escalera de ranuras, el tesorero también vende hasta cuatro ranuras para bolsas, que se desbloquean en orden y a precios cada vez mayores. Coloca en una de ellas una bolsa de tu equipo y sus espacios se sumarán a tu bóveda: una bolsa normal amplía todo el almacén, mientras que una bolsa de reactivos añade espacio solo para materiales de fabricación. Haz clic en una bolsa de tus bolsas para colocarla y en la ranura para retirarla. Retirarla nunca te hace perder nada de lo que hayas guardado: si la bóveda acaba más llena que el espacio reducido, todo permanece en su sitio y los depósitos nuevos simplemente esperan hasta que haya espacio.',
   'guide.settingsPage.ifAlwaysShowAllBuffs': 'Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.',
   'wallet.browser.stepUpBody': 'Elige la cartera vinculada a tu cuenta y firma el mensaje de autorización de $WOC Exchange. Firmar es gratis y no mueve fondos.',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Trineo cohete goblin',
+  'hudChrome.mounts.name_rallycart_rxt': 'Rallycart RXT',
+  'hudChrome.mounts.desc_goblin_rocket_sled':
+    'Un trineo goblin peligrosamente sobredimensionado, propulsado por dos cohetes y un excelente mal juicio.',
+  'hudChrome.mounts.desc_rallycart_rxt':
+    'Una máquina de rally en miniatura que proporciona mayor velocidad de viaje.',
+  'entities.items.reins_goblin_rocket_sled.name': 'Llave de encendido: Trineo cohete goblin',
+  'entities.items.reins_rallycart_rxt.name': 'Llave de encendido: Rallycart RXT',
 };
