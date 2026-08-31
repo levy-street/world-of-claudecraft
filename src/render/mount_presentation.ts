@@ -26,7 +26,7 @@ import { applyRocketSledAttitude } from './goblin_rocket_sled_fx';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
 import { spinMountWheels, updateRickshawPuller } from './rickshaw_mount';
-import { RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
+import { type ExhaustPhase, RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
 import {
   applyVehicleExhaust,
   createVehicleExhaust,
@@ -40,6 +40,12 @@ import {
 } from './vehicle_suspension_fx';
 import { attachVehicleTaillights, RALLYCART_TAILLIGHTS } from './vehicle_taillights';
 import type { Vfx } from './vfx';
+
+// The audio state intentionally latches `stopping` after its one-shot fires so
+// the parked idle can sit underneath it. Smoke still needs the authored tail
+// only, or a parked cart keeps reading as mid-winddown forever. This is the
+// shipped forward Rallycart stop take rounded up from 2.53s.
+const RALLYCART_STOP_EXHAUST_TAIL_SEC = 2.55;
 
 /** The EntityView slice this pass touches: a caller-owned view record. */
 export interface MountPresentationHost {
@@ -93,6 +99,19 @@ export interface MountPresentationInputs {
   enginePhase: { state: 'idle' | 'starting' | 'moving' | 'stopping'; elapsed: number } | null;
   groundSample: (x: number, z: number) => number;
   dt: number;
+}
+
+function rallycartExhaustPhase(input: MountPresentationInputs): ExhaustPhase {
+  const phase = input.enginePhase;
+  if (!phase) return 'idle';
+  if (
+    phase.state === 'stopping' &&
+    !input.moving &&
+    phase.elapsed > RALLYCART_STOP_EXHAUST_TAIL_SEC
+  ) {
+    return 'idle';
+  }
+  return phase.state;
 }
 
 export function updateMountPresentation(
@@ -196,7 +215,7 @@ export function updateMountPresentation(
         chassis: v.mountSuspension.chassis,
         frontSign: v.mountSuspension.frontSign,
         ports: RALLYCART_EXHAUST_PORTS,
-        phase: input.enginePhase?.state ?? 'idle',
+        phase: rallycartExhaustPhase(input),
         elapsed: input.enginePhase?.elapsed ?? 0,
         reversing: input.anim.backwards,
         pivoting: v.mountPivot,
