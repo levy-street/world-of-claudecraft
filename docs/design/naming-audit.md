@@ -391,6 +391,16 @@ Vellum.
       2/3/4/5 and the apex 6 as rungs of the same ladder), so NEITHER
       mechanic is renamed and no rename branch exists. The row's own
       trade-dress note above stands unchanged.
+    - **Might of the Bear** (shipped elixir aura, elixir_of_the_bear;
+      appended 2026-08-31, closing the never-registered elixir-aura gap the
+      2026-08-16 registration recorded above) GENERIC: the stat word Might,
+      already GENERIC in this registry (Colossal Might, Warboar Might),
+      compounded with a real animal noun; shared fantasy English, no coined
+      token.
+    - **Might of the Boar** (shipped elixir aura, elixir_of_the_boar;
+      appended 2026-08-31) GENERIC: same shape and reasoning as the Bear row.
+    - **Might of the Serpent** (shipped elixir aura, elixir_of_the_serpent;
+      appended 2026-08-31) GENERIC: same shape and reasoning as the Bear row.
 
 - MINTED AT PHASE 11e (the four upper-tier crop names, web-verified 2026-08-21
   by a proposing exact-phrase pass and an adversarial pass scoped to the major

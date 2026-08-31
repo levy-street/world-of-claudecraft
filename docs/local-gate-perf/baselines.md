@@ -593,7 +593,7 @@ passes.
 |---|---|---:|
 | 1 | tests/audit_conservation_property.test.ts | 228947 |
 | 2 | tests/battleground.test.ts | 213411 |
-| 3 | tests/chronomancy_balance.test.ts | 116561 |
+| 3 | tests/chronomancy_balance.test.ts (suite since deleted from the tree; the row is a historical profile) | 116561 |
 | 4 | tests/parity/parity_g.test.ts | 97402 |
 | 5 | tests/eastbrook_gameplay_integration.test.ts | 91230 |
 

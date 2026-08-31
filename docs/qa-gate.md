@@ -128,7 +128,8 @@ deliberately wants two full suites running at once.
 that is actually the shared-host bottleneck.
 
 **Task cache (Turborepo):** pure artifact steps (`i18n:gen`, `wiki:content`, `sfx:check`,
-`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `npx turbo run`
+`check:types`, `build:env`, `build:server`, `build:bot`, `build:bundle`) run through `turbo run`
+(the gate spawns the `node_modules/.bin/turbo` binary directly)
 with inputs/outputs in root `turbo.json`. A warm second gate on an unchanged tree
 replays those steps from `.turbo/` (often under a second). Full vitest, browser tests,
 malware, changed-file Biome, and the i18n freshness `git diff` always run (they are not

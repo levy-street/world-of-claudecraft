@@ -92,7 +92,7 @@ const SLOT_DEFAULTS = [
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
-  // Movement / camera — polled every frame (held)
+  // Movement / camera: polled every frame (held)
   {
     id: 'forward',
     label: 'Move Forward',
@@ -446,7 +446,7 @@ export interface KeyMods {
   meta?: boolean;
 }
 
-// e.code values for the modifier keys themselves — never bindable on their own.
+// e.code values for the modifier keys themselves, never bindable on their own.
 const MODIFIER_CODES = new Set([
   'ShiftLeft',
   'ShiftRight',
@@ -624,7 +624,7 @@ export class Keybinds {
     // never letting one code land on two actions (first writer keeps it).
     // Actions absent from the stored blob (e.g. ones added in a later release
     // than the player's last save) KEEP their defaults rather than loading
-    // unbound — explicit stored bindings still win, so this only fills gaps.
+    // unbound (explicit stored bindings still win, so this only fills gaps).
     const claimed = new Set<string>();
     for (const a of BIND_ACTIONS) {
       const entry = obj[a.id];
@@ -718,7 +718,7 @@ export class Keybinds {
     return keyLabel(this.codeAt(id, index));
   }
 
-  /** Primary (or, if unset, secondary) label — used for action-bar keycaps. */
+  /** Primary (or, if unset, secondary) label, used for action-bar keycaps. */
   primaryLabel(id: string): string {
     const codes = this.map.get(id) ?? [];
     return keyLabel(codes[0] ?? codes[1] ?? null);

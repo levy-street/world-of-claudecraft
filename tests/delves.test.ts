@@ -1747,7 +1747,7 @@ describe('delve reward chest + surface exit flow', () => {
     return run;
   }
 
-  it('daily reset + first-vs-repeat XP keys off the injected UTC day (deterministic)', () => {
+  it('daily reset + first-vs-repeat XP keys off the injected reset day (deterministic)', () => {
     const sim = makeSim();
     sim.resetDay = '2026-06-18';
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);

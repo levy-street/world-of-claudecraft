@@ -311,7 +311,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
   // precedent (RIFT_JEWELRY_RATING = 25, matching heroic quartermaster rings).
   // All ratings are off the primary-stat budget like spellPower so stat sums stay
   // budget-enforced. Rating choices follow the stat identity: str/tank -> hit,
-  // agi -> crit, int/spi (healer-facing) -> haste (healers are not level-resisted).
+  // agi -> crit; the int/spi pieces carry haste and NO authored Hit, which under
+  // the operative heroic_variants.ts rule (only an authored Hit seed marks a
+  // spell-facing piece as caster DPS) reads them as healer/throughput cloth.
   // See heroic_loot.ts for the ilvl-31 armor template these mirror.
   emberforged_bulwark: {
     id: 'emberforged_bulwark',
@@ -364,8 +366,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     // ilvl-31 ring epic budget = 13; sta:8+spi:5 = 13.
     // Rating follows the jewelry precedent (25, not the 40 armor-piece floor).
-    // Haste suits the sta/spi (healer-facing) stat identity; healers are not
-    // resisted by level so Hit would be wasted.
+    // Haste with NO authored Hit: under the heroic_variants.ts rule an authored
+    // Hit seed is what marks caster DPS, so the Hit-free sta/spi line reads as
+    // healer/throughput jewelry.
     stats: { sta: 8, spi: 5 },
     hasteRating: RIFT_JEWELRY_RATING,
     sellValue: 12000,

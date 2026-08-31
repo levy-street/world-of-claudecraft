@@ -353,7 +353,7 @@ describe('ranked Arena honor', () => {
     ).toBe(4);
   });
 
-  it('does not reset a persisted daily window when the host has no UTC day', () => {
+  it('does not reset a persisted daily window when the host has no reset day', () => {
     const sim = world();
     sim.resetDay = '2026-07-08';
     const pid = sim.addPlayer('warrior', 'Replay');

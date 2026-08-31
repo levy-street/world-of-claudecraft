@@ -7287,15 +7287,15 @@ export type SimEvent = { pid?: number } & (
   // Rare gather event (Professions 2.0): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom, or a farm bed paid a golden
   // harvest (nodeType 'crop', the farming celebrations phase). Soft zone
-  // broadcast: one copy is
-  // emitted per player currently in the source's zone, `pid` being the
-  // RECIPIENT
-  // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
-  // plus values only, text-free on purpose: the client renders its own
-  // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
+  // broadcast: one copy is emitted per player currently in the source's
+  // zone, `pid` being the RECIPIENT (the chat fanout idiom);
+  // finderPid/finderName identify the harvester. Ids plus values only,
+  // text-free on purpose: the client renders its own localized line off
+  // `flavor` (the gatherEvent.* keys). The HUD reads only
   // flavor/finderName/finderPid today; zoneId/nodeType/itemId are forward
   // payload for the per-family deeds/tuning consumers (asserted by the
-  // gather rare-event tests so the shape is already load-bearing on the wire).
+  // gather rare-event tests so the shape is already load-bearing on the
+  // wire).
   | {
       type: 'gatherRareEvent';
       pid: number;
@@ -8264,7 +8264,9 @@ export type DeedTrigger =
   // craftSkills: with craftId, that one craft at or above level; without, at
   // least `count` (default 1) crafts on the ring at or above level.
   | { kind: 'craftSkill'; craftId?: string; level: number; count?: number }
-  // gatheringProficiency: same shape as craftSkill over the three professions.
+  // gatheringProficiency: same shape as craftSkill over the gathering
+  // professions (the live roster is GATHERING_PROFESSION_IDS in
+  // content/professions.ts).
   | {
       kind: 'gathering';
       professionId?: GatheringProfessionId;

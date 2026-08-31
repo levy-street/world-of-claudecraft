@@ -53,7 +53,10 @@ equals English, brand terms verbatim, no em or en dash or emoji, the "todo" guar
 dialect divergence-only rule), then the inserter, then npm run i18n:gen and the regen
 COMMITTED with the overlays (the freshness suites fail on uncommitted regen). Then the
 reword-staleness rows as FULL REPLACEMENTS through the same pipeline, the deed channel
-by hand, the two whole-block regens as blocks. Verify: I18N_RELEASE_TIER=1 over the six
+by hand, the two whole-block regens as blocks. Release-time wiki seed regen rides here
+too: npm run wiki:seed and RECOMMIT mediawiki/seed/pages.xml (the seed bakes the live
+sim content tables, so any packet content change moves it; zero-diff is also a valid
+outcome, recorded). Verify: I18N_RELEASE_TIER=1 over the six
 release-tier suites (deed_i18n, i18n_status_registry, i18n_t_behavior,
 localization_coverage, localization_fixes, reliquary_i18n): ALL GREEN, pending 0, and
 the summary's pending count 0 (pending=0 is not full coverage: the reword-staleness rows

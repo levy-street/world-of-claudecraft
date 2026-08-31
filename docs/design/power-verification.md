@@ -351,9 +351,10 @@ and 64 at tier 4), so tier 3 and 4 produce is really obtainable and food uptime
 is a real input rather than a dormant one.
 
 **The `recipe_seasoned_stock` row is in the tree** with `marsh_rice` 2 and
-`bog_beet` 2. The phase file calls this "11e decision 6"; it is ruling 11g-D-C
-and it landed in 11g, not 11e. The content the phase file names is correct; the
-label is stale. Recorded, not acted on.
+`bog_beet` 2, per ruling 11g-D-C, landed in 11g. (This paragraph once called
+that ruling by a stale "11e decision 6" label and recorded the staleness;
+CORRECTED 2026-08-31 under qr-18-REOPEN, Phase 18 item
+stale-11e-decision-6-label.)
 
 **The level-20 shelf is UNMOVED by Phase 11o**, re-derived rather than assumed.
 Nineteen recipe rows moved `recipe.level` (rung-50 gear 20 to 15, two rung-75
@@ -1229,6 +1230,8 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   tuned here.
 - **The phase file's "11e decision 6"** is ruling 11g-D-C, landed in 11g. The
   content is correct; the label is stale.
+  ACTIONED (qr-18-REOPEN, 2026-08-31): Phase 18 corrected the label everywhere
+  it stood (item stale-11e-decision-6-label); this row stays as the record.
 - **The server PBE boost gives a prot tank a caster belt.** `spiritweld_girdle`
   wins the tank waist in `server/pbe_boost.ts`'s scorer, because a tank role adds
   any armour to identity and the rating term then breaks the tie, costing the

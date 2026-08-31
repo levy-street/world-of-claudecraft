@@ -72,8 +72,9 @@ export const MANIFEST_ARTIFACTS = Object.freeze([
 /**
  * Full local gate steps (after dep-sync and ffmpeg preflights in gate.mjs).
  *
- * Cacheable pure artifacts go through `npx turbo run` (inputs/outputs in
- * turbo.json). Malware, biome, and tests always run via npm (no "passed" cache).
+ * Cacheable pure artifacts go through `turbo run`, spawned directly from
+ * node_modules/.bin/turbo (inputs/outputs in turbo.json). Malware, biome, and
+ * tests always run via npm (no "passed" cache).
  * i18n:gen, wiki:content, and sfx:check are independent leaf tasks in turbo.json
  * (none dependsOn another), so they share one turbo multi-task step for wall-clock
  * overlap on a cold cache, same as typecheck + env + server builds below; client

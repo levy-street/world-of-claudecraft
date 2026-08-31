@@ -565,9 +565,6 @@ export function evaluateDisenchantAdmission(
   return null;
 }
 
-/** Canonical JSON with recursively sorted object keys, so two structurally
- *  identical instance payloads fingerprint identically regardless of key
- *  insertion order (a save round-trip can reorder keys). Pure, draw-free. */
 // Exported for professions/sundering.ts: the sunder cast rides the same
 // enchant-family session fields (and so the same cancel semantics).
 export function beginEnchantFamilyCast(

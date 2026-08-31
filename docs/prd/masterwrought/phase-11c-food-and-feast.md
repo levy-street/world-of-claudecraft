@@ -1,5 +1,7 @@
 # Phase 11c: Food and feast reconciliation
 
+OUTCOME NOTE (2026-08-31): the pre-tune flask 15 and 21-stamina kit premises below are that era's facts, superseded by the Phase 15 tune; read them as the record of what R5 was measured against then, not the live values.
+
 ### Starter Prompt
 ```
 This is Phase 11c of the Masterwrought feature: the one genuine design collision in the

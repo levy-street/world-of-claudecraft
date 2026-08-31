@@ -364,7 +364,8 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     // tier: the three role plates and the three flasks at rung 100, and both
     // skill-125 capstones, the top of the CONSUMABLE catalog (cooking and
     // alchemy top out at 125, and since masterwrought Phase 11o re-tiered
-    // the apex tool family off 150 the whole table does too). Every one
+    // the apex tool family off 150 the whole table does too; AMENDED
+    // 2026-08-31, masterwrought qr-11o-150). Every one
     // of them is a row farming did not write, so the half of this census that
     // is not farming buying from itself goes from ONE member to NINE.
     expect(endgameBills.map((r) => r.id).sort()).toEqual(

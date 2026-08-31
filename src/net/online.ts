@@ -1765,9 +1765,9 @@ export class ClientWorld implements IWorld {
     knownRecipes: [],
     cadenceBlockedQuests: [],
   };
-  // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
-  // from the `gprof` self-wire delta below (the real read surface; see
-  // professionsState below for crafting/secondary professions).
+  // Gathering profession proficiency (the GATHERING_PROFESSION_IDS roster,
+  // #1119), mirrored from the `gprof` self-wire delta below (the real read
+  // surface; see professionsState below for crafting/secondary professions).
   gatheringProficiency: Record<string, number> = {};
   // Slotted tool effects, one row per gathering profession that has one,
   // mirrored from the `tslot` self-wire delta. Empty for every player who has
@@ -1797,8 +1797,8 @@ export class ClientWorld implements IWorld {
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
-  // Gathering profession proficiency (Mining/Logging/Herbalism), the real
-  // read surface for #1119; mirrored from the `prof` wire delta below.
+  // Gathering profession proficiency (the GATHERING_PROFESSION_IDS roster),
+  // the real read surface for #1119; mirrored from the `prof` wire delta below.
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };

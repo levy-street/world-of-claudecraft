@@ -299,6 +299,18 @@ For off-box safety, sync the directory to S3 occasionally:
   unenchanted copy a player confirms a replace onto loses its bonus until
   restore-from-backup. Deploy the Perfecting release fleet-wide in one pass like the
   two bullets above.
+- **Content-id additions are a one-way door (the itemsDiscovered/deeds class)**: any
+  release that adds a content id (an item, a deed, a visited-mark namespace) is
+  rollback-destructive and mixed-fleet-unsafe for persisted state that USES the new
+  id, even when the release's code changes look trivially revertible. The mechanism
+  is the load-side id gate: `restoreDeedStats` (src/sim/deeds.ts) drops any
+  `itemsDiscovered` id its own ITEMS table lacks, and the old binary's next autosave
+  writes the reduced set back, permanently; deed counters behave the same way (the
+  `legendariesForged` erasure in the orange-promotion bullet below is this class). A
+  mixed fleet does it without any rollback: a character landing on an old process
+  loses the new-id state on its next autosave. So treat every content-id addition as
+  a fleet-wide-in-one-pass boundary, and a rollback across one as needing
+  restore-from-backup for the state that referenced the new ids.
 - **Orange-promotion rolling window (cosmetic)**: the promotion release RETIRES the
   sim's "That item is already Perfected." line (its client matcher row was removed
   with it), so during a realm-by-realm roll an OLD server still emits that line to

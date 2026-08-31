@@ -177,9 +177,9 @@ the judgment surface for the future-tier revisit brainstorm.md carries.
   record and is reported as such; it is never an in-phase re-tune of a settled magnitude.
 - Confirm 11e landed before measuring: decision 1 (the tier 3 and 4 seed faucet at
   `farmer_hollis` and `farmer_verbena`) changes real-world tier 3 and 4 produce
-  availability, which changes food uptime, which is an R5 INPUT; and decision 6
-  (`marsh_rice` count 2 into `recipe_seasoned_stock`) must be in the tree before this
-  phase seals numbers, never after.
+  availability, which changes food uptime, which is an R5 INPUT; and ruling 11g-D-C
+  (`marsh_rice` count 2 into `recipe_seasoned_stock`, landed in 11g) must be in the tree
+  before this phase seals numbers, never after.
 - ACCESS VERSUS POWER IS SETTLED (2026-08-20, row ip-15-ACCESS). R5 measures the GEARED
   INDIVIDUAL at full food uptime, never the raid aggregate. Every knob R5 names is a
   per-character stat (flask 15, well-fed 6, apex enchants, 2 Perfected pieces), and

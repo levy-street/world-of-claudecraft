@@ -26,7 +26,11 @@ import type { ProfessionRecipeRecord } from './types';
 
 /** Why a pattern use was refused, or `ok` when the learn may proceed.
  *  Stable codes, not player-facing prose: the apply function below owns the
- *  English literals, so the resolver stays language-agnostic and testable. */
+ *  English literals, so the resolver stays language-agnostic and testable.
+ *  Exported with no external consumer ON PURPOSE, the TrainResult idiom
+ *  (./training.ts TrainResult): a pure resolver's result type is part of its
+ *  public seam, so a test or a future caller can name the outcome shape
+ *  without re-deriving it. */
 export type PatternLearnResult =
   | { ok: true }
   | { ok: false; reason: 'invalid' | 'already_known' | 'profession' | 'tier' };

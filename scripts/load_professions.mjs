@@ -119,7 +119,7 @@ const TOOL_BY_NODE_TYPE = {
 };
 const T1_TOOLS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
 const ROD_ITEM = 'silverstream_fishing_rod';
-const GATHER_PROFS = ['mining', 'logging', 'herbalism'];
+const GATHER_PROFS = ['mining', 'logging', 'herbalism', 'fishing', 'farming'];
 
 const SNAP_PREFIX = Buffer.from('{"t":"snap"');
 const EVENTS_PREFIX = Buffer.from('{"t":"events"');

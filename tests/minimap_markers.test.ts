@@ -898,7 +898,8 @@ describe('station markers (Professions 2.0)', () => {
       const markers = stationMarkers(makeStationWorld(shape));
       // The four Eastbrook stations; the two other-zone stations are culled.
       expect(markers, shape).toHaveLength(4);
-      // The forge (STATIONS[0], x -5.80, z -123.90) lands at the projected px:
+      // The forge (STATIONS[0]; coordinates read live from STATIONS[0].pos)
+      // lands at the projected px:
       // mx = half - dx * pxPerYard, my = half - dz * pxPerYard.
       const half = S / 2;
       const forge = STATIONS[0];

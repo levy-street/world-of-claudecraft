@@ -183,7 +183,8 @@ export function turboRunArgs(tasks) {
 }
 
 /**
- * True when a gate step invokes turbo through npx for cacheable pure artifacts.
+ * True when a gate step invokes the node_modules/.bin/turbo binary for
+ * cacheable pure artifacts.
  * @param {string} cmd
  * @param {ReadonlyArray<string>} args
  */

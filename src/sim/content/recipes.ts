@@ -8,7 +8,8 @@
 // recipe is craftable with zero craft skill, gated only by having the
 // materials). The file has since grown past that floor: TOOL_RECIPES
 // (skillReq 75/125 since masterwrought Phase 11o retired the fictional 150
-// rung to the reachable cap tier, station-bound at the toolworks) and
+// rung to the reachable cap tier, station-bound at the toolworks; AMENDED
+// 2026-08-31, masterwrought qr-11o-150) and
 // COMBO_RECIPES
 // (skillReq 25, the #1132 dual-craft gate) sit alongside it. There is still
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
@@ -2438,7 +2439,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'spiritweld_girdle',
     resultCount: 1,
-    // Input 491 vs output 300.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'forgefold_plating', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2456,7 +2458,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'forgefold_legguards',
     resultCount: 1,
-    // Input 491 vs output 320.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'forgefold_plating', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2474,7 +2477,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'wardspeaker_sabatons',
     resultCount: 1,
-    // Input 491 vs output 280.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'forgefold_plating', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2492,7 +2496,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'briarstep_jerkin',
     resultCount: 1,
-    // Input 265 vs output 175.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'wyrmhide_cording', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2510,7 +2515,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'fenbloom_breeches',
     resultCount: 1,
-    // Input 265 vs output 160.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'wyrmhide_cording', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2528,7 +2534,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'barksong_handguards',
     resultCount: 1,
-    // Input 265 vs output 140.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'wyrmhide_cording', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2546,7 +2553,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'sunspun_vestments',
     resultCount: 1,
-    // Input 280 vs output 200.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'sunspun_bolt', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2564,7 +2572,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'sunspun_leggings',
     resultCount: 1,
-    // Input 280 vs output 190.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'sunspun_bolt', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2582,7 +2591,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'sunspun_handwraps',
     resultCount: 1,
-    // Input 280 vs output 170.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'sunspun_bolt', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -2600,7 +2610,8 @@ export const APEX_ARMOR_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'sunspun_haversack',
     resultCount: 1,
-    // Input 280 vs output 180.
+    // Authored gold-negative: input value exceeds the output sellValue (live
+    // values in items.ts; pinned by tests/recipe_economy.test.ts).
     reagents: [
       { itemId: 'sunspun_bolt', count: 3 },
       { itemId: 'wyrmfall_core', count: 2 },
@@ -3121,7 +3132,8 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   // ceiling. ALL_RECIPES topped out at 150 at that phase's own runtime, the
   // apex tool family it recorded as out of scope, census "3 at 125, 3 at
   // 150"; masterwrought Phase 11o later re-tiered those three to 125, so the
-  // table now tops out at the cap. 2026-08-27, phase 13 / R13: INSCRIPTION
+  // table now tops out at the cap; AMENDED 2026-08-31, masterwrought
+  // qr-11o-150. 2026-08-27, phase 13 / R13: INSCRIPTION
   // joins the 125 rung with recipe_deed_of_making, its first, a trainer row
   // in INSCRIPTION_RECIPES rather than a drop.) Neither is a hoe twin (the hoe ladder
   // takes fine_vale_wheat,
