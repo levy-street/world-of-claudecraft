@@ -1618,9 +1618,9 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
       (entry) => entry.itemId,
     );
-    const heroicLootIds = (
-      HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []
-    ).map((entry) => entry.itemId);
+    const heroicLootIds = (HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []).map(
+      (entry) => entry.itemId,
+    );
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
     expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
     expect(normalLootIds).not.toContain('varkhul_emberward');
