@@ -23547,6 +23547,50 @@ record; the QA twin re-sweeps and diffs.
   test split across two commits. It named the hunk boundaries; one hunk staged,
   five skipped.
 
+### THE CLOSE-OUT, AND THE CHECK THAT SHOULD HAVE RUN ALL ALONG
+
+The phase's last finding is the most portable one and it was found by an agent
+assembling a report rather than by any gate: A COMMIT CAN LAND A CONSUMER WHILE
+ITS NEW MODULE STAYS UNTRACKED. src/ui/hud.ts was committed importing two
+extracted modules that were never added to git. It typechecked for every agent
+and every local run, because every working tree had the files sitting untracked
+on disk, and it would have failed for the first person to check the branch out.
+Two paired suites went the same way, so two new modules shipped without their
+tests. The author proved it rather than inferring it: moved the files aside, ran
+tsc, got exactly the two TS2307s, moved them back, clean again.
+
+THE CHECK THAT CATCHES IT is a clean worktree at the tip with node_modules
+linked, typechecked in isolation:
+  git worktree add --detach <tmp> HEAD
+  ln -s <repo>/node_modules <tmp>/node_modules
+  cd <tmp> && npx tsc --noEmit
+Run on a tip whose WORKING tree read exit 0, that returned 166 ERRORS. Only four
+errors' worth were the missing modules; the remaining 162 were the same shape one
+level up, the committed catalog deletions referencing regenerated bundles that
+only the working tree had. So the isolation check found both the local mistake
+and the deferred obligation, and it is what turned the phase-close regeneration
+from a scheduling item into a hard prerequisite. The sequence was 166, then 13
+after the regen, then 0 after five trailing suites that still spoke pre-narrowing
+shapes. A cheap pre-check catches the common case without a worktree: list
+untracked new sources, then grep HEAD for anything COMMITTED that references
+them.
+
+Recorded beside it, from the same commit: a .ts file written with RAW control
+bytes is classified BINARY by git. The collision guard used two 0x00 bytes as its
+key separator, which is the right CHOICE (NUL is the one character that cannot
+occur in TypeScript source, so an element expression containing spaces cannot
+forge a boundary) written the wrong WAY. git rendered the whole guard as Bin, so
+every review of it was blind. Write the escape, never the byte.
+
+CLOSE-OUT STATE at the time of writing: every unit committed, including five that
+were complete but unstaged when their agents hit the session limit and one whose
+author died twice over; the committed tree typechecks clean IN ISOLATION; the
+monolith ratchet green with five ceilings LOWERED and none raised; architecture,
+IWorld parity and the S3 i18n guard green; the single phase-close regeneration
+landed; and the symbol census at exit 0 RESULT PASS, its first clean run of the
+phase, after 27 missing rows were written from the code and five honest rows were
+RELOCATED (never deleted) out of a table structurally unable to hold them.
+
 ### THE SESSION-LIMIT WAVE (four units died at once; what the replacements found)
 
 Four units hit a hard session limit within minutes of each other with all their
