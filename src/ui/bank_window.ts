@@ -41,6 +41,7 @@ import { bankBonusSectionHtml } from './bank_bonus_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_layout_core';
 import { filterBankSlots } from './bank_filter';
+import { bankSlotDisplayName } from './bank_item_name_core';
 import { bankMeterAriaLabel, bankMeterTooltipHtml } from './bank_meter_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { BankRungPurchase } from './bank_rung_purchase_core';
@@ -1043,7 +1044,10 @@ export class BankWindow {
       slots,
       (id) => knownItemDef(ITEMS, id),
       this.filter,
-      (id) => this.itemNameOf(id),
+      // Search and the name-sort both read the name the CELL shows
+      // (bank_item_name_core), so neither can file a copy under a name the
+      // player cannot see.
+      (slot) => bankSlotDisplayName(knownItemDef(ITEMS, slot.itemId), slot),
     );
     if (visible.length === 0) {
       // A narrowing filter matched nothing: show the no-match line. With NO filter active
@@ -1146,14 +1150,6 @@ export class BankWindow {
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
-  }
-
-  // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id falls back to the raw id: that is the label
-  // its cell renders (the stale-client guard above), so sort and search stay agreed.
-  private itemNameOf(itemId: string): string {
-    const item = knownItemDef(ITEMS, itemId);
-    return item ? itemDisplayName(item) : itemId;
   }
 
   // Repaint ONLY the grid from the live bank + current filter, preserving the search
@@ -1883,9 +1879,9 @@ export class BankWindow {
     const item = knownItemDef(ITEMS, slot.itemId);
     // Uniformity read: inert today, since the partial-withdraw rung offers
     // only on !slot.instance (bank_view.ts bankSlotAction), so this always
-    // resolves the def name; kept on the authority so a future instanced
-    // rung cannot regress it silently.
-    const itemName = item ? wornItemCellParts(item, slot.instance).name : slot.itemId;
+    // resolves the def name; kept on the shared cell rule the search and the
+    // name-sort read, so a future instanced rung cannot regress it silently.
+    const itemName = bankSlotDisplayName(item, slot);
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>

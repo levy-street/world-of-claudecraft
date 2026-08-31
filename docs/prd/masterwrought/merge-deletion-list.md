@@ -1410,6 +1410,14 @@ authors a new name appends its rows in the same change.
 | i18n key | `materialHint.oldCragmawsPelt` | 18 | qr-18-REOPEN, item per-item-material-hint-lead | the same, for Old Cragmaw's Pelt (src/ui/i18n.catalog/hud_chrome.ts) |
 | i18n key | `materialHint.emberwingCinderscale` | 18 | qr-18-REOPEN, item per-item-material-hint-lead | the same, for the Emberwing Cinderscale (src/ui/i18n.catalog/hud_chrome.ts) |
 | i18n key | `masterwrought.tooltipLegendaryLimit` | 18 | qr-18-REOPEN, item legendary-subcap-tooltip | the legendary SUB-cap stated on the hover tooltip of a legendary-effective Masterwrought copy, the only copy the rule can refuse; `{cap}` interpolates MASTERWROUGHT_LEGENDARY_CAP so the number cannot drift from src/sim/equipment_rules.ts; wordy under M16, five non-Latin fills in the same change (src/ui/i18n.catalog/hud_chrome.ts) |
+| exports | `isPatternItem` | 18 | qr-18-REOPEN, item market-pattern-corner-mark | the pattern predicate, shared with the Browse type chip so the mark and the filter cannot disagree (src/ui/market_armor_badge.ts) |
+| exports | `marketPatternMark` | 18 | qr-18-REOPEN, item market-pattern-corner-mark | the third icon-corner mark, bottom-left where it can collide with neither the heroic star nor the armor pips (src/ui/market_armor_badge.ts) |
+| exports | `localizedMarketSearch` | 18 | qr-18-REOPEN, item market-search-localized | translates a localized Browse query into an English one it can PROVE selects the same items, else hands back the typed text (src/ui/market_search_localized_core.ts) |
+| exports | `LocalizedMarketSearchInput` | 18 | qr-18-REOPEN, item market-search-localized | that resolver's injected inputs: the catalog, the localized name resolver, the authority's own matcher (src/ui/market_search_localized_core.ts) |
+| exports | `LocalizedItemName` | 18 | qr-18-REOPEN, item market-search-localized | the localized-name resolver type (src/ui/market_search_localized_core.ts) |
+| exports | `EnglishSearchMatch` | 18 | qr-18-REOPEN, item market-search-localized | the English/id matcher type; the caller passes the real marketItemMatches so verification cannot drift (src/ui/market_search_localized_core.ts) |
+| exports | `bankSlotDisplayName` | 18 | qr-18-REOPEN, item bank-search-chosen-name | the name a bank CELL shows, so the search and the name-sort file a copy under the name the player can actually see; it takes the slot rather than an item id because a chosen name belongs to a COPY (src/ui/bank_item_name_core.ts) |
+| exports | `BankNamedSlot` | 18 | qr-18-REOPEN, item bank-search-chosen-name | the per-cell slice that rule reads, an itemId plus the optional instance payload, so the core stays a pure leaf over the bank grid model (src/ui/bank_item_name_core.ts) |
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 

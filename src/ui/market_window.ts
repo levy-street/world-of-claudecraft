@@ -19,6 +19,7 @@
 // prompt itself is Hud's one #confirm-dialog, injected as a dep.
 
 import { audio } from '../game/audio';
+import { ITEMS } from '../sim/data';
 import type { ItemInstancePayload, ItemSlot } from '../sim/types';
 import {
   type IWorld,
@@ -32,14 +33,20 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
-import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
+import { formatMoney as formatLocalizedMoney, formatNumber, getLanguage, t } from './i18n';
+import {
+  marketArmorBadge,
+  marketArmorPips,
+  marketHeroicStar,
+  marketPatternMark,
+} from './market_armor_badge';
 import {
   type MarketBuyConfirm,
   marketBuyConfirm,
   recheckMarketBuy,
 } from './market_buy_confirm_core';
 import {
+  defaultMarketQuery,
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
@@ -52,9 +59,11 @@ import {
   type MarketRarityFilter,
   type MarketSort,
   type MarketSubtypeFilter,
+  marketItemMatches,
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
 import { marketPriceHtml } from './market_price_view';
+import { localizedMarketSearch } from './market_search_localized_core';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -128,6 +137,19 @@ export class MarketWindow {
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
+  // Memo for the typed-to-sent search translation (effectiveSearch): the
+  // resolution walks the whole item catalog, and currentQuery() is reachable
+  // from the per-frame reconnect check as well as from a keystroke.
+  //
+  // The LANGUAGE is part of the key, not just the typed text. The resolution
+  // reads localized item names, so the same typed string resolves to a
+  // different search per locale, and a text-only key served the previous
+  // locale's substitution after a switch: not the empty result the untranslated
+  // path gives, but a wrong one, which is the single thing this feature must
+  // never produce. This is the memo half of the language fan-out rule
+  // (src/ui/CLAUDE.md); keying it is what answers it, so no relocalize() arm is
+  // owed and none is registered.
+  private searchEcho: { typed: string; lang: string; sent: string } | null = null;
   private lastSig = '';
   // The Sell tab's price-reference echo signature (issue 3043), tracked SEPARATELY
   // from lastSig: the Sell tab is excluded from the general per-frame rebuild (it
@@ -213,10 +235,31 @@ export class MarketWindow {
     this.render();
   }
 
+  /** The search string actually SENT, which is the typed text translated at the
+   *  UI boundary when the player is not typing English (see
+   *  market_search_localized_core.ts; the box keeps showing what they typed).
+   *  Memoized on the typed text because currentQuery() is also reached from the
+   *  per-frame reconnect check, while the resolution walks the whole catalog. */
+  private effectiveSearch(): string {
+    const lang = getLanguage();
+    if (this.searchEcho?.typed === this.searchQuery && this.searchEcho.lang === lang) {
+      return this.searchEcho.sent;
+    }
+    const sent = localizedMarketSearch({
+      query: this.searchQuery,
+      itemIds: Object.keys(ITEMS),
+      localizedNameOf: (id) => itemDisplayName(ITEMS[id]),
+      englishMatches: (id, search) => marketItemMatches(id, { ...defaultMarketQuery(), search }),
+      englishHaystackOf: (id) => `${id} ${ITEMS[id]?.name ?? ''}`,
+    });
+    this.searchEcho = { typed: this.searchQuery, lang, sent };
+    return sent;
+  }
+
   /** The current browse query (search + filters + page) the UI sends to the server. */
   private currentQuery(): MarketQuery {
     return {
-      search: this.searchQuery,
+      search: this.effectiveSearch(),
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
       armorClass: this.armorClassFilter,
@@ -769,6 +812,10 @@ export class MarketWindow {
       // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
       // "left-bracket HEROIC right-bracket".
       const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      // Pattern mark: the third corner of the same family, bottom-left (the two
+      // above hold top-left and bottom-right). Reuses the type chip's own word,
+      // so the mark and the filter that finds it read the same.
+      const patternMark = marketPatternMark(item, esc(t('itemUi.market.filterTypePattern')));
       // Gold-dominant, coinless, copper-trimmed price (market-scoped, see
       // market_price_view). The pure builder is i18n-free: pass the localized
       // short unit letters and the full localized amount (which rides the block's
@@ -780,7 +827,7 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-ico">${this.deps.itemIcon(item, effQuality)}${badge}${heroicStar}${patternMark}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;

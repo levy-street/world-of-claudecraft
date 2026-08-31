@@ -13968,6 +13968,25 @@
       0 0 3px #000;
     pointer-events: none;
   }
+  /* Pattern mark: the third corner of the same family, BOTTOM-LEFT. The heroic
+     star holds top-left and the armor pips bottom-right, and bottom-left is the
+     corner that cannot collide with either: an armor pattern is not itself
+     armor so it draws no pips, while a pattern CAN be heroic, and both must
+     stay readable at once. Parchment-toned rather than gold, so the two marks
+     never read as one repeated cue; the lozenge glyph is distinguishable from
+     the star in silhouette alone, which is what carries it in grayscale. */
+  .mkt-pattern-mark {
+    position: absolute;
+    left: -3px;
+    bottom: -3px;
+    font-size: 10px;
+    line-height: 1;
+    color: #d9c9a3;
+    text-shadow:
+      0 1px 2px #000,
+      0 0 3px #000;
+    pointer-events: none;
+  }
   /* Price is the number a shopper is actually comparing, so give it real weight.
      The market paints a gold-dominant, coinless, copper-trimmed block
      (market_price_view.ts): the largest denomination is the big headline, the

@@ -427,6 +427,8 @@ const UI_PURE_CORES = [
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
+  'src/ui/market_search_localized_core.ts',
+  'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',

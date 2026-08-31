@@ -174,10 +174,16 @@ describe('bank_window: modal prompt a11y contract', () => {
     const promptBody = stripped.slice(stripped.indexOf('private showWithdrawQuantityPrompt('));
     expect(promptBody.slice(0, 400)).toContain('knownItemDef(ITEMS, slot.itemId)');
     expect(promptBody.slice(0, 400)).not.toContain('? ITEMS[slot.itemId]');
-    // The title reads the cell authority (inert today: the partial rung
-    // offers only on !slot.instance; pinned so an instanced rung cannot
-    // regress it silently, the round-4 audit).
-    expect(promptBody.slice(0, 600)).toContain('wornItemCellParts(item, slot.instance).name');
+    // The title reads the cell authority, and reads it through the SHARED core
+    // the bank's search and name-sort read (bank_item_name_core), not through a
+    // second open-coded copy of that core's body. Pinning the duplicated text
+    // was itself holding the duplication in place, so the pin moved to the call
+    // (inert today: the partial rung offers only on !slot.instance; pinned so
+    // an instanced rung cannot regress it silently, the round-4 audit).
+    expect(promptBody.slice(0, 600)).toContain('bankSlotDisplayName(item, slot)');
+    // The regression this actually guards: falling back to the def name, which
+    // is what the title showed before a copy could carry its own.
+    expect(promptBody.slice(0, 600)).not.toContain('itemDisplayName(item)');
   });
 
   it('re-validates the live slot at quantity-prompt submit (stale-index guard)', () => {

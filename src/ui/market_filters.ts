@@ -34,6 +34,11 @@ export {
   type MarketSort,
   type MarketSubtypeFilter,
   type MarketWeaponTypeFilter,
+  // The AUTHORITY's own English/id matcher. Re-exported so the localized-search
+  // resolver (market_search_localized_core.ts) verifies its candidate searches
+  // against the exact predicate the server will run, rather than a client copy
+  // of it that could drift.
+  marketItemMatches,
   sanitizeMarketQuery,
 } from '../sim/market_query';
 

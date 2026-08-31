@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { ITEMS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
 import { MarketWindow } from '../src/ui/market_window';
 
@@ -143,9 +146,19 @@ describe('market_window: the Collect tab sale ledger', () => {
 
   it('builds the rows in the pure core, leaving the painter no item resolution', () => {
     expect(core).toContain('collectionSales');
-    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS itself.
+    // The painter consumes MarketCollectSaleRow; it never reaches into ITEMS to
+    // resolve a LEDGER ROW.
     expect(painter).toContain('MarketCollectSaleRow');
-    expect(painter.includes("from '../sim/data'")).toBe(false);
+    // Scoped to the ledger's own render, not the whole file. The painter does
+    // now import ITEMS, for one unrelated seam: it hands the catalog to the
+    // localized-search resolver (effectiveSearch), which is a pure core that
+    // imports no data of its own and must be given it by its composition point.
+    // A blanket file-wide import ban would have to fail that or be deleted, and
+    // neither answers what this pin is actually for, so it reads the region.
+    const at = painterCode.indexOf('renderCollect');
+    expect(at, 'the collect render must exist to be scoped').toBeGreaterThan(-1);
+    const ledger = painterCode.slice(at, painterCode.indexOf('\n  private ', at + 1));
+    expect(ledger, 'the ledger render resolves no item itself').not.toContain('ITEMS');
   });
 });
 
@@ -461,6 +474,62 @@ describe('market_window: behavior preserved through the core', () => {
   });
 });
 
+describe('market_window: the localized Browse search is resolved at the UI boundary', () => {
+  // The server filters the book on ENGLISH names and ids (src/sim/market_query.ts),
+  // so the client translates the typed text before sending it. These pin the two
+  // properties that keep that from being worse than the empty result it replaces.
+  it('verifies its candidate searches with the SERVER own matcher, not a client copy', () => {
+    // The whole soundness argument is that a substituted search is proven to
+    // select the same set the server will select. That proof is only worth
+    // anything while the predicate doing the proving is the authority's.
+    expect(painterCode).toContain('localizedMarketSearch');
+    expect(painterCode).toContain('marketItemMatches');
+    // Over the WHOLE catalog and with every facet neutral: a narrower universe
+    // would prove set-equality only on a subset, which does not carry to the
+    // book the server actually searches.
+    expect(painterCode).toContain('itemIds: Object.keys(ITEMS)');
+    expect(painterCode).toContain('...defaultMarketQuery(), search');
+  });
+
+  it('re-resolves the sent search when the LANGUAGE moves under an unchanged query', async () => {
+    // The resolution reads localized item names, so one typed string resolves
+    // differently per locale. Keyed on the text alone, the memo kept serving the
+    // PREVIOUS locale's substitution after a switch: not the empty result the
+    // untranslated path gives, a wrong one, which is the single outcome this
+    // feature exists to avoid.
+    //
+    // Driven for real (the private reach-in follows this file's own precedent
+    // two describes down): the resolver touches no DOM, only the catalog and the
+    // locale table.
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    const jaName = itemDisplayName(ITEMS.worn_sword);
+    setLanguage('en');
+
+    const win = new MarketWindow({} as never) as any;
+    win.searchQuery = jaName;
+    // Under English the Japanese name matches no English name or id, so the
+    // typed text is handed back untouched. That is the memo this arm poisons.
+    const underEnglish = win.effectiveSearch() as string;
+    expect(underEnglish, 'the untranslated path returns the typed text').toBe(jaName);
+
+    setLanguage('ja_JP');
+    const afterSwitch = win.effectiveSearch() as string;
+    // A window that never saw English resolves the same query fresh; the one
+    // that did must agree with it.
+    const fresh = new MarketWindow({} as never) as any;
+    fresh.searchQuery = jaName;
+    const expected = fresh.effectiveSearch() as string;
+    setLanguage('en');
+
+    expect(afterSwitch, 'the switched window must not serve the English memo').toBe(expected);
+    // Non-vacuity: the two locales really do resolve this query differently, so
+    // the equality above is a claim and not a coincidence.
+    expect(expected, 'ja_JP resolves to a verified English search').toBe('worn_sword');
+    expect(expected).not.toBe(underEnglish);
+  });
+});
+
 describe('market_window: filter chip label routing', () => {
   // marketItemTypeLabel falls through to the 'All types' label for any filter
   // value without an arm, so deleting a chip's arm (say 'pattern') would render
@@ -483,9 +552,17 @@ describe('market_window: filter chip label routing', () => {
 
 describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
   it('resolves the badge from the shared armor-type resolver, not a second classification', () => {
-    expect(painter).toContain(
-      "import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';",
-    );
+    // The claim is WHERE the badge helpers come from, not how the import happens
+    // to be formatted: the module grew a fourth member (the pattern mark) and
+    // biome wrapped the line, which a byte-exact single-line pin fails on while
+    // the property it names is untouched. Named imports plus the source module,
+    // so a second local classification still reds it.
+    const at = painterCode.indexOf("from './market_armor_badge'");
+    expect(at, 'the badge helpers must come from the shared module').toBeGreaterThan(-1);
+    const importStmt = painterCode.slice(painterCode.lastIndexOf('import', at), at);
+    for (const named of ['marketArmorBadge', 'marketArmorPips', 'marketHeroicStar']) {
+      expect(importStmt, `${named} comes from market_armor_badge`).toContain(named);
+    }
     expect(painter).toContain('const armorBadge = marketArmorBadge(item);');
   });
 

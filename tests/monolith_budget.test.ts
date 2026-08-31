@@ -1768,7 +1768,16 @@ const MONOLITHS: MonolithRow[] = [
     // wiring), authored before the row existed on this branch. Measured on
     // the merged tree: 1941 (wc -l < src/ui/bank_window.ts). Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 1941,
+    //
+    // LOWERED 1941 -> 1937 by the localized bank-search unit, on the same
+    // terms. Matching and name-sorting on the name the CELL shows (so a
+    // renamed legendary is findable under the name the player can see) needed
+    // a line in a file with zero slack, and the rule it needed paid for
+    // itself: resolving a slot to its cell name is a pure function of the def,
+    // the copy and the active language, so it went to
+    // src/ui/bank_item_name_core.ts and the window's private method went with
+    // it. Measured after the fix round, the phase 17 rule.
+    ceiling: 1937,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {
