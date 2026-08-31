@@ -41,23 +41,58 @@
 // applied (the fourth tool-effect slot, farming having become slottable, and a
 // fixed production-width epoch anchor across the measure arm's three sims).
 //
-// The 38.9 KB WHOLE-CHARACTER figure above has NOT been re-measured since: it
-// was taken with the professions block about 2.5 KB smaller than the merged
-// tree carries, so the merged maximal character is roughly 41.4 KB. That is an
-// arithmetic carry, not a measurement, and it is stated as one deliberately: a
-// fresh maximal-character measurement is the honest way to move it, and it is
-// carried to Phase 12 with the rest of the bound-policy work.
+// Both figures above are dated. The professions block was re-measured through
+// the phases that followed and now measures 17,596 bytes, tracking band
+// 17,216..17,597, ceiling 18,432; tests/professions_blob_growth.test.ts is the
+// live authority for that number and its ledger records every move, so read it
+// there rather than trusting this sentence to stay current.
 //
-// 131,072 bytes is therefore about 3.2x the legitimate worst case: far
-// enough above it that ordinary authored content growth (a new zone's nodes, a
-// new crop, another dungeon's lockouts) cannot drift into it and train an
-// operator to ignore the line, and still one power-of-two step BELOW the
-// 262,144-byte guild-bank scale, which is the largest single row this codebase
-// considers plausible at all. A character past this number is not a busy player;
-// it is a field that grew per-player without a bound, which is the defect this
-// signal exists to catch early. Re-mint it here WITH a fresh measurement (the
-// professions_blob_growth re-mint doctrine) if authored content ever legitimately
-// approaches it; do not nudge it up to silence a line.
+// THE 38.9 KB WHOLE-CHARACTER FIGURE IS SUPERSEDED, and the relation it implied
+// is INVERTED rather than merely stale. It was never re-measured after v0.36.0;
+// the "roughly 41.4 KB" that followed it was an arithmetic carry and said so.
+// Masterwrought Phase 18 measured a maximal character through the real
+// Sim.serializeCharacter path, settled to a fixed point across two further real
+// loads with every container at its LEGAL ceiling:
+//   maximal character, merged tree: 151,525 bytes measured
+//   (pinned with its band and its full derivation in
+//   tests/professions_blob_growth.test.ts, the whole-character arm).
+// That is 3.66x the 41.4 KB carry. The old fixture is why: it armed level,
+// quests, recipes, nodes, beds, skills and 140 instanced container slots and
+// nothing else, so it predates the Book of Deeds (deedStats alone measures
+// 30,145 in the new fixture, the largest single term), the Reliquary, the
+// Materials Vault, the raid lockouts, the loadout list and the bank purchase
+// ladder, and it counted 140 instanced slots where the legal ceiling is now 268
+// (80 carried, 176 bank, 12 buyback).
+//
+// So 131,072 bytes is NOT "about 3.2x the legitimate worst case". It sits BELOW
+// that worst case, at about 0.87x, exceeded by 20,453 bytes: a character who
+// really reached every ceiling would cross this threshold on every autosave.
+// The sentence this replaces claimed the opposite relation and used it to argue
+// the line could not be trained away by ordinary content growth; that argument
+// does not survive its own measurement, and the honest statement is that the
+// headroom it described does not exist.
+//
+// WHAT THIS COMMENT DELIBERATELY DOES NOT DO is move the number. Whether the
+// threshold should be re-minted, and to what, is a decision tabled as Phase 19
+// row D122, and it is a real decision rather than a clerical one: the maximal
+// character is a legal-ceiling construction rather than a player anyone expects
+// to meet, the p99 gauge and high-water mark below already answer the
+// fleet-creep question this line answers badly, and raising the threshold and
+// leaving it are both defensible. The value stays exactly as it was until that
+// ruling lands. What changed here is only the description, which was false.
+// When the ruling does land, re-mint WITH a fresh measurement (the
+// professions_blob_growth re-mint doctrine) and re-read that suite's
+// whole-character arm in the same change: the arm pins the measured relation
+// between the two numbers, so it reds on a re-mint by design and the two are
+// re-read together.
+//
+// The other half of the original rationale is untouched and still true: 131,072
+// is one power-of-two step BELOW the 262,144-byte guild-bank scale, the largest
+// single row this codebase considers plausible at all. A character past this
+// number may be a field that grew per-player without a bound, which is the
+// defect this signal exists to catch early; since Phase 18 it may also be a
+// character who simply owns a great deal, which is precisely what D122 has to
+// weigh. Do not nudge the value up to silence a line.
 export const CHARACTER_BLOB_WARN_BYTES = 131_072;
 
 // The decision, kept pure so it is unit-testable without a database: returns the
