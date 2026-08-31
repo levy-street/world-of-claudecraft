@@ -131,12 +131,12 @@ World of Claudecraft is a browser-playable, classic-style micro-MMO with online 
 </div>
 </div>
 \` + section('Featured portals', bullets([
-  link('Zones') + ' — Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
-  link('Classes') + ' — all nine playable class kits.',
-  link('Quests') + ' — the full source-defined quest chain.',
-  link('Dungeons') + ' — Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
-  link('Community Lore') + ' — launch-week player culture from Discord, Reddit, and X.',
-  link('Development Timeline') + ' — issue, PR, and release themes.',
+  link('Zones') + ': Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
+  link('Classes') + ': all nine playable class kits.',
+  link('Quests') + ': the full source-defined quest chain.',
+  link('Dungeons') + ': Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
+  link('Community Lore') + ': launch-week player culture from Discord, Reddit, and X.',
+  link('Development Timeline') + ': issue, PR, and release themes.',
 ])), ['Wiki']);
 
 add('Quick Start', section('First hour route', bullets([
@@ -151,8 +151,8 @@ add('Quick Start', section('First hour route', bullets([
 ])), ['Guides']);
 
 add('The Gravecaller Saga', section('Overview', 'The main story follows Brother Aldric from restless bones outside Eastbrook to Korzul the Gravewyrm beneath Thornpeak.') + section('Acts', bullets([
-  link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ' — Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
-  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ' — Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
+  link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ': Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
+  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ': Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
   link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ': Broodsworn zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
 ])), ['Lore', 'Quests']);
 
@@ -206,7 +206,7 @@ const systemRows = [
   ['Mobile Play', 'Touch controls, joystick fixes, quest-log access, fullscreen polish, and launch-week mobile testing.'],
   ['Agents and Bots', 'Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.'],
 ];
-add('Gameplay Systems', section('Systems index', bullets(systemRows.map(([name, desc]) => link(name) + ' — ' + desc))), ['Systems']);
+add('Gameplay Systems', section('Systems index', bullets(systemRows.map(([name, desc]) => link(name) + ': ' + desc))), ['Systems']);
 for (const [name, desc] of systemRows) {
   add(name, section('Overview', desc), ['Systems']);
 }

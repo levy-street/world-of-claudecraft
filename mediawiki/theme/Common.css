@@ -1,24 +1,24 @@
 /* =========================================================================
-   World of Claudecraft Wiki — "Aged Grimoire" theme for Vector 2022.
+   World of Claudecraft Wiki: "Aged Grimoire" theme for Vector 2022.
    Warm parchment reading surface, deep oak chrome, gold + wax-seal-red
    accents, elegant serif display headings.
    ========================================================================= */
 
 :root {
-  --woc-ink: #2a1c10;          /* primary text on parchment */
-  --woc-ink-soft: #5a4427;     /* secondary text */
-  --woc-parchment: #f3e8cc;    /* reading surface */
-  --woc-parchment-2: #ece0bf;  /* alt surface (zebra, facts) */
-  --woc-oak: #241710;          /* dark chrome base */
-  --woc-oak-2: #160e09;        /* darker chrome */
-  --woc-gold: #e7b54a;         /* primary accent */
-  --woc-gold-soft: #f0d28a;    /* accent text on dark */
-  --woc-seal: #8a1f1c;         /* wax-seal red */
-  --woc-rule: rgba(106, 74, 33, 0.30);
+  --woc-ink: #2a1c10; /* primary text on parchment */
+  --woc-ink-soft: #5a4427; /* secondary text */
+  --woc-parchment: #f3e8cc; /* reading surface */
+  --woc-parchment-2: #ece0bf; /* alt surface (zebra, facts) */
+  --woc-oak: #241710; /* dark chrome base */
+  --woc-oak-2: #160e09; /* darker chrome */
+  --woc-gold: #e7b54a; /* primary accent */
+  --woc-gold-soft: #f0d28a; /* accent text on dark */
+  --woc-seal: #8a1f1c; /* wax-seal red */
+  --woc-rule: rgba(106, 74, 33, 0.3);
   --woc-rule-strong: #9d7c43;
-  --woc-link: #1c5a7a;         /* lapis on parchment */
+  --woc-link: #1c5a7a; /* lapis on parchment */
   --woc-link-visited: #6a417e; /* aged plum */
-  --woc-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --woc-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
 }
 
 /* ---- Page backdrop: photo pushed back behind a dark "table" overlay ---- */
@@ -28,9 +28,9 @@ html {
 
 body {
   background:
-    radial-gradient(ellipse at 50% -10%, rgba(231, 181, 74, 0.10), rgba(13, 9, 6, 0) 55%),
-    linear-gradient(rgba(15, 10, 7, 0.80), rgba(11, 7, 5, 0.93)),
-    url('/wiki/resources/assets/woc-loading-screen.jpg') center top / cover fixed,
+    radial-gradient(ellipse at 50% -10%, rgba(231, 181, 74, 0.1), rgba(13, 9, 6, 0) 55%),
+    linear-gradient(rgba(15, 10, 7, 0.8), rgba(11, 7, 5, 0.93)),
+    url("/wiki/resources/assets/woc-loading-screen.jpg") center top / cover fixed,
     var(--woc-oak-2);
   color: var(--woc-ink);
 }
@@ -91,7 +91,7 @@ body {
 }
 
 /* ---- Side columns: dark oak panels ---- */
-/* NB: don't give .vector-settings panel chrome — an empty collapsed copy of
+/* NB: don't give .vector-settings panel chrome, because an empty collapsed copy of
    it lives in the right column and would render as a stray dark nub. */
 .vector-main-menu,
 .vector-toc,
@@ -175,7 +175,7 @@ body {
 }
 
 /* the header divider under "Contents"/"Appearance" defaults to light grey,
-   which paints a harsh line across the dark oak panels — soften to gold */
+   which paints a harsh line across the dark oak panels, so soften to gold */
 .vector-pinnable-header {
   border-bottom: 1px solid rgba(231, 181, 74, 0.22) !important;
 }
@@ -290,10 +290,14 @@ body {
   display: grid;
   place-items: center;
   padding: 14px;
-  background: radial-gradient(120% 120% at 50% 0, #34221580, transparent 70%), linear-gradient(180deg, #2c1c13, #160d08);
+  background:
+    radial-gradient(120% 120% at 50% 0, #34221580, transparent 70%),
+    linear-gradient(180deg, #2c1c13, #160d08);
   border: 1px solid rgba(231, 181, 74, 0.42);
   border-radius: 6px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3) inset, 0 12px 26px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3) inset,
+    0 12px 26px rgba(0, 0, 0, 0.4);
 }
 
 .woc-crest {
@@ -304,7 +308,7 @@ body {
   padding: 14px;
   background:
     linear-gradient(rgba(24, 15, 10, 0), rgba(24, 15, 10, 0.85)),
-    url('/wiki/resources/assets/worldofclaudecraft-logo.png') center / contain no-repeat;
+    url("/wiki/resources/assets/worldofclaudecraft-logo.png") center / contain no-repeat;
   color: var(--woc-gold-soft);
   font-family: var(--woc-display);
   font-weight: 700;
@@ -332,7 +336,7 @@ body {
   padding: 8px 12px;
 }
 
-/* column + top headers — light text on oak, now actually visible */
+/* column + top headers: light text on oak, now actually visible */
 .wikitable > * > tr > th,
 .article-facts > * > tr > th {
   color: #fdeec8 !important;
@@ -356,7 +360,7 @@ body {
 
 /* ---- Categories / footer of article ---- */
 .catlinks {
-  background: rgba(64, 42, 20, 0.10);
+  background: rgba(64, 42, 20, 0.1);
   border: 1px solid var(--woc-rule);
   border-radius: 4px;
   padding: 8px 12px;
