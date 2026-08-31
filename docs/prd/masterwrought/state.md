@@ -23548,6 +23548,67 @@ record; the QA twin re-sweeps and diffs.
   test split across two commits. It named the hunk boundaries; one hunk staged,
   five skipped.
 
+### THE GATE FIX ROUND: SIXTEEN ARMS, AND WHAT MOVED THEM
+
+The full suite at 0761e2a28e returned 16 failures across 12 files on a QUIET
+box (load 10, no competing run), so none was contention. Fifteen are closed at
+8b89530d9e; the sixteenth is the shard-weight coverage floor, which is a
+measurement rather than a fix. Five arms now assert MORE than before, ten the
+same, NONE less. No production code changed.
+
+THE DOMINANT CAUSE IS A PHASE CHANGING TEXT THAT PINS REACH FOR, and it appears
+twice in different clothes. The naming sweep re-authored ability DISPLAY names
+while freezing their ids (Meteor to Skystone, Frozen Orb to Frostglobe, Icy
+Veins to Coldsurge, and more), and a Monte Carlo harness identified ground
+impacts by the English literal. Those events carry no abilityId, so every
+renamed impact fell OUT of a banked total while its payout stayed counted, and
+a conservation arm read 2.9 percent over. It was a MISSING BANK, not a
+double-dip: accounting for the rename lands the ratio at 0.994, the "just under
+1.0" the arm's own comment describes. Separately the em dash pass over
+seed-published prose moved two complete-payload digests by rewording five NPC
+greetings. Both classes fail in the QUIET direction, dropping rows out of a set
+rather than erroring, which is why a full suite found them and nothing else
+had.
+
+TWO ARMS TURNED OUT TO BE PINS THAT COULD NOT DO THEIR OWN JOB, and both were
+found by agents sent to make a red go away.
+- A scan for a forbidden top-level frame type matched a COMMENT documenting the
+  trap. The tempting fix, rewording the comment, punishes the next author for
+  documenting the same hazard and leaves the scan unable to tell code from
+  prose. It now reads comment-stripped source, with two self-proof arms holding
+  both directions so the strip cannot blind it.
+- An arm titled "naming the exact carried copy" used a ONE-COPY fixture, where
+  the anchor reads the same whatever the sender computed. Updating its literal
+  would have left it exactly as vacuous, and green. It now clicks the second of
+  a sibling pair, and the proof is that pointing the anchor at the wrong sibling
+  reds THAT arm while the single-copy sibling arm stays green, which is the old
+  blindness visible beside the new discrimination.
+
+THE DIGEST RE-MINT STANDARD, worth keeping beyond this packet. A complete-payload
+sha tells you SOMETHING moved and nothing about what, so re-measuring it is an
+act of faith. Instead: replay the payload at the pin's OWN MINT REVISION against
+current siblings, reproduce the OLD digest exactly, and diff the projection to
+show which fields moved and that key order held. Then assert each moved field as
+a literal BEFORE the digest, so the next change fails where it is described
+rather than as an opaque hash mismatch. Both re-mints here were done that way.
+
+TWO EXTRACTIONS HAD LEFT PINS AT OLD HOMES, and in both cases re-pointing the
+literal alone was the trap. A sender extracted out of the coordinator is inert
+without its caller, so a pin on the new home alone goes green over a broken
+feature; and an ORPHAN GUARD re-pointed to a moved import literal leaves the
+consumed set orphanable behind a live-but-dead import, which is precisely what
+the guard exists to prevent. Both now pin the whole chain.
+
+ONE NEAR MISS WORTH THE RECORD. A pkill on the harvest wrapper orphaned its node
+child, which kept measuring through a deliberately-loaded probe and would have
+written 224 weights into the committed shard table. Nothing would have flagged
+them: they would have carried an honest local-median attribution and shaped LPT
+packing for every future CI run, because provenance records HOW a number was
+obtained and not whether the box was quiet when it was obtained. Caught, table
+verified byte-identical to HEAD, and the wrapper now traps EXIT/INT/TERM to take
+its child with it. Same family as the phase's other silent-success failures: a
+plausible artifact produced by measuring the wrong thing.
+
 ### THE CLOSE-OUT, AND THE CHECK THAT SHOULD HAVE RUN ALL ALONG
 
 The phase's last finding is the most portable one and it was found by an agent
