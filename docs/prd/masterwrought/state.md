@@ -23504,6 +23504,80 @@ record; the QA twin re-sweeps and diffs.
   lines filter to nothing, and the generated wiki output hashes byte-identical
   under both versions).
 
+- U-CONTENT-PARITY 44ba0e057b (11 items, the sole golden re-recorder this
+  window). Its discipline is the standard the packet should keep: the whole
+  parity directory was baselined GREEN before its first change, so no other
+  agent's drift could be folded into a re-record, and only two goldens moved,
+  each re-recorded as its own step. farming_session moved with rng completely
+  still (no draws line and no rng.digest changed anywhere) and every added and
+  removed leaf diffed, leaving two reliquary arrays and a trailing comma.
+  perfecting_walk moved with draws 8 to 8, a BYTE-IDENTICAL drawDigest and
+  frames 0 through 7 unchanged, so the one altered old frame is just the former
+  final now that the drive continues past it. It declined to run
+  rename_state_proof, correctly: that path is for state-hash-only deltas from a
+  pure rename, and using it here would have laundered a real content delta
+  through a rename-shaped door. TWO items are recorded for what they did NOT
+  move: the meteor rename touched no golden because no scenario surfaces an
+  ability display name, and the zero-key carve-out moved none either, including
+  perfecting_walk's pre-existing frames, which is the strongest available
+  evidence that the Perfecting merge really does skip zero shares today, a claim
+  its module made and nothing checked. The heroic five-man scenario changed
+  DUNGEON after measuring, which is that item's finding: the obvious pick has
+  zero base-table items with heroic variants, so a scenario there would have
+  claimed the variant-swap arm in its coverage line while never reaching it.
+  Three briefs were deviated from with reasons: seven material-hint leads rather
+  than nine (nine was the adoption count when the rejection row was written, and
+  the QA pass then output-excluded two ids that have no consumer today), no new
+  key for the apex recut so no fills are owed, and the legendary sub-cap line
+  living with the other Masterwrought tooltip lines rather than in the file the
+  brief named, which would have duplicated the equipment walk.
+- Blob-size comment repair aa184248da (routed to the unit that took the
+  measurement). The header argued the warn threshold sat about 3.2x above the
+  worst legitimate blob and used that relation to claim the line could not be
+  trained away by ordinary content growth. The measurement inverts it: the
+  maximal legal blob is 151,525 bytes, so 131,072 sits BELOW it at about 0.87x,
+  exceeded by 20,453 bytes, and the argument does not survive its own
+  measurement. No value moved, since the threshold is D122's call. The unit also
+  caught a commit hazard the lead did not know about: that source file was
+  ALREADY dirty with another unit's queue-cap IMPLEMENTATION, whose test lives
+  elsewhere, so a wholesale stage would have landed implementation without its
+  test split across two commits. It named the hunk boundaries; one hunk staged,
+  five skipped.
+
+### OWNERSHIP FORENSICS: WHAT ACTUALLY SETTLES A CLAIM IN A SHARED TREE
+
+The phase spent real time on "whose is this?" and the answer is that agent
+recollection is the weakest evidence available. Ranked by what actually settled
+a question here:
+
+1. FILE MTIMES. `ls -lT` against the current clock. A cluster six agents had
+   disowned, and which the lead was about to assign to a fresh reader, turned out
+   to have been written FOUR MINUTES earlier. Ownership claims are what an agent
+   believes; mtimes are what the filesystem observed. Assigning a second writer
+   into a live file is how hunks are lost silently, so this check now runs before
+   any orphan is declared.
+2. A WHOLE-TREE tsc RUN MADE DURING A ROUND, which is a timestamped fingerprint
+   of the tree. One unit bracketed this cluster to the minute: at 11:26 the
+   narrowing was present with all thirteen of its test errors OPEN; by 11:48 they
+   were gone and three suites carried a new cast boundary. That dates the work
+   and eliminates every agent whose round closed earlier, which no amount of "I
+   do not think I touched it" can do. The same unit stated its own caveats: the
+   run's total error count includes other units' churn, so only the shaped errors
+   are evidence, and the bracket dates the REPAIR rather than the original
+   change.
+3. A start-of-unit `git status` snapshot, a scoped brief listing assigned files,
+   and a landed commit whose diffstat matches the agent's own report.
+
+Two traps this phase paid for. COHERENT SHAPE DOES NOT ESTABLISH AN OWNER: a
+cluster dirty at one agent's session start reads as that agent's unit extending
+outward, and two agents independently reasoned exactly that; it was wrong,
+because those files were dirty before that agent ran anything, having been handed
+a dead predecessor's partial work. And AUTHORING IS NOT TIDYING: an agent that
+fixes a typecheck red blocking its own run leaves fingerprints identical to the
+author's. The question that separates them in one round is "did you WRITE this,
+or only fix the red it caused", and it has to be asked that way, because both
+answers feel like "no" to an agent recalling rather than checking.
+
 ### A PROCESS HAZARD THE PHASE FOUND AND CLOSED IN THE SAME WINDOW
 
 Worth recording because the fix and the finding arrived from different units and
