@@ -23255,7 +23255,16 @@ record; the QA twin re-sweeps and diffs.
   (one dropped literal reds the census on exactly that emit, real tree
   untouched). The QA bar "RESULT PASS with the union-only pin list shrunk and
   the mutation guard re-run for the emits class" is met on this unit's
-  classes; the tree-wide RESULT rides the batch validation.
+  classes; the tree-wide RESULT rides the batch validation. Gate-integrity
+  review f29426195b: CLEAN (0 blocking, 0 should-fix, 4 INFO); the reviewer
+  reproduced both mutation proofs independently and showed the pre-change
+  configuration's report byte-identical to its unmutated control under the
+  same deletion (the hole the change closes); the legendaryForgedZone extras
+  row is load-bearing (its loss reds "allowlist entries GONE"). INFO kept on
+  record: fanout helpers match by bare identifier before `(` with no import
+  resolution (the pre-existing emitToZonePlayers shape, backstopped by
+  emitsOutsideUnion), and the census reads syntax, so a gutted helper body is
+  caught by the live fanout suites, not the census.
 - U-SIM-FARM architecture review round 155a925cd2 (0 blocking, 4 should-fix,
   7 notes, ALL applied): the battleground and honor arms the monotone
   resetDay setter had silently no-opped rebuilt on fresh worlds; the sim
@@ -23361,6 +23370,16 @@ record; the QA twin re-sweeps and diffs.
   memory and skips that one correction; the bed itself shows the truth, so the
   cost is one missing "N beds ready" line in a narrow one-time case, accepted
   over a new persisted field.
+
+### CARRIED (bucket-A items this phase cannot execute, each with its reason)
+
+- castle-deed-art-pending: generating the two castle deed paintings from
+  their briefs runs the asset-pipeline skill against the Tripo and gpt-image
+  APIs, whose credentials are maintainer-held and absent from this environment
+  (no TRIPO/OPENAI variable is set); the same credential-gated class the
+  verifier applied to the farmer voice lines. Carried to the maintainer's art
+  wave (the ip-16-ICON park), not to the Phase 19 table (no decision is open,
+  only a credential).
 
 ### RECORDED, NOT ACTED (maintainer reads this phase adds)
 
