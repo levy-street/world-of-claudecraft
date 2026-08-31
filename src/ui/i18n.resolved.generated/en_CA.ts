@@ -16700,7 +16700,7 @@ export const en_CA: EnTranslations = {
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidewatcher",
-        "greeting": "The mere drinks the moonlight, {className}, and gives back the drowned. I have watched that gate for thirty nights — and tonight it is open."
+        "greeting": "The mere drinks the moonlight, {className}, and gives back the drowned. I have watched that gate for thirty nights, and tonight it is open."
       }
     },
     "quests": {
@@ -18927,7 +18927,7 @@ export const en_CA: EnTranslations = {
       },
       "q_drowned_choir": {
         "title": "The Drowned Choir",
-        "text": "The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.",
+        "text": "The waders do not act alone. Among them walk the Drowned Votaries, the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.",
         "completion": "Pearls, knuckle-bones, a child's carved fish... grave-gifts, {playerName}. They are not raising the dead. They are dressing them, the way you dress a body for burial. The temple is a tomb that refuses to close.",
         "objectives": {
           "0": {
@@ -18940,8 +18940,8 @@ export const en_CA: EnTranslations = {
       },
       "q_drowned_moon": {
         "title": "The Drowned Moon",
-        "text": "I have read the last of the rubbings, {playerName}, and I understand now what the cult drowned themselves to keep asleep. Ysolei — the Drowned Moon made flesh — coils on the altar at the temple's heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her — the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.",
-        "completion": "The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, {playerName} — and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.",
+        "text": "I have read the last of the rubbings, {playerName}, and I understand now what the cult drowned themselves to keep asleep. Ysolei, the Drowned Moon made flesh, coils on the altar at the temple's heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her: the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.",
+        "completion": "The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, {playerName}, and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.",
         "objectives": {
           "0": {
             "label": "Ysolei, Avatar of the Drowned Moon, slain"
@@ -18950,7 +18950,7 @@ export const en_CA: EnTranslations = {
       },
       "q_glimmermere_light": {
         "title": "Light on the Water",
-        "text": "Look there, {playerName} — under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.",
+        "text": "Look there, {playerName}, under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.",
         "completion": "A waking-prayer... to something they called the Drowned Moon. And below it, in a steadier hand: \"It only sleeps.\" The water has been listening a long time, {playerName}.",
         "objectives": {
           "0": {
@@ -18960,8 +18960,8 @@ export const en_CA: EnTranslations = {
       },
       "q_palecoil": {
         "title": "Sethrael the Palecoil",
-        "text": "One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins — Sethrael, the rubbings call it, the Palecoil, the moon's own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, {playerName}. Take its heartscale so I know the deed is done.",
-        "completion": "Cold as the bottom of the world, and still it twitches. The shelf is clear, {playerName} — the stair to the gate stands open. I almost wish it did not.",
+        "text": "One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins: Sethrael, the rubbings call it, the Palecoil, the moon's own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, {playerName}. Take its heartscale so I know the deed is done.",
+        "completion": "Cold as the bottom of the world, and still it twitches. The shelf is clear, {playerName}. The stair to the gate stands open. I almost wish it did not.",
         "objectives": {
           "0": {
             "label": "Sethrael's Heartscale"
@@ -18970,7 +18970,7 @@ export const en_CA: EnTranslations = {
       },
       "q_silence_the_choir": {
         "title": "Silence the Choir",
-        "text": "The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep — and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, {playerName}.",
+        "text": "The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep, and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, {playerName}.",
         "completion": "The prayer falters... and for the first time in thirty nights, the mere is quiet. But quiet is not the same as ended. Selthe was only the choir. Something below it still listens.",
         "objectives": {
           "0": {
@@ -18980,8 +18980,8 @@ export const en_CA: EnTranslations = {
       },
       "q_tarn_waders": {
         "title": "What the Tarn Gives Up",
-        "text": "Since the gate opened, things climb out of the mere at dusk — bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.",
-        "completion": "Ten back in the water. They feel no cold, {playerName}, and no fear — only the pull of that gate. Whatever sings to them, it sings loud.",
+        "text": "Since the gate opened, things climb out of the mere at dusk: bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.",
+        "completion": "Ten back in the water. They feel no cold, {playerName}, and no fear, only the pull of that gate. Whatever sings to them, it sings loud.",
         "objectives": {
           "0": {
             "label": "Glimmermere Wader slain"
