@@ -23544,6 +23544,64 @@ record; the QA twin re-sweeps and diffs.
   test split across two commits. It named the hunk boundaries; one hunk staged,
   five skipped.
 
+### THE SESSION-LIMIT WAVE (four units died at once; what the replacements found)
+
+Four units hit a hard session limit within minutes of each other with all their
+work uncommitted in the tree. Opus replacements inherited each one's file set and
+in-flight WIP. Recording it because the replacements found things their
+predecessors had not, which is an argument for a fresh reader on inherited work
+rather than a cost of the outage.
+
+- THE CENSUS HAD THREE REAL DEFECTS, found by a replacement answering an
+  unrelated question. Three `literal-only` rows were sitting INSIDE the live
+  Phase 18 extras table. That class is not a key of EXTRA_CLASS_BY_LABEL, so each
+  parsed as an unknown class, and the census header states a defective doc row
+  fails exactly like a defective deletion row; they also carried SIX cells under
+  a FIVE-column header, so even accepted they would have read one column off.
+  The lead relocated all three into the `## Literal-only records` section, whose
+  header is the six-column shape they were already written for, so nothing was
+  rewritten. Verified after: 713 rows, ZERO defects. Those three were the only
+  defects in the file.
+- THE BLANK-LINE TRAP IS WORSE THAN THE PHASE HAD BEEN RECORDING IT. Measured on
+  a scratch copy rather than argued: the stray blank line orphaned not only the
+  author's own rows but the FOUR ROWS THAT FOLLOWED, and the three standing
+  defects VANISHED from the report, taking the total from 713 to 710 while the
+  run read as clean. So one unit's blank line silently drops the NEXT unit's rows
+  and converts real defects into apparent success.
+- A VACUOUS-PIN FINDING WAS CORRECTED BY ITS OWN FIXER, and the correction
+  outlives the finding. The pin was reported vacuous because widening a union
+  left the suite GREEN. That green was measured on the arm that never checks
+  types: VITEST TRANSPILES WITHOUT TYPE-CHECKING, so a runner pass says nothing
+  about a type-level assertion, and the same mutation through `tsc` did red in
+  one direction. The honest diagnosis is narrower (an obscure double-cast idiom,
+  a runtime half that compared a literal with itself, and only one direction
+  covered), and the rule that falls out is general: MUTATION-PROVE A TYPE-LEVEL
+  PIN WITH tsc, NEVER WITH THE TEST RUNNER. The replacement pin pairs a
+  type-level Exact with an exhaustive Record per union so the runtime half is
+  visible to the runner, and is proven with four tsc mutations plus a fifth the
+  runner can see.
+- A STAGING COUPLING THAT WOULD HAVE REDDENED CI. market_window.ts gained an
+  ITEMS import while its suite carried a pin forbidding exactly that import in
+  the painter; the hunk relaxing the pin is JOINT with another unit's edit, so
+  staging the source without it reds. Found by a replacement reasoning about what
+  its own change implied for existing pins, not by hitting it.
+- A FILE MISSING FROM ITS OWN BRIEF. src/styles/components.css carries the only
+  rule for the new pattern mark; without it the mark renders unstyled and
+  unpositioned. The brief never named it.
+- ORPHANED PROCESSES. Two vite dev servers were still listening out of a dead
+  unit's worktree, one since 10:53. The replacement distinguished them from five
+  live processes belonging to other units and the user (including a running
+  vitest) and killed nothing without authorization.
+
+A STANDING OBLIGATION THE PHASE ACQUIRED: the widened MEMO_DECL in
+tests/language_fanout_registry.test.ts is now a tree-wide tripwire. Any new
+private *Cache / *Sig / *Memo / *Echo / *Signature field in a text-emitting
+src/ui module owes a LANGUAGE_KEYED registry row from whoever adds it, with a
+verifier that checks the module reads getLanguage() AND that the memo's own gate
+compares a language value. The measured false-positive cost of that widening was
++3 classifications against the 308-versus-106 explosion of the match-every-
+private-field alternative.
+
 ### OWNERSHIP FORENSICS: WHAT ACTUALLY SETTLES A CLAIM IN A SHARED TREE
 
 The phase spent real time on "whose is this?" and the answer is that agent
