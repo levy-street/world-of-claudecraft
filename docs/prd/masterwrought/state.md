@@ -23169,6 +23169,7 @@ recommendations, never rulings (no decision is guessed in this phase).
 | D118 | tusk-rung50-ceiling | Raise the 460 crafted-output value ceiling (and accept a stretched bill) so a rung-50 ogre-tusk output can exist, or keep the recorded rejection standing. | state.md, Phase 16 'THE REJECTION LIST, AS RECORDED DESIGN' (lines 16366-16367 as read): 'A rung-50 output above the 460 ceiling for the ogre tusk (every zone3-band uncrafted weapon sells 700 or more): a new ceiling and a stretched bill.' | Keep the rejection standing [no-op]; Set a new crafted-output ceiling and author the rung-50 tusk output [a maintainer ceiling value, one recipe row with a stretched bill in src/sim/content, re-derived output-doctrine and economy pins, wiki regen plus content same-change obligations, and a check that the R5 surface stays untouched] | Keep the rejection: the arithmetic bars every candidate (zone3-band uncrafted weapons all sell 700+), the 460 ceiling is load-bearing across the whole nine-output doctrine, and nothing since Phase 16 has produced a demand for the output. | new |
 | D119 | two-markitemdiscovered-routes | Ratify the established two-route discovery idiom for promoted legendaries (the same-tick stamp-site mark plus the login retro sweep) or pick which single route survives a consolidation. | state.md, the Phase 17 judged list, reopened by qr-18-REOPEN (lines 19837-19838 as read): 'the two markItemDiscovered routes (the established idiom)'. Code: the stamp-site mark at src/sim/professions/perfecting.ts:698 (documented at 598-601 as landing same-tick, never at the next login's retro pass) and the retro sweep at src/sim/deeds.ts:1363-1375. | Ratify the two-route idiom [no-op plus a dated RULED line closing the reopened judged-refusal row]; Consolidate to the stamp-site route only [drops the retro sweep's legacy-save backfill for promoted legendaries; deeds sweep edit plus re-pinned deeds tests]; Consolidate to the retro route only [loses the documented same-tick discovery landing (discovery would wait for the next login retro pass); perfecting edit, test churn in both the perfecting and deeds suites] | Ratify the two routes: each consolidation loses a documented behavior (same-tick landing or legacy-save backfill), the ledger already names it 'the established idiom', and the original judged refusal found consolidation is not the mechanical refactor it looks like. | new |
 | D120 | well-fed-last-eaten-wins | Keep the classic last-eaten-wins well-fed overwrite (eating a tier-1 dish after an apex plate downgrades the buff) or add a downgrade guard. | state.md, the 11c review record (lines 7032-7034 as read): 'Note RECORDED, not changed: eating a tier-1 dish after an apex plate downgrades the buff, the deliberate classic last-eaten-wins rule', a recorded-not-acted note qr-18-REOPEN reopens; the adjacent ruling 11c-D-2 (farming/state.md:479 as read) ratified the single well_fed id but never ruled on guarding the downgrade. | Keep last-eaten-wins, ratified [no-op (a dated RULED line); the legibility question stays with its own row]; Add a downgrade guard (refuse or confirm when the incoming buff is weaker) [wellfed.ts logic plus a sim test, identical behavior in both hosts, new confirm/refusal player copy with t() keys, and a deliberate departure from classic-era behavior] | Keep last-eaten-wins: classic fidelity is a project pillar, the ledger records the rule as deliberate, and the softer remedy (making the downgrade legible) is already priced separately as the row-4 legibility item rather than a mechanic change. | new (distinct from the row-4 legibility row: this is the mechanic policy, that is the UX surface) |
+| D121 | admin-preauth-ip-meter | Should /admin/api mount an IP-keyed rate meter ABOVE the require-admin frame, so the two awaited per-request auth reads (accountAndScopeForToken, adminRolesForAccount) are bounded per address, or stay on the deliberate direct-reads posture with the in-handler buckets only? | The Phase 18 hot-path review of 8cc3248db6 (this ledger): the analytics bucket sits below the auth frame, so a 429'd request has already paid both reads; server/CLAUDE.md rules the admin gate stays on direct reads (the auth-guard cache is marketplace-only); the sizing comment now names the pair as the deliberately unmetered real cost. | Stay on direct reads, comment-only (shipped) [no-op; the Phase 18 fix round already lands the honest sentence]; Mount a pre-auth IP meter for /admin/api [a middleware-onion change touching every admin route, its own limiter family and tests, and a review of the operator lockout failure mode] | Stay: the reads are two primary-key lookups on an operator-only surface, the buckets bound the handlers, and a pre-auth meter's lockout failure mode (an office NAT bricking the dashboard including moderation) costs more than the reads it saves. | new |
 
 ### THE BUCKET-C LIST
 
@@ -23331,7 +23332,28 @@ record; the QA twin re-sweeps and diffs.
   (clock_seconds_core over three sites), farm-pin-palette-split (the station
   token on both surfaces). hud.ts LOWERED 18731 to 18718, main.ts 11515 to
   11509 (the sheathe cue rule extracted to src/game/sheathe_toggle.ts).
-  Frontend seam review in flight; the browser suite rides the batch gate.
+  Frontend seam review da6443b616: 0 blocking, 4 should-fix, 5 notes, fix
+  rounds in flight across both FE writers; the tone migration was verified
+  value-preserving by mechanical reconciliation of every hex count. JUDGED
+  from that round: the two new rail tiles ship DELIBERATELY GLYPH-ONLY until
+  the maintainer's art wave (no painted chrome art can be authored in this
+  environment; the upgrade path is a magenta-keyed raster through npm run
+  assets:chrome plus CHROME_ART_IDS, stated at the glyphs), the ip-16-ICON
+  class. RECORDED: the long-localized-reagent nowrap overflow on narrow
+  mobile is a VERIFY for the E2E unit's screenshot pass; hud_perf_budget
+  ARM 3 and the axe browser suite ride the batch gate. Hot-path review of
+  8cc3248db6: 0 blocking, 2 should-fix (the zone-celebration record priced
+  the stringify term while routeEvents' O(recipients x sessions) selection
+  pass dominates, so the fix round LANDS a per-pid fragment index and amends
+  the record; the analytics sizing comment must name the pre-limiter auth
+  pair as the path's real per-request DB cost), 3 nits, all in the wire
+  writer's addendum C. RECORDED: emitToZonePlayers scans every player with a
+  zoneAt call per celebration (O(all players), unmeasured, identical under
+  both arms of the refusal). A NEW Phase 19 row is tabled from that review:
+  whether /admin/api mounts an IP-keyed meter ABOVE the auth frame (it
+  changes the admin middleware onion for every route; today the two awaited
+  auth reads run before any limiter, deliberately, per the direct-reads
+  rule), appended to the table draft as D121.
 
 ### JUDGED THIS PHASE (refusals this phase itself makes; each cites the ground)
 
