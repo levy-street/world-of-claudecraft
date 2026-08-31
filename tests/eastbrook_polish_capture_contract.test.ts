@@ -527,8 +527,14 @@ interface AttributionTargetFixture {
 // run over the fully resolved merged tree on 2026-08-30, after every
 // renderer.ts byte was final, and committed with exactly the bytes it read.
 // No capture was retaken.
+// Re-minted 2026-08-31 for the Phase 18 farm render unit: renderer.ts moved
+// again (the farm compile gate handed at construction, the gate's label
+// parameter, the typed zone-prewarm host weld, the single-sited farm drive,
+// and the shadow arm's body extracted to src/render/shadow_depth_compile.ts).
+// Run over the finished unit, after every renderer.ts byte was final and
+// after biome left the file unchanged. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '02f05f2543c81fd6a1d8aa255f72b1a2ce85d8a8a988e4756eef7b94b1904706';
+  '161370d0857d868f0e4dabf0af40006ad69330326faf07a8613d8d35c43ffab2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
