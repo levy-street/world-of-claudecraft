@@ -103,6 +103,7 @@ import {
   rethrowCheaterMarkRefusal,
 } from './cheater_mark_api';
 import { runClearItemName } from './clear_item_name';
+import { characterStateExists } from './clear_item_name_db';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -2176,6 +2177,9 @@ function makeRealAdminDb() {
     // fence answers the reconnect window the session map cannot see.
     getCharacterById,
     saveOfflineCharacterState,
+    // The refusal arm's SELECT 1 existence probe (clear_item_name_db.ts): a
+    // fenced-out write is read as the retry line without a second blob load.
+    characterStateExists,
     recordItemNameClear,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
@@ -3304,6 +3308,7 @@ async function clearItemNameHandler(ctx: Ctx): Promise<void> {
           const row = await adminDb().getCharacterById(characterId);
           return row ? { level: row.level, state: row.state } : null;
         },
+        characterStateExists: (characterId) => adminDb().characterStateExists(characterId),
         saveCharacterState: (characterId, level, state) =>
           adminDb().saveOfflineCharacterState(characterId, level, state),
         recordAudit: (input) => adminDb().recordItemNameClear(input),

@@ -1,5 +1,5 @@
 // The legendary-name strip core (server/clear_item_name.ts): target
-// validation (explicit-sweep, allowlisted bag id), the blob region walk (the
+// validation (explicit-sweep, shape-bounded bag id), the blob region walk (the
 // rekeyInstanceSigner regions), and the runClearItemName endpoint body's
 // ordering contract (validate, offline, audit, load-strip, the pre-save
 // online re-check, save) over an injected deps bag. The RouteDef arm rides
@@ -16,6 +16,7 @@ import {
   runClearItemName,
   stripLegendaryNames,
 } from '../../server/clear_item_name';
+import { ITEMS } from '../../src/sim/data';
 import type { CharacterState } from '../../src/sim/sim';
 import type { ItemInstancePayload } from '../../src/sim/types';
 
@@ -105,11 +106,39 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
     expect(clearItemNameBodyError({ bag: 0, itemId: '' })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 7 })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 'x'.repeat(65) })).toBe('unknown item id');
-    // The allowlist arm (the restoreItemBodyError precedent): a well-shaped id
-    // the ITEMS table does not carry is refused, so free text never reaches
-    // the audit reason's folded detail.
-    expect(clearItemNameBodyError({ bag: 0, itemId: 'not_a_real_item' })).toBe('unknown item id');
-    expect(clearItemNameBodyError({ bag: 0, itemId: 'hasOwnProperty' })).toBe('unknown item id');
+    // The SHAPE bound (the signer doctrine: a persisted id survives
+    // shape-bounded validation, never a catalog filter, so retired ids stay
+    // reachable; src/sim/professions/training.ts sanitizeKnownRecipeIds is the
+    // sim's own statement of it). Free text, spaces, quotes, and control
+    // bytes are refused so they never reach the audit reason's folded detail.
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'not a real item' })).toBe('unknown item id');
+    expect(clearItemNameBodyError({ bag: 0, itemId: "x'; DROP TABLE" })).toBe('unknown item id');
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'slur\nline' })).toBe('unknown item id');
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'wyrmfall pendant' })).toBe('unknown item id');
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'pendant/../etc' })).toBe('unknown item id');
+  });
+
+  it('a bagged copy of a RETIRED id is targetable per-cell (the shape bound, not an allowlist)', () => {
+    // A promoted copy outlives its catalog record: an id retired from the
+    // content tables still sits in the blob, and the sweep (all: true)
+    // already reaches it by payload. The per-cell arm reaches it too, so the
+    // bound is the id SHAPE, never ITEMS membership (the Phase 18
+    // retired-id-per-cell-targeting item).
+    const retired = 'retired_masterwrought_blade_v1';
+    expect(Object.hasOwn(ITEMS, retired)).toBe(false);
+    expect(clearItemNameBodyError({ bag: 2, itemId: retired })).toBeNull();
+    expect(clearItemNameTarget({ bag: 2, itemId: retired })).toEqual({
+      kind: 'bag',
+      bag: 2,
+      itemId: retired,
+    });
+    // Every LIVE id passes the shape: the bound can never refuse a real target.
+    for (const id of Object.keys(ITEMS)) {
+      expect(clearItemNameBodyError({ bag: 0, itemId: id }), id).toBeNull();
+    }
+    // The length bound is the sim's persisted-id bound: 64 passes, 65 fails
+    // (the malformed-dimension test above).
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'x'.repeat(64) })).toBeNull();
   });
 
   it('describes each target for the audit detail', () => {
@@ -191,12 +220,42 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     const deps: ClearItemNameDeps = {
       characterOnline: () => false,
       loadCharacter: vi.fn(async () => ({ level: 20, state })),
+      characterStateExists: vi.fn(async () => true),
       saveCharacterState,
       recordAudit,
       ...overrides,
     };
     return { deps, state, recordAudit, saveCharacterState };
   }
+
+  it('strips a bagged copy of a RETIRED id per-cell end to end', async () => {
+    // The validator's shape bound admits the id and the cell walk matches it
+    // by the persisted itemId, so a copy whose catalog record is gone is
+    // still remediable without the whole-character sweep.
+    const retired = 'retired_masterwrought_blade_v1';
+    expect(Object.hasOwn(ITEMS, retired)).toBe(false);
+    const state = stateWith({
+      inventory: [
+        { itemId: 'wyrmfall_pendant', count: 1, instance: namedCopy('Keep') },
+        { itemId: retired, count: 1, instance: namedCopy('Strip') },
+      ],
+    });
+    const { deps, recordAudit, saveCharacterState } = makeDeps({
+      loadCharacter: vi.fn(async () => ({ level: 20, state })),
+    });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { bag: 1, itemId: retired, reason: 'slur' },
+    });
+    expect(outcome).toEqual({ ok: true, cleared: 1 });
+    expect(recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({ detail: `bag 1 ${retired}` }),
+    );
+    expect(saveCharacterState).toHaveBeenCalledWith(5, 20, state);
+    expect(state.inventory[1].instance?.name).toBeUndefined();
+    expect(state.inventory[0].instance?.name).toBe('Keep');
+  });
 
   it('audits FIRST, then loads, strips, and saves the stripped blob', async () => {
     const { deps, state, recordAudit, saveCharacterState } = makeDeps();
@@ -320,36 +379,43 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     // refusal is the statement's own 0-row answer, never a skipped call.
     expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
     expect(deps.saveCharacterState).toHaveBeenCalledWith(5, 20, state);
-    // The refusal re-loaded once to tell a lease from a vanished row.
-    expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
+    // The refusal asked the existence probe ONCE (SELECT 1 over the same
+    // id-realm-state predicate, server/clear_item_name_db.ts) to tell a lease
+    // from a vanished row; the blob itself loaded exactly once, never a
+    // second full load on the refusal path (the Phase 18
+    // clear-item-name-select1 item).
+    expect(deps.characterStateExists).toHaveBeenCalledTimes(1);
+    expect(deps.characterStateExists).toHaveBeenCalledWith(5);
+    expect(deps.loadCharacter).toHaveBeenCalledTimes(1);
   });
 
   it('a row that vanished between the load and the fenced write answers not found, not the lease line', async () => {
     // The fenced UPDATE's 0-row answer has two causes; a deleted character is
-    // the one no retry can cure, so the endpoint distinguishes it with one
-    // extra load on the refusal path only (the fresh reader's finding on the
-    // first QA fix, which read every 0-row answer as a lease). Both shapes
-    // the first load calls not-found (no row, a row with a null state) are
-    // not-found here too, never the kick-and-retry line.
-    for (const gone of [null, { level: 20, state: null as unknown as CharacterState }]) {
-      const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
-      const { deps, recordAudit } = makeDeps({
-        loadCharacter: vi
-          .fn<ClearItemNameDeps['loadCharacter']>()
-          .mockResolvedValueOnce({ level: 20, state })
-          .mockResolvedValueOnce(gone),
-        saveCharacterState: vi.fn(async () => false),
-      });
-      const outcome = await runClearItemName(deps, {
-        characterId: 5,
-        adminAccountId: 7,
-        body: { all: true, reason: 'slur' },
-      });
-      expect(outcome, JSON.stringify(gone)).toEqual({ ok: false, error: 'character not found' });
-      expect(recordAudit).toHaveBeenCalledTimes(1);
-      expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
-      expect(deps.loadCharacter).toHaveBeenCalledTimes(2);
-    }
+    // the one no retry can cure, so the endpoint distinguishes it on the
+    // refusal path with the lightweight existence probe (the fresh reader's
+    // finding on the first QA fix, which read every 0-row answer as a lease).
+    // The probe carries the SAME predicate the first load answers not-found
+    // on (id, realm, state IS NOT NULL: tests/server/clear_item_name_db.test.ts
+    // pins the SQL), so a null-state row is not-found here too, never the
+    // kick-and-retry line; and the blob loads exactly ONCE, the probe being
+    // a SELECT 1 rather than a second full load.
+    const state = stateWith({ equipmentInstances: { neck: namedCopy() } });
+    const { deps, recordAudit } = makeDeps({
+      loadCharacter: vi.fn(async () => ({ level: 20, state })),
+      saveCharacterState: vi.fn(async () => false),
+      characterStateExists: vi.fn(async () => false),
+    });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+    expect(outcome).toEqual({ ok: false, error: 'character not found' });
+    expect(recordAudit).toHaveBeenCalledTimes(1);
+    expect(deps.saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(deps.characterStateExists).toHaveBeenCalledTimes(1);
+    expect(deps.characterStateExists).toHaveBeenCalledWith(5);
+    expect(deps.loadCharacter).toHaveBeenCalledTimes(1);
   });
 });
 

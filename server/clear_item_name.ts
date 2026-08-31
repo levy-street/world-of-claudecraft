@@ -62,10 +62,22 @@
 // can autosave over a landed strip. An operator handling a contested name
 // suspends the account first (DEPLOY.md).
 
-import { ITEMS } from '../src/sim/data';
 import type { CharacterState } from '../src/sim/sim';
 import { type EquipSlot, isEquipSlot } from '../src/sim/types';
 import { CHARACTER_SAVE_LEASED_LINE } from './character_save_statement';
+
+/** The bag target's item-id SHAPE bound (the signer doctrine, never a catalog
+ *  allowlist): a persisted id survives shape-bounded validation, so a bagged
+ *  copy of an id RETIRED from the content tables stays targetable per-cell,
+ *  exactly as the `all: true` sweep already reaches it by payload
+ *  (src/sim/professions/training.ts sanitizeKnownRecipeIds is the sim's own
+ *  statement of the doctrine; the marketplace routes' ITEM_ID_SHAPE carries
+ *  the same closed charset). The bound still keeps free text, spaces, quotes,
+ *  and control bytes out of the audit reason's folded detail, which is all
+ *  the retired allowlist ever bought here: the cell walk matches the
+ *  persisted itemId exactly, so an id nothing holds strips nothing. The
+ *  length is the sim's persisted-id bound. */
+const BAG_ITEM_ID_SHAPE = /^[A-Za-z0-9_.:-]{1,64}$/;
 
 /** What the operator asked to strip: one worn slot, one bag cell (the
  *  index-plus-id pin, so a shifted stack is never stripped by accident), or
@@ -87,9 +99,10 @@ export type ClearItemNameTarget =
  *  whole-character sweep is EXPLICIT: exactly one of a worn slot, a bag cell
  *  (both halves), or the literal `all: true` must be named, so a body that
  *  carries only a reason can never quietly strip every copy the character
- *  owns. The bag itemId is allowlisted against the live ITEMS table (the
- *  restoreItemBodyError precedent), which also keeps free-text out of the
- *  audit reason's folded detail. */
+ *  owns. The bag itemId is SHAPE-bounded (BAG_ITEM_ID_SHAPE, the signer
+ *  doctrine), never allowlisted against ITEMS, so a retired id stays
+ *  targetable while free text still never reaches the audit reason's folded
+ *  detail. */
 export function clearItemNameBodyError(body: {
   slot?: unknown;
   bag?: unknown;
@@ -119,10 +132,12 @@ export function clearItemNameBodyError(body: {
   if (typeof body.bag !== 'number' || !Number.isInteger(body.bag) || body.bag < 0) {
     return 'bag must be a non-negative whole number';
   }
-  if (typeof body.itemId !== 'string' || !Object.hasOwn(ITEMS, body.itemId)) {
-    // Accepted consequence of the allowlist: a bagged copy of an id RETIRED
-    // from the content tables can no longer be targeted per-cell; all: true
-    // still reaches it (the sweep matches payloads, never ids).
+  if (typeof body.itemId !== 'string' || !BAG_ITEM_ID_SHAPE.test(body.itemId)) {
+    // Shape, not catalog membership: a bagged copy of an id RETIRED from the
+    // content tables is still targetable per-cell (the Phase 18
+    // retired-id-per-cell-targeting item closed the allowlist's recorded
+    // consequence); the cell walk's exact itemId match decides whether
+    // anything strips.
     return 'unknown item id';
   }
   return null;
@@ -211,6 +226,11 @@ export interface ClearItemNameDeps {
   loadCharacter(
     characterId: number,
   ): Promise<{ level: number; state: CharacterState | null } | null>;
+  /** The refusal arm's existence probe (server/clear_item_name_db.ts
+   *  characterStateExists): SELECT 1 over the SAME id-realm-state-not-null
+   *  predicate loadCharacter answers not-found on, so a fenced-out write is
+   *  read as the retry line without paying the blob a second time. */
+  characterStateExists(characterId: number): Promise<boolean>;
   /** The lease-fenced offline save (server/db.ts saveOfflineCharacterState):
    *  resolves false when a live load lease exists, in which case the strip
    *  did NOT land and the endpoint refuses (the reconnect-window closure). */
@@ -278,12 +298,13 @@ export async function runClearItemName(
   if (!landed) {
     // The fenced UPDATE's 0-row answer has two causes: a live lease (the
     // retry line), or the character row vanishing between the load and the
-    // write (a deleted character, which no retry can cure). One extra load on
-    // the refusal path only, so the operator reads the true cause.
-    const still = await deps.loadCharacter(input.characterId);
-    // The same predicate the first load answers not-found on (a row with a
-    // null state is a vanished character too, never a lease).
-    return { ok: false, error: still?.state ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
+    // write (a deleted character, which no retry can cure). One SELECT 1 on
+    // the refusal path only, never a second blob load, over the same
+    // predicate the first load answers not-found on (a row with a null state
+    // is a vanished character too, never a lease), so the operator reads the
+    // true cause.
+    const still = await deps.characterStateExists(input.characterId);
+    return { ok: false, error: still ? CHARACTER_SAVE_LEASED_LINE : 'character not found' };
   }
   return { ok: true, cleared };
 }

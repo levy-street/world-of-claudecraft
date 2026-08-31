@@ -1267,6 +1267,8 @@ authors a new name appends its rows in the same change.
 | exports | `DroppedFarmPlotCounts` | 18 | qr-18-REOPEN, item quest-credit-seam-fold | that count's result shape (src/sim/professions/farm_load_report.ts) |
 | exports | `warnDroppedFarmPlotRows` | 18 | qr-18-REOPEN, item quest-credit-seam-fold | the one addPlayer call: counts, then the dev-channel warn only when something dropped (src/sim/professions/farm_load_report.ts) |
 | exports | `claimedInstanceForMob` | 18 | qr-18-REOPEN, item wyrmfall-marks-scan-dedup | the ONE claimed-instance-for-a-mob predicate the death hub resolves once and hands to awardHeroicMarks and awardWyrmfallCores through their new optional `claimed` parameter (src/sim/instances/dungeons.ts) |
+| exports | `characterStateExists` | 18 | qr-18-REOPEN, item clear-item-name-select1 | the SELECT 1 existence probe (id, realm, state IS NOT NULL) the clear-item-name refusal arm asks instead of re-loading the blob; the arm's *_db.ts SQL boundary (server/clear_item_name_db.ts) |
+| exports | `defaultBoostDeps` | 18 | qr-18-REOPEN, item unfenced-offline-writers | the PBE boost's real db deps (formerly the module-private `defaultDeps`), exported so the lease-fenced roster save is provable in isolation and against real Postgres (server/pbe_boost.ts) |
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 

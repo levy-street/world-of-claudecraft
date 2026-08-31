@@ -48,7 +48,7 @@ import { meetsLevelRequirement } from '../src/sim/item_level_req';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { EquipSlot, ItemDef, PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
-import { createCharacterCapped, saveCharacterState } from './db';
+import { createCharacterCapped, saveOfflineCharacterState } from './db';
 import { logger } from './http/logger';
 import { isUniqueViolation } from './http_util';
 
@@ -824,7 +824,8 @@ export function buildBoostedCharacterState(
 
 // ---------------------------------------------------------------------------
 // Orchestration: one character per class on the fresh account. Injected deps
-// keep the db seam testable; the defaults hit the real characters table.
+// keep the db seam testable; the defaults hit the real characters table
+// through the lease-fenced offline writer (server/db.ts saveOfflineCharacterState).
 
 export type BoostCreateResult = { id: number } | 'name_taken' | null;
 
@@ -836,12 +837,17 @@ export interface BoostDeps {
     cls: PlayerClass,
     state: CharacterState,
   ): Promise<BoostCreateResult>;
-  /** Persist the level column + state blob (charselect reads the column). */
+  /** Persist the level column + state blob (charselect reads the column).
+   *  An OFFLINE writer by contract: the real binding is the lease-fenced
+   *  saveOfflineCharacterState, and a fence refusal logs and resolves (the
+   *  roster loop's swallow-and-log posture), never throws. */
   saveState(characterId: number, level: number, state: CharacterState): Promise<void>;
   rand?: RandFn;
 }
 
-const defaultDeps: BoostDeps = {
+/** The real db deps (exported so the fenced roster save is provable in
+ *  isolation; production reaches it only as boostAccountCharacters' default). */
+export const defaultBoostDeps: BoostDeps = {
   createCharacter: async (accountId, name, cls, state) => {
     try {
       const row = await createCharacterCapped(accountId, name, cls, CHARACTER_LIMIT, state);
@@ -852,7 +858,19 @@ const defaultDeps: BoostDeps = {
     }
   },
   saveState: async (characterId, level, state) => {
-    await saveCharacterState(characterId, level, state);
+    // The lease-fenced OFFLINE writer (the Phase 18 unfenced-offline-writers
+    // item): a freshly created row can hold no live lease, so the fence
+    // should always admit; when it does not, the create already landed, so
+    // the roster keeps counting the character and the refusal goes to the
+    // log (the level column stays at the insert default until the first
+    // world join tops the character up).
+    const landed = await saveOfflineCharacterState(characterId, level, state);
+    if (!landed) {
+      logger.error(
+        { characterId, level },
+        'pbe boost roster save refused by the load lease fence (a live lease stands)',
+      );
+    }
   },
 };
 
@@ -864,7 +882,7 @@ const defaultDeps: BoostDeps = {
  */
 export async function boostAccountCharacters(
   accountId: number,
-  deps: BoostDeps = defaultDeps,
+  deps: BoostDeps = defaultBoostDeps,
 ): Promise<number> {
   const rand = deps.rand ?? randomInt;
   const triedNames = new Set<string>();

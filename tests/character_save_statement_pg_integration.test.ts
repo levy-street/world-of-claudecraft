@@ -20,7 +20,7 @@
 
 import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CharacterState } from '../src/sim/sim';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
@@ -46,6 +46,13 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
   let admin: PgPool;
   let pool: PgPool;
   let db: typeof import('../server/db');
+  // The OFFLINE writers behind the unleased fence (the Phase 18
+  // unfenced-offline-writers item) and the refusal arm's existence probe
+  // (clear-item-name-select1), imported the same deferred way.
+  let characters: typeof import('../server/characters');
+  let pbe: typeof import('../server/pbe_boost');
+  let clearItemNameDb: typeof import('../server/clear_item_name_db');
+  let logger: typeof import('../server/http/logger').logger;
   let realm: string;
 
   let nextSeq = 0;
@@ -94,6 +101,10 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     await admin.query(`CREATE DATABASE ${VERIFY_DB}`);
 
     db = await import('../server/db');
+    characters = await import('../server/characters');
+    pbe = await import('../server/pbe_boost');
+    clearItemNameDb = await import('../server/clear_item_name_db');
+    logger = (await import('../server/http/logger')).logger;
     realm = (await import('../server/realm')).REALM;
     await db.ensureSchema();
 
@@ -163,6 +174,189 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       const id = Number(other.rows[0].id);
       expect(await db.saveOfflineCharacterState(id, 7, STATE('cross-realm'))).toBe(false);
       expect(await markerOf(id)).toBeUndefined();
+    });
+  });
+
+  describe('the OFFLINE writers behind the unleased fence (the Phase 18 unfenced-offline-writers item)', () => {
+    // Every offline writer in the tree rides saveOfflineCharacterState now:
+    // the two signer sweeps in server/characters.ts (rename, reclaim) and the
+    // PBE boost's registration-time roster save. Each is driven through its
+    // REAL entry (the same function production calls) against the real
+    // fence: it lands with no lease, refuses while a live lease stands
+    // touching nothing, and scopes per character. A refusal follows each
+    // writer's swallow-and-log contract (a logged line, never a throw).
+    const SIGNED = (marker: string, signer: string) =>
+      ({
+        level: 5,
+        marker,
+        questLog: [],
+        questsDone: [],
+        inventory: [{ itemId: 'iron_ore', count: 1, instance: { signer } }],
+      }) as unknown as CharacterState;
+
+    async function signerOf(characterId: number): Promise<string | undefined> {
+      const res = await pool.query(
+        `SELECT state->'inventory'->0->'instance'->>'signer' AS signer FROM characters WHERE id = $1`,
+        [characterId],
+      );
+      return res.rows[0]?.signer ?? undefined;
+    }
+
+    async function levelOf(characterId: number): Promise<number | undefined> {
+      const res = await pool.query(`SELECT level FROM characters WHERE id = $1`, [characterId]);
+      return res.rows[0] ? Number(res.rows[0].level) : undefined;
+    }
+
+    const stubBooks = () => ({
+      rekeyMarketSeller: () => false,
+      saveMarket: async () => {},
+      rekeyMailOwner: () => false,
+      saveMail: async () => {},
+    });
+
+    let consoleError: ReturnType<typeof vi.spyOn>;
+    let loggerError: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      loggerError = vi.spyOn(logger, 'error').mockImplementation(() => {});
+    });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('the rename own-signer sweep lands with no lease and refuses under a live one, per character', async () => {
+      const free = await makeCharacter();
+      const leased = await makeCharacter();
+      await grantLease(leased, 'live-nonce', 3600);
+
+      await characters.rekeyRenamedCharacterOwnSigner(
+        free,
+        9,
+        SIGNED('rename-ok', 'Oldname'),
+        'Oldname',
+        'Newname',
+      );
+      expect(await signerOf(free)).toBe('Newname');
+      expect(await markerOf(free)).toBe('rename-ok');
+      expect(await levelOf(free)).toBe(9);
+      expect(consoleError).not.toHaveBeenCalled();
+
+      // The neighbour's live lease refuses ONLY the neighbour: nothing lands,
+      // nothing throws, one logged line.
+      await expect(
+        characters.rekeyRenamedCharacterOwnSigner(
+          leased,
+          9,
+          SIGNED('must-not-land', 'Oldname'),
+          'Oldname',
+          'Newname',
+        ),
+      ).resolves.toBeUndefined();
+      expect(await signerOf(leased)).toBeUndefined();
+      expect(await markerOf(leased)).toBeUndefined();
+      expect(await levelOf(leased)).toBe(1);
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(String(consoleError.mock.calls[0][0])).toContain('lease');
+    });
+
+    it('the reclaim holder sweep lands with no lease and refuses under a live one, per character', async () => {
+      const free = await makeCharacter();
+      const leased = await makeCharacter();
+      await grantLease(leased, 'live-nonce', 3600);
+
+      await characters.rekeyReclaimedCharacterWorldState(stubBooks(), {
+        id: free,
+        archivedName: 'Freeda',
+        freedName: 'Freed',
+        level: 4,
+        state: SIGNED('reclaim-ok', 'Freed'),
+      });
+      expect(await signerOf(free)).toBe('Freeda');
+      expect(await markerOf(free)).toBe('reclaim-ok');
+      expect(await levelOf(free)).toBe(4);
+      expect(consoleError).not.toHaveBeenCalled();
+
+      await expect(
+        characters.rekeyReclaimedCharacterWorldState(stubBooks(), {
+          id: leased,
+          archivedName: 'Freeda',
+          freedName: 'Freed',
+          level: 4,
+          state: SIGNED('must-not-land', 'Freed'),
+        }),
+      ).resolves.toBeUndefined();
+      expect(await signerOf(leased)).toBeUndefined();
+      expect(await markerOf(leased)).toBeUndefined();
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(String(consoleError.mock.calls[0][0])).toContain('lease');
+    });
+
+    it('the PBE boost roster save lands the level column with no lease and refuses under a live one', async () => {
+      const free = await makeCharacter();
+      const leased = await makeCharacter();
+      await grantLease(leased, 'live-nonce', 3600);
+
+      await pbe.defaultBoostDeps.saveState(free, pbe.BOOST_LEVEL, STATE('boost-ok'));
+      expect(await levelOf(free)).toBe(pbe.BOOST_LEVEL);
+      expect(await markerOf(free)).toBe('boost-ok');
+      expect(loggerError).not.toHaveBeenCalled();
+
+      await expect(
+        pbe.defaultBoostDeps.saveState(leased, pbe.BOOST_LEVEL, STATE('must-not-land')),
+      ).resolves.toBeUndefined();
+      expect(await levelOf(leased)).toBe(1);
+      expect(await markerOf(leased)).toBeUndefined();
+      expect(loggerError).toHaveBeenCalledTimes(1);
+    });
+
+    it('the writers land once the lease is EXPIRED (the crashed-process arm)', async () => {
+      const id = await makeCharacter();
+      await grantLease(id, 'stale-nonce', -60);
+      await characters.rekeyRenamedCharacterOwnSigner(
+        id,
+        9,
+        SIGNED('expired-ok', 'Oldname'),
+        'Oldname',
+        'Newname',
+      );
+      expect(await signerOf(id)).toBe('Newname');
+      expect(consoleError).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('the existence probe (characterStateExists, the clear-item-name refusal arm)', () => {
+    // The SELECT 1 the refusal arm asks instead of re-loading the blob (the
+    // Phase 18 clear-item-name-select1 item): it must answer exactly what
+    // the first load (getCharacterById, id-realm) plus its state-not-null
+    // qualifier answers, so a lease refusal and a vanished row can never be
+    // confused in either direction.
+    it('answers true for a row carrying a state on this realm', async () => {
+      const id = await makeCharacter();
+      expect(await clearItemNameDb.characterStateExists(id)).toBe(true);
+      // A live lease does not change existence: this is what lets the
+      // refusal arm read a fenced-out write as the retry line.
+      await grantLease(id, 'live-nonce', 3600);
+      expect(await clearItemNameDb.characterStateExists(id)).toBe(true);
+    });
+
+    it("answers false for a null-state row, a missing row, and another realm's row", async () => {
+      const acc = await pool.query(
+        `INSERT INTO accounts (username, password_hash) VALUES ($1, 'x') RETURNING id`,
+        [`csprobe_${seq()}`],
+      );
+      const nullState = await pool.query(
+        `INSERT INTO characters (account_id, name, class, realm, level, state)
+           VALUES ($1, $2, 'warrior', $3, 1, NULL) RETURNING id`,
+        [Number(acc.rows[0].id), `CSProbe${seq()}`, realm],
+      );
+      expect(await clearItemNameDb.characterStateExists(Number(nullState.rows[0].id))).toBe(false);
+      expect(await clearItemNameDb.characterStateExists(999_998)).toBe(false);
+      const other = await pool.query(
+        `INSERT INTO characters (account_id, name, class, realm, level, state)
+           VALUES ($1, $2, 'warrior', $3, 1, '{}'::jsonb) RETURNING id`,
+        [Number(acc.rows[0].id), `CSProbeX${seq()}`, `${realm}-other`],
+      );
+      expect(await clearItemNameDb.characterStateExists(Number(other.rows[0].id))).toBe(false);
     });
   });
 

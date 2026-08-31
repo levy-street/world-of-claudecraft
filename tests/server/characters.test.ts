@@ -720,8 +720,12 @@ describe('create handler', () => {
       level: 3,
       state: orphanState,
     }));
-    const saveCharacterState = vi.fn(async () => true);
-    setCharactersDbForTests({ createCharacterCapped, reclaimDeactivatedName, saveCharacterState });
+    const saveOfflineCharacterState = vi.fn(async () => true);
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName,
+      saveOfflineCharacterState,
+    });
     const rekeyMarketSeller = vi.fn(() => true);
     const rekeyMailOwner = vi.fn(() => true);
     const saveMarket = vi.fn(async () => {});
@@ -745,8 +749,8 @@ describe('create handler', () => {
     expect(saveMail).toHaveBeenCalledTimes(1);
     // The rename path's third rekey runs here too: the orphan's own signed
     // instances follow the archived identity, and the swept blob is saved.
-    expect(saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(saveCharacterState).toHaveBeenCalledWith(900, 3, orphanState);
+    expect(saveOfflineCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(900, 3, orphanState);
     expect(
       (orphanState as unknown as { inventory: { instance: { signer: string } }[] }).inventory[0]
         .instance.signer,
@@ -760,7 +764,7 @@ describe('create handler', () => {
       .fn()
       .mockRejectedValueOnce({ code: '23505' })
       .mockResolvedValueOnce(charRow({ id: 12, name: 'Valid', class: 'warrior', level: 1 }));
-    const saveCharacterState = vi.fn(async () => true);
+    const saveOfflineCharacterState = vi.fn(async () => true);
     setCharactersDbForTests({
       createCharacterCapped,
       reclaimDeactivatedName: async () => ({
@@ -770,7 +774,7 @@ describe('create handler', () => {
         level: 1,
         state: st({ inventory: [{ itemId: 'iron_ore', count: 1 }] }),
       }),
-      saveCharacterState,
+      saveOfflineCharacterState,
     });
     const rekeyMarketSeller = vi.fn(() => false);
     const rekeyMailOwner = vi.fn(() => false);
@@ -786,7 +790,52 @@ describe('create handler', () => {
     expect(rekeyMailOwner).toHaveBeenCalledTimes(1);
     expect(saveMarket).not.toHaveBeenCalled();
     expect(saveMail).not.toHaveBeenCalled();
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('a reclaim sweep the load lease fence refuses logs, moves on, and still completes the create', async () => {
+    // The sweep's blob save is the lease-fenced OFFLINE writer (db.ts
+    // saveOfflineCharacterState, the Phase 18 unfenced-offline-writers item):
+    // a deactivated account cannot hold a live session, so the fence should
+    // always admit, but a 0-row answer is the fence's refusal, not a throw,
+    // and it rides the sweep's swallow-and-log contract: the committed
+    // reclaim must never 500 or skip the create retry because of it.
+    const createCharacterCapped = vi
+      .fn()
+      .mockRejectedValueOnce({ code: '23505' })
+      .mockResolvedValueOnce(charRow({ id: 13, name: 'Valid', class: 'warrior', level: 1 }));
+    const orphanState = st({
+      inventory: [{ itemId: 'iron_ore', count: 2, instance: { signer: 'Valid' } }],
+    });
+    const saveOfflineCharacterState = vi.fn(async () => false);
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({
+        id: 903,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 3,
+        state: orphanState,
+      }),
+      saveOfflineCharacterState,
+    });
+    installRuntime({
+      rekeyMarketSeller: vi.fn(() => false),
+      rekeyMailOwner: vi.fn(() => false),
+    });
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: 13, name: 'Valid' });
+    expect(createCharacterCapped).toHaveBeenCalledTimes(2);
+    // The fenced write was attempted exactly once, with the swept blob.
+    expect(saveOfflineCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(903, 3, orphanState);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain('lease');
   });
 
   it('409s when the reclaimed name collides AGAIN on the retry (second 23505)', async () => {
@@ -1338,10 +1387,10 @@ describe('rename handler', () => {
       equipmentInstance: { chest: { signer: 'Oldname', enchant: 'ench_minor_stamina' } },
     });
     const renamed = charRow({ id: 5, name: 'Newname', level: 8, force_rename: false, state: blob });
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveOfflineCharacterState });
     installRuntime({ isCharacterOnline: () => false });
 
     const character = charRow({ id: 5, name: 'Oldname', level: 8, force_rename: true });
@@ -1351,9 +1400,9 @@ describe('rename handler', () => {
       body: { name: 'Newname' },
     });
     expect(res.status).toBe(200);
-    expect(saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(saveCharacterState).toHaveBeenCalledWith(5, 8, blob);
-    const saved = saveCharacterState.mock.calls[0][2];
+    expect(saveOfflineCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 8, blob);
+    const saved = saveOfflineCharacterState.mock.calls[0][2];
     expect(saved.inventory).toEqual([
       { itemId: 'bone_fragments', count: 3, instance: { signer: 'Newname' } },
       { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
@@ -1366,15 +1415,45 @@ describe('rename handler', () => {
     });
   });
 
+  it('a rename sweep the load lease fence refuses logs, moves on, and still 200s', async () => {
+    // The own-signer sweep rides the lease-fenced OFFLINE writer (db.ts
+    // saveOfflineCharacterState, the Phase 18 unfenced-offline-writers item).
+    // isCharacterOnline stays the fast-path courtesy; the in-statement fence
+    // is the guarantee (a login mid-handshake, a session on a peer process),
+    // and its 0-row refusal logs and moves on: the rename already committed,
+    // so the response must not 500 over the sweep.
+    const blob = st({
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'Oldname' } }],
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', level: 8, force_rename: false, state: blob });
+    const saveOfflineCharacterState = vi.fn(async () => false);
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveOfflineCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const character = charRow({ id: 5, name: 'Oldname', level: 8, force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: 5, name: 'Newname' });
+    expect(saveOfflineCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 8, blob);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain('lease');
+  });
+
   it('skips the state save when no held instance carried the old name', async () => {
     const blob = st({
       inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } }],
     });
     const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: blob });
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveOfflineCharacterState });
     installRuntime({ isCharacterOnline: () => false });
 
     const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
@@ -1384,7 +1463,7 @@ describe('rename handler', () => {
       body: { name: 'Newname' },
     });
     expect(res.status).toBe(200);
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
     // The foreign-signed copy passed through the no-op sweep untouched.
     expect(blob.inventory).toEqual([
       { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
@@ -1393,10 +1472,10 @@ describe('rename handler', () => {
 
   it('skips the state save when the renamed row carries no state blob', async () => {
     const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: null });
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveOfflineCharacterState });
     installRuntime({ isCharacterOnline: () => false });
 
     const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
@@ -1406,7 +1485,7 @@ describe('rename handler', () => {
       body: { name: 'Newname' },
     });
     expect(res.status).toBe(200);
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 
   it('400s an invalid new name (normalizeCharName -> null) before the force_rename gate', async () => {
@@ -1960,15 +2039,15 @@ describe('rekeyRenamedCharacterOwnSigner', () => {
       },
       equipmentInstance: { chest: { signer: 'Oldname', enchant: 'ench_minor_stamina' } },
     } as unknown as CharacterState;
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ saveCharacterState });
+    setCharactersDbForTests({ saveOfflineCharacterState });
 
     await rekeyRenamedCharacterOwnSigner(5, 8, state, 'Oldname', 'Newname');
 
-    expect(saveCharacterState).toHaveBeenCalledTimes(1);
-    expect(saveCharacterState).toHaveBeenCalledWith(5, 8, state);
+    expect(saveOfflineCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 8, state);
     expect(state.inventory?.[0].instance?.signer).toBe('Newname');
     expect(state.bank?.inventory[0].instance?.signer).toBe('Newname');
     expect(state.equipmentInstance?.chest?.signer).toBe('Newname');
@@ -1979,24 +2058,24 @@ describe('rekeyRenamedCharacterOwnSigner', () => {
     const state = {
       inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } }],
     } as unknown as CharacterState;
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ saveCharacterState });
+    setCharactersDbForTests({ saveOfflineCharacterState });
 
     await rekeyRenamedCharacterOwnSigner(5, 8, state, 'Oldname', 'Newname');
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
     expect(state.inventory?.[0].instance?.signer).toBe('SomeoneElse');
   });
 
   it('skips the save when the renamed row carries no state blob', async () => {
-    const saveCharacterState = vi.fn(
+    const saveOfflineCharacterState = vi.fn(
       async (_characterId: number, _level: number, _state: CharacterState) => true,
     );
-    setCharactersDbForTests({ saveCharacterState });
+    setCharactersDbForTests({ saveOfflineCharacterState });
 
     await rekeyRenamedCharacterOwnSigner(5, 8, null, 'Oldname', 'Newname');
-    expect(saveCharacterState).not.toHaveBeenCalled();
+    expect(saveOfflineCharacterState).not.toHaveBeenCalled();
   });
 });
 

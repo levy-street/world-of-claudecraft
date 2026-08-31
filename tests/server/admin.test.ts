@@ -48,6 +48,7 @@ import {
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
 import { characterProfessionsSheet } from '../../server/character_professions';
+import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
@@ -4337,6 +4338,33 @@ describe('phase 13 legendary-name strip (clear-item-name)', () => {
     });
     expect(recordItemNameClear).toHaveBeenCalled();
     expect(saveOfflineCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('a fenced-out save asks the SELECT 1 probe, never a second blob load, to pick the lease line', async () => {
+    // The binder wires the refusal arm's existence probe (server/db.ts side:
+    // clear_item_name_db.ts characterStateExists) beside the blob read, so
+    // the endpoint's retry line costs one SELECT 1 and the blob loads once
+    // (the Phase 18 clear-item-name-select1 item).
+    const getCharacterById = vi.fn(
+      async () => ({ id: 5, level: 20, state: NAMED_STATE() }) as never,
+    );
+    const characterStateExists = vi.fn(async () => true);
+    authedAdminDb({
+      recordItemNameClear: vi.fn(async () => ({ accountId: 9 })),
+      saveOfflineCharacterState: vi.fn(async () => false),
+      getCharacterById,
+      characterStateExists,
+    } as never);
+    installAdminRuntime({ adminCharacterOnline: vi.fn(() => false) });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/clear-item-name', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { all: true, reason: 'slur' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: CHARACTER_SAVE_LEASED_LINE });
+    expect(characterStateExists).toHaveBeenCalledWith(5);
+    expect(getCharacterById).toHaveBeenCalledTimes(1);
   });
 });
 
