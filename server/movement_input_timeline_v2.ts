@@ -90,6 +90,7 @@ export function applyMovementInputFrame(
         facing: frame.facing,
       });
     }
+    if (ctx) noteBattlegroundWallPressure(ctx, meta, entity, frame.moveInput);
     return frame;
   }
   if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);

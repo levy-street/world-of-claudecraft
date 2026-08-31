@@ -42,6 +42,7 @@ import {
   type Entity,
   emptyMoveInput,
   isConsuming,
+  type MoveInput,
   type UnstuckArea,
   type UnstuckBlockedReason,
   type UnstuckCancelReason,
@@ -182,17 +183,22 @@ function sameArea(a: UnstuckArea, b: UnstuckArea): boolean {
 }
 
 function hasMoveInput(meta: PlayerMeta): boolean {
-  const input = meta.moveInput;
+  return inputHasMove(meta.moveInput);
+}
+
+function inputHasMove(input: MoveInput): boolean {
   return input.forward || input.back || input.strafeLeft || input.strafeRight || input.jump;
 }
 
-function hasAnyMovementInput(meta: PlayerMeta): boolean {
-  const input = meta.moveInput;
-  return hasMoveInput(meta) || input.turnLeft || input.turnRight || input.dive || input.surface;
+function inputHasAnyMovement(input: MoveInput): boolean {
+  return inputHasMove(input) || input.turnLeft || input.turnRight || input.dive || input.surface;
 }
 
-function moveInputVector(meta: PlayerMeta, p: Entity): { x: number; z: number } | null {
-  const input = meta.moveInput;
+function hasAnyMovementInput(meta: PlayerMeta): boolean {
+  return inputHasAnyMovement(meta.moveInput);
+}
+
+function inputMoveVector(input: MoveInput, p: Entity): { x: number; z: number } | null {
   let mx = 0;
   let mz = 0;
   if (input.forward) mz += 1;
@@ -206,6 +212,10 @@ function moveInputVector(meta: PlayerMeta, p: Entity): { x: number; z: number } 
   const sin = Math.sin(p.facing);
   const cos = Math.cos(p.facing);
   return { x: mz * sin - mx * cos, z: mz * cos + mx * sin };
+}
+
+function moveInputVector(meta: PlayerMeta, p: Entity): { x: number; z: number } | null {
+  return inputMoveVector(meta.moveInput, p);
 }
 
 function forcedAction(p: Entity): boolean {
@@ -264,6 +274,7 @@ export function noteBattlegroundWallPressure(
   ctx: SimContext | undefined,
   meta: PlayerMeta,
   p: Entity,
+  input: MoveInput = meta.moveInput,
 ): void {
   if (!ctx?.bgMatches) return;
   const grace = battlegroundWallPressGrace.get(ctx);
@@ -271,13 +282,14 @@ export function noteBattlegroundWallPressure(
     grace?.delete(p.id);
     return;
   }
-  if (battlegroundBlockedWallPress(ctx, meta, p)) {
+  const wish = inputMoveVector(input, p);
+  if (wish && activeBattlegroundAt(ctx, p) && battlegroundBlockedProbe(ctx, p, wish)) {
     const activeGrace = grace ?? new Map<number, number>();
     if (!grace) battlegroundWallPressGrace.set(ctx, activeGrace);
     activeGrace.set(p.id, ctx.time + BG_WALL_PRESS_ESC_GRACE_SECONDS);
     return;
   }
-  if (hasAnyMovementInput(meta)) grace?.delete(p.id);
+  if (inputHasAnyMovement(input)) grace?.delete(p.id);
 }
 
 function battlegroundBlockedProbe(
