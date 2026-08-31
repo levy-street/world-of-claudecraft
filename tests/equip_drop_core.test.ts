@@ -12,9 +12,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot, InvSlot, ItemDef } from '../src/sim/types';
-import { itemCopyPin } from '../src/sim/item_copy_ref';
 import {
   draggedCopySlotIndex,
   dropRequiredLevel,
